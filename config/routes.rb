@@ -1,9 +1,20 @@
 Cdp::Application.routes.draw do
+  resources :subscribers
+
+  resources :facilities
+
+  resources :work_groups
+
+  resources :reports
+
+  devise_for :users
+
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  # root 'welcome#index'
+  root 'work_groups#index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
