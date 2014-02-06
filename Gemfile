@@ -6,6 +6,8 @@ gem 'sass-rails', '~> 4.0.0'
 gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'jquery-rails'
+gem 'haml-rails'
+gem 'underscore-rails'
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
@@ -32,11 +34,16 @@ gem 'omniauth'
 gem 'cancan'
 gem "elasticsearch"
 
+gem 'oj'
+# gem 'guid'
+
 gem 'pry-byebug', group: [:development, :test]
 
 group :test do
   gem "tire"
-  gem "factory_girl_rails"
+  # gem "factory_girl_rails"
+  gem 'faker'
+  gem 'machinist'
   gem "capybara"
   gem "guard-rspec"
   gem 'rspec'

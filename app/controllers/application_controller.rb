@@ -3,4 +3,8 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
   before_filter :authenticate_user!
+
+  def render_json(object, params={})
+    render params.merge(text: object.to_json_oj, content_type: 'text/json')
+  end
 end

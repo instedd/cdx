@@ -14,26 +14,17 @@ class ElasticRecord
   end
 
   def self.for(index, type)
-    table = Class.new(self)
-    table.index = index
-    table.type = type
-    table.client = Elasticsearch::Client.new log: false
-    # table.columns.each do |column|
-    #   begin
-    #     table.class_eval <<-METHODS, __FILE__, __LINE__ + 1
-    #       def #{column.underscore}
-    #         properties["#{column}"]
-    #       end
-
-    #       def #{column.underscore}= new_value
-    #         properties["#{column}"] = new_value
-    #       end
-    #     METHODS
-    #   rescue SyntaxError => e
-    #     # The column name was probably a GUID and it doesn't make sense to generate a method
-    #   end
-    # end
-    table
+    record = Class.new(self)
+    record.instance_eval do
+      extend ActiveModel::Naming
+      def name
+        type.camelize
+      end
+    end
+    record.index = index
+    record.type = type
+    record.client = Elasticsearch::Client.new log: false
+    record
   end
 
   def self.where(*options)
@@ -54,6 +45,10 @@ class ElasticRecord
 
   def self.all
     ElasticQuery.new(self)
+  end
+
+  def self.first
+    all.first
   end
 
   def self.columns
