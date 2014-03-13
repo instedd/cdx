@@ -47,8 +47,12 @@ class ElasticRecord
     ElasticQuery.new(self)
   end
 
+  def self.count
+    self.all.count
+  end
+
   def self.first
-    all.first
+    self.all.first
   end
 
   def self.columns
@@ -99,8 +103,9 @@ class ElasticRecord
     object
   end
 
-  def self.create(properties)
-    self.new(properties).save!
+  def self.create(objects)
+    objects = [objects] unless objects.kind_of?(Array)
+    objects.map { |o| self.new(o) }.each &:save!
   end
 
   def destroy
@@ -111,7 +116,7 @@ class ElasticRecord
     client.delete index: index, type: type, id: object.id, refresh: true
   end
 
-  def as_json
-    { id: id, created_at: created_at, updated_at: updated_at }.merge properties
+  def as_json extras = {}
+    { id: id, created_at: created_at, updated_at: updated_at }.merge(properties: properties).merge extras
   end
 end

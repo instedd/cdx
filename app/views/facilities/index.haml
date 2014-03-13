@@ -1,0 +1,20 @@
+%h1 Listing facilities
+= link_to 'Back', root_path
+%table
+  %thead
+    %tr
+      %th Name
+      %th Work group
+      %th
+      %th
+      %th
+  %tbody
+    - @facilities.each do |facility|
+      %tr
+        %td= facility.name
+        %td= facility.work_group.try(:name)
+        %td= link_to 'Show', facility
+        %td= link_to 'Edit', edit_facility_path(facility)
+        %td= link_to 'Destroy', facility, method: :delete, data: { confirm: 'Are you sure?' }
+%br/
+= link_to 'New Facility', new_facility_path

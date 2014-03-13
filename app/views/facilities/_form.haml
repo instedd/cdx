@@ -1,0 +1,19 @@
+= form_for(@facility) do |f|
+  - if @facility.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@facility.errors.count, "error")
+        prohibited this facility from being saved:
+      %ul
+        - @facility.errors.full_messages.each do |msg|
+          %li= msg
+  .field
+    = f.label :name
+    %br/
+    = f.text_field :name
+  .field
+    = f.label :work_group_id
+    %br/
+    = f.collection_select :work_group_id, @work_groups, :id, :name
+  .actions
+    = f.submit

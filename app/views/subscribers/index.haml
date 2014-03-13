@@ -1,0 +1,24 @@
+%h1 Listing subscribers
+= link_to 'Back', root_path
+%table
+  %thead
+    %tr
+      %th Name
+      %th Work group
+      %th Callback url
+      %th Auth token
+      %th
+      %th
+      %th
+  %tbody
+    - @subscribers.each do |subscriber|
+      %tr
+        %td= subscriber.name
+        %td= subscriber.work_group.try(:name)
+        %td= truncate(subscriber.callback_url, length: 20)
+        %td= truncate(subscriber.auth_token, length: 12)
+        %td= link_to 'Show', subscriber
+        %td= link_to 'Edit', edit_subscriber_path(subscriber)
+        %td= link_to 'Destroy', subscriber, method: :delete, data: { confirm: 'Are you sure?' }
+%br/
+= link_to 'New Subscriber', new_subscriber_path

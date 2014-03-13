@@ -1,5 +1,6 @@
 class SubscribersController < ApplicationController
   before_action :set_subscriber, only: [:show, :edit, :update, :destroy]
+  before_action :load_work_groups, only: [:new, :edit]
 
   def index
     @subscribers = Subscriber.all
@@ -57,6 +58,10 @@ class SubscribersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def subscriber_params
-      params.require(:subscriber).permit(:name, :work_group_id, :callback_url)
+      params.require(:subscriber).permit(:name, :work_group_id, :callback_url, :auth_token)
+    end
+
+    def load_work_groups
+      @work_groups = current_user.work_groups
     end
 end

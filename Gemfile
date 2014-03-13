@@ -32,7 +32,8 @@ end
 gem 'devise'
 gem 'omniauth'
 gem 'cancan'
-gem "elasticsearch"
+gem 'elasticsearch'
+gem 'bunny'
 
 gem 'oj'
 # gem 'guid'
@@ -40,12 +41,12 @@ gem 'oj'
 gem 'pry-byebug', group: [:development, :test]
 
 group :test do
-  gem "tire"
-  # gem "factory_girl_rails"
+  gem 'tire'
+  # gem 'factory_girl_rails'
   gem 'faker'
   gem 'machinist'
-  gem "capybara"
-  gem "guard-rspec"
+  gem 'capybara'
+  gem 'guard-rspec'
   gem 'rspec'
   gem 'rspec-rails'
   gem 'vcr'

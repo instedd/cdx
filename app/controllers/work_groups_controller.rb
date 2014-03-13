@@ -2,7 +2,7 @@ class WorkGroupsController < ApplicationController
   before_action :set_work_group, only: [:show, :edit, :update, :destroy]
 
   def index
-    @work_groups = WorkGroup.all
+    @work_groups = current_user.work_groups
   end
 
   def show
@@ -16,7 +16,7 @@ class WorkGroupsController < ApplicationController
   end
 
   def create
-    @work_group = WorkGroup.new(work_group_params)
+    @work_group = current_user.work_groups.new(work_group_params)
 
     respond_to do |format|
       if @work_group.save

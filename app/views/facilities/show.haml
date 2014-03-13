@@ -1,0 +1,10 @@
+%p#notice= notice
+%p
+  %strong Name:
+  = @facility.name
+%p
+  %strong Work group:
+  = @facility.work_group.try(:name)
+= link_to 'Edit', edit_facility_path(@facility)
+|
+= link_to 'Back', facilities_path

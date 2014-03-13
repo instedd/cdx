@@ -20,6 +20,8 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 # If you are not using ActiveRecord, you can remove this line.
 ActiveRecord::Migration.check_pending! if defined?(ActiveRecord::Migration)
 
+FakeWeb.allow_net_connect = %r[^https?://localhost]
+
 RSpec.configure do |config|
   # ## Mock Framework
   #
@@ -49,4 +51,9 @@ RSpec.configure do |config|
   config.order = "random"
 
   config.include Devise::TestHelpers, :type => :controller
+
+  config.before(:each) do
+    Timecop.return
+    FakeWeb.clean_registry
+  end
 end

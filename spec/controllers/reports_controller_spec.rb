@@ -10,8 +10,14 @@ describe ReportsController do
   after(:each) {Elasticsearch::Client.new(log: false).indices.delete index: work_group.index_name}
 
   it 'Should notify subscribers' do
-    Subscriber.create! name: 'foo', callback_url: 'bar'
+    FakeWeb.register_uri(:get, "http://mbuilder.instedd.org:3001/external/application/3/trigger/asd?auth_token=4Q5E6RLZoLDbs0Gk3JqiQ5--GCLt7lLyBD37c-2l8Ys&data='facility_id':'#{facility.id}','result':'positive','test_id':'12345','patient_id':'123'", :body => "todo ok", :status => ["200", "OK"], :content_type => "application/json; charset=utf-8")
+
+    work_group.subscribers.create! name: 'foo', callback_url: 'http://mbuilder.instedd.org:3001/external/application/3/trigger/asd', auth_token: '4Q5E6RLZoLDbs0Gk3JqiQ5--GCLt7lLyBD37c-2l8Ys'
+
     post :create, report: {facility_id: facility.id, result: 'positive', test_id: '12345', patient_id: '123'}, format: :json
+
+    FakeWeb.last_request.method.should eq("GET")
+    FakeWeb.last_request['host'].should eq("mbuilder.instedd.org:3001")
 
     report.first.properties[:facility_id].should eq(facility.id)
     report.first.properties[:result].should eq('positive')

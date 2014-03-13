@@ -11,12 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140204134837) do
+ActiveRecord::Schema.define(version: 20140312144328) do
 
   create_table "facilities", force: true do |t|
     t.string   "name"
     t.integer  "work_group_id"
-    t.string   "index_name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -29,6 +28,7 @@ ActiveRecord::Schema.define(version: 20140204134837) do
     t.integer  "work_group_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "auth_token"
   end
 
   add_index "subscribers", ["work_group_id"], name: "index_subscribers_on_work_group_id", using: :btree

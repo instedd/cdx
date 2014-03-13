@@ -1,5 +1,6 @@
 class FacilitiesController < ApplicationController
   before_action :set_facility, only: [:show, :edit, :update, :destroy]
+  before_action :load_work_groups, only: [:new, :edit]
 
   def index
     @facilities = Facility.all
@@ -58,5 +59,9 @@ class FacilitiesController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def facility_params
       params.require(:facility).permit(:name, :work_group_id, :index_name)
+    end
+
+    def load_work_groups
+      @work_groups = current_user.work_groups
     end
 end
