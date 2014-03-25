@@ -12,8 +12,11 @@ defmodule ApplicationRouter do
   # routers, forwarding the requests between them:
   # forward "/posts", to: PostsRouter
 
-  get "/" do
-    conn = conn.assign(:title, "Welcome to Dynamo!")
+  get "/devices/:device_id" do
+    {device_id, ""} = Integer.parse device_id
+    device = CdpElixir.Repo.get CdpElixir.Device, device_id
+
+    conn = conn.assign(:title, "Welcome to device #{device.name}!")
     render conn, "index.html"
   end
 

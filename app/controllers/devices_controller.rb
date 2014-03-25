@@ -1,5 +1,5 @@
 class DevicesController < ApplicationController
-  before_action :set_2, only: [:show, :edit, :update, :destroy]
+  before_action :set_device, only: [:show, :edit, :update, :destroy]
   before_action :load_work_groups, only: [:new, :edit]
 
   def index
