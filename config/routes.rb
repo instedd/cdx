@@ -1,7 +1,7 @@
 Cdp::Application.routes.draw do
   resources :subscribers
 
-  resources :facilities
+  resources :devices
 
   resources :work_groups
 

@@ -20,7 +20,7 @@ WorkGroup.blueprint do
   name
 end
 
-Facility.blueprint do
+Device.blueprint do
   work_group
   name
 end

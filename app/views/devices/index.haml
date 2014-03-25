@@ -1,0 +1,20 @@
+%h1 Listing devices
+= link_to 'Back', root_path
+%table
+  %thead
+    %tr
+      %th Name
+      %th Work group
+      %th
+      %th
+      %th
+  %tbody
+    - @devices.each do |device|
+      %tr
+        %td= device.name
+        %td= device.work_group.try(:name)
+        %td= link_to 'Show', device
+        %td= link_to 'Edit', edit_device_path(device)
+        %td= link_to 'Destroy', device, method: :delete, data: { confirm: 'Are you sure?' }
+%br/
+= link_to 'New device', new_device_path

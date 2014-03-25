@@ -1,7 +1,7 @@
 class WorkGroup < ActiveRecord::Base
   belongs_to :user
   has_many :subscribers
-  has_many :facilities
+  has_many :devices
 
   if Rails.env.test?
     def index_name
