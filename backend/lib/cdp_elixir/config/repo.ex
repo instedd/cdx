@@ -1,4 +1,4 @@
-defmodule CdpElixir.Repo do
+defmodule Cdp.Repo do
   use Ecto.Repo, adapter: Ecto.Adapters.Postgres
 
   def conf do

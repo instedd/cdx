@@ -1,4 +1,4 @@
-defmodule CdpElixir.Dynamo do
+defmodule Cdp.Dynamo do
   use Dynamo
 
   config :dynamo,
@@ -6,7 +6,7 @@ defmodule CdpElixir.Dynamo do
     env: Mix.env,
 
     # The OTP application associated with this Dynamo
-    otp_app: :cdp_elixir,
+    otp_app: :cdp,
 
     # The endpoint to dispatch requests to
     endpoint: ApplicationRouter,
@@ -19,7 +19,7 @@ defmodule CdpElixir.Dynamo do
   # config :dynamo,
   #   session_store: Session.CookieStore,
   #   session_options:
-  #     [ key: "_cdp_elixir_session",
+  #     [ key: "_cdp_session",
   #       secret: "2Lwu7wWrJjoR2TORXyuNdBAWEYUA0wfLX4KeuqACQ5J1QXGB3Nx73YjaJ1htPCLz"]
 
   # Default functionality available in templates

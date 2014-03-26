@@ -15,7 +15,7 @@
 /log/*.log
 /tmp
 
-cdp_elixir/_build
-cdp_elixir/deps
-cdp_elixir/tmp
-cdp_elixir/erl_crash.dump
+backend/_build
+backend/deps
+backend/tmp
+backend/erl_crash.dump

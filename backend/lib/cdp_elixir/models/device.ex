@@ -1,4 +1,4 @@
-defmodule CdpElixir.Device do
+defmodule Cdp.Device do
   use Ecto.Model
 
   queryable "devices" do

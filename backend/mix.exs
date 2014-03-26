@@ -1,11 +1,11 @@
-defmodule CdpElixir.Mixfile do
+defmodule Cdp.Mixfile do
   use Mix.Project
 
   def project do
-    [ app: :cdp_elixir,
+    [ app: :cdp,
       version: "0.0.1",
       build_per_environment: true,
-      dynamos: [CdpElixir.Dynamo],
+      dynamos: [Cdp.Dynamo],
       compilers: [:elixir, :dynamo, :app],
       deps: deps ]
   end
@@ -13,7 +13,7 @@ defmodule CdpElixir.Mixfile do
   # Configuration for the OTP application
   def application do
     [ applications: [:cowboy, :dynamo, :postgrex, :ecto],
-      mod: { CdpElixir, [] } ]
+      mod: { Cdp, [] } ]
   end
 
   defp deps do

@@ -1,4 +1,4 @@
-defmodule CdpElixir do
+defmodule Cdp do
   use Application.Behaviour
 
   @doc """
@@ -6,11 +6,11 @@ defmodule CdpElixir do
   application and its Dynamos.
   """
   def start(_type, _args) do
-    CdpElixir.Sup.start_link
+    Cdp.Sup.start_link
   end
 end
 
-defmodule CdpElixir.Sup do
+defmodule Cdp.Sup do
   use Supervisor.Behaviour
 
   def start_link do
@@ -19,8 +19,8 @@ defmodule CdpElixir.Sup do
 
   def init([]) do
     tree = [
-      worker(CdpElixir.Repo, []),
-      worker(CdpElixir.Dynamo, [[max_restarts: 5, max_seconds: 5]]),
+      worker(Cdp.Repo, []),
+      worker(Cdp.Dynamo, [[max_restarts: 5, max_seconds: 5]]),
     ]
     supervise(tree, strategy: :one_for_all)
   end

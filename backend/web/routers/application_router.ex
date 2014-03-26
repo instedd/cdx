@@ -14,7 +14,7 @@ defmodule ApplicationRouter do
 
   get "/devices/:device_id" do
     {device_id, ""} = Integer.parse device_id
-    device = CdpElixir.Repo.get CdpElixir.Device, device_id
+    device = Cdp.Repo.get Cdp.Device, device_id
 
     conn = conn.assign(:title, "Welcome to device #{device.name}!")
     render conn, "index.html"
