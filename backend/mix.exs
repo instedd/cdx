@@ -22,6 +22,8 @@ defmodule Cdp.Mixfile do
       { :dynamo, "~> 0.1.0-dev", github: "elixir-lang/dynamo" },
       { :postgrex, github: "ericmj/postgrex" },
       { :ecto, github: "elixir-lang/ecto" },
+      { :json, github: "cblage/elixir-json" },
+      { :tirexs, github: "roundscope/tirexs" },
     ]
   end
 end
