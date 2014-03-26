@@ -30,7 +30,7 @@ defmodule Cdp.Report do
 
     settings = Tirexs.ElasticSearch.Config.new()
 
-    Tirexs.Bulk.store [index: "cdp_work_group_#{device.work_group_id}", refresh: true], settings do
+    Tirexs.Bulk.store [index: Cdp.WorkGroup.elasticsearch_index_name(device.work_group_id), refresh: true], settings do
       create data_as_json
     end
   end
