@@ -1,11 +1,14 @@
 Cdp::Application.routes.draw do
   resources :subscribers
 
-  resources :devices
+  resources :devices do
+    member do
+      get 'regenerate_key'
+    end
+  end
+
 
   resources :work_groups
-
-  resources :reports
 
   devise_for :users
 

@@ -1,5 +1,5 @@
 class DevicesController < ApplicationController
-  before_action :set_device, only: [:show, :edit, :update, :destroy]
+  before_action :set_device, only: [:show, :edit, :update, :destroy, :regenerate_key]
   before_action :load_work_groups, only: [:new, :edit]
 
   def index
@@ -14,6 +14,19 @@ class DevicesController < ApplicationController
   end
 
   def edit
+  end
+
+  def regenerate_key
+    @device.set_key
+    respond_to do |format|
+      if @device.save
+        format.html { redirect_to @device, notice: 'Key updated' }
+        format.json { render action: 'show', location: @device }
+      else
+        format.html { render action: 'edit' }
+        format.json { render json: @device.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   def create

@@ -36,7 +36,7 @@ gem 'elasticsearch'
 gem 'bunny'
 
 gem 'oj'
-# gem 'guid'
+gem 'guid'
 
 gem 'pry-byebug', group: [:development, :test]
 

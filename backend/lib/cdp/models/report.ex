@@ -10,8 +10,8 @@ defmodule Cdp.Report do
     field :data, :binary
   end
 
-  def create(device_id, data) do
-    device = Cdp.Repo.get Cdp.Device, device_id
+  def create(device_key, data) do
+    device = Cdp.Device.find_by_key(device_key)
     now = Cdp.DateTime.now
 
     # Create in DB
@@ -30,7 +30,7 @@ defmodule Cdp.Report do
 
     settings = Tirexs.ElasticSearch.Config.new()
 
-    Tirexs.Bulk.store [index: "work_group_#{device.work_group_id}", refresh: true], settings do
+    Tirexs.Bulk.store [index: "cdp_work_group_#{device.work_group_id}", refresh: true], settings do
       create data_as_json
     end
   end
