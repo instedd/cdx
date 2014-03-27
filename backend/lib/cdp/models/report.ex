@@ -26,7 +26,7 @@ defmodule Cdp.Report do
 
     # Create in ElasticSearch
     {:ok, data_as_json} = JSON.decode data
-    data_as_json = HashDict.put data_as_json, :type, "report"
+    data_as_json = Dict.put data_as_json, :type, "report"
 
     settings = Tirexs.ElasticSearch.Config.new()
 

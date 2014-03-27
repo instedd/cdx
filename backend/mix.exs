@@ -24,6 +24,7 @@ defmodule Cdp.Mixfile do
       { :ecto, github: "elixir-lang/ecto" },
       { :json, github: "cblage/elixir-json" },
       { :tirexs, github: "roundscope/tirexs" },
+      { :amqp_client, github: "jbrisbin/amqp_client" },
     ]
   end
 end

@@ -1,4 +1,6 @@
-[ "cowboy": {:git, "git://github.com/extend/cowboy.git", "239e5e0ba7f413642aca3cf2735f0709a643fb8e", []},
+[ "amqp": {:git, "git://github.com/cthulhuology/Amqp.git", "cf97ca379e530ddbaa9bba30cb40ae714e9c6818", []},
+  "amqp_client": {:git, "git://github.com/jbrisbin/amqp_client.git", "2b8c2c5a3b647fc4b4733978046305acde611a43", []},
+  "cowboy": {:git, "git://github.com/extend/cowboy.git", "239e5e0ba7f413642aca3cf2735f0709a643fb8e", []},
   "cowlib": {:git, "git://github.com/extend/cowlib.git", "0d4ece08a7cce90a07cf33d4edad29bc324c7d90", [ref: "0.5.1"]},
   "decimal": {:git, "git://github.com/ericmj/decimal.git", "ab1b6637aac1eabce5dc5a57290b5366878c2e84", []},
   "dynamo": {:git, "git://github.com/elixir-lang/dynamo.git", "584d06e809fc3aa57a62a1b785204cbaa554d26e", []},
@@ -12,5 +14,6 @@
   "mimetypes": {:git, "git://github.com/spawngrid/mimetypes.git", "47d37a977a7d633199822bf6b08353007483d00f", [ref: "master"]},
   "poolboy": {:git, "git://github.com/devinus/poolboy.git", "64e1eaef0b1e88849c7e7ba9ff75f8cd4dba2a3b", []},
   "postgrex": {:git, "git://github.com/ericmj/postgrex.git", "720b45b5613ef364bca3f5228e285489bb9f01d4", []},
+  "rabbit_common": {:git, "git://github.com/jbrisbin/rabbit_common.git", "99f27775da2e1763c723e41f8b9ca0a68b24ed19", [tag: "rabbitmq-3.0.2"]},
   "ranch": {:git, "git://github.com/extend/ranch.git", "5df1f222f94e08abdcab7084f5e13027143cc222", [ref: "0.9.0"]},
   "tirexs": {:git, "git://github.com/roundscope/tirexs.git", "4d621e40e80bbf007780bd9926845bffe4e3af6e", []} ]
