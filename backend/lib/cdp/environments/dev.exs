@@ -19,3 +19,10 @@ config :dynamo,
 
 # Run on port 4000 for development
 config :server, port: 4000
+
+config :rabbit_amqp,
+  user: "guest",
+  pass: "guest",
+  vhost: "/cdp_dev",
+  subscribers_exchange: "dev_cdp_subscribers_exchange",
+  subscribers_queue: "dev_cdp_subscribers_queue"

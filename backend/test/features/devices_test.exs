@@ -34,6 +34,24 @@ defmodule DevicesTest do
     assert result["_source"]["result"] == "positive"
   end
 
+  test "enqueues in RabbitMQ", meta do
+    amqp_config = Cdp.Dynamo.config[:rabbit_amqp]
+
+    post("/devices/foo", meta[:data])
+
+    amqp = Exrabbit.Utils.connect
+    channel = Exrabbit.Utils.channel amqp
+    Exrabbit.Utils.declare_queue channel, amqp_config[:subscribers_queue]
+    Exrabbit.Utils.bind_queue channel, amqp_config[:subscribers_queue], amqp_config[:subscribers_exchange]
+    Exrabbit.Utils.get_messages channel, amqp_config[:subscribers_queue]
+    case Exrabbit.Utils.get_messages_ack channel, amqp_config[:subscribers_queue] do
+        nil -> assert false
+        [tag: tag, content: message] ->
+            assert message == meta[:data]
+            Exrabbit.Utils.ack channel, tag
+    end
+  end
+
   teardown(meta) do
     Enum.each [Cdp.WorkGroup, Cdp.Device, Cdp.Report], &Cdp.Repo.delete_all/1
     Tirexs.ElasticSearch.delete meta[:index_name], meta[:settings]
