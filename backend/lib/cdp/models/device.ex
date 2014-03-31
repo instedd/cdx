@@ -10,8 +10,8 @@ defmodule Cdp.Device do
 
   def find_by_key(device_key) do
     query = from d in Cdp.Device,
-          where: d.secret_key == ^device_key,
-         select: d
+      where: d.secret_key == ^device_key,
+      select: d
     [device] = Cdp.Repo.all(query)
     device
   end

@@ -6,7 +6,7 @@ class Rabbitmq
     @connection.start
 
     @channel = @connection.create_channel
-    @queue  = @channel.queue("bunny.examples.hello_world", :auto_delete => true)
+    @queue  = @channel.queue("cdp_subscribers_exchange", :auto_delete => true)
     @exchange  = @channel.default_exchange
 
     @queue.subscribe do |delivery_info, metadata, payload|
