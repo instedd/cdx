@@ -34,6 +34,7 @@ defmodule DevicesTest do
     end
     [result] = Tirexs.Query.create_resource(search).hits
     assert result["_source"]["result"] == "positive"
+    assert result["_source"]["created_at"] != nil
   end
 
   # test "enqueues in RabbitMQ", meta do

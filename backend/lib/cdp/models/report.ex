@@ -1,6 +1,8 @@
 defmodule Cdp.Report do
+  use Timex
   use Ecto.Model
   import Tirexs.Bulk
+  import Tirexs.Search
 
   queryable "reports" do
     field :work_group_id, :integer
@@ -25,6 +27,7 @@ defmodule Cdp.Report do
   def create_in_elasticsearch(device, data) do
     {:ok, data_as_json} = JSON.decode data
     data_as_json = Dict.put data_as_json, :type, "report"
+    data_as_json = Dict.put data_as_json, :created_at, (DateFormat.format!(Date.now, "{ISO}"))
 
     settings = Tirexs.ElasticSearch.Config.new()
 
@@ -57,4 +60,29 @@ defmodule Cdp.Report do
     Cdp.Report.create_in_elasticsearch(device, data)
     # Cdp.Report.enqueue_in_rabbit(device, data)
   end
+
+  def since(date) do
+
+    articles = search [index: "_all"] do
+
+      query do
+        range "created_at", from: date, include_lower: true
+      end
+
+      sort do
+        [
+          [created_at: "asc"]
+        ]
+      end
+    end
+
+    result = Tirexs.Query.create_resource(articles)
+
+    # Enum.each result.hits, fn(item) ->
+    #   IO.puts inspect(item)
+    #   #=> [{"_index","articles"},{"_type","article"},{"_id","2"},{"_score",1.0},{"_source",[{"id",2}, {"title","Two"},{"tags",["elixir","r uby"]},{"type","article"}]}]
+    # end
+    result.hits
+  end
+
 end

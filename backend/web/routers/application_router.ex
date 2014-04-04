@@ -9,4 +9,5 @@ defmodule ApplicationRouter do
   end
 
   forward "/devices", to: DevicesRouter
+  forward "/api", to: ApiRouter
 end

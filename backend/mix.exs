@@ -25,6 +25,7 @@ defmodule Cdp.Mixfile do
       { :json, github: "cblage/elixir-json" },
       { :tirexs, github: "roundscope/tirexs" },
       { :exrabbit, github: "neo/exrabbit" },
+      { :timex, github: "bitwalker/timex" },
     ]
   end
 end
