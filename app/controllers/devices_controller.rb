@@ -1,6 +1,6 @@
 class DevicesController < ApplicationController
   before_action :set_device, only: [:show, :edit, :update, :destroy, :regenerate_key]
-  before_action :load_work_groups, only: [:new, :edit]
+  before_action :load_laboratories, only: [:new, :edit]
 
   def index
     @devices = Device.all
@@ -71,10 +71,10 @@ class DevicesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def device_params
-      params.require(:device).permit(:name, :work_group_id, :index_name)
+      params.require(:device).permit(:name, :laboratory_id, :index_name)
     end
 
-    def load_work_groups
-      @work_groups = current_user.work_groups
+    def load_laboratories
+      @laboratories = current_user.laboratories
     end
 end

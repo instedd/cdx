@@ -6,5 +6,6 @@ class User < ActiveRecord::Base
          :validatable, :confirmable, :omniauthable,
          :lockable
 
-  has_many :work_groups
+  has_many :institutions
+  has_many :laboratories, through: :institutions
 end

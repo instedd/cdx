@@ -4,7 +4,7 @@
   = @subscriber.name
 %p
   %strong Work group:
-  = @subscriber.work_group.try(:name)
+  = @subscriber.institution.try(:name)
 %p
   %strong Callback url:
   = @subscriber.callback_url

@@ -1,0 +1,17 @@
+%h1 Listing laboratories
+
+%table
+  %tr
+    %th
+    %th
+    %th
+
+  - @laboratories.each do |laboratory|
+    %tr
+      %td= link_to 'Show', laboratory
+      %td= link_to 'Edit', edit_laboratory_path(laboratory)
+      %td= link_to 'Destroy', laboratory, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Laboratory', new_laboratory_path

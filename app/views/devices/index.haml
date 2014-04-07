@@ -12,7 +12,7 @@
     - @devices.each do |device|
       %tr
         %td= device.name
-        %td= device.work_group.try(:name)
+        %td= device.institution.try(:name)
         %td= link_to 'Show', device
         %td= link_to 'Edit', edit_device_path(device)
         %td= link_to 'Destroy', device, method: :delete, data: { confirm: 'Are you sure?' }

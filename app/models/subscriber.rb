@@ -1,11 +1,11 @@
 class Subscriber < ActiveRecord::Base
-  belongs_to :work_group
+  belongs_to :institution
 
-  def enqueue_notification report
+  def enqueue_notification test_result
     if Rails.env.test?
-      SubscriptionDispatcher.new(nil, nil, {report: report, subscriber: self}.to_json).run
+      SubscriptionDispatcher.new(nil, nil, {test_result: test_result, subscriber: self}.to_json).run
     else
-      Rabbitmq.active_connection.enqueue report: report, subscriber: self
+      Rabbitmq.active_connection.enqueue test_result: test_result, subscriber: self
     end
   end
 end

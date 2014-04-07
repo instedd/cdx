@@ -1,12 +1,11 @@
-defmodule Cdp.Report do
+defmodule Cdp.TestResult do
   use Timex
   use Ecto.Model
   import Tirexs.Bulk
   import Tirexs.Search
 
-  queryable "reports" do
-    field :work_group_id, :integer
-    field :device_id, :integer
+  queryable "test_results" do
+    belongs_to(:device, Cdp.Device)
     field :created_at, :datetime
     field :updated_at, :datetime
     field :data, :binary
@@ -14,30 +13,29 @@ defmodule Cdp.Report do
 
   def create_in_db(device, data) do
     now = Cdp.DateTime.now
-    report = Cdp.Report.new [
-      work_group_id: device.work_group_id,
+    test_result = Cdp.TestResult.new [
       device_id: device.id,
       data: data,
       created_at: now,
       updated_at: now,
     ]
-    Cdp.Repo.create(report)
+    Cdp.Repo.create(test_result)
   end
 
-  def create_in_elasticsearch(device, data) do
-    {:ok, data_as_json} = JSON.decode data
-    data_as_json = Dict.put data_as_json, :type, "report"
-    data_as_json = Dict.put data_as_json, :created_at, (DateFormat.format!(Date.now, "{ISO}"))
+  def create_in_elasticsearch(device, json_data) do
+    {:ok, data} = JSON.decode json_data
+    data = Dict.put data, :type, "test_result"
+    data = Dict.put data, :created_at, (DateFormat.format!(Date.now, "{ISO}"))
 
     settings = Tirexs.ElasticSearch.Config.new()
-
-    Tirexs.Bulk.store [index: Cdp.WorkGroup.elasticsearch_index_name(device.work_group_id), refresh: true], settings do
-      create data_as_json
+    institution_id = device.laboratory.get.institution_id
+    Tirexs.Bulk.store [index: Cdp.Institution.elasticsearch_index_name(institution_id), refresh: true], settings do
+      create data
     end
   end
 
   # def enqueue_in_rabbit(device, data) do
-  #   subscribers = Cdp.Subscriber.find_by_work_group_id(device.work_group_id)
+  #   subscribers = Cdp.Subscriber.find_by_institution_id(device.institution_id)
 
   #   amqp_config = Cdp.Dynamo.config[:rabbit_amqp]
   #   amqp = Exrabbit.Utils.connect
@@ -48,7 +46,7 @@ defmodule Cdp.Report do
 
   #   Enum.each subscribers, fn(s) ->
   #     IO.puts s.id
-  #     {:ok, message} = JSON.encode([report: data, subscriber: s.id])
+  #     {:ok, message} = JSON.encode([test_result: data, subscriber: s.id])
   #     Exrabbit.Utils.publish channel, amqp_config[:subscribers_exchange], "", message
   #   end
   # end
@@ -56,9 +54,9 @@ defmodule Cdp.Report do
   def create_and_enqueue(device_key, data) do
     device = Cdp.Device.find_by_key(device_key)
 
-    Cdp.Report.create_in_db(device, data)
-    Cdp.Report.create_in_elasticsearch(device, data)
-    # Cdp.Report.enqueue_in_rabbit(device, data)
+    Cdp.TestResult.create_in_db(device, data)
+    Cdp.TestResult.create_in_elasticsearch(device, data)
+    # Cdp.TestResult.enqueue_in_rabbit(device, data)
   end
 
   def since(date) do

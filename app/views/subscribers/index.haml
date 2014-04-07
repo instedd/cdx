@@ -14,7 +14,7 @@
     - @subscribers.each do |subscriber|
       %tr
         %td= subscriber.name
-        %td= subscriber.work_group.try(:name)
+        %td= subscriber.institution.try(:name)
         %td= truncate(subscriber.callback_url, length: 20)
         %td= truncate(subscriber.auth_token, length: 12)
         %td= link_to 'Show', subscriber

@@ -1,5 +1,6 @@
 class Device < ActiveRecord::Base
-  belongs_to :work_group
+  belongs_to :laboratory
+  has_many :test_results
 
   before_create :set_key
 

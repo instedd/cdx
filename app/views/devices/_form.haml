@@ -12,8 +12,8 @@
     %br/
     = f.text_field :name
   .field
-    = f.label :work_group_id
+    = f.label :laboratory_id
     %br/
-    = f.collection_select :work_group_id, @work_groups, :id, :name
+    = f.collection_select :laboratory_id, @laboratories, :id, :name
   .actions
     = f.submit

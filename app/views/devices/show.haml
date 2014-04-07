@@ -4,7 +4,7 @@
   = @device.name
 %p
   %strong Work group:
-  = @device.work_group.try(:name)
+  = @device.laboratory.try(:name)
 %p
   %strong Secret Key:
   = @device.secret_key

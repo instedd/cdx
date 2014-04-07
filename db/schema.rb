@@ -11,25 +11,42 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140326191422) do
+ActiveRecord::Schema.define(version: 20140407154134) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "devices", force: true do |t|
     t.string   "name"
-    t.integer  "work_group_id"
+    t.integer  "laboratory_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "secret_key"
   end
 
-  add_index "devices", ["work_group_id"], name: "index_devices_on_work_group_id", using: :btree
+  add_index "devices", ["laboratory_id"], name: "index_devices_on_laboratory_id", using: :btree
 
-  create_table "reports", force: true do |t|
-    t.integer  "work_group_id"
-    t.integer  "device_id"
-    t.binary   "data"
+  create_table "institutions", force: true do |t|
+    t.string   "name"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
+
+  create_table "laboratories", force: true do |t|
+    t.string   "name"
+    t.integer  "institution_id"
+    t.string   "address"
+    t.string   "city"
+    t.string   "state"
+    t.string   "zip_code"
+    t.string   "country"
+    t.string   "region"
+    t.float    "lat"
+    t.float    "lng"
+    t.integer  "location_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -37,13 +54,20 @@ ActiveRecord::Schema.define(version: 20140326191422) do
   create_table "subscribers", force: true do |t|
     t.string   "name"
     t.string   "callback_url"
-    t.integer  "work_group_id"
+    t.integer  "institution_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "auth_token"
   end
 
-  add_index "subscribers", ["work_group_id"], name: "index_subscribers_on_work_group_id", using: :btree
+  add_index "subscribers", ["institution_id"], name: "index_subscribers_on_institution_id", using: :btree
+
+  create_table "test_results", force: true do |t|
+    t.integer  "device_id"
+    t.binary   "data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "", null: false
@@ -71,14 +95,5 @@ ActiveRecord::Schema.define(version: 20140326191422) do
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
-
-  create_table "work_groups", force: true do |t|
-    t.string   "name"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "work_groups", ["user_id"], name: "index_work_groups_on_user_id", using: :btree
 
 end

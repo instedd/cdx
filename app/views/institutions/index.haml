@@ -1,0 +1,18 @@
+%h1 Listing institutions
+= link_to 'Back', root_path
+%table
+  %thead
+    %tr
+      %th Name
+      %th
+      %th
+      %th
+  %tbody
+    - @institutions.each do |institution|
+      %tr
+        %td= institution.name
+        %td= link_to 'Show', institution
+        %td= link_to 'Edit', edit_institution_path(institution)
+        %td= link_to 'Destroy', institution, method: :delete, data: { confirm: 'Are you sure?' }
+%br/
+= link_to 'New Work group', new_institution_path

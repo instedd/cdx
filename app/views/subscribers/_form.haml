@@ -12,9 +12,9 @@
     %br/
     = f.text_field :name
   .field
-    = f.label :work_group_id
+    = f.label :institution_id
     %br/
-    = f.collection_select :work_group_id, @work_groups, :id, :name
+    = f.collection_select :institution_id, @institutions, :id, :name
   .field
     = f.label :callback_url
     %br/

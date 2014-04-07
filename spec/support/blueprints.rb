@@ -15,12 +15,17 @@ User.blueprint do
   confirmed_at { Time.now - 1.day }
 end
 
-WorkGroup.blueprint do
+Institution.blueprint do
   user
   name
 end
 
+Laboratory.blueprint do
+  institution
+  name
+end
+
 Device.blueprint do
-  work_group
+  laboratory
   name
 end

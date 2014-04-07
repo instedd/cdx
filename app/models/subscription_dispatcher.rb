@@ -6,6 +6,6 @@ class SubscriptionDispatcher
   end
 
   def run
-    Net::HTTP.get URI.parse("#{@payload['subscriber']['callback_url']}?auth_token=#{@payload['subscriber']['auth_token']}&data=#{@payload['report']['properties'].map {|k, v| "'#{k}':'#{v}'"}.join ','}")
+    Net::HTTP.get URI.parse("#{@payload['subscriber']['callback_url']}?auth_token=#{@payload['subscriber']['auth_token']}&data=#{@payload['test_result']['properties'].map {|k, v| "'#{k}':'#{v}'"}.join ','}")
   end
 end

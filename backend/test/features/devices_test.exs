@@ -4,27 +4,27 @@ defmodule DevicesTest do
   require Tirexs.Search
 
   setup do
-    work_group = Cdp.Repo.create Cdp.WorkGroup.new
-    # subscriber = Cdp.Repo.create Cdp.Subscriber.new(work_group_id: work_group.id, auth_token: "foo", callback_url: "http://bar.baz")
-    device = Cdp.Repo.create Cdp.Device.new(work_group_id: work_group.id, secret_key: "foo")
+    institution = Cdp.Repo.create Cdp.Institution.new(name: "baz")
+    laboratory = Cdp.Repo.create Cdp.Laboratory.new(institution_id: institution.id, name: "bar")
+    # subscriber = Cdp.Repo.create Cdp.Subscriber.new(institution_id: institution.id, auth_token: "foo", callback_url: "http://bar.baz")
+    device = Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory.id, secret_key: "foo")
     data = "{\"result\": \"positive\"}"
     settings = Tirexs.ElasticSearch.Config.new()
-    index_name = Cdp.WorkGroup.elasticsearch_index_name(work_group.id)
-    # {:ok, work_group: work_group, device: device, data: data, settings: settings, index_name: index_name, subscriber: subscriber}
-    {:ok, work_group: work_group, device: device, data: data, settings: settings, index_name: index_name}
+    index_name = Cdp.Institution.elasticsearch_index_name(institution.id)
+    # {:ok, institution: institution, device: device, data: data, settings: settings, index_name: index_name, subscriber: subscriber}
+    {:ok, institution: institution, device: device, data: data, settings: settings, index_name: index_name}
   end
 
-  test "create report in postgres", meta do
+  test "create test_result in postgres", meta do
     conn = post("/devices/foo", meta[:data])
     assert conn.status == 200
 
-    [report] = Cdp.Repo.all Cdp.Report
-    assert report.work_group_id == meta[:work_group].id
-    assert report.device_id == meta[:device].id
-    assert report.data == meta[:data]
+    [test_result] = Cdp.Repo.all Cdp.TestResult
+    assert test_result.device_id == meta[:device].id
+    assert test_result.data == meta[:data]
   end
 
-  test "create report in elasticsearch", meta do
+  test "create test_result in elasticsearch", meta do
     post("/devices/foo", meta[:data])
 
     search = Tirexs.Search.search [index: meta[:index_name]] do
@@ -51,14 +51,14 @@ defmodule DevicesTest do
   #           # IO.puts json_message
   #           {:ok, message } = JSON.decode json_message
   #           IO.inspect(message)
-  #           assert message["report"] == meta[:data]
+  #           assert message["test_result"] == meta[:data]
   #           assert message["subscriber"] == meta[:subscriber].id
   #           Exrabbit.Utils.ack channel, tag
   #   end
   # end
 
   teardown(meta) do
-    Enum.each [Cdp.WorkGroup, Cdp.Device, Cdp.Report], &Cdp.Repo.delete_all/1
+    Enum.each [Cdp.Institution, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
     Tirexs.ElasticSearch.delete meta[:index_name], meta[:settings]
 
     # amqp_config = Cdp.Dynamo.config[:rabbit_amqp]

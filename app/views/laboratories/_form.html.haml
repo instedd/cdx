@@ -1,0 +1,10 @@
+= form_for @laboratory do |f|
+  - if @laboratory.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@laboratory.errors.count, "error")} prohibited this laboratory from being saved:"
+      %ul
+        - @laboratory.errors.full_messages.each do |msg|
+          %li= msg
+
+  .actions
+    = f.submit 'Save'

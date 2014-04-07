@@ -1,4 +1,6 @@
 Cdp::Application.routes.draw do
+  resources :laboratories
+
   resources :subscribers
 
   resources :devices do
@@ -8,7 +10,7 @@ Cdp::Application.routes.draw do
   end
 
 
-  resources :work_groups
+  resources :institutions
 
   devise_for :users
 
