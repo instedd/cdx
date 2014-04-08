@@ -3,8 +3,8 @@
   %strong Name:
   = @subscriber.name
 %p
-  %strong Work group:
-  = @subscriber.institution.try(:name)
+  %strong Institution:
+  = @subscriber.institution
 %p
   %strong Callback url:
   = @subscriber.callback_url

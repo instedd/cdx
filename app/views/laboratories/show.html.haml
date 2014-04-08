@@ -1,5 +1,14 @@
 %p#notice= notice
 
+%p
+  %b Name:
+  = @laboratory.name
+%p
+  %b Location:
+  = @laboratory.location.name
+%p
+  %b Institution:
+  = @laboratory.institution.name
 
 = link_to 'Edit', edit_laboratory_path(@laboratory)
 \|

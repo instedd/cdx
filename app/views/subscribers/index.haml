@@ -1,20 +1,18 @@
 %h1 Listing subscribers
-= link_to 'Back', root_path
-%table
+
+%table.table
   %thead
     %tr
       %th Name
-      %th Work group
+      %th Institution
       %th Callback url
       %th Auth token
-      %th
-      %th
-      %th
+      %th{colspan:3}
   %tbody
     - @subscribers.each do |subscriber|
       %tr
         %td= subscriber.name
-        %td= subscriber.institution.try(:name)
+        %td= subscriber.institution.name
         %td= truncate(subscriber.callback_url, length: 20)
         %td= truncate(subscriber.auth_token, length: 12)
         %td= link_to 'Show', subscriber

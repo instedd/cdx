@@ -1,0 +1,9 @@
+.btn-group.pull-right
+  - if current_user
+    - dropdown current_user.email do
+      - dropdown_item 'Settings', '#'
+      - dropdown_divider
+      - dropdown_item 'Sign out', destroy_user_session_path, method: :delete
+  - else
+    %a.btn.btn-link{href: new_user_session_path}
+      Sign in

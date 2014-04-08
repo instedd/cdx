@@ -1,3 +1,13 @@
+GIT
+  remote: https://bitbucket.org/instedd/instedd-bootstrap.git
+  revision: 8acd08efe7922a5bf886cd7214e9663c38724c01
+  branch: master
+  specs:
+    instedd-bootstrap (0.0.1)
+      bootstrap-sass
+      rails
+      sass-rails
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -31,7 +41,11 @@ GEM
     ansi (1.4.3)
     arel (4.0.1)
     atomic (1.1.14)
+    awesome_nested_set (2.1.6)
+      activerecord (>= 3.0.0)
     bcrypt-ruby (3.1.2)
+    bootstrap-sass (2.3.2.2)
+      sass (~> 3.2)
     builder (3.1.4)
     bunny (1.1.3)
       amq-protocol (>= 1.9.2)
@@ -255,6 +269,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-postgresql-adapter
+  awesome_nested_set
   bunny
   cancan
   capybara
@@ -267,6 +282,7 @@ DEPENDENCIES
   guard-rspec
   guid
   haml-rails
+  instedd-bootstrap!
   jbuilder (~> 1.2)
   jquery-rails
   machinist

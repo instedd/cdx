@@ -1,13 +1,17 @@
 %h1 Listing laboratories
 
-%table
+%table.table
   %tr
-    %th
-    %th
-    %th
+    %th Name
+    %th Location
+    %th Institution
+    %th{colspan:3}
 
   - @laboratories.each do |laboratory|
     %tr
+      %td= laboratory.name
+      %td= laboratory.location.name
+      %td= laboratory.institution.name
       %td= link_to 'Show', laboratory
       %td= link_to 'Edit', edit_laboratory_path(laboratory)
       %td= link_to 'Destroy', laboratory, :method => :delete, :data => { :confirm => 'Are you sure?' }

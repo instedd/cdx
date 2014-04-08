@@ -1,13 +1,1 @@
 This is CDP's home.
-
-%div
-  - if current_user
-    = link_to "Institutions", institutions_path
-    %br/
-    = link_to "Laboratories", laboratories_path
-    %br/
-    = link_to "Devices", devices_path
-    %br/
-    = link_to "Subscribers", subscribers_path
-  - else
-    = link_to "Sign in", guisso_sign_in_path_for(:user)

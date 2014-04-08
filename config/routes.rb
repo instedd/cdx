@@ -1,4 +1,6 @@
 Cdp::Application.routes.draw do
+  resources :locations
+
   resources :laboratories
 
   resources :subscribers
