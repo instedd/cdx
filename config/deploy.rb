@@ -61,6 +61,7 @@ namespace :deploy do
     end
   end
 
+  before :restart, :migrate
   after :publishing, :restart
 
   # after :restart, :clear_cache do
@@ -75,21 +76,21 @@ namespace :deploy do
   task :start do ; end
   task :stop do ; end
 
-  task :prepare_broker do
-    on roles(:app) do
-      execute "test -f #{fetch(:shared_path)}/cdp.config || cp #{fetch(:release_path)}/broker/cdp.config #{fetch(:shared_path)}"
-      execute "ln -nfs #{fetch(:shared_path)}/cdp.config #{fetch(:release_path)}/broker/cdp.config"
+  # task :prepare_broker do
+    # on roles(:app) do
+    #   execute "test -f #{fetch(:shared_path)}/cdp.config || cp #{fetch(:release_path)}/broker/cdp.config #{fetch(:shared_path)}"
+    #   execute "ln -nfs #{fetch(:shared_path)}/cdp.config #{fetch(:release_path)}/broker/cdp.config"
 
-      execute "test -d #{fetch(:shared_path)}/log/broker || mkdir #{fetch(:shared_path)}/log/broker"
-      execute "ln -nfs #{fetch(:shared_path)}/log/broker #{fetch(:release_path)}/broker/log"
-    end
-  end
+    #   execute "test -d #{fetch(:shared_path)}/log/broker || mkdir #{fetch(:shared_path)}/log/broker"
+    #   execute "ln -nfs #{fetch(:shared_path)}/log/broker #{fetch(:release_path)}/broker/log"
+    # end
+  # end
 
-  task :compile_broker do
-    on roles(:app) do
-      execute "make -C #{fetch(:release_path)}/broker"
-    end
-  end
+  # task :compile_broker do
+  #   on roles(:app) do
+  #     execute "make -C #{fetch(:release_path)}/broker"
+  #   end
+  # end
 
   task :symlink_configs do
     on roles(:app) do
@@ -141,10 +142,11 @@ namespace :foreman do
       execute "sudo start #{fetch(:application)} || sudo restart #{fetch(:application)}"
     end
   end
+
 end
 
 # before "deploy:start", "deploy:migrate"
-# before "deploy:restart", "deploy:migrate"
+
 # after 'deploy:publishing', 'deploy:restart'
 # after "deploy:publishing", "foreman:export"    # Export foreman scripts
 # after "deploy:restart", "foreman:restart"   # Restart application scripts
