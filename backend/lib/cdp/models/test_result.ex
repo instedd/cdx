@@ -82,5 +82,4 @@ defmodule Cdp.TestResult do
     # end
     result.hits
   end
-
 end

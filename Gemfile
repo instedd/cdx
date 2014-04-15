@@ -28,14 +28,19 @@ end
 # Use unicorn as the app server
 # gem 'unicorn'
 
-# Use Capistrano for deployment
-# gem 'capistrano', group: :development
+group :development do
+  gem 'capistrano', '~> 3.1.0', require: false
+  gem 'capistrano-rails',   '~> 1.1', require: false
+  gem 'capistrano-bundler', '~> 1.1', require: false
+  gem 'capistrano-rvm',   '~> 0.1', require: false
+end
 
 gem 'devise'
 gem 'omniauth'
 gem 'cancan'
 gem 'elasticsearch'
 gem 'bunny'
+gem 'foreman'
 
 gem 'oj'
 gem 'guid'
