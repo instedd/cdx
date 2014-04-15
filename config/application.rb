@@ -5,6 +5,10 @@ require "active_record/railtie"
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "sprockets/railtie"
+require "openid"
+require 'openid/extensions/sreg'
+require 'openid/extensions/pape'
+require 'openid/store/filesystem'
 # require "rails/test_unit/railtie"
 
 # Require the gems listed in Gemfile, including any gems

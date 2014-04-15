@@ -14,7 +14,8 @@ Cdp::Application.routes.draw do
 
   resources :institutions
 
-  devise_for :users
+  devise_for :users, controllers: {omniauth_callbacks: "omniauth_callbacks"}
+  guisso_for :user
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

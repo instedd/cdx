@@ -3,7 +3,7 @@
     - dropdown current_user.email do
       - dropdown_item 'Settings', '#'
       - dropdown_divider
-      - dropdown_item 'Sign out', destroy_user_session_path, method: :delete
+      - dropdown_item 'Sign out', guisso_sign_out_path_for(:user, after_sign_out_url: root_url), method: :delete
   - else
-    %a.btn.btn-link{href: new_user_session_path}
+    %a.btn.btn-link{href: guisso_sign_in_path_for(:user)}
       Sign in

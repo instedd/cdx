@@ -10,6 +10,9 @@ gem 'haml-rails'
 gem 'underscore-rails'
 gem 'awesome_nested_set'
 gem 'instedd-bootstrap', git: "https://bitbucket.org/instedd/instedd-bootstrap.git", branch: 'master'
+gem 'ruby-openid'
+gem 'rack-oauth2', git: "https://github.com/manastech/rack-oauth2.git", branch: 'master'
+gem 'alto_guisso', git: "https://bitbucket.org/instedd/alto_guisso.git", branch: 'master'
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
@@ -37,6 +40,7 @@ end
 
 gem 'devise'
 gem 'omniauth'
+gem 'omniauth-openid'
 gem 'cancan'
 gem 'elasticsearch'
 gem 'bunny'
