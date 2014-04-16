@@ -1,7 +1,7 @@
 ---
 category: Devices
 path: '/api'
-title: 'Query events'
+title: 'Add event'
 type: 'PUT'
 
 layout: nil
