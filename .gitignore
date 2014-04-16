@@ -19,3 +19,4 @@ backend/_build
 backend/deps
 backend/tmp
 backend/erl_crash.dump
+public/assets
