@@ -509,6 +509,12 @@ code {
   outline: none;
 }
 
+
+#intro {
+   padding-left: 260px;
+   max-width: 700px;
+}
+
 /* References */
 #content {
   padding: 20px;
