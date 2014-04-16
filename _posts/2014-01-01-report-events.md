@@ -11,16 +11,16 @@ This method allows devices to report test results.
 
 ###Request Parameters###
 
-* `timestamp` - retrieve events reported after a specific date time
+* `timestamp` - indicates the date and time for when the event ocurred
 
 `/event?timestamp=2014-04-10T15:22:12+0000`
 
 
 REQUIRED FIELDS
 
-* `location` - filter events by location
+* `deviceID` - ID of the device where the test was performed
 
-`/events?location={location1}`
+`/events?deviceID={123}`
 
 OPTIONAL FIELDS
 
