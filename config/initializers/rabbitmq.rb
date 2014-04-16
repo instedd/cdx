@@ -19,10 +19,10 @@ class Rabbitmq
   end
 
   class << self
-    attr_reader :active_connection
+    def active_connection
+      @active_connection ||= new
+    end
   end
-
-  @active_connection = self.new
 end
 
 # if defined?(PhusionPassenger) # otherwise it breaks rake commands if you put this in an initializer
