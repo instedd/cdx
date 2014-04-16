@@ -34,10 +34,11 @@ set :log_level, :info
 # set :pty, true
 
 # Default value for :linked_files is []
-# set :linked_files, %w{config/database.yml}
+set :linked_files, %w{config/database.yml}
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
+set :linked_dirs, %w{log}
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
@@ -64,6 +65,8 @@ namespace :deploy do
   before :restart, :migrate
   after :publishing, :restart
 
+  # after :publishing, :prepare_backend
+
   # after :restart, :clear_cache do
   #   on roles(:web), in: :groups, limit: 3, wait: 10 do
   #     # Here we can do anything such as:
@@ -76,83 +79,39 @@ namespace :deploy do
   task :start do ; end
   task :stop do ; end
 
-  # task :prepare_broker do
-    # on roles(:app) do
-    #   execute "test -f #{fetch(:shared_path)}/cdp.config || cp #{fetch(:release_path)}/broker/cdp.config #{fetch(:shared_path)}"
-    #   execute "ln -nfs #{fetch(:shared_path)}/cdp.config #{fetch(:release_path)}/broker/cdp.config"
-
-    #   execute "test -d #{fetch(:shared_path)}/log/broker || mkdir #{fetch(:shared_path)}/log/broker"
-    #   execute "ln -nfs #{fetch(:shared_path)}/log/broker #{fetch(:release_path)}/broker/log"
-    # end
-  # end
-
-  # task :compile_broker do
+  # task :prepare_backend do
   #   on roles(:app) do
-  #     execute "make -C #{fetch(:release_path)}/broker"
+  #     execute "test -f #{fetch(:shared_path)}/cdp.config || cp #{release_path}/backend/cdp.config #{fetch(:shared_path)}"
+  #     execute "ln -nfs #{fetch(:shared_path)}/cdp.config #{release_path}/backend/cdp.config"
+
+  #     execute "test -d #{fetch(:shared_path)}/log/backend || mkdir #{fetch(:shared_path)}/log/backend"
+  #     execute "ln -nfs #{fetch(:shared_path)}/log/backend #{release_path}/backend/log"
   #   end
   # end
 
-  task :symlink_configs do
+  task :compile_backend do
     on roles(:app) do
-      %W(credentials cdp newrelic oauth nuntium poirot).each do |file|
-        execute "ln -nfs #{fetch(:shared_path)}/#{file}.yml #{fetch(:release_path)}/config/"
+      within "#{release_path}/backend" do
+        with :mix_env => :prod do
+          execute :mix, "do deps.get, compile > #{release_path}/backend/mix.output 2>&1"
+        end
       end
     end
   end
+  after :publishing, :compile_backend
 
-  task :symlink_data do
+  task :restart_backend do
     on roles(:app) do
-      execute "ln -nfs #{fetch(:shared_path)}/data #{fetch(:release_path)}/"
+      execute "sudo stop cdp || true >> foo.txt 2>&1"
+      execute "sudo start cdp >> foo.txt 2>&1"
     end
   end
+  after :compile_backend, :restart_backend
 
   task :generate_version do
     on roles(:app) do
-      execute "cd #{fetch(:current_path)} && git describe --always > #{fetch(:release_path)}/VERSION"
+      execute :echo, "#{fetch(:current_revision)} > #{release_path}/VERSION"
     end
   end
+  after :publishing, :generate_version
 end
-
-namespace :foreman do
-  desc 'Export the Procfile to Ubuntu upstart scripts'
-  task :export do
-    on roles(:app) do
-      execute "echo -e \"PATH=$PATH\\nGEM_HOME=$GEM_HOME\\nGEM_PATH=$GEM_PATH\\nRAILS_ENV=production\" >  #{fetch(:current_path)}/.env"
-      execute "cd #{fetch(:current_path)} && rvmsudo bundle exec foreman export upstart /etc/init -f #{fetch(:current_path)}/Procfile -a #{fetch(:application)} -u #{fetch(:user)} --concurrency=\"broker=1,delayed=1\""
-    end
-  end
-
-  desc "Start the application services"
-  task :start do
-    on roles(:app) do
-      execute "sudo start #{fetch(:application)}"
-    end
-  end
-
-  desc "Stop the application services"
-  task :stop do
-    on roles(:app) do
-      execute "sudo stop #{fetch(:application)}"
-    end
-  end
-
-  desc "Restart the application services"
-  task :restart do
-    on roles(:app) do
-      execute "sudo start #{fetch(:application)} || sudo restart #{fetch(:application)}"
-    end
-  end
-
-end
-
-# before "deploy:start", "deploy:migrate"
-
-# after 'deploy:publishing', 'deploy:restart'
-# after "deploy:publishing", "foreman:export"    # Export foreman scripts
-# after "deploy:restart", "foreman:restart"   # Restart application scripts
-
-# after "deploy:update_code", "deploy:generate_version"
-# after "deploy:update_code", "deploy:symlink_configs"
-# after "deploy:update_code", "deploy:symlink_data"
-# after "deploy:update_code", "deploy:prepare_broker"
-# after "deploy:update_code", "deploy:compile_broker"
