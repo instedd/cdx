@@ -27,6 +27,7 @@ defmodule Cdp.TestResult do
     data = Dict.put data, :type, "test_result"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.now, "{ISO}"))
     data = Dict.put data, :device_id, device.id
+    data = Dict.put data, :laboratory_id, device.laboratory_id
 
     settings = Tirexs.ElasticSearch.Config.new()
     institution_id = device.laboratory.get.institution_id
@@ -70,6 +71,11 @@ defmodule Cdp.TestResult do
 
     if device_id = params["device"] do
       condition = [match: [device_id: device_id]]
+      conditions = [condition | conditions]
+    end
+
+    if laboratory_id = params["laboratory"] do
+      condition = [match: [laboratory_id: laboratory_id]]
       conditions = [condition | conditions]
     end
 
