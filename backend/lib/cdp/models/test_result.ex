@@ -92,6 +92,11 @@ defmodule Cdp.TestResult do
       conditions = [condition | conditions]
     end
 
+    if age_low = params["age_low"] do
+      condition = [range: [age: [from: age_low, include_lower: true]]]
+      conditions = [condition | conditions]
+    end
+
     query = [
       search: [
         query: [
