@@ -26,6 +26,7 @@ defmodule Cdp.TestResult do
     {:ok, data} = JSON.decode json_data
     data = Dict.put data, :type, "test_result"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.now, "{ISO}"))
+    data = Dict.put data, :device_id, device.id
 
     settings = Tirexs.ElasticSearch.Config.new()
     institution_id = device.laboratory.get.institution_id
@@ -59,27 +60,34 @@ defmodule Cdp.TestResult do
     # Cdp.TestResult.enqueue_in_rabbit(device, data)
   end
 
-  def since(date) do
+  def query(params) do
+    conditions = []
 
-    articles = search [index: "_all"] do
-
-      query do
-        range "created_at", from: date, include_lower: true
-      end
-
-      sort do
-        [
-          [created_at: "asc"]
-        ]
-      end
+    if date = params["since"] do
+      condition = [range: [created_at: [from: date, include_lower: true]]]
+      conditions = [condition | conditions]
     end
 
-    result = Tirexs.Query.create_resource(articles)
+    if device_id = params["device"] do
+      condition = [match: [device_id: device_id]]
+      conditions = [condition | conditions]
+    end
 
-    # Enum.each result.hits, fn(item) ->
-    #   IO.puts inspect(item)
-    #   #=> [{"_index","articles"},{"_type","article"},{"_id","2"},{"_score",1.0},{"_source",[{"id",2}, {"title","Two"},{"tags",["elixir","r uby"]},{"type","article"}]}]
-    # end
+    query = [
+      search: [
+        query: [
+          bool: [
+            must: conditions
+          ]
+        ],
+        sort: [
+          [created_at: "asc"]
+        ]
+      ],
+      index: "_all"
+    ]
+
+    result = Tirexs.Query.create_resource(query)
     result.hits
   end
 end
