@@ -58,7 +58,7 @@ defmodule DevicesTest do
   # end
 
   teardown(meta) do
-    Enum.each [Cdp.Institution, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
+    Enum.each [Cdp.Institution, Cdp.Laboratory, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
     Tirexs.ElasticSearch.delete meta[:index_name], meta[:settings]
 
     # amqp_config = Cdp.Dynamo.config[:rabbit_amqp]

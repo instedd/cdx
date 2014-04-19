@@ -102,6 +102,11 @@ defmodule Cdp.TestResult do
       conditions = [condition | conditions]
     end
 
+    if result = params["result"] do
+      condition = [match: [result: result]]
+      conditions = [condition | conditions]
+    end
+
     query = [
       search: [
         query: [
