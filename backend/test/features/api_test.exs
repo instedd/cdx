@@ -91,6 +91,30 @@ defmodule ApiTest do
     {:ok, []} = JSON.decode(conn.sent_body)
   end
 
+  test "checks for new tests util a date with query string" do
+    first_test = [result: "positive"]
+    {:ok, first_test_json} = JSON.encode first_test
+    post("/devices/foo", first_test_json)
+
+    after_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
+
+    conn = get("/api/updates?until=#{Cdp.Cgi.escape(after_first_test)}")
+    assert conn.status == 200
+    {:ok, [response] } = JSON.decode(conn.sent_body)
+    assert HashDict.get(response, "result") == "positive"
+
+    :timer.sleep(1000)
+
+    second_test = [result: "negative"]
+    {:ok, second_test_json} = JSON.encode second_test
+    post("/devices/foo", second_test_json)
+
+    conn = get("/api/updates?until=#{Cdp.Cgi.escape(after_first_test)}")
+    assert conn.status == 200
+    {:ok, [response]} = JSON.decode(conn.sent_body)
+    assert HashDict.get(response,"result") == "positive"
+  end
+
   test "filters by device", meta do
     foo_test = [result: "positive"]
     {:ok, foo_test_json} = JSON.encode foo_test

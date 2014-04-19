@@ -67,8 +67,13 @@ defmodule Cdp.TestResult do
   def query(params) do
     conditions = []
 
-    if date = params["since"] do
-      condition = [range: [created_at: [from: date, include_lower: true]]]
+    if since = params["since"] do
+      condition = [range: [created_at: [from: since, include_lower: true]]]
+      conditions = [condition | conditions]
+    end
+
+    if until = params["until"] do
+      condition = [range: [created_at: [to: until, include_lower: true]]]
       conditions = [condition | conditions]
     end
 
