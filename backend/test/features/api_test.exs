@@ -188,6 +188,30 @@ defmodule ApiTest do
     {:ok, [] } = JSON.decode(conn.sent_body)
   end
 
+  test "filters by age high" do
+    test = [result: "positive", age: 10]
+    {:ok, test_json} = JSON.encode test
+    post("/devices/foo", test_json)
+
+    test = [result: "negative", age: 20]
+    {:ok, test_json} = JSON.encode test
+    post("/devices/foo", test_json)
+
+    conn = get("/api/updates?age_high=15")
+    assert conn.status == 200
+    {:ok, [response] } = JSON.decode(conn.sent_body)
+    assert HashDict.get(response, "result") == "positive"
+
+    conn = get("/api/updates?age_high=10")
+    assert conn.status == 200
+    {:ok, [response] } = JSON.decode(conn.sent_body)
+    assert HashDict.get(response, "result") == "positive"
+
+    conn = get("/api/updates?age_high=9")
+    assert conn.status == 200
+    {:ok, [] } = JSON.decode(conn.sent_body)
+  end
+
   teardown(meta) do
     Enum.each [Cdp.Institution, Cdp.Laboratory, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
     Tirexs.ElasticSearch.delete meta[:index_name], meta[:settings]
