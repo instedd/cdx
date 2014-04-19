@@ -87,6 +87,11 @@ defmodule Cdp.TestResult do
       conditions = [condition | conditions]
     end
 
+    if gender = params["gender"] do
+      condition = [match: [gender: gender]]
+      conditions = [condition | conditions]
+    end
+
     query = [
       search: [
         query: [

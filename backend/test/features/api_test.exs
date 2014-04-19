@@ -144,6 +144,26 @@ defmodule ApiTest do
     assert HashDict.get(first, "result") == "positive"
   end
 
+  test "filters by gender" do
+    test = [result: "positive", gender: "male"]
+    {:ok, test_json} = JSON.encode test
+    post("/devices/foo", test_json)
+
+    test = [result: "negative", gender: "female"]
+    {:ok, test_json} = JSON.encode test
+    post("/devices/foo", test_json)
+
+    conn = get("/api/updates?gender=male")
+    assert conn.status == 200
+    {:ok, [response] } = JSON.decode(conn.sent_body)
+    assert HashDict.get(response, "result") == "positive"
+
+    conn = get("/api/updates?gender=female")
+    assert conn.status == 200
+    {:ok, [response] } = JSON.decode(conn.sent_body)
+    assert HashDict.get(response, "result") == "negative"
+  end
+
   teardown(meta) do
     Enum.each [Cdp.Institution, Cdp.Laboratory, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
     Tirexs.ElasticSearch.delete meta[:index_name], meta[:settings]
