@@ -97,6 +97,11 @@ defmodule Cdp.TestResult do
       conditions = [condition | conditions]
     end
 
+    if assay_code = params["assay_code"] do
+      condition = [match: [assay_code: assay_code]]
+      conditions = [condition | conditions]
+    end
+
     if age_low = params["age_low"] do
       condition = [range: [age: [from: age_low, include_lower: true]]]
       conditions = [condition | conditions]

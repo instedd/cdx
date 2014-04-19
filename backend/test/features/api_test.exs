@@ -188,6 +188,26 @@ defmodule ApiTest do
     assert HashDict.get(response, "result") == "negative"
   end
 
+  test "filters by assay code" do
+    test = [result: "positive", assay_code: "GX4001"]
+    {:ok, test_json} = JSON.encode test
+    post("/devices/foo", test_json)
+
+    test = [result: "negative", assay_code: "GX1234"]
+    {:ok, test_json} = JSON.encode test
+    post("/devices/foo", test_json)
+
+    conn = get("/api/updates?assay_code=GX4001")
+    assert conn.status == 200
+    {:ok, [response] } = JSON.decode(conn.sent_body)
+    assert HashDict.get(response, "result") == "positive"
+
+    conn = get("/api/updates?assay_code=GX1234")
+    assert conn.status == 200
+    {:ok, [response] } = JSON.decode(conn.sent_body)
+    assert HashDict.get(response, "result") == "negative"
+  end
+
   test "filters by age low" do
     test = [result: "positive", age: 10]
     {:ok, test_json} = JSON.encode test
