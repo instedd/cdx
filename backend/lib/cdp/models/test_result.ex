@@ -23,14 +23,17 @@ defmodule Cdp.TestResult do
   end
 
   def create_in_elasticsearch(device, json_data) do
+    laboratory = device.laboratory.get
+    institution_id = laboratory.institution_id
+
     {:ok, data} = JSON.decode json_data
     data = Dict.put data, :type, "test_result"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.now, "{ISO}"))
     data = Dict.put data, :device_id, device.id
     data = Dict.put data, :laboratory_id, device.laboratory_id
+    data = Dict.put data, :institution_id, institution_id
 
     settings = Tirexs.ElasticSearch.Config.new()
-    institution_id = device.laboratory.get.institution_id
     Tirexs.Bulk.store [index: Cdp.Institution.elasticsearch_index_name(institution_id), refresh: true], settings do
       create data
     end
@@ -69,13 +72,18 @@ defmodule Cdp.TestResult do
       conditions = [condition | conditions]
     end
 
-    if device_id = params["device"] do
-      condition = [match: [device_id: device_id]]
+    if institution_id = params["institution"] do
+      condition = [match: ["institution_id": institution_id]]
       conditions = [condition | conditions]
     end
 
     if laboratory_id = params["laboratory"] do
       condition = [match: [laboratory_id: laboratory_id]]
+      conditions = [condition | conditions]
+    end
+
+    if device_id = params["device"] do
+      condition = [match: [device_id: device_id]]
       conditions = [condition | conditions]
     end
 

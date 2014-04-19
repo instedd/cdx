@@ -6,11 +6,13 @@ defmodule ApiTest do
 
   setup do
     institution = Cdp.Repo.create Cdp.Institution.new(name: "baz")
+    institution2 = Cdp.Repo.create Cdp.Institution.new(name: "baz2")
     laboratory = Cdp.Repo.create Cdp.Laboratory.new(institution_id: institution.id, name: "bar")
     device = Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory.id, secret_key: "foo")
     settings = Tirexs.ElasticSearch.Config.new()
     index_name = Cdp.Institution.elasticsearch_index_name(institution.id)
-    {:ok, institution: institution, laboratory: laboratory, device: device, settings: settings, index_name: index_name}
+    index_name2 = Cdp.Institution.elasticsearch_index_name(institution2.id)
+    {:ok, institution: institution, institution2: institution2, laboratory: laboratory, device: device, settings: settings, index_name: index_name, index_name2: index_name2}
   end
 
   test "checks for new tests since a date" do
@@ -124,8 +126,27 @@ defmodule ApiTest do
     assert HashDict.get(first, "result") == "positive"
   end
 
+  test "filters by institution", meta do
+    foo_test = [result: "positive"]
+    {:ok, foo_test_json} = JSON.encode foo_test
+    post("/devices/foo", foo_test_json)
+
+    laboratory2 = Cdp.Repo.create Cdp.Laboratory.new(institution_id: meta[:institution2].id, name: "baz")
+    Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory2.id, secret_key: "bar")
+
+    bar_test = [result: "negative"]
+    {:ok, bar_test_json} = JSON.encode bar_test
+    post("/devices/bar", bar_test_json)
+
+    conn = get("/api/updates?institution=#{meta[:institution].id}")
+    assert conn.status == 200
+    {:ok, [first]} = JSON.decode(conn.sent_body)
+    assert HashDict.get(first, "result") == "positive"
+  end
+
   teardown(meta) do
     Enum.each [Cdp.Institution, Cdp.Laboratory, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
     Tirexs.ElasticSearch.delete meta[:index_name], meta[:settings]
+    Tirexs.ElasticSearch.delete meta[:index_name2], meta[:settings]
   end
 end
