@@ -1,22 +1,5 @@
-%h1 Listing subscribers
-
-%table.table
-  %thead
-    %tr
-      %th Name
-      %th Institution
-      %th Callback url
-      %th Auth token
-      %th{colspan:3}
-  %tbody
-    - @subscribers.each do |subscriber|
-      %tr
-        %td= subscriber.name
-        %td= subscriber.institution.name
-        %td= truncate(subscriber.callback_url, length: 20)
-        %td= truncate(subscriber.auth_token, length: 12)
-        %td= link_to 'Show', subscriber
-        %td= link_to 'Edit', edit_subscriber_path(subscriber)
-        %td= link_to 'Destroy', subscriber, method: :delete, data: { confirm: 'Are you sure?' }
-%br/
-= link_to 'New Subscriber', new_subscriber_path
+.row-fluid
+  .span6
+    - simple_list :subscriber, title: 'Subscribers', icon: :folder, create_path: new_institution_subscriber_path(institution) do
+      - subscribers.each do |subscriber|
+        - simple_list_item subscriber.name, edit_institution_subscriber_path(institution, subscriber)

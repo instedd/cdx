@@ -1,38 +1,35 @@
 class LaboratoriesController < ApplicationController
-  before_action :set_laboratory, only: [:show, :edit, :update, :destroy]
+  layout "institutions"
+  set_institution_tab :laboratories
 
-  # GET /laboratories
-  # GET /laboratories.json
-  def index
-    @laboratories = current_user.laboratories
+  add_breadcrumb 'Institutions', :institutions_path
+  before_filter do
+    add_breadcrumb institution.name, institution_path(institution)
+    add_breadcrumb 'Laboratories', institution_laboratories_path(institution)
   end
 
-  # GET /laboratories/1
-  # GET /laboratories/1.json
+  expose(:institution) { current_user.institutions.find(params[:institution_id]) }
+  expose(:laboratories) { institution.laboratories }
+  expose(:laboratory, attributes: :laboratory_params)
+
   def show
+    add_breadcrumb laboratory.name, institution_laboratory_path(institution, laboratory)
   end
 
-  # GET /laboratories/new
-  def new
-    @laboratory = Laboratory.new
-  end
-
-  # GET /laboratories/1/edit
   def edit
+    add_breadcrumb laboratory.name, institution_laboratory_path(institution, laboratory)
   end
 
   # POST /laboratories
   # POST /laboratories.json
   def create
-    @laboratory = current_user.laboratories.new(laboratory_params)
-
     respond_to do |format|
-      if @laboratory.save
-        format.html { redirect_to @laboratory, notice: 'Laboratory was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @laboratory }
+      if laboratory.save
+        format.html { redirect_to institution_laboratories_path(institution), notice: 'Laboratory was successfully created.' }
+        format.json { render action: 'show', status: :created, location: laboratory }
       else
         format.html { render action: 'new' }
-        format.json { render json: @laboratory.errors, status: :unprocessable_entity }
+        format.json { render json: laboratory.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -41,12 +38,12 @@ class LaboratoriesController < ApplicationController
   # PATCH/PUT /laboratories/1.json
   def update
     respond_to do |format|
-      if @laboratory.update(laboratory_params)
-        format.html { redirect_to @laboratory, notice: 'Laboratory was successfully updated.' }
+      if laboratory.update(laboratory_params)
+        format.html { redirect_to institution_laboratories_path(institution), notice: 'Laboratory was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
-        format.json { render json: @laboratory.errors, status: :unprocessable_entity }
+        format.json { render json: laboratory.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -54,21 +51,16 @@ class LaboratoriesController < ApplicationController
   # DELETE /laboratories/1
   # DELETE /laboratories/1.json
   def destroy
-    @laboratory.destroy
+    laboratory.destroy
     respond_to do |format|
-      format.html { redirect_to laboratories_url }
+      format.html { redirect_to institution_laboratories_url(institution) }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_laboratory
-      @laboratory = Laboratory.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def laboratory_params
-      params.require(:laboratory).permit(:name, :institution_id, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_id)
-    end
+  def laboratory_params
+    params.require(:laboratory).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_id)
+  end
 end

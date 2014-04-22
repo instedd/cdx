@@ -1,7 +1,3 @@
-%p#notice= notice
-%p
-  %strong Name:
-  = @institution.name
-= link_to 'Edit', edit_institution_path(@institution)
-|
-= link_to 'Back', institutions_path
+/ %hr
+
+= icon_link_to :'icf-delete', "Delete this institution", institution, method: :delete, confirm: "Are you sure you want to delete the institution '#{institution.name}'"

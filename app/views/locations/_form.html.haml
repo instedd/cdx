@@ -1,9 +1,9 @@
-= form_for @location do |f|
-  - if @location.errors.any?
+= form_for current_location do |f|
+  - if current_location.errors.any?
     #error_explanation
-      %h2= "#{pluralize(@location.errors.count, "error")} prohibited this location from being saved:"
+      %h2= "#{pluralize(current_location.errors.count, "error")} prohibited this location from being saved:"
       %ul
-        - @location.errors.full_messages.each do |msg|
+        - current_location.errors.full_messages.each do |msg|
           %li= msg
 
   .field
@@ -11,7 +11,7 @@
     = f.text_field :name
   .field
     = f.label :parent_id
-    = f.select :parent_id, nested_set_options(Location, @location) {|i| "#{'-' * i.level} #{i.name}" }
+    = f.select :parent_id, nested_set_options(Location, current_location) {|i| "#{'-' * i.level} #{i.name}" }
 
   .actions
     = f.submit 'Save'

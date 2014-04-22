@@ -1,0 +1,8 @@
+- content_for :instedd_content do
+  - full_row do
+    = render 'shared/institution_tabs'
+
+  .row-fluid
+    = yield
+
+= render template: 'layouts/application'

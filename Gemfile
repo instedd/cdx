@@ -9,6 +9,11 @@ gem 'jquery-rails'
 gem 'haml-rails'
 gem 'underscore-rails'
 gem 'awesome_nested_set'
+gem 'decent_exposure'
+
+# A newer version breaks instedd-bootstrap
+gem 'bootstrap-sass', '2.3.2.1'
+
 gem 'instedd-bootstrap', git: "https://bitbucket.org/instedd/instedd-bootstrap.git", branch: 'master'
 gem 'ruby-openid'
 gem 'rack-oauth2', git: "https://github.com/manastech/rack-oauth2.git", branch: 'master'

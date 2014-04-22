@@ -1,21 +1,5 @@
-%h1 Listing laboratories
-
-%table.table
-  %tr
-    %th Name
-    %th Location
-    %th Institution
-    %th{colspan:3}
-
-  - @laboratories.each do |laboratory|
-    %tr
-      %td= laboratory.name
-      %td= laboratory.location.name
-      %td= laboratory.institution.name
-      %td= link_to 'Show', laboratory
-      %td= link_to 'Edit', edit_laboratory_path(laboratory)
-      %td= link_to 'Destroy', laboratory, :method => :delete, :data => { :confirm => 'Are you sure?' }
-
-%br
-
-= link_to 'New Laboratory', new_laboratory_path
+.row-fluid
+  .span6
+    - simple_list :laboratory, title: 'Laboratories', icon: :folder, create_path: new_institution_laboratory_path(institution) do
+      - laboratories.each do |laboratory|
+        - simple_list_item laboratory.name, edit_institution_laboratory_path(institution, laboratory)

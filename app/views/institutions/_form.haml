@@ -1,15 +1,12 @@
-= form_for(@institution) do |f|
-  - if @institution.errors.any?
-    #error_explanation
-      %h2
-        = pluralize(@institution.errors.count, "error")
-        prohibited this institution from being saved:
-      %ul
-        - @institution.errors.full_messages.each do |msg|
-          %li= msg
-  .field
+= form_for(institution) do |f|
+  - if institution.errors.present?
+    .alert-container
+      .alert.alert-error
+        %ul
+          - institution.errors.full_messages.each do |msg|
+            %li= msg
+  %div
     = f.label :name
-    %br/
     = f.text_field :name
-  .actions
-    = f.submit
+
+  = f.submit class: 'btn'

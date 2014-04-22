@@ -1,19 +1,15 @@
-= form_for(@device) do |f|
-  - if @device.errors.any?
-    #error_explanation
-      %h2
-        = pluralize(@device.errors.count, "error")
-        prohibited this device from being saved:
-      %ul
-        - @device.errors.full_messages.each do |msg|
-          %li= msg
-  .field
+= form_for([institution, device]) do |f|
+  - if device.errors.present?
+    .alert-container
+      .alert.alert-error
+        %ul
+          - device.errors.full_messages.each do |msg|
+            %li= msg
+  %div
     = f.label :name
-    %br/
     = f.text_field :name
-  .field
+  %div
     = f.label :laboratory_id
-    %br/
-    = f.collection_select :laboratory_id, @laboratories, :id, :name
-  .actions
-    = f.submit
+    = f.collection_select :laboratory_id, laboratories, :id, :name
+
+  = f.submit class: 'btn'

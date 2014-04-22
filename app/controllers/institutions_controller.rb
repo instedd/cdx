@@ -1,48 +1,53 @@
 class InstitutionsController < ApplicationController
-  before_action :set_institution, only: [:show, :edit, :update, :destroy]
+  layout "institutions", except: [:index, :new]
+  layout "application", only: [:index, :new]
+
+  add_breadcrumb 'Institutions', :institutions_path
+
+  expose(:institutions) { current_user.institutions }
+  expose(:institution, attributes: :institution_params)
 
   def index
-    @institutions = current_user.institutions
   end
 
   def show
-  end
-
-  def new
-    @institution = Institution.new
+    add_breadcrumb institution.name, institution
+    add_breadcrumb 'Overview'
+    set_institution_tab :overview
   end
 
   def edit
+    add_breadcrumb institution.name, institution
+    add_breadcrumb 'Settings'
+    set_institution_tab :settings
   end
 
   def create
-    @institution = current_user.institutions.new(institution_params)
-
     respond_to do |format|
-      if @institution.save
-        format.html { redirect_to @institution, notice: 'Institution was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @institution }
+      if institution.save
+        format.html { redirect_to institution, notice: 'Institution was successfully created.' }
+        format.json { render action: 'show', status: :created, location: institution }
       else
         format.html { render action: 'new' }
-        format.json { render json: @institution.errors, status: :unprocessable_entity }
+        format.json { render json: institution.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def update
     respond_to do |format|
-      if @institution.update(institution_params)
-        format.html { redirect_to @institution, notice: 'Institution was successfully updated.' }
+      if institution.update(institution_params)
+        format.html { redirect_to institution, notice: 'Institution was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
-        format.json { render json: @institution.errors, status: :unprocessable_entity }
+        format.json { render json: institution.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def destroy
-    @institution.destroy
+    institution.destroy
     respond_to do |format|
       format.html { redirect_to institutions_url }
       format.json { head :no_content }
@@ -50,13 +55,8 @@ class InstitutionsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_institution
-      @institution = Institution.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def institution_params
-      params.require(:institution).permit(:name, :user_id)
-    end
+  def institution_params
+    params.require(:institution).permit(:name)
+  end
 end

@@ -1,27 +1,18 @@
-= form_for(@subscriber) do |f|
-  - if @subscriber.errors.any?
-    #error_explanation
-      %h2
-        = pluralize(@subscriber.errors.count, "error")
-        prohibited this subscriber from being saved:
-      %ul
-        - @subscriber.errors.full_messages.each do |msg|
-          %li= msg
-  .field
+= form_for([institution, subscriber]) do |f|
+  - if subscriber.errors.present?
+    .alert-container
+      .alert.alert-error
+        %ul
+          - subscriber.errors.full_messages.each do |msg|
+            %li= msg
+  %div
     = f.label :name
-    %br/
     = f.text_field :name
-  .field
-    = f.label :institution_id
-    %br/
-    = f.collection_select :institution_id, @institutions, :id, :name
-  .field
+  %div
     = f.label :callback_url
-    %br/
     = f.text_field :callback_url
-  .field
+  %div
     = f.label :auth_token
-    %br/
     = f.text_field :auth_token
-  .actions
-    = f.submit
+
+  = f.submit class: 'btn'

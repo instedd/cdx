@@ -1,80 +1,76 @@
 class DevicesController < ApplicationController
-  before_action :set_device, only: [:show, :edit, :update, :destroy, :regenerate_key]
-  before_action :load_laboratories, only: [:new, :edit]
+  layout "institutions"
+  set_institution_tab :devices
 
-  def index
-    @devices = Device.all
+  add_breadcrumb 'Institutions', :institutions_path
+  before_filter do
+    add_breadcrumb institution.name, institution_path(institution)
+    add_breadcrumb 'Devices', institution_devices_path(institution)
   end
+
+  expose(:institution) { current_user.institutions.find(params[:institution_id]) }
+  expose(:laboratories) { institution.laboratories }
+
+  expose(:devices) { institution.devices }
+  expose(:device, attributes: :device_params)
 
   def show
-  end
-
-  def new
-    @device = Device.new
+    add_breadcrumb device.name, institution_device_path(institution, device)
   end
 
   def edit
-  end
-
-  def regenerate_key
-    @device.set_key
-    respond_to do |format|
-      if @device.save
-        format.html { redirect_to @device, notice: 'Key updated' }
-        format.json { render action: 'show', location: @device }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: @device.errors, status: :unprocessable_entity }
-      end
-    end
+    add_breadcrumb device.name, institution_device_path(institution, device)
   end
 
   def create
-    @device = Device.new(device_params)
-
     respond_to do |format|
-      if @device.save
-        format.html { redirect_to @device, notice: 'Device was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @device }
+      if device.save
+        format.html { redirect_to institution_devices_path(institution), notice: 'Device was successfully created.' }
+        format.json { render action: 'show', status: :created, location: device }
       else
         format.html { render action: 'new' }
-        format.json { render json: @device.errors, status: :unprocessable_entity }
+        format.json { render json: device.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def update
     respond_to do |format|
-      if @device.update(device_params)
-        format.html { redirect_to @device, notice: 'Device was successfully updated.' }
+      if device.update(device_params)
+        format.html { redirect_to institution_devices_path(institution), notice: 'Device was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
-        format.json { render json: @device.errors, status: :unprocessable_entity }
+        format.json { render json: device.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def destroy
-    @device.destroy
+    device.destroy
     respond_to do |format|
-      format.html { redirect_to devices_url }
+      format.html { redirect_to institution_devices_url(institution) }
       format.json { head :no_content }
     end
   end
 
+  def regenerate_key
+    device.set_key
+    respond_to do |format|
+      if device.save
+        format.html { redirect_to edit_institution_device_path(institution, device), notice: 'Key updated' }
+        format.json { render action: 'show', location: device }
+      else
+        format.html { render action: 'edit' }
+        format.json { render json: device.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_device
-      @device = Device.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def device_params
-      params.require(:device).permit(:name, :laboratory_id, :index_name)
-    end
-
-    def load_laboratories
-      @laboratories = current_user.laboratories
-    end
+  def device_params
+    params.require(:device).permit(:name, :laboratory_id, :index_name)
+  end
 end

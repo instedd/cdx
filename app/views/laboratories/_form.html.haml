@@ -1,20 +1,16 @@
-= form_for @laboratory do |f|
-  - if @laboratory.errors.any?
-    #error_explanation
-      %h2= "#{pluralize(@laboratory.errors.count, "error")} prohibited this laboratory from being saved:"
-      %ul
-        - @laboratory.errors.full_messages.each do |msg|
-          %li= msg
+= form_for([institution, laboratory]) do |f|
+  - if laboratory.errors.present?
+    .alert-container
+      .alert.alert-error
+        %ul
+          - laboratory.errors.full_messages.each do |msg|
+            %li= msg
 
-  .field
+  %div
     = f.label :name
     = f.text_field :name
-  .field
+  %div
     = f.label :location_id
     = f.select :location_id, nested_set_options(Location) {|i| "#{'-' * i.level} #{i.name}" }
-  .field
-    = f.label :institution_id
-    = f.collection_select :institution_id, current_user.institutions, :id, :name
 
-  .actions
-    = f.submit 'Save'
+  = f.submit class: 'btn'

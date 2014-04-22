@@ -1,5 +1,14 @@
-%h1 Editing device
+%h3 Editing #{device.name}
+
 = render 'form'
-= link_to 'Show', @device
-|
-= link_to 'Back', devices_path
+
+%hr
+
+%p
+  %strong Secret Key:
+  = device.secret_key
+  = link_to "Generate new key", regenerate_key_institution_device_path(institution, device)
+
+%hr
+
+= icon_link_to :'icf-delete', "Delete this device", [institution, device], method: :delete, confirm: "Are you sure you want to delete the device '#{device.name}'"
