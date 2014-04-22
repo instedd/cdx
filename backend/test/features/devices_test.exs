@@ -8,7 +8,7 @@ defmodule DevicesTest do
     laboratory = Cdp.Repo.create Cdp.Laboratory.new(institution_id: institution.id, name: "bar")
     # subscriber = Cdp.Repo.create Cdp.Subscriber.new(institution_id: institution.id, auth_token: "foo", callback_url: "http://bar.baz")
     device = Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory.id, secret_key: "foo")
-    data = "{\"result\": \"positive\"}"
+    {:ok, data} = JSON.encode [result: "positive"]
     settings = Tirexs.ElasticSearch.Config.new()
     index_name = Cdp.Institution.elasticsearch_index_name(institution.id)
     # {:ok, institution: institution, device: device, data: data, settings: settings, index_name: index_name, subscriber: subscriber}
@@ -21,7 +21,9 @@ defmodule DevicesTest do
 
     [test_result] = Cdp.Repo.all Cdp.TestResult
     assert test_result.device_id == meta[:device].id
-    assert test_result.data == meta[:data]
+    assert test_result.raw_data != meta[:data]
+    test_result = Cdp.TestResult.decrypt(test_result)
+    assert test_result.raw_data == meta[:data]
   end
 
   test "create test_result in elasticsearch", meta do
@@ -35,6 +37,21 @@ defmodule DevicesTest do
     [result] = Tirexs.Query.create_resource(search).hits
     assert result["_source"]["result"] == "positive"
     assert result["_source"]["created_at"] != nil
+  end
+
+  test "doesn't store sensitive data in elasticsearch", meta do
+    data = "{\"result\": \"positive\", \"patient_id\": 1234}"
+    post("/devices/foo", data)
+
+    search = Tirexs.Search.search [index: meta[:index_name]] do
+      query do
+        match_all
+      end
+    end
+    [result] = Tirexs.Query.create_resource(search).hits
+    assert result["_source"]["result"] == "positive"
+    assert result["_source"]["created_at"] != nil
+    assert result["_source"]["patient_id"] == nil
   end
 
   # test "enqueues in RabbitMQ", meta do

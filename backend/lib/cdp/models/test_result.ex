@@ -8,25 +8,45 @@ defmodule Cdp.TestResult do
     belongs_to(:device, Cdp.Device)
     field :created_at, :datetime
     field :updated_at, :datetime
-    field :data, :binary
+    field :raw_data, :binary
+    field :sensitive_data, :binary
   end
 
-  def create_in_db(device, data) do
+  def create_in_db(device, data, raw_data) do
     now = Cdp.DateTime.now
+
+    sensitive_data = Enum.map sensitive_fields, fn field_name ->
+      {field_name, data[field_name]}
+    end
+
     test_result = Cdp.TestResult.new [
       device_id: device.id,
-      data: data,
+      raw_data: raw_data,
+      sensitive_data: sensitive_data,
       created_at: now,
       updated_at: now,
     ]
+
+    test_result = encrypt(test_result)
     Cdp.Repo.create(test_result)
   end
 
-  def create_in_elasticsearch(device, json_data) do
+  def find_by_id(test_result_id) do
+    query = from t in Cdp.TestResult,
+      where: t.id == ^test_result_id,
+      select: t
+    [test_result] = Cdp.Repo.all(query)
+    test_result = decrypt(test_result)
+    test_result
+  end
+
+  def create_in_elasticsearch(device, data) do
     laboratory = device.laboratory.get
     institution_id = laboratory.institution_id
 
-    {:ok, data} = JSON.decode json_data
+    # remove sensitive data from the hash
+    data = Dict.drop(data, (Enum.map sensitive_fields, &atom_to_binary(&1)))
+
     data = Dict.put data, :type, "test_result"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.now, "{ISO}"))
     data = Dict.put data, :device_id, device.id
@@ -39,27 +59,12 @@ defmodule Cdp.TestResult do
     end
   end
 
-  # def enqueue_in_rabbit(device, data) do
-  #   subscribers = Cdp.Subscriber.find_by_institution_id(device.institution_id)
-
-  #   amqp_config = Cdp.Dynamo.config[:rabbit_amqp]
-  #   amqp = Exrabbit.Utils.connect
-  #   channel = Exrabbit.Utils.channel amqp
-  #   Exrabbit.Utils.declare_exchange channel, amqp_config[:subscribers_exchange]
-  #   Exrabbit.Utils.declare_queue channel, amqp_config[:subscribers_queue], true
-  #   Exrabbit.Utils.bind_queue channel, amqp_config[:subscribers_queue], amqp_config[:subscribers_exchange]
-
-  #   Enum.each subscribers, fn(s) ->
-  #     IO.puts s.id
-  #     {:ok, message} = JSON.encode([test_result: data, subscriber: s.id])
-  #     Exrabbit.Utils.publish channel, amqp_config[:subscribers_exchange], "", message
-  #   end
-  # end
-
-  def create_and_enqueue(device_key, data) do
+  def create_and_enqueue(device_key, raw_data) do
     device = Cdp.Device.find_by_key(device_key)
 
-    Cdp.TestResult.create_in_db(device, data)
+    {:ok, data} = JSON.decode raw_data
+
+    Cdp.TestResult.create_in_db(device, data, raw_data)
     Cdp.TestResult.create_in_elasticsearch(device, data)
     # Cdp.TestResult.enqueue_in_rabbit(device, data)
   end
@@ -134,4 +139,83 @@ defmodule Cdp.TestResult do
     result = Tirexs.Query.create_resource(query)
     result.hits
   end
+
+  def encrypt(test_result) do
+    # des_ecb_encrypt(Key, Text) -> Cipher
+    :application.start(:crypto)
+    # Enum.reduce sensitive_fields, test_result, fn field_name, test ->
+    #   set(test, field_name, :crypto.des_ecb_encrypt(encryption_key, get(test, field_name)))
+    # end
+    {:ok, json_data} = JSON.encode(test_result.sensitive_data)
+    test_result = test_result.sensitive_data(json_data)
+    test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
+    test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
+  end
+
+  # defp get(test_result, field) do
+  #   apply(test_result, field, [])
+  # end
+
+  # defp set(test_result, field, value) do
+  #  apply(test_result, field, [value])
+  # end
+
+
+  def decrypt(test_result) do
+    # des_ecb_decrypt(Key, Cipher) -> Text
+    :application.start(:crypto)
+
+    # Enum.each sensitive_fields, fn field_name ->
+    #   set(test, field_name, :crypto.des_ecb_decrypt(encryption_key, get(test, field_name)))
+    # end
+    test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
+    {:ok, data} = JSON.decode(test_result.sensitive_data)
+    test_result = test_result.sensitive_data(data)
+    test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
+  end
+
+  defp encryption_key do
+    "some secure key"
+  end
+
+  def sensitive_fields do
+    [
+      :patient_id,
+      :patient_name,
+      :patient_telephone_number,
+    ]
+  end
+
+  def serchable_fields do
+    [
+      {:assay, :string},
+      {:assay_name, :multi_field},
+      {:device_serial_number, :multi_field},
+      {:guid, :string},
+      {:institution_id, :integer},
+      {:laboratory_id, :integer},
+      {:location_id, :integer},
+      {:parent_locations, :integer},
+      {:result, :multi_field},
+      {:start_time, :date},
+      {:system_user, :string},
+    ]
+  end
+
+  # def enqueue_in_rabbit(device, data) do
+  #   subscribers = Cdp.Subscriber.find_by_institution_id(device.institution_id)
+
+  #   amqp_config = Cdp.Dynamo.config[:rabbit_amqp]
+  #   amqp = Exrabbit.Utils.connect
+  #   channel = Exrabbit.Utils.channel amqp
+  #   Exrabbit.Utils.declare_exchange channel, amqp_config[:subscribers_exchange]
+  #   Exrabbit.Utils.declare_queue channel, amqp_config[:subscribers_queue], true
+  #   Exrabbit.Utils.bind_queue channel, amqp_config[:subscribers_queue], amqp_config[:subscribers_exchange]
+
+  #   Enum.each subscribers, fn(s) ->
+  #     IO.puts s.id
+  #     {:ok, message} = JSON.encode([test_result: data, subscriber: s.id])
+  #     Exrabbit.Utils.publish channel, amqp_config[:subscribers_exchange], "", message
+  #   end
+  # end
 end

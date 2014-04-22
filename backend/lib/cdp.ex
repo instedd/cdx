@@ -6,6 +6,7 @@ defmodule Cdp do
   application and its Dynamos.
   """
   def start(_type, _args) do
+    # Cdp.Elasticsearch.initialize()
     Cdp.Sup.start_link
   end
 end
