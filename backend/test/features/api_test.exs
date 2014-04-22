@@ -217,17 +217,17 @@ defmodule ApiTest do
     {:ok, test_json} = JSON.encode test
     post("/devices/foo", test_json)
 
-    conn = get("/api/updates?age_low=15")
+    conn = get("/api/updates?min_age=15")
     assert conn.status == 200
     {:ok, [response] } = JSON.decode(conn.sent_body)
     assert HashDict.get(response, "result") == "negative"
 
-    conn = get("/api/updates?age_low=20")
+    conn = get("/api/updates?min_age=20")
     assert conn.status == 200
     {:ok, [response] } = JSON.decode(conn.sent_body)
     assert HashDict.get(response, "result") == "negative"
 
-    conn = get("/api/updates?age_low=21")
+    conn = get("/api/updates?min_age=21")
     assert conn.status == 200
     {:ok, [] } = JSON.decode(conn.sent_body)
   end
@@ -241,17 +241,17 @@ defmodule ApiTest do
     {:ok, test_json} = JSON.encode test
     post("/devices/foo", test_json)
 
-    conn = get("/api/updates?age_high=15")
+    conn = get("/api/updates?max_age=15")
     assert conn.status == 200
     {:ok, [response] } = JSON.decode(conn.sent_body)
     assert HashDict.get(response, "result") == "positive"
 
-    conn = get("/api/updates?age_high=10")
+    conn = get("/api/updates?max_age=10")
     assert conn.status == 200
     {:ok, [response] } = JSON.decode(conn.sent_body)
     assert HashDict.get(response, "result") == "positive"
 
-    conn = get("/api/updates?age_high=9")
+    conn = get("/api/updates?max_age=9")
     assert conn.status == 200
     {:ok, [] } = JSON.decode(conn.sent_body)
   end

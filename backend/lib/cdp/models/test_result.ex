@@ -107,13 +107,13 @@ defmodule Cdp.TestResult do
       conditions = [condition | conditions]
     end
 
-    if age_low = params["age_low"] do
-      condition = [range: [age: [from: age_low, include_lower: true]]]
+    if min_age = params["min_age"] do
+      condition = [range: [age: [from: min_age, include_lower: true]]]
       conditions = [condition | conditions]
     end
 
-    if age_high = params["age_high"] do
-      condition = [range: [age: [to: age_high, include_upper: true]]]
+    if max_age = params["max_age"] do
+      condition = [range: [age: [to: max_age, include_upper: true]]]
       conditions = [condition | conditions]
     end
 
