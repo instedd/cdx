@@ -16,7 +16,7 @@ defmodule ApiTest do
   end
 
   def get_updates(query_string, post_data \\ "") do
-    conn = get("/api/updates?#{query_string}", post_data)
+    conn = get("/api/events?#{query_string}", post_data)
     assert conn.status == 200
     JSON.decode!(conn.sent_body)
   end

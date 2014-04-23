@@ -1,7 +1,7 @@
 defmodule ApiRouter do
   use Dynamo.Router
 
-  get "/updates" do
+  get "/events" do
     if String.length(conn.req_body()) == 0 do
       params = Dynamo.Connection.QueryParser.parse(conn.query_string())
     else

@@ -43,7 +43,6 @@ defmodule Cdp.TestResult do
     laboratory = device.laboratory.get
     institution_id = laboratory.institution_id
 
-    # remove sensitive data from the hash
     data = Dict.drop(data, (Enum.map sensitive_fields, &atom_to_binary(&1)))
 
     data = Dict.put data, :type, "test_result"
@@ -195,31 +194,13 @@ defmodule Cdp.TestResult do
   end
 
   def encrypt(test_result) do
-    # des_ecb_encrypt(Key, Text) -> Cipher
-    # Enum.reduce sensitive_fields, test_result, fn field_name, test ->
-    #   set(test, field_name, :crypto.des_ecb_encrypt(encryption_key, get(test, field_name)))
-    # end
     {:ok, json_data} = JSON.encode(test_result.sensitive_data)
     test_result = test_result.sensitive_data(json_data)
     test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
     test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
   end
 
-  # defp get(test_result, field) do
-  #   apply(test_result, field, [])
-  # end
-
-  # defp set(test_result, field, value) do
-  #  apply(test_result, field, [value])
-  # end
-
-
   def decrypt(test_result) do
-    # des_ecb_decrypt(Key, Cipher) -> Text
-
-    # Enum.each sensitive_fields, fn field_name ->
-    #   set(test, field_name, :crypto.des_ecb_decrypt(encryption_key, get(test, field_name)))
-    # end
     test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
     {:ok, data} = JSON.decode(test_result.sensitive_data)
     test_result = test_result.sensitive_data(data)
