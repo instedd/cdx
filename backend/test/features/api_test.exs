@@ -149,13 +149,13 @@ defmodule ApiTest do
   end
 
   test "filters by assay code" do
-    post_result result: "positive", assay_code: "GX4001"
-    post_result result: "negative", assay_code: "GX1234"
+    post_result result: "positive", assay_name: "GX4001"
+    post_result result: "negative", assay_name: "GX1234"
 
-    response = get_one_update("assay_code=GX4001")
+    response = get_one_update("assay_name=GX4001")
     assert HashDict.get(response, "result") == "positive"
 
-    response = get_one_update("assay_code=GX1234")
+    response = get_one_update("assay_name=GX1234")
     assert HashDict.get(response, "result") == "negative"
   end
 

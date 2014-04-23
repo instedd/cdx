@@ -101,8 +101,8 @@ defmodule Cdp.TestResult do
       conditions = [condition | conditions]
     end
 
-    if assay_code = params["assay_code"] do
-      condition = [match: [assay_code: assay_code]]
+    if assay_name = params["assay_name"] do
+      condition = [match: [assay_name: assay_name]]
       conditions = [condition | conditions]
     end
 
@@ -187,7 +187,7 @@ defmodule Cdp.TestResult do
   def serchable_fields do
     [
       {:assay, :string},
-      {:assay_code, :string},
+      {:assay_name, :string},
       {:device_serial_number, :multi_field},
       {:guid, :string},
       {:institution_id, :integer},
