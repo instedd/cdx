@@ -23,7 +23,7 @@ defmodule Cdp.Mixfile do
       { :postgrex, github: "ericmj/postgrex" },
       { :ecto, github: "elixir-lang/ecto" },
       { :json, github: "cblage/elixir-json" },
-      { :tirexs, github: "roundscope/tirexs" },
+      { :tirexs, github: "manastech/tirexs", branch: "master" },
       { :exrabbit, github: "neo/exrabbit" },
       { :timex, github: "bitwalker/timex" },
       { :exlager, github: "khia/exlager", ref: "2a4b002dfe34abf1b03c9d26a3ebe2e101437f5"},

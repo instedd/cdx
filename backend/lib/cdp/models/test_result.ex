@@ -69,6 +69,39 @@ defmodule Cdp.TestResult do
   end
 
   def query(params) do
+    query = [bool: [must: fetch_conditions(params)]]
+
+    if group_by = params["group_by"] do
+      query = [
+        search: [
+          query: query,
+          aggregations: [
+            count: [terms: [field: group_by]],
+          ],
+          size: 0
+        ]
+      ]
+
+      result = Tirexs.Query.create_resource(query)
+      count = result.aggregations["count"]
+      buckets = count["buckets"]
+      Enum.map buckets, fn(bucket) ->
+        [{group_by, bucket["key"]}, {"count", bucket["doc_count"]}]
+      end
+    else
+      query = [
+        search: [
+          query: query,
+          sort: [[created_at: "asc"]],
+        ],
+        index: "_all"
+      ]
+      result = Tirexs.Query.create_resource(query)
+      Enum.map result.hits, fn(hit) -> hit["_source"] end
+    end
+  end
+
+  defp fetch_conditions(params) do
     conditions = []
 
     if since = params["since"] do
@@ -121,22 +154,12 @@ defmodule Cdp.TestResult do
       conditions = [condition | conditions]
     end
 
-    query = [
-      search: [
-        query: [
-          bool: [
-            must: conditions
-          ]
-        ],
-        sort: [
-          [created_at: "asc"]
-        ]
-      ],
-      index: "_all"
-    ]
+    if Enum.empty?(conditions) do
+      condition = [match_all: []]
+      conditions = [condition | conditions]
+    end
 
-    result = Tirexs.Query.create_resource(query)
-    result.hits
+    conditions
   end
 
   def encrypt(test_result) do
