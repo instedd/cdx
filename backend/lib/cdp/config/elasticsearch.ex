@@ -1,102 +1,51 @@
 defmodule Cdp.Elasticsearch do
-  # use Lager
+  require Lager
 
   def default_url do
-    "http://localhost:9200"
+    'http://localhost:9200'
   end
 
   def initialize do
-    url = index_template_url()
-    template_json_binary = iolist_to_binary(template_as_json())
-    {status, result} = :httpc.request(:put, {Url, [], "", template_json_binary}, [], [])
-    case status do
-      :ok -> status
-      _   -> "ES test results indices mapping definition failed"
-      # _   -> :lager.warning("ES test results indices mapping definition failed: ~p", [result]), status
+    :inets.start
+    {status, result} = :httpc.request(:put, {index_template_url, [], '', template_as_json}, [], [])
+    case result do
+      {{_, 200, _ },_, _ } -> status
+      {{_, error_code, _ },_, _ }   ->
+        log_error(result)
+        error_code
+      _ ->
+        log_error(result)
+        status
     end
   end
 
-def index_template_url do
-  :string.join([default_url(), "_template", "test_results_index_template"], "/")
-end
-
-defp template_as_json do
-  properties = build_properties_mapping()
-  JSON.encode({:struct, [
-    {:template, 'cdp_institution_*'},
-    {:mappings, {:struct, [
-      {:test_result, {:struct, [
-        {:properties, {:struct, properties}}
-      ]}}
-    ]}}
-  ]})
-end
-
-defp build_properties_mapping do
-  Enum.map Cdp.TestResult.serchable_fields, fn {name, type} ->
-    map_field(name, type)
+  defp log_error(result) do
+    Lager.error("ES test results indices mapping definition failed: #{inspect(result)}")
   end
-end
 
-defp map_field(field, type) do
-  fieldBody = case type do
-    :multi_field ->
-         {:fields,
-            {:struct, [
-              {:analyzed, {:struct, [{type, :string}, {:index, :analyzed}]}},
-              {"@#{field}", {:struct, [{type, :string}, {:index, :not_analyzed}]}}
-            ]}};
-    _ -> {:index, :not_analyzed}
+  def index_template_url do
+    :string.join([default_url, '_template', 'test_results_index_template'], '/')
   end
-  {"@#{field}", {:struct, [{type, type}, fieldBody]}}
-end
 
-defp template do
-  '{
-        "template" : "cdp_*",
-        "settings" : {
-          "index.refresh_interval" : "5s",
-          "analysis" : {
-            "analyzer" : {
-              "default" : {
-                "type" : "standard",
-                "stopwords" : "_none_"
-              }
-            }
-          }
-        },
-        "mappings" : {
-          "_default_" : {
-             "_all" : {"enabled" : true},
-             "dynamic_templates" : [ {
-               "string_fields" : {
-                 "path_match" : "@fields.*",
-                 "match_mapping_type" : "string",
-                 "mapping" : {
-                   "type" : "multi_field",
-                     "fields" : {
-                       "{name}" : {"type": "string", "index" : "analyzed", "omit_norms" : true },
-                       "raw" : {"type": "string", "index" : "not_analyzed", "ignore_above" : 256}
-                     }
-                 }
-               }
-             } ],
-             "properties" : {
-               "@version": { "type": "string", "index": "not_analyzed" },
-               "@timestamp" : { "type": "date", "index": "not_analyzed" },
-               "@tags" : { "type": "string", "index": "not_analyzed" },
-               "@activity" : { "type": "string", "index": "not_analyzed" },
-               "@parent" : { "type": "string", "index": "not_analyzed" },
-               "@source" : {
-                 "type": "multi_field",
-                 "fields": {
-                  "analyzed": { "type": "string", "index": "analyzed" },
-                  "@source": { "type": "string", "index": "not_analyzed" }
-                 }
-               }
-             }
-          }
-        }
-      }'
+  defp template_as_json do
+    JSON.encode!([template: "cdp_institution_*", mappings: [ test_result: [ properties: build_properties_mapping]]])
+  end
+
+  defp build_properties_mapping do
+    Enum.map Cdp.TestResult.serchable_fields, fn {name, type} ->
+      map_field(name, type)
+    end
+  end
+
+  defp map_field(field, type) do
+    field_body = case type do
+      :multi_field ->
+            [
+              fields: [ analyzed: [{:type, :string}, {:index, :analyzed}]],
+              field: [{:type, :string}, {:index, :not_analyzed}]
+            ]
+      _ -> [index: :not_analyzed]
+    end
+    {field, [type: type] ++ field_body}
   end
 end

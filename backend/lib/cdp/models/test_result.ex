@@ -2,7 +2,6 @@ defmodule Cdp.TestResult do
   use Timex
   use Ecto.Model
   import Tirexs.Bulk
-  import Tirexs.Search
 
   queryable "test_results" do
     belongs_to(:device, Cdp.Device)
@@ -142,7 +141,6 @@ defmodule Cdp.TestResult do
 
   def encrypt(test_result) do
     # des_ecb_encrypt(Key, Text) -> Cipher
-    :application.start(:crypto)
     # Enum.reduce sensitive_fields, test_result, fn field_name, test ->
     #   set(test, field_name, :crypto.des_ecb_encrypt(encryption_key, get(test, field_name)))
     # end
@@ -163,7 +161,6 @@ defmodule Cdp.TestResult do
 
   def decrypt(test_result) do
     # des_ecb_decrypt(Key, Cipher) -> Text
-    :application.start(:crypto)
 
     # Enum.each sensitive_fields, fn field_name ->
     #   set(test, field_name, :crypto.des_ecb_decrypt(encryption_key, get(test, field_name)))
@@ -183,22 +180,30 @@ defmodule Cdp.TestResult do
       :patient_id,
       :patient_name,
       :patient_telephone_number,
+      :patient_zip_code,
     ]
   end
 
   def serchable_fields do
     [
       {:assay, :string},
-      {:assay_name, :multi_field},
+      {:assay_code, :string},
       {:device_serial_number, :multi_field},
       {:guid, :string},
       {:institution_id, :integer},
       {:laboratory_id, :integer},
       {:location_id, :integer},
       {:parent_locations, :integer},
-      {:result, :multi_field},
+      {:result, :string},
       {:start_time, :date},
       {:system_user, :string},
+      {:age, :integer},
+      {:device_id, :integer},
+      {:type, :string},
+      {:created_at, :date},
+      {:device_id, :integer},
+      {:laboratory_id, :integer},
+      {:institution_id, :integer},
     ]
   end
 

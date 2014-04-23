@@ -26,6 +26,7 @@ defmodule Cdp.Mixfile do
       { :tirexs, github: "roundscope/tirexs" },
       { :exrabbit, github: "neo/exrabbit" },
       { :timex, github: "bitwalker/timex" },
+      { :exlager, github: "khia/exlager", ref: "2a4b002dfe34abf1b03c9d26a3ebe2e101437f5"},
     ]
   end
 end
