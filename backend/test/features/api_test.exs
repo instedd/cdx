@@ -15,259 +15,181 @@ defmodule ApiTest do
     {:ok, institution: institution, institution2: institution2, laboratory: laboratory, device: device, settings: settings, index_name: index_name, index_name2: index_name2}
   end
 
+  def get_updates(query_string, post_data \\ "") do
+    conn = get("/api/updates?#{query_string}", post_data)
+    assert conn.status == 200
+    JSON.decode!(conn.sent_body)
+  end
+
+  def get_one_update(query_string, post_data \\ "") do
+    [result] = get_updates(query_string, post_data)
+    result
+  end
+
+  def assert_no_updates(query_string, post_data \\ "") do
+    assert get_updates(query_string, post_data) == []
+  end
+
+  def post_result(result, device \\ "foo") do
+    post("/devices/#{device}", JSON.encode!(result))
+  end
+
   test "checks for new tests since a date" do
     before_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
 
-    first_test = [result: "positive"]
-    {:ok, first_test_json} = JSON.encode first_test
-    post("/devices/foo", first_test_json)
+    post_result result: "positive"
 
-    conn = get("/api/updates", "{\"since\": \"#{before_first_test}\"}")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("", "{\"since\": \"#{before_first_test}\"}")
     assert HashDict.get(response, "result") == "positive"
 
     :timer.sleep(1000)
     after_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
 
-    second_test = [result: "negative"]
-    {:ok, second_test_json} = JSON.encode second_test
-    post("/devices/foo", second_test_json)
+    post_result result: "negative"
 
-    conn = get("/api/updates", "{\"since\": \"#{after_first_test}\"}")
-    assert conn.status == 200
-    {:ok, [response]} = JSON.decode(conn.sent_body)
+    response = get_one_update("", "{\"since\": \"#{after_first_test}\"}")
     assert HashDict.get(response,"result") == "negative"
 
-    conn = get("/api/updates", "{\"since\": \"#{before_first_test}\"}")
-    assert conn.status == 200
-    {:ok, [first, second]} = JSON.decode(conn.sent_body)
+    [first, second] = get_updates("", "{\"since\": \"#{before_first_test}\"}")
     assert HashDict.get(first, "result") == "positive"
     assert HashDict.get(second, "result") == "negative"
 
     :timer.sleep(1000)
     after_second_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
 
-    conn = get("/api/updates", "{\"since\": \"#{after_second_test}\"}")
-    assert conn.status == 200
-    {:ok, []} = JSON.decode(conn.sent_body)
+    assert_no_updates "", "{\"since\": \"#{after_second_test}\"}"
   end
 
   test "checks for new tests since a date with query string" do
     before_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
 
-    first_test = [result: "positive"]
-    {:ok, first_test_json} = JSON.encode first_test
-    post("/devices/foo", first_test_json)
+    post_result result: "positive"
 
-    conn = get("/api/updates?since=#{Cdp.Cgi.escape(before_first_test)}")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("since=#{Cdp.Cgi.escape(before_first_test)}")
     assert HashDict.get(response, "result") == "positive"
 
     :timer.sleep(1000)
     after_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
 
-    second_test = [result: "negative"]
-    {:ok, second_test_json} = JSON.encode second_test
-    post("/devices/foo", second_test_json)
+    post_result result: "negative"
 
-    conn = get("/api/updates?since=#{Cdp.Cgi.escape(after_first_test)}")
-    assert conn.status == 200
-    {:ok, [response]} = JSON.decode(conn.sent_body)
+    response = get_one_update("since=#{Cdp.Cgi.escape(after_first_test)}")
     assert HashDict.get(response,"result") == "negative"
 
-    conn = get("/api/updates?since=#{Cdp.Cgi.escape(before_first_test)}")
-    assert conn.status == 200
-    {:ok, [first, second]} = JSON.decode(conn.sent_body)
+    [first, second] = get_updates("since=#{Cdp.Cgi.escape(before_first_test)}")
     assert HashDict.get(first, "result") == "positive"
     assert HashDict.get(second, "result") == "negative"
 
     :timer.sleep(1000)
     after_second_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
 
-    conn = get("/api/updates?since=#{Cdp.Cgi.escape(after_second_test)}")
-    assert conn.status == 200
-    {:ok, []} = JSON.decode(conn.sent_body)
+    assert_no_updates("since=#{Cdp.Cgi.escape(after_second_test)}")
   end
 
   test "checks for new tests util a date with query string" do
-    first_test = [result: "positive"]
-    {:ok, first_test_json} = JSON.encode first_test
-    post("/devices/foo", first_test_json)
+    post_result result: "positive"
 
     after_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
 
-    conn = get("/api/updates?until=#{Cdp.Cgi.escape(after_first_test)}")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("until=#{Cdp.Cgi.escape(after_first_test)}")
     assert HashDict.get(response, "result") == "positive"
 
     :timer.sleep(1000)
 
-    second_test = [result: "negative"]
-    {:ok, second_test_json} = JSON.encode second_test
-    post("/devices/foo", second_test_json)
+    post_result result: "negative"
 
-    conn = get("/api/updates?until=#{Cdp.Cgi.escape(after_first_test)}")
-    assert conn.status == 200
-    {:ok, [response]} = JSON.decode(conn.sent_body)
+    response = get_one_update("until=#{Cdp.Cgi.escape(after_first_test)}")
     assert HashDict.get(response,"result") == "positive"
   end
 
   test "filters by device", meta do
-    foo_test = [result: "positive"]
-    {:ok, foo_test_json} = JSON.encode foo_test
-    post("/devices/foo", foo_test_json)
+    post_result result: "positive"
 
     Cdp.Repo.create Cdp.Device.new(laboratory_id: meta[:laboratory].id, secret_key: "bar")
 
-    bar_test = [result: "negative"]
-    {:ok, bar_test_json} = JSON.encode bar_test
-    post("/devices/bar", bar_test_json)
+    post_result [result: "negative"], "bar"
 
-    conn = get("/api/updates?device=#{meta[:device].id}")
-    assert conn.status == 200
-    {:ok, [first]} = JSON.decode(conn.sent_body)
-    assert HashDict.get(first, "result") == "positive"
+    response = get_one_update("device=#{meta[:device].id}")
+    assert HashDict.get(response, "result") == "positive"
   end
 
   test "filters by laboratory", meta do
-    foo_test = [result: "positive"]
-    {:ok, foo_test_json} = JSON.encode foo_test
-    post("/devices/foo", foo_test_json)
+    post_result result: "positive"
 
     laboratory2 = Cdp.Repo.create Cdp.Laboratory.new(institution_id: meta[:institution].id, name: "baz")
     Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory2.id, secret_key: "bar")
 
-    bar_test = [result: "negative"]
-    {:ok, bar_test_json} = JSON.encode bar_test
-    post("/devices/bar", bar_test_json)
+    post_result [result: "negative"], "bar"
 
-    conn = get("/api/updates?laboratory=#{meta[:laboratory].id}")
-    assert conn.status == 200
-    {:ok, [first]} = JSON.decode(conn.sent_body)
-    assert HashDict.get(first, "result") == "positive"
+    response = get_one_update("laboratory=#{meta[:laboratory].id}")
+    assert HashDict.get(response, "result") == "positive"
   end
 
   test "filters by institution", meta do
-    foo_test = [result: "positive"]
-    {:ok, foo_test_json} = JSON.encode foo_test
-    post("/devices/foo", foo_test_json)
+    post_result result: "positive"
 
     laboratory2 = Cdp.Repo.create Cdp.Laboratory.new(institution_id: meta[:institution2].id, name: "baz")
     Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory2.id, secret_key: "bar")
 
-    bar_test = [result: "negative"]
-    {:ok, bar_test_json} = JSON.encode bar_test
-    post("/devices/bar", bar_test_json)
+    post_result [result: "negative"], "bar"
 
-    conn = get("/api/updates?institution=#{meta[:institution].id}")
-    assert conn.status == 200
-    {:ok, [first]} = JSON.decode(conn.sent_body)
-    assert HashDict.get(first, "result") == "positive"
+    response = get_one_update("institution=#{meta[:institution].id}")
+    assert HashDict.get(response, "result") == "positive"
   end
 
   test "filters by gender" do
-    test = [result: "positive", gender: "male"]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
+    post_result result: "positive", gender: "male"
+    post_result result: "negative", gender: "female"
 
-    test = [result: "negative", gender: "female"]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
-
-    conn = get("/api/updates?gender=male")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("gender=male")
     assert HashDict.get(response, "result") == "positive"
 
-    conn = get("/api/updates?gender=female")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("gender=female")
     assert HashDict.get(response, "result") == "negative"
   end
 
   test "filters by assay code" do
-    test = [result: "positive", assay_code: "GX4001"]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
+    post_result result: "positive", assay_code: "GX4001"
+    post_result result: "negative", assay_code: "GX1234"
 
-    test = [result: "negative", assay_code: "GX1234"]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
-
-    conn = get("/api/updates?assay_code=GX4001")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("assay_code=GX4001")
     assert HashDict.get(response, "result") == "positive"
 
-    conn = get("/api/updates?assay_code=GX1234")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("assay_code=GX1234")
     assert HashDict.get(response, "result") == "negative"
   end
 
   test "filters by age low" do
-    test = [result: "positive", age: 10]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
+    post_result result: "positive", age: 10
+    post_result result: "negative", age: 20
 
-    test = [result: "negative", age: 20]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
-
-    conn = get("/api/updates?min_age=15")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("min_age=15")
     assert HashDict.get(response, "result") == "negative"
 
-    conn = get("/api/updates?min_age=20")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("min_age=20")
     assert HashDict.get(response, "result") == "negative"
 
-    conn = get("/api/updates?min_age=21")
-    assert conn.status == 200
-    {:ok, [] } = JSON.decode(conn.sent_body)
+    assert_no_updates("min_age=21")
   end
 
   test "filters by age high" do
-    test = [result: "positive", age: 10]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
+    post_result result: "positive", age: 10
+    post_result result: "negative", age: 20
 
-    test = [result: "negative", age: 20]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
-
-    conn = get("/api/updates?max_age=15")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("max_age=15")
     assert HashDict.get(response, "result") == "positive"
 
-    conn = get("/api/updates?max_age=10")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("max_age=10")
     assert HashDict.get(response, "result") == "positive"
 
-    conn = get("/api/updates?max_age=9")
-    assert conn.status == 200
-    {:ok, [] } = JSON.decode(conn.sent_body)
+    assert_no_updates("max_age=9")
   end
 
   test "filters by result" do
-    test = [result: "positive", age: 10]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
+    post_result result: "positive", age: 10
+    post_result result: "negative", age: 20
 
-    test = [result: "negative", age: 20]
-    {:ok, test_json} = JSON.encode test
-    post("/devices/foo", test_json)
-
-    conn = get("/api/updates?result=positive")
-    assert conn.status == 200
-    {:ok, [response] } = JSON.decode(conn.sent_body)
+    response = get_one_update("result=positive")
     assert HashDict.get(response, "age") == 10
   end
 
