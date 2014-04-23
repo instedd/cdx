@@ -1,4 +1,6 @@
 class Laboratory < ActiveRecord::Base
+  resourcify
+
   belongs_to :institution
   has_one :user, through: :institution
   belongs_to :location

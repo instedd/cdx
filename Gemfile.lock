@@ -251,6 +251,7 @@ GEM
       json (~> 1.4)
     rest-client (1.6.7)
       mime-types (>= 1.16)
+    rolify (3.4.0)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
@@ -363,6 +364,7 @@ DEPENDENCIES
   rack-oauth2!
   rails (= 4.0.2)
   rails_config
+  rolify
   rspec
   rspec-rails
   ruby-openid

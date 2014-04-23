@@ -1,4 +1,6 @@
 class Institution < ActiveRecord::Base
+  resourcify
+
   belongs_to :user
   has_many :subscribers
   has_many :laboratories
