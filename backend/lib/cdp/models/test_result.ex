@@ -69,39 +69,71 @@ defmodule Cdp.TestResult do
   end
 
   def query(params) do
-    query = [bool: [must: fetch_conditions(params)]]
+    query = [bool: [must: process_conditions(params)]]
 
     if group_by = params["group_by"] do
-      query = [
-        search: [
-          query: query,
-          aggregations: [
-            count: [terms: [field: group_by]],
-          ],
-          size: 0
-        ]
-      ]
-
-      result = Tirexs.Query.create_resource(query)
-      count = result.aggregations["count"]
-      buckets = count["buckets"]
-      Enum.map buckets, fn(bucket) ->
-        [{group_by, bucket["key"]}, {"count", bucket["doc_count"]}]
-      end
+      query_with_group_by(query, group_by)
     else
-      query = [
-        search: [
-          query: query,
-          sort: [[created_at: "asc"]],
-        ],
-        index: "_all"
-      ]
-      result = Tirexs.Query.create_resource(query)
-      Enum.map result.hits, fn(hit) -> hit["_source"] end
+      query_without_group_by(query)
     end
   end
 
-  defp fetch_conditions(params) do
+  defp query_with_group_by(query, group_by) do
+    all_group_by = String.split(group_by, ",")
+    aggregations = process_group_by(all_group_by)
+
+    query = [
+      search: [
+        query: query,
+        aggregations: aggregations,
+        size: 0
+      ]
+    ]
+
+    result = Tirexs.Query.create_resource(query)
+    process_group_by_buckets(result.aggregations, all_group_by, [], [], 0)
+  end
+
+  defp process_group_by_buckets(aggregations, all_group_by, results, result, doc_count) do
+    count = Dict.get(aggregations, "count")
+    if count do
+      buckets = count["buckets"]
+      Enum.reduce buckets, results, fn(bucket, results) ->
+        [first_group_by | other_group_by] = all_group_by
+        result = result ++ [{first_group_by, bucket["key"]}]
+        process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
+      end
+    else
+      result = result ++ [count: doc_count]
+      [result | results]
+    end
+  end
+
+  defp process_group_by([group_by]) do
+    [count: [terms: [field: group_by]]]
+  end
+
+  defp process_group_by([group_by|rest]) do
+    aggregations = process_group_by(rest)
+    [
+      count: [terms: aggregations[:count][:terms]] ++
+        [aggregations: process_group_by([group_by])]
+    ]
+  end
+
+  defp query_without_group_by(query) do
+    query = [
+      search: [
+        query: query,
+        sort: [[created_at: "asc"]],
+      ],
+      index: "_all"
+    ]
+    result = Tirexs.Query.create_resource(query)
+    Enum.map result.hits, fn(hit) -> hit["_source"] end
+  end
+
+  defp process_conditions(params) do
     conditions = []
 
     if since = params["since"] do

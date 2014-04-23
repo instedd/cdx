@@ -204,6 +204,28 @@ defmodule ApiTest do
     assert HashDict.get(male, "count") == 2
   end
 
+  test "groups by gender and assay_code" do
+    post_result result: "positive", gender: "male", assay_code: "a"
+    post_result result: "positive", gender: "male", assay_code: "a"
+    post_result result: "positive", gender: "male", assay_code: "b"
+    post_result result: "negative", gender: "female", assay_code: "a"
+    post_result result: "negative", gender: "female", assay_code: "b"
+    post_result result: "negative", gender: "female", assay_code: "b"
+
+    response = get_updates("group_by=gender,assay_code")
+    [female_a, female_b, male_a, male_b] = Enum.sort response, fn(r1, r2) ->
+      if r1["gender"] == r2["gender"] do
+        r1["assay_code"] < r2["assay_code"]
+      else
+        r1["gender"] < r2["gender"]
+      end
+    end
+    assert HashDict.get(female_a, "count") == 1
+    assert HashDict.get(female_b, "count") == 2
+    assert HashDict.get(male_a, "count") == 2
+    assert HashDict.get(male_b, "count") == 1
+  end
+
   teardown(meta) do
     Enum.each [Cdp.Institution, Cdp.Laboratory, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
     Tirexs.ElasticSearch.delete meta[:index_name], meta[:settings]
