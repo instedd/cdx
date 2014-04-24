@@ -10,4 +10,5 @@ defmodule ApplicationRouter do
 
   forward "/devices", to: DevicesRouter
   forward "/api", to: ApiRouter
+  forward "/playground", to: PlaygroundRouter
 end
