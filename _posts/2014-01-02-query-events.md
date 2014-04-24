@@ -96,7 +96,7 @@ Returns a collection of [events](#/event-resource)
 
 Returns a collection of grouped values
 
-````/events?group_by=gender,result```
+```/events?group_by=gender,result```
 
 ```[
   {
