@@ -159,7 +159,20 @@ defmodule ApiTest do
     assert HashDict.get(response, "result") == "negative"
   end
 
-  test "filters by age low" do
+  test "filters by age" do
+    post_result result: "positive", age: 10
+    post_result result: "negative", age: 20
+
+    response = get_one_update("age=10")
+    assert HashDict.get(response, "result") == "positive"
+
+    response = get_one_update("age=20")
+    assert HashDict.get(response, "result") == "negative"
+
+    assert_no_updates("age=15")
+  end
+
+  test "filters by min age" do
     post_result result: "positive", age: 10
     post_result result: "negative", age: 20
 
@@ -172,7 +185,7 @@ defmodule ApiTest do
     assert_no_updates("min_age=21")
   end
 
-  test "filters by age high" do
+  test "filters by max age" do
     post_result result: "positive", age: 10
     post_result result: "negative", age: 20
 
