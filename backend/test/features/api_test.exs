@@ -34,71 +34,81 @@ defmodule ApiTest do
     post("/devices/#{device}", JSON.encode!(result))
   end
 
+  def create_result(result, date \\ :calendar.universal_time(), device \\ "foo") do
+    Cdp.TestResult.create_and_enqueue(device, JSON.encode!(result), date)
+  end
+
   test "checks for new tests since a date" do
-    before_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
+    before_first_test = {{2010,1,1},{12,0,0}}
+    before_first_test_formatted = DateFormat.format!(Date.from(before_first_test), "{ISO}")
 
-    post_result result: "positive"
+    create_result [result: "positive"], before_first_test
 
-    response = get_one_update("", "{\"since\": \"#{before_first_test}\"}")
+    response = get_one_update("", "{\"since\": \"#{before_first_test_formatted}\"}")
     assert HashDict.get(response, "result") == "positive"
 
-    :timer.sleep(1000)
-    after_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
+    after_first_test = {{2010,1,2},{12,0,0}}
+    after_first_test_formatted = DateFormat.format!(Date.from(after_first_test), "{ISO}")
 
-    post_result result: "negative"
+    create_result [result: "negative"], after_first_test
 
-    response = get_one_update("", "{\"since\": \"#{after_first_test}\"}")
+    response = get_one_update("", "{\"since\": \"#{after_first_test_formatted}\"}")
     assert HashDict.get(response,"result") == "negative"
 
-    [first, second] = get_updates("", "{\"since\": \"#{before_first_test}\"}")
+    [first, second] = get_updates("", "{\"since\": \"#{before_first_test_formatted}\"}")
     assert HashDict.get(first, "result") == "positive"
     assert HashDict.get(second, "result") == "negative"
 
-    :timer.sleep(1000)
-    after_second_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
+    after_second_test = {{2010,1,3},{12,0,0}}
+    after_second_test_formatted = DateFormat.format!(Date.from(after_second_test), "{ISO}")
 
-    assert_no_updates "", "{\"since\": \"#{after_second_test}\"}"
+    assert_no_updates "", "{\"since\": \"#{after_second_test_formatted}\"}"
   end
 
   test "checks for new tests since a date with query string" do
-    before_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
+    before_first_test = {{2010,1,1},{12,0,0}}
+    before_first_test_formatted = DateFormat.format!(Date.from(before_first_test), "{ISO}")
 
-    post_result result: "positive"
+    create_result [result: "positive"], before_first_test
 
-    response = get_one_update("since=#{Cdp.Cgi.escape(before_first_test)}")
+    response = get_one_update("since=#{Cdp.Cgi.escape(before_first_test_formatted)}")
     assert HashDict.get(response, "result") == "positive"
 
-    :timer.sleep(1000)
-    after_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
+    after_first_test = {{2010,1,2},{12,0,0}}
+    after_first_test_formatted = DateFormat.format!(Date.from(after_first_test), "{ISO}")
 
-    post_result result: "negative"
+    create_result [result: "negative"], after_first_test
 
-    response = get_one_update("since=#{Cdp.Cgi.escape(after_first_test)}")
+    response = get_one_update("since=#{Cdp.Cgi.escape(after_first_test_formatted)}")
     assert HashDict.get(response,"result") == "negative"
 
-    [first, second] = get_updates("since=#{Cdp.Cgi.escape(before_first_test)}")
+    [first, second] = get_updates("since=#{Cdp.Cgi.escape(before_first_test_formatted)}")
     assert HashDict.get(first, "result") == "positive"
     assert HashDict.get(second, "result") == "negative"
 
-    :timer.sleep(1000)
-    after_second_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
+    after_second_test = {{2010,1,3},{12,0,0}}
+    after_second_test_formatted = DateFormat.format!(Date.from(after_second_test), "{ISO}")
 
-    assert_no_updates("since=#{Cdp.Cgi.escape(after_second_test)}")
+    assert_no_updates("since=#{Cdp.Cgi.escape(after_second_test_formatted)}")
   end
 
   test "checks for new tests util a date with query string" do
-    post_result result: "positive"
+    before_first_test = {{2010,1,1},{12,0,0}}
 
-    after_first_test = DateFormat.format!(Date.from(:calendar.universal_time()), "{ISO}")
+    create_result [result: "positive"], before_first_test
 
-    response = get_one_update("until=#{Cdp.Cgi.escape(after_first_test)}")
+    after_first_test = {{2010,1,2},{12,0,0}}
+    after_first_test_formatted = DateFormat.format!(Date.from(after_first_test), "{ISO}")
+
+    response = get_one_update("until=#{Cdp.Cgi.escape(after_first_test_formatted)}")
     assert HashDict.get(response, "result") == "positive"
 
-    :timer.sleep(1000)
+    after_first_test_later = {{2010,1,3},{12,0,0}}
+    after_first_test_later_formatted = DateFormat.format!(Date.from(after_first_test_later), "{ISO}")
 
-    post_result result: "negative"
+    create_result [result: "negative"], after_first_test_later
 
-    response = get_one_update("until=#{Cdp.Cgi.escape(after_first_test)}")
+    response = get_one_update("until=#{Cdp.Cgi.escape(after_first_test_formatted)}")
     assert HashDict.get(response,"result") == "positive"
   end
 

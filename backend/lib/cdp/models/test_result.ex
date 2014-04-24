@@ -11,25 +11,6 @@ defmodule Cdp.TestResult do
     field :sensitive_data, :binary
   end
 
-  def create_in_db(device, data, raw_data) do
-    now = Cdp.DateTime.now
-
-    sensitive_data = Enum.map sensitive_fields, fn field_name ->
-      {field_name, data[field_name]}
-    end
-
-    test_result = Cdp.TestResult.new [
-      device_id: device.id,
-      raw_data: raw_data,
-      sensitive_data: sensitive_data,
-      created_at: now,
-      updated_at: now,
-    ]
-
-    test_result = encrypt(test_result)
-    Cdp.Repo.create(test_result)
-  end
-
   def find_by_id(test_result_id) do
     query = from t in Cdp.TestResult,
       where: t.id == ^test_result_id,
@@ -39,31 +20,13 @@ defmodule Cdp.TestResult do
     test_result
   end
 
-  def create_in_elasticsearch(device, data) do
-    laboratory = device.laboratory.get
-    institution_id = laboratory.institution_id
-
-    data = Dict.drop(data, (Enum.map sensitive_fields, &atom_to_binary(&1)))
-
-    data = Dict.put data, :type, "test_result"
-    data = Dict.put data, :created_at, (DateFormat.format!(Date.now, "{ISO}"))
-    data = Dict.put data, :device_id, device.id
-    data = Dict.put data, :laboratory_id, device.laboratory_id
-    data = Dict.put data, :institution_id, institution_id
-
-    settings = Tirexs.ElasticSearch.Config.new()
-    Tirexs.Bulk.store [index: Cdp.Institution.elasticsearch_index_name(institution_id), refresh: true], settings do
-      create data
-    end
-  end
-
-  def create_and_enqueue(device_key, raw_data) do
+  def create_and_enqueue(device_key, raw_data, date \\ :calendar.universal_time()) do
     device = Cdp.Device.find_by_key(device_key)
 
     {:ok, data} = JSON.decode raw_data
 
-    Cdp.TestResult.create_in_db(device, data, raw_data)
-    Cdp.TestResult.create_in_elasticsearch(device, data)
+    create_in_db(device, data, raw_data, date)
+    create_in_elasticsearch(device, data, date)
     # Cdp.TestResult.enqueue_in_rabbit(device, data)
   end
 
@@ -74,6 +37,97 @@ defmodule Cdp.TestResult do
       query_with_group_by(query, group_by)
     else
       query_without_group_by(query)
+    end
+  end
+
+  def encrypt(test_result) do
+    {:ok, json_data} = JSON.encode(test_result.sensitive_data)
+    test_result = test_result.sensitive_data(json_data)
+    test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
+    test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
+  end
+
+  def decrypt(test_result) do
+    test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
+    {:ok, data} = JSON.decode(test_result.sensitive_data)
+    test_result = test_result.sensitive_data(data)
+    test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
+  end
+
+  defp encryption_key do
+    "some secure key"
+  end
+
+  def sensitive_fields do
+    [
+      :patient_id,
+      :patient_name,
+      :patient_telephone_number,
+      :patient_zip_code,
+    ]
+  end
+
+  def serchable_fields do
+    [
+      {:assay, :string},
+      {:assay_name, :string},
+      {:device_serial_number, :multi_field},
+      {:guid, :string},
+      {:institution_id, :integer},
+      {:laboratory_id, :integer},
+      {:location_id, :integer},
+      {:parent_locations, :integer},
+      {:result, :string},
+      {:start_time, :date},
+      {:system_user, :string},
+      {:age, :integer},
+      {:device_id, :integer},
+      {:type, :string},
+      {:created_at, :date},
+      {:device_id, :integer},
+      {:laboratory_id, :integer},
+      {:institution_id, :integer},
+    ]
+  end
+
+  # ---------------------------------------------------------
+  # Private functions
+  # ---------------------------------------------------------
+
+  defp create_in_db(device, data, raw_data, date) do
+    date = Ecto.DateTime.from_erl(date)
+
+    sensitive_data = Enum.map sensitive_fields, fn field_name ->
+      {field_name, data[field_name]}
+    end
+
+    test_result = Cdp.TestResult.new [
+      device_id: device.id,
+      raw_data: raw_data,
+      sensitive_data: sensitive_data,
+      created_at: date,
+      updated_at: date,
+    ]
+
+    test_result = encrypt(test_result)
+    Cdp.Repo.create(test_result)
+  end
+
+  defp create_in_elasticsearch(device, data, date) do
+    laboratory = device.laboratory.get
+    institution_id = laboratory.institution_id
+
+    data = Dict.drop(data, (Enum.map sensitive_fields, &atom_to_binary(&1)))
+
+    data = Dict.put data, :type, "test_result"
+    data = Dict.put data, :created_at, (DateFormat.format!(Date.from(date), "{ISO}"))
+    data = Dict.put data, :device_id, device.id
+    data = Dict.put data, :laboratory_id, device.laboratory_id
+    data = Dict.put data, :institution_id, institution_id
+
+    settings = Tirexs.ElasticSearch.Config.new()
+    Tirexs.Bulk.store [index: Cdp.Institution.elasticsearch_index_name(institution_id), refresh: true], settings do
+      create data
     end
   end
 
@@ -196,56 +250,6 @@ defmodule Cdp.TestResult do
     end
 
     conditions
-  end
-
-  def encrypt(test_result) do
-    {:ok, json_data} = JSON.encode(test_result.sensitive_data)
-    test_result = test_result.sensitive_data(json_data)
-    test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
-    test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
-  end
-
-  def decrypt(test_result) do
-    test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
-    {:ok, data} = JSON.decode(test_result.sensitive_data)
-    test_result = test_result.sensitive_data(data)
-    test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
-  end
-
-  defp encryption_key do
-    "some secure key"
-  end
-
-  def sensitive_fields do
-    [
-      :patient_id,
-      :patient_name,
-      :patient_telephone_number,
-      :patient_zip_code,
-    ]
-  end
-
-  def serchable_fields do
-    [
-      {:assay, :string},
-      {:assay_name, :string},
-      {:device_serial_number, :multi_field},
-      {:guid, :string},
-      {:institution_id, :integer},
-      {:laboratory_id, :integer},
-      {:location_id, :integer},
-      {:parent_locations, :integer},
-      {:result, :string},
-      {:start_time, :date},
-      {:system_user, :string},
-      {:age, :integer},
-      {:device_id, :integer},
-      {:type, :string},
-      {:created_at, :date},
-      {:device_id, :integer},
-      {:laboratory_id, :integer},
-      {:institution_id, :integer},
-    ]
   end
 
   # def enqueue_in_rabbit(device, data) do
