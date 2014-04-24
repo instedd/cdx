@@ -90,7 +90,7 @@ defmodule Cdp.TestResult do
     ]
 
     result = Tirexs.Query.create_resource(query)
-    process_group_by_buckets(result.aggregations, all_group_by, [], [], 0)
+    process_group_by_buckets(result.aggregations, Enum.reverse(all_group_by), [], [], 0)
   end
 
   defp process_group_by_buckets(aggregations, all_group_by, results, result, doc_count) do

@@ -200,8 +200,12 @@ defmodule ApiTest do
 
     response = get_updates("group_by=gender")
     [female, male] = Enum.sort response, fn(r1, r2) -> r1["gender"] < r2["gender"] end
+
     assert HashDict.get(female, "count") == 1
+    assert HashDict.get(female, "gender") == "female"
+
     assert HashDict.get(male, "count") == 2
+    assert HashDict.get(male, "gender") == "male"
   end
 
   test "groups by gender and assay_code" do
@@ -220,10 +224,22 @@ defmodule ApiTest do
         r1["gender"] < r2["gender"]
       end
     end
+
     assert HashDict.get(female_a, "count") == 1
+    assert HashDict.get(female_a, "gender") == "female"
+    assert HashDict.get(female_a, "assay_code") == "a"
+
     assert HashDict.get(female_b, "count") == 2
+    assert HashDict.get(female_b, "gender") == "female"
+    assert HashDict.get(female_b, "assay_code") == "b"
+
     assert HashDict.get(male_a, "count") == 2
+    assert HashDict.get(male_a, "gender") == "male"
+    assert HashDict.get(male_a, "assay_code") == "a"
+
     assert HashDict.get(male_b, "count") == 1
+    assert HashDict.get(male_b, "gender") == "male"
+    assert HashDict.get(male_b, "assay_code") == "b"
   end
 
   teardown(meta) do
