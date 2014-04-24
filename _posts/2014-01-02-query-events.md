@@ -69,7 +69,7 @@ This method allows applications to retrieve test results.
 
 In the query parameter the options are limited to indicate a couple of fields to group by
 
-````/events?group_by=gender,result```
+```/events?group_by=gender,result```
 
 ### JSON Body
 
