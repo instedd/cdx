@@ -69,24 +69,20 @@ defmodule Cdp.TestResult do
 
   def serchable_fields do
     [
-      {:assay, :string},
-      {:assay_name, :string},
-      {:device_serial_number, :multi_field},
-      {:guid, :string},
-      {:institution_id, :integer},
-      {:laboratory_id, :integer},
-      {:location_id, :integer},
-      {:parent_locations, :integer},
-      {:result, :string},
-      {:start_time, :date},
-      {:system_user, :string},
-      {:age, :integer},
-      {:device_id, :integer},
-      {:type, :string},
       {:created_at, :date},
       {:device_id, :integer},
       {:laboratory_id, :integer},
       {:institution_id, :integer},
+      {:location_id, :integer},
+      {:parent_locations, :integer},
+      {:age, :integer},
+      {:assay, :string},
+      {:assay_name, :string},
+      {:device_serial_number, :multi_field},
+      {:guid, :string},
+      {:result, :string},
+      {:start_time, :date},
+      {:system_user, :string},
     ]
   end
 
