@@ -81,7 +81,11 @@
       <form id="report_form" method="post">
         <div>
           <label for="device">Device</label>
-          <select id="device" name="device"><%= @devices %></select>
+          <select id="device" name="device">
+            <%= Enum.map @devices, fn(device) -> %>
+              <option value="<%= device.secret_key %>"><%= device.name %></option>
+            <% end %>
+          </select>
         </div>
         <div>
           <label for="age">Age</label>
@@ -89,10 +93,10 @@
         </div>
         <div>
           <label for="gender">Gender</label>
-          <select id="gender" name="gender"><option value="Male">Male</option>
-          <option value="male">male</option>
-          <option value="Female">Female</option>
-          <option value="female">female</option></select>
+          <select id="gender" name="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
         </div>
         <div>
           <label for="assay_code">Assay code</label>
