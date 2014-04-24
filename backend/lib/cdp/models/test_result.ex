@@ -144,7 +144,7 @@ defmodule Cdp.TestResult do
     ]
 
     result = Tirexs.Query.create_resource(query)
-    process_group_by_buckets(result.aggregations, Enum.reverse(all_group_by), [], [], 0)
+    process_group_by_buckets(result.aggregations, all_group_by, [], [], 0)
   end
 
   defp process_group_by_buckets(aggregations, all_group_by, results, result, doc_count) do
@@ -167,10 +167,11 @@ defmodule Cdp.TestResult do
   end
 
   defp process_group_by([group_by|rest]) do
-    aggregations = process_group_by(rest)
+    rest_aggregations = process_group_by(rest)
+    group_by_aggregations = process_group_by([group_by])
     [
-      count: [terms: aggregations[:count][:terms]] ++
-        [aggregations: process_group_by([group_by])]
+      count: [terms: group_by_aggregations[:count][:terms]] ++
+        [aggregations: rest_aggregations]
     ]
   end
 
