@@ -4,10 +4,13 @@ defmodule Cdp.Repo do
   def conf do
     current_user = String.strip System.cmd("whoami")
     env = Mix.env
-    if Mix.env == :dev do
-      parse_url "ecto://#{current_user}:@localhost/cdp_development"
-    else
-      parse_url "ecto://#{current_user}:#{current_user}@localhost/cdp_production"
+    case Mix.env do
+      :dev ->
+        parse_url "ecto://#{current_user}:@localhost/cdp_development"
+      :test ->
+        parse_url "ecto://#{current_user}:@localhost/cdp_test"
+      :prod ->
+        parse_url "ecto://#{current_user}:#{current_user}@localhost/cdp_production"
     end
   end
 end
