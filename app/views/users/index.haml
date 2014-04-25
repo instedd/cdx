@@ -1,0 +1,9 @@
+.row-fluid
+  .span12
+    .title Users
+
+.row-fluid
+  .span6
+    - simple_list :user, title: 'All users', icon: :folder do
+      - users.each do |user|
+        - simple_list_item user.email, user

@@ -10,4 +10,5 @@ class User < ActiveRecord::Base
   has_many :identities
   has_many :institutions
   has_many :laboratories, through: :institutions
+  has_many :devices, through: :institutions
 end

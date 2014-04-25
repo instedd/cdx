@@ -1,0 +1,49 @@
+:css
+  input[type=checkbox] {
+    margin-top: 1px;
+  }
+
+.row-fluid
+  .span12
+    .title User: #{user.email}
+
+= form_for user do |f|
+  %ul
+    - if current_user.has_role? :admin
+      %li
+        %label.checkbox
+          %input{type: "checkbox", name: "roles[]", value: "admin", checked: roles.any? { |r| r.name == "admin" && !r.resource}}
+          Superadmin
+    - if institutions.present?
+      %li
+        Institutions
+        %ul
+          - institutions.each do |institution|
+            %li
+              %label.checkbox
+                %input{type: "checkbox", name: "roles[]", value: "Institution-#{institution.id}", checked: roles.any? { |r| r.resource_type == "Institution" && r.resource_id == institution.id }}
+                = institution.name
+            - if institution.laboratories.present?
+              %li
+                Laboratories
+                %ul
+                  - institution.laboratories.each do |lab|
+                    %li
+                      %label.checkbox
+                        %input{type: "checkbox", name: "roles[]", value: "Laboratory-#{lab.id}", checked: roles.any? { |r| r.resource_type == "Laboratory" && r.resource_id == lab.id }}
+                        = lab.name
+            - if institution.devices.present?
+              %li
+                Devices
+                %ul
+                  - institution.devices.each do |device|
+                    %li
+                      %label.checkbox
+                        %input{type: "checkbox", name: "roles[]", value: "Device-#{device.id}", checked: roles.any? { |r| r.resource_type == "Device" && r.resource_id == device.id }}
+                        = device.name
+    - if locations.present?
+      %li
+        Locations
+        = render "locations", locations: locations
+
+  = f.submit class: 'btn'
