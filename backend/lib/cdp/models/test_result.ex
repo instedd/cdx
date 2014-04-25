@@ -177,7 +177,7 @@ defmodule Cdp.TestResult do
         query: query,
         sort: [[created_at: "asc"]],
       ],
-      index: "_all"
+      index: "#{Cdp.Elasticsearch.index_prefix}*"
     ]
     result = Tirexs.Query.create_resource(query)
     Enum.map result.hits, fn(hit) -> hit["_source"] end

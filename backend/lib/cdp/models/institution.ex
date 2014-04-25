@@ -9,6 +9,6 @@ defmodule Cdp.Institution do
   end
 
   def elasticsearch_index_name(institution_id) do
-    "cdp_institution_#{institution_id}_#{Mix.env}"
+    "#{Cdp.Elasticsearch.index_prefix}#{institution_id}_#{Mix.env}"
   end
 end

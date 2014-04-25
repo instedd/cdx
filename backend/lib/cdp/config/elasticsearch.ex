@@ -28,7 +28,7 @@ defmodule Cdp.Elasticsearch do
   end
 
   defp template_as_json do
-    JSON.encode!([template: "cdp_institution_*", mappings: [ test_result: [ properties: build_properties_mapping]]])
+    JSON.encode!([template: "#{index_prefix}*", mappings: [ test_result: [ properties: build_properties_mapping]]])
   end
 
   defp build_properties_mapping do
@@ -48,4 +48,9 @@ defmodule Cdp.Elasticsearch do
     end
     {field, [type: type] ++ field_body}
   end
+
+  def index_prefix do
+    "cdp_institution_"
+  end
+
 end
