@@ -12,7 +12,7 @@
     - if current_user.has_role? :admin
       %li
         %label.checkbox
-          %input{type: "checkbox", name: "roles[]", value: "admin", checked: roles.any? { |r| r.name == "admin" && !r.resource}}
+          %input{type: "checkbox", name: "roles[]", value: "admin", checked: roles.any?(&:superadmin?)}
           Superadmin
     - if institutions.present?
       %li
@@ -21,7 +21,7 @@
           - institutions.each do |institution|
             %li
               %label.checkbox
-                %input{type: "checkbox", name: "roles[]", value: "Institution-#{institution.id}", checked: roles.any? { |r| r.resource_type == "Institution" && r.resource_id == institution.id }}
+                %input{type: "checkbox", name: "roles[]", value: "Institution-#{institution.id}", checked: roles.any? { |r| r.matches?(institution) }}
                 = institution.name
             - if institution.laboratories.present?
               %li
@@ -30,7 +30,7 @@
                   - institution.laboratories.each do |lab|
                     %li
                       %label.checkbox
-                        %input{type: "checkbox", name: "roles[]", value: "Laboratory-#{lab.id}", checked: roles.any? { |r| r.resource_type == "Laboratory" && r.resource_id == lab.id }}
+                        %input{type: "checkbox", name: "roles[]", value: "Laboratory-#{lab.id}", checked: roles.any? { |r| r.matches?(lab) }}
                         = lab.name
             - if institution.devices.present?
               %li
@@ -39,7 +39,7 @@
                   - institution.devices.each do |device|
                     %li
                       %label.checkbox
-                        %input{type: "checkbox", name: "roles[]", value: "Device-#{device.id}", checked: roles.any? { |r| r.resource_type == "Device" && r.resource_id == device.id }}
+                        %input{type: "checkbox", name: "roles[]", value: "Device-#{device.id}", checked: roles.any? { |r| r.matches?(device) }}
                         = device.name
     - if locations.present?
       %li

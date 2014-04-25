@@ -34,10 +34,9 @@ class UsersController < ApplicationController
         model = model_class.find(id)
         user.add_role :admin, model
 
-        # TODO
-        # if model.is_a?(Laboratory) || model.is_a?(Device)
-        #   user.add_role :member, model.institution
-        # end
+        if model.is_a?(Laboratory) || model.is_a?(Device)
+          user.add_role :member, model.institution
+        end
       end
     end
 

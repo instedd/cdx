@@ -4,7 +4,7 @@ class Institution < ActiveRecord::Base
   belongs_to :user
   has_many :subscribers
   has_many :laboratories
-  has_many :devices, through: :laboratories
+  has_many :devices
 
   if Rails.env.test?
     def index_name

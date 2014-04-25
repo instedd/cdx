@@ -1,6 +1,7 @@
 class Device < ActiveRecord::Base
   resourcify
 
+  belongs_to :institution
   belongs_to :laboratory
   has_many :test_results
 

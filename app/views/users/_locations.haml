@@ -2,7 +2,7 @@
   - locations.each do |location|
     %li
       %label.checkbox
-        %input{type: "checkbox", name: "roles[]", value: "Location-#{location.id}", checked: roles.any? { |r| r.resource_type == "Location" && r.resource_id == location.id }}
+        %input{type: "checkbox", name: "roles[]", value: "Location-#{location.id}", checked: roles.any? { |r| r.matches?(location) }}
         = location.name
       - children = location.children.all
       - if children.present?
