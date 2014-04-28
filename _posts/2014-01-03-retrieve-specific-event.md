@@ -1,6 +1,6 @@
 ---
 category: Applications
-path: '/api/event'
+path: '/api/events'
 title: 'Retrieve specific event'
 type: 'GET'
 
@@ -11,14 +11,14 @@ This method allows applications to retrieve the private patient information for 
 
 # Request Parameters
 
-```/event/test_result_id```
+```/events/test_result_id```
 
 * The path must include a **valid test_result_id**.
 * ```test_result_id``` - id of the desired test result.
 
 ### Example
 
-```/event/2```
+```/events/2```
 
 # Response
 

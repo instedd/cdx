@@ -9,7 +9,15 @@ layout: nil
 
 This method allows applications to retrieve test results.
 
-# Request Parameters
+# Filters
+
+Query parameters are optional, and they allow to filter the system's information.
+
+The data retrieved will allways be sorted by the creation date.
+
+* `start_at` - the system will return a maximum of 1000 results, to retrieve the next batch of results the `start_at` parameter must be used
+
+`start_at=1001`
 
 * `since` - retrieve events reported after a specific date time.
 
@@ -18,8 +26,6 @@ This method allows applications to retrieve test results.
 * `until` - retrieve events reported before a specific date time. Useful to define a time window in combination with “since”.
 
 `/events?until=2014-04-10T15:22:12+0000`
-
-## Filtering
 
 * `location` - filter events by location id
 
@@ -61,28 +67,58 @@ This method allows applications to retrieve test results.
 
 `/events?assay=ASSAY001`
 
-## Grouping
+# Data Aggregation
 
-* Grouping of results is accomplished through the “group_by” option.
+There are two ways to accomplish data aggregation:
 
-### Query Parameter
+* through the “group_by” option in the query string
+* sending a JSON in the request body with the "group_by" key in it
+
+## Query Parameter
 
 In the query parameter the options are limited to indicate a couple of fields to group by
 
-```/events?group_by=gender,result```
+`/events?group_by=gender,result`
 
-### JSON Body
+* `year() | month() | week() | day()` - groups the given date field by the time interval specified. This parenthesis should be escaped when used in the query string.
 
-* `age_ranges` - Groups and filters by age ranges. The tests are skipped if they are outside those ranges.
-```{ “group_by” : [ { “age_ranges” : [ [0, 10], [11, 20] ] } ] }```
+`/events?group_by=year(created_at)`
 
-* `location_depth` - Groups by location depth, up to the third level in this case, which is a state level.
+`/events?group_by=year%29created_at%29`
 
-```{ “group_by” : [ {“location_depth" : 3 } ] }```
+## JSON in request body
 
-* `time_interval` - Groups by a given time interval, it could be one of: yearly, monthly, weekly, daily, semesterly, or quarterly.
+The JSON allows more complex aggregations, such as age ranges.
 
-```{ “group_by” : [ {“time_interval” : "yearly" } ] }```
+* `age_ranges` - groups and filters by age ranges. The tests are skipped if they are outside those ranges.
+
+```{
+  "group_by" : [
+    { "age_ranges" : [ [0, 10], [11, 20] ] },
+    ...
+  ]
+}```
+
+* `location_depth` - groups by location depth, up to the third level in this case, which is a state level.
+
+```{
+  “group_by” : [
+    { “location_depth" : 3 },
+    ...
+  ]
+}```
+
+* `time_interval` - groups by a given time interval, it could be one of: yearly, monthly, weekly, daily.
+
+```{
+  “group_by” : [
+    { “time_interval” : [
+      { "created_at" : "yearly" },
+      ...
+    ] },
+    ...
+  ]
+}```
 
 # Response
 
@@ -90,7 +126,43 @@ In the query parameter the options are limited to indicate a couple of fields to
 
 ## Without Grouping
 
-Returns a collection of [events](#/event-resource)
+Returns an array of events without any PII:
+```[
+{
+  "assay" : "ASSAY001",
+  "assay_name" : "MTB",
+  "device_serial_number" : "123456789",
+  "result" : "positive",
+  "start_time" : "2014-04-24T17:16:03+0000",
+  "system_user" : "jdoe",
+  "age" : "21",
+  "created_at" : "2014-04-24T17:16:03+0000",
+  "device_id" : 2,
+  "laboratory_id" : 3,
+  "institution_id" : 4,
+  "location_id" : 5,
+  "parent_locations" : [1, 2, 3],
+  "guid" : "c4c52784-bfd5-717d-7a91-614acd972d5e"
+},
+{
+  "assay" : "ASSAY002",
+  "assay_name" : "MTB",
+  "device_serial_number" : "123456789",
+  "result" : "positive",
+  "start_time" : "2014-04-24T17:16:03+0000",
+  "system_user" : "jdoe",
+  "age" : "21",
+  "created_at" : "2014-04-24T17:16:03+0000",
+  "device_id" : 2,
+  "laboratory_id" : 3,
+  "institution_id" : 4,
+  "location_id" : 5,
+  "parent_locations" : [1, 2, 3],
+  "guid" : "c4c52784-bfd5-717d-7a91-614acd972d5e"
+},
+...
+]
+```
 
 ## With Grouping
 

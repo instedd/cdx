@@ -1,17 +1,11 @@
 ---
 category: Events
-title: 'Full Event structure'
+title: 'Event Without PII'
 
 layout: nil
 ---
 
 ```{
-  "pii" : {
-    "patient_id" : 2,
-    "patient_name" : "Lorem Ipsum",
-    "patient_telephone_number" : "12345678",
-    "patient_zip_code" : "1234",
-  },
   "guid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
   "assay" : "ASSAY001",
   "assay_name" : "MTB",

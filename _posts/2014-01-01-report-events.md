@@ -12,17 +12,15 @@ This method allows devices to report test results.
 # Request
 
 * The path must include a **valid authentication token**.
-* **The body can't be empty** and must include at the test values.
+* **The body can't be empty** and must include .
 
-```Authentication: bearer f862f658-ad89-4fcb-995b-7a4c50554ff6```
+`Authentication: bearer f862f658-ad89-4fcb-995b-7a4c50554ff6`
 
-```/devices/c4c52784-bfd5-717d-7a91-614acd972d5d```
+`/devices/authentication_token`
+
+`/devices/c4c52784-bfd5-717d-7a91-614acd972d5d`
 
 ```{
-  "patient_id" : 2,
-  "patient_name" : "Lorem Ipsum",
-  "patient_telephone_number" : "12345678",
-  "patient_zip_code" : "1234",
   "assay" : "ASSAY001",
   "assay_name" : "MTB",
   "device_serial_number" : "123456789",
@@ -34,8 +32,8 @@ This method allows devices to report test results.
 
 # Response
 
-**If succeeds**, returns the created event.
+**If succeeds**, returns the created [event](#/event-without-pii-resource).
 
-```Status: 201 Created```
+`Status: 201 Created`
 
 For errors responses, see the [response status codes documentation](#http-response-codes).
