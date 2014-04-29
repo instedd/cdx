@@ -67,10 +67,9 @@ class DevicesController < ApplicationController
     end
   end
 
-
   private
 
   def device_params
-    params.require(:device).permit(:name, :index_name)
+    params.require(:device).permit(:name, :index_name, laboratory_ids: [])
   end
 end

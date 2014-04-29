@@ -1,3 +1,7 @@
+:css
+  .checks { display: inline-block; }
+  .checks label { display: inline-block; }
+
 = form_for([institution, device]) do |f|
   - if device.errors.present?
     .alert-container
@@ -9,7 +13,8 @@
     = f.label :name
     = f.text_field :name
   %div
-    = f.label :laboratory_id
-    = f.collection_select :laboratory_id, laboratories, :id, :name
+    = f.label :laboratories
+    .checks
+      = f.collection_check_boxes(:laboratory_ids, laboratories, :id, :name) { |b| b.label { b.check_box + b.text } + "<br/>".html_safe }
 
   = f.submit class: 'btn'
