@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-  <title>CDC - Playground</title>
+  <title>CDP - Playground</title>
   <link rel="shortcut icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" />
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
@@ -31,12 +31,12 @@
         success: function(data, textStatus, jqXHR) {
           $create_button.prop("disabled", false);
           $create_button.val("Created!");
-          setTimeout(function() { $create_button.val("Create another report"); }, 1000);
+          setTimeout(function() { $create_button.val("Create another test result"); }, 1000);
         },
         error: function(jqXHR, textStatus, errorThrown) {
           $create_button.prop("disabled", false);
           $create_button.val("Error: " + errorThrown);
-          setTimeout(function() { $create_button.val("Create another report"); }, 1000);
+          setTimeout(function() { $create_button.val("Create another test result"); }, 1000);
         }
       });
       return false;
@@ -74,10 +74,10 @@
   </script>
 </head>
 <body>
-  <h3>CDC - Playground</h3>
+  <h3>CDP - Playground</h3>
   <div class='row-fluid'>
-    <div class='span3'>
-      <h4>Create Report</h4>
+    <div class='span3' style="border-right:1px solid black">
+      <h4>Submit test result</h4>
       <form id="report_form" method="post">
         <div>
           <label for="device">Device</label>
@@ -107,12 +107,12 @@
           <input id="result" name="result" type="text" value="positive" />
         </div>
         <div>
-          <input id="create_button" class="btn" name="commit" type="submit" value="Create report" />
+          <input id="create_button" class="btn" name="commit" type="submit" value="Create test result" />
         </div>
       </form>
     </div>
     <div class='span9'>
-      <h4>Query Reports</h4>
+      <h4>Query results</h4>
 
       <form id="query_form" method="post">
         <div>
