@@ -3,8 +3,9 @@ defmodule Cdp.Device do
   import Ecto.Query
 
   queryable "devices" do
-    belongs_to(:laboratory, Cdp.Laboratory)
+    has_many(:devices_laboratories, Cdp.DevicesLaboratories)
     has_many(:test_results, Cdp.TestResult)
+    belongs_to(:institution, Cdp.Institution)
     field :name
     field :secret_key
   end
@@ -12,7 +13,7 @@ defmodule Cdp.Device do
   def find_by_key(device_key) do
     query = from d in Cdp.Device,
       where: d.secret_key == ^device_key,
-      preload: :laboratory,
+      preload: :devices_laboratories,
       select: d
     [device] = Cdp.Repo.all(query)
     device

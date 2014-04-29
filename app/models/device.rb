@@ -2,7 +2,7 @@ class Device < ActiveRecord::Base
   resourcify
 
   belongs_to :institution
-  belongs_to :laboratory
+  has_and_belongs_to_many :laboratories
   has_many :test_results
 
   before_create :set_key

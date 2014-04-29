@@ -8,11 +8,9 @@ defmodule ApiTest do
     institution = Cdp.Repo.create Cdp.Institution.new(name: "baz")
     institution2 = Cdp.Repo.create Cdp.Institution.new(name: "baz2")
     laboratory = Cdp.Repo.create Cdp.Laboratory.new(institution_id: institution.id, name: "bar")
-    device = Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory.id, secret_key: "foo")
-    settings = Tirexs.ElasticSearch.Config.new()
-    index_name = Cdp.Institution.elasticsearch_index_name(institution.id)
-    index_name2 = Cdp.Institution.elasticsearch_index_name(institution2.id)
-    {:ok, institution: institution, institution2: institution2, laboratory: laboratory, device: device, settings: settings, index_name: index_name, index_name2: index_name2}
+    device = Cdp.Repo.create Cdp.Device.new(institution_id: institution.id, secret_key: "foo")
+    Cdp.Repo.create Cdp.DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
+    {:ok, institution: institution, institution2: institution2, laboratory: laboratory, device: device}
   end
 
   def get_updates(query_string, post_data \\ "") do
@@ -38,9 +36,24 @@ defmodule ApiTest do
     Cdp.TestResult.create_and_enqueue(device, JSON.encode!(result), date)
   end
 
+  def format_date(date) do
+    DateFormat.format!(Date.from(date), "{ISO}")
+  end
+
+  def escape_and_format(date) do
+    Cdp.Cgi.escape(format_date(date))
+  end
+
+  def create_device(institution_id, secret_key) do
+    laboratory = Cdp.Repo.create Cdp.Laboratory.new(institution_id: institution_id, name: "baz")
+    device = Cdp.Repo.create Cdp.Device.new(institution_id: institution_id, secret_key: secret_key)
+    Cdp.Repo.create Cdp.DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
+  end
+
+
   test "checks for new tests since a date" do
     before_first_test = {{2010,1,1},{12,0,0}}
-    before_first_test_formatted = DateFormat.format!(Date.from(before_first_test), "{ISO}")
+    before_first_test_formatted = format_date(before_first_test)
 
     create_result [result: "positive"], before_first_test
 
@@ -48,11 +61,10 @@ defmodule ApiTest do
     assert HashDict.get(response, "result") == "positive"
 
     after_first_test = {{2010,1,2},{12,0,0}}
-    after_first_test_formatted = DateFormat.format!(Date.from(after_first_test), "{ISO}")
 
     create_result [result: "negative"], after_first_test
 
-    response = get_one_update("", "{\"since\": \"#{after_first_test_formatted}\"}")
+    response = get_one_update("", "{\"since\": \"#{format_date(after_first_test)}\"}")
     assert HashDict.get(response,"result") == "negative"
 
     [first, second] = get_updates("", "{\"since\": \"#{before_first_test_formatted}\"}")
@@ -60,62 +72,52 @@ defmodule ApiTest do
     assert HashDict.get(second, "result") == "negative"
 
     after_second_test = {{2010,1,3},{12,0,0}}
-    after_second_test_formatted = DateFormat.format!(Date.from(after_second_test), "{ISO}")
+    after_second_test_formatted = format_date(after_second_test)
 
     assert_no_updates "", "{\"since\": \"#{after_second_test_formatted}\"}"
   end
 
   test "checks for new tests since a date with query string" do
     before_first_test = {{2010,1,1},{12,0,0}}
-    before_first_test_formatted = DateFormat.format!(Date.from(before_first_test), "{ISO}")
+    before_first_test_formatted = escape_and_format(before_first_test)
 
     create_result [result: "positive"], before_first_test
 
-    response = get_one_update("since=#{Cdp.Cgi.escape(before_first_test_formatted)}")
+    response = get_one_update("since=#{before_first_test_formatted}")
     assert HashDict.get(response, "result") == "positive"
 
     after_first_test = {{2010,1,2},{12,0,0}}
-    after_first_test_formatted = DateFormat.format!(Date.from(after_first_test), "{ISO}")
 
     create_result [result: "negative"], after_first_test
 
-    response = get_one_update("since=#{Cdp.Cgi.escape(after_first_test_formatted)}")
+    response = get_one_update("since=#{escape_and_format(after_first_test)}")
     assert HashDict.get(response,"result") == "negative"
 
-    [first, second] = get_updates("since=#{Cdp.Cgi.escape(before_first_test_formatted)}")
+    [first, second] = get_updates("since=#{before_first_test_formatted}")
     assert HashDict.get(first, "result") == "positive"
     assert HashDict.get(second, "result") == "negative"
 
-    after_second_test = {{2010,1,3},{12,0,0}}
-    after_second_test_formatted = DateFormat.format!(Date.from(after_second_test), "{ISO}")
-
-    assert_no_updates("since=#{Cdp.Cgi.escape(after_second_test_formatted)}")
+    assert_no_updates("since=#{escape_and_format({{2010,1,3},{12,0,0}})}")
   end
 
   test "checks for new tests util a date with query string" do
-    before_first_test = {{2010,1,1},{12,0,0}}
+    create_result [result: "positive"], {{2010,1,1},{12,0,0}}
 
-    create_result [result: "positive"], before_first_test
+    after_first_test = escape_and_format({{2010,1,2},{12,0,0}})
 
-    after_first_test = {{2010,1,2},{12,0,0}}
-    after_first_test_formatted = DateFormat.format!(Date.from(after_first_test), "{ISO}")
-
-    response = get_one_update("until=#{Cdp.Cgi.escape(after_first_test_formatted)}")
+    response = get_one_update("until=#{after_first_test}")
     assert HashDict.get(response, "result") == "positive"
 
-    after_first_test_later = {{2010,1,3},{12,0,0}}
-    after_first_test_later_formatted = DateFormat.format!(Date.from(after_first_test_later), "{ISO}")
+    create_result [result: "negative"], {{2010,1,3},{12,0,0}}
 
-    create_result [result: "negative"], after_first_test_later
-
-    response = get_one_update("until=#{Cdp.Cgi.escape(after_first_test_formatted)}")
+    response = get_one_update("until=#{after_first_test}")
     assert HashDict.get(response,"result") == "positive"
   end
 
   test "filters by device", meta do
     post_result result: "positive"
 
-    Cdp.Repo.create Cdp.Device.new(laboratory_id: meta[:laboratory].id, secret_key: "bar")
+    Cdp.Repo.create Cdp.Device.new(institution_id: meta[:institution].id, secret_key: "bar")
 
     post_result [result: "negative"], "bar"
 
@@ -126,8 +128,7 @@ defmodule ApiTest do
   test "filters by laboratory", meta do
     post_result result: "positive"
 
-    laboratory2 = Cdp.Repo.create Cdp.Laboratory.new(institution_id: meta[:institution].id, name: "baz")
-    Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory2.id, secret_key: "bar")
+    create_device(meta[:institution].id, "bar")
 
     post_result [result: "negative"], "bar"
 
@@ -138,8 +139,7 @@ defmodule ApiTest do
   test "filters by institution", meta do
     post_result result: "positive"
 
-    laboratory2 = Cdp.Repo.create Cdp.Laboratory.new(institution_id: meta[:institution2].id, name: "baz")
-    Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory2.id, secret_key: "bar")
+    create_device(meta[:institution2].id, "bar")
 
     post_result [result: "negative"], "bar"
 
@@ -315,7 +315,12 @@ defmodule ApiTest do
 
   teardown(meta) do
     Enum.each [Cdp.Institution, Cdp.Laboratory, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
-    Tirexs.ElasticSearch.delete meta[:index_name], meta[:settings]
-    Tirexs.ElasticSearch.delete meta[:index_name2], meta[:settings]
+    settings = Tirexs.ElasticSearch.Config.new()
+    delete_index meta[:institution], settings
+    delete_index meta[:institution2], settings
+  end
+
+  def delete_index(institution, settings) do
+    Tirexs.ElasticSearch.delete Cdp.Institution.elasticsearch_index_name(institution.id), settings
   end
 end

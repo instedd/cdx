@@ -6,13 +6,10 @@ defmodule DevicesTest do
   setup do
     institution = Cdp.Repo.create Cdp.Institution.new(name: "baz")
     laboratory = Cdp.Repo.create Cdp.Laboratory.new(institution_id: institution.id, name: "bar")
-    # subscriber = Cdp.Repo.create Cdp.Subscriber.new(institution_id: institution.id, auth_token: "foo", callback_url: "http://bar.baz")
-    device = Cdp.Repo.create Cdp.Device.new(laboratory_id: laboratory.id, secret_key: "foo")
-    {:ok, data} = JSON.encode [result: "positive"]
-    settings = Tirexs.ElasticSearch.Config.new()
-    index_name = Cdp.Institution.elasticsearch_index_name(institution.id)
-    # {:ok, institution: institution, device: device, data: data, settings: settings, index_name: index_name, subscriber: subscriber}
-    {:ok, institution: institution, device: device, data: data, settings: settings, index_name: index_name}
+    device = Cdp.Repo.create Cdp.Device.new(institution_id: institution.id, secret_key: "foo")
+    Cdp.Repo.create Cdp.DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
+    data = JSON.encode! [result: "positive"]
+    {:ok, institution: institution, device: device, data: data}
   end
 
   test "create test_result in postgres", meta do
@@ -76,7 +73,12 @@ defmodule DevicesTest do
 
   teardown(meta) do
     Enum.each [Cdp.Institution, Cdp.Laboratory, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
-    Tirexs.ElasticSearch.delete meta[:index_name], meta[:settings]
+    delete_index meta[:institution], Tirexs.ElasticSearch.Config.new()
+  end
+
+  def delete_index(institution, settings) do
+    Tirexs.ElasticSearch.delete Cdp.Institution.elasticsearch_index_name(institution.id), settings
+  end
 
     # amqp_config = Cdp.Dynamo.config[:rabbit_amqp]
     # amqp = Exrabbit.Utils.connect
@@ -88,5 +90,4 @@ defmodule DevicesTest do
     #         IO.puts json_message
     #         Exrabbit.Utils.ack channel, tag
     # end
-  end
 end

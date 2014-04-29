@@ -2,6 +2,7 @@ defmodule Cdp.TestResult do
   use Timex
   use Ecto.Model
   import Tirexs.Bulk
+  import Ecto.Query
 
   queryable "test_results" do
     belongs_to(:device, Cdp.Device)
@@ -11,11 +12,36 @@ defmodule Cdp.TestResult do
     field :sensitive_data, :binary
   end
 
+  def sensitive_fields do
+    [
+      :patient_id,
+      :patient_name,
+      :patient_telephone_number,
+      :patient_zip_code,
+    ]
+  end
+
+  def serchable_fields do
+    [
+      {:created_at, :date},
+      {:device_id, :integer},
+      {:laboratory_id, :integer},
+      {:institution_id, :integer},
+      {:location_id, :integer},
+      {:parent_locations, :integer},
+      {:age, :integer},
+      {:assay, :string},
+      {:assay_name, :string},
+      {:device_serial_number, :multi_field},
+      {:guid, :string},
+      {:result, :string},
+      {:start_time, :date},
+      {:system_user, :string},
+    ]
+  end
+
   def find_by_id(test_result_id) do
-    query = from t in Cdp.TestResult,
-      where: t.id == ^test_result_id,
-      select: t
-    [test_result] = Cdp.Repo.all(query)
+    test_result = Cdp.Repo.get(Cdp.TestResult, test_result_id)
     test_result = decrypt(test_result)
     test_result
   end
@@ -54,41 +80,13 @@ defmodule Cdp.TestResult do
     test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
   end
 
-  defp encryption_key do
-    "some secure key"
-  end
-
-  def sensitive_fields do
-    [
-      :patient_id,
-      :patient_name,
-      :patient_telephone_number,
-      :patient_zip_code,
-    ]
-  end
-
-  def serchable_fields do
-    [
-      {:created_at, :date},
-      {:device_id, :integer},
-      {:laboratory_id, :integer},
-      {:institution_id, :integer},
-      {:location_id, :integer},
-      {:parent_locations, :integer},
-      {:age, :integer},
-      {:assay, :string},
-      {:assay_name, :string},
-      {:device_serial_number, :multi_field},
-      {:guid, :string},
-      {:result, :string},
-      {:start_time, :date},
-      {:system_user, :string},
-    ]
-  end
-
   # ---------------------------------------------------------
   # Private functions
   # ---------------------------------------------------------
+
+  defp encryption_key do
+    "some secure key"
+  end
 
   defp create_in_db(device, data, raw_data, date) do
     date = Ecto.DateTime.from_erl(date)
@@ -110,15 +108,22 @@ defmodule Cdp.TestResult do
   end
 
   defp create_in_elasticsearch(device, data, date) do
-    laboratory = device.laboratory.get
-    institution_id = laboratory.institution_id
+    institution_id = device.institution_id
 
     data = Dict.drop(data, (Enum.map sensitive_fields, &atom_to_binary(&1)))
+
+    case Cdp.Repo.all(device.devices_laboratories) do
+      [lab] ->
+        laboratory_id = lab.laboratory_id
+      [lab | _ ] ->
+        laboratory_id = lab.laboratory_id
+      _ ->
+    end
 
     data = Dict.put data, :type, "test_result"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.from(date), "{ISO}"))
     data = Dict.put data, :device_id, device.id
-    data = Dict.put data, :laboratory_id, device.laboratory_id
+    data = Dict.put data, :laboratory_id, laboratory_id
     data = Dict.put data, :institution_id, institution_id
 
     settings = Tirexs.ElasticSearch.Config.new()
