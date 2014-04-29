@@ -54,6 +54,26 @@ defmodule ApiTest do
     Repo.create DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
   end
 
+  def fetch_many(dict, []) do
+    []
+  end
+
+  def fetch_many(dict, [key|other_keys]) do
+    [HashDict.get(dict, key) | fetch_many(dict, other_keys)]
+  end
+
+  def assert_values(dict, keys, values) do
+    assert fetch_many(dict, keys) == values
+  end
+
+  def assert_all_values([], _keys, []) do
+    # Ok
+  end
+
+  def assert_all_values([dict|other_dicts], keys, [values|other_values]) do
+    assert_values dict, keys, values
+    assert_all_values other_dicts, keys, other_values
+  end
 
   test "checks for new tests since a date" do
     before_first_test = {{2010,1,1},{12,0,0}}
@@ -226,13 +246,12 @@ defmodule ApiTest do
     post_result result: "negative", gender: "female"
 
     response = get_updates("group_by=gender")
-    [female, male] = Enum.sort response, fn(r1, r2) -> r1["gender"] < r2["gender"] end
+    response = Enum.sort response, fn(r1, r2) -> r1["gender"] < r2["gender"] end
 
-    assert HashDict.get(female, "count") == 1
-    assert HashDict.get(female, "gender") == "female"
-
-    assert HashDict.get(male, "count") == 2
-    assert HashDict.get(male, "gender") == "male"
+    assert_all_values response, ["gender", "count"], [
+      ["female", 1],
+      ["male", 2],
+    ]
   end
 
   test "groups by gender and assay_code" do
@@ -244,7 +263,7 @@ defmodule ApiTest do
     post_result result: "negative", gender: "female", assay_code: "b"
 
     response = get_updates("group_by=gender,assay_code")
-    [female_a, female_b, male_a, male_b] = Enum.sort response, fn(r1, r2) ->
+    response = Enum.sort response, fn(r1, r2) ->
       if r1["gender"] == r2["gender"] do
         r1["assay_code"] < r2["assay_code"]
       else
@@ -252,21 +271,12 @@ defmodule ApiTest do
       end
     end
 
-    assert HashDict.get(female_a, "count") == 1
-    assert HashDict.get(female_a, "gender") == "female"
-    assert HashDict.get(female_a, "assay_code") == "a"
-
-    assert HashDict.get(female_b, "count") == 2
-    assert HashDict.get(female_b, "gender") == "female"
-    assert HashDict.get(female_b, "assay_code") == "b"
-
-    assert HashDict.get(male_a, "count") == 2
-    assert HashDict.get(male_a, "gender") == "male"
-    assert HashDict.get(male_a, "assay_code") == "a"
-
-    assert HashDict.get(male_b, "count") == 1
-    assert HashDict.get(male_b, "gender") == "male"
-    assert HashDict.get(male_b, "assay_code") == "b"
+    assert_all_values response, ["gender", "assay_code", "count"], [
+      ["female", "a", 1],
+      ["female", "b", 2],
+      ["male", "a", 2],
+      ["male", "b", 1],
+    ]
   end
 
   test "groups by gender, result and assay_code" do
@@ -278,43 +288,25 @@ defmodule ApiTest do
     post_result result: "negative", gender: "female", assay_code: "b"
 
     response = get_updates("group_by=gender,result,assay_code")
-    [female_negative_a, female_negative_b, male_negative_a, male_positive_a, male_positive_b] =
-      Enum.sort response, fn(r1, r2) ->
-        if r1["gender"] == r2["gender"] do
-          if r1["result"] == r2["result"] do
-            r1["assay_code"] < r2["assay_code"]
-          else
-            r1["result"] < r2["result"]
-          end
+    response = Enum.sort response, fn(r1, r2) ->
+      if r1["gender"] == r2["gender"] do
+        if r1["result"] == r2["result"] do
+          r1["assay_code"] < r2["assay_code"]
         else
-          r1["gender"] < r2["gender"]
+          r1["result"] < r2["result"]
         end
+      else
+        r1["gender"] < r2["gender"]
       end
+    end
 
-    assert HashDict.get(female_negative_a, "count") == 1
-    assert HashDict.get(female_negative_a, "gender") == "female"
-    assert HashDict.get(female_negative_a, "result") == "negative"
-    assert HashDict.get(female_negative_a, "assay_code") == "a"
-
-    assert HashDict.get(female_negative_b, "count") == 2
-    assert HashDict.get(female_negative_b, "gender") == "female"
-    assert HashDict.get(female_negative_b, "result") == "negative"
-    assert HashDict.get(female_negative_b, "assay_code") == "b"
-
-    assert HashDict.get(male_negative_a, "count") == 1
-    assert HashDict.get(male_negative_a, "gender") == "male"
-    assert HashDict.get(male_negative_a, "result") == "negative"
-    assert HashDict.get(male_negative_a, "assay_code") == "a"
-
-    assert HashDict.get(male_positive_a, "count") == 1
-    assert HashDict.get(male_positive_a, "gender") == "male"
-    assert HashDict.get(male_positive_a, "result") == "positive"
-    assert HashDict.get(male_positive_a, "assay_code") == "a"
-
-    assert HashDict.get(male_positive_b, "count") == 1
-    assert HashDict.get(male_positive_b, "gender") == "male"
-    assert HashDict.get(male_positive_b, "result") == "positive"
-    assert HashDict.get(male_positive_b, "assay_code") == "b"
+    assert_all_values response, ["gender", "result", "assay_code", "count"], [
+      ["female", "negative", "a", 1],
+      ["female", "negative", "b", 2],
+      ["male", "negative", "a", 1],
+      ["male", "positive", "a", 1],
+      ["male", "positive", "b", 1],
+    ]
   end
 
   test "group by year(date)" do
@@ -323,13 +315,30 @@ defmodule ApiTest do
     create_result [result: "positive"], {{2011,1,1},{12,0,0}}
 
     response = get_updates("group_by=#{escape("year(created_at)")}")
-    [y2010, y2011] = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
+    response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
 
-    assert HashDict.get(y2010, "count") == 2
-    assert HashDict.get(y2010, "created_at") == "2010"
+    assert_all_values response, ["created_at", "count"], [
+      ["2010", 2],
+      ["2011", 1],
+    ]
+  end
 
-    assert HashDict.get(y2011, "count") == 1
-    assert HashDict.get(y2011, "created_at") == "2011"
+  test "group by month(date)" do
+    create_result [result: "positive"], {{2010,1,1},{12,0,0}}
+    create_result [result: "positive"], {{2010,2,2},{12,0,0}}
+    create_result [result: "positive"], {{2011,1,1},{12,0,0}}
+    create_result [result: "positive"], {{2011,1,2},{12,0,0}}
+    create_result [result: "positive"], {{2011,2,1},{12,0,0}}
+
+    response = get_updates("group_by=#{escape("month(created_at)")}")
+    response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
+
+    assert_all_values response, ["created_at", "count"], [
+      ["2010-01", 1],
+      ["2010-02", 1],
+      ["2011-01", 2],
+      ["2011-02", 1],
+      ]
   end
 
   teardown(meta) do
