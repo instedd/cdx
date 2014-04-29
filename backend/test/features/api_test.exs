@@ -5,11 +5,11 @@ defmodule ApiTest do
   require Tirexs.Search
 
   setup do
-    institution = Cdp.Repo.create Cdp.Institution.new(name: "baz")
-    institution2 = Cdp.Repo.create Cdp.Institution.new(name: "baz2")
-    laboratory = Cdp.Repo.create Cdp.Laboratory.new(institution_id: institution.id, name: "bar")
-    device = Cdp.Repo.create Cdp.Device.new(institution_id: institution.id, secret_key: "foo")
-    Cdp.Repo.create Cdp.DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
+    institution = Repo.create Institution.new(name: "baz")
+    institution2 = Repo.create Institution.new(name: "baz2")
+    laboratory = Repo.create Laboratory.new(institution_id: institution.id, name: "bar")
+    device = Repo.create Device.new(institution_id: institution.id, secret_key: "foo")
+    Repo.create DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
     {:ok, institution: institution, institution2: institution2, laboratory: laboratory, device: device}
   end
 
@@ -33,7 +33,7 @@ defmodule ApiTest do
   end
 
   def create_result(result, date \\ :calendar.universal_time(), device \\ "foo") do
-    Cdp.TestResult.create_and_enqueue(device, JSON.encode!(result), date)
+    TestResult.create_and_enqueue(device, JSON.encode!(result), date)
   end
 
   def format_date(date) do
@@ -41,13 +41,13 @@ defmodule ApiTest do
   end
 
   def escape_and_format(date) do
-    Cdp.Cgi.escape(format_date(date))
+    Cgi.escape(format_date(date))
   end
 
   def create_device(institution_id, secret_key) do
-    laboratory = Cdp.Repo.create Cdp.Laboratory.new(institution_id: institution_id, name: "baz")
-    device = Cdp.Repo.create Cdp.Device.new(institution_id: institution_id, secret_key: secret_key)
-    Cdp.Repo.create Cdp.DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
+    laboratory = Repo.create Laboratory.new(institution_id: institution_id, name: "baz")
+    device = Repo.create Device.new(institution_id: institution_id, secret_key: secret_key)
+    Repo.create DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
   end
 
 
@@ -117,7 +117,7 @@ defmodule ApiTest do
   test "filters by device", meta do
     post_result result: "positive"
 
-    Cdp.Repo.create Cdp.Device.new(institution_id: meta[:institution].id, secret_key: "bar")
+    Repo.create Device.new(institution_id: meta[:institution].id, secret_key: "bar")
 
     post_result [result: "negative"], "bar"
 
@@ -314,13 +314,13 @@ defmodule ApiTest do
   end
 
   teardown(meta) do
-    Enum.each [Cdp.Institution, Cdp.Laboratory, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
+    Enum.each [Institution, Laboratory, Device, TestResult], &Repo.delete_all/1
     settings = Tirexs.ElasticSearch.Config.new()
     delete_index meta[:institution], settings
     delete_index meta[:institution2], settings
   end
 
   def delete_index(institution, settings) do
-    Tirexs.ElasticSearch.delete Cdp.Institution.elasticsearch_index_name(institution.id), settings
+    Tirexs.ElasticSearch.delete Institution.elasticsearch_index_name(institution.id), settings
   end
 end

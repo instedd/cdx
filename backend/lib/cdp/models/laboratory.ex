@@ -1,9 +1,9 @@
-defmodule Cdp.Laboratory do
+defmodule Laboratory do
   use Ecto.Model
 
   queryable "laboratories" do
-    belongs_to(:institution, Cdp.Institution)
-    has_many(:devices, Cdp.Device)
+    belongs_to(:institution, Institution)
+    has_many(:devices, Device)
     field :name
   end
 end

@@ -6,11 +6,11 @@ defmodule Cdp do
   application and its Dynamos.
   """
   def start(_type, _args) do
-    Cdp.Sup.start_link
+    Cdp.Supervisor.start_link
   end
 end
 
-defmodule Cdp.Sup do
+defmodule Cdp.Supervisor do
   use Supervisor.Behaviour
 
   def start_link do
@@ -20,9 +20,9 @@ defmodule Cdp.Sup do
   def init([]) do
     :application.start :crypto
     :lager.start
-    :ok = Cdp.Elasticsearch.initialize
+    :ok = Elasticsearch.initialize
     tree = [
-      worker(Cdp.Repo, []),
+      worker(Repo, []),
       worker(Cdp.Dynamo, [[max_restarts: 5, max_seconds: 5]]),
     ]
     supervise(tree, strategy: :one_for_all)

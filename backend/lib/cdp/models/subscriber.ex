@@ -1,18 +1,18 @@
-defmodule Cdp.Subscriber do
+defmodule Subscriber do
   use Ecto.Model
 
   queryable "subscribers" do
-    belongs_to(:institution, Cdp.Institution)
+    belongs_to(:institution, Institution)
     field :name
     field :auth_token
     field :callback_url
   end
 
   def find_by_institution_id(institution_id) do
-    query = from s in Cdp.Subscriber,
+    query = from s in Subscriber,
       where: s.institution_id == ^institution_id,
       select: s
-    Cdp.Repo.all(query)
+    Repo.all(query)
   end
 end
 

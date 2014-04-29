@@ -1,4 +1,4 @@
-defmodule Cdp.Elasticsearch do
+defmodule Elasticsearch do
   require Lager
 
   def default_url do
@@ -32,7 +32,7 @@ defmodule Cdp.Elasticsearch do
   end
 
   defp build_properties_mapping do
-    Enum.map Cdp.TestResult.serchable_fields, fn {name, type} ->
+    Enum.map TestResult.serchable_fields, fn {name, type} ->
       map_field(name, type)
     end
   end

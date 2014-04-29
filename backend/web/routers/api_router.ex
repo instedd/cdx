@@ -7,7 +7,7 @@ defmodule ApiRouter do
     else
       {:ok, params} = JSON.decode conn.req_body()
     end
-    test_results = Enum.map Cdp.TestResult.query(params), fn test_result -> HashDict.new(test_result) end
+    test_results = Enum.map TestResult.query(params), fn test_result -> HashDict.new(test_result) end
     {:ok, test_results} = JSON.encode(test_results)
     conn.send(200, test_results)
   end

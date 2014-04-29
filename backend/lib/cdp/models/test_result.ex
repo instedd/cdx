@@ -1,11 +1,11 @@
-defmodule Cdp.TestResult do
+defmodule TestResult do
   use Timex
   use Ecto.Model
   import Tirexs.Bulk
   import Ecto.Query
 
   queryable "test_results" do
-    belongs_to(:device, Cdp.Device)
+    belongs_to(:device, Device)
     field :created_at, :datetime
     field :updated_at, :datetime
     field :raw_data, :binary
@@ -41,19 +41,19 @@ defmodule Cdp.TestResult do
   end
 
   def find_by_id(test_result_id) do
-    test_result = Cdp.Repo.get(Cdp.TestResult, test_result_id)
+    test_result = Repo.get(TestResult, test_result_id)
     test_result = decrypt(test_result)
     test_result
   end
 
   def create_and_enqueue(device_key, raw_data, date \\ :calendar.universal_time()) do
-    device = Cdp.Device.find_by_key(device_key)
+    device = Device.find_by_key(device_key)
 
     {:ok, data} = JSON.decode raw_data
 
     create_in_db(device, data, raw_data, date)
     create_in_elasticsearch(device, data, date)
-    # Cdp.TestResult.enqueue_in_rabbit(device, data)
+    # enqueue_in_rabbit(device, data)
   end
 
   def query(params) do
@@ -95,7 +95,7 @@ defmodule Cdp.TestResult do
       {field_name, data[field_name]}
     end
 
-    test_result = Cdp.TestResult.new [
+    test_result = TestResult.new [
       device_id: device.id,
       raw_data: raw_data,
       sensitive_data: sensitive_data,
@@ -104,7 +104,7 @@ defmodule Cdp.TestResult do
     ]
 
     test_result = encrypt(test_result)
-    Cdp.Repo.create(test_result)
+    Repo.create(test_result)
   end
 
   defp create_in_elasticsearch(device, data, date) do
@@ -112,7 +112,7 @@ defmodule Cdp.TestResult do
 
     data = Dict.drop(data, (Enum.map sensitive_fields, &atom_to_binary(&1)))
 
-    case Cdp.Repo.all(device.devices_laboratories) do
+    case Repo.all(device.devices_laboratories) do
       [lab] ->
         laboratory_id = lab.laboratory_id
       [lab | _ ] ->
@@ -127,7 +127,7 @@ defmodule Cdp.TestResult do
     data = Dict.put data, :institution_id, institution_id
 
     settings = Tirexs.ElasticSearch.Config.new()
-    Tirexs.Bulk.store [index: Cdp.Institution.elasticsearch_index_name(institution_id), refresh: true], settings do
+    Tirexs.Bulk.store [index: Institution.elasticsearch_index_name(institution_id), refresh: true], settings do
       create data
     end
   end
@@ -182,7 +182,7 @@ defmodule Cdp.TestResult do
         query: query,
         sort: [[created_at: "asc"]],
       ],
-      index: "#{Cdp.Elasticsearch.index_prefix}*"
+      index: "#{Elasticsearch.index_prefix}*"
     ]
     result = Tirexs.Query.create_resource(query)
     Enum.map result.hits, fn(hit) -> hit["_source"] end
@@ -255,7 +255,7 @@ defmodule Cdp.TestResult do
   end
 
   # def enqueue_in_rabbit(device, data) do
-  #   subscribers = Cdp.Subscriber.find_by_institution_id(device.institution_id)
+  #   subscribers = Subscriber.find_by_institution_id(device.institution_id)
 
   #   amqp_config = Cdp.Dynamo.config[:rabbit_amqp]
   #   amqp = Exrabbit.Utils.connect

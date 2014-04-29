@@ -4,10 +4,10 @@ defmodule DevicesTest do
   require Tirexs.Search
 
   setup do
-    institution = Cdp.Repo.create Cdp.Institution.new(name: "baz")
-    laboratory = Cdp.Repo.create Cdp.Laboratory.new(institution_id: institution.id, name: "bar")
-    device = Cdp.Repo.create Cdp.Device.new(institution_id: institution.id, secret_key: "foo")
-    Cdp.Repo.create Cdp.DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
+    institution = Repo.create Institution.new(name: "baz")
+    laboratory = Repo.create Laboratory.new(institution_id: institution.id, name: "bar")
+    device = Repo.create Device.new(institution_id: institution.id, secret_key: "foo")
+    Repo.create DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
     data = JSON.encode! [result: "positive"]
     {:ok, institution: institution, device: device, data: data}
   end
@@ -16,10 +16,10 @@ defmodule DevicesTest do
     conn = post("/devices/foo", meta[:data])
     assert conn.status == 200
 
-    [test_result] = Cdp.Repo.all Cdp.TestResult
+    [test_result] = Repo.all TestResult
     assert test_result.device_id == meta[:device].id
     assert test_result.raw_data != meta[:data]
-    test_result = Cdp.TestResult.decrypt(test_result)
+    test_result = TestResult.decrypt(test_result)
     assert test_result.raw_data == meta[:data]
   end
 
@@ -52,7 +52,7 @@ defmodule DevicesTest do
   end
 
   # test "enqueues in RabbitMQ", meta do
-  #   amqp_config = Cdp.Dynamo.config[:rabbit_amqp]
+  #   amqp_config = Dynamo.config[:rabbit_amqp]
 
   #   post("/devices/foo", meta[:data])
 
@@ -72,15 +72,15 @@ defmodule DevicesTest do
   # end
 
   teardown(meta) do
-    Enum.each [Cdp.Institution, Cdp.Laboratory, Cdp.Device, Cdp.TestResult], &Cdp.Repo.delete_all/1
+    Enum.each [Institution, Laboratory, Device, TestResult], &Repo.delete_all/1
     delete_index meta[:institution], Tirexs.ElasticSearch.Config.new()
   end
 
   def delete_index(institution, settings) do
-    Tirexs.ElasticSearch.delete Cdp.Institution.elasticsearch_index_name(institution.id), settings
+    Tirexs.ElasticSearch.delete Institution.elasticsearch_index_name(institution.id), settings
   end
 
-    # amqp_config = Cdp.Dynamo.config[:rabbit_amqp]
+    # amqp_config = Dynamo.config[:rabbit_amqp]
     # amqp = Exrabbit.Utils.connect
     # channel = Exrabbit.Utils.channel amqp
     # Exrabbit.Utils.declare_queue channel, amqp_config[:subscribers_queue], true
