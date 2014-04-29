@@ -23,24 +23,25 @@
               %label.checkbox
                 %input{type: "checkbox", name: "roles[]", value: "Institution-#{institution.id}", checked: roles.any? { |r| r.matches?(institution) }}
                 = institution.name
-            - if institution.laboratories.present?
-              %li
-                Laboratories
-                %ul
-                  - institution.laboratories.each do |lab|
-                    %li
-                      %label.checkbox
-                        %input{type: "checkbox", name: "roles[]", value: "Laboratory-#{lab.id}", checked: roles.any? { |r| r.matches?(lab) }}
-                        = lab.name
-            - if institution.devices.present?
-              %li
-                Devices
-                %ul
-                  - institution.devices.each do |device|
-                    %li
-                      %label.checkbox
-                        %input{type: "checkbox", name: "roles[]", value: "Device-#{device.id}", checked: roles.any? { |r| r.matches?(device) }}
-                        = device.name
+              %ul
+                - if institution.laboratories.present?
+                  %li
+                    Laboratories
+                    %ul
+                      - institution.laboratories.each do |lab|
+                        %li
+                          %label.checkbox
+                            %input{type: "checkbox", name: "roles[]", value: "Laboratory-#{lab.id}", checked: roles.any? { |r| r.matches?(lab) }}
+                            = lab.name
+                - if institution.devices.present?
+                  %li
+                    Devices
+                    %ul
+                      - institution.devices.each do |device|
+                        %li
+                          %label.checkbox
+                            %input{type: "checkbox", name: "roles[]", value: "Device-#{device.id}", checked: roles.any? { |r| r.matches?(device) }}
+                            = device.name
     - if locations.present?
       %li
         Locations
