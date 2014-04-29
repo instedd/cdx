@@ -341,6 +341,22 @@ defmodule ApiTest do
       ]
   end
 
+  test "group by week(date)" do
+    create_result [result: "positive"], {{2010,1,4},{12,0,0}}
+    create_result [result: "positive"], {{2010,1,5},{12,0,0}}
+    create_result [result: "positive"], {{2010,1,6},{12,0,0}}
+    create_result [result: "positive"], {{2010,1,12},{12,0,0}}
+    create_result [result: "positive"], {{2010,1,13},{12,0,0}}
+
+    response = get_updates("group_by=#{escape("week(created_at)")}")
+    response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
+
+    assert_all_values response, ["created_at", "count"], [
+      ["2010-W1", 3],
+      ["2010-W2", 2],
+      ]
+  end
+
   teardown(meta) do
     Enum.each [Institution, Laboratory, Device, TestResult], &Repo.delete_all/1
     settings = Tirexs.ElasticSearch.Config.new()

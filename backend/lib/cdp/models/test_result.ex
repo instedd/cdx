@@ -170,7 +170,7 @@ defmodule TestResult do
   end
 
   def date_regex do
-    ~r/\A(year|month)\(([^\)]+)\)\Z/
+    ~r/\A(year|month|week)\(([^\)]+)\)\Z/
   end
 
   def match_date_regex(string) do
@@ -190,6 +190,7 @@ defmodule TestResult do
       format = case interval do
                        "year" -> "yyyy"
                        "month" -> "yyyy-MM"
+                       "week" -> "yyyy-'W'w"
                      end
       [count: [date_histogram: [field: field, interval: interval, format: format]]]
     else
