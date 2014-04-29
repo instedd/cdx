@@ -40,8 +40,12 @@ defmodule ApiTest do
     DateFormat.format!(Date.from(date), "{ISO}")
   end
 
+  def escape(string) do
+    Cgi.escape(string)
+  end
+
   def escape_and_format(date) do
-    Cgi.escape(format_date(date))
+    escape(format_date(date))
   end
 
   def create_device(institution_id, secret_key) do
@@ -311,6 +315,21 @@ defmodule ApiTest do
     assert HashDict.get(male_positive_b, "gender") == "male"
     assert HashDict.get(male_positive_b, "result") == "positive"
     assert HashDict.get(male_positive_b, "assay_code") == "b"
+  end
+
+  test "group by year(date)" do
+    create_result [result: "positive"], {{2010,1,1},{12,0,0}}
+    create_result [result: "positive"], {{2010,1,2},{12,0,0}}
+    create_result [result: "positive"], {{2011,1,1},{12,0,0}}
+
+    response = get_updates("group_by=#{escape("year(created_at)")}")
+    [y2010, y2011] = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
+
+    assert HashDict.get(y2010, "count") == 2
+    assert HashDict.get(y2010, "created_at") == "2010"
+
+    assert HashDict.get(y2011, "count") == 1
+    assert HashDict.get(y2011, "created_at") == "2011"
   end
 
   teardown(meta) do

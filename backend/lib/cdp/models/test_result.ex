@@ -152,9 +152,15 @@ defmodule TestResult do
     count = Dict.get(aggregations, "count")
     if count do
       buckets = count["buckets"]
+      [first_group_by | other_group_by] = all_group_by
+      date_captures = match_date_regex(first_group_by)
       Enum.reduce buckets, results, fn(bucket, results) ->
-        [first_group_by | other_group_by] = all_group_by
-        result = result ++ [{first_group_by, bucket["key"]}]
+        if date_captures do
+          {interval, field} = date_captures
+          result = result ++ [{field, bucket["key_as_string"]}]
+        else
+          result = result ++ [{first_group_by, bucket["key"]}]
+        end
         process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
       end
     else
@@ -163,8 +169,31 @@ defmodule TestResult do
     end
   end
 
+  def date_regex do
+    ~r/\A(year)\(([^\)]+)\)\Z/
+  end
+
+  def match_date_regex(string) do
+    captures = Regex.run(date_regex, string)
+    if captures do
+      [_, interval, field] = captures
+      {interval, field}
+    else
+      nil
+    end
+  end
+
   defp process_group_by([group_by]) do
-    [count: [terms: [field: group_by]]]
+    date_captures = match_date_regex(group_by)
+    if date_captures do
+      {interval, field} = date_captures
+      format = case interval do
+                       "year" -> "yyyy"
+                     end
+      [count: [date_histogram: [field: field, interval: interval, format: format]]]
+    else
+      [count: [terms: [field: group_by]]]
+    end
   end
 
   defp process_group_by([group_by|rest]) do
