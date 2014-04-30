@@ -1,9 +1,11 @@
 ---
-category: Events
-title: 'Event Without PII'
+category: Resources
+title: 'Test Result'
 
 layout: nil
 ---
+
+The Test Result resource contains the fields related to the result reported by the device. No personal identifiable information is contained in this resource.
 
 ```{
   "guid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
@@ -20,9 +22,9 @@ layout: nil
   "institution_id" : 4,
   "location_id" : 5,
   "parent_locations" : [1, 2, 3],
-  "user_fields" : [
+  "custom_fields" : [
     ...
   ]
 }```
 
-Any other field reported by the device will be included inside the "user_fields" section.
+Non standard fields reported by the device will be included inside the "custom_fields" section.
