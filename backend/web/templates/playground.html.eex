@@ -24,7 +24,7 @@
       }
 
       $.ajax({
-        url: "/devices/" + device,
+        url: "/api/devices/" + device + "/results",
         type: "POST",
         data: JSON.stringify(data),
         contentType: "application/json; charset=utf-8",

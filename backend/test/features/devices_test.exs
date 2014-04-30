@@ -20,7 +20,7 @@ defmodule DevicesTest do
   end
 
   test "create test_result in postgres", meta do
-    conn = post("/devices/foo", meta[:data])
+    conn = post("/api/devices/foo/results", meta[:data])
     assert conn.status == 200
 
     [test_result] = Repo.all TestResult
@@ -31,7 +31,7 @@ defmodule DevicesTest do
   end
 
   test "create test_result in elasticsearch", meta do
-    post("/devices/foo", meta[:data])
+    post("/api/devices/foo/results", meta[:data])
 
     search = Tirexs.Search.search [index: meta[:index_name]] do
       query do
@@ -45,7 +45,7 @@ defmodule DevicesTest do
 
   test "doesn't store sensitive data in elasticsearch", meta do
     data = "{\"result\": \"positive\", \"patient_id\": 1234}"
-    post("/devices/foo", data)
+    post("/api/devices/foo/results", data)
 
     search = Tirexs.Search.search [index: meta[:index_name]] do
       query do
@@ -59,7 +59,7 @@ defmodule DevicesTest do
   end
 
   test "store the location id when the device is registered in only one laboratory", meta do
-    post("/devices/foo", meta[:data])
+    post("/api/devices/foo/results", meta[:data])
 
     search = Tirexs.Search.search [index: meta[:index_name]] do
       query do
@@ -76,7 +76,7 @@ defmodule DevicesTest do
     Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
     Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
 
-    post("/devices/foo", meta[:data])
+    post("/api/devices/foo/results", meta[:data])
 
     search = Tirexs.Search.search [index: meta[:index_name]] do
       query do
@@ -94,7 +94,7 @@ defmodule DevicesTest do
     Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
     Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
 
-    post("/devices/foo", meta[:data])
+    post("/api/devices/foo/results", meta[:data])
 
     search = Tirexs.Search.search [index: meta[:index_name]] do
       query do
@@ -110,7 +110,7 @@ defmodule DevicesTest do
   test "store nil if no location was found", meta do
     Repo.create Device.new(institution_id: meta[:institution].id, secret_key: "bar")
 
-    post("/devices/bar", meta[:data])
+    post("/api/devices/bar/results", meta[:data])
 
     search = Tirexs.Search.search [index: meta[:index_name]] do
       query do
@@ -126,7 +126,7 @@ defmodule DevicesTest do
   # test "enqueues in RabbitMQ", meta do
   #   amqp_config = Dynamo.config[:rabbit_amqp]
 
-  #   post("/devices/foo", meta[:data])
+  #   post("/api/devices/foo/results", meta[:data])
 
   #   amqp = Exrabbit.Utils.connect
   #   channel = Exrabbit.Utils.channel amqp

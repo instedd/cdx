@@ -29,7 +29,7 @@ defmodule ApiTest do
   end
 
   def post_result(result, device \\ "foo") do
-    post("/devices/#{device}", JSON.encode!(result))
+    post("/api/devices/#{device}/results", JSON.encode!(result))
   end
 
   def create_result(result, date \\ :calendar.universal_time(), device \\ "foo") do
