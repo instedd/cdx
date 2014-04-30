@@ -1,6 +1,6 @@
 ---
 category: Devices
-path: '/devices'
+path: '/devices/[authehtication_token]/results'
 title: 'Submit test results'
 type: 'POST'
 
@@ -16,9 +16,9 @@ Allows devices to submit test results.
 
 `Authentication: bearer f862f658-ad89-4fcb-995b-7a4c50554ff6`
 
-`/devices/authentication_token`
+`/devices/[authentication_token]/results`
 
-`/devices/c4c52784-bfd5-717d-7a91-614acd972d5d`
+`/devices/f862f658-ad89-4fcb-995b-7a4c50554ff6/results`
 
 ```{
   "assay" : "ASSAY001",
@@ -32,7 +32,7 @@ Allows devices to submit test results.
 
 # Response
 
-**If succeeds**, returns the created [event](#/event-without-pii-resource).
+**If succeeds**, returns the created [test-result](#/test-result-resource).
 
 `Status: 201 Created`
 

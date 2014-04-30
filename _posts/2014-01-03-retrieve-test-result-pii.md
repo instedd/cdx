@@ -1,7 +1,7 @@
 ---
 category: Applications
-path: '/results/[result_guid]'
-title: 'Retrieve a Test Result'
+path: '/results/[result_guid]/pii'
+title: 'Retrieve PII'
 type: 'GET'
 
 layout: nil
@@ -11,19 +11,19 @@ Retrieves the private patient information for a given test result.
 
 # Request Parameters
 
-```/results/[test_result_guid]```
+```/results/[test_result_guid]/pii```
 
 * The path must include a **valid test_result_guid**.
 * ```test_result_guid``` - guid of the desired test result.
 
 ### Example
 
-```/results/2```
+```/results/c4c52784-bfd5-717d-7a91-614acd972d5d/pii```
 
 # Response
 
-```Status: 200 OK```
+Returns the [test result with the private patient information attached](#/test-result-resource-with-pii).
 
-Returns a [test_result](#/test-result-resource)
+```Status: 200 OK```
 
 For errors responses, see the [response status codes documentation](#http-response-codes).

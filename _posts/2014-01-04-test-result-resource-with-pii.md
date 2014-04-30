@@ -1,6 +1,6 @@
 ---
 category: Resources
-title: 'Full Event structure'
+title: 'Test Result with additional PII'
 
 layout: nil
 ---
