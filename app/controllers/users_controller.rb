@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   expose(:users) { User.where("id != ?", current_user.id) }
   expose(:user)
 
-  expose(:institutions) { current_user.institutions.includes(:laboratories, :devices).all }
+  expose(:institutions) { current_user.visible_institutions.includes(:laboratories, :devices).all }
   expose(:locations) { Location.roots }
 
   expose(:roles) { user.roles.all }
@@ -33,6 +33,7 @@ class UsersController < ApplicationController
         model_class = model_name.constantize
         model = model_class.find(id)
         user.add_role :admin, model
+        user.add_role :member, model
 
         if model.is_a?(Laboratory) || model.is_a?(Device)
           user.add_role :member, model.institution

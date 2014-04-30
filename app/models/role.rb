@@ -8,7 +8,7 @@ class Role < ActiveRecord::Base
     name == "admin" && !resource_id
   end
 
-  def matches?(resource)
-    resource_type == resource.class.name && resource_id == resource.id
+  def admin_of?(resource)
+    resource_type == resource.class.name && resource_id == resource.id && name == "admin"
   end
 end

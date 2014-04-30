@@ -26,6 +26,6 @@ Laboratory.blueprint do
 end
 
 Device.blueprint do
-  laboratory
+  institution
   name
 end

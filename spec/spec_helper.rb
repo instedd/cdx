@@ -22,6 +22,13 @@ ActiveRecord::Migration.check_pending! if defined?(ActiveRecord::Migration)
 
 FakeWeb.allow_net_connect = %r[^https?://localhost]
 
+# This is to make machinist work with Rails 4
+class ActiveRecord::Reflection::AssociationReflection
+  def primary_key_name
+    foreign_key
+  end
+end
+
 RSpec.configure do |config|
   # ## Mock Framework
   #

@@ -11,4 +11,19 @@ class User < ActiveRecord::Base
   has_many :institutions
   has_many :laboratories, through: :institutions
   has_many :devices, through: :institutions
+
+  def visible_institutions
+    Institution.with_role(:member, self)
+  end
+
+  def create(model)
+    if model.respond_to?(:user=)
+      model.user = self
+    end
+    if (status = model.save)
+      add_role :admin, model
+      add_role :member, model
+    end
+    status
+  end
 end

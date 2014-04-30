@@ -10,7 +10,7 @@ class LocationsController < ApplicationController
   # POST /locations.json
   def create
     respond_to do |format|
-      if current_location.save
+      if current_user.create(current_location)
         format.html { redirect_to locations_path, notice: 'Location was successfully created.' }
         format.json { render action: 'show', status: :created, location: current_location }
       else
@@ -25,7 +25,7 @@ class LocationsController < ApplicationController
   def update
     respond_to do |format|
       if current_location.update(location_params)
-        format.html { puts "ACA!"; redirect_to locations_path, notice: 'Location was successfully updated.' }
+        format.html { redirect_to locations_path, notice: 'Location was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

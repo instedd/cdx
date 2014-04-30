@@ -1,5 +1,5 @@
 .row-fluid
   .span6
-    - simple_list :laboratory, title: 'Laboratories', icon: :folder, create_path: new_institution_laboratory_path(institution) do
+    - simple_list :laboratory, title: 'Laboratories', icon: :folder, create_path: (institution_admin? && new_institution_laboratory_path(institution)) do
       - laboratories.each do |laboratory|
         - simple_list_item laboratory.name, edit_institution_laboratory_path(institution, laboratory)

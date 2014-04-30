@@ -2,9 +2,9 @@ class Institution < ActiveRecord::Base
   resourcify
 
   belongs_to :user
-  has_many :subscribers
-  has_many :laboratories
-  has_many :devices
+  has_many :subscribers, dependent: :destroy
+  has_many :laboratories, dependent: :destroy
+  has_many :devices, dependent: :destroy
 
   if Rails.env.test?
     def index_name
