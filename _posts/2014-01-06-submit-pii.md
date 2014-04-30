@@ -1,7 +1,7 @@
 ---
 category: Devices
 path: '/devices/authehtication_token/events/[test_result_guid]/pii'
-title: 'Submit PII for a Test Result'
+title: 'Submit PII'
 type: 'PUT'
 
 layout: nil
