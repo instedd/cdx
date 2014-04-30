@@ -13,7 +13,7 @@ defmodule Device do
   def find_by_key(device_key) do
     query = from d in Device,
       where: d.secret_key == ^device_key,
-      preload: :devices_laboratories,
+      preload: [devices_laboratories: [laboratory: :location]],
       select: d
     [device] = Repo.all(query)
     device

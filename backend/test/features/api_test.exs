@@ -48,7 +48,7 @@ defmodule ApiTest do
     escape(format_date(date))
   end
 
-  def create_device(institution_id, secret_key) do
+  def create_device_and_laboratory(institution_id, secret_key) do
     laboratory = Repo.create Laboratory.new(institution_id: institution_id, name: "baz")
     device = Repo.create Device.new(institution_id: institution_id, secret_key: secret_key)
     Repo.create DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
@@ -152,7 +152,7 @@ defmodule ApiTest do
   test "filters by laboratory", meta do
     post_result result: "positive"
 
-    create_device(meta[:institution].id, "bar")
+    create_device_and_laboratory(meta[:institution].id, "bar")
 
     post_result [result: "negative"], "bar"
 
@@ -163,7 +163,7 @@ defmodule ApiTest do
   test "filters by institution", meta do
     post_result result: "positive"
 
-    create_device(meta[:institution2].id, "bar")
+    create_device_and_laboratory(meta[:institution2].id, "bar")
 
     post_result [result: "negative"], "bar"
 

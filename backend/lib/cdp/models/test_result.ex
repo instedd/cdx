@@ -112,17 +112,32 @@ defmodule TestResult do
 
     data = Dict.drop(data, (Enum.map sensitive_fields, &atom_to_binary(&1)))
 
-    case Repo.all(device.devices_laboratories) do
-      [lab] ->
-        laboratory_id = lab.laboratory_id
-      [lab | _ ] ->
-        laboratory_id = lab.laboratory_id
+    laboratories = Enum.map device.devices_laboratories.to_list, fn dl -> dl.laboratory.get end
+    case laboratories do
+      [lab | t ] when t != [] ->
+        laboratory_id = nil
+        locations = (Enum.map [lab|t], fn lab -> lab.location.get end)
+        root_location = Location.common_root(locations)
+        if root_location do
+          location_id = root_location.id
+          parent_locations = Location.with_parents root_location
+        else
+          parent_locations = []
+        end
+      [lab | []] when lab != nil ->
+        laboratory_id = lab.id
+        location = lab.location.get
+        location_id = location.id
+        parent_locations = Location.with_parents location
       _ ->
+        parent_locations = []
     end
 
     data = Dict.put data, :type, "test_result"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.from(date), "{ISO}"))
     data = Dict.put data, :device_id, device.id
+    data = Dict.put data, :location_id, location_id
+    data = Dict.put data, :parent_locations, parent_locations
     data = Dict.put data, :laboratory_id, laboratory_id
     data = Dict.put data, :institution_id, institution_id
 

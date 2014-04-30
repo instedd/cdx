@@ -5,11 +5,18 @@ defmodule DevicesTest do
 
   setup do
     institution = Repo.create Institution.new(name: "baz")
-    laboratory = Repo.create Laboratory.new(institution_id: institution.id, name: "bar")
+    root_location = Repo.create Location.new(name: "locr")
+    parent_location = Repo.create Location.new(name: "locp", parent_id: root_location.id)
+    location1 = Repo.create Location.new(name: "loc1", parent_id: parent_location.id)
+    location2 = Repo.create Location.new(name: "loc2", parent_id: parent_location.id)
+    location3 = Repo.create Location.new(name: "loc3", parent_id: root_location.id)
+    laboratory1 = Repo.create Laboratory.new(institution_id: institution.id, name: "bar", location_id: location1.id)
+    laboratory2 = Repo.create Laboratory.new(institution_id: institution.id, name: "bar", location_id: location2.id)
+    laboratory3 = Repo.create Laboratory.new(institution_id: institution.id, name: "bar", location_id: location3.id)
     device = Repo.create Device.new(institution_id: institution.id, secret_key: "foo")
-    Repo.create DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
+    Repo.create DevicesLaboratories.new(laboratory_id: laboratory1.id, device_id: device.id)
     data = JSON.encode! [result: "positive"]
-    {:ok, institution: institution, device: device, data: data}
+    {:ok, institution: institution, device: device, data: data, root_location: root_location, parent_location: parent_location, location1: location1, location2: location2, laboratory1: laboratory1, laboratory2: laboratory2, laboratory3: laboratory3}
   end
 
   test "create test_result in postgres", meta do
@@ -49,6 +56,71 @@ defmodule DevicesTest do
     assert result["_source"]["result"] == "positive"
     assert result["_source"]["created_at"] != nil
     assert result["_source"]["patient_id"] == nil
+  end
+
+  test "store the location id when the device is registered in only one laboratory", meta do
+    post("/devices/foo", meta[:data])
+
+    search = Tirexs.Search.search [index: meta[:index_name]] do
+      query do
+        match_all
+      end
+    end
+    [result] = Tirexs.Query.create_resource(search).hits
+    assert result["_source"]["location_id"] == meta[:location1].id
+    assert result["_source"]["laboratory_id"] == meta[:laboratory1].id
+    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([meta[:location1].id, meta[:parent_location].id, meta[:root_location].id])
+  end
+
+  test "store the parent location id when the device is registered more than one laboratory", meta do
+    Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
+    Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
+
+    post("/devices/foo", meta[:data])
+
+    search = Tirexs.Search.search [index: meta[:index_name]] do
+      query do
+        match_all
+      end
+    end
+    [result] = Tirexs.Query.create_resource(search).hits
+    assert result["_source"]["location_id"] == meta[:root_location].id
+    assert result["_source"]["laboratory_id"] == nil
+    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([meta[:root_location].id])
+  end
+
+
+  test "store the parent location id when the device is registered more than one laboratory with another tree order", meta do
+    Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
+    Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
+
+    post("/devices/foo", meta[:data])
+
+    search = Tirexs.Search.search [index: meta[:index_name]] do
+      query do
+        match_all
+      end
+    end
+    [result] = Tirexs.Query.create_resource(search).hits
+    assert result["_source"]["location_id"] == meta[:root_location].id
+    assert result["_source"]["laboratory_id"] == nil
+    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([meta[:root_location].id])
+  end
+
+  test "store nil if no location was found", meta do
+    Repo.create Device.new(institution_id: meta[:institution].id, secret_key: "bar")
+
+    post("/devices/bar", meta[:data])
+
+    search = Tirexs.Search.search [index: meta[:index_name]] do
+      query do
+        match_all
+      end
+    end
+    [result] = Tirexs.Query.create_resource(search).hits
+    assert result["_source"]["location_id"] == nil
+    assert result["_source"]["laboratory_id"] == nil
+    assert result["_source"]["parent_locations"] == []
   end
 
   # test "enqueues in RabbitMQ", meta do
