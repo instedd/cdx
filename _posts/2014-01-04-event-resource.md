@@ -1,5 +1,5 @@
 ---
-category: Events
+category: Resources
 title: 'Full Event structure'
 
 layout: nil
