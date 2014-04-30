@@ -24,6 +24,6 @@ Retrieves the private patient information for a given test result.
 
 ```Status: 200 OK```
 
-Returns a [test_result](#/test_result_resource)
+Returns a [test_result](#/test-result-resource)
 
 For errors responses, see the [response status codes documentation](#http-response-codes).
