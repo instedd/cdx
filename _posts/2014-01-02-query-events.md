@@ -1,69 +1,69 @@
 ---
 category: Applications
-path: '/api/events'
-title: 'Query events'
+path: '/results'
+title: 'Query Test Results'
 type: 'GET'
 
 layout: nil
 ---
 
-This method allows applications to retrieve test results.
+Returns a list of Test Results
 
 # Filters
 
-Query parameters are optional, and they allow to filter the system's information.
+Filter parameters allow querying a subset of the available results.
 
-The data retrieved will allways be sorted by the creation date.
+The data retrieved will allways be sorted by the result creation date.
 
 * `start_at` - the system will return a maximum of 1000 results, to retrieve the next batch of results the `start_at` parameter must be used
 
 `start_at=1001`
 
-* `since` - retrieve events reported after a specific date time.
+* `since` - retrieve results reported after a specific date time.
 
 `/events?since=2014-04-10T15:22:12+0000`
 
-* `until` - retrieve events reported before a specific date time. Useful to define a time window in combination with “since”.
+* `until` - retrieve results reported before a specific date time. Useful to define a time window in combination with “since”.
 
 `/events?until=2014-04-10T15:22:12+0000`
 
-* `location` - filter events by location id
+* `location` - filter results by location id
 
 `/events?location=1`
 
-* `institution` - filter events by institution id
+* `institution` - filter results by institution id
 
 `/events?institution=1`
 
-* `device` - filter events by device id
+* `device` - filter results by device id
 
 `/events?device=1`
 
-* `laboratory` - filter events by laboratory id
+* `laboratory` - filter results by laboratory id
 
 `/events?laboratory=1`
 
-* `gender` - filter events by gender
+* `gender` - filter results by gender
 
 `/events?gender=male`
 
-* `min_age` - filter events for people of age greater or equal than min_age
+* `min_age` - filter results for people of age greater or equal than min_age
 
 `/events?min_age=7`
 
-* `max_age` - filter events for people of age lower or equal than max_age
+* `max_age` - filter results for people of age lower or equal than max_age
 
 `/events?max_age=7`
 
-* `result` - filter by the event outcome.
+* `result` - filter by the results outcome.
 
 `/events?result=positive`
 
-* `assay_name` - filter events for a particular assay name
+* `assay_name` - filter results for a particular assay name
 
 `/events?assay_name=MTB`
 
-* `assay` - filter tests for a particular assay ID
+* `assay` - filter results for a particular assay ID
 
 `/events?assay=ASSAY001`
 
@@ -166,7 +166,7 @@ Returns an array of events without any PII:
 
 ## With Grouping
 
-Returns a collection of grouped values
+Returns the quantity of test results matching each combination of aggregated fields.
 
 ```/events?group_by=gender,result```
 
