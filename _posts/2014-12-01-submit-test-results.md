@@ -1,13 +1,13 @@
 ---
 category: Devices
 path: '/devices'
-title: 'Report an event'
+title: 'Submit test results'
 type: 'POST'
 
 layout: nil
 ---
 
-This method allows devices to report test results.
+Allows devices to submit test results.
 
 # Request
 
