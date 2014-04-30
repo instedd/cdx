@@ -54,7 +54,7 @@ defmodule ApiTest do
     Repo.create DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
   end
 
-  def fetch_many(dict, []) do
+  def fetch_many(_, []) do
     []
   end
 

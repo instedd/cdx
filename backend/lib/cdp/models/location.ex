@@ -16,6 +16,10 @@ defmodule Location do
     location
   end
 
+  def common_root([nil]) do
+    nil
+  end
+
   def common_root([location| [other | t]]) do
     root = common_root location, other
     common_root [root | t]

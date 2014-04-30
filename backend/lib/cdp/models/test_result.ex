@@ -116,19 +116,16 @@ defmodule TestResult do
     case laboratories do
       [lab | t ] when t != [] ->
         laboratory_id = nil
-        locations = (Enum.map [lab|t], fn lab -> lab.location.get end)
+        locations = (Enum.map [lab|t], fn lab -> Repo.get Location, lab.location_id end)
         root_location = Location.common_root(locations)
+        parent_locations = Location.with_parents root_location
         if root_location do
           location_id = root_location.id
-          parent_locations = Location.with_parents root_location
-        else
-          parent_locations = []
         end
       [lab | []] when lab != nil ->
         laboratory_id = lab.id
-        location = lab.location.get
-        location_id = location.id
-        parent_locations = Location.with_parents location
+        location_id = lab.location_id
+        parent_locations = Location.with_parents Repo.get(Location, lab.location_id)
       _ ->
         parent_locations = []
     end
