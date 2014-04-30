@@ -1,18 +1,18 @@
 ---
 category: Devices
-path: '/devices/authehtication_token/events/event_id/pii'
-title: 'Set an event''s PII'
+path: '/devices/authehtication_token/events/[test_result_guid]/pii'
+title: 'Submit PII for a Test Result'
 type: 'PUT'
 
 layout: nil
 ---
 
-This method allows to authorized personal to update the PII for a test result.
+Allows submission of Personal Identifiable Information into a previously submitted test result.
 
 # Request
 
 * The path must include a **valid authentication token**.
-* The path must include a valid **report GUID**.
+* The path must include a valid **test result GUID**.
 * **The body can't be empty** and must include the PII.
 
 `Authentication: bearer f862f658-ad89-4fcb-995b-7a4c50554ff6`
