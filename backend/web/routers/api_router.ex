@@ -19,8 +19,8 @@ defmodule ApiRouter do
     conn.send(200, conn.req_body())
   end
 
-  post "/devices/:device_key/results/:result_uuid/pii" do
-    TestResult.update_pii(device_key, result_uuid, conn.req_body())
+  put "/results/:result_uuid/pii" do
+    TestResult.update_pii(result_uuid, JSON.decode!(conn.req_body()))
     conn.send(200, conn.req_body())
   end
 end

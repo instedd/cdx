@@ -42,15 +42,32 @@ defmodule TestResult do
   end
 
   def find_by_uuid(test_result_uuid) do
+    [elastic_test_result] = query([uuid: test_result_uuid])
+
+    HashDict.put elastic_test_result, "pii", find_by_uuid_in_postgres(test_result_uuid).sensitive_data
+  end
+
+  def update_pii(result_uuid, data, date \\ :calendar.universal_time()) do
+    date = Ecto.DateTime.from_erl(date)
+
+    sensitive_data = Enum.map sensitive_fields, fn field_name ->
+      {field_name, data[atom_to_binary(field_name)]}
+    end
+
+    test_result = find_by_uuid_in_postgres(result_uuid)
+    test_result = test_result.sensitive_data sensitive_data
+    test_result = test_result.updated_at date
+    test_result = encrypt(test_result)
+
+    Repo.update(test_result)
+  end
+
+  defp find_by_uuid_in_postgres(test_result_uuid) do
     query = from t in TestResult,
       where: t.uuid == ^test_result_uuid,
       select: t
     [postgres_test_result] = Repo.all(query)
-    postgres_test_result = decrypt(postgres_test_result)
-
-    [elastic_test_result] = query([uuid: test_result_uuid])
-
-    HashDict.put elastic_test_result, "pii", postgres_test_result.sensitive_data
+    decrypt(postgres_test_result)
   end
 
   def create_and_enqueue(device_key, raw_data, date \\ :calendar.universal_time()) do
