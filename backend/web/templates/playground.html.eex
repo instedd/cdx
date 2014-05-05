@@ -50,7 +50,7 @@
       $query_button.val("Querying...");
 
       $.ajax({
-        url: "/api/events?" + query_string,
+        url: "/api/results?" + query_string,
         type: "GET",
         success: function(data, textStatus, jqXHR) {
           $query_button.prop("disabled", false);
