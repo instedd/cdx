@@ -14,10 +14,17 @@ defmodule ApiTest do
   end
 
   def get_updates(query_string, post_data \\ "") do
-    conn = get("/api/events?#{query_string}", post_data)
+    conn = get("/api/results?#{query_string}", post_data)
     assert conn.status == 200
     JSON.decode!(conn.sent_body)
   end
+
+  def get_pii(result_uuid) do
+    conn = get("api/results/#{result_uuid}/pii")
+    assert conn.status == 200
+    JSON.decode!(conn.sent_body)
+  end
+
 
   def get_one_update(query_string, post_data \\ "") do
     [result] = get_updates(query_string, post_data)
@@ -370,6 +377,29 @@ defmodule ApiTest do
       ["2010-01-04", 3],
       ["2010-01-05", 1],
       ]
+  end
+
+  test "filters by uuid" do
+    post_result result: "positive", assay_name: "GX4001"
+    post_result result: "negative", assay_name: "GX1234"
+
+    response = get_one_update("assay_name=GX4001")
+    response = get_one_update("uuid=#{HashDict.get(response, "uuid")}")
+    assert HashDict.get(response, "result") == "positive"
+
+    response = get_one_update("assay_name=GX1234")
+    response = get_one_update("uuid=#{HashDict.get(response, "uuid")}")
+    assert HashDict.get(response, "result") == "negative"
+  end
+
+  test "retrieves a test result PII by uuid" do
+    create_result [result: "positive", patient_name: "jdoe"]
+
+    result = get_one_update ""
+
+    response = get_pii(HashDict.get(result, "uuid"))
+    assert HashDict.get(HashDict.get(response, "pii"), "patient_name") == "jdoe"
+    assert HashDict.get(response, "result") == "positive"
   end
 
   teardown(meta) do

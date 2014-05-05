@@ -8,6 +8,7 @@ defmodule TestResult do
     belongs_to(:device, Device)
     field :created_at, :datetime
     field :updated_at, :datetime
+    field :uuid
     field :raw_data, :binary
     field :sensitive_data, :binary
   end
@@ -33,17 +34,23 @@ defmodule TestResult do
       {:assay, :string},
       {:assay_name, :string},
       {:device_serial_number, :multi_field},
-      {:guid, :string},
+      {:uuid, :string},
       {:result, :string},
       {:start_time, :date},
       {:system_user, :string},
     ]
   end
 
-  def find_by_id(test_result_id) do
-    test_result = Repo.get(TestResult, test_result_id)
-    test_result = decrypt(test_result)
-    test_result
+  def find_by_uuid(test_result_uuid) do
+    query = from t in TestResult,
+      where: t.uuid == ^test_result_uuid,
+      select: t
+    [postgres_test_result] = Repo.all(query)
+    postgres_test_result = decrypt(postgres_test_result)
+
+    [elastic_test_result] = query([uuid: test_result_uuid])
+
+    HashDict.put elastic_test_result, "pii", postgres_test_result.sensitive_data
   end
 
   def create_and_enqueue(device_key, raw_data, date \\ :calendar.universal_time()) do
@@ -51,8 +58,9 @@ defmodule TestResult do
 
     {:ok, data} = JSON.decode raw_data
 
-    create_in_db(device, data, raw_data, date)
-    create_in_elasticsearch(device, data, date)
+    uuid = :erlang.iolist_to_binary(:uuid.to_string(:uuid.uuid1()))
+    create_in_db(device, data, raw_data, date, uuid)
+    create_in_elasticsearch(device, data, date, uuid)
     # enqueue_in_rabbit(device, data)
   end
 
@@ -64,19 +72,20 @@ defmodule TestResult do
     else
       query_without_group_by(query)
     end
+      |> Enum.map fn test_result -> HashDict.new(test_result) end
   end
 
   def encrypt(test_result) do
-    {:ok, json_data} = JSON.encode(test_result.sensitive_data)
-    test_result = test_result.sensitive_data(json_data)
-    test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
+    test_result = :crypto.rc4_encrypt(encryption_key, JSON.encode!(test_result.sensitive_data))
+      |> test_result.sensitive_data
     test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
   end
 
   def decrypt(test_result) do
-    test_result = test_result.sensitive_data(:crypto.rc4_encrypt(encryption_key, test_result.sensitive_data))
-    {:ok, data} = JSON.decode(test_result.sensitive_data)
-    test_result = test_result.sensitive_data(data)
+    test_result = :crypto.rc4_encrypt(encryption_key, test_result.sensitive_data)
+      |> JSON.decode!
+      |> test_result.sensitive_data
+
     test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
   end
 
@@ -88,16 +97,17 @@ defmodule TestResult do
     "some secure key"
   end
 
-  defp create_in_db(device, data, raw_data, date) do
+  defp create_in_db(device, data, raw_data, date, uuid) do
     date = Ecto.DateTime.from_erl(date)
 
     sensitive_data = Enum.map sensitive_fields, fn field_name ->
-      {field_name, data[field_name]}
+      {field_name, data[atom_to_binary(field_name)]}
     end
 
     test_result = TestResult.new [
       device_id: device.id,
       raw_data: raw_data,
+      uuid: uuid,
       sensitive_data: sensitive_data,
       created_at: date,
       updated_at: date,
@@ -107,7 +117,7 @@ defmodule TestResult do
     Repo.create(test_result)
   end
 
-  defp create_in_elasticsearch(device, data, date) do
+  defp create_in_elasticsearch(device, data, date, uuid) do
     institution_id = device.institution_id
 
     data = Dict.drop(data, (Enum.map sensitive_fields, &atom_to_binary(&1)))
@@ -137,6 +147,7 @@ defmodule TestResult do
     data = Dict.put data, :parent_locations, parent_locations
     data = Dict.put data, :laboratory_id, laboratory_id
     data = Dict.put data, :institution_id, institution_id
+    data = Dict.put data, :uuid, uuid
 
     settings = Tirexs.ElasticSearch.Config.new()
     Tirexs.Bulk.store [index: Institution.elasticsearch_index_name(institution_id), refresh: true], settings do
@@ -287,6 +298,11 @@ defmodule TestResult do
 
     if result = params["result"] do
       condition = [match: [result: result]]
+      conditions = [condition | conditions]
+    end
+
+    if uuid = params["uuid"] do
+      condition = [match: [uuid: uuid]]
       conditions = [condition | conditions]
     end
 

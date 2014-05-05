@@ -21,4 +21,5 @@
   "rabbit_common": {:git, "git://github.com/jbrisbin/rabbit_common.git", "99f27775da2e1763c723e41f8b9ca0a68b24ed19", [tag: "rabbitmq-3.0.2"]},
   "ranch": {:git, "git://github.com/extend/ranch.git", "5df1f222f94e08abdcab7084f5e13027143cc222", [ref: "0.9.0"]},
   "timex": {:git, "git://github.com/bitwalker/timex.git", "7f9398da05a9c29ad5129effe4fee20cabfe6a75", []},
-  "tirexs": {:git, "git://github.com/manastech/tirexs.git", "9a3f4f290281cc0760a48095b324804b6efceb70", [branch: "master"]} ]
+  "tirexs": {:git, "git://github.com/manastech/tirexs.git", "9a3f4f290281cc0760a48095b324804b6efceb70", [branch: "master"]},
+  "uuid": {:git, "git://github.com/avtobiff/erlang-uuid.git", "9cfe9666f1787d27550495c9c9cfa0297d861252", []} ]

@@ -1,14 +1,26 @@
 defmodule ApiRouter do
   use Dynamo.Router
 
-  get "/" do
+  get "/results/" do
     if String.length(conn.req_body()) == 0 do
       params = Dynamo.Connection.QueryParser.parse(conn.query_string())
     else
       {:ok, params} = JSON.decode conn.req_body()
     end
-    test_results = Enum.map TestResult.query(params), fn test_result -> HashDict.new(test_result) end
-    {:ok, test_results} = JSON.encode(test_results)
-    conn.send(200, test_results)
+    conn.send(200, JSON.encode!(TestResult.query(params)))
+  end
+
+  get "/results/:result_uuid/pii" do
+    conn.send(200, JSON.encode!(TestResult.find_by_uuid(result_uuid)))
+  end
+
+  post "/devices/:device_key/results" do
+    TestResult.create_and_enqueue(device_key, conn.req_body())
+    conn.send(200, conn.req_body())
+  end
+
+  post "/devices/:device_key/results/:result_uuid/pii" do
+    TestResult.update_pii(device_key, result_uuid, conn.req_body())
+    conn.send(200, conn.req_body())
   end
 end

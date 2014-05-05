@@ -8,7 +8,6 @@ defmodule ApplicationRouter do
     conn.fetch([:cookies, :params, :body])
   end
 
-  forward "/api/devices", to: DevicesRouter
-  forward "/api/events", to: ApiRouter
+  forward "/api", to: ApiRouter
   forward "/playground", to: PlaygroundRouter
 end
