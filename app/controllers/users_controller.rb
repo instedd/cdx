@@ -19,7 +19,7 @@ class UsersController < ApplicationController
   def update
     roles = params[:roles] || []
 
-    if current_user.has_role?(:admin)
+    if current_user.superadmin?
       # Need to delete all applies roles
       roles_to_delete = user.roles
     else
@@ -36,7 +36,7 @@ class UsersController < ApplicationController
     roles.each do |role|
       case role
       when "admin"
-        if current_user.has_role?(:admin)
+        if current_user.superadmin?
           user.add_role :admin
         end
       else

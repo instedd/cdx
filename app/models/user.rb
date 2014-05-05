@@ -12,6 +12,10 @@ class User < ActiveRecord::Base
   has_many :laboratories, through: :institutions
   has_many :devices, through: :institutions
 
+  def superadmin?
+    has_role? :admin
+  end
+
   def visible_institutions
     Institution.with_role(:member, self)
   end
