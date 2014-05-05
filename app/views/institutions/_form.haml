@@ -7,7 +7,7 @@
             %li= msg
   %div
     = f.label :name
-    = f.text_field :name, readonly: !institution_admin?
+    = f.text_field :name, readonly: !(institution_admin? || institution.new_record?)
 
-  - if institution_admin?
+  - if institution_admin? || institution.new_record?
     = f.submit class: 'btn'
