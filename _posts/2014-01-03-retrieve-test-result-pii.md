@@ -1,6 +1,6 @@
 ---
 category: Applications
-path: '/results/[result_guid]/pii'
+path: '/results/[result_uuid]/pii'
 title: 'Retrieve PII'
 type: 'GET'
 
@@ -11,10 +11,10 @@ Retrieves the private patient information for a given test result.
 
 # Request Parameters
 
-```/results/[test_result_guid]/pii```
+```/results/[test_result_uuid]/pii```
 
-* The path must include a **valid test_result_guid**.
-* ```test_result_guid``` - guid of the desired test result.
+* The path must include a **valid test_result_uuid**.
+* ```test_result_uuid``` - UUID of the desired test result.
 
 ### Example
 

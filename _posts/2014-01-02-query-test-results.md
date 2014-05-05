@@ -67,6 +67,10 @@ The data retrieved will allways be sorted by the result creation date.
 
 `/events?assay=ASSAY001`
 
+* `uuid` - retrieves the result with a particular UUID
+
+`/events?uuid=c4c52784-bfd5-717d-7a91-614acd972d5e`
+
 # Data Aggregation
 
 There are two ways to accomplish data aggregation:
@@ -142,7 +146,7 @@ Returns an array of events without any PII:
   "institution_id" : 4,
   "location_id" : 5,
   "parent_locations" : [1, 2, 3],
-  "guid" : "c4c52784-bfd5-717d-7a91-614acd972d5e"
+  "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e"
 },
 {
   "assay" : "ASSAY002",
@@ -158,7 +162,7 @@ Returns an array of events without any PII:
   "institution_id" : 4,
   "location_id" : 5,
   "parent_locations" : [1, 2, 3],
-  "guid" : "c4c52784-bfd5-717d-7a91-614acd972d5e"
+  "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e"
 },
 ...
 ]

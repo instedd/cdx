@@ -8,7 +8,7 @@ layout: nil
 The Test Result resource contains the fields related to the result reported by the device. No personal identifiable information is contained in this resource.
 
 ```{
-  "guid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
+  "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
   "assay" : "ASSAY001",
   "assay_name" : "MTB",
   "result" : "positive",
