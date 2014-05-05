@@ -1,6 +1,6 @@
 ---
 category: Devices
-path: '/devices/[authehtication_token]/results'
+path: '/devices/[device_uuid]/results'
 title: 'Submit test results'
 type: 'POST'
 
@@ -11,12 +11,10 @@ Allows devices to submit test results.
 
 # Request
 
-* The path must include a **valid authentication token**.
+* The path must include a valid **device UUID**.
 * **The body can't be empty** and must include .
 
-`Authentication: bearer f862f658-ad89-4fcb-995b-7a4c50554ff6`
-
-`/devices/[authentication_token]/results`
+`/devices/[device_uuid]/results`
 
 `/devices/f862f658-ad89-4fcb-995b-7a4c50554ff6/results`
 
