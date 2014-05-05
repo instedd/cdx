@@ -11,7 +11,7 @@
     = f.text_field :name
   .field
     = f.label :parent_id
-    = f.select :parent_id, nested_set_options(Location, current_location) {|i| "#{'-' * i.level} #{i.name}" }
+    = f.select :parent_id, nested_set_options(Location, current_location) {|i| "#{'-' * i.level} #{i.name}" }, include_blank: '(none)'
 
   .actions
     = f.submit 'Save'
