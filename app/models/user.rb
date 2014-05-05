@@ -26,4 +26,12 @@ class User < ActiveRecord::Base
     end
     status
   end
+
+  def remove_role_from_another_role(role)
+    if role.resource_id
+      remove_role role.name, role.resource
+    else
+      remove_role role.name
+    end
+  end
 end

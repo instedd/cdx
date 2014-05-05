@@ -19,25 +19,31 @@
         Institutions
         %ul
           - institutions.each do |institution|
+            - user_is_institution_admin = roles.any? { |r| r.admin_of?(institution) }
+            - current_user_is_institution_admin = current_user_roles.any? { |r| r.admin_of?(institution) }
             %li
               %label.checkbox
-                %input{type: "checkbox", name: "roles[]", value: "Institution-#{institution.id}", checked: roles.any? { |r| r.admin_of?(institution) }}
+                %input{type: "checkbox", name: "roles[]", value: "Institution-#{institution.id}", checked: user_is_institution_admin, disabled: !current_user_is_institution_admin}
                 = institution.name
               %ul
-                - if institution.laboratories.present?
+                - laboratories = institution.laboratories
+                - laboratories = laboratories.select { |lab| current_user_roles.any? { |r| r.admin_of?(lab) } } unless current_user_is_institution_admin
+                - if laboratories.present?
                   %li
                     Laboratories
                     %ul
-                      - institution.laboratories.each do |lab|
+                      - laboratories.each do |lab|
                         %li
                           %label.checkbox
                             %input{type: "checkbox", name: "roles[]", value: "Laboratory-#{lab.id}", checked: roles.any? { |r| r.admin_of?(lab) }}
                             = lab.name
-                - if institution.devices.present?
+                - devices = institution.devices
+                - devices = devices.select { |device| current_user_roles.any? { |r| r.admin_of?(device) } } unless current_user_is_institution_admin
+                - if devices.present?
                   %li
                     Devices
                     %ul
-                      - institution.devices.each do |device|
+                      - devices.each do |device|
                         %li
                           %label.checkbox
                             %input{type: "checkbox", name: "roles[]", value: "Device-#{device.id}", checked: roles.any? { |r| r.admin_of?(device) }}
