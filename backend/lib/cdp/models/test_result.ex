@@ -179,7 +179,8 @@ defmodule TestResult do
         query: query,
         aggregations: aggregations,
         size: 0
-      ]
+      ],
+      index: "#{Elasticsearch.index_prefix}*"
     ]
 
     result = Tirexs.Query.create_resource(query)
