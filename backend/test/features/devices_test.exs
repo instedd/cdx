@@ -143,13 +143,9 @@ defmodule DevicesTest do
   #   end
   # end
 
-  teardown(meta) do
+  teardown do
     Enum.each [Institution, Laboratory, Device, TestResult], &Repo.delete_all/1
-    delete_index meta[:institution], Tirexs.ElasticSearch.Config.new()
-  end
-
-  def delete_index(institution, settings) do
-    Tirexs.ElasticSearch.delete Institution.elasticsearch_index_name(institution.id), settings
+    Tirexs.ElasticSearch.delete "#{Elasticsearch.index_prefix}*", Tirexs.ElasticSearch.Config.new()
   end
 
     # amqp_config = Dynamo.config[:rabbit_amqp]

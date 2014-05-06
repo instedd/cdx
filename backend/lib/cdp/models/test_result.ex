@@ -241,9 +241,9 @@ defmodule TestResult do
   defp process_group_by([group_by|rest]) do
     rest_aggregations = process_group_by(rest)
     group_by_aggregations = process_group_by([group_by])
+
     [
-      count: [terms: group_by_aggregations[:count][:terms]] ++
-        [aggregations: rest_aggregations]
+      count: (group_by_aggregations[:count] ++ [aggregations: rest_aggregations])
     ]
   end
 

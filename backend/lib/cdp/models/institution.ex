@@ -9,6 +9,6 @@ defmodule Institution do
   end
 
   def elasticsearch_index_name(institution_id) do
-    "#{Elasticsearch.index_prefix}#{institution_id}_#{Mix.env}"
+    "#{Elasticsearch.index_prefix}_#{institution_id}"
   end
 end

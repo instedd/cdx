@@ -50,7 +50,7 @@ defmodule Elasticsearch do
   end
 
   def index_prefix do
-    "cdp_institution_"
+    "cdp_institution_#{Mix.env}"
   end
 
 end

@@ -379,6 +379,28 @@ defmodule ApiTest do
       ]
   end
 
+  test "group by day(date) and result" do
+    create_result [result: "positive"], {{2010,1,4},{12,0,0}}
+    create_result [result: "positive"], {{2010,1,4},{13,0,0}}
+    create_result [result: "negative"], {{2010,1,4},{14,0,0}}
+    create_result [result: "positive"], {{2010,1,5},{12,0,0}}
+
+    response = get_updates("group_by=#{escape("day(created_at)")},result")
+    response = Enum.sort response, fn(r1, r2) ->
+      if r1["created_at"] == r2["created_at"] do
+        r1["result"] < r2["result"]
+      else
+        r1["created_at"] < r2["created_at"]
+      end
+    end
+
+    assert_all_values response, ["created_at", "result", "count"], [
+      ["2010-01-04", "negative", 1],
+      ["2010-01-04", "positive", 2],
+      ["2010-01-05", "positive", 1],
+      ]
+  end
+
   test "filters by uuid" do
     post_result result: "positive", assay_name: "GX4001"
     post_result result: "negative", assay_name: "GX1234"
@@ -422,14 +444,8 @@ defmodule ApiTest do
     assert HashDict.get(updated_result, "result") == nil
   end
 
-  teardown(meta) do
+  teardown do
     Enum.each [Institution, Laboratory, Device, TestResult], &Repo.delete_all/1
-    settings = Tirexs.ElasticSearch.Config.new()
-    delete_index meta[:institution], settings
-    delete_index meta[:institution2], settings
-  end
-
-  def delete_index(institution, settings) do
-    Tirexs.ElasticSearch.delete Institution.elasticsearch_index_name(institution.id), settings
+    Tirexs.ElasticSearch.delete "#{Elasticsearch.index_prefix}*", Tirexs.ElasticSearch.Config.new()
   end
 end
