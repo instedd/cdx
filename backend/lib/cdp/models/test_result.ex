@@ -68,7 +68,7 @@ defmodule TestResult do
     decrypt(postgres_test_result)
   end
 
-  def create_and_enqueue(device_key, raw_data, date \\ :calendar.universal_time()) do
+  def create(device_key, raw_data, date \\ :calendar.universal_time()) do
     device = Device.find_by_key(device_key)
 
     {:ok, data} = JSON.decode raw_data
@@ -76,7 +76,6 @@ defmodule TestResult do
     uuid = :erlang.iolist_to_binary(:uuid.to_string(:uuid.uuid1()))
     create_in_db(device, data, raw_data, date, uuid)
     create_in_elasticsearch(device, data, date, uuid)
-    # enqueue_in_rabbit(device, data)
   end
 
   def query(params) do
@@ -329,21 +328,4 @@ defmodule TestResult do
 
     conditions
   end
-
-  # def enqueue_in_rabbit(device, data) do
-  #   subscribers = Subscriber.find_by_institution_id(device.institution_id)
-
-  #   amqp_config = Cdp.Dynamo.config[:rabbit_amqp]
-  #   amqp = Exrabbit.Utils.connect
-  #   channel = Exrabbit.Utils.channel amqp
-  #   Exrabbit.Utils.declare_exchange channel, amqp_config[:subscribers_exchange]
-  #   Exrabbit.Utils.declare_queue channel, amqp_config[:subscribers_queue], true
-  #   Exrabbit.Utils.bind_queue channel, amqp_config[:subscribers_queue], amqp_config[:subscribers_exchange]
-
-  #   Enum.each subscribers, fn(s) ->
-  #     IO.puts s.id
-  #     {:ok, message} = JSON.encode([test_result: data, subscriber: s.id])
-  #     Exrabbit.Utils.publish channel, amqp_config[:subscribers_exchange], "", message
-  #   end
-  # end
 end
