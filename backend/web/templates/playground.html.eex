@@ -19,7 +19,7 @@
       data = {
         age: $("#age").val(),
         gender: $("#gender").val(),
-        assay_code: $("#assay_code").val(),
+        assay_name: $("#assay_name").val(),
         result: $("#result").val()
       }
 
@@ -99,8 +99,8 @@
           </select>
         </div>
         <div>
-          <label for="assay_code">Assay code</label>
-          <input id="assay_code" name="assay_code" type="text" value="GX4001" />
+          <label for="assay_name">Assay name</label>
+          <input id="assay_name" name="assay_name" type="text" value="GX4001" />
         </div>
         <div>
           <label for="result">Result</label>
