@@ -42,9 +42,7 @@ defmodule TestResult do
   end
 
   def find_by_uuid(test_result_uuid) do
-    [elastic_test_result] = query([uuid: test_result_uuid])
-
-    HashDict.put elastic_test_result, "pii", find_by_uuid_in_postgres(test_result_uuid).sensitive_data
+    HashDict.new([{"uuid", test_result_uuid}, {"pii", find_by_uuid_in_postgres(test_result_uuid).sensitive_data}])
   end
 
   def update_pii(result_uuid, data, date \\ :calendar.universal_time()) do
