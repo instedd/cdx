@@ -1,9 +1,6 @@
 defmodule FilterTest do
   use Cdp.TestCase
   import TestHelpers
-  use Dynamo.HTTP.Case
-  use Timex
-  require Tirexs.Search
 
   test "checks for new tests since a date" do
     before_first_test = {{2010,1,1},{12,0,0}}

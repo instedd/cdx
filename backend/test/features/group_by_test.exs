@@ -1,9 +1,6 @@
 defmodule GroupByTest do
   use Cdp.TestCase
   import TestHelpers
-  use Dynamo.HTTP.Case
-  use Timex
-  require Tirexs.Search
 
   test "groups by gender and assay_code" do
     post_result result: "positive", gender: "male", assay_code: "a"

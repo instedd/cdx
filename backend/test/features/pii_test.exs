@@ -2,8 +2,6 @@ defmodule PiiTest do
   use Cdp.TestCase
   import TestHelpers
   use Dynamo.HTTP.Case
-  use Timex
-  require Tirexs.Search
 
   test "retrieves a test result PII by uuid" do
     create_result [result: "positive", patient_name: "jdoe"]
