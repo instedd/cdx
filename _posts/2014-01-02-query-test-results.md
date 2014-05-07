@@ -94,11 +94,11 @@ In the query parameter the options are limited to indicate a couple of fields to
 
 The JSON allows more complex aggregations, such as age ranges.
 
-* `age_ranges` - groups and filters by age ranges. The tests are skipped if they are outside those ranges.
+* `age` - groups and filters by age ranges. The tests are skipped if they are outside those ranges.
 
 ```{
   "group_by" : [
-    { "age_ranges" : [ [0, 10], [11, 20] ] },
+    { "age" : [ [0, 10], [11, 20] ] },
     ...
   ]
 }```
