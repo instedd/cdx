@@ -57,8 +57,8 @@ defmodule ReportingTest do
   end
 
   test "store the parent location id when the device is registered more than one laboratory", meta do
-    Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
-    Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
+    Repo.insert DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
+    Repo.insert DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
 
     post("/api/devices/foo/results", meta[:data])
 
@@ -75,8 +75,8 @@ defmodule ReportingTest do
 
 
   test "store the parent location id when the device is registered more than one laboratory with another tree order", meta do
-    Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
-    Repo.create DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
+    Repo.insert DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
+    Repo.insert DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
 
     post("/api/devices/foo/results", meta[:data])
 
@@ -92,7 +92,7 @@ defmodule ReportingTest do
   end
 
   test "store nil if no location was found", meta do
-    Repo.create Device.new(institution_id: meta[:institution].id, secret_key: "bar")
+    Repo.insert Device.new(institution_id: meta[:institution].id, secret_key: "bar")
 
     post("/api/devices/bar/results", meta[:data])
 

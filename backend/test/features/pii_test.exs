@@ -7,29 +7,29 @@ defmodule PiiTest do
     create_result [result: "positive", patient_name: "jdoe"]
 
     result = get_one_update ""
-    test_uuid = HashDict.get(result, "uuid")
+    test_uuid = Dict.get(result, "uuid")
 
     response = get_pii(test_uuid)
 
-    assert HashDict.get(HashDict.get(response, "pii"), "patient_name") == "jdoe"
-    assert HashDict.get(response, "uuid") == test_uuid
-    assert HashDict.get(response, "result") == nil
+    assert Dict.get(Dict.get(response, "pii"), "patient_name") == "jdoe"
+    assert Dict.get(response, "uuid") == test_uuid
+    assert Dict.get(response, "result") == nil
   end
 
   test "update a test result PII" do
     create_result [result: "positive", patient_name: "jdoe"]
 
-    test_uuid = HashDict.get(get_one_update(""), "uuid")
+    test_uuid = Dict.get(get_one_update(""), "uuid")
 
-    put("/api/results/#{test_uuid}/pii", JSON.encode!([patient_id: 2, patient_name: "foobar", patient_telephone_number: "1234", patient_zip_code: "ABC1234"]))
+    put("/api/results/#{test_uuid}/pii", JSEX.encode!([patient_id: 2, patient_name: "foobar", patient_telephone_number: "1234", patient_zip_code: "ABC1234"]))
 
     updated_result = get_pii(test_uuid)
-    pii = HashDict.get(updated_result, "pii")
-    assert HashDict.get(pii, "patient_id") == 2
-    assert HashDict.get(pii, "patient_name") == "foobar"
-    assert HashDict.get(pii, "patient_telephone_number") == "1234"
-    assert HashDict.get(pii, "patient_zip_code") == "ABC1234"
-    assert HashDict.get(updated_result, "uuid") == test_uuid
-    assert HashDict.get(updated_result, "result") == nil
+    pii = Dict.get(updated_result, "pii")
+    assert Dict.get(pii, "patient_id") == 2
+    assert Dict.get(pii, "patient_name") == "foobar"
+    assert Dict.get(pii, "patient_telephone_number") == "1234"
+    assert Dict.get(pii, "patient_zip_code") == "ABC1234"
+    assert Dict.get(updated_result, "uuid") == test_uuid
+    assert Dict.get(updated_result, "result") == nil
   end
 end

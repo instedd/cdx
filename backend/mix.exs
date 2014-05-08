@@ -20,13 +20,14 @@ defmodule Cdp.Mixfile do
     [
       { :cowboy, github: "extend/cowboy" },
       { :dynamo, "~> 0.1.0-dev", github: "elixir-lang/dynamo" },
-      { :postgrex, github: "ericmj/postgrex" },
-      { :ecto, github: "elixir-lang/ecto" },
-      { :json, github: "cblage/elixir-json" },
+      { :decimal, "~> 0.2.0" },
+      { :postgrex, "~> 0.5.0" },
+      { :ecto, "~> 0.1.0" },
+      { :jsex, "~> 2.0.0" },
       { :tirexs, github: "manastech/tirexs", branch: "master" },
-      { :exrabbit, github: "neo/exrabbit" },
+      { :exrabbit, github: "d0rc/exrabbit" },
       { :timex, github: "bitwalker/timex" },
-      { :exlager, github: "khia/exlager", ref: "2a4b002dfe34abf1b03c9d26a3ebe2e101437f5"},
+      { :exlager, github: "khia/exlager" },
       { :uuid, github: "avtobiff/erlang-uuid" },
     ]
   end

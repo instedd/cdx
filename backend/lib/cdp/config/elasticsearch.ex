@@ -28,7 +28,7 @@ defmodule Elasticsearch do
   end
 
   defp template_as_json do
-    JSON.encode!([template: "#{index_prefix}*", mappings: [ test_result: [ properties: build_properties_mapping]]])
+    JSEX.encode!([template: "#{index_prefix}*", mappings: [ test_result: [ properties: build_properties_mapping]]])
   end
 
   defp build_properties_mapping do

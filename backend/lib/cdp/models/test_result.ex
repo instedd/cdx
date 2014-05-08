@@ -42,7 +42,7 @@ defmodule TestResult do
   end
 
   def find_by_uuid(test_result_uuid) do
-    HashDict.new([{"uuid", test_result_uuid}, {"pii", find_by_uuid_in_postgres(test_result_uuid).sensitive_data}])
+    Enum.into([{"uuid", test_result_uuid}, {"pii", find_by_uuid_in_postgres(test_result_uuid).sensitive_data}], %{})
   end
 
   def update_pii(result_uuid, data, date \\ :calendar.universal_time()) do
@@ -71,7 +71,7 @@ defmodule TestResult do
   def create(device_key, raw_data, date \\ :calendar.universal_time()) do
     device = Device.find_by_key(device_key)
 
-    {:ok, data} = JSON.decode raw_data
+    {:ok, data} = JSEX.decode raw_data
 
     uuid = :erlang.iolist_to_binary(:uuid.to_string(:uuid.uuid1()))
     create_in_db(device, data, raw_data, date, uuid)
@@ -86,18 +86,18 @@ defmodule TestResult do
     else
       query_without_group_by(query)
     end
-      |> Enum.map fn test_result -> HashDict.new(test_result) end
+      |> Enum.map fn test_result -> Enum.into(test_result, %{}) end
   end
 
   def encrypt(test_result) do
-    test_result = :crypto.rc4_encrypt(encryption_key, JSON.encode!(test_result.sensitive_data))
+    test_result = :crypto.rc4_encrypt(encryption_key, JSEX.encode!(test_result.sensitive_data))
       |> test_result.sensitive_data
     test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
   end
 
   def decrypt(test_result) do
     test_result = :crypto.rc4_encrypt(encryption_key, test_result.sensitive_data)
-      |> JSON.decode!
+      |> JSEX.decode!
       |> test_result.sensitive_data
 
     test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
@@ -128,7 +128,7 @@ defmodule TestResult do
     ]
 
     test_result = encrypt(test_result)
-    Repo.create(test_result)
+    Repo.insert(test_result)
   end
 
   defp create_in_elasticsearch(device, data, date, uuid) do
