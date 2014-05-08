@@ -37,6 +37,15 @@ defmodule TestHelpers do
     TestResult.create(device, JSEX.encode!(result), date)
   end
 
+  def get_all_elasticsearch_results do
+    search = Tirexs.Search.search [index: "#{Elasticsearch.index_prefix}*"] do
+      query do
+        match_all
+      end
+    end
+    Tirexs.Query.create_resource(search).hits
+  end
+
   def format_date(date) do
     DateFormat.format!(Date.from(date), "{ISO}")
   end

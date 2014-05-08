@@ -2,6 +2,7 @@ defmodule ReportingTest do
   use Cdp.TestCase
   use Dynamo.HTTP.Case
   require Tirexs.Search
+  import TestHelpers
 
   test "create test_result in postgres", meta do
     conn = post("/api/devices/foo/results", meta[:data])
@@ -17,12 +18,7 @@ defmodule ReportingTest do
   test "create test_result in elasticsearch", meta do
     post("/api/devices/foo/results", meta[:data])
 
-    search = Tirexs.Search.search [index: meta[:index_name]] do
-      query do
-        match_all
-      end
-    end
-    [result] = Tirexs.Query.create_resource(search).hits
+    [result] = get_all_elasticsearch_results()
     assert result["_source"]["result"] == "positive"
     assert result["_source"]["created_at"] != nil
     assert result["_source"]["device_uuid"] == "foo"
@@ -32,12 +28,7 @@ defmodule ReportingTest do
     data = "{\"result\": \"positive\", \"patient_id\": 1234}"
     post("/api/devices/foo/results", data)
 
-    search = Tirexs.Search.search [index: meta[:index_name]] do
-      query do
-        match_all
-      end
-    end
-    [result] = Tirexs.Query.create_resource(search).hits
+    [result] = get_all_elasticsearch_results()
     assert result["_source"]["result"] == "positive"
     assert result["_source"]["created_at"] != nil
     assert result["_source"]["patient_id"] == nil
@@ -46,12 +37,7 @@ defmodule ReportingTest do
   test "store the location id when the device is registered in only one laboratory", meta do
     post("/api/devices/foo/results", meta[:data])
 
-    search = Tirexs.Search.search [index: meta[:index_name]] do
-      query do
-        match_all
-      end
-    end
-    [result] = Tirexs.Query.create_resource(search).hits
+    [result] = get_all_elasticsearch_results()
     assert result["_source"]["location_id"] == meta[:location1].id
     assert result["_source"]["laboratory_id"] == meta[:laboratory1].id
     assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([meta[:location1].id, meta[:parent_location].id, meta[:root_location].id])
@@ -63,12 +49,7 @@ defmodule ReportingTest do
 
     post("/api/devices/foo/results", meta[:data])
 
-    search = Tirexs.Search.search [index: meta[:index_name]] do
-      query do
-        match_all
-      end
-    end
-    [result] = Tirexs.Query.create_resource(search).hits
+    [result] = get_all_elasticsearch_results()
     assert result["_source"]["location_id"] == meta[:root_location].id
     assert result["_source"]["laboratory_id"] == nil
     assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([meta[:root_location].id])
@@ -81,12 +62,7 @@ defmodule ReportingTest do
 
     post("/api/devices/foo/results", meta[:data])
 
-    search = Tirexs.Search.search [index: meta[:index_name]] do
-      query do
-        match_all
-      end
-    end
-    [result] = Tirexs.Query.create_resource(search).hits
+    [result] = get_all_elasticsearch_results()
     assert result["_source"]["location_id"] == meta[:root_location].id
     assert result["_source"]["laboratory_id"] == nil
     assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([meta[:root_location].id])
@@ -97,12 +73,7 @@ defmodule ReportingTest do
 
     post("/api/devices/bar/results", meta[:data])
 
-    search = Tirexs.Search.search [index: meta[:index_name]] do
-      query do
-        match_all
-      end
-    end
-    [result] = Tirexs.Query.create_resource(search).hits
+    [result] = get_all_elasticsearch_results()
     assert result["_source"]["location_id"] == nil
     assert result["_source"]["laboratory_id"] == nil
     assert result["_source"]["parent_locations"] == []
