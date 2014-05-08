@@ -71,6 +71,19 @@ The data retrieved will allways be sorted by the result creation date.
 
 `/events?uuid=c4c52784-bfd5-717d-7a91-614acd972d5e`
 
+# Sorting
+
+* `order_by` - orders by a given field.
+* Ascending by default. Append a `-` to sort descending.
+* Comma separated.
+
+### Examples
+
+* `order_by=age` - orders ascending by age.
+* `order_by=age,gender` - orders ascending by age and gender.
+* `order_by=-age` - orders descending by age.
+* `order_by=age,-gender` - orders ascending by age and descending by gender.
+
 # Data Aggregation
 
 There are two ways to accomplish data aggregation:
