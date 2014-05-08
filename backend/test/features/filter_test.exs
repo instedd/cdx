@@ -167,20 +167,6 @@ defmodule FilterTest do
     assert Dict.get(response, "age") == 10
   end
 
-  test "groups by gender" do
-    post_result result: "positive", gender: "male"
-    post_result result: "positive", gender: "male"
-    post_result result: "negative", gender: "female"
-
-    response = get_updates("group_by=gender")
-    response = Enum.sort response, fn(r1, r2) -> r1["gender"] < r2["gender"] end
-
-    assert_all_values response, ["gender", "count"], [
-      ["female", 1],
-      ["male", 2],
-    ]
-  end
-
   test "filters by uuid" do
     post_result result: "positive", assay_name: "GX4001"
     post_result result: "negative", assay_name: "GX1234"

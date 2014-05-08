@@ -2,6 +2,34 @@ defmodule GroupByTest do
   use Cdp.TestCase
   import TestHelpers
 
+  test "groups by gender" do
+    post_result result: "positive", gender: "male"
+    post_result result: "positive", gender: "male"
+    post_result result: "negative", gender: "female"
+
+    response = get_updates("group_by=gender")
+    response = Enum.sort response, fn(r1, r2) -> r1["gender"] < r2["gender"] end
+
+    assert_all_values response, ["gender", "count"], [
+      ["female", 1],
+      ["male", 2],
+    ]
+  end
+
+  test "groups by gender in post body" do
+    post_result result: "positive", gender: "male"
+    post_result result: "positive", gender: "male"
+    post_result result: "negative", gender: "female"
+
+    response = get_updates("", JSEX.encode!([group_by: "gender"]))
+    response = Enum.sort response, fn(r1, r2) -> r1["gender"] < r2["gender"] end
+
+    assert_all_values response, ["gender", "count"], [
+      ["female", 1],
+      ["male", 2],
+    ]
+  end
+
   test "groups by gender and assay_code" do
     post_result result: "positive", gender: "male", assay_code: "a"
     post_result result: "positive", gender: "male", assay_code: "a"
@@ -11,6 +39,31 @@ defmodule GroupByTest do
     post_result result: "negative", gender: "female", assay_code: "b"
 
     response = get_updates("group_by=gender,assay_code")
+    response = Enum.sort response, fn(r1, r2) ->
+      if r1["gender"] == r2["gender"] do
+        r1["assay_code"] < r2["assay_code"]
+      else
+        r1["gender"] < r2["gender"]
+      end
+    end
+
+    assert_all_values response, ["gender", "assay_code", "count"], [
+      ["female", "a", 1],
+      ["female", "b", 2],
+      ["male", "a", 2],
+      ["male", "b", 1],
+    ]
+  end
+
+  test "groups by gender and assay_code in post body" do
+    post_result result: "positive", gender: "male", assay_code: "a"
+    post_result result: "positive", gender: "male", assay_code: "a"
+    post_result result: "positive", gender: "male", assay_code: "b"
+    post_result result: "negative", gender: "female", assay_code: "a"
+    post_result result: "negative", gender: "female", assay_code: "b"
+    post_result result: "negative", gender: "female", assay_code: "b"
+
+    response = get_updates("", JSEX.encode!([group_by: ["gender", "assay_code"]]))
     response = Enum.sort response, fn(r1, r2) ->
       if r1["gender"] == r2["gender"] do
         r1["assay_code"] < r2["assay_code"]
@@ -139,6 +192,29 @@ defmodule GroupByTest do
       ["2010-01-04", "negative", 1],
       ["2010-01-04", "positive", 2],
       ["2010-01-05", "positive", 1],
+      ]
+  end
+
+  test "group by age ranges" do
+    post_result age: 9
+    post_result age: 10
+    post_result age: 11
+    post_result age: 12
+    post_result age: 13
+    post_result age: 20
+    post_result age: 21
+
+    response = get_updates("", JSEX.encode!([
+      group_by: [
+        ["age", [[0, 10], [15, 120], [10, 15], ]]
+      ]
+    ]))
+    response = Enum.sort response, fn(r1, r2) -> r1["age"] < r2["age"] end
+
+    assert_all_values response, ["age", "count"], [
+      [[ 0,  10], 1],
+      [[10,  15], 4],
+      [[15, 120], 2],
       ]
   end
 end

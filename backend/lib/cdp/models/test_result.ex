@@ -78,16 +78,22 @@ defmodule TestResult do
     create_in_elasticsearch(device, data, date, uuid)
   end
 
-  def query(params) do
-    query = [bool: [must: process_conditions(params)]]
+  def query(params, post_body) do
+    conditions = process_conditions(params, [])
+    conditions = process_conditions(post_body, conditions)
+
+    query = [bool: [must: conditions]]
     order = process_order(params)
 
-    if group_by = params["group_by"] do
-      query_with_group_by(query, group_by)
+    group_by = params["group_by"] || post_body["group_by"]
+
+    if group_by do
+      results = query_with_group_by(query, group_by)
     else
-      query_without_group_by(query, order)
+      results = query_without_group_by(query, order)
     end
-      |> Enum.map fn test_result -> Enum.into(test_result, %{}) end
+
+    Enum.map results, fn test_result -> Enum.into(test_result, %{}) end
   end
 
   def encrypt(test_result) do
@@ -171,7 +177,12 @@ defmodule TestResult do
   end
 
   defp query_with_group_by(query, group_by) do
-    all_group_by = String.split(group_by, ",")
+    if is_list(group_by) do
+      all_group_by = group_by
+    else
+      all_group_by = String.split(group_by, ",")
+    end
+
     aggregations = process_group_by(all_group_by)
 
     query = [
@@ -184,6 +195,7 @@ defmodule TestResult do
     ]
 
     result = Tirexs.Query.create_resource(query)
+
     process_group_by_buckets(result.aggregations, all_group_by, [], [], 0)
   end
 
@@ -192,13 +204,19 @@ defmodule TestResult do
     if count do
       buckets = count["buckets"]
       [first_group_by | other_group_by] = all_group_by
-      date_captures = match_date_regex(first_group_by)
+      is_range = is_list(first_group_by)
+      date_captures = !is_range and match_date_regex(first_group_by)
       Enum.reduce buckets, results, fn(bucket, results) ->
-        if date_captures do
-          {interval, field} = date_captures
-          result = result ++ [{field, bucket["key_as_string"]}]
+        if is_range do
+          [field, _ranges] = first_group_by
+          result = result ++ [{field, [normalize(bucket["from"]), normalize(bucket["to"])]}]
         else
-          result = result ++ [{first_group_by, bucket["key"]}]
+          if date_captures do
+            {interval, field} = date_captures
+            result = result ++ [{field, bucket["key_as_string"]}]
+          else
+            result = result ++ [{first_group_by, bucket["key"]}]
+          end
         end
         process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
       end
@@ -223,18 +241,23 @@ defmodule TestResult do
   end
 
   defp process_group_by([group_by]) do
-    date_captures = match_date_regex(group_by)
-    if date_captures do
-      {interval, field} = date_captures
-      format = case interval do
-                       "year"  -> "yyyy"
-                       "month" -> "yyyy-MM"
-                       "week"  -> "yyyy-'W'w"
-                       "day"   -> "yyyy-MM-dd"
-                     end
-      [count: [date_histogram: [field: field, interval: interval, format: format]]]
+    if is_list(group_by) do
+      [name, ranges] = group_by
+      [count: [range: [field: name, ranges: convert_ranges_to_elastic_search(ranges)]]]
     else
-      [count: [terms: [field: group_by]]]
+      date_captures = match_date_regex(group_by)
+      if date_captures do
+        {interval, field} = date_captures
+        format = case interval do
+                         "year"  -> "yyyy"
+                         "month" -> "yyyy-MM"
+                         "week"  -> "yyyy-'W'w"
+                         "day"   -> "yyyy-MM-dd"
+                       end
+        [count: [date_histogram: [field: field, interval: interval, format: format]]]
+      else
+        [count: [terms: [field: group_by]]]
+      end
     end
   end
 
@@ -245,6 +268,14 @@ defmodule TestResult do
     [
       count: (group_by_aggregations[:count] ++ [aggregations: rest_aggregations])
     ]
+  end
+
+  defp convert_ranges_to_elastic_search([]) do
+    []
+  end
+
+  defp convert_ranges_to_elastic_search([[from, to] | other]) do
+    [[from: from, to: to] | convert_ranges_to_elastic_search(other)]
   end
 
   defp query_without_group_by(query, sort) do
@@ -259,9 +290,7 @@ defmodule TestResult do
     Enum.map result.hits, fn(hit) -> hit["_source"] end
   end
 
-  defp process_conditions(params) do
-    conditions = []
-
+  defp process_conditions(params, conditions) do
     if since = params["since"] do
       condition = [range: [created_at: [from: since, include_lower: true]]]
       conditions = [condition | conditions]
@@ -343,5 +372,18 @@ defmodule TestResult do
     else
       [[created_at: "asc"]]
     end
+  end
+
+  defp normalize(value) when is_float(value) do
+    truncated_value = trunc(value)
+    if truncated_value == value do
+      truncated_value
+    else
+      value
+    end
+  end
+
+  defp normalize(value) do
+    value
   end
 end
