@@ -25,7 +25,7 @@ defmodule TestResult do
   def serchable_fields do
     [
       {:created_at, :date},
-      {:device_id, :integer},
+      {:device_uuid, :string},
       {:laboratory_id, :integer},
       {:institution_id, :integer},
       {:location_id, :integer},
@@ -157,7 +157,7 @@ defmodule TestResult do
 
     data = Dict.put data, :type, "test_result"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.from(date), "{ISO}"))
-    data = Dict.put data, :device_id, device.id
+    data = Dict.put data, :device_uuid, device.secret_key
     data = Dict.put data, :location_id, location_id
     data = Dict.put data, :parent_locations, parent_locations
     data = Dict.put data, :laboratory_id, laboratory_id
@@ -282,8 +282,8 @@ defmodule TestResult do
       conditions = [condition | conditions]
     end
 
-    if device_id = params["device"] do
-      condition = [match: [device_id: device_id]]
+    if device_uuid = params["device"] do
+      condition = [match: [device_uuid: device_uuid]]
       conditions = [condition | conditions]
     end
 

@@ -25,6 +25,7 @@ defmodule ReportingTest do
     [result] = Tirexs.Query.create_resource(search).hits
     assert result["_source"]["result"] == "positive"
     assert result["_source"]["created_at"] != nil
+    assert result["_source"]["device_uuid"] == "foo"
   end
 
   test "doesn't store sensitive data in elasticsearch", meta do

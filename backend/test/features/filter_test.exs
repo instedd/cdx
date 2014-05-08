@@ -72,7 +72,7 @@ defmodule FilterTest do
 
     post_result [result: "negative"], "bar"
 
-    response = get_one_update("device=#{meta[:device].id}")
+    response = get_one_update("device=foo")
     assert Dict.get(response, "result") == "positive"
   end
 
