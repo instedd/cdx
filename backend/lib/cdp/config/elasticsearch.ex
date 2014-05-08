@@ -41,8 +41,10 @@ defmodule Elasticsearch do
     field_body = case type do
       :multi_field ->
             [
-              fields: [ analyzed: [{:type, :string}, {:index, :analyzed}]],
-              field: [{:type, :string}, {:index, :not_analyzed}]
+              fields: [
+                {:analyzed, [{:type, :string}, {:index, :analyzed}]},
+                {field, [{:type, :string}, {:index, :not_analyzed}]}
+              ]
             ]
       _ -> [index: :not_analyzed]
     end

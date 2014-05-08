@@ -31,11 +31,11 @@ defmodule TestResult do
       {:location_id, :integer},
       {:parent_locations, :integer},
       {:age, :integer},
-      {:assay, :string},
+      {:condition, :string},
       {:assay_name, :string},
-      {:device_serial_number, :multi_field},
+      {:device_serial_number, :string},
       {:uuid, :string},
-      {:result, :string},
+      {:result, :multi_field},
       {:start_time, :date},
       {:system_user, :string},
     ]
@@ -317,7 +317,11 @@ defmodule TestResult do
     end
 
     if gender = params["gender"] do
-      condition = [match: [gender: gender]]
+      condition = if Regex.match? ~r/.*\*.*/, gender do
+        [wildcard: [gender: gender]]
+      else
+        [match: [gender: gender]]
+      end
       conditions = [condition | conditions]
     end
 
@@ -327,7 +331,20 @@ defmodule TestResult do
     end
 
     if assay_name = params["assay_name"] do
-      condition = [match: [assay_name: assay_name]]
+      condition = if Regex.match? ~r/.*\*.*/, assay_name do
+        [wildcard: [assay_name: assay_name]]
+      else
+        [match: [assay_name: assay_name]]
+      end
+      conditions = [condition | conditions]
+    end
+
+    if condition_name = params["condition"] do
+      condition = if Regex.match? ~r/.*\*.*/, condition_name do
+        [wildcard: [condition: condition_name]]
+      else
+        [match: [condition: condition_name]]
+      end
       conditions = [condition | conditions]
     end
 
@@ -342,7 +359,11 @@ defmodule TestResult do
     end
 
     if result = params["result"] do
-      condition = [match: [result: result]]
+      condition = if Regex.match? ~r/.*\*.*/, result do
+        [wildcard: [result: result]]
+      else
+        [match: [{"result.analyzed", result}]]
+      end
       conditions = [condition | conditions]
     end
 
