@@ -1,4 +1,4 @@
-defmodule FilterTest do
+defmodule OrderByTest do
   use Cdp.TestCase
   import TestHelpers
 
