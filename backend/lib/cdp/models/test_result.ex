@@ -80,11 +80,12 @@ defmodule TestResult do
 
   def query(params) do
     query = [bool: [must: process_conditions(params)]]
+    order = process_order(params)
 
     if group_by = params["group_by"] do
       query_with_group_by(query, group_by)
     else
-      query_without_group_by(query)
+      query_without_group_by(query, order)
     end
       |> Enum.map fn test_result -> Enum.into(test_result, %{}) end
   end
@@ -246,11 +247,11 @@ defmodule TestResult do
     ]
   end
 
-  defp query_without_group_by(query) do
+  defp query_without_group_by(query, sort) do
     query = [
       search: [
         query: query,
-        sort: [[created_at: "asc"]],
+        sort: sort,
       ],
       index: "#{Elasticsearch.index_prefix}*"
     ]
@@ -327,5 +328,20 @@ defmodule TestResult do
     end
 
     conditions
+  end
+
+  defp process_order(params) do
+    if order = params["order_by"] do
+      all_orders = String.split(order, ",")
+      Enum.map all_orders, fn(order) ->
+        if String.starts_with?(order, "-") do
+          {String.slice(order, 1, String.length(order) - 1), "desc"}
+        else
+          {order, "asc"}
+        end
+      end
+    else
+      [[created_at: "asc"]]
+    end
   end
 end
