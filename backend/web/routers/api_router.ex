@@ -2,14 +2,11 @@ defmodule ApiRouter do
   use Dynamo.Router
 
   get "/results/" do
-    params = Dynamo.Connection.QueryParser.parse(conn.query_string())
+    get_results(conn)
+  end
 
-    if String.length(conn.req_body()) == 0 do
-      post_body = %{}
-    else
-      {:ok, post_body} = JSEX.decode conn.req_body()
-    end
-    conn.send(200, JSEX.encode!(TestResult.query(params, post_body)))
+  post "/results/" do
+    get_results(conn)
   end
 
   get "/results/:result_uuid/pii" do
@@ -24,5 +21,16 @@ defmodule ApiRouter do
   put "/results/:result_uuid/pii" do
     TestResult.update_pii(result_uuid, JSEX.decode!(conn.req_body()))
     conn.send(200, conn.req_body())
+  end
+
+  defp get_results(conn) do
+    params = Dynamo.Connection.QueryParser.parse(conn.query_string())
+
+    if String.length(conn.req_body()) == 0 do
+      post_body = %{}
+    else
+      {:ok, post_body} = JSEX.decode conn.req_body()
+    end
+    conn.send(200, JSEX.encode!(TestResult.query(params, post_body)))
   end
 end

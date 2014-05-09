@@ -206,8 +206,29 @@ defmodule GroupByTest do
 
     response = get_updates("", JSEX.encode!([
       group_by: [
-        ["age", [[0, 10], [15, 120], [10, 15], ]]
+        ["age", [[0, 10], [15, 120], [10, 15]]]
       ]
+    ]))
+    response = Enum.sort response, fn(r1, r2) -> r1["age"] < r2["age"] end
+
+    assert_all_values response, ["age", "count"], [
+      [[ 0,  10], 1],
+      [[10,  15], 4],
+      [[15, 120], 2],
+      ]
+  end
+
+  test "group by age ranges in a different way" do
+    post_result age: 9
+    post_result age: 10
+    post_result age: 11
+    post_result age: 12
+    post_result age: 13
+    post_result age: 20
+    post_result age: 21
+
+    response = get_updates("", JSEX.encode!([
+      group_by: ["age", [[0, 10], [15, 120], [10, 15]]]
     ]))
     response = Enum.sort response, fn(r1, r2) -> r1["age"] < r2["age"] end
 

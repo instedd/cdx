@@ -179,6 +179,19 @@ defmodule TestResult do
   defp query_with_group_by(query, group_by) do
     if is_list(group_by) do
       all_group_by = group_by
+
+      # Handle the case when they send us:
+      #
+      #     ["field", ranges]
+      #
+      # instead of:
+      #
+      #     [["field", ranges]]
+      case group_by do
+        [name, range] when is_binary(name) and is_list(range) ->
+          all_group_by = [all_group_by]
+        _ -> :ok
+      end
     else
       all_group_by = String.split(group_by, ",")
     end

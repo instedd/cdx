@@ -46,12 +46,15 @@
     $query_button = $("#query_button");
     $query_form.submit(function() {
       query_string = $("#query_string").val();
+      post_body = $("#post_body").val();
       $query_button.prop("disabled", true);
       $query_button.val("Querying...");
 
       $.ajax({
         url: "/api/results?" + query_string,
-        type: "GET",
+        type: "POST",
+        data: post_body,
+        contentType: "application/json; charset=utf-8",
         success: function(data, textStatus, jqXHR) {
           $query_button.prop("disabled", false);
           $query_button.val("Query");
@@ -115,9 +118,15 @@
       <h4>Query results</h4>
 
       <form id="query_form" method="post">
-        <div>
-          <label for="query_string">Query string</label>
-          <textarea id="query_string" name="query_string" style="width:400px;height:50px">age=20</textarea>
+        <div class='row-fluid'>
+          <div class='span4'>
+            <label for="query_string">Query string</label>
+            <textarea id="query_string" name="query_string" style="width:300px;height:50px">age=20</textarea>
+          </div>
+          <div class='span4'>
+            <label for="post_body">Request Body</label>
+            <textarea id="post_body" name="post_body" style="width:300px;height:50px"></textarea>
+          </div>
         </div>
         <div>
           <input id="query_button" class="btn" name="commit" type="submit" value="Query" />
