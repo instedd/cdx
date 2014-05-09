@@ -22,7 +22,7 @@ defmodule TestResult do
     ]
   end
 
-  def serchable_fields do
+  def searchable_fields do
     [
       {:created_at, :date, [
         {"since", {:range, [:from, {:include_lower, true}]}},
@@ -340,7 +340,7 @@ defmodule TestResult do
 
   defp process_conditions(params, conditions) do
 
-    conditions = Enum.reduce serchable_fields, conditions, fn field, conditions ->
+    conditions = Enum.reduce searchable_fields, conditions, fn field, conditions ->
       process_field(field, params, conditions)
     end
 
