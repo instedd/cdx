@@ -32,7 +32,7 @@ defmodule Elasticsearch do
   end
 
   defp build_properties_mapping do
-    Enum.map TestResult.serchable_fields, fn {name, type} ->
+    Enum.map TestResult.serchable_fields, fn {name, type, _} ->
       map_field(name, type)
     end
   end
