@@ -1,0 +1,88 @@
+{
+  "metadata" : {
+    "version" : "1.0.0",
+    "signature" : "12345",
+    "device_models" : ["GX4001", "GX4002"]
+  },
+  "data" : {
+    "patient_name" : {
+      "path" : "patient_information/name"
+    },
+    "system_user" : {
+      "path" : "doctor_name",
+    },
+    "condition" : {
+      "multiple" : true,
+      "path" : "root_path/to/conditions_array", // only if multiple:true
+      "name" : {
+        "path" : "tested_condition",
+        "mappings" : {
+          "*MTB*" : "MTB",
+          "*FLU*" : "H1N1",
+          "*FLUA*" : "A1N1"
+        }
+      },
+      "result" : {
+        "path" : "Test/result_text",
+        // "path" : "Test/result/@key",
+        "mappings" : {
+          "*NOT DETECTED*" : "negative",
+          "*POSITIVE*" : "positive",
+          "*POSITIVE WITH RIFF*" : "positive with riff"
+        }
+      },
+      "grade_of_resistance" : {
+        "path" : "resistance",
+        "condition" : ["MTB", "H1N1"], // It only applies to this particular conditions
+        "possible_values": {
+          "range" : {
+            "min" : 0,
+            "max" : 100
+          }
+        }
+      },
+    },
+    "device_serial_number" : {
+      "path" : "patient_information/name" // how could we prevent this case?
+    },
+    "test_type" : {
+      "path" : "Test/test_type",
+      "possible_values" : {
+        "options" : [0, 1]
+      }
+    },
+    "temperature" : {
+      "path" : "Test/test_type",
+      "possible_values": {
+        "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
+          "min" : -20,
+          "max" : 60
+        },
+      },
+      "indexed" : true
+    },
+    "percentage_of_confidence" : {
+      "path" : "Test/test_type",
+      "possible_values": {
+        "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
+          "min" : 0.001,
+          "max" : 999.999
+        },
+      },
+      "indexed" : true
+    },
+    "end_time": {
+      "path" : "Test/end_time",
+      "possible_values": {
+        "date" : "iso"
+      },
+      "indexed" : false
+    },
+    "result_text": { //this is accepted only for signed manifests. Eg: "HIV DETECTED > 1.00E06 Copies/mL (log 6.00)"
+      "path" : "assay/result_text",
+      // "data-type" : "string", // to prevent elastic for automatically indexing with the type of the first received value (eg. integer vs float)
+      "pii" : false,
+      "indexed" : true
+    }
+  }
+}
