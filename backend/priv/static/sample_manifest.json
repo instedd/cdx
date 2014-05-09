@@ -2,37 +2,40 @@
   "metadata" : {
     "version" : "1.0.0",
     "signature" : "12345",
-    "device_models" : ["GX4001", "GX4002"]
+    "device_models" : ["GX4001", "GX4002"],
+    "source_data_type": "json"
   },
-  "data" : {
+  "field_mapping" : {
     "patient_name" : {
-      "path" : "patient_information/name"
+      "selector" : "patient_information/name",
+      "type" : "core"
+
     },
     "system_user" : {
-      "path" : "doctor_name",
+      "selector" : "doctor_name",
     },
-    "condition" : {
+    "conditions" : {
       "multiple" : true,
-      "path" : "root_path/to/conditions_array", // only if multiple:true
-      "name" : {
-        "path" : "tested_condition",
-        "mappings" : {
+      "selector" : "path/to/conditions_array", // only if multiple:true
+      "condition" : {
+        "selector" : "tested_condition",
+        "value_mappings" : {
           "*MTB*" : "MTB",
           "*FLU*" : "H1N1",
           "*FLUA*" : "A1N1"
         }
       },
       "result" : {
-        "path" : "Test/result_text",
-        // "path" : "Test/result/@key",
-        "mappings" : {
+        "selector" : "Test/result_text",
+        // "selector" : "Test/result/@key",
+        "value_mappings" : {
           "*NOT DETECTED*" : "negative",
           "*POSITIVE*" : "positive",
           "*POSITIVE WITH RIFF*" : "positive with riff"
         }
       },
       "grade_of_resistance" : {
-        "path" : "resistance",
+        "selector" : "resistance",
         "condition" : ["MTB", "H1N1"], // It only applies to this particular conditions
         "possible_values": {
           "range" : {
@@ -43,16 +46,16 @@
       },
     },
     "device_serial_number" : {
-      "path" : "patient_information/name" // how could we prevent this case?
+      "selector" : "patient_information/name" // how could we prevent this case?
     },
     "test_type" : {
-      "path" : "Test/test_type",
+      "selector" : "Test/test_type",
       "possible_values" : {
         "options" : [0, 1]
       }
     },
     "temperature" : {
-      "path" : "Test/test_type",
+      "selector" : "Test/test_type",
       "possible_values": {
         "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
           "min" : -20,
@@ -62,7 +65,7 @@
       "indexed" : true
     },
     "percentage_of_confidence" : {
-      "path" : "Test/test_type",
+      "selector" : "Test/test_type",
       "possible_values": {
         "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
           "min" : 0.001,
@@ -72,15 +75,15 @@
       "indexed" : true
     },
     "end_time": {
-      "path" : "Test/end_time",
+      "selector" : "Test/end_time",
       "possible_values": {
         "date" : "iso"
       },
       "indexed" : false
     },
     "result_text": { //this is accepted only for signed manifests. Eg: "HIV DETECTED > 1.00E06 Copies/mL (log 6.00)"
-      "path" : "assay/result_text",
-      // "data-type" : "string", // to prevent elastic for automatically indexing with the type of the first received value (eg. integer vs float)
+      "selector" : "assay/result_text",
+      "data-type" : "string", // to prevent elastic for automatically indexing with the type of the first received value (eg. integer vs float)
       "pii" : false,
       "indexed" : true
     }
