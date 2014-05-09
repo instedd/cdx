@@ -211,4 +211,33 @@ defmodule FilterTest do
     response = get_one_update("result=positive")
     assert Dict.get(response, "result") == "Positive with RIFF resistance"
   end
+
+  test "filters by location", context do
+    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar")
+    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory2].id, device_id: device.id)
+    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "baz")
+    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory3].id, device_id: device.id)
+
+    post_result [result: "negative"]
+    post_result [result: "positive"], "bar"
+    post_result [result: "positive with riff"], "baz"
+
+    response = get_one_update("location=#{context[:location1].id}")
+    assert Dict.get(response, "result") == "negative"
+    response = get_one_update("location=#{context[:location2].id}")
+    assert Dict.get(response, "result") == "positive"
+    response = get_updates("location=#{context[:parent_location].id}")
+    response = Enum.sort response, fn(r1, r2) -> r1["location_id"] < r2["location_id"] end
+    assert_all_values response, ["result", "location_id"], [
+      ["negative", context[:location1].id],
+      ["positive", context[:location2].id],
+    ]
+    response = get_updates("location=#{context[:root_location].id}")
+    response = Enum.sort response, fn(r1, r2) -> r1["location_id"] < r2["location_id"] end
+    assert_all_values response, ["result", "location_id"], [
+      ["negative", context[:location1].id],
+      ["positive", context[:location2].id],
+      ["positive with riff", context[:location3].id],
+    ]
+  end
 end

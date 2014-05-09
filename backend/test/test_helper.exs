@@ -91,7 +91,7 @@ defmodule TestHelpers do
     device = Repo.insert Device.new(institution_id: institution.id, secret_key: "foo")
     Repo.insert DevicesLaboratories.new(laboratory_id: laboratory1.id, device_id: device.id)
     data = JSEX.encode! [result: "positive"]
-    {:ok, institution: institution, institution2: institution2, device: device, data: data, root_location: root_location, parent_location: parent_location, location1: location1, location2: location2, laboratory1: laboratory1, laboratory2: laboratory2, laboratory3: laboratory3}
+    {:ok, institution: institution, institution2: institution2, device: device, data: data, root_location: root_location, parent_location: parent_location, location1: location1, location2: location2, location3: location3, laboratory1: laboratory1, laboratory2: laboratory2, laboratory3: laboratory3}
   end
 
   def clear_database do

@@ -301,8 +301,8 @@ defmodule TestResult do
       conditions = [condition | conditions]
     end
 
-    if institution_id = params["institution"] do
-      condition = [match: ["institution_id": institution_id]]
+    if device_uuid = params["device"] do
+      condition = [match: [device_uuid: device_uuid]]
       conditions = [condition | conditions]
     end
 
@@ -311,8 +311,13 @@ defmodule TestResult do
       conditions = [condition | conditions]
     end
 
-    if device_uuid = params["device"] do
-      condition = [match: [device_uuid: device_uuid]]
+    if institution_id = params["institution"] do
+      condition = [match: ["institution_id": institution_id]]
+      conditions = [condition | conditions]
+    end
+
+    if location_id = params["location"] do
+      condition = [match: ["parent_locations": location_id]]
       conditions = [condition | conditions]
     end
 
