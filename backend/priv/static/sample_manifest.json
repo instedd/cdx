@@ -9,14 +9,17 @@
     "patient_name" : {
       "selector" : "patient_information/name",
       "type" : "core"
-
+    },
+    "assay_name" : {
+      "selector" : "Test/assay_name",
+      "type" : "core"
     },
     "system_user" : {
       "selector" : "doctor_name",
     },
-    "conditions" : {
+    "analytes" : {
       "multiple" : true,
-      "selector" : "path/to/conditions_array", // only if multiple:true
+      "selector" : "path/to/analytes_array", // only if multiple:true
       "condition" : {
         "selector" : "tested_condition",
         "value_mappings" : {
