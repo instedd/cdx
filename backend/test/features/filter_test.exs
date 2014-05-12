@@ -161,8 +161,8 @@ defmodule FilterTest do
   end
 
   test "filters by result" do
-    post_result result: "positive", age: 10
-    post_result result: "negative", age: 20
+    post_result analytes: [condition: "MTB", result: "positive"], age: 10
+    post_result analytes: [condition: "MTB", result: "negative"], age: 20
 
     response = get_one_update("result=positive")
     assert Dict.get(response, "age") == 10
@@ -194,22 +194,22 @@ defmodule FilterTest do
   end
 
   test "filters by condition name" do
-    post_result result: "positive", condition: "Flu"
-    post_result result: "negative", condition: "MTB"
+    post_result analytes: [result: "positive", condition: "Flu"]
+    post_result analytes: [result: "negative", condition: "MTB"]
 
     response = get_one_update("condition=MTB")
-    assert Dict.get(response, "result") == "negative"
+    assert Dict.get(Dict.get(response, "analytes"), "result") == "negative"
 
     response = get_one_update("condition=Flu")
-    assert Dict.get(response, "result") == "positive"
+    assert Dict.get(Dict.get(response, "analytes"), "result") == "positive"
   end
 
   test "filters by an analyzed result" do
-    post_result result: "negative", condition: "MTB"
-    post_result result: "Positive with RIFF resistance", condition: "MTB"
+    post_result analytes: [result: "negative", condition: "MTB"]
+    post_result analytes: [result: "Positive with RIFF resistance", condition: "MTB"]
 
     response = get_one_update("result=positive")
-    assert Dict.get(response, "result") == "Positive with RIFF resistance"
+    assert Dict.get(Dict.get(response, "analytes"), "result") == "Positive with RIFF resistance"
   end
 
   test "filters by location", context do

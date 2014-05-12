@@ -38,14 +38,16 @@ defmodule TestResult do
         {"min_age", {:range, [:from, {:include_lower, true}]}},
         {"max_age", {:range, [:to, {:include_upper, true}]}},
       ]},
-      {:condition, :string, [{"condition", :wildcard}]},
       {:assay_name, :string, [{"assay_name", :wildcard}]},
       {:device_serial_number, :string, []},
       {:gender, :string, [{"gender", :wildcard}]},
-      {:result, :multi_field, [{"result", :wildcard}]},
       {:uuid, :string, [{"uuid", :match}]},
       {:start_time, :date, []},
       {:system_user, :string, []},
+      {:analytes, :nested, [
+        {:result, :multi_field, [{"result", :wildcard}]},
+        {:condition, :string, [{"condition", :wildcard}]},
+      ]},
     ]
   end
 
@@ -319,6 +321,12 @@ defmodule TestResult do
     field_name
   end
 
+  defp process_fields(fields, params, conditions) do
+    Enum.reduce fields, conditions, fn field, conditions ->
+      process_field(field, params, conditions)
+    end
+  end
+
   defp process_field({field_name, type, [{param_name, :wildcard}| tail ]}, params, conditions) do
     if field_value = params[param_name] do
       condition = if Regex.match? ~r/.*\*.*/, field_value do
@@ -347,15 +355,30 @@ defmodule TestResult do
     process_field({field_name, type, tail}, params, conditions)
   end
 
+  defp process_field({field_name, :nested, nested_fields}, params, conditions) do
+    nested_fields = Enum.map nested_fields, fn({name, type, properties}) ->
+      {"#{field_name}.#{name}", type, properties}
+    end
+    nested_conditions = process_fields(nested_fields, params, [])
+    case nested_conditions do
+      [] -> conditions
+      _  ->
+        condition = [
+          nested: [
+            path: field_name,
+            query: [bool: [must: nested_conditions]]
+          ]
+        ]
+        conditions = [condition | conditions]
+    end
+  end
+
   defp process_field({_, _, []}, _, conditions) do
     conditions
   end
 
   defp process_conditions(params, conditions) do
-
-    conditions = Enum.reduce searchable_fields, conditions, fn field, conditions ->
-      process_field(field, params, conditions)
-    end
+    conditions = process_fields(searchable_fields, params, conditions)
 
     if Enum.empty?(conditions) do
       condition = [match_all: []]
