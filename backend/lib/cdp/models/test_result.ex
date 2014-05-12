@@ -225,23 +225,44 @@ defmodule TestResult do
   defp process_group_by_buckets(aggregations, all_group_by, results, result, doc_count) do
     count = Dict.get(aggregations, "count")
     if count do
-      buckets = count["buckets"]
       [first_group_by | other_group_by] = all_group_by
       is_range = is_list(first_group_by)
-      date_captures = !is_range and match_date_regex(first_group_by)
-      Enum.reduce buckets, results, fn(bucket, results) ->
-        if is_range do
+      if is_range do
+        buckets = count["buckets"]
+        Enum.reduce buckets, results, fn(bucket, results) ->
           [field, _ranges] = first_group_by
           result = result ++ [{field, [normalize(bucket["from"]), normalize(bucket["to"])]}]
-        else
-          if date_captures do
-            {_, field} = date_captures
+          process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
+        end
+      else
+        date_captures = !is_range and match_date_regex(first_group_by)
+        if date_captures do
+          {_, field} = date_captures
+          buckets = count["buckets"]
+          Enum.reduce buckets, results, fn(bucket, results) ->
             result = result ++ [{field, bucket["key_as_string"]}]
-          else
-            result = result ++ [{first_group_by, bucket["key"]}]
+            process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
+          end
+        else
+          found = find_in_searchable_fields(first_group_by)
+          case found do
+            {:flat, _ } ->
+              buckets = count["buckets"]
+              Enum.reduce buckets, results, fn(bucket, results) ->
+                result = result ++ [{first_group_by, bucket["key"]}]
+                process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
+              end
+            {:nested, nesting_field, {:flat, field_name}} ->
+              buckets = count["count"]["buckets"]
+              Enum.reduce buckets, results, fn(bucket, results) ->
+                result = result ++ [{first_group_by, bucket["key"]}]
+                process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
+              end
+            nil ->
+              # TODO Test
+              raise "Trying to group by a non searchable field"
           end
         end
-        process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
       end
     else
       result = result ++ [count: doc_count]
@@ -263,6 +284,31 @@ defmodule TestResult do
     end
   end
 
+  def find_in_searchable_fields(name) do
+    find_in_fields name, searchable_fields
+  end
+
+  def find_in_fields(name, []) do
+    nil
+  end
+
+  def find_in_fields(name, [{field_name, :nested, properties} | fields]) do
+    found = find_in_fields(name, properties)
+    if found do
+      {:nested, field_name, found}
+    else
+      find_in_fields(name, fields)
+    end
+  end
+
+  def find_in_fields(name, [{field_name, _, _} | fields]) do
+    if name == atom_to_binary(field_name) do
+      {:flat, name}
+    else
+      find_in_fields(name, fields)
+    end
+  end
+
   defp process_group_by([group_by]) do
     if is_list(group_by) do
       [name, ranges] = group_by
@@ -279,7 +325,25 @@ defmodule TestResult do
                        end
         [count: [date_histogram: [field: field, interval: interval, format: format]]]
       else
-        [count: [terms: [field: group_by]]]
+        found = find_in_searchable_fields(group_by)
+        case found do
+          {:flat, _ } ->
+            [count: [terms: [field: group_by]]]
+          {:nested, nesting_field, {:flat, field_name}} ->
+            [
+              count: [
+                nested: [path: nesting_field],
+                aggs: [
+                  count: [
+                    terms: [field: "#{nesting_field}.#{field_name}"]
+                  ]
+                ]
+              ]
+            ]
+          nil ->
+            # TODO Test
+            raise "Trying to group by a non searchable field"
+        end
       end
     end
   end

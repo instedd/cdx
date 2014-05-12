@@ -30,24 +30,24 @@ defmodule GroupByTest do
     ]
   end
 
-  test "groups by gender and assay_code" do
-    post_result result: "positive", gender: "male", assay_code: "a"
-    post_result result: "positive", gender: "male", assay_code: "a"
-    post_result result: "positive", gender: "male", assay_code: "b"
-    post_result result: "negative", gender: "female", assay_code: "a"
-    post_result result: "negative", gender: "female", assay_code: "b"
-    post_result result: "negative", gender: "female", assay_code: "b"
+  test "groups by gender and assay_name" do
+    post_result result: "positive", gender: "male", assay_name: "a"
+    post_result result: "positive", gender: "male", assay_name: "a"
+    post_result result: "positive", gender: "male", assay_name: "b"
+    post_result result: "negative", gender: "female", assay_name: "a"
+    post_result result: "negative", gender: "female", assay_name: "b"
+    post_result result: "negative", gender: "female", assay_name: "b"
 
-    response = get_updates("group_by=gender,assay_code")
+    response = get_updates("group_by=gender,assay_name")
     response = Enum.sort response, fn(r1, r2) ->
       if r1["gender"] == r2["gender"] do
-        r1["assay_code"] < r2["assay_code"]
+        r1["assay_name"] < r2["assay_name"]
       else
         r1["gender"] < r2["gender"]
       end
     end
 
-    assert_all_values response, ["gender", "assay_code", "count"], [
+    assert_all_values response, ["gender", "assay_name", "count"], [
       ["female", "a", 1],
       ["female", "b", 2],
       ["male", "a", 2],
@@ -55,24 +55,24 @@ defmodule GroupByTest do
     ]
   end
 
-  test "groups by gender and assay_code in post body" do
-    post_result result: "positive", gender: "male", assay_code: "a"
-    post_result result: "positive", gender: "male", assay_code: "a"
-    post_result result: "positive", gender: "male", assay_code: "b"
-    post_result result: "negative", gender: "female", assay_code: "a"
-    post_result result: "negative", gender: "female", assay_code: "b"
-    post_result result: "negative", gender: "female", assay_code: "b"
+  test "groups by gender and assay_name in post body" do
+    post_result result: "positive", gender: "male", assay_name: "a"
+    post_result result: "positive", gender: "male", assay_name: "a"
+    post_result result: "positive", gender: "male", assay_name: "b"
+    post_result result: "negative", gender: "female", assay_name: "a"
+    post_result result: "negative", gender: "female", assay_name: "b"
+    post_result result: "negative", gender: "female", assay_name: "b"
 
-    response = get_updates("", JSEX.encode!([group_by: ["gender", "assay_code"]]))
+    response = get_updates("", JSEX.encode!([group_by: ["gender", "assay_name"]]))
     response = Enum.sort response, fn(r1, r2) ->
       if r1["gender"] == r2["gender"] do
-        r1["assay_code"] < r2["assay_code"]
+        r1["assay_name"] < r2["assay_name"]
       else
         r1["gender"] < r2["gender"]
       end
     end
 
-    assert_all_values response, ["gender", "assay_code", "count"], [
+    assert_all_values response, ["gender", "assay_name", "count"], [
       ["female", "a", 1],
       ["female", "b", 2],
       ["male", "a", 2],
@@ -80,19 +80,19 @@ defmodule GroupByTest do
     ]
   end
 
-  test "groups by gender, result and assay_code" do
-    post_result result: "positive", gender: "male", assay_code: "a"
-    post_result result: "negative", gender: "male", assay_code: "a"
-    post_result result: "positive", gender: "male", assay_code: "b"
-    post_result result: "negative", gender: "female", assay_code: "a"
-    post_result result: "negative", gender: "female", assay_code: "b"
-    post_result result: "negative", gender: "female", assay_code: "b"
+  test "groups by gender, assay_name and result" do
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "a"
+    post_result analytes: [result: "negative"], gender: "male", assay_name: "a"
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "b"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "a"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "b"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "b"
 
-    response = get_updates("group_by=gender,result,assay_code")
+    response = get_updates("group_by=gender,assay_name,result")
     response = Enum.sort response, fn(r1, r2) ->
       if r1["gender"] == r2["gender"] do
         if r1["result"] == r2["result"] do
-          r1["assay_code"] < r2["assay_code"]
+          r1["assay_name"] < r2["assay_name"]
         else
           r1["result"] < r2["result"]
         end
@@ -101,7 +101,7 @@ defmodule GroupByTest do
       end
     end
 
-    assert_all_values response, ["gender", "result", "assay_code", "count"], [
+    assert_all_values response, ["gender", "result", "assay_name", "count"], [
       ["female", "negative", "a", 1],
       ["female", "negative", "b", 2],
       ["male", "negative", "a", 1],
@@ -174,10 +174,10 @@ defmodule GroupByTest do
   end
 
   test "group by day(date) and result" do
-    create_result [result: "positive"], {{2010,1,4},{12,0,0}}
-    create_result [result: "positive"], {{2010,1,4},{13,0,0}}
-    create_result [result: "negative"], {{2010,1,4},{14,0,0}}
-    create_result [result: "positive"], {{2010,1,5},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,4},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,4},{13,0,0}}
+    create_result [analytes: [result: "negative"]], {{2010,1,4},{14,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,5},{12,0,0}}
 
     response = get_updates("group_by=#{escape("day(created_at)")},result")
     response = Enum.sort response, fn(r1, r2) ->
@@ -238,4 +238,38 @@ defmodule GroupByTest do
       [[15, 120], 2],
       ]
   end
+
+  test "group by analyte result" do
+    post_result analytes: [[condition: "MTB", result: "positive"], [condition: "Flu", result: "negative"]]
+
+    response = get_updates("group_by=result")
+    response = Enum.sort response, fn(r1, r2) -> r1["result"] < r2["result"] end
+
+    assert_all_values response, ["result", "count"], [
+      ["negative", 1],
+      ["positive", 1],
+    ]
+  end
+
+  # test "group by day(date) and result" do
+  #   create_result [analytes: [result: "positive"]], {{2010,1,4},{12,0,0}}
+  #   create_result [analytes: [result: "positive"]], {{2010,1,4},{13,0,0}}
+  #   create_result [analytes: [result: "negative"]], {{2010,1,4},{14,0,0}}
+  #   create_result [analytes: [result: "positive"]], {{2010,1,5},{12,0,0}}
+
+  #   response = get_updates("group_by=result,#{escape("day(created_at)")}")
+  #   response = Enum.sort response, fn(r1, r2) ->
+  #     if r1["created_at"] == r2["created_at"] do
+  #       r1["result"] < r2["result"]
+  #     else
+  #       r1["created_at"] < r2["created_at"]
+  #     end
+  #   end
+
+  #   assert_all_values response, ["created_at", "result", "count"], [
+  #     ["2010-01-04", "negative", 1],
+  #     ["2010-01-04", "positive", 2],
+  #     ["2010-01-05", "positive", 1],
+  #     ]
+  # end
 end
