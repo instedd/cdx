@@ -19,7 +19,7 @@
     {
     	"target_field": "system_user",
       "selector" : "doctor_name",
-      "type": "custom"
+      "type": "custom" //this field would only be accepted in a signed manifest
     },
     {
     	"target_field": "conditions",
@@ -28,8 +28,8 @@
       "selector" : "$.conditions[*].condition", // only if multiple:true
       "value_mappings" : {
         "*MTB*" : "MTB",
-          "*FLU*" : "H1N1",
-          "*FLUA*" : "A1N1"
+        "*FLU*" : "H1N1",
+        "*FLUA*" : "A1N1"
       }
     },
     {
