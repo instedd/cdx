@@ -21,7 +21,7 @@
       	"selector" : "doctor_name"
     },
     {
-    	"target_field": "analytes",
+    	"target_field": "conditions",
       	"multiple" : true,
       	"selector" : "path/to/analytes_array", // only if multiple:true
       	"condition" : {
