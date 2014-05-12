@@ -47,7 +47,6 @@
      	"target_field": "grade_of_resistance",
      	"type": "custom",
         "selector" : "resistance",
-        "condition" : ["MTB", "H1N1"], // It only applies to this particular conditions
         "possible_values": {
           "range" : {
             "min" : 0,
