@@ -18,10 +18,12 @@
     },
     {
     	"target_field": "system_user",
-      	"selector" : "doctor_name"
+      	"selector" : "doctor_name",
+      	"type": "custom"
     },
     {
     	"target_field": "conditions",
+    	"type": "core",
       	"multiple" : true,
       	"selector" : "path/to/analytes_array", // only if multiple:true
       	"condition" : {
@@ -35,6 +37,7 @@
     },
     {
     	"target_field": "result",
+    	"type": "core",
         "selector" : "Test/result_text",
         // "selector" : "Test/result/@key",
         "value_mappings" : {
@@ -45,6 +48,7 @@
      },
      {
      	"target_field": "grade_of_resistance",
+     	"type": "custom",
         "selector" : "resistance",
         "condition" : ["MTB", "H1N1"], // It only applies to this particular conditions
         "possible_values": {
@@ -56,17 +60,20 @@
     },
     {
     	"target_field": "device_serial_number",
+    	"type": "core",
       	"selector" : "patient_information/name" // how could we prevent this case?
     },
     {
     	"target_field": "test_type",
       	"selector" : "Test/test_type",
+      	"type": "custom",
       	"possible_values" : {
         	"options" : [0, 1]
       	}
     },
     {
     	"target_field": "temperature",
+    	"type": "custom",
       	"selector" : "Test/test_type",
       	"possible_values": {
         	"range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
@@ -78,6 +85,7 @@
     },
     {
     	"target_field": "percentage_of_confidence",
+    	"type": "custom",
       	"selector" : "Test/test_type",
       	"possible_values": {
         	"range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
@@ -89,6 +97,7 @@
     },
     {
     	"target_field": "end_time",
+    	"type": "custom",
       	"selector" : "Test/end_time",
       	"possible_values": {
         	"date" : "iso"
@@ -97,6 +106,7 @@
     },
     {
     	"target_field": "result_text", //this is accepted only for signed manifests. Eg: "HIV DETECTED > 1.00E06 Copies/mL (log 6.00)"
+    	"type": "custom",
       	"selector" : "assay/result_text",
       	"data-type" : "string", // to prevent elastic for automatically indexing with the type of the first received value (eg. integer vs float)
       	"pii" : false,
