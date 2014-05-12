@@ -223,7 +223,7 @@ defmodule TestResult do
   end
 
   defp process_group_by_buckets(aggregations, all_group_by, results, result, doc_count) do
-    count = Dict.get(aggregations, "count")
+    count = aggregations["count"]
     if count do
       [first_group_by | other_group_by] = all_group_by
       is_range = is_list(first_group_by)

@@ -64,7 +64,7 @@ defmodule TestHelpers do
   end
 
   def fetch_many(dict, [key|other_keys]) do
-    [Dict.get(dict, key) | fetch_many(dict, other_keys)]
+    [dict[key] | fetch_many(dict, other_keys)]
   end
 
   def assert_values(dict, keys, values) do
