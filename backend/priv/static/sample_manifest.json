@@ -5,30 +5,36 @@
     "device_models" : ["GX4001", "GX4002"],
     "source_data_type": "json"
   },
-  "field_mapping" : {
-    "patient_name" : {
-      "selector" : "patient_information/name",
-      "type" : "core"
+  "field_mapping" : [
+    {
+    	"target_field": "patient_name",
+      	"selector" : "patient_information/name",
+      	"type" : "core"
     },
-    "assay_name" : {
-      "selector" : "Test/assay_name",
-      "type" : "core"
+    {
+    	"target_field": "assay_name",
+      	"selector" : "Test/assay_name",
+      	"type" : "core"
     },
-    "system_user" : {
-      "selector" : "doctor_name",
+    {
+    	"target_field": "system_user",
+      	"selector" : "doctor_name"
     },
-    "analytes" : {
-      "multiple" : true,
-      "selector" : "path/to/analytes_array", // only if multiple:true
-      "condition" : {
-        "selector" : "tested_condition",
-        "value_mappings" : {
-          "*MTB*" : "MTB",
-          "*FLU*" : "H1N1",
-          "*FLUA*" : "A1N1"
+    {
+    	"target_field": "analytes",
+      	"multiple" : true,
+      	"selector" : "path/to/analytes_array", // only if multiple:true
+      	"condition" : {
+        	"selector" : "tested_condition",
+        	"value_mappings" : {
+          		"*MTB*" : "MTB",
+          		"*FLU*" : "H1N1",
+          		"*FLUA*" : "A1N1"
+        	}
         }
-      },
-      "result" : {
+    },
+    {
+    	"target_field": "result",
         "selector" : "Test/result_text",
         // "selector" : "Test/result/@key",
         "value_mappings" : {
@@ -36,8 +42,9 @@
           "*POSITIVE*" : "positive",
           "*POSITIVE WITH RIFF*" : "positive with riff"
         }
-      },
-      "grade_of_resistance" : {
+     },
+     {
+     	"target_field": "grade_of_resistance",
         "selector" : "resistance",
         "condition" : ["MTB", "H1N1"], // It only applies to this particular conditions
         "possible_values": {
@@ -46,49 +53,54 @@
             "max" : 100
           }
         }
-      },
     },
-    "device_serial_number" : {
-      "selector" : "patient_information/name" // how could we prevent this case?
+    {
+    	"target_field": "device_serial_number",
+      	"selector" : "patient_information/name" // how could we prevent this case?
     },
-    "test_type" : {
-      "selector" : "Test/test_type",
-      "possible_values" : {
-        "options" : [0, 1]
-      }
+    {
+    	"target_field": "test_type",
+      	"selector" : "Test/test_type",
+      	"possible_values" : {
+        	"options" : [0, 1]
+      	}
     },
-    "temperature" : {
-      "selector" : "Test/test_type",
-      "possible_values": {
-        "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
-          "min" : -20,
-          "max" : 60
-        },
-      },
-      "indexed" : true
+    {
+    	"target_field": "temperature",
+      	"selector" : "Test/test_type",
+      	"possible_values": {
+        	"range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
+          		"min" : -20,
+          		"max" : 60
+        	},
+      	},
+      	"indexed" : true
     },
-    "percentage_of_confidence" : {
-      "selector" : "Test/test_type",
-      "possible_values": {
-        "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
-          "min" : 0.001,
-          "max" : 999.999
-        },
-      },
-      "indexed" : true
+    {
+    	"target_field": "percentage_of_confidence",
+      	"selector" : "Test/test_type",
+      	"possible_values": {
+        	"range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
+          		"min" : 0.001,
+          		"max" : 999.999
+        	},
+      	},
+      	"indexed" : true
     },
-    "end_time": {
-      "selector" : "Test/end_time",
-      "possible_values": {
-        "date" : "iso"
-      },
-      "indexed" : false
+    {
+    	"target_field": "end_time",
+      	"selector" : "Test/end_time",
+      	"possible_values": {
+        	"date" : "iso"
+      	},
+      	"indexed" : false
     },
-    "result_text": { //this is accepted only for signed manifests. Eg: "HIV DETECTED > 1.00E06 Copies/mL (log 6.00)"
-      "selector" : "assay/result_text",
-      "data-type" : "string", // to prevent elastic for automatically indexing with the type of the first received value (eg. integer vs float)
-      "pii" : false,
-      "indexed" : true
+    {
+    	"target_field": "result_text", //this is accepted only for signed manifests. Eg: "HIV DETECTED > 1.00E06 Copies/mL (log 6.00)"
+      	"selector" : "assay/result_text",
+      	"data-type" : "string", // to prevent elastic for automatically indexing with the type of the first received value (eg. integer vs float)
+      	"pii" : false,
+      	"indexed" : true
     }
-  }
+  ]
 }
