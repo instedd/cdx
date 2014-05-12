@@ -25,14 +25,11 @@
     	"target_field": "conditions",
     	"type": "core",
       	"multiple" : true,
-      	"selector" : "path/to/analytes_array", // only if multiple:true
-      	"condition" : {
-        	"selector" : "tested_condition",
-        	"value_mappings" : {
-          		"*MTB*" : "MTB",
-          		"*FLU*" : "H1N1",
-          		"*FLUA*" : "A1N1"
-        	}
+      	"selector" : "$.conditions[*].condition", // only if multiple:true
+      	"value_mappings" : {
+        	"*MTB*" : "MTB",
+          	"*FLU*" : "H1N1",
+          	"*FLUA*" : "A1N1"
         }
     },
     {
