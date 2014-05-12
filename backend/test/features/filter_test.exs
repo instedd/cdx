@@ -1,6 +1,7 @@
 defmodule FilterTest do
   use Cdp.TestCase
   import TestHelpers
+  require Tirexs.Search
 
   test "checks for new tests since a date" do
     before_first_test = {{2010,1,1},{12,0,0}}
@@ -65,10 +66,10 @@ defmodule FilterTest do
     assert Dict.get(response,"result") == "positive"
   end
 
-  test "filters by device", meta do
+  test "filters by device", context do
     post_result result: "positive"
 
-    Repo.insert Device.new(institution_id: meta[:institution].id, secret_key: "bar")
+    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar")
 
     post_result [result: "negative"], "bar"
 
@@ -76,25 +77,25 @@ defmodule FilterTest do
     assert Dict.get(response, "result") == "positive"
   end
 
-  test "filters by laboratory", meta do
+  test "filters by laboratory", context do
     post_result result: "positive"
 
-    create_device_and_laboratory(meta[:institution].id, "bar")
+    create_device_and_laboratory(context[:institution].id, "bar")
 
     post_result [result: "negative"], "bar"
 
-    response = get_one_update("laboratory=#{meta[:laboratory1].id}")
+    response = get_one_update("laboratory=#{context[:laboratory1].id}")
     assert Dict.get(response, "result") == "positive"
   end
 
-  test "filters by institution", meta do
+  test "filters by institution", context do
     post_result result: "positive"
 
-    create_device_and_laboratory(meta[:institution2].id, "bar")
+    create_device_and_laboratory(context[:institution2].id, "bar")
 
     post_result [result: "negative"], "bar"
 
-    response = get_one_update("institution=#{meta[:institution].id}")
+    response = get_one_update("institution=#{context[:institution].id}")
     assert Dict.get(response, "result") == "positive"
   end
 
@@ -109,7 +110,7 @@ defmodule FilterTest do
     assert Dict.get(response, "result") == "negative"
   end
 
-  test "filters by assay code" do
+  test "filters by assay name" do
     post_result result: "positive", assay_name: "GX4001"
     post_result result: "negative", assay_name: "GX1234"
 
@@ -178,5 +179,65 @@ defmodule FilterTest do
     response = get_one_update("assay_name=GX1234")
     response = get_one_update("uuid=#{Dict.get(response, "uuid")}")
     assert Dict.get(response, "result") == "negative"
+  end
+
+  test "filters by a partial match" do
+    post_result result: "positive", assay_name: "GX4001"
+    post_result result: "negative", assay_name: "GX1234"
+
+    response = get_updates("assay_name=GX*")
+    response = Enum.sort response, fn(r1, r2) -> r1["assay_name"] < r2["assay_name"] end
+    assert_all_values response, ["result", "assay_name"], [
+      ["negative", "GX1234"],
+      ["positive", "GX4001"],
+    ]
+  end
+
+  test "filters by condition name" do
+    post_result result: "positive", condition: "Flu"
+    post_result result: "negative", condition: "MTB"
+
+    response = get_one_update("condition=MTB")
+    assert Dict.get(response, "result") == "negative"
+
+    response = get_one_update("condition=Flu")
+    assert Dict.get(response, "result") == "positive"
+  end
+
+  test "filters by an analyzed result" do
+    post_result result: "negative", condition: "MTB"
+    post_result result: "Positive with RIFF resistance", condition: "MTB"
+
+    response = get_one_update("result=positive")
+    assert Dict.get(response, "result") == "Positive with RIFF resistance"
+  end
+
+  test "filters by location", context do
+    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar")
+    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory2].id, device_id: device.id)
+    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "baz")
+    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory3].id, device_id: device.id)
+
+    post_result [result: "negative"]
+    post_result [result: "positive"], "bar"
+    post_result [result: "positive with riff"], "baz"
+
+    response = get_one_update("location=#{context[:location1].id}")
+    assert Dict.get(response, "result") == "negative"
+    response = get_one_update("location=#{context[:location2].id}")
+    assert Dict.get(response, "result") == "positive"
+    response = get_updates("location=#{context[:parent_location].id}")
+    response = Enum.sort response, fn(r1, r2) -> r1["location_id"] < r2["location_id"] end
+    assert_all_values response, ["result", "location_id"], [
+      ["negative", context[:location1].id],
+      ["positive", context[:location2].id],
+    ]
+    response = get_updates("location=#{context[:root_location].id}")
+    response = Enum.sort response, fn(r1, r2) -> r1["location_id"] < r2["location_id"] end
+    assert_all_values response, ["result", "location_id"], [
+      ["negative", context[:location1].id],
+      ["positive", context[:location2].id],
+      ["positive with riff", context[:location3].id],
+    ]
   end
 end

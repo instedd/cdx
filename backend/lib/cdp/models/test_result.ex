@@ -22,22 +22,30 @@ defmodule TestResult do
     ]
   end
 
-  def serchable_fields do
+  def searchable_fields do
     [
-      {:created_at, :date},
-      {:device_uuid, :string},
-      {:laboratory_id, :integer},
-      {:institution_id, :integer},
-      {:location_id, :integer},
-      {:parent_locations, :integer},
-      {:age, :integer},
-      {:assay, :string},
-      {:assay_name, :string},
-      {:device_serial_number, :multi_field},
-      {:uuid, :string},
-      {:result, :string},
-      {:start_time, :date},
-      {:system_user, :string},
+      {:created_at, :date, [
+        {"since", {:range, [:from, {:include_lower, true}]}},
+        {"until", {:range, [:to, {:include_lower, true}]}}
+      ]},
+      {:device_uuid, :string, [{"device", :match}]},
+      {:laboratory_id, :integer, [{"laboratory", :match}]},
+      {:institution_id, :integer, [{"institution", :match}]},
+      {:location_id, :integer, []},
+      {:parent_locations, :integer, [{"location", :match}]},
+      {:age, :integer, [
+        {"age", :match},
+        {"min_age", {:range, [:from, {:include_lower, true}]}},
+        {"max_age", {:range, [:to, {:include_upper, true}]}},
+      ]},
+      {:condition, :string, [{"condition", :wildcard}]},
+      {:assay_name, :string, [{"assay_name", :wildcard}]},
+      {:device_serial_number, :string, []},
+      {:gender, :string, [{"gender", :wildcard}]},
+      {:result, :multi_field, [{"result", :wildcard}]},
+      {:uuid, :string, [{"uuid", :match}]},
+      {:start_time, :date, []},
+      {:system_user, :string, []},
     ]
   end
 
@@ -225,7 +233,7 @@ defmodule TestResult do
           result = result ++ [{field, [normalize(bucket["from"]), normalize(bucket["to"])]}]
         else
           if date_captures do
-            {interval, field} = date_captures
+            {_, field} = date_captures
             result = result ++ [{field, bucket["key_as_string"]}]
           else
             result = result ++ [{first_group_by, bucket["key"]}]
@@ -303,65 +311,50 @@ defmodule TestResult do
     Enum.map result.hits, fn(hit) -> hit["_source"] end
   end
 
+  def field_matcher(field_name, :multi_field) do
+    "#{field_name}.analyzed"
+  end
+
+  def field_matcher(field_name, _) do
+    field_name
+  end
+
+  defp process_field({field_name, type, [{param_name, :wildcard}| tail ]}, params, conditions) do
+    if field_value = params[param_name] do
+      condition = if Regex.match? ~r/.*\*.*/, field_value do
+        [wildcard: [{field_name, field_value}]]
+      else
+        [match: [{field_matcher(field_name, type), field_value}]]
+      end
+      conditions = [condition | conditions]
+    end
+    process_field({field_name, type, tail}, params, conditions)
+  end
+
+  defp process_field({field_name, type, [{param_name, :match}| tail ]}, params, conditions) do
+    if field_value = params[param_name] do
+      condition = [match: [{field_name, field_value}]]
+      conditions = [condition | conditions]
+    end
+    process_field({field_name, type, tail}, params, conditions)
+  end
+
+  defp process_field({field_name, type, [{param_name, {:range, [start | options]}}| tail ]}, params, conditions) do
+    if field_value = params[param_name] do
+      condition = [range: [{field_name, [{start, field_value}] ++ options}]]
+      conditions = [condition | conditions]
+    end
+    process_field({field_name, type, tail}, params, conditions)
+  end
+
+  defp process_field({_, _, []}, _, conditions) do
+    conditions
+  end
+
   defp process_conditions(params, conditions) do
-    if since = params["since"] do
-      condition = [range: [created_at: [from: since, include_lower: true]]]
-      conditions = [condition | conditions]
-    end
 
-    if until = params["until"] do
-      condition = [range: [created_at: [to: until, include_lower: true]]]
-      conditions = [condition | conditions]
-    end
-
-    if institution_id = params["institution"] do
-      condition = [match: ["institution_id": institution_id]]
-      conditions = [condition | conditions]
-    end
-
-    if laboratory_id = params["laboratory"] do
-      condition = [match: [laboratory_id: laboratory_id]]
-      conditions = [condition | conditions]
-    end
-
-    if device_uuid = params["device"] do
-      condition = [match: [device_uuid: device_uuid]]
-      conditions = [condition | conditions]
-    end
-
-    if gender = params["gender"] do
-      condition = [match: [gender: gender]]
-      conditions = [condition | conditions]
-    end
-
-    if age = params["age"] do
-      condition = [match: [age: age]]
-      conditions = [condition | conditions]
-    end
-
-    if assay_name = params["assay_name"] do
-      condition = [match: [assay_name: assay_name]]
-      conditions = [condition | conditions]
-    end
-
-    if min_age = params["min_age"] do
-      condition = [range: [age: [from: min_age, include_lower: true]]]
-      conditions = [condition | conditions]
-    end
-
-    if max_age = params["max_age"] do
-      condition = [range: [age: [to: max_age, include_upper: true]]]
-      conditions = [condition | conditions]
-    end
-
-    if result = params["result"] do
-      condition = [match: [result: result]]
-      conditions = [condition | conditions]
-    end
-
-    if uuid = params["uuid"] do
-      condition = [match: [uuid: uuid]]
-      conditions = [condition | conditions]
+    conditions = Enum.reduce searchable_fields, conditions, fn field, conditions ->
+      process_field(field, params, conditions)
     end
 
     if Enum.empty?(conditions) do

@@ -32,7 +32,7 @@ defmodule Elasticsearch do
   end
 
   defp build_properties_mapping do
-    Enum.map TestResult.serchable_fields, fn {name, type} ->
+    Enum.map TestResult.searchable_fields, fn {name, type, _} ->
       map_field(name, type)
     end
   end
@@ -41,8 +41,10 @@ defmodule Elasticsearch do
     field_body = case type do
       :multi_field ->
             [
-              fields: [ analyzed: [{:type, :string}, {:index, :analyzed}]],
-              field: [{:type, :string}, {:index, :not_analyzed}]
+              fields: [
+                {:analyzed, [{:type, :string}, {:index, :analyzed}]},
+                {field, [{:type, :string}, {:index, :not_analyzed}]}
+              ]
             ]
       _ -> [index: :not_analyzed]
     end

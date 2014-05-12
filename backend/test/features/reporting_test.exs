@@ -4,19 +4,19 @@ defmodule ReportingTest do
   require Tirexs.Search
   import TestHelpers
 
-  test "create test_result in postgres", meta do
-    conn = post("/api/devices/foo/results", meta[:data])
+  test "create test_result in postgres", context do
+    conn = post("/api/devices/foo/results", context[:data])
     assert conn.status == 200
 
     [test_result] = Repo.all TestResult
-    assert test_result.device_id == meta[:device].id
-    assert test_result.raw_data != meta[:data]
+    assert test_result.device_id == context[:device].id
+    assert test_result.raw_data != context[:data]
     test_result = TestResult.decrypt(test_result)
-    assert test_result.raw_data == meta[:data]
+    assert test_result.raw_data == context[:data]
   end
 
-  test "create test_result in elasticsearch", meta do
-    post("/api/devices/foo/results", meta[:data])
+  test "create test_result in elasticsearch", context do
+    post("/api/devices/foo/results", context[:data])
 
     [result] = get_all_elasticsearch_results()
     assert result["_source"]["result"] == "positive"
@@ -24,7 +24,7 @@ defmodule ReportingTest do
     assert result["_source"]["device_uuid"] == "foo"
   end
 
-  test "doesn't store sensitive data in elasticsearch", meta do
+  test "doesn't store sensitive data in elasticsearch" do
     data = "{\"result\": \"positive\", \"patient_id\": 1234}"
     post("/api/devices/foo/results", data)
 
@@ -34,44 +34,44 @@ defmodule ReportingTest do
     assert result["_source"]["patient_id"] == nil
   end
 
-  test "store the location id when the device is registered in only one laboratory", meta do
-    post("/api/devices/foo/results", meta[:data])
+  test "store the location id when the device is registered in only one laboratory", context do
+    post("/api/devices/foo/results", context[:data])
 
     [result] = get_all_elasticsearch_results()
-    assert result["_source"]["location_id"] == meta[:location1].id
-    assert result["_source"]["laboratory_id"] == meta[:laboratory1].id
-    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([meta[:location1].id, meta[:parent_location].id, meta[:root_location].id])
+    assert result["_source"]["location_id"] == context[:location1].id
+    assert result["_source"]["laboratory_id"] == context[:laboratory1].id
+    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([context[:location1].id, context[:parent_location].id, context[:root_location].id])
   end
 
-  test "store the parent location id when the device is registered more than one laboratory", meta do
-    Repo.insert DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
-    Repo.insert DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
+  test "store the parent location id when the device is registered more than one laboratory", context do
+    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory2].id, device_id: context[:device].id)
+    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory3].id, device_id: context[:device].id)
 
-    post("/api/devices/foo/results", meta[:data])
+    post("/api/devices/foo/results", context[:data])
 
     [result] = get_all_elasticsearch_results()
-    assert result["_source"]["location_id"] == meta[:root_location].id
+    assert result["_source"]["location_id"] == context[:root_location].id
     assert result["_source"]["laboratory_id"] == nil
-    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([meta[:root_location].id])
+    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([context[:root_location].id])
   end
 
 
-  test "store the parent location id when the device is registered more than one laboratory with another tree order", meta do
-    Repo.insert DevicesLaboratories.new(laboratory_id: meta[:laboratory3].id, device_id: meta[:device].id)
-    Repo.insert DevicesLaboratories.new(laboratory_id: meta[:laboratory2].id, device_id: meta[:device].id)
+  test "store the parent location id when the device is registered more than one laboratory with another tree order", context do
+    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory3].id, device_id: context[:device].id)
+    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory2].id, device_id: context[:device].id)
 
-    post("/api/devices/foo/results", meta[:data])
+    post("/api/devices/foo/results", context[:data])
 
     [result] = get_all_elasticsearch_results()
-    assert result["_source"]["location_id"] == meta[:root_location].id
+    assert result["_source"]["location_id"] == context[:root_location].id
     assert result["_source"]["laboratory_id"] == nil
-    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([meta[:root_location].id])
+    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([context[:root_location].id])
   end
 
-  test "store nil if no location was found", meta do
-    Repo.insert Device.new(institution_id: meta[:institution].id, secret_key: "bar")
+  test "store nil if no location was found", context do
+    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar")
 
-    post("/api/devices/bar/results", meta[:data])
+    post("/api/devices/bar/results", context[:data])
 
     [result] = get_all_elasticsearch_results()
     assert result["_source"]["location_id"] == nil
