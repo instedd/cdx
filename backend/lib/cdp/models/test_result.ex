@@ -92,7 +92,7 @@ defmodule TestResult do
     conditions = process_conditions(params, [])
     conditions = process_conditions(post_body, conditions)
 
-    query = [bool: [must: conditions]]
+    query = and_conditions(conditions)
     order = process_order(params)
 
     group_by = params["group_by"] || post_body["group_by"]
@@ -450,7 +450,7 @@ defmodule TestResult do
         condition = [
           nested: [
             path: field_name,
-            query: [bool: [must: nested_conditions]]
+            query: and_conditions(nested_conditions),
           ]
         ]
         [condition | conditions]
@@ -470,6 +470,14 @@ defmodule TestResult do
     end
 
     conditions
+  end
+
+  defp and_conditions([condition]) do
+    condition
+  end
+
+  defp and_conditions(conditions) do
+    [bool: [must: conditions]]
   end
 
   defp process_order(params) do
