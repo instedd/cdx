@@ -4,7 +4,7 @@ defmodule PiiTest do
   use Dynamo.HTTP.Case
 
   test "retrieves a test result PII by uuid" do
-    create_result [result: "positive", patient_name: "jdoe"]
+    create_result [analytes: [result: "positive"], patient_name: "jdoe"]
 
     test_uuid = get_one_update("")["uuid"]
 
@@ -12,11 +12,11 @@ defmodule PiiTest do
 
     assert response["pii"]["patient_name"] == "jdoe"
     assert response["uuid"] == test_uuid
-    assert response["result"] == nil
+    assert response["analytes"] == nil
   end
 
   test "update a test result PII" do
-    create_result [result: "positive", patient_name: "jdoe"]
+    create_result [analytes: [result: "positive"], patient_name: "jdoe"]
 
     test_uuid = get_one_update("")["uuid"]
 
@@ -29,6 +29,6 @@ defmodule PiiTest do
     assert pii["patient_telephone_number"] == "1234"
     assert pii["patient_zip_code"] == "ABC1234"
     assert updated_result["uuid"] == test_uuid
-    assert updated_result["result"] == nil
+    assert updated_result["analytes"] == nil
   end
 end

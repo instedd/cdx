@@ -3,9 +3,9 @@ defmodule GroupByTest do
   import TestHelpers
 
   test "groups by gender" do
-    post_result result: "positive", gender: "male"
-    post_result result: "positive", gender: "male"
-    post_result result: "negative", gender: "female"
+    post_result analytes: [result: "positive"], gender: "male"
+    post_result analytes: [result: "positive"], gender: "male"
+    post_result analytes: [result: "negative"], gender: "female"
 
     response = get_updates("group_by=gender")
     response = Enum.sort response, fn(r1, r2) -> r1["gender"] < r2["gender"] end
@@ -17,9 +17,9 @@ defmodule GroupByTest do
   end
 
   test "groups by gender in post body" do
-    post_result result: "positive", gender: "male"
-    post_result result: "positive", gender: "male"
-    post_result result: "negative", gender: "female"
+    post_result analytes: [result: "positive"], gender: "male"
+    post_result analytes: [result: "positive"], gender: "male"
+    post_result analytes: [result: "negative"], gender: "female"
 
     response = get_updates("", JSEX.encode!([group_by: "gender"]))
     response = Enum.sort response, fn(r1, r2) -> r1["gender"] < r2["gender"] end
@@ -31,12 +31,12 @@ defmodule GroupByTest do
   end
 
   test "groups by gender and assay_name" do
-    post_result result: "positive", gender: "male", assay_name: "a"
-    post_result result: "positive", gender: "male", assay_name: "a"
-    post_result result: "positive", gender: "male", assay_name: "b"
-    post_result result: "negative", gender: "female", assay_name: "a"
-    post_result result: "negative", gender: "female", assay_name: "b"
-    post_result result: "negative", gender: "female", assay_name: "b"
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "a"
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "a"
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "b"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "a"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "b"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "b"
 
     response = get_updates("group_by=gender,assay_name")
     response = Enum.sort response, fn(r1, r2) ->
@@ -56,12 +56,12 @@ defmodule GroupByTest do
   end
 
   test "groups by gender and assay_name in post body" do
-    post_result result: "positive", gender: "male", assay_name: "a"
-    post_result result: "positive", gender: "male", assay_name: "a"
-    post_result result: "positive", gender: "male", assay_name: "b"
-    post_result result: "negative", gender: "female", assay_name: "a"
-    post_result result: "negative", gender: "female", assay_name: "b"
-    post_result result: "negative", gender: "female", assay_name: "b"
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "a"
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "a"
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "b"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "a"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "b"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "b"
 
     response = get_updates("", JSEX.encode!([group_by: ["gender", "assay_name"]]))
     response = Enum.sort response, fn(r1, r2) ->
@@ -111,9 +111,9 @@ defmodule GroupByTest do
   end
 
   test "group by year(date)" do
-    create_result [result: "positive"], {{2010,1,1},{12,0,0}}
-    create_result [result: "positive"], {{2010,1,2},{12,0,0}}
-    create_result [result: "positive"], {{2011,1,1},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,1},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,2},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2011,1,1},{12,0,0}}
 
     response = get_updates("group_by=#{escape("year(created_at)")}")
     response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
@@ -125,11 +125,11 @@ defmodule GroupByTest do
   end
 
   test "group by month(date)" do
-    create_result [result: "positive"], {{2010,1,1},{12,0,0}}
-    create_result [result: "positive"], {{2010,2,2},{12,0,0}}
-    create_result [result: "positive"], {{2011,1,1},{12,0,0}}
-    create_result [result: "positive"], {{2011,1,2},{12,0,0}}
-    create_result [result: "positive"], {{2011,2,1},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,1},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,2,2},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2011,1,1},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2011,1,2},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2011,2,1},{12,0,0}}
 
     response = get_updates("group_by=#{escape("month(created_at)")}")
     response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
@@ -143,11 +143,11 @@ defmodule GroupByTest do
   end
 
   test "group by week(date)" do
-    create_result [result: "positive"], {{2010,1,4},{12,0,0}}
-    create_result [result: "positive"], {{2010,1,5},{12,0,0}}
-    create_result [result: "positive"], {{2010,1,6},{12,0,0}}
-    create_result [result: "positive"], {{2010,1,12},{12,0,0}}
-    create_result [result: "positive"], {{2010,1,13},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,4},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,5},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,6},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,12},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,13},{12,0,0}}
 
     response = get_updates("group_by=#{escape("week(created_at)")}")
     response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
@@ -159,10 +159,10 @@ defmodule GroupByTest do
   end
 
   test "group by day(date)" do
-    create_result [result: "positive"], {{2010,1,4},{12,0,0}}
-    create_result [result: "positive"], {{2010,1,4},{13,0,0}}
-    create_result [result: "positive"], {{2010,1,4},{14,0,0}}
-    create_result [result: "positive"], {{2010,1,5},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,4},{12,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,4},{13,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,4},{14,0,0}}
+    create_result [analytes: [result: "positive"]], {{2010,1,5},{12,0,0}}
 
     response = get_updates("group_by=#{escape("day(created_at)")}")
     response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
