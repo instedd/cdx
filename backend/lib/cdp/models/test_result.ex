@@ -230,23 +230,23 @@ defmodule TestResult do
       case classify_group_by_field(first_group_by) do
         {:range, field, _ranges} ->
           buckets = count["buckets"]
-          function = fn(bucket) -> {field, [normalize(bucket["from"]), normalize(bucket["to"])]} end
+          mapping = fn(bucket) -> {field, [normalize(bucket["from"]), normalize(bucket["to"])]} end
         {:date, _interval, field} ->
           buckets = count["buckets"]
-          function = fn(bucket) -> {field, bucket["key_as_string"]} end
+          mapping = fn(bucket) -> {field, bucket["key_as_string"]} end
         {:flat, _} ->
           buckets = count["buckets"]
-          function = fn(bucket) -> {first_group_by, bucket["key"]} end
+          mapping = fn(bucket) -> {first_group_by, bucket["key"]} end
         {:nested, _nesting_field, {:flat, _field_name}} ->
           buckets = count["count"]["buckets"]
-          function = fn(bucket) -> {first_group_by, bucket["key"]} end
+          mapping = fn(bucket) -> {first_group_by, bucket["key"]} end
         nil ->
           # TODO Test
           raise "Trying to group by a non searchable field"
       end
 
       Enum.reduce buckets, results, fn(bucket, results) ->
-        result = result ++ [function.(bucket)]
+        result = result ++ [mapping.(bucket)]
         process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
       end
     else
