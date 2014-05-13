@@ -206,6 +206,8 @@ defmodule TestResult do
       all_group_by = String.split(group_by, ",")
     end
 
+    all_group_by = sort_group_by(all_group_by)
+
     aggregations = process_group_by(all_group_by)
 
     query = [
@@ -220,6 +222,31 @@ defmodule TestResult do
     result = Tirexs.Query.create_resource(query)
 
     process_group_by_buckets(result.aggregations, all_group_by, [], [], 0)
+  end
+
+  # nested fields must appear last in the group by
+  defp sort_group_by(fields) do
+    Enum.sort fields, fn(f1, f2) ->
+      g1 = classify_group_by_field(f1)
+      g2 = classify_group_by_field(f2)
+
+      case g1 do
+        {:nested, _, _} ->
+          case g2 do
+            {:nested, _, _} ->
+              f1 < f2
+            _ ->
+              false
+          end
+        _ ->
+          case g2 do
+            {:nested, _, _} ->
+              true
+            _ ->
+              f1 < f2
+          end
+      end
+    end
   end
 
   defp process_group_by_buckets(aggregations, all_group_by, results, result, doc_count) do

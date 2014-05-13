@@ -110,6 +110,36 @@ defmodule GroupByTest do
     ]
   end
 
+  test "groups by gender, assay_name and result in a different order" do
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "a"
+    post_result analytes: [result: "negative"], gender: "male", assay_name: "a"
+    post_result analytes: [result: "positive"], gender: "male", assay_name: "b"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "a"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "b"
+    post_result analytes: [result: "negative"], gender: "female", assay_name: "b"
+
+    response = get_updates("group_by=result,gender,assay_name")
+    response = Enum.sort response, fn(r1, r2) ->
+      if r1["gender"] == r2["gender"] do
+        if r1["result"] == r2["result"] do
+          r1["assay_name"] < r2["assay_name"]
+        else
+          r1["result"] < r2["result"]
+        end
+      else
+        r1["gender"] < r2["gender"]
+      end
+    end
+
+    assert_all_values response, ["gender", "result", "assay_name", "count"], [
+      ["female", "negative", "a", 1],
+      ["female", "negative", "b", 2],
+      ["male", "negative", "a", 1],
+      ["male", "positive", "a", 1],
+      ["male", "positive", "b", 1],
+    ]
+  end
+
   test "group by year(date)" do
     create_result [analytes: [result: "positive"]], {{2010,1,1},{12,0,0}}
     create_result [analytes: [result: "positive"]], {{2010,1,2},{12,0,0}}
