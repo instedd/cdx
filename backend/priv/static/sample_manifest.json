@@ -5,61 +5,73 @@
     "device_models" : ["GX4001", "GX4002"],
     "source_data_type": "json"
   },
-  "field_mapping" : {
-    "patient_name" : {
+  "field_mapping" : [
+    {
+    	"target_field": "patient_name",
       "selector" : "patient_information/name",
       "type" : "core"
     },
-    "assay_name" : {
+    {
+    	"target_field": "assay_name",
       "selector" : "Test/assay_name",
       "type" : "core"
     },
-    "system_user" : {
+    {
+    	"target_field": "system_user",
       "selector" : "doctor_name",
+      "type": "custom" //this field would only be accepted in a signed manifest
     },
-    "analytes" : {
+    {
+    	"target_field": "conditions",
+    	"type": "core",
       "multiple" : true,
-      "selector" : "path/to/analytes_array", // only if multiple:true
-      "condition" : {
-        "selector" : "tested_condition",
-        "value_mappings" : {
-          "*MTB*" : "MTB",
-          "*FLU*" : "H1N1",
-          "*FLUA*" : "A1N1"
-        }
-      },
-      "result" : {
-        "selector" : "Test/result_text",
-        // "selector" : "Test/result/@key",
-        "value_mappings" : {
-          "*NOT DETECTED*" : "negative",
-          "*POSITIVE*" : "positive",
-          "*POSITIVE WITH RIFF*" : "positive with riff"
-        }
-      },
-      "grade_of_resistance" : {
-        "selector" : "resistance",
-        "condition" : ["MTB", "H1N1"], // It only applies to this particular conditions
-        "possible_values": {
-          "range" : {
-            "min" : 0,
-            "max" : 100
-          }
-        }
-      },
+      "selector" : "$.conditions[*].condition", // only if multiple:true
+      "value_mappings" : {
+        "*MTB*" : "MTB",
+        "*FLU*" : "H1N1",
+        "*FLUA*" : "A1N1"
+      }
     },
-    "device_serial_number" : {
+    {
+    	"target_field": "result",
+    	"type": "core",
+      "selector" : "Test/result_text",
+      // "selector" : "Test/result/@key",
+      "value_mappings" : {
+        "*NOT DETECTED*" : "negative",
+        "*POSITIVE*" : "positive",
+        "*POSITIVE WITH RIFF*" : "positive with riff"
+      }
+    },
+    {
+     	"target_field": "grade_of_resistance",
+     	"type": "custom",
+      "selector" : "resistance",
+      "valid_values": {
+        "range" : {
+          "min" : 0,
+          "max" : 100
+        }
+      }
+    },
+    {
+    	"target_field": "device_serial_number",
+    	"type": "core",
       "selector" : "patient_information/name" // how could we prevent this case?
     },
-    "test_type" : {
+    {
+    	"target_field": "test_type",
       "selector" : "Test/test_type",
-      "possible_values" : {
+      "type": "custom",
+      "valid_values" : {
         "options" : [0, 1]
       }
     },
-    "temperature" : {
+    {
+    	"target_field": "temperature",
+    	"type": "custom",
       "selector" : "Test/test_type",
-      "possible_values": {
+      "valid_values": {
         "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
           "min" : -20,
           "max" : 60
@@ -67,9 +79,11 @@
       },
       "indexed" : true
     },
-    "percentage_of_confidence" : {
+    {
+    	"target_field": "percentage_of_confidence",
+    	"type": "custom",
       "selector" : "Test/test_type",
-      "possible_values": {
+      "valid_values": {
         "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
           "min" : 0.001,
           "max" : 999.999
@@ -77,18 +91,22 @@
       },
       "indexed" : true
     },
-    "end_time": {
+    {
+    	"target_field": "end_time",
+    	"type": "custom",
       "selector" : "Test/end_time",
-      "possible_values": {
+      "valid_values": {
         "date" : "iso"
       },
       "indexed" : false
     },
-    "result_text": { //this is accepted only for signed manifests. Eg: "HIV DETECTED > 1.00E06 Copies/mL (log 6.00)"
+    {
+    	"target_field": "result_text", //this is accepted only for signed manifests. Eg: "HIV DETECTED > 1.00E06 Copies/mL (log 6.00)"
+    	"type": "custom",
       "selector" : "assay/result_text",
       "data-type" : "string", // to prevent elastic for automatically indexing with the type of the first received value (eg. integer vs float)
       "pii" : false,
       "indexed" : true
     }
-  }
+  ]
 }
