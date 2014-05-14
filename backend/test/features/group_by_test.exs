@@ -281,25 +281,23 @@ defmodule GroupByTest do
     ]
   end
 
-  # test "group by day(date) and result" do
-  #   create_result [analytes: [result: "positive"]], {{2010,1,4},{12,0,0}}
-  #   create_result [analytes: [result: "positive"]], {{2010,1,4},{13,0,0}}
-  #   create_result [analytes: [result: "negative"]], {{2010,1,4},{14,0,0}}
-  #   create_result [analytes: [result: "positive"]], {{2010,1,5},{12,0,0}}
+  test "group by analyte result and condition" do
+    post_result analytes: [[condition: "MTB", result: "positive"], [condition: "Flu", result: "negative"]]
 
-  #   response = get_updates("group_by=result,#{escape("day(created_at)")}")
-  #   response = Enum.sort response, fn(r1, r2) ->
-  #     if r1["created_at"] == r2["created_at"] do
-  #       r1["result"] < r2["result"]
-  #     else
-  #       r1["created_at"] < r2["created_at"]
-  #     end
-  #   end
+    response = get_updates("group_by=result,condition")
+    response = Enum.sort response, fn(r1, r2) -> r1["result"] < r2["result"] end
 
-  #   assert_all_values response, ["created_at", "result", "count"], [
-  #     ["2010-01-04", "negative", 1],
-  #     ["2010-01-04", "positive", 2],
-  #     ["2010-01-05", "positive", 1],
-  #     ]
-  # end
+    assert_all_values response, ["condition", "result", "count"], [
+      ["Flu", "negative", 1],
+      ["MTB", "positive", 1],
+    ]
+  end
+
+  test "group by a non indexed field raises an error" do
+    post_result analytes: [[condition: "MTB", result: "positive"], [condition: "Flu", result: "negative"]]
+
+    assert_raise RuntimeError, "Trying to group by a non searchable field", fn ->
+      get_updates("group_by=foo")
+    end
+  end
 end

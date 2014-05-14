@@ -3,7 +3,6 @@ defmodule Repo do
 
   def conf do
     current_user = String.strip System.cmd("whoami")
-    env = Mix.env
     case Mix.env do
       :dev ->
         parse_url "ecto://#{current_user}:@localhost/cdp_development"

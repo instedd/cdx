@@ -226,7 +226,7 @@ defmodule TestResult do
 
   # nested fields must appear last in the group by
   defp sort_group_by(fields) do
-    Enum.sort fields, fn(f1, f2) ->
+    group_nested_fields Enum.sort fields, fn(f1, f2) ->
       g1 = classify_group_by_field(f1)
       g2 = classify_group_by_field(f2)
 
@@ -249,32 +249,40 @@ defmodule TestResult do
     end
   end
 
+  defp group_nested_fields([]) do
+    []
+  end
+
+  defp group_nested_fields([field | fields]) do
+    group_nested_fields(classify_group_by_field(field), fields)
+  end
+
+  defp group_nested_fields({:nested, _nesting_field, {:flat, field_name}}, fields) do
+    [{:nested, [{:nested, _nesting_field, {:flat, field_name}}] ++ find_all_in_searchable_fields(fields)}]
+  end
+
+  defp group_nested_fields(field, fields) do
+    [field] ++ group_nested_fields(fields)
+  end
+
   defp process_group_by_buckets(aggregations, all_group_by, results, result, doc_count) do
     count = aggregations["count"]
     if count do
       [first_group_by | other_group_by] = all_group_by
 
-      case classify_group_by_field(first_group_by) do
+      case first_group_by do
         {:range, field, _ranges} ->
-          buckets = count["buckets"]
-          mapping = fn(bucket) -> {field, [normalize(bucket["from"]), normalize(bucket["to"])]} end
+          process_bucket(other_group_by, results, result, count["buckets"], fn(bucket) -> {field, [normalize(bucket["from"]), normalize(bucket["to"])]} end)
         {:date, _interval, field} ->
-          buckets = count["buckets"]
-          mapping = fn(bucket) -> {field, bucket["key_as_string"]} end
-        {:flat, _} ->
-          buckets = count["buckets"]
-          mapping = fn(bucket) -> {first_group_by, bucket["key"]} end
-        {:nested, _nesting_field, {:flat, _field_name}} ->
-          buckets = count["count"]["buckets"]
-          mapping = fn(bucket) -> {first_group_by, bucket["key"]} end
+          process_bucket(other_group_by, results, result, count["buckets"], fn(bucket) -> {field, bucket["key_as_string"]} end)
+        {:flat, field_name} ->
+          process_bucket(other_group_by, results, result, count["buckets"], fn(bucket) -> {field_name, bucket["key"]} end)
+        {:nested, fields} ->
+          process_group_by_buckets(count, fields, results, result, doc_count)
+        {:nested, _nesting_field, {:flat, field_name}} ->
+          process_bucket(other_group_by, results, result, count["buckets"], fn(bucket) -> {field_name, bucket["key"]} end)
         nil ->
-          # TODO Test
           raise "Trying to group by a non searchable field"
-      end
-
-      Enum.reduce buckets, results, fn(bucket, results) ->
-        result = result ++ [mapping.(bucket)]
-        process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
       end
     else
       result = result ++ [count: doc_count]
@@ -282,6 +290,12 @@ defmodule TestResult do
     end
   end
 
+  defp process_bucket(other_group_by, results, result, buckets, mapping) do
+    Enum.reduce buckets, results, fn(bucket, results) ->
+      result = result ++ [mapping.(bucket)]
+      process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
+    end
+  end
   def date_regex do
     ~r/\A(year|month|week|day)\(([^\)]+)\)\Z/
   end
@@ -294,6 +308,10 @@ defmodule TestResult do
     else
       nil
     end
+  end
+
+  defp classify_group_by_field([field_name]) do
+    classify_group_by_field(field_name)
   end
 
   defp classify_group_by_field(field_name) do
@@ -309,6 +327,14 @@ defmodule TestResult do
         find_in_searchable_fields(field_name)
       end
     end
+  end
+
+  defp find_all_in_searchable_fields([name |rest]) do
+    [find_in_searchable_fields(name) | find_all_in_searchable_fields(rest)]
+  end
+
+  defp find_all_in_searchable_fields([]) do
+    []
   end
 
   defp find_in_searchable_fields(name) do
@@ -336,8 +362,30 @@ defmodule TestResult do
     end
   end
 
+  defp process_group_by([]) do
+    []
+  end
+
+  defp process_group_by([{:nested, [nested_field | rest]}]) do
+    case nested_field do
+      {:nested, nesting_field, {:flat, field_name}} ->
+        [
+          count: [
+            nested: [path: nesting_field],
+            aggs: [
+              count: [
+                terms: [field: "#{nesting_field}.#{field_name}"]
+              ] ++ process_group_by(rest)
+            ]
+          ]
+        ]
+      _ ->
+        raise "Trying to group by a non searchable field"
+    end
+  end
+
   defp process_group_by([group_by]) do
-    case classify_group_by_field(group_by) do
+    case group_by do
       {:range, name, ranges} ->
         [count: [range: [field: name, ranges: convert_ranges_to_elastic_search(ranges)]]]
       {:date, interval, field} ->
@@ -348,21 +396,17 @@ defmodule TestResult do
                          "day"   -> "yyyy-MM-dd"
                        end
         [count: [date_histogram: [field: field, interval: interval, format: format]]]
-      {:flat, _} ->
-        [count: [terms: [field: group_by]]]
+      {:flat, field_name} ->
+        [count: [terms: [field: field_name]]]
       {:nested, nesting_field, {:flat, field_name}} ->
         [
-          count: [
-            nested: [path: nesting_field],
-            aggs: [
-              count: [
-                terms: [field: "#{nesting_field}.#{field_name}"]
-              ]
+          aggs: [
+            count: [
+              terms: [field: "#{nesting_field}.#{field_name}"]
             ]
           ]
         ]
-      nil ->
-        # TODO Test
+      _ ->
         raise "Trying to group by a non searchable field"
     end
   end
