@@ -212,6 +212,15 @@ defmodule FilterTest do
     assert response["analytes"]["result"] == "Positive with RIFF resistance"
   end
 
+  test "filters by an result, age and condition" do
+    post_result analytes: [result: "negative", condition: "MTB"], age: 20
+    post_result analytes: [result: "positive", condition: "MTB"], age: 20
+    post_result analytes: [result: "negative", condition: "Flu"], age: 20
+
+    response = get_one_update("result=negative&age=20&condition=Flu")
+    assert response["analytes"]["result"] == "negative"
+  end
+
   test "filters by location", context do
     device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar")
     Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory2].id, device_id: device.id)
