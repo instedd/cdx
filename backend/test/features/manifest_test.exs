@@ -35,4 +35,16 @@ defmodule ManifestTest do
                     %{"patient" => %{"name" => "John"}},
                     %{indexed: %{}, pii: %{"patient_name" => "John"}, custom: %{}}
   end
+
+  test "applies simple manifest to custom non-indexed field" do
+    assert_manifest_application """
+                    [{
+                        "target_field": "temperature",
+                        "selector" : "temperature",
+                        "type" : "custom"
+                    }]
+                    """,
+                    %{"temperature" => 20},
+                    %{indexed: %{}, pii: %{}, custom: %{"temperature" => 20}}
+  end
 end
