@@ -34,7 +34,7 @@ defmodule TestHelpers do
   end
 
   def create_result(result, date \\ :calendar.universal_time(), device \\ "foo") do
-    TestResult.create(device, JSEX.encode!(result), date)
+    TestResultCreation.create(device, JSEX.encode!(result), date)
   end
 
   def get_all_elasticsearch_results do

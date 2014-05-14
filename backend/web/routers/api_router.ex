@@ -14,12 +14,12 @@ defmodule ApiRouter do
   end
 
   post "/devices/:device_key/results" do
-    TestResult.create(device_key, conn.req_body())
+    TestResultCreation.create(device_key, conn.req_body())
     conn.send(200, conn.req_body())
   end
 
   put "/results/:result_uuid/pii" do
-    TestResult.update_pii(result_uuid, JSEX.decode!(conn.req_body()))
+    TestResultCreation.update_pii(result_uuid, JSEX.decode!(conn.req_body()))
     conn.send(200, conn.req_body())
   end
 
@@ -31,6 +31,6 @@ defmodule ApiRouter do
     else
       {:ok, post_body} = JSEX.decode conn.req_body()
     end
-    conn.send(200, JSEX.encode!(TestResult.query(params, post_body)))
+    conn.send(200, JSEX.encode!(TestResultFiltering.query(params, post_body)))
   end
 end

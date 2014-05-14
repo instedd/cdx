@@ -45,7 +45,7 @@ defmodule Elasticsearch do
     {field, [type: :nested, properties: map_fields(nested_fields)]}
   end
 
-  defp map_field(field, type, properties) do
+  defp map_field(field, type, _properties) do
     field_body = case type do
       :multi_field ->
             [
@@ -62,5 +62,4 @@ defmodule Elasticsearch do
   def index_prefix do
     "cdp_institution_#{Mix.env}"
   end
-
 end
