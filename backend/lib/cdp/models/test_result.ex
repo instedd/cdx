@@ -51,6 +51,10 @@ defmodule TestResult do
     ]
   end
 
+  def pii?(field) do
+    Enum.member? sensitive_fields, binary_to_atom(field)
+  end
+
   def find_by_uuid(test_result_uuid) do
     Enum.into([{"uuid", test_result_uuid}, {"pii", find_by_uuid_in_postgres(test_result_uuid).sensitive_data}], %{})
   end
