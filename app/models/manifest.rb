@@ -5,7 +5,7 @@ class Manifest < ActiveRecord::Base
   # before_save :update_version
 
   def update_models
-    JSON.parse(self.definition)["device_models"].each { |model| self.device_models << (DeviceModel.find_or_create_by_name(model))}
+    JSON.parse(self.definition)["device_models"].each { |model| self.device_models << (DeviceModel.find_or_create_by(name: model))}
   end
 
   # def update_version
