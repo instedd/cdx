@@ -56,17 +56,27 @@ defmodule Manifest do
   end
 
   defp check_valid_value(value, target_field, valid_values) do
-    options = valid_values["options"]
-    if options do
+    if options = valid_values["options"]do
       check_value_in_options(value, target_field, options)
-    else
-      value
+    end
+
+    if range = valid_values["range"] do
+      check_value_in_range(value, target_field, range)
     end
   end
 
   defp check_value_in_options(value, target_field, options) do
     unless Enum.member? options, value do
-      raise "'#{value}' is not a valid option for '#{target_field}' (valid options are: #{Enum.join options, ", "})"
+      raise "'#{value}' is not a valid value for '#{target_field}' (valid options are: #{Enum.join options, ", "})"
+    end
+  end
+
+  defp check_value_in_range(value, target_field, range) do
+    min = range["min"]
+    max = range["max"]
+
+    unless min <= value and value <= max do
+      raise "'#{value}' is not a valid value for '#{target_field}' (valid values must be between #{min} and #{max})"
     end
   end
 end

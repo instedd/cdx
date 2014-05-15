@@ -107,6 +107,66 @@ defmodule ManifestTest do
                     }]
                     """,
                     %{"level" => "John Doe"},
-                    "'John Doe' is not a valid option for 'level' (valid options are: low, medium, high)"
+                    "'John Doe' is not a valid value for 'level' (valid options are: low, medium, high)"
+  end
+
+  test "doesn't raise on valid value in range" do
+    assert_manifest_application """
+                    [{
+                        "target_field": "temperature",
+                        "selector" : "temperature",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "valid_values": {
+                          "range": {
+                            "min": 30,
+                            "max": 30
+                          }
+                        }
+                    }]
+                    """,
+                    %{"temperature" => 30},
+                    %{indexed: %{"temperature" => 30}, pii: %{}, custom: %{}}
+  end
+
+  test "raise on invalid value in range (lesser)" do
+    assert_raises_manifest_data_validation """
+                    [{
+                        "target_field": "temperature",
+                        "selector" : "temperature",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "valid_values": {
+                          "range": {
+                            "min": 30,
+                            "max": 31
+                          }
+                        }
+                    }]
+                    """,
+                    %{"temperature" => 29.9},
+                    "'29.9' is not a valid value for 'temperature' (valid values must be between 30 and 31)"
+  end
+
+  test "raise on invalid value in range (greater)" do
+    assert_raises_manifest_data_validation """
+                    [{
+                        "target_field": "temperature",
+                        "selector" : "temperature",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "valid_values": {
+                          "range": {
+                            "min": 30,
+                            "max": 31
+                          }
+                        }
+                    }]
+                    """,
+                    %{"temperature" => 31.1},
+                    "'31.1' is not a valid value for 'temperature' (valid values must be between 30 and 31)"
   end
 end
