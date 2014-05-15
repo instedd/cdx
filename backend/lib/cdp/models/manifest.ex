@@ -63,6 +63,10 @@ defmodule Manifest do
     if range = valid_values["range"] do
       check_value_in_range(value, target_field, range)
     end
+
+    if date = valid_values["date"] do
+      check_value_is_date(value, target_field, date)
+    end
   end
 
   defp check_value_in_options(value, target_field, options) do
@@ -77,6 +81,18 @@ defmodule Manifest do
 
     unless min <= value and value <= max do
       raise "'#{value}' is not a valid value for '#{target_field}' (valid values must be between #{min} and #{max})"
+    end
+  end
+
+  defp check_value_is_date(value, target_field, date_format) do
+    case date_format do
+      "iso" ->
+        case :tempo.parse(:iso8601, {:datetime, value}) do
+          {:error, _} ->
+            raise "'#{value}' is not a valid value for '#{target_field}' (valid value must be an iso date)"
+          {:ok, _} ->
+            :ok
+        end
     end
   end
 end

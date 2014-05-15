@@ -29,6 +29,7 @@ defmodule Cdp.Mixfile do
       { :timex, github: "bitwalker/timex" },
       { :exlager, github: "khia/exlager" },
       { :uuid, github: "avtobiff/erlang-uuid" },
+      { :tempo, github: "selectel/tempo" },
     ]
   end
 end

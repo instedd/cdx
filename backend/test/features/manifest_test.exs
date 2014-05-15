@@ -169,4 +169,38 @@ defmodule ManifestTest do
                     %{"temperature" => 31.1},
                     "'31.1' is not a valid value for 'temperature' (valid values must be between 30 and 31)"
   end
+
+  test "doesn't raise on valid value in date iso" do
+    assert_manifest_application """
+                    [{
+                        "target_field": "sample_date",
+                        "selector" : "sample_date",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "valid_values": {
+                          "date": "iso"
+                        }
+                    }]
+                    """,
+                    %{"sample_date" => "2014-05-14T15:22:11+0000"},
+                    %{indexed: %{"sample_date" => "2014-05-14T15:22:11+0000"}, pii: %{}, custom: %{}}
+  end
+
+  test "raise on invalid value in date iso" do
+    assert_raises_manifest_data_validation """
+                    [{
+                        "target_field": "sample_date",
+                        "selector" : "sample_date",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "valid_values": {
+                          "date": "iso"
+                        }
+                    }]
+                    """,
+                    %{"sample_date" => "John Doe"},
+                    "'John Doe' is not a valid value for 'sample_date' (valid value must be an iso date)"
+  end
 end
