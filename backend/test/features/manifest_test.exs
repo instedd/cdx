@@ -12,7 +12,19 @@ defmodule ManifestTest do
     assert result == expected
   end
 
-  test "applies simple manifest to indexed core field" do
+  defp assert_raises_manifest_data_validation(mappings_json, data, message) do
+    manifest_json = """
+                    {
+                      "field_mapping" : #{mappings_json}
+                    }
+                    """
+    manifest = JSEX.decode!(manifest_json)
+    assert_raise RuntimeError, message, fn ->
+      Manifest.apply(manifest, data)
+    end
+  end
+
+  test "apply to indexed core field" do
     assert_manifest_application """
                     [{
                         "target_field": "assay_name",
@@ -24,7 +36,7 @@ defmodule ManifestTest do
                     %{indexed: %{"assay_name" => "GX4002"}, pii: %{}, custom: %{}}
   end
 
-  test "applies simple manifest to pii core field" do
+  test "apply to pii core field" do
     assert_manifest_application """
                     [{
                         "target_field": "patient_name",
@@ -36,15 +48,65 @@ defmodule ManifestTest do
                     %{indexed: %{}, pii: %{"patient_name" => "John"}, custom: %{}}
   end
 
-  test "applies simple manifest to custom non-indexed field" do
+  test "apply to custom non-pii non-indexed field" do
     assert_manifest_application """
                     [{
                         "target_field": "temperature",
                         "selector" : "temperature",
-                        "type" : "custom"
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": false
                     }]
                     """,
                     %{"temperature" => 20},
                     %{indexed: %{}, pii: %{}, custom: %{"temperature" => 20}}
+  end
+
+  test "apply to custom non-pii indexed field" do
+    assert_manifest_application """
+                    [{
+                        "target_field": "temperature",
+                        "selector" : "temperature",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true
+                    }]
+                    """,
+                    %{"temperature" => 20},
+                    %{indexed: %{"temperature" => 20}, pii: %{}, custom: %{}}
+  end
+
+  test "doesn't raise on valid value in options" do
+    assert_manifest_application """
+                    [{
+                        "target_field": "level",
+                        "selector" : "level",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "valid_values": {
+                          "options": ["low", "medium", "high"]
+                        }
+                    }]
+                    """,
+                    %{"level" => "high"},
+                    %{indexed: %{"level" => "high"}, pii: %{}, custom: %{}}
+  end
+
+  test "raises on invalid value in options" do
+    assert_raises_manifest_data_validation """
+                    [{
+                        "target_field": "level",
+                        "selector" : "level",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "valid_values": {
+                          "options": ["low", "medium", "high"]
+                        }
+                    }]
+                    """,
+                    %{"level" => "John Doe"},
+                    "'John Doe' is not a valid option for 'level' (valid options are: low, medium, high)"
   end
 end
