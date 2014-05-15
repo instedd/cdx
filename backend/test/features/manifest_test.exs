@@ -203,4 +203,61 @@ defmodule ManifestTest do
                     %{"sample_date" => "John Doe"},
                     "'John Doe' is not a valid value for 'sample_date' (valid value must be an iso date)"
   end
+
+  test "applies first value mapping" do
+    assert_manifest_application """
+                    [{
+                        "target_field": "condition",
+                        "selector" : "condition",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "value_mappings" : {
+                          "*MTB*" : "MTB",
+                          "*FLU*" : "H1N1",
+                          "*FLUA*" : "A1N1"
+                        }
+                    }]
+                    """,
+                    %{"condition" => "PATIENT HAS MTB CONDITION"},
+                    %{indexed: %{"condition" => "MTB"}, pii: %{}, custom: %{}}
+  end
+
+  test "applies second value mapping" do
+    assert_manifest_application """
+                    [{
+                        "target_field": "condition",
+                        "selector" : "condition",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "value_mappings" : {
+                          "*MTB*" : "MTB",
+                          "*FLU*" : "H1N1",
+                          "*FLUA*" : "A1N1"
+                        }
+                    }]
+                    """,
+                    %{"condition" => "PATIENT HAS FLU CONDITION"},
+                    %{indexed: %{"condition" => "H1N1"}, pii: %{}, custom: %{}}
+  end
+
+  test "raise on mapping not found" do
+    assert_raises_manifest_data_validation """
+                    [{
+                        "target_field": "condition",
+                        "selector" : "condition",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": true,
+                        "value_mappings" : {
+                          "*MTB*" : "MTB",
+                          "*FLU*" : "H1N1",
+                          "*FLUA*" : "A1N1"
+                        }
+                    }]
+                    """,
+                    %{"condition" => "PATIENT IS OK"},
+                    "'PATIENT IS OK' is not a valid value for 'condition' (valid value must be in one of these forms: *FLU*, *FLUA*, *MTB*)"
+  end
 end

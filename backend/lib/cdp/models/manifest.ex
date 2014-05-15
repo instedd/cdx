@@ -18,6 +18,7 @@ defmodule Manifest do
 
     value = apply_selector(selector, data)
     check_valid_value(value, target_field, mapping["valid_values"])
+    value = apply_value_mappings(value, target_field, mapping["value_mappings"])
 
     key = hash_key(type, target_field, mapping)
     element = result[key]
@@ -93,6 +94,24 @@ defmodule Manifest do
           {:ok, _} ->
             :ok
         end
+    end
+  end
+
+  defp apply_value_mappings(value, target_field, nil) do
+    value
+  end
+
+  defp apply_value_mappings(value, target_field, mappings) do
+    mappings_keys = Dict.keys(mappings)
+    matched_mapping = Enum.find mappings_keys, fn(mapping) ->
+      mapping = String.replace(mapping, "*", ".*")
+      regex = Regex.compile!(mapping)
+      Regex.match?(regex, value)
+    end
+    if matched_mapping do
+      mappings[matched_mapping]
+    else
+      raise "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{Enum.join mappings_keys, ", "})"
     end
   end
 end
