@@ -1,0 +1,21 @@
+:css
+  .checks { display: inline-block; }
+  .checks label { display: inline-block; }
+
+- if manifest.version
+  %p
+    %strong Version:
+    = manifest.version
+
+= form_for(manifest) do |f|
+  - if manifest.errors.present?
+    .alert-container
+      .alert.alert-error
+        %ul
+          - manifest.errors.full_messages.each do |msg|
+            %li= msg
+  %div
+    = f.label :definition
+    = f.text_area :definition
+
+  = f.submit class: 'btn'

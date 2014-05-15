@@ -1,5 +1,4 @@
 defmodule TestResultFiltering do
-  use Timex
 
   def query(params, post_body) do
     conditions = process_conditions(params, [])

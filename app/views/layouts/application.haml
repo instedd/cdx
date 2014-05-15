@@ -15,6 +15,7 @@
   - if current_user
     - top_nav_bar_item 'Institutions', institutions_path, !@institution_tab.nil?
     - top_nav_bar_item 'Locations', locations_path, @in_locations
+    - top_nav_bar_item 'Manifests', manifests_path, (params[:controller] == "manifests")
     - top_nav_bar_item 'Users', users_path, @in_users
   - top_nav_bar_item 'Tour', '#'
   - top_nav_bar_item 'Community', '#'

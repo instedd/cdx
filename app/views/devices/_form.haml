@@ -13,6 +13,9 @@
     = f.label :name
     = f.text_field :name
   %div
+    = f.label :device_model_id
+    = f.collection_select :device_model_id, @device_models, :id, :name
+  %div
     = f.label :laboratories
     .checks
       = f.collection_check_boxes(:laboratory_ids, laboratories, :id, :name) { |b| b.label { b.check_box + b.text } + "<br/>".html_safe }

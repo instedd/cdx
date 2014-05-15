@@ -13,6 +13,7 @@ Cdp::Application.routes.draw do
   end
 
   resources :locations
+  resources :manifests
   resources :users
 
   root :to => 'home#index'
