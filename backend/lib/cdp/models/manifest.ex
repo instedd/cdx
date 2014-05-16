@@ -1,4 +1,12 @@
 defmodule Manifest do
+  use Ecto.Model
+
+  queryable "manifests" do
+    has_many(:device_models_manifests, DeviceModelsManifests)
+    field :version, :integer
+    field :definition
+  end
+
   def apply(manifest, data) do
     result = %{
       indexed: %{},
