@@ -44,5 +44,15 @@ describe Manifest do
     DeviceModel.count.should eq(1)
 
     Manifest.first.device_models.first.should eq(DeviceModel.first)
+
+    manifest = Manifest.first
+
+    manifest.version.should eq(1)
+    manifest.definition = '{"device_models" : "foo", "version" : 2}'
+    manifest.save!
+    DeviceModel.count.should eq(1)
+
+    Manifest.first.device_models.first.should eq(DeviceModel.first)
+    DeviceModel.first.name.should eq("foo")
   end
 end

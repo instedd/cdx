@@ -4,9 +4,10 @@ class Manifest < ActiveRecord::Base
   before_save :update_models
   before_save :update_version
   after_destroy :ensure_no_orphan_models
+  after_save :ensure_no_orphan_models
 
   def update_models
-    self.device_models = JSON.parse(self.definition)["device_models"].map { |model| DeviceModel.find_or_create_by(name: model)}
+    self.device_models = Array(JSON.parse(self.definition)["device_models"] || []).map { |model| DeviceModel.find_or_create_by(name: model)}
   end
 
   def update_version
