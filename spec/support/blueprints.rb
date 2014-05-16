@@ -28,4 +28,9 @@ end
 Device.blueprint do
   institution
   name
+  device_model
+end
+
+DeviceModel.blueprint do
+  name
 end

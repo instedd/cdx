@@ -15,6 +15,7 @@ describe DevicesController do
       post :create, institution_id: institution.id, device: Device.plan
 
       institution.devices.count.should eq(1)
+      Device.first.device_model.should eq(DeviceModel.first)
     end
 
     it "allows another admin to create it" do

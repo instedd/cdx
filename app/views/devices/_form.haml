@@ -14,7 +14,7 @@
     = f.text_field :name
   %div
     = f.label :device_model_id
-    = f.collection_select :device_model_id, @device_models, :id, :name
+    = f.collection_select :device_model_id, device_models, :id, :name
   %div
     = f.label :laboratories
     .checks
