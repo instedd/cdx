@@ -28,9 +28,9 @@ end
 Device.blueprint do
   institution
   name
-  device_model
+  model
 end
 
-DeviceModel.blueprint do
+Model.blueprint do
   name
 end

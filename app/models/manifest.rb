@@ -1,5 +1,5 @@
 class Manifest < ActiveRecord::Base
-  has_and_belongs_to_many :device_models
+  has_and_belongs_to_many :models
 
   before_save :update_models
   before_save :update_version
@@ -7,7 +7,7 @@ class Manifest < ActiveRecord::Base
   after_save :ensure_no_orphan_models
 
   def update_models
-    self.device_models = Array(JSON.parse(self.definition)["device_models"] || []).map { |model| DeviceModel.find_or_create_by(name: model)}
+    self.models = Array(JSON.parse(self.definition)["models"] || []).map { |model| Model.find_or_create_by(name: model)}
   end
 
   def update_version
@@ -15,6 +15,6 @@ class Manifest < ActiveRecord::Base
   end
 
   def ensure_no_orphan_models
-    DeviceModel.includes(:manifests).where('device_models_manifests.manifest_id' => nil).destroy_all
+    Model.includes(:manifests).where('manifests_models.manifest_id' => nil).destroy_all
   end
 end

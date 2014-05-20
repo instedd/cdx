@@ -97,15 +97,15 @@ defmodule TestHelpers do
     laboratory1 = Repo.insert Laboratory.new(institution_id: institution.id, name: "bar", location_id: location1.id)
     laboratory2 = Repo.insert Laboratory.new(institution_id: institution.id, name: "bar2", location_id: location2.id)
     laboratory3 = Repo.insert Laboratory.new(institution_id: institution.id, name: "bar3", location_id: location3.id)
-    device_model = Repo.insert DeviceModel.new(name: "fobar")
-    device = Repo.insert Device.new(institution_id: institution.id, secret_key: "foo", device_model_id: device_model.id)
+    model = Repo.insert Model.new(name: "fobar")
+    device = Repo.insert Device.new(institution_id: institution.id, secret_key: "foo", model_id: model.id)
     Repo.insert DevicesLaboratories.new(laboratory_id: laboratory1.id, device_id: device.id)
     data = JSEX.encode! [result: "positive"]
-    {:ok, institution: institution, institution2: institution2, device_model: device_model, device: device, data: data, root_location: root_location, parent_location: parent_location, location1: location1, location2: location2, location3: location3, laboratory1: laboratory1, laboratory2: laboratory2, laboratory3: laboratory3}
+    {:ok, institution: institution, institution2: institution2, model: model, device: device, data: data, root_location: root_location, parent_location: parent_location, location1: location1, location2: location2, location3: location3, laboratory1: laboratory1, laboratory2: laboratory2, laboratory3: laboratory3}
   end
 
   def clear_database do
-    Enum.each [Institution, Laboratory, Device, TestResult, DeviceModel, DeviceModelsManifests, Manifest], &Repo.delete_all/1
+    Enum.each [Institution, Laboratory, Device, TestResult, Model, ManifestsModels, Manifest], &Repo.delete_all/1
     Tirexs.ElasticSearch.delete "#{Elasticsearch.index_prefix}*", Tirexs.ElasticSearch.Config.new()
   end
 end

@@ -9,7 +9,7 @@ class DevicesController < ApplicationController
   end
 
   expose(:institution) { current_user.visible_institutions.find(params[:institution_id]) }
-  expose(:device_models)
+  expose(:models)
   expose(:laboratories) do
     if institution_admin?
       institution.laboratories
@@ -87,7 +87,7 @@ class DevicesController < ApplicationController
   private
 
   def device_params
-    params.require(:device).permit(:name, :index_name, :device_model_id, laboratory_ids: [])
+    params.require(:device).permit(:name, :index_name, :model_id, laboratory_ids: [])
   end
 
   def check_institution_or_device_admin
