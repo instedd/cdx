@@ -2,7 +2,7 @@ defmodule Manifest do
   use Ecto.Model
 
   queryable "manifests" do
-    has_many(:manifests_models, ManifestsModels)
+    has_many(:device_models_manifests, DeviceModelsManifests)
     field :version, :integer
     field :definition
   end

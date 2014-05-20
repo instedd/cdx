@@ -11,10 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140520153146) do
+ActiveRecord::Schema.define(version: 20140520163711) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "device_models", force: true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "device_models_manifests", id: false, force: true do |t|
+    t.integer "manifest_id"
+    t.integer "device_model_id"
+  end
 
   create_table "devices", force: true do |t|
     t.string   "name"
@@ -22,7 +33,7 @@ ActiveRecord::Schema.define(version: 20140520153146) do
     t.datetime "updated_at"
     t.string   "secret_key"
     t.integer  "institution_id"
-    t.integer  "model_id"
+    t.integer  "device_model_id"
   end
 
   create_table "devices_laboratories", id: false, force: true do |t|
@@ -83,17 +94,6 @@ ActiveRecord::Schema.define(version: 20140520153146) do
   create_table "manifests", force: true do |t|
     t.integer  "version"
     t.text     "definition"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "manifests_models", id: false, force: true do |t|
-    t.integer "manifest_id"
-    t.integer "model_id"
-  end
-
-  create_table "models", force: true do |t|
-    t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
