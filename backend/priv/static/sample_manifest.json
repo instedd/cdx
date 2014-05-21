@@ -19,13 +19,13 @@
     {
     	"target_field": "system_user",
       "selector" : "doctor_name",
-      "type": "custom" //this field would only be accepted in a signed manifest
+      "type": "custom"
     },
     {
     	"target_field": "conditions",
     	"type": "core",
       "multiple" : true,
-      "selector" : "$.conditions[*].condition", // only if multiple:true
+      "selector" : "$.conditions[*].condition",
       "value_mappings" : {
         "*MTB*" : "MTB",
         "*FLU*" : "H1N1",
@@ -36,7 +36,6 @@
     	"target_field": "result",
     	"type": "core",
       "selector" : "Test/result_text",
-      // "selector" : "Test/result/@key",
       "value_mappings" : {
         "*NOT DETECTED*" : "negative",
         "*POSITIVE*" : "positive",
@@ -57,7 +56,7 @@
     {
     	"target_field": "device_serial_number",
     	"type": "core",
-      "selector" : "patient_information/name" // how could we prevent this case?
+      "selector" : "patient_information/name"
     },
     {
     	"target_field": "test_type",
@@ -72,10 +71,10 @@
     	"type": "custom",
       "selector" : "Test/test_type",
       "valid_values": {
-        "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
+        "range" : {
           "min" : -20,
           "max" : 60
-        },
+        }
       },
       "indexed" : true
     },
@@ -84,10 +83,10 @@
     	"type": "custom",
       "selector" : "Test/test_type",
       "valid_values": {
-        "range" : { // the difference between them has to be smaller than 1000, and the precission can't be greater than three decimal places
+        "range" : {
           "min" : 0.001,
           "max" : 999.999
-        },
+        }
       },
       "indexed" : true
     },
@@ -101,10 +100,10 @@
       "indexed" : false
     },
     {
-    	"target_field": "result_text", //this is accepted only for signed manifests. Eg: "HIV DETECTED > 1.00E06 Copies/mL (log 6.00)"
+    	"target_field": "result_text",
     	"type": "custom",
       "selector" : "assay/result_text",
-      "data-type" : "string", // to prevent elastic for automatically indexing with the type of the first received value (eg. integer vs float)
+      "data-type" : "string",
       "pii" : false,
       "indexed" : true
     }
