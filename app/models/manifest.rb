@@ -7,14 +7,18 @@ class Manifest < ActiveRecord::Base
   after_save :ensure_no_orphan_models
 
   def update_models
-    self.device_models = Array(JSON.parse(self.definition)["device_models"] || []).map { |model| DeviceModel.find_or_create_by(name: model)}
+    self.device_models = Array(metadata["device_models"] || []).map { |model| DeviceModel.find_or_create_by(name: model)}
   end
 
   def update_version
-    self.version = JSON.parse(self.definition)["version"]
+    self.version = metadata["version"]
   end
 
   def ensure_no_orphan_models
     DeviceModel.includes(:manifests).where('device_models_manifests.manifest_id' => nil).destroy_all
+  end
+
+  def metadata
+    JSON.parse(self.definition)["metadata"]
   end
 end
