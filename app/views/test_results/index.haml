@@ -1,0 +1,25 @@
+%form
+  Laboratory:
+  %select(name="laboratory")
+    %option(value="") (all)
+    = options_from_collection_for_select laboratories, :id, :name, params["laboratory"]
+  Condition:
+  %input{type: "text", name: "condition", value: params["condition"]}
+  %input{type: "submit", value: "Filter"}
+
+%table.table
+  %tr
+    %th Created at
+    %th Institution
+    %th Laboratory
+    %th Device
+    %th Assay name
+    %th Results
+  - @test_results.each do |result|
+    %tr
+      %td= result["created_at"]
+      %td= @institutions[result["institution_id"]]
+      %td= @laboratories[result["laboratory_id"]]
+      %td= @devices[result["device_uuid"]]
+      %td= result["assay_name"]
+      %td= result["analytes"].map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "

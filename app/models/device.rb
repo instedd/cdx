@@ -11,4 +11,8 @@ class Device < ActiveRecord::Base
   def set_key
     self.secret_key = Guid.new.to_s
   end
+
+  def to_s
+    name
+  end
 end

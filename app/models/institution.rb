@@ -19,4 +19,8 @@ class Institution < ActiveRecord::Base
   def test_result_provider
     ElasticRecord.for index_name, 'test_result'
   end
+
+  def to_s
+    name
+  end
 end

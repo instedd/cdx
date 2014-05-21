@@ -364,6 +364,7 @@ DEPENDENCIES
   rack-oauth2!
   rails (= 4.0.2)
   rails_config
+  rest-client
   rolify
   rspec
   rspec-rails
