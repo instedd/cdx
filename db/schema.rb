@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140515171158) do
+ActiveRecord::Schema.define(version: 20140521153720) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -110,15 +110,15 @@ ActiveRecord::Schema.define(version: 20140515171158) do
   add_index "roles", ["name"], name: "index_roles_on_name", using: :btree
 
   create_table "subscribers", force: true do |t|
+    t.integer  "user_id"
     t.string   "name"
-    t.string   "callback_url"
-    t.integer  "institution_id"
+    t.string   "url"
+    t.text     "filter"
+    t.text     "fields"
+    t.datetime "last_run_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "auth_token"
   end
-
-  add_index "subscribers", ["institution_id"], name: "index_subscribers_on_institution_id", using: :btree
 
   create_table "test_results", force: true do |t|
     t.integer  "device_id"

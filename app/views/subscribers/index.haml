@@ -1,5 +1,0 @@
-.row-fluid
-  .span6
-    - simple_list :subscriber, title: 'Subscribers', icon: :folder, create_path: new_institution_subscriber_path(institution) do
-      - subscribers.each do |subscriber|
-        - simple_list_item subscriber.name, edit_institution_subscriber_path(institution, subscriber)

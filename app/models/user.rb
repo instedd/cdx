@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
   has_many :institutions
   has_many :laboratories, through: :institutions
   has_many :devices, through: :institutions
+  has_many :subscribers
 
   def superadmin?
     has_role? :admin

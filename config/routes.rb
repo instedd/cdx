@@ -9,13 +9,13 @@ Cdp::Application.routes.draw do
         get 'regenerate_key'
       end
     end
-    resources :subscribers
   end
 
   resources :locations
   resources :manifests
   resources :test_results
   resources :users
+  resources :subscribers
 
   root :to => 'home#index'
 end

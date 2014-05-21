@@ -1,61 +1,20 @@
 class SubscribersController < ApplicationController
-  layout "institutions"
-  set_institution_tab :subscribers
-
-  add_breadcrumb 'Institutions', :institutions_path
-  before_filter do
-    add_breadcrumb institution.name, institution_path(institution)
-    add_breadcrumb 'Subscribers', institution_subscribers_path(institution)
-  end
-
-  expose(:institution) { current_user.institutions.find(params[:institution_id]) }
-
-  expose(:subscribers) { institution.subscribers }
-  expose(:subscriber, attributes: :subscriber_params)
-
-  def show
-    add_breadcrumb subscriber.name, institution_subscriber_path(institution, subscriber)
-  end
-
-  def edit
-    add_breadcrumb subscriber.name, institution_subscriber_path(institution, subscriber)
-  end
-
   def create
-    respond_to do |format|
-      if subscriber.save
-        format.html { redirect_to institution_subscribers_path(institution), notice: 'Subscriber was successfully created.' }
-        format.json { render action: 'show', status: :created, location: subscriber }
-      else
-        format.html { render action: 'new' }
-        format.json { render json: subscriber.errors, status: :unprocessable_entity }
-      end
-    end
-  end
+    subscriber = current_user.subscribers.new(subscriber_params)
+    subscriber.last_run_at = Time.now
+    subscriber.filter = params["filter"].to_json
+    subscriber.fields = (params["fields"] || {}).keys.to_json
 
-  def update
-    respond_to do |format|
-      if subscriber.update(subscriber_params)
-        format.html { redirect_to institution_subscribers_path(institution), notice: 'Subscriber was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: subscriber.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  def destroy
-    subscriber.destroy
-    respond_to do |format|
-      format.html { redirect_to institution_subscribers_url(institution) }
-      format.json { head :no_content }
+    if subscriber.save
+      redirect_to test_results_path(params["filter"]), notice: "Subscriber created successfully"
+    else
+      redirect_to test_results_path(params["filter"]), alert: "Couldn't create subscriber"
     end
   end
 
   private
 
   def subscriber_params
-    params.require(:subscriber).permit(:name, :institution_id, :callback_url, :auth_token)
+    params.require(:subscriber).permit(:name, :url)
   end
 end

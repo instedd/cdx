@@ -1,11 +1,34 @@
-%form
-  Laboratory:
-  %select(name="laboratory")
-    %option(value="") (all)
-    = options_from_collection_for_select laboratories, :id, :name, params["laboratory"]
-  Condition:
-  %input{type: "text", name: "condition", value: params["condition"]}
-  %input{type: "submit", value: "Filter"}
+%div{style: 'border: 1px solid gray; padding:10px'}
+  %form
+    Laboratory:
+    %select(name="laboratory")
+      %option(value="") (all)
+      = options_from_collection_for_select laboratories, :id, :name, params["laboratory"]
+    Condition:
+    %input{type: "text", name: "condition", value: params["condition"]}
+    %input{type: "submit", value: "Filter"}
+
+  - if params["laboratory"].present? && params["condition"].present?
+    = form_for(Subscriber.new) do |f|
+      = hidden_field :filter, :laboratory, value: params["laboratory"]
+      = hidden_field :filter, :condition, value: params["condition"]
+      %div
+        Create a subscriber for this filter (laboratory: #{@laboratories[params["laboratory"].to_i]}, condition: #{params["condition"]}):
+      %div
+        = f.label :name
+        = f.text_field :name
+      %div
+        = f.label :url, "URL"
+        = f.text_field :url
+      %div
+        = f.label :fields
+        - ["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code", "created_at", "device_uuid", "institution_id", "laboratory_id", "location_id", "assay_name", "device_serial_number", "age", "gender", "system_user", "start_time", "condition", "result"].each do |field|
+          %label
+            = check_box_tag "fields[#{field}]", true
+            = field
+      %input{type: "submit", value: "Create subscriber"}
+
+%br
 
 %table.table
   %tr

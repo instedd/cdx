@@ -1,11 +1,9 @@
 class Subscriber < ActiveRecord::Base
-  belongs_to :institution
+  belongs_to :user
 
-  def enqueue_notification test_result
-    if Rails.env.test?
-      SubscriptionDispatcher.new(nil, nil, {test_result: test_result, subscriber: self}.to_json).run
-    else
-      Rabbitmq.active_connection.enqueue test_result: test_result, subscriber: self
-    end
-  end
+  validates_presence_of :user
+  validates_presence_of :name
+  validates_presence_of :url
+  validates_presence_of :filter
+  validates_presence_of :fields
 end
