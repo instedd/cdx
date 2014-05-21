@@ -18,13 +18,26 @@ defmodule TestResultCreation do
   end
 
   def create(device_key, raw_data, date \\ :calendar.universal_time()) do
-    device = Device.find_by_key(device_key)
+    create(Device.find_by_key(device_key), raw_data, JSEX.decode!(raw_data), date, :erlang.iolist_to_binary(:uuid.to_string(:uuid.uuid1())))
+  end
 
-    {:ok, data} = JSEX.decode raw_data
-
-    uuid = :erlang.iolist_to_binary(:uuid.to_string(:uuid.uuid1()))
+  def create({device, [], laboratories}, raw_data, data, date, uuid) do
     create_in_db(device, data, raw_data, date, uuid)
-    create_in_elasticsearch(device, data, date, uuid)
+    # TODO: when no manifest is found we should use a default mapping
+    data = Dict.drop(data, (Enum.map TestResult.sensitive_fields, &atom_to_binary(&1)))
+    create_in_elasticsearch(device, laboratories, data, date, uuid)
+  end
+
+  def create({device, [manifest], laboratories}, raw_data, data, date, uuid) do
+    data = Manifest.apply(JSEX.decode!(manifest.definition), data)
+
+    create_in_db(device, data, raw_data, date, uuid)
+    create_in_elasticsearch(device, laboratories, data[:indexed], date, uuid)
+  end
+
+  def create({device, [manifest | manifests], laboratories}, raw_data, data, date, uuid) do
+    # TODO: Take the last version of the manifest
+    create({device, [manifest], laboratories}, raw_data, data, date, uuid)
   end
 
   defp create_in_db(device, data, raw_data, date, uuid) do
@@ -47,29 +60,29 @@ defmodule TestResultCreation do
     Repo.insert(test_result)
   end
 
-  defp create_in_elasticsearch(device, data, date, uuid) do
-    institution_id = device.institution_id
+  defp create_in_elasticsearch(device, [], data, date, uuid) do
+    create_in_elasticsearch(device, nil, [], nil, date, data, uuid)
+  end
 
-    data = Dict.drop(data, (Enum.map TestResult.sensitive_fields, &atom_to_binary(&1)))
+  defp create_in_elasticsearch(device, [laboratory], data, date, uuid) do
+    laboratory_id = laboratory.id
+    location_id = laboratory.location_id
+    parent_locations = Location.with_parents Repo.get(Location, laboratory.location_id)
+    create_in_elasticsearch(device, laboratory_id, parent_locations, location_id, date, data, uuid)
+  end
 
-    laboratories = Enum.map device.devices_laboratories.to_list, fn dl -> dl.laboratory.get end
-    case laboratories do
-      [lab | t ] when t != [] ->
-        laboratory_id = nil
-        locations = (Enum.map [lab|t], fn lab -> Repo.get Location, lab.location_id end)
-        root_location = Location.common_root(locations)
-        parent_locations = Location.with_parents root_location
-        if root_location do
-          location_id = root_location.id
-        end
-      [lab | []] when lab != nil ->
-        laboratory_id = lab.id
-        location_id = lab.location_id
-        parent_locations = Location.with_parents Repo.get(Location, lab.location_id)
-      _ ->
-        parent_locations = []
+  defp create_in_elasticsearch(device, laboratories, data, date, uuid) do
+    locations = (Enum.map laboratories, fn laboratory -> Repo.get Location, laboratory.location_id end)
+    root_location = Location.common_root(locations)
+    parent_locations = Location.with_parents root_location
+    if root_location do
+      location_id = root_location.id
     end
+    create_in_elasticsearch(device, nil, parent_locations, location_id, date, data, uuid)
+  end
 
+  defp create_in_elasticsearch(device, laboratory_id, parent_locations, location_id, date, data, uuid) do
+    institution_id = device.institution_id
     data = Dict.put data, :type, "test_result"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.from(date), "{ISO}"))
     data = Dict.put data, :device_uuid, device.secret_key
