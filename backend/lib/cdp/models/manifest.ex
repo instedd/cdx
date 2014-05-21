@@ -23,33 +23,36 @@ defmodule Manifest do
     target_field = mapping["target_field"]
     selector = mapping["selector"]
     type = mapping["type"]
+    pii = mapping["pii"]
 
     value = apply_selector(selector, data)
     check_valid_value(value, target_field, mapping["valid_values"])
     value = apply_value_mappings(value, target_field, mapping["value_mappings"])
 
-    key = hash_key(type, target_field, mapping)
+    key = hash_key(type, target_field, mapping["indexed"], pii)
     element = result[key]
     element = Dict.put(element, target_field, value)
     Dict.put(result, key, element)
   end
 
-  defp hash_key(type, target_field, mapping) do
-    case type do
-      "core" ->
-        if TestResult.pii?(target_field) do
-          :pii
-        else
-          :indexed
-        end
-      "custom" ->
-        indexed = mapping["indexed"]
-        if indexed do
-          :indexed
-        else
-          :custom
-        end
+  defp hash_key("core", target_field, _, _) do
+    if TestResult.pii?(target_field) do
+      :pii
+    else
+      :indexed
     end
+  end
+
+  defp hash_key("custom", target_field, _, true) do
+    :pii
+  end
+
+  defp hash_key("custom", target_field, true, false) do
+    :indexed
+  end
+
+  defp hash_key("custom", target_field, false, false) do
+    :custom
   end
 
   defp apply_selector(selector, data) do

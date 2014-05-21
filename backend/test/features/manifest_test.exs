@@ -76,6 +76,20 @@ defmodule ManifestTest do
                     %{indexed: %{"temperature" => 20}, pii: %{}, custom: %{}}
   end
 
+  test "apply to custom pii field" do
+    assert_manifest_application """
+                    [{
+                        "target_field": "temperature",
+                        "selector" : "temperature",
+                        "type" : "custom",
+                        "pii": true,
+                        "indexed": false
+                    }]
+                    """,
+                    %{"temperature" => 20},
+                    %{indexed: %{}, pii: %{"temperature" => 20}, custom: %{}}
+  end
+
   test "doesn't raise on valid value in options" do
     assert_manifest_application """
                     [{
