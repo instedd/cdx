@@ -22,16 +22,20 @@ defmodule TestResultCreation do
   end
 
   def create({device, [], laboratories}, raw_data, data, date, uuid) do
-    create_in_db(device, data, raw_data, date, uuid)
     # TODO: when no manifest is found we should use a default mapping
+
+    sensitive_data = Enum.map TestResult.sensitive_fields, fn field_name ->
+      {field_name, data[atom_to_binary(field_name)]}
+    end
+    create_in_db(device, sensitive_data, raw_data, date, uuid)
+
     data = Dict.drop(data, (Enum.map TestResult.sensitive_fields, &atom_to_binary(&1)))
     create_in_elasticsearch(device, laboratories, data, date, uuid)
   end
 
   def create({device, [manifest], laboratories}, raw_data, data, date, uuid) do
     data = Manifest.apply(JSEX.decode!(manifest.definition), data)
-
-    create_in_db(device, data, raw_data, date, uuid)
+    create_in_db(device, data[:pii], raw_data, date, uuid)
     create_in_elasticsearch(device, laboratories, data[:indexed], date, uuid)
   end
 
@@ -40,12 +44,8 @@ defmodule TestResultCreation do
     create({device, [manifest], laboratories}, raw_data, data, date, uuid)
   end
 
-  defp create_in_db(device, data, raw_data, date, uuid) do
+  defp create_in_db(device, sensitive_data, raw_data, date, uuid) do
     date = Ecto.DateTime.from_erl(date)
-
-    sensitive_data = Enum.map TestResult.sensitive_fields, fn field_name ->
-      {field_name, data[atom_to_binary(field_name)]}
-    end
 
     test_result = TestResult.new [
       device_id: device.id,
