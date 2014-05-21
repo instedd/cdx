@@ -39,8 +39,14 @@ defmodule TestResultCreation do
     create_in_elasticsearch(device, laboratories, data[:indexed], date, uuid)
   end
 
-  def create({device, [manifest | manifests], laboratories}, raw_data, data, date, uuid) do
-    # TODO: Take the last version of the manifest
+  def create({device, [manifest| manifests], laboratories}, raw_data, data, date, uuid) do
+    manifest = Enum.reduce manifests, manifest, fn(current_manifest, last_manifest) ->
+      if last_manifest.version < current_manifest.version do
+        current_manifest
+      else
+        last_manifest
+      end
+    end
     create({device, [manifest], laboratories}, raw_data, data, date, uuid)
   end
 
