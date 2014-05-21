@@ -20,7 +20,12 @@
         age: $("#age").val(),
         gender: $("#gender").val(),
         assay_name: $("#assay_name").val(),
-        result: $("#result").val()
+        analytes: [
+          {
+            condition: $("#condition").val(),
+            result: $("#result").val()
+          }
+        ]
       }
 
       $.ajax({
@@ -104,6 +109,10 @@
         <div>
           <label for="assay_name">Assay name</label>
           <input id="assay_name" name="assay_name" type="text" value="GX4001" />
+        </div>
+        <div>
+          <label for="condition">Condition</label>
+          <input id="condition" name="condition" type="text" value="MTB" />
         </div>
         <div>
           <label for="result">Result</label>
