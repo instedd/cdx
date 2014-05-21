@@ -9,9 +9,7 @@ class TestResultsController < ApplicationController
     query = {}
     query["laboratory"] = params["laboratory"] if params["laboratory"].present?
     query["condition"] = params["condition"] if params["condition"].present?
-    url = "http://localhost:4000/api/results?#{query.to_query}"
-
-    puts url
+    url = "#{Settings.backend}/api/results?#{query.to_query}"
 
     @test_results = JSON.parse RestClient.get(url)
     @institutions = indexed_model @test_results, Institution, "institution_id"
