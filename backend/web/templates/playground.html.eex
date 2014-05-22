@@ -87,8 +87,7 @@
         </div>
         <div>
           <label for="data">Data</label>
-          <textarea id="data" name="data" style="width:300px;height:300px">
-{
+          <textarea id="data" name="data" style="width:300px;height:300px;font-family:monospace">{
   "gender": "male",
   "age": 20,
   "assay_name": "GX4001",
@@ -98,8 +97,7 @@
       "result": "positive"
     }
   ]
-}
-          </textarea>
+}</textarea>
         </div>
         <div>
           <input id="create_button" class="btn" name="commit" type="submit" value="Create test result" />
@@ -113,11 +111,11 @@
         <div class='row-fluid'>
           <div class='span5'>
             <label for="query_string">Query string</label>
-            <textarea id="query_string" name="query_string" style="width:300px;height:50px">age=20</textarea>
+            <textarea id="query_string" name="query_string" style="width:300px;height:50px;font-family:monospace">age=20</textarea>
           </div>
           <div class='span5'>
             <label for="post_body">Request Body</label>
-            <textarea id="post_body" name="post_body" style="width:300px;height:50px"></textarea>
+            <textarea id="post_body" name="post_body" style="width:300px;height:50px;font-family:monospace"></textarea>
           </div>
         </div>
         <div>
