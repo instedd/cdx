@@ -53,8 +53,8 @@ defmodule MappingTest do
 
     test_uuid = result["_source"]["uuid"]
 
-    updated_result = get_pii(test_uuid)
-    pii = updated_result["pii"]
+    result = get_pii(test_uuid)
+    pii = result["pii"]
     assert pii["patient_id"] == nil
     assert pii["foo"] == 1234
   end
@@ -87,5 +87,38 @@ defmodule MappingTest do
     [result] = get_all_elasticsearch_results()
     assert result["_source"]["foo"] == nil
     assert result["_source"]["assay_name"] == "GX4002"
+  end
+
+  test "stores custom fields according to the manifest", context do
+    device_model = Repo.insert DeviceModel.new(name: "fobar")
+    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
+
+    manifest = Repo.insert Manifest.new(definition: """
+                    { "field_mapping" : [
+                      {
+                        "target_field": "foo",
+                        "selector" : "some_field",
+                        "type" : "custom",
+                        "pii": false,
+                        "indexed": false
+                      }
+                    ]}
+                    """, version: 1)
+    Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
+
+    post("/api/devices/bar/results", JSEX.encode!(%{"some_field" => 1234}))
+
+    [result] = get_all_elasticsearch_results()
+    assert result["_source"]["foo"] == nil
+
+    test_uuid = result["_source"]["uuid"]
+
+    result = get_pii(test_uuid)
+    pii = result["pii"]
+    assert pii["some_field"] == nil
+    assert pii["foo"] == nil
+
+    [test_result] = Repo.all TestResult
+    assert JSEX.decode!(test_result.custom_fields)["foo"] == 1234
   end
 end

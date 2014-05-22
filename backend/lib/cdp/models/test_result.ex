@@ -7,6 +7,7 @@ defmodule TestResult do
     field :created_at, :datetime
     field :updated_at, :datetime
     field :uuid
+    field :custom_fields
     field :raw_data, :binary
     field :sensitive_data, :binary
   end

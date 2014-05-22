@@ -27,7 +27,7 @@ defmodule TestResultCreation do
     sensitive_data = Enum.map TestResult.sensitive_fields, fn field_name ->
       {field_name, data[atom_to_binary(field_name)]}
     end
-    create_in_db(device, sensitive_data, raw_data, date, uuid)
+    create_in_db(device, sensitive_data, [], raw_data, date, uuid)
 
     data = Dict.drop(data, (Enum.map TestResult.sensitive_fields, &atom_to_binary(&1)))
     create_in_elasticsearch(device, laboratories, data, date, uuid)
@@ -35,7 +35,7 @@ defmodule TestResultCreation do
 
   def create({device, [manifest], laboratories}, raw_data, data, date, uuid) do
     data = Manifest.apply(JSEX.decode!(manifest.definition), data)
-    create_in_db(device, data[:pii], raw_data, date, uuid)
+    create_in_db(device, data[:pii], data[:custom], raw_data, date, uuid)
     create_in_elasticsearch(device, laboratories, data[:indexed], date, uuid)
   end
 
@@ -50,7 +50,7 @@ defmodule TestResultCreation do
     create({device, [manifest], laboratories}, raw_data, data, date, uuid)
   end
 
-  defp create_in_db(device, sensitive_data, raw_data, date, uuid) do
+  defp create_in_db(device, sensitive_data, custom_data, raw_data, date, uuid) do
     date = Ecto.DateTime.from_erl(date)
 
     test_result = TestResult.new [
@@ -58,6 +58,7 @@ defmodule TestResultCreation do
       raw_data: raw_data,
       uuid: uuid,
       sensitive_data: sensitive_data,
+      custom_fields: JSEX.encode!(custom_data),
       created_at: date,
       updated_at: date,
     ]
