@@ -16,22 +16,12 @@
       $create_button.prop("disabled", true);
       $create_button.val("Creating...");
       device = $("#device").val();
-      data = {
-        age: $("#age").val(),
-        gender: $("#gender").val(),
-        assay_name: $("#assay_name").val(),
-        analytes: [
-          {
-            condition: $("#condition").val(),
-            result: $("#result").val()
-          }
-        ]
-      }
+      data = $("#data").val();
 
       $.ajax({
         url: "/api/devices/" + device + "/results",
         type: "POST",
-        data: JSON.stringify(data),
+        data: data,
         contentType: "application/json; charset=utf-8",
         success: function(data, textStatus, jqXHR) {
           $create_button.prop("disabled", false);
@@ -84,7 +74,7 @@
 <body>
   <h3>CDP - Playground</h3>
   <div class='row-fluid'>
-    <div class='span3' style="border-right:1px solid black">
+    <div class='span4' style="border-right:1px solid black">
       <h4>Submit test result</h4>
       <form id="report_form" method="post">
         <div>
@@ -96,43 +86,36 @@
           </select>
         </div>
         <div>
-          <label for="age">Age</label>
-          <input id="age" name="age" type="number" value="20" />
-        </div>
-        <div>
-          <label for="gender">Gender</label>
-          <select id="gender" name="gender">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-        <div>
-          <label for="assay_name">Assay name</label>
-          <input id="assay_name" name="assay_name" type="text" value="GX4001" />
-        </div>
-        <div>
-          <label for="condition">Condition</label>
-          <input id="condition" name="condition" type="text" value="MTB" />
-        </div>
-        <div>
-          <label for="result">Result</label>
-          <input id="result" name="result" type="text" value="positive" />
+          <label for="data">Data</label>
+          <textarea id="data" name="data" style="width:300px;height:300px">
+{
+  "gender": "male",
+  "age": 20,
+  "assay_name": "GX4001",
+  "analytes": [
+    {
+      "condiiton": "MTB",
+      "result": "positive"
+    }
+  ]
+}
+          </textarea>
         </div>
         <div>
           <input id="create_button" class="btn" name="commit" type="submit" value="Create test result" />
         </div>
       </form>
     </div>
-    <div class='span9'>
+    <div class='span8'>
       <h4>Query results</h4>
 
       <form id="query_form" method="post">
         <div class='row-fluid'>
-          <div class='span4'>
+          <div class='span5'>
             <label for="query_string">Query string</label>
             <textarea id="query_string" name="query_string" style="width:300px;height:50px">age=20</textarea>
           </div>
-          <div class='span4'>
+          <div class='span5'>
             <label for="post_body">Request Body</label>
             <textarea id="post_body" name="post_body" style="width:300px;height:50px"></textarea>
           </div>
