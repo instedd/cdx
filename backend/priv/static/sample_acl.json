@@ -1,128 +1,117 @@
-AdministratorAccess-johndoe-201405231008
+SuperAdmin:
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "*",
-      "Resource": "*"
-    }
+  "creator" :  null,
+  "delegable": true,
+  "effect": "allow", // deny - default:allow
+  "action": "*", // not_action
+  "resouce": "*",
+  "condition": []
+}
+
+Everyone (implicit):
+{
+  "action": "*",
+  "resource": "*",
+  "condition": "creator == self"
+}
+
+Permission to add locations under location with id 7:
+{
+  "action": "locations#*",
+  "resource": "cdp:location/5/7/*"
+}
+
+Create a device in any lab of institution 1:
+{
+  "action": "devices#create",
+  "resource": [
+    "cdp:laboratory/*",
+    "cdp:institution/1"
   ]
 }
 
-PowerUserAccess-johndoe-201405231009
+Admin for devices under location 7:
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "NotAction": "iam:*",
-      "Resource": "*"
-    }
+  "action": "devices#*",
+  "resource": [
+    "cdp:institution/1",
+    "cdp:laboratory/*",
+    "cdp:location/5/7/*"
   ]
 }
 
-ReadOnlyAccess-johndoe-201405231009
+Admin for devices under location 7 (option B):
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "appstream:Get*",
-        "autoscaling:Describe*",
-        "cloudformation:DescribeStacks",
-        "cloudformation:DescribeStackEvents",
-        "cloudformation:DescribeStackResources",
-        "cloudformation:GetTemplate",
-        "cloudformation:List*",
-        "cloudfront:Get*",
-        "cloudfront:List*",
-        "cloudtrail:DescribeTrails",
-        "cloudtrail:GetTrailStatus",
-        "cloudwatch:Describe*",
-        "cloudwatch:Get*",
-        "cloudwatch:List*",
-        "directconnect:Describe*",
-        "dynamodb:GetItem",
-        "dynamodb:BatchGetItem",
-        "dynamodb:Query",
-        "dynamodb:Scan",
-        "dynamodb:DescribeTable",
-        "dynamodb:ListTables",
-        "ec2:Describe*",
-        "elasticache:Describe*",
-        "elasticbeanstalk:Check*",
-        "elasticbeanstalk:Describe*",
-        "elasticbeanstalk:List*",
-        "elasticbeanstalk:RequestEnvironmentInfo",
-        "elasticbeanstalk:RetrieveEnvironmentInfo",
-        "elasticloadbalancing:Describe*",
-        "elastictranscoder:Read*",
-        "elastictranscoder:List*",
-        "iam:List*",
-        "iam:Get*",
-        "opsworks:Describe*",
-        "opsworks:Get*",
-        "route53:Get*",
-        "route53:List*",
-        "redshift:Describe*",
-        "redshift:ViewQueriesInConsole",
-        "rds:Describe*",
-        "rds:ListTagsForResource",
-        "s3:Get*",
-        "s3:List*",
-        "sdb:GetAttributes",
-        "sdb:List*",
-        "sdb:Select*",
-        "ses:Get*",
-        "ses:List*",
-        "sns:Get*",
-        "sns:List*",
-        "sqs:GetQueueAttributes",
-        "sqs:ListQueues",
-        "sqs:ReceiveMessage",
-        "storagegateway:List*",
-        "storagegateway:Describe*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
+  "action": "*",
+  "resource": "cdp:device",
+  "condition" : [
+    "cdp:institution == 1",
+    "cdp:location == 5/7/*"
   ]
 }
 
-CloudFrontFullAccess-johndoe-201405231010
+Institution Admin under location 7:
+Statements: [
+  {
+    "action" : "*",
+    "resource" : "cdp:laboratory/*",
+    "condition": [
+      "cdp:institution == 1",
+      "cdp:location == 5/7/*"
+    ]
+  },
+  {
+    "action" : "*",
+    "resource" : "cdp:device/*",
+    "condition": "cdp:institution == 1"
+  }
+]
+
+Institution Admin under location 7 (option B):
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "s3:ListAllMyBuckets"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::*"
-    },
-    {
-      "Action": [
-        "cloudfront:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
+  "action" : [
+    "device#list",
+    "device#retrieve",
+    "device#create",
+    "device#update",
+    "device#delete",
+    "laboratory#list",
+    "laboratory#retrieve",
+    "laboratory#create",
+    "laboratory#update",
+    "laboratory#delete",
+    "institution#update",
+    "institution#delete",
+  ],
+  "resource" : "*",
+  "condition": [
+    "cdp:location == 5/7/*",
+    "cdp:institution == 1"
   ]
 }
 
-CloudFrontReadOnlyAccess-johndoe-201405231010
+Institution Admin:
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "cloudfront:Get*",
-        "cloudfront:List*",
-        "route53:List*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
-  ]
+  "action" : "*",
+  "resource" : [
+    "cdp:laboratory/*",
+    "cdp:device/*",
+  ],
+  "condition" : "cdp:institution == 1"
+}
+
+Institution Admin (option B):
+{
+  "action" : [
+    "device#create",
+    "device#update",
+    "device#delete",
+    "laboratory#create",
+    "laboratory#update",
+    "laboratory#delete",
+    "institution#update",
+    "institution#delete",
+  ],
+  "resource" : "*",
+  "condition": "cdp:institution == 1"
 }
