@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140526174156) do
+ActiveRecord::Schema.define(version: 20140526181013) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -94,6 +94,15 @@ ActiveRecord::Schema.define(version: 20140526174156) do
   create_table "manifests", force: true do |t|
     t.integer  "version"
     t.text     "definition"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "policies", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "granter_id"
+    t.text     "definition"
+    t.boolean  "delegable"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

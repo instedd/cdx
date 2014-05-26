@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
   has_many :laboratories, through: :institutions
   has_many :devices, through: :institutions
   has_many :subscribers
+  has_many :policies
 
   def create(model)
     if model.respond_to?(:user=)
