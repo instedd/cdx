@@ -2,8 +2,8 @@ class SubscribersController < ApplicationController
   def create
     subscriber = current_user.subscribers.new(subscriber_params)
     subscriber.last_run_at = Time.now
-    subscriber.filter = params["filter"].to_json
-    subscriber.fields = (params["fields"] || {}).keys.to_json
+    subscriber.filter = params["filter"]
+    subscriber.fields = (params["fields"] || {}).keys
 
     if subscriber.save
       redirect_to test_results_path(params["filter"]), notice: "Subscriber created successfully"

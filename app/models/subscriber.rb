@@ -1,6 +1,9 @@
 class Subscriber < ActiveRecord::Base
   belongs_to :user
 
+  serialize :filter, JSON
+  serialize :fields, JSON
+
   validates_presence_of :user
   validates_presence_of :name
   validates_presence_of :url
@@ -14,8 +17,8 @@ class Subscriber < ActiveRecord::Base
   end
 
   def notify
-    fields = JSON.parse self.fields
-    filter = JSON.parse self.filter
+    fields = self.fields
+    filter = self.filter
     filter["since"] = last_run_at.iso8601
     backend_url = "#{Settings.backend}/api/results?#{filter.to_query}"
     results = JSON.parse RestClient.get backend_url
