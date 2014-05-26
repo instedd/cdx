@@ -4,10 +4,8 @@ class InstitutionsController < ApplicationController
 
   add_breadcrumb 'Institutions', :institutions_path
 
-  expose(:institutions) { current_user.visible_institutions }
+  expose(:institutions) { current_user.institutions }
   expose(:institution, attributes: :institution_params)
-
-  before_action :check_institution_admin, only: [:update, :destroy]
 
   def index
   end

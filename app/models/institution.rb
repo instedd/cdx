@@ -1,8 +1,5 @@
 class Institution < ActiveRecord::Base
-  resourcify
-
   belongs_to :user
-  has_many :subscribers, dependent: :destroy
   has_many :laboratories, dependent: :destroy
   has_many :devices, dependent: :destroy
 

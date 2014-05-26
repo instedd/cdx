@@ -8,13 +8,6 @@ class ApplicationController < ActionController::Base
     strategy DecentExposure::StrongParametersStrategy
   end
 
-  expose(:superadmin?) { current_user.superadmin? }
-  expose(:institution_admin?) { current_user.has_role? :admin, institution }
-
-  def check_institution_admin
-    head :unauthorized unless institution_admin?
-  end
-
   def render_json(object, params={})
     render params.merge(text: object.to_json_oj, content_type: 'text/json')
   end

@@ -1,5 +1,5 @@
 .row-fluid
   .span6
-    - simple_list :device, title: 'Devices', icon: :folder, create_path: (institution_admin? && new_institution_device_path(institution)) do
+    - simple_list :device, title: 'Devices', icon: :folder, create_path: new_institution_device_path(institution) do
       - devices.each do |device|
         - simple_list_item device.name, edit_institution_device_path(institution, device)
