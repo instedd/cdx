@@ -1,29 +1,28 @@
 SuperAdmin:
 {
-  "creator" :  null,
+  "granter" :  null,
   "delegable": true,
   "effect": "allow", // deny - default:allow
   "action": "*", // not_action
-  "resouce": "*",
-  "condition": []
+  "resouce": "*"
 }
 
 Everyone (implicit):
 {
   "action": "*",
   "resource": "*",
-  "condition": "creator == self"
+  "condition": {"equals" : {"owner" : ["self"]}}
 }
 
 Permission to add locations under location with id 7:
 {
-  "action": "locations#*",
+  "action": "adminLocations",
   "resource": "cdp:location/5/7/*"
 }
 
 Create a device in any lab of institution 1:
 {
-  "action": "devices#create",
+  "action": "createDevices",
   "resource": [
     "cdp:laboratory/*",
     "cdp:institution/1"
@@ -32,10 +31,10 @@ Create a device in any lab of institution 1:
 
 Admin for devices under location 7:
 {
-  "action": "devices#*",
+  "action": "adminDevices",
   "resource": [
     "cdp:institution/1",
-    "cdp:laboratory/*",
+    "cdp:laboratory",
     "cdp:location/5/7/*"
   ]
 }
@@ -45,48 +44,56 @@ Admin for devices under location 7 (option B):
   "action": "*",
   "resource": "cdp:device",
   "condition" : [
-    "cdp:institution == 1",
-    "cdp:location == 5/7/*"
+    {"equals" : {"cdp:institution" : [1]}},
+    {"like" : {"cdp:location":["5/7/*"]}}
   ]
 }
 
 Institution Admin under location 7:
 Statements: [
   {
-    "action" : "*",
-    "resource" : "cdp:laboratory/*",
-    "condition": [
-      "cdp:institution == 1",
-      "cdp:location == 5/7/*"
+    "action" : "*", //"adminAll" ?
+    "resource" : "cdp:laboratory",
+    "condition" : [
+      {"equals" : {"cdp:institution" : [1]}},
+      {"like" : {"cdp:location":["5/7/*"]}}
     ]
   },
   {
     "action" : "*",
-    "resource" : "cdp:device/*",
-    "condition": "cdp:institution == 1"
+    "resource" : "cdp:device",
+    "condition": {"equals" : {"cdp:institution" : [1]}}
+  },
+  {
+    "action" : [
+      "updateInstitution",
+      "deleteInstitution"
+    ],
+    "resource" : "cdp:institution",
+    "condition": {"equals" : {"cdp:institution" : [1]}}
   }
 ]
 
 Institution Admin under location 7 (option B):
 {
   "action" : [
-    "device#list",
-    "device#retrieve",
-    "device#create",
-    "device#update",
-    "device#delete",
-    "laboratory#list",
-    "laboratory#retrieve",
-    "laboratory#create",
-    "laboratory#update",
-    "laboratory#delete",
-    "institution#update",
-    "institution#delete",
+    "listDevice",
+    "retrieveDevice",
+    "createDevice",
+    "updateDevice",
+    "deleteDevice",
+    "listLaboratory",
+    "retrieveLaboratory",
+    "createLaboratory",
+    "updateLaboratory",
+    "deleteLaboratory",
+    "updateInstitution",
+    "deleteInstitution"
   ],
   "resource" : "*",
   "condition": [
-    "cdp:location == 5/7/*",
-    "cdp:institution == 1"
+    {"like" : {"cdp:location":["5/7/*"]}},
+    {"equals" : {"cdp:institution" : [1]}}
   ]
 }
 
@@ -94,24 +101,28 @@ Institution Admin:
 {
   "action" : "*",
   "resource" : [
-    "cdp:laboratory/*",
-    "cdp:device/*",
+    "cdp:laboratory",
+    "cdp:device",
   ],
-  "condition" : "cdp:institution == 1"
+  "condition" : {"equals" : {"cdp:institution" : [1]}}
 }
 
 Institution Admin (option B):
 {
   "action" : [
-    "device#create",
-    "device#update",
-    "device#delete",
-    "laboratory#create",
-    "laboratory#update",
-    "laboratory#delete",
-    "institution#update",
-    "institution#delete",
+    "listDevice",
+    "retrieveDevice",
+    "createDevice",
+    "updateDevice",
+    "deleteDevice",
+    "listLaboratory",
+    "retrieveLaboratory",
+    "createLaboratory",
+    "updateLaboratory",
+    "deleteLaboratory",
+    "updateInstitution",
+    "deleteInstitution"
   ],
   "resource" : "*",
-  "condition": "cdp:institution == 1"
+  "condition" : {"equals" : {"cdp:institution" : [1]}}
 }
