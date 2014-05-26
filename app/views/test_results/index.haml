@@ -51,4 +51,4 @@
       %td= @laboratories[result["laboratory_id"]]
       %td= @devices[result["device_uuid"]]
       %td= result["assay_name"]
-      %td= result["analytes"].map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "
+      %td= (result["analytes"] || []).map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "
