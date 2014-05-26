@@ -1,0 +1,24 @@
+= form_for policy do |f|
+  - if policy.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(policy.errors.count, "error")} prohibited this policy from being saved:"
+      %ul
+        - policy.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :name
+    = f.text_field :name
+  .field
+    = f.label :user_id
+    = f.collection_select :user_id, User.all.where('id != ?', current_user.id).sort_by(&:email), :id, :email
+  .field
+    = f.label :definition
+    = f.text_area :definition, style: "width:400px;height:200px"
+  .field
+    %label
+      Delegable
+      = f.check_box :delegable
+
+  .actions
+    = f.submit 'Save'

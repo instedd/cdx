@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
   has_many :devices, through: :institutions
   has_many :subscribers
   has_many :policies
+  has_many :granted_policies, class_name: "Policy", foreign_key: "granter_id"
 
   def create(model)
     if model.respond_to?(:user=)

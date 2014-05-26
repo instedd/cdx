@@ -1,0 +1,7 @@
+%h3 Editing #{policy.name}
+
+= render 'form'
+
+%hr
+
+= icon_link_to :'icf-delete', "Delete this policy", policy, method: :delete, confirm: "Are you sure you want to delete the policy '#{policy.name}'"

@@ -1,6 +1,8 @@
 class Policy < ActiveRecord::Base
   belongs_to :user
 
+  validates_presence_of :name
+
   serialize :definition, JSON
 
   def self.superadmin

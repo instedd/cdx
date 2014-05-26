@@ -15,6 +15,7 @@ Cdp::Application.routes.draw do
   resources :manifests
   resources :test_results
   resources :subscribers
+  resources :policies
 
   root :to => 'home#index'
 end
