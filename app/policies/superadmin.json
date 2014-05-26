@@ -1,0 +1,10 @@
+{
+  "statement": [
+    {
+      "effect": "allow",
+      "action": "*",
+      "resouce": "*"
+    }
+  ],
+  "delegable": true
+}
