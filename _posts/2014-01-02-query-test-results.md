@@ -109,25 +109,25 @@ The JSON allows more complex aggregations, such as age ranges.
 
 * `age` - groups and filters by age ranges. The tests are skipped if they are outside those ranges.
 
-```{
+`{
   "group_by" : [
     { "age" : [ [0, 10], [11, 20] ] },
     ...
   ]
-}```
+}`
 
 * `location_depth` - groups by location depth, up to the third level in this case, which is a state level.
 
-```{
+`{
   “group_by” : [
     { “location_depth" : 3 },
     ...
   ]
-}```
+}`
 
 * `time_interval` - groups by a given time interval, it could be one of: yearly, monthly, weekly, daily.
 
-```{
+`{
   “group_by” : [
     { “time_interval” : [
       { "created_at" : "yearly" },
@@ -135,7 +135,7 @@ The JSON allows more complex aggregations, such as age ranges.
     ] },
     ...
   ]
-}```
+}`
 
 # Response
 
@@ -144,7 +144,7 @@ The JSON allows more complex aggregations, such as age ranges.
 ## Without Grouping
 
 Returns an array of events without any PII:
-```[
+`[
 {
   "assay" : "ASSAY001",
   "assay_name" : "MTB",
@@ -178,16 +178,15 @@ Returns an array of events without any PII:
   "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e"
 },
 ...
-]
-```
+]`
 
 ## With Grouping
 
 Returns the quantity of test results matching each combination of aggregated fields.
 
-```/events?group_by=gender,result```
+`/events?group_by=gender,result`
 
-```[
+`[
   {
     "gender" : "male",
     "result" : "positive",
@@ -208,6 +207,6 @@ Returns the quantity of test results matching each combination of aggregated fie
     "result" : "negative",
     "count" : 30
   },
-]```
+]`
 
 For errors responses, see the [response status codes documentation](#http-response-codes).
