@@ -17,7 +17,7 @@ class DevicesController < ApplicationController
 
   def new
     @device = @institution.devices.new
-    return unless authorize_resource(@device, "cpdx:createDevice")
+    return unless authorize_resource(@device, "cdpx:createDevice")
   end
 
   def create

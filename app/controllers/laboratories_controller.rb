@@ -17,7 +17,7 @@ class LaboratoriesController < ApplicationController
 
   def new
     @laboratory = @institution.laboratories.new
-    return unless authorize_resource(@laboratory, "cpdx:createLaboratory")
+    return unless authorize_resource(@laboratory, "cdpx:createLaboratory")
   end
 
   # POST /laboratories

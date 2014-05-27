@@ -19,7 +19,7 @@ class InstitutionsController < ApplicationController
 
   def edit
     @institution = Institution.find(params[:id])
-    return unless authorize_resource(@institution, "cdpx:updateInstitution")
+    @readonly = !has_access?(@institution, "cdpx:editInstitution")
 
     add_breadcrumb @institution.name, @institution
     add_breadcrumb 'Settings'
@@ -29,15 +29,16 @@ class InstitutionsController < ApplicationController
   def new
     @institution = current_user.institutions.new
     @institution.user_id = current_user.id
-    return unless authorize_resource(@institution, "cpdx:createInstitution")
+    return unless authorize_resource(@institution, "cdpx:createInstitution")
 
+    @readonly = false
     set_institution_tab :new
   end
 
   def create
     @institution = Institution.new(institution_params)
     @institution.user_id = current_user.id
-    return unless authorize_resource(@institution, "cpdx:createInstitution")
+    return unless authorize_resource(@institution, "cdpx:createInstitution")
 
     respond_to do |format|
       if @institution.save

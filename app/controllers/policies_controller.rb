@@ -31,6 +31,7 @@ class PoliciesController < ApplicationController
 
   def edit
     @policy = Policy.find params[:id]
+    @policy.definition = @policy.definition.to_json
   end
 
   # PATCH/PUT /policies/1
