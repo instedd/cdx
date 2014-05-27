@@ -40,37 +40,54 @@ class Policy < ActiveRecord::Base
   end
 
   def check(action, resource, user)
-    conditions = []
+    found_one = false
 
     definition["statement"].each do |statement|
-      if action_matches?(action, statement["action"]) &&
-        resource_matches?(resource, statement["resource"])
-        conditions << statement["condition"] if statement["condition"]
-      else
-        return nil
+      return nil unless action_matches?(action, statement["action"])
+
+      new_resource = apply_resource_filters(resource, statement["resource"])
+      if new_resource
+        found_one = true
+        resource = new_resource
+        if (condition = statement["condition"])
+          resource = apply_condition(resource, condition, user)
+        end
       end
     end
 
-    apply_conditions(resource, conditions, user)
+    found_one ? resource : nil
   end
 
   private
 
-  def action_matches?(action, action_filter)
-    action_filter == "*"
+  def action_matches?(action, action_filters)
+    action_filters = Array(action_filters)
+    action_filters.any? do |action_filter|
+      action_filter == "*" || action_filter == action
+    end
   end
 
-  def resource_matches?(resource, resource_filter)
-    resource_filter == "*"
+  def apply_resource_filters(resource, resource_filters)
+    resource_filters = Array(resource_filters)
+    resource_filters.each do |resource_filter|
+      if resource_filter == "*"
+        return resource
+      end
+
+      new_resource = resource.filter_by_resource(resource_filter)
+      if new_resource
+        return new_resource
+      end
+    end
+
+    nil
   end
 
-  def apply_conditions(resource, conditions, user)
-    conditions.each do |condition|
-      condition.each do |key, value|
-        case key
-        when "is_owner"
-          resource = resource.filter_by_owner(user)
-        end
+  def apply_condition(resource, condition, user)
+    condition.each do |key, value|
+      case key
+      when "is_owner"
+        resource = resource.filter_by_owner(user)
       end
     end
 

@@ -25,6 +25,36 @@ class Institution < ActiveRecord::Base
     user_id == user.id ? self : nil
   end
 
+  def self.filter_by_resource(resource)
+    unless resource =~ /cdpx:institution\/(.*)/
+      return nil
+    end
+
+    match = $1
+    if match == "*"
+      return self
+    end
+
+    where(id: match)
+  end
+
+  def filter_by_resource(resource)
+    unless resource =~ /cdpx:institution\/(.*)/
+      return nil
+    end
+
+    match = $1
+    if match == "*"
+      return self
+    end
+
+    if match.to_i == id
+      return self
+    end
+
+    nil
+  end
+
   def to_s
     name
   end
