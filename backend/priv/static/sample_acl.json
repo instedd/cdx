@@ -11,21 +11,22 @@ Everyone (implicit):
 {
   "action": "*",
   "resource": "*",
-  "condition": {"equals" : {"owner" : ["self"]}}
+  "condition": {"is_owner" : true},
+  "delegable" : true
 }
 
 Permission to add locations under location with id 7:
 {
   "action": "adminLocations",
-  "resource": "cdp:location/5/7/*"
+  "resource": "cdxp:location/5/7/*"
 }
 
 Create a device in any lab of institution 1:
 {
   "action": "createDevices",
   "resource": [
-    "cdp:laboratory/*",
-    "cdp:institution/1"
+    "cdxp:laboratory/*",
+    "cdxp:institution/1"
   ]
 }
 
@@ -33,19 +34,19 @@ Admin for devices under location 7:
 {
   "action": "adminDevices",
   "resource": [
-    "cdp:institution/1",
-    "cdp:laboratory",
-    "cdp:location/5/7/*"
+    "cdxp:institution/1",
+    "cdxp:laboratory",
+    "cdxp:location/5/7/*"
   ]
 }
 
 Admin for devices under location 7 (option B):
 {
   "action": "*",
-  "resource": "cdp:device",
+  "resource": "cdxp:device",
   "condition" : [
-    {"equals" : {"cdp:institution" : [1]}},
-    {"like" : {"cdp:location":["5/7/*"]}}
+    {"equals" : {"cdxp:institution" : [1]}},
+    {"like" : {"cdxp:location":["5/7/*"]}}
   ]
 }
 
@@ -53,24 +54,24 @@ Institution Admin under location 7:
 Statements: [
   {
     "action" : "*", //"adminAll" ?
-    "resource" : "cdp:laboratory",
+    "resource" : "cdxp:laboratory",
     "condition" : [
-      {"equals" : {"cdp:institution" : [1]}},
-      {"like" : {"cdp:location":["5/7/*"]}}
+      {"equals" : {"cdxp:institution" : [1]}},
+      {"like" : {"cdxp:location":["5/7/*"]}}
     ]
   },
   {
     "action" : "*",
-    "resource" : "cdp:device",
-    "condition": {"equals" : {"cdp:institution" : [1]}}
+    "resource" : "cdxp:device",
+    "condition": {"equals" : {"cdxp:institution" : [1]}}
   },
   {
     "action" : [
       "updateInstitution",
       "deleteInstitution"
     ],
-    "resource" : "cdp:institution",
-    "condition": {"equals" : {"cdp:institution" : [1]}}
+    "resource" : "cdxp:institution",
+    "condition": {"equals" : {"cdxp:institution" : [1]}}
   }
 ]
 
@@ -92,8 +93,8 @@ Institution Admin under location 7 (option B):
   ],
   "resource" : "*",
   "condition": [
-    {"like" : {"cdp:location":["5/7/*"]}},
-    {"equals" : {"cdp:institution" : [1]}}
+    {"like" : {"cdxp:location":["5/7/*"]}},
+    {"equals" : {"cdxp:institution" : [1]}}
   ]
 }
 
@@ -101,10 +102,10 @@ Institution Admin:
 {
   "action" : "*",
   "resource" : [
-    "cdp:laboratory",
-    "cdp:device",
+    "cdxp:laboratory",
+    "cdxp:device",
   ],
-  "condition" : {"equals" : {"cdp:institution" : [1]}}
+  "condition" : {"equals" : {"cdxp:institution" : [1]}}
 }
 
 Institution Admin (option B):
@@ -124,7 +125,7 @@ Institution Admin (option B):
     "deleteInstitution"
   ],
   "resource" : "*",
-  "condition" : {"equals" : {"cdp:institution" : [1]}}
+  "condition" : {"equals" : {"cdxp:institution" : [1]}}
 }
 
 Read Permission for tests grouped yearly by date ranges and location:
@@ -132,7 +133,7 @@ Read Permission for tests grouped yearly by date ranges and location:
   "action" : [
     "queryTestResults"
   ],
-  "resource" : "cdp:api",
+  "resource" : "cdxp:api",
   "condition" : { "group_by" : [
     { "age" : [ [0, 10], [11, 20] ] },
     { "time_interval" : [{ "created_at" : "yearly" }]},
