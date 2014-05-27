@@ -93,7 +93,7 @@
   "assay_name": "GX4001",
   "analytes": [
     {
-      "condiiton": "MTB",
+      "condition": "MTB",
       "result": "positive"
     }
   ]

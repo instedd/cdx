@@ -3,7 +3,7 @@
     {
       "effect": "allow",
       "action": "*",
-      "resouce": "*"
+      "resource": "*"
     }
   ],
   "delegable": true
