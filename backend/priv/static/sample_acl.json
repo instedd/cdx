@@ -126,3 +126,16 @@ Institution Admin (option B):
   "resource" : "*",
   "condition" : {"equals" : {"cdp:institution" : [1]}}
 }
+
+Read Permission for tests grouped yearly by date ranges and location:
+{
+  "action" : [
+    "queryTestResults"
+  ],
+  "resource" : "cdp:api",
+  "condition" : { "group_by" : [
+    { "age" : [ [0, 10], [11, 20] ] },
+    { "time_interval" : [{ "created_at" : "yearly" }]},
+    { "location_depth" : 3 }
+  ]}
+}
