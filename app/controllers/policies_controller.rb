@@ -15,6 +15,7 @@ class PoliciesController < ApplicationController
   # POST /policies.json
   def create
     @policy = Policy.new(policy_params)
+    @policy.definition = JSON.parse @policy.definition
     @policy.granter_id = current_user.id
 
     respond_to do |format|
@@ -36,8 +37,12 @@ class PoliciesController < ApplicationController
   # PATCH/PUT /policies/1.json
   def update
     @policy = Policy.find params[:id]
+
     respond_to do |format|
-      if @policy.update(policy_params)
+      @policy.attributes = policy_params
+      @policy.definition = JSON.parse @policy.definition
+
+      if @policy.save
         format.html { redirect_to policies_path, notice: 'Policy was successfully updated.' }
         format.json { head :no_content }
       else
@@ -61,6 +66,6 @@ class PoliciesController < ApplicationController
   private
 
   def policy_params
-    params.require(:policy).permit(:name, :user_id, :delegable)
+    params.require(:policy).permit(:name, :user_id, :definition, :delegable)
   end
 end
