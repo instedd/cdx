@@ -1,0 +1,10 @@
+{
+  "statement": [
+    {
+      "action": "*",
+      "resource": "*",
+      "condition": {"is_owner" : true}
+    }
+  ],
+  "delegable": true
+}

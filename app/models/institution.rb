@@ -17,6 +17,14 @@ class Institution < ActiveRecord::Base
     ElasticRecord.for index_name, 'test_result'
   end
 
+  def self.filter_by_owner(user)
+    where(user_id: user.id)
+  end
+
+  def filter_by_owner(user)
+    user_id == user.id ? self : nil
+  end
+
   def to_s
     name
   end

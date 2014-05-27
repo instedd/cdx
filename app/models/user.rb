@@ -14,10 +14,14 @@ class User < ActiveRecord::Base
   has_many :policies
   has_many :granted_policies, class_name: "Policy", foreign_key: "granter_id"
 
+  def all_policies
+    policies.all + [Policy.implicit]
+  end
+
   def create(model)
     if model.respond_to?(:user=)
       model.user = self
     end
-    model.save
+    model.save ? model : nil
   end
 end

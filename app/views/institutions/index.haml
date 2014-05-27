@@ -5,5 +5,5 @@
 .row-fluid
   .span6
     - simple_list :institution, title: 'My Institutions', icon: :folder, create_path: new_institution_path do
-      - institutions.each do |institution|
+      - @institutions.each do |institution|
         - simple_list_item institution.name, institution

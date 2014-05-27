@@ -21,4 +21,14 @@ class ApplicationController < ActionController::Base
   def set_institution_tab(key)
     @institution_tab = key
   end
+
+  def authorize_access(resource, action)
+    result = Policy.check_all(action, resource, current_user.all_policies, current_user)
+    if result.allowed?
+      result.resources
+    else
+      head :forbidden
+      nil
+    end
+  end
 end
