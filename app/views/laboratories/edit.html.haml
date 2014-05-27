@@ -1,7 +1,7 @@
-%h3 Editing #{laboratory.name}
+%h3 Editing #{@laboratory.name}
 
 = render 'form'
 
 %hr
 
-= icon_link_to :'icf-delete', "Delete this laboratory", [institution, laboratory], method: :delete, confirm: "Are you sure you want to delete the laboratory '#{laboratory.name}'"
+= icon_link_to :'icf-delete', "Delete this laboratory", [@institution, @laboratory], method: :delete, confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'"

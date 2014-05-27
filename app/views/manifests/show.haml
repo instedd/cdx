@@ -1,11 +1,11 @@
 %p#notice= notice
 %p
   %strong Version:
-  = manifest.version
+  = @manifest.version
 %p
   %strong Definition:
-  = manifest.definition
+  = @manifest.definition
 
-= link_to 'Edit', edit_manifest_path(manifest)
+= link_to 'Edit', edit_manifest_path(@manifest)
 |
 = link_to 'Back', manifests_path

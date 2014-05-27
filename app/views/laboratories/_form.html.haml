@@ -1,9 +1,9 @@
-= form_for([institution, laboratory]) do |f|
-  - if laboratory.errors.present?
+= form_for([@institution, @laboratory]) do |f|
+  - if @laboratory.errors.present?
     .alert-container
       .alert.alert-error
         %ul
-          - laboratory.errors.full_messages.each do |msg|
+          - @laboratory.errors.full_messages.each do |msg|
             %li= msg
 
   %div

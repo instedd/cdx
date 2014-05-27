@@ -1,5 +1,5 @@
 .row-fluid
   .span6
     - simple_list :policy, title: 'Policies', icon: :folder, create_path: new_policy_path do
-      - policies.each do |policy|
+      - @policies.each do |policy|
         - simple_list_item policy.name, edit_policy_path(policy)

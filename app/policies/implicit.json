@@ -1,6 +1,7 @@
 {
   "statement": [
     {
+      "effect": "allow",
       "action": "*",
       "resource": "*",
       "condition": {"is_owner" : true}

@@ -1,7 +1,7 @@
-%h3 Editing #{current_location.name}
+%h3 Editing #{@location.name}
 
 = render 'form'
 
 %hr
 
-= icon_link_to :'icf-delete', "Delete this location", current_location, method: :delete, confirm: "Are you sure you want to delete the location '#{current_location.name}'"
+= icon_link_to :'icf-delete', "Delete this location", @location, method: :delete, confirm: "Are you sure you want to delete the location '#{@location.name}'"

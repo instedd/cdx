@@ -9,7 +9,6 @@ gem 'jquery-rails'
 gem 'haml-rails'
 gem 'underscore-rails'
 gem 'awesome_nested_set'
-gem 'decent_exposure'
 
 # A newer version breaks instedd-bootstrap
 gem 'bootstrap-sass', '2.3.2.1'

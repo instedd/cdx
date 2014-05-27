@@ -4,10 +4,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :authenticate_user!
 
-  decent_configuration do
-    strategy DecentExposure::StrongParametersStrategy
-  end
-
   def render_json(object, params={})
     render params.merge(text: object.to_json_oj, content_type: 'text/json')
   end
@@ -22,8 +18,8 @@ class ApplicationController < ActionController::Base
     @institution_tab = key
   end
 
-  def authorize_access(resource, action)
-    result = Policy.check_all(action, resource, current_user.all_policies, current_user)
+  def authorize_resource(resource, action)
+    result = Policy.check_all(action, resource, current_user.policies.all, current_user)
     if result.allowed?
       result.resources
     else

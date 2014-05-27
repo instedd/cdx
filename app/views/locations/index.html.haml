@@ -1,5 +1,5 @@
 .row-fluid
   .span6
     - simple_list :location, title: 'Locations', icon: :folder, create_path: new_location_path do
-      - locations.each do |location|
+      - @locations.each do |location|
         - simple_list_item location.name, edit_location_path(location)

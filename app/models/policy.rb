@@ -1,5 +1,6 @@
 class Policy < ActiveRecord::Base
   belongs_to :user
+  belongs_to :granter, class_name: 'User', foreign_key: 'granter_id'
 
   validates_presence_of :name
 
@@ -78,6 +79,7 @@ class Policy < ActiveRecord::Base
 
   def self.predefined_policy(name)
     policy = Policy.new
+    policy.name = name
     policy.definition = JSON.load File.read("#{Rails.root}/app/policies/#{name}.json")
     policy.delegable = policy.definition["delegable"]
     policy

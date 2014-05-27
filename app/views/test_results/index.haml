@@ -3,7 +3,7 @@
     Laboratory:
     %select(name="laboratory")
       %option(value="") (all)
-      = options_from_collection_for_select laboratories, :id, :name, params["laboratory"]
+      = options_from_collection_for_select @combo_laboratories, :id, :name, params["laboratory"]
     Condition:
     %input{type: "text", name: "condition", value: params["condition"]}
     %input{type: "submit", value: "Filter"}

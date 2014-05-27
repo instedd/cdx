@@ -2,17 +2,17 @@
   .checks { display: inline-block; }
   .checks label { display: inline-block; }
 
-- if manifest.version
+- if @manifest.version
   %p
     %strong Version:
-    = manifest.version
+    = @manifest.version
 
-= form_for(manifest) do |f|
-  - if manifest.errors.present?
+= form_for(@manifest) do |f|
+  - if @manifest.errors.present?
     .alert-container
       .alert.alert-error
         %ul
-          - manifest.errors.full_messages.each do |msg|
+          - @manifest.errors.full_messages.each do |msg|
             %li= msg
   %div
     = f.label :definition

@@ -1,11 +1,9 @@
 class TestResultsController < ApplicationController
   add_breadcrumb 'Results', :test_results_path
 
-  expose(:laboratories) do
-    Laboratory.with_role(:admin, current_user)
-  end
-
   def index
+    @combo_laboratories = authorize_resource(Laboratory, "cdpx:readLaboratory")
+
     query = {}
     query["laboratory"] = params["laboratory"] if params["laboratory"].present?
     query["condition"] = params["condition"] if params["condition"].present?

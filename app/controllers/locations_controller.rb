@@ -1,35 +1,48 @@
 class LocationsController < ApplicationController
-  expose(:locations)
-  expose(:current_location, model: :location, attributes: :location_params)
-
   add_breadcrumb 'Locations', :locations_path
 
   before_filter { @in_locations = true }
 
+  def index
+    @locations = Location.all
+  end
+
+  def new
+    @location = Location.new
+  end
+
   # POST /locations
   # POST /locations.json
   def create
+    @location = Location.new(location_params)
+
     respond_to do |format|
-      if current_user.create(current_location)
+      if @location.save
         format.html { redirect_to locations_path, notice: 'Location was successfully created.' }
-        format.json { render action: 'show', status: :created, location: current_location }
+        format.json { render action: 'show', status: :created, location: @location }
       else
         format.html { render action: 'new' }
-        format.json { render json: current_location.errors, status: :unprocessable_entity }
+        format.json { render json: @location.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def edit
+    @location = Location.find(params[:id])
   end
 
   # PATCH/PUT /locations/1
   # PATCH/PUT /locations/1.json
   def update
+    @location = Location.find(params[:id])
+
     respond_to do |format|
-      if current_location.update(location_params)
+      if @location.update(location_params)
         format.html { redirect_to locations_path, notice: 'Location was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
-        format.json { render json: current_location.errors, status: :unprocessable_entity }
+        format.json { render json: @location.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -37,7 +50,9 @@ class LocationsController < ApplicationController
   # DELETE /locations/1
   # DELETE /locations/1.json
   def destroy
-    current_location.destroy
+    @location = Location.find(params[:id])
+
+    @location.destroy
     respond_to do |format|
       format.html { redirect_to locations_path }
       format.json { head :no_content }

@@ -4,63 +4,73 @@ class InstitutionsController < ApplicationController
 
   add_breadcrumb 'Institutions', :institutions_path
 
-  expose(:institution, attributes: :institution_params)
-
   def index
-    @institutions = authorize_access(Institution, "cdp:list_institutions")
-  end
-
-  def new
-    @institution = current_user.institutions.new
-    set_institution_tab :new
+    @institutions = authorize_resource(Institution, "cdpx:readInstitution")
   end
 
   def show
-    @institutions = authorize_access(institution, "cdp:list_institutions")
+    @institution = Institution.find(params[:id])
+    return unless authorize_resource(@institution, "cdpx:readInstitution")
 
-    add_breadcrumb institution.name, institution
+    add_breadcrumb @institution.name, @institution
     add_breadcrumb 'Overview'
     set_institution_tab :overview
   end
 
   def edit
-    return unless authorize_access(institution, "cdp:edit_institution")
+    @institution = Institution.find(params[:id])
+    return unless authorize_resource(@institution, "cdpx:updateInstitution")
 
-    add_breadcrumb institution.name, institution
+    add_breadcrumb @institution.name, @institution
     add_breadcrumb 'Settings'
     set_institution_tab :settings
   end
 
+  def new
+    @institution = current_user.institutions.new
+    @institution.user_id = current_user.id
+    return unless authorize_resource(@institution, "cpdx:createInstitution")
+
+    set_institution_tab :new
+  end
+
   def create
+    @institution = Institution.new(institution_params)
+    @institution.user_id = current_user.id
+    return unless authorize_resource(@institution, "cpdx:createInstitution")
+
     respond_to do |format|
-      if current_user.create(institution)
-        format.html { redirect_to institution, notice: 'Institution was successfully created.' }
-        format.json { render action: 'show', status: :created, location: institution }
+      if @institution.save
+        format.html { redirect_to @institution, notice: 'Institution was successfully created.' }
+        format.json { render action: 'show', status: :created, location: @institution }
       else
         format.html { render action: 'new' }
-        format.json { render json: institution.errors, status: :unprocessable_entity }
+        format.json { render json: @institution.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def update
-    return unless authorize_access(institution, "cdp:edit_institution")
+    @institution = Institution.find(params[:id])
+    return unless authorize_resource(@institution, "cdpx:updateInstitution")
 
     respond_to do |format|
-      if institution.update(institution_params)
-        format.html { redirect_to institution, notice: 'Institution was successfully updated.' }
+      if @institution.update(institution_params)
+        format.html { redirect_to @institution, notice: 'Institution was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
-        format.json { render json: institution.errors, status: :unprocessable_entity }
+        format.json { render json: @institution.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def destroy
-    return unless authorize_access(institution, "cdp:delete_institution")
+    @institution = Institution.find(params[:id])
+    return unless authorize_resource(@institution, "cdpx:deleteInstitution")
 
-    institution.destroy
+    @institution.destroy
+
     respond_to do |format|
       format.html { redirect_to institutions_url }
       format.json { head :no_content }
