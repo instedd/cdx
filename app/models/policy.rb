@@ -35,7 +35,7 @@ class Policy < ActiveRecord::Base
     if resources.empty?
       CheckResult.new(false, nil)
     else
-      CheckResult.new(true, resources.flatten)
+      CheckResult.new(true, resources.flatten.to_a.uniq)
     end
   end
 
