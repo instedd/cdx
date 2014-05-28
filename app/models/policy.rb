@@ -61,7 +61,12 @@ class Policy < ActiveRecord::Base
     if resources.empty?
       CheckResult.new(false, nil)
     else
-      CheckResult.new(true, resources.flatten.to_a.uniq)
+      resources.map! do |resource|
+        resource.is_a?(Class) ? resource.all : resource
+      end
+      resources.flatten!
+      resources.uniq!
+      CheckResult.new(true, resources)
     end
   end
 
@@ -105,6 +110,8 @@ class Policy < ActiveRecord::Base
       if actions
         actions = Array(actions)
         actions.each do |action|
+          next if action == "*"
+
           unless ACTIONS.include?(action)
             return errors.add :definition, "has an unknown action: `#{action}`"
           end

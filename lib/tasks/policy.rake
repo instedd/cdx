@@ -7,6 +7,10 @@ namespace :policy do
     end
 
     user = User.find args[:user_id]
-    user.policies.create! definition: Policy.superadmin, delegable: true
+
+    superadmin = Policy.superadmin
+    superadmin.user_id = user.id
+    superadmin.granter_id = user.id
+    superadmin.save!
   end
 end

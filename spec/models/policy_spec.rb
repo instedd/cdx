@@ -137,4 +137,17 @@ describe Policy do
     result.allowed?.should be_true
     result.resources.should eq([institution2])
   end
+
+  it "allows reading all institutions if superadmin" do
+    user2 = User.make
+    institution2 = user2.create Institution.make_unsaved
+
+    action = Policy::READ_INSTITUTION
+    resource = Institution
+    policies = [Policy.implicit, Policy.superadmin]
+
+    result = Policy.check_all action, resource, policies, user
+    result.allowed?.should be_true
+    result.resources.should eq([institution, institution2])
+  end
 end
