@@ -15,14 +15,28 @@ class PoliciesController < ApplicationController
   # POST /policies.json
   def create
     @policy = Policy.new(policy_params)
-    @policy.definition = JSON.parse @policy.definition
+
+    begin
+      definition = JSON.parse @policy.definition
+      @policy.definition = definition
+    rescue => ex
+      @policy.errors.add :definition, ex.message
+      has_definition_error = true
+    end
+
     @policy.granter_id = current_user.id
 
     respond_to do |format|
-      if @policy.save
+      if @policy.errors.empty? && @policy.save
         format.html { redirect_to policies_path, notice: 'Policy was successfully created.' }
         format.json { render action: 'show', status: :created, policy: @policy }
       else
+        if has_definition_error
+          @policy.definition = params[:policy][:definition]
+        else
+          @policy.definition = JSON.pretty_generate(@policy.definition)
+        end
+
         format.html { render action: 'new' }
         format.json { render json: @policy.errors, status: :unprocessable_entity }
       end
@@ -31,22 +45,33 @@ class PoliciesController < ApplicationController
 
   def edit
     @policy = Policy.find params[:id]
-    @policy.definition = @policy.definition.to_json
+    @policy.definition = JSON.pretty_generate(@policy.definition)
   end
 
   # PATCH/PUT /policies/1
   # PATCH/PUT /policies/1.json
   def update
     @policy = Policy.find params[:id]
+    @policy.attributes = policy_params
+
+    begin
+      definition = JSON.parse @policy.definition
+      @policy.definition = definition
+    rescue => ex
+      @policy.errors.add :definition, ex.message
+      has_definition_error = true
+    end
 
     respond_to do |format|
-      @policy.attributes = policy_params
-      @policy.definition = JSON.parse @policy.definition
-
-      if @policy.save
+      if @policy.errors.empty? && @policy.save
         format.html { redirect_to policies_path, notice: 'Policy was successfully updated.' }
         format.json { head :no_content }
       else
+        if has_definition_error
+          @policy.definition = params[:policy][:definition]
+        else
+          @policy.definition = JSON.pretty_generate(@policy.definition)
+        end
         format.html { render action: 'edit' }
         format.json { render json: @policy.errors, status: :unprocessable_entity }
       end

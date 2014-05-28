@@ -3,8 +3,11 @@ class Policy < ActiveRecord::Base
   belongs_to :granter, class_name: 'User', foreign_key: 'granter_id'
 
   validates_presence_of :name
+  validate :validate_definition
 
   serialize :definition, JSON
+
+  before_save :set_delegable_from_definition
 
   PREFIX = "cdpx"
 
@@ -82,6 +85,55 @@ class Policy < ActiveRecord::Base
   end
 
   private
+
+  def validate_definition
+    unless definition["statement"]
+      return errors.add :definition, "is missing a statement"
+    end
+
+    definition["statement"].each do |statement|
+      effect = statement["effect"]
+      if effect
+        if effect != "allow" && effect != "disallow"
+          return errors.add :definition, "has an invalid effect: `#{effect}`"
+        end
+      else
+        return errors.add :definition, "is missing efect in statement"
+      end
+
+      actions = statement["action"]
+      if actions
+        actions = Array(actions)
+        actions.each do |action|
+          unless ACTIONS.include?(action)
+            return errors.add :definition, "has an unknown action: `#{action}`"
+          end
+        end
+      else
+        return errors.add :definition, "is missing action in statemenet"
+      end
+
+      resources = statement["resource"]
+      if resources
+        # TODO: validate resources
+      else
+        return errors.add :definition, "is missing resource in statement"
+      end
+    end
+
+    delegable = definition["delegable"]
+    if delegable
+      if delegable != true && delegable != false
+        return errors.add :definition, "has an invalid delegable value: `#{delegable}`"
+      end
+    else
+      return errors.add :definition, "is missing delegable attribute"
+    end
+  end
+
+  def set_delegable_from_definition
+    self.delegable = definition["delegable"]
+  end
 
   def action_matches?(action, action_filters)
     action_filters = Array(action_filters)
