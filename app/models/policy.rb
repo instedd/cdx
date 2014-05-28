@@ -6,6 +6,29 @@ class Policy < ActiveRecord::Base
 
   serialize :definition, JSON
 
+  PREFIX = "cdpx"
+
+  CREATE_INSTITUTION = "#{PREFIX}:createInstitution"
+  READ_INSTITUTION = "#{PREFIX}:readInstitution"
+  UPDATE_INSTITUTION = "#{PREFIX}:updateInstitution"
+  DELETE_INSTITUTION = "#{PREFIX}:deleteInstitution"
+
+  CREATE_LABORATORY = "#{PREFIX}:createLaboratory"
+  READ_LABORATORY = "#{PREFIX}:readLaboratory"
+  UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory"
+  DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory"
+
+  CREATE_DEVICE = "#{PREFIX}:createDevice"
+  READ_DEVICE = "#{PREFIX}:readDevice"
+  UPDATE_DEVICE = "#{PREFIX}:updateDevice"
+  DELETE_DEVICE = "#{PREFIX}:deleteDevice"
+  REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey"
+
+  ACTIONS = [
+    READ_INSTITUTION, UPDATE_INSTITUTION, DELETE_INSTITUTION,
+    CREATE_DEVICE, READ_DEVICE, UPDATE_DEVICE, DELETE_DEVICE, REGENERATE_DEVICE_KEY,
+  ]
+
   class CheckResult
     attr_reader :resources
 

@@ -2,7 +2,7 @@ class TestResultsController < ApplicationController
   add_breadcrumb 'Results', :test_results_path
 
   def index
-    @combo_laboratories = authorize_resource(Laboratory, "cdpx:readLaboratory")
+    @combo_laboratories = authorize_resource(Laboratory, Policy::READ_LABORATORY)
 
     query = {}
     query["laboratory"] = params["laboratory"] if params["laboratory"].present?

@@ -34,3 +34,7 @@ end
 DeviceModel.blueprint do
   name
 end
+
+Policy.blueprint do
+  name
+end

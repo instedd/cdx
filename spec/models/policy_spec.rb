@@ -4,8 +4,8 @@ describe Policy do
   let!(:user) { User.make }
   let!(:institution) { user.create Institution.make_unsaved }
 
-  it "doesn't allow a user to list his institutions without the implicit policy" do
-    action = "cdpx:list_institutions"
+  it "doesn't allow a user to read his institutions without the implicit policy" do
+    action = Policy::READ_INSTITUTION
     resource = Institution
     policies = []
 
@@ -14,11 +14,11 @@ describe Policy do
     result.resources.should eq(nil)
   end
 
-  it "allows a user to list his institutions" do
+  it "allows a user to read his institutions" do
     user2 = User.make
     institution2 = user2.create Institution.make_unsaved
 
-    action = "cdpx:list_institutions"
+    action = Policy::READ_INSTITUTION
     resource = Institution
     policies = [Policy.implicit]
 
@@ -27,8 +27,8 @@ describe Policy do
     result.resources.should eq([institution])
   end
 
-  it "allows a user to edit his institution" do
-    action = "cdpx:edit_institution"
+  it "allows a user to update his institution" do
+    action = Policy::UPDATE_INSTITUTION
     resource = institution
     policies = [Policy.implicit]
 
@@ -37,11 +37,11 @@ describe Policy do
     result.resources.should eq([institution])
   end
 
-  it "doesn't allows a user to edit an instiutiton he is not an owner of" do
+  it "doesn't allows a user to update an instiutiton he is not an owner of" do
     user2 = User.make
     institution2 = user2.create Institution.make_unsaved
 
-    action = "cdpx:edit_institution"
+    action = Policy::UPDATE_INSTITUTION
     resource = institution2
     policies = [Policy.implicit]
 
@@ -61,8 +61,8 @@ describe Policy do
                                           {
                                             "effect": "allow",
                                             "action": [
-                                              "cdpx:readInstitution",
-                                              "cdpx:updateInstitution"
+                                              "#{Policy::READ_INSTITUTION}",
+                                              "#{Policy::UPDATE_INSTITUTION}"
                                             ],
                                             "resource": "cdpx:institution/#{institution2.id}"
                                           }
@@ -70,7 +70,7 @@ describe Policy do
                                         "delegable": true
                                       }
                                     )
-    action = "cdpx:readInstitution"
+    action = Policy::READ_INSTITUTION
     resource = institution2
     policies = [policy]
 
@@ -91,8 +91,8 @@ describe Policy do
                                           {
                                             "effect": "allow",
                                             "action": [
-                                              "cdpx:readInstitution",
-                                              "cdpx:updateInstitution"
+                                              "#{Policy::READ_INSTITUTION}",
+                                              "#{Policy::UPDATE_INSTITUTION}"
                                             ],
                                             "resource": "cdpx:institution/#{institution3.id}"
                                           }
@@ -100,7 +100,7 @@ describe Policy do
                                         "delegable": true
                                       }
                                     )
-    action = "cdpx:readInstitution"
+    action = Policy::READ_INSTITUTION
     resource = institution2
     policies = [policy]
 
@@ -120,8 +120,8 @@ describe Policy do
                                           {
                                             "effect": "allow",
                                             "action": [
-                                              "cdpx:readInstitution",
-                                              "cdpx:updateInstitution"
+                                              "#{Policy::READ_INSTITUTION}",
+                                              "#{Policy::UPDATE_INSTITUTION}"
                                             ],
                                             "resource": "cdpx:institution/#{institution2.id}"
                                           }
@@ -129,7 +129,7 @@ describe Policy do
                                         "delegable": true
                                       }
                                     )
-    action = "cdpx:readInstitution"
+    action = Policy::READ_INSTITUTION
     resource = Institution
     policies = [policy]
 
