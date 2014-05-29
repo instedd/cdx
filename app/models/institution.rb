@@ -26,7 +26,7 @@ class Institution < ActiveRecord::Base
   end
 
   def self.filter_by_resource(resource)
-    unless resource =~ /cdpx:institution\/(.*)/
+    unless resource =~ /#{Policy::PREFIX}:#{name.underscore}\/(.*)/
       return nil
     end
 
@@ -39,7 +39,7 @@ class Institution < ActiveRecord::Base
   end
 
   def filter_by_resource(resource)
-    unless resource =~ /cdpx:institution\/(.*)/
+    unless resource =~ /#{Policy::PREFIX}:#{self.class.name.underscore}\/(.*)/
       return nil
     end
 

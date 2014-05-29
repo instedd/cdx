@@ -269,4 +269,75 @@ describe Policy do
     result.allowed?.should be_false
     result.resources.should be_nil
   end
+
+  it "disallows delegable (1)" do
+    user2 = User.make
+    user3 = User.make
+    user4 = User.make
+
+    definition_delegable = %({
+                                "statement":  [
+                                  {
+                                    "effect": "allow",
+                                    "action": [
+                                      "#{Policy::READ_INSTITUTION}"
+                                    ],
+                                    "resource": "cdpx:institution/#{institution.id}"
+                                  }
+                                ],
+                                "delegable": true
+                              }
+                            )
+
+    definition_not_delegable = %({
+                                "statement":  [
+                                  {
+                                    "effect": "allow",
+                                    "action": [
+                                      "#{Policy::READ_INSTITUTION}"
+                                    ],
+                                    "resource": "cdpx:institution/#{institution.id}"
+                                  }
+                                ],
+                                "delegable": false
+                              }
+                            )
+
+    policy = Policy.new
+    policy.name = "user2 can read institution"
+    policy.definition = JSON.parse definition_not_delegable
+    policy.granter_id = user.id
+    policy.user_id = user2.id
+    policy.save!
+
+    policy = Policy.new
+    policy.name = "user3 can read institution"
+    policy.definition = JSON.parse definition_delegable
+    policy.granter_id = user.id
+    policy.user_id = user3.id
+    policy.save!
+
+    policy = Policy.new
+    policy.name = "user4 can read institution"
+    policy.definition = JSON.parse definition_delegable
+    policy.granter_id = user3.id
+    policy.user_id = user4.id
+    policy.save!
+
+    policy = Policy.new
+    policy.name = "user4 can read institution"
+    policy.definition = JSON.parse definition_delegable
+    policy.granter_id = user2.id
+    policy.user_id = user4.id
+    policy.save!
+
+    # user4 should be able to read institution
+    action = Policy::READ_INSTITUTION
+    resource = institution
+    policies = user4.policies
+
+    result = Policy.check_all action, resource, policies, user4
+    result.allowed?.should be_true
+    result.resources.should eq([institution])
+  end
 end
