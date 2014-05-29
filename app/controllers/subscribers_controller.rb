@@ -1,15 +1,60 @@
 class SubscribersController < ApplicationController
-  def create
-    subscriber = current_user.subscribers.new(subscriber_params)
-    subscriber.last_run_at = Time.now
-    subscriber.filter = JSON.parse params["filter"]
-    subscriber.fields = JSON.parse (params["fields"] || {}).keys
+  def index
+    @subscribers = current_user.subscribers
+  end
 
-    if subscriber.save
-      redirect_to test_results_path(params["filter"]), notice: "Subscriber created successfully"
+  def new
+    @subscriber = Subscriber.new
+    @subscriber.fields = []
+    @filter_laboratory = params[:laboratory]
+    @filter_condition = params[:condition]
+    @laboratory = Laboratory.find @filter_laboratory
+  end
+
+  def create
+    @subscriber = current_user.subscribers.new(subscriber_params)
+    @subscriber.last_run_at = Time.now
+    @subscriber.filter = params["filter"]
+    @subscriber.fields = (params["fields"] || {}).keys
+
+    if @subscriber.save
+      redirect_to subscribers_path, notice: "Subscriber was successfully created"
     else
-      redirect_to test_results_path(params["filter"]), alert: "Couldn't create subscriber"
+      @filter_laboratory = @subscriber.filter["laboratory"]
+      @filter_condition = @subscriber.filter["condition"]
+      @laboratory = Laboratory.find @filter_laboratory
+
+      render "new"
     end
+  end
+
+  def edit
+    @subscriber = current_user.subscribers.find params[:id]
+    @filter_laboratory = @subscriber.filter["laboratory"]
+    @filter_condition = @subscriber.filter["condition"]
+    @laboratory = Laboratory.find @filter_laboratory
+  end
+
+  def update
+    @subscriber = current_user.subscribers.find params[:id]
+    @subscriber.filter = params["filter"]
+    @subscriber.fields = (params["fields"] || {}).keys
+
+    if @subscriber.update(subscriber_params)
+      redirect_to subscribers_path, notice: "Subscriber was successfully updated"
+    else
+      @filter_laboratory = @subscriber.filter["laboratory"]
+      @filter_condition = @subscriber.filter["condition"]
+      @laboratory = Laboratory.find @filter_laboratory
+
+      render "edit"
+    end
+  end
+
+  def destroy
+    @subscriber = current_user.subscribers.find params[:id]
+    @subscriber.destroy
+    redirect_to subscribers_path
   end
 
   private
