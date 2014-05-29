@@ -4,7 +4,7 @@ class PoliciesController < ApplicationController
   add_breadcrumb 'Policies', :policies_path
 
   def index
-    @policies = current_user.granted_policies.all
+    @policies = current_user.granted_policies.includes(:user).all
   end
 
   def new

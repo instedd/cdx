@@ -32,6 +32,10 @@ class Policy < ActiveRecord::Base
     CREATE_DEVICE, READ_DEVICE, UPDATE_DEVICE, DELETE_DEVICE, REGENERATE_DEVICE_KEY,
   ]
 
+  def self.delegable
+    where(delegable: true)
+  end
+
   class CheckResult
     attr_reader :resources
 
@@ -86,7 +90,22 @@ class Policy < ActiveRecord::Base
       end
     end
 
-    found_one ? resource : nil
+    return nil unless found_one && resource
+
+    # Check that the granter's policies allow the action on the resource,
+    # but only if the user is not the same as the granter (like implicit and superadmin policies)
+    unless self_granted?
+      granter_result = Policy.check_all action, resource, granter.policies.delegable, granter
+      return nil unless granter_result.allowed?
+
+      resource = granter_result.resources
+    end
+
+    resource
+  end
+
+  def self_granted?
+    self.user_id == self.granter_id
   end
 
   private
@@ -129,7 +148,7 @@ class Policy < ActiveRecord::Base
     end
 
     delegable = definition["delegable"]
-    if delegable
+    if !delegable.nil?
       if delegable != true && delegable != false
         return errors.add :definition, "has an invalid delegable value: `#{delegable}`"
       end
@@ -140,6 +159,7 @@ class Policy < ActiveRecord::Base
 
   def set_delegable_from_definition
     self.delegable = definition["delegable"]
+    true
   end
 
   def action_matches?(action, action_filters)

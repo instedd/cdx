@@ -150,4 +150,123 @@ describe Policy do
     result.allowed?.should be_true
     result.resources.should eq([institution, institution2])
   end
+
+  it "disallows read one institution if granter doesn't have a permission for it" do
+    user2 = User.make
+
+    user3 = User.make
+    institution3 = user3.create Institution.make_unsaved
+
+    # user gives user2 permission to read institution3
+    policy = Policy.new
+    policy.name = "user2 can read institution3"
+    policy.definition = JSON.parse %(
+                                      {
+                                        "statement":  [
+                                          {
+                                            "effect": "allow",
+                                            "action": [
+                                              "#{Policy::READ_INSTITUTION}"
+                                            ],
+                                            "resource": "cdpx:institution/#{institution3.id}"
+                                          }
+                                        ],
+                                        "delegable": true
+                                      }
+                                    )
+    policy.user_id = user2.id
+    policy.granter_id = user.id
+    policy.save!
+
+    # user2 shouldn't be able to read institution3
+    action = Policy::READ_INSTITUTION
+    resource = institution3
+    policies = user2.policies
+
+    result = Policy.check_all action, resource, policies, user2
+    result.allowed?.should be_false
+    result.resources.should be_nil
+  end
+
+  it "disallows read all institution if granter doesn't have a permission for it" do
+    user2 = User.make
+
+    user3 = User.make
+    institution3 = user3.create Institution.make_unsaved
+
+    # user gives user2 permission to read all institutions
+    policy = Policy.new
+    policy.name = "user2 can read all institutions"
+    policy.definition = JSON.parse %(
+                                      {
+                                        "statement":  [
+                                          {
+                                            "effect": "allow",
+                                            "action": [
+                                              "#{Policy::READ_INSTITUTION}"
+                                            ],
+                                            "resource": "cdpx:institution/*"
+                                          }
+                                        ],
+                                        "delegable": true
+                                      }
+                                    )
+    policy.user_id = user2.id
+    policy.granter_id = user.id
+    policy.save!
+
+    # user2 shouldn't be able to read any institution
+    action = Policy::READ_INSTITUTION
+    resource = Institution
+    policies = user2.policies
+
+    result = Policy.check_all action, resource, policies, user2
+    result.allowed?.should be_true
+    result.resources.should eq([institution])
+  end
+
+  it "disallows delegable" do
+    user2 = User.make
+
+    user3 = User.make
+
+    # user gives user2 permission to read institution
+    definition = %({
+                      "statement":  [
+                        {
+                          "effect": "allow",
+                          "action": [
+                            "#{Policy::READ_INSTITUTION}"
+                          ],
+                          "resource": "cdpx:institution/#{institution.id}"
+                        }
+                      ],
+                      "delegable": false
+                    }
+                  )
+
+    policy = Policy.new
+    policy.name = "user2 can read institution"
+    policy.definition = JSON.parse definition
+    policy.user_id = user2.id
+    policy.granter_id = user.id
+    policy.save!
+
+    # user2 gives user3 permission to read institution
+    policy = Policy.new
+    policy.name = "user3 can read institution"
+    policy.definition = JSON.parse definition
+    policy.user_id = user3.id
+    policy.granter_id = user2.id
+    policy.save!
+
+    # user3 shouldn't be able to read any institution
+    action = Policy::READ_INSTITUTION
+    resource = institution
+    policies = user3.policies
+
+    result = Policy.check_all action, resource, policies, user3
+    result.allowed?.should be_false
+    result.resources.should be_nil
+  end
 end
