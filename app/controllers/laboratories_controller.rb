@@ -12,19 +12,19 @@ class LaboratoriesController < ApplicationController
   end
 
   def index
-    @laboratories = authorize_resource(@institution.laboratories, Policy::READ_LABORATORY)
+    @laboratories = authorize_resource(@institution.laboratories, READ_LABORATORY)
   end
 
   def new
     @laboratory = @institution.laboratories.new
-    return unless authorize_resource(@laboratory, Policy::CREATE_LABORATORY)
+    return unless authorize_resource(@laboratory, CREATE_LABORATORY)
   end
 
   # POST /laboratories
   # POST /laboratories.json
   def create
     @laboratory = @institution.laboratories.new(laboratory_params)
-    return unless authorize_resource(@laboratory, Policy::CREATE_LABORATORY)
+    return unless authorize_resource(@laboratory, CREATE_LABORATORY)
 
     respond_to do |format|
       if current_user.create(@laboratory)
@@ -39,7 +39,7 @@ class LaboratoriesController < ApplicationController
 
   def edit
     @laboratory = @institution.laboratories.find params[:id]
-    return unless authorize_resource(@laboratory, Policy::UPDATE_LABORATORY)
+    return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
     add_breadcrumb @laboratory.name, institution_laboratory_path(@institution, @laboratory)
   end
@@ -48,7 +48,7 @@ class LaboratoriesController < ApplicationController
   # PATCH/PUT /laboratories/1.json
   def update
     @laboratory = @institution.laboratories.find params[:id]
-    return unless authorize_resource(@laboratory, Policy::UPDATE_LABORATORY)
+    return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
     respond_to do |format|
       if @laboratory.update(laboratory_params)
@@ -65,7 +65,7 @@ class LaboratoriesController < ApplicationController
   # DELETE /laboratories/1.json
   def destroy
     @laboratory = @institution.laboratories.find params[:id]
-    return unless authorize_resource(@laboratory, Policy::DELETE_LABORATORY)
+    return unless authorize_resource(@laboratory, DELETE_LABORATORY)
 
     @laboratory.destroy
 
@@ -79,7 +79,7 @@ class LaboratoriesController < ApplicationController
 
   def load_institution
     @institution = Institution.find params[:institution_id]
-    authorize_resource(@institution, Policy::READ_INSTITUTION)
+    authorize_resource(@institution, READ_INSTITUTION)
   end
 
   def laboratory_params

@@ -5,12 +5,12 @@ class InstitutionsController < ApplicationController
   add_breadcrumb 'Institutions', :institutions_path
 
   def index
-    @institutions = authorize_resource(Institution, Policy::READ_INSTITUTION)
+    @institutions = authorize_resource(Institution, READ_INSTITUTION)
   end
 
   def show
     @institution = Institution.find(params[:id])
-    return unless authorize_resource(@institution, Policy::READ_INSTITUTION)
+    return unless authorize_resource(@institution, READ_INSTITUTION)
 
     add_breadcrumb @institution.name, @institution
     add_breadcrumb 'Overview'
@@ -19,7 +19,7 @@ class InstitutionsController < ApplicationController
 
   def edit
     @institution = Institution.find(params[:id])
-    @readonly = !has_access?(@institution, Policy::UPDATE_INSTITUTION)
+    @readonly = !has_access?(@institution, UPDATE_INSTITUTION)
 
     add_breadcrumb @institution.name, @institution
     add_breadcrumb 'Settings'
@@ -29,7 +29,7 @@ class InstitutionsController < ApplicationController
   def new
     @institution = current_user.institutions.new
     @institution.user_id = current_user.id
-    return unless authorize_resource(@institution, Policy::CREATE_INSTITUTION)
+    return unless authorize_resource(@institution, CREATE_INSTITUTION)
 
     @readonly = false
     set_institution_tab :new
@@ -38,7 +38,7 @@ class InstitutionsController < ApplicationController
   def create
     @institution = Institution.new(institution_params)
     @institution.user_id = current_user.id
-    return unless authorize_resource(@institution, Policy::CREATE_INSTITUTION)
+    return unless authorize_resource(@institution, CREATE_INSTITUTION)
 
     respond_to do |format|
       if @institution.save
@@ -53,7 +53,7 @@ class InstitutionsController < ApplicationController
 
   def update
     @institution = Institution.find(params[:id])
-    return unless authorize_resource(@institution, Policy::UPDATE_INSTITUTION)
+    return unless authorize_resource(@institution, UPDATE_INSTITUTION)
 
     respond_to do |format|
       if @institution.update(institution_params)
@@ -68,7 +68,7 @@ class InstitutionsController < ApplicationController
 
   def destroy
     @institution = Institution.find(params[:id])
-    return unless authorize_resource(@institution, Policy::DELETE_INSTITUTION)
+    return unless authorize_resource(@institution, DELETE_INSTITUTION)
 
     @institution.destroy
 

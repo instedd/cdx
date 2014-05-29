@@ -1,22 +1,25 @@
 require 'active_support/concern'
 module Resource
   extend ActiveSupport::Concern
+  include Policy::Actions
+
   included do
     def self.filter_by_resource(resource)
-      unless resource =~ /#{Policy::PREFIX}:#{name.underscore}\/(.*)/
-        return nil
+      match_resource(resource) do |match|
+        where(id: match)
       end
-
-      match = $1
-      if match == "*"
-        return self
-      end
-
-      where(id: match)
     end
 
     def filter_by_resource(resource)
-      unless resource =~ /#{Policy::PREFIX}:#{self.class.name.underscore}\/(.*)/
+      self.class.match_resource(resource) do |match|
+        if match.to_i == id
+          return self
+        end
+      end
+    end
+
+    def self.match_resource(resource)
+      unless resource =~ resource_matcher
         return nil
       end
 
@@ -25,11 +28,23 @@ module Resource
         return self
       end
 
-      if match.to_i == id
-        return self
-      end
+      yield match
+    end
 
-      nil
+    def self.resource_name_prefix
+      "#{PREFIX}:#{name.underscore}"
+    end
+
+    def self.resource_matcher
+      /#{resource_name_prefix}\/(.*)/
+    end
+
+    def self.resource_name
+      "#{resource_name_prefix}/*"
+    end
+
+    def resource_name
+      "#{self.class.resource_name_prefix}/#{id}"
     end
   end
 end

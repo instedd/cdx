@@ -9,27 +9,29 @@ class Policy < ActiveRecord::Base
 
   before_save :set_delegable_from_definition
 
-  PREFIX = "cdpx"
+  module Actions
+    PREFIX = "cdpx"
 
-  CREATE_INSTITUTION = "#{PREFIX}:createInstitution"
-  READ_INSTITUTION = "#{PREFIX}:readInstitution"
-  UPDATE_INSTITUTION = "#{PREFIX}:updateInstitution"
-  DELETE_INSTITUTION = "#{PREFIX}:deleteInstitution"
+    CREATE_INSTITUTION = "#{PREFIX}:createInstitution"
+    READ_INSTITUTION = "#{PREFIX}:readInstitution"
+    UPDATE_INSTITUTION = "#{PREFIX}:updateInstitution"
+    DELETE_INSTITUTION = "#{PREFIX}:deleteInstitution"
 
-  CREATE_LABORATORY = "#{PREFIX}:createLaboratory"
-  READ_LABORATORY = "#{PREFIX}:readLaboratory"
-  UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory"
-  DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory"
+    CREATE_LABORATORY = "#{PREFIX}:createLaboratory"
+    READ_LABORATORY = "#{PREFIX}:readLaboratory"
+    UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory"
+    DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory"
 
-  CREATE_DEVICE = "#{PREFIX}:createDevice"
-  READ_DEVICE = "#{PREFIX}:readDevice"
-  UPDATE_DEVICE = "#{PREFIX}:updateDevice"
-  DELETE_DEVICE = "#{PREFIX}:deleteDevice"
-  REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey"
+    CREATE_DEVICE = "#{PREFIX}:createDevice"
+    READ_DEVICE = "#{PREFIX}:readDevice"
+    UPDATE_DEVICE = "#{PREFIX}:updateDevice"
+    DELETE_DEVICE = "#{PREFIX}:deleteDevice"
+    REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey"
+  end
 
   ACTIONS = [
-    READ_INSTITUTION, UPDATE_INSTITUTION, DELETE_INSTITUTION,
-    CREATE_DEVICE, READ_DEVICE, UPDATE_DEVICE, DELETE_DEVICE, REGENERATE_DEVICE_KEY,
+    Actions::READ_INSTITUTION, Actions::UPDATE_INSTITUTION, Actions::DELETE_INSTITUTION,
+    Actions::CREATE_DEVICE, Actions::READ_DEVICE, Actions::UPDATE_DEVICE, Actions::DELETE_DEVICE, Actions::REGENERATE_DEVICE_KEY,
   ]
 
   def self.delegable

@@ -12,17 +12,17 @@ class DevicesController < ApplicationController
   end
 
   def index
-    @devices = authorize_resource(@institution.devices, Policy::READ_DEVICE)
+    @devices = authorize_resource(@institution.devices, READ_DEVICE)
   end
 
   def new
     @device = @institution.devices.new
-    return unless authorize_resource(@device, Policy::CREATE_DEVICE)
+    return unless authorize_resource(@device, CREATE_DEVICE)
   end
 
   def create
     @device = @institution.devices.new(device_params)
-    return unless authorize_resource(@device, Policy::CREATE_DEVICE)
+    return unless authorize_resource(@device, CREATE_DEVICE)
 
     respond_to do |format|
       if @device.save
@@ -37,14 +37,14 @@ class DevicesController < ApplicationController
 
   def edit
     @device = @institution.devices.find params[:id]
-    return unless authorize_resource(@device, Policy::UPDATE_DEVICE)
+    return unless authorize_resource(@device, UPDATE_DEVICE)
 
     add_breadcrumb @device.name, institution_device_path(@institution, @device)
   end
 
   def update
     @device = @institution.devices.find params[:id]
-    return unless authorize_resource(@device, Policy::UPDATE_DEVICE)
+    return unless authorize_resource(@device, UPDATE_DEVICE)
 
     respond_to do |format|
       if @device.update(device_params)
@@ -59,7 +59,7 @@ class DevicesController < ApplicationController
 
   def destroy
     @device = @institution.devices.find params[:id]
-    return unless authorize_resource(@device, Policy::DELETE_DEVICE)
+    return unless authorize_resource(@device, DELETE_DEVICE)
 
     @device.destroy
 
@@ -71,7 +71,7 @@ class DevicesController < ApplicationController
 
   def regenerate_key
     @device = @institution.devices.find params[:id]
-    return unless authorize_resource(@device, Policy::REGENERATE_DEVICE_KEY)
+    return unless authorize_resource(@device, REGENERATE_DEVICE_KEY)
 
     @device.set_key
 
@@ -90,7 +90,7 @@ class DevicesController < ApplicationController
 
   def load_institution
     @institution = Institution.find params[:institution_id]
-    authorize_resource(@institution, Policy::READ_INSTITUTION)
+    authorize_resource(@institution, READ_INSTITUTION)
   end
 
   def device_params
