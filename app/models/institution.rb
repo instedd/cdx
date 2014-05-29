@@ -1,5 +1,6 @@
 class Institution < ActiveRecord::Base
   belongs_to :user
+  include Resource
   has_many :laboratories, dependent: :destroy
   has_many :devices, dependent: :destroy
 
@@ -23,36 +24,6 @@ class Institution < ActiveRecord::Base
 
   def filter_by_owner(user)
     user_id == user.id ? self : nil
-  end
-
-  def self.filter_by_resource(resource)
-    unless resource =~ /#{Policy::PREFIX}:#{name.underscore}\/(.*)/
-      return nil
-    end
-
-    match = $1
-    if match == "*"
-      return self
-    end
-
-    where(id: match)
-  end
-
-  def filter_by_resource(resource)
-    unless resource =~ /#{Policy::PREFIX}:#{self.class.name.underscore}\/(.*)/
-      return nil
-    end
-
-    match = $1
-    if match == "*"
-      return self
-    end
-
-    if match.to_i == id
-      return self
-    end
-
-    nil
   end
 
   def to_s
