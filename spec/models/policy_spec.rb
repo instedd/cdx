@@ -10,8 +10,7 @@ describe Policy do
     policies = []
 
     result = Policy.check_all action, resource, policies, user
-    result.allowed?.should be_false
-    result.resources.should eq(nil)
+    result.should be_nil
   end
 
   it "allows a user to read his institutions" do
@@ -23,8 +22,7 @@ describe Policy do
     policies = [Policy.implicit]
 
     result = Policy.check_all action, resource, policies, user
-    result.allowed?.should be_true
-    result.resources.should eq([institution])
+    result.should eq([institution])
   end
 
   it "allows a user to update his institution" do
@@ -33,8 +31,7 @@ describe Policy do
     policies = [Policy.implicit]
 
     result = Policy.check_all action, resource, policies, user
-    result.allowed?.should be_true
-    result.resources.should eq([institution])
+    result.should eq([institution])
   end
 
   it "doesn't allows a user to update an instiutiton he is not an owner of" do
@@ -46,8 +43,7 @@ describe Policy do
     policies = [Policy.implicit]
 
     result = Policy.check_all action, resource, policies, user
-    result.allowed?.should be_false
-    result.resources.should eq(nil)
+    result.should be_nil
   end
 
   it "allows a user to read an institution" do
@@ -75,8 +71,7 @@ describe Policy do
     policies = [policy]
 
     result = Policy.check_all action, resource, policies, user
-    result.allowed?.should be_true
-    result.resources.should eq([institution2])
+    result.should eq([institution2])
   end
 
   it "doesn't allows a user to read another institution" do
@@ -105,8 +100,7 @@ describe Policy do
     policies = [policy]
 
     result = Policy.check_all action, resource, policies, user
-    result.allowed?.should be_false
-    result.resources.should be_nil
+    result.should be_nil
   end
 
   it "allows a user to list an institution" do
@@ -134,8 +128,7 @@ describe Policy do
     policies = [policy]
 
     result = Policy.check_all action, resource, policies, user
-    result.allowed?.should be_true
-    result.resources.should eq([institution2])
+    result.should eq([institution2])
   end
 
   it "allows reading all institutions if superadmin" do
@@ -147,8 +140,7 @@ describe Policy do
     policies = [Policy.implicit, Policy.superadmin]
 
     result = Policy.check_all action, resource, policies, user
-    result.allowed?.should be_true
-    result.resources.should eq([institution, institution2])
+    result.should eq([institution, institution2])
   end
 
   it "disallows read one institution if granter doesn't have a permission for it" do
@@ -184,8 +176,7 @@ describe Policy do
     policies = user2.policies
 
     result = Policy.check_all action, resource, policies, user2
-    result.allowed?.should be_false
-    result.resources.should be_nil
+    result.should be_nil
   end
 
   it "disallows read all institution if granter doesn't have a permission for it" do
@@ -221,8 +212,7 @@ describe Policy do
     policies = user2.policies
 
     result = Policy.check_all action, resource, policies, user2
-    result.allowed?.should be_true
-    result.resources.should eq([institution])
+    result.should eq([institution])
   end
 
   it "disallows delegable" do
@@ -266,8 +256,7 @@ describe Policy do
     policies = user3.policies
 
     result = Policy.check_all action, resource, policies, user3
-    result.allowed?.should be_false
-    result.resources.should be_nil
+    result.should be_nil
   end
 
   it "disallows delegable (1)" do
@@ -337,7 +326,6 @@ describe Policy do
     policies = user4.policies
 
     result = Policy.check_all action, resource, policies, user4
-    result.allowed?.should be_true
-    result.resources.should eq([institution])
+    result.should eq([institution])
   end
 end

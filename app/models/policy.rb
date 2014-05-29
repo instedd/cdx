@@ -36,19 +36,6 @@ class Policy < ActiveRecord::Base
     where(delegable: true)
   end
 
-  class CheckResult
-    attr_reader :resources
-
-    def initialize(allowed, resources)
-      @allowed = allowed
-      @resources = resources
-    end
-
-    def allowed?
-      @allowed
-    end
-  end
-
   def self.superadmin
     predefined_policy "superadmin"
   end
@@ -63,14 +50,14 @@ class Policy < ActiveRecord::Base
     end
     resources.compact!
     if resources.empty?
-      CheckResult.new(false, nil)
+      nil
     else
       resources.map! do |resource|
         resource.is_a?(Class) ? resource.all : resource
       end
       resources.flatten!
       resources.uniq!
-      CheckResult.new(true, resources)
+      resources
     end
   end
 
@@ -96,9 +83,9 @@ class Policy < ActiveRecord::Base
     # but only if the user is not the same as the granter (like implicit and superadmin policies)
     unless self_granted?
       granter_result = Policy.check_all action, resource, granter.policies.delegable, granter
-      return nil unless granter_result.allowed?
+      return nil unless granter_result
 
-      resource = granter_result.resources
+      resource = granter_result
     end
 
     resource
