@@ -31,7 +31,7 @@ describe Policy do
   it "allows a user to read an institution" do
     user2, institution2 = create_user_and_institution
 
-    grant user, user2, institution2, [READ_INSTITUTION, UPDATE_INSTITUTION]
+    grant user2, user, institution2, [READ_INSTITUTION, UPDATE_INSTITUTION]
 
     assert_can user, institution2, READ_INSTITUTION, [institution2]
   end
@@ -65,7 +65,9 @@ describe Policy do
     user2 = User.make
     user3, institution3 = create_user_and_institution
 
+    policy = grant user3, user, institution3, READ_INSTITUTION
     grant user, user2, institution3, READ_INSTITUTION
+    policy.destroy
 
     assert_cannot user2, institution3, READ_INSTITUTION
   end
@@ -83,8 +85,12 @@ describe Policy do
     user2 = User.make
     user3 = User.make
 
-    grant user, user2, institution, READ_INSTITUTION, false
+    policy = grant user, user2, institution, READ_INSTITUTION, true
+
     grant user2, user3, institution, READ_INSTITUTION, true
+
+    policy.definition = policy_definition(institution, READ_INSTITUTION, false)
+    policy.save!
 
     assert_cannot user3, institution, READ_INSTITUTION
   end
@@ -99,6 +105,26 @@ describe Policy do
     grant user3, user4, institution, READ_INSTITUTION, true
 
     assert_can user4, institution, READ_INSTITUTION, [institution]
+  end
+
+  it "disallows policy creation if granter can't delegate it" do
+    user2 = User.make
+    user3 = User.make
+
+    grant user, user2, institution, READ_INSTITUTION, false
+
+    policy = Policy.make_unsaved
+    policy.definition = policy_definition(institution, READ_INSTITUTION, false)
+    policy.granter_id = user2.id
+    policy.user_id = user3.id
+    policy.save.should be_false
+
+    action = Policy::READ_INSTITUTION
+    resource = institution
+    policies = [policy]
+
+    result = Policy.check_all action, resource, policies, user3
+    result.should be_nil
   end
 
   def create_user_and_institution
@@ -123,6 +149,7 @@ describe Policy do
     policy.granter_id = granter.id
     policy.user_id = user.id
     policy.save!
+    policy
   end
 
   def policy_definition(resource, action, delegable = true)
@@ -130,16 +157,16 @@ describe Policy do
     action = Array(action)
 
     JSON.parse %(
-                  {
-                    "statement":  [
-                      {
-                        "effect": "allow",
-                        "action": #{action.to_json},
-                        "resource": #{resource.to_json}
-                      }
-                    ],
-                    "delegable": #{delegable}
-                  }
-                )
+      {
+        "statement":  [
+          {
+            "effect": "allow",
+            "action": #{action.to_json},
+            "resource": #{resource.to_json}
+          }
+        ],
+        "delegable": #{delegable}
+      }
+    )
   end
 end

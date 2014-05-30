@@ -4,6 +4,7 @@ class Policy < ActiveRecord::Base
 
   validates_presence_of :name
   validate :validate_definition
+  validate :validate_owner_permissions
 
   serialize :definition, JSON
 
@@ -98,6 +99,25 @@ class Policy < ActiveRecord::Base
   end
 
   private
+
+  def validate_owner_permissions
+    unless self_granted?
+      resources = definition["statement"].map do |statement|
+        Array(statement["action"]).map do |action|
+          Array(statement["resource"]).map do |resource_matcher|
+            resources = Array(Resource.find(resource_matcher))
+            resources.map do |resource|
+              Policy.check_all(action, resource, granter.policies.delegable, granter)
+            end
+          end
+        end
+      end.flatten.compact
+      if resources.empty?
+        return errors.add :owner, "can't delegate permission"
+      end
+    end
+    true
+  end
 
   def validate_definition
     unless definition["statement"]

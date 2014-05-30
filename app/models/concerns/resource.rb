@@ -3,7 +3,33 @@ module Resource
   extend ActiveSupport::Concern
   include Policy::Actions
 
+  def self.add_resource(resource)
+    (@resources||=[]) << resource
+  end
+
+  def self.all
+    @resources.clone
+  end
+
+  def self.find(resource_string)
+    if resource_string == "*"
+      return all
+    end
+    all.each do |resource|
+      if result = resource.find_resource(resource_string)
+        return result
+      end
+    end
+  end
+
   included do
+
+    def self.find_resource(resource)
+      match_resource(resource) do |match|
+        find match
+      end
+    end
+
     def self.filter_by_resource(resource)
       match_resource(resource) do |match|
         where(id: match)
@@ -46,5 +72,7 @@ module Resource
     def resource_name
       "#{self.class.resource_name_prefix}/#{id}"
     end
+
+    Resource.add_resource(self)
   end
 end

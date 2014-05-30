@@ -1,6 +1,6 @@
 class Institution < ActiveRecord::Base
-  belongs_to :user
   include Resource
+  belongs_to :user
   has_many :laboratories, dependent: :destroy
   has_many :devices, dependent: :destroy
 

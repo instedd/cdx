@@ -9,12 +9,12 @@ defmodule MappingTest do
     device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
 
     manifest = Repo.insert Manifest.new(definition: """
-                    { "field_mapping" : [{
-                        "target_field": "assay_name",
-                        "selector" : "assay/name",
-                        "type" : "core"
-                    }]}
-                    """, version: 1)
+      { "field_mapping" : [{
+          "target_field": "assay_name",
+          "selector" : "assay/name",
+          "type" : "core"
+      }]}
+      """, version: 1)
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
     post("/api/devices/bar/results", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
@@ -30,20 +30,20 @@ defmodule MappingTest do
     device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
 
     manifest = Repo.insert Manifest.new(definition: """
-                    { "field_mapping" : [
-                      {
-                        "target_field": "assay_name",
-                        "selector" : "assay/name",
-                        "type" : "core"
-                      },
-                      {
-                        "target_field": "foo",
-                        "selector" : "patient_id",
-                        "type" : "custom",
-                        "pii": true
-                      }
-                    ]}
-                    """, version: 1)
+      { "field_mapping" : [
+        {
+          "target_field": "assay_name",
+          "selector" : "assay/name",
+          "type" : "core"
+        },
+        {
+          "target_field": "foo",
+          "selector" : "patient_id",
+          "type" : "custom",
+          "pii": true
+        }
+      ]}
+      """, version: 1)
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
     post("/api/devices/bar/results", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
@@ -64,21 +64,21 @@ defmodule MappingTest do
     device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
 
     manifest = Repo.insert Manifest.new(definition: """
-                    { "field_mapping" : [{
-                        "target_field": "assay_name",
-                        "selector" : "assay/name",
-                        "type" : "core"
-                    }]}
-                    """, version: 2)
+      { "field_mapping" : [{
+          "target_field": "assay_name",
+          "selector" : "assay/name",
+          "type" : "core"
+      }]}
+      """, version: 2)
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
     manifest = Repo.insert Manifest.new(definition: """
-                    { "field_mapping" : [{
-                        "target_field": "foo",
-                        "selector" : "assay/name",
-                        "type" : "core"
-                    }]}
-                    """, version: 1)
+      { "field_mapping" : [{
+          "target_field": "foo",
+          "selector" : "assay/name",
+          "type" : "core"
+      }]}
+      """, version: 1)
 
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
@@ -94,16 +94,16 @@ defmodule MappingTest do
     device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
 
     manifest = Repo.insert Manifest.new(definition: """
-                    { "field_mapping" : [
-                      {
-                        "target_field": "foo",
-                        "selector" : "some_field",
-                        "type" : "custom",
-                        "pii": false,
-                        "indexed": false
-                      }
-                    ]}
-                    """, version: 1)
+      { "field_mapping" : [
+        {
+          "target_field": "foo",
+          "selector" : "some_field",
+          "type" : "custom",
+          "pii": false,
+          "indexed": false
+        }
+      ]}
+      """, version: 1)
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
     post("/api/devices/bar/results", JSEX.encode!(%{"some_field" => 1234}))
