@@ -2,11 +2,10 @@ defmodule MappingTest do
   use Cdp.TestCase
   use Dynamo.HTTP.Case
   import TestHelpers
-  import Ecto.Query
 
   test "applies an existing manifest", context do
     device_model = Repo.insert DeviceModel.new(name: "fobar")
-    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
+    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
 
     manifest = Repo.insert Manifest.new(definition: """
       { "field_mapping" : [{
@@ -27,7 +26,7 @@ defmodule MappingTest do
 
   test "stores pii according to manifest", context do
     device_model = Repo.insert DeviceModel.new(name: "fobar")
-    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
+    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
 
     manifest = Repo.insert Manifest.new(definition: """
       { "field_mapping" : [
@@ -60,8 +59,8 @@ defmodule MappingTest do
   end
 
   test "Uses the last version of the manifest", context do
-   device_model = Repo.insert DeviceModel.new(name: "fobar")
-    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
+    device_model = Repo.insert DeviceModel.new(name: "fobar")
+    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
 
     manifest = Repo.insert Manifest.new(definition: """
       { "field_mapping" : [{
@@ -91,7 +90,7 @@ defmodule MappingTest do
 
   test "stores custom fields according to the manifest", context do
     device_model = Repo.insert DeviceModel.new(name: "fobar")
-    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
+    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
 
     manifest = Repo.insert Manifest.new(definition: """
       { "field_mapping" : [

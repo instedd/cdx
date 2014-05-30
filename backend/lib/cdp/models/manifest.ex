@@ -43,15 +43,15 @@ defmodule Manifest do
     end
   end
 
-  defp hash_key("custom", target_field, _, true) do
+  defp hash_key("custom", _target_field, _, true) do
     :pii
   end
 
-  defp hash_key("custom", target_field, true, false) do
+  defp hash_key("custom", _target_field, true, false) do
     :indexed
   end
 
-  defp hash_key("custom", target_field, false, false) do
+  defp hash_key("custom", _target_field, false, false) do
     :custom
   end
 
@@ -63,7 +63,7 @@ defmodule Manifest do
     end
   end
 
-  defp check_valid_value(value, target_field, nil) do
+  defp check_valid_value(value, _target_field, nil) do
     value
   end
 
@@ -108,7 +108,7 @@ defmodule Manifest do
     end
   end
 
-  defp apply_value_mappings(value, target_field, nil) do
+  defp apply_value_mappings(value, _target_field, nil) do
     value
   end
 
