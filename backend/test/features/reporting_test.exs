@@ -78,4 +78,23 @@ defmodule ReportingTest do
     assert result["_source"]["laboratory_id"] == nil
     assert result["_source"]["parent_locations"] == []
   end
+
+  test "overrides result if event_id is the same" do
+    data = JSEX.encode! [event_id: "1234", age: 20]
+    post("/api/devices/foo/results", data)
+
+    [test_result] = Repo.all TestResult
+    assert test_result.event_id == "1234"
+
+    data = JSEX.encode! [event_id: "1234", age: 30]
+    post("/api/devices/foo/results", data)
+
+    [test_result] = Repo.all TestResult
+    test_result = TestResult.decrypt(test_result)
+    raw_data = JSEX.decode! test_result.raw_data
+    assert raw_data["age"] == 30
+
+    [result] = get_all_elasticsearch_results()
+    assert result["_source"]["age"] == 30
+  end
 end

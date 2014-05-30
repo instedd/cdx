@@ -1,6 +1,7 @@
 defmodule TestResultCreation do
   use Timex
   import Tirexs.Bulk
+  import Ecto.Query
 
   def update_pii(result_uuid, data, date \\ :calendar.universal_time()) do
     date = Ecto.DateTime.from_erl(date)
@@ -23,20 +24,25 @@ defmodule TestResultCreation do
 
   def create({device, [], laboratories}, raw_data, data, date, uuid) do
     # TODO: when no manifest is found we should use a default mapping
+    event_id = data["event_id"]
 
     sensitive_data = Enum.map TestResult.sensitive_fields, fn field_name ->
       {field_name, data[atom_to_binary(field_name)]}
     end
-    create_in_db(device, sensitive_data, [], raw_data, date, uuid)
+    create_in_db(device, sensitive_data, [], raw_data, date, uuid, event_id)
 
     data = Dict.drop(data, (Enum.map TestResult.sensitive_fields, &atom_to_binary(&1)))
-    create_in_elasticsearch(device, laboratories, data, date, uuid)
+
+    create_in_elasticsearch(device, laboratories, data, date, uuid, event_id)
   end
 
   def create({device, [manifest], laboratories}, raw_data, data, date, uuid) do
     data = Manifest.apply(JSEX.decode!(manifest.definition), data)
-    create_in_db(device, data[:pii], data[:custom], raw_data, date, uuid)
-    create_in_elasticsearch(device, laboratories, data[:indexed], date, uuid)
+
+    event_id = data["event_id"]
+
+    create_in_db(device, data[:pii], data[:custom], raw_data, date, uuid, event_id)
+    create_in_elasticsearch(device, laboratories, data[:indexed], date, uuid, event_id)
   end
 
   def create({device, [manifest| manifests], laboratories}, raw_data, data, date, uuid) do
@@ -50,11 +56,24 @@ defmodule TestResultCreation do
     create({device, [manifest], laboratories}, raw_data, data, date, uuid)
   end
 
-  defp create_in_db(device, sensitive_data, custom_data, raw_data, date, uuid) do
+  def find_by_device_id_and_event_id(device_id, event_id) do
+    query = from t in TestResult,
+      where: t.device_id == ^device_id,
+      where: t.event_id == ^event_id,
+      select: t
+    test_results = Repo.all(query)
+    case test_results do
+      [test_result] -> test_result
+      _ -> nil
+    end
+  end
+
+  defp create_in_db(device, sensitive_data, custom_data, raw_data, date, uuid, event_id) do
     date = Ecto.DateTime.from_erl(date)
 
     test_result = TestResult.new [
       device_id: device.id,
+      event_id: event_id,
       raw_data: raw_data,
       uuid: uuid,
       sensitive_data: sensitive_data,
@@ -64,32 +83,45 @@ defmodule TestResultCreation do
     ]
 
     test_result = TestResult.encrypt(test_result)
-    Repo.insert(test_result)
+
+    # Check if the test result already exists with that event_id
+    if event_id do
+      existing_test_result = find_by_device_id_and_event_id(device.id, event_id)
+      if existing_test_result do
+        test_result = test_result.id(existing_test_result.id)
+        Repo.update(test_result)
+      else
+        Repo.insert(test_result)
+      end
+    else
+      Repo.insert(test_result)
+    end
   end
 
-  defp create_in_elasticsearch(device, [], data, date, uuid) do
-    create_in_elasticsearch(device, nil, [], nil, date, data, uuid)
+  defp create_in_elasticsearch(device, [], data, date, uuid, event_id) do
+    create_in_elasticsearch(device, nil, [], nil, date, data, uuid, event_id)
   end
 
-  defp create_in_elasticsearch(device, [laboratory], data, date, uuid) do
+  defp create_in_elasticsearch(device, [laboratory], data, date, uuid, event_id) do
     laboratory_id = laboratory.id
     location_id = laboratory.location_id
     parent_locations = Location.with_parents Repo.get(Location, laboratory.location_id)
-    create_in_elasticsearch(device, laboratory_id, parent_locations, location_id, date, data, uuid)
+    create_in_elasticsearch(device, laboratory_id, parent_locations, location_id, date, data, uuid, event_id)
   end
 
-  defp create_in_elasticsearch(device, laboratories, data, date, uuid) do
+  defp create_in_elasticsearch(device, laboratories, data, date, uuid, event_id) do
     locations = (Enum.map laboratories, fn laboratory -> Repo.get Location, laboratory.location_id end)
     root_location = Location.common_root(locations)
     parent_locations = Location.with_parents root_location
     if root_location do
       location_id = root_location.id
     end
-    create_in_elasticsearch(device, nil, parent_locations, location_id, date, data, uuid)
+    create_in_elasticsearch(device, nil, parent_locations, location_id, date, data, uuid, event_id)
   end
 
-  defp create_in_elasticsearch(device, laboratory_id, parent_locations, location_id, date, data, uuid) do
+  defp create_in_elasticsearch(device, laboratory_id, parent_locations, location_id, date, data, uuid, event_id) do
     institution_id = device.institution_id
+
     data = Dict.put data, :type, "test_result"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.from(date), "{ISO}"))
     data = Dict.put data, :device_uuid, device.secret_key
@@ -99,9 +131,13 @@ defmodule TestResultCreation do
     data = Dict.put data, :institution_id, institution_id
     data = Dict.put data, :uuid, uuid
 
+    if event_id do
+      data = Dict.put data, :id, "#{device.secret_key}_#{event_id}"
+    end
+
     settings = Tirexs.ElasticSearch.Config.new()
     Tirexs.Bulk.store [index: Institution.elasticsearch_index_name(institution_id), refresh: true], settings do
-      create data
+      index data
     end
   end
 end

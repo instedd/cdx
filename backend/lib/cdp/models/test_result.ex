@@ -7,6 +7,7 @@ defmodule TestResult do
     field :created_at, :datetime
     field :updated_at, :datetime
     field :uuid
+    field :event_id
     field :custom_fields
     field :raw_data, :binary
     field :sensitive_data, :binary
@@ -27,6 +28,7 @@ defmodule TestResult do
         {"since", {:range, [:from, {:include_lower, true}]}},
         {"until", {:range, [:to, {:include_lower, true}]}}
       ]},
+      {:event_id, :integer, [{"event_id", :match}]},
       {:device_uuid, :string, [{"device", :match}]},
       {:laboratory_id, :integer, [{"laboratory", :match}]},
       {:institution_id, :integer, [{"institution", :match}]},
