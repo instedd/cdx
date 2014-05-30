@@ -48,8 +48,12 @@ class Policy < ActiveRecord::Base
   end
 
   def self.check_all(action, resource, policies, user)
+    check_all_recursive action, resource, policies, user
+  end
+
+  def self.check_all_recursive(action, resource, policies, user, users_so_far = Set.new)
     resources = policies.map do |policy|
-      policy.check action, resource, user
+      policy.check action, resource, user, users_so_far
     end
     resources.compact!
     if resources.empty?
@@ -64,7 +68,7 @@ class Policy < ActiveRecord::Base
     end
   end
 
-  def check(action, resource, user)
+  def check(action, resource, user, users_so_far)
     found_one = false
 
     definition["statement"].each do |statement|
@@ -84,8 +88,11 @@ class Policy < ActiveRecord::Base
 
     # Check that the granter's policies allow the action on the resource,
     # but only if the user is not the same as the granter (like implicit and superadmin policies)
-    unless implicit?
-      granter_result = Policy.check_all action, resource, granter.policies.delegable, granter
+    if !implicit? && !users_so_far.include?(granter)
+      users_so_far.add granter
+      granter_result = Policy.check_all_recursive action, resource, granter.policies.delegable, granter, users_so_far
+      users_so_far.delete granter
+
       return nil unless granter_result
 
       resource = granter_result

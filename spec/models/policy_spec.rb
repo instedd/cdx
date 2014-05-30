@@ -19,7 +19,7 @@ describe Policy do
   end
 
   it "allows a user to update his institution" do
-    assert_can user, institution, UPDATE_INSTITUTION, [institution]
+    assert_can user, institution, UPDATE_INSTITUTION
   end
 
   it "doesn't allows a user to update an instiutiton he is not an owner of" do
@@ -33,7 +33,7 @@ describe Policy do
 
     grant user2, user, institution2, [READ_INSTITUTION, UPDATE_INSTITUTION]
 
-    assert_can user, institution2, READ_INSTITUTION, [institution2]
+    assert_can user, institution2, READ_INSTITUTION
   end
 
   it "doesn't allows a user to read another institution" do
@@ -107,7 +107,7 @@ describe Policy do
     grant user, user3, institution, READ_INSTITUTION, true
     grant user3, user4, institution, READ_INSTITUTION, true
 
-    assert_can user4, institution, READ_INSTITUTION, [institution]
+    assert_can user4, institution, READ_INSTITUTION
   end
 
   it "disallows policy creation if granter can't delegate it" do
@@ -146,13 +146,24 @@ describe Policy do
     policy.save.should be_false
   end
 
+  it "allows checking when there's a loop" do
+    user2, institution2 = create_user_and_institution
+    user3, institution3 = create_user_and_institution
+
+    grant user2, user3, institution2, READ_INSTITUTION
+    grant user3, user2, institution2, READ_INSTITUTION
+
+    assert_cannot user2, institution3, READ_INSTITUTION
+    assert_can user3, institution2, READ_INSTITUTION
+  end
+
   def create_user_and_institution
     user = User.make
     institution = user.create Institution.make_unsaved
     [user, institution]
   end
 
-  def assert_can(user, resource, action, result)
+  def assert_can(user, resource, action, result = [resource])
     result = Policy.check_all action, resource, user.policies, user
     result.should eq(result)
   end
