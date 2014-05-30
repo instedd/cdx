@@ -163,9 +163,9 @@ describe Policy do
     [user, institution]
   end
 
-  def assert_can(user, resource, action, result = [resource])
+  def assert_can(user, resource, action, expected_result = [resource])
     result = Policy.check_all action, resource, user.policies, user
-    result.should eq(result)
+    result.should eq(expected_result)
   end
 
   def assert_cannot(user, resource, action)
