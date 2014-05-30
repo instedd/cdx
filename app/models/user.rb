@@ -27,8 +27,8 @@ class User < ActiveRecord::Base
 
   def grant_implicit_policy
     implicit = Policy.implicit
-    implicit.granter = self
+    implicit.granter = nil
     implicit.user = self
-    implicit.save!
+    implicit.save(validate: false)
   end
 end

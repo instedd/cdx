@@ -56,7 +56,10 @@ describe Policy do
   it "allows reading all institutions if superadmin" do
     user2, institution2 = create_user_and_institution
 
-    grant user, user, "*", "*"
+    policy = Policy.superadmin
+    policy.granter_id = nil
+    policy.user_id = user.id
+    policy.save(validate: false)
 
     assert_can user, Institution, READ_INSTITUTION, [institution, institution2]
   end
@@ -125,6 +128,22 @@ describe Policy do
 
     result = Policy.check_all action, resource, policies, user3
     result.should be_nil
+  end
+
+  it "disallows policy creation if self-granted" do
+    policy = Policy.make_unsaved
+    policy.definition = policy_definition(institution, READ_INSTITUTION, false)
+    policy.granter_id = user.id
+    policy.user_id = user.id
+    policy.save.should be_false
+  end
+
+  it "disallows policy creation if granter is nil" do
+    policy = Policy.make_unsaved
+    policy.definition = policy_definition(institution, READ_INSTITUTION, false)
+    policy.granter_id = nil
+    policy.user_id = user.id
+    policy.save.should be_false
   end
 
   def create_user_and_institution

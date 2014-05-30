@@ -2,7 +2,7 @@ class Policy < ActiveRecord::Base
   belongs_to :user
   belongs_to :granter, class_name: 'User', foreign_key: 'granter_id'
 
-  validates_presence_of :name
+  validates_presence_of :name, :granter, :user, :definition
   validate :validate_definition
   validate :validate_owner_permissions
 
@@ -84,7 +84,7 @@ class Policy < ActiveRecord::Base
 
     # Check that the granter's policies allow the action on the resource,
     # but only if the user is not the same as the granter (like implicit and superadmin policies)
-    unless self_granted?
+    unless implicit?
       granter_result = Policy.check_all action, resource, granter.policies.delegable, granter
       return nil unless granter_result
 
@@ -94,6 +94,10 @@ class Policy < ActiveRecord::Base
     resource
   end
 
+  def implicit?
+    self.granter_id == nil
+  end
+
   def self_granted?
     self.user_id == self.granter_id
   end
@@ -101,20 +105,22 @@ class Policy < ActiveRecord::Base
   private
 
   def validate_owner_permissions
-    unless self_granted?
-      resources = definition["statement"].map do |statement|
-        Array(statement["action"]).map do |action|
-          Array(statement["resource"]).map do |resource_matcher|
-            resources = Array(Resource.find(resource_matcher))
-            resources.map do |resource|
-              Policy.check_all(action, resource, granter.policies.delegable, granter)
-            end
+    return errors.add :owner, "permission can't be self granted" if self_granted?
+    return errors.add :owner, "permission granter can't be nil" if implicit?
+
+    resources = definition["statement"].map do |statement|
+      Array(statement["action"]).map do |action|
+        Array(statement["resource"]).map do |resource_matcher|
+          resources = Array(Resource.find(resource_matcher))
+          resources.map do |resource|
+            Policy.check_all(action, resource, granter.policies.delegable, granter)
           end
         end
-      end.flatten.compact
-      if resources.empty?
-        return errors.add :owner, "can't delegate permission"
       end
+    end.flatten.compact
+
+    if resources.empty?
+      return errors.add :owner, "can't delegate permission"
     end
     true
   end
