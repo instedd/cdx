@@ -10,7 +10,11 @@ defmodule ApiRouter do
   end
 
   get "/results/:result_uuid/pii" do
-    conn.send(200, JSEX.encode!(TestResult.find_by_uuid(result_uuid)))
+    conn.send(200, JSEX.encode!(TestResult.pii_of(result_uuid)))
+  end
+
+  get "/results/:result_uuid/custom_fields" do
+    conn.send(200, JSEX.encode!(TestResult.custom_fields_of(result_uuid)))
   end
 
   post "/devices/:device_key/results" do

@@ -20,6 +20,12 @@ defmodule TestHelpers do
     JSEX.decode!(conn.sent_body)
   end
 
+  def get_custom_fields(result_uuid) do
+    conn = get("api/results/#{result_uuid}/custom_fields")
+    assert conn.status == 200
+    JSEX.decode!(conn.sent_body)
+  end
+
   def get_one_update(query_string, post_data \\ "") do
     [result] = get_updates(query_string, post_data)
     result
