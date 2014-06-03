@@ -1,4 +1,4 @@
-defmodule TestResultGrouping do
+defmodule EventGrouping do
   def query_with_group_by(query, group_by) do
     if is_list(group_by) do
       all_group_by = group_by
@@ -32,9 +32,9 @@ defmodule TestResultGrouping do
       index: "#{Elasticsearch.index_prefix}*"
     ]
 
-    result = Tirexs.Query.create_resource(query)
+    event = Tirexs.Query.create_resource(query)
 
-    process_group_by_buckets(result.aggregations, all_group_by, [], [], 0)
+    process_group_by_buckets(event.aggregations, all_group_by, [], [], 0)
   end
 
   # nested fields must appear last in the group by
@@ -78,35 +78,35 @@ defmodule TestResultGrouping do
     [field] ++ group_nested_fields(fields)
   end
 
-  defp process_group_by_buckets(aggregations, all_group_by, results, result, doc_count) do
+  defp process_group_by_buckets(aggregations, all_group_by, events, event, doc_count) do
     count = aggregations["count"]
     if count do
       [first_group_by | other_group_by] = all_group_by
 
       case first_group_by do
         {:range, field, _ranges} ->
-          process_bucket(other_group_by, results, result, count["buckets"], fn(bucket) -> {field, [normalize(bucket["from"]), normalize(bucket["to"])]} end)
+          process_bucket(other_group_by, events, event, count["buckets"], fn(bucket) -> {field, [normalize(bucket["from"]), normalize(bucket["to"])]} end)
         {:date, _interval, field} ->
-          process_bucket(other_group_by, results, result, count["buckets"], fn(bucket) -> {field, bucket["key_as_string"]} end)
+          process_bucket(other_group_by, events, event, count["buckets"], fn(bucket) -> {field, bucket["key_as_string"]} end)
         {:flat, field_name} ->
-          process_bucket(other_group_by, results, result, count["buckets"], fn(bucket) -> {field_name, bucket["key"]} end)
+          process_bucket(other_group_by, events, event, count["buckets"], fn(bucket) -> {field_name, bucket["key"]} end)
         {:nested, fields} ->
-          process_group_by_buckets(count, fields, results, result, doc_count)
+          process_group_by_buckets(count, fields, events, event, doc_count)
         {:nested, _nesting_field, {:flat, field_name}} ->
-          process_bucket(other_group_by, results, result, count["buckets"], fn(bucket) -> {field_name, bucket["key"]} end)
+          process_bucket(other_group_by, events, event, count["buckets"], fn(bucket) -> {field_name, bucket["key"]} end)
         nil ->
           raise "Trying to group by a non searchable field"
       end
     else
-      result = result ++ [count: doc_count]
-      [result | results]
+      event = event ++ [count: doc_count]
+      [event | events]
     end
   end
 
-  defp process_bucket(other_group_by, results, result, buckets, mapping) do
-    Enum.reduce buckets, results, fn(bucket, results) ->
-      result = result ++ [mapping.(bucket)]
-      process_group_by_buckets(bucket, other_group_by, results, result, bucket["doc_count"])
+  defp process_bucket(other_group_by, events, event, buckets, mapping) do
+    Enum.reduce buckets, events, fn(bucket, events) ->
+      event = event ++ [mapping.(bucket)]
+      process_group_by_buckets(bucket, other_group_by, events, event, bucket["doc_count"])
     end
   end
 
@@ -152,7 +152,7 @@ defmodule TestResultGrouping do
   end
 
   defp find_in_searchable_fields(name) do
-    find_in_fields name, TestResult.searchable_fields
+    find_in_fields name, Event.searchable_fields
   end
 
   defp find_in_fields(_name, []) do

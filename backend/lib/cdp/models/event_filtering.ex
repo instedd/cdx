@@ -1,4 +1,4 @@
-defmodule TestResultFiltering do
+defmodule EventFiltering do
 
   def query(params, post_body) do
     conditions = process_conditions(params, [])
@@ -10,12 +10,12 @@ defmodule TestResultFiltering do
     group_by = params["group_by"] || post_body["group_by"]
 
     if group_by do
-      results = TestResultGrouping.query_with_group_by(query, group_by)
+      events = EventGrouping.query_with_group_by(query, group_by)
     else
-      results = query_without_group_by(query, order)
+      events = query_without_group_by(query, order)
     end
 
-    Enum.map results, fn test_result -> Enum.into(test_result, %{}) end
+    Enum.map events, fn event -> Enum.into(event, %{}) end
   end
 
   defp query_without_group_by(query, sort) do
@@ -26,8 +26,8 @@ defmodule TestResultFiltering do
       ],
       index: "#{Elasticsearch.index_prefix}*"
     ]
-    result = Tirexs.Query.create_resource(query)
-    Enum.map result.hits, fn(hit) -> hit["_source"] end
+    event = Tirexs.Query.create_resource(query)
+    Enum.map event.hits, fn(hit) -> hit["_source"] end
   end
 
   def field_matcher(field_name, :multi_field) do
@@ -96,7 +96,7 @@ defmodule TestResultFiltering do
   end
 
   defp process_conditions(params, conditions) do
-    conditions = process_fields(TestResult.searchable_fields, params, conditions)
+    conditions = process_fields(Event.searchable_fields, params, conditions)
 
     if Enum.empty?(conditions) do
       condition = [match_all: []]

@@ -2,7 +2,7 @@ class Device < ActiveRecord::Base
   belongs_to :device_model
   belongs_to :institution
   has_and_belongs_to_many :laboratories
-  has_many :test_results
+  has_many :events
 
   validates_presence_of :institution
   validates_presence_of :name

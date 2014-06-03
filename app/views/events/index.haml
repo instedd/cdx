@@ -21,11 +21,11 @@
     %th Device
     %th Assay name
     %th Results
-  - @test_results.each do |result|
+  - @events.each do |event|
     %tr
-      %td= result["created_at"]
-      %td= @institutions[result["institution_id"]]
-      %td= @laboratories[result["laboratory_id"]]
-      %td= @devices[result["device_uuid"]]
-      %td= result["assay_name"]
-      %td= (result["analytes"] || []).map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "
+      %td= event["created_at"]
+      %td= @institutions[event["institution_id"]]
+      %td= @laboratories[event["laboratory_id"]]
+      %td= @devices[event["device_uuid"]]
+      %td= event["assay_name"]
+      %td= (event["results"] || []).map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "

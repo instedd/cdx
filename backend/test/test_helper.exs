@@ -9,41 +9,41 @@ defmodule TestHelpers do
   require Tirexs.Search
 
   def get_updates(query_string, post_data \\ "") do
-    conn = get("/api/results?#{query_string}", post_data)
+    conn = get("/api/events?#{query_string}", post_data)
     assert conn.status == 200
     JSEX.decode!(conn.sent_body)
   end
 
-  def get_pii(result_uuid) do
-    conn = get("api/results/#{result_uuid}/pii")
+  def get_pii(event_uuid) do
+    conn = get("api/events/#{event_uuid}/pii")
     assert conn.status == 200
     JSEX.decode!(conn.sent_body)
   end
 
-  def get_custom_fields(result_uuid) do
-    conn = get("api/results/#{result_uuid}/custom_fields")
+  def get_custom_fields(event_uuid) do
+    conn = get("api/events/#{event_uuid}/custom_fields")
     assert conn.status == 200
     JSEX.decode!(conn.sent_body)
   end
 
   def get_one_update(query_string, post_data \\ "") do
-    [result] = get_updates(query_string, post_data)
-    result
+    [event] = get_updates(query_string, post_data)
+    event
   end
 
   def assert_no_updates(query_string, post_data \\ "") do
     assert get_updates(query_string, post_data) == []
   end
 
-  def post_result(result, device \\ "foo") do
-    post("/api/devices/#{device}/results", JSEX.encode!(result))
+  def post_event(event, device \\ "foo") do
+    post("/api/devices/#{device}/events", JSEX.encode!(event))
   end
 
-  def create_result(result, date \\ :calendar.universal_time(), device \\ "foo") do
-    TestResultCreation.create(device, JSEX.encode!(result), date)
+  def create_event(event, date \\ :calendar.universal_time(), device \\ "foo") do
+    EventCreation.create(device, JSEX.encode!(event), date)
   end
 
-  def get_all_elasticsearch_results do
+  def get_all_elasticsearch_events do
     search = Tirexs.Search.search [index: "#{Elasticsearch.index_prefix}*"] do
       query do
         match_all
@@ -105,12 +105,12 @@ defmodule TestHelpers do
     laboratory3 = Repo.insert Laboratory.new(institution_id: institution.id, name: "bar3", location_id: location3.id)
     device = Repo.insert Device.new(institution_id: institution.id, secret_key: "foo")
     Repo.insert DevicesLaboratories.new(laboratory_id: laboratory1.id, device_id: device.id)
-    data = JSEX.encode! [result: "positive"]
+    data = JSEX.encode! [event: "positive"]
     {:ok, institution: institution, institution2: institution2, device: device, data: data, root_location: root_location, parent_location: parent_location, location1: location1, location2: location2, location3: location3, laboratory1: laboratory1, laboratory2: laboratory2, laboratory3: laboratory3}
   end
 
   def clear_database do
-    Enum.each [Institution, Laboratory, Device, TestResult, DeviceModel, DeviceModelsManifests, Manifest], &Repo.delete_all/1
+    Enum.each [Institution, Laboratory, Device, Event, DeviceModel, DeviceModelsManifests, Manifest], &Repo.delete_all/1
     Tirexs.ElasticSearch.delete "#{Elasticsearch.index_prefix}*", Tirexs.ElasticSearch.Config.new()
   end
 end

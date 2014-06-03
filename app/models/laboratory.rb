@@ -3,7 +3,7 @@ class Laboratory < ActiveRecord::Base
   has_one :user, through: :institution
   belongs_to :location
   has_and_belongs_to_many :devices
-  has_many :test_results, through: :devices
+  has_many :events, through: :devices
 
   validates_presence_of :institution
   validates_presence_of :name

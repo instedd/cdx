@@ -16,12 +16,12 @@ defmodule MappingTest do
       """, version: 1)
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
-    post("/api/devices/bar/results", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
+    post("/api/devices/bar/events", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["assay_name"] == "GX4002"
-    assert result["_source"]["created_at"] != nil
-    assert result["_source"]["patient_id"] == nil
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["assay_name"] == "GX4002"
+    assert event["_source"]["created_at"] != nil
+    assert event["_source"]["patient_id"] == nil
   end
 
   test "stores pii according to manifest", context do
@@ -45,15 +45,15 @@ defmodule MappingTest do
       """, version: 1)
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
-    post("/api/devices/bar/results", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
+    post("/api/devices/bar/events", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["foo"] == nil
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["foo"] == nil
 
-    test_uuid = result["_source"]["uuid"]
+    test_uuid = event["_source"]["uuid"]
 
-    result = get_pii(test_uuid)
-    pii = result["pii"]
+    event = get_pii(test_uuid)
+    pii = event["pii"]
     assert pii["patient_id"] == nil
     assert pii["foo"] == 1234
   end
@@ -81,11 +81,11 @@ defmodule MappingTest do
 
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
-    post("/api/devices/bar/results", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
+    post("/api/devices/bar/events", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["foo"] == nil
-    assert result["_source"]["assay_name"] == "GX4002"
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["foo"] == nil
+    assert event["_source"]["assay_name"] == "GX4002"
   end
 
   test "stores custom fields according to the manifest", context do
@@ -105,19 +105,19 @@ defmodule MappingTest do
       """, version: 1)
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
-    post("/api/devices/bar/results", JSEX.encode!(%{"some_field" => 1234}))
+    post("/api/devices/bar/events", JSEX.encode!(%{"some_field" => 1234}))
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["foo"] == nil
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["foo"] == nil
 
-    test_uuid = result["_source"]["uuid"]
+    test_uuid = event["_source"]["uuid"]
 
-    result = get_pii(test_uuid)
-    pii = result["pii"]
+    event = get_pii(test_uuid)
+    pii = event["pii"]
     assert pii["some_field"] == nil
     assert pii["foo"] == nil
 
-    [test_result] = Repo.all TestResult
-    assert JSEX.decode!(test_result.custom_fields)["foo"] == 1234
+    [event] = Repo.all Event
+    assert JSEX.decode!(event.custom_fields)["foo"] == 1234
   end
 end

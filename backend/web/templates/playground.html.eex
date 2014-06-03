@@ -26,12 +26,12 @@
         success: function(data, textStatus, jqXHR) {
           $create_button.prop("disabled", false);
           $create_button.val("Created!");
-          setTimeout(function() { $create_button.val("Create another test result"); }, 1000);
+          setTimeout(function() { $create_button.val("Create another event"); }, 1000);
         },
         error: function(jqXHR, textStatus, errorThrown) {
           $create_button.prop("disabled", false);
           $create_button.val("Error: " + errorThrown);
-          setTimeout(function() { $create_button.val("Create another test result"); }, 1000);
+          setTimeout(function() { $create_button.val("Create another event"); }, 1000);
         }
       });
       return false;
@@ -75,7 +75,7 @@
   <h3>CDP - Playground</h3>
   <div class='row-fluid'>
     <div class='span4' style="border-right:1px solid black">
-      <h4>Submit test result</h4>
+      <h4>Submit event</h4>
       <form id="report_form" method="post">
         <div>
           <label for="device">Device</label>
@@ -91,7 +91,7 @@
   "gender": "male",
   "age": 20,
   "assay_name": "GX4001",
-  "analytes": [
+  "results": [
     {
       "condition": "MTB",
       "result": "positive"
@@ -100,7 +100,7 @@
 }</textarea>
         </div>
         <div>
-          <input id="create_button" class="btn" name="commit" type="submit" value="Create test result" />
+          <input id="create_button" class="btn" name="commit" type="submit" value="Create event" />
         </div>
       </form>
     </div>

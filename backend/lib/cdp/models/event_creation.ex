@@ -1,21 +1,21 @@
-defmodule TestResultCreation do
+defmodule EventCreation do
   use Timex
   import Tirexs.Bulk
   import Ecto.Query
 
-  def update_pii(result_uuid, data, date \\ :calendar.universal_time()) do
+  def update_pii(uuid, data, date \\ :calendar.universal_time()) do
     date = Ecto.DateTime.from_erl(date)
 
-    sensitive_data = Enum.map TestResult.sensitive_fields, fn field_name ->
+    sensitive_data = Enum.map Event.sensitive_fields, fn field_name ->
       {field_name, data[atom_to_binary(field_name)]}
     end
 
-    test_result = TestResult.find_by_uuid_in_postgres(result_uuid)
-    test_result = test_result.sensitive_data sensitive_data
-    test_result = test_result.updated_at date
-    test_result = TestResult.encrypt(test_result)
+    event = Event.find_by_uuid_in_postgres(uuid)
+    event = event.sensitive_data sensitive_data
+    event = event.updated_at date
+    event = Event.encrypt(event)
 
-    Repo.update(test_result)
+    Repo.update(event)
   end
 
   def create(device_key, raw_data, date \\ :calendar.universal_time()) do
@@ -26,12 +26,12 @@ defmodule TestResultCreation do
     # TODO: when no manifest is found we should use a default mapping
     event_id = data["event_id"]
 
-    sensitive_data = Enum.map TestResult.sensitive_fields, fn field_name ->
+    sensitive_data = Enum.map Event.sensitive_fields, fn field_name ->
       {field_name, data[atom_to_binary(field_name)]}
     end
     create_in_db(device, sensitive_data, [], raw_data, date, uuid, event_id)
 
-    data = Dict.drop(data, (Enum.map TestResult.sensitive_fields, &atom_to_binary(&1)))
+    data = Dict.drop(data, (Enum.map Event.sensitive_fields, &atom_to_binary(&1)))
 
     create_in_elasticsearch(device, laboratories, data, date, uuid, event_id)
   end
@@ -57,13 +57,13 @@ defmodule TestResultCreation do
   end
 
   def find_by_device_id_and_event_id(device_id, event_id) do
-    query = from t in TestResult,
+    query = from t in Event,
       where: t.device_id == ^device_id,
       where: t.event_id == ^event_id,
       select: t
-    test_results = Repo.all(query)
-    case test_results do
-      [test_result] -> test_result
+    events = Repo.all(query)
+    case events do
+      [event] -> event
       _ -> nil
     end
   end
@@ -71,7 +71,7 @@ defmodule TestResultCreation do
   defp create_in_db(device, sensitive_data, custom_data, raw_data, date, uuid, event_id) do
     date = Ecto.DateTime.from_erl(date)
 
-    test_result = TestResult.new [
+    event = Event.new [
       device_id: device.id,
       event_id: event_id,
       raw_data: raw_data,
@@ -82,19 +82,19 @@ defmodule TestResultCreation do
       updated_at: date,
     ]
 
-    test_result = TestResult.encrypt(test_result)
+    event = Event.encrypt(event)
 
-    # Check if the test result already exists with that event_id
+    # Check if the event already exists with that event_id
     if event_id do
-      existing_test_result = find_by_device_id_and_event_id(device.id, event_id)
-      if existing_test_result do
-        test_result = test_result.id(existing_test_result.id)
-        Repo.update(test_result)
+      existing_event = find_by_device_id_and_event_id(device.id, event_id)
+      if existing_event do
+        event = event.id(existing_event.id)
+        Repo.update(event)
       else
-        Repo.insert(test_result)
+        Repo.insert(event)
       end
     else
-      Repo.insert(test_result)
+      Repo.insert(event)
     end
   end
 
@@ -122,7 +122,7 @@ defmodule TestResultCreation do
   defp create_in_elasticsearch(device, laboratory_id, parent_locations, location_id, date, data, uuid, event_id) do
     institution_id = device.institution_id
 
-    data = Dict.put data, :type, "test_result"
+    data = Dict.put data, :type, "event"
     data = Dict.put data, :created_at, (DateFormat.format!(Date.from(date), "{ISO}"))
     data = Dict.put data, :device_uuid, device.secret_key
     data = Dict.put data, :location_id, location_id

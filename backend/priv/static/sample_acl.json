@@ -131,7 +131,7 @@ Institution Admin (option B):
 Read Permission for tests grouped yearly by date ranges and location:
 {
   "action" : [
-    "queryTestResults"
+    "queryEvents"
   ],
   "resource" : "cdxp:api",
   "condition" : { "group_by" : [

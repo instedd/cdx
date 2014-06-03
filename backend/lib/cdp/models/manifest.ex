@@ -8,18 +8,18 @@ defmodule Manifest do
   end
 
   def apply(manifest, data) do
-    result = %{
+    event = %{
       indexed: %{},
       pii: %{},
       custom: %{},
     }
 
-    Enum.reduce manifest["field_mapping"], result, fn(mapping, result) ->
-      apply_single_mapping(mapping, data, result)
+    Enum.reduce manifest["field_mapping"], event, fn(mapping, event) ->
+      apply_single_mapping(mapping, data, event)
     end
   end
 
-  defp apply_single_mapping(mapping, data, result) do
+  defp apply_single_mapping(mapping, data, event) do
     target_field = mapping["target_field"]
     selector = mapping["selector"]
     type = mapping["type"]
@@ -30,13 +30,13 @@ defmodule Manifest do
     value = apply_value_mappings(value, target_field, mapping["value_mappings"])
 
     key = hash_key(type, target_field, mapping["indexed"], pii)
-    element = result[key]
+    element = event[key]
     element = Dict.put(element, target_field, value)
-    Dict.put(result, key, element)
+    Dict.put(event, key, element)
   end
 
   defp hash_key("core", target_field, _, _) do
-    if TestResult.pii?(target_field) do
+    if Event.pii?(target_field) do
       :pii
     else
       :indexed

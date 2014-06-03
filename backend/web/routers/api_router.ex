@@ -1,33 +1,33 @@
 defmodule ApiRouter do
   use Dynamo.Router
 
-  get "/results/" do
-    get_results(conn)
+  get "/events/" do
+    get_events(conn)
   end
 
-  post "/results/" do
-    get_results(conn)
+  post "/events/" do
+    get_events(conn)
   end
 
-  get "/results/:result_uuid/pii" do
-    conn.send(200, JSEX.encode!(TestResult.pii_of(result_uuid)))
+  get "/events/:result_uuid/pii" do
+    conn.send(200, JSEX.encode!(Event.pii_of(result_uuid)))
   end
 
-  get "/results/:result_uuid/custom_fields" do
-    conn.send(200, JSEX.encode!(TestResult.custom_fields_of(result_uuid)))
+  get "/events/:result_uuid/custom_fields" do
+    conn.send(200, JSEX.encode!(Event.custom_fields_of(result_uuid)))
   end
 
-  post "/devices/:device_key/results" do
-    TestResultCreation.create(device_key, conn.req_body())
+  post "/devices/:device_key/events" do
+    EventCreation.create(device_key, conn.req_body())
     conn.send(200, conn.req_body())
   end
 
-  put "/results/:result_uuid/pii" do
-    TestResultCreation.update_pii(result_uuid, JSEX.decode!(conn.req_body()))
+  put "/events/:result_uuid/pii" do
+    EventCreation.update_pii(result_uuid, JSEX.decode!(conn.req_body()))
     conn.send(200, conn.req_body())
   end
 
-  defp get_results(conn) do
+  defp get_events(conn) do
     params = Dynamo.Connection.QueryParser.parse(conn.query_string())
 
     if String.length(conn.req_body()) == 0 do
@@ -35,6 +35,6 @@ defmodule ApiRouter do
     else
       {:ok, post_body} = JSEX.decode conn.req_body()
     end
-    conn.send(200, JSEX.encode!(TestResultFiltering.query(params, post_body)))
+    conn.send(200, JSEX.encode!(EventFiltering.query(params, post_body)))
   end
 end

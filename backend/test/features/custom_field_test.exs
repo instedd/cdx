@@ -3,7 +3,7 @@ defmodule CustomFieldTest do
   import TestHelpers
   use Dynamo.HTTP.Case
 
-  test "retrieves a test result custom fields by uuid", context do
+  test "retrieves an event custom fields by uuid", context do
     device_model = Repo.insert DeviceModel.new(name: "fobar")
     device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
 
@@ -20,7 +20,7 @@ defmodule CustomFieldTest do
       """, version: 1)
     Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
 
-    post("/api/devices/bar/results", JSEX.encode!(%{"some_field" => 1234}))
+    post("/api/devices/bar/events", JSEX.encode!(%{"some_field" => 1234}))
 
     test_uuid = get_one_update("")["uuid"]
 

@@ -4,20 +4,6 @@ class Institution < ActiveRecord::Base
   has_many :laboratories, dependent: :destroy
   has_many :devices, dependent: :destroy
 
-  if Rails.env.test?
-    def index_name
-      "cpd_institution_#{id}_test"
-    end
-  else
-    def index_name
-      "cpd_institution_#{id}"
-    end
-  end
-
-  def test_result_provider
-    ElasticRecord.for index_name, 'test_result'
-  end
-
   def self.filter_by_owner(user)
     where(user_id: user.id)
   end

@@ -1,8 +1,8 @@
-defmodule TestResult do
+defmodule Event do
   use Ecto.Model
   import Ecto.Query
 
-  queryable "test_results" do
+  queryable "events" do
     belongs_to(:device, Device)
     field :created_at, :datetime
     field :updated_at, :datetime
@@ -45,7 +45,7 @@ defmodule TestResult do
       {:uuid, :string, [{"uuid", :match}]},
       {:start_time, :date, []},
       {:system_user, :string, []},
-      {:analytes, :nested, [
+      {:results, :nested, [
         {:result, :multi_field, [{"result", :wildcard}]},
         {:condition, :string, [{"condition", :wildcard}]},
       ]},
@@ -56,34 +56,34 @@ defmodule TestResult do
     Enum.member? sensitive_fields, binary_to_atom(field)
   end
 
-  def pii_of(test_result_uuid) do
-    Enum.into([{"uuid", test_result_uuid}, {"pii", find_by_uuid_in_postgres(test_result_uuid).sensitive_data}], %{})
+  def pii_of(event_uuid) do
+    Enum.into([{"uuid", event_uuid}, {"pii", find_by_uuid_in_postgres(event_uuid).sensitive_data}], %{})
   end
 
-  def custom_fields_of(test_result_uuid) do
-    Enum.into([{"uuid", test_result_uuid}, {"custom_fields", JSEX.decode!(find_by_uuid_in_postgres(test_result_uuid).custom_fields)}], %{})
+  def custom_fields_of(event_uuid) do
+    Enum.into([{"uuid", event_uuid}, {"custom_fields", JSEX.decode!(find_by_uuid_in_postgres(event_uuid).custom_fields)}], %{})
   end
 
-  def find_by_uuid_in_postgres(test_result_uuid) do
-    query = from t in TestResult,
-      where: t.uuid == ^test_result_uuid,
+  def find_by_uuid_in_postgres(event_uuid) do
+    query = from t in Event,
+      where: t.uuid == ^event_uuid,
       select: t
-    [postgres_test_result] = Repo.all(query)
-    decrypt(postgres_test_result)
+    [postgres_event] = Repo.all(query)
+    decrypt(postgres_event)
   end
 
-  def encrypt(test_result) do
-    test_result = :crypto.rc4_encrypt(encryption_key, JSEX.encode!(test_result.sensitive_data))
-      |> test_result.sensitive_data
-    test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
+  def encrypt(event) do
+    event = :crypto.rc4_encrypt(encryption_key, JSEX.encode!(event.sensitive_data))
+      |> event.sensitive_data
+    event.raw_data(:crypto.rc4_encrypt(encryption_key, event.raw_data))
   end
 
-  def decrypt(test_result) do
-    test_result = :crypto.rc4_encrypt(encryption_key, test_result.sensitive_data)
+  def decrypt(event) do
+    event = :crypto.rc4_encrypt(encryption_key, event.sensitive_data)
       |> JSEX.decode!
-      |> test_result.sensitive_data
+      |> event.sensitive_data
 
-    test_result.raw_data(:crypto.rc4_encrypt(encryption_key, test_result.raw_data))
+    event.raw_data(:crypto.rc4_encrypt(encryption_key, event.raw_data))
   end
 
   defp encryption_key do

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140530205604) do
+ActiveRecord::Schema.define(version: 20140603191744) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,17 @@ ActiveRecord::Schema.define(version: 20140530205604) do
   create_table "devices_laboratories", id: false, force: true do |t|
     t.integer "device_id"
     t.integer "laboratory_id"
+  end
+
+  create_table "events", force: true do |t|
+    t.integer  "device_id"
+    t.binary   "raw_data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.binary   "sensitive_data"
+    t.string   "uuid"
+    t.text     "custom_fields"
+    t.string   "event_id"
   end
 
   create_table "identities", force: true do |t|
@@ -119,17 +130,6 @@ ActiveRecord::Schema.define(version: 20140530205604) do
     t.datetime "updated_at"
     t.string   "url_user"
     t.string   "url_password"
-  end
-
-  create_table "test_results", force: true do |t|
-    t.integer  "device_id"
-    t.binary   "raw_data"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.binary   "sensitive_data"
-    t.string   "uuid"
-    t.text     "custom_fields"
-    t.string   "event_id"
   end
 
   create_table "users", force: true do |t|

@@ -13,7 +13,7 @@ Cdp::Application.routes.draw do
 
   resources :locations
   resources :manifests
-  resources :test_results
+  resources :events
   resources :subscribers
   resources :policies
 

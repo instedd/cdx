@@ -7,32 +7,32 @@ defmodule Elasticsearch do
 
   def initialize do
     :inets.start
-    {status, result} = :httpc.request(:put, {index_template_url, [], '', template_as_json}, [], [])
-    case result do
+    {status, event} = :httpc.request(:put, {index_template_url, [], '', template_as_json}, [], [])
+    case event do
       {{_, 200, _ },_, _ } -> status
       {{_, error_code, _ },_, _ }   ->
-        log_error(result)
+        log_error(event)
         error_code
       _ ->
-        log_error(result)
+        log_error(event)
         status
     end
   end
 
-  defp log_error(result) do
-    Lager.error("ES test results indices mapping definition failed: #{inspect(result)}")
+  defp log_error(event) do
+    Lager.error("ES event indices mapping definition failed: #{inspect(event)}")
   end
 
   def index_template_url do
-    :string.join([default_url, '_template', 'test_results_index_template'], '/')
+    :string.join([default_url, '_template', 'events_index_template'], '/')
   end
 
   defp template_as_json do
-    JSEX.encode!([template: "#{index_prefix}*", mappings: [ test_result: [ properties: build_properties_mapping]]])
+    JSEX.encode!([template: "#{index_prefix}*", mappings: [ event: [ properties: build_properties_mapping]]])
   end
 
   defp build_properties_mapping do
-    map_fields TestResult.searchable_fields
+    map_fields Event.searchable_fields
   end
 
   defp map_fields(fields) do

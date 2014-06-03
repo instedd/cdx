@@ -4,55 +4,55 @@ defmodule ReportingTest do
   require Tirexs.Search
   import TestHelpers
 
-  test "create test_result in postgres", context do
-    conn = post("/api/devices/foo/results", context[:data])
+  test "create event in postgres", context do
+    conn = post("/api/devices/foo/events", context[:data])
     assert conn.status == 200
 
-    [test_result] = Repo.all TestResult
-    assert test_result.device_id == context[:device].id
-    assert test_result.raw_data != context[:data]
-    test_result = TestResult.decrypt(test_result)
-    assert test_result.raw_data == context[:data]
+    [event] = Repo.all Event
+    assert event.device_id == context[:device].id
+    assert event.raw_data != context[:data]
+    event = Event.decrypt(event)
+    assert event.raw_data == context[:data]
   end
 
-  test "create test_result in elasticsearch", context do
-    post("/api/devices/foo/results", context[:data])
+  test "create event in elasticsearch", context do
+    post("/api/devices/foo/events", context[:data])
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["result"] == "positive"
-    assert result["_source"]["created_at"] != nil
-    assert result["_source"]["device_uuid"] == "foo"
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["event"] == "positive"
+    assert event["_source"]["created_at"] != nil
+    assert event["_source"]["device_uuid"] == "foo"
   end
 
   test "doesn't store sensitive data in elasticsearch" do
-    data = "{\"result\": \"positive\", \"patient_id\": 1234}"
-    post("/api/devices/foo/results", data)
+    data = "{\"event\": \"positive\", \"patient_id\": 1234}"
+    post("/api/devices/foo/events", data)
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["result"] == "positive"
-    assert result["_source"]["created_at"] != nil
-    assert result["_source"]["patient_id"] == nil
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["event"] == "positive"
+    assert event["_source"]["created_at"] != nil
+    assert event["_source"]["patient_id"] == nil
   end
 
   test "store the location id when the device is registered in only one laboratory", context do
-    post("/api/devices/foo/results", context[:data])
+    post("/api/devices/foo/events", context[:data])
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["location_id"] == context[:location1].id
-    assert result["_source"]["laboratory_id"] == context[:laboratory1].id
-    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([context[:location1].id, context[:parent_location].id, context[:root_location].id])
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["location_id"] == context[:location1].id
+    assert event["_source"]["laboratory_id"] == context[:laboratory1].id
+    assert Enum.sort(event["_source"]["parent_locations"]) == Enum.sort([context[:location1].id, context[:parent_location].id, context[:root_location].id])
   end
 
   test "store the parent location id when the device is registered more than one laboratory", context do
     Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory2].id, device_id: context[:device].id)
     Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory3].id, device_id: context[:device].id)
 
-    post("/api/devices/foo/results", context[:data])
+    post("/api/devices/foo/events", context[:data])
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["location_id"] == context[:root_location].id
-    assert result["_source"]["laboratory_id"] == nil
-    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([context[:root_location].id])
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["location_id"] == context[:root_location].id
+    assert event["_source"]["laboratory_id"] == nil
+    assert Enum.sort(event["_source"]["parent_locations"]) == Enum.sort([context[:root_location].id])
   end
 
 
@@ -60,41 +60,41 @@ defmodule ReportingTest do
     Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory3].id, device_id: context[:device].id)
     Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory2].id, device_id: context[:device].id)
 
-    post("/api/devices/foo/results", context[:data])
+    post("/api/devices/foo/events", context[:data])
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["location_id"] == context[:root_location].id
-    assert result["_source"]["laboratory_id"] == nil
-    assert Enum.sort(result["_source"]["parent_locations"]) == Enum.sort([context[:root_location].id])
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["location_id"] == context[:root_location].id
+    assert event["_source"]["laboratory_id"] == nil
+    assert Enum.sort(event["_source"]["parent_locations"]) == Enum.sort([context[:root_location].id])
   end
 
   test "store nil if no location was found", context do
     Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar")
 
-    post("/api/devices/bar/results", context[:data])
+    post("/api/devices/bar/events", context[:data])
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["location_id"] == nil
-    assert result["_source"]["laboratory_id"] == nil
-    assert result["_source"]["parent_locations"] == []
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["location_id"] == nil
+    assert event["_source"]["laboratory_id"] == nil
+    assert event["_source"]["parent_locations"] == []
   end
 
-  test "overrides result if event_id is the same" do
+  test "overrides event if event_id is the same" do
     data = JSEX.encode! [event_id: "1234", age: 20]
-    post("/api/devices/foo/results", data)
+    post("/api/devices/foo/events", data)
 
-    [test_result] = Repo.all TestResult
-    assert test_result.event_id == "1234"
+    [event] = Repo.all Event
+    assert event.event_id == "1234"
 
     data = JSEX.encode! [event_id: "1234", age: 30]
-    post("/api/devices/foo/results", data)
+    post("/api/devices/foo/events", data)
 
-    [test_result] = Repo.all TestResult
-    test_result = TestResult.decrypt(test_result)
-    raw_data = JSEX.decode! test_result.raw_data
+    [event] = Repo.all Event
+    event = Event.decrypt(event)
+    raw_data = JSEX.decode! event.raw_data
     assert raw_data["age"] == 30
 
-    [result] = get_all_elasticsearch_results()
-    assert result["_source"]["age"] == 30
+    [event] = get_all_elasticsearch_events()
+    assert event["_source"]["age"] == 30
   end
 end

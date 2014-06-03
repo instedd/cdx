@@ -5,7 +5,7 @@ defmodule Device do
   queryable "devices" do
     has_many(:devices_laboratories, DevicesLaboratories)
     belongs_to(:device_model, DeviceModel)
-    has_many(:test_results, TestResult)
+    has_many(:events, Event)
     belongs_to(:institution, Institution)
     field :name
     field :secret_key
