@@ -1,11 +1,11 @@
 ---
 category: Resources
-title: 'Test Result'
+title: 'Event'
 
 layout: nil
 ---
 
-The Test Result resource contains the fields related to the result reported by the device. No personal identifiable information is contained in this resource.
+The Event resource contains the fields related to the event reported by the device. No personal identifiable information is contained in this resource.
 
 `{
   "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
@@ -21,7 +21,7 @@ The Test Result resource contains the fields related to the result reported by t
   "location_id" : 5,
   "parent_locations" : [1, 2, 3],
   "type" : "QC/Specimen",
-  "analytes" : [
+  "results" : [
     "condition" : "MTB",
     "result" : "positive",
     "custom_fields" : [ //per analyte

@@ -1,22 +1,22 @@
 ---
 category: Devices
-path: '/devices/[device_uuid]/results'
-title: 'Submit test results'
+path: '/devices/[device_uuid]/events'
+title: 'Submit events'
 type: 'POST'
 
 layout: nil
 ---
 
-Allows devices to submit test results.
+Allows devices to submit events.
 
 # Request
 
 * The path must include a valid **device UUID**.
 * **The body can't be empty** and must include .
 
-`/devices/[device_uuid]/results`
+`/devices/[device_uuid]/events`
 
-`/devices/f862f658-ad89-4fcb-995b-7a4c50554ff6/results`
+`/devices/f862f658-ad89-4fcb-995b-7a4c50554ff6/events`
 
 `{
   "assay" : "ASSAY001",
@@ -30,7 +30,7 @@ Allows devices to submit test results.
 
 # Response
 
-**If succeeds**, returns the created [test-result](#/test-result-resource).
+**If succeeds**, returns the created [event](#/event-resource).
 
 `Status: 201 Created`
 

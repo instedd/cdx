@@ -11,15 +11,15 @@ Allows an application to subscribe for new reports of a particular disease.
 
 The necesary steps for setting this up are:
 
-* Create a test results query specifying which laboratory and condition you want to monitor.
-* Register a subscriber endpoint to be notified when the result of the query changes.
+* Create a events query specifying which laboratory and condition you want to monitor.
+* Register a subscriber endpoint to be notified when the events of the query changes.
 
-The query will be executed in regular intervals depending on the installation. If the result of the query changes, the push notification will be triggered for every new record returned by the query.
+The query will be executed in regular intervals depending on the installation. If the result of the query changes, the push notification will be triggered for every new event returned by the query.
 
 # Parameters
 
 * Name - to identify the subscriber
-* URL - the endpoint that will be triggered with a post for every new result
+* URL - the endpoint that will be triggered with a post for every new events
 * User - Optional. Basic auth. The user that must be used to login in the URL provided
 * Password - Optional. Basic auth. The password that must be used to login in the URL provided
 

@@ -1,24 +1,24 @@
 ---
 category: Devices
-path: '/results/[test_result_uuid]/pii'
+path: '/events/[event_uuid]/pii'
 title: 'Submit PII'
 type: 'PUT'
 
 layout: nil
 ---
 
-Allows submission of Personal Identifiable Information into a previously submitted test result.
+Allows submission of Personal Identifiable Information into a previously submitted event.
 
 # Request
 
-`/results/[test_result_uuid]/pii`
+`/events/[event_uuid]/pii`
 
-* The path must include a valid **test result UUID**.
+* The path must include a valid **event UUID**.
 * **The body can't be empty** and must include the PII.
 
 # Example
 
-```/results/c4c52784-bfd5-717d-7a91-614acd972d5e/pii```
+```/events/c4c52784-bfd5-717d-7a91-614acd972d5e/pii```
 
 ```{
   "patient_id" : 2,
@@ -29,7 +29,7 @@ Allows submission of Personal Identifiable Information into a previously submitt
 
 # Response
 
-**If succeeds**, returns the [uploaded PII](#/test-result-resource-with-pii).
+**If succeeds**, returns the [uploaded PII](#/event-resource-with-pii).
 
 `Status: 200 Ok`
 
