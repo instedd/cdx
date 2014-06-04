@@ -157,6 +157,15 @@ describe Policy do
     assert_can user3, institution2, READ_INSTITUTION
   end
 
+  it "disallow read if explicitly denied" do
+    user2 = User.make
+
+    grant user, user2, institution, READ_INSTITUTION
+    deny user, user2, institution, READ_INSTITUTION
+
+    assert_cannot user2, institution, READ_INSTITUTION
+  end
+
   def create_user_and_institution
     user = User.make
     institution = user.create Institution.make_unsaved
@@ -174,15 +183,23 @@ describe Policy do
   end
 
   def grant(granter, user, resource, action, delegable = true)
+    grant_or_deny granter, user, resource, action, delegable, "allow"
+  end
+
+  def deny(granter, user, resource, action, delegable = true)
+    grant_or_deny granter, user, resource, action, delegable, "deny"
+  end
+
+  def grant_or_deny(granter, user, resource, action, delegable, effect)
     policy = Policy.make_unsaved
-    policy.definition = policy_definition(resource, action, delegable)
+    policy.definition = policy_definition(resource, action, delegable, effect)
     policy.granter_id = granter.id
     policy.user_id = user.id
     policy.save!
     policy
   end
 
-  def policy_definition(resource, action, delegable = true)
+  def policy_definition(resource, action, delegable = true, effect = "allow")
     resource = Array(resource).map(&:resource_name)
     action = Array(action)
 
@@ -190,7 +207,7 @@ describe Policy do
       {
         "statement":  [
           {
-            "effect": "allow",
+            "effect": "#{effect}",
             "action": #{action.to_json},
             "resource": #{resource.to_json}
           }

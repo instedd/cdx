@@ -30,6 +30,9 @@ class Policy < ActiveRecord::Base
     REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey"
   end
 
+  class PolicyDeniedException < Exception
+  end
+
   ACTIONS = [
     Actions::READ_INSTITUTION, Actions::UPDATE_INSTITUTION, Actions::DELETE_INSTITUTION,
     Actions::CREATE_DEVICE, Actions::READ_DEVICE, Actions::UPDATE_DEVICE, Actions::DELETE_DEVICE, Actions::REGENERATE_DEVICE_KEY,
@@ -66,6 +69,8 @@ class Policy < ActiveRecord::Base
       resources.uniq!
       resources
     end
+  rescue PolicyDeniedException => ex
+    nil
   end
 
   def check(action, resource, user, users_so_far)
@@ -80,6 +85,10 @@ class Policy < ActiveRecord::Base
         resource = new_resource
         if (condition = statement["condition"])
           resource = apply_condition(resource, condition, user)
+        end
+
+        if statement["effect"] == "deny"
+          raise PolicyDeniedException.new
         end
       end
     end
@@ -140,7 +149,7 @@ class Policy < ActiveRecord::Base
     definition["statement"].each do |statement|
       effect = statement["effect"]
       if effect
-        if effect != "allow" && effect != "disallow"
+        if effect != "allow" && effect != "deny"
           return errors.add :definition, "has an invalid effect: `#{effect}`"
         end
       else
