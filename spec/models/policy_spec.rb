@@ -166,6 +166,18 @@ describe Policy do
     assert_cannot user2, institution, READ_INSTITUTION
   end
 
+  it "allows reading all institutions except one" do
+    institution2 = user.create Institution.make_unsaved
+    institution3 = user.create Institution.make_unsaved
+
+    user2 = User.make
+
+    grant user, user2, Institution, READ_INSTITUTION
+    deny user, user2, institution3, READ_INSTITUTION
+
+    assert_can user2, Institution, READ_INSTITUTION, [institution, institution2]
+  end
+
   def create_user_and_institution
     user = User.make
     institution = user.create Institution.make_unsaved
@@ -174,6 +186,9 @@ describe Policy do
 
   def assert_can(user, resource, action, expected_result = [resource])
     result = Policy.check_all action, resource, user.policies, user
+    result = result.sort_by &:id
+    expected_result = expected_result.sort_by &:id
+
     result.should eq(expected_result)
   end
 

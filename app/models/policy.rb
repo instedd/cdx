@@ -55,45 +55,50 @@ class Policy < ActiveRecord::Base
   end
 
   def self.check_all_recursive(action, resource, policies, user, users_so_far = Set.new)
-    resources = policies.map do |policy|
-      policy.check action, resource, user, users_so_far
-    end
-    resources.compact!
-    if resources.empty?
-      nil
-    else
-      resources.map! do |resource|
-        resource.is_a?(Class) ? resource.all : resource
+    allowed = []
+    denied = []
+
+    policies.each do |policy|
+      policy.definition["statement"].each do |statement|
+        match = policy.check(statement, action, resource, user, users_so_far)
+        if match
+          if statement["effect"] == "allow"
+            allowed << match
+          else
+            denied << match
+          end
+        end
       end
-      resources.flatten!
-      resources.uniq!
-      resources
     end
-  rescue PolicyDeniedException => ex
-    nil
+
+    classes = denied.select { |klass| klass.is_a?(Class) }
+    allowed -= classes
+    denied -= classes
+
+    allowed = allowed.map! do |resource|
+      resource.is_a?(Class) ? resource.all : resource
+    end
+    allowed = allowed.flatten.uniq
+
+    denied = denied.map! do |resource|
+      resource.is_a?(Class) ? resource.all : resource
+    end
+    denied = denied.flatten.uniq
+
+    result = allowed - denied
+    result.presence
   end
 
-  def check(action, resource, user, users_so_far)
-    found_one = false
+  def check(statement, action, resource, user, users_so_far)
+    return nil unless action_matches?(action, statement["action"])
 
-    definition["statement"].each do |statement|
-      return nil unless action_matches?(action, statement["action"])
+    resource = apply_resource_filters(resource, statement["resource"])
+    return nil unless resource
 
-      new_resource = apply_resource_filters(resource, statement["resource"])
-      if new_resource
-        found_one = true
-        resource = new_resource
-        if (condition = statement["condition"])
-          resource = apply_condition(resource, condition, user)
-        end
-
-        if statement["effect"] == "deny"
-          raise PolicyDeniedException.new
-        end
-      end
+    if (condition = statement["condition"])
+      resource = apply_condition(resource, condition, user)
+      return nil unless resource
     end
-
-    return nil unless found_one && resource
 
     # Check that the granter's policies allow the action on the resource,
     # but only if the user is not the same as the granter (like implicit and superadmin policies)
