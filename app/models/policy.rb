@@ -75,15 +75,13 @@ class Policy < ActiveRecord::Base
     allowed -= classes
     denied -= classes
 
-    allowed = allowed.map! do |resource|
-      resource.is_a?(Class) ? resource.all : resource
+    [allowed, denied].each do |resources|
+      resources.map! do |resource|
+        resource.is_a?(Class) ? resource.all : resource
+      end
+      resources.flatten!
+      resources.uniq!
     end
-    allowed = allowed.flatten.uniq
-
-    denied = denied.map! do |resource|
-      resource.is_a?(Class) ? resource.all : resource
-    end
-    denied = denied.flatten.uniq
 
     result = allowed - denied
     result.presence
