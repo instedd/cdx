@@ -186,6 +186,14 @@ class Policy < ActiveRecord::Base
 
       resources = statement["resource"]
       if resources
+        resources.each do |resource|
+          found_resource = Resource.all.any? do |klass|
+            klass.filter_by_resource(resource)
+          end
+          unless found_resource
+            return errors.add :definition, "has an unknown resource: `#{resource}`"
+          end
+        end
         # TODO: validate resources
       else
         return errors.add :definition, "is missing resource in statement"
