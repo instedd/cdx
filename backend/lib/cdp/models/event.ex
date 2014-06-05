@@ -2,7 +2,7 @@ defmodule Event do
   use Ecto.Model
   import Ecto.Query
 
-  queryable "events" do
+  schema "events" do
     belongs_to(:device, Device)
     field :created_at, :datetime
     field :updated_at, :datetime

@@ -24,10 +24,10 @@ defmodule EventCreation do
 
   def create({device, [], laboratories}, raw_data, data, date, uuid) do
     # TODO: when no manifest is found we should use a default mapping
-    event_id = data["event_id"]
+    event_id = data[:event_id]
 
     sensitive_data = Enum.map Event.sensitive_fields, fn field_name ->
-      {field_name, data[atom_to_binary(field_name)]}
+      {field_name, data[field_name]}
     end
     create_in_db(device, sensitive_data, [], raw_data, date, uuid, event_id)
 
@@ -39,7 +39,7 @@ defmodule EventCreation do
   def create({device, [manifest], laboratories}, raw_data, data, date, uuid) do
     data = Manifest.apply(JSEX.decode!(manifest.definition), data)
 
-    event_id = data["event_id"]
+    event_id = data[:event_id]
 
     create_in_db(device, data[:pii], data[:custom], raw_data, date, uuid, event_id)
     create_in_elasticsearch(device, laboratories, data[:indexed], date, uuid, event_id)
@@ -71,7 +71,7 @@ defmodule EventCreation do
   defp create_in_db(device, sensitive_data, custom_data, raw_data, date, uuid, event_id) do
     date = Ecto.DateTime.from_erl(date)
 
-    event = Event.new [
+    event = %Event{
       device_id: device.id,
       event_id: event_id,
       raw_data: raw_data,
@@ -80,7 +80,7 @@ defmodule EventCreation do
       custom_fields: JSEX.encode!(custom_data),
       created_at: date,
       updated_at: date,
-    ]
+    }
 
     event = Event.encrypt(event)
 

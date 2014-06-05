@@ -1,7 +1,7 @@
 defmodule Manifest do
   use Ecto.Model
 
-  queryable "manifests" do
+  schema "manifests" do
     has_many(:device_models_manifests, DeviceModelsManifests)
     field :version, :integer
     field :definition
@@ -14,22 +14,22 @@ defmodule Manifest do
       custom: %{},
     }
 
-    Enum.reduce manifest["field_mapping"], event, fn(mapping, event) ->
+    Enum.reduce manifest[:field_mapping], event, fn(mapping, event) ->
       apply_single_mapping(mapping, data, event)
     end
   end
 
   defp apply_single_mapping(mapping, data, event) do
-    target_field = mapping["target_field"]
-    selector = mapping["selector"]
-    type = mapping["type"]
-    pii = mapping["pii"]
+    target_field = mapping[:target_field]
+    selector = mapping[:selector]
+    type = mapping[:type]
+    pii = mapping[:pii]
 
     value = apply_selector(selector, data)
-    check_valid_value(value, target_field, mapping["valid_values"])
-    value = apply_value_mappings(value, target_field, mapping["value_mappings"])
+    check_valid_value(value, target_field, mapping[:valid_values])
+    value = apply_value_mappings(value, target_field, mapping[:value_mappings])
 
-    key = hash_key(type, target_field, mapping["indexed"], pii)
+    key = hash_key(type, target_field, mapping[:indexed], pii)
     element = event[key]
     element = Dict.put(element, target_field, value)
     Dict.put(event, key, element)
@@ -68,15 +68,15 @@ defmodule Manifest do
   end
 
   defp check_valid_value(value, target_field, valid_values) do
-    if options = valid_values["options"]do
+    if options = valid_values[:options]do
       check_value_in_options(value, target_field, options)
     end
 
-    if range = valid_values["range"] do
+    if range = valid_values[:range] do
       check_value_in_range(value, target_field, range)
     end
 
-    if date = valid_values["date"] do
+    if date = valid_values[:date] do
       check_value_is_date(value, target_field, date)
     end
   end
@@ -88,8 +88,8 @@ defmodule Manifest do
   end
 
   defp check_value_in_range(value, target_field, range) do
-    min = range["min"]
-    max = range["max"]
+    min = range[:min]
+    max = range[:max]
 
     unless min <= value and value <= max do
       raise "'#{value}' is not a valid value for '#{target_field}' (valid values must be between #{min} and #{max})"

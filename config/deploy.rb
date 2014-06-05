@@ -93,6 +93,7 @@ namespace :deploy do
     on roles(:app) do
       within "#{release_path}/backend" do
         with :mix_env => :prod do
+          execute :yes, "y | mix local.hex > #{release_path}/backend/mix.output 2>&1"
           execute :mix, "do deps.get, compile > #{release_path}/backend/mix.output 2>&1"
         end
       end

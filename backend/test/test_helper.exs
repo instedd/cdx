@@ -87,24 +87,24 @@ defmodule TestHelpers do
   end
 
   def create_device_and_laboratory(institution_id, secret_key) do
-    laboratory = Repo.insert Laboratory.new(institution_id: institution_id, name: "baz")
-    device = Repo.insert Device.new(institution_id: institution_id, secret_key: secret_key)
-    Repo.insert DevicesLaboratories.new(laboratory_id: laboratory.id, device_id: device.id)
+    laboratory = Repo.insert %Laboratory{institution_id: institution_id, name: "baz"}
+    device = Repo.insert %Device{institution_id: institution_id, secret_key: secret_key}
+    Repo.insert %DevicesLaboratories{laboratory_id: laboratory.id, device_id: device.id}
   end
 
   def load_fixtures do
-    institution = Repo.insert Institution.new(name: "baz")
-    institution2 = Repo.insert Institution.new(name: "baz2")
-    root_location = Repo.insert Location.new(name: "locr")
-    parent_location = Repo.insert Location.new(name: "locp", parent_id: root_location.id)
-    location1 = Repo.insert Location.new(name: "loc1", parent_id: parent_location.id)
-    location2 = Repo.insert Location.new(name: "loc2", parent_id: parent_location.id)
-    location3 = Repo.insert Location.new(name: "loc3", parent_id: root_location.id)
-    laboratory1 = Repo.insert Laboratory.new(institution_id: institution.id, name: "bar", location_id: location1.id)
-    laboratory2 = Repo.insert Laboratory.new(institution_id: institution.id, name: "bar2", location_id: location2.id)
-    laboratory3 = Repo.insert Laboratory.new(institution_id: institution.id, name: "bar3", location_id: location3.id)
-    device = Repo.insert Device.new(institution_id: institution.id, secret_key: "foo")
-    Repo.insert DevicesLaboratories.new(laboratory_id: laboratory1.id, device_id: device.id)
+    institution = Repo.insert %Institution{name: "baz"}
+    institution2 = Repo.insert %Institution{name: "baz2"}
+    root_location = Repo.insert %Location{name: "locr"}
+    parent_location = Repo.insert %Location{name: "locp", parent_id: root_location.id}
+    location1 = Repo.insert %Location{name: "loc1", parent_id: parent_location.id}
+    location2 = Repo.insert %Location{name: "loc2", parent_id: parent_location.id}
+    location3 = Repo.insert %Location{name: "loc3", parent_id: root_location.id}
+    laboratory1 = Repo.insert %Laboratory{institution_id: institution.id, name: "bar", location_id: location1.id}
+    laboratory2 = Repo.insert %Laboratory{institution_id: institution.id, name: "bar2", location_id: location2.id}
+    laboratory3 = Repo.insert %Laboratory{institution_id: institution.id, name: "bar3", location_id: location3.id}
+    device = Repo.insert %Device{institution_id: institution.id, secret_key: "foo"}
+    Repo.insert %DevicesLaboratories{laboratory_id: laboratory1.id, device_id: device.id}
     data = JSEX.encode! [event: "positive"]
     {:ok, institution: institution, institution2: institution2, device: device, data: data, root_location: root_location, parent_location: parent_location, location1: location1, location2: location2, location3: location3, laboratory1: laboratory1, laboratory2: laboratory2, laboratory3: laboratory3}
   end

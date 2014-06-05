@@ -1,7 +1,7 @@
 defmodule DevicesLaboratories do
   use Ecto.Model
 
-  queryable "devices_laboratories", primary_key: false do
+  schema "devices_laboratories", primary_key: false do
     belongs_to(:laboratory, Laboratory)
     belongs_to(:device, Device)
   end

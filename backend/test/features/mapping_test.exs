@@ -4,17 +4,17 @@ defmodule MappingTest do
   import TestHelpers
 
   test "applies an existing manifest", context do
-    device_model = Repo.insert DeviceModel.new(name: "fobar")
-    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
+    device_model = Repo.insert %DeviceModel{name: "fobar"}
+    Repo.insert %Device{institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id}
 
-    manifest = Repo.insert Manifest.new(definition: """
+    manifest = Repo.insert %Manifest{definition: """
       { "field_mapping" : [{
           "target_field": "assay_name",
           "selector" : "assay/name",
           "type" : "core"
       }]}
-      """, version: 1)
-    Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
+      """, version: 1}
+    Repo.insert %DeviceModelsManifests{device_model_id: device_model.id, manifest_id: manifest.id}
 
     post("/api/devices/bar/events", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
 
@@ -25,10 +25,10 @@ defmodule MappingTest do
   end
 
   test "stores pii according to manifest", context do
-    device_model = Repo.insert DeviceModel.new(name: "fobar")
-    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
+    device_model = Repo.insert %DeviceModel{name: "fobar"}
+    Repo.insert %Device{institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id}
 
-    manifest = Repo.insert Manifest.new(definition: """
+    manifest = Repo.insert %Manifest{definition: """
       { "field_mapping" : [
         {
           "target_field": "assay_name",
@@ -42,8 +42,8 @@ defmodule MappingTest do
           "pii": true
         }
       ]}
-      """, version: 1)
-    Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
+      """, version: 1}
+    Repo.insert %DeviceModelsManifests{device_model_id: device_model.id, manifest_id: manifest.id}
 
     post("/api/devices/bar/events", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
 
@@ -59,27 +59,27 @@ defmodule MappingTest do
   end
 
   test "Uses the last version of the manifest", context do
-    device_model = Repo.insert DeviceModel.new(name: "fobar")
-    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
+    device_model = Repo.insert %DeviceModel{name: "fobar"}
+    Repo.insert %Device{institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id}
 
-    manifest = Repo.insert Manifest.new(definition: """
+    manifest = Repo.insert %Manifest{definition: """
       { "field_mapping" : [{
           "target_field": "assay_name",
           "selector" : "assay/name",
           "type" : "core"
       }]}
-      """, version: 2)
-    Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
+      """, version: 2}
+    Repo.insert %DeviceModelsManifests{device_model_id: device_model.id, manifest_id: manifest.id}
 
-    manifest = Repo.insert Manifest.new(definition: """
+    manifest = Repo.insert %Manifest{definition: """
       { "field_mapping" : [{
           "target_field": "foo",
           "selector" : "assay/name",
           "type" : "core"
       }]}
-      """, version: 1)
+      """, version: 1}
 
-    Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
+    Repo.insert %DeviceModelsManifests{device_model_id: device_model.id, manifest_id: manifest.id}
 
     post("/api/devices/bar/events", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
 
@@ -89,10 +89,10 @@ defmodule MappingTest do
   end
 
   test "stores custom fields according to the manifest", context do
-    device_model = Repo.insert DeviceModel.new(name: "fobar")
-    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id)
+    device_model = Repo.insert %DeviceModel{name: "fobar"}
+    Repo.insert %Device{institution_id: context[:institution].id, secret_key: "bar", device_model_id: device_model.id}
 
-    manifest = Repo.insert Manifest.new(definition: """
+    manifest = Repo.insert %Manifest{definition: """
       { "field_mapping" : [
         {
           "target_field": "foo",
@@ -102,8 +102,8 @@ defmodule MappingTest do
           "indexed": false
         }
       ]}
-      """, version: 1)
-    Repo.insert DeviceModelsManifests.new(device_model_id: device_model.id, manifest_id: manifest.id)
+      """, version: 1}
+    Repo.insert %DeviceModelsManifests{device_model_id: device_model.id, manifest_id: manifest.id}
 
     post("/api/devices/bar/events", JSEX.encode!(%{"some_field" => 1234}))
 

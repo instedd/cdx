@@ -1,7 +1,7 @@
 defmodule Subscriber do
   use Ecto.Model
 
-  queryable "subscribers" do
+  schema "subscribers" do
     belongs_to(:institution, Institution)
     field :name
     field :auth_token

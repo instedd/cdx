@@ -1,7 +1,7 @@
 defmodule Institution do
   use Ecto.Model
 
-  queryable "institutions" do
+  schema "institutions" do
     has_many(:subscribers, Subscriber)
     has_many(:laboratories, Laboratory)
     field :name

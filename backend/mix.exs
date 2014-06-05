@@ -4,6 +4,7 @@ defmodule Cdp.Mixfile do
   def project do
     [ app: :cdp,
       version: "0.0.1",
+      elixir: "0.13.3",
       build_per_environment: true,
       dynamos: [Cdp.Dynamo],
       compilers: [:elixir, :dynamo, :app],
@@ -22,8 +23,8 @@ defmodule Cdp.Mixfile do
       { :dynamo, "~> 0.1.0-dev", github: "elixir-lang/dynamo" },
       { :decimal, "~> 0.2.0" },
       { :postgrex, "~> 0.5.0" },
-      { :ecto, "~> 0.1.0" },
-      { :jsex, "~> 2.0.0" },
+      { :ecto, "~> 0.2.0" },
+      { :jsex, github: "talentdeficit/jsex" },
       { :tirexs, github: "manastech/tirexs", branch: "master" },
       { :exrabbit, github: "d0rc/exrabbit" },
       { :timex, github: "bitwalker/timex" },

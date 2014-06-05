@@ -2,7 +2,7 @@ defmodule Device do
   use Ecto.Model
   import Ecto.Query
 
-  queryable "devices" do
+  schema "devices" do
     has_many(:devices_laboratories, DevicesLaboratories)
     belongs_to(:device_model, DeviceModel)
     has_many(:events, Event)

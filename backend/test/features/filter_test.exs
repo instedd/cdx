@@ -69,7 +69,7 @@ defmodule FilterTest do
   test "filters by device", context do
     post_event results: [result: "positive"]
 
-    Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar")
+    Repo.insert %Device{institution_id: context[:institution].id, secret_key: "bar"}
 
     post_event [results: [result: "negative"]], "bar"
 
@@ -222,10 +222,10 @@ defmodule FilterTest do
   end
 
   test "filters by location", context do
-    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "bar")
-    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory2].id, device_id: device.id)
-    device = Repo.insert Device.new(institution_id: context[:institution].id, secret_key: "baz")
-    Repo.insert DevicesLaboratories.new(laboratory_id: context[:laboratory3].id, device_id: device.id)
+    device = Repo.insert %Device{institution_id: context[:institution].id, secret_key: "bar"}
+    Repo.insert %DevicesLaboratories{laboratory_id: context[:laboratory2].id, device_id: device.id}
+    device = Repo.insert %Device{institution_id: context[:institution].id, secret_key: "baz"}
+    Repo.insert %DevicesLaboratories{laboratory_id: context[:laboratory3].id, device_id: device.id}
 
     post_event results: [result: "negative"]
     post_event [results: [result: "positive"]], "bar"

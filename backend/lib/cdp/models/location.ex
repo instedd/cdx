@@ -1,7 +1,7 @@
 defmodule Location do
   use Ecto.Model
 
-  queryable "locations" do
+  schema "locations" do
     has_many(:laboratories, Laboratory)
     field :name
     field :rgt
