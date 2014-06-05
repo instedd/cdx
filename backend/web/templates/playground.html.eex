@@ -19,7 +19,7 @@
       data = $("#data").val();
 
       $.ajax({
-        url: "/api/devices/" + device + "/results",
+        url: "/api/devices/" + device + "/events",
         type: "POST",
         data: data,
         contentType: "application/json; charset=utf-8",
@@ -46,7 +46,7 @@
       $query_button.val("Querying...");
 
       $.ajax({
-        url: "/api/results?" + query_string,
+        url: "/api/events?" + query_string,
         type: "POST",
         data: post_body,
         contentType: "application/json; charset=utf-8",

@@ -20,7 +20,7 @@ defmodule Cdp.Mixfile do
   defp deps do
     [
       { :cowboy, github: "extend/cowboy" },
-      { :dynamo, "~> 0.1.0-dev", github: "elixir-lang/dynamo" },
+      { :dynamo, github: "dynamo/dynamo" },
       { :decimal, "~> 0.2.0" },
       { :postgrex, "~> 0.5.0" },
       { :ecto, "~> 0.2.0" },

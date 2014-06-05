@@ -3,7 +3,7 @@
   "cowboy": {:git, "git://github.com/extend/cowboy.git", "7a808e0aa3e764d923da74e18f76790936d19a35", []},
   "cowlib": {:git, "git://github.com/extend/cowlib.git", "f58340a0044856bb508df03cfe94cf79308380a2", [ref: "0.6.1"]},
   "decimal": {:package, "0.2.1"},
-  "dynamo": {:git, "git://github.com/elixir-lang/dynamo.git", "3c28f27603a480d2755a89aba3a91e88df3469ce", []},
+  "dynamo": {:git, "git://github.com/dynamo/dynamo.git", "3c28f27603a480d2755a89aba3a91e88df3469ce", []},
   "ecto": {:package, "0.2.0"},
   "edown": {:git, "https://github.com/esl/edown.git", "3a738bf6d4f027eac100b3a43e36e3375fc56da8", [ref: "master"]},
   "exjson": {:package, "0.3.0"},
