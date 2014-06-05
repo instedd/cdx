@@ -3,12 +3,11 @@ module Resource
   extend ActiveSupport::Concern
   include Policy::Actions
 
-  def self.add_resource(resource)
-    (@resources||=[]) << resource
-  end
-
+  # Note: we could use an instance variable to store the classes as this module
+  # is included, but Rails reloads every class in development mode, so the class
+  # variable ends nil/empty.
   def self.all
-    @resources.clone
+    [Institution, Laboratory, Device, Location]
   end
 
   def self.find(resource_string)
@@ -23,7 +22,6 @@ module Resource
   end
 
   included do
-
     def self.find_resource(resource)
       match_resource(resource) do |match|
         find match
@@ -72,7 +70,5 @@ module Resource
     def resource_name
       "#{self.class.resource_name_prefix}/#{id}"
     end
-
-    Resource.add_resource(self)
   end
 end

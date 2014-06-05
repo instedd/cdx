@@ -178,6 +178,47 @@ describe Policy do
     assert_can user2, Institution, READ_INSTITUTION, [institution, institution2]
   end
 
+  it "disallows creating institution laboratory" do
+    user2 = User.make
+    assert_cannot user2, institution, CREATE_INSTITUTION_LABORATORY
+  end
+
+  it "allows creating institution laboratory" do
+    user2 = User.make
+
+    grant user, user2, institution, CREATE_INSTITUTION_LABORATORY
+
+    assert_can user2, institution, CREATE_INSTITUTION_LABORATORY
+  end
+
+  it "disallows reading institution laboratory" do
+    laboratory = institution.laboratories.make
+
+    user2 = User.make
+    assert_cannot user2, [institution, laboratory], READ_LABORATORY
+  end
+
+  it "allows reading self institution laboratory" do
+    laboratory = institution.laboratories.make
+
+    assert_can user, [institution, laboratory], READ_LABORATORY, [laboratory]
+  end
+
+  it "allows reading self laboratories" do
+    laboratory = institution.laboratories.make
+
+    assert_can user, [institution, institution.laboratories], READ_LABORATORY, [laboratory]
+  end
+
+  it "allows reading other institution laboratory" do
+    laboratory = institution.laboratories.make
+    user2 = User.make
+
+    grant user, user2, [institution, laboratory], READ_LABORATORY
+
+    assert_can user2, [institution, laboratory], READ_LABORATORY, [laboratory]
+  end
+
   def create_user_and_institution
     user = User.make
     institution = user.create Institution.make_unsaved
@@ -186,10 +227,14 @@ describe Policy do
 
   def assert_can(user, resource, action, expected_result = [resource])
     result = Policy.check_all action, resource, user.policies, user
-    result = result.sort_by &:id
-    expected_result = expected_result.sort_by &:id
+    if resource.is_a?(Array)
+      result.should eq(expected_result)
+    else
+      result = result.sort_by &:id
+      expected_result = expected_result.sort_by &:id
 
-    result.should eq(expected_result)
+      result.should eq(expected_result)
+    end
   end
 
   def assert_cannot(user, resource, action)

@@ -18,7 +18,7 @@ class Policy < ActiveRecord::Base
     UPDATE_INSTITUTION = "#{PREFIX}:updateInstitution"
     DELETE_INSTITUTION = "#{PREFIX}:deleteInstitution"
 
-    CREATE_LABORATORY = "#{PREFIX}:createLaboratory"
+    CREATE_INSTITUTION_LABORATORY = "#{PREFIX}:createInstitutionLaboratory"
     READ_LABORATORY = "#{PREFIX}:readLaboratory"
     UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory"
     DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory"
@@ -30,11 +30,9 @@ class Policy < ActiveRecord::Base
     REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey"
   end
 
-  class PolicyDeniedException < Exception
-  end
-
   ACTIONS = [
     Actions::READ_INSTITUTION, Actions::UPDATE_INSTITUTION, Actions::DELETE_INSTITUTION,
+    Actions::CREATE_INSTITUTION_LABORATORY, Actions::READ_LABORATORY, Actions::UPDATE_LABORATORY, Actions::DELETE_LABORATORY,
     Actions::CREATE_DEVICE, Actions::READ_DEVICE, Actions::UPDATE_DEVICE, Actions::DELETE_DEVICE, Actions::REGENERATE_DEVICE_KEY,
   ]
 
@@ -55,6 +53,19 @@ class Policy < ActiveRecord::Base
   end
 
   def self.check_all_recursive(action, resource, policies, user, users_so_far = Set.new)
+    # If the resource we are checking is an array, it is a group of instances that
+    # we are checking. The simplest (but slowest) way is to check if we can perform
+    # the action on each of this instances, and then keep the last one as the result.
+    if resource.is_a?(Array)
+      result = nil
+      resource.each do |sub_resource|
+        result = check_all_recursive action, sub_resource, policies, user
+        return nil unless result
+      end
+
+      return result
+    end
+
     allowed = []
     denied = []
 
