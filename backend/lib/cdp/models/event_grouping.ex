@@ -79,21 +79,21 @@ defmodule EventGrouping do
   end
 
   defp process_group_by_buckets(aggregations, all_group_by, events, event, doc_count) do
-    count = aggregations["count"]
+    count = aggregations[:count]
     if count do
       [first_group_by | other_group_by] = all_group_by
 
       case first_group_by do
         {:range, field, _ranges} ->
-          process_bucket(other_group_by, events, event, count["buckets"], fn(bucket) -> {field, [normalize(bucket["from"]), normalize(bucket["to"])]} end)
+          process_bucket(other_group_by, events, event, count[:buckets], fn(bucket) -> {field, [normalize(bucket[:from]), normalize(bucket[:to])]} end)
         {:date, _interval, field} ->
-          process_bucket(other_group_by, events, event, count["buckets"], fn(bucket) -> {field, bucket["key_as_string"]} end)
+          process_bucket(other_group_by, events, event, count[:buckets], fn(bucket) -> {field, bucket[:key_as_string]} end)
         {:flat, field_name} ->
-          process_bucket(other_group_by, events, event, count["buckets"], fn(bucket) -> {field_name, bucket["key"]} end)
+          process_bucket(other_group_by, events, event, count[:buckets], fn(bucket) -> {field_name, bucket[:key]} end)
         {:nested, fields} ->
           process_group_by_buckets(count, fields, events, event, doc_count)
         {:nested, _nesting_field, {:flat, field_name}} ->
-          process_bucket(other_group_by, events, event, count["buckets"], fn(bucket) -> {field_name, bucket["key"]} end)
+          process_bucket(other_group_by, events, event, count[:buckets], fn(bucket) -> {field_name, bucket[:key]} end)
         nil ->
           raise "Trying to group by a non searchable field"
       end
@@ -106,7 +106,7 @@ defmodule EventGrouping do
   defp process_bucket(other_group_by, events, event, buckets, mapping) do
     Enum.reduce buckets, events, fn(bucket, events) ->
       event = event ++ [mapping.(bucket)]
-      process_group_by_buckets(bucket, other_group_by, events, event, bucket["doc_count"])
+      process_group_by_buckets(bucket, other_group_by, events, event, bucket[:doc_count])
     end
   end
 

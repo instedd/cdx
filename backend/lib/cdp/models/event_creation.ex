@@ -11,8 +11,8 @@ defmodule EventCreation do
     end
 
     event = Event.find_by_uuid_in_postgres(uuid)
-    event = event.sensitive_data sensitive_data
-    event = event.updated_at date
+    event = %{event | sensitive_data: sensitive_data}
+    event = %{event | updated_at: date}
     event = Event.encrypt(event)
 
     Repo.update(event)
@@ -24,10 +24,10 @@ defmodule EventCreation do
 
   def create({device, [], laboratories}, raw_data, data, date, uuid) do
     # TODO: when no manifest is found we should use a default mapping
-    event_id = data[:event_id]
+    event_id = data["event_id"]
 
     sensitive_data = Enum.map Event.sensitive_fields, fn field_name ->
-      {field_name, data[field_name]}
+      {field_name, data[atom_to_binary(field_name)]}
     end
     create_in_db(device, sensitive_data, [], raw_data, date, uuid, event_id)
 
@@ -37,7 +37,8 @@ defmodule EventCreation do
   end
 
   def create({device, [manifest], laboratories}, raw_data, data, date, uuid) do
-    data = Manifest.apply(JSEX.decode!(manifest.definition), data)
+    decoded = JSEX.decode!(manifest.definition)
+    data = Manifest.apply(decoded, data)
 
     event_id = data[:event_id]
 
@@ -88,7 +89,7 @@ defmodule EventCreation do
     if event_id do
       existing_event = find_by_device_id_and_event_id(device.id, event_id)
       if existing_event do
-        event = event.id(existing_event.id)
+        event = %{event | id: existing_event.id}
         Repo.update(event)
       else
         Repo.insert(event)

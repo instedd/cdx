@@ -19,9 +19,9 @@ defmodule MappingTest do
     post("/api/devices/bar/events", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
 
     [event] = get_all_elasticsearch_events()
-    assert event["_source"]["assay_name"] == "GX4002"
-    assert event["_source"]["created_at"] != nil
-    assert event["_source"]["patient_id"] == nil
+    assert event[:_source][:assay_name] == "GX4002"
+    assert event[:_source][:created_at] != nil
+    assert event[:_source][:patient_id] == nil
   end
 
   test "stores pii according to manifest", context do
@@ -48,9 +48,9 @@ defmodule MappingTest do
     post("/api/devices/bar/events", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
 
     [event] = get_all_elasticsearch_events()
-    assert event["_source"]["foo"] == nil
+    assert event[:_source][:foo] == nil
 
-    test_uuid = event["_source"]["uuid"]
+    test_uuid = event[:_source][:uuid]
 
     event = get_pii(test_uuid)
     pii = event["pii"]
@@ -84,8 +84,8 @@ defmodule MappingTest do
     post("/api/devices/bar/events", JSEX.encode!(%{"assay" => %{"name" => "GX4002"}, "patient_id" => 1234}))
 
     [event] = get_all_elasticsearch_events()
-    assert event["_source"]["foo"] == nil
-    assert event["_source"]["assay_name"] == "GX4002"
+    assert event[:_source][:foo] == nil
+    assert event[:_source][:assay_name] == "GX4002"
   end
 
   test "stores custom fields according to the manifest", context do
@@ -108,9 +108,9 @@ defmodule MappingTest do
     post("/api/devices/bar/events", JSEX.encode!(%{"some_field" => 1234}))
 
     [event] = get_all_elasticsearch_events()
-    assert event["_source"]["foo"] == nil
+    assert event[:_source][:foo] == nil
 
-    test_uuid = event["_source"]["uuid"]
+    test_uuid = event[:_source][:uuid]
 
     event = get_pii(test_uuid)
     pii = event["pii"]

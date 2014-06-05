@@ -15,13 +15,13 @@ defmodule TestHelpers do
   end
 
   def get_pii(event_uuid) do
-    conn = get("api/events/#{event_uuid}/pii")
+    conn = get("/api/events/#{event_uuid}/pii")
     assert conn.status == 200
     JSEX.decode!(conn.sent_body)
   end
 
   def get_custom_fields(event_uuid) do
-    conn = get("api/events/#{event_uuid}/custom_fields")
+    conn = get("/api/events/#{event_uuid}/custom_fields")
     assert conn.status == 200
     JSEX.decode!(conn.sent_body)
   end
@@ -128,5 +128,6 @@ defmodule Cdp.TestCase do
 
   teardown do
     clear_database
+    :ok
   end
 end

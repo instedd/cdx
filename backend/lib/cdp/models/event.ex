@@ -73,17 +73,16 @@ defmodule Event do
   end
 
   def encrypt(event) do
-    event = :crypto.rc4_encrypt(encryption_key, JSEX.encode!(event.sensitive_data))
-      |> event.sensitive_data
-    event.raw_data(:crypto.rc4_encrypt(encryption_key, event.raw_data))
+    event = %{event | sensitive_data: :crypto.rc4_encrypt(encryption_key, JSEX.encode!(event.sensitive_data))}
+    event = %{event | raw_data: :crypto.rc4_encrypt(encryption_key, event.raw_data)}
   end
 
   def decrypt(event) do
-    event = :crypto.rc4_encrypt(encryption_key, event.sensitive_data)
+    data = :crypto.rc4_encrypt(encryption_key, event.sensitive_data)
       |> JSEX.decode!
-      |> event.sensitive_data
+    event = %{event | sensitive_data: data}
 
-    event.raw_data(:crypto.rc4_encrypt(encryption_key, event.raw_data))
+    %{event | raw_data: :crypto.rc4_encrypt(encryption_key, event.raw_data)}
   end
 
   defp encryption_key do

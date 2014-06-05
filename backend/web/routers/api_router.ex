@@ -1,4 +1,5 @@
 defmodule ApiRouter do
+  require IEx
   use Dynamo.Router
 
   get "/events/" do
@@ -9,12 +10,12 @@ defmodule ApiRouter do
     get_events(conn)
   end
 
-  get "/events/:result_uuid/pii" do
-    conn.send(200, JSEX.encode!(Event.pii_of(result_uuid)))
+  get "/events/:event_uuid/pii" do
+    conn.send(200, JSEX.encode!(Event.pii_of(event_uuid)))
   end
 
-  get "/events/:result_uuid/custom_fields" do
-    conn.send(200, JSEX.encode!(Event.custom_fields_of(result_uuid)))
+  get "/events/:event_uuid/custom_fields" do
+    conn.send(200, JSEX.encode!(Event.custom_fields_of(event_uuid)))
   end
 
   post "/devices/:device_key/events" do
@@ -22,8 +23,8 @@ defmodule ApiRouter do
     conn.send(200, conn.req_body())
   end
 
-  put "/events/:result_uuid/pii" do
-    EventCreation.update_pii(result_uuid, JSEX.decode!(conn.req_body()))
+  put "/events/:event_uuid/pii" do
+    EventCreation.update_pii(event_uuid, JSEX.decode!(conn.req_body()))
     conn.send(200, conn.req_body())
   end
 

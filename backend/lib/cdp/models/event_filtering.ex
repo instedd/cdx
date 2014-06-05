@@ -27,7 +27,7 @@ defmodule EventFiltering do
       index: "#{Elasticsearch.index_prefix}*"
     ]
     event = Tirexs.Query.create_resource(query)
-    Enum.map event.hits, fn(hit) -> hit["_source"] end
+    Enum.map event.hits, fn(hit) -> hit[:_source] end
   end
 
   def field_matcher(field_name, :multi_field) do
