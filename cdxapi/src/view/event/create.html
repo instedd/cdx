@@ -1,4 +1,4 @@
-{% extends "greeting/list.html" %}
+{% extends "event/list.html" %}
 {% block title %}A new greeting!{% endblock %}
 {% block body %}
 
@@ -12,7 +12,8 @@
 
 <form method="post">
   Enter a new greeting:
-  <textarea name="greeting_text">{% if new_msg %}{{ new_msg.greeting_text }}{% endif %}</textarea>
+  <textarea name="id">{% if new_msg %}{{ new_msg.id }}{% endif %}</textarea>
   <input type="submit">
 </form>
 {% endblock %}
+
