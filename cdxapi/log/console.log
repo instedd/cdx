@@ -1,0 +1,426 @@
+2014-06-06 15:06:19.335 [info] <0.7.0> Application lager started on node nonode@nohost
+2014-06-06 15:06:19.394 [info] <0.2.0>@boss_load:load_all_modules:57 Loading application cdxapi
+2014-06-06 15:06:19.394 [notice] <0.2.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/mail/cdxapi_incoming_mail_controller.erl" with options [{out_dir,"ebin"},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:06:19.424 [notice] <0.2.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/mail/cdxapi_outgoing_mail_controller.erl" with options [{out_dir,"ebin"},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:06:19.431 [notice] <0.2.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/view/lib/tag_modules/cdxapi_custom_tags.erl" with options [{out_dir,"ebin"},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:06:19.435 [notice] <0.2.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/view/lib/filter_modules/cdxapi_custom_filters.erl" with options [{out_dir,"ebin"},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:06:19.438 [info] <0.2.0>@boss_load:compile_view_dir_erlydtl:311 Compile Modules "src/view/lib/tag_html"  cdxapi_view_lib_tags
+2014-06-06 15:06:31.656 [info] <0.7.0> Application lager started on node cdxapi@Bifrost
+2014-06-06 15:06:31.667 [info] <0.7.0> Application crypto started on node cdxapi@Bifrost
+2014-06-06 15:06:31.684 [info] <0.7.0> Application mimetypes started on node cdxapi@Bifrost
+2014-06-06 15:06:31.734 [info] <0.94.0> Starting Boss in development mode....
+
+2014-06-06 15:06:31.747 [info] <0.94.0>@boss_db:start:72 Start Database Adapter boss_db_adapter_mock options [{adapter,mock},{cache_enable,false},{cache_prefix,db},{shards,[]},{is_master_node,true},{db_host,"localhost"},{db_port,1978}]
+2014-06-06 15:06:31.794 [notice] <0.62.0>@lager_app:132 Deprecated lager_file_backend config detected, please consider updating it
+2014-06-06 15:06:31.810 [info] <0.94.0> Starting master services on cdxapi@Bifrost
+
+2014-06-06 15:06:31.830 [info] <0.7.0> Application tinymq started on node cdxapi@Bifrost
+2014-06-06 15:06:31.886 [info] <0.94.0> SSL:[]
+
+2014-06-06 15:06:31.891 [info] <0.94.0> Starting cowboy... on cdxapi@Bifrost
+
+2014-06-06 15:06:31.896 [info] <0.7.0> Application cowlib started on node cdxapi@Bifrost
+2014-06-06 15:06:31.901 [info] <0.7.0> Application ranch started on node cdxapi@Bifrost
+2014-06-06 15:06:31.918 [info] <0.7.0> Application cowboy started on node cdxapi@Bifrost
+2014-06-06 15:06:31.918 [info] <0.94.0> Starting http listener... on 0.0.0.0:8001 
+
+2014-06-06 15:06:31.993 [info] <0.94.0>@boss_load:load_all_modules:57 Loading application cdxapi
+2014-06-06 15:06:32.011 [info] <0.94.0>@boss_load:compile_view_dir_erlydtl:311 Compile Modules "src/view/lib/tag_html"  cdxapi_view_lib_tags
+2014-06-06 15:06:32.077 [notice] <0.94.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/priv/init/cdxapi_01_news.erl" with options [{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]}] 
+2014-06-06 15:06:52.090 [warning] <0.6.0> lager_error_logger_h dropped 83 messages in the last second that exceeded the limit of 50 messages/sec
+2014-06-06 15:06:52.091 [error] <0.109.0> Supervisor {<0.109.0>,poolboy_sup} had child boss_session_controller started with boss_session_controller:start_link([{name,{local,boss_session_pool}},{worker_module,boss_session_controller},{size,20},{max_overflow,...},...]) at undefined exit with reason shutdown in context shutdown_error
+2014-06-06 15:13:24.692 [info] <0.7.0> Application lager started on node cdxapi@Bifrost
+2014-06-06 15:13:24.703 [info] <0.7.0> Application crypto started on node cdxapi@Bifrost
+2014-06-06 15:13:24.722 [info] <0.7.0> Application mimetypes started on node cdxapi@Bifrost
+2014-06-06 15:13:24.774 [info] <0.94.0> Starting Boss in development mode....
+
+2014-06-06 15:13:24.789 [info] <0.94.0>@boss_db:start:72 Start Database Adapter boss_db_adapter_mock options [{adapter,mock},{cache_enable,false},{cache_prefix,db},{shards,[]},{is_master_node,true},{db_host,"localhost"},{db_port,1978}]
+2014-06-06 15:13:24.835 [notice] <0.62.0>@lager_app:132 Deprecated lager_file_backend config detected, please consider updating it
+2014-06-06 15:13:24.860 [info] <0.94.0> Starting master services on cdxapi@Bifrost
+
+2014-06-06 15:13:24.883 [info] <0.7.0> Application tinymq started on node cdxapi@Bifrost
+2014-06-06 15:13:24.935 [info] <0.94.0> SSL:[]
+
+2014-06-06 15:13:24.940 [info] <0.94.0> Starting cowboy... on cdxapi@Bifrost
+
+2014-06-06 15:13:24.946 [info] <0.7.0> Application cowlib started on node cdxapi@Bifrost
+2014-06-06 15:13:24.952 [info] <0.7.0> Application ranch started on node cdxapi@Bifrost
+2014-06-06 15:13:24.970 [info] <0.7.0> Application cowboy started on node cdxapi@Bifrost
+2014-06-06 15:13:24.970 [info] <0.94.0> Starting http listener... on 0.0.0.0:8001 
+
+2014-06-06 15:13:25.038 [warning] <0.6.0> lager_error_logger_h dropped 66 messages in the last second that exceeded the limit of 50 messages/sec
+2014-06-06 15:13:25.039 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:13:25.053 [info] <0.94.0>@boss_load:load_all_modules:57 Loading application cdxapi
+2014-06-06 15:13:25.082 [info] <0.94.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:13:25.087 [notice] <0.94.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:13:25.129 [info] <0.94.0>@boss_load:compile_view_dir_erlydtl:311 Compile Modules "src/view/lib/tag_html"  cdxapi_view_lib_tags
+2014-06-06 15:13:25.194 [notice] <0.94.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/priv/init/cdxapi_01_news.erl" with options [{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]}] 
+2014-06-06 15:13:27.786 [notice] <0.269.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:13:27.791 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:13:27.811 [notice] <0.269.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:13:27.811 [notice] <0.269.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:13:27.819 [info] <0.269.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:16:57.389 [notice] <0.272.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:16:57.395 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:16:57.397 [info] <0.272.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:16:57.398 [notice] <0.272.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:16:57.404 [notice] <0.272.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:16:57.404 [notice] <0.272.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:16:57.404 [info] <0.272.0> GET /greeting/foo [cdxapi] 200 0ms
+2014-06-06 15:18:30.124 [notice] <0.276.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:18:30.126 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:18:30.129 [info] <0.276.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:18:30.129 [notice] <0.276.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:18:30.136 [notice] <0.276.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:18:30.136 [notice] <0.276.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:18:30.149 [info] <0.276.0> GET /greeting/bar [cdxapi] 200 0ms
+2014-06-06 15:21:50.023 [notice] <0.281.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:21:50.024 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:21:50.029 [info] <0.281.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:21:50.029 [notice] <0.281.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:21:50.036 [notice] <0.281.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:21:50.036 [notice] <0.281.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:21:50.082 [info] <0.281.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:23:37.496 [notice] <0.285.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:23:37.496 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:23:37.499 [notice] <0.285.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:23:37.499 [notice] <0.285.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:23:37.509 [info] <0.285.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:24:27.966 [notice] <0.289.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:24:27.967 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:24:27.972 [notice] <0.289.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:24:27.972 [notice] <0.289.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:24:27.985 [info] <0.289.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:24:53.404 [notice] <0.293.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:24:53.405 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:24:53.409 [notice] <0.293.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:24:53.409 [notice] <0.293.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:24:53.419 [info] <0.293.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:25:00.985 [notice] <0.297.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:25:00.986 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:25:00.989 [notice] <0.297.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:25:00.989 [notice] <0.297.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:25:00.999 [info] <0.297.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:25:12.061 [notice] <0.301.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:25:12.062 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:25:12.065 [notice] <0.301.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:25:12.065 [notice] <0.301.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:25:12.077 [info] <0.301.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:25:23.101 [notice] <0.304.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:25:23.102 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:25:23.105 [notice] <0.304.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:25:23.105 [notice] <0.304.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:25:23.116 [info] <0.304.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:25:32.550 [notice] <0.308.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:25:32.551 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:25:32.553 [notice] <0.308.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:25:32.553 [notice] <0.308.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:25:32.564 [info] <0.308.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:27:11.391 [notice] <0.312.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:27:11.392 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:27:11.420 [notice] <0.312.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/model/greeting.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_record_compiler.trick_out_forms.2>},{token_transform,#Fun<boss_record_compiler.process_tokens.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:27:11.420 [info] <0.312.0>@boss_record_compiler:process_tokens:120 Tokens [{'-',{1,1}},{atom,{1,2},module},{'(',{1,8}},{atom,{1,9},greeting},{',',{1,17}},{'[',{1,19}},{var,{1,20},'Id'},{',',{1,22}},{var,{1,24},'GreetingText'},{']',{1,36}},{')',{1,37}},{dot,{1,38}},{'-',{2,1}},{atom,{2,2},compile},{'(',{2,9}},{atom,{2,10},export_all},{')',{2,20}},{dot,{2,21}},{eof,{3,1}}]
+2014-06-06 15:27:11.420 [notice] <0.312.0>@boss_record_compiler:make_generated_forms:225 Module "greeting" Parameters ['Id','GreetingText'] Attributes[{compile,export_all}]
+2014-06-06 15:27:11.442 [notice] <0.312.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:27:11.443 [notice] <0.312.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:27:11.453 [info] <0.312.0> GET /greeting/hello [cdxapi] 200 0ms
+2014-06-06 15:32:12.487 [notice] <0.325.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:32:12.489 [info] <0.325.0>@boss_record_compiler:process_tokens:120 Tokens [{'-',{1,1}},{atom,{1,2},module},{'(',{1,8}},{atom,{1,9},greeting},{',',{1,17}},{'[',{1,19}},{var,{1,20},'Id'},{',',{1,22}},{var,{1,24},'GreetingText'},{']',{1,36}},{')',{1,37}},{dot,{1,38}},{'-',{2,1}},{atom,{2,2},compile},{'(',{2,9}},{atom,{2,10},export_all},{')',{2,20}},{dot,{2,21}},{eof,{3,1}}]
+2014-06-06 15:32:12.489 [notice] <0.325.0>@boss_record_compiler:make_generated_forms:225 Module "greeting" Parameters ['Id','GreetingText'] Attributes[{compile,export_all}]
+2014-06-06 15:32:12.694 [info] <0.325.0> GET /doc/greeting [cdxapi] 200 0ms
+2014-06-06 15:32:21.677 [notice] <0.330.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:32:21.681 [info] <0.330.0>@boss_record_compiler:process_tokens:120 Tokens [{'-',{1,1}},{atom,{1,2},module},{'(',{1,8}},{atom,{1,9},greeting},{',',{1,17}},{'[',{1,19}},{var,{1,20},'Id'},{',',{1,22}},{var,{1,24},'GreetingText'},{']',{1,36}},{')',{1,37}},{dot,{1,38}},{'-',{2,1}},{atom,{2,2},compile},{'(',{2,9}},{atom,{2,10},export_all},{')',{2,20}},{dot,{2,21}},{eof,{3,1}}]
+2014-06-06 15:32:21.682 [notice] <0.330.0>@boss_record_compiler:make_generated_forms:225 Module "greeting" Parameters ['Id','GreetingText'] Attributes[{compile,export_all}]
+2014-06-06 15:32:21.707 [info] <0.330.0> GET /doc/greeting [cdxapi] 200 0ms
+2014-06-06 15:39:08.811 [notice] <0.340.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:39:08.815 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:39:08.819 [notice] <0.340.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:39:08.819 [notice] <0.340.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:39:08.819 [notice] <0.340.0>@boss_controller_adapter_pmod:action:100 [ChicagoBoss] The function cdxapi_greeting_controller:list/2 is not exported, if in doubt add -export([list/2])) to the module
+2014-06-06 15:39:08.849 [info] <0.340.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:39:46.169 [notice] <0.343.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:39:46.170 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:39:46.173 [info] <0.343.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:39:46.173 [notice] <0.343.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:39:46.181 [notice] <0.343.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:39:46.181 [notice] <0.343.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:39:46.183 [info] <0.343.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:42:20.428 [notice] <0.350.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:42:20.429 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:42:20.433 [notice] <0.350.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:42:20.433 [notice] <0.350.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:42:20.454 [info] <0.350.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:42:21.964 [notice] <0.351.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:42:21.965 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:42:21.968 [notice] <0.351.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:42:21.968 [notice] <0.351.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:42:21.968 [notice] <0.351.0>@boss_controller_adapter_pmod:action:100 [ChicagoBoss] The function cdxapi_greeting_controller:create/2 is not exported, if in doubt add -export([create/2])) to the module
+2014-06-06 15:42:21.971 [error] <0.351.0> GET /greeting/create [cdxapi] 404 0ms
+2014-06-06 15:42:49.785 [notice] <0.358.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:42:49.786 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:42:49.790 [notice] <0.358.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:42:49.790 [notice] <0.358.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:42:49.790 [notice] <0.358.0>@boss_controller_adapter_pmod:action:100 [ChicagoBoss] The function cdxapi_greeting_controller:create/2 is not exported, if in doubt add -export([create/2])) to the module
+2014-06-06 15:42:49.834 [info] <0.358.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:44:00.120 [notice] <0.363.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:44:00.121 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:44:00.125 [notice] <0.363.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:44:00.126 [notice] <0.363.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:44:00.128 [info] <0.363.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:44:01.133 [notice] <0.365.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:44:01.134 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:44:01.138 [notice] <0.365.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:44:01.138 [notice] <0.365.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:44:01.138 [notice] <0.365.0>@boss_controller_adapter_pmod:action:100 [ChicagoBoss] The function cdxapi_greeting_controller:create/2 is not exported, if in doubt add -export([create/2])) to the module
+2014-06-06 15:44:01.158 [info] <0.365.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:45:28.138 [notice] <0.368.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:45:28.139 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:45:28.142 [info] <0.368.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:45:28.142 [notice] <0.368.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:45:28.152 [notice] <0.368.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:45:28.152 [notice] <0.368.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:45:28.155 [info] <0.368.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:45:30.312 [notice] <0.371.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:45:30.313 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:45:30.318 [notice] <0.371.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:45:30.318 [notice] <0.371.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:45:30.321 [info] <0.371.0> POST /greeting/create [cdxapi] 302 0ms
+2014-06-06 15:45:30.325 [notice] <0.373.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:45:30.326 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:45:30.329 [notice] <0.373.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:45:30.329 [notice] <0.373.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:45:30.332 [info] <0.373.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:45:46.721 [info] <0.7.0> Application lager started on node cdxapi@Bifrost
+2014-06-06 15:45:46.732 [info] <0.7.0> Application crypto started on node cdxapi@Bifrost
+2014-06-06 15:45:46.751 [info] <0.7.0> Application mimetypes started on node cdxapi@Bifrost
+2014-06-06 15:45:46.804 [info] <0.94.0> Starting Boss in development mode....
+
+2014-06-06 15:45:46.820 [info] <0.94.0>@boss_db:start:72 Start Database Adapter boss_db_adapter_mock options [{adapter,mock},{cache_enable,false},{cache_prefix,db},{shards,[]},{is_master_node,true},{db_host,"localhost"},{db_port,1978}]
+2014-06-06 15:45:46.844 [notice] <0.62.0>@lager_app:132 Deprecated lager_file_backend config detected, please consider updating it
+2014-06-06 15:45:46.890 [info] <0.94.0> Starting master services on cdxapi@Bifrost
+
+2014-06-06 15:45:46.925 [info] <0.7.0> Application tinymq started on node cdxapi@Bifrost
+2014-06-06 15:45:46.977 [info] <0.94.0> SSL:[]
+
+2014-06-06 15:45:46.982 [info] <0.94.0> Starting cowboy... on cdxapi@Bifrost
+
+2014-06-06 15:45:46.987 [info] <0.7.0> Application cowlib started on node cdxapi@Bifrost
+2014-06-06 15:45:46.994 [info] <0.7.0> Application ranch started on node cdxapi@Bifrost
+2014-06-06 15:45:47.013 [info] <0.7.0> Application cowboy started on node cdxapi@Bifrost
+2014-06-06 15:45:47.013 [info] <0.94.0> Starting http listener... on 0.0.0.0:8001 
+
+2014-06-06 15:45:47.101 [info] <0.94.0>@boss_load:load_all_modules:57 Loading application cdxapi
+2014-06-06 15:45:47.126 [info] <0.94.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:45:47.131 [notice] <0.94.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:45:47.182 [notice] <0.94.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/model/greeting.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_record_compiler.trick_out_forms.2>},{token_transform,#Fun<boss_record_compiler.process_tokens.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:45:47.182 [info] <0.94.0>@boss_record_compiler:process_tokens:120 Tokens [{'-',{1,1}},{atom,{1,2},module},{'(',{1,8}},{atom,{1,9},greeting},{',',{1,17}},{'[',{1,19}},{var,{1,20},'Id'},{',',{1,22}},{var,{1,24},'GreetingText'},{']',{1,36}},{')',{1,37}},{dot,{1,38}},{'-',{2,1}},{atom,{2,2},compile},{'(',{2,9}},{atom,{2,10},export_all},{')',{2,20}},{dot,{2,21}},{eof,{3,1}}]
+2014-06-06 15:45:47.183 [notice] <0.94.0>@boss_record_compiler:make_generated_forms:225 Module "greeting" Parameters ['Id','GreetingText'] Attributes[{compile,export_all}]
+2014-06-06 15:45:47.220 [info] <0.94.0>@boss_load:compile_view_dir_erlydtl:311 Compile Modules "src/view/lib/tag_html"  cdxapi_view_lib_tags
+2014-06-06 15:45:47.380 [notice] <0.94.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/priv/init/cdxapi_01_news.erl" with options [{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]}] 
+2014-06-06 15:45:51.709 [notice] <0.273.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:45:51.714 [warning] <0.6.0> lager_error_logger_h dropped 33 messages in the last second that exceeded the limit of 50 messages/sec
+2014-06-06 15:45:51.714 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:45:51.735 [notice] <0.273.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:45:51.735 [notice] <0.273.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:45:51.758 [info] <0.273.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:46:05.050 [notice] <0.275.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:46:05.051 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:46:05.056 [notice] <0.275.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:46:05.056 [notice] <0.275.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:46:05.059 [info] <0.275.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:46:08.874 [notice] <0.277.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:46:08.875 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:46:08.880 [notice] <0.277.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:46:08.880 [notice] <0.277.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:46:08.901 [info] <0.277.0> POST /greeting/create [cdxapi] 302 0ms
+2014-06-06 15:46:08.904 [notice] <0.279.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:46:08.905 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:46:08.908 [notice] <0.279.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:46:08.908 [notice] <0.279.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:46:08.911 [info] <0.279.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:46:09.664 [notice] <0.281.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:46:09.665 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:46:09.668 [notice] <0.281.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:46:09.668 [notice] <0.281.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:46:09.670 [info] <0.281.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:46:10.151 [notice] <0.283.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:46:10.152 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:46:10.156 [notice] <0.283.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:46:10.156 [notice] <0.283.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:46:10.159 [info] <0.283.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:47:22.162 [notice] <0.285.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:22.163 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:22.166 [notice] <0.285.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:47:22.166 [notice] <0.285.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:22.188 [info] <0.285.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:47:25.031 [notice] <0.288.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:25.031 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:25.035 [notice] <0.288.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:47:25.035 [notice] <0.288.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:25.035 [notice] <0.288.0>@boss_controller_adapter_pmod:action:100 [ChicagoBoss] The function cdxapi_greeting_controller:goodbye/2 is not exported, if in doubt add -export([goodbye/2])) to the module
+2014-06-06 15:47:25.039 [error] <0.288.0> POST /greeting/goodbye [cdxapi] 404 0ms
+2014-06-06 15:47:50.745 [notice] <0.291.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:50.746 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:50.749 [info] <0.291.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:47:50.749 [notice] <0.291.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:47:50.761 [notice] <0.291.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:47:50.761 [notice] <0.291.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:50.763 [info] <0.291.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:47:52.075 [notice] <0.294.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:52.076 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:52.080 [notice] <0.294.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:47:52.080 [notice] <0.294.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:52.083 [info] <0.294.0> POST /greeting/goodbye [cdxapi] 302 0ms
+2014-06-06 15:47:52.086 [notice] <0.296.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:52.087 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:52.091 [notice] <0.296.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:47:52.091 [notice] <0.296.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:52.093 [info] <0.296.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:47:53.437 [notice] <0.298.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:53.438 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:53.443 [notice] <0.298.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:47:53.443 [notice] <0.298.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:53.469 [info] <0.298.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:47:54.920 [notice] <0.301.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:54.921 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:54.925 [notice] <0.301.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:47:54.925 [notice] <0.301.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:54.927 [info] <0.301.0> POST /greeting/create [cdxapi] 302 0ms
+2014-06-06 15:47:54.934 [notice] <0.303.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:54.934 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:54.940 [notice] <0.303.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:47:54.940 [notice] <0.303.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:54.944 [info] <0.303.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:47:55.985 [notice] <0.305.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:55.986 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:55.990 [notice] <0.305.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:47:55.990 [notice] <0.305.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:55.993 [info] <0.305.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:47:57.726 [notice] <0.307.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:57.727 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:57.732 [notice] <0.307.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:47:57.732 [notice] <0.307.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:57.734 [info] <0.307.0> POST /greeting/create [cdxapi] 302 0ms
+2014-06-06 15:47:57.736 [notice] <0.309.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:57.737 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:57.741 [notice] <0.309.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:47:57.741 [notice] <0.309.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:57.744 [info] <0.309.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:47:59.943 [notice] <0.311.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:59.943 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:59.947 [notice] <0.311.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:47:59.947 [notice] <0.311.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:59.950 [info] <0.311.0> POST /greeting/goodbye [cdxapi] 302 0ms
+2014-06-06 15:47:59.953 [notice] <0.313.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:47:59.954 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:47:59.958 [notice] <0.313.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:47:59.958 [notice] <0.313.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:47:59.961 [info] <0.313.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:55:43.824 [notice] <0.315.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:55:43.824 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:55:43.827 [notice] <0.315.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/model/greeting.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_record_compiler.trick_out_forms.2>},{token_transform,#Fun<boss_record_compiler.process_tokens.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:55:43.828 [info] <0.315.0>@boss_record_compiler:process_tokens:120 Tokens [{'-',{1,1}},{atom,{1,2},module},{'(',{1,8}},{atom,{1,9},greeting},{',',{1,17}},{'[',{1,19}},{var,{1,20},'Id'},{',',{1,22}},{var,{1,24},'GreetingText'},{']',{1,36}},{')',{1,37}},{dot,{1,38}},{'-',{2,1}},{atom,{2,2},compile},{'(',{2,9}},{atom,{2,10},export_all},{')',{2,20}},{dot,{2,21}},{atom,{4,1},validation_tests},{'(',{4,17}},{')',{4,18}},{'->',{4,20}},{'[',{5,3}},{'{',{5,4}},{fun,{5,5}},{'(',{5,8}},{')',{5,9}},{'->',{5,11}},{atom,{5,14},length},{'(',{5,20}},{var,{5,21},'GreetingText'},{')',{5,33}},{'>',{5,35}},{integer,{5,37},0},{end,{5,39}},{',',{5,42}},{string,{6,5},"Greeting must be non-empty!"},{'}',{6,34}},{',',{6,35}},{'{',{7,3}},{fun,{7,4}},{'(',{7,7}},{')',{7,8}},{'->',{7,10}},{atom,{7,13},length},{'(',{7,19}},{var,{7,20},'GreetingText'},{')',{7,32}},{'=<',{7,34}},{integer,{7,37},140},{end,{7,41}},{',',{7,44}},{string,{8,5},"Greeting must be tweetable"},{'}',{8,33}},{']',{8,34}},{dot,{8,35}},{eof,{9,1}}]
+2014-06-06 15:55:43.829 [notice] <0.315.0>@boss_record_compiler:make_generated_forms:225 Module "greeting" Parameters ['Id','GreetingText'] Attributes[{compile,export_all}]
+2014-06-06 15:55:43.849 [notice] <0.315.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:55:43.849 [notice] <0.315.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:55:43.850 [info] <0.315.0> POST /greeting/goodbye [cdxapi] 302 0ms
+2014-06-06 15:55:43.855 [notice] <0.318.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:55:43.856 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:55:43.859 [notice] <0.318.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:55:43.859 [notice] <0.318.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:55:43.862 [info] <0.318.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:55:44.674 [notice] <0.320.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:55:44.674 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:55:44.680 [notice] <0.320.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:55:44.681 [notice] <0.320.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:55:44.684 [info] <0.320.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:55:45.774 [notice] <0.322.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:55:45.775 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:55:45.779 [notice] <0.322.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:55:45.779 [notice] <0.322.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:55:45.779 [error] <0.322.0>@boss_web_controller:call_controller_action:366 Error in controller error {badmatch,{error,["Greeting must be non-empty!"]}} [{cdxapi_greeting_controller,create,3,[{file,"/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl"},{line,22}]},{boss_web_controller,call_controller_action,3,[{file,"src/boss/boss_web_controller.erl"},{line,363}]},{boss_web_controller,apply_action,4,[{file,"src/boss/boss_web_controller.erl"},{line,355}]},{boss_web_controller,execute_action_inner,9,[{file,"src/boss/boss_web_controller.erl"},{line,334}]},{boss_web_controller_handle_request,process_dynamic_request,4,[{file,"src/boss/boss_web_controller_handle_request.erl"},{line,242}]},{boss_web_controller_handle_request,process_request,4,[{file,"src/boss/boss_web_controller_handle_request.erl"},{line,228}]},{boss_web_controller_handle_request,set_timer,7,[{file,"src/boss/boss_web_controller_handle_request.erl"},{line,148}]},{boss_web_controller_handle_request,build_dynamic_response,4,[{file,"src/boss/boss_web_controller_handle_request.erl"},{line,122}]}]
+2014-06-06 15:55:45.781 [info] <0.322.0> POST /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:55:57.605 [notice] <0.324.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:55:57.606 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:55:57.610 [notice] <0.324.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:55:57.610 [notice] <0.324.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:55:57.613 [info] <0.324.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:56:11.295 [notice] <0.326.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:56:11.295 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:56:11.298 [notice] <0.326.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:56:11.298 [notice] <0.326.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:56:11.301 [info] <0.326.0> POST /greeting/create [cdxapi] 302 0ms
+2014-06-06 15:56:11.304 [notice] <0.328.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:56:11.304 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:56:11.307 [notice] <0.328.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:56:11.307 [notice] <0.328.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:56:11.310 [info] <0.328.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:56:14.506 [notice] <0.330.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:56:14.507 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:56:14.512 [notice] <0.330.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:56:14.512 [notice] <0.330.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:56:14.515 [info] <0.330.0> POST /greeting/goodbye [cdxapi] 302 0ms
+2014-06-06 15:56:14.517 [notice] <0.332.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:56:14.518 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:56:14.521 [notice] <0.332.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:56:14.521 [notice] <0.332.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:56:14.524 [info] <0.332.0> GET /greeting/list [cdxapi] 200 0ms
+2014-06-06 15:56:17.034 [notice] <0.334.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:56:17.035 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:56:17.039 [notice] <0.334.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:56:17.039 [notice] <0.334.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:56:17.043 [info] <0.334.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:57:11.307 [notice] <0.336.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:57:11.308 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:57:11.311 [notice] <0.336.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:57:11.311 [notice] <0.336.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:57:11.312 [error] <0.336.0>@boss_web_controller:call_controller_action:366 Error in controller error {badmatch,{error,["Greeting must be tweetable"]}} [{cdxapi_greeting_controller,create,3,[{file,"/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl"},{line,22}]},{boss_web_controller,call_controller_action,3,[{file,"src/boss/boss_web_controller.erl"},{line,363}]},{boss_web_controller,apply_action,4,[{file,"src/boss/boss_web_controller.erl"},{line,355}]},{boss_web_controller,execute_action_inner,9,[{file,"src/boss/boss_web_controller.erl"},{line,334}]},{boss_web_controller_handle_request,process_dynamic_request,4,[{file,"src/boss/boss_web_controller_handle_request.erl"},{line,242}]},{boss_web_controller_handle_request,process_request,4,[{file,"src/boss/boss_web_controller_handle_request.erl"},{line,228}]},{boss_web_controller_handle_request,set_timer,7,[{file,"src/boss/boss_web_controller_handle_request.erl"},{line,148}]},{boss_web_controller_handle_request,build_dynamic_response,4,[{file,"src/boss/boss_web_controller_handle_request.erl"},{line,122}]}]
+2014-06-06 15:57:11.313 [info] <0.336.0> POST /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:57:16.028 [notice] <0.338.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:57:16.029 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:57:16.033 [notice] <0.338.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:57:16.033 [notice] <0.338.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:57:16.037 [info] <0.338.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:58:35.790 [notice] <0.341.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:58:35.791 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:58:35.793 [info] <0.341.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:58:35.793 [notice] <0.341.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:58:35.796 [error] <0.341.0>@boss_load:compile_and_accumulate_errors:261 Compile Error, "src/controller/cdxapi_greeting_controller.erl" -> [{"/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl",[{28,erl_parse,["syntax error before: ","'{'"]}]}]
+2014-06-06 15:58:35.820 [info] <0.341.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:58:51.614 [notice] <0.344.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:58:51.616 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:58:51.620 [info] <0.344.0>@boss_controller_compiler:compile:59 Compile controller /Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl
+2014-06-06 15:58:51.620 [notice] <0.344.0>@boss_compiler:compile:47 Compile file "/Users/nekron/Projects/cdp/cdxapi/src/controller/cdxapi_greeting_controller.erl" with options [debug_info,{pre_revert_transform,#Fun<boss_controller_compiler.add_routes_to_forms.1>},{out_dir,undefined},{include_dirs,["/Users/nekron/Projects/cdp/cdxapi/include"]},{compiler_options,[{parse_transform,lager_transform},return_errors]}] 
+2014-06-06 15:58:51.632 [notice] <0.344.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 15:58:51.632 [notice] <0.344.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:58:51.634 [info] <0.344.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:58:53.055 [notice] <0.347.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:58:53.056 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:58:53.062 [notice] <0.347.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:58:53.062 [notice] <0.347.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:58:53.065 [info] <0.347.0> POST /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:59:53.230 [notice] <0.349.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:59:53.231 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:59:53.235 [notice] <0.349.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:59:53.236 [notice] <0.349.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:59:53.271 [info] <0.349.0> POST /greeting/create [cdxapi] 200 0ms
+2014-06-06 15:59:58.404 [notice] <0.352.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 15:59:58.405 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 15:59:58.411 [notice] <0.352.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 15:59:58.411 [notice] <0.352.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 15:59:58.414 [info] <0.352.0> POST /greeting/create [cdxapi] 200 0ms
+2014-06-06 16:00:02.153 [notice] <0.354.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 16:00:02.154 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 16:00:02.160 [notice] <0.354.0>@boss_controller_adapter_pmod:action:91 Request Method 'GET'
+2014-06-06 16:00:02.160 [notice] <0.354.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 16:00:02.163 [info] <0.354.0> GET /greeting/create [cdxapi] 200 0ms
+2014-06-06 16:00:03.441 [notice] <0.356.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 16:00:03.441 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 16:00:03.445 [notice] <0.356.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 16:00:03.445 [notice] <0.356.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 16:00:03.448 [info] <0.356.0> POST /greeting/create [cdxapi] 200 0ms
+2014-06-06 16:00:06.298 [notice] <0.358.0>@boss_web_controller_handle_request:handle_request:23 ApplicationForPath cdxapi
+2014-06-06 16:00:06.299 [info] <0.262.0> Loading routes from "/Users/nekron/Projects/cdp/cdxapi/priv/cdxapi.routes" ....
+2014-06-06 16:00:06.303 [notice] <0.358.0>@boss_controller_adapter_pmod:action:91 Request Method 'POST'
+2014-06-06 16:00:06.303 [notice] <0.358.0>@boss_controller_adapter_pmod:action:92 Tokens []
+2014-06-06 16:00:06.306 [info] <0.358.0> POST /greeting/create [cdxapi] 200 0ms

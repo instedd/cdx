@@ -1,0 +1,18 @@
+{% extends "greeting/list.html" %}
+{% block title %}A new greeting!{% endblock %}
+{% block body %}
+
+{% if errors %}
+  <ul>
+   {% for error in errors %}
+     <li><font color=red>{{ error }}</font>
+   {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post">
+  Enter a new greeting:
+  <textarea name="greeting_text">{% if new_msg %}{{ new_msg.greeting_text }}{% endif %}</textarea>
+  <input type="submit">
+</form>
+{% endblock %}
