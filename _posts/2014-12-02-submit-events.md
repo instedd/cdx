@@ -19,6 +19,7 @@ Allows devices to submit events.
 `/devices/f862f658-ad89-4fcb-995b-7a4c50554ff6/events`
 
 `{
+  "event_id" : "1", // Unique by device
   "assay" : "ASSAY001",
   "assay_name" : "MTB",
   "device_serial_number" : "123456789",
@@ -27,6 +28,8 @@ Allows devices to submit events.
   "system_user" : "jdoe",
   "age" : "21"
 }`
+
+If the same test is sent more than once (with the same event_id), the result data gets updated and no duplicated record is created.
 
 # Response
 
