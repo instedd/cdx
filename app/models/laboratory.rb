@@ -18,6 +18,14 @@ class Laboratory < ActiveRecord::Base
     institution.user_id == user.id ? self : nil
   end
 
+  def self.filter_by_query(query)
+    result = self
+    if institution = query["institution"]
+      result = result.where(institution_id: institution)
+    end
+    result
+  end
+
   def to_s
     name
   end

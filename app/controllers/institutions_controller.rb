@@ -5,7 +5,8 @@ class InstitutionsController < ApplicationController
   add_breadcrumb 'Institutions', :institutions_path
 
   def index
-    @institutions = authorize_resource(Institution, READ_INSTITUTION)
+    @institutions = check_access(Institution, READ_INSTITUTION)
+    @institutions ||= []
   end
 
   def show

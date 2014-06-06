@@ -12,11 +12,11 @@ class LaboratoriesController < ApplicationController
   end
 
   def index
-    @laboratories = check_access([@institution, @institution.laboratories], READ_LABORATORY)
+    @laboratories = check_access(@institution.laboratories, READ_LABORATORY)
     @laboratories ||= []
     @can_create = has_access?(@institution, CREATE_INSTITUTION_LABORATORY)
 
-    @labs_to_edit = check_access([@institution, @institution.laboratories], UPDATE_LABORATORY)
+    @labs_to_edit = check_access(@institution.laboratories, UPDATE_LABORATORY)
     @labs_to_edit ||= []
     @labs_to_edit.map!(&:id)
   end
@@ -45,9 +45,9 @@ class LaboratoriesController < ApplicationController
 
   def edit
     @laboratory = @institution.laboratories.find params[:id]
-    return unless authorize_resource([@institution, @laboratory], UPDATE_LABORATORY)
+    return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
-    @can_delete = has_access?([@institution, @laboratory], DELETE_LABORATORY)
+    @can_delete = has_access?(@laboratory, DELETE_LABORATORY)
 
     add_breadcrumb @laboratory.name, institution_laboratory_path(@institution, @laboratory)
   end
@@ -56,7 +56,7 @@ class LaboratoriesController < ApplicationController
   # PATCH/PUT /laboratories/1.json
   def update
     @laboratory = @institution.laboratories.find params[:id]
-    return unless authorize_resource([@institution, @laboratory], UPDATE_LABORATORY)
+    return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
     respond_to do |format|
       if @laboratory.update(laboratory_params)
@@ -73,7 +73,7 @@ class LaboratoriesController < ApplicationController
   # DELETE /laboratories/1.json
   def destroy
     @laboratory = @institution.laboratories.find params[:id]
-    return unless authorize_resource([@institution, @laboratory], DELETE_LABORATORY)
+    return unless authorize_resource(@laboratory, DELETE_LABORATORY)
 
     @laboratory.destroy
 

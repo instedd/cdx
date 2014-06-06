@@ -11,7 +11,7 @@ class Policy < ActiveRecord::Base
   before_save :set_delegable_from_definition
 
   module Actions
-    PREFIX = "cdpx"
+    PREFIX = "cdxp"
 
     CREATE_INSTITUTION = "#{PREFIX}:createInstitution"
     READ_INSTITUTION = "#{PREFIX}:readInstitution"
@@ -54,19 +54,6 @@ class Policy < ActiveRecord::Base
   end
 
   def self.check_all_recursive(action, resource, policies, user, users_so_far = Set.new)
-    # If the resource we are checking is an array, it is a group of instances that
-    # we are checking. The simplest (but slowest) way is to check if we can perform
-    # the action on each of this instances, and then keep the last one as the result.
-    if resource.is_a?(Array)
-      result = nil
-      resource.each do |sub_resource|
-        result = check_all_recursive action, sub_resource, policies, user
-        return nil unless result
-      end
-
-      return result
-    end
-
     allowed = []
     denied = []
 
@@ -139,20 +126,23 @@ class Policy < ActiveRecord::Base
     return errors.add :owner, "permission can't be self granted" if self_granted?
     return errors.add :owner, "permission granter can't be nil" if implicit?
 
-    resources = definition["statement"].map do |statement|
-      Array(statement["action"]).map do |action|
-        Array(statement["resource"]).map do |resource_matcher|
-          resources = Array(Resource.find(resource_matcher))
-          resources.map do |resource|
-            Policy.check_all(action, resource, granter.policies.delegable, granter)
+    resources = definition["statement"].each do |statement|
+      Array(statement["action"]).each do |action|
+        Array(statement["resource"]).each do |resource_matcher|
+          match = Resource.find(resource_matcher)
+          if match
+            resources = Array(match)
+            resources.each do |resource|
+              passed = Policy.check_all(action, resource, granter.policies.delegable, granter)
+              unless passed
+                return errors.add :owner, "can't delegate permission over #{resource_matcher}"
+              end
+            end
           end
         end
       end
-    end.flatten.compact
-
-    if resources.empty?
-      return errors.add :owner, "can't delegate permission"
     end
+
     true
   end
 
@@ -187,7 +177,7 @@ class Policy < ActiveRecord::Base
 
       resources = statement["resource"]
       if resources
-        resources.each do |resource|
+        Array(resources).each do |resource|
           found_resource = Resource.all.any? do |klass|
             klass.filter_by_resource(resource)
           end

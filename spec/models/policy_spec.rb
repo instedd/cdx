@@ -36,6 +36,14 @@ describe Policy do
     assert_can user, institution2, READ_INSTITUTION
   end
 
+  it "allows a user to read all institutions" do
+    user2, institution2 = create_user_and_institution
+
+    grant user2, user, Institution, [READ_INSTITUTION, UPDATE_INSTITUTION]
+
+    assert_can user, Institution, READ_INSTITUTION, [institution, institution2]
+  end
+
   it "doesn't allows a user to read another institution" do
     user2, institution2 = create_user_and_institution
     institution3 = user2.create Institution.make_unsaved
@@ -195,28 +203,66 @@ describe Policy do
     laboratory = institution.laboratories.make
 
     user2 = User.make
-    assert_cannot user2, [institution, laboratory], READ_LABORATORY
+    assert_cannot user2, laboratory, READ_LABORATORY
   end
 
   it "allows reading self institution laboratory" do
     laboratory = institution.laboratories.make
 
-    assert_can user, [institution, laboratory], READ_LABORATORY, [laboratory]
+    assert_can user, laboratory, READ_LABORATORY, [laboratory]
   end
 
   it "allows reading self laboratories" do
     laboratory = institution.laboratories.make
 
-    assert_can user, [institution, institution.laboratories], READ_LABORATORY, [laboratory]
+    assert_can user, institution.laboratories, READ_LABORATORY, [laboratory]
   end
 
   it "allows reading other institution laboratory" do
     laboratory = institution.laboratories.make
     user2 = User.make
 
-    grant user, user2, [institution, laboratory], READ_LABORATORY
+    grant user, user2, laboratory, READ_LABORATORY
 
-    assert_can user2, [institution, laboratory], READ_LABORATORY, [laboratory]
+    assert_can user2, laboratory, READ_LABORATORY, [laboratory]
+  end
+
+  it "allows reading other laboratories" do
+    laboratory = institution.laboratories.make
+    user2 = User.make
+
+    grant user, user2, Laboratory, READ_LABORATORY
+
+    assert_can user2, Laboratory, READ_LABORATORY, [laboratory]
+  end
+
+  it "allows reading other laboratories (2)" do
+    laboratory = institution.laboratories.make
+    user2 = User.make
+
+    grant user, user2, Laboratory, READ_LABORATORY
+
+    assert_can user2, laboratory, READ_LABORATORY
+  end
+
+  it "allows reading other institution laboratories" do
+    laboratory = institution.laboratories.make
+    user2 = User.make
+
+    grant user, user2, "#{Laboratory.resource_name}?institution=#{institution.id}", READ_LABORATORY
+
+    assert_can user2, Laboratory, READ_LABORATORY, [laboratory]
+  end
+
+  it "disallows reading other institution laboratories when id is other" do
+    institution2 = user.create Institution.make_unsaved
+
+    laboratory = institution.laboratories.make
+    user2 = User.make
+
+    grant user, user2, "#{Laboratory.resource_name}?institution=#{institution2.id}", READ_LABORATORY
+
+    assert_cannot user2, Laboratory, READ_LABORATORY
   end
 
   def create_user_and_institution
@@ -227,14 +273,10 @@ describe Policy do
 
   def assert_can(user, resource, action, expected_result = [resource])
     result = Policy.check_all action, resource, user.policies, user
-    if resource.is_a?(Array)
-      result.should eq(expected_result)
-    else
-      result = result.sort_by &:id
-      expected_result = expected_result.sort_by &:id
+    result = result.sort_by &:id
+    expected_result = expected_result.sort_by &:id
 
-      result.should eq(expected_result)
-    end
+    result.should eq(expected_result)
   end
 
   def assert_cannot(user, resource, action)

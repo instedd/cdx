@@ -1,4 +1,3 @@
-require 'active_support/concern'
 module Resource
   extend ActiveSupport::Concern
   include Policy::Actions
@@ -42,17 +41,31 @@ module Resource
       end
     end
 
+    def self.filter_by_query(query)
+      self
+    end
+
+    def filter_by_query(query)
+      self
+    end
+
     def self.match_resource(resource)
       unless resource =~ resource_matcher
         return nil
       end
 
-      match = $1
-      if match == "*"
-        return self
+      match, query = $1, $2
+
+      if match == "*" || match.nil?
+        if query
+          query = Rack::Utils.parse_nested_query(query)
+          return filter_by_query(query)
+        else
+          return self
+        end
       end
 
-      yield match
+      yield match, query
     end
 
     def self.resource_name_prefix
@@ -60,11 +73,11 @@ module Resource
     end
 
     def self.resource_matcher
-      /#{resource_name_prefix}\/(.*)/
+      /#{resource_name_prefix}(?:\/(.*))?(?:\?(.*))?/
     end
 
     def self.resource_name
-      "#{resource_name_prefix}/*"
+      resource_name_prefix
     end
 
     def resource_name
