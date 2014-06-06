@@ -22,7 +22,7 @@ Retrieves the private patient information for a given event.
 
 # Response
 
-Returns the [event with the private patient information attached](#/event-resource-with-pii).
+Returns the [private patient information](#/pii).
 
 `Status: 200 OK`
 

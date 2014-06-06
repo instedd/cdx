@@ -29,7 +29,7 @@ Allows submission of Personal Identifiable Information into a previously submitt
 
 # Response
 
-**If succeeds**, returns the [uploaded PII](#/event-resource-with-pii).
+**If succeeds**, returns the [uploaded PII](#/pii).
 
 `Status: 200 Ok`
 
