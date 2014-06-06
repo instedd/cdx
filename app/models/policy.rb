@@ -23,17 +23,18 @@ class Policy < ActiveRecord::Base
     UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory"
     DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory"
 
-    CREATE_DEVICE = "#{PREFIX}:createDevice"
+    REGISTER_INSTITUTION_DEVICE = "#{PREFIX}:registerInstitutionDevice"
     READ_DEVICE = "#{PREFIX}:readDevice"
     UPDATE_DEVICE = "#{PREFIX}:updateDevice"
     DELETE_DEVICE = "#{PREFIX}:deleteDevice"
+    ASSIGN_DEVICE_LABORATORY = "#{PREFIX}:assignDeviceLaboratory"
     REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey"
   end
 
   ACTIONS = [
     Actions::READ_INSTITUTION, Actions::UPDATE_INSTITUTION, Actions::DELETE_INSTITUTION,
     Actions::CREATE_INSTITUTION_LABORATORY, Actions::READ_LABORATORY, Actions::UPDATE_LABORATORY, Actions::DELETE_LABORATORY,
-    Actions::CREATE_DEVICE, Actions::READ_DEVICE, Actions::UPDATE_DEVICE, Actions::DELETE_DEVICE, Actions::REGENERATE_DEVICE_KEY,
+    Actions::REGISTER_INSTITUTION_DEVICE, Actions::READ_DEVICE, Actions::UPDATE_DEVICE, Actions::DELETE_DEVICE, Actions::ASSIGN_DEVICE_LABORATORY, Actions::REGENERATE_DEVICE_KEY,
   ]
 
   def self.delegable

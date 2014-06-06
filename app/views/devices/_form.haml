@@ -18,6 +18,6 @@
   %div
     = f.label :laboratories
     .checks
-      = f.collection_check_boxes(:laboratory_ids, @institution.laboratories.all, :id, :name) { |b| b.label { b.check_box + b.text } + "<br/>".html_safe }
+      = f.collection_check_boxes(:laboratory_ids, @laboratories, :id, :name) { |b| b.label { b.check_box + b.text } + "<br/>".html_safe }
 
   = f.submit class: 'btn'

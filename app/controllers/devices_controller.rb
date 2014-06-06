@@ -12,17 +12,29 @@ class DevicesController < ApplicationController
   end
 
   def index
-    @devices = authorize_resource(@institution.devices, READ_DEVICE)
+    @devices = check_access([@institution, @institution.devices], READ_DEVICE)
+    @devices ||= []
+
+    @can_create = has_access?(@institution, REGISTER_INSTITUTION_DEVICE)
+
+    @devices_to_edit = check_access([@institution, @institution.devices], UPDATE_DEVICE)
+    @devices_to_edit ||= []
+    @devices_to_edit.map!(&:id)
   end
 
   def new
     @device = @institution.devices.new
-    return unless authorize_resource(@device, CREATE_DEVICE)
+    return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
+
+    @laboratories = check_access([@institution, @institution.laboratories], ASSIGN_DEVICE_LABORATORY)
+    @laboratories ||= []
   end
 
   def create
     @device = @institution.devices.new(device_params)
-    return unless authorize_resource(@device, CREATE_DEVICE)
+    return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
+
+    # TODO: check valid laboratories
 
     respond_to do |format|
       if @device.save
@@ -37,14 +49,22 @@ class DevicesController < ApplicationController
 
   def edit
     @device = @institution.devices.find params[:id]
-    return unless authorize_resource(@device, UPDATE_DEVICE)
+    return unless authorize_resource([@institution, @device], UPDATE_DEVICE)
+
+    # TODO: check valid laboratories
+
+    @laboratories = check_access([@institution, @institution.laboratories], ASSIGN_DEVICE_LABORATORY)
+    @laboratories ||= []
+
+    @can_regenerate_key = has_access?([@institution, @devices], REGENERATE_DEVICE_KEY)
+    @can_delete = has_access?([@institution, @device], DELETE_DEVICE)
 
     add_breadcrumb @device.name, institution_device_path(@institution, @device)
   end
 
   def update
     @device = @institution.devices.find params[:id]
-    return unless authorize_resource(@device, UPDATE_DEVICE)
+    return unless authorize_resource([@institution, @device], UPDATE_DEVICE)
 
     respond_to do |format|
       if @device.update(device_params)
@@ -59,7 +79,7 @@ class DevicesController < ApplicationController
 
   def destroy
     @device = @institution.devices.find params[:id]
-    return unless authorize_resource(@device, DELETE_DEVICE)
+    return unless authorize_resource([@institution, @device], DELETE_DEVICE)
 
     @device.destroy
 
@@ -71,7 +91,7 @@ class DevicesController < ApplicationController
 
   def regenerate_key
     @device = @institution.devices.find params[:id]
-    return unless authorize_resource(@device, REGENERATE_DEVICE_KEY)
+    return unless authorize_resource([@institution, @device], REGENERATE_DEVICE_KEY)
 
     @device.set_key
 
