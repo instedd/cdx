@@ -2,6 +2,10 @@
 
 This is a project built with Elixir that uses Dynamo to serve web requests.
 
+To start the web server type "iex -S mix server"
+
+To test it just go to localhost:4000/playground
+
 Resources:
 
 * [Elixir website](http://elixir-lang.org/)
