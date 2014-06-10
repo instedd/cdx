@@ -2,7 +2,7 @@
 -compile(export_all).
 
 hello('GET', []) ->
- {ok, [{events, "Hello, world!"}]}.
+  {ok, [{events, "Hello, world!"}]}.
 
 foo('GET', []) ->
   {output, "Hello, Foo!"}.
