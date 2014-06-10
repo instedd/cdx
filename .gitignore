@@ -22,3 +22,4 @@ backend/erl_crash.dump
 public/assets
 backend/log
 *.dump
+cdxapi/.eunit
