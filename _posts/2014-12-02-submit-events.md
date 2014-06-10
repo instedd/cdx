@@ -29,7 +29,7 @@ Allows devices to submit events.
   "age" : "21"
 }`
 
-If the same test is sent more than once (with the same event_id), the result data gets updated and no duplicated record is created.
+If the same event is sent more than once (with the same event_id), the result data gets updated and no duplicated record is created.
 
 # Response
 
