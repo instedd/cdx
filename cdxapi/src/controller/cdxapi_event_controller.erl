@@ -18,7 +18,7 @@ create('GET', []) ->
   ok;
 create('POST', []) ->
   EventId = Req:post_param("id"),
-  NewEvent = events:new(id, EventId),
+  NewEvent = event:new(id, EventId),
   case NewEvent:save() of
     {ok, SavedEvent} ->
       {redirect, [{action, "list"}]};
