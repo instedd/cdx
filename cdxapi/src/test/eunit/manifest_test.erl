@@ -20,15 +20,26 @@ apply_to_pii_core_field_test() ->
     [{pii, [{patient_name, "John"}]}, {indexed, []}, {custom, []}]).
 
 apply_to_custom_non_pii_non_indexed_field_test() ->
-    assert_manifest_application([[
-          {target_field, temperature},
-          {selector, "temperature"},
-          {type, custom},
-          {pii, false},
-          {indexed, false}
-        ]],
-      [{"temperature", 20}],
-      [{custom, [{temperature, 20}]}, {indexed, []}, {pii, []}]).
+  assert_manifest_application([[
+      {target_field, temperature},
+      {selector, "temperature"},
+      {type, custom},
+      {pii, false},
+      {indexed, false}
+    ]],
+    [{"temperature", 20}],
+    [{custom, [{temperature, 20}]}, {indexed, []}, {pii, []}]).
+
+apply_to_custom_non_pii_indexed_field_test() ->
+  assert_manifest_application([[
+      {target_field, temperature},
+      {selector, "temperature"},
+      {type, custom},
+      {pii, false},
+      {indexed, true}
+    ]],
+    [{"temperature", 20}],
+    [{indexed, [{temperature, 20}]}, {pii, []}, {custom, []}]).
 
 assert_manifest_application(Mappings, Data, Expected) ->
   Manifest = manifest:new(id, created_at, updated_at, 1, [{field_mapping, Mappings}]),
