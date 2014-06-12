@@ -1,6 +1,5 @@
 -module(manifest_test).
 -include_lib("eunit/include/eunit.hrl").
-% -export([apply_to_indexed_core_field_test/0]).
 
 apply_to_indexed_core_field_test() ->
   assert_manifest_application([[
@@ -11,6 +10,15 @@ apply_to_indexed_core_field_test() ->
     [{"assay", [{"name", "GX4002"}]}],
     [{indexed , [{assay_name, "GX4002"}]}, {pii, []}, {custom, []}]).
 
+apply_to_pii_core_field_test() ->
+  assert_manifest_application([[
+      {target_field, patient_name},
+      {selector, "patient/name"},
+      {type, core}
+    ]],
+    [{"patient", [{"name", "John"}]}],
+    [{pii, [{patient_name, "John"}]}, {indexed, []}, {custom, []}]).
+
 assert_manifest_application(Mappings, Data, Expected) ->
   Manifest = manifest:new(id, created_at, updated_at, 1, [{field_mapping, Mappings}]),
 
@@ -19,29 +27,16 @@ assert_manifest_application(Mappings, Data, Expected) ->
   io:format("expected: ~p~n", [Expected]),
   ?assertEqual(Result, Expected).
 
-
-  % test "apply to indexed core field" do
-  %   assert_manifest_application """
-  %       [{
-  %         "target_field": "assay_name",
-  %         "selector" : "assay/name",
-  %         "type" : "core"
-  %       }]
-  %     """,
-  %     %{"assay" => %{"name" => "GX4002"}},
-  %     %{indexed: %{"assay_name" => "GX4002"}, pii: %{}, custom: %{}}
-  % end
-
-  % defp assert_manifest_application(mappings_json, data, expected) do
-  %   manifest_json = """
-  %     {
-  %       "field_mapping" : #{mappings_json}
-  %     }
-  %     """
-  %   manifest = JSEX.decode!(manifest_json)
-  %   result = Manifest.apply(manifest, data)
-  %   assert result == expected
-  % end
+% defp assert_manifest_application(mappings_json, data, expected) do
+%   manifest_json = """
+%     {
+%       "field_mapping" : #{mappings_json}
+%     }
+%     """
+%   manifest = JSEX.decode!(manifest_json)
+%   result = Manifest.apply(manifest, data)
+%   assert result == expected
+% end
 
 % all_test_() ->
 %   [fun should_update_index/0].
