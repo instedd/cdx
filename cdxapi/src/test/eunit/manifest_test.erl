@@ -3,18 +3,20 @@
 % -export([apply_to_indexed_core_field_test/0]).
 
 apply_to_indexed_core_field_test() ->
-  assert_manifest_application([
+  assert_manifest_application([[
       {target_field, assay_name},
       {selector, "assay/name"},
       {type, core}
-    ],
-    {assay, {name, "GX4002"}},
+    ]],
+    [{"assay", [{"name", "GX4002"}]}],
     [{indexed , [{assay_name, "GX4002"}]}, {pii, []}, {custom, []}]).
 
-assert_manifest_application(MappingsJson, Data, Expected) ->
-  Manifest = manifest:new(id, created_at, updated_at, 1, {field_mapping, MappingsJson}),
+assert_manifest_application(Mappings, Data, Expected) ->
+  Manifest = manifest:new(id, created_at, updated_at, 1, [{field_mapping, Mappings}]),
 
   Result = Manifest:apply_to(Data),
+  io:format("result: ~p~n", [Result]),
+  io:format("expected: ~p~n", [Expected]),
   ?assertEqual(Result, Expected).
 
 

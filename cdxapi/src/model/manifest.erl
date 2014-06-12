@@ -2,128 +2,136 @@
 -compile(export_all).
 -table("manifests").
 
-apply_to(Data) ->
   % Manifest:definition(),
   % Definition
-  [{indexed , [{assay_name, "GX4002"}]}, {pii, []}, {custom, []}].
+  % [{indexed , [{assay_name, "GX4002"}]}, {pii, []}, {custom, []}].
 
+apply_to(Data) ->
+  Event = [
+      {indexed, []},
+      {pii, []},
+      {custom, []}
+    ],
 
-%   def apply(manifest, data) do
-%     event = %{
-%       indexed: %{},
-%       pii: %{},
-%       custom: %{},
-%     }
+  lists:foldl(
+    fun(Mapping, Event) ->
+      apply_single_mapping(Mapping, Data, Event)
+    end,
+    Event,
+    proplists:get_value(field_mapping, Definition)).
 
-%     Enum.reduce manifest["field_mapping"], event, fn(mapping, event) ->
-%       apply_single_mapping(mapping, data, event)
-%     end
-%   end
+apply_single_mapping(Mapping, Data, Event) ->
+  io:format("mapping: ~p~n", [Mapping]),
+  TargetField = proplists:get_value(target_field, Mapping),
+  Selector = proplists:get_value(selector, Mapping),
+  Type = proplists:get_value(type, Mapping),
+  Pii = proplists:get_value(pii, Mapping),
 
-%   defp apply_single_mapping(mapping, data, event) do
-%     target_field = mapping["target_field"]
-%     selector = mapping["selector"]
-%     type = mapping["type"]
-%     pii = mapping["pii"]
+  Value = apply_selector(Selector, Data),
+  check_valid_value(Value, TargetField, proplists:get_value(valid_values, Mapping)),
+  Value2 = apply_value_mappings(Value, TargetField, proplists:get_value(value_mappings, Mapping)),
 
-%     value = apply_selector(selector, data)
-%     check_valid_value(value, target_field, mapping["valid_values"])
-%     value = apply_value_mappings(value, target_field, mapping["value_mappings"])
+  Key = hash_key(Type, TargetField, proplists:get_value(indexed, Mapping), Pii),
+  Element = proplists:get_value(Key, Event),
+  Element2 = [{TargetField, Value} | Element],
+  Event2 = proplists:delete(Key, Event),
+  [{Key, Element2} | Event2].
 
-%     key = hash_key(type, target_field, mapping["indexed"], pii)
-%     element = event[key]
-%     element = Dict.put(element, target_field, value)
-%     Dict.put(event, key, element)
-%   end
+hash_key(core, TargetField, _Indexed, _Pii) ->
+  case event_definition:pii(TargetField) of
+    true -> pii;
+    false -> indexed
+  end;
 
-%   defp hash_key("core", target_field, _, _) do
-%     if Event.pii?(target_field) do
-%       :pii
-%     else
-%       :indexed
-%     end
-%   end
+hash_key(custom, _TargetField, _Indexed, true) ->
+  pii;
 
-%   defp hash_key("custom", _target_field, _, true) do
-%     :pii
-%   end
+hash_key(custom, _TargetField, true, false) ->
+  indexed;
 
-%   defp hash_key("custom", _target_field, true, false) do
-%     :indexed
-%   end
+hash_key(custom, _TargetField, false, false) ->
+  custom.
 
-%   defp hash_key("custom", _target_field, false, false) do
-%     :custom
-%   end
+apply_selector(Selector, Data) ->
+  % Keep it simple for now: split by '/' and index on that
+  Paths = string:tokens(Selector, "/"),
+  lists:foldl(
+    fun(Path, Current) ->
+      proplists:get_value(Path, Current)
+    end,
+    Data,
+    Paths).
 
-%   defp apply_selector(selector, data) do
-%     # Keep it simple for now: split by '/' and index on that
-%     paths = String.split selector, "/"
-%     Enum.reduce paths, data, fn(path, current) ->
-%       current[path]
-%     end
-%   end
+check_valid_value(Value, _TargetField, undefined) ->
+  Value;
 
-%   defp check_valid_value(value, _target_field, nil) do
-%     value
-%   end
+check_valid_value(Value, TargetField, ValidValues) ->
+  case proplists:get_value(options, ValidValues) of
+    undefined -> ok;
+    Options -> check_value_in_options(Value, TargetField, Options)
+  end,
+  case proplists:get_value(range, ValidValues) of
+    undefined -> ok;
+    Range -> check_value_in_range(Value, TargetField, Range)
+  end,
+  case proplists:get_value(date, ValidValues) of
+    undefined -> ok;
+    Date -> check_value_is_date(Value, TargetField, Date)
+  end.
 
-%   defp check_valid_value(value, target_field, valid_values) do
-%     if options = valid_values["options"]do
-%       check_value_in_options(value, target_field, options)
-%     end
+check_value_in_options(Value, TargetField, Options) ->
+  case list:member(Options, Value) of
+    false ->
+      erlang:error(
+        mapping_error,
+        io_lib:format("'~s' is not a valid value for '~s' (valid options are: ~s)", [Value, TargetField, string:join(Options, ", ")]));
+    _ -> ok
+  end.
 
-%     if range = valid_values["range"] do
-%       check_value_in_range(value, target_field, range)
-%     end
+check_value_in_range(Value, TargetField, Range) ->
+  Min = proplists:get_value(min, Range),
+  Max = proplists:get_value(max, Range),
 
-%     if date = valid_values["date"] do
-%       check_value_is_date(value, target_field, date)
-%     end
-%   end
+  if
+    not ((Min =< Value) and (Value =< Max)) ->
+      erlang:error(
+        mapping_error,
+        io_lib:format("'~s' is not a valid value for '~s' (valid values must be between ~s and ~s)", [Value, TargetField, Min, Max]))
+  end.
 
-%   defp check_value_in_options(value, target_field, options) do
-%     unless Enum.member? options, value do
-%       raise "'#{value}' is not a valid value for '#{target_field}' (valid options are: #{Enum.join options, ", "})"
-%     end
-%   end
+check_value_is_date(Value, TargetField, DateFormat) ->
+  case DateFormat of
+    iso ->
+      case tempo:parse(iso8601, {datetime, Value}) of
+        {error, _} ->
+          erlang:error(
+            mapping_error,
+            io_lib:format("'~s' is not a valid value for '~s' (valid value must be an iso date)", [Value, TargetField]));
+        {ok, _} ->
+          ok
+      end
+  end.
 
-%   defp check_value_in_range(value, target_field, range) do
-%     min = range["min"]
-%     max = range["max"]
+apply_value_mappings(Value, _, undefined) ->
+  Value;
 
-%     unless min <= value and value <= max do
-%       raise "'#{value}' is not a valid value for '#{target_field}' (valid values must be between #{min} and #{max})"
-%     end
-%   end
+apply_value_mappings(Value, TargetField, Mappings) ->
+    MappingsKeys = dict:keys(Mappings),
+    Star = re:compile("\\*"),
+    MatchedMapping = list_utils:find(fun(Mapping) ->
+      re:replace(Mapping, Star, ".*", [{return, list}]),
+      case re:match(Mapping, Value) of
+        {match, _Captured} -> true;
+        nomatch -> false
+      end
+    end,
+    undefined,
+    MappingsKeys),
 
-%   defp check_value_is_date(value, target_field, date_format) do
-%     case date_format do
-%       "iso" ->
-%         case :tempo.parse(:iso8601, {:datetime, value}) do
-%           {:error, _} ->
-%             raise "'#{value}' is not a valid value for '#{target_field}' (valid value must be an iso date)"
-%           {:ok, _} ->
-%             :ok
-%         end
-%     end
-%   end
-
-%   defp apply_value_mappings(value, _target_field, nil) do
-%     value
-%   end
-
-%   defp apply_value_mappings(value, target_field, mappings) do
-%     mappings_keys = Dict.keys(mappings)
-%     matched_mapping = Enum.find mappings_keys, fn(mapping) ->
-%       mapping = String.replace(mapping, "*", ".*")
-%       regex = Regex.compile!(mapping)
-%       Regex.match?(regex, value)
-%     end
-%     if matched_mapping do
-%       mappings[matched_mapping]
-%     else
-%       raise "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{Enum.join mappings_keys, ", "})"
-%     end
-%   end
-% end
+    case MatchedMapping of
+      undefined ->
+        erlang:error(
+          mapping_error,
+          io_lib:format("'~s' is not a valid value for '~s' (valid value must be in one of these forms: ~s)", [Value, TargetField, string:join(MappingsKeys, ", ")]));
+      _ -> proplists:get_value(MatchedMapping, Mappings)
+    end.
