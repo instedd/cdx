@@ -80,7 +80,7 @@ check_valid_value(Value, TargetField, ValidValues) ->
   end.
 
 check_value_in_options(Value, TargetField, Options) ->
-  case list:member(Options, Value) of
+  case lists:member(Value, Options) of
     false ->
       erlang:error(
         mapping_error,

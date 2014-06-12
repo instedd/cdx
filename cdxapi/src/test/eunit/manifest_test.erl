@@ -52,6 +52,20 @@ apply_to_custom_pii_field_test() ->
     [{"temperature", 20}],
     [{pii, [{temperature, 20}]}, {indexed, []}, {custom, []}]).
 
+doesnt_raise_on_valid_value_in_options_test() ->
+  assert_manifest_application([[
+      {target_field, level},
+      {selector, "level"},
+      {type, custom},
+      {pii, false},
+      {indexed, true},
+      {valid_values, [
+        {options, ["low", "medium", "high"]}
+      ]}
+    ]],
+    [{"level", "high"}],
+    [{indexed, [{level, "high"}]}, {pii, []}, {custom, []}]).
+
 assert_manifest_application(Mappings, Data, Expected) ->
   Manifest = manifest:new(id, created_at, updated_at, 1, [{field_mapping, Mappings}]),
 
