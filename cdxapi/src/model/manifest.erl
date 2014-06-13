@@ -81,10 +81,8 @@ check_valid_value(Value, TargetField, ValidValues) ->
 
 check_value_in_options(Value, TargetField, Options) ->
   case lists:member(Value, Options) of
-    false ->
-      erlang:error(
-        mapping_error,
-        io_lib:format("'~s' is not a valid value for '~s' (valid options are: ~s)", [Value, TargetField, string:join(Options, ", ")]));
+    false -> throw(mapping_error);
+        % io_lib:format("'~s' is not a valid value for '~s' (valid options are: ~s)", [Value, TargetField, string:join(Options, ", ")]));
     _ -> ok
   end.
 
@@ -93,22 +91,17 @@ check_value_in_range(Value, TargetField, Range) ->
   Max = proplists:get_value(max, Range),
 
   if
-    not ((Min =< Value) and (Value =< Max)) ->
-      erlang:error(
-        mapping_error,
-        io_lib:format("'~s' is not a valid value for '~s' (valid values must be between ~s and ~s)", [Value, TargetField, Min, Max]))
+    not ((Min =< Value) and (Value =< Max)) -> throw(mapping_error)
+        % io_lib:format("'~s' is not a valid value for '~s' (valid values must be between ~s and ~s)", [Value, TargetField, Min, Max]))
   end.
 
 check_value_is_date(Value, TargetField, DateFormat) ->
   case DateFormat of
     iso ->
       case tempo:parse(iso8601, {datetime, Value}) of
-        {error, _} ->
-          erlang:error(
-            mapping_error,
-            io_lib:format("'~s' is not a valid value for '~s' (valid value must be an iso date)", [Value, TargetField]));
-        {ok, _} ->
-          ok
+        {error, _} -> throw(mapping_error);
+            % io_lib:format("'~s' is not a valid value for '~s' (valid value must be an iso date)", [Value, TargetField]));
+        {ok, _} -> ok
       end
   end.
 
@@ -129,9 +122,7 @@ apply_value_mappings(Value, TargetField, Mappings) ->
     MappingsKeys),
 
     case MatchedMapping of
-      undefined ->
-        erlang:error(
-          mapping_error,
-          io_lib:format("'~s' is not a valid value for '~s' (valid value must be in one of these forms: ~s)", [Value, TargetField, string:join(MappingsKeys, ", ")]));
+      undefined -> throw(mapping_error);
+          % io_lib:format("'~s' is not a valid value for '~s' (valid value must be in one of these forms: ~s)", [Value, TargetField, string:join(MappingsKeys, ", ")]));
       _ -> proplists:get_value(MatchedMapping, Mappings)
     end.

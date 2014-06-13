@@ -66,6 +66,20 @@ doesnt_raise_on_valid_value_in_options_test() ->
     [{"level", "high"}],
     [{indexed, [{level, "high"}]}, {pii, []}, {custom, []}]).
 
+raises_on_invalid_value_in_options_test() ->
+    assert_raises_manifest_data_validation(
+        [[
+          {target_field, level},
+          {selector, "level"},
+          {type, custom},
+          {pii, false},
+          {indexed, true},
+          {valid_values, [
+            {options, ["low", "medium", "high"]}
+          ]}
+        ]],
+      [{"level", "John Doe"}]).
+
 assert_manifest_application(Mappings, Data, Expected) ->
   Manifest = manifest:new(id, created_at, updated_at, 1, [{field_mapping, Mappings}]),
 
@@ -73,6 +87,11 @@ assert_manifest_application(Mappings, Data, Expected) ->
   io:format("result: ~p~n", [Result]),
   io:format("expected: ~p~n", [Expected]),
   ?assertEqual(Result, Expected).
+
+assert_raises_manifest_data_validation(Mappings, Data) ->
+  Manifest = manifest:new(id, created_at, updated_at, 1, [{field_mapping, Mappings}]),
+
+  ?assertThrow(mapping_error, Manifest:apply_to(Data)).
 
 % defp assert_manifest_application(mappings_json, data, expected) do
 %   manifest_json = """
