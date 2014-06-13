@@ -29,8 +29,8 @@ Allows submission of Personal Identifiable Information into a previously submitt
 
 # Response
 
-**If succeeds**, returns the [uploaded PII](#/pii).
+**If it succeeds**, it returns the [uploaded PII](#/pii).
 
 `Status: 200 Ok`
 
-For errors responses, see the [response status codes documentation](#http-response-codes).
+For error responses, see the [response status codes documentation](#http-response-codes).

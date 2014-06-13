@@ -13,7 +13,7 @@ Returns a list of Events
 
 Filter parameters allow querying a subset of the available events.
 
-The data retrieved will allways be sorted by the event creation date.
+The data returned will be sorted by default by the event creation date.
 
 * `start_at` - the system will return a maximum of 1000 events, to retrieve the next batch of events the `start_at` parameter must be used
 
@@ -209,4 +209,4 @@ Returns the quantity of events matching each combination of aggregated fields.
   },
 ]`
 
-For errors responses, see the [response status codes documentation](#http-response-codes).
+For error responses, see the [response status codes documentation](#http-response-codes).

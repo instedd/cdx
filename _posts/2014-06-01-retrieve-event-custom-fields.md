@@ -26,4 +26,4 @@ Returns the [custom fields](#/custom-fields).
 
 `Status: 200 OK`
 
-For errors responses, see the [response status codes documentation](#http-response-codes).
+For error responses, see the [response status codes documentation](#http-response-codes).

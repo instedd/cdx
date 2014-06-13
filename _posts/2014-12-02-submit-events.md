@@ -33,8 +33,8 @@ If the same event is sent more than once (with the same event_id), the result da
 
 # Response
 
-**If succeeds**, returns the created [event](#/event-resource).
+**If it succeeds**, it returns the created [event](#/event-resource).
 
 `Status: 201 Created`
 
-For errors responses, see the [response status codes documentation](#http-response-codes).
+For error responses, see the [response status codes documentation](#http-response-codes).
