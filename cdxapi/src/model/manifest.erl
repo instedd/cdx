@@ -21,7 +21,6 @@ apply_to(Data) ->
     proplists:get_value(field_mapping, Definition)).
 
 apply_single_mapping(Mapping, Data, Event) ->
-  io:format("mapping: ~p~n", [Mapping]),
   TargetField = proplists:get_value(target_field, Mapping),
   Selector = proplists:get_value(selector, Mapping),
   Type = proplists:get_value(type, Mapping),
@@ -29,13 +28,11 @@ apply_single_mapping(Mapping, Data, Event) ->
 
   Value = apply_selector(Selector, Data),
   check_valid_value(Value, TargetField, proplists:get_value(valid_values, Mapping)),
-  Value2 = apply_value_mappings(Value, TargetField, proplists:get_value(value_mappings, Mapping)),
+  MappedValue = apply_value_mappings(Value, TargetField, proplists:get_value(value_mappings, Mapping)),
 
   Key = hash_key(Type, TargetField, proplists:get_value(indexed, Mapping), Pii),
-  Element = proplists:get_value(Key, Event),
-  Element2 = [{TargetField, Value} | Element],
-  Event2 = proplists:delete(Key, Event),
-  [{Key, Element2} | Event2].
+  Element = [{TargetField, MappedValue} | proplists:get_value(Key, Event)],
+  lists:keystore(Key, 1, Event, {Key, Element}).
 
 hash_key(core, TargetField, _Indexed, _Pii) ->
   case event_definition:pii(TargetField) of
@@ -90,18 +87,19 @@ check_value_in_range(Value, TargetField, Range) ->
   Min = proplists:get_value(min, Range),
   Max = proplists:get_value(max, Range),
 
-  if
-    not ((Min =< Value) and (Value =< Max)) -> throw(mapping_error)
+  case ((Min =< Value) and (Value =< Max)) of
+    false -> throw(mapping_error);
         % io_lib:format("'~s' is not a valid value for '~s' (valid values must be between ~s and ~s)", [Value, TargetField, Min, Max]))
+    _ -> ok
   end.
 
 check_value_is_date(Value, TargetField, DateFormat) ->
   case DateFormat of
-    iso ->
-      case tempo:parse(iso8601, {datetime, Value}) of
-        {error, _} -> throw(mapping_error);
-            % io_lib:format("'~s' is not a valid value for '~s' (valid value must be an iso date)", [Value, TargetField]));
-        {ok, _} -> ok
+    "iso" ->
+      try
+        tempo:parse(iso8601, {datetime, iolist_to_binary(Value)})
+      catch
+        Exception:Reason -> throw(mapping_error)
       end
   end.
 
@@ -109,20 +107,25 @@ apply_value_mappings(Value, _, undefined) ->
   Value;
 
 apply_value_mappings(Value, TargetField, Mappings) ->
-    MappingsKeys = dict:keys(Mappings),
-    Star = re:compile("\\*"),
-    MatchedMapping = list_utils:find(fun(Mapping) ->
-      re:replace(Mapping, Star, ".*", [{return, list}]),
-      case re:match(Mapping, Value) of
-        {match, _Captured} -> true;
-        nomatch -> false
-      end
+    MappingKeys = proplists:get_keys(Mappings),
+    MatchedMapping = find_mappign(fun(Mapping) ->
+      RegexMapping = re:replace(Mapping, "\\*", ".*", [{return, list}, global]),
+      re:run(Value, RegexMapping)
     end,
     undefined,
-    MappingsKeys),
-
+    MappingKeys),
     case MatchedMapping of
-      undefined -> throw(mapping_error);
-          % io_lib:format("'~s' is not a valid value for '~s' (valid value must be in one of these forms: ~s)", [Value, TargetField, string:join(MappingsKeys, ", ")]));
+      undefined ->
+        throw(mapping_error);
+          % io_lib:format("'~s' is not a valid value for '~s' (valid value must be in one of these forms: ~s)", [Value, TargetField, string:join(MappingKeys, ", ")]));
       _ -> proplists:get_value(MatchedMapping, Mappings)
     end.
+
+find_mappign(Condition, Default, [E | Rest]) ->
+  case Condition(E) of
+    {match, _Captured} -> E;
+    nomatch -> find_mappign(Condition, Default, Rest)
+  end;
+
+find_mappign(_Cond, Default, []) -> Default.
+

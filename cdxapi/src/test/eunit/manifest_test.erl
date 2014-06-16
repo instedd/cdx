@@ -17,7 +17,7 @@ apply_to_pii_core_field_test() ->
       {type, core}
     ]],
     [{"patient", [{"name", "John"}]}],
-    [{pii, [{patient_name, "John"}]}, {indexed, []}, {custom, []}]).
+    [{indexed, []}, {pii, [{patient_name, "John"}]}, {custom, []}]).
 
 apply_to_custom_non_pii_non_indexed_field_test() ->
   assert_manifest_application([[
@@ -28,7 +28,7 @@ apply_to_custom_non_pii_non_indexed_field_test() ->
       {indexed, false}
     ]],
     [{"temperature", 20}],
-    [{custom, [{temperature, 20}]}, {indexed, []}, {pii, []}]).
+    [{indexed, []}, {pii, []}, {custom, [{temperature, 20}]}]).
 
 apply_to_custom_non_pii_indexed_field_test() ->
   assert_manifest_application([[
@@ -50,7 +50,7 @@ apply_to_custom_pii_field_test() ->
       {indexed, false}
     ]],
     [{"temperature", 20}],
-    [{pii, [{temperature, 20}]}, {indexed, []}, {custom, []}]).
+    [{indexed, []}, {pii, [{temperature, 20}]}, {custom, []}]).
 
 doesnt_raise_on_valid_value_in_options_test() ->
   assert_manifest_application([[
@@ -67,8 +67,7 @@ doesnt_raise_on_valid_value_in_options_test() ->
     [{indexed, [{level, "high"}]}, {pii, []}, {custom, []}]).
 
 raises_on_invalid_value_in_options_test() ->
-    assert_raises_manifest_data_validation(
-        [[
+    assert_raises_manifest_data_validation([[
           {target_field, level},
           {selector, "level"},
           {type, custom},
@@ -79,6 +78,129 @@ raises_on_invalid_value_in_options_test() ->
           ]}
         ]],
       [{"level", "John Doe"}]).
+
+doesnt_raise_on_valid_value_in_range_test() ->
+    assert_manifest_application([[
+          {target_field, temperature},
+          {selector, "temperature"},
+          {type, custom},
+          {pii, false},
+          {indexed, true},
+          {valid_values, [
+            {range, [
+              {min, 30},
+              {max, 30}
+            ]}
+          ]}
+        ]],
+      [{"temperature", 30}],
+      [{indexed, [{temperature, 30}]}, {pii, []}, {custom, []}]).
+
+raise_on_invalid_value_in_range_lesser_test() ->
+    assert_raises_manifest_data_validation([[
+          {target_field, temperature},
+          {selector, "temperature"},
+          {type, custom},
+          {pii, false},
+          {indexed, true},
+          {valid_values, [
+            {range, [
+              {min, 30},
+              {max, 31}
+            ]}
+          ]}
+        ]],
+      [{"temperature", 29.9}]).
+
+raise_on_invalid_value_in_range_greater_test() ->
+    assert_raises_manifest_data_validation([[
+          {target_field, temperature},
+          {selector, "temperature"},
+          {type, custom},
+          {pii, false},
+          {indexed, true},
+          {valid_values, [
+            {range, [
+              {min, 30},
+              {max, 31}
+            ]}
+          ]}
+        ]],
+      [{"temperature", 31.1}]).
+
+doesnt_raise_on_valid_value_in_date_iso_test() ->
+    assert_manifest_application([[
+          {target_field, sample_date},
+          {selector, "sample_date"},
+          {type, custom},
+          {pii, false},
+          {indexed, true},
+          {valid_values, [
+            {date, "iso"}
+          ]}
+        ]],
+      [{"sample_date", "2014-05-14T15:22:11+0000"}],
+      [{indexed, [{sample_date, "2014-05-14T15:22:11+0000"}]}, {pii, []}, {custom, []}]).
+
+raise_on_invalid_value_in_date_iso_test() ->
+    assert_raises_manifest_data_validation([[
+          {target_field, sample_date},
+          {selector, "sample_date"},
+          {type, custom},
+          {pii, false},
+          {indexed, true},
+          {valid_values, [
+            {date, "iso"}
+          ]}
+        ]],
+      [{"sample_date", "John Doe"}]).
+
+applies_first_value_mapping_test() ->
+    assert_manifest_application([[
+          {target_field, condition},
+          {selector, "condition"},
+          {type, custom},
+          {pii, false},
+          {indexed, true},
+          {value_mappings, [
+            {"*MTB*", "MTB"},
+            {"*FLU*", "H1N1"},
+            {"*FLUA*", "A1N1"}
+          ]}
+        ]],
+      [{"condition", "PATIENT HAS MTB CONDITION"}],
+      [{indexed, [{condition, "MTB"}]}, {pii, []}, {custom, []}]).
+
+applies_second_value_mapping_test() ->
+    assert_manifest_application([[
+          {target_field, condition},
+          {selector, "condition"},
+          {type, custom},
+          {pii, false},
+          {indexed, true},
+          {value_mappings, [
+            {"*MTB*", "MTB"},
+            {"*FLU*", "H1N1"},
+            {"*FLUA*", "A1N1"}
+          ]}
+        ]],
+      [{"condition", "PATIENT HAS FLU CONDITION"}],
+      [{indexed, [{condition, "H1N1"}]}, {pii, []}, {custom, []}]).
+
+raise_on_mapping_not_found_test() ->
+    assert_raises_manifest_data_validation([[
+          {target_field, condition},
+          {selector, "condition"},
+          {type, custom},
+          {pii, false},
+          {indexed, true},
+          {value_mappings, [
+            {"*MTB*", "MTB"},
+            {"*FLU*", "H1N1"},
+            {"*FLUA*", "A1N1"}
+          ]}
+        ]],
+      [{"condition", "PATIENT IS OK"}]).
 
 assert_manifest_application(Mappings, Data, Expected) ->
   Manifest = manifest:new(id, created_at, updated_at, 1, [{field_mapping, Mappings}]),
@@ -92,60 +214,3 @@ assert_raises_manifest_data_validation(Mappings, Data) ->
   Manifest = manifest:new(id, created_at, updated_at, 1, [{field_mapping, Mappings}]),
 
   ?assertThrow(mapping_error, Manifest:apply_to(Data)).
-
-% defp assert_manifest_application(mappings_json, data, expected) do
-%   manifest_json = """
-%     {
-%       "field_mapping" : #{mappings_json}
-%     }
-%     """
-%   manifest = JSEX.decode!(manifest_json)
-%   result = Manifest.apply(manifest, data)
-%   assert result == expected
-% end
-
-% all_test_() ->
-%   [fun should_update_index/0].
-
-% should_update_index() ->
-%   meck:new(httpc),
-%   try
-%     Attrs1 = [{foo, "foo value"}],
-%     Attrs2 = [{bar, "bar value"}],
-%     List = [{1, 2010, Attrs1}, {2, 2012, Attrs2}],
-%     Header1 = build_header(1, 2010),
-%     Header2 = build_header(2, 2012),
-%     Doc1 = build_doc(Attrs1),
-%     Doc2 = build_doc(Attrs2),
-%     Expected = <<Header1/binary, "\n", Doc1/binary, "\n", Header2/binary, "\n", Doc2/binary, "\n">>,
-%     meck:expect(httpc, request, fun(put, {Url, [], "", BatchRequest}, [], []) ->
-%       ?assertEqual(elastic_search:bulk_url(), Url),
-%       ?assertEqual(Expected, BatchRequest),
-%       {ok, {{"HTTP/1.1", 200, "OK"}, [], []}}
-%     end),
-%     ?assertMatch({ok, _}, elastic_search:batch_update(List)),
-%     ?assert(meck:validate(httpc))
-%   after
-%     meck:unload(httpc)
-%   end.
-
-% build_header(Id, Year) ->
-%   iolist_to_binary(mochijson2:encode({struct, [
-%     {update, {struct, [
-%       {'_index', list_to_binary(["test_results_", integer_to_list(Year)])},
-%       {'_type', test_result},
-%       {'_id', Id}
-%     ]}}
-%   ]})).
-
-% build_doc(Attributes) ->
-%   iolist_to_binary(mochijson2:encode({struct, [{doc, {struct, Attributes}}]})).
-
-
-% should_build_errors_with_custom_description_for_failed_self_test() ->
-%   DatagramRecord = sample_datagram_record([{type, kdg_failed_self_test},
-%                                            {error_code, 6},
-%                                            {params, [1,2,3,4]}]),
-
-%   Error = datagram:build_error(sample_test_result(), DatagramRecord),
-%   ?assertEqual(<<"FailedSelfTest : 4006 Syringe motor doesn't work (1;2;3;4)">>, Error#test_result_error.description).
