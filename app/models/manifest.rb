@@ -19,6 +19,6 @@ class Manifest < ActiveRecord::Base
   end
 
   def metadata
-    JSON.parse(self.definition)["metadata"]
+    Oj.load(self.definition)["metadata"]
   end
 end
