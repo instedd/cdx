@@ -107,13 +107,13 @@ class Manifest < ActiveRecord::Base
     return value unless mappings
 
     matched_mapping = mappings.keys.detect do |mapping|
-      mapping.gsub("*", ".*").match value
+      value.match mapping.gsub("*", ".*")
     end
 
     if matched_mapping
       mappings[matched_mapping]
     else
-      raise "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{mappings_keys.join ", "})"
+      raise "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{mappings.keys.join ", "})"
     end
   end
 end
