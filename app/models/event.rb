@@ -4,8 +4,8 @@ class Event < ActiveRecord::Base
 
   before_create :generate_uuid
   before_save :encrypt
-  before_create :create_in_elasticsearch
-  before_update :update_in_elasticsearch
+  after_create :create_in_elasticsearch
+  after_update :update_in_elasticsearch
 
   def self.pii?(field)
     sensitive_fields.include? field.to_sym
@@ -65,7 +65,8 @@ class Event < ActiveRecord::Base
   end
 
   def create_in_elasticsearch
-
+    client = Elasticsearch::Client.new log: true
+    client.index index: device.institution.elasticsearch_index_name, type: 'result', body: Oj.load(Encryptor.decrypt(self.raw_data, :key => secret_key, :iv => iv, :salt => salt)).merge( created_at: self.created_at, updated_at: self.updated_at, device_uuid: device.secret_key)
   end
 
   def update_in_elasticsearch

@@ -15,4 +15,8 @@ class Institution < ActiveRecord::Base
   def to_s
     name
   end
+
+  def elasticsearch_index_name
+    "#{Elasticsearch.index_prefix}_#{id}"
+  end
 end
