@@ -80,7 +80,7 @@
         <div>
           <label for="device">Device</label>
           <select id="device" name="device">
-            <%= Enum.map @devices, fn(device) -> %>
+            <%= @devices.map do |device| %>
               <option value="<%= device.secret_key %>"><%= device.name %></option>
             <% end %>
           </select>

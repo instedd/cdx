@@ -54,6 +54,7 @@ gem 'foreman'
 
 gem 'oj'
 gem 'guid'
+gem 'encryptor'
 
 gem 'pry-byebug', group: [:development, :test]
 

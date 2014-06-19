@@ -18,4 +18,8 @@ Cdp::Application.routes.draw do
   resources :policies
 
   root :to => 'home#index'
+  scope '/api' do
+    get 'playground' => 'api#playground'
+    post '/devices/:device_uuid/events' => 'api#create'
+  end
 end
