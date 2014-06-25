@@ -22,31 +22,99 @@ class Event < ActiveRecord::Base
 
   def self.searchable_fields
     [
-      [:created_at, :date, [
-        {"since" => {range: [from: {include_lower: true}]}},
-        {"until" => {range: [to: {include_lower: true}]}}
-      ]],
-      [:event_id, :integer, {"event_id" => :match}],
-      [:device_uuid, :string, {"device" => :match}],
-      [:laboratory_id, :integer, {"laboratory" => :match}],
-      [:institution_id, :integer, {"institution" => :match}],
-      [:location_id, :integer, []],
-      [:parent_locations, :integer, {"location" => :match}],
-      [:age, :integer, [
-        {"age" => :match},
-        {"min_age" => {range: [from: {include_lower: true}]}},
-        {"max_age" => {range: [to: {include_upper: true}]}},
-      ]],
-      [:assay_name, :string, {"assay_name" => :wildcard}],
-      [:device_serial_number, :string, []],
-      [:gender, :string, {"gender" => :wildcard}],
-      [:uuid, :string, {"uuid" => :match}],
-      [:start_time, :date, []],
-      [:system_user, :string, []],
-      [:results, :nested, [
-        [:result, :multi_field, {"result" => :wildcard}],
-        [:condition, :string, {"condition" => :wildcard}],
-      ]],
+      {
+        name: :created_at,
+        type: :date,
+        queryable_options: [
+          {"since" => {range: [from: {include_lower: true}]}},
+          {"until" => {range: [to: {include_lower: true}]}}
+        ]
+      },
+      {
+        name: :event_id,
+        type: :integer,
+        queryable_options: [{"event_id" => :match}]
+      },
+      {
+        name: :device_uuid,
+        type: :string,
+        queryable_options: [{"device" => :match}]
+        },
+      {
+        name: :laboratory_id,
+        type: :integer,
+        queryable_options: [{"laboratory" => :match}]
+        },
+      {
+        name: :institution_id,
+        type: :integer,
+        queryable_options: [{"institution" => :match}]
+      },
+      {
+        name: :location_id,
+        type: :integer,
+        queryable_options: []
+      },
+      {
+        name: :parent_locations,
+        type: :integer,
+        queryable_options: [{"location" => :match}]
+        },
+      {
+        name: :age,
+        type: :integer,
+        queryable_options: [
+          {"age" => :match},
+          {"min_age" => {range: [from: {include_lower: true}]}},
+          {"max_age" => {range: [to: {include_upper: true}]}}
+        ]
+      },
+      {
+        name: :assay_name,
+        type: :string,
+        queryable_options: [{"assay_name" => :wildcard}]
+      },
+      {
+        name: :device_serial_number,
+        type: :string,
+        queryable_options: []
+      },
+      {
+        name: :gender,
+        type: :string,
+        queryable_options: [{"gender" => :wildcard}]
+      },
+      {
+        name: :uuid,
+        type: :string,
+        queryable_options: [{"uuid" => :match}]
+      },
+      {
+        name: :start_time,
+        type: :date,
+        queryable_options: []
+      },
+      {
+        name: :system_user,
+        type: :string,
+        queryable_options: []
+      },
+      {
+        name: :results,
+        type: :nested,
+        sub_fields: [
+          {
+            name: :result,
+            type: :multi_field,
+            queryable_options: [{"result" => :wildcard}]
+          },
+          {
+            name: :condition,
+            type: :string,
+            queryable_options: [{"condition" => :wildcard}]
+          }
+        ]
+      }
     ]
   end
 
@@ -61,12 +129,13 @@ class Event < ActiveRecord::Base
   end
 
   def generate_uuid
-
+    self.uuid = Guid.new.to_s
   end
 
   def create_in_elasticsearch
+    decrypt
     client = Elasticsearch::Client.new log: true
-    client.index index: device.institution.elasticsearch_index_name, type: 'result', body: Oj.load(Encryptor.decrypt(self.raw_data, :key => secret_key, :iv => iv, :salt => salt)).merge( created_at: self.created_at, updated_at: self.updated_at, device_uuid: device.secret_key)
+    client.index index: device.institution.elasticsearch_index_name, type: 'result', body: indexed_fields
   end
 
   def update_in_elasticsearch
@@ -74,6 +143,10 @@ class Event < ActiveRecord::Base
   end
 
   private
+
+  def indexed_fields
+    (device.manifests.first || Manifest.default).apply_to(Oj.load raw_data)[:indexed].merge(created_at: self.created_at, updated_at: self.updated_at, device_uuid: device.secret_key)
+  end
 
   def secret_key
     'a very secret key'

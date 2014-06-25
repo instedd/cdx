@@ -6,6 +6,10 @@ class Manifest < ActiveRecord::Base
   after_destroy :ensure_no_orphan_models
   after_save :ensure_no_orphan_models
 
+  def self.default
+    new definition: default_definition
+  end
+
   def update_models
     self.device_models = Array(metadata["device_models"] || []).map { |model| DeviceModel.find_or_create_by(name: model)}
   end
@@ -78,7 +82,6 @@ class Manifest < ActiveRecord::Base
     end
   end
 
-
   def check_value_in_options(value, target_field, options)
     unless options.include? value
       raise "'#{value}' is not a valid value for '#{target_field}' (valid options are: #{options.join ", "})"
@@ -114,6 +117,39 @@ class Manifest < ActiveRecord::Base
       mappings[matched_mapping]
     else
       raise "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{mappings.keys.join ", "})"
+    end
+  end
+
+  def self.default_definition
+    field_mapping = Event.sensitive_fields.map do |sensitive_field|
+      {
+        target_field: sensitive_field,
+        selector: sensitive_field,
+        type: :core,
+        pii: true,
+        indexed: false
+      }
+    end
+
+    field_mapping.concat(map(Event.searchable_fields).flatten)
+    Oj.dump field_mapping: field_mapping
+  end
+
+  private
+
+  def self.map fields
+    fields.map do |field_definition|
+      if field_definition[:type] == :nested
+        map field_definition[:sub_fields]
+      else
+        {
+          target_field: field_definition[:name],
+          selector: field_definition[:name],
+          type: :core,
+          pii: false,
+          indexed: true
+        }
+      end
     end
   end
 end
