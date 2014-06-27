@@ -5,6 +5,7 @@ class Device < ActiveRecord::Base
   belongs_to :device_model
   belongs_to :institution
   has_and_belongs_to_many :laboratories
+  has_many :locations, through: :laboratories
   has_many :events
 
   validates_presence_of :institution

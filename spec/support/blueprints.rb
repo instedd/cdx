@@ -22,6 +22,7 @@ end
 
 Laboratory.blueprint do
   institution
+  location
   name
 end
 
@@ -29,6 +30,11 @@ Device.blueprint do
   institution
   name
   device_model
+  laboratories { [Laboratory.make] }
+end
+
+Location.blueprint do
+  name
 end
 
 DeviceModel.blueprint do

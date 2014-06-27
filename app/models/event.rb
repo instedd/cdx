@@ -157,7 +157,34 @@ class Event < ActiveRecord::Base
   end
 
   def indexed_fields
-    parsed_fields[:indexed].merge(created_at: self.created_at, updated_at: self.updated_at, device_uuid: device.secret_key, uuid: uuid)
+    if device.laboratories.size == 1
+      laboratory = device.laboratories.first
+      laboratory_id = laboratory.id
+      location = device.locations.first
+      location_id = location.id
+      parent_locations = location.self_and_ancestors.map &:id
+    elsif device.laboratories.size == 0
+      laboratory_id = nil
+      location_id = nil
+      parent_locations = []
+    else
+      laboratory_id = nil
+      locations = device.locations
+      location = locations.first
+      location = location.common_root_with(locations[1..-1])
+      location_id = location.id
+      parent_locations = location.self_and_ancestors.map &:id
+    end
+
+    parsed_fields[:indexed].merge(
+      created_at: self.created_at,
+      updated_at: self.updated_at,
+      device_uuid: device.secret_key,
+      uuid: uuid,
+      location_id: location_id,
+      parent_locations: parent_locations,
+      laboratory_id: laboratory_id
+    )
   end
 
   def parsed_fields

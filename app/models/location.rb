@@ -14,4 +14,19 @@ class Location < ActiveRecord::Base
   def filter_by_owner(user)
     self
   end
+
+  def common_root_with(locations)
+    locations.inject self do |location, root|
+      if root.is_or_is_ancestor_of? location
+        location
+      elsif root.is_or_is_descendant_of? location
+        root
+      else
+        root_ancestors = root.ancestors
+        location.ancestors.find do |ancestor|
+          root_ancestors.include? ancestor
+        end
+      end
+    end
+  end
 end
