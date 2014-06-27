@@ -1,9 +1,11 @@
 class Event < ActiveRecord::Base
   belongs_to :device
   belongs_to :institution
+  serialize :custom_fields
 
   before_create :generate_uuid
   before_save :extract_pii
+  before_save :extract_custom_fields
   before_save :encrypt
   after_create :create_in_elasticsearch
   after_update :update_in_elasticsearch
@@ -135,6 +137,8 @@ class Event < ActiveRecord::Base
     self.uuid = Guid.new.to_s
   end
 
+  private
+
   def create_in_elasticsearch
     client = Elasticsearch::Client.new log: true
     client.index index: device.institution.elasticsearch_index_name, type: 'result', body: indexed_fields
@@ -148,7 +152,9 @@ class Event < ActiveRecord::Base
     self.sensitive_data = parsed_fields[:pii]
   end
 
-  private
+  def extract_custom_fields
+    self.custom_fields = parsed_fields[:custom]
+  end
 
   def indexed_fields
     parsed_fields[:indexed].merge(created_at: self.created_at, updated_at: self.updated_at, device_uuid: device.secret_key, uuid: uuid)

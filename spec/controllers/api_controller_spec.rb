@@ -95,7 +95,7 @@ describe ApiController do
     event.sensitive_data["foo"].should eq(1234)
   end
 
-  it "should use the last version of the manifest" do
+  it "uses the last version of the manifest" do
     Manifest.create definition: %{{
       "metadata" : {
         "device_models" : ["#{device.device_model.name}"],
@@ -129,5 +129,33 @@ describe ApiController do
     event = get_all_elasticsearch_events
     event["foo"].should be(nil)
     event["assay_name"].should eq("GX4002")
+  end
+
+  it "stores custom fields according to the manifest" do
+    Manifest.create definition: %{{
+      "metadata" : {
+        "device_models" : ["#{device.device_model.name}"],
+        "version" : 2
+      },
+      "field_mapping" : [
+        {
+          "target_field": "foo",
+          "selector" : "some_field",
+          "type" : "custom",
+          "pii": false,
+          "indexed": false
+        }
+      ]
+    }}
+
+    post :create, Oj.dump(some_field: 1234), device_uuid: device.secret_key
+
+    event = get_all_elasticsearch_events
+    event["foo"].should be(nil)
+
+    event = Event.first.decrypt
+    event.sensitive_data["some_field"].should be(nil)
+    event.sensitive_data["foo"].should be(nil)
+    event.custom_fields["foo"].should eq(1234)
   end
 end
