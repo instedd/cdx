@@ -3,6 +3,7 @@ class Event < ActiveRecord::Base
   belongs_to :institution
 
   before_create :generate_uuid
+  before_save :extract_pii
   before_save :encrypt
   after_create :create_in_elasticsearch
   after_update :update_in_elasticsearch
@@ -119,12 +120,14 @@ class Event < ActiveRecord::Base
   end
 
   def decrypt
-    self.raw_data = Encryptor.decrypt(self.raw_data, :key => secret_key, :iv => iv, :salt => salt)
+    self.raw_data = Encryptor.decrypt self.raw_data, :key => secret_key, :iv => iv, :salt => salt
+    self.sensitive_data = Oj.load Encryptor.decrypt(self.sensitive_data, :key => secret_key, :iv => iv, :salt => salt)
     self
   end
 
   def encrypt
-    self.raw_data = Encryptor.encrypt(self.raw_data, :key => secret_key, :iv => iv, :salt => salt)
+    self.raw_data = Encryptor.encrypt self.raw_data, :key => secret_key, :iv => iv, :salt => salt
+    self.sensitive_data = Encryptor.encrypt Oj.dump(self.sensitive_data), :key => secret_key, :iv => iv, :salt => salt
     self
   end
 
@@ -133,7 +136,6 @@ class Event < ActiveRecord::Base
   end
 
   def create_in_elasticsearch
-    decrypt
     client = Elasticsearch::Client.new log: true
     client.index index: device.institution.elasticsearch_index_name, type: 'result', body: indexed_fields
   end
@@ -142,10 +144,18 @@ class Event < ActiveRecord::Base
 
   end
 
+  def extract_pii
+    self.sensitive_data = parsed_fields[:pii]
+  end
+
   private
 
   def indexed_fields
-    (device.manifests.first || Manifest.default).apply_to(Oj.load raw_data)[:indexed].merge(created_at: self.created_at, updated_at: self.updated_at, device_uuid: device.secret_key)
+    parsed_fields[:indexed].merge(created_at: self.created_at, updated_at: self.updated_at, device_uuid: device.secret_key, uuid: uuid)
+  end
+
+  def parsed_fields
+    @parsed_fields ||= (device.manifests.first || Manifest.default).apply_to(Oj.load raw_data)
   end
 
   def secret_key
