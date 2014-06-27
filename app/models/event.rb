@@ -155,7 +155,7 @@ class Event < ActiveRecord::Base
   end
 
   def parsed_fields
-    @parsed_fields ||= (device.manifests.first || Manifest.default).apply_to(Oj.load raw_data)
+    @parsed_fields ||= (device.manifests.order("version DESC").first || Manifest.default).apply_to(Oj.load raw_data)
   end
 
   def secret_key

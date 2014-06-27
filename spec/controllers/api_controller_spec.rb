@@ -41,7 +41,7 @@ describe ApiController do
   end
 
   it "applies an existing manifest" do
-    manifest = Manifest.create definition: %{{
+    Manifest.create definition: %{{
       "metadata" : {
         "device_models" : ["#{device.device_model.name}"],
         "version" : 1
@@ -61,7 +61,7 @@ describe ApiController do
   end
 
   it "stores pii according to manifest" do
-    manifest = Manifest.create definition: %{{
+    Manifest.create definition: %{{
       "metadata" : {
         "device_models" : ["#{device.device_model.name}"],
         "version" : 1
@@ -93,5 +93,41 @@ describe ApiController do
     event.decrypt.sensitive_data.should_not eq(raw_data)
     event.sensitive_data["patient_id"].should be(nil)
     event.sensitive_data["foo"].should eq(1234)
+  end
+
+  it "should use the last version of the manifest" do
+    Manifest.create definition: %{{
+      "metadata" : {
+        "device_models" : ["#{device.device_model.name}"],
+        "version" : 1
+      },
+      "field_mapping" : [
+        {
+          "target_field": "foo",
+          "selector" : "assay/name",
+          "type" : "core"
+        }
+      ]
+    }}
+
+    Manifest.create definition: %{{
+      "metadata" : {
+        "device_models" : ["#{device.device_model.name}"],
+        "version" : 2
+      },
+      "field_mapping" : [
+        {
+          "target_field": "assay_name",
+          "selector" : "assay/name",
+          "type" : "core"
+        }
+      ]
+    }}
+
+    post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_uuid: device.secret_key
+
+    event = get_all_elasticsearch_events
+    event["foo"].should be(nil)
+    event["assay_name"].should eq("GX4002")
   end
 end
