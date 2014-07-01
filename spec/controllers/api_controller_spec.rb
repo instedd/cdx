@@ -5,10 +5,10 @@ describe ApiController do
   let(:institution) {device.institution}
   let(:data) {Oj.dump result: :positive}
 
-  def get_all_elasticsearch_events
+  def all_elasticsearch_events
     client = Elasticsearch::Client.new log: true
     client.indices.refresh index: institution.elasticsearch_index_name
-    client.search(index: institution.elasticsearch_index_name)["hits"]["hits"].first["_source"]
+    client.search(index: institution.elasticsearch_index_name)["hits"]["hits"]
   end
 
   context "Creation" do
@@ -25,7 +25,7 @@ describe ApiController do
     it "should create event in elasticsearch" do
       post :create, data, device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["result"].should eq("positive")
       event["created_at"].should_not eq(nil)
       event["device_uuid"].should eq(device.secret_key)
@@ -37,7 +37,7 @@ describe ApiController do
     it "shouldn't store sensitive data in elasticsearch" do
       post :create, Oj.dump(result: :positive, patient_id: 1234), device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["result"].should eq("positive")
       event["created_at"].should_not eq(nil)
       event["patient_id"].should eq(nil)
@@ -57,7 +57,7 @@ describe ApiController do
       }}
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["assay_name"].should eq("GX4002")
       event["created_at"].should_not eq(nil)
       event["patient_id"].should be(nil)
@@ -86,7 +86,7 @@ describe ApiController do
 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["assay_name"].should eq("GX4002")
       event["patient_id"].should eq(nil)
       event["foo"].should be(nil)
@@ -96,6 +96,7 @@ describe ApiController do
       event.decrypt.sensitive_data.should_not eq(raw_data)
       event.sensitive_data["patient_id"].should be(nil)
       event.sensitive_data["foo"].should eq(1234)
+      event.sensitive_data[:foo].should eq(1234)
     end
 
     it "uses the last version of the manifest" do
@@ -129,7 +130,7 @@ describe ApiController do
 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["foo"].should be(nil)
       event["assay_name"].should eq("GX4002")
     end
@@ -153,12 +154,13 @@ describe ApiController do
 
       post :create, Oj.dump(some_field: 1234), device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["foo"].should be(nil)
 
       event = Event.first.decrypt
       event.sensitive_data["some_field"].should be(nil)
       event.sensitive_data["foo"].should be(nil)
+      event.custom_fields[:foo].should eq(1234)
       event.custom_fields["foo"].should eq(1234)
     end
   end
@@ -178,7 +180,7 @@ describe ApiController do
       device.save!
       post :create, data, device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(leaf_location1.id)
       event["laboratory_id"].should eq(laboratory1.id)
       event["parent_locations"].sort.should eq([leaf_location1.id, parent_location.id, root_location.id].sort)
@@ -190,7 +192,7 @@ describe ApiController do
 
       post :create, data, device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(root_location.id)
       event["laboratory_id"].should be(nil)
       event["parent_locations"].should eq([root_location.id])
@@ -202,7 +204,7 @@ describe ApiController do
 
       post :create, data, device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(root_location.id)
       event["laboratory_id"].should be(nil)
       event["parent_locations"].should eq([root_location.id])
@@ -214,10 +216,38 @@ describe ApiController do
 
       post :create, data, device_uuid: device.secret_key
 
-      event = get_all_elasticsearch_events
+      event = all_elasticsearch_events.first["_source"]
       event["location_id"].should be(nil)
       event["laboratory_id"].should be(nil)
       event["parent_locations"].should eq([])
+    end
+
+    it "should override event if event_id is the same" do
+      post :create, Oj.dump(event_id: "1234", age: 20), device_uuid: device.secret_key
+
+      event = Event.first
+      event.event_id.should eq("1234")
+
+      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20), device_uuid: device.secret_key
+
+      Event.count.should eq(1)
+      event = Event.first.decrypt
+      raw_data = Oj.load event.raw_data
+      raw_data["age"].should eq(30)
+      event.sensitive_data[:patient_id].should eq(20)
+
+      events = all_elasticsearch_events
+      events.size.should eq(1)
+      event = events.first
+      event["_source"]["event_id"].should eq("1234")
+      event["_id"].should eq("#{device.secret_key}_1234")
+      event["_source"]["age"].should eq(30)
+
+      post :create, Oj.dump(event_id: "1234", age: 20, patient_id: 22), device_uuid: Device.make(institution: institution).secret_key
+
+      Event.count.should eq(2)
+      events = all_elasticsearch_events
+      events.size.should eq(2)
     end
   end
 end

@@ -4,11 +4,11 @@ class Event < ActiveRecord::Base
   serialize :custom_fields
 
   before_create :generate_uuid
+  before_create :extract_event_id
   before_save :extract_pii
   before_save :extract_custom_fields
   before_save :encrypt
-  after_create :create_in_elasticsearch
-  after_update :update_in_elasticsearch
+  after_save :save_in_elasticsearch
 
   def self.pii?(field)
     sensitive_fields.include? field.to_sym
@@ -123,7 +123,7 @@ class Event < ActiveRecord::Base
 
   def decrypt
     self.raw_data = Encryptor.decrypt self.raw_data, :key => secret_key, :iv => iv, :salt => salt
-    self.sensitive_data = Oj.load Encryptor.decrypt(self.sensitive_data, :key => secret_key, :iv => iv, :salt => salt)
+    self.sensitive_data = Oj.load(Encryptor.decrypt(self.sensitive_data, :key => secret_key, :iv => iv, :salt => salt)).with_indifferent_access
     self
   end
 
@@ -133,28 +133,26 @@ class Event < ActiveRecord::Base
     self
   end
 
-  def generate_uuid
-    self.uuid = Guid.new.to_s
+  def self.create_or_update_with device, raw_data
+    event = self.new device: device, raw_data: raw_data
+    if event.parsed_fields[:indexed][:event_id] && existing_event = self.find_by(device: device, event_id: event.parsed_fields[:indexed][:event_id])
+      existing_event.update_with raw_data
+    else
+      event.save
+    end
+  end
+
+  def update_with raw_data
+    self.raw_data = raw_data
+    @parsed_fields = nil
+    save
+  end
+
+  def parsed_fields
+    @parsed_fields ||= (device.manifests.order("version DESC").first || Manifest.default).apply_to(Oj.load raw_data).with_indifferent_access
   end
 
   private
-
-  def create_in_elasticsearch
-    client = Elasticsearch::Client.new log: true
-    client.index index: device.institution.elasticsearch_index_name, type: 'result', body: indexed_fields
-  end
-
-  def update_in_elasticsearch
-
-  end
-
-  def extract_pii
-    self.sensitive_data = parsed_fields[:pii]
-  end
-
-  def extract_custom_fields
-    self.custom_fields = parsed_fields[:custom]
-  end
 
   def indexed_fields
     if device.laboratories.size == 1
@@ -187,8 +185,25 @@ class Event < ActiveRecord::Base
     )
   end
 
-  def parsed_fields
-    @parsed_fields ||= (device.manifests.order("version DESC").first || Manifest.default).apply_to(Oj.load raw_data)
+  def generate_uuid
+    self.uuid = Guid.new.to_s
+  end
+
+  def extract_event_id
+    self.event_id = indexed_fields[:event_id] || self.uuid
+  end
+
+  def save_in_elasticsearch
+    client = Elasticsearch::Client.new log: true
+    client.index index: device.institution.elasticsearch_index_name, type: 'result', body: indexed_fields, id: "#{device.secret_key}_#{self.event_id}"
+  end
+
+  def extract_pii
+    self.sensitive_data = parsed_fields[:pii]
+  end
+
+  def extract_custom_fields
+    self.custom_fields = parsed_fields[:custom].with_indifferent_access
   end
 
   def secret_key
