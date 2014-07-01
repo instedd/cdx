@@ -175,8 +175,8 @@ class Event < ActiveRecord::Base
     end
 
     parsed_fields[:indexed].merge(
-      created_at: self.created_at,
-      updated_at: self.updated_at,
+      created_at: self.created_at.utc.iso8601,
+      updated_at: self.updated_at.utc.iso8601,
       device_uuid: device.secret_key,
       uuid: uuid,
       location_id: location_id,

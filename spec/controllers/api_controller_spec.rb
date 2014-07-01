@@ -31,6 +31,34 @@ describe ApiController do
       event["device_uuid"].should eq(device.secret_key)
       Event.first.uuid.should eq(event["uuid"])
     end
+
+    it "should override event if event_id is the same" do
+      post :create, Oj.dump(event_id: "1234", age: 20), device_uuid: device.secret_key
+
+      event = Event.first
+      event.event_id.should eq("1234")
+
+      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20), device_uuid: device.secret_key
+
+      Event.count.should eq(1)
+      event = Event.first.decrypt
+      raw_data = Oj.load event.raw_data
+      raw_data["age"].should eq(30)
+      event.sensitive_data[:patient_id].should eq(20)
+
+      events = all_elasticsearch_events
+      events.size.should eq(1)
+      event = events.first
+      event["_source"]["event_id"].should eq("1234")
+      event["_id"].should eq("#{device.secret_key}_1234")
+      event["_source"]["age"].should eq(30)
+
+      post :create, Oj.dump(event_id: "1234", age: 20, patient_id: 22), device_uuid: Device.make(institution: institution).secret_key
+
+      Event.count.should eq(2)
+      events = all_elasticsearch_events
+      events.size.should eq(2)
+    end
   end
 
   context "Manifest" do
@@ -220,34 +248,6 @@ describe ApiController do
       event["location_id"].should be(nil)
       event["laboratory_id"].should be(nil)
       event["parent_locations"].should eq([])
-    end
-
-    it "should override event if event_id is the same" do
-      post :create, Oj.dump(event_id: "1234", age: 20), device_uuid: device.secret_key
-
-      event = Event.first
-      event.event_id.should eq("1234")
-
-      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20), device_uuid: device.secret_key
-
-      Event.count.should eq(1)
-      event = Event.first.decrypt
-      raw_data = Oj.load event.raw_data
-      raw_data["age"].should eq(30)
-      event.sensitive_data[:patient_id].should eq(20)
-
-      events = all_elasticsearch_events
-      events.size.should eq(1)
-      event = events.first
-      event["_source"]["event_id"].should eq("1234")
-      event["_id"].should eq("#{device.secret_key}_1234")
-      event["_source"]["age"].should eq(30)
-
-      post :create, Oj.dump(event_id: "1234", age: 20, patient_id: 22), device_uuid: Device.make(institution: institution).secret_key
-
-      Event.count.should eq(2)
-      events = all_elasticsearch_events
-      events.size.should eq(2)
     end
   end
 end

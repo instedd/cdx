@@ -66,6 +66,6 @@ RSpec.configure do |config|
 
   config.after(:each) do
     client = Elasticsearch::Client.new log: true
-    client.indices.delete index: "#{Elasticsearch.index_prefix}_*"
+    client.indices.delete index: "#{Elasticsearch.index_prefix}_*" rescue nil
   end
 end
