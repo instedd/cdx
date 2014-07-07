@@ -44,7 +44,8 @@ module EventIndexing
         uuid: uuid,
         location_id: location_id,
         parent_locations: parent_locations,
-        laboratory_id: laboratory_id
+        laboratory_id: laboratory_id,
+        institution_id: device.institution_id
       )
     end
 

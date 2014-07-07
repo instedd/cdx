@@ -19,6 +19,8 @@ module EventFiltering
       events
     end
 
+  private
+
     def self.query_without_group_by query, sort
       client = Elasticsearch::Client.new log: true
       client.search(index: "#{Elasticsearch.index_prefix}*", body: {query: query, sort: sort})["hits"]["hits"].map do |hit|
@@ -69,71 +71,36 @@ module EventFiltering
       case parameter_definition[:type]
       when :match
         if field_value = params[parameter_definition[:name]]
-          conditions + [{match: {field_definition[:name] => field_value}}]
-        else
-          conditions
+          conditions += [{match: {field_definition[:name] => field_value}}]
         end
+        conditions
       when :range
         if field_value = params[parameter_definition[:name]]
-          conditions + [{range: {field_definition[:name] => ({parameter_definition[:boundary] => field_value}.merge parameter_definition[:options])}}]
-        else
-          conditions
+          conditions += [{range: {field_definition[:name] => ({parameter_definition[:boundary] => field_value}.merge parameter_definition[:options])}}]
         end
+        conditions
+      when :wildcard
+        if field_value = params[parameter_definition[:name]]
+          condition = if /.*\*.*/ =~ field_value
+            [{wildcard: {parameter_definition[:name] => field_value}}]
+          else
+            [{match: {field_matcher(parameter_definition[:name], field_definition[:type]) => field_value}}]
+          end
+          conditions += condition
+        end
+        conditions
       else
         conditions
       end
     end
 
-    # def process_field {field_name, type, [{param_name, :match}| tail ]}, params, conditions
-    #   if field_value = params[param_name] do
-    #     condition = [match: [{field_name, field_value}]]
-    #     conditions = [condition | conditions]
-    #   end
-    #   process_field({field_name, type, tail}, params, conditions)
-    # end
-
-    # def process_field {field_name, type, [{param_name, :wildcard}| tail ]}, params, conditions
-    #   if field_value = params[param_name] do
-    #     condition = if Regex.match? ~r/.*\*.*/, field_value do
-    #       [wildcard: [{field_name, field_value}]]
-    #     else
-    #       [match: [{field_matcher(field_name, type), field_value}]]
-    #     end
-    #     conditions = [condition | conditions]
-    #   end
-    #   process_field({field_name, type, tail}, params, conditions)
-    # end
-
-    # def process_field {field_name, type, [{param_name, {:range, [start | options]}}| tail ]}, params, conditions
-    #   if field_value = params[param_name] do
-    #     condition = [range: [{field_name, [{start, field_value}] ++ options}]]
-    #     conditions = [condition | conditions]
-    #   end
-    #   process_field({field_name, type, tail}, params, conditions)
-    # end
-
-    # def process_field {field_name, :nested, nested_fields}, params, conditions
-    #   nested_fields = Enum.map nested_fields, fn({name, type, properties}) ->
-    #     {"#{field_name}.#{name}", type, properties}
-    #   end
-    #   nested_conditions = process_fields(nested_fields, params, [])
-    #   case nested_conditions do
-    #     [] ->
-    #       conditions
-    #     _  ->
-    #       condition = [
-    #         nested: [
-    #           path: field_name,
-    #           query: and_conditions(nested_conditions),
-    #         ]
-    #       ]
-    #       [condition | conditions]
-    #   end
-    # end
-
-    # def process_field {_, _, []}, _, conditions
-    #   conditions
-    # end
+    def self.field_matcher(field_name, field_type)
+      # if field_type == :multi_field
+      #   "#{field_name}.analyzed"
+      # else
+        field_name
+      # end
+    end
 
     def self.process_order params
       if order = params["order_by"]

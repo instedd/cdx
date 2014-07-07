@@ -40,6 +40,13 @@ describe ApiController do
       Event.first.uuid.should eq(event["uuid"])
     end
 
+    it "should store institution_id in elasticsearch" do
+      post :create, data, device_uuid: device.secret_key
+
+      event = all_elasticsearch_events.first["_source"]
+      event["institution_id"].should eq(device.institution_id)
+    end
+
     it "should override event if event_id is the same" do
       post :create, Oj.dump(event_id: "1234", age: 20), device_uuid: device.secret_key
 
@@ -257,30 +264,261 @@ describe ApiController do
       event["laboratory_id"].should be(nil)
       event["parent_locations"].should eq([])
     end
+
+    it "filters by location" do
+      device1 = Device.make institution: institution, laboratories: [laboratory1]
+      device2 = Device.make institution: institution, laboratories: [laboratory2]
+      device3 = Device.make institution: institution, laboratories: [laboratory3]
+      post :create, (Oj.dump results:[result: "negative"]), device_uuid: device1.secret_key
+      post :create, (Oj.dump results:[result: "positive"]), device_uuid: device2.secret_key
+      post :create, (Oj.dump results:[result: "positive with riff"]), device_uuid: device3.secret_key
+
+      response = get_updates(location: leaf_location1.id)
+
+      response.first["results"].first["result"].should eq("negative")
+
+      response = get_updates(location: leaf_location2.id)
+
+      response.first["results"].first["result"].should eq("positive")
+
+      response = get_updates(location: parent_location.id)
+
+      response.size.should be(2)
+      response[0]["results"].first["result"].should eq("negative")
+      response[1]["results"].first["result"].should eq("positive")
+
+      response = get_updates(location: root_location.id)
+
+      response.size.should be(3)
+      response[0]["results"].first["result"].should eq("negative")
+      response[1]["results"].first["result"].should eq("positive")
+      response[2]["results"].first["result"].should eq("positive with riff")
+    end
   end
 
   context "Query" do
     context "Filter" do
+      let(:device2) {Device.make institution: institution}
+
       it "should check for new events since a date" do
         Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
-
         post :create, data, device_uuid: device.secret_key
-
-        response = get_updates(since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601).first
-        response["results"].first["result"].should eq("positive")
-
         Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
-
         post :create, (Oj.dump results:[result: :negative]), device_uuid: device.secret_key
 
-        response = get_updates(since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601).first
-        response["results"].first["result"].should eq("negative")
+        response = get_updates(since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
 
-        results = get_updates(since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
-        results.first["results"].first["result"].should eq("positive")
-        results.last["results"].first["result"].should eq("negative")
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+
+        response = get_updates(since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
+
+        response.first["results"].first["result"].should eq("positive")
+        response.last["results"].first["result"].should eq("negative")
 
         get_updates(since: Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601).should be_empty
+      end
+
+
+      it "should check for new events util a date" do
+        Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
+        post :create, data, device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2013, 1, 3, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :negative]), device_uuid: device.secret_key
+
+        response = get_updates(:until => Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+      end
+
+      it "should filter by device" do
+        post :create, data, device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative]), device_uuid: device2.secret_key
+
+        response = get_updates(device: device.secret_key)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+      end
+
+      it "filters by laboratory" do
+        post :create, data, device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative]), device_uuid: device2.secret_key
+
+        response = get_updates(laboratory: device2.laboratories.first.id)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+      end
+
+      it "should filter by institution" do
+        post :create, data, device_uuid: device.secret_key
+        device3 = Device.make
+        post :create, (Oj.dump results:[result: :negative]), device_uuid: device3.secret_key
+        client = Elasticsearch::Client.new log: true
+        client.indices.refresh index: device3.institution.elasticsearch_index_name
+
+        response = get_updates(institution: device3.institution.id)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+      end
+
+      it "should filter by gender" do
+        post :create, (Oj.dump results:[result: :positive], gender: "male"), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: "female"), device_uuid: device.secret_key
+
+        response = get_updates(gender: "male")
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+
+        response = get_updates(gender: "female")
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+      end
+
+      it "should filter by assay name" do
+        post :create, (Oj.dump results:[result: :positive], assay_name: "GX4001"), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], assay_name: "GX1234"), device_uuid: device.secret_key
+
+        response = get_updates(assay_name: "GX4001")
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+
+        response = get_updates(assay_name: "GX1234")
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+      end
+
+      it "should filter by age" do
+        post :create, (Oj.dump results:[result: :positive], age: 10), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], age: 20), device_uuid: device.secret_key
+
+        response = get_updates(age: 10)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+
+        response = get_updates(age: 20)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+
+        response = get_updates(age: 15)
+        response.size.should be(0)
+      end
+
+      it "filters by min age" do
+        post :create, (Oj.dump results:[result: :positive], age: 10), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], age: 20), device_uuid: device.secret_key
+
+        response = get_updates(min_age: 15)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+
+        response = get_updates(min_age: 20)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+
+        response = get_updates(min_age: 21)
+        response.size.should be(0)
+      end
+
+      it "filters by max age" do
+        post :create, (Oj.dump results:[result: :positive], age: 10), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], age: 20), device_uuid: device.secret_key
+
+        response = get_updates(max_age: 15)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+
+        response = get_updates(max_age: 10)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+
+        response = get_updates(max_age: 9)
+        response.size.should be(0)
+      end
+
+      it "filters by result" do
+        post :create, (Oj.dump results:[condition: "MTB", result: :positive], age: 10), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "Flu", result: :negative], age: 20), device_uuid: device.secret_key
+
+        response = get_updates(result: :positive)
+
+        response.size.should be(1)
+        response.first["age"].should eq(10)
+      end
+
+      it "filters by uuid" do
+        post :create, (Oj.dump results:[result: :positive], assay_name: "GX4001"), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], assay_name: "GX1234"), device_uuid: device.secret_key
+
+        response = get_updates(assay_name: "GX4001")
+        response = get_updates(uuid: response.first["uuid"])
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+
+        response = get_updates(assay_name: "GX1234")
+        response = get_updates(uuid: response.first["uuid"])
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+      end
+
+      it "filters by a partial match" do
+        post :create, (Oj.dump results:[result: :positive], assay_name: "GX4001"), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], assay_name: "GX1234"), device_uuid: device.secret_key
+
+        response = get_updates(assay_name: "GX1*")
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+      end
+
+      it "filters by condition name" do
+        post :create, (Oj.dump results:[condition: "MTB", result: :positive]), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "Flu", result: :negative]), device_uuid: device.secret_key
+
+        response = get_updates(condition: "MTB")
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+
+        response = get_updates(condition: "Flu")
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+      end
+
+      # it "filters by an analyzed result" do
+      #   post :create, (Oj.dump results:[condition: "MTB", result: :negative]), device_uuid: device.secret_key
+      #   post :create, (Oj.dump results:[condition: "MTB", result: "Positive with RIFF resistance"]), device_uuid: device.secret_key
+
+      #   response = get_updates(result: :positive)
+
+      #   response.size.should be(1)
+      #   response.first["results"].first["result"].should eq("Positive with RIFF resistance")
+      # end
+
+      it "filters by result, age and condition" do
+        post :create, (Oj.dump results:[condition: "MTB", result: :positive], age: 20), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "MTB", result: :negative], age: 20), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "Flu", result: :negative], age: 20), device_uuid: device.secret_key
+
+        response = get_updates(result: :negative, age: 20, condition: "Flu")
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
       end
     end
   end
