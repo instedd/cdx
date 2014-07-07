@@ -22,7 +22,7 @@
       "type": "custom"
     },
     {
-    	"target_field": "conditions",
+    	"target_field": "results[*]conditions",
     	"type": "core",
       "multiple" : true,
       "selector" : "$.conditions[*].condition",

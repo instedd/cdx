@@ -72,7 +72,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "assay_name",
-          "selector" : "assay/name",
+          "selector" : "assay.name",
           "type" : "core"
         }]
       },
@@ -84,7 +84,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "patient_name",
-          "selector" : "patient/name",
+          "selector" : "patient.name",
           "type" : "core"
         }]
       },
@@ -317,5 +317,94 @@ describe Manifest do
       },
       '{"condition" : "PATIENT IS OK"}',
       "'PATIENT IS OK' is not a valid value for 'condition' (valid value must be in one of these forms: *FLU*, *FLUA*, *MTB*)"
+  end
+
+  it "should apply to multiple indexed field" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "list[*].temperature",
+          "selector" : "temperature_list[*].temperature",
+          "type" : "custom",
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{"temperature_list" : [{"temperature" : 20}, {"temperature" : 10}]}',
+      {indexed: {"list" => [{"temperature" => 20}, {"temperature" => 10}]}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "should map to multiple indexed fields to the same list" do
+    assert_manifest_application %{[
+        {
+          "target_field" : "collection[*].temperature",
+          "selector" : "some_list[*].temperature",
+          "type" : "custom",
+          "pii" : false,
+          "indexed" : true
+        },
+        {
+          "target_field" : "collection[*].foo",
+          "selector" : "some_list[*].bar",
+          "type" : "custom",
+          "pii" : false,
+          "indexed" : true
+        }
+      ]},
+      '{
+        "some_list" : [
+          {
+            "temperature" : 20,
+            "bar" : 12
+          },
+          {
+            "temperature" : 10,
+            "bar" : 2
+          }
+        ]
+      }',
+      {indexed: {"collection" => [
+        {
+          "temperature" => 20,
+          "foo" => 12
+        },
+        {
+          "temperature" => 10,
+          "foo" => 2
+        }]}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "should map to multiple indexed fields to the same list accross multiple collections" do
+    assert_manifest_application %{[
+        {
+          "target_field" : "collection[*].temperature",
+          "selector" : "temperature_list[*].temperature",
+          "type" : "custom",
+          "pii" : false,
+          "indexed" : true
+        },
+        {
+          "target_field" : "collection[*].foo",
+          "selector" : "other_list[*].bar",
+          "type" : "custom",
+          "pii" : false,
+          "indexed" : true
+        }
+      ]},
+      '{
+        "temperature_list" : [{"temperature" : 20}, {"temperature" : 10}],
+        "other_list" : [{"bar" : 10}, {"bar" : 30}, {"bar" : 40}]
+      }',
+      {indexed: {"collection" => [
+        {
+          "temperature" => 20,
+          "foo" => 10
+        },
+        {
+          "temperature" => 10,
+          "foo" => 30
+        },
+        {
+          "foo" => 40
+        }]}, pii: Hash.new, custom: Hash.new}
   end
 end

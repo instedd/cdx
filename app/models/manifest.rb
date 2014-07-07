@@ -39,10 +39,42 @@ class Manifest < ActiveRecord::Base
     value = apply_selector(selector, data)
     check_valid_value(value, target_field, mapping["valid_values"])
     value = apply_value_mappings(value, target_field, mapping["value_mappings"])
-
     key = hash_key(mapping["type"], target_field, mapping["indexed"], mapping["pii"])
-    event[key][target_field] = value
+
+    if (targets = target_field.split("[*].")).size > 1
+      # find the array or create it. Only one level for now
+      target_array = event[key][targets.first] ||= Array.new
+      # merge the new values
+      value.each_with_index do |value, index|
+        (target_array[index] ||= Hash.new)[targets[-1]] = value
+      end
+    else
+      event[key][target_field] = value
+    end
+
     event
+  end
+
+  def apply_selector(selector, data)
+    if (targets = selector.split("[*].")).size > 1
+
+      paths = targets.first.split "."
+
+      elements_array = paths.inject data do |current, path|
+        current[path] || []
+      end
+      elements_array.map do |element|
+        paths = targets.last.split "."
+        paths.inject element do |current, path|
+          current[path]
+        end
+      end
+    else
+      paths = selector.split "."
+      paths.inject data do |current, path|
+        current[path]
+      end
+    end
   end
 
   def hash_key(type, target_field, indexed, pii)
@@ -59,16 +91,15 @@ class Manifest < ActiveRecord::Base
     end
   end
 
-  def apply_selector(selector, data)
-    # Keep it simple for now: split by '/' and index on that
-    paths = selector.split "/"
-    paths.inject data do |current, path|
-      current[path]
-    end
-  end
-
   def check_valid_value(value, target_field, valid_values)
     return value if valid_values ==  nil
+
+    if value.is_a? Array
+      value.each do |v|
+        check_valid_value v, target_field, valid_values
+      end
+    end
+
     if options = valid_values["options"]
       check_value_in_options(value, target_field, options)
     end
@@ -137,14 +168,15 @@ class Manifest < ActiveRecord::Base
 
   private
 
-  def self.map fields
+  def self.map fields, selector_prefix=""
     fields.map do |field_definition|
+      field = selector_prefix + field_definition[:name].to_s
       if field_definition[:type] == :nested
-        map field_definition[:sub_fields]
+        map field_definition[:sub_fields], "#{selector_prefix}#{field_definition[:name]}[*]."
       else
         {
-          target_field: field_definition[:name],
-          selector: field_definition[:name],
+          target_field: field,
+          selector: field,
           type: :core,
           pii: false,
           indexed: true

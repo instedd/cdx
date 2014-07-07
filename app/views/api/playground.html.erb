@@ -53,7 +53,6 @@
         success: function(data, textStatus, jqXHR) {
           $query_button.prop("disabled", false);
           $query_button.val("Query");
-          data = JSON.parse(data);
           data = JSON.stringify(data, null, 4);
           $('#response_div').show();
           $('#response').text(data);

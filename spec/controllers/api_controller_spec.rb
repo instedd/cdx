@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ApiController do
   let(:device) {Device.make}
   let(:institution) {device.institution}
-  let(:data) {Oj.dump result: :positive}
+  let(:data) {Oj.dump results: [result: :positive]}
 
   def all_elasticsearch_events
     client = Elasticsearch::Client.new log: true
@@ -11,10 +11,18 @@ describe ApiController do
     client.search(index: institution.elasticsearch_index_name)["hits"]["hits"]
   end
 
+  def get_updates(options)
+    client = Elasticsearch::Client.new log: true
+    client.indices.refresh index: institution.elasticsearch_index_name
+    response = get :events, options
+    response.status.should eq(200)
+    Oj.load response.body
+  end
+
   context "Creation" do
     it "should create event in the database" do
-      conn = post :create, data, device_uuid: device.secret_key
-      conn.status.should eq(200)
+      response = post :create, data, device_uuid: device.secret_key
+      response.status.should eq(200)
 
       event = Event.first
       event.device_id.should eq(device.id)
@@ -26,7 +34,7 @@ describe ApiController do
       post :create, data, device_uuid: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["result"].should eq("positive")
+      event["results"].first["result"].should eq("positive")
       event["created_at"].should_not eq(nil)
       event["device_uuid"].should eq(device.secret_key)
       Event.first.uuid.should eq(event["uuid"])
@@ -63,10 +71,10 @@ describe ApiController do
 
   context "Manifest" do
     it "shouldn't store sensitive data in elasticsearch" do
-      post :create, Oj.dump(result: :positive, patient_id: 1234), device_uuid: device.secret_key
+      post :create, Oj.dump(results:[result: :positive], patient_id: 1234), device_uuid: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["result"].should eq("positive")
+      event["results"].first["result"].should eq("positive")
       event["created_at"].should_not eq(nil)
       event["patient_id"].should eq(nil)
     end
@@ -79,7 +87,7 @@ describe ApiController do
         },
         "field_mapping" : [{
             "target_field" : "assay_name",
-            "selector" : "assay/name",
+            "selector" : "assay.name",
             "type" : "core"
           }]
       }}
@@ -100,7 +108,7 @@ describe ApiController do
         "field_mapping" : [
           {
             "target_field": "assay_name",
-            "selector" : "assay/name",
+            "selector" : "assay.name",
             "type" : "core"
           },
           {
@@ -136,7 +144,7 @@ describe ApiController do
         "field_mapping" : [
           {
             "target_field": "foo",
-            "selector" : "assay/name",
+            "selector" : "assay.name",
             "type" : "core"
           }
         ]
@@ -150,7 +158,7 @@ describe ApiController do
         "field_mapping" : [
           {
             "target_field": "assay_name",
-            "selector" : "assay/name",
+            "selector" : "assay.name",
             "type" : "core"
           }
         ]
@@ -248,6 +256,32 @@ describe ApiController do
       event["location_id"].should be(nil)
       event["laboratory_id"].should be(nil)
       event["parent_locations"].should eq([])
+    end
+  end
+
+  context "Query" do
+    context "Filter" do
+      it "should check for new events since a date" do
+        Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
+
+        post :create, data, device_uuid: device.secret_key
+
+        response = get_updates(since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601).first
+        response["results"].first["result"].should eq("positive")
+
+        Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
+
+        post :create, (Oj.dump results:[result: :negative]), device_uuid: device.secret_key
+
+        response = get_updates(since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601).first
+        response["results"].first["result"].should eq("negative")
+
+        results = get_updates(since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
+        results.first["results"].first["result"].should eq("positive")
+        results.last["results"].first["result"].should eq("negative")
+
+        get_updates(since: Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601).should be_empty
+      end
     end
   end
 end

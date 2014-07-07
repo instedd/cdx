@@ -20,6 +20,7 @@ Cdp::Application.routes.draw do
   root :to => 'home#index'
   scope '/api' do
     get 'playground' => 'api#playground'
+    match 'events' => 'api#events', via: [:get, :post]
     post '/devices/:device_uuid/events' => 'api#create'
   end
 end

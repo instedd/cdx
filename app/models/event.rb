@@ -1,7 +1,8 @@
 class Event < ActiveRecord::Base
-  include EventEncryption
-  include EventIndexing
   include EventFieldDefinition
+  include EventIndexing
+  include EventEncryption
+  include EventFiltering
   belongs_to :device
   belongs_to :institution
   serialize :custom_fields

@@ -16,79 +16,142 @@ module EventFieldDefinition
         {
           name: :created_at,
           type: :date,
-          queryable_options: [
-            {"since" => {range: [from: {include_lower: true}]}},
-            {"until" => {range: [to: {include_lower: true}]}}
+          parameter_definition: [
+            {
+              name: "since",
+              type: :range,
+              boundary: :from,
+              options: {include_lower: true}
+            },
+            {
+              name: "until",
+              type: :range,
+              boundary: :to,
+              options: {include_lower: true}
+            }
           ]
         },
         {
           name: :event_id,
           type: :integer,
-          queryable_options: [{"event_id" => :match}]
+          parameter_definition: [
+            {
+              name: "event_id",
+              type: :match
+            }
+          ]
         },
         {
           name: :device_uuid,
           type: :string,
-          queryable_options: [{"device" => :match}]
-          },
+          parameter_definition: [
+            {
+              name: "device",
+              type: :match
+            }
+          ]
+        },
         {
           name: :laboratory_id,
           type: :integer,
-          queryable_options: [{"laboratory" => :match}]
-          },
+          parameter_definition: [
+            {
+              name: "laboratory",
+              type: :match
+            }
+          ]
+        },
         {
           name: :institution_id,
           type: :integer,
-          queryable_options: [{"institution" => :match}]
+          parameter_definition: [
+            {
+              name: "institution",
+              type: :match
+            }
+          ]
         },
         {
           name: :location_id,
           type: :integer,
-          queryable_options: []
+          parameter_definition: []
         },
         {
           name: :parent_locations,
           type: :integer,
-          queryable_options: [{"location" => :match}]
-          },
+          parameter_definition: [
+            {
+              name: "location",
+              type: :match
+            }
+          ]
+        },
         {
           name: :age,
           type: :integer,
-          queryable_options: [
-            {"age" => :match},
-            {"min_age" => {range: [from: {include_lower: true}]}},
-            {"max_age" => {range: [to: {include_upper: true}]}}
+          parameter_definition: [
+            {
+              name: "age",
+              type: :match
+            },
+            {
+              name: "min_age",
+              type: :range,
+              boundary: :from,
+              options: {include_lower: true}
+            },
+            {
+              name: "max_age",
+              type: :range,
+              boundary: :to,
+              options: {include_upper: true}
+            }
           ]
         },
         {
           name: :assay_name,
           type: :string,
-          queryable_options: [{"assay_name" => :wildcard}]
+          parameter_definition: [
+            {
+              name: "assay_name",
+              type: :wildcard
+            }
+          ]
         },
         {
           name: :device_serial_number,
           type: :string,
-          queryable_options: []
+          parameter_definition: []
         },
         {
           name: :gender,
           type: :string,
-          queryable_options: [{"gender" => :wildcard}]
+          parameter_definition: [
+            {
+              name: "gender",
+              type: :wildcard
+            }
+          ]
         },
         {
           name: :uuid,
           type: :string,
-          queryable_options: [{"uuid" => :match}]
+          parameter_definition: [
+            {
+              name: "uuid",
+              type: :match
+            }
+          ]
         },
         {
           name: :start_time,
           type: :date,
-          queryable_options: []
+          parameter_definition: []
         },
         {
           name: :system_user,
           type: :string,
-          queryable_options: []
+          parameter_definition: []
         },
         {
           name: :results,
@@ -97,12 +160,22 @@ module EventFieldDefinition
             {
               name: :result,
               type: :multi_field,
-              queryable_options: [{"result" => :wildcard}]
+              parameter_definition: [
+                {
+                  name: "result",
+                  type: :wildcard
+                }
+              ]
             },
             {
               name: :condition,
               type: :string,
-              queryable_options: [{"condition" => :wildcard}]
+              parameter_definition: [
+                {
+                  name: "condition",
+                  type: :wildcard
+                }
+              ]
             }
           ]
         }

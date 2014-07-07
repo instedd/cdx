@@ -4,7 +4,7 @@ module EventIndexing
   included do
     def save_in_elasticsearch
       client = Elasticsearch::Client.new log: true
-      client.index index: device.institution.elasticsearch_index_name, type: 'result', body: indexed_fields, id: "#{device.secret_key}_#{self.event_id}"
+      client.index index: device.institution.elasticsearch_index_name, type: 'event', body: indexed_fields, id: "#{device.secret_key}_#{self.event_id}"
     end
 
     def self.pii?(field)
