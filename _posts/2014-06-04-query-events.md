@@ -116,11 +116,11 @@ The JSON allows more complex aggregations, such as age ranges.
   ]
 }`
 
-* `location_depth` - groups by location depth, up to the third level in this case, which is a state level.
+* `admin_level` - groups by administrative level, up to the third level in this case, which is a state level.
 
 `{
   “group_by” : [
-    { “location_depth" : 3 },
+    { “admin_level" : 4 },
     ...
   ]
 }`
