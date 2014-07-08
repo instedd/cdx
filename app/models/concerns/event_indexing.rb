@@ -4,7 +4,7 @@ module EventIndexing
   included do
     def save_in_elasticsearch
       client = Elasticsearch::Client.new log: true
-      client.index index: device.institution.elasticsearch_index_name, type: 'event', body: indexed_fields, id: "#{device.secret_key}_#{self.event_id}"
+      client.index index: device.institution.elasticsearch_index_name, type: 'event', body: indexed_fields.merge(event_id: self.event_id), id: "#{device.secret_key}_#{self.event_id}"
     end
 
     def self.pii?(field)
@@ -42,7 +42,6 @@ module EventIndexing
         updated_at: self.updated_at.utc.iso8601,
         device_uuid: device.secret_key,
         uuid: uuid,
-        event_id: self.event_id,
         location_id: location_id,
         parent_locations: parent_locations,
         laboratory_id: laboratory_id,
