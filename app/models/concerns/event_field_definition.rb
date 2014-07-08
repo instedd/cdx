@@ -33,7 +33,7 @@ module EventFieldDefinition
         },
         {
           name: :event_id,
-          type: :integer,
+          type: :string,
           parameter_definition: [
             {
               name: "event_id",

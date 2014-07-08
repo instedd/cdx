@@ -42,6 +42,7 @@ module EventIndexing
         updated_at: self.updated_at.utc.iso8601,
         device_uuid: device.secret_key,
         uuid: uuid,
+        event_id: self.event_id,
         location_id: location_id,
         parent_locations: parent_locations,
         laboratory_id: laboratory_id,
