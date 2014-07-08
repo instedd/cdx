@@ -8,12 +8,33 @@
   "field_mapping" : [
     {
     	"target_field": "patient_name",
-      "selector" : "patient_information/name",
+      "selector" : "patient_information.name",
       "type" : "core"
     },
     {
+      "target_field": "age",
+      "type": "core",
+      "selector" : "patient_information.age",
+      "transform" : {
+        "days_in" : ["month"],
+
+        // "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}},
+        // "Condition": {"Month"},
+        // "Condition": {"StringEquals":{ "s3:prefix" : ["","home/"] , "s3:delimiter" : ["/"] }},
+        // "*MTB*" : "MTB",
+        // "*FLU*" : "H1N1",
+        // "*FLUA*" : "A1N1"
+      },
+      "valid_values": {
+        "range" : {
+          "min" : 0,
+          "max" : 100
+        }
+      }
+    },
+    {
     	"target_field": "assay_name",
-      "selector" : "Test/assay_name",
+      "selector" : "Test.assay_name",
       "type" : "core"
     },
     {
@@ -22,10 +43,10 @@
       "type": "custom"
     },
     {
-    	"target_field": "results[*]conditions",
+    	"target_field": "results[*].conditions",
     	"type": "core",
       "multiple" : true,
-      "selector" : "$.conditions[*].condition",
+      "selector" : "conditions[*].condition",
       "value_mappings" : {
         "*MTB*" : "MTB",
         "*FLU*" : "H1N1",
@@ -33,13 +54,13 @@
       }
     },
     {
-    	"target_field": "result",
+    	"target_field": "results[*].result",
     	"type": "core",
-      "selector" : "Test/result_text",
+      "selector" : "conditions[*].condition",
       "value_mappings" : {
         "*NOT DETECTED*" : "negative",
         "*POSITIVE*" : "positive",
-        "*POSITIVE WITH RIFF*" : "positive with riff"
+        "*POSITIVE WITH RIF*" : "positive with rif"
       }
     },
     {
@@ -56,11 +77,11 @@
     {
     	"target_field": "device_serial_number",
     	"type": "core",
-      "selector" : "patient_information/name"
+      "selector" : "patient_information.name"
     },
     {
     	"target_field": "test_type",
-      "selector" : "Test/test_type",
+      "selector" : "Test.test_type",
       "type": "custom",
       "valid_values" : {
         "options" : [0, 1]
@@ -69,7 +90,7 @@
     {
     	"target_field": "temperature",
     	"type": "custom",
-      "selector" : "Test/test_type",
+      "selector" : "Test.test_type",
       "valid_values": {
         "range" : {
           "min" : -20,
@@ -81,7 +102,7 @@
     {
     	"target_field": "percentage_of_confidence",
     	"type": "custom",
-      "selector" : "Test/test_type",
+      "selector" : "Test.test_type",
       "valid_values": {
         "range" : {
           "min" : 0.001,
@@ -93,7 +114,7 @@
     {
     	"target_field": "end_time",
     	"type": "custom",
-      "selector" : "Test/end_time",
+      "selector" : "Test.end_time",
       "valid_values": {
         "date" : "iso"
       },
@@ -102,7 +123,7 @@
     {
     	"target_field": "result_text",
     	"type": "custom",
-      "selector" : "assay/result_text",
+      "selector" : "assay.result_text",
       "data-type" : "string",
       "pii" : false,
       "indexed" : true
