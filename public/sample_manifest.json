@@ -12,18 +12,10 @@
       "type" : "core"
     },
     {
-      "target_field": "age",
+      "target_field": "age", 
       "type": "core",
-      "selector" : "patient_information.age",
-      "transform" : {
-        "days_in" : ["month"],
-
-        // "Condition": {"Bool": {"aws:MultiFactorAuthPresent": "true"}},
-        // "Condition": {"Month"},
-        // "Condition": {"StringEquals":{ "s3:prefix" : ["","home/"] , "s3:delimiter" : ["/"] }},
-        // "*MTB*" : "MTB",
-        // "*FLU*" : "H1N1",
-        // "*FLUA*" : "A1N1"
+      "source" : { //age="24mo"
+        "days_in" : ["month", {"slice": {"path" : "patient_information.age"}}]
       },
       "valid_values": {
         "range" : {
@@ -46,11 +38,15 @@
     	"target_field": "results[*].conditions",
     	"type": "core",
       "multiple" : true,
-      "selector" : "conditions[*].condition",
-      "value_mappings" : {
-        "*MTB*" : "MTB",
-        "*FLU*" : "H1N1",
-        "*FLUA*" : "A1N1"
+      "source" : {
+        "mapping": [
+          {"path" : "conditions[*].condition"},
+          [
+            {"match": "*MTB*", "output" : "MTB"},
+            {"match": "*FLU*", "output" : "H1N1"},
+            {"match": "*FLUA*", "output" : "A1N1"}
+          ]
+        ]
       }
     },
     {
