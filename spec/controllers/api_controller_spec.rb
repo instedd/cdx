@@ -281,13 +281,17 @@ describe ApiController do
 
       response.first["results"].first["result"].should eq("positive")
 
-      response = get_updates(location: parent_location.id)
+      response = get_updates(location: parent_location.id).sort_by do |event|
+        event["results"].first["result"]
+      end
 
       response.size.should be(2)
       response[0]["results"].first["result"].should eq("negative")
       response[1]["results"].first["result"].should eq("positive")
 
-      response = get_updates(location: root_location.id)
+      response = get_updates(location: root_location.id).sort_by do |event|
+        event["results"].first["result"]
+      end
 
       response.size.should be(3)
       response[0]["results"].first["result"].should eq("negative")
