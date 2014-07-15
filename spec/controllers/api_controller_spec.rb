@@ -912,5 +912,21 @@ describe ApiController do
         response["uuid"].should eq(event["uuid"])
       end
     end
+
+    context "PII" do
+      it "should retrieve an event PII by uuid" do
+        post :create, Oj.dump(results: [result: :positive], patient_name: "jdoe"), device_uuid: device.secret_key
+        event = all_elasticsearch_events.first["_source"]
+
+        client = Elasticsearch::Client.new log: false
+        client.indices.refresh index: institution.elasticsearch_index_name
+        response = get :pii, event_uuid: event["uuid"]
+        response.status.should eq(200)
+        response = Oj.load response.body
+
+        response["pii"]["patient_name"].should eq("jdoe")
+        response["uuid"].should eq(event["uuid"])
+      end
+    end
   end
 end

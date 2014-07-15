@@ -19,8 +19,12 @@ class ApiController < ActionController::Base
 
   def custom_fields
     event = Event.find_by_uuid(params[:event_uuid])
-    # binding.pry
     render_json "uuid" => params[:event_uuid], "custom_fields" => event.custom_fields
+  end
+
+  def pii
+    event = Event.find_by_uuid(params[:event_uuid])
+    render_json "uuid" => params[:event_uuid], "pii" => event.decrypt.sensitive_data
   end
 
   def playground
