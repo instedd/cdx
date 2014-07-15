@@ -7,12 +7,13 @@ class ApiController < ActionController::Base
 
   def create
     device = Device.includes(:manifests).includes(:institution).includes(:laboratories).includes(:locations).find_by_secret_key(params[:device_uuid])
-    Event.create_or_update_with device, request.raw_post
+    Event.create_or_update_with device, request.body.read
     head :ok
   end
 
   def events
-    result = Event.query(params)
+    body = Oj.load(request.body.read) || {}
+    result = Event.query(params.merge(body))
     render_json result
   end
 
