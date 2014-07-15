@@ -65,48 +65,8 @@ namespace :deploy do
   before :restart, :migrate
   after :publishing, :restart
 
-  # after :publishing, :prepare_backend
-
-  # after :restart, :clear_cache do
-  #   on roles(:web), in: :groups, limit: 3, wait: 10 do
-  #     # Here we can do anything such as:
-  #     # within release_path do
-  #     #   execute :rake, 'cache:clear'
-  #     # end
-  #   end
-  # end
-
   task :start do ; end
   task :stop do ; end
-
-  # task :prepare_backend do
-  #   on roles(:app) do
-  #     execute "test -f #{fetch(:shared_path)}/cdp.config || cp #{release_path}/backend/cdp.config #{fetch(:shared_path)}"
-  #     execute "ln -nfs #{fetch(:shared_path)}/cdp.config #{release_path}/backend/cdp.config"
-
-  #     execute "test -d #{fetch(:shared_path)}/log/backend || mkdir #{fetch(:shared_path)}/log/backend"
-  #     execute "ln -nfs #{fetch(:shared_path)}/log/backend #{release_path}/backend/log"
-  #   end
-  # end
-
-  task :compile_backend do
-    on roles(:app) do
-      within "#{release_path}/backend" do
-        with :mix_env => :prod do
-          execute :mix, "do deps.get, compile > #{release_path}/backend/mix.output 2>&1"
-        end
-      end
-    end
-  end
-  after :publishing, :compile_backend
-
-  task :restart_backend do
-    on roles(:app) do
-      execute "sudo stop cdp || true >> foo.txt 2>&1"
-      execute "sudo start cdp >> foo.txt 2>&1"
-    end
-  end
-  after :compile_backend, :restart_backend
 
   task :generate_version do
     on roles(:app) do
