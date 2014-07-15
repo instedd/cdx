@@ -5,25 +5,19 @@ module EventFiltering
     def self.query params
       conditions = process_conditions(params)
       # conditions = process_conditions(params[:body], conditions)
-
       query = and_conditions(conditions)
-      order = process_order(params)
 
-      # group_by = params["group_by"] || post_body["group_by"]
-      # if group_by do
-        # events = EventGrouping.query_with_group_by(query, group_by)
-      # else
-        events = query_without_group_by(query, order)
-      # end
-
-      events
+      if params[:group_by]
+        query_with_group_by(query, params[:group_by])
+      else
+        run_query query: query, sort: process_order(params)
+      end
     end
 
   private
-
-    def self.query_without_group_by query, sort
+    def self.run_query body
       client = Elasticsearch::Client.new log: true
-      client.search(index: "#{Elasticsearch.index_prefix}*", body: {query: query, sort: sort})["hits"]["hits"].map do |hit|
+      client.search(index: "#{Elasticsearch.index_prefix}*", body: body)["hits"]["hits"].map do |hit|
         hit["_source"]
       end
     end

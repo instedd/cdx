@@ -3,6 +3,8 @@ class Event < ActiveRecord::Base
   include EventIndexing
   include EventEncryption
   include EventFiltering
+  include EventGrouping
+
   belongs_to :device
   belongs_to :institution
   serialize :custom_fields
