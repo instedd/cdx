@@ -6,13 +6,13 @@ describe ApiController do
   let(:data) {Oj.dump results: [result: :positive]}
 
   def all_elasticsearch_events
-    client = Elasticsearch::Client.new log: true
+    client = Elasticsearch::Client.new log: false
     client.indices.refresh index: institution.elasticsearch_index_name
     client.search(index: institution.elasticsearch_index_name)["hits"]["hits"]
   end
 
   def get_updates(options, body="")
-    client = Elasticsearch::Client.new log: true
+    client = Elasticsearch::Client.new log: false
     client.indices.refresh index: institution.elasticsearch_index_name
     response = get :events, body, options
     response.status.should eq(200)
@@ -639,167 +639,176 @@ describe ApiController do
         ])
       end
 
-      # it "group by year(date)" do
-      #   create_event [results: [result: "positive"]], {{2010,1,1},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,2},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2011,1,1},{12,0,0}}
+      it "group by year(date)" do
+        Timecop.freeze(Time.utc(2010, 1, 1, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 2, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2011, 1, 1, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
 
-      #   response = get_updates("group_by=#{escape("year(created_at)")}")
-      #   response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
+        response = get_updates(group_by: "year(created_at)").sort_by do |event|
+          event["created_at"]
+        end
 
-      #   assert_all_values response, ["created_at", "count"], [
-      #     ["2010", 2],
-      #     ["2011", 1],
-      #   ]
-      # end
+        response.should eq([
+          {"created_at"=>"2010", "count"=>2},
+          {"created_at"=>"2011", "count"=>1}
+        ])
+      end
 
-      # it "group by month(date)" do
-      #   create_event [results: [result: "positive"]], {{2010,1,1},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,2,2},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2011,1,1},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2011,1,2},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2011,2,1},{12,0,0}}
+      it "group by month(date)" do
+        Timecop.freeze(Time.utc(2010, 1, 1, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 2, 2, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2011, 1, 1, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2011, 1, 2, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2011, 2, 1, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
 
-      #   response = get_updates("group_by=#{escape("month(created_at)")}")
-      #   response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
+        response = get_updates(group_by: "month(created_at)").sort_by do |event|
+          event["created_at"]
+        end
 
-      #   assert_all_values response, ["created_at", "count"], [
-      #     ["2010-01", 1],
-      #     ["2010-02", 1],
-      #     ["2011-01", 2],
-      #     ["2011-02", 1],
-      #     ]
-      # end
+        response.should eq([
+          {"created_at"=>"2010-01", "count"=>1},
+          {"created_at"=>"2010-02", "count"=>1},
+          {"created_at"=>"2011-01", "count"=>2},
+          {"created_at"=>"2011-02", "count"=>1}
+        ])
+      end
 
-      # it "group by week(date)" do
-      #   create_event [results: [result: "positive"]], {{2010,1,4},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,5},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,6},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,12},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,13},{12,0,0}}
+      it "group by week(date)" do
+        Timecop.freeze(Time.utc(2010, 1, 4, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 5, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 6, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 12, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 13, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
 
-      #   response = get_updates("group_by=#{escape("week(created_at)")}")
-      #   response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
+        response = get_updates(group_by: "week(created_at)").sort_by do |event|
+          event["created_at"]
+        end
 
-      #   assert_all_values response, ["created_at", "count"], [
-      #     ["2010-W1", 3],
-      #     ["2010-W2", 2],
-      #     ]
-      # end
+        response.should eq([
+          {"created_at"=>"2010-W1", "count"=>3},
+          {"created_at"=>"2010-W2", "count"=>2}
+        ])
+      end
 
-      # it "group by day(date)" do
-      #   create_event [results: [result: "positive"]], {{2010,1,4},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,4},{13,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,4},{14,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,5},{12,0,0}}
+      it "group by day(date)" do
+        Timecop.freeze(Time.utc(2010, 1, 4, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 4, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 4, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 5, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
 
-      #   response = get_updates("group_by=#{escape("day(created_at)")}")
-      #   response = Enum.sort response, fn(r1, r2) -> r1["created_at"] < r2["created_at"] end
+        response = get_updates(group_by: "day(created_at)").sort_by do |event|
+          event["created_at"]
+        end
 
-      #   assert_all_values response, ["created_at", "count"], [
-      #     ["2010-01-04", 3],
-      #     ["2010-01-05", 1],
-      #     ]
-      # end
+        response.should eq([
+          {"created_at"=>"2010-01-04", "count"=>3},
+          {"created_at"=>"2010-01-05", "count"=>1}
+        ])
+      end
 
-      # it "group by day(date) and result" do
-      #   create_event [results: [result: "positive"]], {{2010,1,4},{12,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,4},{13,0,0}}
-      #   create_event [results: [result: "negative"]], {{2010,1,4},{14,0,0}}
-      #   create_event [results: [result: "positive"]], {{2010,1,5},{12,0,0}}
+      it "group by day(date) and result" do
+        Timecop.freeze(Time.utc(2010, 1, 4, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 4, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 4, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :negative]), device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2010, 1, 5, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :positive]), device_uuid: device.secret_key
 
-      #   response = get_updates("group_by=#{escape("day(created_at)")},result")
-      #   response = Enum.sort response, fn(r1, r2) ->
-      #     if r1["created_at"] == r2["created_at"] do
-      #       r1["result"] < r2["result"]
-      #     else
-      #       r1["created_at"] < r2["created_at"]
-      #     end
-      #   end
+        response = get_updates(group_by: "day(created_at),result").sort_by do |event|
+          event["created_at"] + event["result"]
+        end
 
-      #   assert_all_values response, ["created_at", "result", "count"], [
-      #     ["2010-01-04", "negative", 1],
-      #     ["2010-01-04", "positive", 2],
-      #     ["2010-01-05", "positive", 1],
-      #     ]
-      # end
+        response.should eq([
+          {"created_at"=>"2010-01-04", "result" => "negative", "count"=>1},
+          {"created_at"=>"2010-01-04", "result" => "positive", "count"=>2},
+          {"created_at"=>"2010-01-05", "result" => "positive", "count"=>1}
+        ])
+      end
 
-      # it "group by age ranges" do
-      #   post_event age: 9
-      #   post_event age: 10
-      #   post_event age: 11
-      #   post_event age: 12
-      #   post_event age: 13
-      #   post_event age: 20
-      #   post_event age: 21
+      it "group by age ranges" do
+        post :create, (Oj.dump age: 9), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 10), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 11), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 12), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 13), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 20), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 21), device_uuid: device.secret_key
 
-      #   response = get_updates("", JSEX.encode!([
-      #     group_by: [
-      #       ["age", [[0, 10], [15, 120], [10, 15]]]
-      #     ]
-      #   ]))
-      #   response = Enum.sort response, fn(r1, r2) -> r1["age"] < r2["age"] end
+        response = get_updates({}, Oj.dump(group_by: [{"age" => [[0, 10], [15, 120], [10, 15]]}])).sort_by do |event|
+          event["age"]
+        end
 
-      #   assert_all_values response, ["age", "count"], [
-      #     [[ 0,  10], 1],
-      #     [[10,  15], 4],
-      #     [[15, 120], 2],
-      #     ]
-      # end
+        response.should eq([
+          {"age"=>[0, 10], "count"=>1},
+          {"age"=>[10, 15], "count"=>4},
+          {"age"=>[15, 120], "count"=>2}
+        ])
+      end
 
-      # it "group by age ranges in a different way" do
-      #   post_event age: 9
-      #   post_event age: 10
-      #   post_event age: 11
-      #   post_event age: 12
-      #   post_event age: 13
-      #   post_event age: 20
-      #   post_event age: 21
+      it "group by age ranges without the array" do
+        post :create, (Oj.dump age: 9), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 10), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 11), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 12), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 13), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 20), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 21), device_uuid: device.secret_key
 
-      #   response = get_updates("", JSEX.encode!([
-      #     group_by: ["age", [[0, 10], [15, 120], [10, 15]]]
-      #   ]))
-      #   response = Enum.sort response, fn(r1, r2) -> r1["age"] < r2["age"] end
+        response = get_updates({}, Oj.dump(group_by: {"age" => [[0, 10], [15, 120], [10, 15]]})).sort_by do |event|
+          event["age"]
+        end
 
-      #   assert_all_values response, ["age", "count"], [
-      #     [[ 0,  10], 1],
-      #     [[10,  15], 4],
-      #     [[15, 120], 2],
-      #     ]
-      # end
+        response.should eq([
+          {"age"=>[0, 10], "count"=>1},
+          {"age"=>[10, 15], "count"=>4},
+          {"age"=>[15, 120], "count"=>2}
+        ])
+      end
 
-      # it "group by results result" do
-      #   post_event results: [[condition: "MTB", result: "positive"], [condition: "Flu", result: "negative"]]
+      it "group by results result" do
+        post :create, (Oj.dump results:[{condition: "MTB", result: :positive}, {condition: "Flu", result: :negative}]), device_uuid: device.secret_key
 
-      #   response = get_updates("group_by=result")
-      #   response = Enum.sort response, fn(r1, r2) -> r1["result"] < r2["result"] end
+        response = get_updates(group_by: :result).sort_by do |event|
+          event["result"]
+        end
 
-      #   assert_all_values response, ["result", "count"], [
-      #     ["negative", 1],
-      #     ["positive", 1],
-      #   ]
-      # end
+        response.should eq([
+          {"result"=>"negative", "count"=>1},
+          {"result"=>"positive", "count"=>1}
+        ])
+      end
 
-      # it "group by results result and condition" do
-      #   post_event results: [[condition: "MTB", result: "positive"], [condition: "Flu", result: "negative"]]
+      it "group by results result and condition" do
+        post :create, (Oj.dump results:[{condition: "MTB", result: :positive}, {condition: "Flu", result: :negative}]), device_uuid: device.secret_key
 
-      #   response = get_updates("group_by=result,condition")
-      #   response = Enum.sort response, fn(r1, r2) -> r1["result"] < r2["result"] end
+        response = get_updates(group_by: "result,condition").sort_by do |event|
+          event["result"] + event["condition"]
+        end
 
-      #   assert_all_values response, ["condition", "result", "count"], [
-      #     ["Flu", "negative", 1],
-      #     ["MTB", "positive", 1],
-      #   ]
-      # end
-
-      # it "group by a non indexed field raises an error" do
-      #   post_event results: [[condition: "MTB", result: "positive"], [condition: "Flu", result: "negative"]]
-
-      #   assert_raise RuntimeError, "Trying to group by a non searchable field", fn ->
-      #     get_updates("group_by=foo")
-      #   end
-      # end
-
+        response.should eq([
+          {"result"=>"negative", "condition" => "Flu", "count"=>1},
+          {"result"=>"positive", "condition" => "MTB", "count"=>1}
+        ])
+      end
     end
   end
 end

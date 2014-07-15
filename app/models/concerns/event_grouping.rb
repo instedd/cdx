@@ -5,6 +5,8 @@ module EventGrouping
     def self.query_with_group_by(query, group_by)
       group_by = if (group_by.is_a? String)
         group_by.split ","
+      elsif group_by.is_a? Hash
+        [group_by]
       else
         Array(group_by)
       end
@@ -13,110 +15,24 @@ module EventGrouping
         classify_group_by_field field
       end
 
-      # nested fields must appear last in the group by
-      group_by = group_by.sort_by do |field|
-        field[:type]
-      end
+      nested_fields = group_by.select {|f| f[:type] == :nested}
+      non_nested_fields = group_by.reject {|f| f[:type] == :nested}
 
-      aggregations = process_group_by(group_by)
+      aggregations = Aggregations.new
+      aggregations.append non_nested_fields if non_nested_fields.present?
+      aggregations.append nested_fields if nested_fields.present?
 
       client = Elasticsearch::Client.new log: true
-      event = client.search(index: "#{Elasticsearch.index_prefix}*", body: {query: query, aggregations: aggregations})
+      event = client.search(index: "#{Elasticsearch.index_prefix}*", body: aggregations.to_hash.merge(query: query))
 
-      process_group_by_buckets(event["aggregations"].with_indifferent_access, group_by, [], {}, 0)
-    end
-
-    def self.process_group_by(aggregations)
-      return Array.new if aggregations.empty?
-
-      count = process_group_by_options(aggregations[0])
-
-      (aggregations[1..-1].inject count do |count, group_by|
-        count[:count][:aggregations] = process_group_by_options(group_by)
-      end)
-
-      count
-    end
-
-    def self.process_nested_group_by(fields)
-      count = {
-          aggregations: {
-            count: {
-              terms: {field: "#{fields[0][:name]}.#{fields[0][:sub_fields][:name]}"}
-            }
-          }
-        }
-      (fields[1..-1].inject count do |count, group_by|
-        count[:aggregations] = {
-          aggregations: {
-            count: {
-              terms: {field: "#{group_by[:name]}.#{group_by[:sub_fields][:name]}"}
-            }
-          }
-        }
-      end)
-    end
-
-    def self.process_group_by_options(group_by)
-      if group_by[:type] == :nested
-        if group_by[:sub_fields].is_a? Array and group_by[:sub_fields].size > 1
-          return {
-            count: {
-              nested: {path: group_by[:name]},
-              aggs: {
-                count: {
-                  terms: {field: "#{group_by[:name]}.#{group_by[:sub_fields][0][:name]}"}
-                }.merge(process_nested_group_by group_by[:sub_fields][1..-1])
-              }
-            }
-          }
-        else
-          return {
-            count: {
-              nested: {path: group_by[:name]},
-              aggs: {
-                count: {
-                  terms: {field: "#{group_by[:name]}.#{group_by[:sub_fields][:name]}"}
-                }
-              }
-            }
-          }
-        end
-      end
-      if group_by[:type] == :range
-        return {count: {range: {field: group_by[:name], ranges: convert_ranges_to_elastic_search(group_by[:ranges])}}}
-      end
-      if group_by[:type] == :date
-        format = case group_by[:interval]
-          when "year"
-            "yyyy"
-          when "month"
-            "yyyy-MM"
-          when "week"
-            "yyyy-'W'w"
-          when "day"
-            "yyyy-MM-dd"
-          else
-            raise "Invalid time interval."
-         end
-        return {count: {date_histogram: {field: group_by[:name], interval: group_by[:interval], format: format}}}
-      end
-      if group_by[:type] == :flat
-        return {count: {terms: {field: group_by[:name]}}}
-      end
-    end
-
-    def self.convert_ranges_to_elastic_search(ranges)
-      ranges.map do |range|
-        {from: range[0], to: range[1]}
-      end
+      process_group_by_buckets(event["aggregations"].with_indifferent_access, (non_nested_fields + nested_fields), [], {}, 0)
     end
 
     def self.classify_group_by_field(field_name)
       field_name = field_name.first if field_name.is_a? Array and field_name.size == 1
 
-      if field_name.is_a? Array
-        {type: :range, name: field_name[0], ranges: field_name[1]}
+      if field_name.is_a? Hash
+        {type: :range, name: field_name.keys[0], ranges: field_name.values[0]}
       else
         date_captures = field_name.match /\A(year|month|week|day)\(([^\)]+)\)\Z/
         if date_captures
@@ -169,7 +85,9 @@ module EventGrouping
             {head[:name] => bucket[:key]}
           end
         when :nested
-          process_group_by_buckets(count, head[:sub_fields], events, event, doc_count)
+          process_bucket(rest, events, event, (count[:count] || count)[:buckets]) do |bucket|
+            {head[:sub_fields][:name] => bucket[:key]}
+          end
         else
           raise "Trying to group by a non searchable field"
         end
@@ -187,12 +105,7 @@ module EventGrouping
     end
 
     def self.normalize(value)
-      if value.is_a? Float
-        truncated_value = trunc(value)
-        if truncated_value == value
-          return truncated_value
-        end
-      end
+      return value.round if value.is_a? Float and value.round == value
       value
     end
   end
