@@ -881,5 +881,36 @@ describe ApiController do
         response[3]["gender"].should eq("female")
       end
     end
+
+    context "Custom Fields" do
+      it "should retrieve an event custom fields by uuid", context do
+        Manifest.create definition: %{{
+          "metadata" : {
+            "device_models" : ["#{device.device_model.name}"],
+            "version" : 2
+          },
+          "field_mapping" : [
+            {
+              "target_field": "foo",
+              "selector" : "some_field",
+              "type" : "custom",
+              "pii": false,
+              "indexed": false
+            }
+          ]
+        }}
+        post :create, Oj.dump(some_field: 1234), device_uuid: device.secret_key
+        event = all_elasticsearch_events.first["_source"]
+
+        client = Elasticsearch::Client.new log: false
+        client.indices.refresh index: institution.elasticsearch_index_name
+        response = get :custom_fields, event_uuid: event["uuid"]
+        response.status.should eq(200)
+        response = Oj.load response.body
+
+        response["custom_fields"]["foo"].should eq(1234)
+        response["uuid"].should eq(event["uuid"])
+      end
+    end
   end
 end

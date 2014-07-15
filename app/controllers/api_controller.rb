@@ -17,6 +17,12 @@ class ApiController < ActionController::Base
     render_json result
   end
 
+  def custom_fields
+    event = Event.find_by_uuid(params[:event_uuid])
+    # binding.pry
+    render_json "uuid" => params[:event_uuid], "custom_fields" => event.custom_fields
+  end
+
   def playground
     @devices = Device.all
   end
