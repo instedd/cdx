@@ -63,8 +63,8 @@ GEM
     ansi (1.4.3)
     arel (4.0.2)
     attr_required (1.0.0)
-    awesome_nested_set (2.1.6)
-      activerecord (>= 3.0.0)
+    awesome_nested_set (3.0.0.rc.6)
+      activerecord (>= 4.0.0, < 5)
     bcrypt-ruby (3.1.2)
     bootstrap-sass (2.3.2.1)
       sass (~> 3.2)
@@ -329,7 +329,7 @@ PLATFORMS
 
 DEPENDENCIES
   alto_guisso!
-  awesome_nested_set
+  awesome_nested_set (~> 3.0.0.rc.3)
   bootstrap-sass (= 2.3.2.1)
   bunny
   cancan
