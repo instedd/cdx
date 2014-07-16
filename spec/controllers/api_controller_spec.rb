@@ -239,6 +239,18 @@ describe ApiController do
     end
 
     it "should store the parent location id when the device is registered more than one laboratory" do
+      device.laboratories = [laboratory1, laboratory2]
+      device.save!
+
+      post :create, data, device_uuid: device.secret_key
+
+      event = all_elasticsearch_events.first["_source"]
+      event["location_id"].should eq(parent_location.id)
+      event["laboratory_id"].should be(nil)
+      event["parent_locations"].should eq([root_location.id, parent_location.id].sort)
+    end
+
+    it "should store the root location id when the device is registered more than one laboratory" do
       device.laboratories = [laboratory2, laboratory3]
       device.save!
 
@@ -250,7 +262,7 @@ describe ApiController do
       event["parent_locations"].should eq([root_location.id])
     end
 
-    it "should store the parent location id when the device is registered more than one laboratory with another tree order" do
+    it "should store the root location id when the device is registered more than one laboratory with another tree order" do
       device.laboratories = [laboratory3, laboratory2]
       device.save!
 

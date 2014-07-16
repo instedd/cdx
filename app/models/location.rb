@@ -23,7 +23,7 @@ class Location < ActiveRecord::Base
         root
       else
         root_ancestors = root.ancestors
-        location.ancestors.find do |ancestor|
+        location.ancestors.sort_by{|l| l.depth}.reverse.find do |ancestor|
           root_ancestors.include? ancestor
         end
       end
