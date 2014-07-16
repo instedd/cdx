@@ -761,14 +761,35 @@ describe ApiController do
         post :create, (Oj.dump age: 20), device_uuid: device.secret_key
         post :create, (Oj.dump age: 21), device_uuid: device.secret_key
 
-        response = get_updates({}, Oj.dump(group_by: [{"age" => [[0, 10], [15, 120], [10, 15]]}])).sort_by do |event|
-          event["age"]
+        response = get_updates({}, Oj.dump(group_by: [{"age" => [[nil, 10], [15, 120], [10, 15]]}])).sort_by do |event|
+          event["age"].compact
         end
 
         response.should eq([
-          {"age"=>[0, 10], "count"=>1},
+          {"age"=>[nil, 10], "count"=>1},
           {"age"=>[10, 15], "count"=>4},
           {"age"=>[15, 120], "count"=>2}
+        ])
+      end
+
+      it "group by age ranges using hashes" do
+        post :create, (Oj.dump age: 9), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 10), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 11), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 12), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 13), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 20), device_uuid: device.secret_key
+        post :create, (Oj.dump age: 21), device_uuid: device.secret_key
+
+        response = get_updates({}, Oj.dump(group_by: [{"age" => [{to: 10}, [10, 15], {from: 16, to: 21}, [21]]}])).sort_by do |event|
+          event["age"].compact
+        end
+
+        response.should eq([
+          {"age"=>[nil, 10], "count"=>1},
+          {"age"=>[10, 15], "count"=>4},
+          {"age"=>[16, 21], "count"=>1},
+          {"age"=>[21, nil], "count"=>1}
         ])
       end
 

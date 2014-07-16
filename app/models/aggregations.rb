@@ -66,7 +66,11 @@ private
 
   def convert_ranges_to_elastic_search(ranges)
     ranges.map do |range|
-      {from: range[0], to: range[1]}
+      if range.is_a? Hash
+        range
+      else
+        {from: range[0], to: range[1]}
+      end
     end
   end
 end
