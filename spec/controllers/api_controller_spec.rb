@@ -6,17 +6,21 @@ describe ApiController do
   let(:data) {Oj.dump results: [result: :positive]}
 
   def all_elasticsearch_events
-    client = Elasticsearch::Client.new log: false
-    client.indices.refresh index: institution.elasticsearch_index_name
+    client = fresh_client_for institution.elasticsearch_index_name
     client.search(index: institution.elasticsearch_index_name)["hits"]["hits"]
   end
 
   def get_updates(options, body="")
-    client = Elasticsearch::Client.new log: false
-    client.indices.refresh index: institution.elasticsearch_index_name
+    fresh_client_for institution.elasticsearch_index_name
     response = get :events, body, options
     response.status.should eq(200)
     Oj.load response.body
+  end
+
+  def fresh_client_for index_name
+    client = Elasticsearch.client
+    client.indices.refresh index: index_name
+    client
   end
 
   context "Creation" do
@@ -365,8 +369,7 @@ describe ApiController do
         post :create, data, device_uuid: device.secret_key
         device3 = Device.make
         post :create, (Oj.dump results:[result: :negative]), device_uuid: device3.secret_key
-        client = Elasticsearch::Client.new log: true
-        client.indices.refresh index: device3.institution.elasticsearch_index_name
+        client = fresh_client_for device3.institution.elasticsearch_index_name
 
         response = get_updates(institution: device3.institution.id)
 
@@ -907,8 +910,7 @@ describe ApiController do
         post :create, Oj.dump(some_field: 1234), device_uuid: device.secret_key
         event = all_elasticsearch_events.first["_source"]
 
-        client = Elasticsearch::Client.new log: false
-        client.indices.refresh index: institution.elasticsearch_index_name
+        fresh_client_for institution.elasticsearch_index_name
         response = get :custom_fields, event_uuid: event["uuid"]
         response.status.should eq(200)
         response = Oj.load response.body
@@ -923,8 +925,7 @@ describe ApiController do
         post :create, Oj.dump(results: [result: :positive], patient_name: "jdoe"), device_uuid: device.secret_key
         event = all_elasticsearch_events.first["_source"]
 
-        client = Elasticsearch::Client.new log: false
-        client.indices.refresh index: institution.elasticsearch_index_name
+        fresh_client_for institution.elasticsearch_index_name
         response = get :pii, event_uuid: event["uuid"]
         response.status.should eq(200)
         response = Oj.load response.body

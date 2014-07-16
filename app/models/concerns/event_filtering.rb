@@ -3,24 +3,18 @@ module EventFiltering
 
   included do
     def self.query params
-      conditions = process_conditions(params)
-      # conditions = process_conditions(params[:body], conditions)
-      query = and_conditions(conditions)
+      query = and_conditions(process_conditions(params))
 
       if params[:group_by]
         query_with_group_by(query, params[:group_by])
       else
-        run_query query: query, sort: process_order(params)
+        Elasticsearch.search_all(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
+          hit["_source"]
+        end
       end
     end
 
   private
-    def self.run_query body
-      client = Elasticsearch::Client.new log: true
-      client.search(index: "#{Elasticsearch.index_prefix}*", body: body)["hits"]["hits"].map do |hit|
-        hit["_source"]
-      end
-    end
 
     def self.process_conditions params, conditions=[]
       conditions = process_fields(Event.searchable_fields, params, conditions)
@@ -32,9 +26,7 @@ module EventFiltering
     end
 
     def self.and_conditions conditions
-      return [] if conditions.empty?
       return conditions.first if conditions.size == 1
-
       {bool: {must: conditions}}
     end
 

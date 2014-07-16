@@ -4,7 +4,7 @@ class Aggregations
     @last = @aggregations
   end
 
-  def append fields, options={}
+  def append fields
     if fields.first[:type] == :nested
       append_last count: {nested: {path: fields.first[:name]}}
     end

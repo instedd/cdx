@@ -3,7 +3,7 @@ module EventIndexing
 
   included do
     def save_in_elasticsearch
-      client = Elasticsearch::Client.new log: true
+      client = Elasticsearch::Client.new log: false
       client.index index: device.institution.elasticsearch_index_name, type: 'event', body: indexed_fields.merge(event_id: self.event_id), id: "#{device.secret_key}_#{self.event_id}"
     end
 

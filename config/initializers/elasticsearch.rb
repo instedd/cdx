@@ -2,6 +2,18 @@ module Elasticsearch
   require "net/http"
   require "uri"
 
+  def self.search_all body
+    client.search(index: "#{index_prefix}*", body: body)
+  end
+
+  def self.client
+    if Rails.env == 'test'
+      Elasticsearch::Client.new log: false
+    else
+      Elasticsearch::Client.new log: true
+    end
+  end
+
   def self.index_prefix
     "cdp_institution_#{Rails.env}"
   end
