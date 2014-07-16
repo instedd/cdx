@@ -48,18 +48,23 @@ describe ApiController do
     end
 
     it "should override event if event_id is the same" do
-      post :create, Oj.dump(event_id: "1234", age: 20), device_uuid: device.secret_key
+      post :create, Oj.dump(event_id: "1234", age: 20, patient_name: 'john doe'), device_uuid: device.secret_key
 
-      event = Event.first
+      event = Event.first.decrypt
       event.event_id.should eq("1234")
+      raw_data = Oj.load event.raw_data
+      raw_data["age"].should eq(20)
+      event.sensitive_data[:patient_id].should be(nil)
+      event.sensitive_data[:patient_name].should eq('john doe')
 
-      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20), device_uuid: device.secret_key
+      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20, patient_name: 'jane doe'), device_uuid: device.secret_key
 
       Event.count.should eq(1)
       event = Event.first.decrypt
       raw_data = Oj.load event.raw_data
       raw_data["age"].should eq(30)
       event.sensitive_data[:patient_id].should eq(20)
+      event.sensitive_data[:patient_name].should eq('jane doe')
 
       events = all_elasticsearch_events
       events.size.should eq(1)
