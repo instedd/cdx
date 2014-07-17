@@ -125,14 +125,11 @@ The JSON allows more complex aggregations, such as age ranges.
   ]
 }`
 
-* `time_interval` - groups by a given time interval, it could be one of: yearly, monthly, weekly, daily.
+* `year() | month() | week() | day()` - groups the given date field by the time interval specified.
 
 `{
   “group_by” : [
-    { “time_interval” : [
-      { "created_at" : "yearly" },
-      ...
-    ] },
+    “year(created_at)",
     ...
   ]
 }`
