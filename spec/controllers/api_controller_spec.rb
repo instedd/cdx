@@ -319,6 +319,27 @@ describe ApiController do
       response[1]["results"].first["result"].should eq("positive")
       response[2]["results"].first["result"].should eq("positive with riff")
     end
+
+    it "groups by administrative level" do
+      device1 = Device.make institution: institution, laboratories: [laboratory1]
+      device2 = Device.make institution: institution, laboratories: [laboratory2]
+      device3 = Device.make institution: institution, laboratories: [laboratory3]
+      post :create, (Oj.dump results:[result: "negative"]), device_uuid: device1.secret_key
+      post :create, (Oj.dump results:[result: "positive"]), device_uuid: device2.secret_key
+      post :create, (Oj.dump results:[result: "positive with riff"]), device_uuid: device3.secret_key
+
+      response = get_updates(group_by: {admin_level: 1})
+      response.should eq([
+        {"location"=>parent_location.id, "count"=>2},
+        {"location"=>upper_leaf_location.id, "count"=>1}
+      ])
+
+      response = get_updates(group_by: {admin_level: 0})
+
+      response.should eq([
+        {"location"=>root_location.id, "count"=>3}
+      ])
+    end
   end
 
   context "Query" do

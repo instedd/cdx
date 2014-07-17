@@ -23,15 +23,17 @@ module EventGrouping
       aggregations.append nested_fields if nested_fields.present?
 
       event = Elasticsearch.search_all aggregations.to_hash.merge(query: query)
-
       process_group_by_buckets(event["aggregations"].with_indifferent_access, (non_nested_fields + nested_fields), [], {}, 0)
     end
 
     def self.classify_group_by_field(field_name)
       field_name = field_name.first if field_name.is_a? Array and field_name.size == 1
-
       if field_name.is_a? Hash
-        {type: :range, name: field_name.keys[0], ranges: field_name.values[0]}
+        if field_name.values[0].is_a? Array
+          {type: :range, name: field_name.keys[0], ranges: field_name.values[0]}
+        else
+          {type: :reference, name: field_name.keys[0], value: field_name.values[0]}
+        end
       else
         date_captures = field_name.match /\A(year|month|week|day)\(([^\)]+)\)\Z/
         if date_captures
@@ -61,7 +63,7 @@ module EventGrouping
     end
 
     def self.process_group_by_buckets(aggregations, group_by, events, event, doc_count)
-      count = aggregations[:count]
+      count = aggregations[:count] || aggregations[:kind]
       if count
         if group_by.is_an? Array
           head = group_by.first
@@ -82,6 +84,14 @@ module EventGrouping
         when :flat
           process_bucket(rest, events, event, count[:buckets]) do |bucket|
             {head[:name] => bucket[:key]}
+          end
+        when :reference
+          locations = Location.where(depth: head[:value]).map &:id
+          buckets = count[:buckets].select do |bucket|
+            locations.include? bucket[:key]
+          end
+          process_bucket(rest, events, event, buckets) do |bucket|
+            {'location' => bucket[:key]}
           end
         when :nested
           process_bucket(rest, events, event, (count[:count] || count)[:buckets]) do |bucket|

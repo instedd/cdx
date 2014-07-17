@@ -54,6 +54,8 @@ private
           }
         }
       }
+    when :reference
+      {kind: {terms: {field: 'parent_locations', size: 0}}}
     else
       raise "Unsupported field type"
     end
