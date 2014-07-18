@@ -41,11 +41,11 @@ module Elasticsearch
   end
 
   def self.map_field properties, field
-    properties[field[:name]] = if field[:type] == :nested
+    properties[field[:name]] = if field[:type] == "nested"
       {type: :nested, properties: map_fields(field[:sub_fields])}
     else
       field_body = case field[:type]
-      when :multi_field
+      when "multi_field"
         {
           fields: {
             analyzed: {type: :string, index: :analyzed},

@@ -8,7 +8,7 @@ module EventIndexing
     end
 
     def self.pii?(field)
-      sensitive_fields.include? field.to_sym
+      sensitive_fields.include? field
     end
 
     def parsed_fields

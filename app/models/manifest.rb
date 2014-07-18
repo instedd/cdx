@@ -170,8 +170,8 @@ class Manifest < ActiveRecord::Base
 
   def self.map fields, selector_prefix=""
     fields.map do |field_definition|
-      field = selector_prefix + field_definition[:name].to_s
-      if field_definition[:type] == :nested
+      field = selector_prefix + field_definition[:name]
+      if field_definition[:type] == "nested"
         map field_definition[:sub_fields], "#{selector_prefix}#{field_definition[:name]}[*]."
       else
         {

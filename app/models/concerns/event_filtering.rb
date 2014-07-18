@@ -32,7 +32,7 @@ module EventFiltering
 
     def self.process_fields fields, params, conditions=[]
       fields.inject conditions do |conditions, field_definition|
-        if field_definition[:type] == :nested
+        if field_definition[:type] == "nested"
           nested_conditions = self.process_fields(field_definition[:sub_fields], params)
           if nested_conditions.empty?
             conditions
@@ -46,31 +46,31 @@ module EventFiltering
             ]
           end
         else
-          field_definition[:parameter_definition].inject conditions do |conditions, parameter_definition|
-            process_field(field_definition, parameter_definition, params, conditions)
+          (field_definition[:filter_parameter_definition] || []).inject conditions do |conditions, filter_parameter_definition|
+            process_field(field_definition, filter_parameter_definition, params, conditions)
           end
         end
       end
     end
 
-    def self.process_field field_definition, parameter_definition, params, conditions
-      case parameter_definition[:type]
-      when :match
-        if field_value = params[parameter_definition[:name]]
+    def self.process_field field_definition, filter_parameter_definition, params, conditions
+      case filter_parameter_definition[:type]
+      when "match"
+        if field_value = params[filter_parameter_definition[:name]]
           conditions += [{match: {field_definition[:name] => field_value}}]
         end
         conditions
-      when :range
-        if field_value = params[parameter_definition[:name]]
-          conditions += [{range: {field_definition[:name] => ({parameter_definition[:boundary] => field_value}.merge parameter_definition[:options])}}]
+      when "range"
+        if field_value = params[filter_parameter_definition[:name]]
+          conditions += [{range: {field_definition[:name] => ({filter_parameter_definition[:boundary] => field_value}.merge filter_parameter_definition[:options])}}]
         end
         conditions
-      when :wildcard
-        if field_value = params[parameter_definition[:name]]
+      when "wildcard"
+        if field_value = params[filter_parameter_definition[:name]]
           condition = if /.*\*.*/ =~ field_value
-            [{wildcard: {parameter_definition[:name] => field_value}}]
+            [{wildcard: {filter_parameter_definition[:name] => field_value}}]
           else
-            [{match: {field_matcher(parameter_definition[:name], field_definition[:type]) => field_value}}]
+            [{match: {field_matcher(filter_parameter_definition[:name], field_definition[:type]) => field_value}}]
           end
           conditions += condition
         end

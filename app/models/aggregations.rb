@@ -5,7 +5,7 @@ class Aggregations
   end
 
   def append fields
-    if fields.first[:type] == :nested
+    if fields.first[:type] == "nested"
       append_last count: {nested: {path: fields.first[:name]}}
     end
 
@@ -22,7 +22,7 @@ private
 
   def create_grouping_for field
     case field[:type]
-    when :flat
+    when "flat"
       {
         count: {
           terms: {
@@ -30,7 +30,7 @@ private
           }
         }
       }
-    when :date
+    when "date"
       format = case field[:interval]
         when "year"
           "yyyy"
@@ -41,12 +41,12 @@ private
         when "day"
           "yyyy-MM-dd"
         else
-          raise "Invalid time interval."
+          raise "Invalid time interval: #{field[:interval]}"
        end
       {count: {date_histogram: {field: field[:name], interval: field[:interval], format: format}}}
-    when :range
+    when "range"
       {count: {range: {field: field[:name], ranges: convert_ranges_to_elastic_search(field[:ranges])}}}
-    when :nested
+    when "nested"
       {
         count: {
           terms: {
@@ -54,10 +54,10 @@ private
           }
         }
       }
-    when :reference
+    when "kind"
       {kind: {terms: {field: 'parent_locations', size: 0}}}
     else
-      raise "Unsupported field type"
+      raise "Unsupported field type: #{field[:type]}"
     end
   end
 
