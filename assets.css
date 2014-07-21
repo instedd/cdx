@@ -61,8 +61,12 @@ audio:not([controls]) {
  *    user zoom.
  */
 
+/* Google fonts "Open sans" imported by mscebba */
+
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700,300,800);
+
 html {
-    font-family: sans-serif; /* 1 */
+    font-family: 'Open Sans', sans-serif; /* 1 */
     -webkit-text-size-adjust: 100%; /* 2 */
     -ms-text-size-adjust: 100%; /* 2 */
 }
@@ -410,8 +414,10 @@ body {
 body,
 input,
 textarea {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  line-height: 140%;
   color: #191919;
-  font: 14px/140% 'Open Sans', Arial, sans-serif;
 }
 
 a {
@@ -441,7 +447,7 @@ code {
 #sidebar {
   background: #191919;
   color: #fff;
-  float: left;  
+  float: left;
   height: 100%;
   overflow: auto;
   position: fixed;
@@ -643,4 +649,91 @@ code {
   display: block;
   padding: 15px;
   white-space: pre;
+}
+
+/* Styles fixess by mscebba */
+
+body {
+  background: #dcdcdc;
+}
+
+
+#intro {
+   padding: 40px 20px 20px;
+   padding-left: 280px;
+   max-width: 1000px;
+}
+
+#content {
+  padding: 20px;
+  padding-left: 280px;
+  max-width: 1000px;
+}
+
+.logo {
+  background: url(lib/assets/img/cdx_logo.png) no-repeat center #ffffff;
+  height: 40px;
+  padding: 24px 0;
+}
+
+h1 {
+  font-size: 2.6em;
+  font-weight: 300;
+}
+
+#sidebar ul ul {
+  padding-left: 0;
+  margin-bottom: 12px;
+}
+
+#sidebar h2 {
+  font-size: 12px;
+  font-weight: bold !important;
+  text-transform: uppercase;
+}
+
+#content a h2 code b {
+  color: #191919;
+}
+
+#content article > a {
+  background: #191919;
+}
+
+#sidebar input {
+  background: #000000;
+  border-radius: 20px;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  box-shadow: none
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+}
+
+#sidebar input::-webkit-input-placeholder {
+  background: url(lib/assets/img/ic-search.png) no-repeat 0px 2px;
+   color: #626262;
+   font-style: italic;
+   padding-left: 22px;
+}
+
+#sidebar input:-moz-placeholder { /* Firefox 18- */
+  background: url(lib/assets/img/ic-search.png) no-repeat 0px 2px;
+   color: #626262;
+   font-style: italic;
+   padding-left: 22px;
+}
+
+#sidebar input::-moz-placeholder {  /* Firefox 19+ */
+  background: url(lib/assets/img/ic-search.png) no-repeat 0px 2px;
+   color: #626262;
+   font-style: italic;
+   padding-left: 22px;
+}
+
+#sidebar input:-ms-input-placeholder {
+  background: url(lib/assets/img/ic-search.png) no-repeat 0px 2px;
+   color: #626262;
+   font-style: italic;
+   padding-left: 22px;
 }
