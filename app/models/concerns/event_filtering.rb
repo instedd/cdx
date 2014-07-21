@@ -68,9 +68,9 @@ module EventFiltering
       when "wildcard"
         if field_value = params[filter_parameter_definition[:name]]
           condition = if /.*\*.*/ =~ field_value
-            [{wildcard: {filter_parameter_definition[:name] => field_value}}]
+            [{wildcard: {field_definition[:name] => field_value}}]
           else
-            [{match: {field_matcher(filter_parameter_definition[:name], field_definition[:type]) => field_value}}]
+            [{match: {field_matcher(field_definition[:name], field_definition[:type]) => field_value}}]
           end
           conditions += condition
         end
