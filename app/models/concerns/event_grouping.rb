@@ -28,38 +28,19 @@ module EventGrouping
 
     def self.classify_group_by_field(field_name)
       field_name = field_name.first if field_name.is_a? Array and field_name.size == 1
+
       if field_name.is_a? Hash
-        if field_name.values[0].is_a? Array
-          {type: "range", name: field_name.keys[0], ranges: field_name.values[0]}
-        else
-          {type: "kind", name: field_name.keys[0], value: field_name.values[0]}
-        end
+        name = field_name.keys.first
+        value = field_name[name]
       else
-        date_captures = field_name.match /\A(year|month|week|day)\(([^\)]+)\)\Z/
-        if date_captures
-          {type: "date", name: date_captures[2], interval: date_captures[1]}
-        else
-          find_in_searchable_fields(field_name)
-        end
+        name = field_name
+        value = nil
       end
-    end
-
-    def self.find_in_searchable_fields(name)
-      find_in_fields name, Event.searchable_fields
-    end
-
-    def self.find_in_fields(name, fields=[])
-      sub_field_found = nil
-      found = fields.detect do |field|
-        field[:name].to_s == name.to_s || (field[:type] == "nested" && (sub_field_found = find_in_fields(name, field[:sub_fields])))
+      classified_field = nil
+      searchable_fields.detect do |field|
+        classified_field = field.grouping_detail_for name, value
       end
-      if found
-        if found[:type] == "nested"
-          {type: "nested", name: found[:name], sub_fields: sub_field_found}
-        else
-          {type: "flat", name: found[:name]}
-        end
-      end
+      classified_field
     end
 
     def self.process_group_by_buckets(aggregations, group_by, events, event, doc_count)
@@ -79,19 +60,19 @@ module EventGrouping
           end
         when "date"
           process_bucket(rest, events, event, count[:buckets]) do |bucket|
-            {head[:name] => bucket[:key_as_string]}
+            {head[:field][:name] => bucket[:key_as_string]}
           end
         when "flat"
           process_bucket(rest, events, event, count[:buckets]) do |bucket|
             {head[:name] => bucket[:key]}
           end
         when "kind"
-          locations = Location.where(depth: head[:value]).map &:id
+          elements = head[:reference_table][:name].classify.constantize.where(head[:reference_table][:query_target] => head[:value]).map &head[:reference_table][:value_field].to_sym
           buckets = count[:buckets].select do |bucket|
-            locations.include? bucket[:key]
+            elements.include? bucket[:key]
           end
           process_bucket(rest, events, event, buckets) do |bucket|
-            {'location' => bucket[:key]}
+            {head[:reference_table][:name].singularize => bucket[:key]}
           end
         when "nested"
           process_bucket(rest, events, event, (count[:count] || count)[:buckets]) do |bucket|

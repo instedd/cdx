@@ -26,7 +26,7 @@ private
       {
         count: {
           terms: {
-            field: field[:name]
+            field: field[:field][:name]
           }
         }
       }
@@ -43,9 +43,9 @@ private
         else
           raise "Invalid time interval: #{field[:interval]}"
        end
-      {count: {date_histogram: {field: field[:name], interval: field[:interval], format: format}}}
+      {count: {date_histogram: {field: field[:field][:name], interval: field[:interval], format: format}}}
     when "range"
-      {count: {range: {field: field[:name], ranges: convert_ranges_to_elastic_search(field[:ranges])}}}
+      {count: {range: {field: field[:field][:name], ranges: convert_ranges_to_elastic_search(field[:ranges])}}}
     when "nested"
       {
         count: {
@@ -55,7 +55,7 @@ private
         }
       }
     when "kind"
-      {kind: {terms: {field: 'parent_locations', size: 0}}}
+      {kind: {terms: {field: field[:field][:name], size: 0}}}
     else
       raise "Unsupported field type: #{field[:type]}"
     end
