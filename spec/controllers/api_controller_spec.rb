@@ -219,8 +219,8 @@ describe ApiController do
     end
   end
 
-  context "locations" do
-    let(:root_location) {Location.make}
+  context "Locations" do
+    let(:root_location) {Location.create_default}
     let(:parent_location) {Location.make parent: root_location}
     let(:leaf_location1) {Location.make parent: parent_location}
     let(:leaf_location2) {Location.make parent: parent_location}

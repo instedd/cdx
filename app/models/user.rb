@@ -29,13 +29,13 @@ class User < ActiveRecord::Base
     implicit = Policy.implicit
     implicit.granter = nil
     implicit.user = self
-    implicit.save(validate: false)
+    implicit.save validate: false
   end
 
   def grant_superadmin_policy
     implicit = Policy.superadmin
     implicit.granter = nil
     implicit.user = self
-    implicit.save(validate: false)
+    implicit.save validate: false
   end
 end

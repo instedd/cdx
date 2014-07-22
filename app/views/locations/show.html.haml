@@ -1,9 +1,13 @@
 %p#notice= notice
 
+%h3 #{@location.name}
 %p
-  %b Name:
-  = location.name
+  %b Parent:
+  = @location.parent.try :name
+%p
+  %b Admin level:
+  = @location.admin_level
 
-= link_to 'Edit', edit_location_path(location)
-\|
-= link_to 'Back', locations_path
+
+.actions
+  = link_to 'Back', locations_path

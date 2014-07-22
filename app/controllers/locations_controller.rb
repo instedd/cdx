@@ -11,6 +11,10 @@ class LocationsController < ApplicationController
     @location = Location.new
   end
 
+  def show
+    @location = Location.find_by_id params[:id]
+  end
+
   # POST /locations
   # POST /locations.json
   def create
@@ -52,16 +56,24 @@ class LocationsController < ApplicationController
   def destroy
     @location = Location.find(params[:id])
 
-    @location.destroy
-    respond_to do |format|
-      format.html { redirect_to locations_path }
-      format.json { head :no_content }
+    if @location.destroy
+      respond_to do |format|
+        format.html { redirect_to locations_path }
+        format.json { head :no_content }
+      end
+    else
+      respond_to do |format|
+        format.html do
+          render action: 'edit'
+        end
+        format.json { render json: @location.errors, status: :unprocessable_entity }
+      end
     end
   end
 
   private
 
   def location_params
-    params.require(:location).permit(:name, :parent_id)
+    params.require(:location).permit(:name, :parent_id, :admin_level)
   end
 end

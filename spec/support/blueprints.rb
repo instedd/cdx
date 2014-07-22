@@ -35,6 +35,8 @@ end
 
 Location.blueprint do
   name
+  parent {Location.create_default}
+  admin_level {parent.admin_level + 1}
 end
 
 DeviceModel.blueprint do

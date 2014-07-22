@@ -12,6 +12,9 @@
   .field
     = f.label :parent_id
     = f.select :parent_id, nested_set_options(Location, @location) {|i| "#{'-' * i.level} #{i.name}" }, include_blank: '(none)'
+  .field
+    = f.label :admin_level
+    = f.number_field :admin_level
 
   .actions
     = f.submit 'Save'

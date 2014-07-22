@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140603191744) do
+ActiveRecord::Schema.define(version: 20140722154526) do
 
   create_table "device_models", force: true do |t|
     t.string   "name"
@@ -92,6 +92,7 @@ ActiveRecord::Schema.define(version: 20140603191744) do
     t.integer  "depth"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "admin_level"
   end
 
   add_index "locations", ["depth"], name: "index_locations_on_depth", using: :btree

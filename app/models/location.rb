@@ -3,9 +3,11 @@ class Location < ActiveRecord::Base
 
   acts_as_nested_set dependent: :destroy
 
-  has_many :laboratories, dependent: :restrict_with_exception
+  has_many :laboratories, dependent: :restrict_with_error
   has_many :devices, :through => :laboratories
   has_many :events, :through => :laboratories
+  validates_presence_of :admin_level, :parent
+  validate :validate_admin_level_hierarchy
 
   def self.filter_by_owner(user)
     self
@@ -28,5 +30,21 @@ class Location < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def self.create_default
+    location = self.new admin_level: 0, name: "World"
+    location.save validate: false
+    location
+  end
+
+  private
+
+  def validate_admin_level_hierarchy
+    return errors.add :admin_level, "must be below parent's admin_level" unless below_parent?
+  end
+
+  def below_parent?
+    parent.admin_level < self.admin_level if parent
   end
 end
