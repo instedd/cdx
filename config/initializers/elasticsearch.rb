@@ -1,3 +1,5 @@
+require "cdx/api/elasticsearch"
+
 module Elasticsearch
   require "net/http"
   require "uri"
@@ -31,7 +33,7 @@ module Elasticsearch
   end
 
   def self.build_properties_mapping
-    self.map_fields Event.searchable_fields
+    self.map_fields Cdx::Api.searchable_fields
   end
 
   def self.map_fields fields

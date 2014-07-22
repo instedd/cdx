@@ -152,7 +152,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def self.default_definition
-    field_mapping = Event.sensitive_fields.map do |sensitive_field|
+    field_mapping = Cdx::Api.sensitive_fields.map do |sensitive_field|
       {
         target_field: sensitive_field,
         selector: sensitive_field,
@@ -162,7 +162,7 @@ class Manifest < ActiveRecord::Base
       }
     end
 
-    field_mapping.concat(map(Event.searchable_fields).flatten)
+    field_mapping.concat(map(Cdx::Api.searchable_fields).flatten)
     Oj.dump field_mapping: field_mapping
   end
 

@@ -14,7 +14,7 @@ class ApiController < ApplicationController
 
   def events
     body = Oj.load(request.body.read) || {}
-    result = Event.query(params.merge(body))
+    result = Cdx::Api.query(params.merge(body))
     render_json result
   end
 

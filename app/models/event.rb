@@ -1,7 +1,4 @@
 class Event < ActiveRecord::Base
-  include Cdx::Api::Elasticsearch::Concerns::EventFieldDefinition
-  include Cdx::Api::Elasticsearch::Concerns::EventFiltering
-  include Cdx::Api::Elasticsearch::Concerns::EventGrouping
   include EventIndexing
   include EventEncryption
 
