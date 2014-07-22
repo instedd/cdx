@@ -609,11 +609,11 @@ code {
 
 /* PUT */
 #content article.PUT a h2 code {
-  color: #e08f10;
+  color: #e1bf00;
 }
 
 #content article.PUT a h2 code b {
-  background: #e08f10;
+  background: #e1bf00;
 }
 
 /* DELETE */
