@@ -11,6 +11,13 @@ GIT
       ruby-openid
 
 GIT
+  remote: https://bitbucket.org/instedd/cdx-api-elasticsearch.git
+  revision: 8ddae4be0cf9ad7a72740cde295c685bc773d374
+  branch: master
+  specs:
+    cdx-api-elasticsearch (0.0.1)
+
+GIT
   remote: https://bitbucket.org/instedd/instedd-bootstrap.git
   revision: 473e946188ade671230800c680ceeccd0b8e1888
   branch: master
@@ -339,6 +346,7 @@ DEPENDENCIES
   capistrano-rvm (~> 0.1)
   capybara
   capybara-mechanize
+  cdx-api-elasticsearch!
   coffee-rails (~> 4.0.0)
   devise
   elasticsearch

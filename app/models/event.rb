@@ -1,9 +1,9 @@
 class Event < ActiveRecord::Base
-  include EventFieldDefinition
+  include Cdx::Api::Elasticsearch::Concerns::EventFieldDefinition
+  include Cdx::Api::Elasticsearch::Concerns::EventFiltering
+  include Cdx::Api::Elasticsearch::Concerns::EventGrouping
   include EventIndexing
   include EventEncryption
-  include EventFiltering
-  include EventGrouping
 
   belongs_to :device
   belongs_to :institution
