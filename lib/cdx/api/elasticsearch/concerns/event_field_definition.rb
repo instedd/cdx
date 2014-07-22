@@ -13,9 +13,9 @@ module Cdx::Api::Elasticsearch::Concerns::EventFieldDefinition
     end
 
     def self.event_fields_config
-      config_filename = "#{Rails.root}/config/event_fields.yml"
+      config_filename = "#{Rails.root}/config/cdx_api_fields.yml"
       unless File.exists?(config_filename)
-        config_filename = File.expand_path("../../../../../../config/event_fields.yml", __FILE__)
+        config_filename = File.expand_path("../../../../../../config/cdx_api_fields.yml", __FILE__)
       end
 
       YAML.load_file(config_filename).with_indifferent_access

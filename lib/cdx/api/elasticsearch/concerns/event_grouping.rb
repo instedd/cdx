@@ -22,7 +22,7 @@ module Cdx::Api::Elasticsearch::Concerns::EventGrouping
       aggregations.append non_nested_fields if non_nested_fields.present?
       aggregations.append nested_fields if nested_fields.present?
 
-      event = Elasticsearch.search_all aggregations.to_hash.merge(query: query)
+      event = search_elastic aggregations.to_hash.merge(query: query)
       process_group_by_buckets(event["aggregations"].with_indifferent_access, (non_nested_fields + nested_fields), [], {}, 0)
     end
 

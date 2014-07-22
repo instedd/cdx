@@ -8,7 +8,7 @@ module Cdx::Api::Elasticsearch::Concerns::EventFiltering
       if params[:group_by]
         query_with_group_by(query, params[:group_by])
       else
-        Elasticsearch.search_all(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
+        search_elastic(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
           hit["_source"]
         end
       end
@@ -17,7 +17,7 @@ module Cdx::Api::Elasticsearch::Concerns::EventFiltering
   private
 
     def self.process_conditions params, conditions=[]
-      conditions = process_fields(Event.searchable_fields, params, conditions)
+      conditions = process_fields(searchable_fields, params, conditions)
       if conditions.empty?
         [{match_all: []}]
       else
