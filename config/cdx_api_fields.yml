@@ -90,3 +90,6 @@ searchable_fields:
       - name: result
         type: multi_field
       - name: condition
+  - name: test_type
+    filter_parameter_definition:
+      - type: match

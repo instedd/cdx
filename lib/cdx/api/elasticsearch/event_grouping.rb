@@ -1,8 +1,6 @@
-module Cdx::Api::Elasticsearch::Concerns::EventGrouping
-  extend ActiveSupport::Concern
-
-  included do
-    def self.query_with_group_by(query, group_by)
+module Cdx::Api::Elasticsearch::EventGrouping
+  class << self
+    def query_with_group_by(query, group_by)
       group_by = if (group_by.is_a? String)
         group_by.split ","
       elsif group_by.is_a? Hash
@@ -22,11 +20,11 @@ module Cdx::Api::Elasticsearch::Concerns::EventGrouping
       aggregations.append non_nested_fields if non_nested_fields.present?
       aggregations.append nested_fields if nested_fields.present?
 
-      event = search_elastic aggregations.to_hash.merge(query: query)
+      event = Cdx::Api.search_elastic aggregations.to_hash.merge(query: query)
       process_group_by_buckets(event["aggregations"].with_indifferent_access, (non_nested_fields + nested_fields), [], {}, 0)
     end
 
-    def self.classify_group_by_field(field_name)
+    def classify_group_by_field(field_name)
       field_name = field_name.first if field_name.is_a? Array and field_name.size == 1
 
       if field_name.is_a? Hash
@@ -37,13 +35,13 @@ module Cdx::Api::Elasticsearch::Concerns::EventGrouping
         value = nil
       end
       classified_field = nil
-      searchable_fields.detect do |field|
+      Cdx::Api.searchable_fields.detect do |field|
         classified_field = field.grouping_detail_for name, value
       end
       classified_field
     end
 
-    def self.process_group_by_buckets(aggregations, group_by, events, event, doc_count)
+    def process_group_by_buckets(aggregations, group_by, events, event, doc_count)
       count = aggregations[:count] || aggregations[:kind]
       if count
         if group_by.is_an? Array
@@ -87,14 +85,14 @@ module Cdx::Api::Elasticsearch::Concerns::EventGrouping
       end
     end
 
-    def self.process_bucket(group_by, events, event, buckets)
+    def process_bucket(group_by, events, event, buckets)
       buckets.inject events do |events, bucket|
         event = event.merge(yield bucket)
         process_group_by_buckets(bucket, group_by, events, event, bucket[:doc_count])
       end
     end
 
-    def self.normalize(value)
+    def normalize(value)
       return value.round if value.is_a? Float and value.round == value
       value
     end

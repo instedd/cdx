@@ -1,10 +1,10 @@
-require "cdx/api/elasticsearch/version"
+require "active_support/core_ext/hash"
+require "yaml"
+require "elasticsearch"
 
 module Cdx
   module Api
     module Elasticsearch
-      module Concerns
-      end
     end
   end
 end
@@ -14,25 +14,42 @@ Dir[File.expand_path("../elasticsearch/**/*.rb", __FILE__)].each do |file|
 end
 
 module Cdx::Api
+  class << self
+    def setup
+      yield Cdx::Api::Elasticsearch::Config
+    end
 
-  include Cdx::Api::Elasticsearch::Concerns::EventFieldDefinition
-  include Cdx::Api::Elasticsearch::Concerns::EventFiltering
-  include Cdx::Api::Elasticsearch::Concerns::EventGrouping
+    def query(params)
+      Cdx::Api::Elasticsearch::EventFiltering.query(params)
+    end
 
-  def self.search_elastic body
-    client.search(index: elastic_index_pattern, body: body)
-  end
+    def sensitive_fields
+      Cdx::Api::Elasticsearch::Config.sensitive_fields
+    end
 
-  def self.client
-    if Rails.env == 'test'
-      ::Elasticsearch::Client.new log: false
-    else
-      ::Elasticsearch::Client.new log: true
+    def searchable_fields
+      Cdx::Api::Elasticsearch::Config.searchable_fields
+    end
+
+    def index_name_pattern
+      Cdx::Api::Elasticsearch::Config.index_name_pattern
+    end
+
+    def search_elastic body
+      if index_name_pattern
+        client.search(index: index_name_pattern, body: body)
+      else
+        raise "You must define the index_name_pattern: Cdx::Api::Elasticsearch.setup { |config| config.index_name_pattern = ... }"
+      end
+    end
+
+    def client
+      log_enabled = !!Cdx::Api::Elasticsearch::Config.log
+      ::Elasticsearch::Client.new log: log_enabled
+    end
+
+    def elastic_index_pattern
+      Settings.cdx_elastic_index_pattern
     end
   end
-
-  def self.elastic_index_pattern
-    Settings.cdx_elastic_index_pattern
-  end
-
 end

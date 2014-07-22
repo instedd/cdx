@@ -1,23 +1,19 @@
-module Cdx::Api::Elasticsearch::Concerns::EventFiltering
-  extend ActiveSupport::Concern
-
-  included do
-    def self.query params
+module Cdx::Api::Elasticsearch::EventFiltering
+  class << self
+    def query params
       query = and_conditions(process_conditions(params))
 
       if params[:group_by]
-        query_with_group_by(query, params[:group_by])
+        Cdx::Api::Elasticsearch::EventGrouping.query_with_group_by(query, params[:group_by])
       else
-        search_elastic(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
+        Cdx::Api.search_elastic(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
           hit["_source"]
         end
       end
     end
 
-  private
-
-    def self.process_conditions params, conditions=[]
-      conditions = process_fields(searchable_fields, params, conditions)
+    def process_conditions params, conditions=[]
+      conditions = process_fields(Cdx::Api.searchable_fields, params, conditions)
       if conditions.empty?
         [{match_all: []}]
       else
@@ -25,12 +21,12 @@ module Cdx::Api::Elasticsearch::Concerns::EventFiltering
       end
     end
 
-    def self.and_conditions conditions
+    def and_conditions conditions
       return conditions.first if conditions.size == 1
       {bool: {must: conditions}}
     end
 
-    def self.process_fields fields, params, conditions=[]
+    def process_fields fields, params, conditions=[]
       fields.inject conditions do |conditions, field_definition|
         if field_definition[:type] == "nested"
           nested_conditions = self.process_fields(field_definition[:sub_fields], params)
@@ -53,7 +49,7 @@ module Cdx::Api::Elasticsearch::Concerns::EventFiltering
       end
     end
 
-    def self.process_field field_definition, filter_parameter_definition, params, conditions
+    def process_field field_definition, filter_parameter_definition, params, conditions
       case filter_parameter_definition[:type]
       when "match"
         if field_value = params[filter_parameter_definition[:name]]
@@ -80,7 +76,7 @@ module Cdx::Api::Elasticsearch::Concerns::EventFiltering
       end
     end
 
-    def self.field_matcher(field_name, field_type)
+    def field_matcher(field_name, field_type)
       # if field_type == :multi_field
       #   "#{field_name}.analyzed"
       # else
@@ -88,7 +84,7 @@ module Cdx::Api::Elasticsearch::Concerns::EventFiltering
       # end
     end
 
-    def self.process_order params
+    def process_order params
       if order = params["order_by"]
         all_orders = order.split ","
         all_orders.map do |order|
