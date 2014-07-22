@@ -17,6 +17,6 @@ class Institution < ActiveRecord::Base
   end
 
   def elasticsearch_index_name
-    "#{Elasticsearch.index_prefix}_#{id}"
+    "#{ElasticsearchHelper.index_prefix}_#{id}"
   end
 end

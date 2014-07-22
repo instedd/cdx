@@ -67,6 +67,6 @@ RSpec.configure do |config|
   config.after(:each) do
     Timecop.return
     FakeWeb.clean_registry
-    Elasticsearch.client.indices.delete index: "#{Elasticsearch.index_prefix}_*" rescue nil
+    ElasticsearchHelper.client.indices.delete index: "#{ElasticsearchHelper.index_prefix}_*" rescue nil
   end
 end

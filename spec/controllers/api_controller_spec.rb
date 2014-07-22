@@ -20,7 +20,7 @@ describe ApiController do
   end
 
   def fresh_client_for index_name
-    client = Elasticsearch.client
+    client = ElasticsearchHelper.client
     client.indices.refresh index: index_name
     client
   end
