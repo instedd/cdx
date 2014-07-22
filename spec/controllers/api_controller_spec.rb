@@ -567,6 +567,16 @@ describe ApiController do
         response.size.should be(1)
         response.first["results"].first["result"].should eq("negative")
       end
+
+      it "filters by test type" do
+        post :create, (Oj.dump results:[condition: "MTB", result: :positive], test_type: :qc), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "MTB", result: :negative], test_type: :specimen), device_uuid: device.secret_key
+
+        response = get_updates test_type: :specimen
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+      end
     end
 
     context "Grouping" do
