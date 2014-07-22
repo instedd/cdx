@@ -1,6 +1,6 @@
 GIT
   remote: https://bitbucket.org/instedd/alto_guisso.git
-  revision: e32914c0c77524e60701f53334cf9b709021a458
+  revision: 23d3c209edf172a8ef8d0e1771ffaf6085ffbe8d
   branch: master
   specs:
     alto_guisso (0.0.1)

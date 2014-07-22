@@ -1,9 +1,9 @@
-class ApiController < ActionController::Base
+class ApiController < ApplicationController
   include ApplicationHelper
+  include Policy::Actions
 
-  def render_json(object, params={})
-    render params.merge(text: object.to_json_oj, content_type: 'text/json')
-  end
+  skip_before_action :authenticate_user!
+  before_action :authenticate_api_user!
 
   def create
     device = Device.includes(:manifests).includes(:institution).includes(:laboratories).includes(:locations).find_by_secret_key(params[:device_uuid])

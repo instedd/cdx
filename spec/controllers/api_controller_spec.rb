@@ -1,9 +1,11 @@
 require 'spec_helper'
 
 describe ApiController do
+  let(:user) {User.make}
   let(:device) {Device.make}
   let(:institution) {device.institution}
   let(:data) {Oj.dump results: [result: :positive]}
+  before(:each) {sign_in user}
 
   def all_elasticsearch_events
     client = fresh_client_for institution.elasticsearch_index_name

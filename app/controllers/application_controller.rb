@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
 
   def load_current_user_policies
     if current_user
-      @current_user_policies = current_user.policies.all
+      @current_user_policies = current_user.policies.load
     end
   end
 

@@ -6,7 +6,7 @@ class IndexedField
   def initialize definition
     @definition = definition
 
-    if @definition[:type] == 'nested'
+    if nested?
       @definition[:sub_fields] = @definition[:sub_fields].map do |field|
         self.class.from field
       end
