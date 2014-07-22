@@ -10,7 +10,7 @@ sensitive_fields:
 # 2) When listing a date field (eg: created_at):
 #   a) The following filters will be enabled: created_at_since and created_at_until
 #   b) The following groups will be enabled: year(created_at), month(created_at), day(created_at)
-# 3) When listing a string of multi_field type field:
+# 3) When listing a string or multi_field type field:
 #   a) A 'wildcard' filter with the same name will be enabled.
 #   b) A 'flat' group with the same name will be enabled.
 # 4) When listing an integer type field:
@@ -18,7 +18,7 @@ sensitive_fields:
 #   b) A 'flat' group with the same name will be enabled.
 # 5) If the field name ends with '_id', the default group and filter will be created with the name without the '_id': institution_id => institution.
 # 6) Range grouping also implies flat grouping, and it will depend on what is received on the request.
-# 7) If the default group or filter is not needed, this must be overriden with the keyword 'none'.
+# 7) If the default group or filter is not needed, it must be overriden with the keyword 'none'.
 # 8) The default field type is 'string'
 # 9) If a filter or group has no name, it will be the same as the field name, as specified in (5).
 # 10) If a filter or group has no type, it will be the default type as specified in (3) and (4).
@@ -90,3 +90,7 @@ searchable_fields:
       - name: result
         type: multi_field
       - name: condition
+  - name: test_type
+    filter_parameter_definition:
+      - type: match
+
