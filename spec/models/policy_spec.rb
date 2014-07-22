@@ -44,7 +44,7 @@ describe Policy do
     assert_can user, Institution, READ_INSTITUTION, [institution, institution2]
   end
 
-  it "doesn't allows a user to read another institution" do
+  it "doesn't allow a user to read another institution" do
     user2, institution2 = create_user_and_institution
     institution3 = user2.create Institution.make_unsaved
 
