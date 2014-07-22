@@ -151,7 +151,7 @@ describe Manifest do
       {indexed: {"level" => "high"}, pii: Hash.new, custom: Hash.new}
   end
 
-  it "should raises on invalid value in options" do
+  it "should raise on invalid value in options" do
     assert_raises_manifest_data_validation %{
         [{
           "target_field" : "level",
