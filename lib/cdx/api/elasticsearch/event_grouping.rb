@@ -1,13 +1,15 @@
 module Cdx::Api::Elasticsearch::EventGrouping
   class << self
     def query_with_group_by(query, group_by)
-      group_by = if (group_by.is_a? String)
-        group_by.split ","
-      elsif group_by.is_a? Hash
-        [group_by]
-      else
-        Array(group_by)
-      end
+      group_by =
+        case group_by
+        when String, Symbol
+          group_by.to_s.split ","
+        when Hash
+          [group_by]
+        else
+          Array(group_by)
+        end
 
       group_by = group_by.map do |field|
         classify_group_by_field field
@@ -44,7 +46,7 @@ module Cdx::Api::Elasticsearch::EventGrouping
     def process_group_by_buckets(aggregations, group_by, events, event, doc_count)
       count = aggregations[:count] || aggregations[:kind]
       if count
-        if group_by.is_an? Array
+        if group_by.is_a? Array
           head = group_by.first
           rest = group_by[1..-1]
         else

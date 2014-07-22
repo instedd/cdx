@@ -147,4 +147,260 @@ describe Cdx::Api do
       expect_one_result "negative", test_type: :specimen
     end
   end
+
+  describe "Grouping" do
+    it "groups by gender" do
+      index results:[result: :positive], gender: :male
+      index results:[result: :negative], gender: :male
+      index results:[result: :negative], gender: :female
+
+      response = query(group_by: :gender).sort_by do |event|
+        event["gender"]
+      end
+
+      expect(response).to eq([
+        {"gender"=>"female", count: 1},
+        {"gender"=>"male", count: 2}
+      ])
+    end
+
+    it "groups by gender and assay_name" do
+      index results:[result: :positive], gender: :male, assay_name: "a"
+      index results:[result: :positive], gender: :male, assay_name: "a"
+      index results:[result: :positive], gender: :male, assay_name: "b"
+      index results:[result: :negative], gender: :female, assay_name: "a"
+      index results:[result: :negative], gender: :female, assay_name: "b"
+      index results:[result: :negative], gender: :female, assay_name: "b"
+
+      response = query(group_by: "gender,assay_name").sort_by do |event|
+        event["gender"] + event["assay_name"]
+      end
+
+      expect(response).to eq([
+        {"gender"=>"female", "assay_name" => "a", count: 1},
+        {"gender"=>"female", "assay_name" => "b", count: 2},
+        {"gender"=>"male", "assay_name" => "a", count: 2},
+        {"gender"=>"male", "assay_name" => "b", count: 1}
+      ])
+    end
+
+    it "groups by gender, assay_name and result" do
+      index results:[result: :positive], gender: :male, assay_name: "a"
+      index results:[result: :negative], gender: :male, assay_name: "a"
+      index results:[result: :positive], gender: :male, assay_name: "b"
+      index results:[result: :negative], gender: :female, assay_name: "a"
+      index results:[result: :negative], gender: :female, assay_name: "b"
+      index results:[result: :negative], gender: :female, assay_name: "b"
+
+      response = query(group_by: "gender,assay_name,result").sort_by do |event|
+        event["gender"] + event["result"] + event["assay_name"]
+      end
+
+      expect(response).to eq([
+        {"gender"=>"female", "result" => "negative", "assay_name" => "a", count: 1},
+        {"gender"=>"female", "result" => "negative", "assay_name" => "b", count: 2},
+        {"gender"=>"male", "result" => "negative", "assay_name" => "a", count: 1},
+        {"gender"=>"male", "result" => "positive", "assay_name" => "a", count: 1},
+        {"gender"=>"male", "result" => "positive", "assay_name" => "b", count: 1}
+      ])
+    end
+
+    it "groups by gender, assay_name and result in a different order" do
+      index results:[result: :positive], gender: :male, assay_name: "a"
+      index results:[result: :negative], gender: :male, assay_name: "a"
+      index results:[result: :positive], gender: :male, assay_name: "b"
+      index results:[result: :negative], gender: :female, assay_name: "a"
+      index results:[result: :negative], gender: :female, assay_name: "b"
+      index results:[result: :negative], gender: :female, assay_name: "b"
+
+      response = query(group_by: "result,gender,assay_name").sort_by do |event|
+        event["gender"] + event["result"] + event["assay_name"]
+      end
+
+      expect(response).to eq([
+        {"gender"=>"female", "result" => "negative", "assay_name" => "a", count: 1},
+        {"gender"=>"female", "result" => "negative", "assay_name" => "b", count: 2},
+        {"gender"=>"male", "result" => "negative", "assay_name" => "a", count: 1},
+        {"gender"=>"male", "result" => "positive", "assay_name" => "a", count: 1},
+        {"gender"=>"male", "result" => "positive", "assay_name" => "b", count: 1}
+      ])
+    end
+
+    it "groups by year(date)" do
+      index results:[result: :positive], created_at: time(2010, 1, 1)
+      index results:[result: :positive], created_at: time(2010, 1, 2)
+      index results:[result: :positive], created_at: time(2011, 1, 1)
+
+      response = query(group_by: "year(created_at)").sort_by do |event|
+        event["created_at"]
+      end
+
+      expect(response).to eq([
+        {"created_at"=>"2010", count: 2},
+        {"created_at"=>"2011", count: 1}
+      ])
+    end
+
+    it "groups by month(date)" do
+      index results:[result: :positive], created_at: time(2010, 1, 1)
+      index results:[result: :positive], created_at: time(2010, 2, 2)
+      index results:[result: :positive], created_at: time(2011, 1, 1)
+      index results:[result: :positive], created_at: time(2011, 1, 2)
+      index results:[result: :positive], created_at: time(2011, 2, 1)
+
+      response = query(group_by: "month(created_at)").sort_by do |event|
+        event["created_at"]
+      end
+
+      expect(response).to eq([
+        {"created_at"=>"2010-01", count: 1},
+        {"created_at"=>"2010-02", count: 1},
+        {"created_at"=>"2011-01", count: 2},
+        {"created_at"=>"2011-02", count: 1}
+      ])
+    end
+
+    it "groups by week(date)" do
+      index results:[result: :positive], created_at: time(2010, 1, 4)
+      index results:[result: :positive], created_at: time(2010, 1, 5)
+      index results:[result: :positive], created_at: time(2010, 1, 6)
+      index results:[result: :positive], created_at: time(2010, 1, 12)
+      index results:[result: :positive], created_at: time(2010, 1, 13)
+
+      response = query(group_by: "week(created_at)").sort_by do |event|
+        event["created_at"]
+      end
+
+      expect(response).to eq([
+        {"created_at"=>"2010-W1", count: 3},
+        {"created_at"=>"2010-W2", count: 2}
+      ])
+    end
+
+    it "groups by day(date)" do
+      index results:[result: :positive], created_at: time(2010, 1, 4)
+      index results:[result: :positive], created_at: time(2010, 1, 4)
+      index results:[result: :positive], created_at: time(2010, 1, 4)
+      index results:[result: :positive], created_at: time(2010, 1, 5)
+
+      response = query(group_by: "day(created_at)").sort_by do |event|
+        event["created_at"]
+      end
+
+      expect(response).to eq([
+        {"created_at"=>"2010-01-04", count: 3},
+        {"created_at"=>"2010-01-05", count: 1}
+      ])
+    end
+
+    it "groups by day(date) and result" do
+      index results:[result: :positive], created_at: time(2010, 1, 4)
+      index results:[result: :positive], created_at: time(2010, 1, 4)
+      index results:[result: :negative], created_at: time(2010, 1, 4)
+      index results:[result: :positive], created_at: time(2010, 1, 5)
+
+      response = query(group_by: "day(created_at),result").sort_by do |event|
+        event["created_at"] + event["result"]
+      end
+
+      expect(response).to eq([
+        {"created_at"=>"2010-01-04", "result" => "negative", count: 1},
+        {"created_at"=>"2010-01-04", "result" => "positive", count: 2},
+        {"created_at"=>"2010-01-05", "result" => "positive", count: 1}
+      ])
+    end
+
+    it "groups by age ranges" do
+      index age: 9
+      index age: 10
+      index age: 11
+      index age: 12
+      index age: 13
+      index age: 20
+      index age: 21
+
+      response = query(group_by: [{"age" => [[nil, 10], [15, 120], [10, 15]]}]).sort_by do |event|
+        event["age"].compact
+      end
+
+      expect(response).to eq([
+        {"age"=>[nil, 10], count: 1},
+        {"age"=>[10, 15], count: 4},
+        {"age"=>[15, 120], count: 2}
+      ])
+    end
+
+    it "groups by age ranges using hashes" do
+      index age: 9
+      index age: 10
+      index age: 11
+      index age: 12
+      index age: 13
+      index age: 20
+      index age: 21
+
+      response = query(group_by: [{"age" => [{to: 10}, [10, 15], {from: 16, to: 21}, [21]]}]).sort_by do |event|
+        event["age"].compact
+      end
+
+      expect(response).to eq([
+        {"age"=>[nil, 10], count: 1},
+        {"age"=>[10, 15], count: 4},
+        {"age"=>[16, 21], count: 1},
+        {"age"=>[21, nil], count: 1}
+      ])
+    end
+
+    it "groups by age ranges without the array" do
+      index age: 9
+      index age: 10
+      index age: 11
+      index age: 12
+      index age: 13
+      index age: 20
+      index age: 21
+
+      response = query(group_by: {"age" => [[0, 10], [15, 120], [10, 15]]}).sort_by do |event|
+        event["age"]
+      end
+
+      expect(response).to eq([
+        {"age"=>[0, 10], count: 1},
+        {"age"=>[10, 15], count: 4},
+        {"age"=>[15, 120], count: 2}
+      ])
+    end
+
+    it "groups by results result" do
+      index results:[
+        {condition: "MTB", result: :positive},
+        {condition: "Flu", result: :negative},
+      ]
+
+      response = query(group_by: :result).sort_by do |event|
+        event["result"]
+      end
+
+      expect(response).to eq([
+        {"result"=>"negative", count: 1},
+        {"result"=>"positive", count: 1}
+      ])
+    end
+
+    it "groups by results result and condition" do
+      index results:[
+        {condition: "MTB", result: :positive},
+        {condition: "Flu", result: :negative},
+      ]
+
+      response = query(group_by: "result,condition").sort_by do |event|
+        event["result"] + event["condition"]
+      end
+
+      expect(response).to eq([
+        {"result"=>"negative", "condition" => "Flu", count: 1},
+        {"result"=>"positive", "condition" => "MTB", count: 1}
+      ])
+    end
+  end
 end
