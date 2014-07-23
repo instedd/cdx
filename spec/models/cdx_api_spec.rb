@@ -473,4 +473,61 @@ describe Cdx::Api do
       expect(response[3]["gender"]).to eq("female")
     end
   end
+
+  context "Location" do
+    it "filters by location" do
+      index results: [result: "negative"], parent_locations: [1, 2, 3]
+      index results: [result: "positive"], parent_locations: [1, 2, 4]
+      index results: [result: "positive with riff"], parent_locations: [1, 5]
+
+      expect_one_result "negative", location: 3
+      expect_one_result "positive", location: 4
+
+      response = query(location: 2).sort_by do |event|
+        event["results"].first["result"]
+      end
+
+      expect(response.size).to eq(2)
+      expect(response[0]["results"].first["result"]).to eq("negative")
+      expect(response[1]["results"].first["result"]).to eq("positive")
+
+      response = query(location: 1).sort_by do |event|
+        event["results"].first["result"]
+      end
+
+      expect(response.size).to eq(3)
+      expect(response[0]["results"].first["result"]).to eq("negative")
+      expect(response[1]["results"].first["result"]).to eq("positive")
+      expect(response[2]["results"].first["result"]).to eq("positive with riff")
+    end
+
+    it "groups by administrative level" do
+      expect_any_instance_of(Cdx::Api::Elasticsearch::IndexedField).to receive(:target_grouping_values) do |obj, grouping_def, values|
+        case values
+        when 0
+          [1]
+        when 1
+          [2, 5]
+        else
+          fail
+        end
+      end.exactly(2).times
+
+      index results: [result: "negative"], parent_locations: [1, 2, 3]
+      index results: [result: "positive"], parent_locations: [1, 2, 4]
+      index results: [result: "positive with riff"], parent_locations: [1, 5]
+
+      response = query(group_by: {admin_level: 1})
+      expect(response).to eq([
+        {"location"=>2, count: 2},
+        {"location"=>5, count: 1}
+      ])
+
+      response = query(group_by: {admin_level: 0})
+
+      expect(response).to eq([
+        {"location"=>1, count: 3}
+      ])
+    end
+  end
 end
