@@ -60,7 +60,7 @@ namespace :deploy do
     end
   end
 
-  before :restart, :migrate
+  # before :restart, :migrate
   after :publishing, :restart
 
   task :start do ; end
