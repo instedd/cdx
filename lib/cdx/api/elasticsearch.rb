@@ -19,6 +19,10 @@ module Cdx::Api
       yield Cdx::Api::Elasticsearch::Config
     end
 
+    def initialize_default_template(template_name)
+      Cdx::Api::Elasticsearch::Initializer.initialize_default_template(template_name)
+    end
+
     def query(params)
       Cdx::Api::Elasticsearch::EventFiltering.query(params)
     end
