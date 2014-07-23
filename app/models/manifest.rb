@@ -152,7 +152,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def self.default_definition
-    field_mapping = Cdx::Api.sensitive_fields.map do |sensitive_field|
+    field_mapping = Event.sensitive_fields.map do |sensitive_field|
       {
         target_field: sensitive_field,
         selector: sensitive_field,

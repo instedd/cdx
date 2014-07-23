@@ -7,7 +7,7 @@ module EventIndexing
     end
 
     def self.pii?(field)
-      Cdx::Api.sensitive_fields.include? field
+      Event.sensitive_fields.include? field
     end
 
     def parsed_fields

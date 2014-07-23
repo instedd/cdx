@@ -22,9 +22,14 @@ class Event < ActiveRecord::Base
     end
   end
 
+  def self.sensitive_fields
+    ["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code"]
+  end
+
   def update_with raw_data
     self.raw_data = raw_data
     @parsed_fields = nil
     save
   end
+
 end
