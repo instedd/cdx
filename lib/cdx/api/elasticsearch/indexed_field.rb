@@ -43,12 +43,17 @@ class Cdx::Api::Elasticsearch::IndexedField
 
         if grouping_def[:type] == "kind"
           grouping_def[:value] = values
+          grouping_def[:elements] = target_grouping_values(grouping_def, values)
         end
 
         grouping_def[:field] = @definition
         grouping_def
       end
     end
+  end
+
+  def target_grouping_values(grouping_def, values)
+    grouping_def[:reference_table][:name].classify.constantize.where(grouping_def[:reference_table][:query_target] => values).map &grouping_def[:reference_table][:value_field].to_sym
   end
 
   def group_definitions

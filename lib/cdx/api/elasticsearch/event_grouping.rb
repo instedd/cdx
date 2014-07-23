@@ -67,7 +67,7 @@ module Cdx::Api::Elasticsearch::EventGrouping
             {head[:name] => bucket[:key]}
           end
         when "kind"
-          elements = head[:reference_table][:name].classify.constantize.where(head[:reference_table][:query_target] => head[:value]).map &head[:reference_table][:value_field].to_sym
+          elements = head[:elements]
           buckets = count[:buckets].select do |bucket|
             elements.include? bucket[:key]
           end
