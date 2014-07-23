@@ -1,9 +1,3 @@
-sensitive_fields:
-  - patient_id
-  - patient_name
-  - patient_telephone_number
-  - patient_zip_code
-
 # Defaults:
 
 # 1) If a field is not listed here, it can't be used as fiter or group by.

@@ -27,10 +27,6 @@ module Cdx::Api
       Cdx::Api::Elasticsearch::EventFiltering.query(params)
     end
 
-    def sensitive_fields
-      Cdx::Api::Elasticsearch::Config.sensitive_fields
-    end
-
     def searchable_fields
       Cdx::Api::Elasticsearch::Config.searchable_fields
     end

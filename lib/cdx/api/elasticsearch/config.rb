@@ -18,10 +18,6 @@ module Cdx::Api::Elasticsearch::Config
     attr_accessor :index_name_pattern
     attr_accessor :log
 
-    def sensitive_fields
-      @sensitive_fields ||= api_fields[:sensitive_fields]
-    end
-
     def searchable_fields
       @searchable_fields ||= api_fields[:searchable_fields].map do |definition|
         Cdx::Api::Elasticsearch::IndexedField.from definition
