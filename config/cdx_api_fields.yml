@@ -93,3 +93,5 @@ searchable_fields:
   - name: test_type
     filter_parameter_definition:
       - type: match
+
+default_sort: created_at

@@ -85,17 +85,15 @@ module Cdx::Api::Elasticsearch::EventFiltering
     end
 
     def process_order params
-      if order = params["order_by"]
-        all_orders = order.split ","
-        all_orders.map do |order|
-          if order[0] == "-"
-            {order[1..-1] => "desc"}
-          else
-            {order => "asc"}
-          end
+      order = params["order_by"] || Cdx::Api.default_sort
+      
+      all_orders = order.split ","
+      all_orders.map do |order|
+        if order[0] == "-"
+          {order[1..-1] => "desc"}
+        else
+          {order => "asc"}
         end
-      else
-        [{created_at: "asc"}]
       end
     end
   end

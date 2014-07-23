@@ -27,5 +27,10 @@ module Cdx::Api::Elasticsearch::Config
         Cdx::Api::Elasticsearch::IndexedField.from definition
       end
     end
+
+    def default_sort
+      @default_sort ||= api_fields[:default_sort]
+    end
+
   end
 end

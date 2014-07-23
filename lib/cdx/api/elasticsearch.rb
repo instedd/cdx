@@ -35,6 +35,10 @@ module Cdx::Api
       Cdx::Api::Elasticsearch::Config.index_name_pattern
     end
 
+    def default_sort
+      Cdx::Api::Elasticsearch::Config.default_sort
+    end
+
     def search_elastic body
       if index_name_pattern
         client.search(index: index_name_pattern, body: body)
