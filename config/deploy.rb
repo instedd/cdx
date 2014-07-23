@@ -7,10 +7,8 @@ set :repo_url,  "git@bitbucket.org:instedd/cdp.git"
 set :rvm_ruby_version, '2.0.0-p353'
 set :rvm_type, :system
 set :rails_env, 'production'
-set :scm, :git
 set :deploy_via, :remote_cache
 set :user, 'ubuntu'
-set :deploy_to, "/u/apps/#{fetch(:application)}"
 
 set :default_env, { 'TERM' => ENV['TERM'] }
 
@@ -18,7 +16,7 @@ set :default_env, { 'TERM' => ENV['TERM'] }
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
 
 # Default deploy_to directory is /var/www/my_app
-# set :deploy_to, '/var/www/my_app'
+set :deploy_to, "/u/apps/#{fetch(:application)}"
 
 # Default value for :scm is :git
 # set :scm, :git
