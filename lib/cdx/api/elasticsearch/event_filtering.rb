@@ -86,8 +86,8 @@ module Cdx::Api::Elasticsearch::EventFiltering
 
     def process_order params
       order = params["order_by"] || Cdx::Api.default_sort
-      
-      all_orders = order.split ","
+
+      all_orders = order.to_s.split ","
       all_orders.map do |order|
         if order[0] == "-"
           {order[1..-1] => "desc"}

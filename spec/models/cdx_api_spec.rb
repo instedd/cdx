@@ -403,4 +403,74 @@ describe Cdx::Api do
       ])
     end
   end
+
+  describe "Ordering" do
+    it "should order by age" do
+      index results:[result: :positive], age: 20
+      index results:[result: :negative], age: 10
+
+      response = query(order_by: :age)
+
+      expect(response[0]["results"].first["result"]).to eq("negative")
+      expect(response[0]["age"]).to eq(10)
+      expect(response[1]["results"].first["result"]).to eq("positive")
+      expect(response[1]["age"]).to eq(20)
+    end
+
+    it "should order by age desc" do
+      index results:[result: :positive], age: 20
+      index results:[result: :negative], age: 10
+
+      response = query(order_by: "-age")
+
+      expect(response[0]["results"].first["result"]).to eq("positive")
+      expect(response[0]["age"]).to eq(20)
+      expect(response[1]["results"].first["result"]).to eq("negative")
+      expect(response[1]["age"]).to eq(10)
+    end
+
+    it "should order by age and gender" do
+      index results:[result: :positive], age: 20, gender: :male
+      index results:[result: :positive], age: 10, gender: :male
+      index results:[result: :negative], age: 20, gender: :female
+      index results:[result: :negative], age: 10, gender: :female
+
+      response = query(order_by: "age,gender")
+
+      expect(response[0]["results"].first["result"]).to eq("negative")
+      expect(response[0]["age"]).to eq(10)
+      expect(response[0]["gender"]).to eq("female")
+      expect(response[1]["results"].first["result"]).to eq("positive")
+      expect(response[1]["age"]).to eq(10)
+      expect(response[1]["gender"]).to eq("male")
+      expect(response[2]["results"].first["result"]).to eq("negative")
+      expect(response[2]["age"]).to eq(20)
+      expect(response[2]["gender"]).to eq("female")
+      expect(response[3]["results"].first["result"]).to eq("positive")
+      expect(response[3]["age"]).to eq(20)
+      expect(response[3]["gender"]).to eq("male")
+    end
+
+    it "should order by age and gender desc" do
+      index results:[result: :positive], age: 20, gender: :male
+      index results:[result: :positive], age: 10, gender: :male
+      index results:[result: :negative], age: 20, gender: :female
+      index results:[result: :negative], age: 10, gender: :female
+
+      response = query(order_by: "age,-gender")
+
+      expect(response[0]["results"].first["result"]).to eq("positive")
+      expect(response[0]["age"]).to eq(10)
+      expect(response[0]["gender"]).to eq("male")
+      expect(response[1]["results"].first["result"]).to eq("negative")
+      expect(response[1]["age"]).to eq(10)
+      expect(response[1]["gender"]).to eq("female")
+      expect(response[2]["results"].first["result"]).to eq("positive")
+      expect(response[2]["age"]).to eq(20)
+      expect(response[2]["gender"]).to eq("male")
+      expect(response[3]["results"].first["result"]).to eq("negative")
+      expect(response[3]["age"]).to eq(20)
+      expect(response[3]["gender"]).to eq("female")
+    end
+  end
 end
