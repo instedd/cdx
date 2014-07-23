@@ -348,6 +348,25 @@ describe ApiController do
     context "Filter" do
       let(:device2) {Device.make institution: institution}
 
+      it "should check for new events since a date" do
+        Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
+        post :create, data, device_uuid: device.secret_key
+        Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
+        post :create, (Oj.dump results:[result: :negative]), device_uuid: device.secret_key
+
+        response = get_updates(since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("negative")
+
+        response = get_updates(since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
+
+        response.first["results"].first["result"].should eq("positive")
+        response.last["results"].first["result"].should eq("negative")
+
+        get_updates(since: Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601).should be_empty
+      end
+
       # it "filters by an analyzed result" do
       #   post :create, (Oj.dump results:[condition: "MTB", result: :negative]), device_uuid: device.secret_key
       #   post :create, (Oj.dump results:[condition: "MTB", result: "Positive with RIFF resistance"]), device_uuid: device.secret_key
@@ -417,63 +436,6 @@ describe ApiController do
         response[0]["age"].should eq(10)
         response[1]["results"].first["result"].should eq("positive")
         response[1]["age"].should eq(20)
-      end
-
-      it "should order by age desc" do
-        post :create, (Oj.dump results:[result: :positive], age: 20), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], age: 10), device_uuid: device.secret_key
-
-        response = get_updates(order_by: "-age")
-
-        response[0]["results"].first["result"].should eq("positive")
-        response[0]["age"].should eq(20)
-        response[1]["results"].first["result"].should eq("negative")
-        response[1]["age"].should eq(10)
-      end
-
-      it "should order by age and gender" do
-        post :create, (Oj.dump results:[result: :positive], age: 20, gender: :male), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :positive], age: 10, gender: :male), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], age: 20, gender: :female), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], age: 10, gender: :female), device_uuid: device.secret_key
-
-        response = get_updates(order_by: "age,gender")
-
-
-        response[0]["results"].first["result"].should eq("negative")
-        response[0]["age"].should eq(10)
-        response[0]["gender"].should eq("female")
-        response[1]["results"].first["result"].should eq("positive")
-        response[1]["age"].should eq(10)
-        response[1]["gender"].should eq("male")
-        response[2]["results"].first["result"].should eq("negative")
-        response[2]["age"].should eq(20)
-        response[2]["gender"].should eq("female")
-        response[3]["results"].first["result"].should eq("positive")
-        response[3]["age"].should eq(20)
-        response[3]["gender"].should eq("male")
-      end
-
-      it "should order by age and gender desc" do
-        post :create, (Oj.dump results:[result: :positive], age: 20, gender: :male), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :positive], age: 10, gender: :male), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], age: 20, gender: :female), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], age: 10, gender: :female), device_uuid: device.secret_key
-
-        response = get_updates(order_by: "age,-gender")
-
-        response[0]["results"].first["result"].should eq("positive")
-        response[0]["age"].should eq(10)
-        response[0]["gender"].should eq("male")
-        response[1]["results"].first["result"].should eq("negative")
-        response[1]["age"].should eq(10)
-        response[1]["gender"].should eq("female")
-        response[2]["results"].first["result"].should eq("positive")
-        response[2]["age"].should eq(20)
-        response[2]["gender"].should eq("male")
-        response[3]["results"].first["result"].should eq("negative")
-        response[3]["age"].should eq(20)
-        response[3]["gender"].should eq("female")
       end
     end
 
