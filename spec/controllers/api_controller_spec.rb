@@ -20,7 +20,7 @@ describe ApiController do
   end
 
   def fresh_client_for index_name
-    client = ElasticsearchHelper.client
+    client = Cdx::Api.client
     client.indices.refresh index: index_name
     client
   end
