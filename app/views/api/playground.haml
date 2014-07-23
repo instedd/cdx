@@ -1,0 +1,44 @@
+%h3 CDP - Playground
+.row-fluid
+  .span4(style="border-right:1px solid black")
+    %h4 Submit event
+    %form#report_form(method="post")
+      %div
+        %label(for="device") Device
+        %select#device(name="device")
+          = @devices.map do |device|
+            %option{ value: device.secret_key}=device.name
+      %div
+        %label(for="data") Data
+        %textarea#data(name="data" style="width:300px;height:300px;font-family:monospace")
+          :preserve
+            {
+              "gender": "male",
+              "age": 20,
+              "assay_name": "GX4001",
+              "results": [
+                {
+                  "condition": "MTB",
+                  "result": "positive"
+                }
+              ]
+            }
+      %div
+        %input#create_button.btn(name="commit" type="submit" value="Create event")
+  .span8
+    %h4 Query results
+
+    %form#query_form(method="post")
+      .row-fluid
+        .span5
+          %label(for="query_string") Query string
+          %textarea#query_string(name="query_string" style="width:300px;height:50px;font-family:monospace") age=20
+        .span5
+          %label(for="post_body") Request Body
+          %textarea#post_body(name="post_body" style="width:300px;height:50px;font-family:monospace")
+      %div
+        %input#query_button.btn(name="commit" type="submit" value="Query")
+    #response_div(style="display:none")
+      %hr
+      %h5 Response:
+      %pre#response(style="height:300px;overflow:auto")
