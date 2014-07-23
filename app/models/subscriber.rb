@@ -20,8 +20,7 @@ class Subscriber < ActiveRecord::Base
     fields = self.fields
     filter = self.filter
     filter["since"] = last_run_at.iso8601
-    backend_url = "#{Settings.backend}/api/events?#{filter.to_query}"
-    events = JSON.parse RestClient.get backend_url
+    events = Cdx::Api.query filter
     now = Time.now
     events.each do |event|
       filtered_event = filter_event(event, fields)
