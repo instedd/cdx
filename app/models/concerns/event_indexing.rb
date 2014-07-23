@@ -3,8 +3,7 @@ module EventIndexing
 
   included do
     def save_in_elasticsearch
-      client = Elasticsearch::Client.new log: false
-      client.index index: device.institution.elasticsearch_index_name, type: 'event', body: indexed_fields.merge(event_id: self.event_id), id: "#{device.secret_key}_#{self.event_id}"
+      Cdx::Api.client.index index: device.institution.elasticsearch_index_name, type: 'event', body: indexed_fields.merge(event_id: self.event_id), id: "#{device.secret_key}_#{self.event_id}"
     end
 
     def self.pii?(field)
