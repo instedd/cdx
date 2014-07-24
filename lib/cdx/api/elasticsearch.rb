@@ -24,7 +24,7 @@ module Cdx::Api
     end
 
     def query(params)
-      Cdx::Api::Elasticsearch::EventFiltering.query(params)
+      Cdx::Api::Elasticsearch::Query.new(params).execute
     end
 
     def searchable_fields
