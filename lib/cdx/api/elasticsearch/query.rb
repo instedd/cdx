@@ -1,6 +1,8 @@
 class Cdx::Api::Elasticsearch::Query
-  def initialize(params)
+  
+  def initialize(params, api = Cdx::Api)
     @params = params
+    @api = api
   end
 
   def execute
@@ -15,14 +17,14 @@ class Cdx::Api::Elasticsearch::Query
     if params[:group_by]
       query_with_group_by(query, params[:group_by])
     else
-      Cdx::Api.search_elastic(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
+      @api.search_elastic(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
         hit["_source"]
       end
     end
   end
 
   def process_conditions params, conditions=[]
-    conditions = process_fields(Cdx::Api.searchable_fields, params, conditions)
+    conditions = process_fields(@api.searchable_fields, params, conditions)
     if conditions.empty?
       [{match_all: []}]
     else
@@ -94,7 +96,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_order params
-    order = params["order_by"] || Cdx::Api.default_sort
+    order = params["order_by"] || @api.default_sort
 
     all_orders = order.to_s.split ","
     all_orders.map do |order|
@@ -128,7 +130,7 @@ class Cdx::Api::Elasticsearch::Query
     aggregations.append non_nested_fields if non_nested_fields.present?
     aggregations.append nested_fields if nested_fields.present?
 
-    event = Cdx::Api.search_elastic aggregations.to_hash.merge(query: query)
+    event = @api.search_elastic aggregations.to_hash.merge(query: query)
     process_group_by_buckets(event["aggregations"].with_indifferent_access, (non_nested_fields + nested_fields), [], {}, 0)
   end
 
@@ -143,7 +145,7 @@ class Cdx::Api::Elasticsearch::Query
       value = nil
     end
     classified_field = nil
-    Cdx::Api.searchable_fields.detect do |field|
+    @api.searchable_fields.detect do |field|
       classified_field = field.grouping_detail_for name, value
     end
     classified_field

@@ -1,14 +1,20 @@
 class Cdx::Api::Elasticsearch::IndexedField
-  def self.from definition
-    new definition
+  def self.from(definition, document_format)
+    new(definition, document_format)
   end
 
-  def initialize definition
+  def initialize definition, document_format
     @definition = definition
+
+    # 'api_name' is used to match agains api queries
+    @definition[:api_name] = @definition[:name]
+
+    # 'name' is used to build the ES filters
+    @definition[:name] = document_format.indexed_field_name(@definition[:name])
 
     if nested?
       @definition[:sub_fields] = @definition[:sub_fields].map do |field|
-        self.class.from field
+        self.class.from(field, document_format)
       end
     else
       add_defaults
@@ -96,7 +102,7 @@ private
   end
 
   def default_name
-    @definition[:name].gsub(/_id$/, "")
+    @definition[:api_name].gsub(/_id$/, "")
   end
 
   def default_filter_type
