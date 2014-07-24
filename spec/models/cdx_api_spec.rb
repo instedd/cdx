@@ -6,7 +6,7 @@ describe Cdx::Api do
   end
 
   def query(query)
-    Cdx::Api.query(query.with_indifferent_access)
+    Cdx::Api::Elasticsearch::Query.new(query.with_indifferent_access).execute
   end
 
   def time(year, month, day, hour = 12, minute = 0, second = 0)
