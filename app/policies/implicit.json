@@ -3,8 +3,17 @@
     {
       "effect": "allow",
       "action": "*",
-      "resource": "*",
+      "resource": [
+        "cdxp:institution",
+        "cdxp:device",
+        "cdxp:laboratory"
+      ],
       "condition": {"is_owner" : true}
+    },
+    {
+      "effect": "allow",
+      "action": "cdxp:readLocation",
+      "resource": "cdxp:location"
     }
   ],
   "delegable": true

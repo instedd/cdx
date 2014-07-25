@@ -16,19 +16,19 @@ class Policy < ActiveRecord::Base
     CREATE_INSTITUTION = "#{PREFIX}:createInstitution"
     READ_INSTITUTION = "#{PREFIX}:readInstitution"
     UPDATE_INSTITUTION = "#{PREFIX}:updateInstitution"
-    DELETE_INSTITUTION = "#{PREFIX}:deleteInstitution"
+    DELETE_INSTITUTION = "#{PREFIX}:deleteInstitution" # This is not tested.
 
     CREATE_INSTITUTION_LABORATORY = "#{PREFIX}:createInstitutionLaboratory"
     READ_LABORATORY = "#{PREFIX}:readLaboratory"
-    UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory"
-    DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory"
+    UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory" # This is not tested.
+    DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory" # This is not tested.
 
-    REGISTER_INSTITUTION_DEVICE = "#{PREFIX}:registerInstitutionDevice"
-    READ_DEVICE = "#{PREFIX}:readDevice"
-    UPDATE_DEVICE = "#{PREFIX}:updateDevice"
-    DELETE_DEVICE = "#{PREFIX}:deleteDevice"
-    ASSIGN_DEVICE_LABORATORY = "#{PREFIX}:assignDeviceLaboratory"
-    REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey"
+    REGISTER_INSTITUTION_DEVICE = "#{PREFIX}:registerInstitutionDevice" # This is not tested.
+    READ_DEVICE = "#{PREFIX}:readDevice" # This is not tested.
+    UPDATE_DEVICE = "#{PREFIX}:updateDevice" # This is not tested.
+    DELETE_DEVICE = "#{PREFIX}:deleteDevice" # This is not tested.
+    ASSIGN_DEVICE_LABORATORY = "#{PREFIX}:assignDeviceLaboratory" # This is not tested.
+    REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey" # This is not tested.
   end
 
   ACTIONS = [

@@ -12,7 +12,7 @@
       "type" : "core"
     },
     {
-      "target_field": "age", 
+      "target_field": "age",
       "type": "core",
       "source" : { //age="24mo"
         "days_in" : ["month", {"slice": {"path" : "patient_information.age"}}]
@@ -29,13 +29,18 @@
       "selector" : "Test.assay_name",
       "type" : "core"
     },
-    {
+    { // this field is clearly not pii, but the catch is how to restrict it to the system user and not the patient name, the length could be a possibility
     	"target_field": "system_user",
       "selector" : "doctor_name",
-      "type": "custom"
+      "type": "custom",
+      "pii" : false,
+      "indexed" : false,
+      "valid_values": {
+        "length" : 6
+      }
     },
     {
-    	"target_field": "results[*].conditions",
+    	"target_field": "results[*].condition",
     	"type": "core",
       "multiple" : true,
       "source" : {
@@ -79,6 +84,7 @@
     	"target_field": "test_type",
       "selector" : "Test.test_type",
       "type": "custom",
+      "pii" : false,
       "valid_values" : {
         "options" : [0, 1]
       }
@@ -86,7 +92,8 @@
     {
     	"target_field": "temperature",
     	"type": "custom",
-      "selector" : "Test.test_type",
+      "selector" : "Test.temp",
+      "pii" : false,
       "valid_values": {
         "range" : {
           "min" : -20,
@@ -98,7 +105,8 @@
     {
     	"target_field": "percentage_of_confidence",
     	"type": "custom",
-      "selector" : "Test.test_type",
+      "selector" : "Test.percent",
+      "pii" : false,
       "valid_values": {
         "range" : {
           "min" : 0.001,
@@ -111,17 +119,10 @@
     	"target_field": "end_time",
     	"type": "custom",
       "selector" : "Test.end_time",
+      "pii" : "false",
       "valid_values": {
         "date" : "iso"
       },
-      "indexed" : false
-    },
-    {
-    	"target_field": "result_text",
-    	"type": "custom",
-      "selector" : "assay.result_text",
-      "data-type" : "string",
-      "pii" : false,
       "indexed" : true
     }
   ]

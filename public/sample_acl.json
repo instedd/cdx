@@ -1,142 +1,141 @@
 SuperAdmin:
 {
-  "granter" :  null,
-  "delegable": true,
-  "effect": "allow", // deny - default:allow
-  "action": "*", // not_action
-  "resouce": "*"
+  "statement": [
+    {
+      "effect": "allow",
+      "action": "*",
+      "resource": "*"
+    }
+  ],
+  "delegable": true
 }
 
 Everyone (implicit):
 {
-  "action": "*",
-  "resource": "*",
-  "condition": {"is_owner" : true},
-  "delegable" : true
-}
-
-Permission to add locations under location with id 7:
-{
-  "action": "adminLocations",
-  "resource": "cdxp:location/5/7/*"
-}
-
-Create a device in any lab of institution 1:
-{
-  "action": "createDevices",
-  "resource": [
-    "cdxp:laboratory/*",
-    "cdxp:institution/1"
-  ]
-}
-
-Admin for devices under location 7:
-{
-  "action": "adminDevices",
-  "resource": [
-    "cdxp:institution/1",
-    "cdxp:laboratory",
-    "cdxp:location/5/7/*"
-  ]
-}
-
-Admin for devices under location 7 (option B):
-{
-  "action": "*",
-  "resource": "cdxp:device",
-  "condition" : [
-    {"equals" : {"cdxp:institution" : [1]}},
-    {"like" : {"cdxp:location":["5/7/*"]}}
-  ]
-}
-
-Institution Admin under location 7:
-Statements: [
-  {
-    "action" : "*", //"adminAll" ?
-    "resource" : "cdxp:laboratory",
-    "condition" : [
-      {"equals" : {"cdxp:institution" : [1]}},
-      {"like" : {"cdxp:location":["5/7/*"]}}
-    ]
-  },
-  {
-    "action" : "*",
-    "resource" : "cdxp:device",
-    "condition": {"equals" : {"cdxp:institution" : [1]}}
-  },
-  {
-    "action" : [
-      "updateInstitution",
-      "deleteInstitution"
-    ],
-    "resource" : "cdxp:institution",
-    "condition": {"equals" : {"cdxp:institution" : [1]}}
-  }
-]
-
-Institution Admin under location 7 (option B):
-{
-  "action" : [
-    "listDevice",
-    "retrieveDevice",
-    "createDevice",
-    "updateDevice",
-    "deleteDevice",
-    "listLaboratory",
-    "retrieveLaboratory",
-    "createLaboratory",
-    "updateLaboratory",
-    "deleteLaboratory",
-    "updateInstitution",
-    "deleteInstitution"
+  "statement": [
+    {
+      "effect": "allow",
+      "action": "*",
+      "resource": "*",
+      "condition": {"is_owner" : true}
+    },
+    {
+      "effect": "allow",
+      "action": "cdxp:readLocation",
+      "resource": "cdxp:location"
+    }
   ],
-  "resource" : "*",
-  "condition": [
-    {"like" : {"cdxp:location":["5/7/*"]}},
-    {"equals" : {"cdxp:institution" : [1]}}
-  ]
+  "delegable": true
 }
 
 Institution Admin:
 {
-  "action" : "*",
-  "resource" : [
-    "cdxp:laboratory",
-    "cdxp:device",
+  "statement": [
+    {
+      "action" : [
+        "cdxp:readInstitution",
+        "cdxp:updateInstitution",
+        "cdxp:deleteInstitution",
+        "cdxp:createInstitutionLaboratory",
+        "cdxp:registerInstitutionDevice"
+      ],
+      "resource" : "cdxp:institution/1"
+    },
+    {
+      "action" : [
+        "cdxp:readLaboratory",
+        "cdxp:updateLaboratory",
+        "cdxp:deleteLaboratory",
+        "cdxp:assignDeviceLaboratory"
+      ],
+      "resource" : "cdxp:laboratory?institution=1"
+    },
+    {
+      "action" : [
+        "cdxp:readDevice",
+        "cdxp:updateDevice",
+        "cdxp:deleteDevice",
+        "cdxp:regenerateDeviceKey"
+      ],
+      "resource" : "cdxp:device?institution=1"
+    }
   ],
-  "condition" : {"equals" : {"cdxp:institution" : [1]}}
+  "delegable": true
 }
 
-Institution Admin (option B):
+Permission to admin locations under location with id 7:
 {
-  "action" : [
-    "listDevice",
-    "retrieveDevice",
-    "createDevice",
-    "updateDevice",
-    "deleteDevice",
-    "listLaboratory",
-    "retrieveLaboratory",
-    "createLaboratory",
-    "updateLaboratory",
-    "deleteLaboratory",
-    "updateInstitution",
-    "deleteInstitution"
+  "statement": [
+    {
+      "effect": "allow",
+      "action": [
+        "cdxp:addSublocation",
+        "cdxp:readLocation",
+        "cdxp:updateLocation",
+        "cdxp:deleteLocation"
+      ],
+      "resource": "cdxp:location/7"
+    }
   ],
-  "resource" : "*",
-  "condition" : {"equals" : {"cdxp:institution" : [1]}}
+  "delegable" : false
 }
+
+Admin for devices under location 7:
+{
+  "statement": [
+    {
+      "action" : [
+        "cdxp:registerInstitutionDevice"
+      ],
+      "resource" : "cdxp:institution/1"
+    },
+    {
+      "action" : [
+        "cdxp:assignDeviceLaboratory"
+      ],
+      "resource" : "cdxp:laboratory?institution=1&location=7"
+    },
+    {
+      "action" : [
+        "cdxp:readDevice",
+        "cdxp:updateDevice",
+        "cdxp:deleteDevice",
+        "cdxp:regenerateDeviceKey"
+      ],
+      "resource" : "cdxp:device?institution=1&location=7"
+    }
+  ],
+  "delegable": true
+}
+
+Institution Admin under location 7:
 
 Read Permission for tests grouped yearly by date ranges and location:
 {
-  "action" : [
-    "queryEvents"
+  "statement": [
+    {
+      "action" : [
+        "cdxp:queryEvents"
+      ],
+      "resource" : "cdxp:event",
+      "condition" : { "group_by" : [
+        { "age" : [ [0, 10], [11, 20] ] },
+        { "time_interval" : [{ "created_at" : "yearly" }]},
+        { "location_depth" : 3 }
+      ]}
+    }
+  ]
+}
+
+Read permission for tests of institution 1:
+{
+  "statement": [
+    {
+      "action" : [
+        "cdxp:queryEvents"
+      ],
+      "resource" : "cdxp:event?institution=1"
+    }
   ],
-  "resource" : "cdxp:api",
-  "condition" : { "group_by" : [
-    { "age" : [ [0, 10], [11, 20] ] },
-    { "time_interval" : [{ "created_at" : "yearly" }]},
-    { "location_depth" : 3 }
-  ]}
+  "delegable": true
 }
