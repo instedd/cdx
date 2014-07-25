@@ -184,6 +184,21 @@ describe Cdx::Api do
       ])
     end
 
+    it "groups by test type" do
+      index results:[result: :positive], test_type: "qc"
+      index results:[result: :positive], test_type: "specimen"
+      index results:[result: :positive], test_type: "qc"
+
+      response = query(group_by:"test_type").sort_by do |event|
+        event["test_type"]
+      end
+
+      expect(response).to eq([
+        {"test_type"=>"qc", count: 2},
+        {"test_type"=>"specimen", count: 1},  
+      ])
+    end
+
     it "groups by gender, assay_name and result" do
       index results:[result: :positive], gender: :male, assay_name: "a"
       index results:[result: :negative], gender: :male, assay_name: "a"

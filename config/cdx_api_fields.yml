@@ -87,5 +87,9 @@ searchable_fields:
   - name: test_type
     filter_parameter_definition:
       - type: match
+    valid_values:
+      options:
+        - specimen
+        - qc
 
 default_sort: created_at
