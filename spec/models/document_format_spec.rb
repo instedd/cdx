@@ -6,7 +6,14 @@ describe "formats of document stored" do
     api.client.delete_by_query index: "cdx_events", body: { query: { match_all: {} } } rescue nil
   end
 
-  let(:api)  { setup_api CustomDocumentFormat.new }
+  let(:custom_document_format) {
+    Cdx::Api::Elasticsearch::CustomDocumentFormat.new({
+      "assay_name" => "assay",
+      "device_uuid" => "device_id",
+      "created_at" => "start_time"
+    })
+  }
+  let(:api)  { setup_api custom_document_format }
 
   it "should retrieve documents in standard format even if they are stored with different names" do
     es_index start_time: time(2013, 1, 1), assay: "ASSAY001"
@@ -80,60 +87,25 @@ describe "formats of document stored" do
     ])
   end
 
-end
+  def setup_api(document_format)
+    api = Cdx::Api::Service.new
+    api.setup do |config|
+      config.index_name_pattern = "cdx_events"
+      config.document_format = document_format
+      # config.log = true
+    end
 
-def setup_api(document_format)
-  api = Cdx::Api::Service.new
-  api.setup do |config|
-    config.index_name_pattern = "cdx_events"
-    config.document_format = document_format
-    # config.log = true
+    api.client.indices.delete index: "cdx_events" rescue nil
+    api.initialize_default_template "cdx_events_template"
+    api
   end
 
-  api.client.indices.delete index: "cdx_events" rescue nil
-  api.initialize_default_template "cdx_events_template"
-  api
-end
-
-def es_index doc
-  api.client.index index: "cdx_events", type: "event", body: doc, refresh: true
-end
-
-def time(year, month, day, hour = 12, minute = 0, second = 0)
-  Time.utc(year, month, day, hour, minute, second).iso8601
-end
-
-class CustomDocumentFormat
-
-  attr_reader :mappings
-
-  def initialize
-    @mappings = {
-      "assay_name" => "assay",
-      "device_uuid" => "device_id",
-      "created_at" => "start_time"
-    }
-    @reverse_mappings = @mappings.invert
+  def es_index doc
+    api.client.index index: "cdx_events", type: "event", body: doc, refresh: true
   end
 
-  def default_sort
-    "start_time"
-  end
-
-  def indexed_field_name(cdp_field_name)
-    @mappings[cdp_field_name] || cdp_field_name
-  end
-
-  def cdp_field_name(indexed_name)
-    @reverse_mappings[indexed_name] || indexed_name
-  end
-
-  # receives an event in the format used in ES and
-  # translates it into a CDP compliant response
-  def translate_event(event)
-    Hash[event.map { |indexed_name, value|
-      [cdp_field_name(indexed_name), value]
-    }]
+  def time(year, month, day, hour = 12, minute = 0, second = 0)
+    Time.utc(year, month, day, hour, minute, second).iso8601
   end
 
 end
