@@ -44,6 +44,8 @@ searchable_fields:
     group_parameter_definition:
       - name: device
   - name: device_serial_number
+  - name: error_code
+    type: integer
   - name: laboratory_id
     type: integer
   - name: institution_id
