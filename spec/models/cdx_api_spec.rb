@@ -88,6 +88,15 @@ describe Cdx::Api do
       end
     end
 
+    it "filters by system_user" do
+      index system_user: "jdoe"
+      index system_user: "mmajor"
+
+      expect_one_result_with_field "system_user", "jdoe", system_user: "jdoe"
+      expect_one_result_with_field "system_user", "mmajor", system_user: "mmajor"
+      expect_no_results system_user: "ffoo"
+    end
+
     it "filters by min age" do
       index results: [result: :positive], age: 10
       index results: [result: :negative], age: 20
@@ -246,6 +255,22 @@ describe Cdx::Api do
         {"gender"=>"male", "result" => "negative", "assay_name" => "a", count: 1},
         {"gender"=>"male", "result" => "positive", "assay_name" => "a", count: 1},
         {"gender"=>"male", "result" => "positive", "assay_name" => "b", count: 1}
+      ])
+    end
+
+    it "groups by system user" do
+      index system_user: "jdoe"
+      index system_user: "jdoe"
+      index system_user: "mmajor"
+      index system_user: "mmajor"
+
+      response = query(group_by: "system_user").sort_by do |event|
+        event["system_user"]
+      end
+
+      expect(response).to eq([
+        {"system_user"=>"jdoe", count:2},
+        {"system_user"=>"mmajor", count:2},
       ])
     end
 

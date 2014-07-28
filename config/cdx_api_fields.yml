@@ -43,6 +43,7 @@ searchable_fields:
       - name: device
     group_parameter_definition:
       - name: device
+  - name: system_user
   - name: device_serial_number
   - name: error_code
     type: integer
