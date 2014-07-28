@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/cdx-api-elasticsearch/cdx-api-elasticsearch.git
-  revision: feefa727d61663afce0884f4c1406f52a6922ca6
+  revision: 300d3b25d57237a5718e4aa21ac6bc09bb5a5118
   branch: master
   specs:
     cdx-api-elasticsearch (0.0.1)
