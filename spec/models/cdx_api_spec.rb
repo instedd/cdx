@@ -146,6 +146,14 @@ describe Cdx::Api do
 
       expect_one_result "negative", test_type: :specimen
     end
+
+    it "filters by error code, one result expected" do
+      index error_code: 1
+      index error_code: 2
+
+      expect_one_result_with_field "error_code", 1, error_code: 1
+      expect_no_results error_code: 3
+    end
   end
 
   describe "Grouping" do
@@ -195,7 +203,7 @@ describe Cdx::Api do
 
       expect(response).to eq([
         {"test_type"=>"qc", count: 2},
-        {"test_type"=>"specimen", count: 1},  
+        {"test_type"=>"specimen", count: 1},
       ])
     end
 
@@ -415,6 +423,22 @@ describe Cdx::Api do
       expect(response).to eq([
         {"result"=>"negative", "condition" => "Flu", count: 1},
         {"result"=>"positive", "condition" => "MTB", count: 1}
+      ])
+    end
+
+    it "groups by error code" do
+      index error_code: 1
+      index error_code: 2
+      index error_code: 2
+      index error_code: 2
+
+      response = query(group_by: "error_code").sort_by do |event|
+        event["error_code"]
+      end
+
+      expect(response).to eq([
+        {"error_code" => 1, count: 1},
+        {"error_code" => 2, count: 3}
       ])
     end
   end
