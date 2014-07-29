@@ -61,7 +61,7 @@ searchable_fields:
         reference_table:
           name: locations
           value_field: id
-          query_target: depth
+          query_target: admin_level
   - name: age
     type: integer
     filter_parameter_definition:

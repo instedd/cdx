@@ -30,5 +30,4 @@ class Cdx::Api::Elasticsearch::CustomDocumentFormat
     @reverse_mappings[indexed_name] || indexed_name
   end
 
-
 end
