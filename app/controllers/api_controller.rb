@@ -14,7 +14,7 @@ class ApiController < ApplicationController
 
   def events
     body = Oj.load(request.body.read) || {}
-    result = Cdx::Api.query(params.merge(body))
+    result = Cdx::Api::Elasticsearch::Query.new(params.merge(body)).execute
     render_json result
   end
 
