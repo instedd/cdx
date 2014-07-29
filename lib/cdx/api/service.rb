@@ -8,13 +8,6 @@ class Cdx::Api::Service
     Cdx::Api::Elasticsearch::Initializer.new(self).initialize_default_template(template_name)
   end
 
-  def query(params)
-    params = params.with_indifferent_access
-    format = config.document_format
-    response = Cdx::Api::Elasticsearch::Query.new(params, self).execute
-    response.map { |event| format.translate_event(event) }
-  end
-
   def searchable_fields
     config.searchable_fields
   end
@@ -25,6 +18,11 @@ class Cdx::Api::Service
 
   def default_sort
     config.document_format.default_sort
+  end
+
+  def translate(response)
+    format = config.document_format
+    response.map { |event| format.translate_event(event) }
   end
 
   def search_elastic body

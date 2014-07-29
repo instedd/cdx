@@ -6,7 +6,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def execute
-    query(@params)
+    @api.translate query(@params)
   end
 
   protected
