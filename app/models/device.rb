@@ -29,6 +29,18 @@ class Device < ActiveRecord::Base
     result
   end
 
+  def filter_by_query(query)
+    if institution = query["institution"]
+      if institution_id == institution
+        self
+      else
+        nil
+      end
+    else
+      self
+    end
+  end
+
   def to_s
     name
   end

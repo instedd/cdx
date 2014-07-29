@@ -30,9 +30,8 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_resource(resource, action)
-    result = Policy.check_all(action, resource, @current_user_policies, current_user)
-    if result
-      result
+    if Policy.can?(action, resource, current_user, @current_user_policies)
+      Policy.authorize(action, resource, current_user, @current_user_policies)
     else
       head :forbidden
       nil

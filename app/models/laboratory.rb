@@ -19,11 +19,23 @@ class Laboratory < ActiveRecord::Base
   end
 
   def self.filter_by_query(query)
-    result = self
     if institution = query["institution"]
-      result = result.where(institution_id: institution)
+      where(institution_id: institution)
+    else
+      self
     end
-    result
+  end
+
+  def filter_by_query(query)
+    if institution = query["institution"]
+      if institution_id == institution
+        self
+      else
+        nil
+      end
+    else
+      self
+    end
   end
 
   def to_s

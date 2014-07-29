@@ -11,6 +11,11 @@ describe Resource do
 
   it "should return the resource for a given class matcher" do
     Resource.find("#{PREFIX}:institution/*").should be(Institution)
+    Resource.find("#{PREFIX}:institution").should be(Institution)
+  end
+
+  it "should return nil if the resource is invalid" do
+    Resource.find("foo").should be(nil)
   end
 
   it "should return all the resources if matcher is '*'" do

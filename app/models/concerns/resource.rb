@@ -18,27 +18,36 @@ module Resource
         return result
       end
     end
+    return nil
   end
 
   included do
-    def self.find_resource(resource)
-      match_resource(resource) do |match|
+    def self.find_resource(resource_filter)
+      match_resource(resource_filter) do |match|
         find match
       end
     end
 
-    def self.filter_by_resource(resource)
-      match_resource(resource) do |match|
+    def self.filter_by_resource(resource_filter)
+      match_resource(resource_filter) do |match|
         where(id: match)
       end
     end
 
-    def filter_by_resource(resource)
-      self.class.match_resource(resource) do |match|
+    def filter_by_resource(resource_filter)
+      self.class.match_resource(resource_filter, self) do |match|
         if match.to_i == id
           return self
         end
       end
+    end
+
+    def filter_by_owner(user)
+      self
+    end
+
+    def self.filter_by_owner(user)
+      self
     end
 
     def self.filter_by_query(query)
@@ -49,8 +58,8 @@ module Resource
       self
     end
 
-    def self.match_resource(resource)
-      unless resource =~ resource_matcher
+    def self.match_resource(resource_filter, resource=self)
+      unless resource_filter =~ resource_matcher
         return nil
       end
 
@@ -59,13 +68,13 @@ module Resource
       if match == "*" || match.nil?
         if query
           query = Rack::Utils.parse_nested_query(query)
-          return filter_by_query(query)
+          resource.filter_by_query(query)
         else
-          return self
+          resource
         end
+      else
+        yield match, query
       end
-
-      yield match, query
     end
 
     def self.resource_name_prefix

@@ -134,8 +134,8 @@ describe Policy do
     resource = institution
     policies = [policy]
 
-    result = Policy.check_all action, resource, policies, user3
-    result.should be_nil
+    result = Policy.cannot? action, resource, user3, policies
+    result.should be_true
   end
 
   it "disallows policy creation if self-granted" do
@@ -262,7 +262,7 @@ describe Policy do
 
     grant user, user2, "#{Laboratory.resource_name}?institution=#{institution2.id}", READ_LABORATORY
 
-    assert_cannot user2, Laboratory, READ_LABORATORY
+    assert_cannot user2, laboratory, READ_LABORATORY
   end
 
   def create_user_and_institution
@@ -272,7 +272,11 @@ describe Policy do
   end
 
   def assert_can(user, resource, action, expected_result = [resource])
-    result = Policy.check_all action, resource, user.policies, user
+    result = Policy.can? action, resource, user
+
+    result.should be_true
+
+    result = Policy.authorize action, resource, user
     result = result.sort_by &:id
     expected_result = expected_result.sort_by &:id
 
@@ -280,8 +284,8 @@ describe Policy do
   end
 
   def assert_cannot(user, resource, action)
-    result = Policy.check_all action, resource, user.policies, user
-    result.should be_nil
+    result = Policy.cannot? action, resource, user
+    result.should be_true
   end
 
   def grant(granter, user, resource, action, delegable = true)

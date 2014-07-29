@@ -49,11 +49,23 @@ class Policy < ActiveRecord::Base
     predefined_policy "implicit"
   end
 
-  def self.check_all(action, resource, policies, user)
-    check_all_recursive action, resource, policies, user
+  def self.can? action, resource, user, policies=nil
+    authorize(action, resource, user, (policies || user.policies)) != nil
   end
 
-  def self.check_all_recursive(action, resource, policies, user, users_so_far = Set.new)
+  def self.cannot? action, resource, user, policies=nil
+    !can? action, resource, user, (policies || user.policies)
+  end
+
+  def self.can_delegate?(action, resource, granter)
+    self.can? action, resource, granter, granter.policies.delegable
+  end
+
+  def self.authorize action, resource, user, policies=nil
+    check_all action, resource, (policies || user.policies), user
+  end
+
+  def self.check_all(action, resource, policies, user, users_so_far = Set.new)
     allowed = []
     denied = []
 
@@ -101,7 +113,7 @@ class Policy < ActiveRecord::Base
     # but only if the user is not the same as the granter (like implicit and superadmin policies)
     if !implicit? && !users_so_far.include?(granter)
       users_so_far.add granter
-      granter_result = Policy.check_all_recursive action, resource, granter.policies.delegable, granter, users_so_far
+      granter_result = Policy.check_all action, resource, granter.policies.delegable, granter, users_so_far
       users_so_far.delete granter
 
       return nil unless granter_result
@@ -133,8 +145,7 @@ class Policy < ActiveRecord::Base
           if match
             resources = Array(match)
             resources.each do |resource|
-              passed = Policy.check_all(action, resource, granter.policies.delegable, granter)
-              unless passed
+              unless self.class.can_delegate?(action, resource, granter)
                 return errors.add :owner, "can't delegate permission over #{resource_matcher}"
               end
             end
@@ -175,11 +186,11 @@ class Policy < ActiveRecord::Base
         return errors.add :definition, "is missing action in statemenet"
       end
 
-      resources = statement["resource"]
-      if resources
-        Array(resources).each do |resource|
-          found_resource = Resource.all.any? do |klass|
-            klass.filter_by_resource(resource)
+      resource_statements = statement["resource"]
+      if resource_statements
+        Array(resource_statements).each do |resource_statement|
+          found_resource = Resource.all.any? do |resource|
+            resource.filter_by_resource(resource_statement)
           end
           unless found_resource
             return errors.add :definition, "has an unknown resource: `#{resource}`"
@@ -220,8 +231,14 @@ class Policy < ActiveRecord::Base
         return resource
       end
 
-      new_resource = resource.filter_by_resource(resource_filter)
-      if new_resource
+      new_resource = if resource.is_a? ActiveRecord::Relation
+        resource.to_a.map do |resource|
+          resource.filter_by_resource(resource_filter)
+        end.delete_if &:nil?
+      else
+        resource.filter_by_resource(resource_filter)
+      end
+      if new_resource.present?
         return new_resource
       end
     end
@@ -233,7 +250,13 @@ class Policy < ActiveRecord::Base
     condition.each do |key, value|
       case key
       when "is_owner"
-        resource = resource.filter_by_owner(user)
+        resource = if resource.is_a? Array
+          resource.map do |resource|
+            resource.filter_by_owner(user) if resource
+          end
+        else
+          resource.filter_by_owner(user)
+        end
       end
     end
 

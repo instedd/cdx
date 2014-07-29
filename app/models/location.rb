@@ -9,14 +9,6 @@ class Location < ActiveRecord::Base
   validates_presence_of :admin_level, :parent
   validate :validate_admin_level_hierarchy
 
-  def self.filter_by_owner(user)
-    self
-  end
-
-  def filter_by_owner(user)
-    self
-  end
-
   def common_root_with(locations)
     locations.inject self do |location, root|
       if root.is_or_is_ancestor_of? location
