@@ -16,10 +16,6 @@ class Cdx::Api::Elasticsearch::CustomDocumentFormat
     @mappings[cdp_field_name] || cdp_field_name
   end
 
-  def cdp_field_name(indexed_name)
-    @reverse_mappings[indexed_name] || indexed_name
-  end
-
   # receives an event in the format used in ES and
   # translates it into a CDP compliant response
   def translate_event(event)
@@ -27,5 +23,12 @@ class Cdx::Api::Elasticsearch::CustomDocumentFormat
       [cdp_field_name(indexed_name), value]
     }]
   end
+
+  private
+
+  def cdp_field_name(indexed_name)
+    @reverse_mappings[indexed_name] || indexed_name
+  end
+
 
 end
