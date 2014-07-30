@@ -91,6 +91,68 @@ With the exception of _since_, _until_, _min_age_ and _max_age_, all the fields 
 
 `/events?gender=male,female`
 
+# Unknown values
+
+If a field value is not specified, the keyword used to represent it in filters must be _'nil'_.
+
+If the value is specified, but impossible to determine at the moment of the test, the keyword used to represent it is _'unknown'_
+
+`/events?gender=male,unknown,nil`
+
+The response must include all the unknown values, buy skip the nil ones.
+
+When grouping, a bucket must be include for all elements that fall into the unknown or nil buckets.
+
+`/events?group_by=gender,result`
+
+Assuming gender values of male, female, unknown and nil and result values of positive and negative, an expected result could be:
+
+`{
+  "total_count" : 55,
+  "events" : [
+    {
+      "gender" : "male",
+      "result" : "positive",
+      "count" : 23
+    },
+    {
+      "gender" : "male",
+      "result" : "negative",
+      "count" : 10
+    },
+    {
+      "gender" : "female",
+      "result" : "positive",
+      "count" : 2
+    },
+    {
+      "gender" : "female",
+      "result" : "negative",
+      "count" : 30
+    },
+    {
+      "gender" : "unknown",
+      "result" : "positive",
+      "count" : 3
+    },
+    {
+      "gender" : "unknown",
+      "result" : "negative",
+      "count" : 1
+    },
+    {
+      "gender" : "nil",
+      "result" : "positive",
+      "count" : 0
+    },
+    {
+      "gender" : "nil",
+      "result" : "negative",
+      "count" : 4
+    }
+  ]
+}`
+
 # Sorting
 
 * `order_by` - orders by a given field.
