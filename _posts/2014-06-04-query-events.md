@@ -75,6 +75,10 @@ The data returned will be sorted by default by the event creation date.
 
 `/events?error_code=A01`
 
+* `system_user` - filter events for the user that executed the test.
+
+`/events?system_user=jdoe`
+
 * `test_type` - filter events for the type of the test: qc / specimen.
 
 `/events?test_type=qc`
@@ -114,6 +118,7 @@ The possible groupings are:
 * gender
 * result
 * error_code
+* system_user
 * test_type
 * assay
 * `year() | month() | week() | day()` - groups the given date field by the time interval specified.
