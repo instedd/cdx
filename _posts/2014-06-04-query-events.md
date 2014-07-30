@@ -83,6 +83,14 @@ The data returned will be sorted by default by the event creation date.
 
 `/events?test_type=qc`
 
+## Multiple Values
+
+With the exception of _since_, _until_, _min_age_ and _max_age_, all the fields can accept multiple values using a comma as a separator:
+
+`/events?error_code=A01,A02`
+
+`/events?gender=male,female`
+
 # Sorting
 
 * `order_by` - orders by a given field.
