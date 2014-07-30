@@ -75,6 +75,10 @@ The data returned will be sorted by default by the event creation date.
 
 `/events?error_code=A01`
 
+* `test_type` - filter events for the type of the test: qc / specimen.
+
+`/events?test_type=qc`
+
 # Sorting
 
 * `order_by` - orders by a given field.
@@ -110,6 +114,7 @@ The possible groupings are:
 * gender
 * result
 * error_code
+* test_type
 * assay
 * `year() | month() | week() | day()` - groups the given date field by the time interval specified.
 
