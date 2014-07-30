@@ -1,13 +1,4 @@
 GIT
-  remote: git://github.com/cdx-api-elasticsearch/cdx-api-elasticsearch.git
-  revision: aca948e9d7a941c0606dd3ef7acabec6c4da81b6
-  branch: master
-  specs:
-    cdx-api-elasticsearch (0.0.1)
-      activesupport
-      elasticsearch
-
-GIT
   remote: https://bitbucket.org/instedd/alto_guisso.git
   revision: 23d3c209edf172a8ef8d0e1771ffaf6085ffbe8d
   branch: master
@@ -18,6 +9,15 @@ GIT
       rack-oauth2
       rails (>= 3.0)
       ruby-openid
+
+GIT
+  remote: https://bitbucket.org/instedd/cdx-api-elasticsearch.git
+  revision: aca948e9d7a941c0606dd3ef7acabec6c4da81b6
+  branch: master
+  specs:
+    cdx-api-elasticsearch (0.0.1)
+      activesupport
+      elasticsearch
 
 GIT
   remote: https://bitbucket.org/instedd/instedd-bootstrap.git
