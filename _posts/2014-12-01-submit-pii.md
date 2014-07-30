@@ -20,13 +20,6 @@ Allows submission of Personal Identifiable Information into a previously submitt
 
 ```/events/c4c52784-bfd5-717d-7a91-614acd972d5e/pii```
 
-```{
-  "patient_id" : 2,
-  "patient_name" : "Lorem Ipsum",
-  "patient_telephone_number" : "12345678",
-  "patient_zip_code" : "1234"
-}```
-
 # Response
 
 **If it succeeds**, it returns the [uploaded PII](#/pii).
