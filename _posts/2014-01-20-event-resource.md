@@ -21,6 +21,7 @@ The Event resource contains the fields related to the event reported by the devi
   "location_id" : 5,
   "parent_locations" : [1, 2, 3],
   "type" : "QC/Specimen",
+  "error_code" : "1234",
   "results" : [
     "condition" : "MTB",
     "result" : "positive",

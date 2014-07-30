@@ -71,6 +71,10 @@ The data returned will be sorted by default by the event creation date.
 
 `/events?uuid=c4c52784-bfd5-717d-7a91-614acd972d5e`
 
+* `error_code` - filter events for a particular error code.
+
+`/events?error_code=A01`
+
 # Sorting
 
 * `order_by` - orders by a given field.
@@ -93,19 +97,27 @@ There are two ways to accomplish data aggregation:
 
 ## Query Parameter
 
-In the query parameter the options are limited to indicate a couple of fields to group by
+In the query parameter the options are limited to indicate the fields to group by.
 
-`/events?group_by=gender,result`
+`/events?group_by=laboratory,gender,result`
 
-* `year() | month() | week() | day()` - groups the given date field by the time interval specified. This parenthesis should be escaped when used in the query string.
+The possible groupings are:
+
+* location
+* institution
+* device
+* laboratory
+* gender
+* result
+* error_code
+* assay
+* `year() | month() | week() | day()` - groups the given date field by the time interval specified.
 
 `/events?group_by=year(created_at)`
 
-`/events?group_by=year%29created_at%29`
-
 ## JSON in request body
 
-The JSON allows more complex aggregations, such as age ranges.
+The JSON allows more complex aggregations, such as:
 
 * `age` - groups and filters by age ranges. The events are skipped if they are outside those ranges.
 
@@ -119,17 +131,19 @@ The JSON allows more complex aggregations, such as age ranges.
 * `admin_level` - groups by administrative level, up to the third level in this case, which is a state level.
 
 `{
-  “group_by” : [
-    { “admin_level" : 4 },
+  "group_by" : [
+    { "admin_level" : 4 },
     ...
   ]
 }`
 
-* `year() | month() | week() | day()` - groups the given date field by the time interval specified.
+* All the groupigs of the query string are also available when querying through the request body.
 
 `{
-  “group_by” : [
-    “year(created_at)",
+  "group_by" : [
+    "age",
+    "year(created_at)",
+    { "admin_level" : 4 },
     ...
   ]
 }`
