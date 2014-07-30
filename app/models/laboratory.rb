@@ -10,11 +10,15 @@ class Laboratory < ActiveRecord::Base
   validates_presence_of :institution
   validates_presence_of :name
 
-  def self.filter_by_owner(user)
-    joins(:institution).where(institutions: {user_id: user.id})
+  def self.filter_by_owner(user, check_conditions)
+    if check_conditions
+      joins(:institution).where(institutions: {user_id: user.id})
+    else
+      self
+    end
   end
 
-  def filter_by_owner(user)
+  def filter_by_owner(user, check_conditions)
     institution.user_id == user.id ? self : nil
   end
 

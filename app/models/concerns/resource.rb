@@ -42,11 +42,11 @@ module Resource
       end
     end
 
-    def filter_by_owner(user)
+    def filter_by_owner(user, check_conditions)
       self
     end
 
-    def self.filter_by_owner(user)
+    def self.filter_by_owner(user, check_conditions)
       self
     end
 

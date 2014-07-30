@@ -4,11 +4,15 @@ class Institution < ActiveRecord::Base
   has_many :laboratories, dependent: :destroy
   has_many :devices, dependent: :destroy
 
-  def self.filter_by_owner(user)
-    where(user_id: user.id)
+  def self.filter_by_owner(user, check_conditions)
+    if check_conditions
+      where(user_id: user.id)
+    else
+      self
+    end
   end
 
-  def filter_by_owner(user)
+  def filter_by_owner(user, check_conditions)
     user_id == user.id ? self : nil
   end
 

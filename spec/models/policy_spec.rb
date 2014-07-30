@@ -3,16 +3,17 @@ require 'spec_helper'
 include Policy::Actions
 
 describe Policy do
-  let!(:user) { User.make }
-  let!(:institution) { user.create Institution.make_unsaved }
+  let(:user) { User.make }
+  let(:institution) { user.create Institution.make_unsaved }
 
   it "doesn't allow a user to read his institutions without the implicit policy" do
     user.policies.destroy_all
+    user.reload
 
     assert_cannot user, Institution, READ_INSTITUTION
   end
 
-  it "allows a user to read his institutions" do
+  it "allows a user to read only his institutions" do
     user2, institution2 = create_user_and_institution
 
     assert_can user, Institution, READ_INSTITUTION, [institution]
@@ -29,9 +30,10 @@ describe Policy do
   end
 
   it "allows a user to read an institution" do
+    user.policies.destroy_all
     user2, institution2 = create_user_and_institution
-
     grant user2, user, institution2, [READ_INSTITUTION, UPDATE_INSTITUTION]
+    user.reload
 
     assert_can user, institution2, READ_INSTITUTION
   end
@@ -92,6 +94,20 @@ describe Policy do
     assert_can user2, Institution, READ_INSTITUTION, [institution]
   end
 
+  it "allows to read institutions even if the granter doesn't have institutions created" do
+    user.policies.destroy_all
+    user2 = User.make
+    create_user_and_institution
+    grant user2, user, Institution, READ_INSTITUTION
+    user.reload
+
+    can = Policy.can? READ_INSTITUTION, Institution, user
+    institutions = Policy.authorize READ_INSTITUTION, Institution, user
+
+    can.should be_true
+    institutions.should eq([])
+  end
+
   it "disallows delegable" do
     user2 = User.make
     user3 = User.make
@@ -134,8 +150,8 @@ describe Policy do
     resource = institution
     policies = [policy]
 
-    result = Policy.cannot? action, resource, user3, policies
-    result.should be_true
+    result = Policy.can? action, resource, user3, policies
+    result.should be_false
   end
 
   it "disallows policy creation if self-granted" do
@@ -263,6 +279,15 @@ describe Policy do
     grant user, user2, "#{Laboratory.resource_name}?institution=#{institution2.id}", READ_LABORATORY
 
     assert_cannot user2, laboratory, READ_LABORATORY
+  end
+
+  it "allows a user to read institutions even if there are no institutions on the system" do
+    user2 = User.make
+    can = Policy.can? READ_INSTITUTION, Institution, user2
+    institutions = Policy.authorize READ_INSTITUTION, Institution, user2
+
+    can.should be_true
+    institutions.should eq([])
   end
 
   def create_user_and_institution

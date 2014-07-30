@@ -50,78 +50,19 @@ class Policy < ActiveRecord::Base
   end
 
   def self.can? action, resource, user, policies=nil
-    authorize(action, resource, user, (policies || user.policies)) != nil
+    check_all(action, resource, user, (policies || user.policies), Set.new, false).present?
   end
 
-  def self.cannot? action, resource, user, policies=nil
-    !can? action, resource, user, (policies || user.policies)
+  def self.cannot? action, resource, user
+    !can? action, resource, user
   end
 
-  def self.can_delegate?(action, resource, granter)
+  def self.can_delegate? action, resource, granter
     self.can? action, resource, granter, granter.policies.delegable
   end
 
-  def self.authorize action, resource, user, policies=nil
-    check_all action, resource, (policies || user.policies), user
-  end
-
-  def self.check_all(action, resource, policies, user, users_so_far = Set.new)
-    allowed = []
-    denied = []
-
-    policies.each do |policy|
-      policy.definition["statement"].each do |statement|
-        match = policy.check(statement, action, resource, user, users_so_far)
-        if match
-          if statement["effect"] == "allow"
-            allowed << match
-          else
-            denied << match
-          end
-        end
-      end
-    end
-
-    classes = denied.select { |klass| klass.is_a?(Class) }
-    allowed -= classes
-    denied -= classes
-
-    [allowed, denied].each do |resources|
-      resources.map! do |resource|
-        resource.is_a?(Class) ? resource.all : resource
-      end
-      resources.flatten!
-      resources.uniq!
-    end
-
-    result = allowed - denied
-    result.presence
-  end
-
-  def check(statement, action, resource, user, users_so_far)
-    return nil unless action_matches?(action, statement["action"])
-
-    resource = apply_resource_filters(resource, statement["resource"])
-    return nil unless resource
-
-    if (condition = statement["condition"])
-      resource = apply_condition(resource, condition, user)
-      return nil unless resource
-    end
-
-    # Check that the granter's policies allow the action on the resource,
-    # but only if the user is not the same as the granter (like implicit and superadmin policies)
-    if !implicit? && !users_so_far.include?(granter)
-      users_so_far.add granter
-      granter_result = Policy.check_all action, resource, granter.policies.delegable, granter, users_so_far
-      users_so_far.delete granter
-
-      return nil unless granter_result
-
-      resource = granter_result
-    end
-
-    resource
+  def self.authorize action, resource, user, policies=nil, users_so_far = Set.new
+    check_all action, resource, user, (policies || user.policies), users_so_far, true
   end
 
   def implicit?
@@ -132,7 +73,87 @@ class Policy < ActiveRecord::Base
     self.user_id == self.granter_id
   end
 
+  def check action, resource, user, check_conditions=false, users_so_far=Set.new
+    allowed = []
+    denied = []
+    definition["statement"].each do |statement|
+      match = check_statement(statement, action, resource, user, users_so_far, check_conditions)
+      if match
+        if statement["effect"] == "allow"
+          allowed << match
+        else
+          denied << match
+        end
+      end
+    end
+    return allowed, denied
+  end
+
+  def self.check_all action, resource, user, policies, users_so_far, check_conditions
+    allowed = []
+    denied = []
+
+    policies.each do |policy|
+      match_allowed, match_denied = policy.check(action, resource, user, check_conditions, users_so_far)
+      allowed += match_allowed
+      denied += match_denied
+    end
+
+    classes = denied.select { |klass| klass.is_a?(Class) }
+    allowed -= classes
+    denied -= classes
+
+    load_results allowed, denied, !check_conditions
+  end
+
   private
+
+  def check_statement statement, action, resource, user, users_so_far, check_conditions
+    return nil unless action_matches?(action, statement["action"])
+
+    resource = apply_resource_filters(resource, statement["resource"])
+    return nil unless resource
+
+    if (condition = statement["condition"])
+      resource = apply_condition(resource, condition, user, check_conditions)
+      return nil unless resource
+    end
+
+    # Check that the granter's policies allow the action on the resource,
+    # but only if the user is not the same as the granter (like implicit and superadmin policies)
+    if !implicit? && !users_so_far.include?(granter)
+      users_so_far.add granter
+      granter_result = Policy.check_all action, resource, granter, granter.policies.delegable, users_so_far, check_conditions
+      users_so_far.delete granter
+
+      return nil unless granter_result
+
+      resource = granter_result
+    end
+
+    resource
+  end
+
+  def self.load_results allowed, denied, keep_classes_if_empty=false
+    [allowed, denied].each do |resources|
+      resources.map! do |resource|
+        if resource.is_a?(Class)
+          all = resource.all
+          if keep_classes_if_empty && all.empty?
+            resource
+          else
+            all
+          end
+        else
+          resource
+        end
+      end
+      resources.flatten!
+      resources.uniq!
+    end
+
+    allowed - denied
+  end
 
   def validate_owner_permissions
     return errors.add :owner, "permission can't be self granted" if self_granted?
@@ -217,14 +238,14 @@ class Policy < ActiveRecord::Base
     true
   end
 
-  def action_matches?(action, action_filters)
+  def action_matches? action, action_filters
     action_filters = Array(action_filters)
     action_filters.any? do |action_filter|
       action_filter == "*" || action_filter == action
     end
   end
 
-  def apply_resource_filters(resource, resource_filters)
+  def apply_resource_filters resource, resource_filters
     resource_filters = Array(resource_filters)
     resource_filters.each do |resource_filter|
       if resource_filter == "*"
@@ -246,16 +267,16 @@ class Policy < ActiveRecord::Base
     nil
   end
 
-  def apply_condition(resource, condition, user)
+  def apply_condition resource, condition, user, check_conditions
     condition.each do |key, value|
       case key
       when "is_owner"
         resource = if resource.is_a? Array
           resource.map do |resource|
-            resource.filter_by_owner(user) if resource
+            resource.filter_by_owner(user, check_conditions)
           end
         else
-          resource.filter_by_owner(user)
+          resource.filter_by_owner(user, check_conditions)
         end
       end
     end
@@ -263,7 +284,7 @@ class Policy < ActiveRecord::Base
     resource
   end
 
-  def self.predefined_policy(name)
+  def self.predefined_policy name
     policy = Policy.new
     policy.name = name
     policy.definition = JSON.load File.read("#{Rails.root}/app/policies/#{name}.json")
