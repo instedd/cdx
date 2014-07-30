@@ -19,8 +19,7 @@ gem 'rack-oauth2', git: "https://github.com/manastech/rack-oauth2.git", branch: 
 gem 'alto_guisso', git: "https://bitbucket.org/instedd/alto_guisso.git", branch: 'master'
 gem 'rails_config'
 gem 'rest-client'
-# gem 'cdx-api-elasticsearch', git: "https://bitbucket.org/instedd/cdx-api-elasticsearch.git", branch: 'master'
-gem 'cdx-api-elasticsearch', :github => 'cdx-api-elasticsearch/cdx-api-elasticsearch', :branch => 'master'
+gem 'cdx-api-elasticsearch', git: "https://bitbucket.org/instedd/cdx-api-elasticsearch.git", branch: 'master'
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
