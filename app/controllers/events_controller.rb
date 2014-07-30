@@ -8,7 +8,7 @@ class EventsController < ApplicationController
     query["laboratory"] = params["laboratory"] if params["laboratory"].present?
     query["condition"] = params["condition"] if params["condition"].present?
 
-    @events = Cdx::Api::Elasticsearch::Query.new query
+    @events = Cdx::Api::Elasticsearch::Query.new(query).execute
     @institutions = indexed_model @events, Institution, "institution_id"
     @laboratories = indexed_model @events, Laboratory, "laboratory_id"
     @devices = indexed_model @events, Device, "device_uuid", "secret_key"
