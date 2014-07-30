@@ -166,6 +166,25 @@ Assuming gender values of male, female, unknown and nil and result values of pos
 * `order_by=-age` - orders descending by age.
 * `order_by=age,-gender` - orders ascending by age and descending by gender.
 
+# Pagination
+
+Every request will contain the total amount of records that matched the filters, but will only retrieve a portion of them in each request.
+
+* `page_size` Specifies the number of element returned in the request.
+
+`page_size=20`
+
+* `offset` - Specifies the starting point of the batch in terms of number of elements that have already been retrieved.
+
+`page_size=20&offset=450` will bring the elements 451 to 470.
+
+* to retrieve only a count of the values that will match certain filters, a page size of zero can be specified. The result will be a record with no events and the desired count:
+
+`{
+  "total_count" : 1234,
+  "events" :[]
+}`
+
 # Data Aggregation
 
 There are two ways to accomplish data aggregation:
@@ -234,70 +253,83 @@ The JSON allows more complex aggregations, such as:
 
 ## Without Grouping
 
-Returns an array of events without any PII:
-`[
-{
-  "assay" : "ASSAY001",
-  "assay_name" : "MTB",
-  "device_serial_number" : "123456789",
-  "result" : "positive",
-  "start_time" : "2014-04-24T17:16:03+0000",
-  "system_user" : "jdoe",
-  "age" : "21",
-  "created_at" : "2014-04-24T17:16:03+0000",
-  "device_id" : 2,
-  "laboratory_id" : 3,
-  "institution_id" : 4,
-  "location_id" : 5,
-  "parent_locations" : [1, 2, 3],
-  "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e"
-},
-{
-  "assay" : "ASSAY002",
-  "assay_name" : "MTB",
-  "device_serial_number" : "123456789",
-  "result" : "positive",
-  "start_time" : "2014-04-24T17:16:03+0000",
-  "system_user" : "jdoe",
-  "age" : "21",
-  "created_at" : "2014-04-24T17:16:03+0000",
-  "device_id" : 2,
-  "laboratory_id" : 3,
-  "institution_id" : 4,
-  "location_id" : 5,
-  "parent_locations" : [1, 2, 3],
-  "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e"
-},
-...
-]`
+Returns an array of events without any PII and the total count of elements that matched the filter.
+
+`{
+  "total_count" : 2,
+  "events" : [
+    {
+      "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
+      "assay" : "ASSAY001",
+      "age" : "21",
+      "created_at" : "2014-04-24T17:16:03+0000",
+      "start_time" : "2014-04-24T17:16:03+0000",
+      "device_serial_number" : "123456789",
+      "device_id" : 2,
+      "laboratory_id" : 3,
+      "system_user" : "jdoe",
+      "institution_id" : 4,
+      "location_id" : 5,
+      "parent_locations" : [1, 2, 3],
+      "type" : "QC/Specimen",
+      "error_code": 1234,
+      "results" : [
+        "condition" : "MTB",
+        "result" : "error",
+      ]
+    },
+    {
+      "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
+      "assay" : "ASSAY001",
+      "age" : "21",
+      "created_at" : "2014-04-24T17:16:03+0000",
+      "start_time" : "2014-04-24T17:16:03+0000",
+      "device_serial_number" : "123456789",
+      "device_id" : 2,
+      "laboratory_id" : 3,
+      "system_user" : "jdoe",
+      "institution_id" : 4,
+      "location_id" : 5,
+      "parent_locations" : [1, 2, 3],
+      "type" : "QC/Specimen",
+      "results" : [
+        "condition" : "MTB",
+        "result" : "positive"
+      ]
+    }
+  ]
+}`
 
 ## With Grouping
 
-Returns the quantity of events matching each combination of aggregated fields.
+Returns the quantity of events matching each combination of aggregated fields and the total count of elements that matched the filter.
 
 `/events?group_by=gender,result`
 
-`[
-  {
-    "gender" : "male",
-    "result" : "positive",
-    "count" : 23
-  },
-  {
-    "gender" : "male",
-    "result" : "negative",
-    "count" : 10
-  },
-  {
-    "gender" : "female",
-    "result" : "positive",
-    "count" : 2
-  },
-  {
-    "gender" : "female",
-    "result" : "negative",
-    "count" : 30
-  },
-]`
+`{
+  "total_count" : 55,
+  "events" : [
+    {
+      "gender" : "male",
+      "result" : "positive",
+      "count" : 23
+    },
+    {
+      "gender" : "male",
+      "result" : "negative",
+      "count" : 10
+    },
+    {
+      "gender" : "female",
+      "result" : "positive",
+      "count" : 2
+    },
+    {
+      "gender" : "female",
+      "result" : "negative",
+      "count" : 30
+    },
+  ]
+}`
 
 For error responses, see the [response status codes documentation](#http-response-codes).
