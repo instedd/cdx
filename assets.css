@@ -633,6 +633,7 @@ code {
   border-top: 1px solid #eef1f2;
   display: block;
   padding: 15px 0 15px 0;
+  width: 100%;
 }
 
 #content .body code {
