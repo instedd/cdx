@@ -10,12 +10,19 @@
             %option{ value: device.secret_key}=device.name
       %div
         %label(for="data") Data
-        %textarea#data(name="data" style="width:300px;height:300px;font-family:monospace")
+        %textarea#data(name="data" style="width:350px;height:300px;font-family:monospace")
           :preserve
             {
-              "gender": "male",
-              "age": 20,
-              "assay_name": "GX4001",
+              "patient_id" : 2,
+              "patient_name" : "Lorem Ipsum",
+              "patient_telephone_number" : "12345678",
+              "patient_zip_code" : "1234",
+              //"event_id" : "1",
+              "assay_name" : "ASSAY001",
+              "age" : "20",
+              "system_user" : "jdoe",
+              "test_type" : "specimen",
+              //"error_code" : "1234",
               "results": [
                 {
                   "condition": "MTB",
