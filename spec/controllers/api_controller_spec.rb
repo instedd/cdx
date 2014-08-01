@@ -14,7 +14,7 @@ describe ApiController do
 
   def get_updates(options, body="")
     fresh_client_for institution.elasticsearch_index_name
-    response = get :events, body, options
+    response = get :events, body, options.merge(format: 'json')
     response.status.should eq(200)
     Oj.load response.body
   end
@@ -389,12 +389,12 @@ describe ApiController do
     end
 
     context "Grouping" do
-      it "groups by gender in post body" do
+      it "groups by gender in query params" do
         post :create, (Oj.dump results:[result: :positive], gender: :male), device_uuid: device.secret_key
         post :create, (Oj.dump results:[result: :negative], gender: :male), device_uuid: device.secret_key
         post :create, (Oj.dump results:[result: :negative], gender: :female), device_uuid: device.secret_key
 
-        response = get_updates({}, Oj.dump(group_by: :gender)).sort_by do |event|
+        response = get_updates(group_by: :gender).sort_by do |event|
           event["gender"]
         end
 
@@ -422,6 +422,26 @@ describe ApiController do
           {"gender"=>"male", "assay_name" => "a", "count"=>2},
           {"gender"=>"male", "assay_name" => "b", "count"=>1}
         ])
+      end
+      context "CSV" do
+
+        render_views
+
+        it "responds a csv for a given grouping" do
+          Timecop.freeze
+          post :create, (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe), device_uuid: device.secret_key
+          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_uuid: device.secret_key
+          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_uuid: device.secret_key
+          fresh_client_for institution.elasticsearch_index_name
+
+          response = get :events, "", format: 'csv', group_by: 'system_user,error_code'
+
+          response.status.should eq(200)
+          response.content_type.should eq("text/csv")
+          response.headers["Content-Disposition"].should eq("attachment; filename=\"Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
+          response.should render_template("events")
+          response.body.should eq("system_user,error_code,count\njane_doe,1234,2\njdoe,1234,1\n")
+        end
       end
     end
 

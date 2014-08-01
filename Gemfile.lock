@@ -117,6 +117,8 @@ GEM
       execjs
     coffee-script-source (1.7.0)
     columnize (0.8.9)
+    csv_builder (2.1.1)
+      actionpack (>= 3.0.0)
     debugger-linecache (1.2.0)
     devise (3.1.0)
       bcrypt-ruby (~> 3.0)
@@ -350,6 +352,7 @@ DEPENDENCIES
   capybara-mechanize
   cdx-api-elasticsearch!
   coffee-rails (~> 4.0.0)
+  csv_builder
   devise
   elasticsearch
   encryptor

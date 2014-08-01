@@ -15,7 +15,13 @@ class ApiController < ApplicationController
   def events
     body = Oj.load(request.body.read) || {}
     result = Cdx::Api::Elasticsearch::Query.new(params.merge(body)).execute
-    render_json result
+    respond_to do |format|
+      format.csv do
+        build_csv result
+        render :layout => false
+      end
+      format.json { render_json result }
+    end
   end
 
   def custom_fields
@@ -30,5 +36,11 @@ class ApiController < ApplicationController
 
   def playground
     @devices = Device.all
+  end
+
+  def build_csv events
+    @csv_options = { :col_sep => ',' }
+    @csv_builder = EventCSVBuilder.new(events)
+    @filename = "Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
   end
 end

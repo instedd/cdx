@@ -20,7 +20,7 @@ Cdp::Application.routes.draw do
   root :to => 'home#index'
   scope '/api' do
     get 'playground' => 'api#playground'
-    match 'events' => 'api#events', via: [:get, :post]
+    match 'events(.:format)' => 'api#events', via: [:get, :post], defaults: { format: 'json' }
     get 'events/:event_uuid/custom_fields' => 'api#custom_fields'
     get 'events/:event_uuid/pii' => 'api#pii'
     post '/devices/:device_uuid/events' => 'api#create'

@@ -9,6 +9,7 @@ gem 'jquery-rails'
 gem 'haml-rails'
 gem 'underscore-rails'
 gem 'awesome_nested_set', '~> 3.0.0.rc.3'
+gem 'csv_builder'
 
 # A newer version breaks instedd-bootstrap
 gem 'bootstrap-sass', '2.3.2.1'
