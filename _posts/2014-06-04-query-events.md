@@ -205,6 +205,7 @@ The possible groupings are:
 * device
 * laboratory
 * gender
+* condition
 * result
 * error_code
 * system_user
