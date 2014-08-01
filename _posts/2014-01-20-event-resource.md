@@ -9,7 +9,7 @@ The Event resource contains the fields related to the event reported by the devi
 
 `{
   "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
-  "assay" : "ASSAY001",
+  "assay_name" : "ASSAY001",
   "age" : "21",
   "created_at" : "2014-04-24T17:16:03+0000",
   "start_time" : "2014-04-24T17:16:03+0000",

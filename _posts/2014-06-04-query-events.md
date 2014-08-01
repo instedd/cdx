@@ -59,13 +59,13 @@ The data returned will be sorted by default by the event creation date.
 
 `/events?result=positive`
 
+* `condition` - filter events for a particular condition name
+
+`/events?condition=MTB`
+
 * `assay_name` - filter events for a particular assay name
 
-`/events?assay_name=MTB`
-
-* `assay` - filter events for a particular assay ID
-
-`/events?assay=ASSAY001`
+`/events?assay_name=ASSAY001`
 
 * `uuid` - retrieves the event with a particular UUID
 
@@ -209,7 +209,7 @@ The possible groupings are:
 * error_code
 * system_user
 * test_type
-* assay
+* assay_name
 * `year() | month() | week() | day()` - groups the given date field by the time interval specified.
 
 `/events?group_by=year(created_at)`
@@ -260,7 +260,7 @@ Returns an array of events without any PII and the total count of elements that 
   "events" : [
     {
       "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
-      "assay" : "ASSAY001",
+      "assay_name" : "ASSAY001",
       "age" : "21",
       "created_at" : "2014-04-24T17:16:03+0000",
       "start_time" : "2014-04-24T17:16:03+0000",
@@ -280,7 +280,7 @@ Returns an array of events without any PII and the total count of elements that 
     },
     {
       "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
-      "assay" : "ASSAY001",
+      "assay_name" : "ASSAY001",
       "age" : "21",
       "created_at" : "2014-04-24T17:16:03+0000",
       "start_time" : "2014-04-24T17:16:03+0000",
