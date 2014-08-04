@@ -11,6 +11,7 @@ The Event resource contains the fields related to the event reported by the devi
   "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
   "assay_name" : "ASSAY001",
   "age" : "21",
+  "gender" : "male",
   "created_at" : "2014-04-24T17:16:03+0000",
   "start_time" : "2014-04-24T17:16:03+0000",
   "device_serial_number" : "123456789",
