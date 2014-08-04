@@ -1,5 +1,5 @@
 class Cdx::Api::Elasticsearch::Query
-  
+
   def initialize(params, api = Cdx::Api)
     @params = params
     @api = api
@@ -37,6 +37,11 @@ class Cdx::Api::Elasticsearch::Query
     {bool: {must: conditions}}
   end
 
+  def or_conditions conditions
+    return conditions.first if conditions.size == 1
+    {bool: {should: conditions}}
+  end
+
   def process_fields fields, params, conditions=[]
     fields.inject conditions do |conditions, field_definition|
       if field_definition[:type] == "nested"
@@ -64,26 +69,55 @@ class Cdx::Api::Elasticsearch::Query
     case filter_parameter_definition[:type]
     when "match"
       if field_value = params[filter_parameter_definition[:name]]
-        conditions += [{match: {field_definition[:name] => field_value}}]
+        conditions.push process_range_field(field_definition, field_value)
       end
-      conditions
     when "range"
       if field_value = params[filter_parameter_definition[:name]]
-        conditions += [{range: {field_definition[:name] => ({filter_parameter_definition[:boundary] => field_value}.merge filter_parameter_definition[:options])}}]
+        conditions.push range: {field_definition[:name] => ({filter_parameter_definition[:boundary] => field_value}.merge filter_parameter_definition[:options])}
       end
-      conditions
     when "wildcard"
       if field_value = params[filter_parameter_definition[:name]]
-        condition = if /.*\*.*/ =~ field_value
-          [{wildcard: {field_definition[:name] => field_value}}]
-        else
-          [{match: {field_matcher(field_definition[:name], field_definition[:type]) => field_value}}]
-        end
-        conditions += condition
+        conditions.push process_wildcard_field(field_definition, field_value)
       end
-      conditions
+    end
+    conditions
+  end
+
+  def process_range_field(field_definition, field_value)
+    process_multi_field(field_value) do |value|
+      process_single_wildcard_field(field_definition, value)
+    end
+  end
+
+  def process_single_range_field(field_definition, field_value)
+    {match: {field_definition[:name] => field_value}}
+  end
+
+  def process_wildcard_field(field_definition, field_value)
+    process_multi_field(field_value) do |value|
+      process_single_wildcard_field(field_definition, value)
+    end
+  end
+
+  def process_single_wildcard_field(field_definition, field_value)
+    if /.*\*.*/ =~ field_value
+      {wildcard: {field_definition[:name] => field_value}}
     else
-      conditions
+      {match: {field_matcher(field_definition[:name], field_definition[:type]) => field_value}}
+    end
+  end
+
+  def process_multi_field(field_value, &block)
+    values = extract_multi_values(field_value)
+    values = values.map(&block)
+    or_conditions values
+  end
+
+  def extract_multi_values(field_value)
+    if field_value.is_a?(Array)
+      field_value
+    else
+      field_value.to_s.split(",").map(&:strip)
     end
   end
 

@@ -163,6 +163,68 @@ describe Cdx::Api do
       expect_one_result_with_field "error_code", 1, error_code: 1
       expect_no_results error_code: 3
     end
+
+    describe "Multi" do
+      it "filters by multiple genders with array" do
+        index age: 1, gender: "male"
+        index age: 2, gender: "female"
+        index age: 3, gender: "unknown"
+
+        response = query(gender: ["male", "female"]).sort_by do |event|
+          event["age"]
+        end
+
+        expect(response).to eq([
+          {"age" => 1, "gender" => "male"},
+          {"age" => 2, "gender" => "female"},
+        ])
+      end
+
+      it "filters by multiple genders with comma" do
+        index age: 1, gender: "male"
+        index age: 2, gender: "female"
+        index age: 3, gender: "unknown"
+
+        response = query(gender: "male,female").sort_by do |event|
+          event["age"]
+        end
+
+        expect(response).to eq([
+          {"age" => 1, "gender" => "male"},
+          {"age" => 2, "gender" => "female"},
+        ])
+      end
+
+      it "filters by multiple test types with array" do
+        index age: 1, test_type: "one"
+        index age: 2, test_type: "two"
+        index age: 3, test_type: "three"
+
+        response = query(test_type: ["one", "two"]).sort_by do |event|
+          event["test_type"]
+        end
+
+        expect(response).to eq([
+          {"age" => 1, "test_type" => "one"},
+          {"age" => 2, "test_type" => "two"},
+        ])
+      end
+
+      it "filters by multiple test types with comma" do
+        index age: 1, test_type: "one"
+        index age: 2, test_type: "two"
+        index age: 3, test_type: "three"
+
+        response = query(test_type: "one,two").sort_by do |event|
+          event["test_type"]
+        end
+
+        expect(response).to eq([
+          {"age" => 1, "test_type" => "one"},
+          {"age" => 2, "test_type" => "two"},
+        ])
+      end
+    end
   end
 
   describe "Grouping" do
