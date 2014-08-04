@@ -15,10 +15,6 @@ Filter parameters allow querying a subset of the available events.
 
 The data returned will be sorted by default by the event creation date.
 
-* `start_at` - the system will return a maximum of 1000 events, to retrieve the next batch of events the `start_at` parameter must be used
-
-`start_at=1001`
-
 * `since` - retrieve events reported after a specific date time.
 
 `/events?since=2014-04-10T15:22:12+0000`
