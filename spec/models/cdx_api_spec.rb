@@ -528,6 +528,22 @@ describe Cdx::Api do
         {"error_code" => 2, count: 3}
       ])
     end
+    
+    describe "by fields with option valid values" do
+      it "should include group for option with 0 results" do
+        index results:[result: :positive], test_type: "qc"
+        index results:[result: :positive], test_type: "qc"
+
+        response = query(group_by:"test_type").sort_by do |event|
+          event["test_type"]
+        end
+
+        expect(response).to eq([
+          {"test_type"=>"qc", count: 2},
+          {"test_type"=>"specimen", count: 0}
+        ])
+      end
+    end
   end
 
   describe "Ordering" do

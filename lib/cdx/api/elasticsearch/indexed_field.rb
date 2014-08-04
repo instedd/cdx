@@ -1,4 +1,6 @@
 class Cdx::Api::Elasticsearch::IndexedField
+  attr_reader :definition
+
   def self.from(definition, document_format)
     new(definition, document_format)
   end
@@ -27,39 +29,18 @@ class Cdx::Api::Elasticsearch::IndexedField
     @definition[key]
   end
 
-  def grouping_detail_for field_name, values=nil
-    if nested?
-      group = sub_fields.detect do |field|
-        field.grouping_detail_for field_name, values
-      end
-      {type: type, name: name, sub_fields: group} if group
-    else
-      definition = group_definitions.detect do |definition|
-        definition[:name] == field_name
-      end
-      if definition
-        grouping_def = definition.clone
-        if grouping_def[:type] == "range"
-          if values
-            grouping_def[:ranges] = values
-          else
-            grouping_def[:type] = 'flat'
-          end
-        end
+  def self.grouping_detail_for field_name, values=nil
+    grouping_detail = nil
 
-        if grouping_def[:type] == "kind"
-          grouping_def[:value] = values
-          grouping_def[:elements] = target_grouping_values(grouping_def, values)
-        end
-
-        grouping_def[:field] = @definition
-        grouping_def
-      end
+    Cdx::Api.searchable_fields.detect do |field|
+      grouping_detail = field.grouping_detail_for field_name, values
     end
+
+    grouping_detail
   end
 
-  def target_grouping_values(grouping_def, values)
-    grouping_def[:reference_table][:name].classify.constantize.where(grouping_def[:reference_table][:query_target] => values).map &grouping_def[:reference_table][:value_field].to_sym
+  def grouping_detail_for field_name, values=nil
+    GroupingDetail.for self, field_name, values
   end
 
   def group_definitions

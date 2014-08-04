@@ -1,78 +1,46 @@
 class Cdx::Api::Elasticsearch::Aggregations
-  def initialize
+  def initialize grouping_details
+    @nested_grouping_details, @non_nested_grouping_details = grouping_details.partition {|g| g.nested?}
     @aggregations = Hash.new
     @last = @aggregations
-  end
 
-  def append fields
-    if fields.first[:type] == "nested"
-      append_last count: {nested: {path: fields.first[:name]}}
-    end
-
-    fields.each do |field|
-      append_last create_grouping_for(field)
-    end
+    process_non_nested
+    process_nested
   end
 
   def to_hash
     @aggregations
   end
 
-private
+  def in_order
+   @non_nested_grouping_details + @nested_grouping_details
+  end
 
-  def create_grouping_for field
-    case field[:type]
-    when "flat"
-      {
-        count: {
-          terms: {
-            field: field[:field][:name]
-          }
-        }
-      }
-    when "date"
-      format = case field[:interval]
-        when "year"
-          "yyyy"
-        when "month"
-          "yyyy-MM"
-        when "week"
-          "yyyy-'W'w"
-        when "day"
-          "yyyy-MM-dd"
-        else
-          raise "Invalid time interval: #{field[:interval]}"
-       end
-      {count: {date_histogram: {field: field[:field][:name], interval: field[:interval], format: format}}}
-    when "range"
-      {count: {range: {field: field[:field][:name], ranges: convert_ranges_to_elastic_search(field[:ranges])}}}
-    when "nested"
-      {
-        count: {
-          terms: {
-            field: "#{field[:name]}.#{field[:sub_fields][:name]}"
-          }
-        }
-      }
-    when "kind"
-      {kind: {terms: {field: field[:field][:name], size: 0}}}
-    else
-      raise "Unsupported field type: #{field[:type]}"
+private
+  def process_nested
+    process @nested_grouping_details if @nested_grouping_details.present?
+  end
+
+  def process_non_nested
+    process @non_nested_grouping_details if @non_nested_grouping_details.present?
+  end
+
+  def process grouping_details
+    if grouping_details.first.nested?
+      process_last count: {nested: {path: grouping_details.first.name} }
+    end
+
+    grouping_details.each do |grouping_detail|
+      process_last create_grouping_for(grouping_detail)
     end
   end
 
-  def append_last field
+  def create_grouping_for grouping_detail
+    grouping_detail.to_es
+  end
+
+  def process_last field
     @last[:aggregations] = field
     @last = field[:count]
-  end
-
-  def convert_ranges_to_elastic_search(ranges)
-    ranges.map do |range|
-      if range.is_a? Hash
-        range
-      else
-        {from: range[0], to: range[1]}
-      end
-    end
   end
 end
