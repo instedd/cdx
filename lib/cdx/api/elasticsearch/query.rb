@@ -179,59 +179,6 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_group_by_buckets(aggregations, group_by, events, event, doc_count)
-    count = aggregations[:count] || aggregations[:kind]
-
-    if count
-      if group_by.is_a? Array
-        head = group_by.first
-        rest = group_by[1..-1]
-      else
-        head = group_by
-        rest = []
-      end
-      case head[:type]
-      when "range"
-        process_bucket(rest, events, event, count[:buckets]) do |bucket|
-          {head[:name] => [normalize(bucket[:from]), normalize(bucket[:to])]}
-        end
-      when "date"
-        process_bucket(rest, events, event, count[:buckets]) do |bucket|
-          {head[:field][:name] => bucket[:key_as_string]}
-        end
-      when "flat"
-        process_bucket(rest, events, event, count[:buckets]) do |bucket|
-          {head[:name] => bucket[:key]}
-        end
-      when "kind"
-        elements = head[:elements]
-        buckets = count[:buckets].select do |bucket|
-          elements.include? bucket[:key]
-        end
-        process_bucket(rest, events, event, buckets) do |bucket|
-          {head[:reference_table][:name].singularize => bucket[:key]}
-        end
-      when "nested"
-        process_bucket(rest, events, event, (count[:count] || count)[:buckets]) do |bucket|
-          {head[:sub_fields][:name] => bucket[:key]}
-        end
-      else
-        raise "Trying to group by a non searchable field"
-      end
-    else
-      event[:count] = doc_count
-      events + [event]
-    end
-  end
-
-  def process_bucket(group_by, events, event, buckets)
-    buckets.inject events do |events, bucket|
-      event = event.merge(yield bucket)
-      process_group_by_buckets(bucket, group_by, events, event, bucket[:doc_count])
-    end
-  end
-
-  def normalize(value)
-    return value.round if value.is_a? Float and value.round == value
-    value
+    GroupingDetail.process_buckets(aggregations, group_by, events, event, doc_count)
   end
 end

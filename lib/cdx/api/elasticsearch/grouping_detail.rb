@@ -37,7 +37,6 @@ class GroupingDetail
 
         if !grouping
           if grouping_def[:type] == "date"
-            binding.pry
             grouping = DateGroupingDetail.new indexed_field.name, indexed_field.definition
           else
             grouping = FlatGroupingDetail.new indexed_field.name, indexed_field.definition    
@@ -46,6 +45,37 @@ class GroupingDetail
 
         grouping
       end
+    end
+  end
+
+  def self.process_buckets(aggregations, group_by, events, event, doc_count)
+    count = aggregations[:count] || aggregations[:kind]
+
+    if count
+      if group_by.is_a? Array
+        head = group_by.first
+        rest = group_by[1..-1]
+      else
+        head = group_by
+        rest = []
+      end
+
+      buckets = head.preprocess_buckets count
+      head.process_bucket rest, events, event, buckets
+    else
+      event[:count] = doc_count
+      events + [event]
+    end
+  end
+
+  def preprocess_buckets(count)
+    count[:buckets]
+  end
+
+  def process_bucket(group_by, events, event, buckets)
+    buckets.inject events do |events, bucket|
+      event = event.merge yield_bucket(bucket)
+      GroupingDetail.process_buckets bucket, group_by, events, event, bucket[:doc_count]
     end
   end
 end
@@ -86,6 +116,10 @@ class DateGroupingDetail < GroupingDetail
     
     {count: {date_histogram: {field: field_definition[:name], interval: interval, format: format}}}
   end
+
+  def yield_bucket(bucket)
+    {field_definition[:name] => bucket[:key_as_string]}
+  end
 end
 
 class KindGroupingDetail < GroupingDetail
@@ -110,6 +144,16 @@ class KindGroupingDetail < GroupingDetail
     }
   end
 
+  def preprocess_buckets(count)    
+    count[:buckets].select do |bucket|
+      elements.include? bucket[:key]
+    end
+  end
+
+  def yield_bucket(bucket)
+    {reference_table.name.singularize => bucket[:key]}
+  end
+
   private 
 
   def target_grouping_values
@@ -130,6 +174,10 @@ class FlatGroupingDetail < GroupingDetail
         }
       }
     }
+  end
+
+  def yield_bucket(bucket)
+    {name => bucket[:key]}
   end
 end
 
@@ -160,6 +208,15 @@ class RangeGroupingDetail < GroupingDetail
       end
     end
   end
+
+  def yield_bucket(bucket)  
+    {name => [normalize(bucket[:from]), normalize(bucket[:to])]}
+  end
+
+  def normalize(value)
+    return value.round if value.is_a? Float and value.round == value
+    value
+  end
 end
 
 class NestedGroupingDetail < GroupingDetail
@@ -182,6 +239,14 @@ class NestedGroupingDetail < GroupingDetail
         }
       }
     }
+  end
+
+  def preprocess_buckets(count)
+    (count[:count] || count)[:buckets]
+  end
+
+  def yield_bucket(bucket)
+    {child_grouping.name => bucket[:key]}
   end
 
   def self.create(indexed_field, child_field_name, values)
