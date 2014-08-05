@@ -10,7 +10,7 @@ describe Cdx::Api do
   end
 
   def time(year, month, day, hour = 12, minute = 0, second = 0)
-    Time.utc(year, month, day, hour, minute, second).iso8601
+    Time.local(year, month, day, hour, minute, second).iso8601
   end
 
   def expect_one_result(result, query)
@@ -60,6 +60,25 @@ describe Cdx::Api do
       expect(response.last["results"].first["result"]).to eq("negative")
 
       expect(query(since: time(2013, 1, 3))).to be_empty
+    end
+
+    it "should check for new events since a date in a differen time zone" do
+      Time.zone = ActiveSupport::TimeZone["Asia/Seoul"]
+
+      index results: [result: :positive], created_at: 3.day.ago.at_noon.iso8601
+      index results: [result: :negative], created_at: 1.day.ago.at_noon.iso8601
+
+      response = query(since: 2.day.ago.at_noon.iso8601)
+
+      expect(response.size).to eq(1)
+      expect(response.first["results"].first["result"]).to eq("negative")
+
+      response = query(since: 4.day.ago.at_noon.iso8601)
+
+      expect(response.first["results"].first["result"]).to eq("positive")
+      expect(response.last["results"].first["result"]).to eq("negative")
+
+      expect(query(since: Date.current.at_noon.iso8601)).to be_empty
     end
 
     it "should check for new events util a date" do
