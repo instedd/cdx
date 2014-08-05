@@ -377,6 +377,16 @@ describe ApiController do
       #   response.first["results"].first["result"].should eq("Positive with RIFF resistance")
       # end
 
+      it "filters by condition" do
+        post :create, (Oj.dump results:[condition: "MTB", result: :positive]), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "Flu", result: :negative]), device_uuid: device.secret_key
+
+        response = get_updates condition: 'MTB'
+
+        response.size.should be(1)
+        response.first["results"].first["result"].should eq("positive")
+      end
+
       it "filters by test type" do
         post :create, (Oj.dump results:[condition: "MTB", result: :positive], test_type: :qc), device_uuid: device.secret_key
         post :create, (Oj.dump results:[condition: "MTB", result: :negative], test_type: :specimen), device_uuid: device.secret_key
