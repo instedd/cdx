@@ -37,6 +37,20 @@ describe Manifest do
     Manifest.first.version.should eq(2)
   end
 
+  it "updates it's api_version number" do
+    Manifest.create(definition: '{"metadata" : {"device_models" : ["foo"], "api_version" : "1.0.0"}}')
+
+    manifest = Manifest.first
+
+    manifest.api_version.should eq('1.0.0')
+    manifest.definition = '{"metadata" : {"device_models" : ["foo"], "api_version" : "2.0.0"}}'
+    manifest.save!
+
+    Manifest.count.should eq(1)
+    DeviceModel.count.should eq(1)
+    Manifest.first.api_version.should eq("2.0.0")
+  end
+
   it "leaves no orphan model" do
     Manifest.create(definition: '{"metadata" : {"device_models" : ["foo"], "version" : 1}}')
 

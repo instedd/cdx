@@ -3,6 +3,7 @@ class Manifest < ActiveRecord::Base
 
   before_save :update_models
   before_save :update_version
+  before_save :update_api_version
   after_destroy :ensure_no_orphan_models
   after_save :ensure_no_orphan_models
 
@@ -16,6 +17,10 @@ class Manifest < ActiveRecord::Base
 
   def update_version
     self.version = metadata["version"]
+  end
+
+  def update_api_version
+    self.api_version = metadata["api_version"]
   end
 
   def ensure_no_orphan_models
