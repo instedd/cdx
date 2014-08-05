@@ -79,6 +79,18 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  def request_api_token
+    @institution = Institution.find(params[:id])
+    return unless authorize_resource(@institution, READ_INSTITUTION)
+
+    add_breadcrumb @institution.name, @institution
+    add_breadcrumb 'Settings', :edit_institution_path
+    add_breadcrumb 'Token'
+    set_institution_tab :settings
+
+    @token = Guisso.generate_bearer_token current_user.email
+  end
+
   private
 
   def institution_params

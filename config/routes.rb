@@ -3,6 +3,9 @@ Cdp::Application.routes.draw do
   guisso_for :user
 
   resources :institutions do
+    member do
+      get :request_api_token
+    end
     resources :laboratories
     resources :devices do
       member do
