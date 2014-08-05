@@ -336,6 +336,16 @@ describe Cdx::Api do
       ])
     end
 
+    it "raises exception when interval is not supported" do
+      index results:[result: :positive], created_at: time(2010, 1, 1)
+      index results:[result: :positive], created_at: time(2010, 1, 2)
+      index results:[result: :positive], created_at: time(2011, 1, 1)
+
+      expect { 
+        query(group_by: "foo(created_at)")
+      }.to raise_error
+    end
+
     it "groups by year(date)" do
       index results:[result: :positive], created_at: time(2010, 1, 1)
       index results:[result: :positive], created_at: time(2010, 1, 2)
@@ -529,8 +539,9 @@ describe Cdx::Api do
       ])
     end
     
+
     describe "by fields with option valid values" do
-      it "should include group for option with 0 results" do
+      pending "should include group for option with 0 results" do
         index results:[result: :positive], test_type: "qc"
         index results:[result: :positive], test_type: "qc"
 
@@ -644,8 +655,8 @@ describe Cdx::Api do
     end
 
     it "groups by administrative level" do
-      expect_any_instance_of(Cdx::Api::Elasticsearch::IndexedField).to receive(:target_grouping_values) do |obj, grouping_def, values|
-        case values
+      allow_any_instance_of(KindGroupingDetail).to receive(:target_grouping_values) do |obj|
+        case obj.value
         when 0
           [1]
         when 1
@@ -653,7 +664,7 @@ describe Cdx::Api do
         else
           fail
         end
-      end.exactly(2).times
+      end
 
       index results: [result: "negative"], parent_locations: [1, 2, 3]
       index results: [result: "positive"], parent_locations: [1, 2, 4]

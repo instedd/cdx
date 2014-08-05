@@ -1,6 +1,4 @@
 class Cdx::Api::Elasticsearch::IndexedField
-  attr_reader :definition
-
   def self.from(definition, document_format)
     new(definition, document_format)
   end
@@ -29,10 +27,10 @@ class Cdx::Api::Elasticsearch::IndexedField
     @definition[key]
   end
 
-  def self.grouping_detail_for field_name, values=nil
+  def self.grouping_detail_for field_name, values=nil, api
     grouping_detail = nil
 
-    Cdx::Api.searchable_fields.detect do |field|
+    api.searchable_fields.detect do |field|
       grouping_detail = field.grouping_detail_for field_name, values
     end
 

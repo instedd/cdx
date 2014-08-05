@@ -1,24 +1,26 @@
 class GroupingDetail
   attr_reader :name
   attr_reader :field_definition
+  attr_reader :uri_param
 
-  def initialize(name, field_definition)
+  def initialize(name, field_definition, uri_param)
     @name = name
     @field_definition = field_definition
+    @uri_param = uri_param
   end
 
   def nested?
     false
   end
 
-	def self.for(indexed_field, field_name, values)    
+	def self.for(indexed_field, uri_param, values)    
     if indexed_field.nested?
-      NestedGroupingDetail.create indexed_field, field_name, values
+      NestedGroupingDetail.create indexed_field, uri_param, values
     else
       grouping = nil
 
       definition = indexed_field.group_definitions.detect do |definition|
-        definition[:name] == field_name
+        definition[:name] == uri_param
       end
 
       if definition        
@@ -26,20 +28,20 @@ class GroupingDetail
         
         if grouping_def[:type] == "range"
           if values
-            grouping = RangeGroupingDetail.new indexed_field.name, indexed_field.definition, values
+            grouping = RangeGroupingDetail.new indexed_field.name, indexed_field, uri_param, values 
           end
         end
 
         if grouping_def[:type] == "kind"
           reference_table = ReferenceTable.new grouping_def[:reference_table][:name], grouping_def[:reference_table][:query_target], grouping_def[:reference_table][:value_field]
-          grouping = KindGroupingDetail.new indexed_field.name, indexed_field.definition, values, reference_table
+          grouping = KindGroupingDetail.new indexed_field.name, indexed_field, uri_param, values, reference_table
         end
 
         if !grouping
           if grouping_def[:type] == "date"
-            grouping = DateGroupingDetail.new indexed_field.name, indexed_field.definition
+            grouping = DateGroupingDetail.new indexed_field.name, indexed_field, uri_param, grouping_def[:interval]
           else
-            grouping = FlatGroupingDetail.new indexed_field.name, indexed_field.definition    
+            grouping = FlatGroupingDetail.new indexed_field.name, indexed_field, uri_param    
           end
         end
 
@@ -95,13 +97,13 @@ end
 class DateGroupingDetail < GroupingDetail
   attr_reader :interval
 
-  def initialize(name, field_definition, interval)
-    super name, field_definition
+  def initialize(name, field_definition, uri_param, interval)
+    super name, field_definition, uri_param
     @interval = interval
   end
 
   def to_es
-    format = case grouping_detail[:interval]
+    format = case interval
       when "year"
         "yyyy"
       when "month"
@@ -111,14 +113,14 @@ class DateGroupingDetail < GroupingDetail
       when "day"
         "yyyy-MM-dd"
       else
-        raise "Invalid time interval: #{field[:interval]}"
+        raise "Invalid time interval: #{interval}"
     end
     
     {count: {date_histogram: {field: field_definition[:name], interval: interval, format: format}}}
   end
 
   def yield_bucket(bucket)
-    {field_definition[:name] => bucket[:key_as_string]}
+    {name => bucket[:key_as_string]}
   end
 end
 
@@ -127,8 +129,8 @@ class KindGroupingDetail < GroupingDetail
   attr_reader :elements
   attr_reader :reference_table
 
-  def initialize(name, field_definition, value, reference_table)
-    super name, field_definition
+  def initialize(name, field_definition, uri_param, value, reference_table)
+    super name, field_definition, uri_param
     @value = value
     @reference_table = reference_table
     @elements = target_grouping_values    
@@ -162,8 +164,8 @@ class KindGroupingDetail < GroupingDetail
 end
 
 class FlatGroupingDetail < GroupingDetail
-  def initialize(name, field_definition)
-    super name, field_definition
+  def initialize(name, field_definition, uri_param)
+    super name, field_definition, uri_param
   end
 
   def to_es
@@ -177,15 +179,15 @@ class FlatGroupingDetail < GroupingDetail
   end
 
   def yield_bucket(bucket)
-    {name => bucket[:key]}
+    {uri_param => bucket[:key]}
   end
 end
 
 class RangeGroupingDetail < GroupingDetail
   attr_reader :ranges
 
-  def initialize(name, field_definition, ranges)
-    super name, field_definition
+  def initialize(name, field_definition, uri_param, ranges)
+    super name, field_definition, uri_param
     @ranges = ranges
   end
 
@@ -210,7 +212,7 @@ class RangeGroupingDetail < GroupingDetail
   end
 
   def yield_bucket(bucket)  
-    {name => [normalize(bucket[:from]), normalize(bucket[:to])]}
+    {uri_param => [normalize(bucket[:from]), normalize(bucket[:to])]}
   end
 
   def normalize(value)
@@ -222,8 +224,8 @@ end
 class NestedGroupingDetail < GroupingDetail
   attr_reader :child_grouping
 
-  def initialize(name, field_definition, child_grouping)
-    super name, field_definition
+  def initialize(name, field_definition, uri_param, child_grouping)
+    super name, field_definition, uri_param
     @child_grouping = child_grouping
   end
 
@@ -235,7 +237,7 @@ class NestedGroupingDetail < GroupingDetail
     {
       count: {
         terms: {
-          field: "#{field[:name]}.#{field[:sub_fields][:name]}"
+          field: "#{field_definition[:name]}.#{child_grouping.name}"
         }
       }
     }
@@ -246,7 +248,7 @@ class NestedGroupingDetail < GroupingDetail
   end
 
   def yield_bucket(bucket)
-    {child_grouping.name => bucket[:key]}
+    {uri_param => bucket[:key]}
   end
 
   def self.create(indexed_field, child_field_name, values)
@@ -254,6 +256,6 @@ class NestedGroupingDetail < GroupingDetail
       GroupingDetail.for field, child_field_name, values
     end
 
-    NestedGroupingDetail.new(indexed_field.name, indexed_field.definition, children_groupings) if child_grouping
+    NestedGroupingDetail.new(indexed_field.name, indexed_field, child_field_name, child_grouping) if child_grouping
   end
 end

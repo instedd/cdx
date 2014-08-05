@@ -17,7 +17,6 @@ class Cdx::Api::Elasticsearch::Config
 
   attr_accessor :index_name_pattern
   attr_accessor :log
-  attr_accessor :document_format
 
   def searchable_fields
     @searchable_fields ||= api_fields[:searchable_fields].map do |definition|
@@ -36,5 +35,4 @@ class Cdx::Api::Elasticsearch::Config
   def document_format
     @document_format || CDPDocumentFormat.new
   end
-
 end

@@ -6,7 +6,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def execute
-    @api.translate query(@params)
+    query(@params)
   end
 
   protected
@@ -17,9 +17,9 @@ class Cdx::Api::Elasticsearch::Query
     if params[:group_by]
       query_with_group_by(query, params[:group_by])
     else
-      @api.search_elastic(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
+      @api.translate(@api.search_elastic(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
         hit["_source"]
-      end
+      end)
     end
   end
 
@@ -155,7 +155,7 @@ class Cdx::Api::Elasticsearch::Query
 
     group_by = group_by.map do |field|
       name, value = extract_group_by_criteria field
-      Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value
+      Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value, @api
     end
 
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
