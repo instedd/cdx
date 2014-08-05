@@ -17,11 +17,19 @@ The data returned will be sorted by default by the event creation date.
 
 * `since` - retrieve events reported after a specific date time.
 
-`/events?since=2014-04-10T15:22:12+0000`
+`/events?since=2014-04-10T15:22:12+00:00`
+
+When querying from the query string the _'+'_ sign must be escaped as _'%2B'_
+
+`since=2014-08-01T18:10:36%2B07:00`
 
 * `until` - retrieve events reported before a specific date time. Useful to define a time window in combination with “since”.
 
-`/events?until=2014-04-10T15:22:12+0000`
+`/events?until=2014-04-10T15:22:12-0300`
+
+When querying from the query string the _'+'_ sign must be escaped as _'%2B'_
+
+`until=2014-08-01T18:10:36%2B07:00`
 
 * `location` - filter events by location id
 
