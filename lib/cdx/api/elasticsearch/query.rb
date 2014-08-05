@@ -69,7 +69,7 @@ class Cdx::Api::Elasticsearch::Query
     case filter_parameter_definition[:type]
     when "match"
       if field_value = params[filter_parameter_definition[:name]]
-        conditions.push process_range_field(field_definition, field_value)
+        conditions.push process_match_field(field_definition, field_value)
       end
     when "range"
       if field_value = params[filter_parameter_definition[:name]]
@@ -83,13 +83,13 @@ class Cdx::Api::Elasticsearch::Query
     conditions
   end
 
-  def process_range_field(field_definition, field_value)
+  def process_match_field(field_definition, field_value)
     process_multi_field(field_value) do |value|
-      process_single_wildcard_field(field_definition, value)
+      process_single_match_field(field_definition, value)
     end
   end
 
-  def process_single_range_field(field_definition, field_value)
+  def process_single_match_field(field_definition, field_value)
     {match: {field_definition[:name] => field_value}}
   end
 
