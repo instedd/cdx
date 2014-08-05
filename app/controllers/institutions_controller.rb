@@ -1,6 +1,6 @@
 class InstitutionsController < ApplicationController
-  layout "institutions", except: [:index, :new]
-  layout "application", only: [:index, :new]
+  layout "institutions", except: [:index, :new, :create]
+  layout "application", only: [:index, :new, :create]
 
   add_breadcrumb 'Institutions', :institutions_path
 
