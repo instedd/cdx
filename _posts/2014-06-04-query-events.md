@@ -89,19 +89,19 @@ With the exception of _since_, _until_, _min_age_ and _max_age_, all the fields 
 
 # Unknown values
 
-If a field value is not specified, the keyword used to represent it in filters must be _'nil'_.
+If a field value is not specified, the keyword used to represent it in filters must be _'null'_.
 
 If the value is specified, but impossible to determine at the moment of the test, the keyword used to represent it is _'unknown'_
 
-`/events?gender=male,unknown,nil`
+`/events?gender=male,unknown,null`
 
-The response must include all the unknown values, buy skip the nil ones.
+The response must include all the unknown values, and null values.
 
 When grouping, a bucket must be include for all elements that fall into the unknown or nil buckets.
 
 `/events?group_by=gender,result`
 
-Assuming gender values of male, female, unknown and nil and result values of positive and negative, an expected result could be:
+Assuming gender values of male, female, unknown and null, and result values of positive and negative, an expected result could be:
 
 `{
   "total_count" : 55,
