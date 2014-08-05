@@ -97,7 +97,7 @@ If the value is specified, but impossible to determine at the moment of the test
 
 The response must include all the unknown and null values.
 
-When grouping, a bucket must be include for all elements that fall into the unknown or nil buckets.
+When grouping, a bucket must be included for all elements that fall into the unknown or nil buckets.
 
 `/events?group_by=gender,result`
 
