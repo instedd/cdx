@@ -247,6 +247,38 @@ describe Cdx::Api do
           {"age" => 2, "test_type" => "two"},
         ])
       end
+
+      it "filters by null value" do
+        index results:[result: :positive], age: 10
+        index results:[condition: "Flu", result: :negative], age: 20
+        index results:[condition: "MTB", result: :negative], age: 30
+
+        expect_one_result "positive", condition: 'null'
+
+        response = query_events(condition: "null,MTB").sort_by do |event|
+          event["age"]
+        end
+
+        expect(response).to eq([
+          {"age" => 10, "results" => ["result" => "positive"]},
+          {"age" => 30, "results" => ["condition" => "MTB", "result" => "negative"]}
+        ])
+      end
+
+      it "filters by not(null) value" do
+        index results:[result: :positive], age: 10
+        index results:[condition: "Flu", result: :negative], age: 20
+        index results:[condition: "MTB", result: :negative], age: 30
+
+        response = query_events(condition: "not(null)").sort_by do |event|
+          event["age"]
+        end
+
+        expect(response).to eq([
+          {"age" => 20, "results" => ["condition" => "Flu", "result" => "negative"]},
+          {"age" => 30, "results" => ["condition" => "MTB", "result" => "negative"]}
+        ])
+      end
     end
   end
 

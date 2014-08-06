@@ -105,7 +105,9 @@ class Cdx::Api::Elasticsearch::Query
 
   def process_match_field(field_definition, field_value)
     process_multi_field(field_value) do |value|
-      process_single_match_field(field_definition, value)
+      process_null(field_definition, value) do
+        process_single_match_field(field_definition, value)
+      end
     end
   end
 
@@ -115,7 +117,9 @@ class Cdx::Api::Elasticsearch::Query
 
   def process_wildcard_field(field_definition, field_value)
     process_multi_field(field_value) do |value|
-      process_single_wildcard_field(field_definition, value)
+      process_null(field_definition, value) do |variable|
+        process_single_wildcard_field(field_definition, value)
+      end
     end
   end
 
@@ -141,6 +145,16 @@ class Cdx::Api::Elasticsearch::Query
     end
   end
 
+  def process_null(field_definition, value)
+    if value == 'null'
+      {filtered: {filter: { missing: { field: field_definition[:name] }}}}
+    elsif value == 'not(null)'
+      {filtered: {filter: { exists: { field: field_definition[:name] }}}}
+    else
+      yield
+    end
+  end
+
   def field_matcher(field_name, field_type)
     # if field_type == :multi_field
     #   "#{field_name}.analyzed"
@@ -152,7 +166,7 @@ class Cdx::Api::Elasticsearch::Query
   def process_order params
     order = params["order_by"] || @api.default_sort
 
-    all_orders = order.to_s.split ","
+    all_orders = extract_multi_values(order)
     all_orders.map do |order|
       if order[0] == "-"
         {order[1..-1] => "desc"}
