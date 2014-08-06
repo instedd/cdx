@@ -440,4 +440,23 @@ describe Manifest do
           "foo" => 40
         }]}, pii: Hash.new, custom: Hash.new}
   end
+
+  pending "should map single indexed field to a list" do
+    assert_manifest_application %{[
+        {
+          "target_field" : "collection[*].temperature",
+          "selector" : "temperature",
+          "type" : "custom",
+          "pii" : false,
+          "indexed" : true
+        }
+      ]},
+      '{
+        "temperature" : 20
+      }',
+      {indexed: {"collection" => [
+        {
+          "temperature" => 20
+        }]}, pii: Hash.new, custom: Hash.new}
+  end
 end
