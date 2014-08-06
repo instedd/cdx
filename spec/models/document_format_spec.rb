@@ -87,6 +87,15 @@ describe "formats of document stored" do
     ])
   end
 
+  it "allows to group by start time" do
+    es_index start_time: time(2013, 1, 1), assay: "ASSAY001"
+    es_index start_time: time(2013, 1, 1), assay: "ASSAY001"
+    es_index start_time: time(2013, 1, 1), assay: "ASSAY002"
+
+    response = query_events since: time(2013, 1, 1), group_by: "year(created_at)"
+    expect(response).to eq([{"created_at" => "2013", :count => 3}])
+  end
+
   def query_events(query)
     query(query)["events"]
   end

@@ -22,6 +22,8 @@ class Cdx::Api::Elasticsearch::Query
       events, total_count = query_without_group_by(query, params)
     end
 
+    events = @api.translate events
+
     {"events" => events, "total_count" => total_count}
   end
 
@@ -37,7 +39,7 @@ class Cdx::Api::Elasticsearch::Query
     results = @api.search_elastic(es_query)
     hits = results["hits"]
     total = hits["total"]
-    results = @api.translate hits["hits"].map { |hit| hit["_source"] }
+    results = hits["hits"].map { |hit| hit["_source"] }
     [results, total]
   end
 
