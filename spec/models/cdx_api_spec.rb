@@ -72,17 +72,17 @@ describe Cdx::Api do
       index results: [result: :positive], created_at: 3.day.ago.at_noon.iso8601
       index results: [result: :negative], created_at: 1.day.ago.at_noon.iso8601
 
-      response = query(since: 2.day.ago.at_noon.iso8601)
+      response = query_events(since: 2.day.ago.at_noon.iso8601)
 
       expect(response.size).to eq(1)
       expect(response.first["results"].first["result"]).to eq("negative")
 
-      response = query(since: 4.day.ago.at_noon.iso8601)
+      response = query_events(since: 4.day.ago.at_noon.iso8601)
 
       expect(response.first["results"].first["result"]).to eq("positive")
       expect(response.last["results"].first["result"]).to eq("negative")
 
-      expect(query(since: Date.current.at_noon.iso8601)).to be_empty
+      expect(query_events(since: Date.current.at_noon.iso8601)).to be_empty
     end
 
     it "should check for new events util a date" do
