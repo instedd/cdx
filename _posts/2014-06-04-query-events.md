@@ -189,6 +189,8 @@ Every request will contain the total amount of records that matched the filters,
   "events" :[]
 }`
 
+The default page size is 50.
+
 # Data Aggregation
 
 There are two ways to accomplish data aggregation:
