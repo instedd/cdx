@@ -5,6 +5,7 @@ class DevicesController < ApplicationController
   add_breadcrumb 'Institutions', :institutions_path
 
   before_filter :load_institution
+  before_filter :load_laboratories, only: [:new, :create]
 
   before_filter do
     add_breadcrumb @institution.name, institution_path(@institution)
@@ -25,9 +26,6 @@ class DevicesController < ApplicationController
   def new
     @device = @institution.devices.new
     return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
-
-    @laboratories = check_access(@institution.laboratories, ASSIGN_DEVICE_LABORATORY)
-    @laboratories ||= []
   end
 
   def create
@@ -111,6 +109,11 @@ class DevicesController < ApplicationController
   def load_institution
     @institution = Institution.find params[:institution_id]
     authorize_resource(@institution, READ_INSTITUTION)
+  end
+
+  def load_laboratories
+    @laboratories = check_access(@institution.laboratories, ASSIGN_DEVICE_LABORATORY)
+    @laboratories ||= []
   end
 
   def device_params
