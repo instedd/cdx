@@ -347,6 +347,25 @@ describe Manifest do
       {indexed: {"list" => [{"temperature" => 20}, {"temperature" => 10}]}, pii: Hash.new, custom: Hash.new}
   end
 
+  pending "should apply value mapping to multiple indexed field" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "results[*].condition",
+          "selector" : "conditions[*].condition",
+          "type" : "custom",
+          "pii" : false,
+          "indexed" : true,
+          "value_mappings" : {
+            "*MTB*" : "MTB",
+            "*FLU*" : "H1N1",
+            "*FLUA*" : "A1N1"
+          }
+        }]
+      },
+      '{"conditions" : [{"condition" : "PATIENT HAS MTB CONDITION"}, {"condition" : "PATIENT HAS FLU CONDITION"}]}',
+      {indexed: {"results" => [{"condition" => "MTB"}, {"condition" => "H1N1"}]}, pii: Hash.new, custom: Hash.new}
+  end
+
   it "should map to multiple indexed fields to the same list" do
     assert_manifest_application %{[
         {
