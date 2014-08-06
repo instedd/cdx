@@ -17,7 +17,7 @@ class ApiController < ApplicationController
     result = Cdx::Api::Elasticsearch::Query.new(params.merge(body)).execute
     respond_to do |format|
       format.csv do
-        build_csv result
+        build_csv result["events"]
         render :layout => false
       end
       format.json { render_json result }

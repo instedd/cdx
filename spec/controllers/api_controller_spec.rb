@@ -16,7 +16,7 @@ describe ApiController do
     fresh_client_for institution.elasticsearch_index_name
     response = get :events, body, options.merge(format: 'json')
     response.status.should eq(200)
-    Oj.load response.body
+    Oj.load(response.body)["events"]
   end
 
   def fresh_client_for index_name
