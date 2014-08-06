@@ -1,4 +1,5 @@
 class Cdx::Api::Elasticsearch::Query
+  DEFAULT_PAGE_SIZE = 50
 
   def initialize(params, api = Cdx::Api)
     @params = params
@@ -15,12 +16,29 @@ class Cdx::Api::Elasticsearch::Query
     query = and_conditions(process_conditions(params))
 
     if params[:group_by]
-      query_with_group_by(query, params[:group_by])
+      events = query_with_group_by(query, params[:group_by])
+      total_count = events.inject(0) { |sum, result| sum + result[:count].to_i }
     else
-      @api.translate(@api.search_elastic(query: query, sort: process_order(params))["hits"]["hits"].map do |hit|
-        hit["_source"]
-      end)
+      events, total_count = query_without_group_by(query, params)
     end
+
+    {"events" => events, "total_count" => total_count}
+  end
+
+  def query_without_group_by(query, params)
+    sort = process_order(params)
+    page_size = params[:page_size] || DEFAULT_PAGE_SIZE
+    offset = params[:offset]
+
+    es_query = {body: {query: query, sort: sort}}
+    es_query[:size] = page_size if page_size.present?
+    es_query[:from] = offset if offset.present?
+
+    results = @api.search_elastic(es_query)
+    hits = results["hits"]
+    total = hits["total"]
+    results = @api.translate hits["hits"].map { |hit| hit["_source"] }
+    [results, total]
   end
 
   def process_conditions params, conditions=[]
@@ -160,7 +178,7 @@ class Cdx::Api::Elasticsearch::Query
 
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
-    event = @api.search_elastic aggregations.to_hash.merge(query: query)
+    event = @api.search_elastic body: aggregations.to_hash.merge(query: query)
     process_group_by_buckets(event["aggregations"].with_indifferent_access, aggregations.in_order, [], {}, 0)
   end
 

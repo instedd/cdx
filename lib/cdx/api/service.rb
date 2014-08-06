@@ -25,9 +25,9 @@ class Cdx::Api::Service
     response.map { |event| format.translate_event(event) }
   end
 
-  def search_elastic body
+  def search_elastic options
     if index_name_pattern
-      client.search(index: index_name_pattern, body: body)
+      client.search options.merge(index: index_name_pattern)
     else
       raise "You must define the index_name_pattern: Cdx::Api::Elasticsearch.setup { |config| config.index_name_pattern = ... }"
     end
