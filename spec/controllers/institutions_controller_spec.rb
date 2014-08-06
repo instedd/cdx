@@ -5,8 +5,8 @@ describe InstitutionsController do
   before(:each) {sign_in user}
 
   it "institution is created if name is provided" do
-    post :create, {"institution" => {"name" => ""}}
-    Institution.count.should eq(0)
+    post :create, {"institution" => {"name" => "foo"}}
+    Institution.count.should eq(1)
   end
 
   it "institutions without name are not created" do
