@@ -48,6 +48,10 @@ describe Cdx::Api do
     Cdx::Api.client.delete_by_query index: "cdx_events", body: { query: { match_all: {} } } rescue nil
   end
 
+  after(:each) do
+    Cdx::Api.client.delete_by_query index: "cdx_events", body: { query: { match_all: {} } } rescue nil
+  end
+
   describe "Filter" do
     it "should check for new events since a date" do
       index results: [result: :positive], created_at: time(2013, 1, 1)
@@ -594,6 +598,20 @@ describe Cdx::Api do
       ])
     end
 
+    it "returns 0 elements if no events match the filter by condition name" do
+      index results:[condition: "MTB", result: :positive]
+      index results:[condition: "Flu", result: :negative]
+
+      results = query(result: 'foo', group_by: "result")
+
+      expect(results["events"].length).to eq(0)
+      expect(results["total_count"]).to eq(0)
+
+      results = query(result: 'foo')
+
+      expect(results["events"].length).to eq(0)
+      expect(results["total_count"]).to eq(0)
+    end
 
     describe "by fields with option valid values" do
       pending "should include group for option with 0 results" do

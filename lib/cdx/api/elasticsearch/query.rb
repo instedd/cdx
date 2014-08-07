@@ -195,7 +195,11 @@ class Cdx::Api::Elasticsearch::Query
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
     event = @api.search_elastic body: aggregations.to_hash.merge(query: query), size: 0
-    process_group_by_buckets(event["aggregations"].with_indifferent_access, aggregations.in_order, [], {}, 0)
+    if event["aggregations"]
+      process_group_by_buckets(event["aggregations"].with_indifferent_access, aggregations.in_order, [], {}, 0)
+    else
+      []
+    end
   end
 
   def extract_group_by_criteria(field)
