@@ -1,6 +1,6 @@
 ---
 category: Applications
-path: '/events'
+path: '/events[.format]'
 title: 'Query Events'
 type: 'GET'
 
@@ -8,6 +8,14 @@ layout: nil
 ---
 
 Returns a list of Events
+
+# Format
+
+The query can be answered in CSV, XML, and JSON formats.
+
+The CSV format don't include the total count.
+
+The default response format is JSON.
 
 # Filters
 
@@ -258,7 +266,9 @@ The JSON allows more complex aggregations, such as:
 
 `Status: 200 OK`
 
-## Without Grouping
+##JSON
+
+### Without Grouping
 
 Returns an array of events without any PII and the total count of elements that matched the filter.
 
@@ -307,7 +317,7 @@ Returns an array of events without any PII and the total count of elements that 
   ]
 }`
 
-## With Grouping
+### With Grouping
 
 Returns the quantity of events matching each combination of aggregated fields and the total count of elements that matched the filter.
 
@@ -338,5 +348,21 @@ Returns the quantity of events matching each combination of aggregated fields an
     },
   ]
 }`
+
+## CSV
+
+## Without Grouping
+
+`created_at,event_id,uuid,device_uuid,system_user,device_serial_number,error_code,laboratory_id,institution_id,...
+2014-08-01T21:29:52Z,b84a0c16-f223-1cd7-3705-71ec0056a682,b84a0c16-f223-1cd7-3705-71ec0056a682,efbc8343-b160-f...
+2014-08-01T21:30:06Z,cf44adcb-7414-8fd9-d663-a556c407be69,cf44adcb-7414-8fd9-d663-a556c407be69,efbc8343-b160-f...`
+
+## With Grouping
+
+`gender,result,count
+male,positive,23
+male,negative,10
+female,positive,2
+female,negative,30`
 
 For error responses, see the [response status codes documentation](#http-response-codes).
