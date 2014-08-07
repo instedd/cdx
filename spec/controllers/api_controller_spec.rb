@@ -453,8 +453,18 @@ describe ApiController do
           response.body.should eq("system_user,error_code,count\njane_doe,1234,2\njdoe,1234,1\n")
         end
 
-        pending "should respond an empty csv if no values" do
-          response = get :events, "", format: 'csv', group_by: 'system_user,error_code'
+        it "should respond an empty csv if no values" do
+          Timecop.freeze
+          post :create, (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe), device_uuid: device.secret_key
+          response = get :events, "", format: 'csv', result:'foo', group_by: 'result'
+
+          response.status.should eq(200)
+          response.content_type.should eq("text/csv")
+          response.headers["Content-Disposition"].should eq("attachment; filename=\"Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
+          response.should render_template("events")
+          response.body.should eq("")
+
+          response = get :events, "", format: 'csv'
 
           response.status.should eq(200)
           response.content_type.should eq("text/csv")

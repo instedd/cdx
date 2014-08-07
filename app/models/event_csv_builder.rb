@@ -1,14 +1,18 @@
 class EventCSVBuilder
   def initialize events
     @events = events
-    @columns = events.first.keys
+    @columns = events.first.try(:keys)
   end
 
   def build csv
-    csv << @columns
+    if @columns
+      csv << @columns
 
-    @events.each do |event|
-      csv << @columns.map {|column| event[column]}
+      @events.each do |event|
+        csv << @columns.map {|column| event[column]}
+      end
     end
+
+    csv
   end
 end

@@ -62,6 +62,7 @@ RSpec.configure do |config|
   config.before(:each) do
     Timecop.return
     FakeWeb.clean_registry
+    Cdx::Api.client.indices.delete index: "#{Cdx::Api.index_prefix}_*" rescue nil
   end
 
   config.after(:each) do
