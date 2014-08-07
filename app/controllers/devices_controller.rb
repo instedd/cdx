@@ -5,7 +5,7 @@ class DevicesController < ApplicationController
   add_breadcrumb 'Institutions', :institutions_path
 
   before_filter :load_institution
-  before_filter :load_laboratories, only: [:new, :create]
+  before_filter :load_laboratories, only: [:new, :create, :edit, :update]
 
   before_filter do
     add_breadcrumb @institution.name, institution_path(@institution)
@@ -50,9 +50,6 @@ class DevicesController < ApplicationController
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     # TODO: check valid laboratories
-
-    @laboratories = check_access(@institution.laboratories, ASSIGN_DEVICE_LABORATORY)
-    @laboratories ||= []
 
     @can_regenerate_key = has_access?(@devices, REGENERATE_DEVICE_KEY)
     @can_delete = has_access?(@device, DELETE_DEVICE)
