@@ -8,7 +8,7 @@ class SubscribersController < ApplicationController
     @subscriber.fields = []
     @filter_laboratory = params[:laboratory]
     @filter_condition = params[:condition]
-    @laboratory = Laboratory.find @filter_laboratory
+    @laboratory = Laboratory.find @filter_laboratory rescue nil
   end
 
   def create
@@ -32,7 +32,7 @@ class SubscribersController < ApplicationController
     @subscriber = current_user.subscribers.find params[:id]
     @filter_laboratory = @subscriber.filter["laboratory"]
     @filter_condition = @subscriber.filter["condition"]
-    @laboratory = Laboratory.find @filter_laboratory
+    @laboratory = Laboratory.find @filter_laboratory rescue nil
   end
 
   def update

@@ -3,7 +3,7 @@ APP_PATH = File.expand_path('../../config/application',  __FILE__)
 require_relative '../config/boot'
 require_relative '../config/environment'
 
-sleep_time = (ARGV[0] || 5).to_i.minutes
+sleep_time = (ARGV[0] || 5).to_i.seconds
 
 loop do
   Subscriber.notify_all
