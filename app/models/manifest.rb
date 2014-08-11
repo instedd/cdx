@@ -1,6 +1,7 @@
 class Manifest < ActiveRecord::Base
   has_and_belongs_to_many :device_models
 
+  validate :manifest_validation
   before_save :update_models
   before_save :update_version
   before_save :update_api_version
@@ -28,7 +29,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def metadata
-    Oj.load(self.definition)["metadata"]
+    Oj.load(self.definition)["metadata"] rescue {}
   end
 
   def apply_to(data)
@@ -189,4 +190,61 @@ class Manifest < ActiveRecord::Base
       end
     end
   end
+
+  def manifest_validation
+    if self.metadata.blank?
+      self.errors.add(:metadata, "can't be blank")
+    else
+      fields =  ["version","api_version","device_models"]
+      check_fields_in_metadata(fields)
+    end
+
+    check_field_mapping
+
+  rescue Oj::ParseError => ex
+    self.errors.add(:parse_error, ex.message)
+  end
+
+  def check_fields_in_metadata(fields)
+    m = self.metadata
+    fields.each do |f|
+      if m[f].blank?
+        self.errors.add(:metadata, "must include "+ f +" field")
+      end
+    end
+  end
+
+  def check_field_mapping
+    definition = Oj.load self.definition
+    if definition["field_mapping"].is_a? Array
+      definition["field_mapping"].each do |fm|
+        if (fm["type"] == "core")
+          check_valid_values fm
+          check_value_mappings fm
+        end
+      end
+    else
+      self.errors.add(:field_mapping, "must be an array")
+    end
+  end
+
+  def check_valid_values(field_mapping)
+    if (! field_mapping["valid_values"].blank?)
+      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'.  Valid_values are not permitted for core fields")
+    end
+  end
+
+  def check_value_mappings(field_mapping)
+    searchable_fields = Cdx::Api.searchable_fields
+    if(! field_mapping["value_mappings"].blank?)
+      target = searchable_fields.select { |f| f.name == field_mapping["target_field"] }.first
+      field_mapping["value_mappings"].values.each do |vm|
+        #Assuming there is an options key for valid_values field
+        if !target["valid_values"]["options"].include? vm
+          self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. '#{vm}' is not a valid value")
+        end
+      end
+    end
+  end
+
 end
