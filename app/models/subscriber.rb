@@ -20,7 +20,7 @@ class Subscriber < ActiveRecord::Base
     fields = self.fields
     filter = self.filter
     filter["since"] = last_run_at.iso8601
-    events = Cdx::Api::Elasticsearch::Query.new filter
+    events = Cdx::Api::Elasticsearch::Query.new(filter).execute["events"]
     now = Time.now
     events.each do |event|
       filtered_event = filter_event(event, fields)
