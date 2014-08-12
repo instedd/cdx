@@ -21,11 +21,20 @@ class DateGroupingDetail < GroupingDetail
       else
         raise "Invalid time interval: #{interval}"
     end
-    
+
     {count: {date_histogram: {field: field_definition[:name], interval: interval, format: format}}}
   end
 
   def yield_bucket(bucket)
-    {name => bucket[:key_as_string]}
+    value = bucket[:key_as_string]
+
+    # Pad week with a zero if it's less than ten
+    if @interval == "week"
+      value =~ /(\d+)-W(\d+)/
+      year, week = $1.to_i, $2.to_i
+      value = "%s-W%02d" % [year, week]
+    end
+
+    {name => value}
   end
 end

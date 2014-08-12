@@ -445,14 +445,16 @@ describe Cdx::Api do
       index results:[result: :positive], created_at: time(2010, 1, 6)
       index results:[result: :positive], created_at: time(2010, 1, 12)
       index results:[result: :positive], created_at: time(2010, 1, 13)
+      index results:[result: :positive], created_at: time(2010, 6, 13)
 
       response = query_events(group_by: "week(created_at)").sort_by do |event|
         event["created_at"]
       end
 
       expect(response).to eq([
-        {"created_at"=>"2010-W1", count: 3},
-        {"created_at"=>"2010-W2", count: 2}
+        {"created_at"=>"2010-W01", count: 3},
+        {"created_at"=>"2010-W02", count: 2},
+        {"created_at"=>"2010-W23", count: 1},
       ])
     end
 
