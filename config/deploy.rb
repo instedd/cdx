@@ -36,7 +36,7 @@ set :linked_files, %w{config/database.yml config/settings.yml config/guisso.yml}
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
-set :linked_dirs, %w{log}
+set :linked_dirs, %w{log public/nndd}
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
@@ -118,6 +118,6 @@ namespace :deploy do
     end
   end
 
-  after "deploy:updated", "foreman:export"    # Export foreman scripts
-  after "foreman:export", "foreman:restart"   # Restart application scripts
+  # after "deploy:updated", "foreman:export"    # Export foreman scripts
+  after :restart, "foreman:restart"   # Restart application scripts
 end
