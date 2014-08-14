@@ -14,22 +14,48 @@ describe Manifest do
   end
 
   it "creates a device model named according to the manifest" do
-    manifest = '{"metadata" : {"device_models" : ["foo"]}}'
-    Manifest.create(definition: manifest)
+    definition = %{{
+      "metadata" : {
+        "device_models" : ["foo"],
+        "api_version" : "1.0.0",
+        "version" : 1
+      },
+      "field_mapping" : []
+    }}
+
+    Manifest.create(definition: definition)
 
     Manifest.count.should eq(1)
-    Manifest.first.definition.should eq(manifest)
+    Manifest.first.definition.should eq(definition)
     DeviceModel.count.should eq(1)
     Manifest.first.device_models.first.name.should eq("foo")
   end
 
   it "updates it's version number" do
-    Manifest.create(definition: '{"metadata" : {"device_models" : ["foo"], "version" : 1}}')
+    definition = %{{
+      "metadata" : {
+        "device_models" : ["foo"],
+        "api_version" : "1.0.0",
+        "version" : 1
+      },
+      "field_mapping" : []
+    }}
+
+    updated_definition = %{{
+      "metadata" : {
+        "device_models" : ["foo"],
+        "api_version" : "1.0.0",
+        "version" : 2
+      },
+      "field_mapping" : []
+    }}
+
+    Manifest.create(definition: definition)
 
     manifest = Manifest.first
 
     manifest.version.should eq(1)
-    manifest.definition = '{"metadata" : {"device_models" : ["foo"], "version" : 2}}'
+    manifest.definition = updated_definition
     manifest.save!
 
     Manifest.count.should eq(1)
@@ -38,12 +64,30 @@ describe Manifest do
   end
 
   it "updates it's api_version number" do
-    Manifest.create(definition: '{"metadata" : {"device_models" : ["foo"], "api_version" : "1.0.0"}}')
+    definition = %{{
+      "metadata" : {
+        "device_models" : ["foo"],
+        "api_version" : "1.0.0",
+        "version" : 1
+      },
+      "field_mapping" : []
+    }}
+
+    updated_definition = %{{
+      "metadata" : {
+        "device_models" : ["foo"],
+        "api_version" : "2.0.0",
+        "version" : 1
+      },
+      "field_mapping" : []
+    }}
+
+    Manifest.create(definition: definition)
 
     manifest = Manifest.first
 
     manifest.api_version.should eq('1.0.0')
-    manifest.definition = '{"metadata" : {"device_models" : ["foo"], "api_version" : "2.0.0"}}'
+    manifest.definition = updated_definition
     manifest.save!
 
     Manifest.count.should eq(1)
@@ -52,16 +96,35 @@ describe Manifest do
   end
 
   it "leaves no orphan model" do
-    Manifest.create(definition: '{"metadata" : {"device_models" : ["foo"], "version" : 1}}')
+    definition = %{{
+      "metadata" : {
+        "version" : 1,
+        "api_version" : "1.0.0",
+        "device_models" : ["foo"]
+      },
+      "field_mapping" : []
+    }}
+
+    Manifest.create(definition: definition)
+
 
     Manifest.count.should eq(1)
     DeviceModel.count.should eq(1)
     Manifest.first.destroy()
     Manifest.count.should eq(0)
     DeviceModel.count.should eq(0)
+    Manifest.create(definition: definition)
 
-    Manifest.create(definition: '{"metadata" : {"device_models" : ["foo"], "version" : 1}}')
-    Manifest.create(definition: '{"metadata" : {"device_models" : ["bar"], "version" : 1}}')
+    definition_bar = %{{
+      "metadata" : {
+        "version" : 1,
+        "api_version" : "1.0.0",
+        "device_models" : ["bar"]
+      },
+      "field_mapping" : []
+    }}
+
+    Manifest.create(definition: definition_bar)
 
     Manifest.count.should eq(2)
     DeviceModel.count.should eq(2)
@@ -71,10 +134,19 @@ describe Manifest do
 
     Manifest.first.device_models.first.should eq(DeviceModel.first)
 
+    definition_version = %{{
+      "metadata" : {
+        "version" : 2,
+        "api_version" : "1.0.0",
+        "device_models" : ["foo"]
+      },
+      "field_mapping" : []
+    }}
+
     manifest = Manifest.first
 
     manifest.version.should eq(1)
-    manifest.definition = '{"metadata" : {"device_models" : "foo", "version" : 2}}'
+    manifest.definition = definition_version
     manifest.save!
     DeviceModel.count.should eq(1)
 
@@ -459,4 +531,160 @@ describe Manifest do
           "temperature" => 20
         }]}, pii: Hash.new, custom: Hash.new}
   end
+
+  it "shouldn't pass validations when creating if definition is an invalid json" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0" , ,
+        "api_version" : "1.0.0"
+      }
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:parse_error].should_not eq(nil)
+  end
+
+  it "shouldn't pass validations if metadata is empty" do
+    definition = %{{
+      "metadata" : {
+      }
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:metadata].first.should eq("can't be blank")
+  end
+
+  it "shouldn't pass validations if metadata doesn't include version" do
+    definition = %{{
+      "metadata" : {
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : []
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:metadata].first.should eq("must include version field")
+  end
+
+  it "shouldn't pass validations if metadata doesn't include api_version" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : []
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:metadata].first.should eq("must include api_version field")
+  end
+
+  it "shouldn't pass validations if metadata doesn't include device_models" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0"
+      },
+      "field_mapping" : []
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:metadata].first.should eq("must include device_models field")
+  end
+
+  it "shouldn't pass validations if field_mapping is not an array" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      }
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:field_mapping].first.should eq("must be an array")
+  end
+
+  it "shouldn't create if a core field is provided with valid values" do
+    definition = %{{
+      "metadata": {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping": [
+        {
+          "target_field": "age",
+          "type": "core",
+          "valid_values": {
+            "range" : {
+              "min" : 0,
+              "max" : 100
+            }
+          }
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:invalid_field_mapping].first.should eq(": target 'age'. Valid_values are not permitted for core fields")
+  end
+
+  it "shouldn't create if a core field is provided with an invalid value mapping" do
+    definition = %{{
+      "metadata": {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping": [
+        {
+          "target_field" : "test_type",
+          "selector" : "Test.test_type",
+          "type" : "core",
+          "value_mappings" : {
+            "*QC*" : "Invalid mapping",
+            "*Specimen*" : "specimen"
+          }
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:invalid_field_mapping].first.should eq(": target 'test_type'. 'Invalid mapping' is not a valid value")
+  end
+
+  it "should create if a core fields are provided with valid value mappings" do
+    definition = %{{
+      "metadata": {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping": [
+        {
+          "target_field" : "test_type",
+          "selector" : "Test.test_type",
+          "type" : "core",
+          "value_mappings" : {
+            "*QC*" : "qc",
+            "*Specimen*" : "specimen"
+          }
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(1)
+  end
+
 end

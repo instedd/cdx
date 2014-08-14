@@ -101,7 +101,8 @@ describe ApiController do
       Manifest.create definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
-          "version" : 1
+          "version" : 1,
+          "api_version" : "1.0.0"
         },
         "field_mapping" : [{
             "target_field" : "assay_name",
@@ -121,7 +122,8 @@ describe ApiController do
       Manifest.create definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
-          "version" : 1
+          "version" : 1,
+          "api_version" : "1.0.0"
         },
         "field_mapping" : [
           {
@@ -171,7 +173,8 @@ describe ApiController do
       Manifest.create definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
-          "version" : 2
+          "version" : 2,
+          "api_version" : "1.0.0"
         },
         "field_mapping" : [
           {
@@ -193,7 +196,8 @@ describe ApiController do
       Manifest.create definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
-          "version" : 2
+          "version" : 2,
+          "api_version" : "1.0.0"
         },
         "field_mapping" : [
           {
@@ -494,7 +498,8 @@ describe ApiController do
         Manifest.create definition: %{{
           "metadata" : {
             "device_models" : ["#{device.device_model.name}"],
-            "version" : 2
+            "version" : 2,
+            "api_version" : "1.0.0"
           },
           "field_mapping" : [
             {

@@ -230,7 +230,7 @@ class Manifest < ActiveRecord::Base
 
   def check_valid_values(field_mapping)
     if (! field_mapping["valid_values"].blank?)
-      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'.  Valid_values are not permitted for core fields")
+      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Valid_values are not permitted for core fields")
     end
   end
 
