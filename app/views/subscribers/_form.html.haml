@@ -14,7 +14,7 @@
     - else
       This is a subscriber for this filter:
     %ul
-      %li Laboratory: #{@laboratory.name}
+      %li Laboratory: #{@laboratory.try(:name)}
       %li Condition: #{@filter_condition}
   %div
     = f.label :name

@@ -25,8 +25,8 @@ set :deploy_to, "/u/apps/#{fetch(:application)}"
 # set :format, :pretty
 
 # Default value for :log_level is :debug
-# set :log_level, :debug
-set :log_level, :info
+set :log_level, :debug
+# set :log_level, :info
 
 # Default value for :pty is false
 # set :pty, true
@@ -36,7 +36,7 @@ set :linked_files, %w{config/database.yml config/settings.yml config/guisso.yml}
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
-set :linked_dirs, %w{log}
+set :linked_dirs, %w{log public/nndd}
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
@@ -72,4 +72,52 @@ namespace :deploy do
     end
   end
   after :publishing, :generate_version
+
+  namespace :foreman do
+    desc 'Export the Procfile to Ubuntu upstart scripts'
+
+    task :export do
+      on roles(:app) do
+        execute :echo, "-e \"PATH=$PATH\\nGEM_HOME=$GEM_HOME\\nGEM_PATH=$GEM_PATH\\nRAILS_ENV=production\" >  #{release_path}/.env"
+        # within current_path do
+        #   execute "#{fetch(:rvm_path)}/bin/rvmsudo #{fetch(:rvm_path)}/bin/bundle exec foreman export upstart /etc/init -f #{current_path}/Procfile -a #{fetch(:application)} -u #{fetch(:user)} --concurrency=\"subscribers=1\""
+        # end
+
+        # on roles(:app) do
+          execute [
+            "cd #{release_path} &&",
+            'export rvmsudo_secure_path=0 && ',
+            "#{fetch(:rvm_path)}/bin/rvm #{fetch(:rvm_ruby_version)} do",
+            'rvmsudo',
+            "#{fetch(:rvm_path)}/bin/bundle exec foreman export -a #{fetch(:application)} -u #{fetch(:user)} upstart /etc/init --concurrency=\"subscribers=1\""
+            # "bundle exec foreman export -a #{fetch(:application)} -u #{fetch(:user)} -p 8787 upstart /etc/init"
+          ].join(' ')
+        # end
+      end
+    end
+
+    desc "Start the application services"
+    task :start do
+      on roles(:app) do
+        execute "sudo start #{fetch(:application)}"
+      end
+
+    end
+    desc "Stop the application services"
+    task :stop do
+      on roles(:app) do
+        execute "sudo stop #{fetch(:application)}"
+      end
+    end
+
+    desc "Restart the application services"
+    task :restart do
+      on roles(:app) do
+        execute "sudo start #{fetch(:application)} || sudo restart #{fetch(:application)}"
+      end
+    end
+  end
+
+  # after "deploy:updated", "foreman:export"    # Export foreman scripts
+  after :restart, "foreman:restart"   # Restart application scripts
 end

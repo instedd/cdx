@@ -20,7 +20,7 @@ class Subscriber < ActiveRecord::Base
     fields = self.fields
     filter = self.filter
     filter["since"] = last_run_at.iso8601
-    events = Cdx::Api::Elasticsearch::Query.new filter
+    events = Cdx::Api::Elasticsearch::Query.new(filter).execute["events"]
     now = Time.now
     events.each do |event|
       filtered_event = filter_event(event, fields)
@@ -42,15 +42,16 @@ class Subscriber < ActiveRecord::Base
   end
 
   def filter_event(event, fields)
+    merged_event = event.merge Event.find_by_uuid(event['uuid']).decrypt.sensitive_data
     filtered_event = {}
     fields.each do |field|
       case field
       when "event"
-        filtered_event["event"] = event["results"].first["result"]
+        filtered_event["event"] = merged_event["results"].first["result"]
       when "condition"
-        filtered_event["condition"] = event["results"].first["condition"]
+        filtered_event["condition"] = merged_event["results"].first["condition"]
       else
-        filtered_event[field] = event[field]
+        filtered_event[field] = merged_event[field]
       end
     end
     filtered_event
