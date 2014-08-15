@@ -107,7 +107,7 @@ describe ApiController do
         "field_mapping" : [{
             "target_field" : "assay_name",
             "selector" : "assay.name",
-            "type" : "core"
+            "core" : true
           }]
       }}
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_uuid: device.secret_key
@@ -129,12 +129,12 @@ describe ApiController do
           {
             "target_field": "assay_name",
             "selector" : "assay.name",
-            "type" : "core"
+            "core" : true
           },
           {
             "target_field": "foo",
             "selector" : "patient_id",
-            "type" : "custom",
+            "core" : false,
             "pii": true
           }
         ]
@@ -165,7 +165,7 @@ describe ApiController do
           {
             "target_field": "foo",
             "selector" : "assay.name",
-            "type" : "core"
+            "core" : true
           }
         ]
       }}
@@ -180,7 +180,7 @@ describe ApiController do
           {
             "target_field": "assay_name",
             "selector" : "assay.name",
-            "type" : "core"
+            "core" : true
           }
         ]
       }}
@@ -203,7 +203,7 @@ describe ApiController do
           {
             "target_field": "foo",
             "selector" : "some_field",
-            "type" : "custom",
+            "core" : false,
             "pii": false,
             "indexed": false
           }
@@ -220,6 +220,31 @@ describe ApiController do
       event.sensitive_data["foo"].should be(nil)
       event.custom_fields[:foo].should eq(1234)
       event.custom_fields["foo"].should eq(1234)
+    end
+
+    it "validates the data type" do
+      Manifest.create definition: %{{
+        "metadata" : {
+          "device_models" : ["#{device.device_model.name}"],
+          "api_version": "1",
+          "version" : 1
+        },
+        "field_mapping" : [{
+            "target_field" : "error_code",
+            "selector" : "error_code",
+            "core" : true,
+            "type" : "integer"
+          }]
+      }}
+      post :create, Oj.dump(error_code: 1234), device_uuid: device.secret_key
+
+      event = all_elasticsearch_events.first["_source"]
+      event["error_code"].should eq(1234)
+
+      post :create, Oj.dump(error_code: "foo"), device_uuid: device.secret_key
+
+      response.code.should eq("422")
+      Oj.load(response.body)["errors"].should eq("'foo' is not a valid value for 'error_code' (must be an integer)")
     end
   end
 
@@ -505,7 +530,7 @@ describe ApiController do
             {
               "target_field": "foo",
               "selector" : "some_field",
-              "type" : "custom",
+              "core" : false,
               "pii": false,
               "indexed": false
             }

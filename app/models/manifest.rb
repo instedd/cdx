@@ -43,9 +43,9 @@ class Manifest < ActiveRecord::Base
     target_field = mapping["target_field"]
     selector = mapping["selector"]
     value = apply_selector(selector, data)
-    check_valid_value(value, target_field, mapping["valid_values"])
+    check_valid_value(value, mapping, target_field, mapping["valid_values"])
     value = apply_value_mappings(value, target_field, mapping["value_mappings"])
-    key = hash_key(mapping["type"], target_field, mapping["indexed"], mapping["pii"])
+    key = hash_key(target_field, mapping["core"], mapping["indexed"], mapping["pii"])
 
     if (targets = target_field.split("[*].")).size > 1
       # find the array or create it. Only one level for now
@@ -83,21 +83,24 @@ class Manifest < ActiveRecord::Base
     end
   end
 
-  def hash_key(type, target_field, indexed, pii)
-    case type
-    when "core"
+  def hash_key(target_field, core, indexed, pii)
+    if core
       return :pii if Event.pii?(target_field)
       :indexed
-    when "custom"
+    else
       return :pii if pii
       return :indexed if indexed
       :custom
-    else
-      raise "This should've been validated on creation"
     end
   end
 
-  def check_valid_value(value, target_field, valid_values)
+  def check_valid_value(value, mapping, target_field, valid_values)
+    if mapping['type'] == 'integer' and value.present? and !value.is_a? Integer
+      if value.to_i.to_s != value
+        raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (must be an integer)"
+      end
+    end
+
     return value if valid_values ==  nil
 
     if value.is_a? Array
@@ -121,7 +124,7 @@ class Manifest < ActiveRecord::Base
 
   def check_value_in_options(value, target_field, options)
     unless options.include? value
-      raise "'#{value}' is not a valid value for '#{target_field}' (valid options are: #{options.join ", "})"
+      raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (valid options are: #{options.join ", "})"
     end
   end
 
@@ -130,16 +133,16 @@ class Manifest < ActiveRecord::Base
     max = range["max"]
 
     unless min <= value and value <= max
-      raise "'#{value}' is not a valid value for '#{target_field}' (valid values must be between #{min} and #{max})"
+      raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (valid values must be between #{min} and #{max})"
     end
   end
 
   def check_value_is_date(value, target_field, date_format)
     case date_format
     when "iso"
-      Time.parse(value) rescue raise "'#{value}' is not a valid value for '#{target_field}' (valid value must be an iso date)"
+      Time.parse(value) rescue raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (valid value must be an iso date)"
     else
-      raise "Not implemented"
+      raise ManifestParsingError.new "Date format not implemented"
     end
   end
 
@@ -153,7 +156,7 @@ class Manifest < ActiveRecord::Base
     if matched_mapping
       mappings[matched_mapping]
     else
-      raise "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{mappings.keys.join ", "})"
+      raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{mappings.keys.join ", "})"
     end
   end
 
@@ -162,7 +165,8 @@ class Manifest < ActiveRecord::Base
       {
         target_field: sensitive_field,
         selector: sensitive_field,
-        type: :core,
+        core: true,
+        type: 'string',
         pii: true,
         indexed: false
       }
@@ -183,7 +187,8 @@ class Manifest < ActiveRecord::Base
         {
           target_field: field,
           selector: field,
-          type: :core,
+          type: field_definition[:type],
+          core: true,
           pii: false,
           indexed: true
         }
@@ -218,7 +223,7 @@ class Manifest < ActiveRecord::Base
     definition = Oj.load self.definition
     if definition["field_mapping"].is_a? Array
       definition["field_mapping"].each do |fm|
-        if (fm["type"] == "core")
+        if (fm["core"] == true)
           check_valid_values fm
           check_value_mappings fm
         end
@@ -230,7 +235,7 @@ class Manifest < ActiveRecord::Base
 
   def check_valid_values(field_mapping)
     if (! field_mapping["valid_values"].blank?)
-      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Valid_values are not permitted for core fields")
+      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Valid values are not permitted for core fields")
     end
   end
 

@@ -10,6 +10,8 @@ class ApiController < ApplicationController
     device = Device.includes(:manifests).includes(:institution).includes(:laboratories).includes(:locations).find_by_secret_key(params[:device_uuid])
     Event.create_or_update_with device, request.body.read
     head :ok
+  rescue ManifestParsingError  => ex
+    render :status => :unprocessable_entity, :json => { :errors => ex.message}
   end
 
   def events

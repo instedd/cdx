@@ -159,7 +159,7 @@ describe Manifest do
         [{
           "target_field" : "assay_name",
           "selector" : "assay.name",
-          "type" : "core"
+          "core" : true
         }]
       },
       '{"assay" : {"name" : "GX4002"}}',
@@ -171,7 +171,7 @@ describe Manifest do
         [{
           "target_field" : "patient_name",
           "selector" : "patient.name",
-          "type" : "core"
+          "core" : true
         }]
       },
       '{"patient" : {"name" : "John"}}',
@@ -183,7 +183,7 @@ describe Manifest do
         [{
           "target_field" : "temperature",
           "selector" : "temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : false
         }]
@@ -197,7 +197,7 @@ describe Manifest do
         [{
           "target_field" : "temperature",
           "selector" : "temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true
         }]
@@ -211,7 +211,7 @@ describe Manifest do
         [{
           "target_field" : "temperature",
           "selector" : "temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : true,
           "indexed" : false
         }]
@@ -225,7 +225,7 @@ describe Manifest do
         [{
           "target_field" : "level",
           "selector" : "level",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "valid_values" : {
@@ -242,7 +242,7 @@ describe Manifest do
         [{
           "target_field" : "level",
           "selector" : "level",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "valid_values" : {
@@ -259,7 +259,7 @@ describe Manifest do
         [{
           "target_field" : "temperature",
           "selector" : "temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "valid_values" : {
@@ -279,7 +279,7 @@ describe Manifest do
         [{
           "target_field" : "temperature",
           "selector" : "temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "valid_values" : {
@@ -299,7 +299,7 @@ describe Manifest do
         [{
           "target_field" : "temperature",
           "selector" : "temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "valid_values" : {
@@ -319,7 +319,7 @@ describe Manifest do
         [{
           "target_field" : "sample_date",
           "selector" : "sample_date",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "valid_values" : {
@@ -336,7 +336,7 @@ describe Manifest do
         [{
           "target_field" : "sample_date",
           "selector" : "sample_date",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "valid_values" : {
@@ -353,7 +353,7 @@ describe Manifest do
         [{
           "target_field" : "condition",
           "selector" : "condition",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "value_mappings" : {
@@ -372,7 +372,7 @@ describe Manifest do
         [{
           "target_field" : "condition",
           "selector" : "condition",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "value_mappings" : {
@@ -391,7 +391,7 @@ describe Manifest do
         [{
           "target_field" : "condition",
           "selector" : "condition",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "value_mappings" : {
@@ -410,7 +410,7 @@ describe Manifest do
         [{
           "target_field" : "list[*].temperature",
           "selector" : "temperature_list[*].temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true
         }]
@@ -424,7 +424,7 @@ describe Manifest do
         [{
           "target_field" : "results[*].condition",
           "selector" : "conditions[*].condition",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true,
           "value_mappings" : {
@@ -443,14 +443,14 @@ describe Manifest do
         {
           "target_field" : "collection[*].temperature",
           "selector" : "some_list[*].temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true
         },
         {
           "target_field" : "collection[*].foo",
           "selector" : "some_list[*].bar",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true
         }
@@ -483,14 +483,14 @@ describe Manifest do
         {
           "target_field" : "collection[*].temperature",
           "selector" : "temperature_list[*].temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true
         },
         {
           "target_field" : "collection[*].foo",
           "selector" : "other_list[*].bar",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true
         }
@@ -518,7 +518,7 @@ describe Manifest do
         {
           "target_field" : "collection[*].temperature",
           "selector" : "temperature",
-          "type" : "custom",
+          "core" : false,
           "pii" : false,
           "indexed" : true
         }
@@ -614,16 +614,16 @@ describe Manifest do
 
   it "shouldn't create if a core field is provided with valid values" do
     definition = %{{
-      "metadata": {
+      "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
         "device_models" : ["GX4001"]
       },
-      "field_mapping": [
+      "field_mapping" : [
         {
-          "target_field": "age",
-          "type": "core",
-          "valid_values": {
+          "target_field" : "age",
+          "core" : true,
+          "valid_values" : {
             "range" : {
               "min" : 0,
               "max" : 100
@@ -635,21 +635,21 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'age'. Valid_values are not permitted for core fields")
+    m.errors[:invalid_field_mapping].first.should eq(": target 'age'. Valid values are not permitted for core fields")
   end
 
   it "shouldn't create if a core field is provided with an invalid value mapping" do
     definition = %{{
-      "metadata": {
+      "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
         "device_models" : ["GX4001"]
       },
-      "field_mapping": [
+      "field_mapping" : [
         {
           "target_field" : "test_type",
           "selector" : "Test.test_type",
-          "type" : "core",
+          "core" : true,
           "value_mappings" : {
             "*QC*" : "Invalid mapping",
             "*Specimen*" : "specimen"
@@ -665,16 +665,16 @@ describe Manifest do
 
   it "should create if a core fields are provided with valid value mappings" do
     definition = %{{
-      "metadata": {
+      "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
         "device_models" : ["GX4001"]
       },
-      "field_mapping": [
+      "field_mapping" : [
         {
           "target_field" : "test_type",
           "selector" : "Test.test_type",
-          "type" : "core",
+          "core" : true,
           "value_mappings" : {
             "*QC*" : "qc",
             "*Specimen*" : "specimen"
