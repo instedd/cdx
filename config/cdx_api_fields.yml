@@ -104,8 +104,8 @@ searchable_fields:
       - name: condition
         valid_values:
           - bcr_abl
-          - C.diff
-          - C.diff_027
+          - c_diff
+          - c_diff_027
           - ct
           - ng
           - ev
