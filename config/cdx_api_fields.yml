@@ -47,6 +47,9 @@ searchable_fields:
   - name: device_serial_number
   - name: error_code
     type: integer
+  - name: error_description
+    filter_parameter_definition: none
+    group_parameter_definition: none
   - name: laboratory_id
     type: integer
   - name: institution_id
@@ -81,12 +84,52 @@ searchable_fields:
   - name: assay_name
   - name: gender
   - name: ethnicity
+  - name: race
+  - name: race_ethnicity
+  - name: status
+    valid_values:
+      - invalid
+      - error
+      - no_result
+      - success
+      - negative
   - name: results
     type: nested
     sub_fields:
       - name: result
         type: multi_field
+        valid_values:
+          - positive
+          - negative
       - name: condition
+        valid_values:
+          - bcr_abl
+          - C.diff
+          - C.diff_027
+          - ct
+          - ng
+          - ev
+          - fii
+          - fv
+          - flu_a
+          - h1n1
+          - flu_b
+          - rsv
+          - gbs
+          - hcv
+          - hiv
+          - hpv_16
+          - hpv_18_45
+          - other_hr_hpv
+          - hr_hpv
+          - mrsa
+          - sa
+          - mtb
+          - rif
+          - norovirus_gi
+          - norovirus_gii
+          - vre_van_a
+          - vre_van_b
   - name: test_type
     filter_parameter_definition:
       - type: match
