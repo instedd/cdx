@@ -20,4 +20,12 @@ describe Location do
     location.errors.keys.should include(:parent)
     Location.create(admin_level: 2, parent: root_location).errors.should be_empty
   end
+
+  it "prevents the creation of a location with parent and without admin level" do
+    location = Location.new
+    location.parent = root_location
+    location.save
+
+    location.errors.keys.should include(:admin_level)
+  end
 end

@@ -37,6 +37,6 @@ class Location < ActiveRecord::Base
   end
 
   def below_parent?
-    parent.admin_level < self.admin_level if parent
+    parent.admin_level < self.admin_level if parent && self.admin_level
   end
 end
