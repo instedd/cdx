@@ -5,8 +5,6 @@ class Manifest < ActiveRecord::Base
   before_save :update_models
   before_save :update_version
   before_save :update_api_version
-  after_destroy :ensure_no_orphan_models
-  after_save :ensure_no_orphan_models
 
   def self.default
     new definition: default_definition
@@ -22,10 +20,6 @@ class Manifest < ActiveRecord::Base
 
   def update_api_version
     self.api_version = metadata["api_version"]
-  end
-
-  def ensure_no_orphan_models
-    DeviceModel.includes(:manifests).where('device_models_manifests.manifest_id' => nil).destroy_all
   end
 
   def metadata

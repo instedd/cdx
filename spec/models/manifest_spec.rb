@@ -13,8 +13,8 @@ describe Manifest do
     expect { manifest.apply_to(Oj.load(data)) }.to raise_error
   end
 
-  it "creates a device model named according to the manifest" do
-    definition = %{{
+  let (:definition) do
+    %{{
       "metadata" : {
         "device_models" : ["foo"],
         "api_version" : "1.0.0",
@@ -22,7 +22,9 @@ describe Manifest do
       },
       "field_mapping" : []
     }}
+  end
 
+  it "creates a device model named according to the manifest" do
     Manifest.create(definition: definition)
 
     Manifest.count.should eq(1)
@@ -31,16 +33,7 @@ describe Manifest do
     Manifest.first.device_models.first.name.should eq("foo")
   end
 
-  it "updates it's version number" do
-    definition = %{{
-      "metadata" : {
-        "device_models" : ["foo"],
-        "api_version" : "1.0.0",
-        "version" : 1
-      },
-      "field_mapping" : []
-    }}
-
+  it "updates it's version number" do  
     updated_definition = %{{
       "metadata" : {
         "device_models" : ["foo"],
@@ -64,15 +57,6 @@ describe Manifest do
   end
 
   it "updates it's api_version number" do
-    definition = %{{
-      "metadata" : {
-        "device_models" : ["foo"],
-        "api_version" : "1.0.0",
-        "version" : 1
-      },
-      "field_mapping" : []
-    }}
-
     updated_definition = %{{
       "metadata" : {
         "device_models" : ["foo"],
@@ -95,24 +79,35 @@ describe Manifest do
     Manifest.first.api_version.should eq("2.0.0")
   end
 
+  it "reuses an existing device model if it already exists" do
+    Manifest.create definition: definition
+    Manifest.first.destroy
+
+    model = DeviceModel.first
+
+    Manifest.create definition: definition
+
+    DeviceModel.count.should eq(1)
+    DeviceModel.first.id.should eq(model.id)
+  end
+
+  it "leaves device models after being deleted" do
+    Manifest.create definition: definition
+    
+    Manifest.first.destroy
+
+    Manifest.count.should eq(0)
+    DeviceModel.count.should eq(1)
+  end
+
   it "leaves no orphan model" do
-    definition = %{{
-      "metadata" : {
-        "version" : 1,
-        "api_version" : "1.0.0",
-        "device_models" : ["foo"]
-      },
-      "field_mapping" : []
-    }}
-
     Manifest.create(definition: definition)
-
 
     Manifest.count.should eq(1)
     DeviceModel.count.should eq(1)
     Manifest.first.destroy()
     Manifest.count.should eq(0)
-    DeviceModel.count.should eq(0)
+
     Manifest.create(definition: definition)
 
     definition_bar = %{{
@@ -130,9 +125,7 @@ describe Manifest do
     DeviceModel.count.should eq(2)
     Manifest.first.destroy()
     Manifest.count.should eq(1)
-    DeviceModel.count.should eq(1)
-
-    Manifest.first.device_models.first.should eq(DeviceModel.first)
+    DeviceModel.count.should eq(2)
 
     definition_version = %{{
       "metadata" : {
@@ -148,7 +141,8 @@ describe Manifest do
     manifest.version.should eq(1)
     manifest.definition = definition_version
     manifest.save!
-    DeviceModel.count.should eq(1)
+
+    DeviceModel.count.should eq(2)
 
     Manifest.first.device_models.first.should eq(DeviceModel.first)
     DeviceModel.first.name.should eq("foo")
