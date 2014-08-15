@@ -13,11 +13,4 @@ class CDPDocumentFormat
     def translate_event(event)
       event
     end
-
-    private
-
-    def cdp_field_name(indexed_field_name)
-      indexed_field_name
-    end
-
 end
