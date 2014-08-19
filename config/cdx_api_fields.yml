@@ -99,37 +99,39 @@ searchable_fields:
       - name: result
         type: multi_field
         valid_values:
-          - positive
-          - negative
+          options:
+            - positive
+            - negative
       - name: condition
         valid_values:
-          - bcr_abl
-          - c_diff
-          - c_diff_027
-          - ct
-          - ng
-          - ev
-          - fii
-          - fv
-          - flu_a
-          - h1n1
-          - flu_b
-          - rsv
-          - gbs
-          - hcv
-          - hiv
-          - hpv_16
-          - hpv_18_45
-          - other_hr_hpv
-          - hr_hpv
-          - mrsa
-          - sa
-          - mtb
-          - rif
-          - norovirus_gi
-          - norovirus_gii
-          - vre_van_a
-          - vre_van_b
+          options:
+            - bcr_abl
+            - c_diff
+            - c_diff_027
+            - ct
+            - ng
+            - ev
+            - fii
+            - fv
+            - flu_a
+            - h1n1
+            - flu_b
+            - rsv
+            - gbs
+            - hcv
+            - hiv
+            - hpv_16
+            - hpv_18_45
+            - other_hr_hpv
+            - hr_hpv
+            - mrsa
+            - sa
+            - mtb
+            - rif
+            - norovirus_gi
+            - norovirus_gii
+            - vre_van_a
+            - vre_van_b
   - name: test_type
     filter_parameter_definition:
       - type: match
