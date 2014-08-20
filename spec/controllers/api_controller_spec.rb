@@ -321,43 +321,43 @@ describe ApiController do
       device1 = Device.make institution: institution, laboratories: [laboratory1]
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
-      post :create, (Oj.dump results:[result: "negative"]), device_uuid: device1.secret_key
-      post :create, (Oj.dump results:[result: "positive"]), device_uuid: device2.secret_key
-      post :create, (Oj.dump results:[result: "positive with riff"]), device_uuid: device3.secret_key
+      post :create, (Oj.dump results:[condition: "flu_a"]), device_uuid: device1.secret_key
+      post :create, (Oj.dump results:[condition: "flu_b"]), device_uuid: device2.secret_key
+      post :create, (Oj.dump results:[condition: "mtb"]), device_uuid: device3.secret_key
 
       response = get_updates(location: leaf_location1.id)
 
-      response.first["results"].first["result"].should eq("negative")
+      response.first["results"].first["condition"].should eq("flu_a")
 
       response = get_updates(location: leaf_location2.id)
 
-      response.first["results"].first["result"].should eq("positive")
+      response.first["results"].first["condition"].should eq("flu_b")
 
       response = get_updates(location: parent_location.id).sort_by do |event|
-        event["results"].first["result"]
+        event["results"].first["condition"]
       end
 
       response.size.should be(2)
-      response[0]["results"].first["result"].should eq("negative")
-      response[1]["results"].first["result"].should eq("positive")
+      response[0]["results"].first["condition"].should eq("flu_a")
+      response[1]["results"].first["condition"].should eq("flu_b")
 
       response = get_updates(location: root_location.id).sort_by do |event|
-        event["results"].first["result"]
+        event["results"].first["condition"]
       end
 
       response.size.should be(3)
-      response[0]["results"].first["result"].should eq("negative")
-      response[1]["results"].first["result"].should eq("positive")
-      response[2]["results"].first["result"].should eq("positive with riff")
+      response[0]["results"].first["condition"].should eq("flu_a")
+      response[1]["results"].first["condition"].should eq("flu_b")
+      response[2]["results"].first["condition"].should eq("mtb")
     end
 
     it "groups by administrative level" do
       device1 = Device.make institution: institution, laboratories: [laboratory1]
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
-      post :create, (Oj.dump results:[result: "negative"]), device_uuid: device1.secret_key
-      post :create, (Oj.dump results:[result: "positive"]), device_uuid: device2.secret_key
-      post :create, (Oj.dump results:[result: "positive with riff"]), device_uuid: device3.secret_key
+      post :create, (Oj.dump results:[condition: "flu_a"]), device_uuid: device1.secret_key
+      post :create, (Oj.dump results:[condition: "flu_b"]), device_uuid: device2.secret_key
+      post :create, (Oj.dump results:[condition: "mtb"]), device_uuid: device3.secret_key
 
       response = get_updates(group_by: {admin_level: 1})
       response.should eq([
@@ -407,18 +407,18 @@ describe ApiController do
       # end
 
       it "filters by condition" do
-        post :create, (Oj.dump results:[condition: "MTB", result: :positive]), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[condition: "Flu", result: :negative]), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_uuid: device.secret_key
 
-        response = get_updates condition: 'MTB'
+        response = get_updates condition: 'mtb'
 
         response.size.should be(1)
         response.first["results"].first["result"].should eq("positive")
       end
 
       it "filters by test type" do
-        post :create, (Oj.dump results:[condition: "MTB", result: :positive], test_type: :qc), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[condition: "MTB", result: :negative], test_type: :specimen), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen), device_uuid: device.secret_key
 
         response = get_updates test_type: :specimen
 

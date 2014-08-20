@@ -45,8 +45,10 @@ class Manifest < ActiveRecord::Base
       # find the array or create it. Only one level for now
       target_array = event[key][targets.first] ||= Array.new
       # merge the new values
-      value.each_with_index do |value, index|
-        (target_array[index] ||= Hash.new)[targets[-1]] = value
+      if value.present?
+        value.each_with_index do |value, index|
+          (target_array[index] ||= Hash.new)[targets[-1]] = value
+        end
       end
     else
       event[key][target_field] = value
@@ -72,7 +74,7 @@ class Manifest < ActiveRecord::Base
     else
       paths = selector.split "."
       paths.inject data do |current, path|
-        current[path]
+        current[path] if current.is_a? Hash
       end
     end
   end
@@ -89,7 +91,9 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_valid_value(value, mapping, target_field, valid_values)
-    if mapping['type'] == 'integer' and value.present? and !value.is_a? Integer
+    return unless value.present?
+
+    if mapping['type'] == 'integer' and !value.is_a? Integer
       if value.to_i.to_s != value
         raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (must be an integer)"
       end
@@ -99,21 +103,22 @@ class Manifest < ActiveRecord::Base
 
     if value.is_a? Array
       value.each do |v|
-        check_valid_value v, target_field, valid_values
+        check_valid_value v, mapping, target_field, valid_values
+      end
+    else
+      if options = valid_values["options"]
+        check_value_in_options(value, target_field, options)
+      end
+
+      if range = valid_values["range"]
+        check_value_in_range(value, target_field, range)
+      end
+
+      if date = valid_values["date"]
+        check_value_is_date(value, target_field, date)
       end
     end
 
-    if options = valid_values["options"]
-      check_value_in_options(value, target_field, options)
-    end
-
-    if range = valid_values["range"]
-      check_value_in_range(value, target_field, range)
-    end
-
-    if date = valid_values["date"]
-      check_value_is_date(value, target_field, date)
-    end
   end
 
   def check_value_in_options(value, target_field, options)
@@ -184,7 +189,8 @@ class Manifest < ActiveRecord::Base
           type: field_definition[:type],
           core: true,
           pii: false,
-          indexed: true
+          indexed: true,
+          valid_values: field_definition[:valid_values]
         }
       end
     end
@@ -235,7 +241,7 @@ class Manifest < ActiveRecord::Base
 
   def check_value_mappings(field_mapping)
     searchable_fields = Cdx::Api.searchable_fields
-    if(! field_mapping["value_mappings"].blank?)
+    if(field_mapping["value_mappings"].present?)
       target = searchable_fields.select { |f| f.name == field_mapping["target_field"] }.first
       field_mapping["value_mappings"].values.each do |vm|
         #Assuming there is an options key for valid_values field
