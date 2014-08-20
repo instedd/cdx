@@ -458,6 +458,16 @@ describe Cdx::Api do
       ])
     end
 
+    it "groups by week(date) and uses weekyear" do
+      index created_at: time(2012, 12, 31)
+
+      response = query_events(group_by: "week(created_at)")
+
+      expect(response).to eq([
+        {"created_at"=>"2013-W01", count: 1},
+      ])
+    end
+
     it "groups by day(date)" do
       index results:[result: :positive], created_at: time(2010, 1, 4)
       index results:[result: :positive], created_at: time(2010, 1, 4)
