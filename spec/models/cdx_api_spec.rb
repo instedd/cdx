@@ -96,6 +96,13 @@ describe Cdx::Api do
       expect_one_result "positive", until: time(2013, 1, 2)
     end
 
+    it "filters by created_at_since and created_at_until" do
+      index results: [result: :positive], created_at: time(2013, 1, 1)
+      index results: [result: :positive], created_at: time(2013, 1, 3)
+
+      expect_one_result "positive", created_at_since: time(2013, 1, 2), created_at_until: time(2013, 1, 3)
+    end
+
     [
       [:device, :device_uuid, ["dev1", "dev2", "dev3"]],
       [:laboratory, :laboratory_id, [1, 2, 3]],
@@ -190,6 +197,8 @@ describe Cdx::Api do
       expect_one_result_with_field "error_code", 1, error_code: 1
       expect_no_results error_code: 3
     end
+
+
 
     describe "Multi" do
       it "filters by multiple genders with array" do
