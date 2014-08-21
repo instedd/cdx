@@ -33,7 +33,7 @@ describe Manifest do
     Manifest.first.device_models.first.name.should eq("foo")
   end
 
-  it "updates it's version number" do  
+  it "updates it's version number" do
     updated_definition = %{{
       "metadata" : {
         "device_models" : ["foo"],
@@ -93,7 +93,7 @@ describe Manifest do
 
   it "leaves device models after being deleted" do
     Manifest.create definition: definition
-    
+
     Manifest.first.destroy
 
     Manifest.count.should eq(0)
@@ -616,6 +616,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "age",
+          "selector" : "age",
           "core" : true,
           "valid_values" : {
             "range" : {
@@ -679,6 +680,47 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(1)
+  end
+
+  it "shouldn't create if a core field is provided without selector" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : [
+        {
+          "target_field" : "results[*].result",
+          "core" : true
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping in core fields must include target_field and selector")
+  end
+
+
+  it "shouldn't create if a core field is provided without target_field" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : [
+        {
+          "selector" : "result",
+          "core" : true
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:invalid_field_mapping].first.should eq(": target ''. Mapping in core fields must include target_field and selector")
   end
 
 end

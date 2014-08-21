@@ -224,12 +224,19 @@ class Manifest < ActiveRecord::Base
     if definition["field_mapping"].is_a? Array
       definition["field_mapping"].each do |fm|
         if (fm["core"] == true)
+          check_presence_of_target_field_and_selector fm
           check_valid_values fm
           check_value_mappings fm
         end
       end
     else
       self.errors.add(:field_mapping, "must be an array")
+    end
+  end
+
+  def check_presence_of_target_field_and_selector(field_mapping)
+    if (field_mapping["target_field"].blank? || field_mapping["selector"].blank?)
+      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Mapping in core fields must include target_field and selector")
     end
   end
 
