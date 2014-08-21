@@ -1,73 +1,52 @@
 {
   "metadata" : {
     "version" : "1.0.0",
+    "api_version" : "1.0.0",
     "signature" : "12345",
     "device_models" : ["GX4001", "GX4002"],
     "source_data_type": "json"
   },
   "field_mapping" : [
     {
-    	"target_field": "patient_name",
+      "target_field": "patient_name",
       "selector" : "patient_information.name",
-      "type" : "core"
+      "core" : true,
+      "type" : "string"
     },
     {
       "target_field": "age",
-      "type": "core",
-      "source" : { //age="24mo"
-        "days_in" : ["month", {"slice": {"path" : "patient_information.age"}}]
-      },
-      "valid_values": {
-        "range" : {
-          "min" : 0,
-          "max" : 100
-        }
-      }
+      "selector": "age",
+      "type": "integer",
+      "core" : true
     },
     {
-    	"target_field": "assay_name",
+      "target_field": "assay_name",
       "selector" : "Test.assay_name",
-      "type" : "core"
+      "core" : true
     },
-    { // this field is clearly not pii, but the catch is how to restrict it to the system user and not the patient name, the length could be a possibility
-    	"target_field": "system_user",
+    {
+      "target_field" : "system_user",
       "selector" : "doctor_name",
-      "type": "custom",
+      "type": "string",
+      "core" : true,
       "pii" : false,
-      "indexed" : false,
-      "valid_values": {
-        "length" : 6
-      }
+      "indexed" : false
     },
     {
-    	"target_field": "results[*].condition",
-    	"type": "core",
-      "multiple" : true,
-      "source" : {
-        "mapping": [
-          {"path" : "conditions[*].condition"},
-          [
-            {"match": "*MTB*", "output" : "MTB"},
-            {"match": "*FLU*", "output" : "H1N1"},
-            {"match": "*FLUA*", "output" : "A1N1"}
-          ]
-        ]
-      }
+      "target_field" : "results[*].condition",
+      "selector" : "condition",
+      "core" : true
     },
     {
-    	"target_field": "results[*].result",
-    	"type": "core",
-      "selector" : "conditions[*].condition",
-      "value_mappings" : {
-        "*NOT DETECTED*" : "negative",
-        "*POSITIVE*" : "positive",
-        "*POSITIVE WITH RIF*" : "positive with rif"
-      }
+      "target_field" : "results[*].result",
+      "selector" : "result",
+      "core" : true
     },
     {
-     	"target_field": "grade_of_resistance",
-     	"type": "custom",
+      "target_field": "grade_of_resistance",
       "selector" : "resistance",
+      "core" : false,
+      "type": "integer",
       "valid_values": {
         "range" : {
           "min" : 0,
@@ -76,23 +55,25 @@
       }
     },
     {
-    	"target_field": "device_serial_number",
-    	"type": "core",
-      "selector" : "patient_information.name"
+      "target_field": "device_serial_number",
+      "selector" : "device_serial_number",
+      "core": true
     },
     {
-    	"target_field": "test_type",
+      "target_field": "test_type",
       "selector" : "Test.test_type",
-      "type": "custom",
+      "core" : false,
+      "type": "integer",
       "pii" : false,
       "valid_values" : {
         "options" : [0, 1]
       }
     },
     {
-    	"target_field": "temperature",
-    	"type": "custom",
+      "target_field": "temperature",
       "selector" : "Test.temp",
+      "core" : false,
+      "type": "integer",
       "pii" : false,
       "valid_values": {
         "range" : {
@@ -103,8 +84,9 @@
       "indexed" : true
     },
     {
-    	"target_field": "percentage_of_confidence",
-    	"type": "custom",
+      "target_field": "percentage_of_confidence",
+      "core" : false,
+      "type": "integer",
       "selector" : "Test.percent",
       "pii" : false,
       "valid_values": {
@@ -116,9 +98,10 @@
       "indexed" : true
     },
     {
-    	"target_field": "end_time",
-    	"type": "custom",
+      "target_field": "end_time",
       "selector" : "Test.end_time",
+      "type": "date",
+      "core" : false,
       "pii" : "false",
       "valid_values": {
         "date" : "iso"
