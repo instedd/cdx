@@ -46,7 +46,7 @@ class Manifest < ActiveRecord::Base
       target_array = event[key][targets.first] ||= Array.new
       # merge the new values
       if value.present?
-        value.each_with_index do |value, index|
+        Array(value).each_with_index do |value, index|
           (target_array[index] ||= Hash.new)[targets[-1]] = value
         end
       end
@@ -234,7 +234,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_valid_values(field_mapping)
-    if (! field_mapping["valid_values"].blank?)
+    if (field_mapping["valid_values"].present?)
       self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Valid values are not permitted for core fields")
     end
   end
