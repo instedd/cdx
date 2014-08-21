@@ -15,7 +15,7 @@ Cdp::Application.routes.draw do
   end
 
   resources :locations
-  resources :manifests
+  resources :manifests, except: [:update]
   resources :events
   resources :subscribers
   resources :policies

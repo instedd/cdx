@@ -5,9 +5,18 @@ class Manifest < ActiveRecord::Base
   before_save :update_models
   before_save :update_version
   before_save :update_api_version
+  after_save :update_mappings
+  attr_writer :default
+
+  COLLECTION_SPLIT_TOKEN = "[*]."
+  PATH_SPLIT_TOKEN = "."
 
   def self.default
-    new definition: default_definition
+    new definition: default_definition, default: true
+  end
+
+  def default?
+    @default.present?
   end
 
   def update_models
@@ -33,6 +42,10 @@ class Manifest < ActiveRecord::Base
     end
   end
 
+  def field_mapping
+    Oj.load(self.definition).with_indifferent_access["field_mapping"]
+  end
+
   def apply_single_mapping(mapping, data, event)
     target_field = mapping["target_field"]
     selector = mapping["selector"]
@@ -41,7 +54,7 @@ class Manifest < ActiveRecord::Base
     value = apply_value_mappings(value, target_field, mapping["value_mappings"])
     key = hash_key(target_field, mapping["core"], mapping["indexed"], mapping["pii"])
 
-    if (targets = target_field.split("[*].")).size > 1
+    if (targets = target_field.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
       # find the array or create it. Only one level for now
       target_array = event[key][targets.first] ||= Array.new
       # merge the new values
@@ -58,9 +71,9 @@ class Manifest < ActiveRecord::Base
   end
 
   def apply_selector(selector, data)
-    if (targets = selector.split("[*].")).size > 1
+    if (targets = selector.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
 
-      paths = targets.first.split "."
+      paths = targets.first.split Manifest::PATH_SPLIT_TOKEN
 
       elements_array = paths.inject data do |current, path|
         current[path] || []
@@ -263,11 +276,18 @@ class Manifest < ActiveRecord::Base
     end
   end
 
+  def update_mappings
+    mapping_template = ElasticsearchMappingTemplate.new
+
+    mapping_template.load
+    mapping_template.update_existing_indices_with self
+  end
+
   def check_valid_type(field_mapping)
     valid_types = ["integer", "date", "string"]
     if(field_mapping["type"].blank? || ! valid_types.include?(field_mapping["type"]))
       self.errors.add(:invalid_type, ": custom fields must include a type, with value 'integer', 'date' or 'string'")
     end
   end
-
 end
+

@@ -4,8 +4,8 @@
   = @manifest.version
 %p
   %strong Definition:
-  = @manifest.definition
+  %p= @manifest.definition
 
-= link_to 'Edit', edit_manifest_path(@manifest)
+= link_to 'Delete', manifest_path(@manifest), method: "DELETE", confirm: "Are you sure?"
 |
 = link_to 'Back', manifests_path
