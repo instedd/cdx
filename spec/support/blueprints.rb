@@ -46,3 +46,6 @@ end
 Policy.blueprint do
   name
 end
+
+Manifest.blueprint do
+end

@@ -95,7 +95,7 @@ class Manifest < ActiveRecord::Base
 
     if mapping['type'] == 'integer' and !value.is_a? Integer
       if value.to_i.to_s != value
-        raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (must be an integer)"
+        raise ManifestParsingError.invalid_value_for_integer value, target_field
       end
     end
 

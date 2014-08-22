@@ -7,11 +7,14 @@ class ApiController < ApplicationController
   before_action :authenticate_api_user!
 
   def create
-    device = Device.includes(:manifests).includes(:institution).includes(:laboratories).includes(:locations).find_by_secret_key(params[:device_uuid])
-    Event.create_or_update_with device, request.body.read
-    head :ok
-  rescue ManifestParsingError  => ex
-    render :status => :unprocessable_entity, :json => { :errors => ex.message}
+    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_secret_key(params[:device_uuid])
+    event = Event.create_or_update_with device, request.body.read
+
+    if event.index_failed?
+      render :status => :unprocessable_entity, :json => { :errors => event.index_failure_reason }
+    else
+      head :ok
+    end
   end
 
   def events
