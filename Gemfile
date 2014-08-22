@@ -54,7 +54,6 @@ gem 'omniauth-openid'
 gem 'cancan'
 gem 'elasticsearch'
 gem 'bunny'
-gem 'foreman'
 
 gem 'oj'
 gem 'guid'
