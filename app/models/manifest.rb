@@ -227,6 +227,8 @@ class Manifest < ActiveRecord::Base
           check_presence_of_target_field_and_selector fm
           check_valid_values fm
           check_value_mappings fm
+        else
+          check_valid_type fm
         end
       end
     else
@@ -256,6 +258,13 @@ class Manifest < ActiveRecord::Base
           self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. '#{vm}' is not a valid value")
         end
       end
+    end
+  end
+
+  def check_valid_type(field_mapping)
+    valid_types = ["integer", "date", "string"]
+    if(field_mapping["type"].blank? || ! valid_types.include?(field_mapping["type"]))
+      self.errors.add(:invalid_type, ": custom fields must include a type, with value 'integer', 'date' or 'string'")
     end
   end
 

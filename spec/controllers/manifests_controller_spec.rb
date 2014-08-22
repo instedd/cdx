@@ -26,12 +26,12 @@ describe ManifestsController do
           {
             "target_field": "assay_name",
             "selector" : "Test.assay_name",
-            "type" : "core"
+            "core" : true
           },
           {
             "target_field" : "test_type",
             "selector" : "Test.test_type",
-            "type" : "core",
+            "core" : true,
             "value_mappings" : {
               "*QC*" : "qc",
               "*Specimen*" : "specimen"

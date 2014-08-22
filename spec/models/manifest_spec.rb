@@ -723,4 +723,75 @@ describe Manifest do
     m.errors[:invalid_field_mapping].first.should eq(": target ''. Mapping in core fields must include target_field and selector")
   end
 
+  it "shouldn't create if a custom field is provided without type" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : [
+        {
+          "field" : "patient_name",
+          "core" : false
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:invalid_type].first.should eq(": custom fields must include a type, with value 'integer', 'date' or 'string'")
+  end
+
+  it "shouldn't create if a custom field is provided with an invalid type" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : [
+        {
+          "field" : "patient_name",
+          "type" : "quantity",
+          "core" : false
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:invalid_type].first.should eq(": custom fields must include a type, with value 'integer', 'date' or 'string'")
+  end
+
+  it "should create when fields are provided with valid types" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : [
+        {
+          "field" : "patient_name",
+          "type" : "string",
+          "core" : false
+        },
+        {
+          "field" : "control_date",
+          "type" : "date",
+          "core" : false
+        },
+        {
+          "field" : "rbc count",
+          "type" : "integer",
+          "core" : false
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(1)
+  end
+
 end

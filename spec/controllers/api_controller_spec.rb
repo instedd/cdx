@@ -134,6 +134,7 @@ describe ApiController do
           {
             "target_field": "foo",
             "selector" : "patient_id",
+            "type" : "integer",
             "core" : false,
             "pii": true
           }
@@ -203,6 +204,7 @@ describe ApiController do
           {
             "target_field": "foo",
             "selector" : "some_field",
+            "type" : "string",
             "core" : false,
             "pii": false,
             "indexed": false
@@ -530,6 +532,7 @@ describe ApiController do
             {
               "target_field": "foo",
               "selector" : "some_field",
+              "type" : "string",
               "core" : false,
               "pii": false,
               "indexed": false
