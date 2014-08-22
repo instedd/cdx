@@ -62,12 +62,7 @@
     {
       "target_field": "test_type",
       "selector" : "Test.test_type",
-      "core" : false,
-      "type": "integer",
-      "pii" : false,
-      "valid_values" : {
-        "options" : [0, 1]
-      }
+      "core" : true
     },
     {
       "target_field": "temperature",
