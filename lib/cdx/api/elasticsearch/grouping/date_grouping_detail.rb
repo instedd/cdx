@@ -15,7 +15,7 @@ class DateGroupingDetail < GroupingDetail
       when "month"
         "yyyy-MM"
       when "week"
-        "yyyy-'W'w"
+        "x-'W'w"
       when "day"
         "yyyy-MM-dd"
       else

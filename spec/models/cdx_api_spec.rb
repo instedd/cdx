@@ -54,8 +54,8 @@ describe Cdx::Api do
 
   describe "Filter" do
     it "should check for new events since a date" do
-      index results: [result: :positive], created_at: time(2013, 1, 1)
-      index results: [result: :negative], created_at: time(2013, 1, 2)
+      index results: [result: :positive], started_at: time(2013, 1, 1)
+      index results: [result: :negative], started_at: time(2013, 1, 2)
 
       response = query_events(since: time(2013, 1, 2))
 
@@ -73,8 +73,8 @@ describe Cdx::Api do
     it "should check for new events since a date in a differen time zone" do
       Time.zone = ActiveSupport::TimeZone["Asia/Seoul"]
 
-      index results: [result: :positive], created_at: 3.day.ago.at_noon.iso8601
-      index results: [result: :negative], created_at: 1.day.ago.at_noon.iso8601
+      index results: [result: :positive], started_at: 3.day.ago.at_noon.iso8601
+      index results: [result: :negative], started_at: 1.day.ago.at_noon.iso8601
 
       response = query_events(since: 2.day.ago.at_noon.iso8601)
 
@@ -90,10 +90,17 @@ describe Cdx::Api do
     end
 
     it "should check for new events util a date" do
-      index results: [result: :positive], created_at: time(2013, 1, 1)
-      index results: [result: :negative], created_at: time(2013, 1, 3)
+      index results: [result: :positive], started_at: time(2013, 1, 1)
+      index results: [result: :negative], started_at: time(2013, 1, 3)
 
       expect_one_result "positive", until: time(2013, 1, 2)
+    end
+
+    it "filters by created_at_since and created_at_until" do
+      index results: [result: :positive], created_at: time(2013, 1, 1)
+      index results: [result: :positive], created_at: time(2013, 1, 3)
+
+      expect_one_result "positive", created_at_since: time(2013, 1, 2), created_at_until: time(2013, 1, 3)
     end
 
     [
@@ -190,6 +197,8 @@ describe Cdx::Api do
       expect_one_result_with_field "error_code", 1, error_code: 1
       expect_no_results error_code: 3
     end
+
+
 
     describe "Multi" do
       it "filters by multiple genders with array" do
@@ -455,6 +464,16 @@ describe Cdx::Api do
         {"created_at"=>"2010-W01", count: 3},
         {"created_at"=>"2010-W02", count: 2},
         {"created_at"=>"2010-W23", count: 1},
+      ])
+    end
+
+    it "groups by week(date) and uses weekyear" do
+      index created_at: time(2012, 12, 31)
+
+      response = query_events(group_by: "week(created_at)")
+
+      expect(response).to eq([
+        {"created_at"=>"2013-W01", count: 1},
       ])
     end
 

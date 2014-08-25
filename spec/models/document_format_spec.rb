@@ -10,7 +10,7 @@ describe "formats of document stored" do
     Cdx::Api::Elasticsearch::CustomDocumentFormat.new({
       "assay_name" => "assay",
       "device_uuid" => "device_id",
-      "created_at" => "start_time"
+      "started_at" => "start_time"
     })
   }
   let(:api)  { setup_api custom_document_format }
@@ -78,9 +78,9 @@ describe "formats of document stored" do
     es_index start_time: time(2013, 1, 3)
 
     response = query_events since: time(2013, 1, 1)
-    event_dates = response.map { |event| event["created_at"] }
+    event_dates = response.map { |event| event["started_at"] }
 
-    expect(event_dates).to eq([
+    expect(event_dates.sort).to eq([
       time(2013,1,1),
       time(2013,1,2),
       time(2013,1,3)
@@ -92,8 +92,8 @@ describe "formats of document stored" do
     es_index start_time: time(2013, 1, 1), assay: "ASSAY001"
     es_index start_time: time(2013, 1, 1), assay: "ASSAY002"
 
-    response = query_events since: time(2013, 1, 1), group_by: "year(created_at)"
-    expect(response).to eq([{"created_at" => "2013", :count => 3}])
+    response = query_events since: time(2013, 1, 1), group_by: "year(started_at)"
+    expect(response).to eq([{"started_at" => "2013", :count => 3}])
   end
 
   def query_events(query)

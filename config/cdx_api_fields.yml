@@ -19,7 +19,7 @@
 # 11) If a filter or group is added with the sole option 'include_default: true', then the default filter or group will be added to the filters or groups array, as specified in (3), (4), and (5).
 
 searchable_fields:
-  - name: created_at
+  - name: started_at
     type: date
     filter_parameter_definition:
       - name: since
@@ -32,6 +32,8 @@ searchable_fields:
         boundary: to
         options:
           include_lower: true
+  - name: created_at
+    type: date
   - name: event_id
     group_parameter_definition: none
   - name: uuid

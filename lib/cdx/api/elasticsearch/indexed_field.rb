@@ -62,9 +62,20 @@ class Cdx::Api::Elasticsearch::IndexedField
   end
 
 private
+  def default_date_filter_definition_boundary(suffix, boundary)
+    {name: "#{default_name}_#{suffix}", type: 'range', boundary: boundary, options: { include_lower: true }}
+  end
+
+  def default_date_filter_definition
+    [default_date_filter_definition_boundary('since', 'from'), default_date_filter_definition_boundary('until', 'to')]
+  end
 
   def default_filter_definition
-    [{name: default_name, type: default_filter_type}]
+    if @definition[:type] == 'date'
+      default_date_filter_definition
+    else
+      [{name: default_name, type: default_filter_type}]
+    end
   end
 
   def default_group_definition
