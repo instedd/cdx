@@ -43,7 +43,6 @@ describe ManifestsController do
       post :create, manifest: json
       Manifest.count.should eq(1)
     end
-
   end
 end
 

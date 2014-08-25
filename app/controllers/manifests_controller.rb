@@ -23,22 +23,8 @@ class ManifestsController < ApplicationController
     end
   end
 
-  def edit
+  def show
     @manifest = Manifest.find params[:id]
-  end
-
-  def update
-    @manifest = Manifest.find params[:id]
-
-    respond_to do |format|
-      if @manifest.update(manifest_params)
-        format.html { redirect_to manifests_path, notice: 'Manifest was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: @manifest.errors, status: :unprocessable_entity }
-      end
-    end
   end
 
   def destroy

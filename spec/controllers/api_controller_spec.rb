@@ -385,28 +385,28 @@ describe ApiController do
         Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
         post :create, (Oj.dump results:[result: :negative]), device_uuid: device.secret_key
 
-        response = get_updates(since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
+        response = get_updates(created_at_since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
 
         response.size.should be(1)
         response.first["results"].first["result"].should eq("negative")
 
-        response = get_updates(since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
+        response = get_updates(created_at_since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
 
         response.first["results"].first["result"].should eq("positive")
         response.last["results"].first["result"].should eq("negative")
 
-        get_updates(since: Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601).should be_empty
+        get_updates(created_at_since: Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601).should be_empty
       end
 
-      # it "filters by an analyzed result" do
-      #   post :create, (Oj.dump results:[condition: "MTB", result: :negative]), device_uuid: device.secret_key
-      #   post :create, (Oj.dump results:[condition: "MTB", result: "Positive with RIFF resistance"]), device_uuid: device.secret_key
+       it "filters by an analyzed result" do
+         post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_uuid: device.secret_key
+         post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_uuid: device.secret_key
 
-      #   response = get_updates(result: :positive)
+         response = get_updates(result: :positive)
 
-      #   response.size.should be(1)
-      #   response.first["results"].first["result"].should eq("Positive with RIFF resistance")
-      # end
+         response.size.should be(1)
+         response.first["results"].first["result"].should eq("positive")
+       end
 
       it "filters by condition" do
         post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_uuid: device.secret_key

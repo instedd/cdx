@@ -604,6 +604,19 @@ describe Manifest do
     m.save
     Manifest.count.should eq(0)
     m.errors[:field_mapping].first.should eq("must be an array")
+
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : {}
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:field_mapping].first.should eq("must be an array")
   end
 
   it "shouldn't create if a core field is provided with valid values" do
@@ -658,7 +671,7 @@ describe Manifest do
     m.errors[:invalid_field_mapping].first.should eq(": target 'test_type'. 'Invalid mapping' is not a valid value")
   end
 
-  it "should create if a core fields are provided with valid value mappings" do
+  it "should create if core fields are provided with valid value mappings" do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",

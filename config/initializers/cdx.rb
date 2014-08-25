@@ -13,4 +13,5 @@ Cdx::Api.setup do |config|
   config.log = Rails.env != "test"
 end
 
-Cdx::Api.initialize_default_template "cdx_events_template"
+ElasticsearchMappingTemplate.new.load
+

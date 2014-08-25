@@ -3,7 +3,13 @@ module EventIndexing
 
   included do
     def save_in_elasticsearch
-      Cdx::Api.client.index index: device.institution.elasticsearch_index_name, type: 'event', body: indexed_fields.merge(event_id: self.event_id), id: "#{device.secret_key}_#{self.event_id}"
+      type = if manifest.default?
+        'event'
+      else
+        "event_#{manifest.id}"
+      end
+
+      Cdx::Api.client.index index: device.institution.elasticsearch_index_name, type: type, body: indexed_fields.merge(event_id: self.event_id), id: "#{device.secret_key}_#{self.event_id}"
     end
 
     def self.pii?(field)
@@ -11,7 +17,11 @@ module EventIndexing
     end
 
     def parsed_fields
-      @parsed_fields ||= (device.manifests.order("version DESC").first || Manifest.default).apply_to(Oj.load raw_data).with_indifferent_access
+      @parsed_fields ||= manifest.apply_to(Oj.load raw_data).with_indifferent_access
+    end
+    
+    def manifest
+      @manifest ||= device.manifests.order("version DESC").first || Manifest.default
     end
 
     private

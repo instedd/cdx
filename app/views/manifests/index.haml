@@ -2,4 +2,4 @@
   .span6
     - simple_list :manifest, title: 'Device Models', icon: :folder, create_path: (new_manifest_path) do
       - @manifests.each do |manifest|
-        - simple_list_item (manifest.device_models.map {|model| model.try(:name)}).join(", "), edit_manifest_path(manifest)
+        - simple_list_item (manifest.device_models.map {|model| model.try(:name)}).join(", "), manifest_path(manifest)
