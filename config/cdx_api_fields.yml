@@ -34,6 +34,10 @@ searchable_fields:
           include_lower: true
   - name: created_at
     type: date
+  - name: updated_at
+    type: date
+    filter_parameter_definition: none
+    group_parameter_definition: none
   - name: event_id
     group_parameter_definition: none
   - name: uuid
@@ -54,6 +58,10 @@ searchable_fields:
     group_parameter_definition: none
   - name: laboratory_id
     type: integer
+  - name: location_id
+    type: integer
+    filter_parameter_definition: none
+    group_parameter_definition: none
   - name: institution_id
     type: integer
   - name: parent_locations

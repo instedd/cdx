@@ -156,11 +156,11 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def field_matcher(field_name, field_type)
-    # if field_type == :multi_field
-    #   "#{field_name}.analyzed"
-    # else
+     if field_type == :multi_field
+       "#{field_name}.analyzed"
+     else
       field_name
-    # end
+     end
   end
 
   def process_order params

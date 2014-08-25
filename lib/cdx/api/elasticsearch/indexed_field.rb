@@ -106,26 +106,34 @@ private
   def add_defaults
     @definition[:type] = 'string' unless @definition[:type]
 
-    @definition[:filter_parameter_definition] = if @definition[:filter_parameter_definition] && @definition[:filter_parameter_definition] != 'none'
-      filter_definitions = @definition[:filter_parameter_definition]
-      filter_definitions.each do |filter|
-        filter[:name] = default_name unless filter[:name]
-        filter[:type] = default_filter_type unless filter[:type]
+    if @definition[:filter_parameter_definition] != 'none'
+      @definition[:filter_parameter_definition] = if @definition[:filter_parameter_definition]
+        filter_definitions = @definition[:filter_parameter_definition]
+        filter_definitions.each do |filter|
+          filter[:name] = default_name unless filter[:name]
+          filter[:type] = default_filter_type unless filter[:type]
+        end
+        filter_definitions
+      else
+        default_filter_definition
       end
-      filter_definitions
     else
-      default_filter_definition
+      @definition[:filter_parameter_definition] = Array.new
     end
 
-    @definition[:group_parameter_definition] = if @definition[:group_parameter_definition] && @definition[:group_parameter_definition] != 'none'
-      group_definitions = @definition[:group_parameter_definition]
-      group_definitions.each do |group|
-        group[:name] = default_name unless group[:name]
-        group[:type] = 'flat' unless group[:type]
+    if @definition[:group_parameter_definition] != 'none'
+      @definition[:group_parameter_definition] = if @definition[:group_parameter_definition]
+        group_definitions = @definition[:group_parameter_definition]
+        group_definitions.each do |group|
+          group[:name] = default_name unless group[:name]
+          group[:type] = 'flat' unless group[:type]
+        end
+        group_definitions
+      else
+        default_group_definition
       end
-      group_definitions
     else
-      default_group_definition
+      @definition[:group_parameter_definition] = Array.new
     end
   end
 end
