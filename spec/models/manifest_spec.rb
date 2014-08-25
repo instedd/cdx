@@ -720,7 +720,7 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target ''. Mapping in core fields must include target_field and selector")
+    m.errors[:invalid_field_mapping].first.should eq(": target 'result'. Mapping in core fields must include target_field and selector")
   end
 
   it "shouldn't create if a custom field is provided without type" do
@@ -732,7 +732,8 @@ describe Manifest do
       },
       "field_mapping" : [
         {
-          "field" : "patient_name",
+          "target_field" : "patient_name",
+          "selector" : "patient_name",
           "core" : false
         }
       ]
@@ -752,7 +753,8 @@ describe Manifest do
       },
       "field_mapping" : [
         {
-          "field" : "patient_name",
+          "target_field" : "patient_name",
+          "selector" : "patient_name",
           "type" : "quantity",
           "core" : false
         }
@@ -773,17 +775,20 @@ describe Manifest do
       },
       "field_mapping" : [
         {
-          "field" : "patient_name",
+          "target_field" : "patient_name",
+          "selector" : "patient_name",
           "type" : "string",
           "core" : false
         },
         {
-          "field" : "control_date",
+          "target_field" : "control_date",
+          "selector" : "control_date",
           "type" : "date",
           "core" : false
         },
         {
-          "field" : "rbc count",
+          "target_field" : "rbc_count",
+          "selector" : "rbc_count",
           "type" : "integer",
           "core" : false
         }

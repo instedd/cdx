@@ -223,8 +223,8 @@ class Manifest < ActiveRecord::Base
     definition = Oj.load self.definition
     if definition["field_mapping"].is_a? Array
       definition["field_mapping"].each do |fm|
+        check_presence_of_target_field_and_selector fm
         if (fm["core"] == true)
-          check_presence_of_target_field_and_selector fm
           check_valid_values fm
           check_value_mappings fm
         else
@@ -237,8 +237,10 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_presence_of_target_field_and_selector(field_mapping)
+    invalid_field = field_mapping["target_field"]
+    invalid_field ||= field_mapping["selector"]
     if (field_mapping["target_field"].blank? || field_mapping["selector"].blank?)
-      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Mapping in core fields must include target_field and selector")
+      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field}'. Mapping in core fields must include target_field and selector")
     end
   end
 
