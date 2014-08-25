@@ -86,38 +86,36 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_field field_definition, filter_parameter_definition, params, conditions
-    case filter_parameter_definition[:type]
-    when "match"
-      if field_value = params[filter_parameter_definition[:name]]
-        conditions.push process_match_field(field_definition, field_value)
-      end
-    when "range"
-      if field_value = params[filter_parameter_definition[:name]]
+    if field_value = params[filter_parameter_definition[:name]]
+      case filter_parameter_definition[:type]
+      when "match"
+        conditions.push process_match_field(field_definition[:name], field_definition[:type], field_value)
+      when "range"
         conditions.push range: {field_definition[:name] => ({filter_parameter_definition[:boundary] => field_value}.merge filter_parameter_definition[:options])}
-      end
-    when "wildcard"
-      if field_value = params[filter_parameter_definition[:name]]
+      when "wildcard"
         conditions.push process_wildcard_field(field_definition, field_value)
+      when "location"
+        conditions.push process_match_field("parent_#{field_definition[:name].pluralize}", field_definition[:type], field_value)
       end
     end
     conditions
   end
 
-  def process_match_field(field_definition, field_value)
+  def process_match_field(field_name, field_type, field_value)
     process_multi_field(field_value) do |value|
-      process_null(field_definition, value) do
-        process_single_match_field(field_definition, value)
+      process_null(field_name, value) do
+        process_single_match_field(field_name, value)
       end
     end
   end
 
-  def process_single_match_field(field_definition, field_value)
-    {match: {field_definition[:name] => field_value}}
+  def process_single_match_field(field_name, field_value)
+    {match: {field_name => field_value}}
   end
 
   def process_wildcard_field(field_definition, field_value)
     process_multi_field(field_value) do |value|
-      process_null(field_definition, value) do |variable|
+      process_null(field_definition[:name], value) do |variable|
         process_single_wildcard_field(field_definition, value)
       end
     end
@@ -145,11 +143,11 @@ class Cdx::Api::Elasticsearch::Query
     end
   end
 
-  def process_null(field_definition, value)
+  def process_null(field_name, value)
     if value == 'null'
-      {filtered: {filter: { missing: { field: field_definition[:name] }}}}
+      {filtered: {filter: { missing: { field: field_name }}}}
     elsif value == 'not(null)'
-      {filtered: {filter: { exists: { field: field_definition[:name] }}}}
+      {filtered: {filter: { exists: { field: field_name }}}}
     else
       yield
     end

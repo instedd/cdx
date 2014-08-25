@@ -64,17 +64,11 @@ searchable_fields:
     group_parameter_definition: none
   - name: institution_id
     type: integer
-  - name: parent_locations
-    type: integer
+  - name: location
+    type: location
     filter_parameter_definition:
       - name: location
-    group_parameter_definition:
-      - name: admin_level
-        type: kind
-        reference_table:
-          name: locations
-          value_field: id
-          query_target: admin_level
+        type: location
   - name: age
     type: integer
     filter_parameter_definition:

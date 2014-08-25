@@ -86,6 +86,8 @@ private
         {name: "week(#{default_name})", type: 'date', interval: 'week'},
         {name: "day(#{default_name})", type: 'date', interval: 'day'}
       ]
+    elsif type == 'location'
+      [{name: "admin_level", type: 'location'}]
     else
       [{name: default_name, type: 'flat'}]
     end

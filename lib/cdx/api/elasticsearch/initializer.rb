@@ -30,24 +30,33 @@ class Cdx::Api::Elasticsearch::Initializer
   end
 
   def map_field properties, field
-    properties[field[:name]] =
-      if field[:type] == "nested"
-        {type: :nested, properties: map_fields(field[:sub_fields])}
-      else
-        field_body =
-          case field[:type]
-          when "multi_field"
-            {
-              fields: {
-                analyzed: {type: :string, index: :analyzed},
-                field[:name] => {type: :string, index: :not_analyzed}
-              }
+    case field[:type]
+    when "nested"
+      properties[field[:name]] = {type: :nested, properties: map_fields(field[:sub_fields])}
+    when "location"
+      properties["parent_#{field[:name].pluralize}"] = { type: :integer }
+
+      properties[field[:name]] = { 
+        type: :nested,
+        properties: Hash[ (0..3).map { |i|
+          ["admin_level_#{i}", { type: :integer, index: :not_analyzed } ]
+        }]
+      }
+    else
+      field_body =
+        case field[:type]
+        when "multi_field"
+          {
+            fields: {
+              analyzed: {type: :string, index: :analyzed},
+              field[:name] => {type: :string, index: :not_analyzed}
             }
-          else
-            {index: :not_analyzed}
-          end
-        {type: field[:type]}.merge(field_body)
-      end
+          }
+        else
+          {index: :not_analyzed}
+        end
+      properties[field[:name]] = {type: field[:type]}.merge(field_body)
+    end
     properties
   end
 
