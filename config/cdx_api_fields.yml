@@ -41,7 +41,7 @@ searchable_fields:
   - name: device_uuid
     filter_parameter_definition:
       - name: device
-    group_parameter_definition:
+    group_parameter_definition  :
       - name: device
   - name: system_user
   - name: device_serial_number
@@ -88,11 +88,12 @@ searchable_fields:
   - name: race_ethnicity
   - name: status
     valid_values:
-      - invalid
-      - error
-      - no_result
-      - success
-      - negative
+      options:
+        - invalid
+        - error
+        - no_result
+        - success
+        - negative
   - name: results
     type: nested
     sub_fields:
