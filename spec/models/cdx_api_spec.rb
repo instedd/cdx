@@ -83,10 +83,12 @@ describe Cdx::Api do
       expect(response.size).to eq(1)
       expect(response.first["results"].first["result"]).to eq("negative")
 
-      response = query_events(since: 4.day.ago.at_noon.iso8601)
+      response = query_events(since: 4.day.ago.at_noon.iso8601).sort_by do |event|
+        event["results"].first["result"]
+      end
 
-      expect(response.first["results"].first["result"]).to eq("positive")
-      expect(response.last["results"].first["result"]).to eq("negative")
+      expect(response.first["results"].first["result"]).to eq("negative")
+      expect(response.last["results"].first["result"]).to eq("positive")
 
       expect(query_events(since: Date.current.at_noon.iso8601)).to be_empty
     end
@@ -731,7 +733,7 @@ describe Cdx::Api do
 
       expect_one_result "negative", location: 3
       expect_one_result "positive", location: 4
-      
+
       response = query_events(location: 2).sort_by do |event|
         event["results"].first["result"]
       end
@@ -739,7 +741,7 @@ describe Cdx::Api do
       expect(response.size).to eq(2)
       expect(response[0]["results"].first["result"]).to eq("negative")
       expect(response[1]["results"].first["result"]).to eq("positive")
-      
+
       response = query_events(location: 1).sort_by do |event|
         event["results"].first["result"]
       end
