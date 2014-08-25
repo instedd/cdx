@@ -43,7 +43,7 @@ searchable_fields:
   - name: device_uuid
     filter_parameter_definition:
       - name: device
-    group_parameter_definition  :
+    group_parameter_definition:
       - name: device
   - name: system_user
   - name: device_serial_number
