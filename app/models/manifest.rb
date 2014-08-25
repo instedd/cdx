@@ -11,6 +11,8 @@ class Manifest < ActiveRecord::Base
   COLLECTION_SPLIT_TOKEN = "[*]."
   PATH_SPLIT_TOKEN = "."
 
+  NULL_STRING = "null"
+
   def self.default
     new definition: default_definition, default: true
   end
@@ -237,6 +239,9 @@ class Manifest < ActiveRecord::Base
     if definition["field_mapping"].is_a? Array
       definition["field_mapping"].each do |fm|
         check_presence_of_target_field_and_selector fm
+        if (fm["valid_values"] && fm["valid_values"]["options"])
+          verify_absence_of_null_string fm
+        end
         if (fm["core"] == true)
           check_valid_values fm
           check_value_mappings fm
@@ -249,11 +254,24 @@ class Manifest < ActiveRecord::Base
     end
   end
 
-  def check_presence_of_target_field_and_selector(field_mapping)
+  def verify_absence_of_null_string field_mapping
+    valid_values = field_mapping["valid_values"]["options"]
+    valid_values.each do |value|
+      if value == NULL_STRING
+        self.errors.add(:string_null, ": cannot appear as valid value. (In '#{invalid_field(field_mapping)}') ")
+      end
+    end
+  end
+
+  def invalid_field field_mapping
     invalid_field = field_mapping["target_field"]
     invalid_field ||= field_mapping["selector"]
+    invalid_field
+  end
+
+  def check_presence_of_target_field_and_selector field_mapping
     if (field_mapping["target_field"].blank? || field_mapping["selector"].blank?)
-      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field}'. Mapping in core fields must include target_field and selector")
+      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field(field_mapping)}'. Mapping in core fields must include target_field and selector")
     end
   end
 

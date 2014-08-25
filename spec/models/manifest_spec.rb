@@ -812,4 +812,29 @@ describe Manifest do
     Manifest.count.should eq(1)
   end
 
+  it "shouldn't create if string 'null' appears as valid value of some field" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : [
+        {
+          "target_field" : "rbc_description",
+          "selector" : "rbc_description",
+          "type" : "string",
+          "core" : false,
+          "valid_values" : {
+            "options" : ["high","low","null"]
+          }
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:string_null].first.should eq(": cannot appear as valid value. (In 'rbc_description') ")
+  end
+
 end
