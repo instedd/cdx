@@ -71,8 +71,11 @@ private
   end
 
   def default_filter_definition
-    if @definition[:type] == 'date'
+    case @definition[:type]
+    when 'date'
       default_date_filter_definition
+    when 'location'
+      [{name: 'location', type: 'location'}]
     else
       [{name: default_name, type: default_filter_type}]
     end

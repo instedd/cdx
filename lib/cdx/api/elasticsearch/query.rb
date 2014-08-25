@@ -95,7 +95,7 @@ class Cdx::Api::Elasticsearch::Query
       when "wildcard"
         conditions.push process_wildcard_field(field_definition, field_value)
       when "location"
-        conditions.push process_match_field("parent_#{field_definition[:name].pluralize}", field_definition[:type], field_value)
+        conditions.push process_location_field(field_definition, field_value)
       end
     end
     conditions
@@ -159,6 +159,10 @@ class Cdx::Api::Elasticsearch::Query
      else
       field_name
      end
+  end
+
+  def process_location_field(field_definition, field_value)
+    process_match_field("parent_#{field_definition[:name].pluralize}", field_definition[:type], field_value)
   end
 
   def process_order params

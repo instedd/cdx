@@ -66,9 +66,6 @@ searchable_fields:
     type: integer
   - name: location
     type: location
-    filter_parameter_definition:
-      - name: location
-        type: location
   - name: age
     type: integer
     filter_parameter_definition:

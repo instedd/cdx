@@ -753,9 +753,9 @@ describe Cdx::Api do
     end
 
     it "groups by administrative level" do
-      index results: [result: "negative"], parent_locations: [1, 2, 3], location: { admin_level_0: 1, admin_level_1: 2 }
-      index results: [result: "positive"], parent_locations: [1, 2, 4], location: { admin_level_0: 1, admin_level_1: 2 }
-      index results: [result: "positive with riff"], parent_locations: [1, 5], location: { admin_level_0: 1, admin_level_1: 5 }
+      index results: [result: "negative"], location: { admin_level_0: 1, admin_level_1: 2 }
+      index results: [result: "positive"], location: { admin_level_0: 1, admin_level_1: 2 }
+      index results: [result: "positive with riff"], location: { admin_level_0: 1, admin_level_1: 5 }
 
       response = query_events(group_by: {admin_level: 1})
       expect(response).to eq([

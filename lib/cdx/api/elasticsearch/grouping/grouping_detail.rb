@@ -32,11 +32,6 @@ class GroupingDetail
           end
         end
 
-        # if grouping_def[:type] == "kind"
-        #   reference_table = ReferenceTable.new grouping_def[:reference_table][:name], grouping_def[:reference_table][:query_target], grouping_def[:reference_table][:value_field]
-        #   grouping = KindGroupingDetail.new indexed_field.name, indexed_field, uri_param, values, reference_table
-        # end
-
         if grouping_def[:type] == "location"
           grouping = LocationGroupingDetail.new indexed_field.name, indexed_field, uri_param, values
         end
