@@ -13,9 +13,25 @@ class Cdx::Api::Elasticsearch::Initializer
       template: @api.config.index_name_pattern,
       mappings: {
         event: {
+          dynamic_templates: build_dynamic_templates,
           properties: build_properties_mapping
         }
       }
+    }
+  end
+
+  def build_dynamic_templates
+    @api.searchable_fields.inject([]) { |templates, field|
+      if field[:type].eql? "location"
+        template = {
+          "#{field[:name]}_levels" => {
+            path_match: "#{field[:name]}.admin_level_*",
+            mapping:    { type: :integer }
+          }
+        }
+        templates << template
+      end
+      templates
     }
   end
 
@@ -35,13 +51,7 @@ class Cdx::Api::Elasticsearch::Initializer
       properties[field[:name]] = {type: :nested, properties: map_fields(field[:sub_fields])}
     when "location"
       properties["parent_#{field[:name].pluralize}"] = { type: :integer }
-
-      properties[field[:name]] = {
-        type: :nested,
-        properties: Hash[ (0..3).map { |i|
-          ["admin_level_#{i}", { type: :integer } ]
-        }]
-      }
+      properties[field[:name]] = { type: :nested }
     else
       field_body =
         case field[:type]
