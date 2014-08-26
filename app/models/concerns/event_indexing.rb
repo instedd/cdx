@@ -3,10 +3,10 @@ module EventIndexing
 
   included do
     def save_in_elasticsearch
-      type = if manifest.default?
-        'event'
-      else
+      type = if manifest.present?
         "event_#{manifest.id}"
+      else
+        'event'
       end
 
       Cdx::Api.client.index index: device.institution.elasticsearch_index_name, type: type, body: indexed_fields.merge(event_id: self.event_id), id: "#{device.secret_key}_#{self.event_id}"
@@ -17,11 +17,11 @@ module EventIndexing
     end
 
     def parsed_fields
-      @parsed_fields ||= manifest.apply_to(Oj.load raw_data).with_indifferent_access
+      @parsed_fields ||= (manifest || Manifest.default).apply_to(Oj.load raw_data).with_indifferent_access
     end
     
     def manifest
-      @manifest ||= device.manifests.order("version DESC").first || Manifest.default
+      @manifest ||= device.manifests.order("version DESC").first 
     end
 
     private

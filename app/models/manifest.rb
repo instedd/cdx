@@ -6,7 +6,6 @@ class Manifest < ActiveRecord::Base
   before_save :update_version
   before_save :update_api_version
   after_save :update_mappings
-  attr_writer :default
 
   COLLECTION_SPLIT_TOKEN = "[*]."
   PATH_SPLIT_TOKEN = "."
@@ -14,9 +13,7 @@ class Manifest < ActiveRecord::Base
   NULL_STRING = "null"
 
   def self.default
-    default_manifest = self.new definition: default_definition
-    default_manifest.default = true
-    default_manifest
+    new definition: default_definition
   end
 
   def default?
