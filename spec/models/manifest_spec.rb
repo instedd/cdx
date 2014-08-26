@@ -712,7 +712,7 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping in core fields must include target_field and selector")
+    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include target_field and selector")
   end
 
 
@@ -733,7 +733,7 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'result'. Mapping in core fields must include target_field and selector")
+    m.errors[:invalid_field_mapping].first.should eq(": target 'result'. Mapping must include target_field and selector")
   end
 
   it "shouldn't create if a custom field is provided without type" do
@@ -835,6 +835,27 @@ describe Manifest do
     m.save
     Manifest.count.should eq(0)
     m.errors[:string_null].first.should eq(": cannot appear as valid value. (In 'rbc_description') ")
+  end
+
+  it "shouldn't create if a field is provided without core specification" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : [
+        {
+          "target_field" : "results[*].result",
+          "selector" : "result",
+          "type" : "string"
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include a core field")
   end
 
 end

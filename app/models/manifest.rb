@@ -52,7 +52,8 @@ class Manifest < ActiveRecord::Base
     target_field = mapping["target_field"]
     selector = mapping["selector"]
     value = apply_selector(selector, data)
-    check_valid_value(value, mapping, target_field, mapping["valid_values"])
+    valid_values = valid_values_for mapping
+    check_valid_value(value, mapping, target_field, valid_values)
     value = apply_value_mappings(value, target_field, mapping["value_mappings"])
     key = hash_key(target_field, mapping["core"], mapping["indexed"], mapping["pii"])
 
@@ -114,6 +115,8 @@ class Manifest < ActiveRecord::Base
       end
     end
 
+    verify_value_is_not_null_string value, mapping
+
     return value if valid_values ==  nil
 
     if value.is_a? Array
@@ -134,6 +137,12 @@ class Manifest < ActiveRecord::Base
       end
     end
 
+  end
+
+  def verify_value_is_not_null_string value, mapping
+    if value == NULL_STRING
+      raise ManifestParsingError.new "String 'null' is not permitted as value, in field '#{invalid_field(mapping)}'"
+    end
   end
 
   def check_value_in_options(value, target_field, options)
@@ -211,6 +220,20 @@ class Manifest < ActiveRecord::Base
     end
   end
 
+  def valid_values_for mapping
+    if mapping["core"]
+      valid_values_for_core mapping["target_field"]
+    else
+      mapping["valid_values"]
+    end
+  end
+
+  def valid_values_for_core target_field
+    field = Oj.load(Manifest.default_definition)["field_mapping"].detect { |f| f["target_field"] == target_field }
+    valid_values = field["valid_values"]
+    valid_values
+  end
+
   def manifest_validation
     if self.metadata.blank?
       self.errors.add(:metadata, "can't be blank")
@@ -239,6 +262,7 @@ class Manifest < ActiveRecord::Base
     if definition["field_mapping"].is_a? Array
       definition["field_mapping"].each do |fm|
         check_presence_of_target_field_and_selector fm
+        check_presence_of_core_field fm
         if (fm["valid_values"] && fm["valid_values"]["options"])
           verify_absence_of_null_string fm
         end
@@ -255,11 +279,8 @@ class Manifest < ActiveRecord::Base
   end
 
   def verify_absence_of_null_string field_mapping
-    valid_values = field_mapping["valid_values"]["options"]
-    valid_values.each do |value|
-      if value == NULL_STRING
-        self.errors.add(:string_null, ": cannot appear as valid value. (In '#{invalid_field(field_mapping)}') ")
-      end
+    if field_mapping["valid_values"]["options"].include? NULL_STRING
+      self.errors.add(:string_null, ": cannot appear as valid value. (In '#{invalid_field(field_mapping)}') ")
     end
   end
 
@@ -269,9 +290,15 @@ class Manifest < ActiveRecord::Base
     invalid_field
   end
 
+  def check_presence_of_core_field field_mapping
+    if (field_mapping["core"].nil?)
+      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field(field_mapping)}'. Mapping must include a core field")
+    end
+  end
+
   def check_presence_of_target_field_and_selector field_mapping
     if (field_mapping["target_field"].blank? || field_mapping["selector"].blank?)
-      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field(field_mapping)}'. Mapping in core fields must include target_field and selector")
+      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field(field_mapping)}'. Mapping must include target_field and selector")
     end
   end
 
@@ -307,5 +334,6 @@ class Manifest < ActiveRecord::Base
       self.errors.add(:invalid_type, ": custom fields must include a type, with value 'integer', 'date' or 'string'")
     end
   end
+
 end
 
