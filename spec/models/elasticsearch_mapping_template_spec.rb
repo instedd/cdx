@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe ElasticsearchMappingTemplate do
-
   let(:manifest) do
     definition = %{{
       "metadata" : {
@@ -60,7 +59,8 @@ describe ElasticsearchMappingTemplate do
         "laboratory_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
         "location_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
         "institution_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
-        "parent_locations"=>{'type'=>"integer", 'index'=>'not_analyzed'},
+        "parent_locations"=>{'type' => 'integer'},
+        "location"=>{'type'=>'nested', 'properties'=>{"admin_level_0"=>{'type'=>'integer'}, "admin_level_1"=>{'type'=>'integer'}, "admin_level_2"=>{'type'=>'integer'}, "admin_level_3"=>{'type'=>'integer'}}},
         "age"=>{'type'=>"integer", 'index'=>'not_analyzed'},
         "assay_name"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "gender"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -103,7 +103,8 @@ describe ElasticsearchMappingTemplate do
         "laboratory_id"=>{'type'=>"integer"},
         "location_id"=>{'type'=>"integer"},
         "institution_id"=>{'type'=>"integer"},
-        "parent_locations"=>{'type'=>"integer"},
+        "parent_locations"=>{'type' => 'integer'},
+        "location"=>{'type'=>'nested', 'properties'=>{"admin_level_0"=>{'type'=>'integer'}, "admin_level_1"=>{'type'=>'integer'}, "admin_level_2"=>{'type'=>'integer'}, "admin_level_3"=>{'type'=>'integer'}}},
         "age"=>{'type'=>"integer"},
         "assay_name"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "gender"=>{'type'=>"string", 'index'=>'not_analyzed'},

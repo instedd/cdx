@@ -1,11 +1,9 @@
 require "cdx/api/elasticsearch"
 
 module Cdx::Api
-  
   def self.index_prefix
     "cdp_institution_#{Rails.env}"
   end
-
 end
 
 Cdx::Api.setup do |config|

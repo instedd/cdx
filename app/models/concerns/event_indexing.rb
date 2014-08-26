@@ -19,7 +19,7 @@ module EventIndexing
     def parsed_fields
       @parsed_fields ||= manifest.apply_to(Oj.load raw_data).with_indifferent_access
     end
-    
+
     def manifest
       @manifest ||= device.manifests.order("version DESC").first || Manifest.default
     end
@@ -32,7 +32,7 @@ module EventIndexing
         laboratory_id = laboratory.id
         location = device.locations.first
         location_id = location.id
-        parent_locations = location.self_and_ancestors.map &:id
+        parent_locations = location.self_and_ancestors.load
       elsif device.laboratories.size == 0
         laboratory_id = nil
         location_id = nil
@@ -43,19 +43,25 @@ module EventIndexing
         location = locations.first
         location = location.common_root_with(locations[1..-1])
         location_id = location.id
-        parent_locations = location.self_and_ancestors.map &:id
+        parent_locations = location.self_and_ancestors.load
       end
 
-      parsed_fields[:indexed].merge(
+      parent_locations_id = parent_locations.map &:id
+      admin_levels = Hash[parent_locations.map { |l| ["admin_level_#{l.admin_level}", l.id] }]
+
+      properties = {
         created_at: self.created_at.utc.iso8601,
         updated_at: self.updated_at.utc.iso8601,
         device_uuid: device.secret_key,
         uuid: uuid,
         location_id: location_id,
-        parent_locations: parent_locations,
+        parent_locations: parent_locations_id,
         laboratory_id: laboratory_id,
-        institution_id: device.institution_id
-      )
+        institution_id: device.institution_id,
+        location: admin_levels,
+      }
+
+      parsed_fields[:indexed].merge(properties)
     end
 
     def generate_uuid

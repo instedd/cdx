@@ -1,5 +1,4 @@
 class ElasticsearchMappingTemplate
-
   def load
     Cdx::Api.client.indices.put_template name: "cdx_events_template", body: template
   end
@@ -75,20 +74,28 @@ class ElasticsearchMappingTemplate
     else
       field_name = field_names.first
       field_body =
-        case field['type']
-        when "multi_field"
-          {
-            'fields' => {
-              'analyzed' => {'type' => 'string', 'index' => 'analyzed'},
-              field_name => {'type' => 'string', 'index' => 'not_analyzed'}
-            }
-          }
-        else
-          {'index' => 'not_analyzed'}
-        end
-      properties[field_name] = {'type' => field[:type]}.merge(field_body)
+      case field['type']
+      when "multi_field"
+        field_body = {
+                       'fields' => {
+                         'analyzed' => {'type' => 'string', 'index' => 'analyzed'},
+                         field_name => {'type' => 'string', 'index' => 'not_analyzed'}
+                       }
+                     }
+        properties[field_name] = {'type' => field[:type]}.merge(field_body)
+      when "location"
+        properties["parent_#{field_name.pluralize}"] = { 'type' => 'integer' }
+        properties[field_name] = {
+          'type' => 'nested',
+          'properties' => Hash[ (0..3).map { |i|
+            ["admin_level_#{i}", { 'type' => 'integer' } ]
+          }]
+        }
+      else
+        field_body = {'index' => 'not_analyzed'}
+        properties[field_name] = {'type' => field[:type]}.merge(field_body)
+      end
     end
     properties
   end
 end
-
