@@ -60,7 +60,7 @@ describe ApiController do
       event.event_id.should eq("1234")
       raw_data = Oj.load event.raw_data
       raw_data["age"].should eq(20)
-      event.sensitive_data[:patient_id].should be(nil)
+      event.sensitive_data[:patient_id].should be_nil
       event.sensitive_data[:patient_name].should eq('john doe')
 
       post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20, patient_name: 'jane doe'), device_uuid: device.secret_key
@@ -115,7 +115,7 @@ describe ApiController do
       event = all_elasticsearch_events.first["_source"]
       event["assay_name"].should eq("GX4002")
       event["created_at"].should_not eq(nil)
-      event["patient_id"].should be(nil)
+      event["patient_id"].should be_nil
     end
 
     it "stores pii according to manifest" do
@@ -146,12 +146,12 @@ describe ApiController do
       event = all_elasticsearch_events.first["_source"]
       event["assay_name"].should eq("GX4002")
       event["patient_id"].should eq(nil)
-      event["foo"].should be(nil)
+      event["foo"].should be_nil
 
       event = Event.first
       raw_data = event.sensitive_data
       event.decrypt.sensitive_data.should_not eq(raw_data)
-      event.sensitive_data["patient_id"].should be(nil)
+      event.sensitive_data["patient_id"].should be_nil
       event.sensitive_data["foo"].should eq(1234)
       event.sensitive_data[:foo].should eq(1234)
     end
@@ -189,7 +189,7 @@ describe ApiController do
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_uuid: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["foo"].should be(nil)
+      event["foo"].should be_nil
       event["assay_name"].should eq("GX4002")
     end
 
@@ -215,11 +215,11 @@ describe ApiController do
       post :create, Oj.dump(some_field: 1234), device_uuid: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["foo"].should be(nil)
+      event["foo"].should be_nil
 
       event = Event.first.decrypt
-      event.sensitive_data["some_field"].should be(nil)
-      event.sensitive_data["foo"].should be(nil)
+      event.sensitive_data["some_field"].should be_nil
+      event.sensitive_data["foo"].should be_nil
       event.custom_fields[:foo].should eq(1234)
       event.custom_fields["foo"].should eq(1234)
     end
@@ -279,7 +279,7 @@ describe ApiController do
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(parent_location.id)
-      event["laboratory_id"].should be(nil)
+      event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([root_location.id, parent_location.id].sort)
     end
 
@@ -291,7 +291,7 @@ describe ApiController do
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(root_location.id)
-      event["laboratory_id"].should be(nil)
+      event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([root_location.id])
     end
 
@@ -303,7 +303,7 @@ describe ApiController do
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(root_location.id)
-      event["laboratory_id"].should be(nil)
+      event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([root_location.id])
     end
 
@@ -314,8 +314,8 @@ describe ApiController do
       post :create, data, device_uuid: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["location_id"].should be(nil)
-      event["laboratory_id"].should be(nil)
+      event["location_id"].should be_nil
+      event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([])
     end
 
@@ -339,7 +339,7 @@ describe ApiController do
         event["results"].first["condition"]
       end
 
-      response.size.should be(2)
+      response.size.should eq(2)
       response[0]["results"].first["condition"].should eq("flu_a")
       response[1]["results"].first["condition"].should eq("flu_b")
 
@@ -347,7 +347,7 @@ describe ApiController do
         event["results"].first["condition"]
       end
 
-      response.size.should be(3)
+      response.size.should eq(3)
       response[0]["results"].first["condition"].should eq("flu_a")
       response[1]["results"].first["condition"].should eq("flu_b")
       response[2]["results"].first["condition"].should eq("mtb")
@@ -387,7 +387,7 @@ describe ApiController do
 
         response = get_updates(created_at_since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
 
-        response.size.should be(1)
+        response.size.should eq(1)
         response.first["results"].first["result"].should eq("negative")
 
         response = get_updates(created_at_since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
@@ -404,7 +404,7 @@ describe ApiController do
 
          response = get_updates(result: :positive)
 
-         response.size.should be(1)
+         response.size.should eq(1)
          response.first["results"].first["result"].should eq("positive")
        end
 
@@ -414,7 +414,7 @@ describe ApiController do
 
         response = get_updates condition: 'mtb'
 
-        response.size.should be(1)
+        response.size.should eq(1)
         response.first["results"].first["result"].should eq("positive")
       end
 
@@ -424,7 +424,7 @@ describe ApiController do
 
         response = get_updates test_type: :specimen
 
-        response.size.should be(1)
+        response.size.should eq(1)
         response.first["results"].first["result"].should eq("negative")
       end
     end
