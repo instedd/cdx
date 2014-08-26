@@ -36,10 +36,10 @@ class Cdx::Api::Elasticsearch::Initializer
     when "location"
       properties["parent_#{field[:name].pluralize}"] = { type: :integer }
 
-      properties[field[:name]] = { 
+      properties[field[:name]] = {
         type: :nested,
         properties: Hash[ (0..3).map { |i|
-          ["admin_level_#{i}", { type: :integer, index: :not_analyzed } ]
+          ["admin_level_#{i}", { type: :integer } ]
         }]
       }
     else
