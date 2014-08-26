@@ -14,7 +14,9 @@ class Manifest < ActiveRecord::Base
   NULL_STRING = "null"
 
   def self.default
-    new definition: default_definition, default: true
+    default_manifest = self.new definition: default_definition
+    default_manifest.default = true
+    default_manifest
   end
 
   def default?
