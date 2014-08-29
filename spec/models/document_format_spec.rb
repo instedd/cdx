@@ -107,7 +107,8 @@ describe "formats of document stored" do
   def setup_api(document_format)
     api = Cdx::Api::Service.new
     api.setup do |config|
-      config.index_name_pattern = "cdx_events"
+      config.index_name_pattern = "cdx_events*"
+      config.template_name_pattern = "cdx_events*"
       config.document_format = document_format
       # config.log = true
     end

@@ -3,9 +3,9 @@ require "cdx/api/elasticsearch"
 require "pry-byebug"
 
 Cdx::Api.setup do |config|
-  config.index_name_pattern = "cdx_events"
+  config.index_name_pattern = "cdx_events*"
+  config.template_name_pattern = "cdx_events*"
   # config.log = true
-
 end
 
 Cdx::Api.client.indices.delete index: "cdx_events" rescue nil

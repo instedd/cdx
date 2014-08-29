@@ -10,7 +10,7 @@ class Cdx::Api::Elasticsearch::Initializer
 
   def template
     {
-      template: @api.config.index_name_pattern,
+      template: @api.config.template_name_pattern,
       mappings: {
         event: {
           dynamic_templates: build_dynamic_templates,

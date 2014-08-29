@@ -16,6 +16,7 @@ class Cdx::Api::Elasticsearch::Config
   end
 
   attr_accessor :index_name_pattern
+  attr_accessor :template_name_pattern
   attr_accessor :log
 
   def searchable_fields
