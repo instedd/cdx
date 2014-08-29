@@ -7,7 +7,10 @@ class ElasticsearchMappingTemplate
     mapping = {
       index: Cdx::Api.config.index_name_pattern,
       type: "event_#{manifest.id}",
-      body: {properties: build_properties_mapping_for(manifest)}
+      body: {
+        dynamic_templates: build_dynamic_templates_for(manifest),
+        properties: build_properties_mapping_for(manifest),
+      }
     }
     Cdx::Api.client.indices.put_mapping mapping
   rescue Elasticsearch::Transport::Transport::Errors::NotFound => ex
@@ -25,22 +28,52 @@ class ElasticsearchMappingTemplate
     mappings = {
       '_default_' => {
         'dynamic' => "strict",
-        'properties' => build_default_properties_mapping
+        'dynamic_templates' => build_default_dynamic_templates,
+        'properties' => build_default_properties_mapping,
       },
-      'event' => { 'properties' => {}}
+      'event' => {
+        'dynamic_templates' => [],
+        'properties' => {},
+      }
     }
 
     Manifest.all.each do |manifest|
-      mappings["event_#{manifest.id}"] = { 'properties' => build_properties_mapping_for(manifest) }
+      mappings["event_#{manifest.id}"] = {
+        'dynamic_templates' => build_dynamic_templates_for(manifest),
+        'properties' => build_properties_mapping_for(manifest),
+      }
     end
 
     mappings
+  end
+
+  def build_dynamic_templates_for manifest
+    templates = []
+
+    manifest.field_mapping.each do |mapping|
+      if mapping['type'] == "location"
+        field_name = mapping['target_field']
+        template = {
+          "#{field_name}_levels" => {
+            "path_match" => "#{field_name}.admin_level_*",
+            "mapping" =>    { "type" => "integer" }
+          }
+        }
+        templates << template
+      end
+    end
+
+    templates
   end
 
   def build_default_properties_mapping
     map_fields(Manifest.default.field_mapping.select do |mapping|
       mapping[:indexed]
     end)
+  end
+
+  def build_default_dynamic_templates
+    build_dynamic_templates_for Manifest.default
   end
 
   def build_properties_mapping_for manifest

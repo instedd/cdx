@@ -45,6 +45,14 @@ describe ElasticsearchMappingTemplate do
   def default_mapping
     {
       'dynamic' => "strict",
+      "dynamic_templates"=>[
+        {
+          "location_levels"=>{
+            "path_match"=>"location.admin_level_*",
+            "mapping"=>{"type"=>"integer"}
+          }
+        }
+      ],
       'properties'=> {
         "started_at" => { 'type' => "date", 'index' => 'not_analyzed'},
         "created_at"=>{'type'=>"date", 'index'=>'not_analyzed'},
@@ -89,6 +97,14 @@ describe ElasticsearchMappingTemplate do
   def default_mapping2
     {
       'dynamic' => "strict",
+      "dynamic_templates"=>[
+        {
+          "location_levels"=>{
+            "path_match"=>"location.admin_level_*",
+            "mapping"=>{"type"=>"integer"}
+          }
+        }
+      ],
       'properties'=> {
         "started_at" => { 'type' => "date", 'format' => 'dateOptionalTime'},
         "created_at"=>{'type'=>"date", 'format' => 'dateOptionalTime'},
@@ -136,8 +152,12 @@ describe ElasticsearchMappingTemplate do
       'template'=>"cdp_institution_test*",
       'mappings'=> {
         '_default_'=> default_mapping,
-        'event' => {'properties' => {}},
+        'event' => {
+          "dynamic_templates"=>[],
+          'properties' => {},
+          },
         "event_#{manifest.id}" => {
+          "dynamic_templates"=>[],
           'properties' => {
             "custom_fields" => {
               'type' => 'nested',
@@ -174,7 +194,7 @@ describe ElasticsearchMappingTemplate do
       'type' => 'nested',
       'properties' => {
         "temperature" => {'type' => "integer"}
-      }
+      },
     }
     event_mapping['properties']['results']['properties']['custom_fields'] = {
       'type' => 'nested',
