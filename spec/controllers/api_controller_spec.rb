@@ -85,6 +85,13 @@ describe ApiController do
       events = all_elasticsearch_events
       events.size.should eq(2)
     end
+
+    it "should generate a started_at date if it's not provided" do
+      post :create, data, device_uuid: device.secret_key
+
+      event = all_elasticsearch_events.first["_source"]
+      event["started_at"].should eq(event["created_at"])
+    end
   end
 
   context "Manifest" do

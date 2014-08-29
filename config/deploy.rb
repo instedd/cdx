@@ -14,6 +14,7 @@ set :default_env, { 'TERM' => ENV['TERM'] }
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
+set :branch, ENV['REVISION'] || 'master'
 
 # Default deploy_to directory is /var/www/my_app
 set :deploy_to, "/u/apps/#{fetch(:application)}"
@@ -51,6 +52,45 @@ set :keep_releases, 5
 
 set :assets_roles, [:web, :app]
 
+namespace :foreman do
+  desc 'Export the Procfile to Ubuntu upstart scripts'
+  task :export do
+    on roles(:app) do
+      within current_path do
+        execute :echo, "RAILS_ENV=production > .env"
+        %w(PATH GEM_HOME GEM_PATH).each do |var|
+          execute :rvm, %(#{fetch(:rvm_ruby_version)} do ruby -e 'puts "#{var}=\#{ENV["#{var}"]}"' >> .env)
+        end
+        execute :bundle, "exec rvmsudo foreman export upstart /etc/init -f Procfile -a #{fetch(:application)} -u `whoami` -p #{fetch(:port)} --concurrency=\"web=1\""
+      end
+    end
+  end
+  
+  desc "Start the application services"
+  task :start do
+    on roles(:app) do
+      execute "sudo start #{fetch(:application)}"
+    end
+
+  end
+  desc "Stop the application services"
+  task :stop do
+    on roles(:app) do
+      execute "sudo stop #{fetch(:application)}"
+    end
+  end
+
+  desc "Restart the application services"
+  task :restart do
+    on roles(:app) do
+      execute "sudo start #{fetch(:application)} || sudo restart #{fetch(:application)}"
+    end
+  end
+
+  after "deploy:publishing", "foreman:export"    # Export foreman scripts
+  after "deploy:restart", "foreman:restart"   # Restart application scripts
+end
+
 namespace :deploy do
 
   desc 'Restart application'
@@ -63,61 +103,13 @@ namespace :deploy do
   # before :restart, :migrate
   after :publishing, :restart
 
-  task :start do ; end
-  task :stop do ; end
-
-  task :generate_version do
+  task :write_version do
     on roles(:app) do
-      execute :echo, "#{fetch(:current_revision)} > #{release_path}/VERSION"
-    end
-  end
-  after :publishing, :generate_version
-
-  namespace :foreman do
-    desc 'Export the Procfile to Ubuntu upstart scripts'
-
-    task :export do
-      on roles(:app) do
-        execute :echo, "-e \"PATH=$PATH\\nGEM_HOME=$GEM_HOME\\nGEM_PATH=$GEM_PATH\\nRAILS_ENV=production\" >  #{release_path}/.env"
-        # within current_path do
-        #   execute "#{fetch(:rvm_path)}/bin/rvmsudo #{fetch(:rvm_path)}/bin/bundle exec foreman export upstart /etc/init -f #{current_path}/Procfile -a #{fetch(:application)} -u #{fetch(:user)} --concurrency=\"subscribers=1\""
-        # end
-
-        # on roles(:app) do
-          execute [
-            "cd #{release_path} &&",
-            'export rvmsudo_secure_path=0 && ',
-            "#{fetch(:rvm_path)}/bin/rvm #{fetch(:rvm_ruby_version)} do",
-            'rvmsudo',
-            "#{fetch(:rvm_path)}/bin/bundle exec foreman export -a #{fetch(:application)} -u #{fetch(:user)} upstart /etc/init --concurrency=\"subscribers=1\""
-            # "bundle exec foreman export -a #{fetch(:application)} -u #{fetch(:user)} -p 8787 upstart /etc/init"
-          ].join(' ')
-        # end
-      end
-    end
-
-    desc "Start the application services"
-    task :start do
-      on roles(:app) do
-        execute "sudo start #{fetch(:application)}"
-      end
-
-    end
-    desc "Stop the application services"
-    task :stop do
-      on roles(:app) do
-        execute "sudo stop #{fetch(:application)}"
-      end
-    end
-
-    desc "Restart the application services"
-    task :restart do
-      on roles(:app) do
-        execute "sudo start #{fetch(:application)} || sudo restart #{fetch(:application)}"
+      within repo_path do
+        execute :git, "describe --always > #{release_path}/VERSION"
       end
     end
   end
 
-  # after "deploy:updated", "foreman:export"    # Export foreman scripts
-  after :restart, "foreman:restart"   # Restart application scripts
+  after :publishing, :write_version
 end
