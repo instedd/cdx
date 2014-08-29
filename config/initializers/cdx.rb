@@ -11,5 +11,3 @@ Cdx::Api.setup do |config|
   config.log = Rails.env != "test"
 end
 
-ElasticsearchMappingTemplate.new.load rescue nil # for when the database is not initialized yet.
-
