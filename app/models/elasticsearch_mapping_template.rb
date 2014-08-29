@@ -5,7 +5,7 @@ class ElasticsearchMappingTemplate
 
   def update_existing_indices_with manifest
     mapping = {
-      index: Cdx::Api.config.index_name_pattern,
+      index: Cdx::Api.config.template_name_pattern,
       type: "event_#{manifest.id}",
       body: {
         dynamic_templates: build_dynamic_templates_for(manifest),
@@ -19,7 +19,7 @@ class ElasticsearchMappingTemplate
 
   def template
     {
-      'template' => Cdx::Api.config.index_name_pattern,
+      'template' => Cdx::Api.config.template_name_pattern,
       'mappings' => mappings
     }
   end

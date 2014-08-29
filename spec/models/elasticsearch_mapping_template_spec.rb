@@ -149,7 +149,7 @@ describe ElasticsearchMappingTemplate do
   it "should build a template with the default manifest and an specific mapping for each custom manifest" do
     manifest
     ElasticsearchMappingTemplate.new.template.should eq({
-      'template'=>"cdp_institution_test*",
+      'template'=>"cdp_institution*",
       'mappings'=> {
         '_default_'=> default_mapping,
         'event' => {

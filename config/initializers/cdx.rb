@@ -8,6 +8,7 @@ end
 
 Cdx::Api.setup do |config|
   config.index_name_pattern = "#{Cdx::Api.index_prefix}*"
+  config.template_name_pattern = "cdp_institution*"
   config.log = Rails.env != "test"
 end
 
