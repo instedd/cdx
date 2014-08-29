@@ -619,33 +619,6 @@ describe Manifest do
     m.errors[:field_mapping].first.should eq("must be an array")
   end
 
-  it "shouldn't create if a core field is provided with valid values" do
-    definition = %{{
-      "metadata" : {
-        "version" : "1.0.0",
-        "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
-      },
-      "field_mapping" : [
-        {
-          "target_field" : "age",
-          "selector" : "age",
-          "core" : true,
-          "valid_values" : {
-            "range" : {
-              "min" : 0,
-              "max" : 100
-            }
-          }
-        }
-      ]
-    }}
-    m = Manifest.new(definition: definition)
-    m.save
-    Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'age'. Valid values are not permitted for core fields")
-  end
-
   it "shouldn't create if a core field is provided with an invalid value mapping" do
     definition = %{{
       "metadata" : {

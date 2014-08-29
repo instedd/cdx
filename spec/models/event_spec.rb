@@ -56,30 +56,4 @@ describe Event do
     expect(e.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'results[*].result'")
   end
 
-  it "stores failed events when value is not valid" do
-    manifest = Manifest.make definition: %{
-      {
-        "metadata": {
-          "version": "1",
-          "api_version": "1",
-          "device_models": "#{model.name}"
-        },
-        "field_mapping" : [{
-            "target_field" : "results[*].result",
-            "selector" : "result",
-            "core" : true
-        }]
-      }
-    }
-
-    device = Device.make device_model: model
-    json = %{{ "result": "non_positive" }}
-
-    e = Event.create_or_update_with device, json
-
-    expect(e.new_record?).to be_false
-    expect(e.index_failed?).to be_true
-    expect(e.index_failure_reason).to eq("'non_positive' is not a valid value for 'results[*].result' (valid options are: positive, negative)")
-  end
-
 end

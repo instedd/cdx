@@ -47,7 +47,7 @@ class Manifest < ActiveRecord::Base
     target_field = mapping["target_field"]
     selector = mapping["selector"]
     value = apply_selector(selector, data)
-    valid_values = valid_values_for mapping
+    valid_values = mapping["valid_values"]
     check_valid_value(value, mapping, target_field, valid_values)
     value = apply_value_mappings(value, target_field, mapping["value_mappings"])
     key = hash_key(target_field, mapping["core"], mapping["indexed"], mapping["pii"])
@@ -215,20 +215,6 @@ class Manifest < ActiveRecord::Base
     end
   end
 
-  def valid_values_for mapping
-    if mapping["core"]
-      valid_values_for_core mapping["target_field"]
-    else
-      mapping["valid_values"]
-    end
-  end
-
-  def valid_values_for_core target_field
-    field = Oj.load(Manifest.default_definition)["field_mapping"].detect { |f| f["target_field"] == target_field }
-    valid_values = field["valid_values"]
-    valid_values
-  end
-
   def manifest_validation
     if self.metadata.blank?
       self.errors.add(:metadata, "can't be blank")
@@ -262,7 +248,6 @@ class Manifest < ActiveRecord::Base
           verify_absence_of_null_string fm
         end
         if (fm["core"] == true)
-          check_valid_values fm
           check_value_mappings fm
         else
           check_valid_type fm
@@ -294,12 +279,6 @@ class Manifest < ActiveRecord::Base
   def check_presence_of_target_field_and_selector field_mapping
     if (field_mapping["target_field"].blank? || field_mapping["selector"].blank?)
       self.errors.add(:invalid_field_mapping, ": target '#{invalid_field(field_mapping)}'. Mapping must include target_field and selector")
-    end
-  end
-
-  def check_valid_values(field_mapping)
-    if (field_mapping["valid_values"].present?)
-      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Valid values are not permitted for core fields")
     end
   end
 

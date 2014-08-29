@@ -48,4 +48,8 @@ class ApiController < ApplicationController
     @csv_builder = EventCSVBuilder.new(events)
     @filename = "Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
   end
+
+  def schema_endpoint event_structure
+  end
+
 end
