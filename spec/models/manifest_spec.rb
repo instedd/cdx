@@ -656,6 +656,12 @@ describe Manifest do
           "target_field" : "test_type",
           "selector" : "Test.test_type",
           "core" : true,
+          "valid_values" : {
+            "options" : [
+              "qc",
+              "specimen"
+            ]
+          },
           "value_mappings" : {
             "*QC*" : "qc",
             "*Specimen*" : "specimen"

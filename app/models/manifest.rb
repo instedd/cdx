@@ -47,9 +47,8 @@ class Manifest < ActiveRecord::Base
     target_field = mapping["target_field"]
     selector = mapping["selector"]
     value = apply_selector(selector, data)
-    valid_values = mapping["valid_values"]
-    check_valid_value(value, mapping, target_field, valid_values)
     value = apply_value_mappings(value, target_field, mapping["value_mappings"])
+    check_valid_value(value, mapping, target_field, mapping["valid_values"])
     key = hash_key(target_field, mapping["core"], mapping["indexed"], mapping["pii"])
 
     if (targets = target_field.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
@@ -283,13 +282,15 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_value_mappings(field_mapping)
-    searchable_fields = Cdx::Api.searchable_fields
     if(field_mapping["value_mappings"].present?)
-      target = searchable_fields.select { |f| f.name == field_mapping["target_field"] }.first
+      valid_values = []
+      if field_mapping["valid_values"] && field_mapping["valid_values"]["options"]
+        valid_values = field_mapping["valid_values"]["options"]
+      end
       field_mapping["value_mappings"].values.each do |vm|
         #Assuming there is an options key for valid_values field
-        if !target["valid_values"]["options"].include? vm
-          self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. '#{vm}' is not a valid value")
+        if !valid_values.include? vm
+          self.errors.add(:invalid_field_mapping, ": target '#{invalid_field field_mapping}'. '#{vm}' is not a valid value")
         end
       end
     end

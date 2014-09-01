@@ -40,12 +40,29 @@
     {
       "target_field" : "results[*].condition",
       "selector" : "condition",
-      "core" : true
+      "core" : true,
+      "valid_values" : {
+        "options" : [
+          "flu_a",
+          "flu_b",
+          "h1n1"
+        ]
+      },
+      "value_mappings" : {
+        "*FLU_A*" : "flu_a",
+        "*FLU_B*" : "flu_b"
+      }
     },
     {
       "target_field" : "results[*].result",
       "selector" : "result",
-      "core" : true
+      "core" : true,
+      "valid_values" : {
+        "options" : [
+          "positive",
+          "negative"
+        ]
+      }
     },
     {
       "target_field": "grade_of_resistance",
