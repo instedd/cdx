@@ -100,19 +100,16 @@ namespace :deploy do
     end
   end
 
-  # before :restart, :migrate
-  after :publishing, :restart
-
   desc 'Initialize Elasticsearch template'
   task :initialize_template do
     on roles(:app) do
-      with rails_env: :production do
-        rake 'cdx_elasticserach:initialize_template'
+      within current_path do
+        with rails_env: :production do
+          rake 'cdx_elasticserach:initialize_template'
+        end
       end
     end
   end
-
-  after :restart, :initialize_template
 
   task :write_version do
     on roles(:app) do
@@ -122,5 +119,8 @@ namespace :deploy do
     end
   end
 
+  # before :restart, :migrate
   after :publishing, :write_version
+  after :publishing, :initialize_template
+  after :publishing, :restart
 end
