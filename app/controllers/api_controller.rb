@@ -40,7 +40,7 @@ class ApiController < ApplicationController
   end
 
   def playground
-    @devices = Device.all
+    @devices = check_access(Device.all, READ_DEVICE)
   end
 
   def build_csv elements, prefix
