@@ -22,7 +22,7 @@ class ApiController < ApplicationController
     result = Cdx::Api::Elasticsearch::Query.new(params.merge(body)).execute
     respond_to do |format|
       format.csv do
-        build_csv result["events"]
+        build_events_csv result["events"]
         render :layout => false
       end
       format.json { render_json result }
@@ -43,13 +43,44 @@ class ApiController < ApplicationController
     @devices = Device.all
   end
 
-  def build_csv events
+  def build_csv elements, prefix
     @csv_options = { :col_sep => ',' }
-    @csv_builder = EventCSVBuilder.new(events)
-    @filename = "Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+    @csv_builder = CSVBuilder.new(elements)
+    @filename = "#{prefix}-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+  end
+
+  def build_laboratories_csv elements
+    build_csv elements, 'Laboratories'
+  end
+
+  def build_events_csv elements
+    build_csv elements, 'Events'
   end
 
   def schema_endpoint event_structure
   end
 
+  def laboratories
+    @laboratories = if params[:institution_id]
+      Institution.find(params[:institution_id]).laboratories
+    else
+      Laboratory.all
+    end
+    @laboratories = check_access(@laboratories, READ_LABORATORY).map do |lab|
+      {id: lab.id, name: lab.name, location: lab.location_id}
+    end
+
+    respond_to do |format|
+      format.csv do
+        build_laboratories_csv @laboratories
+        render :layout => false
+      end
+      format.json do 
+        render_json({
+          total_count: @laboratories.size,
+          laboratories: @laboratories
+        })
+      end
+    end
+  end
 end

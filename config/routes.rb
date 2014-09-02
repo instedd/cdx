@@ -27,5 +27,6 @@ Cdp::Application.routes.draw do
     get 'events/:event_uuid/custom_fields' => 'api#custom_fields'
     get 'events/:event_uuid/pii' => 'api#pii'
     post '/devices/:device_uuid/events' => 'api#create'
+    get 'laboratories(.:format)' => 'api#laboratories', defaults: { format: 'json' }
   end
 end

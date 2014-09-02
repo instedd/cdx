@@ -257,6 +257,49 @@ describe ApiController do
     end
   end
 
+  context "Laboratories" do
+    it "should list the laboratories" do
+      institution = Institution.make user: user
+      lab_ids = 3.times.map do
+        lab = Laboratory.make(institution: institution)
+        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_id}
+      end
+
+      result = get :laboratories, format: 'json'
+      Oj.load(result.body).should eq({'total_count' => 3, 'laboratories' => lab_ids})
+    end
+
+    it "should list the laboratories for a given institution" do
+      institution = Institution.make user: user
+      lab_ids = 3.times.map do
+        lab = Laboratory.make(institution: institution)
+        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_id}
+      end
+
+      Laboratory.make institution: (Institution.make user: user)
+
+      get :laboratories, institution_id: institution.id, format: 'json'
+      Oj.load(response.body).should eq({'total_count' => 3, 'laboratories' => lab_ids})
+    end
+
+    context 'CSV' do
+      render_views
+      it "should responds a csv" do
+        Timecop.freeze
+        institution = Institution.make user: user
+        lab = Laboratory.make(institution: institution)
+
+        get :laboratories, format: 'csv'
+
+        response.status.should eq(200)
+        response.content_type.should eq("text/csv")
+        response.headers["Content-Disposition"].should eq("attachment; filename=\"Laboratories-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
+        response.should render_template("laboratories")
+        response.body.should eq("id,name,location\n#{lab.id},#{lab.name},#{lab.location_id}\n")
+      end
+    end
+  end
+
   context "Locations" do
     let(:root_location) {Location.create_default}
     let(:parent_location) {Location.make parent: root_location}

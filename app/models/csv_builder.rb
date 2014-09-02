@@ -1,4 +1,4 @@
-class EventCSVBuilder
+class CSVBuilder
   def initialize events
     @events = events
     @columns = events.first.try(:keys)
