@@ -50,6 +50,7 @@ class Cdx::Api::Elasticsearch::Initializer
     when "nested"
       properties[field[:name]] = {type: :nested, properties: map_fields(field[:sub_fields])}
     when "location"
+      properties["#{field[:name]}_id"] = { type: :integer }
       properties["parent_#{field[:name].pluralize}"] = { type: :integer }
       properties[field[:name]] = { type: :nested }
     else

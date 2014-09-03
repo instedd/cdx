@@ -74,8 +74,6 @@ private
     case @definition[:type]
     when 'date'
       default_date_filter_definition
-    when 'location'
-      [{name: default_name, type: 'location'}]
     else
       [{name: default_name, type: default_filter_type}]
     end
@@ -89,10 +87,8 @@ private
         {name: "week(#{default_name})", type: 'date', interval: 'week'},
         {name: "day(#{default_name})", type: 'date', interval: 'day'}
       ]
-    elsif type == 'location'
-      [{name: "admin_level", type: 'location'}]
     else
-      [{name: default_name, type: 'flat'}]
+      [{name: default_grouping_name, type: default_grouping_type}]
     end
   end
 
@@ -100,11 +96,29 @@ private
     @definition[:api_name].gsub(/_id$/, "")
   end
 
+  def default_grouping_name
+    if type == 'location'
+      "#{default_name}_admin_level"
+    else
+      default_name
+    end
+  end
+
   def default_filter_type
-    if @definition[:type] == 'integer'
+    if @definition[:type] == 'location'
+      'location'  
+    elsif @definition[:type] == 'integer'
       'match'
     else
       'wildcard'
+    end
+  end
+
+  def default_grouping_type
+    if @definition[:type] == 'location'
+      'location'  
+    else
+      'flat'
     end
   end
 
@@ -130,8 +144,8 @@ private
       @definition[:group_parameter_definition] = if @definition[:group_parameter_definition]
         group_definitions = @definition[:group_parameter_definition]
         group_definitions.each do |group|
-          group[:name] = default_name unless group[:name]
-          group[:type] = 'flat' unless group[:type]
+          group[:name] = default_grouping_name unless group[:name]
+          group[:type] = default_grouping_type unless group[:type]
         end
         group_definitions
       else

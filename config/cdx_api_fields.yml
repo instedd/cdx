@@ -17,6 +17,9 @@
 # 9) If a filter or group has no name, it will be the same as the field name, as specified in (5).
 # 10) If a filter or group has no type, it will be the default type as specified in (3) and (4).
 # 11) If a filter or group is added with the sole option 'include_default: true', then the default filter or group will be added to the filters or groups array, as specified in (3), (4), and (5).
+# 12) If a field of type location is defined, the filters and groupings are going to be the following:
+#   a) a filter with the same name
+#   b) a grouping with the name of '#{default_name}_admin_level'
 
 searchable_fields:
   - name: started_at
@@ -58,14 +61,12 @@ searchable_fields:
     group_parameter_definition: none
   - name: laboratory_id
     type: integer
-  - name: location_id
-    type: integer
-    filter_parameter_definition: none
-    group_parameter_definition: none
   - name: institution_id
     type: integer
   - name: location
     type: location
+    group_parameter_definition: 
+      - name: admin_level
   - name: age
     type: integer
     filter_parameter_definition:
