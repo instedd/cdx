@@ -723,6 +723,32 @@ describe Cdx::Api do
       expect(response[3]["age"]).to eq(20)
       expect(response[3]["gender"]).to eq("female")
     end
+
+    it "orders a grouped result" do
+      index results:[result: :positive], created_at: time(2010, 1, 1)
+      index results:[result: :positive], created_at: time(2010, 2, 2)
+      index results:[result: :positive], created_at: time(2011, 1, 1)
+      index results:[result: :positive], created_at: time(2011, 1, 2)
+      index results:[result: :positive], created_at: time(2011, 2, 1)
+
+      response = query_events(group_by: "month(created_at)", order_by: "month(created_at)")
+
+      expect(response).to eq([
+        {"created_at"=>"2010-01", count: 1},
+        {"created_at"=>"2010-02", count: 1},
+        {"created_at"=>"2011-01", count: 2},
+        {"created_at"=>"2011-02", count: 1}
+      ])
+
+      response = query_events(group_by: "month(created_at)", order_by: "-month(created_at)")
+
+      expect(response).to eq([
+        {"created_at"=>"2011-02", count: 1},
+        {"created_at"=>"2011-01", count: 2},
+        {"created_at"=>"2010-02", count: 1},
+        {"created_at"=>"2010-01", count: 1}
+      ])
+    end
   end
 
   context "Location" do

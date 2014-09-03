@@ -17,6 +17,15 @@ class Cdx::Api::Elasticsearch::Query
 
     if params[:group_by]
       events = query_with_group_by(query, params[:group_by])
+      if params['order_by']
+        all_orders = extract_multi_values(params['order_by'])
+        all_orders.map do |order|
+          events = events.sort_by do |event|
+            event[order.delete('-')]
+          end
+          events = events.reverse if order[0] == "-"
+        end
+      end
       total_count = events.inject(0) { |sum, result| sum + result[:count].to_i }
     else
       events, total_count = query_without_group_by(query, params)
