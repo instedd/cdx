@@ -74,4 +74,5 @@ group :test do
   gem 'fakeweb'
   gem 'capybara-mechanize'
   gem 'timecop'
+  gem 'shoulda'
 end

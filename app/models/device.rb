@@ -10,6 +10,7 @@ class Device < ActiveRecord::Base
 
   validates_presence_of :institution
   validates_presence_of :name
+  validates_presence_of :device_model
 
   before_create :set_key
 
