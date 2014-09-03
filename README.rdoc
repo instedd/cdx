@@ -1,28 +1,27 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Reference implementation for the Connected Diagnostics API (http://dxapi.org/)
 
-Things you may want to cover:
+To start developing:
 
-* Ruby version
+1. Clone the repo.
 
-* System dependencies
+2. Install dependencies:
 
-* Configuration
+    bundle install
+  
+3. Setup development database:
 
-* Database creation
+    bundle exec rake db:setup
+  
+4. Setup test database:
 
-* Database initialization
+    bundle exec rake db:test:prepare
+  
+5. Run tests:
 
-* How to run the test suite
+    bundle exec rspec
+  
+6. Start development server:
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+    bundle exec rails s
