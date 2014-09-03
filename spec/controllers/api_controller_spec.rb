@@ -284,7 +284,7 @@ describe ApiController do
 
     context 'CSV' do
       render_views
-      it "should responds a csv" do
+      it "should respond a csv" do
         Timecop.freeze
         institution = Institution.make user: user
         lab = Laboratory.make(institution: institution)
