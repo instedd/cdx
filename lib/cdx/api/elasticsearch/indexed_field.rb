@@ -75,7 +75,7 @@ private
     when 'date'
       default_date_filter_definition
     when 'location'
-      [{name: 'location', type: 'location'}]
+      [{name: default_name, type: 'location'}]
     else
       [{name: default_name, type: default_filter_type}]
     end
