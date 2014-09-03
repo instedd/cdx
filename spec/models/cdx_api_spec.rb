@@ -731,7 +731,7 @@ describe Cdx::Api do
       index results:[result: :positive], created_at: time(2011, 1, 2)
       index results:[result: :positive], created_at: time(2011, 2, 1)
 
-      response = query_events(group_by: "month(created_at)", order_by: "month(created_at)")
+      response = query_events(group_by: "month(created_at)", order_by: "created_at")
 
       expect(response).to eq([
         {"created_at"=>"2010-01", count: 1},
@@ -740,7 +740,7 @@ describe Cdx::Api do
         {"created_at"=>"2011-02", count: 1}
       ])
 
-      response = query_events(group_by: "month(created_at)", order_by: "-month(created_at)")
+      response = query_events(group_by: "month(created_at)", order_by: "-created_at")
 
       expect(response).to eq([
         {"created_at"=>"2011-02", count: 1},
