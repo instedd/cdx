@@ -44,7 +44,6 @@ describe ElasticsearchMappingTemplate do
 
   def default_mapping
     {
-      'dynamic' => "strict",
       "dynamic_templates"=>[
         {
           "location_levels"=>{
@@ -65,10 +64,10 @@ describe ElasticsearchMappingTemplate do
         "error_code"=>{'type'=>"integer", 'index'=>'not_analyzed'},
         "error_description"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "laboratory_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
-        "location_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
+        "location_id"=>{'type'=>"integer"},
         "institution_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
         "parent_locations"=>{'type' => 'integer'},
-        "location"=>{'type'=>'nested', 'properties'=>{"admin_level_0"=>{'type'=>'integer'}, "admin_level_1"=>{'type'=>'integer'}, "admin_level_2"=>{'type'=>'integer'}, "admin_level_3"=>{'type'=>'integer'}}},
+        "location"=>{'type'=>'nested'},
         "age"=>{'type'=>"integer", 'index'=>'not_analyzed'},
         "assay_name"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "gender"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -96,7 +95,6 @@ describe ElasticsearchMappingTemplate do
 
   def default_mapping2
     {
-      'dynamic' => "strict",
       "dynamic_templates"=>[
         {
           "location_levels"=>{
@@ -120,7 +118,7 @@ describe ElasticsearchMappingTemplate do
         "location_id"=>{'type'=>"integer"},
         "institution_id"=>{'type'=>"integer"},
         "parent_locations"=>{'type' => 'integer'},
-        "location"=>{'type'=>'nested', 'properties'=>{"admin_level_0"=>{'type'=>'integer'}, "admin_level_1"=>{'type'=>'integer'}, "admin_level_2"=>{'type'=>'integer'}, "admin_level_3"=>{'type'=>'integer'}}},
+        "location"=>{'type'=>'nested'},
         "age"=>{'type'=>"integer"},
         "assay_name"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "gender"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -203,11 +201,17 @@ describe ElasticsearchMappingTemplate do
       }
     }
 
+    default_event_mapping = default_mapping2
+    default_event_mapping['properties']['location']["properties"]={
+      "admin_level_0" => {"type"=>"integer"},
+      "admin_level_1"=>{"type"=>"integer"}
+    }
+
     mapping.should eq({
       "cdp_institution_test_#{Institution.first.id}" => {
         "mappings" => {
           '_default_'=> default_mapping2,
-          'event' => default_mapping2,
+          'event' => default_event_mapping,
           "event_#{manifest.id}" => event_mapping
         }
       }

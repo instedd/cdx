@@ -319,6 +319,9 @@ describe ApiController do
       event["location_id"].should eq(leaf_location1.id)
       event["laboratory_id"].should eq(laboratory1.id)
       event["parent_locations"].sort.should eq([leaf_location1.id, parent_location.id, root_location.id].sort)
+      event["location"]['admin_level_0'].should eq(root_location.id)
+      event["location"]['admin_level_1'].should eq(parent_location.id)
+      event["location"]['admin_level_2'].should eq(leaf_location1.id)
     end
 
     it "should store the parent location id when the device is registered more than one laboratory" do
@@ -331,6 +334,8 @@ describe ApiController do
       event["location_id"].should eq(parent_location.id)
       event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([root_location.id, parent_location.id].sort)
+      event["location"]['admin_level_0'].should eq(root_location.id)
+      event["location"]['admin_level_1'].should eq(parent_location.id)
     end
 
     it "should store the root location id when the device is registered more than one laboratory" do
@@ -343,6 +348,7 @@ describe ApiController do
       event["location_id"].should eq(root_location.id)
       event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([root_location.id])
+      event["location"]['admin_level_0'].should eq(root_location.id)
     end
 
     it "should store the root location id when the device is registered more than one laboratory with another tree order" do
@@ -355,6 +361,7 @@ describe ApiController do
       event["location_id"].should eq(root_location.id)
       event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([root_location.id])
+      event["location"]['admin_level_0'].should eq(root_location.id)
     end
 
     it "should store nil if no location was found" do
@@ -367,6 +374,7 @@ describe ApiController do
       event["location_id"].should be_nil
       event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([])
+      event["location"].should eq({})
     end
 
     it "filters by location" do

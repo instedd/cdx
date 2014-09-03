@@ -27,7 +27,6 @@ class ElasticsearchMappingTemplate
   def mappings
     mappings = {
       '_default_' => {
-        'dynamic' => "strict",
         'dynamic_templates' => build_default_dynamic_templates,
         'properties' => build_default_properties_mapping,
       },
@@ -109,24 +108,19 @@ class ElasticsearchMappingTemplate
       field_body =
       case field['type']
       when "multi_field"
-        field_body = {
-                       'fields' => {
-                         'analyzed' => {'type' => 'string', 'index' => 'analyzed'},
-                         field_name => {'type' => 'string', 'index' => 'not_analyzed'}
-                       }
-                     }
-        properties[field_name] = {'type' => field[:type]}.merge(field_body)
-      when "location"
-        properties["parent_#{field_name.pluralize}"] = { 'type' => 'integer' }
         properties[field_name] = {
-          'type' => 'nested',
-          'properties' => Hash[ (0..3).map { |i|
-            ["admin_level_#{i}", { 'type' => 'integer' } ]
-          }]
+          'type' => field[:type],
+          'fields' => {
+            'analyzed' => {'type' => 'string', 'index' => 'analyzed'},
+            field_name => {'type' => 'string', 'index' => 'not_analyzed'}
+          }
         }
+      when "location"
+        properties["#{field_name}_id"] = { 'type' => 'integer' }
+        properties["parent_#{field_name.pluralize}"] = { 'type' => 'integer' }
+        properties[field_name] = { 'type' => 'nested' }
       else
-        field_body = {'index' => 'not_analyzed'}
-        properties[field_name] = {'type' => field[:type]}.merge(field_body)
+        properties[field_name] = {'type' => field[:type], 'index' => 'not_analyzed'}
       end
     end
     properties
