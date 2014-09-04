@@ -283,19 +283,37 @@ describe ApiController do
     end
 
     context 'CSV' do
+      def check_laboratories_csv(r)
+        r.status.should eq(200)
+        r.content_type.should eq("text/csv")
+        r.headers["Content-Disposition"].should eq("attachment; filename=\"Laboratories-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
+        r.should render_template("laboratories")
+      end
+
+      let(:institution) { Institution.make user: user }
+      let(:lab) { Laboratory.make(institution: institution) }
+
       render_views
+
+      before(:each) { Timecop.freeze }
+
       it "should respond a csv" do
-        Timecop.freeze
-        institution = Institution.make user: user
-        lab = Laboratory.make(institution: institution)
+        institution
+        lab
 
         get :laboratories, format: 'csv'
 
-        response.status.should eq(200)
-        response.content_type.should eq("text/csv")
-        response.headers["Content-Disposition"].should eq("attachment; filename=\"Laboratories-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-        response.should render_template("laboratories")
+        check_laboratories_csv response
         response.body.should eq("id,name,location\n#{lab.id},#{lab.name},#{lab.location_id}\n")
+      end
+
+      it "renders column names even when there are no laboratories to render" do
+        institution
+
+        get :laboratories, format: 'csv'
+
+        check_laboratories_csv response
+        response.body.should eq("id,name,location\n")
       end
     end
   end
@@ -522,44 +540,35 @@ describe ApiController do
           {"gender"=>"male", "assay_name" => "b", "count"=>1}
         ])
       end
+
       context "CSV" do
+        def check_csv(r)
+          r.status.should eq(200)
+          r.content_type.should eq("text/csv")
+          r.headers["Content-Disposition"].should eq("attachment; filename=\"Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
+          r.should render_template("events")
+        end
 
         render_views
 
+        before(:each) { Timecop.freeze }
+
         it "responds a csv for a given grouping" do
-          Timecop.freeze
           post :create, (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe), device_uuid: device.secret_key
           post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_uuid: device.secret_key
           post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_uuid: device.secret_key
+
           fresh_client_for institution.elasticsearch_index_name
 
           response = get :events, "", format: 'csv', group_by: 'system_user,error_code'
 
-          response.status.should eq(200)
-          response.content_type.should eq("text/csv")
-          response.headers["Content-Disposition"].should eq("attachment; filename=\"Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-          response.should render_template("events")
+          check_csv response
           response.body.should eq("system_user,error_code,count\njane_doe,1234,2\njdoe,1234,1\n")
         end
 
-        it "should respond an empty csv if no values" do
-          Timecop.freeze
-          post :create, (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe), device_uuid: device.secret_key
-          response = get :events, "", format: 'csv', result:'foo', group_by: 'result'
-
-          response.status.should eq(200)
-          response.content_type.should eq("text/csv")
-          response.headers["Content-Disposition"].should eq("attachment; filename=\"Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-          response.should render_template("events")
-          response.body.should eq("")
-
-          response = get :events, "", format: 'csv'
-
-          response.status.should eq(200)
-          response.content_type.should eq("text/csv")
-          response.headers["Content-Disposition"].should eq("attachment; filename=\"Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-          response.should render_template("events")
-          response.body.should eq("")
+        it "returns a csv with columns for a given grouping even when there are no results" do
+          get :events, "", format: 'csv', group_by: 'system_user,error_code'
+          response.body.should eq("system_user,error_code,count\n")
         end
       end
     end

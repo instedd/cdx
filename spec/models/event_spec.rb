@@ -55,5 +55,4 @@ describe Event do
     expect(e.index_failed?).to be_true
     expect(e.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'results[*].result'")
   end
-
 end

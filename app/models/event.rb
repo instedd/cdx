@@ -37,6 +37,14 @@ class Event < ActiveRecord::Base
     ["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code"]
   end
 
+  def self.csv_builder(query, events)
+    if query.grouped_by.empty?
+      CSVBuilder.new events
+    else
+      CSVBuilder.new events, column_names: query.grouped_by.concat(["count"])
+    end
+  end
+
   def update_with raw_data
     self.raw_data = raw_data
     @parsed_fields = nil
