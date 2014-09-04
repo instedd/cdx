@@ -2,7 +2,7 @@
 lock '3.1.0'
 
 set :application, "cdp"
-set :repo_url,  "git@bitbucket.org:instedd/cdp.git"
+set :repo_url,  "git@github.com:instedd/cdp.git"
 
 set :rvm_ruby_version, '2.0.0-p353'
 set :rvm_type, :system
