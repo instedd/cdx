@@ -10,6 +10,10 @@ class Cdx::Api::Elasticsearch::Query
     query(@params)
   end
 
+  def grouped_by
+    @params[:group_by].try(:dup)
+  end
+
   protected
 
   def query(params)
