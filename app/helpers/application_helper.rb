@@ -1,6 +1,6 @@
 module ApplicationHelper
   def has_access?(resource, action)
-    !!check_access(resource, action)
+    Policy.can? resource, action
   end
 
   def check_access(resource, action)

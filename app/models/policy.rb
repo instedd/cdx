@@ -152,7 +152,9 @@ class Policy < ActiveRecord::Base
       resources.uniq!
     end
 
-    allowed - denied
+    result = allowed - denied
+    result.delete nil
+    result
   end
 
   def validate_owner_permissions
@@ -246,6 +248,7 @@ class Policy < ActiveRecord::Base
   end
 
   def apply_resource_filters resource, resource_filters
+    return unless resource
     resource_filters = Array(resource_filters)
     resource_filters.each do |resource_filter|
       if resource_filter == "*"
