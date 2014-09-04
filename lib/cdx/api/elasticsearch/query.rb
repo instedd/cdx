@@ -11,7 +11,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def grouped_by
-    @params[:group_by].try(:dup)
+    @params[:group_by].split(',')
   end
 
   protected
