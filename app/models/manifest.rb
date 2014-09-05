@@ -76,13 +76,13 @@ class Manifest < ActiveRecord::Base
         current[path] || []
       end
       elements_array.map do |element|
-        paths = targets.last.split "."
+        paths = targets.last.split PATH_SPLIT_TOKEN
         paths.inject element do |current, path|
           current[path]
         end
       end
     else
-      paths = selector.split "."
+      paths = selector.split PATH_SPLIT_TOKEN
       paths.inject data do |current, path|
         current[path] if current.is_a? Hash
       end
@@ -164,7 +164,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def apply_value_mappings(value, target_field, mappings)
-    return value unless mappings
+    return value unless (mappings && value)
 
     matched_mapping = mappings.keys.detect do |mapping|
       value.match mapping.gsub("*", ".*")

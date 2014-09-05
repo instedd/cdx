@@ -8,26 +8,55 @@
   },
   "field_mapping" : [
     {
+      "target_field": "started_at",
+      "selector" : "started_at",
+      "core" : true,
+      "indexed" : true,
+      "type" : "date"
+    },
+    {
       "target_field": "patient_name",
       "selector" : "patient_information.name",
       "core" : true,
+      "indexed" : true,
       "type" : "string"
     },
     {
       "target_field": "event_id",
+      "type": "integer",
       "selector" : "event_id",
-      "core" : true
+      "core" : true,
+      "indexed" : true
+    },
+    {
+      "target_field" : "location",
+      "selector" : "location",
+      "type" : "location",
+      "core" : true,
+      "indexed" : true
     },
     {
       "target_field": "age",
       "selector": "age",
       "type": "integer",
-      "core" : true
+      "indexed" : "true",
+      "core" : true,
+      "valid_values" : {
+        "range" : {
+          "min" : 0,
+          "max" : 125
+        }
+      }
     },
     {
       "target_field": "assay_name",
       "selector" : "Test.assay_name",
-      "core" : true
+      "core" : true,
+      "valid_values" : {
+        "options" : [
+          "cartridge_1"
+        ]
+      }
     },
     {
       "target_field" : "system_user",
@@ -41,6 +70,7 @@
       "target_field" : "results[*].condition",
       "selector" : "condition",
       "core" : true,
+      "indexed" : true,
       "valid_values" : {
         "options" : [
           "flu_a",
@@ -57,6 +87,7 @@
       "target_field" : "results[*].result",
       "selector" : "result",
       "core" : true,
+      "indexed" : true,
       "valid_values" : {
         "options" : [
           "positive",
