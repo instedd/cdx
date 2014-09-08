@@ -243,23 +243,30 @@ class Manifest < ActiveRecord::Base
       definition["field_mapping"].each do |fm|
         check_presence_of_target_field_and_selector fm
         check_presence_of_core_field fm
-        if (fm["valid_values"] && fm["valid_values"]["options"])
-          verify_absence_of_null_string fm
-        end
-        if (fm["core"] == true)
-          check_value_mappings fm
-        else
-          check_valid_type fm
-        end
+        check_valid_type fm
+        check_properties_of_enum_field fm
       end
     else
       self.errors.add(:field_mapping, "must be an array")
     end
   end
 
+  def check_properties_of_enum_field field_mapping
+    if field_mapping["type"] == "enum"
+      if (field_mapping["options"])
+        verify_absence_of_null_string field_mapping
+        if (field_mapping["value_mappings"])
+          check_value_mappings field_mapping
+        end
+      else
+        self.errors.add(:enum_fields, "must be provided with options. (In '#{invalid_field(field_mapping)}'")
+      end
+    end
+  end
+
   def verify_absence_of_null_string field_mapping
-    if field_mapping["valid_values"]["options"].include? NULL_STRING
-      self.errors.add(:string_null, ": cannot appear as valid value. (In '#{invalid_field(field_mapping)}') ")
+    if field_mapping["options"].include? NULL_STRING
+      self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{invalid_field(field_mapping)}') ")
     end
   end
 
@@ -282,16 +289,10 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_value_mappings(field_mapping)
-    if(field_mapping["value_mappings"].present?)
-      valid_values = []
-      if field_mapping["valid_values"] && field_mapping["valid_values"]["options"]
-        valid_values = field_mapping["valid_values"]["options"]
-      end
-      field_mapping["value_mappings"].values.each do |vm|
-        #Assuming there is an options key for valid_values field
-        if !valid_values.include? vm
-          self.errors.add(:invalid_field_mapping, ": target '#{invalid_field field_mapping}'. '#{vm}' is not a valid value")
-        end
+    valid_values = field_mapping["options"]
+    field_mapping["value_mappings"].values.each do |vm|
+      if !valid_values.include? vm
+        self.errors.add(:invalid_field_mapping, ": target '#{invalid_field field_mapping}'. '#{vm}' is not a valid value")
       end
     end
   end
@@ -304,9 +305,11 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_valid_type(field_mapping)
-    valid_types = ["integer", "date", "string"]
-    if(field_mapping["type"].blank? || ! valid_types.include?(field_mapping["type"]))
-      self.errors.add(:invalid_type, ": custom fields must include a type, with value 'integer', 'date' or 'string'")
+    if (field_mapping["pii"].blank? || field_mapping["pii"]==false)
+      valid_types = ["enum","integer", "date", "string"]
+      if(field_mapping["type"].blank? || ! valid_types.include?(field_mapping["type"]))
+        self.errors.add(:invalid_type, ": custom fields must include a type, with value 'integer', 'date' or 'string'")
+      end
     end
   end
 

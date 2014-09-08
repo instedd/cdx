@@ -41,7 +41,9 @@ describe Event do
         "field_mapping" : [{
             "target_field" : "results[*].result",
             "selector" : "result",
-            "core" : true
+            "core" : true,
+            "type" : "enum",
+            "options" : ["positive","negative"]
         }]
       }
     }

@@ -630,7 +630,12 @@ describe Manifest do
         {
           "target_field" : "test_type",
           "selector" : "Test.test_type",
+          "type" : "enum",
           "core" : true,
+          "options" : [
+              "qc",
+              "specimen"
+          ],
           "value_mappings" : {
             "*QC*" : "Invalid mapping",
             "*Specimen*" : "specimen"
@@ -656,12 +661,11 @@ describe Manifest do
           "target_field" : "test_type",
           "selector" : "Test.test_type",
           "core" : true,
-          "valid_values" : {
-            "options" : [
-              "qc",
-              "specimen"
-            ]
-          },
+          "type" : "enum",
+          "options" : [
+            "qc",
+            "specimen"
+          ],
           "value_mappings" : {
             "*QC*" : "qc",
             "*Specimen*" : "specimen"
@@ -802,18 +806,16 @@ describe Manifest do
         {
           "target_field" : "rbc_description",
           "selector" : "rbc_description",
-          "type" : "string",
+          "type" : "enum",
           "core" : false,
-          "valid_values" : {
-            "options" : ["high","low","null"]
-          }
+          "options" : ["high","low","null"]
         }
       ]
     }}
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:string_null].first.should eq(": cannot appear as valid value. (In 'rbc_description') ")
+    m.errors[:string_null].first.should eq(": cannot appear as a possible value. (In 'rbc_description') ")
   end
 
   it "shouldn't create if a field is provided without core specification" do
@@ -836,5 +838,28 @@ describe Manifest do
     Manifest.count.should eq(0)
     m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include a core field")
   end
+
+  it "shouldn't create if an enum field is provided without options" do
+    definition = %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.0.0",
+        "device_models" : ["GX4001"]
+      },
+      "field_mapping" : [
+        {
+          "target_field" : "results[*].result",
+          "selector" : "result",
+          "core" : true,
+          "type" : "enum"
+        }
+      ]
+    }}
+    m = Manifest.new(definition: definition)
+    m.save
+    Manifest.count.should eq(0)
+    m.errors[:enum_fields].first.should eq("must be provided with options. (In 'results[*].result'")
+  end
+
 
 end

@@ -26,18 +26,18 @@ describe ManifestsController do
           {
             "target_field": "assay_name",
             "selector" : "Test.assay_name",
-            "core" : true
+            "core" : true,
+            "type" : "string"
           },
           {
             "target_field" : "test_type",
             "selector" : "Test.test_type",
             "core" : true,
-            "valid_values" : {
-              "options" : [
-                "qc",
-                "specimen"
-              ]
-            },
+            "type" : "enum",
+            "options" : [
+              "qc",
+              "specimen"
+            ],
             "value_mappings" : {
               "*QC*" : "qc",
               "*Specimen*" : "specimen"

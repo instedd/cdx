@@ -114,6 +114,7 @@ describe ApiController do
         "field_mapping" : [{
             "target_field" : "assay_name",
             "selector" : "assay.name",
+            "type" : "string",
             "core" : true
           }]
       }}
@@ -136,6 +137,7 @@ describe ApiController do
           {
             "target_field": "assay_name",
             "selector" : "assay.name",
+            "type" : "string",
             "core" : true
           },
           {
@@ -188,6 +190,7 @@ describe ApiController do
           {
             "target_field": "assay_name",
             "selector" : "assay.name",
+            "type" : "string",
             "core" : true
           }
         ]
