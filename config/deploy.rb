@@ -65,7 +65,7 @@ namespace :foreman do
       end
     end
   end
-  
+
   desc "Start the application services"
   task :start do
     on roles(:app) do
@@ -111,15 +111,28 @@ namespace :deploy do
     end
   end
 
+  task :write_revision do
+    on roles(:app) do
+      within repo_path do
+        execute :git, "describe --always > #{release_path}/REVISION"
+      end
+    end
+  end
+
   task :write_version do
     on roles(:app) do
       within repo_path do
-        execute :git, "describe --always > #{release_path}/VERSION"
+        if ENV['VERSION']
+          execute :echo, "#{VERSION} > #{release_path}/VERSION"
+        else
+          execute :git, "describe --always > #{release_path}/VERSION"
+        end
       end
     end
   end
 
   # before :restart, :migrate
+  after :publishing, :write_revision
   after :publishing, :write_version
   after :publishing, :initialize_template
   after :publishing, :restart

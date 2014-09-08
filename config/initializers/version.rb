@@ -1,7 +1,12 @@
-VersionFilePath = "#{::Rails.root.to_s}/REVISION"
+RevisionFilePath = "#{::Rails.root.to_s}/REVISION"
+VersionFilePath = "#{::Rails.root.to_s}/VERSION"
 
-Cdp::Application.config.send "version_name=", if FileTest.exists?(VersionFilePath) then
-  IO.read(VersionFilePath)
+if FileTest.exists?(VersionFilePath)
+  version = IO.read(VersionFilePath)
+elsif FileTest.exists?(RevisionFilePath)
+  version = IO.read(RevisionFilePath)
 else
-  "development"
+  version = "development"
 end
+
+Cdp::Application.config.version_name = version
