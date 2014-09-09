@@ -36,6 +36,8 @@ class Capability
       date_schema json, field
     elsif type == "integer"
       integer_schema json, field
+    elsif type == "enum"
+      enum_schema json, field
     elsif type == "location"
       location_schema json
     else
@@ -65,11 +67,14 @@ class Capability
     json
   end
 
+  def enum_schema json, field
+    json["type"] = "string"
+    json["enum"] = field["options"]
+    json
+  end
+
   def string_schema json, field
     json["type"] = "string"
-    if field["valid_values"] && field["valid_values"]["options"]
-      json["enum"] = field["valid_values"]["options"]
-    end
     json
   end
 

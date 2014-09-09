@@ -15,14 +15,13 @@ describe Capability do
         {
           "target_field" : "results[*].result",
           "selector" : "result",
+          "type" : "enum",
           "core" : true,
           "indexed" : true,
-          "valid_values" : {
-            "options" : [
-              "positive",
-              "negative"
-            ]
-          }
+          "options" : [
+            "positive",
+            "negative"
+          ]
         },
         {
           "target_field": "patient_name",

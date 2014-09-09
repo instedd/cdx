@@ -299,16 +299,15 @@ class Manifest < ActiveRecord::Base
 
   def update_mappings
     mapping_template = ElasticsearchMappingTemplate.new
-
     mapping_template.load
     mapping_template.update_existing_indices_with self
   end
 
   def check_valid_type(field_mapping)
     if (field_mapping["pii"].blank? || field_mapping["pii"]==false)
-      valid_types = ["enum","integer", "date", "string"]
+      valid_types = ["integer","date","enum","location","string"]
       if(field_mapping["type"].blank? || ! valid_types.include?(field_mapping["type"]))
-        self.errors.add(:invalid_type, ": custom fields must include a type, with value 'integer', 'date' or 'string'")
+        self.errors.add(:invalid_type, ": target '#{invalid_field field_mapping}'. Fields must include a type, with value 'integer', 'date', 'enum', 'location' or 'string'")
       end
     end
   end

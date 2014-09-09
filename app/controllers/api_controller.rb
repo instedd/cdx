@@ -106,8 +106,8 @@ class ApiController < ApplicationController
   def suitable_manifest manifest, target_field, value
     field = manifest["field_mapping"].detect { |f| f["target_field"] == target_field }
     valid_values = []
-    if field["valid_values"] && field["valid_values"]["options"]
-      valid_values = field["valid_values"]["options"]
+    if field["options"]
+      valid_values = field["options"]
     end
     valid_values.include? value
   end

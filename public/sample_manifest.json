@@ -51,12 +51,11 @@
     {
       "target_field": "assay_name",
       "selector" : "Test.assay_name",
+      "type" : "enum",
       "core" : true,
-      "valid_values" : {
-        "options" : [
-          "cartridge_1"
-        ]
-      }
+      "options" : [
+        "cartridge_1"
+      ]
     },
     {
       "target_field" : "system_user",
@@ -69,15 +68,14 @@
     {
       "target_field" : "results[*].condition",
       "selector" : "condition",
+      "type" : "enum",
       "core" : true,
       "indexed" : true,
-      "valid_values" : {
-        "options" : [
-          "flu_a",
-          "flu_b",
-          "h1n1"
-        ]
-      },
+      "options" : [
+        "flu_a",
+        "flu_b",
+        "h1n1"
+      ],
       "value_mappings" : {
         "*FLU_A*" : "flu_a",
         "*FLU_B*" : "flu_b"
@@ -86,14 +84,13 @@
     {
       "target_field" : "results[*].result",
       "selector" : "result",
+      "type" : "enum",
       "core" : true,
       "indexed" : true,
-      "valid_values" : {
-        "options" : [
-          "positive",
-          "negative"
-        ]
-      }
+      "options" : [
+        "positive",
+        "negative"
+      ]
     },
     {
       "target_field": "grade_of_resistance",
@@ -110,11 +107,13 @@
     {
       "target_field": "device_serial_number",
       "selector" : "device_serial_number",
+      "type" : "string",
       "core": true
     },
     {
       "target_field": "test_type",
       "selector" : "Test.test_type",
+      "type" : "string",
       "core" : true
     },
     {
