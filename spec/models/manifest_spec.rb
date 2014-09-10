@@ -235,13 +235,12 @@ describe Manifest do
     assert_raises_manifest_data_validation %{
         [{
           "target_field" : "level",
+          "type" : "enum",
           "selector" : "level",
           "core" : false,
           "pii" : false,
           "indexed" : true,
-          "valid_values" : {
-            "options" : ["low", "medium", "high"]
-          }
+          "options" : ["low", "medium", "high"]
         }]
       },
       '{"level" : "John Doe"}',

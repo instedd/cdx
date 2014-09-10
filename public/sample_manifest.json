@@ -23,8 +23,8 @@
     },
     {
       "target_field": "event_id",
-      "type": "integer",
       "selector" : "event_id",
+      "type": "integer",
       "core" : true,
       "indexed" : true
     },
@@ -78,7 +78,8 @@
       ],
       "value_mappings" : {
         "*FLU_A*" : "flu_a",
-        "*FLU_B*" : "flu_b"
+        "*FLU_B*" : "flu_b",
+        "*CT*" : "ct"
       }
     },
     {

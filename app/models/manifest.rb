@@ -111,14 +111,14 @@ class Manifest < ActiveRecord::Base
 
     verify_value_is_not_null_string value, mapping
 
-    return value if valid_values ==  nil
+    return value if (valid_values ==  nil && mapping["options"] == nil)
 
     if value.is_a? Array
       value.each do |v|
         check_valid_value v, mapping, target_field, valid_values
       end
     else
-      if options = valid_values["options"]
+      if options = mapping["options"]
         check_value_in_options(value, target_field, options)
       end
 
