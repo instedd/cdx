@@ -59,7 +59,7 @@ class ApiController < ApplicationController
   end
 
   # TODO : Normalize by assay name to avoid keeping manifests in main memory.
-  def capabilities
+  def schema
     manifest = find_suitable_manifest("assay_name", params["assay_name"])
     if !manifest
       render :status => :manifest_not_found, :json => { :errors => "0 Manifests matches with '#{params["assay_name"]}' " } and return
