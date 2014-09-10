@@ -26,7 +26,7 @@ Cdp::Application.routes.draw do
     match 'events(.:format)' => 'api#events', via: [:get, :post], defaults: { format: 'json' }
     get 'events/:event_uuid/custom_fields' => 'api#custom_fields'
     get 'events/:event_uuid/pii' => 'api#pii'
-    get 'capabilities(.:format)' => 'api#capabilities'
+    get 'schema(.:format)' => 'api#schema'
     post '/devices/:device_uuid/events' => 'api#create'
     get 'laboratories(.:format)' => 'api#laboratories', defaults: { format: 'json' }
   end
