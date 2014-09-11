@@ -122,11 +122,11 @@ class Manifest < ActiveRecord::Base
         check_value_in_options(value, target_field, options)
       end
 
-      if range = valid_values["range"]
+      if valid_values && range = valid_values["range"]
         check_value_in_range(value, target_field, range)
       end
 
-      if date = valid_values["date"]
+      if valid_values && date = valid_values["date"]
         check_value_is_date(value, target_field, date)
       end
     end

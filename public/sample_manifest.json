@@ -74,7 +74,8 @@
       "options" : [
         "flu_a",
         "flu_b",
-        "h1n1"
+        "h1n1",
+        "ct"
       ],
       "value_mappings" : {
         "*FLU_A*" : "flu_a",
