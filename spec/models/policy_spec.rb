@@ -1,6 +1,5 @@
 require 'spec_helper'
-
-include Policy::Actions
+require 'policy_spec_helper'
 
 describe Policy do
   let(:user) { User.make }
@@ -290,61 +289,35 @@ describe Policy do
     institutions.should eq([])
   end
 
+  context "queryEvents" do
+    context "Allow" do
+      let!(:laboratory) {Laboratory.make institution_id: institution.id}
+      let!(:device) {Device.make laboratories: [laboratory], institution_id: institution.id}
+
+      [Institution, Laboratory, Device].each do |resource|
+        it "allows a user to query events of it's own #{resource}" do
+          Policy.authorize(QUERY_EVENT, resource, user).should eq(resource.all)
+        end
+      end
+    end
+
+    context "Deny" do
+      let!(:user2) { User.make }
+      let!(:institution2) { user2.create Institution.make_unsaved }
+      let!(:laboratory) { Laboratory.create institution_id: institution2.id }
+      let!(:device2) { Device.create laboratories: [laboratory], institution_id: institution2.id }
+
+      [Institution, Laboratory, Device].each do |resource|
+        it "forbids a user to query events of other user's #{resource}" do
+          Policy.authorize(QUERY_EVENT, resource, user).should eq([])
+        end
+      end
+    end
+  end
+
   def create_user_and_institution
     user = User.make
     institution = user.create Institution.make_unsaved
     [user, institution]
-  end
-
-  def assert_can(user, resource, action, expected_result = [resource])
-    result = Policy.can? action, resource, user
-
-    result.should be_true
-
-    result = Policy.authorize action, resource, user
-    result = result.sort_by &:id
-    expected_result = expected_result.sort_by &:id
-
-    result.should eq(expected_result)
-  end
-
-  def assert_cannot(user, resource, action)
-    result = Policy.cannot? action, resource, user
-    result.should be_true
-  end
-
-  def grant(granter, user, resource, action, delegable = true)
-    grant_or_deny granter, user, resource, action, delegable, "allow"
-  end
-
-  def deny(granter, user, resource, action, delegable = true)
-    grant_or_deny granter, user, resource, action, delegable, "deny"
-  end
-
-  def grant_or_deny(granter, user, resource, action, delegable, effect)
-    policy = Policy.make_unsaved
-    policy.definition = policy_definition(resource, action, delegable, effect)
-    policy.granter_id = granter.id
-    policy.user_id = user.id
-    policy.save!
-    policy
-  end
-
-  def policy_definition(resource, action, delegable = true, effect = "allow")
-    resource = Array(resource).map(&:resource_name)
-    action = Array(action)
-
-    JSON.parse %(
-      {
-        "statement":  [
-          {
-            "effect": "#{effect}",
-            "action": #{action.to_json},
-            "resource": #{resource.to_json}
-          }
-        ],
-        "delegable": #{delegable}
-      }
-    )
   end
 end

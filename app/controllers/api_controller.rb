@@ -19,14 +19,13 @@ class ApiController < ApplicationController
 
   def events
     body = Oj.load(request.body.read) || {}
-    query = Cdx::Api::Elasticsearch::Query.new(params.merge(body))
-    result = query.execute
+    query = Event.query(params.merge(body), current_user)
     respond_to do |format|
       format.csv do
-        build_csv 'Events', Event.csv_builder(query, result["events"])
+        build_csv 'Events', query.csv_builder
         render :layout => false
       end
-      format.json { render_json result }
+      format.json { render_json query.result }
     end
   end
 

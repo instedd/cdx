@@ -11,4 +11,3 @@ Cdx::Api.setup do |config|
   config.template_name_pattern = "cdp_institution*"
   config.log = Rails.env != "test"
 end
-
