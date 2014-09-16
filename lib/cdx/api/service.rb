@@ -26,11 +26,15 @@ class Cdx::Api::Service
   end
 
   def search_elastic options
-    if index_name_pattern
-      client.search options.merge(index: index_name_pattern)
-    else
-      raise "You must define the index_name_pattern: Cdx::Api::Elasticsearch.setup { |config| config.index_name_pattern = ... }"
+    unless options[:index].present?
+      if index_name_pattern
+        options[:index] = index_name_pattern
+      else
+        raise "You must define the index_name_pattern: Cdx::Api::Elasticsearch.setup { |config| config.index_name_pattern = ... }"
+      end
     end
+
+    client.search options
   end
 
   def client

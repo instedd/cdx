@@ -1,5 +1,13 @@
 class Cdx::Api::Elasticsearch::Query
+  attr_accessor :indices
+
   DEFAULT_PAGE_SIZE = 50
+
+  def self.for_indices indices, params
+    query = new params
+    query.indices = indices.join ', '
+    query
+  end
 
   def initialize(params, api = Cdx::Api)
     @params = params
@@ -49,7 +57,7 @@ class Cdx::Api::Elasticsearch::Query
     es_query[:size] = page_size if page_size.present?
     es_query[:from] = offset if offset.present?
 
-    results = @api.search_elastic(es_query)
+    results = @api.search_elastic es_query.merge(index: indices)
     hits = results["hits"]
     total = hits["total"]
     results = hits["hits"].map { |hit| hit["_source"] }
@@ -209,7 +217,7 @@ class Cdx::Api::Elasticsearch::Query
 
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
-    event = @api.search_elastic body: aggregations.to_hash.merge(query: query), size: 0
+    event = @api.search_elastic body: aggregations.to_hash.merge(query: query), size: 0, index: indices
     if event["aggregations"]
       process_group_by_buckets(event["aggregations"].with_indifferent_access, aggregations.in_order, [], {}, 0)
     else
