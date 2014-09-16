@@ -54,7 +54,8 @@
       "type" : "enum",
       "core" : true,
       "options" : [
-        "cartridge_1"
+        "cartridge_1",
+        "cartridge_2"
       ]
     },
     {
@@ -89,10 +90,25 @@
       "type" : "enum",
       "core" : true,
       "indexed" : true,
-      "options" : [
-        "positive",
-        "negative"
-      ]
+      "options" : {
+        "when" : [
+          {
+            "property" : "assay_name",
+            "value" : "cartridge_1",
+            "options" : [
+              "positive",
+              "positive_with_riff",
+              "negative"
+            ]
+          },
+        ],
+        "else" : {
+          "options" : [
+            "positive",
+            "negative"
+          ]
+        }
+      }
     },
     {
       "target_field": "grade_of_resistance",
