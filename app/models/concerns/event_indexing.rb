@@ -9,7 +9,7 @@ module EventIndexing
         'event'
       end
 
-      Cdx::Api.client.index index: device.institution.elasticsearch_index_name, type: type, body: indexed_fields.merge(event_id: self.event_id), id: "#{device.secret_key}_#{self.event_id}"
+      Cdx::Api.client.index index: device.institution.elasticsearch_index_name, type: type, body: indexed_body, id: "#{device.secret_key}_#{self.event_id}"
     end
 
     def self.pii?(field)
@@ -21,7 +21,11 @@ module EventIndexing
     end
 
     def manifest
-      @manifest ||= device.manifests.order("version DESC").first 
+      @manifest ||= device.manifests.order("version DESC").first
+    end
+
+    def indexed_body
+      @indexed_body ||= indexed_fields.merge(event_id: self.event_id)
     end
 
     private
@@ -45,7 +49,7 @@ module EventIndexing
         location_id = location.id
         parent_locations = location.self_and_ancestors.load
       end
-        
+
       unless parsed_fields[:indexed][:started_at].present?
         parsed_fields[:indexed][:started_at] = self.created_at.utc.iso8601
       end

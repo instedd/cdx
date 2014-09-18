@@ -16,21 +16,20 @@ class Event < ActiveRecord::Base
   def self.create_or_update_with device, raw_data
     event = self.new device: device, raw_data: raw_data
 
-    begin
-      event_id = event.parsed_fields[:indexed][:event_id]
+    event_id = event.parsed_fields[:indexed][:event_id]
 
-      if event_id && existing_event = self.find_by(device: device, event_id: event_id)
-        existing_event.update_with raw_data
-      else
-        event.save
-      end
-    rescue ManifestParsingError => err
-      event.index_failed = true
-      event.index_failure_reason = err.message
-      event.save
+    if event_id && existing_event = self.find_by(device: device, event_id: event_id)
+      result = existing_event.update_with raw_data
+      [existing_event, result]
+    else
+      result = event.save
+      [event, result]
     end
-
-    event
+  rescue ManifestParsingError => err
+    event.index_failed = true
+    event.index_failure_reason = err.message
+    result = event.save
+    [event, result]
   end
 
   def self.sensitive_fields

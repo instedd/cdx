@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140822165416) do
+ActiveRecord::Schema.define(version: 20140918175424) do
 
   create_table "device_models", force: true do |t|
     t.string   "name"
@@ -103,7 +103,7 @@ ActiveRecord::Schema.define(version: 20140822165416) do
   add_index "locations", ["rgt"], name: "index_locations_on_rgt", using: :btree
 
   create_table "manifests", force: true do |t|
-    t.integer  "version"
+    t.string   "version"
     t.text     "definition"
     t.datetime "created_at"
     t.datetime "updated_at"

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ApiController do
+describe Api::EventsController do
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
   let(:device) {Device.make institution_id: institution.id}
@@ -14,7 +14,7 @@ describe ApiController do
 
   def get_updates(options, body="")
     fresh_client_for institution.elasticsearch_index_name
-    response = get :events, body, options.merge(format: 'json')
+    response = get :index, body, options.merge(format: 'json')
     response.status.should eq(200)
     Oj.load(response.body)["events"]
   end
@@ -27,7 +27,7 @@ describe ApiController do
 
   context "Creation" do
     it "should create event in the database" do
-      response = post :create, data, device_uuid: device.secret_key
+      response = post :create, data, device_id: device.secret_key
       response.status.should eq(200)
 
       event = Event.first
@@ -37,7 +37,7 @@ describe ApiController do
     end
 
     it "should create event in elasticsearch" do
-      post :create, data, device_uuid: device.secret_key
+      post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["results"].first["result"].should eq("positive")
@@ -47,14 +47,14 @@ describe ApiController do
     end
 
     it "should store institution_id in elasticsearch" do
-      post :create, data, device_uuid: device.secret_key
+      post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["institution_id"].should eq(device.institution_id)
     end
 
     it "should override event if event_id is the same" do
-      post :create, Oj.dump(event_id: "1234", age: 20, patient_name: 'john doe'), device_uuid: device.secret_key
+      post :create, Oj.dump(event_id: "1234", age: 20, patient_name: 'john doe'), device_id: device.secret_key
 
       event = Event.first.decrypt
       event.event_id.should eq("1234")
@@ -63,7 +63,7 @@ describe ApiController do
       event.sensitive_data[:patient_id].should be_nil
       event.sensitive_data[:patient_name].should eq('john doe')
 
-      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20, patient_name: 'jane doe'), device_uuid: device.secret_key
+      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20, patient_name: 'jane doe'), device_id: device.secret_key
 
       Event.count.should eq(1)
       event = Event.first.decrypt
@@ -79,7 +79,7 @@ describe ApiController do
       event["_id"].should eq("#{device.secret_key}_1234")
       event["_source"]["age"].should eq(30)
 
-      post :create, Oj.dump(event_id: "1234", age: 20, patient_id: 22), device_uuid: Device.make(institution: institution).secret_key
+      post :create, Oj.dump(event_id: "1234", age: 20, patient_id: 22), device_id: Device.make(institution: institution).secret_key
 
       Event.count.should eq(2)
       events = all_elasticsearch_events
@@ -87,7 +87,7 @@ describe ApiController do
     end
 
     it "should generate a started_at date if it's not provided" do
-      post :create, data, device_uuid: device.secret_key
+      post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["started_at"].should eq(event["created_at"])
@@ -96,7 +96,7 @@ describe ApiController do
 
   context "Manifest" do
     it "shouldn't store sensitive data in elasticsearch" do
-      post :create, Oj.dump(results:[result: :positive], patient_id: 1234), device_uuid: device.secret_key
+      post :create, Oj.dump(results:[result: :positive], patient_id: 1234), device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["results"].first["result"].should eq("positive")
@@ -118,7 +118,7 @@ describe ApiController do
             "core" : true
           }]
       }}
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_uuid: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["assay_name"].should eq("GX4002")
@@ -150,7 +150,7 @@ describe ApiController do
         ]
       }}
 
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_uuid: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["assay_name"].should eq("GX4002")
@@ -196,7 +196,7 @@ describe ApiController do
         ]
       }}
 
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_uuid: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["foo"].should be_nil
@@ -222,7 +222,7 @@ describe ApiController do
         ]
       }}
 
-      post :create, Oj.dump(some_field: 1234), device_uuid: device.secret_key
+      post :create, Oj.dump(some_field: 1234), device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["foo"].should be_nil
@@ -248,76 +248,15 @@ describe ApiController do
             "type" : "integer"
           }]
       }}
-      post :create, Oj.dump(error_code: 1234), device_uuid: device.secret_key
+      post :create, Oj.dump(error_code: 1234), device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["error_code"].should eq(1234)
 
-      post :create, Oj.dump(error_code: "foo"), device_uuid: device.secret_key
+      post :create, Oj.dump(error_code: "foo"), device_id: device.secret_key
 
       response.code.should eq("422")
       Oj.load(response.body)["errors"].should eq("'foo' is not a valid value for 'error_code' (must be an integer)")
-    end
-  end
-
-  context "Laboratories" do
-    it "should list the laboratories" do
-      institution = Institution.make user: user
-      lab_ids = 3.times.map do
-        lab = Laboratory.make(institution: institution)
-        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_id}
-      end
-
-      result = get :laboratories, format: 'json'
-      Oj.load(result.body).should eq({'total_count' => 3, 'laboratories' => lab_ids})
-    end
-
-    it "should list the laboratories for a given institution" do
-      institution = Institution.make user: user
-      lab_ids = 3.times.map do
-        lab = Laboratory.make(institution: institution)
-        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_id}
-      end
-
-      Laboratory.make institution: (Institution.make user: user)
-
-      get :laboratories, institution_id: institution.id, format: 'json'
-      Oj.load(response.body).should eq({'total_count' => 3, 'laboratories' => lab_ids})
-    end
-
-    context 'CSV' do
-      def check_laboratories_csv(r)
-        r.status.should eq(200)
-        r.content_type.should eq("text/csv")
-        r.headers["Content-Disposition"].should eq("attachment; filename=\"Laboratories-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-        r.should render_template("laboratories")
-      end
-
-      let(:institution) { Institution.make user: user }
-      let(:lab) { Laboratory.make(institution: institution) }
-
-      render_views
-
-      before(:each) { Timecop.freeze }
-
-      it "should respond a csv" do
-        institution
-        lab
-
-        get :laboratories, format: 'csv'
-
-        check_laboratories_csv response
-        response.body.should eq("id,name,location\n#{lab.id},#{lab.name},#{lab.location_id}\n")
-      end
-
-      it "renders column names even when there are no laboratories to render" do
-        institution
-
-        get :laboratories, format: 'csv'
-
-        check_laboratories_csv response
-        response.body.should eq("id,name,location\n")
-      end
     end
   end
 
@@ -334,7 +273,7 @@ describe ApiController do
     it "should store the location id when the device is registered in only one laboratory" do
       device.laboratories = [laboratory1]
       device.save!
-      post :create, data, device_uuid: device.secret_key
+      post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(leaf_location1.id)
@@ -349,7 +288,7 @@ describe ApiController do
       device.laboratories = [laboratory1, laboratory2]
       device.save!
 
-      post :create, data, device_uuid: device.secret_key
+      post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(parent_location.id)
@@ -363,7 +302,7 @@ describe ApiController do
       device.laboratories = [laboratory2, laboratory3]
       device.save!
 
-      post :create, data, device_uuid: device.secret_key
+      post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(root_location.id)
@@ -376,7 +315,7 @@ describe ApiController do
       device.laboratories = [laboratory3, laboratory2]
       device.save!
 
-      post :create, data, device_uuid: device.secret_key
+      post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(root_location.id)
@@ -389,7 +328,7 @@ describe ApiController do
       device.laboratories = []
       device.save!
 
-      post :create, data, device_uuid: device.secret_key
+      post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should be_nil
@@ -402,9 +341,9 @@ describe ApiController do
       device1 = Device.make institution: institution, laboratories: [laboratory1]
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
-      post :create, (Oj.dump results:[condition: "flu_a"]), device_uuid: device1.secret_key
-      post :create, (Oj.dump results:[condition: "flu_b"]), device_uuid: device2.secret_key
-      post :create, (Oj.dump results:[condition: "mtb"]), device_uuid: device3.secret_key
+      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.secret_key
+      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.secret_key
+      post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.secret_key
 
       response = get_updates(location: leaf_location1.id)
 
@@ -436,9 +375,9 @@ describe ApiController do
       device1 = Device.make institution: institution, laboratories: [laboratory1]
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
-      post :create, (Oj.dump results:[condition: "flu_a"]), device_uuid: device1.secret_key
-      post :create, (Oj.dump results:[condition: "flu_b"]), device_uuid: device2.secret_key
-      post :create, (Oj.dump results:[condition: "mtb"]), device_uuid: device3.secret_key
+      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.secret_key
+      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.secret_key
+      post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.secret_key
 
       response = get_updates(group_by: {admin_level: 1})
       response.should eq([
@@ -455,12 +394,11 @@ describe ApiController do
   end
 
   context "Query" do
-
     context "Policies" do
       it "allows a user to query events of it's own institutions" do
         device2 = Device.make
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_uuid: device2.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_id: device2.secret_key
 
         fresh_client_for device2.institution.elasticsearch_index_name
 
@@ -476,9 +414,9 @@ describe ApiController do
 
       it "should check for new events since a date" do
         Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
-        post :create, data, device_uuid: device.secret_key
+        post :create, data, device_id: device.secret_key
         Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
-        post :create, (Oj.dump results:[result: :negative]), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :negative]), device_id: device.secret_key
 
         response = get_updates(created_at_since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
 
@@ -494,8 +432,8 @@ describe ApiController do
       end
 
        it "filters by an analyzed result" do
-         post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_uuid: device.secret_key
-         post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_uuid: device.secret_key
+         post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_id: device.secret_key
+         post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.secret_key
 
          response = get_updates(result: :positive)
 
@@ -504,8 +442,8 @@ describe ApiController do
        end
 
       it "filters by condition" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.secret_key
 
         response = get_updates condition: 'mtb'
 
@@ -514,8 +452,8 @@ describe ApiController do
       end
 
       it "filters by test type" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen), device_id: device.secret_key
 
         response = get_updates test_type: :specimen
 
@@ -572,9 +510,9 @@ describe ApiController do
 
     context "Grouping" do
       it "groups by gender in query params" do
-        post :create, (Oj.dump results:[result: :positive], gender: :male), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :male), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], gender: :male), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :male), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :female), device_id: device.secret_key
 
         response = get_updates(group_by: :gender).sort_by do |event|
           event["gender"]
@@ -587,12 +525,12 @@ describe ApiController do
       end
 
       it "groups by gender and assay_name in post body" do
-        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "b"), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "a"), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "b"), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "a"), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.secret_key
 
         response = get_updates({}, Oj.dump(group_by: [:gender , :assay_name])).sort_by do |event|
           event["gender"] + event["assay_name"]
@@ -611,7 +549,7 @@ describe ApiController do
           r.status.should eq(200)
           r.content_type.should eq("text/csv")
           r.headers["Content-Disposition"].should eq("attachment; filename=\"Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-          r.should render_template("events")
+          r.should render_template("api/events/index")
         end
 
         render_views
@@ -619,20 +557,20 @@ describe ApiController do
         before(:each) { Timecop.freeze }
 
         it "responds a csv for a given grouping" do
-          post :create, (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe), device_uuid: device.secret_key
-          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_uuid: device.secret_key
-          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_uuid: device.secret_key
+          post :create, (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe), device_id: device.secret_key
+          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_id: device.secret_key
+          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_id: device.secret_key
 
           fresh_client_for institution.elasticsearch_index_name
 
-          response = get :events, "", format: 'csv', group_by: 'system_user,error_code'
+          response = get :index, "", format: 'csv', group_by: 'system_user,error_code'
 
           check_csv response
           response.body.should eq("system_user,error_code,count\njane_doe,1234,2\njdoe,1234,1\n")
         end
 
         it "returns a csv with columns for a given grouping even when there are no results" do
-          get :events, "", format: 'csv', group_by: 'system_user,error_code'
+          get :index, "", format: 'csv', group_by: 'system_user,error_code'
           response.body.should eq("system_user,error_code,count\n")
         end
       end
@@ -640,8 +578,8 @@ describe ApiController do
 
     context "Ordering" do
       it "should order by age" do
-        post :create, (Oj.dump results:[result: :positive], age: 20), device_uuid: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], age: 10), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], age: 20), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], age: 10), device_id: device.secret_key
 
         response = get_updates(order_by: :age)
 
@@ -671,11 +609,11 @@ describe ApiController do
             }
           ]
         }}
-        post :create, Oj.dump(some_field: 1234), device_uuid: device.secret_key
+        post :create, Oj.dump(some_field: 1234), device_id: device.secret_key
         event = all_elasticsearch_events.first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
-        response = get :custom_fields, event_uuid: event["uuid"]
+        response = get :custom_fields, id: event["uuid"]
         response.status.should eq(200)
         response = Oj.load response.body
 
@@ -686,11 +624,11 @@ describe ApiController do
 
     context "PII" do
       it "should retrieve an event PII by uuid" do
-        post :create, Oj.dump(results: [result: :positive], patient_name: "jdoe"), device_uuid: device.secret_key
+        post :create, Oj.dump(results: [result: :positive], patient_name: "jdoe"), device_id: device.secret_key
         event = all_elasticsearch_events.first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
-        response = get :pii, event_uuid: event["uuid"]
+        response = get :pii, id: event["uuid"]
         response.status.should eq(200)
         response = Oj.load response.body
 
