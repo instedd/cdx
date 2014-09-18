@@ -795,6 +795,46 @@ describe Cdx::Api do
         {"location"=>1, count: 3}
       ])
     end
+
+    context "with a second location field" do
+      before(:all) do
+        @extra_field = Cdx::Api::Elasticsearch::IndexedField.new({ name: 'patient_loc', type: 'location' }, Cdx::Api.config.document_format)
+        Cdx::Api.searchable_fields.push @extra_field
+
+        # Delete the index and recreate it to make ES grab the new template
+        Cdx::Api.client.indices.delete index: "cdx_events" rescue nil
+        Cdx::Api.initialize_default_template "cdx_events_template"
+      end
+
+      after(:all) do
+        Cdx::Api.searchable_fields.delete @extra_field
+
+        # Delete the index and recreate it to make ES grab the new template
+        Cdx::Api.client.indices.delete index: "cdx_events" rescue nil
+        Cdx::Api.initialize_default_template "cdx_events_template"
+      end
+
+      it "should allow searching by the new field" do
+        index patient_loc_id: 1, parent_patient_locs: [1]
+        index patient_loc_id: 2, parent_patient_locs: [1,2]
+        index patient_loc_id: 3, parent_patient_locs: [3]
+
+        response = query_events patient_loc: 1
+        expect(response.count).to eq(2)
+
+        response = query_events patient_loc: 3
+        expect(response.count).to eq(1)
+      end
+
+      it "should allow grouping by new field's admin level" do
+        index patient_loc: { admin_level_0: 1 }
+        index patient_loc: { admin_level_0: 1, admin_level_1: 2}
+        index patient_loc: { admin_level_0: 3 }
+
+        response = query_events(group_by: { patient_loc_admin_level: 0 })
+        expect(response).to eq [{"patient_loc" => 1, :count => 2}, {"patient_loc" => 3, :count => 1}]
+      end
+    end
   end
 
   context "Count" do

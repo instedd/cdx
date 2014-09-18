@@ -10,7 +10,8 @@ describe "formats of document stored" do
     Cdx::Api::Elasticsearch::CustomDocumentFormat.new({
       "assay_name" => "assay",
       "device_uuid" => "device_id",
-      "started_at" => "start_time"
+      "started_at" => "start_time",
+      "location" => "place"
     })
   }
   let(:api)  { setup_api custom_document_format }
@@ -94,6 +95,27 @@ describe "formats of document stored" do
 
     response = query_events since: time(2013, 1, 1), group_by: "year(started_at)"
     expect(response).to eq([{"started_at" => "2013", :count => 3}])
+  end
+
+  it "allows searching by location with custom name" do
+    es_index parent_places: [1, 2, 3]
+    es_index parent_places: [1, 2, 4]
+    es_index parent_places: [1, 5, 6]
+
+    response = query_events location: 2
+    expect(response.count).to eq(2)
+  end
+
+  it "allows grouping by location with custom name" do
+    es_index place: [admin_level_0: 1, admin_level_1: 2, admin_level2: 3]
+    es_index place: [admin_level_0: 1, admin_level_1: 2, admin_level2: 4]
+    es_index place: [admin_level_0: 1, admin_level_1: 5, admin_level2: 6]
+
+    response = query_events group_by: { admin_level: 1 }
+    expect(response).to eq([{"location" => 2, :count => 2}, {"location" => 5, :count => 1}])
+
+    response = query_events group_by: { admin_level: 0 }
+    expect(response).to eq([{"location" => 1, :count => 3}])
   end
 
   def query_events(query)

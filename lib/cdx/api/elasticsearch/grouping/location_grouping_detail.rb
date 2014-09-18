@@ -11,10 +11,10 @@ class LocationGroupingDetail < GroupingDetail
   def to_es
     {
       count: {
-        nested: { path: "location" },
+        nested: { path: name },
         aggregations: {
             "admin_level_#{value}" => {
-                terms: { field: "location.admin_level_#{value}", size: 0 }
+                terms: { field: "#{name}.admin_level_#{value}", size: 0 }
             }
         }
       }
@@ -26,7 +26,7 @@ class LocationGroupingDetail < GroupingDetail
   end
 
   def yield_bucket(bucket)
-    { "location" => bucket[:key] }
+    { name => bucket[:key] }
   end
 
 end
