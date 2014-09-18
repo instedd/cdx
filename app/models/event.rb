@@ -16,12 +16,12 @@ class Event < ActiveRecord::Base
   def self.create_or_update_with device, raw_data
     event = self.new device: device, raw_data: raw_data
 
-    begin 
+    begin
       event_id = event.parsed_fields[:indexed][:event_id]
 
       if event_id && existing_event = self.find_by(device: device, event_id: event_id)
         existing_event.update_with raw_data
-      else        
+      else
         event.save
       end
     rescue ManifestParsingError => err
@@ -37,18 +37,13 @@ class Event < ActiveRecord::Base
     ["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code"]
   end
 
-  def self.csv_builder(query, events)
-    if query.grouped_by.empty?
-      CSVBuilder.new events
-    else
-      CSVBuilder.new events, column_names: query.grouped_by.concat(["count"])
-    end
-  end
-
   def update_with raw_data
     self.raw_data = raw_data
     @parsed_fields = nil
     save
   end
 
+  def self.query params, user
+    EventQuery.new params, user
+  end
 end

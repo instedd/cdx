@@ -29,12 +29,26 @@ class Policy < ActiveRecord::Base
     DELETE_DEVICE = "#{PREFIX}:deleteDevice" # This is not tested.
     ASSIGN_DEVICE_LABORATORY = "#{PREFIX}:assignDeviceLaboratory" # This is not tested.
     REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey" # This is not tested.
+    QUERY_EVENT = "#{PREFIX}:queryEvent"
+    REPORT_EVENT = "#{PREFIX}:reportEvent"
   end
 
   ACTIONS = [
-    Actions::READ_INSTITUTION, Actions::UPDATE_INSTITUTION, Actions::DELETE_INSTITUTION,
-    Actions::CREATE_INSTITUTION_LABORATORY, Actions::READ_LABORATORY, Actions::UPDATE_LABORATORY, Actions::DELETE_LABORATORY,
-    Actions::REGISTER_INSTITUTION_DEVICE, Actions::READ_DEVICE, Actions::UPDATE_DEVICE, Actions::DELETE_DEVICE, Actions::ASSIGN_DEVICE_LABORATORY, Actions::REGENERATE_DEVICE_KEY,
+    Actions::READ_INSTITUTION,
+    Actions::UPDATE_INSTITUTION,
+    Actions::DELETE_INSTITUTION,
+    Actions::CREATE_INSTITUTION_LABORATORY,
+    Actions::READ_LABORATORY,
+    Actions::UPDATE_LABORATORY,
+    Actions::DELETE_LABORATORY,
+    Actions::REGISTER_INSTITUTION_DEVICE,
+    Actions::READ_DEVICE,
+    Actions::UPDATE_DEVICE,
+    Actions::DELETE_DEVICE,
+    Actions::ASSIGN_DEVICE_LABORATORY,
+    Actions::REGENERATE_DEVICE_KEY,
+    Actions::QUERY_EVENT,
+    Actions::REPORT_EVENT,
   ]
 
   def self.delegable

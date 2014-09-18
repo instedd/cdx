@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe ApiController do
   let(:user) {User.make}
-  let(:device) {Device.make}
-  let(:institution) {device.institution}
+  let(:institution) {Institution.make user_id: user.id}
+  let(:device) {Device.make institution_id: institution.id}
   let(:data) {Oj.dump results: [result: :positive]}
   before(:each) {sign_in user}
 
@@ -455,6 +455,22 @@ describe ApiController do
   end
 
   context "Query" do
+
+    context "Policies" do
+      it "allows a user to query events of it's own institutions" do
+        device2 = Device.make
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_uuid: device2.secret_key
+
+        fresh_client_for device2.institution.elasticsearch_index_name
+
+        response = get_updates condition: 'mtb'
+
+        response.size.should eq(1)
+        response.first["results"].first["result"].should eq("positive")
+      end
+    end
+
     context "Filter" do
       let(:device2) {Device.make institution: institution}
 
