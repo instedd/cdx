@@ -33,7 +33,6 @@ class Subscriber < ActiveRecord::Base
         options[:user] = self.url_user
         options[:password] = self.url_password
       end
-      puts callback_url
       site = RestClient::Resource.new(callback_url, options)
       site.post "" rescue nil
     end
@@ -46,8 +45,8 @@ class Subscriber < ActiveRecord::Base
     filtered_event = {}
     fields.each do |field|
       case field
-      when "event"
-        filtered_event["event"] = merged_event["results"].first["result"]
+      when "result"
+        filtered_event["result"] = merged_event["results"].first["result"]
       when "condition"
         filtered_event["condition"] = merged_event["results"].first["condition"]
       else

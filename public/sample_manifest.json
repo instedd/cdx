@@ -16,9 +16,10 @@
     },
     {
       "target_field": "patient_name",
-      "selector" : "patient_information.name",
+      "selector" : "patient_name",
       "core" : true,
       "indexed" : true,
+      "pii" : false,
       "type" : "string"
     },
     {
@@ -50,7 +51,7 @@
     },
     {
       "target_field": "assay_name",
-      "selector" : "Test.assay_name",
+      "selector" : "assay_name",
       "type" : "enum",
       "core" : true,
       "options" : [
@@ -59,7 +60,7 @@
     },
     {
       "target_field" : "system_user",
-      "selector" : "doctor_name",
+      "selector" : "system_user",
       "type": "string",
       "core" : true,
       "pii" : false,
@@ -75,12 +76,14 @@
         "flu_a",
         "flu_b",
         "h1n1",
-        "ct"
+        "ct",
+        "mtb"
       ],
       "value_mappings" : {
         "*FLU_A*" : "flu_a",
         "*FLU_B*" : "flu_b",
-        "*CT*" : "ct"
+        "*CT*" : "ct",
+        "mtb" : "mtb"
       }
     },
     {

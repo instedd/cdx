@@ -49,3 +49,10 @@ end
 
 Manifest.blueprint do
 end
+
+Subscriber.blueprint do
+  user
+  name
+  last_run_at {Time.now}
+end
+

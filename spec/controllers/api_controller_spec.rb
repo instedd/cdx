@@ -506,6 +506,52 @@ describe ApiController do
         response.size.should eq(1)
         response.first["results"].first["result"].should eq("negative")
       end
+
+      it "filters by condition with non default manifest" do
+        Manifest.create definition: %{{
+          "metadata" : {
+            "device_models" : ["#{device.device_model.name}"],
+            "version" : 2,
+            "api_version" : "1.0.0"
+          },
+          "field_mapping" : [
+            {
+              "target_field" : "results[*].condition",
+              "selector" : "results[*].condition",
+              "type" : "enum",
+              "core" : true,
+              "pii" : false,
+              "indexed" : true,
+              "options" : [
+                "flu_a",
+                "flu_b",
+                "h1n1",
+                "ct",
+                "mtb"
+              ]
+            },
+            {
+              "target_field" : "results[*].result",
+              "selector" : "results[*].result",
+              "type" : "enum",
+              "core" : true,
+              "indexed" : true,
+              "pii" : false,
+              "options" : [
+                "positive",
+                "negative"
+              ]
+            }
+          ]
+        }}
+        Manifest.count.should eq(1)
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_uuid: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_uuid: device.secret_key
+        Event.count.should eq(2)
+        response = get_updates condition: 'mtb'
+        response.size.should eq(2)
+      end
+
     end
 
     context "Grouping" do

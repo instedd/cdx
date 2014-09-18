@@ -71,7 +71,7 @@ group :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'vcr'
-  gem 'fakeweb'
+  gem 'webmock'
   gem 'capybara-mechanize'
   gem 'timecop'
   gem 'shoulda'

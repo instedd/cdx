@@ -8,6 +8,7 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
 require 'capybara/rspec'
 require 'capybara/mechanize'
+require 'webmock/rspec'
 
 # HTTPI.log = false
 # Savon.log = false
@@ -20,7 +21,7 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 # If you are not using ActiveRecord, you can remove this line.
 ActiveRecord::Migration.check_pending! if defined?(ActiveRecord::Migration)
 
-FakeWeb.allow_net_connect = %r[^https?://localhost]
+WebMock.disable_net_connect!(:allow_localhost => true)
 
 # This is to make machinist work with Rails 4
 class ActiveRecord::Reflection::AssociationReflection
@@ -65,13 +66,11 @@ RSpec.configure do |config|
 
   config.before(:each) do
     Timecop.return
-    FakeWeb.clean_registry
     Cdx::Api.client.indices.delete index: "#{Cdx::Api.index_prefix}_*" rescue nil
   end
 
   config.after(:each) do
     Timecop.return
-    FakeWeb.clean_registry
     Cdx::Api.client.indices.delete index: "#{Cdx::Api.index_prefix}_*" rescue nil
   end
 end
