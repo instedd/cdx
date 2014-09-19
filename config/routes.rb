@@ -26,10 +26,12 @@ Cdp::Application.routes.draw do
     resources :playground, only: :index, defaults: { format: 'html' }
     match 'events(.:format)' => "events#index", via: [:get, :post]
     resources :events, only: [] do
+      collection do
+        get :schema
+      end
       member do
         get :custom_fields
         get :pii
-        get :schema
       end
     end
     resources :devices, only: [] do

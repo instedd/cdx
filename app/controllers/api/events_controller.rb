@@ -37,32 +37,12 @@ class Api::EventsController < ApiController
     render_json "uuid" => params[:id], "pii" => event.decrypt.sensitive_data
   end
 
-  # TODO : Normalize by assay name to avoid keeping manifests in main memory.
   def schema
-    manifest = find_suitable_manifest("assay_name", params["assay_name"])
-    if !manifest
-      render :status => :manifest_not_found, :json => { :errors => "0 Manifests matches with '#{params["assay_name"]}' " } and return
-    end
-    field_mapping = Oj.load(manifest.definition)["field_mapping"]
-    schema = Capability.new field_mapping, params["assay_name"], params["locale"]
+    schema = EventsSchema.for params["assay_name"], params["locale"]
     respond_to do |format|
-      format.json { render_json schema.to_json }
+      format.json { render_json schema.schema }
     end
-  end
-
-  private
-
-  def find_suitable_manifest target_field, value
-    ms = Manifest.all.select { |m| suitable_manifest(Oj.load(m.definition), target_field, params["assay_name"]) }
-    ms.last
-  end
-
-  def suitable_manifest manifest, target_field, value
-    field = manifest["field_mapping"].detect { |f| f["target_field"] == target_field }
-    valid_values = []
-    if field["options"]
-      valid_values = field["options"]
-    end
-    valid_values.include? value
+  rescue ActiveRecord::RecordNotFound => ex
+    render :status => :manifest_not_found, :json => { :errors => ex.message } and return
   end
 end
