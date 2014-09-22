@@ -38,7 +38,7 @@ describe Manifest do
       "metadata" : {
         "device_models" : ["foo"],
         "api_version" : "1.0.0",
-        "version" : 2
+        "version" : "2.0.1"
       },
       "field_mapping" : []
     }}
@@ -47,13 +47,13 @@ describe Manifest do
 
     manifest = Manifest.first
 
-    manifest.version.should eq(1)
+    manifest.version.should eq("1")
     manifest.definition = updated_definition
     manifest.save!
 
     Manifest.count.should eq(1)
     DeviceModel.count.should eq(1)
-    Manifest.first.version.should eq(2)
+    Manifest.first.version.should eq("2.0.1")
   end
 
   it "updates it's api_version number" do
@@ -138,7 +138,7 @@ describe Manifest do
 
     manifest = Manifest.first
 
-    manifest.version.should eq(1)
+    manifest.version.should eq("1")
     manifest.definition = definition_version
     manifest.save!
 

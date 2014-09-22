@@ -1,9 +1,9 @@
 {
   "metadata" : {
-    "version" : "1.0.0",
+    "version" : "1.0.1",
     "api_version" : "1.0.0",
     "signature" : "12345",
-    "device_models" : ["GX4001", "GX4002"],
+    "device_models" : ["default"],
     "source_data_type": "json"
   },
   "field_mapping" : [
@@ -69,7 +69,7 @@
     },
     {
       "target_field" : "results[*].condition",
-      "selector" : "condition",
+      "selector" : "results[*].condition",
       "type" : "enum",
       "core" : true,
       "indexed" : true,
@@ -77,19 +77,12 @@
         "flu_a",
         "flu_b",
         "h1n1",
-        "ct",
         "mtb"
-      ],
-      "value_mappings" : {
-        "*FLU_A*" : "flu_a",
-        "*FLU_B*" : "flu_b",
-        "*CT*" : "ct",
-        "mtb" : "mtb"
-      }
+      ]
     },
     {
       "target_field" : "results[*].result",
-      "selector" : "result",
+      "selector" : "results[*].result",
       "type" : "enum",
       "core" : true,
       "indexed" : true,

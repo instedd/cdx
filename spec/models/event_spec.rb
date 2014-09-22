@@ -23,9 +23,9 @@ describe Event do
     device = Device.make device_model: model
     json = %{{ "error_code": "foo" }}
 
-    e = Event.create_or_update_with device, json
+    e, saved = Event.create_or_update_with device, json
 
-    expect(e.new_record?).to be_false
+    expect(saved).to be_true
     expect(e.index_failed?).to be_true
     expect(e.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "error_code").message)
   end
@@ -51,9 +51,9 @@ describe Event do
     device = Device.make device_model: model
     json = %{{ "result": "null" }}
 
-    e = Event.create_or_update_with device, json
+    e, saved = Event.create_or_update_with device, json
 
-    expect(e.new_record?).to be_false
+    expect(saved).to be_true
     expect(e.index_failed?).to be_true
     expect(e.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'results[*].result'")
   end

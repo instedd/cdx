@@ -21,13 +21,22 @@ Cdp::Application.routes.draw do
   resources :policies
 
   root :to => 'home#index'
-  scope '/api' do
-    get 'playground' => 'api#playground'
-    match 'events(.:format)' => 'api#events', via: [:get, :post], defaults: { format: 'json' }
-    get 'events/:event_uuid/custom_fields' => 'api#custom_fields'
-    get 'events/:event_uuid/pii' => 'api#pii'
-    get 'events/schema(.:format)' => 'api#events_schema'
-    post '/devices/:device_uuid/events' => 'api#create'
-    get 'laboratories(.:format)' => 'api#laboratories', defaults: { format: 'json' }
+
+  namespace :api, defaults: { format: 'json' } do
+    resources :playground, only: :index, defaults: { format: 'html' }
+    match 'events(.:format)' => "events#index", via: [:get, :post]
+    resources :events, only: [] do
+      collection do
+        get :schema
+      end
+      member do
+        get :custom_fields
+        get :pii
+      end
+    end
+    resources :devices, only: [] do
+      resources :events, only: :create, shallow: true
+    end
+    resources :laboratories, only: :index
   end
 end

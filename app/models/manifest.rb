@@ -12,6 +12,27 @@ class Manifest < ActiveRecord::Base
 
   NULL_STRING = "null"
 
+  #TODO Refiy the assay and delegate this to mysql.
+  ####################################################################################################
+  def self.find_by_assay_name assay_name
+    manifests = self.all.select do |manifest|
+      manifest.find_assay_name assay_name
+    end
+    raise ActiveRecord::RecordNotFound.new "There is no manifest for assay_name: '#{assay_name}'." unless manifests.present?
+
+    manifests.sort_by(&:version).last
+  end
+
+  def find_assay_name assay_name
+    field = field_mapping.detect { |f| f["target_field"] == "assay_name" }
+    valid_values = []
+    if field["options"]
+      valid_values = field["options"]
+    end
+    valid_values.include? assay_name
+  end
+  ####################################################################################################
+
   def self.default
     new definition: default_definition
   end
@@ -29,18 +50,21 @@ class Manifest < ActiveRecord::Base
   end
 
   def metadata
-    Oj.load(self.definition)["metadata"] rescue {}
+    loaded_definition["metadata"] rescue {}
+  end
+
+  def loaded_definition
+    Oj.load(self.definition)
   end
 
   def apply_to(data)
-    decoded = Oj.load(definition)
-    decoded["field_mapping"].inject(indexed: Hash.new, pii: Hash.new, custom: Hash.new) do |event, mapping|
+    field_mapping.inject(indexed: Hash.new, pii: Hash.new, custom: Hash.new) do |event, mapping|
       apply_single_mapping(mapping, data, event)
     end
   end
 
   def field_mapping
-    Oj.load(self.definition).with_indifferent_access["field_mapping"]
+    loaded_definition.with_indifferent_access["field_mapping"]
   end
 
   def apply_single_mapping(mapping, data, event)
@@ -130,7 +154,6 @@ class Manifest < ActiveRecord::Base
         check_value_is_date(value, target_field, date)
       end
     end
-
   end
 
   def verify_value_is_not_null_string value, mapping
@@ -311,6 +334,4 @@ class Manifest < ActiveRecord::Base
       end
     end
   end
-
 end
-
