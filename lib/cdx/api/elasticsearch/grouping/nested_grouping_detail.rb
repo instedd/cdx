@@ -16,7 +16,8 @@ class NestedGroupingDetail < GroupingDetail
     {
       count: {
         terms: {
-          field: "#{field_definition[:name]}.#{child_grouping.name}"
+          field: "#{field_definition[:name]}.#{child_grouping.name}",
+          size: 0
         }
       }
     }
