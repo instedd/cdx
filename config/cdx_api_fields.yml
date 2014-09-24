@@ -22,7 +22,7 @@
 #   b) a grouping with the name of '#{default_name}_admin_level'
 
 searchable_fields:
-  - name: started_at
+  - name: start_time
     type: date
     filter_parameter_definition:
       - name: since
@@ -65,7 +65,7 @@ searchable_fields:
     type: integer
   - name: location
     type: location
-    group_parameter_definition: 
+    group_parameter_definition:
       - name: admin_level
   - name: age
     type: integer

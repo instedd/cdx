@@ -54,8 +54,8 @@ describe Cdx::Api do
 
   describe "Filter" do
     it "should check for new events since a date" do
-      index results: [result: :positive], started_at: time(2013, 1, 1)
-      index results: [result: :negative], started_at: time(2013, 1, 2)
+      index results: [result: :positive], start_time: time(2013, 1, 1)
+      index results: [result: :negative], start_time: time(2013, 1, 2)
 
       response = query_events(since: time(2013, 1, 2))
 
@@ -75,8 +75,8 @@ describe Cdx::Api do
     it "should check for new events since a date in a differen time zone" do
       Time.zone = ActiveSupport::TimeZone["Asia/Seoul"]
 
-      index results: [result: :positive], started_at: 3.day.ago.at_noon.iso8601
-      index results: [result: :negative], started_at: 1.day.ago.at_noon.iso8601
+      index results: [result: :positive], start_time: 3.day.ago.at_noon.iso8601
+      index results: [result: :negative], start_time: 1.day.ago.at_noon.iso8601
 
       response = query_events(since: 2.day.ago.at_noon.iso8601)
 
@@ -94,8 +94,8 @@ describe Cdx::Api do
     end
 
     it "should check for new events util a date" do
-      index results: [result: :positive], started_at: time(2013, 1, 1)
-      index results: [result: :negative], started_at: time(2013, 1, 3)
+      index results: [result: :positive], start_time: time(2013, 1, 1)
+      index results: [result: :negative], start_time: time(2013, 1, 3)
 
       expect_one_result "positive", until: time(2013, 1, 2)
     end

@@ -10,7 +10,6 @@ describe "formats of document stored" do
     Cdx::Api::Elasticsearch::CustomDocumentFormat.new({
       "assay_name" => "assay",
       "device_uuid" => "device_id",
-      "started_at" => "start_time",
       "location" => "place"
     })
   }
@@ -79,7 +78,7 @@ describe "formats of document stored" do
     es_index start_time: time(2013, 1, 3)
 
     response = query_events since: time(2013, 1, 1)
-    event_dates = response.map { |event| event["started_at"] }
+    event_dates = response.map { |event| event["start_time"] }
 
     expect(event_dates.sort).to eq([
       time(2013,1,1),
@@ -93,8 +92,8 @@ describe "formats of document stored" do
     es_index start_time: time(2013, 1, 1), assay: "ASSAY001"
     es_index start_time: time(2013, 1, 1), assay: "ASSAY002"
 
-    response = query_events since: time(2013, 1, 1), group_by: "year(started_at)"
-    expect(response).to eq([{"started_at" => "2013", :count => 3}])
+    response = query_events since: time(2013, 1, 1), group_by: "year(start_time)"
+    expect(response).to eq([{"start_time" => "2013", :count => 3}])
   end
 
   it "allows searching by location with custom name" do
