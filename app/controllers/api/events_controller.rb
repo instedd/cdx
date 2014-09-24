@@ -38,11 +38,11 @@ class Api::EventsController < ApiController
   end
 
   def schema
-    schema = EventsSchema.for params["assay_name"], params["locale"]
+    schema = EventsSchema.for params["locale"], params["assay_name"]
     respond_to do |format|
-      format.json { render_json schema.schema }
+      format.json { render_json schema.build }
     end
   rescue ActiveRecord::RecordNotFound => ex
-    render :status => :manifest_not_found, :json => { :errors => ex.message } and return
+    render :status => :unprocessable_entity, :json => { :errors => ex.message } and return
   end
 end

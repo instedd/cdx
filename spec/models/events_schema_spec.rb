@@ -80,17 +80,17 @@ describe EventsSchema do
       "maximum" => 125
     }
 
-    json_schema = EventsSchema.new Manifest.new(definition:definition), "first_assay", "es-AR"
-    json_schema = json_schema.schema
+    schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)
+    schema = schema.build
 
-    json_schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
-    json_schema["type"].should eq("object")
-    json_schema["title"].should eq("first_assay.es-AR")
+    schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
+    schema["type"].should eq("object")
+    schema["title"].should eq("first_assay.es-AR")
 
-    json_schema["properties"]["started_at"].should eq(date_schema)
-    json_schema["properties"]["result"].should eq(enum_schema)
-    json_schema["properties"]["patient_name"].should eq(string_schema)
-    json_schema["properties"]["age"].should eq(number_schema)
+    schema["properties"]["started_at"].should eq(date_schema)
+    schema["properties"]["result"].should eq(enum_schema)
+    schema["properties"]["patient_name"].should eq(string_schema)
+    schema["properties"]["age"].should eq(number_schema)
   end
 
   it "creates a schema with location field" do
@@ -117,13 +117,76 @@ describe EventsSchema do
       }
     }
 
-    json_schema = EventsSchema.new Manifest.new(definition:definition), "first_assay", "es-AR"
-    json_schema = json_schema.schema
+    schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)
+    schema = schema.build
 
-    json_schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
-    json_schema["type"].should eq("object")
-    json_schema["title"].should eq("first_assay.es-AR")
+    schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
+    schema["type"].should eq("object")
+    schema["title"].should eq("first_assay.es-AR")
 
-    json_schema["properties"]["patient_location"].should eq(location_schema)
+    schema["properties"]["patient_location"].should eq(location_schema)
+  end
+
+  it "should return an empty schema with all the assay_names available if none is provided" do
+    Manifest.create definition: %{{
+      "metadata" : {
+        "device_models" : ["foo"],
+        "api_version" : "1.0.0",
+        "version" : "1.0.1"
+      },
+      "field_mapping" : [
+        {
+          "target_field": "assay_name",
+          "selector" : "assay_name",
+          "core" : true,
+          "indexed" : true,
+          "type" : "enum",
+          "options" : [
+            "first_assay",
+            "second_assay"
+          ]
+        }
+      ]
+    }}
+
+    manifest = Manifest.create definition: %{{
+      "metadata" : {
+        "device_models" : ["bar"],
+        "api_version" : "1.0.0",
+        "version" : "1.0.1"
+      },
+      "field_mapping" : [
+        {
+          "target_field": "assay_name",
+          "selector" : "assay_name",
+          "core" : true,
+          "indexed" : true,
+          "type" : "enum",
+          "options" : [
+            "cardridge_1",
+            "cardridge_2"
+          ]
+        }
+      ]
+    }}
+
+    schema = EventsSchema.for "es-AR"
+    schema = schema.build
+
+    schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
+    schema["type"].should eq("object")
+    schema["title"].should eq("es-AR")
+
+    schema["properties"]["assay_name"].should eq({
+      "title" => "Assay Name",
+      "type" => "string",
+      "enum" => ["first_assay", "second_assay", "cardridge_1", "cardridge_2"],
+      "values" => {
+        "first_assay" => {"name" => "First Assay"},
+        "second_assay" => {"name" => "Second Assay"},
+        "cardridge_1" => {"name" => "Cardridge 1"},
+        "cardridge_2" => {"name" => "Cardridge 2"}
+      }
+    })
   end
 end
