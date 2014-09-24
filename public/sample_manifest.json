@@ -8,8 +8,8 @@
   },
   "field_mapping" : [
     {
-      "target_field": "started_at",
-      "selector" : "started_at",
+      "target_field": "start_time",
+      "selector" : "start_time",
       "core" : true,
       "indexed" : true,
       "type" : "date"

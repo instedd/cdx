@@ -50,8 +50,8 @@ module EventIndexing
         parent_locations = location.self_and_ancestors.load
       end
 
-      unless parsed_fields[:indexed][:started_at].present?
-        parsed_fields[:indexed][:started_at] = self.created_at.utc.iso8601
+      unless parsed_fields[:indexed][:start_time].present?
+        parsed_fields[:indexed][:start_time] = self.created_at.utc.iso8601
       end
 
       parent_locations_id = parent_locations.map &:id

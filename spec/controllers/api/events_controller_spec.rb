@@ -86,11 +86,11 @@ describe Api::EventsController do
       events.size.should eq(2)
     end
 
-    it "should generate a started_at date if it's not provided" do
+    it "should generate a start_time date if it's not provided" do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["started_at"].should eq(event["created_at"])
+      event["start_time"].should eq(event["created_at"])
     end
   end
 
@@ -460,6 +460,20 @@ describe Api::EventsController do
         response.size.should eq(1)
         response.first["results"].first["result"].should eq("negative")
       end
+
+      it "filters for more than one value" do
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.secret_key
+
+        response = get_updates(gender: [:male, :female]).sort_by do |event|
+          event["results"].first["result"]
+        end
+
+        response.size.should eq(2)
+        response.first["results"].first["result"].should eq("negative")
+        response.last["results"].first["result"].should eq("positive")
+      end
     end
 
     context "Grouping" do
@@ -495,6 +509,22 @@ describe Api::EventsController do
           {"gender"=>"female", "assay_name" => "b", "count"=>2},
           {"gender"=>"male", "assay_name" => "a", "count"=>2},
           {"gender"=>"male", "assay_name" => "b", "count"=>1}
+        ])
+      end
+
+      it "groups and filters for more than one value" do
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.secret_key
+
+        response = get_updates("page_size"=>0, "group_by"=>["gender"], "gender"=>["male", "female"]).sort_by do |event|
+          event["gender"]
+        end
+
+        response.should eq([
+          {"gender"=>"female", "count"=>1},
+          {"gender"=>"male", "count"=>2}
         ])
       end
 
@@ -615,8 +645,8 @@ describe Api::EventsController do
               ]
             },
             {
-              "target_field": "started_at",
-              "selector" : "started_at",
+              "target_field": "start_time",
+              "selector" : "start_time",
               "core" : true,
               "indexed" : true,
               "type" : "date"
@@ -688,7 +718,7 @@ describe Api::EventsController do
         Manifest.make definition: definition
 
         date_schema = {
-          "title" => "Started At",
+          "title" => "Start Time",
           "type" => "string",
           "format" => "date-time",
           "resolution" => "second"
@@ -736,7 +766,7 @@ describe Api::EventsController do
         schema["type"].should eq("object")
         schema["title"].should eq("first_assay.es-AR")
 
-        schema["properties"]["started_at"].should eq(date_schema)
+        schema["properties"]["start_time"].should eq(date_schema)
         schema["properties"]["result"].should eq(enum_schema)
         schema["properties"]["patient_name"].should eq(string_schema)
         schema["properties"]["age"].should eq(number_schema)

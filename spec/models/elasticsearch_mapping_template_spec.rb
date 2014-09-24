@@ -53,7 +53,7 @@ describe ElasticsearchMappingTemplate do
         }
       ],
       'properties'=> {
-        "started_at" => { 'type' => "date", 'index' => 'not_analyzed'},
+        "start_time" => { 'type' => "date", 'index' => 'not_analyzed'},
         "created_at"=>{'type'=>"date", 'index'=>'not_analyzed'},
         "updated_at"=>{'type'=>"date", 'index'=>'not_analyzed'},
         "event_id"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -104,7 +104,7 @@ describe ElasticsearchMappingTemplate do
         }
       ],
       'properties'=> {
-        "started_at" => { 'type' => "date", 'format' => 'dateOptionalTime'},
+        "start_time" => { 'type' => "date", 'format' => 'dateOptionalTime'},
         "created_at"=>{'type'=>"date", 'format' => 'dateOptionalTime'},
         "updated_at"=>{'type'=>"date", 'format' => 'dateOptionalTime'},
         "event_id"=>{'type'=>"string", 'index'=>'not_analyzed'},

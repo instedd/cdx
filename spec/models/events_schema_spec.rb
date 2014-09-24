@@ -9,8 +9,8 @@ describe EventsSchema do
     definition = %{{
       "field_mapping" : [
         {
-          "target_field": "started_at",
-          "selector" : "started_at",
+          "target_field": "start_time",
+          "selector" : "start_time",
           "core" : true,
           "indexed" : true,
           "type" : "date"
@@ -51,7 +51,7 @@ describe EventsSchema do
     }}
 
     date_schema = {
-      "title" => "Started At",
+      "title" => "Start Time",
       "type" => "string",
       "format" => "date-time",
       "resolution" => "second"
@@ -87,7 +87,7 @@ describe EventsSchema do
     schema["type"].should eq("object")
     schema["title"].should eq("first_assay.es-AR")
 
-    schema["properties"]["started_at"].should eq(date_schema)
+    schema["properties"]["start_time"].should eq(date_schema)
     schema["properties"]["result"].should eq(enum_schema)
     schema["properties"]["patient_name"].should eq(string_schema)
     schema["properties"]["age"].should eq(number_schema)
