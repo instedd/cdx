@@ -785,14 +785,14 @@ describe Cdx::Api do
 
       response = query_events(group_by: {admin_level: 1})
       expect(response).to eq([
-        {"location"=>2, count: 2},
-        {"location"=>5, count: 1}
+        {"location"=>"2", count: 2},
+        {"location"=>"5", count: 1}
       ])
 
       response = query_events(group_by: {admin_level: 0})
 
       expect(response).to eq([
-        {"location"=>1, count: 3}
+        {"location"=>"1", count: 3}
       ])
     end
 
@@ -832,7 +832,7 @@ describe Cdx::Api do
         index patient_loc: { admin_level_0: 3 }
 
         response = query_events(group_by: { patient_loc_admin_level: 0 })
-        expect(response).to eq [{"patient_loc" => 1, :count => 2}, {"patient_loc" => 3, :count => 1}]
+        expect(response).to eq [{"patient_loc" => "1", :count => 2}, {"patient_loc" => "3", :count => 1}]
       end
     end
   end

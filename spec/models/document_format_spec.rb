@@ -111,10 +111,10 @@ describe "formats of document stored" do
     es_index place: [admin_level_0: 1, admin_level_1: 5, admin_level2: 6]
 
     response = query_events group_by: { admin_level: 1 }
-    expect(response).to eq([{"location" => 2, :count => 2}, {"location" => 5, :count => 1}])
+    expect(response).to eq([{"location" => "2", :count => 2}, {"location" => "5", :count => 1}])
 
     response = query_events group_by: { admin_level: 0 }
-    expect(response).to eq([{"location" => 1, :count => 3}])
+    expect(response).to eq([{"location" => "1", :count => 3}])
   end
 
   def query_events(query)

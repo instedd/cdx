@@ -26,7 +26,7 @@ class Cdx::Api::Elasticsearch::Initializer
         template = {
           "#{field[:name]}_levels" => {
             path_match: "#{field[:name]}.admin_level_*",
-            mapping:    { type: :integer }
+            mapping:    { type: :string, index: :not_analyzed }
           }
         }
         templates << template
@@ -50,8 +50,8 @@ class Cdx::Api::Elasticsearch::Initializer
     when "nested"
       properties[field[:name]] = {type: :nested, properties: map_fields(field[:sub_fields])}
     when "location"
-      properties["#{field[:name]}_id"] = { type: :integer }
-      properties["parent_#{field[:name].pluralize}"] = { type: :integer }
+      properties["#{field[:name]}_id"] = { type: :string, index: :not_analyzed }
+      properties["parent_#{field[:name].pluralize}"] = { type: :string, index: :not_analyzed }
       properties[field[:name]] = { type: :nested }
     else
       field_body =
