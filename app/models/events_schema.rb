@@ -111,11 +111,13 @@ class EventsSchema
     schema["type"] = "string"
     schema["enum"] = Array.new
     schema["locations"] = Location.all.inject(Hash.new) do |locations, location|
-      schema["enum"].push(location.id.to_s)
-      locations[location.id.to_s] = {
+      schema["enum"].push(location.geo_id.to_s)
+      locations[location.geo_id.to_s] = {
         "name" => location.name,
         "level" => location.admin_level,
-        "parent" => location.parent_id
+        "parent" => location.parent.try(:geo_id), # TODO Remove this n+1
+        "lat" => location.lat,
+        "lng" => location.lng
       }
       locations
     end

@@ -55,7 +55,7 @@ class ElasticsearchMappingTemplate
         template = {
           "#{field_name}_levels" => {
             "path_match" => "#{field_name}.admin_level_*",
-            "mapping" =>    { "type" => "integer" }
+            "mapping" =>    { "type" => "string", 'index' => 'not_analyzed'}
           }
         }
         templates << template
@@ -116,8 +116,8 @@ class ElasticsearchMappingTemplate
           }
         }
       when "location"
-        properties["#{field_name}_id"] = { 'type' => 'integer' }
-        properties["parent_#{field_name.pluralize}"] = { 'type' => 'integer' }
+        properties["#{field_name}_id"] = { 'type' => 'string', 'index' => 'not_analyzed' }
+        properties["parent_#{field_name.pluralize}"] = { 'type' => 'string', 'index' => 'not_analyzed' }
         properties[field_name] = { 'type' => 'nested' }
       else
         properties[field_name] = {'type' => field[:type], 'index' => 'not_analyzed'}

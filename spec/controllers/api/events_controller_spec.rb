@@ -276,12 +276,12 @@ describe Api::EventsController do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["location_id"].should eq(leaf_location1.id)
+      event["location_id"].should eq(leaf_location1.geo_id)
       event["laboratory_id"].should eq(laboratory1.id)
-      event["parent_locations"].sort.should eq([leaf_location1.id, parent_location.id, root_location.id].sort)
-      event["location"]['admin_level_0'].should eq(root_location.id)
-      event["location"]['admin_level_1'].should eq(parent_location.id)
-      event["location"]['admin_level_2'].should eq(leaf_location1.id)
+      event["parent_locations"].sort.should eq([leaf_location1.geo_id, parent_location.geo_id, root_location.geo_id].sort)
+      event["location"]['admin_level_0'].should eq(root_location.geo_id)
+      event["location"]['admin_level_1'].should eq(parent_location.geo_id)
+      event["location"]['admin_level_2'].should eq(leaf_location1.geo_id)
     end
 
     it "should store the parent location id when the device is registered more than one laboratory" do
@@ -291,11 +291,11 @@ describe Api::EventsController do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["location_id"].should eq(parent_location.id)
+      event["location_id"].should eq(parent_location.geo_id)
       event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([root_location.id, parent_location.id].sort)
-      event["location"]['admin_level_0'].should eq(root_location.id)
-      event["location"]['admin_level_1'].should eq(parent_location.id)
+      event["parent_locations"].should eq([root_location.geo_id, parent_location.geo_id].sort)
+      event["location"]['admin_level_0'].should eq(root_location.geo_id)
+      event["location"]['admin_level_1'].should eq(parent_location.geo_id)
     end
 
     it "should store the root location id when the device is registered more than one laboratory" do
@@ -305,10 +305,10 @@ describe Api::EventsController do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["location_id"].should eq(root_location.id)
+      event["location_id"].should eq(root_location.geo_id)
       event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([root_location.id])
-      event["location"]['admin_level_0'].should eq(root_location.id)
+      event["parent_locations"].should eq([root_location.geo_id])
+      event["location"]['admin_level_0'].should eq(root_location.geo_id)
     end
 
     it "should store the root location id when the device is registered more than one laboratory with another tree order" do
@@ -318,10 +318,10 @@ describe Api::EventsController do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["location_id"].should eq(root_location.id)
+      event["location_id"].should eq(root_location.geo_id)
       event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([root_location.id])
-      event["location"]['admin_level_0'].should eq(root_location.id)
+      event["parent_locations"].should eq([root_location.geo_id])
+      event["location"]['admin_level_0'].should eq(root_location.geo_id)
     end
 
     it "should store nil if no location was found" do
@@ -345,15 +345,15 @@ describe Api::EventsController do
       post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.secret_key
       post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.secret_key
 
-      response = get_updates(location: leaf_location1.id)
+      response = get_updates(location: leaf_location1.geo_id)
 
       response.first["results"].first["condition"].should eq("flu_a")
 
-      response = get_updates(location: leaf_location2.id)
+      response = get_updates(location: leaf_location2.geo_id)
 
       response.first["results"].first["condition"].should eq("flu_b")
 
-      response = get_updates(location: parent_location.id).sort_by do |event|
+      response = get_updates(location: parent_location.geo_id).sort_by do |event|
         event["results"].first["condition"]
       end
 
@@ -361,7 +361,7 @@ describe Api::EventsController do
       response[0]["results"].first["condition"].should eq("flu_a")
       response[1]["results"].first["condition"].should eq("flu_b")
 
-      response = get_updates(location: root_location.id).sort_by do |event|
+      response = get_updates(location: root_location.geo_id).sort_by do |event|
         event["results"].first["condition"]
       end
 
@@ -381,14 +381,14 @@ describe Api::EventsController do
 
       response = get_updates(group_by: {admin_level: 1})
       response.should eq([
-        {"location"=>parent_location.id, "count"=>2},
-        {"location"=>upper_leaf_location.id, "count"=>1}
+        {"location"=>parent_location.geo_id, "count"=>2},
+        {"location"=>upper_leaf_location.geo_id, "count"=>1}
       ])
 
       response = get_updates(group_by: {admin_level: 0})
 
       response.should eq([
-        {"location"=>root_location.id, "count"=>3}
+        {"location"=>root_location.geo_id, "count"=>3}
       ])
     end
   end
@@ -684,9 +684,16 @@ describe Api::EventsController do
               }
             },
             {
+              "target_field": "location",
+              "selector" : "location",
+              "core" : true,
+              "indexed" : true,
+              "type" : "location"
+            },
+            {
               "target_field": "patient_location",
               "selector" : "patient_location",
-              "core" : true,
+              "core" : false,
               "indexed" : true,
               "type" : "location"
             }
@@ -749,12 +756,12 @@ describe Api::EventsController do
 
         locations = Location.all
         location_schema = {
-          "title" => "Patient Location",
+          "title" => "Location",
           "type" => "string",
-          "enum" => [ root_location.id.to_s, parent_location.id.to_s ],
+          "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
           "locations" => {
-            "#{root_location.id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => root_location.parent_id},
-            "#{parent_location.id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => parent_location.parent_id}
+            "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
+            "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
           }
         }
 
@@ -770,7 +777,8 @@ describe Api::EventsController do
         schema["properties"]["result"].should eq(enum_schema)
         schema["properties"]["patient_name"].should eq(string_schema)
         schema["properties"]["age"].should eq(number_schema)
-        schema["properties"]["patient_location"].should eq(location_schema)
+        schema["properties"]["patient_location"].should be_nil
+        schema["properties"]["location"].should eq(location_schema)
       end
 
       it "should respond with an error if no manifest is present for a given assay name" do

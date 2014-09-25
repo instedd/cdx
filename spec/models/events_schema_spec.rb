@@ -110,10 +110,10 @@ describe EventsSchema do
     location_schema = {
       "title" => "Patient Location",
       "type" => "string",
-      "enum" => [ root_location.id.to_s, parent_location.id.to_s ],
+      "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
       "locations" => {
-        "#{root_location.id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => root_location.parent_id},
-        "#{parent_location.id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => parent_location.parent_id}
+        "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
+        "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
       }
     }
 

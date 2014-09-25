@@ -6,7 +6,8 @@ class Location < ActiveRecord::Base
   has_many :laboratories, dependent: :restrict_with_error
   has_many :devices, :through => :laboratories
   has_many :events, :through => :laboratories
-  validates_presence_of :admin_level, :parent
+  validates_presence_of :admin_level, :parent, :geo_id
+  validates_uniqueness_of :geo_id
   validate :validate_admin_level_hierarchy
 
   def common_root_with(locations)
@@ -24,8 +25,12 @@ class Location < ActiveRecord::Base
     end
   end
 
+  def self.find_or_create_default
+    find_by_admin_level(0) || create_default
+  end
+
   def self.create_default
-    location = self.new admin_level: 0, name: "World"
+    location = self.new admin_level: 0, name: "World", geo_id: '0'
     location.save validate: false
     location
   end
