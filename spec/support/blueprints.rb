@@ -36,6 +36,7 @@ end
 Location.blueprint do
   name
   parent {Location.create_default}
+  geo_id { Faker::Lorem.words(1)[0] }
   admin_level {parent.admin_level + 1}
 end
 

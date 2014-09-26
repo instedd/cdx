@@ -9,8 +9,8 @@ describe EventsSchema do
     definition = %{{
       "field_mapping" : [
         {
-          "target_field": "started_at",
-          "selector" : "started_at",
+          "target_field": "start_time",
+          "selector" : "start_time",
           "core" : true,
           "indexed" : true,
           "type" : "date"
@@ -51,7 +51,7 @@ describe EventsSchema do
     }}
 
     date_schema = {
-      "title" => "Started At",
+      "title" => "Start Time",
       "type" => "string",
       "format" => "date-time",
       "resolution" => "second"
@@ -80,17 +80,17 @@ describe EventsSchema do
       "maximum" => 125
     }
 
-    json_schema = EventsSchema.new Manifest.new(definition:definition), "first_assay", "es-AR"
-    json_schema = json_schema.schema
+    schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)
+    schema = schema.build
 
-    json_schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
-    json_schema["type"].should eq("object")
-    json_schema["title"].should eq("first_assay.es-AR")
+    schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
+    schema["type"].should eq("object")
+    schema["title"].should eq("first_assay.es-AR")
 
-    json_schema["properties"]["started_at"].should eq(date_schema)
-    json_schema["properties"]["result"].should eq(enum_schema)
-    json_schema["properties"]["patient_name"].should eq(string_schema)
-    json_schema["properties"]["age"].should eq(number_schema)
+    schema["properties"]["start_time"].should eq(date_schema)
+    schema["properties"]["result"].should eq(enum_schema)
+    schema["properties"]["patient_name"].should eq(string_schema)
+    schema["properties"]["age"].should eq(number_schema)
   end
 
   it "creates a schema with location field" do
@@ -110,20 +110,83 @@ describe EventsSchema do
     location_schema = {
       "title" => "Patient Location",
       "type" => "string",
-      "enum" => [ root_location.id.to_s, parent_location.id.to_s ],
+      "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
       "locations" => {
-        "#{root_location.id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => root_location.parent_id},
-        "#{parent_location.id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => parent_location.parent_id}
+        "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
+        "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
       }
     }
 
-    json_schema = EventsSchema.new Manifest.new(definition:definition), "first_assay", "es-AR"
-    json_schema = json_schema.schema
+    schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)
+    schema = schema.build
 
-    json_schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
-    json_schema["type"].should eq("object")
-    json_schema["title"].should eq("first_assay.es-AR")
+    schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
+    schema["type"].should eq("object")
+    schema["title"].should eq("first_assay.es-AR")
 
-    json_schema["properties"]["patient_location"].should eq(location_schema)
+    schema["properties"]["patient_location"].should eq(location_schema)
+  end
+
+  it "should return an empty schema with all the assay_names available if none is provided" do
+    Manifest.create definition: %{{
+      "metadata" : {
+        "device_models" : ["foo"],
+        "api_version" : "1.0.0",
+        "version" : "1.0.1"
+      },
+      "field_mapping" : [
+        {
+          "target_field": "assay_name",
+          "selector" : "assay_name",
+          "core" : true,
+          "indexed" : true,
+          "type" : "enum",
+          "options" : [
+            "first_assay",
+            "second_assay"
+          ]
+        }
+      ]
+    }}
+
+    manifest = Manifest.create definition: %{{
+      "metadata" : {
+        "device_models" : ["bar"],
+        "api_version" : "1.0.0",
+        "version" : "1.0.1"
+      },
+      "field_mapping" : [
+        {
+          "target_field": "assay_name",
+          "selector" : "assay_name",
+          "core" : true,
+          "indexed" : true,
+          "type" : "enum",
+          "options" : [
+            "cardridge_1",
+            "cardridge_2"
+          ]
+        }
+      ]
+    }}
+
+    schema = EventsSchema.for "es-AR"
+    schema = schema.build
+
+    schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
+    schema["type"].should eq("object")
+    schema["title"].should eq("es-AR")
+
+    schema["properties"]["assay_name"].should eq({
+      "title" => "Assay Name",
+      "type" => "string",
+      "enum" => ["first_assay", "second_assay", "cardridge_1", "cardridge_2"],
+      "values" => {
+        "first_assay" => {"name" => "First Assay"},
+        "second_assay" => {"name" => "Second Assay"},
+        "cardridge_1" => {"name" => "Cardridge 1"},
+        "cardridge_2" => {"name" => "Cardridge 2"}
+      }
+    })
   end
 end

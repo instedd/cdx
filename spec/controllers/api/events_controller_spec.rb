@@ -86,11 +86,11 @@ describe Api::EventsController do
       events.size.should eq(2)
     end
 
-    it "should generate a started_at date if it's not provided" do
+    it "should generate a start_time date if it's not provided" do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["started_at"].should eq(event["created_at"])
+      event["start_time"].should eq(event["created_at"])
     end
   end
 
@@ -276,12 +276,12 @@ describe Api::EventsController do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["location_id"].should eq(leaf_location1.id)
+      event["location_id"].should eq(leaf_location1.geo_id)
       event["laboratory_id"].should eq(laboratory1.id)
-      event["parent_locations"].sort.should eq([leaf_location1.id, parent_location.id, root_location.id].sort)
-      event["location"]['admin_level_0'].should eq(root_location.id)
-      event["location"]['admin_level_1'].should eq(parent_location.id)
-      event["location"]['admin_level_2'].should eq(leaf_location1.id)
+      event["parent_locations"].sort.should eq([leaf_location1.geo_id, parent_location.geo_id, root_location.geo_id].sort)
+      event["location"]['admin_level_0'].should eq(root_location.geo_id)
+      event["location"]['admin_level_1'].should eq(parent_location.geo_id)
+      event["location"]['admin_level_2'].should eq(leaf_location1.geo_id)
     end
 
     it "should store the parent location id when the device is registered more than one laboratory" do
@@ -291,11 +291,11 @@ describe Api::EventsController do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["location_id"].should eq(parent_location.id)
+      event["location_id"].should eq(parent_location.geo_id)
       event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([root_location.id, parent_location.id].sort)
-      event["location"]['admin_level_0'].should eq(root_location.id)
-      event["location"]['admin_level_1'].should eq(parent_location.id)
+      event["parent_locations"].should eq([root_location.geo_id, parent_location.geo_id].sort)
+      event["location"]['admin_level_0'].should eq(root_location.geo_id)
+      event["location"]['admin_level_1'].should eq(parent_location.geo_id)
     end
 
     it "should store the root location id when the device is registered more than one laboratory" do
@@ -305,10 +305,10 @@ describe Api::EventsController do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["location_id"].should eq(root_location.id)
+      event["location_id"].should eq(root_location.geo_id)
       event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([root_location.id])
-      event["location"]['admin_level_0'].should eq(root_location.id)
+      event["parent_locations"].should eq([root_location.geo_id])
+      event["location"]['admin_level_0'].should eq(root_location.geo_id)
     end
 
     it "should store the root location id when the device is registered more than one laboratory with another tree order" do
@@ -318,10 +318,10 @@ describe Api::EventsController do
       post :create, data, device_id: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
-      event["location_id"].should eq(root_location.id)
+      event["location_id"].should eq(root_location.geo_id)
       event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([root_location.id])
-      event["location"]['admin_level_0'].should eq(root_location.id)
+      event["parent_locations"].should eq([root_location.geo_id])
+      event["location"]['admin_level_0'].should eq(root_location.geo_id)
     end
 
     it "should store nil if no location was found" do
@@ -345,15 +345,15 @@ describe Api::EventsController do
       post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.secret_key
       post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.secret_key
 
-      response = get_updates(location: leaf_location1.id)
+      response = get_updates(location: leaf_location1.geo_id)
 
       response.first["results"].first["condition"].should eq("flu_a")
 
-      response = get_updates(location: leaf_location2.id)
+      response = get_updates(location: leaf_location2.geo_id)
 
       response.first["results"].first["condition"].should eq("flu_b")
 
-      response = get_updates(location: parent_location.id).sort_by do |event|
+      response = get_updates(location: parent_location.geo_id).sort_by do |event|
         event["results"].first["condition"]
       end
 
@@ -361,7 +361,7 @@ describe Api::EventsController do
       response[0]["results"].first["condition"].should eq("flu_a")
       response[1]["results"].first["condition"].should eq("flu_b")
 
-      response = get_updates(location: root_location.id).sort_by do |event|
+      response = get_updates(location: root_location.geo_id).sort_by do |event|
         event["results"].first["condition"]
       end
 
@@ -381,14 +381,14 @@ describe Api::EventsController do
 
       response = get_updates(group_by: {admin_level: 1})
       response.should eq([
-        {"location"=>parent_location.id, "count"=>2},
-        {"location"=>upper_leaf_location.id, "count"=>1}
+        {"location"=>parent_location.geo_id, "count"=>2},
+        {"location"=>upper_leaf_location.geo_id, "count"=>1}
       ])
 
       response = get_updates(group_by: {admin_level: 0})
 
       response.should eq([
-        {"location"=>root_location.id, "count"=>3}
+        {"location"=>root_location.geo_id, "count"=>3}
       ])
     end
   end
@@ -460,6 +460,20 @@ describe Api::EventsController do
         response.size.should eq(1)
         response.first["results"].first["result"].should eq("negative")
       end
+
+      it "filters for more than one value" do
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.secret_key
+
+        response = get_updates(gender: [:male, :female]).sort_by do |event|
+          event["results"].first["result"]
+        end
+
+        response.size.should eq(2)
+        response.first["results"].first["result"].should eq("negative")
+        response.last["results"].first["result"].should eq("positive")
+      end
     end
 
     context "Grouping" do
@@ -495,6 +509,22 @@ describe Api::EventsController do
           {"gender"=>"female", "assay_name" => "b", "count"=>2},
           {"gender"=>"male", "assay_name" => "a", "count"=>2},
           {"gender"=>"male", "assay_name" => "b", "count"=>1}
+        ])
+      end
+
+      it "groups and filters for more than one value" do
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.secret_key
+
+        response = get_updates("page_size"=>0, "group_by"=>["gender"], "gender"=>["male", "female"]).sort_by do |event|
+          event["gender"]
+        end
+
+        response.should eq([
+          {"gender"=>"female", "count"=>1},
+          {"gender"=>"male", "count"=>2}
         ])
       end
 
@@ -615,8 +645,8 @@ describe Api::EventsController do
               ]
             },
             {
-              "target_field": "started_at",
-              "selector" : "started_at",
+              "target_field": "start_time",
+              "selector" : "start_time",
               "core" : true,
               "indexed" : true,
               "type" : "date"
@@ -654,9 +684,16 @@ describe Api::EventsController do
               }
             },
             {
+              "target_field": "location",
+              "selector" : "location",
+              "core" : true,
+              "indexed" : true,
+              "type" : "location"
+            },
+            {
               "target_field": "patient_location",
               "selector" : "patient_location",
-              "core" : true,
+              "core" : false,
               "indexed" : true,
               "type" : "location"
             }
@@ -688,7 +725,7 @@ describe Api::EventsController do
         Manifest.make definition: definition
 
         date_schema = {
-          "title" => "Started At",
+          "title" => "Start Time",
           "type" => "string",
           "format" => "date-time",
           "resolution" => "second"
@@ -719,34 +756,99 @@ describe Api::EventsController do
 
         locations = Location.all
         location_schema = {
-          "title" => "Patient Location",
+          "title" => "Location",
           "type" => "string",
-          "enum" => [ root_location.id.to_s, parent_location.id.to_s ],
+          "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
           "locations" => {
-            "#{root_location.id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => root_location.parent_id},
-            "#{parent_location.id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => parent_location.parent_id}
+            "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
+            "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
           }
         }
 
         response = get :schema, assay_name: "first_assay", locale: "es-AR", format: 'json'
-        json_schema = Oj.load response.body
+        schema = Oj.load response.body
 
-        json_schema["errors"].should be_nil
-        json_schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
-        json_schema["type"].should eq("object")
-        json_schema["title"].should eq("first_assay.es-AR")
+        schema["errors"].should be_nil
+        schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
+        schema["type"].should eq("object")
+        schema["title"].should eq("first_assay.es-AR")
 
-        json_schema["properties"]["started_at"].should eq(date_schema)
-        json_schema["properties"]["result"].should eq(enum_schema)
-        json_schema["properties"]["patient_name"].should eq(string_schema)
-        json_schema["properties"]["age"].should eq(number_schema)
-        json_schema["properties"]["patient_location"].should eq(location_schema)
+        schema["properties"]["start_time"].should eq(date_schema)
+        schema["properties"]["result"].should eq(enum_schema)
+        schema["properties"]["patient_name"].should eq(string_schema)
+        schema["properties"]["age"].should eq(number_schema)
+        schema["properties"]["patient_location"].should be_nil
+        schema["properties"]["location"].should eq(location_schema)
       end
 
       it "should respond with an error if no manifest is present for a given assay name" do
         response = get :schema, assay_name: "first_assay", locale: "es-AR", format: 'json'
 
         Oj.load(response.body)["errors"].should eq("There is no manifest for assay_name: 'first_assay'.")
+      end
+
+
+      it "should return an empty schema with all the assay_names available if none is provided" do
+        Manifest.create definition: %{{
+          "metadata" : {
+            "device_models" : ["foo"],
+            "api_version" : "1.0.0",
+            "version" : "1.0.1"
+          },
+          "field_mapping" : [
+            {
+              "target_field": "assay_name",
+              "selector" : "assay_name",
+              "core" : true,
+              "indexed" : true,
+              "type" : "enum",
+              "options" : [
+                "first_assay",
+                "second_assay"
+              ]
+            }
+          ]
+        }}
+
+        manifest = Manifest.create definition: %{{
+          "metadata" : {
+            "device_models" : ["bar"],
+            "api_version" : "1.0.0",
+            "version" : "1.0.1"
+          },
+          "field_mapping" : [
+            {
+              "target_field": "assay_name",
+              "selector" : "assay_name",
+              "core" : true,
+              "indexed" : true,
+              "type" : "enum",
+              "options" : [
+                "cardridge_1",
+                "cardridge_2"
+              ]
+            }
+          ]
+        }}
+
+        response = get :schema, format: 'json'
+        schema = Oj.load response.body
+
+        schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
+        schema["type"].should eq("object")
+        schema["title"].should eq("en-US")
+
+        schema["properties"]["assay_name"].should eq({
+          "title" => "Assay Name",
+          "type" => "string",
+          "enum" => ["first_assay", "second_assay", "cardridge_1", "cardridge_2"],
+          "values" => {
+            "first_assay" => {"name" => "First Assay"},
+            "second_assay" => {"name" => "Second Assay"},
+            "cardridge_1" => {"name" => "Cardridge 1"},
+            "cardridge_2" => {"name" => "Cardridge 2"}
+          }
+        })
       end
     end
   end

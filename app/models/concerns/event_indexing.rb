@@ -35,7 +35,7 @@ module EventIndexing
         laboratory = device.laboratories.first
         laboratory_id = laboratory.id
         location = device.locations.first
-        location_id = location.id
+        location_id = location.geo_id
         parent_locations = location.self_and_ancestors.load
       elsif device.laboratories.size == 0
         laboratory_id = nil
@@ -46,16 +46,16 @@ module EventIndexing
         locations = device.locations
         location = locations.first
         location = location.common_root_with(locations[1..-1])
-        location_id = location.id
+        location_id = location.geo_id
         parent_locations = location.self_and_ancestors.load
       end
 
-      unless parsed_fields[:indexed][:started_at].present?
-        parsed_fields[:indexed][:started_at] = self.created_at.utc.iso8601
+      unless parsed_fields[:indexed][:start_time].present?
+        parsed_fields[:indexed][:start_time] = self.created_at.utc.iso8601
       end
 
-      parent_locations_id = parent_locations.map &:id
-      admin_levels = Hash[parent_locations.map { |l| ["admin_level_#{l.admin_level}", l.id] }]
+      parent_locations_id = parent_locations.map &:geo_id
+      admin_levels = Hash[parent_locations.map { |l| ["admin_level_#{l.admin_level}", l.geo_id] }]
 
       properties = {
         created_at: self.created_at.utc.iso8601,

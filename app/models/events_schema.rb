@@ -1,32 +1,45 @@
 class EventsSchema
-  def initialize manifest, assay_name, locale
+  def initialize locale="en-US", assay_name=nil, manifest=nil
     @assay_name = assay_name
     @locale = locale
     @manifest = manifest
   end
 
-  def self.for assay_name, locale
-    EventsSchema.new Manifest.find_by_assay_name(assay_name), assay_name, locale
+  def self.for locale, assay_name=nil
+    locale ||= "en-US"
+    if assay_name.present?
+      EventsSchema.new locale, assay_name, Manifest.find_by_assay_name(assay_name)
+    else
+      EventsSchema.new locale
+    end
   end
 
-  def schema
-    @schema ||= build_schema
+  def build
+    @schema ||= schema
   end
 
   private
 
-  def build_schema
+  def schema
     schema = Hash.new
 
     schema["$schema"] = 'http://json-schema.org/draft-04/schema#'
     schema["type"] = "object"
-    schema["title"] = @assay_name + "." + @locale
+    schema["title"] = if @assay_name.present?
+      "#{@assay_name}.#{@locale}"
+    else
+      @locale
+    end
     schema["properties"] = Hash.new
 
-    @manifest.field_mapping.each do |field|
-      if field["core"] && field["indexed"]
-        schema["properties"][field_name(field)] = schema_for field
+    if @manifest
+      @manifest.field_mapping.each do |field|
+        if field["core"] && field["indexed"]
+          schema["properties"][field_name(field)] = schema_for field
+        end
       end
+    else
+      schema["properties"]["assay_name"] = all_assay_names_schema
     end
     schema
   end
@@ -98,13 +111,44 @@ class EventsSchema
     schema["type"] = "string"
     schema["enum"] = Array.new
     schema["locations"] = Location.all.inject(Hash.new) do |locations, location|
-      schema["enum"].push(location.id.to_s)
-      locations[location.id.to_s] = {
+      schema["enum"].push(location.geo_id.to_s)
+      locations[location.geo_id.to_s] = {
         "name" => location.name,
         "level" => location.admin_level,
-        "parent" => location.parent_id
+        "parent" => location.parent.try(:geo_id), # TODO Remove this n+1
+        "lat" => location.lat,
+        "lng" => location.lng
       }
       locations
     end
+  end
+
+
+  def all_assay_names_schema
+    enum = all_assay_names
+    values = enum.inject Hash.new do |values, assay_name|
+        values[assay_name] = { "name" => assay_name.titleize }
+        values
+      end
+    {
+      "title" => "Assay Name",
+      "type" => "string",
+      "enum" => enum,
+      "values" => values
+    }
+
+  end
+
+  def all_assay_names
+    #TODO This should be AssayName.all
+    assay_names = Manifest.all.collect do |manifest|
+      assay_mapping = manifest.field_mapping.detect do |mapping|
+        mapping["target_field"] == "assay_name"
+      end
+
+      assay_mapping["options"]
+    end.flatten
+    assay_names.delete nil
+    assay_names
   end
 end

@@ -48,12 +48,12 @@ describe ElasticsearchMappingTemplate do
         {
           "location_levels"=>{
             "path_match"=>"location.admin_level_*",
-            "mapping"=>{"type"=>"integer"}
+            "mapping"=>{"type"=>"string", 'index' => 'not_analyzed'}
           }
         }
       ],
       'properties'=> {
-        "started_at" => { 'type' => "date", 'index' => 'not_analyzed'},
+        "start_time" => { 'type' => "date", 'index' => 'not_analyzed'},
         "created_at"=>{'type'=>"date", 'index'=>'not_analyzed'},
         "updated_at"=>{'type'=>"date", 'index'=>'not_analyzed'},
         "event_id"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -64,9 +64,9 @@ describe ElasticsearchMappingTemplate do
         "error_code"=>{'type'=>"integer", 'index'=>'not_analyzed'},
         "error_description"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "laboratory_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
-        "location_id"=>{'type'=>"integer"},
+        "location_id"=>{'type'=>"string", 'index' => 'not_analyzed'},
         "institution_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
-        "parent_locations"=>{'type' => 'integer'},
+        "parent_locations"=>{'type' =>"string", 'index' => 'not_analyzed'},
         "location"=>{'type'=>'nested'},
         "age"=>{'type'=>"integer", 'index'=>'not_analyzed'},
         "assay_name"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -99,12 +99,12 @@ describe ElasticsearchMappingTemplate do
         {
           "location_levels"=>{
             "path_match"=>"location.admin_level_*",
-            "mapping"=>{"type"=>"integer"}
+            "mapping"=>{"type"=>"string", 'index' => 'not_analyzed'}
           }
         }
       ],
       'properties'=> {
-        "started_at" => { 'type' => "date", 'format' => 'dateOptionalTime'},
+        "start_time" => { 'type' => "date", 'format' => 'dateOptionalTime'},
         "created_at"=>{'type'=>"date", 'format' => 'dateOptionalTime'},
         "updated_at"=>{'type'=>"date", 'format' => 'dateOptionalTime'},
         "event_id"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -115,9 +115,9 @@ describe ElasticsearchMappingTemplate do
         "error_code"=>{'type'=>"integer"},
         "error_description"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "laboratory_id"=>{'type'=>"integer"},
-        "location_id"=>{'type'=>"integer"},
+        "location_id"=>{'type'=>"string", 'index' => 'not_analyzed'},
         "institution_id"=>{'type'=>"integer"},
-        "parent_locations"=>{'type' => 'integer'},
+        "parent_locations"=>{'type' =>"string", 'index' => 'not_analyzed'},
         "location"=>{'type'=>'nested'},
         "age"=>{'type'=>"integer"},
         "assay_name"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -203,8 +203,8 @@ describe ElasticsearchMappingTemplate do
 
     default_event_mapping = default_mapping2
     default_event_mapping['properties']['location']["properties"]={
-      "admin_level_0" => {"type"=>"integer"},
-      "admin_level_1"=>{"type"=>"integer"}
+      "admin_level_0" => {"type"=>"string", 'index' => 'not_analyzed'},
+      "admin_level_1"=>{"type"=>"string", 'index' => 'not_analyzed'}
     }
 
     mapping.should eq({
