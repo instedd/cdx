@@ -23,7 +23,11 @@ Cdp::Application.routes.draw do
   root :to => 'home#index'
 
   namespace :api, defaults: { format: 'json' } do
-    resources :playground, only: :index, defaults: { format: 'html' }
+    resources :playground, only: :index, defaults: { format: 'html' } do
+      collection do
+        get :simulator
+      end
+    end
     match 'events(.:format)' => "events#index", via: [:get, :post]
     resources :events, only: [] do
       collection do
