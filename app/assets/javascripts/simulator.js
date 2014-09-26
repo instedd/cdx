@@ -13,6 +13,12 @@
           .remove()
           .end()
         ;
+        $("#gender")
+          .find('option')
+          .remove()
+          .end()
+        ;
+
         populate_fields();
       });
 
@@ -24,12 +30,14 @@
         condition= $("#condition").val();
         patient_name = $("#patient_name").val();
         patient_telephone_number = $("#patient_telephone_number").val();
+        assay_name = result_and_condition["assay_name"][device]["original"][0];
+        gender = $("#gender").val();
+        age = $("#age").val();
 
         $create_button.prop("disabled", true);
         $create_button.val("Creating...");
 
-        var data = '{ "condition" : "' + condition + '" ,\n "result" : "' + result + '",\n "patient_name" : "' + patient_name + '" ,\n "patient_telephone_number" : "' + patient_telephone_number +'" \n }';
-
+        var data = '{"assay_name" : "' + assay_name + '", "test_type" : "specimen", "results" : [{"condition" : "' + condition + '" , "result" : "' + result + '"} ], "gender" : "' + gender + '" , "age" : ' + age + ' , "patient_name" : "' + patient_name + '" , "patient_telephone_number" : "' + patient_telephone_number +'"}';
         $.ajax({
           url: "/api/devices/" + device + "/events",
           type: "POST",
@@ -101,4 +109,5 @@ function populate_field(field) {
 function populate_fields(){
   populate_field("result");
   populate_field("condition");
+  populate_field("gender");
 }
