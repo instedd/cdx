@@ -37,7 +37,7 @@ set :linked_files, %w{config/database.yml config/settings.yml config/guisso.yml}
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
-set :linked_dirs, %w{log public/nndd}
+set :linked_dirs, %w{log}
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
@@ -131,6 +131,15 @@ namespace :deploy do
     end
   end
 
+  task :symlink_nndd do
+    on roles(:app) do
+      within current_path do
+        execute :ln, "-s #{shared_path}/nndd #{release_path}/public"
+      end
+    end
+  end
+
+  after :publishing, :symlink_nndd
   # before :restart, :migrate
   after :publishing, :write_revision
   after :publishing, :write_version
