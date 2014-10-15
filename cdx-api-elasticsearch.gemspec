@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Cdx::Api::Elasticsearch::VERSION
   spec.authors       = ["Ary Borenszweig"]
   spec.email         = ["aborenszweig@manas.com.ar"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{ElasticSearch based CDX API implementation}
+  spec.summary       = %q{Provides an implementation of the CDX API based on an ElasticSearch backend}
   spec.homepage      = ""
   spec.license       = "MIT"
 

@@ -1,6 +1,6 @@
 # Cdx::Api::Elasticsearch
 
-TODO: Write a gem description
+Provides an implementation of the CDX API based on an ElasticSearch backend.
 
 ## Installation
 
@@ -15,10 +15,6 @@ And then execute:
 Or install it yourself as:
 
     $ gem install cdx-api-elasticsearch
-
-## Usage
-
-TODO: Write usage instructions here
 
 ## Contributing
 
