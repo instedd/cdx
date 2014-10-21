@@ -2,9 +2,7 @@ require 'spec_helper'
 
 describe "formats of document stored" do
 
-  before(:each) do
-    api.client.delete_by_query index: "cdx_events", body: { query: { match_all: {} } } rescue nil
-  end
+  include_context "elasticsearch index"
 
   let(:custom_document_format) {
     Cdx::Api::Elasticsearch::CustomDocumentFormat.new({
@@ -13,6 +11,7 @@ describe "formats of document stored" do
       "location" => "place"
     })
   }
+
   let(:api)  { setup_api custom_document_format }
 
   it "should retrieve documents in standard format even if they are stored with different names" do
