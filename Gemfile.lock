@@ -1,5 +1,5 @@
 GIT
-  remote: https://bitbucket.org/instedd/alto_guisso.git
+  remote: git://github.com/instedd/alto_guisso.git
   revision: 23d3c209edf172a8ef8d0e1771ffaf6085ffbe8d
   branch: master
   specs:
@@ -9,6 +9,18 @@ GIT
       rack-oauth2
       rails (>= 3.0)
       ruby-openid
+
+GIT
+  remote: git://github.com/manastech/rack-oauth2.git
+  revision: 192e4d020a84432179297deb035f9716d4bf6622
+  branch: master
+  specs:
+    rack-oauth2 (1.0.5)
+      activesupport (>= 2.3)
+      attr_required (>= 0.0.5)
+      httpclient (>= 2.2.0.2)
+      multi_json (>= 1.3.6)
+      rack (>= 1.1)
 
 GIT
   remote: https://bitbucket.org/instedd/cdx-api-elasticsearch.git
@@ -21,25 +33,13 @@ GIT
 
 GIT
   remote: https://bitbucket.org/instedd/instedd-bootstrap.git
-  revision: b9934e640d74b83acb5e3b0356369c473480236b
+  revision: e3dd7bb922cb89c5007cc371afafb31ac391bdf1
   branch: master
   specs:
     instedd-bootstrap (0.0.1)
       bootstrap-sass
       rails
       sass-rails
-
-GIT
-  remote: https://github.com/manastech/rack-oauth2.git
-  revision: 192e4d020a84432179297deb035f9716d4bf6622
-  branch: master
-  specs:
-    rack-oauth2 (1.0.5)
-      activesupport (>= 2.3)
-      attr_required (>= 0.0.5)
-      httpclient (>= 2.2.0.2)
-      multi_json (>= 1.3.6)
-      rack (>= 1.1)
 
 GEM
   remote: https://rubygems.org/
@@ -176,7 +176,7 @@ GEM
     hike (1.2.3)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
-    httpclient (2.3.4.1)
+    httpclient (2.5.2)
     i18n (0.6.11)
     jbuilder (1.5.3)
       activesupport (>= 3.0.0)
