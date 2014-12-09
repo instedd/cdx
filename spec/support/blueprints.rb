@@ -2,6 +2,14 @@ require 'machinist/active_record'
 require 'sham'
 require 'faker'
 
+class Sham
+  # Emulates Machinist 2 serial number
+  def self.sn
+    @sn ||= 0
+    @sn += 1
+  end
+end
+
 Sham.define do
   name { Faker::Name.name }
   email { Faker::Internet.email }
@@ -36,7 +44,7 @@ end
 Location.blueprint do
   name
   parent {Location.create_default}
-  geo_id { Faker::Lorem.words(1)[0] }
+  geo_id { "location-#{Sham.sn}" }
   admin_level {parent.admin_level + 1}
 end
 
