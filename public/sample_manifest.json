@@ -89,11 +89,11 @@
       "options" : {
         "when" : [
           {
-            "property" : "assay_name",
-            "value" : "cartridge_1",
+            "property" : "condition",
+            "value" : "mtb",
             "options" : [
               "positive",
-              "positive_with_riff",
+              "positive_with_rif",
               "negative"
             ]
           },
