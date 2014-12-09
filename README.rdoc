@@ -1,3 +1,5 @@
+{rdoc-image:https://travis-ci.org/instedd/cdp.svg?branch=master}[https://travis-ci.org/instedd/cdp.svg?branch=master]
+
 == README
 
 Reference implementation for the Connected Diagnostics API (http://dxapi.org/)
