@@ -1,27 +1,32 @@
-== README
+[![Build Status](https://travis-ci.org/instedd/cdp.svg?branch=master)](https://travis-ci.org/instedd/cdp)
+
+# README
 
 Reference implementation for the Connected Diagnostics API (http://dxapi.org/)
+
+## Getting Started
 
 To start developing:
 
 1. Clone the repo.
 
 2. Install dependencies:
-
+  ```
     bundle install
-  
+  ```
 3. Setup development database:
-
+  ```
     bundle exec rake db:setup
-  
+  ```
 4. Setup test database:
-
+  ```
     bundle exec rake db:test:prepare
-  
+  ```
 5. Run tests:
-
+  ```
     bundle exec rspec
-  
+  ```
 6. Start development server:
-
+  ```
     bundle exec rails s
+  ```
