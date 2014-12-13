@@ -17,7 +17,7 @@ module EventIndexing
     end
 
     def parsed_fields
-      @parsed_fields ||= (manifest || Manifest.default).apply_to(Oj.load raw_data).with_indifferent_access
+      @parsed_fields ||= (manifest || Manifest.default).apply_to(raw_data).with_indifferent_access
     end
 
     def manifest

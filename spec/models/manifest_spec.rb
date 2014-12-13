@@ -3,14 +3,14 @@ require 'spec_helper'
 describe Manifest do
 
   def assert_manifest_application(mappings_json, data, expected)
-    manifest = Manifest.new(definition: "{\"field_mapping\" : #{mappings_json}}")
-    result = manifest.apply_to(Oj.load(data))
+    manifest = Manifest.new(definition: "{\"metadata\":{\"source_data_type\" : \"json\"},\"field_mapping\" : #{mappings_json}}")
+    result = manifest.apply_to(data)
     result.should eq(expected)
   end
 
   def assert_raises_manifest_data_validation(mappings_json, data, message)
     manifest = Manifest.new(definition: "{\"field_mapping\" : #{mappings_json}}")
-    expect { manifest.apply_to(Oj.load(data)) }.to raise_error
+    expect { manifest.apply_to(data) }.to raise_error
   end
 
   let (:definition) do
@@ -18,7 +18,8 @@ describe Manifest do
       "metadata" : {
         "device_models" : ["foo"],
         "api_version" : "1.0.0",
-        "version" : 1
+        "version" : 1,
+        "source_data_type" : "json"
       },
       "field_mapping" : []
     }}
@@ -38,7 +39,8 @@ describe Manifest do
       "metadata" : {
         "device_models" : ["foo"],
         "api_version" : "1.0.0",
-        "version" : "2.0.1"
+        "version" : "2.0.1",
+        "source_data_type" : "json"
       },
       "field_mapping" : []
     }}
@@ -61,7 +63,8 @@ describe Manifest do
       "metadata" : {
         "device_models" : ["foo"],
         "api_version" : "2.0.0",
-        "version" : 1
+        "version" : 1,
+        "source_data_type" : "json"
       },
       "field_mapping" : []
     }}
@@ -114,7 +117,8 @@ describe Manifest do
       "metadata" : {
         "version" : 1,
         "api_version" : "1.0.0",
-        "device_models" : ["bar"]
+        "device_models" : ["bar"],
+        "source_data_type" : "json"
       },
       "field_mapping" : []
     }}
@@ -131,7 +135,8 @@ describe Manifest do
       "metadata" : {
         "version" : 2,
         "api_version" : "1.0.0",
-        "device_models" : ["foo"]
+        "device_models" : ["foo"],
+        "source_data_type" : "json"
       },
       "field_mapping" : []
     }}
@@ -623,7 +628,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {
@@ -653,7 +659,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {
@@ -682,7 +689,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {
@@ -703,7 +711,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {
@@ -723,7 +732,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {
@@ -744,7 +754,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {
@@ -766,7 +777,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {
@@ -799,7 +811,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {
@@ -822,7 +835,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {
@@ -843,7 +857,8 @@ describe Manifest do
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.0.0",
-        "device_models" : ["GX4001"]
+        "device_models" : ["GX4001"],
+        "source_data_type" : "json"
       },
       "field_mapping" : [
         {

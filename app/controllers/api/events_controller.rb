@@ -14,6 +14,19 @@ class Api::EventsController < ApiController
     end
   end
 
+  def upload
+    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_secret_key(params[:device_id])
+    raw_events = CSVEventParser.new.load_all request.body.read
+    events = raw_events.map do |raw_event|
+      raw_event = CSVEventParser.new.dump raw_event
+      Event.create_or_update_with device, raw_event
+    end
+    events = events.map do |event|
+     {event: event[0].indexed_body, saved: event[1], errors: event[0].errors, index_failure_reason: event[0].index_failure_reason}
+    end
+    render :status => :ok, :json => { events: events}
+  end
+
   def index
     params.delete(:event)
     body = Oj.load(request.body.read) || {}

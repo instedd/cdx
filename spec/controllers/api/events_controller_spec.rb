@@ -109,7 +109,8 @@ describe Api::EventsController do
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "api_version" : "1.0.0"
+          "api_version" : "1.0.0",
+          "source_data_type" : "json"
         },
         "field_mapping" : [{
             "target_field" : "assay_name",
@@ -131,7 +132,8 @@ describe Api::EventsController do
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "api_version" : "1.0.0"
+          "api_version" : "1.0.0",
+          "source_data_type" : "json"
         },
         "field_mapping" : [
           {
@@ -169,7 +171,8 @@ describe Api::EventsController do
       Manifest.create definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
-          "version" : 1
+          "version" : 1,
+          "source_data_type" : "json"
         },
         "field_mapping" : [
           {
@@ -184,7 +187,8 @@ describe Api::EventsController do
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 2,
-          "api_version" : "1.0.0"
+          "api_version" : "1.0.0",
+          "source_data_type" : "json"
         },
         "field_mapping" : [
           {
@@ -208,7 +212,8 @@ describe Api::EventsController do
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 2,
-          "api_version" : "1.0.0"
+          "api_version" : "1.0.0",
+          "source_data_type" : "json"
         },
         "field_mapping" : [
           {
@@ -239,7 +244,8 @@ describe Api::EventsController do
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "api_version": "1",
-          "version" : 1
+          "version" : 1,
+          "source_data_type" : "json"
         },
         "field_mapping" : [{
             "target_field" : "error_code",
@@ -257,6 +263,49 @@ describe Api::EventsController do
 
       response.code.should eq("422")
       Oj.load(response.body)["errors"].should eq("'foo' is not a valid value for 'error_code' (must be an integer)")
+    end
+
+    context "csv" do
+      it 'parses a csv' do
+        manifest = Manifest.make definition: %{
+          {
+            "metadata": {
+              "version": "1",
+              "api_version": "1",
+              "device_models": "#{device.device_model.name}",
+              "source_data_type" : "csv"
+            },
+            "field_mapping" : [{
+                "target_field" : "error_code",
+                "selector" : "error_code",
+                "core" : true,
+                "type" : "integer"
+              },
+              {
+                "target_field" : "result",
+                "selector" : "result",
+                "core" : true,
+                "type" : "enum",
+                "options" : [
+                  "positive",
+                  "negative"
+                ]
+              }
+            ]
+          }
+        }
+        csv = %{error_code,result\n0,positive\n1,negative}
+
+        post :upload, csv, device_id: device.secret_key
+
+        events = all_elasticsearch_events.sort_by { |event| event["_source"]["error_code"] }
+        event = events.first["_source"]
+        event["error_code"].should eq("0")
+        event["result"].should eq("positive")
+        event = events.last["_source"]
+        event["error_code"].should eq("1")
+        event["result"].should eq("negative")
+      end
     end
   end
 
@@ -580,7 +629,8 @@ describe Api::EventsController do
           "metadata" : {
             "device_models" : ["#{device.device_model.name}"],
             "version" : 2,
-            "api_version" : "1.0.0"
+            "api_version" : "1.0.0",
+            "source_data_type" : "json"
           },
           "field_mapping" : [
             {
@@ -630,7 +680,8 @@ describe Api::EventsController do
           "metadata" : {
             "device_models" : ["foo"],
             "api_version" : "1.0.0",
-            "version" : "1.0.1"
+            "version" : "1.0.1",
+            "source_data_type" : "json"
           },
           "field_mapping" : [
             {
@@ -705,7 +756,8 @@ describe Api::EventsController do
           "metadata" : {
             "device_models" : ["foo"],
             "api_version" : "1.0.0",
-            "version" : "1.0.0"
+            "version" : "1.0.0",
+            "source_data_type" : "json"
           },
           "field_mapping" : [
             {
@@ -793,7 +845,8 @@ describe Api::EventsController do
           "metadata" : {
             "device_models" : ["foo"],
             "api_version" : "1.0.0",
-            "version" : "1.0.1"
+            "version" : "1.0.1",
+            "source_data_type" : "json"
           },
           "field_mapping" : [
             {
@@ -814,7 +867,8 @@ describe Api::EventsController do
           "metadata" : {
             "device_models" : ["bar"],
             "api_version" : "1.0.0",
-            "version" : "1.0.1"
+            "version" : "1.0.1",
+            "source_data_type" : "json"
           },
           "field_mapping" : [
             {

@@ -58,6 +58,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def apply_to(data)
+    data = parser.load data
     field_mapping.inject(indexed: Hash.new, pii: Hash.new, custom: Hash.new) do |event, mapping|
       apply_single_mapping(mapping, data, event)
     end
@@ -92,24 +93,17 @@ class Manifest < ActiveRecord::Base
   end
 
   def apply_selector(selector, data)
-    if (targets = selector.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
+    parser.apply_selector(selector, data)
+  end
 
-      paths = targets.first.split Manifest::PATH_SPLIT_TOKEN
-
-      elements_array = paths.inject data do |current, path|
-        current[path] || []
-      end
-      elements_array.map do |element|
-        paths = targets.last.split PATH_SPLIT_TOKEN
-        paths.inject element do |current, path|
-          current[path]
-        end
-      end
+  def parser
+    @parser ||= case metadata["source_data_type"]
+    when "json"
+      JsonEventParser.new
+    when "csv"
+      CSVEventParser.new
     else
-      paths = selector.split PATH_SPLIT_TOKEN
-      paths.inject data do |current, path|
-        current[path] if current.is_a? Hash
-      end
+      raise "unsupported source data type"
     end
   end
 
@@ -213,7 +207,7 @@ class Manifest < ActiveRecord::Base
     end
 
     field_mapping.concat(map(Cdx::Api.searchable_fields).flatten)
-    Oj.dump field_mapping: field_mapping
+    Oj.dump metadata: {source_data_type: "json"}, field_mapping: field_mapping
   end
 
   private

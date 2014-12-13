@@ -18,7 +18,7 @@ gem 'bootstrap-sass', '2.3.2.1'
 
 gem 'instedd-bootstrap', git: "https://bitbucket.org/instedd/instedd-bootstrap.git", branch: 'master'
 gem 'ruby-openid'
-gem 'rack-oauth2', github: "manastech/rack-oauth2", branch: 'master'
+gem 'alto_guisso_rails', github: "instedd/alto_guisso_rails", branch: 'master'
 gem 'alto_guisso', github: "instedd/alto_guisso", branch: 'master'
 gem 'rails_config'
 gem 'rest-client'

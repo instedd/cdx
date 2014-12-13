@@ -4,7 +4,7 @@
     "api_version" : "1.0.0",
     "signature" : "12345",
     "device_models" : ["default"],
-    "source_data_type": "json"
+    "source_data_type": "json" // CSV source must have flat selectors
   },
   "field_mapping" : [
     {

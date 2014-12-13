@@ -23,7 +23,8 @@ describe Subscriber do
         "metadata": {
           "version": "1",
           "api_version": "1",
-          "device_models": "#{model.name}"
+          "device_models": "#{model.name}",
+          "source_data_type" : "json"
         },
         "field_mapping" : [
           {
