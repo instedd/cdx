@@ -14,7 +14,7 @@ class Device < ActiveRecord::Base
 
   before_create :set_key
 
-  has_many :device_ssh_keys
+  has_many :ssh_keys, class_name: 'DeviceSshKey'
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions

@@ -44,6 +44,7 @@ Cdp::Application.routes.draw do
           post :upload
         end
       end
+      resources :ssh_keys, only: [:create, :destroy]
     end
     resources :laboratories, only: :index
   end
