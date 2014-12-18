@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+APP_PATH = File.expand_path('../../config/application',  __FILE__)
+require_relative '../config/boot'
+require_relative '../config/environment'
+
+sleep_time = (ARGV[0] || 5).to_i.seconds
+
+loop do
+  CSVEventParser.new.import_from Settings.import_directory
+  sleep sleep_time
+end

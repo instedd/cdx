@@ -107,11 +107,11 @@ describe Api::EventsController do
           "source_data_type" : "json"
         },
         "field_mapping" : [{
-            "target_field" : "assay_name",
-            "selector" : "assay.name",
-            "type" : "string",
-            "core" : true
-          }]
+          "target_field" : "assay_name",
+          "selector" : "assay.name",
+          "type" : "string",
+          "core" : true
+        }]
       }}
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
 
