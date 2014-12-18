@@ -14,6 +14,8 @@ class Device < ActiveRecord::Base
 
   before_create :set_key
 
+  has_many :device_ssh_keys
+
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
       joins(:institution).where(institutions: {user_id: user.id})
