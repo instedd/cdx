@@ -38,4 +38,14 @@ class CSVEventParser
      {event: event[0].indexed_body, saved: event[1], errors: event[0].errors, index_failure_reason: event[0].index_failure_reason}
     end
   end
+
+  def import_from path
+    Dir.glob(File.join(path, "*.csv")).each do |file_name|
+      File.open(file_name) do |file|
+        # File name follows the pattern: "device_key-yyyymmddhhmmss.csv"
+        load_for_device file, file_name.split("/").last[0..-("-yyyymmddhhmmss.csv".length + 1)]
+      end
+      File.delete(file_name)
+    end
+  end
 end

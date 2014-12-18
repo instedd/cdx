@@ -19,12 +19,6 @@ describe Api::EventsController do
     Oj.load(response.body)["events"]
   end
 
-  def fresh_client_for index_name
-    client = Cdx::Api.client
-    client.indices.refresh index: index_name
-    client
-  end
-
   context "Creation" do
     it "should create event in the database" do
       response = post :create, data, device_id: device.secret_key
