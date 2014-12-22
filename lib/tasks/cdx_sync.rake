@@ -1,6 +1,6 @@
 namespace :demo do
 
-  desc "Add documents in inbox"
+  desc "Start a watcher for loading all csv files on the sync folder"
 
   task :watch_files do
     sync_dir = CDXSync::SyncDirectory.new
@@ -9,9 +9,7 @@ namespace :demo do
     watcher = CDXSync::FileWatcher.new(sync_dir)
 
     watcher.watch do |path|
-      contents = File.read path
-      # process file here
-      File.delete path
+      CSVEventParser.new.import_from sync_dir
     end
   end
 

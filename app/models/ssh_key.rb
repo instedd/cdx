@@ -12,27 +12,16 @@ class SshKey < ActiveRecord::Base
   end
 
   def to_client
-    CDXSync::Client.new("device-#{device_id}", public_key)
+    CDXSync::Client.new(device.secret_key, public_key)
   end
-
 
   class << self
     def regenerate_authorized_keys!
-      authorized_keys.write! clients, sync_dir
+      CDXSync::AuthorizedKeys.new.write! clients, CDXSync::SyncDirectory.new
     end
 
     def clients
       all.map(&:to_client)
-    end
-
-    private
-
-    def authorized_keys
-      CDXSync::AuthorizedKeys.new
-    end
-
-    def sync_dir
-      CDXSync::SyncDirectory.new
     end
   end
 
