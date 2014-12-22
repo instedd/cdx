@@ -36,6 +36,6 @@ Cdp::Application.configure do
 
   config.action_mailer.default_url_options = { host: Settings.host }
 
-  config.authorized_keys_path = 'tmp/authorized_keys'
-  config.sync_dir_path = 'tmp/sync'
+  config.authorized_keys_path = Rails.root.join('tmp/authorized_keys')
+  config.sync_dir_path = Rails.root.join('tmp/sync')
 end
