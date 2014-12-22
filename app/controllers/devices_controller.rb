@@ -25,6 +25,8 @@ class DevicesController < ApplicationController
 
   def new
     @device = @institution.devices.new
+    @device.ssh_keys << SshKey.new
+
     return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
   end
 
@@ -47,6 +49,7 @@ class DevicesController < ApplicationController
 
   def edit
     @device = @institution.devices.find params[:id]
+    @device.ssh_keys << SshKey.new
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     # TODO: check valid laboratories
@@ -114,6 +117,7 @@ class DevicesController < ApplicationController
   end
 
   def device_params
-    params.require(:device).permit(:name, :device_model_id, laboratory_ids: [])
+    params.require(:device).permit(:name, :device_model_id, laboratory_ids: [],
+                                   ssh_keys_attributes: [:id, :public_key, :_destroy])
   end
 end

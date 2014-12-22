@@ -19,5 +19,14 @@
     = f.label :laboratories
     .checks
       = f.collection_check_boxes(:laboratory_ids, @laboratories, :id, :name) { |b| b.label { b.check_box + b.text } + "<br/>".html_safe }
+  %div
+    = f.label :ssh_keys
+    %ul
+      = f.fields_for :ssh_keys do |keys_f|
+        %li
+          = keys_f.label :destroy?
+          = keys_f.check_box :_destroy
+          = keys_f.label :public_key, 'Public Key'
+          = keys_f.text_field :public_key
 
   = f.submit class: 'btn'

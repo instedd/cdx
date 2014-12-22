@@ -3,6 +3,18 @@ class SshKey < ActiveRecord::Base
   belongs_to :device
 
   validates_presence_of :public_key
+  validate :validate_public_key
+
+  def validate_public_key
+    to_client.validate! unless public_key.blank?
+  rescue
+    errors.add(:public_key, "Key #{public_key.truncate(10)} is invalid")
+  end
+
+  def to_client
+    CDXSync::Client.new("device-#{device_id}", public_key)
+  end
+
 
   class << self
     def regenerate_authorized_keys!
@@ -10,7 +22,7 @@ class SshKey < ActiveRecord::Base
     end
 
     def clients
-      all.map { |key| CDXSync::Client.new("device-#{key.device_id}", key.public_key) }
+      all.map(&:to_client)
     end
 
     private

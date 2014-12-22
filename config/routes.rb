@@ -11,6 +11,7 @@ Cdp::Application.routes.draw do
       member do
         get 'regenerate_key'
       end
+      resources :ssh_keys, only: [:create, :destroy]
     end
   end
 
@@ -44,7 +45,7 @@ Cdp::Application.routes.draw do
           post :upload
         end
       end
-      resources :ssh_keys, only: [:create, :destroy]
+      resources :events, only: :create, shallow: true
     end
     resources :laboratories, only: :index
   end
