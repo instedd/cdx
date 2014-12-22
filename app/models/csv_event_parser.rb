@@ -28,7 +28,7 @@ class CSVEventParser
   end
 
   def load_for_device(data, device_key)
-    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_secret_key(device_key)
+    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by!(secret_key: device_key)
     raw_events = load_all data
     events = raw_events.map do |raw_event|
       raw_event = dump raw_event
@@ -40,9 +40,9 @@ class CSVEventParser
   end
 
   def import_from(sync_dir)
-    sync_dir.each_inbox_file('*.csv') do |client_id, filename|
-      File.open(filename) { |file| load_for_device file, client_id }
-      File.delete(file_name)
+    sync_dir.each_inbox_file('*.csv') do |secret_key, filename|
+      File.open(filename) { |file| load_for_device file, secret_key }
+      File.delete(filename)
     end
   end
 end

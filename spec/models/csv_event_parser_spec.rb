@@ -4,8 +4,15 @@ describe CSVEventParser do
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
   let(:device) {Device.make institution_id: institution.id}
+  let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
+
+  before do
+    sync_dir.init_sync_path!
+    sync_dir.init_client_sync_paths! device.secret_key
+  end
+
   before(:each) do
-    File.open(Rails.root.join("spec", "support", "#{device.secret_key}-#{DateTime.now.strftime('%Y%m%d%H%M%S')}.csv"), "w") do |io|
+    File.open(File.join(sync_dir.inbox_path(device.secret_key), "#{DateTime.now.strftime('%Y%m%d%H%M%S')}.csv"), "w") do |io|
       io << %{error_code,result\n0,positive\n1,negative}
     end
   end
@@ -41,7 +48,7 @@ describe CSVEventParser do
       }
     }
 
-    CSVEventParser.new.import_from Rails.root.join("spec", "support")
+    CSVEventParser.new.import_from sync_dir
 
     events = all_elasticsearch_events.sort_by { |event| event["_source"]["error_code"] }
     event = events.first["_source"]
