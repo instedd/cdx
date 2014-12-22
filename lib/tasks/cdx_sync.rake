@@ -3,11 +3,15 @@ namespace :demo do
   desc "Add documents in inbox"
 
   task :watch_files do
-    watcher = CDXSync::FileWatcher.new(sync_directory: 'tmp/cdxsync')
-    watcher.ensure_sync_directory
+    sync_dir = CDXSync::SyncDirectory.new
+    sync_dir.init_sync_path!
+
+    watcher = CDXSync::FileWatcher.new(sync_dir)
+
     watcher.watch do |path|
       contents = File.read path
-      ## TODO hit cdx server here
+      # process file here
+      File.delete path
     end
   end
 

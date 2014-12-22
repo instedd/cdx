@@ -28,4 +28,7 @@ Cdp::Application.configure do
   config.assets.debug = false
 
   config.action_mailer.default_url_options = { host: Settings.host }
+
+  config.authorized_keys_path = 'tmp/authorized_keys'
+  config.sync_dir_path = 'tmp/sync'
 end

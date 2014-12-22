@@ -79,4 +79,9 @@ Cdp::Application.configure do
   config.log_formatter = ::Logger::Formatter.new
 
   config.action_mailer.default_url_options = { host: Settings.host }
+
+  #Must be set
+  #config.authorized_keys_path =
+  #config.sync_dir_path =
+
 end
