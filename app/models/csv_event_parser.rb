@@ -1,9 +1,9 @@
 class CSVEventParser
-  def apply_selector(selector, data)
-    if (selector.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1 || selector.split(Manifest::PATH_SPLIT_TOKEN).size > 1
-      raise "selector nesting is unsupported for CSV Events"
+  def parse(path, data)
+    if (path.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1 || path.split(Manifest::PATH_SPLIT_TOKEN).size > 1
+      raise "path nesting is unsupported for CSV Events"
     else
-      data[selector]
+      data[path]
     end
   end
 

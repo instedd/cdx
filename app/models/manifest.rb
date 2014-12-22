@@ -54,46 +54,18 @@ class Manifest < ActiveRecord::Base
   end
 
   def loaded_definition
-    Oj.load(self.definition)
+    @loaded_definition ||= Oj.load(self.definition)
   end
 
   def apply_to(data)
     data = parser.load data
-    field_mapping.inject(indexed: Hash.new, pii: Hash.new, custom: Hash.new) do |event, mapping|
-      apply_single_mapping(mapping, data, event)
+    field_mapping.inject(indexed: Hash.new, pii: Hash.new, custom: Hash.new) do |event, field|
+      ManifestField.new(self, field).apply_to data, event
     end
   end
 
   def field_mapping
     loaded_definition.with_indifferent_access["field_mapping"]
-  end
-
-  def apply_single_mapping(mapping, data, event)
-    target_field = mapping["target_field"]
-    selector = mapping["selector"]
-    value = apply_selector(selector, data)
-    value = apply_value_mappings(value, target_field, mapping["value_mappings"])
-    check_valid_value(value, mapping, target_field, mapping["valid_values"])
-    key = hash_key(target_field, mapping["core"], mapping["indexed"], mapping["pii"])
-
-    if (targets = target_field.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
-      # find the array or create it. Only one level for now
-      target_array = event[key][targets.first] ||= Array.new
-      # merge the new values
-      if value.present?
-        Array(value).each_with_index do |value, index|
-          (target_array[index] ||= Hash.new)[targets[-1]] = value
-        end
-      end
-    else
-      event[key][target_field] = value
-    end
-
-    event
-  end
-
-  def apply_selector(selector, data)
-    parser.apply_selector(selector, data)
   end
 
   def parser
@@ -107,98 +79,11 @@ class Manifest < ActiveRecord::Base
     end
   end
 
-  def hash_key(target_field, core, indexed, pii)
-    if core
-      return :pii if Event.pii?(target_field)
-      :indexed
-    else
-      return :pii if pii
-      return :indexed if indexed
-      :custom
-    end
-  end
-
-  def check_valid_value(value, mapping, target_field, valid_values)
-    return unless value.present?
-
-    if mapping['type'] == 'integer' and !value.is_a? Integer
-      if value.to_i.to_s != value
-        raise ManifestParsingError.invalid_value_for_integer value, target_field
-      end
-    end
-
-    verify_value_is_not_null_string value, mapping
-
-    return value if (valid_values ==  nil && mapping["options"] == nil)
-
-    if value.is_a? Array
-      value.each do |v|
-        check_valid_value v, mapping, target_field, valid_values
-      end
-    else
-      if options = mapping["options"]
-        check_value_in_options(value, target_field, options)
-      end
-
-      if valid_values && range = valid_values["range"]
-        check_value_in_range(value, target_field, range)
-      end
-
-      if valid_values && date = valid_values["date"]
-        check_value_is_date(value, target_field, date)
-      end
-    end
-  end
-
-  def verify_value_is_not_null_string value, mapping
-    if value == NULL_STRING
-      raise ManifestParsingError.new "String 'null' is not permitted as value, in field '#{invalid_field(mapping)}'"
-    end
-  end
-
-  def check_value_in_options(value, target_field, options)
-    unless options.include? value
-      raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (valid options are: #{options.join ", "})"
-    end
-  end
-
-  def check_value_in_range(value, target_field, range)
-    min = range["min"]
-    max = range["max"]
-
-    unless min <= value and value <= max
-      raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (valid values must be between #{min} and #{max})"
-    end
-  end
-
-  def check_value_is_date(value, target_field, date_format)
-    case date_format
-    when "iso"
-      Time.parse(value) rescue raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (valid value must be an iso date)"
-    else
-      raise ManifestParsingError.new "Date format not implemented"
-    end
-  end
-
-  def apply_value_mappings(value, target_field, mappings)
-    return value unless (mappings && value)
-
-    matched_mapping = mappings.keys.detect do |mapping|
-      value.match mapping.gsub("*", ".*")
-    end
-
-    if matched_mapping
-      mappings[matched_mapping]
-    else
-      raise ManifestParsingError.new "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{mappings.keys.join ", "})"
-    end
-  end
-
   def self.default_definition
     field_mapping = Event.sensitive_fields.map do |sensitive_field|
       {
         target_field: sensitive_field,
-        selector: sensitive_field,
+        source: {path: sensitive_field},
         core: true,
         type: 'string',
         pii: true,
@@ -212,15 +97,15 @@ class Manifest < ActiveRecord::Base
 
   private
 
-  def self.map fields, selector_prefix=""
+  def self.map fields, source_prefix=""
     fields.map do |field_definition|
-      field = selector_prefix + field_definition[:name]
+      field = source_prefix + field_definition[:name]
       if field_definition[:type] == "nested"
-        map field_definition[:sub_fields], "#{selector_prefix}#{field_definition[:name]}[*]."
+        map field_definition[:sub_fields], "#{source_prefix}#{field_definition[:name]}[*]."
       else
         {
           target_field: field,
-          selector: field,
+          source: {path: field},
           type: field_definition[:type],
           core: true,
           pii: false,
@@ -258,7 +143,7 @@ class Manifest < ActiveRecord::Base
     definition = Oj.load self.definition
     if definition["field_mapping"].is_a? Array
       definition["field_mapping"].each do |fm|
-        check_presence_of_target_field_and_selector fm
+        check_presence_of_target_field_and_source fm
         check_presence_of_core_field fm
         check_valid_type fm
         check_properties_of_enum_field fm
@@ -272,6 +157,7 @@ class Manifest < ActiveRecord::Base
     if field_mapping["type"] == "enum"
       if (field_mapping["options"])
         verify_absence_of_null_string field_mapping
+        # TODO: validate source mappings
         if (field_mapping["value_mappings"])
           check_value_mappings field_mapping
         end
@@ -288,9 +174,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def invalid_field field_mapping
-    invalid_field = field_mapping["target_field"]
-    invalid_field ||= field_mapping["selector"]
-    invalid_field
+    field_mapping["target_field"] || (field_mapping["source"] && field_mapping["source"]["path"])
   end
 
   def check_presence_of_core_field field_mapping
@@ -299,9 +183,9 @@ class Manifest < ActiveRecord::Base
     end
   end
 
-  def check_presence_of_target_field_and_selector field_mapping
-    if (field_mapping["target_field"].blank? || field_mapping["selector"].blank?)
-      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field(field_mapping)}'. Mapping must include target_field and selector")
+  def check_presence_of_target_field_and_source field_mapping
+    if (field_mapping["target_field"].blank? || field_mapping["source"].blank?)
+      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field(field_mapping)}'. Mapping must include target_field and source")
     end
   end
 

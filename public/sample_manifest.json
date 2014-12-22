@@ -54,12 +54,10 @@
       "selector" : "assay_name",
       "type" : "enum",
       "core" : true,
-      "valid_values": {
-        "options" : [
-          "cartridge_1",
-          "cartridge_2"
-        ]
-      }
+      "options" : [
+        "cartridge_1",
+        "cartridge_2"
+      ]
     },
     {
       "target_field" : "system_user",
@@ -75,14 +73,12 @@
       "type" : "enum",
       "core" : true,
       "indexed" : true,
-      "valid_values": {
-        "options" : [
-          "flu_a",
-          "flu_b",
-          "h1n1",
-          "mtb"
-        ]
-      }
+      "options" : [
+        "flu_a",
+        "flu_b",
+        "h1n1",
+        "mtb"
+      ]
     },
     {
       "target_field" : "results[*].result",
@@ -90,25 +86,23 @@
       "type" : "enum",
       "core" : true,
       "indexed" : true,
-      "valid_values": {
-        "options" : {
-          "when" : [
-            {
-              "property" : "condition",
-              "value" : "mtb",
-              "options" : [
-                "positive",
-                "positive_with_rif",
-                "negative"
-              ]
-            },
-          ],
-          "else" : {
+      "options" : {
+        "when" : [
+          {
+            "property" : "condition",
+            "value" : "mtb",
             "options" : [
               "positive",
+              "positive_with_rif",
               "negative"
             ]
-          }
+          },
+        ],
+        "else" : {
+          "options" : [
+            "positive",
+            "negative"
+          ]
         }
       }
     },

@@ -9,15 +9,15 @@ describe EventsSchema do
     definition = %{{
       "field_mapping" : [
         {
-          "target_field": "start_time",
-          "selector" : "start_time",
+          "target_field" : "start_time",
+          "source" : {"path" : "start_time"},
           "core" : true,
           "indexed" : true,
           "type" : "date"
         },
         {
           "target_field" : "results[*].result",
-          "selector" : "result",
+          "source" : {"path" : "result"},
           "type" : "enum",
           "core" : true,
           "indexed" : true,
@@ -28,16 +28,16 @@ describe EventsSchema do
           ]
         },
         {
-          "target_field": "patient_name",
-          "selector" : "patient_information.name",
+          "target_field" : "patient_name",
+          "source" : {"path" : "patient_information.name"},
           "core" : true,
           "indexed" : true,
           "type" : "string"
         },
         {
-          "target_field": "age",
-          "selector": "age",
-          "type": "integer",
+          "target_field" : "age",
+          "source" : {"path" : "age"},
+          "type" : "integer",
           "indexed" : "true",
           "core" : true,
           "valid_values" : {
@@ -97,8 +97,8 @@ describe EventsSchema do
     definition = %{{
       "field_mapping" :[
         {
-          "target_field": "patient_location",
-          "selector" : "patient_location",
+          "target_field" : "patient_location",
+          "source" : {"path" : "patient_location"},
           "core" : true,
           "indexed" : true,
           "type" : "location"
@@ -136,8 +136,8 @@ describe EventsSchema do
       },
       "field_mapping" : [
         {
-          "target_field": "assay_name",
-          "selector" : "assay_name",
+          "target_field" : "assay_name",
+          "source" : {"path" : "assay_name"},
           "core" : true,
           "indexed" : true,
           "type" : "enum",
@@ -157,8 +157,8 @@ describe EventsSchema do
       },
       "field_mapping" : [
         {
-          "target_field": "assay_name",
-          "selector" : "assay_name",
+          "target_field" : "assay_name",
+          "source" : {"path" : "assay_name"},
           "core" : true,
           "indexed" : true,
           "type" : "enum",

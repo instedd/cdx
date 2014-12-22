@@ -14,7 +14,7 @@ describe Event do
         },
         "field_mapping" : [{
             "target_field" : "error_code",
-            "selector" : "error_code",
+            "source" : {"path": "error_code"},
             "core" : true,
             "type" : "integer"
         }]
@@ -41,7 +41,7 @@ describe Event do
         },
         "field_mapping" : [{
             "target_field" : "results[*].result",
-            "selector" : "result",
+            "source" : {"path": "result"},
             "core" : true,
             "type" : "enum",
             "options" : ["positive","negative"]
@@ -69,19 +69,16 @@ describe Event do
         },
         "field_mapping" : [{
             "target_field" : "error_code",
-            "selector" : "error_code",
+            "source" : {"path": "error_code"},
             "core" : true,
             "type" : "integer"
           },
           {
             "target_field" : "result",
-            "selector" : "result",
+            "source" : {"path": "result"},
             "core" : true,
             "type" : "enum",
-            "options" : [
-              "positive",
-              "negative"
-            ]
+            "options" : [ "positive", "negative" ]
           }
         ]
       }

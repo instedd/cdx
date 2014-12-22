@@ -1,6 +1,6 @@
 class JsonEventParser
-  def apply_selector(selector, data)
-    if (targets = selector.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
+  def parse(path, data)
+    if (targets = path.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
 
       paths = targets.first.split Manifest::PATH_SPLIT_TOKEN
 
@@ -14,7 +14,7 @@ class JsonEventParser
         end
       end
     else
-      paths = selector.split Manifest::PATH_SPLIT_TOKEN
+      paths = path.split Manifest::PATH_SPLIT_TOKEN
       paths.inject data do |current, path|
         current[path] if current.is_a? Hash
       end

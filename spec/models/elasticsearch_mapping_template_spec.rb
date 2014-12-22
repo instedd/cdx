@@ -11,7 +11,7 @@ describe ElasticsearchMappingTemplate do
       "field_mapping" : [
         {
           "target_field" : "temperature",
-          "selector" : "Test.temp",
+          "source" : {"path" : "Test.temp"},
           "core" : false,
           "type" : "integer",
           "pii" : false,
@@ -25,7 +25,7 @@ describe ElasticsearchMappingTemplate do
         },
         {
           "target_field" : "results[*].temperature",
-          "selector" : "Test.temp",
+          "source" : {"path" : "Test.temp"},
           "type" : "integer",
           "core" : false,
           "pii" : false,

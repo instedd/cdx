@@ -108,7 +108,7 @@ describe Api::EventsController do
         },
         "field_mapping" : [{
           "target_field" : "assay_name",
-          "selector" : "assay.name",
+          "source" : {"path" : "assay.name"},
           "type" : "string",
           "core" : true
         }]
@@ -131,17 +131,17 @@ describe Api::EventsController do
         },
         "field_mapping" : [
           {
-            "target_field": "assay_name",
-            "selector" : "assay.name",
+            "target_field" : "assay_name",
+            "source" : {"path" : "assay.name"},
             "type" : "string",
             "core" : true
           },
           {
-            "target_field": "foo",
-            "selector" : "patient_id",
+            "target_field" : "foo",
+            "source" : {"path" : "patient_id"},
             "type" : "integer",
             "core" : false,
-            "pii": true
+            "pii" : true
           }
         ]
       }}
@@ -170,8 +170,8 @@ describe Api::EventsController do
         },
         "field_mapping" : [
           {
-            "target_field": "foo",
-            "selector" : "assay.name",
+            "target_field" : "foo",
+            "source" : {"path" : "assay.name"},
             "core" : true
           }
         ]
@@ -186,8 +186,8 @@ describe Api::EventsController do
         },
         "field_mapping" : [
           {
-            "target_field": "assay_name",
-            "selector" : "assay.name",
+            "target_field" : "assay_name",
+            "source" : {"path" : "assay.name"},
             "type" : "string",
             "core" : true
           }
@@ -211,12 +211,12 @@ describe Api::EventsController do
         },
         "field_mapping" : [
           {
-            "target_field": "foo",
-            "selector" : "some_field",
+            "target_field" : "foo",
+            "source" : {"path" : "some_field"},
             "type" : "string",
             "core" : false,
-            "pii": false,
-            "indexed": false
+            "pii" : false,
+            "indexed" : false
           }
         ]
       }}
@@ -237,13 +237,13 @@ describe Api::EventsController do
       Manifest.create definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
-          "api_version": "1",
+          "api_version" : "1",
           "version" : 1,
           "source_data_type" : "json"
         },
         "field_mapping" : [{
             "target_field" : "error_code",
-            "selector" : "error_code",
+            "source" : {"path" : "error_code"},
             "core" : true,
             "type" : "integer"
           }]
@@ -263,21 +263,21 @@ describe Api::EventsController do
       it 'parses a csv' do
         manifest = Manifest.make definition: %{
           {
-            "metadata": {
-              "version": "1",
-              "api_version": "1",
-              "device_models": "#{device.device_model.name}",
+            "metadata" : {
+              "version" : "1",
+              "api_version" : "1",
+              "device_models" : "#{device.device_model.name}",
               "source_data_type" : "csv"
             },
             "field_mapping" : [{
                 "target_field" : "error_code",
-                "selector" : "error_code",
+                "source" : {"path" : "error_code"},
                 "core" : true,
                 "type" : "integer"
               },
               {
                 "target_field" : "result",
-                "selector" : "result",
+                "source" : {"path" : "result"},
                 "core" : true,
                 "type" : "enum",
                 "options" : [
@@ -628,12 +628,12 @@ describe Api::EventsController do
           },
           "field_mapping" : [
             {
-              "target_field": "foo",
-              "selector" : "some_field",
+              "target_field" : "foo",
+              "source" : {"path" : "some_field"},
               "type" : "string",
               "core" : false,
-              "pii": false,
-              "indexed": false
+              "pii" : false,
+              "indexed" : false
             }
           ]
         }}
@@ -679,8 +679,8 @@ describe Api::EventsController do
           },
           "field_mapping" : [
             {
-              "target_field": "assay_name",
-              "selector" : "assay_name",
+              "target_field" : "assay_name",
+              "source" : {"path" : "assay_name"},
               "core" : true,
               "indexed" : true,
               "type" : "enum",
@@ -690,15 +690,15 @@ describe Api::EventsController do
               ]
             },
             {
-              "target_field": "start_time",
-              "selector" : "start_time",
+              "target_field" : "start_time",
+              "source" : {"path" : "start_time"},
               "core" : true,
               "indexed" : true,
               "type" : "date"
             },
             {
               "target_field" : "results[*].result",
-              "selector" : "result",
+              "source" : {"path" : "result"},
               "type" : "enum",
               "core" : true,
               "indexed" : true,
@@ -709,16 +709,16 @@ describe Api::EventsController do
               ]
             },
             {
-              "target_field": "patient_name",
-              "selector" : "patient_information.name",
+              "target_field" : "patient_name",
+              "source" : {"path" : "patient_information.name"},
               "core" : true,
               "indexed" : true,
               "type" : "string"
             },
             {
-              "target_field": "age",
-              "selector": "age",
-              "type": "integer",
+              "target_field" : "age",
+              "source" : {"path" : "age"},
+              "type" : "integer",
               "indexed" : "true",
               "core" : true,
               "valid_values" : {
@@ -729,15 +729,15 @@ describe Api::EventsController do
               }
             },
             {
-              "target_field": "location",
-              "selector" : "location",
+              "target_field" : "location",
+              "source" : {"path" : "location"},
               "core" : true,
               "indexed" : true,
               "type" : "location"
             },
             {
-              "target_field": "patient_location",
-              "selector" : "patient_location",
+              "target_field" : "patient_location",
+              "source" : {"path" : "patient_location"},
               "core" : false,
               "indexed" : true,
               "type" : "location"
@@ -755,8 +755,8 @@ describe Api::EventsController do
           },
           "field_mapping" : [
             {
-              "target_field": "assay_name",
-              "selector" : "assay_name",
+              "target_field" : "assay_name",
+              "source" : {"path" : "assay_name"},
               "core" : true,
               "indexed" : true,
               "type" : "enum",
@@ -844,8 +844,8 @@ describe Api::EventsController do
           },
           "field_mapping" : [
             {
-              "target_field": "assay_name",
-              "selector" : "assay_name",
+              "target_field" : "assay_name",
+              "source" : {"path" : "assay_name"},
               "core" : true,
               "indexed" : true,
               "type" : "enum",
@@ -866,8 +866,8 @@ describe Api::EventsController do
           },
           "field_mapping" : [
             {
-              "target_field": "assay_name",
-              "selector" : "assay_name",
+              "target_field" : "assay_name",
+              "source" : {"path" : "assay_name"},
               "core" : true,
               "indexed" : true,
               "type" : "enum",

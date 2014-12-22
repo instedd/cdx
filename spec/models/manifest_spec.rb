@@ -157,7 +157,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "assay_name",
-          "selector" : "assay.name",
+          "source" : {"path" : "assay.name"},
           "core" : true
         }]
       },
@@ -169,7 +169,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "patient_name",
-          "selector" : "patient.name",
+          "source" : {"path" : "patient.name"},
           "core" : true
         }]
       },
@@ -181,7 +181,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "temperature",
-          "selector" : "temperature",
+          "source" : {"path" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : false
@@ -195,7 +195,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "temperature",
-          "selector" : "temperature",
+          "source" : {"path" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -209,7 +209,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "temperature",
-          "selector" : "temperature",
+          "source" : {"path" : "temperature"},
           "core" : false,
           "pii" : true,
           "indexed" : false
@@ -223,13 +223,11 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "level",
-          "selector" : "level",
+          "source" : {"path" : "level"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
-          "valid_values" : {
-            "options" : ["low", "medium", "high"]
-          }
+          "options" : ["low", "medium", "high"]
         }]
       },
       '{"level" : "high"}',
@@ -241,7 +239,7 @@ describe Manifest do
         [{
           "target_field" : "level",
           "type" : "enum",
-          "selector" : "level",
+          "source" : {"path" : "level"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -256,7 +254,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "temperature",
-          "selector" : "temperature",
+          "source" : {"path" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -276,7 +274,7 @@ describe Manifest do
     assert_raises_manifest_data_validation %{
         [{
           "target_field" : "temperature",
-          "selector" : "temperature",
+          "source" : {"path" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -296,7 +294,7 @@ describe Manifest do
     assert_raises_manifest_data_validation %{
         [{
           "target_field" : "temperature",
-          "selector" : "temperature",
+          "source" : {"path" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -316,7 +314,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "sample_date",
-          "selector" : "sample_date",
+          "source" : {"path" : "sample_date"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -333,7 +331,7 @@ describe Manifest do
     assert_raises_manifest_data_validation %{
         [{
           "target_field" : "sample_date",
-          "selector" : "sample_date",
+          "source" : {"path" : "sample_date"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -350,15 +348,19 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "condition",
-          "selector" : "condition",
+          "source" : {
+            "mapping" : [
+              {"path" : "condition"},
+              [
+                { "match" : "*MTB*", "output" : "MTB"},
+                { "match" : "*FLU*", "output" : "H1N1"},
+                { "match" : "*FLUA*", "output" : "A1N1"}
+              ]
+            ]
+          },
           "core" : false,
           "pii" : false,
-          "indexed" : true,
-          "value_mappings" : {
-            "*MTB*" : "MTB",
-            "*FLU*" : "H1N1",
-            "*FLUA*" : "A1N1"
-          }
+          "indexed" : true
         }]
       },
       '{"condition" : "PATIENT HAS MTB CONDITION"}',
@@ -369,15 +371,19 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "condition",
-          "selector" : "condition",
+          "source" : {
+            "mapping" : [
+              {"path" : "condition"},
+              [
+                { "match" : "*MTB*", "output" : "MTB"},
+                { "match" : "*FLU*", "output" : "H1N1"},
+                { "match" : "*FLUA*", "output" : "A1N1"}
+              ]
+            ]
+          },
           "core" : false,
           "pii" : false,
-          "indexed" : true,
-          "value_mappings" : {
-            "*MTB*" : "MTB",
-            "*FLU*" : "H1N1",
-            "*FLUA*" : "A1N1"
-          }
+          "indexed" : true
         }]
       },
       '{"condition" : "PATIENT HAS FLU CONDITION"}',
@@ -388,15 +394,19 @@ describe Manifest do
     assert_raises_manifest_data_validation %{
         [{
           "target_field" : "condition",
-          "selector" : "condition",
+          "source" : {
+            "mapping" : [
+              {"path" : "condition"},
+              [
+                { "match" : "*MTB*", "output" : "MTB"},
+                { "match" : "*FLU*", "output" : "H1N1"},
+                { "match" : "*FLUA*", "output" : "A1N1"}
+              ]
+            ]
+          },
           "core" : false,
           "pii" : false,
-          "indexed" : true,
-          "value_mappings" : {
-            "*MTB*" : "MTB",
-            "*FLU*" : "H1N1",
-            "*FLUA*" : "A1N1"
-          }
+          "indexed" : true
         }]
       },
       '{"condition" : "PATIENT IS OK"}',
@@ -407,7 +417,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "list[*].temperature",
-          "selector" : "temperature_list[*].temperature",
+          "source" : {"path" : "temperature_list[*].temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -421,15 +431,19 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "results[*].condition",
-          "selector" : "conditions[*].condition",
+          "source" : {
+            "mapping" : [
+              {"path" : "conditions[*].condition"},
+              [
+                { "match" : "*MTB*", "output" : "MTB"},
+                { "match" : "*FLU*", "output" : "H1N1"},
+                { "match" : "*FLUA*", "output" : "A1N1"}
+              ]
+            ]
+          },
           "core" : false,
           "pii" : false,
-          "indexed" : true,
-          "value_mappings" : {
-            "*MTB*" : "MTB",
-            "*FLU*" : "H1N1",
-            "*FLUA*" : "A1N1"
-          }
+          "indexed" : true
         }]
       },
       '{"conditions" : [{"condition" : "PATIENT HAS MTB CONDITION"}, {"condition" : "PATIENT HAS FLU CONDITION"}]}',
@@ -440,14 +454,14 @@ describe Manifest do
     assert_manifest_application %{[
         {
           "target_field" : "collection[*].temperature",
-          "selector" : "some_list[*].temperature",
+          "source" : {"path" : "some_list[*].temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
         },
         {
           "target_field" : "collection[*].foo",
-          "selector" : "some_list[*].bar",
+          "source" : {"path" : "some_list[*].bar"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -480,14 +494,14 @@ describe Manifest do
     assert_manifest_application %{[
         {
           "target_field" : "collection[*].temperature",
-          "selector" : "temperature_list[*].temperature",
+          "source" : {"path" : "temperature_list[*].temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
         },
         {
           "target_field" : "collection[*].foo",
-          "selector" : "other_list[*].bar",
+          "source" : {"path" : "other_list[*].bar"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -515,7 +529,7 @@ describe Manifest do
     assert_manifest_application %{[
         {
           "target_field" : "collection[*].temperature",
-          "selector" : "temperature",
+          "source" : {"path" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -623,7 +637,7 @@ describe Manifest do
     m.errors[:field_mapping].first.should eq("must be an array")
   end
 
-  it "shouldn't create if a core field is provided with an invalid value mapping" do
+  pending "shouldn't create if a core field is provided with an invalid value mapping" do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
@@ -634,17 +648,18 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "test_type",
-          "selector" : "Test.test_type",
+          "source" : {
+            "mapping" : [
+              {"path" : "Test.test_type"},
+              [
+                { "match" : "*QC*", "output" : "Invalid mapping"},
+                { "match" : "*Specimen*", "output" : "specimen"}
+              ]
+            ]
+          },
           "type" : "enum",
           "core" : true,
-          "options" : [
-              "qc",
-              "specimen"
-          ],
-          "value_mappings" : {
-            "*QC*" : "Invalid mapping",
-            "*Specimen*" : "specimen"
-          }
+          "options" : [ "qc", "specimen" ]
         }
       ]
     }}
@@ -665,17 +680,18 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "test_type",
-          "selector" : "Test.test_type",
+          "source" : {
+            "mapping" : [
+              {"path" : "Test.test_type"},
+              [
+                { "match" : "*QC*", "output" : "qc"},
+                { "match" : "*Specimen*", "output" : "specimen"}
+              ]
+            ]
+          },
           "core" : true,
           "type" : "enum",
-          "options" : [
-            "qc",
-            "specimen"
-          ],
-          "value_mappings" : {
-            "*QC*" : "qc",
-            "*Specimen*" : "specimen"
-          }
+          "options" : ["qc", "specimen"]
         }
       ]
     }}
@@ -684,7 +700,7 @@ describe Manifest do
     Manifest.count.should eq(1)
   end
 
-  it "shouldn't create if a core field is provided without selector" do
+  it "shouldn't create if a core field is provided without source" do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
@@ -702,7 +718,7 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include target_field and selector")
+    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include target_field and source")
   end
 
 
@@ -716,7 +732,7 @@ describe Manifest do
       },
       "field_mapping" : [
         {
-          "selector" : "result",
+          "source" : {"path": "result"},
           "core" : true
         }
       ]
@@ -724,7 +740,7 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'result'. Mapping must include target_field and selector")
+    m.errors[:invalid_field_mapping].first.should eq(": target 'result'. Mapping must include target_field and source")
   end
 
   it "shouldn't create if a custom field is provided without type" do
@@ -738,7 +754,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "patient_name",
-          "selector" : "patient_name",
+          "source" : {"path" : "patient_name"},
           "core" : false
         }
       ]
@@ -760,7 +776,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "patient_name",
-          "selector" : "patient_name",
+          "source" : {"path" : "patient_name"},
           "type" : "quantity",
           "core" : false
         }
@@ -783,19 +799,19 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "patient_name",
-          "selector" : "patient_name",
+          "source" : {"path" : "patient_name"},
           "type" : "string",
           "core" : false
         },
         {
           "target_field" : "control_date",
-          "selector" : "control_date",
+          "source" : {"path": "control_date"},
           "type" : "date",
           "core" : false
         },
         {
           "target_field" : "rbc_count",
-          "selector" : "rbc_count",
+          "source" : {"path": "rbc_count"},
           "type" : "integer",
           "core" : false
         }
@@ -817,7 +833,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "rbc_description",
-          "selector" : "rbc_description",
+          "source" : {"path" : "rbc_description"},
           "type" : "enum",
           "core" : false,
           "options" : ["high","low","null"]
@@ -841,7 +857,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "results[*].result",
-          "selector" : "result",
+          "source" : {"path" : "result"},
           "type" : "string"
         }
       ]
@@ -863,7 +879,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "results[*].result",
-          "selector" : "result",
+          "source" : {"path" : "result"},
           "core" : true,
           "type" : "enum"
         }
@@ -875,5 +891,112 @@ describe Manifest do
     m.errors[:enum_fields].first.should eq("must be provided with options. (In 'results[*].result'")
   end
 
+  it "concats two or more elements" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "name",
+          "source" : {
+            "concat" : [
+              {"path" : "last_name"},
+              ", ",
+              {"path" : "first_name"}
+            ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "first_name" : "John",
+        "last_name" : "Doe"
+      }',
+      {indexed: {"name" => "Doe, John"}, pii: Hash.new, custom: Hash.new}
+  end
 
+  it "strips spaces from an element" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "name",
+          "source" : {
+            "concat" : [
+              {"strip" : {"path" : "last_name"}},
+              ", ",
+              {"path" : "first_name"}
+            ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "first_name" : "John",
+        "last_name" : "   Doe   "
+      }',
+      {indexed: {"name" => "Doe, John"}, pii: Hash.new, custom: Hash.new}
+  end
+
+
+  it "concats the result of a mapping" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "foo",
+          "source" : {
+            "concat" : [
+              {"strip" : {"path" : "last_name"}},
+              ": ",
+              {
+                "mapping" : [
+                  {"path" : "test_type"},
+                  [
+                    { "match" : "*QC*", "output" : "qc"},
+                    { "match" : "*Specimen*", "output" : "specimen"}
+                  ]
+                ]
+              }
+            ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "test_type" : "This is a QC test",
+        "last_name" : "   Doe   "
+      }',
+      {indexed: {"foo" => "Doe: qc"}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "maps the result of a concat" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "test_type",
+          "source" : {
+            "mapping" : [
+              {
+                "concat" : [
+                  {"strip" : {"path" : "last_name"}},
+                  ": ",
+                  {"strip" : {"path" : "first_name"}}
+                ]
+              },
+              [
+                { "match" : "Subject:*", "output" : "specimen"},
+                { "match" : "Doe: John", "output" : "qc"}
+              ]
+            ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "first_name" : " John ",
+        "last_name" : "   Doe   "
+      }',
+      {indexed: {"test_type" => "qc"}, pii: Hash.new, custom: Hash.new}
+  end
 end

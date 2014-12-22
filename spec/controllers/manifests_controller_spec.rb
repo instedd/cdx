@@ -20,28 +20,33 @@ describe ManifestsController do
         "metadata": {
           "version" : "1.0.0",
           "api_version" : "1.0.0",
-          "device_models" : ["GX4001"]
+          "device_models" : ["GX4001"],
+          "source_data_type" : "json"
         },
         "field_mapping": [
           {
             "target_field": "assay_name",
-            "selector" : "Test.assay_name",
+            "source" : {"path" : "Test.assay_name"},
             "core" : true,
             "type" : "string"
           },
           {
             "target_field" : "test_type",
-            "selector" : "Test.test_type",
+            "source" : {
+              "mapping" : [
+                {"path" : "Test.test_type"},
+                [
+                  {"match" : "*QC*", "output" : "qc"},
+                  {"match" : "*Specimen*", "output" : "specimen"}
+                ]
+              ]
+            },
             "core" : true,
             "type" : "enum",
             "options" : [
               "qc",
               "specimen"
-            ],
-            "value_mappings" : {
-              "*QC*" : "qc",
-              "*Specimen*" : "specimen"
-            }
+            ]
           }
         ]
       }} }
