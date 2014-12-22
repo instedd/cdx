@@ -24,7 +24,7 @@ gem 'rails_config'
 gem 'rest-client'
 
 gem 'cdx-api-elasticsearch', git: "https://bitbucket.org/instedd/cdx-api-elasticsearch.git", branch: 'master'
-gem 'cdx_sync',  git: "https://github.com/instedd/cdx-sync-server.git", branch: 'master'
+gem 'cdx-sync-server',  git: "https://github.com/instedd/cdx-sync-server.git", branch: 'master'
 
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks

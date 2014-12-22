@@ -34,16 +34,17 @@ GIT
   branch: master
   specs:
     instedd-bootstrap (0.0.1)
-      bootstrap-sass
+      bootstrap-sass (~> 2.3.2)
       rails
       sass-rails
 
 GIT
   remote: https://github.com/instedd/cdx-sync-server.git
-  revision: e505bd16918590e3520e6ea68d2f604b89256f04
+  revision: 7a970af9ba11245fe9b17b821d50d9bb7796f8ff
   branch: master
   specs:
-    cdx_sync (0.0.0)
+    cdx-sync-server (0.0.0)
+      filewatcher
 
 GEM
   remote: https://rubygems.org/
@@ -378,14 +379,13 @@ DEPENDENCIES
   capybara
   capybara-mechanize
   cdx-api-elasticsearch!
-  cdx_sync!
+  cdx-sync-server!
   coffee-rails (~> 4.0.0)
   csv_builder
   devise
   elasticsearch
   encryptor
   faker
-  filewatcher
   foreman
   guard-rspec
   guid
