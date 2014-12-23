@@ -41,10 +41,21 @@ class CSVEventParser
 
   def import_from(sync_dir)
     Rails.logger.info "Running import for #{sync_dir.sync_path}"
-    sync_dir.each_inbox_file('*.csv') do |secret_key, filename|
+    sync_dir.each_inbox_file('*.csv', &load_file)
+  end
+
+  def import_single(sync_dir, filename)
+    sync_dir.if_inbox_file(filename, '*.csv', &load_file)
+  end
+
+  private
+
+  def load_file
+    lambda do |secret_key, filename|
       Rails.logger.info "Importing #{filename} for device #{secret_key}"
       File.open(filename) { |file| load_for_device file, secret_key }
       File.delete(filename)
     end
   end
+
 end
