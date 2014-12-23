@@ -1,5 +1,5 @@
 class CSVEventParser
-  def parse(path, data)
+  def lookup(path, data)
     if (path.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1 || path.split(Manifest::PATH_SPLIT_TOKEN).size > 1
       raise "path nesting is unsupported for CSV Events"
     else

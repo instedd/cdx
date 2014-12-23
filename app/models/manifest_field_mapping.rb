@@ -2,59 +2,79 @@ class ManifestFieldMapping
   def initialize(manifest, field)
     @manifest = manifest
     @field = field
-    @source = @field["source"]
-  end
-
-  def map(value, mappings)
-    return value unless mappings && value
-
-    matched_mapping = mappings.detect do |field|
-      value.match field["match"].gsub("*", ".*")
-    end
-
-    if matched_mapping
-      matched_mapping["output"]
-    else
-      raise ManifestParsingError.new "'#{value}' is not a valid value for '#{@target_field}' (valid value must be in one of these forms: #{mappings.map(){|f| f["match"]}.join(", ")})"
-    end
-  end
-
-  def parse(path, data)
-    @manifest.parser.parse(path, data)
   end
 
   def apply_to(data)
-    traverse @source, data
+    traverse @field["source"], data
   end
 
   def traverse node, data
-    case identify node
-    when "lookup"
-      parse(node["lookup"], data)
-    when "map"
-      map(traverse(node["map"][0], data), node["map"][1])
-    when "concat"
-      node["concat"].map do |source|
+    if node["lookup"].present?
+      return lookup(node["lookup"], data)
+    end
+
+    if node["map"].present?
+      return map(traverse(node["map"][0], data), node["map"][1])
+    end
+
+    if node["concat"].present?
+      return node["concat"].map do |source|
         traverse(source, data)
       end.join
-    when "strip"
-      traverse(node["strip"], data).strip
-    when "convert_time"
-      traverse(node["convert_time"], data).to_s
-    else
-      node.to_s
     end
+
+    if node["strip"].present?
+      return traverse(node["strip"], data).strip
+    end
+
+    if node["convert_time"].present?
+      return convert_time(traverse(node["convert_time"][0], data), node["convert_time"][1], node["convert_time"][2])
+    end
+
+    if node["beginnin_of"].present?
+      return beginning_of(traverse(node["beginning_of"][0], data), node["beginning_of"][1])
+    end
+
+    if node["milliseconds_between"].present?
+     return milliseconds_between(traverse(node["milliseconds_between"][0], data), traverse(node["milliseconds_between"][1], data))
+    end
+
+    if node["clusterise"].present?
+      return clusterise(traverse(node["clusterise"][0], data), traverse(node["clusterise"][1], data))
+    end
+
+    if node["substring"].present?
+      return traverse(node["substring"][0], data)[node["substring"][1]..node["substring"][2]]
+    end
+
+    node.to_s
   end
 
-  def identify node
-    return node unless node.is_a? Hash
+  def map(value, mappings)
+    return value unless value
 
-    return "lookup" if node["lookup"].present?
-    return "map" if node["map"].present?
-    return "concat" if node["concat"].present?
-    return "convert_time" if node["convert_time"].present?
-    return "strip" if node["strip"].present?
+    mapping = mappings.detect do |mapping|
+      value.match mapping["match"].gsub("*", ".*")
+    end
 
-    ""
+    raise ManifestParsingError.invalid_mapping(value, @field['target_field'], mappings) unless mapping
+
+    mapping["output"]
+  end
+
+  def lookup(path, data)
+    @manifest.parser.lookup(path, data)
+  end
+
+  def convert_time
+  end
+
+  def beginning_of
+  end
+
+  def milliseconds_between
+  end
+
+  def clusterise
   end
 end

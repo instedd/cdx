@@ -9,7 +9,7 @@ class ManifestFieldValidation
     return unless value.present?
 
     if @field['type'] == 'integer' && !value.is_a?(Integer) && value.to_i.to_s != value
-      raise ManifestParsingError.invalid_value_for_integer value, @target_field
+      raise ManifestParsingError.invalid_value_for_integer(value, @target_field)
     end
 
     verify_value_is_not_null_string value
@@ -28,32 +28,29 @@ class ManifestFieldValidation
   end
 
   def verify_value_is_not_null_string value
-    if value == Manifest::NULL_STRING
-      raise ManifestParsingError.new "String 'null' is not permitted as value, in field '#{@target_field}'"
+    unless value != Manifest::NULL_STRING
+      raise ManifestParsingError.null_not_allowed(@target_field)
     end
   end
 
   def check_value_in_options(value, options)
     unless options.include? value
-      raise ManifestParsingError.new "'#{value}' is not a valid value for '#{@target_field}' (valid options are: #{options.join ', '})"
+      raise ManifestParsingError.invalid_value_for_options(value, @target_field, options)
     end
   end
 
   def check_value_in_range(value, range)
-    min = range["min"]
-    max = range["max"]
-
-    unless min <= value and value <= max
-      raise ManifestParsingError.new "'#{value}' is not a valid value for '#{@target_field}' (valid values must be between #{min} and #{max})"
+    unless range["min"] <= value and value <= range["max"]
+      raise ManifestParsingError.invalid_value_for_range(value, @target_field, range["min"], range["max"])
     end
   end
 
   def check_value_is_date(value, date_format)
     case date_format
     when "iso"
-      Time.parse(value) rescue raise ManifestParsingError.new "'#{value}' is not a valid value for '#{@target_field}' (valid value must be an iso date)"
+      Time.parse(value) rescue raise ManifestParsingError.invalid_value_for_date(value, @target_field)
     else
-      raise ManifestParsingError.new "Date format not implemented"
+      raise ManifestParsingError.unsupported_date_format
     end
   end
 end

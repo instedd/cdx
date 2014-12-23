@@ -977,4 +977,32 @@ describe Manifest do
       }',
       {indexed: {"test_type" => "qc"}, pii: Hash.new, custom: Hash.new}
   end
+
+  it "retrieves a substring of an element" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "test",
+          "source" : {
+            "substring" : [{"lookup" : "name_and_test"}, 0, 2]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        },
+        {
+          "target_field" : "first_name",
+          "source" : {
+            "substring" : [{"lookup" : "name_and_test"}, 4, -5]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }
+        ]
+      },
+      '{
+        "name_and_test" : "ABC John Doe"
+      }',
+      {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
+  end
 end

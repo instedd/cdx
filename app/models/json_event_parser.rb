@@ -1,5 +1,5 @@
 class JsonEventParser
-  def parse(path, data)
+  def lookup(path, data)
     if (targets = path.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
 
       paths = targets.first.split Manifest::PATH_SPLIT_TOKEN
