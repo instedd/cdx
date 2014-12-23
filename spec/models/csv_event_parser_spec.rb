@@ -23,7 +23,7 @@ describe CSVEventParser do
   end
 
   it 'parses a csv' do
-    manifest = Manifest.make definition: %{
+    manifest = Manifest.create! definition: %{
       {
         "metadata": {
           "version": "1",
@@ -33,13 +33,13 @@ describe CSVEventParser do
         },
         "field_mapping" : [{
             "target_field" : "error_code",
-            "source" : {"path": "error_code"},
+            "source" : {"lookup": "error_code"},
             "core" : true,
             "type" : "integer"
           },
           {
             "target_field" : "result",
-            "source" : {"path": "result"},
+            "source" : {"lookup": "result"},
             "core" : true,
             "type" : "enum",
             "options" : [ "positive", "negative" ]

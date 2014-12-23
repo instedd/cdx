@@ -83,7 +83,7 @@ class Manifest < ActiveRecord::Base
     field_mapping = Event.sensitive_fields.map do |sensitive_field|
       {
         target_field: sensitive_field,
-        source: {path: sensitive_field},
+        source: {lookup: sensitive_field},
         core: true,
         type: 'string',
         pii: true,
@@ -105,7 +105,7 @@ class Manifest < ActiveRecord::Base
       else
         {
           target_field: field,
-          source: {path: field},
+          source: {lookup: field},
           type: field_definition[:type],
           core: true,
           pii: false,
@@ -162,30 +162,26 @@ class Manifest < ActiveRecord::Base
           check_value_mappings field_mapping
         end
       else
-        self.errors.add(:enum_fields, "must be provided with options. (In '#{invalid_field(field_mapping)}'")
+        self.errors.add(:enum_fields, "must be provided with options. (In '#{field_mapping["target_field"]}'")
       end
     end
   end
 
   def verify_absence_of_null_string field_mapping
     if field_mapping["options"].include? NULL_STRING
-      self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{invalid_field(field_mapping)}') ")
+      self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{field_mapping["target_field"]}') ")
     end
-  end
-
-  def invalid_field field_mapping
-    field_mapping["target_field"] || (field_mapping["source"] && field_mapping["source"]["path"])
   end
 
   def check_presence_of_core_field field_mapping
     if (field_mapping["core"].nil?)
-      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field(field_mapping)}'. Mapping must include a core field")
+      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Mapping must include 'core' field")
     end
   end
 
   def check_presence_of_target_field_and_source field_mapping
     if (field_mapping["target_field"].blank? || field_mapping["source"].blank?)
-      self.errors.add(:invalid_field_mapping, ": target '#{invalid_field(field_mapping)}'. Mapping must include target_field and source")
+      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Mapping must include 'target_field' and 'source' fields")
     end
   end
 
@@ -193,7 +189,7 @@ class Manifest < ActiveRecord::Base
     valid_values = field_mapping["options"]
     field_mapping["value_mappings"].values.each do |vm|
       if !valid_values.include? vm
-        self.errors.add(:invalid_field_mapping, ": target '#{invalid_field field_mapping}'. '#{vm}' is not a valid value")
+        self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. '#{vm}' is not a valid value")
       end
     end
   end
@@ -208,7 +204,7 @@ class Manifest < ActiveRecord::Base
     if (field_mapping["pii"].blank? || field_mapping["pii"]==false)
       valid_types = ["integer","date","enum","location","string"]
       if(field_mapping["type"].blank? || ! valid_types.include?(field_mapping["type"]))
-        self.errors.add(:invalid_type, ": target '#{invalid_field field_mapping}'. Fields must include a type, with value 'integer', 'date', 'enum', 'location' or 'string'")
+        self.errors.add(:invalid_type, ": target '#{field_mapping["target_field"]}'. Fields must include a type, with value 'integer', 'date', 'enum', 'location' or 'string'")
       end
     end
   end

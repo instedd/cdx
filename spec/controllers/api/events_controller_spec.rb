@@ -108,7 +108,7 @@ describe Api::EventsController do
         },
         "field_mapping" : [{
           "target_field" : "assay_name",
-          "source" : {"path" : "assay.name"},
+          "source" : {"lookup" : "assay.name"},
           "type" : "string",
           "core" : true
         }]
@@ -132,13 +132,13 @@ describe Api::EventsController do
         "field_mapping" : [
           {
             "target_field" : "assay_name",
-            "source" : {"path" : "assay.name"},
+            "source" : {"lookup" : "assay.name"},
             "type" : "string",
             "core" : true
           },
           {
             "target_field" : "foo",
-            "source" : {"path" : "patient_id"},
+            "source" : {"lookup" : "patient_id"},
             "type" : "integer",
             "core" : false,
             "pii" : true
@@ -171,7 +171,7 @@ describe Api::EventsController do
         "field_mapping" : [
           {
             "target_field" : "foo",
-            "source" : {"path" : "assay.name"},
+            "source" : {"lookup" : "assay.name"},
             "core" : true
           }
         ]
@@ -187,7 +187,7 @@ describe Api::EventsController do
         "field_mapping" : [
           {
             "target_field" : "assay_name",
-            "source" : {"path" : "assay.name"},
+            "source" : {"lookup" : "assay.name"},
             "type" : "string",
             "core" : true
           }
@@ -212,7 +212,7 @@ describe Api::EventsController do
         "field_mapping" : [
           {
             "target_field" : "foo",
-            "source" : {"path" : "some_field"},
+            "source" : {"lookup" : "some_field"},
             "type" : "string",
             "core" : false,
             "pii" : false,
@@ -243,7 +243,7 @@ describe Api::EventsController do
         },
         "field_mapping" : [{
             "target_field" : "error_code",
-            "source" : {"path" : "error_code"},
+            "source" : {"lookup" : "error_code"},
             "core" : true,
             "type" : "integer"
           }]
@@ -271,13 +271,13 @@ describe Api::EventsController do
             },
             "field_mapping" : [{
                 "target_field" : "error_code",
-                "source" : {"path" : "error_code"},
+                "source" : {"lookup" : "error_code"},
                 "core" : true,
                 "type" : "integer"
               },
               {
                 "target_field" : "result",
-                "source" : {"path" : "result"},
+                "source" : {"lookup" : "result"},
                 "core" : true,
                 "type" : "enum",
                 "options" : [
@@ -629,7 +629,7 @@ describe Api::EventsController do
           "field_mapping" : [
             {
               "target_field" : "foo",
-              "source" : {"path" : "some_field"},
+              "source" : {"lookup" : "some_field"},
               "type" : "string",
               "core" : false,
               "pii" : false,
@@ -680,7 +680,7 @@ describe Api::EventsController do
           "field_mapping" : [
             {
               "target_field" : "assay_name",
-              "source" : {"path" : "assay_name"},
+              "source" : {"lookup" : "assay_name"},
               "core" : true,
               "indexed" : true,
               "type" : "enum",
@@ -691,14 +691,14 @@ describe Api::EventsController do
             },
             {
               "target_field" : "start_time",
-              "source" : {"path" : "start_time"},
+              "source" : {"lookup" : "start_time"},
               "core" : true,
               "indexed" : true,
               "type" : "date"
             },
             {
               "target_field" : "results[*].result",
-              "source" : {"path" : "result"},
+              "source" : {"lookup" : "result"},
               "type" : "enum",
               "core" : true,
               "indexed" : true,
@@ -710,14 +710,14 @@ describe Api::EventsController do
             },
             {
               "target_field" : "patient_name",
-              "source" : {"path" : "patient_information.name"},
+              "source" : {"lookup" : "patient_information.name"},
               "core" : true,
               "indexed" : true,
               "type" : "string"
             },
             {
               "target_field" : "age",
-              "source" : {"path" : "age"},
+              "source" : {"lookup" : "age"},
               "type" : "integer",
               "indexed" : "true",
               "core" : true,
@@ -730,14 +730,14 @@ describe Api::EventsController do
             },
             {
               "target_field" : "location",
-              "source" : {"path" : "location"},
+              "source" : {"lookup" : "location"},
               "core" : true,
               "indexed" : true,
               "type" : "location"
             },
             {
               "target_field" : "patient_location",
-              "source" : {"path" : "patient_location"},
+              "source" : {"lookup" : "patient_location"},
               "core" : false,
               "indexed" : true,
               "type" : "location"
@@ -756,7 +756,7 @@ describe Api::EventsController do
           "field_mapping" : [
             {
               "target_field" : "assay_name",
-              "source" : {"path" : "assay_name"},
+              "source" : {"lookup" : "assay_name"},
               "core" : true,
               "indexed" : true,
               "type" : "enum",
@@ -845,7 +845,7 @@ describe Api::EventsController do
           "field_mapping" : [
             {
               "target_field" : "assay_name",
-              "source" : {"path" : "assay_name"},
+              "source" : {"lookup" : "assay_name"},
               "core" : true,
               "indexed" : true,
               "type" : "enum",
@@ -867,7 +867,7 @@ describe Api::EventsController do
           "field_mapping" : [
             {
               "target_field" : "assay_name",
-              "source" : {"path" : "assay_name"},
+              "source" : {"lookup" : "assay_name"},
               "core" : true,
               "indexed" : true,
               "type" : "enum",

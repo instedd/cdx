@@ -29,21 +29,21 @@ describe Subscriber do
         "field_mapping" : [
           {
             "target_field" : "results[*].result",
-            "source" : {"path" : "result"},
+            "source" : {"lookup" : "result"},
             "core" : true,
             "type" : "enum",
             "options" : ["positive","negative"]
           },
           {
             "target_field" : "results[*].condition",
-            "source" : {"path" : "condition"},
+            "source" : {"lookup" : "condition"},
             "core" : true,
             "type" : "enum",
             "options" : ["mtb","flu_a"]
           },
           {
             "target_field" : "patient_name",
-            "source" : {"path" : "patient_name"},
+            "source" : {"lookup" : "patient_name"},
             "core" : true,
             "type" : "string"
           }

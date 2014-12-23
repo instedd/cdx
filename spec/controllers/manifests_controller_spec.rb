@@ -26,7 +26,7 @@ describe ManifestsController do
         "field_mapping": [
           {
             "target_field": "assay_name",
-            "source" : {"path" : "Test.assay_name"},
+            "source" : {"lookup" : "Test.assay_name"},
             "core" : true,
             "type" : "string"
           },
@@ -34,7 +34,7 @@ describe ManifestsController do
             "target_field" : "test_type",
             "source" : {
               "mapping" : [
-                {"path" : "Test.test_type"},
+                {"lookup" : "Test.test_type"},
                 [
                   {"match" : "*QC*", "output" : "qc"},
                   {"match" : "*Specimen*", "output" : "specimen"}

@@ -157,7 +157,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "assay_name",
-          "source" : {"path" : "assay.name"},
+          "source" : {"lookup" : "assay.name"},
           "core" : true
         }]
       },
@@ -169,7 +169,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "patient_name",
-          "source" : {"path" : "patient.name"},
+          "source" : {"lookup" : "patient.name"},
           "core" : true
         }]
       },
@@ -181,7 +181,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "temperature",
-          "source" : {"path" : "temperature"},
+          "source" : {"lookup" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : false
@@ -195,7 +195,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "temperature",
-          "source" : {"path" : "temperature"},
+          "source" : {"lookup" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -209,7 +209,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "temperature",
-          "source" : {"path" : "temperature"},
+          "source" : {"lookup" : "temperature"},
           "core" : false,
           "pii" : true,
           "indexed" : false
@@ -223,7 +223,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "level",
-          "source" : {"path" : "level"},
+          "source" : {"lookup" : "level"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -239,7 +239,7 @@ describe Manifest do
         [{
           "target_field" : "level",
           "type" : "enum",
-          "source" : {"path" : "level"},
+          "source" : {"lookup" : "level"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -254,7 +254,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "temperature",
-          "source" : {"path" : "temperature"},
+          "source" : {"lookup" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -274,7 +274,7 @@ describe Manifest do
     assert_raises_manifest_data_validation %{
         [{
           "target_field" : "temperature",
-          "source" : {"path" : "temperature"},
+          "source" : {"lookup" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -294,7 +294,7 @@ describe Manifest do
     assert_raises_manifest_data_validation %{
         [{
           "target_field" : "temperature",
-          "source" : {"path" : "temperature"},
+          "source" : {"lookup" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -314,7 +314,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "sample_date",
-          "source" : {"path" : "sample_date"},
+          "source" : {"lookup" : "sample_date"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -331,7 +331,7 @@ describe Manifest do
     assert_raises_manifest_data_validation %{
         [{
           "target_field" : "sample_date",
-          "source" : {"path" : "sample_date"},
+          "source" : {"lookup" : "sample_date"},
           "core" : false,
           "pii" : false,
           "indexed" : true,
@@ -349,8 +349,8 @@ describe Manifest do
         [{
           "target_field" : "condition",
           "source" : {
-            "mapping" : [
-              {"path" : "condition"},
+            "map" : [
+              {"lookup" : "condition"},
               [
                 { "match" : "*MTB*", "output" : "MTB"},
                 { "match" : "*FLU*", "output" : "H1N1"},
@@ -372,8 +372,8 @@ describe Manifest do
         [{
           "target_field" : "condition",
           "source" : {
-            "mapping" : [
-              {"path" : "condition"},
+            "map" : [
+              {"lookup" : "condition"},
               [
                 { "match" : "*MTB*", "output" : "MTB"},
                 { "match" : "*FLU*", "output" : "H1N1"},
@@ -395,8 +395,8 @@ describe Manifest do
         [{
           "target_field" : "condition",
           "source" : {
-            "mapping" : [
-              {"path" : "condition"},
+            "map" : [
+              {"lookup" : "condition"},
               [
                 { "match" : "*MTB*", "output" : "MTB"},
                 { "match" : "*FLU*", "output" : "H1N1"},
@@ -417,7 +417,7 @@ describe Manifest do
     assert_manifest_application %{
         [{
           "target_field" : "list[*].temperature",
-          "source" : {"path" : "temperature_list[*].temperature"},
+          "source" : {"lookup" : "temperature_list[*].temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -432,8 +432,8 @@ describe Manifest do
         [{
           "target_field" : "results[*].condition",
           "source" : {
-            "mapping" : [
-              {"path" : "conditions[*].condition"},
+            "map" : [
+              {"lookup" : "conditions[*].condition"},
               [
                 { "match" : "*MTB*", "output" : "MTB"},
                 { "match" : "*FLU*", "output" : "H1N1"},
@@ -454,14 +454,14 @@ describe Manifest do
     assert_manifest_application %{[
         {
           "target_field" : "collection[*].temperature",
-          "source" : {"path" : "some_list[*].temperature"},
+          "source" : {"lookup" : "some_list[*].temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
         },
         {
           "target_field" : "collection[*].foo",
-          "source" : {"path" : "some_list[*].bar"},
+          "source" : {"lookup" : "some_list[*].bar"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -494,14 +494,14 @@ describe Manifest do
     assert_manifest_application %{[
         {
           "target_field" : "collection[*].temperature",
-          "source" : {"path" : "temperature_list[*].temperature"},
+          "source" : {"lookup" : "temperature_list[*].temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
         },
         {
           "target_field" : "collection[*].foo",
-          "source" : {"path" : "other_list[*].bar"},
+          "source" : {"lookup" : "other_list[*].bar"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -529,7 +529,7 @@ describe Manifest do
     assert_manifest_application %{[
         {
           "target_field" : "collection[*].temperature",
-          "source" : {"path" : "temperature"},
+          "source" : {"lookup" : "temperature"},
           "core" : false,
           "pii" : false,
           "indexed" : true
@@ -649,8 +649,8 @@ describe Manifest do
         {
           "target_field" : "test_type",
           "source" : {
-            "mapping" : [
-              {"path" : "Test.test_type"},
+            "map" : [
+              {"lookup" : "Test.test_type"},
               [
                 { "match" : "*QC*", "output" : "Invalid mapping"},
                 { "match" : "*Specimen*", "output" : "specimen"}
@@ -681,8 +681,8 @@ describe Manifest do
         {
           "target_field" : "test_type",
           "source" : {
-            "mapping" : [
-              {"path" : "Test.test_type"},
+            "map" : [
+              {"lookup" : "Test.test_type"},
               [
                 { "match" : "*QC*", "output" : "qc"},
                 { "match" : "*Specimen*", "output" : "specimen"}
@@ -718,29 +718,7 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include target_field and source")
-  end
-
-
-  it "shouldn't create if a core field is provided without target_field" do
-    definition = %{{
-      "metadata" : {
-        "version" : "1.0.0",
-        "api_version" : "1.0.0",
-        "device_models" : ["GX4001"],
-        "source_data_type" : "json"
-      },
-      "field_mapping" : [
-        {
-          "source" : {"path": "result"},
-          "core" : true
-        }
-      ]
-    }}
-    m = Manifest.new(definition: definition)
-    m.save
-    Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'result'. Mapping must include target_field and source")
+    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include 'target_field' and 'source' fields")
   end
 
   it "shouldn't create if a custom field is provided without type" do
@@ -754,7 +732,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "patient_name",
-          "source" : {"path" : "patient_name"},
+          "source" : {"lookup" : "patient_name"},
           "core" : false
         }
       ]
@@ -776,7 +754,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "patient_name",
-          "source" : {"path" : "patient_name"},
+          "source" : {"lookup" : "patient_name"},
           "type" : "quantity",
           "core" : false
         }
@@ -799,19 +777,19 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "patient_name",
-          "source" : {"path" : "patient_name"},
+          "source" : {"lookup" : "patient_name"},
           "type" : "string",
           "core" : false
         },
         {
           "target_field" : "control_date",
-          "source" : {"path": "control_date"},
+          "source" : {"lookup": "control_date"},
           "type" : "date",
           "core" : false
         },
         {
           "target_field" : "rbc_count",
-          "source" : {"path": "rbc_count"},
+          "source" : {"lookup": "rbc_count"},
           "type" : "integer",
           "core" : false
         }
@@ -833,7 +811,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "rbc_description",
-          "source" : {"path" : "rbc_description"},
+          "source" : {"lookup" : "rbc_description"},
           "type" : "enum",
           "core" : false,
           "options" : ["high","low","null"]
@@ -857,7 +835,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "results[*].result",
-          "source" : {"path" : "result"},
+          "source" : {"lookup" : "result"},
           "type" : "string"
         }
       ]
@@ -865,7 +843,7 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include a core field")
+    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include 'core' field")
   end
 
   it "shouldn't create if an enum field is provided without options" do
@@ -879,7 +857,7 @@ describe Manifest do
       "field_mapping" : [
         {
           "target_field" : "results[*].result",
-          "source" : {"path" : "result"},
+          "source" : {"lookup" : "result"},
           "core" : true,
           "type" : "enum"
         }
@@ -897,9 +875,9 @@ describe Manifest do
           "target_field" : "name",
           "source" : {
             "concat" : [
-              {"path" : "last_name"},
+              {"lookup" : "last_name"},
               ", ",
-              {"path" : "first_name"}
+              {"lookup" : "first_name"}
             ]
           },
           "core" : false,
@@ -920,9 +898,9 @@ describe Manifest do
           "target_field" : "name",
           "source" : {
             "concat" : [
-              {"strip" : {"path" : "last_name"}},
+              {"strip" : {"lookup" : "last_name"}},
               ", ",
-              {"path" : "first_name"}
+              {"lookup" : "first_name"}
             ]
           },
           "core" : false,
@@ -944,11 +922,11 @@ describe Manifest do
           "target_field" : "foo",
           "source" : {
             "concat" : [
-              {"strip" : {"path" : "last_name"}},
+              {"strip" : {"lookup" : "last_name"}},
               ": ",
               {
-                "mapping" : [
-                  {"path" : "test_type"},
+                "map" : [
+                  {"lookup" : "test_type"},
                   [
                     { "match" : "*QC*", "output" : "qc"},
                     { "match" : "*Specimen*", "output" : "specimen"}
@@ -974,12 +952,12 @@ describe Manifest do
         [{
           "target_field" : "test_type",
           "source" : {
-            "mapping" : [
+            "map" : [
               {
                 "concat" : [
-                  {"strip" : {"path" : "last_name"}},
+                  {"strip" : {"lookup" : "last_name"}},
                   ": ",
-                  {"strip" : {"path" : "first_name"}}
+                  {"strip" : {"lookup" : "first_name"}}
                 ]
               },
               [

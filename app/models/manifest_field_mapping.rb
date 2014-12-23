@@ -29,30 +29,30 @@ class ManifestFieldMapping
 
   def traverse node, data
     case identify node
-    when "path"
-      parse(node["path"], data)
-    when "mapping"
-      map(traverse(node["mapping"][0], data), node["mapping"][1])
+    when "lookup"
+      parse(node["lookup"], data)
+    when "map"
+      map(traverse(node["map"][0], data), node["map"][1])
     when "concat"
       node["concat"].map do |source|
         traverse(source, data)
       end.join
     when "strip"
       traverse(node["strip"], data).strip
-    when "days_in"
-      node
+    when "convert_time"
+      traverse(node["convert_time"], data).to_s
     else
-      node
+      node.to_s
     end
   end
 
   def identify node
-    return node.to_s unless node.is_a? Hash
+    return node unless node.is_a? Hash
 
-    return "path" if node["path"].present?
-    return "mapping" if node["mapping"].present?
+    return "lookup" if node["lookup"].present?
+    return "map" if node["map"].present?
     return "concat" if node["concat"].present?
-    return "days_in" if node["days_in"].present?
+    return "convert_time" if node["convert_time"].present?
     return "strip" if node["strip"].present?
 
     ""
