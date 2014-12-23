@@ -7,8 +7,8 @@ describe CSVEventParser do
   let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
 
   before do
-    sync_dir.init_sync_path!
-    sync_dir.init_client_sync_paths! device.secret_key
+    sync_dir.ensure_sync_path!
+    sync_dir.ensure_client_sync_paths! device.secret_key
   end
 
   before(:each) do
