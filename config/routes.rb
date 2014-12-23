@@ -45,7 +45,6 @@ Cdp::Application.routes.draw do
           post :upload
         end
       end
-      resources :events, only: :create, shallow: true
     end
     resources :laboratories, only: :index
   end
