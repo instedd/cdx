@@ -14,6 +14,12 @@ class Device < ActiveRecord::Base
 
   before_create :set_key
 
+  has_many :ssh_keys
+
+  accepts_nested_attributes_for :ssh_keys, allow_destroy: true, reject_if: :all_blank
+
+  after_save :try_regenerate_keys!
+
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
       joins(:institution).where(institutions: {user_id: user.id})
@@ -51,6 +57,10 @@ class Device < ActiveRecord::Base
   end
 
   private
+
+  def try_regenerate_keys!
+    SshKey.regenerate_authorized_keys!
+  end
 
   def set_key
     self.secret_key = Guid.new.to_s

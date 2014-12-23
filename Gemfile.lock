@@ -21,7 +21,7 @@ GIT
 
 GIT
   remote: https://bitbucket.org/instedd/cdx-api-elasticsearch.git
-  revision: bdb36f91f6bcf028dedbaf1f3104015a2bbf3d80
+  revision: 3a80e0e4f91585de7cfc78b7cdb89ca515b3652f
   branch: master
   specs:
     cdx-api-elasticsearch (0.0.1)
@@ -34,9 +34,17 @@ GIT
   branch: master
   specs:
     instedd-bootstrap (0.0.1)
-      bootstrap-sass
+      bootstrap-sass (~> 2.3.2)
       rails
       sass-rails
+
+GIT
+  remote: https://github.com/instedd/cdx-sync-server.git
+  revision: b4fc89658d6e9afddfbfd4db8ff8681ef93c2e35
+  branch: master
+  specs:
+    cdx-sync-server (0.0.0)
+      filewatcher
 
 GEM
   remote: https://rubygems.org/
@@ -147,6 +155,8 @@ GEM
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.3)
+    filewatcher (0.3.5)
+      trollop (~> 2.0)
     foreman (0.63.0)
       dotenv (>= 0.7)
       thor (>= 0.13.6)
@@ -331,6 +341,7 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
+    trollop (2.0)
     turbolinks (2.2.0)
       coffee-rails
     tzinfo (0.3.42)
@@ -368,6 +379,7 @@ DEPENDENCIES
   capybara
   capybara-mechanize
   cdx-api-elasticsearch!
+  cdx-sync-server!
   coffee-rails (~> 4.0.0)
   csv_builder
   devise
