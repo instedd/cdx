@@ -18,7 +18,9 @@ class SshKey < ActiveRecord::Base
   class << self
     def regenerate_authorized_keys!
       dir = CDXSync::SyncDirectory.new
-      dir.init_sync_path!
+      clients.each do |client|
+        dir.ensure_client_sync_paths! client.id
+      end
       CDXSync::AuthorizedKeys.new.write! clients, dir
     end
 
