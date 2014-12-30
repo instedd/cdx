@@ -32,6 +32,7 @@ To start developing:
   ```
     bundle exec rails s
   ```
+  
 ### Sync Server
 
 In order to allow synchronization of clients through rsyns - for csv files -, you should use [cdx-sync-sshd](https://github.com/instedd/cdx-sync-sshd), which is a dockerized sshd container, with an inbox and outbox directoy for each client. Download and build it before continuing. 
