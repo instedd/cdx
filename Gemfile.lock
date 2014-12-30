@@ -40,11 +40,11 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-sync-server.git
-  revision: cda8e6804719d0775fab60cdb36b73605d3e3aee
+  revision: fc5249a9d04b8bde45b4c424f904abf25ca34448
   branch: master
   specs:
     cdx-sync-server (0.0.0)
-      filewatcher
+      filewatcher (= 0.3.6)
 
 GEM
   remote: https://rubygems.org/
@@ -155,7 +155,7 @@ GEM
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.3)
-    filewatcher (0.3.5)
+    filewatcher (0.3.6)
       trollop (~> 2.0)
     foreman (0.63.0)
       dotenv (>= 0.7)
