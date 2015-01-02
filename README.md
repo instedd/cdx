@@ -65,3 +65,27 @@ Now you must start the sync filewatcher. It is based on [cdx-sync-server](https:
 ```
 
 Now, whenever a new csv file enters the sshd inbox, it will be imported into the cdx platform. 
+
+### Sync File Watcher - Client Side
+
+In thee client side, you will need to run another filewatcher: [cdx-sync-client](https://github.com/instedd/cdx-sync-client). It is a Java CLI app, download and follow the installing instructions in its documentation, and then write a .properties file with the following information: 
+
+```properties
+sync.remote.host = <sshd host> 
+sync.remote.user = cdx-sync
+sync.remote.port = 2222
+
+sync.local.outbox.dir = <outbox sync directory>
+
+sync.remote.inbox.dir = sync/<device key>/inbox
+
+app.name = cdxsync-client
+app.mode = upload
+```
+
+**Notice**: The device key is that key you got when registering a new device in CDP at  ```institutions/:institution_id/devices/:device_id```
+
+Finally, in order to assemble pieces together, you will need to generate a ssh public key in your client, and upload it to CDP as a public key for your device. Then you will be able to run the client and ...wait for it... see how new files are uploaded to CDP when created on the client's outbox. 
+
+
+
