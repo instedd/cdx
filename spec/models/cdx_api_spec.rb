@@ -46,6 +46,17 @@ describe Cdx::Api do
       expect(query_events(since: Date.current.at_noon.iso8601)).to be_empty
     end
 
+    it "should asume current timezone if no one is provided" do
+      Time.zone = ActiveSupport::TimeZone["Asia/Seoul"]
+
+      index results: [result: :negative], start_time: Time.zone.local(2010, 10, 10, 01, 00, 30).iso8601
+
+      response = query_events(since: '2010-10-10T01:00:29')
+
+      expect(response.size).to eq(1)
+      expect(response.first["results"].first["result"]).to eq("negative")
+    end
+
     it "should check for new events util a date" do
       index results: [result: :positive], start_time: time(2013, 1, 1)
       index results: [result: :negative], start_time: time(2013, 1, 3)
