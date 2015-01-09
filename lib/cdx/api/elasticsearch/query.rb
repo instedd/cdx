@@ -112,6 +112,7 @@ class Cdx::Api::Elasticsearch::Query
       when "match"
         conditions.push process_match_field(field_definition[:name], field_definition[:type], field_value)
       when "range"
+        field_value = convert_timezone_if_date(field_value)
         conditions.push range: {field_definition[:name] => ({filter_parameter_definition[:boundary] => field_value}.merge filter_parameter_definition[:options])}
       when "wildcard"
         conditions.push process_wildcard_field(field_definition, field_value)
@@ -241,5 +242,15 @@ class Cdx::Api::Elasticsearch::Query
 
   def process_group_by_buckets(aggregations, group_by, events, event, doc_count)
     GroupingDetail.process_buckets(aggregations, group_by, events, event, doc_count)
+  end
+
+  def convert_timezone_if_date(value)
+    return value unless (Time.zone rescue nil)
+
+    Integer(value) rescue (convert_timezone(value) || value)
+  end
+
+  def convert_timezone(date_string)
+    Time.zone.parse(date_string).try(&:iso8601)
   end
 end
