@@ -11,11 +11,13 @@ describe Cdx::Api::LocalTimeZoneConversion do
 
   describe 'converting dates' do
     context 'when there is a local timezone' do
-      before { Time.zone = ActiveSupport::TimeZone["Asia/Seoul"] }
+      let(:timezone) { 'Asia/Seoul' }
+      before { Time.zone = ActiveSupport::TimeZone[timezone] }
       it { expect(convert_timezone_if_date("1990-10-01")).to eq local(1990, 10, 1, 00, 00, 00) }
       it { expect(convert_timezone_if_date("1990-10-01T02:30:24")).to eq local(1990, 10, 1, 02, 30, 24) }
-      it { expect(convert_timezone_if_date("1990-01-01T02:30:24Z-03:00")).to eq "1990-01-01T02:30:24Z-03:00" }
+      it { expect(convert_timezone_if_date("1990-01-01T02:30:24-03:00")).to eq Time.parse('1990-01-01T02:30:24-03:00').in_time_zone(timezone).iso8601 }
     end
+
     context 'when there is no local timezone' do
       before { Time.zone = nil }
       it { expect(convert_timezone_if_date("1990-10-01")).to eq "1990-10-01" }
