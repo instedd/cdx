@@ -1,6 +1,8 @@
 class Cdx::Api::Elasticsearch::Query
   attr_accessor :indices
 
+  include Cdx::Api::LocalTimeZoneConversion
+
   DEFAULT_PAGE_SIZE = 50
 
   def self.for_indices indices, params
@@ -244,13 +246,5 @@ class Cdx::Api::Elasticsearch::Query
     GroupingDetail.process_buckets(aggregations, group_by, events, event, doc_count)
   end
 
-  def convert_timezone_if_date(value)
-    return value unless (Time.zone rescue nil)
 
-    Integer(value) rescue (convert_timezone(value) || value)
-  end
-
-  def convert_timezone(date_string)
-    Time.zone.parse(date_string).try(&:iso8601)
-  end
 end
