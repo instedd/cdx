@@ -1,7 +1,3 @@
-:css
-  .checks { display: inline-block; }
-  .checks label { display: inline-block; }
-
 - if @manifest.version
   %p
     %strong Version:
@@ -14,8 +10,11 @@
         %ul
           - @manifest.errors.full_messages.each do |msg|
             %li= msg
-  %div
-    = f.label :definition
-    = f.text_area :definition
+  .control-group
+    = f.label :definition, :class => 'control-label'
+    .controls
+      = f.text_area :definition
 
-  = f.submit class: 'btn'
+  .control-group
+    .controls
+      = f.submit class: 'btn'

@@ -5,9 +5,12 @@
         %ul
           - @institution.errors.full_messages.each do |msg|
             %li= msg
-  %div
-    = f.label :name
-    = f.text_field :name, readonly: @readonly
+  .control-group
+    = f.label :name, :class => 'control-label'
+    .controls
+      = f.text_field :name, readonly: @readonly
 
   - unless @readonly
-    = f.submit class: 'btn'
+    .control-group
+      .controls
+        = f.submit class: 'btn'

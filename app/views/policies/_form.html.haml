@@ -1,20 +1,23 @@
 = form_for @policy do |f|
   - if @policy.errors.any?
     #error_explanation
-      %h2= "#{pluralize(@policy.errors.count, "error")} prohibited this @policy from being saved:"
+      %h3= "#{pluralize(@policy.errors.count, "error")} prohibited this @policy from being saved:"
       %ul
         - @policy.errors.full_messages.each do |msg|
           %li= msg
 
-  .field
-    = f.label :name
-    = f.text_field :name
-  .field
-    = f.label :user_id
-    = f.collection_select :user_id, User.all.where('id != ?', current_user.id).sort_by(&:email), :id, :email
-  .field
-    = f.label :definition
-    = f.text_area :definition, style: "width:400px;height:200px;font-family:monospace"
-
-  .actions
-    = f.submit 'Save'
+  .control-group
+    = f.label :name, :class => 'control-label'
+    .controls
+      = f.text_field :name, :class => 'span2'
+  .control-group
+    = f.label :user_id, :class => 'control-label'
+    .controls
+      = f.collection_select :user_id, User.all.where('id != ?', current_user.id).sort_by(&:email), :id, :email,{}, {:class => 'span2'}
+  .control-group
+    = f.label :definition, :class => 'control-label'
+    .controls
+      = f.text_area :definition, :rows => 5, :class => 'span3'
+  .control-group
+    .controls
+      = f.submit 'Save', :class => 'btn'

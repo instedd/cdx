@@ -1,7 +1,3 @@
-:css
-  .checks { display: inline-block; }
-  .checks label { display: inline-block; }
-
 = form_for([@institution, @device]) do |f|
   - if @device.errors.present?
     .alert-container
@@ -9,24 +5,30 @@
         %ul
           - @device.errors.full_messages.each do |msg|
             %li= msg
-  %div
-    = f.label :name
-    = f.text_field :name
-  %div
-    = f.label :device_model_id
-    = f.collection_select :device_model_id, DeviceModel.all, :id, :name
-  %div
-    = f.label :laboratories
-    .checks
-      = f.collection_check_boxes(:laboratory_ids, @laboratories, :id, :name) { |b| b.label { b.check_box + b.text } + "<br/>".html_safe }
-  %div
-    = f.label :ssh_keys
-    %ul
-      = f.fields_for :ssh_keys do |keys_f|
-        %li
-          = keys_f.label :destroy?
-          = keys_f.check_box :_destroy
-          = keys_f.label :public_key, 'Public Key'
-          = keys_f.text_field :public_key
+  .control-group
+    = f.label :name, :class => 'control-label'
+    .controls
+      = f.text_field :name
+  .control-group
+    = f.label :device_model_id, :class => 'control-label'
+    .controls
+      = f.collection_select :device_model_id, DeviceModel.all, :id, :name
+  .control-group
+    = f.label :laboratories, :class => 'control-label'
+    .controls
+      .checks
+        = f.collection_check_boxes(:laboratory_ids, @laboratories, :id, :name) { |b| b.label { b.check_box + b.text } + "<br/>".html_safe }
+  .control-group
+    = f.label :ssh_keys, :class => 'control-label'
+    .controls
+      %ul
+        = f.fields_for :ssh_keys do |keys_f|
+          %li
+            = keys_f.label :destroy?
+            = keys_f.check_box :_destroy
+            = keys_f.label :public_key, 'Public Key'
+            = keys_f.text_field :public_key
 
-  = f.submit class: 'btn'
+  .control-group
+    .controls
+      = f.submit class: 'btn'

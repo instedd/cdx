@@ -50,3 +50,9 @@ textarea {
   }
 }
 
+.checks { display: inline-block; }
+.checks label { display: inline-block; }
+
+#error_explanation {
+  color: #ff0000;
+}

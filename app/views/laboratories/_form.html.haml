@@ -6,11 +6,15 @@
           - @laboratory.errors.full_messages.each do |msg|
             %li= msg
 
-  %div
-    = f.label :name
-    = f.text_field :name
-  %div
-    = f.label :location_id
-    = f.select :location_id, nested_set_options(Location) {|i| "#{'-' * i.level} #{i.name}" }
+  .control-group
+    = f.label :name, :class => 'control-label'
+    .control
+      = f.text_field :name, :class => 'input-large'
+  .control-group
+    = f.label :location_id, :class => 'control-label'
+    .control
+      = f.select :location_id, nested_set_options(Location) {|i| "#{'-' * i.level} #{i.name}" }, {}, class: 'input-large'
 
-  = f.submit class: 'btn'
+  .control-group
+    .control
+      = f.submit class: 'btn'

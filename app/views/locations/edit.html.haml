@@ -1,7 +1,9 @@
-%h3 Editing #{@location.name}
+.row-fluid
+  .span12
+    %h3 Editing #{@location.name}
 
-= render 'form'
+    = render 'form'
 
-%hr
+    %hr
 
-= icon_link_to :'icf-delete', "Delete this location", @location, method: :delete, confirm: "Are you sure you want to delete the location '#{@location.name}'"
+    = icon_link_to :'icf-delete', "Delete this location", @location, method: :delete, confirm: "Are you sure you want to delete the location '#{@location.name}'"

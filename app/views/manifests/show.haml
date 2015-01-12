@@ -1,11 +1,13 @@
-%p#notice= notice
-%p
-  %strong Version:
-  = @manifest.version
-%p
-  %strong Definition:
-  %p= @manifest.definition
+.row-fluid
+  .span12
+    %p#notice= notice
+    %p
+      %strong Version:
+      = @manifest.version
+    %p
+      %strong Definition:
+      %p= @manifest.definition
 
-= link_to 'Delete', manifest_path(@manifest), method: "DELETE", confirm: "Are you sure?"
-|
-= link_to 'Back', manifests_path
+    = link_to 'Back', manifests_path, :class => 'btn'
+    = link_to 'Delete', manifest_path(@manifest), method: "DELETE", confirm: "Are you sure?", :class => 'btn btn-link'
+

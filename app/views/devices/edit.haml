@@ -1,17 +1,18 @@
-%h3 Editing #{@device.name}
+.span12
+  %h3 Editing #{@device.name}
 
-= render 'form'
+  = render 'form'
 
-%hr
-
-%p
-  %strong UUID:
-  = @device.secret_key
-
-  - if @can_regenerate_key
-    = link_to "Generate new key", regenerate_key_institution_device_path(@institution, @device)
-
-- if @can_delete
   %hr
 
-  = icon_link_to :'icf-delete', "Delete this device", [@institution, @device], method: :delete, confirm: "Are you sure you want to delete the device '#{@device.name}'"
+  %p
+    %strong UUID:
+    = @device.secret_key
+
+    - if @can_regenerate_key
+      = link_to "Generate new key", regenerate_key_institution_device_path(@institution, @device)
+
+  - if @can_delete
+    %hr
+
+    = icon_link_to :'icf-delete', "Delete this device", [@institution, @device], method: :delete, confirm: "Are you sure you want to delete the device '#{@device.name}'"

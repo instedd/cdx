@@ -6,18 +6,23 @@
         - @location.errors.full_messages.each do |msg|
           %li= msg
 
-  .field
-    = f.label :name
-    = f.text_field :name
-  .field
-    = f.label :parent_id
-    = f.select :parent_id, nested_set_options(Location, @location) {|i| "#{'-' * i.level} #{i.name}" }, include_blank: '(none)'
-  .field
-    = f.label :admin_level
-    = f.number_field :admin_level
-  .field
-    = f.label :geo_id
-    = f.text_field :geo_id
+  .control-group
+    = f.label :name, :class => 'control-label'
+    .controls
+      = f.text_field :name, :class => 'input-large'
+  .control-group
+    = f.label :parent_id, :class => 'control-label'
+    .controls
+      = f.select :parent_id, nested_set_options(Location, @location) {|i| "#{'-' * i.level} #{i.name}" }, {include_blank: '(none)'}, class: 'input-large'
+  .control-group
+    = f.label :admin_level, :class => 'control-label'
+    .controls
+      = f.number_field :admin_level, :class => 'input-large'
+  .control-group
+    = f.label :geo_id, :class => 'control-label'
+    .controls
+      = f.text_field :geo_id, :class => 'input-large'
 
-  .actions
-    = f.submit 'Save'
+  .control-group
+    .controls
+      = f.submit 'Save', :class => 'btn'

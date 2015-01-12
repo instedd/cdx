@@ -1,7 +1,8 @@
-%h3 Edit #{@subscriber.name}
+.span12
+  %h3 Edit #{@subscriber.name}
 
-= render 'form'
+  = render 'form'
 
-%hr
+  %hr
 
-= icon_link_to :'icf-delete', "Delete this subscriber", @subscriber, method: :delete, confirm: "Are you sure you want to delete the location '#{@subscriber.name}'"
+  = icon_link_to :'icf-delete', "Delete this subscriber", @subscriber, method: :delete, confirm: "Are you sure you want to delete the location '#{@subscriber.name}'"

@@ -1,31 +1,32 @@
-%div{style: 'border: 1px solid gray; padding:10px'}
-  %form
-    Laboratory:
-    %select(name="laboratory")
-      %option(value="") (all)
-      = options_from_collection_for_select @combo_laboratories, :id, :name, params["laboratory"]
-    Condition:
-    %input{type: "text", name: "condition", value: params["condition"]}
-    %input{type: "submit", value: "Filter"}
+.row-fluid
+  .span12.well-white
+    %form.form-inline
+      %label Laboratory:
+      %select(name="laboratory")
+        %option(value="") (all)
+        = options_from_collection_for_select @combo_laboratories, :id, :name, params["laboratory"]
+      %label Condition:
+      %input{type: "text", name: "condition", value: params["condition"]}
+      %input.btn.btn-small{type: "submit", value: "Filter"}
 
-    - if params["laboratory"].present? && params["condition"].present?
-      = link_to "Create a subscriber for this filter", new_subscriber_path(laboratory: params["laboratory"], condition: params["condition"])
+      - if params["laboratory"].present? && params["condition"].present?
+        = link_to "Create a subscriber for this filter", new_subscriber_path(laboratory: params["laboratory"], condition: params["condition"])
 
-%br
-
-%table.table
-  %tr
-    %th Created at
-    %th Institution
-    %th Laboratory
-    %th Device
-    %th Assay name
-    %th Results
-  - @events.each do |event|
-    %tr
-      %td= event["created_at"]
-      %td= @institutions[event["institution_id"]]
-      %td= @laboratories[event["laboratory_id"]]
-      %td= @devices[event["device_uuid"]]
-      %td= event["assay_name"]
-      %td= (event["results"] || []).map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "
+.row-fluid
+  .span12
+    %table.table
+      %tr
+        %th Created at
+        %th Institution
+        %th Laboratory
+        %th Device
+        %th Assay name
+        %th Results
+      - @events.each do |event|
+        %tr
+          %td= event["created_at"]
+          %td= @institutions[event["institution_id"]]
+          %td= @laboratories[event["laboratory_id"]]
+          %td= @devices[event["device_uuid"]]
+          %td= event["assay_name"]
+          %td= (event["results"] || []).map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "
