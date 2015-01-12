@@ -1,6 +1,8 @@
 class Cdx::Api::Elasticsearch::Query
   attr_accessor :indices
 
+  include Cdx::Api::LocalTimeZoneConversion
+
   DEFAULT_PAGE_SIZE = 50
 
   def self.for_indices indices, params
@@ -112,6 +114,7 @@ class Cdx::Api::Elasticsearch::Query
       when "match"
         conditions.push process_match_field(field_definition[:name], field_definition[:type], field_value)
       when "range"
+        field_value = convert_timezone_if_date(field_value)
         conditions.push range: {field_definition[:name] => ({filter_parameter_definition[:boundary] => field_value}.merge filter_parameter_definition[:options])}
       when "wildcard"
         conditions.push process_wildcard_field(field_definition, field_value)
@@ -242,4 +245,6 @@ class Cdx::Api::Elasticsearch::Query
   def process_group_by_buckets(aggregations, group_by, events, event, doc_count)
     GroupingDetail.process_buckets(aggregations, group_by, events, event, doc_count)
   end
+
+
 end
