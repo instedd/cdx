@@ -1,53 +1,61 @@
 %h3#playground CDP - Playground
 .row-fluid
-  .span4(style="border-right:1px solid black")
+  .span4.r-border
     %h4 Submit event
     %form#report_form(method="post")
-      %div
-        %label(for="device") Device
-        %select#device(name="device")
-          = @devices.map do |device|
-            %option{ value: device.secret_key}=device.name
-      %div
-        %label(for="data") Data
-        %textarea#data(name="data" style="width:350px;height:300px;font-family:monospace")
-          :preserve
-            {
-              //"start_time" : "2014-08-05T20:29:19Z",
-              "patient_id" : 2,
-              "patient_name" : "Lorem Ipsum",
-              "patient_telephone_number" : "12345678",
-              "patient_zip_code" : "1234",
-              //"event_id" : "1",
-              "assay_name" : "cartridge_1",
-              "age" : 20,
-              "system_user" : "jdoe",
-              "test_type" : "specimen",
-              "gender" : "male",
-              //"error_code" : "1234",
-              "results": [
-                {
-                  "condition": "mtb",
-                  "result": "positive"
-                }
-              ]
-            }
-      %div
+      .control-group
+        %label.control-label(for="device") Device
+        .controls
+          %select#device
+            = @devices.map do |device|
+              %option{ value: device.secret_key}=device.name
+      .control-group
+        %label.control-label(for="data") Data
+        .controls
+          %textarea#data
+            :preserve
+              {
+                //"start_time" : "2014-08-05T20:29:19Z",
+                "patient_id" : 2,
+                "patient_name" : "Lorem Ipsum",
+                "patient_telephone_number" : "12345678",
+                "patient_zip_code" : "1234",
+                //"event_id" : "1",
+                "assay_name" : "cartridge_1",
+                "age" : 20,
+                "system_user" : "jdoe",
+                "test_type" : "specimen",
+                "gender" : "male",
+                //"error_code" : "1234",
+                "results": [
+                  {
+                    "condition": "mtb",
+                    "result": "positive"
+                  }
+                ]
+              }
+      .control-group
         %input#create_button.btn(name="commit" type="submit" value="Create event")
   .span8
     %h4 Query results
 
     %form#query_form(method="post")
       .row-fluid
-        .span5
-          %label(for="query_string") Query string
-          %textarea#query_string(name="query_string" style="width:300px;height:50px;font-family:monospace") age=20
-        .span5
-          %label(for="post_body") Request Body
-          %textarea#post_body(name="post_body" style="width:300px;height:50px;font-family:monospace")
-      %div
-        %input#query_button.btn(name="commit" type="submit" value="Query")
-    #response_div(style="display:none")
+        .span6
+          .control-group
+            %label.control-label(for="query_string") Query string
+            .controls
+              %textarea#query_string age=20
+        .span6
+          .control-group
+            %label.control-label(for="post_body") Request Body
+            .controls
+              %textarea#post_body
+      .row-fluid
+        .span12
+          .control-group
+            %input#query_button.btn(name="commit" type="submit" value="Query")
+    #response_div
       %hr
       %h5 Response:
-      %pre#response(style="height:300px;overflow:auto")
+      %pre#response

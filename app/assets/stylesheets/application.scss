@@ -21,3 +21,32 @@
   font-size: 20px;
   padding: 8px 0 14px;
 }
+pre#response {
+  height: 300px;
+  overflow: auto;
+}
+
+
+
+//---------- Playground -----------
+//---------------------------------
+#response_div {
+  display: none;
+}
+.r-border {
+  border-right: 1px solid black;
+}
+textarea {
+  &#query_string,
+  &#post_body {
+    font-family: monospace;
+    width: 300px;
+    height: 50px;
+  }
+  &#data {
+    font-family: monospace;
+    width: 350px;
+    height: 300px;
+  }
+}
+

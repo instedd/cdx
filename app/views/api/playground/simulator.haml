@@ -3,51 +3,49 @@
 
 %h3#simulator CDP - Simulator
 
-%div{:style => "width: 100%; overflow: hidden;"}
+.row-fluid{:style => "overflow: hidden"}
 
-  %div
+  .span12
     %form#report_form(method="post")
-      %div
-        %label(for="device") Device:
-        %select#device(name="device")
-          = @devices.map do |device|
-            %option{ value: device.secret_key}=device.name
+      .control-group
+        %label.control-label(for="device") Device:
+        .controls
+          %select#device(name="device")
+            = @devices.map do |device|
+              %option{ value: device.secret_key}=device.name
 
-      %div{:style => "margin: 20px; float: left;"}
-        = image_tag "genexpert.png"
+      .row-fluid
+        .span2
+          = image_tag "genexpert.png"
+        .span2
+          .control-group
+            %label.control-label(for="patient_name") Patient name:
+            .controls
+              %input#patient_name.span12(name="patient_name"){:type => "text", :value => "John Doe"}
+          .control-group
+            %label.control-label(for="gender") Gender:
+            .controls
+              %select#gender.span12(name="gender")
 
-      %div{:style => "float:left"}
-        %div
-          %label(for="patient_name") Patient name:
-          %input#patient_name(name="patient_name"){:type => "text", :value => "John Doe"}
+          .control-group
+            %label.control-label(for="age") Age:
+            .controls
+              %input#age.span12(name="age"){:type => "numeric", :value => "20"}
 
-        %div
-          %label(for="gender") Gender:
-          %select#gender(name="gender")
+          .control-group
+            %label.control-label(for="patient_telephone_number") Patient telephone number:
+            .controls
+              %input#patient_telephone_number.span12(name="patient_telephone_number"){:type => "text", :value => "12345678"}
 
-        %div
-          %label(for="age") Age:
-          %input#age(name="age"){:type => "numeric", :value => "20"}
+          .control-group
+            %label.control-label(for="condition") Condition:
+            .controls
+              %select#condition.span12(name="condition")
 
-        %div
-          %label(for="patient_telephone_number") Patient telephone number:
-          %input#patient_telephone_number(name="patient_telephone_number"){:type => "text", :value => "12345678"}
+          .control-group
+            %label.control-label(for="result") Result:
+            .controls
+              %select#result.span12(name="result")
 
-        %div
-          %label(for="condition") Condition:
-          %select#condition(name="condition")
-
-        %div
-          %label(for="result") Result:
-          %select#result(name="result")
-
-        %div
-          %input#create_button.btn(name="commit" type="submit" value="Simulate test")
-
-
-
-
-
-
-
-
+          .control-group
+            %input#create_button.btn(name="commit" type="submit" value="Simulate test")
