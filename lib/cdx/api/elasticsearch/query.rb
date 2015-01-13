@@ -1,3 +1,5 @@
+require "cdx/api/elasticsearch/local_timezone_conversion"
+
 class Cdx::Api::Elasticsearch::Query
   attr_accessor :indices
 
