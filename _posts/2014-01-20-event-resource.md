@@ -35,9 +35,9 @@ The Event resource contains the fields related to the event reported by the devi
       {
           "result": "positive_with_rif",
           "condition": "mtb",
-          "custom_fields" : [ //per analyte
+          "custom_fields" : { //per analyte
               ...
-          ]
+          }
       }
   ],
   "test_type": "specimen",
@@ -50,9 +50,9 @@ The Event resource contains the fields related to the event reported by the devi
       "0400000US08",
       "0500000US08021"
   ],
-  "custom_fields" : [ //per analyte
+  "custom_fields" : { //per analyte
       ...
-  ]
+  }
 }`
 
 Non standard fields reported by the device will be included inside the "custom_fields" section.
