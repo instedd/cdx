@@ -6,7 +6,7 @@ Provides an implementation of the CDX API based on an ElasticSearch backend.
 
 Add this line to your application's Gemfile:
 
-    gem 'cdx-api-elasticsearch'
+    gem 'cdx-api-elasticsearch', :git => 'https://github.com/instedd/cdx-api-elasticsearch'
 
 And then execute:
 
@@ -14,7 +14,10 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install cdx-api-elasticsearch
+    $ git clone https://github.com/instedd/cdx-api-elasticsearch
+    $ cd cdx-api-elasticsearch
+    $ gem build cdx-api-elasticsearch.gemspec
+    $ gem install cdx-api-elasticsearch-0.0.1.gem
 
 ## Contributing
 
