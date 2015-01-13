@@ -20,15 +20,6 @@ GIT
       ruby-openid
 
 GIT
-  remote: https://bitbucket.org/instedd/cdx-api-elasticsearch.git
-  revision: 3a80e0e4f91585de7cfc78b7cdb89ca515b3652f
-  branch: master
-  specs:
-    cdx-api-elasticsearch (0.0.1)
-      activesupport
-      elasticsearch
-
-GIT
   remote: https://bitbucket.org/instedd/instedd-bootstrap.git
   revision: abd90e62cb8eaa922719acc18e3d7570b3b9b106
   branch: master
@@ -37,6 +28,15 @@ GIT
       bootstrap-sass (~> 2.3.2)
       rails
       sass-rails
+
+GIT
+  remote: https://github.com/instedd/cdx-api-elasticsearch.git
+  revision: 6839a55c76ecc95539c5a01c4f7e53a3b2cd5af3
+  branch: master
+  specs:
+    cdx-api-elasticsearch (0.0.1)
+      activesupport
+      elasticsearch
 
 GIT
   remote: https://github.com/instedd/cdx-sync-server.git
