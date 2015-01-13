@@ -13,7 +13,7 @@ Returns a list of Events
 
 The query can be answered in CSV, XML, and JSON formats.
 
-The CSV format don't include the total count.
+The CSV format doesn't include the total count.
 
 The default response format is JSON.
 
