@@ -56,3 +56,5 @@ The Event resource contains the fields related to the event reported by the devi
 }`
 
 Non standard fields reported by the device will be included inside the "custom_fields" section.
+
+The default "event_id" will be the same as the uuid. If the device reports its own id, it will be stored there.
