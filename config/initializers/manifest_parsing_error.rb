@@ -26,4 +26,8 @@ class ManifestParsingError < RuntimeError
   def self.unsupported_date_format
     new "Date format not implemented"
   end
+
+  def self.unsupported_time_unit(time_unit, target_field)
+    new "'#{time_unit} is not a valid time unit for #{target_field}."
+  end
 end

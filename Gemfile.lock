@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/instedd/alto_guisso.git
-  revision: a68286fa260dd092d54a5c471c252874d17feb51
+  revision: bdd04569e1f1925664f839f18cba3c2807aafe19
   branch: master
   specs:
     alto_guisso (0.0.2)
@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: git://github.com/instedd/alto_guisso_rails.git
-  revision: a9bb41430e636e3dec1a85a2be2af0fc27358a9c
+  revision: d9dcdce816f0633acb2515724157aa0d8c48fda2
   branch: master
   specs:
     alto_guisso_rails (0.0.1)
@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: 6839a55c76ecc95539c5a01c4f7e53a3b2cd5af3
+  revision: 498f3d346c8645ca7bf117d12d5b00efe6188752
   branch: master
   specs:
     cdx-api-elasticsearch (0.0.1)

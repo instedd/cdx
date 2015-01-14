@@ -1005,4 +1005,246 @@ describe Manifest do
       }',
       {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
   end
+
+  it "obtains the beginning of the month" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "month",
+          "source" : {
+            "beginning_of" : [
+              {"lookup" : "run_at"},
+              "month"
+            ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "2014-05-14T15:22:11+0000"
+      }',
+      {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "parses an strange date" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "month",
+          "source" : {
+            "parse_date" : [
+              {"lookup" : "run_at"},
+              "%a%d%b%y%H%p%z"
+            ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "sat3feb014pm+7"
+      }',
+      {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "obtains the distance in years between two dates" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "years_between" : [
+                {"lookup" : "birth_day"},
+                {"lookup" : "run_at"}
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "2014-05-14T15:22:11+0000",
+        "birth_day" : "2013-04-12T16:23:11.123+0000"
+      }',
+      {indexed: {"age" => 1}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "obtains the distance in months between two dates" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "months_between" : [
+                {"lookup" : "birth_day"},
+                {"lookup" : "run_at"}
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "2014-05-14T15:22:11+0000",
+        "birth_day" : "2013-04-12T16:23:11.123+0000"
+      }',
+      {indexed: {"age" => 13}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "obtains the distance in days between two dates" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "days_between" : [
+                {"lookup" : "birth_day"},
+                {"lookup" : "run_at"}
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "2014-05-14T15:22:11+0000",
+        "birth_day" : "2013-04-12T16:23:11.123+0000"
+      }',
+      {indexed: {"age" => 396}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "obtains the distance in hours between two dates" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "hours_between" : [
+                {"lookup" : "birth_day"},
+                {"lookup" : "run_at"}
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "2014-05-14T15:22:11+0000",
+        "birth_day" : "2013-04-12T16:23:11.123+0000"
+      }',
+      {indexed: {"age" => 9526}, pii: Hash.new, custom: Hash.new}
+      # 396 days and 22 hours
+  end
+
+  it "obtains the distance in minutes between two dates" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "minutes_between" : [
+                {"lookup" : "birth_day"},
+                {"lookup" : "run_at"}
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "2014-05-14T15:22:11+0000",
+        "birth_day" : "2013-04-12T16:23:11.123+0000"
+      }',
+      {indexed: {"age" => 571618}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "obtains the distance in seconds between two dates" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "seconds_between" : [
+                {"lookup" : "birth_day"},
+                {"lookup" : "run_at"}
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "2014-05-14T15:22:11+0000",
+        "birth_day" : "2013-04-12T16:23:11.123+0000"
+      }',
+      {indexed: {"age" => 34297139}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "obtains the distance in milliseconds between two dates" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "milliseconds_between" : [
+                {"lookup" : "birth_day"},
+                {"lookup" : "run_at"}
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "2014-05-14T15:22:11+0000",
+        "birth_day" : "2013-04-12T16:23:11.123+0000"
+      }',
+      {indexed: {"age" => 34297139877000}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "obtains the distance in milliseconds between two dates disregarding the order" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "milliseconds_between" : [
+                {"lookup" : "run_at"},
+                {"lookup" : "birth_day"}
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "run_at" : "2014-05-14T15:22:11+0000",
+        "birth_day" : "2013-04-12T16:23:11.123+0000"
+      }',
+      {indexed: {"age" => 34297139877000}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "converts from minutes to hours" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "convert_time" : [
+                {"lookup" : "age"},
+                {"lookup" : "unit"},
+                "hours"
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "age" : "90",
+        "unit" : "minutes"
+      }',
+      {indexed: {"age" => 1.5}, pii: Hash.new, custom: Hash.new}
+  end
 end
