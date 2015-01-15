@@ -64,7 +64,7 @@ describe CSVEventParser do
 
     device = Device.make institution_id: institution.id, device_model: DeviceModel.find_by_name('genoscan')
 
-    CSVEventParser.new.load_for_device(IO.read(File.join(Rails.root, 'public', 'genoscan_sample.csv')), device.secret_key)
+    CSVEventParser.new.load_for_device(IO.read(File.join(Rails.root, 'spec', 'support', 'genoscan_sample.csv')), device.secret_key)
     events = all_elasticsearch_events.sort_by { |event| event["_source"]["results"][0]["result"] }
     event = events.first["_source"]
     event["results"][0]["condition"].should eq("mtb")
