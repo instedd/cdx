@@ -288,7 +288,7 @@ describe Api::EventsController do
             ]
           }
         }
-        csv = %{error_code,result\n0,positive\n1,negative}
+        csv = %{error_code;result\n0;positive\n1;negative}
 
         post :upload, csv, device_id: device.secret_key
 

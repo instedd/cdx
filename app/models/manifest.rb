@@ -202,9 +202,9 @@ class Manifest < ActiveRecord::Base
 
   def check_valid_type(field_mapping)
     if (field_mapping["pii"].blank? || field_mapping["pii"]==false)
-      valid_types = ["integer","date","enum","location","string"]
+      valid_types = ["date", "enum", "location", "string", "integer", "long", "float", "double", "boolean"]
       if(field_mapping["type"].blank? || ! valid_types.include?(field_mapping["type"]))
-        self.errors.add(:invalid_type, ": target '#{field_mapping["target_field"]}'. Fields must include a type, with value 'integer', 'date', 'enum', 'location' or 'string'")
+        self.errors.add(:invalid_type, ": target '#{field_mapping["target_field"]}'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
       end
     end
   end

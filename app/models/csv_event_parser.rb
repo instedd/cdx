@@ -8,7 +8,7 @@ class CSVEventParser
   end
 
   def load_all(data)
-    csv = CSV.new data
+    csv = CSV.new(data, col_sep: ';')
     headers = csv.shift
     csv.map do |row|
       result = Hash.new
@@ -24,7 +24,7 @@ class CSVEventParser
   end
 
   def dump(data)
-    CSV.generate_line(data.keys) + CSV.generate_line(data.values)
+    CSV.generate_line(data.keys, col_sep: ';') + CSV.generate_line(data.values, col_sep: ';')
   end
 
   def load_for_device(data, device_key)
@@ -57,5 +57,4 @@ class CSVEventParser
       File.delete(filename)
     end
   end
-
 end

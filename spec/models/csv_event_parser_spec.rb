@@ -13,7 +13,7 @@ describe CSVEventParser do
 
   before(:each) do
     File.open(File.join(sync_dir.inbox_path(device.secret_key), "#{DateTime.now.strftime('%Y%m%d%H%M%S')}.csv"), "w") do |io|
-      io << %{error_code,result\n0,positive\n1,negative}
+      io << %{error_code;result\n0;positive\n1;negative}
     end
   end
 
@@ -57,5 +57,20 @@ describe CSVEventParser do
     event = events.last["_source"]
     event["error_code"].should eq("1")
     event["result"].should eq("negative")
+  end
+
+  it 'parses genoscan csv' do
+    manifest = Manifest.create! definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', 'genoscan_manifest.json'))
+
+    device = Device.make institution_id: institution.id, device_model: DeviceModel.find_by_name('genoscan')
+
+    CSVEventParser.new.load_for_device(IO.read(File.join(Rails.root, 'public', 'genoscan_sample.csv')), device.secret_key)
+    events = all_elasticsearch_events.sort_by { |event| event["_source"]["results"][0]["result"] }
+    event = events.first["_source"]
+    event["results"][0]["condition"].should eq("mtb")
+    event["results"][0]["result"].should eq("positive")
+    event = events.last["_source"]
+    event["results"][0]["condition"].should eq("mtb")
+    event["results"][0]["result"].should eq("positive_with_rmp_and_inh")
   end
 end

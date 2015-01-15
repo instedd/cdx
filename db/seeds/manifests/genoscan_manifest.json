@@ -1,0 +1,239 @@
+{
+  "metadata" : {
+    "version" : "0.0.1",
+    "api_version" : "1.0.0",
+    "signature" : "",
+    "device_models" : ["genoscan"],
+    "source_data_type": "csv"
+  },
+  "field_mapping" : [
+  {
+      "target_field": "patient_id",
+      "source" : {"lookup" : "PID"},
+      "core" : true,
+      "indexed" : false,
+      "pii" : true,
+      "type" : "string"
+    },
+    {
+      "target_field": "patient_name",
+      "source" : {
+        "concat" : [
+            {"lookup" : "Firstname"},
+            " ",
+            {"lookup" : "LastName"}
+        ]
+      },
+      "core" : true,
+      "indexed" : false,
+      "pii" : true,
+      "type" : "string"
+    },
+    {
+      "target_field": "start_time",
+      "source" : {
+        "parse_date" : [
+            {"lookup" : "DateOfAnalysis"},
+            "%d.%m.%Y"
+          ]
+      },
+      "core" : true,
+      "indexed" : true,
+      "pii" : false,
+      "type" : "date"
+    },
+    {
+      "target_field": "event_id",
+      "source" : {"lookup" : "SampleNo."},
+      "core" : true,
+      "indexed" : true,
+      "pii" : false,
+      "type" : "integer"
+    },
+    {
+      "target_field": "system_user",
+      "source" : {"lookup" : "WindowsUser"},
+      "core" : true,
+      "indexed" : true,
+      "pii" : false,
+      "type" : "string"
+    },
+    {
+      "target_field": "age",
+      "source" : {
+        "years_between" : [
+            {"parse_date" : [
+              {"lookup" : "Birthday"},
+              "%d.%m.%Y"
+            ]},
+            {"parse_date" : [
+              {"lookup" : "DateOfAnalysis"},
+              "%d.%m.%Y"
+            ]}
+          ]
+      },
+      "core" : true,
+      "indexed" : true,
+      "pii" : false,
+      "type" : "integer"
+    },
+    {
+      "target_field": "assay_name",
+      "source" : {"lookup" : "TypeOfTest"},
+      "core" : true,
+      "indexed" : true,
+      "pii" : false,
+      "type" : "string"
+    },
+    {
+      "target_field": "gender",
+      "source" : {
+        "map" : [
+          {"lookup" : "Sex"},
+          [
+            {"match": "*n.a.*", "output" : "unknown"},
+            {"match": "*Female*", "output" : "female"},
+            {"match": "*", "output" : "male"}
+          ]
+        ]
+      },
+      "core" : true,
+      "indexed" : true,
+      "pii" : false,
+      "type" : "enum",
+      "options" : ["male", "female", "unknown"]
+    },
+    {
+      "target_field" : "results[*].condition",
+      "source" : {
+        "map" : [
+          {"lookup" : "TypeOfTest"},
+          [
+            {"match": "MTBDRplus", "output" : "mtb"}
+          ]
+        ]
+      },
+      "type" : "enum",
+      "core" : true,
+      "indexed" : true,
+      "options" : [
+        "mtb"
+      ]
+    },
+    {
+      "target_field" : "results[*].result",
+      "source" : {
+        "map" : [
+          {"lookup" : "Result"},
+          [
+            {"match": "*RMP resistant*INH resistant*", "output" : "positive_with_rmp_and_inh"},
+            {"match": "*RMP resistant*INH sensitive*", "output" : "positive_with_rmp"},
+            {"match": "*RMP sensitive*INH resistant*", "output" : "positive_with_inh"},
+            {"match": "*RMP sensitive*INH sensitive*", "output" : "positive"},
+            {"match": "*tuberculosis*", "output" : "positive"},
+            {"match": "*", "output" : "negative"}
+          ]
+        ]
+      },
+      "type" : "enum",
+      "core" : true,
+      "indexed" : true,
+      "options" : [
+        "positive",
+        "positive_with_rpm_and_ihn",
+        "positive_with_rpm",
+        "positive_with_ihn",
+        "negative"
+      ]
+    },
+    {
+      "target_field": "test_type",
+      "source" : {
+        "map" : [
+          {"lookup" : "Strip-Type"},
+          [
+            {"match": "*Patient*", "output" : "specimen"},
+            {"match": "*", "output" : "qc"}
+          ]
+        ]
+      },
+      "core" : true,
+      "indexed" : true,
+      "pii" : false,
+      "type" : "enum",
+      "options" : ["specimen", "qc"]
+    },
+    {
+      "target_field": "cw",
+      "source" : {"lookup" : "CW"},
+      "core" : false,
+      "indexed" : true,
+      "pii" : false,
+      "type" : "string"
+    },
+    {
+      "target_field": "revision",
+      "source" : {"lookup" : "Revision"},
+      "core" : false,
+      "indexed" : false,
+      "pii" : false,
+      "type" : "string"
+    },
+    {
+      "target_field": "control",
+      "source" : {"lookup" : "Control"},
+      "core" : false,
+      "indexed" : false,
+      "pii" : false,
+      "type" : "string"
+    },
+    {
+      "target_field": "ig_type",
+      "source" : {
+        "map" : [
+          {"lookup" : "Ig-Type"},
+          [
+            {"match": "*IgA*", "output" : "ig_a"},
+            {"match": "*IgG*", "output" : "ig_g"},
+            {"match": "*IgM*", "output" : "ig_m"},
+            {"match": "*", "output" : "unknown"}
+          ]
+        ]
+      },
+      "core" : false,
+      "indexed" : false,
+      "pii" : false,
+      "type" : "enum",
+      "options" : ["ig_a", "ig_g", "ig_m", "unknown"]
+    },
+    {
+      "target_field": "control_strip",
+      "source" : {
+        "map" : [
+          {"lookup" : "Strip-Type"},
+          [
+            {"match": "*Patient*", "output" : "patient"},
+            {"match": "*Cut-Off*", "output" : "cut_off"},
+            {"match": "*Avidity*", "output" : "avidity"},
+            {"match": "*Liquor*", "output" : "liquor"},
+            {"match": "*Positive*", "output" : "positive"},
+            {"match": "*Negative*", "output" : "negative"}
+          ]
+        ]
+      },
+      "core" : false,
+      "indexed" : false,
+      "pii" : false,
+      "type" : "enum",
+      "options" : ["patient", "cut_off", "avidity", "liquor", "positive", "negative"]
+    },
+    {
+      "target_field": "bands",
+      "source" : {"lookup" : "Bands"},
+      "core" : false,
+      "indexed" : false,
+      "pii" : false,
+      "type" : "string"
+    }
+  ]
+}

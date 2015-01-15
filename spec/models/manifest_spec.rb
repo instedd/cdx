@@ -740,7 +740,7 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_type].first.should eq(": target 'patient_name'. Fields must include a type, with value 'integer', 'date', 'enum', 'location' or 'string'")
+    m.errors[:invalid_type].first.should eq(": target 'patient_name'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
   end
 
   it "shouldn't create if a custom field is provided with an invalid type" do
@@ -763,7 +763,7 @@ describe Manifest do
     m = Manifest.new(definition: definition)
     m.save
     Manifest.count.should eq(0)
-    m.errors[:invalid_type].first.should eq(": target 'patient_name'. Fields must include a type, with value 'integer', 'date', 'enum', 'location' or 'string'")
+    m.errors[:invalid_type].first.should eq(": target 'patient_name'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
   end
 
   it "should create when fields are provided with valid types" do
