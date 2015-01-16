@@ -23,18 +23,20 @@ class Subscriber < ActiveRecord::Base
     events = Cdx::Api::Elasticsearch::Query.new(filter).execute["events"]
     now = Time.now
     events.each do |event|
-      filtered_event = filter_event(event, fields)
-      callback_url = URI.parse self.url
-      callback_query = Rack::Utils.parse_nested_query(callback_url.query || "")
-      merged_query = filtered_event.merge(callback_query)
-      callback_url = "#{callback_url.scheme}://#{callback_url.host}:#{callback_url.port}#{callback_url.path}?#{merged_query.to_query}"
-      options = {}
-      if self.url_user && self.url_password
-        options[:user] = self.url_user
-        options[:password] = self.url_password
+      PoirotRails::Activity.start("Publish event to subscriber #{self.name}") do
+        filtered_event = filter_event(event, fields)
+        callback_url = URI.parse self.url
+        callback_query = Rack::Utils.parse_nested_query(callback_url.query || "")
+        merged_query = filtered_event.merge(callback_query)
+        callback_url = "#{callback_url.scheme}://#{callback_url.host}:#{callback_url.port}#{callback_url.path}?#{merged_query.to_query}"
+        options = {}
+        if self.url_user && self.url_password
+          options[:user] = self.url_user
+          options[:password] = self.url_password
+        end
+        site = RestClient::Resource.new(callback_url, options)
+        site.post "" rescue nil
       end
-      site = RestClient::Resource.new(callback_url, options)
-      site.post "" rescue nil
     end
     self.last_run_at = now
     self.save!
