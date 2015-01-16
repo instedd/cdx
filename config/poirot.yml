@@ -1,0 +1,18 @@
+common: &default_settings
+  server: localhost:2120
+  source: cdp
+  debug: false
+
+development:
+  <<: *default_settings
+  enabled: true
+  mute:
+   - /assets/
+
+production:
+  <<: *default_settings
+  enabled: true
+
+test:
+  <<: *default_settings
+  enabled: false

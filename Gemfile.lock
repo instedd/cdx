@@ -46,6 +46,18 @@ GIT
     cdx-sync-server (0.0.0)
       filewatcher (= 0.3.6)
 
+GIT
+  remote: https://github.com/instedd/poirot_rails.git
+  revision: 42f04b0197c9559831b4ca69c396e599a86ba094
+  branch: master
+  specs:
+    poirot_rails (0.0.4)
+      bertrpc
+      ffi-rzmq (~> 2.0.1)
+      guid
+      json
+      rails (>= 3.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -81,6 +93,9 @@ GEM
     awesome_nested_set (3.0.0.rc.6)
       activerecord (>= 4.0.0, < 5)
     bcrypt-ruby (3.1.2)
+    bert (1.1.6)
+    bertrpc (1.3.1)
+      bert (>= 1.1.0, < 2.0.0)
     bootstrap-sass (2.3.2.1)
       sass (~> 3.2)
     builder (3.1.4)
@@ -155,6 +170,10 @@ GEM
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.3)
+    ffi-rzmq (2.0.1)
+      ffi-rzmq-core (>= 1.0.1)
+    ffi-rzmq-core (1.0.3)
+      ffi (~> 1.9)
     filewatcher (0.3.6)
       trollop (~> 2.0)
     foreman (0.63.0)
@@ -398,6 +417,7 @@ DEPENDENCIES
   oj
   omniauth
   omniauth-openid
+  poirot_rails!
   pry-byebug
   rails (= 4.0.2)
   rails_config
