@@ -10,13 +10,20 @@ class ActivationToken < ActiveRecord::Base
     !activation.nil?
   end
 
-  def use!
-    Activation.create!(activation_token: self) unless used?
+  def use!(public_key)
+    ActivationToken.transaction do
+      device.ssh_keys.create!(public_key: public_key)
+      self.activation = Activation.create!(activation_token: self)
+    end
+  end
+
+  def device_secret_key_valid?
+    device.secret_key == device_secret_key
   end
 
   private
 
   def set_device_secret_key
-    self.device_secret_key = device.secret_key if device
+    self.device_secret_key = device.secret_key if device && !self.device_secret_key
   end
 end
