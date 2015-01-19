@@ -7,4 +7,10 @@ class ActivationToken < ActiveRecord::Base
   def available?
     activation.nil?
   end
+
+  def used?
+    !available?
+  end
+
+
 end
