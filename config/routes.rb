@@ -24,6 +24,7 @@ Cdp::Application.routes.draw do
   root :to => 'home#index'
 
   namespace :api, defaults: { format: 'json' } do
+    resources :activations, only: :create
     resources :playground, only: :index, defaults: { format: 'html' } do
       collection do
         get :simulator
