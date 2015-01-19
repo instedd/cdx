@@ -16,8 +16,6 @@ class Device < ActiveRecord::Base
 
   has_many :ssh_keys
 
-  accepts_nested_attributes_for :ssh_keys, allow_destroy: true, reject_if: :all_blank
-
   after_save :try_regenerate_keys!
 
   def self.filter_by_owner(user, check_conditions)
