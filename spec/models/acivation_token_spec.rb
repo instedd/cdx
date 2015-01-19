@@ -13,7 +13,7 @@ describe ActivationToken do
     context 'when there is an activation' do
       let!(:activation) { Activation.create(activation_token: subject) }
 
-      it { activation.used?.should be_true }
+      it { subject.used?.should be_true }
     end
   end
 

@@ -4,13 +4,19 @@ class ActivationToken < ActiveRecord::Base
 
   validates_presence_of :device, :device_secret_key, :value
 
-  def available?
-    activation.nil?
-  end
+  before_validation :set_device_secret_key, if: :new_record?
 
   def used?
-    !available?
+    !activation.nil?
   end
 
+  def use!
+    Activation.create!(activation_token: self) unless used?
+  end
 
+  private
+
+  def set_device_secret_key
+    self.device_secret_key = device.secret_key if device
+  end
 end
