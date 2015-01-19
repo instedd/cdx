@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150119150757) do
+ActiveRecord::Schema.define(version: 20150119154001) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(version: 20150119150757) do
   end
 
   add_index "activation_tokens", ["device_id"], name: "index_activation_tokens_on_device_id", using: :btree
+  add_index "activation_tokens", ["value"], name: "index_activation_tokens_on_value", unique: true, using: :btree
 
   create_table "activations", force: true do |t|
     t.integer  "activation_token_id"
