@@ -16,9 +16,7 @@ class Device < ActiveRecord::Base
 
   has_many :ssh_keys
 
-  accepts_nested_attributes_for :ssh_keys, allow_destroy: true, reject_if: :all_blank
-
-  after_save :try_regenerate_keys!
+  after_save :regenerate_authorized_keys!
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
@@ -58,11 +56,11 @@ class Device < ActiveRecord::Base
 
   private
 
-  def try_regenerate_keys!
+  def regenerate_authorized_keys!
     SshKey.regenerate_authorized_keys!
   end
 
   def set_key
-    self.secret_key = Guid.new.to_s
+    self.secret_key = Guid.new.to_s unless self.secret_key
   end
 end
