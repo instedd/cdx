@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: git://github.com/instedd/alto_guisso_rails.git
-  revision: d9dcdce816f0633acb2515724157aa0d8c48fda2
+  revision: 9d4aa030f4e02ce63014aa7519078780e2eb25d0
   branch: master
   specs:
     alto_guisso_rails (0.0.1)
