@@ -88,8 +88,7 @@ Cdp::Application.configure do
 
   config.action_mailer.default_url_options = { host: Settings.host }
 
-  #Must be set
-  #config.authorized_keys_path =
-  #config.sync_dir_path =
+  config.authorized_keys_path = ENV["SSH_KEYS_PATH"]
+  config.sync_dir_path = ENV["SSH_SYNC_DIR"]
 
 end
