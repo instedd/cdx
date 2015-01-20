@@ -3,15 +3,16 @@ class Api::ActivationsController < ApiController
 
   def create
     activation_token = ActivationToken.find_by(value: params[:token])
-    if activation_token && !@activation_token.used?
-      if activation_token.device_secret_key_valid?
-        settings = activation_token.use!(params[:public_key])
-        render json: { status: :success, settings: settings }
-      else
-        render json: { status: :failure, settings: settings }
-      end
+    if activation_token.nil?
+      render json: { status: :failure, message: 'Invalid activation token' }
+    elsif @activation_token.used?
+      render json: { status: :failure, message: 'Activation token already used' }
+    elsif !activation_token.client_id_valid?
+      render json: { status: :failure, message: 'Client id expired', settings: settings }
     else
-      render json: { status: :failure }
+      settings = activation_token.use!(params[:public_key])
+      render json: { status: :success, message: 'Device activated', settings: settings }
     end
   end
+
 end
