@@ -12,6 +12,12 @@ RUN rm /etc/nginx/sites-enabled/default
 ADD docker/nginx-app.conf /etc/nginx/sites-enabled/app.conf
 ADD docker/nginx-env.conf /etc/nginx/main.d/env.conf
 
+# Setup daemons
+RUN mkdir /etc/service/subscribers
+ADD docker/subscribers.sh /etc/service/subscribers/run
+RUN mkdir /etc/service/csv_watch
+ADD docker/csv_watch.sh /etc/service/csv_watch/run
+
 # Prepare application directory
 RUN mkdir /app
 WORKDIR /app
