@@ -65,7 +65,7 @@ class ManifestFieldMapping
     end
 
     if node["clusterise"].present?
-      return clusterise(traverse(node["clusterise"][0], data), traverse(node["clusterise"][1], data))
+      return clusterise(traverse(node["clusterise"][0], data), node["clusterise"][1])
     end
 
     if node["substring"].present?
@@ -202,6 +202,14 @@ class ManifestFieldMapping
   end
 
   def clusterise(number, interval_stops)
-    raise "not implemented"
+    number = number.to_f
+    interval_stops = interval_stops.map &:to_i
+    return "#{interval_stops.last}+" if number > interval_stops.last
+    return "0-#{interval_stops[0]}"  if number.between? 0, interval_stops[0]
+    interval_stops.each_with_index do |stop, index|
+      if number.between? stop, interval_stops[index + 1 ]
+        return "#{stop}-#{interval_stops[index+1]}"
+      end
+    end
   end
 end

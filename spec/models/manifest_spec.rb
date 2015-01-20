@@ -1247,4 +1247,63 @@ describe Manifest do
       }',
       {indexed: {"age" => 1.5}, pii: Hash.new, custom: Hash.new}
   end
+
+  it "clusterises a number" do
+    definition = %{
+        [{
+          "target_field" : "age",
+          "source" : {
+            "clusterise" : [
+                {"lookup" : "age"},
+                [5, 20, 40]
+              ]
+          },
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      }
+
+    assert_manifest_application definition,
+      '{
+        "age" : "30",
+        "unit" : "minutes"
+      }',
+      {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
+
+      assert_manifest_application definition,
+      '{
+        "age" : "90",
+        "unit" : "minutes"
+      }',
+      {indexed: {"age" => "40+"}, pii: Hash.new, custom: Hash.new}
+
+      assert_manifest_application definition,
+      '{
+        "age" : "2",
+        "unit" : "minutes"
+      }',
+      {indexed: {"age" => "0-5"}, pii: Hash.new, custom: Hash.new}
+
+      assert_manifest_application definition,
+      '{
+        "age" : "20.1",
+        "unit" : "minutes"
+      }',
+      {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
+
+      assert_manifest_application definition,
+      '{
+        "age" : "20",
+        "unit" : "minutes"
+      }',
+      {indexed: {"age" => "5-20"}, pii: Hash.new, custom: Hash.new}
+
+      assert_manifest_application definition,
+      '{
+        "age" : "40",
+        "unit" : "minutes"
+      }',
+      {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
+  end
 end
