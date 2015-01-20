@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ActivationToken do
-  let(:device) { Device.make }
+  let(:device) { Device.make(secret_key: '74ee5b6e-f64c-17d3-49d6-28ff59b1b1d3') }
   subject { ActivationToken.create!(device: device, value: 'foobar') }
 
 
@@ -20,14 +20,19 @@ describe ActivationToken do
   end
 
   describe '#use!' do
+    let!(:settings) { subject.use!(SampleSshKey) }
     context 'when it is unused' do
-      before { subject.use!(SampleSshKey) }
       it { subject.used?.should be_true }
       it { subject.device.ssh_keys.should_not be_empty }
       it { subject.activation.should_not be_nil }
+
+      it { settings[:host].should eq('localhost') }
+      it { settings[:port].should eq(2222) }
+      it { settings[:user].should eq('cdx-sync') }
+      it { settings[:inbox_dir].should eq('sync/74ee5b6e-f64c-17d3-49d6-28ff59b1b1d3/inbox') }
+      it { settings[:outbox_dir].should eq('sync/74ee5b6e-f64c-17d3-49d6-28ff59b1b1d3/outbox') }
     end
     context 'when it was used' do
-      before { subject.use!(SampleSshKey) }
       it { expect { subject.use!(SampleSshKey) }.to raise_error }
     end
   end

@@ -15,6 +15,7 @@ class ActivationToken < ActiveRecord::Base
       device.ssh_keys.create!(public_key: public_key)
       self.activation = Activation.create!(activation_token: self)
     end
+    SyncHelpers.client_settings(device_secret_key)
   end
 
   def device_secret_key_valid?

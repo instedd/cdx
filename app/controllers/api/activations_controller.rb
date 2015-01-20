@@ -5,10 +5,10 @@ class Api::ActivationsController < ApiController
     activation_token = ActivationToken.find_by(value: params[:token])
     if activation_token && !@activation_token.used?
       if activation_token.device_secret_key_valid?
-        activation = activation_token.use!(params[:public_key])
-        render json: { status: :success, settings: activation.settings }
+        settings = activation_token.use!(params[:public_key])
+        render json: { status: :success, settings: settings }
       else
-        render json: { status: :failure, settings: activation.settings }
+        render json: { status: :failure, settings: settings }
       end
     else
       render json: { status: :failure }
