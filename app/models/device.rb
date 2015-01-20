@@ -61,6 +61,6 @@ class Device < ActiveRecord::Base
   end
 
   def set_key
-    self.secret_key = Guid.new.to_s
+    self.secret_key = Guid.new.to_s unless self.secret_key
   end
 end
