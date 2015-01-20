@@ -15,8 +15,8 @@ describe ActivationToken do
     end
   end
 
-  describe '#device_secret_key' do
-    it { subject.device_secret_key.should_not be_nil }
+  describe '#client_id' do
+    it { subject.client_id.should_not be_nil }
   end
 
   describe '#use!' do
@@ -37,13 +37,13 @@ describe ActivationToken do
     end
   end
 
-  describe '#device_secret_key_valid?' do
-    context 'when device_secret_key is current device.secret_key' do
-      it { subject.device_secret_key_valid?.should be_true }
+  describe '#client_id_valid?' do
+    context 'when client_id is current device.secret_key' do
+      it { subject.client_id_valid?.should be_true }
     end
-    context 'when device_secret_key is not current device.secret_key' do
-      before { device.secret_key = 'a_new_secret_key' }
-      it { subject.device_secret_key_valid?.should be_false }
+    context 'when client_id is not current device.secret_key' do
+      before { device.update! secret_key: 'a_new_secret_key' }
+      it { subject.client_id_valid?.should be_false }
     end
   end
 end
