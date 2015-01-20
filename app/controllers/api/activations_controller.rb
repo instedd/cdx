@@ -10,8 +10,12 @@ class Api::ActivationsController < ApiController
     elsif !activation_token.client_id_valid?
       { status: :failure, message: 'Client id expired' }
     else
-      settings = activation_token.use!(params.require(:public_key))
-      { status: :success, message: 'Device activated', settings: settings }
+      begin
+        settings = activation_token.use!(params.require(:public_key))
+        { status: :success, message: 'Device activated', settings: settings }
+      rescue CDXSync::InvalidPublicKeyError => e
+        { status: :failure, message: 'Invalid public key' }
+      end
     end
     logger.info "Response for activation request #{params[:token]}: #{response}"
     render json: response

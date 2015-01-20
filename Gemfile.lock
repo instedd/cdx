@@ -40,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-sync-server.git
-  revision: fc5249a9d04b8bde45b4c424f904abf25ca34448
+  revision: bedd17f15e94659e2ee70146c3f8c35895b21c6a
   branch: master
   specs:
     cdx-sync-server (0.0.0)
@@ -360,7 +360,7 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
-    trollop (2.0)
+    trollop (2.1.1)
     turbolinks (2.2.0)
       coffee-rails
     tzinfo (0.3.42)
