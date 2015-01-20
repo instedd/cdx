@@ -40,6 +40,8 @@ describe EventQuery do
 
   it "doesn't fails if no device is indexed for the institution yet" do
     institution
+    client = Cdx::Api.client
+    client.indices.refresh index: institution.elasticsearch_index_name
 
     query = EventQuery.new({condition: 'mtb'}, user)
 
