@@ -90,5 +90,9 @@ Cdp::Application.configure do
 
   config.authorized_keys_path = ENV["SSH_KEYS_PATH"]
   config.sync_dir_path = ENV["SSH_SYNC_DIR"]
+  # Must be set
+  #config.ssh_server_host = 'localhost'
+  config.ssh_server_port = 2222
+  config.ssh_user = 'cdx-sync'
 
 end
