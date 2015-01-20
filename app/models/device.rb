@@ -16,7 +16,7 @@ class Device < ActiveRecord::Base
 
   has_many :ssh_keys
 
-  after_save :try_regenerate_keys!
+  after_save :regenerate_authorized_keys!
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
@@ -56,7 +56,7 @@ class Device < ActiveRecord::Base
 
   private
 
-  def try_regenerate_keys!
+  def regenerate_authorized_keys!
     SshKey.regenerate_authorized_keys!
   end
 
