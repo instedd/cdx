@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "0.0.1",
+    "version" : "0.0.2",
     "api_version" : "1.0.0",
     "signature" : "",
     "device_models" : ["genoscan"],
@@ -43,11 +43,11 @@
       "type" : "date"
     },
     {
-      "target_field": "event_id",
+      "target_field": "sample_id",
       "source" : {"lookup" : "SampleNo."},
       "core" : true,
       "indexed" : true,
-      "pii" : false,
+      "pii" : true,
       "type" : "integer"
     },
     {
