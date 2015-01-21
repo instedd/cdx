@@ -2,7 +2,7 @@ class Api::ActivationsController < ApiController
   skip_before_action :authenticate_api_user!
 
   def create
-    activation_token = ActivationToken.find_by(value: params[:token]))
+    activation_token = ActivationToken.find_by(value: params[:token])
     response = if activation_token.nil?
       { status: :failure, message: 'Invalid activation token' }
     elsif activation_token.used?
