@@ -5,6 +5,8 @@ class ActivationToken < ActiveRecord::Base
   validates_presence_of :device, :client_id, :value
 
   before_validation :set_client_id, if: :new_record?
+  before_validation :set_value, if: :new_record?
+
 
   def used?
     !activation.nil?
@@ -27,4 +29,9 @@ class ActivationToken < ActiveRecord::Base
   def set_client_id
     self.client_id = SyncHelpers.client_id(device) if device && !self.client_id
   end
+
+  def set_value
+    self.value = Guid.new.to_s unless self.value
+  end
+
 end
