@@ -102,6 +102,24 @@ class DevicesController < ApplicationController
     end
   end
 
+  def activation_tokens
+    @device = @institution.devices.find params[:id]
+
+    token = ActivationToken.new(device: @device)
+    respond_to do |format|
+      if token.save
+        format.html {
+          redirect_to edit_institution_device_path(@institution, @device),
+          notice: "Token #{token.value} generated"
+        }
+        format.json { render action: 'show', location: @device }
+      else
+        format.html { render action: 'edit', notice: "Could not generate activation token. #{token.errors.first}"}
+        format.json { render json: token.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
   private
 
   def load_institution
