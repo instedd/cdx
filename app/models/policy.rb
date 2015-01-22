@@ -29,6 +29,7 @@ class Policy < ActiveRecord::Base
     DELETE_DEVICE = "#{PREFIX}:deleteDevice" # This is not tested.
     ASSIGN_DEVICE_LABORATORY = "#{PREFIX}:assignDeviceLaboratory" # This is not tested.
     REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey" # This is not tested.
+    GENERATE_ACTIVATION_TOKEN = "#{PREFIX}:generateActivationToken"
     QUERY_EVENT = "#{PREFIX}:queryEvent"
     REPORT_EVENT = "#{PREFIX}:reportEvent"
   end
@@ -47,6 +48,7 @@ class Policy < ActiveRecord::Base
     Actions::DELETE_DEVICE,
     Actions::ASSIGN_DEVICE_LABORATORY,
     Actions::REGENERATE_DEVICE_KEY,
+    Actions::GENERATE_ACTIVATION_TOKEN,
     Actions::QUERY_EVENT,
     Actions::REPORT_EVENT,
   ]

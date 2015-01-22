@@ -10,7 +10,7 @@ Cdp::Application.routes.draw do
     resources :devices do
       member do
         get  'regenerate_key'
-        post 'activation_tokens'
+        post 'generate_activation_token'
       end
       resources :ssh_keys, only: [:create, :destroy]
     end

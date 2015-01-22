@@ -53,6 +53,7 @@ class DevicesController < ApplicationController
     # TODO: check valid laboratories
 
     @can_regenerate_key = has_access?(@devices, REGENERATE_DEVICE_KEY)
+    @can_generate_activation_token = has_access?(@devices, GENERATE_ACTIVATION_TOKEN)
     @can_delete = has_access?(@device, DELETE_DEVICE)
 
     add_breadcrumb @device.name, institution_device_path(@institution, @device)
@@ -102,8 +103,9 @@ class DevicesController < ApplicationController
     end
   end
 
-  def activation_tokens
+  def generate_activation_token
     @device = @institution.devices.find params[:id]
+    return unless authorize_resource(@device, GENERATE_ACTIVATION_TOKEN)
 
     token = ActivationToken.new(device: @device)
     respond_to do |format|

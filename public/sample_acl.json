@@ -55,7 +55,8 @@ Institution Admin:
         "cdxp:readDevice",
         "cdxp:updateDevice",
         "cdxp:deleteDevice",
-        "cdxp:regenerateDeviceKey"
+        "cdxp:regenerateDeviceKey",
+        "cdxp:generateActivationToken"
       ],
       "resource" : "cdxp:device?institution=1"
     }
@@ -100,7 +101,8 @@ Admin for devices under location 7:
         "cdxp:readDevice",
         "cdxp:updateDevice",
         "cdxp:deleteDevice",
-        "cdxp:regenerateDeviceKey"
+        "cdxp:regenerateDeviceKey",
+        "cdxp:generateActivationToken"
       ],
       "resource" : "cdxp:device?institution=1&location=7"
     }

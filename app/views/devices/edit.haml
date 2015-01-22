@@ -12,13 +12,13 @@
     - if @can_regenerate_key
       = link_to "Generate new key", regenerate_key_institution_device_path(@institution, @device)
 
-  %hr
-
-  %p
-    = link_to "Generate activation token",
-      activation_tokens_institution_device_path(@institution, @device),
-      method: :post,
-      class: 'btn'
+  - if @can_generate_activation_token
+    %hr
+    %p
+      = link_to "Generate activation token",
+        activation_tokens_institution_device_path(@institution, @device),
+        method: :post,
+        class: 'btn'
 
   - if @can_delete
     %hr
