@@ -107,12 +107,11 @@ class DevicesController < ApplicationController
     @device = @institution.devices.find params[:id]
     return unless authorize_resource(@device, GENERATE_ACTIVATION_TOKEN)
 
-    token = ActivationToken.new(device: @device)
+    @token = ActivationToken.new(device: @device)
     respond_to do |format|
-      if token.save
+      if @token.save
         format.html {
-          redirect_to edit_institution_device_path(@institution, @device),
-          notice: "Token #{token.value} generated"
+          render 'devices/token'
         }
         format.json { render action: 'show', location: @device }
       else
