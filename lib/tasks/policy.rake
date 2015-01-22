@@ -8,9 +8,6 @@ namespace :policy do
 
     user = User.find args[:user_id]
 
-    superadmin = Policy.superadmin
-    superadmin.user_id = user.id
-    superadmin.granter_id = user.id
-    superadmin.save!
+    user.grant_superadmin_policy
   end
 end

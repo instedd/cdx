@@ -23,8 +23,6 @@ class User < ActiveRecord::Base
     model.save ? model : nil
   end
 
-  private
-
   def grant_implicit_policy
     implicit = Policy.implicit
     implicit.granter = nil
