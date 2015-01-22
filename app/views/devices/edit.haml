@@ -16,7 +16,7 @@
     %hr
     %p
       = link_to "Generate activation token",
-        activation_tokens_institution_device_path(@institution, @device),
+        generate_activation_token_institution_device_path(@institution, @device),
         method: :post,
         class: 'btn'
 
