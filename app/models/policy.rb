@@ -230,7 +230,7 @@ class Policy < ActiveRecord::Base
             resource.filter_by_resource(resource_statement)
           end
           unless found_resource
-            return errors.add :definition, "has an unknown resource: `#{resource}`"
+            return errors.add :definition, "has an unknown resource: `#{resource_statement}`"
           end
         end
         # TODO: validate resources
