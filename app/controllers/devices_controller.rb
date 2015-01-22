@@ -52,8 +52,8 @@ class DevicesController < ApplicationController
 
     # TODO: check valid laboratories
 
-    @can_regenerate_key = has_access?(@devices, REGENERATE_DEVICE_KEY)
-    @can_generate_activation_token = has_access?(@devices, GENERATE_ACTIVATION_TOKEN)
+    @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
+    @can_generate_activation_token = has_access?(@device, GENERATE_ACTIVATION_TOKEN)
     @can_delete = has_access?(@device, DELETE_DEVICE)
 
     add_breadcrumb @device.name, institution_device_path(@institution, @device)
