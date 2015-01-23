@@ -81,14 +81,19 @@ class ManifestFieldMapping
 
   def map(value, mappings)
     return value unless value
+    if value.is_an? Array
+      value.map do |value|
+        map value, mappings
+      end
+    else
+      mapping = mappings.detect do |mapping|
+        value.match mapping["match"].gsub("*", ".*")
+      end
 
-    mapping = mappings.detect do |mapping|
-      value.match mapping["match"].gsub("*", ".*")
+      raise ManifestParsingError.invalid_mapping(value, @field['target_field'], mappings) unless mapping
+
+      mapping["output"]
     end
-
-    raise ManifestParsingError.invalid_mapping(value, @field['target_field'], mappings) unless mapping
-
-    mapping["output"]
   end
 
   def lookup(path, data)
