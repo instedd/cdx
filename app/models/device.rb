@@ -16,8 +16,6 @@ class Device < ActiveRecord::Base
 
   has_many :ssh_keys
 
-  after_save :regenerate_authorized_keys!
-
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
       joins(:institution).where(institutions: {user_id: user.id})
@@ -55,10 +53,6 @@ class Device < ActiveRecord::Base
   end
 
   private
-
-  def regenerate_authorized_keys!
-    SshKey.regenerate_authorized_keys!
-  end
 
   def set_key
     self.secret_key = Guid.new.to_s unless self.secret_key
