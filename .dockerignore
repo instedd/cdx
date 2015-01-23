@@ -1,4 +1,4 @@
 .bundle
 .git
-tmp/
-log/
+tmp
+log
