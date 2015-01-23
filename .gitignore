@@ -25,3 +25,4 @@ backend/log
 cdxapi/.eunit
 cdxapi/ebin
 cdxapi/log
+VERSION
