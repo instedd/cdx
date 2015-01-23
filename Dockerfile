@@ -29,9 +29,11 @@ RUN bundle install --jobs 8 --deployment --without development test
 
 # Install the application
 ADD . /app
-RUN mkdir -p /app/tmp && chown -R app:app /app/tmp
 
 # Precompile assets
 RUN bundle exec rake assets:precompile RAILS_ENV=production
+
+# Set permissions for tmp and log directories
+RUN mkdir -p /app/tmp /app/log && chown -R app:app /app/tmp /app/log
 
 EXPOSE 80
