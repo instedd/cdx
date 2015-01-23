@@ -1,3 +1,3 @@
 #!/bin/sh
 cd /app
-bundle exec rake csv:watch
+sudo -u app -E -- bundle exec rake csv:watch

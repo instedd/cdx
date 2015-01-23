@@ -1,3 +1,3 @@
 #!/bin/sh
 cd /app
-./bin/notify_subscribers
+sudo -u app -E -- ./bin/notify_subscribers
