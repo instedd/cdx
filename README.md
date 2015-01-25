@@ -40,20 +40,15 @@ In order to allow synchronization of clients through rsyns - for csv files -, yo
 You have to mount sshd volumes pointing to the folders where you will store your authorized keys, server keys and sync directory.  Although sshd-server runs standalone and independently of the cdx server, the cdx server needs to be aware of such directories:
  * ```SYNC_HOME```: here is where files from clients wil be sync'ed. The file watcher will monitor inbox files here
  * ```SYNC_SSH```: here is where ```authorized_keys``` file will be stored. The cdx app will write such file on this directory whenever a new ssh keys is added to a device.
- * ```SYNC_KEYS```: is where private server keys are stored. The cdp platform does not actually require to know where they are, but we will set them now too.
 
-By default, the cdp app assumes such directories are all placed in `/tmp/cdx/`. Thus, you should start the cdx-sync-sshd docker container this way:
+By default, the cdx app assumes such directories will point to the tmp directory of the cdp app. Thus, you should start the cdx-sync-sshd docker container this way:
 
 ```
- cd <where you have cloned cdx-sync-server>
- make testrun SYNC_KEYS=/tmp/cdx/keys \
-              SYNC_HOME=/tmp/cdx/sync \
-              SYNC_SSH=/tmp/cdx/ssh
+  cd <where you have cloned cdx-sync-server>
+  export CDP_PATH=<where you have cloned this cdp repository>
+  make testrun SYNC_HOME=$CDP_PATH/tmp/sync \
+               SYNC_SSH=$CDP_PATH/tmp/.ssh
 ```
-
-If you want to point ```SYNC_HOME``` or ```SYNC_SSH``` to another dir, please update also the following config keys in the application config files for you environment:
- * ```config.authorized_keys_path```
- * ```config.sync_dir_path```
 
 ### Sync File Watcher
 
