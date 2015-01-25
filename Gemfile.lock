@@ -40,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-sync-server.git
-  revision: bedd17f15e94659e2ee70146c3f8c35895b21c6a
+  revision: a5f9038b7c61a369196bf4cdea83b76517bf5e3a
   branch: master
   specs:
     cdx-sync-server (0.0.0)

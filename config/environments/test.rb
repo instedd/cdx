@@ -36,8 +36,8 @@ Cdp::Application.configure do
 
   config.action_mailer.default_url_options = { host: Settings.host }
 
-  config.authorized_keys_path = Rails.root.join('/tmp/cdx/ssh/authorized_keys')
-  config.sync_dir_path = Rails.root.join('/tmp/cdx/sync')
+  config.authorized_keys_path = 'tmp/.ssh/authorized_keys'
+  config.sync_dir_path = 'tmp/sync'
   config.ssh_server_host = 'localhost'
   config.ssh_server_port = 2222
   config.ssh_user = 'cdx-sync'

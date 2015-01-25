@@ -28,8 +28,8 @@ describe ActivationToken do
       it { settings[:host].should eq('localhost') }
       it { settings[:port].should eq(2222) }
       it { settings[:user].should eq('cdx-sync') }
-      it { settings[:inbox_dir].should end_with('74ee5b6e-f64c-17d3-49d6-28ff59b1b1d3/inbox') }
-      it { settings[:outbox_dir].should end_with('74ee5b6e-f64c-17d3-49d6-28ff59b1b1d3/outbox') }
+      it { settings[:inbox_dir].should eq('inbox') }
+      it { settings[:outbox_dir].should eq('outbox') }
     end
     context 'when it was used' do
       it { expect { token.use!(SampleSshKey) }.to raise_error }

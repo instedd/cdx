@@ -26,10 +26,9 @@ module SyncHelpers
         host: Rails.application.config.ssh_server_host,
         port: Rails.application.config.ssh_server_port,
         user: Rails.application.config.ssh_user,
-        inbox_dir: dir.inbox_path(client_id),
-        outbox_dir: dir.outbox_path(client_id)
+        inbox_dir: dir.inbox_area,
+        outbox_dir: dir.outbox_area
       }
     end
-
   end
 end
