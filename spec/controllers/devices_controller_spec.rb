@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'policy_spec_helper'
 
 describe DevicesController do
   let(:institution) {Institution.make}
@@ -8,8 +9,19 @@ describe DevicesController do
 
   before(:each) {sign_in user}
 
-  context "Update" do
+  context "Index" do
+    it "should display index when other user grants admin permission" do
+      user2 = User.make
+      institution2 = Institution.make user: user2
+      institution2.devices.make
 
+      grant user2, user, [Institution.resource_name, Device.resource_name], "*"
+
+      get :index, institution_id: institution2.id
+    end
+  end
+
+  context "Update" do
     it "device is successfully updated if name is provided" do
       d = Device.find(device.id)
       d.name.should_not eq("New device")
@@ -29,7 +41,6 @@ describe DevicesController do
       d = Device.find(device.id)
       d.name.should eq(device.name)
     end
-
   end
 
   describe "generate_activation_token" do

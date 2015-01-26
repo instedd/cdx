@@ -16,20 +16,20 @@ class Policy < ActiveRecord::Base
     CREATE_INSTITUTION = "#{PREFIX}:createInstitution"
     READ_INSTITUTION = "#{PREFIX}:readInstitution"
     UPDATE_INSTITUTION = "#{PREFIX}:updateInstitution"
-    DELETE_INSTITUTION = "#{PREFIX}:deleteInstitution" # This is not tested.
+    DELETE_INSTITUTION = "#{PREFIX}:deleteInstitution"
 
     CREATE_INSTITUTION_LABORATORY = "#{PREFIX}:createInstitutionLaboratory"
     READ_LABORATORY = "#{PREFIX}:readLaboratory"
-    UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory" # This is not tested.
-    DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory" # This is not tested.
+    UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory"
+    DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory"
 
-    REGISTER_INSTITUTION_DEVICE = "#{PREFIX}:registerInstitutionDevice" # This is not tested.
-    READ_DEVICE = "#{PREFIX}:readDevice" # This is not tested.
-    UPDATE_DEVICE = "#{PREFIX}:updateDevice" # This is not tested.
-    DELETE_DEVICE = "#{PREFIX}:deleteDevice" # This is not tested.
+    REGISTER_INSTITUTION_DEVICE = "#{PREFIX}:registerInstitutionDevice"
+    READ_DEVICE = "#{PREFIX}:readDevice"
+    UPDATE_DEVICE = "#{PREFIX}:updateDevice"
+    DELETE_DEVICE = "#{PREFIX}:deleteDevice"
     ASSIGN_DEVICE_LABORATORY = "#{PREFIX}:assignDeviceLaboratory" # This is not tested.
     REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey" # This is not tested.
-    GENERATE_ACTIVATION_TOKEN = "#{PREFIX}:generateActivationToken"
+    GENERATE_ACTIVATION_TOKEN = "#{PREFIX}:generateActivationToken" # This is not tested.
     QUERY_EVENT = "#{PREFIX}:queryEvent"
     REPORT_EVENT = "#{PREFIX}:reportEvent"
   end
@@ -271,7 +271,7 @@ class Policy < ActiveRecord::Base
         return resource
       end
 
-      new_resource = if resource.is_a? ActiveRecord::Relation
+      new_resource = if resource.is_a?(ActiveRecord::Relation) || resource.is_a?(Array)
         resource.to_a.map do |resource|
           resource.filter_by_resource(resource_filter)
         end.delete_if &:nil?
