@@ -308,6 +308,15 @@ describe Policy do
         assert_can user2, Laboratory, READ_LABORATORY, [laboratory]
       end
 
+      it "allows reading other laboratories" do
+        laboratory = institution.laboratories.make
+        user2 = User.make
+
+        grant user, user2, Laboratory, READ_LABORATORY
+
+        assert_can user2, institution.laboratories, READ_LABORATORY, [laboratory]
+      end
+
       it "allows reading other laboratory" do
         laboratory = institution.laboratories.make
         user2 = User.make
