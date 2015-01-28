@@ -9,7 +9,7 @@ class Cdx::Api::Elasticsearch::Query
 
   def self.for_indices indices, params
     query = new params
-    query.indices = indices.join ', '
+    query.indices = indices.join ','
     query
   end
 
