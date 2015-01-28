@@ -47,9 +47,9 @@ When querying from the query string the _'+'_ sign must be escaped as _'%2B'_
 
 `/events?institution=1`
 
-* `device` - filter events by device id
+* `device` - filter events by device uuid
 
-`/events?device=1`
+`/events?device=9d68e8fd-3ebe-a163-2ad6-7a675dac5dde`
 
 * `laboratory` - filter events by laboratory id
 
@@ -282,7 +282,7 @@ Returns an array of events without any PII and the total count of elements that 
       "created_at" : "2014-04-24T17:16:03+0000",
       "start_time" : "2014-04-24T17:16:03+0000",
       "device_serial_number" : "123456789",
-      "device_id" : 2,
+      "device_uuid" : "9d68e8fd-3ebe-a163-2ad6-7a675dac5dde",
       "laboratory_id" : 3,
       "system_user" : "jdoe",
       "institution_id" : 4,
@@ -302,7 +302,7 @@ Returns an array of events without any PII and the total count of elements that 
       "created_at" : "2014-04-24T17:16:03+0000",
       "start_time" : "2014-04-24T17:16:03+0000",
       "device_serial_number" : "123456789",
-      "device_id" : 2,
+      "device_uuid" : "9d68e8fd-3ebe-a163-2ad6-7a675dac5dde",
       "laboratory_id" : 3,
       "system_user" : "jdoe",
       "institution_id" : 4,
