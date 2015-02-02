@@ -7,11 +7,12 @@ describe Subscriber do
   let(:laboratory){device.laboratories.first}
 
   it "generates a correct filter_event query" do
-    filter = {"condition" => "mtb", "laboratory" => laboratory.id.to_s}
+    filter_params = {"condition" => "mtb", "laboratory" => laboratory.id.to_s}
     fields = ["condition", "result", "patient_name"]
     url = "http://mbuilder-stg.instedd.org/external/application/118/trigger/cdp_trigger"
 
-    subscriber = Subscriber.make ({:fields => fields, :url => url, :filter => filter})
+    filter = Filter.make params: filter_params
+    subscriber = Subscriber.make fields: fields, url: url, filter: filter
 
     callback_query = "http://mbuilder-stg.instedd.org/external/application/118/trigger/cdp_trigger?condition=mtb&patient_name=jdoe&result=positive"
 

@@ -1,7 +1,7 @@
 class Subscriber < ActiveRecord::Base
   belongs_to :user
+  belongs_to :filter
 
-  serialize :filter, JSON
   serialize :fields, JSON
 
   validates_presence_of :user
@@ -18,7 +18,7 @@ class Subscriber < ActiveRecord::Base
 
   def notify
     fields = self.fields
-    filter = self.filter
+    filter = self.filter.params
     filter["since"] = last_run_at.iso8601
     events = Cdx::Api::Elasticsearch::Query.new(filter).execute["events"]
     now = Time.now

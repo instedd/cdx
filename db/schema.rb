@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150120144346) do
+ActiveRecord::Schema.define(version: 20150202184854) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -69,6 +69,16 @@ ActiveRecord::Schema.define(version: 20150120144346) do
     t.boolean  "index_failed"
     t.text     "index_failure_reason"
   end
+
+  create_table "filters", force: true do |t|
+    t.integer  "user_id"
+    t.string   "name"
+    t.text     "params"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "filters", ["user_id"], name: "index_filters_on_user_id", using: :btree
 
   create_table "identities", force: true do |t|
     t.integer  "user_id"
@@ -153,14 +163,16 @@ ActiveRecord::Schema.define(version: 20150120144346) do
     t.integer  "user_id"
     t.string   "name"
     t.string   "url"
-    t.text     "filter"
     t.text     "fields"
     t.datetime "last_run_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "url_user"
     t.string   "url_password"
+    t.integer  "filter_id"
   end
+
+  add_index "subscribers", ["filter_id"], name: "index_subscribers_on_filter_id", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "", null: false

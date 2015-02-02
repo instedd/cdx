@@ -71,6 +71,11 @@ Subscriber.blueprint do
   last_run_at {Time.now}
 end
 
+Filter.blueprint do
+  user
+  name
+end
+
 ActivationToken.blueprint do
   device
   value { "token-#{Sham.sn}" }
