@@ -73,7 +73,7 @@ When querying from the query string the _'+'_ sign must be escaped as _'%2B'_
 
 * `condition` - filter events for a particular condition name
 
-`/events?condition=MTB`
+`/events?condition=mtb`
 
 * `assay_name` - filter events for a particular assay name
 
