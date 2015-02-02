@@ -14,7 +14,7 @@ class SubscribersController < ApplicationController
   def create
     @subscriber = current_user.subscribers.new(subscriber_params)
     @subscriber.last_run_at = Time.now
-    @subscriber.filter = Filter.new params: params["filter"], name: "Filter for '#{@subscriber.name}' subscriber"
+    @subscriber.filter = current_user.filters.create! params: params["filter"], name: "Filter for '#{@subscriber.name}' subscriber"
     @subscriber.fields = (params["fields"] || {}).keys
 
     if @subscriber.save

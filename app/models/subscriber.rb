@@ -5,6 +5,7 @@ class Subscriber < ActiveRecord::Base
   serialize :fields, JSON
 
   validates_presence_of :user
+  validates_presence_of :filter
   validates_presence_of :name
   validates_presence_of :url
   validates_presence_of :filter
