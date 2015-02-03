@@ -197,9 +197,9 @@ class Cdx::Api::Elasticsearch::Query
     all_orders = extract_multi_values(order)
     all_orders.map do |order|
       if order[0] == "-"
-        {order[1..-1] => "desc"}
+        {order[1..-1] => { :order => "desc", :ignore_unmapped => true} }
       else
-        {order => "asc"}
+        {order => { :order => "asc", :ignore_unmapped => true} }
       end
     end
   end
