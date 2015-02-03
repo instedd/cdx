@@ -39,7 +39,7 @@ class Cdx::Api::Service
 
   def client
     log_enabled = !!config.log
-    ::Elasticsearch::Client.new log: log_enabled
+    ::Elasticsearch::Client.new log: log_enabled, host: config.elasticsearch_url || "http://localhost:9200"
   end
 
   def elastic_index_pattern

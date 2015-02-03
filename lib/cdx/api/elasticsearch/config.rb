@@ -18,6 +18,7 @@ class Cdx::Api::Elasticsearch::Config
   attr_accessor :index_name_pattern
   attr_accessor :template_name_pattern
   attr_accessor :log
+  attr_accessor :elasticsearch_url
 
   def searchable_fields
     @searchable_fields ||= api_fields[:searchable_fields].map do |definition|
