@@ -1,8 +1,8 @@
 class Filter < ActiveRecord::Base
   belongs_to :user
-  serialize :params, JSON
+  serialize :query, JSON
 
   validates_presence_of :user
   validates_presence_of :name
-  validates_presence_of :params
+  validates_presence_of :query
 end

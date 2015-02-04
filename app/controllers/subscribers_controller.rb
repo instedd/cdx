@@ -20,8 +20,8 @@ class SubscribersController < ApplicationController
     if @subscriber.save
       redirect_to subscribers_path, notice: "Subscriber was successfully created"
     else
-      @filter_laboratory = @subscriber.filter.params["laboratory"]
-      @filter_condition = @subscriber.filter.params["condition"]
+      @filter_laboratory = @subscriber.filter.query["laboratory"]
+      @filter_condition = @subscriber.filter.query["condition"]
       @laboratory = Laboratory.find @filter_laboratory
 
       render "new"
@@ -30,21 +30,21 @@ class SubscribersController < ApplicationController
 
   def edit
     @subscriber = current_user.subscribers.find params[:id]
-    @filter_laboratory = @subscriber.filter.params["laboratory"]
-    @filter_condition = @subscriber.filter.params["condition"]
+    @filter_laboratory = @subscriber.filter.query["laboratory"]
+    @filter_condition = @subscriber.filter.query["condition"]
     @laboratory = Laboratory.find @filter_laboratory rescue nil
   end
 
   def update
     @subscriber = current_user.subscribers.find params[:id]
-    @subscriber.filter.params = params["filter"]
+    @subscriber.filter.query = params["filter"]
     @subscriber.fields = (params["fields"] || {}).keys
 
     if @subscriber.update(subscriber_params)
       redirect_to subscribers_path, notice: "Subscriber was successfully updated"
     else
-      @filter_laboratory = @subscriber.filter.params["laboratory"]
-      @filter_condition = @subscriber.filter.params["condition"]
+      @filter_laboratory = @subscriber.filter.query["laboratory"]
+      @filter_condition = @subscriber.filter.query["condition"]
       @laboratory = Laboratory.find @filter_laboratory
 
       render "edit"
