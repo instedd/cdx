@@ -6,16 +6,10 @@
         - @subscriber.errors.full_messages.each do |msg|
           %li= msg
 
-  = hidden_field :filter, :laboratory, value: @filter_laboratory
-  = hidden_field :filter, :condition, value: @filter_condition
-  %div
-    - if @subscriber.new_record?
-      Create a subscriber for this filter:
-    - else
-      This is a subscriber for this filter:
-    %ul
-      %li Laboratory: #{@laboratory.try(:name)}
-      %li Condition: #{@filter_condition}
+  .control-group
+    = f.label :filter, class: 'control-label'
+    .control
+      = f.collection_select :filter_id, @filters, :id, :name, class: 'input-large'
   .control-group
     = f.label :name, :class => 'control-label'
     .control
@@ -41,4 +35,4 @@
           = field
   .control-group
     .control
-      %input.btn{type: "submit", value: "Create subscriber"}
+      = f.submit nil, class: "btn"

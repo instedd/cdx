@@ -1,5 +1,5 @@
 .row-fluid
   .span6
-    - simple_list :subscriber, title: 'Subscribers', icon: :folder do
+    - simple_list :subscriber, title: 'Subscribers', icon: :folder, create_path: new_subscriber_path do
       - @subscribers.each do |subscriber|
         - simple_list_item subscriber.name, edit_subscriber_path(subscriber)
