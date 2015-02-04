@@ -10,7 +10,8 @@
       %input.btn.btn-small{type: "submit", value: "Filter"}
 
       - if params["laboratory"].present? && params["condition"].present?
-        = link_to "Create a subscriber for this filter", new_subscriber_path(laboratory: params["laboratory"], condition: params["condition"])
+        - query = {laboratory: params["laboratory"], condition: params["condition"]}
+        = link_to "Save this filter", new_filter_path(query: query)
 
 .row-fluid
   .span12

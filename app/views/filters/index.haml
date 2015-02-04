@@ -1,0 +1,5 @@
+.row-fluid
+  .span6
+    - simple_list :filter, title: 'Filters', icon: :folder do
+      - @filters.each do |filter|
+        - simple_list_item filter.name, edit_filter_path(filter)

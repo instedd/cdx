@@ -1,0 +1,26 @@
+= form_for(@filter) do |f|
+  - if @filter.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@filter.errors.count, "error")} prohibited this filter from being saved:"
+      %ul
+        - @filter.errors.full_messages.each do |msg|
+          %li= msg
+
+  = f.fields_for(:query) do |p|
+    - @filter.query.each do |key, value|
+      = p.hidden_field key, value: value
+  %div
+    - if @filter.new_record?
+      Create a filter:
+    - else
+      This is a filter:
+    %ul
+      %li Laboratory: #{@laboratory.try(:name)}
+      %li Condition: #{@condition}
+  .control-group
+    = f.label :name, :class => 'control-label'
+    .control
+      = f.text_field :name
+  .control-group
+    .control
+      = f.submit class: "btn"

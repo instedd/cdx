@@ -19,6 +19,7 @@ Cdp::Application.routes.draw do
   resources :locations
   resources :manifests, except: [:update]
   resources :events
+  resources :filters
   resources :subscribers
   resources :policies
 
