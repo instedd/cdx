@@ -55,22 +55,6 @@
       "indexed" : true
     },
     {
-      "target_field" : "uuid",
-      "source" : {"lookup" : "uuid"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "device_uuid",
-      "source" : {"lookup" : "device_uuid"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
       "target_field" : "system_user",
       "source" : {"lookup" : "system_user"},
       "type" : "string",
@@ -98,30 +82,6 @@
       "target_field" : "error_description",
       "source" : {"lookup" : "error_description"},
       "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "laboratory_id",
-      "source" : {"lookup" : "laboratory_id"},
-      "type" : "integer",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "institution_id",
-      "source" : {"lookup" : "institution_id"},
-      "type" : "integer",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "location",
-      "source" : {"lookup" : "location"},
-      "type" : "location",
       "core" : true,
       "pii" : false,
       "indexed" : true
