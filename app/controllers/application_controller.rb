@@ -9,6 +9,10 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :load_current_user_policies
 
+  decent_configuration do
+    strategy DecentExposure::StrongParametersStrategy
+  end
+
   def render_json(object, params={})
     render params.merge(text: object.to_json_oj, content_type: 'text/json')
   end

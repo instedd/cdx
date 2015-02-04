@@ -1,46 +1,31 @@
 class FiltersController < ApplicationController
-  def index
-    @filters = current_user.filters
-  end
+  expose(:filters) { current_user.filters }
+  expose(:filter, attributes: :filter_params)
+  expose(:laboratory) { Laboratory.find(filter.query.with_indifferent_access[:laboratory]) }
+  expose(:condition) { filter.query.with_indifferent_access[:condition] }
 
   def new
-    @filter = Filter.new
-    @filter.query = params[:query]
-    @laboratory = Laboratory.find(@filter.query[:laboratory])
-    @condition = @filter.query[:condition]
+    filter.query = params[:query]
   end
 
   def create
-    @filter = current_user.filters.new(filter_params)
-    if @filter.save
+    if filter.save
       redirect_to filters_path, notice: "Filter was successfully created"
     else
-      @laboratory = Laboratory.find(@filter.query[:laboratory])
-      @condition = @filter.query[:condition]
-      render "new"
+      render :new
     end
   end
 
-  def edit
-    @filter = current_user.filters.find params[:id]
-    @laboratory = Laboratory.find(@filter.query["laboratory"])
-    @condition = @filter.query["condition"]
-  end
-
   def update
-    @filter = current_user.filters.find params[:id]
-    if @filter.update(filter_params)
+    if filter.save
       redirect_to filters_path, notice: "Filter was successfully updated"
     else
-      @laboratory = Laboratory.find @filter.query["laboratory"]
-      @condition = @filter.query["condition"]
-      render "edit"
+      render :edit
     end
   end
 
   def destroy
-    @filter = current_user.filters.find params[:id]
-    @filter.destroy
+    filter.destroy
     redirect_to filters_path
   end
 

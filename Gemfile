@@ -10,6 +10,7 @@ gem 'haml-rails'
 gem 'underscore-rails'
 gem 'awesome_nested_set', '~> 3.0.0.rc.3'
 gem 'csv_builder'
+gem 'decent_exposure'
 
 gem 'foreman'
 
