@@ -50,5 +50,6 @@ Cdp::Application.routes.draw do
       end
     end
     resources :laboratories, only: :index
+    resources :filters
   end
 end
