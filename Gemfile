@@ -64,7 +64,12 @@ gem 'oj'
 gem 'guid'
 gem 'encryptor'
 
-gem 'pry-byebug', group: [:development, :test]
+group :development, :test do
+  gem 'pry-byebug'
+  gem 'pry-rescue'
+  gem 'pry-stack_explorer'
+  gem 'pry-clipboard'
+end
 
 group :test do
   gem 'tire'
