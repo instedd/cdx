@@ -8,7 +8,6 @@ class Subscriber < ActiveRecord::Base
   validates_presence_of :filter
   validates_presence_of :name
   validates_presence_of :url
-  validates_presence_of :filter
   validates_presence_of :fields
 
   def self.notify_all

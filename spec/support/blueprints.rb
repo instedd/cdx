@@ -20,6 +20,7 @@ Sham.define do
   name { Faker::Name.name }
   email { Faker::Internet.email }
   password { Faker::Name.name }
+  url { Faker::Internet.url }
 end
 
 User.blueprint do
@@ -68,6 +69,7 @@ end
 Subscriber.blueprint do
   user
   name
+  url
   last_run_at {Time.now}
 end
 

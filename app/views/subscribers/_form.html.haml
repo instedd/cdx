@@ -1,15 +1,15 @@
-= form_for(@subscriber) do |f|
-  - if @subscriber.errors.any?
+= form_for(subscriber) do |f|
+  - if subscriber.errors.any?
     #error_explanation
-      %h2= "#{pluralize(@subscriber.errors.count, "error")} prohibited this subscriber from being saved:"
+      %h2= "#{pluralize(subscriber.errors.count, "error")} prohibited this subscriber from being saved:"
       %ul
-        - @subscriber.errors.full_messages.each do |msg|
+        - subscriber.errors.full_messages.each do |msg|
           %li= msg
 
   .control-group
     = f.label :filter, class: 'control-label'
     .control
-      = f.collection_select :filter_id, @filters, :id, :name, class: 'input-large'
+      = f.collection_select :filter_id, filters, :id, :name, class: 'input-large'
   .control-group
     = f.label :name, :class => 'control-label'
     .control
@@ -31,7 +31,7 @@
     .control
       - ["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code", "created_at", "device_uuid", "institution_id", "laboratory_id", "location_id", "assay_name", "device_serial_number", "age", "gender", "system_user", "start_time", "condition", "result"].each do |field|
         %label
-          = check_box_tag "fields[#{field}]", true, @subscriber.fields.include?(field)
+          = check_box_tag "fields[#{field}]", true, subscriber.fields.include?(field)
           = field
   .control-group
     .control
