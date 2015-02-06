@@ -7,8 +7,6 @@ class Api::ActivationsController < ApiController
       { status: :failure, message: 'Invalid activation token' }
     elsif activation_token.used?
       { status: :failure, message: 'Activation token already used' }
-    elsif !activation_token.client_id_valid?
-      { status: :failure, message: 'Client id expired' }
     else
       begin
         settings = activation_token.use!(params.require(:public_key))

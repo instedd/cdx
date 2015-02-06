@@ -15,13 +15,13 @@ describe Api::ActivationsController do
       it { response_json['message'].should eq('Device activated') }
     end
 
-    context 'when token exists but device secret changed' do
+    context 'when token exists but device uuid does not match' do
       let!(:activation_token) { ActivationToken.make(value: '12345') }
-      before { activation_token.device.update secret_key: 'a new secret key' }
+      before { activation_token.device.tap(&:set_key).save }
       include_context :do_post
 
       it { response_json['status'].should eq('failure') }
-      it { response_json['message'].should eq('Client id expired') }
+      it { response_json['message'].should eq('Invalid activation token') }
     end
 
     context 'when token exists but was used' do

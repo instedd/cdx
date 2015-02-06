@@ -21,10 +21,6 @@ class ActivationToken < ActiveRecord::Base
     SyncHelpers.client_settings(client_id)
   end
 
-  def client_id_valid?
-    SyncHelpers.client_id(device) == client_id
-  end
-
   private
 
   def set_client_id
@@ -34,5 +30,4 @@ class ActivationToken < ActiveRecord::Base
   def set_value
     self.value = Guid.new.to_s unless self.value
   end
-
 end

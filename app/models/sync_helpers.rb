@@ -13,7 +13,7 @@ module SyncHelpers
     end
 
     def client_id(device)
-      device.secret_key
+      device.uuid
     end
 
     def to_client(device, public_key)

@@ -1,16 +1,23 @@
 class Api::EventsController < ApiController
-  def create
-    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_secret_key(params[:device_id])
-    event, saved = Event.create_or_update_with device, request.body.read
+  skip_before_action :authenticate_api_user!, only: :create
+  skip_before_action :load_current_user_policies, only: :create
 
-    if saved
-      if event.index_failed?
-        render :status => :unprocessable_entity, :json => { :errors => event.index_failure_reason }
+  def create
+    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_uuid(params[:device_id])
+    if device.validate_authentication(params[:authentication_token])
+      event, saved = Event.create_or_update_with device, request.body.read
+
+      if saved
+        if event.index_failed?
+          render :status => :unprocessable_entity, :json => { :errors => event.index_failure_reason }
+        else
+          render :status => :ok, :json => { :event => event.indexed_body }
+        end
       else
-        render :status => :ok, :json => { :event => event.indexed_body }
+        render :status => :unprocessable_entity, :json => { :errors => event.errors }
       end
     else
-      render :status => :unprocessable_entity, :json => { :errors => event.errors }
+      render :status => :forbidden, :json => {}
     end
   end
 

@@ -9,7 +9,7 @@ module EventIndexing
         'event'
       end
 
-      Cdx::Api.client.index index: device.institution.elasticsearch_index_name, type: type, body: indexed_body, id: "#{device.secret_key}_#{self.event_id}"
+      Cdx::Api.client.index index: device.institution.elasticsearch_index_name, type: type, body: indexed_body, id: "#{device.uuid}_#{self.event_id}"
     end
 
     def self.pii?(field)
@@ -60,7 +60,7 @@ module EventIndexing
       properties = {
         created_at: self.created_at.utc.iso8601,
         updated_at: self.updated_at.utc.iso8601,
-        device_uuid: device.secret_key,
+        device_uuid: device.uuid,
         uuid: uuid,
         location_id: location_id,
         parent_locations: parent_locations_id,

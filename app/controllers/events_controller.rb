@@ -11,7 +11,7 @@ class EventsController < ApplicationController
     @events = Cdx::Api::Elasticsearch::Query.new(query).execute["events"]
     @institutions = indexed_model Institution, "institution_id"
     @laboratories = indexed_model Laboratory, "laboratory_id"
-    @devices = indexed_model Device, "device_uuid", "secret_key"
+    @devices = indexed_model Device, "device_uuid", "uuid"
   end
 
   private

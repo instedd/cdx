@@ -1,16 +1,15 @@
 .span12
   %h3 Editing #{@device.name}
+  %p
+    %strong UUID:
+    = @device.uuid
 
   = render 'form'
 
-  %hr
-
-  %p
-    %strong UUID:
-    = @device.secret_key
-
-    - if @can_regenerate_key
-      = link_to "Generate new key", regenerate_key_institution_device_path(@institution, @device)
+  - if @can_regenerate_key
+    %hr
+    %p
+      = link_to "Generate new key", regenerate_key_institution_device_path(@institution, @device), class: 'btn'
 
   - if @can_generate_activation_token
     %hr

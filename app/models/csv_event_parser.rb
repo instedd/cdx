@@ -27,8 +27,8 @@ class CSVEventParser
     CSV.generate_line(data.keys, col_sep: ';') + CSV.generate_line(data.values, col_sep: ';')
   end
 
-  def load_for_device(data, device_key)
-    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by!(secret_key: device_key)
+  def load_for_device(data, device_uuid)
+    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by!(uuid: device_uuid)
     raw_events = load_all data
     events = raw_events.map do |raw_event|
       raw_event = dump raw_event
@@ -51,9 +51,9 @@ class CSVEventParser
   private
 
   def load_file
-    lambda do |secret_key, filename|
-      Rails.logger.info "Importing #{filename} for device #{secret_key}"
-      File.open(filename) { |file| load_for_device file, secret_key }
+    lambda do |uuid, filename|
+      Rails.logger.info "Importing #{filename} for device #{uuid}"
+      File.open(filename) { |file| load_for_device file, uuid }
       File.delete(filename)
     end
   end

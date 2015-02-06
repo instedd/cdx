@@ -1,5 +1,4 @@
 class SshKey < ActiveRecord::Base
-
   belongs_to :device
 
   validates_presence_of :public_key, :device

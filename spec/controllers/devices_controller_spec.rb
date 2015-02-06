@@ -49,7 +49,7 @@ describe DevicesController do
 
     it { token.should_not be_nil }
     it { token.device.should eq(device) }
-    it { token.client_id.should eq(device.secret_key) }
+    it { token.client_id.should eq(device.uuid) }
     it { token.value.should_not be_nil }
   end
 

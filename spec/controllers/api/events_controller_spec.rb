@@ -5,7 +5,6 @@ describe Api::EventsController do
   let(:institution) {Institution.make user_id: user.id}
   let(:device) {Device.make institution_id: institution.id}
   let(:data) {Oj.dump results: [result: :positive]}
-  before(:each) {sign_in user}
 
   def all_elasticsearch_events
     client = fresh_client_for institution.elasticsearch_index_name
@@ -21,7 +20,7 @@ describe Api::EventsController do
 
   context "Creation" do
     it "should create event in the database" do
-      response = post :create, data, device_id: device.secret_key
+      response = post :create, data, device_id: device.uuid, authentication_token: device.secret_key
       response.status.should eq(200)
 
       event = Event.first
@@ -31,24 +30,24 @@ describe Api::EventsController do
     end
 
     it "should create event in elasticsearch" do
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["results"].first["result"].should eq("positive")
       event["created_at"].should_not eq(nil)
-      event["device_uuid"].should eq(device.secret_key)
+      event["device_uuid"].should eq(device.uuid)
       Event.first.uuid.should eq(event["uuid"])
     end
 
     it "should store institution_id in elasticsearch" do
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["institution_id"].should eq(device.institution_id)
     end
 
     it "should override event if event_id is the same" do
-      post :create, Oj.dump(event_id: "1234", age: 20, patient_name: 'john doe'), device_id: device.secret_key
+      post :create, Oj.dump(event_id: "1234", age: 20, patient_name: 'john doe'), device_id: device.uuid, authentication_token: device.secret_key
 
       event = Event.first.decrypt
       event.event_id.should eq("1234")
@@ -57,7 +56,7 @@ describe Api::EventsController do
       event.sensitive_data[:patient_id].should be_nil
       event.sensitive_data[:patient_name].should eq('john doe')
 
-      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20, patient_name: 'jane doe'), device_id: device.secret_key
+      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20, patient_name: 'jane doe'), device_id: device.uuid, authentication_token: device.secret_key
 
       Event.count.should eq(1)
       event = Event.first.decrypt
@@ -70,10 +69,11 @@ describe Api::EventsController do
       events.size.should eq(1)
       event = events.first
       event["_source"]["event_id"].should eq("1234")
-      event["_id"].should eq("#{device.secret_key}_1234")
+      event["_id"].should eq("#{device.uuid}_1234")
       event["_source"]["age"].should eq(30)
 
-      post :create, Oj.dump(event_id: "1234", age: 20, patient_id: 22), device_id: Device.make(institution: institution).secret_key
+      device2 = Device.make(institution: institution)
+      post :create, Oj.dump(event_id: "1234", age: 20, patient_id: 22), device_id: device2.uuid, authentication_token: device2.secret_key
 
       Event.count.should eq(2)
       events = all_elasticsearch_events
@@ -81,7 +81,7 @@ describe Api::EventsController do
     end
 
     it "should generate a start_time date if it's not provided" do
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["start_time"].should eq(event["created_at"])
@@ -90,7 +90,7 @@ describe Api::EventsController do
 
   context "Manifest" do
     it "shouldn't store sensitive data in elasticsearch" do
-      post :create, Oj.dump(results:[result: :positive], patient_id: 1234), device_id: device.secret_key
+      post :create, Oj.dump(results:[result: :positive], patient_id: 1234), device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["results"].first["result"].should eq("positive")
@@ -113,7 +113,7 @@ describe Api::EventsController do
           "core" : true
         }]
       }}
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["assay_name"].should eq("GX4002")
@@ -146,7 +146,7 @@ describe Api::EventsController do
         ]
       }}
 
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["assay_name"].should eq("GX4002")
@@ -194,7 +194,7 @@ describe Api::EventsController do
         ]
       }}
 
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["foo"].should be_nil
@@ -221,7 +221,7 @@ describe Api::EventsController do
         ]
       }}
 
-      post :create, Oj.dump(some_field: 1234), device_id: device.secret_key
+      post :create, Oj.dump(some_field: 1234), device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["foo"].should be_nil
@@ -248,18 +248,19 @@ describe Api::EventsController do
             "type" : "integer"
           }]
       }}
-      post :create, Oj.dump(error_code: 1234), device_id: device.secret_key
+      post :create, Oj.dump(error_code: 1234), device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["error_code"].should eq(1234)
 
-      post :create, Oj.dump(error_code: "foo"), device_id: device.secret_key
+      post :create, Oj.dump(error_code: "foo"), device_id: device.uuid, authentication_token: device.secret_key
 
       response.code.should eq("422")
       Oj.load(response.body)["errors"].should eq("'foo' is not a valid value for 'error_code' (must be an integer)")
     end
 
     context "csv" do
+      before(:each) { sign_in user}
       it 'parses a csv' do
         manifest = Manifest.make definition: %{
           {
@@ -290,7 +291,7 @@ describe Api::EventsController do
         }
         csv = %{error_code;result\n0;positive\n1;negative}
 
-        post :upload, csv, device_id: device.secret_key
+        post :upload, csv, device_id: device.uuid, authentication_token: device.secret_key
 
         events = all_elasticsearch_events.sort_by { |event| event["_source"]["error_code"] }
         event = events.first["_source"]
@@ -312,11 +313,12 @@ describe Api::EventsController do
     let(:laboratory1) {Laboratory.make institution: institution, location: leaf_location1}
     let(:laboratory2) {Laboratory.make institution: institution, location: leaf_location2}
     let(:laboratory3) {Laboratory.make institution: institution, location: upper_leaf_location}
+    before(:each) {sign_in user}
 
     it "should store the location id when the device is registered in only one laboratory" do
       device.laboratories = [laboratory1]
       device.save!
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(leaf_location1.geo_id)
@@ -331,7 +333,7 @@ describe Api::EventsController do
       device.laboratories = [laboratory1, laboratory2]
       device.save!
 
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(parent_location.geo_id)
@@ -345,7 +347,7 @@ describe Api::EventsController do
       device.laboratories = [laboratory2, laboratory3]
       device.save!
 
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(root_location.geo_id)
@@ -358,7 +360,7 @@ describe Api::EventsController do
       device.laboratories = [laboratory3, laboratory2]
       device.save!
 
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should eq(root_location.geo_id)
@@ -371,7 +373,7 @@ describe Api::EventsController do
       device.laboratories = []
       device.save!
 
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events.first["_source"]
       event["location_id"].should be_nil
@@ -384,9 +386,9 @@ describe Api::EventsController do
       device1 = Device.make institution: institution, laboratories: [laboratory1]
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
-      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.secret_key
-      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.secret_key
-      post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.secret_key
+      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.uuid, authentication_token: device1.secret_key
+      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.uuid, authentication_token: device2.secret_key
+      post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.uuid, authentication_token: device3.secret_key
 
       response = get_updates(location: leaf_location1.geo_id)
 
@@ -418,9 +420,9 @@ describe Api::EventsController do
       device1 = Device.make institution: institution, laboratories: [laboratory1]
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
-      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.secret_key
-      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.secret_key
-      post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.secret_key
+      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.uuid, authentication_token: device1.secret_key
+      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.uuid, authentication_token: device2.secret_key
+      post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.uuid, authentication_token: device3.secret_key
 
       response = get_updates(group_by: {admin_level: 1})
       response.should eq([
@@ -437,11 +439,12 @@ describe Api::EventsController do
   end
 
   context "Query" do
+    before(:each) {sign_in user}
     context "Policies" do
       it "allows a user to query events of it's own institutions" do
         device2 = Device.make
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_id: device2.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_id: device2.uuid, authentication_token: device2.secret_key
 
         fresh_client_for device2.institution.elasticsearch_index_name
 
@@ -457,9 +460,9 @@ describe Api::EventsController do
 
       it "should check for new events since a date" do
         Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
-        post :create, data, device_id: device.secret_key
+        post :create, data, device_id: device.uuid, authentication_token: device.secret_key
         Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
-        post :create, (Oj.dump results:[result: :negative]), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
 
         response = get_updates(created_at_since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
 
@@ -475,8 +478,8 @@ describe Api::EventsController do
       end
 
        it "filters by an analyzed result" do
-         post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_id: device.secret_key
-         post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.secret_key
+         post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
+         post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
 
          response = get_updates(result: :positive)
 
@@ -485,8 +488,8 @@ describe Api::EventsController do
        end
 
       it "filters by condition" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.secret_key
-        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
 
         response = get_updates condition: 'mtb'
 
@@ -495,8 +498,8 @@ describe Api::EventsController do
       end
 
       it "filters by test type" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc), device_id: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen), device_id: device.uuid, authentication_token: device.secret_key
 
         response = get_updates test_type: :specimen
 
@@ -505,9 +508,9 @@ describe Api::EventsController do
       end
 
       it "filters for more than one value" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.secret_key
-        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
 
         response = get_updates(gender: [:male, :female]).sort_by do |event|
           event["results"].first["result"]
@@ -521,9 +524,9 @@ describe Api::EventsController do
 
     context "Grouping" do
       it "groups by gender in query params" do
-        post :create, (Oj.dump results:[result: :positive], gender: :male), device_id: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :male), device_id: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :female), device_id: device.uuid, authentication_token: device.secret_key
 
         response = get_updates(group_by: :gender).sort_by do |event|
           event["gender"]
@@ -536,12 +539,12 @@ describe Api::EventsController do
       end
 
       it "groups by gender and assay_name in post body" do
-        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_id: device.secret_key
-        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_id: device.secret_key
-        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "b"), device_id: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "a"), device_id: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "b"), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "a"), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.uuid, authentication_token: device.secret_key
 
         response = get_updates({}, Oj.dump(group_by: [:gender , :assay_name])).sort_by do |event|
           event["gender"] + event["assay_name"]
@@ -556,10 +559,10 @@ describe Api::EventsController do
       end
 
       it "groups and filters for more than one value" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.secret_key
-        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
 
         response = get_updates("page_size"=>0, "group_by"=>["gender"], "gender"=>["male", "female"]).sort_by do |event|
           event["gender"]
@@ -584,9 +587,9 @@ describe Api::EventsController do
         before(:each) { Timecop.freeze }
 
         it "responds a csv for a given grouping" do
-          post :create, (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe), device_id: device.secret_key
-          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_id: device.secret_key
-          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_id: device.secret_key
+          post :create, (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe), device_id: device.uuid, authentication_token: device.secret_key
+          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_id: device.uuid, authentication_token: device.secret_key
+          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_id: device.uuid, authentication_token: device.secret_key
 
           fresh_client_for institution.elasticsearch_index_name
 
@@ -605,8 +608,8 @@ describe Api::EventsController do
 
     context "Ordering" do
       it "should order by age" do
-        post :create, (Oj.dump results:[result: :positive], age: 20), device_id: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], age: 10), device_id: device.secret_key
+        post :create, (Oj.dump results:[result: :positive], age: 20), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[result: :negative], age: 10), device_id: device.uuid, authentication_token: device.secret_key
 
         response = get_updates(order_by: :age)
 
@@ -637,7 +640,7 @@ describe Api::EventsController do
             }
           ]
         }}
-        post :create, Oj.dump(some_field: 1234), device_id: device.secret_key
+        post :create, Oj.dump(some_field: 1234), device_id: device.uuid, authentication_token: device.secret_key
         event = all_elasticsearch_events.first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
@@ -652,7 +655,7 @@ describe Api::EventsController do
 
     context "PII" do
       it "should retrieve an event PII by uuid" do
-        post :create, Oj.dump(results: [result: :positive], patient_name: "jdoe"), device_id: device.secret_key
+        post :create, Oj.dump(results: [result: :positive], patient_name: "jdoe"), device_id: device.uuid, authentication_token: device.secret_key
         event = all_elasticsearch_events.first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name

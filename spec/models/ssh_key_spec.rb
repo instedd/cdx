@@ -18,7 +18,7 @@ describe SshKey do
     it { expect(clients.size).to eq 1 }
 
     it { expect(clients.first.public_key).to include 'ssh-rsa AAAAB3' }
-    it { expect(clients.first.id).to eq device.secret_key }
+    it { expect(clients.first.id).to eq device.uuid }
 
   end
 

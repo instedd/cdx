@@ -8,11 +8,11 @@ describe CSVEventParser do
 
   before do
     sync_dir.ensure_sync_path!
-    sync_dir.ensure_client_sync_paths! device.secret_key
+    sync_dir.ensure_client_sync_paths! device.uuid
   end
 
   before(:each) do
-    File.open(File.join(sync_dir.inbox_path(device.secret_key), "#{DateTime.now.strftime('%Y%m%d%H%M%S')}.csv"), "w") do |io|
+    File.open(File.join(sync_dir.inbox_path(device.uuid), "#{DateTime.now.strftime('%Y%m%d%H%M%S')}.csv"), "w") do |io|
       io << %{error_code;result\n0;positive\n1;negative}
     end
   end
@@ -64,7 +64,7 @@ describe CSVEventParser do
 
     device = Device.make institution_id: institution.id, device_model: DeviceModel.find_by_name('genoscan')
 
-    CSVEventParser.new.load_for_device(IO.read(File.join(Rails.root, 'spec', 'support', 'genoscan_sample.csv')), device.secret_key)
+    CSVEventParser.new.load_for_device(IO.read(File.join(Rails.root, 'spec', 'support', 'genoscan_sample.csv')), device.uuid)
     events = all_elasticsearch_events.sort_by { |event| event["_source"]["results"][0]["result"] }
     event = events.first["_source"]
     event["results"][0]["condition"].should eq("mtb")

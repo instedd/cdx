@@ -6,11 +6,10 @@
     = @token.value
 
   %p
-    This token can be used only once. It will be valid as long as device secret key - #{@token.client_id} - does not change.
+    This token can be used only once. It will be valid as long as device secret key does not change.
   %p
     %strong This is the last time you will be able to view the token. Please keep it safe
 
     %hr
-
 
     = link_to "Ok, understood, go back", edit_institution_device_path(@institution, @device), class: 'btn'
