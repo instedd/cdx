@@ -48,7 +48,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/poirot_rails.git
-  revision: 73b1f79c30c2b27435b5e18515c228ecc2062465
+  revision: 22bbb52ca0fba0603873ed7d9b0c976d2675664c
   branch: master
   specs:
     poirot_rails (0.0.4)
