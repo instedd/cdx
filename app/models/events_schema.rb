@@ -109,17 +109,18 @@ class EventsSchema
 
   def location_schema schema
     schema["type"] = "string"
-    schema["enum"] = Array.new
-    schema["locations"] = Location.all.inject(Hash.new) do |locations, location|
-      schema["enum"].push(location.geo_id.to_s)
-      locations[location.geo_id.to_s] = {
+    schema["enum"] = enum = []
+    schema["locations"] = locations = {}
+
+    Location.includes(:parent).find_each do |location|
+      enum << location.geo_id
+      locations[location.geo_id] = {
         "name" => location.name,
         "level" => location.admin_level,
-        "parent" => location.parent.try(:geo_id), # TODO Remove this n+1
+        "parent" => location.parent.try(:geo_id),
         "lat" => location.lat,
         "lng" => location.lng
       }
-      locations
     end
   end
 
