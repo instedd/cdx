@@ -32,15 +32,16 @@ class EventsSchema
     end
     schema["properties"] = Hash.new
 
-    if @manifest
-      @manifest.field_mapping.each do |field|
-        if field["core"] && field["indexed"]
-          schema["properties"][field_name(field)] = schema_for field
-        end
+    (@manifest || Manifest.default).field_mapping.each do |field|
+      if field["core"] && field["indexed"]
+        schema["properties"][field_name(field)] = schema_for field
       end
-    else
+    end
+
+    unless @manifest
       schema["properties"]["assay_name"] = all_assay_names_schema
     end
+
     schema
   end
 
