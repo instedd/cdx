@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/flbulgarelli/geojson_import
-  revision: 255a5f55be9265ee8f6dcb4c076e7b7c7b67a0b4
+  revision: f41f5a1cf9506f336068ec14780a3ce02181e52c
   branch: master
   specs:
     geojson_import (0.0.1)
