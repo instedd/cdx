@@ -25,7 +25,7 @@ class Location < ActiveRecord::Base
     end
   end
 
-  def self.create_from_geojson(parent, feature)
+  def self.create_from_geojson!(parent, feature)
     Location.create!(
       name: feature.name,
       geo_id: feature.location_id,
