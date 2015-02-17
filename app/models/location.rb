@@ -25,6 +25,19 @@ class Location < ActiveRecord::Base
     end
   end
 
+  def self.create_from_geojson(parent, feature)
+    Location.create!(
+      name: feature.name,
+      geo_id: feature.location_id,
+      lat: feature.center[1],
+      lng: feature.center[0],
+      parent: parent)
+  end
+
+  def self.update_from_geojson!(feature)
+    location.update_attributes!(lat: feature.center[1], lng: feature.center[1])
+  end
+
   def self.find_or_create_default
     find_by_admin_level(0) || create_default
   end
