@@ -1,7 +1,13 @@
 class Api::EventsController < ApiController
   def create
     device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_secret_key(params[:device_id])
-    event, saved = Event.create_or_update_with device, request.body.read
+    data = request.body.read rescue nil
+
+    if data.blank?
+      render :status => :unprocessable_entity, :json => { :errors => ['Missing data'] } and return
+    end
+
+    event, saved = Event.create_or_update_with device, data
 
     if saved
       if event.index_failed?
