@@ -5,3 +5,5 @@ remote_shapefiles:
   - "http://s3.amazonaws.com/xpert-shapefiles/GIN_adm1.json"
   - "http://s3.amazonaws.com/xpert-shapefiles/GIN_adm2.json"
   - "http://s3.amazonaws.com/xpert-shapefiles/GIN_adm3.json"
+
+elasticsearch_locations_index: "locations"
