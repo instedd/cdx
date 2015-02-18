@@ -1,6 +1,6 @@
 require 'geojson_import'
 
-desc "Imports all locations from /etc/shapes and regenerates the index"
+desc "Imports all locations from /etc/shapes and imports them"
 task :geo do
   Rake::Task['Geojson:all'].invoke
 end
@@ -19,17 +19,7 @@ namespace :geo do
     Geojson::Importer.new(filenames).import!
   end
 
-  desc "Deletes existing locations index and reindexes all locations from DB"
-  task :reindex => :logger do
-    Geojson::Indexer.new.reindex_all!
-  end
-
-  desc "Validates if the center of all locations is contained within their polygon"
-  task :validate => :logger do
-    Geojson::Indexer.new.validate_center(Location.includes(:shape).all)
-  end
-
-  desc "Downloads all locations into /etc/shapes and regenerates the index"
+  desc "Downloads all locations into /etc/shapes and imports them"
   task :all => :logger do
     filenames = Settings.remote_shapefiles
     downloaded = Geojson::Downloader.new(filenames).download!
@@ -39,7 +29,6 @@ namespace :geo do
     else
       Rails.logger.info("Downloaded: #{downloaded.join('; ')}")
       Geojson::Importer.new(downloaded).import!
-      Geojson::Indexer.new.reindex_all!
     end
   end
 
