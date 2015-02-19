@@ -59,6 +59,7 @@ class Manifest < ActiveRecord::Base
 
   def apply_to(data)
     data = parser.load data
+    raise EventParsingError.incomplete_data if data.blank?
     field_mapping.inject(indexed: Hash.new, pii: Hash.new, custom: Hash.new) do |event, field|
       ManifestField.new(self, field).apply_to data, event
     end
