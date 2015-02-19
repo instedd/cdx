@@ -1,6 +1,6 @@
 $(function() {
   function errorMessageFor(response) {
-    return (response.responseJSON || {errors:[response.statusText]}).errors[0];
+    return (response.responseJSON || {errors: response.statusText}).errors;
   }
 
   if ($("#playground").length > 0){

@@ -6,7 +6,7 @@ class Api::EventsController < ApiController
     begin
       event, saved = Event.create_or_update_with device, data
     rescue EventParsingError => e
-      render :status => :unprocessable_entity, :json => { :errors => [e.message] } and return
+      render :status => :unprocessable_entity, :json => { :errors => e.message } and return
     end
 
     if saved
