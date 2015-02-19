@@ -113,6 +113,10 @@ If the value is specified, but impossible to determine at the moment of the test
 
 The response must include all the unknown and null values.
 
+If you want all the results where the gender is a known value, you can ignore the null using:
+
+`/events?gender=not(null)`
+
 When grouping, a bucket must be included for all elements that fall into the unknown or null buckets.
 
 `/events?group_by=gender,result`
