@@ -8,10 +8,7 @@ class JsonEventParser
         current[path] || []
       end
       elements_array.map do |element|
-        paths = targets.last.split Manifest::PATH_SPLIT_TOKEN
-        paths.inject element do |current, path|
-          current[path]
-        end
+        lookup(targets.drop(1).join(Manifest::COLLECTION_SPLIT_TOKEN), element)
       end
     else
       paths = path.split Manifest::PATH_SPLIT_TOKEN

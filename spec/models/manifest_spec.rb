@@ -206,7 +206,101 @@ describe Manifest do
         }]
       },
       '{"temperature" : 20}',
-      {indexed: {"temperature" => 20}, pii: Hash.new, custom: Hash.new}
+      {indexed: {"custom_fields" => {"temperature" => 20}}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "should apply to custom non-pii indexed field inside results array" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "results[*].temperature",
+          "source" : {"lookup" : "temperature"},
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{"temperature" : 20}',
+      {indexed: {"results" => [{"custom_fields" => {"temperature" => 20}}]}, pii: Hash.new, custom: Hash.new}
+  end
+
+  it "should apply to an array of custom non-pii indexed field inside results array" do
+    assert_manifest_application %{
+        [{
+          "target_field" : "results[*].instant_temperature[*].value",
+          "source" : {"lookup" : "tests[*].temperatures[*].value"},
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        },
+        {
+          "target_field" : "results[*].instant_temperature[*].sample_time",
+          "source" : {"lookup" : "tests[*].temperatures[*].time"},
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        },
+        {
+          "target_field" : "results[*].condition",
+          "source" : {"lookup" : "tests[*].condition"},
+          "core" : true,
+          "pii" : false,
+          "indexed" : true
+        },
+        {
+          "target_field" : "results[*].result",
+          "source" : {"lookup" : "tests[*].result"},
+          "core" : true,
+          "pii" : false,
+          "indexed" : true
+        },
+        {
+          "target_field" : "final_temperature",
+          "source" : {"lookup" : "temperature"},
+          "core" : false,
+          "pii" : false,
+          "indexed" : true
+        }]
+      },
+      '{
+        "temperature" : 20,
+        "tests" : [
+          {
+            "result" : "positive",
+            "condition" : "mtb",
+            "temperatures" : [
+              { "time": "start", "value": 12},
+              { "time" : "end", "value": 23}
+            ]
+          },
+          {
+           "result" : "negative",
+            "condition" : "rif",
+            "temperatures" : [
+              {"time" : "start", "value": 22},
+              {"time" : "end", "value": 30}
+            ]
+          }
+        ]
+      }',
+      {indexed: {
+        "results" => [
+          { "condition" => "mtb",
+            "result" => "positive",
+            "custom_fields" => {"instant_temperature" => [
+              {"sample_time" => "start", "value" => 12},
+              {"sample_time" => "end", "value" => 23}
+            ]}
+          },
+          { "condition" => "rif",
+            "result" => "negative",
+            "custom_fields" => {"instant_temperature" => [
+              {"sample_time" => "start", "value" => 22},
+              {"sample_time" => "end", "value" => 30}
+            ]}
+          }
+        ],
+        "custom_fields" => {"final_temperature" => 20}
+      }, pii: Hash.new, custom: Hash.new}
   end
 
   it "should apply to custom pii field" do
@@ -228,7 +322,7 @@ describe Manifest do
         [{
           "target_field" : "level",
           "source" : {"lookup" : "level"},
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true,
           "options" : ["low", "medium", "high"]
@@ -271,7 +365,7 @@ describe Manifest do
         }]
       },
       '{"temperature" : 30}',
-      {indexed: {"temperature" => 30}, pii: Hash.new, custom: Hash.new}
+      {indexed: {"custom_fields" => {"temperature" => 30}}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should raise on invalid value in range (lesser)" do
@@ -319,7 +413,7 @@ describe Manifest do
         [{
           "target_field" : "sample_date",
           "source" : {"lookup" : "sample_date"},
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true,
           "valid_values" : {
@@ -336,7 +430,7 @@ describe Manifest do
         [{
           "target_field" : "sample_date",
           "source" : {"lookup" : "sample_date"},
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true,
           "valid_values" : {
@@ -362,7 +456,7 @@ describe Manifest do
               ]
             ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -385,7 +479,7 @@ describe Manifest do
               ]
             ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -428,7 +522,7 @@ describe Manifest do
         }]
       },
       '{"temperature_list" : [{"temperature" : 20}, {"temperature" : 10}]}',
-      {indexed: {"list" => [{"temperature" => 20}, {"temperature" => 10}]}, pii: Hash.new, custom: Hash.new}
+      {indexed: {"custom_fields" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should map to multiple indexed fields to the same list" do
@@ -460,7 +554,7 @@ describe Manifest do
           }
         ]
       }',
-      {indexed: {"collection" => [
+      {indexed: {"custom_fields" => {"collection" => [
         {
           "temperature" => 20,
           "foo" => 12
@@ -468,7 +562,7 @@ describe Manifest do
         {
           "temperature" => 10,
           "foo" => 2
-        }]}, pii: Hash.new, custom: Hash.new}
+        }]}}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should map to multiple indexed fields to the same list accross multiple collections" do
@@ -476,14 +570,14 @@ describe Manifest do
         {
           "target_field" : "collection[*].temperature",
           "source" : {"lookup" : "temperature_list[*].temperature"},
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         },
         {
           "target_field" : "collection[*].foo",
           "source" : {"lookup" : "other_list[*].bar"},
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }
@@ -843,15 +937,15 @@ describe Manifest do
             ]
           },
           "core" : false,
-          "pii" : false,
-          "indexed" : true
+          "pii" : true,
+          "indexed" : false
         }]
       },
       '{
         "first_name" : "John",
         "last_name" : "Doe"
       }',
-      {indexed: {"name" => "Doe, John"}, pii: Hash.new, custom: Hash.new}
+      {indexed: Hash.new, pii: {"name" => "Doe, John"}, custom: Hash.new}
   end
 
   it "strips spaces from an element" do
@@ -865,7 +959,7 @@ describe Manifest do
               {"lookup" : "first_name"}
             ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -897,7 +991,7 @@ describe Manifest do
               }
             ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -928,7 +1022,7 @@ describe Manifest do
               ]
             ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -947,7 +1041,7 @@ describe Manifest do
           "source" : {
             "substring" : [{"lookup" : "name_and_test"}, 0, 2]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         },
@@ -956,7 +1050,7 @@ describe Manifest do
           "source" : {
             "substring" : [{"lookup" : "name_and_test"}, 4, -5]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }
@@ -978,7 +1072,7 @@ describe Manifest do
               "month"
             ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -999,7 +1093,7 @@ describe Manifest do
               "%a%d%b%y%H%p%z"
             ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1020,7 +1114,7 @@ describe Manifest do
                 {"lookup" : "run_at"}
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1042,7 +1136,7 @@ describe Manifest do
                 {"lookup" : "run_at"}
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1064,7 +1158,7 @@ describe Manifest do
                 {"lookup" : "run_at"}
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1086,7 +1180,7 @@ describe Manifest do
                 {"lookup" : "run_at"}
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1109,7 +1203,7 @@ describe Manifest do
                 {"lookup" : "run_at"}
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1131,7 +1225,7 @@ describe Manifest do
                 {"lookup" : "run_at"}
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1153,7 +1247,7 @@ describe Manifest do
                 {"lookup" : "run_at"}
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1175,7 +1269,7 @@ describe Manifest do
                 {"lookup" : "birth_day"}
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1198,7 +1292,7 @@ describe Manifest do
                 "hours"
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1220,7 +1314,7 @@ describe Manifest do
                 [5, 20, 40]
               ]
           },
-          "core" : false,
+          "core" : true,
           "pii" : false,
           "indexed" : true
         }]
@@ -1245,7 +1339,7 @@ describe Manifest do
           {
             "target_field" : "collection[*].temperature",
             "source" : {"lookup" : "temperature"},
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }
@@ -1270,7 +1364,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].name"},
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1296,7 +1390,7 @@ describe Manifest do
             "source" : {
               {"strip" : {"lookup" : "conditions[*].name"}}
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1328,7 +1422,7 @@ describe Manifest do
                 ]
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1344,7 +1438,7 @@ describe Manifest do
             "source" : {
               "substring" : [{"lookup" : "name_and_test"}, 0, 2]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           },
@@ -1353,7 +1447,7 @@ describe Manifest do
             "source" : {
               "substring" : [{"lookup" : "name_and_test"}, 4, -5]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }
@@ -1375,7 +1469,7 @@ describe Manifest do
                 "month"
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1396,7 +1490,7 @@ describe Manifest do
                 "%a%d%b%y%H%p%z"
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1417,7 +1511,7 @@ describe Manifest do
                 {"lookup" : "birth_day"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1441,7 +1535,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1465,7 +1559,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1495,7 +1589,7 @@ describe Manifest do
                 {"lookup" : "birth_day"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1519,7 +1613,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1543,7 +1637,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1573,7 +1667,7 @@ describe Manifest do
                 {"lookup" : "birth_day"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1597,7 +1691,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1621,7 +1715,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1651,7 +1745,7 @@ describe Manifest do
                 {"lookup" : "birth_day"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1675,7 +1769,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1699,7 +1793,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1729,7 +1823,7 @@ describe Manifest do
                 {"lookup" : "birth_day"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1753,7 +1847,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1777,7 +1871,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1807,7 +1901,7 @@ describe Manifest do
                 {"lookup" : "birth_day"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1831,7 +1925,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1855,7 +1949,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1885,7 +1979,7 @@ describe Manifest do
                 {"lookup" : "birth_day"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1909,7 +2003,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1933,7 +2027,7 @@ describe Manifest do
                 {"lookup" : "conditions[*].run_at"}
               ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1964,7 +2058,7 @@ describe Manifest do
                   "hours"
                 ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
@@ -1989,7 +2083,7 @@ describe Manifest do
                   [5, 20, 40]
                 ]
             },
-            "core" : false,
+            "core" : true,
             "pii" : false,
             "indexed" : true
           }]
