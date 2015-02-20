@@ -2,14 +2,18 @@ require 'spec_helper'
 
 describe Manifest do
 
+  def manifest_from_json_mappings(mappings_json)
+    Manifest.new(definition: "{\"metadata\":{\"source_data_type\" : \"json\"},\"field_mapping\" : #{mappings_json}}")
+  end
+
   def assert_manifest_application(mappings_json, data, expected)
-    manifest = Manifest.new(definition: "{\"metadata\":{\"source_data_type\" : \"json\"},\"field_mapping\" : #{mappings_json}}")
+    manifest = manifest_from_json_mappings(mappings_json)
     result = manifest.apply_to(data)
     result.should eq(expected)
   end
 
   def assert_raises_manifest_data_validation(mappings_json, data, message)
-    manifest = Manifest.new(definition: "{\"field_mapping\" : #{mappings_json}}")
+    manifest = manifest = manifest_from_json_mappings(mappings_json)
     expect { manifest.apply_to(data) }.to raise_error(message)
   end
 
