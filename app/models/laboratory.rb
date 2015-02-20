@@ -36,7 +36,7 @@ class Laboratory < ActiveRecord::Base
 
   def filter_by_query(query)
     if institution = query["institution"]
-      if institution_id == institution
+      if institution_id == institution.to_i
         self
       else
         nil
