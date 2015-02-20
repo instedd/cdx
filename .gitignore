@@ -25,4 +25,5 @@ backend/log
 cdxapi/.eunit
 cdxapi/ebin
 cdxapi/log
+etc/shapes/*
 VERSION

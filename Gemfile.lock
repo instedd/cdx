@@ -30,6 +30,13 @@ GIT
       sass-rails
 
 GIT
+  remote: https://github.com/flbulgarelli/geojson_import
+  revision: f41f5a1cf9506f336068ec14780a3ce02181e52c
+  branch: master
+  specs:
+    geojson_import (0.0.1)
+
+GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
   revision: 8c047c4eebbe7b7c7a744ca331df957c6a09de24
   branch: master
@@ -422,6 +429,7 @@ DEPENDENCIES
   encryptor
   faker
   foreman
+  geojson_import!
   guard-rspec
   guid
   haml-rails

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150204181542) do
+ActiveRecord::Schema.define(version: 20150218140923) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -123,7 +123,6 @@ ActiveRecord::Schema.define(version: 20150204181542) do
     t.integer  "depth"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "admin_level"
     t.string   "geo_id"
   end
 

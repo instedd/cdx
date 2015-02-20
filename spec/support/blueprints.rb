@@ -52,7 +52,6 @@ Location.blueprint do
   name
   parent {Location.create_default}
   geo_id { "location-#{Sham.sn}" }
-  admin_level {parent.admin_level + 1}
 end
 
 DeviceModel.blueprint do

@@ -15,10 +15,6 @@
     .controls
       = f.select :parent_id, nested_set_options(Location, @location) {|i| "#{'-' * i.level} #{i.name}" }, {include_blank: '(none)'}, class: 'input-large'
   .control-group
-    = f.label :admin_level, :class => 'control-label'
-    .controls
-      = f.number_field :admin_level, :class => 'input-large'
-  .control-group
     = f.label :geo_id, :class => 'control-label'
     .controls
       = f.text_field :geo_id, :class => 'input-large'
