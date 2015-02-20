@@ -50,7 +50,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def metadata
-    loaded_definition["metadata"] rescue {}
+    loaded_definition["metadata"] || {}
   end
 
   def loaded_definition
