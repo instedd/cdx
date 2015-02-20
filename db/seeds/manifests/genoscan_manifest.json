@@ -140,9 +140,9 @@
       "indexed" : true,
       "options" : [
         "positive",
-        "positive_with_rpm_and_ihn",
-        "positive_with_rpm",
-        "positive_with_ihn",
+        "positive_with_rmp_and_inh",
+        "positive_with_rmp",
+        "positive_with_inh",
         "negative"
       ]
     },
