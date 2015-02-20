@@ -10,7 +10,7 @@ describe Manifest do
 
   def assert_raises_manifest_data_validation(mappings_json, data, message)
     manifest = Manifest.new(definition: "{\"field_mapping\" : #{mappings_json}}")
-    expect { manifest.apply_to(data) }.to raise_error
+    expect { manifest.apply_to(data) }.to raise_error(message)
   end
 
   let (:definition) do
