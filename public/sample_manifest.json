@@ -1,257 +1,229 @@
 {
-  "metadata": {
-    "version": "1.0.0",
-    "api_version": "1.0.0",
-    "device_models": "MTB Device Model",
-    "source_data_type": "json"
+  "metadata" : {
+    "version" : "1.0.1",
+    "api_version" : "1.0.0",
+    "signature" : "12345",
+    "device_models" : ["default"],
+    "source_data_type": "json", // CSV source must have flat selectors
+    "test_report": "multiple",
+    "event_root_path" : "tests"
   },
-  "field_mapping": [
-    {
-      "target_field": "patient_id",
-      "source": { "lookup": "patient_id" },
-      "core": true,
-      "type": "string",
-      "pii": true,
-      "indexed": false
-    },
-    {
-      "target_field": "patient_name",
-      "source": { "lookup": "patient_name" },
-      "core": true,
-      "type": "string",
-      "pii": true,
-      "indexed": false
-    },
-    {
-      "target_field": "patient_telephone_number",
-      "source": { "lookup": "patient_telephone_number" },
-      "core": true,
-      "type": "string",
-      "pii": true,
-      "indexed": false
-    },
-    {
-      "target_field": "patient_zip_code",
-      "source": { "lookup": "patient_zip_code" },
-      "core": true,
-      "type": "string",
-      "pii": true,
-      "indexed": false
-    },
-    {
-      "target_field": "start_time",
-      "source": { "lookup": "start_time" },
-      "type": "date",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "event_id",
-      "source": { "lookup": "event_id" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "uuid",
-      "source": { "lookup": "uuid" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "device_uuid",
-      "source": { "lookup": "device_uuid" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "system_user",
-      "source": { "lookup": "system_user" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "device_serial_number",
-      "source": { "lookup": "device_serial_number" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "error_code",
-      "source": { "lookup": "error_code" },
-      "type": "integer",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "error_description",
-      "source": { "lookup": "error_description" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "laboratory_id",
-      "source": { "lookup": "laboratory_id" },
-      "type": "integer",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "institution_id",
-      "source": { "lookup": "institution_id" },
-      "type": "integer",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "location",
-      "source": { "lookup": "location" },
-      "type": "location",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "age",
-      "source": { "lookup": "age" },
-      "type": "integer",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": {
-        "range": {
-          "min": 0,
-          "max": 125
-        }
+  "field_mapping" : {
+    "sample" : [
+      {
+        "target_field": "id",
+        "selector" : "sample.id",
+        "core" : true,
+        "indexed" : true,
+        "type" : "integer"
+      },
+      {
+        "target_field": "type",
+        "selector" : "sample.type",
+        "core" : true,
+        "indexed" : true,
+        "type" : "enum",
+        "options" : [
+          "blood",
+          "urine",
+          "sputum",
+          "stool",
+          "biopsy"
+        ]
       }
-    },
-    {
-      "target_field": "assay_name",
-      "source": { "lookup": "assay_name" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "options": [
-        "MTB Assay"
-      ]
-    },
-    {
-      "target_field": "gender",
-      "source": { "lookup": "gender" },
-      "type": "enum",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "options": [
-        "male",
-        "female"
-      ]
-    },
-    {
-      "target_field": "ethnicity",
-      "source": { "lookup": "ethnicity" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "race",
-      "source": { "lookup": "race" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "race_ethnicity",
-      "source": { "lookup": "race_ethnicity" },
-      "type": "string",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "valid_values": null
-    },
-    {
-      "target_field": "status",
-      "source": { "lookup": "status" },
-      "type": "enum",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "options": [
-        "invalid",
-        "error",
-        "no_result",
-        "success",
-        "negative"
-      ]
-    },
-    {
-      "target_field": "results[*].result",
-      "source": { "lookup": "results[*].result" },
-      "type": "enum",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "options": [
-        "positive",
-        "negative",
-        "positive_with_rif",
-        "positive_with_rif_inconclusive"
-      ]
-    },
-    {
-      "target_field": "results[*].condition",
-      "source": { "lookup": "results[*].condition" },
-      "type": "enum",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "options": [
-        "mtb"
-      ]
-    },
-    {
-      "target_field": "test_type",
-      "source": { "lookup": "test_type" },
-      "type": "enum",
-      "core": true,
-      "pii": false,
-      "indexed": true,
-      "options": [
-        "specimen",
-        "qc"
-      ]
-    }
-  ]
+    ],
+    "patient" : [
+      {
+        "target_field" : "id",
+        "source" : {"lookup" : "patient.id"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true,
+        "indexed" : false
+      },
+      {
+        "target_field" : "name",
+        "source" : {"lookup" : "patient.name"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true,
+        "indexed" : false
+      },
+      {
+        "target_field" : "telephone_number",
+        "source" : {"lookup" : "patient.telephone_number"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true,
+        "indexed" : false
+      },
+      {
+        "target_field" : "zip_code",
+        "source" : {"lookup" : "patient.zip_code"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true,
+        "indexed" : false
+      }
+    ],
+  "event" : {
+    "report_type": "multiple", // single
+    "root_path" : "tests", // only if multiple
+    "fields": [
+      {
+        "target_field": "start_time",
+        "selector" : "start_time",
+        "core" : true,
+        "indexed" : true,
+        "type" : "date"
+      },
+      {
+        "target_field": "event_id",
+        "selector" : "event_id",
+        "type": "integer",
+        "core" : true,
+        "indexed" : true
+      },
+      {
+        "target_field" : "location",
+        "selector" : "location",
+        "type" : "location",
+        "core" : true,
+        "indexed" : true
+      },
+      {
+        "target_field": "age",
+        "selector": "age",
+        "type": "integer",
+        "indexed" : "true",
+        "core" : true,
+        "valid_values" : {
+          "range" : {
+            "min" : 0,
+            "max" : 125
+          }
+        }
+      },
+      {
+        "target_field": "assay_name",
+        "selector" : "assay_name",
+        "type" : "enum",
+        "core" : true,
+        "options" : [
+          "cartridge_1",
+          "cartridge_2"
+        ]
+      },
+      {
+        "target_field" : "system_user",
+        "selector" : "system_user",
+        "type": "string",
+        "core" : true,
+        "pii" : false,
+        "indexed" : false
+      },
+      {
+        "target_field" : "results[*].condition",
+        "selector" : "results[*].condition",
+        "type" : "enum",
+        "core" : true,
+        "indexed" : true,
+        "options" : [
+          "flu_a",
+          "flu_b",
+          "h1n1",
+          "mtb"
+        ]
+      },
+      {
+        "target_field" : "results[*].result",
+        "selector" : "results[*].result",
+        "type" : "enum",
+        "core" : true,
+        "indexed" : true,
+        "options" : {
+          "when" : [
+            {
+              "property" : "condition",
+              "value" : "mtb",
+              "options" : [
+                "positive",
+                "positive_with_rif",
+                "negative"
+              ]
+            },
+          ],
+          "else" : {
+            "options" : [
+              "positive",
+              "negative"
+            ]
+          }
+        }
+      },
+      {
+        "target_field": "grade_of_resistance",
+        "selector" : "resistance",
+        "core" : false,
+        "type": "integer",
+        "valid_values": {
+          "range" : {
+            "min" : 0,
+            "max" : 100
+          }
+        }
+      },
+      {
+        "target_field": "device_serial_number",
+        "selector" : "device_serial_number",
+        "type" : "string",
+        "core": true
+      },
+      {
+        "target_field": "test_type",
+        "selector" : "Test.test_type",
+        "type" : "string",
+        "core" : true
+      },
+      {
+        "target_field": "temperature",
+        "selector" : "Test.temp",
+        "core" : false,
+        "type": "integer",
+        "pii" : false,
+        "valid_values": {
+          "range" : {
+            "min" : -20,
+            "max" : 60
+          }
+        },
+        "indexed" : true
+      },
+      {
+        "target_field": "percentage_of_confidence",
+        "core" : false,
+        "type": "integer",
+        "selector" : "Test.percent",
+        "pii" : false,
+        "valid_values": {
+          "range" : {
+            "min" : 0.001,
+            "max" : 999.999
+          }
+        },
+        "indexed" : true
+      },
+      {
+        "target_field": "end_time",
+        "selector" : "Test.end_time",
+        "type": "date",
+        "core" : false,
+        "pii" : "false",
+        "valid_values": {
+          "date" : "iso"
+        },
+        "indexed" : true
+      }
+    ]
+  }
 }
