@@ -414,7 +414,7 @@ describe Manifest do
         }]
       },
       '{"condition" : "PATIENT IS OK"}',
-      "'PATIENT IS OK' is not a valid value for 'condition' (valid value must be in one of these forms: *FLU*, *FLUA*, *MTB*)"
+      "'PATIENT IS OK' is not a valid value for 'condition' (valid value must be in one of these forms: *MTB*, *FLU*, *FLUA*)"
   end
 
   it "should apply to multiple indexed field" do
