@@ -2,7 +2,7 @@ class FiltersController < ApplicationController
   respond_to :html, :json
   expose(:filters) { current_user.filters }
   expose(:filter, attributes: :filter_params)
-  expose(:laboratory) { Laboratory.find(filter.query.with_indifferent_access[:laboratory]) }
+  expose(:laboratory) { Laboratory.find(filter.query.with_indifferent_access[:laboratory]) rescue nil }
   expose(:condition) { filter.query.with_indifferent_access[:condition] }
 
   def index
