@@ -30,6 +30,9 @@ class Event < ActiveRecord::Base
     event.index_failure_reason = err.message
     result = event.save
     [event, result]
+  rescue EventParsingError => err
+    event.errors.add(:raw_data, err.message)
+    [event, false]
   end
 
   def self.sensitive_fields
