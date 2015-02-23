@@ -8,7 +8,6 @@ class Subscriber < ActiveRecord::Base
   validates_presence_of :filter
   validates_presence_of :name
   validates_presence_of :url
-  validates_presence_of :fields
 
   def self.notify_all
     Subscriber.find_each do |subscriber|
@@ -44,6 +43,7 @@ class Subscriber < ActiveRecord::Base
 
   def filter_event(event, fields)
     merged_event = event.merge Event.find_by_uuid(event['uuid']).decrypt.sensitive_data
+    fields ||= merged_event.keys # use all fields if none is specified
     filtered_event = {}
     fields.each do |field|
       case field

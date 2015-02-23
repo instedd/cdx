@@ -1,4 +1,8 @@
 class SubscribersController < ApplicationController
+  # TODO should split API controller
+  skip_before_action :authenticate_user!, if: -> { request.path.starts_with? "/api/" }
+  before_filter :authenticate_api_user!, if: -> { request.path.starts_with? "/api/" }
+
   respond_to :html, :json
   expose(:subscribers) do
     if params[:filter_id]
@@ -24,7 +28,6 @@ class SubscribersController < ApplicationController
 
   def create
     subscriber.last_run_at = Time.now
-
     flash[:notice] = "Subscriber was successfully created" if subscriber.save
     respond_with subscriber, location: subscribers_path
   end
