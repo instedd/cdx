@@ -43,7 +43,7 @@ class Subscriber < ActiveRecord::Base
   end
 
   def filter_event(event, fields)
-    merged_event = event.merge Event.find_by_uuid(event['uuid']).decrypt.sensitive_data
+    merged_event = event.merge Event.find_by_uuid(event['uuid']).sample.decrypt.sensitive_data
     filtered_event = {}
     fields.each do |field|
       case field

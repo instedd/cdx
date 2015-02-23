@@ -1,9 +1,9 @@
 class Event < ActiveRecord::Base
   include EventIndexing
-  include EventEncryption
 
   belongs_to :device
   belongs_to :institution
+  belongs_to :sample
   serialize :custom_fields
 
   before_create :generate_uuid
@@ -12,6 +12,16 @@ class Event < ActiveRecord::Base
   before_save :extract_custom_fields, :unless => :index_failed?
   before_save :encrypt, :unless => :index_failed?
   after_save :save_in_elasticsearch, :unless => :index_failed?
+
+  def decrypt
+    self.raw_data = EventEncryption.decrypt self.raw_data
+    self
+  end
+
+  def encrypt
+    self.raw_data = EventEncryption.encrypt self.raw_data
+    self
+  end
 
   def self.create_or_update_with device, raw_data
     event = self.new device: device, raw_data: raw_data
@@ -22,6 +32,12 @@ class Event < ActiveRecord::Base
       result = existing_event.update_with raw_data
       [existing_event, result]
     else
+      sample_id = event.parsed_fields[:indexed][:sample_id]
+      if sample_id && existing_sample = Sample.find_by(device: device, sample_id: sample_id)
+        event.sample = existing_sample
+      else
+        event.sample = Sample.new sample_id: sample_id
+      end
       result = event.save
       [event, result]
     end

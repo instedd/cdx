@@ -51,20 +51,22 @@ describe Api::EventsController do
       post :create, Oj.dump(event_id: "1234", age: 20, patient_name: 'john doe'), device_id: device.secret_key
 
       event = Event.first.decrypt
+      sample = event.sample.decrypt
       event.event_id.should eq("1234")
       raw_data = Oj.load event.raw_data
       raw_data["age"].should eq(20)
-      event.sensitive_data[:patient_id].should be_nil
-      event.sensitive_data[:patient_name].should eq('john doe')
+      sample.sensitive_data[:patient_id].should be_nil
+      sample.sensitive_data[:patient_name].should eq('john doe')
 
       post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20, patient_name: 'jane doe'), device_id: device.secret_key
 
       Event.count.should eq(1)
       event = Event.first.decrypt
+      sample = event.sample.decrypt
       raw_data = Oj.load event.raw_data
       raw_data["age"].should eq(30)
-      event.sensitive_data[:patient_id].should eq(20)
-      event.sensitive_data[:patient_name].should eq('jane doe')
+      sample.sensitive_data[:patient_id].should eq(20)
+      sample.sensitive_data[:patient_name].should eq('jane doe')
 
       events = all_elasticsearch_events
       events.size.should eq(1)
@@ -154,11 +156,12 @@ describe Api::EventsController do
       event["foo"].should be_nil
 
       event = Event.first
-      raw_data = event.sensitive_data
-      event.decrypt.sensitive_data.should_not eq(raw_data)
-      event.sensitive_data["patient_id"].should be_nil
-      event.sensitive_data["foo"].should eq(1234)
-      event.sensitive_data[:foo].should eq(1234)
+      raw_data = event.sample.sensitive_data
+      sample = event.sample.decrypt
+      sample.sensitive_data.should_not eq(raw_data)
+      sample.sensitive_data["patient_id"].should be_nil
+      sample.sensitive_data["foo"].should eq(1234)
+      sample.sensitive_data[:foo].should eq(1234)
     end
 
     it "uses the last version of the manifest" do
@@ -227,8 +230,9 @@ describe Api::EventsController do
       event["foo"].should be_nil
 
       event = Event.first.decrypt
-      event.sensitive_data["some_field"].should be_nil
-      event.sensitive_data["foo"].should be_nil
+      sample = event.sample.decrypt
+      sample.sensitive_data["some_field"].should be_nil
+      sample.sensitive_data["foo"].should be_nil
       event.custom_fields[:foo].should eq(1234)
       event.custom_fields["foo"].should eq(1234)
     end

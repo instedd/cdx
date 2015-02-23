@@ -81,7 +81,8 @@ module EventIndexing
     end
 
     def extract_pii
-      self.sensitive_data = parsed_fields[:pii]
+      self.sample.merge_sensitive_data parsed_fields[:pii]
+      self.sample.save!
     end
 
     def extract_custom_fields

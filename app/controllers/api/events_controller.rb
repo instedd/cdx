@@ -40,8 +40,8 @@ class Api::EventsController < ApiController
   end
 
   def pii
-    event = Event.find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "pii" => event.decrypt.sensitive_data
+    sample = Event.find_by_uuid(params[:id]).sample
+    render_json "uuid" => params[:id], "pii" => sample.decrypt.sensitive_data
   end
 
   def schema

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150204181542) do
+ActiveRecord::Schema.define(version: 20150223151900) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -47,9 +47,10 @@ ActiveRecord::Schema.define(version: 20150204181542) do
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "secret_key"
+    t.string   "uuid"
     t.integer  "institution_id"
     t.integer  "device_model_id"
+    t.string   "secret_key"
   end
 
   create_table "devices_laboratories", id: false, force: true do |t|
@@ -62,12 +63,12 @@ ActiveRecord::Schema.define(version: 20150204181542) do
     t.binary   "raw_data"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.binary   "sensitive_data"
     t.string   "uuid"
     t.text     "custom_fields"
     t.string   "event_id"
     t.boolean  "index_failed"
     t.text     "index_failure_reason"
+    t.integer  "sample_id"
   end
 
   create_table "filters", force: true do |t|
@@ -148,6 +149,12 @@ ActiveRecord::Schema.define(version: 20150204181542) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "name"
+  end
+
+  create_table "samples", force: true do |t|
+    t.string "sample_id"
+    t.string "uuid"
+    t.binary "sensitive_data"
   end
 
   create_table "ssh_keys", force: true do |t|
