@@ -15,6 +15,10 @@ class Subscriber < ActiveRecord::Base
     end
   end
 
+  def self.available_fields
+    EventsSchema.new.build['properties'].keys.concat(["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code"]).sort
+  end
+
   def notify
     fields = self.fields
     filter = self.filter.query
@@ -43,7 +47,7 @@ class Subscriber < ActiveRecord::Base
 
   def filter_event(event, fields)
     merged_event = event.merge Event.find_by_uuid(event['uuid']).decrypt.sensitive_data
-    fields ||= merged_event.keys # use all fields if none is specified
+    fields = Subscriber.available_fields if fields.nil? || fields.empty? # use all fields if none is specified
     filtered_event = {}
     fields.each do |field|
       case field
