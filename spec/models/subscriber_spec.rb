@@ -27,28 +27,32 @@ describe Subscriber do
           "device_models": "#{model.name}",
           "source_data_type" : "json"
         },
-        "field_mapping" : [
-          {
-            "target_field" : "results[*].result",
-            "source" : {"lookup" : "result"},
-            "core" : true,
-            "type" : "enum",
-            "options" : ["positive","negative"]
-          },
-          {
-            "target_field" : "results[*].condition",
-            "source" : {"lookup" : "condition"},
-            "core" : true,
-            "type" : "enum",
-            "options" : ["mtb","flu_a"]
-          },
-          {
-            "target_field" : "patient_name",
-            "source" : {"lookup" : "patient_name"},
-            "core" : true,
-            "type" : "string"
-          }
-        ]
+        "field_mapping" : {
+          "event" : [
+            {
+              "target_field" : "results[*].result",
+              "source" : {"lookup" : "result"},
+              "core" : true,
+              "type" : "enum",
+              "options" : ["positive","negative"]
+            },
+            {
+              "target_field" : "results[*].condition",
+              "source" : {"lookup" : "condition"},
+              "core" : true,
+              "type" : "enum",
+              "options" : ["mtb","flu_a"]
+            }
+          ],
+          "patient" : [
+            {
+              "target_field" : "patient_name",
+              "source" : {"lookup" : "patient_name"},
+              "core" : true,
+              "type" : "string"
+            }
+          ]
+        }
       }
     }
 

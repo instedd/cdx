@@ -8,7 +8,7 @@ describe ElasticsearchMappingTemplate do
         "api_version" : "1.0.0",
         "device_models" : ["GX4001"]
       },
-      "field_mapping" : [
+      "field_mapping" : { "event" : [
         {
           "target_field" : "temperature",
           "source" : {"lookup" : "Test.temp"},
@@ -37,7 +37,7 @@ describe ElasticsearchMappingTemplate do
             }
           }
         }
-      ]
+      ]}
     }}
     Manifest.create!(definition: definition)
   end

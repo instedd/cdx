@@ -24,7 +24,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def find_assay_name assay_name
-    field = field_mapping.detect { |f| f["target_field"] == "assay_name" }
+    field = flat_mappings.detect { |f| f["target_field"] == "assay_name" }
     valid_values = []
     if field["options"]
       valid_values = field["options"]

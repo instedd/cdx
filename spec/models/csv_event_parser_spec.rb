@@ -31,7 +31,7 @@ describe CSVEventParser do
           "device_models": "#{device.device_model.name}",
           "source_data_type" : "csv"
         },
-        "field_mapping" : [{
+        "field_mapping" : {"event" : [{
             "target_field" : "error_code",
             "source" : {"lookup": "error_code"},
             "core" : true,
@@ -44,7 +44,7 @@ describe CSVEventParser do
             "type" : "enum",
             "options" : [ "positive", "negative" ]
           }
-        ]
+        ]}
       }
     }
 

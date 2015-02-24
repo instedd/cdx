@@ -12,12 +12,12 @@ describe Event do
           "device_models": "#{device.device_model.name}",
           "source_data_type" : "json"
         },
-        "field_mapping" : [{
+        "field_mapping" : {"event" :[{
             "target_field" : "error_code",
             "source" : {"lookup": "error_code"},
             "core" : true,
             "type" : "integer"
-        }]
+        }]}
       }
     }
 
@@ -39,13 +39,13 @@ describe Event do
           "device_models": "#{device.device_model.name}",
           "source_data_type" : "json"
         },
-        "field_mapping" : [{
+        "field_mapping" : { "event" : [{
             "target_field" : "results[*].result",
             "source" : {"lookup": "result"},
             "core" : true,
             "type" : "enum",
             "options" : ["positive","negative"]
-        }]
+        }]}
       }
     }
 
@@ -67,7 +67,7 @@ describe Event do
           "device_models": "#{device.device_model.name}",
           "source_data_type" : "csv"
         },
-        "field_mapping" : [{
+        "field_mapping" : { "event" : [{
             "target_field" : "error_code",
             "source" : {"lookup": "error_code"},
             "core" : true,
@@ -80,7 +80,7 @@ describe Event do
             "type" : "enum",
             "options" : [ "positive", "negative" ]
           }
-        ]
+        ]}
       }
     }
 

@@ -108,12 +108,12 @@ describe Api::EventsController do
           "api_version" : "1.0.0",
           "source_data_type" : "json"
         },
-        "field_mapping" : [{
+        "field_mapping" : { "event" : [{
           "target_field" : "assay_name",
           "source" : {"lookup" : "assay.name"},
           "type" : "string",
           "core" : true
-        }]
+        }]}
       }}
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
 
@@ -131,7 +131,7 @@ describe Api::EventsController do
           "api_version" : "1.0.0",
           "source_data_type" : "json"
         },
-        "field_mapping" : [
+        "field_mapping" : {"event" : [
           {
             "target_field" : "assay_name",
             "source" : {"lookup" : "assay.name"},
@@ -145,7 +145,7 @@ describe Api::EventsController do
             "core" : false,
             "pii" : true
           }
-        ]
+        ]}
       }}
 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
@@ -171,13 +171,13 @@ describe Api::EventsController do
           "version" : 1,
           "source_data_type" : "json"
         },
-        "field_mapping" : [
+        "field_mapping" : { "event" : [
           {
             "target_field" : "foo",
             "source" : {"lookup" : "assay.name"},
             "core" : true
           }
-        ]
+        ]}
       }}
 
       Manifest.create definition: %{{
@@ -187,14 +187,14 @@ describe Api::EventsController do
           "api_version" : "1.0.0",
           "source_data_type" : "json"
         },
-        "field_mapping" : [
+        "field_mapping" : { "event" : [
           {
             "target_field" : "assay_name",
             "source" : {"lookup" : "assay.name"},
             "type" : "string",
             "core" : true
           }
-        ]
+        ]}
       }}
 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
@@ -212,7 +212,7 @@ describe Api::EventsController do
           "api_version" : "1.0.0",
           "source_data_type" : "json"
         },
-        "field_mapping" : [
+        "field_mapping" : { "event" : [
           {
             "target_field" : "foo",
             "source" : {"lookup" : "some_field"},
@@ -221,7 +221,7 @@ describe Api::EventsController do
             "pii" : false,
             "indexed" : false
           }
-        ]
+        ]}
       }}
 
       post :create, Oj.dump(some_field: 1234), device_id: device.secret_key
@@ -245,12 +245,12 @@ describe Api::EventsController do
           "version" : 1,
           "source_data_type" : "json"
         },
-        "field_mapping" : [{
+        "field_mapping" : { "event" : [{
             "target_field" : "error_code",
             "source" : {"lookup" : "error_code"},
             "core" : true,
             "type" : "integer"
-          }]
+          }]}
       }}
       post :create, Oj.dump(error_code: 1234), device_id: device.secret_key
 
@@ -273,7 +273,7 @@ describe Api::EventsController do
               "device_models" : "#{device.device_model.name}",
               "source_data_type" : "csv"
             },
-            "field_mapping" : [{
+            "field_mapping" : { "event" : [{
                 "target_field" : "error_code",
                 "source" : {"lookup" : "error_code"},
                 "core" : true,
@@ -289,7 +289,7 @@ describe Api::EventsController do
                   "negative"
                 ]
               }
-            ]
+            ]}
           }
         }
         csv = %{error_code;result\n0;positive\n1;negative}
@@ -630,7 +630,7 @@ describe Api::EventsController do
             "api_version" : "1.0.0",
             "source_data_type" : "json"
           },
-          "field_mapping" : [
+          "field_mapping" : { "event" : [
             {
               "target_field" : "foo",
               "source" : {"lookup" : "some_field"},
@@ -639,7 +639,7 @@ describe Api::EventsController do
               "pii" : false,
               "indexed" : false
             }
-          ]
+          ]}
         }}
         post :create, Oj.dump(some_field: 1234), device_id: device.secret_key
         event = all_elasticsearch_events.first["_source"]
@@ -681,72 +681,76 @@ describe Api::EventsController do
             "version" : "1.0.1",
             "source_data_type" : "json"
           },
-          "field_mapping" : [
-            {
-              "target_field" : "assay_name",
-              "source" : {"lookup" : "assay_name"},
-              "core" : true,
-              "indexed" : true,
-              "type" : "enum",
-              "options" : [
-                "first_assay",
-                "second_assay"
-              ]
-            },
-            {
-              "target_field" : "start_time",
-              "source" : {"lookup" : "start_time"},
-              "core" : true,
-              "indexed" : true,
-              "type" : "date"
-            },
-            {
-              "target_field" : "results[*].result",
-              "source" : {"lookup" : "result"},
-              "type" : "enum",
-              "core" : true,
-              "indexed" : true,
-              "options" : [
-                "positive",
-                "positive_with_riff",
-                "negative"
-              ]
-            },
-            {
-              "target_field" : "patient_name",
-              "source" : {"lookup" : "patient_information.name"},
-              "core" : true,
-              "indexed" : true,
-              "type" : "string"
-            },
-            {
-              "target_field" : "age",
-              "source" : {"lookup" : "age"},
-              "type" : "integer",
-              "indexed" : "true",
-              "core" : true,
-              "valid_values" : {
-                "range" : {
-                  "min" : 0,
-                  "max" : 125
-                }
+          "field_mapping" : {
+            "event" : [
+              {
+                "target_field" : "assay_name",
+                "source" : {"lookup" : "assay_name"},
+                "core" : true,
+                "indexed" : true,
+                "type" : "enum",
+                "options" : [
+                  "first_assay",
+                  "second_assay"
+                ]
+              },
+              {
+                "target_field" : "start_time",
+                "source" : {"lookup" : "start_time"},
+                "core" : true,
+                "indexed" : true,
+                "type" : "date"
+              },
+              {
+                "target_field" : "results[*].result",
+                "source" : {"lookup" : "result"},
+                "type" : "enum",
+                "core" : true,
+                "indexed" : true,
+                "options" : [
+                  "positive",
+                  "positive_with_riff",
+                  "negative"
+                ]
+              },
+              {
+                "target_field" : "location",
+                "source" : {"lookup" : "location"},
+                "core" : true,
+                "indexed" : true,
+                "type" : "location"
               }
-            },
-            {
-              "target_field" : "location",
-              "source" : {"lookup" : "location"},
-              "core" : true,
-              "indexed" : true,
-              "type" : "location"
-            },
-            {
-              "target_field" : "patient_location",
-              "source" : {"lookup" : "patient_location"},
-              "core" : false,
-              "indexed" : true,
-              "type" : "location"
-            }
-          ]
+            ],
+            "patient" : [
+              {
+                "target_field" : "patient_name",
+                "source" : {"lookup" : "patient_information.name"},
+                "core" : true,
+                "indexed" : true,
+                "type" : "string"
+              },
+              {
+                "target_field" : "age",
+                "source" : {"lookup" : "age"},
+                "type" : "integer",
+                "indexed" : "true",
+                "core" : true,
+                "valid_values" : {
+                  "range" : {
+                    "min" : 0,
+                    "max" : 125
+                  }
+                }
+              },
+              {
+                "target_field" : "patient_location",
+                "source" : {"lookup" : "patient_location"},
+                "core" : false,
+                "indexed" : true,
+                "type" : "location"
+              }
+            ]
+          }
         }}
         Manifest.make definition: definition
 
@@ -757,7 +761,7 @@ describe Api::EventsController do
             "version" : "1.0.0",
             "source_data_type" : "json"
           },
-          "field_mapping" : [
+          "field_mapping" : { "event" : [
             {
               "target_field" : "assay_name",
               "source" : {"lookup" : "assay_name"},
@@ -769,7 +773,7 @@ describe Api::EventsController do
                 "second_assay"
               ]
             }
-          ]
+          ]}
         }}
 
         Manifest.make definition: definition
@@ -846,7 +850,7 @@ describe Api::EventsController do
             "version" : "1.0.1",
             "source_data_type" : "json"
           },
-          "field_mapping" : [
+          "field_mapping" : { "event" : [
             {
               "target_field" : "assay_name",
               "source" : {"lookup" : "assay_name"},
@@ -858,7 +862,7 @@ describe Api::EventsController do
                 "second_assay"
               ]
             }
-          ]
+          ]}
         }}
 
         manifest = Manifest.create definition: %{{
@@ -868,7 +872,7 @@ describe Api::EventsController do
             "version" : "1.0.1",
             "source_data_type" : "json"
           },
-          "field_mapping" : [
+          "field_mapping" : { "event" : [
             {
               "target_field" : "assay_name",
               "source" : {"lookup" : "assay_name"},
@@ -880,7 +884,7 @@ describe Api::EventsController do
                 "cardridge_2"
               ]
             }
-          ]
+          ]}
         }}
 
         response = get :schema, format: 'json'

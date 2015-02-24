@@ -5,173 +5,177 @@
     "device_models" : ["FLU Device Model"],
     "source_data_type": "json"
   },
-  "field_mapping" : [
-    {
-      "target_field" : "patient_id",
-      "source" : {"lookup" : "patient_id"},
-      "type" : "string",
-      "core" : true,
-      "pii" : true,
-      "indexed" : false
-    },
-    {
-      "target_field" : "patient_name",
-      "source" : {"lookup" : "patient_name"},
-      "type" : "string",
-      "core" : true,
-      "pii" : true,
-      "indexed" : false
-    },
-    {
-      "target_field" : "patient_telephone_number",
-      "source" : {"lookup" : "patient_telephone_number"},
-      "type" : "string",
-      "core" : true,
-      "pii" : true,
-      "indexed" : false
-    },
-    {
-      "target_field" : "patient_zip_code",
-      "source" : {"lookup" : "patient_zip_code"},
-      "type" : "string",
-      "core" : true,
-      "pii" : true,
-      "indexed" : false
-    },
-    {
-      "target_field" : "start_time",
-      "source" : {"lookup" : "start_time"},
-      "type" : "date",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "event_id",
-      "source" : {"lookup" : "event_id"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "system_user",
-      "source" : {"lookup" : "system_user"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "device_serial_number",
-      "source" : {"lookup" : "device_serial_number"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "error_code",
-      "source" : {"lookup" : "error_code"},
-      "type" : "integer",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "error_description",
-      "source" : {"lookup" : "error_description"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "age",
-      "source" : {"lookup" : "age"},
-      "type" : "integer",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true,
-      "valid_values":{"range": {"min": 0, "max": 125}}
-    },
-    {
-      "target_field" : "assay_name",
-      "source" : {"lookup" : "assay_name"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true,
-      "options":["FLU Assay"]
-    },
-    {
-      "target_field" : "gender",
-      "source" : {"lookup" : "gender"},
-      "type" : "enum",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true,
-      "options":["male", "female"]
-    },
-    {
-      "target_field" : "ethnicity",
-      "source" : {"lookup" : "ethnicity"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "race",
-      "source" : {"lookup" : "race"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "race_ethnicity",
-      "source" : {"lookup" : "race_ethnicity"},
-      "type" : "string",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true
-    },
-    {
-      "target_field" : "status",
-      "source" : {"lookup" : "status"},
-      "type" : "enum",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true,
-      "options":["invalid","error","no_result","success","negative"]
-    },
-    {
-      "target_field" : "results[*].result",
-      "source" : {"lookup" : "results[*].result"},
-      "type" : "enum",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true,
-      "options": ["positive","negative"]
-    },
-    {
-      "target_field" : "results[*].condition",
-      "source" : {"lookup" : "results[*].condition"},
-      "type" : "enum",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true,
-      "options": ["flu_a", "flu_b", "h1n1"]
-    },
-    {
-      "target_field" : "test_type",
-      "source" : {"lookup" : "test_type"},
-      "type" : "enum",
-      "core" : true,
-      "pii" : false,
-      "indexed" : true,
-      "options": ["specimen","qc"]
-    }
-  ]
+  "field_mapping" : {
+    "patient" : [
+      {
+        "target_field" : "patient_id",
+        "source" : {"lookup" : "patient_id"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true,
+        "indexed" : false
+      },
+      {
+        "target_field" : "patient_name",
+        "source" : {"lookup" : "patient_name"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true,
+        "indexed" : false
+      },
+      {
+        "target_field" : "patient_telephone_number",
+        "source" : {"lookup" : "patient_telephone_number"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true,
+        "indexed" : false
+      },
+      {
+        "target_field" : "patient_zip_code",
+        "source" : {"lookup" : "patient_zip_code"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true,
+        "indexed" : false
+      },
+      {
+        "target_field" : "age",
+        "source" : {"lookup" : "age"},
+        "type" : "integer",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true,
+        "valid_values":{"range": {"min": 0, "max": 125}}
+      },
+      {
+        "target_field" : "gender",
+        "source" : {"lookup" : "gender"},
+        "type" : "enum",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true,
+        "options":["male", "female"]
+      },
+      {
+        "target_field" : "ethnicity",
+        "source" : {"lookup" : "ethnicity"},
+        "type" : "string",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true
+      },
+      {
+        "target_field" : "race",
+        "source" : {"lookup" : "race"},
+        "type" : "string",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true
+      },
+      {
+        "target_field" : "race_ethnicity",
+        "source" : {"lookup" : "race_ethnicity"},
+        "type" : "string",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true
+      }
+    ],
+    "event" : [
+      {
+        "target_field" : "start_time",
+        "source" : {"lookup" : "start_time"},
+        "type" : "date",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true
+      },
+      {
+        "target_field" : "event_id",
+        "source" : {"lookup" : "event_id"},
+        "type" : "string",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true
+      },
+      {
+        "target_field" : "system_user",
+        "source" : {"lookup" : "system_user"},
+        "type" : "string",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true
+      },
+      {
+        "target_field" : "device_serial_number",
+        "source" : {"lookup" : "device_serial_number"},
+        "type" : "string",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true
+      },
+      {
+        "target_field" : "error_code",
+        "source" : {"lookup" : "error_code"},
+        "type" : "integer",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true
+      },
+      {
+        "target_field" : "error_description",
+        "source" : {"lookup" : "error_description"},
+        "type" : "string",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true
+      },
+      {
+        "target_field" : "assay_name",
+        "source" : {"lookup" : "assay_name"},
+        "type" : "string",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true,
+        "options":["FLU Assay"]
+      },
+      {
+        "target_field" : "status",
+        "source" : {"lookup" : "status"},
+        "type" : "enum",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true,
+        "options":["invalid","error","no_result","success","negative"]
+      },
+      {
+        "target_field" : "results[*].result",
+        "source" : {"lookup" : "results[*].result"},
+        "type" : "enum",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true,
+        "options": ["positive","negative"]
+      },
+      {
+        "target_field" : "results[*].condition",
+        "source" : {"lookup" : "results[*].condition"},
+        "type" : "enum",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true,
+        "options": ["flu_a", "flu_b", "h1n1"]
+      },
+      {
+        "target_field" : "test_type",
+        "source" : {"lookup" : "test_type"},
+        "type" : "enum",
+        "core" : true,
+        "pii" : false,
+        "indexed" : true,
+        "options": ["specimen","qc"]
+      }
+    ]
+  }
 }

@@ -32,7 +32,7 @@ class EventsSchema
     end
     schema["properties"] = Hash.new
 
-    (@manifest || Manifest.default).field_mapping.each do |field|
+    (@manifest || Manifest.default).flat_mappings.each do |field|
       if field["core"] && field["indexed"]
         schema["properties"][field_name(field)] = schema_for field
       end
@@ -144,7 +144,7 @@ class EventsSchema
   def all_assay_names
     #TODO This should be AssayName.all
     assay_names = Manifest.all.collect do |manifest|
-      assay_mapping = manifest.field_mapping.detect do |mapping|
+      assay_mapping = manifest.flat_mappings.detect do |mapping|
         mapping["target_field"] == "assay_name"
       end
 
