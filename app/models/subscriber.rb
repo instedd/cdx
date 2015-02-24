@@ -1,4 +1,6 @@
 class Subscriber < ActiveRecord::Base
+  VALID_VERBS = %w(GET POST)
+
   belongs_to :user
   belongs_to :filter
 
@@ -8,6 +10,8 @@ class Subscriber < ActiveRecord::Base
   validates_presence_of :filter
   validates_presence_of :name
   validates_presence_of :url
+  validates_presence_of :verb
+  validates_inclusion_of :verb, in: VALID_VERBS
 
   def self.notify_all
     Subscriber.find_each do |subscriber|
@@ -27,18 +31,31 @@ class Subscriber < ActiveRecord::Base
     now = Time.now
     events.each do |event|
       PoirotRails::Activity.start("Publish event to subscriber #{self.name}") do
+
         filtered_event = filter_event(event, fields)
-        callback_url = URI.parse self.url
-        callback_query = Rack::Utils.parse_nested_query(callback_url.query || "")
-        merged_query = filtered_event.merge(callback_query)
-        callback_url = "#{callback_url.scheme}://#{callback_url.host}:#{callback_url.port}#{callback_url.path}?#{merged_query.to_query}"
+
+        callback_url = self.url
+
+        if self.verb == 'GET'
+          callback_url = URI.parse self.url
+          callback_query = Rack::Utils.parse_nested_query(callback_url.query || "")
+          merged_query = filtered_event.merge(callback_query)
+          callback_url = "#{callback_url.scheme}://#{callback_url.host}:#{callback_url.port}#{callback_url.path}?#{merged_query.to_query}"
+        end
+
         options = {}
         if self.url_user && self.url_password
           options[:user] = self.url_user
           options[:password] = self.url_password
         end
-        site = RestClient::Resource.new(callback_url, options)
-        site.post "" rescue nil
+
+        request = RestClient::Resource.new(callback_url, options)
+
+        if self.verb == 'GET'
+          request.get rescue nil
+        else
+          request.post filtered_event.to_json rescue nil
+        end
       end
     end
     self.last_run_at = now

@@ -19,6 +19,10 @@
     .control
       = f.text_field :url
   .control-group
+    = f.label :verb, "HTTP Verb", :class => 'control-label'
+    %span.help-block GET will send fields in query string. POST will send a JSON object in the request body.
+    = f.collection_select :verb, Subscriber::VALID_VERBS, :to_s, :to_s, include_blank: false
+  .control-group
     = f.label :url_user, "User (optional)", :class => 'control-label'
     .control
       = f.text_field :url_user
