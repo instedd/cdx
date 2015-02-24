@@ -49,7 +49,7 @@ class ElasticsearchMappingTemplate
   def build_dynamic_templates_for manifest
     templates = []
 
-    manifest.field_mapping.each do |mapping|
+    manifest.flat_mappings.each do |mapping|
       if mapping['type'] == "location"
         field_name = mapping['target_field']
         template = {
@@ -66,7 +66,7 @@ class ElasticsearchMappingTemplate
   end
 
   def build_default_properties_mapping
-    map_fields(Manifest.default.field_mapping.select do |mapping|
+    map_fields(Manifest.default.flat_mappings.select do |mapping|
       mapping[:indexed]
     end)
   end
@@ -76,7 +76,7 @@ class ElasticsearchMappingTemplate
   end
 
   def build_properties_mapping_for manifest
-    mappings = map_fields(manifest.field_mapping.select do |mapping|
+    mappings = map_fields(manifest.flat_mappings.select do |mapping|
       mapping[:indexed] && !mapping[:core]
     end)
     custom_fields = {"custom_fields" => {'type' => 'nested', 'properties' => mappings}}

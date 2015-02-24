@@ -60,13 +60,41 @@ class Manifest < ActiveRecord::Base
   def apply_to(data)
     data = parser.load data
     raise EventParsingError.incomplete_data if data.blank?
-    field_mapping.inject(indexed: Hash.new, pii: Hash.new, custom: Hash.new) do |event, field|
-      ManifestField.new(self, field).apply_to data, event
+    event = {indexed: Hash.new, pii: Hash.new, custom: Hash.new}
+    field_mapping.each do |target, mappings|
+      if target == "event" && mappings.is_a?(Hash)
+        path = mappings["path"]
+        mappings = mappings["fields"]
+      end
+      event = mappings.inject event do |event, field|
+        ManifestField.new(self, field, target, path).apply_to data, event
+      end
     end
+    event
   end
 
   def field_mapping
     loaded_definition.with_indifferent_access["field_mapping"]
+  end
+
+  def event_mapping
+    field_mapping["event"] || []
+  end
+
+  def sample_mapping
+    field_mapping["sample"] || []
+  end
+
+  def patient_mapping
+    field_mapping["patient"] || []
+  end
+
+  def flat_mappings
+    if event_mapping.is_a? Hash
+      event_mapping["fields"]
+    else
+      event_mapping
+    end + patient_mapping + sample_mapping
   end
 
   def parser
@@ -93,7 +121,7 @@ class Manifest < ActiveRecord::Base
     end
 
     field_mapping.concat(map(Cdx::Api.searchable_fields).flatten)
-    Oj.dump metadata: {source_data_type: "json"}, field_mapping: field_mapping
+    Oj.dump metadata: {source_data_type: "json"}, field_mapping: {event: field_mapping}
   end
 
   private
@@ -141,16 +169,15 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_field_mapping
-    definition = Oj.load self.definition
-    if definition["field_mapping"].is_a? Array
-      definition["field_mapping"].each do |fm|
+    if loaded_definition["field_mapping"].is_a? Hash
+      flat_mappings.each do |fm|
         check_presence_of_target_field_and_source fm
         check_presence_of_core_field fm
         check_valid_type fm
         check_properties_of_enum_field fm
       end
     else
-      self.errors.add(:field_mapping, "must be an array")
+      self.errors.add(:field_mapping, "must be a json object")
     end
   end
 

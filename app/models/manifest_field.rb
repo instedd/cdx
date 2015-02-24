@@ -1,5 +1,5 @@
 class ManifestField
-  def initialize(manifest, field)
+  def initialize(manifest, field, target=nil, path=nil)
     @manifest = manifest
     @field = field
     @target_field = @field["target_field"]
