@@ -70,5 +70,4 @@ class Cdx::Api::Elasticsearch::Initializer
     end
     properties
   end
-
 end

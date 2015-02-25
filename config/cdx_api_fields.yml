@@ -43,6 +43,7 @@ searchable_fields:
     group_parameter_definition: none
   - name: event_id
     group_parameter_definition: none
+  - name: sample_id
   - name: uuid
     filter_parameter_definition:
       - type: match
