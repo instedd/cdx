@@ -16,8 +16,8 @@ class ManifestField
   def store value, event
     if value.present?
       index value, @target_field, event[hash_key]
+      event[:sample_id] = value if @target_field == "sample_id"
     end
-
     event
   end
 

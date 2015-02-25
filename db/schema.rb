@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150223151900) do
+ActiveRecord::Schema.define(version: 20150225160228) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -152,9 +152,10 @@ ActiveRecord::Schema.define(version: 20150223151900) do
   end
 
   create_table "samples", force: true do |t|
-    t.string "sample_id"
-    t.string "uuid"
-    t.binary "sensitive_data"
+    t.string  "sample_id"
+    t.string  "uuid"
+    t.binary  "sensitive_data"
+    t.integer "institution_id"
   end
 
   create_table "ssh_keys", force: true do |t|

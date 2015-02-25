@@ -88,6 +88,17 @@ describe Api::EventsController do
       event = all_elasticsearch_events.first["_source"]
       event["start_time"].should eq(event["created_at"])
     end
+
+    it "should create a sample" do
+      response = post :create, data, device_id: device.secret_key
+      response.status.should eq(200)
+
+      event = Event.first
+      sample = Sample.first
+      event.sample.should eq(sample)
+      sample.sample_id.should eq(sample.uuid)
+      sample.uuid.should_not eq(nil)
+    end
   end
 
   context "Manifest" do
@@ -123,7 +134,7 @@ describe Api::EventsController do
       event["patient_id"].should be_nil
     end
 
-    it "stores pii according to manifest" do
+    it "stores pii in the sample according to manifest" do
       Manifest.create definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
@@ -162,6 +173,72 @@ describe Api::EventsController do
       sample.sensitive_data["patient_id"].should be_nil
       sample.sensitive_data["foo"].should eq(1234)
       sample.sensitive_data[:foo].should eq(1234)
+    end
+
+    it "merges pii from different tests in the same sample" do
+      device2 = Device.make institution_id: institution.id, device_model: device.device_model
+      Manifest.create definition: %{{
+        "metadata" : {
+          "device_models" : ["#{device.device_model.name}"],
+          "version" : 1,
+          "api_version" : "1.0.0",
+          "source_data_type" : "json"
+        },
+        "field_mapping" : {
+          "event" : [
+            {
+              "target_field" : "assay_name",
+              "source" : {"lookup" : "assay.name"},
+              "type" : "string",
+              "core" : true,
+              "indexed" : true,
+              "pii" : false
+            }
+          ],
+          "sample" : [
+            {
+              "target_field" : "sample_id",
+              "source" : {"lookup" : "sample_id"},
+              "type" : "integer",
+              "core" : true,
+              "pii" : false,
+              "indexed" : true
+            }
+          ],
+          "patient" : [
+            {
+              "target_field" : "patient_id",
+              "source" : {"lookup" : "patient_id"},
+              "type" : "integer",
+              "core" : false,
+              "pii" : true,
+              "indexed" : false
+            },
+            {
+              "target_field" : "patient_telephone_number",
+              "source" : {"lookup" : "patient_telephone_number"},
+              "type" : "integer",
+              "core" : false,
+              "pii" : true,
+              "indexed" : false
+            }
+          ]
+        }
+      }}
+
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 3, sample_id: "10"), device_id: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_telephone_number: 2222222, sample_id: 10), device_id: device2.secret_key
+
+      Event.count.should eq(2)
+      Sample.count.should eq(1)
+
+      Event.first.sample.should eq(Sample.first)
+      Event.last.sample.should eq(Sample.first)
+
+      sample = Sample.first.decrypt
+      sample.sample_id.should eq("10")
+      sample.sensitive_data["patient_id"].should eq(3)
+      sample.sensitive_data["patient_telephone_number"].should eq(2222222)
     end
 
     it "uses the last version of the manifest" do
@@ -261,6 +338,18 @@ describe Api::EventsController do
 
       response.code.should eq("422")
       Oj.load(response.body)["errors"].should eq("'foo' is not a valid value for 'error_code' (must be an integer)")
+    end
+
+    it "should create a sample" do
+
+      response = post :create, data, device_id: device.secret_key
+      response.status.should eq(200)
+
+      event = Event.first
+      sample = Sample.first
+      event.sample.should eq(sample)
+      sample.sample_id.should eq(sample.uuid)
+      sample.uuid.should_not eq(nil)
     end
 
     context "csv" do

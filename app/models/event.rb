@@ -2,7 +2,7 @@ class Event < ActiveRecord::Base
   include EventIndexing
 
   belongs_to :device
-  belongs_to :institution
+  has_one :institution, through: :device
   belongs_to :sample
   serialize :custom_fields
 
@@ -32,11 +32,11 @@ class Event < ActiveRecord::Base
       result = existing_event.update_with raw_data
       [existing_event, result]
     else
-      sample_id = event.parsed_fields[:indexed][:sample_id]
-      if sample_id && existing_sample = Sample.find_by(device: device, sample_id: sample_id)
+      sample_id = event.parsed_fields[:sample_id]
+      if sample_id && existing_sample = Sample.find_by(institution_id: event.institution.id, sample_id: sample_id)
         event.sample = existing_sample
       else
-        event.sample = Sample.new sample_id: sample_id
+        event.sample = Sample.new sample_id: sample_id, institution_id: event.institution.id
       end
       result = event.save
       [event, result]

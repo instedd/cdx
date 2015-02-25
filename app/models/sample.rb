@@ -1,8 +1,10 @@
 class Sample < ActiveRecord::Base
   include EventEncryption
   has_many :events
+  belongs_to :institution
   before_save :encrypt
   before_create :generate_uuid
+  before_create :ensure_sample_id
 
   def merge_sensitive_data pii
     decrypt if sensitive_data.is_a? String
@@ -22,5 +24,9 @@ class Sample < ActiveRecord::Base
 
   def generate_uuid
     self.uuid = Guid.new.to_s
+  end
+
+  def ensure_sample_id
+    self.sample_id ||= self.uuid
   end
 end
