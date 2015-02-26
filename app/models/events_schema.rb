@@ -33,9 +33,7 @@ class EventsSchema
     schema["properties"] = Hash.new
 
     (@manifest || Manifest.default).field_mapping.each do |field|
-      if field["core"] && field["indexed"]
-        schema["properties"][field_name(field)] = schema_for field
-      end
+      schema["properties"][field_name(field)] = schema_for field
     end
 
     unless @manifest
@@ -60,6 +58,9 @@ class EventsSchema
     else
       string_schema schema
     end
+
+    schema['searchable'] = field["core"] && field["indexed"]
+
     schema
   end
 

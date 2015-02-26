@@ -38,7 +38,7 @@ describe EventsSchema do
           "target_field" : "age",
           "source" : {"lookup" : "age"},
           "type" : "integer",
-          "indexed" : "true",
+          "indexed" : true,
           "core" : true,
           "valid_values" : {
             "range" : {
@@ -54,7 +54,8 @@ describe EventsSchema do
       "title" => "Start Time",
       "type" => "string",
       "format" => "date-time",
-      "resolution" => "second"
+      "resolution" => "second",
+      "searchable" => true
     }
 
     enum_schema = {
@@ -65,19 +66,22 @@ describe EventsSchema do
         "positive" => { "name" => "Positive", "kind" => "positive" },
         "positive_with_riff" => { "name" => "Positive With Riff", "kind" => "positive" },
         "negative" => { "name" => "Negative", "kind" => "negative" }
-      }
+      },
+      "searchable" => true
     }
 
     string_schema = {
       "title" => "Patient Name",
-      "type" => "string"
+      "type" => "string",
+      "searchable" => true
     }
 
     number_schema = {
       "title" => "Age",
       "type" => "integer",
       "minimum" => 0,
-      "maximum" => 125
+      "maximum" => 125,
+      "searchable" => true
     }
 
     schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)
@@ -114,7 +118,8 @@ describe EventsSchema do
       "locations" => {
         "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
         "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
-      }
+      },
+      "searchable" => true
     }
 
     schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)

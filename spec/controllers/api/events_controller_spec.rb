@@ -719,7 +719,7 @@ describe Api::EventsController do
               "target_field" : "age",
               "source" : {"lookup" : "age"},
               "type" : "integer",
-              "indexed" : "true",
+              "indexed" : true,
               "core" : true,
               "valid_values" : {
                 "range" : {
@@ -774,7 +774,8 @@ describe Api::EventsController do
           "title" => "Start Time",
           "type" => "string",
           "format" => "date-time",
-          "resolution" => "second"
+          "resolution" => "second",
+          "searchable" => true
         }
 
         enum_schema = {
@@ -785,19 +786,22 @@ describe Api::EventsController do
             "positive" => { "name" => "Positive", "kind" => "positive" },
             "positive_with_riff" => { "name" => "Positive With Riff", "kind" => "positive" },
             "negative" => { "name" => "Negative", "kind" => "negative" }
-          }
+          },
+          "searchable" => true
         }
 
         string_schema = {
           "title" => "Patient Name",
-          "type" => "string"
+          "type" => "string",
+          "searchable" => true
         }
 
         number_schema = {
           "title" => "Age",
           "type" => "integer",
           "minimum" => 0,
-          "maximum" => 125
+          "maximum" => 125,
+          "searchable" => true
         }
 
         locations = Location.all
@@ -808,7 +812,19 @@ describe Api::EventsController do
           "locations" => {
             "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
             "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
-          }
+          },
+          "searchable" => true
+        }
+
+        patient_location_schema = {
+          "title" => "Patient Location",
+          "type" => "string",
+          "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
+          "locations" => {
+            "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
+            "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
+          },
+          "searchable" => false
         }
 
         response = get :schema, assay_name: "first_assay", locale: "es-AR", format: 'json'
@@ -823,7 +839,7 @@ describe Api::EventsController do
         schema["properties"]["result"].should eq(enum_schema)
         schema["properties"]["patient_name"].should eq(string_schema)
         schema["properties"]["age"].should eq(number_schema)
-        schema["properties"]["patient_location"].should be_nil
+        schema["properties"]["patient_location"].should eq(patient_location_schema)
         schema["properties"]["location"].should eq(location_schema)
       end
 
