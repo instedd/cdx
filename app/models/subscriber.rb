@@ -20,7 +20,7 @@ class Subscriber < ActiveRecord::Base
   end
 
   def self.available_fields
-    EventsSchema.new("en-US", nil, Manifest.default).build['properties'].keys.concat(Event.sensitive_fields).sort
+    EventsSchema.new("en-US", nil, Manifest.default).build['properties'].keys.sort
   end
 
   def notify
