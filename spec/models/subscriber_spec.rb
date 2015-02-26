@@ -9,15 +9,14 @@ describe Subscriber do
   it "generates a correct filter_event query" do
     query = {"condition" => "mtb", "laboratory" => laboratory.id.to_s}
     fields = ["condition", "result", "patient_name"]
-    url = "http://mbuilder-stg.instedd.org/external/application/118/trigger/cdp_trigger"
+    url = "http://subscriber/cdp_trigger"
 
     filter = Filter.make query: query
-    subscriber = Subscriber.make fields: fields, url: url, filter: filter
+    subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'GET'
 
-    callback_query = "http://mbuilder-stg.instedd.org/external/application/118/trigger/cdp_trigger?condition=mtb&patient_name=jdoe&result=positive"
+    callback_query = "http://subscriber/cdp_trigger?condition=mtb&patient_name=jdoe&result=positive"
 
-    stub_request(:post, callback_query).with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Content-Length'=>'0', 'User-Agent'=>'Ruby'}).
-         to_return(:status => 200, :body => "", :headers => {})
+    callback_request = stub_request(:get, callback_query).to_return(:status => 200, :body => "", :headers => {})
 
     manifest = Manifest.make definition: %{
       {
@@ -62,7 +61,7 @@ describe Subscriber do
 
     Subscriber.notify_all
 
-    WebMock.should have_requested(:post, callback_query)
+    assert_requested(callback_request)
   end
 
 end
