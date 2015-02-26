@@ -20,7 +20,7 @@ class Subscriber < ActiveRecord::Base
   end
 
   def self.available_fields
-    EventsSchema.new.build['properties'].keys.concat(["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code"]).sort
+    EventsSchema.new("en-US", nil, Manifest.default).build['properties'].keys.concat(["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code"]).sort
   end
 
   def notify
