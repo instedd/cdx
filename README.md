@@ -1,5 +1,7 @@
 # Cdx::Api::Elasticsearch
 
+[![Build Status](https://travis-ci.org/instedd/cdx-api-elasticsearch.svg)](https://travis-ci.org/instedd/cdx-api-elasticsearch)
+
 Provides an implementation of the [CDX query API](http://dxapi.org/#/query-events) based on an ElasticSearch backend.
 
 ## Installation
