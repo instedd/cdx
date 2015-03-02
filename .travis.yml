@@ -1,0 +1,14 @@
+language: ruby
+cache: bundler
+rvm:
+- 2.0.0
+services:
+- elasticsearch
+before_script:
+- bundle exec rake db:setup
+- bundle exec rake db:test:prepare
+script:
+- bundle exec rspec spec/
+notifications:
+  slack:
+    secure: Zi0O+z3WpZMGnVm5A+L/xHChFvTVkFk4oeiVuUM94Ez6jPK7yiK/LfObMza4DTtR2KcEnr+ANVIAznDyAnkbm3hJCUu5EYYViH3v2dEaWgKyN59CyWgfHkidaK3V5sv1aVOgMXSKKY4wvEo3PuB4vX7XlgA1Eq6YoXQXAfTPff0=
