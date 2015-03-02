@@ -4,9 +4,6 @@ rvm:
 - 2.0.0
 services:
 - elasticsearch
-before_script:
-- bundle exec rake db:setup
-- bundle exec rake db:test:prepare
 script:
 - bundle exec rspec spec/
 notifications:
