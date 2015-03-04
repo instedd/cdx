@@ -44,6 +44,9 @@ searchable_fields:
   - name: event_id
     group_parameter_definition: none
   - name: sample_id
+    scope: sample
+  - name: sample_type
+    scope: sample
   - name: uuid
     filter_parameter_definition:
       - type: match
@@ -69,6 +72,7 @@ searchable_fields:
     group_parameter_definition:
       - name: admin_level
   - name: age
+    scope: patient
     type: integer
     filter_parameter_definition:
       - include_default: true
@@ -86,9 +90,13 @@ searchable_fields:
       - type: range
   - name: assay_name
   - name: gender
+    scope: patient
   - name: ethnicity
+    scope: patient
   - name: race
+    scope: patient
   - name: race_ethnicity
+    scope: patient
   - name: status
     valid_values:
       options:
@@ -107,35 +115,6 @@ searchable_fields:
             - positive
             - negative
       - name: condition
-        valid_values:
-          options:
-            - bcr_abl
-            - c_diff
-            - c_diff_027
-            - ct
-            - ng
-            - ev
-            - fii
-            - fv
-            - flu_a
-            - h1n1
-            - flu_b
-            - rsv
-            - gbs
-            - hcv
-            - hiv
-            - hpv_16
-            - hpv_18_45
-            - other_hr_hpv
-            - hr_hpv
-            - mrsa
-            - sa
-            - mtb
-            - rif
-            - norovirus_gi
-            - norovirus_gii
-            - vre_van_a
-            - vre_van_b
   - name: test_type
     filter_parameter_definition:
       - type: match
