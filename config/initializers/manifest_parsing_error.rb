@@ -30,4 +30,8 @@ class ManifestParsingError < RuntimeError
   def self.unsupported_time_unit(time_unit, target_field)
     new "'#{time_unit} is not a valid time unit for #{target_field}."
   end
+
+  def self.empty_event
+    new "Empty event reported"
+  end
 end

@@ -1,4 +1,8 @@
 class CSVEventParser
+  def initialize(separator)
+    @separator = separator
+  end
+
   def lookup(path, data)
     if (path.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1 || path.split(Manifest::PATH_SPLIT_TOKEN).size > 1
       raise "path nesting is unsupported for CSV Events"
@@ -8,7 +12,7 @@ class CSVEventParser
   end
 
   def load_all(data)
-    csv = CSV.new(data, col_sep: ';')
+    csv = CSV.new(data, col_sep: @separator)
     headers = csv.shift
     csv.map do |row|
       result = Hash.new

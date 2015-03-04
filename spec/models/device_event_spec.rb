@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Event do
+describe DeviceEvent do
   let(:device) {Device.make}
 
   it 'stores failed events with raw data when it hits an issue parsing a manifest' do
@@ -23,11 +23,11 @@ describe Event do
 
     json = %{{ "error_code": "foo" }}
 
-    e, saved = Event.create_or_update_with device, json
+    device = DeviceEvent.new(device: device, raw_data: json)
 
-    expect(saved).to be_true
-    expect(e.index_failed?).to be_true
-    expect(e.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "error_code").message)
+    expect(device.save).to be_true
+    expect(device.index_failed?).to be_true
+    expect(device.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "error_code").message)
   end
 
   it "stores failed events when the string 'null' is passed as value" do
@@ -51,7 +51,7 @@ describe Event do
 
     json = %{{ "result": "null" }}
 
-    e, saved = Event.create_or_update_with device, json
+    e, saved = DeviceEvent.create_or_update_with device, json
 
     expect(saved).to be_true
     expect(e.index_failed?).to be_true
@@ -86,7 +86,7 @@ describe Event do
 
     csv = %{error_code,result\n0,positive}
 
-    e, saved = Event.create_or_update_with device, csv
+    e, saved = DeviceEvent.create_or_update_with device, csv
 
     expect(saved).to be_true
     expect(e.index_failed?).to be_false

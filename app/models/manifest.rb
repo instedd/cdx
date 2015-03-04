@@ -59,15 +59,20 @@ class Manifest < ActiveRecord::Base
 
   def apply_to(data)
     data = parser.load data
-    raise EventParsingError.incomplete_data if data.blank?
-    event = {indexed: Hash.new, pii: Hash.new, custom: Hash.new}
-    field_mapping.each do |target, mappings|
-      if target == "event" && mappings.is_a?(Hash)
-        path = mappings["path"]
-        mappings = mappings["fields"]
-      end
+    raise ManifestParsingError.empty_event if data.blank?
+    event = {
+      "event" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
+      "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
+      "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
+    }
+    field_mapping.each do |scope, mappings|
+      # if scope == "event" && mappings.is_a?(Hash)
+      #   path = mappings["path"]
+      #   mappings = mappings["fields"]
+      #   event[:indexed] = Array.new
+      # end
       event = mappings.inject event do |event, field|
-        ManifestField.new(self, field, target, path).apply_to data, event
+        ManifestField.new(self, field, scope).apply_to data, event
       end
     end
     event
@@ -98,11 +103,11 @@ class Manifest < ActiveRecord::Base
   end
 
   def parser
-    @parser ||= case metadata["source_data_type"]
+    @parser ||= case metadata["source"]["type"]
     when "json"
       JsonEventParser.new
     when "csv"
-      CSVEventParser.new
+      CSVEventParser.new metadata["source"]["separator"]
     else
       raise "unsupported source data type"
     end

@@ -1,7 +1,8 @@
 class ManifestFieldMapping
-  def initialize(manifest, field)
+  def initialize(manifest, field, root_path=nil)
     @manifest = manifest
     @field = field
+    @root_path = root_path
   end
 
   def apply_to(data)
@@ -76,6 +77,12 @@ class ManifestFieldMapping
       return DateTime.strptime(traverse(node["parse_date"][0], data), traverse(node["parse_date"][1], data))
     end
 
+    if node["hash"].present?
+      value = traverse(node["hash"][0], data)
+      return unless value
+      return EventEncryption.hash value
+    end
+
     node.to_s
   end
 
@@ -97,8 +104,17 @@ class ManifestFieldMapping
   end
 
   def lookup(path, data)
-    @manifest.parser.lookup(path, data)
+    @manifest.parser.lookup(absolute_path_for(path), data)
   end
+
+  def absolute_path_for(path)
+    if @root_path.present?
+      "#{@root_path}[*].#{path}"
+    else
+      path
+    end
+  end
+
 
   def beginning_of(date_time, time_unit)
     date_time = DateTime.parse(date_time.to_s) # to ensure we have a date_time and not a string

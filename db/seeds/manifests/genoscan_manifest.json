@@ -4,7 +4,7 @@
     "api_version" : "1.0.0",
     "signature" : "",
     "device_models" : ["genoscan"],
-    "source_data_type": "csv"
+    "source": { "type" : "csv", "separator" : ";" }
   },
   "field_mapping" : {
     "patient" : [

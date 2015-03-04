@@ -3,12 +3,13 @@ class Api::EventsController < ApiController
     device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_secret_key(params[:device_id])
     data = request.body.read rescue nil
 
-    event, saved = Event.create_or_update_with device, data
+    event = DeviceEvent.new(device:device, plain_text_data: data)
 
-    if saved
+    if event.save
       if event.index_failed?
         render :status => :unprocessable_entity, :json => { :errors => event.index_failure_reason }
       else
+        event.process
         render :status => :ok, :json => { :event => event.indexed_body }
       end
     else

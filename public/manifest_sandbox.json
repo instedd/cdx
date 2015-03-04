@@ -65,9 +65,8 @@
       }
     ],
   "event" : {
-    "report_type": "multiple", // single
     "root_path" : "tests", // only if multiple
-    "fields": [
+    "fields": [ // if not multiple, event will be the fields array directly
       {
         "target_field": "start_time",
         "source" : {"lookup" : "start_time"},
@@ -101,6 +100,33 @@
             "max" : 125
           }
         }
+      },
+      {
+        "target_field": "events[*].results[*].result",
+        "source" : [
+            [{"lookup" : "MGIT"}],
+            [{"lookup" : "LG"}]
+        ],
+        "core" : true,
+        "indexed" : false,
+        "pii" : true,
+        "type" : "string"
+      },
+      {
+        "target_field": "events[*].results[*].condition",
+        "source" : [ "mtb", "mtb" ],
+        "core" : true,
+        "indexed" : false,
+        "pii" : true,
+        "type" : "string"
+      },
+      {
+        "target_field": "events[*].test_type",
+        "source" : [ "MGIT", "LG" ],
+        "core" : true,
+        "indexed" : false,
+        "pii" : true,
+        "type" : "string"
       },
       {
         "target_field": "assay_name",

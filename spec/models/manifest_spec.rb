@@ -234,42 +234,174 @@ describe Manifest do
       {indexed: {"results" => [{"custom_fields" => {"temperature" => 20}}]}, pii: Hash.new, custom: Hash.new}
   end
 
-  it "should detect sample_id and store it sepparately" do
-    assert_manifest_application %{
-        {
-          "sample" : [{
-            "target_field" : "sample_id",
-            "source" : {"lookup" : "sample.id"},
-            "core" : true
-          }]
-        }
-      },
-      '{"sample" : {"id" : "4002"}}',
-      {indexed: {"sample_id" => "4002"}, pii: Hash.new, custom: Hash.new, sample_id: "4002"}
-  end
-
-  it "should store sample_id in all the events and store it sepparately" do
-    assert_manifest_application %{
-        {
-          "sample" : [{
-            "target_field" : "sample_id",
-            "source" : {"lookup" : "sample.id"},
-            "core" : true
-          }],
-          "event" : {
-            "path" : "tests",
-            "fields" : [
-              {
-                "target_field" : "event_id",
-                "source" : {"lookup" : "id"},
-                "core" : true
-              }
-            ]
+  it "should store fields in sample, event or patient as specified" do
+    manifest = Manifest.new(definition: %{
+      {
+        "metadata": {
+          "source": {
+            "type" : "json"
           }
+        },
+        "field_mapping" : {
+          "sample" : [
+            {
+              "target_field" : "sample_id",
+              "source" : {"lookup" : "sample_id"},
+              "core" : true,
+              "indexed" : true
+            },
+            {
+              "target_field" : "sample_type",
+              "source" : {"lookup" : "sample_type"},
+              "core" : true,
+              "indexed" : true
+            },
+            {
+              "target_field" : "culture_days",
+              "source" : {"lookup" : "culture_days"},
+              "indexed" : true,
+              "custom" : true
+            },
+            {
+              "target_field" : "datagram",
+              "source" : {"lookup" : "datagram"},
+              "custom" : true
+            },
+            {
+              "target_field" : "collected_at",
+              "source" : {"lookup" : "collected_at"},
+              "pii" : true
+            }
+          ],
+          "patient" : [
+            {
+              "target_field" : "patient_id",
+              "source" : {"lookup" : "patient_id"},
+              "pii" : true
+            },
+            {
+              "target_field" : "gender",
+              "source" : {"lookup" : "gender"},
+              "core" : true,
+              "indexed" : true
+            },
+            {
+              "target_field" : "dob",
+              "source" : {"lookup" : "dob"},
+              "core" : true,
+              "pii" : true
+            },
+            {
+              "target_field" : "hiv",
+              "source" : {"lookup" : "hiv"},
+              "custom" : true,
+              "indexed" : true
+            },
+            {
+              "target_field" : "shirt_color",
+              "source" : {"lookup" : "shirt_color"},
+              "custom" : true
+            }
+          ],
+          "event" : [
+            {
+              "target_field" : "event_id",
+              "source" : {"lookup" : "event_id"},
+              "core" : true
+            },
+            {
+              "target_field" : "assay",
+              "source" : {"lookup" : "assay"},
+              "core" : true,
+              "indexed" : true
+            },
+            {
+              "target_field" : "start_time",
+              "source" : {"lookup" : "start_time"},
+              "core" : true,
+              "pii" : true
+            },
+            {
+              "target_field" : "raw_result",
+              "source" : {"lookup" : "raw_result"},
+              "custom" : true
+            },
+            {
+              "target_field" : "concentration",
+              "source" : {"lookup" : "concentration"},
+              "custom" : true,
+              "indexed" :true
+            }
+          ]
+        }
+      }
+    })
+
+    result = manifest.apply_to(Oj.dump({
+      event_id: "4",                    # event id
+      assay: "mtb",                     # test, indexable
+      start_time: "2000/1/1 10:00:00",  # test, pii
+      concentration: "15%",             # test, indexable, custom
+      raw_result: "positivo 15%",       # test, no indexable, custom
+      sample_id: "4002",                # sample id
+      sample_type: "sputum",            # sample, indexable
+      collected_at: "2000/1/1 9:00:00", # sample, pii, non indexable
+      culture_days: "10",               # sample, indexable, custom,
+      datagram: "010100011100",         # sample, non indexable, custom
+      patient_id: "8000",               # patient id
+      gender: "male",                   # patient, indexable
+      dob: "2000/1/1",                  # patient, pii, non indexable
+      hiv: "positive",                  # patient, indexable, custom
+      shirt_color: "blue"               # patient, non indexable, custom
+    }))
+
+    result.should eq({
+      event: {
+        indexed: {
+          event_id: "4",
+          assay: "mtb",
+          custom_fields: {
+            concentration: "15%"
+          }
+        },
+        custom: {
+          raw_result: "positivo 15%"
+        },
+        pii: {
+          start_time: "2000/1/1 10:00:00"
         }
       },
-      '{"sample" : {"id" : "4002"}, "tests" : [{"event_id" : 1}, {"event_id" : 2}]}',
-      {indexed: [{"sample_id" => "4002", "event_id" => 1}, {"sample_id" => "4002", "event_id" => 2}], pii: Hash.new, custom: Hash.new, sample_id: "4002"}
+      sample: {
+        indexed: {
+          sample_id: "4002",
+          sample_type: "sputum",
+          custom_fields: {
+            culture_days: "10"
+          }
+        },
+        custom: {
+          datagram: "010100011100"
+        },
+        pii: {
+          collected_at: "2000/1/1 9:00:00"
+        }
+      },
+      patient: {
+        indexed: {
+          gender: "male",
+          custom_fields: {
+            hiv: "positive"
+          }
+        },
+        pii: {
+          patient_id: "8000",
+          dob: "2000/1/1"
+        },
+        custom: {
+          shirt_color: "blue"
+        }
+      }
+    }.recursive_stringify_keys!)
   end
 
   it "should apply to an array of custom non-pii indexed field inside results array" do

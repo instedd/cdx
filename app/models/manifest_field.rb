@@ -1,10 +1,12 @@
 class ManifestField
-  def initialize(manifest, field, target=nil, path=nil)
+  def initialize(manifest, field, scope=nil, path=nil)
     @manifest = manifest
     @field = field
     @target_field = @field["target_field"]
-    @mapping = ManifestFieldMapping.new(@manifest, @field)
+    @mapping = ManifestFieldMapping.new(@manifest, @field, path)
     @validation = ManifestFieldValidation.new(@field)
+    @scope = scope
+    @path = path
   end
 
   def apply_to(data, event)
@@ -15,20 +17,19 @@ class ManifestField
 
   def store value, event
     if value.present?
-      index value, @target_field, event[hash_key]
-      event[:sample_id] = value if @target_field == "sample_id"
+      index value, @target_field, event[@scope][hash_key]
     end
     event
   end
 
   def hash_key
-    return :pii if @field["pii"]
+    return "pii" if @field["pii"]
     if @field["core"]
-      return :pii if Event.pii?(@target_field)
-      :indexed
+      return "pii" if Event.pii?(@target_field)
+      "indexed"
     else
-      return :indexed if @field["indexed"]
-      :custom
+      return "indexed" if @field["indexed"]
+      "custom"
     end
   end
 

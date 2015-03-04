@@ -7,6 +7,10 @@ module EventEncryption
     Encryptor.decrypt(string, :key => secret_key, :iv => iv, :salt => salt)
   end
 
+  def self.hash string
+    (Digest::SHA2.new << string).to_s
+  end
+
   private
 
   def self.secret_key
