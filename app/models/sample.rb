@@ -5,6 +5,8 @@ class Sample < ActiveRecord::Base
   before_save :encrypt
   before_create :generate_uuid
   before_create :ensure_sample_uid
+  serialize :custom_fields
+  serialize :indexed_fields
 
   attr_writer :plain_sensitive_data
 
@@ -22,7 +24,7 @@ class Sample < ActiveRecord::Base
   end
 
   def generate_uuid
-    self.uuid = Guid.new.to_s
+    self.uuid ||= Guid.new.to_s
   end
 
   def ensure_sample_uid

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150304203629) do
+ActiveRecord::Schema.define(version: 20150305145336) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -173,6 +173,7 @@ ActiveRecord::Schema.define(version: 20150304203629) do
     t.integer "institution_id"
     t.text    "custom_fields"
     t.string  "sample_uid_hash"
+    t.text    "indexed_fields"
   end
 
   add_index "samples", ["institution_id", "sample_uid_hash"], name: "index_samples_on_institution_id_and_sample_uid_hash", using: :btree

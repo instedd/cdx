@@ -1,14 +1,18 @@
 module EventEncryption
   def self.encrypt string
-    Encryptor.encrypt string, :key => secret_key, :iv => iv, :salt => salt
+    Encryptor.encrypt string, :key => secret_key, :iv => iv, :salt => salt unless string.blank?
   end
 
   def self.decrypt string
-    Encryptor.decrypt(string, :key => secret_key, :iv => iv, :salt => salt)
+    unless string.blank?
+      Encryptor.decrypt(string, :key => secret_key, :iv => iv, :salt => salt)
+    else
+      ''
+    end
   end
 
   def self.hash string
-    (Digest::SHA2.new << string).to_s
+    (Digest::SHA2.new << string).to_s unless string.blank?
   end
 
   private

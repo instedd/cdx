@@ -55,6 +55,11 @@ Location.blueprint do
   admin_level {parent.admin_level + 1}
 end
 
+Sample.blueprint do
+  institution
+  plain_sensitive_data { { sample_uid: "sample-#{Sham.sn}" } }
+end
+
 DeviceModel.blueprint do
   name
 end
