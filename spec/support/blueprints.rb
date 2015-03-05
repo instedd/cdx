@@ -60,6 +60,17 @@ Sample.blueprint do
   plain_sensitive_data { { sample_uid: "sample-#{Sham.sn}" } }
 end
 
+Event.blueprint do
+  sample
+  device_events {[DeviceEvent.make]}
+  device {device_events.first.device}
+  event_id { "event-#{Sham.sn}" }
+end
+
+DeviceEvent.blueprint do
+  device
+end
+
 DeviceModel.blueprint do
   name
 end

@@ -114,19 +114,10 @@ class Manifest < ActiveRecord::Base
   end
 
   def self.default_definition
-    field_mapping = Event.sensitive_fields.map do |sensitive_field|
-      {
-        target_field: sensitive_field,
-        source: {lookup: sensitive_field},
-        core: true,
-        type: 'string',
-        pii: true,
-        indexed: false
-      }
-    end
-
-    field_mapping.concat(map(Cdx::Api.searchable_fields).flatten)
-    Oj.dump metadata: {source_data_type: "json"}, field_mapping: {event: field_mapping}
+    Oj.dump({
+      metadata: { source: { type: "csv" } },
+      field_mapping: { event: map(Cdx::Api.searchable_fields).flatten }
+    })
   end
 
   private

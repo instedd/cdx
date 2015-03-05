@@ -7,11 +7,22 @@ class Sample < ActiveRecord::Base
   before_create :ensure_sample_uid
   serialize :custom_fields
   serialize :indexed_fields
+  validates_presence_of :institution
+  validates_uniqueness_of :sample_uid_hash, scope: :institution_id
 
   attr_writer :plain_sensitive_data
 
-  def merge_sensitive_data pii
-    self.plain_sensitive_data.merge!(pii.delete_if {|k,v| v.nil?})
+  after_initialize do
+    self.custom_fields  ||= {}
+    self.indexed_fields ||= {}
+  end
+
+  def merge sample
+    self.plain_sensitive_data.deep_merge_not_nil!(sample.plain_sensitive_data)
+    self.custom_fields.deep_merge_not_nil!(sample.custom_fields)
+    self.indexed_fields.deep_merge_not_nil!(sample.indexed_fields)
+
+    self
   end
 
   def plain_sensitive_data

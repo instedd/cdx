@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150305145336) do
+ActiveRecord::Schema.define(version: 20150305175247) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -85,7 +85,11 @@ ActiveRecord::Schema.define(version: 20150305145336) do
     t.string   "event_id"
     t.integer  "sample_id"
     t.binary   "sensitive_data"
+    t.integer  "device_id"
   end
+
+  add_index "events", ["sample_id"], name: "index_events_on_sample_id", using: :btree
+  add_index "events", ["uuid"], name: "index_events_on_uuid", using: :btree
 
   create_table "filters", force: true do |t|
     t.integer  "user_id"

@@ -1,7 +1,22 @@
 require "spec_helper"
 
+class Event
+  def self.create_and_index indexed_fields, params={}
+    event = self.make params
+    EventIndexer.new(indexed_fields, event).index
+    event
+  end
+end
+
 describe DeviceEventProcessor do
+
+  def all_elasticsearch_events
+    client = fresh_client_for institution.elasticsearch_index_name
+    client.search(index: institution.elasticsearch_index_name)["hits"]["hits"]
+  end
+
   let(:device) {Device.make}
+  let(:institution) {device.institution}
   let(:device_event) do
     device_event = DeviceEvent.new(device: device, plain_text_data: 'foo')
     device_event.stub(:parsed_event).and_return({
@@ -11,7 +26,13 @@ describe DeviceEventProcessor do
           assay: "mtb",
           custom_fields: {
             concentration: "15%"
-          }
+          },
+          results: [
+            {
+              result: "positive",
+              condition: "mtb"
+            }
+          ]
         },
         custom: {
           raw_result: "positivo 15%"
@@ -104,50 +125,111 @@ describe DeviceEventProcessor do
     }.recursive_stringify_keys!)
   end
 
-  it "should index a document" do
+  it "should update sample data and existing events" do
     sample_indexed_fields = {
+      sample_type: "blood",
+      custom_fields: {
+        hiv: "positive"
+      }
+    }.recursive_stringify_keys!
+    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution)
+
+    event = Event.create_and_index({event_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, event_id: '4'})
+
+    event = Event.create_and_index({event_id: "2", assay: "mtb"}, {sample: sample, event_id: '2'})
+
+    device_event_processor.process
+
+    Sample.count.should eq(1)
+
+    sample = Sample.first
+
+    sample.plain_sensitive_data.should eq({
+      patient_id: "8000",
+      dob: "2000/1/1",
+      sample_uid: "abc4002",
+      sample_id: "4002",
+      collected_at: "2000/1/1 9:00:00"
+    }.recursive_stringify_keys!)
+
+    sample.custom_fields.should eq({
+      datagram: "010100011100",
+      shirt_color: "blue"
+    }.recursive_stringify_keys!)
+
+    sample.indexed_fields.should eq({
       sample_type: "sputum",
       gender: "male",
       custom_fields: {
         culture_days: "10",
         hiv: "positive"
       }
+    }.recursive_stringify_keys!)
+
+    events = all_elasticsearch_events
+
+    events.each do |event|
+      event["_source"]["sample_type"].should eq("sputum")
+    end
+  end
+
+  it "shouldn't update sample from another institution" do
+    sample_indexed_fields = {
+      sample_type: "sputum",
+      custom_fields: {
+        hiv: "positive"
+      }
     }
-    event = Event.create!(
-      device_events: [device_event],
-      sample: Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields),
-      event_id: '4')
+    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'})
 
-    client = double(:es_client)
-    device_event_processor.should_receive(:client).and_return(client)
+    device_event_processor.process
 
-    client.should_receive(:index).with(
-      index: device.institution.elasticsearch_index_name,
-      type: "event",
-      body: {
-        start_time: event.created_at.utc.iso8601,
-        created_at: event.created_at.utc.iso8601,
-        updated_at: event.updated_at.utc.iso8601,
-        device_uuid: device.secret_key,
-        uuid: event.uuid,
-        location_id: device.laboratories.first.location.geo_id,
-        parent_locations: Location.all.map(&:geo_id),
-        laboratory_id: device.laboratories.first.id,
-        institution_id: device.institution_id,
-        location: {"admin_level_0"=>"0", "admin_level_1"=>device.laboratories.first.location.geo_id},
-        event_id: "4",
-        sample_uuid: 'abc',
-        assay: "mtb",
-        sample_type: "sputum",
-        gender: "male",
-        custom_fields: {
-          concentration: "15%",
-          culture_days: "10",
-          hiv: "positive"
-        }
-      }.recursive_stringify_keys!,
-      id: "#{device.secret_key}_4")
+    Sample.count.should eq(2)
 
-    device_event_processor.index_document event
+    sample.reload
+
+    sample.plain_sensitive_data.should eq({
+      sample_uid: 'abc4002'
+    })
+
+    sample.indexed_fields.should eq({
+      sample_type: "sputum",
+      custom_fields: {
+        hiv: "positive"
+      }
+    })
+  end
+
+  it "should update events with the same event_id and different sample_uid" do
+    event = Event.create_and_index({event_id: "4", custom_fields: {concentration: "10%", foo: "bar"}, results: [
+            {
+              result: "negative",
+              condition: "flu"
+            },
+            {
+              result: "pos",
+              condition: "mtb1"
+            }
+          ]}, { event_id: '4', device: device})
+
+    device_event_processor.process
+
+    Sample.count.should eq(2)
+
+    events = all_elasticsearch_events
+    events.size.should eq(1)
+    events.first["_source"]["assay"].should eq("mtb")
+    events.first["_source"]["sample_type"].should eq("sputum")
+    events.first["_source"]["custom_fields"]["concentration"].should eq("15%")
+    events.first["_source"]["custom_fields"]["foo"].should eq("bar")
+
+    Event.count.should eq(1)
+    Event.first.sample_id.should eq(Sample.last.id)
+    Event.first.custom_fields.should eq({ "raw_result" => "positivo 15%" })
+    Event.first.plain_sensitive_data.should eq({ "start_time" => "2000/1/1 10:00:00" })
+  end
+
+  pending "On new event with no sample uid, create event and sample with no uid" do
+
   end
 end

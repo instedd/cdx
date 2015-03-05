@@ -7,4 +7,8 @@ class Hash
     values.select{|v| v.is_a?(Array) }.flatten.each{|h| h.recursive_stringify_keys! if h.is_a?(Hash) }
     self
   end
+
+  def deep_merge_not_nil!(hash)
+    self.deep_merge!(hash) { |key, v1, v2| v2.nil? ? v1 : v2 }
+  end
 end

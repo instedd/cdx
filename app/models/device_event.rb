@@ -1,5 +1,6 @@
 class DeviceEvent < ActiveRecord::Base
   belongs_to :device
+  has_one :institution, through: :device
   has_and_belongs_to_many :events
 
   before_save :parsed_event
@@ -11,12 +12,8 @@ class DeviceEvent < ActiveRecord::Base
     @plain_text_data ||= EventEncryption.decrypt self.raw_data
   end
 
-  def manifest
-    @manifest ||= device.manifests.order("version DESC").first
-  end
-
   def parsed_event
-    @parsed_event ||= (manifest || Manifest.default).apply_to(plain_text_data).with_indifferent_access
+    @parsed_event ||= (device.current_manifest || Manifest.default).apply_to(plain_text_data).with_indifferent_access
   rescue ManifestParsingError => err
     self.index_failed = true
     self.index_failure_reason = err.message

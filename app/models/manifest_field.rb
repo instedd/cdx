@@ -25,7 +25,6 @@ class ManifestField
   def hash_key
     return "pii" if @field["pii"]
     if @field["core"]
-      return "pii" if Event.pii?(@target_field)
       "indexed"
     else
       return "indexed" if @field["indexed"]

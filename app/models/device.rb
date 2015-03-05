@@ -24,6 +24,10 @@ class Device < ActiveRecord::Base
     end
   end
 
+  def current_manifest
+    @manifest ||= manifests.order("version DESC").first
+  end
+
   def filter_by_owner(user, check_conditions)
     institution.user_id == user.id ? self : nil
   end
