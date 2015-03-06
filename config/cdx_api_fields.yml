@@ -43,7 +43,7 @@ searchable_fields:
     group_parameter_definition: none
   - name: event_id
     group_parameter_definition: none
-  - name: sample_id
+  - name: sample_uuid
     scope: sample
   - name: sample_type
     scope: sample
