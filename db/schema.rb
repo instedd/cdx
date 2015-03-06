@@ -203,6 +203,7 @@ ActiveRecord::Schema.define(version: 20150305175247) do
     t.string   "url_user"
     t.string   "url_password"
     t.integer  "filter_id"
+    t.string   "verb",         default: "GET"
   end
 
   add_index "subscribers", ["filter_id"], name: "index_subscribers_on_filter_id", using: :btree

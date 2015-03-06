@@ -59,7 +59,6 @@ end
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-openid'
-gem 'cancan'
 gem 'elasticsearch'
 gem 'bunny'
 

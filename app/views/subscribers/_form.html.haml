@@ -19,6 +19,10 @@
     .control
       = f.text_field :url
   .control-group
+    = f.label :verb, "HTTP Verb", :class => 'control-label'
+    %span.help-block GET will send fields in query string. POST will send a JSON object in the request body.
+    = f.collection_select :verb, Subscriber::VALID_VERBS, :to_s, :to_s, include_blank: false
+  .control-group
     = f.label :url_user, "User (optional)", :class => 'control-label'
     .control
       = f.text_field :url_user
@@ -28,8 +32,9 @@
       = f.password_field :url_password
   .control-group
     = f.label :fields, :class => 'control-label'
+    %span.help-block Empty selection will send all fields
     .control
-      - ["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code", "created_at", "device_uuid", "institution_id", "laboratory_id", "location_id", "assay_name", "device_serial_number", "age", "gender", "system_user", "start_time", "condition", "result"].each do |field|
+      - Subscriber.available_fields.each do |field|
         %label
           = check_box_tag "fields[#{field}]", true, subscriber.fields.include?(field)
           = field

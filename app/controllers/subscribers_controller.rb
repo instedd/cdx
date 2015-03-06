@@ -1,4 +1,8 @@
 class SubscribersController < ApplicationController
+  # TODO should split API controller
+  skip_before_action :authenticate_user!, if: -> { request.path.starts_with? "/api/" }
+  before_filter :authenticate_api_user!, if: -> { request.path.starts_with? "/api/" }
+
   respond_to :html, :json
   expose(:subscribers) do
     if params[:filter_id]
@@ -24,7 +28,6 @@ class SubscribersController < ApplicationController
 
   def create
     subscriber.last_run_at = Time.now
-
     flash[:notice] = "Subscriber was successfully created" if subscriber.save
     respond_with subscriber, location: subscribers_path
   end
@@ -42,7 +45,7 @@ class SubscribersController < ApplicationController
   private
 
   def subscriber_params
-    params.require(:subscriber).permit(:name, :url, :url_user, :url_password, :filter_id).tap do |whitelisted|
+    params.require(:subscriber).permit(:name, :url, :verb, :url_user, :url_password, :filter_id).tap do |whitelisted|
       whitelisted[:fields] ||= begin
         case fields = params[:subscriber][:fields] || params[:fields]
         when Array then fields
