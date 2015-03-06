@@ -1,20 +1,6 @@
 require "spec_helper"
 
-class Event
-  def self.create_and_index indexed_fields, params={}
-    event = self.make params
-    EventIndexer.new(indexed_fields, event).index
-    event
-  end
-end
-
 describe DeviceEventProcessor do
-
-  def all_elasticsearch_events
-    client = fresh_client_for institution.elasticsearch_index_name
-    client.search(index: institution.elasticsearch_index_name)["hits"]["hits"]
-  end
-
   let(:device) {Device.make}
   let(:institution) {device.institution}
   let(:device_event) do
@@ -166,7 +152,7 @@ describe DeviceEventProcessor do
       }
     }.recursive_stringify_keys!)
 
-    events = all_elasticsearch_events
+    events = all_elasticsearch_events_for(institution)
 
     events.each do |event|
       event["_source"]["sample_type"].should eq("sputum")
@@ -216,7 +202,7 @@ describe DeviceEventProcessor do
 
     Sample.count.should eq(2)
 
-    events = all_elasticsearch_events
+    events = all_elasticsearch_events_for(institution)
     events.size.should eq(1)
     events.first["_source"]["assay"].should eq("mtb")
     events.first["_source"]["sample_type"].should eq("sputum")

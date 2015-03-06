@@ -12,7 +12,6 @@ class ManifestFieldValidation
       raise ManifestParsingError.invalid_value_for_integer(value, @target_field)
     end
 
-
     verify_value_is_not_null_string value
 
     if value.is_a? Array

@@ -12,8 +12,8 @@ describe EventQuery do
   let(:second_user) {User.make}
 
   it "applies institution policy" do
-    Event.create_or_update_with user_device, Oj.dump(results:[condition: "mtb", result: :positive])
-    Event.create_or_update_with non_user_device, Oj.dump(results:[condition: "mtb", result: :negative])
+    Event.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
+    Event.create_and_index({results:[condition: "mtb", result: :negative]}, {device_events:[DeviceEvent.make(device: non_user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
     client.indices.refresh index: non_user_device.institution.elasticsearch_index_name
@@ -25,8 +25,8 @@ describe EventQuery do
   end
 
   it "delegates institution policy" do
-    Event.create_or_update_with user_device, Oj.dump(results:[condition: "mtb", result: :positive])
-    Event.create_or_update_with third_user_device, Oj.dump(results:[condition: "mtb", result: :negative])
+    Event.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
+    Event.create_and_index({results:[condition: "mtb", result: :negative]}, {device_events:[DeviceEvent.make(device: third_user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 
@@ -50,7 +50,7 @@ describe EventQuery do
   end
 
   it "should not access any event if has no policy" do
-    Event.create_or_update_with user_device, Oj.dump(results:[condition: "mtb", result: :positive])
+    Event.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 

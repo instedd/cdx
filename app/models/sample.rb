@@ -8,7 +8,7 @@ class Sample < ActiveRecord::Base
   serialize :custom_fields
   serialize :indexed_fields
   validates_presence_of :institution
-  validates_uniqueness_of :sample_uid_hash, scope: :institution_id
+  validates_uniqueness_of :sample_uid_hash, scope: :institution_id, allow_nil: true
 
   attr_writer :plain_sensitive_data
 
@@ -39,6 +39,6 @@ class Sample < ActiveRecord::Base
   end
 
   def ensure_sample_uid
-    self.sample_uid_hash ||= EventEncryption.hash(self.plain_sensitive_data[:sample_uid]) if self.plain_sensitive_data[:sample_uid]
+    self.sample_uid_hash ||= EventEncryption.hash(self.plain_sensitive_data[:sample_uid].to_s) if self.plain_sensitive_data[:sample_uid]
   end
 end

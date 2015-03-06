@@ -21,9 +21,9 @@ class DeviceEventProcessor
   end
 
   def create_sample
-    merged_pii = parsed_event[:sample][:pii].merge parsed_event[:patient][:pii]
-    merged_custom_fields = parsed_event[:sample][:custom].merge parsed_event[:patient][:custom]
-    merged_indexed_fields = parsed_event[:sample][:indexed].deep_merge parsed_event[:patient][:indexed]
+    merged_pii = parsed_event[:sample][:pii].merge(parsed_event[:patient][:pii]).with_indifferent_access
+    merged_custom_fields = parsed_event[:sample][:custom].merge(parsed_event[:patient][:custom]).with_indifferent_access
+    merged_indexed_fields = parsed_event[:sample][:indexed].deep_merge(parsed_event[:patient][:indexed]).with_indifferent_access
 
     sample = Sample.new plain_sensitive_data: merged_pii, custom_fields: merged_custom_fields, indexed_fields: merged_indexed_fields, institution_id: @device_event.institution.id
 

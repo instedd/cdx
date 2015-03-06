@@ -103,11 +103,11 @@ class Manifest < ActiveRecord::Base
   end
 
   def parser
-    @parser ||= case metadata["source"]["type"]
+    @parser ||= case (metadata["source"] || {})["type"]
     when "json"
       JsonEventParser.new
     when "csv"
-      CSVEventParser.new metadata["source"]["separator"]
+      CSVEventParser.new metadata["source"]["separator"] || CSVEventParser::DEFAULT_SEPARATOR
     else
       raise "unsupported source data type"
     end
@@ -115,7 +115,7 @@ class Manifest < ActiveRecord::Base
 
   def self.default_definition
     Oj.dump({
-      metadata: { source: { type: "csv" } },
+      metadata: { source: { type: "json" } },
       field_mapping: { event: map(Cdx::Api.searchable_fields).flatten }
     })
   end
@@ -147,12 +147,19 @@ class Manifest < ActiveRecord::Base
     else
       fields =  ["version","api_version","device_models"]
       check_fields_in_metadata(fields)
+      check_api_version
     end
 
     check_field_mapping
 
   rescue Oj::ParseError => ex
     self.errors.add(:parse_error, ex.message)
+  end
+
+  def check_api_version
+    unless self.metadata["api_version"].try(:starts_with?, "1.1")
+      self.errors.add(:api_version, "must be 1.1.x")
+    end
   end
 
   def check_fields_in_metadata(fields)
@@ -168,7 +175,6 @@ class Manifest < ActiveRecord::Base
     if loaded_definition["field_mapping"].is_a? Hash
       flat_mappings.each do |fm|
         check_presence_of_target_field_and_source fm
-        check_presence_of_core_field fm
         check_valid_type fm
         check_properties_of_enum_field fm
       end
@@ -194,12 +200,6 @@ class Manifest < ActiveRecord::Base
   def verify_absence_of_null_string field_mapping
     if field_mapping["options"].include? NULL_STRING
       self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{field_mapping["target_field"]}') ")
-    end
-  end
-
-  def check_presence_of_core_field field_mapping
-    if (field_mapping["core"].nil?)
-      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Mapping must include 'core' field")
     end
   end
 

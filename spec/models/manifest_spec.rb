@@ -3,13 +3,19 @@ require 'spec_helper'
 describe Manifest do
 
   def manifest_from_json_mappings(mappings_json)
-    Manifest.new(definition: "{\"metadata\":{\"source_data_type\" : \"json\"},\"field_mapping\" : #{mappings_json}}")
+    Manifest.new(definition: "{\"metadata\":{\"source\" : {\"type\" : \"json\"}},\"field_mapping\" : #{mappings_json}}")
   end
 
   def assert_manifest_application(mappings_json, data, expected)
     manifest = manifest_from_json_mappings(mappings_json)
     result = manifest.apply_to(data)
-    result.should eq(expected)
+    expected = {
+      event:   { indexed: {}, custom: {}, pii: {} },
+      sample:  { indexed: {}, custom: {}, pii: {} },
+      patient: { indexed: {}, custom: {}, pii: {} },
+    }.deep_merge(expected)
+
+    result.should eq(expected.recursive_stringify_keys!)
   end
 
   def assert_raises_manifest_data_validation(mappings_json, data, message)
@@ -21,16 +27,16 @@ describe Manifest do
     %{{
       "metadata" : {
         "device_models" : ["foo"],
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "version" : 1,
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {}
     }}
   end
 
   it "creates a device model named according to the manifest" do
-    Manifest.create(definition: definition)
+    Manifest.create!(definition: definition)
 
     Manifest.count.should eq(1)
     Manifest.first.definition.should eq(definition)
@@ -38,18 +44,18 @@ describe Manifest do
     Manifest.first.device_models.first.name.should eq("foo")
   end
 
-  it "updates it's version number" do
+  it "updates its version number" do
     updated_definition = %{{
       "metadata" : {
         "device_models" : ["foo"],
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "version" : "2.0.1",
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {}
     }}
 
-    Manifest.create(definition: definition)
+    Manifest.create!(definition: definition)
 
     manifest = Manifest.first
 
@@ -62,28 +68,28 @@ describe Manifest do
     Manifest.first.version.should eq("2.0.1")
   end
 
-  it "updates it's api_version number" do
+  it "updates its api_version number" do
     updated_definition = %{{
       "metadata" : {
         "device_models" : ["foo"],
-        "api_version" : "2.0.0",
+        "api_version" : "1.1.1",
         "version" : 1,
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {}
     }}
 
-    Manifest.create(definition: definition)
+    Manifest.create!(definition: definition)
 
     manifest = Manifest.first
 
-    manifest.api_version.should eq('1.0.0')
+    manifest.api_version.should eq('1.1.0')
     manifest.definition = updated_definition
     manifest.save!
 
     Manifest.count.should eq(1)
     DeviceModel.count.should eq(1)
-    Manifest.first.api_version.should eq("2.0.0")
+    Manifest.first.api_version.should eq("1.1.1")
   end
 
   it "reuses an existing device model if it already exists" do
@@ -108,26 +114,26 @@ describe Manifest do
   end
 
   it "leaves no orphan model" do
-    Manifest.create(definition: definition)
+    Manifest.create!(definition: definition)
 
     Manifest.count.should eq(1)
     DeviceModel.count.should eq(1)
     Manifest.first.destroy()
     Manifest.count.should eq(0)
 
-    Manifest.create(definition: definition)
+    Manifest.create!(definition: definition)
 
     definition_bar = %{{
       "metadata" : {
         "version" : 1,
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["bar"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {}
     }}
 
-    Manifest.create(definition: definition_bar)
+    Manifest.create!(definition: definition_bar)
 
     Manifest.count.should eq(2)
     DeviceModel.count.should eq(2)
@@ -138,9 +144,9 @@ describe Manifest do
     definition_version = %{{
       "metadata" : {
         "version" : 2,
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["foo"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {}
     }}
@@ -168,7 +174,7 @@ describe Manifest do
         }
       },
       '{"assay" : {"name" : "GX4002"}}',
-      {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should apply to pii core field" do
@@ -183,7 +189,7 @@ describe Manifest do
         }
       },
       '{"patient" : {"name" : "John"}}',
-      {indexed: Hash.new, pii: {"patient_name" => "John"}, custom: Hash.new}
+      patient: {indexed: Hash.new, pii: {"patient_name" => "John"}, custom: Hash.new}
   end
 
   it "should apply to custom non-pii non-indexed field" do
@@ -199,7 +205,7 @@ describe Manifest do
         }
       },
       '{"temperature" : 20}',
-      {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => 20}}
+      event: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => 20}}
   end
 
   it "should apply to custom non-pii indexed field" do
@@ -215,7 +221,7 @@ describe Manifest do
         }
       },
       '{"temperature" : 20}',
-      {indexed: {"custom_fields" => {"temperature" => 20}}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"custom_fields" => {"temperature" => 20}}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should apply to custom non-pii indexed field inside results array" do
@@ -231,16 +237,14 @@ describe Manifest do
         }
       },
       '{"temperature" : 20}',
-      {indexed: {"results" => [{"custom_fields" => {"temperature" => 20}}]}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"results" => [{"custom_fields" => {"temperature" => 20}}]}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should store fields in sample, event or patient as specified" do
     manifest = Manifest.new(definition: %{
       {
         "metadata": {
-          "source": {
-            "type" : "json"
-          }
+          "source" : {"type" : "json"}
         },
         "field_mapping" : {
           "sample" : [
@@ -465,7 +469,7 @@ describe Manifest do
           }
         ]
       }',
-      {indexed: {
+      event: {indexed: {
         "results" => [
           { "condition" => "mtb",
             "result" => "positive",
@@ -499,7 +503,7 @@ describe Manifest do
         }
       },
       '{"temperature" : 20}',
-      {indexed: Hash.new, pii: {"temperature" => 20}, custom: Hash.new}
+      event: {indexed: Hash.new, pii: {"temperature" => 20}, custom: Hash.new}
   end
 
   it "doesn't raise on valid value in options" do
@@ -516,7 +520,7 @@ describe Manifest do
         }
       },
       '{"level" : "high"}',
-      {indexed: {"level" => "high"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"level" => "high"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should raise on invalid value in options" do
@@ -556,7 +560,7 @@ describe Manifest do
         }
       },
       '{"temperature" : 30}',
-      {indexed: {"custom_fields" => {"temperature" => 30}}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"custom_fields" => {"temperature" => 30}}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should raise on invalid value in range (lesser)" do
@@ -619,7 +623,7 @@ describe Manifest do
         }
       },
       '{"sample_date" : "2014-05-14T15:22:11+0000"}',
-      {indexed: {"sample_date" => "2014-05-14T15:22:11+0000"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"sample_date" => "2014-05-14T15:22:11+0000"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should raise on invalid value in date iso" do
@@ -663,7 +667,7 @@ describe Manifest do
         }
       },
       '{"condition" : "PATIENT HAS MTB CONDITION"}',
-      {indexed: {"condition" => "MTB"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"condition" => "MTB"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "applies second value mapping" do
@@ -688,7 +692,7 @@ describe Manifest do
         }
       },
       '{"condition" : "PATIENT HAS FLU CONDITION"}',
-      {indexed: {"condition" => "H1N1"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"condition" => "H1N1"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should raise on mapping not found" do
@@ -729,7 +733,7 @@ describe Manifest do
         }
       },
       '{"temperature_list" : [{"temperature" : 20}, {"temperature" : 10}]}',
-      {indexed: {"custom_fields" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"custom_fields" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}, pii: Hash.new, custom: Hash.new}
   end
 
   it "should map to multiple indexed fields to the same list" do
@@ -763,7 +767,7 @@ describe Manifest do
           }
         ]
       }',
-      {indexed: {"custom_fields" => {"collection" => [
+      event: {indexed: {"custom_fields" => {"collection" => [
         {
           "temperature" => 20,
           "foo" => 12
@@ -797,7 +801,7 @@ describe Manifest do
         "temperature_list" : [{"temperature" : 20}, {"temperature" : 10}],
         "other_list" : [{"bar" : 10}, {"bar" : 30}, {"bar" : 40}]
       }',
-      {indexed: {"collection" => [
+      event: {indexed: {"collection" => [
         {
           "temperature" => 20,
           "foo" => 10
@@ -838,7 +842,7 @@ describe Manifest do
   it "shouldn't pass validations if metadata doesn't include version" do
     definition = %{{
       "metadata" : {
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"]
       },
       "field_mapping" : []
@@ -881,7 +885,7 @@ describe Manifest do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"]
       }
     }}
@@ -893,7 +897,7 @@ describe Manifest do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"]
       },
       "field_mapping" : []
@@ -908,9 +912,9 @@ describe Manifest do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : [
         {
@@ -940,9 +944,9 @@ describe Manifest do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {
         "event" : [
@@ -973,9 +977,9 @@ describe Manifest do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {
         "event" : [
@@ -996,9 +1000,9 @@ describe Manifest do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {
         "event" : [
@@ -1020,9 +1024,9 @@ describe Manifest do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {
         "event" : [
@@ -1045,9 +1049,9 @@ describe Manifest do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {
         "event" : [
@@ -1081,9 +1085,9 @@ describe Manifest do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {
         "event" : [
@@ -1103,37 +1107,13 @@ describe Manifest do
     m.errors[:string_null].first.should eq(": cannot appear as a possible value. (In 'rbc_description') ")
   end
 
-  it "shouldn't create if a field is provided without core specification" do
-    definition = %{{
-      "metadata" : {
-        "version" : "1.0.0",
-        "api_version" : "1.0.0",
-        "device_models" : ["GX4001"],
-        "source_data_type" : "json"
-      },
-      "field_mapping" : {
-          "event" : [
-          {
-            "target_field" : "results[*].result",
-            "source" : {"lookup" : "result"},
-            "type" : "string"
-          }
-        ]
-      }
-    }}
-    m = Manifest.new(definition: definition)
-    m.save
-    Manifest.count.should eq(0)
-    m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include 'core' field")
-  end
-
   it "shouldn't create if an enum field is provided without options" do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"],
-        "source_data_type" : "json"
+        "source" : {"type" : "json"}
       },
       "field_mapping" : {
         "event" : [
@@ -1174,7 +1154,7 @@ describe Manifest do
         "first_name" : "John",
         "last_name" : "Doe"
       }',
-      {indexed: Hash.new, pii: {"name" => "Doe, John"}, custom: Hash.new}
+      patient: {indexed: Hash.new, pii: {"name" => "Doe, John"}, custom: Hash.new}
   end
 
   it "strips spaces from an element" do
@@ -1199,7 +1179,7 @@ describe Manifest do
         "first_name" : "John",
         "last_name" : "   Doe   "
       }',
-      {indexed: {"name" => "Doe, John"}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"name" => "Doe, John"}, pii: Hash.new, custom: Hash.new}
   end
 
 
@@ -1233,7 +1213,7 @@ describe Manifest do
         "test_type" : "This is a QC test",
         "last_name" : "   Doe   "
       }',
-      {indexed: {"foo" => "Doe: qc"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"foo" => "Doe: qc"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "maps the result of a concat" do
@@ -1266,7 +1246,7 @@ describe Manifest do
         "first_name" : " John ",
         "last_name" : "   Doe   "
       }',
-      {indexed: {"test_type" => "qc"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"test_type" => "qc"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "retrieves a substring of an element" do
@@ -1297,7 +1277,7 @@ describe Manifest do
       '{
         "name_and_test" : "ABC John Doe"
       }',
-      {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "obtains the beginning of the month" do
@@ -1320,7 +1300,7 @@ describe Manifest do
       '{
         "run_at" : "2014-05-14T15:22:11+0000"
       }',
-      {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "parses an strange date" do
@@ -1343,7 +1323,7 @@ describe Manifest do
       '{
         "run_at" : "sat3feb014pm+7"
       }',
-      {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
+      event: {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
   end
 
   it "obtains the distance in years between two dates" do
@@ -1367,7 +1347,7 @@ describe Manifest do
         "run_at" : "2014-05-14T15:22:11+0000",
         "birth_day" : "2013-04-12T16:23:11.123+0000"
       }',
-      {indexed: {"age" => 1}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"age" => 1}, pii: Hash.new, custom: Hash.new}
   end
 
   it "obtains the distance in months between two dates" do
@@ -1391,7 +1371,7 @@ describe Manifest do
         "run_at" : "2014-05-14T15:22:11+0000",
         "birth_day" : "2013-04-12T16:23:11.123+0000"
       }',
-      {indexed: {"age" => 13}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"age" => 13}, pii: Hash.new, custom: Hash.new}
   end
 
   it "obtains the distance in days between two dates" do
@@ -1415,7 +1395,7 @@ describe Manifest do
         "run_at" : "2014-05-14T15:22:11+0000",
         "birth_day" : "2013-04-12T16:23:11.123+0000"
       }',
-      {indexed: {"age" => 396}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"age" => 396}, pii: Hash.new, custom: Hash.new}
   end
 
   it "obtains the distance in hours between two dates" do
@@ -1439,7 +1419,7 @@ describe Manifest do
         "run_at" : "2014-05-14T15:22:11+0000",
         "birth_day" : "2013-04-12T16:23:11.123+0000"
       }',
-      {indexed: {"age" => 9526}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"age" => 9526}, pii: Hash.new, custom: Hash.new}
       # 396 days and 22 hours
   end
 
@@ -1464,7 +1444,7 @@ describe Manifest do
         "run_at" : "2014-05-14T15:22:11+0000",
         "birth_day" : "2013-04-12T16:23:11.123+0000"
       }',
-      {indexed: {"age" => 571618}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"age" => 571618}, pii: Hash.new, custom: Hash.new}
   end
 
   it "obtains the distance in seconds between two dates" do
@@ -1488,7 +1468,7 @@ describe Manifest do
         "run_at" : "2014-05-14T15:22:11+0000",
         "birth_day" : "2013-04-12T16:23:11.123+0000"
       }',
-      {indexed: {"age" => 34297139}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"age" => 34297139}, pii: Hash.new, custom: Hash.new}
   end
 
   it "obtains the distance in milliseconds between two dates" do
@@ -1512,7 +1492,7 @@ describe Manifest do
         "run_at" : "2014-05-14T15:22:11+0000",
         "birth_day" : "2013-04-12T16:23:11.123+0000"
       }',
-      {indexed: {"age" => 34297139877000}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"age" => 34297139877000}, pii: Hash.new, custom: Hash.new}
   end
 
   it "obtains the distance in milliseconds between two dates disregarding the order" do
@@ -1536,7 +1516,7 @@ describe Manifest do
         "run_at" : "2014-05-14T15:22:11+0000",
         "birth_day" : "2013-04-12T16:23:11.123+0000"
       }',
-      {indexed: {"age" => 34297139877000}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"age" => 34297139877000}, pii: Hash.new, custom: Hash.new}
   end
 
   it "converts from minutes to hours" do
@@ -1561,7 +1541,7 @@ describe Manifest do
         "age" : "90",
         "unit" : "minutes"
       }',
-      {indexed: {"age" => 1.5}, pii: Hash.new, custom: Hash.new}
+      patient: {indexed: {"age" => 1.5}, pii: Hash.new, custom: Hash.new}
   end
 
   it "clusterises a number" do
@@ -1582,17 +1562,17 @@ describe Manifest do
         }
       }
 
-    assert_manifest_application definition, '{ "age" : "30" }', {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
+    assert_manifest_application definition, '{ "age" : "30" }', patient: {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
 
-    assert_manifest_application definition, '{ "age" : "90" }', {indexed: {"age" => "40+"}, pii: Hash.new, custom: Hash.new}
+    assert_manifest_application definition, '{ "age" : "90" }', patient: {indexed: {"age" => "40+"}, pii: Hash.new, custom: Hash.new}
 
-    assert_manifest_application definition, '{ "age" : "2" }', {indexed: {"age" => "0-5"}, pii: Hash.new, custom: Hash.new}
+    assert_manifest_application definition, '{ "age" : "2" }', patient: {indexed: {"age" => "0-5"}, pii: Hash.new, custom: Hash.new}
 
-    assert_manifest_application definition, '{ "age" : "20.1" }', {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
+    assert_manifest_application definition, '{ "age" : "20.1" }', patient: {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
 
-    assert_manifest_application definition, '{ "age" : "20" }', {indexed: {"age" => "5-20"}, pii: Hash.new, custom: Hash.new}
+    assert_manifest_application definition, '{ "age" : "20" }', patient: {indexed: {"age" => "5-20"}, pii: Hash.new, custom: Hash.new}
 
-    assert_manifest_application definition, '{ "age" : "40" }', {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
+    assert_manifest_application definition, '{ "age" : "40" }', patient: {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
   end
 
   pending "Multiple fields" do
@@ -1611,7 +1591,7 @@ describe Manifest do
         '{
           "temperature" : 20
         }',
-        {indexed: {"collection" => [
+        event: {indexed: {"collection" => [
           {
             "temperature" => 20
           }]}, pii: Hash.new, custom: Hash.new}
@@ -1646,7 +1626,7 @@ describe Manifest do
             }
           ]
         }',
-        {indexed: {"results" => [{"name" => "Doe, foo"}, {"name" => "Doe, bar"}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"name" => "Doe, foo"}, {"name" => "Doe, bar"}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "strips spaces from multiple elements" do
@@ -1673,7 +1653,7 @@ describe Manifest do
             },
           ]
         }',
-        {indexed: {"results" => [{"name" => "foo"}, {"name" => "bar"}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"name" => "foo"}, {"name" => "bar"}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should apply value mapping to multiple indexed field" do
@@ -1698,7 +1678,7 @@ describe Manifest do
           }
         },
         '{"conditions" : [{"condition" : "PATIENT HAS MTB CONDITION"}, {"condition" : "PATIENT HAS FLU CONDITION"}]}',
-        {indexed: {"results" => [{"condition" => "MTB"}, {"condition" => "H1N1"}]}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"results" => [{"condition" => "MTB"}, {"condition" => "H1N1"}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "retrieves a substring of an element" do
@@ -1729,7 +1709,7 @@ describe Manifest do
         '{
           "name_and_test" : "ABC John Doe"
         }',
-        {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "obtains the beginning of the month" do
@@ -1752,7 +1732,7 @@ describe Manifest do
         '{
           "run_at" : "2014-05-14T15:22:11+0000"
         }',
-        {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "parses an strange date" do
@@ -1775,7 +1755,7 @@ describe Manifest do
         '{
           "run_at" : "sat3feb014pm+7"
         }',
-        {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count years between multiple indexed fields" do
@@ -1801,7 +1781,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count years between multiple indexed fields on the second parameter" do
@@ -1827,7 +1807,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count years between multiple indexed fields on both parameters" do
@@ -1859,7 +1839,7 @@ describe Manifest do
               "end_time" : "2013-04-13T16:23:11.123+0000"
             },
           ]}',
-        {indexed: {"results" => [{"time" => 1}, {"time" => 1}]}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"results" => [{"time" => 1}, {"time" => 1}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count months between multiple indexed fields" do
@@ -1885,7 +1865,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count months between multiple indexed fields on the second parameter" do
@@ -1911,7 +1891,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count months between multiple indexed fields on both parameters" do
@@ -1943,7 +1923,7 @@ describe Manifest do
               "end_time" : "2013-04-13T16:23:11.123+0000"
             },
           ]}',
-        {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count days between multiple indexed fields" do
@@ -1969,7 +1949,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count days between multiple indexed fields on the second parameter" do
@@ -1995,7 +1975,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count days between multiple indexed fields on both parameters" do
@@ -2027,7 +2007,7 @@ describe Manifest do
               "end_time" : "2013-04-13T16:23:11.123+0000"
             },
           ]}',
-        {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count hours between multiple indexed fields" do
@@ -2053,7 +2033,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 9526}, {"age" => 9526}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 9526}, {"age" => 9526}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count hours between multiple indexed fields on the second parameter" do
@@ -2079,7 +2059,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 9526}, {"age" => 9526}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 9526}, {"age" => 9526}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count hours between multiple indexed fields on both parameters" do
@@ -2111,7 +2091,7 @@ describe Manifest do
               "end_time" : "2013-04-13T16:23:11.123+0000"
             },
           ]}',
-        {indexed: {"results" => [{"time" => 9526}, {"time" => 9526}]}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"results" => [{"time" => 9526}, {"time" => 9526}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count minutes between multiple indexed fields" do
@@ -2137,7 +2117,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 571618}, {"age" => 571618}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 571618}, {"age" => 571618}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count minutes between multiple indexed fields on the second parameter" do
@@ -2163,7 +2143,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 571618}, {"age" => 571618}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 571618}, {"age" => 571618}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count minutes between multiple indexed fields on both parameters" do
@@ -2195,7 +2175,7 @@ describe Manifest do
               "end_time" : "2013-04-13T16:23:11.123+0000"
             },
           ]}',
-        {indexed: {"results" => [{"time" => 571618}, {"time" => 571618}]}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"results" => [{"time" => 571618}, {"time" => 571618}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count seconds between multiple indexed fields" do
@@ -2221,7 +2201,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 34297139}, {"age" => 34297139}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 34297139}, {"age" => 34297139}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count seconds between multiple indexed fields on the second parameter" do
@@ -2247,7 +2227,7 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 34297139}, {"age" => 34297139}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 34297139}, {"age" => 34297139}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count seconds between multiple indexed fields on both parameters" do
@@ -2279,7 +2259,7 @@ describe Manifest do
               "end_time" : "2013-04-13T16:23:11.123+0000"
             },
           ]}',
-        {indexed: {"results" => [{"time" => 34297139}, {"time" => 34297139}]}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"results" => [{"time" => 34297139}, {"time" => 34297139}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count milliseconds between multiple indexed fields" do
@@ -2305,23 +2285,25 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 34297139877000}, {"age" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"results" => [{"age" => 34297139877000}, {"age" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count milliseconds between multiple indexed fields on the second parameter" do
       assert_manifest_application %{
-          [{
-            "target_field" : "results[*].age",
-            "source" : {
-              "milliseconds_between" : [
-                {"lookup" : "birth_day"},
-                {"lookup" : "conditions[*].run_at"}
-              ]
-            },
-            "core" : true,
-            "pii" : false,
-            "indexed" : true
-          }]
+          {
+            "event" : [{
+              "target_field" : "results[*].age",
+              "source" : {
+                "milliseconds_between" : [
+                  {"lookup" : "birth_day"},
+                  {"lookup" : "conditions[*].run_at"}
+                ]
+              },
+              "core" : true,
+              "pii" : false,
+              "indexed" : true
+            }]
+          }
         },
         '{
           "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -2329,23 +2311,25 @@ describe Manifest do
             {"run_at" : "2014-05-14T15:22:11+0000"},
             {"run_at" : "2014-05-15T15:22:11+0000"}
           ]}',
-        {indexed: {"results" => [{"age" => 34297139877000}, {"age" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
+        event: {indexed: {"results" => [{"age" => 34297139877000}, {"age" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should count milliseconds between multiple indexed fields on both parameters" do
       assert_manifest_application %{
-          [{
-            "target_field" : "results[*].time",
-            "source" : {
-              "milliseconds_between" : [
-                {"lookup" : "conditions[*].end_time"},
-                {"lookup" : "conditions[*].run_at"}
-              ]
-            },
-            "core" : true,
-            "pii" : false,
-            "indexed" : true
-          }]
+          {
+            "event" : [{
+              "target_field" : "results[*].time",
+              "source" : {
+                "milliseconds_between" : [
+                  {"lookup" : "conditions[*].end_time"},
+                  {"lookup" : "conditions[*].run_at"}
+                ]
+              },
+              "core" : true,
+              "pii" : false,
+              "indexed" : true
+            }]
+          }
         },
         '{
           "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -2364,19 +2348,21 @@ describe Manifest do
 
     it "converts from minutes to hours" do
       assert_manifest_application %{
-          [{
-            "target_field" : "results[*].age",
-            "source" : {
-              "convert_time" : [
-                  {"lookup" : "multiple[*].age"},
-                  {"lookup" : "unit"},
-                  "hours"
-                ]
-            },
-            "core" : true,
-            "pii" : false,
-            "indexed" : true
-          }]
+          {
+            "event" : [{
+              "target_field" : "results[*].age",
+              "source" : {
+                "convert_time" : [
+                    {"lookup" : "multiple[*].age"},
+                    {"lookup" : "unit"},
+                    "hours"
+                  ]
+              },
+              "core" : true,
+              "pii" : false,
+              "indexed" : true
+            }]
+          }
         },
         '{
           "multiple" : [
@@ -2390,18 +2376,20 @@ describe Manifest do
 
     it "clusterises an array of numbers" do
       definition = %{
-          [{
-            "target_field" : "results[*].age",
-            "source" : {
-              "clusterise" : [
-                  {"lookup" : "multiple[*].age"},
-                  [5, 20, 40]
-                ]
-            },
-            "core" : true,
-            "pii" : false,
-            "indexed" : true
-          }]
+          {
+            "event" : [{
+              "target_field" : "results[*].age",
+              "source" : {
+                "clusterise" : [
+                    {"lookup" : "multiple[*].age"},
+                    [5, 20, 40]
+                  ]
+              },
+              "core" : true,
+              "pii" : false,
+              "indexed" : true
+            }]
+          }
         }
 
       assert_manifest_application definition,

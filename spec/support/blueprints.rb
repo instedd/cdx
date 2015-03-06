@@ -42,10 +42,10 @@ Laboratory.blueprint do
 end
 
 Device.blueprint do
-  institution
+  laboratories { [Laboratory.make] }
+  institution { laboratories.first.institution }
   name
   device_model
-  laboratories { [Laboratory.make] }
 end
 
 Location.blueprint do
@@ -61,9 +61,9 @@ Sample.blueprint do
 end
 
 Event.blueprint do
-  sample
   device_events {[DeviceEvent.make]}
   device {device_events.first.device}
+  sample { Sample.make institution: device.institution }
   event_id { "event-#{Sham.sn}" }
 end
 

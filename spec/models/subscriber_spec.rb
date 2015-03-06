@@ -3,6 +3,7 @@ require 'spec_helper'
 describe Subscriber do
   let(:model){DeviceModel.make}
   let(:device){Device.make device_model: model}
+  let(:device_event){DeviceEvent.make(device: device)}
   let(:institution){device.institution}
   let(:laboratory){device.laboratories.first}
 
@@ -19,13 +20,13 @@ describe Subscriber do
     stub_request(:post, callback_query).with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Content-Length'=>'0', 'User-Agent'=>'Ruby'}).
          to_return(:status => 200, :body => "", :headers => {})
 
-    manifest = Manifest.make definition: %{
+    manifest = Manifest.create! definition: %{
       {
         "metadata": {
           "version": "1",
-          "api_version": "1",
+          "api_version": "1.1.0",
           "device_models": "#{model.name}",
-          "source_data_type" : "json"
+          "source" : {"type" : "json"}
         },
         "field_mapping" : {
           "event" : [
@@ -56,17 +57,12 @@ describe Subscriber do
       }
     }
 
-    Manifest.count.should eq(1)
-    json = %{{ "result": "positive", "condition" : "mtb", "patient_name" : "jdoe" }}
-    e = Event.create_or_update_with device, json
+    e = Event.create_and_index({ results: [result: "positive", condition: "mtb"], patient_name: "jdoe" }, {device_events: [device_event]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
-
-    Event.count.should eq(1)
 
     Subscriber.notify_all
 
     WebMock.should have_requested(:post, callback_query)
   end
-
 end

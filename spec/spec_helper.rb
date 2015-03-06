@@ -80,3 +80,16 @@ def fresh_client_for index_name
   client.indices.refresh index: index_name
   client
 end
+
+class Event
+  def self.create_and_index indexed_fields, params={}
+    event = self.make params
+    EventIndexer.new(indexed_fields, event).index
+    event
+  end
+end
+
+def all_elasticsearch_events_for(institution)
+  client = fresh_client_for institution.elasticsearch_index_name
+  client.search(index: institution.elasticsearch_index_name)["hits"]["hits"]
+end

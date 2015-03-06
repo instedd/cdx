@@ -5,7 +5,7 @@ describe ElasticsearchMappingTemplate do
     definition = %{{
       "metadata" : {
         "version" : "1.0.0",
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "device_models" : ["GX4001"]
       },
       "field_mapping" : { "event" : [
@@ -57,7 +57,8 @@ describe ElasticsearchMappingTemplate do
         "created_at"=>{'type'=>"date", 'index'=>'not_analyzed'},
         "updated_at"=>{'type'=>"date", 'index'=>'not_analyzed'},
         "event_id"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "sample_id"=>{'type'=>"string", 'index'=>'not_analyzed'},
+        "sample_uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
+        "sample_type"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "device_uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "system_user"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -109,7 +110,8 @@ describe ElasticsearchMappingTemplate do
         "created_at"=>{'type'=>"date", 'format' => 'dateOptionalTime'},
         "updated_at"=>{'type'=>"date", 'format' => 'dateOptionalTime'},
         "event_id"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "sample_id"=>{'type'=>"string", 'index'=>'not_analyzed'},
+        "sample_uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
+        "sample_type"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "device_uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
         "system_user"=>{'type'=>"string", 'index'=>'not_analyzed'},
@@ -148,7 +150,7 @@ describe ElasticsearchMappingTemplate do
 
   it "should build a template with the default manifest and an specific mapping for each custom manifest" do
     manifest
-    ElasticsearchMappingTemplate.new.template.should eq({
+    template = {
       'template'=>"cdp_institution*",
       'mappings'=> {
         '_default_'=> default_mapping,
@@ -179,15 +181,17 @@ describe ElasticsearchMappingTemplate do
           }
         }
       }
-    })
+    }
+
+    ElasticsearchMappingTemplate.new.template.should eq(template)
   end
 
   it "should update the mappings of the existing indices" do
     ElasticsearchMappingTemplate.new.load
-    Event.create_or_update_with Device.make, Oj.dump({results: [{result: :positive}]})
+    event = Event.create_and_index results: [{result: :positive}]
     manifest
 
-    mapping = Cdx::Api.client.indices.get_mapping index: Institution.first.elasticsearch_index_name
+    mapping = Cdx::Api.client.indices.get_mapping index: event.institution.elasticsearch_index_name
 
     event_mapping = default_mapping2
     event_mapping['properties']['custom_fields'] = {
@@ -210,7 +214,7 @@ describe ElasticsearchMappingTemplate do
     }
 
     mapping.should eq({
-      "cdp_institution_test_#{Institution.first.id}" => {
+      "cdp_institution_test_#{event.institution.id}" => {
         "mappings" => {
           '_default_'=> default_mapping2,
           'event' => default_event_mapping,

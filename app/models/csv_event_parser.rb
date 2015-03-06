@@ -1,5 +1,7 @@
 class CSVEventParser
-  def initialize(separator)
+  DEFAULT_SEPARATOR = ";"
+
+  def initialize(separator=DEFAULT_SEPARATOR)
     @separator = separator
   end
 
@@ -28,7 +30,7 @@ class CSVEventParser
   end
 
   def dump(data)
-    CSV.generate_line(data.keys, col_sep: ';') + CSV.generate_line(data.values, col_sep: ';')
+    CSV.generate_line(data.keys, col_sep: @separator) + CSV.generate_line(data.values, col_sep: @separator) #TODO This shouldnt exist
   end
 
   def load_for_device(data, device_key)

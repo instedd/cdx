@@ -4,13 +4,13 @@ describe DeviceEvent do
   let(:device) {Device.make}
 
   it 'stores failed events with raw data when it hits an issue parsing a manifest' do
-    manifest = Manifest.make definition: %{
+    manifest = Manifest.create! definition: %{
       {
         "metadata": {
           "version": "1",
-          "api_version": "1",
+          "api_version": "1.1.0",
           "device_models": "#{device.device_model.name}",
-          "source_data_type" : "json"
+          "source" : { "type" : "json"}
         },
         "field_mapping" : {"event" :[{
             "target_field" : "error_code",
@@ -23,21 +23,21 @@ describe DeviceEvent do
 
     json = %{{ "error_code": "foo" }}
 
-    device = DeviceEvent.new(device: device, raw_data: json)
+    event = DeviceEvent.new(device:device, plain_text_data: json)
 
-    expect(device.save).to be_true
-    expect(device.index_failed?).to be_true
-    expect(device.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "error_code").message)
+    expect(event.save).to be_true
+    expect(event.index_failed?).to be_true
+    expect(event.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "error_code").message)
   end
 
   it "stores failed events when the string 'null' is passed as value" do
-    manifest = Manifest.make definition: %{
+    manifest = Manifest.create! definition: %{
       {
         "metadata": {
           "version": "1",
-          "api_version": "1",
+          "api_version": "1.1.0",
           "device_models": "#{device.device_model.name}",
-          "source_data_type" : "json"
+          "source" : { "type" : "json"}
         },
         "field_mapping" : { "event" : [{
             "target_field" : "results[*].result",
@@ -51,21 +51,21 @@ describe DeviceEvent do
 
     json = %{{ "result": "null" }}
 
-    e, saved = DeviceEvent.create_or_update_with device, json
+    event = DeviceEvent.new(device:device, plain_text_data: json)
 
-    expect(saved).to be_true
-    expect(e.index_failed?).to be_true
-    expect(e.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'results[*].result'")
+    expect(event.save).to be_true
+    expect(event.index_failed?).to be_true
+    expect(event.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'results[*].result'")
   end
 
   it 'parses a csv with a single row' do
-    manifest = Manifest.make definition: %{
+    manifest = Manifest.create! definition: %{
       {
         "metadata": {
           "version": "1",
-          "api_version": "1",
+          "api_version": "1.1.0",
           "device_models": "#{device.device_model.name}",
-          "source_data_type" : "csv"
+          "source" : { "type" : "csv"}
         },
         "field_mapping" : { "event" : [{
             "target_field" : "error_code",
@@ -86,9 +86,9 @@ describe DeviceEvent do
 
     csv = %{error_code,result\n0,positive}
 
-    e, saved = DeviceEvent.create_or_update_with device, csv
+    event = DeviceEvent.new(device:device, plain_text_data: csv)
 
-    expect(saved).to be_true
-    expect(e.index_failed?).to be_false
+    expect(event.save).to be_true
+    expect(event.index_failed?).to be_false
   end
 end

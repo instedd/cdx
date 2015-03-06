@@ -19,9 +19,9 @@ describe ManifestsController do
       json = {"definition" => %{{
         "metadata": {
           "version" : "1.0.0",
-          "api_version" : "1.0.0",
+          "api_version" : "1.1.0",
           "device_models" : ["GX4001"],
-          "source_data_type" : "json"
+          "source" : { "type" : "json" }
         },
         "field_mapping": {
           "event" : [

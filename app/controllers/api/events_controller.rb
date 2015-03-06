@@ -10,7 +10,7 @@ class Api::EventsController < ApiController
         render :status => :unprocessable_entity, :json => { :errors => event.index_failure_reason }
       else
         event.process
-        render :status => :ok, :json => { :event => event.indexed_body }
+        render :status => :ok, :json => { :event => event.parsed_event }
       end
     else
       render :status => :unprocessable_entity, :json => { :errors => event.errors.full_messages.join(', ') }
@@ -18,7 +18,7 @@ class Api::EventsController < ApiController
   end
 
   def upload
-    events = CSVEventParser.new.load_for_device request.body.read, params[:device_id]
+    events = CSVEventParser.new.load_for_device request.body.read, params[:device_id] # TODO fix this
     render :status => :ok, :json => { events: events}
   end
 
@@ -36,13 +36,13 @@ class Api::EventsController < ApiController
   end
 
   def custom_fields
-    event = Event.find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "custom_fields" => event.custom_fields
+    event = Event.includes(:sample).find_by_uuid(params[:id])
+    render_json "uuid" => params[:id], "custom_fields" => event.custom_fields.deep_merge(event.sample.custom_fields)
   end
 
   def pii
-    sample = Event.find_by_uuid(params[:id]).sample
-    render_json "uuid" => params[:id], "pii" => sample.decrypt.sensitive_data
+    event = Event.includes(:sample).find_by_uuid(params[:id])
+    render_json "uuid" => params[:id], "pii" => event.plain_sensitive_data.deep_merge(event.sample.plain_sensitive_data)
   end
 
   def schema

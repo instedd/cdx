@@ -132,10 +132,10 @@ describe EventsSchema do
   end
 
   it "should return an empty schema with all the assay_names available if none is provided" do
-    Manifest.create definition: %{{
+    Manifest.create! definition: %{{
       "metadata" : {
         "device_models" : ["foo"],
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "version" : "1.0.1"
       },
       "field_mapping" : { "event" : [
@@ -153,10 +153,10 @@ describe EventsSchema do
       ]}
     }}
 
-    manifest = Manifest.create definition: %{{
+    manifest = Manifest.create! definition: %{{
       "metadata" : {
         "device_models" : ["bar"],
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "version" : "1.0.1"
       },
       "field_mapping" : { "event" : [

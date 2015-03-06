@@ -7,11 +7,6 @@ describe Api::EventsController do
   let(:data) {Oj.dump results: [result: :positive]}
   before(:each) {sign_in user}
 
-  def all_elasticsearch_events
-    client = fresh_client_for institution.elasticsearch_index_name
-    client.search(index: institution.elasticsearch_index_name)["hits"]["hits"]
-  end
-
   def get_updates(options, body="")
     fresh_client_for institution.elasticsearch_index_name
     response = get :index, body, options.merge(format: 'json')
@@ -24,16 +19,16 @@ describe Api::EventsController do
       response = post :create, data, device_id: device.secret_key
       response.status.should eq(200)
 
-      event = Event.first
+      event = DeviceEvent.first
       event.device_id.should eq(device.id)
       event.raw_data.should_not eq(data)
-      event.decrypt.raw_data.should eq(data)
+      event.plain_text_data.should eq(data)
     end
 
     it "should create event in elasticsearch" do
       post :create, data, device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["results"].first["result"].should eq("positive")
       event["created_at"].should_not eq(nil)
       event["device_uuid"].should eq(device.secret_key)
@@ -43,49 +38,53 @@ describe Api::EventsController do
     it "should store institution_id in elasticsearch" do
       post :create, data, device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["institution_id"].should eq(device.institution_id)
     end
 
     it "should override event if event_id is the same" do
-      post :create, Oj.dump(event_id: "1234", age: 20, patient_name: 'john doe'), device_id: device.secret_key
-
-      event = Event.first.decrypt
-      sample = event.sample.decrypt
-      event.event_id.should eq("1234")
-      raw_data = Oj.load event.raw_data
-      raw_data["age"].should eq(20)
-      sample.sensitive_data[:patient_id].should be_nil
-      sample.sensitive_data[:patient_name].should eq('john doe')
-
-      post :create, Oj.dump(event_id: "1234", age: 30, patient_id: 20, patient_name: 'jane doe'), device_id: device.secret_key
+      post :create, Oj.dump(event_id: "1234", age: 20), device_id: device.secret_key
 
       Event.count.should eq(1)
-      event = Event.first.decrypt
-      sample = event.sample.decrypt
-      raw_data = Oj.load event.raw_data
-      raw_data["age"].should eq(30)
-      sample.sensitive_data[:patient_id].should eq(20)
-      sample.sensitive_data[:patient_name].should eq('jane doe')
+      event = Event.first
+      event.event_id.should eq("1234")
 
-      events = all_elasticsearch_events
+      Oj.load(DeviceEvent.first.plain_text_data)["age"].should eq(20)
+
+      events = all_elasticsearch_events_for(institution)
+      events.size.should eq(1)
+      event = events.first
+      event["_source"]["event_id"].should eq("1234")
+      event["_id"].should eq("#{device.secret_key}_1234")
+      event["_source"]["age"].should eq(20)
+
+      post :create, Oj.dump(event_id: "1234", age: 30), device_id: device.secret_key
+
+      Event.count.should eq(1)
+      event = Event.first
+      event.event_id.should eq("1234")
+
+      DeviceEvent.count.should eq(2)
+      Oj.load(DeviceEvent.last.plain_text_data)["age"].should eq(30)
+
+      events = all_elasticsearch_events_for(institution)
       events.size.should eq(1)
       event = events.first
       event["_source"]["event_id"].should eq("1234")
       event["_id"].should eq("#{device.secret_key}_1234")
       event["_source"]["age"].should eq(30)
 
-      post :create, Oj.dump(event_id: "1234", age: 20, patient_id: 22), device_id: Device.make(institution: institution).secret_key
+      post :create, Oj.dump(event_id: "1234", age: 20), device_id: Device.make(institution: institution).secret_key
 
       Event.count.should eq(2)
-      events = all_elasticsearch_events
+      events = all_elasticsearch_events_for(institution)
       events.size.should eq(2)
     end
 
     it "should generate a start_time date if it's not provided" do
       post :create, data, device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["start_time"].should eq(event["created_at"])
     end
 
@@ -96,8 +95,8 @@ describe Api::EventsController do
       event = Event.first
       sample = Sample.first
       event.sample.should eq(sample)
-      sample.sample_id.should eq(sample.uuid)
-      sample.uuid.should_not eq(nil)
+      sample.sample_uid_hash.should be(nil)
+      sample.uuid.should_not be(nil)
     end
   end
 
@@ -105,19 +104,19 @@ describe Api::EventsController do
     it "shouldn't store sensitive data in elasticsearch" do
       post :create, Oj.dump(results:[result: :positive], patient_id: 1234), device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["results"].first["result"].should eq("positive")
       event["created_at"].should_not eq(nil)
       event["patient_id"].should eq(nil)
     end
 
     it "applies an existing manifest" do
-      Manifest.create definition: %{{
+      Manifest.create! definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "api_version" : "1.0.0",
-          "source_data_type" : "json"
+          "api_version" : "1.1.0",
+          "source" : {"type" : "json"}
         },
         "field_mapping" : { "event" : [{
           "target_field" : "assay_name",
@@ -128,19 +127,19 @@ describe Api::EventsController do
       }}
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["assay_name"].should eq("GX4002")
       event["created_at"].should_not eq(nil)
       event["patient_id"].should be_nil
     end
 
-    it "stores pii in the sample according to manifest" do
-      Manifest.create definition: %{{
+    it "stores pii in the event according to manifest" do
+      Manifest.create! definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "api_version" : "1.0.0",
-          "source_data_type" : "json"
+          "api_version" : "1.1.0",
+          "source" : {"type" : "json"}
         },
         "field_mapping" : {"event" : [
           {
@@ -153,7 +152,6 @@ describe Api::EventsController do
             "target_field" : "foo",
             "source" : {"lookup" : "patient_id"},
             "type" : "integer",
-            "core" : false,
             "pii" : true
           }
         ]}
@@ -161,28 +159,27 @@ describe Api::EventsController do
 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["assay_name"].should eq("GX4002")
       event["patient_id"].should eq(nil)
       event["foo"].should be_nil
 
       event = Event.first
-      raw_data = event.sample.sensitive_data
-      sample = event.sample.decrypt
-      sample.sensitive_data.should_not eq(raw_data)
-      sample.sensitive_data["patient_id"].should be_nil
-      sample.sensitive_data["foo"].should eq(1234)
-      sample.sensitive_data[:foo].should eq(1234)
+      raw_data = event.sensitive_data
+      event.plain_sensitive_data.should_not eq(raw_data)
+      event.plain_sensitive_data["patient_id"].should be_nil
+      event.plain_sensitive_data["foo"].should eq(1234)
+      event.plain_sensitive_data[:foo].should eq(1234)
     end
 
-    it "merges pii from different tests in the same sample" do
+    it "merges pii from different tests in the same sample across devices" do
       device2 = Device.make institution_id: institution.id, device_model: device.device_model
-      Manifest.create definition: %{{
+      Manifest.create! definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "api_version" : "1.0.0",
-          "source_data_type" : "json"
+          "api_version" : "1.1.0",
+          "source" : {"type" : "json"}
         },
         "field_mapping" : {
           "event" : [
@@ -191,18 +188,16 @@ describe Api::EventsController do
               "source" : {"lookup" : "assay.name"},
               "type" : "string",
               "core" : true,
-              "indexed" : true,
-              "pii" : false
+              "indexed" : true
             }
           ],
           "sample" : [
             {
-              "target_field" : "sample_id",
+              "target_field" : "sample_uid",
               "source" : {"lookup" : "sample_id"},
-              "type" : "integer",
+              "type" : "string",
               "core" : true,
-              "pii" : false,
-              "indexed" : true
+              "pii" : true
             }
           ],
           "patient" : [
@@ -210,17 +205,13 @@ describe Api::EventsController do
               "target_field" : "patient_id",
               "source" : {"lookup" : "patient_id"},
               "type" : "integer",
-              "core" : false,
-              "pii" : true,
-              "indexed" : false
+              "pii" : true
             },
             {
               "target_field" : "patient_telephone_number",
               "source" : {"lookup" : "patient_telephone_number"},
               "type" : "integer",
-              "core" : false,
-              "pii" : true,
-              "indexed" : false
+              "pii" : true
             }
           ]
         }
@@ -235,34 +226,36 @@ describe Api::EventsController do
       Event.first.sample.should eq(Sample.first)
       Event.last.sample.should eq(Sample.first)
 
-      sample = Sample.first.decrypt
-      sample.sample_id.should eq("10")
-      sample.sensitive_data["patient_id"].should eq(3)
-      sample.sensitive_data["patient_telephone_number"].should eq(2222222)
+      sample = Sample.first
+      sample.plain_sensitive_data["sample_uid"].should eq(10)
+      sample.plain_sensitive_data["patient_id"].should eq(3)
+      sample.plain_sensitive_data["patient_telephone_number"].should eq(2222222)
     end
 
     it "uses the last version of the manifest" do
-      Manifest.create definition: %{{
+      Manifest.create! definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "source_data_type" : "json"
+          "api_version" : "1.1.0",
+          "source" : {"type" : "json"}
         },
         "field_mapping" : { "event" : [
           {
             "target_field" : "foo",
             "source" : {"lookup" : "assay.name"},
+            "type" : "string",
             "core" : true
           }
         ]}
       }}
 
-      Manifest.create definition: %{{
+      Manifest.create! definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 2,
-          "api_version" : "1.0.0",
-          "source_data_type" : "json"
+          "api_version" : "1.1.0",
+          "source" : {"type" : "json"}
         },
         "field_mapping" : { "event" : [
           {
@@ -276,38 +269,35 @@ describe Api::EventsController do
 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["foo"].should be_nil
       event["assay_name"].should eq("GX4002")
     end
 
     it "stores custom fields according to the manifest" do
-      Manifest.create definition: %{{
+      Manifest.create! definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 2,
-          "api_version" : "1.0.0",
-          "source_data_type" : "json"
+          "api_version" : "1.1.0",
+          "source" : {"type" : "json"}
         },
         "field_mapping" : { "event" : [
           {
             "target_field" : "foo",
             "source" : {"lookup" : "some_field"},
-            "type" : "string",
-            "core" : false,
-            "pii" : false,
-            "indexed" : false
+            "type" : "string"
           }
         ]}
       }}
 
       post :create, Oj.dump(some_field: 1234), device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["foo"].should be_nil
 
-      event = Event.first.decrypt
-      sample = event.sample.decrypt
+      event = Event.first
+      sample = event.sample
       sample.sensitive_data["some_field"].should be_nil
       sample.sensitive_data["foo"].should be_nil
       event.custom_fields[:foo].should eq(1234)
@@ -315,12 +305,12 @@ describe Api::EventsController do
     end
 
     it "validates the data type" do
-      Manifest.create definition: %{{
+      Manifest.create! definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
-          "api_version" : "1",
+          "api_version" : "1.1.0",
           "version" : 1,
-          "source_data_type" : "json"
+          "source" : {"type" : "json"}
         },
         "field_mapping" : { "event" : [{
             "target_field" : "error_code",
@@ -331,7 +321,7 @@ describe Api::EventsController do
       }}
       post :create, Oj.dump(error_code: 1234), device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["error_code"].should eq(1234)
 
       post :create, Oj.dump(error_code: "foo"), device_id: device.secret_key
@@ -340,27 +330,15 @@ describe Api::EventsController do
       Oj.load(response.body)["errors"].should eq("'foo' is not a valid value for 'error_code' (must be an integer)")
     end
 
-    it "should create a sample" do
-
-      response = post :create, data, device_id: device.secret_key
-      response.status.should eq(200)
-
-      event = Event.first
-      sample = Sample.first
-      event.sample.should eq(sample)
-      sample.sample_id.should eq(sample.uuid)
-      sample.uuid.should_not eq(nil)
-    end
-
-    context "csv" do
+    pending "csv" do
       it 'parses a csv' do
-        manifest = Manifest.make definition: %{
+        manifest = Manifest.create! definition: %{
           {
             "metadata" : {
               "version" : "1",
-              "api_version" : "1",
+              "api_version" : "1.1.0",
               "device_models" : "#{device.device_model.name}",
-              "source_data_type" : "csv"
+              "source" : { "type" : "csv" }
             },
             "field_mapping" : { "event" : [{
                 "target_field" : "error_code",
@@ -385,7 +363,7 @@ describe Api::EventsController do
 
         post :upload, csv, device_id: device.secret_key
 
-        events = all_elasticsearch_events.sort_by { |event| event["_source"]["error_code"] }
+        events = all_elasticsearch_events_for(institution).sort_by { |event| event["_source"]["error_code"] }
         event = events.first["_source"]
         event["error_code"].should eq("0")
         event["result"].should eq("positive")
@@ -411,7 +389,7 @@ describe Api::EventsController do
       device.save!
       post :create, data, device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should eq(leaf_location1.geo_id)
       event["laboratory_id"].should eq(laboratory1.id)
       event["parent_locations"].sort.should eq([leaf_location1.geo_id, parent_location.geo_id, root_location.geo_id].sort)
@@ -426,7 +404,7 @@ describe Api::EventsController do
 
       post :create, data, device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should eq(parent_location.geo_id)
       event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([root_location.geo_id, parent_location.geo_id].sort)
@@ -440,7 +418,7 @@ describe Api::EventsController do
 
       post :create, data, device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should eq(root_location.geo_id)
       event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([root_location.geo_id])
@@ -453,7 +431,7 @@ describe Api::EventsController do
 
       post :create, data, device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should eq(root_location.geo_id)
       event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([root_location.geo_id])
@@ -466,7 +444,7 @@ describe Api::EventsController do
 
       post :create, data, device_id: device.secret_key
 
-      event = all_elasticsearch_events.first["_source"]
+      event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should be_nil
       event["laboratory_id"].should be_nil
       event["parent_locations"].should eq([])
@@ -712,26 +690,23 @@ describe Api::EventsController do
 
     context "Custom Fields" do
       it "should retrieve an event custom fields by uuid", context do
-        Manifest.create definition: %{{
+        Manifest.create! definition: %{{
           "metadata" : {
             "device_models" : ["#{device.device_model.name}"],
             "version" : 2,
-            "api_version" : "1.0.0",
-            "source_data_type" : "json"
+            "api_version" : "1.1.0",
+            "source" : {"type" : "json"}
           },
           "field_mapping" : { "event" : [
             {
               "target_field" : "foo",
               "source" : {"lookup" : "some_field"},
-              "type" : "string",
-              "core" : false,
-              "pii" : false,
-              "indexed" : false
+              "type" : "string"
             }
           ]}
         }}
         post :create, Oj.dump(some_field: 1234), device_id: device.secret_key
-        event = all_elasticsearch_events.first["_source"]
+        event = all_elasticsearch_events_for(institution).first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
         response = get :custom_fields, id: event["uuid"]
@@ -745,8 +720,41 @@ describe Api::EventsController do
 
     context "PII" do
       it "should retrieve an event PII by uuid" do
+        definition = %{{
+          "metadata" : {
+            "device_models" : ["#{device.device_model.name}"],
+            "api_version" : "1.1.0",
+            "version" : "1.0.0",
+            "source" : {"type" : "json"}
+          },
+          "field_mapping" : {
+            "event" : [
+              {
+                "target_field" : "results[*].result",
+                "source" : {"lookup" : "results[*].result"},
+                "core" : true,
+                "indexed" : true,
+                "type" : "enum",
+                "options" : [
+                  "positive",
+                  "negative"
+                ]
+              }
+            ],
+            "patient" : [
+              {
+                "target_field" : "patient_name",
+                "source" : {"lookup" : "patient_name"},
+                "pii" : true
+              }
+            ]
+          }
+        }}
+
+        Manifest.create! definition: definition
+
         post :create, Oj.dump(results: [result: :positive], patient_name: "jdoe"), device_id: device.secret_key
-        event = all_elasticsearch_events.first["_source"]
+        event = all_elasticsearch_events_for(institution).first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
         response = get :pii, id: event["uuid"]
@@ -766,9 +774,9 @@ describe Api::EventsController do
         definition = %{{
           "metadata" : {
             "device_models" : ["foo"],
-            "api_version" : "1.0.0",
+            "api_version" : "1.1.0",
             "version" : "1.0.1",
-            "source_data_type" : "json"
+            "source" : {"type" : "json"}
           },
           "field_mapping" : {
             "event" : [
@@ -834,21 +842,20 @@ describe Api::EventsController do
               {
                 "target_field" : "patient_location",
                 "source" : {"lookup" : "patient_location"},
-                "core" : false,
                 "indexed" : true,
                 "type" : "location"
               }
             ]
           }
         }}
-        Manifest.make definition: definition
+        Manifest.create! definition: definition
 
         definition = %{{
           "metadata" : {
             "device_models" : ["foo"],
-            "api_version" : "1.0.0",
+            "api_version" : "1.1.0",
             "version" : "1.0.0",
-            "source_data_type" : "json"
+            "source" : {"type" : "json"}
           },
           "field_mapping" : { "event" : [
             {
@@ -865,7 +872,7 @@ describe Api::EventsController do
           ]}
         }}
 
-        Manifest.make definition: definition
+        Manifest.create! definition: definition
 
         date_schema = {
           "title" => "Start Time",
@@ -932,12 +939,12 @@ describe Api::EventsController do
 
 
       it "should return an empty schema with all the assay_names available if none is provided" do
-        Manifest.create definition: %{{
+        Manifest.create! definition: %{{
           "metadata" : {
             "device_models" : ["foo"],
-            "api_version" : "1.0.0",
+            "api_version" : "1.1.0",
             "version" : "1.0.1",
-            "source_data_type" : "json"
+            "source" : {"type" : "json"}
           },
           "field_mapping" : { "event" : [
             {
@@ -954,12 +961,12 @@ describe Api::EventsController do
           ]}
         }}
 
-        manifest = Manifest.create definition: %{{
+        manifest = Manifest.create! definition: %{{
           "metadata" : {
             "device_models" : ["bar"],
-            "api_version" : "1.0.0",
+            "api_version" : "1.1.0",
             "version" : "1.0.1",
-            "source_data_type" : "json"
+            "source" : {"type" : "json"}
           },
           "field_mapping" : { "event" : [
             {
