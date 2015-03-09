@@ -59,6 +59,7 @@ RSpec.configure do |config|
   config.order = "random"
 
   config.include Devise::TestHelpers, :type => :controller
+  config.include ManifestSpecHelper,  :example_group => { :file_path => config.escaped_path(%w[spec models]) }
 
   config.before(:all) do
     ElasticsearchMappingTemplate.new.load
