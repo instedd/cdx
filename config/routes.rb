@@ -43,11 +43,7 @@ Cdp::Application.routes.draw do
       end
     end
     resources :devices, only: [] do
-      resources :events, only: [:create], shallow: true do
-        collection do
-          post :upload
-        end
-      end
+      resources :events, only: [:create], shallow: true
     end
     resources :laboratories, only: :index
   end

@@ -17,11 +17,6 @@ class Api::EventsController < ApiController
     end
   end
 
-  def upload
-    events = CSVEventParser.new.load_for_device request.body.read, params[:device_id] # TODO fix this
-    render :status => :ok, :json => { events: events}
-  end
-
   def index
     params.delete(:event)
     body = Oj.load(request.body.read) || {}

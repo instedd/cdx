@@ -330,9 +330,9 @@ describe Api::EventsController do
       Oj.load(response.body)["errors"].should eq("'foo' is not a valid value for 'error_code' (must be an integer)")
     end
 
-    pending "csv" do
-      it 'parses a csv' do
-        manifest = Manifest.create! definition: %{
+    context "csv" do
+
+      let!(:manifest) do Manifest.create! definition: %{
           {
             "metadata" : {
               "version" : "1",
@@ -359,11 +359,25 @@ describe Api::EventsController do
             ]}
           }
         }
-        csv = %{error_code;result\n0;positive\n1;negative}
+      end
 
-        post :upload, csv, device_id: device.secret_key
+      it 'parses a single line csv' do
+        csv = %{error_code;result\n0;positive}
+        post :create, csv, device_id: device.secret_key
 
         events = all_elasticsearch_events_for(institution).sort_by { |event| event["_source"]["error_code"] }
+        events.count.should eq(1)
+        event = events.first["_source"]
+        event["error_code"].should eq("0")
+        event["result"].should eq("positive")
+      end
+
+      pending 'parses a multi line csv' do
+        csv = %{error_code;result\n0;positive\n1;negative}
+        post :create, csv, device_id: device.secret_key
+
+        events = all_elasticsearch_events_for(institution).sort_by { |event| event["_source"]["error_code"] }
+        events.count.should eq(2)
         event = events.first["_source"]
         event["error_code"].should eq("0")
         event["result"].should eq("positive")
