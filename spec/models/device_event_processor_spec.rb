@@ -1,8 +1,11 @@
 require "spec_helper"
 
 describe DeviceEventProcessor do
+
   let(:device) {Device.make}
+
   let(:institution) {device.institution}
+
   let(:device_event) do
     device_event = DeviceEvent.new(device: device, plain_text_data: 'foo')
     device_event.stub(:parsed_event).and_return({
@@ -215,7 +218,99 @@ describe DeviceEventProcessor do
     Event.first.plain_sensitive_data.should eq({ "start_time" => "2000/1/1 10:00:00" })
   end
 
-  pending "On new event with no sample uid, create event and sample with no uid" do
+  context "on event with no sample uid" do
+
+    let(:device_event) do
+      device_event = DeviceEvent.new(device: device, plain_text_data: 'foo')
+      device_event.stub(:parsed_event).and_return({
+        event: {
+          indexed: {
+            event_id: "4",
+            assay: "mtb",
+          },
+          custom: {
+            raw_result: "positivo 15%"
+          },
+          pii: {
+            start_time: "2000/1/1 10:00:00"
+          }
+        },
+        sample: {
+          indexed: {
+            sample_type: "sputum",
+            custom_fields: {
+              culture_days: "10"
+            }
+          },
+          custom: {
+            datagram: "010100011100"
+          },
+          pii: {
+            sample_id: "4002",
+            collected_at: "2000/1/1 9:00:00"
+          }
+        },
+        patient: {
+          indexed: {
+            gender: "male",
+            custom_fields: {
+              hiv: "positive"
+            }
+          },
+          pii: {
+            patient_id: "8000",
+            dob: "2000/1/1"
+          },
+          custom: {
+            shirt_color: "blue"
+          }
+        }
+      }.recursive_stringify_keys!.with_indifferent_access)
+      device_event.save!
+      device_event
+    end
+
+    it "should create sample with no uid" do
+      device_event_processor.process
+
+      Sample.count.should eq(1)
+      sample = Sample.first
+      sample.sample_uid_hash.should be_blank
+
+      sample.plain_sensitive_data.should eq({
+        patient_id: "8000",
+        dob: "2000/1/1",
+        sample_id: "4002",
+        collected_at: "2000/1/1 9:00:00"
+      }.recursive_stringify_keys!)
+
+      sample.custom_fields.should eq({
+        datagram: "010100011100",
+        shirt_color: "blue"
+      }.recursive_stringify_keys!)
+
+      sample.indexed_fields.should eq({
+        sample_type: "sputum",
+        gender: "male",
+        custom_fields: {
+          culture_days: "10",
+          hiv: "positive"
+        }
+      }.recursive_stringify_keys!)
+    end
+
+    it "should create event linked to sample without uid" do
+      device_event_processor.process
+
+      Sample.count.should eq(1)
+      sample = Sample.first
+
+      events = all_elasticsearch_events_for(institution)
+      events.size.should eq(1)
+      events.first["_source"]['sample_uuid'].should eq(sample.uuid)
+    end
 
   end
+
+
 end
