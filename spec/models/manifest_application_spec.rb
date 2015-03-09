@@ -18,6 +18,22 @@ describe Manifest do
         event: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
     end
 
+    it "should fail to apply with a nested field" do
+      mappings_json = %{{
+                        "event" : [{
+                          "target_field" : "assay_name",
+                          "source" : {"lookup" : "assay.name"},
+                          "core" : true
+                        }]
+                      }}
+
+      manifest = manifest_from_json_mappings(mappings_json, 'csv')
+
+      expect {
+        manifest.apply_to("assay.name\nGX4002")
+      }.to raise_error
+    end
+
     it "should apply to pii core field" do
       assert_manifest_application %{
           {
@@ -45,7 +61,23 @@ describe Manifest do
             }]
           }
         },
-        '{"temperature" : 20}',
+        {json: '{"temperature" : "20"}', csv: "temperature\n20"},
+        event: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => "20"}}
+    end
+
+    pending "should apply to custom non-pii non-indexed field coercing to integer" do
+      assert_manifest_application %{
+          {
+            "event" : [{
+              "target_field" : "temperature",
+              "source" : {"lookup" : "temperature"},
+              "core" : false,
+              "pii" : false,
+              "indexed" : false
+            }]
+          }
+        },
+        {json: '{"temperature" : 20}', csv: "temperature\n20"},
         event: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => 20}}
     end
 
@@ -61,8 +93,8 @@ describe Manifest do
             }]
           }
         },
-        '{"temperature" : 20}',
-        event: {indexed: {"custom_fields" => {"temperature" => 20}}, pii: Hash.new, custom: Hash.new}
+        {json: '{"temperature" : "20"}', csv: "temperature\n20"},
+        event: {indexed: {"custom_fields" => {"temperature" => "20"}}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should apply to custom non-pii indexed field inside results array" do
@@ -82,107 +114,7 @@ describe Manifest do
     end
 
     it "should store fields in sample, event or patient as specified" do
-      manifest = Manifest.new(definition: %{
-        {
-          "metadata": {
-            "source" : {"type" : "json"}
-          },
-          "field_mapping" : {
-            "sample" : [
-              {
-                "target_field" : "sample_id",
-                "source" : {"lookup" : "sample_id"},
-                "core" : true,
-                "indexed" : true
-              },
-              {
-                "target_field" : "sample_type",
-                "source" : {"lookup" : "sample_type"},
-                "core" : true,
-                "indexed" : true
-              },
-              {
-                "target_field" : "culture_days",
-                "source" : {"lookup" : "culture_days"},
-                "indexed" : true,
-                "custom" : true
-              },
-              {
-                "target_field" : "datagram",
-                "source" : {"lookup" : "datagram"},
-                "custom" : true
-              },
-              {
-                "target_field" : "collected_at",
-                "source" : {"lookup" : "collected_at"},
-                "pii" : true
-              }
-            ],
-            "patient" : [
-              {
-                "target_field" : "patient_id",
-                "source" : {"lookup" : "patient_id"},
-                "pii" : true
-              },
-              {
-                "target_field" : "gender",
-                "source" : {"lookup" : "gender"},
-                "core" : true,
-                "indexed" : true
-              },
-              {
-                "target_field" : "dob",
-                "source" : {"lookup" : "dob"},
-                "core" : true,
-                "pii" : true
-              },
-              {
-                "target_field" : "hiv",
-                "source" : {"lookup" : "hiv"},
-                "custom" : true,
-                "indexed" : true
-              },
-              {
-                "target_field" : "shirt_color",
-                "source" : {"lookup" : "shirt_color"},
-                "custom" : true
-              }
-            ],
-            "event" : [
-              {
-                "target_field" : "event_id",
-                "source" : {"lookup" : "event_id"},
-                "core" : true
-              },
-              {
-                "target_field" : "assay",
-                "source" : {"lookup" : "assay"},
-                "core" : true,
-                "indexed" : true
-              },
-              {
-                "target_field" : "start_time",
-                "source" : {"lookup" : "start_time"},
-                "core" : true,
-                "pii" : true
-              },
-              {
-                "target_field" : "raw_result",
-                "source" : {"lookup" : "raw_result"},
-                "custom" : true
-              },
-              {
-                "target_field" : "concentration",
-                "source" : {"lookup" : "concentration"},
-                "custom" : true,
-                "indexed" :true
-              }
-            ]
-          }
-        }
-      })
-
-      result = manifest.apply_to(Oj.dump({
+      event = Oj.dump({
         event_id: "4",                    # event id
         assay: "mtb",                     # test, indexable
         start_time: "2000/1/1 10:00:00",  # test, pii
@@ -198,9 +130,105 @@ describe Manifest do
         dob: "2000/1/1",                  # patient, pii, non indexable
         hiv: "positive",                  # patient, indexable, custom
         shirt_color: "blue"               # patient, non indexable, custom
-      }))
+      })
 
-      result.should eq({
+      csv = "event_id;assay;start_time;concentration;raw_result;sample_id;sample_type;collected_at;culture_days;datagram;patient_id;gender;dob;hiv;shirt_color" +
+      "\n4;mtb;2000/1/1 10:00:00;15%;positivo 15%;4002;sputum;2000/1/1 9:00:00;10;010100011100;8000;male;2000/1/1;positive;blue"
+
+      definition = %{{
+        "sample" : [
+          {
+            "target_field" : "sample_id",
+            "source" : {"lookup" : "sample_id"},
+            "core" : true,
+            "indexed" : true
+          },
+          {
+            "target_field" : "sample_type",
+            "source" : {"lookup" : "sample_type"},
+            "core" : true,
+            "indexed" : true
+          },
+          {
+            "target_field" : "culture_days",
+            "source" : {"lookup" : "culture_days"},
+            "indexed" : true,
+            "custom" : true
+          },
+          {
+            "target_field" : "datagram",
+            "source" : {"lookup" : "datagram"},
+            "custom" : true
+          },
+          {
+            "target_field" : "collected_at",
+            "source" : {"lookup" : "collected_at"},
+            "pii" : true
+          }
+        ],
+        "patient" : [
+          {
+            "target_field" : "patient_id",
+            "source" : {"lookup" : "patient_id"},
+            "pii" : true
+          },
+          {
+            "target_field" : "gender",
+            "source" : {"lookup" : "gender"},
+            "core" : true,
+            "indexed" : true
+          },
+          {
+            "target_field" : "dob",
+            "source" : {"lookup" : "dob"},
+            "core" : true,
+            "pii" : true
+          },
+          {
+            "target_field" : "hiv",
+            "source" : {"lookup" : "hiv"},
+            "custom" : true,
+            "indexed" : true
+          },
+          {
+            "target_field" : "shirt_color",
+            "source" : {"lookup" : "shirt_color"},
+            "custom" : true
+          }
+        ],
+        "event" : [
+          {
+            "target_field" : "event_id",
+            "source" : {"lookup" : "event_id"},
+            "core" : true
+          },
+          {
+            "target_field" : "assay",
+            "source" : {"lookup" : "assay"},
+            "core" : true,
+            "indexed" : true
+          },
+          {
+            "target_field" : "start_time",
+            "source" : {"lookup" : "start_time"},
+            "core" : true,
+            "pii" : true
+          },
+          {
+            "target_field" : "raw_result",
+            "source" : {"lookup" : "raw_result"},
+            "custom" : true
+          },
+          {
+            "target_field" : "concentration",
+            "source" : {"lookup" : "concentration"},
+            "custom" : true,
+            "indexed" :true
+          }
+        ]
+      }}
+
+      expected = {
         event: {
           indexed: {
             event_id: "4",
@@ -246,7 +274,9 @@ describe Manifest do
             shirt_color: "blue"
           }
         }
-      }.recursive_stringify_keys!)
+      }
+
+      assert_manifest_application definition, {json: event, csv: csv}, expected
     end
 
     it "should apply to an array of custom non-pii indexed field inside results array" do
