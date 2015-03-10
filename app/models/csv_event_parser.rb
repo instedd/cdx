@@ -13,7 +13,7 @@ class CSVEventParser
     end
   end
 
-  def load_all(data)
+  def load(data)
     csv = CSV.new(data, col_sep: @separator)
     headers = csv.shift
     csv.map do |row|
@@ -25,8 +25,8 @@ class CSVEventParser
     end
   end
 
-  def load(data)
-    load_all(data).first
+  def load_all(data)
+    load(data)
   end
 
   def dump(data)

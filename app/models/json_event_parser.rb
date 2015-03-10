@@ -21,6 +21,6 @@ class JsonEventParser
   end
 
   def load(data)
-    Oj.load data
+    Array.wrap(Oj.load(data))
   end
 end

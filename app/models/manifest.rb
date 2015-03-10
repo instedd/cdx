@@ -12,6 +12,12 @@ class Manifest < ActiveRecord::Base
 
   NULL_STRING = "null"
 
+  EVENT_TEMPLATE = {
+    "event" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
+    "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
+    "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
+  }.freeze
+
   #TODO Refiy the assay and delegate this to mysql.
   ####################################################################################################
   def self.find_by_assay_name assay_name
@@ -58,24 +64,25 @@ class Manifest < ActiveRecord::Base
   end
 
   def apply_to(data)
-    data = parser.load data
     raise ManifestParsingError.empty_event if data.blank?
-    event = {
-      "event" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
-      "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
-      "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
-    }
-    field_mapping.each do |scope, mappings|
-      # if scope == "event" && mappings.is_a?(Hash)
-      #   path = mappings["path"]
-      #   mappings = mappings["fields"]
-      #   event[:indexed] = Array.new
-      # end
-      event = mappings.inject event do |event, field|
-        ManifestField.new(self, field, scope).apply_to data, event
+
+    events = []
+    parser.load(data).each do |record|
+      event = EVENT_TEMPLATE.deep_dup
+      field_mapping.each do |scope, mappings|
+        # if scope == "event" && mappings.is_a?(Hash)
+        #   path = mappings["path"]
+        #   mappings = mappings["fields"]
+        #   event[:indexed] = Array.new
+        # end
+        event = mappings.inject(event) do |event, field|
+          ManifestField.new(self, field, scope).apply_to record, event
+        end
       end
+      events << event
     end
-    event
+
+    events
   end
 
   def field_mapping

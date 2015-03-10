@@ -7,8 +7,8 @@ describe DeviceEventProcessor do
   let(:institution) {device.institution}
 
   let(:device_event) do
-    device_event = DeviceEvent.new(device: device, plain_text_data: 'foo')
-    device_event.stub(:parsed_event).and_return({
+    device_event = DeviceEvent.new(device: device, plain_text_data: '{}')
+    device_event.stub(:parsed_events).and_return([{
       event: {
         indexed: {
           event_id: "4",
@@ -61,7 +61,7 @@ describe DeviceEventProcessor do
           shirt_color: "blue"
         }
       }
-    }.recursive_stringify_keys!.with_indifferent_access)
+    }.recursive_stringify_keys!.with_indifferent_access])
     device_event.save!
     device_event
   end
@@ -222,7 +222,7 @@ describe DeviceEventProcessor do
 
     let(:device_event) do
       device_event = DeviceEvent.new(device: device, plain_text_data: 'foo')
-      device_event.stub(:parsed_event).and_return({
+      device_event.stub(:parsed_events).and_return([{
         event: {
           indexed: {
             event_id: "4",
@@ -265,7 +265,7 @@ describe DeviceEventProcessor do
             shirt_color: "blue"
           }
         }
-      }.recursive_stringify_keys!.with_indifferent_access)
+      }.recursive_stringify_keys!.with_indifferent_access])
       device_event.save!
       device_event
     end

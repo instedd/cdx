@@ -28,10 +28,10 @@ describe CSVEventParser do
       4002;negative
     CSV
 
-    data.should eq({
+    data.should eq([{
       error_code: '4002',
       result: 'negative'
-    }.stringify_keys)
+    }.stringify_keys])
   end
 
   it "parses a multi line CSV" do
