@@ -2,16 +2,11 @@ require "spec_helper"
 
 describe DeviceEventProcessor, elasticsearch: true do
 
-  let(:device) {Device.make}
-
-  let(:institution) {device.institution}
-
-  let(:device_event) do
-    device_event = DeviceEvent.new(device: device, plain_text_data: '{}')
-    device_event.stub(:parsed_events).and_return([{
+  def parsed_event(event_id, params={})
+    {
       event: {
         indexed: {
-          event_id: "4",
+          event_id: event_id,
           assay: "mtb",
           custom_fields: {
             concentration: "15%"
@@ -61,7 +56,16 @@ describe DeviceEventProcessor, elasticsearch: true do
           shirt_color: "blue"
         }
       }
-    }.recursive_stringify_keys!.with_indifferent_access])
+    }.recursive_stringify_keys!.with_indifferent_access.deep_merge(params)
+  end
+
+  let(:device) {Device.make}
+
+  let(:institution) {device.institution}
+
+  let(:device_event) do
+    device_event = DeviceEvent.new(device: device, plain_text_data: '{}')
+    device_event.stub(:parsed_events).and_return([parsed_event("4")])
     device_event.save!
     device_event
   end
@@ -122,6 +126,19 @@ describe DeviceEventProcessor, elasticsearch: true do
     event.custom_fields.should eq({
       raw_result: "positivo 15%"
     }.recursive_stringify_keys!)
+  end
+
+  it "should create multiple events with single sample" do
+    device_event.stub(:parsed_events).and_return([parsed_event("4"), parsed_event("5"), parsed_event("6")])
+    device_event_processor.process
+
+    Sample.count.should eq(1)
+
+    Event.count.should eq(3)
+    Event.pluck(:event_id).should =~ ['4', '5', '6']
+    Event.pluck(:sample_id).should eq([Sample.first.id] * 3)
+
+    all_elasticsearch_events_for(device.institution).map {|e| e['_source']['sample_uuid']}.should eq([Sample.first.uuid] * 3)
   end
 
   it "should update sample data and existing events on new event" do
