@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe DeviceEventImporter do
+describe DeviceEventImporter, elasticsearch: true do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}

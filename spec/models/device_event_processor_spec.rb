@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe DeviceEventProcessor do
+describe DeviceEventProcessor, elasticsearch: true do
 
   let(:device) {Device.make}
 

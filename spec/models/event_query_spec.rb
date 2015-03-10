@@ -1,7 +1,8 @@
 require 'spec_helper'
 require 'policy_spec_helper'
 
-describe EventQuery do
+describe EventQuery, elasticsearch: true do
+
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
   let(:user_device) {Device.make institution_id: institution.id}

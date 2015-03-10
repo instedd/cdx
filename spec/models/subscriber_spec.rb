@@ -1,6 +1,7 @@
 require 'spec_helper'
 
-describe Subscriber do
+describe Subscriber, elasticsearch: true do
+
   let(:model){DeviceModel.make}
   let(:device){Device.make device_model: model}
   let(:device_event){DeviceEvent.make(device: device)}

@@ -1,6 +1,7 @@
 require 'spec_helper'
 
-describe ElasticsearchMappingTemplate do
+describe ElasticsearchMappingTemplate, elasticsearch: true do
+
   let(:manifest) do
     definition = %{{
       "metadata" : {

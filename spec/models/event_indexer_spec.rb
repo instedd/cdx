@@ -1,6 +1,7 @@
 require "spec_helper"
 
-describe EventIndexer do
+describe EventIndexer, elasticsearch: true do
+
   let(:sample) do
     sample_indexed_fields = {
       sample_type: "sputum",

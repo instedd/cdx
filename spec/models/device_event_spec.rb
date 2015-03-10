@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe DeviceEvent do
+describe DeviceEvent, elasticsearch: true do
   let(:device) {Device.make}
 
   it 'stores failed events with raw data when it hits an issue parsing a manifest' do
