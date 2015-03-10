@@ -1,3 +1,4 @@
+# Given a device event, creates the associated events in the DB with their samples, and indexes them
 class DeviceEventProcessor
 
   attr_reader :device_event

@@ -413,5 +413,31 @@ describe Api::EventsController do
         event["result"].should eq("negative")
       end
     end
+
+    context "real scenarios" do
+      it 'parses genoscan csv' do
+        manifest = Manifest.create! definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', 'genoscan_manifest.json'))
+        device = Device.make institution_id: institution.id, device_model: DeviceModel.find_by_name('genoscan')
+
+        data = IO.read(File.join(Rails.root, 'spec', 'support', 'genoscan_sample.csv'))
+        post :create, data, device_id: device.secret_key
+
+        events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["results"][0]["result"] }
+        events.should have(5).items
+
+        event = events.first["_source"]
+        event["results"][0]["condition"].should eq("mtb")
+        event["results"][0]["result"].should eq("positive")
+
+        event = events.last["_source"]
+        event["results"][0]["condition"].should eq("mtb")
+        event["results"][0]["result"].should eq("positive_with_rmp_and_inh")
+
+        dbevents = Event.all
+        dbevents.should have(5).items
+        dbevents.map(&:uuid).should =~ events.map {|e| e['_source']['uuid']}
+      end
+    end
+
   end
 end
