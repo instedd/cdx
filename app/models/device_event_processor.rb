@@ -14,7 +14,7 @@ class DeviceEventProcessor
   end
 
   def client
-    Cdx::Api.client
+    @client ||= Cdx::Api.client
   end
 
   def index_name
@@ -43,18 +43,7 @@ class DeviceEventProcessor
 
     def process
       sample = create_sample
-      update_existing_documents_with sample
       create_event sample
-    end
-
-    def update_existing_documents_with sample
-      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { sample_uuid: sample.uuid } } } }, fields: []}, size: 10000
-
-      body = response["hits"]["hits"].map do |element|
-        { update: { _type: element["_type"], _id: element["_id"], data: { doc: sample.indexed_fields } } }
-      end
-
-      client.bulk index: index_name, body: body unless body.blank?
     end
 
     def create_sample
@@ -65,11 +54,24 @@ class DeviceEventProcessor
       sample = Sample.new plain_sensitive_data: merged_pii, custom_fields: merged_custom_fields, indexed_fields: merged_indexed_fields, institution_id: @parent.institution.id
 
       id = sample.ensure_sample_uid
-      if id && existing = Sample.find_by(institution_id: @parent.institution.id, sample_uid_hash: id)
-        existing.merge(sample).save! && existing
+      if id and existing = Sample.find_by(institution_id: @parent.institution.id, sample_uid_hash: id)
+        existing_indexed = existing.indexed_fields.deep_dup
+        existing.merge(sample).save!
+        update_existing_documents_with(existing) if existing.indexed_fields != existing_indexed
+        existing
       else
-        sample.save! && sample
+        sample.save!
+        sample
       end
+    end
+
+    def update_existing_documents_with sample
+      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { sample_uuid: sample.uuid } } } }, fields: []}, size: 10000
+      body = response["hits"]["hits"].map do |element|
+        { update: { _type: element["_type"], _id: element["_id"], data: { doc: sample.indexed_fields } } }
+      end
+
+      client.bulk index: index_name, body: body unless body.blank?
     end
 
     def create_event sample

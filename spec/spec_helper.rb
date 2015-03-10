@@ -76,6 +76,10 @@ RSpec.configure do |config|
   end
 end
 
+def refresh_indices index_name=nil
+  Cdx::Api.client.indices.refresh index: index_name
+end
+
 def fresh_client_for index_name
   client = Cdx::Api.client
   client.indices.refresh index: index_name
