@@ -2,19 +2,39 @@ require 'spec_helper'
 
 describe Manifest do
 
-  let (:definition) do
-    %{{
-      "metadata" : {
-        "device_models" : ["foo"],
-        "api_version" : "1.1.0",
-        "version" : 1,
-        "source" : {"type" : "json"}
-      },
-      "field_mapping" : {}
-    }}
-  end
-
   context "validations" do
+
+    it "should apply if valid" do
+      assert_manifest_application %{
+          {
+            "event" : [{
+              "target_field" : "assay_name",
+              "source" : {"lookup" : "assay.name"},
+              "type": "string",
+              "core" : true
+            }]
+          }
+        },
+        '{"assay" : {"name" : "GX4002"}}',
+        event: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
+    end
+
+    it "should not apply if invalid" do
+      expect {
+        assert_manifest_application %{
+            {
+              "event" : [{
+                "target_field" : "assay_name",
+                "source" : {"lookup" : "assay.name"},
+                "type": "INVALID",
+                "core" : true
+              }]
+            }
+          },
+          '{"assay" : {"name" : "GX4002"}}',
+          event: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
+      }.to raise_error(ManifestParsingError)
+    end
 
     it "shouldn't pass validations when creating if definition is an invalid json" do
       definition = %{{

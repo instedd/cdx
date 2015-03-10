@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Manifest do
+describe Manifest, validate_manifest: false do
 
   context "applying to event" do
 

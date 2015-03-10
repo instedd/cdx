@@ -1,7 +1,15 @@
 module ManifestSpecHelper
 
   def manifest_from_json_mappings(mappings_json, source="json")
-    Manifest.new(definition: "{\"metadata\":{\"source\" : {\"type\" : \"#{source}\"}},\"field_mapping\" : #{mappings_json}}")
+    Manifest.new(definition: %{{
+      "metadata" : {
+        "version" : "1.0.0",
+        "api_version" : "1.1.0",
+        "device_models" : ["GX4001"],
+        "source" : {"type" : "#{source}"}
+      },
+      "field_mapping": #{mappings_json}
+    }})
   end
 
   def assert_manifest_application(mappings_json, format_data, expected_fields={})

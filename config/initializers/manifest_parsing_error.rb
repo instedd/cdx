@@ -34,4 +34,8 @@ class ManifestParsingError < RuntimeError
   def self.empty_event
     new "Empty event reported"
   end
+
+  def self.invalid_manifest(manifest)
+    new "Cannot apply invalid manifest to document:\n #{manifest.errors.full_messages.join("\n ")}"
+  end
 end

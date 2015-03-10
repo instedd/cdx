@@ -65,6 +65,7 @@ class Manifest < ActiveRecord::Base
 
   def apply_to(data)
     raise ManifestParsingError.empty_event if data.blank?
+    raise ManifestParsingError.invalid_manifest(self) if self.invalid?
 
     events = []
     parser.load(data).each do |record|
@@ -127,6 +128,21 @@ class Manifest < ActiveRecord::Base
     })
   end
 
+  def manifest_validation
+    if self.metadata.blank?
+      self.errors.add(:metadata, "can't be blank")
+    else
+      fields =  ["version","api_version","device_models"]
+      check_fields_in_metadata(fields)
+      check_api_version
+    end
+
+    check_field_mapping
+
+  rescue Oj::ParseError => ex
+    self.errors.add(:parse_error, ex.message)
+  end
+
   private
 
   def self.map fields, source_prefix=""
@@ -146,21 +162,6 @@ class Manifest < ActiveRecord::Base
         }
       end
     end
-  end
-
-  def manifest_validation
-    if self.metadata.blank?
-      self.errors.add(:metadata, "can't be blank")
-    else
-      fields =  ["version","api_version","device_models"]
-      check_fields_in_metadata(fields)
-      check_api_version
-    end
-
-    check_field_mapping
-
-  rescue Oj::ParseError => ex
-    self.errors.add(:parse_error, ex.message)
   end
 
   def check_api_version
