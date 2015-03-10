@@ -55,11 +55,10 @@ describe Api::EventsController do
       events = all_elasticsearch_events_for(institution)
       events.count.should eq(2)
 
-      events.first["_source"]["results"].first["result"].should eq("positive")
-      events.last["_source"]["results"].first["result"].should eq("negative")
+      events.map {|e| e["_source"]["results"].first["result"]}.should =~ ["positive", "negative"]
 
-      Event.first.uuid.should eq(events.first["_source"]["uuid"])
-      Event.last.uuid.should eq(events.last["_source"]["uuid"])
+      Event.count.should eq(2)
+      Event.pluck(:uuid).should =~ events.map {|e| e["_source"]["uuid"]}
     end
 
     it "should store institution_id in elasticsearch" do
