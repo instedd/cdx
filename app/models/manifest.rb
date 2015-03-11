@@ -71,11 +71,6 @@ class Manifest < ActiveRecord::Base
     parser.load(data).each do |record|
       event = EVENT_TEMPLATE.deep_dup
       field_mapping.each do |scope, mappings|
-        # if scope == "event" && mappings.is_a?(Hash)
-        #   path = mappings["path"]
-        #   mappings = mappings["fields"]
-        #   event[:indexed] = Array.new
-        # end
         event = mappings.inject(event) do |event, field|
           ManifestField.new(self, field, scope).apply_to record, event
         end
