@@ -55,10 +55,10 @@ describe DeviceEventImporter, elasticsearch: true do
 
       events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["error_code"] }
       event = events.first["_source"]
-      event["error_code"].should eq("0")
+      event["error_code"].should eq(0)
       event["result"].should eq("positive")
       event = events.last["_source"]
-      event["error_code"].should eq("1")
+      event["error_code"].should eq(1)
       event["result"].should eq("negative")
     end
 
@@ -75,10 +75,10 @@ describe DeviceEventImporter, elasticsearch: true do
 
       events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["error_code"] }
       event = events.first["_source"]
-      event["error_code"].should eq("0")
+      event["error_code"].should eq(0)
       event["result"].should eq("positive")
       event = events.last["_source"]
-      event["error_code"].should eq("1")
+      event["error_code"].should eq(1)
       event["result"].should eq("negative")
     end
 
