@@ -12,7 +12,7 @@
         .controls
           %select#device(name="device")
             = @devices.map do |device|
-              %option{ value: device.secret_key}=device.name
+              %option{ value: device.uuid}=device.name
 
       .row-fluid
         .span2

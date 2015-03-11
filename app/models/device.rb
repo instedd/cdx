@@ -7,12 +7,13 @@ class Device < ActiveRecord::Base
   has_and_belongs_to_many :laboratories
   has_many :locations, through: :laboratories
   has_many :events
+  has_many :activation_tokens
 
   validates_presence_of :institution
   validates_presence_of :name
   validates_presence_of :device_model
 
-  before_create :set_key
+  before_create :set_key, :set_uuid
 
   has_many :ssh_keys
 
@@ -56,9 +57,17 @@ class Device < ActiveRecord::Base
     name
   end
 
-  private
+  def validate_authentication(token)
+    secret_key == token
+  end
 
   def set_key
-    self.secret_key = Guid.new.to_s unless self.secret_key
+    self.secret_key = Guid.new.to_s
+    self.ssh_keys.destroy_all
+    self.activation_tokens.destroy_all
+  end
+
+  def set_uuid
+    self.uuid = Guid.new.to_s
   end
 end

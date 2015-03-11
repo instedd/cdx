@@ -40,6 +40,7 @@ describe CSVEventParser do
     }.to raise_error
   end
 
+
   it "does not support nested fields in lookup" do
     expect {
       CSVEventParser.new.lookup('error.error_code', {'error_code' => '4002', 'result' => 'negative'})

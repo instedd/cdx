@@ -35,14 +35,4 @@ describe ActivationToken do
       it { expect { token.use!(SampleSshKey) }.to raise_error }
     end
   end
-
-  describe '#client_id_valid?' do
-    context 'when client_id is current device.secret_key' do
-      it { token.client_id_valid?.should be_true }
-    end
-    context 'when client_id is not current device.secret_key' do
-      before { device.update! secret_key: 'a_new_secret_key' }
-      it { token.client_id_valid?.should be_false }
-    end
-  end
 end

@@ -1,0 +1,16 @@
+.span12
+  %h3 Secret Key Generated
+
+  %p
+    %strong Secret:
+    = @device.secret_key
+
+  %p
+    This secret key must be used by this device to report tests through the API.
+  %p
+    %strong This is the last time you will be able to view this key. Please keep it safe.
+
+    %hr
+
+
+    = link_to "Ok, understood, go back", edit_institution_device_path(@institution, @device), class: 'btn'

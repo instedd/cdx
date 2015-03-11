@@ -9,11 +9,11 @@ describe DeviceEventImporter, elasticsearch: true do
 
   before do
     sync_dir.ensure_sync_path!
-    sync_dir.ensure_client_sync_paths! device.secret_key
+    sync_dir.ensure_client_sync_paths! device.uuid
   end
 
   def write_file(content, extension)
-    File.open(File.join(sync_dir.inbox_path(device.secret_key), "#{DateTime.now.strftime('%Y%m%d%H%M%S')}.#{extension}"), "w") do |io|
+    File.open(File.join(sync_dir.inbox_path(device.uuid), "#{DateTime.now.strftime('%Y%m%d%H%M%S')}.#{extension}"), "w") do |io|
       io << content
     end
   end

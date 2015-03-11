@@ -94,8 +94,8 @@ class DevicesController < ApplicationController
 
     respond_to do |format|
       if @device.save
-        format.html { redirect_to edit_institution_device_path(@institution, @device), notice: 'Key updated' }
-        format.json { render action: 'show', location: @device }
+        format.html
+        format.json { render json: {secret_key: @device.secret_key }.to_json}
       else
         format.html { render action: 'edit' }
         format.json { render json: @device.errors, status: :unprocessable_entity }

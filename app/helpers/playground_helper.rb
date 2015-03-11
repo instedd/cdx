@@ -4,10 +4,10 @@ module PlaygroundHelper
     devices = Device.all
     devices.each do |d|
       field_mappings = Oj.load(d.device_model.manifests.last.definition)["field_mapping"]
-      devices_and_results["#{d.secret_key}"] = {}
+      devices_and_results["#{d.uuid}"] = {}
       results = field_mappings.detect {|f| f["target_field"] == specified_field}["options"]
-      devices_and_results["#{d.secret_key}"]["original"] = results
-      devices_and_results["#{d.secret_key}"]["titleized"] = results.map &:titleize
+      devices_and_results["#{d.uuid}"]["original"] = results
+      devices_and_results["#{d.uuid}"]["titleized"] = results.map &:titleize
     end
     devices_and_results
   end

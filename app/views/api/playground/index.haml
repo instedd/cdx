@@ -8,7 +8,7 @@
         .controls
           %select#device
             = @devices.map do |device|
-              %option{ value: device.secret_key}=device.name
+              %option{ value: device.uuid}=device.name
       .control-group
         %label.control-label(for="data") Data
         .controls

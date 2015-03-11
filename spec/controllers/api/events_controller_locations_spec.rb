@@ -28,7 +28,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     it "should store the location id when the device is registered in only one laboratory" do
       device.laboratories = [laboratory1]
       device.save!
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should eq(leaf_location1.geo_id)
@@ -43,7 +43,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device.laboratories = [laboratory1, laboratory2]
       device.save!
 
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should eq(parent_location.geo_id)
@@ -57,7 +57,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device.laboratories = [laboratory2, laboratory3]
       device.save!
 
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should eq(root_location.geo_id)
@@ -70,7 +70,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device.laboratories = [laboratory3, laboratory2]
       device.save!
 
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should eq(root_location.geo_id)
@@ -83,7 +83,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device.laboratories = []
       device.save!
 
-      post :create, data, device_id: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
       event = all_elasticsearch_events_for(institution).first["_source"]
       event["location_id"].should be_nil
@@ -96,9 +96,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device1 = Device.make institution: institution, laboratories: [laboratory1]
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
-      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.secret_key
-      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.secret_key
-      post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.secret_key
+      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.uuid, authentication_token: device1.secret_key
+      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.uuid, authentication_token: device2.secret_key
+      post :create, (Oj.dump results:[condition: "mtb"]),   device_id: device3.uuid, authentication_token: device3.secret_key
 
       response = get_updates(location: leaf_location1.geo_id)
 
@@ -130,9 +130,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device1 = Device.make institution: institution, laboratories: [laboratory1]
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
-      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.secret_key
-      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.secret_key
-      post :create, (Oj.dump results:[condition: "mtb"]), device_id: device3.secret_key
+      post :create, (Oj.dump results:[condition: "flu_a"]), device_id: device1.uuid, authentication_token: device1.secret_key
+      post :create, (Oj.dump results:[condition: "flu_b"]), device_id: device2.uuid, authentication_token: device2.secret_key
+      post :create, (Oj.dump results:[condition: "mtb"]),   device_id: device3.uuid, authentication_token: device3.secret_key
 
       response = get_updates(group_by: {admin_level: 1})
       response.should eq([

@@ -16,8 +16,8 @@ class DeviceEventImporter
     sync_dir.if_inbox_file(filename, @pattern, &load_file)
   end
 
-  def load_for_device(data, device_key)
-    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_secret_key(device_key)
+  def load_for_device(data, device_uuid)
+    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by!(uuid: device_uuid)
     device_event = DeviceEvent.new(device: device, plain_text_data: data)
     device_event.process if device_event.save && !device_event.index_failed?
   end
@@ -25,9 +25,9 @@ class DeviceEventImporter
   private
 
   def load_file
-    lambda do |secret_key, filename|
-      Rails.logger.info "Importing #{filename} for device #{secret_key}"
-      File.open(filename) { |file| load_for_device file.read, secret_key }
+    lambda do |uuid, filename|
+      Rails.logger.info "Importing #{filename} for device #{uuid}"
+      File.open(filename) { |file| load_for_device file.read, uuid }
       File.delete(filename)
     end
   end
