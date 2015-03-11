@@ -19,12 +19,6 @@ class DeviceEvent < ActiveRecord::Base
     self.index_failure_reason = err.message
   end
 
-  # TODO: Review this method
-  def extract_pii
-    self.sample.merge_sensitive_data parsed_fields[:pii]
-    self.sample.save!
-  end
-
   def process
     DeviceEventProcessor.new(self).process
   end
