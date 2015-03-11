@@ -12,6 +12,12 @@ class Manifest < ActiveRecord::Base
 
   NULL_STRING = "null"
 
+  EVENT_TEMPLATE = {
+    "event" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
+    "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
+    "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
+  }.freeze
+
   #TODO Refiy the assay and delegate this to mysql.
   ####################################################################################################
   def self.find_by_assay_name assay_name
@@ -24,7 +30,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def find_assay_name assay_name
-    field = field_mapping.detect { |f| f["target_field"] == "assay_name" }
+    field = flat_mappings.detect { |f| f["target_field"] == "assay_name" }
     valid_values = []
     if field["options"]
       valid_values = field["options"]
@@ -50,7 +56,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def metadata
-    loaded_definition["metadata"] rescue {}
+    loaded_definition["metadata"] || {}
   end
 
   def loaded_definition
@@ -58,41 +64,78 @@ class Manifest < ActiveRecord::Base
   end
 
   def apply_to(data)
-    data = parser.load data
-    field_mapping.inject(indexed: Hash.new, pii: Hash.new, custom: Hash.new) do |event, field|
-      ManifestField.new(self, field).apply_to data, event
+    raise ManifestParsingError.empty_event if data.blank?
+    raise ManifestParsingError.invalid_manifest(self) if self.invalid?
+
+    events = []
+    parser.load(data).each do |record|
+      event = EVENT_TEMPLATE.deep_dup
+      field_mapping.each do |scope, mappings|
+        event = mappings.inject(event) do |event, field|
+          ManifestField.new(self, field, scope).apply_to record, event
+        end
+      end
+      events << event
     end
+
+    events
   end
 
   def field_mapping
     loaded_definition.with_indifferent_access["field_mapping"]
   end
 
+  def event_mapping
+    field_mapping["event"] || []
+  end
+
+  def sample_mapping
+    field_mapping["sample"] || []
+  end
+
+  def patient_mapping
+    field_mapping["patient"] || []
+  end
+
+  def flat_mappings
+    if event_mapping.is_a? Hash
+      event_mapping["fields"]
+    else
+      event_mapping
+    end + patient_mapping + sample_mapping
+  end
+
   def parser
-    @parser ||= case metadata["source_data_type"]
+    @parser ||= case (metadata["source"] || {})["type"]
     when "json"
       JsonEventParser.new
     when "csv"
-      CSVEventParser.new
+      CSVEventParser.new metadata["source"]["separator"] || CSVEventParser::DEFAULT_SEPARATOR
     else
       raise "unsupported source data type"
     end
   end
 
   def self.default_definition
-    field_mapping = Event.sensitive_fields.map do |sensitive_field|
-      {
-        target_field: sensitive_field,
-        source: {lookup: sensitive_field},
-        core: true,
-        type: 'string',
-        pii: true,
-        indexed: false
-      }
+    Oj.dump({
+      metadata: { source: { type: "json" } },
+      field_mapping: { event: map(Cdx::Api.searchable_fields).flatten }
+    })
+  end
+
+  def manifest_validation
+    if self.metadata.blank?
+      self.errors.add(:metadata, "can't be blank")
+    else
+      fields =  ["version","api_version","device_models"]
+      check_fields_in_metadata(fields)
+      check_api_version
     end
 
-    field_mapping.concat(map(Cdx::Api.searchable_fields).flatten)
-    Oj.dump metadata: {source_data_type: "json"}, field_mapping: field_mapping
+    check_field_mapping
+
+  rescue Oj::ParseError => ex
+    self.errors.add(:parse_error, ex.message)
   end
 
   private
@@ -116,18 +159,10 @@ class Manifest < ActiveRecord::Base
     end
   end
 
-  def manifest_validation
-    if self.metadata.blank?
-      self.errors.add(:metadata, "can't be blank")
-    else
-      fields =  ["version","api_version","device_models"]
-      check_fields_in_metadata(fields)
+  def check_api_version
+    unless self.metadata["api_version"].try(:starts_with?, "1.1")
+      self.errors.add(:api_version, "must be 1.1.x")
     end
-
-    check_field_mapping
-
-  rescue Oj::ParseError => ex
-    self.errors.add(:parse_error, ex.message)
   end
 
   def check_fields_in_metadata(fields)
@@ -140,16 +175,14 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_field_mapping
-    definition = Oj.load self.definition
-    if definition["field_mapping"].is_a? Array
-      definition["field_mapping"].each do |fm|
+    if loaded_definition["field_mapping"].is_a? Hash
+      flat_mappings.each do |fm|
         check_presence_of_target_field_and_source fm
-        check_presence_of_core_field fm
         check_valid_type fm
         check_properties_of_enum_field fm
       end
     else
-      self.errors.add(:field_mapping, "must be an array")
+      self.errors.add(:field_mapping, "must be a json object")
     end
   end
 
@@ -170,12 +203,6 @@ class Manifest < ActiveRecord::Base
   def verify_absence_of_null_string field_mapping
     if field_mapping["options"].include? NULL_STRING
       self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{field_mapping["target_field"]}') ")
-    end
-  end
-
-  def check_presence_of_core_field field_mapping
-    if (field_mapping["core"].nil?)
-      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Mapping must include 'core' field")
     end
   end
 

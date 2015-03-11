@@ -1,10 +1,12 @@
 class ManifestField
-  def initialize(manifest, field)
+  def initialize(manifest, field, scope=nil, path=nil)
     @manifest = manifest
     @field = field
     @target_field = @field["target_field"]
-    @mapping = ManifestFieldMapping.new(@manifest, @field)
+    @mapping = ManifestFieldMapping.new(@manifest, @field, path)
     @validation = ManifestFieldValidation.new(@field)
+    @scope = scope
+    @path = path
   end
 
   def apply_to(data, event)
@@ -14,30 +16,41 @@ class ManifestField
   end
 
   def store value, event
-    if (targets = @target_field.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
-      # find the array or create it. Only one level for now
-      target_array = event[hash_key][targets.first] ||= Array.new
-      # merge the new values
-      if value.present?
-        Array(value).each_with_index do |value, index|
-          (target_array[index] ||= Hash.new)[targets[-1]] = value
-        end
-      end
-    else
-      event[hash_key][@target_field] = value
+    if value.present?
+      index value, @target_field, event[@scope][hash_key]
     end
-
     event
   end
 
   def hash_key
+    return "pii" if @field["pii"]
     if @field["core"]
-      return :pii if Event.pii?(@target_field)
-      :indexed
+      "indexed"
     else
-      return :pii if @field["pii"]
-      return :indexed if @field["indexed"]
-      :custom
+      return "indexed" if @field["indexed"]
+      "custom"
+    end
+  end
+
+
+  def index value, target, event, custom=false
+    if (targets = target.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
+
+      event, custom = index [], targets.first, event, custom
+
+      Array(value).each_with_index do |element, index|
+        index(element, targets.drop(1).join(Manifest::COLLECTION_SPLIT_TOKEN), (event[index]||={}), custom)
+      end
+    else
+      paths = target.split Manifest::PATH_SPLIT_TOKEN
+      event = paths[0...-1].inject event do |current, path|
+        current[path] ||= {}
+      end
+      if @field["indexed"] && !@field["core"] && target != "results" && !custom
+        event = event["custom_fields"] ||= {}
+        custom = true
+      end
+      [(event[paths.last] ||= value), custom]
     end
   end
 end

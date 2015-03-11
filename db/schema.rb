@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150206142251) do
+ActiveRecord::Schema.define(version: 20150305175247) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -31,6 +31,25 @@ ActiveRecord::Schema.define(version: 20150206142251) do
   end
 
   add_index "activations", ["activation_token_id"], name: "index_activations_on_activation_token_id", unique: true, using: :btree
+
+  create_table "device_events", force: true do |t|
+    t.binary   "raw_data"
+    t.integer  "device_id"
+    t.boolean  "index_failed"
+    t.text     "index_failure_reason"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "device_events", ["device_id"], name: "index_device_events_on_device_id", using: :btree
+
+  create_table "device_events_events", force: true do |t|
+    t.integer "device_event_id"
+    t.integer "event_id"
+  end
+
+  add_index "device_events_events", ["device_event_id"], name: "index_device_events_events_on_device_event_id", using: :btree
+  add_index "device_events_events", ["event_id"], name: "index_device_events_events_on_event_id", using: :btree
 
   create_table "device_models", force: true do |t|
     t.string   "name"
@@ -59,17 +78,18 @@ ActiveRecord::Schema.define(version: 20150206142251) do
   end
 
   create_table "events", force: true do |t|
-    t.integer  "device_id"
-    t.binary   "raw_data"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.binary   "sensitive_data"
     t.string   "uuid"
     t.text     "custom_fields"
     t.string   "event_id"
-    t.boolean  "index_failed"
-    t.text     "index_failure_reason"
+    t.integer  "sample_id"
+    t.binary   "sensitive_data"
+    t.integer  "device_id"
   end
+
+  add_index "events", ["sample_id"], name: "index_events_on_sample_id", using: :btree
+  add_index "events", ["uuid"], name: "index_events_on_uuid", using: :btree
 
   create_table "filters", force: true do |t|
     t.integer  "user_id"
@@ -151,6 +171,18 @@ ActiveRecord::Schema.define(version: 20150206142251) do
     t.string   "name"
   end
 
+  create_table "samples", force: true do |t|
+    t.string  "uuid"
+    t.binary  "sensitive_data"
+    t.integer "institution_id"
+    t.text    "custom_fields"
+    t.string  "sample_uid_hash"
+    t.text    "indexed_fields"
+  end
+
+  add_index "samples", ["institution_id", "sample_uid_hash"], name: "index_samples_on_institution_id_and_sample_uid_hash", using: :btree
+  add_index "samples", ["uuid"], name: "index_samples_on_uuid", using: :btree
+
   create_table "ssh_keys", force: true do |t|
     t.text     "public_key"
     t.integer  "device_id"
@@ -171,6 +203,7 @@ ActiveRecord::Schema.define(version: 20150206142251) do
     t.string   "url_user"
     t.string   "url_password"
     t.integer  "filter_id"
+    t.string   "verb",         default: "GET"
   end
 
   add_index "subscribers", ["filter_id"], name: "index_subscribers_on_filter_id", using: :btree

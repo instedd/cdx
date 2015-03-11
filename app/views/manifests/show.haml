@@ -9,5 +9,5 @@
       %pre= JSON.pretty_generate(JSON.parse(@manifest.definition))
 
     = link_to 'Back', manifests_path, :class => 'btn'
-    = link_to 'Delete', manifest_path(@manifest), method: "DELETE", confirm: "Are you sure?", :class => 'btn btn-link'
+    = link_to 'Delete', manifest_path(@manifest), method: "DELETE", data: { confirm: "Are you sure?" }, :class => 'btn btn-link'
 

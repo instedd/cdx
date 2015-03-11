@@ -59,6 +59,7 @@ RSpec.configure do |config|
   config.order = "random"
 
   config.include Devise::TestHelpers, :type => :controller
+  config.include ManifestSpecHelper,  :example_group => { :file_path => config.escaped_path(%w[spec models]) }
 
   config.before(:all) do
     ElasticsearchMappingTemplate.new.load
@@ -66,17 +67,9 @@ RSpec.configure do |config|
 
   config.before(:each) do
     Timecop.return
-    Cdx::Api.client.indices.delete index: "#{Cdx::Api.index_prefix}_*" rescue nil
   end
 
   config.after(:each) do
     Timecop.return
-    Cdx::Api.client.indices.delete index: "#{Cdx::Api.index_prefix}_*" rescue nil
   end
-end
-
-def fresh_client_for index_name
-  client = Cdx::Api.client
-  client.indices.refresh index: index_name
-  client
 end

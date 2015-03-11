@@ -7,54 +7,59 @@ describe EventsSchema do
   # Crear un manifest
   it "creates a schema with string, enum and number fields" do
     definition = %{{
-      "field_mapping" : [
-        {
-          "target_field" : "start_time",
-          "source" : {"lookup" : "start_time"},
-          "core" : true,
-          "indexed" : true,
-          "type" : "date"
-        },
-        {
-          "target_field" : "results[*].result",
-          "source" : {"lookup" : "result"},
-          "type" : "enum",
-          "core" : true,
-          "indexed" : true,
-          "options" : [
-            "positive",
-            "positive_with_riff",
-            "negative"
-          ]
-        },
-        {
-          "target_field" : "patient_name",
-          "source" : {"lookup" : "patient_information.name"},
-          "core" : true,
-          "indexed" : true,
-          "type" : "string"
-        },
-        {
-          "target_field" : "age",
-          "source" : {"lookup" : "age"},
-          "type" : "integer",
-          "indexed" : "true",
-          "core" : true,
-          "valid_values" : {
-            "range" : {
-              "min" : 0,
-              "max" : 125
+      "field_mapping" : {
+        "event" : [
+          {
+            "target_field" : "start_time",
+            "source" : {"lookup" : "start_time"},
+            "core" : true,
+            "indexed" : true,
+            "type" : "date"
+          },
+          {
+            "target_field" : "results[*].result",
+            "source" : {"lookup" : "result"},
+            "type" : "enum",
+            "core" : true,
+            "indexed" : true,
+            "options" : [
+              "positive",
+              "positive_with_riff",
+              "negative"
+            ]
+          }
+        ],
+        "patient" : [
+          {
+            "target_field" : "patient_name",
+            "source" : {"lookup" : "patient_information.name"},
+            "core" : true,
+            "indexed" : true,
+            "type" : "string"
+          },
+          {
+            "target_field" : "age",
+            "source" : {"lookup" : "age"},
+            "type" : "integer",
+            "indexed" : true,
+            "core" : true,
+            "valid_values" : {
+              "range" : {
+                "min" : 0,
+                "max" : 125
+              }
             }
           }
-        }
-      ]
+        ]
+      }
     }}
 
     date_schema = {
       "title" => "Start Time",
       "type" => "string",
       "format" => "date-time",
-      "resolution" => "second"
+      "resolution" => "second",
+      "searchable" => true
     }
 
     enum_schema = {
@@ -65,19 +70,22 @@ describe EventsSchema do
         "positive" => { "name" => "Positive", "kind" => "positive" },
         "positive_with_riff" => { "name" => "Positive With Riff", "kind" => "positive" },
         "negative" => { "name" => "Negative", "kind" => "negative" }
-      }
+      },
+      "searchable" => true
     }
 
     string_schema = {
       "title" => "Patient Name",
-      "type" => "string"
+      "type" => "string",
+      "searchable" => true
     }
 
     number_schema = {
       "title" => "Age",
       "type" => "integer",
       "minimum" => 0,
-      "maximum" => 125
+      "maximum" => 125,
+      "searchable" => true
     }
 
     schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)
@@ -95,7 +103,7 @@ describe EventsSchema do
 
   it "creates a schema with location field" do
     definition = %{{
-      "field_mapping" :[
+      "field_mapping" : { "patient" : [
         {
           "target_field" : "patient_location",
           "source" : {"lookup" : "patient_location"},
@@ -103,7 +111,7 @@ describe EventsSchema do
           "indexed" : true,
           "type" : "location"
         }
-      ]
+      ]}
     }}
 
     locations = Location.all
@@ -114,7 +122,8 @@ describe EventsSchema do
       "locations" => {
         "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
         "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
-      }
+      },
+      "searchable" => true
     }
 
     schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)
@@ -128,13 +137,13 @@ describe EventsSchema do
   end
 
   it "should return an empty schema with all the assay_names available if none is provided" do
-    Manifest.create definition: %{{
+    Manifest.create! definition: %{{
       "metadata" : {
         "device_models" : ["foo"],
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "version" : "1.0.1"
       },
-      "field_mapping" : [
+      "field_mapping" : { "event" : [
         {
           "target_field" : "assay_name",
           "source" : {"lookup" : "assay_name"},
@@ -146,16 +155,16 @@ describe EventsSchema do
             "second_assay"
           ]
         }
-      ]
+      ]}
     }}
 
-    manifest = Manifest.create definition: %{{
+    manifest = Manifest.create! definition: %{{
       "metadata" : {
         "device_models" : ["bar"],
-        "api_version" : "1.0.0",
+        "api_version" : "1.1.0",
         "version" : "1.0.1"
       },
-      "field_mapping" : [
+      "field_mapping" : { "event" : [
         {
           "target_field" : "assay_name",
           "source" : {"lookup" : "assay_name"},
@@ -167,7 +176,7 @@ describe EventsSchema do
             "cardridge_2"
           ]
         }
-      ]
+      ]}
     }}
 
     schema = EventsSchema.for "es-AR"

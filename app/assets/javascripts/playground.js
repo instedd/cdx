@@ -1,9 +1,15 @@
 $(function() {
+  function errorMessageFor(response) {
+    return (response.responseJSON || {errors: response.statusText}).errors;
+  }
+
   if ($("#playground").length > 0){
     $report_form = $("#report_form");
     $create_button = $("#create_button");
+    $results_div = $(".results");
     $report_form.submit(function() {
       $create_button.prop("disabled", true);
+      $results_div.html("");
       $create_button.val("Creating...");
       device = $("#device").val();
       data = $("#data").val();
@@ -17,10 +23,10 @@ $(function() {
           $create_button.val("Created!");
           setTimeout(function() { $create_button.val("Create another event"); }, 1000);
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-          $create_button.prop("disabled", false);
-          $create_button.val("Error: " + errorThrown);
-          setTimeout(function() { $create_button.val("Create another event"); }, 1000);
+        error: function(response) {
+          $results_div.html("<p> Error: " + errorMessageFor(response) + "</p>");
+          $create_button.val("Create another event");
+          setTimeout(function() { $create_button.prop("disabled", false); }, 1000);
         }
       });
       return false;

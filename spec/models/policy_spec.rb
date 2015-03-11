@@ -333,6 +333,7 @@ describe Policy do
         grant user, user2, "#{Laboratory.resource_name}?institution=#{institution.id}", READ_LABORATORY
 
         assert_can user2, Laboratory, READ_LABORATORY, [laboratory]
+        assert_can user2, institution.laboratories, READ_LABORATORY, [laboratory]
       end
 
       it "disallows reading other institution laboratories when id is other" do
@@ -500,6 +501,7 @@ describe Policy do
         grant user, user2, "#{Device.resource_name}?institution=#{institution.id}", READ_DEVICE
 
         assert_can user2, Device, READ_DEVICE, [device]
+        assert_can user2, institution.devices, READ_DEVICE, [device]
       end
 
       it "disallows reading other institution devices when id is other" do

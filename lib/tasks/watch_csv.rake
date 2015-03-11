@@ -9,8 +9,7 @@ namespace :csv do
     Rails.logger.info "Watching directory #{sync_dir.sync_path}"
 
     watcher.watch do |path|
-      CSVEventParser.new.import_single sync_dir, path
+      DeviceEventImporter.new.import_single sync_dir, path
     end
   end
-
 end

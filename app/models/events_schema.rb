@@ -32,15 +32,14 @@ class EventsSchema
     end
     schema["properties"] = Hash.new
 
-    if @manifest
-      @manifest.field_mapping.each do |field|
-        if field["core"] && field["indexed"]
-          schema["properties"][field_name(field)] = schema_for field
-        end
-      end
-    else
+    (@manifest || Manifest.default).flat_mappings.each do |field|
+      schema["properties"][field_name(field)] = schema_for field
+    end
+
+    unless @manifest
       schema["properties"]["assay_name"] = all_assay_names_schema
     end
+
     schema
   end
 
@@ -59,6 +58,9 @@ class EventsSchema
     else
       string_schema schema
     end
+
+    schema['searchable'] = field["core"] && field["indexed"] || false
+
     schema
   end
 
@@ -109,17 +111,18 @@ class EventsSchema
 
   def location_schema schema
     schema["type"] = "string"
-    schema["enum"] = Array.new
-    schema["locations"] = Location.all.inject(Hash.new) do |locations, location|
-      schema["enum"].push(location.geo_id.to_s)
-      locations[location.geo_id.to_s] = {
+    schema["enum"] = enum = []
+    schema["locations"] = locations = {}
+
+    Location.includes(:parent).find_each do |location|
+      enum << location.geo_id
+      locations[location.geo_id] = {
         "name" => location.name,
         "level" => location.admin_level,
-        "parent" => location.parent.try(:geo_id), # TODO Remove this n+1
+        "parent" => location.parent.try(:geo_id),
         "lat" => location.lat,
         "lng" => location.lng
       }
-      locations
     end
   end
 
@@ -142,7 +145,7 @@ class EventsSchema
   def all_assay_names
     #TODO This should be AssayName.all
     assay_names = Manifest.all.collect do |manifest|
-      assay_mapping = manifest.field_mapping.detect do |mapping|
+      assay_mapping = manifest.flat_mappings.detect do |mapping|
         mapping["target_field"] == "assay_name"
       end
 

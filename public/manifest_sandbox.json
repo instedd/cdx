@@ -4,22 +4,20 @@
     "api_version" : "1.0.0",
     "signature" : "12345",
     "device_models" : ["default"],
-    "source_data_type": "json", // CSV source must have flat selectors
-    "test_report": "multiple",
-    "event_root_path" : "tests"
+    "source_data_type": "json", // CSV source must have flat lookups
   },
   "field_mapping" : {
     "sample" : [
       {
         "target_field": "id",
-        "selector" : "sample.id",
+        "source" : {"lookup" : "sample.id"},
         "core" : true,
         "indexed" : true,
         "type" : "integer"
       },
       {
         "target_field": "type",
-        "selector" : "sample.type",
+        "source" : {"lookup" : "sample.type"},
         "core" : true,
         "indexed" : true,
         "type" : "enum",
@@ -67,33 +65,32 @@
       }
     ],
   "event" : {
-    "report_type": "multiple", // single
     "root_path" : "tests", // only if multiple
-    "fields": [
+    "fields": [ // if not multiple, event will be the fields array directly
       {
         "target_field": "start_time",
-        "selector" : "start_time",
+        "source" : {"lookup" : "start_time"},
         "core" : true,
         "indexed" : true,
         "type" : "date"
       },
       {
         "target_field": "event_id",
-        "selector" : "event_id",
+        "source" : {"lookup" : "event_id"},
         "type": "integer",
         "core" : true,
         "indexed" : true
       },
       {
         "target_field" : "location",
-        "selector" : "location",
+        "source" : {"lookup" : "location"},
         "type" : "location",
         "core" : true,
         "indexed" : true
       },
       {
         "target_field": "age",
-        "selector": "age",
+        "source" : {"lookup" : "age"},
         "type": "integer",
         "indexed" : "true",
         "core" : true,
@@ -105,8 +102,35 @@
         }
       },
       {
+        "target_field": "events[*].results[*].result",
+        "source" : [
+            [{"lookup" : "MGIT"}],
+            [{"lookup" : "LG"}]
+        ],
+        "core" : true,
+        "indexed" : false,
+        "pii" : true,
+        "type" : "string"
+      },
+      {
+        "target_field": "events[*].results[*].condition",
+        "source" : [ "mtb", "mtb" ],
+        "core" : true,
+        "indexed" : false,
+        "pii" : true,
+        "type" : "string"
+      },
+      {
+        "target_field": "events[*].test_type",
+        "source" : [ "MGIT", "LG" ],
+        "core" : true,
+        "indexed" : false,
+        "pii" : true,
+        "type" : "string"
+      },
+      {
         "target_field": "assay_name",
-        "selector" : "assay_name",
+        "source" : {"lookup" : "assay_name"},
         "type" : "enum",
         "core" : true,
         "options" : [
@@ -116,7 +140,7 @@
       },
       {
         "target_field" : "system_user",
-        "selector" : "system_user",
+        "source" : {"lookup" : "system_user"},
         "type": "string",
         "core" : true,
         "pii" : false,
@@ -124,7 +148,7 @@
       },
       {
         "target_field" : "results[*].condition",
-        "selector" : "results[*].condition",
+        "source" : {"lookup" : "results[*].condition"},
         "type" : "enum",
         "core" : true,
         "indexed" : true,
@@ -137,7 +161,7 @@
       },
       {
         "target_field" : "results[*].result",
-        "selector" : "results[*].result",
+        "source" : {"lookup" : "results[*].result"},
         "type" : "enum",
         "core" : true,
         "indexed" : true,
@@ -163,7 +187,7 @@
       },
       {
         "target_field": "grade_of_resistance",
-        "selector" : "resistance",
+        "source" : {"lookup" : "resistance"},
         "core" : false,
         "type": "integer",
         "valid_values": {
@@ -175,19 +199,19 @@
       },
       {
         "target_field": "device_serial_number",
-        "selector" : "device_serial_number",
+        "source" : {"lookup" : "device_serial_number"},
         "type" : "string",
         "core": true
       },
       {
         "target_field": "test_type",
-        "selector" : "Test.test_type",
+        "source" : {"lookup" : "test_type"},
         "type" : "string",
         "core" : true
       },
       {
         "target_field": "temperature",
-        "selector" : "Test.temp",
+        "source" : {"lookup" : "temperature"},
         "core" : false,
         "type": "integer",
         "pii" : false,
@@ -203,7 +227,7 @@
         "target_field": "percentage_of_confidence",
         "core" : false,
         "type": "integer",
-        "selector" : "Test.percent",
+        "source" : {"lookup" : "percentage"},
         "pii" : false,
         "valid_values": {
           "range" : {
@@ -215,7 +239,7 @@
       },
       {
         "target_field": "end_time",
-        "selector" : "Test.end_time",
+        "source" : {"lookup" : "end_time"},
         "type": "date",
         "core" : false,
         "pii" : "false",

@@ -20,6 +20,7 @@ Sham.define do
   name { Faker::Name.name }
   email { Faker::Internet.email }
   password { Faker::Name.name }
+  url { Faker::Internet.url }
 end
 
 User.blueprint do
@@ -41,10 +42,10 @@ Laboratory.blueprint do
 end
 
 Device.blueprint do
-  institution
+  laboratories { [Laboratory.make] }
+  institution { laboratories.first.institution }
   name
   device_model
-  laboratories { [Laboratory.make] }
 end
 
 Location.blueprint do
@@ -52,6 +53,22 @@ Location.blueprint do
   parent {Location.create_default}
   geo_id { "location-#{Sham.sn}" }
   admin_level {parent.admin_level + 1}
+end
+
+Sample.blueprint do
+  institution
+  plain_sensitive_data { { sample_uid: "sample-#{Sham.sn}" } }
+end
+
+Event.blueprint do
+  device_events {[DeviceEvent.make]}
+  device {device_events.first.device}
+  sample { Sample.make institution: device.institution }
+  event_id { "event-#{Sham.sn}" }
+end
+
+DeviceEvent.blueprint do
+  device
 end
 
 DeviceModel.blueprint do
@@ -68,6 +85,7 @@ end
 Subscriber.blueprint do
   user
   name
+  url
   last_run_at {Time.now}
 end
 

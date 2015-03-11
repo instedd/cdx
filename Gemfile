@@ -51,12 +51,14 @@ group :development do
   gem 'capistrano-rails',   '~> 1.1', require: false
   gem 'capistrano-bundler', '~> 1.1', require: false
   gem 'capistrano-rvm',   '~> 0.1', require: false
+  # gem "awesome_print", require: "ap"
+  # gem 'meta_request'
+  # gem 'quiet_assets'
 end
 
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-openid'
-gem 'cancan'
 gem 'elasticsearch'
 gem 'bunny'
 
@@ -64,7 +66,12 @@ gem 'oj'
 gem 'guid'
 gem 'encryptor'
 
-gem 'pry-byebug', group: [:development, :test]
+group :development, :test do
+  gem 'pry-byebug'
+  gem 'pry-rescue'
+  gem 'pry-stack_explorer'
+  gem 'pry-clipboard'
+end
 
 group :test do
   gem 'tire'

@@ -1,48 +1,44 @@
 class Event < ActiveRecord::Base
-  include EventIndexing
-  include EventEncryption
-
+  has_and_belongs_to_many :device_events
   belongs_to :device
-  belongs_to :institution
+  has_one :institution, through: :device
+  belongs_to :sample
   serialize :custom_fields
+  validates_presence_of :device
+  validates_uniqueness_of :event_id, scope: :device_id, allow_nil: true
 
   before_create :generate_uuid
-  before_create :extract_event_id, :unless => :index_failed?
-  before_save :extract_pii, :unless => :index_failed?
-  before_save :extract_custom_fields, :unless => :index_failed?
-  before_save :encrypt, :unless => :index_failed?
-  after_save :save_in_elasticsearch, :unless => :index_failed?
+  before_save :encrypt
 
-  def self.create_or_update_with device, raw_data
-    event = self.new device: device, raw_data: raw_data
-
-    event_id = event.parsed_fields[:indexed][:event_id]
-
-    if event_id && existing_event = self.find_by(device: device, event_id: event_id)
-      result = existing_event.update_with raw_data
-      [existing_event, result]
-    else
-      result = event.save
-      [event, result]
-    end
-  rescue ManifestParsingError => err
-    event.index_failed = true
-    event.index_failure_reason = err.message
-    result = event.save
-    [event, result]
+  after_initialize do
+    self.custom_fields  ||= {}
   end
 
-  def self.sensitive_fields
-    ["patient_id", "patient_name", "patient_telephone_number", "patient_zip_code"]
+  attr_writer :plain_sensitive_data
+
+  def merge(event)
+    self.plain_sensitive_data.deep_merge_not_nil!(event.plain_sensitive_data)
+    self.custom_fields.deep_merge_not_nil!(event.custom_fields)
+    self.sample_id = event.sample_id unless event.sample_id.blank?
+    self.device_events |= event.device_events
+    self
   end
 
-  def update_with raw_data
-    self.raw_data = raw_data
-    @parsed_fields = nil
-    save
+  def plain_sensitive_data
+    @plain_sensitive_data ||= (Oj.load(EventEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
+  end
+
+  def encrypt
+    self.sensitive_data = EventEncryption.encrypt Oj.dump(self.plain_sensitive_data)
+    self
+  end
+
+  def generate_uuid
+    self.uuid ||= Guid.new.to_s
   end
 
   def self.query params, user
     EventQuery.new params, user
   end
 end
+

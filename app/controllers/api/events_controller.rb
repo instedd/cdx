@@ -5,25 +5,22 @@ class Api::EventsController < ApiController
   def create
     device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_uuid(params[:device_id])
     if device.validate_authentication(params[:authentication_token])
-      event, saved = Event.create_or_update_with device, request.body.read
+      data = request.body.read rescue nil
+      device_event = DeviceEvent.new(device: device, plain_text_data: data)
 
-      if saved
-        if event.index_failed?
-          render :status => :unprocessable_entity, :json => { :errors => event.index_failure_reason }
+      if device_event.save
+        if device_event.index_failed?
+          render :status => :unprocessable_entity, :json => { :errors => device_event.index_failure_reason }
         else
-          render :status => :ok, :json => { :event => event.indexed_body }
+          device_event.process
+          render :status => :ok, :json => { :events => device_event.parsed_events }
         end
       else
-        render :status => :unprocessable_entity, :json => { :errors => event.errors }
+        render :status => :unprocessable_entity, :json => { :errors => device_event.errors.full_messages.join(', ') }
       end
     else
       render :status => :forbidden, :json => {}
     end
-  end
-
-  def upload
-    events = CSVEventParser.new.load_for_device request.body.read, params[:device_id]
-    render :status => :ok, :json => { events: events}
   end
 
   def index
@@ -40,13 +37,13 @@ class Api::EventsController < ApiController
   end
 
   def custom_fields
-    event = Event.find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "custom_fields" => event.custom_fields
+    event = Event.includes(:sample).find_by_uuid(params[:id])
+    render_json "uuid" => params[:id], "custom_fields" => event.custom_fields.deep_merge(event.sample.custom_fields)
   end
 
   def pii
-    event = Event.find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "pii" => event.decrypt.sensitive_data
+    event = Event.includes(:sample).find_by_uuid(params[:id])
+    render_json "uuid" => params[:id], "pii" => event.plain_sensitive_data.deep_merge(event.sample.plain_sensitive_data)
   end
 
   def schema

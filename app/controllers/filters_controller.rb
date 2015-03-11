@@ -1,32 +1,39 @@
 class FiltersController < ApplicationController
+  # TODO should split API controller
+  skip_before_action :authenticate_user!, if: -> { request.path.starts_with? "/api/" }
+  before_filter :authenticate_api_user!, if: -> { request.path.starts_with? "/api/" }
+
+  respond_to :html, :json
   expose(:filters) { current_user.filters }
   expose(:filter, attributes: :filter_params)
-  expose(:laboratory) { Laboratory.find(filter.query.with_indifferent_access[:laboratory]) }
+  expose(:laboratory) { Laboratory.find(filter.query.with_indifferent_access[:laboratory]) rescue nil }
   expose(:condition) { filter.query.with_indifferent_access[:condition] }
+
+  def index
+    respond_with filters
+  end
+
+  def show
+    respond_with filter
+  end
 
   def new
     filter.query = params[:query]
   end
 
   def create
-    if filter.save
-      redirect_to filters_path, notice: "Filter was successfully created"
-    else
-      render :new
-    end
+    flash[:notice] = "Filter was successfully created" if filter.save
+    respond_with filter, location: filters_path
   end
 
   def update
-    if filter.save
-      redirect_to filters_path, notice: "Filter was successfully updated"
-    else
-      render :edit
-    end
+    flash[:notice] = "Filter was successfully updated" if filter.save
+    respond_with filter, location: filters_path
   end
 
   def destroy
     filter.destroy
-    redirect_to filters_path
+    respond_with filter
   end
 
   private

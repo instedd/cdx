@@ -19,7 +19,7 @@ Cdp::Application.routes.draw do
   resources :locations
   resources :manifests, except: [:update]
   resources :events
-  resources :filters
+  resources :filters, format: 'html'
   resources :subscribers
   resources :policies
 
@@ -43,13 +43,15 @@ Cdp::Application.routes.draw do
       end
     end
     resources :devices, only: [] do
-      resources :events, only: [:create], shallow: true do
-        collection do
-          post :upload
-        end
-      end
+      resources :events, only: [:create], shallow: true
     end
     resources :laboratories, only: :index
-    resources :filters
+  end
+
+  scope :api, format: 'json', except: [:new, :edit] do
+    resources :filters do
+      resources :subscribers
+    end
+    resources :subscribers
   end
 end

@@ -1,0 +1,8 @@
+.span12
+  %h3 Edit #{filter.name}
+
+  = render 'form'
+
+  %hr
+
+  = icon_link_to :'icf-delete', "Delete this filter", filter, method: :delete, data: { confirm: "Are you sure you want to delete the filter '#{filter.name}'" }
