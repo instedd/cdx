@@ -4,7 +4,7 @@ class Api::EventsController < ApiController
 
   def create
     device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_uuid(params[:device_id])
-    if device.validate_authentication(params[:authentication_token])
+    if authenticate_create(device)
       data = request.body.read rescue nil
       device_event = DeviceEvent.new(device: device, plain_text_data: data)
 
@@ -53,5 +53,12 @@ class Api::EventsController < ApiController
     end
   rescue ActiveRecord::RecordNotFound => ex
     render :status => :unprocessable_entity, :json => { :errors => ex.message } and return
+  end
+
+  private
+
+  def authenticate_create(device)
+    token = params[:authentication_token]
+    token.blank? ? authenticate_api_user! : device.validate_authentication(token)
   end
 end
