@@ -6,7 +6,7 @@ class ManifestFieldMapping
   end
 
   def apply_to(data)
-    traverse @field["source"], data
+    coerce_values(traverse @field["source"], data)
   end
 
   def traverse node, data
@@ -231,6 +231,14 @@ class ManifestFieldMapping
       if number.between? stop, interval_stops[index + 1 ]
         return "#{stop}-#{interval_stops[index+1]}"
       end
+    end
+  end
+
+  def coerce_values value
+    if @field['type'] == 'integer' &&  ManifestFieldValidation.new(@field).is_an_integer?(value)
+      value.to_i
+    else
+      value
     end
   end
 end

@@ -65,7 +65,7 @@ describe Manifest, validate_manifest: false do
         event: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => "20"}}
     end
 
-    pending "should apply to custom non-pii non-indexed field coercing to integer" do
+    it "should apply to custom non-pii non-indexed field coercing to integer" do
       assert_manifest_application %{
           {
             "event" : [{
@@ -73,7 +73,8 @@ describe Manifest, validate_manifest: false do
               "source" : {"lookup" : "temperature"},
               "core" : false,
               "pii" : false,
-              "indexed" : false
+              "indexed" : false,
+              "type" : "integer"
             }]
           }
         },
