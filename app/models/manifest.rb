@@ -25,7 +25,7 @@ class Manifest < ActiveRecord::Base
   #TODO Refiy the assay and delegate this to mysql.
   ####################################################################################################
   def self.find_by_assay_name assay_name
-    manifests = self.all.select do |manifest|
+    manifests = self.valid.select do |manifest|
       manifest.find_assay_name assay_name
     end
     raise ActiveRecord::RecordNotFound.new "There is no manifest for assay_name: '#{assay_name}'." unless manifests.present?
