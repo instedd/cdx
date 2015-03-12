@@ -98,11 +98,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def flat_mappings
-    if event_mapping.is_a? Hash
-      event_mapping["fields"]
-    else
-      event_mapping
-    end + patient_mapping + sample_mapping
+    event_mapping + patient_mapping + sample_mapping
   end
 
   def parser
