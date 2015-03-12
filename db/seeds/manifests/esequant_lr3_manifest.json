@@ -1,0 +1,148 @@
+{
+  "metadata": {
+    "version": "0.0.7",
+    "api_version": "1.1.0",
+    "device_models": [
+      "esequant_lr3"
+    ],
+    "source_data_type": "json"
+  },
+  "field_mapping": {
+    "patient" : [],
+    "sample" : [
+      {
+        "target_field": "sample_id",
+        "source": {
+          "lookup": "SampleId"
+        },
+        "type": "string",
+        "core": true,
+        "pii": true,
+        "indexed": false
+      }
+    ],
+    "event" : [
+    {
+      "target_field": "start_time",
+      "source": {
+        "parse_date": [
+          {
+            "lookup": "MeasurementDateTime"
+          },
+          "%Y-%m-%d %H:%M:%S"
+        ]
+      },
+      "type": "date",
+      "core": true,
+      "pii": false,
+      "indexed": true
+    },
+    {
+      "target_field": "event_id",
+      "source": {
+        "lookup": "RunNumber"
+      },
+      "type": "integer",
+      "core": true,
+      "pii": false,
+      "indexed": true
+    },
+    {
+      "target_field": "system_user",
+      "source": {
+        "lookup": "User"
+      },
+      "type": "string",
+      "core": true,
+      "pii": false,
+      "indexed": true
+    },
+    {
+      "target_field": "device_serial_number",
+      "source": {
+        "concat": [
+          {
+            "lookup": "DeviceType"
+          },
+          "_",
+          {
+            "lookup": "SerialNumber"
+          }
+        ]
+      },
+      "type": "string",
+      "core": true,
+      "pii": false,
+      "indexed": true
+    },
+    {
+      "target_field": "error_code",
+      "source": {
+        "lookup": "error_code"
+      },
+      "type": "integer",
+      "core": true,
+      "pii": false,
+      "indexed": true
+    },
+    {
+      "target_field": "assay_name",
+      "source": {
+        "lookup": "ProductId"
+      },
+      "type": "string",
+      "core": true,
+      "pii": false,
+      "indexed": true,
+      "options": [
+        "MTBDRplus, SD TB Ag MPT64, Smear, Solid Culture"
+      ]
+    },
+    {
+      "target_field": "results[*].result",
+      "source": {
+        "lookup": "results[*].result"
+      },
+      "type": "enum",
+      "core": true,
+      "pii": false,
+      "indexed": true,
+      "options": [
+        "invalid",
+        "valid",
+        "positive",
+        "negative",
+        "positive_with_rmp_and_inh",
+        "positive_with_rmp",
+        "positive_with_inh"
+      ]
+    },
+    {
+      "target_field": "results[*].condition",
+      "source": {
+        "lookup": "results[*].condition"
+      },
+      "type": "enum",
+      "core": true,
+      "pii": false,
+      "indexed": true,
+      "options": [
+        "mtb"
+      ]
+    },
+    {
+      "target_field": "test_type",
+      "source": {
+        "lookup": "SampleName"
+      },
+      "type": "enum",
+      "core": true,
+      "pii": false,
+      "indexed": true,
+      "options": [
+        "specimen",
+        "qc"
+      ]
+    }
+  ]
+}
