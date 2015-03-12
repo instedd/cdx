@@ -6,7 +6,7 @@
       = @manifest.version
     %p
       %strong Definition:
-      %pre= JSON.pretty_generate(JSON.parse(@manifest.definition))
+      %pre= JSON.pretty_generate(Oj.load(@manifest.definition)) rescue @manifest.definition
 
     = link_to 'Back', manifests_path, :class => 'btn'
     = link_to 'Delete', manifest_path(@manifest), method: "DELETE", data: { confirm: "Are you sure?" }, :class => 'btn btn-link'
