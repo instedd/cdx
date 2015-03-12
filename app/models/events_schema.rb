@@ -144,7 +144,7 @@ class EventsSchema
 
   def all_assay_names
     #TODO This should be AssayName.all
-    assay_names = Manifest.all.collect do |manifest|
+    assay_names = Manifest.valid.collect do |manifest|
       assay_mapping = manifest.flat_mappings.detect do |mapping|
         mapping["target_field"] == "assay_name"
       end

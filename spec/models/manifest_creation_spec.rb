@@ -60,17 +60,33 @@ describe Manifest do
         "field_mapping" : {}
       }}
 
-      Manifest.create!(definition: definition)
+      Manifest.new(definition: definition).save(:validate => false)
 
       manifest = Manifest.first
 
       manifest.api_version.should eq('1.1.0')
       manifest.definition = updated_definition
-      manifest.save!
+      manifest.save(:validate => false)
 
       Manifest.count.should eq(1)
       DeviceModel.count.should eq(1)
       Manifest.first.api_version.should eq("1.1.1")
+    end
+
+    it "returns all the valid manifests" do
+      Manifest.new(definition: %{{
+        "metadata" : {
+          "device_models" : ["foo"],
+          "api_version" : "0.1.1",
+          "version" : 1,
+          "source" : {"type" : "json"}
+        },
+        "field_mapping" : {}
+      }}).save(:validate => false)
+
+      manifest = Manifest.create!(definition: definition)
+
+      Manifest.valid.should eq([manifest])
     end
 
     it "reuses an existing device model if it already exists" do
@@ -143,7 +159,5 @@ describe Manifest do
       Manifest.first.device_models.first.should eq(DeviceModel.first)
       DeviceModel.first.name.should eq("foo")
     end
-
   end
-
 end

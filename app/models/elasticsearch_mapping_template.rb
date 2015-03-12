@@ -36,7 +36,7 @@ class ElasticsearchMappingTemplate
       }
     }
 
-    Manifest.all.each do |manifest|
+    Manifest.valid.each do |manifest|
       mappings["event_#{manifest.id}"] = {
         'dynamic_templates' => build_dynamic_templates_for(manifest),
         'properties' => build_properties_mapping_for(manifest),
