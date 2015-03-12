@@ -12,6 +12,10 @@ class Manifest < ActiveRecord::Base
 
   NULL_STRING = "null"
 
+  CURRENT_VERSION = "1.1.0"
+
+  scope :valid, -> { where(api_version: CURRENT_VERSION) }
+
   EVENT_TEMPLATE = {
     "event" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
     "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
@@ -156,8 +160,8 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_api_version
-    unless self.metadata["api_version"].try(:starts_with?, "1.1")
-      self.errors.add(:api_version, "must be 1.1.x")
+    unless self.metadata["api_version"] == CURRENT_VERSION
+      self.errors.add(:api_version, "must be #{CURRENT_VERSION}")
     end
   end
 

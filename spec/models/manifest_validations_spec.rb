@@ -88,6 +88,18 @@ describe Manifest do
       m.errors[:metadata].first.should eq("must include api_version field")
     end
 
+    it "checks the version number against the current api version" do
+      expect {Manifest.create!(definition: %{{
+        "metadata" : {
+          "device_models" : ["foo"],
+          "api_version" : "1.1.1",
+          "version" : 1,
+          "source" : {"type" : "json"}
+        },
+        "field_mapping" : {}
+      }})}.to raise_error("Validation failed: Api version must be 1.1.0")
+    end
+
     it "shouldn't pass validations if metadata doesn't include device_models" do
       definition = %{{
         "metadata" : {
@@ -352,7 +364,5 @@ describe Manifest do
       Manifest.count.should eq(0)
       m.errors[:enum_fields].first.should eq("must be provided with options. (In 'results[*].result'")
     end
-
   end
-
 end
