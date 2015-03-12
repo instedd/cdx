@@ -1,7 +1,7 @@
 {
   "metadata" : {
-    "version" : "1.0.1",
-    "api_version" : "1.0.0",
+    "version" : "1.0.2",
+    "api_version" : "1.1.0",
     "device_models" : ["HPV Device Model"],
     "source_data_type": "json"
   },
@@ -12,39 +12,34 @@
         "source" : {"lookup" : "patient_id"},
         "type" : "string",
         "core" : true,
-        "pii" : true,
-        "indexed" : false
+        "pii" : true
       },
       {
         "target_field" : "patient_name",
         "source" : {"lookup" : "patient_name"},
         "type" : "string",
         "core" : true,
-        "pii" : true,
-        "indexed" : false
+        "pii" : true
       },
       {
         "target_field" : "patient_telephone_number",
         "source" : {"lookup" : "patient_telephone_number"},
         "type" : "string",
         "core" : true,
-        "pii" : true,
-        "indexed" : false
+        "pii" : true
       },
       {
         "target_field" : "patient_zip_code",
         "source" : {"lookup" : "patient_zip_code"},
         "type" : "string",
         "core" : true,
-        "pii" : true,
-        "indexed" : false
+        "pii" : true
       },
       {
         "target_field" : "age",
         "source" : {"lookup" : "age"},
         "type" : "integer",
         "core" : true,
-        "pii" : false,
         "indexed" : true,
         "valid_values":{"range": {"min": 0, "max": 125}}
       },
@@ -53,7 +48,6 @@
         "source" : {"lookup" : "gender"},
         "type" : "enum",
         "core" : true,
-        "pii" : false,
         "indexed" : true,
         "options":["male", "female"]
       },
@@ -62,7 +56,6 @@
         "source" : {"lookup" : "ethnicity"},
         "type" : "string",
         "core" : true,
-        "pii" : false,
         "indexed" : true
       },
       {
@@ -70,7 +63,6 @@
         "source" : {"lookup" : "race"},
         "type" : "string",
         "core" : true,
-        "pii" : false,
         "indexed" : true
       },
       {
@@ -78,7 +70,22 @@
         "source" : {"lookup" : "race_ethnicity"},
         "type" : "string",
         "core" : true,
-        "pii" : false,
+        "indexed" : true
+      }
+    ],
+    "sample" : [
+      {
+        "target_field" : "sample_uid",
+        "source" : {"lookup" : "sample_uid"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true
+      },
+      {
+        "target_field" : "sample_type",
+        "source" : {"lookup" : "sample_type"},
+        "type" : "string",
+        "core" : true,
         "indexed" : true
       }
     ],
@@ -88,7 +95,6 @@
         "source" : {"lookup" : "start_time"},
         "type" : "date",
         "core" : true,
-        "pii" : false,
         "indexed" : true
       },
       {
@@ -96,7 +102,6 @@
         "source" : {"lookup" : "event_id"},
         "type" : "string",
         "core" : true,
-        "pii" : false,
         "indexed" : true
       },
       {
@@ -104,7 +109,6 @@
         "source" : {"lookup" : "system_user"},
         "type" : "string",
         "core" : true,
-        "pii" : false,
         "indexed" : true
       },
       {
@@ -112,7 +116,6 @@
         "source" : {"lookup" : "device_serial_number"},
         "type" : "string",
         "core" : true,
-        "pii" : false,
         "indexed" : true
       },
       {
@@ -120,7 +123,6 @@
         "source" : {"lookup" : "error_code"},
         "type" : "integer",
         "core" : true,
-        "pii" : false,
         "indexed" : true
       },
       {
@@ -128,7 +130,6 @@
         "source" : {"lookup" : "error_description"},
         "type" : "string",
         "core" : true,
-        "pii" : false,
         "indexed" : true
       },
       {
@@ -136,7 +137,6 @@
         "source" : {"lookup" : "assay_name"},
         "type" : "string",
         "core" : true,
-        "pii" : false,
         "indexed" : true,
         "options":["HPV Assay"]
       },
@@ -145,7 +145,6 @@
         "source" : {"lookup" : "status"},
         "type" : "enum",
         "core" : true,
-        "pii" : false,
         "indexed" : true,
         "options":["invalid","error","no_result","success","negative"]
       },
@@ -154,7 +153,6 @@
         "source" : {"lookup" : "results[*].result"},
         "type" : "enum",
         "core" : true,
-        "pii" : false,
         "indexed" : true,
         "options": ["positive","negative"]
       },
@@ -163,7 +161,6 @@
         "source" : {"lookup" : "results[*].condition"},
         "type" : "enum",
         "core" : true,
-        "pii" : false,
         "indexed" : true,
         "options": ["hpv_16", "hpv_18_45", "hr_hpv"]
       },
@@ -172,7 +169,6 @@
         "source" : {"lookup" : "test_type"},
         "type" : "enum",
         "core" : true,
-        "pii" : false,
         "indexed" : true,
         "options": ["specimen","qc"]
       }

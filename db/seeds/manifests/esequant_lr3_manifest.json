@@ -8,16 +8,26 @@
     "source_data_type": "json"
   },
   "field_mapping": {
-    "sample" : [
+    "patient" : [
       {
-        "target_field": "sample_id",
+        "target_field": "patient_id",
         "source": {
           "lookup": "SampleId"
         },
         "type": "string",
         "core": true,
-        "pii": true,
-        "indexed": false
+        "pii": true
+      }
+    ],
+    "sample" : [
+      {
+        "target_field": "sample_uid",
+        "source": {
+            "lookup": "SampleId"
+          },
+        "type": "string",
+        "core": true,
+        "pii": true
       }
     ],
     "event" : [
@@ -33,7 +43,6 @@
         },
         "type": "date",
         "core": true,
-        "pii": false,
         "indexed": true
       },
       {
@@ -43,7 +52,6 @@
         },
         "type": "integer",
         "core": true,
-        "pii": false,
         "indexed": true
       },
       {
@@ -53,7 +61,6 @@
         },
         "type": "string",
         "core": true,
-        "pii": false,
         "indexed": true
       },
       {
@@ -71,7 +78,6 @@
         },
         "type": "string",
         "core": true,
-        "pii": false,
         "indexed": true
       },
       {
@@ -81,7 +87,6 @@
         },
         "type": "integer",
         "core": true,
-        "pii": false,
         "indexed": true
       },
       {
@@ -89,12 +94,14 @@
         "source": {
           "lookup": "ProductId"
         },
-        "type": "string",
+        "type": "enum",
         "core": true,
-        "pii": false,
         "indexed": true,
         "options": [
-          "MTBDRplus, SD TB Ag MPT64, Smear, Solid Culture"
+          "MTBDRplus",
+          "SD TB Ag MPT64",
+          "Smear",
+          "Solid Culture"
         ]
       },
       {
@@ -104,7 +111,6 @@
         },
         "type": "enum",
         "core": true,
-        "pii": false,
         "indexed": true,
         "options": [
           "invalid",
@@ -123,7 +129,6 @@
         },
         "type": "enum",
         "core": true,
-        "pii": false,
         "indexed": true,
         "options": [
           "mtb"
@@ -136,7 +141,6 @@
         },
         "type": "enum",
         "core": true,
-        "pii": false,
         "indexed": true,
         "options": [
           "specimen",
