@@ -4,12 +4,14 @@ namespace :csv do
 
   task :watch => :environment do
     sync_dir = CDXSync::SyncDirectory.new
-    watcher = CDXSync::FileWatcher.new(sync_dir)
+    watcher = CDXSync::FileWatcher.new(sync_dir, logger: Rails.logger)
 
     Rails.logger.info "Watching directory #{sync_dir.sync_path}"
 
     watcher.watch do |path|
-      DeviceEventImporter.new.import_single sync_dir, path
+      PoirotRails::Activity.start("Importing file #{path}", dir: sync_dir.sync_path, path: path) do
+        DeviceEventImporter.new.import_single(sync_dir, path)
+      end
     end
   end
 end
