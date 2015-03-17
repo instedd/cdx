@@ -18,6 +18,10 @@ class ManifestFieldMapping
       return map(traverse(node["map"][0], data), node["map"][1])
     end
 
+    if node["lowercase"].present?
+      return traverse(node["lowercase"], data).downcase
+    end
+
     if node["concat"].present?
       return node["concat"].map do |source|
         traverse(source, data)

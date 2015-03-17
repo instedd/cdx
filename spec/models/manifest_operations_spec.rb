@@ -54,6 +54,23 @@ describe Manifest, validate_manifest: false do
         patient: {indexed: {"name" => "Doe, John"}, pii: Hash.new, custom: Hash.new}
     end
 
+    it "converts to lowercase" do
+      assert_manifest_application %(
+        {
+          "patient": [{
+            "target_field" : "name",
+            "source": {
+              "lowercase": {"lookup" : "last_name" }
+            },
+            "core": true,
+            "pii": false,
+            "indexed": true
+          }]
+        }
+      ), %({"last_name" : "Doe"}),
+      patient: {indexed: {"name" => "doe"}, pii: {}, custom: {}}
+    end
+
 
     it "concats the result of a mapping" do
       assert_manifest_application %{
