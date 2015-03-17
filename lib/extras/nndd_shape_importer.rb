@@ -90,12 +90,10 @@ class NNDDShapeImporter
       id_fields.each do |id_field|
         new_id << props[id_field] if props.has_key? id_field
       end
-      props["ID"] = new_id.join "_"
+      id = new_id.join "_"
 
-      name_fields = @levels.reverse.map {|l| "NAME_#{l}" } + ["NAME_FAO"]
-      name_fields.each do |name_field|
-        props["NAME"] ||= props[name_field]
-      end
+      props["ID"] = id
+      props["NAME"] = Location.where(geo_id: id).first.name
     end
 
     File.new(output_path, 'w').write(geojson.to_json)

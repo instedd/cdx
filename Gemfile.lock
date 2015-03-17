@@ -30,13 +30,6 @@ GIT
       sass-rails
 
 GIT
-  remote: https://github.com/flbulgarelli/geojson_import
-  revision: f41f5a1cf9506f336068ec14780a3ce02181e52c
-  branch: master
-  specs:
-    geojson_import (0.0.1)
-
-GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
   revision: 3bd37dd8d92fc636dbddbac32928fcd89a2b5b6f
   branch: master
@@ -52,6 +45,13 @@ GIT
   specs:
     cdx-sync-server (0.0.0)
       filewatcher (= 0.3.6)
+
+GIT
+  remote: https://github.com/instedd/geojson_import
+  revision: fae5bfa63bf179e64e4febc00b0d03beceb4fab8
+  branch: master
+  specs:
+    geojson_import (0.0.1)
 
 GIT
   remote: https://github.com/instedd/poirot_rails.git
