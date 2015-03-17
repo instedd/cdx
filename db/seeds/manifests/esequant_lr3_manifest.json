@@ -5,7 +5,9 @@
     "device_models": [
       "esequant_lr3"
     ],
-    "source_data_type": "json"
+    "source": {
+      "type": "json"
+    }
   },
   "field_mapping": {
     "patient" : [
@@ -106,8 +108,21 @@
       },
       {
         "target_field": "results[*].result",
-        "source": {
-          "lookup": "results[*].result"
+        "source" : {
+          "map" : [
+            {"lookup": "results[*].result"},
+            [
+              {"match": "positive_with_rmp_and_inh", "output" : "positive_with_rmp_and_inh"},
+              {"match": "positive_with_rmp", "output" : "positive_with_rmp"},
+              {"match": "positive_with_inh", "output" : "positive_with_inh"},
+              {"match": "Positive", "output" : "positive"},
+              {"match": "positive", "output" : "positive"},
+              {"match": "valid", "output" : "valid"},
+              {"match": "INVALID", "output" : "invalid"},
+              {"match": "invalid", "output" : "invalid"},
+              {"match": "negative", "output" : "negative"}
+            ]
+          ]
         },
         "type": "enum",
         "core": true,
