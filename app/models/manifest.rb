@@ -144,7 +144,7 @@ class Manifest < ActiveRecord::Base
     fields.map do |field_definition|
       field = source_prefix + field_definition[:name]
       if field_definition[:type] == "nested"
-        map field_definition[:sub_fields], "#{source_prefix}#{field_definition[:name]}[*]."
+        map field_definition[:sub_fields], "#{source_prefix}#{field_definition[:name]}#{COLLECTION_SPLIT_TOKEN}"
       else
         {
           target_field: field,
