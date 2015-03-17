@@ -45,6 +45,8 @@ searchable_fields:
     group_parameter_definition: none
   - name: sample_uuid
     scope: sample
+  - name: sample_id
+    scope: sample
   - name: sample_type
     scope: sample
   - name: uuid
