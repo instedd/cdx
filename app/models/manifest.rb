@@ -111,6 +111,8 @@ class Manifest < ActiveRecord::Base
       JsonEventParser.new
     when "csv"
       CSVEventParser.new metadata["source"]["separator"] || CSVEventParser::DEFAULT_SEPARATOR
+    when "headless_csv"
+      HeadlessCSVEventParser.new metadata["source"]["separator"] || CSVEventParser::DEFAULT_SEPARATOR
     else
       raise "unsupported source data type"
     end

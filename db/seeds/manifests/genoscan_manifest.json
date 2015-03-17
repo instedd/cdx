@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "0.0.3",
+    "version" : "0.0.4",
     "api_version" : "1.1.0",
     "signature" : "",
     "device_models" : ["genoscan"],
@@ -12,7 +12,6 @@
         "target_field": "patient_id",
         "source" : {"lookup" : "PID"},
         "core" : true,
-        "indexed" : false,
         "pii" : true,
         "type" : "string"
       },
@@ -26,7 +25,6 @@
           ]
         },
         "core" : true,
-        "indexed" : false,
         "pii" : true,
         "type" : "string"
       },
@@ -46,7 +44,6 @@
         },
         "core" : true,
         "indexed" : true,
-        "pii" : false,
         "type" : "integer"
       },
       {
@@ -63,17 +60,22 @@
         },
         "core" : true,
         "indexed" : true,
-        "pii" : false,
         "type" : "enum",
         "options" : ["male", "female", "unknown"]
       }
     ],
     "sample" : [
       {
+        "target_field": "sample_uid",
+        "source" : {"lookup" : "SampleNo."},
+        "core" : true,
+        "pii" : true,
+        "type" : "integer"
+      },
+      {
         "target_field": "sample_id",
         "source" : {"lookup" : "SampleNo."},
         "core" : true,
-        "indexed" : true,
         "pii" : true,
         "type" : "integer"
       }
@@ -89,7 +91,6 @@
         },
         "core" : true,
         "indexed" : true,
-        "pii" : false,
         "type" : "date"
       },
       {
@@ -97,7 +98,6 @@
         "source" : {"lookup" : "WindowsUser"},
         "core" : true,
         "indexed" : true,
-        "pii" : false,
         "type" : "string"
       },
       {
@@ -105,7 +105,6 @@
         "source" : {"lookup" : "TypeOfTest"},
         "core" : true,
         "indexed" : true,
-        "pii" : false,
         "type" : "string"
       },
       {
@@ -164,32 +163,23 @@
         },
         "core" : true,
         "indexed" : true,
-        "pii" : false,
         "type" : "enum",
         "options" : ["specimen", "qc"]
       },
       {
         "target_field": "cw",
         "source" : {"lookup" : "CW"},
-        "core" : false,
         "indexed" : true,
-        "pii" : false,
         "type" : "string"
       },
       {
         "target_field": "revision",
         "source" : {"lookup" : "Revision"},
-        "core" : false,
-        "indexed" : false,
-        "pii" : false,
         "type" : "string"
       },
       {
         "target_field": "control",
         "source" : {"lookup" : "Control"},
-        "core" : false,
-        "indexed" : false,
-        "pii" : false,
         "type" : "string"
       },
       {
@@ -205,9 +195,6 @@
             ]
           ]
         },
-        "core" : false,
-        "indexed" : false,
-        "pii" : false,
         "type" : "enum",
         "options" : ["ig_a", "ig_g", "ig_m", "unknown"]
       },
@@ -226,18 +213,12 @@
             ]
           ]
         },
-        "core" : false,
-        "indexed" : false,
-        "pii" : false,
         "type" : "enum",
         "options" : ["patient", "cut_off", "avidity", "liquor", "positive", "negative"]
       },
       {
         "target_field": "bands",
         "source" : {"lookup" : "Bands"},
-        "core" : false,
-        "indexed" : false,
-        "pii" : false,
         "type" : "string"
       }
     ]

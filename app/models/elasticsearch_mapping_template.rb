@@ -119,6 +119,8 @@ class ElasticsearchMappingTemplate
         properties["#{field_name}_id"] = { 'type' => 'string', 'index' => 'not_analyzed' }
         properties["parent_#{field_name.pluralize}"] = { 'type' => 'string', 'index' => 'not_analyzed' }
         properties[field_name] = { 'type' => 'nested' }
+      when "enum"
+        properties[field_name] = {'type' => "string", 'index' => 'not_analyzed'}
       else
         properties[field_name] = {'type' => field[:type], 'index' => 'not_analyzed'}
       end

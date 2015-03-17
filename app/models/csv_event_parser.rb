@@ -24,5 +24,4 @@ class CSVEventParser
       result
     end
   end
-
 end

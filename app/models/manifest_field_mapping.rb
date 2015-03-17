@@ -82,9 +82,22 @@ class ManifestFieldMapping
     end
 
     if node["hash"].present?
-      value = traverse(node["hash"][0], data)
+      value = traverse(node["hash"], data)
       return unless value
       return EventEncryption.hash value
+    end
+
+    if node["if"].present?
+      condition = traverse(node["if"][0], data)
+      if condition
+        return traverse(node["if"][1], data)
+      else
+        return traverse(node["if"][2], data)
+      end
+    end
+
+    if node["equals"].present?
+      return traverse(node["equals"][0], data) == traverse(node["equals"][1], data)
     end
 
     node.to_s
