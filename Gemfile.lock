@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: 3bd37dd8d92fc636dbddbac32928fcd89a2b5b6f
+  revision: 6f8b9ea861c20fa95f630876072afcb1538316ba
   branch: master
   specs:
     cdx-api-elasticsearch (0.0.1)
@@ -158,12 +158,12 @@ GEM
     domain_name (0.5.15)
       unf (>= 0.0.5, < 1.0.0)
     dotenv (0.9.0)
-    elasticsearch (1.0.6)
-      elasticsearch-api (= 1.0.6)
-      elasticsearch-transport (= 1.0.6)
-    elasticsearch-api (1.0.6)
+    elasticsearch (1.0.8)
+      elasticsearch-api (= 1.0.7)
+      elasticsearch-transport (= 1.0.7)
+    elasticsearch-api (1.0.7)
       multi_json
-    elasticsearch-transport (1.0.6)
+    elasticsearch-transport (1.0.7)
       faraday
       multi_json
     encryptor (1.3.0)
@@ -238,7 +238,7 @@ GEM
     mime-types (1.25.1)
     mini_portile (0.5.2)
     minitest (4.7.5)
-    multi_json (1.10.1)
+    multi_json (1.11.0)
     multipart-post (2.0.0)
     mysql2 (0.3.15)
     net-http-digest_auth (1.4)
@@ -358,7 +358,7 @@ GEM
     term-ansicolor (1.3.0)
       tins (~> 1.0)
     thor (0.19.1)
-    thread_safe (0.3.4)
+    thread_safe (0.3.5)
     tilt (1.4.1)
     timecop (0.6.3)
     timers (1.1.0)
