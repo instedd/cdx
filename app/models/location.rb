@@ -26,7 +26,7 @@ class Location < ActiveRecord::Base
   end
 
   def self.find_or_create_default
-    find_by_admin_level(0) || create_default
+    @@default ||= (find_by_admin_level(0) || create_default)
   end
 
   def self.create_default
