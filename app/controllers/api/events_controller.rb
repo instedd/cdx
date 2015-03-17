@@ -3,7 +3,14 @@ class Api::EventsController < ApiController
   skip_before_action :load_current_user_policies, only: :create
 
   def create
-    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by_uuid(params[:device_id])
+    if current_user && !params[:authentication_token]
+      devices_scope = current_user.devices
+    else
+      devices_scope = Device.all
+    end
+
+    device = devices_scope.includes(:manifests, :institution, :laboratories, :locations).find_by_uuid(params[:device_id])
+
     if authenticate_create(device)
       data = request.body.read rescue nil
       device_event = DeviceEvent.new(device: device, plain_text_data: data)
@@ -19,7 +26,7 @@ class Api::EventsController < ApiController
         render :status => :unprocessable_entity, :json => { :errors => device_event.errors.full_messages.join(', ') }
       end
     else
-      render :status => :forbidden, :json => {}
+      head :unauthorized
     end
   end
 
@@ -59,6 +66,15 @@ class Api::EventsController < ApiController
 
   def authenticate_create(device)
     token = params[:authentication_token]
-    token.blank? ? authenticate_api_user! : device.validate_authentication(token)
+    return true if current_user && !token
+    token ||= basic_password
+    return false unless token
+    device.validate_authentication(token)
+  end
+
+  def basic_password
+    ActionController::HttpAuthentication::Basic.authenticate(request) do |user, password|
+      password
+    end
   end
 end
