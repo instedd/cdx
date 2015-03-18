@@ -30,6 +30,9 @@ namespace :geo do
     NNDDShapeImporter.new(filenames).import!
   end
 
+  task :all => [:logger, :download, :import, :nndd] do
+  end
+
   task :logger => :environment do
     if Rails.env.development?
       logger       = Logger.new(STDOUT)
