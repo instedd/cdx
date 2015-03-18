@@ -47,6 +47,11 @@ class Manifest < ActiveRecord::Base
     new definition: default_definition
   end
 
+  def reload
+    @loaded_definition = nil
+    super
+  end
+
   def update_models
     self.device_models = Array(metadata["device_models"] || []).map { |model| DeviceModel.find_or_create_by(name: model)}
   end

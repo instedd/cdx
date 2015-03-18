@@ -88,7 +88,7 @@ describe EventsSchema do
       "searchable" => true
     }
 
-    schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)
+    schema = EventsSchema.new "es-AR", {assay_name: "first_assay"}, Manifest.new(definition:definition)
     schema = schema.build
 
     schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
@@ -126,7 +126,7 @@ describe EventsSchema do
       "searchable" => true
     }
 
-    schema = EventsSchema.new "es-AR", "first_assay", Manifest.new(definition:definition)
+    schema = EventsSchema.new "es-AR", {assay_name: "first_assay"}, Manifest.new(definition:definition)
     schema = schema.build
 
     schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
@@ -189,6 +189,7 @@ describe EventsSchema do
     schema["properties"]["assay_name"].should eq({
       "title" => "Assay Name",
       "type" => "string",
+      "searchable" => true,
       "enum" => ["first_assay", "second_assay", "cardridge_1", "cardridge_2"],
       "values" => {
         "first_assay" => {"name" => "First Assay"},

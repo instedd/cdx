@@ -456,8 +456,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       it "should respond with an error if no manifest is present for a given assay name" do
         response = get :schema, assay_name: "first_assay", locale: "es-AR", format: 'json'
-
-        Oj.load(response.body)["errors"].should eq("There is no manifest for assay_name: 'first_assay'.")
+        Oj.load(response.body)["errors"].should_not be_empty
       end
 
 
@@ -516,6 +515,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         schema["properties"]["assay_name"].should eq({
           "title" => "Assay Name",
           "type" => "string",
+          "searchable" => true,
           "enum" => ["first_assay", "second_assay", "cardridge_1", "cardridge_2"],
           "values" => {
             "first_assay" => {"name" => "First Assay"},

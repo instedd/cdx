@@ -1,17 +1,28 @@
 class EventsSchema
-  def initialize locale="en-US", assay_name=nil, manifest=nil
-    @assay_name = assay_name
+
+  CONTEXT_KEYS = %w(condition assay_name status test_type).freeze
+
+  def initialize locale="en-US", context=nil, manifest_or_manifests=nil
+    @context = (context || {}).select{|key| CONTEXT_KEYS.include?(key.to_s)}.stringify_keys
     @locale = locale
-    @manifest = manifest
+    @manifests = Array.wrap(manifest_or_manifests || manifests_for(@context))
+    raise ActiveRecord::RecordNotFound.new("No manifests found for context #{@context}") if @manifests.blank?
   end
 
-  def self.for locale, assay_name=nil
-    locale ||= "en-US"
-    if assay_name.present?
-      EventsSchema.new locale, assay_name, Manifest.find_by_assay_name(assay_name)
-    else
-      EventsSchema.new locale
+  def self.for locale, context=nil
+    EventsSchema.new(locale || "en-US", context, nil)
+  end
+
+  def manifests_for(context)
+    CONTEXT_KEYS.each do |field|
+      return Manifest.valid.select{|m| manifest_applies_to?(m, field, context[field])} if context[field]
     end
+    Manifest.valid
+  end
+
+  def manifest_applies_to?(manifest, field_name, value)
+    field = manifest.flat_mappings.find{|mapping| field_name(mapping) == field_name}
+    return field && field['options'] && field['options'].include?(value)
   end
 
   def build
@@ -25,22 +36,36 @@ class EventsSchema
 
     schema["$schema"] = 'http://json-schema.org/draft-04/schema#'
     schema["type"] = "object"
-    schema["title"] = if @assay_name.present?
-      "#{@assay_name}.#{@locale}"
-    else
-      @locale
-    end
+    schema["title"] = schema_title
     schema["properties"] = Hash.new
 
-    (@manifest || Manifest.default).flat_mappings.each do |field|
-      schema["properties"][field_name(field)] = schema_for field
-    end
-
-    unless @manifest
-      schema["properties"]["assay_name"] = all_assay_names_schema
+    @manifests.each do |manifest|
+      manifest.flat_mappings.each do |field|
+        name = field_name(field)
+        next if @context.keys.include?(name)
+        field_schema = schema_for(field)
+        if existing = schema["properties"][name]
+          if existing['type'] != field_schema['type']
+            Rails.logger.warn("Warning merging field #{name} from manifests #{@manifests.map(&:id)}: inconsistent types found (#{existing['type']} vs #{field_schema['type']}). Skipping field of type #{field_schema['type']} from manifest #{manifest.id}.")
+          elsif existing['enum'] && field_schema['enum']
+            merge_options!(existing, field_schema)
+          end
+        else
+          schema["properties"][name] = field_schema
+        end
+      end
     end
 
     schema
+  end
+
+  def merge_options!(existing, newfield)
+    existing['enum'] |= newfield['enum']
+    existing['values'].merge!(newfield['values'])
+  end
+
+  def schema_title
+    (@context.values + [@locale]).map(&:to_s).join('.') rescue @locale
   end
 
   def schema_for field
@@ -93,13 +118,14 @@ class EventsSchema
 
       #TODO Remove this regex and let the manifest specify this values
       kind = case option
-      when /.*positive.*/i
+      when /.*pos.*/i
         'positive'
-      when /.*negative.*/i
+      when /.*neg.*/i
         'negative'
       end
 
-      values[option] = { "name" => option.titleize, "kind" => kind }
+      values[option] = { "name" => option.titleize }
+      values[option]['kind'] = kind if kind
       values
     end
     schema["values"] = values
@@ -127,31 +153,31 @@ class EventsSchema
   end
 
 
-  def all_assay_names_schema
-    enum = all_assay_names
-    values = enum.inject Hash.new do |values, assay_name|
-        values[assay_name] = { "name" => assay_name.titleize }
-        values
-      end
-    {
-      "title" => "Assay Name",
-      "type" => "string",
-      "enum" => enum,
-      "values" => values
-    }
+  # def all_assay_names_schema
+  #   enum = all_assay_names
+  #   values = enum.inject Hash.new do |values, assay_name|
+  #       values[assay_name] = { "name" => assay_name.titleize }
+  #       values
+  #     end
+  #   {
+  #     "title" => "Assay Name",
+  #     "type" => "string",
+  #     "enum" => enum,
+  #     "values" => values
+  #   }
 
-  end
+  # end
 
-  def all_assay_names
-    #TODO This should be AssayName.all
-    assay_names = Manifest.valid.collect do |manifest|
-      assay_mapping = manifest.flat_mappings.detect do |mapping|
-        mapping["target_field"] == "assay_name"
-      end
+  # def all_assay_names
+  #   #TODO This should be AssayName.all
+  #   assay_names = Manifest.valid.collect do |manifest|
+  #     assay_mapping = manifest.flat_mappings.detect do |mapping|
+  #       mapping["target_field"] == "assay_name"
+  #     end
 
-      assay_mapping["options"]
-    end.flatten
-    assay_names.delete nil
-    assay_names
-  end
+  #     assay_mapping["options"]
+  #   end.flatten
+  #   assay_names.delete nil
+  #   assay_names
+  # end
 end
