@@ -14,8 +14,14 @@ class Subscriber < ActiveRecord::Base
   validates_inclusion_of :verb, in: VALID_VERBS
 
   def self.notify_all
-    Subscriber.find_each do |subscriber|
-      subscriber.notify
+    PoirotRails::Activity.start("Subscriber.notify_all") do
+      Subscriber.find_each do |subscriber|
+        begin
+          subscriber.notify
+        rescue => ex
+          Rails.logger.info "#{ex.message} : #{ex.backtrace}"
+        end
+      end
     end
   end
 
