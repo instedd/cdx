@@ -19,7 +19,7 @@ class Subscriber < ActiveRecord::Base
         begin
           subscriber.notify
         rescue => ex
-          Rails.logger.info "#{ex.message} : #{ex.backtrace}"
+          Rails.logger.error "#{ex.message} : #{ex.backtrace}"
         end
       end
     end
@@ -32,6 +32,7 @@ class Subscriber < ActiveRecord::Base
   def notify
     fields = self.fields
     filter = self.filter.query
+    Rails.logger.info "Filter : #{filter}"
     filter["updated_at_since"] = last_run_at.iso8601
     events = Cdx::Api::Elasticsearch::Query.new(filter).execute["events"]
     now = Time.now
