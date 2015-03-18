@@ -47,6 +47,13 @@ GIT
       filewatcher (= 0.3.6)
 
 GIT
+  remote: https://github.com/instedd/geojson_import
+  revision: fae5bfa63bf179e64e4febc00b0d03beceb4fab8
+  branch: master
+  specs:
+    geojson_import (0.0.1)
+
+GIT
   remote: https://github.com/instedd/poirot_rails.git
   revision: 2fce8f5b833c94c901daee6acd172cf2d75450b7
   branch: master
@@ -420,6 +427,7 @@ DEPENDENCIES
   encryptor
   faker
   foreman
+  geojson_import!
   guard-rspec
   guid
   haml-rails

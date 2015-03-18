@@ -26,3 +26,6 @@ cdxapi/.eunit
 cdxapi/ebin
 cdxapi/log
 VERSION
+
+/etc/shapes/*
+/public/polygons/*

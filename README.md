@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/instedd/cdp.svg?branch=master)](https://travis-ci.org/instedd/cdp)
 
-# README
+# CDX
 
 Reference implementation for the Connected Diagnostics API (http://dxapi.org/)
 
@@ -32,6 +32,10 @@ To start developing:
   ```
     bundle exec rails s
   ```
+
+### Locations setup
+
+Locations are imported from GeoJSON files specified as `remote_shapefiles` in `config/settings.yml`. Upon running `rake geo:all`, these files will be downloaded, imported as Location entities, and converted to Topojson for usage from NNDD. Note that if there are CSV files with the same name as the GeoJSONs, they will be used for overriding the names of the locations; this is useful for GADM imports, which provide an extra CSV since the original Shapefiles cannot handle unicode chars.
 
 ### Sync Server
 
