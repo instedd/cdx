@@ -62,12 +62,12 @@ class Device < ActiveRecord::Base
   end
 
   def set_key
-    self.secret_key = Guid.new.to_s
+    self.secret_key = EventEncryption.secure_random(9)
     self.ssh_keys.destroy_all
     self.activation_tokens.destroy_all
   end
 
   def set_uuid
-    self.uuid = Guid.new.to_s
+    self.uuid = EventEncryption.secure_random(9)
   end
 end
