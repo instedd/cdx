@@ -39,8 +39,6 @@ searchable_fields:
     type: date
   - name: updated_at
     type: date
-    filter_parameter_definition: none
-    group_parameter_definition: none
   - name: event_id
     group_parameter_definition: none
   - name: sample_uuid
