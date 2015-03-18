@@ -2,6 +2,7 @@
   "brand": "CDP",
   "api": "/api",
   "useLocalStorage" : true,
+  "reportMainField": "condition",
   "polygons": {
     "location": {
       "1": "/polygons/level-0.topo.json",
