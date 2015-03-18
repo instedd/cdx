@@ -27,7 +27,7 @@ class EventIndexer
   end
 
   def elasticsearch_id
-    "#{device.secret_key}_#{event.event_id || event.uuid}"
+    "#{device.uuid}_#{event.event_id || event.uuid}"
   end
 
   def index_name
@@ -68,7 +68,7 @@ class EventIndexer
     properties = {
       created_at: event.created_at.utc.iso8601,
       updated_at: event.updated_at.utc.iso8601,
-      device_uuid: device.secret_key,
+      device_uuid: device.uuid,
       uuid: event.uuid,
       location_id: location_id,
       parent_locations: parent_locations_id,
