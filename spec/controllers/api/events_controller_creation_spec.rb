@@ -34,7 +34,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       event = all_elasticsearch_events_for(institution).first["_source"]
       event["results"].first["result"].should eq("positive")
       event["created_at"].should_not eq(nil)
-      event["device_uuid"].should eq(device.secret_key)
+      event["device_uuid"].should eq(device.uuid)
       Event.first.uuid.should eq(event["uuid"])
     end
 
@@ -82,7 +82,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       events.size.should eq(1)
       event = events.first
       event["_source"]["event_id"].should eq("1234")
-      event["_id"].should eq("#{device.secret_key}_1234")
+      event["_id"].should eq("#{device.uuid}_1234")
       event["_source"]["age"].should eq(20)
 
       post :create, Oj.dump(event_id: "1234", age: 30), device_id: device.uuid, authentication_token: device.secret_key
@@ -98,7 +98,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       events.size.should eq(1)
       event = events.first
       event["_source"]["event_id"].should eq("1234")
-      event["_id"].should eq("#{device.secret_key}_1234")
+      event["_id"].should eq("#{device.uuid}_1234")
       event["_source"]["age"].should eq(30)
 
       a_device = Device.make(institution: institution)

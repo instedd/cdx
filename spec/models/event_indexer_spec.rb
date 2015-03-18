@@ -46,7 +46,7 @@ describe EventIndexer, elasticsearch: true do
         start_time: event.created_at.utc.iso8601,
         created_at: event.created_at.utc.iso8601,
         updated_at: event.updated_at.utc.iso8601,
-        device_uuid: event.device.secret_key,
+        device_uuid: event.device.uuid,
         uuid: event.uuid,
         location_id: event.device.laboratories.first.location.geo_id,
         parent_locations: Location.all.map(&:geo_id),
@@ -70,7 +70,7 @@ describe EventIndexer, elasticsearch: true do
           }
         ]
       },
-      id: "#{event.device.secret_key}_4")
+      id: "#{event.device.uuid}_4")
 
     event_indexer.index
   end
