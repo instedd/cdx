@@ -8,7 +8,7 @@ class ManifestFieldValidation
   def apply_to(value)
     return unless value.present?
 
-    if @field['type'] == 'integer' && !is_an_integer?(value)
+    if @field['type'] == 'integer' && !self.class.is_an_integer?(value)
       raise ManifestParsingError.invalid_value_for_integer(value, @target_field)
     end
 
@@ -25,7 +25,7 @@ class ManifestFieldValidation
     end
   end
 
-  def is_an_integer? value
+  def self.is_an_integer? value
     value.is_a?(Integer) || value.to_i.to_s == value
   end
 

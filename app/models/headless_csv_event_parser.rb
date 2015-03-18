@@ -6,10 +6,10 @@ class HeadlessCSVEventParser
   end
 
   def lookup(path, data)
-    unless ManifestFieldValidation.new(nil).is_an_integer?(path)
+    unless ManifestFieldValidation.is_an_integer?(path)
       raise "Header lookup is unsupported for headless CSV Events"
     else
-      data[path]
+      data[path.to_i]
     end
   end
 

@@ -3,28 +3,28 @@
     "version" : "0.0.1",
     "api_version" : "1.1.0",
     "signature" : "",
-    "device_models" : ["epicenter_es"],
-    "source": { "type" : "csv", "separator" : "," }
+    "device_models" : ["epicenter_headless_es"],
+    "source": { "type" : "headless_csv", "separator" : "," }
   },
   "field_mapping" : {
     "patient" : [
       {
         "target_field": "patient_id",
-        "source" : {"lookup" : "ID del paciente"},
+        "source" : {"lookup" : "1"},
         "core" : true,
         "pii" : true,
         "type" : "string"
       },
       {
         "target_field": "patient_name",
-        "source" : {"lookup" : "Nombre del paciente"},
+        "source" : {"lookup" : "0"},
         "core" : true,
         "pii" : true,
         "type" : "string"
       },
       {
         "target_field": "age",
-        "source" : {"lookup" : "Edad del paciente"},
+        "source" : {"lookup" : "3"},
         "core" : true,
         "indexed" : true,
         "type" : "integer"
@@ -33,7 +33,7 @@
         "target_field": "gender",
         "source" : {
           "map" : [
-            {"lookup" : "Sexo del paciente"},
+            {"lookup" : "2"},
             [
               {"match": "*Masculino*", "output" : "male"},
               {"match": "*Femenino*", "output" : "female"},
@@ -50,7 +50,7 @@
         "target_field": "hiv",
         "source" : {
           "map" : [
-            {"lookup" : "HIV"},
+            {"lookup" : "4"},
             [
               {"match": "*NEGATIVO*", "output" : "negative"},
               {"match": "*POSITIVO*", "output" : "positive"}
@@ -64,7 +64,7 @@
       },
       {
         "target_field": "ethnicity",
-        "source" : {"lookup" : "Ethnicity"},
+        "source" : {"lookup" : "5"},
         "core" : true,
         "indexed" : true,
         "type" : "enum",
@@ -72,7 +72,7 @@
       },
       {
         "target_field": "race",
-        "source" : {"lookup" : "Race"},
+        "source" : {"lookup" : "6"},
         "core" : true,
         "indexed" : true,
         "type" : "enum",
@@ -81,9 +81,9 @@
       {
         "target_field": "race_ethnicity",
         "source" : { "if" : [
-          {"equals" : [{"lookup" : "Ethnicity"}, "hispanic"]},
+          {"equals" : [{"lookup" : "5"}, "hispanic"]},
           "hispanic",
-          {"lookup" : "Race"}
+          {"lookup" : "6"}
         ]},
         "core" : true,
         "indexed" : true,
@@ -94,7 +94,7 @@
     "sample" : [
       {
         "target_field": "sample_id",
-        "source" : {"lookup" : "N de Acceso"},
+        "source" : {"lookup" : "7"},
         "core" : true,
         "pii" : true,
         "type" : "string"
@@ -102,8 +102,8 @@
       {
         "target_field": "sample_uid",
         "source" : {"concat" : [
-          {"lookup" : "ID del paciente"},
-          {"lookup" : "N de Acceso"}
+          {"lookup" : "1"},
+          {"lookup" : "7"}
         ]},
         "core" : true,
         "pii" : true,
@@ -113,7 +113,7 @@
         "target_field": "sample_type",
         "source" : {
           "map" : [
-            {"lookup" : "Tipo de muestra"},
+            {"lookup" : "10"},
             [
               {"match": "ES",  "output" : "sputum"},
               {"match": "LB",  "output" : "gastric_lavage"},
@@ -153,7 +153,7 @@
         "target_field": "sample_type_group",
         "source" : {
           "map" : [
-            {"lookup" : "Grupo de tipo de muestra"},
+            {"lookup" : "9"},
             [
               {"match": "GRPPUL", "output" : "extrapulmonary"},
               {"match": "GRPEXT", "output" : "intrapulmonary"}
@@ -171,10 +171,10 @@
         "source" : {
           "hash" : {
             "concat" : [
-              {"lookup" : "ID del paciente"},
-              {"lookup" : "N de Acceso"},
-              {"lookup" : "Nombre del test"},
-              {"lookup" : "Nombre del antibiotico del test"}
+              {"lookup" : "1"},
+              {"lookup" : "7"},
+              {"lookup" : "11"},
+              {"lookup" : "14"}
             ]
           }
         },
@@ -186,7 +186,7 @@
         "target_field": "start_time",
         "source" : {
           "parse_date" : [
-              {"lookup" : "Fecha y hora de recogida de la muesta"},
+              {"lookup" : "8"},
               "%d/%m/%Y %I:%M:%S %P"
             ]
         },
@@ -206,8 +206,8 @@
         "target_field": "assay_name",
         "source" : {
           "concat" : [
-            {"lookup" : "Nombre del test"},
-            {"lookup" : "Nombre del antibiotico del test"}
+            {"lookup" : "11"},
+            {"lookup" : "14"}
           ]
         },
         "core" : true,
@@ -226,11 +226,11 @@
         "target_field" : "results[*].result",
         "source" : {
           "if" : [
-            {"equals" : [{"lookup" : "Estatus del test"}, "."]},
+            {"equals" : [{"lookup" : "12"}, "."]},
             {"concat" : [
               {
                 "map": [
-                {"lookup" : "Nombre del antibiotico del test"},
+                {"lookup" : "14"},
                 [
                   {"match": "Estreptomicina", "output" : "streptomycin"},
                   {"match": "Etambutol", "output" : "ethambutol"},
@@ -246,7 +246,7 @@
               "_",
               {
                 "map": [
-                {"lookup" : "Resultado SIR del antibiotico del test"},
+                {"lookup" : "15"},
                 [
                   {"match": "X", "output" : "invalid"},
                   {"match": "S", "output" : "sensitive"},
@@ -259,7 +259,7 @@
               "map" : [
                 {
                   "concat" : [
-                    {"lookup" : "Estatus del test"}
+                    {"lookup" : "12"}
                   ]
                 },
                 [
@@ -325,7 +325,7 @@
         "target_field" : "status",
         "source" : {
           "map" : [
-            {"lookup" : "Estatus del test"},
+            {"lookup" : "12"},
             [
               {"match": "No v*lido", "output" : "invalid"},
               {"match": "Negativo", "output" : "negative"},

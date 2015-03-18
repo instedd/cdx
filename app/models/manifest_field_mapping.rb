@@ -252,7 +252,7 @@ class ManifestFieldMapping
   end
 
   def coerce_values value
-    if @field['type'] == 'integer' &&  ManifestFieldValidation.new(@field).is_an_integer?(value)
+    if @field['type'] == 'integer' &&  ManifestFieldValidation.is_an_integer?(value)
       value.to_i
     else
       value
