@@ -26,7 +26,7 @@ class Subscriber < ActiveRecord::Base
   def notify
     fields = self.fields
     filter = self.filter.query
-    filter["since"] = last_run_at.iso8601
+    filter["updated_at_since"] = last_run_at.iso8601
     events = Cdx::Api::Elasticsearch::Query.new(filter).execute["events"]
     now = Time.now
     events.each do |event|
