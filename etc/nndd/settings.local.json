@@ -3,6 +3,8 @@
   "api": "/api",
   "useLocalStorage" : true,
   "reportMainField": "condition",
+  "mapCenter": [15.978, 105.807],
+  "mapBounds": [[23, 116], [8, 103]],
   "polygons": {
     "location": {
       "1": "/polygons/level-0.topo.json",
