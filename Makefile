@@ -3,5 +3,11 @@ TAG := instedd/cdp
 
 docker-image:
 	echo $(VERSION) > VERSION
+	rm -rf public/nndd
+	docker run --rm \
+		-v $(shell pwd)/public/nndd:/nndd/dist/nndd \
+		-v $(shell pwd)/etc/nndd/settings.local.json:/nndd/conf/settings.local.json \
+		instedd/nndd-builder
+	rake geo
 	docker build --tag $(TAG):$(VERSION) .
 	docker push $(TAG):$(VERSION)
