@@ -1,6 +1,6 @@
 class Filter < ActiveRecord::Base
   belongs_to :user
-  has_many :subscribers, ->(f) { where user_id: f.user_id }
+  has_many :subscribers, ->(f) { where user_id: f.user_id }, dependent: :restrict_with_error
   serialize :query, JSON
 
   validates_presence_of :user

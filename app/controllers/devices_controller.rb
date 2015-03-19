@@ -1,4 +1,7 @@
 class DevicesController < ApplicationController
+  require 'barby'
+  require 'barby/barcode/code_93'
+  require 'barby/outputter/html_outputter'
   layout "institutions"
   set_institution_tab :devices
 
@@ -50,6 +53,8 @@ class DevicesController < ApplicationController
     @device = @institution.devices.find params[:id]
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
+    @uuid_barcode = Barby::Code93.new(@device.uuid)
+    @uuid_barcode_for_html = Barby::HtmlOutputter.new(@uuid_barcode)
     # TODO: check valid laboratories
 
     @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
@@ -91,6 +96,9 @@ class DevicesController < ApplicationController
     return unless authorize_resource(@device, REGENERATE_DEVICE_KEY)
 
     @device.set_key
+
+    @key_barcode = Barby::Code93.new(@device.secret_key)
+    @key_barcode_for_html = Barby::HtmlOutputter.new(@key_barcode)
 
     respond_to do |format|
       if @device.save

@@ -8,6 +8,7 @@ class Device < ActiveRecord::Base
   has_many :locations, through: :laboratories
   has_many :events
   has_many :activation_tokens
+  validates_uniqueness_of :uuid
 
   validates_presence_of :institution
   validates_presence_of :name
@@ -62,12 +63,12 @@ class Device < ActiveRecord::Base
   end
 
   def set_key
-    self.secret_key = Guid.new.to_s
+    self.secret_key = EventEncryption.secure_random(9)
     self.ssh_keys.destroy_all
     self.activation_tokens.destroy_all
   end
 
   def set_uuid
-    self.uuid = Guid.new.to_s
+    self.uuid = EventEncryption.secure_random(9)
   end
 end

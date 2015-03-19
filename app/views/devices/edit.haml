@@ -3,6 +3,7 @@
   %p
     %strong UUID:
     = @device.uuid
+    = raw @uuid_barcode_for_html.to_html
 
   = render 'form'
 
