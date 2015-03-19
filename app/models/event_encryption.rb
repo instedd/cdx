@@ -18,9 +18,6 @@ module EventEncryption
   end
 
   def self.secure_random length
-    # min = ('1' + '0' * (length - 1)).to_i(36)
-    # max = ('Z' * length).to_i(36)
-    # (SecureRandom.random_number(max - min) + min).to_s(36).upcase
     Base64.urlsafe_encode64(SecureRandom.random_bytes(length))
   end
 

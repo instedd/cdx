@@ -8,6 +8,7 @@ class Device < ActiveRecord::Base
   has_many :locations, through: :laboratories
   has_many :events
   has_many :activation_tokens
+  validates_uniqueness_of :uuid
 
   validates_presence_of :institution
   validates_presence_of :name
