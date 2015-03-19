@@ -59,7 +59,15 @@ textarea {
 
 
 //----- Barby -------
-table.barby-barcode { border-spacing: 0; }
+table.barby-barcode {
+  border-spacing: 0;
+  width: 200px;
+  height: 50px;
+}
 tr.barby-row {}
-td.barby-cell { width: 3px; height: 100px; }
-td.barby-cell.on { background: #000; }
+td.barby-cell {
+  width: 3px;
+}
+td.barby-cell.on {
+  background: #000;
+}
