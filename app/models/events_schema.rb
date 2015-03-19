@@ -14,10 +14,9 @@ class EventsSchema
   end
 
   def manifests_for(context)
-    CONTEXT_KEYS.each do |field|
-      return Manifest.valid.select{|m| manifest_applies_to?(m, field, context[field])} if context[field]
-    end
-    Manifest.valid
+    Manifest.valid.select do |manifest|
+      context.keys.all? { |field| manifest_applies_to?(manifest, field, context[field]) }
+    end + [Manifest.default]
   end
 
   def manifest_applies_to?(manifest, field_name, value)
@@ -152,32 +151,4 @@ class EventsSchema
     end
   end
 
-
-  # def all_assay_names_schema
-  #   enum = all_assay_names
-  #   values = enum.inject Hash.new do |values, assay_name|
-  #       values[assay_name] = { "name" => assay_name.titleize }
-  #       values
-  #     end
-  #   {
-  #     "title" => "Assay Name",
-  #     "type" => "string",
-  #     "enum" => enum,
-  #     "values" => values
-  #   }
-
-  # end
-
-  # def all_assay_names
-  #   #TODO This should be AssayName.all
-  #   assay_names = Manifest.valid.collect do |manifest|
-  #     assay_mapping = manifest.flat_mappings.detect do |mapping|
-  #       mapping["target_field"] == "assay_name"
-  #     end
-
-  #     assay_mapping["options"]
-  #   end.flatten
-  #   assay_names.delete nil
-  #   assay_names
-  # end
 end
