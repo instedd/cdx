@@ -135,7 +135,7 @@
       {
         "target_field" : "assay_name",
         "source" : {"lookup" : "assay_name"},
-        "type" : "string",
+        "type" : "enum",
         "core" : true,
         "indexed" : true,
         "options":["MTB Assay"]

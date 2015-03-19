@@ -39,6 +39,13 @@ Locations are imported from GeoJSON files specified as `remote_shapefiles` in `c
 
 This task requires the executables `topojson` and `mapshaper` to be available, which can be installed via `npm`. The fullpath to the executables can be provided by the environment variables `TOPOJSON` and `MAPSHAPER` respectively.
 
+### NNDD
+
+To run [notifiable diseases](https://github.com/instedd/notifiable-diseases) on development, checkout the project and symlink the custom settings files in `/etc/nndd` on this project:
+
+    $ cd $NOTIFIABLE_DISEASES/conf
+    $ ln -s $CEPHEID_WEB/etc/nndd/settings.json settings.local.json
+
 ### Sync Server
 
 In order to allow synchronization of clients through rsyns - for csv files -, you should use [cdx-sync-sshd](https://github.com/instedd/cdx-sync-sshd), which is a dockerized sshd container, with an inbox and outbox directoy for each client. Download and build it before continuing.
