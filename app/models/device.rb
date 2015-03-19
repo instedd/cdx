@@ -7,16 +7,15 @@ class Device < ActiveRecord::Base
   has_and_belongs_to_many :laboratories
   has_many :locations, through: :laboratories
   has_many :events
-  has_many :activation_tokens
-  validates_uniqueness_of :uuid
+  has_many :activation_tokens, dependent: :destroy
+  has_many :ssh_keys, dependent: :destroy
 
+  validates_uniqueness_of :uuid
   validates_presence_of :institution
   validates_presence_of :name
   validates_presence_of :device_model
 
   before_create :set_key, :set_uuid
-
-  has_many :ssh_keys
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions

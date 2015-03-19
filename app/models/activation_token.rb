@@ -1,6 +1,6 @@
 class ActivationToken < ActiveRecord::Base
   belongs_to :device
-  has_one :activation
+  has_one :activation, dependent: :destroy
 
   validates_presence_of :device, :client_id, :value
 
