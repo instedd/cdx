@@ -60,7 +60,7 @@ class EventsSchema
 
   def merge_options!(existing, newfield)
     existing['enum'] |= newfield['enum']
-    existing['values'].merge!(newfield['values'])
+    existing['values'].merge!(newfield['values'] || {}) if existing['values']
   end
 
   def schema_title

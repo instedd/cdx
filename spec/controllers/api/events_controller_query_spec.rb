@@ -454,12 +454,6 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         schema["properties"]["location"].should eq(location_schema)
       end
 
-      it "should respond with an error if no manifest is present for a given assay name" do
-        response = get :schema, assay_name: "first_assay", locale: "es-AR", format: 'json'
-        Oj.load(response.body)["errors"].should_not be_empty
-      end
-
-
       it "should return an empty schema with all the assay_names available if none is provided" do
         Manifest.create! definition: %{{
           "metadata" : {
