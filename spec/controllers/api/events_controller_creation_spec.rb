@@ -424,18 +424,18 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
         events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["results"][0]["result"] }
-        events.should have(5).items
+        events.should have(13).items
 
         event = events.first["_source"]
         event["results"][0]["condition"].should eq("mtb")
-        event["results"][0]["result"].should eq("positive")
+        event["results"][0]["result"].should eq("negative")
 
         event = events.last["_source"]
         event["results"][0]["condition"].should eq("mtb")
         event["results"][0]["result"].should eq("positive_with_rmp_and_inh")
 
         dbevents = Event.all
-        dbevents.should have(5).items
+        dbevents.should have(13).items
         dbevents.map(&:uuid).should =~ events.map {|e| e['_source']['uuid']}
       end
 
