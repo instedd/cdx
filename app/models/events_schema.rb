@@ -40,17 +40,17 @@ class EventsSchema
 
     @manifests.each do |manifest|
       manifest.flat_mappings.each do |field|
-        name = field_name(field)
-        next if @context.keys.include?(name)
-        field_schema = schema_for(field)
-        if existing = schema["properties"][name]
-          if existing['type'] != field_schema['type']
-            Rails.logger.warn("Warning merging field #{name} from manifests #{@manifests.map(&:id)}: inconsistent types found (#{existing['type']} vs #{field_schema['type']}). Skipping field of type #{field_schema['type']} from manifest #{manifest.id}.")
-          elsif existing['enum'] && field_schema['enum']
-            merge_options!(existing, field_schema)
+        schemas_for(field).each do |name, field_schema|
+          next if @context.keys.include?(name)
+          if existing = schema["properties"][name]
+            if existing['type'] != field_schema['type']
+              Rails.logger.warn("Warning merging field #{name} from manifests #{@manifests.map(&:id)}: inconsistent types found (#{existing['type']} vs #{field_schema['type']}). Skipping field of type #{field_schema['type']} from manifest #{manifest.id}.")
+            elsif existing['enum'] && field_schema['enum']
+              merge_options!(existing, field_schema)
+            end
+          else
+            schema["properties"][name] = field_schema
           end
-        else
-          schema["properties"][name] = field_schema
         end
       end
     end
@@ -67,9 +67,12 @@ class EventsSchema
     (@context.values + [@locale]).map(&:to_s).join('.') rescue @locale
   end
 
-  def schema_for field
+  def schemas_for field
     schema = Hash.new
+    name = field_name(field)
+
     schema["title"] = field_title field
+
     case field["type"]
     when "date"
       date_schema schema
@@ -79,13 +82,19 @@ class EventsSchema
       enum_schema schema, field
     when "location"
       location_schema schema
+      set_searchable schema, field
+      coords_schema(coords = Hash.new, field)
+      return [[name, schema], ["#{name}_coords", coords]]
     else
       string_schema schema
     end
 
-    schema['searchable'] = field["core"] && field["indexed"] || false
+    set_searchable schema, field
+    [[name, schema]]
+  end
 
-    schema
+  def set_searchable schema, field
+    schema['searchable'] = field["core"] && field["indexed"] || false
   end
 
   def field_name field
@@ -149,6 +158,14 @@ class EventsSchema
         "lng" => location.lng
       }
     end
+  end
+
+  def coords_schema schema, field
+    schema["title"] = "#{field_title(field)} coordinates"
+    schema["searchable"] = false
+    schema["type"] = "string"
+    schema["format"] = "lat,lng"
+    schema["location_identifier"] = field_name(field)
   end
 
 end
