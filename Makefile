@@ -4,6 +4,8 @@ TAG := instedd/cdp
 docker-image:
 	echo $(VERSION) > VERSION
 	rm -rf public/nndd
+	# Uncomment next line to update nndd to the latest version
+	# docker pull instedd/nndd-builder:latest
 	docker run --rm \
 		-v $(shell pwd)/public/nndd:/nndd/dist/nndd \
 		-v $(shell pwd)/etc/nndd/settings.local.json:/nndd/conf/settings.local.json \
