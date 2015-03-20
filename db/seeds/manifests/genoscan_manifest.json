@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "0.0.5",
+    "version" : "0.0.6",
     "api_version" : "1.1.0",
     "signature" : "",
     "device_models" : ["genoscan"],
@@ -71,14 +71,20 @@
     "sample" : [
       {
         "target_field": "sample_uid",
-        "source" : {"lookup" : "PID"},
+        "source" : {
+          "concat" : [
+              {"lookup" : "PID"},
+              "-",
+              {"lookup" : "SampleNo."}
+          ]
+        },
         "core" : true,
         "pii" : true,
         "type" : "string"
       },
       {
         "target_field": "sample_id",
-        "source" : {"lookup" : "PID"},
+        "source" : {"lookup" : "SampleNo."},
         "core" : true,
         "pii" : true,
         "type" : "string"
