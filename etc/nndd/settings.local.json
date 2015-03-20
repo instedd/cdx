@@ -6,7 +6,7 @@
   "mapCenter": [15.978, 105.807],
   "mapBounds": null,
   "onlyShowPositiveResults": false,
-  "parentURL": "http://localhost:3000/dashboards/nndd",
+  "parentURL": "/dashboards/nndd",
   "customStyles": "../conf/custom.local.scss",
   "polygons": {
     "location": {
