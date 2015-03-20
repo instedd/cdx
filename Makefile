@@ -7,9 +7,10 @@ docker-image:
 	# Uncomment next line to update nndd to the latest version
 	# docker pull instedd/nndd-builder:latest
 	docker run --rm \
-		-v $(shell pwd)/public/nndd:/nndd/dist/nndd \
-		-v $(shell pwd)/etc/nndd/settings.local.json:/nndd/conf/settings.local.json \
-		instedd/nndd-builder
+    -v $(shell pwd)/public/nndd:/nndd/dist/nndd \
+    -v $(shell pwd)/etc/nndd/settings.local.json:/nndd/conf/settings.local.json \
+            -v $(shell pwd)/etc/nndd/custom.local.scss:/nndd/conf/custom.local.scss \
+    instedd/nndd-builder
 	rake geo
 	docker build --tag $(TAG):$(VERSION) .
 	docker push $(TAG):$(VERSION)
