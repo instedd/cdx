@@ -2,6 +2,7 @@ class ActivationToken < ActiveRecord::Base
   belongs_to :device
   has_one :activation, dependent: :destroy
 
+  validates_uniqueness_of :device_id
   validates_presence_of :device, :client_id, :value
 
   before_validation :set_client_id, if: :new_record?
@@ -14,7 +15,7 @@ class ActivationToken < ActiveRecord::Base
 
   def use!(public_key)
     ActivationToken.transaction do
-      device.ssh_keys.create!(public_key: public_key)
+      device.ssh_key = SshKey.create!(public_key: public_key, device: device)
       self.activation = Activation.create!(activation_token: self)
       SshKey.regenerate_authorized_keys!
     end

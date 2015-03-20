@@ -7,8 +7,8 @@ class Device < ActiveRecord::Base
   has_and_belongs_to_many :laboratories
   has_many :locations, through: :laboratories
   has_many :events
-  has_many :activation_tokens, dependent: :destroy
-  has_many :ssh_keys, dependent: :destroy
+  has_one :activation_token, dependent: :destroy
+  has_one :ssh_key, dependent: :destroy
 
   validates_uniqueness_of :uuid
   validates_presence_of :institution
@@ -63,11 +63,18 @@ class Device < ActiveRecord::Base
 
   def set_key
     self.secret_key = EventEncryption.secure_random(9)
-    self.ssh_keys.destroy_all
-    self.activation_tokens.destroy_all
+    self.ssh_key.try :destroy
+    self.activation_token.try :destroy
   end
 
   def set_uuid
     self.uuid = EventEncryption.secure_random(9)
+  end
+
+  def new_activation_token
+    self.ssh_key.try :destroy
+    self.activation_token.try :destroy
+    SshKey.regenerate_authorized_keys!
+    self.activation_token = ActivationToken.new(device: self)
   end
 end

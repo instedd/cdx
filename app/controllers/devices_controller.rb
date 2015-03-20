@@ -115,7 +115,7 @@ class DevicesController < ApplicationController
     @device = @institution.devices.find params[:id]
     return unless authorize_resource(@device, GENERATE_ACTIVATION_TOKEN)
 
-    @token = ActivationToken.new(device: @device)
+    @token = @device.new_activation_token
     respond_to do |format|
       if @token.save
         format.html {
@@ -123,8 +123,8 @@ class DevicesController < ApplicationController
         }
         format.json { render action: 'show', location: @device }
       else
-        format.html { render action: 'edit', notice: "Could not generate activation token. #{token.errors.first}"}
-        format.json { render json: token.errors, status: :unprocessable_entity }
+        format.html { render action: 'edit', notice: "Could not generate activation token. #{@token.errors.first}"}
+        format.json { render json: @token.errors, status: :unprocessable_entity }
       end
     end
   end

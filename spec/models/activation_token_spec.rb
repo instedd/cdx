@@ -22,7 +22,7 @@ describe ActivationToken do
     let!(:settings) { token.use!(SampleSshKey) }
     context 'when it is unused' do
       it { token.used?.should be_true }
-      it { token.device.ssh_keys.should_not be_empty }
+      it { token.device.ssh_key.should eq(SshKey.last) }
       it { token.activation.should_not be_nil }
 
       it { settings[:host].should eq('localhost') }
