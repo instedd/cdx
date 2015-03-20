@@ -91,7 +91,7 @@ describe Subscriber, elasticsearch: true do
     Subscriber.notify_all
 
     assert_requested(:post, url) do |req|
-      JSON.parse(req.body).keys.should =~ ["age","assay_name","condition","created_at","device_serial_number","device_uuid","error_code","error_description","ethnicity","event_id","gender","institution_id","laboratory_id","location","race","race_ethnicity","result","start_time","status","system_user","test_type","updated_at","uuid", "sample_type", "sample_uuid", "sample_id"]
+      JSON.parse(req.body).keys.should =~ ["age","assay_name","condition","created_at","device_serial_number","device_uuid","error_code","error_description","ethnicity","event_id","gender","institution_id","laboratory_id","location","race","race_ethnicity","result","start_time","status","system_user","test_type","updated_at","uuid", "sample_type", "sample_uuid", "sample_id", "location_coords"]
     end
   end
 

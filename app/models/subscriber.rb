@@ -61,11 +61,16 @@ class Subscriber < ActiveRecord::Base
         end
 
         request = RestClient::Resource.new(callback_url, options)
-        if self.verb == 'GET'
-          request.get rescue nil
-        else
-          request.post filtered_event.to_json rescue nil
+        begin
+          if self.verb == 'GET'
+            request.get
+          else
+            request.post filtered_event.to_json
+          end
+        rescue Exception => e
+          Rails.logger.warn "Could not #{verb} to subscriber #{subscriber.id} at #{callback_url}: #{ex.message}\n#{ex.backtrace}"
         end
+
       end
     end
     self.last_run_at = now
@@ -84,9 +89,9 @@ class Subscriber < ActiveRecord::Base
         filtered_event["result"] = merged_event["results"].first["result"]
       elsif field == "condition"
         filtered_event["condition"] = merged_event["results"].first["condition"]
-      elsif fields_properties[field]['locations'].not_nil?
+      elsif fields_properties[field] && fields_properties[field]['locations'].not_nil?
         filtered_event[field] = merged_event["#{field}_id"]
-      elsif fields_properties[field]['format'] == 'lat,lng'
+      elsif fields_properties[field] && fields_properties[field]['format'] == 'lat,lng'
         location_id_field_name = "#{fields_properties[field]['location_identifier']}_id"
         location = Location.where(geo_id: merged_event[location_id_field_name]).first
         filtered_event[field] = "#{location.lat},#{location.lng}" if location
