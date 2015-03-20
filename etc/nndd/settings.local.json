@@ -6,6 +6,8 @@
   "mapCenter": [15.978, 105.807],
   "mapBounds": null,
   "onlyShowPositiveResults": false,
+  "parentURL": "http://localhost:3000/dashboards/nndd",
+  "customStyles": "../conf/custom.local.scss",
   "polygons": {
     "location": {
       "1": "/polygons/level-0.topo.json",

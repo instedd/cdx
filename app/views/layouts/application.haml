@@ -13,6 +13,7 @@
 - top_nav_bar do
   - top_nav_bar_item 'Home', root_path
   - if current_user
+    - top_nav_bar_item 'Dashboard', nndd_path, (params[:controller] == 'dashboards')
     - top_nav_bar_item 'Institutions', institutions_path, !@institution_tab.nil?
     - top_nav_bar_item 'Locations', locations_path, @in_locations
     - top_nav_bar_item 'Manifests', manifests_path, (params[:controller] == "manifests")

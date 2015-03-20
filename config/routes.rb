@@ -23,6 +23,10 @@ Cdp::Application.routes.draw do
   resources :subscribers
   resources :policies
 
+  scope :dashboards, controller: :dashboards do
+    get :nndd
+  end
+
   root :to => 'home#index'
 
   namespace :api, defaults: { format: 'json' } do
