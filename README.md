@@ -61,7 +61,7 @@ class CdxApiController < ApplicationController
 end
 ```
 
-### Authorisation
+### Authorization
 
 The `Query` class has a `process_conditions` method where it generates the filters to be executed on ES. This method can be overriden to concatenate any filters required by custom authorisation restrictions imposed by your application. Simply override the class and add your own restrictions:
 
