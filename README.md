@@ -44,7 +44,8 @@ This task requires the executables `topojson` and `mapshaper` to be available, w
 To run [notifiable diseases](https://github.com/instedd/notifiable-diseases) on development, checkout the project and symlink the custom settings files in `/etc/nndd` on this project:
 
     $ cd $NOTIFIABLE_DISEASES/conf
-    $ ln -s $CEPHEID_WEB/etc/nndd/settings.json settings.local.json
+    $ ln -s $CDP/etc/nndd/settings.local.json settings.local.json
+    $ ln -s $CDP/etc/nndd/custom.local.scss custom.local.scss
 
 ### Sync Server
 
