@@ -177,7 +177,7 @@
         "options" : ["specimen", "qc"]
       },
       {
-        "target_field": "cw",
+        "target_field": "clia_waived_test",
         "source" : {"lookup" : "CW"},
         "indexed" : true,
         "type" : "string"
