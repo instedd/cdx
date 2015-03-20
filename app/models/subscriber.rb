@@ -26,7 +26,11 @@ class Subscriber < ActiveRecord::Base
   end
 
   def self.available_fields
-    EventsSchema.new("en-US", nil, Manifest.default).build['properties'].keys.sort
+    default_schema['properties'].keys.sort
+  end
+
+  def self.default_schema
+    EventsSchema.new("en-US", nil, Manifest.default).build
   end
 
   def notify
@@ -57,7 +61,6 @@ class Subscriber < ActiveRecord::Base
         end
 
         request = RestClient::Resource.new(callback_url, options)
-
         if self.verb == 'GET'
           request.get rescue nil
         else
@@ -73,13 +76,20 @@ class Subscriber < ActiveRecord::Base
     event = Event.includes(:sample).find_by_uuid(indexed_event['uuid'])
     merged_event = indexed_event.merge event.plain_sensitive_data.merge(event.sample.plain_sensitive_data)
     fields = Subscriber.available_fields if fields.nil? || fields.empty? # use all fields if none is specified
+    fields_properties = self.class.default_schema['properties']
     filtered_event = {}
+
     fields.each do |field|
-      case field
-      when "result"
+      if field == 'result'
         filtered_event["result"] = merged_event["results"].first["result"]
-      when "condition"
+      elsif field == "condition"
         filtered_event["condition"] = merged_event["results"].first["condition"]
+      elsif fields_properties[field]['locations'].not_nil?
+        filtered_event[field] = merged_event["#{field}_id"]
+      elsif fields_properties[field]['format'] == 'lat,lng'
+        location_id_field_name = "#{fields_properties[field]['location_identifier']}_id"
+        location = Location.where(geo_id: merged_event[location_id_field_name]).first
+        filtered_event[field] = "#{location.lat},#{location.lng}" if location
       else
         filtered_event[field] = merged_event[field]
       end
