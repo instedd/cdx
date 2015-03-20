@@ -1,23 +1,24 @@
 {
-  "brand": "Notifiable Diseases",
+  "brand": "CDP",
   "api": "/api",
-  "store": "/store",
   "useLocalStorage" : true,
+  "reportMainField": "condition",
+  "mapCenter": [15.978, 105.807],
+  "mapBounds": null,
+  "onlyShowPositiveResults": false,
+  "parentURL": "http://localhost:3000/dashboards/nndd",
+  "customStyles": "../conf/custom.local.scss",
   "polygons": {
     "location": {
-      "1": "/polygons/us_outline.topo.json",
-      "2": "/polygons/us_states.topo.json",
-      "3": "/polygons/us_counties.topo.json"
+      "1": "/polygons/level-0.topo.json",
+      "2": "/polygons/level-1.topo.json",
+      "3": "/polygons/level-2.topo.json",
+      "4": "/polygons/level-3.topo.json"
     }
   },
   "proxies": [
     {
       "context": "/api/events",
-      "host": "localhost",
-      "port": 3000
-    },
-    {
-      "context": "/store",
       "host": "localhost",
       "port": 3000
     },

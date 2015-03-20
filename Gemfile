@@ -24,6 +24,7 @@ gem 'alto_guisso_rails', github: "instedd/alto_guisso_rails", branch: 'master'
 gem 'alto_guisso', github: "instedd/alto_guisso", branch: 'master'
 gem 'rails_config'
 gem 'rest-client'
+gem 'barby'
 
 gem 'cdx-api-elasticsearch', git: "https://github.com/instedd/cdx-api-elasticsearch.git", branch: 'master'
 gem 'cdx-sync-server',  git: "https://github.com/instedd/cdx-sync-server.git", branch: 'master'

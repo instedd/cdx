@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: 6f8b9ea861c20fa95f630876072afcb1538316ba
+  revision: d86ac1f7cbd5116bbc7110eab4c10c68f8cdf028
   branch: master
   specs:
     cdx-api-elasticsearch (0.0.1)
@@ -99,6 +99,7 @@ GEM
     attr_required (1.0.0)
     awesome_nested_set (3.0.0.rc.6)
       activerecord (>= 4.0.0, < 5)
+    barby (0.6.2)
     bcrypt-ruby (3.1.2)
     bert (1.1.6)
     bertrpc (1.3.1)
@@ -409,6 +410,7 @@ DEPENDENCIES
   alto_guisso!
   alto_guisso_rails!
   awesome_nested_set (~> 3.0.0.rc.3)
+  barby
   bootstrap-sass (= 2.3.2.1)
   bunny
   capistrano (~> 3.1.0)

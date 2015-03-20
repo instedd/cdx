@@ -14,8 +14,14 @@ class Subscriber < ActiveRecord::Base
   validates_inclusion_of :verb, in: VALID_VERBS
 
   def self.notify_all
-    Subscriber.find_each do |subscriber|
-      subscriber.notify
+    PoirotRails::Activity.start("Subscriber.notify_all") do
+      Subscriber.find_each do |subscriber|
+        begin
+          subscriber.notify
+        rescue => ex
+          Rails.logger.error "#{ex.message} : #{ex.backtrace}"
+        end
+      end
     end
   end
 
@@ -26,7 +32,8 @@ class Subscriber < ActiveRecord::Base
   def notify
     fields = self.fields
     filter = self.filter.query
-    filter["since"] = last_run_at.iso8601
+    Rails.logger.info "Filter : #{filter}"
+    filter["updated_at_since"] = last_run_at.iso8601
     events = Cdx::Api::Elasticsearch::Query.new(filter).execute["events"]
     now = Time.now
     events.each do |event|

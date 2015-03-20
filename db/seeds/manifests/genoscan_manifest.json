@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "0.0.4",
+    "version" : "0.0.6",
     "api_version" : "1.1.0",
     "signature" : "",
     "device_models" : ["genoscan"],
@@ -30,8 +30,11 @@
       },
       {
         "target_field": "age",
-        "source" : {
-          "years_between" : [
+        "source" :  { "if" : [
+          {"equals" : [{"lookup" : "Birthday"}, "n.a."]},
+          "",
+          {
+            "years_between" : [
               {"parse_date" : [
                 {"lookup" : "Birthday"},
                 "%d.%m.%Y"
@@ -41,7 +44,8 @@
                 "%d.%m.%Y"
               ]}
             ]
-        },
+          }
+        ]},
         "core" : true,
         "indexed" : true,
         "type" : "integer"
@@ -67,17 +71,23 @@
     "sample" : [
       {
         "target_field": "sample_uid",
-        "source" : {"lookup" : "SampleNo."},
+        "source" : {
+          "concat" : [
+              {"lookup" : "PID"},
+              "-",
+              {"lookup" : "SampleNo."}
+          ]
+        },
         "core" : true,
         "pii" : true,
-        "type" : "integer"
+        "type" : "string"
       },
       {
         "target_field": "sample_id",
         "source" : {"lookup" : "SampleNo."},
         "core" : true,
         "pii" : true,
-        "type" : "integer"
+        "type" : "string"
       }
     ],
     "event" : [
@@ -167,7 +177,7 @@
         "options" : ["specimen", "qc"]
       },
       {
-        "target_field": "cw",
+        "target_field": "clia_waived_test",
         "source" : {"lookup" : "CW"},
         "indexed" : true,
         "type" : "string"

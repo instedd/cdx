@@ -4,6 +4,7 @@
   %p
     %strong Secret:
     = @device.secret_key
+    = raw @key_barcode_for_html.to_html
 
   %p
     This secret key must be used by this device to report tests through the API.

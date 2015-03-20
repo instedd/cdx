@@ -2,13 +2,18 @@ class LocationsController < ApplicationController
   add_breadcrumb 'Locations', :locations_path
 
   before_filter { @in_locations = true }
+  before_filter :show_ancestors_in_breadcrumb
 
   def index
-    @locations = Location.all
+    @locations = Location.where(parent_id: params[:parent_id])
   end
 
   def new
-    @location = Location.new
+    add_breadcrumb 'New Location'
+    if params[:parent_id]
+      admin_level = Location.find(params[:parent_id]).admin_level + 1
+    end
+    @location = Location.new(parent_id: params[:parent_id], admin_level: admin_level)
   end
 
   def show
@@ -22,7 +27,7 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       if @location.save
-        format.html { redirect_to locations_path, notice: 'Location was successfully created.' }
+        format.html { redirect_to locations_path(parent_id: @location.parent_id), notice: 'Location was successfully created.' }
         format.json { render action: 'show', status: :created, location: @location }
       else
         format.html { render action: 'new' }
@@ -42,7 +47,7 @@ class LocationsController < ApplicationController
 
     respond_to do |format|
       if @location.update(location_params)
-        format.html { redirect_to locations_path, notice: 'Location was successfully updated.' }
+        format.html { redirect_to locations_path(parent_id: @location.parent_id), notice: 'Location was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -58,7 +63,7 @@ class LocationsController < ApplicationController
 
     if @location.destroy
       respond_to do |format|
-        format.html { redirect_to locations_path }
+        format.html { redirect_to locations_path(parent_id: @location.parent_id) }
         format.json { head :no_content }
       end
     else
@@ -75,5 +80,18 @@ class LocationsController < ApplicationController
 
   def location_params
     params.require(:location).permit(:name, :parent_id, :admin_level, :geo_id)
+  end
+
+  def show_ancestors_in_breadcrumb
+    ancestors = []
+    parent_id = params[:parent_id] || params[:id]
+
+    while parent_id
+      ancestors << ancestor = Location.find(parent_id)
+      parent_id = ancestor.parent_id
+    end
+    ancestors.reverse_each do |ancestor|
+      add_breadcrumb ancestor.name, locations_path(parent_id: ancestor.id)
+    end
   end
 end

@@ -1,4 +1,5 @@
 host: localhost:3000
+nndd_url: "/nndd/"
 remote_shapefiles:
   - "http://s3.amazonaws.com/xpert-shapefiles/VNM_adm0.json"
   - "http://s3.amazonaws.com/xpert-shapefiles/VNM_adm1.json"
@@ -8,3 +9,11 @@ remote_shapefiles:
   - "http://s3.amazonaws.com/xpert-shapefiles/VNM_adm1.csv"
   - "http://s3.amazonaws.com/xpert-shapefiles/VNM_adm2.csv"
   - "http://s3.amazonaws.com/xpert-shapefiles/VNM_adm3.csv"
+  - "http://s3.amazonaws.com/xpert-shapefiles/PER_adm0.json"
+  - "http://s3.amazonaws.com/xpert-shapefiles/PER_adm1.json"
+  - "http://s3.amazonaws.com/xpert-shapefiles/PER_adm2.json"
+  - "http://s3.amazonaws.com/xpert-shapefiles/PER_adm3.json"
+  - "http://s3.amazonaws.com/xpert-shapefiles/PER_adm0.csv"
+  - "http://s3.amazonaws.com/xpert-shapefiles/PER_adm1.csv"
+  - "http://s3.amazonaws.com/xpert-shapefiles/PER_adm2.csv"
+  - "http://s3.amazonaws.com/xpert-shapefiles/PER_adm3.csv"

@@ -14,7 +14,7 @@ class FiltersController < ApplicationController
   end
 
   def show
-    respond_with filter
+    render :edit
   end
 
   def new
@@ -32,8 +32,12 @@ class FiltersController < ApplicationController
   end
 
   def destroy
-    filter.destroy
-    respond_with filter
+    if filter.destroy
+      flash[:notice] = "Filter was successfully deleted"
+      respond_with filter
+    else
+      render :edit
+    end
   end
 
   private

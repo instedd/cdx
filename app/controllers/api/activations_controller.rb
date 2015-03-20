@@ -18,5 +18,4 @@ class Api::ActivationsController < ApiController
     logger.info "Response for activation request #{params[:token]}: #{response}"
     render json: response
   end
-
 end

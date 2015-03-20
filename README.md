@@ -37,6 +37,16 @@ To start developing:
 
 Locations are imported from GeoJSON files specified as `remote_shapefiles` in `config/settings.yml`. Upon running `rake geo:all`, these files will be downloaded, imported as Location entities, and converted to Topojson for usage from NNDD. Note that if there are CSV files with the same name as the GeoJSONs, they will be used for overriding the names of the locations; this is useful for GADM imports, which provide an extra CSV since the original Shapefiles cannot handle unicode chars.
 
+This task requires the executables `topojson` and `mapshaper` to be available, which can be installed via `npm`. The fullpath to the executables can be provided by the environment variables `TOPOJSON` and `MAPSHAPER` respectively.
+
+### NNDD
+
+To run [notifiable diseases](https://github.com/instedd/notifiable-diseases) on development, checkout the project and symlink the custom settings files in `/etc/nndd` on this project:
+
+    $ cd $NOTIFIABLE_DISEASES/conf
+    $ ln -s $CDP/etc/nndd/settings.local.json settings.local.json
+    $ ln -s $CDP/etc/nndd/custom.local.scss custom.local.scss
+
 ### Sync Server
 
 In order to allow synchronization of clients through rsyns - for csv files -, you should use [cdx-sync-sshd](https://github.com/instedd/cdx-sync-sshd), which is a dockerized sshd container, with an inbox and outbox directoy for each client. Download and build it before continuing.

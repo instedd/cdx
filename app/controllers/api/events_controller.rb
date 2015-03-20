@@ -54,7 +54,7 @@ class Api::EventsController < ApiController
   end
 
   def schema
-    schema = EventsSchema.for params["locale"], params["assay_name"]
+    schema = EventsSchema.for params["locale"], params
     respond_to do |format|
       format.json { render_json schema.build }
     end

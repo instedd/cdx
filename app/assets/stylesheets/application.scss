@@ -56,3 +56,18 @@ textarea {
 #error_explanation {
   color: #ff0000;
 }
+
+
+//----- Barby -------
+table.barby-barcode {
+  border-spacing: 0;
+  width: 200px;
+  height: 50px;
+}
+tr.barby-row {}
+td.barby-cell {
+  width: 3px;
+}
+td.barby-cell.on {
+  background: #000;
+}

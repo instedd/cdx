@@ -1,4 +1,7 @@
 class DevicesController < ApplicationController
+  require 'barby'
+  require 'barby/barcode/code_93'
+  require 'barby/outputter/html_outputter'
   layout "institutions"
   set_institution_tab :devices
 
@@ -50,6 +53,8 @@ class DevicesController < ApplicationController
     @device = @institution.devices.find params[:id]
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
+    @uuid_barcode = Barby::Code93.new(@device.uuid)
+    @uuid_barcode_for_html = Barby::HtmlOutputter.new(@uuid_barcode)
     # TODO: check valid laboratories
 
     @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
@@ -92,6 +97,9 @@ class DevicesController < ApplicationController
 
     @device.set_key
 
+    @key_barcode = Barby::Code93.new(@device.secret_key)
+    @key_barcode_for_html = Barby::HtmlOutputter.new(@key_barcode)
+
     respond_to do |format|
       if @device.save
         format.html
@@ -107,7 +115,7 @@ class DevicesController < ApplicationController
     @device = @institution.devices.find params[:id]
     return unless authorize_resource(@device, GENERATE_ACTIVATION_TOKEN)
 
-    @token = ActivationToken.new(device: @device)
+    @token = @device.new_activation_token
     respond_to do |format|
       if @token.save
         format.html {
@@ -115,8 +123,8 @@ class DevicesController < ApplicationController
         }
         format.json { render action: 'show', location: @device }
       else
-        format.html { render action: 'edit', notice: "Could not generate activation token. #{token.errors.first}"}
-        format.json { render json: token.errors, status: :unprocessable_entity }
+        format.html { render action: 'edit', notice: "Could not generate activation token. #{@token.errors.first}"}
+        format.json { render json: @token.errors, status: :unprocessable_entity }
       end
     end
   end
