@@ -1,4 +1,5 @@
 host: localhost:3000
+nndd_url: "/nndd/"
 remote_shapefiles:
   - "http://s3.amazonaws.com/xpert-shapefiles/VNM_adm0.json"
   - "http://s3.amazonaws.com/xpert-shapefiles/VNM_adm1.json"
