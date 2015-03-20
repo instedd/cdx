@@ -1,0 +1,285 @@
+{
+  "metadata": {
+    "version": "1.0.8",
+    "api_version": "1.1.0",
+    "device_models": [
+      "GX Model I"
+    ],
+    "source": {
+      "type": "json"
+    }
+  },
+  "field_mapping": {
+    "patient": [
+      {
+        "target_field": "patient_id",
+        "source": {
+          "lookup": "event.patient_id"
+        },
+        "type": "string",
+        "core": true,
+        "pii": true
+      },
+      {
+        "target_field": "patient_name",
+        "source": {
+          "lookup": "event.patient_name"
+        },
+        "type": "string",
+        "core": true,
+        "pii": true
+      },
+      {
+        "target_field": "patient_telephone_number",
+        "source": {
+          "lookup": "event.patient_telephone_number"
+        },
+        "type": "string",
+        "core": true,
+        "pii": true
+      },
+      {
+        "target_field": "patient_zip_code",
+        "source": {
+          "lookup": "event.patient_zip_code"
+        },
+        "type": "string",
+        "core": true,
+        "pii": true
+      },
+      {
+        "target_field": "age",
+        "source": {
+          "lookup": "event.age"
+        },
+        "type": "integer",
+        "core": true,
+        "indexed": true,
+        "valid_values": {
+          "range": {
+            "min": 0,
+            "max": 125
+          }
+        }
+      },
+      {
+        "target_field": "gender",
+        "source": { "map" : [
+          { "lookup": "event.gender" },
+          [
+            { "match" : "M", "output" : "male"},
+            { "match" : "F", "output" : "female"},
+            { "match" : "*", "output" : "undefined"}
+          ]
+        ]},
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "male",
+          "female",
+          "undefined"
+        ]
+      },
+      {
+        "target_field": "ethnicity",
+        "source": {
+          "lookup": "event.ethnicity"
+        },
+        "type": "string",
+        "core": true,
+        "indexed": true
+      },
+      {
+        "target_field": "race",
+        "source": {
+          "lookup": "event.race"
+        },
+        "type": "string",
+        "core": true,
+        "indexed": true
+      },
+      {
+        "target_field": "race_ethnicity",
+        "source": {
+          "lookup": "event.race_ethnicity"
+        },
+        "type": "string",
+        "core": true,
+        "indexed": true
+      }
+    ],
+    "sample": [
+      {
+        "target_field": "sample_uid",
+        "source": {
+          "lookup": "event.sample_uid"
+        },
+        "type": "string",
+        "core": true,
+        "pii": true
+      },
+      {
+        "target_field": "sample_type",
+        "source": {
+          "lookup": "event.sample_type"
+        },
+        "type": "string",
+        "core": true,
+        "indexed": true
+      }
+    ],
+    "event": [
+      {
+        "target_field": "start_time",
+        "source": {
+          "lookup": "event.start_time"
+        },
+        "type": "date",
+        "core": true,
+        "indexed": true
+      },
+      {
+        "target_field": "event_id",
+        "source": {
+          "lookup": "event.event_id"
+        },
+        "type": "string",
+        "core": true,
+        "indexed": true
+      },
+      {
+        "target_field": "system_user",
+        "source": {
+          "lookup": "event.system_user"
+        },
+        "type": "string",
+        "core": true,
+        "indexed": true
+      },
+      {
+        "target_field": "device_serial_number",
+        "source": {
+          "lookup": "event.device_serial_number"
+        },
+        "type": "string",
+        "core": true,
+        "indexed": true
+      },
+      {
+        "target_field": "error_code",
+        "source": {
+          "lookup": "event.error_code"
+        },
+        "type": "integer",
+        "core": true,
+        "indexed": true
+      },
+      {
+        "target_field": "error_description",
+        "source": {
+          "lookup": "event.error_description"
+        },
+        "type": "string",
+        "core": true,
+        "indexed": true
+      },
+      {
+        "target_field": "assay_name",
+        "source": {
+          "lookup": "event.assay_name"
+        },
+        "type": "string",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "MTB Assay",
+          "Xpert SA Nasal Complete G3"
+        ]
+      },
+      {
+        "target_field": "status",
+        "source": { "map" : [
+          { "lookup": "event.result" },
+          [{"match" : "INVALID", "output" : "invalid" },
+            {"match" : "ERROR", "output" : "error" },
+            {"match" : "NO RESULT", "output" : "no_result" },
+            {"match" : "MTB NOT DETECTED", "output" : "negative" },
+            {"match" : "Rif Resistance DETECTED", "output" : "success" },
+            {"match" : "Rif Resistance INDETERMINATE", "output" : "success" },
+            {"match" : "MTB DETECTED", "output" : "success" }
+          ]
+        ]},
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "invalid",
+          "error",
+          "no_result",
+          "success",
+          "negative"
+        ]
+      },
+      {
+        "target_field": "results[*].result",
+        "source": { "map" : [
+          { "lookup": "event.result" },
+          [ {"match" : "INVALID", "output" : "unknown" },
+            {"match" : "ERROR", "output" : "unknown" },
+            {"match" : "NO RESULT", "output" : "unknown" },
+            {"match" : "MTB NOT DETECTED", "output" : "negative" },
+            {"match" : "Rif Resistance DETECTED", "output" : "positive_with_rif" },
+            {"match" : "Rif Resistance INDETERMINATE", "output" : "positive_with_rif_inconclusive" },
+            {"match" : "MTB DETECTED", "output" : "positive" }
+          ]
+        ]},
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "unknown",
+          "positive",
+          "negative",
+          "positive_with_rif",
+          "positive_with_rif_inconclusive"
+        ]
+      },
+      {
+        "target_field": "results[*].condition",
+        "source": { "map" : [
+          { "lookup" : "event.assay_name"},
+          [ {"match" : "Xpert MTB-RIF", "output" : "mtb"},
+            {"match" : "Xpert MTB-RIF G3", "output" : "mtb"},
+            {"match" : "MTB-RIF Assay G4", "output" : "mtb"},
+            {"match" : "Xpert MTB-RIF Assay G4", "output" : "mtb"},
+            {"match" : "MTB Beta", "output" : "mtb"}
+          ]
+        ]},
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "mtb"
+        ]
+      },
+      {
+        "target_field": "test_type",
+        "source": { "map" : [
+          { "lookup": "event.test_type" },
+          [
+            { "match" : "0", "output" : "specimen"},
+            { "match" : "*", "output" : "qc"}
+          ]
+        ]},
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "specimen",
+          "qc"
+        ]
+      }
+    ]
+  }
+}
