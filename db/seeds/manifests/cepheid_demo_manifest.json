@@ -14,34 +14,7 @@
       {
         "target_field": "patient_id",
         "source": {
-          "lookup": "event.patient_id"
-        },
-        "type": "string",
-        "core": true,
-        "pii": true
-      },
-      {
-        "target_field": "patient_name",
-        "source": {
-          "lookup": "event.patient_name"
-        },
-        "type": "string",
-        "core": true,
-        "pii": true
-      },
-      {
-        "target_field": "patient_telephone_number",
-        "source": {
-          "lookup": "event.patient_telephone_number"
-        },
-        "type": "string",
-        "core": true,
-        "pii": true
-      },
-      {
-        "target_field": "patient_zip_code",
-        "source": {
-          "lookup": "event.patient_zip_code"
+          "lookup": "event.patient_ID"
         },
         "type": "string",
         "core": true,
@@ -86,47 +59,89 @@
         "source": {
           "lookup": "event.ethnicity"
         },
-        "type": "string",
+        "type": "enum",
         "core": true,
-        "indexed": true
+        "indexed": true,
+        "options" : [
+          "hispanic",
+          "not_hispanic",
+          "unknown"
+        ]
       },
       {
         "target_field": "race",
-        "source": {
-          "lookup": "event.race"
-        },
-        "type": "string",
+        "source": { "map" : [
+          {"lookup": "event.race"},
+          [
+            { "match" : "2054-5", "output" : "black_or_african_american"},
+            { "match" : "1002-5", "output" : "american_indian_or_alaska_native"},
+            { "match" : "2028-9", "output" : "asian"},
+            { "match" : "2076-8", "output" : "native_hawaiian_or_other_pacific_islander"},
+            { "match" : "2106-3", "output" : "white"},
+            { "match" : "2131-1", "output" : "other"},
+            { "match" : "*", "output" : "unknown"}
+          ]
+        ]},
+        "type": "enum",
         "core": true,
-        "indexed": true
+        "indexed": true,
+        "options" : [
+          "black_or_african_american",
+          "american_indian_or_alaska_native",
+          "asian",
+          "native_hawaiian_or_other_pacific_islander",
+          "white",
+          "other",
+          "unknown"
+        ]
       },
       {
         "target_field": "race_ethnicity",
-        "source": {
-          "lookup": "event.race_ethnicity"
-        },
-        "type": "string",
+        "source": { "map" : [
+          {"lookup": "event.race_ethnicity"},
+          [
+            { "match" : "2135-2", "output" : "hispanic"},
+            { "match" : "2054-5", "output" : "black_or_african_american"},
+            { "match" : "1002-5", "output" : "american_indian_or_alaska_native"},
+            { "match" : "2028-9", "output" : "asian"},
+            { "match" : "2076-8", "output" : "native_hawaiian_or_other_pacific_islander"},
+            { "match" : "2106-3", "output" : "white"},
+            { "match" : "2131-1", "output" : "other"},
+            { "match" : "*", "output" : "unknown"}
+          ]
+        ]},
+        "type": "enum",
         "core": true,
-        "indexed": true
+        "indexed": true,
+        "options" : [
+          "hispanic",
+          "black_or_african_american",
+          "american_indian_or_alaska_native",
+          "asian",
+          "native_hawaiian_or_other_pacific_islander",
+          "white",
+          "other",
+          "unknown"
+        ]
       }
     ],
     "sample": [
       {
         "target_field": "sample_uid",
         "source": {
-          "lookup": "event.sample_uid"
+          "lookup": "event.sample_ID"
         },
         "type": "string",
         "core": true,
         "pii": true
       },
       {
-        "target_field": "sample_type",
+        "target_field": "sample_id",
         "source": {
-          "lookup": "event.sample_type"
+          "lookup": "event.sample_ID"
         },
         "type": "string",
-        "core": true,
-        "indexed": true
+        "core": true
       }
     ],
     "event": [
@@ -253,7 +268,8 @@
             {"match" : "Xpert MTB-RIF G3", "output" : "mtb"},
             {"match" : "MTB-RIF Assay G4", "output" : "mtb"},
             {"match" : "Xpert MTB-RIF Assay G4", "output" : "mtb"},
-            {"match" : "MTB Beta", "output" : "mtb"}
+            {"match" : "MTB Beta", "output" : "mtb"},
+            {"match" : "*", "output" : "mtb"}
           ]
         ]},
         "type": "enum",
