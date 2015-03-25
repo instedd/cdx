@@ -82,6 +82,20 @@ describe DeviceEventImporter, elasticsearch: true do
       event["result"].should eq("negative")
     end
 
+    it 'parses a json from sync dir registering multiple extensions' do
+      manifest
+      write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
+      DeviceEventImporter.new("*.{csv,json}").import_from sync_dir
+
+      events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["error_code"] }
+      event = events.first["_source"]
+      event["error_code"].should eq(0)
+      event["result"].should eq("positive")
+      event = events.last["_source"]
+      event["error_code"].should eq(1)
+      event["result"].should eq("negative")
+    end
+
   end
 
 
