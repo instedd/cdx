@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "1.0.10",
+    "version": "1.0.11",
     "api_version": "1.1.0",
     "device_models": [
       "GX Model I"
@@ -42,7 +42,7 @@
           [
             { "match" : "M", "output" : "male"},
             { "match" : "F", "output" : "female"},
-            { "match" : "*", "output" : "undefined"}
+            { "match" : "*", "output" : "unknown"}
           ]
         ]},
         "type": "enum",
@@ -51,14 +51,19 @@
         "options": [
           "male",
           "female",
-          "undefined"
+          "unknown"
         ]
       },
       {
         "target_field": "ethnicity",
-        "source": {
-          "lookup": "event.ethnicity"
-        },
+        "source": { "map" : [
+          { "lookup": "event.ethnicity" },
+          [
+            { "match" : "hispanic", "output" : "hispanic"},
+            { "match" : "not_hispanic", "output" : "not_hispanic"},
+            { "match" : "*", "output" : "unknown"}
+          ]
+        ]},
         "type": "enum",
         "core": true,
         "indexed": true,
@@ -155,6 +160,15 @@
         "indexed": true
       },
       {
+        "target_field": "end_time",
+        "source": {
+          "lookup": "event.end_time"
+        },
+        "type": "date",
+        "core": false,
+        "indexed": true
+      },
+      {
         "target_field": "event_id",
         "source": {
           "lookup": "event.event_id"
@@ -222,7 +236,8 @@
             {"match" : "MTB NOT DETECTED", "output" : "negative" },
             {"match" : "Rif Resistance DETECTED", "output" : "success" },
             {"match" : "Rif Resistance INDETERMINATE", "output" : "success" },
-            {"match" : "MTB DETECTED", "output" : "success" }
+            {"match" : "MTB DETECTED", "output" : "success" },
+            {"match" : "*", "output" : "error"}
           ]
         ]},
         "type": "enum",
@@ -246,7 +261,8 @@
             {"match" : "MTB NOT DETECTED", "output" : "negative" },
             {"match" : "Rif Resistance DETECTED", "output" : "positive_with_rif" },
             {"match" : "Rif Resistance INDETERMINATE", "output" : "positive_with_rif_inconclusive" },
-            {"match" : "MTB DETECTED", "output" : "positive" }
+            {"match" : "MTB DETECTED", "output" : "positive" },
+            {"match" : "*", "output" : "unknown"}
           ]
         ]},
         "type": "enum",
