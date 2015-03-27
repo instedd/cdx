@@ -30,8 +30,9 @@ describe Manifest do
 
     matcher :have_template do |template|
       match do |client|
-        @template = client.indices.get_template(name: template)
-        @template[template]\
+        @template = client.indices.get_template(name: template) rescue nil
+        @template\
+          && @template[template]\
           && (@type.nil? || @template[template]['mappings'][@type])\
           && (!@fields   || @fields.all?    { |field| @template[template]['mappings'][@type]['properties']['custom_fields']['properties'].has_key?(field) })\
           && (!@nofields || !@nofields.any? { |field| @template[template]['mappings'][@type]['properties']['custom_fields']['properties'].has_key?(field) })
@@ -114,6 +115,16 @@ describe Manifest do
 
         manifest.destroy!
         assert_original_templates
+      end
+
+      it "deletes templates when no manifest is present" do
+        manifest = Manifest.create!(definition: new_definition)
+        Cdx::Api.client.should have_template("cdp_events_template_test_#{model(1).id}")
+        Cdx::Api.client.should have_template("cdp_events_template_test_#{model(2).id}")
+
+        manifest.destroy!
+        Cdx::Api.client.should_not have_template("cdp_events_template_test_#{model(1).id}")
+        Cdx::Api.client.should_not have_template("cdp_events_template_test_#{model(2).id}")
       end
 
       # it "updates existing indices mappings" do

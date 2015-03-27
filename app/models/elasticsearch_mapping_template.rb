@@ -35,6 +35,12 @@ class ElasticsearchMappingTemplate
     "cdp_events_template_#{Rails.env}"
   end
 
+  def self.delete_templates_for(models)
+    models.each do |model|
+      Cdx::Api.client.indices.delete_template(name: template_name(model.id))
+    end
+  end
+
   def update!
     put_template!
     update_indices!

@@ -244,8 +244,12 @@ class Manifest < ActiveRecord::Base
     models = self.current_models
     yield
 
-    models.each(&:reload).group_by(&:current_manifest).each do |manifest, models|
-      ElasticsearchMappingTemplate.new(manifest, models).update!
+      models.each(&:reload).group_by(&:current_manifest).each do |manifest, models|
+        if manifest
+          ElasticsearchMappingTemplate.new(manifest, models).update!
+        else
+          ElasticsearchMappingTemplate.delete_templates_for(models)
+        end
     end
   end
 
