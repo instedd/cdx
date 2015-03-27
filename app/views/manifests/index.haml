@@ -1,5 +1,5 @@
 .row-fluid
   .span6
     - simple_list :manifest, title: 'Device Models', icon: :folder, create_path: (new_manifest_path) do
-      - @manifests.each do |manifest|
-        - simple_list_item (manifest.device_models.map {|model| "#{model.try(:name)} #{manifest.version}"}).join(", "), manifest_path(manifest)
+      - @device_models.each do |device_model|
+        - simple_list_item "#{device_model.name} #{device_model.current_manifest.version}", manifest_path(device_model.current_manifest)

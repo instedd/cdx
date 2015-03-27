@@ -2,7 +2,7 @@ class ManifestsController < ApplicationController
   add_breadcrumb 'Manifests', :manifests_path
 
   def index
-    @manifests = Manifest.all.includes(:device_models)
+    @device_models = DeviceModel.active.includes(:manifests)
   end
 
   def new

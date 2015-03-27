@@ -31,15 +31,23 @@ class Api::EventsController < ApiController
   end
 
   def index
+    params.delete(:format)
+    params.delete(:controller)
+    params.delete(:action)
     params.delete(:event)
     body = Oj.load(request.body.read) || {}
-    query = Event.query(params.merge(body), current_user)
-    respond_to do |format|
-      format.csv do
-        build_csv 'Events', query.csv_builder
-        render :layout => false
+    filters = params.merge(body)
+    if filters.blank?
+      render :status => :unprocessable_entity, :json => { :errors => "The query must contain at least one filter"}
+    else
+      query = Event.query(filters, current_user)
+      respond_to do |format|
+        format.csv do
+          build_csv 'Events', query.csv_builder
+          render :layout => false
+        end
+        format.json { render_json query.result }
       end
-      format.json { render_json query.result }
     end
   end
 

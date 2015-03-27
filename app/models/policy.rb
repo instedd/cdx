@@ -136,7 +136,7 @@ class Policy < ActiveRecord::Base
     end
 
     # Check that the granter's policies allow the action on the resource,
-    # but only if the user is not the same as the granter (like implicit and superadmin policies)
+    # but only if the policy is not implicit (or superadmin)
     if !implicit? && !users_so_far.include?(granter)
       users_so_far.add granter
       granter_result = Policy.check_all action, resource, granter, granter.policies.delegable, users_so_far, check_conditions

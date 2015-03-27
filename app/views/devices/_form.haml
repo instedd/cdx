@@ -12,7 +12,7 @@
   .control-group
     = f.label :device_model_id, :class => 'control-label'
     .controls
-      = f.collection_select :device_model_id, DeviceModel.all, :id, :name
+      = f.collection_select :device_model_id, DeviceModel.active, :id, :name
   .control-group
     = f.label :laboratories, :class => 'control-label'
     .controls
