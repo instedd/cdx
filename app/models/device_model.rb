@@ -7,7 +7,7 @@ class DeviceModel < ActiveRecord::Base
     @manifest ||= manifests.order("id").last
   end
 
-  def reload!
+  def reload
     super
     @manifest = nil
   end
