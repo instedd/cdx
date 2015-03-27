@@ -8,7 +8,11 @@ end
 
 Cdx::Api.setup do |config|
   config.index_name_pattern = "#{Cdx::Api.index_prefix}*"
-  config.template_name_pattern = "cdp_institution*"
+  config.template_name_pattern = "#{Cdx::Api.index_prefix}*"
   config.log = Rails.env != "test"
   config.elasticsearch_url = ENV["ELASTICSEARCH_URL"]
+end
+
+Rails.application.config.after_initialize do
+  ElasticsearchMappingTemplate.create_default! unless Rails.env.test?
 end
