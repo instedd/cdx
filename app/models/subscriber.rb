@@ -37,7 +37,7 @@ class Subscriber < ActiveRecord::Base
     fields = self.fields
     filter = self.filter.query.merge "page_size" => 10000, "updated_at_since" => last_run_at.iso8601
     Rails.logger.info "Filter : #{filter}"
-    events = Cdx::Api::Elasticsearch::Query.new(filter).execute["events"]
+    events = Cdx::Api::Elasticsearch::Query.new(filter.with_indifferent_access).execute["events"]
     now = Time.now
     events.each do |event|
       PoirotRails::Activity.start("Publish event to subscriber #{self.name}") do
