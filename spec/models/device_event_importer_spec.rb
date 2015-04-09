@@ -12,8 +12,8 @@ describe DeviceEventImporter, elasticsearch: true do
     sync_dir.ensure_client_sync_paths! device.uuid
   end
 
-  def write_file(content, extension)
-    File.open(File.join(sync_dir.inbox_path(device.uuid), "#{DateTime.now.strftime('%Y%m%d%H%M%S')}.#{extension}"), "w") do |io|
+  def write_file(content, extension, name=nil)
+    File.open(File.join(sync_dir.inbox_path(device.uuid), "#{name || DateTime.now.strftime('%Y%m%d%H%M%S')}.#{extension}"), "w") do |io|
       io << content
     end
   end
@@ -86,6 +86,20 @@ describe DeviceEventImporter, elasticsearch: true do
       manifest
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
       DeviceEventImporter.new("*.{csv,json}").import_from sync_dir
+
+      events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["error_code"] }
+      event = events.first["_source"]
+      event["error_code"].should eq(0)
+      event["result"].should eq("positive")
+      event = events.last["_source"]
+      event["error_code"].should eq(1)
+      event["result"].should eq("negative")
+    end
+
+    it 'parses a json from sync dir registering multiple extensions using import single' do
+      manifest
+      write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json', 'mytestfile')
+      DeviceEventImporter.new("*.{csv,json}").import_single(sync_dir, File.join(sync_dir.inbox_path(device.uuid), "mytestfile.json"))
 
       events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["error_code"] }
       event = events.first["_source"]
