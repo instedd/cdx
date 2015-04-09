@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "1.0.92",
+    "version": "1.0.93",
     "api_version": "1.1.0",
     "device_models": [
       "GX Model I"
@@ -215,7 +215,8 @@
         "indexed": true,
         "options": [
           "MTB Assay",
-          "Xpert SA Nasal Complete G3"
+          "Xpert SA Nasal Complete G3",
+          "MTB-RIF Assay G4_noQC1_2"
         ]
       },
       {
