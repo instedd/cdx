@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "0.0.6",
+    "version" : "0.0.7",
     "api_version" : "1.1.0",
     "signature" : "",
     "device_models" : ["genoscan"],
@@ -140,8 +140,8 @@
           "map" : [
             {"lookup" : "Result"},
             [
-              {"match": "*RMP resistant*INH resistant*", "output" : "positive_with_rmp_and_inh"},
-              {"match": "*RMP resistant*INH sensitive*", "output" : "positive_with_rmp"},
+              {"match": "*RMP resistant*INH resistant*", "output" : "positive_with_rif_and_inh"},
+              {"match": "*RMP resistant*INH sensitive*", "output" : "positive_with_rif"},
               {"match": "*RMP sensitive*INH resistant*", "output" : "positive_with_inh"},
               {"match": "*RMP sensitive*INH sensitive*", "output" : "positive"},
               {"match": "*tuberculosis*", "output" : "positive"},
@@ -154,8 +154,8 @@
         "indexed" : true,
         "options" : [
           "positive",
-          "positive_with_rmp_and_inh",
-          "positive_with_rmp",
+          "positive_with_rif_and_inh",
+          "positive_with_rif",
           "positive_with_inh",
           "negative"
         ]
