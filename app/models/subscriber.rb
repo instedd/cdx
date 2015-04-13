@@ -66,8 +66,8 @@ class Subscriber < ActiveRecord::Base
           else
             request.post filtered_event.to_json
           end
-        rescue Exception => e
-          Rails.logger.warn "Could not #{verb} to subscriber #{subscriber.id} at #{callback_url}: #{ex.message}\n#{ex.backtrace}"
+        rescue Exception => ex
+          Rails.logger.warn "Could not #{verb} to subscriber #{id} at #{callback_url}: #{ex.message}\n#{ex.backtrace}"
         end
 
       end
