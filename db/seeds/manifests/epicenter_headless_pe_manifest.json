@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "0.0.1",
+    "version": "0.0.2",
     "api_version": "1.1.0",
     "signature": "",
     "device_models": [
@@ -60,7 +60,7 @@
             {
               "lookup": "7"
             },
-            "%m/%d/%Y %I:%M:%S %P"
+            "%d/%m/%Y %I:%M:%S %P"
           ]
         },
         "core": true,
@@ -74,7 +74,7 @@
             {
               "lookup": "6"
             },
-            "%m/%d/%Y %I:%M:%S %P"
+            "%d/%m/%Y %I:%M:%S %P"
           ]
         },
         "core": false,
