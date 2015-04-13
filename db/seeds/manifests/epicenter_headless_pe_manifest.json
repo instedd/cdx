@@ -1,0 +1,180 @@
+{
+  "metadata": {
+    "version": "0.0.1",
+    "api_version": "1.1.0",
+    "signature": "",
+    "device_models": [
+      "epicenter_headless_pe"
+    ],
+    "source": {
+      "type": "headless_csv",
+      "separator": ","
+    }
+  },
+  "field_mapping": {
+    "patient": [
+      {
+        "target_field": "patient_id",
+        "source": {
+          "lookup": "0"
+        },
+        "core": true,
+        "pii": true,
+        "type": "string"
+      }
+    ],
+    "sample": [
+      {
+        "target_field": "sample_id",
+        "source": {
+          "lookup": "0"
+        },
+        "core": true,
+        "indexed": true,
+        "type": "string"
+      },
+      {
+        "target_field": "sample_uid",
+        "source": {
+          "lookup": "0"
+        },
+        "core": true,
+        "pii": true,
+        "type": "string"
+      }
+    ],
+    "event": [
+      {
+        "target_field": "event_id",
+        "source": {
+          "lookup": "2"
+        },
+        "core": true,
+        "indexed": true,
+        "type": "string"
+      },
+      {
+        "target_field": "start_time",
+        "source": {
+          "parse_date": [
+            {
+              "lookup": "7"
+            },
+            "%m/%d/%Y %I:%M:%S %P"
+          ]
+        },
+        "core": true,
+        "indexed": true,
+        "type": "date"
+      },
+      {
+        "target_field": "end_time",
+        "source": {
+          "parse_date": [
+            {
+              "lookup": "6"
+            },
+            "%m/%d/%Y %I:%M:%S %P"
+          ]
+        },
+        "core": false,
+        "indexed": true,
+        "type": "date"
+      },
+      {
+        "target_field": "assay_name",
+        "source": {
+          "lookup": "1"
+        },
+        "core": true,
+        "indexed": true,
+        "type": "string"
+      },
+      {
+        "target_field": "results[*].condition",
+        "source": "mtb",
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "mtb"
+        ]
+      },
+      {
+        "target_field": "results[*].result",
+        "source": {
+          "map": [
+            {
+              "lookup": "3"
+            },
+            [
+              {
+                "match": "Umbral positivo",
+                "output": "indeterminate"
+              },
+              {
+                "match": "Positivo",
+                "output": "positive"
+              },
+              {
+                "match": "Negativo",
+                "output": "negative"
+              },
+              {
+                "match": "*",
+                "output": "unknown"
+              }
+            ]
+          ]
+        },
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "positive",
+          "indeterminate",
+          "negative",
+          "unknown"
+        ]
+      },
+      {
+        "target_field": "status",
+        "source": {
+          "map" : [
+            { "lookup": "3" },
+            [
+              {"match" : "Positivo", "output" : "success" },
+              {"match" : "Negativo", "output" : "negative" },
+              {"match" : "Umbral positivo", "output" : "success" },
+              {"match" : "No válido", "output" : "invalid" },
+              {"match" : "En curso retirado", "output" : "error" },
+              {"match" : "Completo retirado", "output" : "no_result" },
+              {"match" : "*", "output" : "unknown"}
+            ]
+          ]
+        },
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "invalid",
+          "error",
+          "no_result",
+          "success",
+          "negative",
+          "unknown"
+        ]
+      },
+      {
+        "target_field": "test_type",
+        "source": {
+          "lookup": "5"
+        },
+        "core": true,
+        "indexed": true,
+        "pii": false,
+        "type": "string"
+      }
+    ]
+  }
+}
