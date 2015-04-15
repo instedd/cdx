@@ -65,6 +65,14 @@ GIT
       json
       rails (>= 3.2)
 
+GIT
+  remote: https://github.com/instedd/ruby-location_service.git
+  revision: f1c2352a1d16acbd036c68b24bf59866d20eb4f2
+  branch: master
+  specs:
+    location_service (0.1.0)
+      rest-client (~> 1.6)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -436,6 +444,7 @@ DEPENDENCIES
   instedd-bootstrap!
   jbuilder (~> 1.2)
   jquery-rails
+  location_service!
   machinist
   mysql2
   oj
