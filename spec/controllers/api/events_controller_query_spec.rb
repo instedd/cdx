@@ -275,7 +275,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     end
 
     context "Schema" do
-      let!(:root_location) { Location.create_default }
+      let!(:root_location) { Location.make }
       let!(:parent_location) { Location.make parent: root_location }
 
       it "should retrieve the schema for a given assay_name" do

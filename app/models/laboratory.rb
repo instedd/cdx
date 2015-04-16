@@ -19,6 +19,8 @@ class Laboratory < ActiveRecord::Base
   }
 
   def location(opts={})
+    @location = nil if @location_opts != opts
+    @location_opts = opts
     @location ||= Location.find(location_geoid, opts)
   end
 
