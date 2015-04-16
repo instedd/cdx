@@ -143,21 +143,11 @@ class EventsSchema
     schema["type"] = "string"
   end
 
+  # TODO: Return reference to URL where to query locations info
   def location_schema schema
     schema["type"] = "string"
-    schema["enum"] = enum = []
     schema["locations"] = locations = {}
-
-    Location.includes(:parent).find_each do |location|
-      enum << location.geo_id
-      locations[location.geo_id] = {
-        "name" => location.name,
-        "level" => location.admin_level,
-        "parent" => location.parent.try(:geo_id),
-        "lat" => location.lat,
-        "lng" => location.lng
-      }
-    end
+    # schema["enum"] = enum = []
   end
 
   def coords_schema schema, field
