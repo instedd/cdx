@@ -212,19 +212,13 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
 
     default_event_mapping = default_mapping2
     default_event_mapping['properties']['location']["properties"]={
-      "admin_level_0" => {"type"=>"string", 'index' => 'not_analyzed'},
-      "admin_level_1"=>{"type"=>"string", 'index' => 'not_analyzed'}
+      "admin_level_0" => {"type"=>"string", 'index' => 'not_analyzed'}
     }
 
-    mapping.should eq({
-      "cdp_institution_test_#{event.institution.id}" => {
-        "mappings" => {
-          '_default_'=> default_mapping2,
-          'event' => default_event_mapping,
-          "event_#{manifest.id}" => event_mapping
-        }
-      }
-    })
+    institution_mappings = mapping["cdp_institution_test_#{event.institution.id}"]['mappings']
+    institution_mappings['_default_'].should eq_hash(default_mapping2)
+    institution_mappings['event'].should eq_hash(default_event_mapping)
+    institution_mappings["event_#{manifest.id}"].should eq_hash(event_mapping)
   end
 end
 
