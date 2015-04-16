@@ -415,26 +415,17 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           "searchable" => true
         }
 
-        locations = Location.all
         location_schema = {
           "title" => "Location",
           "type" => "string",
-          "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
-          "locations" => {
-            "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
-            "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
-          },
+          "locations" => "http://locations.instedd.org/children?set=test",
           "searchable" => true
         }
 
         patient_location_schema = {
           "title" => "Patient Location",
           "type" => "string",
-          "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
-          "locations" => {
-            "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
-            "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
-          },
+          "locations" => "http://locations.instedd.org/children?set=test",
           "searchable" => false
         }
 

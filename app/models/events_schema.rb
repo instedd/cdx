@@ -143,11 +143,11 @@ class EventsSchema
     schema["type"] = "string"
   end
 
-  # TODO: Return reference to URL where to query locations info
   def location_schema schema
+    url =  "#{Settings.location_service_url}/children"
+    url << "?set=#{Settings.location_service_set}" if Settings.location_service_set
     schema["type"] = "string"
-    schema["locations"] = locations = {}
-    # schema["enum"] = enum = []
+    schema["locations"] = url
   end
 
   def coords_schema schema, field
