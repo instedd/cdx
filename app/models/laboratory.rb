@@ -3,12 +3,24 @@ class Laboratory < ActiveRecord::Base
 
   belongs_to :institution
   has_one :user, through: :institution
-  belongs_to :location
   has_and_belongs_to_many :devices
   has_many :events, through: :devices
 
   validates_presence_of :institution
   validates_presence_of :name
+
+  attr_writer :location
+
+  scope :with_locations, ->(labsq){
+    labs = labsq.all
+    locations = Hash[Location.details(labs.map(&:location_geoid).uniq).map{|l| [l.id, l]}]
+    labs.each { |lab| lab.location = locations[lab.location_geoid]}
+    labs
+  }
+
+  def location(opts={})
+    @location ||= Location.find(location_geoid, opts)
+  end
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions

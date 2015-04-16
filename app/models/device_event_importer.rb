@@ -17,7 +17,7 @@ class DeviceEventImporter
   end
 
   def load_for_device(data, device_uuid)
-    device = Device.includes(:manifests, :institution, :laboratories, :locations).find_by!(uuid: device_uuid)
+    device = Device.includes(:manifests, :institution, :laboratories).find_by!(uuid: device_uuid)
     device_event = DeviceEvent.new(device: device, plain_text_data: data)
     device_event.save!
     Rails.logger.debug("Saved device event #{device_event.id} for device #{device_uuid}")

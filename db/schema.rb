@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150305175247) do
+ActiveRecord::Schema.define(version: 20150415173303) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -50,6 +50,14 @@ ActiveRecord::Schema.define(version: 20150305175247) do
 
   add_index "device_events_events", ["device_event_id"], name: "index_device_events_events_on_device_event_id", using: :btree
   add_index "device_events_events", ["event_id"], name: "index_device_events_events_on_event_id", using: :btree
+
+  create_table "device_events_samples", force: true do |t|
+    t.integer "device_event_id"
+    t.integer "sample_id"
+  end
+
+  add_index "device_events_samples", ["device_event_id"], name: "index_device_events_samples_on_device_event_id", using: :btree
+  add_index "device_events_samples", ["sample_id"], name: "index_device_events_samples_on_sample_id", using: :btree
 
   create_table "device_models", force: true do |t|
     t.string   "name"
@@ -129,29 +137,10 @@ ActiveRecord::Schema.define(version: 20150305175247) do
     t.string   "region"
     t.float    "lat"
     t.float    "lng"
-    t.integer  "location_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "location_geoid", limit: 60
   end
-
-  create_table "locations", force: true do |t|
-    t.string   "name"
-    t.integer  "parent_id"
-    t.integer  "lft"
-    t.integer  "rgt"
-    t.float    "lat"
-    t.float    "lng"
-    t.integer  "depth"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "admin_level"
-    t.string   "geo_id"
-  end
-
-  add_index "locations", ["depth"], name: "index_locations_on_depth", using: :btree
-  add_index "locations", ["lft"], name: "index_locations_on_lft", using: :btree
-  add_index "locations", ["parent_id"], name: "index_locations_on_parent_id", using: :btree
-  add_index "locations", ["rgt"], name: "index_locations_on_rgt", using: :btree
 
   create_table "manifests", force: true do |t|
     t.string   "version"

@@ -91,6 +91,6 @@ class LaboratoriesController < ApplicationController
   end
 
   def laboratory_params
-    params.require(:laboratory).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_id)
+    params.require(:laboratory).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid)
   end
 end

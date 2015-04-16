@@ -66,6 +66,10 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+    LocationService.fake!
+  end
+
+  config.before(:each) do
     Timecop.return
   end
 

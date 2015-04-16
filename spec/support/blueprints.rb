@@ -37,8 +37,8 @@ end
 
 Laboratory.blueprint do
   institution
-  location
   name
+  location_geoid { LocationService.repository.make.id }
 end
 
 Device.blueprint do
@@ -46,13 +46,6 @@ Device.blueprint do
   institution { laboratories.first.institution }
   name
   device_model
-end
-
-Location.blueprint do
-  name
-  parent {Location.create_default}
-  geo_id { "location-#{Sham.sn}" }
-  admin_level {parent.admin_level + 1}
 end
 
 Sample.blueprint do
