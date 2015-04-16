@@ -217,6 +217,7 @@ GEM
       activesupport (>= 4.0.1)
       haml (>= 3.1, < 5.0)
       railties (>= 4.0.1)
+    hashdiff (0.2.2)
     hashie (3.3.2)
     hashr (0.0.22)
     hike (1.2.3)
@@ -444,6 +445,7 @@ DEPENDENCIES
   guard-rspec
   guid
   haml-rails
+  hashdiff
   instedd-bootstrap!
   jbuilder (~> 1.2)
   jquery-rails

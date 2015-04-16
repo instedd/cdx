@@ -91,4 +91,5 @@ group :test do
   gem 'capybara-mechanize'
   gem 'timecop'
   gem 'shoulda'
+  gem 'hashdiff'
 end
