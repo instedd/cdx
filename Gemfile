@@ -53,6 +53,7 @@ group :development do
   gem 'capistrano-rails',   '~> 1.1', require: false
   gem 'capistrano-bundler', '~> 1.1', require: false
   gem 'capistrano-rvm',   '~> 0.1', require: false
+  gem 'spring-commands-rspec'
   # gem "awesome_print", require: "ap"
   # gem 'meta_request'
   # gem 'quiet_assets'
