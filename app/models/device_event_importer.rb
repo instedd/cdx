@@ -28,7 +28,7 @@ class DeviceEventImporter
       begin
         device_event.process
       rescue => ex
-        Rails.logger.error("Error processing device event #{device_event.id}: #{ex}")
+        Rails.logger.error("Error processing device event #{device_event.id}: #{ex}\n #{ex.backtrace.join("\n")}")
       else
         Rails.logger.debug("Processed device event #{device_event.id}")
       end
@@ -42,10 +42,13 @@ class DeviceEventImporter
       PoirotRails::Activity.current.merge! device_uuid: uuid
       Rails.logger.info "Importing #{filename} for device #{uuid}"
       begin
-        File.open(filename) { |file| load_for_device file.read, uuid }
+        encoding = CharDet.detect(File.read(filename, 256))
+        File.open(filename, internal_encoding: 'UTF-8', external_encoding: "#{encoding['encoding']}") do |file|
+          load_for_device file.read, uuid
+        end
         File.delete(filename)
       rescue => ex
-        Rails.logger.error "Error processing #{filename} for device #{uuid}: #{ex}"
+        Rails.logger.error "Error processing #{filename} for device #{uuid}: #{ex}\n #{ex.backtrace.join("\n ")}"
         sync_dir.move_inbox_file_to_error(filename)
       end
     end
