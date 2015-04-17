@@ -432,7 +432,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
         event = events.last["_source"]
         event["results"][0]["condition"].should eq("mtb")
-        event["results"][0]["result"].should eq("positive_with_rmp_and_inh")
+        event["results"][0]["result"].should eq("positive_with_rif_and_inh")
 
         dbevents = Event.all
         dbevents.should have(13).items
