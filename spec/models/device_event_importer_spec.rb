@@ -1,10 +1,12 @@
+# encoding UTF8
 require 'spec_helper'
 
 describe DeviceEventImporter, elasticsearch: true do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
-  let(:device) {Device.make institution_id: institution.id}
+  let(:device_model) { DeviceModel.make name: 'test_model'}
+  let(:device) {Device.make institution_id: institution.id, device_model: device_model}
   let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
 
   before do
@@ -12,8 +14,8 @@ describe DeviceEventImporter, elasticsearch: true do
     sync_dir.ensure_client_sync_paths! device.uuid
   end
 
-  def write_file(content, extension, name=nil)
-    File.open(File.join(sync_dir.inbox_path(device.uuid), "#{name || DateTime.now.strftime('%Y%m%d%H%M%S')}.#{extension}"), "w") do |io|
+  def write_file(content, extension, name=nil, encoding='UTF-8')
+    File.open(File.join(sync_dir.inbox_path(device.uuid), "#{name || DateTime.now.strftime('%Y%m%d%H%M%S')}.#{extension}"), "w", encoding: encoding) do |io|
       io << content
     end
   end
@@ -37,7 +39,7 @@ describe DeviceEventImporter, elasticsearch: true do
           "source" : {"lookup": "result"},
           "core" : true,
           "type" : "enum",
-          "options" : [ "positive", "negative" ]
+          "options" : [ "positive", "negative", "positivo", "negativo", "inválido" ]
         }
       ]}
     }
@@ -60,6 +62,22 @@ describe DeviceEventImporter, elasticsearch: true do
       event = events.last["_source"]
       event["error_code"].should eq(1)
       event["result"].should eq("negative")
+    end
+
+    it 'parses a csv in utf 16' do
+      manifest
+
+      write_file(%{error_code;result\r\n0;positivo\r\n1;inválido\r\n}, 'csv', nil, 'UTF-16LE')
+      CharDet.stub(:detect).and_return('encoding' => 'UTF-16LE', 'confidence' => 1.0)
+      DeviceEventImporter.new.import_from sync_dir
+
+      events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["error_code"] }
+      event = events.first["_source"]
+      event["error_code"].should eq(0)
+      event["result"].should eq("positivo")
+      event = events.last["_source"]
+      event["error_code"].should eq(1)
+      event["result"].should eq("inválido")
     end
 
   end
