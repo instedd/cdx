@@ -420,7 +420,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         manifest = Manifest.create! definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', 'genoscan_manifest.json'))
         device = Device.make institution_id: institution.id, device_model: DeviceModel.find_by_name('genoscan')
 
-        data = IO.read(File.join(Rails.root, 'spec', 'support', 'genoscan_sample.csv'))
+        data = IO.read(File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'genoscan_sample.csv'))
         post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
         events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["results"][0]["result"] }
@@ -443,7 +443,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         manifest = Manifest.create! definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', 'epicenter_manifest.json'))
         device = Device.make institution_id: institution.id, device_model: DeviceModel.find_by_name('epicenter_es')
 
-        data = IO.read(File.join(Rails.root, 'spec', 'support', 'epicenter_sample.csv'))
+        data = IO.read(File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'epicenter_sample.csv'))
         post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
         events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["results"][0]["result"] }
@@ -469,7 +469,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         manifest = Manifest.create! definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', 'epicenter_headless_manifest.json'))
         device = Device.make institution_id: institution.id, device_model: DeviceModel.find_by_name('epicenter_headless_es')
 
-        data = IO.read(File.join(Rails.root, 'spec', 'support', 'epicenter_headless_sample.csv'))
+        data = IO.read(File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'epicenter_headless_sample.csv'))
         post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
         events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["results"][0]["result"] }
