@@ -133,16 +133,107 @@ describe DeviceEventImporter, elasticsearch: true do
 
   context "real scenarios" do
 
-    let(:device_model) { DeviceModel.make name: 'epicenter_headless_es'}
-    let!(:manifest)    { Manifest.create! definition: File.read(File.join(Rails.root, 'spec', 'fixtures', 'manifests', 'epicenter_headless_es_manifest.json'))}
+    def copy_sample_csv(name)
+      FileUtils.cp File.join(Rails.root, 'spec', 'fixtures', 'csvs', name), sync_dir.inbox_path(device.uuid)
+    end
 
-    it "parses epicenter headless csv in utf-16le" do
-      FileUtils.cp File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'epicenter_headless_sample_utf16.csv'), sync_dir.inbox_path(device.uuid)
-      DeviceEventImporter.new("*.csv").import_from sync_dir
+    def load_manifest(name)
+      Manifest.create! definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', name))
+    end
 
-      events = all_elasticsearch_events_for(device.institution)
-      events.should have(18).items
-      events.map{|e| e['_source']['start_time']}.should =~ ['2014-09-09T17:07:32+00:00', '2014-10-28T13:00:58+00:00', '2014-10-28T17:24:34+00:00', '2015-02-10T18:10:28+00:00', '2015-03-03T19:27:36+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2014-11-05T08:38:30+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00']
+    context 'epicenter headless_es' do
+      let(:device_model) { DeviceModel.make name: 'epicenter_headless_es'}
+      let!(:manifest)    { load_manifest 'epicenter_headless_es_manifest.json' }
+
+      it "parses csv in utf-16le" do
+        copy_sample_csv 'epicenter_headless_sample_utf16.csv'
+        DeviceEventImporter.new("*.csv").import_from sync_dir
+
+        events = all_elasticsearch_events_for(device.institution)
+        events.should have(18).items
+        events.map{|e| e['_source']['start_time']}.should =~ ['2014-09-09T17:07:32+00:00', '2014-10-28T13:00:58+00:00', '2014-10-28T17:24:34+00:00', '2015-02-10T18:10:28+00:00', '2015-03-03T19:27:36+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2014-11-05T08:38:30+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00']
+      end
+    end
+
+    context 'genoscan' do
+      let(:device_model) { DeviceModel.make name: 'genoscan'}
+      let!(:manifest) { load_manifest 'genoscan_manifest.json' }
+
+      it 'parses csv' do
+        copy_sample_csv 'genoscan_sample.csv'
+        DeviceEventImporter.new("*.csv").import_from sync_dir
+
+        events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["results"][0]["result"] }
+        events.should have(13).items
+
+        event = events.first["_source"]
+        event["results"][0]["condition"].should eq("mtb")
+        event["results"][0]["result"].should eq("negative")
+
+        event = events.last["_source"]
+        event["results"][0]["condition"].should eq("mtb")
+        event["results"][0]["result"].should eq("positive_with_rif_and_inh")
+
+        dbevents = Event.all
+        dbevents.should have(13).items
+        dbevents.map(&:uuid).should =~ events.map {|e| e['_source']['uuid']}
+      end
+    end
+
+    context 'epicenter' do
+      let(:device_model) { DeviceModel.make name: 'epicenter_es'}
+      let!(:manifest) { load_manifest 'epicenter_manifest.json' }
+
+      it 'parses csv' do
+        copy_sample_csv 'epicenter_sample.csv'
+        DeviceEventImporter.new("*.csv").import_from sync_dir
+
+        events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["results"][0]["result"] }
+        events.should have(29).items
+
+        event = events.first["_source"]
+        event["results"][0]["condition"].should eq("mtb")
+        event["results"][0]["result"].should eq("ethambutol_sensitive")
+
+        event = events.last["_source"]
+        event["results"][0]["condition"].should eq("mtb")
+        event["results"][0]["result"].should eq("thiosemicarbazone_invalid")
+
+        dbevents = Event.all
+        dbevents.should have(29).items
+        dbevents.map(&:uuid).should =~ events.map {|e| e['_source']['uuid']}
+
+        dbevents = Sample.all
+        dbevents.should have(3).items
+      end
+    end
+
+    context "epicenter headless" do
+      let(:device_model) { DeviceModel.make name: 'epicenter_headless_es'}
+      let!(:manifest) { load_manifest 'epicenter_headless_manifest.json' }
+
+      it 'parses csv' do
+        copy_sample_csv 'epicenter_headless_sample.csv'
+        DeviceEventImporter.new("*.csv").import_from sync_dir
+
+        events = all_elasticsearch_events_for(device.institution).sort_by { |event| event["_source"]["results"][0]["result"] }
+        events.should have(29).items
+
+        event = events.first["_source"]
+        event["results"][0]["condition"].should eq("mtb")
+        event["results"][0]["result"].should eq("ethambutol_sensitive")
+
+        event = events.last["_source"]
+        event["results"][0]["condition"].should eq("mtb")
+        event["results"][0]["result"].should eq("thiosemicarbazone_invalid")
+
+        dbevents = Event.all
+        dbevents.should have(29).items
+        dbevents.map(&:uuid).should =~ events.map {|e| e['_source']['uuid']}
+
+        dbevents = Sample.all
+        dbevents.should have(3).items
+      end
     end
 
   end
