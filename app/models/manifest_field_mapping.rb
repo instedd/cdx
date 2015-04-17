@@ -10,6 +10,8 @@ class ManifestFieldMapping
   end
 
   def traverse node, data
+    return nil if node.nil?
+
     if node["lookup"].present?
       return lookup(node["lookup"], data)
     end
