@@ -1,0 +1,307 @@
+// sample_id
+// test_id
+// antibiotic_id
+// patient_name
+// patient_id
+// hospital_name
+// sample_type
+// assay_name
+// sequence_number (tube_id)
+// test_status/result
+// instrument_number (epicenter_device_id)
+// test_type
+// fecha de retirado del tubo
+// start_date_time
+// antibiotic_name
+// sensibility result (S, R)
+// concentration
+// sample_end_time
+// gender (1 - unknown, 2 - male, 3 - female)
+// birth_date
+// hiv (SINE - unknown, N - negative, P - positive)
+
+{
+  "metadata": {
+    "version": "0.0.1",
+    "api_version": "1.1.0",
+    "signature": "",
+    "device_models": [
+      "epicenter_headless_es"
+    ],
+    "source": {
+      "type": "headless_csv",
+      "separator": ","
+    }
+  },
+  "field_mapping": {
+    "patient": [
+      {
+        "target_field": "patient_id",
+        "source": {
+          "lookup": "4"
+        },
+        "core": true,
+        "pii": true,
+        "type": "string"
+      },
+      {
+        "target_field": "patient_name",
+        "source": {
+          "lookup": "3"
+        },
+        "core": true,
+        "pii": true,
+        "type": "string"
+      },
+      {
+        "target_field": "age",
+        "source" :  { "if" : [
+          {"equals" : [{"lookup" : "19"}, null]},
+          "",
+          {
+            "years_between" : [
+              {"parse_date" : [
+                {"lookup" : "19"},
+                "%Y-%m-%d %H:%M:%S.%L"
+              ]},
+              {"parse_date" : [
+                {"lookup" : "13"},
+                "%Y-%m-%d %H:%M:%S.%L"
+              ]}
+            ]
+          }
+        ]},
+        "core" : true,
+        "indexed" : true,
+        "type" : "integer"
+      }
+    ],
+    "sample": [
+      {
+        "target_field": "sample_id",
+        "source": {
+          "lookup": "0"
+        },
+        "core": true,
+        "indexed": true,
+        "type": "string"
+      },
+      {
+        "target_field": "sample_uid",
+        "source" : {
+          "concat" : [
+              {"lookup" : "4"},
+              "-",
+              {"lookup" : "0"}
+          ]
+        },
+        "core": true,
+        "pii": true,
+        "type": "string"
+      }
+    ],
+    "event": [
+      {
+        "target_field": "event_id",
+        "source": {
+          "concat" : [
+              {"lookup" : "0"},
+              "-",
+              {"lookup" : "9"},
+              "-",
+              {"lookup" : "1"},
+              "-",
+              {"lookup" : "2"}
+          ]
+        },
+        "core": true,
+        "indexed": true,
+        "type": "string"
+      },
+      {
+        "target_field": "start_time",
+        "source": {
+          "parse_date": [
+            {
+              "lookup": "13"
+            },
+            "%Y-%m-%d %H:%M:%S.%L"
+          ]
+        },
+        "core": true,
+        "indexed": true,
+        "type": "date"
+      },
+      {
+        "target_field": "end_time",
+        "source": {
+          "parse_date": [
+            {
+              "lookup": "12"
+            },
+            "%Y-%m-%d %H:%M:%S.%L"
+          ]
+        },
+        "indexed": true,
+        "type": "date"
+      },
+      {
+        "target_field": "assay_name",
+        "source": {
+          "lookup": "7"
+        },
+        "core": true,
+        "indexed": true,
+        "type": "string"
+      },
+      {
+        "target_field": "results[*].condition",
+        "source": "mtb",
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "mtb"
+        ]
+      },
+      {
+        "target_field" : "results[*].result",
+        "source" : {
+          "if" : [
+            {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
+            {"concat" : [
+              {
+                "map": [
+                {"lookup" : "14"},
+                [
+                  {"match": "Estreptomicina", "output" : "streptomycin"},
+                  {"match": "Etambutol", "output" : "ethambutol"},
+                  {"match": "Rifampicina", "output" : "rifampicin"},
+                  {"match": "Pirazinamida", "output" : "pyrazinamide"},
+                  {"match": "Isoniazid", "output" : "isoniazid"},
+                  {"match": "*cido p-Aminosalic*lico", "output" : "p_aminosalicyclic_acid"},
+                  {"match": "Hidrazida del *cido tiofenocarbox*lico", "output" : "thiophenecarboxylic_acid_hydrazide"},
+                  {"match": "Levofloxacino", "output" : "levofloxacin"},
+                  {"match": "Tiosemicarbazona", "output" : "thiosemicarbazone"},
+                  {"match": "*", "output" : "unknown"}
+                ]
+              ]},
+              "_",
+              {
+                "map": [
+                {"lookup" : "15"},
+                [
+                  {"match": "X", "output" : "invalid"},
+                  {"match": "S", "output" : "sensitive"},
+                  {"match": "R", "output" : "resistant"},
+                  {"match": "*", "output" : "unknown"}
+                ]
+              ]}
+            ]},
+            {
+              "map" : [
+                {
+                  "concat" : [
+                    {"lookup" : "9"}
+                  ]
+                },
+                [
+                  {"match": "Positivo", "output" : "positive"},
+                  {"match": "Negativo", "output" : "negative"},
+                  {"match": "Umbral positivo", "output" : "indeterminate"},
+                  {"match": "*No v*lido*", "output" : "invalid"},
+                  {"match": "*Contaminad*", "output" : "invalid"},
+                  {"match": "*", "output" : "unknown"}
+                ]
+              ]
+            }
+          ]
+        },
+        "type" : "enum",
+        "core" : true,
+        "indexed" : true,
+        "options" : [
+          "streptomycin_unknown",
+          "ethambutol_unknown",
+          "rifampicin_unknown",
+          "pyrazinamide_unknown",
+          "isoniazid_unknown",
+          "p_aminosalicyclic_acid_unknown",
+          "thiophenecarboxylic_acid_hydrazide_unknown",
+          "levofloxacin_unknown",
+          "thiosemicarbazone_unknown",
+          "streptomycin_sensitive",
+          "ethambutol_sensitive",
+          "rifampicin_sensitive",
+          "pyrazinamide_sensitive",
+          "isoniazid_sensitive",
+          "p_aminosalicyclic_acid_sensitive",
+          "thiophenecarboxylic_acid_hydrazide_sensitive",
+          "levofloxacin_sensitive",
+          "thiosemicarbazone_sensitive",
+          "streptomycin_resistant",
+          "ethambutol_resistant",
+          "rifampicin_resistant",
+          "pyrazinamide_resistant",
+          "isoniazid_resistant",
+          "p_aminosalicyclic_acid_resistant",
+          "thiophenecarboxylic_acid_hydrazide_resistant",
+          "levofloxacin_resistant",
+          "thiosemicarbazone_resistant",
+          "streptomycin_invalid",
+          "ethambutol_invalid",
+          "rifampicin_invalid",
+          "pyrazinamide_invalid",
+          "isoniazid_invalid",
+          "p_aminosalicyclic_acid_invalid",
+          "thiophenecarboxylic_acid_hydrazide_invalid",
+          "levofloxacin_invalid",
+          "thiosemicarbazone_invalid",
+          "positive",
+          "negative",
+          "indeterminate",
+          "invalid",
+          "unknown"
+        ]
+      },
+      {
+        "target_field": "status",
+        "source": {
+          "map" : [
+            { "lookup": "9" },
+            [
+              {"match" : "Positivo", "output" : "success" },
+              {"match" : "Completo retirado", "output" : "success" },
+              {"match" : "Negativo", "output" : "negative" },
+              {"match" : "No válido", "output" : "invalid" },
+              {"match" : "En curso retirado", "output" : "error" },
+              {"match" : "Umbral positivo", "output" : "no_result" },
+              {"match" : "*", "output" : "unknown"}
+            ]
+          ]
+        },
+        "type": "enum",
+        "core": true,
+        "indexed": true,
+        "options": [
+          "invalid",
+          "error",
+          "no_result",
+          "success",
+          "negative",
+          "unknown"
+        ]
+      },
+      {
+        "target_field": "test_type",
+        "source": "specimen",
+        "core": true,
+        "indexed": true,
+        "type": "enum",
+        "options": [
+          "specimen"
+        ]
+      }
+    ]
+  }
+}
