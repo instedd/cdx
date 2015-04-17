@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
   before_action :load_current_user_policies
+  before_action :load_js_global_settings
 
   decent_configuration do
     strategy DecentExposure::StrongParametersStrategy
@@ -32,6 +33,11 @@ class ApplicationController < ActionController::Base
     if current_user
       @current_user_policies = current_user.policies.load
     end
+  end
+
+  def load_js_global_settings
+    gon.location_service_url = Settings.location_service_url
+    gon.location_service_set = Settings.location_service_set
   end
 
   def authorize_resource(resource, action)

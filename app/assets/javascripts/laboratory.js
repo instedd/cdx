@@ -16,7 +16,7 @@ $(function() {
     placeholder: "Search locations",
     minimumInputLength: 2,
     ajax: {
-      url: "http://localhost:8080/suggest",
+      url: gon.location_service_url + "/suggest",
       dataType: 'json',
       quietMillis: 250,
       data: function (term, page) {
@@ -24,7 +24,8 @@ $(function() {
           name: term,
           limit: 20,
           offset: page * 20,
-          ancestors: true
+          ancestors: true,
+          set: gon.location_service_set
         };
       },
       results: function (data, page) {
@@ -38,7 +39,7 @@ $(function() {
     initSelection: function(element, callback) {
         var id = $(element).val();
         if (id !== "") {
-          $.ajax("http://localhost:8080/details", {
+          $.ajax(gon.location_service_url + "/details", {
             dataType: 'json',
             data: { id: id, ancestors: true },
             success: function(data) {

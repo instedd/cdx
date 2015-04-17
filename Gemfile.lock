@@ -200,6 +200,11 @@ GEM
       dotenv (>= 0.7)
       thor (>= 0.13.6)
     formatador (0.2.4)
+    gon (5.2.3)
+      actionpack (>= 2.3.0)
+      json
+      multi_json
+      request_store (>= 1.0.5)
     guard (2.3.0)
       formatador (>= 0.2.4)
       listen (~> 2.1)
@@ -324,6 +329,7 @@ GEM
       ffi (>= 0.5.0)
     rdoc (4.1.1)
       json (~> 1.4)
+    request_store (1.1.0)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rspec (2.13.0)
@@ -442,6 +448,7 @@ DEPENDENCIES
   faker
   foreman
   geojson_import!
+  gon
   guard-rspec
   guid
   haml-rails
