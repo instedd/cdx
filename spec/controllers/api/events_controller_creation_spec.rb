@@ -414,6 +414,5 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         event["result"].should eq("negative")
       end
     end
-
   end
 end
