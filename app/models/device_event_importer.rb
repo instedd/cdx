@@ -42,13 +42,13 @@ class DeviceEventImporter
       PoirotRails::Activity.current.merge! device_uuid: uuid
       Rails.logger.info "Importing #{filename} for device #{uuid}"
       begin
-        encoding = CharDet.detect(File.read(filename, 256))
+        encoding = CharDet.detect(File.read(filename))
         File.open(filename, internal_encoding: 'UTF-8', external_encoding: "#{encoding['encoding']}") do |file|
           load_for_device file.read, uuid
         end
         File.delete(filename)
       rescue => ex
-        Rails.logger.error "Error processing #{filename} for device #{uuid}: #{ex}\n #{ex.backtrace.join("\n ")}"
+        Rails.logger.error "Error processing #{filename} with encoding #{encoding || 'nil'} for device #{uuid}: #{ex}\n #{ex.backtrace.join("\n ")}"
         sync_dir.move_inbox_file_to_error(filename)
       end
     end
