@@ -418,15 +418,21 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         location_schema = {
           "title" => "Location",
           "type" => "string",
-          "locations" => "http://locations.instedd.org/children?set=test",
-          "searchable" => true
+          "searchable" => true,
+          "location-service" => {
+            "url" => "http://locations.instedd.org",
+            "set" => "test"
+          }
         }
 
         patient_location_schema = {
           "title" => "Patient Location",
           "type" => "string",
-          "locations" => "http://locations.instedd.org/children?set=test",
-          "searchable" => false
+          "searchable" => false,
+          "location-service" => {
+            "url" => "http://locations.instedd.org",
+            "set" => "test"
+          }
         }
 
         response = get :schema, assay_name: "first_assay", locale: "es-AR", format: 'json'

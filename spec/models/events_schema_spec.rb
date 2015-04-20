@@ -114,8 +114,11 @@ describe EventsSchema do
     location_schema = {
       "title" => "Patient Location",
       "type" => "string",
-      "locations" => "http://locations.instedd.org/children?set=test",
-      "searchable" => true
+      "searchable" => true,
+      "location-service" => {
+        "url" => "http://locations.instedd.org",
+        "set" => "test"
+      }
     }
 
     schema = EventsSchema.new "es-AR", {assay_name: "first_assay"}, Manifest.new(definition:definition)

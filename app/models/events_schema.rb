@@ -144,10 +144,11 @@ class EventsSchema
   end
 
   def location_schema schema
-    url =  "#{Settings.location_service_url}/children"
-    url << "?set=#{Settings.location_service_set}" if Settings.location_service_set
     schema["type"] = "string"
-    schema["locations"] = url
+    schema["location-service"] = {
+      "url" => Settings.location_service_url,
+      "set" => Settings.location_service_set
+    }
   end
 
   def coords_schema schema, field
