@@ -1,8 +1,8 @@
 .row-fluid
   .span6
-    - simple_list :location, title: 'Locations', icon: :folder, create_path: new_location_path(parent_id: params[:parent_id]) do
+    - simple_list :location, title: 'Locations', icon: :folder do
       - @locations.each do |location|
         %tr
           %td
             = link_to location.name, locations_path(parent_id: location.id)
-            = icon_link_to :'icf-arrow', '', edit_location_path(location), class: 'pull-right'
+            = icon_link_to :'icf-arrow', '', location_path(location.id), class: 'pull-right'

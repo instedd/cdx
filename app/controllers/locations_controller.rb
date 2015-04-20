@@ -5,20 +5,20 @@ class LocationsController < ApplicationController
   before_filter :show_ancestors_in_breadcrumb
 
   def index
-    # TODO: Reimplement
+    @locations = Location.children(params[:parent_id])
+  end
+
+  def show
+    @location = Location.find(params[:id], ancestors: true)
   end
 
   private
 
   def show_ancestors_in_breadcrumb
-    ancestors = []
     parent_id = params[:parent_id] || params[:id]
+    return if !parent_id
 
-    while parent_id
-      ancestors << ancestor = Location.find(parent_id)
-      parent_id = ancestor.parent_id
-    end
-    ancestors.reverse_each do |ancestor|
+    Location.find(parent_id, ancestors: true).self_and_ancestors.each do |ancestor|
       add_breadcrumb ancestor.name, locations_path(parent_id: ancestor.id)
     end
   end
