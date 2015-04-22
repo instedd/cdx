@@ -2,7 +2,7 @@ $(function() {
 
   var formatLocation = function(location) {
     var name = location.name;
-    if (location.ancestors.length > 0) {
+    if (location.ancestors && location.ancestors.length > 0) {
       var ancestorsNames = _.pluck(location.ancestors, 'name');
       name += (" (" + ancestorsNames.reverse().join(", ") + ")");
     }
@@ -23,7 +23,7 @@ $(function() {
         return {
           name: term,
           limit: 20,
-          offset: page * 20,
+          offset: (page-1) * 20,
           ancestors: true,
           set: gon.location_service_set
         };
