@@ -27,6 +27,6 @@
 
 - content_for :instedd_content do
   = Gon::Base.render_data({})
-  = yield
+  = content_for?(:cdp_content) ? yield(:cdp_content) : yield
 
 = render template: 'instedd/application'
