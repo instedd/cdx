@@ -17,16 +17,14 @@ class Device < ActiveRecord::Base
 
   before_create :set_key, :set_uuid
 
+  delegate :current_manifest, to: :device_model
+
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
       joins(:institution).where(institutions: {user_id: user.id})
     else
       self
     end
-  end
-
-  def current_manifest
-    @manifest ||= device_model.current_manifest
   end
 
   def filter_by_owner(user, check_conditions)
