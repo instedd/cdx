@@ -8,12 +8,13 @@
   "onlyShowPositiveResults": false,
   "parentURL": "/dashboards/nndd",
   "customStyles": "../conf/custom.local.scss",
+  "showMarkersOnMap": false,
   "polygons": {
     "location": {
-      "1": "/polygons/level-0.topo.json",
-      "2": "/polygons/level-1.topo.json",
-      "3": "/polygons/level-2.topo.json",
-      "4": "/polygons/level-3.topo.json"
+      "0": "/polygons/level-0.topo.json",
+      "1": "/polygons/level-1.topo.json",
+      "2": "/polygons/level-2.topo.json",
+      "3": "/polygons/level-3.topo.json"
     }
   },
   "proxies": [
