@@ -1,5 +1,6 @@
 class DeviceModel < ActiveRecord::Base
   has_and_belongs_to_many :manifests
+  has_many :devices
 
   scope :active, -> { joins(:manifests).distinct }
 
@@ -11,5 +12,4 @@ class DeviceModel < ActiveRecord::Base
     super
     @manifest = nil
   end
-
 end

@@ -35,10 +35,9 @@ class Subscriber < ActiveRecord::Base
 
   def notify
     fields = self.fields
-    filter = self.filter.query
+    filter = self.filter.query.merge "page_size" => 10000, "updated_at_since" => last_run_at.iso8601
     Rails.logger.info "Filter : #{filter}"
-    filter["updated_at_since"] = last_run_at.iso8601
-    events = Cdx::Api::Elasticsearch::Query.new(filter).execute["events"]
+    events = Cdx::Api::Elasticsearch::Query.new(filter.with_indifferent_access).execute["events"]
     now = Time.now
     events.each do |event|
       PoirotRails::Activity.start("Publish event to subscriber #{self.name}") do
@@ -67,8 +66,8 @@ class Subscriber < ActiveRecord::Base
           else
             request.post filtered_event.to_json
           end
-        rescue Exception => e
-          Rails.logger.warn "Could not #{verb} to subscriber #{subscriber.id} at #{callback_url}: #{ex.message}\n#{ex.backtrace}"
+        rescue Exception => ex
+          Rails.logger.warn "Could not #{verb} to subscriber #{id} at #{callback_url}: #{ex.message}\n#{ex.backtrace}"
         end
 
       end

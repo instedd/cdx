@@ -25,6 +25,7 @@ gem 'alto_guisso', github: "instedd/alto_guisso", branch: 'master'
 gem 'rails_config'
 gem 'rest-client'
 gem 'barby'
+gem 'rchardet'
 
 gem 'cdx-api-elasticsearch', git: "https://github.com/instedd/cdx-api-elasticsearch.git", branch: 'master'
 gem 'cdx-sync-server',  git: "https://github.com/instedd/cdx-sync-server.git", branch: 'master'
@@ -53,6 +54,7 @@ group :development do
   gem 'capistrano-rails',   '~> 1.1', require: false
   gem 'capistrano-bundler', '~> 1.1', require: false
   gem 'capistrano-rvm',   '~> 0.1', require: false
+  gem 'spring-commands-rspec'
   # gem "awesome_print", require: "ap"
   # gem 'meta_request'
   # gem 'quiet_assets'
