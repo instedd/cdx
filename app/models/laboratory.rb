@@ -11,13 +11,6 @@ class Laboratory < ActiveRecord::Base
 
   attr_writer :location
 
-  scope :with_locations, ->(labsq){
-    labs = labsq.all
-    locations = Hash[Location.details(labs.map(&:location_geoid).uniq).map{|l| [l.id, l]}]
-    labs.each { |lab| lab.location = locations[lab.location_geoid]}
-    labs
-  }
-
   def location(opts={})
     @location = nil if @location_opts != opts
     @location_opts = opts
