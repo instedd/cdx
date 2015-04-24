@@ -28,5 +28,7 @@ class Institution < ActiveRecord::Base
 
   def ensure_elasticsearch_index
     Cdx::Api.client.indices.create index: elasticsearch_index_name
+  rescue Elasticsearch::Transport::Transport::Errors::BadRequest => ex
+    raise unless ex.message =~ /IndexAlreadyExistsException/
   end
 end

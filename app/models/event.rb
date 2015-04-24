@@ -16,6 +16,8 @@ class Event < ActiveRecord::Base
 
   attr_writer :plain_sensitive_data
 
+  delegate :device_model, :device_model_id, to: :device
+
   def merge(event)
     self.plain_sensitive_data.deep_merge_not_nil!(event.plain_sensitive_data)
     self.custom_fields.deep_merge_not_nil!(event.custom_fields)

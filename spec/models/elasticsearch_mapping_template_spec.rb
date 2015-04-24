@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ElasticsearchMappingTemplate, elasticsearch: true do
 
   let(:manifest) do
-    definition = %{{
+    Manifest.create! definition: %{{
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "1.1.0",
@@ -40,185 +40,152 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
         }
       ]}
     }}
-    Manifest.create!(definition: definition)
   end
 
-  def default_mapping
-    {
-      "dynamic_templates"=>[
-        {
-          "location_levels"=>{
-            "path_match"=>"location.admin_level_*",
-            "mapping"=>{"type"=>"string", 'index' => 'not_analyzed'}
-          }
-        }
-      ],
-      'properties'=> {
-        "start_time" => { 'type' => "date", 'index' => 'not_analyzed'},
-        "created_at"=>{'type'=>"date", 'index'=>'not_analyzed'},
-        "updated_at"=>{'type'=>"date", 'index'=>'not_analyzed'},
-        "event_id"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "sample_uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "sample_id"=>{"type"=>"string", "index"=>"not_analyzed"},
-        "sample_type"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "device_uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "system_user"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "device_serial_number"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "error_code"=>{'type'=>"integer", 'index'=>'not_analyzed'},
-        "error_description"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "laboratory_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
-        "location_id"=>{'type'=>"string", 'index' => 'not_analyzed'},
-        "institution_id"=>{'type'=>"integer", 'index'=>'not_analyzed'},
-        "parent_locations"=>{'type' =>"string", 'index' => 'not_analyzed'},
-        "location"=>{'type'=>'nested'},
-        "age"=>{'type'=>"integer", 'index'=>'not_analyzed'},
-        "assay_name"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "gender"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "ethnicity"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "race"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "race_ethnicity"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "status"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "results"=> {
-          'type'=>'nested',
-          'properties'=> {
-            "result"=> {
-              'type'=>"multi_field",
-              'fields'=> {
-                'analyzed'=> {'type'=> 'string', 'index'=>'analyzed'},
-                "result"=>{'type'=>'string', 'index'=>'not_analyzed'}
-              }
-            },
-            "condition"=>{'type'=>"string", 'index'=>'not_analyzed'}
-          }
-        },
-        "test_type"=>{'type'=>"string", 'index'=>'not_analyzed'}
-      }
-    }
+  let(:device_model) { DeviceModel.find_or_create_by(name: "GX4001") }
+  let(:device)       { Device.make(device_model: device_model) }
+
+  matcher :have_nested_keys do |keys|
+    match do |hash|
+      value = keys.inject hash do |h, key|
+        h[key] if h && h.has_key?(key) rescue nil
+      end
+      value == @expected_value
+    end
+
+    chain :with_value do |expected_value|
+      @expected_value = expected_value
+    end
+
+    failure_message_for_should do |hash|
+      "expected hash to have keys nested #{keys} with value #{@expected_value} but found:\n#{hash.to_yaml}"
+    end
   end
 
-  def default_mapping2
-    {
-      "dynamic_templates"=>[
-        {
-          "location_levels"=>{
-            "path_match"=>"location.admin_level_*",
-            "mapping"=>{"type"=>"string", 'index' => 'not_analyzed'}
-          }
-        }
-      ],
-      'properties'=> {
-        "start_time" => { 'type' => "date", 'format' => 'dateOptionalTime'},
-        "created_at"=>{'type'=>"date", 'format' => 'dateOptionalTime'},
-        "updated_at"=>{'type'=>"date", 'format' => 'dateOptionalTime'},
-        "event_id"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "sample_uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "sample_id"=>{"type"=>"string", "index"=>"not_analyzed"},
-        "sample_type"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "device_uuid"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "system_user"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "device_serial_number"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "error_code"=>{'type'=>"integer"},
-        "error_description"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "laboratory_id"=>{'type'=>"integer"},
-        "location_id"=>{'type'=>"string", 'index' => 'not_analyzed'},
-        "institution_id"=>{'type'=>"integer"},
-        "parent_locations"=>{'type' =>"string", 'index' => 'not_analyzed'},
-        "location"=>{'type'=>'nested'},
-        "age"=>{'type'=>"integer"},
-        "assay_name"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "gender"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "ethnicity"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "race"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "race_ethnicity"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "status"=>{'type'=>"string", 'index'=>'not_analyzed'},
-        "results"=> {
-          'type'=>'nested',
-          'properties'=> {
-            "result"=> {
-              'type'=>"string",
-              'index'=>'not_analyzed',
-              'fields'=> {
-                'analyzed'=> {'type'=> 'string'}
-              }
-            },
-            "condition"=>{'type'=>"string", 'index'=>'not_analyzed'}
-          }
-        },
-        "test_type"=>{'type'=>"string", 'index'=>'not_analyzed'}
-      }
-    }
+  shared_examples "has default mappings by" do
+
+    it "being not blank" do
+      subject.should_not be_blank
+    end
+
+    it "having location level dynamic template" do
+      subject['dynamic_templates'][0].should have_nested_keys(['location_levels', 'path_match']).with_value('location.admin_level_*')
+      subject['dynamic_templates'][0].should have_nested_keys(['location_levels', 'mapping', 'type']).with_value('string')
+      subject['dynamic_templates'][0].should have_nested_keys(['location_levels', 'mapping', 'index']).with_value('not_analyzed')
+    end
+
+    it "mapping plain types" do
+      subject.should have_nested_keys(['properties', 'start_time', 'type']).with_value('date')
+      subject.should have_nested_keys(['properties', 'event_id', 'type']).with_value('string')
+      subject.should have_nested_keys(['properties', 'error_code', 'type']).with_value('integer')
+      subject.should have_nested_keys(['properties', 'laboratory_id', 'type']).with_value('integer')
+      subject.should have_nested_keys(['properties', 'parent_locations', 'type']).with_value('string')
+      subject.should have_nested_keys(['properties', 'location', 'type']).with_value('nested')
+      subject.should have_nested_keys(['properties', 'race', 'type']).with_value('string')
+    end
+
+    it "mapping nested types" do
+      subject.should have_nested_keys(['properties', 'results', 'type']).with_value('nested')
+      subject.should have_nested_keys(['properties', 'results', 'properties', 'result', 'type']).with_value('string')
+      subject.should have_nested_keys(['properties', 'results', 'properties', 'result', 'index']).with_value('not_analyzed')
+      subject.should have_nested_keys(['properties', 'results', 'properties', 'result', 'fields', 'analyzed', 'type']).with_value('string')
+      subject.should have_nested_keys(['properties', 'results', 'properties', 'condition', 'type']).with_value('string')
+    end
+
   end
 
-  it "should build a template with the default manifest and an specific mapping for each custom manifest" do
-    manifest
-    template = {
-      'template'=>"cdp_institution*",
-      'mappings'=> {
-        '_default_'=> default_mapping,
-        'event' => {
-          "dynamic_templates"=>[],
-          'properties' => {},
-          },
-        "event_#{manifest.id}" => {
-          "dynamic_templates"=>[],
-          'properties' => {
-            "custom_fields" => {
-              'type' => 'nested',
-              'properties' => {
-                "temperature" => {'type' => "integer", 'index' => 'not_analyzed'}
-              }
-            },
-            "results" => {
-              'type' => 'nested',
-              'properties' => {
-                "custom_fields" => {
-                  'type' => 'nested',
-                  'properties' => {
-                    "temperature" => {'type' => "integer", 'index' => 'not_analyzed'}
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
 
-    ElasticsearchMappingTemplate.new.template.should eq(template)
+  shared_examples "has manifest mappings by" do
+
+    it "being not blank" do
+      subject.should_not be_blank
+    end
+
+    it "mapping plain custom fields" do
+      subject.should have_nested_keys(['properties', 'custom_fields', 'type']).with_value('nested')
+      subject.should have_nested_keys(['properties', 'custom_fields', 'properties', 'temperature', 'type']).with_value('integer')
+    end
+
+    it "mapping nested custom fields" do
+      subject.should have_nested_keys(['properties', 'results', 'properties', 'custom_fields', 'type']).with_value('nested')
+      subject.should have_nested_keys(['properties', 'results', 'properties', 'custom_fields', 'properties', 'temperature', 'type']).with_value('integer')
+    end
+
   end
 
-  it "should update the mappings of the existing indices" do
-    ElasticsearchMappingTemplate.new.load
-    event = Event.create_and_index results: [{result: :positive}]
-    manifest
+  context "default" do
 
-    mapping = Cdx::Api.client.indices.get_mapping index: event.institution.elasticsearch_index_name
+    let(:template) { Cdx::Api.client.indices.get_template(name: 'cdp_events_template_test_default')['cdp_events_template_test_default'] }
 
-    event_mapping = default_mapping2
-    event_mapping['properties']['custom_fields'] = {
-      'type' => 'nested',
-      'properties' => {
-        "temperature" => {'type' => "integer"}
-      },
-    }
-    event_mapping['properties']['results']['properties']['custom_fields'] = {
-      'type' => 'nested',
-      'properties' => {
-        "temperature" => {'type' => "integer"}
-      }
-    }
+    subject { template['mappings']['_default_'] }
+    include_examples 'has default mappings by'
 
-    default_event_mapping = default_mapping2
-    default_event_mapping['properties']['location']["properties"]={
-      "admin_level_0" => {"type"=>"string", 'index' => 'not_analyzed'}
-    }
+    it "should have a template name" do
+      template['template'].should eq('cdp_institution_test*')
+    end
 
-    institution_mappings = mapping["cdp_institution_test_#{event.institution.id}"]['mappings']
-    institution_mappings['_default_'].should eq_hash(default_mapping2)
-    institution_mappings['event'].should eq_hash(default_event_mapping)
-    institution_mappings["event_#{manifest.id}"].should eq_hash(event_mapping)
+    it "should have en empty default event mapping" do
+      template['mappings']['event'].should eq({"dynamic_templates"=>[], 'properties' => {}})
+    end
+
   end
+
+  context "for manifest" do
+
+    let(:event)     { Event.create_and_index({results: [{result: :positive}]}, device_events: [DeviceEvent.make(device: device)]) }
+    let(:mapping)   { Cdx::Api.client.indices.get_mapping index: event.institution.elasticsearch_index_name }
+
+    shared_examples "on mapping" do
+
+      def mapping_for(name)
+        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'][name]
+      end
+
+      it "should have all types" do
+        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'].should_not be_blank
+        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'].should have_key('_default_')
+        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'].should have_key('event')
+        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'].should have_key("event_#{device_model.id}")
+      end
+
+      context "default" do
+        subject { mapping_for('_default_') }
+        include_examples 'has default mappings by'
+      end
+
+      context "for plain event" do
+        subject { mapping_for('event') }
+        include_examples 'has default mappings by'
+      end
+
+      context "for manifest" do
+        subject { mapping_for("event_#{device_model.id}") }
+
+        include_examples 'has default mappings by'
+        include_examples 'has manifest mappings by'
+      end
+
+    end
+
+    it "should index event with correct device model" do
+      event.device_model.name.should eq("GX4001")
+    end
+
+    context "creating template for index" do
+      before(:each) { manifest; event }
+      include_examples 'on mapping'
+    end
+
+    context "updating template for index" do
+      before(:each) { event; manifest }
+      include_examples 'on mapping'
+
+      it "should map location fields from dynamic template" do
+        mapping_for('event').should have_nested_keys(['properties', 'location', 'properties', 'admin_level_0', 'type']).with_value('string')
+        mapping_for('event').should have_nested_keys(['properties', 'location', 'properties', 'admin_level_1', 'type']).with_value('string')
+      end
+    end
+
+  end
+
 end
-

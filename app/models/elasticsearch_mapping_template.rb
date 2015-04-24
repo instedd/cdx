@@ -1,49 +1,136 @@
 class ElasticsearchMappingTemplate
-  def load
-    Cdx::Api.client.indices.put_template name: "cdx_events_template", body: template
+
+  attr_reader :manifest
+  attr_reader :device_models
+
+  delegate :template_name, to: :class
+
+  def initialize(manifest, device_models=nil)
+    @manifest = manifest
+    @device_models = device_models || manifest.try(:current_models)
   end
 
-  def update_existing_indices_with manifest
-    mapping = {
-      index: Cdx::Api.config.template_name_pattern,
-      type: "event_#{manifest.id}",
-      body: {
-        dynamic_templates: build_dynamic_templates_for(manifest),
-        properties: build_properties_mapping_for(manifest),
-      }
-    }
-    Cdx::Api.client.indices.put_mapping mapping
-  rescue Elasticsearch::Transport::Transport::Errors::NotFound => ex
-    # do nothing. if no index match with the patern is because no event was indexed yet.
-  end
-
-  def template
-    {
-      'template' => Cdx::Api.config.template_name_pattern,
-      'mappings' => mappings
-    }
-  end
-
-  def mappings
-    mappings = {
-      '_default_' => {
-        'dynamic_templates' => build_default_dynamic_templates,
-        'properties' => build_default_properties_mapping,
-      },
-      'event' => {
-        'dynamic_templates' => [],
-        'properties' => {},
-      }
-    }
-
+  def self.update_all!
+    ElasticsearchDefaultMappingTemplate.new.update!
     Manifest.valid.each do |manifest|
-      mappings["event_#{manifest.id}"] = {
-        'dynamic_templates' => build_dynamic_templates_for(manifest),
-        'properties' => build_properties_mapping_for(manifest),
+      self.new(manifest).update!
+    end
+  end
+
+  def self.create_default!
+    ElasticsearchDefaultMappingTemplate.new.put_template!
+  end
+
+  def self.delete_templates!
+    Cdx::Api.client.indices.delete_template(name: "#{template_prefix}*")
+  rescue Elasticsearch::Transport::Transport::Errors::NotFound => ex
+    nil
+  end
+
+  def self.template_name(name)
+    return "#{template_prefix}_#{name}"
+  end
+
+  def self.template_prefix
+    "cdp_events_template_#{Rails.env}"
+  end
+
+  def self.delete_templates_for(models)
+    models.each do |model|
+      Cdx::Api.client.indices.delete_template(name: template_name(model.id))
+    end
+  end
+
+  def update!
+    put_template!
+    update_indices!
+  end
+
+  def put_template!
+    mapping = mapping_for(manifest)
+    device_models.each do |model|
+      Cdx::Api.client.indices.put_template name: template_name(model.id), body: {
+        'template' => Cdx::Api.config.template_name_pattern,
+        'mappings' => { "event_#{model.id}" => mapping }
+      }
+    end
+  end
+
+  def update_indices!
+    mapping = mapping_for(manifest)
+    device_models.each do |device_model|
+      begin
+        Cdx::Api.client.indices.put_mapping index_mapping(mapping, "event_#{device_model.id}")
+      rescue Elasticsearch::Transport::Transport::Errors::NotFound => ex
+        nil
+      end
+    end
+  end
+
+  class ElasticsearchDefaultMappingTemplate < ElasticsearchMappingTemplate
+
+    def initialize
+      super(nil, [])
+    end
+
+    def put_template!
+      Cdx::Api.client.indices.put_template name: template_name('default'), body: {
+        'template' => Cdx::Api.config.template_name_pattern,
+        'mappings' => {
+          "_default_" => default_mapping,
+          "event" => empty_mapping
+        }
       }
     end
 
-    mappings
+    def update_indices!
+      Cdx::Api.client.indices.put_mapping index_mapping(default_mapping, '_default_')
+      Cdx::Api.client.indices.put_mapping index_mapping(empty_mapping, 'event')
+    rescue Elasticsearch::Transport::Transport::Errors::NotFound => ex
+      nil
+    end
+
+    def default_mapping
+      {
+        'dynamic_templates' => build_default_dynamic_templates,
+        'properties' => build_default_properties_mapping,
+      }
+    end
+
+    def empty_mapping
+      {
+        'dynamic_templates' => [],
+        'properties' => {}
+      }
+    end
+
+    def build_default_properties_mapping
+      map_fields(Manifest.default.flat_mappings.select do |mapping|
+        mapping[:indexed]
+      end)
+    end
+
+    def build_default_dynamic_templates
+      build_dynamic_templates_for Manifest.default
+    end
+
+  end
+
+  protected
+
+  def index_mapping(body, type)
+    {
+      index: Cdx::Api.config.template_name_pattern,
+      body: body,
+      type: type
+    }
+  end
+
+  def mapping_for(manifest)
+    {
+      'dynamic_templates' => build_dynamic_templates_for(manifest),
+      'properties' => build_properties_mapping_for(manifest),
+    }
   end
 
   def build_dynamic_templates_for manifest
@@ -63,16 +150,6 @@ class ElasticsearchMappingTemplate
     end
 
     templates
-  end
-
-  def build_default_properties_mapping
-    map_fields(Manifest.default.flat_mappings.select do |mapping|
-      mapping[:indexed]
-    end)
-  end
-
-  def build_default_dynamic_templates
-    build_dynamic_templates_for Manifest.default
   end
 
   def build_properties_mapping_for manifest
@@ -109,10 +186,10 @@ class ElasticsearchMappingTemplate
       case field['type']
       when "multi_field"
         properties[field_name] = {
-          'type' => field[:type],
+          'type' => 'string',
+          'index' => 'not_analyzed',
           'fields' => {
-            'analyzed' => {'type' => 'string', 'index' => 'analyzed'},
-            field_name => {'type' => 'string', 'index' => 'not_analyzed'}
+            'analyzed' => {'type' => 'string', 'index' => 'analyzed'}
           }
         }
       when "location"

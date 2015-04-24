@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150415173303) do
+ActiveRecord::Schema.define(version: 20150422124002) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -50,14 +50,6 @@ ActiveRecord::Schema.define(version: 20150415173303) do
 
   add_index "device_events_events", ["device_event_id"], name: "index_device_events_events_on_device_event_id", using: :btree
   add_index "device_events_events", ["event_id"], name: "index_device_events_events_on_event_id", using: :btree
-
-  create_table "device_events_samples", force: true do |t|
-    t.integer "device_event_id"
-    t.integer "sample_id"
-  end
-
-  add_index "device_events_samples", ["device_event_id"], name: "index_device_events_samples_on_device_event_id", using: :btree
-  add_index "device_events_samples", ["sample_id"], name: "index_device_events_samples_on_sample_id", using: :btree
 
   create_table "device_models", force: true do |t|
     t.string   "name"
@@ -161,12 +153,14 @@ ActiveRecord::Schema.define(version: 20150415173303) do
   end
 
   create_table "samples", force: true do |t|
-    t.string  "uuid"
-    t.binary  "sensitive_data"
-    t.integer "institution_id"
-    t.text    "custom_fields"
-    t.string  "sample_uid_hash"
-    t.text    "indexed_fields"
+    t.string   "uuid"
+    t.binary   "sensitive_data"
+    t.integer  "institution_id"
+    t.text     "custom_fields"
+    t.string   "sample_uid_hash"
+    t.text     "indexed_fields"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "samples", ["institution_id", "sample_uid_hash"], name: "index_samples_on_institution_id_and_sample_uid_hash", using: :btree

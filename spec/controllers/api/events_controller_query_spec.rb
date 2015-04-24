@@ -73,6 +73,16 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         response.first["results"].first["result"].should eq("positive")
       end
 
+      it "filters by event_id" do
+        post :create, (Oj.dump event_id: 2, results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
+        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
+
+        response = get_updates event: 2
+
+        response.size.should eq(1)
+        response.first["results"].first["result"].should eq("positive")
+      end
+
       it "filters by test type" do
         post :create, (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc), device_id: device.uuid, authentication_token: device.secret_key
         post :create, (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen), device_id: device.uuid, authentication_token: device.secret_key

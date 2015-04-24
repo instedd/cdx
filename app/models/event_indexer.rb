@@ -20,7 +20,7 @@ class EventIndexer
 
   def type
     if device.current_manifest.present?
-      "event_#{device.current_manifest.id}"
+      "event_#{device.device_model_id}"
     else
       'event'
     end

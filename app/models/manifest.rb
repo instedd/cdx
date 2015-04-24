@@ -2,10 +2,13 @@ class Manifest < ActiveRecord::Base
   has_and_belongs_to_many :device_models
 
   validate :manifest_validation
+
   before_save :update_models
   before_save :update_version
   before_save :update_api_version
-  after_save :update_mappings
+
+  after_save     :update_mappings
+  around_destroy :restore_mappings
 
   COLLECTION_SPLIT_TOKEN = "[*]."
   PATH_SPLIT_TOKEN = "."
@@ -50,6 +53,10 @@ class Manifest < ActiveRecord::Base
   def reload
     @loaded_definition = nil
     super
+  end
+
+  def current_models
+    self.device_models.to_a.select {|model| model.current_manifest.id == id}
   end
 
   def update_models
@@ -229,9 +236,21 @@ class Manifest < ActiveRecord::Base
   end
 
   def update_mappings
-    mapping_template = ElasticsearchMappingTemplate.new
-    mapping_template.load
-    mapping_template.update_existing_indices_with self
+    ElasticsearchMappingTemplate.new(self, current_models).update!
+  end
+
+  def restore_mappings
+    # TODO: Add tests for restoring old mappings
+    models = self.current_models
+    yield
+
+      models.each(&:reload).group_by(&:current_manifest).each do |manifest, models|
+        if manifest
+          ElasticsearchMappingTemplate.new(manifest, models).update!
+        else
+          ElasticsearchMappingTemplate.delete_templates_for(models)
+        end
+    end
   end
 
   def check_valid_type(field_mapping)

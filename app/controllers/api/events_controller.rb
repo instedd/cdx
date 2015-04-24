@@ -1,4 +1,5 @@
 class Api::EventsController < ApiController
+  wrap_parameters false
   skip_before_action :authenticate_api_user!, only: :create
   skip_before_action :load_current_user_policies, only: :create
 
@@ -34,7 +35,6 @@ class Api::EventsController < ApiController
     params.delete(:format)
     params.delete(:controller)
     params.delete(:action)
-    params.delete(:event)
     body = Oj.load(request.body.read) || {}
     filters = params.merge(body)
     if filters.blank?
