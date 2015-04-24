@@ -1,12 +1,13 @@
 %p#notice= notice
 
 %h3 #{@location.name}
-%p
-  %b Parent:
-  = @location.parent.try :name
+- if @location.parent
+  %p
+    %b Parent:
+    = @location.parent.name
 %p
   %b Admin level:
-  = @location.admin_level
+  = "#{@location.type} (#{@location.admin_level})"
 
 
 .actions

@@ -1,10 +1,7 @@
 require 'spec_helper'
 
 describe EventsSchema do
-  let!(:root_location) { Location.create_default }
-  let!(:parent_location) { Location.make parent: root_location }
 
-  # Crear un manifest
   it "creates a schema with string, enum and number fields" do
     definition = %{{
       "field_mapping" : {
@@ -114,16 +111,14 @@ describe EventsSchema do
       ]}
     }}
 
-    locations = Location.all
     location_schema = {
       "title" => "Patient Location",
       "type" => "string",
-      "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
-      "locations" => {
-        "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
-        "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
-      },
-      "searchable" => true
+      "searchable" => true,
+      "location-service" => {
+        "url" => "http://locations.instedd.org",
+        "set" => "test"
+      }
     }
 
     schema = EventsSchema.new "es-AR", {assay_name: "first_assay"}, Manifest.new(definition:definition)

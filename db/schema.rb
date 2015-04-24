@@ -129,29 +129,10 @@ ActiveRecord::Schema.define(version: 20150422124002) do
     t.string   "region"
     t.float    "lat"
     t.float    "lng"
-    t.integer  "location_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "location_geoid", limit: 60
   end
-
-  create_table "locations", force: true do |t|
-    t.string   "name"
-    t.integer  "parent_id"
-    t.integer  "lft"
-    t.integer  "rgt"
-    t.float    "lat"
-    t.float    "lng"
-    t.integer  "depth"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "admin_level"
-    t.string   "geo_id"
-  end
-
-  add_index "locations", ["depth"], name: "index_locations_on_depth", using: :btree
-  add_index "locations", ["lft"], name: "index_locations_on_lft", using: :btree
-  add_index "locations", ["parent_id"], name: "index_locations_on_parent_id", using: :btree
-  add_index "locations", ["rgt"], name: "index_locations_on_rgt", using: :btree
 
   create_table "manifests", force: true do |t|
     t.string   "version"

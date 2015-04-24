@@ -16,7 +16,7 @@ Cdp::Application.routes.draw do
     end
   end
 
-  resources :locations
+  resources :locations, only: [:index, :show]
   resources :manifests, except: [:update]
   resources :events
   resources :filters, format: 'html'

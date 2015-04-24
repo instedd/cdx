@@ -10,7 +10,7 @@ class Api::EventsController < ApiController
       devices_scope = Device.all
     end
 
-    device = devices_scope.includes(:manifests, :institution, :laboratories, :locations).find_by_uuid(params[:device_id])
+    device = devices_scope.includes(:manifests, :institution, :laboratories).find_by_uuid(params[:device_id])
 
     if authenticate_create(device)
       data = request.body.read rescue nil

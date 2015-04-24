@@ -5,7 +5,6 @@ class Device < ActiveRecord::Base
   belongs_to :device_model
   belongs_to :institution
   has_and_belongs_to_many :laboratories
-  has_many :locations, through: :laboratories
   has_many :events
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
@@ -25,6 +24,10 @@ class Device < ActiveRecord::Base
     else
       self
     end
+  end
+
+  def locations(opts={})
+    laboratories.map{|l| l.location(opts)}.uniq
   end
 
   def filter_by_owner(user, check_conditions)

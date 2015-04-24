@@ -92,7 +92,7 @@ class Subscriber < ActiveRecord::Base
         filtered_event[field] = merged_event["#{field}_id"]
       elsif fields_properties[field] && fields_properties[field]['format'] == 'lat,lng'
         location_id_field_name = "#{fields_properties[field]['location_identifier']}_id"
-        location = Location.where(geo_id: merged_event[location_id_field_name]).first
+        location = Location.find(merged_event[location_id_field_name])
         filtered_event[field] = "#{location.lat},#{location.lng}" if location
       else
         filtered_event[field] = merged_event[field]

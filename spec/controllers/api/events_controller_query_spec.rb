@@ -285,7 +285,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     end
 
     context "Schema" do
-      let!(:root_location) { Location.create_default }
+      let!(:root_location) { Location.make }
       let!(:parent_location) { Location.make parent: root_location }
 
       it "should retrieve the schema for a given assay_name" do
@@ -425,27 +425,24 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           "searchable" => true
         }
 
-        locations = Location.all
         location_schema = {
           "title" => "Location",
           "type" => "string",
-          "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
-          "locations" => {
-            "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
-            "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
-          },
-          "searchable" => true
+          "searchable" => true,
+          "location-service" => {
+            "url" => "http://locations.instedd.org",
+            "set" => "test"
+          }
         }
 
         patient_location_schema = {
           "title" => "Patient Location",
           "type" => "string",
-          "enum" => [ root_location.geo_id.to_s, parent_location.geo_id.to_s ],
-          "locations" => {
-            "#{root_location.geo_id.to_s}" => {"name" => root_location.name, "level" => root_location.admin_level, "parent" => nil, "lat" => root_location.lat, "lng" => root_location.lng},
-            "#{parent_location.geo_id.to_s}" => {"name" => parent_location.name, "level" => parent_location.admin_level, "parent" => root_location.geo_id, "lat" => parent_location.lat, "lng" => parent_location.lng}
-          },
-          "searchable" => false
+          "searchable" => false,
+          "location-service" => {
+            "url" => "http://locations.instedd.org",
+            "set" => "test"
+          }
         }
 
         response = get :schema, assay_name: "first_assay", locale: "es-AR", format: 'json'

@@ -7,7 +7,7 @@ class Api::LaboratoriesController < ApiController
     end
 
     @laboratories = check_access(@laboratories, READ_LABORATORY).map do |lab|
-      {id: lab.id, name: lab.name, location: lab.location_id}
+      {id: lab.id, name: lab.name, location: lab.location_geoid}
     end
 
     respond_to do |format|

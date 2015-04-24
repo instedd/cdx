@@ -12,7 +12,7 @@ describe Api::LaboratoriesController do
       institution = Institution.make user: user
       lab_ids = 3.times.map do
         lab = Laboratory.make(institution: institution)
-        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_id}
+        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_geoid}
       end
 
       result = get :index, format: 'json'
@@ -23,7 +23,7 @@ describe Api::LaboratoriesController do
       institution = Institution.make user: user
       lab_ids = 3.times.map do
         lab = Laboratory.make(institution: institution)
-        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_id}
+        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_geoid}
       end
 
       Laboratory.make institution: (Institution.make user: user)
@@ -54,7 +54,7 @@ describe Api::LaboratoriesController do
         get :index, format: 'csv'
 
         check_laboratories_csv response
-        response.body.should eq("id,name,location\n#{lab.id},#{lab.name},#{lab.location_id}\n")
+        response.body.should eq("id,name,location\n#{lab.id},#{lab.name},#{lab.location_geoid}\n")
       end
 
       it "renders column names even when there are no laboratories to render" do

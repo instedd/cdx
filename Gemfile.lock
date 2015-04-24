@@ -65,6 +65,14 @@ GIT
       json
       rails (>= 3.2)
 
+GIT
+  remote: https://github.com/instedd/ruby-location_service.git
+  revision: d086982d0f7ed4eacc1a2801700abfbe20e09a3b
+  branch: master
+  specs:
+    location_service (0.1.0)
+      rest-client (~> 1.6)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -192,6 +200,11 @@ GEM
       dotenv (>= 0.7)
       thor (>= 0.13.6)
     formatador (0.2.4)
+    gon (5.2.3)
+      actionpack (>= 2.3.0)
+      json
+      multi_json
+      request_store (>= 1.0.5)
     guard (2.3.0)
       formatador (>= 0.2.4)
       listen (~> 2.1)
@@ -209,6 +222,7 @@ GEM
       activesupport (>= 4.0.1)
       haml (>= 3.1, < 5.0)
       railties (>= 4.0.1)
+    hashdiff (0.2.2)
     hashie (3.3.2)
     hashr (0.0.22)
     hike (1.2.3)
@@ -223,6 +237,9 @@ GEM
     jquery-rails (3.1.0)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
+    jquery-turbolinks (2.1.0)
+      railties (>= 3.1.0)
+      turbolinks
     json (1.8.1)
     listen (2.4.0)
       celluloid (>= 0.15.2)
@@ -316,6 +333,7 @@ GEM
     rchardet (1.6.0)
     rdoc (4.1.1)
       json (~> 1.4)
+    request_store (1.1.0)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rspec (2.13.0)
@@ -434,12 +452,16 @@ DEPENDENCIES
   faker
   foreman
   geojson_import!
+  gon
   guard-rspec
   guid
   haml-rails
+  hashdiff
   instedd-bootstrap!
   jbuilder (~> 1.2)
   jquery-rails
+  jquery-turbolinks
+  location_service!
   machinist
   mysql2
   oj

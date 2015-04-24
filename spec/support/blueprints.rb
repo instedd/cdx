@@ -35,24 +35,11 @@ Institution.blueprint do
   name
 end
 
-Laboratory.blueprint do
-  institution
-  location
-  name
-end
-
 Device.blueprint do
   laboratories { [Laboratory.make] }
   institution { laboratories.first.institution }
   name
   device_model
-end
-
-Location.blueprint do
-  name
-  parent {Location.create_default}
-  geo_id { "location-#{Sham.sn}" }
-  admin_level {parent.admin_level + 1}
 end
 
 Sample.blueprint do
@@ -97,4 +84,16 @@ end
 ActivationToken.blueprint do
   device
   value { "token-#{Sham.sn}" }
+end
+
+Laboratory.blueprint do
+  institution
+  name
+  location_geoid { LocationService.repository.make.id }
+end
+
+Location; class Location
+  def self.make(params={})
+    LocationService.repository.make(params)
+  end
 end

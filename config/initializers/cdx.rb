@@ -14,5 +14,5 @@ Cdx::Api.setup do |config|
 end
 
 Rails.application.config.after_initialize do
-  ElasticsearchMappingTemplate.create_default! unless Rails.env.test?
+  ElasticsearchMappingTemplate.create_default! unless Rails.env.test? || File.basename($0) == "rake"
 end

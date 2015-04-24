@@ -62,6 +62,10 @@ RSpec.configure do |config|
   config.include ManifestSpecHelper,  :example_group => { :file_path => config.escaped_path(%w[spec models]) }
 
   config.before(:each) do
+    LocationService.fake!
+  end
+
+  config.before(:each) do
     Timecop.return
   end
 

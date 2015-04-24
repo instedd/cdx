@@ -38,6 +38,7 @@ describe EventIndexer, elasticsearch: true do
   it "should index a document" do
     client = double(:es_client)
     EventIndexer.any_instance.stub(:client).and_return(client)
+    location = event.device.laboratories.first.location
 
     client.should_receive(:index).with(
       index: event.device.institution.elasticsearch_index_name,
@@ -48,11 +49,11 @@ describe EventIndexer, elasticsearch: true do
         updated_at: event.updated_at.utc.iso8601,
         device_uuid: event.device.uuid,
         uuid: event.uuid,
-        location_id: event.device.laboratories.first.location.geo_id,
-        parent_locations: Location.all.map(&:geo_id),
+        location_id: location.geo_id,
+        parent_locations: [location.geo_id],
         laboratory_id: event.device.laboratories.first.id,
         institution_id: event.device.institution_id,
-        location: {"admin_level_0"=>"0", "admin_level_1"=>event.device.laboratories.first.location.geo_id},
+        location: {"admin_level_0"=>location.geo_id},
         event_id: "4",
         sample_uuid: 'abc',
         assay: "mtb",

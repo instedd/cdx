@@ -11,9 +11,9 @@
     .control
       = f.text_field :name, :class => 'input-large'
   .control-group
-    = f.label :location_id, :class => 'control-label'
+    = f.label :location_geoid, "Location", :class => 'control-label'
     .control
-      = f.select :location_id, nested_set_options(Location) {|i| "#{'-' * i.level} #{i.name}" }, {}, class: 'input-large'
+      = f.hidden_field :location_geoid, class: 'input-xxlarge'
 
   .control-group
     .control

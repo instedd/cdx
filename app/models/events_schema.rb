@@ -145,19 +145,10 @@ class EventsSchema
 
   def location_schema schema
     schema["type"] = "string"
-    schema["enum"] = enum = []
-    schema["locations"] = locations = {}
-
-    Location.includes(:parent).find_each do |location|
-      enum << location.geo_id
-      locations[location.geo_id] = {
-        "name" => location.name,
-        "level" => location.admin_level,
-        "parent" => location.parent.try(:geo_id),
-        "lat" => location.lat,
-        "lng" => location.lng
-      }
-    end
+    schema["location-service"] = {
+      "url" => Settings.location_service_url,
+      "set" => Settings.location_service_set
+    }
   end
 
   def coords_schema schema, field

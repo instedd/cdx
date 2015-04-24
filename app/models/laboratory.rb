@@ -3,12 +3,19 @@ class Laboratory < ActiveRecord::Base
 
   belongs_to :institution
   has_one :user, through: :institution
-  belongs_to :location
   has_and_belongs_to_many :devices
   has_many :events, through: :devices
 
   validates_presence_of :institution
   validates_presence_of :name
+
+  attr_writer :location
+
+  def location(opts={})
+    @location = nil if @location_opts != opts
+    @location_opts = opts
+    @location ||= Location.find(location_geoid, opts)
+  end
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
