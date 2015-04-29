@@ -1,7 +1,7 @@
 host: localhost:3000
 nndd_url: "/nndd/"
 location_service_url: "locations.instedd.org"
-location_service_set: 'gadm'
+location_service_set: 'ne'
 sync_pattern: "*.{csv,bef}"
 remote_shapefiles:
   - "http://s3.amazonaws.com/xpert-shapefiles/VNM_adm0.json"
