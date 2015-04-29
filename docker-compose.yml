@@ -4,7 +4,7 @@ db:
     MYSQL_ROOT_PASSWORD: root
 
 elasticsearch:
-  image: dockerfile/elasticsearch
+  image: elasticsearch:1.4.4
 
 smtp:
   image: instedd/smtp-debug
