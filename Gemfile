@@ -27,6 +27,7 @@ gem 'rest-client'
 gem 'barby'
 gem 'gon'
 gem 'rchardet'
+gem 'therubyracer'
 
 gem 'cdx-api-elasticsearch', git: "https://github.com/instedd/cdx-api-elasticsearch.git", branch: 'master'
 gem 'cdx-sync-server',  git: "https://github.com/instedd/cdx-sync-server.git", branch: 'master'
