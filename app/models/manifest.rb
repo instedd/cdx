@@ -118,7 +118,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def parser
-    @parser ||= case (metadata["source"] || {})["type"]
+    @parser ||= case data_type
     when "json"
       JsonEventParser.new
     when "csv"
@@ -128,6 +128,10 @@ class Manifest < ActiveRecord::Base
     else
       raise "unsupported source data type"
     end
+  end
+
+  def data_type
+    (metadata["source"] || {})["type"]
   end
 
   def self.default_definition

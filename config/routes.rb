@@ -13,6 +13,11 @@ Cdp::Application.routes.draw do
         post 'generate_activation_token'
       end
       resources :ssh_keys, only: [:create, :destroy]
+      resources :device_events, only: [:index], path: 'events' do
+        member do
+          get 'raw'
+        end
+      end
     end
   end
 

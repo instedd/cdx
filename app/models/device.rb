@@ -6,6 +6,7 @@ class Device < ActiveRecord::Base
   belongs_to :institution
   has_and_belongs_to_many :laboratories
   has_many :events
+  has_many :device_events
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
 

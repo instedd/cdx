@@ -7,6 +7,10 @@
 
   = render 'form'
 
+  %hr
+    %p
+      = link_to "Events", institution_device_device_events_path(@institution, @device), class: 'btn'
+
   - if @can_regenerate_key
     %hr
     %p
