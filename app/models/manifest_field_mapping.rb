@@ -102,7 +102,21 @@ class ManifestFieldMapping
       return traverse(node["equals"][0], data) == traverse(node["equals"][1], data)
     end
 
+    if node["script"].present?
+      return run_script(node["script"], data)
+    end
+
     node.to_s
+  end
+
+  def run_script(script, data)
+    ctx = V8::Context.new
+    begin
+      ctx["event"] = data
+      ctx.eval(script)
+    ensure
+      ctx.dispose
+    end
   end
 
   def map(value, mappings)

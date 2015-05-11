@@ -71,6 +71,23 @@ describe Manifest, validate_manifest: false do
       patient: {indexed: {"name" => "doe"}, pii: {}, custom: {}}
     end
 
+    it "runs javascript" do
+      assert_manifest_application %(
+        {
+          "patient": [{
+            "target_field": "name",
+            "source": {
+              "script": "event.first_name + ' ' + event.last_name"
+            },
+            "core": true,
+            "pii": false,
+            "indexed": true
+          }]
+        }
+      ), %({"first_name": "John", "last_name": "Doe"}),
+      patient: {indexed: {"name" => "John Doe"}, pii: {}, custom: {}}
+    end
+
 
     it "concats the result of a mapping" do
       assert_manifest_application %{
