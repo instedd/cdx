@@ -13,7 +13,7 @@ class DeviceEvent < ActiveRecord::Base
   end
 
   def parsed_events
-    @parsed_events ||= (device.try(:current_manifest) || Manifest.default).apply_to(plain_text_data).map(&:with_indifferent_access)
+    @parsed_events ||= (device.try(:current_manifest) || Manifest.default).apply_to(plain_text_data, device).map(&:with_indifferent_access)
   rescue ManifestParsingError => err
     self.index_failed = true # TODO: We are just parsing here, is this the correct place to set this flag?
     self.index_failure_reason = err.message

@@ -1,12 +1,12 @@
 class ManifestField
-  def initialize(manifest, field, scope=nil, path=nil)
+  def initialize(manifest, field, scope=nil, device=nil)
     @manifest = manifest
     @field = field
     @target_field = @field["target_field"]
-    @mapping = ManifestFieldMapping.new(@manifest, @field, path)
+    @mapping = ManifestFieldMapping.new(@manifest, @field, device)
     @validation = ManifestFieldValidation.new(@field)
     @scope = scope
-    @path = path
+    @device = device
   end
 
   def apply_to(data, event)

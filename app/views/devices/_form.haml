@@ -18,6 +18,10 @@
     .controls
       .checks
         = f.collection_check_boxes(:laboratory_ids, @laboratories, :id, :name) { |b| b.label { b.check_box + b.text } + "<br/>".html_safe }
+  .control-group
+    = f.label :time_zone
+    .controls
+      = f.time_zone_select(:time_zone, nil, default: "UTC")
 
   .control-group
     .controls

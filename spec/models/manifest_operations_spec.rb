@@ -209,7 +209,7 @@ describe Manifest, validate_manifest: false do
         event: {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
     end
 
-    it "parses an strange date" do
+    it "parses a strange date" do
       assert_manifest_application %{
           {
             "event" : [{
@@ -230,6 +230,30 @@ describe Manifest, validate_manifest: false do
           "run_at" : "sat3feb014pm+7"
         }',
         event: {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
+    end
+
+    it "parses a date without timezone using the device timezone" do
+      assert_manifest_application %{
+          {
+            "event" : [{
+              "target_field" : "month",
+              "source" : {
+                "parse_date" : [
+                  {"lookup" : "run_at"},
+                  "%a%d%b%y%H%p"
+                ]
+              },
+              "core" : true,
+              "pii" : false,
+              "indexed" : true
+            }]
+          }
+        },
+        '{
+          "run_at" : "sat13feb014pm"
+        }',
+        {event: {indexed: {"month" => "2001-02-13T20:00:00+0000"}, pii: Hash.new, custom: Hash.new}},
+        Device.make(time_zone: 'Atlantic Time (Canada)')
     end
 
     it "obtains the distance in years between two dates" do

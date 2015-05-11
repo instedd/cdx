@@ -79,7 +79,7 @@ class Manifest < ActiveRecord::Base
     @loaded_definition ||= Oj.load(self.definition)
   end
 
-  def apply_to(data)
+  def apply_to(data, device)
     raise ManifestParsingError.empty_event if data.blank?
     raise ManifestParsingError.invalid_manifest(self) if self.invalid?
 
@@ -88,7 +88,7 @@ class Manifest < ActiveRecord::Base
       event = EVENT_TEMPLATE.deep_dup
       field_mapping.each do |scope, mappings|
         event = mappings.inject(event) do |event, field|
-          ManifestField.new(self, field, scope).apply_to record, event
+          ManifestField.new(self, field, scope, device).apply_to record, event
         end
       end
       events << event

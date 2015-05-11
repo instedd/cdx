@@ -1,8 +1,8 @@
 class ManifestFieldMapping
-  def initialize(manifest, field, root_path=nil)
+  def initialize(manifest, field, device)
     @manifest = manifest
     @field = field
-    @root_path = root_path
+    @device = device
   end
 
   def apply_to(data)
@@ -80,7 +80,7 @@ class ManifestFieldMapping
     end
 
     if node["parse_date"].present?
-      return DateTime.strptime(traverse(node["parse_date"][0], data), traverse(node["parse_date"][1], data))
+      return parse_date(node, data)
     end
 
     if node["hash"].present?
@@ -137,17 +137,18 @@ class ManifestFieldMapping
   end
 
   def lookup(path, data)
-    @manifest.parser.lookup(absolute_path_for(path), data)
+    @manifest.parser.lookup(path, data)
   end
 
-  def absolute_path_for(path)
-    if @root_path.present?
-      "#{@root_path}[*].#{path}"
+  def parse_date(node, data)
+    format = traverse(node["parse_date"][1], data)
+    date = traverse(node["parse_date"][0], data)
+    if !format.match(/%[zZ]/) && @device.try(:time_zone)
+      DateTime.strptime(date + @device.time_zone, format + "%Z").in_time_zone
     else
-      path
+      DateTime.strptime(date, format)
     end
   end
-
 
   def beginning_of(date_time, time_unit)
     date_time = DateTime.parse(date_time.to_s) # to ensure we have a date_time and not a string

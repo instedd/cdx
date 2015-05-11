@@ -12,7 +12,7 @@ module ManifestSpecHelper
     }})
   end
 
-  def assert_manifest_application(mappings_json, format_data, expected_fields={})
+  def assert_manifest_application(mappings_json, format_data, expected_fields={}, device= nil)
     format_data = {json: format_data} unless format_data.kind_of?(Hash)
 
     expected = {
@@ -23,14 +23,14 @@ module ManifestSpecHelper
 
     format_data.each do |format, data|
       manifest = manifest_from_json_mappings(mappings_json, format)
-      result = manifest.apply_to(data).first
+      result = manifest.apply_to(data, device).first
       result.should eq(expected), "Result in format #{format} does not match expected value"
     end
   end
 
-  def assert_raises_manifest_data_validation(mappings_json, data, message)
+  def assert_raises_manifest_data_validation(mappings_json, data, message, device=nil)
     manifest = manifest = manifest_from_json_mappings(mappings_json)
-    expect { manifest.apply_to(data).first }.to raise_error(message)
+    expect { manifest.apply_to(data, device).first }.to raise_error(message)
   end
 
 end
