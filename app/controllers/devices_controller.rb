@@ -142,6 +142,6 @@ class DevicesController < ApplicationController
   end
 
   def device_params
-    params.require(:device).permit(:name, :device_model_id, laboratory_ids: [])
+    params.require(:device).permit(:name, :device_model_id, :time_zone, laboratory_ids: [])
   end
 end
