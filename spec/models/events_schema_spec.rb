@@ -193,5 +193,7 @@ describe EventsSchema do
         "cardridge_2" => {"name" => "Cardridge 2"}
       }
     })
+
+    schema["properties"].keys.should =~ ["assay_name", "start_time", "created_at", "updated_at", "event_id", "sample_uuid", "sample_id", "sample_type", "uuid", "device_uuid", "system_user", "device_serial_number", "error_code", "error_description", "laboratory_id", "institution_id", "location", "location_coords", "age", "gender", "ethnicity", "race", "race_ethnicity", "status", "result", "condition", "test_type", "device_name", "institution_name", "laboratory_name"]
   end
 end

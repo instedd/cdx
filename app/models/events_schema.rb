@@ -55,6 +55,11 @@ class EventsSchema
       end
     end
 
+    ["institution_name", "laboratory_name", "device_name"].each do |field|
+      name, field_schema = schemas_for("target_field" => field).first
+      schema["properties"][name] = field_schema
+    end
+
     schema
   end
 

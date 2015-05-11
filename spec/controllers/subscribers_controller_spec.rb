@@ -24,5 +24,4 @@ describe SubscribersController do
     delete :destroy, filter_id: filter.id, id: subscriber.id
     filter.subscribers.count.should be(0)
   end
-
 end

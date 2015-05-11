@@ -77,7 +77,7 @@ class Subscriber < ActiveRecord::Base
   end
 
   def filter_event(indexed_event, fields)
-    event = Event.includes(:sample).find_by_uuid(indexed_event['uuid'])
+    event = Event.includes(:sample, :device, :institution).find_by_uuid(indexed_event['uuid'])
     merged_event = indexed_event.merge event.plain_sensitive_data.merge(event.sample.plain_sensitive_data)
     fields = Subscriber.available_fields if fields.nil? || fields.empty? # use all fields if none is specified
     fields_properties = self.class.default_schema['properties']
@@ -94,6 +94,12 @@ class Subscriber < ActiveRecord::Base
         location_id_field_name = "#{fields_properties[field]['location_identifier']}_id"
         location = Location.find(merged_event[location_id_field_name])
         filtered_event[field] = "#{location.lat},#{location.lng}" if location
+      elsif field == "institution_name"
+        filtered_event[field] = event.institution.name
+      elsif field == "laboratory_name" && indexed_event["laboratory_id"]
+        filtered_event[field] = Laboratory.find(indexed_event["laboratory_id"]).try(:name)
+      elsif field == "device_name"
+        filtered_event[field] = event.device.name
       else
         filtered_event[field] = merged_event[field]
       end
