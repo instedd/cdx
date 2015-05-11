@@ -77,7 +77,7 @@ describe Manifest, validate_manifest: false do
           "patient": [{
             "target_field": "name",
             "source": {
-              "script": "first_name + ' ' + last_name"
+              "script": "event.first_name + ' ' + event.last_name"
             },
             "core": true,
             "pii": false,

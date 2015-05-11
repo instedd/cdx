@@ -112,9 +112,7 @@ class ManifestFieldMapping
   def run_script(script, data)
     ctx = V8::Context.new
     begin
-      data.each do |key, value|
-        ctx[key] = value
-      end
+      ctx["event"] = data
       ctx.eval(script)
     ensure
       ctx.dispose
