@@ -27,4 +27,10 @@ class DeviceEvent < ActiveRecord::Base
     self.raw_data = EventEncryption.encrypt self.plain_text_data
     self
   end
+
+  def reprocess
+    new_event = DeviceEvent.create(device: self.device, plain_text_data: self.plain_text_data)
+    new_event.process unless new_event.index_failed
+    new_event
+  end
 end

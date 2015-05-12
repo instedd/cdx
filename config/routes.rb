@@ -16,6 +16,7 @@ Cdp::Application.routes.draw do
       resources :device_events, only: [:index], path: 'events' do
         member do
           get 'raw'
+          post 'reprocess'
         end
       end
     end

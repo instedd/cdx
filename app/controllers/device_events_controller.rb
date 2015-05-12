@@ -6,6 +6,7 @@ class DeviceEventsController < ApplicationController
 
   before_filter :load_institution
   before_filter :load_device
+  before_filter :load_event, only: [:raw, :reprocess]
 
   before_filter do
     add_breadcrumb @institution.name, institution_path(@institution)
@@ -20,8 +21,6 @@ class DeviceEventsController < ApplicationController
   end
 
   def raw
-    event = @device.device_events.find(params[:id])
-
     ext, type = case @device.current_manifest.data_type
     when 'json'
       ['json', 'application/json']
@@ -31,7 +30,13 @@ class DeviceEventsController < ApplicationController
       ['txt', 'text/plain']
     end
 
-    send_data event.plain_text_data, filename: "event_#{event.id}.#{ext}", type: type
+    send_data @event.plain_text_data, filename: "event_#{@event.id}.#{ext}", type: type
+  end
+
+  def reprocess
+    @event.reprocess
+    redirect_to institution_device_device_events_path(@institution, @device),
+                notice: 'The event will be reprocessed'
   end
 
   private
@@ -44,5 +49,9 @@ class DeviceEventsController < ApplicationController
   def load_device
     @device = @institution.devices.find params[:device_id]
     authorize_resource(@device, READ_DEVICE)
+  end
+
+  def load_event
+    @event = @device.device_events.find(params[:id])
   end
 end

@@ -9,6 +9,11 @@
       - @events.each do |event|
         %tr
           %td= event.created_at.in_time_zone(@device.time_zone).strftime('%Y-%m-%d %H:%M:%S')
-          %td= event.index_failed ? 'Failed' : 'Succeed'
+          %td
+            - if event.index_failed
+              Failed
+              = link_to '(reprocess)', reprocess_institution_device_device_event_path(@institution, @device, event), method: 'post'
+            - else
+              Succeed
           %td= event.index_failure_reason
           %td= link_to 'Download', raw_institution_device_device_event_path(@institution, @device, event)
