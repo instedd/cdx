@@ -28,6 +28,7 @@ describe DeviceEvent, elasticsearch: true do
     expect(event.save).to be_true
     expect(event.index_failed?).to be_true
     expect(event.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "error_code").message)
+    expect(event.index_failure_data[:target_field]).to eq('error_code')
   end
 
   it "stores failed events when the string 'null' is passed as value" do
@@ -56,6 +57,7 @@ describe DeviceEvent, elasticsearch: true do
     expect(event.save).to be_true
     expect(event.index_failed?).to be_true
     expect(event.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'results[*].result'")
+    expect(event.index_failure_data[:target_field]).to eq('results[*].result')
   end
 
   it 'parses a csv with a single row' do

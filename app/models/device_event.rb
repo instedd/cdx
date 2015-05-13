@@ -6,6 +6,8 @@ class DeviceEvent < ActiveRecord::Base
   before_save :parsed_events
   before_save :encrypt
 
+  store :index_failure_data, coder: JSON
+
   attr_writer :plain_text_data
 
   def plain_text_data
@@ -17,6 +19,7 @@ class DeviceEvent < ActiveRecord::Base
   rescue ManifestParsingError => err
     self.index_failed = true # TODO: We are just parsing here, is this the correct place to set this flag?
     self.index_failure_reason = err.message
+    self.index_failure_data[:target_field] = err.target_field if err.target_field.present?
   end
 
   def process

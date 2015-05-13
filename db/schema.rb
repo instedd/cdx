@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150508170417) do
+ActiveRecord::Schema.define(version: 20150513175833) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20150508170417) do
     t.text     "index_failure_reason"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "index_failure_data"
   end
 
   add_index "device_events", ["device_id"], name: "index_device_events_on_device_id", using: :btree
