@@ -96,30 +96,24 @@ describe DeviceEvent, elasticsearch: true do
 
   context 'reprocess' do
     let(:device_event) { DeviceEvent.make }
-    let(:new_event) { double('new device event')}
 
     before(:each) do
-      DeviceEvent.should_receive(:create)
-        .with(device: device_event.device, plain_text_data: device_event.plain_text_data)
-        .and_return(new_event)
+      device_event.should_receive(:clear_errors)
+      device_event.should_receive(:save)
     end
 
-    it 'should create new event and process' do
-      new_event.should_receive(:index_failed).and_return(false)
-      new_event.should_receive(:process)
+    it 'should process if index did not failed' do
+      device_event.should_receive(:index_failed).and_return(false)
+      device_event.should_receive(:process)
 
-      r = device_event.reprocess
-
-      expect(r).to eq(new_event)
+      device_event.reprocess
     end
 
-    it "should not process new event if index failed" do
-      new_event.should_receive(:index_failed).and_return(true)
-      new_event.should_not_receive(:process)
+    it "should not process if index failed" do
+      device_event.should_receive(:index_failed).and_return(true)
+      device_event.should_not_receive(:process)
 
-      r = device_event.reprocess
-
-      expect(r).to eq(new_event)
+      device_event.reprocess
     end
   end
 end

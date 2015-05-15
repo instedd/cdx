@@ -33,8 +33,17 @@ class DeviceEvent < ActiveRecord::Base
   end
 
   def reprocess
-    new_event = DeviceEvent.create(device: self.device, plain_text_data: self.plain_text_data)
-    new_event.process unless new_event.index_failed
-    new_event
+    clear_errors
+    self.save
+    self.process unless self.index_failed
+    self
+  end
+
+  private
+
+  def clear_errors
+    self.index_failed = false
+    self.index_failure_reason = nil
+    self.index_failure_data = {}
   end
 end
