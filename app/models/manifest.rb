@@ -84,14 +84,19 @@ class Manifest < ActiveRecord::Base
     raise ManifestParsingError.invalid_manifest(self) if self.invalid?
 
     events = []
-    parser.load(data).each do |record|
-      event = EVENT_TEMPLATE.deep_dup
-      field_mapping.each do |scope, mappings|
-        event = mappings.inject(event) do |event, field|
-          ManifestField.new(self, field, scope, device).apply_to record, event
+    parser.load(data).each_with_index do |record, record_index|
+      begin
+        event = EVENT_TEMPLATE.deep_dup
+        field_mapping.each do |scope, mappings|
+          event = mappings.inject(event) do |event, field|
+            ManifestField.new(self, field, scope, device).apply_to record, event
+          end
         end
+        events << event
+      rescue ManifestParsingError => err
+        err.record_index = record_index + 1
+        raise err
       end
-      events << event
     end
 
     events

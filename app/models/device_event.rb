@@ -20,6 +20,7 @@ class DeviceEvent < ActiveRecord::Base
     self.index_failed = true # TODO: We are just parsing here, is this the correct place to set this flag?
     self.index_failure_reason = err.message
     self.index_failure_data[:target_field] = err.target_field if err.target_field.present?
+    self.index_failure_data[:record_index] = err.record_index if err.record_index.present?
   end
 
   def process
