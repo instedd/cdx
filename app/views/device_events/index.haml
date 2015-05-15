@@ -4,7 +4,9 @@
       %tr
         %th Created at
         %th Status
-        %th Error
+        %th Error Description
+        %th Error Record Index
+        %th Error Field
         %th Raw message
       - @events.each do |event|
         %tr
@@ -16,4 +18,6 @@
             - else
               Succeed
           %td= event.index_failure_reason
+          %td= event.index_failure_data[:record_index]
+          %td= event.index_failure_data[:target_field]
           %td= link_to 'Download', raw_institution_device_device_event_path(@institution, @device, event)
