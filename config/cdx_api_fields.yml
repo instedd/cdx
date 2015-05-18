@@ -47,6 +47,9 @@ searchable_fields:
     scope: sample
   - name: sample_type
     scope: sample
+  - name: sample_collection_date
+    scope: sample
+    type: date
   - name: uuid
     filter_parameter_definition:
       - type: match
