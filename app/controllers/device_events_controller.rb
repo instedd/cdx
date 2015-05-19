@@ -26,6 +26,8 @@ class DeviceEventsController < ApplicationController
       ['json', 'application/json']
     when 'csv', 'headless_csv'
       ['csv', 'text/csv']
+    when 'xml'
+      ['xml', 'application/xml']
     else
       ['txt', 'text/plain']
     end
