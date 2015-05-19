@@ -143,11 +143,11 @@ class ManifestFieldMapping
   def parse_date(node, data)
     format = traverse(node["parse_date"][1], data)
     date = traverse(node["parse_date"][0], data)
+    parsed_date = DateTime.strptime(date, format)
     if !format.match(/%[zZ]/) && @device.try(:time_zone)
-      DateTime.strptime(date + @device.time_zone, format + "%Z").in_time_zone
-    else
-      DateTime.strptime(date, format)
+      parsed_date = ActiveSupport::TimeZone[@device.time_zone].local(parsed_date.year, parsed_date.month, parsed_date.day, parsed_date.hour, parsed_date.minute, parsed_date.second)
     end
+    parsed_date
   end
 
   def beginning_of(date_time, time_unit)
