@@ -1353,14 +1353,26 @@ describe Manifest, validate_manifest: false do
               {"age" : "40"}
             ]
           }',
-          {indexed: {"results" => [
-            {"age" => "20-40"},
-            {"age" => "40+"},
-            {"age" => "0-5"},
-            {"age" => "20-40"},
-            {"age" => "5-20"},
-            {"age" => "20-40"}
-          ]}, pii: Hash.new, custom: Hash.new}
+
+          {
+            event: {
+              indexed: {
+                "results" => [
+                  {"age" => "20-40"},
+                  {"age" => "40+"},
+                  {"age" => "0-5"},
+                  {"age" => "20-40"},
+                  {"age" => "5-20"},
+                  {"age" => "20-40"}
+                ]
+              },
+              pii: Hash.new,
+              custom: Hash.new
+            },
+            patient: { indexed: Hash.new, pii: Hash.new, custom: Hash.new },
+            sample: { indexed: Hash.new, pii: Hash.new, custom: Hash.new }
+          }
+
 
       end
 
