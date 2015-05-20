@@ -556,7 +556,7 @@ describe Manifest, validate_manifest: false do
                   "concat" : [
                     {"lookup" : "last_name"},
                     ", ",
-                    {"lookup" : "conditions[*].name"},
+                    {"lookup" : "conditions[*].name"}
                   ]
                 },
                 "core" : true,
@@ -585,7 +585,7 @@ describe Manifest, validate_manifest: false do
               "patient" : [{
                 "target_field" : "results[*].name",
                 "source" : {
-                  {"strip" : {"lookup" : "conditions[*].name"}}
+                  "strip" : {"lookup" : "conditions[*].name"}
                 },
                 "core" : true,
                 "pii" : false,
@@ -600,7 +600,7 @@ describe Manifest, validate_manifest: false do
               },
               {
                 "name": "    bar   "
-              },
+              }
             ]
           }',
           patient: {indexed: {"results" => [{"name" => "foo"}, {"name" => "bar"}]}, pii: Hash.new, custom: Hash.new}
@@ -787,7 +787,7 @@ describe Manifest, validate_manifest: false do
               {
                 "run_at" : "2014-05-15T15:22:11+0000",
                 "end_time" : "2013-04-13T16:23:11.123+0000"
-              },
+              }
             ]}',
           event: {indexed: {"results" => [{"time" => 1}, {"time" => 1}]}, pii: Hash.new, custom: Hash.new}
       end
@@ -871,7 +871,7 @@ describe Manifest, validate_manifest: false do
               {
                 "run_at" : "2014-05-15T15:22:11+0000",
                 "end_time" : "2013-04-13T16:23:11.123+0000"
-              },
+              }
             ]}',
           event: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
       end
@@ -955,7 +955,7 @@ describe Manifest, validate_manifest: false do
               {
                 "run_at" : "2014-05-15T15:22:11+0000",
                 "end_time" : "2013-04-13T16:23:11.123+0000"
-              },
+              }
             ]}',
           event: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
       end
@@ -1039,7 +1039,7 @@ describe Manifest, validate_manifest: false do
               {
                 "run_at" : "2014-05-15T15:22:11+0000",
                 "end_time" : "2013-04-13T16:23:11.123+0000"
-              },
+              }
             ]}',
           event: {indexed: {"results" => [{"time" => 9526}, {"time" => 9526}]}, pii: Hash.new, custom: Hash.new}
       end
@@ -1123,7 +1123,7 @@ describe Manifest, validate_manifest: false do
               {
                 "run_at" : "2014-05-15T15:22:11+0000",
                 "end_time" : "2013-04-13T16:23:11.123+0000"
-              },
+              }
             ]}',
           event: {indexed: {"results" => [{"time" => 571618}, {"time" => 571618}]}, pii: Hash.new, custom: Hash.new}
       end
@@ -1207,7 +1207,7 @@ describe Manifest, validate_manifest: false do
               {
                 "run_at" : "2014-05-15T15:22:11+0000",
                 "end_time" : "2013-04-13T16:23:11.123+0000"
-              },
+              }
             ]}',
           event: {indexed: {"results" => [{"time" => 34297139}, {"time" => 34297139}]}, pii: Hash.new, custom: Hash.new}
       end
@@ -1291,7 +1291,7 @@ describe Manifest, validate_manifest: false do
               {
                 "run_at" : "2014-05-15T15:22:11+0000",
                 "end_time" : "2013-04-13T16:23:11.123+0000"
-              },
+              }
             ]}',
           {indexed: {"results" => [{"time" => 34297139877000}, {"time" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
       end
@@ -1351,7 +1351,7 @@ describe Manifest, validate_manifest: false do
               {"age" : "20.1"},
               {"age" : "20"},
               {"age" : "40"}
-            ],
+            ]
           }',
           {indexed: {"results" => [
             {"age" => "20-40"},
