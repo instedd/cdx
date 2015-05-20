@@ -130,6 +130,8 @@ class Manifest < ActiveRecord::Base
       CSVEventParser.new metadata["source"]["separator"] || CSVEventParser::DEFAULT_SEPARATOR
     when "headless_csv"
       HeadlessCSVEventParser.new metadata["source"]["separator"] || CSVEventParser::DEFAULT_SEPARATOR
+    when "xml"
+      XmlEventParser.new
     else
       raise "unsupported source data type"
     end

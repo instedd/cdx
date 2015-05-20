@@ -17,7 +17,7 @@ $(function() {
         url: "/api/devices/" + device + "/events",
         type: "POST",
         data: data,
-        contentType: "application/json; charset=utf-8",
+        contentType: false,
         success: function(data, textStatus, jqXHR) {
           $create_button.prop("disabled", false);
           $create_button.val("Created!");

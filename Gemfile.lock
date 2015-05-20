@@ -469,6 +469,7 @@ DEPENDENCIES
   location_service!
   machinist
   mysql2
+  nokogiri
   oj
   omniauth
   omniauth-openid

@@ -1,0 +1,25 @@
+<DiagnosticTests>
+  <DiagnosticTest id="12345678901234567890">
+    <Patient>
+      <Id>1234567890</Id>
+      <Name>Jane Doe</Name>
+      <Gender>Female</Gender>
+      <Age>25</Age>
+      <AgeUnit>years</AgeUnit>
+      <PregnancyStatus>Not Pregnant</PregnancyStatus>
+    </Patient>
+    <SampleId>0987654321</SampleId>
+    <Facility>Rural Clinic ABC</Facility>
+    <TestDate>2015-05-18T12:34:56+05:00</TestDate>
+    <Test type="RDT">
+      <Code value="SD_MALPFPV_02_02" displayValue="SD Malaria P.f and P.v" />
+      <Control qualitative="Valid" value="45.67" />
+      <Assay code="HRPII" codingScheme="Fio" displayValue="P.f">
+        <Result qualitative="Positive" value="23.45" />
+      </Assay>
+      <Assay code="pLDH" codingScheme="Fio" displayValue="P.v">
+        <Result qualitative="Negative" value="0.0" />
+      </Assay>
+    </Test>
+  </DiagnosticTest>
+</DiagnosticTests>
