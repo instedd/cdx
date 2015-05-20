@@ -250,6 +250,7 @@ class ManifestFieldMapping
   end
 
   def clusterise(number, interval_stops)
+    return nil if number.nil?
     number = number.to_f
     interval_stops = interval_stops.map &:to_i
     return "#{interval_stops.last}+" if number > interval_stops.last
