@@ -9,22 +9,9 @@
   "parentURL": "/dashboards/nndd",
   "customStyles": "../conf/custom.local.scss",
   "showMarkersOnMap": false,
-  "polygons": {
-    "location": {
-      "0": "/polygons/level-0.topo.json",
-      "1": "/polygons/level-1.topo.json",
-      "2": "/polygons/level-2.topo.json",
-      "3": "/polygons/level-3.topo.json"
-    }
-  },
   "proxies": [
     {
       "context": "/api/events",
-      "host": "localhost",
-      "port": 3000
-    },
-    {
-      "context": "/polygons",
       "host": "localhost",
       "port": 3000
     }

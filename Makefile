@@ -11,6 +11,6 @@ docker-image:
     -v $(shell pwd)/etc/nndd/settings.local.json:/nndd/conf/settings.local.json \
             -v $(shell pwd)/etc/nndd/custom.local.scss:/nndd/conf/custom.local.scss \
     instedd/nndd-builder
-	rake geo
+
 	docker build --tag $(TAG):$(VERSION) .
 	docker push $(TAG):$(VERSION)
