@@ -251,13 +251,17 @@ class ManifestFieldMapping
 
   def clusterise(number, interval_stops)
     return nil if number.nil?
-    number = number.to_f
-    interval_stops = interval_stops.map &:to_i
-    return "#{interval_stops.last}+" if number > interval_stops.last
-    return "0-#{interval_stops[0]}"  if number.between? 0, interval_stops[0]
-    interval_stops.each_with_index do |stop, index|
-      if number.between? stop, interval_stops[index + 1 ]
-        return "#{stop}-#{interval_stops[index+1]}"
+    if number.is_a? Array
+      number.map {|num| clusterise(num, interval_stops)}
+    else
+      number = number.to_f
+      interval_stops = interval_stops.map &:to_i
+      return "#{interval_stops.last}+" if number > interval_stops.last
+      return "0-#{interval_stops[0]}"  if number.between? 0, interval_stops[0]
+      interval_stops.each_with_index do |stop, index|
+        if number.between? stop, interval_stops[index + 1 ]
+          return "#{stop}-#{interval_stops[index+1]}"
+        end
       end
     end
   end
