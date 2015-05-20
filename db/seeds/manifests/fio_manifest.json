@@ -1,0 +1,121 @@
+{
+  "metadata" : {
+    "version" : "1.0.0",
+    "api_version" : "1.1.0",
+    "device_models" : ["FIO"],
+    "source": {"type" : "xml"}
+  },
+  "field_mapping" : {
+    "patient" : [
+      {
+        "target_field" : "patient_id",
+        "source" : {"lookup" : "Patient/Id/text()"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true
+      },
+      {
+        "target_field" : "patient_name",
+        "source" : {"lookup" : "Patient/Name/text()"},
+        "type" : "string",
+        "core" : true,
+        "pii" : true
+      },
+      {
+        "target_field" : "age",
+        "source" : {"lookup" : "Patient/Age/text()"},
+        "type" : "integer",
+        "core" : true,
+        "indexed" : true,
+        "valid_values":{"range": {"min": 0, "max": 125}}
+      },
+      {
+        "target_field" : "gender",
+        "source" : {
+          "lowercase": { "lookup" : "Patient/Gender/text()" }
+        },
+        "type" : "enum",
+        "core" : true,
+        "indexed" : true,
+        "options":["male", "female"]
+      },
+      {
+        "target_field" : "pregnancy_status",
+        "source" : {"lookup" : "Patient/PregnancyStatus/text()"},
+        "type" : "string",
+        "custom": true,
+        "indexed" : true
+      }
+    ],
+    "sample" : [
+      {
+        "target_field" : "sample_uid",
+        "source" : {"lookup" : "SampleId/text()"},
+        "type" : "string",
+        "core" : true,
+        "pii": true
+      },
+      {
+        "target_field" : "sample_id",
+        "source" : {"lookup" : "SampleId/text()"},
+        "type" : "string",
+        "core" : true,
+        "indexed": true
+      }
+    ],
+    "event" : [
+      {
+        "target_field" : "start_time",
+        "source" : {"lookup" : "TestDate/text()"},
+        "type" : "date",
+        "core" : true,
+        "indexed" : true
+      },
+      {
+        "target_field" : "event_id",
+        "source" : {"lookup" : "@id"},
+        "type" : "string",
+        "core" : true,
+        "indexed" : true
+      },
+      {
+        "target_field" : "assay_name",
+        "source" : {"lookup" : "Test/Code/@value"},
+        "type" : "enum",
+        "core" : true,
+        "indexed" : true,
+        "options":["SD_MALPFPV_02_02"]
+      },
+      {
+        "target_field" : "status",
+        "source": { "map" : [
+          { "lookup": "Test/Control/@qualitative" },
+          [
+            { "match" : "Valid", "output" : "success"},
+            { "match" : "*", "output" : "error"}
+          ]
+        ]},
+        "type" : "enum",
+        "core" : true,
+        "indexed" : true,
+        "options":["invalid","error","no_result","success","negative"]
+      },
+      {
+        "target_field" : "results[*].result",
+        "source" : {"lookup" : "Test/Assay/Result/@qualitative"},
+        "type" : "enum",
+        "core" : true,
+        "indexed" : true,
+        "options": ["Positive", "Negative"]
+      },
+      {
+        "target_field" : "results[*].condition",
+        "source" : {"lookup" : "Test/Assay/@code"},
+        "type" : "enum",
+        "core" : true,
+        "indexed" : true,
+        "options": ["HRPII", "pLDH"]
+      }
+    ]
+  }
+}

@@ -134,7 +134,15 @@ describe DeviceEventImporter, elasticsearch: true do
   context "real scenarios" do
 
     def copy_sample_csv(name)
-      FileUtils.cp File.join(Rails.root, 'spec', 'fixtures', 'csvs', name), sync_dir.inbox_path(device.uuid)
+      copy_sample(name, 'csvs')
+    end
+
+    def copy_sample_xml(name)
+      copy_sample(name, 'xmls')
+    end
+
+    def copy_sample(name, format)
+      FileUtils.cp File.join(Rails.root, 'spec', 'fixtures', format, name), sync_dir.inbox_path(device.uuid)
     end
 
     def load_manifest(name)
@@ -233,6 +241,42 @@ describe DeviceEventImporter, elasticsearch: true do
 
         dbevents = Sample.all
         dbevents.should have(3).items
+      end
+    end
+
+    context 'fio' do
+      let(:device_model) { DeviceModel.make name: 'FIO'}
+      let!(:manifest) { load_manifest 'fio_manifest.json' }
+
+      it 'parses xml' do
+        copy_sample_xml 'fio_sample.xml'
+        DeviceEventImporter.new("*.xml").import_from sync_dir
+
+        events = all_elasticsearch_events_for(device.institution)
+        events.should have(1).items
+
+        event = events.first['_source']
+
+        event['event_id'].should eq('12345678901234567890')
+        event['gender'].should eq('female')
+        event['age'].should eq(25)
+        event['custom_fields']['pregnancy_status'].should eq('Not Pregnant')
+        event['sample_id'].should eq('0987654321')
+        event['start_time'].should  eq('2015-05-18T12:34:56+05:00')
+        event['assay_name'].should eq('SD_MALPFPV_02_02')
+        event['status'].should eq('success')
+
+        event_results = event['results']
+        event_results.size.should eq(2)
+        event_results.first['result'].should eq('Positive')
+        event_results.first['condition'].should eq('HRPII')
+        event_results.second['result'].should eq('Negative')
+        event_results.second['condition'].should eq('pLDH')
+
+        Event.count.should eq(1)
+        db_event = Event.first
+        db_event.uuid.should eq(event['uuid'])
+        db_event.event_id.should eq('12345678901234567890')
       end
     end
 
