@@ -62,4 +62,68 @@ describe ManifestFieldMapping do
     end
   end
 
+  describe "strip" do
+    let(:mapping) { ManifestFieldMapping.new(nil, nil, nil) }
+
+    describe "single values" do
+
+      it "stripes an empty string" do
+        mapping.strip("").should eq("")
+      end
+
+      it "stripes a blank string" do
+        mapping.strip(" ").should eq("")
+      end
+
+      it "stripes a blank string" do
+        mapping.strip("       ").should eq("")
+      end
+
+      it "stripes newlines" do
+        mapping.strip("\n").should eq("")
+      end
+
+      it "stripes nil" do
+        mapping.strip(nil).should eq(nil)
+      end
+
+      it "stripes an stripped string" do
+        mapping.strip("hi there").should eq("hi there")
+      end
+
+      it "stripes a non-empty string" do
+        mapping.strip(" hi there        ").should eq("hi there")
+      end
+
+      it "stripes newlines from non-empty strings" do
+        mapping.strip("\n\n hi there \n   \n").should eq("hi there")
+      end
+
+    end
+
+    describe "multiple values" do
+
+      it "strips an empty list" do
+        mapping.strip([]).should eq([])
+      end
+
+      it "strips a list with a single value" do
+        mapping.strip([" hi there "]).should eq(["hi there"])
+      end
+
+      it "strips a list with multiple values" do
+        mapping.strip([" hi there ", "hi", "", "\n\nhi "]).should eq(["hi there", "hi", "", "hi"])
+      end
+
+      it "strips a list with duplicated values" do
+        mapping.strip([" hi there ", "hi", "", "\n\nhi ", "hi", " hi there "]).should eq(["hi there", "hi", "", "hi", "hi", "hi there"])
+      end
+
+      it "strips a list with nil values" do
+        mapping.strip([" hi there ", "hi", nil, "", "\n\nhi ", "hi", " hi there "]).should eq(["hi there", "hi", nil, "", "hi", "hi", "hi there"])
+      end
+
+    end
+  end
+
 end

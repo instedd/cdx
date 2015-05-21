@@ -579,7 +579,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"name" => "Doe, foo"}, {"name" => "Doe, bar"}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      pending "strips spaces from multiple elements" do
+      it "strips spaces from multiple elements" do
         assert_manifest_application %{
             {
               "patient" : [{

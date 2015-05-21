@@ -33,7 +33,7 @@ class ManifestFieldMapping
     end
 
     if node["strip"].present?
-      return traverse(node["strip"], data).strip
+      return strip(traverse(node["strip"], data))
     end
 
     if node["convert_time"].present?
@@ -271,6 +271,15 @@ class ManifestFieldMapping
       value.to_i
     else
       value
+    end
+  end
+
+  def strip(values)
+    return nil if values.nil?
+    if values.is_a? Array
+      values.map {|value| strip(value)}
+    else
+      values.strip
     end
   end
 end
