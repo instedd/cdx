@@ -524,7 +524,7 @@ describe Manifest, validate_manifest: false do
       assert_manifest_application definition, '{ "age" : "40" }', patient: {indexed: {"age" => "20-40"}, pii: Hash.new, custom: Hash.new}
     end
 
-    pending "Multiple fields" do
+    describe "Multiple fields" do
 
       it "should map single indexed field to a list" do
         assert_manifest_application %{{
@@ -547,7 +547,7 @@ describe Manifest, validate_manifest: false do
             }]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "concats two or more elements" do
+      pending "concats two or more elements" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -579,7 +579,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"name" => "Doe, foo"}, {"name" => "Doe, bar"}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "strips spaces from multiple elements" do
+      pending "strips spaces from multiple elements" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -708,7 +708,7 @@ describe Manifest, validate_manifest: false do
           event: {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count years between multiple indexed fields" do
+      pending "should count years between multiple indexed fields" do
         assert_manifest_application %{
             {
               "event" : [{
@@ -734,7 +734,7 @@ describe Manifest, validate_manifest: false do
           event: {indexed: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count years between multiple indexed fields on the second parameter" do
+      pending "should count years between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -760,7 +760,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count years between multiple indexed fields on both parameters" do
+      pending "should count years between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
               "event" : [{
@@ -792,7 +792,7 @@ describe Manifest, validate_manifest: false do
           event: {indexed: {"results" => [{"time" => 1}, {"time" => 1}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count months between multiple indexed fields" do
+      pending "should count months between multiple indexed fields" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -818,7 +818,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count months between multiple indexed fields on the second parameter" do
+      pending "should count months between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -844,8 +844,8 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count months between multiple indexed fields on both parameters" do
-        assert_manifest_application %{
+      pending "should count months between multiple indexed fields on both parameters" do
+      assert_manifest_application %{
             {
               "event" : [{
                 "target_field" : "results[*].time",
@@ -876,7 +876,7 @@ describe Manifest, validate_manifest: false do
           event: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count days between multiple indexed fields" do
+      pending "should count days between multiple indexed fields" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -902,7 +902,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count days between multiple indexed fields on the second parameter" do
+      pending "should count days between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -928,7 +928,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count days between multiple indexed fields on both parameters" do
+      pending "should count days between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
               "event" : [{
@@ -960,7 +960,7 @@ describe Manifest, validate_manifest: false do
           event: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count hours between multiple indexed fields" do
+      pending "should count hours between multiple indexed fields" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -986,7 +986,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 9526}, {"age" => 9526}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count hours between multiple indexed fields on the second parameter" do
+      pending "should count hours between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -1012,7 +1012,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 9526}, {"age" => 9526}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count hours between multiple indexed fields on both parameters" do
+      pending "should count hours between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
               "event" : [{
@@ -1044,7 +1044,7 @@ describe Manifest, validate_manifest: false do
           event: {indexed: {"results" => [{"time" => 9526}, {"time" => 9526}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count minutes between multiple indexed fields" do
+      pending "should count minutes between multiple indexed fields" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -1070,7 +1070,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 571618}, {"age" => 571618}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count minutes between multiple indexed fields on the second parameter" do
+      pending "should count minutes between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -1096,7 +1096,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 571618}, {"age" => 571618}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count minutes between multiple indexed fields on both parameters" do
+      pending "should count minutes between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
               "event" : [{
@@ -1128,7 +1128,7 @@ describe Manifest, validate_manifest: false do
           event: {indexed: {"results" => [{"time" => 571618}, {"time" => 571618}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count seconds between multiple indexed fields" do
+      pending "should count seconds between multiple indexed fields" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -1154,7 +1154,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 34297139}, {"age" => 34297139}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count seconds between multiple indexed fields on the second parameter" do
+      pending "should count seconds between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -1180,7 +1180,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 34297139}, {"age" => 34297139}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count seconds between multiple indexed fields on both parameters" do
+      pending "should count seconds between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
               "event" : [{
@@ -1212,7 +1212,7 @@ describe Manifest, validate_manifest: false do
           event: {indexed: {"results" => [{"time" => 34297139}, {"time" => 34297139}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count milliseconds between multiple indexed fields" do
+      pending "should count milliseconds between multiple indexed fields" do
         assert_manifest_application %{
             {
               "patient" : [{
@@ -1238,7 +1238,7 @@ describe Manifest, validate_manifest: false do
           patient: {indexed: {"results" => [{"age" => 34297139877000}, {"age" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count milliseconds between multiple indexed fields on the second parameter" do
+      pending "should count milliseconds between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
               "event" : [{
@@ -1264,7 +1264,7 @@ describe Manifest, validate_manifest: false do
           event: {indexed: {"results" => [{"age" => 34297139877000}, {"age" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "should count milliseconds between multiple indexed fields on both parameters" do
+      pending "should count milliseconds between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
               "event" : [{
@@ -1296,7 +1296,7 @@ describe Manifest, validate_manifest: false do
           {indexed: {"results" => [{"time" => 34297139877000}, {"time" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
       end
 
-      it "converts from minutes to hours" do
+      pending "converts from minutes to hours" do
         assert_manifest_application %{
             {
               "event" : [{
