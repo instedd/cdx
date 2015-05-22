@@ -27,9 +27,7 @@ class ManifestFieldMapping
     end
 
     if node["concat"].present?
-      return node["concat"].map do |source|
-        traverse(source, data)
-      end.join
+      return concat(node["concat"], data)
     end
 
     if node["strip"].present?
@@ -272,6 +270,14 @@ class ManifestFieldMapping
     else
       value
     end
+  end
+
+  def concat(values, data)
+    return values.map do |source|
+      value = traverse(source, data)
+      raise "Can't concat array values - use collect instead" if value.is_a? Array
+      value
+    end.join
   end
 
   def strip(values)

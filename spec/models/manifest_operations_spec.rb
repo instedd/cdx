@@ -547,36 +547,38 @@ describe Manifest, validate_manifest: false do
             }]}, pii: Hash.new, custom: Hash.new}
       end
 
-      pending "concats two or more elements" do
-        assert_manifest_application %{
-            {
-              "patient" : [{
-                "target_field" : "results[*].name",
-                "source" : {
-                  "concat" : [
-                    {"lookup" : "last_name"},
-                    ", ",
-                    {"lookup" : "conditions[*].name"}
-                  ]
-                },
-                "core" : true,
-                "pii" : false,
-                "indexed" : true
-              }]
-            }
-          },
-          '{
-            "last_name" : "Doe",
-             "conditions" : [
+      it "concats two or more elements" do
+        expect {
+          assert_manifest_application %{
               {
-                "name" : "foo"
-              },
-              {
-                "name": "bar"
+                "patient" : [{
+                  "target_field" : "results[*].name",
+                  "source" : {
+                    "concat" : [
+                      {"lookup" : "last_name"},
+                      ", ",
+                      {"lookup" : "conditions[*].name"}
+                    ]
+                  },
+                  "core" : true,
+                  "pii" : false,
+                  "indexed" : true
+                }]
               }
-            ]
-          }',
-          patient: {indexed: {"results" => [{"name" => "Doe, foo"}, {"name" => "Doe, bar"}]}, pii: Hash.new, custom: Hash.new}
+            },
+            '{
+              "last_name" : "Doe",
+               "conditions" : [
+                {
+                  "name" : "foo"
+                },
+                {
+                  "name": "bar"
+                }
+              ]
+            }',
+            patient: {indexed: {"results" => [{"name" => "Doe, foo"}, {"name" => "Doe, bar"}]}, pii: Hash.new, custom: Hash.new}
+          }.to raise_error("Can't concat array values - use collect instead")
       end
 
       it "strips spaces from multiple elements" do
