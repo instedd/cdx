@@ -61,7 +61,7 @@
         "source": {
           "lookup": "RunNumber"
         },
-        "type": "integer",
+        "type": "string",
         "core": true,
         "indexed": true
       },

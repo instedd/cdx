@@ -88,6 +88,25 @@ describe Manifest, validate_manifest: false do
       patient: {indexed: {"name" => "John Doe"}, pii: {}, custom: {}}
     end
 
+    it "loads xml in javascript" do
+      assert_manifest_application %(
+        {
+          "patient": [{
+            "target_field": "name",
+            "source": {
+              "script": "event.xpath('Patient/@name').first().value"
+            },
+            "core": true,
+            "indexed": true
+          }]
+        }
+      ), {xml: %(<Events>
+        <Event>
+          <Patient name="Socrates" age="27"/>
+        </Event>
+      </Events>)},
+      patient: {indexed: {"name" => "Socrates"}, pii: {}, custom: {}}
+    end
 
     it "concats the result of a mapping" do
       assert_manifest_application %{
