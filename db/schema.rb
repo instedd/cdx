@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150513175833) do
+ActiveRecord::Schema.define(version: 20150526153400) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -88,8 +88,10 @@ ActiveRecord::Schema.define(version: 20150513175833) do
     t.integer  "sample_id"
     t.binary   "sensitive_data"
     t.integer  "device_id"
+    t.integer  "patient_id"
   end
 
+  add_index "events", ["patient_id"], name: "index_events_on_patient_id", using: :btree
   add_index "events", ["sample_id"], name: "index_events_on_sample_id", using: :btree
   add_index "events", ["uuid"], name: "index_events_on_uuid", using: :btree
 
@@ -144,6 +146,19 @@ ActiveRecord::Schema.define(version: 20150513175833) do
     t.string   "api_version"
   end
 
+  create_table "patients", force: true do |t|
+    t.binary   "sensitive_data"
+    t.text     "custom_fields"
+    t.text     "indexed_fields"
+    t.string   "patient_id_hash"
+    t.string   "uuid"
+    t.integer  "institution_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "patients", ["institution_id"], name: "index_patients_on_institution_id", using: :btree
+
   create_table "policies", force: true do |t|
     t.integer  "user_id"
     t.integer  "granter_id"
@@ -163,9 +178,11 @@ ActiveRecord::Schema.define(version: 20150513175833) do
     t.text     "indexed_fields"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "patient_id"
   end
 
   add_index "samples", ["institution_id", "sample_uid_hash"], name: "index_samples_on_institution_id_and_sample_uid_hash", using: :btree
+  add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
   add_index "samples", ["uuid"], name: "index_samples_on_uuid", using: :btree
 
   create_table "ssh_keys", force: true do |t|

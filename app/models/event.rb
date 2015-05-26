@@ -3,6 +3,7 @@ class Event < ActiveRecord::Base
   belongs_to :device
   has_one :institution, through: :device
   belongs_to :sample
+  belongs_to :patient
   serialize :custom_fields
   validates_presence_of :device
   validates_uniqueness_of :event_id, scope: :device_id, allow_nil: true

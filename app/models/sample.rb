@@ -2,6 +2,7 @@ class Sample < ActiveRecord::Base
   include EventEncryption
   has_many :events
   belongs_to :institution
+  belongs_to :patient
   before_save :encrypt
   before_create :generate_uuid
   before_create :ensure_sample_uid
