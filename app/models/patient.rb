@@ -19,12 +19,24 @@ class Patient < ActiveRecord::Base
     self.indexed_fields ||= {}
   end
 
+  def merge(patient)
+    self.plain_sensitive_data.deep_merge_not_nil!(patient.plain_sensitive_data)
+    self.custom_fields.deep_merge_not_nil!(patient.custom_fields)
+    self.indexed_fields.deep_merge_not_nil!(patient.indexed_fields)
+
+    self
+  end
+
   def plain_sensitive_data
     @plain_sensitive_data ||= (Oj.load(EventEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
   end
 
-  def self.find_by_pii(patient_id)
-    self.find_by_patient_id_hash EventEncryption.hash(patient_id.to_s)
+  def patient_id
+    self.plain_sensitive_data[:patient_id]
+  end
+
+  def self.find_by_pii(patient_id, institution_id)
+    self.find_by(patient_id_hash: EventEncryption.hash(patient_id.to_s), institution_id: institution_id)
   end
 
 private

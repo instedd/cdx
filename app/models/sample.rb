@@ -26,8 +26,37 @@ class Sample < ActiveRecord::Base
     self
   end
 
+  def add_patient_data(patient)
+    self.plain_sensitive_data[:patient] ||= {}
+    self.plain_sensitive_data[:patient].deep_merge_not_nil!(patient.plain_sensitive_data)
+
+    self.custom_fields[:patient] ||= {}
+    self.custom_fields[:patient].deep_merge_not_nil!(patient.custom_fields)
+
+    self.indexed_fields[:patient] ||= {}
+    self.indexed_fields[:patient].deep_merge_not_nil!(patient.indexed_fields)
+  end
+
+  def extract_patient_data_into(patient)
+    patient.plain_sensitive_data.reverse_deep_merge! (self.plain_sensitive_data[:patient] || {})
+    patient.custom_fields.reverse_deep_merge! (self.custom_fields[:patient] || {})
+    patient.indexed_fields.reverse_deep_merge! (self.indexed_fields[:patient] || {})
+
+    self.plain_sensitive_data.delete(:patient)
+    self.custom_fields.delete(:patient)
+    self.indexed_fields.delete(:patient)
+  end
+
   def plain_sensitive_data
     @plain_sensitive_data ||= (Oj.load(EventEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
+  end
+
+  def sample_uid
+    self.plain_sensitive_data[:sample_uid]
+  end
+
+  def self.find_by_pii(sample_uid, institution_id)
+    self.find_by(sample_uid_hash: EventEncryption.hash(sample_uid.to_s), institution_id: institution_id)
   end
 
   def encrypt

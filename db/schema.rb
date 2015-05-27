@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150526153400) do
+ActiveRecord::Schema.define(version: 20150527160209) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -89,6 +89,7 @@ ActiveRecord::Schema.define(version: 20150526153400) do
     t.binary   "sensitive_data"
     t.integer  "device_id"
     t.integer  "patient_id"
+    t.text     "indexed_fields"
   end
 
   add_index "events", ["patient_id"], name: "index_events_on_patient_id", using: :btree
