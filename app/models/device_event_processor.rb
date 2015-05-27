@@ -54,34 +54,6 @@ class DeviceEventProcessor
 
     private
 
-    # def create_sample(patient)
-    #   pii = parsed_event[:sample][:pii].with_indifferent_access
-    #   custom_fields = parsed_event[:sample][:custom].with_indifferent_access
-    #   indexed_fields = parsed_event[:sample][:indexed].with_indifferent_access
-
-    #   sample = Sample.new plain_sensitive_data: pii, custom_fields: custom_fields, indexed_fields: indexed_fields, institution_id: @parent.institution.id, patient_id: patient.id
-
-    #   id = sample.ensure_sample_uid
-    #   if id and existing = Sample.find_by(institution_id: @parent.institution.id, sample_uid_hash: id)
-    #     existing_indexed = existing.indexed_fields.deep_dup
-    #     existing.merge(sample).save!
-    #     update_existing_documents_with(existing) if existing.indexed_fields != existing_indexed
-    #     existing
-    #   else
-    #     sample.save!
-    #     sample
-    #   end
-    # end
-
-    # def update_existing_documents_with sample
-    #   response = client.search index: index_name, body:{query: { filtered: { filter: { term: { sample_uuid: sample.uuid } } } }, fields: []}, size: 10000
-    #   body = response["hits"]["hits"].map do |element|
-    #     { update: { _type: element["_type"], _id: element["_id"], data: { doc: sample.indexed_fields } } }
-    #   end
-
-    #   client.bulk index: index_name, body: body unless body.blank?
-    # end
-
     def find_or_initialize_event
       event = Event.new device_events: [device_event],
                         plain_sensitive_data: parsed_event[:event][:pii],
@@ -109,10 +81,11 @@ class DeviceEventProcessor
                           institution_id: @parent.institution.id
 
       if sample_uid.present? && existing = Sample.find_by_pii(sample_uid, @parent.institution.id)
+        existing_indexed = existing.indexed_fields.deep_dup
         existing.merge(sample)
-        existing
+        [existing, existing_indexed]
       else
-        sample
+        [sample, nil]
       end
     end
 
@@ -127,15 +100,16 @@ class DeviceEventProcessor
                             indexed_fields: indexed_fields,
                             institution_id: @parent.institution.id
       if patient_id.present? && existing = Patient.find_by_pii(patient_id, @parent.institution.id)
+        existing_indexed = existing.indexed_fields.deep_dup
         existing.merge(patient)
-        existing
+        [existing, existing_indexed]
       else
-        patient
+        [patient, nil]
       end
     end
 
     def process_sample(event)
-      sample = find_or_initialize_sample
+      sample, existing_indexed = find_or_initialize_sample
 
       if event.sample.present?
         if sample.sample_uid.present?
@@ -160,10 +134,14 @@ class DeviceEventProcessor
           event.add_sample_data sample
         end
       end
+
+      if !existing_indexed.nil? && existing_indexed != event.sample.try(:indexed_fields)
+        update_sample_in_existing_documents_with event.sample
+      end
     end
 
     def process_patient(event)
-      patient = find_or_initialize_patient
+      patient, existing_indexed = find_or_initialize_patient
       current = event.current_patient
 
       if current.present?
@@ -189,6 +167,10 @@ class DeviceEventProcessor
           event.add_patient_data patient
         end
       end
+
+      if !existing_indexed.nil? && existing_indexed != event.current_patient.try(:indexed_fields)
+        update_patient_in_existing_documents_with event.current_patient
+      end
     end
 
     def index_event(event, is_new)
@@ -196,24 +178,23 @@ class DeviceEventProcessor
       is_new ? indexer.index : indexer.update
     end
 
-    # def create_event sample
-    #   event = Event.new device_events: [device_event],
-    #                     sample: sample,
-    #                     plain_sensitive_data: parsed_event[:event][:pii],
-    #                     custom_fields: parsed_event[:event][:custom],
-    #                     event_id: parsed_event[:event][:indexed][:event_id],
-    #                     device: device
+    def update_sample_in_existing_documents_with sample
+      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { sample_uuid: sample.uuid } } } }, fields: []}, size: 10000
+      body = response["hits"]["hits"].map do |element|
+        { update: { _type: element["_type"], _id: element["_id"], data: { doc: sample.indexed_fields } } }
+      end
 
-    #   if event.event_id && existing = Event.find_by(event_id: event.event_id, device_id: event.device_id)
-    #     existing.merge(event).save!
-    #     EventIndexer.new(parsed_event[:event][:indexed], existing).update
-    #     existing
-    #   else
-    #     event.save!
-    #     EventIndexer.new(parsed_event[:event][:indexed], event).index
-    #     event
-    #   end
-    # end
+      client.bulk index: index_name, body: body unless body.blank?
+    end
+
+    def update_patient_in_existing_documents_with patient
+      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { patient_uuid: patient.uuid } } } }, fields: []}, size: 10000
+      body = response["hits"]["hits"].map do |element|
+        { update: { _type: element["_type"], _id: element["_id"], data: { doc: patient.indexed_fields } } }
+      end
+
+      client.bulk index: index_name, body: body unless body.blank?
+    end
 
   end
 

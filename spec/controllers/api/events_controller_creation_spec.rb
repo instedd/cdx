@@ -116,16 +116,17 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       event["start_time"].should eq(event["created_at"])
     end
 
-    it "should create a sample" do
-      response = post :create, data, device_id: device.uuid, authentication_token: device.secret_key
-      response.status.should eq(200)
+    it "should create a sample"
+    # it "should create a sample" do
+    #   response = post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+    #   response.status.should eq(200)
 
-      event = Event.first
-      sample = Sample.first
-      event.sample.should eq(sample)
-      sample.sample_uid_hash.should be(nil)
-      sample.uuid.should_not be(nil)
-    end
+    #   event = Event.first
+    #   sample = Sample.first
+    #   event.sample.should eq(sample)
+    #   sample.sample_uid_hash.should be(nil)
+    #   sample.uuid.should_not be(nil)
+    # end
   end
 
   context "Manifest" do
@@ -256,8 +257,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       sample = Sample.first
       sample.plain_sensitive_data["sample_uid"].should eq(10)
-      sample.plain_sensitive_data["patient_id"].should eq(3)
-      sample.plain_sensitive_data["patient_telephone_number"].should eq(2222222)
+      sample.patient.plain_sensitive_data["patient_id"].should eq(3)
+      sample.patient.plain_sensitive_data["patient_telephone_number"].should eq(2222222)
     end
 
     it "uses the last version of the manifest" do
@@ -325,9 +326,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       event["foo"].should be_nil
 
       event = Event.first
-      sample = event.sample
-      sample.sensitive_data["some_field"].should be_nil
-      sample.sensitive_data["foo"].should be_nil
+      event.sample.should be_nil
       event.custom_fields[:foo].should eq(1234)
       event.custom_fields["foo"].should eq(1234)
     end

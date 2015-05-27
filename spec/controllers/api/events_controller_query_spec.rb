@@ -279,7 +279,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         response.status.should eq(200)
         response = Oj.load response.body
 
-        response["pii"]["patient_name"].should eq("jdoe")
+        response["pii"]["patient"]["patient_name"].should eq("jdoe")
         response["uuid"].should eq(event["uuid"])
       end
     end

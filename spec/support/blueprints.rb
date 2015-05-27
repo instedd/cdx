@@ -47,6 +47,11 @@ Sample.blueprint do
   plain_sensitive_data { { sample_uid: "sample-#{Sham.sn}" } }
 end
 
+Patient.blueprint do
+  institution
+  plain_sensitive_data { { patient_id: "patient-#{Sham.sn}" } }
+end
+
 Event.blueprint do
   device_events {[DeviceEvent.make]}
   device {device_events.first.device}

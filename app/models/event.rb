@@ -107,6 +107,20 @@ class Event < ActiveRecord::Base
     @plain_sensitive_data ||= (Oj.load(EventEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
   end
 
+  def pii_data
+    # TODO AR include patient here?
+    pii = self.plain_sensitive_data
+    pii = pii.deep_merge(event.sample.plain_sensitive_data) if self.sample.present?
+    pii
+  end
+
+  def custom_fields_data
+    # TODO AR include patient here?
+    data = self.custom_fields
+    data = data.deep_merge(self.sample.custom_fields) if self.sample.present?
+    data
+  end
+
   def encrypt
     self.sensitive_data = EventEncryption.encrypt Oj.dump(self.plain_sensitive_data)
     self

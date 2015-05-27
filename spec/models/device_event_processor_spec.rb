@@ -74,23 +74,36 @@ describe DeviceEventProcessor, elasticsearch: true do
 
   def assert_sample_data(sample)
     sample.plain_sensitive_data.should eq({
-      patient_id: "8000",
-      dob: "2000/1/1",
       sample_uid: "abc4002",
       sample_id: "4002",
       collected_at: "2000/1/1 9:00:00"
     }.recursive_stringify_keys!)
 
     sample.custom_fields.should eq({
-      datagram: "010100011100",
-      shirt_color: "blue"
+      datagram: "010100011100"
     }.recursive_stringify_keys!)
 
     sample.indexed_fields.should eq({
       sample_type: "sputum",
+      custom_fields: {
+        culture_days: "10"
+      }
+    }.recursive_stringify_keys!)
+  end
+
+  def assert_patient_data(patient)
+    patient.plain_sensitive_data.should eq({
+      patient_id: "8000",
+      dob: "2000/1/1"
+    }.recursive_stringify_keys!)
+
+    patient.custom_fields.should eq({
+      shirt_color: "blue"
+    }.recursive_stringify_keys!)
+
+    patient.indexed_fields.should eq({
       gender: "male",
       custom_fields: {
-        culture_days: "10",
         hiv: "positive"
       }
     }.recursive_stringify_keys!)
@@ -103,6 +116,7 @@ describe DeviceEventProcessor, elasticsearch: true do
     sample = Sample.first
     sample.sample_uid_hash.should eq(EventEncryption.hash "abc4002")
     assert_sample_data(sample)
+    assert_patient_data(sample.patient)
   end
 
   it "should not update existing events on new sample" do
@@ -143,13 +157,18 @@ describe DeviceEventProcessor, elasticsearch: true do
 
   it "should update sample data and existing events on new event" do
     sample_indexed_fields = {
-      sample_type: "blood",
+      sample_type: "blood"
+    }.recursive_stringify_keys!
+
+    patient_indexed_fields = {
       custom_fields: {
         hiv: "positive"
       }
     }.recursive_stringify_keys!
 
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution)
+    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution)
+
+    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution, patient: patient)
 
     event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "3", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, event_id: '3', device: device})
     event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "2", assay: "mtb"}, {sample: sample, event_id: '2', device: device})
@@ -159,22 +178,30 @@ describe DeviceEventProcessor, elasticsearch: true do
     device_event_processor.process
 
     Sample.count.should eq(1)
+    Patient.count.should eq(1)
     sample = Sample.first
     assert_sample_data(sample)
+    assert_patient_data(sample.patient)
 
     events = all_elasticsearch_events_for(institution)
+
     events.map { |event| event["_source"]["sample_type"] }.should eq(['sputum'] * 3)
   end
 
   it "should update sample data and existing events on event update" do
     sample_indexed_fields = {
-      sample_type: "blood",
+      sample_type: "blood"
+    }.recursive_stringify_keys!
+
+    patient_indexed_fields = {
       custom_fields: {
         hiv: "positive"
       }
     }.recursive_stringify_keys!
 
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution)
+    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution)
+
+    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution, patient: patient)
 
     event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, event_id: '4', device: device})
     event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "2", assay: "mtb"}, {sample: sample, event_id: '2', device: device})
@@ -184,8 +211,10 @@ describe DeviceEventProcessor, elasticsearch: true do
     device_event_processor.process
 
     Sample.count.should eq(1)
+    Patient.count.should eq(1)
     sample = Sample.first
     assert_sample_data(sample)
+    assert_patient_data(sample.patient)
 
     events = all_elasticsearch_events_for(institution)
     events.map { |event| event["_source"]["sample_type"] }.should eq(['sputum'] * 2)
@@ -194,14 +223,20 @@ describe DeviceEventProcessor, elasticsearch: true do
   it "should not update existing events if sample data indexed fields did not change" do
     sample_indexed_fields = {
       sample_type: "sputum",
+      custom_fields: {
+        culture_days: "10"
+      }
+    }.recursive_stringify_keys!
+
+    patient_indexed_fields = {
       gender: "male",
       custom_fields: {
-        culture_days: "10",
         hiv: "positive"
       }
     }.recursive_stringify_keys!
 
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution)
+    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution)
+    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution, patient: patient)
     event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, event_id: '4', device: device})
     event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "2", assay: "mtb"}, {sample: sample, event_id: '2', device: device})
 
@@ -211,8 +246,10 @@ describe DeviceEventProcessor, elasticsearch: true do
     device_event_processor.process
 
     Sample.count.should eq(1)
+    Patient.count.should eq(1)
     sample = Sample.first
     assert_sample_data(sample)
+    assert_patient_data(sample.patient)
   end
 
   it "shouldn't update sample from another institution" do
@@ -323,45 +360,48 @@ describe DeviceEventProcessor, elasticsearch: true do
       device_event
     end
 
-    it "should create sample with no uid" do
+    it "should store sample data in event when sample uid is not present" do
       device_event_processor.process
 
-      Sample.count.should eq(1)
-      sample = Sample.first
-      sample.sample_uid_hash.should be_blank
+      Event.count.should eq(1)
+      Sample.count.should eq(0)
+      Patient.count.should eq(1)
 
-      sample.plain_sensitive_data.should eq({
-        patient_id: "8000",
-        dob: "2000/1/1",
+      event = Event.first
+
+      # sample = Sample.first
+      # sample.sample_uid_hash.should be_blank
+
+      event.plain_sensitive_data[:sample].should eq({
         sample_id: "4002",
         collected_at: "2000/1/1 9:00:00"
       }.recursive_stringify_keys!)
 
-      sample.custom_fields.should eq({
-        datagram: "010100011100",
-        shirt_color: "blue"
+      event.custom_fields[:sample].should eq({
+        datagram: "010100011100"
       }.recursive_stringify_keys!)
 
-      sample.indexed_fields.should eq({
+      event.indexed_fields[:sample].should eq({
         sample_type: "sputum",
-        gender: "male",
         custom_fields: {
-          culture_days: "10",
-          hiv: "positive"
+          culture_days: "10"
         }
       }.recursive_stringify_keys!)
+
+      assert_patient_data(event.patient)
     end
 
-    it "should create event linked to sample without uid" do
-      device_event_processor.process
+    it "should create event linked to sample without uid"
+    # it "should create event linked to sample without uid" do
+    #   device_event_processor.process
 
-      Sample.count.should eq(1)
-      sample = Sample.first
+    #   Sample.count.should eq(1)
+    #   sample = Sample.first
 
-      events = all_elasticsearch_events_for(institution)
-      events.size.should eq(1)
-      events.first["_source"]['sample_uuid'].should eq(sample.uuid)
-    end
+    #   events = all_elasticsearch_events_for(institution)
+    #   events.size.should eq(1)
+    #   events.first["_source"]['sample_uuid'].should eq(sample.uuid)
+    # end
 
   end
 
