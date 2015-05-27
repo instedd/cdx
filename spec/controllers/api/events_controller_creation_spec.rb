@@ -116,17 +116,6 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       event["start_time"].should eq(event["created_at"])
     end
 
-    it "should create a sample"
-    # it "should create a sample" do
-    #   response = post :create, data, device_id: device.uuid, authentication_token: device.secret_key
-    #   response.status.should eq(200)
-
-    #   event = Event.first
-    #   sample = Sample.first
-    #   event.sample.should eq(sample)
-    #   sample.sample_uid_hash.should be(nil)
-    #   sample.uuid.should_not be(nil)
-    # end
   end
 
   context "Manifest" do

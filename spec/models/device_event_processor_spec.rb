@@ -369,9 +369,6 @@ describe DeviceEventProcessor, elasticsearch: true do
 
       event = Event.first
 
-      # sample = Sample.first
-      # sample.sample_uid_hash.should be_blank
-
       event.plain_sensitive_data[:sample].should eq({
         sample_id: "4002",
         collected_at: "2000/1/1 9:00:00"
@@ -391,19 +388,6 @@ describe DeviceEventProcessor, elasticsearch: true do
       assert_patient_data(event.patient)
     end
 
-    it "should create event linked to sample without uid"
-    # it "should create event linked to sample without uid" do
-    #   device_event_processor.process
-
-    #   Sample.count.should eq(1)
-    #   sample = Sample.first
-
-    #   events = all_elasticsearch_events_for(institution)
-    #   events.size.should eq(1)
-    #   events.first["_source"]['sample_uuid'].should eq(sample.uuid)
-    # end
-
   end
-
 
 end
