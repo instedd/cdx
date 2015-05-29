@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ManifestFieldMapping do
 
   describe "clusterisation" do
-    let(:mapping) { ManifestFieldMapping.new(nil, nil, nil) }
+    let(:mapping) { ManifestFieldMapping.new(nil, nil, nil, nil) }
 
     describe "single values" do
 
@@ -63,7 +63,7 @@ describe ManifestFieldMapping do
   end
 
   describe "strip" do
-    let(:mapping) { ManifestFieldMapping.new(nil, nil, nil) }
+    let(:mapping) { ManifestFieldMapping.new(nil, nil, nil, nil) }
 
     describe "single values" do
 

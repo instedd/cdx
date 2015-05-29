@@ -1,14 +1,15 @@
 class ManifestFieldMapping
   include ActionView::Helpers::DateHelper
-  
-  def initialize(manifest, field, device)
+
+  def initialize(manifest, field, device, data)
     @manifest = manifest
     @field = field
     @device = device
+    @root = data
   end
 
-  def apply_to(data)
-    coerce_values(traverse @field["source"], data)
+  def apply
+    coerce_values(traverse @field["source"], @root)
   end
 
   def traverse node, data
@@ -137,7 +138,7 @@ class ManifestFieldMapping
   end
 
   def lookup(path, data)
-    @manifest.parser.lookup(path, data)
+    @manifest.parser.lookup(path, data, @root)
   end
 
   def parse_date(node, data)

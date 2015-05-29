@@ -3,14 +3,13 @@ class ManifestField
     @manifest = manifest
     @field = field
     @target_field = @field["target_field"]
-    @mapping = ManifestFieldMapping.new(@manifest, @field, device)
     @validation = ManifestFieldValidation.new(@field)
     @scope = scope
     @device = device
   end
 
   def apply_to(data, event)
-    value = @mapping.apply_to data
+    value = ManifestFieldMapping.new(@manifest, @field, @device, data).apply
     @validation.apply_to value
     store value, event
   end

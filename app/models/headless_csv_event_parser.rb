@@ -5,7 +5,7 @@ class HeadlessCSVEventParser
     @separator = separator
   end
 
-  def lookup(path, data)
+  def lookup(path, data, root = data)
     unless ManifestFieldValidation.is_an_integer?(path)
       raise "Header lookup is unsupported for headless CSV Events"
     else
