@@ -83,7 +83,6 @@ class Event < ActiveRecord::Base
   def add_patient_data(patient)
     if self.sample.present?
       self.sample.add_patient_data(patient)
-      # TODO check if this can be moved to autosave
       self.sample.save!
     else
       if patient.plain_sensitive_data.present?
@@ -128,7 +127,6 @@ class Event < ActiveRecord::Base
   def current_patient=(patient)
     if self.sample.present?
       self.sample.patient = patient
-      # TODO AR see if we can remove this by autosaving relation
       self.sample.save!
     else
       self.patient = patient

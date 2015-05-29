@@ -131,24 +131,22 @@ class DeviceEventProcessor
         if sample.sample_uid.present?
           if event.sample.sample_uid == sample.sample_uid
             event.sample.merge sample
-            event.sample.save!
           else
-            sample.save!
             event.sample = sample
           end
         else
           event.sample.merge sample
-          event.sample.save!
         end
       else
         if sample.sample_uid.present?
           event.extract_sample_data_into sample
-          sample.save!
           event.sample = sample
         else
           event.add_sample_data sample
         end
       end
+
+      event.sample.save! if event.sample.present?
 
       if !existing_indexed.nil? && existing_indexed != event.sample.try(:indexed_fields)
         update_sample_in_existing_documents_with event.sample
@@ -163,24 +161,22 @@ class DeviceEventProcessor
         if patient.patient_id.present?
           if current.patient_id == patient.patient_id
             current.merge patient
-            current.save!
           else
-            patient.save!
             event.current_patient = patient
           end
         else
           current.merge patient
-          current.save!
         end
       else
         if patient.patient_id.present?
           event.extract_patient_data_into patient
-          patient.save!
           event.current_patient = patient
         else
           event.add_patient_data patient
         end
       end
+
+      event.current_patient.save! if event.current_patient.present?
 
       if !existing_indexed.nil? && existing_indexed != event.current_patient.try(:indexed_fields)
         update_patient_in_existing_documents_with event.current_patient
