@@ -1,4 +1,6 @@
 class ManifestFieldMapping
+  include ActionView::Helpers::DateHelper
+  
   def initialize(manifest, field, device)
     @manifest = manifest
     @field = field
@@ -172,46 +174,37 @@ class ManifestFieldMapping
   end
 
   def years_between(first_date, second_date)
-    second_date = DateTime.parse(second_date.to_s)
-    first_date = DateTime.parse(first_date.to_s)
-    years = (second_date.year - first_date.year)
-    if second_date.month == first_date.month
-      years + (second_date.day >= first_date.day ? 0 : 1)
-    else
-      years + (second_date.month >= first_date.month ? 0 : 1)
-    end
+    distance_between(first_date, second_date, :years)
   end
 
   def months_between(first_date, second_date)
-    second_date = DateTime.parse(second_date.to_s)
-    first_date = DateTime.parse(first_date.to_s)
-    (second_date.year - first_date.year) * 12 + second_date.month - first_date.month - (second_date.day >= first_date.day ? 0 : 1)
+    distance_between(first_date, second_date, :months)
   end
 
   def days_between(first_date, second_date)
-    distance_between(first_date, second_date).to_i
+    distance_between(first_date, second_date, :days)
   end
 
   def hours_between(first_date, second_date)
-    (distance_between(first_date, second_date) * 24).to_i
+    distance_between(first_date, second_date, :hours)
   end
 
   def minutes_between(first_date, second_date)
-    (distance_between(first_date, second_date) * 1440).to_i
+    distance_between(first_date, second_date, :minutes)
   end
 
   def seconds_between(first_date, second_date)
-    (distance_between(first_date, second_date) * 86400).to_i
+    distance_between(first_date, second_date, :seconds)
   end
 
   def milliseconds_between(first_date, second_date)
-    (distance_between(first_date, second_date) * 86400000000).to_i
+    seconds_between(first_date, second_date) * 1000
   end
 
-  def distance_between(first_date, second_date)
+  def distance_between(first_date, second_date, unit)
     second_date = DateTime.parse(second_date.to_s)
     first_date = DateTime.parse(first_date.to_s)
-    (second_date - first_date).abs
+    distance_of_time_in_words_hash(first_date, second_date, accumulate_on: unit)[unit]
   end
 
   def convert_time(time_interval, source_unit, desired_unit)
