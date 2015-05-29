@@ -1,6 +1,6 @@
 class Sample < ActiveRecord::Base
   include EventEncryption
-  has_many :events
+  has_many :events, dependent: :restrict_with_error
   belongs_to :institution
   belongs_to :patient
   before_save :encrypt
@@ -27,14 +27,20 @@ class Sample < ActiveRecord::Base
   end
 
   def add_patient_data(patient)
-    self.plain_sensitive_data[:patient] ||= {}
-    self.plain_sensitive_data[:patient].deep_merge_not_nil!(patient.plain_sensitive_data)
+    if patient.plain_sensitive_data.present?
+      self.plain_sensitive_data[:patient] ||= {}
+      self.plain_sensitive_data[:patient].deep_merge_not_nil!(patient.plain_sensitive_data)
+    end
 
-    self.custom_fields[:patient] ||= {}
-    self.custom_fields[:patient].deep_merge_not_nil!(patient.custom_fields)
+    if patient.custom_fields.present?
+      self.custom_fields[:patient] ||= {}
+      self.custom_fields[:patient].deep_merge_not_nil!(patient.custom_fields)
+    end
 
-    self.indexed_fields[:patient] ||= {}
-    self.indexed_fields[:patient].deep_merge_not_nil!(patient.indexed_fields)
+    if patient.indexed_fields.present?
+      self.indexed_fields[:patient] ||= {}
+      self.indexed_fields[:patient].deep_merge_not_nil!(patient.indexed_fields)
+    end
   end
 
   def extract_patient_data_into(patient)

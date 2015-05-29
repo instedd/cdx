@@ -1,5 +1,6 @@
 class Patient < ActiveRecord::Base
-  has_many :samples
+  has_many :events, dependent: :restrict_with_error
+  has_many :samples, dependent: :restrict_with_error
   belongs_to :institution
 
   before_save :encrypt

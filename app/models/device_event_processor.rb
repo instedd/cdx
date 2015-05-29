@@ -43,13 +43,28 @@ class DeviceEventProcessor
 
     def process
       event = find_or_initialize_event
+      is_new_event = event.new_record?
+      old_sample = event.sample
+      old_patient = event.current_patient
+
       process_sample event
       process_patient event
 
-      is_new = event.new_record?
+      sample_changed = event.sample_id_changed?
+      patient_changed = event.patient_id_changed? ||
+        (event.sample.present? && event.sample.patient_id_changed?)
+
       event.save!
 
-      index_event event, is_new
+      if sample_changed && old_sample.present?
+        old_sample.destroy
+      end
+
+      if patient_changed && old_patient.present?
+        old_patient.destroy
+      end
+
+      index_event event, is_new_event
     end
 
     private
@@ -99,6 +114,7 @@ class DeviceEventProcessor
                             custom_fields: custom_fields,
                             indexed_fields: indexed_fields,
                             institution_id: @parent.institution.id
+
       if patient_id.present? && existing = Patient.find_by_pii(patient_id, @parent.institution.id)
         existing_indexed = existing.indexed_fields.deep_dup
         existing.merge(patient)
@@ -119,7 +135,6 @@ class DeviceEventProcessor
           else
             sample.save!
             event.sample = sample
-            # TODO try to delete old sample
           end
         else
           event.sample.merge sample
@@ -152,7 +167,6 @@ class DeviceEventProcessor
           else
             patient.save!
             event.current_patient = patient
-            # TODO try to delete old patient
           end
         else
           current.merge patient

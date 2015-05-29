@@ -31,14 +31,20 @@ class Event < ActiveRecord::Base
   end
 
   def add_sample_data(sample)
-    self.plain_sensitive_data[:sample] ||= {}
-    self.plain_sensitive_data[:sample].deep_merge_not_nil!(sample.plain_sensitive_data)
+    if sample.plain_sensitive_data.present?
+      self.plain_sensitive_data[:sample] ||= {}
+      self.plain_sensitive_data[:sample].deep_merge_not_nil!(sample.plain_sensitive_data)
+    end
 
-    self.custom_fields[:sample] ||= {}
-    self.custom_fields[:sample].deep_merge_not_nil!(sample.custom_fields)
+    if sample.custom_fields.present?
+      self.custom_fields[:sample] ||= {}
+      self.custom_fields[:sample].deep_merge_not_nil!(sample.custom_fields)
+    end
 
-    self.indexed_fields[:sample] ||= {}
-    self.indexed_fields[:sample].deep_merge_not_nil!(sample.indexed_fields)
+    if sample.indexed_fields.present?
+      self.indexed_fields[:sample] ||= {}
+      self.indexed_fields[:sample].deep_merge_not_nil!(sample.indexed_fields)
+    end
   end
 
   def extract_sample_data_into(sample)
@@ -51,23 +57,49 @@ class Event < ActiveRecord::Base
     sample.custom_fields.reverse_deep_merge! (self.custom_fields[:sample] || {})
     sample.indexed_fields.reverse_deep_merge! (self.indexed_fields[:sample] || {})
 
+    if self.plain_sensitive_data[:patient].present?
+      sample.plain_sensitive_data[:patient] ||= {}
+      sample.plain_sensitive_data[:patient].reverse_deep_merge! self.plain_sensitive_data[:patient]
+    end
+
+    if self.custom_fields[:patient].present?
+      sample.custom_fields[:patient] ||= {}
+      sample.custom_fields[:patient].reverse_deep_merge! self.custom_fields[:patient]
+    end
+
+    if self.indexed_fields[:patient].present?
+      sample.indexed_fields[:patient] ||= {}
+      sample.indexed_fields[:patient].reverse_deep_merge! self.indexed_fields[:patient]
+    end
+
     self.plain_sensitive_data.delete(:sample)
     self.custom_fields.delete(:sample)
     self.indexed_fields.delete(:sample)
+    self.plain_sensitive_data.delete(:patient)
+    self.custom_fields.delete(:patient)
+    self.indexed_fields.delete(:patient)
   end
 
   def add_patient_data(patient)
     if self.sample.present?
       self.sample.add_patient_data(patient)
+      # TODO check if this can be moved to autosave
+      self.sample.save!
     else
-      self.plain_sensitive_data[:patient] ||= {}
-      self.plain_sensitive_data[:patient].deep_merge_not_nil!(patient.plain_sensitive_data)
+      if patient.plain_sensitive_data.present?
+        self.plain_sensitive_data[:patient] ||= {}
+        self.plain_sensitive_data[:patient].deep_merge_not_nil!(patient.plain_sensitive_data)
+      end
 
-      self.custom_fields[:patient] ||= {}
-      self.custom_fields[:patient].deep_merge_not_nil!(patient.custom_fields)
+      if patient.custom_fields.present?
+        self.custom_fields[:patient] ||= {}
+        self.custom_fields[:patient].deep_merge_not_nil!(patient.custom_fields)
+      end
 
-      self.indexed_fields[:patient] ||= {}
-      self.indexed_fields[:patient].deep_merge_not_nil!(patient.indexed_fields)
+      if patient.indexed_fields.present?
+        self.indexed_fields[:patient] ||= {}
+        self.indexed_fields[:patient].deep_merge_not_nil!(patient.indexed_fields)
+      end
     end
   end
 
