@@ -138,16 +138,16 @@ class Event < ActiveRecord::Base
   end
 
   def pii_data
-    # TODO AR include patient here?
     pii = self.plain_sensitive_data
-    pii = pii.deep_merge(event.sample.plain_sensitive_data) if self.sample.present?
+    pii = pii.deep_merge(self.sample.plain_sensitive_data) if self.sample.present?
+    pii = pii.deep_merge(self.current_patient.plain_sensitive_data) if self.current_patient.present?
     pii
   end
 
   def custom_fields_data
-    # TODO AR include patient here?
     data = self.custom_fields
     data = data.deep_merge(self.sample.custom_fields) if self.sample.present?
+    data = data.deep_merge(self.current_patient.custom_fields) if self.current_patient.present?
     data
   end
 
