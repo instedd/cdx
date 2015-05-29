@@ -72,12 +72,20 @@ class EventIndexer
       laboratory_id: laboratory_id,
       institution_id: device.institution_id,
       location: admin_levels,
-      event_id: event.event_id,
-      sample_uuid: event.sample.uuid
+      event_id: event.event_id
     }
+
+    if event.sample.present?
+      properties[:sample_uuid] = event.sample.uuid
+    end
+
+    if event.current_patient.present?
+      properties[:patient_uuid] = event.current_patient.uuid
+    end
 
     fields.
       merge(properties).
-      deep_merge(event.sample.indexed_fields || {})
+      deep_merge(event.sample.try(:indexed_fields) || {}).
+      deep_merge(event.current_patient.try(:indexed_fields) || {})
   end
 end
