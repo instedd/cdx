@@ -75,6 +75,8 @@ gem 'oj'
 gem 'guid'
 gem 'encryptor'
 
+gem 'dotiw'
+
 group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rescue'

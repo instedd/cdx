@@ -174,6 +174,9 @@ GEM
     domain_name (0.5.15)
       unf (>= 0.0.5, < 1.0.0)
     dotenv (0.9.0)
+    dotiw (3.0.1)
+      actionpack (>= 3)
+      i18n
     elasticsearch (1.0.8)
       elasticsearch-api (= 1.0.7)
       elasticsearch-transport (= 1.0.7)
@@ -452,6 +455,7 @@ DEPENDENCIES
   csv_builder
   decent_exposure
   devise
+  dotiw
   elasticsearch
   encryptor
   faker

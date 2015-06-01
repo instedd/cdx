@@ -441,7 +441,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {indexed: {"age" => 34297139877000}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"age" => 34297139000}, pii: Hash.new, custom: Hash.new}
     end
 
     it "obtains the distance in milliseconds between two dates disregarding the order" do
@@ -465,7 +465,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {indexed: {"age" => 34297139877000}, pii: Hash.new, custom: Hash.new}
+        patient: {indexed: {"age" => 34297139000}, pii: Hash.new, custom: Hash.new}
     end
 
     it "converts from minutes to hours" do

@@ -53,12 +53,12 @@ class Api::EventsController < ApiController
 
   def custom_fields
     event = Event.includes(:sample).find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "custom_fields" => event.custom_fields.deep_merge(event.sample.custom_fields)
+    render_json "uuid" => params[:id], "custom_fields" => event.custom_fields_data
   end
 
   def pii
-    event = Event.includes(:sample).find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "pii" => event.plain_sensitive_data.deep_merge(event.sample.plain_sensitive_data)
+    event = Event.find_by_uuid(params[:id])
+    render_json "uuid" => params[:id], "pii" => event.pii_data
   end
 
   def schema
