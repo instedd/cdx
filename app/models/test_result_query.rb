@@ -1,4 +1,4 @@
-class EventQuery
+class TestResultQuery
   include Policy::Actions
 
   def initialize params, user

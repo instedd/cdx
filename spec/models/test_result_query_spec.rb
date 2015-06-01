@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'policy_spec_helper'
 
-describe EventQuery, elasticsearch: true do
+describe TestResultQuery, elasticsearch: true do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
@@ -19,7 +19,7 @@ describe EventQuery, elasticsearch: true do
     client.indices.refresh index: institution.elasticsearch_index_name
     client.indices.refresh index: non_user_device.institution.elasticsearch_index_name
 
-    query = EventQuery.new({condition: 'mtb'}, user)
+    query = TestResultQuery.new({condition: 'mtb'}, user)
 
     query.result['total_count'].should eq(1)
     query.result['events'].first['results'].first['result'].should eq('positive')
@@ -33,7 +33,7 @@ describe EventQuery, elasticsearch: true do
 
     grant(user, second_user, institution, QUERY_EVENT)
 
-    query = EventQuery.new({condition: 'mtb'}, second_user)
+    query = TestResultQuery.new({condition: 'mtb'}, second_user)
 
     query.result['total_count'].should eq(1)
     query.result['events'].first['results'].first['result'].should eq('positive')
@@ -44,18 +44,18 @@ describe EventQuery, elasticsearch: true do
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 
-    query = EventQuery.new({condition: 'mtb'}, user)
+    query = TestResultQuery.new({condition: 'mtb'}, user)
 
     query.result['total_count'].should eq(0)
     query.result['events'].should eq([])
   end
 
-  it "should not access any event if has no policy" do
+  it "should not access any test if has no policy" do
     TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 
-    query = EventQuery.new({condition: 'mtb'}, User.new)
+    query = TestResultQuery.new({condition: 'mtb'}, User.new)
 
     query.result['total_count'].should eq(0)
     query.result['events'].should eq([])

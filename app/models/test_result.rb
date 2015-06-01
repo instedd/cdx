@@ -161,7 +161,7 @@ class TestResult < ActiveRecord::Base
   end
 
   def self.query params, user
-    EventQuery.new params, user
+    TestResultQuery.new params, user
   end
 end
 
