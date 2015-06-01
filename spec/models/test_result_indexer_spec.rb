@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe EventIndexer, elasticsearch: true do
+describe TestResultIndexer, elasticsearch: true do
 
   let(:sample) do
     sample_indexed_fields = {
@@ -20,8 +20,8 @@ describe EventIndexer, elasticsearch: true do
   )}
 
 
-  let(:event_indexer) { EventIndexer.new({
-      event_id: "4",
+  let(:test_indexer) { TestResultIndexer.new({
+      test_id: "4",
       assay: "mtb",
       custom_fields: {
         concentration: "15%"
@@ -37,12 +37,12 @@ describe EventIndexer, elasticsearch: true do
 
   it "should index a document" do
     client = double(:es_client)
-    EventIndexer.any_instance.stub(:client).and_return(client)
+    TestResultIndexer.any_instance.stub(:client).and_return(client)
     location = test.device.laboratories.first.location
 
     client.should_receive(:index).with(
       index: test.device.institution.elasticsearch_index_name,
-      type: "event",
+      type: "test",
       body: {
         start_time: test.created_at.utc.iso8601,
         created_at: test.created_at.utc.iso8601,
@@ -54,7 +54,7 @@ describe EventIndexer, elasticsearch: true do
         laboratory_id: test.device.laboratories.first.id,
         institution_id: test.device.institution_id,
         location: {"admin_level_0"=>location.geo_id},
-        event_id: "4",
+        test_id: "4",
         sample_uuid: 'abc',
         assay: "mtb",
         sample_type: "sputum",
@@ -73,6 +73,6 @@ describe EventIndexer, elasticsearch: true do
       },
       id: "#{test.device.uuid}_4")
 
-    event_indexer.index
+    test_indexer.index
   end
 end

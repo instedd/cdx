@@ -184,7 +184,7 @@ class DeviceEventProcessor
     end
 
     def index_test(test, is_new)
-      indexer = EventIndexer.new(parsed_event[:event][:indexed], test)
+      indexer = TestResultIndexer.new(parsed_event[:event][:indexed], test)
       is_new ? indexer.index : indexer.update
     end
 

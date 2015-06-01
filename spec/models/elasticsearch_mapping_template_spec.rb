@@ -181,7 +181,7 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
       include_examples 'on mapping'
 
       it "should map location fields from dynamic template" do
-        mapping_for('event').should have_nested_keys(['properties', 'location', 'properties', 'admin_level_0', 'type']).with_value('string')
+        mapping_for('test').should have_nested_keys(['properties', 'location', 'properties', 'admin_level_0', 'type']).with_value('string')
       end
     end
 
