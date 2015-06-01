@@ -80,6 +80,11 @@ class ManifestFieldMapping
       return traverse(node["substring"][0], data)[node["substring"][1]..node["substring"][2]]
     end
 
+    if node["collect"].present?
+      collection_lookup, mapping = node["collect"].first, node["collect"].second
+      return collect(traverse(collection_lookup, data), mapping)
+    end
+
     if node["parse_date"].present?
       return parse_date(node, data)
     end
@@ -287,6 +292,13 @@ class ManifestFieldMapping
       values.map {|value| strip(value)}
     else
       values.strip
+    end
+  end
+
+  def collect(values, mapping)
+    return traverse(mapping, values) unless values.is_a? Array
+    values.map do |value|
+      traverse(mapping, value)
     end
   end
 end

@@ -126,4 +126,84 @@ describe ManifestFieldMapping do
     end
   end
 
+  describe "collect" do
+
+    let(:manifest) {
+      manifest = double()
+      manifest.stub(:parser) { JsonEventParser.new }
+      manifest
+    }
+
+    context "without using root object" do
+      let(:mapping) {
+        ManifestFieldMapping.new(manifest, nil, nil, nil)
+      }
+
+      describe "works as identity for single values" do
+
+        it "collects single values" do
+          mapping.collect({ "id" => "flu-a","name" => "Flu A" }, {"lookup" => "name"}).should eq("Flu A")
+        end
+
+        it "collects nil values" do
+          mapping.collect(nil, {"lookup" => "name"}).should eq(nil)
+        end
+
+      end
+
+      describe "multiple values" do
+
+        it "collects an empty list" do
+          mapping.collect([], {"lookup" => "name"}).should eq([])
+        end
+
+        it "collects a list with a single value" do
+          mapping.collect([ { "id" => "flu-a","name" => "Flu A" } ], {"lookup" => "name"}).should eq(["Flu A"])
+        end
+
+        it "collects a list with multiple values" do
+          mapping.collect(
+            [
+              { "id" => "flu-a","name" => "Flu A" },
+              { "id" => "flu-b","name" => "Flu B" }
+            ],
+            {"lookup" => "name"}
+          ).should eq(["Flu A", "Flu B"])
+        end
+
+        it "collects a list with duplicated values" do
+          mapping.collect(
+            [
+              { "id" => "flu-a","name" => "Flu A" },
+              { "id" => "flu-a","name" => "Flu A" },
+              { "id" => "flu-b","name" => "Flu B" }
+            ],
+            {"lookup" => "name"}
+          ).should eq(["Flu A", "Flu A", "Flu B"])
+        end
+
+        it "clusterises a list with nil values" do
+          mapping.collect(
+            [
+              { "id" => "flu-a","name" => "Flu A" },
+              nil,
+              { "id" => "flu-a","name" => "Flu A" },
+              { "id" => "flu-b","name" => "Flu B" }
+            ],
+            {"lookup" => "name"}
+          ).should eq(["Flu A", nil, "Flu A", "Flu B"])
+        end
+
+      end
+    end
+
+    context "using the root object" do
+      describe "single values" do
+        it "collects single values" do
+          ManifestFieldMapping.new(manifest, nil, nil, " Hi there  \n\n ").collect(" Hi there  \n\n ", {"strip" => {"lookup" => "$"}}).should eq("Hi there")
+        end
+      end
+    end
+  end
+
 end
