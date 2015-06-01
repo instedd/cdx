@@ -1,7 +1,7 @@
 class DeviceEvent < ActiveRecord::Base
   belongs_to :device
   has_one :institution, through: :device
-  has_and_belongs_to_many :events
+  has_and_belongs_to_many :test_results
 
   before_save :parsed_events
   before_save :encrypt

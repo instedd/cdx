@@ -100,10 +100,10 @@ describe Subscriber, elasticsearch: true do
   end
 
   def submit_event
-    Event.create_and_index({ results: [result: "positive", condition: "mtb"], patient_name: "jdoe" }, {device_events: [device_event]})
+    TestResult.create_and_index({ results: [result: "positive", condition: "mtb"], patient_name: "jdoe" }, {device_events: [device_event]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 
-    Event.count.should eq(1)
+    TestResult.count.should eq(1)
   end
 end

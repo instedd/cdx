@@ -13,8 +13,8 @@ describe EventQuery, elasticsearch: true do
   let(:second_user) {User.make}
 
   it "applies institution policy" do
-    Event.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
-    Event.create_and_index({results:[condition: "mtb", result: :negative]}, {device_events:[DeviceEvent.make(device: non_user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :negative]}, {device_events:[DeviceEvent.make(device: non_user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
     client.indices.refresh index: non_user_device.institution.elasticsearch_index_name
@@ -26,8 +26,8 @@ describe EventQuery, elasticsearch: true do
   end
 
   it "delegates institution policy" do
-    Event.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
-    Event.create_and_index({results:[condition: "mtb", result: :negative]}, {device_events:[DeviceEvent.make(device: third_user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :negative]}, {device_events:[DeviceEvent.make(device: third_user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 
@@ -51,7 +51,7 @@ describe EventQuery, elasticsearch: true do
   end
 
   it "should not access any event if has no policy" do
-    Event.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 

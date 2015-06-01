@@ -2,11 +2,11 @@ require "spec_helper"
 
 describe DeviceEventProcessor, elasticsearch: true do
 
-  def parsed_event(event_id, params={})
+  def parsed_event(test_id, params={})
     {
       event: {
         indexed: {
-          event_id: event_id,
+          event_id: test_id,
           assay: "mtb",
           custom_fields: {
             concentration: "15%"
@@ -119,43 +119,43 @@ describe DeviceEventProcessor, elasticsearch: true do
     assert_patient_data(sample.patient)
   end
 
-  it "should not update existing events on new sample" do
+  it "should not update existing tests on new sample" do
     device_event_processor.client.should_receive(:bulk).never
     device_event_processor.process
 
     Sample.count.should eq(1)
   end
 
-  it "should create an event" do
+  it "should create a test result" do
     device_event_processor.process
 
-    Event.count.should eq(1)
-    event = Event.first
-    event.event_id.should eq('4')
+    TestResult.count.should eq(1)
+    test = TestResult.first
+    test.test_id.should eq('4')
 
-    event.plain_sensitive_data.should eq({
+    test.plain_sensitive_data.should eq({
       start_time: "2000/1/1 10:00:00"
     }.recursive_stringify_keys!)
 
-    event.custom_fields.should eq({
+    test.custom_fields.should eq({
       raw_result: "positivo 15%"
     }.recursive_stringify_keys!)
   end
 
-  it "should create multiple events with single sample" do
+  it "should create multiple test results with single sample" do
     device_event.stub(:parsed_events).and_return([parsed_event("4"), parsed_event("5"), parsed_event("6")])
     device_event_processor.process
 
     Sample.count.should eq(1)
 
-    Event.count.should eq(3)
-    Event.pluck(:event_id).should =~ ['4', '5', '6']
-    Event.pluck(:sample_id).should eq([Sample.first.id] * 3)
+    TestResult.count.should eq(3)
+    TestResult.pluck(:test_id).should =~ ['4', '5', '6']
+    TestResult.pluck(:sample_id).should eq([Sample.first.id] * 3)
 
     all_elasticsearch_events_for(device.institution).map {|e| e['_source']['sample_uuid']}.should eq([Sample.first.uuid] * 3)
   end
 
-  it "should update sample data and existing events on new event" do
+  it "should update sample data and existing test results on new test result" do
     sample_indexed_fields = {
       sample_type: "blood"
     }.recursive_stringify_keys!
@@ -170,8 +170,8 @@ describe DeviceEventProcessor, elasticsearch: true do
 
     sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution, patient: patient)
 
-    event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "3", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, event_id: '3', device: device})
-    event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "2", assay: "mtb"}, {sample: sample, event_id: '2', device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "3", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '3', device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', device: device})
 
     refresh_indices institution.elasticsearch_index_name
 
@@ -183,12 +183,12 @@ describe DeviceEventProcessor, elasticsearch: true do
     assert_sample_data(sample)
     assert_patient_data(sample.patient)
 
-    events = all_elasticsearch_events_for(institution)
+    tests = all_elasticsearch_events_for(institution)
 
-    events.map { |event| event["_source"]["sample_type"] }.should eq(['sputum'] * 3)
+    tests.map { |test| test["_source"]["sample_type"] }.should eq(['sputum'] * 3)
   end
 
-  it "should update sample data and existing events on event update" do
+  it "should update sample data and existing test results on test result update" do
     sample_indexed_fields = {
       sample_type: "blood"
     }.recursive_stringify_keys!
@@ -203,8 +203,8 @@ describe DeviceEventProcessor, elasticsearch: true do
 
     sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution, patient: patient)
 
-    event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, event_id: '4', device: device})
-    event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "2", assay: "mtb"}, {sample: sample, event_id: '2', device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '4', device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', device: device})
 
     refresh_indices
 
@@ -216,11 +216,11 @@ describe DeviceEventProcessor, elasticsearch: true do
     assert_sample_data(sample)
     assert_patient_data(sample.patient)
 
-    events = all_elasticsearch_events_for(institution)
-    events.map { |event| event["_source"]["sample_type"] }.should eq(['sputum'] * 2)
+    tests = all_elasticsearch_events_for(institution)
+    tests.map { |test| test["_source"]["sample_type"] }.should eq(['sputum'] * 2)
   end
 
-  it "should not update existing events if sample data indexed fields did not change" do
+  it "should not update existing tests if sample data indexed fields did not change" do
     sample_indexed_fields = {
       sample_type: "sputum",
       custom_fields: {
@@ -237,8 +237,8 @@ describe DeviceEventProcessor, elasticsearch: true do
 
     patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution)
     sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution, patient: patient)
-    event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, event_id: '4', device: device})
-    event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "2", assay: "mtb"}, {sample: sample, event_id: '2', device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '4', device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', device: device})
 
     refresh_indices
 
@@ -279,8 +279,8 @@ describe DeviceEventProcessor, elasticsearch: true do
     })
   end
 
-  it "should update events with the same event_id and different sample_uid" do
-    event = Event.create_and_index({event_id: "4", custom_fields: {concentration: "10%", foo: "bar"}, results: [
+  it "should update tests with the same test_id and different sample_uid" do
+    test = TestResult.create_and_index({test_id: "4", custom_fields: {concentration: "10%", foo: "bar"}, results: [
             {
               result: "negative",
               condition: "flu"
@@ -289,23 +289,23 @@ describe DeviceEventProcessor, elasticsearch: true do
               result: "pos",
               condition: "mtb1"
             }
-          ]}, { event_id: '4', device: device})
+          ]}, { test_id: '4', device: device})
 
     device_event_processor.process
 
     Sample.count.should eq(1)
 
-    events = all_elasticsearch_events_for(institution)
-    events.size.should eq(1)
-    events.first["_source"]["assay"].should eq("mtb")
-    events.first["_source"]["sample_type"].should eq("sputum")
-    events.first["_source"]["custom_fields"]["concentration"].should eq("15%")
-    events.first["_source"]["custom_fields"]["foo"].should eq("bar")
+    tests = all_elasticsearch_events_for(institution)
+    tests.size.should eq(1)
+    tests.first["_source"]["assay"].should eq("mtb")
+    tests.first["_source"]["sample_type"].should eq("sputum")
+    tests.first["_source"]["custom_fields"]["concentration"].should eq("15%")
+    tests.first["_source"]["custom_fields"]["foo"].should eq("bar")
 
-    Event.count.should eq(1)
-    Event.first.sample_id.should eq(Sample.last.id)
-    Event.first.custom_fields.should eq({ "raw_result" => "positivo 15%" })
-    Event.first.plain_sensitive_data.should eq({ "start_time" => "2000/1/1 10:00:00" })
+    TestResult.count.should eq(1)
+    TestResult.first.sample_id.should eq(Sample.last.id)
+    TestResult.first.custom_fields.should eq({ "raw_result" => "positivo 15%" })
+    TestResult.first.plain_sensitive_data.should eq({ "start_time" => "2000/1/1 10:00:00" })
   end
 
   context 'sample and patient entities' do
@@ -320,24 +320,24 @@ describe DeviceEventProcessor, elasticsearch: true do
         device_event.stub(:parsed_events).and_return([event])
       end
 
-      it 'should store sample data in event if event does not have a sample' do
+      it 'should store sample data in test if test does not have a sample' do
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(0)
 
-        event = Event.first
+        test = TestResult.first
 
-        event.plain_sensitive_data[:sample].should eq({
+        test.plain_sensitive_data[:sample].should eq({
           sample_id: "4002",
           collected_at: "2000/1/1 9:00:00"
         }.recursive_stringify_keys!)
 
-        event.custom_fields[:sample].should eq({
+        test.custom_fields[:sample].should eq({
           datagram: "010100011100"
         }.recursive_stringify_keys!)
 
-        event.indexed_fields[:sample].should eq({
+        test.indexed_fields[:sample].should eq({
           sample_type: "sputum",
           custom_fields: {
             culture_days: "10"
@@ -345,13 +345,13 @@ describe DeviceEventProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
       end
 
-      it 'should merge sample if event has a sample' do
+      it 'should merge sample if test has a sample' do
         sample = Sample.make(uuid: 'abc', indexed_fields: {existing_field: 'a value'}.recursive_stringify_keys!, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!, institution: device_event.institution)
-        event = Event.create_and_index({sample_uuid: sample.uuid, event_id: "4", assay: "mtb"}, {sample: sample, event_id: '4', device: device})
+        test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb"}, {sample: sample, test_id: '4', device: device})
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(1)
 
         sample = Sample.first
@@ -385,7 +385,7 @@ describe DeviceEventProcessor, elasticsearch: true do
         device_event.stub(:parsed_events).and_return([event])
       end
 
-      it 'should extract existing data in event and create the sample entity' do
+      it 'should extract existing data in test and create the sample entity' do
         indexed_fields = {
           sample: {
             existing_indexed_field: 'existing_indexed_field_value'
@@ -406,8 +406,8 @@ describe DeviceEventProcessor, elasticsearch: true do
 
         patient = Patient.make(plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_event.institution)
 
-        event = Event.create_and_index({event_id: '4', assay: 'mtb'}, {
-          sample: nil, event_id: '4', device: device, patient: patient,
+        test = TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          sample: nil, test_id: '4', device: device, patient: patient,
           indexed_fields: indexed_fields,
           custom_fields: custom_fields,
           plain_sensitive_data: plain_sensitive_data
@@ -415,12 +415,12 @@ describe DeviceEventProcessor, elasticsearch: true do
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(1)
-        event = Event.first
-        sample = event.sample
+        test = TestResult.first
+        sample = test.sample
 
-        event.patient.should be_nil
+        test.patient.should be_nil
         sample.patient.should eq(patient)
 
         sample.plain_sensitive_data.should eq({
@@ -443,12 +443,12 @@ describe DeviceEventProcessor, elasticsearch: true do
           }
         }.recursive_stringify_keys!)
 
-        event.plain_sensitive_data[:sample].should be_nil
-        event.custom_fields[:sample].should be_nil
-        event.indexed_fields[:sample].should be_nil
+        test.plain_sensitive_data[:sample].should be_nil
+        test.custom_fields[:sample].should be_nil
+        test.indexed_fields[:sample].should be_nil
       end
 
-      it 'should extract existing patient data in event into the sample entity' do
+      it 'should extract existing patient data in test into the sample entity' do
         indexed_fields = {
           patient: {
             existing_indexed_field: 'existing_indexed_field_value'
@@ -467,8 +467,8 @@ describe DeviceEventProcessor, elasticsearch: true do
           }
         }.recursive_stringify_keys!.with_indifferent_access
 
-        event = Event.create_and_index({event_id: '4', assay: 'mtb'}, {
-          sample: nil, event_id: '4', device: device,
+        test = TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          sample: nil, test_id: '4', device: device,
           indexed_fields: indexed_fields,
           custom_fields: custom_fields,
           plain_sensitive_data: plain_sensitive_data
@@ -476,10 +476,10 @@ describe DeviceEventProcessor, elasticsearch: true do
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(1)
-        event = Event.first
-        sample = event.sample
+        test = TestResult.first
+        sample = test.sample
 
         sample.plain_sensitive_data[:patient].should eq({
           existing_pii_field: 'existing_pii_field_value'
@@ -505,17 +505,17 @@ describe DeviceEventProcessor, elasticsearch: true do
 
         sample = Sample.make(uuid: 'abc', indexed_fields: indexed_fields, plain_sensitive_data: plain_sensitive_data, institution: device_event.institution)
 
-        Event.create_and_index(
-          {sample_uuid: sample.uuid, event_id: '4', assay: 'mtb'},
-          {sample: sample, event_id: '4', device: device}
+        TestResult.create_and_index(
+          {sample_uuid: sample.uuid, test_id: '4', assay: 'mtb'},
+          {sample: sample, test_id: '4', device: device}
         )
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(1)
 
-        sample = Event.first.sample
+        sample = TestResult.first.sample
 
         sample.plain_sensitive_data.should eq({
           sample_uid: "abc4002",
@@ -547,17 +547,17 @@ describe DeviceEventProcessor, elasticsearch: true do
           institution: device_event.institution
         )
 
-        Event.create_and_index(
-          {sample_uuid: sample.uuid, event_id: '4', assay: 'mtb'},
-          {sample: sample, event_id: '4', device: device}
+        TestResult.create_and_index(
+          {sample_uuid: sample.uuid, test_id: '4', assay: 'mtb'},
+          {sample: sample, test_id: '4', device: device}
         )
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(1)
 
-        sample = Event.first.sample
+        sample = TestResult.first.sample
 
         sample.plain_sensitive_data.should eq({
           sample_uid: "abc4002",
@@ -588,17 +588,17 @@ describe DeviceEventProcessor, elasticsearch: true do
           institution: device_event.institution
         )
 
-        event_1 = Event.create_and_index(
-          {sample_uuid: sample.uuid, event_id: '7', assay: 'mtb'},
-          {sample: sample, event_id: '7', device: device}
+        test_1 = TestResult.create_and_index(
+          {sample_uuid: sample.uuid, test_id: '7', assay: 'mtb'},
+          {sample: sample, test_id: '7', device: device}
         )
 
         device_event_processor.process
 
-        event_2 = Event.find_by(event_id: '4')
+        test_2 = TestResult.find_by(test_id: '4')
 
-        event_1.reload.sample.sample_uid.should eq('def9772')
-        event_2.reload.sample.sample_uid.should eq('abc4002')
+        test_1.reload.sample.sample_uid.should eq('def9772')
+        test_2.reload.sample.sample_uid.should eq('abc4002')
       end
     end
 
@@ -612,7 +612,7 @@ describe DeviceEventProcessor, elasticsearch: true do
         device_event.stub(:parsed_events).and_return([event])
       end
 
-      it 'should merge patient into event patient if event has patient but not sample' do
+      it 'should merge patient into test patient if test has patient but not sample' do
         plain_sensitive_data = {
           patient_id: '8000'
         }.recursive_stringify_keys!.with_indifferent_access
@@ -627,17 +627,17 @@ describe DeviceEventProcessor, elasticsearch: true do
           institution: device_event.institution
         )
 
-        Event.create_and_index({event_id: '4', assay: 'mtb'}, {
-          sample: nil, event_id: '4', device: device, patient: patient
+        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          sample: nil, test_id: '4', device: device, patient: patient
         })
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(0)
         Patient.count.should eq(1)
 
-        patient = Event.first.patient
+        patient = TestResult.first.patient
 
         patient.plain_sensitive_data.should eq({
           patient_id: "8000",
@@ -678,17 +678,17 @@ describe DeviceEventProcessor, elasticsearch: true do
           patient: patient
         )
 
-        Event.create_and_index({event_id: '4', assay: 'mtb'}, {
-          sample: sample, event_id: '4', device: device
+        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          sample: sample, test_id: '4', device: device
         })
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(1)
         Patient.count.should eq(1)
 
-        patient = Event.first.sample.patient
+        patient = TestResult.first.sample.patient
 
         patient.plain_sensitive_data.should eq({
           patient_id: "8000",
@@ -708,24 +708,24 @@ describe DeviceEventProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
       end
 
-      it 'should store patient data in event if event does not have a sample or patient' do
+      it 'should store patient data in test if test does not have a sample or patient' do
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(0)
         Patient.count.should eq(0)
 
-        event = Event.first
+        test = TestResult.first
 
-        event.plain_sensitive_data[:patient].should eq({
+        test.plain_sensitive_data[:patient].should eq({
           dob: "2000/1/1"
         }.recursive_stringify_keys!)
 
-        event.custom_fields[:patient].should eq({
+        test.custom_fields[:patient].should eq({
           shirt_color: "blue"
         }.recursive_stringify_keys!)
 
-        event.indexed_fields[:patient].should eq({
+        test.indexed_fields[:patient].should eq({
           gender: "male",
           custom_fields: {
             hiv: "positive"
@@ -739,17 +739,17 @@ describe DeviceEventProcessor, elasticsearch: true do
           institution: device_event.institution
         )
 
-        Event.create_and_index({event_id: '4', assay: 'mtb'}, {
-          sample: sample, event_id: '4', device: device
+        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          sample: sample, test_id: '4', device: device
         })
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(1)
         Patient.count.should eq(0)
 
-        sample = Event.first.sample
+        sample = TestResult.first.sample
 
         sample.plain_sensitive_data[:patient].should eq({
           dob: "2000/1/1"
@@ -777,7 +777,7 @@ describe DeviceEventProcessor, elasticsearch: true do
         device_event.stub(:parsed_events).and_return([event])
       end
 
-      it 'should extract existing data in event and create the patient entity' do
+      it 'should extract existing data in test and create the patient entity' do
         indexed_fields = {
           patient: {
             existing_indexed_field: 'existing_indexed_field_value'
@@ -796,8 +796,8 @@ describe DeviceEventProcessor, elasticsearch: true do
           }
         }.recursive_stringify_keys!.with_indifferent_access
 
-        Event.create_and_index({event_id: '4', assay: 'mtb'}, {
-          sample: nil, event_id: '4', device: device,
+        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          sample: nil, test_id: '4', device: device,
           indexed_fields: indexed_fields,
           custom_fields: custom_fields,
           plain_sensitive_data: plain_sensitive_data
@@ -805,11 +805,11 @@ describe DeviceEventProcessor, elasticsearch: true do
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(0)
         Patient.count.should eq(1)
 
-        patient = Event.first.patient
+        patient = TestResult.first.patient
 
         patient.plain_sensitive_data.should eq({
           patient_id: "8000",
@@ -858,17 +858,17 @@ describe DeviceEventProcessor, elasticsearch: true do
           institution: device_event.institution
         )
 
-        Event.create_and_index({event_id: '4', assay: 'mtb'}, {
-          sample: sample, event_id: '4', device: device
+        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          sample: sample, test_id: '4', device: device
         })
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(1)
         Patient.count.should eq(1)
 
-        patient = Event.first.sample.patient
+        patient = TestResult.first.sample.patient
 
         patient.plain_sensitive_data.should eq({
           patient_id: "8000",
@@ -911,17 +911,17 @@ describe DeviceEventProcessor, elasticsearch: true do
           institution: device_event.institution
         )
 
-        Event.create_and_index({event_id: '4', assay: 'mtb'}, {
-          sample: nil, event_id: '4', device: device, patient: patient
+        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          sample: nil, test_id: '4', device: device, patient: patient
         })
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(0)
         Patient.count.should eq(1)
 
-        patient = Event.first.patient
+        patient = TestResult.first.patient
 
         patient.plain_sensitive_data.should eq({
           patient_id: "8000",
@@ -953,17 +953,17 @@ describe DeviceEventProcessor, elasticsearch: true do
           institution: device_event.institution
         )
 
-        Event.create_and_index({event_id: '4', assay: 'mtb'}, {
-          sample: nil, event_id: '4', device: device, patient: patient
+        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          sample: nil, test_id: '4', device: device, patient: patient
         })
 
         device_event_processor.process
 
-        Event.count.should eq(1)
+        TestResult.count.should eq(1)
         Sample.count.should eq(0)
         Patient.count.should eq(1)
 
-        patient = Event.first.patient
+        patient = TestResult.first.patient
 
         patient.plain_sensitive_data.should eq({
           patient_id: "8000",
@@ -992,17 +992,17 @@ describe DeviceEventProcessor, elasticsearch: true do
           institution: device_event.institution
         )
 
-        event_1 = Event.create_and_index(
-          {event_id: '7', assay: 'mtb'},
-          {sample: nil, event_id: '7', device: device, patient: patient}
+        test_1 = TestResult.create_and_index(
+          {test_id: '7', assay: 'mtb'},
+          {sample: nil, test_id: '7', device: device, patient: patient}
         )
 
         device_event_processor.process
 
-        event_2 = Event.find_by(event_id: '4')
+        test_2 = TestResult.find_by(test_id: '4')
 
-        event_1.reload.patient.patient_id.should eq('9000')
-        event_2.patient.patient_id.should eq('8000')
+        test_1.reload.patient.patient_id.should eq('9000')
+        test_2.patient.patient_id.should eq('8000')
       end
     end
 

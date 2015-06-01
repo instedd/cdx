@@ -40,7 +40,7 @@ class Api::EventsController < ApiController
     if filters.blank?
       render :status => :unprocessable_entity, :json => { :errors => "The query must contain at least one filter"}
     else
-      query = Event.query(filters, current_user)
+      query = TestResult.query(filters, current_user)
       respond_to do |format|
         format.csv do
           build_csv 'Events', query.csv_builder
@@ -52,13 +52,13 @@ class Api::EventsController < ApiController
   end
 
   def custom_fields
-    event = Event.includes(:sample).find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "custom_fields" => event.custom_fields_data
+    test = TestResult.includes(:sample).find_by_uuid(params[:id])
+    render_json "uuid" => params[:id], "custom_fields" => test.custom_fields_data
   end
 
   def pii
-    event = Event.find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "pii" => event.pii_data
+    test = TestResult.find_by_uuid(params[:id])
+    render_json "uuid" => params[:id], "pii" => test.pii_data
   end
 
   def schema

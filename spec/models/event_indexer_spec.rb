@@ -14,9 +14,9 @@ describe EventIndexer, elasticsearch: true do
     Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields)
   end
 
-  let(:event){ Event.make(
+  let(:test){ TestResult.make(
     sample: sample,
-    event_id: '4'
+    test_id: '4'
   )}
 
 
@@ -32,27 +32,27 @@ describe EventIndexer, elasticsearch: true do
           condition: "mtb"
         }
       ]
-    }, event
+    }, test
   )}
 
   it "should index a document" do
     client = double(:es_client)
     EventIndexer.any_instance.stub(:client).and_return(client)
-    location = event.device.laboratories.first.location
+    location = test.device.laboratories.first.location
 
     client.should_receive(:index).with(
-      index: event.device.institution.elasticsearch_index_name,
+      index: test.device.institution.elasticsearch_index_name,
       type: "event",
       body: {
-        start_time: event.created_at.utc.iso8601,
-        created_at: event.created_at.utc.iso8601,
-        updated_at: event.updated_at.utc.iso8601,
-        device_uuid: event.device.uuid,
-        uuid: event.uuid,
+        start_time: test.created_at.utc.iso8601,
+        created_at: test.created_at.utc.iso8601,
+        updated_at: test.updated_at.utc.iso8601,
+        device_uuid: test.device.uuid,
+        uuid: test.uuid,
         location_id: location.geo_id,
         parent_locations: [location.geo_id],
-        laboratory_id: event.device.laboratories.first.id,
-        institution_id: event.device.institution_id,
+        laboratory_id: test.device.laboratories.first.id,
+        institution_id: test.device.institution_id,
         location: {"admin_level_0"=>location.geo_id},
         event_id: "4",
         sample_uuid: 'abc',
@@ -71,7 +71,7 @@ describe EventIndexer, elasticsearch: true do
           }
         ]
       },
-      id: "#{event.device.uuid}_4")
+      id: "#{test.device.uuid}_4")
 
     event_indexer.index
   end

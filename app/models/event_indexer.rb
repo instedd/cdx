@@ -27,7 +27,7 @@ class EventIndexer
   end
 
   def elasticsearch_id
-    "#{device.uuid}_#{event.event_id || event.uuid}"
+    "#{device.uuid}_#{event.test_id || event.uuid}"
   end
 
   def index_name
@@ -72,7 +72,7 @@ class EventIndexer
       laboratory_id: laboratory_id,
       institution_id: device.institution_id,
       location: admin_levels,
-      event_id: event.event_id
+      event_id: event.test_id
     }
 
     if event.sample.present?

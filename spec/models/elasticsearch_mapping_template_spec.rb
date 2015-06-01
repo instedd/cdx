@@ -132,7 +132,7 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
 
   context "for manifest" do
 
-    let(:event)     { Event.create_and_index({results: [{result: :positive}]}, device_events: [DeviceEvent.make(device: device)]) }
+    let(:event)     { TestResult.create_and_index({results: [{result: :positive}]}, device_events: [DeviceEvent.make(device: device)]) }
     let(:mapping)   { Cdx::Api.client.indices.get_mapping index: event.institution.elasticsearch_index_name }
 
     shared_examples "on mapping" do

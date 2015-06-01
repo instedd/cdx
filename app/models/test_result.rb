@@ -1,4 +1,4 @@
-class Event < ActiveRecord::Base
+class TestResult < ActiveRecord::Base
   has_and_belongs_to_many :device_events
   belongs_to :device
   has_one :institution, through: :device
@@ -7,7 +7,7 @@ class Event < ActiveRecord::Base
   serialize :custom_fields
   serialize :indexed_fields
   validates_presence_of :device
-  validates_uniqueness_of :event_id, scope: :device_id, allow_nil: true
+  validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
 
   before_create :generate_uuid
   before_save :encrypt
@@ -21,12 +21,12 @@ class Event < ActiveRecord::Base
 
   delegate :device_model, :device_model_id, to: :device
 
-  def merge(event)
-    self.plain_sensitive_data.deep_merge_not_nil!(event.plain_sensitive_data)
-    self.custom_fields.deep_merge_not_nil!(event.custom_fields)
-    self.indexed_fields.deep_merge_not_nil!(event.indexed_fields)
-    self.sample_id = event.sample_id unless event.sample_id.blank?
-    self.device_events |= event.device_events
+  def merge(test)
+    self.plain_sensitive_data.deep_merge_not_nil!(test.plain_sensitive_data)
+    self.custom_fields.deep_merge_not_nil!(test.custom_fields)
+    self.indexed_fields.deep_merge_not_nil!(test.indexed_fields)
+    self.sample_id = test.sample_id unless test.sample_id.blank?
+    self.device_events |= test.device_events
     self
   end
 

@@ -42,19 +42,19 @@ class DeviceEventProcessor
     end
 
     def process
-      event = find_or_initialize_event
-      is_new_event = event.new_record?
-      old_sample = event.sample
-      old_patient = event.current_patient
+      test = find_or_initialize_test
+      is_new_test = test.new_record?
+      old_sample = test.sample
+      old_patient = test.current_patient
 
-      process_sample event
-      process_patient event
+      process_sample test
+      process_patient test
 
-      sample_changed = event.sample_id_changed?
-      patient_changed = event.patient_id_changed? ||
-        (event.sample.present? && event.sample.patient_id_changed?)
+      sample_changed = test.sample_id_changed?
+      patient_changed = test.patient_id_changed? ||
+        (test.sample.present? && test.sample.patient_id_changed?)
 
-      event.save!
+      test.save!
 
       if sample_changed && old_sample.present?
         old_sample.destroy
@@ -64,23 +64,23 @@ class DeviceEventProcessor
         old_patient.destroy
       end
 
-      index_event event, is_new_event
+      index_test test, is_new_test
     end
 
     private
 
-    def find_or_initialize_event
-      event = Event.new device_events: [device_event],
-                        plain_sensitive_data: parsed_event[:event][:pii],
-                        custom_fields: parsed_event[:event][:custom],
-                        event_id: parsed_event[:event][:indexed][:event_id],
-                        device: device
+    def find_or_initialize_test
+      test = TestResult.new device_events: [device_event],
+                            plain_sensitive_data: parsed_event[:event][:pii],
+                            custom_fields: parsed_event[:event][:custom],
+                            test_id: parsed_event[:event][:indexed][:event_id],
+                            device: device
 
-      if event.event_id && existing = Event.find_by(event_id: event.event_id, device_id: event.device_id)
-        existing.merge(event)
+      if test.test_id && existing = TestResult.find_by(test_id: test.test_id, device_id: test.device_id)
+        existing.merge(test)
         existing
       else
-        event
+        test
       end
     end
 
@@ -124,67 +124,67 @@ class DeviceEventProcessor
       end
     end
 
-    def process_sample(event)
+    def process_sample(test)
       sample, existing_indexed = find_or_initialize_sample
 
-      if event.sample.present?
+      if test.sample.present?
         if sample.sample_uid.present?
-          if event.sample.sample_uid == sample.sample_uid
-            event.sample.merge sample
+          if test.sample.sample_uid == sample.sample_uid
+            test.sample.merge sample
           else
-            event.sample = sample
+            test.sample = sample
           end
         else
-          event.sample.merge sample
+          test.sample.merge sample
         end
       else
         if sample.sample_uid.present?
-          event.extract_sample_data_into sample
-          event.sample = sample
+          test.extract_sample_data_into sample
+          test.sample = sample
         else
-          event.add_sample_data sample
+          test.add_sample_data sample
         end
       end
 
-      event.sample.save! if event.sample.present?
+      test.sample.save! if test.sample.present?
 
-      if !existing_indexed.nil? && existing_indexed != event.sample.try(:indexed_fields)
-        update_sample_in_existing_documents_with event.sample
+      if !existing_indexed.nil? && existing_indexed != test.sample.try(:indexed_fields)
+        update_sample_in_existing_documents_with test.sample
       end
     end
 
-    def process_patient(event)
+    def process_patient(test)
       patient, existing_indexed = find_or_initialize_patient
-      current = event.current_patient
+      current = test.current_patient
 
       if current.present?
         if patient.patient_id.present?
           if current.patient_id == patient.patient_id
             current.merge patient
           else
-            event.current_patient = patient
+            test.current_patient = patient
           end
         else
           current.merge patient
         end
       else
         if patient.patient_id.present?
-          event.extract_patient_data_into patient
-          event.current_patient = patient
+          test.extract_patient_data_into patient
+          test.current_patient = patient
         else
-          event.add_patient_data patient
+          test.add_patient_data patient
         end
       end
 
-      event.current_patient.save! if event.current_patient.present?
+      test.current_patient.save! if test.current_patient.present?
 
-      if !existing_indexed.nil? && existing_indexed != event.current_patient.try(:indexed_fields)
-        update_patient_in_existing_documents_with event.current_patient
+      if !existing_indexed.nil? && existing_indexed != test.current_patient.try(:indexed_fields)
+        update_patient_in_existing_documents_with test.current_patient
       end
     end
 
-    def index_event(event, is_new)
-      indexer = EventIndexer.new(parsed_event[:event][:indexed], event)
+    def index_test(test, is_new)
+      indexer = EventIndexer.new(parsed_event[:event][:indexed], test)
       is_new ? indexer.index : indexer.update
     end
 
