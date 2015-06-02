@@ -16,10 +16,10 @@ class Cdx::Api::Elasticsearch::CustomDocumentFormat
     @mappings[cdp_field_name] || cdp_field_name
   end
 
-  # receives an event in the format used in ES and
+  # receives an test in the format used in ES and
   # translates it into a CDP compliant response
-  def translate_event(event)
-    Hash[event.map { |indexed_name, value|
+  def translate_test(test)
+    Hash[test.map { |indexed_name, value|
       [cdp_field_name(indexed_name), value]
     }]
   end

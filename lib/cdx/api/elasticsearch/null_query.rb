@@ -5,7 +5,7 @@ class Cdx::Api::Elasticsearch::NullQuery
   end
 
   def execute
-    {"events" => [], "total_count" => 0}
+    {"tests" => [], "total_count" => 0}
   end
 
   def grouped_by

@@ -24,8 +24,8 @@ describe "Cdx::Api Multi" do
     end
 
     it "should return correct results" do
-      expect_one_result_with_field "system_user", "jdoe", response: responses[0]['events']
-      expect_one_result "negative", min_age: 15, response: responses[1]['events']
+      expect_one_result_with_field "system_user", "jdoe", response: responses[0]['tests']
+      expect_one_result "negative", min_age: 15, response: responses[1]['tests']
     end
 
     it "should return correct total counts" do

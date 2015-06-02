@@ -22,7 +22,7 @@ class Cdx::Api::Service
 
   def translate(response)
     format = config.document_format
-    response.map { |event| format.translate_event(event) }
+    response.map { |test| format.translate_test(test) }
   end
 
   def search_elastic options

@@ -6,44 +6,44 @@ describe Cdx::Api do
   include_context "cdx api helpers"
 
   describe "Filter" do
-    it "should check for new events since a date" do
+    it "should check for new tests since a date" do
       index results: [result: :positive], start_time: time(2013, 1, 1)
       index results: [result: :negative], start_time: time(2013, 1, 2)
 
-      response = query_events(since: time(2013, 1, 2))
+      response = query_tests(since: time(2013, 1, 2))
 
       expect(response.size).to eq(1)
       expect(response.first["results"].first["result"]).to eq("negative")
 
-      response = query_events(since: time(2013, 1, 1)).sort_by do |event|
-        event["results"].first["result"]
+      response = query_tests(since: time(2013, 1, 1)).sort_by do |test|
+        test["results"].first["result"]
       end
 
       expect(response.first["results"].first["result"]).to eq("negative")
       expect(response.last["results"].first["result"]).to eq("positive")
 
-      expect(query_events(since: time(2013, 1, 3))).to be_empty
+      expect(query_tests(since: time(2013, 1, 3))).to be_empty
     end
 
-    it "should check for new events since a date in a differen time zone" do
+    it "should check for new tests since a date in a differen time zone" do
       Time.zone = ActiveSupport::TimeZone["Asia/Seoul"]
 
       index results: [result: :positive], start_time: 3.day.ago.at_noon.iso8601
       index results: [result: :negative], start_time: 1.day.ago.at_noon.iso8601
 
-      response = query_events(since: 2.day.ago.at_noon.iso8601)
+      response = query_tests(since: 2.day.ago.at_noon.iso8601)
 
       expect(response.size).to eq(1)
       expect(response.first["results"].first["result"]).to eq("negative")
 
-      response = query_events(since: 4.day.ago.at_noon.iso8601).sort_by do |event|
-        event["results"].first["result"]
+      response = query_tests(since: 4.day.ago.at_noon.iso8601).sort_by do |test|
+        test["results"].first["result"]
       end
 
       expect(response.first["results"].first["result"]).to eq("negative")
       expect(response.last["results"].first["result"]).to eq("positive")
 
-      expect(query_events(since: Date.current.at_noon.iso8601)).to be_empty
+      expect(query_tests(since: Date.current.at_noon.iso8601)).to be_empty
     end
 
     it "should asume current timezone if no one is provided" do
@@ -51,13 +51,13 @@ describe Cdx::Api do
 
       index results: [result: :negative], start_time: Time.zone.local(2010, 10, 10, 01, 00, 30).iso8601
 
-      response = query_events(since: '2010-10-10T01:00:29')
+      response = query_tests(since: '2010-10-10T01:00:29')
 
       expect(response.size).to eq(1)
       expect(response.first["results"].first["result"]).to eq("negative")
     end
 
-    it "should check for new events util a date" do
+    it "should check for new tests util a date" do
       index results: [result: :positive], start_time: time(2013, 1, 1)
       index results: [result: :negative], start_time: time(2013, 1, 3)
 
@@ -174,8 +174,8 @@ describe Cdx::Api do
         index age: 2, gender: "female"
         index age: 3, gender: "unknown"
 
-        response = query_events(gender: ["male", "female"]).sort_by do |event|
-          event["age"]
+        response = query_tests(gender: ["male", "female"]).sort_by do |test|
+          test["age"]
         end
 
         expect(response).to eq([
@@ -189,8 +189,8 @@ describe Cdx::Api do
         index age: 2, gender: "female"
         index age: 3, gender: "unknown"
 
-        response = query_events(gender: "male,female").sort_by do |event|
-          event["age"]
+        response = query_tests(gender: "male,female").sort_by do |test|
+          test["age"]
         end
 
         expect(response).to eq([
@@ -204,8 +204,8 @@ describe Cdx::Api do
         index age: 2, test_type: "two"
         index age: 3, test_type: "three"
 
-        response = query_events(test_type: ["one", "two"]).sort_by do |event|
-          event["test_type"]
+        response = query_tests(test_type: ["one", "two"]).sort_by do |test|
+          test["test_type"]
         end
 
         expect(response).to eq([
@@ -219,8 +219,8 @@ describe Cdx::Api do
         index age: 2, test_type: "two"
         index age: 3, test_type: "three"
 
-        response = query_events(test_type: "one,two").sort_by do |event|
-          event["test_type"]
+        response = query_tests(test_type: "one,two").sort_by do |test|
+          test["test_type"]
         end
 
         expect(response).to eq([
@@ -236,8 +236,8 @@ describe Cdx::Api do
 
         expect_one_result "positive", condition: 'null'
 
-        response = query_events(condition: "null,MTB").sort_by do |event|
-          event["age"]
+        response = query_tests(condition: "null,MTB").sort_by do |test|
+          test["age"]
         end
 
         expect(response).to eq([
@@ -251,8 +251,8 @@ describe Cdx::Api do
         index results:[condition: "Flu", result: :negative], age: 20
         index results:[condition: "MTB", result: :negative], age: 30
 
-        response = query_events(condition: "not(null)").sort_by do |event|
-          event["age"]
+        response = query_tests(condition: "not(null)").sort_by do |test|
+          test["age"]
         end
 
         expect(response).to eq([
@@ -269,8 +269,8 @@ describe Cdx::Api do
       index results:[result: :negative], gender: :male
       index results:[result: :negative], gender: :female
 
-      response = query_events(group_by: :gender).sort_by do |event|
-        event["gender"]
+      response = query_tests(group_by: :gender).sort_by do |test|
+        test["gender"]
       end
 
       expect(response).to eq([
@@ -287,8 +287,8 @@ describe Cdx::Api do
       index results:[result: :negative], gender: :female, assay_name: "b"
       index results:[result: :negative], gender: :female, assay_name: "b"
 
-      response = query_events(group_by: "gender,assay_name").sort_by do |event|
-        event["gender"] + event["assay_name"]
+      response = query_tests(group_by: "gender,assay_name").sort_by do |test|
+        test["gender"] + test["assay_name"]
       end
 
       expect(response).to eq([
@@ -304,8 +304,8 @@ describe Cdx::Api do
       index results:[result: :positive], test_type: "specimen"
       index results:[result: :positive], test_type: "qc"
 
-      response = query_events(group_by:"test_type").sort_by do |event|
-        event["test_type"]
+      response = query_tests(group_by:"test_type").sort_by do |test|
+        test["test_type"]
       end
 
       expect(response).to eq([
@@ -322,8 +322,8 @@ describe Cdx::Api do
       index results:[result: :negative], gender: :female, assay_name: "b"
       index results:[result: :negative], gender: :female, assay_name: "b"
 
-      response = query_events(group_by: "gender,assay_name,result").sort_by do |event|
-        event["gender"] + event["result"] + event["assay_name"]
+      response = query_tests(group_by: "gender,assay_name,result").sort_by do |test|
+        test["gender"] + test["result"] + test["assay_name"]
       end
 
       expect(response).to eq([
@@ -343,8 +343,8 @@ describe Cdx::Api do
       index results:[result: :negative], gender: :female, assay_name: "b"
       index results:[result: :negative], gender: :female, assay_name: "b"
 
-      response = query_events(group_by: "result,gender,assay_name").sort_by do |event|
-        event["gender"] + event["result"] + event["assay_name"]
+      response = query_tests(group_by: "result,gender,assay_name").sort_by do |test|
+        test["gender"] + test["result"] + test["assay_name"]
       end
 
       expect(response).to eq([
@@ -362,8 +362,8 @@ describe Cdx::Api do
       index system_user: "mmajor"
       index system_user: "mmajor"
 
-      response = query_events(group_by: "system_user").sort_by do |event|
-        event["system_user"]
+      response = query_tests(group_by: "system_user").sort_by do |test|
+        test["system_user"]
       end
 
       expect(response).to eq([
@@ -378,7 +378,7 @@ describe Cdx::Api do
       index results:[result: :positive], created_at: time(2011, 1, 1)
 
       expect {
-        query_events(group_by: "foo(created_at)")
+        query_tests(group_by: "foo(created_at)")
       }.to raise_error
     end
 
@@ -387,8 +387,8 @@ describe Cdx::Api do
       index results:[result: :positive], created_at: time(2010, 1, 2)
       index results:[result: :positive], created_at: time(2011, 1, 1)
 
-      response = query_events(group_by: "year(created_at)").sort_by do |event|
-        event["created_at"]
+      response = query_tests(group_by: "year(created_at)").sort_by do |test|
+        test["created_at"]
       end
 
       expect(response).to eq([
@@ -404,8 +404,8 @@ describe Cdx::Api do
       index results:[result: :positive], created_at: time(2011, 1, 2)
       index results:[result: :positive], created_at: time(2011, 2, 1)
 
-      response = query_events(group_by: "month(created_at)").sort_by do |event|
-        event["created_at"]
+      response = query_tests(group_by: "month(created_at)").sort_by do |test|
+        test["created_at"]
       end
 
       expect(response).to eq([
@@ -424,8 +424,8 @@ describe Cdx::Api do
       index results:[result: :positive], created_at: time(2010, 1, 13)
       index results:[result: :positive], created_at: time(2010, 6, 13)
 
-      response = query_events(group_by: "week(created_at)").sort_by do |event|
-        event["created_at"]
+      response = query_tests(group_by: "week(created_at)").sort_by do |test|
+        test["created_at"]
       end
 
       expect(response).to eq([
@@ -438,7 +438,7 @@ describe Cdx::Api do
     it "groups by week(date) and uses weekyear" do
       index created_at: time(2012, 12, 31)
 
-      response = query_events(group_by: "week(created_at)")
+      response = query_tests(group_by: "week(created_at)")
 
       expect(response).to eq([
         {"created_at"=>"2013-W01", count: 1},
@@ -451,8 +451,8 @@ describe Cdx::Api do
       index results:[result: :positive], created_at: time(2010, 1, 4)
       index results:[result: :positive], created_at: time(2010, 1, 5)
 
-      response = query_events(group_by: "day(created_at)").sort_by do |event|
-        event["created_at"]
+      response = query_tests(group_by: "day(created_at)").sort_by do |test|
+        test["created_at"]
       end
 
       expect(response).to eq([
@@ -467,8 +467,8 @@ describe Cdx::Api do
       index results:[result: :negative], created_at: time(2010, 1, 4)
       index results:[result: :positive], created_at: time(2010, 1, 5)
 
-      response = query_events(group_by: "day(created_at),result").sort_by do |event|
-        event["created_at"] + event["result"]
+      response = query_tests(group_by: "day(created_at),result").sort_by do |test|
+        test["created_at"] + test["result"]
       end
 
       expect(response).to eq([
@@ -487,8 +487,8 @@ describe Cdx::Api do
       index age: 20
       index age: 21
 
-      response = query_events(group_by: [{"age" => [[nil, 10], [15, 120], [10, 15]]}]).sort_by do |event|
-        event["age"].compact
+      response = query_tests(group_by: [{"age" => [[nil, 10], [15, 120], [10, 15]]}]).sort_by do |test|
+        test["age"].compact
       end
 
       expect(response).to eq([
@@ -507,8 +507,8 @@ describe Cdx::Api do
       index age: 20
       index age: 21
 
-      response = query_events(group_by: [{"age" => [{to: 10}, [10, 15], {from: 16, to: 21}, [21]]}]).sort_by do |event|
-        event["age"].compact
+      response = query_tests(group_by: [{"age" => [{to: 10}, [10, 15], {from: 16, to: 21}, [21]]}]).sort_by do |test|
+        test["age"].compact
       end
 
       expect(response).to eq([
@@ -528,8 +528,8 @@ describe Cdx::Api do
       index age: 20
       index age: 21
 
-      response = query_events(group_by: {"age" => [[0, 10], [15, 120], [10, 15]]}).sort_by do |event|
-        event["age"]
+      response = query_tests(group_by: {"age" => [[0, 10], [15, 120], [10, 15]]}).sort_by do |test|
+        test["age"]
       end
 
       expect(response).to eq([
@@ -545,8 +545,8 @@ describe Cdx::Api do
         {condition: "Flu", result: :negative},
       ]
 
-      response = query_events(group_by: :result).sort_by do |event|
-        event["result"]
+      response = query_tests(group_by: :result).sort_by do |test|
+        test["result"]
       end
 
       expect(response).to eq([
@@ -561,8 +561,8 @@ describe Cdx::Api do
         {condition: "Flu", result: :negative},
       ]
 
-      response = query_events(group_by: "result,condition").sort_by do |event|
-        event["result"] + event["condition"]
+      response = query_tests(group_by: "result,condition").sort_by do |test|
+        test["result"] + test["condition"]
       end
 
       expect(response).to eq([
@@ -577,8 +577,8 @@ describe Cdx::Api do
       index error_code: 2
       index error_code: 2
 
-      response = query_events(group_by: "error_code").sort_by do |event|
-        event["error_code"]
+      response = query_tests(group_by: "error_code").sort_by do |test|
+        test["error_code"]
       end
 
       expect(response).to eq([
@@ -587,18 +587,18 @@ describe Cdx::Api do
       ])
     end
 
-    it "returns 0 elements if no events match the filter by condition name" do
+    it "returns 0 elements if no tests match the filter by condition name" do
       index results:[condition: "MTB", result: :positive]
       index results:[condition: "Flu", result: :negative]
 
       results = query(result: 'foo', group_by: "result")
 
-      expect(results["events"].length).to eq(0)
+      expect(results["tests"].length).to eq(0)
       expect(results["total_count"]).to eq(0)
 
       results = query(result: 'foo')
 
-      expect(results["events"].length).to eq(0)
+      expect(results["tests"].length).to eq(0)
       expect(results["total_count"]).to eq(0)
     end
 
@@ -607,8 +607,8 @@ describe Cdx::Api do
         index results:[result: :positive], test_type: "qc"
         index results:[result: :positive], test_type: "qc"
 
-        response = query_events(group_by:"test_type").sort_by do |event|
-          event["test_type"]
+        response = query_tests(group_by:"test_type").sort_by do |test|
+          test["test_type"]
         end
 
         expect(response).to eq([
@@ -624,7 +624,7 @@ describe Cdx::Api do
       index results:[result: :positive], age: 20
       index results:[result: :negative], age: 10
 
-      response = query_events(order_by: :age)
+      response = query_tests(order_by: :age)
 
       expect(response[0]["results"].first["result"]).to eq("negative")
       expect(response[0]["age"]).to eq(10)
@@ -636,7 +636,7 @@ describe Cdx::Api do
       index results:[result: :positive], age: 20
       index results:[result: :negative], age: 10
 
-      response = query_events(order_by: "-age")
+      response = query_tests(order_by: "-age")
 
       expect(response[0]["results"].first["result"]).to eq("positive")
       expect(response[0]["age"]).to eq(20)
@@ -650,7 +650,7 @@ describe Cdx::Api do
       index results:[result: :negative], age: 20, gender: :female
       index results:[result: :negative], age: 10, gender: :female
 
-      response = query_events(order_by: "age,gender")
+      response = query_tests(order_by: "age,gender")
 
       expect(response[0]["results"].first["result"]).to eq("negative")
       expect(response[0]["age"]).to eq(10)
@@ -672,7 +672,7 @@ describe Cdx::Api do
       index results:[result: :negative], age: 20, gender: :female
       index results:[result: :negative], age: 10, gender: :female
 
-      response = query_events(order_by: "age,-gender")
+      response = query_tests(order_by: "age,-gender")
 
       expect(response[0]["results"].first["result"]).to eq("positive")
       expect(response[0]["age"]).to eq(10)
@@ -695,7 +695,7 @@ describe Cdx::Api do
       index results:[result: :positive], created_at: time(2011, 1, 2)
       index results:[result: :positive], created_at: time(2011, 2, 1)
 
-      response = query_events(group_by: "month(created_at)", order_by: "created_at")
+      response = query_tests(group_by: "month(created_at)", order_by: "created_at")
 
       expect(response).to eq([
         {"created_at"=>"2010-01", count: 1},
@@ -704,7 +704,7 @@ describe Cdx::Api do
         {"created_at"=>"2011-02", count: 1}
       ])
 
-      response = query_events(group_by: "month(created_at)", order_by: "-created_at")
+      response = query_tests(group_by: "month(created_at)", order_by: "-created_at")
 
       expect(response).to eq([
         {"created_at"=>"2011-02", count: 1},
@@ -724,16 +724,16 @@ describe Cdx::Api do
       expect_one_result "negative", location: 3
       expect_one_result "positive", location: 4
 
-      response = query_events(location: 2).sort_by do |event|
-        event["results"].first["result"]
+      response = query_tests(location: 2).sort_by do |test|
+        test["results"].first["result"]
       end
 
       expect(response.size).to eq(2)
       expect(response[0]["results"].first["result"]).to eq("negative")
       expect(response[1]["results"].first["result"]).to eq("positive")
 
-      response = query_events(location: 1).sort_by do |event|
-        event["results"].first["result"]
+      response = query_tests(location: 1).sort_by do |test|
+        test["results"].first["result"]
       end
 
       expect(response.size).to eq(3)
@@ -747,13 +747,13 @@ describe Cdx::Api do
       index results: [result: "positive"], location: { admin_level_0: 1, admin_level_1: 2 }
       index results: [result: "positive with riff"], location: { admin_level_0: 1, admin_level_1: 5 }
 
-      response = query_events(group_by: {admin_level: 1})
+      response = query_tests(group_by: {admin_level: 1})
       expect(response).to eq([
         {"location"=>"2", count: 2},
         {"location"=>"5", count: 1}
       ])
 
-      response = query_events(group_by: {admin_level: 0})
+      response = query_tests(group_by: {admin_level: 0})
 
       expect(response).to eq([
         {"location"=>"1", count: 3}
@@ -766,16 +766,16 @@ describe Cdx::Api do
         Cdx::Api.searchable_fields.push @extra_field
 
         # Delete the index and recreate it to make ES grab the new template
-        Cdx::Api.client.indices.delete index: "cdx_events" rescue nil
-        Cdx::Api.initialize_default_template "cdx_events_template"
+        Cdx::Api.client.indices.delete index: "cdx_tests" rescue nil
+        Cdx::Api.initialize_default_template "cdx_tests_template"
       end
 
       after(:all) do
         Cdx::Api.searchable_fields.delete @extra_field
 
         # Delete the index and recreate it to make ES grab the new template
-        Cdx::Api.client.indices.delete index: "cdx_events" rescue nil
-        Cdx::Api.initialize_default_template "cdx_events_template"
+        Cdx::Api.client.indices.delete index: "cdx_tests" rescue nil
+        Cdx::Api.initialize_default_template "cdx_tests_template"
       end
 
       it "should allow searching by the new field" do
@@ -783,10 +783,10 @@ describe Cdx::Api do
         index patient_loc_id: 2, parent_patient_locs: [1,2]
         index patient_loc_id: 3, parent_patient_locs: [3]
 
-        response = query_events patient_loc: 1
+        response = query_tests patient_loc: 1
         expect(response.count).to eq(2)
 
-        response = query_events patient_loc: 3
+        response = query_tests patient_loc: 3
         expect(response.count).to eq(1)
       end
 
@@ -795,7 +795,7 @@ describe Cdx::Api do
         index patient_loc: { admin_level_0: 1, admin_level_1: 2}
         index patient_loc: { admin_level_0: 3 }
 
-        response = query_events(group_by: { patient_loc_admin_level: 0 })
+        response = query_tests(group_by: { patient_loc_admin_level: 0 })
         expect(response).to eq [{"patient_loc" => "1", :count => 2}, {"patient_loc" => "3", :count => 1}]
       end
     end
@@ -808,7 +808,7 @@ describe Cdx::Api do
       index age: 1
 
       results = query(age: 1)
-      expect(results["events"].length).to eq(3)
+      expect(results["tests"].length).to eq(3)
       expect(results["total_count"]).to eq(3)
     end
 
@@ -818,7 +818,7 @@ describe Cdx::Api do
       index age: 1
 
       results = query(age: 1, page_size: 2)
-      expect(results["events"].length).to eq(2)
+      expect(results["tests"].length).to eq(2)
       expect(results["total_count"]).to eq(3)
     end
 
@@ -829,9 +829,9 @@ describe Cdx::Api do
 
       results = query(page_size: 1, offset: 1, order_by: 'age')
 
-      events = results["events"]
-      expect(events.length).to eq(1)
-      expect(events.first["age"]).to eq(2)
+      tests = results["tests"]
+      expect(tests.length).to eq(1)
+      expect(tests.first["age"]).to eq(2)
       expect(results["total_count"]).to eq(3)
     end
 

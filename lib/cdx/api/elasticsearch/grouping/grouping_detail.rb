@@ -13,7 +13,7 @@ class GroupingDetail
     false
   end
 
-	def self.for(indexed_field, uri_param, values)    
+	def self.for(indexed_field, uri_param, values)
     if indexed_field.nested?
       NestedGroupingDetail.create indexed_field, uri_param, values
     else
@@ -23,12 +23,12 @@ class GroupingDetail
         definition[:name] == uri_param
       end
 
-      if definition        
+      if definition
         grouping_def = definition.clone
-        
+
         if grouping_def[:type] == "range"
           if values
-            grouping = RangeGroupingDetail.new indexed_field.name, indexed_field, uri_param, values 
+            grouping = RangeGroupingDetail.new indexed_field.name, indexed_field, uri_param, values
           end
         end
 
@@ -40,7 +40,7 @@ class GroupingDetail
           if grouping_def[:type] == "date"
             grouping = DateGroupingDetail.new indexed_field.name, indexed_field, uri_param, grouping_def[:interval]
           else
-            grouping = FlatGroupingDetail.new indexed_field.name, indexed_field, uri_param    
+            grouping = FlatGroupingDetail.new indexed_field.name, indexed_field, uri_param
           end
         end
 
@@ -49,7 +49,7 @@ class GroupingDetail
     end
   end
 
-  def self.process_buckets(aggregations, group_by, events, event, doc_count)
+  def self.process_buckets(aggregations, group_by, tests, test, doc_count)
     count = aggregations[:count]
 
     if count
@@ -62,10 +62,10 @@ class GroupingDetail
       end
 
       buckets = head.preprocess_buckets count
-      head.process_bucket rest, events, event, buckets
+      head.process_bucket rest, tests, test, buckets
     else
-      event[:count] = doc_count
-      events + [event]
+      test[:count] = doc_count
+      tests + [test]
     end
   end
 
@@ -73,10 +73,10 @@ class GroupingDetail
     count[:buckets]
   end
 
-  def process_bucket(group_by, events, event, buckets)
-    buckets.inject events do |events, bucket|
-      event = event.merge yield_bucket(bucket)
-      GroupingDetail.process_buckets bucket, group_by, events, event, bucket[:doc_count]
+  def process_bucket(group_by, tests, test, buckets)
+    buckets.inject tests do |tests, bucket|
+      test = test.merge yield_bucket(bucket)
+      GroupingDetail.process_buckets bucket, group_by, tests, test, bucket[:doc_count]
     end
   end
 end

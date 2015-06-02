@@ -39,7 +39,7 @@ searchable_fields:
     type: date
   - name: updated_at
     type: date
-  - name: event_id
+  - name: test_id
     group_parameter_definition: none
   - name: sample_uuid
     scope: sample

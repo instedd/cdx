@@ -30,7 +30,7 @@ require "cdx/api/elasticsearch"
 
 Cdx::Api.setup do |config|
   config.document_format = MyDocumentFormat.new # Change document format to use a custom class
-  config.index_name_pattern = "events_*"        # Required, indices to query in the ES instance
+  config.index_name_pattern = "tests_*"         # Required, indices to query in the ES instance
   config.log = true                             # Whether to enable logging for all queries
   config.elasticsearch_url = 'localhost:9200'   # URL to the ES instance
 end
@@ -38,7 +38,7 @@ end
 
 ### Mapping
 
-This gem assumes that all events are stored in a canonical ElasticSearch index (or indices) with a mapping based on the standard core fields definition specified in [CDX API](http://dxapi.org/#/event-resource), and encoded in the [API fields definition](config/cdx_api_fields.yml).
+This gem assumes that all tests are stored in a canonical ElasticSearch index (or indices) with a mapping based on the standard core fields definition specified in [CDX API](http://dxapi.org/#/event-resource), and encoded in the [API fields definition](config/cdx_api_fields.yml).
 
 This mapping can be automatically generated from the specification invoking `Cdx::Api::Service.initialize_default_template(template_name)`.
 
@@ -47,7 +47,7 @@ If your data is not stored using that same schema, you will need to provide a wa
 Alternatively, you can provide your own document format implementation, as long as it responds to two methods:
 
 * `indexed_field_name(cdp_field_name)` Based on a canonical field name, provide the field name in your ES instance; this method is used for building the filters and aggregations in ES based on the query received.
-* `translate_event(event)` Given an event or the result of an aggregation to be returned to the client, translate its keys to the ones expected by a CDX API consumer.
+* `translate_test(test)` Given an test or the result of an aggregation to be returned to the client, translate its keys to the ones expected by a CDX API consumer.
 
 ## Querying
 
@@ -55,7 +55,7 @@ To effectively run a CDX query, simply initialize a new instance of [`Cdx::Api::
 
 ```ruby
 class CdxApiController < ApplicationController
-  def events
+  def tests
     render json: Cdx::Api::Elasticsearch::Query.new(params).execute
   end
 end

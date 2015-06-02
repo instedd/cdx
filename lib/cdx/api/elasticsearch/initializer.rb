@@ -12,7 +12,7 @@ class Cdx::Api::Elasticsearch::Initializer
     {
       template: @api.config.template_name_pattern,
       mappings: {
-        event: {
+        test: {
           dynamic_templates: build_dynamic_templates,
           properties: build_properties_mapping
         }

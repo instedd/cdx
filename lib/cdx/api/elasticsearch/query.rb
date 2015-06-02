@@ -32,24 +32,24 @@ class Cdx::Api::Elasticsearch::Query
     query = and_conditions(process_conditions(params))
 
     if params[:group_by]
-      events = query_with_group_by(query, params[:group_by])
+      tests = query_with_group_by(query, params[:group_by])
       if params['order_by']
         all_orders = extract_multi_values(params['order_by'])
         all_orders.map do |order|
-          events = events.sort_by do |event|
-            event[order.delete('-')]
+          tests = tests.sort_by do |test|
+            test[order.delete('-')]
           end
-          events = events.reverse if order[0] == "-"
+          tests = tests.reverse if order[0] == "-"
         end
       end
-      total_count = events.inject(0) { |sum, result| sum + result[:count].to_i }
+      total_count = tests.inject(0) { |sum, result| sum + result[:count].to_i }
     else
-      events, total_count = query_without_group_by(query, params)
+      tests, total_count = query_without_group_by(query, params)
     end
 
-    events = @api.translate events
+    tests = @api.translate tests
 
-    {"events" => events, "total_count" => total_count}
+    {"tests" => tests, "total_count" => total_count}
   end
 
   def query_without_group_by(query, params)
@@ -222,9 +222,9 @@ class Cdx::Api::Elasticsearch::Query
 
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
-    event = @api.search_elastic body: aggregations.to_hash.merge(query: query), size: 0, index: indices
-    if event["aggregations"]
-      process_group_by_buckets(event["aggregations"].with_indifferent_access, aggregations.in_order, [], {}, 0)
+    test = @api.search_elastic body: aggregations.to_hash.merge(query: query), size: 0, index: indices
+    if test["aggregations"]
+      process_group_by_buckets(test["aggregations"].with_indifferent_access, aggregations.in_order, [], {}, 0)
     else
       []
     end
@@ -244,8 +244,8 @@ class Cdx::Api::Elasticsearch::Query
     [name, value]
   end
 
-  def process_group_by_buckets(aggregations, group_by, events, event, doc_count)
-    GroupingDetail.process_buckets(aggregations, group_by, events, event, doc_count)
+  def process_group_by_buckets(aggregations, group_by, tests, test, doc_count)
+    GroupingDetail.process_buckets(aggregations, group_by, tests, test, doc_count)
   end
 
 
