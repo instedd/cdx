@@ -11,7 +11,7 @@ describe Manifest do
          "version"=>1,
          "source"=>{"type"=>"json"}},
        "field_mapping"=>
-        {"event"=> fields.map { |field|
+        {"test"=> fields.map { |field|
            {"target_field"=>field,
             "source"=>{"lookup"=>field},
             "core"=>false,
@@ -57,8 +57,8 @@ describe Manifest do
       it "creates an elasticsearch template for each device model" do
         Manifest.create!(definition: definition)
         [model1, model2].each do |model|
-          template_name = "cdp_events_template_test_#{model.id}"
-          Cdx::Api.client.should have_template(template_name).with_type("event_#{model.id}")
+          template_name = "cdp_tests_template_test_#{model.id}"
+          Cdx::Api.client.should have_template(template_name).with_type("test_#{model.id}")
         end
       end
 
@@ -69,8 +69,8 @@ describe Manifest do
         Manifest.create!(definition: definition)
 
         mappings = Cdx::Api.client.indices.get_mapping(index: institution.elasticsearch_index_name)[institution.elasticsearch_index_name]['mappings']
-        mappings.should have_key("event_#{model1.id}")
-        mappings.should have_key("event_#{model2.id}")
+        mappings.should have_key("test_#{model1.id}")
+        mappings.should have_key("test_#{model2.id}")
       end
 
     end
@@ -86,8 +86,8 @@ describe Manifest do
       def assert_original_templates
         (1..3).each do |index|
           model = model(index)
-          template_name = "cdp_events_template_test_#{model.id}"
-          Cdx::Api.client.should have_template(template_name).with_type("event_#{model.id}").with_custom_field("field_#{index}")
+          template_name = "cdp_tests_template_test_#{model.id}"
+          Cdx::Api.client.should have_template(template_name).with_type("test_#{model.id}").with_custom_field("field_#{index}")
         end
       end
 
@@ -98,17 +98,17 @@ describe Manifest do
         manifest = Manifest.create!(definition: new_definition)
 
         [model(1), model(2)].each do |model|
-          template_name = "cdp_events_template_test_#{model.id}"
+          template_name = "cdp_tests_template_test_#{model.id}"
           Cdx::Api.client.should have_template(template_name)
-            .with_type("event_#{model.id}")
+            .with_type("test_#{model.id}")
             .with_custom_field("field_new1")
             .with_custom_field("field_new2")
             .without_custom_field("field_1")
             .without_custom_field("field_2")
         end
 
-        Cdx::Api.client.should have_template("cdp_events_template_test_#{model(3).id}")
-          .with_type("event_#{model(3).id}")
+        Cdx::Api.client.should have_template("cdp_tests_template_test_#{model(3).id}")
+          .with_type("test_#{model(3).id}")
           .without_custom_field("field_new1")
           .without_custom_field("field_new2")
           .with_custom_field("field_3")
@@ -119,12 +119,12 @@ describe Manifest do
 
       it "deletes templates when no manifest is present" do
         manifest = Manifest.create!(definition: new_definition)
-        Cdx::Api.client.should have_template("cdp_events_template_test_#{model(1).id}")
-        Cdx::Api.client.should have_template("cdp_events_template_test_#{model(2).id}")
+        Cdx::Api.client.should have_template("cdp_tests_template_test_#{model(1).id}")
+        Cdx::Api.client.should have_template("cdp_tests_template_test_#{model(2).id}")
 
         manifest.destroy!
-        Cdx::Api.client.should_not have_template("cdp_events_template_test_#{model(1).id}")
-        Cdx::Api.client.should_not have_template("cdp_events_template_test_#{model(2).id}")
+        Cdx::Api.client.should_not have_template("cdp_tests_template_test_#{model(1).id}")
+        Cdx::Api.client.should_not have_template("cdp_tests_template_test_#{model(2).id}")
       end
 
       # it "updates existing indices mappings" do
@@ -134,8 +134,8 @@ describe Manifest do
       #   Manifest.create!(definition: temperature_definition)
 
       #   mappings = Cdx::Api.client.indices.get_mapping(index: institution.elasticsearch_index_name)[institution.elasticsearch_index_name]['mappings']
-      #   mappings.should have_key("event_#{model1.id}")
-      #   mappings.should have_key("event_#{model2.id}")
+      #   mappings.should have_key("test_#{model1.id}")
+      #   mappings.should have_key("test_#{model2.id}")
       # end
 
     end

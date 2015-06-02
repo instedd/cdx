@@ -17,7 +17,7 @@
     - top_nav_bar_item 'Institutions', institutions_path, !@institution_tab.nil?
     - top_nav_bar_item 'Locations', locations_path, @in_locations
     - top_nav_bar_item 'Manifests', manifests_path, (params[:controller] == "manifests")
-    - top_nav_bar_item 'Events', events_path, (params[:controller] == "events")
+    - top_nav_bar_item 'Tests', test_results_path, (params[:controller] == "test_results")
     - top_nav_bar_item 'Filters', filters_path, (params[:controller] == "filters")
     - top_nav_bar_item 'Subscribers', subscribers_path, (params[:controller] == "subscribers")
     - top_nav_bar_item 'Policies', policies_path, (params[:controller] == "policies")

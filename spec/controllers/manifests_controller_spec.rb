@@ -24,7 +24,7 @@ describe ManifestsController do
           "source" : { "type" : "json" }
         },
         "field_mapping": {
-          "event" : [
+          "test" : [
             {
               "target_field": "assay_name",
               "source" : {"lookup" : "Test.assay_name"},

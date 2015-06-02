@@ -1,13 +1,13 @@
-class EventIndexer
-  attr_reader :event, :fields
+class TestResultIndexer
+  attr_reader :test_result, :fields
 
-  def initialize fields, event
+  def initialize fields, test_result
     @fields = fields
-    @event = event
+    @test_result = test_result
   end
 
   def device
-    event.device
+    test_result.device
   end
 
   def index
@@ -20,14 +20,14 @@ class EventIndexer
 
   def type
     if device.current_manifest.present?
-      "event_#{device.device_model_id}"
+      "test_#{device.device_model_id}"
     else
-      'event'
+      'test'
     end
   end
 
   def elasticsearch_id
-    "#{device.uuid}_#{event.event_id || event.uuid}"
+    "#{device.uuid}_#{test_result.test_id || test_result.uuid}"
   end
 
   def index_name
@@ -54,38 +54,38 @@ class EventIndexer
     end
 
     unless fields[:start_time].present?
-      fields[:start_time] = event.created_at.utc.iso8601
+      fields[:start_time] = test_result.created_at.utc.iso8601
     end
 
     location_id = location.try(:geo_id)
     parent_locations = location.try(:self_and_ancestors) || []
-    parent_locations_id = parent_locations.map &:geo_id
+    parent_locations_id = parent_locations.map(&:geo_id)
     admin_levels = Hash[parent_locations.map { |l| ["admin_level_#{l.admin_level}", l.geo_id] }]
 
     properties = {
-      created_at: event.created_at.utc.iso8601,
-      updated_at: event.updated_at.utc.iso8601,
+      created_at: test_result.created_at.utc.iso8601,
+      updated_at: test_result.updated_at.utc.iso8601,
       device_uuid: device.uuid,
-      uuid: event.uuid,
+      uuid: test_result.uuid,
       location_id: location_id,
       parent_locations: parent_locations_id,
       laboratory_id: laboratory_id,
       institution_id: device.institution_id,
       location: admin_levels,
-      event_id: event.event_id
+      test_id: test_result.test_id
     }
 
-    if event.sample.present?
-      properties[:sample_uuid] = event.sample.uuid
+    if test_result.sample.present?
+      properties[:sample_uuid] = test_result.sample.uuid
     end
 
-    if event.current_patient.present?
-      properties[:patient_uuid] = event.current_patient.uuid
+    if test_result.current_patient.present?
+      properties[:patient_uuid] = test_result.current_patient.uuid
     end
 
     fields.
       merge(properties).
-      deep_merge(event.sample.try(:indexed_fields) || {}).
-      deep_merge(event.current_patient.try(:indexed_fields) || {})
+      deep_merge(test_result.sample.try(:indexed_fields) || {}).
+      deep_merge(test_result.current_patient.try(:indexed_fields) || {})
   end
 end

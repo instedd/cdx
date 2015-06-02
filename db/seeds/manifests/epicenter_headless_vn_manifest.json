@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "0.0.5",
+    "version": "0.0.6",
     "api_version": "1.1.0",
     "signature": "",
     "device_models": [
@@ -43,9 +43,9 @@
         "type": "string"
       }
     ],
-    "event": [
+    "test": [
       {
-        "target_field": "event_id",
+        "target_field": "test_id",
         "source": {
           "lookup": "2"
         },

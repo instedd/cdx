@@ -1,4 +1,4 @@
-class EventQuery
+class TestResultQuery
   include Policy::Actions
 
   def initialize params, user
@@ -19,9 +19,9 @@ class EventQuery
 
   def csv_builder
     if @api_query.grouped_by.empty?
-      CSVBuilder.new result["events"]
+      CSVBuilder.new result["tests"]
     else
-      CSVBuilder.new result["events"], column_names: @api_query.grouped_by.concat(["count"])
+      CSVBuilder.new result["tests"], column_names: @api_query.grouped_by.concat(["count"])
     end
   end
 end

@@ -12,7 +12,7 @@ describe DeviceEvent, elasticsearch: true do
           "device_models": "#{device.device_model.name}",
           "source" : { "type" : "json"}
         },
-        "field_mapping" : {"event" :[{
+        "field_mapping" : {"test" :[{
             "target_field" : "error_code",
             "source" : {"lookup": "error_code"},
             "core" : true,
@@ -40,7 +40,7 @@ describe DeviceEvent, elasticsearch: true do
           "device_models": "#{device.device_model.name}",
           "source" : { "type" : "json"}
         },
-        "field_mapping" : { "event" : [{
+        "field_mapping" : { "test" : [{
             "target_field" : "results[*].result",
             "source" : {"lookup": "result"},
             "core" : true,
@@ -69,7 +69,7 @@ describe DeviceEvent, elasticsearch: true do
           "device_models": "#{device.device_model.name}",
           "source" : { "type" : "csv"}
         },
-        "field_mapping" : { "event" : [{
+        "field_mapping" : { "test" : [{
             "target_field" : "error_code",
             "source" : {"lookup": "error_code"},
             "core" : true,

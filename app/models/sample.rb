@@ -1,6 +1,6 @@
 class Sample < ActiveRecord::Base
   include EventEncryption
-  has_many :events, dependent: :restrict_with_error
+  has_many :test_results, dependent: :restrict_with_error
   belongs_to :institution
   belongs_to :patient
   before_save :encrypt

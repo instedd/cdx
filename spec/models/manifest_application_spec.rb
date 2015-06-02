@@ -7,7 +7,7 @@ describe Manifest, validate_manifest: false do
     it "should apply to indexed core fields" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "assay_name",
               "source" : {"lookup" : "assay.name"},
               "core" : true
@@ -15,12 +15,12 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"assay" : {"name" : "GX4002"}}',
-        event: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should fail to apply with a nested field" do
       mappings_json = %{{
-                        "event" : [{
+                        "test" : [{
                           "target_field" : "assay_name",
                           "source" : {"lookup" : "assay.name"},
                           "core" : true
@@ -52,7 +52,7 @@ describe Manifest, validate_manifest: false do
     it "should apply to custom non-pii non-indexed field" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
               "core" : false,
@@ -62,13 +62,13 @@ describe Manifest, validate_manifest: false do
           }
         },
         {json: '{"temperature" : "20"}', csv: "temperature\n20"},
-        event: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => "20"}}
+        test: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => "20"}}
     end
 
     it "should apply to custom non-pii non-indexed field coercing to integer" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
               "core" : false,
@@ -79,13 +79,13 @@ describe Manifest, validate_manifest: false do
           }
         },
         {json: '{"temperature" : 20}', csv: "temperature\n20"},
-        event: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => 20}}
+        test: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => 20}}
     end
 
     it "should apply to custom non-pii indexed field" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
               "core" : false,
@@ -95,13 +95,13 @@ describe Manifest, validate_manifest: false do
           }
         },
         {json: '{"temperature" : "20"}', csv: "temperature\n20"},
-        event: {indexed: {"custom_fields" => {"temperature" => "20"}}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"custom_fields" => {"temperature" => "20"}}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should apply to custom non-pii indexed field inside results array" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "results[*].temperature",
               "source" : {"lookup" : "temperature"},
               "core" : false,
@@ -111,12 +111,12 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature" : 20}',
-        event: {indexed: {"results" => [{"custom_fields" => {"temperature" => 20}}]}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"results" => [{"custom_fields" => {"temperature" => 20}}]}, pii: Hash.new, custom: Hash.new}
     end
 
-    it "should store fields in sample, event or patient as specified" do
-      event = Oj.dump({
-        event_id: "4",                    # event id
+    it "should store fields in sample, test or patient as specified" do
+      test = Oj.dump({
+        test_id: "4",                     # test id
         assay: "mtb",                     # test, indexable
         start_time: "2000/1/1 10:00:00",  # test, pii
         concentration: "15%",             # test, indexable, custom
@@ -133,7 +133,7 @@ describe Manifest, validate_manifest: false do
         shirt_color: "blue"               # patient, non indexable, custom
       })
 
-      csv = "event_id;assay;start_time;concentration;raw_result;sample_id;sample_type;collected_at;culture_days;datagram;patient_id;gender;dob;hiv;shirt_color" +
+      csv = "test_id;assay;start_time;concentration;raw_result;sample_id;sample_type;collected_at;culture_days;datagram;patient_id;gender;dob;hiv;shirt_color" +
       "\n4;mtb;2000/1/1 10:00:00;15%;positivo 15%;4002;sputum;2000/1/1 9:00:00;10;010100011100;8000;male;2000/1/1;positive;blue"
 
       definition = %{{
@@ -197,10 +197,10 @@ describe Manifest, validate_manifest: false do
             "custom" : true
           }
         ],
-        "event" : [
+        "test" : [
           {
-            "target_field" : "event_id",
-            "source" : {"lookup" : "event_id"},
+            "target_field" : "test_id",
+            "source" : {"lookup" : "test_id"},
             "core" : true
           },
           {
@@ -230,9 +230,9 @@ describe Manifest, validate_manifest: false do
       }}
 
       expected = {
-        event: {
+        test: {
           indexed: {
-            event_id: "4",
+            test_id: "4",
             assay: "mtb",
             custom_fields: {
               concentration: "15%"
@@ -277,13 +277,13 @@ describe Manifest, validate_manifest: false do
         }
       }
 
-      assert_manifest_application definition, {json: event, csv: csv}, expected
+      assert_manifest_application definition, {json: test, csv: csv}, expected
     end
 
     it "should apply to an array of custom non-pii indexed field inside results array" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "results[*].instant_temperature[*].value",
               "source" : {"lookup" : "tests[*].temperatures[*].value"},
               "core" : false,
@@ -341,7 +341,7 @@ describe Manifest, validate_manifest: false do
             }
           ]
         }',
-        event: {indexed: {
+        test: {indexed: {
           "results" => [
             { "condition" => "mtb",
               "result" => "positive",
@@ -365,7 +365,7 @@ describe Manifest, validate_manifest: false do
     it "should apply to custom pii field" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
               "core" : false,
@@ -375,13 +375,13 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature" : 20}',
-        event: {indexed: Hash.new, pii: {"temperature" => 20}, custom: Hash.new}
+        test: {indexed: Hash.new, pii: {"temperature" => 20}, custom: Hash.new}
     end
 
     it "doesn't raise on valid value in options" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "level",
               "source" : {"lookup" : "level"},
               "core" : true,
@@ -392,13 +392,13 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"level" : "high"}',
-        event: {indexed: {"level" => "high"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"level" => "high"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should raise on invalid value in options" do
       assert_raises_manifest_data_validation %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "level",
               "type" : "enum",
               "source" : {"lookup" : "level"},
@@ -416,7 +416,7 @@ describe Manifest, validate_manifest: false do
     it "doesn't raise on valid value in range" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
               "core" : false,
@@ -432,13 +432,13 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature" : 30}',
-        event: {indexed: {"custom_fields" => {"temperature" => 30}}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"custom_fields" => {"temperature" => 30}}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should raise on invalid value in range (lesser)" do
       assert_raises_manifest_data_validation %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
               "core" : false,
@@ -460,7 +460,7 @@ describe Manifest, validate_manifest: false do
     it "should raise on invalid value in range (greater)" do
       assert_raises_manifest_data_validation %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
               "core" : false,
@@ -482,7 +482,7 @@ describe Manifest, validate_manifest: false do
     it "doesn't raise on valid value in date iso" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "sample_date",
               "source" : {"lookup" : "sample_date"},
               "core" : true,
@@ -495,13 +495,13 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"sample_date" : "2014-05-14T15:22:11+0000"}',
-        event: {indexed: {"sample_date" => "2014-05-14T15:22:11+0000"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"sample_date" => "2014-05-14T15:22:11+0000"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should raise on invalid value in date iso" do
       assert_raises_manifest_data_validation %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "sample_date",
               "source" : {"lookup" : "sample_date"},
               "core" : true,
@@ -520,7 +520,7 @@ describe Manifest, validate_manifest: false do
     it "applies first value mapping" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "condition",
               "source" : {
                 "map" : [
@@ -539,13 +539,13 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"condition" : "PATIENT HAS MTB CONDITION"}',
-        event: {indexed: {"condition" => "MTB"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"condition" => "MTB"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "applies second value mapping" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "condition",
               "source" : {
                 "map" : [
@@ -564,13 +564,13 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"condition" : "PATIENT HAS FLU CONDITION"}',
-        event: {indexed: {"condition" => "H1N1"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"condition" => "H1N1"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should raise on mapping not found" do
       assert_raises_manifest_data_validation %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "condition",
               "source" : {
                 "map" : [
@@ -595,7 +595,7 @@ describe Manifest, validate_manifest: false do
     it "should apply to multiple indexed field" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "list[*].temperature",
               "source" : {"lookup" : "temperature_list[*].temperature"},
               "core" : false,
@@ -605,12 +605,12 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature_list" : [{"temperature" : 20}, {"temperature" : 10}]}',
-        event: {indexed: {"custom_fields" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"custom_fields" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should map to multiple indexed fields to the same list" do
       assert_manifest_application %{{
-          "event" : [
+          "test" : [
             {
               "target_field" : "collection[*].temperature",
               "source" : {"lookup" : "some_list[*].temperature"},
@@ -639,7 +639,7 @@ describe Manifest, validate_manifest: false do
             }
           ]
         }',
-        event: {indexed: {"custom_fields" => {"collection" => [
+        test: {indexed: {"custom_fields" => {"collection" => [
           {
             "temperature" => 20,
             "foo" => 12
@@ -652,7 +652,7 @@ describe Manifest, validate_manifest: false do
 
     it "should map to multiple indexed fields to the same list accross multiple collections" do
       assert_manifest_application %{{
-          "event" : [
+          "test" : [
             {
               "target_field" : "collection[*].temperature",
               "source" : {"lookup" : "temperature_list[*].temperature"},
@@ -673,7 +673,7 @@ describe Manifest, validate_manifest: false do
           "temperature_list" : [{"temperature" : 20}, {"temperature" : 10}],
           "other_list" : [{"bar" : 10}, {"bar" : 30}, {"bar" : 40}]
         }',
-        event: {indexed: {"collection" => [
+        test: {indexed: {"collection" => [
           {
             "temperature" => 20,
             "foo" => 10

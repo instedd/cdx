@@ -16,7 +16,7 @@ shared_context "elasticsearch", elasticsearch: true do
     client
   end
 
-  def all_elasticsearch_events_for(institution)
+  def all_elasticsearch_tests_for(institution)
     client = fresh_client_for institution.elasticsearch_index_name
     client.search(index: institution.elasticsearch_index_name, from: 0, size: 1000)["hits"]["hits"]
   end

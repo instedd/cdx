@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "1.0.2",
+    "version" : "1.0.3",
     "api_version" : "1.1.0",
     "device_models" : ["MTB Device Model"],
     "source": {"type" : "json"}
@@ -89,7 +89,7 @@
         "indexed" : true
       }
     ],
-    "event" : [
+    "test" : [
       {
         "target_field" : "start_time",
         "source" : {"lookup" : "start_time"},
@@ -98,7 +98,7 @@
         "indexed" : true
       },
       {
-        "target_field" : "event_id",
+        "target_field" : "test_id",
         "source" : {"lookup" : "event_id"},
         "type" : "string",
         "core" : true,

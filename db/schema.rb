@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150527160209) do
+ActiveRecord::Schema.define(version: 20150601165748) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -44,13 +44,13 @@ ActiveRecord::Schema.define(version: 20150527160209) do
 
   add_index "device_events", ["device_id"], name: "index_device_events_on_device_id", using: :btree
 
-  create_table "device_events_events", force: true do |t|
+  create_table "device_events_test_results", force: true do |t|
     t.integer "device_event_id"
-    t.integer "event_id"
+    t.integer "test_result_id"
   end
 
-  add_index "device_events_events", ["device_event_id"], name: "index_device_events_events_on_device_event_id", using: :btree
-  add_index "device_events_events", ["event_id"], name: "index_device_events_events_on_event_id", using: :btree
+  add_index "device_events_test_results", ["device_event_id"], name: "index_device_events_test_results_on_device_event_id", using: :btree
+  add_index "device_events_test_results", ["test_result_id"], name: "index_device_events_test_results_on_test_result_id", using: :btree
 
   create_table "device_models", force: true do |t|
     t.string   "name"
@@ -78,23 +78,6 @@ ActiveRecord::Schema.define(version: 20150527160209) do
     t.integer "device_id"
     t.integer "laboratory_id"
   end
-
-  create_table "events", force: true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "uuid"
-    t.text     "custom_fields"
-    t.string   "event_id"
-    t.integer  "sample_id"
-    t.binary   "sensitive_data"
-    t.integer  "device_id"
-    t.integer  "patient_id"
-    t.text     "indexed_fields"
-  end
-
-  add_index "events", ["patient_id"], name: "index_events_on_patient_id", using: :btree
-  add_index "events", ["sample_id"], name: "index_events_on_sample_id", using: :btree
-  add_index "events", ["uuid"], name: "index_events_on_uuid", using: :btree
 
   create_table "filters", force: true do |t|
     t.integer  "user_id"
@@ -210,6 +193,23 @@ ActiveRecord::Schema.define(version: 20150527160209) do
   end
 
   add_index "subscribers", ["filter_id"], name: "index_subscribers_on_filter_id", using: :btree
+
+  create_table "test_results", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "uuid"
+    t.text     "custom_fields"
+    t.string   "test_id"
+    t.integer  "sample_id"
+    t.binary   "sensitive_data"
+    t.integer  "device_id"
+    t.integer  "patient_id"
+    t.text     "indexed_fields"
+  end
+
+  add_index "test_results", ["patient_id"], name: "index_test_results_on_patient_id", using: :btree
+  add_index "test_results", ["sample_id"], name: "index_test_results_on_sample_id", using: :btree
+  add_index "test_results", ["uuid"], name: "index_test_results_on_uuid", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "", null: false

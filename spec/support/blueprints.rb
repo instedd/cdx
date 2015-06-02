@@ -52,11 +52,11 @@ Patient.blueprint do
   plain_sensitive_data { { patient_id: "patient-#{Sham.sn}" } }
 end
 
-Event.blueprint do
+TestResult.blueprint do
   device_events {[DeviceEvent.make]}
   device {device_events.first.device}
   sample { Sample.make institution: device.institution }
-  event_id { "event-#{Sham.sn}" }
+  test_id { "test-#{Sham.sn}" }
 end
 
 DeviceEvent.blueprint do

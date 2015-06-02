@@ -12,12 +12,12 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     fresh_client_for institution.elasticsearch_index_name
     response = get :index, body, options.merge(format: 'json')
     response.status.should eq(200)
-    Oj.load(response.body)["events"]
+    Oj.load(response.body)["tests"]
   end
 
   context "Query" do
     context "Policies" do
-      it "allows a user to query events of it's own institutions" do
+      it "allows a user to query tests of it's own institutions" do
         device2 = Device.make
         post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
         post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_id: device2.uuid, authentication_token: device2.secret_key
@@ -34,7 +34,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     context "Filter" do
       let(:device2) {Device.make institution: institution}
 
-      it "should check for new events since a date" do
+      it "should check for new tests since a date" do
         Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
         post :create, data, device_id: device.uuid, authentication_token: device.secret_key
         Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
@@ -73,11 +73,11 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         response.first["results"].first["result"].should eq("positive")
       end
 
-      it "filters by event_id" do
-        post :create, (Oj.dump event_id: 2, results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
+      it "filters by test_id" do
+        post :create, (Oj.dump test_id: 2, results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
         post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
 
-        response = get_updates event: 2
+        response = get_updates test: 2
 
         response.size.should eq(1)
         response.first["results"].first["result"].should eq("positive")
@@ -98,8 +98,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.uuid, authentication_token: device.secret_key
         post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
 
-        response = get_updates(gender: [:male, :female]).sort_by do |event|
-          event["results"].first["result"]
+        response = get_updates(gender: [:male, :female]).sort_by do |test|
+          test["results"].first["result"]
         end
 
         response.size.should eq(2)
@@ -114,8 +114,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         post :create, (Oj.dump results:[result: :negative], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
         post :create, (Oj.dump results:[result: :negative], gender: :female), device_id: device.uuid, authentication_token: device.secret_key
 
-        response = get_updates(group_by: :gender).sort_by do |event|
-          event["gender"]
+        response = get_updates(group_by: :gender).sort_by do |test|
+          test["gender"]
         end
 
         response.should eq([
@@ -132,8 +132,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.uuid, authentication_token: device.secret_key
         post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.uuid, authentication_token: device.secret_key
 
-        response = get_updates({}, Oj.dump(group_by: [:gender , :assay_name])).sort_by do |event|
-          event["gender"] + event["assay_name"]
+        response = get_updates({}, Oj.dump(group_by: [:gender , :assay_name])).sort_by do |test|
+          test["gender"] + test["assay_name"]
         end
 
         response.should eq([
@@ -150,8 +150,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.uuid, authentication_token: device.secret_key
         post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
 
-        response = get_updates("page_size"=>0, "group_by"=>["gender"], "gender"=>["male", "female"]).sort_by do |event|
-          event["gender"]
+        response = get_updates("page_size"=>0, "group_by"=>["gender"], "gender"=>["male", "female"]).sort_by do |test|
+          test["gender"]
         end
 
         response.should eq([
@@ -164,7 +164,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         def check_csv(r)
           r.status.should eq(200)
           r.content_type.should eq("text/csv")
-          r.headers["Content-Disposition"].should eq("attachment; filename=\"Events-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
+          r.headers["Content-Disposition"].should eq("attachment; filename=\"Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
           r.should render_template("api/events/index")
         end
 
@@ -207,7 +207,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     end
 
     context "Custom Fields" do
-      it "should retrieve an event custom fields by uuid", context do
+      it "should retrieve an test custom fields by uuid", context do
         Manifest.create! definition: %{{
           "metadata" : {
             "device_models" : ["#{device.device_model.name}"],
@@ -215,7 +215,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "api_version" : "1.1.0",
             "source" : {"type" : "json"}
           },
-          "field_mapping" : { "event" : [
+          "field_mapping" : { "test" : [
             {
               "target_field" : "foo",
               "source" : {"lookup" : "some_field"},
@@ -224,20 +224,20 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           ]}
         }}
         post :create, Oj.dump(some_field: 1234), device_id: device.uuid, authentication_token: device.secret_key
-        event = all_elasticsearch_events_for(institution).first["_source"]
+        test = all_elasticsearch_tests_for(institution).first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
-        response = get :custom_fields, id: event["uuid"]
+        response = get :custom_fields, id: test["uuid"]
         response.status.should eq(200)
         response = Oj.load response.body
 
         response["custom_fields"]["foo"].should eq(1234)
-        response["uuid"].should eq(event["uuid"])
+        response["uuid"].should eq(test["uuid"])
       end
     end
 
     context "PII" do
-      it "should retrieve an event PII by uuid" do
+      it "should retrieve an test PII by uuid" do
         definition = %{{
           "metadata" : {
             "device_models" : ["#{device.device_model.name}"],
@@ -246,7 +246,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "source" : {"type" : "json"}
           },
           "field_mapping" : {
-            "event" : [
+            "test" : [
               {
                 "target_field" : "results[*].result",
                 "source" : {"lookup" : "results[*].result"},
@@ -272,15 +272,15 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         Manifest.create! definition: definition
 
         post :create, Oj.dump(results: [result: :positive], patient_name: "jdoe"), device_id: device.uuid, authentication_token: device.secret_key
-        event = all_elasticsearch_events_for(institution).first["_source"]
+        test = all_elasticsearch_tests_for(institution).first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
-        response = get :pii, id: event["uuid"]
+        response = get :pii, id: test["uuid"]
         response.status.should eq(200)
         response = Oj.load response.body
 
         response["pii"]["patient"]["patient_name"].should eq("jdoe")
-        response["uuid"].should eq(event["uuid"])
+        response["uuid"].should eq(test["uuid"])
       end
     end
 
@@ -297,7 +297,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "source" : {"type" : "json"}
           },
           "field_mapping" : {
-            "event" : [
+            "test" : [
               {
                 "target_field" : "assay_name",
                 "source" : {"lookup" : "assay_name"},
@@ -374,7 +374,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "version" : "1.0.0",
             "source" : {"type" : "json"}
           },
-          "field_mapping" : { "event" : [
+          "field_mapping" : { "test" : [
             {
               "target_field" : "assay_name",
               "source" : {"lookup" : "assay_name"},
@@ -469,7 +469,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "version" : "1.0.1",
             "source" : {"type" : "json"}
           },
-          "field_mapping" : { "event" : [
+          "field_mapping" : { "test" : [
             {
               "target_field" : "assay_name",
               "source" : {"lookup" : "assay_name"},
@@ -491,7 +491,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "version" : "1.0.1",
             "source" : {"type" : "json"}
           },
-          "field_mapping" : { "event" : [
+          "field_mapping" : { "test" : [
             {
               "target_field" : "assay_name",
               "source" : {"lookup" : "assay_name"},
