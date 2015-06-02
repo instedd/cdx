@@ -19,9 +19,9 @@ class TestResultQuery
 
   def csv_builder
     if @api_query.grouped_by.empty?
-      CSVBuilder.new result["events"]
+      CSVBuilder.new result["tests"]
     else
-      CSVBuilder.new result["events"], column_names: @api_query.grouped_by.concat(["count"])
+      CSVBuilder.new result["tests"], column_names: @api_query.grouped_by.concat(["count"])
     end
   end
 end

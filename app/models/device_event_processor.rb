@@ -71,9 +71,9 @@ class DeviceEventProcessor
 
     def find_or_initialize_test
       test = TestResult.new device_events: [device_event],
-                            plain_sensitive_data: parsed_event[:event][:pii],
-                            custom_fields: parsed_event[:event][:custom],
-                            test_id: parsed_event[:event][:indexed][:event_id],
+                            plain_sensitive_data: parsed_event[:test][:pii],
+                            custom_fields: parsed_event[:test][:custom],
+                            test_id: parsed_event[:test][:indexed][:test_id],
                             device: device
 
       if test.test_id && existing = TestResult.find_by(test_id: test.test_id, device_id: test.device_id)
@@ -184,7 +184,7 @@ class DeviceEventProcessor
     end
 
     def index_test(test, is_new)
-      indexer = TestResultIndexer.new(parsed_event[:event][:indexed], test)
+      indexer = TestResultIndexer.new(parsed_event[:test][:indexed], test)
       is_new ? indexer.index : indexer.update
     end
 

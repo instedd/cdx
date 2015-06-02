@@ -13,7 +13,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     fresh_client_for institution.elasticsearch_index_name
     response = get :index, body, options.merge(format: 'json')
     response.status.should eq(200)
-    Oj.load(response.body)["events"]
+    Oj.load(response.body)["tests"]
   end
 
   context "Locations" do
@@ -31,12 +31,12 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device.save!
       post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
-      event = all_elasticsearch_events_for(institution).first["_source"]
-      event["location_id"].should eq(leaf_location1.geo_id)
-      event["laboratory_id"].should eq(laboratory1.id)
-      event["parent_locations"].sort.should eq([leaf_location1.geo_id, parent_location.geo_id].sort)
-      event["location"]['admin_level_0'].should eq(parent_location.geo_id)
-      event["location"]['admin_level_1'].should eq(leaf_location1.geo_id)
+      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test["location_id"].should eq(leaf_location1.geo_id)
+      test["laboratory_id"].should eq(laboratory1.id)
+      test["parent_locations"].sort.should eq([leaf_location1.geo_id, parent_location.geo_id].sort)
+      test["location"]['admin_level_0'].should eq(parent_location.geo_id)
+      test["location"]['admin_level_1'].should eq(leaf_location1.geo_id)
     end
 
     it "should store the parent location id when the device is registered more than one laboratory" do
@@ -45,11 +45,11 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
-      event = all_elasticsearch_events_for(institution).first["_source"]
-      event["location_id"].should eq(parent_location.geo_id)
-      event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([parent_location.geo_id].sort)
-      event["location"]['admin_level_0'].should eq(parent_location.geo_id)
+      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test["location_id"].should eq(parent_location.geo_id)
+      test["laboratory_id"].should be_nil
+      test["parent_locations"].should eq([parent_location.geo_id].sort)
+      test["location"]['admin_level_0'].should eq(parent_location.geo_id)
     end
 
     it "should store the root location id when the device is registered more than one laboratory" do
@@ -58,10 +58,10 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
-      event = all_elasticsearch_events_for(institution).first["_source"]
-      event["location_id"].should eq(nil)
-      event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([])
+      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test["location_id"].should eq(nil)
+      test["laboratory_id"].should be_nil
+      test["parent_locations"].should eq([])
     end
 
     it "should store the root location id when the device is registered more than one laboratory with another tree order" do
@@ -70,10 +70,10 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
-      event = all_elasticsearch_events_for(institution).first["_source"]
-      event["location_id"].should eq(nil)
-      event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([])
+      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test["location_id"].should eq(nil)
+      test["laboratory_id"].should be_nil
+      test["parent_locations"].should eq([])
     end
 
     it "should store nil if no location was found" do
@@ -82,11 +82,11 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       post :create, data, device_id: device.uuid, authentication_token: device.secret_key
 
-      event = all_elasticsearch_events_for(institution).first["_source"]
-      event["location_id"].should be_nil
-      event["laboratory_id"].should be_nil
-      event["parent_locations"].should eq([])
-      event["location"].should eq({})
+      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test["location_id"].should be_nil
+      test["laboratory_id"].should be_nil
+      test["parent_locations"].should eq([])
+      test["location"].should eq({})
     end
 
     it "filters by location" do
@@ -105,8 +105,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       response.first["results"].first["condition"].should eq("flu_b")
 
-      response = get_updates(location: parent_location.geo_id).sort_by do |event|
-        event["results"].first["condition"]
+      response = get_updates(location: parent_location.geo_id).sort_by do |test|
+        test["results"].first["condition"]
       end
 
       response.size.should eq(2)

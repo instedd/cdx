@@ -22,7 +22,7 @@ describe TestResultQuery, elasticsearch: true do
     query = TestResultQuery.new({condition: 'mtb'}, user)
 
     query.result['total_count'].should eq(1)
-    query.result['events'].first['results'].first['result'].should eq('positive')
+    query.result['tests'].first['results'].first['result'].should eq('positive')
   end
 
   it "delegates institution policy" do
@@ -36,7 +36,7 @@ describe TestResultQuery, elasticsearch: true do
     query = TestResultQuery.new({condition: 'mtb'}, second_user)
 
     query.result['total_count'].should eq(1)
-    query.result['events'].first['results'].first['result'].should eq('positive')
+    query.result['tests'].first['results'].first['result'].should eq('positive')
   end
 
   it "doesn't fails if no device is indexed for the institution yet" do
@@ -47,7 +47,7 @@ describe TestResultQuery, elasticsearch: true do
     query = TestResultQuery.new({condition: 'mtb'}, user)
 
     query.result['total_count'].should eq(0)
-    query.result['events'].should eq([])
+    query.result['tests'].should eq([])
   end
 
   it "should not access any test if has no policy" do
@@ -58,6 +58,6 @@ describe TestResultQuery, elasticsearch: true do
     query = TestResultQuery.new({condition: 'mtb'}, User.new)
 
     query.result['total_count'].should eq(0)
-    query.result['events'].should eq([])
+    query.result['tests'].should eq([])
   end
 end

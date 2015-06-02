@@ -32,7 +32,7 @@ class ElasticsearchMappingTemplate
   end
 
   def self.template_prefix
-    "cdp_events_template_#{Rails.env}"
+    "cdp_tests_template_#{Rails.env}"
   end
 
   def self.delete_templates_for(models)
@@ -51,7 +51,7 @@ class ElasticsearchMappingTemplate
     device_models.each do |model|
       Cdx::Api.client.indices.put_template name: template_name(model.id), body: {
         'template' => Cdx::Api.config.template_name_pattern,
-        'mappings' => { "event_#{model.id}" => mapping }
+        'mappings' => { "test_#{model.id}" => mapping }
       }
     end
   end
@@ -60,7 +60,7 @@ class ElasticsearchMappingTemplate
     mapping = mapping_for(manifest)
     device_models.each do |device_model|
       begin
-        Cdx::Api.client.indices.put_mapping index_mapping(mapping, "event_#{device_model.id}")
+        Cdx::Api.client.indices.put_mapping index_mapping(mapping, "test_#{device_model.id}")
       rescue Elasticsearch::Transport::Transport::Errors::NotFound => ex
         nil
       end
@@ -78,14 +78,14 @@ class ElasticsearchMappingTemplate
         'template' => Cdx::Api.config.template_name_pattern,
         'mappings' => {
           "_default_" => default_mapping,
-          "event" => empty_mapping
+          "test" => empty_mapping
         }
       }
     end
 
     def update_indices!
       Cdx::Api.client.indices.put_mapping index_mapping(default_mapping, '_default_')
-      Cdx::Api.client.indices.put_mapping index_mapping(empty_mapping, 'event')
+      Cdx::Api.client.indices.put_mapping index_mapping(empty_mapping, 'test')
     rescue Elasticsearch::Transport::Transport::Errors::NotFound => ex
       nil
     end

@@ -4,9 +4,9 @@ describe DeviceEventProcessor, elasticsearch: true do
 
   def parsed_event(test_id, params={})
     {
-      event: {
+      test: {
         indexed: {
-          event_id: test_id,
+          test_id: test_id,
           assay: "mtb",
           custom_fields: {
             concentration: "15%"
@@ -152,7 +152,7 @@ describe DeviceEventProcessor, elasticsearch: true do
     TestResult.pluck(:test_id).should =~ ['4', '5', '6']
     TestResult.pluck(:sample_id).should eq([Sample.first.id] * 3)
 
-    all_elasticsearch_events_for(device.institution).map {|e| e['_source']['sample_uuid']}.should eq([Sample.first.uuid] * 3)
+    all_elasticsearch_tests_for(device.institution).map {|e| e['_source']['sample_uuid']}.should eq([Sample.first.uuid] * 3)
   end
 
   it "should update sample data and existing test results on new test result" do
@@ -183,7 +183,7 @@ describe DeviceEventProcessor, elasticsearch: true do
     assert_sample_data(sample)
     assert_patient_data(sample.patient)
 
-    tests = all_elasticsearch_events_for(institution)
+    tests = all_elasticsearch_tests_for(institution)
 
     tests.map { |test| test["_source"]["sample_type"] }.should eq(['sputum'] * 3)
   end
@@ -216,7 +216,7 @@ describe DeviceEventProcessor, elasticsearch: true do
     assert_sample_data(sample)
     assert_patient_data(sample.patient)
 
-    tests = all_elasticsearch_events_for(institution)
+    tests = all_elasticsearch_tests_for(institution)
     tests.map { |test| test["_source"]["sample_type"] }.should eq(['sputum'] * 2)
   end
 
@@ -295,7 +295,7 @@ describe DeviceEventProcessor, elasticsearch: true do
 
     Sample.count.should eq(1)
 
-    tests = all_elasticsearch_events_for(institution)
+    tests = all_elasticsearch_tests_for(institution)
     tests.size.should eq(1)
     tests.first["_source"]["assay"].should eq("mtb")
     tests.first["_source"]["sample_type"].should eq("sputum")

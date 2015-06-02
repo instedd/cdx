@@ -16,7 +16,7 @@ module ManifestSpecHelper
     format_data = {json: format_data} unless format_data.kind_of?(Hash)
 
     expected = {
-      event:   { indexed: {}, custom: {}, pii: {} },
+      test:    { indexed: {}, custom: {}, pii: {} },
       sample:  { indexed: {}, custom: {}, pii: {} },
       patient: { indexed: {}, custom: {}, pii: {} },
     }.deep_merge(expected_fields).recursive_stringify_keys!

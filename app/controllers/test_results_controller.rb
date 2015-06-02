@@ -8,7 +8,7 @@ class TestResultsController < ApplicationController
     query["laboratory"] = params["laboratory"] if params["laboratory"].present?
     query["condition"] = params["condition"] if params["condition"].present?
 
-    @tests = Cdx::Api::Elasticsearch::Query.new(query).execute["events"]
+    @tests = Cdx::Api::Elasticsearch::Query.new(query).execute["tests"]
     @institutions = indexed_model Institution, "institution_id"
     @laboratories = indexed_model Laboratory, "laboratory_id"
     @devices = indexed_model Device, "device_uuid", "uuid"

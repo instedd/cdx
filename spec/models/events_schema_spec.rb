@@ -5,7 +5,7 @@ describe EventsSchema do
   it "creates a schema with string, enum and number fields" do
     definition = %{{
       "field_mapping" : {
-        "event" : [
+        "test" : [
           {
             "target_field" : "start_time",
             "source" : {"lookup" : "start_time"},
@@ -138,7 +138,7 @@ describe EventsSchema do
         "api_version" : "1.1.0",
         "version" : "1.0.1"
       },
-      "field_mapping" : { "event" : [
+      "field_mapping" : { "test" : [
         {
           "target_field" : "assay_name",
           "source" : {"lookup" : "assay_name"},
@@ -159,7 +159,7 @@ describe EventsSchema do
         "api_version" : "1.1.0",
         "version" : "1.0.1"
       },
-      "field_mapping" : { "event" : [
+      "field_mapping" : { "test" : [
         {
           "target_field" : "assay_name",
           "source" : {"lookup" : "assay_name"},
@@ -194,6 +194,6 @@ describe EventsSchema do
       }
     })
 
-    schema["properties"].keys.should =~ ["assay_name", "start_time", "created_at", "updated_at", "event_id", "sample_uuid", "sample_id", "sample_type", "uuid", "device_uuid", "system_user", "device_serial_number", "error_code", "error_description", "laboratory_id", "institution_id", "location", "location_coords", "age", "gender", "ethnicity", "race", "race_ethnicity", "status", "result", "sample_collection_date", "condition", "test_type", "device_name", "institution_name", "laboratory_name"]
+    schema["properties"].keys.should =~ ["assay_name", "start_time", "created_at", "updated_at", "test_id", "sample_uuid", "sample_id", "sample_type", "uuid", "device_uuid", "system_user", "device_serial_number", "error_code", "error_description", "laboratory_id", "institution_id", "location", "location_coords", "age", "gender", "ethnicity", "race", "race_ethnicity", "status", "result", "sample_collection_date", "condition", "test_type", "device_name", "institution_name", "laboratory_name"]
   end
 end

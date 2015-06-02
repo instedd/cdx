@@ -43,7 +43,7 @@ class Api::EventsController < ApiController
       query = TestResult.query(filters, current_user)
       respond_to do |format|
         format.csv do
-          build_csv 'Events', query.csv_builder
+          build_csv 'Tests', query.csv_builder
           render :layout => false
         end
         format.json { render_json query.result }

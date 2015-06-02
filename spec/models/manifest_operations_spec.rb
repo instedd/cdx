@@ -111,7 +111,7 @@ describe Manifest, validate_manifest: false do
     it "concats the result of a mapping" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "foo",
               "source" : {
                 "concat" : [
@@ -138,13 +138,13 @@ describe Manifest, validate_manifest: false do
           "test_type" : "This is a QC test",
           "last_name" : "   Doe   "
         }',
-        event: {indexed: {"foo" => "Doe: qc"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"foo" => "Doe: qc"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "maps the result of a concat" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "test_type",
               "source" : {
                 "map" : [
@@ -171,13 +171,13 @@ describe Manifest, validate_manifest: false do
           "first_name" : " John ",
           "last_name" : "   Doe   "
         }',
-        event: {indexed: {"test_type" => "qc"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"test_type" => "qc"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "retrieves a substring of an element" do
       assert_manifest_application %{
           {
-            "event" : [
+            "test" : [
               {
                 "target_field" : "test",
                 "source" : {
@@ -202,13 +202,13 @@ describe Manifest, validate_manifest: false do
         '{
           "name_and_test" : "ABC John Doe"
         }',
-        event: {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "obtains the beginning of the month" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "month",
               "source" : {
                 "beginning_of" : [
@@ -225,13 +225,13 @@ describe Manifest, validate_manifest: false do
         '{
           "run_at" : "2014-05-14T15:22:11+0000"
         }',
-        event: {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "parses a strange date" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "month",
               "source" : {
                 "parse_date" : [
@@ -248,13 +248,13 @@ describe Manifest, validate_manifest: false do
         '{
           "run_at" : "sat3feb014pm+7"
         }',
-        event: {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "parses a date without timezone using the device timezone" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "month",
               "source" : {
                 "parse_date" : [
@@ -271,7 +271,7 @@ describe Manifest, validate_manifest: false do
         '{
           "run_at" : "sat13feb014pm"
         }',
-        {event: {indexed: {"month" => "2001-02-13T20:00:00+0000"}, pii: Hash.new, custom: Hash.new}},
+        {test: {indexed: {"month" => "2001-02-13T20:00:00+0000"}, pii: Hash.new, custom: Hash.new}},
         Device.make(time_zone: 'Atlantic Time (Canada)')
     end
 
@@ -528,7 +528,7 @@ describe Manifest, validate_manifest: false do
 
       it "should map single indexed field to a list" do
         assert_manifest_application %{{
-            "event" : [
+            "test" : [
               {
                 "target_field" : "collection[*].temperature",
                 "source" : {"lookup" : "temperature"},
@@ -541,7 +541,7 @@ describe Manifest, validate_manifest: false do
           '{
             "temperature" : 20
           }',
-          event: {indexed: {"collection" => [
+          test: {indexed: {"collection" => [
             {
               "temperature" => 20
             }]}, pii: Hash.new, custom: Hash.new}
@@ -609,7 +609,7 @@ describe Manifest, validate_manifest: false do
       it "should apply value mapping to multiple indexed field" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].condition",
                 "source" : {
                   "map" : [
@@ -628,13 +628,13 @@ describe Manifest, validate_manifest: false do
             }
           },
           '{"conditions" : [{"condition" : "PATIENT HAS MTB CONDITION"}, {"condition" : "PATIENT HAS FLU CONDITION"}]}',
-          event: {indexed: {"results" => [{"condition" => "MTB"}, {"condition" => "H1N1"}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"condition" => "MTB"}, {"condition" => "H1N1"}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "retrieves a substring of an element" do
         assert_manifest_application %{
             {
-              "event" : [
+              "test" : [
                 {
                   "target_field" : "test",
                   "source" : {
@@ -659,13 +659,13 @@ describe Manifest, validate_manifest: false do
           '{
             "name_and_test" : "ABC John Doe"
           }',
-          event: {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"test" => "ABC", "first_name" => "John"}, pii: Hash.new, custom: Hash.new}
       end
 
       it "obtains the beginning of the month" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "month",
                 "source" : {
                   "beginning_of" : [
@@ -682,13 +682,13 @@ describe Manifest, validate_manifest: false do
           '{
             "run_at" : "2014-05-14T15:22:11+0000"
           }',
-          event: {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"month" => "2014-05-01T00:00:00+0000"}, pii: Hash.new, custom: Hash.new}
       end
 
       it "parses an strange date" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "month",
                 "source" : {
                   "parse_date" : [
@@ -705,13 +705,13 @@ describe Manifest, validate_manifest: false do
           '{
             "run_at" : "sat3feb014pm+7"
           }',
-          event: {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"month" => "2001-02-03T16:00:00+0700"}, pii: Hash.new, custom: Hash.new}
       end
 
       it "should count years between multiple indexed fields" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].age",
                 "source" : {
                   "years_between" : [
@@ -731,7 +731,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          event: {indexed: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "should count years between multiple indexed fields on the second parameter" do
@@ -763,7 +763,7 @@ describe Manifest, validate_manifest: false do
       it "should count years between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].time",
                 "source" : {
                   "years_between" : [
@@ -789,7 +789,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               },
             ]}',
-          event: {indexed: {"results" => [{"time" => 1}, {"time" => 1}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"time" => 1}, {"time" => 1}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "should count months between multiple indexed fields" do
@@ -847,7 +847,7 @@ describe Manifest, validate_manifest: false do
       it "should count months between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].time",
                 "source" : {
                   "months_between" : [
@@ -873,7 +873,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               },
             ]}',
-          event: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "should count days between multiple indexed fields" do
@@ -931,7 +931,7 @@ describe Manifest, validate_manifest: false do
       it "should count days between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].time",
                 "source" : {
                   "days_between" : [
@@ -957,7 +957,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               },
             ]}',
-          event: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "should count hours between multiple indexed fields" do
@@ -1015,7 +1015,7 @@ describe Manifest, validate_manifest: false do
       it "should count hours between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].time",
                 "source" : {
                   "hours_between" : [
@@ -1041,7 +1041,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               },
             ]}',
-          event: {indexed: {"results" => [{"time" => 9526}, {"time" => 9526}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"time" => 9526}, {"time" => 9526}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "should count minutes between multiple indexed fields" do
@@ -1099,7 +1099,7 @@ describe Manifest, validate_manifest: false do
       it "should count minutes between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].time",
                 "source" : {
                   "minutes_between" : [
@@ -1125,7 +1125,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               },
             ]}',
-          event: {indexed: {"results" => [{"time" => 571618}, {"time" => 571618}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"time" => 571618}, {"time" => 571618}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "should count seconds between multiple indexed fields" do
@@ -1183,7 +1183,7 @@ describe Manifest, validate_manifest: false do
       it "should count seconds between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].time",
                 "source" : {
                   "seconds_between" : [
@@ -1209,7 +1209,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               },
             ]}',
-          event: {indexed: {"results" => [{"time" => 34297139}, {"time" => 34297139}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"time" => 34297139}, {"time" => 34297139}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "should count milliseconds between multiple indexed fields" do
@@ -1241,7 +1241,7 @@ describe Manifest, validate_manifest: false do
       it "should count milliseconds between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].age",
                 "source" : {
                   "milliseconds_between" : [
@@ -1261,13 +1261,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          event: {indexed: {"results" => [{"age" => 34297139877000}, {"age" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"age" => 34297139877000}, {"age" => 34297139877000}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "should count milliseconds between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].time",
                 "source" : {
                   "milliseconds_between" : [
@@ -1299,7 +1299,7 @@ describe Manifest, validate_manifest: false do
       it "converts from minutes to hours" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].age",
                 "source" : {
                   "convert_time" : [
@@ -1327,7 +1327,7 @@ describe Manifest, validate_manifest: false do
       it "clusterises an array of numbers" do
         definition = %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].age",
                 "source" : {
                   "clusterise" : [

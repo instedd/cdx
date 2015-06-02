@@ -29,7 +29,7 @@ describe DeviceEventImporter, elasticsearch: true do
         "device_models": "#{device.device_model.name}",
         "source" : { "type" : "#{source}"}
       },
-      "field_mapping" : {"event" : [{
+      "field_mapping" : {"test" : [{
           "target_field" : "error_code",
           "source" : {"lookup": "error_code"},
           "core" : true,
@@ -56,7 +56,7 @@ describe DeviceEventImporter, elasticsearch: true do
       write_file(%{error_code;result\n0;positive\n1;negative}, 'csv')
       DeviceEventImporter.new.import_from sync_dir
 
-      tests = all_elasticsearch_events_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
       test["error_code"].should eq(0)
       test["result"].should eq("positive")
@@ -72,7 +72,7 @@ describe DeviceEventImporter, elasticsearch: true do
       CharDet.stub(:detect).and_return('encoding' => 'UTF-16LE', 'confidence' => 1.0)
       DeviceEventImporter.new.import_from sync_dir
 
-      tests = all_elasticsearch_events_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
       test["error_code"].should eq(0)
       test["result"].should eq("positivo")
@@ -92,7 +92,7 @@ describe DeviceEventImporter, elasticsearch: true do
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
       DeviceEventImporter.new("*.json").import_from sync_dir
 
-      tests = all_elasticsearch_events_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
       test["error_code"].should eq(0)
       test["result"].should eq("positive")
@@ -106,7 +106,7 @@ describe DeviceEventImporter, elasticsearch: true do
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
       DeviceEventImporter.new("*.{csv,json}").import_from sync_dir
 
-      tests = all_elasticsearch_events_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
       test["error_code"].should eq(0)
       test["result"].should eq("positive")
@@ -120,7 +120,7 @@ describe DeviceEventImporter, elasticsearch: true do
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json', 'mytestfile')
       DeviceEventImporter.new("*.{csv,json}").import_single(sync_dir, File.join(sync_dir.inbox_path(device.uuid), "mytestfile.json"))
 
-      tests = all_elasticsearch_events_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
       test["error_code"].should eq(0)
       test["result"].should eq("positive")
@@ -157,7 +157,7 @@ describe DeviceEventImporter, elasticsearch: true do
         copy_sample_csv 'epicenter_headless_sample_utf16.csv'
         DeviceEventImporter.new("*.csv").import_from sync_dir
 
-        tests = all_elasticsearch_events_for(device.institution)
+        tests = all_elasticsearch_tests_for(device.institution)
         tests.should have(18).items
         tests.map{|e| e['_source']['start_time']}.should =~ ['2014-09-09T17:07:32+00:00', '2014-10-28T13:00:58+00:00', '2014-10-28T17:24:34+00:00', '2015-02-10T18:10:28+00:00', '2015-03-03T19:27:36+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2014-11-05T08:38:30+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00']
       end
@@ -171,7 +171,7 @@ describe DeviceEventImporter, elasticsearch: true do
         copy_sample_csv 'genoscan_sample.csv'
         DeviceEventImporter.new("*.csv").import_from sync_dir
 
-        tests = all_elasticsearch_events_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
+        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
         tests.should have(13).items
 
         test = tests.first["_source"]
@@ -196,7 +196,7 @@ describe DeviceEventImporter, elasticsearch: true do
         copy_sample_csv 'epicenter_sample.csv'
         DeviceEventImporter.new("*.csv").import_from sync_dir
 
-        tests = all_elasticsearch_events_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
+        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
         tests.should have(29).items
 
         test = tests.first["_source"]
@@ -223,7 +223,7 @@ describe DeviceEventImporter, elasticsearch: true do
         copy_sample_csv 'epicenter_headless_sample.csv'
         DeviceEventImporter.new("*.csv").import_from sync_dir
 
-        tests = all_elasticsearch_events_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
+        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
         tests.should have(29).items
 
         test = tests.first["_source"]
@@ -250,12 +250,12 @@ describe DeviceEventImporter, elasticsearch: true do
         copy_sample_xml 'fio_sample.xml'
         DeviceEventImporter.new("*.xml").import_from sync_dir
 
-        tests = all_elasticsearch_events_for(device.institution)
+        tests = all_elasticsearch_tests_for(device.institution)
         tests.should have(1).items
 
         test = tests.first['_source']
 
-        test['event_id'].should eq('12345678901234567890')
+        test['test_id'].should eq('12345678901234567890')
         test['gender'].should eq('female')
         test['age'].should eq(25)
         test['custom_fields']['pregnancy_status'].should eq('Not Pregnant')

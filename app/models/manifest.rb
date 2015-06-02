@@ -20,7 +20,7 @@ class Manifest < ActiveRecord::Base
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
   EVENT_TEMPLATE = {
-    "event" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
+    "test" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
     "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
     "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
   }.freeze
@@ -106,8 +106,8 @@ class Manifest < ActiveRecord::Base
     loaded_definition.with_indifferent_access["field_mapping"]
   end
 
-  def event_mapping
-    field_mapping["event"] || []
+  def test_mapping
+    field_mapping["test"] || []
   end
 
   def sample_mapping
@@ -119,7 +119,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def flat_mappings
-    event_mapping + patient_mapping + sample_mapping
+    test_mapping + patient_mapping + sample_mapping
   end
 
   def parser
@@ -144,7 +144,7 @@ class Manifest < ActiveRecord::Base
   def self.default_definition
     Oj.dump({
       metadata: { source: { type: "json" } },
-      field_mapping: { event: map(Cdx::Api.searchable_fields).flatten }
+      field_mapping: { test: map(Cdx::Api.searchable_fields).flatten }
     })
   end
 

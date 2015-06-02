@@ -9,7 +9,7 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
         "api_version" : "1.1.0",
         "device_models" : ["GX4001"]
       },
-      "field_mapping" : { "event" : [
+      "field_mapping" : { "test" : [
         {
           "target_field" : "temperature",
           "source" : {"lookup" : "Test.temp"},
@@ -76,7 +76,7 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
 
     it "mapping plain types" do
       subject.should have_nested_keys(['properties', 'start_time', 'type']).with_value('date')
-      subject.should have_nested_keys(['properties', 'event_id', 'type']).with_value('string')
+      subject.should have_nested_keys(['properties', 'test_id', 'type']).with_value('string')
       subject.should have_nested_keys(['properties', 'error_code', 'type']).with_value('integer')
       subject.should have_nested_keys(['properties', 'laboratory_id', 'type']).with_value('integer')
       subject.should have_nested_keys(['properties', 'parent_locations', 'type']).with_value('string')
@@ -115,7 +115,7 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
 
   context "default" do
 
-    let(:template) { Cdx::Api.client.indices.get_template(name: 'cdp_events_template_test_default')['cdp_events_template_test_default'] }
+    let(:template) { Cdx::Api.client.indices.get_template(name: 'cdp_tests_template_test_default')['cdp_tests_template_test_default'] }
 
     subject { template['mappings']['_default_'] }
     include_examples 'has default mappings by'
@@ -124,28 +124,28 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
       template['template'].should eq('cdp_institution_test*')
     end
 
-    it "should have en empty default event mapping" do
-      template['mappings']['event'].should eq({"dynamic_templates"=>[], 'properties' => {}})
+    it "should have en empty default test mapping" do
+      template['mappings']['test'].should eq({"dynamic_templates"=>[], 'properties' => {}})
     end
 
   end
 
   context "for manifest" do
 
-    let(:event)     { TestResult.create_and_index({results: [{result: :positive}]}, device_events: [DeviceEvent.make(device: device)]) }
-    let(:mapping)   { Cdx::Api.client.indices.get_mapping index: event.institution.elasticsearch_index_name }
+    let(:test)     { TestResult.create_and_index({results: [{result: :positive}]}, device_events: [DeviceEvent.make(device: device)]) }
+    let(:mapping)  { Cdx::Api.client.indices.get_mapping index: test.institution.elasticsearch_index_name }
 
     shared_examples "on mapping" do
 
       def mapping_for(name)
-        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'][name]
+        mapping["cdp_institution_test_#{test.institution.id}"]['mappings'][name]
       end
 
       it "should have all types" do
-        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'].should_not be_blank
-        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'].should have_key('_default_')
-        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'].should have_key('event')
-        mapping["cdp_institution_test_#{event.institution.id}"]['mappings'].should have_key("event_#{device_model.id}")
+        mapping["cdp_institution_test_#{test.institution.id}"]['mappings'].should_not be_blank
+        mapping["cdp_institution_test_#{test.institution.id}"]['mappings'].should have_key('_default_')
+        mapping["cdp_institution_test_#{test.institution.id}"]['mappings'].should have_key('test')
+        mapping["cdp_institution_test_#{test.institution.id}"]['mappings'].should have_key("test_#{device_model.id}")
       end
 
       context "default" do
@@ -153,13 +153,13 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
         include_examples 'has default mappings by'
       end
 
-      context "for plain event" do
-        subject { mapping_for('event') }
+      context "for plain test" do
+        subject { mapping_for('test') }
         include_examples 'has default mappings by'
       end
 
       context "for manifest" do
-        subject { mapping_for("event_#{device_model.id}") }
+        subject { mapping_for("test_#{device_model.id}") }
 
         include_examples 'has default mappings by'
         include_examples 'has manifest mappings by'
@@ -167,17 +167,17 @@ describe ElasticsearchMappingTemplate, elasticsearch: true do
 
     end
 
-    it "should index event with correct device model" do
-      event.device_model.name.should eq("GX4001")
+    it "should index test with correct device model" do
+      test.device_model.name.should eq("GX4001")
     end
 
     context "creating template for index" do
-      before(:each) { manifest; event }
+      before(:each) { manifest; test }
       include_examples 'on mapping'
     end
 
     context "updating template for index" do
-      before(:each) { event; manifest }
+      before(:each) { test; manifest }
       include_examples 'on mapping'
 
       it "should map location fields from dynamic template" do
