@@ -41,4 +41,37 @@ describe XmlEventParser do
     parser.lookup("Result/text()", data).should eq(['FLU', 'H1N1'])
   end
 
+  let(:complex_xml) do
+    <<-XML
+      <Events>
+        <Event>
+          <Patient name="Socrates" age="27"/>
+          <SampleId>123</SampleId>
+          <Result>
+            <Name>FLU</Name>
+            <Code>flu</Code>
+          </Result>
+          <Result>
+            <Name>H1N1</Name>
+            <Code>h1n1</Code>
+          </Result>
+        </Event>
+        <Event>
+          <Patient name="Plato" age="33"/>
+          <SampleId>456</SampleId>
+        </Event>
+        <ManufacturerId>AcmeInc</ManufacturerId>
+      </Events>
+    XML
+  end
+
+  it 'should lookup from the root element' do
+    root = parser.load(complex_xml)
+    data = root.first.xpath('Result[2]')
+    parser.lookup("Name/text()", data, root).should eq('H1N1')
+    # TODO: We shouldn't need the `..` here, but we're assuming there's always
+    # a root element with elements inside
+    parser.lookup("/../ManufacturerId/text()", data, root).should eq('AcmeInc')
+  end
+
 end
