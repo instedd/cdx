@@ -1403,7 +1403,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          event: {indexed: {"results" => [{"time" => 34297139000}, {"time" => 34297139000}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"time" => 34297139000}, {"time" => 34297139000}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "converts from minutes to hours" do
@@ -1436,7 +1436,7 @@ describe Manifest, validate_manifest: false do
             ],
             "unit" : "minutes"
           }',
-          event: {indexed: {"results" => [{"age" => 1.5}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"age" => 1.5}, {"age" => 1}]}, pii: Hash.new, custom: Hash.new}
       end
 
       it "clusterises an array of numbers" do
@@ -1470,7 +1470,7 @@ describe Manifest, validate_manifest: false do
           }',
 
           {
-            event: {
+            test: {
               indexed: {
                 "results" => [
                   {"age" => "20-40"},
@@ -1494,7 +1494,7 @@ describe Manifest, validate_manifest: false do
       it "should collect elements in an XML file" do
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "results[*].assay_code",
                 "source" : {
                   "collect": [
@@ -1526,7 +1526,7 @@ describe Manifest, validate_manifest: false do
               </Test>
             </Event>
           </Events>' },
-          event: {indexed: {"results" => [{"assay_code" => "some_type - flu-a"}, {"assay_code" => "some_type - flu-b"}]}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"results" => [{"assay_code" => "some_type - flu-a"}, {"assay_code" => "some_type - flu-b"}]}, pii: Hash.new, custom: Hash.new}
       end
 
     end
