@@ -71,9 +71,10 @@ class DeviceEventProcessor
 
     def find_or_initialize_test
       test = TestResult.new device_events: [device_event],
-                            plain_sensitive_data: parsed_event[:test][:pii],
-                            custom_fields: parsed_event[:test][:custom],
-                            test_id: parsed_event[:test][:indexed][:test_id],
+                            plain_sensitive_data: {test: parsed_event[:test][:pii]},  # TODO: this should be what the manifest returns
+                            custom_fields: {test: parsed_event[:test][:custom]},
+                            test_id: parsed_event[:test][:indexed][:id],
+                            indexed_fields: {test: parsed_event[:test][:indexed]},
                             device: device
 
       if test.test_id && existing = TestResult.find_by(test_id: test.test_id, device_id: test.device_id)
@@ -90,9 +91,9 @@ class DeviceEventProcessor
       indexed_fields = parsed_event[:sample][:indexed].with_indifferent_access
       sample_uid = pii[:sample_uid]
 
-      sample = Sample.new plain_sensitive_data: pii,
-                          custom_fields: custom_fields,
-                          indexed_fields: indexed_fields,
+      sample = Sample.new plain_sensitive_data: {sample: pii},
+                          custom_fields: {sample: custom_fields},
+                          indexed_fields: {sample: indexed_fields},
                           institution_id: @parent.institution.id
 
       if sample_uid.present? && existing = Sample.find_by_pii(sample_uid, @parent.institution.id)
@@ -110,9 +111,9 @@ class DeviceEventProcessor
       indexed_fields = parsed_event[:patient][:indexed].with_indifferent_access
       patient_id = pii[:patient_id]
 
-      patient = Patient.new plain_sensitive_data: pii,
-                            custom_fields: custom_fields,
-                            indexed_fields: indexed_fields,
+      patient = Patient.new plain_sensitive_data: {patient: pii},
+                            custom_fields: {patient: custom_fields},
+                            indexed_fields: {patient: indexed_fields},
                             institution_id: @parent.institution.id
 
       if patient_id.present? && existing = Patient.find_by_pii(patient_id, @parent.institution.id)
@@ -184,14 +185,14 @@ class DeviceEventProcessor
     end
 
     def index_test(test, is_new)
-      indexer = TestResultIndexer.new(parsed_event[:test][:indexed], test)
+      indexer = TestResultIndexer.new(test)
       is_new ? indexer.index : indexer.update
     end
 
     def update_sample_in_existing_documents_with sample
       response = client.search index: index_name, body:{query: { filtered: { filter: { term: { sample_uuid: sample.uuid } } } }, fields: []}, size: 10000
       body = response["hits"]["hits"].map do |element|
-        { update: { _type: element["_type"], _id: element["_id"], data: { doc: sample.indexed_fields } } }
+        { update: { _type: element["_type"], _id: element["_id"], data: { doc: { sample: sample.indexed_fields } } } }
       end
 
       client.bulk index: index_name, body: body unless body.blank?
@@ -200,7 +201,7 @@ class DeviceEventProcessor
     def update_patient_in_existing_documents_with patient
       response = client.search index: index_name, body:{query: { filtered: { filter: { term: { patient_uuid: patient.uuid } } } }, fields: []}, size: 10000
       body = response["hits"]["hits"].map do |element|
-        { update: { _type: element["_type"], _id: element["_id"], data: { doc: patient.indexed_fields } } }
+        { update: { _type: element["_type"], _id: element["_id"], data: { doc: { patient: patient.indexed_fields } } } }
       end
 
       client.bulk index: index_name, body: body unless body.blank?

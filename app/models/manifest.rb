@@ -22,29 +22,9 @@ class Manifest < ActiveRecord::Base
   EVENT_TEMPLATE = {
     "test" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
     "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
+    "device" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
     "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
   }.freeze
-
-  #TODO Refiy the assay and delegate this to mysql.
-  ####################################################################################################
-  def self.find_by_assay_name assay_name
-    manifests = self.valid.select do |manifest|
-      manifest.find_assay_name assay_name
-    end
-    raise ActiveRecord::RecordNotFound.new "There is no manifest for assay_name: '#{assay_name}'." unless manifests.present?
-
-    manifests.sort_by(&:version).last
-  end
-
-  def find_assay_name assay_name
-    field = flat_mappings.detect { |f| f["target_field"] == "assay_name" }
-    valid_values = []
-    if field["options"]
-      valid_values = field["options"]
-    end
-    valid_values.include? assay_name
-  end
-  ####################################################################################################
 
   def self.default
     new definition: default_definition
@@ -116,6 +96,10 @@ class Manifest < ActiveRecord::Base
 
   def patient_mapping
     field_mapping["patient"] || []
+  end
+
+  def device_mapping
+    device_mapping["device"] || []
   end
 
   def flat_mappings

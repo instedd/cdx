@@ -74,13 +74,13 @@ class ElasticsearchMappingTemplate
     end
 
     def put_template!
-      Cdx::Api.client.indices.put_template name: template_name('default'), body: {
-        'template' => Cdx::Api.config.template_name_pattern,
-        'mappings' => {
-          "_default_" => default_mapping,
-          "test" => empty_mapping
-        }
-      }
+      # Cdx::Api.client.indices.put_template name: template_name('default'), body: {
+      #   'template' => Cdx::Api.config.template_name_pattern,
+      #   'mappings' => {
+      #     "_default_" => default_mapping,
+      #     "test" => empty_mapping
+      #   }
+      # }
     end
 
     def update_indices!
