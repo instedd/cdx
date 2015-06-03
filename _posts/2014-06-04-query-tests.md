@@ -1,13 +1,13 @@
 ---
 category: Applications
-path: '/events[.format]'
-title: 'Query Events'
+path: '/tests[.format]'
+title: 'Query Tests'
 type: 'GET'
 
 layout: nil
 ---
 
-Returns a list of Events
+Returns a list of Tests
 
 # Format
 
@@ -19,89 +19,89 @@ The default response format is JSON.
 
 # Filters
 
-Filter parameters allow querying a subset of the available events.
+Filter parameters allow querying a subset of the available tests.
 
-The data returned will be sorted by default by the event creation date.
+The data returned will be sorted by default by the test creation date.
 
-* `since` - retrieve events reported after a specific date time.
+* `since` - retrieve tests reported after a specific date time.
 
-`/events?since=2014-04-10T15:22:12+00:00`
+`/tests?since=2014-04-10T15:22:12+00:00`
 
 When querying from the query string the _'+'_ sign must be escaped as _'%2B'_
 
 `since=2014-08-01T18:10:36%2B07:00`
 
-* `until` - retrieve events reported before a specific date time. Useful to define a time window in combination with “since”.
+* `until` - retrieve tests reported before a specific date time. Useful to define a time window in combination with “since”.
 
-`/events?until=2014-04-10T15:22:12-0300`
+`/tests?until=2014-04-10T15:22:12-0300`
 
 When querying from the query string the _'+'_ sign must be escaped as _'%2B'_
 
 `until=2014-08-01T18:10:36%2B07:00`
 
-* `location` - filter events by location id
+* `location` - filter tests by location id
 
-`/events?location=1`
+`/tests?location=1`
 
-* `institution` - filter events by institution id
+* `institution` - filter tests by institution id
 
-`/events?institution=1`
+`/tests?institution=1`
 
-* `device` - filter events by device uuid
+* `device` - filter tests by device uuid
 
-`/events?device=9d68e8fd-3ebe-a163-2ad6-7a675dac5dde`
+`/tests?device=9d68e8fd-3ebe-a163-2ad6-7a675dac5dde`
 
-* `laboratory` - filter events by laboratory id
+* `laboratory` - filter tests by laboratory id
 
-`/events?laboratory=1`
+`/tests?laboratory=1`
 
-* `gender` - filter events by gender
+* `gender` - filter tests by gender
 
-`/events?gender=male`
+`/tests?gender=male`
 
-* `min_age` - filter events for people of age greater or equal than min_age
+* `min_age` - filter tests for people of age greater or equal than min_age
 
-`/events?min_age=7`
+`/tests?min_age=7`
 
-* `max_age` - filter events for people of age lower or equal than max_age
+* `max_age` - filter tests for people of age lower or equal than max_age
 
-`/events?max_age=7`
+`/tests?max_age=7`
 
-* `result` - filter by the events outcome.
+* `result` - filter by the tests outcome.
 
-`/events?result=positive`
+`/tests?result=positive`
 
-* `condition` - filter events for a particular condition name
+* `condition` - filter tests for a particular condition name
 
-`/events?condition=mtb`
+`/tests?condition=mtb`
 
-* `assay_name` - filter events for a particular assay name
+* `assay_name` - filter tests for a particular assay name
 
-`/events?assay_name=ASSAY001`
+`/tests?assay_name=ASSAY001`
 
-* `uuid` - retrieves the event with a particular UUID
+* `uuid` - retrieves the test with a particular UUID
 
-`/events?uuid=c4c52784-bfd5-717d-7a91-614acd972d5e`
+`/tests?uuid=c4c52784-bfd5-717d-7a91-614acd972d5e`
 
-* `error_code` - filter events for a particular error code.
+* `error_code` - filter tests for a particular error code.
 
-`/events?error_code=A01`
+`/tests?error_code=A01`
 
-* `system_user` - filter events for the user that executed the test.
+* `system_user` - filter tests for the user that executed the test.
 
-`/events?system_user=jdoe`
+`/tests?system_user=jdoe`
 
-* `test_type` - filter events for the type of the test: qc / specimen.
+* `test_type` - filter tests for the type of the test: qc / specimen.
 
-`/events?test_type=qc`
+`/tests?test_type=qc`
 
 ## Multiple Values
 
 With the exception of _since_, _until_, _min_age_ and _max_age_, all the fields can accept multiple values using a comma as a separator:
 
-`/events?error_code=A01,A02`
+`/tests?error_code=A01,A02`
 
-`/events?gender=male,female`
+`/tests?gender=male,female`
 
 # Unknown values
 
@@ -109,23 +109,23 @@ If a field value is not specified, the keyword used to represent it in filters m
 
 If the value is specified, but impossible to determine at the moment of the test, the keyword used to represent it is _'unknown'_
 
-`/events?gender=male,unknown,null`
+`/tests?gender=male,unknown,null`
 
 The response must include all the unknown and null values.
 
 If you want all the results where the gender is a known value, you can ignore the null using:
 
-`/events?gender=not(null)`
+`/tests?gender=not(null)`
 
 When grouping, a bucket must be included for all elements that fall into the unknown or null buckets.
 
-`/events?group_by=gender,result`
+`/tests?group_by=gender,result`
 
 Assuming gender values of male, female, unknown and null, and result values of positive and negative, an expected result could be:
 
 `{
   "total_count" : 55,
-  "events" : [
+  "tests" : [
     {
       "gender" : "male",
       "result" : "positive",
@@ -194,11 +194,11 @@ Every request will contain the total amount of records that matched the filters,
 
 `page_size=20&offset=450` will bring the elements 451 to 470.
 
-* to retrieve only a count of the values that will match certain filters, a page size of zero can be specified. The result will be a record with no events and the desired count:
+* to retrieve only a count of the values that will match certain filters, a page size of zero can be specified. The result will be a record with no tests and the desired count:
 
 `{
   "total_count" : 1234,
-  "events" :[]
+  "tests" :[]
 }`
 
 The default page size is 50.
@@ -214,7 +214,7 @@ There are two ways to accomplish data aggregation:
 
 In the query parameter the options are limited to indicate the fields to group by.
 
-`/events?group_by=laboratory,gender,result`
+`/tests?group_by=laboratory,gender,result`
 
 The possible groupings are:
 
@@ -231,13 +231,13 @@ The possible groupings are:
 * assay_name
 * `year() | month() | week() | day()` - groups the given date field by the time interval specified.
 
-`/events?group_by=year(created_at)`
+`/tests?group_by=year(created_at)`
 
 ## JSON in request body
 
 The JSON allows more complex aggregations, such as:
 
-* `age` - groups and filters by age ranges. The events are skipped if they are outside those ranges.
+* `age` - groups and filters by age ranges. The tests are skipped if they are outside those ranges.
 
 `{
   "group_by" : [
@@ -274,11 +274,11 @@ The JSON allows more complex aggregations, such as:
 
 ### Without Grouping
 
-Returns an array of events without any PII and the total count of elements that matched the filter.
+Returns an array of tests without any PII and the total count of elements that matched the filter.
 
 `{
   "total_count" : 2,
-  "events" : [
+  "tests" : [
     {
       "uuid" : "c4c52784-bfd5-717d-7a91-614acd972d5e",
       "assay_name" : "ASSAY001",
@@ -323,13 +323,13 @@ Returns an array of events without any PII and the total count of elements that 
 
 ### With Grouping
 
-Returns the quantity of events matching each combination of aggregated fields and the total count of elements that matched the filter.
+Returns the quantity of tests matching each combination of aggregated fields and the total count of elements that matched the filter.
 
-`/events?group_by=gender,result`
+`/tests?group_by=gender,result`
 
 `{
   "total_count" : 55,
-  "events" : [
+  "tests" : [
     {
       "gender" : "male",
       "result" : "positive",
@@ -357,7 +357,7 @@ Returns the quantity of events matching each combination of aggregated fields an
 
 ## Without Grouping
 
-`created_at,event_id,uuid,device_uuid,system_user,device_serial_number,error_code,laboratory_id,institution_id,...
+`created_at,test_id,uuid,device_uuid,system_user,device_serial_number,error_code,laboratory_id,institution_id,...
 2014-08-01T21:29:52Z,b84a0c16-f223-1cd7-3705-71ec0056a682,b84a0c16-f223-1cd7-3705-71ec0056a682,efbc8343-b160-f...
 2014-08-01T21:30:06Z,cf44adcb-7414-8fd9-d663-a556c407be69,cf44adcb-7414-8fd9-d663-a556c407be69,efbc8343-b160-f...`
 

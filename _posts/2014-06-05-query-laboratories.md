@@ -21,7 +21,7 @@ The default response format is JSON.
 
 The institution Id can be specified, filtering the laboratories list.
 
-* `institution_id` - retrieve events reported after a specific date time.
+* `institution_id` - filter laboratories by institution id.
 
 `/laboratories?institution_id=2`
 

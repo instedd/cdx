@@ -1,24 +1,24 @@
 ---
 category: Devices
-path: '/events/[event_uuid]/pii'
+path: '/tests/[test_uuid]/pii'
 title: 'Submit PII'
 type: 'PUT'
 
 layout: nil
 ---
 
-Allows submission of Personal Identifiable Information into a previously submitted event.
+Allows submission of Personal Identifiable Information into a previously submitted test.
 
 # Request
 
-`/events/[event_uuid]/pii`
+`/tests/[test_uuid]/pii`
 
-* The path must include a valid **event UUID**.
+* The path must include a valid **test UUID**.
 * **The body can't be empty** and must include the PII.
 
 # Example
 
-```/events/c4c52784-bfd5-717d-7a91-614acd972d5e/pii```
+```/tests/c4c52784-bfd5-717d-7a91-614acd972d5e/pii```
 
 # Response
 

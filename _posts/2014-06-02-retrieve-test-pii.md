@@ -1,24 +1,24 @@
 ---
 category: Applications
-path: '/events/[event_uuid]/pii'
+path: '/tests/[test_uuid]/pii'
 title: 'Retrieve PII'
 type: 'GET'
 
 layout: nil
 ---
 
-Retrieves the private patient information for a given event.
+Retrieves the private patient information for a given test.
 
 # Request Parameters
 
-`/events/[event_uuid]/pii`
+`/tests/[test_uuid]/pii`
 
-* The path must include a **valid event_uuid**.
-* ```event_uuid``` - UUID of the desired event.
+* The path must include a **valid test_uuid**.
+* ```test_uuid``` - UUID of the desired test.
 
 ### Example
 
-`/events/c4c52784-bfd5-717d-7a91-614acd972d5d/pii`
+`/tests/c4c52784-bfd5-717d-7a91-614acd972d5d/pii`
 
 # Response
 

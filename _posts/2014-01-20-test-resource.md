@@ -1,15 +1,15 @@
 ---
 category: Resources
-title: 'Event'
+title: 'Test'
 
 layout: nil
 ---
 
-The Event resource contains the fields related to the event reported by the device. No personal identifiable information is contained in this resource.
+The Test resource contains the fields related to the test reported by the device. No personal identifiable information is contained in this resource.
 
 `{
   "start_time": "2014-09-26T22:09:05Z",
-  "event_id": "570254af-eb74-367b-3b0e-0b1f1029ba73",
+  "test_id": "570254af-eb74-367b-3b0e-0b1f1029ba73",
   "uuid": "570254af-eb74-367b-3b0e-0b1f1029ba73",
   "device_uuid": "9d68e8fd-3ebe-a163-2ad6-7a675dac5dde",
   "system_user": "jdoe",
@@ -57,4 +57,4 @@ The Event resource contains the fields related to the event reported by the devi
 
 Non standard fields reported by the device will be included inside the "custom_fields" section.
 
-The default "event_id" will be the same as the uuid. If the device reports its own id, it will be stored there.
+The default "test_id" will be the same as the uuid. If the device reports its own id, it will be stored there.
