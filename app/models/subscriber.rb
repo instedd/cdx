@@ -30,7 +30,7 @@ class Subscriber < ActiveRecord::Base
   end
 
   def self.default_schema
-    EventsSchema.new("en-US", nil, Manifest.default).build
+    TestsSchema.new("en-US", nil, Manifest.default).build
   end
 
   def notify

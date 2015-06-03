@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EventsSchema do
+describe TestsSchema do
 
   it "creates a schema with string, enum and number fields" do
     definition = %{{
@@ -85,7 +85,7 @@ describe EventsSchema do
       "searchable" => true
     }
 
-    schema = EventsSchema.new "es-AR", {assay_name: "first_assay"}, Manifest.new(definition:definition)
+    schema = TestsSchema.new "es-AR", {assay_name: "first_assay"}, Manifest.new(definition:definition)
     schema = schema.build
 
     schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
@@ -121,7 +121,7 @@ describe EventsSchema do
       }
     }
 
-    schema = EventsSchema.new "es-AR", {assay_name: "first_assay"}, Manifest.new(definition:definition)
+    schema = TestsSchema.new "es-AR", {assay_name: "first_assay"}, Manifest.new(definition:definition)
     schema = schema.build
 
     schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
@@ -174,7 +174,7 @@ describe EventsSchema do
       ]}
     }}
 
-    schema = EventsSchema.for "es-AR"
+    schema = TestsSchema.for "es-AR"
     schema = schema.build
 
     schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
