@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "1.0.0",
+    "version" : "1.0.1",
     "api_version" : "1.1.0",
     "device_models" : ["FIO"],
     "source": {"type" : "xml"}
@@ -63,7 +63,7 @@
         "indexed": true
       }
     ],
-    "event" : [
+    "test" : [
       {
         "target_field" : "start_time",
         "source" : {"lookup" : "TestDate/text()"},
@@ -72,7 +72,7 @@
         "indexed" : true
       },
       {
-        "target_field" : "event_id",
+        "target_field" : "test_id",
         "source" : {"lookup" : "@id"},
         "type" : "string",
         "core" : true,

@@ -1,5 +1,8 @@
 class JsonEventParser
-  def lookup(path, data)
+
+  PATH_ROOT_TOKEN = "$"
+
+  def lookup(path, data, root = data)
     if (targets = path.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
 
       #TODO recursive lookup
@@ -10,12 +13,16 @@ class JsonEventParser
       end
       ######################
       elements_array.map do |element|
-        lookup(targets.drop(1).join(Manifest::COLLECTION_SPLIT_TOKEN), element)
+        lookup(targets.drop(1).join(Manifest::COLLECTION_SPLIT_TOKEN), element, root)
       end
     else
       paths = path.split Manifest::PATH_SPLIT_TOKEN
       paths.inject data do |current, path|
-        current[path] if current.is_a? Hash
+        if path == PATH_ROOT_TOKEN
+          root
+        elsif current.is_a? Hash
+          current[path]
+        end
       end
     end
   end

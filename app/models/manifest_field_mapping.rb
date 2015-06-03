@@ -1,14 +1,15 @@
 class ManifestFieldMapping
   include ActionView::Helpers::DateHelper
-  
-  def initialize(manifest, field, device)
+
+  def initialize(manifest, field, device, data)
     @manifest = manifest
     @field = field
     @device = device
+    @root = data
   end
 
-  def apply_to(data)
-    coerce_values(traverse @field["source"], data)
+  def apply
+    coerce_values(traverse @field["source"], @root)
   end
 
   def traverse node, data
@@ -27,13 +28,11 @@ class ManifestFieldMapping
     end
 
     if node["concat"].present?
-      return node["concat"].map do |source|
-        traverse(source, data)
-      end.join
+      return concat(node["concat"], data)
     end
 
     if node["strip"].present?
-      return traverse(node["strip"], data).strip
+      return strip(traverse(node["strip"], data))
     end
 
     if node["convert_time"].present?
@@ -79,6 +78,11 @@ class ManifestFieldMapping
 
     if node["substring"].present?
       return traverse(node["substring"][0], data)[node["substring"][1]..node["substring"][2]]
+    end
+
+    if node["collect"].present?
+      collection_lookup, mapping = node["collect"].first, node["collect"].second
+      return collect(traverse(collection_lookup, data), mapping)
     end
 
     if node["parse_date"].present?
@@ -139,7 +143,7 @@ class ManifestFieldMapping
   end
 
   def lookup(path, data)
-    @manifest.parser.lookup(path, data)
+    @manifest.parser.lookup(path, data, @root)
   end
 
   def parse_date(node, data)
@@ -250,13 +254,18 @@ class ManifestFieldMapping
   end
 
   def clusterise(number, interval_stops)
-    number = number.to_f
-    interval_stops = interval_stops.map &:to_i
-    return "#{interval_stops.last}+" if number > interval_stops.last
-    return "0-#{interval_stops[0]}"  if number.between? 0, interval_stops[0]
-    interval_stops.each_with_index do |stop, index|
-      if number.between? stop, interval_stops[index + 1 ]
-        return "#{stop}-#{interval_stops[index+1]}"
+    return nil if number.nil?
+    if number.is_a? Array
+      number.map {|num| clusterise(num, interval_stops)}
+    else
+      number = number.to_f
+      interval_stops = interval_stops.map &:to_i
+      return "#{interval_stops.last}+" if number > interval_stops.last
+      return "0-#{interval_stops[0]}"  if number.between? 0, interval_stops[0]
+      interval_stops.each_with_index do |stop, index|
+        if number.between? stop, interval_stops[index + 1 ]
+          return "#{stop}-#{interval_stops[index+1]}"
+        end
       end
     end
   end
@@ -266,6 +275,30 @@ class ManifestFieldMapping
       value.to_i
     else
       value
+    end
+  end
+
+  def concat(values, data)
+    return values.map do |source|
+      value = traverse(source, data)
+      raise "Can't concat array values - use collect instead" if value.is_a? Array
+      value
+    end.join
+  end
+
+  def strip(values)
+    return nil if values.nil?
+    if values.is_a? Array
+      values.map {|value| strip(value)}
+    else
+      values.strip
+    end
+  end
+
+  def collect(values, mapping)
+    return traverse(mapping, values) unless values.is_a? Array
+    values.map do |value|
+      traverse(mapping, value)
     end
   end
 end

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "0.0.9",
+    "version": "0.0.10",
     "api_version": "1.1.0",
     "device_models": [
       "esequant_lr3"
@@ -41,7 +41,7 @@
         "indexed": true
       }
     ],
-    "event" : [
+    "test" : [
       {
         "target_field": "start_time",
         "source": {
@@ -57,7 +57,7 @@
         "indexed": true
       },
       {
-        "target_field": "event_id",
+        "target_field": "test_id",
         "source": {
           "lookup": "RunNumber"
         },

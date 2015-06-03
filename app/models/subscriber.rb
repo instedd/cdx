@@ -37,19 +37,19 @@ class Subscriber < ActiveRecord::Base
     fields = self.fields
     filter = self.filter.query.merge "page_size" => 10000, "updated_at_since" => last_run_at.iso8601
     Rails.logger.info "Filter : #{filter}"
-    events = Cdx::Api::Elasticsearch::Query.new(filter.with_indifferent_access).execute["events"]
+    tests = Cdx::Api::Elasticsearch::Query.new(filter.with_indifferent_access).execute["tests"]
     now = Time.now
-    events.each do |event|
-      PoirotRails::Activity.start("Publish event to subscriber #{self.name}") do
+    tests.each do |test|
+      PoirotRails::Activity.start("Publish test to subscriber #{self.name}") do
 
-        filtered_event = filter_event(event, fields)
+        filtered_test = filter_test(test, fields)
 
         callback_url = self.url
 
         if self.verb == 'GET'
           callback_url = URI.parse self.url
           callback_query = Rack::Utils.parse_nested_query(callback_url.query || "")
-          merged_query = filtered_event.merge(callback_query)
+          merged_query = filtered_test.merge(callback_query)
           callback_url = "#{callback_url.scheme}://#{callback_url.host}:#{callback_url.port}#{callback_url.path}?#{merged_query.to_query}"
         end
 
@@ -64,7 +64,7 @@ class Subscriber < ActiveRecord::Base
           if self.verb == 'GET'
             request.get
           else
-            request.post filtered_event.to_json
+            request.post filtered_test.to_json
           end
         rescue Exception => ex
           Rails.logger.warn "Could not #{verb} to subscriber #{id} at #{callback_url}: #{ex.message}\n#{ex.backtrace}"
@@ -76,34 +76,34 @@ class Subscriber < ActiveRecord::Base
     self.save!
   end
 
-  def filter_event(indexed_event, fields)
-    event = Event.includes(:sample, :device, :institution).find_by_uuid(indexed_event['uuid'])
-    merged_event = indexed_event.merge event.plain_sensitive_data.merge(event.sample.plain_sensitive_data)
+  def filter_test(indexed_test, fields)
+    test = TestResult.includes(:sample, :device, :institution).find_by_uuid(indexed_test['uuid'])
+    merged_test = indexed_test.merge test.plain_sensitive_data.merge(test.sample.plain_sensitive_data)
     fields = Subscriber.available_fields if fields.nil? || fields.empty? # use all fields if none is specified
     fields_properties = self.class.default_schema['properties']
-    filtered_event = {}
+    filtered_test = {}
 
     fields.each do |field|
       if field == 'result'
-        filtered_event["result"] = merged_event["results"].first["result"]
+        filtered_test["result"] = merged_test["results"].first["result"]
       elsif field == "condition"
-        filtered_event["condition"] = merged_event["results"].first["condition"]
+        filtered_test["condition"] = merged_test["results"].first["condition"]
       elsif fields_properties[field] && fields_properties[field]['locations'].not_nil?
-        filtered_event[field] = merged_event["#{field}_id"]
+        filtered_test[field] = merged_test["#{field}_id"]
       elsif fields_properties[field] && fields_properties[field]['format'] == 'lat,lng'
         location_id_field_name = "#{fields_properties[field]['location_identifier']}_id"
-        location = Location.find(merged_event[location_id_field_name])
-        filtered_event[field] = "#{location.lat},#{location.lng}" if location
+        location = Location.find(merged_test[location_id_field_name])
+        filtered_test[field] = "#{location.lat},#{location.lng}" if location
       elsif field == "institution_name"
-        filtered_event[field] = event.institution.name
-      elsif field == "laboratory_name" && indexed_event["laboratory_id"]
-        filtered_event[field] = Laboratory.find(indexed_event["laboratory_id"]).try(:name)
+        filtered_test[field] = test.institution.name
+      elsif field == "laboratory_name" && indexed_test["laboratory_id"]
+        filtered_test[field] = Laboratory.find(indexed_test["laboratory_id"]).try(:name)
       elsif field == "device_name"
-        filtered_event[field] = event.device.name
+        filtered_test[field] = test.device.name
       else
-        filtered_event[field] = merged_event[field]
+        filtered_test[field] = merged_test[field]
       end
     end
-    filtered_event
+    filtered_test
   end
 end

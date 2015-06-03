@@ -7,7 +7,7 @@ describe Manifest do
     it "should apply if valid" do
       assert_manifest_application %{
           {
-            "event" : [{
+            "test" : [{
               "target_field" : "assay_name",
               "source" : {"lookup" : "assay.name"},
               "type": "string",
@@ -16,14 +16,14 @@ describe Manifest do
           }
         },
         '{"assay" : {"name" : "GX4002"}}',
-        event: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should not apply if invalid" do
       expect {
         assert_manifest_application %{
             {
-              "event" : [{
+              "test" : [{
                 "target_field" : "assay_name",
                 "source" : {"lookup" : "assay.name"},
                 "type": "INVALID",
@@ -32,7 +32,7 @@ describe Manifest do
             }
           },
           '{"assay" : {"name" : "GX4002"}}',
-          event: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
+          test: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
       }.to raise_error(ManifestParsingError)
     end
 
@@ -182,7 +182,7 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "event" : [
+          "test" : [
             {
               "target_field" : "test_type",
               "source" : {
@@ -215,7 +215,7 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "event" : [
+          "test" : [
             {
               "target_field" : "results[*].result",
               "core" : true
@@ -238,7 +238,7 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "event" : [
+          "test" : [
             {
               "target_field" : "patient_name",
               "source" : {"lookup" : "patient_name"},
@@ -262,7 +262,7 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "event" : [
+          "test" : [
             {
               "target_field" : "patient_name",
               "source" : {"lookup" : "patient_name"},
@@ -287,7 +287,7 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "event" : [
+          "test" : [
             {
               "target_field" : "patient_name",
               "source" : {"lookup" : "patient_name"},
@@ -323,7 +323,7 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "event" : [
+          "test" : [
             {
               "target_field" : "rbc_description",
               "source" : {"lookup" : "rbc_description"},
@@ -349,7 +349,7 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "event" : [
+          "test" : [
             {
               "target_field" : "results[*].result",
               "source" : {"lookup" : "result"},
