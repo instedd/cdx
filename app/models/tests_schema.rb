@@ -1,4 +1,4 @@
-class EventsSchema
+class TestsSchema
 
   CONTEXT_KEYS = %w(condition assay_name status test_type).freeze
 
@@ -10,7 +10,7 @@ class EventsSchema
   end
 
   def self.for locale, context=nil
-    EventsSchema.new(locale || "en-US", context, nil)
+    TestsSchema.new(locale || "en-US", context, nil)
   end
 
   def manifests_for(context)

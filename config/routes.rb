@@ -42,8 +42,8 @@ Cdp::Application.routes.draw do
         get :simulator
       end
     end
-    match 'events(.:format)' => "events#index", via: [:get, :post]
-    resources :events, only: [] do
+    match 'tests(.:format)' => "tests#index", via: [:get, :post]
+    resources :tests, only: [] do
       collection do
         get :schema
       end
