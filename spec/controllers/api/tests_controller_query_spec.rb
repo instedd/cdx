@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::EventsController, elasticsearch: true, validate_manifest: false do
+describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
@@ -19,8 +19,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     context "Policies" do
       it "allows a user to query tests of it's own institutions" do
         device2 = Device.make
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_id: device2.uuid, authentication_token: device2.secret_key
+
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive])
+        DeviceEvent.create_and_process device: device2, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative])
 
         fresh_client_for device2.institution.elasticsearch_index_name
 
@@ -36,9 +37,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       it "should check for new tests since a date" do
         Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
-        post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: data
         Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
-        post :create, (Oj.dump results:[result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative])
 
         response = get_updates(created_at_since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
 
@@ -53,19 +54,19 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         get_updates(created_at_since: Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601).should be_empty
       end
 
-       it "filters by an analyzed result" do
-         post :create, (Oj.dump results:[condition: "mtb", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
-         post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
+      it "filters by an analyzed result" do
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative])
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive])
 
-         response = get_updates(result: :positive)
+        response = get_updates(result: :positive)
 
-         response.size.should eq(1)
-         response.first["results"].first["result"].should eq("positive")
-       end
+        response.size.should eq(1)
+        response.first["results"].first["result"].should eq("positive")
+      end
 
       it "filters by condition" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive])
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
 
         response = get_updates condition: 'mtb'
 
@@ -74,8 +75,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "filters by test_id" do
-        post :create, (Oj.dump test_id: 2, results:[condition: "mtb", result: :positive]), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump test_id: 2, results:[condition: "mtb", result: :positive])
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
 
         response = get_updates test: 2
 
@@ -84,8 +85,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "filters by test type" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc)
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen)
 
         response = get_updates test_type: :specimen
 
@@ -94,9 +95,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "filters for more than one value" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], gender: :male)
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative], gender: :female)
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
 
         response = get_updates(gender: [:male, :female]).sort_by do |test|
           test["results"].first["result"]
@@ -110,9 +111,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
     context "Grouping" do
       it "groups by gender in query params" do
-        post :create, (Oj.dump results:[result: :positive], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male)
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :male)
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female)
 
         response = get_updates(group_by: :gender).sort_by do |test|
           test["gender"]
@@ -125,12 +126,12 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "groups by gender and assay_name in post body" do
-        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "a"), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[result: :positive], gender: :male, assay_name: "b"), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "a"), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], gender: :female, assay_name: "b"), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male, assay_name: "a")
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male, assay_name: "a")
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male, assay_name: "b")
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female, assay_name: "a")
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female, assay_name: "b")
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female, assay_name: "b")
 
         response = get_updates({}, Oj.dump(group_by: [:gender , :assay_name])).sort_by do |test|
           test["gender"] + test["assay_name"]
@@ -145,10 +146,10 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "groups and filters for more than one value" do
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :positive], gender: :male), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[condition: "mtb", result: :negative], gender: :female), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[condition: "flu", result: :negative]), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], gender: :male)
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], gender: :male)
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative], gender: :female)
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
 
         response = get_updates("page_size"=>0, "group_by"=>["gender"], "gender"=>["male", "female"]).sort_by do |test|
           test["gender"]
@@ -165,7 +166,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           r.status.should eq(200)
           r.content_type.should eq("text/csv")
           r.headers["Content-Disposition"].should eq("attachment; filename=\"Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-          r.should render_template("api/events/index")
+          r.should render_template("api/tests/index")
         end
 
         render_views
@@ -173,9 +174,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         before(:each) { Timecop.freeze }
 
         it "responds a csv for a given grouping" do
-          post :create, (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe), device_id: device.uuid, authentication_token: device.secret_key
-          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_id: device.uuid, authentication_token: device.secret_key
-          post :create, (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe), device_id: device.uuid, authentication_token: device.secret_key
+          DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe)
+          DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe)
+          DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe)
 
           fresh_client_for institution.elasticsearch_index_name
 
@@ -194,8 +195,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
     context "Ordering" do
       it "should order by age" do
-        post :create, (Oj.dump results:[result: :positive], age: 20), device_id: device.uuid, authentication_token: device.secret_key
-        post :create, (Oj.dump results:[result: :negative], age: 10), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], age: 20)
+        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], age: 10)
 
         response = get_updates(order_by: :age)
 
@@ -223,7 +224,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             }
           ]}
         }}
-        post :create, Oj.dump(some_field: 1234), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: Oj.dump(some_field: 1234)
         test = all_elasticsearch_tests_for(institution).first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
@@ -271,7 +272,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
         Manifest.create! definition: definition
 
-        post :create, Oj.dump(results: [result: :positive], patient_name: "jdoe"), device_id: device.uuid, authentication_token: device.secret_key
+        DeviceEvent.create_and_process device: device, plain_text_data: Oj.dump(results: [result: :positive], patient_name: "jdoe")
         test = all_elasticsearch_tests_for(institution).first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
