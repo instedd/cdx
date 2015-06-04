@@ -10,6 +10,8 @@ class Device < ActiveRecord::Base
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
 
+  attr_reader :plain_secret_key
+
   validates_uniqueness_of :uuid
   validates_presence_of :institution
   validates_presence_of :name
@@ -60,11 +62,12 @@ class Device < ActiveRecord::Base
   end
 
   def validate_authentication(token)
-    secret_key == token
+    self.secret_key_hash == EventEncryption.hash(token)
   end
 
   def set_key
-    self.secret_key = EventEncryption.secure_random(9)
+    @plain_secret_key = EventEncryption.secure_random(9)
+    self.secret_key_hash = EventEncryption.hash(@plain_secret_key)
     self.ssh_key.try :destroy
     self.activation_token.try :destroy
   end

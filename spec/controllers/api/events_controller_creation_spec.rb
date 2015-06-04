@@ -19,7 +19,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
   context "Creation" do
 
     it "should create event in the database" do
-      response = post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+      response = post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
       response.status.should eq(200)
 
       event = DeviceEvent.first
@@ -29,7 +29,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     end
 
     it "should create test in elasticsearch" do
-      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["results"].first["result"].should eq("positive")
@@ -39,7 +39,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     end
 
     it "should create multiple tests in the database" do
-      response = post :create, datas, device_id: device.uuid, authentication_token: device.secret_key
+      response = post :create, datas, device_id: device.uuid, authentication_token: device.plain_secret_key
       response.status.should eq(200)
 
       event = DeviceEvent.first
@@ -51,7 +51,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     end
 
     it "should create multiple tests in elasticsearch" do
-      post :create, datas, device_id: device.uuid, authentication_token: device.secret_key
+      post :create, datas, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       tests = all_elasticsearch_tests_for(institution)
       tests.count.should eq(2)
@@ -63,14 +63,14 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     end
 
     it "should store institution_id in elasticsearch" do
-      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["institution_id"].should eq(device.institution_id)
     end
 
     it "should override test if test_id is the same" do
-      post :create, Oj.dump(test_id: "1234", age: 20), device_id: device.uuid, authentication_token: device.secret_key
+      post :create, Oj.dump(test_id: "1234", age: 20), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       TestResult.count.should eq(1)
       test = TestResult.first
@@ -85,7 +85,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       test["_id"].should eq("#{device.uuid}_1234")
       test["_source"]["age"].should eq(20)
 
-      post :create, Oj.dump(test_id: "1234", age: 30), device_id: device.uuid, authentication_token: device.secret_key
+      post :create, Oj.dump(test_id: "1234", age: 30), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       TestResult.count.should eq(1)
       test = TestResult.first
@@ -102,7 +102,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       test["_source"]["age"].should eq(30)
 
       a_device = Device.make(institution: institution)
-      post :create, Oj.dump(test_id: "1234", age: 20), device_id: a_device.uuid, authentication_token: a_device.secret_key
+      post :create, Oj.dump(test_id: "1234", age: 20), device_id: a_device.uuid, authentication_token: a_device.plain_secret_key
 
       TestResult.count.should eq(2)
       tests = all_elasticsearch_tests_for(institution)
@@ -110,7 +110,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     end
 
     it "should generate a start_time date if it's not provided" do
-      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["start_time"].should eq(test["created_at"])
@@ -120,7 +120,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
   context "Manifest" do
     it "shouldn't store sensitive data in elasticsearch" do
-      post :create, Oj.dump(results:[result: :positive], patient_id: 1234), device_id: device.uuid, authentication_token: device.secret_key
+      post :create, Oj.dump(results:[result: :positive], patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["results"].first["result"].should eq("positive")
@@ -143,7 +143,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           "core" : true
         }]}
       }}
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["assay_name"].should eq("GX4002")
@@ -175,7 +175,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         ]}
       }}
 
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["assay_name"].should eq("GX4002")
@@ -235,8 +235,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         }
       }}
 
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 3, sample_id: "10"), device_id: device.uuid, authentication_token: device.secret_key
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_telephone_number: 2222222, sample_id: 10), device_id: device2.uuid, authentication_token: device2.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 3, sample_id: "10"), device_id: device.uuid, authentication_token: device.plain_secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_telephone_number: 2222222, sample_id: 10), device_id: device2.uuid, authentication_token: device2.plain_secret_key
 
       TestResult.count.should eq(2)
       Sample.count.should eq(1)
@@ -285,7 +285,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         ]}
       }}
 
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["foo"].should be_nil
@@ -309,7 +309,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         ]}
       }}
 
-      post :create, Oj.dump(some_field: 1234), device_id: device.uuid, authentication_token: device.secret_key
+      post :create, Oj.dump(some_field: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["foo"].should be_nil
@@ -335,12 +335,12 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "type" : "integer"
           }]}
       }}
-      post :create, Oj.dump(error_code: 1234), device_id: device.uuid, authentication_token: device.secret_key
+      post :create, Oj.dump(error_code: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["error_code"].should eq(1234)
 
-      post :create, Oj.dump(error_code: "foo"), device_id: device.uuid, authentication_token: device.secret_key
+      post :create, Oj.dump(error_code: "foo"), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       response.code.should eq("422")
       Oj.load(response.body)["errors"].should eq("'foo' is not a valid value for 'error_code' (must be an integer)")
@@ -379,7 +379,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       it 'parses a single line csv' do
         csv = %{error_code;result\n0;positive}
-        post :create, csv, device_id: device.uuid, authentication_token: device.secret_key
+        post :create, csv, device_id: device.uuid, authentication_token: device.plain_secret_key
 
         tests = all_elasticsearch_tests_for(institution).sort_by { |test| test["_source"]["error_code"] }
         tests.count.should eq(1)
@@ -390,7 +390,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       it 'parses a multi line csv' do
         csv = %{error_code;result\n0;positive\n1;negative}
-        post :create, csv, device_id: device.uuid, authentication_token: device.secret_key
+        post :create, csv, device_id: device.uuid, authentication_token: device.plain_secret_key
 
         tests = all_elasticsearch_tests_for(institution).sort_by { |test| test["_source"]["error_code"] }
         tests.count.should eq(2)

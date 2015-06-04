@@ -22,7 +22,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     it "should store the location id when the device is registered in only one laboratory" do
       device.laboratories = [laboratory1]
       device.save!
-      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["location_id"].should eq(leaf_location1.geo_id)
@@ -36,7 +36,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device.laboratories = [laboratory1, laboratory2]
       device.save!
 
-      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["location_id"].should eq(parent_location.geo_id)
@@ -49,7 +49,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device.laboratories = [laboratory2, laboratory3]
       device.save!
 
-      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["location_id"].should eq(nil)
@@ -61,7 +61,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device.laboratories = [laboratory3, laboratory2]
       device.save!
 
-      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["location_id"].should eq(nil)
@@ -73,7 +73,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       device.laboratories = []
       device.save!
 
-      post :create, data, device_id: device.uuid, authentication_token: device.secret_key
+      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["location_id"].should be_nil

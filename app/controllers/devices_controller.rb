@@ -97,13 +97,13 @@ class DevicesController < ApplicationController
 
     @device.set_key
 
-    @key_barcode = Barby::Code93.new(@device.secret_key)
+    @key_barcode = Barby::Code93.new(@device.plain_secret_key)
     @key_barcode_for_html = Barby::HtmlOutputter.new(@key_barcode)
 
     respond_to do |format|
       if @device.save
         format.html
-        format.json { render json: {secret_key: @device.secret_key }.to_json}
+        format.json { render json: {secret_key: @device.plain_secret_key }.to_json}
       else
         format.html { render action: 'edit' }
         format.json { render json: @device.errors, status: :unprocessable_entity }

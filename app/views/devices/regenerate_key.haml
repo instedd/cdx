@@ -3,7 +3,7 @@
 
   %p
     %strong Secret:
-    = @device.secret_key
+    = @device.plain_secret_key
     = raw @key_barcode_for_html.to_html
 
   %p

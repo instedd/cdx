@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ActivationToken do
-  let!(:device) { Device.make(secret_key: '74ee5b6e-f64c-17d3-49d6-28ff59b1b1d3') }
+  let!(:device) { Device.make }
   let!(:token) { ActivationToken.create!(device: device, value: 'foobar') }
 
   describe '#used?' do
