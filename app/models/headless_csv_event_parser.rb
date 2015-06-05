@@ -13,7 +13,7 @@ class HeadlessCSVEventParser
     end
   end
 
-  def load(data)
+  def load(data, root_path = nil)
     CSV.new(data, col_sep: @separator)
   end
 end

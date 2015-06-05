@@ -13,7 +13,7 @@ class CSVEventParser
     end
   end
 
-  def load(data)
+  def load(data, root_path = nil)
     csv = CSV.new(data, col_sep: @separator)
     headers = csv.shift
     csv.map do |row|

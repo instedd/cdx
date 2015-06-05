@@ -84,7 +84,7 @@ class Manifest < ActiveRecord::Base
     raise ManifestParsingError.invalid_manifest(self) if self.invalid?
 
     events = []
-    parser.load(data).each_with_index do |record, record_index|
+    parser.load(data, data_root).each_with_index do |record, record_index|
       begin
         event = EVENT_TEMPLATE.deep_dup
         field_mapping.each do |scope, mappings|
@@ -139,6 +139,10 @@ class Manifest < ActiveRecord::Base
 
   def data_type
     (metadata["source"] || {})["type"]
+  end
+
+  def data_root
+    (metadata["source"] || {})["root"]
   end
 
   def self.default_definition

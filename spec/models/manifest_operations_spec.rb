@@ -100,11 +100,11 @@ describe Manifest, validate_manifest: false do
             "indexed": true
           }]
         }
-      ), {xml: %(<Events>
+      ), {xml: %(
         <Event>
           <Patient name="Socrates" age="27"/>
         </Event>
-      </Events>)},
+      )},
       patient: {indexed: {"name" => "Socrates"}, pii: {}, custom: {}}
     end
 
@@ -1514,7 +1514,7 @@ describe Manifest, validate_manifest: false do
               }]
             }
           },
-          { xml: '<Events>
+          { xml: '
             <Event>
               <Test type="some_type">
                 <Assay code="flu-a">
@@ -1525,7 +1525,7 @@ describe Manifest, validate_manifest: false do
                 </Assay>
               </Test>
             </Event>
-          </Events>' },
+          ' },
           test: {indexed: {"results" => [{"assay_code" => "some_type - flu-a"}, {"assay_code" => "some_type - flu-b"}]}, pii: Hash.new, custom: Hash.new}
       end
 
