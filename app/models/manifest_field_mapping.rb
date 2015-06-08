@@ -92,7 +92,7 @@ class ManifestFieldMapping
     if node["hash"].present?
       value = traverse(node["hash"], data)
       return unless value
-      return EventEncryption.hash value
+      return MessageEncryption.hash value
     end
 
     if node["if"].present?
@@ -118,7 +118,7 @@ class ManifestFieldMapping
   def run_script(script, data)
     ctx = V8::Context.new
     begin
-      ctx["event"] = data
+      ctx["message"] = data
       ctx.eval(script)
     ensure
       ctx.dispose

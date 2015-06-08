@@ -13,8 +13,8 @@ describe TestResultQuery, elasticsearch: true do
   let(:second_user) {User.make}
 
   it "applies institution policy" do
-    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
-    TestResult.create_and_index({results:[condition: "mtb", result: :negative]}, {device_events:[DeviceEvent.make(device: non_user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_messages:[DeviceMessage.make(device: user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :negative]}, {device_messages:[DeviceMessage.make(device: non_user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
     client.indices.refresh index: non_user_device.institution.elasticsearch_index_name
@@ -26,12 +26,12 @@ describe TestResultQuery, elasticsearch: true do
   end
 
   it "delegates institution policy" do
-    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
-    TestResult.create_and_index({results:[condition: "mtb", result: :negative]}, {device_events:[DeviceEvent.make(device: third_user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_messages:[DeviceMessage.make(device: user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :negative]}, {device_messages:[DeviceMessage.make(device: third_user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 
-    grant(user, second_user, institution, QUERY_EVENT)
+    grant(user, second_user, institution, QUERY_TEST)
 
     query = TestResultQuery.new({condition: 'mtb'}, second_user)
 
@@ -51,7 +51,7 @@ describe TestResultQuery, elasticsearch: true do
   end
 
   it "should not access any test if has no policy" do
-    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_events:[DeviceEvent.make(device: user_device)]})
+    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_messages:[DeviceMessage.make(device: user_device)]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 

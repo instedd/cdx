@@ -19,7 +19,7 @@ class Manifest < ActiveRecord::Base
 
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
-  EVENT_TEMPLATE = {
+  MESSAGE_TEMPLATE = {
     "test" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
     "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
     "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
@@ -80,26 +80,26 @@ class Manifest < ActiveRecord::Base
   end
 
   def apply_to(data, device)
-    raise ManifestParsingError.empty_event if data.blank?
+    raise ManifestParsingError.empty_message if data.blank?
     raise ManifestParsingError.invalid_manifest(self) if self.invalid?
 
-    events = []
+    messages = []
     parser.load(data, data_root).each_with_index do |record, record_index|
       begin
-        event = EVENT_TEMPLATE.deep_dup
+        message = MESSAGE_TEMPLATE.deep_dup
         field_mapping.each do |scope, mappings|
-          event = mappings.inject(event) do |event, field|
-            ManifestField.new(self, field, scope, device).apply_to record, event
+          message = mappings.inject(message) do |message, field|
+            ManifestField.new(self, field, scope, device).apply_to record, message
           end
         end
-        events << event
+        messages << message
       rescue ManifestParsingError => err
         err.record_index = record_index + 1
         raise err
       end
     end
 
-    events
+    messages
   end
 
   def field_mapping
@@ -125,13 +125,13 @@ class Manifest < ActiveRecord::Base
   def parser
     @parser ||= case data_type
     when "json"
-      JsonEventParser.new
+      JsonMessageParser.new
     when "csv"
-      CSVEventParser.new metadata["source"]["separator"] || CSVEventParser::DEFAULT_SEPARATOR
+      CSVMessageParser.new metadata["source"]["separator"] || CSVMessageParser::DEFAULT_SEPARATOR
     when "headless_csv"
-      HeadlessCSVEventParser.new metadata["source"]["separator"] || CSVEventParser::DEFAULT_SEPARATOR
+      HeadlessCSVMessageParser.new metadata["source"]["separator"] || CSVMessageParser::DEFAULT_SEPARATOR
     when "xml"
-      XmlEventParser.new
+      XmlMessageParser.new
     else
       raise "unsupported source data type"
     end

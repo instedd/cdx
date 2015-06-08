@@ -589,14 +589,14 @@ describe Policy do
     end
   end
 
-  context "queryEvent" do
+  context "queryTest" do
     context "Allow" do
       let!(:laboratory) {Laboratory.make institution_id: institution.id}
       let!(:device) {Device.make laboratories: [laboratory], institution_id: institution.id}
 
       [Institution, Laboratory, Device].each do |resource|
-        it "allows a user to query events of it's own #{resource}" do
-          Policy.authorize(QUERY_EVENT, resource, user).should eq(resource.all)
+        it "allows a user to query tests of it's own #{resource}" do
+          Policy.authorize(QUERY_TEST, resource, user).should eq(resource.all)
         end
       end
     end
@@ -608,8 +608,8 @@ describe Policy do
       let!(:device2) { Device.create laboratories: [laboratory], institution_id: institution2.id }
 
       [Institution, Laboratory, Device].each do |resource|
-        it "forbids a user to query events of other user's #{resource}" do
-          Policy.authorize(QUERY_EVENT, resource, user).should eq([])
+        it "forbids a user to query tests of other user's #{resource}" do
+          Policy.authorize(QUERY_TEST, resource, user).should eq([])
         end
       end
     end

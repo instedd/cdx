@@ -2,7 +2,7 @@
 require 'spec_helper'
 require 'fileutils'
 
-describe DeviceEventImporter, elasticsearch: true do
+describe DeviceMessageImporter, elasticsearch: true do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
@@ -54,7 +54,7 @@ describe DeviceEventImporter, elasticsearch: true do
     it 'parses a csv from sync dir' do
       manifest
       write_file(%{error_code;result\n0;positive\n1;negative}, 'csv')
-      DeviceEventImporter.new.import_from sync_dir
+      DeviceMessageImporter.new.import_from sync_dir
 
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
@@ -70,7 +70,7 @@ describe DeviceEventImporter, elasticsearch: true do
 
       write_file(%{error_code;result\r\n0;positivo\r\n1;inválido\r\n}, 'csv', nil, 'UTF-16LE')
       CharDet.stub(:detect).and_return('encoding' => 'UTF-16LE', 'confidence' => 1.0)
-      DeviceEventImporter.new.import_from sync_dir
+      DeviceMessageImporter.new.import_from sync_dir
 
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
@@ -90,7 +90,7 @@ describe DeviceEventImporter, elasticsearch: true do
     it 'parses a json from sync dir' do
       manifest
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
-      DeviceEventImporter.new("*.json").import_from sync_dir
+      DeviceMessageImporter.new("*.json").import_from sync_dir
 
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
@@ -104,7 +104,7 @@ describe DeviceEventImporter, elasticsearch: true do
     it 'parses a json from sync dir registering multiple extensions' do
       manifest
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
-      DeviceEventImporter.new("*.{csv,json}").import_from sync_dir
+      DeviceMessageImporter.new("*.{csv,json}").import_from sync_dir
 
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
@@ -118,7 +118,7 @@ describe DeviceEventImporter, elasticsearch: true do
     it 'parses a json from sync dir registering multiple extensions using import single' do
       manifest
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json', 'mytestfile')
-      DeviceEventImporter.new("*.{csv,json}").import_single(sync_dir, File.join(sync_dir.inbox_path(device.uuid), "mytestfile.json"))
+      DeviceMessageImporter.new("*.{csv,json}").import_single(sync_dir, File.join(sync_dir.inbox_path(device.uuid), "mytestfile.json"))
 
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
       test = tests.first["_source"]
@@ -155,7 +155,7 @@ describe DeviceEventImporter, elasticsearch: true do
 
       it "parses csv in utf-16le" do
         copy_sample_csv 'epicenter_headless_sample_utf16.csv'
-        DeviceEventImporter.new("*.csv").import_from sync_dir
+        DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         tests = all_elasticsearch_tests_for(device.institution)
         tests.should have(18).items
@@ -169,7 +169,7 @@ describe DeviceEventImporter, elasticsearch: true do
 
       it 'parses csv' do
         copy_sample_csv 'genoscan_sample.csv'
-        DeviceEventImporter.new("*.csv").import_from sync_dir
+        DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
         tests.should have(13).items
@@ -194,7 +194,7 @@ describe DeviceEventImporter, elasticsearch: true do
 
       it 'parses csv' do
         copy_sample_csv 'epicenter_sample.csv'
-        DeviceEventImporter.new("*.csv").import_from sync_dir
+        DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
         tests.should have(29).items
@@ -221,7 +221,7 @@ describe DeviceEventImporter, elasticsearch: true do
 
       it 'parses csv' do
         copy_sample_csv 'epicenter_headless_sample.csv'
-        DeviceEventImporter.new("*.csv").import_from sync_dir
+        DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
         tests.should have(29).items
@@ -248,7 +248,7 @@ describe DeviceEventImporter, elasticsearch: true do
 
       it 'parses xml' do
         copy_sample_xml 'fio_sample.xml'
-        DeviceEventImporter.new("*.xml").import_from sync_dir
+        DeviceMessageImporter.new("*.xml").import_from sync_dir
 
         tests = all_elasticsearch_tests_for(device.institution)
         tests.should have(1).items

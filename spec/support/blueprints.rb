@@ -53,13 +53,13 @@ Patient.blueprint do
 end
 
 TestResult.blueprint do
-  device_events {[DeviceEvent.make]}
-  device {device_events.first.device}
+  device_messages {[DeviceMessage.make]}
+  device {device_messages.first.device}
   sample { Sample.make institution: device.institution }
   test_id { "test-#{Sham.sn}" }
 end
 
-DeviceEvent.blueprint do
+DeviceMessage.blueprint do
   device
 end
 

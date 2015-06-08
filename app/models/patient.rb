@@ -29,7 +29,7 @@ class Patient < ActiveRecord::Base
   end
 
   def plain_sensitive_data
-    @plain_sensitive_data ||= (Oj.load(EventEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
+    @plain_sensitive_data ||= (Oj.load(MessageEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
   end
 
   def patient_id
@@ -37,7 +37,7 @@ class Patient < ActiveRecord::Base
   end
 
   def self.find_by_pii(patient_id, institution_id)
-    self.find_by(patient_id_hash: EventEncryption.hash(patient_id.to_s), institution_id: institution_id)
+    self.find_by(patient_id_hash: MessageEncryption.hash(patient_id.to_s), institution_id: institution_id)
   end
 
 private
@@ -47,11 +47,11 @@ private
   end
 
   def encrypt
-    self.sensitive_data = EventEncryption.encrypt Oj.dump(self.plain_sensitive_data)
+    self.sensitive_data = MessageEncryption.encrypt Oj.dump(self.plain_sensitive_data)
     self
   end
 
   def ensure_patient_id_hash
-    self.patient_id_hash ||= EventEncryption.hash(self.plain_sensitive_data[:patient_id].to_s) if self.plain_sensitive_data[:patient_id]
+    self.patient_id_hash ||= MessageEncryption.hash(self.plain_sensitive_data[:patient_id].to_s) if self.plain_sensitive_data[:patient_id]
   end
 end

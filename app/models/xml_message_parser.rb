@@ -1,4 +1,4 @@
-class XmlEventParser
+class XmlMessageParser
   def lookup(path, data, root = data)
     if path.starts_with? "/"
       results = root.xpath(path[1..-1])

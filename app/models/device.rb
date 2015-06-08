@@ -6,7 +6,7 @@ class Device < ActiveRecord::Base
   belongs_to :institution
   has_and_belongs_to_many :laboratories
   has_many :test_results
-  has_many :device_events
+  has_many :device_messages
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
 
@@ -62,18 +62,18 @@ class Device < ActiveRecord::Base
   end
 
   def validate_authentication(token)
-    self.secret_key_hash == EventEncryption.hash(token)
+    self.secret_key_hash == MessageEncryption.hash(token)
   end
 
   def set_key
-    @plain_secret_key = EventEncryption.secure_random(9)
-    self.secret_key_hash = EventEncryption.hash(@plain_secret_key)
+    @plain_secret_key = MessageEncryption.secure_random(9)
+    self.secret_key_hash = MessageEncryption.hash(@plain_secret_key)
     self.ssh_key.try :destroy
     self.activation_token.try :destroy
   end
 
   def set_uuid
-    self.uuid = EventEncryption.secure_random(9)
+    self.uuid = MessageEncryption.secure_random(9)
   end
 
   def new_activation_token

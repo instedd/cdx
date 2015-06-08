@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::EventsController, elasticsearch: true, validate_manifest: false do
+describe Api::MessagesController, elasticsearch: true, validate_manifest: false do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
@@ -9,22 +9,22 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
   context "Authentication" do
 
-    def assert_event_created
-      event = DeviceEvent.first
-      event.device_id.should eq(device.id)
-      event.raw_data.should_not eq(data)
-      event.plain_text_data.should eq(data)
+    def assert_message_created
+      message = DeviceMessage.first
+      message.device_id.should eq(device.id)
+      message.raw_data.should_not eq(data)
+      message.plain_text_data.should eq(data)
     end
 
     def assert_nothing_created
-      DeviceEvent.count.should eq(0)
+      DeviceMessage.count.should eq(0)
     end
 
-    it "should create event authenticating via web" do
+    it "should create message authenticating via web" do
       sign_in user
       response = post :create, data, device_id: device.uuid
       response.status.should eq(200)
-      assert_event_created
+      assert_message_created
     end
 
     it "should fail without authentication" do
@@ -33,24 +33,24 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       assert_nothing_created
     end
 
-    it "should create event authenticating with basic auth" do
+    it "should create message authenticating with basic auth" do
       request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials('', device.plain_secret_key)
       response = post :create, data, device_id: device.uuid
       response.status.should eq(200)
-      assert_event_created
+      assert_message_created
     end
 
-    it "should create event authenticating via secret key" do
+    it "should create message authenticating via secret key" do
       response = post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
       response.status.should eq(200)
-      assert_event_created
+      assert_message_created
     end
 
-    it "should create event authenticating via secret key when signed in" do
+    it "should create message authenticating via secret key when signed in" do
       sign_in user
       response = post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
       response.status.should eq(200)
-      assert_event_created
+      assert_message_created
     end
 
     it "should fail auth if secret key is incorrect" do

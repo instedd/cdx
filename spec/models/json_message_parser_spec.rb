@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe JsonEventParser do
-  let(:parser) { JsonEventParser.new }
+describe JsonMessageParser do
+  let(:parser) { JsonMessageParser.new }
 
   it "looks up an element in the root" do
     data = {
