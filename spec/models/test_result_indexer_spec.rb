@@ -50,6 +50,8 @@ describe TestResultIndexer, elasticsearch: true do
         device_uuid: test.device.uuid,
         uuid: test.uuid,
         location_id: location.geo_id,
+        location_lat: location.lat,
+        location_lng: location.lng,
         parent_locations: [location.geo_id],
         laboratory_id: test.device.laboratories.first.id,
         institution_id: test.device.institution_id,
