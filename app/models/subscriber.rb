@@ -78,7 +78,7 @@ class Subscriber < ActiveRecord::Base
 
   def filter_test(indexed_test, fields)
     test = TestResult.includes(:sample, :device, :institution).find_by_uuid(indexed_test['uuid'])
-    merged_test = indexed_test.merge test.plain_sensitive_data.merge(test.sample.plain_sensitive_data)
+    merged_test = indexed_test.merge test.plain_sensitive_data.merge(test.sample.try(:plain_sensitive_data) || {})
     fields = Subscriber.available_fields if fields.nil? || fields.empty? # use all fields if none is specified
     fields_properties = self.class.default_schema['properties']
     filtered_test = {}
