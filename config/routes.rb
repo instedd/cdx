@@ -13,7 +13,7 @@ Cdp::Application.routes.draw do
         post 'generate_activation_token'
       end
       resources :ssh_keys, only: [:create, :destroy]
-      resources :device_events, only: [:index], path: 'events' do
+      resources :device_messages, only: [:index], path: 'messages' do
         member do
           get 'raw'
           post 'reprocess'
@@ -53,7 +53,7 @@ Cdp::Application.routes.draw do
       end
     end
     resources :devices, only: [] do
-      resources :events, only: [:create], shallow: true
+      resources :messages, only: [:create], shallow: true
     end
     resources :laboratories, only: :index
   end

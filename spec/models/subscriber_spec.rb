@@ -4,7 +4,7 @@ describe Subscriber, elasticsearch: true do
 
   let(:model){DeviceModel.make}
   let(:device){Device.make device_model: model}
-  let(:device_event){DeviceEvent.make(device: device)}
+  let(:device_message){DeviceMessage.make(device: device)}
   let(:institution){device.institution}
   let(:laboratory){device.laboratories.first}
 
@@ -100,7 +100,7 @@ describe Subscriber, elasticsearch: true do
   end
 
   def submit_test
-    TestResult.create_and_index({ results: [result: "positive", condition: "mtb"], patient_name: "jdoe" }, {device_events: [device_event]})
+    TestResult.create_and_index({ results: [result: "positive", condition: "mtb"], patient_name: "jdoe" }, {device_messages: [device_message]})
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 

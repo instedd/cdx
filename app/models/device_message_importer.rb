@@ -1,5 +1,5 @@
 # Imports plain files from sync dirs
-class DeviceEventImporter
+class DeviceMessageImporter
 
   attr_reader :pattern
 
@@ -18,19 +18,19 @@ class DeviceEventImporter
 
   def load_for_device(data, device_uuid)
     device = Device.includes(:manifests, :institution, :laboratories).find_by!(uuid: device_uuid)
-    device_event = DeviceEvent.new(device: device, plain_text_data: data)
-    device_event.save!
-    Rails.logger.debug("Saved device event #{device_event.id} for device #{device_uuid}")
+    device_message = DeviceMessage.new(device: device, plain_text_data: data)
+    device_message.save!
+    Rails.logger.debug("Saved device message #{device_message.id} for device #{device_uuid}")
 
-    if device_event.index_failed?
-      Rails.logger.warn "Parsing failed for device event #{device_event.id}"
+    if device_message.index_failed?
+      Rails.logger.warn "Parsing failed for device message #{device_message.id}"
     else
       begin
-        device_event.process
+        device_message.process
       rescue => ex
-        Rails.logger.error("Error processing device event #{device_event.id}: #{ex}\n #{ex.backtrace.join("\n")}")
+        Rails.logger.error("Error processing device message #{device_message.id}: #{ex}\n #{ex.backtrace.join("\n")}")
       else
-        Rails.logger.debug("Processed device event #{device_event.id}")
+        Rails.logger.debug("Processed device message #{device_message.id}")
       end
     end
   end

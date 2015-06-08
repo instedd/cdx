@@ -10,7 +10,7 @@ describe Device do
     let(:device) { Device.new }
 
     before(:each) do
-      EventEncryption.should_receive(:secure_random).and_return('abc')
+      MessageEncryption.should_receive(:secure_random).and_return('abc')
     end
 
     it 'should tell plain secret key' do
@@ -22,7 +22,7 @@ describe Device do
     it 'should store hashed secret key' do
       device.set_key
 
-      device.secret_key_hash.should eq(EventEncryption.hash 'abc')
+      device.secret_key_hash.should eq(MessageEncryption.hash 'abc')
     end
   end
 end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::EventsController, elasticsearch: true, validate_manifest: false do
+describe Api::MessagesController, elasticsearch: true, validate_manifest: false do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
@@ -18,14 +18,14 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
   context "Creation" do
 
-    it "should create event in the database" do
+    it "should create message in the database" do
       response = post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
       response.status.should eq(200)
 
-      event = DeviceEvent.first
-      event.device_id.should eq(device.id)
-      event.raw_data.should_not eq(data)
-      event.plain_text_data.should eq(data)
+      message = DeviceMessage.first
+      message.device_id.should eq(device.id)
+      message.raw_data.should_not eq(data)
+      message.plain_text_data.should eq(data)
     end
 
     it "should create test in elasticsearch" do
@@ -42,10 +42,10 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       response = post :create, datas, device_id: device.uuid, authentication_token: device.plain_secret_key
       response.status.should eq(200)
 
-      event = DeviceEvent.first
-      event.device_id.should eq(device.id)
-      event.raw_data.should_not eq(datas)
-      event.plain_text_data.should eq(datas)
+      message = DeviceMessage.first
+      message.device_id.should eq(device.id)
+      message.raw_data.should_not eq(datas)
+      message.plain_text_data.should eq(datas)
 
       TestResult.count.should eq(2)
     end
@@ -76,7 +76,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       test = TestResult.first
       test.test_id.should eq("1234")
 
-      Oj.load(DeviceEvent.first.plain_text_data)["age"].should eq(20)
+      Oj.load(DeviceMessage.first.plain_text_data)["age"].should eq(20)
 
       tests = all_elasticsearch_tests_for(institution)
       tests.size.should eq(1)
@@ -91,8 +91,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       test = TestResult.first
       test.test_id.should eq("1234")
 
-      DeviceEvent.count.should eq(2)
-      Oj.load(DeviceEvent.last.plain_text_data)["age"].should eq(30)
+      DeviceMessage.count.should eq(2)
+      Oj.load(DeviceMessage.last.plain_text_data)["age"].should eq(30)
 
       tests = all_elasticsearch_tests_for(institution)
       tests.size.should eq(1)

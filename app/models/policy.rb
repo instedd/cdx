@@ -30,8 +30,8 @@ class Policy < ActiveRecord::Base
     ASSIGN_DEVICE_LABORATORY = "#{PREFIX}:assignDeviceLaboratory" # This is not tested.
     REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey" # This is not tested.
     GENERATE_ACTIVATION_TOKEN = "#{PREFIX}:generateActivationToken" # This is not tested.
-    QUERY_EVENT = "#{PREFIX}:queryEvent"
-    REPORT_EVENT = "#{PREFIX}:reportEvent"
+    QUERY_TEST = "#{PREFIX}:queryTest"
+    REPORT_MESSAGE = "#{PREFIX}:reportMessage"
   end
 
   ACTIONS = [
@@ -49,8 +49,8 @@ class Policy < ActiveRecord::Base
     Actions::ASSIGN_DEVICE_LABORATORY,
     Actions::REGENERATE_DEVICE_KEY,
     Actions::GENERATE_ACTIVATION_TOKEN,
-    Actions::QUERY_EVENT,
-    Actions::REPORT_EVENT,
+    Actions::QUERY_TEST,
+    Actions::REPORT_MESSAGE,
   ]
 
   def self.delegable

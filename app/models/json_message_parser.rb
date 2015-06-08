@@ -1,4 +1,4 @@
-class JsonEventParser
+class JsonMessageParser
 
   PATH_ROOT_TOKEN = "$"
 

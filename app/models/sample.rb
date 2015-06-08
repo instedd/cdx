@@ -1,5 +1,5 @@
 class Sample < ActiveRecord::Base
-  include EventEncryption
+  include MessageEncryption
   has_many :test_results, dependent: :restrict_with_error
   belongs_to :institution
   belongs_to :patient
@@ -54,7 +54,7 @@ class Sample < ActiveRecord::Base
   end
 
   def plain_sensitive_data
-    @plain_sensitive_data ||= (Oj.load(EventEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
+    @plain_sensitive_data ||= (Oj.load(MessageEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
   end
 
   def sample_uid
@@ -62,11 +62,11 @@ class Sample < ActiveRecord::Base
   end
 
   def self.find_by_pii(sample_uid, institution_id)
-    self.find_by(sample_uid_hash: EventEncryption.hash(sample_uid.to_s), institution_id: institution_id)
+    self.find_by(sample_uid_hash: MessageEncryption.hash(sample_uid.to_s), institution_id: institution_id)
   end
 
   def encrypt
-    self.sensitive_data = EventEncryption.encrypt Oj.dump(self.plain_sensitive_data)
+    self.sensitive_data = MessageEncryption.encrypt Oj.dump(self.plain_sensitive_data)
     self
   end
 
@@ -75,6 +75,6 @@ class Sample < ActiveRecord::Base
   end
 
   def ensure_sample_uid
-    self.sample_uid_hash ||= EventEncryption.hash(self.plain_sensitive_data[:sample_uid].to_s) if self.plain_sensitive_data[:sample_uid]
+    self.sample_uid_hash ||= MessageEncryption.hash(self.plain_sensitive_data[:sample_uid].to_s) if self.plain_sensitive_data[:sample_uid]
   end
 end

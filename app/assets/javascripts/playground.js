@@ -14,18 +14,18 @@ $(function() {
       device = $("#device").val();
       data = $("#data").val();
       $.ajax({
-        url: "/api/devices/" + device + "/events",
+        url: "/api/devices/" + device + "/messages",
         type: "POST",
         data: data,
         contentType: false,
         success: function(data, textStatus, jqXHR) {
           $create_button.prop("disabled", false);
           $create_button.val("Created!");
-          setTimeout(function() { $create_button.val("Create another event"); }, 1000);
+          setTimeout(function() { $create_button.val("Create another message"); }, 1000);
         },
         error: function(response) {
           $results_div.html("<p> Error: " + errorMessageFor(response) + "</p>");
-          $create_button.val("Create another event");
+          $create_button.val("Create another message");
           setTimeout(function() { $create_button.prop("disabled", false); }, 1000);
         }
       });

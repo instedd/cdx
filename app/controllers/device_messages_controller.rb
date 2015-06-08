@@ -1,4 +1,4 @@
-class DeviceEventsController < ApplicationController
+class DeviceMessagesController < ApplicationController
   layout "institutions"
   set_institution_tab :devices
 
@@ -6,7 +6,7 @@ class DeviceEventsController < ApplicationController
 
   before_filter :load_institution
   before_filter :load_device
-  before_filter :load_event, only: [:raw, :reprocess]
+  before_filter :load_message, only: [:raw, :reprocess]
 
   before_filter do
     add_breadcrumb @institution.name, institution_path(@institution)
@@ -15,9 +15,9 @@ class DeviceEventsController < ApplicationController
   end
 
   def index
-    add_breadcrumb 'Events', institution_device_device_events_path(@institution, @device)
+    add_breadcrumb 'Messages', institution_device_device_messages_path(@institution, @device)
 
-    @events = @device.device_events
+    @messages = @device.device_messages
   end
 
   def raw
@@ -32,13 +32,13 @@ class DeviceEventsController < ApplicationController
       ['txt', 'text/plain']
     end
 
-    send_data @event.plain_text_data, filename: "event_#{@event.id}.#{ext}", type: type
+    send_data @message.plain_text_data, filename: "message_#{@message.id}.#{ext}", type: type
   end
 
   def reprocess
-    @event.reprocess
-    redirect_to institution_device_device_events_path(@institution, @device),
-                notice: 'The event will be reprocessed'
+    @message.reprocess
+    redirect_to institution_device_device_messages_path(@institution, @device),
+                notice: 'The message will be reprocessed'
   end
 
   private
@@ -53,7 +53,7 @@ class DeviceEventsController < ApplicationController
     authorize_resource(@device, READ_DEVICE)
   end
 
-  def load_event
-    @event = @device.device_events.find(params[:id])
+  def load_message
+    @message = @device.device_messages.find(params[:id])
   end
 end

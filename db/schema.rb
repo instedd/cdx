@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150604132909) do
+ActiveRecord::Schema.define(version: 20150608182846) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(version: 20150604132909) do
 
   add_index "activations", ["activation_token_id"], name: "index_activations_on_activation_token_id", unique: true, using: :btree
 
-  create_table "device_events", force: true do |t|
+  create_table "device_messages", force: true do |t|
     t.binary   "raw_data"
     t.integer  "device_id"
     t.boolean  "index_failed"
@@ -42,15 +42,15 @@ ActiveRecord::Schema.define(version: 20150604132909) do
     t.text     "index_failure_data"
   end
 
-  add_index "device_events", ["device_id"], name: "index_device_events_on_device_id", using: :btree
+  add_index "device_messages", ["device_id"], name: "index_device_messages_on_device_id", using: :btree
 
-  create_table "device_events_test_results", force: true do |t|
-    t.integer "device_event_id"
+  create_table "device_messages_test_results", force: true do |t|
+    t.integer "device_message_id"
     t.integer "test_result_id"
   end
 
-  add_index "device_events_test_results", ["device_event_id"], name: "index_device_events_test_results_on_device_event_id", using: :btree
-  add_index "device_events_test_results", ["test_result_id"], name: "index_device_events_test_results_on_test_result_id", using: :btree
+  add_index "device_messages_test_results", ["device_message_id"], name: "index_device_messages_test_results_on_device_message_id", using: :btree
+  add_index "device_messages_test_results", ["test_result_id"], name: "index_device_messages_test_results_on_test_result_id", using: :btree
 
   create_table "device_models", force: true do |t|
     t.string   "name"

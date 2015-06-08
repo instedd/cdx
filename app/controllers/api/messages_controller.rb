@@ -1,4 +1,4 @@
-class Api::EventsController < ApiController
+class Api::MessagesController < ApiController
   wrap_parameters false
   skip_before_action :authenticate_api_user!, only: :create
   skip_before_action :load_current_user_policies, only: :create
@@ -14,17 +14,17 @@ class Api::EventsController < ApiController
 
     if authenticate_create(device)
       data = request.body.read rescue nil
-      device_event = DeviceEvent.new(device: device, plain_text_data: data)
+      device_message = DeviceMessage.new(device: device, plain_text_data: data)
 
-      if device_event.save
-        if device_event.index_failed?
-          render :status => :unprocessable_entity, :json => { :errors => device_event.index_failure_reason }
+      if device_message.save
+        if device_message.index_failed?
+          render :status => :unprocessable_entity, :json => { :errors => device_message.index_failure_reason }
         else
-          device_event.process
-          render :status => :ok, :json => { :events => device_event.parsed_events }
+          device_message.process
+          render :status => :ok, :json => { :messages => device_message.parsed_messages }
         end
       else
-        render :status => :unprocessable_entity, :json => { :errors => device_event.errors.full_messages.join(', ') }
+        render :status => :unprocessable_entity, :json => { :errors => device_message.errors.full_messages.join(', ') }
       end
     else
       head :unauthorized

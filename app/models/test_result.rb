@@ -1,5 +1,5 @@
 class TestResult < ActiveRecord::Base
-  has_and_belongs_to_many :device_events
+  has_and_belongs_to_many :device_messages
   belongs_to :device
   has_one :institution, through: :device
   belongs_to :sample
@@ -26,7 +26,7 @@ class TestResult < ActiveRecord::Base
     self.custom_fields.deep_merge_not_nil!(test.custom_fields)
     self.indexed_fields.deep_merge_not_nil!(test.indexed_fields)
     self.sample_id = test.sample_id unless test.sample_id.blank?
-    self.device_events |= test.device_events
+    self.device_messages |= test.device_messages
     self
   end
 
@@ -134,7 +134,7 @@ class TestResult < ActiveRecord::Base
   end
 
   def plain_sensitive_data
-    @plain_sensitive_data ||= (Oj.load(EventEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
+    @plain_sensitive_data ||= (Oj.load(MessageEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
   end
 
   def pii_data
@@ -152,7 +152,7 @@ class TestResult < ActiveRecord::Base
   end
 
   def encrypt
-    self.sensitive_data = EventEncryption.encrypt Oj.dump(self.plain_sensitive_data)
+    self.sensitive_data = MessageEncryption.encrypt Oj.dump(self.plain_sensitive_data)
     self
   end
 

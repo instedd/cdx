@@ -77,7 +77,7 @@ describe Manifest, validate_manifest: false do
           "patient": [{
             "target_field": "name",
             "source": {
-              "script": "event.first_name + ' ' + event.last_name"
+              "script": "message.first_name + ' ' + message.last_name"
             },
             "core": true,
             "pii": false,
@@ -94,16 +94,16 @@ describe Manifest, validate_manifest: false do
           "patient": [{
             "target_field": "name",
             "source": {
-              "script": "event.xpath('Patient/@name').first().value"
+              "script": "message.xpath('Patient/@name').first().value"
             },
             "core": true,
             "indexed": true
           }]
         }
       ), {xml: %(
-        <Event>
+        <Message>
           <Patient name="Socrates" age="27"/>
-        </Event>
+        </Message>
       )},
       patient: {indexed: {"name" => "Socrates"}, pii: {}, custom: {}}
     end
@@ -1515,7 +1515,7 @@ describe Manifest, validate_manifest: false do
             }
           },
           { xml: '
-            <Event>
+            <Message>
               <Test type="some_type">
                 <Assay code="flu-a">
                   <Result>positive</Result>
@@ -1524,7 +1524,7 @@ describe Manifest, validate_manifest: false do
                   <Result>negative</Result>
                 </Assay>
               </Test>
-            </Event>
+            </Message>
           ' },
           test: {indexed: {"results" => [{"assay_code" => "some_type - flu-a"}, {"assay_code" => "some_type - flu-b"}]}, pii: Hash.new, custom: Hash.new}
       end

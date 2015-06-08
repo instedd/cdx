@@ -1,15 +1,15 @@
-# Given a device event, creates the associated events in the DB with their samples, and indexes them
-class DeviceEventProcessor
+# Given a device message, creates the associated messages in the DB with their samples, and indexes them
+class DeviceMessageProcessor
 
-  attr_reader :device_event
+  attr_reader :device_message
 
-  def initialize device_event
-    @device_event = device_event
+  def initialize device_message
+    @device_message = device_message
   end
 
   def process
-    @device_event.parsed_events.map do |parsed_event|
-      SingleEventProcessor.new(self, parsed_event).process
+    @device_message.parsed_messages.map do |parsed_message|
+      SingleMessageProcessor.new(self, parsed_message).process
     end
   end
 
@@ -18,27 +18,27 @@ class DeviceEventProcessor
   end
 
   def index_name
-    @device_event.institution.elasticsearch_index_name
+    @device_message.institution.elasticsearch_index_name
   end
 
   def device
-    @device_event.device
+    @device_message.device
   end
 
   def institution
-    @device_event.institution
+    @device_message.institution
   end
 
 
-  class SingleEventProcessor
+  class SingleMessageProcessor
 
-    attr_reader :parsed_event, :parent
+    attr_reader :parsed_message, :parent
 
-    delegate :index_name, :device, :device_event, :client, to: :parent
+    delegate :index_name, :device, :device_message, :client, to: :parent
 
-    def initialize(device_event_processor, parsed_event)
-      @parent = device_event_processor
-      @parsed_event = parsed_event
+    def initialize(device_message_processor, parsed_message)
+      @parent = device_message_processor
+      @parsed_message = parsed_message
     end
 
     def process
@@ -70,10 +70,10 @@ class DeviceEventProcessor
     private
 
     def find_or_initialize_test
-      test = TestResult.new device_events: [device_event],
-                            plain_sensitive_data: parsed_event[:test][:pii],
-                            custom_fields: parsed_event[:test][:custom],
-                            test_id: parsed_event[:test][:indexed][:test_id],
+      test = TestResult.new device_messages: [device_message],
+                            plain_sensitive_data: parsed_message[:test][:pii],
+                            custom_fields: parsed_message[:test][:custom],
+                            test_id: parsed_message[:test][:indexed][:test_id],
                             device: device
 
       if test.test_id && existing = TestResult.find_by(test_id: test.test_id, device_id: test.device_id)
@@ -85,9 +85,9 @@ class DeviceEventProcessor
     end
 
     def find_or_initialize_sample
-      pii = parsed_event[:sample][:pii].with_indifferent_access
-      custom_fields = parsed_event[:sample][:custom].with_indifferent_access
-      indexed_fields = parsed_event[:sample][:indexed].with_indifferent_access
+      pii = parsed_message[:sample][:pii].with_indifferent_access
+      custom_fields = parsed_message[:sample][:custom].with_indifferent_access
+      indexed_fields = parsed_message[:sample][:indexed].with_indifferent_access
       sample_uid = pii[:sample_uid]
 
       sample = Sample.new plain_sensitive_data: pii,
@@ -105,9 +105,9 @@ class DeviceEventProcessor
     end
 
     def find_or_initialize_patient
-      pii = parsed_event[:patient][:pii].with_indifferent_access
-      custom_fields = parsed_event[:patient][:custom].with_indifferent_access
-      indexed_fields = parsed_event[:patient][:indexed].with_indifferent_access
+      pii = parsed_message[:patient][:pii].with_indifferent_access
+      custom_fields = parsed_message[:patient][:custom].with_indifferent_access
+      indexed_fields = parsed_message[:patient][:indexed].with_indifferent_access
       patient_id = pii[:patient_id]
 
       patient = Patient.new plain_sensitive_data: pii,
@@ -184,7 +184,7 @@ class DeviceEventProcessor
     end
 
     def index_test(test, is_new)
-      indexer = TestResultIndexer.new(parsed_event[:test][:indexed], test)
+      indexer = TestResultIndexer.new(parsed_message[:test][:indexed], test)
       is_new ? indexer.index : indexer.update
     end
 
