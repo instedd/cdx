@@ -170,8 +170,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution, patient: patient)
 
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "3", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '3', device: device})
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "3", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '3', patient: patient, device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', patient: patient, device: device})
 
     refresh_indices institution.elasticsearch_index_name
 
@@ -203,8 +203,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution, patient: patient)
 
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '4', device: device})
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '4', patient: patient, device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', patient: patient, device: device})
 
     refresh_indices
 
@@ -237,8 +237,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution)
     sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution, patient: patient)
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '4', device: device})
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '4', patient: patient, device: device})
+    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', patient: patient, device: device})
 
     refresh_indices
 
@@ -420,7 +420,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
         test = TestResult.first
         sample = test.sample
 
-        test.patient.should be_nil
+        test.patient.should eq(patient)
         sample.patient.should eq(patient)
 
         sample.plain_sensitive_data.should eq({
@@ -600,6 +600,21 @@ describe DeviceMessageProcessor, elasticsearch: true do
         test_1.reload.sample.sample_uid.should eq('def9772')
         test_2.reload.sample.sample_uid.should eq('abc4002')
       end
+
+      it "should assign existing sample's patient to the test" do
+        patient = Patient.make(plain_sensitive_data: {patient_id: '8000'}, institution: device_message.institution)
+        Sample.make(plain_sensitive_data: {sample_uid: 'abc4002'}, patient: patient, institution: device_message.institution)
+
+        device_message_processor.process
+
+        TestResult.count.should eq(1)
+        Sample.count.should eq(1)
+        Patient.count.should eq(1)
+
+        test = TestResult.first
+        test.patient.should eq(test.sample.patient)
+      end
+
     end
 
     context 'without patient id' do
@@ -679,7 +694,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
         )
 
         TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
-          sample: sample, test_id: '4', device: device
+          sample: sample, test_id: '4', patient: patient, device: device
         })
 
         device_message_processor.process
@@ -1003,6 +1018,22 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test_1.reload.patient.patient_id.should eq('9000')
         test_2.patient.patient_id.should eq('8000')
+      end
+
+      it 'should create patient and store reference in test and sample' do
+        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+          test_id: '4', device: device
+        })
+
+        device_message_processor.process
+
+        TestResult.count.should eq(1)
+        Sample.count.should eq(1)
+        Patient.count.should eq(1)
+
+        test = TestResult.first
+
+        test.patient.should eq(test.sample.patient)
       end
     end
 

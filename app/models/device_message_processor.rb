@@ -141,6 +141,7 @@ class DeviceMessageProcessor
         if sample.sample_uid.present?
           test.extract_sample_data_into sample
           test.sample = sample
+          test.patient = sample.patient unless test.patient.present?
         else
           test.add_sample_data sample
         end

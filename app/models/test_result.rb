@@ -8,6 +8,7 @@ class TestResult < ActiveRecord::Base
   serialize :indexed_fields
   validates_presence_of :device
   validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
+  validate :same_patient_in_sample
 
   before_create :generate_uuid
   before_save :encrypt
@@ -50,7 +51,6 @@ class TestResult < ActiveRecord::Base
   def extract_sample_data_into(sample)
     if self.patient_id.present?
       sample.patient_id = self.patient_id
-      self.patient_id = nil
     end
 
     sample.plain_sensitive_data.reverse_deep_merge! (self.plain_sensitive_data[:sample] || {})
@@ -117,19 +117,14 @@ class TestResult < ActiveRecord::Base
   end
 
   def current_patient
-    if self.sample.present? && self.sample.patient.present?
-      self.sample.patient
-    else
-      self.patient
-    end
+    self.patient
   end
 
   def current_patient=(patient)
+    self.patient = patient
     if self.sample.present?
       self.sample.patient = patient
       self.sample.save!
-    else
-      self.patient = patient
     end
   end
 
@@ -163,5 +158,14 @@ class TestResult < ActiveRecord::Base
   def self.query params, user
     TestResultQuery.new params, user
   end
+
+  private
+
+  def same_patient_in_sample
+    if self.sample.present? && self.patient != self.sample.patient
+      errors.add(:patient_id, "should match sample's patient")
+    end
+  end
+
 end
 
