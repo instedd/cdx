@@ -95,6 +95,10 @@ When querying from the query string the _'+'_ sign must be escaped as _'%2B'_
 
 `/tests?test_type=qc`
 
+* `sample` - filter tests by sample id
+
+`/tests?sample=475`
+
 ## Multiple Values
 
 With the exception of _since_, _until_, _min_age_ and _max_age_, all the fields can accept multiple values using a comma as a separator:
