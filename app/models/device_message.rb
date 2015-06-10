@@ -1,9 +1,9 @@
-class DeviceEvent < ActiveRecord::Base
+class DeviceMessage < ActiveRecord::Base
   belongs_to :device
   has_one :institution, through: :device
   has_and_belongs_to_many :test_results
 
-  before_save :parsed_events
+  before_save :parsed_messages
   before_save :encrypt
 
   store :index_failure_data, coder: JSON
@@ -11,11 +11,11 @@ class DeviceEvent < ActiveRecord::Base
   attr_writer :plain_text_data
 
   def plain_text_data
-    @plain_text_data ||= EventEncryption.decrypt self.raw_data
+    @plain_text_data ||= MessageEncryption.decrypt self.raw_data
   end
 
-  def parsed_events
-    @parsed_events ||= (device.try(:current_manifest) || Manifest.default).apply_to(plain_text_data, device).map(&:with_indifferent_access)
+  def parsed_messages
+    @parsed_messages ||= (device.try(:current_manifest) || Manifest.default).apply_to(plain_text_data, device).map(&:with_indifferent_access)
   rescue ManifestParsingError => err
     self.index_failed = true # TODO: We are just parsing here, is this the correct place to set this flag?
     self.index_failure_reason = err.message
@@ -24,11 +24,11 @@ class DeviceEvent < ActiveRecord::Base
   end
 
   def process
-    DeviceEventProcessor.new(self).process
+    DeviceMessageProcessor.new(self).process
   end
 
   def encrypt
-    self.raw_data = EventEncryption.encrypt self.plain_text_data
+    self.raw_data = MessageEncryption.encrypt self.plain_text_data
     self
   end
 

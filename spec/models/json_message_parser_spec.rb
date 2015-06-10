@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe JsonEventParser do
-  let(:parser) { JsonEventParser.new }
+describe JsonMessageParser do
+  let(:parser) { JsonMessageParser.new }
 
   it "looks up an element in the root" do
     data = {
@@ -61,6 +61,23 @@ describe JsonEventParser do
     parser.lookup("nested_object.a_key", data, data).should be_nil
     parser.lookup("a_key", data["nested_object"], data).should be_nil
     parser.lookup("$.a_key", data["nested_object"], data).should eq("it's value")
+  end
+
+  it "parses using a root path" do
+    data = {
+      'root_key' => 'root_value',
+      'children' => [
+        {
+          'children_1_key' => 'children_1_value'
+        },
+        {
+          'children_2_key' => 'children_2_value'
+        }
+      ]
+    }
+
+    parsed_data = parser.load(Oj.dump(data), 'children')
+    parsed_data.should eq(data['children'])
   end
 
 end

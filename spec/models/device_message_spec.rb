@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe DeviceEvent, elasticsearch: true do
+describe DeviceMessage, elasticsearch: true do
   let(:device) {Device.make}
 
-  it 'stores failed events with raw data when it hits an issue parsing a manifest' do
+  it 'stores failed messages with raw data when it hits an issue parsing a manifest' do
     manifest = Manifest.create! definition: %{
       {
         "metadata": {
@@ -23,15 +23,15 @@ describe DeviceEvent, elasticsearch: true do
 
     json = %{{ "error_code": "foo" }}
 
-    event = DeviceEvent.new(device:device, plain_text_data: json)
+    message = DeviceMessage.new(device:device, plain_text_data: json)
 
-    expect(event.save).to be_true
-    expect(event.index_failed?).to be_true
-    expect(event.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "error_code").message)
-    expect(event.index_failure_data[:target_field]).to eq('error_code')
+    expect(message.save).to be_true
+    expect(message.index_failed?).to be_true
+    expect(message.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "error_code").message)
+    expect(message.index_failure_data[:target_field]).to eq('error_code')
   end
 
-  it "stores failed events when the string 'null' is passed as value" do
+  it "stores failed messages when the string 'null' is passed as value" do
     manifest = Manifest.create! definition: %{
       {
         "metadata": {
@@ -52,12 +52,12 @@ describe DeviceEvent, elasticsearch: true do
 
     json = %{{ "result": "null" }}
 
-    event = DeviceEvent.new(device:device, plain_text_data: json)
+    message = DeviceMessage.new(device:device, plain_text_data: json)
 
-    expect(event.save).to be_true
-    expect(event.index_failed?).to be_true
-    expect(event.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'results[*].result'")
-    expect(event.index_failure_data[:target_field]).to eq('results[*].result')
+    expect(message.save).to be_true
+    expect(message.index_failed?).to be_true
+    expect(message.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'results[*].result'")
+    expect(message.index_failure_data[:target_field]).to eq('results[*].result')
   end
 
   it 'parses a csv with a single row' do
@@ -88,32 +88,32 @@ describe DeviceEvent, elasticsearch: true do
 
     csv = %{error_code,result\n0,positive}
 
-    event = DeviceEvent.new(device:device, plain_text_data: csv)
+    message = DeviceMessage.new(device:device, plain_text_data: csv)
 
-    expect(event.save).to be_true
-    expect(event.index_failed?).to be_false
+    expect(message.save).to be_true
+    expect(message.index_failed?).to be_false
   end
 
   context 'reprocess' do
-    let(:device_event) { DeviceEvent.make }
+    let(:device_message) { DeviceMessage.make }
 
     before(:each) do
-      device_event.should_receive(:clear_errors)
-      device_event.should_receive(:save)
+      device_message.should_receive(:clear_errors)
+      device_message.should_receive(:save)
     end
 
     it 'should process if index did not failed' do
-      device_event.should_receive(:index_failed).and_return(false)
-      device_event.should_receive(:process)
+      device_message.should_receive(:index_failed).and_return(false)
+      device_message.should_receive(:process)
 
-      device_event.reprocess
+      device_message.reprocess
     end
 
     it "should not process if index failed" do
-      device_event.should_receive(:index_failed).and_return(true)
-      device_event.should_not_receive(:process)
+      device_message.should_receive(:index_failed).and_return(true)
+      device_message.should_not_receive(:process)
 
-      device_event.reprocess
+      device_message.reprocess
     end
   end
 end

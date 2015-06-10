@@ -54,6 +54,8 @@ class TestResultIndexer
     end
 
     location_id = location.try(:geo_id)
+    location_lat = location.try(:lat)
+    location_lng = location.try(:lng)
     parent_locations = location.try(:self_and_ancestors) || []
     parent_locations_id = parent_locations.map(&:geo_id)
     admin_levels = Hash[parent_locations.map { |l| ["admin_level_#{l.admin_level}", l.geo_id] }]
@@ -72,6 +74,8 @@ class TestResultIndexer
           id: location_id,
           parents: parent_locations_id,
           admin_levels: admin_levels,
+          lat: location_lat,
+          lng: location_lng
         },
         institution_id: device.institution_id,
         laboratory_id: laboratory_id

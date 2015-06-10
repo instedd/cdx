@@ -130,7 +130,7 @@ describe ManifestFieldMapping do
 
     let(:manifest) {
       manifest = double()
-      manifest.stub(:parser) { JsonEventParser.new }
+      manifest.stub(:parser) { JsonMessageParser.new }
       manifest
     }
 

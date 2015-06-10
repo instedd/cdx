@@ -1,4 +1,4 @@
-class XmlEventParser
+class XmlMessageParser
   def lookup(path, data, root = data)
     if path.starts_with? "/"
       results = root.xpath(path[1..-1])
@@ -18,9 +18,14 @@ class XmlEventParser
     results.size == 1 ? results.first : results
   end
 
-  def load(data)
-    Nokogiri::XML(data) do |config|
+  def load(data, root_path = nil)
+    data = Nokogiri::XML(data) do |config|
       config.noblanks.strict
-    end.root.children
+    end
+    if root_path.present?
+      self.lookup(root_path, data).children
+    else
+      data.children
+    end
   end
 end

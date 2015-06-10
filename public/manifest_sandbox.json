@@ -64,9 +64,9 @@
         "indexed" : false
       }
     ],
-  "event" : {
+  "test" : {
     "root_path" : "tests", // only if multiple
-    "fields": [ // if not multiple, event will be the fields array directly
+    "fields": [ // if not multiple, test will be the fields array directly
       {
         "target_field": "start_time",
         "source" : {"lookup" : "start_time"},
@@ -75,7 +75,7 @@
         "type" : "date"
       },
       {
-        "target_field": "event_id",
+        "target_field": "test_id",
         "source" : {"lookup" : "event_id"},
         "type": "integer",
         "core" : true,
@@ -102,7 +102,7 @@
         }
       },
       {
-        "target_field": "events[*].results[*].result",
+        "target_field": "tests[*].results[*].result",
         "source" : [
             [{"lookup" : "MGIT"}],
             [{"lookup" : "LG"}]
@@ -113,7 +113,7 @@
         "type" : "string"
       },
       {
-        "target_field": "events[*].results[*].condition",
+        "target_field": "tests[*].results[*].condition",
         "source" : [ "mtb", "mtb" ],
         "core" : true,
         "indexed" : false,
@@ -121,7 +121,7 @@
         "type" : "string"
       },
       {
-        "target_field": "events[*].test_type",
+        "target_field": "tests[*].test_type",
         "source" : [ "MGIT", "LG" ],
         "core" : true,
         "indexed" : false,

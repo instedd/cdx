@@ -2,7 +2,7 @@ class TestResultQuery
   include Policy::Actions
 
   def initialize params, user
-    institutions = Policy.authorize(QUERY_EVENT, Institution, user, user.policies)
+    institutions = Policy.authorize(QUERY_TEST, Institution, user, user.policies)
 
     indices = institutions.map &:elasticsearch_index_name
 

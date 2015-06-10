@@ -1,5 +1,5 @@
 class TestResult < ActiveRecord::Base
-  has_and_belongs_to_many :device_events
+  has_and_belongs_to_many :device_messages
   belongs_to :device
   has_one :institution, through: :device
   belongs_to :sample
@@ -8,6 +8,7 @@ class TestResult < ActiveRecord::Base
   serialize :indexed_fields
   validates_presence_of :device
   validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
+  validate :same_patient_in_sample
 
   before_create :generate_uuid
   before_save :encrypt
@@ -26,7 +27,7 @@ class TestResult < ActiveRecord::Base
     self.custom_fields.deep_merge_not_nil!(test.custom_fields)
     self.indexed_fields.deep_merge_not_nil!(test.indexed_fields)
     self.sample_id = test.sample_id unless test.sample_id.blank?
-    self.device_events |= test.device_events
+    self.device_messages |= test.device_messages
     self
   end
 
@@ -47,7 +48,6 @@ class TestResult < ActiveRecord::Base
   def extract_sample_data_into(sample)
     if self.patient_id.present?
       sample.patient_id = self.patient_id
-      self.patient_id = nil
     end
 
     sample.plain_sensitive_data[:sample].reverse_deep_merge!(self.plain_sensitive_data[:sample] || {})
@@ -108,24 +108,19 @@ class TestResult < ActiveRecord::Base
   end
 
   def current_patient
-    if self.sample.present? && self.sample.patient.present?
-      self.sample.patient
-    else
-      self.patient
-    end
+    self.patient
   end
 
   def current_patient=(patient)
+    self.patient = patient
     if self.sample.present?
       self.sample.patient = patient
       self.sample.save!
-    else
-      self.patient = patient
     end
   end
 
   def plain_sensitive_data
-    @plain_sensitive_data ||= (Oj.load(EventEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
+    @plain_sensitive_data ||= (Oj.load(MessageEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
   end
 
   def pii_data
@@ -143,7 +138,7 @@ class TestResult < ActiveRecord::Base
   end
 
   def encrypt
-    self.sensitive_data = EventEncryption.encrypt Oj.dump(self.plain_sensitive_data)
+    self.sensitive_data = MessageEncryption.encrypt Oj.dump(self.plain_sensitive_data)
     self
   end
 
@@ -154,5 +149,14 @@ class TestResult < ActiveRecord::Base
   def self.query params, user
     TestResultQuery.new params, user
   end
+
+  private
+
+  def same_patient_in_sample
+    if self.sample.present? && self.patient != self.sample.patient
+      errors.add(:patient_id, "should match sample's patient")
+    end
+  end
+
 end
 

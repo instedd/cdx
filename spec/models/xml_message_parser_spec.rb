@@ -1,29 +1,47 @@
 require 'spec_helper'
 
-describe XmlEventParser do
+describe XmlMessageParser do
 
-  let(:parser) { XmlEventParser.new }
+  let(:parser) { XmlMessageParser.new }
+
   let(:xml) do
     <<-XML
-      <Events>
-        <Event>
+      <Message>
+        <Patient name="Socrates" age="27"/>
+        <SampleId>123</SampleId>
+        <Result>FLU</Result>
+        <Result>H1N1</Result>
+      </Message>
+    XML
+  end
+
+  let(:xml_with_children) do
+    <<-XML
+      <Messages>
+        <Message>
           <Patient name="Socrates" age="27"/>
           <SampleId>123</SampleId>
           <Result>FLU</Result>
           <Result>H1N1</Result>
-        </Event>
-        <Event>
+        </Message>
+        <Message>
           <Patient name="Plato" age="33"/>
           <SampleId>456</SampleId>
-        </Event>
-      </Events>
+        </Message>
+      </Messages>
     XML
   end
 
-  it 'should return root children as data' do
+  it 'should return root as data' do
     data = parser.load(xml)
+    data.size.should eq(1)
+    data.map(&:name).should eq(['Message'])
+  end
+
+  it 'should return root using a root path' do
+    data = parser.load(xml_with_children, 'Messages')
     data.size.should eq(2)
-    data.map(&:name).should eq(['Event'] * 2)
+    data.map(&:name).should eq(['Message'] * 2)
   end
 
   it 'should query attributes' do
@@ -43,8 +61,8 @@ describe XmlEventParser do
 
   let(:complex_xml) do
     <<-XML
-      <Events>
-        <Event>
+      <Messages>
+        <Message>
           <Patient name="Socrates" age="27"/>
           <SampleId>123</SampleId>
           <Result>
@@ -55,23 +73,23 @@ describe XmlEventParser do
             <Name>H1N1</Name>
             <Code>h1n1</Code>
           </Result>
-        </Event>
-        <Event>
+        </Message>
+        <Message>
           <Patient name="Plato" age="33"/>
           <SampleId>456</SampleId>
-        </Event>
+        </Message>
         <ManufacturerId>AcmeInc</ManufacturerId>
-      </Events>
+      </Messages>
     XML
   end
 
   it 'should lookup from the root element' do
-    root = parser.load(complex_xml)
+    root = parser.load(complex_xml, 'Messages')
     data = root.first.xpath('Result[2]')
-    parser.lookup("Name/text()", data, root).should eq('H1N1')
+    parser.lookup("Name/text()", data, root.first).should eq('H1N1')
     # TODO: We shouldn't need the `..` here, but we're assuming there's always
     # a root element with elements inside
-    parser.lookup("/../ManufacturerId/text()", data, root).should eq('AcmeInc')
+    parser.lookup("/../ManufacturerId/text()", data, root.first).should eq('AcmeInc')
   end
 
 end

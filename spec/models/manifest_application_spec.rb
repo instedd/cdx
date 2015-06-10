@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Manifest, validate_manifest: false do
 
-  context "applying to event" do
+  context "applying to message" do
 
     it "should apply to indexed core fields" do
       assert_manifest_application %{

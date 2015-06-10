@@ -117,9 +117,9 @@ Read Permission for tests grouped yearly by date ranges and location:
   "statement": [
     {
       "action" : [
-        "cdxp:queryEvents"
+        "cdxp:queryTests"
       ],
-      "resource" : "cdxp:event",
+      "resource" : "cdxp:test",
       "condition" : { "group_by" : [
         { "age" : [ [0, 10], [11, 20] ] },
         { "time_interval" : [{ "created_at" : "yearly" }]},
@@ -134,9 +134,9 @@ Read permission for tests of institution 1:
   "statement": [
     {
       "action" : [
-        "cdxp:queryEvents"
+        "cdxp:queryTests"
       ],
-      "resource" : "cdxp:event?institution=1"
+      "resource" : "cdxp:test?institution=1"
     }
   ],
   "delegable": true

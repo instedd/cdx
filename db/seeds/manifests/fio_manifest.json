@@ -1,9 +1,12 @@
 {
   "metadata" : {
-    "version" : "1.0.1",
+    "version" : "1.0.2",
     "api_version" : "1.1.0",
     "device_models" : ["FIO"],
-    "source": {"type" : "xml"}
+    "source": {
+      "type" : "xml",
+      "root" : "DiagnosticTests"
+    }
   },
   "field_mapping" : {
     "patient" : [

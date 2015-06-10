@@ -8,17 +8,17 @@ class ManifestField
     @device = device
   end
 
-  def apply_to(data, event)
+  def apply_to(data, message)
     value = ManifestFieldMapping.new(@manifest, @field, @device, data).apply
     @validation.apply_to value
-    store value, event
+    store value, message
   end
 
-  def store value, event
+  def store value, message
     if value.present?
-      index value, @target_field, event[@scope][hash_key]
+      index value, @target_field, message[@scope][hash_key]
     end
-    event
+    message
   end
 
   def hash_key
@@ -32,24 +32,24 @@ class ManifestField
   end
 
 
-  def index value, target, event, custom=false
+  def index value, target, message, custom=false
     if (targets = target.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
 
-      event, custom = index [], targets.first, event, custom
+      message, custom = index [], targets.first, message, custom
 
       Array(value).each_with_index do |element, index|
-        index(element, targets.drop(1).join(Manifest::COLLECTION_SPLIT_TOKEN), (event[index]||={}), custom)
+        index(element, targets.drop(1).join(Manifest::COLLECTION_SPLIT_TOKEN), (message[index]||={}), custom)
       end
     else
       paths = target.split Manifest::PATH_SPLIT_TOKEN
-      event = paths[0...-1].inject event do |current, path|
+      message = paths[0...-1].inject message do |current, path|
         current[path] ||= {}
       end
       if @field["indexed"] && !@field["core"] && target != "results" && !custom
-        event = event["custom_fields"] ||= {}
+        message = message["custom_fields"] ||= {}
         custom = true
       end
-      [(event[paths.last] ||= value), custom]
+      [(message[paths.last] ||= value), custom]
     end
   end
 end

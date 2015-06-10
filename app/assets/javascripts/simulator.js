@@ -39,19 +39,19 @@
 
         var data = '{"assay_name" : "' + assay_name + '", "test_type" : "specimen", "results" : [{"condition" : "' + condition + '" , "result" : "' + result + '"} ], "gender" : "' + gender + '" , "age" : ' + age + ' , "patient_name" : "' + patient_name + '" , "patient_telephone_number" : "' + patient_telephone_number +'"}';
         $.ajax({
-          url: "/api/devices/" + device + "/events",
+          url: "/api/devices/" + device + "/messages",
           type: "POST",
           data: data,
           contentType: "application/json; charset=utf-8",
           success: function(data, textStatus, jqXHR) {
             $create_button.prop("disabled", false);
             $create_button.val("Created!");
-            setTimeout(function() { $create_button.val("Create another event"); }, 1000);
+            setTimeout(function() { $create_button.val("Create another message"); }, 1000);
           },
           error: function(jqXHR, textStatus, errorThrown) {
             $create_button.prop("disabled", false);
             $create_button.val("Error: " + errorThrown);
-            setTimeout(function() { $create_button.val("Create another event"); }, 1000);
+            setTimeout(function() { $create_button.val("Create another message"); }, 1000);
           }
         });
         return false;
@@ -66,7 +66,7 @@
         $query_button.val("Querying...");
 
         $.ajax({
-          url: "/api/events?" + query_string,
+          url: "/api/tests?" + query_string,
           type: "POST",
           data: post_body,
           contentType: "application/json; charset=utf-8",

@@ -1,7 +1,7 @@
 %h3#playground CDP - Playground
 .row-fluid
   .span4.r-border
-    %h4 Submit event
+    %h4 Submit message
     %form#report_form(method="post")
       .control-group
         %label.control-label(for="device") Device
@@ -20,7 +20,7 @@
                 "patient_name" : "Lorem Ipsum",
                 "patient_telephone_number" : "12345678",
                 "patient_zip_code" : "1234",
-                //"event_id" : "1",
+                //"test_id" : "1",
                 "assay_name" : "MTB Assay",
                 "age" : 20,
                 "system_user" : "jdoe",
@@ -37,7 +37,7 @@
 
       .results
       .control-group
-        %input#create_button.btn(name="commit" type="submit" value="Create event")
+        %input#create_button.btn(name="commit" type="submit" value="Create message")
   .span8
     %h4 Query results
 

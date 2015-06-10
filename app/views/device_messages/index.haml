@@ -1,0 +1,23 @@
+.row-fluid
+  .span12
+    %table.table
+      %tr
+        %th Created at
+        %th Status
+        %th Error Description
+        %th Error Record Index
+        %th Error Field
+        %th Raw message
+      - @messages.each do |message|
+        %tr
+          %td= message.created_at.in_time_zone(@device.time_zone).strftime('%Y-%m-%d %H:%M:%S')
+          %td
+            - if message.index_failed
+              Failed
+              = link_to '(reprocess)', reprocess_institution_device_device_message_path(@institution, @device, message), method: 'post'
+            - else
+              Succeed
+          %td= message.index_failure_reason
+          %td= message.index_failure_data[:record_index]
+          %td= message.index_failure_data[:target_field]
+          %td= link_to 'Download', raw_institution_device_device_message_path(@institution, @device, message)

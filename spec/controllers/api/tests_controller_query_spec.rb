@@ -20,8 +20,8 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       it "allows a user to query tests of it's own institutions" do
         device2 = Device.make
 
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive])
-        DeviceEvent.create_and_process device: device2, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive])
+        DeviceMessage.create_and_process device: device2, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative])
 
         fresh_client_for device2.institution.elasticsearch_index_name
 
@@ -37,9 +37,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
       it "should check for new tests since a date" do
         Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
-        DeviceEvent.create_and_process device: device, plain_text_data: data
+        DeviceMessage.create_and_process device: device, plain_text_data: data
         Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative])
 
         response = get_updates(created_at_since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
 
@@ -55,8 +55,8 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "filters by an analyzed result" do
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative])
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive])
 
         response = get_updates(result: :positive)
 
@@ -65,8 +65,8 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "filters by condition" do
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive])
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
 
         response = get_updates condition: 'mtb'
 
@@ -75,8 +75,8 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "filters by test_id" do
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump test_id: 2, results:[condition: "mtb", result: :positive])
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test_id: 2, results:[condition: "mtb", result: :positive])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
 
         response = get_updates test: 2
 
@@ -85,8 +85,8 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "filters by test type" do
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc)
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], test_type: :qc)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative], test_type: :specimen)
 
         response = get_updates test_type: :specimen
 
@@ -95,9 +95,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "filters for more than one value" do
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], gender: :male)
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative], gender: :female)
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], gender: :male)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative], gender: :female)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
 
         response = get_updates(gender: [:male, :female]).sort_by do |test|
           test["results"].first["result"]
@@ -111,9 +111,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
     context "Grouping" do
       it "groups by gender in query params" do
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male)
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :male)
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :male)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female)
 
         response = get_updates(group_by: :gender).sort_by do |test|
           test["gender"]
@@ -126,12 +126,12 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "groups by gender and assay_name in post body" do
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male, assay_name: "a")
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male, assay_name: "a")
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male, assay_name: "b")
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female, assay_name: "a")
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female, assay_name: "b")
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female, assay_name: "b")
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male, assay_name: "a")
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male, assay_name: "a")
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], gender: :male, assay_name: "b")
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female, assay_name: "a")
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female, assay_name: "b")
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], gender: :female, assay_name: "b")
 
         response = get_updates({}, Oj.dump(group_by: [:gender , :assay_name])).sort_by do |test|
           test["gender"] + test["assay_name"]
@@ -146,10 +146,10 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       end
 
       it "groups and filters for more than one value" do
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], gender: :male)
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], gender: :male)
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative], gender: :female)
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], gender: :male)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :positive], gender: :male)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "mtb", result: :negative], gender: :female)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[condition: "flu", result: :negative])
 
         response = get_updates("page_size"=>0, "group_by"=>["gender"], "gender"=>["male", "female"]).sort_by do |test|
           test["gender"]
@@ -174,9 +174,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         before(:each) { Timecop.freeze }
 
         it "responds a csv for a given grouping" do
-          DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe)
-          DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe)
-          DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe)
+          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], error_code: 1234, system_user: :jdoe)
+          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe)
+          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], error_code: 1234, system_user: :jane_doe)
 
           fresh_client_for institution.elasticsearch_index_name
 
@@ -195,8 +195,8 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
     context "Ordering" do
       it "should order by age" do
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], age: 20)
-        DeviceEvent.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], age: 10)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :positive], age: 20)
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump results:[result: :negative], age: 10)
 
         response = get_updates(order_by: :age)
 
@@ -224,7 +224,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
             }
           ]}
         }}
-        DeviceEvent.create_and_process device: device, plain_text_data: Oj.dump(some_field: 1234)
+        DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(some_field: 1234)
         test = all_elasticsearch_tests_for(institution).first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name
@@ -272,7 +272,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
         Manifest.create! definition: definition
 
-        DeviceEvent.create_and_process device: device, plain_text_data: Oj.dump(results: [result: :positive], patient_name: "jdoe")
+        DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(results: [result: :positive], patient_name: "jdoe")
         test = all_elasticsearch_tests_for(institution).first["_source"]
 
         fresh_client_for institution.elasticsearch_index_name

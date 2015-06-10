@@ -29,9 +29,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
 
-      DeviceEvent.create_and_process device: device1, plain_text_data: Oj.dump(results:[condition: "flu_a"])
-      DeviceEvent.create_and_process device: device2, plain_text_data: Oj.dump(results:[condition: "flu_b"])
-      DeviceEvent.create_and_process device: device3, plain_text_data: Oj.dump(results:[condition: "mtb"])
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(results:[condition: "flu_a"])
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(results:[condition: "flu_b"])
+      DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(results:[condition: "mtb"])
 
       response = get_updates(location: leaf_location1.geo_id)
 
@@ -55,9 +55,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       device2 = Device.make institution: institution, laboratories: [laboratory2]
       device3 = Device.make institution: institution, laboratories: [laboratory3]
 
-      DeviceEvent.create_and_process device: device1, plain_text_data: Oj.dump(results:[condition: "flu_a"])
-      DeviceEvent.create_and_process device: device2, plain_text_data: Oj.dump(results:[condition: "flu_b"])
-      DeviceEvent.create_and_process device: device3, plain_text_data: Oj.dump(results:[condition: "mtb"])
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(results:[condition: "flu_a"])
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(results:[condition: "flu_b"])
+      DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(results:[condition: "mtb"])
 
       response = get_updates(group_by: {admin_level: 0})
       response.should eq([

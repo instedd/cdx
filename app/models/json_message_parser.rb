@@ -1,4 +1,4 @@
-class JsonEventParser
+class JsonMessageParser
 
   PATH_ROOT_TOKEN = "$"
 
@@ -27,7 +27,11 @@ class JsonEventParser
     end
   end
 
-  def load(data)
-    Array.wrap(Oj.load(data))
+  def load(data, root_path = nil)
+    data = Oj.load(data)
+    if root_path.present?
+      data = self.lookup(root_path, data)
+    end
+    Array.wrap(data)
   end
 end

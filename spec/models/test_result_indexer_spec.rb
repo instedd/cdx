@@ -84,7 +84,8 @@ describe TestResultIndexer, elasticsearch: true do
           id: location.geo_id,
           parents: [location.geo_id],
           admin_levels: {"admin_level_0"=>location.geo_id},
-
+          lat: location.lat,
+          lng: location.lng
         },
         device: {
           uuid: test.device.uuid,
