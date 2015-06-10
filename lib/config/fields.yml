@@ -1,0 +1,69 @@
+sample:
+  - name: uuid
+    searchable: true
+  - name: uid
+    pii: true
+  - name: id
+    searchable: true
+  - name: type # (pull enum from 'system' options in LOINC, current sample_type)
+    searchable: true
+  - name: collection_date
+    type: date
+test:
+  - name: start_time
+    type: date
+    searchable: true
+  - name: end_time # (new)
+    type: date
+    searchable: true
+  - name: reported_time # (current created_at)
+    type: date
+    searchable: true
+  - name: updated_time # (current updated_at)
+    type: date
+    searchable: true
+  - name: error_code
+    type: integer
+    searchable: true
+  - name: error_description
+  - name: patient_age # (store with 'units', goes under test, not sample, not patient) UNITS????
+  - name: name # (current 'assay_name')
+  - name: status # (remove 'negative' from enum, add 'in_progress')
+    valid_values:
+    searchable: true
+    options:
+      - invalid
+      - error
+      - no_result
+      - success
+      - in_progress
+  - name: qualitative_result # ('negative', 'positive', 'n/a') (rename 'unknown' to 'n/a')
+    searchable: true
+    valid_values:
+      options:
+      - negative
+      - positive
+      - n/a
+  - name: assays
+    sub_fields:
+      - name: name # (current 'condition') (LOINC)
+      - name: qualitative_result # (positive, negative)
+        valid_values:
+          options:
+            - positive
+            - negative
+      - name: quantitative_result
+        type: integer
+  - name: type
+    valid_values:
+      options:
+        - specimen
+        - qc
+device:
+  - name: uuid
+  - name: lab_user # (current system_user)
+    searchable: true
+  - name: serial_number
+    searchable: true
+patient:
+  - name: gender
