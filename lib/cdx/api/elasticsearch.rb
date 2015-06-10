@@ -1,12 +1,9 @@
 require "active_support/core_ext/hash"
 require "yaml"
 require "elasticsearch"
+require 'cdx'
 
-module Cdx
-  module Api
-    module Elasticsearch
-    end
-  end
+module Cdx::Api::Elasticsearch
 end
 
 Dir[File.expand_path("../**/*.rb", __FILE__)].each do |file|
