@@ -65,5 +65,13 @@ device:
     searchable: true
   - name: serial_number
     searchable: true
+  - name: institution_id
+  - name: laboratory_id
 patient:
   - name: gender
+location:
+  - name: id
+  - name: parents
+  - name: admin_levels
+  - name: lat
+  - name: lng
