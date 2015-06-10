@@ -68,7 +68,9 @@ class TestResultIndexer
           uuid: test_result.uuid
         },
         device: {
-          uuid: device.uuid
+          uuid: device.uuid,
+          institution_id: device.institution_id,
+          laboratory_id: laboratory_id
         },
         location: {
           id: location_id,
@@ -77,8 +79,6 @@ class TestResultIndexer
           lat: location_lat,
           lng: location_lng
         },
-        institution_id: device.institution_id,
-        laboratory_id: laboratory_id
       }).
       deep_merge(indexed_fields_from(test_result.sample, :sample)).
       deep_merge(indexed_fields_from(test_result.current_patient, :patient))
