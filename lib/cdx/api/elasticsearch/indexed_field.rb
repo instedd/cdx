@@ -1,8 +1,4 @@
 class Cdx::Api::Elasticsearch::IndexedField
-  def self.from(definition, document_format)
-    new(definition, document_format)
-  end
-
   def initialize definition, document_format
     @definition = definition
 
@@ -14,7 +10,7 @@ class Cdx::Api::Elasticsearch::IndexedField
 
     if nested?
       @definition[:sub_fields] = @definition[:sub_fields].map do |field|
-        self.class.from(field, document_format)
+        self.class.new(field, document_format)
       end
     else
       add_defaults
@@ -106,7 +102,7 @@ private
 
   def default_filter_type
     if @definition[:type] == 'location'
-      'location'  
+      'location'
     elsif @definition[:type] == 'integer'
       'match'
     else
@@ -116,7 +112,7 @@ private
 
   def default_grouping_type
     if @definition[:type] == 'location'
-      'location'  
+      'location'
     else
       'flat'
     end

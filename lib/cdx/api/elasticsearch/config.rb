@@ -21,7 +21,7 @@ class Cdx::Api::Elasticsearch::Config
 
   def searchable_fields
     @searchable_fields ||= api_fields[:searchable_fields].map do |definition|
-      Cdx::Api::Elasticsearch::IndexedField.from(definition,document_format)
+      Cdx::Api::Elasticsearch::IndexedField.new(definition,document_format)
     end
   end
 

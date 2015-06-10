@@ -187,7 +187,7 @@ describe Cdx::Api do
         index test: {patient_age: 3}, patient: {gender: "unknown"}
 
         response = query_tests(gender: ["male", "female"]).sort_by do |test|
-          test["age"]
+          test["test"]["patient_age"]
         end
 
         expect(response).to eq([
@@ -202,12 +202,12 @@ describe Cdx::Api do
         index test: {patient_age: 3}, patient: {gender: "unknown"}
 
         response = query_tests(gender: "male,female").sort_by do |test|
-          test["age"]
+          test["test"]["patient_age"]
         end
 
         expect(response).to eq([
-          {"age" => 1, "gender" => "male"},
-          {"age" => 2, "gender" => "female"},
+          {"test" => {"patient_age" => 1, "gender" => "male"}},
+          {"test" => {"patient_age" => 2, "gender" => "female"}},
         ])
       end
 
@@ -217,12 +217,12 @@ describe Cdx::Api do
         index test: {patient_age: 3, type: "three"}
 
         response = query_tests('test.type' => ["one", "two"]).sort_by do |test|
-          test["test.type"]
+          test["test"]["type"]
         end
 
         expect(response).to eq([
-          {"patient_age" => 1, "test.type" => "one"},
-          {"patient_age" => 2, "test.type" => "two"},
+          {"test" => {"patient_age" => 1, "type" => "one"}},
+          {"test" => {"patient_age" => 2, "type" => "two"}},
         ])
       end
 
@@ -232,12 +232,12 @@ describe Cdx::Api do
         index test: {patient_age: 3, type: "three"}
 
         response = query_tests('test.type' => "one,two").sort_by do |test|
-          test["test.type"]
+          test["test"]["type"]
         end
 
         expect(response).to eq([
-          {"patient_age" => 1, "test.type" => "one"},
-          {"patient_age" => 2, "test.type" => "two"},
+          {"test" => {"patient_age" => 1, "type" => "one"}},
+          {"test" => {"patient_age" => 2, "type" => "two"}},
         ])
       end
 
@@ -246,15 +246,15 @@ describe Cdx::Api do
         index test: {assays:[name: "Flu", qualitative_result: :negative], patient_age: 20}
         index test: {assays:[name: "MTB", qualitative_result: :negative], patient_age: 30}
 
-        expect_one_qualitative_result "positive", 'test.patient.name' => 'null'
+        expect_one_qualitative_result "positive", 'test.assays.name' => 'null'
 
         response = query_tests('test.assays.name' => "null,MTB").sort_by do |test|
-          test["patient_age"]
+          test["test"]["patient_age"]
         end
 
         expect(response).to eq([
-          {"patient_age" => 10, "assays" => ["qualitative_result" => "positive"]},
-          {"patient_age" => 30, "assays" => ["name" => "MTB", "qualitative_result" => "negative"]}
+          {"test" => {"patient_age" => 10, "assays" => ["qualitative_result" => "positive"]}},
+          {"test" => {"patient_age" => 30, "assays" => ["name" => "MTB", "qualitative_result" => "negative"]}}
         ])
       end
 
