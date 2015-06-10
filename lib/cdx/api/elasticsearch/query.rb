@@ -188,7 +188,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_location_field(field_definition, field_value)
-    process_match_field("parent_#{field_definition[:name].pluralize}", field_definition[:type], field_value)
+    process_match_field("#{field_definition[:name]}.parents", field_definition[:type], field_value)
   end
 
   def process_order params
@@ -247,6 +247,4 @@ class Cdx::Api::Elasticsearch::Query
   def process_group_by_buckets(aggregations, group_by, tests, test, doc_count)
     GroupingDetail.process_buckets(aggregations, group_by, tests, test, doc_count)
   end
-
-
 end

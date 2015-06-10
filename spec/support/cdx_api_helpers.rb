@@ -1,5 +1,4 @@
 RSpec.shared_context "cdx api helpers" do
-
   def query(query)
     Cdx::Api::Elasticsearch::Query.new(query.with_indifferent_access).execute
   end
@@ -12,23 +11,20 @@ RSpec.shared_context "cdx api helpers" do
     Time.local(year, month, day, hour, minute, second).iso8601
   end
 
-  def expect_one_result(result, query_or_response)
-    response = query_tests(query_or_response)
-
-    expect(response.size).to eq(1)
-    expect(response.first["results"].first["result"]).to eq(result)
+  def expect_one_qualitative_result(result, query_or_response)
+    expect_one(query_or_response) do |response|
+      expect(response["test"]["assays"].first["qualitative_result"]).to eq(result)
+    end
   end
 
-  def expect_one_result_with_field(key, value, query_or_response)
-    response = query_tests(query_or_response)
-
-    expect(response.size).to eq(1)
-    expect(response.first[key]).to eq(value)
+  def expect_one_event_with_field(scope, key, value, query_or_response)
+    expect_one(query_or_response) do |response|
+      expect(response[scope][key]).to eq(value)
+    end
   end
 
   def expect_one(query_or_response)
     response = query_tests(query_or_response)
-
     expect(response.size).to eq(1)
     yield response.first
   end
@@ -37,5 +33,4 @@ RSpec.shared_context "cdx api helpers" do
     response = query_tests(query_or_response)
     expect(response).to be_empty
   end
-
 end

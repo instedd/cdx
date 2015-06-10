@@ -22,7 +22,7 @@
 #   b) a grouping with the name of '#{default_name}_admin_level'
 
 searchable_fields:
-  - name: start_time
+  - name: test.start_time
     type: date
     filter_parameter_definition:
       - name: since
@@ -35,35 +35,29 @@ searchable_fields:
         boundary: to
         options:
           include_lower: true
-  - name: created_at
+  - name: test.end_time
     type: date
-  - name: updated_at
+  - name: test.reported_time
     type: date
-  - name: test_id
+  - name: test.updated_time
+    type: date
+  - name: test.id
     group_parameter_definition: none
-  - name: sample_uuid
-    scope: sample
-  - name: sample_id
-    scope: sample
-  - name: sample_type
-    scope: sample
-  - name: sample_collection_date
-    scope: sample
+  - name: sample.uuid
+  - name: sample.id
+  - name: sample.type
+  - name: sample.collection_date
     type: date
-  - name: uuid
+  - name: test.uuid
     filter_parameter_definition:
       - type: match
     group_parameter_definition: none
-  - name: device_uuid
-    filter_parameter_definition:
-      - name: device
-    group_parameter_definition:
-      - name: device
-  - name: system_user
-  - name: device_serial_number
-  - name: error_code
+  - name: device.uuid
+  - name: device.lab_user
+  - name: device.serial_number
+  - name: test.error_code
     type: integer
-  - name: error_description
+  - name: test.error_description
     filter_parameter_definition: none
     group_parameter_definition: none
   - name: laboratory_id
@@ -74,8 +68,7 @@ searchable_fields:
     type: location
     group_parameter_definition:
       - name: admin_level
-  - name: age
-    scope: patient
+  - name: test.patient_age
     type: integer
     filter_parameter_definition:
       - include_default: true
@@ -91,37 +84,21 @@ searchable_fields:
           include_upper: true
     group_parameter_definition:
       - type: range
-  - name: assay_name
-  - name: gender
-    scope: patient
-  - name: ethnicity
-    scope: patient
-  - name: race
-    scope: patient
-  - name: race_ethnicity
-    scope: patient
+  - name: test.name
+  - name: patient.gender
   - name: status
-    valid_values:
-      options:
-        - invalid
-        - error
-        - no_result
-        - success
-        - negative
-  - name: results
+  - name: qualitative_result
+  - name: test.assays
     type: nested
     sub_fields:
-      - name: result
-        type: multi_field
-        valid_values:
-          options:
-            - positive
-            - negative
-      - name: condition
-  - name: test_type
-    filter_parameter_definition:
-      - type: match
-    valid_values:
-      options:
-        - specimen
-        - qc
+      - name: name
+        filter_parameter_definition:
+          - name: test.assays.name
+        group_parameter_definition:
+          - name: test.assays.name
+      - name: qualitative_result
+        filter_parameter_definition:
+          - name: test.assays.qualitative_result
+        group_parameter_definition:
+          - name: test.assays.qualitative_result
+  - name: test.type

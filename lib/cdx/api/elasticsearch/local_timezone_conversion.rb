@@ -1,5 +1,4 @@
 module Cdx::Api::LocalTimeZoneConversion
-
   # Parses a string value, converting its timezone to the local timezone, if it represents
   # a date, or leaving it as is, otherwise.
   def convert_timezone_if_date(string_value)

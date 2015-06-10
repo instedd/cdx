@@ -1,5 +1,4 @@
 class Cdx::Api::Elasticsearch::Config
-
   def api_fields=(api_fields)
     @api_fields = api_fields.with_indifferent_access
   end
@@ -35,6 +34,6 @@ class Cdx::Api::Elasticsearch::Config
   end
 
   def document_format
-    @document_format || CDPDocumentFormat.new
+    @document_format ||= CDPDocumentFormat.new
   end
 end
