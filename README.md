@@ -7,7 +7,7 @@ This gem contains CDX core fields specification
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'cdx', git: 'instedd/cdx_core'
+gem 'cdx', github: 'instedd/cdx_core'
 ```
 
 And then execute:
