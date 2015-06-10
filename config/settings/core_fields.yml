@@ -5,9 +5,7 @@ sample:
     pii: true
   - name: id
     searchable: true
-    important: true
   - name: type # (pull enum from 'system' options in LOINC, current sample_type)
-    important: true
     searchable: true
   - name: collection_date
     type: date
@@ -15,31 +13,24 @@ test:
   - name: start_time
     type: date
     searchable: true
-    important: true
   - name: end_time # (new)
     type: date
     searchable: true
-    important: true
   - name: reported_time # (current created_at)
     type: date
     searchable: true
-    important: true
   - name: updated_time # (current updated_at)
     type: date
     searchable: true
-    important: true
   - name: error_code
     type: integer
     searchable: true
-    important: true
   - name: error_description
   - name: patient_age # (store with 'units', goes under test, not sample, not patient) UNITS????
-    important: true
   - name: name # (current 'assay_name')
-    important: true
   - name: status # (remove 'negative' from enum, add 'in_progress')
-    important: true
     valid_values:
+    searchable: true
     options:
       - invalid
       - error
@@ -47,7 +38,7 @@ test:
       - success
       - in_progress
   - name: qualitative_result # ('negative', 'positive', 'n/a') (rename 'unknown' to 'n/a')
-    important: true
+    searchable: true
     valid_values:
       options:
       - negative
@@ -55,7 +46,7 @@ test:
       - n/a
   - name: assays
     sub_fields:
-      - name: name # (current 'condition')
+      - name: name # (current 'condition') (LOINC)
       - name: qualitative_result # (positive, negative)
         valid_values:
           options:
