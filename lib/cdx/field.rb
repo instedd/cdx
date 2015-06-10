@@ -23,4 +23,8 @@ class Cdx::Field
   def nested?
     type == 'nested'
   end
+
+  def searchable?
+    @definition[:searchable]
+  end
 end
