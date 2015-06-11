@@ -2,7 +2,6 @@ class TestResultIndexer
   attr_reader :test_result, :fields
 
   def initialize test_result
-    @fields = fields
     @test_result = test_result
   end
 

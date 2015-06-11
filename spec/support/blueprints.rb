@@ -44,7 +44,7 @@ end
 
 Sample.blueprint do
   institution
-  plain_sensitive_data { { sample_uid: "sample-#{Sham.sn}" } }
+  plain_sensitive_data { { sample: { uid: "sample-#{Sham.sn}" } } }
 end
 
 Patient.blueprint do

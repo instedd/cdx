@@ -20,13 +20,6 @@ GIT
       ruby-openid
 
 GIT
-  remote: git://github.com/instedd/cdx_core.git
-  revision: 7e34a114ffa977a11305ac02a8ff4da921a638fc
-  branch: master
-  specs:
-    cdx (0.0.1)
-
-GIT
   remote: https://bitbucket.org/instedd/instedd-bootstrap.git
   revision: abd90e62cb8eaa922719acc18e3d7570b3b9b106
   branch: master
@@ -38,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: 40cf83519deb268d6de646036fab90c83f7cf03a
+  revision: 466793b6cd80cf8bdd382c56d32a5c91347e2f2c
   branch: 8-feature-scoped_fields
   specs:
     cdx-api-elasticsearch (0.0.1)
@@ -456,7 +449,6 @@ DEPENDENCIES
   capistrano-rvm (~> 0.1)
   capybara
   capybara-mechanize
-  cdx!
   cdx-api-elasticsearch!
   cdx-sync-server!
   coffee-rails (~> 4.0.0)
