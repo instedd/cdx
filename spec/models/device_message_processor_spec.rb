@@ -350,8 +350,6 @@ describe DeviceMessageProcessor, elasticsearch: true do
     tests = all_elasticsearch_tests_for(institution)
     tests.size.should eq(1)
 
-    binding.pry
-
     tests.first["_source"]["test"]["assay"].should eq("mtb")
     tests.first["_source"]["sample"]["type"].should eq("sputum")
     tests.first["_source"]["test"]["custom_fields"]["concentration"].should eq("15%")

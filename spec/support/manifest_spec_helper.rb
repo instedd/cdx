@@ -19,6 +19,7 @@ module ManifestSpecHelper
       test:    { indexed: {}, custom: {}, pii: {} },
       sample:  { indexed: {}, custom: {}, pii: {} },
       patient: { indexed: {}, custom: {}, pii: {} },
+      device:  { indexed: {}, custom: {}, pii: {} }
     }.deep_merge(expected_fields).recursive_stringify_keys!
 
     format_data.each do |format, data|
