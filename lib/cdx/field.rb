@@ -1,6 +1,4 @@
 class Cdx::Field
-  attr_reader :definition
-
   def initialize scope, definition
     @scope = scope
     @definition = definition.with_indifferent_access
@@ -15,7 +13,7 @@ class Cdx::Field
   end
 
   def type
-    @definition[:type]
+    @definition[:type] || 'string'
   end
 
   def name
