@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "1.0.2",
+    "version" : "1.0.3",
     "api_version" : "1.1.0",
     "device_models" : ["FIO"],
     "source": {
@@ -46,8 +46,7 @@
         "target_field" : "pregnancy_status",
         "source" : {"lookup" : "Patient/PregnancyStatus/text()"},
         "type" : "string",
-        "custom": true,
-        "indexed" : true
+        "custom": true
       }
     ],
     "sample" : [

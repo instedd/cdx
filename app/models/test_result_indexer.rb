@@ -80,7 +80,8 @@ class TestResultIndexer
         },
       }).
       deep_merge(indexed_fields_from(test_result.sample, :sample)).
-      deep_merge(indexed_fields_from(test_result.current_patient, :patient))
+      deep_merge(indexed_fields_from(test_result.current_patient, :patient)).
+      deep_merge(all_custom_fields)
   end
 
   def indexed_fields_from indexable, scope
@@ -90,4 +91,34 @@ class TestResultIndexer
       {}
     end
   end
+
+  def all_custom_fields
+    fields = {}
+
+    sample = test_result.sample
+    patient = test_result.patient
+
+    append_custom_fields fields, test_result, :test
+    append_custom_fields fields, test_result, :sample
+    append_custom_fields fields, test_result, :patient
+
+    if sample.present?
+      append_custom_fields fields, sample, :sample
+      append_custom_fields fields, sample, :patient
+    end
+
+    if patient.present?
+      append_custom_fields fields, patient, :patient
+    end
+
+    fields
+  end
+
+  def append_custom_fields fields, entity, key
+    if entity.custom_fields[key].present?
+      fields[key] ||= { custom_fields: {} }
+      fields[key][:custom_fields].deep_merge! entity.custom_fields[key]
+    end
+  end
+
 end

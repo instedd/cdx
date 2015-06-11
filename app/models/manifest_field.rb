@@ -22,34 +22,30 @@ class ManifestField
   end
 
   def hash_key
-    return "pii" if @field["pii"]
-    if @field["core"]
-      "indexed"
+    case
+    when @field['pii']
+      'pii'
+    when @field['core'], @field['indexed']
+      'indexed'
     else
-      return "indexed" if @field["indexed"]
-      "custom"
+      'custom'
     end
   end
 
-
-  def index value, target, message, custom=false
+  def index value, target, message
     if (targets = target.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
 
-      message, custom = index [], targets.first, message, custom
+      message = index [], targets.first, message
 
       Array(value).each_with_index do |element, index|
-        index(element, targets.drop(1).join(Manifest::COLLECTION_SPLIT_TOKEN), (message[index]||={}), custom)
+        index(element, targets.drop(1).join(Manifest::COLLECTION_SPLIT_TOKEN), (message[index]||={}))
       end
     else
       paths = target.split Manifest::PATH_SPLIT_TOKEN
       message = paths[0...-1].inject message do |current, path|
         current[path] ||= {}
       end
-      if @field["indexed"] && !@field["core"] && target != "results" && !custom
-        message = message["custom_fields"] ||= {}
-        custom = true
-      end
-      [(message[paths.last] ||= value), custom]
+      message[paths.last] ||= value
     end
   end
 end
