@@ -1,11 +1,13 @@
 class Cdx::Field
+  attr_reader :definition
+
   def initialize scope, definition
     @scope = scope
     @definition = definition.with_indifferent_access
 
-    if nested?
+    if @definition[:sub_fields]
       @definition[:sub_fields] = @definition[:sub_fields].map do |field|
-        self.class.new(field)
+        self.class.new(self, field)
       end
     end
 
@@ -26,5 +28,17 @@ class Cdx::Field
 
   def searchable?
     @definition[:searchable]
+  end
+
+  def sub_fields
+    @definition[:sub_fields]
+  end
+
+  def scoped_name
+    "#{@scope.scoped_name}.#{name}"
+  end
+
+  def flatten
+    sub_fields || self
   end
 end

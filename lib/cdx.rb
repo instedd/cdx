@@ -1,11 +1,13 @@
 require "cdx/version"
 require "cdx/field"
 require "cdx/scope"
+require "yaml"
+require "active_support/core_ext/hash"
 
 module Cdx
   def self.core_fields
-    @core_fields ||= scopes.map do |scope|
-      scope.fields
+    @core_fields ||= core_field_scopes.map do |scope|
+      scope.fields.map(&:flatten).flatten
     end.flatten
   end
 

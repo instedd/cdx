@@ -7,4 +7,8 @@ class Cdx::Scope
       Cdx::Field.new self, definition
     end
   end
+
+  def scoped_name
+    name
+  end
 end

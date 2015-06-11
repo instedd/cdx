@@ -45,6 +45,7 @@ test:
       - positive
       - n/a
   - name: assays
+    type: nested
     sub_fields:
       - name: name # (current 'condition') (LOINC)
       - name: qualitative_result # (positive, negative)
