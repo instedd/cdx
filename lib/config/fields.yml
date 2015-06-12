@@ -27,28 +27,32 @@ test:
     searchable: true
   - name: error_description
   - name: patient_age # (store with 'units', goes under test, not sample, not patient) UNITS????
-  - name: name # (current 'assay_name')
-  - name: status # (remove 'negative' from enum, add 'in_progress')
-    valid_values:
     searchable: true
-    options:
-      - invalid
-      - error
-      - no_result
-      - success
-      - in_progress
+  - name: name # (current 'assay_name')
+    searchable: true
+  - name: status # (remove 'negative' from enum, add 'in_progress')
+    searchable: true
+    valid_values:
+      options:
+        - invalid
+        - error
+        - no_result
+        - success
+        - in_progress
   - name: qualitative_result # ('negative', 'positive', 'n/a') (rename 'unknown' to 'n/a')
     searchable: true
     valid_values:
       options:
-      - negative
-      - positive
-      - n/a
+        - negative
+        - positive
+        - n/a
   - name: assays
     type: nested
     sub_fields:
       - name: name # (current 'condition') (LOINC)
+        searchable: true
       - name: qualitative_result # (positive, negative)
+        searchable: true
         valid_values:
           options:
             - positive
@@ -56,23 +60,40 @@ test:
       - name: quantitative_result
         type: integer
   - name: type
+    searchable: true
     valid_values:
       options:
         - specimen
         - qc
 device:
   - name: uuid
+    searchable: true
+  - name: name
+    searchable: true
   - name: lab_user # (current system_user)
     searchable: true
   - name: serial_number
     searchable: true
-  - name: institution_id
-  - name: laboratory_id
+institution:
+  - name: id
+    searchable: true
+  - name: name
+    searchable: true
+laboratory:
+  - name: id
+    searchable: true
+  - name: name
+    searchable: true
 patient:
+  - name: id
+    pii: true
   - name: gender
+    searchable: true
 location:
   - name: id
   - name: parents
+    searchable: true
   - name: admin_levels
+    searchable: true
   - name: lat
   - name: lng
