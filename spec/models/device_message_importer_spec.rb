@@ -56,11 +56,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       write_file(%{error_code;result\n0;positive\n1;negative}, 'csv')
       DeviceMessageImporter.new.import_from sync_dir
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["result"].should eq("positive")
-      test = tests.last["_source"]
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
       test["result"].should eq("negative")
     end
@@ -72,11 +72,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       CharDet.stub(:detect).and_return('encoding' => 'UTF-16LE', 'confidence' => 1.0)
       DeviceMessageImporter.new.import_from sync_dir
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["result"].should eq("positivo")
-      test = tests.last["_source"]
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
       test["result"].should eq("inválido")
     end
@@ -92,11 +92,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
       DeviceMessageImporter.new("*.json").import_from sync_dir
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["result"].should eq("positive")
-      test = tests.last["_source"]
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
       test["result"].should eq("negative")
     end
@@ -106,11 +106,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
       DeviceMessageImporter.new("*.{csv,json}").import_from sync_dir
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["result"].should eq("positive")
-      test = tests.last["_source"]
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
       test["result"].should eq("negative")
     end
@@ -120,11 +120,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json', 'mytestfile')
       DeviceMessageImporter.new("*.{csv,json}").import_single(sync_dir, File.join(sync_dir.inbox_path(device.uuid), "mytestfile.json"))
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["result"].should eq("positive")
-      test = tests.last["_source"]
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
       test["result"].should eq("negative")
     end
@@ -159,7 +159,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         tests = all_elasticsearch_tests_for(device.institution)
         tests.should have(18).items
-        tests.map{|e| e['_source']['start_time']}.should =~ ['2014-09-09T17:07:32+00:00', '2014-10-28T13:00:58+00:00', '2014-10-28T17:24:34+00:00', '2015-02-10T18:10:28+00:00', '2015-03-03T19:27:36+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2014-11-05T08:38:30+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00']
+        tests.map{|e| e['_source']['test']['start_time']}.should =~ ['2014-09-09T17:07:32+00:00', '2014-10-28T13:00:58+00:00', '2014-10-28T17:24:34+00:00', '2015-02-10T18:10:28+00:00', '2015-03-03T19:27:36+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2014-11-05T08:38:30+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00']
       end
     end
 
@@ -171,20 +171,20 @@ describe DeviceMessageImporter, elasticsearch: true do
         copy_sample_csv 'genoscan_sample.csv'
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
-        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
+        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["results"][0]["result"] }
         tests.should have(13).items
 
-        test = tests.first["_source"]
+        test = tests.first["_source"]["test"]
         test["results"][0]["condition"].should eq("mtb")
         test["results"][0]["result"].should eq("negative")
 
-        test = tests.last["_source"]
+        test = tests.last["_source"]["test"]
         test["results"][0]["condition"].should eq("mtb")
         test["results"][0]["result"].should eq("positive_with_rif_and_inh")
 
         dbtests = TestResult.all
         dbtests.should have(13).items
-        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['uuid']}
+        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['test']['uuid']}
       end
     end
 
@@ -196,20 +196,20 @@ describe DeviceMessageImporter, elasticsearch: true do
         copy_sample_csv 'epicenter_sample.csv'
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
-        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
+        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["results"][0]["result"] }
         tests.should have(29).items
 
-        test = tests.first["_source"]
+        test = tests.first["_source"]["test"]
         test["results"][0]["condition"].should eq("mtb")
         test["results"][0]["result"].should eq("ethambutol_sensitive")
 
-        test = tests.last["_source"]
+        test = tests.last["_source"]["test"]
         test["results"][0]["condition"].should eq("mtb")
         test["results"][0]["result"].should eq("thiosemicarbazone_invalid")
 
         dbtests = TestResult.all
         dbtests.should have(29).items
-        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['uuid']}
+        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['test']['uuid']}
 
         Sample.count.should eq(3)
       end
@@ -223,20 +223,20 @@ describe DeviceMessageImporter, elasticsearch: true do
         copy_sample_csv 'epicenter_headless_sample.csv'
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
-        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
+        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["results"][0]["result"] }
         tests.should have(29).items
 
-        test = tests.first["_source"]
+        test = tests.first["_source"]["test"]
         test["results"][0]["condition"].should eq("mtb")
         test["results"][0]["result"].should eq("ethambutol_sensitive")
 
-        test = tests.last["_source"]
+        test = tests.last["_source"]["test"]
         test["results"][0]["condition"].should eq("mtb")
         test["results"][0]["result"].should eq("thiosemicarbazone_invalid")
 
         dbtests = TestResult.all
         dbtests.should have(29).items
-        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['uuid']}
+        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['test']['uuid']}
 
         Sample.count.should eq(3)
       end
@@ -255,16 +255,16 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         test = tests.first['_source']
 
-        test['test_id'].should eq('12345678901234567890')
-        test['gender'].should eq('female')
-        test['age'].should eq(25)
-        test['custom_fields']['pregnancy_status'].should eq('Not Pregnant')
-        test['sample_id'].should eq('0987654321')
-        test['start_time'].should  eq('2015-05-18T12:34:56+05:00')
-        test['assay_name'].should eq('SD_MALPFPV_02_02')
-        test['status'].should eq('success')
+        test['test']['test_id'].should eq('12345678901234567890')
+        test['patient']['gender'].should eq('female')
+        test['patient']['age'].should eq(25)
+        test['patient']['custom_fields']['pregnancy_status'].should eq('Not Pregnant')
+        test['sample']['sample_id'].should eq('0987654321')
+        test['test']['start_time'].should  eq('2015-05-18T12:34:56+05:00')
+        test['test']['assay_name'].should eq('SD_MALPFPV_02_02')
+        test['test']['status'].should eq('success')
 
-        test_results = test['results']
+        test_results = test['test']['results']
         test_results.size.should eq(2)
         test_results.first['result'].should eq('Positive')
         test_results.first['condition'].should eq('HRPII')
@@ -273,7 +273,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         TestResult.count.should eq(1)
         db_test = TestResult.first
-        db_test.uuid.should eq(test['uuid'])
+        db_test.uuid.should eq(test['test']['uuid'])
         db_test.test_id.should eq('12345678901234567890')
       end
     end
