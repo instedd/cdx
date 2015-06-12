@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "1.0.3",
+    "version" : "1.0.4",
     "api_version" : "1.1.0",
     "device_models" : ["FIO"],
     "source": {
@@ -11,7 +11,7 @@
   "field_mapping" : {
     "patient" : [
       {
-        "target_field" : "patient_id",
+        "target_field" : "id",
         "source" : {"lookup" : "Patient/Id/text()"},
         "type" : "string",
         "core" : true,
@@ -51,14 +51,14 @@
     ],
     "sample" : [
       {
-        "target_field" : "sample_uid",
+        "target_field" : "uid",
         "source" : {"lookup" : "SampleId/text()"},
         "type" : "string",
         "core" : true,
         "pii": true
       },
       {
-        "target_field" : "sample_id",
+        "target_field" : "id",
         "source" : {"lookup" : "SampleId/text()"},
         "type" : "string",
         "core" : true,
@@ -74,14 +74,14 @@
         "indexed" : true
       },
       {
-        "target_field" : "test_id",
+        "target_field" : "id",
         "source" : {"lookup" : "@id"},
         "type" : "string",
         "core" : true,
         "indexed" : true
       },
       {
-        "target_field" : "assay_name",
+        "target_field" : "name",
         "source" : {"lookup" : "Test/Code/@value"},
         "type" : "enum",
         "core" : true,

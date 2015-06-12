@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "0.0.2",
+    "version" : "0.0.3",
     "api_version" : "1.1.0",
     "signature" : "",
     "device_models" : ["epicenter_es"],
@@ -9,7 +9,7 @@
   "field_mapping" : {
     "patient" : [
       {
-        "target_field": "patient_id",
+        "target_field": "id",
         "source" : {"lookup" : "ID del paciente"},
         "core" : true,
         "pii" : true,
@@ -93,14 +93,14 @@
     ],
     "sample" : [
       {
-        "target_field": "sample_id",
+        "target_field": "id",
         "source" : {"lookup" : "N de Acceso"},
         "core" : true,
         "pii" : true,
         "type" : "string"
       },
       {
-        "target_field": "sample_uid",
+        "target_field": "uid",
         "source" : {"concat" : [
           {"lookup" : "ID del paciente"},
           {"lookup" : "N de Acceso"}
@@ -110,7 +110,7 @@
         "type" : "string"
       },
       {
-        "target_field": "sample_type",
+        "target_field": "type",
         "source" : {
           "map" : [
             {"lookup" : "Tipo de muestra"},
@@ -167,7 +167,7 @@
     ],
     "test" : [
       {
-        "target_field": "test_id",
+        "target_field": "id",
         "source" : {
           "hash" : {
             "concat" : [
@@ -339,7 +339,7 @@
         "options":["invalid","success","negative"]
       },
       {
-        "target_field": "test_type",
+        "target_field": "type",
         "source" : "specimen",
         "core" : true,
         "indexed" : true,

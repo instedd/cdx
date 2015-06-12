@@ -255,13 +255,13 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         test = tests.first['_source']
 
-        test['test']['test_id'].should eq('12345678901234567890')
+        test['test']['id'].should eq('12345678901234567890')
         test['patient']['gender'].should eq('female')
         test['patient']['age'].should eq(25)
         test['patient']['custom_fields']['pregnancy_status'].should eq('Not Pregnant')
-        test['sample']['sample_id'].should eq('0987654321')
+        test['sample']['id'].should eq('0987654321')
         test['test']['start_time'].should  eq('2015-05-18T12:34:56+05:00')
-        test['test']['assay_name'].should eq('SD_MALPFPV_02_02')
+        test['test']['name'].should eq('SD_MALPFPV_02_02')
         test['test']['status'].should eq('success')
 
         test_results = test['test']['results']
