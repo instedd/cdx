@@ -12,7 +12,7 @@ class LocationGroupingDetail < GroupingDetail
     {
       count: {
         terms: {
-          field: "#{field_definition[:name]}.admin_levels.admin_level_#{value}",
+          field: "#{field_definition.name}.admin_level_#{value}",
           size: 0
         }
       }

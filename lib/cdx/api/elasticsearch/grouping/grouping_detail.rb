@@ -13,7 +13,7 @@ class GroupingDetail
     false
   end
 
-	def self.for(indexed_field, uri_param, values)
+  def self.for(indexed_field, uri_param, values)
     if indexed_field.nested?
       NestedGroupingDetail.create indexed_field, uri_param, values
     else

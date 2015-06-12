@@ -201,13 +201,13 @@ describe Cdx::Api do
         index test: {patient_age: 2}, patient: {gender: "female"}
         index test: {patient_age: 3}, patient: {gender: "unknown"}
 
-        response = query_tests(gender: "male,female").sort_by do |test|
+        response = query_tests('patient.gender' => "male,female").sort_by do |test|
           test["test"]["patient_age"]
         end
 
         expect(response).to eq([
-          {"test" => {"patient_age" => 1, "gender" => "male"}},
-          {"test" => {"patient_age" => 2, "gender" => "female"}},
+          {"test" => {"patient_age" => 1}, "patient" => {"gender" => "male"}},
+          {"test" => {"patient_age" => 2}, "patient" => {"gender" => "female"}},
         ])
       end
 

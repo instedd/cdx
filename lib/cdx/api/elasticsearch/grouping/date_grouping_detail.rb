@@ -22,7 +22,7 @@ class DateGroupingDetail < GroupingDetail
         raise "Invalid time interval: #{interval}"
     end
 
-    {count: {date_histogram: {field: field_definition[:name], interval: interval, format: format}}}
+    {count: {date_histogram: {field: field_definition.name, interval: interval, format: format}}}
   end
 
   def yield_bucket(bucket)

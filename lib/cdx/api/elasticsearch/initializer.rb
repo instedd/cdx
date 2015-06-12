@@ -22,9 +22,9 @@ class Cdx::Api::Elasticsearch::Initializer
 
   def build_dynamic_templates
     @api.searchable_fields.inject([]) { |templates, field|
-      if field[:type].eql? "location"
+      if field.type.eql? "location"
         template = {
-          "#{field[:name]}.admin_levels" => {
+          "#{field.name}.admin_levels" => {
             path_match: "admin_level_*",
             mapping: { type: :string, index: :not_analyzed }
           }
@@ -46,7 +46,7 @@ class Cdx::Api::Elasticsearch::Initializer
   end
 
   def map_field properties, field
-    current = if (paths = field[:name].split('.')).size > 1
+    current = if (paths = field.name.split('.')).size > 1
       paths[0..-2].inject properties do |current, path|
         (current[path] ||= { properties: {} })[:properties]
       end
@@ -54,9 +54,9 @@ class Cdx::Api::Elasticsearch::Initializer
       properties
     end
 
-    case field[:type]
+    case field.type
     when "nested"
-      current[paths.last] = {type: :nested, properties: map_fields(field[:sub_fields])}
+      current[paths.last] = {type: :nested, properties: map_fields(field.sub_fields)}
     when "location"
       {
         paths.last => {
@@ -67,18 +67,18 @@ class Cdx::Api::Elasticsearch::Initializer
       }
     else
       field_body =
-        case field[:type]
+        case field.type
         when "multi_field"
           {
             fields: {
               analyzed: {type: :string, index: :analyzed},
-              field[:name] => {type: :string, index: :not_analyzed}
+              field.name => {type: :string, index: :not_analyzed}
             }
           }
         else
           {index: :not_analyzed}
         end
-      current[paths.last] = {type: field[:type]}.merge(field_body)
+      current[paths.last] = {type: field.type}.merge(field_body)
     end
     properties
   end

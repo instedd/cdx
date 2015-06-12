@@ -21,84 +21,79 @@
 #   a) a filter with the same name
 #   b) a grouping with the name of '#{default_name}_admin_level'
 
-searchable_fields:
-  - name: test.start_time
-    type: date
-    filter_parameter_definition:
-      - name: since
-        type: range
-        boundary: from
-        options:
-          include_lower: true
-      - name: until
-        type: range
-        boundary: to
-        options:
-          include_lower: true
-  - name: test.end_time
-    type: date
-  - name: test.reported_time
-    type: date
-  - name: test.updated_time
-    type: date
-  - name: test.id
-    group_parameter_definition: none
-  - name: sample.uuid
-  - name: sample.id
-  - name: sample.type
-  - name: sample.collection_date
-    type: date
-  - name: test.uuid
-    filter_parameter_definition:
-      - type: match
-    group_parameter_definition: none
-  - name: device.uuid
-  - name: device.lab_user
-  - name: device.serial_number
-  - name: test.error_code
-    type: integer
-  - name: test.error_description
-    filter_parameter_definition: none
-    group_parameter_definition: none
-  - name: laboratory_id
-    type: integer
-  - name: institution_id
-    type: integer
-  - name: location
-    type: location
-    group_parameter_definition:
-      - name: admin_level
-  - name: test.patient_age
-    type: integer
-    filter_parameter_definition:
-      - include_default: true
-      - name: min_age
-        type: range
-        boundary: from
-        options:
-          include_lower: true
-      - name: max_age
-        type: range
-        boundary: to
-        options:
-          include_upper: true
-    group_parameter_definition:
-      - type: range
-  - name: test.name
-  - name: patient.gender
-  - name: status
-  - name: qualitative_result
-  - name: test.assays
-    type: nested
-    sub_fields:
-      - name: name
-        filter_parameter_definition:
-          - name: test.assays.name
-        group_parameter_definition:
-          - name: test.assays.name
-      - name: qualitative_result
-        filter_parameter_definition:
-          - name: test.assays.qualitative_result
-        group_parameter_definition:
-          - name: test.assays.qualitative_result
-  - name: test.type
+- name: test.start_time
+  type: date
+  filter_parameter_definition:
+    - name: since
+      type: range
+      boundary: from
+      options:
+        include_lower: true
+    - name: until
+      type: range
+      boundary: to
+      options:
+        include_lower: true
+- name: test.end_time
+  type: date
+- name: test.reported_time
+  type: date
+- name: test.updated_time
+  type: date
+- name: test.id
+  group_parameter_definition: none
+- name: sample.uuid
+- name: sample.id
+- name: sample.type
+- name: sample.collection_date
+  type: date
+- name: test.uuid
+  filter_parameter_definition:
+    - type: match
+  group_parameter_definition: none
+- name: device.uuid
+- name: device.lab_user
+- name: device.serial_number
+- name: test.error_code
+  type: integer
+- name: test.error_description
+  filter_parameter_definition: none
+  group_parameter_definition: none
+- name: laboratory_id
+  type: integer
+- name: institution_id
+  type: integer
+- name: location.parents
+  filter_parameter_definition:
+    - name: location.id
+      type: match
+- name: location.admin_levels
+  group_parameter_definition:
+    - name: location.admin_level
+      type: location
+- name: test.patient_age
+  type: integer
+  filter_parameter_definition:
+    - include_default: true
+    - name: min_age
+      type: range
+      boundary: from
+      options:
+        include_lower: true
+    - name: max_age
+      type: range
+      boundary: to
+      options:
+        include_upper: true
+  group_parameter_definition:
+    - type: range
+- name: test.name
+- name: patient.gender
+- name: status
+- name: qualitative_result
+- name: test.assays
+  type: nested
+  sub_fields:
+    - name: test.assays.name
+    - name: test.assays.qualitative_result
+- name: test.type
