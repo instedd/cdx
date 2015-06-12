@@ -96,7 +96,7 @@ class TestResultIndexer
     fields = {}
 
     sample = test_result.sample
-    patient = test_result.patient
+    patient = test_result.current_patient
 
     append_custom_fields fields, test_result, :test
     append_custom_fields fields, test_result, :sample
