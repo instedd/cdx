@@ -72,9 +72,9 @@ describe Cdx::Api do
     end
 
     [
-      [:'test.name', :'name', ["GX4001", "GX1234", "GX9999"]],
-      [:'test.patient_age', :'patient_age', [10, 15, 20]],
-      [:'test.uuid', :'uuid', ["1234", "5678", "9012"]],
+      ['test.name', :'name', ["GX4001", "GX1234", "GX9999"]],
+      ['test.patient_age', :'patient_age', [10, 15, 20]],
+      ['test.uuid', :'uuid', ["1234", "5678", "9012"]],
     ].each do |query_name, index_name, values|
       it "should filter by #{query_name}" do
         index test: {assays: [qualitative_result: :positive], index_name => values[0]}
@@ -186,13 +186,13 @@ describe Cdx::Api do
         index test: {patient_age: 2}, patient: {gender: "female"}
         index test: {patient_age: 3}, patient: {gender: "unknown"}
 
-        response = query_tests(gender: ["male", "female"]).sort_by do |test|
+        response = query_tests('patient.gender' => ["male", "female"]).sort_by do |test|
           test["test"]["patient_age"]
         end
 
         expect(response).to eq([
-          {"age" => 1, "gender" => "male"},
-          {"age" => 2, "gender" => "female"},
+          {'test' => {"patient_age" => 1}, 'patient' => {"gender" => "male"}},
+          {'test' => {"patient_age" => 2}, 'patient' => {"gender" => "female"}}
         ])
       end
 
@@ -774,8 +774,37 @@ describe Cdx::Api do
 
     context "with a second location field" do
       before(:all) do
-        @extra_field = Cdx::Api::Elasticsearch::IndexedField.new({ name: 'patient_location', type: 'location'}, Cdx::Api.config.document_format)
-        Cdx::Api.searchable_fields.push @extra_field
+        # add a new core field and regenerate the indexed fields with it.
+        @extra_scope = Cdx::Scope.new('patient_location', [
+          {name: 'id'},
+          {name: 'parents', searchable: true},
+          {name: 'admin_levels', searchable: true},
+          {name: 'lat'},
+          {name: 'lng'}])
+
+        @extra_fields = @extra_scope.flatten.select(&:searchable?).map do |core_field|
+          Cdx::Api::Elasticsearch::IndexedField.for(core_field, [
+            {
+              name: 'patient_location.parents',
+              filter_parameter_definition: [{
+                name: 'patient_location.id',
+                type: 'match'
+              }]
+            },
+            {
+              name: 'patient_location.admin_levels',
+              group_parameter_definition: [{
+                name: 'patient_location.admin_level',
+                type: 'location'
+              }]
+            }
+          ])
+        end
+
+        Cdx.core_field_scopes.push @extra_scope
+        Cdx.core_fields.concat @extra_scope.flatten
+
+        Cdx::Api.searchable_fields.concat @extra_fields
 
         # Delete the index and recreate it to make ES grab the new template
         Cdx::Api.client.indices.delete index: "cdx_tests" rescue nil
@@ -783,7 +812,14 @@ describe Cdx::Api do
       end
 
       after(:all) do
-        Cdx::Api.searchable_fields.delete @extra_field
+        Cdx.core_field_scopes.delete @extra_scope
+        @extra_scope.flatten.each do |field|
+          Cdx.core_fields.delete field
+        end
+
+        @extra_fields.each do |field|
+          Cdx::Api.searchable_fields.delete field
+        end
 
         # Delete the index and recreate it to make ES grab the new template
         Cdx::Api.client.indices.delete index: "cdx_tests" rescue nil
@@ -807,7 +843,7 @@ describe Cdx::Api do
         index patient_location: {admin_levels: {admin_level_0: "1", admin_level_1: "2"}}
         index patient_location: {admin_levels: {admin_level_0: "3" }}
 
-        response = query_tests(group_by: { patient_location_admin_level: 0 })
+        response = query_tests(group_by: { 'patient_location.admin_level' => 0 })
         expect(response).to eq [{"patient_location" => "1", :count => 2}, {"patient_location" => "3", :count => 1}]
       end
     end

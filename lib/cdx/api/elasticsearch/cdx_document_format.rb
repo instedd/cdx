@@ -1,4 +1,4 @@
-class CDPDocumentFormat
+class Cdx::Api::Elasticsearch::CdxDocumentFormat
   def default_sort
     "test.reported_time"
   end

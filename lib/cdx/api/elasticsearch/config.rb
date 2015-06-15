@@ -30,6 +30,6 @@ class Cdx::Api::Elasticsearch::Config
   end
 
   def document_format
-    @document_format ||= CDPDocumentFormat.new
+    @document_format ||= Cdx::Api::Elasticsearch::CdxDocumentFormat.new
   end
 end

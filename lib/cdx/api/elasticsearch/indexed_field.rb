@@ -2,11 +2,11 @@ class Cdx::Api::Elasticsearch::IndexedField
   attr_reader :name, :core_field, :sub_fields, :group_definitions, :filter_definitions
   delegate :scoped_name, :type, :nested?, to: :core_field
 
-  def self.for(core_field, api_fields, document_format)
+  def self.for(core_field, api_fields, document_format = Cdx::Api::Elasticsearch::CdxDocumentFormat.new)
     definition = api_fields.detect do |definition|
-      definition[:name] == core_field.scoped_name
+      definition['name'] == core_field.scoped_name
     end
-    new(core_field, (definition || {}), document_format)
+    new(core_field, (definition.try(:with_indifferent_access) || {}), document_format)
   end
 
   def initialize core_field, definition, document_format
@@ -19,35 +19,8 @@ class Cdx::Api::Elasticsearch::IndexedField
         self.class.new(field, document_format)
       end
     else
-      if definition[:filter_parameter_definition] != 'none'
-        @filter_definitions = if definition[:filter_parameter_definition]
-          filters = definition[:filter_parameter_definition]
-          filters.each do |filter|
-            filter[:name] = scoped_name unless filter[:name]
-            filter[:type] = default_filter_type unless filter[:type]
-          end
-          filters
-        else
-          default_filter_definition
-        end
-      else
-        definition[:filter_parameter_definition] = Array.new
-      end
-
-      if definition[:group_parameter_definition] != 'none'
-        @group_definitions = if definition[:group_parameter_definition]
-          groups = definition[:group_parameter_definition]
-          groups.each do |group|
-            group[:name] = scoped_name unless group[:name]
-            group[:type] = default_grouping_type unless group[:type]
-          end
-          groups
-        else
-          default_group_definition
-        end
-      else
-        definition[:group_parameter_definition] = Array.new
-      end
+      initialize_filter_definitions definition
+      initialize_group_definitions definition
     end
   end
 
@@ -107,5 +80,35 @@ private
 
   def default_grouping_type
     'flat'
+  end
+
+  def initialize_filter_definitions(definition)
+    @filter_definitions = if definition[:filter_parameter_definition] == 'none'
+      Array.new
+    else
+      if definition[:filter_parameter_definition]
+        definition[:filter_parameter_definition].each do |filter|
+          filter[:name] = scoped_name unless filter[:name]
+          filter[:type] = default_filter_type unless filter[:type]
+        end
+      else
+        default_filter_definition
+      end
+    end
+  end
+
+  def initialize_group_definitions(definition)
+    @group_definitions = if definition[:group_parameter_definition] == 'none'
+      Array.new
+    else
+      if definition[:group_parameter_definition]
+        definition[:group_parameter_definition].each do |group|
+          group[:name] = scoped_name unless group[:name]
+          group[:type] = default_grouping_type unless group[:type]
+        end
+      else
+        default_group_definition
+      end
+    end
   end
 end
