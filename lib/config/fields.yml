@@ -10,6 +10,8 @@ sample:
   - name: collection_date
     type: date
 test:
+  - name: uuid
+    searchable: true
   - name: start_time
     type: date
     searchable: true

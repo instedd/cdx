@@ -6,9 +6,7 @@ require "active_support/core_ext/hash"
 
 module Cdx
   def self.core_fields
-    @core_fields ||= core_field_scopes.map do |scope|
-      scope.fields.map(&:flatten).flatten
-    end.flatten
+    @core_fields ||= core_field_scopes.map(&:flatten).flatten
   end
 
   def self.core_field_scopes

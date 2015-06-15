@@ -11,4 +11,8 @@ class Cdx::Scope
   def scoped_name
     name
   end
+
+  def flatten
+    @fields.map(&:flatten).flatten
+  end
 end
