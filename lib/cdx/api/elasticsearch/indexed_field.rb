@@ -1,6 +1,6 @@
 class Cdx::Api::Elasticsearch::IndexedField
   attr_reader :name, :core_field, :sub_fields, :group_definitions, :filter_definitions
-  delegate :scoped_name, :type, :nested?, to: :core_field
+  delegate :scoped_name, :type, :nested?, :valid_values, to: :core_field
 
   def self.for(core_field, api_fields, document_format = Cdx::Api::Elasticsearch::CdxDocumentFormat.new)
     definition = api_fields.detect do |definition|
