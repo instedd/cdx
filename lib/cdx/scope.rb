@@ -13,6 +13,6 @@ class Cdx::Scope
   end
 
   def flatten
-    @fields.map(&:flatten).flatten
+    @fields
   end
 end
