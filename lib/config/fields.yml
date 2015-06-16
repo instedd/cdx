@@ -97,6 +97,7 @@ location:
   - name: parents
     searchable: true
   - name: admin_levels
+    type: dynamic
     searchable: true
   - name: lat
   - name: lng
