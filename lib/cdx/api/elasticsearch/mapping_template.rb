@@ -80,6 +80,8 @@ class Cdx::Api::Elasticsearch::MappingTemplate
         "type" => "string",
         "index" => "not_analyzed"
       }
+    when "dynamic"
+      { "properties" => {} }
     else
       {
         "type" => field.type,

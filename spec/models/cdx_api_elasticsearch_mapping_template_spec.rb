@@ -149,8 +149,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "index" => "not_analyzed"
               },
               "admin_levels" => {
-                "type" => "string",
-                "index" => "not_analyzed"
+                "properties" => {}
               }
             }
           }
