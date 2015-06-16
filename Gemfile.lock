@@ -47,6 +47,14 @@ GIT
       filewatcher (= 0.3.6)
 
 GIT
+  remote: https://github.com/instedd/cdx_core.git
+  revision: f8e8257fc590cc49eec45f5a89de6a0cb5ee2694
+  branch: master
+  specs:
+    cdx (0.0.1)
+      activesupport
+
+GIT
   remote: https://github.com/instedd/geojson_import
   revision: fae5bfa63bf179e64e4febc00b0d03beceb4fab8
   branch: master
@@ -449,6 +457,7 @@ DEPENDENCIES
   capistrano-rvm (~> 0.1)
   capybara
   capybara-mechanize
+  cdx!
   cdx-api-elasticsearch!
   cdx-sync-server!
   coffee-rails (~> 4.0.0)

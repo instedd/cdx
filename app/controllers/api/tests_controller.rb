@@ -32,7 +32,7 @@ class Api::TestsController < ApiController
   end
 
   def schema
-    schema = TestsSchema.for params["locale"], params
+    schema = TestsSchema.for params["locale"]
     respond_to do |format|
       format.json { render_json schema.build }
     end
