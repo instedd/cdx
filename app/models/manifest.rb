@@ -151,19 +151,19 @@ class Manifest < ActiveRecord::Base
   private
 
   def self.map fields, source_prefix=""
-    fields.map do |field_definition|
-      field = source_prefix + field_definition[:name]
-      if field_definition[:type] == "nested"
-        map field_definition[:sub_fields], "#{source_prefix}#{field_definition[:name]}#{COLLECTION_SPLIT_TOKEN}"
+    fields.map do |field|
+      field_name = source_prefix + field.name
+      if field.type == "nested"
+        map field.sub_fields, "#{source_prefix}#{field.name}#{COLLECTION_SPLIT_TOKEN}"
       else
         {
-          target_field: field,
-          source: {lookup: field},
-          type: field_definition[:type],
+          target_field: field_name,
+          source: {lookup: field_name},
+          type: field.type,
           core: true,
           pii: false,
           indexed: true,
-          valid_values: field_definition[:valid_values]
+          valid_values: field.valid_values
         }
       end
     end
