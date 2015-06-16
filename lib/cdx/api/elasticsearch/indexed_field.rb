@@ -9,14 +9,20 @@ class Cdx::Api::Elasticsearch::IndexedField
     new(core_field, (definition.try(:with_indifferent_access) || {}), document_format)
   end
 
-  def initialize core_field, definition, document_format
+  def initialize core_field, definition, document_format, already_nested=false
     @core_field = core_field
 
-    @name = document_format.indexed_field_name(scoped_name)
+    @name = if already_nested
+      scoped_name
+    else
+      "test." + scoped_name
+    end
+
+    @name = document_format.indexed_field_name(@name)
 
     if nested?
-      @sub_fields = core_field.sub_fields.map do |field|
-        self.class.new(field, document_format)
+      @sub_fields = core_field.sub_fields.select(&:has_searchables?).map do |field|
+        self.class.new(field, {}, document_format, true)
       end
     else
       initialize_filter_definitions definition

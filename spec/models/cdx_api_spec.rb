@@ -448,7 +448,7 @@ describe Cdx::Api do
     end
 
     it "groups by week(date) and uses weekyear" do
-      index reported_time: time(2012, 12, 31)
+      index test: {reported_time: time(2012, 12, 31)}
 
       response = query_tests(group_by: "week(test.reported_time)")
 
@@ -761,14 +761,14 @@ describe Cdx::Api do
 
       response = query_tests(group_by: {'location.admin_level' => 1})
       expect(response).to eq([
-        {"location"=>"2", count: 2},
-        {"location"=>"5", count: 1}
+        {"location.admin_levels"=>"2", count: 2},
+        {"location.admin_levels"=>"5", count: 1}
       ])
 
       response = query_tests(group_by: {'location.admin_level' => 0})
 
       expect(response).to eq([
-        {"location"=>"1", count: 3}
+        {"location.admin_levels"=>"1", count: 3}
       ])
     end
 
@@ -778,7 +778,7 @@ describe Cdx::Api do
         @extra_scope = Cdx::Scope.new('patient_location', [
           {name: 'id'},
           {name: 'parents', searchable: true},
-          {name: 'admin_levels', searchable: true},
+          {name: 'admin_levels', searchable: true, type: 'dynamic'},
           {name: 'lat'},
           {name: 'lng'}])
 
@@ -844,7 +844,7 @@ describe Cdx::Api do
         index patient_location: {admin_levels: {admin_level_0: "3" }}
 
         response = query_tests(group_by: { 'patient_location.admin_level' => 0 })
-        expect(response).to eq [{"patient_location" => "1", :count => 2}, {"patient_location" => "3", :count => 1}]
+        expect(response).to eq [{"patient_location.admin_levels" => "1", :count => 2}, {"patient_location.admin_levels" => "3", :count => 1}]
       end
     end
   end
