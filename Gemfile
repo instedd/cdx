@@ -30,7 +30,7 @@ gem 'gon'
 gem 'rchardet'
 gem 'therubyracer'
 
-gem 'cdx', github: 'instedd/cdx_core', branch: 'master'
+gem 'cdx', git: 'https://github.com/instedd/cdx_core', branch: 'master'
 gem 'cdx-api-elasticsearch', git: "https://github.com/instedd/cdx-api-elasticsearch.git", branch: '8-feature-scoped_fields'
 gem 'cdx-sync-server',  git: "https://github.com/instedd/cdx-sync-server.git", branch: 'master'
 gem 'geojson_import', git: "https://github.com/instedd/geojson_import", branch: 'master'

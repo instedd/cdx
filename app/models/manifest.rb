@@ -7,9 +7,6 @@ class Manifest < ActiveRecord::Base
   before_save :update_version
   before_save :update_api_version
 
-  after_save     :update_mappings
-  around_destroy :restore_mappings
-
   COLLECTION_SPLIT_TOKEN = "[*]."
   PATH_SPLIT_TOKEN = "."
 
@@ -231,24 +228,6 @@ class Manifest < ActiveRecord::Base
       if !valid_values.include? vm
         self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. '#{vm}' is not a valid value")
       end
-    end
-  end
-
-  def update_mappings
-    ElasticsearchMappingTemplate.new(self, current_models).update!
-  end
-
-  def restore_mappings
-    # TODO: Add tests for restoring old mappings
-    models = self.current_models
-    yield
-
-      models.each(&:reload).group_by(&:current_manifest).each do |manifest, models|
-        if manifest
-          ElasticsearchMappingTemplate.new(manifest, models).update!
-        else
-          ElasticsearchMappingTemplate.delete_templates_for(models)
-        end
     end
   end
 

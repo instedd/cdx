@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ElasticsearchMappingTemplate, elasticsearch: true do
+describe Cdx::Api::Elasticsearch::MappingTemplate, elasticsearch: true do
 
   let(:manifest) do
     Manifest.create! definition: %{{

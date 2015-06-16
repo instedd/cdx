@@ -20,14 +20,6 @@ GIT
       ruby-openid
 
 GIT
-  remote: git://github.com/instedd/cdx_core.git
-  revision: 8a6dab7a0b4ceb99a3aa6aa4eb120dc3a9eca6b2
-  branch: master
-  specs:
-    cdx (0.0.1)
-      activesupport
-
-GIT
   remote: https://bitbucket.org/instedd/instedd-bootstrap.git
   revision: abd90e62cb8eaa922719acc18e3d7570b3b9b106
   branch: master
@@ -39,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: 466793b6cd80cf8bdd382c56d32a5c91347e2f2c
+  revision: 077600af330d7b4172ba47db7a1780b339d029b7
   branch: 8-feature-scoped_fields
   specs:
     cdx-api-elasticsearch (0.0.1)
@@ -53,6 +45,14 @@ GIT
   specs:
     cdx-sync-server (0.0.0)
       filewatcher (= 0.3.6)
+
+GIT
+  remote: https://github.com/instedd/cdx_core
+  revision: ffb39de2af3b8d5300cb7c2131c2d9dcb106f0bf
+  branch: master
+  specs:
+    cdx (0.0.1)
+      activesupport
 
 GIT
   remote: https://github.com/instedd/geojson_import
