@@ -32,6 +32,10 @@ class Cdx::Field
     @definition[:sub_fields]
   end
 
+  def has_searchables?
+    searchable? or (nested? and sub_fields.any? &:searchable?)
+  end
+
   def scoped_name
     "#{@scope.scoped_name}.#{name}"
   end
