@@ -33,40 +33,40 @@ test:
   - name: name # (current 'assay_name')
     searchable: true
   - name: status # (remove 'negative' from enum, add 'in_progress')
+    type: enum
     searchable: true
-    valid_values:
-      options:
-        - invalid
-        - error
-        - no_result
-        - success
-        - in_progress
+    options:
+      - invalid
+      - error
+      - no_result
+      - success
+      - in_progress
   - name: qualitative_result # ('negative', 'positive', 'n/a') (rename 'unknown' to 'n/a')
+    type: enum
     searchable: true
-    valid_values:
-      options:
-        - negative
-        - positive
-        - n/a
+    options:
+      - negative
+      - positive
+      - n/a
   - name: assays
     type: nested
     sub_fields:
       - name: name # (current 'condition') (LOINC)
         searchable: true
       - name: qualitative_result # (positive, negative)
+        type: enum
         searchable: true
-        valid_values:
-          options:
-            - positive
-            - negative
+        options:
+          - positive
+          - negative
       - name: quantitative_result
         type: integer
   - name: type
+    type: enum
     searchable: true
-    valid_values:
-      options:
-        - specimen
-        - qc
+    options:
+      - specimen
+      - qc
 device:
   - name: uuid
     searchable: true

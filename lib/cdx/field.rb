@@ -39,4 +39,12 @@ class Cdx::Field
   def flatten
     sub_fields || self
   end
+
+  def valid_values
+    @definition[:valid_values]
+  end
+
+  def options
+    @definition[:options]
+  end
 end
