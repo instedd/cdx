@@ -31,6 +31,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
           },
           "test"=> {
             "properties" => {
+              "uuid" => {
+                "type" => "string",
+                "index" => "not_analyzed"
+              },
               "start_time"=> {
                 "type"=> "date",
                 "index"=> "not_analyzed"
@@ -52,7 +56,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "index"=> "not_analyzed"
               },
               "patient_age" => {
-                "type" => "string",
+                "type" => "integer",
                 "index" => "not_analyzed"
               },
               "name" => {
