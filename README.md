@@ -40,7 +40,7 @@ end
 
 This gem assumes that all tests are stored in a canonical ElasticSearch index (or indices) with a mapping based on the standard core fields definition specified in [CDX API](http://dxapi.org/#/event-resource), and encoded in the [API fields definition](config/cdx_api_fields.yml).
 
-This mapping can be automatically generated from the specification invoking `Cdx::Api::Service.initialize_default_template(template_name)`.
+This mapping can be automatically generated from the specification invoking `Cdx::Api::Service.initialize_template(template_name)`.
 
 If your data is not stored using that same schema, you will need to provide a way of mapping the fields, filters and aggregations that do not match with the canonical mapping to your implementation. The simplest way to do this is to set up a [custom document format](lib/cdx/api/elasticsearch/custom_document_format.rb) with the mappings from the field names in the spec to your ES instance.
 

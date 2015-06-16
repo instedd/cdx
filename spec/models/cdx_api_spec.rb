@@ -808,7 +808,7 @@ describe Cdx::Api do
 
         # Delete the index and recreate it to make ES grab the new template
         Cdx::Api.client.indices.delete index: "cdx_tests" rescue nil
-        Cdx::Api.initialize_default_template "cdx_tests_template"
+        Cdx::Api.initialize_template "cdx_tests_template"
       end
 
       after(:all) do
@@ -823,7 +823,7 @@ describe Cdx::Api do
 
         # Delete the index and recreate it to make ES grab the new template
         Cdx::Api.client.indices.delete index: "cdx_tests" rescue nil
-        Cdx::Api.initialize_default_template "cdx_tests_template"
+        Cdx::Api.initialize_template "cdx_tests_template"
       end
 
       it "should allow searching by the new field" do

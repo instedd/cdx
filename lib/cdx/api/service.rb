@@ -4,8 +4,8 @@ class Cdx::Api::Service
     yield config
   end
 
-  def initialize_default_template(template_name)
-    Cdx::Api::Elasticsearch::Initializer.new(self).initialize_default_template(template_name)
+  def initialize_template(template_name)
+    Cdx::Api::Elasticsearch::MappingTemplate.new(self).initialize_template(template_name)
   end
 
   def searchable_fields
