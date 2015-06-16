@@ -3,17 +3,21 @@ require 'spec_helper'
 describe Cdx do
   it "should provide a collection of fields" do
     Cdx.core_fields.map(&:scoped_name).sort.should =~([
-      "device.institution_id",
       "device.lab_user",
-      "device.laboratory_id",
+      "device.name",
       "device.serial_number",
       "device.uuid",
+      "institution.id",
+      "institution.name",
+      "laboratory.id",
+      "laboratory.name",
       "location.admin_levels",
       "location.id",
       "location.lat",
       "location.lng",
       "location.parents",
       "patient.gender",
+      "patient.id",
       "sample.collection_date",
       "sample.id",
       "sample.type",
@@ -32,7 +36,8 @@ describe Cdx do
       "test.start_time",
       "test.status",
       "test.type",
-      "test.updated_time"
+      "test.updated_time",
+      "test.uuid"
       ])
   end
 end
