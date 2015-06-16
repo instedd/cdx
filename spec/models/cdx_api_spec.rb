@@ -87,10 +87,10 @@ describe Cdx::Api do
     end
 
     [
-      [:'device.uuid', :'device.uuid', ["dev1", "dev2", "dev3"]],
-      [:laboratory, :laboratory_id, [1, 2, 3]],
-      [:institution, :institution_id, [1, 2, 3]],
-      [:'patient.gender', :'patient.gender', ["male", "female", "unknown"]],
+      ['device.uuid', 'device.uuid', ["dev1", "dev2", "dev3"]],
+      ['laboratory.id', 'laboratory.id', ["1", "2", "3"]],
+      ['institution.id', 'institution.id', ["1", "2", "3"]],
+      ['patient.gender', 'patient.gender', ["male", "female", "unknown"]],
     ].each do |query_name, index_name, values|
       it "should filter by #{query_name}" do
         index test: {assays: [qualitative_result: :positive]}, index_name => values[0]
@@ -138,29 +138,29 @@ describe Cdx::Api do
     end
 
     it "filters by a partial match" do
-      index test: {assays:[qualitative_result: :positive], assay_name: "GX4001"}
-      index test: {assays:[qualitative_result: :negative], assay_name: "GX1234"}
+      index test: {assays:[qualitative_result: :positive], name: "GX4001"}
+      index test: {assays:[qualitative_result: :negative], name: "GX1234"}
 
-      expect_one_qualitative_result "negative", assay_name: "GX1*"
-      expect_one_qualitative_result "positive", assay_name: "GX4*"
-      expect_no_results assay_name: "GX5*"
+      expect_one_qualitative_result "negative", 'test.name' => "GX1*"
+      expect_one_qualitative_result "positive", 'test.name' => "GX4*"
+      expect_no_results 'test.name' => "GX5*"
     end
 
     it "filters by assay name" do
       index test: {assays:[name: "MTB", qualitative_result: :positive]}
       index test: {assays:[name: "Flu", qualitative_result: :negative]}
 
-      expect_one_qualitative_result "positive", name: "MTB"
-      expect_one_qualitative_result "negative", name: "Flu"
-      expect_no_results name: "Qux"
+      expect_one_qualitative_result "positive", 'test.assays.name' => "MTB"
+      expect_one_qualitative_result "negative", 'test.assays.name' => "Flu"
+      expect_no_results 'test.assays.name' => "Qux"
     end
 
     it "filters by qualitative_result, age and name" do
-      index test: {assays:[name: "MTB", qualitative_result: :positive], age: 20}
-      index test: {assays:[name: "MTB", qualitative_result: :negative], age: 20}
-      index test: {assays:[name: "Flu", qualitative_result: :negative], age: 20}
+      index test: {assays:[name: "MTB", qualitative_result: :positive], patient_age: 20}
+      index test: {assays:[name: "MTB", qualitative_result: :negative], patient_age: 20}
+      index test: {assays:[name: "Flu", qualitative_result: :negative], patient_age: 20}
 
-      expect_one_qualitative_result "negative", qualitative_result: :negative, age: 20, name: "Flu"
+      expect_one_qualitative_result "negative", 'test.assays.qualitative_result' => :negative, 'test.patient_age' => 20, 'test.assays.name' => "Flu"
     end
 
     it "filters by test type" do
@@ -174,7 +174,7 @@ describe Cdx::Api do
       index test: {error_code: 1}
       index test: {error_code: 2}
 
-      expect_one_event_with_field "test.error_code", 1, 'test.error_code' => 1
+      expect_one_event_with_field "test", "error_code", 1, 'test.error_code' => 1
       expect_no_results 'test.error_code' => 3
     end
 
@@ -264,12 +264,12 @@ describe Cdx::Api do
         index test: {assays:[name: "MTB", qualitative_result: :negative], patient_age: 30}
 
         response = query_tests('test.assays.name' => "not(null)").sort_by do |test|
-          test["patient_age"]
+          test["test"]["patient_age"]
         end
 
         expect(response).to eq([
-          {"patient_age" => 20, "assays" => ["name" => "Flu", "qualitative_result" => "negative"]},
-          {"patient_age" => 30, "assays" => ["name" => "MTB", "qualitative_result" => "negative"]}
+          {"test" => {"patient_age" => 20, "assays" => ["name" => "Flu", "qualitative_result" => "negative"]}},
+          {"test" => {"patient_age" => 30, "assays" => ["name" => "MTB", "qualitative_result" => "negative"]}}
         ])
       end
     end
@@ -603,12 +603,12 @@ describe Cdx::Api do
       index test: {assays:[name: "MTB", qualitative_result: :positive]}
       index test: {assays:[name: "Flu", qualitative_result: :negative]}
 
-      assays = query(qualitative_result: 'foo', group_by: "qualitative_result")
+      assays = query('test.assays.qualitative_result' => 'foo', group_by: "test.assays.qualitative_result")
 
       expect(assays["tests"].length).to eq(0)
       expect(assays["total_count"]).to eq(0)
 
-      assays = query(qualitative_result: 'foo')
+      assays = query('test.assays.qualitative_result' => 'foo')
 
       expect(assays["tests"].length).to eq(0)
       expect(assays["total_count"]).to eq(0)
@@ -733,10 +733,10 @@ describe Cdx::Api do
       index test: {assays: [qualitative_result: "positive"]}, location: {parents: [1, 2, 4]}
       index test: {assays: [qualitative_result: "positive with riff"]}, location: {parents: [1, 5]}
 
-      expect_one_qualitative_result "negative", location: 3
-      expect_one_qualitative_result "positive", location: 4
+      expect_one_qualitative_result "negative", 'location.id' => 3
+      expect_one_qualitative_result "positive", 'location.id' => 4
 
-      response = query_tests(location: 2).sort_by do |test|
+      response = query_tests('location.id' => 2).sort_by do |test|
         test["test"]["assays"].first["qualitative_result"]
       end
 
@@ -744,7 +744,7 @@ describe Cdx::Api do
       expect(response[0]["test"]["assays"].first["qualitative_result"]).to eq("negative")
       expect(response[1]["test"]["assays"].first["qualitative_result"]).to eq("positive")
 
-      response = query_tests(location: 1).sort_by do |test|
+      response = query_tests('location.id' => 1).sort_by do |test|
         test["test"]["assays"].first["qualitative_result"]
       end
 
@@ -759,13 +759,13 @@ describe Cdx::Api do
       index test: {assays: [qualitative_result: "positive"]}, location: {admin_levels: {admin_level_0: "1", admin_level_1: "2"}}
       index test: {assays: [qualitative_result: "positive with riff"]}, location: {admin_levels: {admin_level_0: "1", admin_level_1: "5"}}
 
-      response = query_tests(group_by: {admin_level: 1})
+      response = query_tests(group_by: {'location.admin_level' => 1})
       expect(response).to eq([
         {"location"=>"2", count: 2},
         {"location"=>"5", count: 1}
       ])
 
-      response = query_tests(group_by: {admin_level: 0})
+      response = query_tests(group_by: {'location.admin_level' => 0})
 
       expect(response).to eq([
         {"location"=>"1", count: 3}
@@ -798,7 +798,7 @@ describe Cdx::Api do
                 type: 'location'
               }]
             }
-          ])
+          ].map(&:with_indifferent_access))
         end
 
         Cdx.core_field_scopes.push @extra_scope
@@ -831,10 +831,10 @@ describe Cdx::Api do
         index patient_location: {id: 2, parents: [1,2]}
         index patient_location: {id: 3, parents: [3]}
 
-        response = query_tests patient_location: 1
+        response = query_tests 'patient_location.id' => 1
         expect(response.count).to eq(2)
 
-        response = query_tests patient_location: 3
+        response = query_tests 'patient_location.id' => 3
         expect(response.count).to eq(1)
       end
 
