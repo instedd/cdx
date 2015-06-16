@@ -1,7 +1,7 @@
 class Cdx::Api::Elasticsearch::MappingTemplate
 
-  def initialize(api)
-    @api = api || Cdx::Api.client
+  def initialize(api = Cdx::Api)
+    @api = api
   end
 
   # put_template!
