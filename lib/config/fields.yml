@@ -29,6 +29,7 @@ test:
     searchable: true
   - name: error_description
   - name: patient_age # (store with 'units', goes under test, not sample, not patient) UNITS????
+    type: integer
     searchable: true
   - name: name # (current 'assay_name')
     searchable: true
