@@ -119,7 +119,11 @@ class ManifestFieldMapping
     ctx = V8::Context.new
     begin
       ctx["message"] = data
+      ctx["device"] = { uuid: @device.uuid, name: @device.name } if @device
+
       ctx.eval(script)
+    rescue V8::Error => e
+      raise ManifestParsingError.script_error(@field['target_field'], e.message)
     ensure
       ctx.dispose
     end

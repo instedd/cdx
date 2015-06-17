@@ -88,6 +88,22 @@ describe Manifest, validate_manifest: false do
       patient: {indexed: {"name" => "John Doe"}, pii: {}, custom: {}}
     end
 
+    it "has access to device from script" do
+      device = Device.make
+      assert_manifest_application %(
+        {
+          "sample": [{
+            "target_field": "fields",
+            "source": { "script": "device.name + ',' + device.uuid" },
+            "core": true,
+            "pii": false,
+            "indexed": true
+          }]
+        }
+      ), %({}),
+      {sample: {indexed: {"fields" => "#{device.name},#{device.uuid}"}, pii: {}, custom: {}}}, device
+    end
+
     it "loads xml in javascript" do
       assert_manifest_application %(
         {

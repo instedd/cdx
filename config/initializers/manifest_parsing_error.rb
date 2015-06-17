@@ -46,4 +46,8 @@ class ManifestParsingError < RuntimeError
   def self.invalid_manifest(manifest)
     new "Cannot apply invalid manifest to document:\n #{manifest.errors.full_messages.join("\n ")}"
   end
+
+  def self.script_error(target_field, message)
+    new "Error executing script while mapping the field '#{target_field}': #{message}"
+  end
 end
