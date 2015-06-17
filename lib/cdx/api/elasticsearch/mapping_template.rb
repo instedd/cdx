@@ -43,6 +43,12 @@ class Cdx::Api::Elasticsearch::MappingTemplate
           path_match: "admin_level_*",
           mapping: { type: :string, index: :not_analyzed }
         }
+      },
+      {
+        "custom_fields" => {
+          path_match: "*.custom_fields.*",
+          mapping: { type: :string, index: :no, store: :yes }
+        }
       }
     ]
   end
@@ -93,8 +99,7 @@ class Cdx::Api::Elasticsearch::MappingTemplate
   def custom_fields_mapping
     {
       custom_fields: {
-        type: 'object',
-        index: 'no'
+        type: 'object'
       }
     }
   end

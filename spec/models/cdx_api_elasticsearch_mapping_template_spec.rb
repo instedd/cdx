@@ -11,6 +11,23 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
     let(:template) { Cdx::Api::Elasticsearch::MappingTemplate.new "cdx_tests_template" }
 
     it "maps the core fields" do
+      expect(template.build_dynamic_templates).to eq([
+        {
+          "*.admin_levels" => {
+            path_match: "admin_level_*",
+            mapping: {type: :string, index: :not_analyzed}
+          }
+        },
+        {
+          "custom_fields" => {
+            path_match: "*.custom_fields.*",
+            mapping: {type: :string, index: :no, store: :yes}
+          }
+        }
+      ])
+    end
+
+    it "maps the core fields" do
       expect(template.build_properties_mapping).to eq(
         {
           "sample"=> {
@@ -28,8 +45,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "index"=> "not_analyzed"
               },
               "custom_fields" => {
-                "type" => "object",
-                "index" => "no"
+                "type" => "object"
               }
             }
           },
@@ -93,8 +109,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "index" => "not_analyzed"
               },
               "custom_fields" => {
-                "type" => "object",
-                "index" => "no"
+                "type" => "object"
               }
             }
           },
@@ -117,8 +132,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "index"=> "not_analyzed"
               },
               "custom_fields" => {
-                "type" => "object",
-                "index" => "no"
+                "type" => "object"
               }
             }
           },
@@ -133,8 +147,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "index" => "not_analyzed"
               },
               "custom_fields" => {
-                "type" => "object",
-                "index" => "no"
+                "type" => "object"
               }
             }
           },
@@ -149,8 +162,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "index" => "not_analyzed"
               },
               "custom_fields" => {
-                "type" => "object",
-                "index" => "no"
+                "type" => "object"
               }
             }
           },
@@ -161,8 +173,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "index" => "not_analyzed"
               },
               "custom_fields" => {
-                "type" => "object",
-                "index" => "no"
+                "type" => "object"
               }
             }
           },
@@ -176,8 +187,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "properties" => {}
               },
               "custom_fields" => {
-                "type" => "object",
-                "index" => "no"
+                "type" => "object"
               }
             }
           }
