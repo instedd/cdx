@@ -41,11 +41,11 @@
   group_parameter_definition: none
 - name: location.parents
   filter_parameter_definition:
-    - name: location.id
+    - name: location
       type: match
 - name: location.admin_levels
   group_parameter_definition:
-    - name: location.admin_level
+    - name: admin_level
       type: location
 - name: test.patient_age
   filter_parameter_definition:

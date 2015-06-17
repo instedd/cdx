@@ -733,10 +733,10 @@ describe Cdx::Api do
       index test: {assays: [qualitative_result: "positive"]}, location: {parents: [1, 2, 4]}
       index test: {assays: [qualitative_result: "positive with riff"]}, location: {parents: [1, 5]}
 
-      expect_one_qualitative_result "negative", 'location.id' => 3
-      expect_one_qualitative_result "positive", 'location.id' => 4
+      expect_one_qualitative_result "negative", 'location' => 3
+      expect_one_qualitative_result "positive", 'location' => 4
 
-      response = query_tests('location.id' => 2).sort_by do |test|
+      response = query_tests('location' => 2).sort_by do |test|
         test["test"]["assays"].first["qualitative_result"]
       end
 
@@ -744,7 +744,7 @@ describe Cdx::Api do
       expect(response[0]["test"]["assays"].first["qualitative_result"]).to eq("negative")
       expect(response[1]["test"]["assays"].first["qualitative_result"]).to eq("positive")
 
-      response = query_tests('location.id' => 1).sort_by do |test|
+      response = query_tests('location' => 1).sort_by do |test|
         test["test"]["assays"].first["qualitative_result"]
       end
 
@@ -759,13 +759,13 @@ describe Cdx::Api do
       index test: {assays: [qualitative_result: "positive"]}, location: {admin_levels: {admin_level_0: "1", admin_level_1: "2"}}
       index test: {assays: [qualitative_result: "positive with riff"]}, location: {admin_levels: {admin_level_0: "1", admin_level_1: "5"}}
 
-      response = query_tests(group_by: {'location.admin_level' => 1})
+      response = query_tests(group_by: {'admin_level' => 1})
       expect(response).to eq([
         {"location.admin_levels"=>"2", count: 2},
         {"location.admin_levels"=>"5", count: 1}
       ])
 
-      response = query_tests(group_by: {'location.admin_level' => 0})
+      response = query_tests(group_by: {'admin_level' => 0})
 
       expect(response).to eq([
         {"location.admin_levels"=>"1", count: 3}
