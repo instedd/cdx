@@ -3,7 +3,11 @@ require "yaml"
 require "elasticsearch"
 require 'cdx'
 
-module Cdx::Api::Elasticsearch
+module Cdx
+  module Api
+    module Elasticsearch
+    end
+  end
 end
 
 Dir[File.expand_path("../**/*.rb", __FILE__)].each do |file|
