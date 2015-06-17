@@ -52,7 +52,7 @@ class Cdx::Api::Elasticsearch::MappingTemplate
 
     Hash[
       scoped_fields.map { |scope|
-        [ scope.name, { "properties" => map_fields(scope.fields) } ]
+        [ scope.name, { "properties" => map_fields(scope.fields).merge(custom_fields_mapping) } ]
       }
     ].with_indifferent_access
   end
@@ -88,5 +88,14 @@ class Cdx::Api::Elasticsearch::MappingTemplate
         "index" => "not_analyzed"
       }
     end
+  end
+
+  def custom_fields_mapping
+    {
+      custom_fields: {
+        type: 'object',
+        index: 'no'
+      }
+    }
   end
 end
