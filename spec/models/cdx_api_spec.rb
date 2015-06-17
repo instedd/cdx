@@ -391,7 +391,7 @@ describe Cdx::Api do
 
       expect {
         query_tests(group_by: "foo(test.reported_time)")
-      }.to raise_error
+      }.to raise_error("Unsupported group")
     end
 
     it "groups by year(date)" do

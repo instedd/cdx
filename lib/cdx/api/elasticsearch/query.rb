@@ -214,6 +214,8 @@ class Cdx::Api::Elasticsearch::Query
       Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value, @api
     end
 
+    raise "Unsupported group" if group_by.include? nil
+
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
     test = @api.search_elastic body: aggregations.to_hash.merge(query: query), size: 0, index: indices
