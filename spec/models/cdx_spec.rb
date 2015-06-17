@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Cdx do
   it "should provide a collection of fields" do
-    Cdx.core_fields.map(&:scoped_name).sort.should =~([
+    expect(Cdx.core_fields.map(&:scoped_name).sort).to contain_exactly(
       "device.lab_user",
       "device.name",
       "device.serial_number",
@@ -36,6 +36,6 @@ describe Cdx do
       "test.type",
       "test.updated_time",
       "test.uuid"
-      ])
+    )
   end
 end
