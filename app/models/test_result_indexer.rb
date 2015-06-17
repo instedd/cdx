@@ -18,11 +18,7 @@ class TestResultIndexer
   end
 
   def type
-    if device.current_manifest.present?
-      "test_#{device.device_model_id}"
-    else
-      'test'
-    end
+    'test'
   end
 
   def elasticsearch_id
