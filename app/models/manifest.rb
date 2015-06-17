@@ -87,10 +87,8 @@ class Manifest < ActiveRecord::Base
     parser.load(data, data_root).each_with_index do |record, record_index|
       begin
         message = MESSAGE_TEMPLATE.deep_dup
-        field_mapping.each do |scope, mappings|
-          message = mappings.inject(message) do |message, field|
-            ManifestField.new(self, field, scope, device).apply_to record, message
-          end
+        fields.each do |field|
+          field.apply_to record, message, device
         end
         messages << message
       rescue ManifestParsingError => err
@@ -100,6 +98,15 @@ class Manifest < ActiveRecord::Base
     end
 
     messages
+  end
+
+  def fields
+    @fields ||=
+      field_mapping.inject([]) do |all, (scope, mappings)|
+        mappings.inject(all) do |all, field|
+          all << ManifestField.new(self, field, scope)
+        end
+      end
   end
 
   def field_mapping

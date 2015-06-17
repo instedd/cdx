@@ -1,15 +1,16 @@
 class ManifestField
-  def initialize(manifest, field, scope=nil, device=nil)
+  attr_reader :target_field
+
+  def initialize(manifest, field, scope=nil)
     @manifest = manifest
     @field = field
     @target_field = @field["target_field"]
     @validation = ManifestFieldValidation.new(@field)
     @scope = scope
-    @device = device
   end
 
-  def apply_to(data, message)
-    value = ManifestFieldMapping.new(@manifest, @field, @device, data).apply
+  def apply_to(data, message, device)
+    value = ManifestFieldMapping.new(@manifest, @field, device, data).apply
     @validation.apply_to value
     store value, message
   end
