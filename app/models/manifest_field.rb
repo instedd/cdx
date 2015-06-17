@@ -32,6 +32,9 @@ class ManifestField
     end
   end
 
+  def custom?
+    hash_key == "custom"
+  end
 
   def index value, target, message, custom=false
     if (targets = target.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
