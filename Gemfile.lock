@@ -31,11 +31,12 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: c362dce1d4c55655668aa482acb0eba456576d98
+  revision: 3d1a5d9c354b53ed987c88458089ce5e085438cf
   branch: 8-feature-scoped_fields
   specs:
     cdx-api-elasticsearch (0.0.1)
       activesupport
+      cdx
       elasticsearch
 
 GIT
@@ -185,12 +186,12 @@ GEM
     dotiw (3.0.1)
       actionpack (>= 3)
       i18n
-    elasticsearch (1.0.8)
-      elasticsearch-api (= 1.0.7)
-      elasticsearch-transport (= 1.0.7)
-    elasticsearch-api (1.0.7)
+    elasticsearch (1.0.12)
+      elasticsearch-api (= 1.0.12)
+      elasticsearch-transport (= 1.0.12)
+    elasticsearch-api (1.0.12)
       multi_json
-    elasticsearch-transport (1.0.7)
+    elasticsearch-transport (1.0.12)
       faraday
       multi_json
     encryptor (1.3.0)
@@ -275,7 +276,7 @@ GEM
     mime-types (1.25.1)
     mini_portile (0.5.2)
     minitest (4.7.5)
-    multi_json (1.11.0)
+    multi_json (1.11.1)
     multipart-post (2.0.0)
     mysql2 (0.3.15)
     net-http-digest_auth (1.4)
@@ -423,7 +424,7 @@ GEM
     trollop (2.1.2)
     turbolinks (2.2.0)
       coffee-rails
-    tzinfo (0.3.43)
+    tzinfo (0.3.44)
     uglifier (2.4.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
