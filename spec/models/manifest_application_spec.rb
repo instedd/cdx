@@ -49,15 +49,12 @@ describe Manifest, validate_manifest: false do
         patient: {indexed: Hash.new, pii: {"patient_name" => "John"}, custom: Hash.new}
     end
 
-    it "should apply to custom non-pii non-indexed field" do
+    it "should apply to custom non-pii field" do
       assert_manifest_application %{
           {
             "test" : [{
               "target_field" : "temperature",
-              "source" : {"lookup" : "temperature"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : false
+              "source" : {"lookup" : "temperature"}
             }]
           }
         },
@@ -65,15 +62,12 @@ describe Manifest, validate_manifest: false do
         test: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => "20"}}
     end
 
-    it "should apply to custom non-pii non-indexed field coercing to integer" do
+    it "should apply to custom non-pii field coercing to integer" do
       assert_manifest_application %{
           {
             "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : false,
               "type" : "integer"
             }]
           }
@@ -82,36 +76,17 @@ describe Manifest, validate_manifest: false do
         test: {indexed: Hash.new, pii: Hash.new, custom: {"temperature" => 20}}
     end
 
-    it "should apply to custom non-pii indexed field" do
+    it "should apply to custom non-pii field inside results array" do
       assert_manifest_application %{
           {
             "test" : [{
-              "target_field" : "temperature",
-              "source" : {"lookup" : "temperature"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true
-            }]
-          }
-        },
-        {json: '{"temperature" : "20"}', csv: "temperature\n20"},
-        test: {indexed: {"custom_fields" => {"temperature" => "20"}}, pii: Hash.new, custom: Hash.new}
-    end
-
-    it "should apply to custom non-pii indexed field inside results array" do
-      assert_manifest_application %{
-          {
-            "test" : [{
-              "target_field" : "results[*].temperature",
-              "source" : {"lookup" : "temperature"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true
+              "target_field" : "assays[*].temperature",
+              "source" : {"lookup" : "temperature"}
             }]
           }
         },
         '{"temperature" : 20}',
-        test: {indexed: {"results" => [{"custom_fields" => {"temperature" => 20}}]}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {}, pii: {}, custom: {"assays"=>[{"temperature"=>20}]}}
     end
 
     it "should store fields in sample, test or patient as specified" do

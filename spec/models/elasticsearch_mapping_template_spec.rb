@@ -13,10 +13,7 @@ describe Cdx::Api::Elasticsearch::MappingTemplate, elasticsearch: true do
         {
           "target_field" : "temperature",
           "source" : {"lookup" : "Test.temp"},
-          "core" : false,
           "type" : "integer",
-          "pii" : false,
-          "indexed" : true,
           "valid_values" : {
             "range" : {
               "min" : 0,
@@ -28,9 +25,6 @@ describe Cdx::Api::Elasticsearch::MappingTemplate, elasticsearch: true do
           "target_field" : "results[*].temperature",
           "source" : {"lookup" : "Test.temp"},
           "type" : "integer",
-          "core" : false,
-          "pii" : false,
-          "indexed" :true,
           "valid_values" : {
             "range" : {
               "min" : 0,

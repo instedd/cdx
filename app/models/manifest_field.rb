@@ -25,7 +25,7 @@ class ManifestField
     case
     when @field['pii']
       'pii'
-    when @field['core'], @field['indexed']
+    when @field['core']
       'indexed'
     else
       'custom'
