@@ -114,27 +114,22 @@ describe Manifest, validate_manifest: false do
       definition = %{{
         "sample" : [
           {
-            "target_field" : "sample_id",
+            "target_field" : "id",
             "source" : {"lookup" : "sample_id"},
-            "core" : true,
-            "indexed" : true
+            "core" : true
           },
           {
-            "target_field" : "sample_type",
+            "target_field" : "type",
             "source" : {"lookup" : "sample_type"},
-            "core" : true,
-            "indexed" : true
+            "core" : true
           },
           {
             "target_field" : "culture_days",
-            "source" : {"lookup" : "culture_days"},
-            "indexed" : true,
-            "custom" : true
+            "source" : {"lookup" : "culture_days"}
           },
           {
             "target_field" : "datagram",
-            "source" : {"lookup" : "datagram"},
-            "custom" : true
+            "source" : {"lookup" : "datagram"}
           },
           {
             "target_field" : "collected_at",
@@ -144,42 +139,37 @@ describe Manifest, validate_manifest: false do
         ],
         "patient" : [
           {
-            "target_field" : "patient_id",
+            "target_field" : "id",
             "source" : {"lookup" : "patient_id"},
             "pii" : true
           },
           {
             "target_field" : "gender",
             "source" : {"lookup" : "gender"},
-            "core" : true,
-            "indexed" : true
+            "core" : true
           },
           {
             "target_field" : "dob",
             "source" : {"lookup" : "dob"},
-            "core" : true,
             "pii" : true
           },
           {
             "target_field" : "hiv",
-            "source" : {"lookup" : "hiv"},
-            "custom" : true,
-            "indexed" : true
+            "source" : {"lookup" : "hiv"}
           },
           {
             "target_field" : "shirt_color",
-            "source" : {"lookup" : "shirt_color"},
-            "custom" : true
+            "source" : {"lookup" : "shirt_color"}
           }
         ],
         "test" : [
           {
-            "target_field" : "test_id",
+            "target_field" : "id",
             "source" : {"lookup" : "test_id"},
             "core" : true
           },
           {
-            "target_field" : "assay",
+            "target_field" : "name",
             "source" : {"lookup" : "assay"},
             "core" : true,
             "indexed" : true
@@ -192,14 +182,11 @@ describe Manifest, validate_manifest: false do
           },
           {
             "target_field" : "raw_result",
-            "source" : {"lookup" : "raw_result"},
-            "custom" : true
+            "source" : {"lookup" : "raw_result"}
           },
           {
             "target_field" : "concentration",
-            "source" : {"lookup" : "concentration"},
-            "custom" : true,
-            "indexed" :true
+            "source" : {"lookup" : "concentration"}
           }
         ]
       }}
@@ -207,13 +194,11 @@ describe Manifest, validate_manifest: false do
       expected = {
         test: {
           indexed: {
-            test_id: "4",
-            assay: "mtb",
-            custom_fields: {
-              concentration: "15%"
-            }
+            id: "4",
+            name: "mtb"
           },
           custom: {
+            concentration: "15%",
             raw_result: "positivo 15%"
           },
           pii: {
@@ -222,14 +207,12 @@ describe Manifest, validate_manifest: false do
         },
         sample: {
           indexed: {
-            sample_id: "4002",
-            sample_type: "sputum",
-            custom_fields: {
-              culture_days: "10"
-            }
+            id: "4002",
+            type: "sputum"
           },
           custom: {
-            datagram: "010100011100"
+            datagram: "010100011100",
+            culture_days: "10"
           },
           pii: {
             collected_at: "2000/1/1 9:00:00"
@@ -237,16 +220,14 @@ describe Manifest, validate_manifest: false do
         },
         patient: {
           indexed: {
-            gender: "male",
-            custom_fields: {
-              hiv: "positive"
-            }
+            gender: "male"
           },
           pii: {
-            patient_id: "8000",
+            id: "8000",
             dob: "2000/1/1"
           },
           custom: {
+            hiv: "positive",
             shirt_color: "blue"
           }
         }
@@ -255,43 +236,30 @@ describe Manifest, validate_manifest: false do
       assert_manifest_application definition, {json: test, csv: csv}, expected
     end
 
-    it "should apply to an array of custom non-pii indexed field inside results array" do
+    it "should apply to an array of custom field inside assays array" do
       assert_manifest_application %{
           {
             "test" : [{
-              "target_field" : "results[*].instant_temperature[*].value",
-              "source" : {"lookup" : "tests[*].temperatures[*].value"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true
+              "target_field" : "assays[*].instant_temperature[*].value",
+              "source" : {"lookup" : "tests[*].temperatures[*].value"}
             },
             {
-              "target_field" : "results[*].instant_temperature[*].sample_time",
-              "source" : {"lookup" : "tests[*].temperatures[*].time"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true
+              "target_field" : "assays[*].instant_temperature[*].sample_time",
+              "source" : {"lookup" : "tests[*].temperatures[*].time"}
             },
             {
-              "target_field" : "results[*].condition",
+              "target_field" : "assays[*].condition",
               "source" : {"lookup" : "tests[*].condition"},
-              "core" : true,
-              "pii" : false,
-              "indexed" : true
+              "core" : true
             },
             {
-              "target_field" : "results[*].result",
+              "target_field" : "assays[*].result",
               "source" : {"lookup" : "tests[*].result"},
-              "core" : true,
-              "pii" : false,
-              "indexed" : true
+              "core" : true
             },
             {
               "target_field" : "final_temperature",
-              "source" : {"lookup" : "temperature"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true
+              "source" : {"lookup" : "temperature"}
             }]
           }
         },
@@ -316,25 +284,30 @@ describe Manifest, validate_manifest: false do
             }
           ]
         }',
-        test: {indexed: {
-          "results" => [
-            { "condition" => "mtb",
-              "result" => "positive",
-              "custom_fields" => {"instant_temperature" => [
-                {"sample_time" => "start", "value" => 12},
-                {"sample_time" => "end", "value" => 23}
-              ]}
-            },
-            { "condition" => "rif",
-              "result" => "negative",
-              "custom_fields" => {"instant_temperature" => [
-                {"sample_time" => "start", "value" => 22},
-                {"sample_time" => "end", "value" => 30}
-              ]}
-            }
-          ],
-          "custom_fields" => {"final_temperature" => 20}
-        }, pii: Hash.new, custom: Hash.new}
+        test: {
+          indexed: { "assays" => [
+            { "condition" => "mtb", "result" => "positive" },
+            { "condition" => "rif", "result" => "negative" }
+          ]},
+          pii: Hash.new,
+          custom: {
+            "final_temperature" => 20,
+            "assays" => [
+              {
+                "instant_temperature" => [
+                  {"sample_time" => "start", "value" => 12},
+                  {"sample_time" => "end", "value" => 23}
+                ]
+              },
+              {
+                "instant_temperature" => [
+                  {"sample_time" => "start", "value" => 22},
+                  {"sample_time" => "end", "value" => 30}
+                ]
+              }
+            ]
+          }
+        }
     end
 
     it "should apply to custom pii field" do
@@ -343,9 +316,7 @@ describe Manifest, validate_manifest: false do
             "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
-              "core" : false,
-              "pii" : true,
-              "indexed" : false
+              "pii" : true
             }]
           }
         },
@@ -360,8 +331,6 @@ describe Manifest, validate_manifest: false do
               "target_field" : "level",
               "source" : {"lookup" : "level"},
               "core" : true,
-              "pii" : false,
-              "indexed" : true,
               "options" : ["low", "medium", "high"]
             }]
           }
@@ -377,9 +346,6 @@ describe Manifest, validate_manifest: false do
               "target_field" : "level",
               "type" : "enum",
               "source" : {"lookup" : "level"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true,
               "options" : ["low", "medium", "high"]
             }]
           }
@@ -394,9 +360,6 @@ describe Manifest, validate_manifest: false do
             "test" : [{
               "target_field" : "temperature",
               "source" : {"lookup" : "temperature"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true,
               "valid_values" : {
                 "range" : {
                   "min" : 30,
@@ -407,7 +370,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature" : 30}',
-        test: {indexed: {"custom_fields" => {"temperature" => 30}}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {}, pii: {}, custom: {"temperature" => 30}}
     end
 
     it "should raise on invalid value in range (lesser)" do
@@ -572,15 +535,12 @@ describe Manifest, validate_manifest: false do
           {
             "test" : [{
               "target_field" : "list[*].temperature",
-              "source" : {"lookup" : "temperature_list[*].temperature"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true
+              "source" : {"lookup" : "temperature_list[*].temperature"}
             }]
           }
         },
         '{"temperature_list" : [{"temperature" : 20}, {"temperature" : 10}]}',
-        test: {indexed: {"custom_fields" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {}, pii: {}, custom: {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}
     end
 
     it "should map to multiple indexed fields to the same list" do
@@ -588,17 +548,11 @@ describe Manifest, validate_manifest: false do
           "test" : [
             {
               "target_field" : "collection[*].temperature",
-              "source" : {"lookup" : "some_list[*].temperature"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true
+              "source" : {"lookup" : "some_list[*].temperature"}
             },
             {
               "target_field" : "collection[*].foo",
-              "source" : {"lookup" : "some_list[*].bar"},
-              "core" : false,
-              "pii" : false,
-              "indexed" : true
+              "source" : {"lookup" : "some_list[*].bar"}
             }
           ]}
         },
@@ -614,7 +568,7 @@ describe Manifest, validate_manifest: false do
             }
           ]
         }',
-        test: {indexed: {"custom_fields" => {"collection" => [
+        test: {indexed: {}, pii: Hash.new, custom: {"collection" => [
           {
             "temperature" => 20,
             "foo" => 12
@@ -622,7 +576,7 @@ describe Manifest, validate_manifest: false do
           {
             "temperature" => 10,
             "foo" => 2
-          }]}}, pii: Hash.new, custom: Hash.new}
+          }]}}
     end
 
     it "should map to multiple indexed fields to the same list accross multiple collections" do
@@ -631,16 +585,12 @@ describe Manifest, validate_manifest: false do
             {
               "target_field" : "collection[*].temperature",
               "source" : {"lookup" : "temperature_list[*].temperature"},
-              "core" : true,
-              "pii" : false,
-              "indexed" : true
+              "core" : true
             },
             {
               "target_field" : "collection[*].foo",
               "source" : {"lookup" : "other_list[*].bar"},
-              "core" : true,
-              "pii" : false,
-              "indexed" : true
+              "core" : true
             }
           ]
         }},
