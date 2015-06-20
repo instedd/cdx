@@ -58,49 +58,8 @@ class Cdx::Api::Elasticsearch::MappingTemplate
 
     Hash[
       scoped_fields.map { |scope|
-        [ scope.name, { "properties" => map_fields(scope.fields).merge(custom_fields_mapping) } ]
+        [ scope.name, scope.elasticsearch_mapping ]
       }
     ]
-  end
-
-  def map_fields fields
-    Hash[fields.select(&:has_searchables?).map { |field| [field.name, map_field(field)] }]
-  end
-
-  def map_field field
-    case field.type
-    when "nested"
-      {
-        "type" => "nested",
-        "properties" => map_fields(field.sub_fields)
-      }
-    when "multi_field"
-      {
-        fields: {
-          "analyzed" => {type: :string, index: :analyzed},
-          field.name => {type: :string, index: :not_analyzed}
-        }
-      }
-    when "enum"
-      {
-        "type" => "string",
-        "index" => "not_analyzed"
-      }
-    when "dynamic"
-      { "properties" => {} }
-    else
-      {
-        "type" => field.type,
-        "index" => "not_analyzed"
-      }
-    end
-  end
-
-  def custom_fields_mapping
-    {
-      "custom_fields" => {
-        "type" => "object"
-      }
-    }
   end
 end
