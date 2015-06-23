@@ -144,23 +144,13 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_field_mapping
-    if loaded_definition["field_mapping"].is_a? Hash
-      field_mapping.each do |target_field, source|
-        check_presence_of_lookup target_field, source
-      end
-    else
+    unless loaded_definition["field_mapping"].is_a? Hash
       self.errors.add(:field_mapping, "must be a json object")
     end
   end
 
-  def check_presence_of_lookup target_field, source
-    if source["lookup"].blank?
-      self.errors.add(:invalid_field_mapping, ": target '#{target_field}'. Mapping must include 'lookup' field")
-    end
-  end
-
   def check_custom_fields
-    return unless loaded_definition["custom_fields"].present?
+    return if loaded_definition["custom_fields"].nil?
 
     if loaded_definition["custom_fields"].is_a? Array
       custom_fields.each do |custom_field|
