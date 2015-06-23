@@ -104,9 +104,8 @@ class Manifest < ActiveRecord::Base
         #   end
         # end
 
-        field_mapping.each do |target_field, mapping|
-          # scope = scope_from_definition field_definition
-          message = ManifestField.new(self, mapping, ).apply_to record, message
+        field_mapping.each do |target_path, source|
+          message = ManifestField.new(self, target_path, source, device).apply_to record, message
         end
 
         messages << message
@@ -244,8 +243,8 @@ class Manifest < ActiveRecord::Base
 
   def check_field_mapping
     if loaded_definition["field_mapping"].is_a? Hash
-      field_mapping.each do |name, field_mapping|
-        check_presence_of_lookup name, field_mapping
+      field_mapping.each do |target_field, source|
+        check_presence_of_lookup target_field, source
       end
       # flat_mappings.each do |fm|
       #   check_presence_of_target_field_and_source fm
@@ -264,8 +263,8 @@ class Manifest < ActiveRecord::Base
   #   end
   # end
 
-  def check_presence_of_lookup target_field, field_mapping
-    if field_mapping["lookup"].blank?
+  def check_presence_of_lookup target_field, source
+    if source["lookup"].blank?
       self.errors.add(:invalid_field_mapping, ": target '#{target_field}'. Mapping must include 'lookup' field")
     end
   end
