@@ -9,7 +9,7 @@ class ManifestFieldMapping
   end
 
   def apply
-    coerce_values(traverse @field["source"], @root)
+    coerce_values(traverse @field.source, @root)
   end
 
   def traverse node, data
@@ -123,7 +123,7 @@ class ManifestFieldMapping
 
       ctx.eval(script)
     rescue V8::Error => e
-      raise ManifestParsingError.script_error(@field['target_field'], e.message)
+      raise ManifestParsingError.script_error(@field.target_field, e.message)
     ensure
       ctx.dispose
     end
@@ -140,7 +140,7 @@ class ManifestFieldMapping
         value.match mapping["match"].gsub("*", ".*")
       end
 
-      raise ManifestParsingError.invalid_mapping(value, @field['target_field'], mappings) unless mapping
+      raise ManifestParsingError.invalid_mapping(value, @field.target_field, mappings) unless mapping
 
       mapping["output"]
     end
@@ -177,7 +177,7 @@ class ManifestFieldMapping
     when "year"
       date_time.beginning_of_year
     else
-      raise ManifestParsingError.unsupported_time_unit(time_unit, @field['target_field'])
+      raise ManifestParsingError.unsupported_time_unit(time_unit, @field.target_field)
     end
   end
 
@@ -234,7 +234,7 @@ class ManifestFieldMapping
     when "milliseconds"
       (time_interval / 1000000).seconds
     else
-      raise ManifestParsingError.unsupported_time_unit(source_unit, @field['target_field'])
+      raise ManifestParsingError.unsupported_time_unit(source_unit, @field.target_field)
     end
 
     case desired_unit
@@ -253,7 +253,7 @@ class ManifestFieldMapping
     when "milliseconds"
       time_interval * 1000000
     else
-      raise ManifestParsingError.unsupported_time_unit(desired_unit, @field['target_field'])
+      raise ManifestParsingError.unsupported_time_unit(desired_unit, @field.target_field)
     end
   end
 
@@ -275,7 +275,7 @@ class ManifestFieldMapping
   end
 
   def coerce_values value
-    if @field['type'] == 'integer' &&  ManifestFieldValidation.is_an_integer?(value)
+    if @field.type == 'integer' &&  ManifestFieldValidation.is_an_integer?(value)
       value.to_i
     else
       value

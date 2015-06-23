@@ -38,34 +38,30 @@ module ManifestSpecHelper
     Manifest.create! definition: default_definition(device.model)
   end
 
-  def default_definition(device_model)
+  def self.default_definition(device_model)
+    core_mapping = {}
+
+    Cdx.core_field_scopes.each do |scope|
+      map(scope.fields).flatten.each do |field_definition|
+        scoped_field_definition = "#{scope.name}#{PATH_SPLIT_TOKEN}#{field_definition}"
+        core_mapping[scoped_field_definition] = {
+          lookup: scoped_field_definition
+        }
+      end
+    end
+
     Oj.dump({
-      metadata: { source: { type: "json" } , device_models: [device_model]},
-      field_mapping: field_mapping
+      metadata: { source: { type: "json" } }, device_models: [device_model]},
+      field_mapping: core_mapping
     })
   end
 
-  def field_mapping
-    Hash[Cdx.core_fields_scopes.map do |scope|
-      [scope.name, map(sub_fields, "#{scope.name}#{Manifest::PATH_SPLIT_TOKEN}").flatten]
-    end]
-  end
-
-  def map(fields, source_prefix="")
+  def self.map fields, source_prefix = ''
     fields.map do |field|
-      field_name = source_prefix + field.name
-      if field.type == "nested"
-        map field.sub_fields, "#{source_prefix}#{field.name}#{Manifest::COLLECTION_SPLIT_TOKEN}"
+      if field.nested?
+        map field.sub_fields, "#{source_prefix}#{field.name}#{COLLECTION_SPLIT_TOKEN}"
       else
-        {
-          target_field: field_name,
-          source: {lookup: field_name},
-          type: field.type,
-          core: true,
-          pii: false,
-          indexed: true,
-          valid_values: field.valid_values
-        }
+        "#{source_prefix}#{field.name}"
       end
     end
   end

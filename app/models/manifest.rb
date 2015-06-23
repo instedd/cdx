@@ -44,12 +44,20 @@ class Manifest < ActiveRecord::Base
     self.api_version = metadata["api_version"]
   end
 
+  def loaded_definition
+    @loaded_definition ||= Oj.load(self.definition)
+  end
+
   def metadata
     loaded_definition["metadata"] || {}
   end
 
-  def loaded_definition
-    @loaded_definition ||= Oj.load(self.definition)
+  def field_mapping
+    loaded_definition.with_indifferent_access["field_mapping"]
+  end
+
+  def custom_fields
+    loaded_definition['custom_fields'].map(&:with_indifferent_access)
   end
 
   def apply_to(data, device)
@@ -60,11 +68,11 @@ class Manifest < ActiveRecord::Base
     parser.load(data, data_root).each_with_index do |record, record_index|
       begin
         message = MESSAGE_TEMPLATE.deep_dup
-        field_mapping.each do |scope, mappings|
-          message = mappings.inject(message) do |message, field|
-            ManifestField.new(self, field, scope, device).apply_to record, message
-          end
+
+        field_mapping.each do |target_path, source|
+          message = ManifestField.new(self, target_path, source, device).apply_to record, message
         end
+
         messages << message
       rescue ManifestParsingError => err
         err.record_index = record_index + 1
@@ -75,28 +83,8 @@ class Manifest < ActiveRecord::Base
     messages
   end
 
-  def field_mapping
-    loaded_definition.with_indifferent_access["field_mapping"]
-  end
-
-  def test_mapping
-    field_mapping["test"] || []
-  end
-
-  def sample_mapping
-    field_mapping["sample"] || []
-  end
-
-  def patient_mapping
-    field_mapping["patient"] || []
-  end
-
-  def device_mapping
-    device_mapping["device"] || []
-  end
-
-  def flat_mappings
-    test_mapping + patient_mapping + sample_mapping
+  def scope_from_definition(field_definition)
+    field_definition.split(PATH_SPLIT_TOKEN).first
   end
 
   def parser
@@ -122,8 +110,6 @@ class Manifest < ActiveRecord::Base
     (metadata["source"] || {})["root"]
   end
 
-
-
   def manifest_validation
     if self.metadata.blank?
       self.errors.add(:metadata, "can't be blank")
@@ -134,6 +120,7 @@ class Manifest < ActiveRecord::Base
     end
 
     check_field_mapping
+    check_custom_fields
 
   rescue Oj::ParseError => ex
     self.errors.add(:parse_error, ex.message)
@@ -151,63 +138,77 @@ class Manifest < ActiveRecord::Base
     m = self.metadata
     fields.each do |f|
       if m[f].blank?
-        self.errors.add(:metadata, "must include "+ f +" field")
+        self.errors.add(:metadata, "must include #{f} field")
       end
     end
   end
 
   def check_field_mapping
     if loaded_definition["field_mapping"].is_a? Hash
-      flat_mappings.each do |fm|
-        check_presence_of_target_field_and_source fm
-        check_valid_type fm
-        check_properties_of_enum_field fm
+      field_mapping.each do |target_field, source|
+        check_presence_of_lookup target_field, source
       end
     else
       self.errors.add(:field_mapping, "must be a json object")
     end
   end
 
-  def check_properties_of_enum_field field_mapping
-    if field_mapping["type"] == "enum"
-      if (field_mapping["options"])
-        verify_absence_of_null_string field_mapping
+  def check_presence_of_lookup target_field, source
+    if source["lookup"].blank?
+      self.errors.add(:invalid_field_mapping, ": target '#{target_field}'. Mapping must include 'lookup' field")
+    end
+  end
+
+  def check_custom_fields
+    return unless loaded_definition["custom_fields"].present?
+
+    if loaded_definition["custom_fields"].is_a? Array
+      custom_fields.each do |custom_field|
+        if field_mapping[custom_field['name']].blank?
+          self.errors.add(:invalid_custom_field, ": target '#{custom_field["name"]}'. Must include a field mapping")
+        end
+        check_valid_type custom_field
+        check_properties_of_enum_field custom_field
+      end
+    else
+      self.errors.add(:custom_fields, "must be a json array")
+    end
+  end
+
+  def check_valid_type(custom_field)
+    if (custom_field["pii"].blank? || custom_field["pii"]==false)
+      valid_types = ["date", "enum", "location", "string", "integer", "long", "float", "double", "boolean"]
+      if(custom_field["type"].blank? || ! valid_types.include?(custom_field["type"]))
+        self.errors.add(:invalid_type, ": target '#{custom_field["name"]}'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
+      end
+    end
+  end
+
+  def check_properties_of_enum_field custom_field
+    if custom_field["type"] == "enum"
+      if (custom_field["options"])
+        verify_absence_of_null_string custom_field
         # TODO: validate source mappings
-        if (field_mapping["value_mappings"])
-          check_value_mappings field_mapping
+        if (custom_field["value_mappings"])
+          check_value_mappings custom_field
         end
       else
-        self.errors.add(:enum_fields, "must be provided with options. (In '#{field_mapping["target_field"]}'")
+        self.errors.add(:enum_fields, "must be provided with options. (In '#{custom_field["name"]}'")
       end
     end
   end
 
-  def verify_absence_of_null_string field_mapping
-    if field_mapping["options"].include? NULL_STRING
-      self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{field_mapping["target_field"]}') ")
+  def verify_absence_of_null_string custom_field
+    if custom_field["options"].include? NULL_STRING
+      self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{custom_field["name"]}') ")
     end
   end
 
-  def check_presence_of_target_field_and_source field_mapping
-    if (field_mapping["target_field"].blank? || field_mapping["source"].blank?)
-      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Mapping must include 'target_field' and 'source' fields")
-    end
-  end
-
-  def check_value_mappings(field_mapping)
-    valid_values = field_mapping["options"]
-    field_mapping["value_mappings"].values.each do |vm|
+  def check_value_mappings(custom_field)
+    valid_values = custom_field["options"]
+    custom_field["value_mappings"].values.each do |vm|
       if !valid_values.include? vm
-        self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. '#{vm}' is not a valid value")
-      end
-    end
-  end
-
-  def check_valid_type(field_mapping)
-    if (field_mapping["pii"].blank? || field_mapping["pii"]==false)
-      valid_types = ["date", "enum", "location", "string", "integer", "long", "float", "double", "boolean"]
-      if(field_mapping["type"].blank? || ! valid_types.include?(field_mapping["type"]))
-        self.errors.add(:invalid_type, ": target '#{field_mapping["target_field"]}'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
+        self.errors.add(:invalid_custom_field, ": target '#{custom_field["name"]}'. '#{vm}' is not a valid value")
       end
     end
   end
