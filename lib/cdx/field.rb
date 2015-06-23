@@ -51,4 +51,8 @@ class Cdx::Field
   def options
     @definition[:options]
   end
+
+  def pii?
+    @definition[:pii] || false
+  end
 end
