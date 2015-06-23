@@ -34,4 +34,39 @@ module ManifestSpecHelper
     expect { manifest.apply_to(data, device).first }.to raise_error(message)
   end
 
+  def default_manifest_for(device)
+    Manifest.create! definition: default_definition(device.model)
+  end
+
+  def default_definition(device_model)
+    Oj.dump({
+      metadata: { source: { type: "json" } , device_models: [device_model]},
+      field_mapping: field_mapping
+    })
+  end
+
+  def field_mapping
+    Hash[Cdx.core_fields_scopes.map do |scope|
+      [scope.name, map(sub_fields, "#{scope.name}#{Manifest::PATH_SPLIT_TOKEN}").flatten]
+    end]
+  end
+
+  def map(fields, source_prefix="")
+    fields.map do |field|
+      field_name = source_prefix + field.name
+      if field.type == "nested"
+        map field.sub_fields, "#{source_prefix}#{field.name}#{Manifest::COLLECTION_SPLIT_TOKEN}"
+      else
+        {
+          target_field: field_name,
+          source: {lookup: field_name},
+          type: field.type,
+          core: true,
+          pii: false,
+          indexed: true,
+          valid_values: field.valid_values
+        }
+      end
+    end
+  end
 end

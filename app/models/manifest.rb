@@ -23,10 +23,6 @@ class Manifest < ActiveRecord::Base
     "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
   }.freeze
 
-  def self.default
-    new definition: default_definition
-  end
-
   def reload
     @loaded_definition = nil
     super
@@ -126,12 +122,7 @@ class Manifest < ActiveRecord::Base
     (metadata["source"] || {})["root"]
   end
 
-  def self.default_definition
-    Oj.dump({
-      metadata: { source: { type: "json" } },
-      field_mapping: { test: map(Cdx::Api.searchable_fields).flatten }
-    })
-  end
+
 
   def manifest_validation
     if self.metadata.blank?
@@ -149,25 +140,6 @@ class Manifest < ActiveRecord::Base
   end
 
   private
-
-  def self.map fields, source_prefix=""
-    fields.map do |field|
-      field_name = source_prefix + field.name
-      if field.type == "nested"
-        map field.sub_fields, "#{source_prefix}#{field.name}#{COLLECTION_SPLIT_TOKEN}"
-      else
-        {
-          target_field: field_name,
-          source: {lookup: field_name},
-          type: field.type,
-          core: true,
-          pii: false,
-          indexed: true,
-          valid_values: field.valid_values
-        }
-      end
-    end
-  end
 
   def check_api_version
     unless self.metadata["api_version"] == CURRENT_VERSION
