@@ -113,7 +113,7 @@ class ManifestField
   end
 
   def custom_field
-    @custom_field ||= @manifest.custom_fields[@target_field]
+    @custom_field ||= @manifest.custom_fields.detect{|x| x.name = @target_field}
   end
 
   def core_field

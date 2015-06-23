@@ -12,7 +12,7 @@ class Manifest < ActiveRecord::Base
 
   NULL_STRING = "null"
 
-  CURRENT_VERSION = "1.1.0"
+  CURRENT_VERSION = "1.2.0"
 
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
@@ -57,7 +57,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def custom_fields
-    loaded_definition['custom_fields'].map(&:with_indifferent_access)
+    (loaded_definition['custom_fields'] || []).map(&:with_indifferent_access)
   end
 
   def apply_to(data, device)
