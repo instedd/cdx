@@ -5,7 +5,7 @@ class DeviceModel < ActiveRecord::Base
   scope :active, -> { joins(:manifests).distinct }
 
   def current_manifest
-    @manifest ||= manifests.order("id").last
+    @manifest ||= manifests.order("id").last || (raise ManifestParsingError.no_manifest(self))
   end
 
   def reload

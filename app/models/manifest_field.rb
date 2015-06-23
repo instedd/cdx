@@ -23,9 +23,9 @@ class ManifestField
   end
 
   def hash_key
-    if self.pii?
+    if pii?
       'pii'
-    elsif self.core?
+    elsif core?
       'indexed'
     else
       'custom'
@@ -50,31 +50,55 @@ class ManifestField
   end
 
   def valid_values
-    if self.custom?
-      @custom_field['valid_values']
+    if custom?
+      custom_field['valid_values']
     else
-      @core_field.valid_values
+      core_field.valid_values
     end
   end
 
   def type
-    if self.custom?
-      @custom_field['type']
+    if custom?
+      custom_field['type']
     else
-      @core_field.type
+      core_field.type
     end
   end
 
   def options
-    if self.custom?
-      @custom_field['options']
+    if custom?
+      custom_field['options']
     else
-      @core_field.options
+      core_field.options
     end
   end
 
   def source
     @field_mapping
+  end
+
+  def custom?
+    custom_field.present?
+  end
+
+  def core?
+    !custom?
+  end
+
+  def indexed?
+    if custom?
+      custom_field['indexed'] || false
+    else
+      true
+    end
+  end
+
+  def pii?
+    if custom?
+      custom_field["pii"] || false
+    else
+      core_field.pii?
+    end
   end
 
   private
@@ -86,30 +110,6 @@ class ManifestField
   def target_without_scope
     index = @target_field.index(Manifest::PATH_SPLIT_TOKEN)
     @target_field[index + 1 .. -1]
-  end
-
-  def custom?
-    self.custom_field.present?
-  end
-
-  def core?
-    !self.custom?
-  end
-
-  def indexed?
-    if custom?
-      @custom_field['indexed'] || false
-    else
-      true
-    end
-  end
-
-  def pii?
-    if self.custom?
-      self.custom_field["pii"] || false
-    else
-      core_field.pii?
-    end
   end
 
   def custom_field

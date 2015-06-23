@@ -3,6 +3,8 @@ class DeviceMessage < ActiveRecord::Base
   has_one :institution, through: :device
   has_and_belongs_to_many :test_results
 
+  validates_presence_of :device
+
   before_save :parsed_messages
   before_save :encrypt
 
@@ -15,7 +17,7 @@ class DeviceMessage < ActiveRecord::Base
   end
 
   def parsed_messages
-    @parsed_messages ||= (device.try(:current_manifest) || raise ManifestParsingError.no_manifest(device)).apply_to(plain_text_data, device).map(&:with_indifferent_access)
+    @parsed_messages ||= device.current_manifest.apply_to(plain_text_data, device).map(&:with_indifferent_access)
   rescue ManifestParsingError => err
     self.index_failed = true # TODO: We are just parsing here, is this the correct place to set this flag?
     self.index_failure_reason = err.message

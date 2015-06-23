@@ -51,7 +51,7 @@ module ManifestSpecHelper
     end
 
     Oj.dump({
-      metadata: { source: { type: "json" } }, device_models: [device_model]},
+      metadata: { source: { type: "json" }, device_models: [device_model]},
       field_mapping: core_mapping
     })
   end

@@ -51,7 +51,7 @@ class ManifestParsingError < RuntimeError
     new "Error executing script while mapping the field '#{target_field}': #{message}"
   end
 
-  def self.no_manifest(device)
-    new "The device #{device.uuid} with model #{device.device_model.try(:name)} has no manifest."
+  def self.no_manifest(device_model)
+    new "There is no manifest for model: #{device_model.name}."
   end
 end
