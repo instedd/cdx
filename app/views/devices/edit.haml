@@ -10,6 +10,8 @@
   %hr
     %p
       = link_to "Messages", institution_device_device_messages_path(@institution, @device), class: 'btn'
+      - if @device.current_manifest.fields.any?(&:custom?)
+        = link_to "Custom Mappings", institution_device_custom_mappings_path(@institution, @device), class: 'btn'
 
   - if @can_regenerate_key
     %hr
