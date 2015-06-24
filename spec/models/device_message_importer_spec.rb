@@ -139,7 +139,6 @@ describe DeviceMessageImporter, elasticsearch: true do
     context 'epicenter headless_es' do
       let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es'}
       let!(:manifest)    { load_manifest 'epicenter_headless_es_manifest.json' }
-      let!(:device) { Device.make institution_id: institution.id, device_model: device_model }
 
       it "parses csv in utf-16le" do
         copy_sample_csv 'epicenter_headless_sample_utf16.csv'

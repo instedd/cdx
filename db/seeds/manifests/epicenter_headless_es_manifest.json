@@ -33,6 +33,13 @@
       "separator": ","
     }
   },
+  "custom_fields": [
+    {
+      "name": "patient.name",
+      "type" : "string",
+      "pii" : true
+    }
+  ],
   "field_mapping": {
     "patient.id": { "lookup": "4" },
     "patient.name": { "lookup": "3" },
@@ -154,7 +161,7 @@
             [
               {"match" : "Positivo", "output" : "success" },
               {"match" : "Completo retirado", "output" : "success" },
-              {"match" : "Negativo", "output" : "negative" },
+              {"match" : "Negativo", "output" : "success" },
               {"match" : "No válido", "output" : "invalid" },
               {"match" : "En curso retirado", "output" : "error" },
               {"match" : "Umbral positivo", "output" : "no_result" },

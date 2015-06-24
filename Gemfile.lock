@@ -49,7 +49,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx_core
-  revision: ea2542a8a40271bf035c70b963507e3810f66f30
+  revision: 2b8b58a28e00b1d4941d63e29faf755ec8651ef6
   branch: master
   specs:
     cdx (0.0.1)
