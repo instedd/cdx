@@ -25,30 +25,19 @@ describe DeviceMessageImporter, elasticsearch: true do
     {
       "metadata": {
         "version": "1",
-        "api_version": "1.1.0",
+        "api_version": "1.2.0",
         "device_models": "#{device.device_model.name}",
         "source" : { "type" : "#{source}"}
       },
-      "field_mapping" : {"test" : [{
-          "target_field" : "error_code",
-          "source" : {"lookup": "error_code"},
-          "core" : true,
-          "type" : "integer"
-        },
-        {
-          "target_field" : "result",
-          "source" : {"lookup": "result"},
-          "core" : true,
-          "type" : "enum",
-          "options" : [ "positive", "negative", "positivo", "negativo", "inválido" ]
-        }
-      ]}
+      "field_mapping" : {
+        "test.error_code" : {"lookup": "error_code"},
+        "test.qualitative_result" : {"lookup": "result"}
+      }
     }
   }
   end
 
   context "csv" do
-
     let(:source) { "csv" }
 
     it 'parses a csv from sync dir' do
@@ -59,10 +48,10 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positive")
+      test["qualitative_result"].should eq("positive")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("negative")
+      test["qualitative_result"].should eq("negative")
     end
 
     it 'parses a csv in utf 16' do
@@ -75,12 +64,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positivo")
+      test["qualitative_result"].should eq("positivo")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("inválido")
+      test["qualitative_result"].should eq("inválido")
     end
-
   end
 
   context "json" do
@@ -95,10 +83,10 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positive")
+      test["qualitative_result"].should eq("positive")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("negative")
+      test["qualitative_result"].should eq("negative")
     end
 
     it 'parses a json from sync dir registering multiple extensions' do
@@ -109,10 +97,10 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positive")
+      test["qualitative_result"].should eq("positive")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("negative")
+      test["qualitative_result"].should eq("negative")
     end
 
     it 'parses a json from sync dir registering multiple extensions using import single' do
@@ -123,12 +111,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positive")
+      test["qualitative_result"].should eq("positive")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("negative")
+      test["qualitative_result"].should eq("negative")
     end
-
   end
 
   context "real scenarios" do
@@ -150,8 +137,9 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'epicenter headless_es' do
-      let(:device_model) { DeviceModel.make name: 'epicenter_headless_es'}
+      let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es'}
       let!(:manifest)    { load_manifest 'epicenter_headless_es_manifest.json' }
+      let!(:device) { Device.make institution_id: institution.id, device_model: device_model }
 
       it "parses csv in utf-16le" do
         copy_sample_csv 'epicenter_headless_sample_utf16.csv'
