@@ -8,16 +8,13 @@ describe DeviceMessage, elasticsearch: true do
       {
         "metadata": {
           "version": "1",
-          "api_version": "1.1.0",
+          "api_version": "1.2.0",
           "device_models": "#{device.device_model.name}",
           "source" : { "type" : "json"}
         },
-        "field_mapping" : {"test" :[{
-            "target_field" : "error_code",
-            "source" : {"lookup": "error_code"},
-            "core" : true,
-            "type" : "integer"
-        }]}
+        "field_mapping" : {
+          "test.error_code" : {"lookup": "error_code"}
+        }
       }
     }
 
@@ -27,8 +24,8 @@ describe DeviceMessage, elasticsearch: true do
 
     expect(message.save).to be_true
     expect(message.index_failed?).to be_true
-    expect(message.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "error_code").message)
-    expect(message.index_failure_data[:target_field]).to eq('error_code')
+    expect(message.index_failure_reason).to eq(ManifestParsingError.invalid_value_for_integer("foo", "test.error_code").message)
+    expect(message.index_failure_data[:target_field]).to eq('test.error_code')
   end
 
   it "stores failed messages when the string 'null' is passed as value" do
@@ -36,17 +33,13 @@ describe DeviceMessage, elasticsearch: true do
       {
         "metadata": {
           "version": "1",
-          "api_version": "1.1.0",
+          "api_version": "1.2.0",
           "device_models": "#{device.device_model.name}",
           "source" : { "type" : "json"}
         },
-        "field_mapping" : { "test" : [{
-            "target_field" : "results[*].result",
-            "source" : {"lookup": "result"},
-            "core" : true,
-            "type" : "enum",
-            "options" : ["positive","negative"]
-        }]}
+        "field_mapping" : {
+          "test.assays[*].qualitative_result" : {"lookup": "result"}
+        }
       }
     }
 
@@ -56,8 +49,8 @@ describe DeviceMessage, elasticsearch: true do
 
     expect(message.save).to be_true
     expect(message.index_failed?).to be_true
-    expect(message.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'results[*].result'")
-    expect(message.index_failure_data[:target_field]).to eq('results[*].result')
+    expect(message.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'test.assays[*].qualitative_result'")
+    expect(message.index_failure_data[:target_field]).to eq('test.assays[*].qualitative_result')
   end
 
   it 'parses a csv with a single row' do
@@ -65,24 +58,14 @@ describe DeviceMessage, elasticsearch: true do
       {
         "metadata": {
           "version": "1",
-          "api_version": "1.1.0",
+          "api_version": "1.2.0",
           "device_models": "#{device.device_model.name}",
           "source" : { "type" : "csv"}
         },
-        "field_mapping" : { "test" : [{
-            "target_field" : "error_code",
-            "source" : {"lookup": "error_code"},
-            "core" : true,
-            "type" : "integer"
-          },
-          {
-            "target_field" : "result",
-            "source" : {"lookup": "result"},
-            "core" : true,
-            "type" : "enum",
-            "options" : [ "positive", "negative" ]
-          }
-        ]}
+        "field_mapping" : {
+          "test.error_code" : {"lookup": "error_code"},
+          "test.qualitative_result" : {"lookup": "result"}
+        }
       }
     }
 
