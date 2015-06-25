@@ -17,7 +17,7 @@ describe TestResultIndexer, elasticsearch: true do
         }
       }
     }
-    Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields)
+    Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields.with_indifferent_access)
   end
 
   let(:test){ TestResult.make(
@@ -37,7 +37,7 @@ describe TestResultIndexer, elasticsearch: true do
           }
         ]
       }
-    }
+    }.with_indifferent_access
   )}
 
   let(:test_indexer) { TestResultIndexer.new(test)}
@@ -89,10 +89,10 @@ describe TestResultIndexer, elasticsearch: true do
         },
         device: {
           uuid: test.device.uuid,
-        },
-        laboratory_id: test.device.laboratories.first.id,
-        institution_id: test.device.institution_id
-      },
+          laboratory_id: test.device.laboratories.first.id,
+          institution_id: test.device.institution_id
+        }
+      }.recursive_stringify_keys!,
       id: "#{test.device.uuid}_4")
 
     test_indexer.index
