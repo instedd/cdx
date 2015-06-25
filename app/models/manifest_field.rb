@@ -6,7 +6,7 @@ class ManifestField
     if core_field = core_field_from(target_field)
       CoreManifestField.for(manifest, target_field, field_mapping, device, core_field)
     else
-      CustomManifestField.for(manifest, target_field, field_mapping, device, custom_field_from(manifest))
+      CustomManifestField.for(manifest, target_field, field_mapping, device, custom_field_from(manifest, target_field))
     end
   end
 
@@ -68,13 +68,14 @@ class ManifestField
     cdx_field = cdx_scope.fields.detect{|x| x.name == field}
 
     target_path.each do |path|
+      return nil unless cdx_field.present?
       cdx_field = cdx_field.sub_fields.detect{|x| x.name == path}
     end
 
     cdx_field
   end
 
-  def self.custom_field_from(manifest)
+  def self.custom_field_from(manifest, target_field)
     manifest.custom_fields.detect{|x| x['name'] == target_field}
   end
 end

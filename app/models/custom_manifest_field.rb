@@ -17,7 +17,7 @@ class CustomManifestField < ManifestField
   end
 
   def hash_key
-    'custom'
+    pii? ? 'pii' : 'custom'
   end
 
   def valid_values
@@ -45,6 +45,6 @@ class CustomManifestField < ManifestField
   end
 
   def pii?
-    custom_field["pii"] || false
+    custom_field['pii'] || false
   end
 end
