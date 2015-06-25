@@ -121,7 +121,14 @@ class ManifestFieldMapping
       ctx["message"] = data
       ctx["device"] = { uuid: @device.uuid, name: @device.name } if @device
 
-      ctx.eval(script)
+      result = ctx.eval(script)
+
+      if result.is_a? V8::Array
+        result = result.to_a
+      elsif result.is_a? V8::Object
+        raise ManifestParsingError.invalid_script(@field.target_field)
+      end
+      result
     rescue V8::Error => e
       raise ManifestParsingError.script_error(@field.target_field, e.message)
     ensure

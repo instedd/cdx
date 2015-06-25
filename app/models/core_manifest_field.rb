@@ -3,8 +3,6 @@ class CoreManifestField < ManifestField
   delegate :options, :valid_values, :pii?, :type, to: :core_field
 
   def self.for(manifest, target_field, field_mapping, device, core_field)
-    raise ManifestParsingError.custom_field_not_defined(target_field) unless core_field
-
     new manifest, target_field, field_mapping, device, core_field
   end
 

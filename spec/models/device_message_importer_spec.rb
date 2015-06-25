@@ -184,16 +184,34 @@ describe DeviceMessageImporter, elasticsearch: true do
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
-        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["results"][0]["result"] }
+        tests = all_elasticsearch_tests_for(device.institution).sort_by do |test|
+          test["_source"]["test"]["assays"][0]['qualitative_result'] + test["_source"]["test"]["assays"][1]['qualitative_result'] + test["_source"]["test"]["assays"][2]['qualitative_result']
+        end
         tests.should have(13).items
 
-        test = tests.first["_source"]["test"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("negative")
+        test = tests[0]["_source"]["test"]
+        test["assays"][0]["name"].should eq("mtb")
+        test["assays"][0]["qualitative_result"].should eq("negative")
+        test["assays"][1]["name"].should eq("rif")
+        test["assays"][1]["qualitative_result"].should eq("negative")
+        test["assays"][2]["name"].should eq("inh")
+        test["assays"][2]["qualitative_result"].should eq("negative")
+
+        test = tests[1]["_source"]["test"]
+        test["assays"][0]["name"].should eq("mtb")
+        test["assays"][0]["qualitative_result"].should eq("positive")
+        test["assays"][1]["name"].should eq("rif")
+        test["assays"][1]["qualitative_result"].should eq("negative")
+        test["assays"][2]["name"].should eq("inh")
+        test["assays"][2]["qualitative_result"].should eq("negative")
 
         test = tests.last["_source"]["test"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("positive_with_rif_and_inh")
+        test["assays"][0]["name"].should eq("mtb")
+        test["assays"][0]["qualitative_result"].should eq("positive")
+        test["assays"][1]["name"].should eq("rif")
+        test["assays"][1]["qualitative_result"].should eq("positive")
+        test["assays"][2]["name"].should eq("inh")
+        test["assays"][2]["qualitative_result"].should eq("positive")
 
         dbtests = TestResult.all
         dbtests.should have(13).items
