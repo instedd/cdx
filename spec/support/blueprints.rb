@@ -40,6 +40,7 @@ Device.blueprint do
   institution { laboratories.first.institution }
   name
   device_model
+  time_zone { "UTC" }
 end
 
 Sample.blueprint do

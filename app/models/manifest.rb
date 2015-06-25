@@ -70,7 +70,7 @@ class Manifest < ActiveRecord::Base
         message = MESSAGE_TEMPLATE.deep_dup
 
         field_mapping.each do |target_path, source|
-          message = ManifestField.new(self, target_path, source, device).apply_to record, message
+          message = ManifestField.for(self, target_path, source, device).apply_to record, message
         end
 
         messages << message

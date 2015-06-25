@@ -47,6 +47,10 @@ class ManifestParsingError < RuntimeError
     new "Cannot apply invalid manifest to document:\n #{manifest.errors.full_messages.join("\n ")}"
   end
 
+  def self.custom_field_not_defined(target_field)
+    new "Custom field #{target_field} must be defined in manifest."
+  end
+
   def self.script_error(target_field, message)
     new "Error executing script while mapping the field '#{target_field}': #{message}"
   end

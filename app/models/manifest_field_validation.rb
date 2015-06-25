@@ -1,8 +1,9 @@
 class ManifestFieldValidation
+  attr_reader :field
+  delegate :valid_values, :target_field, to: :field
+
   def initialize(field)
     @field = field
-    @valid_values = field.valid_values
-    @target_field = field.target_field
   end
 
   def apply_to(value)

@@ -1,12 +1,13 @@
 class ManifestField
   attr_reader :target_field
+  subclass_responsibility :hash_key, :custom?, :core?, :indexed?
 
-  def initialize(manifest, target_field, field_mapping, device=nil)
-    @manifest = manifest
-    @target_field = target_field
-    @field_mapping = field_mapping
-    @validation = ManifestFieldValidation.new(self)
-    @device = device
+  def self.for(manifest, target_field, field_mapping, device=nil)
+    if core_field = core_field_from(target_field)
+      CoreManifestField.for(manifest, target_field, field_mapping, device, core_field)
+    else
+      CustomManifestField.for(manifest, target_field, field_mapping, device, custom_field_from(manifest))
+    end
   end
 
   def apply_to(data, message)
@@ -20,16 +21,6 @@ class ManifestField
       index value, target_without_scope, message[scope_from_target][hash_key]
     end
     message
-  end
-
-  def hash_key
-    if pii?
-      'pii'
-    elsif core?
-      'indexed'
-    else
-      'custom'
-    end
   end
 
   def index value, target, message
@@ -49,56 +40,8 @@ class ManifestField
     end
   end
 
-  def valid_values
-    if custom?
-      custom_field['valid_values']
-    else
-      core_field.valid_values
-    end
-  end
-
-  def type
-    if custom?
-      custom_field['type']
-    else
-      core_field.type
-    end
-  end
-
-  def options
-    if custom?
-      custom_field['options']
-    else
-      core_field.options
-    end
-  end
-
   def source
     @field_mapping
-  end
-
-  def custom?
-    custom_field.present?
-  end
-
-  def core?
-    !custom?
-  end
-
-  def indexed?
-    if custom?
-      custom_field['indexed'] || false
-    else
-      true
-    end
-  end
-
-  def pii?
-    if custom?
-      custom_field["pii"] || false
-    else
-      core_field.pii?
-    end
   end
 
   private
@@ -112,26 +55,26 @@ class ManifestField
     @target_field[index + 1 .. -1]
   end
 
-  def custom_field
-    @custom_field ||= @manifest.custom_fields.detect{|x| x['name'] == @target_field}
+  private
+
+  def self.core_field_from(target_field)
+    target_path = target_field
+      .gsub(Manifest::COLLECTION_SPLIT_TOKEN, Manifest::PATH_SPLIT_TOKEN)
+      .split(Manifest::PATH_SPLIT_TOKEN)
+
+    scope = target_path.shift
+    field = target_path.shift
+    cdx_scope = Cdx.core_field_scopes.detect{|x| x.name == scope}
+    cdx_field = cdx_scope.fields.detect{|x| x.name == field}
+
+    target_path.each do |path|
+      cdx_field = cdx_field.sub_fields.detect{|x| x.name == path}
+    end
+
+    cdx_field
   end
 
-  def core_field
-    @core_field ||= begin
-      target_path = @target_field
-        .gsub(Manifest::COLLECTION_SPLIT_TOKEN, Manifest::PATH_SPLIT_TOKEN)
-        .split(Manifest::PATH_SPLIT_TOKEN)
-
-      scope = target_path.shift
-      field = target_path.shift
-      cdx_scope = Cdx.core_field_scopes.detect{|x| x.name == scope}
-      cdx_field = cdx_scope.fields.detect{|x| x.name == field}
-
-      target_path.each do |path|
-        cdx_field = cdx_field.sub_fields.detect{|x| x.name == path}
-      end
-
-      cdx_field
-    end
+  def self.custom_field_from(manifest)
+    manifest.custom_fields.detect{|x| x['name'] == target_field}
   end
 end
