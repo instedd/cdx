@@ -696,7 +696,7 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].time"}]
+            [{"name": "test.results[*].time"}]
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1194,7 +1194,7 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            [{"name": "test.results[*].age"}]
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",

@@ -30,8 +30,8 @@ module ManifestSpecHelper
     end
   end
 
-  def assert_raises_manifest_data_validation(mappings_json, data, message, device=nil)
-    manifest = manifest = manifest_from_json_mappings(mappings_json)
+  def assert_raises_manifest_data_validation(mappings_json, custom_json, data, message, device=nil)
+    manifest = manifest = manifest_from_json_mappings(mappings_json, custom_json)
     expect { manifest.apply_to(data, device).first }.to raise_error(message)
   end
 
