@@ -1,5 +1,6 @@
 class ManifestField
   attr_reader :target_field
+  attr_reader :field
 
   def initialize(manifest, field, scope=nil)
     @manifest = manifest
@@ -13,6 +14,10 @@ class ManifestField
     value = ManifestFieldMapping.new(@manifest, @field, device, data).apply
     @validation.apply_to value
     store value, message
+  end
+
+  def map_from(source_field)
+    ManifestField.new(@manifest, @field.merge({ "source" => source_field.field["source"] }), @scope)
   end
 
   def store value, message

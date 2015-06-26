@@ -87,7 +87,7 @@ class Manifest < ActiveRecord::Base
     parser.load(data, data_root).each_with_index do |record, record_index|
       begin
         message = MESSAGE_TEMPLATE.deep_dup
-        fields.each do |field|
+        fields_for(device).each do |field|
           field.apply_to record, message, device
         end
         messages << message
@@ -107,6 +107,22 @@ class Manifest < ActiveRecord::Base
           all << ManifestField.new(self, field, scope)
         end
       end
+  end
+
+  def fields_for(device)
+    return fields unless device && device.custom_mappings.present?
+    mapped_fields = fields.dup
+    device.custom_mappings.each do |from_field, to_field|
+      from = mapped_fields.select { |f| f.target_field == from_field }.first
+      to = mapped_fields.select { |f| f.target_field == to_field }.first
+
+      if from && to
+        mapped_fields.delete from
+        mapped_fields.delete to
+        mapped_fields << to.map_from(from)
+      end
+    end
+    mapped_fields
   end
 
   def field_mapping
