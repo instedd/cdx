@@ -8,9 +8,6 @@ describe DeviceMessageProcessor, elasticsearch: true do
         indexed: {
           id: test_id,
           assay: "mtb",
-          custom_fields: {
-            concentration: "15%"
-          },
           results: [
             {
               result: "positive",
@@ -19,7 +16,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
           ]
         },
         custom: {
-          raw_result: "positivo 15%"
+          raw_result: "positivo 15%",
+          concentration: "15%"
         },
         pii: {
           start_time: "2000/1/1 10:00:00"
@@ -29,12 +27,10 @@ describe DeviceMessageProcessor, elasticsearch: true do
         indexed: {
           type: "sputum",
           collection_date: "2000/1/1 9:00:00",
-          custom_fields: {
-            culture_days: "10"
-          }
         },
         custom: {
-          datagram: "010100011100"
+          datagram: "010100011100",
+          culture_days: "10"
         },
         pii: {
           uid: "abc4002",
@@ -43,17 +39,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
       },
       patient: {
         indexed: {
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         },
         pii: {
           id: "8000",
           dob: "2000/1/1"
         },
         custom: {
-          shirt_color: "blue"
+          shirt_color: "blue",
+          hiv: "positive"
         }
       }
     }.recursive_stringify_keys!.with_indifferent_access.deep_merge(params)
@@ -82,17 +76,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     sample.custom_fields.should eq({
       sample: {
-        datagram: "010100011100"
+        datagram: "010100011100",
+        culture_days: "10"
       }
     }.recursive_stringify_keys!)
 
     sample.indexed_fields.should eq({
       sample: {
         type: "sputum",
-        collection_date: "2000/1/1 9:00:00",
-        custom_fields: {
-          culture_days: "10"
-        }
+        collection_date: "2000/1/1 9:00:00"
       }
     }.recursive_stringify_keys!)
   end
@@ -107,16 +99,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     patient.custom_fields.should eq({
       patient: {
-        shirt_color: "blue"
+        shirt_color: "blue",
+        hiv: "positive"
       }
     }.recursive_stringify_keys!)
 
     patient.indexed_fields.should eq({
       patient: {
-        gender: "male",
-        custom_fields: {
-          hiv: "positive"
-        }
+        gender: "male"
       }
     }.recursive_stringify_keys!)
   end
@@ -153,7 +143,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     test.custom_fields.should eq({
       test: {
-        raw_result: "positivo 15%"
+        raw_result: "positivo 15%",
+        concentration: "15%"
       }
     }.recursive_stringify_keys!)
   end
@@ -180,9 +171,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     patient_indexed_fields = {
       patient: {
-        custom_fields: {
-          hiv: "positive"
-        }
+        gender: 'male'
       }
     }.with_indifferent_access
 
@@ -216,9 +205,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     patient_indexed_fields = {
       patient: {
-        custom_fields: {
-          hiv: "positive"
-        }
+        gender: 'male'
       }
     }.with_indifferent_access
 
@@ -247,19 +234,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
     sample_indexed_fields = {
       sample: {
         type: "sputum",
-        collection_date: "2000/1/1 9:00:00",
-        custom_fields: {
-          culture_days: "10"
-        }
+        collection_date: "2000/1/1 9:00:00"
       }
     }.with_indifferent_access
 
     patient_indexed_fields = {
       patient: {
-        gender: "male",
-        custom_fields: {
-          hiv: "positive"
-        }
+        gender: "male"
       }
     }.with_indifferent_access
 
@@ -386,15 +367,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         test.custom_fields[:sample].should eq({
-          datagram: "010100011100"
+          datagram: "010100011100",
+          culture_days: "10"
         }.recursive_stringify_keys!)
 
         test.indexed_fields[:sample].should eq({
           type: "sputum",
-          collection_date: "2000/1/1 9:00:00",
-          custom_fields: {
-            culture_days: "10"
-          }
+          collection_date: "2000/1/1 9:00:00"
         }.recursive_stringify_keys!)
       end
 
@@ -424,7 +403,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample.custom_fields.should eq({
           sample: {
-            datagram: "010100011100"
+            datagram: "010100011100",
+            culture_days: "10"
           }
         }.recursive_stringify_keys!)
 
@@ -432,10 +412,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           sample: {
             existing_field: "a value",
             type: "sputum",
-            collection_date: "2000/1/1 9:00:00",
-            custom_fields: {
-              culture_days: "10"
-            }
+            collection_date: "2000/1/1 9:00:00"
           }
         }.recursive_stringify_keys!)
       end
@@ -500,6 +477,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
         sample.custom_fields.should eq({
           sample: {
             datagram: '010100011100',
+            culture_days: "10",
             existing_custom_field: 'existing_custom_field_value'
           }
         }.recursive_stringify_keys!)
@@ -508,10 +486,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           sample: {
             type: "sputum",
             collection_date: "2000/1/1 9:00:00",
-            existing_indexed_field: 'existing_indexed_field_value',
-            custom_fields: {
-              culture_days: "10"
-            }
+            existing_indexed_field: 'existing_indexed_field_value'
           }
         }.recursive_stringify_keys!)
 
@@ -597,16 +572,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         sample.custom_fields[:sample].should eq({
-          datagram: "010100011100"
+          datagram: "010100011100",
+          culture_days: "10"
         }.recursive_stringify_keys!)
 
         sample.indexed_fields[:sample].should eq({
           existing_field: "a value",
           type: "sputum",
-          collection_date: "2000/1/1 9:00:00",
-          custom_fields: {
-            culture_days: "10"
-          }
+          collection_date: "2000/1/1 9:00:00"
         }.recursive_stringify_keys!)
       end
 
@@ -638,15 +611,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         sample.custom_fields[:sample].should eq({
-          datagram: "010100011100"
+          datagram: "010100011100",
+          culture_days: "10"
         }.recursive_stringify_keys!)
 
         sample.indexed_fields[:sample].should eq({
           type: "sputum",
-          collection_date: "2000/1/1 9:00:00",
-          custom_fields: {
-            culture_days: "10"
-          }
+          collection_date: "2000/1/1 9:00:00"
         }.recursive_stringify_keys!)
       end
 
@@ -742,15 +713,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         patient.custom_fields[:patient].should eq({
-          shirt_color: "blue"
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
         patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
@@ -795,15 +764,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         patient.custom_fields[:patient].should eq({
-          shirt_color: "blue"
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
         patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
@@ -821,14 +788,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         test.custom_fields[:patient].should eq({
-          shirt_color: "blue"
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
         test.indexed_fields[:patient].should eq({
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
@@ -853,14 +818,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         sample.custom_fields[:patient].should eq({
-          shirt_color: "blue"
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
         sample.indexed_fields[:patient].should eq({
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
     end
@@ -916,15 +879,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient.custom_fields[:patient].should eq({
           shirt_color: "blue",
+          hiv: "positive",
           existing_custom_field: 'existing_custom_field_value'
         }.recursive_stringify_keys!)
 
         patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
@@ -975,15 +936,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient.custom_fields[:patient].should eq({
           shirt_color: "blue",
+          hiv: "positive",
           existing_custom_field: 'existing_custom_field_value'
         }.recursive_stringify_keys!)
 
         patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
@@ -1032,15 +991,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient.custom_fields[:patient].should eq({
           shirt_color: "blue",
+          hiv: "positive",
           existing_custom_field: 'existing_custom_field_value'
         }.recursive_stringify_keys!)
 
         patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
@@ -1072,14 +1029,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         patient.custom_fields[:patient].should eq({
-          shirt_color: "blue"
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
         patient.indexed_fields[:patient].should eq({
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
