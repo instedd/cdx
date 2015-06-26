@@ -23,6 +23,9 @@ class DeviceMessage < ActiveRecord::Base
     self.index_failure_reason = err.message
     self.index_failure_data[:target_field] = err.target_field if err.target_field.present?
     self.index_failure_data[:record_index] = err.record_index if err.record_index.present?
+  rescue => err
+    self.index_failed = true
+    self.index_failure_reason = err.message
   end
 
   def process
