@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150608182846) do
+ActiveRecord::Schema.define(version: 20150624170646) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(version: 20150608182846) do
     t.integer  "device_model_id"
     t.string   "secret_key_hash"
     t.string   "time_zone"
+    t.text     "custom_mappings"
   end
 
   create_table "devices_laboratories", id: false, force: true do |t|

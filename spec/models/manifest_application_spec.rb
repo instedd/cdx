@@ -687,6 +687,29 @@ describe Manifest, validate_manifest: false do
           }]}, pii: Hash.new, custom: Hash.new}
     end
 
+    it "map custom fields to core fields" do
+      device = Device.make custom_mappings: {"custom_id" => "patient_id"}
+      assert_manifest_application %{
+          {
+            "patient" : [{
+              "target_field" : "patient_id",
+              "source" : {"lookup" : "patient_id"},
+              "pii" : true
+            }],
+            "test" : [{
+              "target_field" : "custom_id",
+              "source" : {"lookup" : "custom_id"},
+              "core" : false,
+              "pii" : false,
+              "indexed" : false
+            }]
+          }
+        },
+        {json: '{"custom_id" : "20"}', csv: "custom_id\n20"},
+        {patient: {pii: {patient_id: "20"}}},
+        device
+    end
+
   end
 
 end

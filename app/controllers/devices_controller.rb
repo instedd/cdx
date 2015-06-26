@@ -142,6 +142,10 @@ class DevicesController < ApplicationController
   end
 
   def device_params
-    params.require(:device).permit(:name, :device_model_id, :time_zone, laboratory_ids: [])
+    params.require(:device).permit(:name, :device_model_id, :time_zone, laboratory_ids: []).tap do |whitelisted|
+      if custom_mappings = params[:device][:custom_mappings]
+        whitelisted[:custom_mappings] = custom_mappings.select { |k, v| v.present? }
+      end
+    end
   end
 end

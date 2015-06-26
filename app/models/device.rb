@@ -10,6 +10,8 @@ class Device < ActiveRecord::Base
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
 
+  serialize :custom_mappings, JSON
+
   attr_reader :plain_secret_key
 
   validates_uniqueness_of :uuid
@@ -20,6 +22,8 @@ class Device < ActiveRecord::Base
   before_create :set_key, :set_uuid
 
   delegate :current_manifest, to: :device_model
+
+  CUSTOM_FIELD_TARGETS = [:patient_id, :sample_id]
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions

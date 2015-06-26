@@ -1,17 +1,23 @@
 class ManifestField
-  def initialize(manifest, field, scope=nil, device=nil)
+  attr_reader :target_field
+  attr_reader :field
+
+  def initialize(manifest, field, scope=nil)
     @manifest = manifest
     @field = field
     @target_field = @field["target_field"]
     @validation = ManifestFieldValidation.new(@field)
     @scope = scope
-    @device = device
   end
 
-  def apply_to(data, message)
-    value = ManifestFieldMapping.new(@manifest, @field, @device, data).apply
+  def apply_to(data, message, device)
+    value = ManifestFieldMapping.new(@manifest, @field, device, data).apply
     @validation.apply_to value
     store value, message
+  end
+
+  def map_from(source_field)
+    ManifestField.new(@manifest, @field.merge({ "source" => source_field.field["source"] }), @scope)
   end
 
   def store value, message
@@ -31,6 +37,9 @@ class ManifestField
     end
   end
 
+  def custom?
+    hash_key == "custom"
+  end
 
   def index value, target, message, custom=false
     if (targets = target.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1

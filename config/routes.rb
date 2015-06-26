@@ -12,6 +12,7 @@ Cdp::Application.routes.draw do
         get  'regenerate_key'
         post 'generate_activation_token'
       end
+      resources :custom_mappings, only: [:index]
       resources :ssh_keys, only: [:create, :destroy]
       resources :device_messages, only: [:index], path: 'messages' do
         member do
