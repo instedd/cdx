@@ -24,7 +24,7 @@ class ManifestFieldMapping
     end
 
     if node["lowercase"].present?
-      return traverse(node["lowercase"], data).downcase
+      return lowercase(traverse(node["lowercase"], data))
     end
 
     if node["concat"].present?
@@ -136,6 +136,10 @@ class ManifestFieldMapping
     end
   end
 
+  def lookup(path, data)
+    @manifest.parser.lookup(path, data, @root)
+  end
+
   def map(value, mappings)
     return value unless value
     if value.is_an? Array
@@ -153,8 +157,15 @@ class ManifestFieldMapping
     end
   end
 
-  def lookup(path, data)
-    @manifest.parser.lookup(path, data, @root)
+  def lowercase(value)
+    return unless value
+    if value.is_a? Array
+      value.map do |value|
+        lowercase value
+      end
+    else
+      value.downcase
+    end
   end
 
   def parse_date(node, data)

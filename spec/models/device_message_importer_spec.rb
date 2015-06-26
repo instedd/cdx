@@ -219,34 +219,6 @@ describe DeviceMessageImporter, elasticsearch: true do
       end
     end
 
-    context 'epicenter' do
-      let(:device_model) { DeviceModel.make name: 'epicenter_es'}
-      let!(:manifest) { load_manifest 'epicenter_manifest.json' }
-
-      it 'parses csv' do
-        copy_sample_csv 'epicenter_sample.csv'
-        DeviceMessageImporter.new("*.csv").import_from sync_dir
-
-        expect(DeviceMessage.first.index_failure_reason).to be_nil
-        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["results"][0]["result"] }
-        tests.should have(29).items
-
-        test = tests.first["_source"]["test"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("ethambutol_sensitive")
-
-        test = tests.last["_source"]["test"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("thiosemicarbazone_invalid")
-
-        dbtests = TestResult.all
-        dbtests.should have(29).items
-        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['test']['uuid']}
-
-        Sample.count.should eq(3)
-      end
-    end
-
     context 'fio' do
       let(:device_model) { DeviceModel.make name: 'FIO'}
       let!(:manifest) { load_manifest 'fio_manifest.json' }
@@ -263,19 +235,19 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         test['test']['id'].should eq('12345678901234567890')
         test['patient']['gender'].should eq('female')
-        test['patient']['age'].should eq(25)
+        test['test']['patient_age'].should eq(25)
         test['patient']['custom_fields']['pregnancy_status'].should eq('Not Pregnant')
         test['sample']['id'].should eq('0987654321')
         test['test']['start_time'].should  eq('2015-05-18T12:34:56+05:00')
         test['test']['name'].should eq('SD_MALPFPV_02_02')
         test['test']['status'].should eq('success')
 
-        test_results = test['test']['results']
-        test_results.size.should eq(2)
-        test_results.first['result'].should eq('Positive')
-        test_results.first['condition'].should eq('HRPII')
-        test_results.second['result'].should eq('Negative')
-        test_results.second['condition'].should eq('pLDH')
+        assays = test['test']['assays']
+        assays.size.should eq(2)
+        assays.first['qualitative_result'].should eq('positive')
+        assays.first['name'].should eq('HRPII')
+        assays.second['qualitative_result'].should eq('negative')
+        assays.second['name'].should eq('pLDH')
 
         TestResult.count.should eq(1)
         db_test = TestResult.first
@@ -283,7 +255,5 @@ describe DeviceMessageImporter, elasticsearch: true do
         db_test.test_id.should eq('12345678901234567890')
       end
     end
-
   end
-
 end
