@@ -13,8 +13,14 @@ describe TestResultQuery, elasticsearch: true do
   let(:second_user) {User.make}
 
   it "applies institution policy" do
-    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_messages:[DeviceMessage.make(device: user_device)]})
-    TestResult.create_and_index({results:[condition: "mtb", result: :negative]}, {device_messages:[DeviceMessage.make(device: non_user_device)]})
+    TestResult.create_and_index(
+      indexed_fields: {test: {results:[condition: "mtb", result: :positive]}}.with_indifferent_access,
+      device_messages:[DeviceMessage.make(device: user_device)]
+    )
+    TestResult.create_and_index(
+      indexed_fields: {test: {results:[condition: "mtb", result: :negative]}}.with_indifferent_access,
+      device_messages:[DeviceMessage.make(device: non_user_device)]
+    )
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
     client.indices.refresh index: non_user_device.institution.elasticsearch_index_name
@@ -22,12 +28,18 @@ describe TestResultQuery, elasticsearch: true do
     query = TestResultQuery.new({condition: 'mtb'}, user)
 
     query.result['total_count'].should eq(1)
-    query.result['tests'].first['results'].first['result'].should eq('positive')
+    query.result['tests'].first['test']['results'].first['result'].should eq('positive')
   end
 
   it "delegates institution policy" do
-    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_messages:[DeviceMessage.make(device: user_device)]})
-    TestResult.create_and_index({results:[condition: "mtb", result: :negative]}, {device_messages:[DeviceMessage.make(device: third_user_device)]})
+    TestResult.create_and_index(
+      indexed_fields: {test: {results:[condition: "mtb", result: :positive]}}.with_indifferent_access,
+      device_messages:[DeviceMessage.make(device: user_device)]
+    )
+    TestResult.create_and_index(
+      indexed_fields: {test: {results:[condition: "mtb", result: :negative]}}.with_indifferent_access,
+      device_messages:[DeviceMessage.make(device: third_user_device)]
+    )
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 
@@ -36,7 +48,7 @@ describe TestResultQuery, elasticsearch: true do
     query = TestResultQuery.new({condition: 'mtb'}, second_user)
 
     query.result['total_count'].should eq(1)
-    query.result['tests'].first['results'].first['result'].should eq('positive')
+    query.result['tests'].first['test']['results'].first['result'].should eq('positive')
   end
 
   it "doesn't fails if no device is indexed for the institution yet" do
@@ -51,7 +63,10 @@ describe TestResultQuery, elasticsearch: true do
   end
 
   it "should not access any test if has no policy" do
-    TestResult.create_and_index({results:[condition: "mtb", result: :positive]}, {device_messages:[DeviceMessage.make(device: user_device)]})
+    TestResult.create_and_index(
+      indexed_fields: {test: {results:[condition: "mtb", result: :positive]}}.with_indifferent_access,
+      device_messages:[DeviceMessage.make(device: user_device)]
+    )
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 
