@@ -5,7 +5,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
   let(:device) {Device.make institution_id: institution.id}
-  let(:data)  {Oj.dump results: [result: :positive]}
+  let(:data)  {Oj.dump test:{assays: [qualitative_result: :positive]} }
 
   context "Authentication" do
 
