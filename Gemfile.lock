@@ -76,7 +76,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/ruby-location_service.git
-  revision: d086982d0f7ed4eacc1a2801700abfbe20e09a3b
+  revision: 830800eec4c4c7874dd6eb9ace576460fba7ba1e
   branch: master
   specs:
     location_service (0.1.0)
