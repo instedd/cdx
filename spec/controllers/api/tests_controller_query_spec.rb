@@ -41,57 +41,56 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative]})
 
-        response = get_updates(created_at_since: Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
-
+        response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
         response.size.should eq(1)
-        response.first["assays"].first["qualitative_result"].should eq("negative")
+        response.first["test"]["assays"].first["qualitative_result"].should eq("negative")
 
-        response = get_updates(created_at_since: Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
+        response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
 
-        response.first["assays"].first["qualitative_result"].should eq("positive")
-        response.last["assays"].first["qualitative_result"].should eq("negative")
+        response.first["test"]["assays"].first["qualitative_result"].should eq("positive")
+        response.last["test"]["assays"].first["qualitative_result"].should eq("negative")
 
-        get_updates(created_at_since: Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601).should be_empty
+        get_updates('test.reported_time_since' => Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601).should be_empty
       end
 
       it "filters by an analyzed qualitative_result" do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", qualitative_result: :negative]})
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", qualitative_result: :positive]})
 
-        response = get_updates(qualitative_result: :positive)
+        response = get_updates('test.assays.qualitative_result' => :positive)
 
         response.size.should eq(1)
-        response.first["assays"].first["qualitative_result"].should eq("positive")
+        response.first["test"]["assays"].first["qualitative_result"].should eq("positive")
       end
 
       it "filters by name" do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", qualitative_result: :positive]})
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "flu", qualitative_result: :negative]})
 
-        response = get_updates name: 'mtb'
+        response = get_updates 'test.assays.name' => 'mtb'
 
         response.size.should eq(1)
-        response.first["assays"].first["qualitative_result"].should eq("positive")
+        response.first["test"]["assays"].first["qualitative_result"].should eq("positive")
       end
 
       it "filters by test_id" do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{id: 2, assays:[name: "mtb", qualitative_result: :positive]})
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "flu", qualitative_result: :negative]})
 
-        response = get_updates test: 2
+        response = get_updates 'test.id' => 2
 
         response.size.should eq(1)
-        response.first["assays"].first["qualitative_result"].should eq("positive")
+        response.first["test"]["assays"].first["qualitative_result"].should eq("positive")
       end
 
       it "filters by test type" do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", qualitative_result: :positive], type: :qc})
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", qualitative_result: :negative], type: :specimen})
 
-        response = get_updates test_type: :specimen
+        response = get_updates 'test.type' => :specimen
 
         response.size.should eq(1)
-        response.first["assays"].first["qualitative_result"].should eq("negative")
+        response.first["test"]["assays"].first["qualitative_result"].should eq("negative")
       end
 
       it "filters for more than one value" do
@@ -99,13 +98,13 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", qualitative_result: :negative]}, patient: {gender: :female})
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test: {assays:[name: "flu", qualitative_result: :negative]})
 
-        response = get_updates(gender: [:male, :female]).sort_by do |test|
+        response = get_updates('patient.gender' => [:male, :female]).sort_by do |test|
           test["test"]["assays"].first["qualitative_result"]
         end
 
         response.size.should eq(2)
-        response.first["assays"].first["qualitative_result"].should eq("negative")
-        response.last["assays"].first["qualitative_result"].should eq("positive")
+        response.first["test"]["assays"].first["qualitative_result"].should eq("negative")
+        response.last["test"]["assays"].first["qualitative_result"].should eq("positive")
       end
     end
 
@@ -125,23 +124,23 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         ])
       end
 
-      it "groups by gender and name in post body" do
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive]}, patient: {gender: :male, name: "a"})
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive]}, patient: {gender: :male, name: "a"})
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive]}, patient: {gender: :male, name: "b"})
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative]}, patient: {gender: :female, name: "a"})
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative]}, patient: {gender: :female, name: "b"})
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative]}, patient: {gender: :female, name: "b"})
+      it "groups by gender and qualitative_result in post body" do
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive]}, patient: {gender: :male})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative]}, patient: {gender: :male})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative]}, patient: {gender: :male})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive]}, patient: {gender: :female})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive]}, patient: {gender: :female})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative]}, patient: {gender: :female})
 
-        response = get_updates({}, Oj.dump(group_by: ['patient.gender', 'patient.name'])).sort_by do |test|
-          test["patient.gender"] + test["patient.name"]
+        response = get_updates({}, Oj.dump(group_by: ['patient.gender', 'test.assays.qualitative_result'])).sort_by do |test|
+          test["patient.gender"] + test["test.assays.qualitative_result"]
         end
 
         response.should eq([
-          {"patient.gender"=>"female", "patient.name" => "a", "count"=>1},
-          {"patient.gender"=>"female", "patient.name" => "b", "count"=>2},
-          {"patient.gender"=>"male", "patient.name" => "a", "count"=>2},
-          {"patient.gender"=>"male", "patient.name" => "b", "count"=>1}
+          {"patient.gender"=>"female", "test.assays.qualitative_result" => "negative", "count"=>1},
+          {"patient.gender"=>"female", "test.assays.qualitative_result" => "positive", "count"=>2},
+          {"patient.gender"=>"male", "test.assays.qualitative_result" => "negative", "count"=>2},
+          {"patient.gender"=>"male", "test.assays.qualitative_result" => "positive", "count"=>1}
         ])
       end
 
@@ -174,16 +173,16 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         before(:each) { Timecop.freeze }
 
         it "responds a csv for a given grouping" do
-          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive], error_code: 1234}, device: {lab_user: :jdoe})
-          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative], error_code: 1234}, device: {lab_user: :jane_doe})
-          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative], error_code: 1234}, device: {lab_user: :jane_doe})
+          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive], error_code: 1234})
+          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative], error_code: 1234})
+          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative], error_code: 1234})
 
           fresh_client_for institution.elasticsearch_index_name
 
-          response = get :index, "", format: 'csv', group_by: 'device.lab_user,test.error_code'
+          response = get :index, "", format: 'csv', group_by: 'test.assays.qualitative_result,test.error_code'
 
           check_csv response
-          response.body.should eq("device.lab_user,test.error_code,count\njane_doe,1234,2\njdoe,1234,1\n")
+          response.body.should eq("test.assays.qualitative_result,test.error_code,count\nnegative,1234,2\npositive,1234,1\n")
         end
 
         it "returns a csv with columns for a given grouping even when there are no assays" do

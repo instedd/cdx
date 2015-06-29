@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-def build(input, options=nil) 
+def build(input, options=nil)
   if options.nil?
-    builder = CSVBuilder.new input 
+    builder = CSVBuilder.new input
   else
     builder = CSVBuilder.new input, options
   end
-  
+
   output = []
   builder.build output
 
@@ -18,12 +18,18 @@ describe CSVBuilder do
     it 'takes column names from first element' do
       build [{"foo" => 1, "bar" => 2}, {"baz" => 3, "etc" => 4}] do |output|
         expect(output[0]).to eq ["foo", "bar"]
-      end      
+      end
     end
 
     it 'is empty if there are no elements' do
       build [] do |output|
         expect(output).to be_empty
+      end
+    end
+
+    it 'access columns with indifferent access' do
+      build [{"foo" => 1, :bar => 2}] do |output|
+        expect(output[1]).to eq([1,2])
       end
     end
   end
