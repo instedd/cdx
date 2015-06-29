@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe DeviceMessage, elasticsearch: true do
-  let(:device) {Device.make}
+  let(:device) {Device.make device_model: DeviceModel.make(manifests: [])}
 
   it 'stores failed messages with raw data when it hits an issue parsing a manifest' do
     manifest = Manifest.create! definition: %{

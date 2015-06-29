@@ -1,5 +1,6 @@
 class DeviceModel < ActiveRecord::Base
   has_and_belongs_to_many :manifests
+  validates_uniqueness_of :name
   has_many :devices
 
   scope :active, -> { joins(:manifests).distinct }

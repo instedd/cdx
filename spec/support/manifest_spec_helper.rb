@@ -35,35 +35,4 @@ module ManifestSpecHelper
     expect { manifest.apply_to(data, device).first }.to raise_error(message)
   end
 
-  def default_manifest_for(device)
-    Manifest.create! definition: default_definition(device.model)
-  end
-
-  def self.default_definition(device_model)
-    core_mapping = {}
-
-    Cdx.core_field_scopes.each do |scope|
-      map(scope.fields).flatten.each do |field_definition|
-        scoped_field_definition = "#{scope.name}#{PATH_SPLIT_TOKEN}#{field_definition}"
-        core_mapping[scoped_field_definition] = {
-          lookup: scoped_field_definition
-        }
-      end
-    end
-
-    Oj.dump({
-      metadata: { source: { type: "json" }, device_models: [device_model]},
-      field_mapping: core_mapping
-    })
-  end
-
-  def self.map fields, source_prefix = ''
-    fields.map do |field|
-      if field.nested?
-        map field.sub_fields, "#{source_prefix}#{field.name}#{COLLECTION_SPLIT_TOKEN}"
-      else
-        "#{source_prefix}#{field.name}"
-      end
-    end
-  end
 end

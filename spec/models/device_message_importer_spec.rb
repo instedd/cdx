@@ -6,7 +6,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
-  let(:device_model) { DeviceModel.make name: 'test_model'}
+  let(:device_model) { DeviceModel.make name: 'test_model', manifests: []}
   let(:device) {Device.make institution_id: institution.id, device_model: device_model}
   let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
 
@@ -161,7 +161,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'epicenter headless_es' do
-      let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es'}
+      let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es', manifests: []}
       let!(:manifest)    { load_manifest 'epicenter_headless_es_manifest.json' }
 
       it "parses csv in utf-16le" do
@@ -176,7 +176,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'genoscan' do
-      let(:device_model) { DeviceModel.make name: 'genoscan'}
+      let(:device_model) { DeviceModel.make name: 'genoscan', manifests: []}
       let!(:manifest) { load_manifest 'genoscan_manifest.json' }
 
       it 'parses csv' do
@@ -220,7 +220,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'fio' do
-      let(:device_model) { DeviceModel.make name: 'FIO'}
+      let(:device_model) { DeviceModel.make name: 'FIO', manifests: []}
       let!(:manifest) { load_manifest 'fio_manifest.json' }
 
       it 'parses xml' do

@@ -3,7 +3,7 @@ DeviceMessage; class DeviceMessage
   def self.create_and_process(params = {})
     device_message = self.make params
     if device_message.index_failed?
-      raise 'DeviceMessage index failed'
+      raise "DeviceMessage index failed. Reason #{device_message.index_failure_reason}"
     else
       device_message.process
     end

@@ -39,7 +39,7 @@ Device.blueprint do
   laboratories { [Laboratory.make] }
   institution { laboratories.first.institution }
   name
-  device_model
+  device_model { Manifest.make.device_models.first }
   time_zone { "UTC" }
 end
 
@@ -73,6 +73,7 @@ Policy.blueprint do
 end
 
 Manifest.blueprint do
+  definition { DefaultManifest.definition(Faker::Name.name) }
 end
 
 Subscriber.blueprint do

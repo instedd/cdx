@@ -294,7 +294,13 @@ class ManifestFieldMapping
 
   def coerce_values value
     if @field.type == 'integer' &&  ManifestFieldValidation.is_an_integer?(value)
-      value.to_i
+      if value.is_a? Array
+        value.map do |value|
+          value && value.to_i
+        end
+      else
+        value.to_i
+      end
     else
       value
     end

@@ -29,7 +29,7 @@ class ManifestFieldValidation
   def self.is_an_integer? value
     if value.is_a?(Array)
       !value.empty? && value.all? do |element|
-        is_an_integer? element
+        element.nil? || is_an_integer?(element)
       end
     else
       value.is_a?(Integer) || value.to_i.to_s == value
