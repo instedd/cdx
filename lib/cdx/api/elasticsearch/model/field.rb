@@ -51,4 +51,74 @@ class Cdx::Field
       { "properties" => {} }
     end
   end
+
+  class DurationField < self
+    def elasticsearch_mapping
+      {
+        "type" => "nested",
+        "properties" => {
+          "in_millis" => {
+            "type" => "long",
+            "index" => "not_analyzed"
+          },
+          "milliseconds" => {
+            "type" => "integer",
+            "index" => "not_analyzed"
+          },
+          "seconds" => {
+            "type" => "integer",
+            "index" => "not_analyzed"
+          },
+          "minutes" => {
+            "type" => "integer",
+            "index" => "not_analyzed"
+          },
+          "hours" => {
+            "type" => "integer",
+            "index" => "not_analyzed"
+          },
+          "days" => {
+            "type" => "integer",
+            "index" => "not_analyzed"
+          },
+          "months" => {
+            "type" => "integer",
+            "index" => "not_analyzed"
+          },
+          "years" => {
+            "type" => "integer",
+            "index" => "not_analyzed"
+          }
+        }
+      }
+    end
+
+    def self.parse_string value
+      components = value.to_s.scan /\d+\D+/
+      components.inject({}) { |parsed, component| parsed.merge(parse_single_value component) }
+    end
+
+    def self.parse_single_value value
+      case value.to_s
+      when /^(\d+)yo?$/
+        { years: $1.to_i }
+      when /^(\d+)mo$/
+        { months: $1.to_i }
+      when /^(\d+)d$/
+        { days: $1.to_i }
+      when /^(\d+)hs?$/
+        { hours: $1.to_i }
+      when /^(\d+)m$/
+        { minutes: $1.to_i }
+      when /^(\d+)ms$/
+        { milliseconds: $1.to_i }
+      when /^(\d+)s$/
+        { seconds: $1.to_i }
+      when /^(\d+)$/
+        { default_unit => $1.to_i }
+      else
+        raise "Unrecognized duration: #{value.to_s}"
+      end
+    end
+  end
 end
