@@ -120,5 +120,25 @@ class Cdx::Field
         raise "Unrecognized duration: #{value.to_s}"
       end
     end
+
+    def self.convert_time duration
+      time = 0
+      duration.each { |unit, amount| time += convert_from_unit(amount, unit) }
+      time
+    end
+
+    UNIT_TO_MILLISECONDS = {
+      years: 31536000000,
+      months: 2592000000,
+      days: 86400000,
+      hours: 3600000,
+      minutes: 60000,
+      seconds: 1000,
+      milliseconds: 1
+    }
+
+    def self.convert_from_unit amount, unit
+      amount * UNIT_TO_MILLISECONDS[unit.to_sym]
+    end
   end
 end
