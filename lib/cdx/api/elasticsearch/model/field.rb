@@ -15,6 +15,10 @@ class Cdx::Field
     }
   end
 
+  def append_to_elastic_script current_script
+    current_script
+  end
+
   class NestedField < self
     def elasticsearch_mapping
       {
@@ -139,6 +143,22 @@ class Cdx::Field
 
     def self.convert_from_unit amount, unit
       amount * UNIT_TO_MILLISECONDS[unit.to_sym]
+    end
+
+    def append_to_elastic_script current_script
+      temp_name = "temp_#{scoped_name.gsub '.', '___'}"
+      name_with_questions = scoped_name.gsub '.', '?.'
+      calculation = UNIT_TO_MILLISECONDS.map { |unit, milliseconds|
+        "(#{temp_name}.#{unit} ?:0) * #{milliseconds}"
+      }.join " +\n"
+      
+      "#{current_script}
+      #{temp_name} = ctx._source.#{name_with_questions}
+      if(#{temp_name}) {
+        ctx._source.#{scoped_name}.in_millis =
+        #{calculation}
+      }
+      "
     end
   end
 end
