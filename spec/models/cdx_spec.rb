@@ -35,7 +35,8 @@ describe Cdx do
       "test.status",
       "test.type",
       "test.updated_time",
-      "test.uuid"
+      "test.uuid",
+      "test.id"
     )
   end
 end

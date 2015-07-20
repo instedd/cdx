@@ -1,6 +1,5 @@
 class Cdx::Field
   attr_accessor :scope
-  delegate :root_scope, to: :scope
 
   def initialize scope, definition
     @scope = scope
@@ -17,6 +16,10 @@ class Cdx::Field
 
   def type
     @definition[:type] || 'string'
+  end
+
+  def root_scope
+    scope.root_scope
   end
 
   def name
