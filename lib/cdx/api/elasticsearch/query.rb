@@ -131,6 +131,8 @@ class Cdx::Api::Elasticsearch::Query
       when "range"
         field_value = convert_timezone_if_date(field_value)
         conditions.push range: {field_definition.name => ({filter_definition["boundary"] => field_value}.merge filter_definition["options"])}
+      when "duration"
+        conditions.push process_duration_field(field_definition.name, field_value)
       when "wildcard"
         conditions.push process_wildcard_field(field_definition, field_value)
       end
@@ -148,6 +150,18 @@ class Cdx::Api::Elasticsearch::Query
 
   def process_single_match_field(field_name, field_value)
     {match: {field_name => field_value}}
+  end
+
+  def process_duration_field(field_name, field_value)
+    process_multi_field(field_value) do |value|
+      process_null(field_name, value) do
+        process_single_duration_field(field_name, value)
+      end
+    end
+  end
+
+  def process_duration_field(field_name, field_value)
+    {range: {"#{field_name}.in_millis" => Cdx::Field::DurationField.parse_range(field_value)}}
   end
 
   def process_wildcard_field(field_definition, field_value)
@@ -204,10 +218,17 @@ class Cdx::Api::Elasticsearch::Query
     all_orders = extract_multi_values(order)
     all_orders.map do |order|
       if order[0] == "-"
-        {order[1..-1] => { :order => "desc", :ignore_unmapped => true} }
+        order = order[1..-1]
+        sorting = "desc"
       else
-        {order => { :order => "asc", :ignore_unmapped => true} }
+        sorting = "asc"
       end
+
+      duration_field = @api.searchable_fields.detect {|field| field.scoped_name == order and field.type == "duration"}
+
+      order = "#{order}.in_millis" if duration_field
+
+      {order => { :order => sorting, :ignore_unmapped => true} }
     end
   end
 

@@ -36,6 +36,10 @@ Cdx::Api.setup do |config|
 end
 ```
 
+If you are willing to use `duration` fields, you need to enable Elastic's `script` functionality by adding this line to your `elasticsearch.yml`:
+
+    script.engine.groovy.inline.mapping: on
+
 ### Mapping
 
 This gem assumes that all tests are stored in a canonical ElasticSearch index (or indices) with a mapping based on the standard core fields definition specified in [CDX API](http://dxapi.org/#/event-resource), and encoded in the [API fields definition](config/cdx_api_fields.yml).

@@ -80,8 +80,40 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "index"=> "not_analyzed"
               },
               "patient_age" => {
-                "type" => "integer",
-                "index" => "not_analyzed"
+                "properties" => {
+                  "in_millis" => {
+                    "type" => "long",
+                    "index" => "not_analyzed"
+                  },
+                  "milliseconds" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "seconds" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "minutes" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "hours" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "days" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "months" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "years" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  }
+                }
               },
               "name" => {
                 "type" => "string",

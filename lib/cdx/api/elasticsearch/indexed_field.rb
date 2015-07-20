@@ -50,6 +50,8 @@ private
     case type
     when 'date'
       default_date_filter_definition
+    when 'duration'
+      default_duration_filter_definition
     else
       [{"name" => scoped_name, "type" => default_filter_type}]
     end
@@ -61,6 +63,10 @@ private
 
   def default_date_filter_definition
     [default_date_filter_definition_boundary('since', 'from'), default_date_filter_definition_boundary('until', 'to')]
+  end
+
+  def default_duration_filter_definition
+    [{"name" => scoped_name, "type" => 'duration'}]
   end
 
   def default_filter_type
@@ -79,6 +85,8 @@ private
         {"name" => "week(#{scoped_name})", "type" => 'date', "interval" => 'week'},
         {"name" => "day(#{scoped_name})", "type" => 'date', "interval" => 'day'}
       ]
+    elsif type == 'duration'
+      [{"name" => scoped_name, "type" => 'duration'}]
     else
       [{"name" => scoped_name, "type" => default_grouping_type}]
     end

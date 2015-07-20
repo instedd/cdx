@@ -47,18 +47,3 @@
   group_parameter_definition:
     - name: admin_level
       type: location
-- name: test.patient_age
-  filter_parameter_definition:
-    - include_default: true
-    - name: min_age
-      type: range
-      boundary: from
-      options:
-        include_lower: true
-    - name: max_age
-      type: range
-      boundary: to
-      options:
-        include_upper: true
-  group_parameter_definition:
-    - type: range

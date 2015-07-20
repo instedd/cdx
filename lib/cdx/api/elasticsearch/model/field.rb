@@ -59,7 +59,6 @@ class Cdx::Field
   class DurationField < self
     def elasticsearch_mapping
       {
-        "type" => "nested",
         "properties" => {
           "in_millis" => {
             "type" => "long",
@@ -95,6 +94,18 @@ class Cdx::Field
           }
         }
       }
+    end
+
+    def self.parse_range value
+      lower_bound, upper_bound = value.split "..", 2
+      range = {}
+      range["from"] = Cdx::Field::DurationField.string_to_time(lower_bound) unless lower_bound.empty?
+      range["to"] = Cdx::Field::DurationField.string_to_time(upper_bound) unless upper_bound.empty?
+      range
+    end
+
+    def self.string_to_time value
+      convert_time parse_string(value)
     end
 
     def self.parse_string value

@@ -36,6 +36,10 @@ class GroupingDetail
           grouping = LocationGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, values
         end
 
+        if grouping_def["type"] == "duration"
+          grouping = DurationGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, values
+        end
+
         if !grouping
           if grouping_def["type"] == "date"
             grouping = DateGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, grouping_def["interval"]
