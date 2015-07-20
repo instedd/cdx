@@ -70,10 +70,15 @@ class DeviceMessageProcessor
     private
 
     def find_or_initialize_test
+      pii = {test: parsed_message[:test][:pii]}.with_indifferent_access
+      custom_fields = {test: parsed_message[:test][:custom]}.with_indifferent_access
+      indexed_fields = {test: parsed_message[:test][:indexed]}.with_indifferent_access
+
       test = TestResult.new device_messages: [device_message],
-                            plain_sensitive_data: parsed_message[:test][:pii],
-                            custom_fields: parsed_message[:test][:custom],
-                            test_id: parsed_message[:test][:indexed][:test_id],
+                            plain_sensitive_data: pii, # TODO: this should be what the manifest returns
+                            custom_fields: custom_fields,
+                            indexed_fields: indexed_fields,
+                            test_id: indexed_fields[:test][:id],
                             device: device
 
       if test.test_id && existing = TestResult.find_by(test_id: test.test_id, device_id: test.device_id)
@@ -85,10 +90,10 @@ class DeviceMessageProcessor
     end
 
     def find_or_initialize_sample
-      pii = parsed_message[:sample][:pii].with_indifferent_access
-      custom_fields = parsed_message[:sample][:custom].with_indifferent_access
-      indexed_fields = parsed_message[:sample][:indexed].with_indifferent_access
-      sample_uid = pii[:sample_uid]
+      pii = {sample: parsed_message[:sample][:pii]}.with_indifferent_access
+      custom_fields = {sample: parsed_message[:sample][:custom]}.with_indifferent_access
+      indexed_fields = {sample: parsed_message[:sample][:indexed]}.with_indifferent_access
+      sample_uid = pii[:sample][:uid]
 
       sample = Sample.new plain_sensitive_data: pii,
                           custom_fields: custom_fields,
@@ -105,10 +110,10 @@ class DeviceMessageProcessor
     end
 
     def find_or_initialize_patient
-      pii = parsed_message[:patient][:pii].with_indifferent_access
-      custom_fields = parsed_message[:patient][:custom].with_indifferent_access
-      indexed_fields = parsed_message[:patient][:indexed].with_indifferent_access
-      patient_id = pii[:patient_id]
+      pii = {patient: parsed_message[:patient][:pii]}.with_indifferent_access
+      custom_fields = {patient: parsed_message[:patient][:custom]}.with_indifferent_access
+      indexed_fields = {patient: parsed_message[:patient][:indexed]}.with_indifferent_access
+      patient_id = pii[:patient][:id]
 
       patient = Patient.new plain_sensitive_data: pii,
                             custom_fields: custom_fields,
@@ -185,12 +190,12 @@ class DeviceMessageProcessor
     end
 
     def index_test(test, is_new)
-      indexer = TestResultIndexer.new(parsed_message[:test][:indexed], test)
+      indexer = TestResultIndexer.new(test)
       is_new ? indexer.index : indexer.update
     end
 
     def update_sample_in_existing_documents_with sample
-      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { sample_uuid: sample.uuid } } } }, fields: []}, size: 10000
+      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { :'sample.uuid' => sample.uuid } } } }, fields: []}, size: 10000
       body = response["hits"]["hits"].map do |element|
         { update: { _type: element["_type"], _id: element["_id"], data: { doc: sample.indexed_fields } } }
       end
@@ -199,7 +204,7 @@ class DeviceMessageProcessor
     end
 
     def update_patient_in_existing_documents_with patient
-      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { patient_uuid: patient.uuid } } } }, fields: []}, size: 10000
+      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { :'patient.uuid' => patient.uuid } } } }, fields: []}, size: 10000
       body = response["hits"]["hits"].map do |element|
         { update: { _type: element["_type"], _id: element["_id"], data: { doc: patient.indexed_fields } } }
       end

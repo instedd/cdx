@@ -15,6 +15,7 @@ class CustomMappingsController < ApplicationController
 
   def index
     @custom_fields = @device.current_manifest.fields.select &:custom?
+    @device.custom_mappings ||= {}
   end
 
   private

@@ -4,8 +4,8 @@ class TestResult < ActiveRecord::Base
   has_one :institution, through: :device
   belongs_to :sample
   belongs_to :patient
-  serialize :custom_fields
-  serialize :indexed_fields
+  serialize :custom_fields, HashWithIndifferentAccess
+  serialize :indexed_fields, HashWithIndifferentAccess
   validates_presence_of :device
   validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
   validate :same_patient_in_sample
@@ -33,18 +33,15 @@ class TestResult < ActiveRecord::Base
 
   def add_sample_data(sample)
     if sample.plain_sensitive_data.present?
-      self.plain_sensitive_data[:sample] ||= {}
-      self.plain_sensitive_data[:sample].deep_merge_not_nil!(sample.plain_sensitive_data)
+      self.plain_sensitive_data.deep_merge_not_nil!(sample.plain_sensitive_data)
     end
 
     if sample.custom_fields.present?
-      self.custom_fields[:sample] ||= {}
-      self.custom_fields[:sample].deep_merge_not_nil!(sample.custom_fields)
+      self.custom_fields.deep_merge_not_nil!(sample.custom_fields)
     end
 
     if sample.indexed_fields.present?
-      self.indexed_fields[:sample] ||= {}
-      self.indexed_fields[:sample].deep_merge_not_nil!(sample.indexed_fields)
+      self.indexed_fields.deep_merge_not_nil!(sample.indexed_fields)
     end
   end
 
@@ -53,9 +50,9 @@ class TestResult < ActiveRecord::Base
       sample.patient_id = self.patient_id
     end
 
-    sample.plain_sensitive_data.reverse_deep_merge! (self.plain_sensitive_data[:sample] || {})
-    sample.custom_fields.reverse_deep_merge! (self.custom_fields[:sample] || {})
-    sample.indexed_fields.reverse_deep_merge! (self.indexed_fields[:sample] || {})
+    sample.plain_sensitive_data[:sample].reverse_deep_merge!(self.plain_sensitive_data[:sample] || {})
+    sample.custom_fields[:sample].reverse_deep_merge!(self.custom_fields[:sample] || {})
+    sample.indexed_fields[:sample].reverse_deep_merge!(self.indexed_fields[:sample] || {})
 
     if self.plain_sensitive_data[:patient].present?
       sample.plain_sensitive_data[:patient] ||= {}
@@ -86,18 +83,15 @@ class TestResult < ActiveRecord::Base
       self.sample.save!
     else
       if patient.plain_sensitive_data.present?
-        self.plain_sensitive_data[:patient] ||= {}
-        self.plain_sensitive_data[:patient].deep_merge_not_nil!(patient.plain_sensitive_data)
+        self.plain_sensitive_data.deep_merge_not_nil!(patient.plain_sensitive_data)
       end
 
       if patient.custom_fields.present?
-        self.custom_fields[:patient] ||= {}
-        self.custom_fields[:patient].deep_merge_not_nil!(patient.custom_fields)
+        self.custom_fields.deep_merge_not_nil!(patient.custom_fields)
       end
 
       if patient.indexed_fields.present?
-        self.indexed_fields[:patient] ||= {}
-        self.indexed_fields[:patient].deep_merge_not_nil!(patient.indexed_fields)
+        self.indexed_fields.deep_merge_not_nil!(patient.indexed_fields)
       end
     end
   end
@@ -106,9 +100,9 @@ class TestResult < ActiveRecord::Base
     if self.sample.present?
       self.sample.extract_patient_data_into(patient)
     else
-      patient.plain_sensitive_data.reverse_deep_merge! (self.plain_sensitive_data[:patient] || {})
-      patient.custom_fields.reverse_deep_merge! (self.custom_fields[:patient] || {})
-      patient.indexed_fields.reverse_deep_merge! (self.indexed_fields[:patient] || {})
+      patient.plain_sensitive_data[:patient].reverse_deep_merge!(self.plain_sensitive_data[:patient] || {})
+      patient.custom_fields[:patient].reverse_deep_merge!(self.custom_fields[:patient] || {})
+      patient.indexed_fields[:patient].reverse_deep_merge!(self.indexed_fields[:patient] || {})
 
       self.plain_sensitive_data.delete(:patient)
       self.custom_fields.delete(:patient)

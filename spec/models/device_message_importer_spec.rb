@@ -6,7 +6,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
-  let(:device_model) { DeviceModel.make name: 'test_model'}
+  let(:device_model) { DeviceModel.make name: 'test_model', manifests: []}
   let(:device) {Device.make institution_id: institution.id, device_model: device_model}
   let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
 
@@ -25,30 +25,38 @@ describe DeviceMessageImporter, elasticsearch: true do
     {
       "metadata": {
         "version": "1",
-        "api_version": "1.1.0",
+        "api_version": "1.2.0",
         "device_models": "#{device.device_model.name}",
         "source" : { "type" : "#{source}"}
       },
-      "field_mapping" : {"test" : [{
-          "target_field" : "error_code",
-          "source" : {"lookup": "error_code"},
-          "core" : true,
-          "type" : "integer"
-        },
-        {
-          "target_field" : "result",
-          "source" : {"lookup": "result"},
-          "core" : true,
-          "type" : "enum",
-          "options" : [ "positive", "negative", "positivo", "negativo", "inválido" ]
-        }
-      ]}
+      "field_mapping" : {
+        "test.error_code" : {"lookup": "error_code"},
+        "test.qualitative_result" : {
+          "map": [
+          {"lookup": "result"},
+          [
+            {"match": "positivo", "output" : "positive"},
+            {"match": "positive", "output" : "positive"},
+            {"match": "negative", "output" : "negative"},
+            {"match": "negativo", "output" : "negative"},
+            {"match": "inválido", "output" : "n/a"}
+          ]
+        ]},
+        "test.status" : {
+          "map": [
+          {"lookup": "result"},
+          [
+            {"match": "inválido", "output" : "invalid"},
+            {"match": "invalid", "output" : "invalid"},
+            {"match": "*", "output" : "success"}
+          ]
+        ]}
+      }
     }
   }
   end
 
   context "csv" do
-
     let(:source) { "csv" }
 
     it 'parses a csv from sync dir' do
@@ -56,13 +64,14 @@ describe DeviceMessageImporter, elasticsearch: true do
       write_file(%{error_code;result\n0;positive\n1;negative}, 'csv')
       DeviceMessageImporter.new.import_from sync_dir
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      expect(DeviceMessage.first.index_failure_reason).to be_nil
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positive")
-      test = tests.last["_source"]
+      test["qualitative_result"].should eq("positive")
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("negative")
+      test["qualitative_result"].should eq("negative")
     end
 
     it 'parses a csv in utf 16' do
@@ -72,15 +81,15 @@ describe DeviceMessageImporter, elasticsearch: true do
       CharDet.stub(:detect).and_return('encoding' => 'UTF-16LE', 'confidence' => 1.0)
       DeviceMessageImporter.new.import_from sync_dir
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      expect(DeviceMessage.first.index_failure_reason).to be_nil
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positivo")
-      test = tests.last["_source"]
+      test["qualitative_result"].should eq("positive")
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("inválido")
+      test["qualitative_result"].should eq("n/a")
     end
-
   end
 
   context "json" do
@@ -92,13 +101,14 @@ describe DeviceMessageImporter, elasticsearch: true do
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
       DeviceMessageImporter.new("*.json").import_from sync_dir
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      expect(DeviceMessage.first.index_failure_reason).to be_nil
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positive")
-      test = tests.last["_source"]
+      test["qualitative_result"].should eq("positive")
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("negative")
+      test["qualitative_result"].should eq("negative")
     end
 
     it 'parses a json from sync dir registering multiple extensions' do
@@ -106,13 +116,14 @@ describe DeviceMessageImporter, elasticsearch: true do
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json')
       DeviceMessageImporter.new("*.{csv,json}").import_from sync_dir
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      expect(DeviceMessage.first.index_failure_reason).to be_nil
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positive")
-      test = tests.last["_source"]
+      test["qualitative_result"].should eq("positive")
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("negative")
+      test["qualitative_result"].should eq("negative")
     end
 
     it 'parses a json from sync dir registering multiple extensions using import single' do
@@ -120,15 +131,15 @@ describe DeviceMessageImporter, elasticsearch: true do
       write_file('[{"error_code": "0", "result": "positive"}, {"error_code": "1", "result": "negative"}]', 'json', 'mytestfile')
       DeviceMessageImporter.new("*.{csv,json}").import_single(sync_dir, File.join(sync_dir.inbox_path(device.uuid), "mytestfile.json"))
 
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["error_code"] }
-      test = tests.first["_source"]
+      expect(DeviceMessage.first.index_failure_reason).to be_nil
+      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["result"].should eq("positive")
-      test = tests.last["_source"]
+      test["qualitative_result"].should eq("positive")
+      test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["result"].should eq("negative")
+      test["qualitative_result"].should eq("negative")
     end
-
   end
 
   context "real scenarios" do
@@ -150,134 +161,99 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'epicenter headless_es' do
-      let(:device_model) { DeviceModel.make name: 'epicenter_headless_es'}
+      let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es', manifests: []}
       let!(:manifest)    { load_manifest 'epicenter_headless_es_manifest.json' }
 
       it "parses csv in utf-16le" do
         copy_sample_csv 'epicenter_headless_sample_utf16.csv'
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests_for(device.institution)
         tests.should have(18).items
-        tests.map{|e| e['_source']['start_time']}.should =~ ['2014-09-09T17:07:32+00:00', '2014-10-28T13:00:58+00:00', '2014-10-28T17:24:34+00:00', '2015-02-10T18:10:28+00:00', '2015-03-03T19:27:36+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:35:19+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2015-03-31T18:34:08+00:00', '2014-11-05T08:38:30+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00', '2014-10-29T12:24:59+00:00']
+        tests.map{|e| e['_source']['test']['start_time']}.should =~ ['2014-09-09T17:07:32Z', '2014-10-28T13:00:58Z', '2014-10-28T17:24:34Z', '2015-02-10T18:10:28Z', '2015-03-03T19:27:36Z', '2015-03-31T18:35:19Z', '2015-03-31T18:35:19Z', '2015-03-31T18:35:19Z', '2015-03-31T18:35:19Z', '2015-03-31T18:34:08Z', '2015-03-31T18:34:08Z', '2015-03-31T18:34:08Z', '2015-03-31T18:34:08Z', '2014-11-05T08:38:30Z', '2014-10-29T12:24:59Z', '2014-10-29T12:24:59Z', '2014-10-29T12:24:59Z', '2014-10-29T12:24:59Z']
       end
     end
 
     context 'genoscan' do
-      let(:device_model) { DeviceModel.make name: 'genoscan'}
+      let(:device_model) { DeviceModel.make name: 'genoscan', manifests: []}
       let!(:manifest) { load_manifest 'genoscan_manifest.json' }
 
       it 'parses csv' do
         copy_sample_csv 'genoscan_sample.csv'
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
-        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
+        tests = all_elasticsearch_tests_for(device.institution).sort_by do |test|
+          test["_source"]["test"]["assays"][0]['qualitative_result'] + test["_source"]["test"]["assays"][1]['qualitative_result'] + test["_source"]["test"]["assays"][2]['qualitative_result']
+        end
         tests.should have(13).items
 
-        test = tests.first["_source"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("negative")
+        test = tests[0]["_source"]["test"]
+        test["assays"][0]["name"].should eq("mtb")
+        test["assays"][0]["qualitative_result"].should eq("negative")
+        test["assays"][1]["name"].should eq("rif")
+        test["assays"][1]["qualitative_result"].should eq("negative")
+        test["assays"][2]["name"].should eq("inh")
+        test["assays"][2]["qualitative_result"].should eq("negative")
 
-        test = tests.last["_source"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("positive_with_rif_and_inh")
+        test = tests[1]["_source"]["test"]
+        test["assays"][0]["name"].should eq("mtb")
+        test["assays"][0]["qualitative_result"].should eq("positive")
+        test["assays"][1]["name"].should eq("rif")
+        test["assays"][1]["qualitative_result"].should eq("negative")
+        test["assays"][2]["name"].should eq("inh")
+        test["assays"][2]["qualitative_result"].should eq("negative")
+
+        test = tests.last["_source"]["test"]
+        test["assays"][0]["name"].should eq("mtb")
+        test["assays"][0]["qualitative_result"].should eq("positive")
+        test["assays"][1]["name"].should eq("rif")
+        test["assays"][1]["qualitative_result"].should eq("positive")
+        test["assays"][2]["name"].should eq("inh")
+        test["assays"][2]["qualitative_result"].should eq("positive")
 
         dbtests = TestResult.all
         dbtests.should have(13).items
-        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['uuid']}
-      end
-    end
-
-    context 'epicenter' do
-      let(:device_model) { DeviceModel.make name: 'epicenter_es'}
-      let!(:manifest) { load_manifest 'epicenter_manifest.json' }
-
-      it 'parses csv' do
-        copy_sample_csv 'epicenter_sample.csv'
-        DeviceMessageImporter.new("*.csv").import_from sync_dir
-
-        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
-        tests.should have(29).items
-
-        test = tests.first["_source"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("ethambutol_sensitive")
-
-        test = tests.last["_source"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("thiosemicarbazone_invalid")
-
-        dbtests = TestResult.all
-        dbtests.should have(29).items
-        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['uuid']}
-
-        Sample.count.should eq(3)
-      end
-    end
-
-    context "epicenter headless" do
-      let(:device_model) { DeviceModel.make name: 'epicenter_headless_es'}
-      let!(:manifest) { load_manifest 'epicenter_headless_manifest.json' }
-
-      it 'parses csv' do
-        copy_sample_csv 'epicenter_headless_sample.csv'
-        DeviceMessageImporter.new("*.csv").import_from sync_dir
-
-        tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["results"][0]["result"] }
-        tests.should have(29).items
-
-        test = tests.first["_source"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("ethambutol_sensitive")
-
-        test = tests.last["_source"]
-        test["results"][0]["condition"].should eq("mtb")
-        test["results"][0]["result"].should eq("thiosemicarbazone_invalid")
-
-        dbtests = TestResult.all
-        dbtests.should have(29).items
-        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['uuid']}
-
-        Sample.count.should eq(3)
+        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['test']['uuid']}
       end
     end
 
     context 'fio' do
-      let(:device_model) { DeviceModel.make name: 'FIO'}
+      let(:device_model) { DeviceModel.make name: 'FIO', manifests: []}
       let!(:manifest) { load_manifest 'fio_manifest.json' }
 
       it 'parses xml' do
         copy_sample_xml 'fio_sample.xml'
         DeviceMessageImporter.new("*.xml").import_from sync_dir
 
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests_for(device.institution)
         tests.should have(1).items
 
         test = tests.first['_source']
 
-        test['test_id'].should eq('12345678901234567890')
-        test['gender'].should eq('female')
-        test['age'].should eq(25)
-        test['custom_fields']['pregnancy_status'].should eq('Not Pregnant')
-        test['sample_id'].should eq('0987654321')
-        test['start_time'].should  eq('2015-05-18T12:34:56+05:00')
-        test['assay_name'].should eq('SD_MALPFPV_02_02')
-        test['status'].should eq('success')
+        test['test']['id'].should eq('12345678901234567890')
+        test['patient']['gender'].should eq('female')
+        test['test']['patient_age'].should eq(25)
+        test['patient']['custom_fields']['pregnancy_status'].should eq('Not Pregnant')
+        test['sample']['id'].should eq('0987654321')
+        test['test']['start_time'].should  eq('2015-05-18T12:34:56+05:00')
+        test['test']['name'].should eq('SD_MALPFPV_02_02')
+        test['test']['status'].should eq('success')
 
-        test_results = test['results']
-        test_results.size.should eq(2)
-        test_results.first['result'].should eq('Positive')
-        test_results.first['condition'].should eq('HRPII')
-        test_results.second['result'].should eq('Negative')
-        test_results.second['condition'].should eq('pLDH')
+        assays = test['test']['assays']
+        assays.size.should eq(2)
+        assays.first['qualitative_result'].should eq('positive')
+        assays.first['name'].should eq('HRPII')
+        assays.second['qualitative_result'].should eq('negative')
+        assays.second['name'].should eq('pLDH')
 
         TestResult.count.should eq(1)
         db_test = TestResult.first
-        db_test.uuid.should eq(test['uuid'])
+        db_test.uuid.should eq(test['test']['uuid'])
         db_test.test_id.should eq('12345678901234567890')
       end
     end
-
   end
-
 end

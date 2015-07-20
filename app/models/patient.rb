@@ -7,8 +7,8 @@ class Patient < ActiveRecord::Base
   before_create :generate_uuid
   before_create :ensure_patient_id_hash
 
-  serialize :custom_fields
-  serialize :indexed_fields
+  serialize :custom_fields, HashWithIndifferentAccess
+  serialize :indexed_fields, HashWithIndifferentAccess
 
   validates_presence_of :institution
   validates_uniqueness_of :patient_id_hash, scope: :institution_id, allow_nil: true
@@ -33,7 +33,7 @@ class Patient < ActiveRecord::Base
   end
 
   def patient_id
-    self.plain_sensitive_data[:patient_id]
+    self.plain_sensitive_data[:patient][:id]
   end
 
   def self.find_by_pii(patient_id, institution_id)

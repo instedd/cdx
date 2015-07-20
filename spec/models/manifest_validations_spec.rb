@@ -7,29 +7,28 @@ describe Manifest do
     it "should apply if valid" do
       assert_manifest_application %{
           {
-            "test" : [{
-              "target_field" : "assay_name",
-              "source" : {"lookup" : "assay.name"},
-              "type": "string",
-              "core" : true
-            }]
+            "test.name": {"lookup" : "assay.name"}
           }
+        }, %{
+          []
         },
         '{"assay" : {"name" : "GX4002"}}',
-        test: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
+        test: {indexed: {"name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
     end
 
     it "should not apply if invalid" do
       expect {
         assert_manifest_application %{
             {
-              "test" : [{
-                "target_field" : "assay_name",
-                "source" : {"lookup" : "assay.name"},
-                "type": "INVALID",
-                "core" : true
-              }]
+              "test.custom": {"lookup" : "assay.name"}
             }
+          }, %{
+            [
+              {
+                "name": "test.custom",
+                "type": "INVALID"
+              }
+            ]
           },
           '{"assay" : {"name" : "GX4002"}}',
           test: {indexed: {"assay_name" => "GX4002"}, pii: Hash.new, custom: Hash.new}
@@ -97,7 +96,7 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {}
-      }})}.to raise_error("Validation failed: Api version must be 1.1.0")
+      }})}.to raise_error("Validation failed: Api version must be 1.2.0")
     end
 
     it "shouldn't pass validations if metadata doesn't include device_models" do
@@ -141,31 +140,48 @@ describe Manifest do
       m.errors[:field_mapping].first.should eq("must be a json object")
     end
 
-    pending "shouldn't create if a core field is provided with an invalid value mapping" do
+    it "shouldn't pass validations if custom_fields is not an array" do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
+          "device_models" : ["GX4001"]
+        },
+        "custom_fields": {},
+        "field_mapping" : {}
+      }}
+      m = Manifest.new(definition: definition)
+      m.save
+      Manifest.count.should eq(0)
+      m.errors[:custom_fields].first.should eq("must be a json array")
+    end
+
+    pending "shouldn't create if a custom field is provided with an invalid value mapping" do
+      definition = %{{
+        "metadata" : {
+          "version" : "1.0.0",
+          "api_version" : "1.2.0",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
-        "field_mapping" : [
+        "custom_fields": [
           {
-            "target_field" : "test_type",
-            "source" : {
-              "map" : [
-                {"lookup" : "Test.test_type"},
-                [
-                  { "match" : "*QC*", "output" : "Invalid mapping"},
-                  { "match" : "*Specimen*", "output" : "specimen"}
-                ]
-              ]
-            },
+            "name": "custom",
             "type" : "enum",
-            "core" : true,
             "options" : [ "qc", "specimen" ]
           }
-        ]
+        ],
+        "field_mapping" : {
+          "custom": {
+            "map" : [
+              {"lookup" : "Test.test_type"},
+              [
+                { "match" : "*QC*", "output" : "Invalid mapping"},
+                { "match" : "*Specimen*", "output" : "specimen"}
+              ]
+            ]
+          }
+        }
       }}
       m = Manifest.new(definition: definition)
       m.save
@@ -177,28 +193,27 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
+        "custom_fields": [
+          {
+            "name": "test.custom",
+            "type" : "enum",
+            "options" : ["qc", "specimen"]
+          }
+        ],
         "field_mapping" : {
-          "test" : [
-            {
-              "target_field" : "test_type",
-              "source" : {
-                "map" : [
-                  {"lookup" : "Test.test_type"},
-                  [
-                    { "match" : "*QC*", "output" : "qc"},
-                    { "match" : "*Specimen*", "output" : "specimen"}
-                  ]
-                ]
-              },
-              "core" : true,
-              "type" : "enum",
-              "options" : ["qc", "specimen"]
-            }
-          ]
+          "test.custom": {
+            "map" : [
+              {"lookup" : "Test.test_type"},
+              [
+                { "match" : "*QC*", "output" : "qc"},
+                { "match" : "*Specimen*", "output" : "specimen"}
+              ]
+            ]
+          }
         }
       }}
       m = Manifest.new(definition: definition)
@@ -206,107 +221,79 @@ describe Manifest do
       Manifest.count.should eq(1)
     end
 
-    it "shouldn't create if a core field is provided without source" do
-      definition = %{{
-        "metadata" : {
-          "version" : "1.0.0",
-          "api_version" : "1.1.0",
-          "device_models" : ["GX4001"],
-          "source" : {"type" : "json"}
-        },
-        "field_mapping" : {
-          "test" : [
-            {
-              "target_field" : "results[*].result",
-              "core" : true
-            }
-          ]
-        }
-      }}
-      m = Manifest.new(definition: definition)
-      m.save
-      Manifest.count.should eq(0)
-      m.errors[:invalid_field_mapping].first.should eq(": target 'results[*].result'. Mapping must include 'target_field' and 'source' fields")
-    end
-
     it "shouldn't create if a custom field is provided without type" do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
+        "custom_fields": [
+          {
+            "name": "test.custom"
+          }
+        ],
         "field_mapping" : {
-          "test" : [
-            {
-              "target_field" : "patient_name",
-              "source" : {"lookup" : "patient_name"},
-              "core" : false
-            }
-          ]
+          "test.custom": {"lookup" : "custom"}
         }
       }}
       m = Manifest.new(definition: definition)
       m.save
       Manifest.count.should eq(0)
-      m.errors[:invalid_type].first.should eq(": target 'patient_name'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
+      m.errors[:invalid_type].first.should eq(": target 'test.custom'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
     end
 
     it "shouldn't create if a custom field is provided with an invalid type" do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
+        "custom_fields": [
+          {
+            "name": "test.custom",
+            "type": "quantity"
+          }
+        ],
         "field_mapping" : {
-          "test" : [
-            {
-              "target_field" : "patient_name",
-              "source" : {"lookup" : "patient_name"},
-              "type" : "quantity",
-              "core" : false
-            }
-          ]
+          "test.custom": {"lookup" : "custom"}
         }
       }}
       m = Manifest.new(definition: definition)
       m.save
       Manifest.count.should eq(0)
-      m.errors[:invalid_type].first.should eq(": target 'patient_name'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
+      m.errors[:invalid_type].first.should eq(": target 'test.custom'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
     end
 
     it "should create when fields are provided with valid types" do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
+        "custom_fields": [
+          {
+            "name": "patient_name",
+            "type" : "string"
+          },
+          {
+            "name": "control_date",
+            "type" : "date"
+          },
+          {
+            "name": "rbc_count",
+            "type" : "integer"
+          }
+        ],
         "field_mapping" : {
-          "test" : [
-            {
-              "target_field" : "patient_name",
-              "source" : {"lookup" : "patient_name"},
-              "type" : "string",
-              "core" : false
-            },
-            {
-              "target_field" : "control_date",
-              "source" : {"lookup": "control_date"},
-              "type" : "date",
-              "core" : false
-            },
-            {
-              "target_field" : "rbc_count",
-              "source" : {"lookup": "rbc_count"},
-              "type" : "integer",
-              "core" : false
-            }
-          ]
+          "patient_name": {"lookup" : "patient_name"},
+          "control_date": {"lookup": "control_date"},
+          "rbc_count": {"lookup": "rbc_count"}
         }
       }}
       m = Manifest.new(definition: definition)
@@ -318,20 +305,19 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
+        "custom_fields": [
+          {
+            "name": "rbc_description",
+            "type" : "enum",
+            "options" : ["high","low","null"]
+          }
+        ],
         "field_mapping" : {
-          "test" : [
-            {
-              "target_field" : "rbc_description",
-              "source" : {"lookup" : "rbc_description"},
-              "type" : "enum",
-              "core" : false,
-              "options" : ["high","low","null"]
-            }
-          ]
+          "rbc_description": {"lookup" : "rbc_description"}
         }
       }}
       m = Manifest.new(definition: definition)
@@ -344,25 +330,24 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
+        "custom_fields": [
+          {
+            "name": "custom",
+            "type" : "enum"
+          }
+        ],
         "field_mapping" : {
-          "test" : [
-            {
-              "target_field" : "results[*].result",
-              "source" : {"lookup" : "result"},
-              "core" : true,
-              "type" : "enum"
-            }
-          ]
+          "custom": {"lookup" : "custom"}
         }
       }}
       m = Manifest.new(definition: definition)
       m.save
       Manifest.count.should eq(0)
-      m.errors[:enum_fields].first.should eq("must be provided with options. (In 'results[*].result'")
+      m.errors[:enum_fields].first.should eq("must be provided with options. (In 'custom'")
     end
   end
 end

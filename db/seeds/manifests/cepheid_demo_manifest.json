@@ -156,9 +156,7 @@
         "source": {
           "lookup": "event.end_time"
         },
-        "type": "date",
-        "core": false,
-        "indexed": true
+        "type": "date"
       },
       {
         "target_field": "test_id",

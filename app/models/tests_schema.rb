@@ -26,9 +26,7 @@ class TestsSchema
       scope_properties = {}
 
       scope.fields.each do |field|
-        schemas_for(field).each do |name, field_schema|
-          scope_properties[name] = field_schema
-        end
+        scope_properties[field.name] = schemas_for(field)
       end
 
       schema['properties'][scope.name] = scope_properties
@@ -46,8 +44,6 @@ class TestsSchema
 
   def schemas_for field
     schema = Hash.new
-    name = field.name
-
     schema["title"] = field_title field
 
     case field.type
@@ -57,16 +53,15 @@ class TestsSchema
       integer_schema schema, field
     when "enum"
       enum_schema schema, field
+    when 'nested'
+      nested_schema schema, field
     else
       string_schema schema
     end
 
-    set_searchable schema, field
-    [[name, schema]]
-  end
-
-  def set_searchable schema, field
     schema['searchable'] = field.searchable? || false
+
+    schema
   end
 
   def field_title field
@@ -111,10 +106,19 @@ class TestsSchema
     end
   end
 
+  def nested_schema schema, field
+    schema['type'] = 'array'
+    schema['items'] = {}
+    schema['items']['type'] = 'object'
+    schema['items']['properties'] = {}
+    field.sub_fields.each do |field|
+       schema['items']['properties'][field.name] = schemas_for field
+    end
+  end
+
   def string_schema schema
     schema["type"] = "string"
   end
-
 
   def set_location_service schema
     if schema['properties']['location'].present?
@@ -124,5 +128,4 @@ class TestsSchema
       }
     end
   end
-
 end

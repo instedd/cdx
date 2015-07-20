@@ -7,48 +7,21 @@ class Manifest < ActiveRecord::Base
   before_save :update_version
   before_save :update_api_version
 
-  after_save     :update_mappings
-  around_destroy :restore_mappings
-
   COLLECTION_SPLIT_TOKEN = "[*]."
   PATH_SPLIT_TOKEN = "."
 
   NULL_STRING = "null"
 
-  CURRENT_VERSION = "1.1.0"
+  CURRENT_VERSION = "1.2.0"
 
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
   MESSAGE_TEMPLATE = {
     "test" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
     "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
+    "device" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
     "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
   }.freeze
-
-  #TODO Refiy the assay and delegate this to mysql.
-  ####################################################################################################
-  def self.find_by_assay_name assay_name
-    manifests = self.valid.select do |manifest|
-      manifest.find_assay_name assay_name
-    end
-    raise ActiveRecord::RecordNotFound.new "There is no manifest for assay_name: '#{assay_name}'." unless manifests.present?
-
-    manifests.sort_by(&:version).last
-  end
-
-  def find_assay_name assay_name
-    field = flat_mappings.detect { |f| f["target_field"] == "assay_name" }
-    valid_values = []
-    if field["options"]
-      valid_values = field["options"]
-    end
-    valid_values.include? assay_name
-  end
-  ####################################################################################################
-
-  def self.default
-    new definition: default_definition
-  end
 
   def reload
     @loaded_definition = nil
@@ -71,12 +44,20 @@ class Manifest < ActiveRecord::Base
     self.api_version = metadata["api_version"]
   end
 
+  def loaded_definition
+    @loaded_definition ||= Oj.load(self.definition)
+  end
+
   def metadata
     loaded_definition["metadata"] || {}
   end
 
-  def loaded_definition
-    @loaded_definition ||= Oj.load(self.definition)
+  def field_mapping
+    loaded_definition.with_indifferent_access["field_mapping"]
+  end
+
+  def custom_fields
+    (loaded_definition['custom_fields'] || []).map(&:with_indifferent_access)
   end
 
   def apply_to(data, device)
@@ -90,6 +71,7 @@ class Manifest < ActiveRecord::Base
         fields_for(device).each do |field|
           field.apply_to record, message, device
         end
+
         messages << message
       rescue ManifestParsingError => err
         err.record_index = record_index + 1
@@ -102,10 +84,8 @@ class Manifest < ActiveRecord::Base
 
   def fields
     @fields ||=
-      field_mapping.inject([]) do |all, (scope, mappings)|
-        mappings.inject(all) do |all, field|
-          all << ManifestField.new(self, field, scope)
-        end
+      field_mapping.inject([]) do |all, (target_path, source)|
+        all << ManifestField.for(self, target_path, source)
       end
   end
 
@@ -116,33 +96,13 @@ class Manifest < ActiveRecord::Base
       from = mapped_fields.select { |f| f.target_field == from_field }.first
       to = mapped_fields.select { |f| f.target_field == to_field }.first
 
-      if from && to
+      if from
         mapped_fields.delete from
         mapped_fields.delete to
-        mapped_fields << to.map_from(from)
+        mapped_fields << ManifestField.for(self, to_field, from.source)
       end
     end
     mapped_fields
-  end
-
-  def field_mapping
-    loaded_definition.with_indifferent_access["field_mapping"]
-  end
-
-  def test_mapping
-    field_mapping["test"] || []
-  end
-
-  def sample_mapping
-    field_mapping["sample"] || []
-  end
-
-  def patient_mapping
-    field_mapping["patient"] || []
-  end
-
-  def flat_mappings
-    test_mapping + patient_mapping + sample_mapping
   end
 
   def parser
@@ -168,13 +128,6 @@ class Manifest < ActiveRecord::Base
     (metadata["source"] || {})["root"]
   end
 
-  def self.default_definition
-    Oj.dump({
-      metadata: { source: { type: "json" } },
-      field_mapping: { test: map(Cdx::Api.searchable_fields).flatten }
-    })
-  end
-
   def manifest_validation
     if self.metadata.blank?
       self.errors.add(:metadata, "can't be blank")
@@ -185,31 +138,13 @@ class Manifest < ActiveRecord::Base
     end
 
     check_field_mapping
+    check_custom_fields
 
   rescue Oj::ParseError => ex
     self.errors.add(:parse_error, ex.message)
   end
 
   private
-
-  def self.map fields, source_prefix=""
-    fields.map do |field_definition|
-      field = source_prefix + field_definition[:name]
-      if field_definition[:type] == "nested"
-        map field_definition[:sub_fields], "#{source_prefix}#{field_definition[:name]}#{COLLECTION_SPLIT_TOKEN}"
-      else
-        {
-          target_field: field,
-          source: {lookup: field},
-          type: field_definition[:type],
-          core: true,
-          pii: false,
-          indexed: true,
-          valid_values: field_definition[:valid_values]
-        }
-      end
-    end
-  end
 
   def check_api_version
     unless self.metadata["api_version"] == CURRENT_VERSION
@@ -221,81 +156,67 @@ class Manifest < ActiveRecord::Base
     m = self.metadata
     fields.each do |f|
       if m[f].blank?
-        self.errors.add(:metadata, "must include "+ f +" field")
+        self.errors.add(:metadata, "must include #{f} field")
       end
     end
   end
 
   def check_field_mapping
-    if loaded_definition["field_mapping"].is_a? Hash
-      flat_mappings.each do |fm|
-        check_presence_of_target_field_and_source fm
-        check_valid_type fm
-        check_properties_of_enum_field fm
-      end
-    else
+    unless loaded_definition["field_mapping"].is_a? Hash
       self.errors.add(:field_mapping, "must be a json object")
     end
   end
 
-  def check_properties_of_enum_field field_mapping
-    if field_mapping["type"] == "enum"
-      if (field_mapping["options"])
-        verify_absence_of_null_string field_mapping
+  def check_custom_fields
+    return if loaded_definition["custom_fields"].nil?
+
+    if loaded_definition["custom_fields"].is_a? Array
+      custom_fields.each do |custom_field|
+        if field_mapping[custom_field['name']].blank?
+          self.errors.add(:invalid_custom_field, ": target '#{custom_field["name"]}'. Must include a field mapping")
+        end
+        check_valid_type custom_field
+        check_properties_of_enum_field custom_field
+      end
+    else
+      self.errors.add(:custom_fields, "must be a json array")
+    end
+  end
+
+  def check_valid_type(custom_field)
+    if (custom_field["pii"].blank? || custom_field["pii"]==false)
+      valid_types = ["date", "enum", "location", "string", "integer", "long", "float", "double", "boolean"]
+      if(custom_field["type"].blank? || ! valid_types.include?(custom_field["type"]))
+        self.errors.add(:invalid_type, ": target '#{custom_field["name"]}'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
+      end
+    end
+  end
+
+  def check_properties_of_enum_field custom_field
+    if custom_field["type"] == "enum"
+      if (custom_field["options"])
+        verify_absence_of_null_string custom_field
         # TODO: validate source mappings
-        if (field_mapping["value_mappings"])
-          check_value_mappings field_mapping
+        if (custom_field["value_mappings"])
+          check_value_mappings custom_field
         end
       else
-        self.errors.add(:enum_fields, "must be provided with options. (In '#{field_mapping["target_field"]}'")
+        self.errors.add(:enum_fields, "must be provided with options. (In '#{custom_field["name"]}'")
       end
     end
   end
 
-  def verify_absence_of_null_string field_mapping
-    if field_mapping["options"].include? NULL_STRING
-      self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{field_mapping["target_field"]}') ")
+  def verify_absence_of_null_string custom_field
+    if custom_field["options"].include? NULL_STRING
+      self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{custom_field["name"]}') ")
     end
   end
 
-  def check_presence_of_target_field_and_source field_mapping
-    if (field_mapping["target_field"].blank? || field_mapping["source"].blank?)
-      self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. Mapping must include 'target_field' and 'source' fields")
-    end
-  end
-
-  def check_value_mappings(field_mapping)
-    valid_values = field_mapping["options"]
-    field_mapping["value_mappings"].values.each do |vm|
+  def check_value_mappings(custom_field)
+    valid_values = custom_field["options"]
+    custom_field["value_mappings"].values.each do |vm|
       if !valid_values.include? vm
-        self.errors.add(:invalid_field_mapping, ": target '#{field_mapping["target_field"]}'. '#{vm}' is not a valid value")
-      end
-    end
-  end
-
-  def update_mappings
-    ElasticsearchMappingTemplate.new(self, current_models).update!
-  end
-
-  def restore_mappings
-    # TODO: Add tests for restoring old mappings
-    models = self.current_models
-    yield
-
-      models.each(&:reload).group_by(&:current_manifest).each do |manifest, models|
-        if manifest
-          ElasticsearchMappingTemplate.new(manifest, models).update!
-        else
-          ElasticsearchMappingTemplate.delete_templates_for(models)
-        end
-    end
-  end
-
-  def check_valid_type(field_mapping)
-    if (field_mapping["pii"].blank? || field_mapping["pii"]==false)
-      valid_types = ["date", "enum", "location", "string", "integer", "long", "float", "double", "boolean"]
-      if(field_mapping["type"].blank? || ! valid_types.include?(field_mapping["type"]))
-        self.errors.add(:invalid_type, ": target '#{field_mapping["target_field"]}'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
+        self.errors.add(:invalid_custom_field, ": target '#{custom_field["name"]}'. '#{vm}' is not a valid value")
       end
     end
   end

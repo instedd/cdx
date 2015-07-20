@@ -31,11 +31,12 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: 02ea7433db442bc6dc41e63a039b646ecca10828
+  revision: d22a085738958b230f7807a102afa6b501be64b7
   branch: master
   specs:
     cdx-api-elasticsearch (0.0.1)
       activesupport
+      cdx
       elasticsearch
 
 GIT
@@ -47,8 +48,8 @@ GIT
       filewatcher (= 0.3.6)
 
 GIT
-  remote: https://github.com/instedd/cdx_core.git
-  revision: f8e8257fc590cc49eec45f5a89de6a0cb5ee2694
+  remote: https://github.com/instedd/cdx_core
+  revision: 1d05d07b59703c7b2b0dd0b89ca74239b8fe9633
   branch: master
   specs:
     cdx (0.0.1)
@@ -75,7 +76,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/ruby-location_service.git
-  revision: d086982d0f7ed4eacc1a2801700abfbe20e09a3b
+  revision: 830800eec4c4c7874dd6eb9ace576460fba7ba1e
   branch: master
   specs:
     location_service (0.1.0)
@@ -185,12 +186,12 @@ GEM
     dotiw (3.0.1)
       actionpack (>= 3)
       i18n
-    elasticsearch (1.0.8)
-      elasticsearch-api (= 1.0.7)
-      elasticsearch-transport (= 1.0.7)
-    elasticsearch-api (1.0.7)
+    elasticsearch (1.0.12)
+      elasticsearch-api (= 1.0.12)
+      elasticsearch-transport (= 1.0.12)
+    elasticsearch-api (1.0.12)
       multi_json
-    elasticsearch-transport (1.0.7)
+    elasticsearch-transport (1.0.12)
       faraday
       multi_json
     encryptor (1.3.0)
@@ -275,7 +276,7 @@ GEM
     mime-types (1.25.1)
     mini_portile (0.5.2)
     minitest (4.7.5)
-    multi_json (1.11.0)
+    multi_json (1.11.1)
     multipart-post (2.0.0)
     mysql2 (0.3.15)
     net-http-digest_auth (1.4)
@@ -423,7 +424,7 @@ GEM
     trollop (2.1.2)
     turbolinks (2.2.0)
       coffee-rails
-    tzinfo (0.3.43)
+    tzinfo (0.3.44)
     uglifier (2.4.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)

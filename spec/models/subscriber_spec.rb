@@ -14,35 +14,14 @@ describe Subscriber, elasticsearch: true do
       {
         "metadata": {
           "version": "1",
-          "api_version": "1.1.0",
+          "api_version": "1.2.0",
           "device_models": "#{model.name}",
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "test" : [
-            {
-              "target_field" : "results[*].result",
-              "source" : {"lookup" : "result"},
-              "core" : true,
-              "type" : "enum",
-              "options" : ["positive","negative"]
-            },
-            {
-              "target_field" : "results[*].condition",
-              "source" : {"lookup" : "condition"},
-              "core" : true,
-              "type" : "enum",
-              "options" : ["mtb","flu_a"]
-            }
-          ],
-          "patient" : [
-            {
-              "target_field" : "patient_name",
-              "source" : {"lookup" : "patient_name"},
-              "core" : true,
-              "type" : "string"
-            }
-          ]
+          "test.assays[*].qualitative_result" : {"lookup" : "result"},
+          "test.assays[*].name" : {"lookup" : "condition"},
+          "patient.gender" : {"lookup" : "patient_gender"}
         }
       }
     }
@@ -53,10 +32,10 @@ describe Subscriber, elasticsearch: true do
   end
 
   it "generates a correct filter_test GET query with specified fields" do
-    fields = ["condition", "result", "patient_name"]
+    fields = ["test.assays.name", "test.assays.qualitative_result", "patient.gender"]
     url = "http://subscriber/cdp_trigger"
     subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'GET'
-    callback_query = "http://subscriber/cdp_trigger?condition=mtb&patient_name=jdoe&result=positive"
+    callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5Bname%5D=mtb&test%5Bassays%5D%5Bqualitative_result%5D=positive"
     callback_request = stub_request(:get, callback_query).to_return(:status => 200, :body => "", :headers => {})
 
     submit_test
@@ -67,11 +46,11 @@ describe Subscriber, elasticsearch: true do
   end
 
   it "generates a correct filter_test POST query with specified fields" do
-    fields = ["condition", "result", "patient_name"]
+    fields = ["test.asssays.name", "test.assays.qualitative_result", "patient.gender"]
     url = "http://subscriber/cdp_trigger?token=48"
     subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'POST'
     callback_request = stub_request(:post, url).
-         with(:body => "{\"condition\":\"mtb\",\"result\":\"positive\",\"patient_name\":\"jdoe\"}").
+         with(:body => '{"test":{"assays":{"qualitative_result":"positive"}},"patient":{"gender":"male"}}').
          to_return(:status => 200, :body => "", :headers => {})
 
     submit_test
@@ -81,8 +60,7 @@ describe Subscriber, elasticsearch: true do
     assert_requested(callback_request)
   end
 
-  # TODO fix this when merging the core fields refactor
-  pending "generates a correct filter_test POST query with all fields" do
+  it "generates a correct filter_test POST query with all fields" do
     url = "http://subscriber/cdp_trigger?token=48"
     subscriber = Subscriber.make fields: [], url: url, filter: filter, verb: 'POST'
     callback_request = stub_request(:post, url).to_return(:status => 200, :body => "", :headers => {})
@@ -93,15 +71,22 @@ describe Subscriber, elasticsearch: true do
 
     assert_requested(:post, url) do |req|
       response = JSON.parse(req.body)
-      response.keys.should =~ ["age","assay_name","condition","created_at","device_serial_number","device_uuid", "device_name", "error_code","error_description","ethnicity","test_id","gender","institution_id", "institution_name","laboratory_id", "laboratory_name","location","race","race_ethnicity","result","sample_collection_date","start_time","status","system_user","test_type","updated_at","uuid", "sample_type", "sample_uuid", "sample_id", "location_coords"]
-      response["institution_name"].should eq(institution.name)
-      response["laboratory_name"].should eq(laboratory.name)
-      response["device_name"].should eq(device.name)
+      response.keys.should =~ ["device", "institution", "laboratory", "location", "patient", "sample", "test"]
+      response["device"].keys.should =~ ["uuid", "name", "lab_user", "serial_number"]
+      response["institution"].keys.should =~ ["id", "name"]
+      response["laboratory"].keys.should =~ ["id", "name"]
+      response["location"].keys.should =~ ["id", "parents", "admin_levels", "lat", "lng"]
+      response["patient"].keys.should =~ ["gender"]
+      response["sample"].keys.should =~ ["uuid", "id", "type", "collection_date"]
+      response["test"].keys.should =~ ["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "qualitative_result", "assays", "quantitative_result", "type"]
+      response["institution"]["name"].should eq(institution.name)
+      response["laboratory"]["name"].should eq(laboratory.name)
+      response["device"]["name"].should eq(device.name)
     end
   end
 
   def submit_test
-    TestResult.create_and_index({ results: [result: "positive", condition: "mtb"], patient_name: "jdoe" }, {device_messages: [device_message]})
+    TestResult.create_and_index(indexed_fields: { test: { assays: [qualitative_result: "positive", name: "mtb"]}, patient: {gender: "male" }}.with_indifferent_access, device_messages: [device_message])
     client = Cdx::Api.client
     client.indices.refresh index: institution.elasticsearch_index_name
 

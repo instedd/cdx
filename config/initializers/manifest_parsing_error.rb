@@ -47,7 +47,19 @@ class ManifestParsingError < RuntimeError
     new "Cannot apply invalid manifest to document:\n #{manifest.errors.full_messages.join("\n ")}"
   end
 
+  def self.custom_field_not_defined(target_field)
+    new "Custom field #{target_field} must be defined in manifest."
+  end
+
   def self.script_error(target_field, message)
     new "Error executing script while mapping the field '#{target_field}': #{message}"
+  end
+
+  def self.invalid_script(target_field)
+    new "JSONObject is not a valid return type for '#{target_field}' script"
+  end
+
+  def self.no_manifest(device_model)
+    new "There is no manifest for model: #{device_model.name}."
   end
 end

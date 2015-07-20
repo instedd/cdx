@@ -6,11 +6,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
     {
       test: {
         indexed: {
-          test_id: test_id,
+          id: test_id,
           assay: "mtb",
-          custom_fields: {
-            concentration: "15%"
-          },
           results: [
             {
               result: "positive",
@@ -19,7 +16,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
           ]
         },
         custom: {
-          raw_result: "positivo 15%"
+          raw_result: "positivo 15%",
+          concentration: "15%"
         },
         pii: {
           start_time: "2000/1/1 10:00:00"
@@ -27,33 +25,29 @@ describe DeviceMessageProcessor, elasticsearch: true do
       },
       sample: {
         indexed: {
-          sample_type: "sputum",
-          custom_fields: {
-            culture_days: "10"
-          }
+          type: "sputum",
+          collection_date: "2000/1/1 9:00:00",
         },
         custom: {
-          datagram: "010100011100"
+          datagram: "010100011100",
+          culture_days: "10"
         },
         pii: {
-          sample_uid: "abc4002",
-          sample_id: "4002",
-          collected_at: "2000/1/1 9:00:00"
+          uid: "abc4002",
+          id: "4002"
         }
       },
       patient: {
         indexed: {
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         },
         pii: {
-          patient_id: "8000",
+          id: "8000",
           dob: "2000/1/1"
         },
         custom: {
-          shirt_color: "blue"
+          shirt_color: "blue",
+          hiv: "positive"
         }
       }
     }.recursive_stringify_keys!.with_indifferent_access.deep_merge(params)
@@ -74,37 +68,45 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
   def assert_sample_data(sample)
     sample.plain_sensitive_data.should eq({
-      sample_uid: "abc4002",
-      sample_id: "4002",
-      collected_at: "2000/1/1 9:00:00"
+      sample: {
+        uid: "abc4002",
+        id: "4002"
+      }
     }.recursive_stringify_keys!)
 
     sample.custom_fields.should eq({
-      datagram: "010100011100"
+      sample: {
+        datagram: "010100011100",
+        culture_days: "10"
+      }
     }.recursive_stringify_keys!)
 
     sample.indexed_fields.should eq({
-      sample_type: "sputum",
-      custom_fields: {
-        culture_days: "10"
+      sample: {
+        type: "sputum",
+        collection_date: "2000/1/1 9:00:00"
       }
     }.recursive_stringify_keys!)
   end
 
   def assert_patient_data(patient)
     patient.plain_sensitive_data.should eq({
-      patient_id: "8000",
-      dob: "2000/1/1"
+      patient: {
+        id: "8000",
+        dob: "2000/1/1"
+      }
     }.recursive_stringify_keys!)
 
     patient.custom_fields.should eq({
-      shirt_color: "blue"
+      patient: {
+        shirt_color: "blue",
+        hiv: "positive"
+      }
     }.recursive_stringify_keys!)
 
     patient.indexed_fields.should eq({
-      gender: "male",
-      custom_fields: {
-        hiv: "positive"
+      patient: {
+        gender: "male"
       }
     }.recursive_stringify_keys!)
   end
@@ -134,11 +136,16 @@ describe DeviceMessageProcessor, elasticsearch: true do
     test.test_id.should eq('4')
 
     test.plain_sensitive_data.should eq({
-      start_time: "2000/1/1 10:00:00"
+      test: {
+        start_time: "2000/1/1 10:00:00"
+      }
     }.recursive_stringify_keys!)
 
     test.custom_fields.should eq({
-      raw_result: "positivo 15%"
+      test: {
+        raw_result: "positivo 15%",
+        concentration: "15%"
+      }
     }.recursive_stringify_keys!)
   end
 
@@ -152,26 +159,28 @@ describe DeviceMessageProcessor, elasticsearch: true do
     TestResult.pluck(:test_id).should =~ ['4', '5', '6']
     TestResult.pluck(:sample_id).should eq([Sample.first.id] * 3)
 
-    all_elasticsearch_tests_for(device.institution).map {|e| e['_source']['sample_uuid']}.should eq([Sample.first.uuid] * 3)
+    all_elasticsearch_tests_for(device.institution).map {|e| e['_source']['sample']['uuid']}.should eq([Sample.first.uuid] * 3)
   end
 
   it "should update sample data and existing test results on new test result" do
     sample_indexed_fields = {
-      sample_type: "blood"
-    }.recursive_stringify_keys!
+      sample: {
+        type: "blood"
+      }
+    }.with_indifferent_access
 
     patient_indexed_fields = {
-      custom_fields: {
-        hiv: "positive"
+      patient: {
+        gender: 'male'
       }
-    }.recursive_stringify_keys!
+    }.with_indifferent_access
 
-    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution)
+    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient: {id: '8000'}}.with_indifferent_access, institution: device_message.institution)
 
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution, patient: patient)
+    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample: {uid: 'abc4002'}}.with_indifferent_access, institution: device_message.institution, patient: patient)
 
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "3", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '3', patient: patient, device: device})
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', patient: patient, device: device})
+    test = TestResult.create_and_index({sample: sample, test_id: '3', patient: patient, device: device, custom_fields: {concentration: "15%"}.with_indifferent_access, indexed_fields: {assay: "mtb"}.with_indifferent_access})
+    test = TestResult.create_and_index({sample: sample, test_id: '2', patient: patient, device: device, indexed_fields: {assay: "mtb"}.with_indifferent_access})
 
     refresh_indices institution.elasticsearch_index_name
 
@@ -184,27 +193,28 @@ describe DeviceMessageProcessor, elasticsearch: true do
     assert_patient_data(sample.patient)
 
     tests = all_elasticsearch_tests_for(institution)
-
-    tests.map { |test| test["_source"]["sample_type"] }.should eq(['sputum'] * 3)
+    tests.map { |test| test["_source"]["sample"]["type"] }.should eq(['sputum'] * 3)
   end
 
   it "should update sample data and existing test results on test result update" do
     sample_indexed_fields = {
-      sample_type: "blood"
-    }.recursive_stringify_keys!
+      sample: {
+        type: "blood"
+      }
+    }.with_indifferent_access
 
     patient_indexed_fields = {
-      custom_fields: {
-        hiv: "positive"
+      patient: {
+        gender: 'male'
       }
-    }.recursive_stringify_keys!
+    }.with_indifferent_access
 
-    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution)
+    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient: {id: '8000'}}.with_indifferent_access, institution: device_message.institution)
 
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution, patient: patient)
+    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample: {uid: 'abc4002'}}.with_indifferent_access, institution: device_message.institution, patient: patient)
 
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '4', patient: patient, device: device})
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', patient: patient, device: device})
+    test = TestResult.create_and_index({sample: sample, test_id: '4', patient: patient, device: device, custom_fields: {concentration: "15%"}.with_indifferent_access, indexed_fields: {assay: "mtb"}.with_indifferent_access})
+    test = TestResult.create_and_index({sample: sample, test_id: '2', patient: patient, device: device, indexed_fields: {assay: "mtb"}.with_indifferent_access})
 
     refresh_indices
 
@@ -217,28 +227,27 @@ describe DeviceMessageProcessor, elasticsearch: true do
     assert_patient_data(sample.patient)
 
     tests = all_elasticsearch_tests_for(institution)
-    tests.map { |test| test["_source"]["sample_type"] }.should eq(['sputum'] * 2)
+    tests.map { |test| test["_source"]["sample"]["type"] }.should eq(['sputum'] * 2)
   end
 
   it "should not update existing tests if sample data indexed fields did not change" do
     sample_indexed_fields = {
-      sample_type: "sputum",
-      custom_fields: {
-        culture_days: "10"
+      sample: {
+        type: "sputum",
+        collection_date: "2000/1/1 9:00:00"
       }
-    }.recursive_stringify_keys!
+    }.with_indifferent_access
 
     patient_indexed_fields = {
-      gender: "male",
-      custom_fields: {
-        hiv: "positive"
+      patient: {
+        gender: "male"
       }
-    }.recursive_stringify_keys!
+    }.with_indifferent_access
 
-    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution)
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution, patient: patient)
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb", custom_fields: {concentration: "15%"}}, {sample: sample, test_id: '4', patient: patient, device: device})
-    test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "2", assay: "mtb"}, {sample: sample, test_id: '2', patient: patient, device: device})
+    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {patient: {id: '8000'}}.with_indifferent_access, institution: device_message.institution)
+    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample: {uid: 'abc4002'}}.with_indifferent_access, institution: device_message.institution, patient: patient)
+    test = TestResult.create_and_index({sample: sample, test_id: '4', patient: patient, device: device, custom_fields: {concentration: "15%"}.with_indifferent_access, indexed_fields: {assay: "mtb"}.with_indifferent_access})
+    test = TestResult.create_and_index({sample: sample, test_id: '2', patient: patient, device: device, indexed_fields: {assay: "mtb"}.with_indifferent_access})
 
     refresh_indices
 
@@ -254,42 +263,66 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
   it "shouldn't update sample from another institution" do
     sample_indexed_fields = {
-      sample_type: "sputum",
-      custom_fields: {
-        hiv: "positive"
+      sample: {
+        type: "sputum",
+        custom_fields: {
+          hiv: "positive"
+        }
       }
-    }
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample_uid: 'abc4002'})
+    }.with_indifferent_access
 
+    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {sample: {uid: 'abc4002'}}.with_indifferent_access)
     device_message_processor.process
 
     Sample.count.should eq(2)
 
-    sample.reload
+    sample = sample.reload
 
     sample.plain_sensitive_data.should eq({
-      sample_uid: 'abc4002'
-    })
+      sample: {
+        uid: 'abc4002'
+      }
+    }.with_indifferent_access)
 
     sample.indexed_fields.should eq({
-      sample_type: "sputum",
-      custom_fields: {
-        hiv: "positive"
+      sample: {
+        type: "sputum",
+        custom_fields: {
+          hiv: "positive"
+        }
       }
-    })
+    }.with_indifferent_access)
   end
 
   it "should update tests with the same test_id and different sample_uid" do
-    test = TestResult.create_and_index({test_id: "4", custom_fields: {concentration: "10%", foo: "bar"}, results: [
-            {
-              result: "negative",
-              condition: "flu"
-            },
-            {
-              result: "pos",
-              condition: "mtb1"
-            }
-          ]}, { test_id: '4', device: device})
+    custom_fields = {
+      test: {
+        concentration: "10%",
+        foo: "bar"
+      }
+    }.with_indifferent_access
+
+    indexed_fields = {
+      test: {
+        results: [
+          {
+            result: "negative",
+            condition: "flu"
+          },
+          {
+            result: "pos",
+            condition: "mtb1"
+          }
+        ]
+      }
+    }.with_indifferent_access
+
+
+    TestResult.create_and_index(
+      custom_fields: custom_fields,
+      indexed_fields: indexed_fields,
+      test_id: '4', device: device
+    )
 
     device_message_processor.process
 
@@ -297,15 +330,16 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     tests = all_elasticsearch_tests_for(institution)
     tests.size.should eq(1)
-    tests.first["_source"]["assay"].should eq("mtb")
-    tests.first["_source"]["sample_type"].should eq("sputum")
-    tests.first["_source"]["custom_fields"]["concentration"].should eq("15%")
-    tests.first["_source"]["custom_fields"]["foo"].should eq("bar")
+
+    tests.first["_source"]["test"]["assay"].should eq("mtb")
+    tests.first["_source"]["sample"]["type"].should eq("sputum")
+    tests.first["_source"]["test"]["custom_fields"]["concentration"].should eq("15%")
+    # tests.first["_source"]["test"]["custom_fields"]["foo"].should eq("bar")
 
     TestResult.count.should eq(1)
     TestResult.first.sample_id.should eq(Sample.last.id)
-    TestResult.first.custom_fields.should eq({ "raw_result" => "positivo 15%" })
-    TestResult.first.plain_sensitive_data.should eq({ "start_time" => "2000/1/1 10:00:00" })
+    # TestResult.first.custom_fields[:test].should eq({ "raw_result" => "positivo 15%" })
+    TestResult.first.plain_sensitive_data[:test].should eq({ "start_time" => "2000/1/1 10:00:00" })
   end
 
   context 'sample and patient entities' do
@@ -313,7 +347,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     context 'without sample uid' do
       before :each do
         message = parsed_message("4")
-        message[:sample][:pii].delete(:sample_uid)
+        message[:sample][:pii].delete(:uid)
         message[:patient][:pii] = {}
         message[:patient][:custom] = {}
         message[:patient][:indexed] = {}
@@ -329,25 +363,29 @@ describe DeviceMessageProcessor, elasticsearch: true do
         test = TestResult.first
 
         test.plain_sensitive_data[:sample].should eq({
-          sample_id: "4002",
-          collected_at: "2000/1/1 9:00:00"
+          id: "4002"
         }.recursive_stringify_keys!)
 
         test.custom_fields[:sample].should eq({
-          datagram: "010100011100"
+          datagram: "010100011100",
+          culture_days: "10"
         }.recursive_stringify_keys!)
 
         test.indexed_fields[:sample].should eq({
-          sample_type: "sputum",
-          custom_fields: {
-            culture_days: "10"
-          }
+          type: "sputum",
+          collection_date: "2000/1/1 9:00:00"
         }.recursive_stringify_keys!)
       end
 
       it 'should merge sample if test has a sample' do
-        sample = Sample.make(uuid: 'abc', indexed_fields: {existing_field: 'a value'}.recursive_stringify_keys!, plain_sensitive_data: {sample_uid: 'abc4002'}.recursive_stringify_keys!, institution: device_message.institution)
-        test = TestResult.create_and_index({sample_uuid: sample.uuid, test_id: "4", assay: "mtb"}, {sample: sample, test_id: '4', device: device})
+        sample = Sample.make(
+          uuid: 'abc',
+          indexed_fields: {sample: {existing_field: 'a value'}}.with_indifferent_access,
+          plain_sensitive_data: {sample: {uid: 'abc4002'}}.with_indifferent_access,
+          institution: device_message.institution
+        )
+
+        test = TestResult.create_and_index({sample: sample, test_id: '4', device: device, indexed_fields: {assay: "mtb"}.with_indifferent_access})
 
         device_message_processor.process
 
@@ -357,20 +395,24 @@ describe DeviceMessageProcessor, elasticsearch: true do
         sample = Sample.first
 
         sample.plain_sensitive_data.should eq({
-          sample_uid: "abc4002",
-          sample_id: "4002",
-          collected_at: "2000/1/1 9:00:00"
+          sample: {
+            uid: "abc4002",
+            id: "4002"
+          }
         }.recursive_stringify_keys!)
 
         sample.custom_fields.should eq({
-          datagram: "010100011100"
+          sample: {
+            datagram: "010100011100",
+            culture_days: "10"
+          }
         }.recursive_stringify_keys!)
 
         sample.indexed_fields.should eq({
-          existing_field: "a value",
-          sample_type: "sputum",
-          custom_fields: {
-            culture_days: "10"
+          sample: {
+            existing_field: "a value",
+            type: "sputum",
+            collection_date: "2000/1/1 9:00:00"
           }
         }.recursive_stringify_keys!)
       end
@@ -387,26 +429,27 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should extract existing data in test and create the sample entity' do
         indexed_fields = {
+          assay: 'mtb',
           sample: {
             existing_indexed_field: 'existing_indexed_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
         custom_fields = {
           sample: {
             existing_custom_field: 'existing_custom_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
         plain_sensitive_data = {
           sample: {
             existing_pii_field: 'existing_pii_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
-        patient = Patient.make(plain_sensitive_data: {patient_id: '8000'}.recursive_stringify_keys!.with_indifferent_access, institution: device_message.institution)
+        patient = Patient.make(plain_sensitive_data: {patient: {id: '8000'}}.with_indifferent_access, institution: device_message.institution)
 
-        test = TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+        test = TestResult.create_and_index({
           sample: nil, test_id: '4', device: device, patient: patient,
           indexed_fields: indexed_fields,
           custom_fields: custom_fields,
@@ -424,22 +467,26 @@ describe DeviceMessageProcessor, elasticsearch: true do
         sample.patient.should eq(patient)
 
         sample.plain_sensitive_data.should eq({
-          sample_uid: "abc4002",
-          sample_id: "4002",
-          collected_at: "2000/1/1 9:00:00",
-          existing_pii_field: 'existing_pii_field_value'
+          sample: {
+            uid: "abc4002",
+            id: "4002",
+            existing_pii_field: 'existing_pii_field_value'
+          }
         }.recursive_stringify_keys!)
 
         sample.custom_fields.should eq({
-          datagram: "010100011100",
-          existing_custom_field: 'existing_custom_field_value'
+          sample: {
+            datagram: '010100011100',
+            culture_days: "10",
+            existing_custom_field: 'existing_custom_field_value'
+          }
         }.recursive_stringify_keys!)
 
         sample.indexed_fields.should eq({
-          sample_type: "sputum",
-          existing_indexed_field: 'existing_indexed_field_value',
-          custom_fields: {
-            culture_days: "10"
+          sample: {
+            type: "sputum",
+            collection_date: "2000/1/1 9:00:00",
+            existing_indexed_field: 'existing_indexed_field_value'
           }
         }.recursive_stringify_keys!)
 
@@ -450,24 +497,25 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should extract existing patient data in test into the sample entity' do
         indexed_fields = {
+          assay: 'mtb',
           patient: {
             existing_indexed_field: 'existing_indexed_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
         custom_fields = {
           patient: {
             existing_custom_field: 'existing_custom_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
         plain_sensitive_data = {
           patient: {
             existing_pii_field: 'existing_pii_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
-        test = TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+        test = TestResult.create_and_index({
           sample: nil, test_id: '4', device: device,
           indexed_fields: indexed_fields,
           custom_fields: custom_fields,
@@ -496,19 +544,20 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should merge sample with existing sample if sample uid matches' do
         indexed_fields = {
-          existing_field: 'a value'
-        }.recursive_stringify_keys!.with_indifferent_access
+          sample: {
+            existing_field: 'a value'
+          }
+        }.with_indifferent_access
 
         plain_sensitive_data  = {
-          sample_uid: 'abc4002'
-        }.recursive_stringify_keys!.with_indifferent_access
+          sample: {
+            uid: 'abc4002'
+          }
+        }.with_indifferent_access
 
         sample = Sample.make(uuid: 'abc', indexed_fields: indexed_fields, plain_sensitive_data: plain_sensitive_data, institution: device_message.institution)
 
-        TestResult.create_and_index(
-          {sample_uuid: sample.uuid, test_id: '4', assay: 'mtb'},
-          {sample: sample, test_id: '4', device: device}
-        )
+        TestResult.create_and_index({sample: sample, test_id: '4', device: device})
 
         device_message_processor.process
 
@@ -517,29 +566,29 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample = TestResult.first.sample
 
-        sample.plain_sensitive_data.should eq({
-          sample_uid: "abc4002",
-          sample_id: "4002",
-          collected_at: "2000/1/1 9:00:00"
+        sample.plain_sensitive_data[:sample].should eq({
+          uid: "abc4002",
+          id: "4002",
         }.recursive_stringify_keys!)
 
-        sample.custom_fields.should eq({
-          datagram: "010100011100"
+        sample.custom_fields[:sample].should eq({
+          datagram: "010100011100",
+          culture_days: "10"
         }.recursive_stringify_keys!)
 
-        sample.indexed_fields.should eq({
+        sample.indexed_fields[:sample].should eq({
           existing_field: "a value",
-          sample_type: "sputum",
-          custom_fields: {
-            culture_days: "10"
-          }
+          type: "sputum",
+          collection_date: "2000/1/1 9:00:00"
         }.recursive_stringify_keys!)
       end
 
       it 'should create a new sample if the existing sample has a different sample uid' do
         plain_sensitive_data  = {
-          sample_uid: 'def9772'
-        }.recursive_stringify_keys!.with_indifferent_access
+          sample: {
+            uid: 'def9772'
+          }
+        }.with_indifferent_access
 
         sample = Sample.make(
           uuid: 'abc',
@@ -547,10 +596,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           institution: device_message.institution
         )
 
-        TestResult.create_and_index(
-          {sample_uuid: sample.uuid, test_id: '4', assay: 'mtb'},
-          {sample: sample, test_id: '4', device: device}
-        )
+        TestResult.create_and_index({sample: sample, test_id: '4', device: device})
 
         device_message_processor.process
 
@@ -559,28 +605,28 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample = TestResult.first.sample
 
-        sample.plain_sensitive_data.should eq({
-          sample_uid: "abc4002",
-          sample_id: "4002",
-          collected_at: "2000/1/1 9:00:00"
+        sample.plain_sensitive_data[:sample].should eq({
+          uid: "abc4002",
+          id: "4002"
         }.recursive_stringify_keys!)
 
-        sample.custom_fields.should eq({
-          datagram: "010100011100"
+        sample.custom_fields[:sample].should eq({
+          datagram: "010100011100",
+          culture_days: "10"
         }.recursive_stringify_keys!)
 
-        sample.indexed_fields.should eq({
-          sample_type: "sputum",
-          custom_fields: {
-            culture_days: "10"
-          }
+        sample.indexed_fields[:sample].should eq({
+          type: "sputum",
+          collection_date: "2000/1/1 9:00:00"
         }.recursive_stringify_keys!)
       end
 
       it 'should not destroy existing sample if it has other references' do
         plain_sensitive_data  = {
-          sample_uid: 'def9772'
-        }.recursive_stringify_keys!.with_indifferent_access
+          sample: {
+            uid: 'def9772'
+          }
+        }.with_indifferent_access
 
         sample = Sample.make(
           uuid: 'abc',
@@ -588,10 +634,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           institution: device_message.institution
         )
 
-        test_1 = TestResult.create_and_index(
-          {sample_uuid: sample.uuid, test_id: '7', assay: 'mtb'},
-          {sample: sample, test_id: '7', device: device}
-        )
+        test_1 = TestResult.create_and_index(sample: sample, test_id: '7', device: device)
 
         device_message_processor.process
 
@@ -602,8 +645,16 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it "should assign existing sample's patient to the test" do
-        patient = Patient.make(plain_sensitive_data: {patient_id: '8000'}, institution: device_message.institution)
-        Sample.make(plain_sensitive_data: {sample_uid: 'abc4002'}, patient: patient, institution: device_message.institution)
+        patient = Patient.make(
+          plain_sensitive_data: {patient: {patient_id: '8000'}}.with_indifferent_access,
+          institution: device_message.institution
+        )
+
+        Sample.make(
+          plain_sensitive_data: {sample: {uid: 'abc4002'}},
+          patient: patient,
+          institution: device_message.institution
+        )
 
         device_message_processor.process
 
@@ -620,7 +671,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     context 'without patient id' do
       before :each do
         message = parsed_message('4')
-        message[:patient][:pii].delete(:patient_id)
+        message[:patient][:pii].delete(:id)
         message[:sample][:pii] = {}
         message[:sample][:custom] = {}
         message[:sample][:indexed] = {}
@@ -629,12 +680,16 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should merge patient into test patient if test has patient but not sample' do
         plain_sensitive_data = {
-          patient_id: '8000'
-        }.recursive_stringify_keys!.with_indifferent_access
+          patient: {
+            id: '8000'
+          }
+        }.with_indifferent_access
 
         indexed_fields = {
-          existing_indexed_field: 'existing_indexed_field_value'
-        }.recursive_stringify_keys!.with_indifferent_access
+          patient: {
+            existing_indexed_field: 'existing_indexed_field_value'
+          }
+        }.with_indifferent_access
 
         patient = Patient.make(
           plain_sensitive_data: plain_sensitive_data,
@@ -642,9 +697,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           institution: device_message.institution
         )
 
-        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
-          sample: nil, test_id: '4', device: device, patient: patient
-        })
+        TestResult.create_and_index(sample: nil, test_id: '4', device: device, patient: patient)
 
         device_message_processor.process
 
@@ -654,32 +707,34 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data.should eq({
-          patient_id: "8000",
+        patient.plain_sensitive_data[:patient].should eq({
+          id: "8000",
           dob: "2000/1/1"
         }.recursive_stringify_keys!)
 
-        patient.custom_fields.should eq({
-          shirt_color: "blue"
+        patient.custom_fields[:patient].should eq({
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
-        patient.indexed_fields.should eq({
+        patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
       it 'should merge patient into sample patient if sample has patient' do
         plain_sensitive_data = {
-          patient_id: '8000'
-        }.recursive_stringify_keys!.with_indifferent_access
+          patient: {
+            id: '8000'
+          }
+        }.with_indifferent_access
 
         indexed_fields = {
-          existing_indexed_field: 'existing_indexed_field_value'
-        }.recursive_stringify_keys!.with_indifferent_access
+          patient: {
+            existing_indexed_field: 'existing_indexed_field_value'
+          }
+        }.with_indifferent_access
 
         patient = Patient.make(
           plain_sensitive_data: plain_sensitive_data,
@@ -688,14 +743,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
         )
 
         sample = Sample.make(
-          plain_sensitive_data: {sample_uid: 'abc4002'},
+          plain_sensitive_data: {sample: {uid: 'abc4002'}}.with_indifferent_access,
           institution: device_message.institution,
           patient: patient
         )
 
-        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
-          sample: sample, test_id: '4', patient: patient, device: device
-        })
+        TestResult.create_and_index(sample: sample, test_id: '4', patient: patient, device: device)
 
         device_message_processor.process
 
@@ -705,21 +758,19 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.sample.patient
 
-        patient.plain_sensitive_data.should eq({
-          patient_id: "8000",
+        patient.plain_sensitive_data[:patient].should eq({
+          id: "8000",
           dob: "2000/1/1"
         }.recursive_stringify_keys!)
 
-        patient.custom_fields.should eq({
-          shirt_color: "blue"
+        patient.custom_fields[:patient].should eq({
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
-        patient.indexed_fields.should eq({
+        patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
@@ -737,26 +788,22 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         test.custom_fields[:patient].should eq({
-          shirt_color: "blue"
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
         test.indexed_fields[:patient].should eq({
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
       it 'should store patient data in sample if sample is present but doest not have a patient' do
         sample = Sample.make(
-          plain_sensitive_data: {sample_uid: 'abc4002'},
+          plain_sensitive_data: {sample: {uid: 'abc4002'}}.with_indifferent_access,
           institution: device_message.institution
         )
 
-        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
-          sample: sample, test_id: '4', device: device
-        })
+        TestResult.create_and_index(sample: sample, test_id: '4', device: device)
 
         device_message_processor.process
 
@@ -771,14 +818,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
         }.recursive_stringify_keys!)
 
         sample.custom_fields[:patient].should eq({
-          shirt_color: "blue"
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
         sample.indexed_fields[:patient].should eq({
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
     end
@@ -797,26 +842,26 @@ describe DeviceMessageProcessor, elasticsearch: true do
           patient: {
             existing_indexed_field: 'existing_indexed_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
         custom_fields = {
           patient: {
             existing_custom_field: 'existing_custom_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
         plain_sensitive_data = {
           patient: {
             existing_pii_field: 'existing_pii_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
-        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
+        TestResult.create_and_index(
           sample: nil, test_id: '4', device: device,
           indexed_fields: indexed_fields,
           custom_fields: custom_fields,
           plain_sensitive_data: plain_sensitive_data
-        })
+        )
 
         device_message_processor.process
 
@@ -826,23 +871,21 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data.should eq({
-          patient_id: "8000",
+        patient.plain_sensitive_data[:patient].should eq({
+          id: "8000",
           dob: "2000/1/1",
           existing_pii_field: 'existing_pii_field_value'
         }.recursive_stringify_keys!)
 
-        patient.custom_fields.should eq({
+        patient.custom_fields[:patient].should eq({
           shirt_color: "blue",
+          hiv: "positive",
           existing_custom_field: 'existing_custom_field_value'
         }.recursive_stringify_keys!)
 
-        patient.indexed_fields.should eq({
+        patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
@@ -851,20 +894,22 @@ describe DeviceMessageProcessor, elasticsearch: true do
           patient: {
             existing_indexed_field: 'existing_indexed_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
         custom_fields = {
           patient: {
             existing_custom_field: 'existing_custom_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
         plain_sensitive_data = {
-          sample_uid: 'abc4002',
+          sample: {
+            uid: 'abc4002'
+          },
           patient: {
             existing_pii_field: 'existing_pii_field_value'
           }
-        }.recursive_stringify_keys!.with_indifferent_access
+        }.with_indifferent_access
 
         sample = Sample.make(
           plain_sensitive_data: plain_sensitive_data,
@@ -873,9 +918,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           institution: device_message.institution
         )
 
-        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
-          sample: sample, test_id: '4', device: device
-        })
+        TestResult.create_and_index(sample: sample, test_id: '4', device: device)
 
         device_message_processor.process
 
@@ -885,39 +928,43 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.sample.patient
 
-        patient.plain_sensitive_data.should eq({
-          patient_id: "8000",
+        patient.plain_sensitive_data[:patient].should eq({
+          id: "8000",
           dob: "2000/1/1",
           existing_pii_field: 'existing_pii_field_value'
         }.recursive_stringify_keys!)
 
-        patient.custom_fields.should eq({
+        patient.custom_fields[:patient].should eq({
           shirt_color: "blue",
+          hiv: "positive",
           existing_custom_field: 'existing_custom_field_value'
         }.recursive_stringify_keys!)
 
-        patient.indexed_fields.should eq({
+        patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
       it 'should merge patient with existing patient if patient id matches' do
         indexed_fields = {
-          existing_indexed_field: 'existing_indexed_field_value'
-        }.recursive_stringify_keys!.with_indifferent_access
+          patient: {
+            existing_indexed_field: 'existing_indexed_field_value'
+          }
+        }.with_indifferent_access
 
         custom_fields = {
-          existing_custom_field: 'existing_custom_field_value'
-        }.recursive_stringify_keys!.with_indifferent_access
+          patient: {
+            existing_custom_field: 'existing_custom_field_value'
+          }
+        }.with_indifferent_access
 
         plain_sensitive_data = {
-          patient_id: '8000',
-          existing_pii_field: 'existing_pii_field_value'
-        }.recursive_stringify_keys!.with_indifferent_access
+          patient: {
+            id: '8000',
+            existing_pii_field: 'existing_pii_field_value'
+          }
+        }.with_indifferent_access
 
         patient = Patient.make(
           plain_sensitive_data: plain_sensitive_data,
@@ -926,9 +973,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           institution: device_message.institution
         )
 
-        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
-          sample: nil, test_id: '4', device: device, patient: patient
-        })
+        TestResult.create_and_index(sample: nil, test_id: '4', device: device, patient: patient)
 
         device_message_processor.process
 
@@ -938,39 +983,37 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data.should eq({
-          patient_id: "8000",
+        patient.plain_sensitive_data[:patient].should eq({
+          id: "8000",
           dob: "2000/1/1",
           existing_pii_field: 'existing_pii_field_value'
         }.recursive_stringify_keys!)
 
-        patient.custom_fields.should eq({
+        patient.custom_fields[:patient].should eq({
           shirt_color: "blue",
+          hiv: "positive",
           existing_custom_field: 'existing_custom_field_value'
         }.recursive_stringify_keys!)
 
-        patient.indexed_fields.should eq({
+        patient.indexed_fields[:patient].should eq({
           existing_indexed_field: 'existing_indexed_field_value',
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
       it 'should create a new patient if the existing patient has a differente patient id' do
         plain_sensitive_data = {
-          patient_id: '9000'
-        }.recursive_stringify_keys!.with_indifferent_access
+          patient: {
+            id: '9000'
+          }
+        }.with_indifferent_access
 
         patient = Patient.make(
           plain_sensitive_data: plain_sensitive_data,
           institution: device_message.institution
         )
 
-        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
-          sample: nil, test_id: '4', device: device, patient: patient
-        })
+        TestResult.create_and_index(sample: nil, test_id: '4', device: device, patient: patient)
 
         device_message_processor.process
 
@@ -980,37 +1023,34 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data.should eq({
-          patient_id: "8000",
+        patient.plain_sensitive_data[:patient].should eq({
+          id: "8000",
           dob: "2000/1/1"
         }.recursive_stringify_keys!)
 
-        patient.custom_fields.should eq({
-          shirt_color: "blue"
+        patient.custom_fields[:patient].should eq({
+          shirt_color: "blue",
+          hiv: "positive"
         }.recursive_stringify_keys!)
 
-        patient.indexed_fields.should eq({
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
-          }
+        patient.indexed_fields[:patient].should eq({
+          gender: "male"
         }.recursive_stringify_keys!)
       end
 
       it 'should not destroy existing patient if it has other references' do
         plain_sensitive_data  = {
-          patient_id: '9000'
-        }.recursive_stringify_keys!.with_indifferent_access
+          patient: {
+            id: '9000'
+          }
+        }.with_indifferent_access
 
         patient = Patient.make(
           plain_sensitive_data: plain_sensitive_data,
           institution: device_message.institution
         )
 
-        test_1 = TestResult.create_and_index(
-          {test_id: '7', assay: 'mtb'},
-          {sample: nil, test_id: '7', device: device, patient: patient}
-        )
+        test_1 = TestResult.create_and_index(sample: nil, test_id: '7', device: device, patient: patient)
 
         device_message_processor.process
 
@@ -1021,9 +1061,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should create patient and store reference in test and sample' do
-        TestResult.create_and_index({test_id: '4', assay: 'mtb'}, {
-          test_id: '4', device: device
-        })
+        TestResult.create_and_index(test_id: '4', device: device)
 
         device_message_processor.process
 

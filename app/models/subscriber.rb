@@ -25,8 +25,12 @@ class Subscriber < ActiveRecord::Base
     end
   end
 
+  def self.available_field_names
+    available_fields.map(&:scoped_name)
+  end
+
   def self.available_fields
-    default_schema['properties'].keys.sort
+    Cdx.core_fields.select{|field| !field.pii?}.map(&:flatten).flatten
   end
 
   def self.default_schema
@@ -77,31 +81,29 @@ class Subscriber < ActiveRecord::Base
   end
 
   def filter_test(indexed_test, fields)
-    test = TestResult.includes(:sample, :device, :institution).find_by_uuid(indexed_test['uuid'])
+    test = TestResult.includes(:sample, :device, :institution).find_by_uuid(indexed_test["test"]["uuid"])
     merged_test = indexed_test.merge test.plain_sensitive_data.merge(test.sample.try(:plain_sensitive_data) || {})
-    fields = Subscriber.available_fields if fields.nil? || fields.empty? # use all fields if none is specified
+    fields = Subscriber.available_field_names if fields.nil? || fields.empty? # use all fields if none is specified
     fields_properties = self.class.default_schema['properties']
     filtered_test = {}
 
-    fields.each do |field|
-      if field == 'result'
-        filtered_test["result"] = merged_test["results"].first["result"]
-      elsif field == "condition"
-        filtered_test["condition"] = merged_test["results"].first["condition"]
-      elsif fields_properties[field] && fields_properties[field]['locations'].not_nil?
-        filtered_test[field] = merged_test["#{field}_id"]
-      elsif fields_properties[field] && fields_properties[field]['format'] == 'lat,lng'
-        location_id_field_name = "#{fields_properties[field]['location_identifier']}_id"
-        location = Location.find(merged_test[location_id_field_name])
-        filtered_test[field] = "#{location.lat},#{location.lng}" if location
-      elsif field == "institution_name"
-        filtered_test[field] = test.institution.name
-      elsif field == "laboratory_name" && indexed_test["laboratory_id"]
-        filtered_test[field] = Laboratory.find(indexed_test["laboratory_id"]).try(:name)
-      elsif field == "device_name"
-        filtered_test[field] = test.device.name
-      else
-        filtered_test[field] = merged_test[field]
+    fields.each do |field_name|
+      field = Subscriber.available_fields.detect do |field|
+        field_name == field.scoped_name
+      end
+      if field
+        if field_name == 'test.assays.qualitative_result'
+          filtered_test["test"] ||= {}
+          filtered_test["test"]["assays"] ||= {}
+          filtered_test["test"]["assays"]["qualitative_result"] = merged_test["test"]["assays"].first["qualitative_result"]
+        elsif field_name == "test.assays.name"
+          filtered_test["test"] ||= {}
+          filtered_test["test"]["assays"] ||= {}
+          filtered_test["test"]["assays"]["name"] = merged_test["test"]["assays"].first["name"]
+        else
+          filtered_test[field.root_scope.name] ||= {}
+          filtered_test[field.root_scope.name][field.name] = merged_test[field.root_scope.name][field.name]
+        end
       end
     end
     filtered_test

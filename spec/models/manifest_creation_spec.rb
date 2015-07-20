@@ -8,7 +8,7 @@ describe Manifest do
       %{{
         "metadata" : {
           "device_models" : ["foo"],
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "version" : 1,
           "source" : {"type" : "json"}
         },
@@ -29,7 +29,7 @@ describe Manifest do
       updated_definition = %{{
         "metadata" : {
           "device_models" : ["foo"],
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "version" : "2.0.1",
           "source" : {"type" : "json"}
         },
@@ -53,7 +53,7 @@ describe Manifest do
       updated_definition = %{{
         "metadata" : {
           "device_models" : ["foo"],
-          "api_version" : "1.1.1",
+          "api_version" : "1.2.1",
           "version" : 1,
           "source" : {"type" : "json"}
         },
@@ -64,13 +64,13 @@ describe Manifest do
 
       manifest = Manifest.first
 
-      manifest.api_version.should eq('1.1.0')
+      manifest.api_version.should eq('1.2.0')
       manifest.definition = updated_definition
       manifest.save(:validate => false)
 
       Manifest.count.should eq(1)
       DeviceModel.count.should eq(1)
-      Manifest.first.api_version.should eq("1.1.1")
+      Manifest.first.api_version.should eq("1.2.1")
     end
 
     it "returns all the valid manifests" do
@@ -123,7 +123,7 @@ describe Manifest do
       definition_bar = %{{
         "metadata" : {
           "version" : 1,
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "device_models" : ["bar"],
           "source" : {"type" : "json"}
         },
@@ -141,7 +141,7 @@ describe Manifest do
       definition_version = %{{
         "metadata" : {
           "version" : 2,
-          "api_version" : "1.1.0",
+          "api_version" : "1.2.0",
           "device_models" : ["foo"],
           "source" : {"type" : "json"}
         },

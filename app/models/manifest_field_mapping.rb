@@ -9,7 +9,7 @@ class ManifestFieldMapping
   end
 
   def apply
-    coerce_values(traverse @field["source"], @root)
+    coerce_values(traverse @field.source, @root)
   end
 
   def traverse node, data
@@ -24,7 +24,7 @@ class ManifestFieldMapping
     end
 
     if node["lowercase"].present?
-      return traverse(node["lowercase"], data).downcase
+      return lowercase(traverse(node["lowercase"], data))
     end
 
     if node["concat"].present?
@@ -121,12 +121,23 @@ class ManifestFieldMapping
       ctx["message"] = data
       ctx["device"] = { uuid: @device.uuid, name: @device.name } if @device
 
-      ctx.eval(script)
+      result = ctx.eval(script)
+
+      if result.is_a? V8::Array
+        result = result.to_a
+      elsif result.is_a? V8::Object
+        raise ManifestParsingError.invalid_script(@field.target_field)
+      end
+      result
     rescue V8::Error => e
-      raise ManifestParsingError.script_error(@field['target_field'], e.message)
+      raise ManifestParsingError.script_error(@field.target_field, e.message)
     ensure
       ctx.dispose
     end
+  end
+
+  def lookup(path, data)
+    @manifest.parser.lookup(path, data, @root)
   end
 
   def map(value, mappings)
@@ -140,14 +151,21 @@ class ManifestFieldMapping
         value.match mapping["match"].gsub("*", ".*")
       end
 
-      raise ManifestParsingError.invalid_mapping(value, @field['target_field'], mappings) unless mapping
+      raise ManifestParsingError.invalid_mapping(value, @field.target_field, mappings) unless mapping
 
       mapping["output"]
     end
   end
 
-  def lookup(path, data)
-    @manifest.parser.lookup(path, data, @root)
+  def lowercase(value)
+    return unless value
+    if value.is_a? Array
+      value.map do |value|
+        lowercase value
+      end
+    else
+      value.downcase
+    end
   end
 
   def parse_date(node, data)
@@ -177,7 +195,7 @@ class ManifestFieldMapping
     when "year"
       date_time.beginning_of_year
     else
-      raise ManifestParsingError.unsupported_time_unit(time_unit, @field['target_field'])
+      raise ManifestParsingError.unsupported_time_unit(time_unit, @field.target_field)
     end
   end
 
@@ -234,7 +252,7 @@ class ManifestFieldMapping
     when "milliseconds"
       (time_interval / 1000000).seconds
     else
-      raise ManifestParsingError.unsupported_time_unit(source_unit, @field['target_field'])
+      raise ManifestParsingError.unsupported_time_unit(source_unit, @field.target_field)
     end
 
     case desired_unit
@@ -253,7 +271,7 @@ class ManifestFieldMapping
     when "milliseconds"
       time_interval * 1000000
     else
-      raise ManifestParsingError.unsupported_time_unit(desired_unit, @field['target_field'])
+      raise ManifestParsingError.unsupported_time_unit(desired_unit, @field.target_field)
     end
   end
 
@@ -275,8 +293,14 @@ class ManifestFieldMapping
   end
 
   def coerce_values value
-    if @field['type'] == 'integer' &&  ManifestFieldValidation.is_an_integer?(value)
-      value.to_i
+    if @field.type == 'integer' &&  ManifestFieldValidation.is_an_integer?(value)
+      if value.is_a? Array
+        value.map do |value|
+          value && value.to_i
+        end
+      else
+        value.to_i
+      end
     else
       value
     end
