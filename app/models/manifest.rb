@@ -68,9 +68,8 @@ class Manifest < ActiveRecord::Base
     parser.load(data, data_root).each_with_index do |record, record_index|
       begin
         message = MESSAGE_TEMPLATE.deep_dup
-
-        field_mapping.each do |target_path, source|
-          message = ManifestField.for(self, target_path, source, device).apply_to record, message
+        fields_for(device).each do |field|
+          field.apply_to record, message, device
         end
 
         messages << message
@@ -83,8 +82,27 @@ class Manifest < ActiveRecord::Base
     messages
   end
 
-  def scope_from_definition(field_definition)
-    field_definition.split(PATH_SPLIT_TOKEN).first
+  def fields
+    @fields ||=
+      field_mapping.inject([]) do |all, (target_path, source)|
+        all << ManifestField.for(self, target_path, source)
+      end
+  end
+
+  def fields_for(device)
+    return fields unless device && device.custom_mappings.present?
+    mapped_fields = fields.dup
+    device.custom_mappings.each do |from_field, to_field|
+      from = mapped_fields.select { |f| f.target_field == from_field }.first
+      to = mapped_fields.select { |f| f.target_field == to_field }.first
+
+      if from
+        mapped_fields.delete from
+        mapped_fields.delete to
+        mapped_fields << ManifestField.for(self, to_field, from.source)
+      end
+    end
+    mapped_fields
   end
 
   def parser

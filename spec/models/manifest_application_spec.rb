@@ -524,6 +524,15 @@ describe Manifest, validate_manifest: false do
           }]}, pii: {}, indexed: {}}
     end
 
+    it "map custom fields to core fields" do
+      device = Device.make custom_mappings: {"test.custom_id" => "patient.id"}
+      assert_manifest_application '{
+          "test.custom_id" :{ "lookup" : "custom_id" }
+        }',
+        '[ { "name" : "test.custom_id" } ]',
+        {json: '{"custom_id" : "20"}', csv: "custom_id\n20"},
+        {patient: {pii: {id: "20"}}},
+        device
+    end
   end
-
 end

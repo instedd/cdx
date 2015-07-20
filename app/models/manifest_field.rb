@@ -2,16 +2,16 @@ class ManifestField
   attr_reader :target_field
   subclass_responsibility :hash_key, :custom?, :core?, :indexed?
 
-  def self.for(manifest, target_field, field_mapping, device=nil)
+  def self.for(manifest, target_field, field_mapping)
     if core_field = core_field_from(target_field)
-      CoreManifestField.for(manifest, target_field, field_mapping, device, core_field)
+      CoreManifestField.for(manifest, target_field, field_mapping, core_field)
     else
-      CustomManifestField.for(manifest, target_field, field_mapping, device, custom_field_from(manifest, target_field))
+      CustomManifestField.for(manifest, target_field, field_mapping, custom_field_from(manifest, target_field))
     end
   end
 
-  def apply_to(data, message)
-    value = ManifestFieldMapping.new(@manifest, self, @device, data).apply
+  def apply_to(data, message, device)
+    value = ManifestFieldMapping.new(@manifest, self, device, data).apply
     @validation.apply_to value
     store value, message
   end
