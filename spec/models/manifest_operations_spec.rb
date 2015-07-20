@@ -500,7 +500,7 @@ describe Manifest, validate_manifest: false do
 
       assert_manifest_application field_definition, custom_definition,'{ "age" : "90" }', patient: {custom: {"age" => "40+"}, pii: {}, indexed: {}}
 
-      assert_manifest_application field_definition, custom_definition,'{ "age" : "2" }', patient: {custom: {"age" => "0-5"}, pii: {}, indexed: {}}
+      assert_manifest_application field_definition, custom_definition,'{ "age" : "2" }', patient: {custom: {"age" => "<5"}, pii: {}, indexed: {}}
 
       assert_manifest_application field_definition, custom_definition,'{ "age" : "20.1" }', patient: {custom: {"age" => "20-40"}, pii: {}, indexed: {}}
 
@@ -1333,7 +1333,7 @@ describe Manifest, validate_manifest: false do
                 "results" => [
                   {"age" => "20-40"},
                   {"age" => "40+"},
-                  {"age" => "0-5"},
+                  {"age" => "<5"},
                   {"age" => "20-40"},
                   {"age" => "5-20"},
                   {"age" => "20-40"}

@@ -6,14 +6,10 @@ describe ManifestFieldMapping do
 
     describe "single values" do
       it "clusterises values lower than lower bound" do
-        mapping.clusterise(1, [5, 20, 40]).should eq("0-5")
-      end
-
-      pending "clusterises doesn't assume 0 as lower bound" do
         mapping.clusterise(1, [5, 20, 40]).should eq("<5")
       end
 
-      pending "clusterises negative values" do
+      it "clusterises negative values" do
         mapping.clusterise(-1, [5, 20, 40]).should eq("<5")
       end
 
@@ -21,7 +17,7 @@ describe ManifestFieldMapping do
         mapping.clusterise(-1, [-5, 5, 20, 40]).should eq("-5-5")
       end
 
-      pending "clusterises values lower than lower bound" do
+      it "clusterises values lower than lower bound" do
         mapping.clusterise(-10, [-5, 5, 20, 40]).should eq("<-5")
       end
 

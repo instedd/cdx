@@ -283,7 +283,7 @@ class ManifestFieldMapping
       number = number.to_f
       interval_stops = interval_stops.map &:to_i
       return "#{interval_stops.last}+" if number > interval_stops.last
-      return "0-#{interval_stops[0]}"  if number.between? 0, interval_stops[0]
+      return "<#{interval_stops[0]}"  if number < interval_stops.first
       interval_stops.each_with_index do |stop, index|
         if number.between? stop, interval_stops[index + 1 ]
           return "#{stop}-#{interval_stops[index+1]}"
