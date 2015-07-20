@@ -1,5 +1,4 @@
 class Cdx::Api::Elasticsearch::NullQuery
-
   def initialize(params)
     @params = params
   end

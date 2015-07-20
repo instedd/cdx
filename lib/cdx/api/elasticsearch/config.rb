@@ -1,7 +1,6 @@
 class Cdx::Api::Elasticsearch::Config
-
   def api_fields=(api_fields)
-    @api_fields = api_fields.with_indifferent_access
+    @api_fields = api_fields
   end
 
   def api_fields
@@ -21,8 +20,8 @@ class Cdx::Api::Elasticsearch::Config
   attr_accessor :elasticsearch_url
 
   def searchable_fields
-    @searchable_fields ||= api_fields[:searchable_fields].map do |definition|
-      Cdx::Api::Elasticsearch::IndexedField.from(definition,document_format)
+    @searchable_fields ||= Cdx.core_fields.select(&:has_searchables?).map do |core_field|
+      Cdx::Api::Elasticsearch::IndexedField.for(core_field, api_fields, document_format)
     end
   end
 
@@ -30,11 +29,7 @@ class Cdx::Api::Elasticsearch::Config
     @document_format = document_format
   end
 
-  def document_mappings=(mappings)
-    @document_format = Cdx::Api::Elasticsearch::CustomDocumentFormat.new(mappings)
-  end
-
   def document_format
-    @document_format || CDPDocumentFormat.new
+    @document_format ||= Cdx::Api::Elasticsearch::CdxDocumentFormat.new
   end
 end

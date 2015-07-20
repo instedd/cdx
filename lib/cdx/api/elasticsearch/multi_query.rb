@@ -1,5 +1,4 @@
 class Cdx::Api::Elasticsearch::MultiQuery
-
   def initialize(params_list_or_queries, api = Cdx::Api)
     @queries = params_list_or_queries.map do |params_or_query|
       if params_or_query.respond_to?(:execute)
@@ -13,5 +12,4 @@ class Cdx::Api::Elasticsearch::MultiQuery
   def execute
     @queries.map(&:execute)
   end
-
 end

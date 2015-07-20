@@ -89,39 +89,37 @@ class Cdx::Api::Elasticsearch::Query
 
   def process_fields fields, params, conditions=[]
     fields.inject conditions do |conditions, field_definition|
-      if field_definition[:type] == "nested"
-        nested_conditions = self.process_fields(field_definition[:sub_fields], params)
+      if field_definition.nested?
+        nested_conditions = self.process_fields(field_definition.sub_fields, params)
         if nested_conditions.empty?
           conditions
         else
           conditions +
           [
             {nested: {
-              path: field_definition[:name],
+              path: field_definition.name,
               query: and_conditions(nested_conditions),
             }}
           ]
         end
       else
-        (field_definition[:filter_parameter_definition] || []).inject conditions do |conditions, filter_parameter_definition|
-          process_field(field_definition, filter_parameter_definition, params, conditions)
+        (field_definition.filter_definitions || []).inject conditions do |conditions, filter_definition|
+          process_field(field_definition, filter_definition, params, conditions)
         end
       end
     end
   end
 
-  def process_field field_definition, filter_parameter_definition, params, conditions
-    if field_value = params[filter_parameter_definition[:name]]
-      case filter_parameter_definition[:type]
+  def process_field field_definition, filter_definition, params, conditions
+    if field_value = params[filter_definition[:name]]
+      case filter_definition[:type]
       when "match"
-        conditions.push process_match_field(field_definition[:name], field_definition[:type], field_value)
+        conditions.push process_match_field(field_definition.name, field_definition.type, field_value)
       when "range"
         field_value = convert_timezone_if_date(field_value)
-        conditions.push range: {field_definition[:name] => ({filter_parameter_definition[:boundary] => field_value}.merge filter_parameter_definition[:options])}
+        conditions.push range: {field_definition.name => ({filter_definition[:boundary] => field_value}.merge filter_definition[:options])}
       when "wildcard"
         conditions.push process_wildcard_field(field_definition, field_value)
-      when "location"
-        conditions.push process_location_field(field_definition, field_value)
       end
     end
     conditions
@@ -141,7 +139,7 @@ class Cdx::Api::Elasticsearch::Query
 
   def process_wildcard_field(field_definition, field_value)
     process_multi_field(field_value) do |value|
-      process_null(field_definition[:name], value) do |variable|
+      process_null(field_definition.name, value) do |variable|
         process_single_wildcard_field(field_definition, value)
       end
     end
@@ -149,9 +147,9 @@ class Cdx::Api::Elasticsearch::Query
 
   def process_single_wildcard_field(field_definition, field_value)
     if /.*\*.*/ =~ field_value
-      {wildcard: {field_definition[:name] => field_value}}
+      {wildcard: {field_definition.name => field_value}}
     else
-      {match: {field_matcher(field_definition[:name], field_definition[:type]) => field_value}}
+      {match: {field_matcher(field_definition.name, field_definition.type) => field_value}}
     end
   end
 
@@ -187,10 +185,6 @@ class Cdx::Api::Elasticsearch::Query
      end
   end
 
-  def process_location_field(field_definition, field_value)
-    process_match_field("parent_#{field_definition[:name].pluralize}", field_definition[:type], field_value)
-  end
-
   def process_order params
     order = params["order_by"] || @api.default_sort
 
@@ -220,6 +214,8 @@ class Cdx::Api::Elasticsearch::Query
       Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value, @api
     end
 
+    raise "Unsupported group" if group_by.include? nil
+
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
     test = @api.search_elastic body: aggregations.to_hash.merge(query: query), size: 0, index: indices
@@ -247,6 +243,4 @@ class Cdx::Api::Elasticsearch::Query
   def process_group_by_buckets(aggregations, group_by, tests, test, doc_count)
     GroupingDetail.process_buckets(aggregations, group_by, tests, test, doc_count)
   end
-
-
 end

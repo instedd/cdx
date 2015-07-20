@@ -9,20 +9,7 @@ class DateGroupingDetail < GroupingDetail
   end
 
   def to_es
-    format = case interval
-      when "year"
-        "yyyy"
-      when "month"
-        "yyyy-MM"
-      when "week"
-        "x-'W'w"
-      when "day"
-        "yyyy-MM-dd"
-      else
-        raise "Invalid time interval: #{interval}"
-    end
-
-    {count: {date_histogram: {field: field_definition[:name], interval: interval, format: format}}}
+    {count: {date_histogram: {field: field_definition.name, interval: interval, format: format}}}
   end
 
   def yield_bucket(bucket)
@@ -36,5 +23,22 @@ class DateGroupingDetail < GroupingDetail
     end
 
     {name => value}
+  end
+
+  private
+
+  def format
+    case interval
+      when "year"
+        "yyyy"
+      when "month"
+        "yyyy-MM"
+      when "week"
+        "x-'W'w"
+      when "day"
+        "yyyy-MM-dd"
+      else
+        raise "Invalid time interval: #{interval}"
+    end
   end
 end

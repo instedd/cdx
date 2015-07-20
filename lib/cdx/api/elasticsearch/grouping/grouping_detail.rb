@@ -13,7 +13,7 @@ class GroupingDetail
     false
   end
 
-	def self.for(indexed_field, uri_param, values)
+  def self.for(indexed_field, uri_param, values)
     if indexed_field.nested?
       NestedGroupingDetail.create indexed_field, uri_param, values
     else
@@ -28,19 +28,19 @@ class GroupingDetail
 
         if grouping_def[:type] == "range"
           if values
-            grouping = RangeGroupingDetail.new indexed_field.name, indexed_field, uri_param, values
+            grouping = RangeGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, values
           end
         end
 
         if grouping_def[:type] == "location"
-          grouping = LocationGroupingDetail.new indexed_field.name, indexed_field, uri_param, values
+          grouping = LocationGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, values
         end
 
         if !grouping
           if grouping_def[:type] == "date"
-            grouping = DateGroupingDetail.new indexed_field.name, indexed_field, uri_param, grouping_def[:interval]
+            grouping = DateGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, grouping_def[:interval]
           else
-            grouping = FlatGroupingDetail.new indexed_field.name, indexed_field, uri_param
+            grouping = FlatGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param
           end
         end
 

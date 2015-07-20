@@ -9,7 +9,7 @@ class FlatGroupingDetail < GroupingDetail
     {
       count: {
         terms: {
-          field: field_definition[:name],
+          field: field_definition.name,
           size: 0
         }
       }

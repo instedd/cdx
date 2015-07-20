@@ -1,30 +1,33 @@
 class Cdx::Api::Elasticsearch::IndexedField
-  def self.from(definition, document_format)
-    new(definition, document_format)
+  attr_reader :name, :core_field, :sub_fields, :group_definitions, :filter_definitions
+  delegate :scoped_name, :type, :nested?, :valid_values, to: :core_field
+
+  def self.for(core_field, api_fields, document_format = Cdx::Api::Elasticsearch::CdxDocumentFormat.new)
+    definition = api_fields.detect do |definition|
+      definition['name'] == core_field.scoped_name
+    end
+    new(core_field, (definition.try(:with_indifferent_access) || {}), document_format)
   end
 
-  def initialize definition, document_format
-    @definition = definition
+  def initialize core_field, definition, document_format, already_nested=false
+    @core_field = core_field
 
-    # 'api_name' is used to match agains api queries
-    @definition[:api_name] = @definition[:name]
-
-    # 'name' is used to build the ES filters
-    @definition[:name] = document_format.indexed_field_name(@definition[:name])
-
-    if nested?
-      @definition[:sub_fields] = @definition[:sub_fields].map do |field|
-        self.class.from(field, document_format)
-      end
+    @name = if already_nested
+      scoped_name
     else
-      add_defaults
+      "test." + scoped_name
     end
 
-    @definition.freeze
-  end
+    @name = document_format.indexed_field_name(@name)
 
-  def [] key
-    @definition[key]
+    if nested?
+      @sub_fields = core_field.sub_fields.select(&:has_searchables?).map do |field|
+        self.class.new(field, {}, document_format, true)
+      end
+    else
+      initialize_filter_definitions definition
+      initialize_group_definitions definition
+    end
   end
 
   def self.grouping_detail_for field_name, values=nil, api
@@ -41,118 +44,77 @@ class Cdx::Api::Elasticsearch::IndexedField
     GroupingDetail.for self, field_name, values
   end
 
-  def group_definitions
-    @definition[:group_parameter_definition]
-  end
-
-  def type
-    @definition[:type]
-  end
-
-  def name
-    @definition[:name]
-  end
-
-  def nested?
-    type == 'nested'
-  end
-
-  def sub_fields
-    @definition[:sub_fields]
-  end
-
 private
+
+  def default_filter_definition
+    case type
+    when 'date'
+      default_date_filter_definition
+    else
+      [{name: scoped_name, type: default_filter_type}]
+    end
+  end
+
   def default_date_filter_definition_boundary(suffix, boundary)
-    {name: "#{default_name}_#{suffix}", type: 'range', boundary: boundary, options: { include_lower: true }}
+    {name: "#{scoped_name}_#{suffix}", type: 'range', boundary: boundary, options: { include_lower: true }}
   end
 
   def default_date_filter_definition
     [default_date_filter_definition_boundary('since', 'from'), default_date_filter_definition_boundary('until', 'to')]
   end
 
-  def default_filter_definition
-    case @definition[:type]
-    when 'date'
-      default_date_filter_definition
-    else
-      [{name: default_name, type: default_filter_type}]
-    end
-  end
-
-  def default_group_definition
-    if type == 'date'
-      [
-        {name: "year(#{default_name})", type: 'date', interval: 'year'},
-        {name: "month(#{default_name})", type: 'date', interval: 'month'},
-        {name: "week(#{default_name})", type: 'date', interval: 'week'},
-        {name: "day(#{default_name})", type: 'date', interval: 'day'}
-      ]
-    else
-      [{name: default_grouping_name, type: default_grouping_type}]
-    end
-  end
-
-  def default_name
-    @definition[:api_name].gsub(/_id$/, "")
-  end
-
-  def default_grouping_name
-    if type == 'location'
-      "#{default_name}_admin_level"
-    else
-      default_name
-    end
-  end
-
   def default_filter_type
-    if @definition[:type] == 'location'
-      'location'  
-    elsif @definition[:type] == 'integer'
+    if type == 'integer'
       'match'
     else
       'wildcard'
     end
   end
 
-  def default_grouping_type
-    if @definition[:type] == 'location'
-      'location'  
+  def default_group_definition
+    if type == 'date'
+      [
+        {name: "year(#{scoped_name})", type: 'date', interval: 'year'},
+        {name: "month(#{scoped_name})", type: 'date', interval: 'month'},
+        {name: "week(#{scoped_name})", type: 'date', interval: 'week'},
+        {name: "day(#{scoped_name})", type: 'date', interval: 'day'}
+      ]
     else
-      'flat'
+      [{name: scoped_name, type: default_grouping_type}]
     end
   end
 
-  def add_defaults
-    @definition[:type] = 'string' unless @definition[:type]
+  def default_grouping_type
+    'flat'
+  end
 
-    if @definition[:filter_parameter_definition] != 'none'
-      @definition[:filter_parameter_definition] = if @definition[:filter_parameter_definition]
-        filter_definitions = @definition[:filter_parameter_definition]
-        filter_definitions.each do |filter|
-          filter[:name] = default_name unless filter[:name]
+  def initialize_filter_definitions(definition)
+    @filter_definitions = if definition[:filter_parameter_definition] == 'none'
+      Array.new
+    else
+      if definition[:filter_parameter_definition]
+        definition[:filter_parameter_definition].each do |filter|
+          filter[:name] = scoped_name unless filter[:name]
           filter[:type] = default_filter_type unless filter[:type]
         end
-        filter_definitions
       else
         default_filter_definition
       end
-    else
-      @definition[:filter_parameter_definition] = Array.new
     end
+  end
 
-    if @definition[:group_parameter_definition] != 'none'
-      @definition[:group_parameter_definition] = if @definition[:group_parameter_definition]
-        group_definitions = @definition[:group_parameter_definition]
-        group_definitions.each do |group|
-          group[:name] = default_grouping_name unless group[:name]
+  def initialize_group_definitions(definition)
+    @group_definitions = if definition[:group_parameter_definition] == 'none'
+      Array.new
+    else
+      if definition[:group_parameter_definition]
+        definition[:group_parameter_definition].each do |group|
+          group[:name] = scoped_name unless group[:name]
           group[:type] = default_grouping_type unless group[:type]
         end
-        group_definitions
       else
         default_group_definition
       end
-    else
-      @definition[:group_parameter_definition] = Array.new
     end
   end
 end

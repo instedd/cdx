@@ -16,7 +16,7 @@ class NestedGroupingDetail < GroupingDetail
     {
       count: {
         terms: {
-          field: "#{field_definition[:name]}.#{child_grouping.name}",
+          field: child_grouping.name,
           size: 0
         }
       }
@@ -36,6 +36,6 @@ class NestedGroupingDetail < GroupingDetail
       GroupingDetail.for field, child_field_name, values
     end
 
-    NestedGroupingDetail.new(indexed_field.name, indexed_field, child_field_name, child_grouping) if child_grouping
+    NestedGroupingDetail.new(indexed_field.scoped_name, indexed_field, child_field_name, child_grouping) if child_grouping
   end
 end

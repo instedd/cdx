@@ -21,107 +21,44 @@
 #   a) a filter with the same name
 #   b) a grouping with the name of '#{default_name}_admin_level'
 
-searchable_fields:
-  - name: start_time
-    type: date
-    filter_parameter_definition:
-      - name: since
-        type: range
-        boundary: from
-        options:
-          include_lower: true
-      - name: until
-        type: range
-        boundary: to
-        options:
-          include_lower: true
-  - name: created_at
-    type: date
-  - name: updated_at
-    type: date
-  - name: test_id
-    group_parameter_definition: none
-  - name: sample_uuid
-    scope: sample
-  - name: sample_id
-    scope: sample
-  - name: sample_type
-    scope: sample
-  - name: sample_collection_date
-    scope: sample
-    type: date
-  - name: uuid
-    filter_parameter_definition:
-      - type: match
-    group_parameter_definition: none
-  - name: device_uuid
-    filter_parameter_definition:
-      - name: device
-    group_parameter_definition:
-      - name: device
-  - name: system_user
-  - name: device_serial_number
-  - name: error_code
-    type: integer
-  - name: error_description
-    filter_parameter_definition: none
-    group_parameter_definition: none
-  - name: laboratory_id
-    type: integer
-  - name: institution_id
-    type: integer
-  - name: location
-    type: location
-    group_parameter_definition:
-      - name: admin_level
-  - name: age
-    scope: patient
-    type: integer
-    filter_parameter_definition:
-      - include_default: true
-      - name: min_age
-        type: range
-        boundary: from
-        options:
-          include_lower: true
-      - name: max_age
-        type: range
-        boundary: to
-        options:
-          include_upper: true
-    group_parameter_definition:
-      - type: range
-  - name: assay_name
-  - name: gender
-    scope: patient
-  - name: ethnicity
-    scope: patient
-  - name: race
-    scope: patient
-  - name: race_ethnicity
-    scope: patient
-  - name: status
-    valid_values:
+- name: test.start_time
+  filter_parameter_definition:
+    - name: since
+      type: range
+      boundary: from
       options:
-        - invalid
-        - error
-        - no_result
-        - success
-        - negative
-  - name: results
-    type: nested
-    sub_fields:
-      - name: result
-        type: multi_field
-        valid_values:
-          options:
-            - positive
-            - negative
-      - name: condition
-  - name: test_type
-    filter_parameter_definition:
-      - type: match
-    valid_values:
+        include_lower: true
+    - name: until
+      type: range
+      boundary: to
       options:
-        - specimen
-        - qc
+        include_lower: true
+- name: test.id
+  group_parameter_definition: none
+- name: test.uuid
+  filter_parameter_definition:
+    - type: match
+  group_parameter_definition: none
+- name: location.parents
+  filter_parameter_definition:
+    - name: location
+      type: match
+- name: location.admin_levels
+  group_parameter_definition:
+    - name: admin_level
+      type: location
+- name: test.patient_age
+  filter_parameter_definition:
+    - include_default: true
+    - name: min_age
+      type: range
+      boundary: from
+      options:
+        include_lower: true
+    - name: max_age
+      type: range
+      boundary: to
+      options:
+        include_upper: true
+  group_parameter_definition:
+    - type: range

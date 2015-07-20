@@ -12,9 +12,9 @@ class RangeGroupingDetail < GroupingDetail
     {
       count: {
         range: {
-          field: field_definition[:name], ranges: ranges_to_es 
-        } 
-      } 
+          field: field_definition.name, ranges: ranges_to_es
+        }
+      }
     }
   end
 
@@ -28,7 +28,7 @@ class RangeGroupingDetail < GroupingDetail
     end
   end
 
-  def yield_bucket(bucket)  
+  def yield_bucket(bucket)
     {uri_param => [normalize(bucket[:from]), normalize(bucket[:to])]}
   end
 
