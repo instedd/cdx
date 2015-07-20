@@ -89,8 +89,15 @@ describe TestResultIndexer, elasticsearch: true do
         },
         device: {
           uuid: test.device.uuid,
-          laboratory_id: test.device.laboratories.first.id,
-          institution_id: test.device.institution_id
+          name: test.device.name
+        },
+        laboratory: {
+          id: test.device.laboratories.first.id,
+          name: test.device.laboratories.first.name
+        },
+        institution: {
+          id: test.device.institution.id,
+          name: test.device.institution.name
         }
       }.recursive_stringify_keys!,
       id: "#{test.device.uuid}_4")

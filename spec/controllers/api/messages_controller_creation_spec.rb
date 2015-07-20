@@ -69,7 +69,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
-      test["device"]["institution_id"].should eq(device.institution_id)
+      test["institution"]["id"].should eq(device.institution_id)
     end
 
     it "should override test if test_id is the same" do

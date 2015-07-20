@@ -37,13 +37,16 @@ class TestResultIndexer
     if device.laboratories.size == 1
       laboratory = device.laboratories.first
       laboratory_id = laboratory.id
+      laboratory_name = laboratory.name
       location = device.locations(ancestors: true).first
     elsif device.laboratories.size == 0
       laboratory_id = nil
       location_id = nil
+      laboratory_name = nil
       location = nil
     else
       laboratory_id = nil
+      laboratory_name = nil
       locations = device.locations(ancestors: true)
       location = Location.common_root(locations)
     end
@@ -64,8 +67,7 @@ class TestResultIndexer
         },
         device: {
           uuid: device.uuid,
-          institution_id: device.institution_id,
-          laboratory_id: laboratory_id
+          name: device.name
         },
         location: {
           id: location_id,
@@ -74,6 +76,14 @@ class TestResultIndexer
           lat: location_lat,
           lng: location_lng
         },
+        institution: {
+          id: device.institution_id,
+          name: device.institution.name
+        },
+        laboratory: {
+          id: laboratory_id,
+          name: laboratory_name
+        }
       }).
       deep_merge(indexed_fields_from(test_result.sample, :sample)).
       deep_merge(indexed_fields_from(test_result.current_patient, :patient)).

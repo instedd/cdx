@@ -26,7 +26,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       test = all_elasticsearch_tests_for(institution).first["_source"]
       test["location"]["id"].should eq(leaf_location1.geo_id)
-      test["device"]["laboratory_id"].should eq(laboratory1.id)
+      test["laboratory"]["id"].should eq(laboratory1.id)
       test["location"]["parents"].sort.should eq([leaf_location1.geo_id, parent_location.geo_id].sort)
       test["location"]["admin_levels"]['admin_level_0'].should eq(parent_location.geo_id)
       test["location"]["admin_levels"]['admin_level_1'].should eq(leaf_location1.geo_id)

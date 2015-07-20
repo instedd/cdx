@@ -34,5 +34,4 @@ module ManifestSpecHelper
     manifest = manifest = manifest_from_json_mappings(mappings_json, custom_json)
     expect { manifest.apply_to(data, device).first }.to raise_error(message)
   end
-
 end
