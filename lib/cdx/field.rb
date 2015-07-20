@@ -1,4 +1,7 @@
 class Cdx::Field
+  attr_accessor :scope
+  delegate :root_scope, to: :scope
+
   def initialize scope, definition
     @scope = scope
     @definition = definition.with_indifferent_access
@@ -37,7 +40,7 @@ class Cdx::Field
   end
 
   def scoped_name
-    "#{@scope.scoped_name}.#{name}"
+    "#{scope.scoped_name}.#{name}"
   end
 
   def flatten

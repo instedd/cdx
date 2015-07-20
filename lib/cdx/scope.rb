@@ -15,4 +15,12 @@ class Cdx::Scope
   def flatten
     @fields
   end
+
+  def has_searchables?
+    fields.any? &:searchable?
+  end
+
+  def root_scope
+    self
+  end
 end
