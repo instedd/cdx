@@ -54,7 +54,7 @@ class Cdx::Api::Elasticsearch::MappingTemplate
   end
 
   def build_properties_mapping
-    scoped_fields = Cdx.core_field_scopes
+    scoped_fields = Cdx.core_field_scopes.select(&:has_searchables?)
 
     Hash[
       scoped_fields.map { |scope|

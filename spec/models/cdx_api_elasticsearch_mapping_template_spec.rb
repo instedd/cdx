@@ -51,6 +51,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
           },
           "test"=> {
             "properties" => {
+              "id"=> {
+                "type"=>"string",
+                "index"=>"not_analyzed"
+              },
               "uuid" => {
                 "type" => "string",
                 "index" => "not_analyzed"
@@ -194,7 +198,5 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
         }
       )
     end
-
   end
-
 end
