@@ -105,6 +105,24 @@ describe Manifest, validate_manifest: false do
       {sample: {custom: {"fields" => "#{device.name},#{device.uuid}"}, pii: {}, indexed: {}}}, device
     end
 
+    it "has access to laboratory from script" do
+      device = Device.make
+      lab = device.current_laboratory
+
+      assert_manifest_application %(
+        {
+          "sample.fields": { "script": "laboratory.name + ',' + laboratory.address + ',' + laboratory.city + ',' + laboratory.state + ',' + laboratory.zip_code + ',' + laboratory.country + ',' + laboratory.region + ',' + parseInt(laboratory.lat) + ',' + parseInt(laboratory.lng) + ',' + laboratory.location_geoid" }
+        }
+      ), %(
+        [
+          {
+            "name": "sample.fields"
+          }
+        ]
+      ), %({}),
+      {sample: {custom: {"fields" => "#{lab.name},#{lab.address},#{lab.city},#{lab.state},#{lab.zip_code},#{lab.country},#{lab.region},#{lab.lat.to_i},#{lab.lng.to_i},#{lab.location_geoid}"}, pii: {}, indexed: {}}}, device
+    end
+
     it "loads xml in javascript" do
       assert_manifest_application %(
         {

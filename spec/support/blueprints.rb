@@ -97,6 +97,14 @@ Laboratory.blueprint do
   institution
   name
   location_geoid { LocationService.repository.make.id }
+  address { Faker::Address.street_address }
+  city { Faker::Address.city }
+  state { Faker::Address.state }
+  zip_code { Faker::Address.zip_code }
+  country { Faker::Address.country }
+  region { Faker::Address.state }
+  lat { rand(-180..180) }
+  lng { rand(-90..90) }
 end
 
 Location; class Location

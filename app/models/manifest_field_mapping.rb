@@ -120,7 +120,13 @@ class ManifestFieldMapping
     ctx = V8::Context.new
     begin
       ctx["message"] = data
-      ctx["device"] = { uuid: @device.uuid, name: @device.name } if @device
+
+      if @device
+        ctx["device"] = script_device(@device)
+        if laboratory = @device.current_laboratory
+          ctx["laboratory"] = script_laboratory(laboratory)
+        end
+      end
 
       result = ctx.eval(script)
 
@@ -135,6 +141,28 @@ class ManifestFieldMapping
     ensure
       ctx.dispose
     end
+  end
+
+  def script_device(device)
+    {
+      uuid: device.uuid,
+      name: device.name,
+    }
+  end
+
+  def script_laboratory(laboratory)
+    {
+      name: laboratory.name,
+      address: laboratory.address,
+      city: laboratory.city,
+      state: laboratory.state,
+      zip_code: laboratory.zip_code,
+      country: laboratory.country,
+      region: laboratory.region,
+      lat: laboratory.lat,
+      lng: laboratory.lng,
+      location_geoid: laboratory.location_geoid,
+    }
   end
 
   def lookup(path, data)
