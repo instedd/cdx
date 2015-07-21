@@ -20,25 +20,25 @@ class GroupingDetail
       grouping = nil
 
       definition = indexed_field.group_definitions.detect do |definition|
-        definition[:name] == uri_param
+        definition["name"] == uri_param
       end
 
       if definition
         grouping_def = definition.clone
 
-        if grouping_def[:type] == "range"
+        if grouping_def["type"] == "range"
           if values
             grouping = RangeGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, values
           end
         end
 
-        if grouping_def[:type] == "location"
+        if grouping_def["type"] == "location"
           grouping = LocationGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, values
         end
 
         if !grouping
-          if grouping_def[:type] == "date"
-            grouping = DateGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, grouping_def[:interval]
+          if grouping_def["type"] == "date"
+            grouping = DateGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param, grouping_def["interval"]
           else
             grouping = FlatGroupingDetail.new indexed_field.scoped_name, indexed_field, uri_param
           end
@@ -50,33 +50,31 @@ class GroupingDetail
   end
 
   def self.process_buckets(aggregations, group_by, tests, test, doc_count)
-    count = aggregations[:count]
+    count = aggregations["count"]
 
     if count
       if group_by.is_a? Array
-        head = group_by.first
-        rest = group_by[1..-1]
+        head, *rest = group_by
       else
-        head = group_by
-        rest = []
+        head, rest = group_by, []
       end
 
       buckets = head.preprocess_buckets count
       head.process_bucket rest, tests, test, buckets
     else
-      test[:count] = doc_count
+      test["count"] = doc_count
       tests + [test]
     end
   end
 
   def preprocess_buckets(count)
-    count[:buckets]
+    count["buckets"]
   end
 
   def process_bucket(group_by, tests, test, buckets)
     buckets.inject tests do |tests, bucket|
       test = test.merge yield_bucket(bucket)
-      GroupingDetail.process_buckets bucket, group_by, tests, test, bucket[:doc_count]
+      GroupingDetail.process_buckets bucket, group_by, tests, test, bucket["doc_count"]
     end
   end
 end

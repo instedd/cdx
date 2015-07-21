@@ -23,7 +23,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def grouped_by
-    @params[:group_by].split(',')
+    @params["group_by"].split(',')
   end
 
   protected
@@ -31,10 +31,10 @@ class Cdx::Api::Elasticsearch::Query
   def query(params)
     query = and_conditions(process_conditions(params))
 
-    if params[:group_by]
-      tests = query_with_group_by(query, params[:group_by])
-      if params['order_by']
-        all_orders = extract_multi_values(params['order_by'])
+    if params["group_by"]
+      tests = query_with_group_by(query, params["group_by"])
+      if params["order_by"]
+        all_orders = extract_multi_values(params["order_by"])
         all_orders.map do |order|
           tests = tests.sort_by do |test|
             test[order.delete('-')]
@@ -42,7 +42,7 @@ class Cdx::Api::Elasticsearch::Query
           tests = tests.reverse if order[0] == "-"
         end
       end
-      total_count = tests.inject(0) { |sum, result| sum + result[:count].to_i }
+      total_count = tests.inject(0) { |sum, result| sum + result["count"].to_i }
     else
       tests, total_count = query_without_group_by(query, params)
     end
@@ -54,8 +54,8 @@ class Cdx::Api::Elasticsearch::Query
 
   def query_without_group_by(query, params)
     sort = process_order(params)
-    page_size = params[:page_size] || DEFAULT_PAGE_SIZE
-    offset = params[:offset]
+    page_size = params["page_size"] || DEFAULT_PAGE_SIZE
+    offset = params["offset"]
 
     es_query = {body: {query: query, sort: sort}}
     es_query[:size] = page_size if page_size.present?
@@ -111,13 +111,13 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_field field_definition, filter_definition, params, conditions
-    if field_value = params[filter_definition[:name]]
-      case filter_definition[:type]
+    if field_value = params[filter_definition["name"]]
+      case filter_definition["type"]
       when "match"
         conditions.push process_match_field(field_definition.name, field_definition.type, field_value)
       when "range"
         field_value = convert_timezone_if_date(field_value)
-        conditions.push range: {field_definition.name => ({filter_definition[:boundary] => field_value}.merge filter_definition[:options])}
+        conditions.push range: {field_definition.name => ({filter_definition["boundary"] => field_value}.merge filter_definition["options"])}
       when "wildcard"
         conditions.push process_wildcard_field(field_definition, field_value)
       end
@@ -201,7 +201,7 @@ class Cdx::Api::Elasticsearch::Query
   def query_with_group_by(query, group_by)
     group_by =
       case group_by
-      when String, Symbol
+      when String
         group_by.to_s.split ","
       when Hash
         [group_by]
@@ -220,7 +220,7 @@ class Cdx::Api::Elasticsearch::Query
 
     test = @api.search_elastic body: aggregations.to_hash.merge(query: query), size: 0, index: indices
     if test["aggregations"]
-      process_group_by_buckets(test["aggregations"].with_indifferent_access, aggregations.in_order, [], {}, 0)
+      process_group_by_buckets(test["aggregations"], aggregations.in_order, [], {}, 0)
     else
       []
     end

@@ -1,6 +1,6 @@
 RSpec.shared_context "cdx api helpers" do
   def query(query)
-    Cdx::Api::Elasticsearch::Query.new(query.with_indifferent_access).execute
+    Cdx::Api::Elasticsearch::Query.new(query).execute
   end
 
   def query_tests(query_or_response)

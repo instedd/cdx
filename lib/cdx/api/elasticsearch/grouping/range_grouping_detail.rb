@@ -29,7 +29,7 @@ class RangeGroupingDetail < GroupingDetail
   end
 
   def yield_bucket(bucket)
-    {uri_param => [normalize(bucket[:from]), normalize(bucket[:to])]}
+    {uri_param => [normalize(bucket["from"]), normalize(bucket["to"])]}
   end
 
   def normalize(value)

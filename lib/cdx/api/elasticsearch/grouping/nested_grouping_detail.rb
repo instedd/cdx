@@ -24,11 +24,11 @@ class NestedGroupingDetail < GroupingDetail
   end
 
   def preprocess_buckets(count)
-    (count[:count] || count)[:buckets]
+    (count["count"] || count)["buckets"]
   end
 
   def yield_bucket(bucket)
-    {uri_param => bucket[:key]}
+    {uri_param => bucket["key"]}
   end
 
   def self.create(indexed_field, child_field_name, values)

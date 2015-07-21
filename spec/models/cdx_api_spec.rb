@@ -10,7 +10,7 @@ describe Cdx::Api do
       index test: {assays: [qualitative_result: :positive], start_time: time(2013, 1, 1)}
       index test: {assays: [qualitative_result: :negative], start_time: time(2013, 1, 2)}
 
-      response = query_tests(since: time(2013, 1, 2))
+      response = query_tests("since" => time(2013, 1, 2))
 
       expect(response.size).to eq(1)
       expect(response.first["test"]["assays"].first["qualitative_result"]).to eq("negative")
@@ -22,7 +22,7 @@ describe Cdx::Api do
       expect(response.first["test"]["assays"].first["qualitative_result"]).to eq("negative")
       expect(response.last["test"]["assays"].first["qualitative_result"]).to eq("positive")
 
-      expect(query_tests(since: time(2013, 1, 3))).to be_empty
+      expect(query_tests("since" => time(2013, 1, 3))).to be_empty
     end
 
     it "should check for new tests since a date in a differen time zone" do
@@ -31,7 +31,7 @@ describe Cdx::Api do
       index test: {assays: [qualitative_result: :positive], start_time: 3.day.ago.at_noon.iso8601}
       index test: {assays: [qualitative_result: :negative], start_time: 1.day.ago.at_noon.iso8601}
 
-      response = query_tests(since: 2.day.ago.at_noon.iso8601)
+      response = query_tests("since" => 2.day.ago.at_noon.iso8601)
 
       expect(response.size).to eq(1)
       expect(response.first["test"]["assays"].first["qualitative_result"]).to eq("negative")
@@ -43,7 +43,7 @@ describe Cdx::Api do
       expect(response.first["test"]["assays"].first["qualitative_result"]).to eq("negative")
       expect(response.last["test"]["assays"].first["qualitative_result"]).to eq("positive")
 
-      expect(query_tests(since: Date.current.at_noon.iso8601)).to be_empty
+      expect(query_tests("since" => Date.current.at_noon.iso8601)).to be_empty
     end
 
     it "should asume current timezone if no one is provided" do
@@ -61,14 +61,14 @@ describe Cdx::Api do
       index test: {assays: [qualitative_result: :positive], start_time: time(2013, 1, 1)}
       index test: {assays: [qualitative_result: :negative], start_time: time(2013, 1, 3)}
 
-      expect_one_qualitative_result "positive", until: time(2013, 1, 2)
+      expect_one_qualitative_result "positive", "until" => time(2013, 1, 2)
     end
 
     it "filters by reported_time_since and reported_time_until" do
       index test: {assays: [qualitative_result: :positive], reported_time: time(2013, 1, 1)}
       index test: {assays: [qualitative_result: :positive], reported_time: time(2013, 1, 3)}
 
-      expect_one_qualitative_result "positive", :'test.reported_time_since' => time(2013, 1, 2), :'test.reported_time_until' => time(2013, 1, 3)
+      expect_one_qualitative_result "positive", 'test.reported_time_since' => time(2013, 1, 2), 'test.reported_time_until' => time(2013, 1, 3)
     end
 
     [
@@ -106,8 +106,8 @@ describe Cdx::Api do
       index device: {lab_user: "jdoe"}
       index device: {lab_user: "mmajor"}
 
-      expect_one_event_with_field "device", "lab_user", "jdoe", :'device.lab_user' => "jdoe"
-      expect_one_event_with_field "device", "lab_user", "mmajor", :'device.lab_user' => "mmajor"
+      expect_one_event_with_field "device", "lab_user", "jdoe", 'device.lab_user' => "jdoe"
+      expect_one_event_with_field "device", "lab_user", "mmajor", 'device.lab_user' => "mmajor"
       expect_no_results "device.lab_user" => "ffoo"
     end
 
@@ -115,18 +115,18 @@ describe Cdx::Api do
       index test: {assays: [qualitative_result: :positive], patient_age: 10}
       index test: {assays: [qualitative_result: :negative], patient_age: 20}
 
-      expect_one_qualitative_result "negative", min_age: 15
-      expect_one_qualitative_result "negative", min_age: 20
-      expect_no_results min_age: 21
+      expect_one_qualitative_result "negative", "min_age" => 15
+      expect_one_qualitative_result "negative", "min_age" => 20
+      expect_no_results "min_age" => 21
     end
 
     it "filters by max age" do
       index test: {assays: [qualitative_result: :positive], patient_age: 10}
       index test: {assays: [qualitative_result: :negative], patient_age: 20}
 
-      expect_one_qualitative_result "positive", max_age: 15
-      expect_one_qualitative_result "positive", max_age: 10
-      expect_no_results max_age: 9
+      expect_one_qualitative_result "positive", "max_age" => 15
+      expect_one_qualitative_result "positive", "max_age" => 10
+      expect_no_results "max_age" => 9
     end
 
     it "filters by qualitative_result" do
@@ -281,13 +281,13 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :negative]}, patient: {gender: :male}
       index test: {assays:[qualitative_result: :negative]}, patient: {gender: :female}
 
-      response = query_tests(group_by: 'patient.gender').sort_by do |test|
+      response = query_tests("group_by" => 'patient.gender').sort_by do |test|
         test["patient.gender"]
       end
 
       expect(response).to eq([
-        {"patient.gender"=>"female", count: 1},
-        {"patient.gender"=>"male", count: 2}
+        {"patient.gender" => "female", "count" => 1},
+        {"patient.gender" => "male",   "count" => 2}
       ])
     end
 
@@ -299,15 +299,15 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :negative], name: "b"}, patient: {gender: :female}
       index test: {assays:[qualitative_result: :negative], name: "b"}, patient: {gender: :female}
 
-      response = query_tests(group_by: "patient.gender,test.name").sort_by do |test|
+      response = query_tests("group_by" => "patient.gender,test.name").sort_by do |test|
         test["patient.gender"] + test["test.name"]
       end
 
       expect(response).to eq([
-        {"patient.gender"=>"female", "test.name" => "a", count: 1},
-        {"patient.gender"=>"female", "test.name" => "b", count: 2},
-        {"patient.gender"=>"male", "test.name" => "a", count: 2},
-        {"patient.gender"=>"male", "test.name" => "b", count: 1}
+        {"patient.gender"=>"female", "test.name" => "a", "count" => 1},
+        {"patient.gender"=>"female", "test.name" => "b", "count" => 2},
+        {"patient.gender"=>"male", "test.name" => "a", "count" => 2},
+        {"patient.gender"=>"male", "test.name" => "b", "count" => 1}
       ])
     end
 
@@ -316,13 +316,13 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :positive], type: "specimen"}
       index test: {assays:[qualitative_result: :positive], type: "qc"}
 
-      response = query_tests(group_by:"test.type").sort_by do |test|
+      response = query_tests("group_by" => "test.type").sort_by do |test|
         test["test.type"]
       end
 
       expect(response).to eq([
-        {"test.type"=>"qc", count: 2},
-        {"test.type"=>"specimen", count: 1},
+        {"test.type"=>"qc", "count" => 2},
+        {"test.type"=>"specimen", "count" => 1},
       ])
     end
 
@@ -334,16 +334,16 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :negative], name: "b"}, patient: {gender: :female}
       index test: {assays:[qualitative_result: :negative], name: "b"}, patient: {gender: :female}
 
-      response = query_tests(group_by: "patient.gender,test.name,test.assays.qualitative_result").sort_by do |test|
+      response = query_tests("group_by" => "patient.gender,test.name,test.assays.qualitative_result").sort_by do |test|
         test["patient.gender"] + test["test.assays.qualitative_result"] + test["test.name"]
       end
 
       expect(response).to eq([
-        {"patient.gender"=>"female", "test.assays.qualitative_result" => "negative", "test.name" => "a", count: 1},
-        {"patient.gender"=>"female", "test.assays.qualitative_result" => "negative", "test.name" => "b", count: 2},
-        {"patient.gender"=>"male", "test.assays.qualitative_result" => "negative", "test.name" => "a", count: 1},
-        {"patient.gender"=>"male", "test.assays.qualitative_result" => "positive", "test.name" => "a", count: 1},
-        {"patient.gender"=>"male", "test.assays.qualitative_result" => "positive", "test.name" => "b", count: 1}
+        {"patient.gender"=>"female", "test.assays.qualitative_result" => "negative", "test.name" => "a", "count" => 1},
+        {"patient.gender"=>"female", "test.assays.qualitative_result" => "negative", "test.name" => "b", "count" => 2},
+        {"patient.gender"=>"male", "test.assays.qualitative_result" => "negative", "test.name" => "a", "count" => 1},
+        {"patient.gender"=>"male", "test.assays.qualitative_result" => "positive", "test.name" => "a", "count" => 1},
+        {"patient.gender"=>"male", "test.assays.qualitative_result" => "positive", "test.name" => "b", "count" => 1}
       ])
     end
 
@@ -355,16 +355,16 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :negative], name: "b"}, patient: {gender: :female}
       index test: {assays:[qualitative_result: :negative], name: "b"}, patient: {gender: :female}
 
-      response = query_tests(group_by: "test.assays.qualitative_result,patient.gender,test.name").sort_by do |test|
+      response = query_tests("group_by" => "test.assays.qualitative_result,patient.gender,test.name").sort_by do |test|
         test["patient.gender"] + test["test.assays.qualitative_result"] + test["test.name"]
       end
 
       expect(response).to eq([
-        {"patient.gender"=>"female", "test.assays.qualitative_result" => "negative", "test.name" => "a", count: 1},
-        {"patient.gender"=>"female", "test.assays.qualitative_result" => "negative", "test.name" => "b", count: 2},
-        {"patient.gender"=>"male", "test.assays.qualitative_result" => "negative", "test.name" => "a", count: 1},
-        {"patient.gender"=>"male", "test.assays.qualitative_result" => "positive", "test.name" => "a", count: 1},
-        {"patient.gender"=>"male", "test.assays.qualitative_result" => "positive", "test.name" => "b", count: 1}
+        {"patient.gender"=>"female", "test.assays.qualitative_result" => "negative", "test.name" => "a", "count" => 1},
+        {"patient.gender"=>"female", "test.assays.qualitative_result" => "negative", "test.name" => "b", "count" => 2},
+        {"patient.gender"=>"male", "test.assays.qualitative_result" => "negative", "test.name" => "a", "count" => 1},
+        {"patient.gender"=>"male", "test.assays.qualitative_result" => "positive", "test.name" => "a", "count" => 1},
+        {"patient.gender"=>"male", "test.assays.qualitative_result" => "positive", "test.name" => "b", "count" => 1}
       ])
     end
 
@@ -374,13 +374,13 @@ describe Cdx::Api do
       index device: {lab_user: "mmajor"}
       index device: {lab_user: "mmajor"}
 
-      response = query_tests(group_by: "device.lab_user").sort_by do |test|
+      response = query_tests("group_by" => "device.lab_user").sort_by do |test|
         test["device.lab_user"]
       end
 
       expect(response).to eq([
-        {"device.lab_user"=>"jdoe", count:2},
-        {"device.lab_user"=>"mmajor", count:2},
+        {"device.lab_user"=>"jdoe", "count" => 2},
+        {"device.lab_user"=>"mmajor", "count" => 2},
       ])
     end
 
@@ -390,7 +390,7 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :positive], reported_time: time(2011, 1, 1)}
 
       expect {
-        query_tests(group_by: "foo(test.reported_time)")
+        query_tests("group_by" => "foo(test.reported_time)")
       }.to raise_error("Unsupported group")
     end
 
@@ -399,13 +399,13 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :positive], reported_time: time(2010, 1, 2)}
       index test: {assays:[qualitative_result: :positive], reported_time: time(2011, 1, 1)}
 
-      response = query_tests(group_by: "year(test.reported_time)").sort_by do |test|
+      response = query_tests("group_by" => "year(test.reported_time)").sort_by do |test|
         test["test.reported_time"]
       end
 
       expect(response).to eq([
-        {"test.reported_time"=>"2010", count: 2},
-        {"test.reported_time"=>"2011", count: 1}
+        {"test.reported_time"=>"2010", "count" => 2},
+        {"test.reported_time"=>"2011", "count" => 1}
       ])
     end
 
@@ -416,15 +416,15 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :positive], reported_time: time(2011, 1, 2)}
       index test: {assays:[qualitative_result: :positive], reported_time: time(2011, 2, 1)}
 
-      response = query_tests(group_by: "month(test.reported_time)").sort_by do |test|
+      response = query_tests("group_by" => "month(test.reported_time)").sort_by do |test|
         test["test.reported_time"]
       end
 
       expect(response).to eq([
-        {"test.reported_time"=>"2010-01", count: 1},
-        {"test.reported_time"=>"2010-02", count: 1},
-        {"test.reported_time"=>"2011-01", count: 2},
-        {"test.reported_time"=>"2011-02", count: 1}
+        {"test.reported_time"=>"2010-01", "count" => 1},
+        {"test.reported_time"=>"2010-02", "count" => 1},
+        {"test.reported_time"=>"2011-01", "count" => 2},
+        {"test.reported_time"=>"2011-02", "count" => 1}
       ])
     end
 
@@ -436,24 +436,24 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :positive], reported_time: time(2010, 1, 13)}
       index test: {assays:[qualitative_result: :positive], reported_time: time(2010, 6, 13)}
 
-      response = query_tests(group_by: "week(test.reported_time)").sort_by do |test|
+      response = query_tests("group_by" => "week(test.reported_time)").sort_by do |test|
         test["test.reported_time"]
       end
 
       expect(response).to eq([
-        {"test.reported_time"=>"2010-W01", count: 3},
-        {"test.reported_time"=>"2010-W02", count: 2},
-        {"test.reported_time"=>"2010-W23", count: 1},
+        {"test.reported_time"=>"2010-W01", "count" => 3},
+        {"test.reported_time"=>"2010-W02", "count" => 2},
+        {"test.reported_time"=>"2010-W23", "count" => 1},
       ])
     end
 
     it "groups by week(date) and uses weekyear" do
       index test: {reported_time: time(2012, 12, 31)}
 
-      response = query_tests(group_by: "week(test.reported_time)")
+      response = query_tests("group_by" => "week(test.reported_time)")
 
       expect(response).to eq([
-        {"test.reported_time"=>"2013-W01", count: 1},
+        {"test.reported_time"=>"2013-W01", "count" => 1},
       ])
     end
 
@@ -463,13 +463,13 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :positive], reported_time: time(2010, 1, 4)}
       index test: {assays:[qualitative_result: :positive], reported_time: time(2010, 1, 5)}
 
-      response = query_tests(group_by: "day(test.reported_time)").sort_by do |test|
+      response = query_tests("group_by" => "day(test.reported_time)").sort_by do |test|
         test["test.reported_time"]
       end
 
       expect(response).to eq([
-        {"test.reported_time"=>"2010-01-04", count: 3},
-        {"test.reported_time"=>"2010-01-05", count: 1}
+        {"test.reported_time"=>"2010-01-04", "count" => 3},
+        {"test.reported_time"=>"2010-01-05", "count" => 1}
       ])
     end
 
@@ -479,14 +479,14 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :negative], reported_time: time(2010, 1, 4)}
       index test: {assays:[qualitative_result: :positive], reported_time: time(2010, 1, 5)}
 
-      response = query_tests(group_by: "day(test.reported_time),test.assays.qualitative_result").sort_by do |test|
+      response = query_tests("group_by" => "day(test.reported_time),test.assays.qualitative_result").sort_by do |test|
         test["test.reported_time"] + test["test.assays.qualitative_result"]
       end
 
       expect(response).to eq([
-        {"test.reported_time"=>"2010-01-04", "test.assays.qualitative_result" => "negative", count: 1},
-        {"test.reported_time"=>"2010-01-04", "test.assays.qualitative_result" => "positive", count: 2},
-        {"test.reported_time"=>"2010-01-05", "test.assays.qualitative_result" => "positive", count: 1}
+        {"test.reported_time"=>"2010-01-04", "test.assays.qualitative_result" => "negative", "count" => 1},
+        {"test.reported_time"=>"2010-01-04", "test.assays.qualitative_result" => "positive", "count" => 2},
+        {"test.reported_time"=>"2010-01-05", "test.assays.qualitative_result" => "positive", "count" => 1}
       ])
     end
 
@@ -499,14 +499,14 @@ describe Cdx::Api do
       index test: {patient_age: 20}
       index test: {patient_age: 21}
 
-      response = query_tests(group_by: [{"test.patient_age" => [[nil, 10], [15, 120], [10, 15]]}]).sort_by do |test|
+      response = query_tests("group_by" => [{"test.patient_age" => [[nil, 10], [15, 120], [10, 15]]}]).sort_by do |test|
         test["test.patient_age"].compact
       end
 
       expect(response).to eq([
-        {"test.patient_age"=>[nil, 10], count: 1},
-        {"test.patient_age"=>[10, 15], count: 4},
-        {"test.patient_age"=>[15, 120], count: 2}
+        {"test.patient_age"=>[nil, 10], "count" => 1},
+        {"test.patient_age"=>[10, 15], "count" => 4},
+        {"test.patient_age"=>[15, 120], "count" => 2}
       ])
     end
 
@@ -519,15 +519,15 @@ describe Cdx::Api do
       index test: {patient_age: 20}
       index test: {patient_age: 21}
 
-      response = query_tests(group_by: [{"test.patient_age" => [{to: 10}, [10, 15], {from: 16, to: 21}, [21]]}]).sort_by do |test|
+      response = query_tests("group_by" => [{"test.patient_age" => [{to: 10}, [10, 15], {from: 16, to: 21}, [21]]}]).sort_by do |test|
         test["test.patient_age"].compact
       end
 
       expect(response).to eq([
-        {"test.patient_age"=>[nil, 10], count: 1},
-        {"test.patient_age"=>[10, 15], count: 4},
-        {"test.patient_age"=>[16, 21], count: 1},
-        {"test.patient_age"=>[21, nil], count: 1}
+        {"test.patient_age"=>[nil, 10], "count" => 1},
+        {"test.patient_age"=>[10, 15], "count" => 4},
+        {"test.patient_age"=>[16, 21], "count" => 1},
+        {"test.patient_age"=>[21, nil], "count" => 1}
       ])
     end
 
@@ -540,14 +540,14 @@ describe Cdx::Api do
       index test: {patient_age: 20}
       index test: {patient_age: 21}
 
-      response = query_tests(group_by: {"test.patient_age" => [[0, 10], [15, 120], [10, 15]]}).sort_by do |test|
+      response = query_tests("group_by" => {"test.patient_age" => [[0, 10], [15, 120], [10, 15]]}).sort_by do |test|
         test["test.patient_age"]
       end
 
       expect(response).to eq([
-        {"test.patient_age"=>[0, 10], count: 1},
-        {"test.patient_age"=>[10, 15], count: 4},
-        {"test.patient_age"=>[15, 120], count: 2}
+        {"test.patient_age"=>[0, 10], "count" => 1},
+        {"test.patient_age"=>[10, 15], "count" => 4},
+        {"test.patient_age"=>[15, 120], "count" => 2}
       ])
     end
 
@@ -557,13 +557,13 @@ describe Cdx::Api do
         {name: "Flu", qualitative_result: :negative},
       ]}
 
-      response = query_tests(group_by: "test.assays.qualitative_result").sort_by do |test|
+      response = query_tests("group_by" => "test.assays.qualitative_result").sort_by do |test|
         test["test.assays.qualitative_result"]
       end
 
       expect(response).to eq([
-        {"test.assays.qualitative_result"=>"negative", count: 1},
-        {"test.assays.qualitative_result"=>"positive", count: 1}
+        {"test.assays.qualitative_result"=>"negative", "count" => 1},
+        {"test.assays.qualitative_result"=>"positive", "count" => 1}
       ])
     end
 
@@ -573,13 +573,13 @@ describe Cdx::Api do
         {name: "Flu", qualitative_result: :negative},
       ]}
 
-      response = query_tests(group_by: "test.assays.qualitative_result,test.assays.name").sort_by do |test|
+      response = query_tests("group_by" => "test.assays.qualitative_result,test.assays.name").sort_by do |test|
         test["test.assays.qualitative_result"] + test["test.assays.name"]
       end
 
       expect(response).to eq([
-        {"test.assays.qualitative_result"=>"negative", "test.assays.name" => "Flu", count: 1},
-        {"test.assays.qualitative_result"=>"positive", "test.assays.name" => "MTB", count: 1}
+        {"test.assays.qualitative_result"=>"negative", "test.assays.name" => "Flu", "count" => 1},
+        {"test.assays.qualitative_result"=>"positive", "test.assays.name" => "MTB", "count" => 1}
       ])
     end
 
@@ -589,13 +589,13 @@ describe Cdx::Api do
       index test: {error_code: 2}
       index test: {error_code: 2}
 
-      response = query_tests(group_by: "test.error_code").sort_by do |test|
+      response = query_tests("group_by" => "test.error_code").sort_by do |test|
         test["test.error_code"]
       end
 
       expect(response).to eq([
-        {"test.error_code" => 1, count: 1},
-        {"test.error_code" => 2, count: 3}
+        {"test.error_code" => 1, "count" => 1},
+        {"test.error_code" => 2, "count" => 3}
       ])
     end
 
@@ -603,7 +603,7 @@ describe Cdx::Api do
       index test: {assays:[name: "MTB", qualitative_result: :positive]}
       index test: {assays:[name: "Flu", qualitative_result: :negative]}
 
-      assays = query('test.assays.qualitative_result' => 'foo', group_by: "test.assays.qualitative_result")
+      assays = query('test.assays.qualitative_result' => 'foo', "group_by" => "test.assays.qualitative_result")
 
       expect(assays["tests"].length).to eq(0)
       expect(assays["total_count"]).to eq(0)
@@ -624,8 +624,8 @@ describe Cdx::Api do
         end
 
         expect(response).to eq([
-          {"test.type"=>"qc", count: 2},
-          {"test.type"=>"specimen", count: 0}
+          {"test.type"=>"qc", "count" => 2},
+          {"test.type"=>"specimen", "count" => 0}
         ])
       end
     end
@@ -636,7 +636,7 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :positive], patient_age: 20}
       index test: {assays:[qualitative_result: :negative], patient_age: 10}
 
-      response = query_tests(order_by: 'test.patient_age')
+      response = query_tests("order_by" => 'test.patient_age')
 
       expect(response[0]["test"]["assays"].first["qualitative_result"]).to eq("negative")
       expect(response[0]["test"]["patient_age"]).to eq(10)
@@ -648,7 +648,7 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :positive], patient_age: 20}
       index test: {assays:[qualitative_result: :negative], patient_age: 10}
 
-      response = query_tests(order_by: "-test.patient_age")
+      response = query_tests("order_by" => "-test.patient_age")
 
       expect(response[0]["test"]["assays"].first["qualitative_result"]).to eq("positive")
       expect(response[0]["test"]["patient_age"]).to eq(20)
@@ -662,7 +662,7 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :negative], patient_age: 20}, patient: {gender: :female}
       index test: {assays:[qualitative_result: :negative], patient_age: 10}, patient: {gender: :female}
 
-      response = query_tests(order_by: "test.patient_age,patient.gender")
+      response = query_tests("order_by" => "test.patient_age,patient.gender")
 
       expect(response[0]["test"]["assays"].first["qualitative_result"]).to eq("negative")
       expect(response[0]["test"]["patient_age"]).to eq(10)
@@ -684,7 +684,7 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :negative], patient_age: 20}, patient: {gender: :female}
       index test: {assays:[qualitative_result: :negative], patient_age: 10}, patient: {gender: :female}
 
-      response = query_tests(order_by: "test.patient_age,-patient.gender")
+      response = query_tests("order_by" => "test.patient_age,-patient.gender")
 
       expect(response[0]["test"]["assays"].first["qualitative_result"]).to eq("positive")
       expect(response[0]["test"]["patient_age"]).to eq(10)
@@ -707,22 +707,22 @@ describe Cdx::Api do
       index test: {assays:[qualitative_result: :positive], reported_time: time(2011, 1, 2)}
       index test: {assays:[qualitative_result: :positive], reported_time: time(2011, 2, 1)}
 
-      response = query_tests(group_by: "month(test.reported_time)", order_by: "test.reported_time")
+      response = query_tests("group_by" => "month(test.reported_time)", "order_by" => "test.reported_time")
 
       expect(response).to eq([
-        {"test.reported_time"=>"2010-01", count: 1},
-        {"test.reported_time"=>"2010-02", count: 1},
-        {"test.reported_time"=>"2011-01", count: 2},
-        {"test.reported_time"=>"2011-02", count: 1}
+        {"test.reported_time"=>"2010-01", "count" => 1},
+        {"test.reported_time"=>"2010-02", "count" => 1},
+        {"test.reported_time"=>"2011-01", "count" => 2},
+        {"test.reported_time"=>"2011-02", "count" => 1}
       ])
 
-      response = query_tests(group_by: "month(test.reported_time)", order_by: "-test.reported_time")
+      response = query_tests("group_by" => "month(test.reported_time)", "order_by" => "-test.reported_time")
 
       expect(response).to eq([
-        {"test.reported_time"=>"2011-02", count: 1},
-        {"test.reported_time"=>"2011-01", count: 2},
-        {"test.reported_time"=>"2010-02", count: 1},
-        {"test.reported_time"=>"2010-01", count: 1}
+        {"test.reported_time"=>"2011-02", "count" => 1},
+        {"test.reported_time"=>"2011-01", "count" => 2},
+        {"test.reported_time"=>"2010-02", "count" => 1},
+        {"test.reported_time"=>"2010-01", "count" => 1}
       ])
     end
   end
@@ -759,16 +759,16 @@ describe Cdx::Api do
       index test: {assays: [qualitative_result: "positive"]}, location: {admin_levels: {admin_level_0: "1", admin_level_1: "2"}}
       index test: {assays: [qualitative_result: "positive with riff"]}, location: {admin_levels: {admin_level_0: "1", admin_level_1: "5"}}
 
-      response = query_tests(group_by: {'admin_level' => 1})
+      response = query_tests("group_by" => {'admin_level' => 1})
       expect(response).to eq([
-        {"location.admin_levels"=>"2", count: 2},
-        {"location.admin_levels"=>"5", count: 1}
+        {"location.admin_levels"=>"2", "count" => 2},
+        {"location.admin_levels"=>"5", "count" => 1}
       ])
 
-      response = query_tests(group_by: {'admin_level' => 0})
+      response = query_tests("group_by" => {'admin_level' => 0})
 
       expect(response).to eq([
-        {"location.admin_levels"=>"1", count: 3}
+        {"location.admin_levels"=>"1", "count" => 3}
       ])
     end
 
@@ -776,29 +776,29 @@ describe Cdx::Api do
       before(:all) do
         # add a new core field and regenerate the indexed fields with it.
         @extra_scope = Cdx::Scope.new('patient_location', [
-          {name: 'id'},
-          {name: 'parents', searchable: true},
-          {name: 'admin_levels', searchable: true, type: 'dynamic'},
-          {name: 'lat'},
-          {name: 'lng'}])
+          {"name" => 'id'},
+          {"name" => 'parents', "searchable" => true},
+          {"name" => 'admin_levels', "searchable" => true, "type" => 'dynamic'},
+          {"name" => 'lat'},
+          {"name" => 'lng'}])
 
         @extra_fields = @extra_scope.flatten.select(&:searchable?).map do |core_field|
           Cdx::Api::Elasticsearch::IndexedField.for(core_field, [
             {
-              name: 'patient_location.parents',
-              filter_parameter_definition: [{
-                name: 'patient_location.id',
+              "name" => 'patient_location.parents',
+              "filter_parameter_definition" => [{
+                "name" => 'patient_location.id',
                 type: 'match'
               }]
             },
             {
-              name: 'patient_location.admin_levels',
-              group_parameter_definition: [{
-                name: 'patient_location.admin_level',
-                type: 'location'
+              "name" => 'patient_location.admin_levels',
+              "group_parameter_definition" => [{
+                "name" => 'patient_location.admin_level',
+                "type" => 'location'
               }]
             }
-          ].map(&:with_indifferent_access))
+          ])
         end
 
         Cdx.core_field_scopes.push @extra_scope
@@ -843,8 +843,8 @@ describe Cdx::Api do
         index patient_location: {admin_levels: {admin_level_0: "1", admin_level_1: "2"}}
         index patient_location: {admin_levels: {admin_level_0: "3" }}
 
-        response = query_tests(group_by: { 'patient_location.admin_level' => 0 })
-        expect(response).to eq [{"patient_location.admin_levels" => "1", :count => 2}, {"patient_location.admin_levels" => "3", :count => 1}]
+        response = query_tests("group_by" => { 'patient_location.admin_level' => 0 })
+        expect(response).to eq [{"patient_location.admin_levels" => "1", "count" => 2}, {"patient_location.admin_levels" => "3", "count" => 1}]
       end
     end
   end
@@ -865,7 +865,7 @@ describe Cdx::Api do
       index test: {patient_age: 1}
       index test: {patient_age: 1}
 
-      assays = query('test.patient_age' => 1, page_size: 2)
+      assays = query('test.patient_age' => 1, "page_size" => 2)
       expect(assays["tests"].length).to eq(2)
       expect(assays["total_count"]).to eq(3)
     end
@@ -875,7 +875,7 @@ describe Cdx::Api do
       index test: {patient_age: 3}
       index test: {patient_age: 1}
 
-      assays = query(page_size: 1, offset: 1, order_by: 'test.patient_age')
+      assays = query("page_size" => 1, "offset" => 1, "order_by" => 'test.patient_age')
 
       tests = assays["tests"]
       expect(tests.length).to eq(1)
@@ -888,7 +888,7 @@ describe Cdx::Api do
       index test: {patient_age: 1}
       index test: {patient_age: 2}
 
-      assays = query(group_by: :'test.patient_age')
+      assays = query("group_by" => 'test.patient_age')
       expect(assays["total_count"]).to eq(3)
     end
   end

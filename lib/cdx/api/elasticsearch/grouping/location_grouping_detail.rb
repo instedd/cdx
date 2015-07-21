@@ -20,6 +20,6 @@ class LocationGroupingDetail < GroupingDetail
   end
 
   def yield_bucket(bucket)
-    { name => bucket[:key] }
+    { name => bucket["key"] }
   end
 end

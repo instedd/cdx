@@ -13,7 +13,7 @@ class DateGroupingDetail < GroupingDetail
   end
 
   def yield_bucket(bucket)
-    value = bucket[:key_as_string]
+    value = bucket["key_as_string"]
 
     # Pad week with a zero if it's less than ten
     if @interval == "week"

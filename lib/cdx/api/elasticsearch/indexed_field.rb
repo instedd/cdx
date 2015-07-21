@@ -6,7 +6,7 @@ class Cdx::Api::Elasticsearch::IndexedField
     definition = api_fields.detect do |definition|
       definition['name'] == core_field.scoped_name
     end
-    new(core_field, (definition.try(:with_indifferent_access) || {}), document_format)
+    new(core_field, (definition || {}), document_format)
   end
 
   def initialize core_field, definition, document_format, already_nested=false
@@ -51,12 +51,12 @@ private
     when 'date'
       default_date_filter_definition
     else
-      [{name: scoped_name, type: default_filter_type}]
+      [{"name" => scoped_name, "type" => default_filter_type}]
     end
   end
 
   def default_date_filter_definition_boundary(suffix, boundary)
-    {name: "#{scoped_name}_#{suffix}", type: 'range', boundary: boundary, options: { include_lower: true }}
+    {"name" => "#{scoped_name}_#{suffix}", "type" => 'range', "boundary" => boundary, "options" => { "include_lower" => true }}
   end
 
   def default_date_filter_definition
@@ -74,13 +74,13 @@ private
   def default_group_definition
     if type == 'date'
       [
-        {name: "year(#{scoped_name})", type: 'date', interval: 'year'},
-        {name: "month(#{scoped_name})", type: 'date', interval: 'month'},
-        {name: "week(#{scoped_name})", type: 'date', interval: 'week'},
-        {name: "day(#{scoped_name})", type: 'date', interval: 'day'}
+        {"name" => "year(#{scoped_name})", "type" => 'date', "interval" => 'year'},
+        {"name" => "month(#{scoped_name})", "type" => 'date', "interval" => 'month'},
+        {"name" => "week(#{scoped_name})", "type" => 'date', "interval" => 'week'},
+        {"name" => "day(#{scoped_name})", "type" => 'date', "interval" => 'day'}
       ]
     else
-      [{name: scoped_name, type: default_grouping_type}]
+      [{"name" => scoped_name, "type" => default_grouping_type}]
     end
   end
 
@@ -89,13 +89,13 @@ private
   end
 
   def initialize_filter_definitions(definition)
-    @filter_definitions = if definition[:filter_parameter_definition] == 'none'
+    @filter_definitions = if definition["filter_parameter_definition"] == 'none'
       Array.new
     else
-      if definition[:filter_parameter_definition]
-        definition[:filter_parameter_definition].each do |filter|
-          filter[:name] = scoped_name unless filter[:name]
-          filter[:type] = default_filter_type unless filter[:type]
+      if definition["filter_parameter_definition"]
+        definition["filter_parameter_definition"].each do |filter|
+          filter["name"] ||= scoped_name
+          filter["type"] ||= default_filter_type
         end
       else
         default_filter_definition
@@ -104,13 +104,13 @@ private
   end
 
   def initialize_group_definitions(definition)
-    @group_definitions = if definition[:group_parameter_definition] == 'none'
+    @group_definitions = if definition["group_parameter_definition"] == 'none'
       Array.new
     else
-      if definition[:group_parameter_definition]
-        definition[:group_parameter_definition].each do |group|
-          group[:name] = scoped_name unless group[:name]
-          group[:type] = default_grouping_type unless group[:type]
+      if definition["group_parameter_definition"]
+        definition["group_parameter_definition"].each do |group|
+          group["name"] ||= scoped_name
+          group["type"] ||= default_grouping_type
         end
       else
         default_group_definition

@@ -17,6 +17,6 @@ class FlatGroupingDetail < GroupingDetail
   end
 
   def yield_bucket(bucket)
-    {uri_param => bucket[:key]}
+    {uri_param => bucket["key"]}
   end
 end

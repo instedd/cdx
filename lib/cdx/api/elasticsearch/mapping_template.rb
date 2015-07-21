@@ -60,11 +60,11 @@ class Cdx::Api::Elasticsearch::MappingTemplate
       scoped_fields.map { |scope|
         [ scope.name, { "properties" => map_fields(scope.fields).merge(custom_fields_mapping) } ]
       }
-    ].with_indifferent_access
+    ]
   end
 
   def map_fields fields
-    Hash[fields.select(&:has_searchables?).map { |field| [field.name, map_field(field)] }].with_indifferent_access
+    Hash[fields.select(&:has_searchables?).map { |field| [field.name, map_field(field)] }]
   end
 
   def map_field field
@@ -98,8 +98,8 @@ class Cdx::Api::Elasticsearch::MappingTemplate
 
   def custom_fields_mapping
     {
-      custom_fields: {
-        type: 'object'
+      "custom_fields" => {
+        "type" => "object"
       }
     }
   end

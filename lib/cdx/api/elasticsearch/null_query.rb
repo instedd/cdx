@@ -8,6 +8,6 @@ class Cdx::Api::Elasticsearch::NullQuery
   end
 
   def grouped_by
-    @params[:group_by].split(',')
+    @params["group_by"].split(',')
   end
 end
