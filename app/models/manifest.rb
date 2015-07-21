@@ -16,12 +16,14 @@ class Manifest < ActiveRecord::Base
 
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
-  MESSAGE_TEMPLATE = {
-    "test" => {"indexed" => {}, "pii" => {}, "custom" => {}},
-    "sample" => {"indexed" => {}, "pii" => {}, "custom" => {}},
-    "device" => {"indexed" => {}, "pii" => {}, "custom" => {}},
-    "patient" => {"indexed" => {}, "pii"=> {}, "custom" => {}}
-  }.freeze
+  def self.new_message
+    {
+      "test" =>    {"indexed" => {}, "pii" => {}, "custom" => {}},
+      "sample" =>  {"indexed" => {}, "pii" => {}, "custom" => {}},
+      "device" =>  {"indexed" => {}, "pii" => {}, "custom" => {}},
+      "patient" => {"indexed" => {}, "pii" => {}, "custom" => {}}
+    }
+  end
 
   def reload
     @loaded_definition = nil
@@ -67,7 +69,7 @@ class Manifest < ActiveRecord::Base
     messages = []
     parser.load(data, data_root).each_with_index do |record, record_index|
       begin
-        message = MESSAGE_TEMPLATE.deep_dup
+        message = self.class.new_message
         fields_for(device).each do |field|
           field.apply_to record, message, device
         end
