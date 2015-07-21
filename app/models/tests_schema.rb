@@ -29,7 +29,10 @@ class TestsSchema
         scope_properties[field.name] = schemas_for(field)
       end
 
-      schema['properties'][scope.name] = scope_properties
+      schema['properties'][scope.name] = {
+        "type" => "object",
+        "properties" => scope_properties
+      }
     end
 
     # TODO dehardcode location service in location scope

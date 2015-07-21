@@ -41,28 +41,37 @@ describe TestsSchema do
     schema["type"].should eq("object")
     schema["title"].should eq("es-AR")
 
-    schema["properties"]["sample"]["uuid"].should eq({
-      title: 'Uuid',
-      type: 'string',
-      searchable: true
-    }.with_indifferent_access)
+    schema["properties"]["sample"].should eq({
+      "type" => "object",
+      "properties" => {
+        "uuid" => {
+          "title" => "Uuid",
+          "type" => "string",
+          "searchable" => true
+        },
+      }
+    })
 
-    schema["properties"]["patient"]["age"].should eq({
-      title: 'Age',
-      type: 'integer',
-      searchable: false
-    }.with_indifferent_access)
-
-    schema["properties"]["patient"]["gender"].should eq({
-      title: 'Gender',
-      type: 'string',
-      enum: ['male', 'female'],
-      values: {
-        male: {name: 'Male'},
-        female: {name: 'Female'}
-      },
-      searchable: false
-    }.with_indifferent_access)
+    schema["properties"]["patient"].should eq({
+      "type" => "object",
+      "properties" => {
+        "age" => {
+          "title" => "Age",
+          "type" => "integer",
+          "searchable" => false
+        },
+        "gender" => {
+          "title" => "Gender",
+          "type" => "string",
+          "enum" => ["male", "female"],
+          "values" => {
+            "male" => { "name" => "Male" },
+            "female" => { "name" => "Female" }
+          },
+          "searchable" => false
+        }
+      }
+    })
   end
 
   it "should add location service properties to location scope" do
