@@ -15,104 +15,105 @@ class ManifestFieldMapping
   def traverse node, data
     return nil if node.nil?
 
-    if node["lookup"].present?
-      return lookup(node["lookup"], data)
+    check_op(node, "lookup") do |value|
+      return lookup(value, data)
     end
 
-    if node["map"].present?
-      return map(traverse(node["map"][0], data), node["map"][1])
+    check_op(node, "map") do |value, cases|
+      return map(traverse(value, data), cases)
     end
 
-    if node["lowercase"].present?
-      return lowercase(traverse(node["lowercase"], data))
+    check_op(node, "lowercase") do |value|
+      return lowercase(traverse(value, data))
     end
 
-    if node["concat"].present?
-      return concat(node["concat"], data)
+    check_op(node, "concat") do |value|
+      return concat(value, data)
     end
 
-    if node["strip"].present?
-      return strip(traverse(node["strip"], data))
+    check_op(node, "strip") do |value|
+      return strip(traverse(value, data))
     end
 
-    if node["convert_time"].present?
-      return convert_time(traverse(node["convert_time"][0], data), traverse(node["convert_time"][1], data), traverse(node["convert_time"][2], data))
+    check_op(node, "convert_time") do |interval, source_unit, desired_unit|
+      return convert_time(traverse(interval, data), traverse(source_unit, data), traverse(desired_unit, data))
     end
 
-    if node["beginning_of"].present?
-      return beginning_of(traverse(node["beginning_of"][0], data), traverse(node["beginning_of"][1], data))
+    check_op(node, "beginning_of") do |date_time, time_unit|
+      return beginning_of(traverse(date_time, data), traverse(time_unit, data))
     end
 
     # TODO: Refactor this
-    if node["years_between"].present?
-     return years_between(traverse(node["years_between"][0], data), traverse(node["years_between"][1], data))
+    check_op(node, "years_between") do |first_date, second_date|
+     return years_between(traverse(first_date, data), traverse(second_date, data))
     end
 
-    if node["months_between"].present?
-     return months_between(traverse(node["months_between"][0], data), traverse(node["months_between"][1], data))
+    check_op(node, "months_between") do |first_date, second_date|
+     return months_between(traverse(first_date, data), traverse(second_date, data))
     end
 
-    if node["days_between"].present?
-     return days_between(traverse(node["days_between"][0], data), traverse(node["days_between"][1], data))
+    check_op(node, "days_between") do |first_date, second_date|
+     return days_between(traverse(first_date, data), traverse(second_date, data))
     end
 
-    if node["hours_between"].present?
-     return hours_between(traverse(node["hours_between"][0], data), traverse(node["hours_between"][1], data))
+    check_op(node, "hours_between") do |first_date, second_date|
+     return hours_between(traverse(first_date, data), traverse(second_date, data))
     end
 
-    if node["minutes_between"].present?
-     return minutes_between(traverse(node["minutes_between"][0], data), traverse(node["minutes_between"][1], data))
+    check_op(node, "minutes_between") do |first_date, second_date|
+     return minutes_between(traverse(first_date, data), traverse(second_date, data))
     end
 
-    if node["seconds_between"].present?
-     return seconds_between(traverse(node["seconds_between"][0], data), traverse(node["seconds_between"][1], data))
+    check_op(node, "seconds_between") do |first_date, second_date|
+     return seconds_between(traverse(first_date, data), traverse(second_date, data))
     end
 
-    if node["milliseconds_between"].present?
-     return milliseconds_between(traverse(node["milliseconds_between"][0], data), traverse(node["milliseconds_between"][1], data))
+    check_op(node, "milliseconds_between") do |first_date, second_date|
+     return milliseconds_between(traverse(first_date, data), traverse(second_date, data))
     end
 
-    if node["clusterise"].present?
-      return clusterise(traverse(node["clusterise"][0], data), node["clusterise"][1])
+    check_op(node, "clusterise") do |number, interval_stops|
+      return clusterise(traverse(number, data), interval_stops)
     end
 
-    if node["substring"].present?
-      return traverse(node["substring"][0], data)[node["substring"][1]..node["substring"][2]]
+    check_op(node, "substring") do |value, from, to|
+      return traverse(value, data)[from..to]
     end
 
-    if node["collect"].present?
-      collection_lookup, mapping = node["collect"].first, node["collect"].second
+    check_op(node, "collect") do |collection_lookup, mapping|
       return collect(traverse(collection_lookup, data), mapping)
     end
 
-    if node["parse_date"].present?
-      return parse_date(node, data)
+    check_op(node, "parse_date") do |date, format|
+      return parse_date(node, data, traverse(date, data), traverse(format, data))
     end
 
-    if node["hash"].present?
-      value = traverse(node["hash"], data)
+    check_op(node, "hash") do |value|
+      value = traverse(value, data)
       return unless value
       return MessageEncryption.hash value
     end
 
-    if node["if"].present?
-      condition = traverse(node["if"][0], data)
-      if condition
-        return traverse(node["if"][1], data)
-      else
-        return traverse(node["if"][2], data)
-      end
+    check_op(node, "if") do |cond, then_body, else_body|
+      condition = traverse(then_body, data)
+      return traverse(condition ? then_body : else_body, data)
     end
 
-    if node["equals"].present?
-      return traverse(node["equals"][0], data) == traverse(node["equals"][1], data)
+    check_op(node, "equals") do |left, right|
+      return traverse(left, data) == traverse(right, data)
     end
 
-    if node["script"].present?
-      return run_script(node["script"], data)
+    check_op(node, "script") do |script|
+      return run_script(script, data)
     end
 
     node.to_s
+  end
+
+  def check_op(node, name)
+    if value = node[name].presence
+      yield value
+    end
   end
 
   def run_script(script, data)
@@ -168,9 +169,7 @@ class ManifestFieldMapping
     end
   end
 
-  def parse_date(node, data)
-    format = traverse(node["parse_date"][1], data)
-    date = traverse(node["parse_date"][0], data)
+  def parse_date(node, data, date, format)
     parsed_date = DateTime.strptime(date, format)
     if !format.match(/%[zZ]/) && @device.try(:time_zone)
       parsed_date = ActiveSupport::TimeZone[@device.time_zone].local(parsed_date.year, parsed_date.month, parsed_date.day, parsed_date.hour, parsed_date.minute, parsed_date.second)
