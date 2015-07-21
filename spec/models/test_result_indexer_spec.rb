@@ -4,40 +4,40 @@ describe TestResultIndexer, elasticsearch: true do
 
   let(:sample) do
     sample_indexed_fields = {
-      sample: {
-        type: "sputum",
-        custom_fields: {
-          culture_days: "10"
+      "sample" => {
+        "type" => "sputum",
+        "custom_fields" => {
+          "culture_days" => "10"
         }
       },
-      patient: {
-        gender: "male",
-        custom_fields: {
-          hiv: "positive"
+      "patient" => {
+        "gender" => "male",
+        "custom_fields" => {
+          "hiv" => "positive"
         }
       }
     }
-    Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields.with_indifferent_access)
+    Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields)
   end
 
   let(:test){ TestResult.make(
-    sample: sample,
-    test_id: '4',
-    indexed_fields: {
-      test: {
-        id: "4",
-        name: "mtb",
-        custom_fields: {
-          concentration: "15%"
+    "sample" => sample,
+    "test_id" => '4',
+    "indexed_fields" => {
+      "test" => {
+        "id" => "4",
+        "name" => "mtb",
+        "custom_fields" => {
+          "concentration" => "15%"
         },
-        assays: [
+        "assays" => [
           {
-            qualitative_result: "positive",
-            name: "mtb"
+            "qualitative_result" => "positive",
+            "name" => "mtb"
           }
         ]
       }
-    }.with_indifferent_access
+    }
   )}
 
   let(:test_indexer) { TestResultIndexer.new(test)}
@@ -51,55 +51,55 @@ describe TestResultIndexer, elasticsearch: true do
       index: test.device.institution.elasticsearch_index_name,
       type: "test",
       body: {
-        test: {
-          id: "4",
-          name: "mtb",
-          custom_fields: {
-            concentration: "15%",
+        "test" => {
+          "id" => "4",
+          "name" => "mtb",
+          "custom_fields" => {
+            "concentration" => "15%",
           },
-          assays: [
+          "assays" => [
             {
-              qualitative_result: "positive",
-              name: "mtb"
+              "qualitative_result" => "positive",
+              "name" => "mtb"
             }
           ],
-          reported_time: test.created_at.utc.iso8601,
-          updated_time: test.updated_at.utc.iso8601,
-          uuid: test.uuid
+          "reported_time" => test.created_at.utc.iso8601,
+          "updated_time" => test.updated_at.utc.iso8601,
+          "uuid" => test.uuid
         },
-        sample: {
-          type: "sputum",
-          uuid: 'abc',
-          custom_fields: {
-            culture_days: "10",
+        "sample" => {
+          "type" => "sputum",
+          "uuid" => 'abc',
+          "custom_fields" => {
+            "culture_days" => "10",
           }
         },
-        patient: {
-          gender: "male",
-          custom_fields: {
-            hiv: "positive"
+        "patient" => {
+          "gender" => "male",
+          "custom_fields" => {
+            "hiv" => "positive"
           }
         },
-        location: {
-          id: location.geo_id,
-          parents: [location.geo_id],
-          admin_levels: {"admin_level_0"=>location.geo_id},
-          lat: location.lat,
-          lng: location.lng
+        "location" => {
+          "id" => location.geo_id,
+          "parents" => [location.geo_id],
+          "admin_levels" => {"admin_level_0"=>location.geo_id},
+          "lat" => location.lat,
+          "lng" => location.lng
         },
-        device: {
-          uuid: test.device.uuid,
-          name: test.device.name
+        "device" => {
+          "uuid" => test.device.uuid,
+          "name" => test.device.name
         },
-        laboratory: {
-          id: test.device.laboratories.first.id,
-          name: test.device.laboratories.first.name
+        "laboratory" => {
+          "id" => test.device.laboratories.first.id,
+          "name" => test.device.laboratories.first.name
         },
-        institution: {
-          id: test.device.institution.id,
-          name: test.device.institution.name
+        "institution" => {
+          "id" => test.device.institution.id,
+          "name" => test.device.institution.name
         }
-      }.recursive_stringify_keys!,
+      },
       id: "#{test.device.uuid}_4")
 
     test_indexer.index

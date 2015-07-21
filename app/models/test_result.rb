@@ -4,8 +4,8 @@ class TestResult < ActiveRecord::Base
   has_one :institution, through: :device
   belongs_to :sample
   belongs_to :patient
-  serialize :custom_fields, HashWithIndifferentAccess
-  serialize :indexed_fields, HashWithIndifferentAccess
+  serialize :custom_fields, Hash
+  serialize :indexed_fields, Hash
   validates_presence_of :device
   validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
   validate :same_patient_in_sample
@@ -50,31 +50,31 @@ class TestResult < ActiveRecord::Base
       sample.patient_id = self.patient_id
     end
 
-    sample.plain_sensitive_data[:sample].reverse_deep_merge!(self.plain_sensitive_data[:sample] || {})
-    sample.custom_fields[:sample].reverse_deep_merge!(self.custom_fields[:sample] || {})
-    sample.indexed_fields[:sample].reverse_deep_merge!(self.indexed_fields[:sample] || {})
+    sample.plain_sensitive_data["sample"].reverse_deep_merge!(self.plain_sensitive_data["sample"] || {})
+    sample.custom_fields["sample"].reverse_deep_merge!(self.custom_fields["sample"] || {})
+    sample.indexed_fields["sample"].reverse_deep_merge!(self.indexed_fields["sample"] || {})
 
-    if self.plain_sensitive_data[:patient].present?
-      sample.plain_sensitive_data[:patient] ||= {}
-      sample.plain_sensitive_data[:patient].reverse_deep_merge! self.plain_sensitive_data[:patient]
+    if self.plain_sensitive_data["patient"].present?
+      sample.plain_sensitive_data["patient"] ||= {}
+      sample.plain_sensitive_data["patient"].reverse_deep_merge! self.plain_sensitive_data["patient"]
     end
 
-    if self.custom_fields[:patient].present?
-      sample.custom_fields[:patient] ||= {}
-      sample.custom_fields[:patient].reverse_deep_merge! self.custom_fields[:patient]
+    if self.custom_fields["patient"].present?
+      sample.custom_fields["patient"] ||= {}
+      sample.custom_fields["patient"].reverse_deep_merge! self.custom_fields["patient"]
     end
 
-    if self.indexed_fields[:patient].present?
-      sample.indexed_fields[:patient] ||= {}
-      sample.indexed_fields[:patient].reverse_deep_merge! self.indexed_fields[:patient]
+    if self.indexed_fields["patient"].present?
+      sample.indexed_fields["patient"] ||= {}
+      sample.indexed_fields["patient"].reverse_deep_merge! self.indexed_fields["patient"]
     end
 
-    self.plain_sensitive_data.delete(:sample)
-    self.custom_fields.delete(:sample)
-    self.indexed_fields.delete(:sample)
-    self.plain_sensitive_data.delete(:patient)
-    self.custom_fields.delete(:patient)
-    self.indexed_fields.delete(:patient)
+    self.plain_sensitive_data.delete("sample")
+    self.custom_fields.delete("sample")
+    self.indexed_fields.delete("sample")
+    self.plain_sensitive_data.delete("patient")
+    self.custom_fields.delete("patient")
+    self.indexed_fields.delete("patient")
   end
 
   def add_patient_data(patient)
@@ -100,13 +100,13 @@ class TestResult < ActiveRecord::Base
     if self.sample.present?
       self.sample.extract_patient_data_into(patient)
     else
-      patient.plain_sensitive_data[:patient].reverse_deep_merge!(self.plain_sensitive_data[:patient] || {})
-      patient.custom_fields[:patient].reverse_deep_merge!(self.custom_fields[:patient] || {})
-      patient.indexed_fields[:patient].reverse_deep_merge!(self.indexed_fields[:patient] || {})
+      patient.plain_sensitive_data["patient"].reverse_deep_merge!(self.plain_sensitive_data["patient"] || {})
+      patient.custom_fields["patient"].reverse_deep_merge!(self.custom_fields["patient"] || {})
+      patient.indexed_fields["patient"].reverse_deep_merge!(self.indexed_fields["patient"] || {})
 
-      self.plain_sensitive_data.delete(:patient)
-      self.custom_fields.delete(:patient)
-      self.indexed_fields.delete(:patient)
+      self.plain_sensitive_data.delete("patient")
+      self.custom_fields.delete("patient")
+      self.indexed_fields.delete("patient")
     end
   end
 
@@ -123,7 +123,7 @@ class TestResult < ActiveRecord::Base
   end
 
   def plain_sensitive_data
-    @plain_sensitive_data ||= (Oj.load(MessageEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
+    @plain_sensitive_data ||= Oj.load(MessageEncryption.decrypt(self.sensitive_data)) || {}
   end
 
   def pii_data

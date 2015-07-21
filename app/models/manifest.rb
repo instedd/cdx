@@ -17,10 +17,10 @@ class Manifest < ActiveRecord::Base
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
   MESSAGE_TEMPLATE = {
-    "test" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
-    "sample" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
-    "device" => {"indexed" => Hash.new, "pii" => Hash.new, "custom" => Hash.new},
-    "patient" => {"indexed" => Hash.new, "pii"=> Hash.new, "custom" => Hash.new}
+    "test" => {"indexed" => {}, "pii" => {}, "custom" => {}},
+    "sample" => {"indexed" => {}, "pii" => {}, "custom" => {}},
+    "device" => {"indexed" => {}, "pii" => {}, "custom" => {}},
+    "patient" => {"indexed" => {}, "pii"=> {}, "custom" => {}}
   }.freeze
 
   def reload
@@ -53,11 +53,11 @@ class Manifest < ActiveRecord::Base
   end
 
   def field_mapping
-    loaded_definition.with_indifferent_access["field_mapping"]
+    loaded_definition["field_mapping"]
   end
 
   def custom_fields
-    (loaded_definition['custom_fields'] || []).map(&:with_indifferent_access)
+    (loaded_definition['custom_fields'] || [])
   end
 
   def apply_to(data, device)

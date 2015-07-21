@@ -26,7 +26,7 @@ describe Manifest, validate_manifest: false do
           "first_name" : "John",
           "last_name" : "Doe"
         }',
-        patient: {indexed: {}, pii: {"name" => "Doe, John"}, custom: {}}
+        "patient" => {"indexed" => {}, "pii" => {"name" => "Doe, John"}, "custom" => {}}
     end
 
     it "strips spaces from an element" do
@@ -51,7 +51,7 @@ describe Manifest, validate_manifest: false do
           "first_name" : "John",
           "last_name" : "   Doe   "
         }',
-        patient: {custom: {"name" => "Doe, John"}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"name" => "Doe, John"}, "pii" => {}, "indexed" => {}}
     end
 
     it "converts to lowercase" do
@@ -69,7 +69,7 @@ describe Manifest, validate_manifest: false do
         ]
       },
       %({"last_name" : "Doe"}),
-      patient: {custom: {"name" => "doe"}, pii: {}, indexed: {}}
+      "patient" => {"custom" => {"name" => "doe"}, "pii" => {}, "indexed" => {}}
     end
 
     it "runs javascript" do
@@ -86,7 +86,7 @@ describe Manifest, validate_manifest: false do
           }
         ]
       ), %({"first_name": "John", "last_name": "Doe"}),
-      patient: {custom: {"name" => "John Doe"}, pii: {}, indexed: {}}
+      "patient" => {"custom" => {"name" => "John Doe"}, "pii" => {}, "indexed" => {}}
     end
 
     it "has access to device from script" do
@@ -102,7 +102,7 @@ describe Manifest, validate_manifest: false do
           }
         ]
       ), %({}),
-      {sample: {custom: {"fields" => "#{device.name},#{device.uuid}"}, pii: {}, indexed: {}}}, device
+      {"sample" => {"custom" => {"fields" => "#{device.name},#{device.uuid}"}, "pii" => {}, "indexed" => {}}}, device
     end
 
     it "has access to laboratory from script" do
@@ -120,7 +120,7 @@ describe Manifest, validate_manifest: false do
           }
         ]
       ), %({}),
-      {sample: {custom: {"fields" => "#{lab.name},#{lab.address},#{lab.city},#{lab.state},#{lab.zip_code},#{lab.country},#{lab.region},#{lab.lat.to_i},#{lab.lng.to_i},#{lab.location_geoid}"}, pii: {}, indexed: {}}}, device
+      {"sample" => {"custom" => {"fields" => "#{lab.name},#{lab.address},#{lab.city},#{lab.state},#{lab.zip_code},#{lab.country},#{lab.region},#{lab.lat.to_i},#{lab.lng.to_i},#{lab.location_geoid}"}, "pii" => {}, "indexed" => {}}}, device
     end
 
     it "has access to location from script" do
@@ -138,7 +138,7 @@ describe Manifest, validate_manifest: false do
           }
         ]
       ), %({}),
-      {sample: {custom: {"fields" => "#{loc.name},#{loc.lat.to_i},#{loc.lng.to_i}"}, pii: {}, indexed: {}}}, device
+      {"sample" => {"custom" => {"fields" => "#{loc.name},#{loc.lat.to_i},#{loc.lng.to_i}"}, "pii" => {}, "indexed" => {}}}, device
     end
 
     it "loads xml in javascript" do
@@ -155,7 +155,7 @@ describe Manifest, validate_manifest: false do
           <Patient name="Socrates" age="27"/>
         </Message>
       )},
-      patient: {custom: {"name" => "Socrates"}, pii: {}, indexed: {}}
+      "patient" => {"custom" => {"name" => "Socrates"}, "pii" => {}, "indexed" => {}}
     end
 
     it "maps an array from javascript" do
@@ -172,7 +172,7 @@ describe Manifest, validate_manifest: false do
           }
         ]
       ), %({"first_name": "John", "last_name": "Doe"}),
-      patient: {custom: {"name" => ["John", "Doe"]}, pii: {}, indexed: {}}
+      "patient" => {"custom" => {"name" => ["John", "Doe"]}, "pii" => {}, "indexed" => {}}
     end
 
     it "maps an array from javascript" do
@@ -220,7 +220,7 @@ describe Manifest, validate_manifest: false do
           "test_type" : "This is a QC test",
           "last_name" : "   Doe   "
         }',
-        test: {custom: {"foo" => "Doe: qc"}, pii: {}, indexed: {}}
+        "test" => {"custom" => {"foo" => "Doe: qc"}, "pii" => {}, "indexed" => {}}
     end
 
     it "maps the result of a concat" do
@@ -251,7 +251,7 @@ describe Manifest, validate_manifest: false do
           "first_name" : " John ",
           "last_name" : "   Doe   "
         }',
-        test: {custom: {"test_type" => "qc"}, pii: {}, indexed: {}}
+        "test" => {"custom" => {"test_type" => "qc"}, "pii" => {}, "indexed" => {}}
     end
 
     it "retrieves a substring of an element" do
@@ -273,7 +273,7 @@ describe Manifest, validate_manifest: false do
         '{
           "name_and_test" : "ABC John Doe"
         }',
-        test: {custom: {"test" => "ABC", "first_name" => "John"}, pii: {}, indexed: {}}
+        "test" => {"custom" => {"test" => "ABC", "first_name" => "John"}, "pii" => {}, "indexed" => {}}
     end
 
     it "obtains the beginning of the month" do
@@ -292,7 +292,7 @@ describe Manifest, validate_manifest: false do
         '{
           "run_at" : "2014-05-14T15:22:11+0000"
         }',
-        test: {custom: {"month" => "2014-05-01T00:00:00+0000"}, pii: {}, indexed: {}}
+        "test" => {"custom" => {"month" => "2014-05-01T00:00:00+0000"}, "pii" => {}, "indexed" => {}}
     end
 
     it "parses a strange date" do
@@ -311,7 +311,7 @@ describe Manifest, validate_manifest: false do
         '{
           "run_at" : "sat3feb014pm+7"
         }',
-        test: {custom: {"month" => "2001-02-03T16:00:00+0700"}, pii: {}, indexed: {}}
+        "test" => {"custom" => {"month" => "2001-02-03T16:00:00+0700"}, "pii" => {}, "indexed" => {}}
     end
 
     it "parses a date without timezone using the device timezone" do
@@ -330,7 +330,7 @@ describe Manifest, validate_manifest: false do
         '{
           "run_at" : "sat13feb014pm"
         }',
-        {test: {custom: {"month" => "2001-02-13T20:00:00+0000"}, pii: {}, indexed: {}}},
+        {"test" => {"custom" => {"month" => "2001-02-13T20:00:00+0000"}, "pii" => {}, "indexed" => {}}},
         Device.make(time_zone: 'Atlantic Time (Canada)')
     end
 
@@ -351,7 +351,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {custom: {"age" => 1}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"age" => 1}, "pii" => {}, "indexed" => {}}
     end
 
     it "obtains the distance in months between two dates" do
@@ -371,7 +371,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {custom: {"age" => 13}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"age" => 13}, "pii" => {}, "indexed" => {}}
     end
 
     it "obtains the distance in days between two dates" do
@@ -391,7 +391,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {custom: {"age" => 396}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"age" => 396}, "pii" => {}, "indexed" => {}}
     end
 
     it "obtains the distance in hours between two dates" do
@@ -411,7 +411,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {custom: {"age" => 9526}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"age" => 9526}, "pii" => {}, "indexed" => {}}
         # 396 days and 22 hours
     end
 
@@ -432,7 +432,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {custom: {"age" => 571618}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"age" => 571618}, "pii" => {}, "indexed" => {}}
     end
 
     it "obtains the distance in seconds between two dates" do
@@ -452,7 +452,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {custom: {"age" => 34297139}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"age" => 34297139}, "pii" => {}, "indexed" => {}}
     end
 
     it "obtains the distance in milliseconds between two dates" do
@@ -472,7 +472,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {custom: {"age" => 34297139000}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"age" => 34297139000}, "pii" => {}, "indexed" => {}}
     end
 
     it "obtains the distance in milliseconds between two dates disregarding the order" do
@@ -492,7 +492,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "2014-05-14T15:22:11+0000",
           "birth_day" : "2013-04-12T16:23:11.123+0000"
         }',
-        patient: {custom: {"age" => 34297139000}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"age" => 34297139000}, "pii" => {}, "indexed" => {}}
     end
 
     it "converts from minutes to hours" do
@@ -513,7 +513,7 @@ describe Manifest, validate_manifest: false do
           "age" : "90",
           "unit" : "minutes"
         }',
-        patient: {custom: {"age" => 1.5}, pii: {}, indexed: {}}
+        "patient" => {"custom" => {"age" => 1.5}, "pii" => {}, "indexed" => {}}
     end
 
     it "clusterises a number" do
@@ -532,17 +532,17 @@ describe Manifest, validate_manifest: false do
         [{"name": "patient.age"}]
       }
 
-      assert_manifest_application field_definition, custom_definition, '{ "age" : "30" }', patient: {custom: {"age" => "20-40"}, pii: {}, indexed: {}}
+      assert_manifest_application field_definition, custom_definition, '{ "age" : "30" }', "patient" => {"custom" => {"age" => "20-40"}, "pii" => {}, "indexed" => {}}
 
-      assert_manifest_application field_definition, custom_definition,'{ "age" : "90" }', patient: {custom: {"age" => "40+"}, pii: {}, indexed: {}}
+      assert_manifest_application field_definition, custom_definition,'{ "age" : "90" }', "patient" => {"custom" => {"age" => "40+"}, "pii" => {}, "indexed" => {}}
 
-      assert_manifest_application field_definition, custom_definition,'{ "age" : "2" }', patient: {custom: {"age" => "<5"}, pii: {}, indexed: {}}
+      assert_manifest_application field_definition, custom_definition,'{ "age" : "2" }', "patient" => {"custom" => {"age" => "<5"}, "pii" => {}, "indexed" => {}}
 
-      assert_manifest_application field_definition, custom_definition,'{ "age" : "20.1" }', patient: {custom: {"age" => "20-40"}, pii: {}, indexed: {}}
+      assert_manifest_application field_definition, custom_definition,'{ "age" : "20.1" }', "patient" => {"custom" => {"age" => "20-40"}, "pii" => {}, "indexed" => {}}
 
-      assert_manifest_application field_definition, custom_definition,'{ "age" : "20" }', patient: {custom: {"age" => "5-20"}, pii: {}, indexed: {}}
+      assert_manifest_application field_definition, custom_definition,'{ "age" : "20" }', "patient" => {"custom" => {"age" => "5-20"}, "pii" => {}, "indexed" => {}}
 
-      assert_manifest_application field_definition, custom_definition,'{ "age" : "40" }', patient: {custom: {"age" => "20-40"}, pii: {}, indexed: {}}
+      assert_manifest_application field_definition, custom_definition,'{ "age" : "40" }', "patient" => {"custom" => {"age" => "20-40"}, "pii" => {}, "indexed" => {}}
     end
 
     describe "Multiple fields" do
@@ -556,10 +556,10 @@ describe Manifest, validate_manifest: false do
           '{
             "temperature" : 20
           }',
-          test: {custom: {"collection" => [
+          "test" => {"custom" => {"collection" => [
             {
               "temperature" => 20
-            }]}, pii: {}, indexed: {}}
+            }]}, "pii" => {}, "indexed" => {}}
       end
 
       it "concats two or more elements" do
@@ -588,7 +588,7 @@ describe Manifest, validate_manifest: false do
                 }
               ]
             }',
-            patient: {custom: {"results" => [{"name" => "Doe, foo"}, {"name" => "Doe, bar"}]}, pii: {}, indexed: {}}
+            "patient" => {"custom" => {"results" => [{"name" => "Doe, foo"}, {"name" => "Doe, bar"}]}, "pii" => {}, "indexed" => {}}
           }.to raise_error("Can't concat array values - use collect instead")
       end
 
@@ -612,7 +612,7 @@ describe Manifest, validate_manifest: false do
               }
             ]
           }',
-          patient: {custom: {"results" => [{"name" => "foo"}, {"name" => "bar"}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"name" => "foo"}, {"name" => "bar"}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should apply value mapping to multiple indexed field" do
@@ -633,7 +633,7 @@ describe Manifest, validate_manifest: false do
             [{"name": "test.results[*].condition"}]
           },
           '{"conditions" : [{"condition" : "PATIENT HAS MTB CONDITION"}, {"condition" : "PATIENT HAS FLU CONDITION"}]}',
-          test: {custom: {"results" => [{"condition" => "MTB"}, {"condition" => "H1N1"}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"condition" => "MTB"}, {"condition" => "H1N1"}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "retrieves a substring of an element" do
@@ -655,7 +655,7 @@ describe Manifest, validate_manifest: false do
           '{
             "name_and_test" : "ABC John Doe"
           }',
-          test: {custom: {"test" => "ABC", "first_name" => "John"}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"test" => "ABC", "first_name" => "John"}, "pii" => {}, "indexed" => {}}
       end
 
       it "obtains the beginning of the month" do
@@ -674,7 +674,7 @@ describe Manifest, validate_manifest: false do
           '{
             "run_at" : "2014-05-14T15:22:11+0000"
           }',
-          test: {custom: {"month" => "2014-05-01T00:00:00+0000"}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"month" => "2014-05-01T00:00:00+0000"}, "pii" => {}, "indexed" => {}}
       end
 
       it "parses an strange date" do
@@ -693,7 +693,7 @@ describe Manifest, validate_manifest: false do
           '{
             "run_at" : "sat3feb014pm+7"
           }',
-          test: {custom: {"month" => "2001-02-03T16:00:00+0700"}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"month" => "2001-02-03T16:00:00+0700"}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count years between multiple indexed fields" do
@@ -720,7 +720,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          test: {custom: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"age" => 1}, {"age" => 1}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count years between multiple indexed fields on the second parameter" do
@@ -747,7 +747,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 1}, {"age" => 1}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 1}, {"age" => 1}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count years between multiple indexed fields on both parameters" do
@@ -780,7 +780,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          test: {custom: {"results" => [{"time" => 1}, {"time" => 1}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"time" => 1}, {"time" => 1}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count months between multiple indexed fields" do
@@ -807,7 +807,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 13}, {"age" => 13}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 13}, {"age" => 13}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count months between multiple indexed fields on the second parameter" do
@@ -834,7 +834,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 13}, {"age" => 13}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 13}, {"age" => 13}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count months between multiple indexed fields on both parameters" do
@@ -867,7 +867,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          test: {custom: {"results" => [{"time" => 13}, {"time" => 13}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"time" => 13}, {"time" => 13}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count days between multiple indexed fields" do
@@ -894,7 +894,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 396}, {"age" => 397}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count days between multiple indexed fields on the second parameter" do
@@ -924,7 +924,7 @@ describe Manifest, validate_manifest: false do
               ]
             }'
           },
-          patient: {custom: {"results" => [{"age" => 396}, {"age" => 397}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 396}, {"age" => 397}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count days between multiple indexed fields on both parameters" do
@@ -957,7 +957,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-11T16:23:11.123+0000"
               }
             ]}',
-          test: {custom: {"results" => [{"time" => 396}, {"time" => 398}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"time" => 396}, {"time" => 398}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count hours between multiple indexed fields" do
@@ -984,7 +984,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 9526}, {"age" => 9550}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 9526}, {"age" => 9550}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count hours between multiple indexed fields on the second parameter" do
@@ -1011,7 +1011,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 9526}, {"age" => 9550}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 9526}, {"age" => 9550}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count hours between multiple indexed fields on both parameters" do
@@ -1044,7 +1044,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          test: {custom: {"results" => [{"time" => 9526}, {"time" => 9526}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"time" => 9526}, {"time" => 9526}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count minutes between multiple indexed fields" do
@@ -1071,7 +1071,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 571618}, {"age" => 573058}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 571618}, {"age" => 573058}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count minutes between multiple indexed fields on the second parameter" do
@@ -1098,7 +1098,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 571618}, {"age" => 573058}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 571618}, {"age" => 573058}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count minutes between multiple indexed fields on both parameters" do
@@ -1131,7 +1131,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          test: {custom: {"results" => [{"time" => 571618}, {"time" => 571618}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"time" => 571618}, {"time" => 571618}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count seconds between multiple indexed fields" do
@@ -1158,7 +1158,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 34297139}, {"age" => 34383539}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 34297139}, {"age" => 34383539}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count seconds between multiple indexed fields on the second parameter" do
@@ -1185,7 +1185,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 34297139}, {"age" => 34383539}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 34297139}, {"age" => 34383539}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count seconds between multiple indexed fields on both parameters" do
@@ -1218,7 +1218,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          test: {custom: {"results" => [{"time" => 34297139}, {"time" => 34297139}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"time" => 34297139}, {"time" => 34297139}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count milliseconds between multiple indexed fields" do
@@ -1245,7 +1245,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          patient: {custom: {"results" => [{"age" => 34297139000}, {"age" => 34383539000}]}, pii: {}, indexed: {}}
+          "patient" => {"custom" => {"results" => [{"age" => 34297139000}, {"age" => 34383539000}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count milliseconds between multiple indexed fields on the second parameter" do
@@ -1272,7 +1272,7 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          test: {custom: {"results" => [{"age" => 34297139000}, {"age" => 34383539000}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"age" => 34297139000}, {"age" => 34383539000}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "should count milliseconds between multiple indexed fields on both parameters" do
@@ -1305,7 +1305,7 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          test: {custom: {"results" => [{"time" => 34297139000}, {"time" => 34297139000}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"time" => 34297139000}, {"time" => 34297139000}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "converts from minutes to hours" do
@@ -1334,7 +1334,7 @@ describe Manifest, validate_manifest: false do
             ],
             "unit" : "minutes"
           }',
-          test: {custom: {"results" => [{"age" => 1.5}, {"age" => 1}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"age" => 1.5}, {"age" => 1}]}, "pii" => {}, "indexed" => {}}
       end
 
       it "clusterises an array of numbers" do
@@ -1364,8 +1364,8 @@ describe Manifest, validate_manifest: false do
           }',
 
           {
-            test: {
-              custom: {
+            "test" => {
+              "custom" => {
                 "results" => [
                   {"age" => "20-40"},
                   {"age" => "40+"},
@@ -1375,11 +1375,11 @@ describe Manifest, validate_manifest: false do
                   {"age" => "20-40"}
                 ]
               },
-              pii: {},
-              indexed: {}
+              "pii" => {},
+              "indexed" => {}
             },
-            patient: { indexed: {}, pii: {}, custom: {} },
-            sample: { indexed: {}, pii: {}, custom: {} }
+            "patient" => { "indexed" => {}, "pii" => {}, "custom" => {} },
+            "sample" => { "indexed" => {}, "pii" => {}, "custom" => {} }
           }
 
 
@@ -1416,7 +1416,7 @@ describe Manifest, validate_manifest: false do
               </Test>
             </Message>
           ' },
-          test: {custom: {"results" => [{"assay_code" => "some_type - flu-a"}, {"assay_code" => "some_type - flu-b"}]}, pii: {}, indexed: {}}
+          "test" => {"custom" => {"results" => [{"assay_code" => "some_type - flu-a"}, {"assay_code" => "some_type - flu-b"}]}, "pii" => {}, "indexed" => {}}
       end
 
     end

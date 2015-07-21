@@ -14,7 +14,6 @@ class CSVBuilder
       csv << @columns
 
       @elements.each do |element|
-        element = element.with_indifferent_access
         csv << @columns.map {|column| element[column]}
       end
     end

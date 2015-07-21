@@ -41,7 +41,7 @@ class Subscriber < ActiveRecord::Base
     fields = self.fields
     filter = self.filter.query.merge "page_size" => 10000, "updated_at_since" => last_run_at.iso8601
     Rails.logger.info "Filter : #{filter}"
-    tests = Cdx::Api::Elasticsearch::Query.new(filter.with_indifferent_access).execute["tests"]
+    tests = Cdx::Api::Elasticsearch::Query.new(filter).execute["tests"]
     now = Time.now
     tests.each do |test|
       PoirotRails::Activity.start("Publish test to subscriber #{self.name}") do

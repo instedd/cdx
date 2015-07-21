@@ -70,15 +70,15 @@ class DeviceMessageProcessor
     private
 
     def find_or_initialize_test
-      pii = {test: parsed_message[:test][:pii]}.with_indifferent_access
-      custom_fields = {test: parsed_message[:test][:custom]}.with_indifferent_access
-      indexed_fields = {test: parsed_message[:test][:indexed]}.with_indifferent_access
+      pii = {"test" => parsed_message["test"]["pii"]}
+      custom_fields = {"test" => parsed_message["test"]["custom"]}
+      indexed_fields = {"test" => parsed_message["test"]["indexed"]}
 
       test = TestResult.new device_messages: [device_message],
                             plain_sensitive_data: pii, # TODO: this should be what the manifest returns
                             custom_fields: custom_fields,
                             indexed_fields: indexed_fields,
-                            test_id: indexed_fields[:test][:id],
+                            test_id: indexed_fields["test"]["id"],
                             device: device
 
       if test.test_id && existing = TestResult.find_by(test_id: test.test_id, device_id: test.device_id)
@@ -90,10 +90,10 @@ class DeviceMessageProcessor
     end
 
     def find_or_initialize_sample
-      pii = {sample: parsed_message[:sample][:pii]}.with_indifferent_access
-      custom_fields = {sample: parsed_message[:sample][:custom]}.with_indifferent_access
-      indexed_fields = {sample: parsed_message[:sample][:indexed]}.with_indifferent_access
-      sample_uid = pii[:sample][:uid]
+      pii = {"sample" => parsed_message["sample"]["pii"]}
+      custom_fields = {"sample" => parsed_message["sample"]["custom"]}
+      indexed_fields = {"sample" => parsed_message["sample"]["indexed"]}
+      sample_uid = pii["sample"]["uid"]
 
       sample = Sample.new plain_sensitive_data: pii,
                           custom_fields: custom_fields,
@@ -110,10 +110,10 @@ class DeviceMessageProcessor
     end
 
     def find_or_initialize_patient
-      pii = {patient: parsed_message[:patient][:pii]}.with_indifferent_access
-      custom_fields = {patient: parsed_message[:patient][:custom]}.with_indifferent_access
-      indexed_fields = {patient: parsed_message[:patient][:indexed]}.with_indifferent_access
-      patient_id = pii[:patient][:id]
+      pii = {"patient" => parsed_message["patient"]["pii"]}
+      custom_fields = {"patient" => parsed_message["patient"]["custom"]}
+      indexed_fields = {"patient" => parsed_message["patient"]["indexed"]}
+      patient_id = pii["patient"]["id"]
 
       patient = Patient.new plain_sensitive_data: pii,
                             custom_fields: custom_fields,

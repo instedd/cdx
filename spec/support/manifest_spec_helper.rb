@@ -17,11 +17,11 @@ module ManifestSpecHelper
     format_data = {json: format_data} unless format_data.kind_of?(Hash)
 
     expected = {
-      test:    { indexed: {}, custom: {}, pii: {} },
-      sample:  { indexed: {}, custom: {}, pii: {} },
-      patient: { indexed: {}, custom: {}, pii: {} },
-      device:  { indexed: {}, custom: {}, pii: {} }
-    }.deep_merge(expected_fields).recursive_stringify_keys!
+      "test" =>    { "indexed" => {}, "custom" => {}, "pii" => {} },
+      "sample" =>  { "indexed" => {}, "custom" => {}, "pii" => {} },
+      "patient" => { "indexed" => {}, "custom" => {}, "pii" => {} },
+      "device" =>  { "indexed" => {}, "custom" => {}, "pii" => {} }
+    }.deep_merge(expected_fields)
 
     format_data.each do |format, data|
       manifest = manifest_from_json_mappings(mappings_json, custom_json, format)

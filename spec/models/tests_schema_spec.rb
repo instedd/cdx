@@ -78,9 +78,9 @@ describe TestsSchema do
     schema = TestsSchema.new("es-AR").build
 
     schema["properties"]["location"]["location-service"].should eq({
-      url: Settings.location_service_url,
-      set: Settings.location_service_set
-    }.with_indifferent_access)
+      "url" => Settings.location_service_url,
+      "set" => Settings.location_service_set
+    })
   end
 
 end

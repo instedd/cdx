@@ -17,7 +17,7 @@ class DeviceMessage < ActiveRecord::Base
   end
 
   def parsed_messages
-    @parsed_messages ||= device.current_manifest.apply_to(plain_text_data, device).map(&:with_indifferent_access)
+    @parsed_messages ||= device.current_manifest.apply_to(plain_text_data, device)
   rescue ManifestParsingError => err
     self.index_failed = true # TODO: We are just parsing here, is this the correct place to set this flag?
     self.index_failure_reason = err.message

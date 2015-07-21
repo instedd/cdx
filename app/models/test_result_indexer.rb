@@ -49,39 +49,39 @@ class TestResultIndexer
 
     test_result.indexed_fields.
       deep_merge({
-        test: {
-          reported_time: test_result.created_at.utc.iso8601,
-          updated_time: test_result.updated_at.utc.iso8601,
-          uuid: test_result.uuid
+        "test" => {
+          "reported_time" => test_result.created_at.utc.iso8601,
+          "updated_time" => test_result.updated_at.utc.iso8601,
+          "uuid" => test_result.uuid
         },
-        device: {
-          uuid: device.uuid,
-          name: device.name
+        "device" => {
+          "uuid" => device.uuid,
+          "name" => device.name
         },
-        location: {
-          id: location_id,
-          parents: parent_locations_id,
-          admin_levels: admin_levels,
-          lat: location_lat,
-          lng: location_lng
+        "location" => {
+          "id" => location_id,
+          "parents" => parent_locations_id,
+          "admin_levels" => admin_levels,
+          "lat" => location_lat,
+          "lng" => location_lng
         },
-        institution: {
-          id: device.institution_id,
-          name: device.institution.name
+        "institution" => {
+          "id" => device.institution_id,
+          "name" => device.institution.name
         },
-        laboratory: {
-          id: laboratory_id,
-          name: laboratory_name
+        "laboratory" => {
+          "id" => laboratory_id,
+          "name" => laboratory_name
         }
       }).
-      deep_merge(indexed_fields_from(test_result.sample, :sample)).
-      deep_merge(indexed_fields_from(test_result.current_patient, :patient)).
+      deep_merge(indexed_fields_from(test_result.sample, "sample")).
+      deep_merge(indexed_fields_from(test_result.current_patient, "patient")).
       deep_merge(all_custom_fields)
   end
 
   def indexed_fields_from indexable, scope
     if indexable
-      indexable.indexed_fields.deep_merge({scope => {uuid: indexable.uuid }})
+      indexable.indexed_fields.deep_merge({scope => {"uuid" => indexable.uuid }})
     else
       {}
     end
@@ -93,17 +93,17 @@ class TestResultIndexer
     sample = test_result.sample
     patient = test_result.current_patient
 
-    append_custom_fields fields, test_result, :test
-    append_custom_fields fields, test_result, :sample
-    append_custom_fields fields, test_result, :patient
+    append_custom_fields fields, test_result, "test"
+    append_custom_fields fields, test_result, "sample"
+    append_custom_fields fields, test_result, "patient"
 
     if sample.present?
-      append_custom_fields fields, sample, :sample
-      append_custom_fields fields, sample, :patient
+      append_custom_fields fields, sample, "sample"
+      append_custom_fields fields, sample, "patient"
     end
 
     if patient.present?
-      append_custom_fields fields, patient, :patient
+      append_custom_fields fields, patient, "patient"
     end
 
     fields

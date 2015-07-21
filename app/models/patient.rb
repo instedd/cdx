@@ -7,8 +7,8 @@ class Patient < ActiveRecord::Base
   before_create :generate_uuid
   before_create :ensure_patient_id_hash
 
-  serialize :custom_fields, HashWithIndifferentAccess
-  serialize :indexed_fields, HashWithIndifferentAccess
+  serialize :custom_fields, Hash
+  serialize :indexed_fields, Hash
 
   validates_presence_of :institution
   validates_uniqueness_of :patient_id_hash, scope: :institution_id, allow_nil: true
@@ -29,11 +29,11 @@ class Patient < ActiveRecord::Base
   end
 
   def plain_sensitive_data
-    @plain_sensitive_data ||= (Oj.load(MessageEncryption.decrypt(self.sensitive_data)) || {}).with_indifferent_access
+    @plain_sensitive_data ||= Oj.load(MessageEncryption.decrypt(self.sensitive_data)) || {}
   end
 
   def patient_id
-    self.plain_sensitive_data[:patient][:id]
+    self.plain_sensitive_data["patient"]["id"]
   end
 
   def self.find_by_pii(patient_id, institution_id)
@@ -52,6 +52,6 @@ private
   end
 
   def ensure_patient_id_hash
-    self.patient_id_hash ||= MessageEncryption.hash(self.plain_sensitive_data[:patient_id].to_s) if self.plain_sensitive_data[:patient_id]
+    self.patient_id_hash ||= MessageEncryption.hash(self.plain_sensitive_data["patient_id"].to_s) if self.plain_sensitive_data["patient_id"]
   end
 end

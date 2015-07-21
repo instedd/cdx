@@ -45,12 +45,12 @@ end
 
 Sample.blueprint do
   institution
-  plain_sensitive_data { { sample: { uid: "sample-#{Sham.sn}" } } }
+  plain_sensitive_data { { "sample" => { "uid" => "sample-#{Sham.sn}" } } }
 end
 
 Patient.blueprint do
   institution
-  plain_sensitive_data { { patient_id: "patient-#{Sham.sn}" } }
+  plain_sensitive_data { { "patient_id" => "patient-#{Sham.sn}" } }
 end
 
 TestResult.blueprint do

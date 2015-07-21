@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: d22a085738958b230f7807a102afa6b501be64b7
+  revision: b85f342207dbdb070798ad94ea844fa473cea774
   branch: master
   specs:
     cdx-api-elasticsearch (0.0.1)

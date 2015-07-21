@@ -14,11 +14,11 @@ describe TestResultQuery, elasticsearch: true do
 
   it "applies institution policy" do
     TestResult.create_and_index(
-      indexed_fields: {test: {results:[condition: "mtb", result: :positive]}}.with_indifferent_access,
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
       device_messages:[DeviceMessage.make(device: user_device)]
     )
     TestResult.create_and_index(
-      indexed_fields: {test: {results:[condition: "mtb", result: :negative]}}.with_indifferent_access,
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :negative]}},
       device_messages:[DeviceMessage.make(device: non_user_device)]
     )
     client = Cdx::Api.client
@@ -33,11 +33,11 @@ describe TestResultQuery, elasticsearch: true do
 
   it "delegates institution policy" do
     TestResult.create_and_index(
-      indexed_fields: {test: {results:[condition: "mtb", result: :positive]}}.with_indifferent_access,
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
       device_messages:[DeviceMessage.make(device: user_device)]
     )
     TestResult.create_and_index(
-      indexed_fields: {test: {results:[condition: "mtb", result: :negative]}}.with_indifferent_access,
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :negative]}},
       device_messages:[DeviceMessage.make(device: third_user_device)]
     )
     client = Cdx::Api.client
@@ -64,7 +64,7 @@ describe TestResultQuery, elasticsearch: true do
 
   it "should not access any test if has no policy" do
     TestResult.create_and_index(
-      indexed_fields: {test: {results:[condition: "mtb", result: :positive]}}.with_indifferent_access,
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
       device_messages:[DeviceMessage.make(device: user_device)]
     )
     client = Cdx::Api.client

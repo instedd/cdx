@@ -181,7 +181,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       test.plain_sensitive_data.should_not eq(raw_data)
       test.plain_sensitive_data["patient"]["id"].should be_nil
       test.plain_sensitive_data["patient"]["foo"].should eq(1234)
-      test.plain_sensitive_data[:patient][:foo].should eq(1234)
+      test.plain_sensitive_data["patient"]["foo"].should eq(1234)
     end
 
     it "merges pii from different tests in the same sample across devices" do
@@ -281,7 +281,6 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       test = TestResult.first
       test.sample.should be_nil
-      test.custom_fields[:test][:foo].should eq(1234)
       test.custom_fields["test"]["foo"].should eq(1234)
     end
 

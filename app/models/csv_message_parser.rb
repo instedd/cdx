@@ -17,7 +17,7 @@ class CSVMessageParser
     csv = CSV.new(data, col_sep: @separator)
     headers = csv.shift
     csv.map do |row|
-      result = Hash.new
+      result = {}
       headers.each_with_index do |header, index|
         result[header] = row[index]
       end

@@ -26,12 +26,6 @@ describe CSVBuilder do
         expect(output).to be_empty
       end
     end
-
-    it 'access columns with indifferent access' do
-      build [{"foo" => 1, :bar => 2}] do |output|
-        expect(output[1]).to eq([1,2])
-      end
-    end
   end
 
   describe 'when user provides column_names' do
