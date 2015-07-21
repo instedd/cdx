@@ -86,4 +86,24 @@ class Device < ActiveRecord::Base
     SshKey.regenerate_authorized_keys!
     self.activation_token = ActivationToken.new(device: self)
   end
+
+  def current_laboratory
+    current_laboratory_and_location[0]
+  end
+
+  def current_location
+    current_laboratory_and_location[1]
+  end
+
+  def current_laboratory_and_location
+    @current_laboratory_and_location ||=
+      case laboratories.count
+      when 0
+        [nil, nil]
+      when 1
+        [laboratories.first, locations(ancestors: true).first]
+      else
+        [nil, Location.common_root(locations(ancestors: true))]
+      end
+  end
 end

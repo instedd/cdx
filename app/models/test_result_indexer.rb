@@ -34,26 +34,15 @@ class TestResultIndexer
   end
 
   def indexed_fields
-    if device.laboratories.size == 1
-      laboratory = device.laboratories.first
-      laboratory_id = laboratory.id
-      laboratory_name = laboratory.name
-      location = device.locations(ancestors: true).first
-    elsif device.laboratories.size == 0
-      laboratory_id = nil
-      location_id = nil
-      laboratory_name = nil
-      location = nil
-    else
-      laboratory_id = nil
-      laboratory_name = nil
-      locations = device.locations(ancestors: true)
-      location = Location.common_root(locations)
-    end
-
+    location = device.current_location
     location_id = location.try(:geo_id)
     location_lat = location.try(:lat)
     location_lng = location.try(:lng)
+
+    laboratory = device.current_laboratory
+    laboratory_id = laboratory.try &:id
+    laboratory_name = laboratory.try &:name
+
     parent_locations = location.try(:self_and_ancestors) || []
     parent_locations_id = parent_locations.map(&:geo_id)
     admin_levels = Hash[parent_locations.map { |l| ["admin_level_#{l.admin_level}", l.geo_id] }]
