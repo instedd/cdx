@@ -3,10 +3,10 @@ class Cdx::Field
 
   def initialize scope, definition
     @scope = scope
-    @definition = definition.with_indifferent_access
+    @definition = definition
 
-    if @definition[:sub_fields]
-      @definition[:sub_fields] = @definition[:sub_fields].map do |field|
+    if @definition["sub_fields"]
+      @definition["sub_fields"].map! do |field|
         self.class.new(self, field)
       end
     end
@@ -15,7 +15,7 @@ class Cdx::Field
   end
 
   def type
-    @definition[:type] || 'string'
+    @definition["type"] || 'string'
   end
 
   def root_scope
@@ -23,7 +23,7 @@ class Cdx::Field
   end
 
   def name
-    @definition[:name]
+    @definition["name"]
   end
 
   def nested?
@@ -31,11 +31,11 @@ class Cdx::Field
   end
 
   def searchable?
-    @definition[:searchable]
+    @definition["searchable"]
   end
 
   def sub_fields
-    @definition[:sub_fields]
+    @definition["sub_fields"]
   end
 
   def has_searchables?
@@ -51,14 +51,14 @@ class Cdx::Field
   end
 
   def valid_values
-    @definition[:valid_values]
+    @definition["valid_values"]
   end
 
   def options
-    @definition[:options]
+    @definition["options"]
   end
 
   def pii?
-    @definition[:pii] || false
+    @definition["pii"] || false
   end
 end
