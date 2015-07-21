@@ -123,6 +123,24 @@ describe Manifest, validate_manifest: false do
       {sample: {custom: {"fields" => "#{lab.name},#{lab.address},#{lab.city},#{lab.state},#{lab.zip_code},#{lab.country},#{lab.region},#{lab.lat.to_i},#{lab.lng.to_i},#{lab.location_geoid}"}, pii: {}, indexed: {}}}, device
     end
 
+    it "has access to location from script" do
+      device = Device.make
+      loc = device.current_location
+
+      assert_manifest_application %(
+        {
+          "sample.fields": { "script": "location.name + ',' + parseInt(location.lat) + ',' + parseInt(location.lng)" }
+        }
+      ), %(
+        [
+          {
+            "name": "sample.fields"
+          }
+        ]
+      ), %({}),
+      {sample: {custom: {"fields" => "#{loc.name},#{loc.lat.to_i},#{loc.lng.to_i}"}, pii: {}, indexed: {}}}, device
+    end
+
     it "loads xml in javascript" do
       assert_manifest_application %(
         {

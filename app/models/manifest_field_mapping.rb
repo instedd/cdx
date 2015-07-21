@@ -126,6 +126,9 @@ class ManifestFieldMapping
         if laboratory = @device.current_laboratory
           ctx["laboratory"] = script_laboratory(laboratory)
         end
+        if location = @device.current_location
+          ctx["location"] = script_location(location)
+        end
       end
 
       result = ctx.eval(script)
@@ -162,6 +165,14 @@ class ManifestFieldMapping
       lat: laboratory.lat,
       lng: laboratory.lng,
       location_geoid: laboratory.location_geoid,
+    }
+  end
+
+  def script_location(location)
+    {
+      name: location.name,
+      lat: location.lat,
+      lng: location.lng,
     }
   end
 
