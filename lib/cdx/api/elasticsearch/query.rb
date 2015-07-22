@@ -2,6 +2,7 @@ require "cdx/api/elasticsearch/local_timezone_conversion"
 
 class Cdx::Api::Elasticsearch::Query
   attr_accessor :indices
+  attr_accessor :params
 
   include Cdx::Api::LocalTimeZoneConversion
 
@@ -18,7 +19,18 @@ class Cdx::Api::Elasticsearch::Query
     @api = api
   end
 
+  def before_execute(&block)
+    @before_execute ||= []
+    @before_execute << block
+  end
+
   def execute
+    if @before_execute
+      @before_execute.each do |block|
+        block.call self
+      end
+    end
+
     query(@params)
   end
 
