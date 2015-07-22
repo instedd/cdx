@@ -15,7 +15,7 @@ describe Cdx::Api do
       expect(response.size).to eq(1)
       expect(response.first["test"]["assays"].first["qualitative_result"]).to eq("negative")
 
-      response = query_tests(since: time(2013, 1, 1)).sort_by do |test|
+      response = query_tests("since" => time(2013, 1, 1)).sort_by do |test|
         test["test"]["assays"].first["qualitative_result"]
       end
 
@@ -36,7 +36,7 @@ describe Cdx::Api do
       expect(response.size).to eq(1)
       expect(response.first["test"]["assays"].first["qualitative_result"]).to eq("negative")
 
-      response = query_tests(since: 4.day.ago.at_noon.iso8601).sort_by do |test|
+      response = query_tests("since" => 4.day.ago.at_noon.iso8601).sort_by do |test|
         test["test"]["assays"].first["qualitative_result"]
       end
 
@@ -51,7 +51,7 @@ describe Cdx::Api do
 
       index test: {assays: [qualitative_result: :negative], start_time: Time.zone.local(2010, 10, 10, 01, 00, 30).iso8601}
 
-      response = query_tests(since: '2010-10-10T01:00:29')
+      response = query_tests("since" => '2010-10-10T01:00:29')
 
       expect(response.size).to eq(1)
       expect(response.first["test"]["assays"].first["qualitative_result"]).to eq("negative")
