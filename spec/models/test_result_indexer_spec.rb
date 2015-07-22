@@ -48,7 +48,7 @@ describe TestResultIndexer, elasticsearch: true do
     location = test.device.laboratories.first.location
 
     client.should_receive(:index).with(
-      index: test.device.institution.elasticsearch_index_name,
+      index: Cdx::Api.index_name,
       type: "test",
       body: {
         "test" => {

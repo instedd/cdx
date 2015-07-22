@@ -8,7 +8,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
   before(:each) {sign_in user}
 
   def get_updates(options, body="")
-    fresh_client_for institution.elasticsearch_index_name
+    refresh_index
     response = get :index, body, options.merge(format: 'json')
     response.status.should eq(200)
     Oj.load(response.body)["tests"]

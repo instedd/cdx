@@ -65,7 +65,7 @@ describe DeviceMessageImporter, elasticsearch: true do
       DeviceMessageImporter.new.import_from sync_dir
 
       expect(DeviceMessage.first.index_failure_reason).to be_nil
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["qualitative_result"].should eq("positive")
@@ -82,7 +82,7 @@ describe DeviceMessageImporter, elasticsearch: true do
       DeviceMessageImporter.new.import_from sync_dir
 
       expect(DeviceMessage.first.index_failure_reason).to be_nil
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["qualitative_result"].should eq("positive")
@@ -102,7 +102,7 @@ describe DeviceMessageImporter, elasticsearch: true do
       DeviceMessageImporter.new("*.json").import_from sync_dir
 
       expect(DeviceMessage.first.index_failure_reason).to be_nil
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["qualitative_result"].should eq("positive")
@@ -117,7 +117,7 @@ describe DeviceMessageImporter, elasticsearch: true do
       DeviceMessageImporter.new("*.{csv,json}").import_from sync_dir
 
       expect(DeviceMessage.first.index_failure_reason).to be_nil
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["qualitative_result"].should eq("positive")
@@ -132,7 +132,7 @@ describe DeviceMessageImporter, elasticsearch: true do
       DeviceMessageImporter.new("*.{csv,json}").import_single(sync_dir, File.join(sync_dir.inbox_path(device.uuid), "mytestfile.json"))
 
       expect(DeviceMessage.first.index_failure_reason).to be_nil
-      tests = all_elasticsearch_tests_for(device.institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+      tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
       test["qualitative_result"].should eq("positive")
@@ -169,7 +169,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
-        tests = all_elasticsearch_tests_for(device.institution)
+        tests = all_elasticsearch_tests
         tests.should have(18).items
         tests.map{|e| e['_source']['test']['start_time']}.should =~ ['2014-09-09T17:07:32Z', '2014-10-28T13:00:58Z', '2014-10-28T17:24:34Z', '2015-02-10T18:10:28Z', '2015-03-03T19:27:36Z', '2015-03-31T18:35:19Z', '2015-03-31T18:35:19Z', '2015-03-31T18:35:19Z', '2015-03-31T18:35:19Z', '2015-03-31T18:34:08Z', '2015-03-31T18:34:08Z', '2015-03-31T18:34:08Z', '2015-03-31T18:34:08Z', '2014-11-05T08:38:30Z', '2014-10-29T12:24:59Z', '2014-10-29T12:24:59Z', '2014-10-29T12:24:59Z', '2014-10-29T12:24:59Z']
       end
@@ -184,7 +184,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
-        tests = all_elasticsearch_tests_for(device.institution).sort_by do |test|
+        tests = all_elasticsearch_tests.sort_by do |test|
           test["_source"]["test"]["assays"][0]['qualitative_result'] + test["_source"]["test"]["assays"][1]['qualitative_result'] + test["_source"]["test"]["assays"][2]['qualitative_result']
         end
         tests.should have(13).items
@@ -228,7 +228,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         DeviceMessageImporter.new("*.xml").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
-        tests = all_elasticsearch_tests_for(device.institution)
+        tests = all_elasticsearch_tests
         tests.should have(1).items
 
         test = tests.first['_source']

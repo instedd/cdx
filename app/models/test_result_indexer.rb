@@ -10,11 +10,11 @@ class TestResultIndexer
   end
 
   def index
-    client.index index: index_name, type: type, body: indexed_fields, id: elasticsearch_id
+    client.index index: Cdx::Api.index_name, type: type, body: indexed_fields, id: elasticsearch_id
   end
 
   def update
-    client.update index: index_name, type: type, body: {doc: indexed_fields}, id: elasticsearch_id
+    client.update index: Cdx::Api.index_name, type: type, body: {doc: indexed_fields}, id: elasticsearch_id
   end
 
   def type
@@ -23,10 +23,6 @@ class TestResultIndexer
 
   def elasticsearch_id
     "#{device.uuid}_#{test_result.test_id || test_result.uuid}"
-  end
-
-  def index_name
-    device.institution.elasticsearch_index_name
   end
 
   def client

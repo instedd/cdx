@@ -87,8 +87,8 @@ describe Subscriber, elasticsearch: true do
 
   def submit_test
     TestResult.create_and_index(indexed_fields: { "test" => { "assays" => ["qualitative_result" => "positive", "name" => "mtb"]}, "patient" => {"gender" => "male" }}, device_messages: [device_message])
-    client = Cdx::Api.client
-    client.indices.refresh index: institution.elasticsearch_index_name
+
+    refresh_index
 
     TestResult.count.should eq(1)
   end

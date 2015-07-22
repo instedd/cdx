@@ -17,10 +17,6 @@ class DeviceMessageProcessor
     @client ||= Cdx::Api.client
   end
 
-  def index_name
-    @device_message.institution.elasticsearch_index_name
-  end
-
   def device
     @device_message.device
   end
@@ -34,7 +30,7 @@ class DeviceMessageProcessor
 
     attr_reader :parsed_message, :parent
 
-    delegate :index_name, :device, :device_message, :client, to: :parent
+    delegate :device, :device_message, :client, to: :parent
 
     def initialize(device_message_processor, parsed_message)
       @parent = device_message_processor
@@ -195,21 +191,21 @@ class DeviceMessageProcessor
     end
 
     def update_sample_in_existing_documents_with sample
-      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { :'sample.uuid' => sample.uuid } } } }, fields: []}, size: 10000
+      response = client.search index: Cdx::Api.index_name, body:{query: { filtered: { filter: { term: { :'sample.uuid' => sample.uuid } } } }, fields: []}, size: 10000
       body = response["hits"]["hits"].map do |element|
         { update: { _type: element["_type"], _id: element["_id"], data: { doc: sample.indexed_fields } } }
       end
 
-      client.bulk index: index_name, body: body unless body.blank?
+      client.bulk index: Cdx::Api.index_name, body: body unless body.blank?
     end
 
     def update_patient_in_existing_documents_with patient
-      response = client.search index: index_name, body:{query: { filtered: { filter: { term: { :'patient.uuid' => patient.uuid } } } }, fields: []}, size: 10000
+      response = client.search index: Cdx::Api.index_name, body:{query: { filtered: { filter: { term: { :'patient.uuid' => patient.uuid } } } }, fields: []}, size: 10000
       body = response["hits"]["hits"].map do |element|
         { update: { _type: element["_type"], _id: element["_id"], data: { doc: patient.indexed_fields } } }
       end
 
-      client.bulk index: index_name, body: body unless body.blank?
+      client.bulk index: Cdx::Api.index_name, body: body unless body.blank?
     end
 
   end

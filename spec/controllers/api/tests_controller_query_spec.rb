@@ -9,7 +9,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
   before(:each) {sign_in user}
 
   def get_updates(options, body="")
-    fresh_client_for institution.elasticsearch_index_name
+    refresh_index
     response = get :index, body, options.merge(format: 'json')
     response.status.should eq(200)
     Oj.load(response.body)["tests"]
@@ -23,7 +23,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[{name: "mtb", qualitative_result: :positive}]})
         DeviceMessage.create_and_process device: device2, plain_text_data: (Oj.dump test:{assays:[{name: "mtb", qualitative_result: :negative}]})
 
-        fresh_client_for device2.institution.elasticsearch_index_name
+        refresh_index
 
         response = get_updates 'test.assays.name' => 'mtb'
 
@@ -177,7 +177,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
           DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative], error_code: 1234})
           DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative], error_code: 1234})
 
-          fresh_client_for institution.elasticsearch_index_name
+          refresh_index
 
           response = get :index, "", format: 'csv', group_by: 'test.assays.qualitative_result,test.error_code'
 
@@ -223,9 +223,10 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
           }
         }}
         DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(some_field: 1234)
-        test = all_elasticsearch_tests_for(institution).first["_source"]["test"]
+        test = all_elasticsearch_tests.first["_source"]["test"]
 
-        fresh_client_for institution.elasticsearch_index_name
+        refresh_index
+
         response = get :custom_fields, id: test["uuid"]
         response.status.should eq(200)
         response = Oj.load response.body
@@ -260,9 +261,10 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         Manifest.create! definition: definition
 
         DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(assays: [qualitative_result: :positive], patient_name: "jdoe")
-        test = all_elasticsearch_tests_for(institution).first["_source"]["test"]
+        test = all_elasticsearch_tests.first["_source"]["test"]
 
-        fresh_client_for institution.elasticsearch_index_name
+        refresh_index
+
         response = get :pii, id: test["uuid"]
         response.status.should eq(200)
         response = Oj.load response.body

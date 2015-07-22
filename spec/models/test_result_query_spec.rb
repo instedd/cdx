@@ -4,13 +4,17 @@ require 'policy_spec_helper'
 describe TestResultQuery, elasticsearch: true do
 
   let(:user) {User.make}
+  let(:user_2) {User.make}
+
   let(:institution) {Institution.make user_id: user.id}
+  let(:institution_2) {Institution.make user_id: user.id}
+  let(:institution_3) {Institution.make user_id: user.id}
+
   let(:user_device) {Device.make institution_id: institution.id}
-  let(:second_user_device) {Device.make institution_id: institution.id}
-  let(:second_institution) {Institution.make user_id: user.id}
-  let(:third_user_device) {Device.make institution_id: second_institution.id}
+  let(:user_device_2) {Device.make institution_id: institution.id}
+  let(:user_device_3) {Device.make institution_id: institution_2.id}
+  let(:user_device_4) {Device.make institution_id: institution_3.id}
   let(:non_user_device) {Device.make}
-  let(:second_user) {User.make}
 
   it "applies institution policy" do
     TestResult.create_and_index(
@@ -21,11 +25,10 @@ describe TestResultQuery, elasticsearch: true do
       indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :negative]}},
       device_messages:[DeviceMessage.make(device: non_user_device)]
     )
-    client = Cdx::Api.client
-    client.indices.refresh index: institution.elasticsearch_index_name
-    client.indices.refresh index: non_user_device.institution.elasticsearch_index_name
 
-    query = TestResultQuery.new({condition: 'mtb'}, user)
+    refresh_index
+
+    query = TestResultQuery.new({"condition" => 'mtb'}, user)
 
     query.result['total_count'].should eq(1)
     query.result['tests'].first['test']['results'].first['result'].should eq('positive')
@@ -38,14 +41,14 @@ describe TestResultQuery, elasticsearch: true do
     )
     TestResult.create_and_index(
       indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :negative]}},
-      device_messages:[DeviceMessage.make(device: third_user_device)]
+      device_messages:[DeviceMessage.make(device: user_device_3)]
     )
-    client = Cdx::Api.client
-    client.indices.refresh index: institution.elasticsearch_index_name
 
-    grant(user, second_user, institution, QUERY_TEST)
+    refresh_index
 
-    query = TestResultQuery.new({condition: 'mtb'}, second_user)
+    grant(user, user_2, institution, QUERY_TEST)
+
+    query = TestResultQuery.new({"condition" => 'mtb'}, user_2)
 
     query.result['total_count'].should eq(1)
     query.result['tests'].first['test']['results'].first['result'].should eq('positive')
@@ -53,10 +56,10 @@ describe TestResultQuery, elasticsearch: true do
 
   it "doesn't fails if no device is indexed for the institution yet" do
     institution
-    client = Cdx::Api.client
-    client.indices.refresh index: institution.elasticsearch_index_name
 
-    query = TestResultQuery.new({condition: 'mtb'}, user)
+    refresh_index
+
+    query = TestResultQuery.new({"condition" => 'mtb'}, user)
 
     query.result['total_count'].should eq(0)
     query.result['tests'].should eq([])
@@ -67,12 +70,48 @@ describe TestResultQuery, elasticsearch: true do
       indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
       device_messages:[DeviceMessage.make(device: user_device)]
     )
-    client = Cdx::Api.client
-    client.indices.refresh index: institution.elasticsearch_index_name
 
-    query = TestResultQuery.new({condition: 'mtb'}, User.new)
+    refresh_index
+
+    query = TestResultQuery.new({"condition" => 'mtb'}, User.new)
 
     query.result['total_count'].should eq(0)
     query.result['tests'].should eq([])
+  end
+
+  it "applies institution.id filter" do
+    TestResult.create_and_index(
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+      device_messages:[DeviceMessage.make(device: user_device_2)]
+    )
+    TestResult.create_and_index(
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+      device_messages:[DeviceMessage.make(device: user_device_3)]
+    )
+    TestResult.create_and_index(
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+      device_messages:[DeviceMessage.make(device: user_device_4)]
+    )
+
+    refresh_index
+
+    query = TestResultQuery.new({"institution.id" => institution_3.id.to_s}, user)
+    query.result['total_count'].should eq(1)
+  end
+
+  it "disallows viewing another institution's tests" do
+    TestResult.create_and_index(
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+      device_messages:[DeviceMessage.make(device: user_device)]
+    )
+    TestResult.create_and_index(
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+      device_messages:[DeviceMessage.make(device: non_user_device)]
+    )
+
+    refresh_index
+
+    query = TestResultQuery.new({"institution.id" => [non_user_device.institution.id.to_s, institution.id]}, user)
+    query.result['total_count'].should eq(1)
   end
 end

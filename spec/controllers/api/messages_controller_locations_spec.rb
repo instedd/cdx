@@ -24,7 +24,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       device.save!
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["location"]["id"].should eq(leaf_location1.geo_id)
       test["laboratory"]["id"].should eq(laboratory1.id)
       test["location"]["parents"].sort.should eq([leaf_location1.geo_id, parent_location.geo_id].sort)
@@ -38,7 +38,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["location"]["id"].should eq(parent_location.geo_id)
       test["device"]["laboratory_id"].should be_nil
       test["location"]["parents"].should eq([parent_location.geo_id].sort)
@@ -51,7 +51,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["location"]["id"].should eq(nil)
       test["device"]["laboratory_id"].should be_nil
       test["location"]["parents"].should eq([])
@@ -63,7 +63,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["location"]["id"].should eq(nil)
       test["device"]["laboratory_id"].should be_nil
       test["location"]["parents"].should eq([])
@@ -75,7 +75,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["location"]["id"].should be_nil
       test["location"]["lat"].should be_nil
       test["location"]["lng"].should be_nil

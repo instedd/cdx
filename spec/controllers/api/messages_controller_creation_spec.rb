@@ -13,7 +13,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
   before(:each) {sign_in user}
 
   def get_updates(options, body="")
-    fresh_client_for institution.elasticsearch_index_name
+    refresh_index
     response = get :index, body, options.merge(format: 'json')
     response.status.should eq(200)
     Oj.load(response.body)["tests"]
@@ -34,7 +34,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     it "should create test in elasticsearch" do
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["test"]["assays"].first["qualitative_result"].should eq("positive")
       test["test"]["reported_time"].should_not eq(nil)
       test["device"]["uuid"].should eq(device.uuid)
@@ -56,7 +56,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     it "should create multiple tests in elasticsearch" do
       post :create, datas, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      tests = all_elasticsearch_tests_for(institution)
+      tests = all_elasticsearch_tests
       tests.count.should eq(2)
 
       tests.map {|e| e["_source"]["test"]["assays"].first["qualitative_result"]}.should =~ ["positive", "negative"]
@@ -68,7 +68,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     it "should store institution_id in elasticsearch" do
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["institution"]["id"].should eq(device.institution_id)
     end
 
@@ -81,7 +81,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       Oj.load(DeviceMessage.first.plain_text_data)["test"]["patient_age"].should eq(20)
 
-      tests = all_elasticsearch_tests_for(institution)
+      tests = all_elasticsearch_tests
       tests.size.should eq(1)
       test = tests.first
       test["_source"]["test"]["id"].should eq("1234")
@@ -97,7 +97,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       DeviceMessage.count.should eq(2)
       Oj.load(DeviceMessage.last.plain_text_data)["test"]["patient_age"].should eq(30)
 
-      tests = all_elasticsearch_tests_for(institution)
+      tests = all_elasticsearch_tests
       tests.size.should eq(1)
       test = tests.first
       test["_source"]["test"]["id"].should eq("1234")
@@ -108,14 +108,14 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, Oj.dump(test: {id: "1234", age: 20}), device_id: a_device.uuid, authentication_token: a_device.plain_secret_key
 
       TestResult.count.should eq(2)
-      tests = all_elasticsearch_tests_for(institution)
+      tests = all_elasticsearch_tests
       tests.size.should eq(2)
     end
 
     it "should generate a start_time date if it's not provided" do
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["start_time"].should eq(test["created_at"])
     end
 
@@ -125,7 +125,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     it "shouldn't store sensitive data in elasticsearch" do
       post :create, Oj.dump(test: {assays:[qualitative_result: :positive]}, patient: {id: 1234}), device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["test"]["assays"].first["qualitative_result"].should eq("positive")
       test["test"]["reported_time"].should_not eq(nil)
       test["patient"]["id"].should eq(nil)
@@ -146,7 +146,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       }}
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["test"]["name"].should eq("GX4002")
       test["test"]["reported_time"].should_not eq(nil)
       test["patient"]["id"].should be_nil
@@ -171,7 +171,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["test"]["name"].should eq("GX4002")
       test["patient"]["id"].should be_nil
       test["patient"]["foo"].should be_nil
@@ -253,7 +253,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["test"]["foo"].should be_nil
       test["test"]["name"].should eq("GX4002")
     end
@@ -276,7 +276,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       post :create, Oj.dump(some_field: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["test"]["foo"].should be_nil
 
       test = TestResult.first
@@ -298,7 +298,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       }}
       post :create, Oj.dump(error_code: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      test = all_elasticsearch_tests_for(institution).first["_source"]
+      test = all_elasticsearch_tests.first["_source"]
       test["test"]["error_code"].should eq(1234)
 
       post :create, Oj.dump(error_code: "foo"), device_id: device.uuid, authentication_token: device.plain_secret_key
@@ -329,7 +329,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         csv = %{error_code;result\n0;positive}
         post :create, csv, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-        tests = all_elasticsearch_tests_for(institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+        tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
         tests.count.should eq(1)
         test = tests.first["_source"]
         test["test"]["error_code"].should eq(0)
@@ -340,7 +340,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         csv = %{error_code;result\n0;positive\n1;negative}
         post :create, csv, device_id: device.uuid, authentication_token: device.plain_secret_key
 
-        tests = all_elasticsearch_tests_for(institution).sort_by { |test| test["_source"]["test"]["error_code"] }
+        tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
         tests.count.should eq(2)
         test = tests.first["_source"]
         test["test"]["error_code"].should eq(0)

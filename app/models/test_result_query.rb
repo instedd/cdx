@@ -4,12 +4,20 @@ class TestResultQuery
   def initialize params, user
     institutions = Policy.authorize(QUERY_TEST, Institution, user, user.policies)
 
-    indices = institutions.map &:elasticsearch_index_name
-
-    @api_query = if indices.present?
-      Cdx::Api::Elasticsearch::Query.for_indices(indices, params)
+    if institutions.present?
+      @api_query = Cdx::Api::Elasticsearch::Query.for_indices([Cdx::Api.index_name], params)
+      @api_query.before_execute do
+        allowed_institution_ids = institutions.map { |i| i.id.to_s }
+        requested_institution_ids = Array(@api_query.params["institution.id"]).map(&:to_s)
+        if requested_institution_ids.empty?
+          final_institution_ids = allowed_institution_ids
+        else
+          final_institution_ids = requested_institution_ids.select { |id| allowed_institution_ids.include? id }
+        end
+        @api_query.params["institution.id"] = final_institution_ids
+      end
     else
-      Cdx::Api::Elasticsearch::NullQuery.new(params)
+      @api_query = Cdx::Api::Elasticsearch::NullQuery.new(params)
     end
   end
 

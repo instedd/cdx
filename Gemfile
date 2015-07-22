@@ -95,7 +95,7 @@ group :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'vcr'
-  gem 'webmock'
+  gem 'webmock', require: false
   gem 'capybara-mechanize'
   gem 'timecop'
   gem 'shoulda'
