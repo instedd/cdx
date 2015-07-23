@@ -3,29 +3,26 @@ require 'spec_helper'
 describe TestsSchema do
 
   before(:each) do
-    sample_fields = [
-      {
-        name: 'uuid',
-        searchable: true
+    sample_fields = {
+      "uuid" => {
+        "searchable" => true,
       }
-    ]
+    }
 
-    patient_fields = [
-      {
-        name: 'age',
-        type: 'integer'
+    patient_fields = {
+      "age" => {
+        "type" => "integer"
       },
-      {
-        name: 'gender',
-        type: 'enum',
-        options: ['male', 'female']
+      "gender" => {
+        "type" => 'enum',
+        "options" => ['male', 'female']
       }
-    ]
+    }
 
-    location_fields = [
-      {name: 'lat'},
-      {name: 'lng'},
-    ]
+    location_fields = {
+      "lat" => {},
+      "lng" => {},
+    }
 
     sample_scope = Cdx::Scope.new('sample', sample_fields)
     patient_scope = Cdx::Scope.new('patient', patient_fields)
