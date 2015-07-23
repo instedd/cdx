@@ -1,41 +1,41 @@
 sample:
-  - name: uuid
+  id:
     searchable: true
-  - name: uid
+  uid:
     pii: true
-  - name: id
+  uuid:
     searchable: true
-  - name: type # (pull enum from 'system' options in LOINC, current sample_type)
+  type: # (pull enum from 'system' options in LOINC, current sample_type)
     searchable: true
-  - name: collection_date
+  collection_date:
     type: date
 test:
-  - name: id
+  id:
     searchable: true
-  - name: uuid
+  uuid:
     searchable: true
-  - name: start_time
+  start_time:
     type: date
     searchable: true
-  - name: end_time # (new)
+  end_time: # (new)
     type: date
     searchable: true
-  - name: reported_time # (current created_at)
+  reported_time: # (current created_at)
     type: date
     searchable: true
-  - name: updated_time # (current updated_at)
+  updated_time: # (current updated_at)
     type: date
     searchable: true
-  - name: error_code
+  error_code:
     type: integer
     searchable: true
-  - name: error_description
-  - name: patient_age # (store with 'units', goes under test, not sample, not patient) UNITS????
+  error_description:
+  patient_age: # (store with 'units', goes under test, not sample, not patient) UNITS????
     type: integer
     searchable: true
-  - name: name # (current 'assay_name')
+  name: # (current 'assay_name')
     searchable: true
-  - name: status # (remove 'negative' from enum, add 'in_progress')
+  status: # (remove 'negative' from enum, add 'in_progress')
     type: enum
     searchable: true
     options:
@@ -44,63 +44,63 @@ test:
       - no_result
       - success
       - in_progress
-  - name: qualitative_result # ('negative', 'positive', 'n/a') (rename 'unknown' to 'n/a')
+  qualitative_result: # ('negative', 'positive', 'n/a') (rename 'unknown' to 'n/a')
     type: enum
     searchable: true
     options:
       - negative
       - positive
       - n/a
-  - name: assays
+  assays:
     type: nested
     sub_fields:
-      - name: name # (current 'condition') (LOINC)
+      name: # (current 'condition') (LOINC)
         searchable: true
-      - name: qualitative_result # (positive, negative)
+      qualitative_result: # (positive, negative)
         type: enum
         searchable: true
         options:
           - positive
           - negative
           - n/a
-      - name: quantitative_result
+      quantitative_result:
         type: integer
-  - name: type
+  type:
     type: enum
     searchable: true
     options:
       - specimen
       - qc
 device:
-  - name: uuid
+  uuid:
     searchable: true
-  - name: name
+  name:
     searchable: true
-  - name: lab_user # (current system_user)
+  lab_user: # (current system_user)
     searchable: true
-  - name: serial_number
+  serial_number:
     searchable: true
 institution:
-  - name: id
+  id:
     searchable: true
-  - name: name
+  name:
     searchable: true
 laboratory:
-  - name: id
+  id:
     searchable: true
-  - name: name
+  name:
     searchable: true
 patient:
-  - name: id
+  id:
     pii: true
-  - name: gender
+  gender:
     searchable: true
 location:
-  - name: id
-  - name: parents
+  id:
+  parents:
     searchable: true
-  - name: admin_levels
+  admin_levels:
     type: dynamic
     searchable: true
-  - name: lat
-  - name: lng
+  lat:
+  lng:

@@ -1,13 +1,14 @@
 class Cdx::Field
   attr_accessor :scope
 
-  def initialize scope, definition
+  def initialize scope, name, definition
     @scope = scope
-    @definition = definition
+    @name = name
+    @definition = definition || {}
 
     if @definition["sub_fields"]
-      @definition["sub_fields"].map! do |field|
-        self.class.new(self, field)
+      @definition["sub_fields"] = @definition["sub_fields"].map do |sub_name, sub_field|
+        self.class.new(self, sub_name, sub_field)
       end
     end
 
@@ -23,7 +24,7 @@ class Cdx::Field
   end
 
   def name
-    @definition["name"]
+    @name
   end
 
   def nested?

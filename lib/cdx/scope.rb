@@ -3,8 +3,8 @@ class Cdx::Scope
 
   def initialize name, fields
     @name = name
-    @fields = fields.map do |definition|
-      Cdx::Field.new self, definition
+    @fields = fields.map do |name, definition|
+      Cdx::Field.new self, name, definition
     end
   end
 
