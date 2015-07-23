@@ -96,7 +96,7 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {}
-      }})}.to raise_error("Validation failed: Api version must be 1.2.0")
+      }})}.to raise_error("Validation failed: Api version must be #{Manifest::CURRENT_VERSION}")
     end
 
     it "shouldn't pass validations if metadata doesn't include device_models" do
@@ -144,7 +144,7 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"]
         },
         "custom_fields": {},
@@ -160,7 +160,7 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
@@ -193,7 +193,7 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
@@ -225,7 +225,7 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
@@ -248,7 +248,7 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
@@ -272,7 +272,7 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
@@ -305,7 +305,7 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
@@ -330,7 +330,7 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },

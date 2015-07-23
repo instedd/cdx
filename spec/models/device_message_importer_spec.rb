@@ -25,7 +25,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     {
       "metadata": {
         "version": "1",
-        "api_version": "1.2.0",
+        "api_version": "#{Manifest::CURRENT_VERSION}",
         "device_models": "#{device.device_model.name}",
         "source" : { "type" : "#{source}"}
       },

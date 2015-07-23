@@ -212,7 +212,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           "metadata" : {
             "device_models" : ["#{device.device_model.name}"],
             "version" : 2,
-            "api_version" : "1.2.0",
+            "api_version" : "#{Manifest::CURRENT_VERSION}",
             "source" : {"type" : "json"}
           },
           "custom_fields": [
@@ -241,7 +241,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         definition = %{{
           "metadata" : {
             "device_models" : ["#{device.device_model.name}"],
-            "api_version" : "1.2.0",
+            "api_version" : "#{Manifest::CURRENT_VERSION}",
             "version" : "1.0.0",
             "source" : {"type" : "json"}
           },

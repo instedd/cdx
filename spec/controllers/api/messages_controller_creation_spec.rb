@@ -136,7 +136,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
@@ -157,7 +157,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
         "custom_fields": [
@@ -190,7 +190,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
         "custom_fields": [
@@ -228,7 +228,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
         "custom_fields" : [
@@ -243,7 +243,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 2,
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
@@ -263,7 +263,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
           "version" : 2,
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
         "custom_fields" : [
@@ -288,7 +288,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       Manifest.create! definition: %{{
         "metadata" : {
           "device_models" : ["#{device.device_model.name}"],
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "version" : 1,
           "source" : {"type" : "json"}
         },
@@ -313,7 +313,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
           {
             "metadata" : {
               "version" : "1",
-              "api_version" : "1.2.0",
+              "api_version" : "#{Manifest::CURRENT_VERSION}",
               "device_models" : "#{device.device_model.name}",
               "source" : { "type" : "csv" }
             },

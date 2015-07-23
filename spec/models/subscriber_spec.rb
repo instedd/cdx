@@ -14,7 +14,7 @@ describe Subscriber, elasticsearch: true do
       {
         "metadata": {
           "version": "1",
-          "api_version": "1.2.0",
+          "api_version": "#{Manifest::CURRENT_VERSION}",
           "device_models": "#{model.name}",
           "source" : {"type" : "json"}
         },

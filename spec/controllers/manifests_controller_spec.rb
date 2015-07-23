@@ -19,7 +19,7 @@ describe ManifestsController do
       json = {"definition" => %{{
         "metadata": {
           "version" : "1.0.0",
-          "api_version" : "1.2.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
           "source" : { "type" : "json" }
         },

@@ -19,7 +19,8 @@ class DefaultManifest
       metadata: {
         source: { type: "json" },
         device_models: [device_model_name],
-        api_version: "1.2.0",
+        api_version: "#{Manifest::CURRENT_VERSION}",
+
         version: "0.0.1"
       },
       field_mapping: core_mapping
