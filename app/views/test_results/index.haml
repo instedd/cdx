@@ -25,9 +25,10 @@
         %th Results
       - @tests.each do |test|
         %tr
-          %td= test["created_at"]
-          %td= @institutions[test["institution_id"]]
-          %td= @laboratories[test["laboratory_id"]]
-          %td= @devices[test["device_uuid"]]
-          %td= test["assay_name"]
-          %td= (test["results"] || []).map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "
+          %td= test["test"]["reported_time"]
+          %td= @institutions[test["institution"]["id"]]
+          %td= @laboratories[test["laboratory"]["id"]]
+          %td= @devices[test["device"]["uuid"]]
+          %td= test["test"]["assays"].first["name"]
+          %td= test["test"]["assays"].first["qualitative_result"]
+          / %td= (test["results"] || []).map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "
