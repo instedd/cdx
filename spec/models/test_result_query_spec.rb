@@ -114,4 +114,29 @@ describe TestResultQuery, elasticsearch: true do
     query = TestResultQuery.new({"institution.id" => [non_user_device.institution.id.to_s, institution.id]}, user)
     query.result['total_count'].should eq(1)
   end
+
+  it "has access to all institutions if superadmin" do
+    super_user = User.make
+    super_institution = user.create Institution.make_unsaved
+    super_device = Device.make institution_id: super_institution.id
+
+    policy = Policy.superadmin
+    policy.granter_id = nil
+    policy.user_id = super_user.id
+    policy.save(validate: false)
+
+    TestResult.create_and_index(
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+      device_messages:[DeviceMessage.make(device: user_device)]
+    )
+    TestResult.create_and_index(
+      indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+      device_messages:[DeviceMessage.make(device: super_device)]
+    )
+
+    refresh_index
+
+    query = TestResultQuery.new({"condition" => 'mtb'}, super_user)
+    query.result['total_count'].should eq(2)
+  end
 end
