@@ -2,7 +2,20 @@ class Cdx::Field
   attr_accessor :scope
 
   def self.for scope, name, definition
-    new scope, name, definition
+    definition = definition || {}
+    field_class = case definition["type"]
+      when "nested"
+        NestedField
+      when "multi_field"
+        MultiField
+      when "enum"
+        EnumField
+      when "dynamic"
+        DynamicField
+      else
+        Cdx::Field
+      end
+    field_class.new scope, name, definition
   end
 
   def initialize scope, name, definition
@@ -32,7 +45,7 @@ class Cdx::Field
   end
 
   def nested?
-    type == 'nested'
+    false
   end
 
   def searchable?
@@ -44,7 +57,7 @@ class Cdx::Field
   end
 
   def has_searchables?
-    searchable? or (nested? and sub_fields.any? &:searchable?)
+    searchable?
   end
 
   def scoped_name
@@ -65,5 +78,24 @@ class Cdx::Field
 
   def pii?
     @definition["pii"] || false
+  end
+
+  class NestedField < self
+    def nested?
+      true
+    end
+
+    def searchable?
+      sub_fields.any? &:searchable?
+    end
+  end
+
+  class MultiField < self
+  end
+
+  class EnumField < self
+  end
+
+  class DynamicField < self
   end
 end
