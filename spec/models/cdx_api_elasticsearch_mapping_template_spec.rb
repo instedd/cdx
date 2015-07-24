@@ -102,6 +102,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                     "type" => "string",
                     "index" => "not_analyzed"
                   },
+                  "condition" => {
+                    "type" => "string",
+                    "index" => "not_analyzed"
+                  },
                   "qualitative_result"=> {
                     "type"=> "string",
                     "index"=> "not_analyzed"

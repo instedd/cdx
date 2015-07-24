@@ -775,12 +775,13 @@ describe Cdx::Api do
     context "with a second location field" do
       before(:all) do
         # add a new core field and regenerate the indexed fields with it.
-        @extra_scope = Cdx::Scope.new('patient_location', [
-          {"name" => 'id'},
-          {"name" => 'parents', "searchable" => true},
-          {"name" => 'admin_levels', "searchable" => true, "type" => 'dynamic'},
-          {"name" => 'lat'},
-          {"name" => 'lng'}])
+        @extra_scope = Cdx::Scope.new('patient_location', {
+          "id" => {},
+          "parents" => {"searchable" => true},
+          "admin_levels" => {"searchable" => true, "type" => 'dynamic'},
+          "lat" => {},
+          "lng" => {},
+        })
 
         @extra_fields = @extra_scope.flatten.select(&:searchable?).map do |core_field|
           Cdx::Api::Elasticsearch::IndexedField.for(core_field, [
