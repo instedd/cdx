@@ -1,11 +1,13 @@
 class Manifest < ActiveRecord::Base
   has_and_belongs_to_many :device_models
+  has_and_belongs_to_many :conditions
 
   validate :manifest_validation
 
   before_save :update_models
   before_save :update_version
   before_save :update_api_version
+  before_save :update_conditions
 
   COLLECTION_SPLIT_TOKEN = "[*]."
   PATH_SPLIT_TOKEN = "."
@@ -36,6 +38,10 @@ class Manifest < ActiveRecord::Base
 
   def update_models
     self.device_models = Array(metadata["device_models"] || []).map { |model| DeviceModel.find_or_create_by(name: model)}
+  end
+
+  def update_conditions
+    self.conditions = Array(metadata["conditions"] || []).map { |name| Condition.find_or_create_by(name: name)}
   end
 
   def update_version

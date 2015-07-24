@@ -8,7 +8,7 @@ describe Manifest do
       %{{
         "metadata" : {
           "device_models" : ["foo"],
-          "conditions": ["MTB"],
+          "conditions": ["MTB", "RIFF"],
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -162,6 +162,16 @@ describe Manifest do
 
       Manifest.first.device_models.first.should eq(DeviceModel.first)
       DeviceModel.first.name.should eq("foo")
+    end
+
+    it "creates conditions from manifest" do
+      Manifest.create!(definition: definition)
+
+      conditions = Condition.all
+      conditions.count.should eq(2)
+      conditions.map(&:name).sort.should eq(["MTB", "RIFF"])
+
+      Manifest.first.conditions.count.should eq(2)
     end
   end
 end
