@@ -4,7 +4,7 @@ class Cdx::Scope
   def initialize name, fields
     @name = name
     @fields = fields.map do |name, definition|
-      Cdx::Field.new self, name, definition
+      Cdx::Field.for self, name, definition
     end
   end
 

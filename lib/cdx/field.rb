@@ -1,6 +1,10 @@
 class Cdx::Field
   attr_accessor :scope
 
+  def self.for scope, name, definition
+    new scope, name, definition
+  end
+
   def initialize scope, name, definition
     @scope = scope
     @name = name
@@ -8,7 +12,7 @@ class Cdx::Field
 
     if @definition["sub_fields"]
       @definition["sub_fields"] = @definition["sub_fields"].map do |sub_name, sub_field|
-        self.class.new(self, sub_name, sub_field)
+        Cdx::Field.for(self, sub_name, sub_field)
       end
     end
 
