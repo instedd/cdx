@@ -700,7 +700,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "years_between" : [
@@ -727,7 +727,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "years_between" : [
@@ -754,7 +754,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].time" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "years_between": [
@@ -787,7 +787,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "months_between": [
@@ -814,7 +814,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "months_between": [
@@ -841,7 +841,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].time" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "months_between": [
@@ -874,7 +874,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "days_between": [
@@ -901,7 +901,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "days_between": [
@@ -931,7 +931,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].time" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "days_between": [
@@ -964,7 +964,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "hours_between": [
@@ -991,7 +991,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "hours_between": [
@@ -1018,7 +1018,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].time" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "hours_between": [
@@ -1051,7 +1051,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "minutes_between": [
@@ -1078,7 +1078,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "minutes_between": [
@@ -1105,7 +1105,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].time" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "minutes_between": [
@@ -1138,7 +1138,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "seconds_between": [
@@ -1165,7 +1165,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "seconds_between": [
@@ -1192,7 +1192,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].time" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "seconds_between": [
@@ -1225,7 +1225,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "patient.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "milliseconds_between": [
@@ -1252,7 +1252,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "milliseconds_between": [
@@ -1279,7 +1279,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].time" : {
-                "collect": [
+                "map": [
                   {"lookup": "conditions"},
                   {
                     "milliseconds_between": [
@@ -1312,7 +1312,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].age" : {
-                "collect": [
+                "map": [
                   {"lookup": "multiple"},
                   {
                     "convert_time": [
@@ -1389,7 +1389,7 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].assay_code" : {
-                "collect": [
+                "map": [
                   {"lookup": "Test/Assay"},
                   {
                     "concat" : [

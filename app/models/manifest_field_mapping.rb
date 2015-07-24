@@ -80,8 +80,8 @@ class ManifestFieldMapping
       return traverse(value, data)[from..to]
     end
 
-    check_op(node, "collect") do |collection_lookup, mapping|
-      return collect(traverse(collection_lookup, data), mapping)
+    check_op(node, "map") do |collection_lookup, mapping|
+      return map(traverse(collection_lookup, data), mapping)
     end
 
     check_op(node, "parse_date") do |date, format|
@@ -361,7 +361,7 @@ class ManifestFieldMapping
     end
   end
 
-  def collect(values, mapping)
+  def map(values, mapping)
     return traverse(mapping, values) unless values.is_a? Array
     values.map do |value|
       traverse(mapping, value)
