@@ -4,7 +4,7 @@
     "api_version" : "1.2.1",
     "signature" : "",
     "device_models" : ["genoscan"],
-    "conditions": ["MTB"],
+    "conditions": ["mtb"],
     "source": { "type" : "csv", "separator" : ";" }
   },
   "custom_fields" : [
@@ -93,6 +93,9 @@
     },
     "device.lab_user" : {"lookup" : "WindowsUser"},
     "test.name" : {"lookup" : "TypeOfTest"},
+    "test.assays[*].condition" : {
+      "script" : "['mtb', 'rif', 'inh']"
+    },
     "test.assays[*].name" : {
       "script" : "['mtb', 'rif', 'inh']"
     },
