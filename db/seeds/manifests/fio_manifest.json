@@ -32,11 +32,11 @@
     "test.id" : {"lookup" : "@id"},
     "test.name" : {"lookup" : "Test/Code/@value"},
     "test.status" : {
-      "map" : [
+      "case" : [
         { "lookup": "Test/Control/@qualitative" },
         [
-          { "match" : "Valid", "output" : "success"},
-          { "match" : "*", "output" : "error"}
+          { "when" : "Valid", "then" : "success"},
+          { "when" : "*", "then" : "error"}
         ]
       ]
     },

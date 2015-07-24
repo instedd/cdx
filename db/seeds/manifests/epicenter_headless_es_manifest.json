@@ -104,19 +104,19 @@
       "if" : [
         {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
         {
-          "map": [
+          "case": [
           {"lookup" : "14"},
           [
-            {"match": "Estreptomicina", "output" : "streptomycin"},
-            {"match": "Etambutol", "output" : "ethambutol"},
-            {"match": "Rifampicina", "output" : "rifampicin"},
-            {"match": "Pirazinamida", "output" : "pyrazinamide"},
-            {"match": "Isoniazid", "output" : "isoniazid"},
-            {"match": "*cido p-Aminosalic*lico", "output" : "p_aminosalicyclic_acid"},
-            {"match": "Hidrazida del *cido tiofenocarbox*lico", "output" : "thiophenecarboxylic_acid_hydrazide"},
-            {"match": "Levofloxacino", "output" : "levofloxacin"},
-            {"match": "Tiosemicarbazona", "output" : "thiosemicarbazone"},
-            {"match": "*", "output" : "mtb"}
+            {"when": "Estreptomicina", "then" : "streptomycin"},
+            {"when": "Etambutol", "then" : "ethambutol"},
+            {"when": "Rifampicina", "then" : "rifampicin"},
+            {"when": "Pirazinamida", "then" : "pyrazinamide"},
+            {"when": "Isoniazid", "then" : "isoniazid"},
+            {"when": "*cido p-Aminosalic*lico", "then" : "p_aminosalicyclic_acid"},
+            {"when": "Hidrazida del *cido tiofenocarbox*lico", "then" : "thiophenecarboxylic_acid_hydrazide"},
+            {"when": "Levofloxacino", "then" : "levofloxacin"},
+            {"when": "Tiosemicarbazona", "then" : "thiosemicarbazone"},
+            {"when": "*", "then" : "mtb"}
           ]
         ]},
         "mtb"
@@ -126,21 +126,21 @@
       "if" : [
         {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
         {
-          "map": [
+          "case": [
           {"lookup" : "15"},
           [
-            {"match": "R", "output" : "positive"},
-            {"match": "S", "output" : "negative"},
-            {"match": "*", "output" : "n/a"}
+            {"when": "R", "then" : "positive"},
+            {"when": "S", "then" : "negative"},
+            {"when": "*", "then" : "n/a"}
           ]
         ]},
         {
-          "map" : [
+          "case" : [
             {"lookup" : "9"},
             [
-              {"match": "Positivo", "output" : "positive"},
-              {"match": "Negativo", "output" : "negative"},
-              {"match": "*", "output" : "n/a"}
+              {"when": "Positivo", "then" : "positive"},
+              {"when": "Negativo", "then" : "negative"},
+              {"when": "*", "then" : "n/a"}
             ]
           ]
         }
@@ -150,25 +150,25 @@
       "if" : [
         {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
         {
-          "map": [
+          "case": [
           {"lookup" : "15"},
           [
-            {"match": "S", "output" : "success"},
-            {"match": "R", "output" : "success"},
-            {"match": "*", "output" : "invalid"}
+            {"when": "S", "then" : "success"},
+            {"when": "R", "then" : "success"},
+            {"when": "*", "then" : "invalid"}
           ]
         ]},
         {
-          "map" : [
+          "case" : [
             { "lookup": "9" },
             [
-              {"match" : "Positivo", "output" : "success" },
-              {"match" : "Completo retirado", "output" : "success" },
-              {"match" : "Negativo", "output" : "success" },
-              {"match" : "No válido", "output" : "invalid" },
-              {"match" : "En curso retirado", "output" : "error" },
-              {"match" : "Umbral positivo", "output" : "no_result" },
-              {"match" : "*", "output" : "unknown"}
+              {"when" : "Positivo", "then" : "success" },
+              {"when" : "Completo retirado", "then" : "success" },
+              {"when" : "Negativo", "then" : "success" },
+              {"when" : "No válido", "then" : "invalid" },
+              {"when" : "En curso retirado", "then" : "error" },
+              {"when" : "Umbral positivo", "then" : "no_result" },
+              {"when" : "*", "then" : "unknown"}
             ]
           ]
         }

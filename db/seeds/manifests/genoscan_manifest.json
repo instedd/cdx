@@ -68,12 +68,12 @@
       ]
     },
     "patient.gender" : {
-      "map" : [
+      "case" : [
         {"lookup" : "Sex"},
         [
-          {"match": "*n.a.*", "output" : "unknown"},
-          {"match": "*Female*", "output" : "female"},
-          {"match": "*", "output" : "male"}
+          {"when": "*n.a.*", "then" : "unknown"},
+          {"when": "*Female*", "then" : "female"},
+          {"when": "*", "then" : "male"}
         ]
       ]
     },
@@ -116,11 +116,11 @@
         [mtb, rif, inh]"
     },
     "test.type" : {
-      "map" : [
+      "case" : [
         {"lookup" : "Strip-Type"},
         [
-          {"match": "*Patient*", "output" : "specimen"},
-          {"match": "*", "output" : "qc"}
+          {"when": "*Patient*", "then" : "specimen"},
+          {"when": "*", "then" : "qc"}
         ]
       ]
     },
@@ -128,26 +128,26 @@
     "test.revision" : {"lookup" : "Revision"},
     "test.control" : {"lookup" : "Control"},
     "test.ig_type" : {
-      "map" : [
+      "case" : [
         {"lookup" : "Ig-Type"},
         [
-          {"match": "*IgA*", "output" : "ig_a"},
-          {"match": "*IgG*", "output" : "ig_g"},
-          {"match": "*IgM*", "output" : "ig_m"},
-          {"match": "*", "output" : "unknown"}
+          {"when": "*IgA*", "then" : "ig_a"},
+          {"when": "*IgG*", "then" : "ig_g"},
+          {"when": "*IgM*", "then" : "ig_m"},
+          {"when": "*", "then" : "unknown"}
         ]
       ]
     },
     "test.control_strip" : {
-      "map" : [
+      "case" : [
         {"lookup" : "Strip-Type"},
         [
-          {"match": "*Patient*", "output" : "patient"},
-          {"match": "*Cut-Off*", "output" : "cut_off"},
-          {"match": "*Avidity*", "output" : "avidity"},
-          {"match": "*Liquor*", "output" : "liquor"},
-          {"match": "*Positive*", "output" : "positive"},
-          {"match": "*Negative*", "output" : "negative"}
+          {"when": "*Patient*", "then" : "patient"},
+          {"when": "*Cut-Off*", "then" : "cut_off"},
+          {"when": "*Avidity*", "then" : "avidity"},
+          {"when": "*Liquor*", "then" : "liquor"},
+          {"when": "*Positive*", "then" : "positive"},
+          {"when": "*Negative*", "then" : "negative"}
         ]
       ]
     },

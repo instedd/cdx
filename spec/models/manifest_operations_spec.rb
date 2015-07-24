@@ -192,7 +192,7 @@ describe Manifest, validate_manifest: false do
       "JSONObject is not a valid return type for 'patient.name' script"
     end
 
-    it "concats the result of a mapping" do
+    it "concats the result of a case" do
       assert_manifest_application %{
           {
             "test.foo" : {
@@ -200,11 +200,11 @@ describe Manifest, validate_manifest: false do
                 {"strip" : {"lookup" : "last_name"}},
                 ": ",
                 {
-                  "map" : [
+                  "case" : [
                     {"lookup" : "test_type"},
                     [
-                      { "match" : "*QC*", "output" : "qc"},
-                      { "match" : "*Specimen*", "output" : "specimen"}
+                      { "when" : "*QC*", "then" : "qc"},
+                      { "when" : "*Specimen*", "then" : "specimen"}
                     ]
                   ]
                 }
@@ -227,7 +227,7 @@ describe Manifest, validate_manifest: false do
       assert_manifest_application %{
           {
             "test.test_type" : {
-              "map" : [
+              "case" : [
                 {
                   "concat" : [
                     {"strip" : {"lookup" : "last_name"}},
@@ -236,8 +236,8 @@ describe Manifest, validate_manifest: false do
                   ]
                 },
                 [
-                  { "match" : "Subject:*", "output" : "specimen"},
-                  { "match" : "Doe: John", "output" : "qc"}
+                  { "when" : "Subject:*", "then" : "specimen"},
+                  { "when" : "Doe: John", "then" : "qc"}
                 ]
               ]
             }
@@ -619,12 +619,12 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{
             {
               "test.results[*].condition" : {
-                "map" : [
+                "case" : [
                   {"lookup" : "conditions[*].condition"},
                   [
-                    { "match" : "*MTB*", "output" : "MTB"},
-                    { "match" : "*FLU*", "output" : "H1N1"},
-                    { "match" : "*FLUA*", "output" : "A1N1"}
+                    { "when" : "*MTB*", "then" : "MTB"},
+                    { "when" : "*FLU*", "then" : "H1N1"},
+                    { "when" : "*FLUA*", "then" : "A1N1"}
                   ]
                 ]
               }

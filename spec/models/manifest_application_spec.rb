@@ -382,12 +382,12 @@ describe Manifest, validate_manifest: false do
       assert_manifest_application %{
           {
             "test.condition": {
-              "map" : [
+              "case" : [
                 {"lookup" : "condition"},
                 [
-                  { "match" : "*MTB*", "output" : "MTB"},
-                  { "match" : "*FLU*", "output" : "H1N1"},
-                  { "match" : "*FLUA*", "output" : "A1N1"}
+                  { "when" : "*MTB*", "then" : "MTB"},
+                  { "when" : "*FLU*", "then" : "H1N1"},
+                  { "when" : "*FLUA*", "then" : "A1N1"}
                 ]
               ]
             }
@@ -403,12 +403,12 @@ describe Manifest, validate_manifest: false do
       assert_manifest_application %{
           {
             "test.condition": {
-              "map" : [
+              "case" : [
                 {"lookup" : "condition"},
                 [
-                  { "match" : "*MTB*", "output" : "MTB"},
-                  { "match" : "*FLU*", "output" : "H1N1"},
-                  { "match" : "*FLUA*", "output" : "A1N1"}
+                  { "when" : "*MTB*", "then" : "MTB"},
+                  { "when" : "*FLU*", "then" : "H1N1"},
+                  { "when" : "*FLUA*", "then" : "A1N1"}
                 ]
               ]
             }
@@ -424,12 +424,12 @@ describe Manifest, validate_manifest: false do
       assert_raises_manifest_data_validation %{
           {
             "test.condition": {
-              "map" : [
+              "case" : [
                 {"lookup" : "condition"},
                 [
-                  { "match" : "*MTB*", "output" : "MTB"},
-                  { "match" : "*FLU*", "output" : "H1N1"},
-                  { "match" : "*FLUA*", "output" : "A1N1"}
+                  { "when" : "*MTB*", "then" : "MTB"},
+                  { "when" : "*FLU*", "then" : "H1N1"},
+                  { "when" : "*FLUA*", "then" : "A1N1"}
                 ]
               ]
             }

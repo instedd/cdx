@@ -174,11 +174,11 @@ describe Manifest do
         ],
         "field_mapping" : {
           "custom": {
-            "map" : [
+            "case" : [
               {"lookup" : "Test.test_type"},
               [
-                { "match" : "*QC*", "output" : "Invalid mapping"},
-                { "match" : "*Specimen*", "output" : "specimen"}
+                { "when" : "*QC*", "then" : "Invalid mapping"},
+                { "when" : "*Specimen*", "then" : "specimen"}
               ]
             ]
           }
@@ -208,11 +208,11 @@ describe Manifest do
         ],
         "field_mapping" : {
           "test.custom": {
-            "map" : [
+            "case" : [
               {"lookup" : "Test.test_type"},
               [
-                { "match" : "*QC*", "output" : "qc"},
-                { "match" : "*Specimen*", "output" : "specimen"}
+                { "when" : "*QC*", "then" : "qc"},
+                { "when" : "*Specimen*", "then" : "specimen"}
               ]
             ]
           }

@@ -106,22 +106,22 @@
       {
         "target_field": "results[*].result",
         "source": {
-          "map": [
+          "case": [
             {
               "lookup": "3"
             },
             [
               {
-                "match": "Threshold Positive",
-                "output": "indeterminate"
+                "when": "Threshold Positive",
+                "then": "indeterminate"
               },
               {
-                "match": "Positive",
-                "output": "positive"
+                "when": "Positive",
+                "then": "positive"
               },
               {
-                "match": "Negative",
-                "output": "negative"
+                "when": "Negative",
+                "then": "negative"
               }
             ]
           ]

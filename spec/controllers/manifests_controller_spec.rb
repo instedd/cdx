@@ -27,11 +27,11 @@ describe ManifestsController do
         "field_mapping": {
           "test.assay_name" : {"lookup" : "Test.assay_name"},
           "test.type" : {
-            "mapping" : [
+            "case" : [
               {"lookup" : "Test.test_type"},
               [
-                {"match" : "*QC*", "output" : "qc"},
-                {"match" : "*Specimen*", "output" : "specimen"}
+                {"when" : "*QC*", "then" : "qc"},
+                {"when" : "*Specimen*", "then" : "specimen"}
               ]
             ]
           }

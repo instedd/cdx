@@ -33,23 +33,23 @@ describe DeviceMessageImporter, elasticsearch: true do
       "field_mapping" : {
         "test.error_code" : {"lookup": "error_code"},
         "test.qualitative_result" : {
-          "map": [
+          "case": [
           {"lookup": "result"},
           [
-            {"match": "positivo", "output" : "positive"},
-            {"match": "positive", "output" : "positive"},
-            {"match": "negative", "output" : "negative"},
-            {"match": "negativo", "output" : "negative"},
-            {"match": "inválido", "output" : "n/a"}
+            {"when": "positivo", "then" : "positive"},
+            {"when": "positive", "then" : "positive"},
+            {"when": "negative", "then" : "negative"},
+            {"when": "negativo", "then" : "negative"},
+            {"when": "inválido", "then" : "n/a"}
           ]
         ]},
         "test.status" : {
-          "map": [
+          "case": [
           {"lookup": "result"},
           [
-            {"match": "inválido", "output" : "invalid"},
-            {"match": "invalid", "output" : "invalid"},
-            {"match": "*", "output" : "success"}
+            {"when": "inválido", "then" : "invalid"},
+            {"when": "invalid", "then" : "invalid"},
+            {"when": "*", "then" : "success"}
           ]
         ]}
       }

@@ -19,8 +19,8 @@ class ManifestFieldMapping
       return lookup(value, data)
     end
 
-    check_op(node, "map") do |value, cases|
-      return map(traverse(value, data), cases)
+    check_op(node, "case") do |value, cases|
+      return case_(traverse(value, data), cases)
     end
 
     check_op(node, "lowercase") do |value|
@@ -180,20 +180,20 @@ class ManifestFieldMapping
     @manifest.parser.lookup(path, data, @root)
   end
 
-  def map(value, mappings)
+  def case_(value, mappings)
     return value unless value
     if value.is_an? Array
       value.map do |value|
-        map value, mappings
+        case_ value, mappings
       end
     else
       mapping = mappings.detect do |mapping|
-        value.match mapping["match"].gsub("*", ".*")
+        value.match mapping["when"].gsub("*", ".*")
       end
 
       raise ManifestParsingError.invalid_mapping(value, @field.target_field, mappings) unless mapping
 
-      mapping["output"]
+      mapping["then"]
     end
   end
 

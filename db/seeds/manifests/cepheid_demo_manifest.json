@@ -31,12 +31,12 @@
       },
       {
         "target_field": "gender",
-        "source": { "map" : [
+        "source": { "case" : [
           { "lookup": "event.gender" },
           [
-            { "match" : "M", "output" : "male"},
-            { "match" : "F", "output" : "female"},
-            { "match" : "*", "output" : "unknown"}
+            { "when" : "M", "then" : "male"},
+            { "when" : "F", "then" : "female"},
+            { "when" : "*", "then" : "unknown"}
           ]
         ]},
         "type": "enum",
@@ -50,12 +50,12 @@
       },
       {
         "target_field": "ethnicity",
-        "source": { "map" : [
+        "source": { "case" : [
           { "lookup": "event.ethnicity" },
           [
-            { "match" : "hispanic", "output" : "hispanic"},
-            { "match" : "not_hispanic", "output" : "not_hispanic"},
-            { "match" : "*", "output" : "unknown"}
+            { "when" : "hispanic", "then" : "hispanic"},
+            { "when" : "not_hispanic", "then" : "not_hispanic"},
+            { "when" : "*", "then" : "unknown"}
           ]
         ]},
         "type": "enum",
@@ -69,16 +69,16 @@
       },
       {
         "target_field": "race",
-        "source": { "map" : [
+        "source": { "case" : [
           {"lookup": "event.race"},
           [
-            { "match" : "2054-5", "output" : "black_or_african_american"},
-            { "match" : "1002-5", "output" : "american_indian_or_alaska_native"},
-            { "match" : "2028-9", "output" : "asian"},
-            { "match" : "2076-8", "output" : "native_hawaiian_or_other_pacific_islander"},
-            { "match" : "2106-3", "output" : "white"},
-            { "match" : "2131-1", "output" : "other"},
-            { "match" : "*", "output" : "unknown"}
+            { "when" : "2054-5", "then" : "black_or_african_american"},
+            { "when" : "1002-5", "then" : "american_indian_or_alaska_native"},
+            { "when" : "2028-9", "then" : "asian"},
+            { "when" : "2076-8", "then" : "native_hawaiian_or_other_pacific_islander"},
+            { "when" : "2106-3", "then" : "white"},
+            { "when" : "2131-1", "then" : "other"},
+            { "when" : "*", "then" : "unknown"}
           ]
         ]},
         "type": "enum",
@@ -96,17 +96,17 @@
       },
       {
         "target_field": "race_ethnicity",
-        "source": { "map" : [
+        "source": { "case" : [
           {"lookup": "event.race_ethnicity"},
           [
-            { "match" : "2135-2", "output" : "hispanic"},
-            { "match" : "2054-5", "output" : "black_or_african_american"},
-            { "match" : "1002-5", "output" : "american_indian_or_alaska_native"},
-            { "match" : "2028-9", "output" : "asian"},
-            { "match" : "2076-8", "output" : "native_hawaiian_or_other_pacific_islander"},
-            { "match" : "2106-3", "output" : "white"},
-            { "match" : "2131-1", "output" : "other"},
-            { "match" : "*", "output" : "unknown"}
+            { "when" : "2135-2", "then" : "hispanic"},
+            { "when" : "2054-5", "then" : "black_or_african_american"},
+            { "when" : "1002-5", "then" : "american_indian_or_alaska_native"},
+            { "when" : "2028-9", "then" : "asian"},
+            { "when" : "2076-8", "then" : "native_hawaiian_or_other_pacific_islander"},
+            { "when" : "2106-3", "then" : "white"},
+            { "when" : "2131-1", "then" : "other"},
+            { "when" : "*", "then" : "unknown"}
           ]
         ]},
         "type": "enum",
@@ -222,16 +222,16 @@
       },
       {
         "target_field": "status",
-        "source": { "map" : [
+        "source": { "case" : [
           { "lookup": "event.result" },
-          [{"match" : "INVALID", "output" : "invalid" },
-            {"match" : "ERROR", "output" : "error" },
-            {"match" : "NO RESULT", "output" : "no_result" },
-            {"match" : "MTB NOT DETECTED", "output" : "negative" },
-            {"match" : "Rif Resistance DETECTED", "output" : "success" },
-            {"match" : "Rif Resistance INDETERMINATE", "output" : "success" },
-            {"match" : "MTB DETECTED", "output" : "success" },
-            {"match" : "*", "output" : "error"}
+          [{"when" : "INVALID", "then" : "invalid" },
+            {"when" : "ERROR", "then" : "error" },
+            {"when" : "NO RESULT", "then" : "no_result" },
+            {"when" : "MTB NOT DETECTED", "then" : "negative" },
+            {"when" : "Rif Resistance DETECTED", "then" : "success" },
+            {"when" : "Rif Resistance INDETERMINATE", "then" : "success" },
+            {"when" : "MTB DETECTED", "then" : "success" },
+            {"when" : "*", "then" : "error"}
           ]
         ]},
         "type": "enum",
@@ -247,16 +247,16 @@
       },
       {
         "target_field": "results[*].result",
-        "source": { "map" : [
+        "source": { "case" : [
           { "lookup": "event.result" },
-          [ {"match" : "INVALID", "output" : "unknown" },
-            {"match" : "ERROR", "output" : "unknown" },
-            {"match" : "NO RESULT", "output" : "unknown" },
-            {"match" : "MTB NOT DETECTED", "output" : "negative" },
-            {"match" : "Rif Resistance DETECTED", "output" : "positive_with_rif" },
-            {"match" : "Rif Resistance INDETERMINATE", "output" : "positive_with_rif_inconclusive" },
-            {"match" : "MTB DETECTED", "output" : "positive" },
-            {"match" : "*", "output" : "unknown"}
+          [ {"when" : "INVALID", "then" : "unknown" },
+            {"when" : "ERROR", "then" : "unknown" },
+            {"when" : "NO RESULT", "then" : "unknown" },
+            {"when" : "MTB NOT DETECTED", "then" : "negative" },
+            {"when" : "Rif Resistance DETECTED", "then" : "positive_with_rif" },
+            {"when" : "Rif Resistance INDETERMINATE", "then" : "positive_with_rif_inconclusive" },
+            {"when" : "MTB DETECTED", "then" : "positive" },
+            {"when" : "*", "then" : "unknown"}
           ]
         ]},
         "type": "enum",
@@ -272,14 +272,14 @@
       },
       {
         "target_field": "results[*].condition",
-        "source": { "map" : [
+        "source": { "case" : [
           { "lookup" : "event.assay_name"},
-          [ {"match" : "Xpert MTB-RIF", "output" : "mtb"},
-            {"match" : "Xpert MTB-RIF G3", "output" : "mtb"},
-            {"match" : "MTB-RIF Assay G4", "output" : "mtb"},
-            {"match" : "Xpert MTB-RIF Assay G4", "output" : "mtb"},
-            {"match" : "MTB Beta", "output" : "mtb"},
-            {"match" : "*", "output" : "mtb"}
+          [ {"when" : "Xpert MTB-RIF", "then" : "mtb"},
+            {"when" : "Xpert MTB-RIF G3", "then" : "mtb"},
+            {"when" : "MTB-RIF Assay G4", "then" : "mtb"},
+            {"when" : "Xpert MTB-RIF Assay G4", "then" : "mtb"},
+            {"when" : "MTB Beta", "then" : "mtb"},
+            {"when" : "*", "then" : "mtb"}
           ]
         ]},
         "type": "enum",
@@ -291,11 +291,11 @@
       },
       {
         "target_field": "test_type",
-        "source": { "map" : [
+        "source": { "case" : [
           { "lookup": "event.test_type" },
           [
-            { "match" : "0", "output" : "specimen"},
-            { "match" : "*", "output" : "qc"}
+            { "when" : "0", "then" : "specimen"},
+            { "when" : "*", "then" : "qc"}
           ]
         ]},
         "type": "enum",

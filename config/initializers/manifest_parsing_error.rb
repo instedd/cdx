@@ -12,7 +12,7 @@ class ManifestParsingError < RuntimeError
   end
 
   def self.invalid_mapping(value, target_field, mappings)
-    new "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{mappings.map(){|f| f["match"]}.join(", ")})", target_field
+    new "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{mappings.map(){|f| f["when"]}.join(", ")})", target_field
   end
 
   def self.null_not_allowed(target_field)

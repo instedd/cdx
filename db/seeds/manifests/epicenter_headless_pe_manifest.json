@@ -107,26 +107,26 @@
       {
         "target_field": "results[*].result",
         "source": {
-          "map": [
+          "case": [
             {
               "lookup": "3"
             },
             [
               {
-                "match": "Umbral positivo",
-                "output": "indeterminate"
+                "when": "Umbral positivo",
+                "then": "indeterminate"
               },
               {
-                "match": "Positivo",
-                "output": "positive"
+                "when": "Positivo",
+                "then": "positive"
               },
               {
-                "match": "Negativo",
-                "output": "negative"
+                "when": "Negativo",
+                "then": "negative"
               },
               {
-                "match": "*",
-                "output": "unknown"
+                "when": "*",
+                "then": "unknown"
               }
             ]
           ]
@@ -144,16 +144,16 @@
       {
         "target_field": "status",
         "source": {
-          "map" : [
+          "case" : [
             { "lookup": "3" },
             [
-              {"match" : "Positivo", "output" : "success" },
-              {"match" : "Negativo", "output" : "negative" },
-              {"match" : "Umbral positivo", "output" : "success" },
-              {"match" : "No válido", "output" : "invalid" },
-              {"match" : "En curso retirado", "output" : "error" },
-              {"match" : "Completo retirado", "output" : "no_result" },
-              {"match" : "*", "output" : "unknown"}
+              {"when" : "Positivo", "then" : "success" },
+              {"when" : "Negativo", "then" : "negative" },
+              {"when" : "Umbral positivo", "then" : "success" },
+              {"when" : "No válido", "then" : "invalid" },
+              {"when" : "En curso retirado", "then" : "error" },
+              {"when" : "Completo retirado", "then" : "no_result" },
+              {"when" : "*", "then" : "unknown"}
             ]
           ]
         },
