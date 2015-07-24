@@ -10,6 +10,7 @@ describe DeviceMessage, elasticsearch: true do
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
           "device_models": "#{device.device_model.name}",
+          "conditions": ["MTB"],
           "source" : { "type" : "json"}
         },
         "field_mapping" : {
@@ -35,6 +36,7 @@ describe DeviceMessage, elasticsearch: true do
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
           "device_models": "#{device.device_model.name}",
+          "conditions": ["MTB"],
           "source" : { "type" : "json"}
         },
         "field_mapping" : {
@@ -60,6 +62,7 @@ describe DeviceMessage, elasticsearch: true do
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
           "device_models": "#{device.device_model.name}",
+          "conditions": ["MTB"],
           "source" : { "type" : "csv"}
         },
         "field_mapping" : {

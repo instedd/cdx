@@ -6,6 +6,9 @@
     "device_models": [
       "epicenter_headless_pe"
     ],
+    "conditions": [
+      "MTB"
+    ],
     "source": {
       "type": "headless_csv",
       "separator": ","

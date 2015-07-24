@@ -5,6 +5,9 @@
     "device_models": [
       "GX Model I"
     ],
+    "conditions": [
+      "MTB"
+    ],
     "source": {
       "type": "json"
     }

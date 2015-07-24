@@ -20,6 +20,7 @@ class DefaultManifest
         source: { type: "json" },
         device_models: [device_model_name],
         api_version: "#{Manifest::CURRENT_VERSION}",
+        conditions: ["MTB"],
 
         version: "0.0.1"
       },

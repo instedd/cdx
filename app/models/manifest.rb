@@ -12,7 +12,7 @@ class Manifest < ActiveRecord::Base
 
   NULL_STRING = "null"
 
-  CURRENT_VERSION = "1.2.0"
+  CURRENT_VERSION = "1.2.1"
 
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
@@ -134,9 +134,10 @@ class Manifest < ActiveRecord::Base
     if self.metadata.blank?
       self.errors.add(:metadata, "can't be blank")
     else
-      fields =  ["version","api_version","device_models"]
+      fields = %w(version api_version device_models conditions)
       check_fields_in_metadata(fields)
       check_api_version
+      check_conditions
     end
 
     check_field_mapping
@@ -151,6 +152,24 @@ class Manifest < ActiveRecord::Base
   def check_api_version
     unless self.metadata["api_version"] == CURRENT_VERSION
       self.errors.add(:api_version, "must be #{CURRENT_VERSION}")
+    end
+  end
+
+  def check_conditions
+    conditions = self.metadata["conditions"]
+    unless conditions.is_a?(Array)
+      self.errors.add(:conditions, "must be a json array")
+      return
+    end
+
+    if conditions.empty?
+      self.errors.add(:conditions, "must be a non-empty json array")
+      return
+    end
+
+    unless conditions.all? { |condition| condition.is_a?(String) }
+      self.errors.add(:conditions, "must be a json string array")
+      return
     end
   end
 

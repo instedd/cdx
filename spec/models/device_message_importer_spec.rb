@@ -27,6 +27,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         "version": "1",
         "api_version": "#{Manifest::CURRENT_VERSION}",
         "device_models": "#{device.device_model.name}",
+        "conditions": ["MTB"],
         "source" : { "type" : "#{source}"}
       },
       "field_mapping" : {

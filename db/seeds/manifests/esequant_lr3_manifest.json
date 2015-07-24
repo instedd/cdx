@@ -5,6 +5,9 @@
     "device_models": [
       "esequant_lr3"
     ],
+    "conditions": [
+      "MTB"
+    ],
     "source": {
       "type": "json"
     }

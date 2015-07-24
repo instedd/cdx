@@ -8,6 +8,7 @@ describe Manifest do
       %{{
         "metadata" : {
           "device_models" : ["foo"],
+          "conditions": ["MTB"],
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -29,6 +30,7 @@ describe Manifest do
       updated_definition = %{{
         "metadata" : {
           "device_models" : ["foo"],
+          "conditions": ["MTB"],
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "version" : "2.0.1",
           "source" : {"type" : "json"}
@@ -125,6 +127,7 @@ describe Manifest do
           "version" : 1,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["bar"],
+          "conditions": ["MTB"],
           "source" : {"type" : "json"}
         },
         "field_mapping" : {}
@@ -143,6 +146,7 @@ describe Manifest do
           "version" : 2,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["foo"],
+          "conditions": ["MTB"],
           "source" : {"type" : "json"}
         },
         "field_mapping" : {}

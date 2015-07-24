@@ -16,6 +16,7 @@ describe Subscriber, elasticsearch: true do
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
           "device_models": "#{model.name}",
+          "conditions": ["MTB"],
           "source" : {"type" : "json"}
         },
         "field_mapping" : {

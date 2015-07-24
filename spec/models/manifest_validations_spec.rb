@@ -91,6 +91,7 @@ describe Manifest do
       expect {Manifest.create!(definition: %{{
         "metadata" : {
           "device_models" : ["foo"],
+          "conditions": ["MTB"],
           "api_version" : "1.1.1",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -194,6 +195,7 @@ describe Manifest do
         "metadata" : {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
+          "conditions": ["MTB"],
           "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
@@ -274,6 +276,7 @@ describe Manifest do
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
+          "conditions" : ["MTB"],
           "source" : {"type" : "json"}
         },
         "custom_fields": [
@@ -348,6 +351,81 @@ describe Manifest do
       m.save
       Manifest.count.should eq(0)
       m.errors[:enum_fields].first.should eq("must be provided with options. (In 'custom'")
+    end
+
+    it "shouldn't create if missing conditions" do
+      definition = %{{
+        "metadata" : {
+          "version" : "1.0.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
+          "device_models" : ["GX4001"],
+          "source" : {"type" : "json"}
+        },
+        "field_mapping" : {
+          "custom": {"lookup" : "custom"}
+        }
+      }}
+      m = Manifest.new(definition: definition)
+      m.save
+      Manifest.count.should eq(0)
+      m.errors[:metadata].first.should eq("must include conditions field")
+    end
+
+    it "shouldn't create if conditions is not an array" do
+      definition = %{{
+        "metadata" : {
+          "version" : "1.0.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
+          "device_models" : ["GX4001"],
+          "conditions": 1,
+          "source" : {"type" : "json"}
+        },
+        "field_mapping" : {
+          "custom": {"lookup" : "custom"}
+        }
+      }}
+      m = Manifest.new(definition: definition)
+      m.save
+      Manifest.count.should eq(0)
+      m.errors[:conditions].first.should eq("must be a json array")
+    end
+
+    it "shouldn't create if conditions is an empty array" do
+      definition = %{{
+        "metadata" : {
+          "version" : "1.0.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
+          "device_models" : ["GX4001"],
+          "conditions": [],
+          "source" : {"type" : "json"}
+        },
+        "field_mapping" : {
+          "custom": {"lookup" : "custom"}
+        }
+      }}
+      m = Manifest.new(definition: definition)
+      m.save
+      Manifest.count.should eq(0)
+      m.errors[:conditions].first.should eq("must be a non-empty json array")
+    end
+
+    it "shouldn't create if conditions is not a string array" do
+      definition = %{{
+        "metadata" : {
+          "version" : "1.0.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
+          "device_models" : ["GX4001"],
+          "conditions": ["foo", 1],
+          "source" : {"type" : "json"}
+        },
+        "field_mapping" : {
+          "custom": {"lookup" : "custom"}
+        }
+      }}
+      m = Manifest.new(definition: definition)
+      m.save
+      Manifest.count.should eq(0)
+      m.errors[:conditions].first.should eq("must be a json string array")
     end
   end
 end

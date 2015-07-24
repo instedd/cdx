@@ -1,8 +1,9 @@
 {
   "metadata" : {
     "version" : "1.0.4",
-    "api_version" : "1.2.0",
+    "api_version" : "1.2.1",
     "device_models" : ["FIO"],
+    "conditions": ["MTB"],
     "source": {
       "type" : "xml",
       "root" : "DiagnosticTests"
