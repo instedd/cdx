@@ -30,8 +30,8 @@ test:
     type: integer
     searchable: true
   error_description:
-  patient_age: # (store with 'units', goes under test, not sample, not patient) UNITS????
-    type: integer
+  patient_age:
+    type: duration
     searchable: true
   name: # (current 'assay_name')
     searchable: true

@@ -12,6 +12,8 @@ class Cdx::Field
         EnumField
       when "dynamic"
         DynamicField
+      when "duration"
+        DurationField
       else
         Cdx::Field
       end
@@ -97,5 +99,8 @@ class Cdx::Field
   end
 
   class DynamicField < self
+  end
+
+  class DurationField < self
   end
 end
