@@ -43,6 +43,10 @@ class ManifestFieldMapping
       return beginning_of(traverse(date_time, data), traverse(time_unit, data))
     end
 
+    check_op(node, "duration") do |components|
+      return duration_field(components, data)
+    end
+
     # TODO: Refactor this
     check_op(node, "years_between") do |first_date, second_date|
      return years_between(traverse(first_date, data), traverse(second_date, data))
@@ -235,6 +239,14 @@ class ManifestFieldMapping
     else
       raise ManifestParsingError.unsupported_time_unit(time_unit, @field.target_field)
     end
+  end
+
+  def duration_field(components, data)
+    Hash[
+      components.map do |key, value|
+        [key, traverse(value, data).to_i]
+      end
+    ]
   end
 
   def years_between(first_date, second_date)
