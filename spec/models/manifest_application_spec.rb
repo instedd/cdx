@@ -10,7 +10,7 @@ describe Manifest, validate_manifest: false do
             "test.assay_name" : {"lookup" : "assay.name"}
           }
         }, %{
-          [{"name": "test.assay_name"}]
+          {"test.assay_name": {}}
         },
         '{"assay" : {"name" : "GX4002"}}',
         "test" => {"custom" => {"assay_name" => "GX4002"}, "pii" => {}, "indexed" => {}}
@@ -30,13 +30,13 @@ describe Manifest, validate_manifest: false do
     it "should apply to pii core field" do
       assert_manifest_application %{
           {
-            "patient.patient_name" : {"lookup" : "patient.name"}
+            "patient.name" : {"lookup" : "patient.name"}
           }
         }, %{
-          [{"name": "patient.patient_name", "pii": true}]
+          {"patient.name": {"pii": true}}
         },
         '{"patient" : {"name" : "John"}}',
-        "patient" => {"indexed" => {}, "pii" => {"patient_name" => "John"}, "custom" => {}}
+        "patient" => {"indexed" => {}, "pii" => {"name" => "John"}, "custom" => {}}
     end
 
     it "should apply to custom non-pii field" do
@@ -45,22 +45,10 @@ describe Manifest, validate_manifest: false do
             "test.temperature" : {"lookup" : "temperature"}
           }
         }, %{
-          [{"name": "test.temperature"}]
+          {"test.temperature": {}}
         },
         {json: '{"temperature" : "20"}', csv: "temperature\n20"},
         "test" => {"indexed" => {}, "pii" => {}, "custom" => {"temperature" => "20"}}
-    end
-
-    it "should apply to custom non-pii field coercing to integer" do
-      assert_manifest_application %{
-          {
-            "test.temperature" : {"lookup" : "temperature"}
-          }
-        }, %{
-          [{"name": "test.temperature", "type" : "integer"}]
-        },
-        {json: '{"temperature" : 20}', csv: "temperature\n20"},
-        "test" => {"indexed" => {}, "pii" => {}, "custom" => {"temperature" => 20}}
     end
 
     it "should apply to custom non-pii field inside results array" do
@@ -69,10 +57,12 @@ describe Manifest, validate_manifest: false do
             "test.assays[*].temperature" : {"lookup" : "temperature"}
           }
         }, %{
-          [{"name": "test.assays[*].temperature", "type" : "integer"}]
+          {
+            "test.assays[*].temperature": {}
+          }
         },
-        '{"temperature" : 20}',
-        "test" => {"indexed" => {}, "pii" => {}, "custom" => {"assays"=>[{"temperature"=>20}]}}
+        '{"temperature" : "20"}',
+        "test" => {"indexed" => {}, "pii" => {}, "custom" => {"assays"=>[{"temperature"=>"20"}]}}
     end
 
     it "should store fields in sample, test or patient as specified" do
@@ -97,16 +87,18 @@ describe Manifest, validate_manifest: false do
       csv = "test_id;assay;start_time;concentration;raw_result;sample_id;sample_type;collected_at;culture_days;datagram;patient_id;gender;dob;hiv;shirt_color" +
       "\n4;mtb;2000/1/1 10:00:00;15%;positivo 15%;4002;sputum;2000/1/1 9:00:00;10;010100011100;8000;male;2000/1/1;positive;blue"
 
-      custom_definition = %{[
-        {"name": "sample.culture_days"},
-        {"name": "sample.datagram"},
-        {"name": "sample.collected_at", "pii": true},
-        {"name": "patient.dob", "pii": true},
-        {"name": "patient.shirt_color"},
-        {"name": "patient.hiv"},
-        {"name": "test.raw_result"},
-        {"name": "test.concentration"}
-      ]}
+      custom_definition = %{
+        {
+          "sample.culture_days": { },
+          "sample.datagram": { },
+          "sample.collected_at": { "pii": true},
+          "patient.dob": { "pii": true},
+          "patient.shirt_color": {},
+          "patient.hiv": {},
+          "test.raw_result": {},
+          "test.concentration": {}
+        }
+      }
 
       field_definition = %{{
         "sample.id": {"lookup" : "sample_id"},
@@ -189,11 +181,13 @@ describe Manifest, validate_manifest: false do
               "lookup" : "temperature"
             }
           }
-        }, %{[
-          {"name": "test.assays[*].instant_temperature[*].value"},
-          {"name": "test.assays[*].instant_temperature[*].sample_time"},
-          {"name": "test.final_temperature"}
-        ]},
+        }, %{
+          {
+            "test.assays[*].instant_temperature[*].value": {},
+            "test.assays[*].instant_temperature[*].sample_time": {},
+            "test.final_temperature": {}
+          }
+        },
         '{
           "temperature" : 20,
           "tests" : [
@@ -247,41 +241,12 @@ describe Manifest, validate_manifest: false do
             "test.temperature": {"lookup" : "temperature"}
           }
         }, %{
-          [{"name": "test.temperature", "pii": true}]
+          {
+            "test.temperature": {"pii": true}
+          }
         },
         '{"temperature" : 20}',
         "test" => {"indexed" => {}, "pii" => {"temperature" => 20}, "custom" => {}}
-    end
-
-    it "doesn't raise on valid value in options" do
-      assert_manifest_application %{
-          {
-            "test.level": {"lookup" : "level"}
-          }
-        }, %{
-          [{
-            "name": "test.level",
-            "options": ["low", "medium", "high"]
-          }]
-        },
-        '{"level" : "high"}',
-        "test" => {"custom" => {"level" => "high"}, "pii" => {}, "indexed" => {}}
-    end
-
-    it "should raise on invalid value in options" do
-      assert_raises_manifest_data_validation %{
-          {
-            "test.level": {"lookup" : "level"}
-          }
-        }, %{
-          [{
-            "name": "test.level",
-            "type": "enum",
-            "options": ["low", "medium", "high"]
-          }]
-        },
-        '{"level" : "John Doe"}',
-        "'John Doe' is not a valid value for 'test.level' (valid options are: low, medium, high)"
     end
 
     it "doesn't raise on valid value in range" do
@@ -290,15 +255,16 @@ describe Manifest, validate_manifest: false do
             "test.temperature" : {"lookup" : "temperature"}
           }
         }, %{
-          [{
-            "name": "test.temperature",
-            "valid_values" : {
-              "range" : {
-                "min" : 30,
-                "max" : 30
+          {
+            "test.temperature": {
+              "valid_values": {
+                "range" : {
+                  "min" : 30,
+                  "max" : 30
+                }
               }
             }
-          }]
+          }
         },
         '{"temperature" : 30}',
         "test" => {"indexed" => {}, "pii" => {}, "custom" => {"temperature" => 30}}
@@ -310,15 +276,16 @@ describe Manifest, validate_manifest: false do
             "test.temperature" : {"lookup" : "temperature"}
           }
         }, %{
-          [{
-            "name": "test.temperature",
-            "valid_values" : {
-              "range" : {
-                "min" : 30,
-                "max" : 31
+          {
+            "test.temperature": {
+              "valid_values": {
+                "range" : {
+                  "min" : 30,
+                  "max" : 31
+                }
               }
             }
-          }]
+          }
         },
         '{"temperature" : 29.9}',
         "'29.9' is not a valid value for 'test.temperature' (valid values must be between 30 and 31)"
@@ -330,15 +297,16 @@ describe Manifest, validate_manifest: false do
             "test.temperature" : {"lookup" : "temperature"}
           }
         }, %{
-          [{
-            "name": "test.temperature",
-            "valid_values" : {
-              "range" : {
-                "min" : 30,
-                "max" : 31
+          {
+            "test.temperature": {
+              "valid_values": {
+                "range" : {
+                  "min" : 30,
+                  "max" : 31
+                }
               }
             }
-          }]
+          }
         },
         '{"temperature" : 31.1}',
         "'31.1' is not a valid value for 'test.temperature' (valid values must be between 30 and 31)"
@@ -350,12 +318,13 @@ describe Manifest, validate_manifest: false do
             "test.sample_date" : {"lookup" : "sample_date"}
           }
         }, %{
-          [{
-            "name": "test.sample_date",
-            "valid_values" : {
-              "date" : "iso"
+          {
+            "test.sample_date": {
+              "valid_values" : {
+                "date" : "iso"
+              }
             }
-          }]
+          }
         },
         '{"sample_date" : "2014-05-14T15:22:11+0000"}',
         "test" => {"custom" => {"sample_date" => "2014-05-14T15:22:11+0000"}, "pii" => {}, "indexed" => {}}
@@ -367,12 +336,13 @@ describe Manifest, validate_manifest: false do
             "test.sample_date" : {"lookup" : "sample_date"}
           }
         }, %{
-          [{
-            "name": "test.sample_date",
-            "valid_values" : {
-              "date" : "iso"
+          {
+            "test.sample_date": {
+              "valid_values" : {
+                "date" : "iso"
+              }
             }
-          }]
+          }
         },
         '{"sample_date" : "John Doe"}',
         "'John Doe' is not a valid value for 'test.sample_date' (valid value must be an iso date)"
@@ -393,7 +363,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "test.condition"}]
+          {
+            "test.condition": {}
+          }
         },
         '{"condition" : "PATIENT HAS MTB CONDITION"}',
         "test" => {"custom" => {"condition" =>"MTB"}, "pii" => {}, "indexed" => {}}
@@ -414,7 +386,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "test.condition"}]
+          {
+            "test.condition": {}
+          }
         },
         '{"condition" : "PATIENT HAS FLU CONDITION"}',
         "test" => {"custom" => {"condition" => "H1N1"}, "pii" => {}, "indexed" => {}}
@@ -435,7 +409,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "test.condition"}]
+          {
+            "test.condition": {}
+          }
         },
         '{"condition" : "PATIENT IS OK"}',
         "'PATIENT IS OK' is not a valid value for 'test.condition' (valid value must be in one of these forms: *MTB*, *FLU*, *FLUA*)"
@@ -449,7 +425,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "test.list[*].temperature"}]
+          {
+            "test.list[*].temperature": {}
+          }
         },
         '{"temperature_list" : [{"temperature" : 20}, {"temperature" : 10}]}',
         "test" => {"indexed" => {}, "pii" => {}, "custom" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}
@@ -464,10 +442,10 @@ describe Manifest, validate_manifest: false do
             "lookup" : "some_list[*].bar"
           }
         }}, %{
-          [
-            {"name": "test.collection[*].temperature"},
-            {"name": "test.collection[*].foo"}
-          ]
+          {
+            "test.collection[*].temperature": {},
+            "test.collection[*].foo": {}
+          }
         },
         '{
           "some_list" : [
@@ -501,10 +479,10 @@ describe Manifest, validate_manifest: false do
             "lookup" : "other_list[*].bar"
           }
         }}, %{
-          [
-            {"name": "test.collection[*].temperature"},
-            {"name": "test.collection[*].foo"}
-          ]
+          {
+            "test.collection[*].temperature": {},
+            "test.collection[*].foo": {}
+          }
         },
         '{
           "temperature_list" : [{"temperature" : 20}, {"temperature" : 10}],
@@ -529,7 +507,7 @@ describe Manifest, validate_manifest: false do
       assert_manifest_application '{
           "test.custom_id" :{ "lookup" : "custom_id" }
         }',
-        '[ { "name" : "test.custom_id" } ]',
+        '{"test.custom_id": {}}',
         {json: '{"custom_id" : "20"}', csv: "custom_id\n20"},
         {"patient" => {"pii" => {"id" => "20"}}},
         device

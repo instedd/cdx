@@ -76,6 +76,6 @@ class ManifestField
   end
 
   def self.custom_field_from(manifest, target_field)
-    manifest.custom_fields.detect{|x| x['name'] == target_field}
+    manifest.custom_fields[target_field]
   end
 end

@@ -160,16 +160,16 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
-        "custom_fields": [
-          {"name": "patient.foo", "type": "integer", "pii": true}
-        ],
+        "custom_fields": {
+          "patient.foo": {"pii": true}
+        },
         "field_mapping" : {
           "test.name" : {"lookup" : "assay.name"},
           "patient.foo" : {"lookup" : "patient_id"}
         }
       }}
 
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: "1234"), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
       test["test"]["name"].should eq("GX4002")
@@ -180,8 +180,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       raw_data = test.sensitive_data
       test.plain_sensitive_data.should_not eq(raw_data)
       test.plain_sensitive_data["patient"]["id"].should be_nil
-      test.plain_sensitive_data["patient"]["foo"].should eq(1234)
-      test.plain_sensitive_data["patient"]["foo"].should eq(1234)
+      test.plain_sensitive_data["patient"]["foo"].should eq("1234")
     end
 
     it "merges pii from different tests in the same sample across devices" do
@@ -193,23 +192,21 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
-        "custom_fields": [
-          {
-            "name": "patient.telephone_number",
-            "type" : "integer",
+        "custom_fields": {
+          "patient.telephone_number": {
             "pii" : true
           }
-        ],
+        },
         "field_mapping" : {
           "test.name" : {"lookup" : "assay.name"},
           "sample.uid" :  {"lookup" : "sample_id"},
-          "patient.id" : {"lookup" : "patient_id"},
-          "patient.telephone_number" : {"lookup" : "patient_telephone_number"}
+          "patient.id" : {"lookup" : "patient.id"},
+          "patient.telephone_number" : {"lookup" : "patient.telephone_number"}
         }
       }}
 
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 3, sample_id: "10"), device_id: device.uuid, authentication_token: device.plain_secret_key
-      post :create, Oj.dump(assay: {name: "GX4002"}, patient_telephone_number: 2222222, sample_id: 10), device_id: device2.uuid, authentication_token: device2.plain_secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient: {id: 3}, sample_id: "10"), device_id: device.uuid, authentication_token: device.plain_secret_key
+      post :create, Oj.dump(assay: {name: "GX4002"}, patient: {telephone_number: "2222222"}, sample_id: 10), device_id: device2.uuid, authentication_token: device2.plain_secret_key
 
       TestResult.count.should eq(2)
       Sample.count.should eq(1)
@@ -220,7 +217,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       sample = Sample.first
       sample.plain_sensitive_data["sample"]["uid"].should eq(10)
       sample.patient.plain_sensitive_data["patient"]["id"].should eq(3)
-      sample.patient.plain_sensitive_data["patient"]["telephone_number"].should eq(2222222)
+      sample.patient.plain_sensitive_data["patient"]["telephone_number"].should eq("2222222")
     end
 
     it "uses the last version of the manifest" do
@@ -231,9 +228,9 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
-        "custom_fields" : [
-          {"name": "test.foo"}
-        ],
+        "custom_fields" : {
+          "test.foo": {}
+        },
         "field_mapping" : {
           "test.foo" : {"lookup" : "assay.name"}
         }
@@ -266,9 +263,9 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
         },
-        "custom_fields" : [
-          {"name": "test.foo"}
-        ],
+        "custom_fields" : {
+          "test.foo" : {}
+        },
         "field_mapping" : {
           "test.foo" : {"lookup" : "some_field"}
         }

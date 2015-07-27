@@ -215,9 +215,11 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "api_version" : "#{Manifest::CURRENT_VERSION}",
             "source" : {"type" : "json"}
           },
-          "custom_fields": [
-            {"name": "test.foo", "type" : "string"}
-          ],
+          "custom_fields": {
+            "test.foo": {
+              "type": "string"
+            }
+          },
           "field_mapping" : {
             "test.foo" : {"lookup" : "some_field"}
           }
@@ -245,9 +247,11 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "version" : "1.0.0",
             "source" : {"type" : "json"}
           },
-          "custom_fields": [
-            {"name": "patient.name", "pii": true}
-          ],
+          "custom_fields": {
+            "patient.name": {
+              "pii": true
+            }
+          },
           "field_mapping" : {
             "test.assays[*].qualitative_result": {
               "lookup" : "assays[*].qualitative_result"

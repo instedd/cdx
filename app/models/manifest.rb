@@ -197,54 +197,18 @@ class Manifest < ActiveRecord::Base
   def check_custom_fields
     return if loaded_definition["custom_fields"].nil?
 
-    if loaded_definition["custom_fields"].is_a? Array
-      custom_fields.each do |custom_field|
-        if field_mapping[custom_field['name']].blank?
-          self.errors.add(:invalid_custom_field, ": target '#{custom_field["name"]}'. Must include a field mapping")
-        end
-        check_valid_type custom_field
-        check_properties_of_enum_field custom_field
+    if loaded_definition["custom_fields"].is_a? Hash
+      custom_fields.each do |custom_field_name, custom_field|
+        check_no_type custom_field_name, custom_field
       end
     else
-      self.errors.add(:custom_fields, "must be a json array")
+      self.errors.add(:custom_fields, "must be a json object")
     end
   end
 
-  def check_valid_type(custom_field)
-    if (custom_field["pii"].blank? || custom_field["pii"]==false)
-      valid_types = ["date", "enum", "location", "string", "integer", "long", "float", "double", "boolean"]
-      if(custom_field["type"].blank? || ! valid_types.include?(custom_field["type"]))
-        self.errors.add(:invalid_type, ": target '#{custom_field["name"]}'. Field type must be one of 'integer', 'long', 'float', 'double', 'date', 'enum', 'location', 'boolean' or 'string'")
-      end
-    end
-  end
-
-  def check_properties_of_enum_field custom_field
-    if custom_field["type"] == "enum"
-      if (custom_field["options"])
-        verify_absence_of_null_string custom_field
-        # TODO: validate source mappings
-        if (custom_field["value_mappings"])
-          check_value_mappings custom_field
-        end
-      else
-        self.errors.add(:enum_fields, "must be provided with options. (In '#{custom_field["name"]}'")
-      end
-    end
-  end
-
-  def verify_absence_of_null_string custom_field
-    if custom_field["options"].include? NULL_STRING
-      self.errors.add(:string_null, ": cannot appear as a possible value. (In '#{custom_field["name"]}') ")
-    end
-  end
-
-  def check_value_mappings(custom_field)
-    valid_values = custom_field["options"]
-    custom_field["value_mappings"].values.each do |vm|
-      if !valid_values.include? vm
-        self.errors.add(:invalid_custom_field, ": target '#{custom_field["name"]}'. '#{vm}' is not a valid value")
-      end
+  def check_no_type(custom_field_name, custom_field)
+    if custom_field["type"]
+      self.errors.add(:invalid_type, ": target '#{custom_field_name}'. Field can't specify a type.")
     end
   end
 end

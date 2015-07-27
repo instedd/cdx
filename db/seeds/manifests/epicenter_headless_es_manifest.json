@@ -36,13 +36,11 @@
       "separator": ","
     }
   },
-  "custom_fields": [
-    {
-      "name": "patient.name",
-      "type" : "string",
+  "custom_fields": {
+    "patient.name": {
       "pii" : true
     }
-  ],
+  },
   "field_mapping": {
     "patient.id": { "lookup": "4" },
     "patient.name": { "lookup": "3" },

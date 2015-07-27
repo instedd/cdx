@@ -15,12 +15,12 @@ describe Manifest, validate_manifest: false do
             ]
           }
         }}, %{
-          [
-            {
+          {
+            "patient.name" : {
               "name": "patient.name",
               "pii" : true
             }
-          ]
+          }
         },
         '{
           "first_name" : "John",
@@ -41,11 +41,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         },%{
-          [
-            {
-              "name": "patient.name"
-            }
-          ]
+          {
+            "patient.name": {}
+          }
         },
         '{
           "first_name" : "John",
@@ -62,11 +60,9 @@ describe Manifest, validate_manifest: false do
           }
         }
       },%{
-        [
-          {
-            "name": "patient.name"
-          }
-        ]
+        {
+          "patient.name": {}
+        }
       },
       %({"last_name" : "Doe"}),
       "patient" => {"custom" => {"name" => "doe"}, "pii" => {}, "indexed" => {}}
@@ -80,11 +76,9 @@ describe Manifest, validate_manifest: false do
           }
         }
       ), %(
-        [
-          {
-            "name": "patient.name"
-          }
-        ]
+        {
+          "patient.name": {}
+        }
       ), %({"first_name": "John", "last_name": "Doe"}),
       "patient" => {"custom" => {"name" => "John Doe"}, "pii" => {}, "indexed" => {}}
     end
@@ -96,11 +90,9 @@ describe Manifest, validate_manifest: false do
           "sample.fields": { "script": "device.name + ',' + device.uuid" }
         }
       ), %(
-        [
-          {
-            "name": "sample.fields"
-          }
-        ]
+        {
+          "sample.fields": {}
+        }
       ), %({}),
       {"sample" => {"custom" => {"fields" => "#{device.name},#{device.uuid}"}, "pii" => {}, "indexed" => {}}}, device
     end
@@ -114,11 +106,9 @@ describe Manifest, validate_manifest: false do
           "sample.fields": { "script": "laboratory.name + ',' + laboratory.address + ',' + laboratory.city + ',' + laboratory.state + ',' + laboratory.zip_code + ',' + laboratory.country + ',' + laboratory.region + ',' + parseInt(laboratory.lat) + ',' + parseInt(laboratory.lng) + ',' + laboratory.location_geoid" }
         }
       ), %(
-        [
-          {
-            "name": "sample.fields"
-          }
-        ]
+        {
+          "sample.fields": {}
+        }
       ), %({}),
       {"sample" => {"custom" => {"fields" => "#{lab.name},#{lab.address},#{lab.city},#{lab.state},#{lab.zip_code},#{lab.country},#{lab.region},#{lab.lat.to_i},#{lab.lng.to_i},#{lab.location_geoid}"}, "pii" => {}, "indexed" => {}}}, device
     end
@@ -132,11 +122,9 @@ describe Manifest, validate_manifest: false do
           "sample.fields": { "script": "location.name + ',' + parseInt(location.lat) + ',' + parseInt(location.lng)" }
         }
       ), %(
-        [
-          {
-            "name": "sample.fields"
-          }
-        ]
+        {
+          "sample.fields": {}
+        }
       ), %({}),
       {"sample" => {"custom" => {"fields" => "#{loc.name},#{loc.lat.to_i},#{loc.lng.to_i}"}, "pii" => {}, "indexed" => {}}}, device
     end
@@ -147,9 +135,9 @@ describe Manifest, validate_manifest: false do
           "patient.name": {"script": "message.xpath('Patient/@name').first().value"}
         }
       ), %(
-        [{
-          "name": "patient.name"
-        }]
+        {
+          "patient.name": {}
+        }
       ), {xml: %(
         <Message>
           <Patient name="Socrates" age="27"/>
@@ -166,11 +154,9 @@ describe Manifest, validate_manifest: false do
           }
         }
       ), %(
-        [
-          {
-            "name": "patient.name"
-          }
-        ]
+        {
+          "patient.name": {}
+        }
       ), %({"first_name": "John", "last_name": "Doe"}),
       "patient" => {"custom" => {"name" => ["John", "Doe"]}, "pii" => {}, "indexed" => {}}
     end
@@ -183,11 +169,9 @@ describe Manifest, validate_manifest: false do
           }
         }
       ), %(
-        [
-          {
-            "name": "patient.name"
-          }
-        ]
+        {
+          "patient.name": {}
+        }
       ), %({"first_name": "John", "last_name": "Doe"}),
       "JSONObject is not a valid return type for 'patient.name' script"
     end
@@ -212,9 +196,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{
-            "name": "test.foo"
-          }]
+          {
+            "test.foo": {}
+          }
         },
         '{
           "test_type" : "This is a QC test",
@@ -243,9 +227,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{
-            "name": "test.test_type"
-          }]
+          {
+            "test.test_type": {}
+          }
         },
         '{
           "first_name" : " John ",
@@ -265,10 +249,10 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [
-            {"name": "test.test"},
-            {"name": "test.first_name"}
-          ]
+          {
+            "test.test": {},
+            "test.first_name": {}
+          }
         },
         '{
           "name_and_test" : "ABC John Doe"
@@ -287,7 +271,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{ "name": "test.month" }]
+          {
+            "test.month": {}
+          }
         },
         '{
           "run_at" : "2014-05-14T15:22:11+0000"
@@ -306,7 +292,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{ "name": "test.month" }]
+          {
+            "test.month": {}
+          }
         },
         '{
           "run_at" : "sat3feb014pm+7"
@@ -325,7 +313,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{ "name": "test.month" }]
+          {
+            "test.month": {}
+          }
         },
         '{
           "run_at" : "sat13feb014pm"
@@ -345,7 +335,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
         },
         '{
           "run_at" : "2014-05-14T15:22:11+0000",
@@ -365,7 +357,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
         },
         '{
           "run_at" : "2014-05-14T15:22:11+0000",
@@ -385,7 +379,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
         },
         '{
           "run_at" : "2014-05-14T15:22:11+0000",
@@ -405,7 +401,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
         },
         '{
           "run_at" : "2014-05-14T15:22:11+0000",
@@ -426,7 +424,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
         },
         '{
           "run_at" : "2014-05-14T15:22:11+0000",
@@ -446,7 +446,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
         },
         '{
           "run_at" : "2014-05-14T15:22:11+0000",
@@ -466,7 +468,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
         },
         '{
           "run_at" : "2014-05-14T15:22:11+0000",
@@ -486,7 +490,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
         },
         '{
           "run_at" : "2014-05-14T15:22:11+0000",
@@ -507,7 +513,9 @@ describe Manifest, validate_manifest: false do
             }
           }
         }, %{
-          [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
         },
         '{
           "age" : "90",
@@ -529,7 +537,9 @@ describe Manifest, validate_manifest: false do
         }
 
       custom_definition = %{
-        [{"name": "patient.age"}]
+          {
+            "patient.age": {}
+          }
       }
 
       assert_manifest_application field_definition, custom_definition, '{ "age" : "30" }', "patient" => {"custom" => {"age" => "20-40"}, "pii" => {}, "indexed" => {}}
@@ -551,14 +561,16 @@ describe Manifest, validate_manifest: false do
         assert_manifest_application %{{
             "test.collection[*].temperature" : {"lookup" : "temperature"}
           }}, %{
-            [{"name": "test.collection[*].temperature"}]
+            {
+              "test.collection[*].temperature": {}
+            }
           },
           '{
-            "temperature" : 20
+            "temperature" : "20"
           }',
           "test" => {"custom" => {"collection" => [
             {
-              "temperature" => 20
+              "temperature" => "20"
             }]}, "pii" => {}, "indexed" => {}}
       end
 
@@ -575,7 +587,9 @@ describe Manifest, validate_manifest: false do
                 }
               }
             }, %{
-              [{"name": "patient.results[*].name"}]
+              {
+                "patient.results[*].name": {}
+              }
             },
             '{
               "last_name" : "Doe",
@@ -600,7 +614,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].name"}]
+            {
+              "patient.results[*].name": {}
+            }
           },
           '{
             "conditions" : [
@@ -630,7 +646,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].condition"}]
+            {
+              "test.results[*].condition": {}
+            }
           },
           '{"conditions" : [{"condition" : "PATIENT HAS MTB CONDITION"}, {"condition" : "PATIENT HAS FLU CONDITION"}]}',
           "test" => {"custom" => {"results" => [{"condition" => "MTB"}, {"condition" => "H1N1"}]}, "pii" => {}, "indexed" => {}}
@@ -647,10 +665,10 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [
-              {"name": "test.test"},
-              {"name": "test.first_name"}
-            ]
+            {
+              "test.test": {},
+              "test.first_name": {}
+            }
           },
           '{
             "name_and_test" : "ABC John Doe"
@@ -669,7 +687,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.month"}]
+            {
+              "test.month": {}
+            }
           },
           '{
             "run_at" : "2014-05-14T15:22:11+0000"
@@ -688,7 +708,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.month"}]
+            {
+              "test.month": {}
+            }
           },
           '{
             "run_at" : "sat3feb014pm+7"
@@ -712,7 +734,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].age"}]
+            {
+              "test.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -739,7 +763,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -766,7 +792,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].time"}]
+            {
+              "test.results[*].time": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -799,7 +827,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -826,7 +856,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -853,7 +885,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].time"}]
+            {
+              "test.results[*].time": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -886,7 +920,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -913,7 +949,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           {
             json: '{
@@ -943,7 +981,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].time"}]
+            {
+              "test.results[*].time": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -976,7 +1016,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1003,7 +1045,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1030,7 +1074,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].time"}]
+            {
+              "test.results[*].time": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1063,7 +1109,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1090,7 +1138,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1117,7 +1167,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].time"}]
+            {
+              "test.results[*].time": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1150,7 +1202,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1177,7 +1231,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1204,7 +1260,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].time"}]
+            {
+              "test.results[*].time": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1237,7 +1295,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "patient.results[*].age"}]
+            {
+              "patient.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1264,7 +1324,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].age"}]
+            {
+              "test.results[*].age": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1291,7 +1353,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].time"}]
+            {
+              "test.results[*].time": {}
+            }
           },
           '{
             "birth_day" : "2013-04-12T16:23:11.123+0000",
@@ -1325,7 +1389,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].age"}]
+            {
+              "test.results[*].age": {}
+            }
           },
           '{
             "multiple" : [
@@ -1349,7 +1415,7 @@ describe Manifest, validate_manifest: false do
             }
           }
 
-        custom_definition = '[{"name": "test.results[*].age"}]'
+        custom_definition = '{"test.results[*].age": {}}'
 
         assert_manifest_application field_definition, custom_definition,
           '{
@@ -1402,7 +1468,9 @@ describe Manifest, validate_manifest: false do
               }
             }
           }, %{
-            [{"name": "test.results[*].assay_code"}]
+            {
+              "test.results[*].assay_code": {}
+            }
           },
           { xml: '
             <Message>

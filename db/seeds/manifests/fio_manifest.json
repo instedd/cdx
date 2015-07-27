@@ -9,17 +9,13 @@
       "root" : "DiagnosticTests"
     }
   },
-  "custom_fields" : [
-    {
-      "name" : "patient.name",
-      "type" : "string",
+  "custom_fields" : {
+    "patient.name": {
       "pii" : true
     },
-    {
-      "name" : "patient.pregnancy_status",
-      "type" : "string"
+    "patient.pregnancy_status": {
     }
-  ],
+  },
   "field_mapping" : {
     "patient.id" : {"lookup" : "Patient/Id/text()"},
     "patient.name" : {"lookup" : "Patient/Name/text()"},

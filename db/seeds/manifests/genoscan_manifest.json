@@ -7,39 +7,23 @@
     "conditions": ["mtb"],
     "source": { "type" : "csv", "separator" : ";" }
   },
-  "custom_fields" : [
-    {
-      "name": "patient.name",
-      "pii" : true,
-      "type" : "string"
+  "custom_fields" : {
+    "patient.name": {
+      "pii" : true
     },
-    {
-      "name": "test.clia_waived_test",
-      "type" : "string"
+    "test.clia_waived_test": {
     },
-    {
-      "name": "test.revision",
-      "type" : "string"
+    "test.revision": {
     },
-    {
-      "name": "test.control",
-      "type" : "string"
+    "test.control": {
     },
-    {
-      "name": "test.ig_type",
-      "type" : "enum",
-      "options" : ["ig_a", "ig_g", "ig_m", "unknown"]
+    "test.ig_type": {
     },
-    {
-      "name": "test.control_strip",
-      "type" : "enum",
-      "options" : ["patient", "cut_off", "avidity", "liquor", "positive", "negative"]
+    "test.control_strip": {
     },
-    {
-      "name": "test.bands",
-      "type" : "string"
+    "test.bands": {
     }
-  ],
+  },
   "field_mapping" : {
     "patient.id" : {"lookup" : "PID"},
     "patient.name" : {
