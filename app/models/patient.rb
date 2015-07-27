@@ -52,6 +52,6 @@ private
   end
 
   def ensure_patient_id_hash
-    self.patient_id_hash ||= MessageEncryption.hash(self.plain_sensitive_data["patient_id"].to_s) if self.plain_sensitive_data["patient_id"]
+    self.patient_id_hash ||= MessageEncryption.hash(patient_id.to_s) if patient_id
   end
 end
