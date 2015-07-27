@@ -1040,8 +1040,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should not destroy existing patient if it has other references' do
         plain_sensitive_data  = {
-          patient: {
-            id: '9000'
+          "patient" => {
+            "id" => '9000'
           }
         }
 
