@@ -47,7 +47,7 @@ class Cdx::Api::Elasticsearch::MappingTemplate
       {
         "custom_fields" => {
           path_match: "*.custom_fields.*",
-          mapping: { type: :string, index: :no, store: :yes }
+          mapping: { enabled: false }
         }
       }
     ]
