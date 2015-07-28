@@ -1,10 +1,11 @@
 class Patient < ActiveRecord::Base
+  include AutoUUID
+
   has_many :test_results, dependent: :restrict_with_error
   has_many :samples, dependent: :restrict_with_error
   belongs_to :institution
 
   before_save :encrypt
-  before_create :generate_uuid
   before_create :ensure_patient_id_hash
 
   serialize :custom_fields, Hash
@@ -41,10 +42,6 @@ class Patient < ActiveRecord::Base
   end
 
 private
-
-  def generate_uuid
-    self.uuid ||= Guid.new.to_s
-  end
 
   def encrypt
     self.sensitive_data = MessageEncryption.encrypt Oj.dump(self.plain_sensitive_data)

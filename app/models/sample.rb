@@ -1,10 +1,10 @@
 class Sample < ActiveRecord::Base
-  include MessageEncryption
+  include AutoUUID
+
   has_many :test_results, dependent: :restrict_with_error
   belongs_to :institution
   belongs_to :patient
   before_save :encrypt
-  before_create :generate_uuid
   before_create :ensure_sample_uid
   serialize :custom_fields, Hash
   serialize :indexed_fields, Hash
@@ -68,10 +68,6 @@ class Sample < ActiveRecord::Base
   def encrypt
     self.sensitive_data = MessageEncryption.encrypt Oj.dump(self.plain_sensitive_data)
     self
-  end
-
-  def generate_uuid
-    self.uuid ||= Guid.new.to_s
   end
 
   def ensure_sample_uid
