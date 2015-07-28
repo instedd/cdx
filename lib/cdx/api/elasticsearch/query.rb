@@ -17,6 +17,7 @@ class Cdx::Api::Elasticsearch::Query
   def initialize(params, api = Cdx::Api)
     @params = params
     @api = api
+    @indices ||= Cdx::Api.index_name
   end
 
   def before_execute(&block)
