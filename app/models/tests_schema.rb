@@ -31,6 +31,7 @@ class TestsSchema
 
       schema['properties'][scope.name] = {
         "type" => "object",
+        "title" => field_title(scope),
         "properties" => scope_properties
       }
     end

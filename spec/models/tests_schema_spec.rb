@@ -30,6 +30,7 @@ describe TestsSchema do
 
     schema["properties"]["sample"].should eq({
       "type" => "object",
+      "title" => "Sample",
       "properties" => {
         "uuid" => {
           "title" => "Uuid",
@@ -41,6 +42,7 @@ describe TestsSchema do
 
     schema["properties"]["patient"].should eq({
       "type" => "object",
+      "title" => "Patient",
       "properties" => {
         "age" => {
           "title" => "Age",
