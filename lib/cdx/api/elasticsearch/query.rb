@@ -231,7 +231,7 @@ class Cdx::Api::Elasticsearch::Query
 
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
-    test = @api.search_elastic body: aggregations.to_hash.merge(query: query), size: 0, index: indices
+    test = @api.search_elastic body: aggregations.to_hash.merge(query: query, size: 0), index: indices
     if test["aggregations"]
       process_group_by_buckets(test["aggregations"], aggregations.in_order, [], {}, 0)
     else
