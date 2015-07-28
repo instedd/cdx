@@ -41,7 +41,7 @@ $(function() {
       $query_button.val("Querying...");
 
       $.ajax({
-        url: "/api/tests?" + query_string,
+        url: "/api/events?" + query_string,
         type: "POST",
         data: post_body,
         contentType: "application/json; charset=utf-8",
