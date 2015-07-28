@@ -761,14 +761,14 @@ describe Cdx::Api do
 
       response = query_tests("group_by" => {'admin_level' => 1})
       expect(response).to eq([
-        {"location.admin_levels"=>"2", "count" => 2},
-        {"location.admin_levels"=>"5", "count" => 1}
+        {"location"=>"2", "count" => 2},
+        {"location"=>"5", "count" => 1}
       ])
 
       response = query_tests("group_by" => {'admin_level' => 0})
 
       expect(response).to eq([
-        {"location.admin_levels"=>"1", "count" => 3}
+        {"location"=>"1", "count" => 3}
       ])
     end
 
@@ -845,7 +845,7 @@ describe Cdx::Api do
         index patient_location: {admin_levels: {admin_level_0: "3" }}
 
         response = query_tests("group_by" => { 'patient_location.admin_level' => 0 })
-        expect(response).to eq [{"patient_location.admin_levels" => "1", "count" => 2}, {"patient_location.admin_levels" => "3", "count" => 1}]
+        expect(response).to eq [{"patient_location" => "1", "count" => 2}, {"patient_location" => "3", "count" => 1}]
       end
     end
   end

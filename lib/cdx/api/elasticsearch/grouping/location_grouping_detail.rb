@@ -20,6 +20,6 @@ class LocationGroupingDetail < GroupingDetail
   end
 
   def yield_bucket(bucket)
-    { name => bucket["key"] }
+    { field_definition.core_field.root_scope.name => bucket["key"] }
   end
 end
