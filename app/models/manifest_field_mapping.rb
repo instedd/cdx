@@ -99,7 +99,7 @@ class ManifestFieldMapping
     end
 
     check_op(node, "if") do |cond, then_body, else_body|
-      condition = traverse(then_body, data)
+      condition = traverse(cond, data)
       return traverse(condition ? then_body : else_body, data)
     end
 
