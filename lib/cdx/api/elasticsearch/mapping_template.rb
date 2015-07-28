@@ -39,8 +39,8 @@ class Cdx::Api::Elasticsearch::MappingTemplate
   def build_dynamic_templates
     [
       {
-        "*.admin_levels" => {
-          path_match: "admin_level_*",
+        "admin_levels" => {
+          path_match: "*.admin_level_*",
           mapping: { type: :string, index: :not_analyzed }
         }
       },

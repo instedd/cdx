@@ -13,8 +13,8 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
     it "maps the core fields" do
       expect(template.build_dynamic_templates).to eq([
         {
-          "*.admin_levels" => {
-            path_match: "admin_level_*",
+          "admin_levels" => {
+            path_match: "*.admin_level_*",
             mapping: {type: :string, index: :not_analyzed}
           }
         },
