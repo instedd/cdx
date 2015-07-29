@@ -8,7 +8,7 @@ describe Subscriber, elasticsearch: true do
   let(:institution){device.institution}
   let(:laboratory){device.laboratories.first}
 
-  let!(:filter) { Filter.make query: {"condition" => "mtb", "laboratory" => laboratory.id.to_s} }
+  let!(:filter) { Filter.make query: {"condition" => "mtb", "laboratory" => laboratory.id.to_s}, user: institution.user}
   let!(:manifest) {
     manifest = Manifest.create! definition: %{
       {

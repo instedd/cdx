@@ -88,16 +88,13 @@ describe TestResultIndexer, elasticsearch: true do
           "lng" => location.lng
         },
         "device" => {
-          "uuid" => test.device.uuid,
-          "name" => test.device.name
+          "uuid" => test.device.uuid
         },
         "laboratory" => {
-          "id" => test.device.laboratories.first.id,
-          "name" => test.device.laboratories.first.name
+          "id" => test.device.laboratories.first.id
         },
         "institution" => {
-          "id" => test.device.institution.id,
-          "name" => test.device.institution.name
+          "id" => test.device.institution.id
         }
       },
       id: "#{test.device.uuid}_4")

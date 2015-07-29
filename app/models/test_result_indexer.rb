@@ -51,8 +51,7 @@ class TestResultIndexer
           "uuid" => test_result.uuid
         },
         "device" => {
-          "uuid" => device.uuid,
-          "name" => device.name
+          "uuid" => device.uuid
         },
         "location" => {
           "id" => location_id,
@@ -62,12 +61,10 @@ class TestResultIndexer
           "lng" => location_lng
         },
         "institution" => {
-          "id" => device.institution_id,
-          "name" => device.institution.name
+          "id" => device.institution_id
         },
         "laboratory" => {
-          "id" => laboratory_id,
-          "name" => laboratory_name
+          "id" => laboratory_id
         }
       }).
       deep_merge(indexed_fields_from(test_result.sample, "sample")).
