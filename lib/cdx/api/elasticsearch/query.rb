@@ -25,6 +25,11 @@ class Cdx::Api::Elasticsearch::Query
     @before_execute << block
   end
 
+  def after_execute(&block)
+    @after_execute ||= []
+    @after_execute << block
+  end
+
   def execute
     if @before_execute
       @before_execute.each do |block|
@@ -32,7 +37,15 @@ class Cdx::Api::Elasticsearch::Query
       end
     end
 
-    query(@params)
+    results = query(@params)
+
+    if @after_execute
+      @after_execute.inject results do |resutls, block|
+        block.call results
+      end
+    else
+      results
+    end
   end
 
   def grouped_by
