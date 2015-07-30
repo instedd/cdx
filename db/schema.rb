@@ -76,7 +76,6 @@ ActiveRecord::Schema.define(version: 20150728150405) do
 
   create_table "devices", force: true do |t|
     t.string   "name"
-    "
     t.datetime "updated_at"
     t.string   "uuid"
     t.integer  "institution_id"
