@@ -4,7 +4,7 @@
     "api_version" : "1.2.1",
     "signature" : "",
     "device_models" : ["genoscan"],
-    "conditions": ["mtb"],
+    "conditions": ["mtb", "rif", "inh"],
     "source": { "type" : "csv", "separator" : ";" }
   },
   "custom_fields" : {
