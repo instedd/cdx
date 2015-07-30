@@ -102,7 +102,9 @@ class Subscriber < ActiveRecord::Base
           filtered_test["test"]["assays"]["name"] = merged_test["test"]["assays"].first["name"]
         else
           filtered_test[field.root_scope.name] ||= {}
-          filtered_test[field.root_scope.name][field.name] = merged_test[field.root_scope.name][field.name]
+          if (data = merged_test[field.root_scope.name])
+            filtered_test[field.root_scope.name][field.name] = data[field.name]
+          end
         end
       end
     end

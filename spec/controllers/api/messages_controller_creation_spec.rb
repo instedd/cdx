@@ -173,8 +173,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       test = all_elasticsearch_tests.first["_source"]
       test["test"]["name"].should eq("GX4002")
-      test["patient"]["id"].should be_nil
-      test["patient"]["foo"].should be_nil
+      test["patient"].should be_nil
 
       test = TestResult.first
       raw_data = test.sensitive_data

@@ -1,37 +1,15 @@
 class Patient < ActiveRecord::Base
   include AutoUUID
+  include Entity
 
+  belongs_to :institution
   has_many :test_results, dependent: :restrict_with_error
   has_many :samples, dependent: :restrict_with_error
-  belongs_to :institution
-
-  before_save :encrypt
-  before_create :ensure_patient_id_hash
-
-  serialize :custom_fields, Hash
-  serialize :indexed_fields, Hash
 
   validates_presence_of :institution
   validates_uniqueness_of :patient_id_hash, scope: :institution_id, allow_nil: true
 
-  attr_writer :plain_sensitive_data
-
-  after_initialize do
-    self.custom_fields  ||= {}
-    self.indexed_fields ||= {}
-  end
-
-  def merge(patient)
-    self.plain_sensitive_data.deep_merge_not_nil!(patient.plain_sensitive_data)
-    self.custom_fields.deep_merge_not_nil!(patient.custom_fields)
-    self.indexed_fields.deep_merge_not_nil!(patient.indexed_fields)
-
-    self
-  end
-
-  def plain_sensitive_data
-    @plain_sensitive_data ||= Oj.load(MessageEncryption.decrypt(self.sensitive_data)) || {}
-  end
+  before_create :ensure_patient_id_hash
 
   def patient_id
     self.plain_sensitive_data["patient"]["id"]
@@ -42,11 +20,6 @@ class Patient < ActiveRecord::Base
   end
 
 private
-
-  def encrypt
-    self.sensitive_data = MessageEncryption.encrypt Oj.dump(self.plain_sensitive_data)
-    self
-  end
 
   def ensure_patient_id_hash
     self.patient_id_hash ||= MessageEncryption.hash(patient_id.to_s) if patient_id

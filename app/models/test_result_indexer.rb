@@ -71,7 +71,8 @@ class TestResultIndexer
         }
       }).
       deep_merge(indexed_fields_from(test_result.sample, "sample")).
-      deep_merge(indexed_fields_from(test_result.current_patient, "patient")).
+      deep_merge(indexed_fields_from(test_result.patient, "patient")).
+      deep_merge(indexed_fields_from(test_result.encounter, "encounter")).
       deep_merge(all_custom_fields)
   end
 
@@ -87,7 +88,7 @@ class TestResultIndexer
     fields = {}
 
     sample = test_result.sample
-    patient = test_result.current_patient
+    patient = test_result.patient
 
     append_custom_fields fields, test_result, "test"
     append_custom_fields fields, test_result, "sample"
@@ -111,5 +112,4 @@ class TestResultIndexer
       fields[key][:custom_fields].deep_merge! entity.custom_fields[key]
     end
   end
-
 end
