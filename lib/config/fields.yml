@@ -96,7 +96,12 @@ patient:
   id:
     pii: true
   gender:
+    type: enum
     searchable: true
+    options:
+      - male
+      - female
+      - other
 location:
   id:
   parents:
