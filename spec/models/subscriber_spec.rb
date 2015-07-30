@@ -72,7 +72,7 @@ describe Subscriber, elasticsearch: true do
 
     assert_requested(:post, url) do |req|
       response = JSON.parse(req.body)
-      response.keys.should =~ ["device", "institution", "laboratory", "location", "patient", "sample", "test"]
+      response.keys.should =~ ["device", "encounter", "institution", "laboratory", "location", "patient", "sample", "test"]
       response["device"].keys.should =~ ["uuid", "name", "lab_user", "serial_number"]
       response["institution"].keys.should =~ ["id", "name"]
       response["laboratory"].keys.should =~ ["id", "name"]
