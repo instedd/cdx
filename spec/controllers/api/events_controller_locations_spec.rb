@@ -61,8 +61,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       response = get_updates(group_by: {admin_level: 0})
       response.should eq([
-        {"location.admin_levels"=>parent_location.geo_id, "count"=>2},
-        {"location.admin_levels"=>upper_leaf_location.geo_id, "count"=>1}
+        {"location"=>parent_location.geo_id, "count"=>2},
+        {"location"=>upper_leaf_location.geo_id, "count"=>1}
       ])
     end
   end

@@ -236,7 +236,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         test['test']['id'].should eq('12345678901234567890')
         test['patient']['gender'].should eq('female')
-        test['test']['patient_age'].should eq(25)
+        test['test']['patient_age'].should eq({"years" => 25})
         test['patient']['custom_fields']['pregnancy_status'].should eq('Not Pregnant')
         test['sample']['id'].should eq('0987654321')
         test['test']['start_time'].should  eq('2015-05-18T12:34:56+05:00')

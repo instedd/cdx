@@ -28,6 +28,8 @@ class DeviceMessageImporter
       begin
         device_message.process
       rescue => ex
+        device_message.record_failure ex
+        device_message.save!
         Rails.logger.error("Error processing device message #{device_message.id}: #{ex}\n #{ex.backtrace.join("\n")}")
       else
         Rails.logger.debug("Processed device message #{device_message.id}")

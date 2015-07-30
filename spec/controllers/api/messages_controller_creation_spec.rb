@@ -73,39 +73,39 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "should override test if test_id is the same" do
-      post :create, Oj.dump(test: {id: "1234", patient_age: 20}), device_id: device.uuid, authentication_token: device.plain_secret_key
+      post :create, Oj.dump(test: {id: "1234", patient_age: {"years" => 20}}), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       TestResult.count.should eq(1)
       test = TestResult.first
       test.test_id.should eq("1234")
 
-      Oj.load(DeviceMessage.first.plain_text_data)["test"]["patient_age"].should eq(20)
+      Oj.load(DeviceMessage.first.plain_text_data)["test"]["patient_age"].should eq({"years" => 20})
 
       tests = all_elasticsearch_tests
       tests.size.should eq(1)
       test = tests.first
       test["_source"]["test"]["id"].should eq("1234")
       test["_id"].should eq("#{device.uuid}_1234")
-      test["_source"]["test"]["patient_age"].should eq(20)
+      test["_source"]["test"]["patient_age"].should eq({"years" => 20})
 
-      post :create, Oj.dump(test: {id: "1234", patient_age: 30}), device_id: device.uuid, authentication_token: device.plain_secret_key
+      post :create, Oj.dump(test: {id: "1234", patient_age: {"years" => 30}}), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       TestResult.count.should eq(1)
       test = TestResult.first
       test.test_id.should eq("1234")
 
       DeviceMessage.count.should eq(2)
-      Oj.load(DeviceMessage.last.plain_text_data)["test"]["patient_age"].should eq(30)
+      Oj.load(DeviceMessage.last.plain_text_data)["test"]["patient_age"].should eq({"years" => 30})
 
       tests = all_elasticsearch_tests
       tests.size.should eq(1)
       test = tests.first
       test["_source"]["test"]["id"].should eq("1234")
       test["_id"].should eq("#{device.uuid}_1234")
-      test["_source"]["test"]["patient_age"].should eq(30)
+      test["_source"]["test"]["patient_age"].should eq({"years" => 30})
 
       a_device = Device.make(institution: institution)
-      post :create, Oj.dump(test: {id: "1234", age: 20}), device_id: a_device.uuid, authentication_token: a_device.plain_secret_key
+      post :create, Oj.dump(test: {id: "1234", age: {"years" => 20}}), device_id: a_device.uuid, authentication_token: a_device.plain_secret_key
 
       TestResult.count.should eq(2)
       tests = all_elasticsearch_tests

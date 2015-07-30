@@ -38,16 +38,20 @@
         {"equals" : [{"lookup" : "Birthday"}, "n.a."]},
         "",
         {
-          "years_between" : [
-            {"parse_date" : [
-              {"lookup" : "Birthday"},
-              "%d.%m.%Y"
-            ]},
-            {"parse_date" : [
-              {"lookup" : "DateOfAnalysis"},
-              "%d.%m.%Y"
-            ]}
-          ]
+          "duration" : {
+            "years" : {
+              "years_between" : [
+                {"parse_date" : [
+                  {"lookup" : "Birthday"},
+                  "%d.%m.%Y"
+                ]},
+                {"parse_date" : [
+                  {"lookup" : "DateOfAnalysis"},
+                  "%d.%m.%Y"
+                ]}
+              ]
+            }
+          }
         }
       ]
     },

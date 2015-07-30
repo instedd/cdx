@@ -26,9 +26,8 @@
       - @tests.each do |test|
         %tr
           %td= test["test"]["reported_time"]
-          %td= @institutions[test["institution"]["id"]]
-          %td= @laboratories[test["laboratory"]["id"]]
-          %td= @devices[test["device"]["uuid"]]
+          %td= test["institution"]["name"]
+          %td= test["laboratory"]["name"]
+          %td= test["device"]["name"]
           %td= test["test"]["assays"].first["name"]
           %td= test["test"]["assays"].first["qualitative_result"]
-          / %td= (test["results"] || []).map { |r| "#{r["condition"]}: #{r["result"]}" }.join ", "

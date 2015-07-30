@@ -19,7 +19,11 @@
   "field_mapping" : {
     "patient.id" : {"lookup" : "Patient/Id/text()"},
     "patient.name" : {"lookup" : "Patient/Name/text()"},
-    "test.patient_age" : {"lookup" : "Patient/Age/text()"},
+    "test.patient_age" : {
+      "duration" : {
+        "years": {"lookup" : "Patient/Age/text()"}
+      }
+    },
     "patient.gender" : { "lowercase": { "lookup" : "Patient/Gender/text()" } },
     "patient.pregnancy_status" : {"lookup" : "Patient/PregnancyStatus/text()"},
     "sample.uid" : {"lookup" : "SampleId/text()"},

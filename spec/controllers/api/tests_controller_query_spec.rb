@@ -194,15 +194,15 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
     context "Ordering" do
       it "should order by age" do
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive], patient_age: 20})
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative], patient_age: 10})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :positive], patient_age: {"years" => 20}})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[qualitative_result: :negative], patient_age: {"years" => 10}})
 
-        response = get_updates(order_by: :patient_age)
+        response = get_updates(order_by: "test.patient_age")
 
         response[0]["test"]["assays"].first["qualitative_result"].should eq("negative")
-        response[0]["test"]["patient_age"].should eq(10)
+        response[0]["test"]["patient_age"].should eq({"years" => 10})
         response[1]["test"]["assays"].first["qualitative_result"].should eq("positive")
-        response[1]["test"]["patient_age"].should eq(20)
+        response[1]["test"]["patient_age"].should eq({"years" => 20})
       end
     end
 

@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe TestsSchema do
-
-  before(:each) do
+  it "creates a schema with string, enum and number fields" do
     sample_fields = {
       "uuid" => {
         "searchable" => true,
@@ -19,19 +18,10 @@ describe TestsSchema do
       }
     }
 
-    location_fields = {
-      "lat" => {},
-      "lng" => {},
-    }
-
     sample_scope = Cdx::Scope.new('sample', sample_fields)
     patient_scope = Cdx::Scope.new('patient', patient_fields)
-    location_scope = Cdx::Scope.new('location', location_fields)
+    Cdx.stub(:core_field_scopes).and_return([sample_scope, patient_scope])
 
-    Cdx.stub(:core_field_scopes).and_return([sample_scope, patient_scope, location_scope])
-  end
-
-  it "creates a schema with string, enum and number fields" do
     schema = TestsSchema.new("es-AR").build
 
     schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
@@ -40,6 +30,7 @@ describe TestsSchema do
 
     schema["properties"]["sample"].should eq({
       "type" => "object",
+      "title" => "Sample",
       "properties" => {
         "uuid" => {
           "title" => "Uuid",
@@ -51,6 +42,7 @@ describe TestsSchema do
 
     schema["properties"]["patient"].should eq({
       "type" => "object",
+      "title" => "Patient",
       "properties" => {
         "age" => {
           "title" => "Age",
@@ -72,12 +64,29 @@ describe TestsSchema do
   end
 
   it "should add location service properties to location scope" do
+    location_fields = {
+      "lat" => {},
+      "lng" => {},
+    }
+
+    location_scope = Cdx::Scope.new('location', location_fields)
+    Cdx.stub(:core_field_scopes).and_return([location_scope])
+
     schema = TestsSchema.new("es-AR").build
 
     schema["properties"]["location"]["location-service"].should eq({
       "url" => Settings.location_service_url,
       "set" => Settings.location_service_set
     })
+  end
+
+  it "shows condition field as enum" do
+    Condition.create! name: "foo"
+    Condition.create! name: "bar"
+    schema = TestsSchema.new("es-AR").build
+
+    condition_field = schema["properties"]["test"]["properties"]["assays"]["items"]["properties"]["condition"]
+    condition_field["enum"].should eq(["bar", "foo"])
   end
 
 end

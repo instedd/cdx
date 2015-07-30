@@ -31,6 +31,7 @@ class TestsSchema
 
       schema['properties'][scope.name] = {
         "type" => "object",
+        "title" => field_title(scope),
         "properties" => scope_properties
       }
     end
@@ -49,17 +50,21 @@ class TestsSchema
     schema = Hash.new
     schema["title"] = field_title field
 
-    case field.type
-    when "date"
-      date_schema schema
-    when "integer"
-      integer_schema schema, field
-    when "enum"
-      enum_schema schema, field
-    when 'nested'
-      nested_schema schema, field
+    if field.name == "condition"
+      condition_schema schema
     else
-      string_schema schema
+      case field.type
+      when "date"
+        date_schema schema
+      when "integer"
+        integer_schema schema, field
+      when "enum"
+        enum_schema schema, field
+      when 'nested'
+        nested_schema schema, field
+      else
+        string_schema schema
+      end
     end
 
     schema['searchable'] = field.searchable? || false
@@ -107,6 +112,11 @@ class TestsSchema
 
       schema["values"] = values
     end
+  end
+
+  def condition_schema schema
+    schema["type"] = "string"
+    schema["enum"] = Condition.order(:name).pluck(:name)
   end
 
   def nested_schema schema, field
