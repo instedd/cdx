@@ -59,7 +59,7 @@
       "case" : [
         {"lookup" : "Sex"},
         [
-          {"when": "*n.a.*", "then" : "unknown"},
+          {"when": "*n.a.*", "then" : null},
           {"when": "*Female*", "then" : "female"},
           {"when": "*", "then" : "male"}
         ]
