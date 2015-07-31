@@ -29,7 +29,6 @@ describe Cdx do
       "test.error_description",
       "test.name",
       "test.patient_age",
-      "test.qualitative_result",
       "test.reported_time",
       "test.start_time",
       "test.status",

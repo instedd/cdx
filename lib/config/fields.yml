@@ -5,7 +5,7 @@ sample:
     pii: true
   uuid:
     searchable: true
-  type: # (pull enum from 'system' options in LOINC, current sample_type)
+  type:
     searchable: true
   collection_date:
     type: date
@@ -17,13 +17,13 @@ test:
   start_time:
     type: date
     searchable: true
-  end_time: # (new)
+  end_time:
     type: date
     searchable: true
-  reported_time: # (current created_at)
+  reported_time:
     type: date
     searchable: true
-  updated_time: # (current updated_at)
+  updated_time:
     type: date
     searchable: true
   error_code:
@@ -33,9 +33,9 @@ test:
   patient_age:
     type: duration
     searchable: true
-  name: # (current 'assay_name')
+  name:
     searchable: true
-  status: # (remove 'negative' from enum, add 'in_progress')
+  status:
     type: enum
     searchable: true
     options:
@@ -44,21 +44,14 @@ test:
       - no_result
       - success
       - in_progress
-  qualitative_result: # ('negative', 'positive', 'n/a') (rename 'unknown' to 'n/a')
-    type: enum
-    searchable: true
-    options:
-      - negative
-      - positive
-      - n/a
   assays:
     type: nested
     sub_fields:
-      name: # (current 'condition') (LOINC)
+      name:
         searchable: true
       condition:
         searchable: true
-      qualitative_result: # (positive, negative)
+      result:
         type: enum
         searchable: true
         options:
@@ -78,7 +71,7 @@ device:
     searchable: true
   name:
     searchable: true
-  lab_user: # (current system_user)
+  lab_user:
     searchable: true
   serial_number:
     searchable: true
