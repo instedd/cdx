@@ -73,3 +73,7 @@ RSpec.configure do |config|
     Timecop.return
   end
 end
+
+require "bundler/setup"
+require "cdx"
+require "pry-byebug"

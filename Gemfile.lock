@@ -48,14 +48,6 @@ GIT
       filewatcher (= 0.3.6)
 
 GIT
-  remote: https://github.com/instedd/cdx_core
-  revision: 2fafa62eeef7ae2c2850b959455762c1409240e7
-  branch: master
-  specs:
-    cdx (0.0.1)
-      activesupport
-
-GIT
   remote: https://github.com/instedd/geojson_import
   revision: fae5bfa63bf179e64e4febc00b0d03beceb4fab8
   branch: master
@@ -81,6 +73,12 @@ GIT
   specs:
     location_service (0.1.0)
       rest-client (~> 1.6)
+
+PATH
+  remote: deps/cdx_core
+  specs:
+    cdx (0.0.1)
+      activesupport
 
 GEM
   remote: https://rubygems.org/
