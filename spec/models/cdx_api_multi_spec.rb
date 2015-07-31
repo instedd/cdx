@@ -11,10 +11,10 @@ describe "Cdx::Api Multi" do
 
   describe "with two different filters" do
     before(:each) do
-      index test: {assays: [{qualitative_result: :positive}]}, device: {lab_user: "jdoe"}
-      index test: {assays: [{qualitative_result: :negative}]}, device: {lab_user: "mmajor"}
-      index test: {assays: [{qualitative_result: :positive}], patient_age: {years: 10}}
-      index test: {assays: [{qualitative_result: :negative}], patient_age: {years: 20}}
+      index test: {assays: [{result: :positive}]}, device: {lab_user: "jdoe"}
+      index test: {assays: [{result: :negative}]}, device: {lab_user: "mmajor"}
+      index test: {assays: [{result: :positive}], patient_age: {years: 10}}
+      index test: {assays: [{result: :negative}], patient_age: {years: 20}}
     end
 
     let(:responses) { multi_query([{'device.lab_user' => "jdoe"}, {'test.patient_age' => "15yo.."}]) }
@@ -25,7 +25,7 @@ describe "Cdx::Api Multi" do
 
     it "should return correct results" do
       expect_one_event_with_field "device", "lab_user", "jdoe", response: responses[0]['tests']
-      expect_one_qualitative_result "negative", "test.patient_age" => "15yo..", response: responses[1]['tests']
+      expect_one_result "negative", "test.patient_age" => "15yo..", response: responses[1]['tests']
     end
 
     it "should return correct total counts" do
@@ -34,5 +34,4 @@ describe "Cdx::Api Multi" do
       end
     end
   end
-
 end

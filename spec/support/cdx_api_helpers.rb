@@ -11,9 +11,9 @@ RSpec.shared_context "cdx api helpers" do
     Time.local(year, month, day, hour, minute, second).iso8601
   end
 
-  def expect_one_qualitative_result(result, query_or_response)
+  def expect_one_result(result, query_or_response)
     expect_one(query_or_response) do |response|
-      expect(response["test"]["assays"].first["qualitative_result"]).to eq(result)
+      expect(response["test"]["assays"].first["result"]).to eq(result)
     end
   end
 

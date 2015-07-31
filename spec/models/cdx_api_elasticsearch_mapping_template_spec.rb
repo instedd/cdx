@@ -123,10 +123,6 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "type"=> "string",
                 "index"=> "not_analyzed"
               },
-              "qualitative_result"=> {
-                "type"=> "string",
-                "index"=> "not_analyzed"
-              },
               "assays" => {
                 "type" => "nested",
                 "properties" => {
@@ -138,7 +134,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                     "type" => "string",
                     "index" => "not_analyzed"
                   },
-                  "qualitative_result"=> {
+                  "result"=> {
                     "type"=> "string",
                     "index"=> "not_analyzed"
                   }
