@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = ""
   spec.license       = "MIT"
 
-  spec.files         = `git ls-files`.split($/)
+  spec.files         = Dir['**/*']
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
@@ -22,10 +22,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency "elasticsearch"
   spec.add_dependency "cdx"
 
-  spec.add_development_dependency "activesupport", "~> 4.1.4"
+  spec.add_development_dependency "activesupport"
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.3.0"
+  spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry-byebug"
   spec.add_development_dependency "pry-rescue"
   spec.add_development_dependency "pry-stack_explorer"
