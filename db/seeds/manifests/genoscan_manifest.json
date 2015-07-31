@@ -87,7 +87,7 @@
     "test.assays[*].name" : {
       "script" : "['mtb', 'rif', 'inh']"
     },
-    "test.assays[*].qualitative_result" : {
+    "test.assays[*].result" : {
       "script" : "
         if(message['Result'].match(/.*tuberculosis.*/)){
           mtb = 'positive'

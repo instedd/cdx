@@ -5,7 +5,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
   let(:device) {Device.make institution_id: institution.id}
-  let(:data) {Oj.dump test: {assays: [qualitative_result: :positive]}}
+  let(:data) {Oj.dump test: {assays: [result: :positive]}}
 
   before(:each) {sign_in user}
 

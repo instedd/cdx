@@ -40,7 +40,7 @@
         ]
       ]
     },
-    "test.assays[*].qualitative_result" : { "lowercase" : {"lookup" : "Test/Assay/Result/@qualitative"} },
+    "test.assays[*].result" : { "lowercase" : {"lookup" : "Test/Assay/Result/@qualitative"} },
     "test.assays[*].name" : {"lookup" : "Test/Assay/@code"}
   }
 }

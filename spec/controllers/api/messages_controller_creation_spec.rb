@@ -5,10 +5,10 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
   let(:device) {Device.make institution_id: institution.id}
-  let(:data)  {Oj.dump test: {assays: [qualitative_result: :positive]}}
+  let(:data)  {Oj.dump test: {assays: [result: :positive]}}
   let(:datas) {Oj.dump [
-    {test: {assays: [qualitative_result: :positive]}},
-    {test: {assays: [qualitative_result: :negative]}}
+    {test: {assays: [result: :positive]}},
+    {test: {assays: [result: :negative]}}
   ]}
   before(:each) {sign_in user}
 
@@ -35,7 +35,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["test"]["assays"].first["qualitative_result"].should eq("positive")
+      test["test"]["assays"].first["result"].should eq("positive")
       test["test"]["reported_time"].should_not eq(nil)
       test["device"]["uuid"].should eq(device.uuid)
       TestResult.first.uuid.should eq(test["test"]["uuid"])
@@ -59,7 +59,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       tests = all_elasticsearch_tests
       tests.count.should eq(2)
 
-      tests.map {|e| e["_source"]["test"]["assays"].first["qualitative_result"]}.should =~ ["positive", "negative"]
+      tests.map {|e| e["_source"]["test"]["assays"].first["result"]}.should =~ ["positive", "negative"]
 
       TestResult.count.should eq(2)
       TestResult.pluck(:uuid).should =~ tests.map {|e| e["_source"]["test"]["uuid"]}
@@ -123,10 +123,10 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
   context "Manifest" do
     it "shouldn't store sensitive data in elasticsearch" do
-      post :create, Oj.dump(test: {assays:[qualitative_result: :positive]}, patient: {id: 1234}), device_id: device.uuid, authentication_token: device.plain_secret_key
+      post :create, Oj.dump(test: {assays:[result: :positive]}, patient: {id: 1234}), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["test"]["assays"].first["qualitative_result"].should eq("positive")
+      test["test"]["assays"].first["result"].should eq("positive")
       test["test"]["reported_time"].should_not eq(nil)
       test["patient"]["id"].should eq(nil)
     end
@@ -316,7 +316,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
             },
             "field_mapping" : {
               "test.error_code" : {"lookup" : "error_code"},
-              "test.qualitative_result" : {"lookup" : "result"}
+              "test.assays[*].result" : {"lookup" : "result"}
             }
           }
         }
@@ -330,7 +330,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         tests.count.should eq(1)
         test = tests.first["_source"]
         test["test"]["error_code"].should eq(0)
-        test["test"]["qualitative_result"].should eq("positive")
+        test["test"]["assays"].first["result"].should eq("positive")
       end
 
       it 'parses a multi line csv' do
@@ -341,10 +341,10 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         tests.count.should eq(2)
         test = tests.first["_source"]
         test["test"]["error_code"].should eq(0)
-        test["test"]["qualitative_result"].should eq("positive")
+        test["test"]["assays"].first["result"].should eq("positive")
         test = tests.last["_source"]
         test["test"]["error_code"].should eq(1)
-        test["test"]["qualitative_result"].should eq("negative")
+        test["test"]["assays"].first["result"].should eq("negative")
       end
     end
   end
