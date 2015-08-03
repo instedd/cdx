@@ -1,6 +1,32 @@
 require "spec_helper"
 
 describe DeviceMessageProcessor, elasticsearch: true do
+  TEST_ID   = "4"
+  TEST_ID_2 = "5"
+  TEST_ID_3 = "6"
+
+  TEST_RAW_RESULT        = "positivo 15%"
+  TEST_CONCENTRATION     = "15%"
+  TEST_START_TIME        = "2000/1/1 10:00:00"
+
+  SAMPLE_ID              = "4002"
+  SAMPLE_UID             = "abc4002"
+  SAMPLE_DATAGRAM        = "010100011100"
+  SAMPLE_CULTURE_DAYS    = "10"
+  SAMPLE_TYPE            = "sputum"
+  SAMPLE_COLLECTION_DATE = "2000/1/1 9:00:00"
+  SAMPLE_PII_FIELDS      = {"id" => SAMPLE_ID, "uid" => SAMPLE_UID}.freeze
+  SAMPLE_INDEXED_FIELDS  = {"type" => SAMPLE_TYPE, "collection_date" => SAMPLE_COLLECTION_DATE}.freeze
+  SAMPLE_CUSTOM_FIELDS   = {"datagram" => SAMPLE_DATAGRAM, "culture_days" => SAMPLE_CULTURE_DAYS}.freeze
+
+  PATIENT_ID             = "8000"
+  PATIENT_GENDER         = "male"
+  PATIENT_DOB            = "2000/1/1"
+  PATIENT_SHIRT_COLOR    = "blue"
+  PATIENT_HIV            = "positive"
+  PATIENT_PII_FIELDS     = {"id" => PATIENT_ID, "dob" => PATIENT_DOB}.freeze
+  PATIENT_INDEXED_FIELDS = {"gender" => PATIENT_GENDER}.freeze
+  PATIENT_CUSTOM_FIELDS  = {"shirt_color" => PATIENT_SHIRT_COLOR, "hiv" => PATIENT_HIV}.freeze
 
   def parsed_message(test_id, params={})
     {
@@ -16,41 +42,32 @@ describe DeviceMessageProcessor, elasticsearch: true do
           ]
         },
         "custom" => {
-          "raw_result" => "positivo 15%",
-          "concentration" => "15%"
+          "raw_result" => TEST_RAW_RESULT,
+          "concentration" => TEST_CONCENTRATION
         },
         "pii" => {
-          "start_time" => "2000/1/1 10:00:00"
+          "start_time" => TEST_START_TIME
         }
       },
       "sample" => {
-        "indexed" => {
-          "type" => "sputum",
-          "collection_date" => "2000/1/1 9:00:00",
-        },
-        "custom" => {
-          "datagram" => "010100011100",
-          "culture_days" => "10"
-        },
-        "pii" => {
-          "uid" => "abc4002",
-          "id" => "4002"
-        }
+        "indexed" => SAMPLE_INDEXED_FIELDS.dup,
+        "custom" => SAMPLE_CUSTOM_FIELDS.dup,
+        "pii" => SAMPLE_PII_FIELDS.dup
       },
       "patient" => {
-        "indexed" => {
-          "gender" => "male"
-        },
-        "pii" => {
-          "id" => "8000",
-          "dob" => "2000/1/1"
-        },
-        "custom" => {
-          "shirt_color" => "blue",
-          "hiv" => "positive"
-        }
+        "indexed" => PATIENT_INDEXED_FIELDS.dup,
+        "pii" => PATIENT_PII_FIELDS.dup,
+        "custom" => PATIENT_CUSTOM_FIELDS.dup,
       }
     }.deep_merge(params)
+  end
+
+  def fields(scope, values)
+    {scope => values}
+  end
+
+  def result(condition, result)
+    {"result" => result, "condition" => condition}
   end
 
   let(:device) {Device.make}
@@ -59,7 +76,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
   let(:device_message) do
     device_message = DeviceMessage.new(device: device, plain_text_data: '{}')
-    device_message.stub(:parsed_messages).and_return([parsed_message("4")])
+    device_message.stub(:parsed_messages).and_return([parsed_message(TEST_ID)])
     device_message.save!
     device_message
   end
@@ -67,48 +84,20 @@ describe DeviceMessageProcessor, elasticsearch: true do
   let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
 
   def assert_sample_data(sample)
-    sample.plain_sensitive_data.should eq({
-      "sample" => {
-        "uid" => "abc4002",
-        "id" => "4002"
-      }
-    })
-
-    sample.custom_fields.should eq({
-      "sample" => {
-        "datagram" => "010100011100",
-        "culture_days" => "10"
-      }
-    })
-
-    sample.indexed_fields.should eq({
-      "sample" => {
-        "type" => "sputum",
-        "collection_date" => "2000/1/1 9:00:00"
-      }
-    })
+    sample.plain_sensitive_data.should eq(fields("sample", SAMPLE_PII_FIELDS))
+    sample.custom_fields.should eq(fields("sample", SAMPLE_CUSTOM_FIELDS))
+    sample.indexed_fields.should eq(fields("sample", SAMPLE_INDEXED_FIELDS))
   end
 
   def assert_patient_data(patient)
-    patient.plain_sensitive_data.should eq({
-      "patient" => {
-        "id" => "8000",
-        "dob" => "2000/1/1"
-      }
-    })
+    patient.plain_sensitive_data.should eq(fields("patient", PATIENT_PII_FIELDS))
+    patient.custom_fields.should eq(fields("patient", PATIENT_CUSTOM_FIELDS))
+    patient.indexed_fields.should eq(fields("patient", PATIENT_INDEXED_FIELDS))
+  end
 
-    patient.custom_fields.should eq({
-      "patient" => {
-        "shirt_color" => "blue",
-        "hiv" => "positive"
-      }
-    })
-
-    patient.indexed_fields.should eq({
-      "patient" => {
-        "gender" => "male"
-      }
-    })
+  def assert_test_data(test)
+    test.plain_sensitive_data.should eq(fields("test", "start_time" => TEST_START_TIME))
+    test.custom_fields.should eq(fields("test", "raw_result" => TEST_RAW_RESULT, "concentration" => TEST_CONCENTRATION))
   end
 
   it "should create a sample" do
@@ -116,16 +105,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     Sample.count.should eq(1)
     sample = Sample.first
-    sample.sample_uid_hash.should eq(MessageEncryption.hash "abc4002")
+    sample.sample_uid_hash.should eq(MessageEncryption.hash SAMPLE_UID)
     assert_sample_data(sample)
     assert_patient_data(sample.patient)
   end
 
-  it "should not update existing tests on new sample" do
-    device_message_processor.client.should_receive(:bulk).never
+  it "should create a patient" do
     device_message_processor.process
 
-    Sample.count.should eq(1)
+    Patient.count.should eq(1)
+    patient = Patient.first
+    patient.patient_id_hash.should eq(MessageEncryption.hash PATIENT_ID)
+    assert_patient_data(patient)
   end
 
   it "should create a test result" do
@@ -133,54 +124,43 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     TestResult.count.should eq(1)
     test = TestResult.first
-    test.test_id.should eq('4')
+    test.test_id.should eq(TEST_ID)
+    assert_test_data(test)
+  end
 
-    test.plain_sensitive_data.should eq({
-      "test" => {
-        "start_time" => "2000/1/1 10:00:00"
-      }
-    })
-
-    test.custom_fields.should eq({
-      "test" => {
-        "raw_result" => "positivo 15%",
-        "concentration" => "15%"
-      }
-    })
+  it "should not update existing tests on new sample" do
+    device_message_processor.client.should_receive(:bulk).never
+    device_message_processor.process
   end
 
   it "should create multiple test results with single sample" do
-    device_message.stub(:parsed_messages).and_return([parsed_message("4"), parsed_message("5"), parsed_message("6")])
+    device_message.stub(:parsed_messages).and_return([parsed_message(TEST_ID), parsed_message(TEST_ID_2), parsed_message(TEST_ID_3)])
     device_message_processor.process
 
     Sample.count.should eq(1)
 
     TestResult.count.should eq(3)
-    TestResult.pluck(:test_id).should =~ ['4', '5', '6']
+    TestResult.pluck(:test_id).should =~ [TEST_ID, TEST_ID_2, TEST_ID_3]
     TestResult.pluck(:sample_id).should eq([Sample.first.id] * 3)
 
     all_elasticsearch_tests.map {|e| e['_source']['sample']['uuid']}.should eq([Sample.first.uuid] * 3)
   end
 
   it "should update sample data and existing test results on new test result" do
-    sample_indexed_fields = {
-      "sample" => {
-        "type" => "blood"
-      }
-    }
+    patient = Patient.make(
+      uuid: 'def', institution: device_message.institution,
+      indexed_fields: fields("patient", PATIENT_INDEXED_FIELDS),
+      plain_sensitive_data: fields("patient", "id" => PATIENT_ID),
+    )
 
-    patient_indexed_fields = {
-      "patient" => {
-        "gender" => 'male'
-      }
-    }
+    sample = Sample.make(
+      uuid: 'abc', institution: device_message.institution, patient: patient,
+      indexed_fields: fields("sample", "type" => "blood"),
+      plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
+    )
 
-    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {"patient" => {"id" => '8000'}}, institution: device_message.institution)
-
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {"sample" => {"uid" => 'abc4002'}}, institution: device_message.institution, patient: patient)
-
-    test = TestResult.create_and_index({sample: sample, test_id: '3', patient: patient, device: device, custom_fields: {concentration: "15%"}, indexed_fields: {assay: "mtb"}})
-    test = TestResult.create_and_index({sample: sample, test_id: '2', patient: patient, device: device, indexed_fields: {assay: "mtb"}})
+    TestResult.create_and_index test_id: TEST_ID_2, sample: sample, patient: patient, device: device
+    TestResult.create_and_index test_id: TEST_ID_3, sample: sample, patient: patient, device: device
 
     refresh_index
 
@@ -193,28 +173,23 @@ describe DeviceMessageProcessor, elasticsearch: true do
     assert_patient_data(sample.patient)
 
     tests = all_elasticsearch_tests
-    tests.map { |test| test["_source"]["sample"]["type"] }.should eq(['sputum'] * 3)
+    tests.map { |test| test["_source"]["sample"]["type"] }.should eq([SAMPLE_TYPE] * 3)
   end
 
   it "should update sample data and existing test results on test result update" do
-    sample_indexed_fields = {
-      "sample" => {
-        "type" => "blood"
-      }
-    }
+    patient = Patient.make(
+      uuid: 'def', institution: device_message.institution,
+      indexed_fields: fields("patient", PATIENT_INDEXED_FIELDS),
+      plain_sensitive_data: fields("patient", "id" => PATIENT_ID),
+    )
+    sample = Sample.make(
+      uuid: 'abc', institution: device_message.institution, patient: patient,
+      indexed_fields: fields("sample", "type" => "blood"),
+      plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
+    )
 
-    patient_indexed_fields = {
-      "patient" => {
-        "gender" => 'male'
-      }
-    }
-
-    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {"patient" => {"id" => '8000'}}, institution: device_message.institution)
-
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {"sample" => {"uid" => 'abc4002'}}, institution: device_message.institution, patient: patient)
-
-    test = TestResult.create_and_index({sample: sample, test_id: '4', patient: patient, device: device, custom_fields: {concentration: "15%"}, indexed_fields: {assay: "mtb"}})
-    test = TestResult.create_and_index({sample: sample, test_id: '2', patient: patient, device: device, indexed_fields: {assay: "mtb"}})
+    TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
+    TestResult.create_and_index test_id: TEST_ID_2, sample: sample, patient: patient, device: device
 
     refresh_index
 
@@ -227,27 +202,23 @@ describe DeviceMessageProcessor, elasticsearch: true do
     assert_patient_data(sample.patient)
 
     tests = all_elasticsearch_tests
-    tests.map { |test| test["_source"]["sample"]["type"] }.should eq(['sputum'] * 2)
+    tests.map { |test| test["_source"]["sample"]["type"] }.should eq([SAMPLE_TYPE] * 2)
   end
 
   it "should not update existing tests if sample data indexed fields did not change" do
-    sample_indexed_fields = {
-      "sample" => {
-        "type" => "sputum",
-        "collection_date" => "2000/1/1 9:00:00"
-      }
-    }
+    patient = Patient.make(
+      uuid: 'def', institution: device_message.institution,
+      indexed_fields: fields("patient", PATIENT_INDEXED_FIELDS),
+      plain_sensitive_data: fields("patient", "id" => PATIENT_ID),
+    )
+    sample = Sample.make(
+      uuid: 'abc', institution: device_message.institution, patient: patient,
+      indexed_fields: fields("sample", SAMPLE_INDEXED_FIELDS),
+      plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
+    )
 
-    patient_indexed_fields = {
-      "patient" => {
-        "gender" => "male"
-      }
-    }
-
-    patient = Patient.make(uuid: 'def', indexed_fields: patient_indexed_fields, plain_sensitive_data: {"patient" => {"id" => '8000'}}, institution: device_message.institution)
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {"sample" => {"uid" => 'abc4002'}}, institution: device_message.institution, patient: patient)
-    test = TestResult.create_and_index({sample: sample, test_id: '4', patient: patient, device: device, custom_fields: {"concentration" => "15%"}, indexed_fields: {"assay" => "mtb"}})
-    test = TestResult.create_and_index({sample: sample, test_id: '2', patient: patient, device: device, indexed_fields: {"assay" => "mtb"}})
+    TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
+    TestResult.create_and_index test_id: TEST_ID_2, sample: sample, patient: patient, device: device
 
     refresh_index
 
@@ -262,66 +233,28 @@ describe DeviceMessageProcessor, elasticsearch: true do
   end
 
   it "shouldn't update sample from another institution" do
-    sample_indexed_fields = {
-      "sample" => {
-        "type" => "sputum",
-        "custom_fields" => {
-          "hiv" => "positive"
-        }
-      }
-    }
+    indexed_fields = fields("sample", "type" => SAMPLE_TYPE, "custom_fields" => {"hiv" => PATIENT_HIV})
 
-    sample = Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields, plain_sensitive_data: {"sample" => {"uid" => 'abc4002'}})
+    sample = Sample.make(
+      uuid: 'abc',
+      indexed_fields: indexed_fields,
+      plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
+    )
     device_message_processor.process
 
     Sample.count.should eq(2)
 
     sample = sample.reload
 
-    sample.plain_sensitive_data.should eq({
-      "sample" => {
-        "uid" => 'abc4002'
-      }
-    })
-
-    sample.indexed_fields.should eq({
-      "sample" => {
-        "type" => "sputum",
-        "custom_fields" => {
-          "hiv" => "positive"
-        }
-      }
-    })
+    sample.plain_sensitive_data.should eq(fields("sample", "uid" => SAMPLE_UID))
+    sample.indexed_fields.should eq(indexed_fields)
   end
 
   it "should update tests with the same test_id and different sample_uid" do
-    custom_fields = {
-      test: {
-        concentration: "10%",
-        foo: "bar"
-      }
-    }
-
-    indexed_fields = {
-      test: {
-        results: [
-          {
-            result: "negative",
-            condition: "flu"
-          },
-          {
-            result: "pos",
-            condition: "mtb1"
-          }
-        ]
-      }
-    }
-
-
     TestResult.create_and_index(
-      custom_fields: custom_fields,
-      indexed_fields: indexed_fields,
-      test_id: '4', device: device
+      test_id: TEST_ID, device: device,
+      custom_fields: fields("test", "concentration" => "10%", "foo" => "bar"),
+      indexed_fields: fields("test", "results" => [result("flu", "negative"), result("mtb1", "pos")]),
     )
 
     device_message_processor.process
@@ -332,18 +265,17 @@ describe DeviceMessageProcessor, elasticsearch: true do
     tests.size.should eq(1)
 
     tests.first["_source"]["test"]["assay"].should eq("mtb")
-    tests.first["_source"]["sample"]["type"].should eq("sputum")
-    tests.first["_source"]["test"]["custom_fields"]["concentration"].should eq("15%")
+    tests.first["_source"]["sample"]["type"].should eq(SAMPLE_TYPE)
+    tests.first["_source"]["test"]["custom_fields"]["concentration"].should eq(TEST_CONCENTRATION)
     # tests.first["_source"]["test"]["custom_fields"]["foo"].should eq("bar")
 
     TestResult.count.should eq(1)
     TestResult.first.sample_id.should eq(Sample.last.id)
-    # TestResult.first.custom_fields["test"].should eq({ "raw_result" => "positivo 15%" })
-    TestResult.first.plain_sensitive_data["test"].should eq({ "start_time" => "2000/1/1 10:00:00" })
+    # TestResult.first.custom_fields["test"].should eq("raw_result" => TEST_RAW_RESULT)
+    TestResult.first.plain_sensitive_data["test"].should eq("start_time" => TEST_START_TIME)
   end
 
   context 'sample and patient entities' do
-
     context 'without sample uid' do
       before :each do
         message = parsed_message("4")
@@ -362,30 +294,23 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test = TestResult.first
 
-        test.plain_sensitive_data["sample"].should eq({
-          "id" => "4002"
-        })
-
-        test.custom_fields["sample"].should eq({
-          "datagram" => "010100011100",
-          "culture_days" => "10"
-        })
-
-        test.indexed_fields["sample"].should eq({
-          "type" => "sputum",
-          "collection_date" => "2000/1/1 9:00:00"
-        })
+        test.plain_sensitive_data["sample"].should eq("id" => SAMPLE_ID)
+        test.custom_fields["sample"].should eq(SAMPLE_CUSTOM_FIELDS)
+        test.indexed_fields["sample"].should eq(SAMPLE_INDEXED_FIELDS)
       end
 
       it 'should merge sample if test has a sample' do
         sample = Sample.make(
           uuid: 'abc',
-          indexed_fields: {"sample" => {"existing_field" => 'a value'}},
-          plain_sensitive_data: {"sample" => {"uid" => 'abc4002'}},
+          indexed_fields: fields("sample", "existing_field" => "a value"),
+          plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
           institution: device_message.institution
         )
 
-        test = TestResult.create_and_index({sample: sample, test_id: '4', device: device, indexed_fields: {"assay" => "mtb"}})
+        test = TestResult.create_and_index(
+          test_id: TEST_ID, sample: sample, device: device,
+          indexed_fields: {"assay" => "mtb"},
+        )
 
         device_message_processor.process
 
@@ -394,27 +319,9 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample = Sample.first
 
-        sample.plain_sensitive_data.should eq({
-          "sample" => {
-            "uid" => "abc4002",
-            "id" => "4002"
-          }
-        })
-
-        sample.custom_fields.should eq({
-          "sample" => {
-            "datagram" => "010100011100",
-            "culture_days" => "10"
-          }
-        })
-
-        sample.indexed_fields.should eq({
-          "sample" => {
-            "existing_field" => "a value",
-            "type" => "sputum",
-            "collection_date" => "2000/1/1 9:00:00"
-          }
-        })
+        sample.plain_sensitive_data.should eq(fields("sample", SAMPLE_PII_FIELDS))
+        sample.custom_fields.should eq(fields("sample", SAMPLE_CUSTOM_FIELDS))
+        sample.indexed_fields.should eq(fields("sample", SAMPLE_INDEXED_FIELDS.merge("existing_field" => "a value")))
       end
     end
 
@@ -428,33 +335,17 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should extract existing data in test and create the sample entity' do
-        indexed_fields = {
-          "assay" => 'mtb',
-          "sample" => {
-            "existing_indexed_field" => 'existing_indexed_field_value'
-          }
-        }
+        patient = Patient.make(
+          plain_sensitive_data: fields("patient", "id" => PATIENT_ID),
+          institution: device_message.institution
+        )
 
-        custom_fields = {
-          "sample" => {
-            "existing_custom_field" => 'existing_custom_field_value'
-          }
-        }
-
-        plain_sensitive_data = {
-          "sample" => {
-            "existing_pii_field" => 'existing_pii_field_value'
-          }
-        }
-
-        patient = Patient.make(plain_sensitive_data: {"patient" => {"id" => '8000'}}, institution: device_message.institution)
-
-        test = TestResult.create_and_index({
-          sample: nil, test_id: '4', device: device, patient: patient,
-          indexed_fields: indexed_fields,
-          custom_fields: custom_fields,
-          plain_sensitive_data: plain_sensitive_data
-        })
+        test = TestResult.create_and_index(
+          test_id: TEST_ID, sample: nil, patient: patient, device: device,
+          indexed_fields: fields("sample", "existing_indexed_field" => "existing_indexed_field_value"),
+          custom_fields: fields("sample", "existing_custom_field" => "existing_custom_field_value"),
+          plain_sensitive_data: fields("sample", "existing_pii_field" => "existing_pii_field_value"),
+        )
 
         device_message_processor.process
 
@@ -466,29 +357,9 @@ describe DeviceMessageProcessor, elasticsearch: true do
         test.patient.should eq(patient)
         sample.patient.should eq(patient)
 
-        sample.plain_sensitive_data.should eq({
-          "sample" => {
-            "uid" => "abc4002",
-            "id" => "4002",
-            "existing_pii_field" => 'existing_pii_field_value'
-          }
-        })
-
-        sample.custom_fields.should eq({
-          "sample" => {
-            "datagram" => '010100011100',
-            "culture_days" => "10",
-            "existing_custom_field" => 'existing_custom_field_value'
-          }
-        })
-
-        sample.indexed_fields.should eq({
-          "sample" => {
-            "type" => "sputum",
-            "collection_date" => "2000/1/1 9:00:00",
-            "existing_indexed_field" => 'existing_indexed_field_value'
-          }
-        })
+        sample.plain_sensitive_data.should eq(fields("sample", SAMPLE_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value")))
+        sample.custom_fields.should eq(fields("sample", SAMPLE_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value")))
+        sample.indexed_fields.should eq(fields("sample", SAMPLE_INDEXED_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value")))
 
         test.plain_sensitive_data["sample"].should be_nil
         test.custom_fields["sample"].should be_nil
@@ -496,31 +367,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should extract existing patient data in test into the sample entity' do
-        indexed_fields = {
-          "assay" => 'mtb',
-          "patient" => {
-            "existing_indexed_field" => 'existing_indexed_field_value'
-          }
-        }
-
-        custom_fields = {
-          "patient" => {
-            "existing_custom_field" => 'existing_custom_field_value'
-          }
-        }
-
-        plain_sensitive_data = {
-          "patient" => {
-            "existing_pii_field" => 'existing_pii_field_value'
-          }
-        }
-
-        test = TestResult.create_and_index({
-          sample: nil, test_id: '4', device: device,
-          indexed_fields: indexed_fields,
-          custom_fields: custom_fields,
-          plain_sensitive_data: plain_sensitive_data
-        })
+        test = TestResult.create_and_index(
+          test_id: TEST_ID, sample: nil, device: device,
+          indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
+          custom_fields: fields("patient", "existing_custom_field" => "existing_custom_field_value"),
+          plain_sensitive_data: fields("patient", "existing_pii_field" => "existing_pii_field_value"),
+        )
 
         device_message_processor.process
 
@@ -529,35 +381,19 @@ describe DeviceMessageProcessor, elasticsearch: true do
         test = TestResult.first
         sample = test.sample
 
-        sample.plain_sensitive_data["patient"].should eq({
-          "existing_pii_field" => 'existing_pii_field_value'
-        })
-
-        sample.custom_fields["patient"].should eq({
-          "existing_custom_field" => 'existing_custom_field_value'
-        })
-
-        sample.indexed_fields["patient"].should eq({
-          "existing_indexed_field" => 'existing_indexed_field_value',
-        })
+        sample.plain_sensitive_data["patient"].should eq("existing_pii_field" => "existing_pii_field_value")
+        sample.custom_fields["patient"].should eq("existing_custom_field" => "existing_custom_field_value")
+        sample.indexed_fields["patient"].should eq("existing_indexed_field" => "existing_indexed_field_value")
       end
 
       it 'should merge sample with existing sample if sample uid matches' do
-        indexed_fields = {
-          "sample" => {
-            "existing_field" => 'a value'
-          }
-        }
+        sample = Sample.make(
+          uuid: 'abc', institution: device_message.institution,
+          indexed_fields: fields("sample", "existing_field" => "a value"),
+          plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
+        )
 
-        plain_sensitive_data  = {
-          "sample" => {
-            "uid" => 'abc4002'
-          }
-        }
-
-        sample = Sample.make(uuid: 'abc', indexed_fields: indexed_fields, plain_sensitive_data: plain_sensitive_data, institution: device_message.institution)
-
-        TestResult.create_and_index({sample: sample, test_id: '4', device: device})
+        TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
 
         device_message_processor.process
 
@@ -566,37 +402,19 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample = TestResult.first.sample
 
-        sample.plain_sensitive_data["sample"].should eq({
-          "uid" => "abc4002",
-          "id" => "4002",
-        })
-
-        sample.custom_fields["sample"].should eq({
-          "datagram" => "010100011100",
-          "culture_days" => "10"
-        })
-
-        sample.indexed_fields["sample"].should eq({
-          "existing_field" => "a value",
-          "type" => "sputum",
-          "collection_date" => "2000/1/1 9:00:00"
-        })
+        sample.plain_sensitive_data["sample"].should eq(SAMPLE_PII_FIELDS)
+        sample.custom_fields["sample"].should eq(SAMPLE_CUSTOM_FIELDS)
+        sample.indexed_fields["sample"].should eq(SAMPLE_INDEXED_FIELDS.merge("existing_field" => "a value"))
       end
 
       it 'should create a new sample if the existing sample has a different sample uid' do
-        plain_sensitive_data  = {
-          "sample" => {
-            "uid" => 'def9772'
-          }
-        }
-
         sample = Sample.make(
           uuid: 'abc',
-          plain_sensitive_data: plain_sensitive_data,
+          plain_sensitive_data: fields("sample", "uid" => "def9772"),
           institution: device_message.institution
         )
 
-        TestResult.create_and_index({sample: sample, test_id: '4', device: device})
+        TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
 
         device_message_processor.process
 
@@ -604,54 +422,34 @@ describe DeviceMessageProcessor, elasticsearch: true do
         Sample.count.should eq(1)
 
         sample = TestResult.first.sample
-
-        sample.plain_sensitive_data["sample"].should eq({
-          "uid" => "abc4002",
-          "id" => "4002"
-        })
-
-        sample.custom_fields["sample"].should eq({
-          "datagram" => "010100011100",
-          "culture_days" => "10"
-        })
-
-        sample.indexed_fields["sample"].should eq({
-          "type" => "sputum",
-          "collection_date" => "2000/1/1 9:00:00"
-        })
+        assert_sample_data sample
       end
 
       it 'should not destroy existing sample if it has other references' do
-        plain_sensitive_data  = {
-          "sample" => {
-            "uid" => 'def9772'
-          }
-        }
-
         sample = Sample.make(
           "uuid" => 'abc',
-          "plain_sensitive_data" => plain_sensitive_data,
+          "plain_sensitive_data" => fields("sample", "uid" => "def9772"),
           "institution" => device_message.institution
         )
 
-        test_1 = TestResult.create_and_index(sample: sample, test_id: '7', device: device)
+        test_1 = TestResult.create_and_index test_id: TEST_ID_2, sample: sample, device: device
 
         device_message_processor.process
 
-        test_2 = TestResult.find_by(test_id: '4')
+        test_2 = TestResult.find_by(test_id: TEST_ID)
 
         test_1.reload.sample.sample_uid.should eq('def9772')
-        test_2.reload.sample.sample_uid.should eq('abc4002')
+        test_2.reload.sample.sample_uid.should eq(SAMPLE_UID)
       end
 
       it "should assign existing sample's patient to the test" do
         patient = Patient.make(
-          "plain_sensitive_data" => {"patient" => {"patient_id" => '8000'}},
+          "plain_sensitive_data" => fields("patient", "patient_id" => PATIENT_ID),
           "institution" => device_message.institution
         )
 
         Sample.make(
-          "plain_sensitive_data" => {"sample" => {"uid" => 'abc4002'}},
+          "plain_sensitive_data" => fields("sample", "uid" => SAMPLE_UID),
           "patient" => patient,
           "institution" => device_message.institution
         )
@@ -665,12 +463,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
         test = TestResult.first
         test.patient.should eq(test.sample.patient)
       end
-
     end
 
     context 'without patient id' do
       before :each do
-        message = parsed_message('4')
+        message = parsed_message(TEST_ID)
         message["patient"]["pii"].delete("id")
         message["sample"]["pii"] = {}
         message["sample"]["custom"] = {}
@@ -679,25 +476,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should merge patient into test patient if test has patient but not sample' do
-        plain_sensitive_data = {
-          "patient" => {
-            "id" => '8000'
-          }
-        }
-
-        indexed_fields = {
-          "patient" => {
-            "existing_indexed_field" => 'existing_indexed_field_value'
-          }
-        }
-
         patient = Patient.make(
-          plain_sensitive_data: plain_sensitive_data,
-          indexed_fields: indexed_fields,
+          plain_sensitive_data: fields("patient", "id" => PATIENT_ID),
+          indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
           institution: device_message.institution
         )
 
-        TestResult.create_and_index(sample: nil, test_id: '4', device: device, patient: patient)
+        TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
 
         device_message_processor.process
 
@@ -707,48 +492,25 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data["patient"].should eq({
-          "id" => "8000",
-          "dob" => "2000/1/1"
-        })
-
-        patient.custom_fields["patient"].should eq({
-          "shirt_color" => "blue",
-          "hiv" => "positive"
-        })
-
-        patient.indexed_fields["patient"].should eq({
-          "existing_indexed_field" => 'existing_indexed_field_value',
-          "gender" => "male"
-        })
+        patient.plain_sensitive_data["patient"].should eq(PATIENT_PII_FIELDS)
+        patient.custom_fields["patient"].should eq(PATIENT_CUSTOM_FIELDS)
+        patient.indexed_fields["patient"].should eq(PATIENT_INDEXED_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should merge patient into sample patient if sample has patient' do
-        plain_sensitive_data = {
-          "patient" => {
-            "id" => '8000'
-          }
-        }
-
-        indexed_fields = {
-          "patient" => {
-            "existing_indexed_field" => 'existing_indexed_field_value'
-          }
-        }
-
         patient = Patient.make(
-          plain_sensitive_data: plain_sensitive_data,
-          indexed_fields: indexed_fields,
+          plain_sensitive_data: fields("patient", "id" => PATIENT_ID),
+          indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
           institution: device_message.institution
         )
 
         sample = Sample.make(
-          plain_sensitive_data: {"sample" => {"uid" => 'abc4002'}},
+          plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
           institution: device_message.institution,
           patient: patient
         )
 
-        TestResult.create_and_index(sample: sample, test_id: '4', patient: patient, device: device)
+        TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
 
         device_message_processor.process
 
@@ -758,20 +520,9 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.sample.patient
 
-        patient.plain_sensitive_data["patient"].should eq({
-          "id" => "8000",
-          "dob" => "2000/1/1"
-        })
-
-        patient.custom_fields["patient"].should eq({
-          "shirt_color" => "blue",
-          "hiv" => "positive"
-        })
-
-        patient.indexed_fields["patient"].should eq({
-          "existing_indexed_field" => 'existing_indexed_field_value',
-          "gender" => "male"
-        })
+        patient.plain_sensitive_data["patient"].should eq(PATIENT_PII_FIELDS)
+        patient.custom_fields["patient"].should eq(PATIENT_CUSTOM_FIELDS)
+        patient.indexed_fields["patient"].should eq(PATIENT_INDEXED_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should store patient data in test if test does not have a sample or patient' do
@@ -783,27 +534,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test = TestResult.first
 
-        test.plain_sensitive_data["patient"].should eq({
-          "dob" => "2000/1/1"
-        })
-
-        test.custom_fields["patient"].should eq({
-          "shirt_color" => "blue",
-          "hiv" => "positive"
-        })
-
-        test.indexed_fields["patient"].should eq({
-          "gender" => "male"
-        })
+        test.plain_sensitive_data["patient"].should eq("dob" => PATIENT_DOB)
+        test.custom_fields["patient"].should eq(PATIENT_CUSTOM_FIELDS)
+        test.indexed_fields["patient"].should eq(PATIENT_INDEXED_FIELDS)
       end
 
       it 'should store patient data in sample if sample is present but doest not have a patient' do
         sample = Sample.make(
-          plain_sensitive_data: {"sample" => {"uid" => 'abc4002'}},
+          plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
           institution: device_message.institution
         )
 
-        TestResult.create_and_index(sample: sample, test_id: '4', device: device)
+        TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
 
         device_message_processor.process
 
@@ -813,24 +555,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample = TestResult.first.sample
 
-        sample.plain_sensitive_data["patient"].should eq({
-          "dob" => "2000/1/1"
-        })
-
-        sample.custom_fields["patient"].should eq({
-          "shirt_color" => "blue",
-          "hiv" => "positive"
-        })
-
-        sample.indexed_fields["patient"].should eq({
-          "gender" => "male"
-        })
+        sample.plain_sensitive_data["patient"].should eq("dob" => PATIENT_DOB)
+        sample.custom_fields["patient"].should eq(PATIENT_CUSTOM_FIELDS)
+        sample.indexed_fields["patient"].should eq(PATIENT_INDEXED_FIELDS)
       end
     end
 
     context 'with patient id' do
       before :each do
-        message = parsed_message('4')
+        message = parsed_message(TEST_ID)
         message["sample"]["pii"] = {}
         message["sample"]["custom"] = {}
         message["sample"]["indexed"] = {}
@@ -838,29 +571,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should extract existing data in test and create the patient entity' do
-        indexed_fields = {
-          "patient" => {
-            "existing_indexed_field" => 'existing_indexed_field_value'
-          }
-        }
-
-        custom_fields = {
-          "patient" => {
-            "existing_custom_field" => 'existing_custom_field_value'
-          }
-        }
-
-        plain_sensitive_data = {
-          "patient" => {
-            "existing_pii_field" => 'existing_pii_field_value'
-          }
-        }
-
         TestResult.create_and_index(
-          sample: nil, test_id: '4', device: device,
-          indexed_fields: indexed_fields,
-          custom_fields: custom_fields,
-          plain_sensitive_data: plain_sensitive_data
+          test_id: TEST_ID, sample: nil, device: device,
+          indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
+          custom_fields: fields("patient", "existing_custom_field" => "existing_custom_field_value"),
+          plain_sensitive_data: fields("patient", "existing_pii_field" => "existing_pii_field_value"),
         )
 
         device_message_processor.process
@@ -871,54 +586,21 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data["patient"].should eq({
-          "id" => "8000",
-          "dob" => "2000/1/1",
-          "existing_pii_field" => 'existing_pii_field_value'
-        })
-
-        patient.custom_fields["patient"].should eq({
-          "shirt_color" => "blue",
-          "hiv" => "positive",
-          "existing_custom_field" => 'existing_custom_field_value'
-        })
-
-        patient.indexed_fields["patient"].should eq({
-          "existing_indexed_field" => 'existing_indexed_field_value',
-          "gender" => "male"
-        })
+        patient.plain_sensitive_data["patient"].should eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        patient.custom_fields["patient"].should eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        patient.indexed_fields["patient"].should eq(PATIENT_INDEXED_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should extract existing data in sample and create the patient entity' do
-        indexed_fields = {
-          "patient" => {
-            "existing_indexed_field" => 'existing_indexed_field_value'
-          }
-        }
-
-        custom_fields = {
-          "patient" => {
-            "existing_custom_field" => 'existing_custom_field_value'
-          }
-        }
-
-        plain_sensitive_data = {
-          "sample" => {
-            "uid" => 'abc4002'
-          },
-          "patient" => {
-            "existing_pii_field" => 'existing_pii_field_value'
-          }
-        }
-
         sample = Sample.make(
-          plain_sensitive_data: plain_sensitive_data,
-          indexed_fields: indexed_fields,
-          custom_fields: custom_fields,
+          plain_sensitive_data: fields("sample", SAMPLE_UID).
+                                  merge(fields("patient", "existing_pii_field" => "existing_pii_field_value")),
+          indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
+          custom_fields: fields("patient", "existing_custom_field" => "existing_custom_field_value"),
           institution: device_message.institution
         )
 
-        TestResult.create_and_index(sample: sample, test_id: '4', device: device)
+        TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
 
         device_message_processor.process
 
@@ -928,52 +610,20 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.sample.patient
 
-        patient.plain_sensitive_data["patient"].should eq({
-          "id" => "8000",
-          "dob" => "2000/1/1",
-          "existing_pii_field" => 'existing_pii_field_value'
-        })
-
-        patient.custom_fields["patient"].should eq({
-          "shirt_color" => "blue",
-          "hiv" => "positive",
-          "existing_custom_field" => 'existing_custom_field_value'
-        })
-
-        patient.indexed_fields["patient"].should eq({
-          "existing_indexed_field" => 'existing_indexed_field_value',
-          "gender" => "male"
-        })
+        patient.plain_sensitive_data["patient"].should eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        patient.custom_fields["patient"].should eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        patient.indexed_fields["patient"].should eq(PATIENT_INDEXED_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should merge patient with existing patient if patient id matches' do
-        indexed_fields = {
-          "patient" => {
-            "existing_indexed_field" => 'existing_indexed_field_value'
-          }
-        }
-
-        custom_fields = {
-          "patient" => {
-            "existing_custom_field" => 'existing_custom_field_value'
-          }
-        }
-
-        plain_sensitive_data = {
-          "patient" => {
-            "id" => '8000',
-            "existing_pii_field" => 'existing_pii_field_value'
-          }
-        }
-
         patient = Patient.make(
-          plain_sensitive_data: plain_sensitive_data,
-          indexed_fields: indexed_fields,
-          custom_fields: custom_fields,
+          plain_sensitive_data: fields("patient", "id" => PATIENT_ID, "existing_pii_field" => "existing_pii_field_value"),
+          indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
+          custom_fields: fields("patient", "existing_custom_field" => "existing_custom_field_value"),
           institution: device_message.institution
         )
 
-        TestResult.create_and_index(sample: nil, test_id: '4', device: device, patient: patient)
+        TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
 
         device_message_processor.process
 
@@ -983,37 +633,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data["patient"].should eq({
-          "id" => "8000",
-          "dob" => "2000/1/1",
-          "existing_pii_field" => 'existing_pii_field_value'
-        })
-
-        patient.custom_fields["patient"].should eq({
-          "shirt_color" => "blue",
-          "hiv" => "positive",
-          "existing_custom_field" => 'existing_custom_field_value'
-        })
-
-        patient.indexed_fields["patient"].should eq({
-          "existing_indexed_field" => 'existing_indexed_field_value',
-          "gender" => "male"
-        })
+        patient.plain_sensitive_data["patient"].should eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        patient.custom_fields["patient"].should eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        patient.indexed_fields["patient"].should eq(PATIENT_INDEXED_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should create a new patient if the existing patient has a differente patient id' do
-        plain_sensitive_data = {
-          "patient" => {
-            "id" => '9000'
-          }
-        }
-
         patient = Patient.make(
-          plain_sensitive_data: plain_sensitive_data,
+          plain_sensitive_data: fields("patient", "id" => "9000"),
           institution: device_message.institution
         )
 
-        TestResult.create_and_index(sample: nil, test_id: '4', device: device, patient: patient)
+        TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
 
         device_message_processor.process
 
@@ -1022,46 +653,27 @@ describe DeviceMessageProcessor, elasticsearch: true do
         Patient.count.should eq(1)
 
         patient = TestResult.first.patient
-
-        patient.plain_sensitive_data["patient"].should eq({
-          "id" => "8000",
-          "dob" => "2000/1/1"
-        })
-
-        patient.custom_fields["patient"].should eq({
-          "shirt_color" => "blue",
-          "hiv" => "positive"
-        })
-
-        patient.indexed_fields["patient"].should eq({
-          "gender" => "male"
-        })
+        assert_patient_data(patient)
       end
 
       it 'should not destroy existing patient if it has other references' do
-        plain_sensitive_data  = {
-          "patient" => {
-            "id" => '9000'
-          }
-        }
-
         patient = Patient.make(
-          plain_sensitive_data: plain_sensitive_data,
+          plain_sensitive_data: fields("patient", "id" => "9000"),
           institution: device_message.institution
         )
 
-        test_1 = TestResult.create_and_index(sample: nil, test_id: '7', device: device, patient: patient)
+        test_1 = TestResult.create_and_index test_id: TEST_ID_2, sample: nil, device: device, patient: patient
 
         device_message_processor.process
 
-        test_2 = TestResult.find_by(test_id: '4')
+        test_2 = TestResult.find_by(test_id: TEST_ID)
 
         test_1.reload.patient.patient_id.should eq('9000')
-        test_2.patient.patient_id.should eq('8000')
+        test_2.patient.patient_id.should eq(PATIENT_ID)
       end
 
       it 'should create patient and store reference in test and sample' do
-        TestResult.create_and_index(test_id: '4', device: device)
+        TestResult.create_and_index test_id: TEST_ID, device: device
 
         device_message_processor.process
 
@@ -1074,7 +686,5 @@ describe DeviceMessageProcessor, elasticsearch: true do
         test.patient.should eq(test.sample.patient)
       end
     end
-
   end
-
 end
