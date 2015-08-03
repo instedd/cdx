@@ -43,6 +43,11 @@ Device.blueprint do
   time_zone { "UTC" }
 end
 
+Encounter.blueprint do
+  institution
+  plain_sensitive_data { { "encounter" => { "id" => "encounter-#{Sham.sn}" } } }
+end
+
 Sample.blueprint do
   institution
   plain_sensitive_data { { "sample" => { "uid" => "sample-#{Sham.sn}" } } }

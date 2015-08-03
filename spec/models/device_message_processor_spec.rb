@@ -78,6 +78,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
     {"result" => result, "condition" => condition}
   end
 
+  def clear(message, *scopes)
+    scopes.each do |scope|
+      message[scope]["pii"] = {}
+      message[scope]["custom"] = {}
+      message[scope]["indexed"] = {}
+    end
+  end
+
   let(:device) {Device.make}
 
   let(:institution) {device.institution}
@@ -297,14 +305,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
     TestResult.first.plain_sensitive_data["test"].should eq("start_time" => TEST_START_TIME)
   end
 
-  context 'sample and patient entities' do
+  context 'sample, patient and encounter entities' do
     context 'without sample uid' do
       before :each do
-        message = parsed_message("4")
+        message = parsed_message(TEST_ID)
         message["sample"]["pii"].delete("uid")
-        message["patient"]["pii"] = {}
-        message["patient"]["custom"] = {}
-        message["patient"]["indexed"] = {}
+        clear message, "patient", "encounter"
         device_message.stub("parsed_messages").and_return([message])
       end
 
@@ -323,16 +329,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should merge sample if test has a sample' do
         sample = Sample.make(
-          uuid: 'abc',
+          uuid: 'abc', institution: device_message.institution,
           indexed_fields: fields("sample", "existing_field" => "a value"),
           plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
-          institution: device_message.institution
         )
 
-        test = TestResult.create_and_index(
-          test_id: TEST_ID, sample: sample, device: device,
-          indexed_fields: {"assay" => "mtb"},
-        )
+        TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
 
         device_message_processor.process
 
@@ -349,20 +351,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     context 'with sample uid' do
       before :each do
-        message = parsed_message("4")
-        message["patient"]["pii"] = {}
-        message["patient"]["custom"] = {}
-        message["patient"]["indexed"] = {}
+        message = parsed_message(TEST_ID)
+        clear message, "patient", "encounter"
         device_message.stub("parsed_messages").and_return([message])
       end
 
       it 'should extract existing data in test and create the sample entity' do
         patient = Patient.make(
+          institution: device_message.institution,
           plain_sensitive_data: fields("patient", "id" => PATIENT_ID),
-          institution: device_message.institution
         )
 
-        test = TestResult.create_and_index(
+        TestResult.create_and_index(
           test_id: TEST_ID, sample: nil, patient: patient, device: device,
           indexed_fields: fields("sample", "existing_indexed_field" => "existing_indexed_field_value"),
           custom_fields: fields("sample", "existing_custom_field" => "existing_custom_field_value"),
@@ -389,7 +389,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should extract existing patient data in test into the sample entity' do
-        test = TestResult.create_and_index(
+        TestResult.create_and_index(
           test_id: TEST_ID, sample: nil, device: device,
           indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
           custom_fields: fields("patient", "existing_custom_field" => "existing_custom_field_value"),
@@ -431,9 +431,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should create a new sample if the existing sample has a different sample uid' do
         sample = Sample.make(
-          uuid: 'abc',
+          uuid: 'abc', institution: device_message.institution,
           plain_sensitive_data: fields("sample", "uid" => "def9772"),
-          institution: device_message.institution
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
@@ -449,9 +448,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should not destroy existing sample if it has other references' do
         sample = Sample.make(
-          "uuid" => 'abc',
-          "plain_sensitive_data" => fields("sample", "uid" => "def9772"),
-          "institution" => device_message.institution
+          uuid: 'abc', institution: device_message.institution,
+          plain_sensitive_data: fields("sample", "uid" => "def9772"),
         )
 
         test_1 = TestResult.create_and_index test_id: TEST_ID_2, sample: sample, device: device
@@ -466,14 +464,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it "should assign existing sample's patient to the test" do
         patient = Patient.make(
-          "plain_sensitive_data" => fields("patient", "patient_id" => PATIENT_ID),
-          "institution" => device_message.institution
+          institution: device_message.institution,
+          plain_sensitive_data: fields("patient", "patient_id" => PATIENT_ID),
         )
 
         Sample.make(
-          "plain_sensitive_data" => fields("sample", "uid" => SAMPLE_UID),
-          "patient" => patient,
-          "institution" => device_message.institution
+          institution: device_message.institution, patient: patient,
+          plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
         )
 
         device_message_processor.process
@@ -491,17 +488,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
       before :each do
         message = parsed_message(TEST_ID)
         message["patient"]["pii"].delete("id")
-        message["sample"]["pii"] = {}
-        message["sample"]["custom"] = {}
-        message["sample"]["indexed"] = {}
+        clear message, "sample", "encounter"
         device_message.stub("parsed_messages").and_return([message])
       end
 
       it 'should merge patient into test patient if test has patient but not sample' do
         patient = Patient.make(
+          institution: device_message.institution,
           plain_sensitive_data: fields("patient", "id" => PATIENT_ID),
           indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
-          institution: device_message.institution
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
@@ -527,9 +522,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
         )
 
         sample = Sample.make(
+          institution: device_message.institution, patient: patient,
           plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
-          institution: device_message.institution,
-          patient: patient
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
@@ -563,8 +557,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should store patient data in sample if sample is present but doest not have a patient' do
         sample = Sample.make(
+          institution: device_message.institution,
           plain_sensitive_data: fields("sample", "uid" => SAMPLE_UID),
-          institution: device_message.institution
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
@@ -586,9 +580,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     context 'with patient id' do
       before :each do
         message = parsed_message(TEST_ID)
-        message["sample"]["pii"] = {}
-        message["sample"]["custom"] = {}
-        message["sample"]["indexed"] = {}
+        clear message, "sample", "encounter"
         device_message.stub("parsed_messages").and_return([message])
       end
 
@@ -615,11 +607,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should extract existing data in sample and create the patient entity' do
         sample = Sample.make(
+          institution: device_message.institution,
           plain_sensitive_data: fields("sample", SAMPLE_UID).
                                   merge(fields("patient", "existing_pii_field" => "existing_pii_field_value")),
           indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
           custom_fields: fields("patient", "existing_custom_field" => "existing_custom_field_value"),
-          institution: device_message.institution
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
@@ -639,10 +631,10 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should merge patient with existing patient if patient id matches' do
         patient = Patient.make(
+          institution: device_message.institution,
           plain_sensitive_data: fields("patient", "id" => PATIENT_ID, "existing_pii_field" => "existing_pii_field_value"),
           indexed_fields: fields("patient", "existing_indexed_field" => "existing_indexed_field_value"),
           custom_fields: fields("patient", "existing_custom_field" => "existing_custom_field_value"),
-          institution: device_message.institution
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
@@ -662,8 +654,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should create a new patient if the existing patient has a differente patient id' do
         patient = Patient.make(
+          institution: device_message.institution,
           plain_sensitive_data: fields("patient", "id" => "9000"),
-          institution: device_message.institution
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
@@ -680,8 +672,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should not destroy existing patient if it has other references' do
         patient = Patient.make(
+          institution: device_message.institution,
           plain_sensitive_data: fields("patient", "id" => "9000"),
-          institution: device_message.institution
         )
 
         test_1 = TestResult.create_and_index test_id: TEST_ID_2, sample: nil, device: device, patient: patient
@@ -706,6 +698,74 @@ describe DeviceMessageProcessor, elasticsearch: true do
         test = TestResult.first
 
         test.patient.should eq(test.sample.patient)
+      end
+    end
+
+    context 'without encounter id' do
+      before :each do
+        message = parsed_message(TEST_ID)
+        message["encounter"]["pii"].delete("id")
+        clear message, "patient", "sample"
+        device_message.stub("parsed_messages").and_return([message])
+      end
+
+      it 'should store encounter data in test if test does not have an encounter' do
+        device_message_processor.process
+
+        TestResult.count.should eq(1)
+        Encounter.count.should eq(0)
+
+        test = TestResult.first
+        test.custom_fields["encounter"].should eq(ENCOUNTER_CUSTOM_FIELDS)
+      end
+
+      it 'should merge encounter if test has an encounter' do
+        encounter = Encounter.make(
+          uuid: 'ghi', institution: device_message.institution,
+          custom_fields: fields("encounter", "existing_field" => "a value"),
+          plain_sensitive_data: fields("encounter", ENCOUNTER_PII_FIELDS),
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, encounter: encounter, device: device
+
+        device_message_processor.process
+
+        TestResult.count.should eq(1)
+        Encounter.count.should eq(1)
+
+        encounter = Encounter.first
+
+        encounter.plain_sensitive_data.should eq(fields("encounter", ENCOUNTER_PII_FIELDS))
+        encounter.custom_fields.should eq(fields("encounter", ENCOUNTER_CUSTOM_FIELDS.merge("existing_field" => "a value")))
+      end
+    end
+
+    context 'with encounter id' do
+      before :each do
+        message = parsed_message(TEST_ID)
+        clear message, "patient", "sample"
+        device_message.stub("parsed_messages").and_return([message])
+      end
+
+      it 'should extract existing data in test and create the encounter entity' do
+        TestResult.create_and_index(
+          test_id: TEST_ID, sample: nil, device: device,
+          indexed_fields: fields("encounter", "existing_indexed_field" => "existing_indexed_field_value"),
+          custom_fields: fields("encounter", "existing_custom_field" => "existing_custom_field_value"),
+          plain_sensitive_data: fields("encounter", "existing_pii_field" => "existing_pii_field_value"),
+        )
+
+        device_message_processor.process
+
+        TestResult.count.should eq(1)
+        Sample.count.should eq(0)
+        Patient.count.should eq(0)
+        Encounter.count.should eq(1)
+
+        encounter = TestResult.first.encounter
+
+        encounter.plain_sensitive_data["encounter"].should eq(ENCOUNTER_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        encounter.custom_fields["encounter"].should eq(ENCOUNTER_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
       end
     end
   end

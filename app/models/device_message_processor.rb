@@ -42,8 +42,8 @@ class DeviceMessageProcessor
       old_encounter = test.encounter
 
       encounter_indexed_fields = process_encounter test
-      sample_indexed_fields    = process_sample test
-      patient_indexed_fields   =  process_patient test
+      sample_indexed_fields    = process_sample    test
+      patient_indexed_fields   = process_patient   test
 
       save_encounter test, encounter_indexed_fields
       save_sample    test, sample_indexed_fields
