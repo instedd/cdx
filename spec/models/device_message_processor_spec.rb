@@ -281,7 +281,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
   end
 
   it "should update tests with the same test_id and different sample_uid" do
-    TestResult.create_and_index(
+    test = TestResult.create_and_index(
       test_id: TEST_ID, device: device,
       custom_fields: fields("test", "concentration" => "10%", "foo" => "bar"),
       indexed_fields: fields("test", "results" => [result("flu", "negative"), result("mtb1", "pos")]),
@@ -766,6 +766,25 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         encounter.plain_sensitive_data["encounter"].should eq(ENCOUNTER_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
         encounter.custom_fields["encounter"].should eq(ENCOUNTER_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+      end
+
+      it "should update encounter if encounter_id changes" do
+        old_encounter = Encounter.make(
+          uuid: 'ghi', institution: device_message.institution,
+          plain_sensitive_data: fields("encounter", "id" => "ANOTHER ID"),
+        )
+
+        test = TestResult.create_and_index test_id: TEST_ID, device: device, encounter: old_encounter
+
+        device_message_processor.process
+
+        Encounter.count.should eq(1)
+
+        encounter = Encounter.first
+        encounter2 = TestResult.first.encounter
+        encounter.should_not eq(old_encounter)
+
+        encounter.should eq(encounter2)
       end
     end
   end

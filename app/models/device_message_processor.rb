@@ -116,10 +116,13 @@ class DeviceMessageProcessor
       else
         if encounter.encounter_id
           test.encounter = encounter
-          test.move_entity_scope "encounter", test.encounter
         else
           test.merge_entity_scope encounter, "encounter"
         end
+      end
+
+      if test.encounter
+        test.move_entity_scope "encounter", test.encounter
       end
 
       existing_indexed
@@ -137,10 +140,13 @@ class DeviceMessageProcessor
       else
         if sample.sample_uid
           test.sample = sample
-          test.move_entity_scope "sample", test.sample
         else
           test.merge_entity_scope sample, "sample"
         end
+      end
+
+      if test.sample
+        test.move_entity_scope "sample", test.sample
       end
 
       existing_indexed
@@ -158,25 +164,29 @@ class DeviceMessageProcessor
       else
         if patient.patient_id
           test.patient = patient
-          test.move_entity_scope "patient", test.patient
         else
           test.merge_entity_scope patient, "patient"
         end
       end
 
+      if test.patient
+        test.move_entity_scope "patient", test.patient
+      end
+
       # Move patient data to sample if there's one,
       # or move sample's patient to test, if the test has no patient
       if test.sample
-        test.move_entity_scope "patient", test.sample
+         test.move_entity_scope "patient", test.sample
 
         if test.patient
           test.sample.move_entity_scope "patient", test.patient
           test.sample.patient = test.patient
         else
-          test.sample.merge_entity_scope patient, "patient"
           if test.sample.patient
             test.patient = test.sample.patient
-            test.sample.patient.merge_entity_scope patient, "patient"
+            test.patient.merge_entity_scope patient, "patient"
+          else
+            test.sample.merge_entity_scope patient, "patient"
           end
         end
       end
