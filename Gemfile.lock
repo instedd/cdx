@@ -30,16 +30,6 @@ GIT
       sass-rails
 
 GIT
-  remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: 977033500ecbf9f74141df9bd6f3cd3efcf449d7
-  branch: master
-  specs:
-    cdx-api-elasticsearch (0.0.1)
-      activesupport
-      cdx
-      elasticsearch
-
-GIT
   remote: https://github.com/instedd/cdx-sync-server.git
   revision: 2e453e4e0c71b42fdf82d0893cd4950b3638ea5e
   branch: master
@@ -73,6 +63,14 @@ GIT
   specs:
     location_service (0.1.0)
       rest-client (~> 1.6)
+
+PATH
+  remote: deps/cdx-api-elasticsearch
+  specs:
+    cdx-api-elasticsearch (0.0.1)
+      activesupport
+      cdx
+      elasticsearch
 
 PATH
   remote: deps/cdx_core

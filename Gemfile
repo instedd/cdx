@@ -31,7 +31,7 @@ gem 'rchardet'
 gem 'therubyracer'
 
 gem 'cdx', path: 'deps/cdx_core'
-gem 'cdx-api-elasticsearch', git: "https://github.com/instedd/cdx-api-elasticsearch.git", branch: 'master'
+gem 'cdx-api-elasticsearch', path: 'deps/cdx-api-elasticsearch'
 gem 'cdx-sync-server',  git: "https://github.com/instedd/cdx-sync-server.git", branch: 'master'
 gem 'geojson_import', git: "https://github.com/instedd/geojson_import", branch: 'master'
 gem 'location_service', git: "https://github.com/instedd/ruby-location_service.git", branch: 'master'
