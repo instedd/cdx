@@ -5,28 +5,32 @@ describe DeviceMessageProcessor, elasticsearch: true do
   TEST_ID_2 = "5"
   TEST_ID_3 = "6"
 
-  TEST_RAW_RESULT        = "positivo 15%"
-  TEST_CONCENTRATION     = "15%"
-  TEST_START_TIME        = "2000/1/1 10:00:00"
+  TEST_RAW_RESULT         = "positivo 15%"
+  TEST_CONCENTRATION      = "15%"
+  TEST_START_TIME         = "2000/1/1 10:00:00"
 
-  SAMPLE_ID              = "4002"
-  SAMPLE_UID             = "abc4002"
-  SAMPLE_DATAGRAM        = "010100011100"
-  SAMPLE_CULTURE_DAYS    = "10"
-  SAMPLE_TYPE            = "sputum"
-  SAMPLE_COLLECTION_DATE = "2000/1/1 9:00:00"
-  SAMPLE_PII_FIELDS      = {"id" => SAMPLE_ID, "uid" => SAMPLE_UID}.freeze
-  SAMPLE_INDEXED_FIELDS  = {"type" => SAMPLE_TYPE, "collection_date" => SAMPLE_COLLECTION_DATE}.freeze
-  SAMPLE_CUSTOM_FIELDS   = {"datagram" => SAMPLE_DATAGRAM, "culture_days" => SAMPLE_CULTURE_DAYS}.freeze
+  SAMPLE_ID               = "4002"
+  SAMPLE_UID              = "abc4002"
+  SAMPLE_DATAGRAM         = "010100011100"
+  SAMPLE_CULTURE_DAYS     = "10"
+  SAMPLE_TYPE             = "sputum"
+  SAMPLE_COLLECTION_DATE  = "2000/1/1 9:00:00"
+  SAMPLE_PII_FIELDS       = {"id" => SAMPLE_ID, "uid" => SAMPLE_UID}.freeze
+  SAMPLE_INDEXED_FIELDS   = {"type" => SAMPLE_TYPE, "collection_date" => SAMPLE_COLLECTION_DATE}.freeze
+  SAMPLE_CUSTOM_FIELDS    = {"datagram" => SAMPLE_DATAGRAM, "culture_days" => SAMPLE_CULTURE_DAYS}.freeze
 
-  PATIENT_ID             = "8000"
-  PATIENT_GENDER         = "male"
-  PATIENT_DOB            = "2000/1/1"
-  PATIENT_SHIRT_COLOR    = "blue"
-  PATIENT_HIV            = "positive"
-  PATIENT_PII_FIELDS     = {"id" => PATIENT_ID, "dob" => PATIENT_DOB}.freeze
-  PATIENT_INDEXED_FIELDS = {"gender" => PATIENT_GENDER}.freeze
-  PATIENT_CUSTOM_FIELDS  = {"shirt_color" => PATIENT_SHIRT_COLOR, "hiv" => PATIENT_HIV}.freeze
+  PATIENT_ID              = "8000"
+  PATIENT_GENDER          = "male"
+  PATIENT_DOB             = "2000/1/1"
+  PATIENT_SHIRT_COLOR     = "blue"
+  PATIENT_HIV             = "positive"
+  PATIENT_PII_FIELDS      = {"id" => PATIENT_ID, "dob" => PATIENT_DOB}.freeze
+  PATIENT_INDEXED_FIELDS  = {"gender" => PATIENT_GENDER}.freeze
+  PATIENT_CUSTOM_FIELDS   = {"shirt_color" => PATIENT_SHIRT_COLOR, "hiv" => PATIENT_HIV}.freeze
+
+  ENCOUNTER_ID            = "1234"
+  ENCOUNTER_PII_FIELDS    = {"id" => ENCOUNTER_ID}.freeze
+  ENCOUNTER_CUSTOM_FIELDS = {"time" => "2001/1/1 10:00:00"}
 
   def parsed_message(test_id, params={})
     {
@@ -58,6 +62,10 @@ describe DeviceMessageProcessor, elasticsearch: true do
         "indexed" => PATIENT_INDEXED_FIELDS.dup,
         "pii" => PATIENT_PII_FIELDS.dup,
         "custom" => PATIENT_CUSTOM_FIELDS.dup,
+      },
+      "encounter" => {
+        "pii" => ENCOUNTER_PII_FIELDS.dup,
+        "custom" => ENCOUNTER_CUSTOM_FIELDS.dup,
       }
     }.deep_merge(params)
   end
@@ -82,6 +90,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
   end
 
   let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
+
+  def assert_encounter_data(encounter)
+    encounter.plain_sensitive_data.should eq(fields("encounter", ENCOUNTER_PII_FIELDS))
+    encounter.custom_fields.should eq(fields("encounter", ENCOUNTER_CUSTOM_FIELDS))
+  end
 
   def assert_sample_data(sample)
     sample.plain_sensitive_data.should eq(fields("sample", SAMPLE_PII_FIELDS))
@@ -126,6 +139,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
     test = TestResult.first
     test.test_id.should eq(TEST_ID)
     assert_test_data(test)
+  end
+
+  it "should create an encounter" do
+    device_message_processor.process
+
+    Encounter.count.should eq(1)
+    encounter = Encounter.first
+    encounter.encounter_id.should eq(ENCOUNTER_ID)
+    assert_encounter_data(encounter)
   end
 
   it "should not update existing tests on new sample" do
