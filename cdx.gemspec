@@ -1,5 +1,5 @@
 # coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('../deps/cdx_core/lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'cdx/version'
 
@@ -12,10 +12,10 @@ Gem::Specification.new do |spec|
   spec.homepage      = ""
   spec.license       = "MIT"
 
-  spec.files         = Dir['**/*']
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = ["lib"]
+  spec.files         = Dir['deps/cdx_core/**/*']
+  spec.executables   = spec.files.grep(%r{^deps/cdx_core/bin/}) { |f| File.basename(f) }
+  spec.test_files    = spec.files.grep(%r{^deps/cdx_core/(test|spec|features)/})
+  spec.require_paths = ["deps/cdx_core/lib"]
 
   spec.add_dependency "activesupport"
 

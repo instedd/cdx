@@ -65,18 +65,14 @@ GIT
       rest-client (~> 1.6)
 
 PATH
-  remote: deps/cdx-api-elasticsearch
+  remote: .
   specs:
+    cdx (0.0.1)
+      activesupport
     cdx-api-elasticsearch (0.0.1)
       activesupport
       cdx
       elasticsearch
-
-PATH
-  remote: deps/cdx_core
-  specs:
-    cdx (0.0.1)
-      activesupport
 
 GEM
   remote: https://rubygems.org/

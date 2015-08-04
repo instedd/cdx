@@ -1,14 +1,14 @@
 # Cdx::Api::Elasticsearch
 
-[![Build Status](https://travis-ci.org/instedd/cdx-api-elasticsearch.svg)](https://travis-ci.org/instedd/cdx-api-elasticsearch)
-
 Provides an implementation of the [CDX query API](http://dxapi.org/#/query-events) based on an ElasticSearch backend.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'cdx-api-elasticsearch', :git => 'https://github.com/instedd/cdx-api-elasticsearch'
+```ruby
+gem 'cdx-api-elasticsearch', github: 'instedd/cdp', branch: 'master'
+```
 
 And then execute:
 
@@ -16,8 +16,8 @@ And then execute:
 
 Or install it yourself as:
 
-    $ git clone https://github.com/instedd/cdx-api-elasticsearch
-    $ cd cdx-api-elasticsearch
+    $ git clone https://github.com/instedd/cdp
+    $ cd cdp
     $ gem build cdx-api-elasticsearch.gemspec
     $ gem install cdx-api-elasticsearch-0.0.1.gem
 
@@ -85,11 +85,3 @@ class MyCdxQuery < Cdx::Api::Elasticsearch::Query
 ### Multi-query
 
 CDX supports batching queries to the backend for improved performance (though the current implementation is a naive one). A [MultiQuery](lib/cdx/api/elasticsearch/multi_query.rb) object can be initialised with an array of parameter hashes (one of each query) or an array of `Query`s. The `execute` method will then return an array with the responses.
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
