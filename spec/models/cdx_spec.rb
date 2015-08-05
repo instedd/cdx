@@ -35,7 +35,9 @@ describe Cdx do
       "test.type",
       "test.updated_time",
       "test.uuid",
-      "test.id"
+      "test.id",
+      "encounter.id",
+      "encounter.uuid",
     ].sort)
   end
 end

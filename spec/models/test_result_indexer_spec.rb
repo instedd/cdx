@@ -34,7 +34,7 @@ describe TestResultIndexer, elasticsearch: true do
       },
       "assays" => [
         {
-          "qualitative_result" => "positive",
+          "result" => "positive",
           "name" => "mtb"
         }
       ]

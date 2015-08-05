@@ -95,7 +95,7 @@ describe Subscriber, elasticsearch: true do
 
     TestResult.create_and_index(
       patient: patient, sample: sample,
-      indexed_fields: {"assays" => ["qualitative_result" => "positive", "name" => "mtb"]},
+      indexed_fields: {"assays" => ["result" => "positive", "name" => "mtb"]},
       device_messages: [device_message]
     )
 

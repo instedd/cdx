@@ -104,3 +104,6 @@ location:
     searchable: true
   lat:
   lng:
+encounter:
+  id:
+  uuid:
