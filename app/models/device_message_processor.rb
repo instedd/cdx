@@ -41,23 +41,23 @@ class DeviceMessageProcessor
       old_patient = test.patient
       old_encounter = test.encounter
 
-      encounter_indexed_fields = process_encounter test
-      sample_indexed_fields    = process_sample    test
-      patient_indexed_fields   = process_patient   test
+      new_sample,    sample_indexed_fields    = find_or_initialize_sample
+      new_encounter, encounter_indexed_fields = find_or_initialize_encounter
+      new_patient,   patient_indexed_fields   = find_or_initialize_patient
 
-      save_encounter test, encounter_indexed_fields
-      save_sample    test, sample_indexed_fields
-      save_patient   test, patient_indexed_fields
+      connect_before test, new_sample, new_encounter, new_patient
 
-      encounter_changed = test.encounter_id_changed?
-      sample_changed    = test.sample_id_changed?
-      patient_changed   = test.patient_id_changed?
+      process_sample    test, new_sample      if new_sample
+      process_encounter test, new_encounter   if new_encounter
+      process_patient   test, new_patient     if new_patient
+
+      connect_after test
+
+      save_entity test.sample,    sample_indexed_fields
+      save_entity test.encounter, encounter_indexed_fields
+      save_entity test.patient,   patient_indexed_fields
 
       test.save!
-
-      old_encounter.destroy  if encounter_changed && old_encounter
-      old_sample.destroy     if sample_changed    && old_sample
-      old_patient.destroy    if patient_changed   && old_patient
 
       index_test test, is_new_test
     end
@@ -69,7 +69,7 @@ class DeviceMessageProcessor
       test = TestResult.new device_messages: [device_message],
                             test_id: test_id,
                             device: device
-      assign_fields parsed_message, test, "test"
+      assign_fields parsed_message, test
 
       if test_id && existing = TestResult.find_by(test_id: test_id, device_id: test.device_id)
         existing.merge(test)
@@ -80,118 +80,87 @@ class DeviceMessageProcessor
     end
 
     def find_or_initialize_sample
-      find_or_initialize_entity Sample, "sample", ((parsed_message["sample"] || {})["pii"] || {})["uid"]
+      find_or_initialize_entity Sample, ((parsed_message["sample"] || {})["pii"] || {})["uid"]
     end
 
     def find_or_initialize_patient
-      find_or_initialize_entity Patient, "patient", ((parsed_message["patient"] || {})["pii"] || {})["id"]
+      find_or_initialize_entity Patient, ((parsed_message["patient"] || {})["pii"] || {})["id"]
     end
 
     def find_or_initialize_encounter
-      find_or_initialize_entity Encounter, "encounter", ((parsed_message["encounter"] || {})["pii"] || {})["id"]
+      find_or_initialize_entity Encounter, ((parsed_message["encounter"] || {})["pii"] || {})["id"]
     end
 
-    def find_or_initialize_entity(klass, scope, entity_id)
+    def find_or_initialize_entity(klass, entity_id)
       new_entity = klass.new institution_id: @parent.institution.id
-      assign_fields parsed_message, new_entity, scope
+      assign_fields parsed_message, new_entity
 
       if entity_id && (existing = klass.find_by_pii(entity_id, @parent.institution.id))
         existing_indexed = existing.indexed_fields.deep_dup
         existing.merge(new_entity)
         [existing, existing_indexed]
+      elsif new_entity.empty_entity?
+        [nil, nil]
       else
         [new_entity, nil]
       end
     end
 
-    def process_encounter(test)
-      encounter, existing_indexed = find_or_initialize_encounter
-
-      if test.encounter
-        if encounter.encounter_id && (encounter.encounter_id != test.encounter.encounter_id)
-          test.encounter = encounter
-        else
-          test.encounter.merge_entity_scope encounter, "encounter"
-        end
-      else
-        if encounter.encounter_id
-          test.encounter = encounter
-        else
-          test.merge_entity_scope encounter, "encounter"
-        end
+    def process_sample(test, sample)
+      unless test.sample
+        test.sample = sample
+        return
       end
 
-      if test.encounter
-        test.move_entity_scope "encounter", test.encounter
+      if !sample.entity_id || (sample.entity_id == test.sample.entity_id)
+        test.sample.merge sample
+        return
       end
 
-      existing_indexed
+      unless test.sample.entity_id
+        sample.merge test.sample
+        test.sample.destroy
+      end
+
+      test.sample = sample
     end
 
-    def process_sample(test)
-      sample, existing_indexed = find_or_initialize_sample
-
-      if test.sample
-        if sample.sample_uid && (sample.sample_uid != test.sample.sample_uid)
-          test.sample = sample
-        else
-          test.sample.merge_entity_scope sample, "sample"
-        end
-      else
-        if sample.sample_uid
-          test.sample = sample
-        else
-          test.merge_entity_scope sample, "sample"
-        end
+    def process_encounter(test, encounter)
+      unless test.encounter
+        test.encounter = encounter
+        return
       end
 
-      if test.sample
-        test.move_entity_scope "sample", test.sample
+      if !encounter.entity_id || (encounter.entity_id == test.encounter.entity_id)
+        test.encounter.merge encounter
+        return
       end
 
-      existing_indexed
+      unless test.encounter.entity_id
+        encounter.merge test.encounter
+        test.encounter.destroy
+      end
+
+      test.encounter = encounter
     end
 
-    def process_patient(test)
-      patient, existing_indexed = find_or_initialize_patient
-
-      if test.patient
-        if patient.patient_id && (patient.patient_id != test.patient.patient_id)
-          test.patient = patient
-        else
-          test.patient.merge_entity_scope patient, "patient"
-        end
-      else
-        if patient.patient_id
-          test.patient = patient
-        else
-          test.merge_entity_scope patient, "patient"
-        end
+    def process_patient(test, patient)
+      unless test.patient
+        test.patient = patient
+        return
       end
 
-      if test.patient
-        test.move_entity_scope "patient", test.patient
+      if !patient.entity_id || (patient.entity_id == test.patient.entity_id)
+        test.patient.merge patient
+        return
       end
 
-      # Move patient data to sample if there's one,
-      # or move sample's patient to test, if the test has no patient
-      if test.sample
-         test.move_entity_scope "patient", test.sample
-
-        if test.patient
-          test.sample.move_entity_scope "patient", test.patient
-          test.sample.patient = test.patient
-        else
-          if test.sample.patient
-            test.patient = test.sample.patient
-            test.patient.merge_entity_scope patient, "patient"
-          else
-            test.sample.merge_entity_scope patient, "patient"
-          end
-        end
+      unless test.patient.entity_id
+        patient.merge test.patient
+        test.patient.destroy
       end
 
-      existing_indexed
+      test.patient = patient
     end
 
     def index_test(test, is_new)
@@ -199,43 +168,50 @@ class DeviceMessageProcessor
       is_new ? indexer.index : indexer.update
     end
 
-    def assign_fields(parsed_message, entity, scope)
-      entity.indexed_fields       = {scope => (parsed_message[scope] || {})["indexed"]}
-      entity.custom_fields        = {scope => (parsed_message[scope] || {})["custom"]}
-      entity.plain_sensitive_data = {scope => (parsed_message[scope] || {})["pii"]}
+    def assign_fields(parsed_message, entity)
+      entity.indexed_fields       = (parsed_message[entity.entity_scope] || {})["indexed"] || {}
+      entity.custom_fields        = (parsed_message[entity.entity_scope] || {})["custom"] || {}
+      entity.plain_sensitive_data = (parsed_message[entity.entity_scope] || {})["pii"] || {}
     end
 
-    def update_entity_in_elasticsearch(entity, key)
-      response = client.search index: Cdx::Api.index_name, body:{query: { filtered: { filter: { term: { key => entity.uuid } } } }, fields: []}, size: 10000
+    def connect_before(test, sample, encounter, patient)
+      unless test.patient
+        if encounter && encounter.patient
+          test.patient = encounter.patient
+        elsif sample && sample.patient
+          test.patient = sample.patient
+        end
+      end
+
+      unless test.encounter
+        if sample && sample.encounter
+          test.encounter = sample.encounter
+        end
+      end
+    end
+
+    def connect_after(test)
+      if test.encounter
+        test.encounter.patient = test.patient
+      end
+
+      if test.sample
+        test.sample.encounter = test.encounter
+        test.sample.patient   = test.patient
+      end
+    end
+
+    def save_entity(entity, old_indexed_fields)
+      entity.try :save!
+
+      return unless old_indexed_fields && old_indexed_fields != entity.try(:indexed_fields)
+
+      response = client.search index: Cdx::Api.index_name, body:{query: { filtered: { filter: { term: { "#{entity.entity_scope}.uuid" => entity.uuid } } } }, fields: []}, size: 10000
       body = response["hits"]["hits"].map do |element|
-        { update: { _type: element["_type"], _id: element["_id"], data: { doc: entity.indexed_fields } } }
+        { update: { _type: element["_type"], _id: element["_id"], data: { doc: {entity.entity_scope => entity.indexed_fields} } } }
       end
 
       client.bulk index: Cdx::Api.index_name, body: body unless body.blank?
-    end
-
-    def save_encounter(test, old_indexed_fields)
-      test.encounter.try(:save!)
-
-      if old_indexed_fields && old_indexed_fields != test.encounter.try(:indexed_fields)
-        update_entity_in_elasticsearch test.encounter, 'encounter.uuid'
-      end
-    end
-
-    def save_sample(test, old_indexed_fields)
-      test.sample.try(:save!)
-
-      if old_indexed_fields && old_indexed_fields != test.sample.try(:indexed_fields)
-        update_entity_in_elasticsearch test.sample, 'sample.uuid'
-      end
-    end
-
-    def save_patient(test, old_indexed_fields)
-      test.patient.try(:save!)
-
-      if old_indexed_fields && old_indexed_fields != test.patient.try(:indexed_fields)
-        update_entity_in_elasticsearch test.patient, 'patient.uuid'
-      end
     end
   end
 end

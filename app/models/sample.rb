@@ -6,7 +6,7 @@ class Sample < ActiveRecord::Base
   belongs_to :patient
   belongs_to :encounter
 
-  has_many :test_results, dependent: :restrict_with_error
+  has_many :test_results
 
   validates_presence_of :institution
   validates_uniqueness_of :sample_uid_hash, scope: :institution_id, allow_nil: true
@@ -14,7 +14,15 @@ class Sample < ActiveRecord::Base
   before_create :ensure_sample_uid_hash
 
   def sample_uid
-    self.plain_sensitive_data["sample"]["uid"]
+    plain_sensitive_data["uid"]
+  end
+
+  def entity_id
+    sample_uid
+  end
+
+  def entity_scope
+    "sample"
   end
 
   def self.find_by_pii(sample_uid, institution_id)

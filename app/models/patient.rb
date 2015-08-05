@@ -3,8 +3,8 @@ class Patient < ActiveRecord::Base
   include Entity
 
   belongs_to :institution
-  has_many :test_results, dependent: :restrict_with_error
-  has_many :samples, dependent: :restrict_with_error
+  has_many :test_results
+  has_many :samples
 
   validates_presence_of :institution
   validates_uniqueness_of :patient_id_hash, scope: :institution_id, allow_nil: true
@@ -12,7 +12,15 @@ class Patient < ActiveRecord::Base
   before_create :ensure_patient_id_hash
 
   def patient_id
-    self.plain_sensitive_data["patient"]["id"]
+    plain_sensitive_data["id"]
+  end
+
+  def entity_id
+    patient_id
+  end
+
+  def entity_scope
+    "patient"
   end
 
   def self.find_by_pii(patient_id, institution_id)

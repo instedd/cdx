@@ -87,7 +87,17 @@ describe Subscriber, elasticsearch: true do
   end
 
   def submit_test
-    TestResult.create_and_index(indexed_fields: { "test" => { "assays" => ["qualitative_result" => "positive", "name" => "mtb"]}, "patient" => {"gender" => "male" }}, device_messages: [device_message])
+    patient = Patient.make(
+      indexed_fields: {"gender" => "male"}
+    )
+
+    sample = Sample.make patient: patient
+
+    TestResult.create_and_index(
+      patient: patient, sample: sample,
+      indexed_fields: {"assays" => ["qualitative_result" => "positive", "name" => "mtb"]},
+      device_messages: [device_message]
+    )
 
     refresh_index
 

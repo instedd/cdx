@@ -96,7 +96,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       it "filters for more than one value" do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", qualitative_result: :positive]}, patient: {gender: :male})
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", qualitative_result: :negative]}, patient: {gender: :female})
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test: {assays:[name: "flu", qualitative_result: :negative]})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "flu", qualitative_result: :negative]})
 
         response = get_updates('patient.gender' => [:male, :female]).sort_by do |test|
           test["test"]["assays"].first["qualitative_result"]

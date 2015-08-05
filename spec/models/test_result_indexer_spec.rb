@@ -2,41 +2,42 @@ require "spec_helper"
 
 describe TestResultIndexer, elasticsearch: true do
 
-  let(:sample) do
-    sample_indexed_fields = {
-      "sample" => {
-        "type" => "sputum",
-        "custom_fields" => {
-          "culture_days" => "10"
-        }
-      },
-      "patient" => {
-        "gender" => "male",
-        "custom_fields" => {
-          "hiv" => "positive"
-        }
+  let(:patient) do
+    patient_indexed_fields = {
+      "gender" => "male",
+      "custom_fields" => {
+        "hiv" => "positive"
       }
     }
-    Sample.make(uuid: 'abc', indexed_fields: sample_indexed_fields)
+    Patient.make(uuid: 'abc', indexed_fields: patient_indexed_fields)
+  end
+
+  let(:sample) do
+    sample_indexed_fields = {
+      "type" => "sputum",
+      "custom_fields" => {
+        "culture_days" => "10"
+      }
+    }
+    Sample.make(uuid: 'abc', patient: patient, indexed_fields: sample_indexed_fields)
   end
 
   let(:test){ TestResult.make(
     "sample" => sample,
+    "patient" => patient,
     "test_id" => '4',
     "indexed_fields" => {
-      "test" => {
-        "id" => "4",
-        "name" => "mtb",
-        "custom_fields" => {
-          "concentration" => "15%"
-        },
-        "assays" => [
-          {
-            "qualitative_result" => "positive",
-            "name" => "mtb"
-          }
-        ]
-      }
+      "id" => "4",
+      "name" => "mtb",
+      "custom_fields" => {
+        "concentration" => "15%"
+      },
+      "assays" => [
+        {
+          "qualitative_result" => "positive",
+          "name" => "mtb"
+        }
+      ]
     }
   )}
 
@@ -75,6 +76,7 @@ describe TestResultIndexer, elasticsearch: true do
           }
         },
         "patient" => {
+          "uuid" => patient.uuid,
           "gender" => "male",
           "custom_fields" => {
             "hiv" => "positive"

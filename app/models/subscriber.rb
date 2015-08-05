@@ -42,6 +42,7 @@ class Subscriber < ActiveRecord::Base
     query = self.filter.query.merge "page_size" => 10000, "updated_at_since" => last_run_at.iso8601
     Rails.logger.info "Filter : #{query}"
     tests = TestResult.query(query, filter.user).result["tests"]
+
     now = Time.now
     tests.each do |test|
       PoirotRails::Activity.start("Publish test to subscriber #{self.name}") do
@@ -82,7 +83,8 @@ class Subscriber < ActiveRecord::Base
 
   def filter_test(indexed_test, fields)
     test = TestResult.includes(:sample, :device, :institution).find_by_uuid(indexed_test["test"]["uuid"])
-    merged_test = indexed_test.merge test.plain_sensitive_data.merge(test.sample.try(:plain_sensitive_data) || {})
+    merged_test = indexed_test.deep_merge(test.entity_scope => test.plain_sensitive_data)
+    merged_test = merged_test.deep_merge(test.sample.entity_scope => test.sample.plain_sensitive_data) if test.sample
     fields = Subscriber.available_field_names if fields.nil? || fields.empty? # use all fields if none is specified
     fields_properties = self.class.default_schema['properties']
     filtered_test = {}

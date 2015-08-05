@@ -2,7 +2,7 @@ class Encounter < ActiveRecord::Base
   include AutoUUID
   include Entity
 
-  has_many :test_results, dependent: :restrict_with_error
+  has_many :test_results
 
   belongs_to :institution
   belongs_to :patient
@@ -12,7 +12,15 @@ class Encounter < ActiveRecord::Base
   before_create :ensure_encounter_id_hash
 
   def encounter_id
-    (plain_sensitive_data["encounter"] || {})["id"]
+    plain_sensitive_data["id"]
+  end
+
+  def entity_id
+    encounter_id
+  end
+
+  def entity_scope
+    "encounter"
   end
 
   def self.find_by_pii(encounter_id, institution_id)

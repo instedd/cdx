@@ -43,7 +43,7 @@ class TestResultIndexer
     parent_locations_id = parent_locations.map(&:geo_id)
     admin_levels = Hash[parent_locations.map { |l| ["admin_level_#{l.admin_level}", l.geo_id] }]
 
-    test_result.indexed_fields.
+    {test_result.entity_scope => test_result.indexed_fields}.
       deep_merge({
         "test" => {
           "reported_time" => test_result.created_at.utc.iso8601,
@@ -67,15 +67,15 @@ class TestResultIndexer
           "id" => laboratory_id
         }
       }).
-      deep_merge(indexed_fields_from(test_result.sample, "sample")).
-      deep_merge(indexed_fields_from(test_result.patient, "patient")).
-      deep_merge(indexed_fields_from(test_result.encounter, "encounter")).
+      deep_merge(indexed_fields_from(test_result.sample)).
+      deep_merge(indexed_fields_from(test_result.encounter)).
+      deep_merge(indexed_fields_from(test_result.patient)).
       deep_merge(all_custom_fields)
   end
 
-  def indexed_fields_from indexable, scope
-    if indexable
-      indexable.indexed_fields.deep_merge({scope => {"uuid" => indexable.uuid }})
+  def indexed_fields_from entity
+    if entity && !entity.empty_entity?
+      {entity.entity_scope => entity.indexed_fields.deep_merge("uuid" => entity.uuid)}
     else
       {}
     end
@@ -84,29 +84,27 @@ class TestResultIndexer
   def all_custom_fields
     fields = {}
 
-    sample = test_result.sample
-    patient = test_result.patient
+    append_custom_fields fields, test_result
 
-    append_custom_fields fields, test_result, "test"
-    append_custom_fields fields, test_result, "sample"
-    append_custom_fields fields, test_result, "patient"
-
-    if sample.present?
-      append_custom_fields fields, sample, "sample"
-      append_custom_fields fields, sample, "patient"
+    if test_result.sample.present?
+      append_custom_fields fields, test_result.sample
     end
 
-    if patient.present?
-      append_custom_fields fields, patient, "patient"
+    if test_result.encounter.present?
+      append_custom_fields fields, test_result.encounter
+    end
+
+    if test_result.patient.present?
+      append_custom_fields fields, test_result.patient
     end
 
     fields
   end
 
-  def append_custom_fields fields, entity, key
-    if entity.custom_fields[key].present?
-      fields[key] ||= { custom_fields: {} }
-      fields[key][:custom_fields].deep_merge! entity.custom_fields[key]
+  def append_custom_fields fields, entity
+    if entity.custom_fields.present?
+      fields[entity.entity_scope] ||= { "custom_fields" => {} }
+      fields[entity.entity_scope]["custom_fields"].deep_merge! entity.custom_fields
     end
   end
 end

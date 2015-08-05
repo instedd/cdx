@@ -26,21 +26,25 @@ class TestResult < ActiveRecord::Base
   end
 
   def pii_data
-    pii = self.plain_sensitive_data
-    pii = pii.deep_merge(self.sample.plain_sensitive_data) if self.sample
-    pii = pii.deep_merge(self.patient.plain_sensitive_data) if self.patient
+    pii = {entity_scope => plain_sensitive_data}
+    pii = pii.deep_merge(sample.entity_scope => sample.plain_sensitive_data) if sample
+    pii = pii.deep_merge(patient.entity_scope => patient.plain_sensitive_data) if patient
     pii
   end
 
   def custom_fields_data
-    data = self.custom_fields
-    data = data.deep_merge(self.sample.custom_fields) if self.sample
-    data = data.deep_merge(self.patient.custom_fields) if self.patient
+    data = {entity_scope => custom_fields}
+    data = data.deep_merge(sample.entity_scope => sample.custom_fields) if sample
+    data = data.deep_merge(patient.entity_scope => patient.custom_fields) if patient
     data
   end
 
   def self.query params, user
     TestResultQuery.new params, user
+  end
+
+  def entity_scope
+    "test"
   end
 
   private

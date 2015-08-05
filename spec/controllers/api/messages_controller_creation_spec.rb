@@ -173,13 +173,13 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       test = all_elasticsearch_tests.first["_source"]
       test["test"]["name"].should eq("GX4002")
-      test["patient"].should be_nil
+      test["patient"].should eq("uuid" => Patient.first.uuid)
 
       test = TestResult.first
       raw_data = test.sensitive_data
       test.plain_sensitive_data.should_not eq(raw_data)
-      test.plain_sensitive_data["patient"]["id"].should be_nil
-      test.plain_sensitive_data["patient"]["foo"].should eq("1234")
+      test.patient.plain_sensitive_data["id"].should be_nil
+      test.patient.plain_sensitive_data["foo"].should eq("1234")
     end
 
     it "merges pii from different tests in the same sample across devices" do
@@ -214,9 +214,10 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       TestResult.last.sample.should eq(Sample.first)
 
       sample = Sample.first
-      sample.plain_sensitive_data["sample"]["uid"].should eq(10)
-      sample.patient.plain_sensitive_data["patient"]["id"].should eq(3)
-      sample.patient.plain_sensitive_data["patient"]["telephone_number"].should eq("2222222")
+
+      sample.plain_sensitive_data["uid"].should eq(10)
+      sample.patient.plain_sensitive_data["id"].should eq(3)
+      sample.patient.plain_sensitive_data["telephone_number"].should eq("2222222")
     end
 
     it "uses the last version of the manifest" do
@@ -277,7 +278,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       test = TestResult.first
       test.sample.should be_nil
-      test.custom_fields["test"]["foo"].should eq(1234)
+      test.custom_fields["foo"].should eq(1234)
     end
 
     it "validates the data type" do

@@ -22,11 +22,11 @@ describe TestResultQuery, elasticsearch: true do
   context "policies" do
     it "applies institution policy" do
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        indexed_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
         device_messages:[DeviceMessage.make(device: user_device)]
       )
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :negative]}},
+        indexed_fields: {"results" =>["condition" => "mtb", "result" => :negative]},
         device_messages:[DeviceMessage.make(device: non_user_device)]
       )
 
@@ -40,11 +40,11 @@ describe TestResultQuery, elasticsearch: true do
 
     it "delegates institution policy" do
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        indexed_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
         device_messages:[DeviceMessage.make(device: user_device)]
       )
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :negative]}},
+        indexed_fields: {"results" =>["condition" => "mtb", "result" => :negative]},
         device_messages:[DeviceMessage.make(device: user_device_3)]
       )
 

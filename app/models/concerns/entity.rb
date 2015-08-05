@@ -27,38 +27,10 @@ module Entity
     self
   end
 
-  def merge_entity_scope(entity, scope)
-    if (data = entity.plain_sensitive_data[scope].presence)
-      self.plain_sensitive_data[scope] ||= {}
-      self.plain_sensitive_data[scope].deep_merge_not_nil!(data)
-    end
-
-    if (data = entity.custom_fields[scope].presence)
-      self.custom_fields[scope] ||= {}
-      self.custom_fields[scope].deep_merge_not_nil!(data)
-    end
-
-    if (data = entity.indexed_fields[scope].presence)
-      self.indexed_fields[scope] ||= {}
-      self.indexed_fields[scope].deep_merge_not_nil!(data)
-    end
-  end
-
-  def move_entity_scope(scope, entity)
-    if (data = self.plain_sensitive_data.delete(scope))
-      entity.plain_sensitive_data[scope] ||= {}
-      entity.plain_sensitive_data[scope].reverse_deep_merge! data
-    end
-
-    if (data = self.custom_fields.delete(scope))
-      entity.custom_fields[scope] ||= {}
-      entity.custom_fields[scope].reverse_deep_merge! data
-    end
-
-    if (data = self.indexed_fields.delete(scope))
-      entity.indexed_fields[scope] ||= {}
-      entity.indexed_fields[scope].reverse_deep_merge! data
-    end
+  def empty_entity?
+    self.plain_sensitive_data.blank? &&
+      self.indexed_fields.blank? &&
+      self.custom_fields.blank?
   end
 
 private
