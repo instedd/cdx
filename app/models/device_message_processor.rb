@@ -91,11 +91,11 @@ class DeviceMessageProcessor
       find_or_initialize_entity Encounter, ((parsed_message["encounter"] || {})["pii"] || {})["id"]
     end
 
-    def find_or_initialize_entity(klass, entity_id)
+    def find_or_initialize_entity(klass, entity_uid)
       new_entity = klass.new institution_id: @parent.institution.id
       assign_fields parsed_message, new_entity
 
-      if entity_id && (existing = klass.find_by_pii(entity_id, @parent.institution.id))
+      if entity_uid && (existing = klass.find_by_pii(entity_uid, @parent.institution.id))
         existing_indexed = existing.indexed_fields.deep_dup
         existing.merge(new_entity)
         [existing, existing_indexed]
@@ -112,12 +112,12 @@ class DeviceMessageProcessor
         return
       end
 
-      if !sample.entity_id || (sample.entity_id == test.sample.entity_id)
+      if !sample.entity_uid || (sample.entity_uid == test.sample.entity_uid)
         test.sample.merge sample
         return
       end
 
-      unless test.sample.entity_id
+      unless test.sample.entity_uid
         sample.merge test.sample
         test.sample.destroy
       end
@@ -131,12 +131,12 @@ class DeviceMessageProcessor
         return
       end
 
-      if !encounter.entity_id || (encounter.entity_id == test.encounter.entity_id)
+      if !encounter.entity_uid || (encounter.entity_uid == test.encounter.entity_uid)
         test.encounter.merge encounter
         return
       end
 
-      unless test.encounter.entity_id
+      unless test.encounter.entity_uid
         encounter.merge test.encounter
         test.encounter.destroy
       end
@@ -150,12 +150,12 @@ class DeviceMessageProcessor
         return
       end
 
-      if !patient.entity_id || (patient.entity_id == test.patient.entity_id)
+      if !patient.entity_uid || (patient.entity_uid == test.patient.entity_uid)
         test.patient.merge patient
         return
       end
 
-      unless test.patient.entity_id
+      unless test.patient.entity_uid
         patient.merge test.patient
         test.patient.destroy
       end

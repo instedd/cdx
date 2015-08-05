@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150728150405) do
+ActiveRecord::Schema.define(version: 20150805180134) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -76,6 +76,7 @@ ActiveRecord::Schema.define(version: 20150728150405) do
 
   create_table "devices", force: true do |t|
     t.string   "name"
+    t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "uuid"
     t.integer  "institution_id"
@@ -94,7 +95,7 @@ ActiveRecord::Schema.define(version: 20150728150405) do
     t.integer  "institution_id"
     t.integer  "patient_id"
     t.string   "uuid"
-    t.string   "encounter_id_hash"
+    t.string   "entity_uid_hash"
     t.binary   "sensitive_data"
     t.text     "custom_fields"
     t.text     "indexed_fields"
@@ -157,7 +158,7 @@ ActiveRecord::Schema.define(version: 20150728150405) do
     t.binary   "sensitive_data"
     t.text     "custom_fields"
     t.text     "indexed_fields"
-    t.string   "patient_id_hash"
+    t.string   "entity_uid_hash"
     t.string   "uuid"
     t.integer  "institution_id"
     t.datetime "created_at"
@@ -181,7 +182,7 @@ ActiveRecord::Schema.define(version: 20150728150405) do
     t.binary   "sensitive_data"
     t.integer  "institution_id"
     t.text     "custom_fields"
-    t.string   "sample_uid_hash"
+    t.string   "entity_uid_hash"
     t.text     "indexed_fields"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -189,7 +190,7 @@ ActiveRecord::Schema.define(version: 20150728150405) do
     t.integer  "encounter_id"
   end
 
-  add_index "samples", ["institution_id", "sample_uid_hash"], name: "index_samples_on_institution_id_and_sample_uid_hash", using: :btree
+  add_index "samples", ["institution_id", "entity_uid_hash"], name: "index_samples_on_institution_id_and_entity_uid_hash", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
   add_index "samples", ["uuid"], name: "index_samples_on_uuid", using: :btree
 

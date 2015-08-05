@@ -131,7 +131,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     Sample.count.should eq(1)
     sample = Sample.first
-    sample.sample_uid_hash.should eq(MessageEncryption.hash SAMPLE_UID)
+    sample.entity_uid_hash.should eq(MessageEncryption.hash SAMPLE_UID)
     assert_sample_data(sample)
   end
 
@@ -140,7 +140,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     Encounter.count.should eq(1)
     encounter = Encounter.first
-    encounter.encounter_id.should eq(ENCOUNTER_ID)
+    encounter.entity_uid_hash.should eq(MessageEncryption.hash ENCOUNTER_ID)
     assert_encounter_data(encounter)
   end
 
@@ -149,7 +149,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     Patient.count.should eq(1)
     patient = Patient.first
-    patient.patient_id_hash.should eq(MessageEncryption.hash PATIENT_ID)
+    patient.entity_uid_hash.should eq(MessageEncryption.hash PATIENT_ID)
     assert_patient_data(patient)
   end
 
@@ -317,7 +317,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test = TestResult.first
         sample = test.sample
-        sample.entity_id.should be_nil
+        sample.entity_uid.should be_nil
 
         sample.plain_sensitive_data.should eq("id" => SAMPLE_ID)
         sample.custom_fields.should eq(SAMPLE_CUSTOM_FIELDS)
@@ -459,8 +459,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test_2 = TestResult.find_by(test_id: TEST_ID)
 
-        test_1.reload.sample.sample_uid.should eq('def9772')
-        test_2.reload.sample.sample_uid.should eq(SAMPLE_UID)
+        test_1.reload.sample.entity_uid.should eq('def9772')
+        test_2.reload.sample.entity_uid.should eq(SAMPLE_UID)
       end
 
       it "should assign existing sample's patient to the test" do
@@ -551,7 +551,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test = TestResult.first
 
-        test.patient.entity_id.should be_nil
+        test.patient.entity_uid.should be_nil
         test.patient.plain_sensitive_data.should eq("dob" => PATIENT_DOB)
         test.patient.custom_fields.should eq(PATIENT_CUSTOM_FIELDS)
         test.patient.indexed_fields.should eq(PATIENT_INDEXED_FIELDS)
@@ -691,8 +691,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test_2 = TestResult.find_by(test_id: TEST_ID)
 
-        test_1.reload.patient.patient_id.should eq('9000')
-        test_2.patient.patient_id.should eq(PATIENT_ID)
+        test_1.reload.patient.entity_uid.should eq('9000')
+        test_2.patient.entity_uid.should eq(PATIENT_ID)
       end
 
       it 'should create patient and store reference in test and sample' do
@@ -725,7 +725,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
         Encounter.count.should eq(1)
 
         encounter = TestResult.first.encounter
-        encounter.entity_id.should be_nil
+        encounter.entity_uid.should be_nil
         encounter.custom_fields.should eq(ENCOUNTER_CUSTOM_FIELDS)
       end
 
