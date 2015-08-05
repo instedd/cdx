@@ -1,0 +1,98 @@
+{
+  "metadata": {
+    "version": "0.0.11",
+    "api_version": "1.2.1",
+    "device_models": [
+      "esequant_lr3"
+    ],
+    "conditions": [
+      "mtb", "rif", "inh"
+    ],
+    "source": {
+      "type": "json"
+    }
+  },
+  "custom_fields" : {
+  },
+  "field_mapping" : {
+    "sample.uid" : {"lookup": "SampleId"},
+    "test.start_time" : {
+      "parse_date": [
+        { "lookup": "MeasurementDateTime" },
+        "%Y-%m-%d %H:%M:%S"
+      ]
+    },
+    "test.id" : { "lookup": "RunNumber" },
+    "device.lab_user" : { "lookup": "User" },
+    "device.serial_number" : {
+      "concat": [
+        {
+          "lookup": "DeviceType"
+        },
+        "_",
+        {
+          "lookup": "SerialNumber"
+        }
+      ]
+    },
+    "test.error_code" : { "lookup": "error_code" },
+    "test.name" : { "lookup": "ProductId" },
+    "test.type" : { "lookup": "SampleName" },
+    "test.assays[*].condition" : {
+      "script" : "
+        if(message['ProductId'] == 'MTBDRplus') {
+          ['mtb', 'rif', 'inh']
+        } else {
+          ['mtb']
+        }"
+    },
+    "test.assays[*].name" : {
+      "script" : "
+        if(message['ProductId'] == 'MTBDRplus') {
+          ['mtb', 'rif', 'inh']
+        } else {
+          ['mtb']
+        }"
+    },
+    "test.assays[*].result" : {
+      "script" : "
+        result = message['results'][0]['result'];
+        if(result.match(/positive.*/i)){
+          mtb = 'positive'
+        } else if (result.match(/negative/i)) {
+          mtb = 'negative'
+        } else {
+          mtb = 'n/a'
+        };
+        if(message['ProductId'] == 'MTBDRplus') {
+          if(mtb == 'positive') {
+            if(result.match(/.*rmp.*/) || result.match(/.*_rif.*/)){
+              rif = 'positive'
+            } else {
+              rif = 'negative'
+            };
+            if(result.match(/.*inh.*/)){
+              inh = 'positive'
+            } else {
+              inh = 'negative'
+            };
+          } else {
+            rif = 'n/a'
+            inh = 'n/a'
+          };
+          [mtb, rif, inh]
+        } else {
+          [mtb]
+        }"
+    },
+    "test.status" : {
+      "case" : [
+        { "lowercase" : { "script": "message['results'][0]['result']"}},
+        [
+          {"when": "*invalid*", "then" : "invalid"},
+          {"when": "*", "then" : "success"}
+        ]
+      ]
+    }
+  }
+}

@@ -124,7 +124,7 @@
         "mtb"
       ]
     },
-    "test.assays[*].qualitative_result": {
+    "test.assays[*].result": {
       "if" : [
         {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
         {

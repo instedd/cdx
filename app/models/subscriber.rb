@@ -94,10 +94,10 @@ class Subscriber < ActiveRecord::Base
         field_name == field.scoped_name
       end
       if field
-        if field_name == 'test.assays.qualitative_result'
+        if field_name == 'test.assays.result'
           filtered_test["test"] ||= {}
           filtered_test["test"]["assays"] ||= {}
-          filtered_test["test"]["assays"]["qualitative_result"] = merged_test["test"]["assays"].first["qualitative_result"]
+          filtered_test["test"]["assays"]["result"] = merged_test["test"]["assays"].first["result"]
         elsif field_name == "test.assays.name"
           filtered_test["test"] ||= {}
           filtered_test["test"]["assays"] ||= {}

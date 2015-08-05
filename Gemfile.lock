@@ -30,30 +30,12 @@ GIT
       sass-rails
 
 GIT
-  remote: https://github.com/instedd/cdx-api-elasticsearch.git
-  revision: 86bef41fb2150aef6bc0a4e5c2aaa42efae08580
-  branch: master
-  specs:
-    cdx-api-elasticsearch (0.0.1)
-      activesupport
-      cdx
-      elasticsearch
-
-GIT
   remote: https://github.com/instedd/cdx-sync-server.git
   revision: 2e453e4e0c71b42fdf82d0893cd4950b3638ea5e
   branch: master
   specs:
     cdx-sync-server (0.0.0)
       filewatcher (= 0.3.6)
-
-GIT
-  remote: https://github.com/instedd/cdx_core
-  revision: 5f9f965540971fe3f7d463494e0540ef721b3bd2
-  branch: 260_encounter
-  specs:
-    cdx (0.0.1)
-      activesupport
 
 GIT
   remote: https://github.com/instedd/geojson_import
@@ -81,6 +63,16 @@ GIT
   specs:
     location_service (0.1.0)
       rest-client (~> 1.6)
+
+PATH
+  remote: .
+  specs:
+    cdx (0.0.1)
+      activesupport
+    cdx-api-elasticsearch (0.0.1)
+      activesupport
+      cdx
+      elasticsearch
 
 GEM
   remote: https://rubygems.org/

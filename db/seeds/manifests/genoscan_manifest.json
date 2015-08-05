@@ -4,7 +4,7 @@
     "api_version" : "1.2.1",
     "signature" : "",
     "device_models" : ["genoscan"],
-    "conditions": ["mtb"],
+    "conditions": ["mtb", "rif", "inh"],
     "source": { "type" : "csv", "separator" : ";" }
   },
   "custom_fields" : {
@@ -59,7 +59,7 @@
       "case" : [
         {"lookup" : "Sex"},
         [
-          {"when": "*n.a.*", "then" : "unknown"},
+          {"when": "*n.a.*", "then" : null},
           {"when": "*Female*", "then" : "female"},
           {"when": "*", "then" : "male"}
         ]
@@ -87,7 +87,7 @@
     "test.assays[*].name" : {
       "script" : "['mtb', 'rif', 'inh']"
     },
-    "test.assays[*].qualitative_result" : {
+    "test.assays[*].result" : {
       "script" : "
         if(message['Result'].match(/.*tuberculosis.*/)){
           mtb = 'positive'

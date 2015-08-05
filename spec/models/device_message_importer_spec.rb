@@ -32,7 +32,7 @@ describe DeviceMessageImporter, elasticsearch: true do
       },
       "field_mapping" : {
         "test.error_code" : {"lookup": "error_code"},
-        "test.qualitative_result" : {
+        "test.assays[*].result" : {
           "case": [
           {"lookup": "result"},
           [
@@ -69,10 +69,10 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["qualitative_result"].should eq("positive")
+      test["assays"].first["result"].should eq("positive")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["qualitative_result"].should eq("negative")
+      test["assays"].first["result"].should eq("negative")
     end
 
     it 'parses a csv in utf 16' do
@@ -86,10 +86,10 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["qualitative_result"].should eq("positive")
+      test["assays"].first["result"].should eq("positive")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["qualitative_result"].should eq("n/a")
+      test["assays"].first["result"].should eq("n/a")
     end
   end
 
@@ -106,10 +106,10 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["qualitative_result"].should eq("positive")
+      test["assays"].first["result"].should eq("positive")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["qualitative_result"].should eq("negative")
+      test["assays"].first["result"].should eq("negative")
     end
 
     it 'parses a json from sync dir registering multiple extensions' do
@@ -121,10 +121,10 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["qualitative_result"].should eq("positive")
+      test["assays"].first["result"].should eq("positive")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["qualitative_result"].should eq("negative")
+      test["assays"].first["result"].should eq("negative")
     end
 
     it 'parses a json from sync dir registering multiple extensions using import single' do
@@ -136,10 +136,10 @@ describe DeviceMessageImporter, elasticsearch: true do
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
       test["error_code"].should eq(0)
-      test["qualitative_result"].should eq("positive")
+      test["assays"].first["result"].should eq("positive")
       test = tests.last["_source"]["test"]
       test["error_code"].should eq(1)
-      test["qualitative_result"].should eq("negative")
+      test["assays"].first["result"].should eq("negative")
     end
   end
 
@@ -186,33 +186,33 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests.sort_by do |test|
-          test["_source"]["test"]["assays"][0]['qualitative_result'] + test["_source"]["test"]["assays"][1]['qualitative_result'] + test["_source"]["test"]["assays"][2]['qualitative_result']
+          test["_source"]["test"]["assays"][0]['result'] + test["_source"]["test"]["assays"][1]['result'] + test["_source"]["test"]["assays"][2]['result']
         end
         tests.should have(13).items
 
         test = tests[0]["_source"]["test"]
         test["assays"][0]["name"].should eq("mtb")
-        test["assays"][0]["qualitative_result"].should eq("negative")
+        test["assays"][0]["result"].should eq("negative")
         test["assays"][1]["name"].should eq("rif")
-        test["assays"][1]["qualitative_result"].should eq("negative")
+        test["assays"][1]["result"].should eq("negative")
         test["assays"][2]["name"].should eq("inh")
-        test["assays"][2]["qualitative_result"].should eq("negative")
+        test["assays"][2]["result"].should eq("negative")
 
         test = tests[1]["_source"]["test"]
         test["assays"][0]["name"].should eq("mtb")
-        test["assays"][0]["qualitative_result"].should eq("positive")
+        test["assays"][0]["result"].should eq("positive")
         test["assays"][1]["name"].should eq("rif")
-        test["assays"][1]["qualitative_result"].should eq("negative")
+        test["assays"][1]["result"].should eq("negative")
         test["assays"][2]["name"].should eq("inh")
-        test["assays"][2]["qualitative_result"].should eq("negative")
+        test["assays"][2]["result"].should eq("negative")
 
         test = tests.last["_source"]["test"]
         test["assays"][0]["name"].should eq("mtb")
-        test["assays"][0]["qualitative_result"].should eq("positive")
+        test["assays"][0]["result"].should eq("positive")
         test["assays"][1]["name"].should eq("rif")
-        test["assays"][1]["qualitative_result"].should eq("positive")
+        test["assays"][1]["result"].should eq("positive")
         test["assays"][2]["name"].should eq("inh")
-        test["assays"][2]["qualitative_result"].should eq("positive")
+        test["assays"][2]["result"].should eq("positive")
 
         dbtests = TestResult.all
         dbtests.should have(13).items
@@ -245,9 +245,9 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         assays = test['test']['assays']
         assays.size.should eq(2)
-        assays.first['qualitative_result'].should eq('positive')
+        assays.first['result'].should eq('positive')
         assays.first['name'].should eq('HRPII')
-        assays.second['qualitative_result'].should eq('negative')
+        assays.second['result'].should eq('negative')
         assays.second['name'].should eq('pLDH')
 
         TestResult.count.should eq(1)

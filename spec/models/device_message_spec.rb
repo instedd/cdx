@@ -40,7 +40,7 @@ describe DeviceMessage, elasticsearch: true do
           "source" : { "type" : "json"}
         },
         "field_mapping" : {
-          "test.assays[*].qualitative_result" : {"lookup": "result"}
+          "test.assays[*].result" : {"lookup": "result"}
         }
       }
     }
@@ -51,8 +51,8 @@ describe DeviceMessage, elasticsearch: true do
 
     expect(message.save).to be_true
     expect(message.index_failed?).to be_true
-    expect(message.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'test.assays[*].qualitative_result'")
-    expect(message.index_failure_data[:target_field]).to eq('test.assays[*].qualitative_result')
+    expect(message.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'test.assays[*].result'")
+    expect(message.index_failure_data[:target_field]).to eq('test.assays[*].result')
   end
 
   it 'parses a csv with a single row' do
@@ -67,7 +67,7 @@ describe DeviceMessage, elasticsearch: true do
         },
         "field_mapping" : {
           "test.error_code" : {"lookup": "error_code"},
-          "test.qualitative_result" : {"lookup": "result"}
+          "test.assays[*].result" : {"lookup": "result"}
         }
       }
     }

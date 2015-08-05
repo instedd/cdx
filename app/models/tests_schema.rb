@@ -62,6 +62,8 @@ class TestsSchema
         enum_schema schema, field
       when 'nested'
         nested_schema schema, field
+      when 'duration'
+        duration_schema schema, field
       else
         string_schema schema
       end
@@ -80,6 +82,18 @@ class TestsSchema
     schema["type"] = "string"
     schema["format"] = "date-time"
     schema["resolution"] = "second"
+  end
+
+  def duration_schema schema, field
+    schema["type"] = "object"
+    schema["class"] = "duration"
+    schema["properties"] = {}
+    %w[milliseconds seconds minutes hours days months years].each do |period|
+      schema["properties"][period] = {
+        "type" => "integer",
+        "title" => "#{field_title field} #{period}"
+      }
+    end
   end
 
   def integer_schema schema, field

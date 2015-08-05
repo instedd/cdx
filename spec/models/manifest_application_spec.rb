@@ -174,7 +174,7 @@ describe Manifest, validate_manifest: false do
             "test.assays[*].name": {
               "lookup" : "tests[*].condition"
             },
-            "test.assays[*].qualitative_result": {
+            "test.assays[*].result": {
               "lookup" : "tests[*].result"
             },
             "test.final_temperature": {
@@ -211,8 +211,8 @@ describe Manifest, validate_manifest: false do
         }',
         "test" => {
           "indexed" => { "assays" => [
-            { "name" => "mtb", "qualitative_result" => "positive" },
-            { "name" => "rif", "qualitative_result" => "negative" }
+            { "name" => "mtb", "result" => "positive" },
+            { "name" => "rif", "result" => "negative" }
           ]},
           "pii" => {},
           "custom" => {
