@@ -22,11 +22,11 @@ describe TestResultQuery, elasticsearch: true do
   context "policies" do
     it "applies institution policy" do
       TestResult.create_and_index(
-        indexed_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
+        core_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
         device_messages:[DeviceMessage.make(device: user_device)]
       )
       TestResult.create_and_index(
-        indexed_fields: {"results" =>["condition" => "mtb", "result" => :negative]},
+        core_fields: {"results" =>["condition" => "mtb", "result" => :negative]},
         device_messages:[DeviceMessage.make(device: non_user_device)]
       )
 
@@ -40,11 +40,11 @@ describe TestResultQuery, elasticsearch: true do
 
     it "delegates institution policy" do
       TestResult.create_and_index(
-        indexed_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
+        core_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
         device_messages:[DeviceMessage.make(device: user_device)]
       )
       TestResult.create_and_index(
-        indexed_fields: {"results" =>["condition" => "mtb", "result" => :negative]},
+        core_fields: {"results" =>["condition" => "mtb", "result" => :negative]},
         device_messages:[DeviceMessage.make(device: user_device_3)]
       )
 
@@ -71,7 +71,7 @@ describe TestResultQuery, elasticsearch: true do
 
     it "should not access any test if has no policy" do
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: user_device)]
       )
 
@@ -85,15 +85,15 @@ describe TestResultQuery, elasticsearch: true do
 
     it "applies institution.id filter" do
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: user_device_2)]
       )
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: user_device_3)]
       )
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: user_device_4)]
       )
 
@@ -105,11 +105,11 @@ describe TestResultQuery, elasticsearch: true do
 
     it "disallows viewing another institution's tests" do
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: user_device)]
       )
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: non_user_device)]
       )
 
@@ -130,11 +130,11 @@ describe TestResultQuery, elasticsearch: true do
       policy.save(validate: false)
 
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: user_device)]
       )
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: super_device)]
       )
 
@@ -148,7 +148,7 @@ describe TestResultQuery, elasticsearch: true do
   context "query adapting" do
     it "should include institution name, device name, and laboratory name in the tests" do
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: user_device)]
       )
       refresh_index
@@ -163,7 +163,7 @@ describe TestResultQuery, elasticsearch: true do
 
     it "should include the updated institution name, device name, and laboratory name in the tests" do
       TestResult.create_and_index(
-        indexed_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: user_device)]
       )
       refresh_index

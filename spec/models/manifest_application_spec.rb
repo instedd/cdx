@@ -13,7 +13,7 @@ describe Manifest, validate_manifest: false do
           {"test.assay_name": {}}
         },
         '{"assay" : {"name" : "GX4002"}}',
-        "test" => {"custom" => {"assay_name" => "GX4002"}, "pii" => {}, "indexed" => {}}
+        "test" => {"custom" => {"assay_name" => "GX4002"}, "pii" => {}, "core" => {}}
     end
 
     it "should fail to apply with a nested field" do
@@ -36,7 +36,7 @@ describe Manifest, validate_manifest: false do
           {"patient.name": {"pii": true}}
         },
         '{"patient" : {"name" : "John"}}',
-        "patient" => {"indexed" => {}, "pii" => {"name" => "John"}, "custom" => {}}
+        "patient" => {"core" => {}, "pii" => {"name" => "John"}, "custom" => {}}
     end
 
     it "should apply to custom non-pii field" do
@@ -48,7 +48,7 @@ describe Manifest, validate_manifest: false do
           {"test.temperature": {}}
         },
         {json: '{"temperature" : "20"}', csv: "temperature\n20"},
-        "test" => {"indexed" => {}, "pii" => {}, "custom" => {"temperature" => "20"}}
+        "test" => {"core" => {}, "pii" => {}, "custom" => {"temperature" => "20"}}
     end
 
     it "should apply to custom non-pii field inside results array" do
@@ -62,7 +62,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature" : "20"}',
-        "test" => {"indexed" => {}, "pii" => {}, "custom" => {"assays"=>[{"temperature"=>"20"}]}}
+        "test" => {"core" => {}, "pii" => {}, "custom" => {"assays"=>[{"temperature"=>"20"}]}}
     end
 
     it "should store fields in sample, test or patient as specified" do
@@ -120,7 +120,7 @@ describe Manifest, validate_manifest: false do
 
       expected = {
         "test" => {
-          "indexed" => {
+          "core" => {
             "uuid" => "4",
             "name" => "mtb",
             "start_time" => "2000/1/1 10:00:00"
@@ -132,7 +132,7 @@ describe Manifest, validate_manifest: false do
           "pii" => {}
         },
         "sample" => {
-          "indexed" => {
+          "core" => {
             "id" => "4002",
             "type" => "sputum"
           },
@@ -145,7 +145,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         "patient" => {
-          "indexed" => {
+          "core" => {
             "gender" => "male"
           },
           "pii" => {
@@ -210,7 +210,7 @@ describe Manifest, validate_manifest: false do
           ]
         }',
         "test" => {
-          "indexed" => { "assays" => [
+          "core" => { "assays" => [
             { "name" => "mtb", "result" => "positive" },
             { "name" => "rif", "result" => "negative" }
           ]},
@@ -246,7 +246,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature" : 20}',
-        "test" => {"indexed" => {}, "pii" => {"temperature" => 20}, "custom" => {}}
+        "test" => {"core" => {}, "pii" => {"temperature" => 20}, "custom" => {}}
     end
 
     it "doesn't raise on valid value in range" do
@@ -267,7 +267,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature" : 30}',
-        "test" => {"indexed" => {}, "pii" => {}, "custom" => {"temperature" => 30}}
+        "test" => {"core" => {}, "pii" => {}, "custom" => {"temperature" => 30}}
     end
 
     it "should raise on invalid value in range (lesser)" do
@@ -327,7 +327,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"sample_date" : "2014-05-14T15:22:11+0000"}',
-        "test" => {"custom" => {"sample_date" => "2014-05-14T15:22:11+0000"}, "pii" => {}, "indexed" => {}}
+        "test" => {"custom" => {"sample_date" => "2014-05-14T15:22:11+0000"}, "pii" => {}, "core" => {}}
     end
 
     it "should raise on invalid value in date iso" do
@@ -368,7 +368,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"condition" : "PATIENT HAS MTB CONDITION"}',
-        "test" => {"custom" => {"condition" =>"MTB"}, "pii" => {}, "indexed" => {}}
+        "test" => {"custom" => {"condition" =>"MTB"}, "pii" => {}, "core" => {}}
     end
 
     it "applies second value mapping" do
@@ -391,7 +391,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"condition" : "PATIENT HAS FLU CONDITION"}',
-        "test" => {"custom" => {"condition" => "H1N1"}, "pii" => {}, "indexed" => {}}
+        "test" => {"custom" => {"condition" => "H1N1"}, "pii" => {}, "core" => {}}
     end
 
     it "should raise on mapping not found" do
@@ -430,7 +430,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature_list" : [{"temperature" : 20}, {"temperature" : 10}]}',
-        "test" => {"indexed" => {}, "pii" => {}, "custom" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}
+        "test" => {"core" => {}, "pii" => {}, "custom" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}
     end
 
     it "should map to multiple indexed fields to the same list" do
@@ -459,7 +459,7 @@ describe Manifest, validate_manifest: false do
             }
           ]
         }',
-        "test" => {"indexed" => {}, "pii" => {}, "custom" => {"collection" => [
+        "test" => {"core" => {}, "pii" => {}, "custom" => {"collection" => [
           {
             "temperature" => 20,
             "foo" => 12
@@ -499,7 +499,7 @@ describe Manifest, validate_manifest: false do
           },
           {
             "foo" => 40
-          }]}, "pii" => {}, "indexed" => {}}
+          }]}, "pii" => {}, "core" => {}}
     end
 
     it "map custom fields to core fields" do

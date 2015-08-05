@@ -35,14 +35,6 @@ class CustomManifestField < ManifestField
     true
   end
 
-  def core?
-    false
-  end
-
-  def indexed?
-    custom_field['indexed'] || false
-  end
-
   def pii?
     custom_field['pii'] || false
   end

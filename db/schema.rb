@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150805180134) do
+ActiveRecord::Schema.define(version: 20150805185341) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -98,7 +98,7 @@ ActiveRecord::Schema.define(version: 20150805180134) do
     t.string   "entity_uid_hash"
     t.binary   "sensitive_data"
     t.text     "custom_fields"
-    t.text     "indexed_fields"
+    t.text     "core_fields"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -157,7 +157,7 @@ ActiveRecord::Schema.define(version: 20150805180134) do
   create_table "patients", force: true do |t|
     t.binary   "sensitive_data"
     t.text     "custom_fields"
-    t.text     "indexed_fields"
+    t.text     "core_fields"
     t.string   "entity_uid_hash"
     t.string   "uuid"
     t.integer  "institution_id"
@@ -183,7 +183,7 @@ ActiveRecord::Schema.define(version: 20150805180134) do
     t.integer  "institution_id"
     t.text     "custom_fields"
     t.string   "entity_uid_hash"
-    t.text     "indexed_fields"
+    t.text     "core_fields"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "patient_id"
@@ -229,7 +229,7 @@ ActiveRecord::Schema.define(version: 20150805180134) do
     t.binary   "sensitive_data"
     t.integer  "device_id"
     t.integer  "patient_id"
-    t.text     "indexed_fields"
+    t.text     "core_fields"
     t.integer  "encounter_id"
   end
 

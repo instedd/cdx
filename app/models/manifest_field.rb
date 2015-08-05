@@ -1,6 +1,6 @@
 class ManifestField
   attr_reader :target_field
-  subclass_responsibility :hash_key, :custom?, :core?, :indexed?
+  subclass_responsibility :hash_key, :custom?
 
   def self.for(manifest, target_field, field_mapping)
     if core_field = core_field_from(target_field)

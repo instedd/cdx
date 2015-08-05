@@ -20,11 +20,11 @@ class Manifest < ActiveRecord::Base
 
   def self.new_message
     {
-      "test"      => {"indexed" => {}, "pii" => {}, "custom" => {}},
-      "sample"    => {"indexed" => {}, "pii" => {}, "custom" => {}},
-      "device"    => {"indexed" => {}, "pii" => {}, "custom" => {}},
-      "patient"   => {"indexed" => {}, "pii" => {}, "custom" => {}},
-      "encounter" => {"indexed" => {}, "pii" => {}, "custom" => {}},
+      "test"      => {"core" => {}, "pii" => {}, "custom" => {}},
+      "sample"    => {"core" => {}, "pii" => {}, "custom" => {}},
+      "device"    => {"core" => {}, "pii" => {}, "custom" => {}},
+      "patient"   => {"core" => {}, "pii" => {}, "custom" => {}},
+      "encounter" => {"core" => {}, "pii" => {}, "custom" => {}},
     }
   end
 

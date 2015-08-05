@@ -3,11 +3,11 @@ module Entity
 
   included do
     serialize :custom_fields, Hash
-    serialize :indexed_fields, Hash
+    serialize :core_fields, Hash
 
     after_initialize do
       self.custom_fields  ||= {}
-      self.indexed_fields ||= {}
+      self.core_fields ||= {}
     end
 
     before_save :encrypt_sensitive_data
@@ -22,14 +22,14 @@ module Entity
   def merge(entity)
     self.plain_sensitive_data.deep_merge_not_nil!(entity.plain_sensitive_data)
     self.custom_fields.deep_merge_not_nil!(entity.custom_fields)
-    self.indexed_fields.deep_merge_not_nil!(entity.indexed_fields)
+    self.core_fields.deep_merge_not_nil!(entity.core_fields)
 
     self
   end
 
   def empty_entity?
     self.plain_sensitive_data.blank? &&
-      self.indexed_fields.blank? &&
+      self.core_fields.blank? &&
       self.custom_fields.blank?
   end
 

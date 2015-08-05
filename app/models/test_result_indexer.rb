@@ -10,11 +10,11 @@ class TestResultIndexer
   end
 
   def index
-    client.index index: Cdx::Api.index_name, type: type, body: indexed_fields, id: elasticsearch_id
+    client.index index: Cdx::Api.index_name, type: type, body: core_fields, id: elasticsearch_id
   end
 
   def update
-    client.update index: Cdx::Api.index_name, type: type, body: {doc: indexed_fields}, id: elasticsearch_id
+    client.update index: Cdx::Api.index_name, type: type, body: {doc: core_fields}, id: elasticsearch_id
   end
 
   def type
@@ -29,7 +29,7 @@ class TestResultIndexer
     Cdx::Api.client
   end
 
-  def indexed_fields
+  def core_fields
     location = device.current_location
     location_id = location.try(:geo_id)
     location_lat = location.try(:lat)
@@ -43,7 +43,7 @@ class TestResultIndexer
     parent_locations_id = parent_locations.map(&:geo_id)
     admin_levels = Hash[parent_locations.map { |l| ["admin_level_#{l.admin_level}", l.geo_id] }]
 
-    {test_result.entity_scope => test_result.indexed_fields}.
+    {test_result.entity_scope => test_result.core_fields}.
       deep_merge({
         "test" => {
           "reported_time" => test_result.created_at.utc.iso8601,
@@ -67,15 +67,15 @@ class TestResultIndexer
           "id" => laboratory_id
         }
       }).
-      deep_merge(indexed_fields_from(test_result.sample)).
-      deep_merge(indexed_fields_from(test_result.encounter)).
-      deep_merge(indexed_fields_from(test_result.patient)).
+      deep_merge(core_fields_from(test_result.sample)).
+      deep_merge(core_fields_from(test_result.encounter)).
+      deep_merge(core_fields_from(test_result.patient)).
       deep_merge(all_custom_fields)
   end
 
-  def indexed_fields_from entity
+  def core_fields_from entity
     if entity && !entity.empty_entity?
-      {entity.entity_scope => entity.indexed_fields.deep_merge("uuid" => entity.uuid)}
+      {entity.entity_scope => entity.core_fields.deep_merge("uuid" => entity.uuid)}
     else
       {}
     end

@@ -13,7 +13,7 @@ describe Manifest do
           {}
         },
         '{"assay" : {"name" : "GX4002"}}',
-        "test" => {"indexed" => {"name" => "GX4002"}, "pii" => {}, "custom" => {}}
+        "test" => {"core" => {"name" => "GX4002"}, "pii" => {}, "custom" => {}}
     end
 
     it "should not apply if invalid" do
@@ -31,7 +31,7 @@ describe Manifest do
             ]
           },
           '{"assay" : {"name" : "GX4002"}}',
-          "test" => {"indexed" => {"assay_name" => "GX4002"}, "pii" => {}, "custom" => {}}
+          "test" => {"core" => {"assay_name" => "GX4002"}, "pii" => {}, "custom" => {}}
       }.to raise_error(ManifestParsingError)
     end
 

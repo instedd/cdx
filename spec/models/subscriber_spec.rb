@@ -88,14 +88,14 @@ describe Subscriber, elasticsearch: true do
 
   def submit_test
     patient = Patient.make(
-      indexed_fields: {"gender" => "male"}
+      core_fields: {"gender" => "male"}
     )
 
     sample = Sample.make patient: patient
 
     TestResult.create_and_index(
       patient: patient, sample: sample,
-      indexed_fields: {"assays" => ["result" => "positive", "name" => "mtb"]},
+      core_fields: {"assays" => ["result" => "positive", "name" => "mtb"]},
       device_messages: [device_message]
     )
 

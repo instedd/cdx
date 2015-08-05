@@ -3,30 +3,30 @@ require "spec_helper"
 describe TestResultIndexer, elasticsearch: true do
 
   let(:patient) do
-    patient_indexed_fields = {
+    patient_core_fields = {
       "gender" => "male",
       "custom_fields" => {
         "hiv" => "positive"
       }
     }
-    Patient.make(uuid: 'abc', indexed_fields: patient_indexed_fields)
+    Patient.make(uuid: 'abc', core_fields: patient_core_fields)
   end
 
   let(:sample) do
-    sample_indexed_fields = {
+    sample_core_fields = {
       "type" => "sputum",
       "custom_fields" => {
         "culture_days" => "10"
       }
     }
-    Sample.make(uuid: 'abc', patient: patient, indexed_fields: sample_indexed_fields)
+    Sample.make(uuid: 'abc', patient: patient, core_fields: sample_core_fields)
   end
 
   let(:test){ TestResult.make(
     "sample" => sample,
     "patient" => patient,
     "test_id" => '4',
-    "indexed_fields" => {
+    "core_fields" => {
       "id" => "4",
       "name" => "mtb",
       "custom_fields" => {

@@ -41,9 +41,9 @@ class DeviceMessageProcessor
       old_patient = test.patient
       old_encounter = test.encounter
 
-      new_sample,    sample_indexed_fields    = find_or_initialize_sample
-      new_encounter, encounter_indexed_fields = find_or_initialize_encounter
-      new_patient,   patient_indexed_fields   = find_or_initialize_patient
+      new_sample,    sample_core_fields    = find_or_initialize_sample
+      new_encounter, encounter_core_fields = find_or_initialize_encounter
+      new_patient,   patient_core_fields   = find_or_initialize_patient
 
       connect_before test, new_sample, new_encounter, new_patient
 
@@ -53,9 +53,9 @@ class DeviceMessageProcessor
 
       connect_after test
 
-      save_entity test.sample,    sample_indexed_fields
-      save_entity test.encounter, encounter_indexed_fields
-      save_entity test.patient,   patient_indexed_fields
+      save_entity test.sample,    sample_core_fields
+      save_entity test.encounter, encounter_core_fields
+      save_entity test.patient,   patient_core_fields
 
       test.save!
 
@@ -65,7 +65,7 @@ class DeviceMessageProcessor
     private
 
     def find_or_initialize_test
-      test_id = parsed_message["test"]["indexed"]["id"]
+      test_id = parsed_message["test"]["core"]["id"]
       test = TestResult.new device_messages: [device_message],
                             test_id: test_id,
                             device: device
@@ -96,7 +96,7 @@ class DeviceMessageProcessor
       assign_fields parsed_message, new_entity
 
       if entity_uid && (existing = klass.find_by_pii(entity_uid, @parent.institution.id))
-        existing_indexed = existing.indexed_fields.deep_dup
+        existing_indexed = existing.core_fields.deep_dup
         existing.merge(new_entity)
         [existing, existing_indexed]
       elsif new_entity.empty_entity?
@@ -169,7 +169,7 @@ class DeviceMessageProcessor
     end
 
     def assign_fields(parsed_message, entity)
-      entity.indexed_fields       = (parsed_message[entity.entity_scope] || {})["indexed"] || {}
+      entity.core_fields          = (parsed_message[entity.entity_scope] || {})["core"] || {}
       entity.custom_fields        = (parsed_message[entity.entity_scope] || {})["custom"] || {}
       entity.plain_sensitive_data = (parsed_message[entity.entity_scope] || {})["pii"] || {}
     end
@@ -201,14 +201,14 @@ class DeviceMessageProcessor
       end
     end
 
-    def save_entity(entity, old_indexed_fields)
+    def save_entity(entity, old_core_fields)
       entity.try :save!
 
-      return unless old_indexed_fields && old_indexed_fields != entity.try(:indexed_fields)
+      return unless old_core_fields && old_core_fields != entity.try(:core_fields)
 
       response = client.search index: Cdx::Api.index_name, body:{query: { filtered: { filter: { term: { "#{entity.entity_scope}.uuid" => entity.uuid } } } }, fields: []}, size: 10000
       body = response["hits"]["hits"].map do |element|
-        { update: { _type: element["_type"], _id: element["_id"], data: { doc: {entity.entity_scope => entity.indexed_fields} } } }
+        { update: { _type: element["_type"], _id: element["_id"], data: { doc: {entity.entity_scope => entity.core_fields} } } }
       end
 
       client.bulk index: Cdx::Api.index_name, body: body unless body.blank?

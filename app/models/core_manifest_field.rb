@@ -15,22 +15,10 @@ class CoreManifestField < ManifestField
   end
 
   def hash_key
-    if pii?
-      'pii'
-    else
-      'indexed'
-    end
+    pii? ? 'pii' : 'core'
   end
 
   def custom?
     false
-  end
-
-  def core?
-    true
-  end
-
-  def indexed?
-    !pii?
   end
 end
