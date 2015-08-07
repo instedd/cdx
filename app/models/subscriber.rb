@@ -39,7 +39,7 @@ class Subscriber < ActiveRecord::Base
 
   def notify
     fields = self.fields
-    query = self.filter.query.merge "page_size" => 10000, "updated_at_since" => last_run_at.iso8601
+    query = self.filter.query.merge "page_size" => 10000, "test.updated_time_since" => last_run_at.iso8601
     Rails.logger.info "Filter : #{query}"
     tests = TestResult.query(query, filter.user).result["tests"]
 
