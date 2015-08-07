@@ -79,7 +79,8 @@ describe Subscriber, elasticsearch: true do
       response["location"].keys.should =~ ["id", "parents", "admin_levels", "lat", "lng"]
       response["patient"].keys.should =~ ["gender"]
       response["sample"].keys.should =~ ["uuid", "id", "type", "collection_date"]
-      response["test"].keys.should =~ ["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "assays", "quantitative_result", "type", "condition"]
+      response["test"].keys.should =~ ["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "assays", "quantitative_result", "type"]
+      response["test"]["assays"].keys.should =~ %w(condition name result)
       response["institution"]["name"].should eq(institution.name)
       response["laboratory"]["name"].should eq(laboratory.name)
       response["device"]["name"].should eq(device.name)

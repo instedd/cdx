@@ -86,7 +86,6 @@ class Subscriber < ActiveRecord::Base
     merged_test = indexed_test.deep_merge(test.entity_scope => test.plain_sensitive_data)
     merged_test = merged_test.deep_merge(test.sample.entity_scope => test.sample.plain_sensitive_data) if test.sample
     fields = Subscriber.available_field_names if fields.nil? || fields.empty? # use all fields if none is specified
-    fields_properties = self.class.default_schema['properties']
     filtered_test = {}
 
     fields.each do |field_name|
@@ -102,6 +101,10 @@ class Subscriber < ActiveRecord::Base
           filtered_test["test"] ||= {}
           filtered_test["test"]["assays"] ||= {}
           filtered_test["test"]["assays"]["name"] = merged_test["test"]["assays"].first["name"]
+        elsif field_name == "test.assays.condition"
+          filtered_test["test"] ||= {}
+          filtered_test["test"]["assays"] ||= {}
+          filtered_test["test"]["assays"]["condition"] = merged_test["test"]["assays"].first["condition"]
         else
           filtered_test[field.root_scope.name] ||= {}
           if (data = merged_test[field.root_scope.name])
