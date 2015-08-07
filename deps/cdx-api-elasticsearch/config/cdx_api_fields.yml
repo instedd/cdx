@@ -1,8 +1,8 @@
 # Defaults:
 
 # 1) If a field is not listed here, it can't be used as fiter or group by.
-# 2) When listing a date field (eg: created_at):
-#   a) The following filters will be enabled: created_at_since and created_at_until
+# 2) When listing a date field (eg: test.created_at):
+#   a) The following filters will be enabled: test.created_at_since and test.created_at_until
 #   b) The following groups will be enabled: year(created_at), month(created_at), day(created_at)
 # 3) When listing a string of multi_field type field:
 #   a) A 'wildcard' filter with the same name will be enabled.

@@ -24,7 +24,7 @@ Cdp::Application.routes.draw do
   end
 
   resources :locations, only: [:index, :show]
-  resources :manifests, except: [:update]
+  resources :manifests, except: [:update, :destroy]
   resources :test_results
   resources :filters, format: 'html'
   resources :subscribers
