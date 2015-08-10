@@ -6,7 +6,7 @@ class TestResultsController < ApplicationController
 
     query = {}
     query["laboratory"] = params["laboratory"] if params["laboratory"].present?
-    query["condition"] = params["condition"] if params["condition"].present?
+    query["test.assays.condition"] = params["condition"] if params["condition"].present?
 
     @tests = TestResult.query(query, current_user).result["tests"]
   end
