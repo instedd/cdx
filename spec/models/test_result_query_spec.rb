@@ -161,6 +161,21 @@ describe TestResultQuery, elasticsearch: true do
       expect(query.result['tests'].first['laboratory']['name']).to eq(laboratory.name)
     end
 
+    it "should include names if there is no lab" do
+      device = Device.make institution_id: institution.id, laboratories: []
+      TestResult.create_and_index(
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        device_messages:[DeviceMessage.make(device: device)]
+      )
+      refresh_index
+
+      query = TestResultQuery.new({"condition" => 'mtb'}, user)
+
+      expect(query.result['tests'].first['institution']['name']).to eq(institution.name)
+      expect(query.result['tests'].first['device']['name']).to eq(device.name)
+      expect(query.result['tests'].first['laboratory']['name']).to eq(nil)
+    end
+
     it "should include the updated institution name, device name, and laboratory name in the tests" do
       TestResult.create_and_index(
         core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},

@@ -49,9 +49,9 @@ class TestResultQuery
     devices = indexed_model tests, Device, ["device", "uuid"], "uuid"
 
     tests.each do |event|
-      event["institution"]["name"] = institutions[event["institution"]["id"]].name if event["institution"]
-      event["device"]["name"] = devices[event["device"]["uuid"]].name if event["device"]
-      event["laboratory"]["name"] = laboratories[event["laboratory"]["id"]].name  if event["laboratory"]
+      event["institution"]["name"] = institutions[event["institution"]["id"]].try(:name) if event["institution"]
+      event["device"]["name"] = devices[event["device"]["uuid"]].try(:name) if event["device"]
+      event["laboratory"]["name"] = laboratories[event["laboratory"]["id"]].try(:name) if event["laboratory"]
     end
     result
   end
