@@ -36,7 +36,6 @@ class DeviceMessageProcessor
 
     def process
       test = find_or_initialize_test
-      is_new_test = test.new_record?
       old_sample = test.sample
       old_patient = test.patient
       old_encounter = test.encounter
@@ -59,7 +58,7 @@ class DeviceMessageProcessor
 
       test.save!
 
-      index_test test, is_new_test
+      index_test test
     end
 
     private
@@ -163,9 +162,9 @@ class DeviceMessageProcessor
       test.patient = patient
     end
 
-    def index_test(test, is_new)
+    def index_test(test)
       indexer = TestResultIndexer.new(test)
-      is_new ? indexer.index : indexer.update
+      indexer.index
     end
 
     def assign_fields(parsed_message, entity)

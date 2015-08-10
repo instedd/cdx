@@ -13,10 +13,6 @@ class TestResultIndexer
     client.index index: Cdx::Api.index_name, type: type, body: core_fields, id: elasticsearch_id
   end
 
-  def update
-    client.update index: Cdx::Api.index_name, type: type, body: {doc: core_fields}, id: elasticsearch_id
-  end
-
   def type
     'test'
   end
