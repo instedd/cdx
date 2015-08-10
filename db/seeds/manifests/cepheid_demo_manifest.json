@@ -1,311 +1,116 @@
 {
   "metadata": {
-    "version": "1.0.94",
-    "api_version": "1.1.0",
+    "version": "1.1.0",
+    "api_version": "1.2.1",
     "device_models": [
       "GX Model I"
     ],
     "conditions": [
-      "MTB"
+      "mtb"
     ],
     "source": {
       "type": "json"
     }
   },
+  "custom_fields" : {
+    "patient.name": {
+      "pii" : true
+    },
+    "patient.ethnicity": {},
+    "patient.race": {},
+    "patient.race_ethnicity": {}
+  },
   "field_mapping": {
-    "patient": [
-      {
-        "target_field": "age",
-        "source": {
-          "lookup": "event.age"
-        },
-        "type": "integer",
-        "core": true,
-        "indexed": true,
-        "valid_values": {
-          "range": {
-            "min": 0,
-            "max": 125
-          }
-        }
-      },
-      {
-        "target_field": "gender",
-        "source": { "case" : [
-          { "lookup": "event.gender" },
-          [
-            { "when" : "M", "then" : "male"},
-            { "when" : "F", "then" : "female"},
-            { "when" : "*", "then" : "unknown"}
-          ]
-        ]},
-        "type": "enum",
-        "core": true,
-        "indexed": true,
-        "options": [
-          "male",
-          "female",
-          "unknown"
-        ]
-      },
-      {
-        "target_field": "ethnicity",
-        "source": { "case" : [
-          { "lookup": "event.ethnicity" },
-          [
-            { "when" : "hispanic", "then" : "hispanic"},
-            { "when" : "not_hispanic", "then" : "not_hispanic"},
-            { "when" : "*", "then" : "unknown"}
-          ]
-        ]},
-        "type": "enum",
-        "core": true,
-        "indexed": true,
-        "options" : [
-          "hispanic",
-          "not_hispanic",
-          "unknown"
-        ]
-      },
-      {
-        "target_field": "race",
-        "source": { "case" : [
-          {"lookup": "event.race"},
-          [
-            { "when" : "2054-5", "then" : "black_or_african_american"},
-            { "when" : "1002-5", "then" : "american_indian_or_alaska_native"},
-            { "when" : "2028-9", "then" : "asian"},
-            { "when" : "2076-8", "then" : "native_hawaiian_or_other_pacific_islander"},
-            { "when" : "2106-3", "then" : "white"},
-            { "when" : "2131-1", "then" : "other"},
-            { "when" : "*", "then" : "unknown"}
-          ]
-        ]},
-        "type": "enum",
-        "core": true,
-        "indexed": true,
-        "options" : [
-          "black_or_african_american",
-          "american_indian_or_alaska_native",
-          "asian",
-          "native_hawaiian_or_other_pacific_islander",
-          "white",
-          "other",
-          "unknown"
-        ]
-      },
-      {
-        "target_field": "race_ethnicity",
-        "source": { "case" : [
-          {"lookup": "event.race_ethnicity"},
-          [
-            { "when" : "2135-2", "then" : "hispanic"},
-            { "when" : "2054-5", "then" : "black_or_african_american"},
-            { "when" : "1002-5", "then" : "american_indian_or_alaska_native"},
-            { "when" : "2028-9", "then" : "asian"},
-            { "when" : "2076-8", "then" : "native_hawaiian_or_other_pacific_islander"},
-            { "when" : "2106-3", "then" : "white"},
-            { "when" : "2131-1", "then" : "other"},
-            { "when" : "*", "then" : "unknown"}
-          ]
-        ]},
-        "type": "enum",
-        "core": true,
-        "indexed": true,
-        "options" : [
-          "hispanic",
-          "black_or_african_american",
-          "american_indian_or_alaska_native",
-          "asian",
-          "native_hawaiian_or_other_pacific_islander",
-          "white",
-          "other",
-          "unknown"
-        ]
-      }
-    ],
-    "sample": [
-      {
-        "target_field": "sample_uid",
-        "source": {
-          "lookup": "event.sample_ID"
-        },
-        "type": "string",
-        "core": true,
-        "pii": true
-      },
-      {
-        "target_field": "sample_id",
-        "source": {
-          "lookup": "event.sample_ID"
-        },
-        "type": "string",
-        "core": true,
-        "indexed": true
-      }
-    ],
-    "test": [
-      {
-        "target_field": "start_time",
-        "source": {
-          "lookup": "event.start_time"
-        },
-        "type": "date",
-        "core": true,
-        "indexed": true
-      },
-      {
-        "target_field": "end_time",
-        "source": {
-          "lookup": "event.end_time"
-        },
-        "type": "date"
-      },
-      {
-        "target_field": "test_id",
-        "source": {
-          "lookup": "event.event_id"
-        },
-        "type": "string",
-        "core": true,
-        "indexed": true
-      },
-      {
-        "target_field": "system_user",
-        "source": {
-          "lookup": "event.system_user"
-        },
-        "type": "string",
-        "core": true,
-        "indexed": true
-      },
-      {
-        "target_field": "device_serial_number",
-        "source": {
-          "lookup": "event.device_serial_number"
-        },
-        "type": "string",
-        "core": true,
-        "indexed": true
-      },
-      {
-        "target_field": "error_code",
-        "source": {
-          "lookup": "event.error_code"
-        },
-        "type": "integer",
-        "core": true,
-        "indexed": true
-      },
-      {
-        "target_field": "error_description",
-        "source": {
-          "lookup": "event.error_description"
-        },
-        "type": "string",
-        "core": true,
-        "indexed": true
-      },
-      {
-        "target_field": "assay_name",
-        "source": {
-          "lookup": "event.assay_name"
-        },
-        "type": "string",
-        "core": true,
-        "indexed": true,
-        "options": [
-          "MTB Assay",
-          "Xpert SA Nasal Complete G3",
-          "MTB-RIF Assay G4_noQC1_2"
-        ]
-      },
-      {
-        "target_field": "status",
-        "source": { "case" : [
-          { "lookup": "event.result" },
-          [{"when" : "INVALID", "then" : "invalid" },
-            {"when" : "ERROR", "then" : "error" },
-            {"when" : "NO RESULT", "then" : "no_result" },
-            {"when" : "MTB NOT DETECTED", "then" : "negative" },
-            {"when" : "Rif Resistance DETECTED", "then" : "success" },
-            {"when" : "Rif Resistance INDETERMINATE", "then" : "success" },
-            {"when" : "MTB DETECTED", "then" : "success" },
-            {"when" : "*", "then" : "error"}
-          ]
-        ]},
-        "type": "enum",
-        "core": true,
-        "indexed": true,
-        "options": [
-          "invalid",
-          "error",
-          "no_result",
-          "success",
-          "negative"
-        ]
-      },
-      {
-        "target_field": "results[*].result",
-        "source": { "case" : [
-          { "lookup": "event.result" },
-          [ {"when" : "INVALID", "then" : "unknown" },
-            {"when" : "ERROR", "then" : "unknown" },
-            {"when" : "NO RESULT", "then" : "unknown" },
-            {"when" : "MTB NOT DETECTED", "then" : "negative" },
-            {"when" : "Rif Resistance DETECTED", "then" : "positive_with_rif" },
-            {"when" : "Rif Resistance INDETERMINATE", "then" : "positive_with_rif_inconclusive" },
-            {"when" : "MTB DETECTED", "then" : "positive" },
-            {"when" : "*", "then" : "unknown"}
-          ]
-        ]},
-        "type": "enum",
-        "core": true,
-        "indexed": true,
-        "options": [
-          "unknown",
-          "positive",
-          "negative",
-          "positive_with_rif",
-          "positive_with_rif_inconclusive"
-        ]
-      },
-      {
-        "target_field": "results[*].condition",
-        "source": { "case" : [
-          { "lookup" : "event.assay_name"},
-          [ {"when" : "Xpert MTB-RIF", "then" : "mtb"},
-            {"when" : "Xpert MTB-RIF G3", "then" : "mtb"},
-            {"when" : "MTB-RIF Assay G4", "then" : "mtb"},
-            {"when" : "Xpert MTB-RIF Assay G4", "then" : "mtb"},
-            {"when" : "MTB Beta", "then" : "mtb"},
-            {"when" : "*", "then" : "mtb"}
-          ]
-        ]},
-        "type": "enum",
-        "core": true,
-        "indexed": true,
-        "options": [
-          "mtb"
-        ]
-      },
-      {
-        "target_field": "test_type",
-        "source": { "case" : [
-          { "lookup": "event.test_type" },
-          [
-            { "when" : "0", "then" : "specimen"},
-            { "when" : "*", "then" : "qc"}
-          ]
-        ]},
-        "type": "enum",
-        "core": true,
-        "indexed": true,
-        "options": [
-          "specimen",
-          "qc"
-        ]
-      }
-    ]
+    "sample.uid" : { "lookup": "event.sample_ID" },
+    "sample.id" : { "lookup": "event.sample_ID" },
+    "patient.gender" : { "case" : [
+      { "lookup": "event.gender" },
+      [
+        { "when" : "M", "then" : "male"},
+        { "when" : "F", "then" : "female"},
+        { "when" : "*", "then" : "unknown"}
+      ]
+    ]},
+    "patient.ethnicity" : { "case" : [
+      { "lookup": "event.ethnicity" },
+      [
+        { "when" : "hispanic", "then" : "hispanic"},
+        { "when" : "not_hispanic", "then" : "not_hispanic"},
+        { "when" : "*", "then" : "unknown"}
+      ]
+    ]},
+    "patient.race" : { "case" : [
+      {"lookup": "event.race"},
+      [
+        { "when" : "2054-5", "then" : "black_or_african_american"},
+        { "when" : "1002-5", "then" : "american_indian_or_alaska_native"},
+        { "when" : "2028-9", "then" : "asian"},
+        { "when" : "2076-8", "then" : "native_hawaiian_or_other_pacific_islander"},
+        { "when" : "2106-3", "then" : "white"},
+        { "when" : "2131-1", "then" : "other"},
+        { "when" : "*", "then" : "unknown"}
+      ]
+    ]},
+    "patient.race_ethnicity" : { "case" : [
+      {"lookup": "event.race_ethnicity"},
+      [
+        { "when" : "2135-2", "then" : "hispanic"},
+        { "when" : "2054-5", "then" : "black_or_african_american"},
+        { "when" : "1002-5", "then" : "american_indian_or_alaska_native"},
+        { "when" : "2028-9", "then" : "asian"},
+        { "when" : "2076-8", "then" : "native_hawaiian_or_other_pacific_islander"},
+        { "when" : "2106-3", "then" : "white"},
+        { "when" : "2131-1", "then" : "other"},
+        { "when" : "*", "then" : "unknown"}
+      ]
+    ]},
+    "device.serial_number" : { "lookup": "event.device_serial_number" },
+    "device.lab_user" : { "lookup": "event.system_user" },
+    "test.patient_age" : { "lookup": "event.age" },
+    "test.start_time" : { "lookup": "event.start_time" },
+    "test.end_time" : { "lookup": "event.end_time" },
+    "test.id" : { "lookup": "event.event_id" },
+    "test.error_code" : { "lookup": "event.error_code" },
+    "test.error_description" : { "lookup": "event.error_description" },
+    "test.name" : { "lookup": "event.assay_name" },
+    "test.type" : { "case" : [
+      { "lookup": "event.test_type" },
+      [
+        { "when" : "0", "then" : "specimen"},
+        { "when" : "*", "then" : "qc"}
+      ]
+    ]},
+    "test.status" : { "case" : [
+      { "lookup": "event.result" },
+      [
+        {"when" : "INVALID", "then" : "invalid" },
+        {"when" : "ERROR", "then" : "error" },
+        {"when" : "NO RESULT", "then" : "no_result" },
+        {"when" : "MTB NOT DETECTED", "then" : "success" },
+        {"when" : "Rif Resistance DETECTED", "then" : "success" },
+        {"when" : "Rif Resistance INDETERMINATE", "then" : "success" },
+        {"when" : "MTB DETECTED", "then" : "success" },
+        {"when" : "*", "then" : "error"}
+      ]
+    ]},
+    "test.assays[*].condition" : { "script" : "['mtb', 'rif']" },
+    "test.assays[*].result" : {
+      "script": "
+      if(message['Result'].match(/.*INVALID.*/) || message['Result'].match(/.*ERROR.*/) || message['Result'].match(/.*NO RESULT.*/)) {
+        ['n/a', 'n/a']
+      } else {
+        if(message['Result'].match(/.*MTB DETECTED.*/)){
+          mtb = 'positive'
+        } else {
+          mtb = 'negative'
+        };
+        if(message['Result'].match(/.*Rif Resistance DETECTED.*/)){
+          rif = 'positive'
+        } else {
+          rif = 'negative'
+        };
+        [mtb, rif]
+      }"
+    }
   }
 }
