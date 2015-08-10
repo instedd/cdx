@@ -182,12 +182,12 @@ describe DeviceMessageImporter, elasticsearch: true do
 
       it "should parse cepheid's document" do
         copy_sample('cepheid_sample.json', 'jsons')
-        DeviceMessageImporter.new("*.csv").import_from sync_dir
+        DeviceMessageImporter.new("*.json").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests
         tests.should have(1).item
-        tests.first['_source']['test']['start_time'].should = '2015-04-07T18:31:20-05:00'
+        tests.first['_source']['test']['start_time'].should eq('2015-04-07T18:31:20-05:00')
       end
     end
 

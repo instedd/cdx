@@ -96,15 +96,15 @@
     "test.assays[*].condition" : { "script" : "['mtb', 'rif']" },
     "test.assays[*].result" : {
       "script": "
-      if(message['Result'].match(/.*INVALID.*/) || message['Result'].match(/.*ERROR.*/) || message['Result'].match(/.*NO RESULT.*/)) {
+      if(message['event']['result'].match(/.*INVALID.*/) || message['event']['result'].match(/.*ERROR.*/) || message['event']['result'].match(/.*NO RESULT.*/)) {
         ['n/a', 'n/a']
       } else {
-        if(message['Result'].match(/.*MTB DETECTED.*/)){
+        if(message['event']['result'].match(/.*MTB DETECTED.*/)){
           mtb = 'positive'
         } else {
           mtb = 'negative'
         };
-        if(message['Result'].match(/.*Rif Resistance DETECTED.*/)){
+        if(message['event']['result'].match(/.*Rif Resistance DETECTED.*/)){
           rif = 'positive'
         } else {
           rif = 'negative'
