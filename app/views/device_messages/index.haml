@@ -16,7 +16,7 @@
               Failed
               = link_to '(reprocess)', reprocess_institution_device_device_message_path(@institution, @device, message), method: 'post'
             - else
-              Succeed
+              Success
           %td= message.index_failure_reason
           %td= message.index_failure_data[:record_index]
           %td= message.index_failure_data[:target_field]
