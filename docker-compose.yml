@@ -30,6 +30,7 @@ web:
     SSH_KEYS_PATH: /home/cdx-sync/.ssh/authorized_keys
     SSH_SYNC_DIR: /home/cdx-sync/sync
     POIROT_SERVER: receiver.poirot.dock.er:2120
+    SUBSCRIBER_INTERVAL: 1
   ports:
     - 80
   volumes_from:
