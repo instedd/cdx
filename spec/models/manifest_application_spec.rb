@@ -113,7 +113,10 @@ describe Manifest, validate_manifest: false do
         "patient.shirt_color": {"lookup" : "shirt_color"},
         "test.uuid": {"lookup" : "test_id"},
         "test.name": {"lookup" : "assay"},
-        "test.start_time": {"lookup" : "start_time"},
+        "test.start_time": {"parse_date": [
+          {"lookup" : "start_time"},
+          "%Y/%m/%d %H:%M:%S"
+          ]},
         "test.raw_result": {"lookup" : "raw_result"},
         "test.concentration": {"lookup" : "concentration"}
       }}
@@ -123,7 +126,7 @@ describe Manifest, validate_manifest: false do
           "core" => {
             "uuid" => "4",
             "name" => "mtb",
-            "start_time" => "2000/1/1 10:00:00"
+            "start_time" => Time.parse("2000-01-01 10:00:00 +0000")
           },
           "custom" => {
             "concentration" => "15%",
@@ -346,6 +349,19 @@ describe Manifest, validate_manifest: false do
         },
         '{"sample_date" : "John Doe"}',
         "'John Doe' is not a valid value for 'test.sample_date' (valid value must be an iso date)"
+    end
+
+    it "should raise on invalid value in date iso when mapped to core field" do
+      assert_raises_manifest_data_validation %{
+          {
+            "test.start_time" : {"lookup" : "sample_date"}
+          }
+        }, %{
+          {
+          }
+        },
+        '{"sample_date" : "John Doe"}',
+        "'John Doe' is not a valid value for 'test.start_time' (valid value must be an iso date)"
     end
 
     it "applies first value mapping" do

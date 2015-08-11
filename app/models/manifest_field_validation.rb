@@ -9,8 +9,13 @@ class ManifestFieldValidation
   def apply_to(value)
     return unless value.present?
 
-    if @field.type == 'integer' && !self.class.is_an_integer?(value)
-      raise ManifestParsingError.invalid_value_for_integer(value, target_field)
+    case @field.type
+    when 'integer'
+      unless self.class.is_an_integer?(value)
+        raise ManifestParsingError.invalid_value_for_integer(value, target_field)
+      end
+    when 'date'
+      check_value_is_an_iso_date value
     end
 
     verify_value_is_not_null_string value
@@ -57,9 +62,15 @@ class ManifestFieldValidation
   def check_value_is_date(value, date_format)
     case date_format
     when "iso"
-      Time.parse(value) rescue raise ManifestParsingError.invalid_value_for_date(value, target_field)
+      check_value_is_an_iso_date(value)
     else
       raise ManifestParsingError.unsupported_date_format
     end
+  end
+
+  def check_value_is_an_iso_date(value)
+    return if value.is_a?(Time) || value.is_a?(DateTime)
+
+    Time.strptime(value, "%Y-%m-%dT%H:%M:%S%z") rescue raise ManifestParsingError.invalid_value_for_date(value, target_field)
   end
 end
