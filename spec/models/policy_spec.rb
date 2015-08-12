@@ -615,6 +615,14 @@ describe Policy do
     end
   end
 
+  it "assigns implicit policy" do
+    user2 = User.make
+
+    policy = grant user, user2, institution, READ_INSTITUTION, true
+    policy.definition = Policy.implicit.definition
+    policy.save!
+  end
+
   def create_user_and_institution
     user = User.make
     institution = user.create Institution.make_unsaved
