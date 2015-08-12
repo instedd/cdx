@@ -10,7 +10,7 @@
       %input.btn.btn-small{type: "submit", value: "Filter"}
 
       - if params["condition"].present?
-        - query = {laboratory: params["laboratory"], condition: params["condition"]}
+        - query = {'laboratory.id' => params["laboratory"], 'test.assays.condition' => params["condition"]}
         = link_to "Save this filter", new_filter_path(query: query)
 
 .row-fluid
@@ -21,13 +21,13 @@
         %th Institution
         %th Laboratory
         %th Device
-        %th Assay name
-        %th Results
+        %th Condition
+        %th Result
       - @tests.each do |test|
         %tr
           %td= test["test"]["reported_time"]
           %td= test["institution"]["name"]
           %td= test["laboratory"]["name"]
           %td= test["device"]["name"]
-          %td= test["test"]["assays"].first["name"]
+          %td= test["test"]["assays"].first["condition"]
           %td= test["test"]["assays"].first["result"]

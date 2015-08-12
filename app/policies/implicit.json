@@ -9,11 +9,6 @@
         "cdxp:laboratory"
       ],
       "condition": {"is_owner" : true}
-    },
-    {
-      "effect": "allow",
-      "action": "cdxp:readLocation",
-      "resource": "cdxp:location"
     }
   ],
   "delegable": true

@@ -22,14 +22,23 @@
 
 {
   "metadata": {
-    "version": "0.0.4",
+    "version": "0.0.5",
     "api_version": "1.2.1",
     "signature": "",
     "device_models": [
       "epicenter_headless_es"
     ],
     "conditions": [
-      "MTB"
+      "mtb",
+      "stm",
+      "emb",
+      "rif",
+      "pza",
+      "inh",
+      "pas",
+      "tch",
+      "lvx",
+      "atsc"
     ],
     "source": {
       "type": "headless_csv",
@@ -102,6 +111,28 @@
       ]
     },
     "test.name": { "lookup": "7" },
+    "test.assays[*].condition": {
+      "if" : [
+        {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
+        {
+          "case": [
+          {"lookup" : "14"},
+          [
+            {"when": "Estreptomicina", "then" : "stm"},
+            {"when": "Etambutol", "then" : "emb"},
+            {"when": "Rifampicina", "then" : "rif"},
+            {"when": "Pirazinamida", "then" : "pza"},
+            {"when": "Isoniazid", "then" : "inh"},
+            {"when": "*cido p-Aminosalic*lico", "then" : "pas"},
+            {"when": "Hidrazida del *cido tiofenocarbox*lico", "then" : "tch"},
+            {"when": "Levofloxacino", "then" : "lvx"},
+            {"when": "Tiosemicarbazona", "then" : "atsc"},
+            {"when": "*", "then" : "mtb"}
+          ]
+        ]},
+        "mtb"
+      ]
+    },
     "test.assays[*].name": {
       "if" : [
         {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
@@ -118,10 +149,10 @@
             {"when": "Hidrazida del *cido tiofenocarbox*lico", "then" : "thiophenecarboxylic_acid_hydrazide"},
             {"when": "Levofloxacino", "then" : "levofloxacin"},
             {"when": "Tiosemicarbazona", "then" : "thiosemicarbazone"},
-            {"when": "*", "then" : "mtb"}
+            {"when": "*", "then" : "mycobacterium_tuberculosis"}
           ]
         ]},
-        "mtb"
+        "mycobacterium_tuberculosis"
       ]
     },
     "test.assays[*].result": {

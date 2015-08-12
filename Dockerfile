@@ -36,4 +36,6 @@ RUN bundle exec rake assets:precompile RAILS_ENV=production
 # Set permissions for tmp and log directories
 RUN mkdir -p /app/tmp /app/log && chown -R app:app /app/tmp /app/log
 
+ENV SUBSCRIBER_INTERVAL 15
+
 EXPOSE 80

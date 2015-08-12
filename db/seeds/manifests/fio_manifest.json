@@ -3,7 +3,7 @@
     "version" : "1.0.4",
     "api_version" : "1.2.1",
     "device_models" : ["FIO"],
-    "conditions": ["MTB"],
+    "conditions": ["malaria_pf", "malaria_pv"],
     "source": {
       "type" : "xml",
       "root" : "DiagnosticTests"
@@ -41,6 +41,15 @@
       ]
     },
     "test.assays[*].result" : { "lowercase" : {"lookup" : "Test/Assay/Result/@qualitative"} },
-    "test.assays[*].name" : {"lookup" : "Test/Assay/@code"}
+    "test.assays[*].name" : {"lookup" : "Test/Assay/@code"},
+    "test.assays[*].condition" : {
+      "case": [
+        {"lookup" : "Test/Assay/@displayValue"},
+        [
+          {"when" : "P.v", "then" : "malaria_pv"},
+          {"when" : "P.f", "then" : "malaria_pf"}
+        ]
+      ]
+    }
   }
 }
