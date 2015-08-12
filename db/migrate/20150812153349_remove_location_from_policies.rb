@@ -1,6 +1,10 @@
 class RemoveLocationFromPolicies < ActiveRecord::Migration
+  class Policy < ActiveRecord::Base
+    serialize :definition, JSON
+  end
+
   def up
-    Policy.all.each do |policy|
+    Policy.find_each do |policy|
       definition = policy.definition
       statements = definition["statement"]
       statements.delete_if { |statement| statement["resource"] == "cdxp:location" }
