@@ -6,8 +6,8 @@ class FiltersController < ApplicationController
   respond_to :html, :json
   expose(:filters) { current_user.filters }
   expose(:filter, attributes: :filter_params)
-  expose(:laboratory) { Laboratory.find(filter.query["laboratory"]) rescue nil }
-  expose(:condition) { filter.query["condition"] }
+  expose(:laboratory) { Laboratory.find(filter.query["laboratory.id"]) rescue nil }
+  expose(:condition) { filter.query["test.assays.condition"] }
 
   def index
     respond_with filters

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150812153349) do
+ActiveRecord::Schema.define(version: 20150812203030) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
