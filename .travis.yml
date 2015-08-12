@@ -2,9 +2,10 @@ language: ruby
 cache: bundler
 rvm:
 - 2.0.0
-before_install:
-- sudo apt-get update
-- sudo apt-get install -y libzmq3-dev
+addons:
+  apt:
+    packages:
+    - libzmq3-dev
 bundler_args: --jobs=8 --without development
 services:
 - elasticsearch
@@ -16,3 +17,4 @@ script:
 notifications:
   slack:
     secure: CmtQgO6TCT89jHc3DYEEtqM0n0BpN6QT8uey7grYAh2YBJJGoGYh0HgiCHiSNLnn+4sfDu91erys+R17fcc4aBaRMQawHebj4L0e0B2Wi99sIptfpkQRYjofiO0XZJUbBbXW+3jgsPui8u2gDVd/cBq3NxZd8jQvUMNr5MTpjf4=
+sudo: false
