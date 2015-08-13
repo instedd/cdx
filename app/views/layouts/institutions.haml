@@ -1,8 +1,5 @@
 - content_for :cdp_content do
-  - full_row do
-    = render 'shared/institution_tabs'
-
-  .row-fluid
-    = yield
+  = render 'shared/institution_tabs'
+  = yield
 
 = render template: 'layouts/application'

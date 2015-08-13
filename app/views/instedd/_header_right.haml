@@ -1,9 +1,0 @@
-.btn-group.pull-right
-  - if current_user
-    - dropdown current_user.email do
-      - dropdown_item 'Settings', '#'
-      - dropdown_divider
-      - dropdown_item 'Sign out', destroy_session_path(:user), method: :delete
-  - else
-    %a.btn.btn-link{href: guisso_sign_in_path_for(:user)}
-      Sign in
