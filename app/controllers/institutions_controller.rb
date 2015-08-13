@@ -28,6 +28,7 @@ class InstitutionsController < ApplicationController
   end
 
   def new
+    add_breadcrumb 'New'
     @institution = current_user.institutions.new
     @institution.user_id = current_user.id
     return unless authorize_resource(@institution, CREATE_INSTITUTION)

@@ -27,6 +27,7 @@ class DevicesController < ApplicationController
   end
 
   def new
+    add_breadcrumb 'New'
     @device = @institution.devices.new
 
     return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
@@ -47,6 +48,10 @@ class DevicesController < ApplicationController
         format.json { render json: @device.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def show
+    redirect_to edit_institution_device_path(@institution, params[:id])
   end
 
   def edit
@@ -94,6 +99,8 @@ class DevicesController < ApplicationController
   def regenerate_key
     @device = @institution.devices.find params[:id]
     return unless authorize_resource(@device, REGENERATE_DEVICE_KEY)
+    add_breadcrumb @device.name, edit_institution_device_path(@institution, @device)
+    add_breadcrumb 'Secret Key'
 
     @device.set_key
 
@@ -114,6 +121,8 @@ class DevicesController < ApplicationController
   def generate_activation_token
     @device = @institution.devices.find params[:id]
     return unless authorize_resource(@device, GENERATE_ACTIVATION_TOKEN)
+    add_breadcrumb @device.name, edit_institution_device_path(@institution, @device)
+    add_breadcrumb 'Activation Token'
 
     @token = @device.new_activation_token
     respond_to do |format|
