@@ -55,6 +55,7 @@ Cdp::Application.routes.draw do
     end
     resources :devices, only: [] do
       resources :messages, only: [:create], shallow: true
+      match 'events' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3
     end
     resources :laboratories, only: :index
   end

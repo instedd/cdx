@@ -3,11 +3,13 @@ class FiltersController < ApplicationController
   skip_before_action :authenticate_user!, if: -> { request.path.starts_with? "/api/" }
   before_filter :authenticate_api_user!, if: -> { request.path.starts_with? "/api/" }
 
+  add_breadcrumb 'Filters', :filters_path
+
   respond_to :html, :json
   expose(:filters) { current_user.filters }
   expose(:filter, attributes: :filter_params)
-  expose(:laboratory) { Laboratory.find(filter.query["laboratory"]) rescue nil }
-  expose(:condition) { filter.query["condition"] }
+  expose(:laboratory) { Laboratory.find(filter.query["laboratory.id"]) rescue nil }
+  expose(:condition) { filter.query["test.assays.condition"] }
 
   def index
     respond_with filters
@@ -18,7 +20,12 @@ class FiltersController < ApplicationController
   end
 
   def new
+    add_breadcrumb 'New'
     filter.query = params[:query]
+  end
+
+  def edit
+    add_breadcrumb filter.name, edit_filter_path(filter)
   end
 
   def create

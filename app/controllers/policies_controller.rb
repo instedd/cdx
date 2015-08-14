@@ -8,6 +8,7 @@ class PoliciesController < ApplicationController
   end
 
   def new
+    add_breadcrumb 'New'
     @policy = Policy.new
   end
 
@@ -46,6 +47,7 @@ class PoliciesController < ApplicationController
   def edit
     @policy = Policy.find params[:id]
     @policy.definition = JSON.pretty_generate(@policy.definition)
+    add_breadcrumb @policy.name, edit_policy_path(@policy)
   end
 
   # PATCH/PUT /policies/1

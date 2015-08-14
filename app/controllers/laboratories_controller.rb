@@ -22,6 +22,7 @@ class LaboratoriesController < ApplicationController
   end
 
   def new
+    add_breadcrumb 'New'
     @laboratory = @institution.laboratories.new
     return unless authorize_resource(@institution, CREATE_INSTITUTION_LABORATORY)
   end

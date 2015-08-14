@@ -9,7 +9,7 @@ class CustomMappingsController < ApplicationController
     add_breadcrumb 'Institutions', :institutions_path
     add_breadcrumb @institution.name, institution_path(@institution)
     add_breadcrumb 'Devices', institution_devices_path(@institution)
-    add_breadcrumb @device.name, institution_device_path(@institution, @device)
+    add_breadcrumb @device.name, edit_institution_device_path(@institution, @device)
     add_breadcrumb 'Custom Mappings', institution_device_custom_mappings_path(@institution, @device)
   end
 
