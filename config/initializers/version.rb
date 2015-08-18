@@ -9,4 +9,4 @@ else
   version = "development"
 end
 
-Cdp::Application.config.version_name = version
+Rails.application.config.version_name = version
