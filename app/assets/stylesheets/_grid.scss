@@ -1,0 +1,124 @@
+/* =============================================================================
+  FLEXBOX GRID
+============================================================================= */
+
+.grid {
+  border: solid 1px;
+}
+
+.row {
+  @include flexbox();
+  flex-direction: column;
+}
+
+/* default for even distribution */
+.col {
+  @include flex(1);
+  padding: $col-padd;
+  border: solid 1px;
+
+  /* forced '%' distribution */
+  &.pe-2 {
+    @include flex(0 0 16.666%);
+  }
+
+  &.pe-3 {
+    @include flex(0 0 24.999%);
+  }
+
+  &.pe-4 {
+    @include flex(0 0 33.333%);
+  }
+
+  &.pe-5 {
+    @include flex(0 0 41.666%);
+  }
+
+  &.pe-6 {
+    @include flex(0 0 49.999%);
+  }
+
+  &.pe-7 {
+    @include flex(0 0 58.333%);
+  }
+
+  &.pe-8 {
+    @include flex(0 0 66.666%);
+  }
+
+  &.pe-9 {
+    @include flex(0 0 74.999%);
+  }
+
+  &.pe-10 {
+    @include flex(0 0 83.333%);
+  }
+
+  &.pe-11 {
+    @include flex(0 0 91.666%);
+  }
+
+
+  /* forced 'PX' distribution */
+
+  &.px-1 {
+    @include flex(0 0 100px);
+  }
+  &.px-2 {
+    @include flex(0 0 200px);
+  }
+
+  &.px-3 {
+    @include flex(0 0 300px);
+  }
+
+  &.px-4 {
+    @include flex(0 0 400px);
+  }
+
+  &.px-5 {
+    @include flex(0 0 500px);
+  }
+
+  &.px-6 {
+    @include flex(0 0 600px);
+  }
+
+  &.px-7 {
+    @include flex(0 0 700px);
+  }
+
+  &.px-8 {
+    @include flex(0 0 800px);
+  }
+
+  &.px-9 {
+    @include flex(0 0 900px);
+  }
+
+  &.px-10 {
+    @include flex(0 0 1000px);
+  }
+}
+
+
+
+
+@media all and ( min-width: 480px ) {
+  .grid_sm {
+    flex-direction: row;
+  }
+}
+
+@media all and ( min-width: 720px ) {
+  .grid_md {
+    flex-direction: row;
+  }
+}
+
+@media all and ( min-width: 960px ) {
+  .grid_lg {
+    flex-direction: row;
+  }
+}
+

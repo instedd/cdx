@@ -2,29 +2,19 @@
 %html
   %head
     %title Connected Diagnostics Platform
+    = Gon::Base.render_data({})
     = stylesheet_link_tag "application", :media => "all"
     = javascript_include_tag "application"
     = csrf_meta_tags
   %body{class: @body_class}
-    %ul
-      %li= link_to "Dashboard", nndd_path
-      %li= link_to "Institutions", institutions_path
-      %li= link_to "Locations", locations_path
-      %li= link_to "Manifests", manifests_path
-      %li= link_to "Tests", test_results_path
-      %li= link_to "Filters", filters_path
-      %li= link_to "Subscribers", subscribers_path
-      %li= link_to "Policies", policies_path
-      %li
-        - if current_user
-          #{current_user.email} -
-          = link_to "Sign out", destroy_session_path(:user), method: :delete
-        - else
-          = link_to "Sign in", guisso_sign_in_path_for(:user)
+    .wrapper
+      %header
+        = render "shared/header_nav"
 
-    = Gon::Base.render_data({})
+      .content
+        = flash_message
 
-    = flash_message
-    = content_for?(:cdp_content) ? yield(:cdp_content) : yield
+        = content_for?(:cdp_content) ? yield(:cdp_content) : yield
 
-    Version: #{Cdp::Application.config.version_name}
+      %footer
+        = render "shared/footer"

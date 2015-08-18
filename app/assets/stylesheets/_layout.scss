@@ -1,0 +1,131 @@
+/* =============================================================================
+  LAYOUT
+============================================================================= */
+
+body {
+  font-family: $sans;
+  font-size: 90%;
+}
+
+.wrapper {
+  @include flexbox();
+  flex-direction: column;
+  height: 100%;
+}
+
+header {
+  background: $gray-dark;
+  flex: none;
+  height: 60px;
+  padding: 0 1em;
+
+  .row {
+    height: 100%;
+    @include flex-flow(row nowrap);
+    @include justify-content(center);
+    @include align-items(center);
+
+    .logo {
+      img {
+        max-width: inherit !important;
+      }
+    }
+
+    nav {
+      @include align-self(stretch);
+      @include flex-grow(2);
+      text-align: center;
+
+      ul {
+        margin: 0;
+        padding: 0;
+
+        li {
+          display: inline;
+          padding: 0;
+          margin: 0;
+
+          &.active a {
+            background: $gray-xdark;
+            color: $white;
+            font-weight: 700;
+            height: 60px;
+          }
+        }
+      }
+
+      a {
+        color: $white-dark;
+        font-family: $sanstitle;
+        line-height: 60px;
+        font-size: 14px;
+        font-weight: 400;
+        text-transform: uppercase;
+        display: inline-block;
+        padding: 0 20px;
+        // -webkit-text-stroke: .01em #fff;
+        // -webkit-font-smoothing: subpixel-antialiased !important; 
+        // -webkit-backface-visibility: hidden; 
+        // -moz-backface-visibility: hidden; 
+        // -ms-backface-visibility: hidden;   
+      }
+    }
+  }
+
+}
+
+.user {
+  color: $white-dark;
+  position: relative;
+  outline: 0 !important;
+
+  span {
+    cursor: pointer;
+  }
+
+  ul {
+    border-radius: 3px;
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
+    background: $white;
+    margin-top: 20px;
+    width: 100%;
+    padding: 2px;
+    position: absolute;
+    visibility: hidden;
+    z-index: 1;
+    transition: visibility 0.2s;
+
+    a {
+      border-radius: 3px;
+      color: $gray-xdark;
+      display: block;
+      padding: 10px;
+      &:hover {
+        background: $white-light;
+        color: $black;
+      }
+    }
+
+  }
+
+  &:focus {
+    pointer-events: none;
+    ul {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+  } 
+}
+
+.content {
+  flex: 1 0 auto;
+  padding: 1.5em 1em;
+}
+
+footer {
+  border-top: 1px solid $white-light;
+  font-size: 90%;
+  padding: 0.5em 1em;
+  flex: none;
+}
