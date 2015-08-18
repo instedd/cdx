@@ -19,10 +19,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["deps/cdx-api-elasticsearch/lib"]
 
   spec.add_runtime_dependency "activesupport"
-  spec.add_dependency "elasticsearch"
-  spec.add_dependency "cdx"
+  spec.add_runtime_dependency "elasticsearch"
+  spec.add_runtime_dependency "cdx"
 
-  spec.add_development_dependency "activesupport"
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
