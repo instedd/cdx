@@ -42,7 +42,7 @@ class ManifestFieldValidation
   end
 
   def verify_value_is_not_null_string value
-    unless value != Manifest::NULL_STRING
+    if Manifest::NULL_STRING == value
       raise ManifestParsingError.null_not_allowed(target_field)
     end
   end

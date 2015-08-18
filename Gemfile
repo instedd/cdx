@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.0.2'
+gem 'rails', '4.0.13'
 gem 'mysql2'
 gem 'sass-rails', '~> 4.0.0'
 gem 'uglifier', '>= 1.3.0'
@@ -86,6 +86,7 @@ group :development, :test do
 end
 
 group :test do
+  gem 'test-unit'
   gem 'tire'
   # gem 'factory_girl_rails'
   gem 'faker'
