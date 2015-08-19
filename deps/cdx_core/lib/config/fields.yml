@@ -76,12 +76,12 @@ device:
   serial_number:
     searchable: true
 institution:
-  id:
+  uuid:
     searchable: true
   name:
     searchable: true
 laboratory:
-  id:
+  uuid:
     searchable: true
   name:
     searchable: true

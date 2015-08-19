@@ -26,7 +26,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       test = all_elasticsearch_tests.first["_source"]
       expect(test["location"]["id"]).to eq(leaf_location1.geo_id)
-      expect(test["laboratory"]["id"]).to eq(laboratory1.id)
+      expect(test["laboratory"]["uuid"]).to eq(laboratory1.uuid)
       expect(test["location"]["parents"].sort).to eq([leaf_location1.geo_id, parent_location.geo_id].sort)
       expect(test["location"]["admin_levels"]['admin_level_0']).to eq(parent_location.geo_id)
       expect(test["location"]["admin_levels"]['admin_level_1']).to eq(leaf_location1.geo_id)

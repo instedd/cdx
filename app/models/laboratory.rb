@@ -1,4 +1,5 @@
 class Laboratory < ActiveRecord::Base
+  include AutoUUID
   include Resource
 
   belongs_to :institution

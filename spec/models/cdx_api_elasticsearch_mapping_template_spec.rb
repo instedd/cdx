@@ -174,7 +174,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
           },
           "institution" => {
             "properties" => {
-              "id" => {
+              "uuid" => {
                 "type" => "string",
                 "index" => "not_analyzed"
               },
@@ -189,7 +189,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
           },
           "laboratory" => {
             "properties" => {
-              "id" => {
+              "uuid" => {
                 "type" => "string",
                 "index" => "not_analyzed"
               },

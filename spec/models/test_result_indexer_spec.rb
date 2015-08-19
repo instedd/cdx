@@ -93,10 +93,10 @@ describe TestResultIndexer, elasticsearch: true do
           "uuid" => test.device.uuid
         },
         "laboratory" => {
-          "id" => test.device.laboratories.first.id
+          "uuid" => test.device.laboratories.first.uuid
         },
         "institution" => {
-          "id" => test.device.institution.id
+          "uuid" => test.device.institution.uuid
         }
       },
       id: "#{test.device.uuid}_4")

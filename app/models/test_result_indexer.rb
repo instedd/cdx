@@ -32,7 +32,7 @@ class TestResultIndexer
     location_lng = location.try(:lng)
 
     laboratory = device.current_laboratory
-    laboratory_id = laboratory.try &:id
+    laboratory_uuid = laboratory.try &:uuid
     laboratory_name = laboratory.try &:name
 
     parent_locations = location.try(:self_and_ancestors) || []
@@ -57,10 +57,10 @@ class TestResultIndexer
           "lng" => location_lng
         },
         "institution" => {
-          "id" => device.institution_id
+          "uuid" => device.institution.uuid
         },
         "laboratory" => {
-          "id" => laboratory_id
+          "uuid" => laboratory_uuid
         }
       }).
       deep_merge(core_fields_from(test_result.sample)).

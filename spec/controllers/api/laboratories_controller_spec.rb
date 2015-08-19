@@ -10,26 +10,26 @@ describe Api::LaboratoriesController do
   context "Laboratories" do
     it "should list the laboratories" do
       institution = Institution.make user: user
-      lab_ids = 3.times.map do
+      labs = 3.times.map do
         lab = Laboratory.make(institution: institution)
-        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_geoid}
+        {'uuid' => lab.uuid, 'name' => lab.name, 'location' => lab.location_geoid}
       end
 
       result = get :index, format: 'json'
-      expect(Oj.load(result.body)).to eq({'total_count' => 3, 'laboratories' => lab_ids})
+      expect(Oj.load(result.body)).to eq({'total_count' => 3, 'laboratories' => labs})
     end
 
     it "should list the laboratories for a given institution" do
       institution = Institution.make user: user
-      lab_ids = 3.times.map do
+      labs = 3.times.map do
         lab = Laboratory.make(institution: institution)
-        {'id' => lab.id, 'name' => lab.name, 'location' => lab.location_geoid}
+        {'uuid' => lab.uuid, 'name' => lab.name, 'location' => lab.location_geoid}
       end
 
       Laboratory.make institution: (Institution.make user: user)
 
-      get :index, institution_id: institution.id, format: 'json'
-      expect(Oj.load(response.body)).to eq({'total_count' => 3, 'laboratories' => lab_ids})
+      get :index, institution_uuid: institution.uuid, format: 'json'
+      expect(Oj.load(response.body)).to eq({'total_count' => 3, 'laboratories' => labs})
     end
 
     context 'CSV' do
@@ -54,7 +54,7 @@ describe Api::LaboratoriesController do
         get :index, format: 'csv'
 
         check_laboratories_csv response
-        expect(response.body).to eq("id,name,location\n#{lab.id},#{lab.name},#{lab.location_geoid}\n")
+        expect(response.body).to eq("uuid,name,location\n#{lab.uuid},#{lab.name},#{lab.location_geoid}\n")
       end
 
       it "renders column names even when there are no laboratories to render" do
@@ -63,7 +63,7 @@ describe Api::LaboratoriesController do
         get :index, format: 'csv'
 
         check_laboratories_csv response
-        expect(response.body).to eq("id,name,location\n")
+        expect(response.body).to eq("uuid,name,location\n")
       end
     end
   end

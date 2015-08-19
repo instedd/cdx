@@ -96,8 +96,8 @@ describe Cdx::Api do
 
     [
       ['device.uuid', 'device.uuid', ["dev1", "dev2", "dev3"]],
-      ['laboratory.id', 'laboratory.id', ["1", "2", "3"]],
-      ['institution.id', 'institution.id', ["1", "2", "3"]],
+      ['laboratory.uuid', 'laboratory.uuid', ["1", "2", "3"]],
+      ['institution.uuid', 'institution.uuid', ["1", "2", "3"]],
       ['patient.gender', 'patient.gender', ["male", "female", "unknown"]],
     ].each do |query_name, index_name, values|
       it "should filter by #{query_name}" do

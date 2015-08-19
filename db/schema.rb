@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150812203030) do
+ActiveRecord::Schema.define(version: 20150818200013) do
 
   create_table "activation_tokens", force: true do |t|
     t.string   "value"
@@ -126,6 +126,7 @@ ActiveRecord::Schema.define(version: 20150812203030) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "uuid"
   end
 
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
@@ -144,6 +145,7 @@ ActiveRecord::Schema.define(version: 20150812203030) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "location_geoid", limit: 60
+    t.string   "uuid"
   end
 
   create_table "manifests", force: true do |t|

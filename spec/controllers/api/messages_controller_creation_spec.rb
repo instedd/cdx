@@ -65,11 +65,11 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       expect(TestResult.pluck(:uuid)).to match_array(tests.map {|e| e["_source"]["test"]["uuid"]})
     end
 
-    it "should store institution_id in elasticsearch" do
+    it "should store institution uuid in elasticsearch" do
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      expect(test["institution"]["id"]).to eq(device.institution_id)
+      expect(test["institution"]["uuid"]).to eq(device.institution.uuid)
     end
 
     it "should override test if test_id is the same" do

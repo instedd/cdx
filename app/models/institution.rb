@@ -1,5 +1,7 @@
 class Institution < ActiveRecord::Base
+  include AutoUUID
   include Resource
+
   belongs_to :user
   has_many :laboratories, dependent: :destroy
   has_many :devices, dependent: :destroy

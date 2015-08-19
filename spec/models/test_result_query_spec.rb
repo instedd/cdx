@@ -99,7 +99,7 @@ describe TestResultQuery, elasticsearch: true do
 
       refresh_index
 
-      query = TestResultQuery.new({"institution.id" => institution_3.id.to_s}, user)
+      query = TestResultQuery.new({"institution.uuid" => institution_3.uuid}, user)
       expect(query.result['total_count']).to eq(1)
     end
 
