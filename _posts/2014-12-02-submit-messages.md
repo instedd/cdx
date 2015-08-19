@@ -12,7 +12,7 @@ Allows devices to submit messages.
 # Request
 
 * The path must include a valid **device UUID**.
-* **The body can't be empty** and must include an [test](#/test-resource).
+* **The body can't be empty** and must include a [test](#/test-resource).
 
 `/devices/[device_uuid]/messages`
 

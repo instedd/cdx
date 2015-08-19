@@ -39,12 +39,12 @@ The response will include a total_count and a list of laboratories
     {
       "id" : 1,
       "name" : "First Lab",
-      "location_id" : 2
+      "location" : "ne:CHE_3424"
     },
     {
       "id" : 2,
       "name" : "Second Lab",
-      "location_id" : 3
+      "location" : "ne:IND_2428"
     }
   ]
 }`
@@ -52,7 +52,7 @@ The response will include a total_count and a list of laboratories
 ## CSV
 
 `id,name,location_id
-1,First Lab, 2
-2,Second Lab, 3`
+1,First Lab,ne:CHE_3424
+2,Second Lab,ne:IND_2428`
 
 For error responses, see the [response status codes documentation](#http-response-codes).
