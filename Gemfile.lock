@@ -333,6 +333,7 @@ GEM
     pry-stack_explorer (0.4.9.2)
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
+    puma (2.13.4)
     rack (1.6.4)
     rack-oauth2 (1.2.1)
       activesupport (>= 2.3)
@@ -537,6 +538,7 @@ DEPENDENCIES
   pry-clipboard
   pry-rescue
   pry-stack_explorer
+  puma
   rails (~> 4.2.0)
   rchardet
   rest-client

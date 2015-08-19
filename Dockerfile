@@ -1,26 +1,10 @@
-FROM phusion/passenger-ruby20
+FROM instedd/nginx-rails:2.2
 
 # Install prerequisites
 RUN \
   apt-get update && \
-  apt-get install -y nodejs libzmq3-dev && \
+  apt-get install -y libzmq3-dev sudo && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Setup nginx / passenger
-RUN rm -f /etc/service/nginx/down
-RUN rm /etc/nginx/sites-enabled/default
-ADD docker/nginx-app.conf /etc/nginx/sites-enabled/app.conf
-ADD docker/nginx-env.conf /etc/nginx/main.d/env.conf
-
-# Setup daemons
-RUN mkdir /etc/service/subscribers
-ADD docker/subscribers.sh /etc/service/subscribers/run
-RUN mkdir /etc/service/csv_watch
-ADD docker/csv_watch.sh /etc/service/csv_watch/run
-
-# Prepare application directory
-RUN mkdir /app
-WORKDIR /app
 
 # Install gem bundle
 ADD Gemfile /app/
@@ -34,8 +18,7 @@ ADD . /app
 RUN bundle exec rake assets:precompile RAILS_ENV=production
 
 # Set permissions for tmp and log directories
-RUN mkdir -p /app/tmp /app/log && chown -R app:app /app/tmp /app/log
+RUN mkdir -p /app/tmp /app/log && chown -R nobody:nogroup /app/tmp /app/log
 
-ENV SUBSCRIBER_INTERVAL 15
-
-EXPOSE 80
+# Add config files
+ADD docker/web-run /etc/service/web/run

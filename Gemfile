@@ -52,8 +52,7 @@ end
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'
 
-# Use unicorn as the app server
-# gem 'unicorn'
+gem 'puma'
 
 group :development do
   gem 'web-console', '~> 2.0'

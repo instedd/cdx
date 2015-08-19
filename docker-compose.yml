@@ -19,19 +19,28 @@ web:
     - elasticsearch
     - smtp
     - sshd
-  environment:
-    RAILS_ENV: production
-    MYSQL_HOST: db
-    MYSQL_PASSWORD: root
-    SMTP_HOST: smtp
-    SMTP_PORT: 25
-    SMTP_TLS: 'false'
-    ELASTICSEARCH_URL: elasticsearch:9200
-    SSH_KEYS_PATH: /home/cdx-sync/.ssh/authorized_keys
-    SSH_SYNC_DIR: /home/cdx-sync/sync
-    POIROT_SERVER: receiver.poirot.dock.er:2120
-    SUBSCRIBER_INTERVAL: 1
+  env_file: docker-dev.env
   ports:
     - 80
+  volumes_from:
+    - sshd
+
+subscribers:
+  build: .
+  user: nobody
+  links:
+    - db
+    - elasticsearch
+  command: bin/notify_subscribers
+  env_file: docker-dev.env
+
+csv_watch:
+  build: .
+  command: rake csv:watch
+  links:
+    - db
+    - elasticsearch
+    - sshd
+  env_file: docker-dev.env
   volumes_from:
     - sshd
