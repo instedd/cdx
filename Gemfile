@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.1.0'
+gem 'rails', '~> 4.2.0'
 gem 'mysql2'
 gem 'sass-rails', '~> 4.0.0'
 gem 'uglifier', '>= 1.3.0'
@@ -23,7 +23,7 @@ gem 'instedd-bootstrap', git: "https://bitbucket.org/instedd/instedd-bootstrap.g
 gem 'ruby-openid'
 gem 'alto_guisso_rails', github: "instedd/alto_guisso_rails", branch: 'master'
 gem 'alto_guisso', github: "instedd/alto_guisso", branch: 'master'
-gem 'rails_config'
+gem 'config'
 gem 'rest-client'
 gem 'barby'
 gem 'gon'
@@ -56,6 +56,7 @@ end
 # gem 'unicorn'
 
 group :development do
+  gem 'web-console', '~> 2.0'
   gem 'capistrano', '~> 3.1.0', require: false
   gem 'capistrano-rails',   '~> 1.1', require: false
   gem 'capistrano-bundler', '~> 1.1', require: false
@@ -91,11 +92,11 @@ group :test do
   gem 'tire'
   # gem 'factory_girl_rails'
   gem 'faker'
-  gem 'machinist'
+  gem 'machinist', '~> 1.0'
   gem 'capybara'
   gem 'guard-rspec'
-  gem 'rspec'
-  gem 'rspec-rails'
+  gem 'rspec', '~> 2.0'
+  gem 'rspec-rails', '~> 2.0'
   gem 'vcr'
   gem 'webmock', require: false
   gem 'capybara-mechanize'

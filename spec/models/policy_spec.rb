@@ -96,7 +96,7 @@ describe Policy do
         can = Policy.can? READ_INSTITUTION, Institution, user2
         institutions = Policy.authorize READ_INSTITUTION, Institution, user2
 
-        can.should be_true
+        can.should eq(true)
         institutions.should eq([])
       end
 
@@ -119,7 +119,7 @@ describe Policy do
         can = Policy.can? READ_INSTITUTION, Institution, user
         institutions = Policy.authorize READ_INSTITUTION, Institution, user
 
-        can.should be_true
+        can.should eq(true)
         institutions.should eq([])
       end
 
@@ -159,14 +159,14 @@ describe Policy do
         policy.definition = policy_definition(institution, READ_INSTITUTION, false)
         policy.granter_id = user2.id
         policy.user_id = user3.id
-        policy.save.should be_false
+        policy.save.should eq(false)
 
         action = Policy::READ_INSTITUTION
         resource = institution
         policies = [policy]
 
         result = Policy.can? action, resource, user3, policies
-        result.should be_false
+        result.should eq(false)
       end
 
       it "disallows policy creation if self-granted" do
@@ -174,7 +174,7 @@ describe Policy do
         policy.definition = policy_definition(institution, READ_INSTITUTION, false)
         policy.granter_id = user.id
         policy.user_id = user.id
-        policy.save.should be_false
+        policy.save.should eq(false)
       end
 
       it "disallows policy creation if granter is nil" do
@@ -182,7 +182,7 @@ describe Policy do
         policy.definition = policy_definition(institution, READ_INSTITUTION, false)
         policy.granter_id = nil
         policy.user_id = user.id
-        policy.save.should be_false
+        policy.save.should eq(false)
       end
 
       it "allows checking when there's a loop" do

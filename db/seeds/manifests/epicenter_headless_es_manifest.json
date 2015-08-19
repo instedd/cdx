@@ -1,25 +1,3 @@
-// sample_id
-// test_id
-// antibiotic_id
-// patient_name
-// patient_id
-// hospital_name
-// sample_type
-// assay_name
-// sequence_number (tube_id)
-// test_status/result
-// instrument_number (epicenter_device_id)
-// test_type
-// fecha de retirado del tubo
-// start_date_time
-// antibiotic_name
-// sensibility result (S, R)
-// concentration
-// sample_end_time
-// gender (1 - unknown, 2 - male, 3 - female)
-// birth_date
-// hiv (SINE - unknown, N - negative, P - positive)
-
 {
   "metadata": {
     "version": "0.0.5",

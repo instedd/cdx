@@ -12,6 +12,6 @@ describe TestResult do
     test.sample.patient = patient_b
 
     test.should be_invalid
-    test.should have(1).error_on(:patient_id)
+    expect(test.errors[:patient_id].size).to eq(1)
   end
 end

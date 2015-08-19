@@ -3,7 +3,7 @@ include Policy::Actions
 def assert_can(user, resource, action, expected_result = [resource])
   result = Policy.can? action, resource, user
 
-  result.should be_true
+  result.should eq(true)
 
   result = Policy.authorize action, resource, user
   result = result.sort_by &:id
@@ -14,7 +14,7 @@ end
 
 def assert_cannot(user, resource, action)
   result = Policy.cannot? action, resource, user
-  result.should be_true
+  result.should eq(true)
 end
 
 def grant(granter, user, resource, action, delegable = true)

@@ -6,11 +6,11 @@ describe ActivationToken do
 
   describe '#used?' do
     context 'when there is no activation' do
-      it { token.used?.should be_false }
+      it { token.used?.should eq(false) }
     end
     context 'when there is an activation' do
       let!(:activation) { Activation.create(activation_token: token) }
-      it { token.used?.should be_true }
+      it { token.used?.should eq(true) }
     end
   end
 
@@ -21,7 +21,7 @@ describe ActivationToken do
   describe '#use!' do
     let!(:settings) { token.use!(SampleSshKey) }
     context 'when it is unused' do
-      it { token.used?.should be_true }
+      it { token.used?.should eq(true) }
       it { token.device.ssh_key.should eq(SshKey.last) }
       it { token.activation.should_not be_nil }
 

@@ -171,7 +171,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests
-        tests.should have(18).items
+        expect(tests.size).to eq(18)
         tests.map{|e| e['_source']['test']['start_time']}.should =~ ['2014-09-09T17:07:32.000Z', '2014-10-28T13:00:58.000Z', '2014-10-28T17:24:34.000Z', '2015-02-10T18:10:28.000Z', '2015-03-03T19:27:36.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:34:08.000Z', '2015-03-31T18:34:08.000Z', '2015-03-31T18:34:08.000Z', '2015-03-31T18:34:08.000Z', '2014-11-05T08:38:30.000Z', '2014-10-29T12:24:59.000Z', '2014-10-29T12:24:59.000Z', '2014-10-29T12:24:59.000Z', '2014-10-29T12:24:59.000Z']
       end
     end
@@ -186,7 +186,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests
-        tests.should have(1).item
+        expect(tests.size).to eq(1)
         tests.first['_source']['test']['start_time'].should eq('2015-04-07T18:31:20-05:00')
       end
     end
@@ -203,7 +203,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         tests = all_elasticsearch_tests.sort_by do |test|
           test["_source"]["test"]["assays"][0]['result'] + test["_source"]["test"]["assays"][1]['result'] + test["_source"]["test"]["assays"][2]['result']
         end
-        tests.should have(13).items
+        expect(tests.size).to eq(13)
 
         test = tests[0]["_source"]["test"]
         test["assays"][0]["name"].should eq("mtb")
@@ -230,7 +230,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         test["assays"][2]["result"].should eq("positive")
 
         dbtests = TestResult.all
-        dbtests.should have(13).items
+        expect(dbtests.size).to eq(13)
         dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['test']['uuid']}
       end
     end
@@ -245,7 +245,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests
-        tests.should have(1).items
+        expect(tests.size).to eq(1)
 
         test = tests.first['_source']
 
