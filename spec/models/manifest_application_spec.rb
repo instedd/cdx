@@ -24,7 +24,7 @@ describe Manifest, validate_manifest: false do
 
       expect {
         manifest.apply_to("assay.name\nGX4002", nil)
-      }.to raise_error
+      }.to raise_error(TypeError)
     end
 
     it "should apply to pii core field" do

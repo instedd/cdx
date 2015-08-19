@@ -32,7 +32,7 @@ describe ActivationToken do
       it { expect(settings[:outbox_dir]).to eq('outbox') }
     end
     context 'when it was used' do
-      it { expect { token.use!(SampleSshKey) }.to raise_error }
+      it { expect { token.use!(SampleSshKey) }.to raise_error(ActiveRecord::RecordInvalid) }
     end
   end
 end

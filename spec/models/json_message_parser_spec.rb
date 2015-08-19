@@ -27,7 +27,7 @@ describe JsonMessageParser do
     expect(parser.lookup("nested_object.second_key", data)).to eq("second value")
     expect(parser.lookup("nested_object.inexistent_key", data)).to be_nil
     pending
-    expect { parser.lookup("inexistent_key.inexistent_key", data) }.to raise_error
+    expect { parser.lookup("inexistent_key.inexistent_key", data) }.to raise_error(RuntimeError)
   end
 
   it "looks up a nested element" do
@@ -43,7 +43,7 @@ describe JsonMessageParser do
     expect(parser.lookup("nested_object.second_key", data)).to eq("second value")
     expect(parser.lookup("nested_object.inexistent_key", data)).to be_nil
     pending
-    expect { parser.lookup("inexistent_key.inexistent_key", data) }.to raise_error
+    expect { parser.lookup("inexistent_key.inexistent_key", data) }.to raise_error(RuntimeError)
   end
 
   it "looks up the root element" do

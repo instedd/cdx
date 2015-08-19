@@ -2,7 +2,6 @@
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
-require 'rspec/autorun'
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
@@ -56,7 +55,7 @@ RSpec.configure do |config|
   config.order = "random"
 
   config.include Devise::TestHelpers, :type => :controller
-  config.include ManifestSpecHelper,  :example_group => { :file_path => config.escaped_path(%w[spec models]) }
+  config.include ManifestSpecHelper
 
   config.before(:each) do
     LocationService.fake!

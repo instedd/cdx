@@ -95,8 +95,8 @@ group :test do
   gem 'machinist', '~> 1.0'
   gem 'capybara'
   gem 'guard-rspec'
-  gem 'rspec', '~> 2.0'
-  gem 'rspec-rails', '~> 2.0'
+  gem 'rspec'
+  gem 'rspec-rails'
   gem 'vcr'
   gem 'webmock', require: false
   gem 'capybara-mechanize'
