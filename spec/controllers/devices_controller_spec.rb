@@ -24,22 +24,22 @@ describe DevicesController do
   context "Update" do
     it "device is successfully updated if name is provided" do
       d = Device.find(device.id)
-      d.name.should_not eq("New device")
+      expect(d.name).not_to eq("New device")
 
       patch :update, {"institution_id" => institution.id, "id" => device.id, "device" => {"name" => "New device"}}
 
       d = Device.find(device.id)
-      d.name.should eq("New device")
+      expect(d.name).to eq("New device")
     end
 
     it "device is not updated if name is not provided" do
       d = Device.find(device.id)
-      d.name.should eq(device.name)
+      expect(d.name).to eq(device.name)
 
       patch :update, {"institution_id" => institution.id, "id" => device.id, "device" => {"name" => ""}}
 
       d = Device.find(device.id)
-      d.name.should eq(device.name)
+      expect(d.name).to eq(device.name)
     end
   end
 
@@ -47,10 +47,10 @@ describe DevicesController do
     before { post :generate_activation_token, {"institution_id" => device.institution_id, "id" => device.id} }
     let(:token) { ActivationToken.find_by(device_id: device.id)  }
 
-    it { token.should_not be_nil }
-    it { token.device.should eq(device) }
-    it { token.client_id.should eq(device.uuid) }
-    it { token.value.should_not be_nil }
+    it { expect(token).not_to be_nil }
+    it { expect(token.device).to eq(device) }
+    it { expect(token.client_id).to eq(device.uuid) }
+    it { expect(token.value).not_to be_nil }
   end
 
 end

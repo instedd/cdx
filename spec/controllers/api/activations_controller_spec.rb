@@ -11,8 +11,8 @@ describe Api::ActivationsController do
       let!(:activation_token) { ActivationToken.make(value: '12345') }
       include_context :do_post
 
-      it { response_json['status'].should eq('success') }
-      it { response_json['message'].should eq('Device activated') }
+      it { expect(response_json['status']).to eq('success') }
+      it { expect(response_json['message']).to eq('Device activated') }
     end
 
     context 'when token exists but device uuid does not match' do
@@ -20,8 +20,8 @@ describe Api::ActivationsController do
       before { activation_token.device.tap(&:set_key).save }
       include_context :do_post
 
-      it { response_json['status'].should eq('failure') }
-      it { response_json['message'].should eq('Invalid activation token') }
+      it { expect(response_json['status']).to eq('failure') }
+      it { expect(response_json['message']).to eq('Invalid activation token') }
     end
 
     context 'when token exists but was used' do
@@ -29,15 +29,15 @@ describe Api::ActivationsController do
       before { activation_token.use!(SampleSshKey) }
       include_context :do_post
 
-      it { response_json['status'].should eq('failure') }
-      it { response_json['message'].should eq('Activation token already used') }
+      it { expect(response_json['status']).to eq('failure') }
+      it { expect(response_json['message']).to eq('Activation token already used') }
     end
 
     context 'when token does not exist' do
       include_context :do_post
 
-      it { response_json['status'].should eq('failure') }
-      it { response_json['message'].should eq('Invalid activation token') }
+      it { expect(response_json['status']).to eq('failure') }
+      it { expect(response_json['message']).to eq('Invalid activation token') }
     end
   end
 end

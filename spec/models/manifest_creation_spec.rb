@@ -20,10 +20,10 @@ describe Manifest do
     it "creates a device model named according to the manifest" do
       Manifest.create!(definition: definition)
 
-      Manifest.count.should eq(1)
-      Manifest.first.definition.should eq(definition)
-      DeviceModel.count.should eq(1)
-      Manifest.first.device_models.first.name.should eq("foo")
+      expect(Manifest.count).to eq(1)
+      expect(Manifest.first.definition).to eq(definition)
+      expect(DeviceModel.count).to eq(1)
+      expect(Manifest.first.device_models.first.name).to eq("foo")
     end
 
     it "updates its version number" do
@@ -42,13 +42,13 @@ describe Manifest do
 
       manifest = Manifest.first
 
-      manifest.version.should eq("1")
+      expect(manifest.version).to eq("1")
       manifest.definition = updated_definition
       manifest.save!
 
-      Manifest.count.should eq(1)
-      DeviceModel.count.should eq(1)
-      Manifest.first.version.should eq("2.0.1")
+      expect(Manifest.count).to eq(1)
+      expect(DeviceModel.count).to eq(1)
+      expect(Manifest.first.version).to eq("2.0.1")
     end
 
     it "updates its api_version number" do
@@ -66,13 +66,13 @@ describe Manifest do
 
       manifest = Manifest.first
 
-      manifest.api_version.should eq(Manifest::CURRENT_VERSION)
+      expect(manifest.api_version).to eq(Manifest::CURRENT_VERSION)
       manifest.definition = updated_definition
       manifest.save(:validate => false)
 
-      Manifest.count.should eq(1)
-      DeviceModel.count.should eq(1)
-      Manifest.first.api_version.should eq("9.9.9")
+      expect(Manifest.count).to eq(1)
+      expect(DeviceModel.count).to eq(1)
+      expect(Manifest.first.api_version).to eq("9.9.9")
     end
 
     it "returns all the valid manifests" do
@@ -88,7 +88,7 @@ describe Manifest do
 
       manifest = Manifest.create!(definition: definition)
 
-      Manifest.valid.should eq([manifest])
+      expect(Manifest.valid).to eq([manifest])
     end
 
     it "reuses an existing device model if it already exists" do
@@ -99,8 +99,8 @@ describe Manifest do
 
       Manifest.create definition: definition
 
-      DeviceModel.count.should eq(1)
-      DeviceModel.first.id.should eq(model.id)
+      expect(DeviceModel.count).to eq(1)
+      expect(DeviceModel.first.id).to eq(model.id)
     end
 
     it "leaves device models after being deleted" do
@@ -108,17 +108,17 @@ describe Manifest do
 
       Manifest.first.destroy
 
-      Manifest.count.should eq(0)
-      DeviceModel.count.should eq(1)
+      expect(Manifest.count).to eq(0)
+      expect(DeviceModel.count).to eq(1)
     end
 
     it "leaves no orphan model" do
       Manifest.create!(definition: definition)
 
-      Manifest.count.should eq(1)
-      DeviceModel.count.should eq(1)
+      expect(Manifest.count).to eq(1)
+      expect(DeviceModel.count).to eq(1)
       Manifest.first.destroy()
-      Manifest.count.should eq(0)
+      expect(Manifest.count).to eq(0)
 
       Manifest.create!(definition: definition)
 
@@ -135,11 +135,11 @@ describe Manifest do
 
       Manifest.create!(definition: definition_bar)
 
-      Manifest.count.should eq(2)
-      DeviceModel.count.should eq(2)
+      expect(Manifest.count).to eq(2)
+      expect(DeviceModel.count).to eq(2)
       Manifest.first.destroy()
-      Manifest.count.should eq(1)
-      DeviceModel.count.should eq(2)
+      expect(Manifest.count).to eq(1)
+      expect(DeviceModel.count).to eq(2)
 
       definition_version = %{{
         "metadata" : {
@@ -154,24 +154,24 @@ describe Manifest do
 
       manifest = Manifest.first
 
-      manifest.version.should eq("1")
+      expect(manifest.version).to eq("1")
       manifest.definition = definition_version
       manifest.save!
 
-      DeviceModel.count.should eq(2)
+      expect(DeviceModel.count).to eq(2)
 
-      Manifest.first.device_models.first.should eq(DeviceModel.first)
-      DeviceModel.first.name.should eq("foo")
+      expect(Manifest.first.device_models.first).to eq(DeviceModel.first)
+      expect(DeviceModel.first.name).to eq("foo")
     end
 
     it "creates conditions from manifest" do
       Manifest.create!(definition: definition)
 
       conditions = Condition.all
-      conditions.count.should eq(2)
-      conditions.map(&:name).sort.should eq(["MTB", "RIFF"])
+      expect(conditions.count).to eq(2)
+      expect(conditions.map(&:name).sort).to eq(["MTB", "RIFF"])
 
-      Manifest.first.conditions.count.should eq(2)
+      expect(Manifest.first.conditions.count).to eq(2)
     end
   end
 end

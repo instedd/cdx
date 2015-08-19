@@ -44,8 +44,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:parse_error].should_not eq(nil)
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:parse_error]).not_to eq(nil)
     end
 
     it "shouldn't pass validations if metadata is empty" do
@@ -55,8 +55,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:metadata].first.should eq("can't be blank")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:metadata].first).to eq("can't be blank")
     end
 
     it "shouldn't pass validations if metadata doesn't include version" do
@@ -69,8 +69,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:metadata].first.should eq("must include version field")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:metadata].first).to eq("must include version field")
     end
 
     it "shouldn't pass validations if metadata doesn't include api_version" do
@@ -83,8 +83,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:metadata].first.should eq("must include api_version field")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:metadata].first).to eq("must include api_version field")
     end
 
     it "checks the version number against the current api version" do
@@ -110,8 +110,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:metadata].first.should eq("must include device_models field")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:metadata].first).to eq("must include device_models field")
     end
 
     it "shouldn't pass validations if field_mapping is not an array" do
@@ -124,8 +124,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:field_mapping].first.should eq("must be a json object")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:field_mapping].first).to eq("must be a json object")
 
       definition = %{{
         "metadata" : {
@@ -137,8 +137,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:field_mapping].first.should eq("must be a json object")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:field_mapping].first).to eq("must be a json object")
     end
 
     it "shouldn't pass validations if custom_fields is not an object" do
@@ -153,8 +153,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:custom_fields].first.should eq("must be a json object")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:custom_fields].first).to eq("must be a json object")
     end
 
     it "shouldn't create if a custom field is provided with an invalid type" do
@@ -176,8 +176,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:invalid_type].first.should eq(": target 'test.custom'. Field can't specify a type.")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:invalid_type].first).to eq(": target 'test.custom'. Field can't specify a type.")
     end
 
     it "should create when fields are provided with no types" do
@@ -205,7 +205,7 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(1)
+      expect(Manifest.count).to eq(1)
     end
 
     it "shouldn't create if missing conditions" do
@@ -222,8 +222,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:metadata].first.should eq("must include conditions field")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:metadata].first).to eq("must include conditions field")
     end
 
     it "shouldn't create if conditions is not an array" do
@@ -241,8 +241,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:conditions].first.should eq("must be a json array")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:conditions].first).to eq("must be a json array")
     end
 
     it "shouldn't create if conditions is an empty array" do
@@ -260,8 +260,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:conditions].first.should eq("must be a non-empty json array")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:conditions].first).to eq("must be a non-empty json array")
     end
 
     it "shouldn't create if conditions is not a string array" do
@@ -279,8 +279,8 @@ describe Manifest do
       }}
       m = Manifest.new(definition: definition)
       m.save
-      Manifest.count.should eq(0)
-      m.errors[:conditions].first.should eq("must be a json string array")
+      expect(Manifest.count).to eq(0)
+      expect(m.errors[:conditions].first).to eq("must be a json string array")
     end
   end
 end

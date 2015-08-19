@@ -34,8 +34,8 @@ describe TestResultQuery, elasticsearch: true do
 
       query = TestResultQuery.new({"condition" => 'mtb'}, user)
 
-      query.result['total_count'].should eq(1)
-      query.result['tests'].first['test']['results'].first['result'].should eq('positive')
+      expect(query.result['total_count']).to eq(1)
+      expect(query.result['tests'].first['test']['results'].first['result']).to eq('positive')
     end
 
     it "delegates institution policy" do
@@ -54,8 +54,8 @@ describe TestResultQuery, elasticsearch: true do
 
       query = TestResultQuery.new({"condition" => 'mtb'}, user_2)
 
-      query.result['total_count'].should eq(1)
-      query.result['tests'].first['test']['results'].first['result'].should eq('positive')
+      expect(query.result['total_count']).to eq(1)
+      expect(query.result['tests'].first['test']['results'].first['result']).to eq('positive')
     end
 
     it "doesn't fails if no device is indexed for the institution yet" do
@@ -65,8 +65,8 @@ describe TestResultQuery, elasticsearch: true do
 
       query = TestResultQuery.new({"condition" => 'mtb'}, user)
 
-      query.result['total_count'].should eq(0)
-      query.result['tests'].should eq([])
+      expect(query.result['total_count']).to eq(0)
+      expect(query.result['tests']).to eq([])
     end
 
     it "should not access any test if has no policy" do
@@ -79,8 +79,8 @@ describe TestResultQuery, elasticsearch: true do
 
       query = TestResultQuery.new({"condition" => 'mtb'}, User.new)
 
-      query.result['total_count'].should eq(0)
-      query.result['tests'].should eq([])
+      expect(query.result['total_count']).to eq(0)
+      expect(query.result['tests']).to eq([])
     end
 
     it "applies institution.id filter" do
@@ -100,7 +100,7 @@ describe TestResultQuery, elasticsearch: true do
       refresh_index
 
       query = TestResultQuery.new({"institution.id" => institution_3.id.to_s}, user)
-      query.result['total_count'].should eq(1)
+      expect(query.result['total_count']).to eq(1)
     end
 
     it "disallows viewing another institution's tests" do
@@ -116,7 +116,7 @@ describe TestResultQuery, elasticsearch: true do
       refresh_index
 
       query = TestResultQuery.new({"institution.id" => [non_user_device.institution.id.to_s, institution.id]}, user)
-      query.result['total_count'].should eq(1)
+      expect(query.result['total_count']).to eq(1)
     end
 
     it "has access to all institutions if superadmin" do
@@ -141,7 +141,7 @@ describe TestResultQuery, elasticsearch: true do
       refresh_index
 
       query = TestResultQuery.new({"condition" => 'mtb'}, super_user)
-      query.result['total_count'].should eq(2)
+      expect(query.result['total_count']).to eq(2)
     end
   end
 

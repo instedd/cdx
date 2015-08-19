@@ -6,30 +6,30 @@ describe ActivationToken do
 
   describe '#used?' do
     context 'when there is no activation' do
-      it { token.used?.should eq(false) }
+      it { expect(token.used?).to eq(false) }
     end
     context 'when there is an activation' do
       let!(:activation) { Activation.create(activation_token: token) }
-      it { token.used?.should eq(true) }
+      it { expect(token.used?).to eq(true) }
     end
   end
 
   describe '#client_id' do
-    it { token.client_id.should_not be_nil }
+    it { expect(token.client_id).not_to be_nil }
   end
 
   describe '#use!' do
     let!(:settings) { token.use!(SampleSshKey) }
     context 'when it is unused' do
-      it { token.used?.should eq(true) }
-      it { token.device.ssh_key.should eq(SshKey.last) }
-      it { token.activation.should_not be_nil }
+      it { expect(token.used?).to eq(true) }
+      it { expect(token.device.ssh_key).to eq(SshKey.last) }
+      it { expect(token.activation).not_to be_nil }
 
-      it { settings[:host].should eq('localhost') }
-      it { settings[:port].should eq(2222) }
-      it { settings[:user].should eq('cdx-sync') }
-      it { settings[:inbox_dir].should eq('inbox') }
-      it { settings[:outbox_dir].should eq('outbox') }
+      it { expect(settings[:host]).to eq('localhost') }
+      it { expect(settings[:port]).to eq(2222) }
+      it { expect(settings[:user]).to eq('cdx-sync') }
+      it { expect(settings[:inbox_dir]).to eq('inbox') }
+      it { expect(settings[:outbox_dir]).to eq('outbox') }
     end
     context 'when it was used' do
       it { expect { token.use!(SampleSshKey) }.to raise_error }

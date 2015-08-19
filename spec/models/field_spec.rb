@@ -32,7 +32,7 @@ describe Cdx::Field do
         expect { duration.parse_string "1d2hs3j" }.to raise_error(RuntimeError)
       end
 
-      pending "detects other malformed durations" do
+      skip "detects other malformed durations" do
         expect { duration.parse_string "hello" }.to raise_error(RuntimeError)
       end
     end

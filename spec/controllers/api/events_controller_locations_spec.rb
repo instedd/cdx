@@ -10,7 +10,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
   def get_updates(options, body="")
     refresh_index
     response = get :index, body, options.merge(format: 'json')
-    response.status.should eq(200)
+    expect(response.status).to eq(200)
     Oj.load(response.body)["tests"]
   end
 
@@ -35,19 +35,19 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       response = get_updates(location: leaf_location1.geo_id)
 
-      response.first["test"]["assays"].first["name"].should eq("flu_a")
+      expect(response.first["test"]["assays"].first["name"]).to eq("flu_a")
 
       response = get_updates(location: leaf_location2.geo_id)
 
-      response.first["test"]["assays"].first["name"].should eq("flu_b")
+      expect(response.first["test"]["assays"].first["name"]).to eq("flu_b")
 
       response = get_updates(location: parent_location.geo_id).sort_by do |test|
         test["test"]["assays"].first["name"]
       end
 
-      response.size.should eq(2)
-      response[0]["test"]["assays"].first["name"].should eq("flu_a")
-      response[1]["test"]["assays"].first["name"].should eq("flu_b")
+      expect(response.size).to eq(2)
+      expect(response[0]["test"]["assays"].first["name"]).to eq("flu_a")
+      expect(response[1]["test"]["assays"].first["name"]).to eq("flu_b")
     end
 
     it "groups by administrative level" do
@@ -60,7 +60,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(test:{assays:[name: "mtb"]})
 
       response = get_updates(group_by: {admin_level: 0})
-      response.should eq([
+      expect(response).to eq([
         {"location"=>parent_location.geo_id, "count"=>2},
         {"location"=>upper_leaf_location.geo_id, "count"=>1}
       ])

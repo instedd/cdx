@@ -11,7 +11,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
   def get_updates(options, body="")
     refresh_index
     response = get :index, body, options.merge(format: 'json')
-    response.status.should eq(200)
+    expect(response.status).to eq(200)
     Oj.load(response.body)["tests"]
   end
 
@@ -27,8 +27,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
         response = get_updates 'test.assays.name' => 'mtb'
 
-        response.size.should eq(1)
-        response.first["test"]["assays"].first["result"].should eq("positive")
+        expect(response.size).to eq(1)
+        expect(response.first["test"]["assays"].first["result"]).to eq("positive")
       end
     end
 
@@ -42,15 +42,15 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :negative]})
 
         response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
-        response.size.should eq(1)
-        response.first["test"]["assays"].first["result"].should eq("negative")
+        expect(response.size).to eq(1)
+        expect(response.first["test"]["assays"].first["result"]).to eq("negative")
 
         response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
 
-        response.first["test"]["assays"].first["result"].should eq("positive")
-        response.last["test"]["assays"].first["result"].should eq("negative")
+        expect(response.first["test"]["assays"].first["result"]).to eq("positive")
+        expect(response.last["test"]["assays"].first["result"]).to eq("negative")
 
-        get_updates('test.reported_time_since' => Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601).should be_empty
+        expect(get_updates('test.reported_time_since' => Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601)).to be_empty
       end
 
       it "filters by an analyzed result" do
@@ -59,8 +59,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
         response = get_updates('test.assays.result' => :positive)
 
-        response.size.should eq(1)
-        response.first["test"]["assays"].first["result"].should eq("positive")
+        expect(response.size).to eq(1)
+        expect(response.first["test"]["assays"].first["result"]).to eq("positive")
       end
 
       it "filters by name" do
@@ -69,8 +69,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
         response = get_updates 'test.assays.name' => 'mtb'
 
-        response.size.should eq(1)
-        response.first["test"]["assays"].first["result"].should eq("positive")
+        expect(response.size).to eq(1)
+        expect(response.first["test"]["assays"].first["result"]).to eq("positive")
       end
 
       it "filters by test_id" do
@@ -79,8 +79,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
         response = get_updates 'test.id' => 2
 
-        response.size.should eq(1)
-        response.first["test"]["assays"].first["result"].should eq("positive")
+        expect(response.size).to eq(1)
+        expect(response.first["test"]["assays"].first["result"]).to eq("positive")
       end
 
       it "filters by test type" do
@@ -89,8 +89,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
         response = get_updates 'test.type' => :specimen
 
-        response.size.should eq(1)
-        response.first["test"]["assays"].first["result"].should eq("negative")
+        expect(response.size).to eq(1)
+        expect(response.first["test"]["assays"].first["result"]).to eq("negative")
       end
 
       it "filters for more than one value" do
@@ -102,9 +102,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           test["test"]["assays"].first["result"]
         end
 
-        response.size.should eq(2)
-        response.first["test"]["assays"].first["result"].should eq("negative")
-        response.last["test"]["assays"].first["result"].should eq("positive")
+        expect(response.size).to eq(2)
+        expect(response.first["test"]["assays"].first["result"]).to eq("negative")
+        expect(response.last["test"]["assays"].first["result"]).to eq("positive")
       end
     end
 
@@ -118,7 +118,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           test["patient.gender"]
         end
 
-        response.should eq([
+        expect(response).to eq([
           {"patient.gender"=>"female", "count"=>1},
           {"patient.gender"=>"male", "count"=>2}
         ])
@@ -136,7 +136,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           test["patient.gender"] + test["test.assays.result"]
         end
 
-        response.should eq([
+        expect(response).to eq([
           {"patient.gender"=>"female", "test.assays.result" => "negative", "count"=>1},
           {"patient.gender"=>"female", "test.assays.result" => "positive", "count"=>2},
           {"patient.gender"=>"male", "test.assays.result" => "negative", "count"=>2},
@@ -154,7 +154,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           test["patient.gender"]
         end
 
-        response.should eq([
+        expect(response).to eq([
           {"patient.gender"=>"female", "count"=>1},
           {"patient.gender"=>"male", "count"=>2}
         ])
@@ -162,10 +162,10 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       context "CSV" do
         def check_csv(r)
-          r.status.should eq(200)
-          r.content_type.should eq("text/csv")
-          r.headers["Content-Disposition"].should eq("attachment; filename=\"Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-          r.should render_template("api/events/index")
+          expect(r.status).to eq(200)
+          expect(r.content_type).to eq("text/csv")
+          expect(r.headers["Content-Disposition"]).to eq("attachment; filename=\"Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
+          expect(r).to render_template("api/events/index")
         end
 
         render_views
@@ -182,12 +182,12 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           response = get :index, "", format: 'csv', group_by: 'test.assays.result,test.error_code'
 
           check_csv response
-          response.body.should eq("test.assays.result,test.error_code,count\nnegative,1234,2\npositive,1234,1\n")
+          expect(response.body).to eq("test.assays.result,test.error_code,count\nnegative,1234,2\npositive,1234,1\n")
         end
 
         it "returns a csv with columns for a given grouping even when there are no assays" do
           get :index, "", format: 'csv', group_by: 'device.lab_user,test.error_code'
-          response.body.should eq("device.lab_user,test.error_code,count\n")
+          expect(response.body).to eq("device.lab_user,test.error_code,count\n")
         end
       end
     end
@@ -199,10 +199,10 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
         response = get_updates(order_by: "test.patient_age")
 
-        response[0]["test"]["assays"].first["result"].should eq("negative")
-        response[0]["test"]["patient_age"].should eq({"years" => 10})
-        response[1]["test"]["assays"].first["result"].should eq("positive")
-        response[1]["test"]["patient_age"].should eq({"years" => 20})
+        expect(response[0]["test"]["assays"].first["result"]).to eq("negative")
+        expect(response[0]["test"]["patient_age"]).to eq({"years" => 10})
+        expect(response[1]["test"]["assays"].first["result"]).to eq("positive")
+        expect(response[1]["test"]["patient_age"]).to eq({"years" => 20})
       end
     end
 
@@ -230,11 +230,11 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         refresh_index
 
         response = get :custom_fields, id: test["uuid"]
-        response.status.should eq(200)
+        expect(response.status).to eq(200)
         response = Oj.load response.body
 
-        response["custom_fields"]["test"]["foo"].should eq(1234)
-        response["uuid"].should eq(test["uuid"])
+        expect(response["custom_fields"]["test"]["foo"]).to eq(1234)
+        expect(response["uuid"]).to eq(test["uuid"])
       end
     end
 
@@ -270,11 +270,11 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         refresh_index
 
         response = get :pii, id: test["uuid"]
-        response.status.should eq(200)
+        expect(response.status).to eq(200)
         response = Oj.load response.body
 
-        response["pii"]["patient"]["name"].should eq("jdoe")
-        response["uuid"].should eq(test["uuid"])
+        expect(response["pii"]["patient"]["name"]).to eq("jdoe")
+        expect(response["uuid"]).to eq(test["uuid"])
       end
     end
 
@@ -282,13 +282,13 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
       it "should return test schema" do
         schema = double('schema')
-        schema.should_receive(:build).and_return('a schema definition')
-        TestsSchema.should_receive(:for).with('es-AR').and_return(schema)
+        expect(schema).to receive(:build).and_return('a schema definition')
+        expect(TestsSchema).to receive(:for).with('es-AR').and_return(schema)
 
         response = get :schema, locale: "es-AR", format: 'json'
 
         response_schema = Oj.load response.body
-        response_schema.should eq('a schema definition')
+        expect(response_schema).to eq('a schema definition')
       end
 
     end

@@ -88,7 +88,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
   let(:device_message) do
     device_message = DeviceMessage.new(device: device, plain_text_data: '{}')
-    device_message.stub(:parsed_messages).and_return([parsed_message(TEST_ID)])
+    allow(device_message).to receive(:parsed_messages).and_return([parsed_message(TEST_ID)])
     device_message.save!
     device_message
   end
@@ -96,79 +96,79 @@ describe DeviceMessageProcessor, elasticsearch: true do
   let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
 
   def assert_encounter_data(encounter)
-    encounter.plain_sensitive_data.should eq(ENCOUNTER_PII_FIELDS)
-    encounter.custom_fields.should eq(ENCOUNTER_CUSTOM_FIELDS)
+    expect(encounter.plain_sensitive_data).to eq(ENCOUNTER_PII_FIELDS)
+    expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS)
   end
 
   def assert_sample_data(sample)
-    sample.plain_sensitive_data.should eq(SAMPLE_PII_FIELDS)
-    sample.custom_fields.should eq(SAMPLE_CUSTOM_FIELDS)
-    sample.core_fields.should eq(SAMPLE_CORE_FIELDS)
+    expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS)
+    expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS)
+    expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS)
   end
 
   def assert_patient_data(patient)
-    patient.plain_sensitive_data.should eq(PATIENT_PII_FIELDS)
-    patient.custom_fields.should eq(PATIENT_CUSTOM_FIELDS)
-    patient.core_fields.should eq(PATIENT_CORE_FIELDS)
+    expect(patient.plain_sensitive_data).to eq(PATIENT_PII_FIELDS)
+    expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS)
+    expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS)
   end
 
   def assert_test_data(test)
-    test.plain_sensitive_data.should eq("start_time" => TEST_START_TIME)
-    test.custom_fields.should eq("raw_result" => TEST_RAW_RESULT, "concentration" => TEST_CONCENTRATION)
+    expect(test.plain_sensitive_data).to eq("start_time" => TEST_START_TIME)
+    expect(test.custom_fields).to eq("raw_result" => TEST_RAW_RESULT, "concentration" => TEST_CONCENTRATION)
   end
 
   it "should create a test result" do
     device_message_processor.process
 
-    TestResult.count.should eq(1)
+    expect(TestResult.count).to eq(1)
     test = TestResult.first
-    test.test_id.should eq(TEST_ID)
+    expect(test.test_id).to eq(TEST_ID)
     assert_test_data(test)
   end
 
   it "should create a sample" do
     device_message_processor.process
 
-    Sample.count.should eq(1)
+    expect(Sample.count).to eq(1)
     sample = Sample.first
-    sample.entity_uid_hash.should eq(MessageEncryption.hash SAMPLE_UID)
+    expect(sample.entity_uid_hash).to eq(MessageEncryption.hash SAMPLE_UID)
     assert_sample_data(sample)
   end
 
   it "should create an encounter" do
     device_message_processor.process
 
-    Encounter.count.should eq(1)
+    expect(Encounter.count).to eq(1)
     encounter = Encounter.first
-    encounter.entity_uid_hash.should eq(MessageEncryption.hash ENCOUNTER_ID)
+    expect(encounter.entity_uid_hash).to eq(MessageEncryption.hash ENCOUNTER_ID)
     assert_encounter_data(encounter)
   end
 
   it "should create a patient" do
     device_message_processor.process
 
-    Patient.count.should eq(1)
+    expect(Patient.count).to eq(1)
     patient = Patient.first
-    patient.entity_uid_hash.should eq(MessageEncryption.hash PATIENT_ID)
+    expect(patient.entity_uid_hash).to eq(MessageEncryption.hash PATIENT_ID)
     assert_patient_data(patient)
   end
 
   it "should not update existing tests on new sample" do
-    device_message_processor.client.should_receive(:bulk).never
+    expect(device_message_processor.client).to receive(:bulk).never
     device_message_processor.process
   end
 
   it "should create multiple test results with single sample" do
-    device_message.stub(:parsed_messages).and_return([parsed_message(TEST_ID), parsed_message(TEST_ID_2), parsed_message(TEST_ID_3)])
+    allow(device_message).to receive(:parsed_messages).and_return([parsed_message(TEST_ID), parsed_message(TEST_ID_2), parsed_message(TEST_ID_3)])
     device_message_processor.process
 
-    Sample.count.should eq(1)
+    expect(Sample.count).to eq(1)
 
-    TestResult.count.should eq(3)
-    TestResult.pluck(:test_id).should =~ [TEST_ID, TEST_ID_2, TEST_ID_3]
-    TestResult.pluck(:sample_id).should eq([Sample.first.id] * 3)
+    expect(TestResult.count).to eq(3)
+    expect(TestResult.pluck(:test_id)).to match_array([TEST_ID, TEST_ID_2, TEST_ID_3])
+    expect(TestResult.pluck(:sample_id)).to eq([Sample.first.id] * 3)
 
-    all_elasticsearch_tests.map {|e| e['_source']['sample']['uuid']}.should eq([Sample.first.uuid] * 3)
+    expect(all_elasticsearch_tests.map {|e| e['_source']['sample']['uuid']}).to eq([Sample.first.uuid] * 3)
   end
 
   it "should update sample data and existing test results on new test result" do
@@ -191,14 +191,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     device_message_processor.process
 
-    Sample.count.should eq(1)
-    Patient.count.should eq(1)
+    expect(Sample.count).to eq(1)
+    expect(Patient.count).to eq(1)
     sample = Sample.first
     assert_sample_data(sample)
     assert_patient_data(sample.patient)
 
     tests = all_elasticsearch_tests
-    tests.map { |test| test["_source"]["sample"]["type"] }.should eq([SAMPLE_TYPE] * 3)
+    expect(tests.map { |test| test["_source"]["sample"]["type"] }).to eq([SAMPLE_TYPE] * 3)
   end
 
   it "should update sample data and existing test results on test result update" do
@@ -220,14 +220,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     device_message_processor.process
 
-    Sample.count.should eq(1)
-    Patient.count.should eq(1)
+    expect(Sample.count).to eq(1)
+    expect(Patient.count).to eq(1)
     sample = Sample.first
     assert_sample_data(sample)
     assert_patient_data(sample.patient)
 
     tests = all_elasticsearch_tests
-    tests.map { |test| test["_source"]["sample"]["type"] }.should eq([SAMPLE_TYPE] * 2)
+    expect(tests.map { |test| test["_source"]["sample"]["type"] }).to eq([SAMPLE_TYPE] * 2)
   end
 
   it "should not update existing tests if sample data indexed fields did not change" do
@@ -247,11 +247,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     refresh_index
 
-    device_message_processor.client.should_receive(:bulk).never
+    expect(device_message_processor.client).to receive(:bulk).never
     device_message_processor.process
 
-    Sample.count.should eq(1)
-    Patient.count.should eq(1)
+    expect(Sample.count).to eq(1)
+    expect(Patient.count).to eq(1)
     sample = Sample.first
     assert_sample_data(sample)
     assert_patient_data(sample.patient)
@@ -267,12 +267,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
     )
     device_message_processor.process
 
-    Sample.count.should eq(2)
+    expect(Sample.count).to eq(2)
 
     sample = sample.reload
 
-    sample.plain_sensitive_data.should eq("uid" => SAMPLE_UID)
-    sample.core_fields.should eq(core_fields)
+    expect(sample.plain_sensitive_data).to eq("uid" => SAMPLE_UID)
+    expect(sample.core_fields).to eq(core_fields)
   end
 
   it "should update tests with the same test_id and different sample_uid" do
@@ -284,20 +284,20 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     device_message_processor.process
 
-    Sample.count.should eq(1)
+    expect(Sample.count).to eq(1)
 
     tests = all_elasticsearch_tests
-    tests.size.should eq(1)
+    expect(tests.size).to eq(1)
 
-    tests.first["_source"]["test"]["assay"].should eq("mtb")
-    tests.first["_source"]["sample"]["type"].should eq(SAMPLE_TYPE)
-    tests.first["_source"]["test"]["custom_fields"]["concentration"].should eq(TEST_CONCENTRATION)
+    expect(tests.first["_source"]["test"]["assay"]).to eq("mtb")
+    expect(tests.first["_source"]["sample"]["type"]).to eq(SAMPLE_TYPE)
+    expect(tests.first["_source"]["test"]["custom_fields"]["concentration"]).to eq(TEST_CONCENTRATION)
     # tests.first["_source"]["test"]["custom_fields"]["foo"].should eq("bar")
 
-    TestResult.count.should eq(1)
-    TestResult.first.sample_id.should eq(Sample.last.id)
+    expect(TestResult.count).to eq(1)
+    expect(TestResult.first.sample_id).to eq(Sample.last.id)
     # TestResult.first.custom_fields.should eq("raw_result" => TEST_RAW_RESULT)
-    TestResult.first.plain_sensitive_data.should eq("start_time" => TEST_START_TIME)
+    expect(TestResult.first.plain_sensitive_data).to eq("start_time" => TEST_START_TIME)
   end
 
   context 'sample, patient and encounter entities' do
@@ -306,22 +306,22 @@ describe DeviceMessageProcessor, elasticsearch: true do
         message = parsed_message(TEST_ID)
         message["sample"]["pii"].delete("uid")
         clear message, "patient", "encounter"
-        device_message.stub("parsed_messages").and_return([message])
+        allow(device_message).to receive("parsed_messages").and_return([message])
       end
 
       it 'should store sample data in test sample (without id) if test does not have a sample' do
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(1)
 
         test = TestResult.first
         sample = test.sample
-        sample.entity_uid.should be_nil
+        expect(sample.entity_uid).to be_nil
 
-        sample.plain_sensitive_data.should eq("id" => SAMPLE_ID)
-        sample.custom_fields.should eq(SAMPLE_CUSTOM_FIELDS)
-        sample.core_fields.should eq(SAMPLE_CORE_FIELDS)
+        expect(sample.plain_sensitive_data).to eq("id" => SAMPLE_ID)
+        expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS)
+        expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS)
       end
 
       it 'should merge sample if test has a sample' do
@@ -335,14 +335,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(1)
 
         sample = Sample.first
 
-        sample.plain_sensitive_data.should eq(SAMPLE_PII_FIELDS)
-        sample.custom_fields.should eq(SAMPLE_CUSTOM_FIELDS)
-        sample.core_fields.should eq(SAMPLE_CORE_FIELDS.merge("existing_field" => "a value"))
+        expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS)
+        expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS)
+        expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS.merge("existing_field" => "a value"))
       end
     end
 
@@ -350,7 +350,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       before :each do
         message = parsed_message(TEST_ID)
         clear message, "patient", "encounter"
-        device_message.stub("parsed_messages").and_return([message])
+        allow(device_message).to receive("parsed_messages").and_return([message])
       end
 
       it 'should extract existing data in sample and create the sample entity with id' do
@@ -370,17 +370,17 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(1)
         test = TestResult.first
         sample = test.sample
 
-        test.patient.should eq(patient)
-        sample.patient.should eq(patient)
+        expect(test.patient).to eq(patient)
+        expect(sample.patient).to eq(patient)
 
-        sample.plain_sensitive_data.should eq(SAMPLE_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
-        sample.custom_fields.should eq(SAMPLE_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
-        sample.core_fields.should eq(SAMPLE_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
+        expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should extract existing data in patient and create the patient entity with id' do
@@ -397,14 +397,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Patient.count).to eq(1)
         test = TestResult.first
         patient = test.patient
 
-        patient.plain_sensitive_data.should eq("existing_pii_field" => "existing_pii_field_value")
-        patient.custom_fields.should eq("existing_custom_field" => "existing_custom_field_value")
-        patient.core_fields.should eq("existing_indexed_field" => "existing_indexed_field_value")
+        expect(patient.plain_sensitive_data).to eq("existing_pii_field" => "existing_pii_field_value")
+        expect(patient.custom_fields).to eq("existing_custom_field" => "existing_custom_field_value")
+        expect(patient.core_fields).to eq("existing_indexed_field" => "existing_indexed_field_value")
       end
 
       it 'should merge sample with existing sample if sample uid matches' do
@@ -420,14 +420,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(1)
 
         sample = TestResult.first.sample
 
-        sample.plain_sensitive_data.should eq(SAMPLE_PII_FIELDS)
-        sample.custom_fields.should eq(SAMPLE_CUSTOM_FIELDS)
-        sample.core_fields.should eq(SAMPLE_CORE_FIELDS.merge("existing_field" => "a value"))
+        expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS)
+        expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS)
+        expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS.merge("existing_field" => "a value"))
       end
 
       it 'should create a new sample if the existing sample has a different sample uid' do
@@ -440,8 +440,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(2)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(2)
 
         sample = TestResult.first.sample
         assert_sample_data sample
@@ -459,8 +459,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test_2 = TestResult.find_by(test_id: TEST_ID)
 
-        test_1.reload.sample.entity_uid.should eq('def9772')
-        test_2.reload.sample.entity_uid.should eq(SAMPLE_UID)
+        expect(test_1.reload.sample.entity_uid).to eq('def9772')
+        expect(test_2.reload.sample.entity_uid).to eq(SAMPLE_UID)
       end
 
       it "should assign existing sample's patient to the test" do
@@ -476,12 +476,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(1)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(1)
+        expect(Patient.count).to eq(1)
 
         test = TestResult.first
-        test.patient.should eq(test.sample.patient)
+        expect(test.patient).to eq(test.sample.patient)
       end
     end
 
@@ -490,7 +490,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
         message = parsed_message(TEST_ID)
         message["patient"]["pii"].delete("id")
         clear message, "sample", "encounter"
-        device_message.stub("parsed_messages").and_return([message])
+        allow(device_message).to receive("parsed_messages").and_return([message])
       end
 
       it 'should merge patient into test patient if test has patient but not sample' do
@@ -504,15 +504,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(0)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(0)
+        expect(Patient.count).to eq(1)
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data.should eq(PATIENT_PII_FIELDS)
-        patient.custom_fields.should eq(PATIENT_CUSTOM_FIELDS)
-        patient.core_fields.should eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
+        expect(patient.plain_sensitive_data).to eq(PATIENT_PII_FIELDS)
+        expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS)
+        expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should merge patient into sample patient if sample has patient' do
@@ -531,30 +531,30 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(1)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(1)
+        expect(Patient.count).to eq(1)
 
         patient = TestResult.first.sample.patient
 
-        patient.plain_sensitive_data.should eq(PATIENT_PII_FIELDS)
-        patient.custom_fields.should eq(PATIENT_CUSTOM_FIELDS)
-        patient.core_fields.should eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
+        expect(patient.plain_sensitive_data).to eq(PATIENT_PII_FIELDS)
+        expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS)
+        expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should store patient data in patient without id if test does not have a sample or patient' do
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(0)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(0)
+        expect(Patient.count).to eq(1)
 
         test = TestResult.first
 
-        test.patient.entity_uid.should be_nil
-        test.patient.plain_sensitive_data.should eq("dob" => PATIENT_DOB)
-        test.patient.custom_fields.should eq(PATIENT_CUSTOM_FIELDS)
-        test.patient.core_fields.should eq(PATIENT_CORE_FIELDS)
+        expect(test.patient.entity_uid).to be_nil
+        expect(test.patient.plain_sensitive_data).to eq("dob" => PATIENT_DOB)
+        expect(test.patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS)
+        expect(test.patient.core_fields).to eq(PATIENT_CORE_FIELDS)
       end
 
       it 'should store patient data in patient if sample is present but doest not have a patient' do
@@ -567,15 +567,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(1)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(1)
+        expect(Patient.count).to eq(1)
 
         patient = TestResult.first.sample.patient
 
-        patient.plain_sensitive_data.should eq("dob" => PATIENT_DOB)
-        patient.custom_fields.should eq(PATIENT_CUSTOM_FIELDS)
-        patient.core_fields.should eq(PATIENT_CORE_FIELDS)
+        expect(patient.plain_sensitive_data).to eq("dob" => PATIENT_DOB)
+        expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS)
+        expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS)
       end
     end
 
@@ -583,7 +583,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       before :each do
         message = parsed_message(TEST_ID)
         clear message, "sample", "encounter"
-        device_message.stub("parsed_messages").and_return([message])
+        allow(device_message).to receive("parsed_messages").and_return([message])
       end
 
       it 'should extract existing data in test and create the patient entity' do
@@ -599,15 +599,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(0)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(0)
+        expect(Patient.count).to eq(1)
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data.should eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
-        patient.custom_fields.should eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
-        patient.core_fields.should eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
+        expect(patient.plain_sensitive_data).to eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should extract existing data in patient and create the patient entity' do
@@ -627,15 +627,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(1)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(1)
+        expect(Patient.count).to eq(1)
 
         patient = TestResult.first.sample.patient
 
-        patient.plain_sensitive_data.should eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
-        patient.custom_fields.should eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
-        patient.core_fields.should eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
+        expect(patient.plain_sensitive_data).to eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should merge patient with existing patient if patient id matches' do
@@ -650,15 +650,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(0)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(0)
+        expect(Patient.count).to eq(1)
 
         patient = TestResult.first.patient
 
-        patient.plain_sensitive_data.should eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
-        patient.custom_fields.should eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
-        patient.core_fields.should eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
+        expect(patient.plain_sensitive_data).to eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it 'should create a new patient if the existing patient has a differente patient id' do
@@ -671,9 +671,9 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(0)
-        Patient.count.should eq(2)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(0)
+        expect(Patient.count).to eq(2)
 
         patient = TestResult.first.patient
         assert_patient_data(patient)
@@ -691,8 +691,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test_2 = TestResult.find_by(test_id: TEST_ID)
 
-        test_1.reload.patient.entity_uid.should eq('9000')
-        test_2.patient.entity_uid.should eq(PATIENT_ID)
+        expect(test_1.reload.patient.entity_uid).to eq('9000')
+        expect(test_2.patient.entity_uid).to eq(PATIENT_ID)
       end
 
       it 'should create patient and store reference in test and sample' do
@@ -700,13 +700,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(1)
-        Patient.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(1)
+        expect(Patient.count).to eq(1)
 
         test = TestResult.first
 
-        test.patient.should eq(test.sample.patient)
+        expect(test.patient).to eq(test.sample.patient)
       end
     end
 
@@ -715,18 +715,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
         message = parsed_message(TEST_ID)
         message["encounter"]["pii"].delete("id")
         clear message, "patient", "sample"
-        device_message.stub("parsed_messages").and_return([message])
+        allow(device_message).to receive("parsed_messages").and_return([message])
       end
 
       it 'should store encounter data in entity without id if test does not have an encounter' do
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Encounter.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Encounter.count).to eq(1)
 
         encounter = TestResult.first.encounter
-        encounter.entity_uid.should be_nil
-        encounter.custom_fields.should eq(ENCOUNTER_CUSTOM_FIELDS)
+        expect(encounter.entity_uid).to be_nil
+        expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS)
       end
 
       it 'should merge encounter if test has an encounter' do
@@ -740,13 +740,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Encounter.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Encounter.count).to eq(1)
 
         encounter = Encounter.first
 
-        encounter.plain_sensitive_data.should eq(ENCOUNTER_PII_FIELDS)
-        encounter.custom_fields.should eq(ENCOUNTER_CUSTOM_FIELDS.merge("existing_field" => "a value"))
+        expect(encounter.plain_sensitive_data).to eq(ENCOUNTER_PII_FIELDS)
+        expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS.merge("existing_field" => "a value"))
       end
     end
 
@@ -754,7 +754,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       before :each do
         message = parsed_message(TEST_ID)
         clear message, "patient", "sample"
-        device_message.stub("parsed_messages").and_return([message])
+        allow(device_message).to receive("parsed_messages").and_return([message])
       end
 
       it 'should extract existing data in encounter and create the encounter entity' do
@@ -769,15 +769,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        TestResult.count.should eq(1)
-        Sample.count.should eq(0)
-        Patient.count.should eq(0)
-        Encounter.count.should eq(1)
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(0)
+        expect(Patient.count).to eq(0)
+        expect(Encounter.count).to eq(1)
 
         encounter = TestResult.first.encounter
 
-        encounter.plain_sensitive_data.should eq(ENCOUNTER_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
-        encounter.custom_fields.should eq(ENCOUNTER_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        expect(encounter.plain_sensitive_data).to eq(ENCOUNTER_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
       end
 
       it "should update encounter if encounter_id changes" do
@@ -790,11 +790,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         device_message_processor.process
 
-        Encounter.count.should eq(2)
+        expect(Encounter.count).to eq(2)
 
         encounter = Encounter.first
         encounter2 = TestResult.first.encounter
-        encounter.should_not eq(encounter2)
+        expect(encounter).not_to eq(encounter2)
       end
     end
   end

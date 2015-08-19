@@ -7,6 +7,6 @@ describe FiltersController do
 
   it "list filters" do
     get :index, format: :json
-    response.body.should eq([filter].to_json)
+    expect(response.body).to eq([filter].to_json)
   end
 end

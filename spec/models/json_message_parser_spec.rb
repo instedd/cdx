@@ -9,9 +9,9 @@ describe JsonMessageParser do
       "other_key" => "other value"
     }
 
-    parser.lookup("a_key", data).should eq("it's value")
-    parser.lookup("other_key", data).should eq("other value")
-    parser.lookup("inexistent_key", data).should be_nil
+    expect(parser.lookup("a_key", data)).to eq("it's value")
+    expect(parser.lookup("other_key", data)).to eq("other value")
+    expect(parser.lookup("inexistent_key", data)).to be_nil
   end
 
   it "looks up a nested element" do
@@ -23,12 +23,11 @@ describe JsonMessageParser do
       }
     }
 
-    parser.lookup("nested_object.first_key", data).should eq("first value")
-    parser.lookup("nested_object.second_key", data).should eq("second value")
-    parser.lookup("nested_object.inexistent_key", data).should be_nil
-    pending do
-      expect { parser.lookup("inexistent_key.inexistent_key", data) }.to raise_error
-    end
+    expect(parser.lookup("nested_object.first_key", data)).to eq("first value")
+    expect(parser.lookup("nested_object.second_key", data)).to eq("second value")
+    expect(parser.lookup("nested_object.inexistent_key", data)).to be_nil
+    pending
+    expect { parser.lookup("inexistent_key.inexistent_key", data) }.to raise_error
   end
 
   it "looks up a nested element" do
@@ -40,12 +39,11 @@ describe JsonMessageParser do
       }
     }
 
-    parser.lookup("nested_object.first_key", data).should eq("first value")
-    parser.lookup("nested_object.second_key", data).should eq("second value")
-    parser.lookup("nested_object.inexistent_key", data).should be_nil
-    pending do
-      expect { parser.lookup("inexistent_key.inexistent_key", data) }.to raise_error
-    end
+    expect(parser.lookup("nested_object.first_key", data)).to eq("first value")
+    expect(parser.lookup("nested_object.second_key", data)).to eq("second value")
+    expect(parser.lookup("nested_object.inexistent_key", data)).to be_nil
+    pending
+    expect { parser.lookup("inexistent_key.inexistent_key", data) }.to raise_error
   end
 
   it "looks up the root element" do
@@ -57,14 +55,14 @@ describe JsonMessageParser do
       }
     }
 
-    parser.lookup("nested_object.first_key", data, data).should eq("first value")
-    parser.lookup("first_key", data["nested_object"], data).should eq("first value")
-    parser.lookup("$.nested_object.first_key", data["nested_object"], data).should eq("first value")
+    expect(parser.lookup("nested_object.first_key", data, data)).to eq("first value")
+    expect(parser.lookup("first_key", data["nested_object"], data)).to eq("first value")
+    expect(parser.lookup("$.nested_object.first_key", data["nested_object"], data)).to eq("first value")
 
-    parser.lookup("a_key", data, data).should eq("it's value")
-    parser.lookup("nested_object.a_key", data, data).should be_nil
-    parser.lookup("a_key", data["nested_object"], data).should be_nil
-    parser.lookup("$.a_key", data["nested_object"], data).should eq("it's value")
+    expect(parser.lookup("a_key", data, data)).to eq("it's value")
+    expect(parser.lookup("nested_object.a_key", data, data)).to be_nil
+    expect(parser.lookup("a_key", data["nested_object"], data)).to be_nil
+    expect(parser.lookup("$.a_key", data["nested_object"], data)).to eq("it's value")
   end
 
   it "parses using a root path" do
@@ -81,7 +79,7 @@ describe JsonMessageParser do
     }
 
     parsed_data = parser.load(Oj.dump(data), 'children')
-    parsed_data.should eq(data['children'])
+    expect(parsed_data).to eq(data['children'])
   end
 
 end

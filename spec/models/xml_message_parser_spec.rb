@@ -34,29 +34,29 @@ describe XmlMessageParser do
 
   it 'should return root as data' do
     data = parser.load(xml)
-    data.size.should eq(1)
-    data.map(&:name).should eq(['Message'])
+    expect(data.size).to eq(1)
+    expect(data.map(&:name)).to eq(['Message'])
   end
 
   it 'should return root using a root path' do
     data = parser.load(xml_with_children, 'Messages')
-    data.size.should eq(2)
-    data.map(&:name).should eq(['Message'] * 2)
+    expect(data.size).to eq(2)
+    expect(data.map(&:name)).to eq(['Message'] * 2)
   end
 
   it 'should query attributes' do
     data = parser.load(xml).first
-    parser.lookup("Patient/@name", data).should eq('Socrates')
+    expect(parser.lookup("Patient/@name", data)).to eq('Socrates')
   end
 
   it 'should query text inside element' do
     data = parser.load(xml).first
-    parser.lookup("SampleId/text()", data).should eq('123')
+    expect(parser.lookup("SampleId/text()", data)).to eq('123')
   end
 
   it 'should query multiple results' do
     data = parser.load(xml).first
-    parser.lookup("Result/text()", data).should eq(['FLU', 'H1N1'])
+    expect(parser.lookup("Result/text()", data)).to eq(['FLU', 'H1N1'])
   end
 
   let(:complex_xml) do
@@ -86,10 +86,10 @@ describe XmlMessageParser do
   it 'should lookup from the root element' do
     root = parser.load(complex_xml, 'Messages')
     data = root.first.xpath('Result[2]')
-    parser.lookup("Name/text()", data, root.first).should eq('H1N1')
+    expect(parser.lookup("Name/text()", data, root.first)).to eq('H1N1')
     # TODO: We shouldn't need the `..` here, but we're assuming there's always
     # a root element with elements inside
-    parser.lookup("/../ManufacturerId/text()", data, root.first).should eq('AcmeInc')
+    expect(parser.lookup("/../ManufacturerId/text()", data, root.first)).to eq('AcmeInc')
   end
 
 end

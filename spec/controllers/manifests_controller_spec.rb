@@ -10,9 +10,9 @@ describe ManifestsController do
       json = {"definition" => %{
         { , , }
       } }
-      Manifest.count.should eq(0)
+      expect(Manifest.count).to eq(0)
       post :create, manifest: json
-      Manifest.count.should eq(0)
+      expect(Manifest.count).to eq(0)
     end
 
     it "should create if is a valid manifest" do
@@ -37,9 +37,9 @@ describe ManifestsController do
           }
         }
       }}}
-      Manifest.count.should eq(0)
+      expect(Manifest.count).to eq(0)
       post :create, manifest: json
-      Manifest.count.should eq(1)
+      expect(Manifest.count).to eq(1)
     end
   end
 end

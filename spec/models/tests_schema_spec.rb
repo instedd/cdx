@@ -20,15 +20,15 @@ describe TestsSchema do
 
     sample_scope = Cdx::Scope.new('sample', sample_fields)
     patient_scope = Cdx::Scope.new('patient', patient_fields)
-    Cdx.stub(:core_field_scopes).and_return([sample_scope, patient_scope])
+    allow(Cdx).to receive(:core_field_scopes).and_return([sample_scope, patient_scope])
 
     schema = TestsSchema.new("es-AR").build
 
-    schema["$schema"].should eq("http://json-schema.org/draft-04/schema#")
-    schema["type"].should eq("object")
-    schema["title"].should eq("es-AR")
+    expect(schema["$schema"]).to eq("http://json-schema.org/draft-04/schema#")
+    expect(schema["type"]).to eq("object")
+    expect(schema["title"]).to eq("es-AR")
 
-    schema["properties"]["sample"].should eq({
+    expect(schema["properties"]["sample"]).to eq({
       "type" => "object",
       "title" => "Sample",
       "properties" => {
@@ -40,7 +40,7 @@ describe TestsSchema do
       }
     })
 
-    schema["properties"]["patient"].should eq({
+    expect(schema["properties"]["patient"]).to eq({
       "type" => "object",
       "title" => "Patient",
       "properties" => {
@@ -70,11 +70,11 @@ describe TestsSchema do
     }
 
     location_scope = Cdx::Scope.new('location', location_fields)
-    Cdx.stub(:core_field_scopes).and_return([location_scope])
+    allow(Cdx).to receive(:core_field_scopes).and_return([location_scope])
 
     schema = TestsSchema.new("es-AR").build
 
-    schema["properties"]["location"]["location-service"].should eq({
+    expect(schema["properties"]["location"]["location-service"]).to eq({
       "url" => Settings.location_service_url,
       "set" => Settings.location_service_set
     })
@@ -86,7 +86,7 @@ describe TestsSchema do
     schema = TestsSchema.new("es-AR").build
 
     condition_field = schema["properties"]["test"]["properties"]["assays"]["items"]["properties"]["condition"]
-    condition_field["enum"].should eq(["bar", "foo"])
+    expect(condition_field["enum"]).to eq(["bar", "foo"])
   end
 
 end

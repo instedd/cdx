@@ -6,12 +6,12 @@ describe InstitutionsController do
 
   it "institution is created if name is provided" do
     post :create, {"institution" => {"name" => "foo"}}
-    Institution.count.should eq(1)
+    expect(Institution.count).to eq(1)
   end
 
   it "institutions without name are not created" do
     post :create, {"institution" => {"name" => ""}}
-    Institution.count.should eq(0)
+    expect(Institution.count).to eq(0)
   end
 
 end

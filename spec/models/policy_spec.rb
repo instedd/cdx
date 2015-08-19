@@ -96,8 +96,8 @@ describe Policy do
         can = Policy.can? READ_INSTITUTION, Institution, user2
         institutions = Policy.authorize READ_INSTITUTION, Institution, user2
 
-        can.should eq(true)
-        institutions.should eq([])
+        expect(can).to eq(true)
+        expect(institutions).to eq([])
       end
 
       it "disallows read all institution if granter doesn't have a permission for it" do
@@ -119,8 +119,8 @@ describe Policy do
         can = Policy.can? READ_INSTITUTION, Institution, user
         institutions = Policy.authorize READ_INSTITUTION, Institution, user
 
-        can.should eq(true)
-        institutions.should eq([])
+        expect(can).to eq(true)
+        expect(institutions).to eq([])
       end
 
       it "disallows delegable" do
@@ -159,14 +159,14 @@ describe Policy do
         policy.definition = policy_definition(institution, READ_INSTITUTION, false)
         policy.granter_id = user2.id
         policy.user_id = user3.id
-        policy.save.should eq(false)
+        expect(policy.save).to eq(false)
 
         action = Policy::READ_INSTITUTION
         resource = institution
         policies = [policy]
 
         result = Policy.can? action, resource, user3, policies
-        result.should eq(false)
+        expect(result).to eq(false)
       end
 
       it "disallows policy creation if self-granted" do
@@ -174,7 +174,7 @@ describe Policy do
         policy.definition = policy_definition(institution, READ_INSTITUTION, false)
         policy.granter_id = user.id
         policy.user_id = user.id
-        policy.save.should eq(false)
+        expect(policy.save).to eq(false)
       end
 
       it "disallows policy creation if granter is nil" do
@@ -182,7 +182,7 @@ describe Policy do
         policy.definition = policy_definition(institution, READ_INSTITUTION, false)
         policy.granter_id = nil
         policy.user_id = user.id
-        policy.save.should eq(false)
+        expect(policy.save).to eq(false)
       end
 
       it "allows checking when there's a loop" do
@@ -596,7 +596,7 @@ describe Policy do
 
       [Institution, Laboratory, Device].each do |resource|
         it "allows a user to query tests of it's own #{resource}" do
-          Policy.authorize(QUERY_TEST, resource, user).should eq(resource.all)
+          expect(Policy.authorize(QUERY_TEST, resource, user)).to eq(resource.all)
         end
       end
     end
@@ -609,7 +609,7 @@ describe Policy do
 
       [Institution, Laboratory, Device].each do |resource|
         it "forbids a user to query tests of other user's #{resource}" do
-          Policy.authorize(QUERY_TEST, resource, user).should eq([])
+          expect(Policy.authorize(QUERY_TEST, resource, user)).to eq([])
         end
       end
     end

@@ -16,7 +16,7 @@ describe Api::LaboratoriesController do
       end
 
       result = get :index, format: 'json'
-      Oj.load(result.body).should eq({'total_count' => 3, 'laboratories' => lab_ids})
+      expect(Oj.load(result.body)).to eq({'total_count' => 3, 'laboratories' => lab_ids})
     end
 
     it "should list the laboratories for a given institution" do
@@ -29,15 +29,15 @@ describe Api::LaboratoriesController do
       Laboratory.make institution: (Institution.make user: user)
 
       get :index, institution_id: institution.id, format: 'json'
-      Oj.load(response.body).should eq({'total_count' => 3, 'laboratories' => lab_ids})
+      expect(Oj.load(response.body)).to eq({'total_count' => 3, 'laboratories' => lab_ids})
     end
 
     context 'CSV' do
       def check_laboratories_csv(r)
-        r.status.should eq(200)
-        r.content_type.should eq("text/csv")
-        r.headers["Content-Disposition"].should eq("attachment; filename=\"Laboratories-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-        r.should render_template("api/laboratories/index")
+        expect(r.status).to eq(200)
+        expect(r.content_type).to eq("text/csv")
+        expect(r.headers["Content-Disposition"]).to eq("attachment; filename=\"Laboratories-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
+        expect(r).to render_template("api/laboratories/index")
       end
 
       let(:institution) { Institution.make user: user }
@@ -54,7 +54,7 @@ describe Api::LaboratoriesController do
         get :index, format: 'csv'
 
         check_laboratories_csv response
-        response.body.should eq("id,name,location\n#{lab.id},#{lab.name},#{lab.location_geoid}\n")
+        expect(response.body).to eq("id,name,location\n#{lab.id},#{lab.name},#{lab.location_geoid}\n")
       end
 
       it "renders column names even when there are no laboratories to render" do
@@ -63,7 +63,7 @@ describe Api::LaboratoriesController do
         get :index, format: 'csv'
 
         check_laboratories_csv response
-        response.body.should eq("id,name,location\n")
+        expect(response.body).to eq("id,name,location\n")
       end
     end
   end

@@ -68,28 +68,28 @@ describe DeviceMessageImporter, elasticsearch: true do
       expect(DeviceMessage.first.index_failure_reason).to be_nil
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
-      test["error_code"].should eq(0)
-      test["assays"].first["result"].should eq("positive")
+      expect(test["error_code"]).to eq(0)
+      expect(test["assays"].first["result"]).to eq("positive")
       test = tests.last["_source"]["test"]
-      test["error_code"].should eq(1)
-      test["assays"].first["result"].should eq("negative")
+      expect(test["error_code"]).to eq(1)
+      expect(test["assays"].first["result"]).to eq("negative")
     end
 
     it 'parses a csv in utf 16' do
       manifest
 
       write_file(%{error_code;result\r\n0;positivo\r\n1;inválido\r\n}, 'csv', nil, 'UTF-16LE')
-      CharDet.stub(:detect).and_return('encoding' => 'UTF-16LE', 'confidence' => 1.0)
+      allow(CharDet).to receive(:detect).and_return('encoding' => 'UTF-16LE', 'confidence' => 1.0)
       DeviceMessageImporter.new.import_from sync_dir
 
       expect(DeviceMessage.first.index_failure_reason).to be_nil
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
-      test["error_code"].should eq(0)
-      test["assays"].first["result"].should eq("positive")
+      expect(test["error_code"]).to eq(0)
+      expect(test["assays"].first["result"]).to eq("positive")
       test = tests.last["_source"]["test"]
-      test["error_code"].should eq(1)
-      test["assays"].first["result"].should eq("n/a")
+      expect(test["error_code"]).to eq(1)
+      expect(test["assays"].first["result"]).to eq("n/a")
     end
   end
 
@@ -105,11 +105,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       expect(DeviceMessage.first.index_failure_reason).to be_nil
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
-      test["error_code"].should eq(0)
-      test["assays"].first["result"].should eq("positive")
+      expect(test["error_code"]).to eq(0)
+      expect(test["assays"].first["result"]).to eq("positive")
       test = tests.last["_source"]["test"]
-      test["error_code"].should eq(1)
-      test["assays"].first["result"].should eq("negative")
+      expect(test["error_code"]).to eq(1)
+      expect(test["assays"].first["result"]).to eq("negative")
     end
 
     it 'parses a json from sync dir registering multiple extensions' do
@@ -120,11 +120,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       expect(DeviceMessage.first.index_failure_reason).to be_nil
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
-      test["error_code"].should eq(0)
-      test["assays"].first["result"].should eq("positive")
+      expect(test["error_code"]).to eq(0)
+      expect(test["assays"].first["result"]).to eq("positive")
       test = tests.last["_source"]["test"]
-      test["error_code"].should eq(1)
-      test["assays"].first["result"].should eq("negative")
+      expect(test["error_code"]).to eq(1)
+      expect(test["assays"].first["result"]).to eq("negative")
     end
 
     it 'parses a json from sync dir registering multiple extensions using import single' do
@@ -135,11 +135,11 @@ describe DeviceMessageImporter, elasticsearch: true do
       expect(DeviceMessage.first.index_failure_reason).to be_nil
       tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
       test = tests.first["_source"]["test"]
-      test["error_code"].should eq(0)
-      test["assays"].first["result"].should eq("positive")
+      expect(test["error_code"]).to eq(0)
+      expect(test["assays"].first["result"]).to eq("positive")
       test = tests.last["_source"]["test"]
-      test["error_code"].should eq(1)
-      test["assays"].first["result"].should eq("negative")
+      expect(test["error_code"]).to eq(1)
+      expect(test["assays"].first["result"]).to eq("negative")
     end
   end
 
@@ -172,7 +172,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests
         expect(tests.size).to eq(18)
-        tests.map{|e| e['_source']['test']['start_time']}.should =~ ['2014-09-09T17:07:32.000Z', '2014-10-28T13:00:58.000Z', '2014-10-28T17:24:34.000Z', '2015-02-10T18:10:28.000Z', '2015-03-03T19:27:36.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:34:08.000Z', '2015-03-31T18:34:08.000Z', '2015-03-31T18:34:08.000Z', '2015-03-31T18:34:08.000Z', '2014-11-05T08:38:30.000Z', '2014-10-29T12:24:59.000Z', '2014-10-29T12:24:59.000Z', '2014-10-29T12:24:59.000Z', '2014-10-29T12:24:59.000Z']
+        expect(tests.map{|e| e['_source']['test']['start_time']}).to match_array(['2014-09-09T17:07:32.000Z', '2014-10-28T13:00:58.000Z', '2014-10-28T17:24:34.000Z', '2015-02-10T18:10:28.000Z', '2015-03-03T19:27:36.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:35:19.000Z', '2015-03-31T18:34:08.000Z', '2015-03-31T18:34:08.000Z', '2015-03-31T18:34:08.000Z', '2015-03-31T18:34:08.000Z', '2014-11-05T08:38:30.000Z', '2014-10-29T12:24:59.000Z', '2014-10-29T12:24:59.000Z', '2014-10-29T12:24:59.000Z', '2014-10-29T12:24:59.000Z'])
       end
     end
 
@@ -187,7 +187,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests
         expect(tests.size).to eq(1)
-        tests.first['_source']['test']['start_time'].should eq('2015-04-07T18:31:20-05:00')
+        expect(tests.first['_source']['test']['start_time']).to eq('2015-04-07T18:31:20-05:00')
       end
     end
 
@@ -206,32 +206,32 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(tests.size).to eq(13)
 
         test = tests[0]["_source"]["test"]
-        test["assays"][0]["name"].should eq("mtb")
-        test["assays"][0]["result"].should eq("negative")
-        test["assays"][1]["name"].should eq("rif")
-        test["assays"][1]["result"].should eq("negative")
-        test["assays"][2]["name"].should eq("inh")
-        test["assays"][2]["result"].should eq("negative")
+        expect(test["assays"][0]["name"]).to eq("mtb")
+        expect(test["assays"][0]["result"]).to eq("negative")
+        expect(test["assays"][1]["name"]).to eq("rif")
+        expect(test["assays"][1]["result"]).to eq("negative")
+        expect(test["assays"][2]["name"]).to eq("inh")
+        expect(test["assays"][2]["result"]).to eq("negative")
 
         test = tests[1]["_source"]["test"]
-        test["assays"][0]["name"].should eq("mtb")
-        test["assays"][0]["result"].should eq("positive")
-        test["assays"][1]["name"].should eq("rif")
-        test["assays"][1]["result"].should eq("negative")
-        test["assays"][2]["name"].should eq("inh")
-        test["assays"][2]["result"].should eq("negative")
+        expect(test["assays"][0]["name"]).to eq("mtb")
+        expect(test["assays"][0]["result"]).to eq("positive")
+        expect(test["assays"][1]["name"]).to eq("rif")
+        expect(test["assays"][1]["result"]).to eq("negative")
+        expect(test["assays"][2]["name"]).to eq("inh")
+        expect(test["assays"][2]["result"]).to eq("negative")
 
         test = tests.last["_source"]["test"]
-        test["assays"][0]["name"].should eq("mtb")
-        test["assays"][0]["result"].should eq("positive")
-        test["assays"][1]["name"].should eq("rif")
-        test["assays"][1]["result"].should eq("positive")
-        test["assays"][2]["name"].should eq("inh")
-        test["assays"][2]["result"].should eq("positive")
+        expect(test["assays"][0]["name"]).to eq("mtb")
+        expect(test["assays"][0]["result"]).to eq("positive")
+        expect(test["assays"][1]["name"]).to eq("rif")
+        expect(test["assays"][1]["result"]).to eq("positive")
+        expect(test["assays"][2]["name"]).to eq("inh")
+        expect(test["assays"][2]["result"]).to eq("positive")
 
         dbtests = TestResult.all
         expect(dbtests.size).to eq(13)
-        dbtests.map(&:uuid).should =~ tests.map {|e| e['_source']['test']['uuid']}
+        expect(dbtests.map(&:uuid)).to match_array(tests.map {|e| e['_source']['test']['uuid']})
       end
     end
 
@@ -249,26 +249,26 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         test = tests.first['_source']
 
-        test['test']['id'].should eq('12345678901234567890')
-        test['patient']['gender'].should eq('female')
-        test['test']['patient_age'].should eq({"years" => 25})
-        test['patient']['custom_fields']['pregnancy_status'].should eq('Not Pregnant')
-        test['sample']['id'].should eq('0987654321')
-        test['test']['start_time'].should  eq('2015-05-18T12:34:56+05:00')
-        test['test']['name'].should eq('SD_MALPFPV_02_02')
-        test['test']['status'].should eq('success')
+        expect(test['test']['id']).to eq('12345678901234567890')
+        expect(test['patient']['gender']).to eq('female')
+        expect(test['test']['patient_age']).to eq({"years" => 25})
+        expect(test['patient']['custom_fields']['pregnancy_status']).to eq('Not Pregnant')
+        expect(test['sample']['id']).to eq('0987654321')
+        expect(test['test']['start_time']).to  eq('2015-05-18T12:34:56+05:00')
+        expect(test['test']['name']).to eq('SD_MALPFPV_02_02')
+        expect(test['test']['status']).to eq('success')
 
         assays = test['test']['assays']
-        assays.size.should eq(2)
-        assays.first['result'].should eq('positive')
-        assays.first['name'].should eq('HRPII')
-        assays.second['result'].should eq('negative')
-        assays.second['name'].should eq('pLDH')
+        expect(assays.size).to eq(2)
+        expect(assays.first['result']).to eq('positive')
+        expect(assays.first['name']).to eq('HRPII')
+        expect(assays.second['result']).to eq('negative')
+        expect(assays.second['name']).to eq('pLDH')
 
-        TestResult.count.should eq(1)
+        expect(TestResult.count).to eq(1)
         db_test = TestResult.first
-        db_test.uuid.should eq(test['test']['uuid'])
-        db_test.test_id.should eq('12345678901234567890')
+        expect(db_test.uuid).to eq(test['test']['uuid'])
+        expect(db_test.test_id).to eq('12345678901234567890')
       end
     end
   end

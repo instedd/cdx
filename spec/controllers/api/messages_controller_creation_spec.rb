@@ -15,7 +15,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
   def get_updates(options, body="")
     refresh_index
     response = get :index, body, options.merge(format: 'json')
-    response.status.should eq(200)
+    expect(response.status).to eq(200)
     Oj.load(response.body)["tests"]
   end
 
@@ -23,100 +23,100 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
     it "should create message in the database" do
       response = post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
-      response.status.should eq(200)
+      expect(response.status).to eq(200)
 
       message = DeviceMessage.first
-      message.device_id.should eq(device.id)
-      message.raw_data.should_not eq(data)
-      message.plain_text_data.should eq(data)
+      expect(message.device_id).to eq(device.id)
+      expect(message.raw_data).not_to eq(data)
+      expect(message.plain_text_data).to eq(data)
     end
 
     it "should create test in elasticsearch" do
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["test"]["assays"].first["result"].should eq("positive")
-      test["test"]["reported_time"].should_not eq(nil)
-      test["device"]["uuid"].should eq(device.uuid)
-      TestResult.first.uuid.should eq(test["test"]["uuid"])
+      expect(test["test"]["assays"].first["result"]).to eq("positive")
+      expect(test["test"]["reported_time"]).not_to eq(nil)
+      expect(test["device"]["uuid"]).to eq(device.uuid)
+      expect(TestResult.first.uuid).to eq(test["test"]["uuid"])
     end
 
     it "should create multiple tests in the database" do
       response = post :create, datas, device_id: device.uuid, authentication_token: device.plain_secret_key
-      response.status.should eq(200)
+      expect(response.status).to eq(200)
 
       message = DeviceMessage.first
-      message.device_id.should eq(device.id)
-      message.raw_data.should_not eq(datas)
-      message.plain_text_data.should eq(datas)
+      expect(message.device_id).to eq(device.id)
+      expect(message.raw_data).not_to eq(datas)
+      expect(message.plain_text_data).to eq(datas)
 
-      TestResult.count.should eq(2)
+      expect(TestResult.count).to eq(2)
     end
 
     it "should create multiple tests in elasticsearch" do
       post :create, datas, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       tests = all_elasticsearch_tests
-      tests.count.should eq(2)
+      expect(tests.count).to eq(2)
 
-      tests.map {|e| e["_source"]["test"]["assays"].first["result"]}.should =~ ["positive", "negative"]
+      expect(tests.map {|e| e["_source"]["test"]["assays"].first["result"]}).to match_array(["positive", "negative"])
 
-      TestResult.count.should eq(2)
-      TestResult.pluck(:uuid).should =~ tests.map {|e| e["_source"]["test"]["uuid"]}
+      expect(TestResult.count).to eq(2)
+      expect(TestResult.pluck(:uuid)).to match_array(tests.map {|e| e["_source"]["test"]["uuid"]})
     end
 
     it "should store institution_id in elasticsearch" do
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["institution"]["id"].should eq(device.institution_id)
+      expect(test["institution"]["id"]).to eq(device.institution_id)
     end
 
     it "should override test if test_id is the same" do
       post :create, Oj.dump(test: {id: "1234", patient_age: {"years" => 20}}), device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      TestResult.count.should eq(1)
+      expect(TestResult.count).to eq(1)
       test = TestResult.first
-      test.test_id.should eq("1234")
+      expect(test.test_id).to eq("1234")
 
-      Oj.load(DeviceMessage.first.plain_text_data)["test"]["patient_age"].should eq({"years" => 20})
+      expect(Oj.load(DeviceMessage.first.plain_text_data)["test"]["patient_age"]).to eq({"years" => 20})
 
       tests = all_elasticsearch_tests
-      tests.size.should eq(1)
+      expect(tests.size).to eq(1)
       test = tests.first
-      test["_source"]["test"]["id"].should eq("1234")
-      test["_id"].should eq("#{device.uuid}_1234")
-      test["_source"]["test"]["patient_age"].should eq({"years" => 20})
+      expect(test["_source"]["test"]["id"]).to eq("1234")
+      expect(test["_id"]).to eq("#{device.uuid}_1234")
+      expect(test["_source"]["test"]["patient_age"]).to eq({"years" => 20})
 
       post :create, Oj.dump(test: {id: "1234", patient_age: {"years" => 30}}), device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      TestResult.count.should eq(1)
+      expect(TestResult.count).to eq(1)
       test = TestResult.first
-      test.test_id.should eq("1234")
+      expect(test.test_id).to eq("1234")
 
-      DeviceMessage.count.should eq(2)
-      Oj.load(DeviceMessage.last.plain_text_data)["test"]["patient_age"].should eq({"years" => 30})
+      expect(DeviceMessage.count).to eq(2)
+      expect(Oj.load(DeviceMessage.last.plain_text_data)["test"]["patient_age"]).to eq({"years" => 30})
 
       tests = all_elasticsearch_tests
-      tests.size.should eq(1)
+      expect(tests.size).to eq(1)
       test = tests.first
-      test["_source"]["test"]["id"].should eq("1234")
-      test["_id"].should eq("#{device.uuid}_1234")
-      test["_source"]["test"]["patient_age"].should eq({"years" => 30})
+      expect(test["_source"]["test"]["id"]).to eq("1234")
+      expect(test["_id"]).to eq("#{device.uuid}_1234")
+      expect(test["_source"]["test"]["patient_age"]).to eq({"years" => 30})
 
       a_device = Device.make(institution: institution)
       post :create, Oj.dump(test: {id: "1234", age: {"years" => 20}}), device_id: a_device.uuid, authentication_token: a_device.plain_secret_key
 
-      TestResult.count.should eq(2)
+      expect(TestResult.count).to eq(2)
       tests = all_elasticsearch_tests
-      tests.size.should eq(2)
+      expect(tests.size).to eq(2)
     end
 
     it "should generate a start_time date if it's not provided" do
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["start_time"].should eq(test["created_at"])
+      expect(test["start_time"]).to eq(test["created_at"])
     end
 
   end
@@ -126,9 +126,9 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, Oj.dump(test: {assays:[result: :positive]}, patient: {id: 1234}), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["test"]["assays"].first["result"].should eq("positive")
-      test["test"]["reported_time"].should_not eq(nil)
-      test["patient"]["id"].should eq(nil)
+      expect(test["test"]["assays"].first["result"]).to eq("positive")
+      expect(test["test"]["reported_time"]).not_to eq(nil)
+      expect(test["patient"]["id"]).to eq(nil)
     end
 
     it "applies an existing manifest" do
@@ -147,9 +147,9 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["test"]["name"].should eq("GX4002")
-      test["test"]["reported_time"].should_not eq(nil)
-      test["patient"]["id"].should be_nil
+      expect(test["test"]["name"]).to eq("GX4002")
+      expect(test["test"]["reported_time"]).not_to eq(nil)
+      expect(test["patient"]["id"]).to be_nil
     end
 
     it "stores pii in the test according to manifest" do
@@ -172,14 +172,14 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: "1234"), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["test"]["name"].should eq("GX4002")
-      test["patient"].should eq("uuid" => Patient.first.uuid)
+      expect(test["test"]["name"]).to eq("GX4002")
+      expect(test["patient"]).to eq("uuid" => Patient.first.uuid)
 
       test = TestResult.first
       raw_data = test.sensitive_data
-      test.plain_sensitive_data.should_not eq(raw_data)
-      test.patient.plain_sensitive_data["id"].should be_nil
-      test.patient.plain_sensitive_data["foo"].should eq("1234")
+      expect(test.plain_sensitive_data).not_to eq(raw_data)
+      expect(test.patient.plain_sensitive_data["id"]).to be_nil
+      expect(test.patient.plain_sensitive_data["foo"]).to eq("1234")
     end
 
     it "merges pii from different tests in the same sample across devices" do
@@ -207,17 +207,17 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient: {id: 3}, sample_id: "10"), device_id: device.uuid, authentication_token: device.plain_secret_key
       post :create, Oj.dump(assay: {name: "GX4002"}, patient: {telephone_number: "2222222"}, sample_id: 10), device_id: device2.uuid, authentication_token: device2.plain_secret_key
 
-      TestResult.count.should eq(2)
-      Sample.count.should eq(1)
+      expect(TestResult.count).to eq(2)
+      expect(Sample.count).to eq(1)
 
-      TestResult.first.sample.should eq(Sample.first)
-      TestResult.last.sample.should eq(Sample.first)
+      expect(TestResult.first.sample).to eq(Sample.first)
+      expect(TestResult.last.sample).to eq(Sample.first)
 
       sample = Sample.first
 
-      sample.plain_sensitive_data["uid"].should eq(10)
-      sample.patient.plain_sensitive_data["id"].should eq(3)
-      sample.patient.plain_sensitive_data["telephone_number"].should eq("2222222")
+      expect(sample.plain_sensitive_data["uid"]).to eq(10)
+      expect(sample.patient.plain_sensitive_data["id"]).to eq(3)
+      expect(sample.patient.plain_sensitive_data["telephone_number"]).to eq("2222222")
     end
 
     it "uses the last version of the manifest" do
@@ -251,8 +251,8 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["test"]["foo"].should be_nil
-      test["test"]["name"].should eq("GX4002")
+      expect(test["test"]["foo"]).to be_nil
+      expect(test["test"]["name"]).to eq("GX4002")
     end
 
     it "stores custom fields according to the manifest" do
@@ -274,11 +274,11 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, Oj.dump(some_field: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["test"]["foo"].should be_nil
+      expect(test["test"]["foo"]).to be_nil
 
       test = TestResult.first
-      test.sample.should be_nil
-      test.custom_fields["foo"].should eq(1234)
+      expect(test.sample).to be_nil
+      expect(test.custom_fields["foo"]).to eq(1234)
     end
 
     it "validates the data type" do
@@ -296,12 +296,12 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, Oj.dump(error_code: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["test"]["error_code"].should eq(1234)
+      expect(test["test"]["error_code"]).to eq(1234)
 
       post :create, Oj.dump(error_code: "foo"), device_id: device.uuid, authentication_token: device.plain_secret_key
 
-      response.code.should eq("422")
-      Oj.load(response.body)["errors"].should eq("'foo' is not a valid value for 'test.error_code' (must be an integer)")
+      expect(response.code).to eq("422")
+      expect(Oj.load(response.body)["errors"]).to eq("'foo' is not a valid value for 'test.error_code' (must be an integer)")
     end
 
     context "csv" do
@@ -327,10 +327,10 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         post :create, csv, device_id: device.uuid, authentication_token: device.plain_secret_key
 
         tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
-        tests.count.should eq(1)
+        expect(tests.count).to eq(1)
         test = tests.first["_source"]
-        test["test"]["error_code"].should eq(0)
-        test["test"]["assays"].first["result"].should eq("positive")
+        expect(test["test"]["error_code"]).to eq(0)
+        expect(test["test"]["assays"].first["result"]).to eq("positive")
       end
 
       it 'parses a multi line csv' do
@@ -338,13 +338,13 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         post :create, csv, device_id: device.uuid, authentication_token: device.plain_secret_key
 
         tests = all_elasticsearch_tests.sort_by { |test| test["_source"]["test"]["error_code"] }
-        tests.count.should eq(2)
+        expect(tests.count).to eq(2)
         test = tests.first["_source"]
-        test["test"]["error_code"].should eq(0)
-        test["test"]["assays"].first["result"].should eq("positive")
+        expect(test["test"]["error_code"]).to eq(0)
+        expect(test["test"]["assays"].first["result"]).to eq("positive")
         test = tests.last["_source"]
-        test["test"]["error_code"].should eq(1)
-        test["test"]["assays"].first["result"].should eq("negative")
+        expect(test["test"]["error_code"]).to eq(1)
+        expect(test["test"]["assays"].first["result"]).to eq("negative")
       end
     end
   end

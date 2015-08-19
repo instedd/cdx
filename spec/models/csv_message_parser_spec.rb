@@ -11,7 +11,7 @@ describe CSVMessageParser do
       4002;negative
     CSV
 
-    data.should eq([{
+    expect(data).to eq([{
       error_code: '4002',
       result: 'negative'
     }.stringify_keys])
@@ -24,14 +24,14 @@ describe CSVMessageParser do
       8002;positive
     CSV
 
-    data.should eq([
+    expect(data).to eq([
       {error_code: '4002', result: 'negative'},
       {error_code: '8002', result: 'positive'}
     ].map(&:stringify_keys))
   end
 
   it "looks up a field given its path" do
-    CSVMessageParser.new.lookup('result', {'error_code' => '4002', 'result' => 'negative'}).should eq('negative')
+    expect(CSVMessageParser.new.lookup('result', {'error_code' => '4002', 'result' => 'negative'})).to eq('negative')
   end
 
   it "does not support collections in lookup" do

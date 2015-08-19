@@ -22,7 +22,7 @@ module ManifestSpecHelper
     format_data.each do |format, data|
       manifest = manifest_from_json_mappings(mappings_json, custom_json, format)
       result = manifest.apply_to(data, device).first
-      result.should eq(expected), "Result in format #{format} does not match expected value"
+      expect(result).to eq(expected), "Result in format #{format} does not match expected value"
     end
   end
 

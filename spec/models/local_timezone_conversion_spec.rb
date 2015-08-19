@@ -19,7 +19,7 @@ describe Cdx::Api::LocalTimeZoneConversion do
     end
 
     context 'when there is no local timezone' do
-      before { Time.stub(:zone).and_return nil }
+      before { allow(Time).to receive(:zone).and_return nil }
       it { expect(convert_timezone_if_date("1990-10-01")).to eq "1990-10-01" }
       it { expect(convert_timezone_if_date("1990-10-01T02:30:24")).to eq "1990-10-01T02:30:24" }
       it { expect(convert_timezone_if_date("1990-01-01T02:30:24-03:00")).to eq "1990-01-01T02:30:24-03:00" }

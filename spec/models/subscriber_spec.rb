@@ -29,7 +29,7 @@ describe Subscriber, elasticsearch: true do
   }
 
   it "should have a manifest" do
-    Manifest.count.should eq(1)
+    expect(Manifest.count).to eq(1)
   end
 
   it "generates a correct filter_test GET query with specified fields" do
@@ -72,18 +72,18 @@ describe Subscriber, elasticsearch: true do
 
     assert_requested(:post, url) do |req|
       response = JSON.parse(req.body)
-      response.keys.should =~ ["device", "encounter", "institution", "laboratory", "location", "patient", "sample", "test"]
-      response["device"].keys.should =~ ["uuid", "name", "lab_user", "serial_number"]
-      response["institution"].keys.should =~ ["id", "name"]
-      response["laboratory"].keys.should =~ ["id", "name"]
-      response["location"].keys.should =~ ["id", "parents", "admin_levels", "lat", "lng"]
-      response["patient"].keys.should =~ ["gender"]
-      response["sample"].keys.should =~ ["uuid", "id", "type", "collection_date"]
-      response["test"].keys.should =~ ["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "assays", "quantitative_result", "type"]
-      response["test"]["assays"].keys.should =~ %w(condition name result)
-      response["institution"]["name"].should eq(institution.name)
-      response["laboratory"]["name"].should eq(laboratory.name)
-      response["device"]["name"].should eq(device.name)
+      expect(response.keys).to match_array(["device", "encounter", "institution", "laboratory", "location", "patient", "sample", "test"])
+      expect(response["device"].keys).to match_array(["uuid", "name", "lab_user", "serial_number"])
+      expect(response["institution"].keys).to match_array(["id", "name"])
+      expect(response["laboratory"].keys).to match_array(["id", "name"])
+      expect(response["location"].keys).to match_array(["id", "parents", "admin_levels", "lat", "lng"])
+      expect(response["patient"].keys).to match_array(["gender"])
+      expect(response["sample"].keys).to match_array(["uuid", "id", "type", "collection_date"])
+      expect(response["test"].keys).to match_array(["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "assays", "quantitative_result", "type"])
+      expect(response["test"]["assays"].keys).to match_array(%w(condition name result))
+      expect(response["institution"]["name"]).to eq(institution.name)
+      expect(response["laboratory"]["name"]).to eq(laboratory.name)
+      expect(response["device"]["name"]).to eq(device.name)
     end
   end
 
@@ -102,6 +102,6 @@ describe Subscriber, elasticsearch: true do
 
     refresh_index
 
-    TestResult.count.should eq(1)
+    expect(TestResult.count).to eq(1)
   end
 end

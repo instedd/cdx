@@ -84,20 +84,20 @@ describe DeviceMessage, elasticsearch: true do
     let(:device_message) { DeviceMessage.make }
 
     before(:each) do
-      device_message.should_receive(:clear_errors)
-      device_message.should_receive(:save)
+      expect(device_message).to receive(:clear_errors)
+      expect(device_message).to receive(:save)
     end
 
     it 'should process if index did not failed' do
-      device_message.should_receive(:index_failed).and_return(false)
-      device_message.should_receive(:process)
+      expect(device_message).to receive(:index_failed).and_return(false)
+      expect(device_message).to receive(:process)
 
       device_message.reprocess
     end
 
     it "should not process if index failed" do
-      device_message.should_receive(:index_failed).and_return(true)
-      device_message.should_not_receive(:process)
+      expect(device_message).to receive(:index_failed).and_return(true)
+      expect(device_message).not_to receive(:process)
 
       device_message.reprocess
     end

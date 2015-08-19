@@ -623,7 +623,7 @@ describe Cdx::Api do
     end
 
     describe "by fields with option valid values" do
-      pending "should include group for option with 0 assays" do
+      skip "should include group for option with 0 assays" do
         index test: {assays:[result: :positive], type: "qc"}
         index test: {assays:[result: :positive], type: "qc"}
 

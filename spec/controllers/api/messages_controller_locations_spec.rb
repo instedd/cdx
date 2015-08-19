@@ -25,11 +25,11 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["location"]["id"].should eq(leaf_location1.geo_id)
-      test["laboratory"]["id"].should eq(laboratory1.id)
-      test["location"]["parents"].sort.should eq([leaf_location1.geo_id, parent_location.geo_id].sort)
-      test["location"]["admin_levels"]['admin_level_0'].should eq(parent_location.geo_id)
-      test["location"]["admin_levels"]['admin_level_1'].should eq(leaf_location1.geo_id)
+      expect(test["location"]["id"]).to eq(leaf_location1.geo_id)
+      expect(test["laboratory"]["id"]).to eq(laboratory1.id)
+      expect(test["location"]["parents"].sort).to eq([leaf_location1.geo_id, parent_location.geo_id].sort)
+      expect(test["location"]["admin_levels"]['admin_level_0']).to eq(parent_location.geo_id)
+      expect(test["location"]["admin_levels"]['admin_level_1']).to eq(leaf_location1.geo_id)
     end
 
     it "should store the parent location id when the device is registered more than one laboratory" do
@@ -39,10 +39,10 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["location"]["id"].should eq(parent_location.geo_id)
-      test["device"]["laboratory_id"].should be_nil
-      test["location"]["parents"].should eq([parent_location.geo_id].sort)
-      test["location"]["admin_levels"]['admin_level_0'].should eq(parent_location.geo_id)
+      expect(test["location"]["id"]).to eq(parent_location.geo_id)
+      expect(test["device"]["laboratory_id"]).to be_nil
+      expect(test["location"]["parents"]).to eq([parent_location.geo_id].sort)
+      expect(test["location"]["admin_levels"]['admin_level_0']).to eq(parent_location.geo_id)
     end
 
     it "should store the root location id when the device is registered more than one laboratory" do
@@ -52,9 +52,9 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["location"]["id"].should eq(nil)
-      test["device"]["laboratory_id"].should be_nil
-      test["location"]["parents"].should eq([])
+      expect(test["location"]["id"]).to eq(nil)
+      expect(test["device"]["laboratory_id"]).to be_nil
+      expect(test["location"]["parents"]).to eq([])
     end
 
     it "should store the root location id when the device is registered more than one laboratory with another tree order" do
@@ -64,9 +64,9 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["location"]["id"].should eq(nil)
-      test["device"]["laboratory_id"].should be_nil
-      test["location"]["parents"].should eq([])
+      expect(test["location"]["id"]).to eq(nil)
+      expect(test["device"]["laboratory_id"]).to be_nil
+      expect(test["location"]["parents"]).to eq([])
     end
 
     it "should store nil if no location was found" do
@@ -76,12 +76,12 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
-      test["location"]["id"].should be_nil
-      test["location"]["lat"].should be_nil
-      test["location"]["lng"].should be_nil
-      test["device"]["laboratory_id"].should be_nil
-      test["location"]["parents"].should eq([])
-      test["location"]["admin_levels"].should eq({})
+      expect(test["location"]["id"]).to be_nil
+      expect(test["location"]["lat"]).to be_nil
+      expect(test["location"]["lng"]).to be_nil
+      expect(test["device"]["laboratory_id"]).to be_nil
+      expect(test["location"]["parents"]).to eq([])
+      expect(test["location"]["admin_levels"]).to eq({})
     end
 
   end
