@@ -13,10 +13,10 @@
 
 ActiveRecord::Schema.define(version: 20150818200013) do
 
-  create_table "activation_tokens", force: true do |t|
-    t.string   "value"
-    t.string   "client_id"
-    t.integer  "device_id"
+  create_table "activation_tokens", force: :cascade do |t|
+    t.string   "value",      limit: 255
+    t.string   "client_id",  limit: 255
+    t.integer  "device_id",  limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -24,238 +24,238 @@ ActiveRecord::Schema.define(version: 20150818200013) do
   add_index "activation_tokens", ["device_id"], name: "index_activation_tokens_on_device_id", using: :btree
   add_index "activation_tokens", ["value"], name: "index_activation_tokens_on_value", unique: true, using: :btree
 
-  create_table "activations", force: true do |t|
-    t.integer  "activation_token_id"
+  create_table "activations", force: :cascade do |t|
+    t.integer  "activation_token_id", limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "activations", ["activation_token_id"], name: "index_activations_on_activation_token_id", unique: true, using: :btree
 
-  create_table "conditions", force: true do |t|
-    t.string   "name"
+  create_table "conditions", force: :cascade do |t|
+    t.string   "name",       limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "conditions_manifests", id: false, force: true do |t|
-    t.integer "manifest_id"
-    t.integer "condition_id"
+  create_table "conditions_manifests", id: false, force: :cascade do |t|
+    t.integer "manifest_id",  limit: 4
+    t.integer "condition_id", limit: 4
   end
 
-  create_table "device_messages", force: true do |t|
-    t.binary   "raw_data"
-    t.integer  "device_id"
+  create_table "device_messages", force: :cascade do |t|
+    t.binary   "raw_data",             limit: 65535
+    t.integer  "device_id",            limit: 4
     t.boolean  "index_failed"
-    t.text     "index_failure_reason"
+    t.text     "index_failure_reason", limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "index_failure_data"
+    t.text     "index_failure_data",   limit: 65535
   end
 
   add_index "device_messages", ["device_id"], name: "index_device_messages_on_device_id", using: :btree
 
-  create_table "device_messages_test_results", force: true do |t|
-    t.integer "device_message_id"
-    t.integer "test_result_id"
+  create_table "device_messages_test_results", force: :cascade do |t|
+    t.integer "device_message_id", limit: 4
+    t.integer "test_result_id",    limit: 4
   end
 
   add_index "device_messages_test_results", ["device_message_id"], name: "index_device_messages_test_results_on_device_message_id", using: :btree
   add_index "device_messages_test_results", ["test_result_id"], name: "index_device_messages_test_results_on_test_result_id", using: :btree
 
-  create_table "device_models", force: true do |t|
-    t.string   "name"
+  create_table "device_models", force: :cascade do |t|
+    t.string   "name",       limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "device_models_manifests", id: false, force: true do |t|
-    t.integer "manifest_id"
-    t.integer "device_model_id"
+  create_table "device_models_manifests", id: false, force: :cascade do |t|
+    t.integer "manifest_id",     limit: 4
+    t.integer "device_model_id", limit: 4
   end
 
-  create_table "devices", force: true do |t|
-    t.string   "name"
+  create_table "devices", force: :cascade do |t|
+    t.string   "name",            limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uuid"
-    t.integer  "institution_id"
-    t.integer  "device_model_id"
-    t.string   "secret_key_hash"
-    t.string   "time_zone"
-    t.text     "custom_mappings"
+    t.string   "uuid",            limit: 255
+    t.integer  "institution_id",  limit: 4
+    t.integer  "device_model_id", limit: 4
+    t.string   "secret_key_hash", limit: 255
+    t.string   "time_zone",       limit: 255
+    t.text     "custom_mappings", limit: 65535
   end
 
-  create_table "devices_laboratories", id: false, force: true do |t|
-    t.integer "device_id"
-    t.integer "laboratory_id"
+  create_table "devices_laboratories", id: false, force: :cascade do |t|
+    t.integer "device_id",     limit: 4
+    t.integer "laboratory_id", limit: 4
   end
 
-  create_table "encounters", force: true do |t|
-    t.integer  "institution_id"
-    t.integer  "patient_id"
-    t.string   "uuid"
-    t.string   "entity_uid_hash"
-    t.binary   "sensitive_data"
-    t.text     "custom_fields"
-    t.text     "core_fields"
+  create_table "encounters", force: :cascade do |t|
+    t.integer  "institution_id",  limit: 4
+    t.integer  "patient_id",      limit: 4
+    t.string   "uuid",            limit: 255
+    t.string   "entity_uid_hash", limit: 255
+    t.binary   "sensitive_data",  limit: 65535
+    t.text     "custom_fields",   limit: 65535
+    t.text     "core_fields",     limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "filters", force: true do |t|
-    t.integer  "user_id"
-    t.string   "name"
-    t.text     "query"
+  create_table "filters", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.string   "name",       limit: 255
+    t.text     "query",      limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "filters", ["user_id"], name: "index_filters_on_user_id", using: :btree
 
-  create_table "identities", force: true do |t|
-    t.integer  "user_id"
-    t.string   "provider"
-    t.string   "token"
+  create_table "identities", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.string   "provider",   limit: 255
+    t.string   "token",      limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "institutions", force: true do |t|
-    t.string   "name"
-    t.integer  "user_id"
+  create_table "institutions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "user_id",    limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uuid"
+    t.string   "uuid",       limit: 255
   end
 
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
 
-  create_table "laboratories", force: true do |t|
-    t.string   "name"
-    t.integer  "institution_id"
-    t.string   "address"
-    t.string   "city"
-    t.string   "state"
-    t.string   "zip_code"
-    t.string   "country"
-    t.string   "region"
-    t.float    "lat"
-    t.float    "lng"
+  create_table "laboratories", force: :cascade do |t|
+    t.string   "name",           limit: 255
+    t.integer  "institution_id", limit: 4
+    t.string   "address",        limit: 255
+    t.string   "city",           limit: 255
+    t.string   "state",          limit: 255
+    t.string   "zip_code",       limit: 255
+    t.string   "country",        limit: 255
+    t.string   "region",         limit: 255
+    t.float    "lat",            limit: 24
+    t.float    "lng",            limit: 24
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "location_geoid", limit: 60
-    t.string   "uuid"
+    t.string   "uuid",           limit: 255
   end
 
-  create_table "manifests", force: true do |t|
-    t.string   "version"
-    t.text     "definition"
+  create_table "manifests", force: :cascade do |t|
+    t.string   "version",     limit: 255
+    t.text     "definition",  limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "api_version"
+    t.string   "api_version", limit: 255
   end
 
-  create_table "patients", force: true do |t|
-    t.binary   "sensitive_data"
-    t.text     "custom_fields"
-    t.text     "core_fields"
-    t.string   "entity_uid_hash"
-    t.string   "uuid"
-    t.integer  "institution_id"
+  create_table "patients", force: :cascade do |t|
+    t.binary   "sensitive_data",  limit: 65535
+    t.text     "custom_fields",   limit: 65535
+    t.text     "core_fields",     limit: 65535
+    t.string   "entity_uid_hash", limit: 255
+    t.string   "uuid",            limit: 255
+    t.integer  "institution_id",  limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "patients", ["institution_id"], name: "index_patients_on_institution_id", using: :btree
 
-  create_table "policies", force: true do |t|
-    t.integer  "user_id"
-    t.integer  "granter_id"
-    t.text     "definition"
+  create_table "policies", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.integer  "granter_id", limit: 4
+    t.text     "definition", limit: 65535
     t.boolean  "delegable"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "name"
+    t.string   "name",       limit: 255
   end
 
-  create_table "samples", force: true do |t|
-    t.string   "uuid"
-    t.binary   "sensitive_data"
-    t.integer  "institution_id"
-    t.text     "custom_fields"
-    t.string   "entity_uid_hash"
-    t.text     "core_fields"
+  create_table "samples", force: :cascade do |t|
+    t.string   "uuid",            limit: 255
+    t.binary   "sensitive_data",  limit: 65535
+    t.integer  "institution_id",  limit: 4
+    t.text     "custom_fields",   limit: 65535
+    t.string   "entity_uid_hash", limit: 255
+    t.text     "core_fields",     limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "patient_id"
-    t.integer  "encounter_id"
+    t.integer  "patient_id",      limit: 4
+    t.integer  "encounter_id",    limit: 4
   end
 
   add_index "samples", ["institution_id", "entity_uid_hash"], name: "index_samples_on_institution_id_and_entity_uid_hash", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
   add_index "samples", ["uuid"], name: "index_samples_on_uuid", using: :btree
 
-  create_table "ssh_keys", force: true do |t|
-    t.text     "public_key"
-    t.integer  "device_id"
+  create_table "ssh_keys", force: :cascade do |t|
+    t.text     "public_key", limit: 65535
+    t.integer  "device_id",  limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "ssh_keys", ["device_id"], name: "index_ssh_keys_on_device_id", using: :btree
 
-  create_table "subscribers", force: true do |t|
-    t.integer  "user_id"
-    t.string   "name"
-    t.string   "url"
-    t.text     "fields"
+  create_table "subscribers", force: :cascade do |t|
+    t.integer  "user_id",      limit: 4
+    t.string   "name",         limit: 255
+    t.string   "url",          limit: 255
+    t.text     "fields",       limit: 65535
     t.datetime "last_run_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "url_user"
-    t.string   "url_password"
-    t.integer  "filter_id"
-    t.string   "verb",         default: "GET"
+    t.string   "url_user",     limit: 255
+    t.string   "url_password", limit: 255
+    t.integer  "filter_id",    limit: 4
+    t.string   "verb",         limit: 255,   default: "GET"
   end
 
   add_index "subscribers", ["filter_id"], name: "index_subscribers_on_filter_id", using: :btree
 
-  create_table "test_results", force: true do |t|
+  create_table "test_results", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uuid"
-    t.text     "custom_fields"
-    t.string   "test_id"
-    t.integer  "sample_id"
-    t.binary   "sensitive_data"
-    t.integer  "device_id"
-    t.integer  "patient_id"
-    t.text     "core_fields"
-    t.integer  "encounter_id"
+    t.string   "uuid",           limit: 255
+    t.text     "custom_fields",  limit: 65535
+    t.string   "test_id",        limit: 255
+    t.integer  "sample_id",      limit: 4
+    t.binary   "sensitive_data", limit: 65535
+    t.integer  "device_id",      limit: 4
+    t.integer  "patient_id",     limit: 4
+    t.text     "core_fields",    limit: 65535
+    t.integer  "encounter_id",   limit: 4
   end
 
   add_index "test_results", ["patient_id"], name: "index_test_results_on_patient_id", using: :btree
   add_index "test_results", ["sample_id"], name: "index_test_results_on_sample_id", using: :btree
   add_index "test_results", ["uuid"], name: "index_test_results_on_uuid", using: :btree
 
-  create_table "users", force: true do |t|
-    t.string   "email",                  default: "", null: false
-    t.string   "encrypted_password",     default: "", null: false
-    t.string   "reset_password_token"
+  create_table "users", force: :cascade do |t|
+    t.string   "email",                  limit: 255, default: "", null: false
+    t.string   "encrypted_password",     limit: 255, default: "", null: false
+    t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          default: 0,  null: false
+    t.integer  "sign_in_count",          limit: 4,   default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.string   "confirmation_token"
+    t.string   "current_sign_in_ip",     limit: 255
+    t.string   "last_sign_in_ip",        limit: 255
+    t.string   "confirmation_token",     limit: 255
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
-    t.string   "unconfirmed_email"
-    t.integer  "failed_attempts",        default: 0,  null: false
-    t.string   "unlock_token"
+    t.string   "unconfirmed_email",      limit: 255
+    t.integer  "failed_attempts",        limit: 4,   default: 0,  null: false
+    t.string   "unlock_token",           limit: 255
     t.datetime "locked_at"
     t.datetime "created_at"
     t.datetime "updated_at"
