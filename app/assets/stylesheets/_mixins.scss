@@ -2,67 +2,125 @@
   MIXINS
 ============================================================================= */
 
-@mixin flexbox() {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
+
+// Transitions ---------------------------------------------------------//
+@mixin transition($transition) {
+  -webkit-transition: $transition;
+     -moz-transition: $transition;
+       -o-transition: $transition;
+          transition: $transition;
+}
+@mixin transition-delay($transition-delay) {
+  -webkit-transition-delay: $transition-delay;
+     -moz-transition-delay: $transition-delay;
+       -o-transition-delay: $transition-delay;
+          transition-delay: $transition-delay;
+}
+@mixin transition-duration($transition-duration) {
+  -webkit-transition-duration: $transition-duration;
+     -moz-transition-duration: $transition-duration;
+       -o-transition-duration: $transition-duration;
+          transition-duration: $transition-duration;
 }
 
-@mixin flex($values) {
-  -webkit-box-flex: $values;
-  -moz-box-flex:  $values;
-  -webkit-flex:  $values;
-  -ms-flex:  $values;
-  flex:  $values;
+
+// Box sizing ---------------------------------------------------------//
+@mixin box-sizing($boxmodel) {
+  -webkit-box-sizing: $boxmodel;
+  -moz-box-sizing: $boxmodel;
+  -ms-box-sizing: $boxmodel;
+  -o-box-sizing: $boxmodel;
+  box-sizing: $boxmodel;
 }
 
-@mixin flex-grow($values) {
-  -webkit-box-flex-grow: $values;
-  -moz-box-flex-grow:  $values;
-  -webkit-flex-grow:  $values;
-  -ms-flex-grow:  $values;
-  flex-grow:  $values;
+// Clearfix ---------------------------------------------------------//
+@mixin clearfix {
+  *zoom: 1;
+  &:before,
+  &:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+  }
+  &:after {
+    clear: both;
+  }
 }
 
-@mixin order($val) {
-  -webkit-box-ordinal-group: $val;
-  -moz-box-ordinal-group: $val;
-  -ms-flex-order: $val;
-  -webkit-order: $val;
-  order: $val;
+@mixin placeholder-style($fstyle) {
+  &::-moz-placeholder           { font-style: $fstyle; } // Firefox
+  &:-ms-input-placeholder       { font-style: $fstyle; } // Internet Explorer 10+
+  &::-webkit-input-placeholder  { font-style: $fstyle; } // Safari and Chrome
 }
 
-@mixin flex-flow($val) {
-  -webkit-box-flex-flow: $val;
-  -moz-box-flex-flow: $val;
-  -ms-flex-flex-flow: $val;
-  -webkit-flex-flow: $val;
-  flex-flow: $val;
-}
 
-@mixin justify-content($val) {
-  -webkit-box-justify-content: $val;
-  -moz-box-justify-content: $val;
-  -ms-flex-justify-content: $val;
-  -webkit-justify-content: $val;
-  justify-content: $val;
-}
 
-@mixin align-items($val) {
-  -webkit-box-align-items: $val;
-  -moz-box-align-items: $val;
-  -ms-flex-align-items: $val;
-  -webkit-align-items: $val;
-  align-items: $val;
-}
 
-@mixin align-self($val) {
-  -webkit-box-align-self: $val;
-  -moz-box-align-self: $val;
-  -ms-flex-align-self: $val;
-  -webkit-align-self: $val;
-  align-self: $val;
-}
+
+
+// =============================================================================
+// FLEX MIXINS
+// =============================================================================
+  @mixin flexbox() {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+  }
+
+  @mixin flex($values) {
+    -webkit-box-flex: $values;
+    -moz-box-flex:  $values;
+    -webkit-flex:  $values;
+    -ms-flex:  $values;
+    flex:  $values;
+  }
+
+  @mixin flex-grow($values) {
+    -webkit-box-flex-grow: $values;
+    -moz-box-flex-grow:  $values;
+    -webkit-flex-grow:  $values;
+    -ms-flex-grow:  $values;
+    flex-grow:  $values;
+  }
+
+  @mixin order($val) {
+    -webkit-box-ordinal-group: $val;
+    -moz-box-ordinal-group: $val;
+    -ms-flex-order: $val;
+    -webkit-order: $val;
+    order: $val;
+  }
+
+  @mixin flex-flow($val) {
+    -webkit-box-flex-flow: $val;
+    -moz-box-flex-flow: $val;
+    -ms-flex-flex-flow: $val;
+    -webkit-flex-flow: $val;
+    flex-flow: $val;
+  }
+
+  @mixin justify-content($val) {
+    -webkit-box-justify-content: $val;
+    -moz-box-justify-content: $val;
+    -ms-flex-justify-content: $val;
+    -webkit-justify-content: $val;
+    justify-content: $val;
+  }
+
+  @mixin align-items($val) {
+    -webkit-box-align-items: $val;
+    -moz-box-align-items: $val;
+    -ms-flex-align-items: $val;
+    -webkit-align-items: $val;
+    align-items: $val;
+  }
+
+  @mixin align-self($val) {
+    -webkit-box-align-self: $val;
+    -moz-box-align-self: $val;
+    -ms-flex-align-self: $val;
+    -webkit-align-self: $val;
+    align-self: $val;
+  }
 

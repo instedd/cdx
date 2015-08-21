@@ -1,0 +1,80 @@
+/* =============================================================================
+  BUTTONS
+============================================================================= */
+
+.btn {
+	border-radius: 2px;
+  background: none;
+  font-family: $sanstitle;
+  font-size: 100%;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  display: inline-block;
+  padding: 0 24px;
+  height: 48px;
+  margin-bottom: 0;
+  vertical-align: middle;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &,
+  &:active,
+  &.active {
+    &:focus {
+      outline: 0;
+    }
+  }
+
+  &:hover,
+  &:focus {
+    // color: @btn-default-color;
+    text-decoration: none;
+  }
+
+  &:active,
+  &.active {
+    outline: 0;
+    background-image: none;
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    cursor: not-allowed;
+    pointer-events: none; // Future-proof disabling of clicks
+    opacity: .65;
+  }
+}
+
+.btn-primary {
+	@extend .btn;
+	background: $gray4;
+	color: $white;
+}
+
+.btn-secondary {
+	@extend .btn;
+	background: $red;
+	color: $white;
+}
+
+.btn-add {
+	border-radius: 50%;
+	background: $red;
+	font-size: 150%;
+	font-weight: 300;
+	color: $white;
+	line-height: 48px;
+	text-align: center;
+	display: inline-block;
+	vertical-align: middle;
+	height: 48px;
+	width: 48px;
+
+	&.fixed {
+		position: fixed;
+		top: 125px;
+	}
+}

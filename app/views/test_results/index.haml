@@ -1,21 +1,30 @@
-.row-fluid
-  .span12.well-white
-    %form.form-inline
-      %label Laboratory:
-      %select(name="laboratory")
+- content_for(:leftcolumn) do
+  - if params["condition"].present?
+    .centered
+      - query = {'laboratory.id' => params["laboratory"], 'test.assays.condition' => params["condition"]}
+      = link_to "+", new_filter_path(query: query), class: 'btn-add fixed', title: 'Add filter'
+
+.row.grid_sm
+  .col
+    %h1 Filters
+%form
+  .row.grid_sm
+    .col.pe-2
+      %label Laboratory
+      %select.ddown(name="laboratory")
         %option(value="") (all)
         = options_from_collection_for_select @combo_laboratories, :id, :name, params["laboratory"]
-      %label Condition:
+    .col.pe-2
+      %label Condition
       %input{type: "text", name: "condition", value: params["condition"]}
-      %input.btn.btn-small{type: "submit", value: "Filter"}
+    .col
+      %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 
-      - if params["condition"].present?
-        - query = {'laboratory.id' => params["laboratory"], 'test.assays.condition' => params["condition"]}
-        = link_to "Save this filter", new_filter_path(query: query)
-
-.row-fluid
-  .span12
+.row.grid_sm
+  .col
     %table.table
+      %tr
+        %th.tableheader{colspan:100} 1,894 Tests
       %tr
         %th Created at
         %th Institution

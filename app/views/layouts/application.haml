@@ -13,8 +13,11 @@
 
       .content
         = flash_message
-
-        = content_for?(:cdp_content) ? yield(:cdp_content) : yield
+        .row.grid_sm
+          .col= yield(:leftcolumn)
+          .col.pe-10
+            = content_for?(:cdp_content) ? yield(:cdp_content) : yield
+          .col= yield(:rightcolumn)
 
       %footer
         = render "shared/footer"

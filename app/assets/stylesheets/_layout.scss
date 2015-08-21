@@ -11,13 +11,20 @@ body {
   @include flexbox();
   flex-direction: column;
   height: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 header {
+  @include flex(none);
   background: $gray-dark;
   flex: none;
   height: 60px;
   padding: 0 1em;
+  -webkit-box-flex: 0;
 
   .row {
     height: 100%;
@@ -119,13 +126,13 @@ header {
 }
 
 .content {
-  flex: 1 0 auto;
+  @include flex(1 0 auto);
   padding: 1.5em 1em;
 }
 
 footer {
+  @include flex(none);
   border-top: 1px solid $white-light;
   font-size: 90%;
   padding: 0.5em 1em;
-  flex: none;
 }

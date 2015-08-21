@@ -1,0 +1,33 @@
+// =============================================================================
+// TABLES
+// =============================================================================
+
+  .table {
+    border-radius: 3px;
+    width: 100%;
+    border: 1px solid $gray1;
+    margin: 15px auto;
+
+    th {
+      font-weight: 700;
+      color: $gray2;
+      text-align: left;
+      padding: 14px 10px;
+
+      &.tableheader {
+        font-family: $sanstitle;
+        font-size: 200%;
+        color: $black;
+        font-weight: 400;
+      }
+    }
+
+    td {
+      padding: 14px 10px;
+      border-bottom: 1px solid $gray1;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }

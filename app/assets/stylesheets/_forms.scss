@@ -1,0 +1,50 @@
+// =============================================================================
+// FORMS
+// =============================================================================
+
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"] {
+    @include placeholder-style(italic);
+    font-family: $sans;
+    font-size: 100%;
+    border: none;
+    border-bottom: 1px solid $gray2;
+    padding: 0 5px;
+    height: 30px;
+    outline: 0 !important;
+  }
+
+  textarea {
+    @include placeholder-style(italic);
+    font-family: $sans;
+    font-size: 100%;
+  }
+
+
+  label {
+    color: $gray3;
+  }
+
+  .dd-container,
+  .dd-select,
+  .dd-options {
+    width: 100% !important;
+  }
+
+  .dd-select {
+    border: none !important;
+    background: none !important;
+
+    label {
+      color: $black;
+    }
+  }
+  .dd-options {
+
+    label {
+      color: $black;
+    }  
+  }

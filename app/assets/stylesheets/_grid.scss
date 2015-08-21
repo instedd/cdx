@@ -3,11 +3,12 @@
 ============================================================================= */
 
 .grid {
-  border: solid 1px;
+  // border: solid 1px;
 }
 
 .row {
   @include flexbox();
+  @include clearfix();
   flex-direction: column;
 }
 
@@ -15,7 +16,8 @@
 .col {
   @include flex(1);
   padding: $col-padd;
-  border: solid 1px;
+  position: relative;
+  // border: solid 1px;
 
   /* forced '%' distribution */
   &.pe-2 {
