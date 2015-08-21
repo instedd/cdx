@@ -1,12 +1,9 @@
 class ManifestsController < ApplicationController
-  add_breadcrumb 'Manifests', :manifests_path
-
   def index
     @device_models = DeviceModel.active.includes(:manifests)
   end
 
   def new
-    add_breadcrumb 'New'
     @manifest = Manifest.new
   end
 
@@ -26,7 +23,6 @@ class ManifestsController < ApplicationController
 
   def show
     @manifest = Manifest.find params[:id]
-    add_breadcrumb "#{@manifest.device_models.first.name} #{@manifest.version}"
   end
 
   def destroy

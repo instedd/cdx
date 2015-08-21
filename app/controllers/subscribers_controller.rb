@@ -3,8 +3,6 @@ class SubscribersController < ApplicationController
   skip_before_action :authenticate_user!, if: -> { request.path.starts_with? "/api/" }
   before_filter :authenticate_api_user!, if: -> { request.path.starts_with? "/api/" }
 
-  add_breadcrumb 'Subscribers', :subscribers_path
-
   respond_to :html, :json
   expose(:subscribers) do
     if params[:filter_id]
@@ -25,12 +23,7 @@ class SubscribersController < ApplicationController
   end
 
   def new
-    add_breadcrumb 'New'
     subscriber.fields = []
-  end
-
-  def edit
-    add_breadcrumb subscriber.name, edit_subscriber_path(subscriber)
   end
 
   def create

@@ -5,14 +5,6 @@ class CustomMappingsController < ApplicationController
   before_filter :load_institution
   before_filter :load_device
 
-  before_filter do
-    add_breadcrumb 'Institutions', :institutions_path
-    add_breadcrumb @institution.name, institution_path(@institution)
-    add_breadcrumb 'Devices', institution_devices_path(@institution)
-    add_breadcrumb @device.name, edit_institution_device_path(@institution, @device)
-    add_breadcrumb 'Custom Mappings', institution_device_custom_mappings_path(@institution, @device)
-  end
-
   def index
     @custom_fields = @device.current_manifest.fields.select &:custom?
     @device.custom_mappings ||= {}

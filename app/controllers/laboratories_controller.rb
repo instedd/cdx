@@ -1,15 +1,7 @@
 class LaboratoriesController < ApplicationController
   layout "institutions"
   set_institution_tab :laboratories
-
-  add_breadcrumb 'Institutions', :institutions_path
-
   before_filter :load_institution
-
-  before_filter do
-    add_breadcrumb @institution.name, institution_path(@institution)
-    add_breadcrumb 'Laboratories', institution_laboratories_path(@institution)
-  end
 
   def index
     @laboratories = check_access(@institution.laboratories, READ_LABORATORY)
@@ -22,7 +14,6 @@ class LaboratoriesController < ApplicationController
   end
 
   def new
-    add_breadcrumb 'New'
     @laboratory = @institution.laboratories.new
     return unless authorize_resource(@institution, CREATE_INSTITUTION_LABORATORY)
   end
@@ -49,8 +40,6 @@ class LaboratoriesController < ApplicationController
     return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
     @can_delete = has_access?(@laboratory, DELETE_LABORATORY)
-
-    add_breadcrumb @laboratory.name, institution_laboratory_path(@institution, @laboratory)
   end
 
   # PATCH/PUT /laboratories/1

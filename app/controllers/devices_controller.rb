@@ -5,15 +5,8 @@ class DevicesController < ApplicationController
   layout "institutions"
   set_institution_tab :devices
 
-  add_breadcrumb 'Institutions', :institutions_path
-
   before_filter :load_institution
   before_filter :load_laboratories, only: [:new, :create, :edit, :update]
-
-  before_filter do
-    add_breadcrumb @institution.name, institution_path(@institution)
-    add_breadcrumb 'Devices', institution_devices_path(@institution)
-  end
 
   def index
     @devices = check_access(@institution.devices, READ_DEVICE)
@@ -27,7 +20,6 @@ class DevicesController < ApplicationController
   end
 
   def new
-    add_breadcrumb 'New'
     @device = @institution.devices.new
 
     return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
@@ -65,8 +57,6 @@ class DevicesController < ApplicationController
     @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
     @can_generate_activation_token = has_access?(@device, GENERATE_ACTIVATION_TOKEN)
     @can_delete = has_access?(@device, DELETE_DEVICE)
-
-    add_breadcrumb @device.name, institution_device_path(@institution, @device)
   end
 
   def update
@@ -99,8 +89,6 @@ class DevicesController < ApplicationController
   def regenerate_key
     @device = @institution.devices.find params[:id]
     return unless authorize_resource(@device, REGENERATE_DEVICE_KEY)
-    add_breadcrumb @device.name, edit_institution_device_path(@institution, @device)
-    add_breadcrumb 'Secret Key'
 
     @device.set_key
 
@@ -121,8 +109,6 @@ class DevicesController < ApplicationController
   def generate_activation_token
     @device = @institution.devices.find params[:id]
     return unless authorize_resource(@device, GENERATE_ACTIVATION_TOKEN)
-    add_breadcrumb @device.name, edit_institution_device_path(@institution, @device)
-    add_breadcrumb 'Activation Token'
 
     @token = @device.new_activation_token
     respond_to do |format|

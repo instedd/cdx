@@ -2,21 +2,11 @@ class DeviceMessagesController < ApplicationController
   layout "institutions"
   set_institution_tab :devices
 
-  add_breadcrumb 'Institutions', :institutions_path
-
   before_filter :load_institution
   before_filter :load_device
   before_filter :load_message, only: [:raw, :reprocess]
 
-  before_filter do
-    add_breadcrumb @institution.name, institution_path(@institution)
-    add_breadcrumb 'Devices', institution_devices_path(@institution)
-    add_breadcrumb @device.name, edit_institution_device_path(@institution, @device)
-  end
-
   def index
-    add_breadcrumb 'Messages', institution_device_device_messages_path(@institution, @device)
-
     @messages = @device.device_messages
   end
 
