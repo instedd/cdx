@@ -2,11 +2,11 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {omniauth_callbacks: "omniauth_callbacks"}
   guisso_for :user
 
+  resources :laboratories
   resources :institutions do
     member do
       get :request_api_token
     end
-    resources :laboratories
     resources :devices do
       member do
         get  'regenerate_key'

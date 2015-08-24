@@ -1,10 +1,21 @@
-= form_for([@institution, @laboratory]) do |f|
+= form_for(@laboratory) do |f|
   - if @laboratory.errors.present?
     .alert-container
       .alert.alert-error
         %ul
           - @laboratory.errors.full_messages.each do |msg|
             %li= msg
+
+
+  - if @laboratory.new_record?
+    .control-group
+      = f.label :institution, class: 'control-label'
+      .control
+        = f.collection_select :institution_id, @institutions, :id, :name
+  - else
+    %p
+      Institution:
+      = @laboratory.institution
 
   .control-group
     = f.label :name, :class => 'control-label'

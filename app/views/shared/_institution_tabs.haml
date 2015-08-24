@@ -3,8 +3,6 @@
 %ul.nav.nav-tabs
   %li{class: @institution_tab == :overview ? 'active' : nil}
     = link_to "Overview", @institution
-  %li{class: @institution_tab == :laboratories ? 'active' : nil}
-    = link_to "Laboratories", institution_laboratories_path(@institution)
   %li{class: @institution_tab == :devices ? 'active' : nil}
     = link_to "Devices", institution_devices_path(@institution)
   %li{class: @institution_tab == :settings ? 'active' : nil}

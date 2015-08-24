@@ -1,8 +1,22 @@
-.row-fluid
-  .span6
-    - simple_list :laboratory, title: 'Laboratories', icon: :folder, create_path: (@can_create && new_institution_laboratory_path(@institution)) do
+- content_for(:leftcolumn) do
+  - if @can_create
+    .centered
+      = link_to "+", new_laboratory_path, class: 'btn-add fixed', title: 'Add filter'
+.row.grid_sm
+  .col
+    %table.table
+      %tr
+        %th.tableheader{colspan:100} Laboratories
+      %tr
+        %th Name
+        %th Institution
+        %th Location
       - @laboratories.each do |laboratory|
-        - if @labs_to_edit.include?(laboratory.id)
-          - simple_list_item laboratory.name, edit_institution_laboratory_path(@institution, laboratory)
-        - else
-          - simple_list_item laboratory.name, nil
+        %tr
+          - if @labs_to_edit.include?(laboratory.id)
+            %td= link_to laboratory.name, edit_laboratory_path(laboratory)
+          - else
+            %td= laboratory.name
+          %td= laboratory.institution.name
+          %td= laboratory.location.try(:name)
+
