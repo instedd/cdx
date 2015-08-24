@@ -1,6 +1,8 @@
-.row-fluid
-  .span12
+.row.grid_sm
+  .col
     %table.table
+      %tr
+        %th.tableheader{colspan:100} #{@device.name} - Device Messages
       %tr
         %th Created at
         %th Status

@@ -1,8 +1,4 @@
 class DeviceMessagesController < ApplicationController
-  layout "institutions"
-  set_institution_tab :devices
-
-  before_filter :load_institution
   before_filter :load_device
   before_filter :load_message, only: [:raw, :reprocess]
 
@@ -27,19 +23,14 @@ class DeviceMessagesController < ApplicationController
 
   def reprocess
     @message.reprocess
-    redirect_to institution_device_device_messages_path(@institution, @device),
+    redirect_to device_device_messages_path(@device),
                 notice: 'The message will be reprocessed'
   end
 
   private
 
-  def load_institution
-    @institution = Institution.find params[:institution_id]
-    authorize_resource(@institution, READ_INSTITUTION)
-  end
-
   def load_device
-    @device = @institution.devices.find params[:device_id]
+    @device = Device.find params[:device_id]
     authorize_resource(@device, READ_DEVICE)
   end
 

@@ -1,16 +1,22 @@
-%table
-  %thead
-    %tr
-      %th
-        Devices
-        - if @can_create
-          = link_to '+', new_institution_device_path(@institution)
-  %tbody
-    - @devices.each do |device|
-      %tr
-        %td
-          - if @devices_to_edit.include?(device.id)
-            = link_to device.name, edit_institution_device_path(@institution, device)
-          - else
-            - device.name
+- content_for(:leftcolumn) do
+  - if @can_create
+    .centered
+      = link_to "+", new_device_path, class: 'btn-add fixed', title: 'Add Device'
 
+.row.grid_sm
+  .col
+    %table.table
+      %tr
+        %th.tableheader{colspan:100} Devices
+      %tr
+        %th Name
+        %th Model
+        %th Lab
+      - @devices.each do |device|
+        %tr
+          - if @devices_to_edit.include?(device.id)
+            %td= link_to device.name, edit_device_path(device)
+          - else
+            %td= device.name
+          %td= device.device_model.name
+          %td= device.current_laboratory.try(:name)

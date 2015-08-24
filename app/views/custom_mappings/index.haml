@@ -1,7 +1,7 @@
 .span12
   %h3 #{@device.name} - Custom Fields
 
-  = form_for([@institution, @device]) do |f|
+  = form_for(@device) do |f|
     = f.fields_for(:custom_mappings) do |m|
       - @custom_fields.each do |field|
         .control-group

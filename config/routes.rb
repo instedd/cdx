@@ -7,23 +7,23 @@ Rails.application.routes.draw do
     member do
       get :request_api_token
     end
-    resources :devices do
-      member do
-        get  'regenerate_key'
-        post 'generate_activation_token'
-      end
-      resources :custom_mappings, only: [:index]
-      resources :ssh_keys, only: [:create, :destroy]
-      resources :device_messages, only: [:index], path: 'messages' do
-        member do
-          get 'raw'
-          post 'reprocess'
-        end
-      end
-    end
   end
 
   resources :locations, only: [:index, :show]
+  resources :devices do
+    member do
+      get  'regenerate_key'
+      post 'generate_activation_token'
+    end
+    resources :custom_mappings, only: [:index]
+    resources :ssh_keys, only: [:create, :destroy]
+    resources :device_messages, only: [:index], path: 'messages' do
+      member do
+        get 'raw'
+        post 'reprocess'
+      end
+    end
+  end
   resources :manifests, except: [:update, :destroy]
   resources :test_results
   resources :filters, format: 'html'

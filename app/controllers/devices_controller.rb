@@ -3,35 +3,36 @@ class DevicesController < ApplicationController
   require 'barby/barcode/code_93'
   require 'barby/outputter/html_outputter'
 
-  before_filter :load_institution
   before_filter :load_laboratories, only: [:new, :create, :edit, :update]
+  before_filter :load_institution, only: :create
 
   def index
-    @devices = check_access(@institution.devices, READ_DEVICE)
+    @devices = check_access(Device, READ_DEVICE)
     @devices ||= []
 
-    @can_create = has_access?(@institution, REGISTER_INSTITUTION_DEVICE)
+    @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
 
-    @devices_to_edit = check_access(@institution.devices, UPDATE_DEVICE)
+    @devices_to_edit = check_access(Device, UPDATE_DEVICE)
     @devices_to_edit ||= []
     @devices_to_edit.map!(&:id)
   end
 
   def new
-    @device = @institution.devices.new
-
-    return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
+    return unless authorize_resource(Institution, REGISTER_INSTITUTION_DEVICE)
+    @device = Device.new
+    @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end
 
   def create
-    @device = @institution.devices.new(device_params)
     return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
+
+    @device = @institution.devices.new(device_params)
 
     # TODO: check valid laboratories
 
     respond_to do |format|
       if @device.save
-        format.html { redirect_to institution_devices_path(@institution), notice: 'Device was successfully created.' }
+        format.html { redirect_to devices_path, notice: 'Device was successfully created.' }
         format.json { render action: 'show', status: :created, location: @device }
       else
         format.html { render action: 'new' }
@@ -45,7 +46,7 @@ class DevicesController < ApplicationController
   end
 
   def edit
-    @device = @institution.devices.find params[:id]
+    @device = Device.find(params[:id])
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     @uuid_barcode = Barby::Code93.new(@device.uuid)
@@ -58,12 +59,12 @@ class DevicesController < ApplicationController
   end
 
   def update
-    @device = @institution.devices.find params[:id]
+    @device = Device.find(params[:id])
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     respond_to do |format|
       if @device.update(device_params)
-        format.html { redirect_to institution_devices_path(@institution), notice: 'Device was successfully updated.' }
+        format.html { redirect_to devices_path, notice: 'Device was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -73,19 +74,19 @@ class DevicesController < ApplicationController
   end
 
   def destroy
-    @device = @institution.devices.find params[:id]
+    @device = Device.find(params[:id])
     return unless authorize_resource(@device, DELETE_DEVICE)
 
     @device.destroy
 
     respond_to do |format|
-      format.html { redirect_to institution_devices_url(@institution) }
+      format.html { redirect_to devices_path, notice: 'Device was successfully deleted.' }
       format.json { head :no_content }
     end
   end
 
   def regenerate_key
-    @device = @institution.devices.find params[:id]
+    @device = Device.find(params[:id])
     return unless authorize_resource(@device, REGENERATE_DEVICE_KEY)
 
     @device.set_key
@@ -105,7 +106,7 @@ class DevicesController < ApplicationController
   end
 
   def generate_activation_token
-    @device = @institution.devices.find params[:id]
+    @device = Device.find(params[:id])
     return unless authorize_resource(@device, GENERATE_ACTIVATION_TOKEN)
 
     @token = @device.new_activation_token
@@ -125,12 +126,12 @@ class DevicesController < ApplicationController
   private
 
   def load_institution
-    @institution = Institution.find params[:institution_id]
+    @institution = Institution.find params[:device][:institution_id]
     authorize_resource(@institution, READ_INSTITUTION)
   end
 
   def load_laboratories
-    @laboratories = check_access(@institution.laboratories, ASSIGN_DEVICE_LABORATORY)
+    @laboratories = check_access(Laboratory, ASSIGN_DEVICE_LABORATORY)
     @laboratories ||= []
   end
 

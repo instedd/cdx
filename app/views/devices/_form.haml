@@ -1,10 +1,21 @@
-= form_for([@institution, @device]) do |f|
+= form_for(@device) do |f|
   - if @device.errors.present?
     .alert-container
       .alert.alert-error
         %ul
           - @device.errors.full_messages.each do |msg|
             %li= msg
+
+  - if @device.new_record?
+    .control-group
+      = f.label :institution, class: 'control-label'
+      .control
+        = f.collection_select :institution_id, @institutions, :id, :name
+  - else
+    %p
+      Institution:
+      = @device.institution
+
   .control-group
     = f.label :name, :class => 'control-label'
     .controls

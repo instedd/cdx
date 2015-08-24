@@ -8,6 +8,8 @@
         = link_to "Dashboard", nndd_path
       %li{:class => params[:controller] == "laboratories" && "active"}
         = link_to "Labs", laboratories_path
+      %li{:class => params[:controller] == "devices" && "active"}
+        = link_to "Devices", devices_path
       %li{:class => params[:controller] == "locations" && "active"}
         = link_to "Locations", locations_path
       %li{:class => params[:controller] == "manifests" && "active"}

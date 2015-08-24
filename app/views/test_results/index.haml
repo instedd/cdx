@@ -24,7 +24,7 @@
   .col
     %table.table
       %tr
-        %th.tableheader{colspan:100} 1,894 Tests
+        %th.tableheader{colspan:100}= pluralize @tests.length, "Test"
       %tr
         %th Created at
         %th Institution

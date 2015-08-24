@@ -9,24 +9,24 @@
 
   %hr
     %p
-      = link_to "Messages", institution_device_device_messages_path(@institution, @device), class: 'btn'
+      = link_to "Messages", device_device_messages_path(@device), class: 'btn'
       - if @device.current_manifest.fields.any?(&:custom?)
-        = link_to "Custom Mappings", institution_device_custom_mappings_path(@institution, @device), class: 'btn'
+        = link_to "Custom Mappings", device_custom_mappings_path(@device), class: 'btn'
 
   - if @can_regenerate_key
     %hr
     %p
-      = link_to "Generate new key", regenerate_key_institution_device_path(@institution, @device), class: 'btn'
+      = link_to "Generate new key", regenerate_key_device_path(@device), class: 'btn'
 
   - if @can_generate_activation_token
     %hr
     %p
       = link_to "Generate activation token",
-        generate_activation_token_institution_device_path(@institution, @device),
+        generate_activation_token_device_path(@device),
         method: :post,
         class: 'btn'
 
   - if @can_delete
     %hr
 
-    = link_to "Delete this device", [@institution, @device], method: :delete, data: { confirm: "Are you sure you want to delete the device '#{@device.name}'" }
+    = link_to "Delete this device", @device, method: :delete, data: { confirm: "Are you sure you want to delete the device '#{@device.name}'" }
