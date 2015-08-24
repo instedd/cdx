@@ -5,4 +5,4 @@
 
   %hr
 
-  = icon_link_to :'icf-delete', "Delete this subscriber", subscriber, method: :delete, data: { confirm: "Are you sure you want to delete the location '#{subscriber.name}'" }
+  = link_to "Delete this subscriber", subscriber, method: :delete, data: { confirm: "Are you sure you want to delete the location '#{subscriber.name}'" }

@@ -29,4 +29,4 @@
   - if @can_delete
     %hr
 
-    = icon_link_to :'icf-delete', "Delete this device", [@institution, @device], method: :delete, data: { confirm: "Are you sure you want to delete the device '#{@device.name}'" }
+    = link_to "Delete this device", [@institution, @device], method: :delete, data: { confirm: "Are you sure you want to delete the device '#{@device.name}'" }

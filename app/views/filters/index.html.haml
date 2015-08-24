@@ -1,5 +1,15 @@
-.row-fluid
-  .span6
-    - simple_list :filter, title: 'Filters', icon: :folder do
+- content_for(:leftcolumn) do
+  - if @can_create
+    .centered
+      = link_to "+", new_filter_path, class: 'btn-add fixed', title: 'Add Filter'
+.row.grid_sm
+  .col
+    %table.table
+      %tr
+        %th.tableheader{colspan:100} Filters
+      %tr
+        %th Name
       - filters.each do |filter|
-        - simple_list_item filter.name, edit_filter_path(filter)
+        %tr
+          %td= link_to filter.name, filter
+

@@ -15,11 +15,7 @@ gem 'nokogiri'
 
 gem 'foreman'
 
-# A newer version breaks instedd-bootstrap
-gem 'bootstrap-sass', '2.3.2.1'
-
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
-gem 'instedd-bootstrap', git: "https://bitbucket.org/instedd/instedd-bootstrap.git", branch: 'master'
 gem 'ruby-openid'
 gem 'alto_guisso_rails', github: "instedd/alto_guisso_rails", branch: 'master'
 gem 'alto_guisso', github: "instedd/alto_guisso", branch: 'master'

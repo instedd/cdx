@@ -20,16 +20,6 @@ GIT
       ruby-openid
 
 GIT
-  remote: https://bitbucket.org/instedd/instedd-bootstrap.git
-  revision: 9d7387772279cb324a8851f297952fe13e0c3185
-  branch: master
-  specs:
-    instedd-bootstrap (0.0.1)
-      bootstrap-sass (~> 2.3.2)
-      rails
-      sass-rails
-
-GIT
   remote: https://github.com/instedd/cdx-sync-server.git
   revision: 2e453e4e0c71b42fdf82d0893cd4950b3638ea5e
   branch: master
@@ -126,8 +116,6 @@ GEM
       bert (>= 1.1.0, < 2.0.0)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
-    bootstrap-sass (2.3.2.1)
-      sass (~> 3.2)
     builder (3.2.2)
     bunny (2.1.0)
       amq-protocol (>= 2.0.0)
@@ -495,7 +483,6 @@ DEPENDENCIES
   alto_guisso_rails!
   awesome_nested_set (~> 3.0.0.rc.3)
   barby
-  bootstrap-sass (= 2.3.2.1)
   bunny
   capistrano (~> 3.1.0)
   capistrano-bundler (~> 1.1)
@@ -522,7 +509,6 @@ DEPENDENCIES
   guid
   haml-rails
   hashdiff
-  instedd-bootstrap!
   jbuilder (~> 1.2)
   jquery-rails
   jquery-turbolinks

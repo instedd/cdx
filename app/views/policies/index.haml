@@ -1,5 +1,16 @@
-.row-fluid
-  .span6
-    - simple_list :policy, title: 'Policies', icon: :folder, create_path: new_policy_path do
+- content_for(:leftcolumn) do
+  .centered
+    = link_to "+", new_policy_path, class: 'btn-add fixed', title: 'Add Policy'
+.row.grid_sm
+  .col
+    %table.table
+      %tr
+        %th.tableheader{colspan:100} Policies
+      %tr
+        %th Name
+        %th User
       - @policies.each do |policy|
-        - simple_list_item "#{policy.name} (#{policy.user.email})", edit_policy_path(policy)
+        %tr
+          %td= link_to policy.name, edit_policy_path(policy) 
+          %td= link_to policy.user.email, edit_policy_path(policy) 
+

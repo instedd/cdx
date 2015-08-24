@@ -6,4 +6,4 @@
   - if @can_delete
     %hr
 
-    = icon_link_to :'icf-delete', "Delete this laboratory", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }
+    = link_to "Delete this laboratory", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }

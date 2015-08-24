@@ -1,8 +1,11 @@
-.row-fluid
-  .span6
-    - simple_list :location, title: 'Locations', icon: :folder do
+.row.grid_sm
+  .col
+    %table.table
+      %tr
+        %th.tableheader{colspan:100} Locations
+      %tr
+        %th Name
       - @locations.each do |location|
         %tr
-          %td
-            = link_to location.name, locations_path(parent_id: location.id)
-            = icon_link_to :'icf-arrow', '', location_path(location.id), class: 'pull-right'
+          %td= link_to location.name, locations_path(parent_id: location.id)
+

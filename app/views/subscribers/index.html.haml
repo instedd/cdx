@@ -1,5 +1,14 @@
-.row-fluid
-  .span6
-    - simple_list :subscriber, title: 'Subscribers', icon: :folder, create_path: new_subscriber_path do
+- content_for(:leftcolumn) do
+  .centered
+    = link_to "+", new_subscriber_path, class: 'btn-add fixed', title: 'Add Subscriber'
+.row.grid_sm
+  .col
+    %table.table
+      %tr
+        %th.tableheader{colspan:100} Subscribers
+      %tr
+        %th Name
       - subscribers.each do |subscriber|
-        - simple_list_item subscriber.name, edit_subscriber_path(subscriber)
+        %tr
+          %td= link_to subscriber.name, edit_subscriber_path(subscriber)
+

@@ -1,8 +1,16 @@
-.row-fluid
-  .span6
-    - simple_list :device, title: 'Devices', icon: :folder, create_path: (@can_create && new_institution_device_path(@institution)) do
-      - @devices.each do |device|
-        - if @devices_to_edit.include?(device.id)
-          - simple_list_item device.name, edit_institution_device_path(@institution, device)
-        - else
-          - simple_list_item device.name, nil
+%table
+  %thead
+    %tr
+      %th
+        Devices
+        - if @can_create
+          = link_to '+', new_institution_device_path(@institution)
+  %tbody
+    - @devices.each do |device|
+      %tr
+        %td
+          - if @devices_to_edit.include?(device.id)
+            = link_to device.name, edit_institution_device_path(@institution, device)
+          - else
+            - device.name
+
