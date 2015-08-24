@@ -1,10 +1,12 @@
 class InstitutionsController < ApplicationController
-  layout "institutions", except: [:index, :new, :create]
-  layout "application", only: [:index, :new, :create]
+  layout "institutions"
 
   def index
     @institutions = check_access(Institution, READ_INSTITUTION)
     @institutions ||= []
+    if @institutions.size == 1
+      redirect_to edit_institution_path(@institutions.first)
+    end
   end
 
   def show
@@ -17,6 +19,7 @@ class InstitutionsController < ApplicationController
   def edit
     @institution = Institution.find(params[:id])
     @readonly = !has_access?(@institution, UPDATE_INSTITUTION)
+    @institutions = check_access(Institution, READ_INSTITUTION)
 
     set_institution_tab :settings
   end
@@ -37,7 +40,7 @@ class InstitutionsController < ApplicationController
 
     respond_to do |format|
       if @institution.save
-        format.html { redirect_to @institution, notice: 'Institution was successfully created.' }
+        format.html { redirect_to institutions_path, notice: 'Institution was successfully created.' }
         format.json { render action: 'show', status: :created, location: @institution }
       else
         format.html { render action: 'new' }
@@ -52,7 +55,7 @@ class InstitutionsController < ApplicationController
 
     respond_to do |format|
       if @institution.update(institution_params)
-        format.html { redirect_to @institution, notice: 'Institution was successfully updated.' }
+        format.html { redirect_to institutions_path, notice: 'Institution was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

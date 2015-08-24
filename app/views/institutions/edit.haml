@@ -1,5 +1,12 @@
-Get access through API token.
-= link_to 'Request API token', request_api_token_institution_path(@institution)
-%br
+%h2
+  = link_to '<-', institutions_path if @institutions.size > 1
+  = @institution.name
+%p
+  Get access through API token.
+  = link_to 'Request API token', request_api_token_institution_path(@institution)
 %br
 = render 'form'
+%br
+- if has_access?(@institution, "cdpx:deleteInstitution")
+  = link_to "Delete this institution", @institution, method: :delete, data: { confirm: "Are you sure you want to delete the institution '#{@institution.name}'" }
+

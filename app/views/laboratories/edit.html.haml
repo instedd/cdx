@@ -1,9 +1,11 @@
-.span12
-  %h3 Editing #{@laboratory.name}
+%h3
+  = link_to '<-', laboratories_path
+  = @laboratory.name
 
-  = render 'form'
+= render 'form'
 
-  - if @can_delete
-    %hr
+- if @can_delete
+  %hr
 
-    = link_to "Delete this laboratory", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }
+  = link_to "Delete this laboratory", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }
+  

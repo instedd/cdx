@@ -2,8 +2,6 @@ class DevicesController < ApplicationController
   require 'barby'
   require 'barby/barcode/code_93'
   require 'barby/outputter/html_outputter'
-  layout "institutions"
-  set_institution_tab :devices
 
   before_filter :load_institution
   before_filter :load_laboratories, only: [:new, :create, :edit, :update]

@@ -1,6 +1,3 @@
-- content_for(:leftcolumn) do
-  .centered
-    = link_to "+", new_institution_path, class: 'btn-add fixed', title: 'Add Institution'
 .row.grid_sm
   .col
     %table.table
@@ -10,5 +7,5 @@
         %th Name
       - @institutions.each do |institution|
         %tr
-          %td= link_to institution.name, institution
+          %td= link_to institution.name, edit_institution_path(institution)
 

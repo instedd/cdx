@@ -1,5 +1,9 @@
 - content_for :cdp_content do
-  = render 'shared/institution_tabs'
+  = render partial: 'user_profile'
   = yield
+
+- content_for(:rightcolumn) do
+  .centered
+    = link_to "+", new_institution_path, class: 'btn-add fixed', title: 'Add Institution'
 
 = render template: 'layouts/application'

@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   guisso_for :user
 
   resources :laboratories
-  resources :institutions do
+  resources :institutions, except: :show do
     member do
       get :request_api_token
     end
