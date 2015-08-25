@@ -6,6 +6,5 @@
 
 - if @can_delete
   %hr
-
   = link_to "Delete this laboratory", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }
   

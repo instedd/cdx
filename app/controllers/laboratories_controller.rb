@@ -1,6 +1,6 @@
 class LaboratoriesController < ApplicationController
   set_institution_tab :laboratories
-  before_filter :load_institutions, except: :index
+  before_filter :load_institutions
 
   def index
     @laboratories = check_access(Laboratory, READ_LABORATORY)
@@ -8,7 +8,12 @@ class LaboratoriesController < ApplicationController
     @institutions = check_access(Institution, READ_INSTITUTION)
     @can_create = has_access?(@institutions, CREATE_INSTITUTION_LABORATORY)
 
-    @labs_to_edit = check_access(Laboratory, UPDATE_LABORATORY)
+    if (institution_id = params[:institution].presence)
+      institution_id = institution_id.to_i
+      @laboratories = @laboratories.select { |lab| lab.institution_id == institution_id }
+    end
+
+    @labs_to_edit = check_access(@laboratories, UPDATE_LABORATORY)
     @labs_to_edit ||= []
     @labs_to_edit.map!(&:id)
   end
@@ -16,7 +21,7 @@ class LaboratoriesController < ApplicationController
   def new
     return unless @institutions = authorize_resource(@institutions, CREATE_INSTITUTION_LABORATORY)
     @laboratory = Laboratory.new
-    if @institutions.size == 1
+    if @institutions.one?
       @laboratory.institution = @institutions.first
     end
   end

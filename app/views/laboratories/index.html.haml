@@ -2,6 +2,21 @@
   - if @can_create
     .centered
       = link_to "+", new_laboratory_path, class: 'btn-add fixed', title: 'Add Laboratory'
+
+- unless @institutions.one?
+  .row.grid_sm
+    .col
+      %h1 Filters
+  %form
+    .row.grid_sm
+      .col.pe-2
+        %label Institution
+        %select.ddown(name="institution")
+          %option(value="") (all)
+          = options_from_collection_for_select @institutions, :id, :name, params["institution"]
+      .col
+        %input.btn-primary.pull-right{type: "submit", value: "Filter"}
+
 .row.grid_sm
   .col
     %table.table
@@ -9,7 +24,8 @@
         %th.tableheader{colspan:100} Laboratories
       %tr
         %th Name
-        %th Institution
+        - unless @institutions.one?
+          %th Institution
         %th Location
       - @laboratories.each do |laboratory|
         %tr
@@ -17,6 +33,7 @@
             %td= link_to laboratory.name, edit_laboratory_path(laboratory)
           - else
             %td= laboratory.name
-          %td= laboratory.institution.name
+          - unless @institutions.one?
+            %td= laboratory.institution.name
           %td= laboratory.location.try(:name)
 

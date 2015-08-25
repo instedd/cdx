@@ -6,30 +6,28 @@
           - @laboratory.errors.full_messages.each do |msg|
             %li= msg
 
-
-  - if @institutions.size == 1
-    = hidden_field :laboratory, :institution_id
-  - else
-    - if @laboratory.new_record?
-      .control-group
-        = f.label :institution, class: 'control-label'
-        .control
-          = f.collection_select :institution_id, @institutions, :id, :name
+  .row.grid_sm
+    - if @institutions.one?
+      = hidden_field :laboratory, :institution_id
     - else
-      .control-group
-        %label Institution
-        .control
+      .col.pe-2
+        - if @laboratory.new_record?
+          = f.label :institution, class: 'control-label'
+          = f.collection_select :institution_id, @institutions, :id, :name, {}, class: 'ddown'
+        - else
+          %label Institution
           %p= @laboratory.institution
 
-  .control-group
-    = f.label :name, :class => 'control-label'
-    .control
-      = f.text_field :name, :class => 'input-large'
-  .control-group
-    = f.label :location_geoid, "Location", :class => 'control-label'
-    .control
+  .row
+    .col.pe-2
+      = f.label :name, :class => 'control-label'
+      %div
+        = f.text_field :name, :class => 'input-large'
+  .row
+    .col.pe-2
+      = f.label :location_geoid, "Location", :class => 'control-label'
       = f.hidden_field :location_geoid, class: 'input-xxlarge'
 
-  .control-group
-    .control
+  .row
+    .col.pe-2
       = f.submit class: 'btn'

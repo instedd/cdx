@@ -1,36 +1,35 @@
 class InstitutionsController < ApplicationController
   layout "institutions"
+  before_filter :load_institutions, except: :index
 
   def index
+    @can_create = true
     @institutions = check_access(Institution, READ_INSTITUTION)
     @institutions ||= []
-    if @institutions.size == 1
+    if @institutions.one?
       redirect_to edit_institution_path(@institutions.first)
     end
-  end
-
-  def show
-    @institution = Institution.find(params[:id])
-    return unless authorize_resource(@institution, READ_INSTITUTION)
-
-    set_institution_tab :overview
   end
 
   def edit
     @institution = Institution.find(params[:id])
     @readonly = !has_access?(@institution, UPDATE_INSTITUTION)
+
+    unless has_access?(@institution, UPDATE_INSTITUTION)
+      redirect_to institution_path(@institutions.first)
+    end
+    
     @institutions = check_access(Institution, READ_INSTITUTION)
 
-    set_institution_tab :settings
+    if @institutions.one?
+      @can_create = true
+    end
   end
 
   def new
     @institution = current_user.institutions.new
     @institution.user_id = current_user.id
     return unless authorize_resource(@institution, CREATE_INSTITUTION)
-
-    @readonly = false
-    set_institution_tab :new
   end
 
   def create
@@ -80,12 +79,14 @@ class InstitutionsController < ApplicationController
     @institution = Institution.find(params[:id])
     return unless authorize_resource(@institution, READ_INSTITUTION)
 
-    set_institution_tab :settings
-
     @token = Guisso.generate_bearer_token current_user.email
   end
 
   private
+
+  def load_institutions
+    @institutions = check_access(Institution, READ_INSTITUTION)
+  end
 
   def institution_params
     params.require(:institution).permit(:name)
