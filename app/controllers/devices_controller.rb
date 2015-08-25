@@ -3,18 +3,25 @@ class DevicesController < ApplicationController
   require 'barby/barcode/code_93'
   require 'barby/outputter/html_outputter'
 
-  before_filter :load_laboratories, only: [:new, :create, :edit, :update]
+  before_filter :load_laboratories, only: [:index, :new, :create, :edit, :update]
   before_filter :load_institution, only: :create
 
   def index
     @devices = check_access(Device, READ_DEVICE)
     @devices ||= []
 
+    if (institution_id = params[:institution].presence)
+      institution_id = institution_id.to_i
+      @devices = @devices.select { |dev| dev.institution_id == institution_id }
+    end
+
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
 
     @devices_to_edit = check_access(Device, UPDATE_DEVICE)
     @devices_to_edit ||= []
     @devices_to_edit.map!(&:id)
+
+    @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end
 
   def new
