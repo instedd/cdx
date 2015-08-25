@@ -8,16 +8,18 @@
 
 
   - if @institutions.size == 1
-    .control-group
-      %label Institution
-      .control
-        %p= @laboratory.institution
-        = hidden_field :laboratory, :institution_id
+    = hidden_field :laboratory, :institution_id
   - else
-    .control-group
-      = f.label :institution, class: 'control-label'
-      .control
-        = f.collection_select :institution_id, @institutions, :id, :name
+    - if @laboratory.new_record?
+      .control-group
+        = f.label :institution, class: 'control-label'
+        .control
+          = f.collection_select :institution_id, @institutions, :id, :name
+    - else
+      .control-group
+        %label Institution
+        .control
+          %p= @laboratory.institution
 
   .control-group
     = f.label :name, :class => 'control-label'

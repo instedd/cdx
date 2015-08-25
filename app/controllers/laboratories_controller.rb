@@ -1,5 +1,6 @@
 class LaboratoriesController < ApplicationController
   set_institution_tab :laboratories
+  before_filter :load_institutions, except: :index
 
   def index
     @laboratories = check_access(Laboratory, READ_LABORATORY)
@@ -13,7 +14,6 @@ class LaboratoriesController < ApplicationController
   end
 
   def new
-    @institutions = check_access(Institution, READ_INSTITUTION)
     return unless @institutions = authorize_resource(@institutions, CREATE_INSTITUTION_LABORATORY)
     @laboratory = Laboratory.new
     if @institutions.size == 1
@@ -24,7 +24,6 @@ class LaboratoriesController < ApplicationController
   # POST /laboratories
   # POST /laboratories.json
   def create
-    @institutions = check_access(Institution, CREATE_INSTITUTION_LABORATORY)
     @institution = Institution.find params[:laboratory][:institution_id]
     return unless authorize_resource(@institution, CREATE_INSTITUTION_LABORATORY)
 
@@ -80,6 +79,9 @@ class LaboratoriesController < ApplicationController
   end
 
   private
+  def load_institutions
+    @institutions = check_access(Institution, CREATE_INSTITUTION_LABORATORY)
+  end
 
   def laboratory_params
     params.require(:laboratory).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid)
