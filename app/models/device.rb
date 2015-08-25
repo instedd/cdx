@@ -4,7 +4,7 @@ class Device < ActiveRecord::Base
   has_many :manifests, through: :device_model
   belongs_to :device_model
   belongs_to :institution
-  has_and_belongs_to_many :laboratories
+  belongs_to :laboratory
   has_many :test_results
   has_many :device_messages
   has_one :activation_token, dependent: :destroy
@@ -87,23 +87,4 @@ class Device < ActiveRecord::Base
     self.activation_token = ActivationToken.new(device: self)
   end
 
-  def current_laboratory
-    current_laboratory_and_location[0]
-  end
-
-  def current_location
-    current_laboratory_and_location[1]
-  end
-
-  def current_laboratory_and_location
-    @current_laboratory_and_location ||=
-      case laboratories.count
-      when 0
-        [nil, nil]
-      when 1
-        [laboratories.first, locations(ancestors: true).first]
-      else
-        [nil, Location.common_root(locations(ancestors: true))]
-      end
-  end
 end

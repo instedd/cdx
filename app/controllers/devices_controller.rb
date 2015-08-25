@@ -35,7 +35,10 @@ class DevicesController < ApplicationController
         format.html { redirect_to devices_path, notice: 'Device was successfully created.' }
         format.json { render action: 'show', status: :created, location: @device }
       else
-        format.html { render action: 'new' }
+        format.html do
+          @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
+          render action: 'new'
+        end
         format.json { render json: @device.errors, status: :unprocessable_entity }
       end
     end
@@ -136,7 +139,7 @@ class DevicesController < ApplicationController
   end
 
   def device_params
-    params.require(:device).permit(:name, :device_model_id, :time_zone, laboratory_ids: []).tap do |whitelisted|
+    params.require(:device).permit(:name, :device_model_id, :time_zone, :laboratory_id).tap do |whitelisted|
       if custom_mappings = params[:device][:custom_mappings]
         whitelisted[:custom_mappings] = custom_mappings.select { |k, v| v.present? }
       end

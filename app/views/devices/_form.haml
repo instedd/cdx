@@ -25,10 +25,10 @@
     .controls
       = f.collection_select :device_model_id, DeviceModel.active, :id, :name
   .control-group
-    = f.label :laboratories, :class => 'control-label'
+    = f.label :laboratory, :class => 'control-label'
     .controls
       .checks
-        = f.collection_check_boxes(:laboratory_ids, @laboratories, :id, :name) { |b| b.label { b.check_box + b.text } + "<br/>".html_safe }
+        = f.collection_select(:laboratory_id, @laboratories, :id, :name, include_blank: true)
   .control-group
     = f.label :time_zone
     .controls

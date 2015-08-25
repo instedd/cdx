@@ -46,7 +46,7 @@ describe TestResultIndexer, elasticsearch: true do
   it "should index a document" do
     client = double(:es_client)
     allow_any_instance_of(TestResultIndexer).to receive(:client).and_return(client)
-    location = test.device.laboratories.first.location
+    location = test.device.laboratory.location
 
     expect(client).to receive(:index).with(
       index: Cdx::Api.index_name,
@@ -93,7 +93,7 @@ describe TestResultIndexer, elasticsearch: true do
           "uuid" => test.device.uuid
         },
         "laboratory" => {
-          "uuid" => test.device.laboratories.first.uuid
+          "uuid" => test.device.laboratory.uuid
         },
         "institution" => {
           "uuid" => test.device.institution.uuid

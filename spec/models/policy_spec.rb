@@ -592,7 +592,7 @@ describe Policy do
   context "queryTest" do
     context "Allow" do
       let!(:laboratory) {Laboratory.make institution_id: institution.id}
-      let!(:device) {Device.make laboratories: [laboratory], institution_id: institution.id}
+      let!(:device) {Device.make laboratory: laboratory, institution_id: institution.id}
 
       [Institution, Laboratory, Device].each do |resource|
         it "allows a user to query tests of it's own #{resource}" do
@@ -605,7 +605,7 @@ describe Policy do
       let!(:user2) { User.make }
       let!(:institution2) { user2.create Institution.make_unsaved }
       let!(:laboratory) { Laboratory.create institution_id: institution2.id }
-      let!(:device2) { Device.create laboratories: [laboratory], institution_id: institution2.id }
+      let!(:device2) { Device.create laboratory: laboratory, institution_id: institution2.id }
 
       [Institution, Laboratory, Device].each do |resource|
         it "forbids a user to query tests of other user's #{resource}" do

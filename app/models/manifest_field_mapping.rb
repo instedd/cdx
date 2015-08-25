@@ -127,10 +127,10 @@ class ManifestFieldMapping
 
       if @device
         ctx["device"] = script_device(@device)
-        if laboratory = @device.current_laboratory
+        if laboratory = @device.laboratory
           ctx["laboratory"] = script_laboratory(laboratory)
         end
-        if location = @device.current_location
+        if location = laboratory.try(&:location)
           ctx["location"] = script_location(location)
         end
       end

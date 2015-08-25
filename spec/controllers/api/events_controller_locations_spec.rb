@@ -25,9 +25,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     let(:laboratory3) {Laboratory.make institution: institution, location_geoid: upper_leaf_location.id}
 
     it "filters by location" do
-      device1 = Device.make institution: institution, laboratories: [laboratory1]
-      device2 = Device.make institution: institution, laboratories: [laboratory2]
-      device3 = Device.make institution: institution, laboratories: [laboratory3]
+      device1 = Device.make institution: institution, laboratory: laboratory1
+      device2 = Device.make institution: institution, laboratory: laboratory2
+      device3 = Device.make institution: institution, laboratory: laboratory3
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_b"]})
@@ -51,9 +51,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
     end
 
     it "groups by administrative level" do
-      device1 = Device.make institution: institution, laboratories: [laboratory1]
-      device2 = Device.make institution: institution, laboratories: [laboratory2]
-      device3 = Device.make institution: institution, laboratories: [laboratory3]
+      device1 = Device.make institution: institution, laboratory: laboratory1
+      device2 = Device.make institution: institution, laboratory: laboratory2
+      device3 = Device.make institution: institution, laboratory: laboratory3
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_b"]})

@@ -13,10 +13,10 @@ describe TestResultQuery, elasticsearch: true do
   let(:laboratory_2)    {Laboratory.make institution: institution_2}
   let(:laboratory_3)    {Laboratory.make institution: institution_3}
 
-  let(:user_device)     {Device.make institution_id: institution.id, laboratories: [laboratory]}
-  let(:user_device_2)   {Device.make institution_id: institution.id, laboratories: [laboratory]}
-  let(:user_device_3)   {Device.make institution_id: institution_2.id, laboratories: [laboratory_2]}
-  let(:user_device_4)   {Device.make institution_id: institution_3.id, laboratories: [laboratory_3]}
+  let(:user_device)     {Device.make institution_id: institution.id, laboratory: laboratory}
+  let(:user_device_2)   {Device.make institution_id: institution.id, laboratory: laboratory}
+  let(:user_device_3)   {Device.make institution_id: institution_2.id, laboratory: laboratory_2}
+  let(:user_device_4)   {Device.make institution_id: institution_3.id, laboratory: laboratory_3}
   let(:non_user_device) {Device.make}
 
   context "policies" do
@@ -162,7 +162,7 @@ describe TestResultQuery, elasticsearch: true do
     end
 
     it "should include names if there is no lab" do
-      device = Device.make institution_id: institution.id, laboratories: []
+      device = Device.make institution_id: institution.id, laboratory: nil
       TestResult.create_and_index(
         core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
         device_messages:[DeviceMessage.make(device: device)]

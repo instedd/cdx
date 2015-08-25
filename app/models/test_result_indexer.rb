@@ -26,14 +26,14 @@ class TestResultIndexer
   end
 
   def core_fields
-    location = device.current_location
+    laboratory = device.laboratory
+    laboratory_uuid = laboratory.try &:uuid
+    laboratory_name = laboratory.try &:name
+
+    location = laboratory.try &:location
     location_id = location.try(:geo_id)
     location_lat = location.try(:lat)
     location_lng = location.try(:lng)
-
-    laboratory = device.current_laboratory
-    laboratory_uuid = laboratory.try &:uuid
-    laboratory_name = laboratory.try &:name
 
     parent_locations = location.try(:self_and_ancestors) || []
     parent_locations_id = parent_locations.map(&:geo_id)

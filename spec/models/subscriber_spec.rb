@@ -6,7 +6,7 @@ describe Subscriber, elasticsearch: true do
   let(:device){Device.make device_model: model}
   let(:device_message){DeviceMessage.make(device: device)}
   let(:institution){device.institution}
-  let(:laboratory){device.laboratories.first}
+  let(:laboratory){device.laboratory}
 
   let!(:filter) { Filter.make query: {"condition" => "mtb", "laboratory" => laboratory.id.to_s}, user: institution.user}
   let!(:manifest) {

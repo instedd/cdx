@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150821200128) do
+ActiveRecord::Schema.define(version: 20150825150412) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -84,11 +84,7 @@ ActiveRecord::Schema.define(version: 20150821200128) do
     t.string   "secret_key_hash", limit: 255
     t.string   "time_zone",       limit: 255
     t.text     "custom_mappings", limit: 65535
-  end
-
-  create_table "devices_laboratories", id: false, force: :cascade do |t|
-    t.integer "device_id",     limit: 4
-    t.integer "laboratory_id", limit: 4
+    t.integer  "laboratory_id",   limit: 4
   end
 
   create_table "encounters", force: :cascade do |t|

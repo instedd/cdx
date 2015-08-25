@@ -99,7 +99,7 @@ describe Manifest, validate_manifest: false do
 
     it "has access to laboratory from script" do
       device = Device.make
-      lab = device.current_laboratory
+      lab = device.laboratory
 
       assert_manifest_application %(
         {
@@ -115,7 +115,7 @@ describe Manifest, validate_manifest: false do
 
     it "has access to location from script" do
       device = Device.make
-      loc = device.current_location
+      loc = device.laboratory.location
 
       assert_manifest_application %(
         {

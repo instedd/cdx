@@ -19,4 +19,4 @@
           - else
             %td= device.name
           %td= device.device_model.name
-          %td= device.current_laboratory.try(:name)
+          %td= device.laboratory.try(:name)

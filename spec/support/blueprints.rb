@@ -36,8 +36,8 @@ Institution.blueprint do
 end
 
 Device.blueprint do
-  laboratories { [Laboratory.make] }
-  institution { laboratories.first.institution }
+  laboratory
+  institution { laboratory.institution }
   name
   device_model { Manifest.make.device_models.first }
   time_zone { "UTC" }
