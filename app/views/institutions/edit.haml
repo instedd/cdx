@@ -1,9 +1,11 @@
 %h2
   = link_to '←', institutions_path if @institutions.size > 1
   = @institution.name
+
 - content_for(:rightcolumn) do
   - if has_access?(@institution, "cdpx:deleteInstitution")
     = link_to "Delete", @institution, method: :delete, data: { confirm: "Are you sure you want to delete the institution '#{@institution.name}'" }, class: 'btn-primary fixed', title: 'Delete Institution'
+
 .row.grid_sm
   .col
     %label Get access through API token.

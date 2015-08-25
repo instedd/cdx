@@ -4,7 +4,7 @@
 
 = render 'form'
 
-- if @can_delete
-  %hr
-  = link_to "Delete this laboratory", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }
+- content_for(:rightcolumn) do
+  - if @can_delete
+    = link_to "Delete", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }, class: 'btn-primary fixed', title: 'Delete Laboratory'
   
