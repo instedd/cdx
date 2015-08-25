@@ -21,7 +21,7 @@
       %li{:class => params[:controller] == "subscribers" && "active"}
         = link_to "Subscribers", subscribers_path
       %li{:class => params[:controller] == "policies" && "active"}
-        = link_to "Policies", policies_path
+        = link_to "Users", policies_path
 
   .user{:tabindex => "0"}
     - if current_user

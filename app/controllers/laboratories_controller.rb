@@ -1,11 +1,11 @@
 class LaboratoriesController < ApplicationController
   set_institution_tab :laboratories
-  before_filter :load_institution, only: :create
 
   def index
     @laboratories = check_access(Laboratory, READ_LABORATORY)
     @laboratories ||= []
-    @can_create = has_access?(Institution, CREATE_INSTITUTION_LABORATORY)
+    @institutions = check_access(Institution, READ_INSTITUTION)
+    @can_create = has_access?(@institutions, CREATE_INSTITUTION_LABORATORY)
 
     @labs_to_edit = check_access(Laboratory, UPDATE_LABORATORY)
     @labs_to_edit ||= []
@@ -13,14 +13,19 @@ class LaboratoriesController < ApplicationController
   end
 
   def new
-    return unless authorize_resource(Institution, CREATE_INSTITUTION_LABORATORY)
+    @institutions = check_access(Institution, READ_INSTITUTION)
+    return unless @institutions = authorize_resource(@institutions, CREATE_INSTITUTION_LABORATORY)
     @laboratory = Laboratory.new
-    @institutions = check_access(Institution, CREATE_INSTITUTION_LABORATORY)
+    if @institutions.size == 1
+      @laboratory.institution = @institutions.first
+    end
   end
 
   # POST /laboratories
   # POST /laboratories.json
   def create
+    @institutions = check_access(Institution, CREATE_INSTITUTION_LABORATORY)
+    @institution = Institution.find params[:laboratory][:institution_id]
     return unless authorize_resource(@institution, CREATE_INSTITUTION_LABORATORY)
 
     @laboratory = @institution.laboratories.new(laboratory_params)
@@ -75,11 +80,6 @@ class LaboratoriesController < ApplicationController
   end
 
   private
-
-  def load_institution
-    @institution = Institution.find params[:laboratory][:institution_id]
-    authorize_resource(@institution, READ_INSTITUTION)
-  end
 
   def laboratory_params
     params.require(:laboratory).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid)
