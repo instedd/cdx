@@ -207,6 +207,82 @@ describe Manifest, validate_manifest: false do
         "test" => {"custom" => {"foo" => "Doe: qc"}, "pii" => {}, "core" => {}}
     end
 
+    it "does case with then that is a lookup" do
+      assert_manifest_application %{
+          {
+            "test.foo" : {
+              "case" : [
+                {"lookup" : "test_type"},
+                [
+                  { "when" : "*QC*", "then" : {"lookup": "last_name"}},
+                  { "when" : "*Specimen*", "then" : "specimen"}
+                ]
+              ]
+            }
+          }
+        }, %{
+          {
+            "test.foo": {}
+          }
+        },
+        %({
+          "test_type" : "This is a QC test",
+          "last_name" : "Doe"
+        }),
+        "test" => {"custom" => {"foo" => "Doe"}, "pii" => {}, "core" => {}}
+    end
+
+    it "does case with else" do
+      assert_manifest_application %{
+          {
+            "test.foo" : {
+              "case" : [
+                {"lookup" : "test_type"},
+                [
+                  { "when" : "*QC*", "then" : "qc"},
+                  { "when" : "*Specimen*", "then" : "specimen"},
+                  { "else" : "unknown"}
+                ]
+              ]
+            }
+          }
+        }, %{
+          {
+            "test.foo": {}
+          }
+        },
+        %({
+          "test_type" : "This won't match"
+        }),
+        "test" => {"custom" => {"foo" => "unknown"}, "pii" => {}, "core" => {}}
+    end
+
+    it "does case with else that is a lookup" do
+      assert_manifest_application %{
+          {
+            "test.foo" : {
+              "case" : [
+                {"lookup" : "test_type"},
+                [
+                  { "when" : "*QC*", "then" : "qc"},
+                  { "when" : "*Specimen*", "then" : "specimen"},
+                  { "else" : {"lookup": "last_name"}}
+                ]
+              ]
+            }
+          }
+        }, %{
+          {
+            "test.foo": {}
+          }
+        },
+        %({
+          "test_type" : "This won't match",
+          "last_name" : "Doe"
+        }),
+        "test" => {"custom" => {"foo" => "Doe"}, "pii" => {}, "core" => {}}
+    end
+
     it "maps the result of a concat" do
       assert_manifest_application %{
           {
