@@ -13,9 +13,6 @@
     }
   },
   "custom_fields" : {
-    "patient.name": {
-      "pii" : true
-    },
     "patient.ethnicity": {},
     "patient.race": {},
     "patient.race_ethnicity": {}

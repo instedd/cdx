@@ -88,6 +88,8 @@ laboratory:
 patient:
   id:
     pii: true
+  name:
+    pii: true
   gender:
     type: enum
     searchable: true

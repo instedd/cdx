@@ -16,10 +16,6 @@ describe Manifest, validate_manifest: false do
           }
         }}, %{
           {
-            "patient.name" : {
-              "name": "patient.name",
-              "pii" : true
-            }
           }
         },
         '{
@@ -42,14 +38,13 @@ describe Manifest, validate_manifest: false do
           }
         },%{
           {
-            "patient.name": {}
           }
         },
         '{
           "first_name" : "John",
           "last_name" : "   Doe   "
         }',
-        "patient" => {"custom" => {"name" => "Doe, John"}, "pii" => {}, "core" => {}}
+        "patient" => {"custom" => {}, "pii" => {"name" => "Doe, John"}, "core" => {}}
     end
 
     it "converts to lowercase" do
@@ -61,11 +56,10 @@ describe Manifest, validate_manifest: false do
         }
       },%{
         {
-          "patient.name": {}
         }
       },
       %({"last_name" : "Doe"}),
-      "patient" => {"custom" => {"name" => "doe"}, "pii" => {}, "core" => {}}
+      "patient" => {"custom" => {}, "pii" => {"name" => "doe"}, "core" => {}}
     end
 
     it "runs javascript" do
@@ -77,10 +71,9 @@ describe Manifest, validate_manifest: false do
         }
       ), %(
         {
-          "patient.name": {}
         }
       ), %({"first_name": "John", "last_name": "Doe"}),
-      "patient" => {"custom" => {"name" => "John Doe"}, "pii" => {}, "core" => {}}
+      "patient" => {"custom" => {}, "pii" => {"name" => "John Doe"}, "core" => {}}
     end
 
     it "has access to device from script" do
@@ -136,14 +129,13 @@ describe Manifest, validate_manifest: false do
         }
       ), %(
         {
-          "patient.name": {}
         }
       ), {xml: %(
         <Message>
           <Patient name="Socrates" age="27"/>
         </Message>
       )},
-      "patient" => {"custom" => {"name" => "Socrates"}, "pii" => {}, "core" => {}}
+      "patient" => {"custom" => {}, "pii" => {"name" => "Socrates"}, "core" => {}}
     end
 
     it "maps an array from javascript" do
@@ -155,10 +147,9 @@ describe Manifest, validate_manifest: false do
         }
       ), %(
         {
-          "patient.name": {}
         }
       ), %({"first_name": "John", "last_name": "Doe"}),
-      "patient" => {"custom" => {"name" => ["John", "Doe"]}, "pii" => {}, "core" => {}}
+      "patient" => {"custom" => {}, "pii" => {"name" => ["John", "Doe"]}, "core" => {}}
     end
 
     it "maps an array from javascript" do
@@ -170,7 +161,6 @@ describe Manifest, validate_manifest: false do
         }
       ), %(
         {
-          "patient.name": {}
         }
       ), %({"first_name": "John", "last_name": "Doe"}),
       "JSONObject is not a valid return type for 'patient.name' script"

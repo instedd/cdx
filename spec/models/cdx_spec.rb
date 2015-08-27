@@ -18,6 +18,7 @@ describe Cdx do
       "location.parents",
       "patient.gender",
       "patient.id",
+      "patient.name",
       "sample.collection_date",
       "sample.id",
       "sample.type",

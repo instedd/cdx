@@ -8,9 +8,6 @@
     "source": { "type" : "csv", "separator" : ";" }
   },
   "custom_fields" : {
-    "patient.name": {
-      "pii" : true
-    },
     "test.clia_waived_test": {
     },
     "test.revision": {

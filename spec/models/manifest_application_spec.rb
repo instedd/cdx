@@ -33,7 +33,7 @@ describe Manifest, validate_manifest: false do
             "patient.name" : {"lookup" : "patient.name"}
           }
         }, %{
-          {"patient.name": {"pii": true}}
+          {}
         },
         '{"patient" : {"name" : "John"}}',
         "patient" => {"core" => {}, "pii" => {"name" => "John"}, "custom" => {}}

@@ -24,9 +24,6 @@
     }
   },
   "custom_fields": {
-    "patient.name": {
-      "pii" : true
-    }
   },
   "field_mapping": {
     "patient.id": { "lookup": "4" },

@@ -10,9 +10,6 @@
     }
   },
   "custom_fields" : {
-    "patient.name": {
-      "pii" : true
-    },
     "patient.pregnancy_status": {
     }
   },

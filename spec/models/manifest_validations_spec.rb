@@ -190,8 +190,6 @@ describe Manifest do
           "source" : {"type" : "json"}
         },
         "custom_fields": {
-          "patient.name": {
-          },
           "patient.control_date": {
           },
           "patient.rbc_count": {

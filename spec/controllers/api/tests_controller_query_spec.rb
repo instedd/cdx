@@ -248,9 +248,6 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
             "source" : {"type" : "json"}
           },
           "custom_fields": {
-            "patient.name": {
-              "pii": true
-            }
           },
           "field_mapping" : {
             "test.assays[*].result": {
