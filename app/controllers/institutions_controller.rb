@@ -20,6 +20,7 @@ class InstitutionsController < ApplicationController
     end
     
     @institutions = check_access(Institution, READ_INSTITUTION)
+    @can_delete = has_access?(@institution, "cdpx:deleteInstitution")
 
     if @institutions.one?
       @can_create = true

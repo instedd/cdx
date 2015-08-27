@@ -1,6 +1,6 @@
 class TestResultsController < ApplicationController
   def index
-    @combo_laboratories = authorize_resource(Laboratory, READ_LABORATORY)
+    @combo_laboratories = check_access(Laboratory, READ_LABORATORY)
 
     query = {}
     query["laboratory.id"] = params["laboratory"] if params["laboratory"].present?

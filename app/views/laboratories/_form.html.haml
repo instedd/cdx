@@ -18,16 +18,21 @@
           %label Institution
           %p= @laboratory.institution
 
-  .row
+  .row.grid_sm
     .col.pe-2
       = f.label :name, :class => 'control-label'
       %div
         = f.text_field :name, :class => 'input-large'
-  .row
+  .row.grid_sm
     .col.pe-2
       = f.label :location_geoid, "Location", :class => 'control-label'
       = f.hidden_field :location_geoid, class: 'input-xxlarge'
 
-  .row
-    .col.pe-2
-      = f.submit class: 'btn'
+  .row.grid_sm
+    .col.pe-1
+      = f.submit 'Save', class: 'btn-primary'
+    .col.pe-10
+    .col.pe-1
+      - if @can_delete
+        = link_to "Delete", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }, class: 'btn-secondary pull-right', title: 'Delete Laboratory'
+

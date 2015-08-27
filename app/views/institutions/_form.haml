@@ -6,11 +6,15 @@
           - @institution.errors.full_messages.each do |msg|
             %li= msg
   - unless @readonly
-    .control-group
+    .row.grid_sm
+      .col.pe-2
       = f.label :name, :class => 'control-label'
-      .controls
-        = f.text_field :name, readonly: @readonly
+      = f.text_field :name, readonly: @readonly
 
-    .control-group
-      .controls
-        = f.submit class: 'btn'
+    .row.grid_sm
+      .col.pe-1
+        = f.submit 'Save', class: 'btn-primary'
+      .col.pe-10
+      .col.pe-1
+        - if @can_delete
+          = link_to "Delete", @institution, method: :delete, data: { confirm: "Are you sure you want to delete the institution '#{@institution.name}'" }, class: 'btn-secondary', title: 'Delete Institution'
