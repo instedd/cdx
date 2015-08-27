@@ -16,10 +16,10 @@
           %td
             - if message.index_failed
               Failed
-              = link_to '(reprocess)', reprocess_institution_device_device_message_path(@institution, @device, message), method: 'post'
+              = link_to '(reprocess)', reprocess_device_device_message_path(@device, message), method: 'post'
             - else
               Success
           %td= message.index_failure_reason
           %td= message.index_failure_data[:record_index]
           %td= message.index_failure_data[:target_field]
-          %td= link_to 'Download', raw_institution_device_device_message_path(@institution, @device, message)
+          %td= link_to 'Download', raw_device_device_message_path(@device, message)
