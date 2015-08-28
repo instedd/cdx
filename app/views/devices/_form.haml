@@ -7,9 +7,9 @@
             %li= msg
 
   - if @device.new_record?
-    .control-group
-      = f.label :institution, class: 'control-label'
-      .control
+    .row
+      .col.pe-3
+        = f.label :institution, class: 'label'
         = f.collection_select :institution_id, @institutions, :id, :name
   - else
     %p
@@ -17,19 +17,19 @@
       = @device.institution
 
   .row
-    .col.pe-2
+    .col.pe-3
       = f.label :name, :class => 'label'
       = f.text_field :name
   .row
-    .col.pe-2
+    .col.pe-3
       = f.label :device_model_id, :class => 'label'
       = f.collection_select :device_model_id, DeviceModel.active, :id, :name, {}, :class => 'ddown'
   .row
-    .col.pe-2
+    .col.pe-3
       = f.label :laboratory, :class => 'label'
       = f.collection_select(:laboratory_id, @laboratories, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
   .row
-    .col.pe-2
+    .col.pe-3
       = f.label :time_zone, :class => 'label'
       = f.time_zone_select(:time_zone, nil,{ default: "UTC"}, class: 'ddown')
   .row

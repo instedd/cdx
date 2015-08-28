@@ -26,4 +26,8 @@ module ApplicationHelper
 
     res
   end
+
+  def editing?
+    params[:action] != 'index'
+  end
 end

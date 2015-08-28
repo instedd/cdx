@@ -1,29 +1,28 @@
-.span12
-  %h3 Editing #{@device.name}
+%h1 Editing #{@device.name}
+%p
+  %strong UUID:
+  = @device.uuid
+  = raw @uuid_barcode_for_html.to_html
+
+= render 'form'
+
+%hr
   %p
-    %strong UUID:
-    = @device.uuid
-    = raw @uuid_barcode_for_html.to_html
+    = link_to "Messages", device_device_messages_path(@device), class: 'btn'
+    - if @device.current_manifest.fields.any?(&:custom?)
+      = link_to "Custom Mappings", device_custom_mappings_path(@device), class: 'btn'
 
-  = render 'form'
-
+- if @can_regenerate_key
   %hr
-    %p
-      = link_to "Messages", device_device_messages_path(@device), class: 'btn'
-      - if @device.current_manifest.fields.any?(&:custom?)
-        = link_to "Custom Mappings", device_custom_mappings_path(@device), class: 'btn'
+  %p
+    = link_to "Generate new key", regenerate_key_device_path(@device), class: 'btn'
 
-  - if @can_regenerate_key
-    %hr
-    %p
-      = link_to "Generate new key", regenerate_key_device_path(@device), class: 'btn'
-
-  - if @can_generate_activation_token
-    %hr
-    %p
-      = link_to "Generate activation token",
-        generate_activation_token_device_path(@device),
-        method: :post,
-        class: 'btn'
+- if @can_generate_activation_token
+  %hr
+  %p
+    = link_to "Generate activation token",
+      generate_activation_token_device_path(@device),
+      method: :post,
+      class: 'btn'
 
 
