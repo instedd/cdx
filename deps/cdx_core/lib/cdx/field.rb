@@ -23,15 +23,7 @@ class Cdx::Field
   def initialize scope, name, definition
     @scope = scope
     @name = name
-    @definition = definition || {}
-
-    if @definition["sub_fields"]
-      @definition["sub_fields"] = @definition["sub_fields"].map do |sub_name, sub_field|
-        Cdx::Field.for(self, sub_name, sub_field)
-      end
-    end
-
-    @definition.freeze
+    @definition = (definition || {}).freeze
   end
 
   def type
@@ -54,28 +46,16 @@ class Cdx::Field
     @definition["searchable"]
   end
 
-  def sub_fields
-    @definition["sub_fields"]
-  end
-
-  def has_searchables?
-    searchable?
-  end
-
   def scoped_name
     "#{scope.scoped_name}.#{name}"
   end
 
   def flatten
-    sub_fields || self
+    self
   end
 
   def valid_values
     @definition["valid_values"]
-  end
-
-  def options
-    @definition["options"]
   end
 
   def pii?
@@ -83,6 +63,16 @@ class Cdx::Field
   end
 
   class NestedField < self
+    def initialize scope, name, definition
+      if definition["sub_fields"]
+        definition["sub_fields"] = definition["sub_fields"].map do |sub_name, sub_field|
+          Cdx::Field.for(self, sub_name, sub_field)
+        end
+      end
+
+      super
+    end
+
     def nested?
       true
     end
@@ -90,12 +80,23 @@ class Cdx::Field
     def searchable?
       sub_fields.any? &:searchable?
     end
+
+    def flatten
+      sub_fields.map(&:flatten)
+    end
+
+    def sub_fields
+      @definition["sub_fields"]
+    end
   end
 
   class MultiField < self
   end
 
   class EnumField < self
+    def options
+      @definition["options"]
+    end
   end
 
   class DynamicField < self

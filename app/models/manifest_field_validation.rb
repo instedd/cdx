@@ -25,7 +25,7 @@ class ManifestFieldValidation
         apply_to v
       end
     else
-      check_value_in_options(value, @field.options) if @field.options && @field.type == "enum"
+      check_value_in_options(value, @field.options) if @field.type == "enum" && @field.options
       check_value_in_range(value, valid_values["range"]) if valid_values && valid_values["range"]
       check_value_is_date(value, valid_values["date"]) if valid_values && valid_values["date"]
     end

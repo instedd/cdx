@@ -30,7 +30,7 @@ class Subscriber < ActiveRecord::Base
   end
 
   def self.available_fields
-    Cdx.core_fields.select{|field| !field.pii?}.map(&:flatten).flatten
+    Cdx.core_fields.select{|field| !field.pii?}
   end
 
   def self.default_schema

@@ -23,7 +23,7 @@ class Cdx::Field
     def elasticsearch_mapping
       {
         "type" => "nested",
-        "properties" => Hash[sub_fields.select(&:has_searchables?).map { |field|
+        "properties" => Hash[sub_fields.select(&:searchable?).map { |field|
           [field.name, field.elasticsearch_mapping]
         }]
       }

@@ -13,10 +13,10 @@ class Cdx::Scope
   end
 
   def flatten
-    @fields
+    fields.map(&:flatten)
   end
 
-  def has_searchables?
+  def searchable?
     fields.any? &:searchable?
   end
 

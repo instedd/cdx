@@ -20,7 +20,7 @@ class Cdx::Api::Elasticsearch::Config
   attr_accessor :elasticsearch_url
 
   def searchable_fields
-    @searchable_fields ||= Cdx.core_fields.select(&:has_searchables?).map do |core_field|
+    @searchable_fields ||= Cdx.first_level_core_fields.select(&:searchable?).map do |core_field|
       Cdx::Api::Elasticsearch::IndexedField.for(core_field, api_fields, document_format)
     end
   end

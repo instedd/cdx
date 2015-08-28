@@ -21,7 +21,7 @@ class Cdx::Api::Elasticsearch::IndexedField
     @name = document_format.indexed_field_name(@name)
 
     if nested?
-      @sub_fields = core_field.sub_fields.select(&:has_searchables?).map do |field|
+      @sub_fields = core_field.sub_fields.select(&:searchable?).map do |field|
         self.class.new(field, {}, document_format, true)
       end
     else
