@@ -18,7 +18,7 @@ class FiltersController < ApplicationController
   end
 
   def new
-    filter.query = params[:query]
+    filter.query = params[:query] || {}
   end
 
   def create

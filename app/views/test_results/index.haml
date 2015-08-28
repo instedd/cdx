@@ -1,8 +1,6 @@
 - content_for(:leftcolumn) do
-  - if params["condition"].present?
-    .centered
-      - query = {'laboratory.id' => params["laboratory"], 'test.assays.condition' => params["condition"]}
-      = link_to "+", new_filter_path(query: query), class: 'btn-add fixed', title: 'Add filter'
+  .centered
+    = link_to "+", new_filter_path(query: @filter), class: 'btn-add fixed', title: 'Add filter'
 
 .row
   .col
@@ -11,12 +9,12 @@
   .row
     .col.pe-2
       %label Laboratory
-      %select.ddown(name="laboratory")
+      %select.ddown(name="laboratory.id")
         %option(value="") (all)
-        = options_from_collection_for_select @combo_laboratories, :id, :name, params["laboratory"]
+        = options_from_collection_for_select @combo_laboratories, :id, :name, params["laboratory.id"]
     .col.pe-2
       %label Condition
-      %input{type: "text", name: "condition", value: params["condition"]}
+      %input{type: "text", name: "test.assays.condition", value: params["test.assays.condition"]}
     .col
       %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 

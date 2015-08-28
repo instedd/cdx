@@ -2,13 +2,16 @@ class TestResultQuery
   include Policy::Actions
 
   def initialize params, user
-    institutions = Policy.authorize(QUERY_TEST, Institution, user, user.policies)
+    institutions = Policy.authorize(QUERY_TEST, Institution, user, user.policies).map(&:uuid)
+    institutions = institutions & Array(params["institution.uuid"]) if params["institution.uuid"]
+    params["institution.uuid"] = institutions
+
+    devices = Policy.authorize(QUERY_TEST, Device, user, user.policies).map(&:uuid)
+    devices = devices & Array(params["device.uuid"]) if params["device.uuid"]
+    params["device.uuid"] = devices
 
     if institutions.present?
       @api_query = Cdx::Api::Elasticsearch::Query.for_indices([Cdx::Api.index_name], params)
-      @api_query.before_execute do
-        filter_institutions_with institutions
-      end
       @api_query.after_execute do |result|
         add_names_to result, institutions
       end
@@ -30,17 +33,6 @@ class TestResultQuery
   end
 
   private
-
-  def filter_institutions_with institutions
-    allowed_institution_ids = institutions.map &:uuid
-    requested_institution_ids = Array(@api_query.params["institution.uuid"]).map(&:to_s)
-    if requested_institution_ids.empty?
-      final_institution_ids = allowed_institution_ids
-    else
-      final_institution_ids = requested_institution_ids.select { |id| allowed_institution_ids.include? id }
-    end
-    @api_query.params["institution.uuid"] = final_institution_ids
-  end
 
   def add_names_to result, institutions
     tests = result["tests"]
