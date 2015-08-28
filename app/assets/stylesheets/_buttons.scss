@@ -10,6 +10,7 @@
   font-weight: 700;
   text-align: center;
   text-transform: uppercase;
+  line-height: 48px;
   border: 1px solid transparent;
   display: inline-block;
   padding: 0 24px;
@@ -19,24 +20,21 @@
   white-space: nowrap;
   cursor: pointer;
 
-  &,
-  &:active,
-  &.active {
-    &:focus {
-      outline: 0;
-    }
-  }
-
   &:hover,
   &:focus {
-    // color: @btn-default-color;
+    background: $gray1;
     text-decoration: none;
+    outline: 0;
   }
 
   &:active,
   &.active {
     outline: 0;
     background-image: none;
+    background: $gray2;
+    &:focus {
+    	outline: 0;
+  	}
   }
 
   &.disabled,
@@ -44,7 +42,7 @@
   fieldset[disabled] & {
     cursor: not-allowed;
     pointer-events: none; // Future-proof disabling of clicks
-    opacity: .65;
+    opacity: .2;
   }
 }
 
@@ -52,12 +50,41 @@
 	@extend .btn;
 	background: $gray4;
 	color: $white;
+
+  &:hover,
+  &:focus {
+    background: opacify($gray4, 0.01);
+  }
+
+  &:active,
+  &.active {
+    background: opacify($gray4, 0.05);
+  }
+
 }
 
 .btn-secondary {
 	@extend .btn;
 	background: $red;
 	color: $white;
+
+  &:hover,
+  &:focus {
+    background: darken($red, 5%);
+  }
+
+  &:active,
+  &.active {
+    background: darken($red, 10%);
+  }
+  
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    cursor: not-allowed;
+    pointer-events: none; // Future-proof disabling of clicks
+    opacity: .1;
+  }
 }
 
 .btn-add {

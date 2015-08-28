@@ -29,10 +29,8 @@
       = f.hidden_field :location_geoid, class: 'input-xxlarge'
 
   .row.grid_sm
-    .col.pe-1
+    .col
       = f.submit 'Save', class: 'btn-primary'
-    .col.pe-10
-    .col.pe-1
       - if @can_delete
         = link_to "Delete", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }, class: 'btn-secondary pull-right', title: 'Delete Laboratory'
 
