@@ -9,7 +9,7 @@
 .row {
   @include flexbox();
   @include clearfix();
-  flex-direction: column;
+  flex-direction: row;
 }
 
 /* default for even distribution */
@@ -106,21 +106,21 @@
 
 
 
-@media all and ( min-width: 480px ) {
+@media all and ( max-width: 480px ) {
   .grid_sm {
-    flex-direction: row;
+    flex-direction: column;
   }
 }
 
-@media all and ( min-width: 720px ) {
+@media all and ( max-width: 720px ) {
   .grid_md {
-    flex-direction: row;
+    flex-direction: column;
   }
 }
 
-@media all and ( min-width: 960px ) {
+@media all and ( max-width: 960px ) {
   .grid_lg {
-    flex-direction: row;
+    flex-direction: column;
   }
 }
 

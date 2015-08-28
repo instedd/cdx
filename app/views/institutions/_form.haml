@@ -6,12 +6,12 @@
           - @institution.errors.full_messages.each do |msg|
             %li= msg
   - unless @readonly
-    .row.grid_sm
+    .row
       .col.pe-2
       = f.label :name, :class => 'control-label'
       = f.text_field :name, readonly: @readonly
 
-    .row.grid_sm
+    .row
       .col.pe-1
         = f.submit 'Save', class: 'btn-primary'
       .col.pe-10

@@ -16,24 +16,24 @@
       Institution:
       = @device.institution
 
-  .control-group
-    = f.label :name, :class => 'control-label'
-    .controls
+  .row
+    .col.pe-2
+      = f.label :name, :class => 'label'
       = f.text_field :name
-  .control-group
-    = f.label :device_model_id, :class => 'control-label'
-    .controls
-      = f.collection_select :device_model_id, DeviceModel.active, :id, :name
-  .control-group
-    = f.label :laboratory, :class => 'control-label'
-    .controls
-      .checks
-        = f.collection_select(:laboratory_id, @laboratories, :id, :name, include_blank: true)
-  .control-group
-    = f.label :time_zone
-    .controls
-      = f.time_zone_select(:time_zone, nil, default: "UTC")
-
-  .control-group
-    .controls
-      = f.submit class: 'btn'
+  .row
+    .col.pe-2
+      = f.label :device_model_id, :class => 'label'
+      = f.collection_select :device_model_id, DeviceModel.active, :id, :name, {}, :class => 'ddown'
+  .row
+    .col.pe-2
+      = f.label :laboratory, :class => 'label'
+      = f.collection_select(:laboratory_id, @laboratories, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
+  .row
+    .col.pe-2
+      = f.label :time_zone, :class => 'label'
+      = f.time_zone_select(:time_zone, nil,{ default: "UTC"}, class: 'ddown')
+  .row
+    .col
+      = f.submit 'Save', class: 'btn-primary'
+      - if @can_delete
+        = link_to "Delete", @device, method: :delete, data: { confirm: "Are you sure you want to delete the device '#{@device.name}'" }, class: 'btn-secondary pull-right'

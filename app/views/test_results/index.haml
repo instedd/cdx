@@ -4,11 +4,11 @@
       - query = {'laboratory.id' => params["laboratory"], 'test.assays.condition' => params["condition"]}
       = link_to "+", new_filter_path(query: query), class: 'btn-add fixed', title: 'Add filter'
 
-.row.grid_sm
+.row
   .col
     %h1 Filters
 %form
-  .row.grid_sm
+  .row
     .col.pe-2
       %label Laboratory
       %select.ddown(name="laboratory")
@@ -20,32 +20,32 @@
     .col
       %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 
-  .row.grid_sm
-    .col
-      %table.table
+.row
+  .col
+    %table.table
+      %tr
+        %th.tableheader{colspan:100}= pluralize @total, "Test"
+      %tr
+        %th Created at
+        %th Institution
+        %th Laboratory
+        %th Device
+        %th Condition
+        %th Result
+      - @tests.each do |test|
         %tr
-          %th.tableheader{colspan:100}= pluralize @total, "Test"
-        %tr
-          %th Created at
-          %th Institution
-          %th Laboratory
-          %th Device
-          %th Condition
-          %th Result
-        - @tests.each do |test|
-          %tr
-            %td= test["test"]["reported_time"]
-            %td= test["institution"]["name"]
-            %td= test["laboratory"]["name"]
-            %td= test["device"]["name"]
-            %td= test["test"]["assays"].first["condition"]
-            %td= test["test"]["assays"].first["result"]
-      = link_to_if has_previous_page, "prev", previous_page_params, enabled: false
-      = link_to_if has_next_page, "next", next_page_params
-      |
-      %input{type: "text", name: "page", value: @page}
-      of
-      = (@total.to_f / @page_size).ceil
-      |
-      %select(name="page_size" onchange="this.form.submit()")
-        = options_for_page_sizes
+          %td= test["test"]["reported_time"]
+          %td= test["institution"]["name"]
+          %td= test["laboratory"]["name"]
+          %td= test["device"]["name"]
+          %td= test["test"]["assays"].first["condition"]
+          %td= test["test"]["assays"].first["result"]
+    = link_to_if has_previous_page, "prev", previous_page_params, enabled: false
+    = link_to_if has_next_page, "next", next_page_params
+    |
+    %input{type: "text", name: "page", value: @page}
+    of
+    = (@total.to_f / @page_size).ceil
+    |
+    %select(name="page_size" onchange="this.form.submit()")
+      = options_for_page_sizes

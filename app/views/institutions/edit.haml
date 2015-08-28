@@ -2,7 +2,7 @@
   = link_to '←', institutions_path if @institutions.size > 1
   = @institution.name
 
-.row.grid_sm
+.row
   .col
     %label Get access through API token.
     %p= link_to 'Request API token', request_api_token_institution_path(@institution)

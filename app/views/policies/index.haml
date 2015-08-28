@@ -1,7 +1,7 @@
 - content_for(:leftcolumn) do
   .centered
     = link_to "+", new_policy_path, class: 'btn-add fixed', title: 'Add Policy'
-.row.grid_sm
+.row
   .col
     %table.table
       %tr
@@ -11,6 +11,6 @@
         %th User
       - @policies.each do |policy|
         %tr
-          %td= link_to policy.name, edit_policy_path(policy) 
-          %td= link_to policy.user.email, edit_policy_path(policy) 
+          %td= link_to policy.name, edit_policy_path(policy)
+          %td= link_to policy.user.email, edit_policy_path(policy)
 

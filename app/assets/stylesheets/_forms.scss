@@ -26,6 +26,10 @@
 
   label {
     color: $gray3;
+
+    &.label {
+      display: block;
+    }
   }
 
   .dd-container,
@@ -33,7 +37,10 @@
   .dd-options {
     width: 100% !important;
   }
-
+  .dd-container,
+  .dd-option {
+    min-height: 40px;
+  }
   .dd-select {
     border: none !important;
     background: none !important;
@@ -46,5 +53,5 @@
 
     label {
       color: $black;
-    }  
+    }
   }

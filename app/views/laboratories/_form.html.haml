@@ -6,7 +6,7 @@
           - @laboratory.errors.full_messages.each do |msg|
             %li= msg
 
-  .row.grid_sm
+  .row
     - if @institutions.one?
       = hidden_field :laboratory, :institution_id
     - else
@@ -18,17 +18,17 @@
           %label Institution
           %p= @laboratory.institution
 
-  .row.grid_sm
+  .row
     .col.pe-2
       = f.label :name, :class => 'control-label'
       %div
         = f.text_field :name, :class => 'input-large'
-  .row.grid_sm
+  .row
     .col.pe-2
       = f.label :location_geoid, "Location", :class => 'control-label'
       = f.hidden_field :location_geoid, class: 'input-xxlarge'
 
-  .row.grid_sm
+  .row
     .col
       = f.submit 'Save', class: 'btn-primary'
       - if @can_delete
