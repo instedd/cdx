@@ -18,32 +18,38 @@
     .col
       %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 
-.row
-  .col
-    %table.table
-      %tr
-        %th.tableheader{colspan:100}= pluralize @total, "Test"
-      %tr
-        %th Created at
-        %th Institution
-        %th Laboratory
-        %th Device
-        %th Condition
-        %th Result
-      - @tests.each do |test|
+  .row
+    .col
+      %table.table
         %tr
-          %td= test["test"]["reported_time"]
-          %td= test["institution"]["name"]
-          %td= test["laboratory"]["name"]
-          %td= test["device"]["name"]
-          %td= test["test"]["assays"].first["condition"]
-          %td= test["test"]["assays"].first["result"]
-    = link_to_if has_previous_page, "prev", previous_page_params, enabled: false
-    = link_to_if has_next_page, "next", next_page_params
-    |
-    %input{type: "text", name: "page", value: @page}
-    of
-    = (@total.to_f / @page_size).ceil
-    |
-    %select(name="page_size" onchange="this.form.submit()")
-      = options_for_page_sizes
+          %th.tableheader{colspan:100}= pluralize @total, "Test"
+        %tr
+          %th= order_by_column "Name", "test.name"
+          %th Result
+          %th Institution
+          %th Laboratory
+          %th= order_by_column "Device", "device.name"
+          %th= order_by_column "Sample ID", "sample.id"
+          %th= order_by_column "Encounter ID", "encounter.id"
+          %th= order_by_column "Start Time", "test.start_time"
+          %th= order_by_column "End Time", "test.end_time"
+        - @tests.each do |test|
+          %tr
+            %td= test["test"]["name"]
+            %td= test["test"]["assays"].map {|assay| "#{assay["name"]}: #{assay["result"]}"}.join ", "
+            %td= test["institution"]["name"]
+            %td= test["laboratory"]["name"]
+            %td= test["device"]["name"]
+            %td= test["sample"]["id"]
+            %td= test["encounter"].try {|e| e["id"]}
+            %td= format_datetime(test["test"]["start_time"])
+            %td= format_datetime(test["test"]["end_time"])
+      = link_to_if has_previous_page, "prev", previous_page_params, enabled: false
+      = link_to_if has_next_page, "next", next_page_params
+      |
+      %input{type: "text", name: "page", value: @page}
+      of
+      = (@total.to_f / @page_size).ceil
+      |
+      %select(name="page_size" onchange="this.form.submit()")
+        = options_for_page_sizes
