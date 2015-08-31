@@ -9,7 +9,7 @@ class TestResult < ActiveRecord::Base
   belongs_to :patient
   belongs_to :encounter
   validates_presence_of :device
-  validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
+  # validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
   validate :same_patient_in_sample
 
   delegate :device_model, :device_model_id, to: :device

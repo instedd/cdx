@@ -33,6 +33,12 @@ module Entity
       self.custom_fields.blank?
   end
 
+  class_methods do
+    def from_the_past_year(relative_to)
+      where('created_at > ?', relative_to - 1.year)
+    end
+  end
+
 private
 
   def encrypt_sensitive_data

@@ -198,7 +198,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         },
         "field_mapping" : {
           "test.name" : {"lookup" : "assay.name"},
-          "sample.uid" :  {"lookup" : "sample_id"},
+          "sample.id" :  {"lookup" : "sample_id"},
           "patient.id" : {"lookup" : "patient.id"},
           "patient.telephone_number" : {"lookup" : "patient.telephone_number"}
         }
@@ -215,7 +215,6 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       sample = Sample.first
 
-      expect(sample.plain_sensitive_data["uid"]).to eq(10)
       expect(sample.patient.plain_sensitive_data["id"]).to eq(3)
       expect(sample.patient.plain_sensitive_data["telephone_number"]).to eq("2222222")
     end

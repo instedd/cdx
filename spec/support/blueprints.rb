@@ -45,17 +45,17 @@ end
 
 Encounter.blueprint do
   institution
-  plain_sensitive_data { { "encounter" => { "id" => "encounter-#{Sham.sn}" } } }
+  core_fields { { "id" => "encounter-#{Sham.sn}" } }
 end
 
 Sample.blueprint do
   institution
-  plain_sensitive_data { { "sample" => { "uid" => "sample-#{Sham.sn}" } } }
+  core_fields { { "uid" => "sample-#{Sham.sn}" } }
 end
 
 Patient.blueprint do
   institution
-  plain_sensitive_data { { "patient" => {"id" => "patient-#{Sham.sn}" } } }
+  plain_sensitive_data { {"id" => "patient-#{Sham.sn}" } }
 end
 
 TestResult.blueprint do

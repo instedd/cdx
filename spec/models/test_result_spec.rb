@@ -14,4 +14,12 @@ describe TestResult do
     expect(test).to be_invalid
     expect(test.errors[:patient_id].size).to eq(1)
   end
+
+  it "gets test result in the past year" do
+    test1 = TestResult.make created_at: 2.years.ago
+    test2 = TestResult.make created_at: 11.months.ago
+
+    tests = TestResult.from_the_past_year(Time.now).all
+    expect(tests).to eq([test2])
+  end
 end

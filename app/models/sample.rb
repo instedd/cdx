@@ -12,7 +12,7 @@ class Sample < ActiveRecord::Base
   validates_presence_of :institution
 
   def entity_uid
-    plain_sensitive_data["uid"]
+    core_fields["id"]
   end
 
   def entity_scope

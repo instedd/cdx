@@ -70,7 +70,7 @@ class DeviceMessageProcessor
                             device: device
       assign_fields parsed_message, test
 
-      if test_id && existing = TestResult.find_by(test_id: test_id, device_id: test.device_id)
+      if test_id && existing = TestResult.from_the_past_year(@parent.device_message.created_at).find_by(test_id: test_id, device_id: test.device_id)
         existing.merge(test)
         existing
       else
@@ -79,7 +79,7 @@ class DeviceMessageProcessor
     end
 
     def find_or_initialize_sample
-      find_or_initialize_entity Sample, ((parsed_message["sample"] || {})["pii"] || {})["uid"]
+      find_or_initialize_entity Sample, ((parsed_message["sample"] || {})["core"] || {})["id"]
     end
 
     def find_or_initialize_patient
@@ -87,14 +87,14 @@ class DeviceMessageProcessor
     end
 
     def find_or_initialize_encounter
-      find_or_initialize_entity Encounter, ((parsed_message["encounter"] || {})["pii"] || {})["id"]
+      find_or_initialize_entity Encounter, ((parsed_message["encounter"] || {})["core"] || {})["id"]
     end
 
-    def find_or_initialize_entity(klass, entity_uid)
+    def find_or_initialize_entity(klass, entity_uid, scope_by_last_year = true)
       new_entity = klass.new institution_id: @parent.institution.id
       assign_fields parsed_message, new_entity
 
-      if entity_uid && (existing = klass.find_by_pii(entity_uid, @parent.institution.id))
+      if entity_uid && (existing = find_entity_by_pii(klass, entity_uid, scope_by_last_year))
         existing_indexed = existing.core_fields.deep_dup
         existing.merge(new_entity)
         [existing, existing_indexed]
@@ -105,13 +105,21 @@ class DeviceMessageProcessor
       end
     end
 
+    def find_entity_by_pii(klass, entity_uid, scope_by_last_year = true)
+      query = klass
+      if scope_by_last_year
+        query = query.from_the_past_year(@parent.device_message.created_at)
+      end
+      query.find_by_pii(entity_uid, @parent.institution.id)
+    end
+
     def process_sample(test, sample)
       unless test.sample
         test.sample = sample
         return
       end
 
-      if !sample.entity_uid || (sample.entity_uid == test.sample.entity_uid)
+      if !sample.entity_uid || same_uid?(sample, test.sample)
         test.sample.merge sample
         return
       end
@@ -130,7 +138,7 @@ class DeviceMessageProcessor
         return
       end
 
-      if !encounter.entity_uid || (encounter.entity_uid == test.encounter.entity_uid)
+      if !encounter.entity_uid || same_uid?(encounter, test.encounter)
         test.encounter.merge encounter
         return
       end
@@ -149,6 +157,7 @@ class DeviceMessageProcessor
         return
       end
 
+      # Here we don't take the year into account
       if !patient.entity_uid || (patient.entity_uid == test.patient.entity_uid)
         test.patient.merge patient
         return
@@ -160,6 +169,13 @@ class DeviceMessageProcessor
       end
 
       test.patient = patient
+    end
+
+    def same_uid?(new_entity, existing_entity)
+      return false unless new_entity.entity_uid == existing_entity.entity_uid
+
+      new_entity_created_at = new_entity.created_at || @parent.device_message.created_at
+      (new_entity_created_at - existing_entity.created_at).abs < 1.year
     end
 
     def index_test(test)

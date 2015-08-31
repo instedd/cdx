@@ -10,13 +10,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
   TEST_START_TIME         = "2000/1/1 10:00:00"
 
   SAMPLE_ID               = "4002"
-  SAMPLE_UID              = "abc4002"
   SAMPLE_DATAGRAM         = "010100011100"
   SAMPLE_CULTURE_DAYS     = "10"
   SAMPLE_TYPE             = "sputum"
   SAMPLE_COLLECTION_DATE  = "2000/1/1 9:00:00"
-  SAMPLE_PII_FIELDS       = {"id" => SAMPLE_ID, "uid" => SAMPLE_UID}.freeze
-  SAMPLE_CORE_FIELDS      = {"type" => SAMPLE_TYPE, "collection_date" => SAMPLE_COLLECTION_DATE}.freeze
+  SAMPLE_PII_FIELDS       = {}.freeze
+  SAMPLE_CORE_FIELDS      = {"id" => SAMPLE_ID, "type" => SAMPLE_TYPE, "collection_date" => SAMPLE_COLLECTION_DATE}.freeze
   SAMPLE_CUSTOM_FIELDS    = {"datagram" => SAMPLE_DATAGRAM, "culture_days" => SAMPLE_CULTURE_DAYS}.freeze
 
   PATIENT_ID              = "8000"
@@ -29,8 +28,9 @@ describe DeviceMessageProcessor, elasticsearch: true do
   PATIENT_CUSTOM_FIELDS   = {"shirt_color" => PATIENT_SHIRT_COLOR, "hiv" => PATIENT_HIV}.freeze
 
   ENCOUNTER_ID            = "1234"
-  ENCOUNTER_PII_FIELDS    = {"id" => ENCOUNTER_ID}.freeze
-  ENCOUNTER_CUSTOM_FIELDS = {"time" => "2001/1/1 10:00:00"}
+  ENCOUNTER_CORE_FIELDS   = {"id" => ENCOUNTER_ID}.freeze
+  ENCOUNTER_PII_FIELDS    = {}.freeze
+  ENCOUNTER_CUSTOM_FIELDS = {"time" => "2001/1/1 10:00:00"}.freeze
 
   def parsed_message(test_id, params={})
     {
@@ -64,6 +64,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
         "custom" => PATIENT_CUSTOM_FIELDS.dup,
       },
       "encounter" => {
+        "core" => ENCOUNTER_CORE_FIELDS.dup,
         "pii" => ENCOUNTER_PII_FIELDS.dup,
         "custom" => ENCOUNTER_CUSTOM_FIELDS.dup,
       }
@@ -96,6 +97,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
   let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
 
   def assert_encounter_data(encounter)
+    expect(encounter.core_fields).to eq(ENCOUNTER_CORE_FIELDS)
     expect(encounter.plain_sensitive_data).to eq(ENCOUNTER_PII_FIELDS)
     expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS)
   end
@@ -131,7 +133,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     expect(Sample.count).to eq(1)
     sample = Sample.first
-    expect(sample.entity_uid_hash).to eq(MessageEncryption.hash SAMPLE_UID)
+    expect(sample.entity_uid_hash).to eq(MessageEncryption.hash SAMPLE_ID)
     assert_sample_data(sample)
   end
 
@@ -180,8 +182,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     sample = Sample.make(
       uuid: 'abc', institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood"},
-      plain_sensitive_data: {"uid" => SAMPLE_UID},
+      core_fields: {"type" => "blood", "id" => SAMPLE_ID},
     )
 
     TestResult.create_and_index test_id: TEST_ID_2, sample: sample, patient: patient, device: device
@@ -201,6 +202,28 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(tests.map { |test| test["_source"]["sample"]["type"] }).to eq([SAMPLE_TYPE] * 3)
   end
 
+  it "should create new sample if it has same sample id but not in the same year" do
+    patient = Patient.make(
+      uuid: 'def', institution: device_message.institution,
+      core_fields: PATIENT_CORE_FIELDS,
+      plain_sensitive_data: {"id" => PATIENT_ID},
+    )
+
+    sample = Sample.make(
+      uuid: 'abc', institution: device_message.institution, patient: patient,
+      core_fields: {"type" => "blood", "id" => SAMPLE_ID},
+      created_at: 2.years.ago,
+    )
+
+    TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
+
+    refresh_index
+
+    device_message_processor.process
+
+    expect(Sample.count).to eq(2)
+  end
+
   it "should update sample data and existing test results on test result update" do
     patient = Patient.make(
       uuid: 'def', institution: device_message.institution,
@@ -209,8 +232,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     )
     sample = Sample.make(
       uuid: 'abc', institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood"},
-      plain_sensitive_data: {"uid" => SAMPLE_UID},
+      core_fields: {"type" => "blood", "id" => SAMPLE_ID},
     )
 
     TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
@@ -239,7 +261,6 @@ describe DeviceMessageProcessor, elasticsearch: true do
     sample = Sample.make(
       uuid: 'abc', institution: device_message.institution, patient: patient,
       core_fields: SAMPLE_CORE_FIELDS,
-      plain_sensitive_data: {"uid" => SAMPLE_UID},
     )
 
     TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
@@ -258,12 +279,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
   end
 
   it "shouldn't update sample from another institution" do
-    core_fields = {"type" => SAMPLE_TYPE, "custom_fields" => {"hiv" => PATIENT_HIV}}
+    core_fields = {"type" => SAMPLE_TYPE, "custom_fields" => {"hiv" => PATIENT_HIV}, "id" => SAMPLE_ID}
 
     sample = Sample.make(
       uuid: 'abc',
       core_fields: core_fields,
-      plain_sensitive_data: {"uid" => SAMPLE_UID},
     )
     device_message_processor.process
 
@@ -271,11 +291,10 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     sample = sample.reload
 
-    expect(sample.plain_sensitive_data).to eq("uid" => SAMPLE_UID)
     expect(sample.core_fields).to eq(core_fields)
   end
 
-  it "should update tests with the same test_id and different sample_uid" do
+  it "should update tests with the same test_id and different sample_id" do
     test = TestResult.create_and_index(
       test_id: TEST_ID, device: device,
       custom_fields: {"concentration" => "10%", "foo" => "bar"},
@@ -300,11 +319,24 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(TestResult.first.plain_sensitive_data).to eq("start_time" => TEST_START_TIME)
   end
 
+  it "should take tests with the same test_id but different year as differents" do
+    test = TestResult.create_and_index(
+      created_at: 2.years.ago,
+      test_id: TEST_ID, device: device,
+      custom_fields: {"concentration" => "10%", "foo" => "bar"},
+      core_fields: {"results" => [result("flu", "negative"), result("mtb1", "pos")]},
+    )
+
+    device_message_processor.process
+
+    expect(TestResult.count).to eq(2)
+  end
+
   context 'sample, patient and encounter entities' do
-    context 'without sample uid' do
+    context 'without sample id' do
       before :each do
         message = parsed_message(TEST_ID)
-        message["sample"]["pii"].delete("uid")
+        message["sample"]["core"].delete("id")
         clear message, "patient", "encounter"
         allow(device_message).to receive("parsed_messages").and_return([message])
       end
@@ -319,16 +351,15 @@ describe DeviceMessageProcessor, elasticsearch: true do
         sample = test.sample
         expect(sample.entity_uid).to be_nil
 
-        expect(sample.plain_sensitive_data).to eq("id" => SAMPLE_ID)
+        expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS)
         expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS)
-        expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS)
+        expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS.except("id"))
       end
 
       it 'should merge sample if test has a sample' do
         sample = Sample.make(
           uuid: 'abc', institution: device_message.institution,
-          core_fields: {"existing_field" => "a value"},
-          plain_sensitive_data: {"uid" => SAMPLE_UID},
+          core_fields: {"existing_field" => "a value", "id" => SAMPLE_ID},
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
@@ -346,7 +377,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
     end
 
-    context 'with sample uid' do
+    context 'with sample id' do
       before :each do
         message = parsed_message(TEST_ID)
         clear message, "patient", "encounter"
@@ -407,13 +438,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
         expect(patient.core_fields).to eq("existing_indexed_field" => "existing_indexed_field_value")
       end
 
-      it 'should merge sample with existing sample if sample uid matches' do
+      it 'should merge sample with existing sample if sample id matches' do
         patient = Patient.make institution: device_message.institution
 
         sample = Sample.make(
           uuid: 'abc', institution: device_message.institution, patient: patient,
-          core_fields: {"existing_field" => "a value"},
-          plain_sensitive_data: {"uid" => SAMPLE_UID},
+          core_fields: {"existing_field" => "a value", "id" => SAMPLE_ID},
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
@@ -430,10 +460,10 @@ describe DeviceMessageProcessor, elasticsearch: true do
         expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS.merge("existing_field" => "a value"))
       end
 
-      it 'should create a new sample if the existing sample has a different sample uid' do
+      it 'should create a new sample if the existing sample has a different sample id' do
         sample = Sample.make(
           uuid: 'abc', institution: device_message.institution,
-          plain_sensitive_data: {"uid" => "def9772"},
+          core_fields: {"id" => "def9772"},
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
@@ -450,7 +480,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       it 'should not destroy existing sample if it has other references' do
         sample = Sample.make(
           uuid: 'abc', institution: device_message.institution,
-          plain_sensitive_data: {"uid" => "def9772"},
+          core_fields: {"id" => "def9772"},
         )
 
         test_1 = TestResult.create_and_index test_id: TEST_ID_2, sample: sample, device: device
@@ -460,7 +490,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
         test_2 = TestResult.find_by(test_id: TEST_ID)
 
         expect(test_1.reload.sample.entity_uid).to eq('def9772')
-        expect(test_2.reload.sample.entity_uid).to eq(SAMPLE_UID)
+        expect(test_2.reload.sample.entity_uid).to eq(SAMPLE_ID)
       end
 
       it "should assign existing sample's patient to the test" do
@@ -471,7 +501,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         Sample.make(
           institution: device_message.institution, patient: patient,
-          plain_sensitive_data: {"uid" => SAMPLE_UID},
+          core_fields: {"id" => SAMPLE_ID},
         )
 
         device_message_processor.process
@@ -524,7 +554,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample = Sample.make(
           institution: device_message.institution, patient: patient,
-          plain_sensitive_data: {"uid" => SAMPLE_UID},
+          core_fields: {"id" => SAMPLE_ID},
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
@@ -560,7 +590,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       it 'should store patient data in patient if sample is present but doest not have a patient' do
         sample = Sample.make(
           institution: device_message.institution,
-          plain_sensitive_data: {"uid" => SAMPLE_UID},
+          core_fields: {"id" => SAMPLE_ID},
         )
 
         TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
@@ -661,6 +691,30 @@ describe DeviceMessageProcessor, elasticsearch: true do
         expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
+      it "should merge patient with existing patient if patient id matches, even if it's a different year" do
+        patient = Patient.make(
+          institution: device_message.institution,
+          plain_sensitive_data: {"id" => PATIENT_ID, "existing_pii_field" => "existing_pii_field_value"},
+          core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
+          custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
+          created_at: 2.years.ago,
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
+
+        device_message_processor.process
+
+        expect(TestResult.count).to eq(1)
+        expect(Sample.count).to eq(0)
+        expect(Patient.count).to eq(1)
+
+        patient = TestResult.first.patient
+
+        expect(patient.plain_sensitive_data).to eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
+      end
+
       it 'should create a new patient if the existing patient has a differente patient id' do
         patient = Patient.make(
           institution: device_message.institution,
@@ -713,7 +767,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     context 'without encounter id' do
       before :each do
         message = parsed_message(TEST_ID)
-        message["encounter"]["pii"].delete("id")
+        message["encounter"]["core"].delete("id")
         clear message, "patient", "sample"
         allow(device_message).to receive("parsed_messages").and_return([message])
       end

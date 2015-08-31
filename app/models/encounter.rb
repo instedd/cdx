@@ -11,7 +11,7 @@ class Encounter < ActiveRecord::Base
   validates_presence_of :institution
 
   def entity_uid
-    plain_sensitive_data["id"]
+    core_fields["id"]
   end
 
   def entity_scope

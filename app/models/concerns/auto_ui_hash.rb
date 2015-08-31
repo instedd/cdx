@@ -10,7 +10,7 @@ module AutoUiHash
     self.entity_uid_hash ||= MessageEncryption.hash(entity_uid.to_s) if entity_uid
   end
 
-  module ClassMethods
+  class_methods do
     def find_by_pii(entity_uid, institution_id)
       find_by(entity_uid_hash: MessageEncryption.hash(entity_uid.to_s), institution_id: institution_id)
     end
