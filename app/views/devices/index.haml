@@ -14,6 +14,11 @@
         %select.ddown(name="institution")
           %option(value="") (all)
           = options_from_collection_for_select @institutions, :id, :name, params["institution"]
+      .col.pe-2
+        %label Laboratory
+        %select.ddown(name="laboratory")
+          %option(value="") (all)
+          = options_from_collection_for_select @laboratories, :id, :name, params["laboratory"]
       .col
         %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 

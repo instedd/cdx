@@ -12,7 +12,12 @@ class DevicesController < ApplicationController
 
     if (institution_id = params[:institution].presence)
       institution_id = institution_id.to_i
-      @devices = @devices.select { |dev| dev.institution_id == institution_id }
+      @devices.select! { |dev| dev.institution_id == institution_id }
+    end
+
+    if (laboratory_id = params[:laboratory].presence)
+      laboratory_id = laboratory_id.to_i
+      @devices.select! { |dev| dev.laboratory_id == laboratory_id }
     end
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
