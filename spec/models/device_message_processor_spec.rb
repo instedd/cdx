@@ -133,7 +133,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     expect(Sample.count).to eq(1)
     sample = Sample.first
-    expect(sample.entity_uid_hash).to eq(MessageEncryption.hash SAMPLE_ID)
+    expect(sample.entity_id_hash).to eq(MessageEncryption.hash SAMPLE_ID)
     assert_sample_data(sample)
   end
 
@@ -142,7 +142,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     expect(Encounter.count).to eq(1)
     encounter = Encounter.first
-    expect(encounter.entity_uid_hash).to eq(MessageEncryption.hash ENCOUNTER_ID)
+    expect(encounter.entity_id_hash).to eq(MessageEncryption.hash ENCOUNTER_ID)
     assert_encounter_data(encounter)
   end
 
@@ -151,7 +151,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     expect(Patient.count).to eq(1)
     patient = Patient.first
-    expect(patient.entity_uid_hash).to eq(MessageEncryption.hash PATIENT_ID)
+    expect(patient.entity_id_hash).to eq(MessageEncryption.hash PATIENT_ID)
     assert_patient_data(patient)
   end
 
@@ -349,7 +349,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test = TestResult.first
         sample = test.sample
-        expect(sample.entity_uid).to be_nil
+        expect(sample.entity_id).to be_nil
 
         expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS)
         expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS)
@@ -489,8 +489,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test_2 = TestResult.find_by(test_id: TEST_ID)
 
-        expect(test_1.reload.sample.entity_uid).to eq('def9772')
-        expect(test_2.reload.sample.entity_uid).to eq(SAMPLE_ID)
+        expect(test_1.reload.sample.entity_id).to eq('def9772')
+        expect(test_2.reload.sample.entity_id).to eq(SAMPLE_ID)
       end
 
       it "should assign existing sample's patient to the test" do
@@ -581,7 +581,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test = TestResult.first
 
-        expect(test.patient.entity_uid).to be_nil
+        expect(test.patient.entity_id).to be_nil
         expect(test.patient.plain_sensitive_data).to eq("dob" => PATIENT_DOB)
         expect(test.patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS)
         expect(test.patient.core_fields).to eq(PATIENT_CORE_FIELDS)
@@ -745,8 +745,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test_2 = TestResult.find_by(test_id: TEST_ID)
 
-        expect(test_1.reload.patient.entity_uid).to eq('9000')
-        expect(test_2.patient.entity_uid).to eq(PATIENT_ID)
+        expect(test_1.reload.patient.entity_id).to eq('9000')
+        expect(test_2.patient.entity_id).to eq(PATIENT_ID)
       end
 
       it 'should create patient and store reference in test and sample' do
@@ -779,7 +779,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
         expect(Encounter.count).to eq(1)
 
         encounter = TestResult.first.encounter
-        expect(encounter.entity_uid).to be_nil
+        expect(encounter.entity_id).to be_nil
         expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS)
       end
 

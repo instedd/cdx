@@ -1,7 +1,7 @@
 class Encounter < ActiveRecord::Base
   include Entity
   include AutoUUID
-  include AutoUiHash
+  include AutoIdHash
 
   has_many :test_results
 
@@ -10,7 +10,7 @@ class Encounter < ActiveRecord::Base
 
   validates_presence_of :institution
 
-  def entity_uid
+  def entity_id
     core_fields["id"]
   end
 

@@ -1,7 +1,7 @@
 class Patient < ActiveRecord::Base
   include Entity
   include AutoUUID
-  include AutoUiHash
+  include AutoIdHash
 
   belongs_to :institution
   has_many :test_results
@@ -9,7 +9,7 @@ class Patient < ActiveRecord::Base
 
   validates_presence_of :institution
 
-  def entity_uid
+  def entity_id
     plain_sensitive_data["id"]
   end
 

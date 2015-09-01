@@ -90,11 +90,11 @@ class DeviceMessageProcessor
       find_or_initialize_entity Encounter, ((parsed_message["encounter"] || {})["core"] || {})["id"]
     end
 
-    def find_or_initialize_entity(klass, entity_uid, scope_by_last_year = true)
+    def find_or_initialize_entity(klass, entity_id, scope_by_last_year = true)
       new_entity = klass.new institution_id: @parent.institution.id
       assign_fields parsed_message, new_entity
 
-      if entity_uid && (existing = find_entity_by_pii(klass, entity_uid, scope_by_last_year))
+      if entity_id && (existing = find_entity_by_id(klass, entity_id, scope_by_last_year))
         existing_indexed = existing.core_fields.deep_dup
         existing.merge(new_entity)
         [existing, existing_indexed]
@@ -105,12 +105,12 @@ class DeviceMessageProcessor
       end
     end
 
-    def find_entity_by_pii(klass, entity_uid, scope_by_last_year = true)
+    def find_entity_by_id(klass, entity_id, scope_by_last_year = true)
       query = klass
       if scope_by_last_year
         query = query.from_the_past_year(@parent.device_message.created_at)
       end
-      query.find_by_pii(entity_uid, @parent.institution.id)
+      query.find_by_entity_id(entity_id, @parent.institution.id)
     end
 
     def process_sample(test, sample)
@@ -119,12 +119,12 @@ class DeviceMessageProcessor
         return
       end
 
-      if !sample.entity_uid || same_uid?(sample, test.sample)
+      if !sample.entity_id || same_uid?(sample, test.sample)
         test.sample.merge sample
         return
       end
 
-      unless test.sample.entity_uid
+      unless test.sample.entity_id
         sample.merge test.sample
         test.sample.destroy
       end
@@ -138,12 +138,12 @@ class DeviceMessageProcessor
         return
       end
 
-      if !encounter.entity_uid || same_uid?(encounter, test.encounter)
+      if !encounter.entity_id || same_uid?(encounter, test.encounter)
         test.encounter.merge encounter
         return
       end
 
-      unless test.encounter.entity_uid
+      unless test.encounter.entity_id
         encounter.merge test.encounter
         test.encounter.destroy
       end
@@ -158,12 +158,12 @@ class DeviceMessageProcessor
       end
 
       # Here we don't take the year into account
-      if !patient.entity_uid || (patient.entity_uid == test.patient.entity_uid)
+      if !patient.entity_id || (patient.entity_id == test.patient.entity_id)
         test.patient.merge patient
         return
       end
 
-      unless test.patient.entity_uid
+      unless test.patient.entity_id
         patient.merge test.patient
         test.patient.destroy
       end
@@ -172,7 +172,7 @@ class DeviceMessageProcessor
     end
 
     def same_uid?(new_entity, existing_entity)
-      return false unless new_entity.entity_uid == existing_entity.entity_uid
+      return false unless new_entity.entity_id == existing_entity.entity_id
 
       new_entity_created_at = new_entity.created_at || @parent.device_message.created_at
       (new_entity_created_at - existing_entity.created_at).abs < 1.year

@@ -1,7 +1,7 @@
 class Sample < ActiveRecord::Base
   include Entity
   include AutoUUID
-  include AutoUiHash
+  include AutoIdHash
 
   belongs_to :institution
   belongs_to :patient
@@ -11,7 +11,7 @@ class Sample < ActiveRecord::Base
 
   validates_presence_of :institution
 
-  def entity_uid
+  def entity_id
     core_fields["id"]
   end
 
