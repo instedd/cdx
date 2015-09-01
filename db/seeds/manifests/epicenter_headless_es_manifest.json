@@ -29,13 +29,6 @@
     "patient.id": { "lookup": "4" },
     "patient.name": { "lookup": "3" },
     "sample.id": { "lookup": "0" },
-    "sample.uid": {
-      "concat" : [
-          {"lookup" : "4"},
-          "-",
-          {"lookup" : "0"}
-      ]
-    },
     "test.patient_age": {
       "if" : [
         {"equals" : [{"lookup" : "19"}, null]},

@@ -15,7 +15,7 @@
   "custom_fields" : {
   },
   "field_mapping" : {
-    "sample.uid" : {"lookup": "SampleId"},
+    "sample.id" : {"lookup": "SampleId"},
     "test.start_time" : {
       "parse_date": [
         { "lookup": "MeasurementDateTime" },

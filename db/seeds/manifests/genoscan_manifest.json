@@ -62,13 +62,6 @@
         ]
       ]
     },
-    "sample.uid" : {
-      "concat" : [
-          {"lookup" : "PID"},
-          "-",
-          {"lookup" : "SampleNo."}
-      ]
-    },
     "sample.id" : {"lookup" : "SampleNo."},
     "test.start_time" : {
       "parse_date" : [

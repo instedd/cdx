@@ -23,7 +23,6 @@
     },
     "patient.gender" : { "lowercase": { "lookup" : "Patient/Gender/text()" } },
     "patient.pregnancy_status" : {"lookup" : "Patient/PregnancyStatus/text()"},
-    "sample.uid" : {"lookup" : "SampleId/text()"},
     "sample.id" : {"lookup" : "SampleId/text()"},
     "test.start_time" : {"lookup" : "TestDate/text()"},
     "test.id" : {"lookup" : "@id"},

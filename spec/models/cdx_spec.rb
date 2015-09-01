@@ -22,7 +22,6 @@ describe Cdx do
       "sample.collection_date",
       "sample.id",
       "sample.type",
-      "sample.uid",
       "sample.uuid",
       "test.assays.result",
       "test.assays.name",

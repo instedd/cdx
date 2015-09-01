@@ -1,8 +1,6 @@
 sample:
   id:
     searchable: true
-  uid:
-    pii: true
   uuid:
     searchable: true
   type:
