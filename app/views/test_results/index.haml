@@ -2,21 +2,57 @@
   .centered
     = link_to "+", new_filter_path(query: @filter), class: 'btn-add fixed', title: 'Add filter'
 
-.row
-  .col
-    %h1 Filters
+
 %form
   .row
-    .col.pe-2
-      %label Laboratory
-      %select.ddown(name="laboratory.id")
-        %option(value="") (all)
-        = options_from_collection_for_select @combo_laboratories, :id, :name, params["laboratory.id"]
-    .col.pe-2
-      %label Condition
-      %input{type: "text", name: "test.assays.condition", value: params["test.assays.condition"]}
+    .col
+      %h1 Filters
+  .row
     .col
       %input.btn-primary.pull-right{type: "submit", value: "Filter"}
+  - unless @institutions.one? || @laboratories.one? || @devices.one?
+    .row
+      - unless @institutions.one?
+        .col.pe-4
+          %label.label Institution
+          %select.ddown(name="institution.uuid")
+            %option(value="") (all)
+            = options_from_collection_for_select @institutions, :uuid, :name, params["institution.uuid"]
+      - unless @laboratories.one?
+        .col.pe-4
+          %label.label Laboratory
+          %select.ddown(name="laboratory.uuid")
+            %option(value="") (all)
+            = options_from_collection_for_select @laboratories, :uuid, :name, params["laboratory.uuid"]
+      - unless @devices.one?
+        .col.pe-4
+          %label.label Device
+          %select.ddown(name="device.uuid")
+            %option(value="") (all)
+            = options_from_collection_for_select @devices, :uuid, :name, params["device.uuid"]
+  .row
+    .col.pe-4
+      %label.label Condition
+      %select.ddown{name: "test.assays.condition", value: params["test.assays.condition"]}
+        %option(value="") (all)
+        = options_for_select @conditions, params["test.assays.condition"]
+    .col.pe-4
+      %label.label Result
+      %select.ddown{name: "test.assays.result"}
+        %option(value="") (all)
+        = options_for_select @results, params["test.assays.result"]
+    .col.pe-4
+      %label.label Date
+      %select.ddown{name: "since"}
+        %option(value="") (all)
+        = options_for_select @date_options, params["since"]
+  .row
+    .col.pe-4
+      %label.label Sample Id
+      %input{type: "text", name: "sample.id", value: params["sample.id"]}
+    .col.pe-4
+      %label.label Encounter Id
+      %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
 
   .row
     .col
@@ -26,20 +62,26 @@
         %tr
           %th= order_by_column "Name", "test.name"
           %th Result
-          %th Institution
-          %th Laboratory
-          %th= order_by_column "Device", "device.name"
-          %th= order_by_column "Sample ID", "sample.id"
-          %th= order_by_column "Encounter ID", "encounter.id"
+          - unless @institutions.one?
+            %th Institution
+          - unless @laboratories.one?
+            %th Laboratory
+          - unless @devices.one?
+            %th Device
+          %th= order_by_column "Sample Id", "sample.id"
+          %th= order_by_column "Encounter Id", "encounter.id"
           %th= order_by_column "Start Time", "test.start_time"
           %th= order_by_column "End Time", "test.end_time"
         - @tests.each do |test|
           %tr
             %td= test["test"]["name"]
-            %td= test["test"]["assays"].map {|assay| "#{assay["name"]}: #{assay["result"]}"}.join ", "
-            %td= test["institution"]["name"]
-            %td= test["laboratory"]["name"]
-            %td= test["device"]["name"]
+            %td= test["test"]["assays"].map {|assay| "#{assay["name"]}: #{assay["result"]}"}.join("<br>").html_safe
+            - unless @institutions.one?
+              %td= test["institution"]["name"]
+            - unless @laboratories.one?
+              %td= test["laboratory"]["name"]
+            - unless @devices.one?
+              %td= test["device"]["name"]
             %td= test["sample"]["id"]
             %td= test["encounter"].try {|e| e["id"]}
             %td= format_datetime(test["test"]["start_time"])
