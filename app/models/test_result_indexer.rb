@@ -47,7 +47,9 @@ class TestResultIndexer
           "uuid" => test_result.uuid
         },
         "device" => {
-          "uuid" => device.uuid
+          "uuid" => device.uuid,
+          "model" => device.device_model.name,
+          "serial_number" => device.serial_number
         },
         "location" => {
           "id" => location_id,

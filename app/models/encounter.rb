@@ -14,7 +14,7 @@ class Encounter < ActiveRecord::Base
     core_fields["id"]
   end
 
-  def entity_scope
+  def self.entity_scope
     "encounter"
   end
 end

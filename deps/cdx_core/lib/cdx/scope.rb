@@ -1,15 +1,20 @@
 class Cdx::Scope
   attr_accessor :name, :fields
 
-  def initialize name, fields
+  def initialize name, definition
     @name = name
-    @fields = fields.map do |name, definition|
+    @definition = definition
+    @fields = @definition['fields'].map do |name, definition|
       Cdx::Field.for self, name, definition
     end
   end
 
   def scoped_name
     name
+  end
+
+  def allows_custom?
+    @definition['allows_custom']
   end
 
   def flatten

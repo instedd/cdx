@@ -90,7 +90,9 @@ describe TestResultIndexer, elasticsearch: true do
           "lng" => location.lng
         },
         "device" => {
-          "uuid" => test.device.uuid
+          "uuid" => test.device.uuid,
+          "model" => test.device.device_model.name,
+          "serial_number" => test.device.serial_number
         },
         "laboratory" => {
           "uuid" => test.device.laboratory.uuid

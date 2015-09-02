@@ -13,7 +13,7 @@ class Patient < ActiveRecord::Base
     plain_sensitive_data["id"]
   end
 
-  def entity_scope
+  def self.entity_scope
     "patient"
   end
 end

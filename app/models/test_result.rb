@@ -43,7 +43,7 @@ class TestResult < ActiveRecord::Base
     TestResultQuery.new params, user
   end
 
-  def entity_scope
+  def self.entity_scope
     "test"
   end
 

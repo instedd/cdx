@@ -3,18 +3,22 @@ require 'spec_helper'
 describe TestsSchema do
   it "creates a schema with string, enum and number fields" do
     sample_fields = {
-      "uuid" => {
-        "searchable" => true,
+      "fields" => {
+        "uuid" => {
+          "searchable" => true,
+        }
       }
     }
 
     patient_fields = {
-      "age" => {
-        "type" => "integer"
-      },
-      "gender" => {
-        "type" => 'enum',
-        "options" => ['male', 'female']
+      "fields" => {
+        "age" => {
+          "type" => "integer"
+        },
+        "gender" => {
+          "type" => 'enum',
+          "options" => ['male', 'female']
+        }
       }
     }
 
@@ -65,8 +69,10 @@ describe TestsSchema do
 
   it "should add location service properties to location scope" do
     location_fields = {
-      "lat" => {},
-      "lng" => {},
+      "fields" => {
+        "lat" => {},
+        "lng" => {},
+      }
     }
 
     location_scope = Cdx::Scope.new('location', location_fields)

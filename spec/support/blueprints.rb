@@ -39,6 +39,7 @@ Device.blueprint do
   laboratory
   institution { laboratory.institution }
   name
+  serial_number { name }
   device_model { Manifest.make.device_models.first }
   time_zone { "UTC" }
 end
@@ -55,12 +56,12 @@ end
 
 Patient.blueprint do
   institution
-  plain_sensitive_data { {"id" => "patient-#{Sham.sn}" } }
+  plain_sensitive_data { { "id" => "patient-#{Sham.sn}" } }
 end
 
 TestResult.blueprint do
-  device_messages {[DeviceMessage.make]}
-  device {device_messages.first.device}
+  device_messages { [ DeviceMessage.make ] }
+  device { device_messages.first.device }
   sample { Sample.make institution: device.institution }
   test_id { "test-#{Sham.sn}" }
 end
@@ -85,7 +86,7 @@ Subscriber.blueprint do
   user
   name
   url
-  last_run_at {Time.now}
+  last_run_at { Time.now }
 end
 
 Filter.blueprint do

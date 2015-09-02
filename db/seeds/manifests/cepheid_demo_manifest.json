@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "1.1.0",
+    "version": "1.1.1",
     "api_version": "1.2.1",
     "device_models": [
       "GX Model I"
@@ -60,8 +60,7 @@
         { "when" : "*", "then" : "unknown"}
       ]
     ]},
-    "device.serial_number" : { "lookup": "event.device_serial_number" },
-    "device.lab_user" : { "lookup": "event.system_user" },
+    "test.lab_user" : { "lookup": "event.system_user" },
     "test.patient_age" : { "lookup": "event.age" },
     "test.start_time" : { "lookup": "event.start_time" },
     "test.end_time" : { "lookup": "event.end_time" },

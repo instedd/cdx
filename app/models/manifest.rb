@@ -20,11 +20,10 @@ class Manifest < ActiveRecord::Base
 
   def self.new_message
     {
-      "test"      => {"core" => {}, "pii" => {}, "custom" => {}},
-      "sample"    => {"core" => {}, "pii" => {}, "custom" => {}},
-      "device"    => {"core" => {}, "pii" => {}, "custom" => {}},
-      "patient"   => {"core" => {}, "pii" => {}, "custom" => {}},
-      "encounter" => {"core" => {}, "pii" => {}, "custom" => {}},
+      TestResult.entity_scope => {"core" => {}, "pii" => {}, "custom" => {}},
+      Sample.entity_scope     => {"core" => {}, "pii" => {}, "custom" => {}},
+      Patient.entity_scope    => {"core" => {}, "pii" => {}, "custom" => {}},
+      Encounter.entity_scope  => {"core" => {}, "pii" => {}, "custom" => {}},
     }
   end
 

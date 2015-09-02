@@ -1,109 +1,120 @@
 sample:
-  id:
-    searchable: true
-  uuid:
-    searchable: true
-  type:
-    searchable: true
-  collection_date:
-    type: date
+  allows_custom: true
+  fields:
+    id:
+      searchable: true
+    uuid:
+      searchable: true
+    type:
+      searchable: true
+    collection_date:
+      type: date
 test:
-  id:
-    searchable: true
-  uuid:
-    searchable: true
-  start_time:
-    type: date
-    searchable: true
-  end_time:
-    type: date
-    searchable: true
-  reported_time:
-    type: date
-    searchable: true
-  updated_time:
-    type: date
-    searchable: true
-  error_code:
-    type: integer
-    searchable: true
-  error_description:
-  patient_age:
-    type: duration
-    searchable: true
-  name:
-    searchable: true
-  status:
-    type: enum
-    searchable: true
-    options:
-      - invalid
-      - error
-      - no_result
-      - success
-      - in_progress
-  assays:
-    type: nested
-    sub_fields:
-      name:
-        searchable: true
-      condition:
-        searchable: true
-      result:
-        type: enum
-        searchable: true
-        options:
-          - positive
-          - negative
-          - n/a
-      quantitative_result:
-        type: integer
-  type:
-    type: enum
-    searchable: true
-    options:
-      - specimen
-      - qc
+  allows_custom: true
+  fields:
+    id:
+      searchable: true
+    uuid:
+      searchable: true
+    start_time:
+      type: date
+      searchable: true
+    end_time:
+      type: date
+      searchable: true
+    reported_time:
+      type: date
+      searchable: true
+    updated_time:
+      type: date
+      searchable: true
+    error_code:
+      type: integer
+      searchable: true
+    error_description:
+    patient_age:
+      type: duration
+      searchable: true
+    lab_user:
+      searchable: true
+    name:
+      searchable: true
+    status:
+      type: enum
+      searchable: true
+      options:
+        - invalid
+        - error
+        - no_result
+        - success
+        - in_progress
+    assays:
+      type: nested
+      sub_fields:
+        name:
+          searchable: true
+        condition:
+          searchable: true
+        result:
+          type: enum
+          searchable: true
+          options:
+            - positive
+            - negative
+            - n/a
+        quantitative_result:
+          type: integer
+    type:
+      type: enum
+      searchable: true
+      options:
+        - specimen
+        - qc
 device:
-  uuid:
-    searchable: true
-  name:
-    searchable: true
-  lab_user:
-    searchable: true
-  serial_number:
-    searchable: true
+  fields:
+    uuid:
+      searchable: true
+    name:
+    model:
+      searchable: true
+    serial_number:
+      searchable: true
 institution:
-  uuid:
-    searchable: true
-  name:
-    searchable: true
+  fields:
+    uuid:
+      searchable: true
+    name:
 laboratory:
-  uuid:
-    searchable: true
-  name:
-    searchable: true
+  fields:
+    uuid:
+      searchable: true
+    name:
 patient:
-  id:
-    pii: true
-  name:
-    pii: true
-  gender:
-    type: enum
-    searchable: true
-    options:
-      - male
-      - female
-      - other
+  allows_custom: true
+  fields:
+    id:
+      pii: true
+    name:
+      pii: true
+    gender:
+      type: enum
+      searchable: true
+      options:
+        - male
+        - female
+        - other
 location:
-  id:
-  parents:
-    searchable: true
-  admin_levels:
-    type: dynamic
-    searchable: true
-  lat:
-  lng:
+  fields:
+    id:
+    parents:
+      searchable: true
+    admin_levels:
+      type: dynamic
+      searchable: true
+    lat:
+    lng:
 encounter:
-  id:
-  uuid:
+  allows_custom: true
+  fields:
+    id:
+    uuid:

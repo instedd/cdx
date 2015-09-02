@@ -111,12 +111,12 @@ describe Cdx::Api do
     end
 
     it "filters by lab_user" do
-      index device: {lab_user: "jdoe"}
-      index device: {lab_user: "mmajor"}
+      index test: {lab_user: "jdoe"}
+      index test: {lab_user: "mmajor"}
 
-      expect_one_event_with_field "device", "lab_user", "jdoe", 'device.lab_user' => "jdoe"
-      expect_one_event_with_field "device", "lab_user", "mmajor", 'device.lab_user' => "mmajor"
-      expect_no_results "device.lab_user" => "ffoo"
+      expect_one_event_with_field "test", "lab_user", "jdoe", 'test.lab_user' => "jdoe"
+      expect_one_event_with_field "test", "lab_user", "mmajor", 'test.lab_user' => "mmajor"
+      expect_no_results "test.lab_user" => "ffoo"
     end
 
     it "filters by min age" do
@@ -377,18 +377,18 @@ describe Cdx::Api do
     end
 
     it "groups by system user" do
-      index device: {lab_user: "jdoe"}
-      index device: {lab_user: "jdoe"}
-      index device: {lab_user: "mmajor"}
-      index device: {lab_user: "mmajor"}
+      index test: {lab_user: "jdoe"}
+      index test: {lab_user: "jdoe"}
+      index test: {lab_user: "mmajor"}
+      index test: {lab_user: "mmajor"}
 
-      response = query_tests("group_by" => "device.lab_user").sort_by do |test|
-        test["device.lab_user"]
+      response = query_tests("group_by" => "test.lab_user").sort_by do |test|
+        test["test.lab_user"]
       end
 
       expect(response).to eq([
-        {"device.lab_user"=>"jdoe", "count" => 2},
-        {"device.lab_user"=>"mmajor", "count" => 2},
+        {"test.lab_user"=>"jdoe", "count" => 2},
+        {"test.lab_user"=>"mmajor", "count" => 2},
       ])
     end
 
@@ -783,7 +783,7 @@ describe Cdx::Api do
     context "with a second location field" do
       before(:all) do
         # add a new core field and regenerate the indexed fields with it.
-        @extra_scope = Cdx::Scope.new('patient_location', {
+        @extra_scope = Cdx::Scope.new('patient_location', 'fields' => {
           "id" => {},
           "parents" => {"searchable" => true},
           "admin_levels" => {"searchable" => true, "type" => 'dynamic'},

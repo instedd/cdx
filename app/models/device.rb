@@ -17,6 +17,7 @@ class Device < ActiveRecord::Base
   validates_uniqueness_of :uuid
   validates_presence_of :institution
   validates_presence_of :name
+  validates_presence_of :serial_number
   validates_presence_of :device_model
 
   before_create :set_key, :set_uuid
@@ -86,5 +87,4 @@ class Device < ActiveRecord::Base
     SshKey.regenerate_authorized_keys!
     self.activation_token = ActivationToken.new(device: self)
   end
-
 end

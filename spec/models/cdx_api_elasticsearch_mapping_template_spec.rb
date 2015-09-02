@@ -115,6 +115,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                   }
                 }
               },
+              "lab_user"=> {
+                "type"=> "string",
+                "index"=> "not_analyzed"
+              },
               "name" => {
                 "type" => "string",
                 "index" => "not_analyzed"
@@ -155,20 +159,13 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "type" => "string",
                 "index" => "not_analyzed"
               },
-              "name" => {
+              "model" => {
                 "type" => "string",
                 "index" => "not_analyzed"
-              },
-              "lab_user"=> {
-                "type"=> "string",
-                "index"=> "not_analyzed"
               },
               "serial_number"=> {
                 "type"=> "string",
                 "index"=> "not_analyzed"
-              },
-              "custom_fields" => {
-                "type" => "object"
               }
             }
           },
@@ -177,13 +174,6 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
               "uuid" => {
                 "type" => "string",
                 "index" => "not_analyzed"
-              },
-              "name" => {
-                "type" => "string",
-                "index" => "not_analyzed"
-              },
-              "custom_fields" => {
-                "type" => "object"
               }
             }
           },
@@ -192,13 +182,6 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
               "uuid" => {
                 "type" => "string",
                 "index" => "not_analyzed"
-              },
-              "name" => {
-                "type" => "string",
-                "index" => "not_analyzed"
-              },
-              "custom_fields" => {
-                "type" => "object"
               }
             }
           },
@@ -221,9 +204,6 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
               },
               "admin_levels" => {
                 "properties" => {}
-              },
-              "custom_fields" => {
-                "type" => "object"
               }
             }
           }

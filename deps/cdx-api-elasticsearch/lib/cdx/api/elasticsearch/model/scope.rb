@@ -8,10 +8,14 @@ class Cdx::Scope
   end
 
   def custom_fields_mapping
-    {
-      custom_fields: {
-        type: 'object'
+    if allows_custom?
+      {
+        custom_fields: {
+          type: 'object'
+        }
       }
-    }
+    else
+      {}
+    end
   end
 end

@@ -4,8 +4,6 @@ class Cdx::Api::Elasticsearch::MappingTemplate
     @api = api
   end
 
-  # put_template!
-  # create_default!
   def initialize_template(template_name)
     @api.client.indices.put_template name: template_name, body: template
   end
