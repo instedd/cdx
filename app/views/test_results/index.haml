@@ -86,12 +86,11 @@
             %td= test["encounter"].try {|e| e["id"]}
             %td= format_datetime(test["test"]["start_time"])
             %td= format_datetime(test["test"]["end_time"])
-      = link_to_if has_previous_page, "prev", previous_page_params, enabled: false
-      = link_to_if has_next_page, "next", next_page_params
-      |
-      %input{type: "text", name: "page", value: @page}
-      of
-      = (@total.to_f / @page_size).ceil
-      |
-      %select(name="page_size" onchange="this.form.submit()")
-        = options_for_page_sizes
+      .pagination
+        = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
+        = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
+        %input.input-x-small.text-right{type: "text", name: "page", value: @page}
+        of
+        = (@total.to_f / @page_size).ceil
+        %select.ddown.input-small(name="page_size" onchange="this.form.submit()")
+          = options_for_page_sizes

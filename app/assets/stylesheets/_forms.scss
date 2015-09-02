@@ -32,10 +32,20 @@
     }
   }
 
-  .dd-container,
-  .dd-select,
+  .dd-container {
+    display: inline-block;
+    vertical-align: middle;
+    width: auto !important;
+
+    .dd-select {
+      padding-right: 20px !important;
+      width: inherit !important;
+    }
+  }
   .dd-options {
-    width: 100% !important;
+    width: auto !important;
+    min-width: 100%;
+    white-space: nowrap;
   }
   .dd-container,
   .dd-option {
@@ -50,8 +60,31 @@
     }
   }
   .dd-options {
-
     label {
       color: $black;
     }
+  }
+  .input-xx-small {
+    width: 20px !important;
+  }
+  .input-x-small {
+    width: 40px;
+  }
+  .input-small {
+    width: 70px;
+  }
+  .input-medium {
+    width: 150px;
+  }
+  .input-large {
+    width: 200px;
+  }
+  .input-x-large {
+    width: 250px;
+  }
+  .input-xx-large {
+    width: 250px;
+  }
+  .input-block {
+    width: 100%;
   }

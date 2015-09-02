@@ -31,3 +31,11 @@
       border-bottom: none;
     }
   }
+
+  .pagination a[class^="btn"] {
+    color: $black;
+    font-size: 20px;
+    line-height: 20px;
+    font-weight: 300;
+    vertical-align: baseline;
+  }
