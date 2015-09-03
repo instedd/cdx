@@ -84,6 +84,15 @@
     flex-grow:  $values;
   }
 
+  @mixin flex-direction($val) {
+    -webkit-box-orient: $val;
+    -webkit-box-direction: $val;
+    -moz-box-direction:  $val;
+    -webkit-flex-direction:  $val;
+    -ms-flex-direction:  $val;
+    flex-direction:  $val;
+  }
+
   @mixin order($val) {
     -webkit-box-ordinal-group: $val;
     -moz-box-ordinal-group: $val;

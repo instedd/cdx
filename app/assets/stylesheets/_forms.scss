@@ -3,88 +3,211 @@
 // =============================================================================
 
 
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"] {
-    @include placeholder-style(italic);
-    font-family: $sans;
-    font-size: 100%;
-    border: none;
-    border-bottom: 1px solid $gray2;
-    padding: 0 5px;
-    height: 30px;
-    outline: 0 !important;
-  }
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"] {
+  @include placeholder-style(italic);
+  font-family: $sans;
+  font-size: 100%;
+  border: none;
+  border-bottom: 1px solid $gray2;
+  padding: 0 5px;
+  height: 30px;
+  outline: 0 !important;
+}
 
-  textarea {
-    @include placeholder-style(italic);
-    font-family: $sans;
-    font-size: 100%;
-  }
+textarea {
+  @include placeholder-style(italic);
+  font-family: $sans;
+  font-size: 100%;
+}
 
+
+label {
+  color: $gray3;
+
+  &.label {
+    display: block;
+  }
+}
+
+// DDslick select styles ---------------------------------------------------------//
+
+
+.dd-container {
+  display: inline-block;
+  vertical-align: middle;
+  width: auto !important;
+
+  .dd-select {
+    padding-right: 20px !important;
+    width: inherit !important;
+  }
+}
+.dd-options {
+  width: auto !important;
+  min-width: 100%;
+  white-space: nowrap;
+}
+.dd-container,
+.dd-option {
+  min-height: 40px;
+}
+.dd-select {
+  border: none !important;
+  background: none !important;
 
   label {
-    color: $gray3;
+    color: $black;
+  }
+}
+.dd-options {
+  label {
+    color: $black;
+  }
+}
 
-    &.label {
-      display: block;
+
+// Checkboxes ---------------------------------------------------------//
+
+input[type="checkbox"] {
+  display: none;
+
+  & + label {
+    color: $black;
+    display: table;
+    position: relative;
+    margin-left: 32px;
+    margin-bottom: 10px;
+    cursor: pointer;
+
+    &:before {
+      content: '';
+      font-family: $sans;
+      color: $white;
+      font-weight: 300;
+      font-size: 12px;
+      line-height: 14px;
+      text-align: center;
+      width: 18px;
+      height:18px;
+      background: none;
+      border: 2px solid $black;
+      top: 0;
+      left: -32px;
+      position: absolute;
+      border-radius: 2px;
+      transition: all 0.4s;
+    }
+    &.inline {
+      display: inline-block;
+      margin-right: 10px;
     }
   }
+  &:checked + label:before {
+    content: '\2714';
+    background: $black;
 
-  .dd-container {
-    display: inline-block;
-    vertical-align: middle;
-    width: auto !important;
+  }
+  &.disabled + label,
+  &[disabled] + label,
+  fieldset[disabled]  + label {
+    cursor: not-allowed;
+    pointer-events: none; // Future-proof disabling of clicks
+    opacity: .35;
+  }
+}
 
-    .dd-select {
-      padding-right: 20px !important;
-      width: inherit !important;
+
+// Radio buttons ---------------------------------------------------------//
+
+
+input[type="radio"] {
+  display: none;
+
+  & + label {
+    color: $black;
+    display: table;
+    position: relative;
+    margin-left: 32px;
+    margin-bottom: 10px;
+    cursor: pointer;
+
+    &:before {
+      content: '';
+      font-family: $sans;
+      color: $white;
+      font-weight: 300;
+      font-size: 12px;
+      line-height: 14px;
+      text-align: center;
+      width: 18px;
+      height:18px;
+      background: none;
+      border: 2px solid $black;
+      top: 0;
+      left: -32px;
+      position: absolute;
+      border-radius: 50%;
+      transition: all 0.4s;
+    }
+    &:after {
+      content: '';
+      background: $black;
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      left: -28px;
+      top: 4px;
+      border-radius: 50%;
+      opacity: 0;
+      transition: all 0.4s;
+    }
+    &.inline {
+      display: inline-block;
+      margin-right: 10px;
     }
   }
-  .dd-options {
-    width: auto !important;
-    min-width: 100%;
-    white-space: nowrap;
+  &:checked + label:after {
+    opacity: 1;
   }
-  .dd-container,
-  .dd-option {
-    min-height: 40px;
+  &.disabled + label,
+  &[disabled] + label,
+  fieldset[disabled]  + label {
+    cursor: not-allowed;
+    pointer-events: none; // Future-proof disabling of clicks
+    opacity: .35;
   }
-  .dd-select {
-    border: none !important;
-    background: none !important;
+}
 
-    label {
-      color: $black;
-    }
-  }
-  .dd-options {
-    label {
-      color: $black;
-    }
-  }
-  .input-xx-small {
-    width: 20px !important;
-  }
-  .input-x-small {
-    width: 40px;
-  }
-  .input-small {
-    width: 70px;
-  }
-  .input-medium {
-    width: 150px;
-  }
-  .input-large {
-    width: 200px;
-  }
-  .input-x-large {
-    width: 250px;
-  }
-  .input-xx-large {
-    width: 250px;
-  }
-  .input-block {
-    width: 100%;
-  }
+
+
+
+// Input text & Area sizes ---------------------------------------------------------//
+
+
+.input-xx-small {
+  width: 20px !important;
+}
+.input-x-small {
+  width: 40px;
+}
+.input-small {
+  width: 70px;
+}
+.input-medium {
+  width: 150px;
+}
+.input-large {
+  width: 200px;
+}
+.input-x-large {
+  width: 250px;
+}
+.input-xx-large {
+  width: 250px;
+}
+.input-block {
+  width: 100%;
+}
