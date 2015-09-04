@@ -27,7 +27,7 @@ textarea {
 label {
   color: $gray3;
 
-  &.label {
+  &.block {
     display: block;
   }
 }
@@ -43,6 +43,17 @@ label {
   .dd-select {
     padding-right: 20px !important;
     width: inherit !important;
+  }
+
+  .dd-selected {
+    font-weight: 400;
+    padding: 10px 6px 10px 0px;
+  }
+  .dd-pointer-down {
+    border-top-color: $gray2;
+  }
+  .dd-pointer-up {
+    border-bottom-color: $gray2 !important;
   }
 }
 .dd-options {
@@ -206,8 +217,9 @@ input[type="radio"] {
   width: 250px;
 }
 .input-xx-large {
-  width: 250px;
+  width: 400px;
 }
 .input-block {
   width: 100%;
 }
+

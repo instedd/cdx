@@ -10,11 +10,11 @@
         %ul
           - @manifest.errors.full_messages.each do |msg|
             %li= msg
-  .control-group
-    = f.label :definition, :class => 'control-label'
-    .controls
-      = f.text_area :definition
+  .row
+    .col
+      = f.label :definition, :class => 'label'
+      = f.text_area :definition, :rows => '5', :class => 'input-xx-large '
 
-  .control-group
-    .controls
-      = f.submit class: 'btn'
+  .row
+    .col
+      = f.submit class: 'btn-primary'

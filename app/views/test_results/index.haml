@@ -7,52 +7,51 @@
   .row
     .col
       %h1 Filters
-  .row
-    .col
-      %input.btn-primary.pull-right{type: "submit", value: "Filter"}
   - unless @institutions.one? || @laboratories.one? || @devices.one?
     .row
       - unless @institutions.one?
-        .col.pe-4
-          %label.label Institution
+        .col
+          %label.block Institution
           %select.ddown(name="institution.uuid")
             %option(value="") (all)
             = options_from_collection_for_select @institutions, :uuid, :name, params["institution.uuid"]
       - unless @laboratories.one?
-        .col.pe-4
-          %label.label Laboratory
+        .col
+          %label.block Laboratory
           %select.ddown(name="laboratory.uuid")
             %option(value="") (all)
             = options_from_collection_for_select @laboratories, :uuid, :name, params["laboratory.uuid"]
       - unless @devices.one?
-        .col.pe-4
-          %label.label Device
+        .col
+          %label.block Device
           %select.ddown(name="device.uuid")
             %option(value="") (all)
             = options_from_collection_for_select @devices, :uuid, :name, params["device.uuid"]
   .row
-    .col.pe-4
-      %label.label Condition
+    .col
+      %label.block Condition
       %select.ddown{name: "test.assays.condition", value: params["test.assays.condition"]}
         %option(value="") (all)
         = options_for_select @conditions, params["test.assays.condition"]
-    .col.pe-4
-      %label.label Result
+    .col
+      %label.block Result
       %select.ddown{name: "test.assays.result"}
         %option(value="") (all)
         = options_for_select @results, params["test.assays.result"]
-    .col.pe-4
-      %label.label Date
+    .col
+      %label.block Date
       %select.ddown{name: "since"}
         %option(value="") (all)
         = options_for_select @date_options, params["since"]
-  .row
-    .col.pe-4
-      %label.label Sample Id
+    .col
+      %label.block Sample Id
       %input{type: "text", name: "sample.id", value: params["sample.id"]}
-    .col.pe-4
-      %label.label Encounter Id
+    .col
+      %label.block Encounter Id
       %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
+  .row
+    .col
+      %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 
   .row
     .col

@@ -9,12 +9,11 @@
       %h1 Filters
   %form
     .row
-      .col.pe-2
-        %label Institution
+      .col
+        %label.block Institution
         %select.ddown(name="institution")
           %option(value="") (all)
           = options_from_collection_for_select @institutions, :id, :name, params["institution"]
-      .col
         %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 
 .row

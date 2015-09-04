@@ -1,5 +1,5 @@
-.row-fluid
-  .span12
+.row
+  .col
     %p#notice= notice
     %p
       %strong Version:
@@ -8,4 +8,6 @@
       %strong Definition:
       %pre= JSON.pretty_generate(Oj.load(@manifest.definition)) rescue @manifest.definition
 
-    = link_to 'Back', manifests_path, :class => 'btn'
+.row
+  .col
+    = link_to 'Back', manifests_path, :class => 'btn-primary'
