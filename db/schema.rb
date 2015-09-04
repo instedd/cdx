@@ -100,19 +100,6 @@ ActiveRecord::Schema.define(version: 20150902154438) do
     t.datetime "updated_at"
   end
 
-  create_table "events", force: :cascade do |t|
-    t.integer  "device_id",            limit: 4
-    t.binary   "raw_data",             limit: 65535
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.binary   "sensitive_data",       limit: 65535
-    t.string   "uuid",                 limit: 255
-    t.text     "custom_fields",        limit: 65535
-    t.string   "event_id",             limit: 255
-    t.boolean  "index_failed"
-    t.text     "index_failure_reason", limit: 65535
-  end
-
   create_table "filters", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
     t.string   "name",       limit: 255
@@ -157,25 +144,6 @@ ActiveRecord::Schema.define(version: 20150902154438) do
     t.string   "location_geoid", limit: 60
     t.string   "uuid",           limit: 255
   end
-
-  create_table "locations", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.integer  "parent_id",   limit: 4
-    t.integer  "lft",         limit: 4
-    t.integer  "rgt",         limit: 4
-    t.float    "lat",         limit: 24
-    t.float    "lng",         limit: 24
-    t.integer  "depth",       limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "admin_level", limit: 4
-    t.string   "geo_id",      limit: 255
-  end
-
-  add_index "locations", ["depth"], name: "index_locations_on_depth", using: :btree
-  add_index "locations", ["lft"], name: "index_locations_on_lft", using: :btree
-  add_index "locations", ["parent_id"], name: "index_locations_on_parent_id", using: :btree
-  add_index "locations", ["rgt"], name: "index_locations_on_rgt", using: :btree
 
   create_table "manifests", force: :cascade do |t|
     t.string   "version",     limit: 255
