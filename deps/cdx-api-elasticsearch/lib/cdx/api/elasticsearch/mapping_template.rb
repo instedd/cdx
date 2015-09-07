@@ -18,13 +18,10 @@ class Cdx::Api::Elasticsearch::MappingTemplate
   end
 
   def mapping
-    elastic_mapping = {
+    {
       dynamic_templates: build_dynamic_templates,
       properties: build_properties_mapping
     }
-    transform_script = build_transform_script
-    elastic_mapping[:transform] = { script: transform_script } unless transform_script.empty?
-    elastic_mapping
   end
 
   def update_indices
@@ -62,11 +59,5 @@ class Cdx::Api::Elasticsearch::MappingTemplate
         [ scope.name, scope.elasticsearch_mapping ]
       }
     ]
-  end
-
-  def build_transform_script
-    Cdx.core_fields.inject("") { |script, field|
-      field.append_to_elastic_script script
-    }
   end
 end

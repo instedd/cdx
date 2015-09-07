@@ -9,8 +9,20 @@ class TestResultIndexer
     test_result.device
   end
 
-  def index
-    client.index index: Cdx::Api.index_name, type: type, body: core_fields, id: elasticsearch_id
+  def index(refresh = false)
+    fields = core_fields()
+    run_before_index_hooks(fields)
+    options = {index: Cdx::Api.index_name, type: type, body: fields, id: elasticsearch_id}
+    options[:refresh] = true if refresh
+    client.index(options)
+  end
+
+  def run_before_index_hooks(fields)
+    Cdx.core_field_scopes.each do |scope|
+      scope.fields.each do |field|
+        field.before_index fields
+      end
+    end
   end
 
   def type

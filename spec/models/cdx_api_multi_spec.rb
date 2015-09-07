@@ -13,8 +13,8 @@ describe "Cdx::Api Multi" do
     before(:each) do
       index test: {assays: [{result: :positive}], lab_user: "jdoe"}
       index test: {assays: [{result: :negative}], lab_user: "mmajor"}
-      index test: {assays: [{result: :positive}], patient_age: {years: 10}}
-      index test: {assays: [{result: :negative}], patient_age: {years: 20}}
+      index test: {assays: [{result: :positive}], patient_age: Cdx::Field::DurationField.years(10)}
+      index test: {assays: [{result: :negative}], patient_age: Cdx::Field::DurationField.years(20)}
     end
 
     let(:responses) { multi_query([{'test.lab_user' => "jdoe"}, {'test.patient_age' => "15yo.."}]) }

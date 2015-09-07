@@ -200,9 +200,9 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         response = get_updates(order_by: "test.patient_age")
 
         expect(response[0]["test"]["assays"].first["result"]).to eq("negative")
-        expect(response[0]["test"]["patient_age"]).to eq({"years" => 10})
+        expect(response[0]["test"]["patient_age"]["years"]).to eq(10)
         expect(response[1]["test"]["assays"].first["result"]).to eq("positive")
-        expect(response[1]["test"]["patient_age"]).to eq({"years" => 20})
+        expect(response[1]["test"]["patient_age"]["years"]).to eq(20)
       end
     end
 

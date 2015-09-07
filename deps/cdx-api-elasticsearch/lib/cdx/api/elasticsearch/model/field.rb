@@ -1,4 +1,7 @@
 class Cdx::Field
+  def before_index(fields)
+    # Nothing
+  end
 
   def elasticsearch_mapping
     {
@@ -13,10 +16,6 @@ class Cdx::Field
         type: 'object'
       }
     }
-  end
-
-  def append_to_elastic_script current_script
-    current_script
   end
 
   class NestedField < self
@@ -142,6 +141,14 @@ class Cdx::Field
       time
     end
 
+    def self.millis(value, unit)
+      UNIT_TO_MILLISECONDS[unit] * value
+    end
+
+    def self.years(value)
+      {"years" => value, "in_millis" => millis(value, :years)}
+    end
+
     UNIT_TO_MILLISECONDS = {
       years: 31536000000,
       months: 2592000000,
@@ -152,24 +159,25 @@ class Cdx::Field
       milliseconds: 1
     }
 
-    def self.convert_from_unit amount, unit
-      amount * UNIT_TO_MILLISECONDS[unit.to_sym]
+    def before_index(fields)
+      scoped_field = fields[scope.name]
+      return unless scoped_field
+
+      field = scoped_field[name]
+      return unless field
+
+      millis = 0
+      UNIT_TO_MILLISECONDS.each do |unit, multiplier|
+        field_value = field[unit.to_s]
+        if field_value
+          millis += field_value.to_i * multiplier
+        end
+      end
+      field["in_millis"] = millis
     end
 
-    def append_to_elastic_script current_script
-      temp_name = "temp_#{scoped_name.gsub '.', '___'}"
-      name_with_questions = scoped_name.gsub '.', '?.'
-      calculation = UNIT_TO_MILLISECONDS.map { |unit, milliseconds|
-        "(#{temp_name}.#{unit} ?:0) * #{milliseconds}"
-      }.join " +\n"
-      
-      "#{current_script}
-      #{temp_name} = ctx._source.#{name_with_questions}
-      if(#{temp_name}) {
-        ctx._source.#{scoped_name}.in_millis =
-        #{calculation}
-      }
-      "
+    def self.convert_from_unit amount, unit
+      amount * UNIT_TO_MILLISECONDS[unit.to_sym]
     end
   end
 end

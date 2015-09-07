@@ -251,7 +251,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         expect(test['test']['id']).to eq('12345678901234567890')
         expect(test['patient']['gender']).to eq('female')
-        expect(test['test']['patient_age']).to eq({"years" => 25})
+        expect(test['test']['patient_age']["years"]).to eq(25)
         expect(test['patient']['custom_fields']['pregnancy_status']).to eq('Not Pregnant')
         expect(test['sample']['id']).to eq('0987654321')
         expect(test['test']['start_time']).to  eq('2015-05-18T12:34:56+05:00')
