@@ -4,13 +4,7 @@ class Api::MessagesController < ApiController
   skip_before_action :load_current_user_policies, only: :create
 
   def create
-    if current_user && !params[:authentication_token]
-      devices_scope = current_user.devices
-    else
-      devices_scope = Device.all
-    end
-
-    device = devices_scope.includes(:manifests, :institution, :laboratories).find_by_uuid(params[:device_id])
+    device = Device.includes(:manifests, :institution, :laboratories).find_by_uuid(params[:device_id])
 
     if authenticate_create(device)
       data = request.body.read rescue nil
@@ -35,7 +29,9 @@ class Api::MessagesController < ApiController
 
   def authenticate_create(device)
     token = params[:authentication_token]
-    return true if current_user && !token
+    if current_user && !token
+      return authorize_resource(device, REPORT_MESSAGE)
+    end
     token ||= basic_password
     return false unless token
     device.validate_authentication(token)
