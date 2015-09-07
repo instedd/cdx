@@ -11,7 +11,7 @@
   "showMarkersOnMap": false,
   "proxies": [
     {
-      "context": "/api/tests",
+      "context": "/api/events",
       "host": "localhost",
       "port": 3000
     }
