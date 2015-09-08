@@ -7,26 +7,26 @@
   .row
     .col
       %h1 Filters
-  - unless @institutions.one? || @laboratories.one? || @devices.one?
+  - unless institutions.one? || laboratories.one? || devices.one?
     .row
-      - unless @institutions.one?
+      - unless institutions.one?
         .col
           %label.block Institution
           %select.ddown(name="institution.uuid")
             %option(value="") (all)
-            = options_from_collection_for_select @institutions, :uuid, :name, params["institution.uuid"]
-      - unless @laboratories.one?
+            = options_from_collection_for_select institutions, :uuid, :name, params["institution.uuid"]
+      - unless laboratories.one?
         .col
           %label.block Laboratory
           %select.ddown(name="laboratory.uuid")
             %option(value="") (all)
-            = options_from_collection_for_select @laboratories, :uuid, :name, params["laboratory.uuid"]
-      - unless @devices.one?
+            = options_from_collection_for_select laboratories, :uuid, :name, params["laboratory.uuid"]
+      - unless devices.one?
         .col
           %label.block Device
           %select.ddown(name="device.uuid")
             %option(value="") (all)
-            = options_from_collection_for_select @devices, :uuid, :name, params["device.uuid"]
+            = options_from_collection_for_select devices, :uuid, :name, params["device.uuid"]
   .row
     .col
       %label.block Condition
@@ -59,32 +59,12 @@
         %tr
           %th.tableheader{colspan:100}= pluralize @total, "Test"
         %tr
-          %th= order_by_column "Name", "test.name"
-          %th Result
-          - unless @institutions.one?
-            %th Institution
-          - unless @laboratories.one?
-            %th Laboratory
-          - unless @devices.one?
-            %th Device
-          %th= order_by_column "Sample Id", "sample.id"
-          %th= order_by_column "Encounter Id", "encounter.id"
-          %th= order_by_column "Start Time", "test.start_time"
-          %th= order_by_column "End Time", "test.end_time"
+          - each_column do |id, title, sortable|
+            %th= sortable ? order_by_column(title, id) : title
         - @tests.each do |test|
           %tr
-            %td= test["test"]["name"]
-            %td= test["test"]["assays"].map {|assay| "#{assay["name"]}: #{assay["result"]}"}.join("<br>").html_safe
-            - unless @institutions.one?
-              %td= test["institution"]["name"]
-            - unless @laboratories.one?
-              %td= test["laboratory"]["name"]
-            - unless @devices.one?
-              %td= test["device"]["name"]
-            %td= test["sample"]["id"]
-            %td= test["encounter"].try {|e| e["id"]}
-            %td= format_datetime(test["test"]["start_time"])
-            %td= format_datetime(test["test"]["end_time"])
+            - each_column do |id|
+              %td= formatted_test_value(test, id, web: true)
       .pagination
         = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
         = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
@@ -93,3 +73,4 @@
         = (@total.to_f / @page_size).ceil
         %select.ddown.input-small(name="page_size" onchange="this.form.submit()")
           = options_for_page_sizes
+        = link_to "download CSV", csv_test_results_path(@filter)

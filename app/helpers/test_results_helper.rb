@@ -17,4 +17,37 @@ module TestResultsHelper
       link
     end
   end
+
+  def test_value(test, path)
+    path.split(".").inject(test) { |obj, step| obj && obj[step] }
+  end
+
+  def formatted_test_value(test, path, web: false)
+    value = test_value(test, path)
+    case path
+    when "test.assays"
+      results = test["test"]["assays"].map {|assay| "#{assay["name"]}: #{assay["result"]}"}
+      if web
+        results.join("<br>").html_safe
+      else
+        results.join(", ")
+      end
+    when "test.start_time", "test.end_time"
+      format_datetime(value)
+    else
+      value
+    end
+  end
+
+  def each_column
+    yield "test.name", "Name", true
+    yield "test.assays", "Result", false
+    yield "institution.name", "Institution", false unless institutions.one?
+    yield "laboratory.name", "Laboratory", false unless laboratories.one?
+    yield "device.name", "Device", false unless devices.one?
+    yield "sample.id", "Sample Id", true
+    yield "encounter.id", "Encounter Id", true
+    yield "test.start_time", "Start Time", true
+    yield "test.end_time", "End Time", true
+  end
 end

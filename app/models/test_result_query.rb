@@ -24,6 +24,21 @@ class TestResultQuery
     @result ||= @api_query.execute
   end
 
+  def next_page
+    return true unless @result
+
+    current_count = @result["tests"].size
+    return false if current_count == 0
+
+    current_offset = @api_query.params["offset"] || 0
+    total_count = @result["total_count"]
+    return false if current_offset + current_count >= total_count
+
+    @result = nil
+    @api_query.params["offset"] = current_offset + current_count
+    true
+  end
+
   def csv_builder
     if @api_query.grouped_by.empty?
       CSVBuilder.new result["tests"]

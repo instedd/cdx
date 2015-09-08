@@ -25,7 +25,11 @@ Rails.application.routes.draw do
     end
   end
   resources :manifests, except: [:update, :destroy]
-  resources :test_results
+  resources :test_results do
+    collection do
+      get 'csv'
+    end
+  end
   resources :filters, format: 'html'
   resources :subscribers
   resources :policies
