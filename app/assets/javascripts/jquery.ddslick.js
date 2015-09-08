@@ -22,7 +22,7 @@
     defaults = {
         data: [],
         keepJSONItemsOnTop: false,
-        width: 260,
+        // width: 260,
         height: null,
         background: "#eee",
         selectText: "",
@@ -103,7 +103,8 @@
                 obj = placeholder;
 
                 //Add classes and append ddSelectHtml & ddOptionsHtml to the container
-                obj.addClass('dd-container').append(ddSelectHtml).append(ddOptionsHtml);
+                var originalClass = original.attr('class');
+                obj.addClass('dd-container').addClass(originalClass).append(ddSelectHtml).append(ddOptionsHtml);
 
                 // Inherit name attribute from original element
                 obj.find("input.dd-selected-value")
