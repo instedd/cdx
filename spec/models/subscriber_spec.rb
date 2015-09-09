@@ -33,10 +33,10 @@ describe Subscriber, elasticsearch: true do
   end
 
   it "generates a correct filter_test GET query with specified fields" do
-    fields = ["test.assays.name", "test.assays.result", "patient.gender"]
+    fields = ["test.assays", "patient.gender"]
     url = "http://subscriber/cdp_trigger"
     subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'GET'
-    callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5Bname%5D=mtb&test%5Bassays%5D%5Bresult%5D=positive"
+    callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5B0%5D%5Bname%5D=mtb&test%5Bassays%5D%5B1%5D%5Bresult%5D=positive"
     callback_request = stub_request(:get, callback_query).to_return(:status => 200, :body => "", :headers => {})
 
     submit_test
@@ -47,11 +47,11 @@ describe Subscriber, elasticsearch: true do
   end
 
   it "generates a correct filter_test POST query with specified fields" do
-    fields = ["test.asssays.name", "test.assays.result", "patient.gender"]
+    fields = ["test.assays", "patient.gender"]
     url = "http://subscriber/cdp_trigger?token=48"
     subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'POST'
     callback_request = stub_request(:post, url).
-         with(:body => '{"test":{"assays":{"result":"positive"}},"patient":{"gender":"male"}}').
+         with(:body => '{"test":{"assays":[{"result":"positive","name":"mtb"}]},"patient":{"gender":"male"}}').
          to_return(:status => 200, :body => "", :headers => {})
 
     submit_test
@@ -79,8 +79,7 @@ describe Subscriber, elasticsearch: true do
       expect(response["location"].keys).to match_array(["id", "parents", "admin_levels", "lat", "lng"])
       expect(response["patient"].keys).to match_array(["gender"])
       expect(response["sample"].keys).to match_array(["uuid", "id", "type", "collection_date"])
-      expect(response["test"].keys).to match_array(["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "assays", "quantitative_result", "type", "lab_user"])
-      expect(response["test"]["assays"].keys).to match_array(%w(condition name result))
+      expect(response["test"].keys).to match_array(["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "assays", "type", "lab_user"])
       expect(response["institution"]["name"]).to eq(institution.name)
       expect(response["laboratory"]["name"]).to eq(laboratory.name)
       expect(response["device"]["name"]).to eq(device.name)
