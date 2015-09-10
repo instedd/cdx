@@ -28,7 +28,8 @@ class Subscriber < ActiveRecord::Base
   def delete_percolator
     Cdx::Api.client.delete index: Cdx::Api.index_name_pattern,
                            type: '.percolator',
-                           id: self.id
+                           id: self.id,
+                           ignore: 404
   end
 
   def self.notify_all
