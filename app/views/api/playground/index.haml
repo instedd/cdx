@@ -1,18 +1,18 @@
-%h3#playground CDP - Playground
-.row-fluid
-  .span4.r-border
-    %h4 Submit message
+%h1#playground CDP - Playground
+.row
+  .col.pe-4
+    %h2 Submit message
     %form#report_form(method="post")
-      .control-group
-        %label.control-label(for="device") Device
-        .controls
-          %select#device
+      .row
+        .col
+          %label.block(for="device") Device
+          %select#device.ddown
             = @devices.map do |device|
               %option{ value: device.uuid}=device.name
-      .control-group
-        %label.control-label(for="data") Data
-        .controls
-          %textarea#data
+      .row
+        .col
+          %label(for="data") Data
+          %textarea#data.input-block
             :preserve
               {
                 //"start_time" : "2014-08-05T20:29:19Z",
@@ -36,28 +36,22 @@
               }
 
       .results
-      .control-group
         %input#create_button.btn(name="commit" type="submit" value="Create message")
-  .span8
-    %h4 Query results
+  .col
+    %h2 Query results
 
     %form#query_form(method="post")
-      .row-fluid
-        .span6
-          .control-group
-            %label.control-label(for="query_string") Query string
-            .controls
-              %textarea#query_string test.patient_age=20yo..20yo
-        .span6
-          .control-group
-            %label.control-label(for="post_body") Request Body
-            .controls
-              %textarea#post_body
-      .row-fluid
-        .span12
-          .control-group
-            %input#query_button.btn(name="commit" type="submit" value="Query")
+      .row
+        .col
+          %label.block(for="query_string") Query string
+          %textarea#query_string.input-block test.patient_age=20yo..20yo
+        .col
+          %label.block(for="post_body") Request Body
+          %textarea#post_body.input-block
+      .row
+        .col
+          %input#query_button.btn(name="commit" type="submit" value="Query")
     #response_div
       %hr
-      %h5 Response:
+      %h3 Response:
       %pre#response
