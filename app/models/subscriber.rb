@@ -18,6 +18,7 @@ class Subscriber < ActiveRecord::Base
 
   def create_percolator
     es_query = filter.create_query.elasticsearch_query
+    return unless es_query
     Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
                           type: '.percolator',
                           id: self.id,
