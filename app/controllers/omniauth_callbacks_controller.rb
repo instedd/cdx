@@ -1,7 +1,6 @@
 class OmniauthCallbacksController < Devise::OmniauthCallbacksController
   skip_before_action :verify_authenticity_token
   skip_before_action :authenticate_user!
-  skip_before_filter :check_guisso_cookie
 
   def instedd
     generic do |auth|
@@ -31,7 +30,6 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     end
 
     sign_in user
-    puts "Current user: #{current_user}"
 
     next_url = env['omniauth.origin'] || root_path
     next_url = root_path if next_url == new_user_session_url

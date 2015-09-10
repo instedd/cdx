@@ -28,4 +28,4 @@
         %li= link_to "Settings", institutions_path
         %li= link_to "Sign out", destroy_session_path(:user), method: :delete
     - else
-      = link_to "Sign in", guisso_sign_in_path_for(:user)
+      = link_to "Sign in", new_session_path(:user)

@@ -17,8 +17,6 @@ gem 'foreman'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'ruby-openid'
-gem 'alto_guisso_rails', github: "instedd/alto_guisso_rails", branch: 'master'
-gem 'alto_guisso', github: "instedd/alto_guisso", branch: 'master'
 gem 'config'
 gem 'rest-client'
 gem 'barby'
@@ -48,7 +46,7 @@ end
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'
 
-gem 'puma'
+# gem 'puma'
 
 group :development do
   gem 'web-console', '~> 2.0'

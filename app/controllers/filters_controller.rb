@@ -1,8 +1,4 @@
 class FiltersController < ApplicationController
-  # TODO should split API controller
-  skip_before_action :authenticate_user!, if: -> { request.path.starts_with? "/api/" }
-  before_filter :authenticate_api_user!, if: -> { request.path.starts_with? "/api/" }
-
   respond_to :html, :json
   expose(:filters) { current_user.filters }
   expose(:filter, attributes: :filter_params)

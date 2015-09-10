@@ -1,6 +1,6 @@
 class Api::MessagesController < ApiController
   wrap_parameters false
-  skip_before_action :authenticate_api_user!, only: :create
+  skip_before_action :authenticate_user!, only: :create
   skip_before_action :load_current_user_policies, only: :create
 
   def create

@@ -1,5 +1,5 @@
 class Api::ActivationsController < ApiController
-  skip_before_action :authenticate_api_user!
+  skip_before_action :authenticate_user!
 
   def create
     activation_token = ActivationToken.find_by(value: params[:token])

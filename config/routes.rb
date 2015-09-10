@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: {omniauth_callbacks: "omniauth_callbacks"}
-  guisso_for :user
 
   resources :laboratories
   resources :institutions, except: :show do
