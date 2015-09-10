@@ -8,7 +8,7 @@ describe Subscriber, elasticsearch: true do
   let(:institution){device.institution}
   let(:laboratory){device.laboratory}
 
-  let!(:filter) { Filter.make query: {"condition" => "mtb", "laboratory" => laboratory.id.to_s}, user: institution.user}
+  let!(:filter) { Filter.make query: {"test.assays.condition" => "mtb", "laboratory.uuid" => laboratory.uuid}, user: institution.user}
   let!(:manifest) {
     manifest = Manifest.create! device_model: model, definition: %{
       {
@@ -35,7 +35,7 @@ describe Subscriber, elasticsearch: true do
     fields = ["test.assays", "patient.gender"]
     url = "http://subscriber/cdp_trigger"
     subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'GET'
-    callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5B0%5D%5Bname%5D=mtb&test%5Bassays%5D%5B1%5D%5Bresult%5D=positive"
+    callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5B0%5D%5Bcondition%5D=mtb&test%5Bassays%5D%5B1%5D%5Bname%5D=mtb&test%5Bassays%5D%5B2%5D%5Bresult%5D=positive"
     callback_request = stub_request(:get, callback_query).to_return(:status => 200, :body => "", :headers => {})
 
     submit_test
@@ -49,9 +49,12 @@ describe Subscriber, elasticsearch: true do
     fields = ["test.assays", "patient.gender"]
     url = "http://subscriber/cdp_trigger?token=48"
     subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'POST'
-    callback_request = stub_request(:post, url).
-         with(:body => '{"test":{"assays":[{"result":"positive","name":"mtb"}]},"patient":{"gender":"male"}}').
-         to_return(:status => 200, :body => "", :headers => {})
+    callback_request = stub_request(:post, url)
+      .with(body: {
+        test: { assays: [{result:"positive", condition:"mtb", name:"mtb"}] },
+        patient: {gender: "male" }
+      })
+      .to_return(status: 200, body: "", headers: {})
 
     submit_test
 
@@ -85,6 +88,27 @@ describe Subscriber, elasticsearch: true do
     end
   end
 
+  it "creates percolator for each subscriber" do
+    subscriber = Subscriber.make filter: filter, user: institution.user
+    percolator = Cdx::Api.client.get index: Cdx::Api.index_name_pattern, type: '.percolator', id: subscriber.id
+    expect(percolator["_source"]).to eq({query: filter.create_query.elasticsearch_query}.with_indifferent_access)
+  end
+
+  it "updates percolator when the filter changes" do
+    subscriber = Subscriber.make filter: filter, user: institution.user
+    filter.update_attributes! query: {"test.assays.condition" => "mtb"}
+    percolator = Cdx::Api.client.get index: Cdx::Api.index_name_pattern, type: '.percolator', id: subscriber.id
+    expect(percolator["_source"]).to eq({query: filter.create_query.elasticsearch_query}.with_indifferent_access)
+  end
+
+  it "deletes percolator when the subscriber is deleted" do
+    subscriber = Subscriber.make filter: filter, user: institution.user
+    subscriber.destroy
+    refresh_index
+    result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
+    expect(result["hits"]["total"]).to eq(0)
+  end
+
   def submit_test
     patient = Patient.make(
       core_fields: {"gender" => "male"}
@@ -94,7 +118,7 @@ describe Subscriber, elasticsearch: true do
 
     TestResult.create_and_index(
       patient: patient, sample: sample,
-      core_fields: {"assays" => ["result" => "positive", "name" => "mtb"]},
+      core_fields: {"assays" => ["result" => "positive", "condition" => "mtb", "name" => "mtb"]},
       device_messages: [device_message]
     )
 

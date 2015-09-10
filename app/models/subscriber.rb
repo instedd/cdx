@@ -13,6 +13,23 @@ class Subscriber < ActiveRecord::Base
   validates_presence_of :verb
   validates_inclusion_of :verb, in: VALID_VERBS
 
+  after_create :create_percolator
+  after_destroy :delete_percolator
+
+  def create_percolator
+    es_query = filter.create_query.elasticsearch_query
+    Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
+                          type: '.percolator',
+                          id: self.id,
+                          body: { query: es_query }
+  end
+
+  def delete_percolator
+    Cdx::Api.client.delete index: Cdx::Api.index_name_pattern,
+                           type: '.percolator',
+                           id: self.id
+  end
+
   def self.notify_all
     PoirotRails::Activity.start("Subscriber.notify_all") do
       Subscriber.find_each do |subscriber|
@@ -80,7 +97,7 @@ class Subscriber < ActiveRecord::Base
           if self.verb == 'GET'
             request.get
           else
-            request.post filtered_test.to_json
+            request.post filtered_test.to_json, content_type: :json
           end
         rescue Exception => ex
           Rails.logger.warn "Could not #{verb} to subscriber #{id} at #{callback_url}: #{ex.message}\n#{ex.backtrace}"
