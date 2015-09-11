@@ -2,12 +2,9 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
   skip_before_action :verify_authenticity_token
   skip_before_action :authenticate_user!
 
-  def instedd
+  def google
     generic do |auth|
-      {
-        email: auth.info['email'],
-        # name: auth.info['name'],
-      }
+      {email: auth.info['email']}
     end
   end
 

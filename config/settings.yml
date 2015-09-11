@@ -3,3 +3,5 @@ nndd_url: "/nndd/"
 location_service_url: "http://locations-stg.instedd.org"
 location_service_set: 'ne'
 sync_pattern: "*.{csv,bef,json,xml}"
+google_client_id:
+google_client_secret:
