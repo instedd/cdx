@@ -2,32 +2,36 @@
 // GLOBAL
 // =============================================================================
 
-  h1 {
-    font-family: $sanstitle;
-    font-size: 220%;
-    font-weight: 300;
-    color: $gray3;
-  }
+h1 {
+  font-family: $sanstitle;
+  font-size: 220%;
+  font-weight: 300;
+  color: $gray3;
+}
 
-  a {
-    color: $gray4;
-  }
+a {
+  color: $gray4;
+}
 
-  .centered {
-    text-align: center;
-  }
+.centered {
+  text-align: center;
+}
 
-  .pull-right {
-    float: right;
-  }
+.pull-right {
+  float: right;
+}
 
-  .pull-left {
-    float: left;
-  }
-  .text-right {
-    text-align: right;
-  }
-  .text-left {
-    text-align: left;
-  }
+.pull-left {
+  float: left;
+}
+.text-right {
+  text-align: right;
+}
+.text-left {
+  text-align: left;
+}
 
+.playground-error {
+  color: $red;
+  min-height: 30px;
+}

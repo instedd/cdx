@@ -1,57 +1,56 @@
 %h1#playground CDP - Playground
 .row
   .col.pe-4
-    %h2 Submit message
+    %h4 Submit message
     %form#report_form(method="post")
-      .row
-        .col
-          %label.block(for="device") Device
-          %select#device.ddown
-            = @devices.map do |device|
-              %option{ value: device.uuid}=device.name
-      .row
-        .col
-          %label(for="data") Data
-          %textarea#data.input-block
-            :preserve
+      %label.block(for="device") Device
+      %select.ddown#device
+        = @devices.map do |device|
+          %option{ value: device.uuid}=device.name
+      %label.block(for="data") Data
+      %textarea.input-xx-large#data{:rows => "18"}
+        :preserve
+          {
+            //"start_time" : "2014-08-05T20:29:19Z",
+            "patient_id" : 2,
+            "patient_name" : "Lorem Ipsum",
+            "patient_telephone_number" : "12345678",
+            "patient_zip_code" : "1234",
+            //"test_id" : "1",
+            "assay_name" : "MTB Assay",
+            "age" : 20,
+            "system_user" : "jdoe",
+            "test_type" : "specimen",
+            "gender" : "male",
+            //"error_code" : "1234",
+            "results": [
               {
-                //"start_time" : "2014-08-05T20:29:19Z",
-                "patient_id" : 2,
-                "patient_name" : "Lorem Ipsum",
-                "patient_telephone_number" : "12345678",
-                "patient_zip_code" : "1234",
-                //"test_id" : "1",
-                "assay_name" : "MTB Assay",
-                "age" : 20,
-                "system_user" : "jdoe",
-                "test_type" : "specimen",
-                "gender" : "male",
-                //"error_code" : "1234",
-                "results": [
-                  {
-                    "condition": "mtb",
-                    "result": "positive"
-                  }
-                ]
+                "condition": "mtb",
+                "result": "positive"
               }
-
-      .results
-        %input#create_button.btn(name="commit" type="submit" value="Create message")
+            ]
+          }
+      .results.playground-error
+      %input#create_button.btn-primary(name="commit" type="submit" value="Create message")
   .col
-    %h2 Query results
+    .row
+      .col
+        %h4 Query results
 
     %form#query_form(method="post")
       .row
         .col
           %label.block(for="query_string") Query string
-          %textarea#query_string.input-block test.patient_age=20yo..20yo
+          %textarea.input-block#query_string{:rows => "8"} test.patient_age=20yo..20yo
         .col
           %label.block(for="post_body") Request Body
-          %textarea#post_body.input-block
+          %textarea.input-block#post_body{:rows => "8"}
       .row
         .col
-          %input#query_button.btn(name="commit" type="submit" value="Query")
-    #response_div
-      %hr
-      %h3 Response:
-      %pre#response
+          %input#query_button.btn-primary(name="commit" type="submit" value="Query")
+    .row
+      .col
+        #response_div
+          %hr
+          %h4 Response:
+          %pre#response
