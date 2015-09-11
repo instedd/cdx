@@ -38,11 +38,10 @@ label {
 .dd-container {
   display: inline-block;
   vertical-align: middle;
-  width: auto !important;
 
   .dd-select {
     padding-right: 20px !important;
-    width: inherit !important;
+    width: inherit;
   }
 
   .dd-selected {

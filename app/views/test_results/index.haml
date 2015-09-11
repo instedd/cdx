@@ -69,8 +69,9 @@
         = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
         = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
         %input.input-x-small.text-right{type: "text", name: "page", value: @page}
-        of
-        = (@total.to_f / @page_size).ceil
-        %select.ddown.input-small(name="page_size" onchange="this.form.submit()")
+        %span
+          of
+          = (@total.to_f / @page_size).ceil
+        %select.ddown(name="page_size" onchange="this.form.submit()")
           = options_for_page_sizes
         = link_to "download CSV", csv_test_results_path(@filter)
