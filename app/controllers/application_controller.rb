@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
   skip_before_filter :verify_authenticity_token, if: :json_request?
 
   before_action :authenticate_user!
+  before_action :check_no_institution!
   before_action :load_current_user_policies
   before_action :load_js_global_settings
 
@@ -49,9 +50,18 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def check_no_institution!
+    if current_user && current_user.institutions.empty?
+      redirect_to new_institution_path
+    end
+  end
+
   protected
 
   def json_request?
     request.format.json?
   end
 end
+
+# Make sure the user can sign out even if he has no institutions
+Devise::SessionsController.skip_before_action :check_no_institution!, only: :destroy

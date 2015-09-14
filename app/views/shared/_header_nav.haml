@@ -3,29 +3,31 @@
     = image_tag 'cdx-logo.png'
 
   %nav
-    %ul
-      %li{:class => params[:controller] == "dashboards" && "active"}
-        = link_to "Dashboard", nndd_path
-      %li{:class => params[:controller] == "laboratories" && "active"}
-        = link_to "Labs", laboratories_path
-      %li{:class => params[:controller] == "devices" && "active"}
-        = link_to "Devices", devices_path
-      %li{:class => params[:controller] == "manifests" && "active"}
-        = link_to "Models", manifests_path
-      %li{:class => params[:controller] == "test_results" && "active"}
-        = link_to "Tests", test_results_path
-      %li{:class => params[:controller] == "filters" && "active"}
-        = link_to "Filters", filters_path
-      %li{:class => params[:controller] == "subscribers" && "active"}
-        = link_to "Apps", subscribers_path
-      %li{:class => params[:controller] == "policies" && "active"}
-        = link_to "Users", policies_path
+    - unless @hide_nav_bar
+      %ul
+        %li{:class => params[:controller] == "dashboards" && "active"}
+          = link_to "Dashboard", nndd_path
+        %li{:class => params[:controller] == "laboratories" && "active"}
+          = link_to "Labs", laboratories_path
+        %li{:class => params[:controller] == "devices" && "active"}
+          = link_to "Devices", devices_path
+        %li{:class => params[:controller] == "manifests" && "active"}
+          = link_to "Models", manifests_path
+        %li{:class => params[:controller] == "test_results" && "active"}
+          = link_to "Tests", test_results_path
+        %li{:class => params[:controller] == "filters" && "active"}
+          = link_to "Filters", filters_path
+        %li{:class => params[:controller] == "subscribers" && "active"}
+          = link_to "Apps", subscribers_path
+        %li{:class => params[:controller] == "policies" && "active"}
+          = link_to "Users", policies_path
 
   .user{:tabindex => "0"}
     - if current_user
       %span= current_user.email
       %ul
-        %li= link_to "Settings", institutions_path
+        - unless @hide_user_settings
+          %li= link_to "Settings", institutions_path
         %li= link_to "Sign out", destroy_session_path(:user), method: :delete
     - else
       = link_to "Sign in", new_session_path(:user)

@@ -1,5 +1,5 @@
 %h2
-  = link_to '←', institutions_path if @institutions.size > 1
+  = link_to '←', institutions_path unless @first_institution_creation
   = @institution.name
 
 .row
