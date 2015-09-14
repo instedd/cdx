@@ -1,5 +1,5 @@
-[![Stories in Ready](https://badge.waffle.io/instedd/cdp.png?label=ready&title=Ready)](https://waffle.io/instedd/cdp)
-[![Build Status](https://travis-ci.org/instedd/cdp.svg?branch=master)](https://travis-ci.org/instedd/cdp)
+[![Stories in Ready](https://badge.waffle.io/instedd/cdx.png?label=ready&title=Ready)](https://waffle.io/instedd/cdx)
+[![Build Status](https://travis-ci.org/instedd/cdx.svg?branch=master)](https://travis-ci.org/instedd/cdx)
 
 # CDX
 
@@ -13,26 +13,16 @@ To start developing:
 
 1. Clone the repo.
 
-2. Install dependencies:
-  ```
-    bundle install
-  ```
-3. Setup development database:
-  ```
-    bundle exec rake db:setup
-  ```
-4. Setup test database:
-  ```
-    bundle exec rake db:test:prepare
-  ```
-5. Run tests:
-  ```
-    bundle exec rspec
-  ```
-6. Start development server:
-  ```
-    bundle exec rails s
-  ```
+2. Install dependencies: `bundle install`
+
+3. Setup development database: `bundle exec rake db:setup`
+
+4. Setup test database: `bundle exec rake db:test:prepare`
+
+5. Run tests: `bundle exec rspec`
+
+6. Start development server: `bundle exec rails s`
+
 
 ### Locations setup
 
