@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe SubscribersController do
   let(:user) { User.make }
+  let!(:institution) { user.create Institution.make_unsaved }
   let(:filter) { user.filters.make query: { laboratory: 1 } }
   before(:each) { sign_in user }
 

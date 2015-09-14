@@ -5,8 +5,8 @@ describe Cdx::Api do
   include_context "elasticsearch index"
   include_context "cdx api helpers"
 
-  let(:device) {Device.make}
-  let(:institution) { device.institution }
+  let!(:device) {Device.make}
+  let!(:institution) { device.institution }
 
   def index_with_test_result(test)
     test_result = TestResult.make device: device
