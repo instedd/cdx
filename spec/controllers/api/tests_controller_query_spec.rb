@@ -250,8 +250,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           "custom_fields": {
           },
           "field_mapping" : {
-            "test.assays[*].result": {
-              "lookup" : "assays[*].result"
+            "test.assays.result": {
+              "lookup" : "assays.result"
             },
             "patient.name": {
               "lookup" : "patient_name"

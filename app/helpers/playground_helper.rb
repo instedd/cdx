@@ -14,8 +14,8 @@ module PlaygroundHelper
 
   def result_and_condition
     fields_with_dictionaries = {}
-    fields_with_dictionaries["result"] = devices_with_specified_field("results[*].result")
-    fields_with_dictionaries["condition"] = devices_with_specified_field("results[*].condition")
+    fields_with_dictionaries["result"] = devices_with_specified_field("results.result")
+    fields_with_dictionaries["condition"] = devices_with_specified_field("results.condition")
     fields_with_dictionaries["assay_name"] = devices_with_specified_field("assay_name")
     fields_with_dictionaries["gender"] = devices_with_specified_field("gender")
     fields_with_dictionaries

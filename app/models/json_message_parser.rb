@@ -3,24 +3,19 @@ class JsonMessageParser
   PATH_ROOT_TOKEN = "$"
 
   def lookup(path, data, root = data)
-    if (targets = path.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1
+    paths = path.split Manifest::PATH_SPLIT_TOKEN
+    paths.inject data do |current, path|
+      next root if path == PATH_ROOT_TOKEN
 
-      #TODO recursive lookup
-      paths = targets.first.split Manifest::PATH_SPLIT_TOKEN
-
-      elements_array = paths.inject data do |current, path|
-        current[path] || []
-      end
-      ######################
-      elements_array.map do |element|
-        lookup(targets.drop(1).join(Manifest::COLLECTION_SPLIT_TOKEN), element, root)
-      end
-    else
-      paths = path.split Manifest::PATH_SPLIT_TOKEN
-      paths.inject data do |current, path|
-        if path == PATH_ROOT_TOKEN
-          root
-        elsif current.is_a? Hash
+      # This check is for nested fields
+      if current.is_a?(Array)
+        current.map do |sub|
+          if sub.is_a?(Hash)
+            sub[path]
+          end
+        end
+      else
+        if current.is_a? Hash
           current[path]
         end
       end

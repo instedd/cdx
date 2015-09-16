@@ -150,16 +150,16 @@
         "options":["invalid","error","no_result","success","negative"]
       },
       {
-        "target_field" : "results[*].result",
-        "source" : {"lookup" : "results[*].result"},
+        "target_field" : "results.result",
+        "source" : {"lookup" : "results.result"},
         "type" : "enum",
         "core" : true,
         "indexed" : true,
         "options": ["positive","negative", "positive_with_rif", "positive_with_rif_inconclusive"]
       },
       {
-        "target_field" : "results[*].condition",
-        "source" : {"lookup" : "results[*].condition"},
+        "target_field" : "results.condition",
+        "source" : {"lookup" : "results.condition"},
         "type" : "enum",
         "core" : true,
         "indexed" : true,

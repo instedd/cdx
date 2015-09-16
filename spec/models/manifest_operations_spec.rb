@@ -625,36 +625,33 @@ describe Manifest, validate_manifest: false do
 
       it "should map single indexed field to a list" do
         assert_manifest_application %{{
-            "test.collection[*].temperature" : {"lookup" : "temperature"}
+            "test.collection.temperature" : {"lookup" : "temperature"}
           }}, %{
             {
-              "test.collection[*].temperature": {}
+              "test.collection.temperature": {}
             }
           },
           '{
             "temperature" : "20"
           }',
-          "test" => {"custom" => {"collection" => [
-            {
-              "temperature" => "20"
-            }]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"collection" => {"temperature" => "20"}}, "pii" => {}, "core" => {}}
       end
 
       it "concats two or more elements" do
         expect {
           assert_manifest_application %{
               {
-                "patient.results[*].name" : {
+                "patient.results.name" : {
                   "concat" : [
                     {"lookup" : "last_name"},
                     ", ",
-                    {"lookup" : "conditions[*].name"}
+                    {"lookup" : "conditions.name"}
                   ]
                 }
               }
             }, %{
               {
-                "patient.results[*].name": {}
+                "patient.results.name": {}
               }
             },
             '{
@@ -675,13 +672,13 @@ describe Manifest, validate_manifest: false do
       it "strips spaces from multiple elements" do
         assert_manifest_application %{
             {
-              "patient.results[*].name" : {
-                "strip" : {"lookup" : "conditions[*].name"}
+              "patient.results.name" : {
+                "strip" : {"lookup" : "conditions.name"}
               }
             }
           }, %{
             {
-              "patient.results[*].name": {}
+              "patient.results.name": {}
             }
           },
           '{
@@ -694,15 +691,15 @@ describe Manifest, validate_manifest: false do
               }
             ]
           }',
-          "patient" => {"custom" => {"results" => [{"name" => "foo"}, {"name" => "bar"}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"name" => ["foo", "bar"]}}, "pii" => {}, "core" => {}}
       end
 
       it "should apply value mapping to multiple indexed field" do
         assert_manifest_application %{
             {
-              "test.results[*].condition" : {
+              "test.results.condition" : {
                 "case" : [
-                  {"lookup" : "conditions[*].condition"},
+                  {"lookup" : "conditions.condition"},
                   [
                     { "when" : "*MTB*", "then" : "MTB"},
                     { "when" : "*FLU*", "then" : "H1N1"},
@@ -713,11 +710,11 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].condition": {}
+              "test.results.condition": {}
             }
           },
           '{"conditions" : [{"condition" : "PATIENT HAS MTB CONDITION"}, {"condition" : "PATIENT HAS FLU CONDITION"}]}',
-          "test" => {"custom" => {"results" => [{"condition" => "MTB"}, {"condition" => "H1N1"}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"condition" => ["MTB", "H1N1"]}}, "pii" => {}, "core" => {}}
       end
 
       it "retrieves a substring of an element" do
@@ -787,7 +784,7 @@ describe Manifest, validate_manifest: false do
       it "should count years between multiple indexed fields" do
         assert_manifest_application %{
             {
-              "test.results[*].age" : {
+              "test.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -801,7 +798,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].age": {}
+              "test.results.age": {}
             }
           },
           '{
@@ -810,13 +807,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "test" => {"custom" => {"results" => [{"age" => 1}, {"age" => 1}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"age" => [1, 1]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count years between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -830,7 +827,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -839,13 +836,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 1}, {"age" => 1}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [1, 1]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count years between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "test.results[*].time" : {
+              "test.results.time" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -859,7 +856,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].time": {}
+              "test.results.time": {}
             }
           },
           '{
@@ -874,13 +871,13 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          "test" => {"custom" => {"results" => [{"time" => 1}, {"time" => 1}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"time" => [1, 1]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count months between multiple indexed fields" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -894,7 +891,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -903,13 +900,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 13}, {"age" => 13}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [13, 13]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count months between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -923,7 +920,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -932,13 +929,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 13}, {"age" => 13}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [13, 13]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count months between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "test.results[*].time" : {
+              "test.results.time" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -952,7 +949,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].time": {}
+              "test.results.time": {}
             }
           },
           '{
@@ -967,13 +964,13 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          "test" => {"custom" => {"results" => [{"time" => 13}, {"time" => 13}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"time" => [13, 13]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count days between multiple indexed fields" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -987,7 +984,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -996,13 +993,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 396}, {"age" => 397}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [396, 397]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count days between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1016,7 +1013,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           {
@@ -1028,13 +1025,13 @@ describe Manifest, validate_manifest: false do
               ]
             }'
           },
-          "patient" => {"custom" => {"results" => [{"age" => 396}, {"age" => 397}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [396, 397]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count days between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "test.results[*].time" : {
+              "test.results.time" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1048,7 +1045,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].time": {}
+              "test.results.time": {}
             }
           },
           '{
@@ -1063,13 +1060,13 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-11T16:23:11.123+0000"
               }
             ]}',
-          "test" => {"custom" => {"results" => [{"time" => 396}, {"time" => 398}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"time" => [396, 398]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count hours between multiple indexed fields" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1083,7 +1080,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -1092,13 +1089,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 9526}, {"age" => 9550}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [9526, 9550]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count hours between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1112,7 +1109,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -1121,13 +1118,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 9526}, {"age" => 9550}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [9526, 9550]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count hours between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "test.results[*].time" : {
+              "test.results.time" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1141,7 +1138,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].time": {}
+              "test.results.time": {}
             }
           },
           '{
@@ -1156,13 +1153,13 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          "test" => {"custom" => {"results" => [{"time" => 9526}, {"time" => 9526}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"time" => [9526, 9526]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count minutes between multiple indexed fields" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1176,7 +1173,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -1185,13 +1182,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 571618}, {"age" => 573058}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [571618, 573058]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count minutes between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1205,7 +1202,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -1214,13 +1211,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 571618}, {"age" => 573058}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [571618, 573058]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count minutes between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "test.results[*].time" : {
+              "test.results.time" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1234,7 +1231,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].time": {}
+              "test.results.time": {}
             }
           },
           '{
@@ -1249,13 +1246,13 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          "test" => {"custom" => {"results" => [{"time" => 571618}, {"time" => 571618}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"time" => [571618, 571618]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count seconds between multiple indexed fields" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1269,7 +1266,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -1278,13 +1275,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 34297139}, {"age" => 34383539}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [34297139, 34383539]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count seconds between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1298,7 +1295,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -1307,13 +1304,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 34297139}, {"age" => 34383539}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [34297139, 34383539]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count seconds between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "test.results[*].time" : {
+              "test.results.time" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1327,7 +1324,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].time": {}
+              "test.results.time": {}
             }
           },
           '{
@@ -1342,13 +1339,13 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          "test" => {"custom" => {"results" => [{"time" => 34297139}, {"time" => 34297139}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"time" => [34297139, 34297139]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count milliseconds between multiple indexed fields" do
         assert_manifest_application %{
             {
-              "patient.results[*].age" : {
+              "patient.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1362,7 +1359,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "patient.results[*].age": {}
+              "patient.results.age": {}
             }
           },
           '{
@@ -1371,13 +1368,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "patient" => {"custom" => {"results" => [{"age" => 34297139000}, {"age" => 34383539000}]}, "pii" => {}, "core" => {}}
+          "patient" => {"custom" => {"results" => {"age" => [34297139000, 34383539000]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count milliseconds between multiple indexed fields on the second parameter" do
         assert_manifest_application %{
             {
-              "test.results[*].age" : {
+              "test.results.age" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1391,7 +1388,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].age": {}
+              "test.results.age": {}
             }
           },
           '{
@@ -1400,13 +1397,13 @@ describe Manifest, validate_manifest: false do
               {"run_at" : "2014-05-14T15:22:11+0000"},
               {"run_at" : "2014-05-15T15:22:11+0000"}
             ]}',
-          "test" => {"custom" => {"results" => [{"age" => 34297139000}, {"age" => 34383539000}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"age" => [34297139000, 34383539000]}}, "pii" => {}, "core" => {}}
       end
 
       it "should count milliseconds between multiple indexed fields on both parameters" do
         assert_manifest_application %{
             {
-              "test.results[*].time" : {
+              "test.results.time" : {
                 "map": [
                   {"lookup": "conditions"},
                   {
@@ -1420,7 +1417,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].time": {}
+              "test.results.time": {}
             }
           },
           '{
@@ -1435,13 +1432,13 @@ describe Manifest, validate_manifest: false do
                 "end_time" : "2013-04-13T16:23:11.123+0000"
               }
             ]}',
-          "test" => {"custom" => {"results" => [{"time" => 34297139000}, {"time" => 34297139000}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"time" => [34297139000, 34297139000]}}, "pii" => {}, "core" => {}}
       end
 
       it "converts from minutes to hours" do
         assert_manifest_application %{
             {
-              "test.results[*].age" : {
+              "test.results.age" : {
                 "map": [
                   {"lookup": "multiple"},
                   {
@@ -1456,7 +1453,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].age": {}
+              "test.results.age": {}
             }
           },
           '{
@@ -1466,22 +1463,22 @@ describe Manifest, validate_manifest: false do
             ],
             "unit" : "minutes"
           }',
-          "test" => {"custom" => {"results" => [{"age" => 1.5}, {"age" => 1}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"age" => [1.5, 1]}}, "pii" => {}, "core" => {}}
       end
 
       it "clusterises an array of numbers" do
         field_definition = %{
             {
-              "test.results[*].age" : {
+              "test.results.age" : {
                 "clusterise" : [
-                    {"lookup" : "multiple[*].age"},
+                    {"lookup" : "multiple.age"},
                     [5, 20, 40]
                   ]
               }
             }
           }
 
-        custom_definition = '{"test.results[*].age": {}}'
+        custom_definition = '{"test.results.age": {}}'
 
         assert_manifest_application field_definition, custom_definition,
           '{
@@ -1498,14 +1495,9 @@ describe Manifest, validate_manifest: false do
           {
             "test" => {
               "custom" => {
-                "results" => [
-                  {"age" => "20-40"},
-                  {"age" => "40+"},
-                  {"age" => "<5"},
-                  {"age" => "20-40"},
-                  {"age" => "5-20"},
-                  {"age" => "20-40"}
-                ]
+                "results" => {
+                  "age" => ["20-40", "40+", "<5", "20-40", "5-20", "20-40"]
+                },
               },
               "pii" => {},
               "core" => {}
@@ -1520,7 +1512,7 @@ describe Manifest, validate_manifest: false do
       it "should collect elements in an XML file" do
         assert_manifest_application %{
             {
-              "test.results[*].assay_code" : {
+              "test.results.assay_code" : {
                 "map": [
                   {"lookup": "Test/Assay"},
                   {
@@ -1535,7 +1527,7 @@ describe Manifest, validate_manifest: false do
             }
           }, %{
             {
-              "test.results[*].assay_code": {}
+              "test.results.assay_code": {}
             }
           },
           { xml: '
@@ -1550,7 +1542,7 @@ describe Manifest, validate_manifest: false do
               </Test>
             </Message>
           ' },
-          "test" => {"custom" => {"results" => [{"assay_code" => "some_type - flu-a"}, {"assay_code" => "some_type - flu-b"}]}, "pii" => {}, "core" => {}}
+          "test" => {"custom" => {"results" => {"assay_code" => ["some_type - flu-a", "some_type - flu-b"]}}, "pii" => {}, "core" => {}}
       end
 
     end

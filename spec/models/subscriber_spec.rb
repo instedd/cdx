@@ -20,8 +20,8 @@ describe Subscriber, elasticsearch: true do
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "test.assays[*].result" : {"lookup" : "result"},
-          "test.assays[*].name" : {"lookup" : "condition"},
+          "test.assays.result" : {"lookup" : "result"},
+          "test.assays.name" : {"lookup" : "condition"},
           "patient.gender" : {"lookup" : "patient_gender"}
         }
       }

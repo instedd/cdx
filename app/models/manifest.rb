@@ -9,12 +9,11 @@ class Manifest < ActiveRecord::Base
   before_save :update_api_version
   before_save :update_conditions
 
-  COLLECTION_SPLIT_TOKEN = "[*]."
   PATH_SPLIT_TOKEN = "."
 
   NULL_STRING = "null"
 
-  CURRENT_VERSION = "1.2.1"
+  CURRENT_VERSION = "1.3.0"
 
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 

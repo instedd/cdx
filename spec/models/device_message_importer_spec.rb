@@ -32,7 +32,7 @@ describe DeviceMessageImporter, elasticsearch: true do
       },
       "field_mapping" : {
         "test.error_code" : {"lookup": "error_code"},
-        "test.assays[*].result" : {
+        "test.assays.result" : {
           "case": [
           {"lookup": "result"},
           [

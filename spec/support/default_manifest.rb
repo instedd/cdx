@@ -31,7 +31,7 @@ class DefaultManifest
   def self.map fields, source_prefix = ''
     fields.map do |field|
       if field.nested?
-        map field.sub_fields, "#{source_prefix}#{field.name}#{Manifest::COLLECTION_SPLIT_TOKEN}"
+        map field.sub_fields, "#{source_prefix}#{field.name}#{Manifest::PATH_SPLIT_TOKEN}"
       else
         "#{source_prefix}#{field.name}"
       end
