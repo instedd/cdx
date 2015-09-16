@@ -20,7 +20,7 @@ class TestResultsController < ApplicationController
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
 
-    result = TestResult.query(@query, current_user).result
+    result = TestResult.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["tests"]
   end

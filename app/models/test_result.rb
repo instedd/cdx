@@ -40,7 +40,7 @@ class TestResult < ActiveRecord::Base
   end
 
   def self.query params, user
-    TestResultQuery.new params, user
+    TestResultQuery.for params, user
   end
 
   def self.entity_scope

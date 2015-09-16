@@ -32,10 +32,10 @@ describe TestResultQuery, elasticsearch: true do
 
       refresh_index
 
-      query = TestResultQuery.new({"condition" => 'mtb'}, user)
+      result = TestResultQuery.for({"condition" => 'mtb'}, user).execute
 
-      expect(query.result['total_count']).to eq(1)
-      expect(query.result['tests'].first['test']['results'].first['result']).to eq('positive')
+      expect(result['total_count']).to eq(1)
+      expect(result['tests'].first['test']['results'].first['result']).to eq('positive')
     end
 
     it "delegates institution policy" do
@@ -51,11 +51,13 @@ describe TestResultQuery, elasticsearch: true do
       refresh_index
 
       grant(user, user_2, institution, QUERY_TEST)
+      grant(user, user_2, laboratory, QUERY_TEST)
+      grant(user, user_2, user_device, QUERY_TEST)
 
-      query = TestResultQuery.new({"condition" => 'mtb'}, user_2)
+      result = TestResultQuery.for({"condition" => 'mtb'}, user_2).execute
 
-      expect(query.result['total_count']).to eq(1)
-      expect(query.result['tests'].first['test']['results'].first['result']).to eq('positive')
+      expect(result['total_count']).to eq(1)
+      expect(result['tests'].first['test']['results'].first['result']).to eq('positive')
     end
 
     it "doesn't fails if no device is indexed for the institution yet" do
@@ -63,10 +65,10 @@ describe TestResultQuery, elasticsearch: true do
 
       refresh_index
 
-      query = TestResultQuery.new({"condition" => 'mtb'}, user)
+      result = TestResultQuery.for({"condition" => 'mtb'}, user).execute
 
-      expect(query.result['total_count']).to eq(0)
-      expect(query.result['tests']).to eq([])
+      expect(result['total_count']).to eq(0)
+      expect(result['tests']).to eq([])
     end
 
     it "should not access any test if has no policy" do
@@ -77,10 +79,10 @@ describe TestResultQuery, elasticsearch: true do
 
       refresh_index
 
-      query = TestResultQuery.new({"condition" => 'mtb'}, User.new)
+      result = TestResultQuery.for({"condition" => 'mtb'}, User.new).execute
 
-      expect(query.result['total_count']).to eq(0)
-      expect(query.result['tests']).to eq([])
+      expect(result['total_count']).to eq(0)
+      expect(result['tests']).to eq([])
     end
 
     it "applies institution.id filter" do
@@ -99,8 +101,8 @@ describe TestResultQuery, elasticsearch: true do
 
       refresh_index
 
-      query = TestResultQuery.new({"institution.uuid" => institution_3.uuid}, user)
-      expect(query.result['total_count']).to eq(1)
+      result = TestResultQuery.for({"institution.uuid" => institution_3.uuid}, user).execute
+      expect(result['total_count']).to eq(1)
     end
 
     it "disallows viewing another institution's tests" do
@@ -115,8 +117,50 @@ describe TestResultQuery, elasticsearch: true do
 
       refresh_index
 
-      query = TestResultQuery.new({"institution.id" => [non_user_device.institution.id.to_s, institution.id]}, user)
-      expect(query.result['total_count']).to eq(1)
+      result = TestResultQuery.for({"institution.id" => [non_user_device.institution.id.to_s, institution.id]}, user).execute
+      expect(result['total_count']).to eq(1)
+    end
+
+    it "have access with policy by institution" do
+      TestResult.create_and_index(
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        device_messages:[DeviceMessage.make(device: user_device)]
+      )
+
+      refresh_index
+
+      grant(user, user_2, institution, QUERY_TEST)
+
+      result = TestResultQuery.for({"condition" => 'mtb'}, user_2).execute
+      expect(result['total_count']).to eq(1)
+    end
+
+    it "have access with policy by laboratory" do
+      TestResult.create_and_index(
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        device_messages:[DeviceMessage.make(device: user_device)]
+      )
+
+      refresh_index
+
+      grant(user, user_2, laboratory, QUERY_TEST)
+
+      result = TestResultQuery.for({"condition" => 'mtb'}, user_2).execute
+      expect(result['total_count']).to eq(1)
+    end
+
+    it "have access with policy by device" do
+      TestResult.create_and_index(
+        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
+        device_messages:[DeviceMessage.make(device: user_device)]
+      )
+
+      refresh_index
+
+      grant(user, user_2, user_device, QUERY_TEST)
+
+      result = TestResultQuery.for({"condition" => 'mtb'}, user_2).execute
+      expect(result['total_count']).to eq(1)
     end
 
     it "has access to all institutions if superadmin" do
@@ -140,8 +184,8 @@ describe TestResultQuery, elasticsearch: true do
 
       refresh_index
 
-      query = TestResultQuery.new({"condition" => 'mtb'}, super_user)
-      expect(query.result['total_count']).to eq(2)
+      result = TestResultQuery.for({"condition" => 'mtb'}, super_user).execute
+      expect(result['total_count']).to eq(2)
     end
   end
 
@@ -153,15 +197,16 @@ describe TestResultQuery, elasticsearch: true do
       )
       refresh_index
 
-      query = TestResultQuery.new({"condition" => 'mtb'}, user)
+      result = TestResultQuery.for({"condition" => 'mtb'}, user).execute
 
 
-      expect(query.result['tests'].first['institution']['name']).to eq(institution.name)
-      expect(query.result['tests'].first['device']['name']).to eq(user_device.name)
-      expect(query.result['tests'].first['laboratory']['name']).to eq(laboratory.name)
+      expect(result['tests'].first['institution']['name']).to eq(institution.name)
+      expect(result['tests'].first['device']['name']).to eq(user_device.name)
+      expect(result['tests'].first['laboratory']['name']).to eq(laboratory.name)
     end
 
     it "should include names if there is no lab" do
+      laboratory
       device = Device.make institution_id: institution.id, laboratory: nil
       TestResult.create_and_index(
         core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
@@ -169,11 +214,11 @@ describe TestResultQuery, elasticsearch: true do
       )
       refresh_index
 
-      query = TestResultQuery.new({"condition" => 'mtb'}, user)
+      result = TestResultQuery.for({"condition" => 'mtb'}, user).execute
 
-      expect(query.result['tests'].first['institution']['name']).to eq(institution.name)
-      expect(query.result['tests'].first['device']['name']).to eq(device.name)
-      expect(query.result['tests'].first['laboratory']['name']).to eq(nil)
+      expect(result['tests'].first['institution']['name']).to eq(institution.name)
+      expect(result['tests'].first['device']['name']).to eq(device.name)
+      expect(result['tests'].first['laboratory']['name']).to eq(nil)
     end
 
     it "should include the updated institution name, device name, and laboratory name in the tests" do
@@ -185,12 +230,12 @@ describe TestResultQuery, elasticsearch: true do
 
       institution.name = 'abc'
       institution.save!
-      query = TestResultQuery.new({"condition" => 'mtb'}, user)
+      result = TestResultQuery.for({"condition" => 'mtb'}, user).execute
 
 
-      expect(query.result['tests'].first['institution']['name']).to eq(institution.name)
-      expect(query.result['tests'].first['device']['name']).to eq(user_device.name)
-      expect(query.result['tests'].first['laboratory']['name']).to eq(laboratory.name)
+      expect(result['tests'].first['institution']['name']).to eq(institution.name)
+      expect(result['tests'].first['device']['name']).to eq(user_device.name)
+      expect(result['tests'].first['laboratory']['name']).to eq(laboratory.name)
     end
 
   end

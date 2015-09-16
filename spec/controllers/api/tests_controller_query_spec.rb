@@ -2,11 +2,12 @@ require 'spec_helper'
 
 describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
-  let(:user) {User.make}
-  let!(:institution) {Institution.make user_id: user.id}
-  let(:device) {Device.make institution_id: institution.id}
-  let(:data) {Oj.dump test:{assays: [result: :positive]}}
-  before(:each) {sign_in user}
+  let(:user) { User.make }
+  let!(:institution) { Institution.make user_id: user.id }
+  let(:laboratory) { Laboratory.make institution: institution }
+  let(:device) { Device.make institution: institution, laboratory: laboratory }
+  let(:data) { Oj.dump test:{assays: [result: :positive]} }
+  before(:each) { sign_in user }
 
   def get_updates(options, body="")
     refresh_index
