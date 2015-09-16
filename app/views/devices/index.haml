@@ -24,7 +24,7 @@
 
 .row
   .col
-    %table.table
+    - cdx_table do
       %tr
         %th.tableheader{colspan:100} Devices
       %tr
@@ -35,10 +35,8 @@
         %th Lab
       - @devices.each do |device|
         %tr
-          - if @devices_to_edit.include?(device.id)
-            %td= link_to device.name, edit_device_path(device)
-          - else
-            %td= device.name
+        %tr{data: (@devices_to_edit.include?(device.id) ? {href: edit_device_path(device) } : {})}
+          %td= device.name
           - unless @institutions.one?
             %td= device.institution.name
           %td= device.device_model.name

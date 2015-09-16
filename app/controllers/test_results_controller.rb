@@ -26,6 +26,8 @@ class TestResultsController < ApplicationController
   end
 
   def show
+    @main_column_width = 6
+    
     @test_result = TestResult.find_by(uuid: params[:id])
     authorize_resource(@test_result.device, QUERY_TEST) or return
     @other_tests = @test_result.sample.test_results.where.not(id: @test_result.id)

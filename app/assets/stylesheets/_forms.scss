@@ -78,6 +78,11 @@ label {
   }
 }
 
+.select2-container {
+  a {
+    color: $gray4
+  }
+}
 
 // Checkboxes ---------------------------------------------------------//
 
@@ -250,4 +255,3 @@ input[type="password"] {
 .input-block {
   width: 100%;
 }
-

@@ -12,6 +12,14 @@ class ApplicationController < ActionController::Base
   before_action :load_current_user_policies
   before_action :load_js_global_settings
 
+  before_action do
+    @main_column_width = if params[:action] != 'index'
+      8
+    else
+      10
+    end
+  end
+
   decent_configuration do
     strategy DecentExposure::StrongParametersStrategy
   end

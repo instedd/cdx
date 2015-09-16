@@ -1,50 +1,63 @@
-- content_for(:leftcolumn) do
-  .centered
-    = link_to "←", :back, class: 'fixed', title: 'Back'
+.row
+  .col
+    %h1
+      = link_to "←", :back, title: 'Back'
+      = @test_result.core_fields['name']
 
 .row
   .col
-    %h1= @test_result.core_fields['name']
+    .card
+      .card-image
+        -# TODO select card image upon test result assays
+        = image_tag "card-unkown.png"
+      .card-detail-top
+        %b= @test_result.core_fields['name']
+        %br
+        %span= @test_result.core_fields['start_time'].strftime('%B %e, %Y')
 
-.row
-  .col
-    %b= @test_result.core_fields['name']
-    %span= @test_result.core_fields['start_time'].strftime('%B %e, %Y')
-    %div
-      Patient
-      -# TODO add link to patient
-      = @test_result.patient.plain_sensitive_data['name']
-
-    %div
-      Test performed on
-      %span
+      .card-detail-bottom
+        Patient
+        -# TODO add link to patient
+        = @test_result.patient.plain_sensitive_data['name']
+        %br
+        Test performed on
         = link_to @test_result.device.name, edit_device_path(@test_result.device)
-      by
-      = @test_result.core_fields['lab_user']
-    - if @test_result.device.laboratory
-      %div
-        at
-        = @test_result.device.laboratory
+        by
+        -# TODO add link to lab_user
+        = @test_result.core_fields['lab_user']
+        - if @test_result.device.laboratory
+          at
+          -# TODO add link to laboratory
+          = link_to @test_result.device.laboratory, edit_laboratory_path(@test_result.device.laboratory)
 
 .row
   .col
+  
+.row
+  .col.pe-2
     %label Assays
-    %ul
-      - @test_result.core_fields['assays'].each do |assay|
-        %li
-          = assay['name'].upcase
-          \ ----
-          = assay['result'].titleize
+  .col
+    - @test_result.core_fields['assays'].each do |assay|
+      .row
+        .col
+          %div.underline
+            %span
+              %b= assay['name'].upcase
+        .col.pe-8
+          %b= assay['result'].titleize
 
 
 .row
-  .col
+  .col.pe-2
     %label Additional data
-    %ul
-      - @test_result.custom_fields.each do |key, value|
-        %li
-          = key.humanize
-          \ ----
+  .col
+    - @test_result.custom_fields.each do |key, value|
+      .row
+        .col
+          %div.underline
+            %span
+              = key.humanize
+        .col.pe-8
           - case key
           - when 'bands'
             %span
@@ -57,20 +70,29 @@
 - @test_result.core_fields.each do |key, value|
   - next if ['name', 'lab_user', 'assays'].include?(key)
   .row
-    .col
+    .col.pe-2
       %label= key.humanize
-      %span= value
+    .col
+      - case
+      - when value.is_a?(Hash) && value.length == 1
+        %span
+          = value.values.first
+          = value.keys.first
+      - else
+        %span= value
 
 .row
-  .col
+  .col.pe-2
     %label Sample
+  .col
     %span= @test_result.sample.core_fields['id']
     -# TODO add barcode and print button
 
 
 .row
-  .col
+  .col.pe-2
     %label Other tests
+  .col
     %span
     - case @other_tests.count
     - when 0

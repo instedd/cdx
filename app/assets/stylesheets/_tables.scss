@@ -8,15 +8,15 @@
     border: 1px solid $gray1;
     margin: 15px auto;
 
+    a {
+      color: $gray4;
+    }
+
     th {
       font-weight: 700;
       color: $gray3;
       text-align: left;
       padding: 14px 10px;
-
-      a {
-        color: inherit;
-      }
 
       &.tableheader {
         font-family: $sanstitle;
@@ -37,6 +37,9 @@
   }
 
   .pagination {
+    a {
+      color: $gray4;
+    }
 
     a[class^="btn"] {
       color: $black;

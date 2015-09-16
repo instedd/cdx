@@ -15,7 +15,7 @@
         = flash_message
         .row
           .col= yield(:leftcolumn)
-          %div{class: "col #{editing? ? 'pe-8' : 'pe-10'}"}
+          %div{class: "col pe-#{@main_column_width}"}
             = content_for?(:cdp_content) ? yield(:cdp_content) : yield
           .col= yield(:rightcolumn)
 

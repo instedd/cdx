@@ -37,7 +37,7 @@ $(document).ready(function(){
       setFilledClass($(this));
     });
 
-  $(document).on('click', '.row-href tr', function(){
+  $(document).on('click', '.row-href tr[data-href]', function(){
     window.location.href = $(this).data('href');
   })
 });

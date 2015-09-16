@@ -27,7 +27,7 @@ module ApplicationHelper
     res
   end
 
-  def editing?
-    params[:action] != 'index'
+  def cdx_table(&block)
+    concat(content_tag(:table, capture(&block), class: "table row-href", cellpadding: "0", cellspacing: "0"))
   end
 end

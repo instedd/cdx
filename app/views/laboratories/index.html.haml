@@ -18,7 +18,7 @@
 
 .row
   .col
-    %table.table
+    - cdx_table do
       %tr
         %th.tableheader{colspan:100} Laboratories
       %tr
@@ -27,12 +27,8 @@
           %th Institution
         %th Location
       - @laboratories.each do |laboratory|
-        %tr
-          - if @labs_to_edit.include?(laboratory.id)
-            %td= link_to laboratory.name, edit_laboratory_path(laboratory)
-          - else
-            %td= laboratory.name
+        %tr{data: (@labs_to_edit.include?(laboratory.id) ? {href: edit_laboratory_path(laboratory) } : {})}
+          %td= laboratory.name
           - unless @institutions.one?
             %td= laboratory.institution.name
           %td= laboratory.location.try(:name)
-
