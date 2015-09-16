@@ -3,7 +3,7 @@
     = image_tag 'cdx-logo.png'
 
   %nav
-    - unless @hide_nav_bar
+    - if current_user && !@hide_nav_bar
       %ul
         %li{:class => params[:controller] == "dashboards" && "active"}
           = link_to "Dashboard", nndd_path
