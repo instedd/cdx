@@ -17,5 +17,20 @@
 //= require_tree .
 
 $(document).ready(function(){
-    $('.ddown').ddslick();
+
+  $('.ddown').ddslick();
+
+
+  $("input[type='email'], input[type='password']").on('keydown', function() {
+    _this = $(this);
+    window.setTimeout(function(){
+      if(_this.val().length > 0) {
+          _this.addClass('filled');
+      } else {
+          _this.removeClass('filled');
+      }
+    }, 0);
+  });
+
 });
+

@@ -6,6 +6,7 @@
       %label.block(for="device") Device
       %select.ddown#device
         = @devices.map do |device|
+          %option(value="") Select device
           %option{ value: device.uuid}=device.name
       %label.block(for="data") Data
       %textarea.input-xx-large#data{:rows => "18"}

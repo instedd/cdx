@@ -46,14 +46,27 @@
   }
 }
 
-@mixin placeholder-style($fstyle) {
-  &::-moz-placeholder           { font-style: $fstyle; } // Firefox
-  &:-ms-input-placeholder       { font-style: $fstyle; } // Internet Explorer 10+
-  &::-webkit-input-placeholder  { font-style: $fstyle; } // Safari and Chrome
+
+// Placeholder ---------------------------------------------------------//
+
+@mixin placeholder($value1, $value2) {
+  &::-moz-placeholder           { font-style: $value1; padding-left: $value2; } // Firefox
+  &:-ms-input-placeholder       { font-style: $value1; padding-left: $value2; } // Internet Explorer 10+
+  &::-webkit-input-placeholder  { font-style: $value1; padding-left: $value2; } // Safari and Chrome
+}
+
+@mixin placeholder-style($value) {
+  &::-moz-placeholder           { font-style: $value; } // Firefox
+  &:-ms-input-placeholder       { font-style: $value; } // Internet Explorer 10+
+  &::-webkit-input-placeholder  { font-style: $value; } // Safari and Chrome
 }
 
 
-
+@mixin placeholder-padd($value) {
+  &::-moz-placeholder           { padding-left: $value; } // Firefox
+  &:-ms-input-placeholder       { padding-left: $value; } // Internet Explorer 10+
+  &::-webkit-input-placeholder  { padding-left: $value; } // Safari and Chrome
+}
 
 
 

@@ -192,6 +192,35 @@ input[type="radio"] {
 }
 
 
+// Input email & password ---------------------------------------------------------//
+
+input[type="email"],
+input[type="password"] {
+
+  @include placeholder($sans, 25px);
+  background: url('ic-login.png') no-repeat $white;
+
+  &.filled {
+    background: $white;
+  }
+}
+
+input[type="email"] {
+  background-position: left top;
+}
+
+input[type="password"] {
+  background-position: left -40px;
+}
+
+.small-quote {
+  font-size: 70%;
+  color: $gray3;
+  font-style: italic;
+  position: absolute;
+}
+
+
 
 
 // Input text & Area sizes ---------------------------------------------------------//
