@@ -4,14 +4,13 @@
 
 .row
   .col
-    %table.table
+    - cdx_table do
       %tr
         %th.tableheader{colspan:100} Device Models
       %tr
         %th Name
         %th Version
       - @device_models.each do |device_model|
-        %tr
-          %td= link_to device_model.name, manifest_path(device_model.current_manifest)
-          %td= link_to device_model.current_manifest.version, manifest_path(device_model.current_manifest)
-
+        %tr{data: {href: manifest_path(device_model.current_manifest) }}
+          %td= device_model.name
+          %td= device_model.current_manifest.version
