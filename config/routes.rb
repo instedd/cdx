@@ -27,7 +27,7 @@ Rails.application.routes.draw do
     end
   end
   resources :manifests, except: [:update, :destroy]
-  resources :test_results do
+  resources :test_results , only: [:index, :show] do
     collection do
       get 'csv'
     end

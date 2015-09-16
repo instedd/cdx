@@ -17,9 +17,7 @@
 //= require_tree .
 
 $(document).ready(function(){
-
   $('.ddown').ddslick();
-
 
   $("input[type='email'], input[type='password']").on('keydown', function() {
     _this = $(this);
@@ -32,5 +30,7 @@ $(document).ready(function(){
     }, 0);
   });
 
+  $(document).on('click', '.row-href tr', function(){
+    window.location.href = $(this).data('href');
+  })
 });
-

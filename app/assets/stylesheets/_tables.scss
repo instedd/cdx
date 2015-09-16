@@ -50,3 +50,11 @@
       padding: 0 18px 0 5px;
     }
   }
+
+
+.row-href tr[data-href] {
+  cursor: pointer;
+  &:hover{
+    background:#f3f3f3;
+  }
+}

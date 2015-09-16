@@ -25,6 +25,12 @@ class TestResultsController < ApplicationController
     @tests = result["tests"]
   end
 
+  def show
+    @test_result = TestResult.find_by(uuid: params[:id])
+    authorize_resource(@test_result.device, QUERY_TEST) or return
+    @other_tests = @test_result.sample.test_results.where.not(id: @test_result.id)
+  end
+
   def csv
     @query = TestResult.query(create_filter, current_user)
     @filename = "Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
@@ -45,4 +51,3 @@ class TestResultsController < ApplicationController
     filter
   end
 end
-

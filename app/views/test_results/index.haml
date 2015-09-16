@@ -55,14 +55,14 @@
 
   .row
     .col
-      %table.table
+      %table.table.row-href
         %tr
           %th.tableheader{colspan:100}= pluralize @total, "Test"
         %tr
           - each_column do |id, title, sortable|
             %th= sortable ? order_by_column(title, id) : title
         - @tests.each do |test|
-          %tr
+          %tr{data: {href: test_result_path(test['test']['uuid']) }}
             - each_column do |id|
               %td= formatted_test_value(test, id, web: true)
       .pagination
