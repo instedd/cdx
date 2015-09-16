@@ -58,6 +58,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def authorize_test_result(test_result)
+    authorize_resource(test_result.institution, QUERY_TEST) or authorize_resource(test_result.device, QUERY_TEST) or authorize_resource(test_result.laboratory, QUERY_TEST)
+  end
+
   def check_no_institution!
     if current_user && current_user.institutions.empty?
       redirect_to new_institution_path

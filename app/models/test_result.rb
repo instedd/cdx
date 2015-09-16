@@ -5,6 +5,7 @@ class TestResult < ActiveRecord::Base
   has_and_belongs_to_many :device_messages
   belongs_to :device
   has_one :institution, through: :device
+  has_one :laboratory, through: :device
   belongs_to :sample
   belongs_to :patient
   belongs_to :encounter
