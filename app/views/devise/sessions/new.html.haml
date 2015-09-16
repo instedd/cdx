@@ -1,0 +1,21 @@
+.row
+  .col
+    %h1 Login
+= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
+  .row
+    .col
+      = f.email_field :email, autofocus: true, placeholder: 'Email', class: "input-block"
+  .row
+    .col
+      = f.password_field :password, autocomplete: "off", placeholder: 'Password', class: "input-block"
+  %br
+  .row
+    .col
+      = f.submit "Login", class: "btn-secondary input-block"
+  .row
+    - if devise_mapping.rememberable?
+      .col
+        = f.check_box :remember_me
+        = f.label :remember_me
+    .col
+      = link_to "Login problems?", new_password_path(resource_name), class: "pull-right"

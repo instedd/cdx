@@ -1,0 +1,15 @@
+.row
+  .col
+    %h1 Resend confirmation instructions
+= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post }) do |f|
+  .row
+    .col
+      = f.email_field :email, autofocus: true, value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email), class: "input-block"
+  %br
+  .row
+    .col
+      = f.submit "Resend confirmation instructions", class: "btn-secondary"
+    .col
+      %br
+      = link_to "Have and account? Log in", new_session_path(resource_name), class: "pull-right"
+= devise_error_messages!

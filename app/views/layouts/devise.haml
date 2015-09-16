@@ -1,0 +1,26 @@
+!!!
+%html
+  %head
+    %title Connected Diagnostics Platform
+    = Gon::Base.render_data({})
+    = stylesheet_link_tag "application", :media => "all"
+    = javascript_include_tag "application"
+    = csrf_meta_tags
+  %body.devise{class: @body_class}
+    .wrapper
+      %header
+        .row
+          .col
+            .logo
+            = image_tag 'cdx-logo.png'
+          .col
+            = link_to "Create an account", new_registration_path(resource_name), :class => 'btn-primary pull-right'
+
+
+      = flash_message
+      .content
+        .devise-box
+          = content_for?(:cdp_content) ? yield(:cdp_content) : yield
+
+      %footer
+        = render "shared/footer"
