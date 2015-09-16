@@ -1,7 +1,7 @@
 .row
   .col
     %h1
-      = link_to "←", :back, title: 'Back'
+      = link_to "←", :back, class: 'side-link', title: 'Back'
       = @test_result.core_fields['name']
 
 .row
@@ -32,9 +32,9 @@
 
 .row
   .col
-  
+
 .row
-  .col.pe-2
+  .col.pe-3
     %label Assays
   .col
     - @test_result.core_fields['assays'].each do |assay|
@@ -48,7 +48,7 @@
 
 
 .row
-  .col.pe-2
+  .col.pe-3
     %label Additional data
   .col
     - @test_result.custom_fields.each do |key, value|
