@@ -40,7 +40,7 @@ class Cdx::Api::Service
   def client
     host = config.elasticsearch_url || "http://localhost:9200"
     if config.log
-      ::Elasticsearch::Client.new log: true, trace: true, logger: Logger.new(STDOUT), host: host
+      ::Elasticsearch::Client.new log: false, trace: true, tracer: NonDebugLogger.new(config.log), host: host
     else
       ::Elasticsearch::Client.new log: false, host: host
     end
@@ -52,6 +52,17 @@ class Cdx::Api::Service
 
   def config
     @config ||= Cdx::Api::Elasticsearch::Config.new
+  end
+
+  private
+
+  class NonDebugLogger < SimpleDelegator
+    def debug?
+      false
+    end
+
+    def debug(msg)
+    end
   end
 
 end
