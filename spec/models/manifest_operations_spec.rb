@@ -152,20 +152,6 @@ describe Manifest, validate_manifest: false do
       "patient" => {"custom" => {}, "pii" => {"name" => ["John", "Doe"]}, "core" => {}}
     end
 
-    it "maps an array from javascript" do
-      assert_raises_manifest_data_validation %(
-        {
-          "patient.name": {
-            "script": "a = {}; a.name = message.first_name; a"
-          }
-        }
-      ), %(
-        {
-        }
-      ), %({"first_name": "John", "last_name": "Doe"}),
-      "JSONObject is not a valid return type for 'patient.name' script"
-    end
-
     it "concats the result of a case" do
       assert_manifest_application %{
           {

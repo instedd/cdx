@@ -65,6 +65,20 @@ describe Manifest, validate_manifest: false do
         "test" => {"core" => {"assays" => [{"name" => "MTB"}]}, "pii" => {}, "custom" => {}}
     end
 
+    it "should apply to core field to results array" do
+      assert_manifest_application %{
+          {
+            "test.assays" : {"script" : "var x = [{'name': 'MTB'}]; x"}
+          }
+        }, %{
+          {
+            "test.assays": {}
+          }
+        },
+        '{}',
+        "test" => {"core" => {"assays" => [{"name" => "MTB"}]}, "pii" => {}, "custom" => {}}
+    end
+
     it "should apply to custom non-pii field inside results array" do
       assert_manifest_application %{
           {

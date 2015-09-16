@@ -136,17 +136,27 @@ class ManifestFieldMapping
       end
 
       result = ctx.eval(script)
-
-      if result.is_a? V8::Array
-        result = result.to_a
-      elsif result.is_a? V8::Object
-        raise ManifestParsingError.invalid_script(@field.target_field)
-      end
+      result = to_ruby(result)
       result
     rescue V8::Error => e
       raise ManifestParsingError.script_error(@field.target_field, e.message)
     ensure
       ctx.dispose
+    end
+  end
+
+  def to_ruby(v8_object)
+    case v8_object
+    when V8::Array
+      array = v8_object.to_a
+      array.map! { |elem| to_ruby(elem) }
+    when V8::Object
+      hash = v8_object.to_h
+      hash.each do |key, value|
+        hash[key] = to_ruby(value)
+      end
+    else
+      v8_object
     end
   end
 
