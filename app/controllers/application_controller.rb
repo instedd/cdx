@@ -62,6 +62,3 @@ class ApplicationController < ActionController::Base
     request.format.json?
   end
 end
-
-# Make sure the user can sign out even if he has no institutions
-Devise::SessionsController.skip_before_action :check_no_institution!, only: :destroy
