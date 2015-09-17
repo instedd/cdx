@@ -10,6 +10,10 @@ class Policy < ActiveRecord::Base
 
   before_save :set_delegable_from_definition
 
+  after_save do
+    ComputedPolicy.update_user(user)
+  end
+
   module Actions
     PREFIX = "cdxp"
 
@@ -52,6 +56,14 @@ class Policy < ActiveRecord::Base
     Actions::QUERY_TEST,
     Actions::REPORT_MESSAGE,
   ]
+
+  def self.resources
+    @resources ||= [
+      Device,
+      Laboratory,
+      Institution
+    ]
+  end
 
   def self.delegable
     where(delegable: true)
@@ -184,7 +196,7 @@ class Policy < ActiveRecord::Base
           if match
             resources = Array(match)
             resources.each do |resource|
-              unless self.class.can_delegate?(action, resource, granter)
+              unless (action == '*' ? ACTIONS : [action]).any?{ |action| self.class.can_delegate?(action, resource, granter) }
                 return errors.add :owner, "can't delegate permission over #{resource_matcher}"
               end
             end

@@ -14,8 +14,7 @@ class User < ActiveRecord::Base
   has_many :subscribers
   has_many :policies
   has_many :granted_policies, class_name: "Policy", foreign_key: "granter_id"
-
-  after_create :grant_implicit_policy
+  has_many :computed_policies
 
   def create(model)
     if model.respond_to?(:user=)

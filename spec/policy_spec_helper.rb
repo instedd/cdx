@@ -28,9 +28,9 @@ end
 def grant_or_deny(granter, user, resource, action, delegable, effect)
   policy = Policy.make_unsaved
   policy.definition = policy_definition(resource, action, delegable, effect)
-  policy.granter_id = granter.id
+  policy.granter_id = granter.try(:id)
   policy.user_id = user.id
-  policy.save!
+  policy.save!(validate: !granter.nil?)
   policy
 end
 
