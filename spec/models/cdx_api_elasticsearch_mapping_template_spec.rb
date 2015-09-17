@@ -2,9 +2,6 @@ require "bundler/setup"
 require "cdx/api/elasticsearch"
 require "pry-byebug"
 
-require "support/elasticsearch_indices.rb"
-require "support/cdx_api_helpers.rb"
-
 describe "Cdx::Api::Elasticsearch::MappingTemplate" do
 
   describe "Mapping template" do

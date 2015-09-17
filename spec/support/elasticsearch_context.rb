@@ -1,10 +1,14 @@
 shared_context "elasticsearch", elasticsearch: true do
 
   before(:each) do
-    Cdx::Api.client.indices.delete index: Cdx::Api.index_name rescue nil
-    Cdx::Api.client.indices.delete_template(name: "cdx_tests_template_test*") rescue nil
+    Cdx::Api.client.indices.delete index: Cdx::Api.index_name, ignore: 404
+    Cdx::Api.client.indices.delete_template name: "cdx_tests_template_test*", ignore: 404
     Cdx::Api::Elasticsearch::MappingTemplate.new.initialize_template "cdx_tests_template_test"
     Cdx::Api.client.indices.create index: Cdx::Api.index_name
+  end
+
+  def index(body)
+    Cdx::Api.client.index index: Cdx::Api.index_name, type: "test", body: body, refresh: true
   end
 
   def refresh_index
