@@ -19,10 +19,15 @@ To start developing:
 
 4. Setup test database: `bundle exec rake db:test:prepare`
 
-5. Run tests: `bundle exec rspec`
+5. Setup elasticsearch index template: `bundle exec rake cdx_elasticsearch:initialize_template`
 
-6. Start development server: `bundle exec rails s`
+6. Run tests: `bundle exec rspec`
 
+7. Start development server: `bundle exec rails s`
+
+Additionally:
+
+8. Import manifests: `bundle exec rake manifests:load`
 
 ### Locations setup
 
