@@ -1,7 +1,6 @@
 class TestResultsController < ApplicationController
   require 'barby'
   require 'barby/barcode/code_93'
-  require 'barby/outputter/html_outputter'
 
   expose(:laboratories) { check_access(Laboratory, QUERY_TEST) }
   expose(:institutions) { check_access(Institution, QUERY_TEST) }
@@ -38,8 +37,8 @@ class TestResultsController < ApplicationController
     @other_tests = @test_result.sample.test_results.where.not(id: @test_result.id)
     @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
 
-    @sample_uuid_barcode = Barby::Code93.new(@test_result.sample.uuid)
-    @sample_uuid_barcode_for_html = Barby::HtmlOutputter.new(@sample_uuid_barcode)
+    @sample_id = @test_result.sample.core_fields['id']
+    @sample_id_barcode = Barby::Code93.new(@sample_id)
   end
 
   def csv
