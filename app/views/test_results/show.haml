@@ -2,7 +2,7 @@
   .col
     %h1
       = link_to "←", :back, class: 'side-link', title: 'Back'
-      = @test_result.core_fields['name']
+      = @test_result.core_fields[TestResult::NAME_FIELD]
 
 .row
   .col
@@ -11,9 +11,9 @@
         -# TODO select card image upon test result assays
         = image_tag "card-unkown.png"
       .card-detail-top
-        %b= @test_result.core_fields['name']
+        %b= @test_result.core_fields[TestResult::NAME_FIELD]
         %br
-        %span= @test_result.core_fields['start_time'].strftime('%B %e, %Y')
+        %span= @test_result.core_fields[TestResult::START_TIME_FIELD].strftime('%B %e, %Y')
 
       .card-detail-bottom
         Patient
@@ -24,7 +24,7 @@
         = link_to @test_result.device.name, edit_device_path(@test_result.device)
         by
         -# TODO add link to lab_user
-        = @test_result.core_fields['lab_user']
+        = @test_result.core_fields[TestResult::LAB_USER_FIELD]
         - if @test_result.device.laboratory
           at
           -# TODO add link to laboratory
@@ -37,7 +37,7 @@
   .col.pe-3
     %label Assays
   .col
-    - @test_result.core_fields['assays'].each do |assay|
+    - @test_result.core_fields[TestResult::ASSAYS_FIELD].each do |assay|
       .row
         .col
           %div.underline
@@ -57,29 +57,18 @@
           %div.underline
             %span
               = key.humanize
-        .col.pe-8
-          - case key
-          - when 'bands'
-            %span
-              - value.split(';').each do |band|
-                = band
-                %br
-          - else
-            = value
+        .col.pe-8.wrap-text
+          = value
 
-- @test_result.core_fields.each do |key, value|
-  - next if ['name', 'lab_user', 'assays'].include?(key)
+- @core_fields_scope.fields.each do |field|
+  - next if [TestResult::NAME_FIELD, TestResult::LAB_USER_FIELD, TestResult::ASSAYS_FIELD].include?(field.name)
+  - value = @test_result.core_field_value(field)
+  - next unless value
   .row
     .col.pe-2
-      %label= key.humanize
-    .col
-      - case
-      - when value.is_a?(Hash) && value.length == 1
-        %span
-          = value.values.first
-          = value.keys.first
-      - else
-        %span= value
+      %label= field.name.humanize
+    .col.wrap-text
+      %span= field.humanize(@test_result.core_field_value(field))
 
 .row
   .col.pe-2
@@ -98,8 +87,8 @@
     - when 0
       No other test was made with this sample
     - when 1
-      = link_to @other_tests.first.core_fields['name'], test_result_path(@other_tests.first.uuid)
+      = link_to @other_tests.first.core_fields[TestResult::NAME_FIELD], test_result_path(@other_tests.first.uuid)
       was also made with this sample
     - else
-      = @other_tests.map { |t| link_to t.core_fields['name'], test_result_path(t.uuid) }.to_sentence.html_safe
+      = @other_tests.map { |t| link_to t.core_fields[TestResult::NAME_FIELD], test_result_path(t.uuid) }.to_sentence.html_safe
       were also made with this sample

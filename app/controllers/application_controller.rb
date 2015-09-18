@@ -59,9 +59,12 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_test_result(test_result)
-    head :forbidden unless [test_result.institution, test_result.laboratory, test_result.device].any? {
-      |resource| Policy.can?(QUERY_TEST, resource, current_user, @current_user_policies)
-    }
+    if [test_result.institution, test_result.laboratory, test_result.device].any? { |resource| Policy.can?(QUERY_TEST, resource, current_user, @current_user_policies) }
+      true
+    else
+      head :forbidden
+      false
+    end
   end
 
   def check_no_institution!

@@ -2,6 +2,11 @@ class TestResult < ActiveRecord::Base
   include AutoUUID
   include Entity
 
+  NAME_FIELD = 'name'
+  LAB_USER_FIELD = 'lab_user'
+  ASSAYS_FIELD = 'assays'
+  START_TIME_FIELD = 'start_time'
+
   has_and_belongs_to_many :device_messages
   belongs_to :device
   has_one :institution, through: :device

@@ -62,6 +62,10 @@ class Cdx::Field
     @definition["pii"] || false
   end
 
+  def humanize(value)
+    value
+  end
+
   class NestedField < self
     def initialize scope, name, definition
       if definition["sub_fields"]
@@ -103,5 +107,12 @@ class Cdx::Field
   end
 
   class DurationField < self
+    def humanize(value)
+      if value.is_a?(Hash) && value.length == 1
+        "#{value.values.first} #{value.keys.first}"
+      else
+        super
+      end
+    end
   end
 end

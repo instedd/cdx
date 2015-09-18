@@ -40,6 +40,10 @@ a {
   min-height: 30px;
 }
 
+.wrap-text {
+  word-wrap: break-word;
+}
+
 .underline {
   border-bottom: 1px solid $gray2;
   span {

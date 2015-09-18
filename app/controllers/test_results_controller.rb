@@ -29,8 +29,10 @@ class TestResultsController < ApplicationController
     @main_column_width = 6
 
     @test_result = TestResult.find_by(uuid: params[:id])
-    authorize_test_result(@test_result) or return
+    return unless authorize_test_result(@test_result)
+
     @other_tests = @test_result.sample.test_results.where.not(id: @test_result.id)
+    @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
   end
 
   def csv
