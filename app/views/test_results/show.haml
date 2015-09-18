@@ -74,8 +74,11 @@
   .col.pe-2
     %label Sample
   .col
-    %span= @test_result.sample.core_fields['id']
-    -# TODO add barcode and print button
+    -# TODO add print button
+    = @test_result.sample.uuid
+    %br
+    %br
+    = raw @sample_uuid_barcode.to_html
 
 
 .row
