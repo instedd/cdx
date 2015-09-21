@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'policy_spec_helper'
 
-describe TestResultsController do
+describe TestResultsController, elasticsearch: true do
   let(:user) {User.make}
   before(:each) {sign_in user}
   let!(:institution) { user.create Institution.make_unsaved }
