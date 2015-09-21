@@ -74,6 +74,26 @@ describe ComputedPolicy do
       expect(user.computed_policies.map(&:action)).to match([READ_DEVICE, UPDATE_DEVICE])
     end
 
+    it "should grant permissions filtered by institution" do
+      expect {
+        grant superadmin, user, "cdxp:device?institution=#{device.institution.id}", [READ_DEVICE]
+      }.to change(ComputedPolicy, :count).by(1)
+
+      user.computed_policies.first.tap do |p|
+        expect(p.condition_institution_id).to eq(device.institution.id)
+      end
+    end
+
+    it "should grant permissions filtered by laboratory" do
+      expect {
+        grant superadmin, user, "cdxp:device?laboratory=#{device.laboratory.id}", [READ_DEVICE]
+      }.to change(ComputedPolicy, :count).by(1)
+
+      user.computed_policies.first.tap do |p|
+        expect(p.condition_laboratory_id).to eq(device.laboratory.id)
+      end
+    end
+
   end
 
 
@@ -90,6 +110,19 @@ describe ComputedPolicy do
       }.to change(ComputedPolicy, :count).by(2)
 
       expect(user.computed_policies.map(&:resource_id)).to match([device.id, device2.id])
+    end
+
+    it "should create intersection from resources with conditions" do
+      grant nil, granter, "cdxp:device?institution=#{device.institution.id}", [READ_DEVICE]
+
+      expect {
+        grant granter, user, "cdxp:device?laboratory=#{device.laboratory.id}?", [READ_DEVICE]
+      }.to change(ComputedPolicy, :count).by(1)
+
+      user.computed_policies.first.tap do |p|
+        expect(p.condition_laboratory_id).to eq(device.laboratory.id)
+        expect(p.condition_institution_id).to eq(device.institution.id)
+      end
     end
 
     it "should create intersection from actions" do

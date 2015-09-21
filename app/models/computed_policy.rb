@@ -13,7 +13,11 @@ class ComputedPolicy < ActiveRecord::Base
       resource_type = intersect_attribute(self.resource_type, p2.resource_type)
       action = intersect_attribute(self.action, p2.action)
 
+      condition_institution_id = intersect_attribute(self.condition_institution_id, p2.condition_institution_id)
+      condition_laboratory_id = intersect_attribute(self.condition_laboratory_id, p2.condition_laboratory_id)
+
       return ComputedPolicy.new action: action, resource_id: resource_id,
+        condition_laboratory_id: condition_laboratory_id, condition_institution_id: condition_institution_id,
         resource_type: self.resource_type, user_id: self.user_id, allow: allow
     end
   end
@@ -22,14 +26,23 @@ class ComputedPolicy < ActiveRecord::Base
     return (self.action.nil? || self.action == p2.action)\
       && (self.resource_type.nil? || self.resource_type == p2.resource_type)\
       && (self.resource_id.nil? || self.resource_id == p2.resource_id)\
-      && (self.allow == p2.allow)
+      && (self.allow == p2.allow)\
+      && (self.conditions.keys.all? {|c| self.conditions[c].nil? || self.conditions[c] == p2.conditions[c] })
   end
 
   def equal_permissions(p2)
     return self.action == p2.action\
       && self.resource_id == p2.resource_id\
       && self.resource_type == p2.resource_type\
-      && self.allow == p2.allow
+      && self.allow == p2.allow\
+      && self.conditions.keys.all? {|c| self.conditions[c] == p2.conditions[c] }
+  end
+
+  def conditions
+    return {
+      laboratory_id: condition_laboratory_id,
+      institution_id: condition_institution_id
+    }
   end
 
   private
@@ -74,7 +87,7 @@ class ComputedPolicy < ActiveRecord::Base
 
     def compute_statement(statement, policy)
       granted = Array(statement['action']).product(Array(statement['resource'])).map do |action, resource|
-        resource_type, resource_id = resolve_resource(resource)
+        resource_type, resource_id, filters = resolve_resource(resource)
         action = nil if action == '*'
 
         ComputedPolicy.new\
@@ -82,7 +95,9 @@ class ComputedPolicy < ActiveRecord::Base
           resource_type: resource_type,
           resource_id: resource_id,
           allow: is_allow(statement['effect']),
-          user: policy.user
+          user: policy.user,
+          condition_institution_id: filters["institution"],
+          condition_laboratory_id: filters["laboratory"]
       end
 
       return granted if policy.granter.nil?
@@ -94,11 +109,13 @@ class ComputedPolicy < ActiveRecord::Base
     end
 
     def resolve_resource(resource_string)
-      return nil if resource_string == '*'
+      return [nil, nil, {}] if resource_string == '*'
       resource_klass = Policy.resources.find{|r| resource_string =~ r.resource_matcher} or raise "Resource not found"
       match, query = $1, $2
-      # TODO: Process query
-      [resource_klass.name, match == "*" ? nil : match]
+
+      [resource_klass.name,
+       match == "*" ? nil : match,
+       Rack::Utils.parse_nested_query(query) || Hash.new]
     end
 
     def intersect(granted, granter)
