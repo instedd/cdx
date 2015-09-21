@@ -214,6 +214,7 @@ class Policy < ActiveRecord::Base
     end
 
     definition["statement"].each do |statement|
+      statement["effect"] ||= "allow" # TODO: Remove effect altogether
       effect = statement["effect"]
       if effect
         if effect != "allow" && effect != "deny"
@@ -239,17 +240,14 @@ class Policy < ActiveRecord::Base
 
       resource_statements = statement["resource"]
       if resource_statements
-        Array(resource_statements).each do |resource_statement|
-          found_resource = Resource.all.any? do |resource|
-            resource.filter_by_resource(resource_statement)
-          end
-          unless found_resource
-            return errors.add :definition, "has an unknown resource: `#{resource_statement}`"
-          end
-        end
-        # TODO: validate resources
+        validate_resource_statements(resource_statements)
       else
         return errors.add :definition, "is missing resource in statement"
+      end
+
+      except_statements = statement["except"]
+      if except_statements
+        validate_resource_statements(except_statements)
       end
     end
 
@@ -260,6 +258,18 @@ class Policy < ActiveRecord::Base
       end
     else
       return errors.add :definition, "is missing delegable attribute"
+    end
+  end
+
+  def validate_resource_statements(resource_statements)
+    Array(resource_statements).each do |resource_statement|
+      found_resource = Resource.all.any? do |resource|
+        resource.filter_by_resource(resource_statement)
+      end
+      unless found_resource
+        return errors.add :definition, "has an unknown resource: `#{resource_statement}`"
+      end
+      # TODO: validate resources
     end
   end
 

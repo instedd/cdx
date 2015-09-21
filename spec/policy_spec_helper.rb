@@ -17,34 +17,28 @@ def assert_cannot(user, resource, action)
   expect(result).to eq(true)
 end
 
-def grant(granter, user, resource, action, delegable = true)
-  grant_or_deny granter, user, resource, action, delegable, "allow"
-end
-
-def deny(granter, user, resource, action, delegable = true)
-  grant_or_deny granter, user, resource, action, delegable, "deny"
-end
-
-def grant_or_deny(granter, user, resource, action, delegable, effect)
+def grant(granter, user, resource, action, opts = {})
   policy = Policy.make_unsaved
-  policy.definition = policy_definition(resource, action, delegable, effect)
+  policy.definition = policy_definition(resource, action, opts.fetch(:delegable, true), opts.fetch(:except, []))
   policy.granter_id = granter.try(:id)
   policy.user_id = user.id
   policy.save!(validate: !granter.nil?)
   policy
 end
 
-def policy_definition(resource, action, delegable = true, effect = "allow")
+def policy_definition(resource, action, delegable = true, except = [])
   resource = Array(resource).map(&:resource_name)
+  except = Array(except).map(&:resource_name)
   action = Array(action)
 
   JSON.parse %(
     {
       "statement":  [
         {
-          "effect": "#{effect}",
           "action": #{action.to_json},
-          "resource": #{resource.to_json}
+          "resource": #{resource.to_json},
+          "except": #{except.to_json},
+          "effect": "allow"
         }
       ],
       "delegable": #{delegable}

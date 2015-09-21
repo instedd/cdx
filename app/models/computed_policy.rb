@@ -90,7 +90,7 @@ class ComputedPolicy < ActiveRecord::Base
     end
 
     def is_allow(effect)
-      effect.downcase == 'allow'
+      true
     end
 
     def resolve_resource(resource_string)

@@ -10,6 +10,13 @@ describe ComputedPolicy do
   let!(:device)      { Device.make }
   let!(:device2)     { Device.make }
 
+  # Temporary hack until implicit policies with is_owner condition are reworked
+  around(:example) do |example|
+    User.skip_implicit_policies = true
+    example.run
+    User.skip_implicit_policies = false
+  end
+
   context "from superadmin" do
 
     let!(:superadmin) { User.make(:superadmin) }

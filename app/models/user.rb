@@ -16,6 +16,9 @@ class User < ActiveRecord::Base
   has_many :granted_policies, class_name: "Policy", foreign_key: "granter_id"
   has_many :computed_policies
 
+  after_create :grant_implicit_policy
+  cattr_accessor :skip_implicit_policies
+
   def create(model)
     if model.respond_to?(:user=)
       model.user = self
@@ -24,6 +27,8 @@ class User < ActiveRecord::Base
   end
 
   def grant_implicit_policy
+    return if @@skip_implicit_policies
+
     implicit = Policy.implicit
     implicit.granter = nil
     implicit.user = self

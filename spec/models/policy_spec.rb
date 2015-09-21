@@ -127,9 +127,9 @@ describe Policy do
         user2 = User.make
         user3 = User.make
 
-        policy = grant user, user2, institution, READ_INSTITUTION, true
+        policy = grant user, user2, institution, READ_INSTITUTION, delegable: true
 
-        grant user2, user3, institution, READ_INSTITUTION, true
+        grant user2, user3, institution, READ_INSTITUTION, delegable: true
 
         policy.definition = policy_definition(institution, READ_INSTITUTION, false)
         policy.save!
@@ -142,9 +142,9 @@ describe Policy do
         user3 = User.make
         user4 = User.make
 
-        grant user, user2, institution, READ_INSTITUTION, false
-        grant user, user3, institution, READ_INSTITUTION, true
-        grant user3, user4, institution, READ_INSTITUTION, true
+        grant user, user2, institution, READ_INSTITUTION, delegable: false
+        grant user, user3, institution, READ_INSTITUTION, delegable: true
+        grant user3, user4, institution, READ_INSTITUTION, delegable: true
 
         assert_can user4, institution, READ_INSTITUTION
       end
@@ -153,7 +153,7 @@ describe Policy do
         user2 = User.make
         user3 = User.make
 
-        grant user, user2, institution, READ_INSTITUTION, false
+        grant user, user2, institution, READ_INSTITUTION, delegable: false
 
         policy = Policy.make_unsaved
         policy.definition = policy_definition(institution, READ_INSTITUTION, false)
@@ -199,9 +199,9 @@ describe Policy do
       it "disallow read if explicitly denied" do
         user2 = User.make
 
-        grant user, user2, institution, READ_INSTITUTION
-        deny user, user2, institution, READ_INSTITUTION
+        grant user, user2, institution, READ_INSTITUTION, except: institution
 
+        pending
         assert_cannot user2, institution, READ_INSTITUTION
       end
 
@@ -211,9 +211,9 @@ describe Policy do
 
         user2 = User.make
 
-        grant user, user2, Institution, READ_INSTITUTION
-        deny user, user2, institution3, READ_INSTITUTION
+        grant user, user2, Institution, READ_INSTITUTION, except: institution3
 
+        pending
         assert_can user2, Institution, READ_INSTITUTION, [institution, institution2]
       end
     end
@@ -618,7 +618,7 @@ describe Policy do
   it "assigns implicit policy" do
     user2 = User.make
 
-    policy = grant user, user2, institution, READ_INSTITUTION, true
+    policy = grant user, user2, institution, READ_INSTITUTION, delegable: true
     policy.definition = Policy.implicit.definition
     policy.save!
   end
