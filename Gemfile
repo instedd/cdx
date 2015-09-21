@@ -66,7 +66,6 @@ gem 'omniauth'
 gem 'omniauth-openid'
 gem 'omniauth-google-oauth2'
 gem 'elasticsearch'
-gem 'bunny'
 
 gem 'oj'
 gem 'guid'
