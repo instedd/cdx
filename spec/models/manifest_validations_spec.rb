@@ -91,7 +91,7 @@ describe Manifest do
       expect {Manifest.create!(definition: %{{
         "metadata" : {
           "device_models" : ["foo"],
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "api_version" : "1.1.1",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -186,7 +186,7 @@ describe Manifest do
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
-          "conditions" : ["MTB"],
+          "conditions" : ["mtb"],
           "source" : {"type" : "json"}
         },
         "custom_fields": {

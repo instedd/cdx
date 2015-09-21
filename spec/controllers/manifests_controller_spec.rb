@@ -22,7 +22,7 @@ describe ManifestsController do
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["GX4001"],
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : { "type" : "json" }
         },
         "field_mapping": {

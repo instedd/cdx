@@ -7,7 +7,7 @@
       "epicenter_headless_vn"
     ],
     "conditions": [
-      "MTB"
+      "mtb"
     ],
     "source": {
       "type": "headless_csv",

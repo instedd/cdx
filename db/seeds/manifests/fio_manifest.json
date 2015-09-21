@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "version" : "1.0.4",
-    "api_version" : "1.3.0",
+    "api_version" : "1.4.0",
     "device_models" : ["FIO"],
     "conditions": ["malaria_pf", "malaria_pv"],
     "source": {

@@ -8,7 +8,7 @@ describe Manifest do
       %{{
         "metadata" : {
           "device_models" : ["foo"],
-          "conditions": ["MTB", "RIFF"],
+          "conditions": ["mtb", "riff"],
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -30,7 +30,7 @@ describe Manifest do
       updated_definition = %{{
         "metadata" : {
           "device_models" : ["foo"],
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "version" : "2.0.1",
           "source" : {"type" : "json"}
@@ -127,7 +127,7 @@ describe Manifest do
           "version" : 1,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["bar"],
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : {"type" : "json"}
         },
         "field_mapping" : {}
@@ -146,7 +146,7 @@ describe Manifest do
           "version" : 2,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "device_models" : ["foo"],
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : {"type" : "json"}
         },
         "field_mapping" : {}
@@ -169,9 +169,26 @@ describe Manifest do
 
       conditions = Condition.all
       expect(conditions.count).to eq(2)
-      expect(conditions.map(&:name).sort).to eq(["MTB", "RIFF"])
+      expect(conditions.map(&:name).sort).to eq(["mtb", "riff"])
 
       expect(Manifest.first.conditions.count).to eq(2)
+    end
+
+    it "errors if condition is not in snake case" do
+      definition = %{{
+        "metadata" : {
+          "device_models" : ["foo"],
+          "conditions": ["MTB"],
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
+          "version" : 1,
+          "source" : {"type" : "json"}
+        },
+        "field_mapping" : {}
+      }}
+
+      manifest = Manifest.create(definition: definition)
+      expect(manifest).not_to be_valid
+      expect(manifest.errors[:conditions]).to eq(["must be in snake case: MTB"])
     end
   end
 end
