@@ -30,15 +30,6 @@ User.blueprint do
   confirmed_at { Time.now - 1.day }
 end
 
-User.blueprint(:superadmin) do
-  email
-  password
-  password_confirmation { password }
-  confirmed_at { Time.now - 1.day }
-
-  object.grant_superadmin_policy
-end
-
 Institution.blueprint do
   user
   name

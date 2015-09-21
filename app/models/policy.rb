@@ -2,7 +2,11 @@ class Policy < ActiveRecord::Base
   belongs_to :user
   belongs_to :granter, class_name: 'User', foreign_key: 'granter_id'
 
-  validates_presence_of :name, :granter, :user, :definition
+  validates_presence_of :name, :user, :definition
+
+  attr_accessor :allows_implicit
+  validates :granter, presence: true, unless: :allows_implicit
+
   validate :validate_definition
   validate :validate_owner_permissions
 
@@ -39,6 +43,7 @@ class Policy < ActiveRecord::Base
   end
 
   ACTIONS = [
+    Actions::CREATE_INSTITUTION,
     Actions::READ_INSTITUTION,
     Actions::UPDATE_INSTITUTION,
     Actions::DELETE_INSTITUTION,
@@ -75,6 +80,10 @@ class Policy < ActiveRecord::Base
 
   def self.implicit
     predefined_policy "implicit"
+  end
+
+  def self.owner(institution_id)
+    predefined_policy "owner", institution_id: institution_id
   end
 
   def self.can? action, resource, user, policies=nil
@@ -187,7 +196,7 @@ class Policy < ActiveRecord::Base
 
   def validate_owner_permissions
     return errors.add :owner, "permission can't be self granted" if self_granted?
-    return errors.add :owner, "permission granter can't be nil" if implicit?
+    return if implicit?
 
     resources = definition["statement"].each do |statement|
       Array(statement["action"]).each do |action|
@@ -325,10 +334,11 @@ class Policy < ActiveRecord::Base
     resource
   end
 
-  def self.predefined_policy name
+  def self.predefined_policy(name, args={})
     policy = Policy.new
-    policy.name = name
-    policy.definition = JSON.load File.read("#{Rails.root}/app/policies/#{name}.json")
+    policy.allows_implicit = true
+    policy.name = name.titleize
+    policy.definition = JSON.load(Erubis::Eruby.new(File.read("#{Rails.root}/app/policies/#{name}.json.erb")).result(args))
     policy.delegable = policy.definition["delegable"]
     policy
   end

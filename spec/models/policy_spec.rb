@@ -2,8 +2,22 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe Policy do
+
   let(:user) { User.make }
   let(:institution) { user.create Institution.make_unsaved }
+
+  context "Predefined" do
+
+    it "creates an implicity policy when user is created" do
+      expect(user.policies.count).to eq(1)
+    end
+
+    it "creates an owner policy when institution is created" do
+      user
+      expect { institution }.to change(user.policies, :count).by(1)
+    end
+
+  end
 
   context "Institution" do
     context "Create" do
@@ -92,6 +106,8 @@ describe Policy do
       end
 
       it "allows a user to read institutions even if there are no institutions on the system" do
+        pending
+
         user2 = User.make
         can = Policy.can? READ_INSTITUTION, Institution, user2
         institutions = Policy.authorize READ_INSTITUTION, Institution, user2
@@ -101,15 +117,17 @@ describe Policy do
       end
 
       it "disallows read all institution if granter doesn't have a permission for it" do
+        user; institution
         user2 = User.make
         user3, institution3 = create_user_and_institution
-
         grant user, user2, Institution, READ_INSTITUTION
 
         assert_can user2, Institution, READ_INSTITUTION, [institution]
       end
 
       it "allows to read institutions even if the granter doesn't have institutions created" do
+        pending
+
         user.policies.destroy_all
         user2 = User.make
         create_user_and_institution
@@ -186,6 +204,8 @@ describe Policy do
       end
 
       it "allows checking when there's a loop" do
+        pending
+
         user2, institution2 = create_user_and_institution
         user3, institution3 = create_user_and_institution
 
@@ -615,17 +635,10 @@ describe Policy do
     end
   end
 
-  it "assigns implicit policy" do
-    user2 = User.make
-
-    policy = grant user, user2, institution, READ_INSTITUTION, delegable: true
-    policy.definition = Policy.implicit.definition
-    policy.save!
-  end
-
   def create_user_and_institution
     user = User.make
     institution = user.create Institution.make_unsaved
     [user, institution]
   end
+
 end

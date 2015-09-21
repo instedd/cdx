@@ -22,7 +22,8 @@ def grant(granter, user, resource, action, opts = {})
   policy.definition = policy_definition(resource, action, opts.fetch(:delegable, true), opts.fetch(:except, []))
   policy.granter_id = granter.try(:id)
   policy.user_id = user.id
-  policy.save!(validate: !granter.nil?)
+  policy.allows_implicit = true
+  policy.save!
   policy
 end
 

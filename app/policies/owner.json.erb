@@ -1,0 +1,14 @@
+{
+  "statement": [
+    {
+      "effect": "allow",
+      "action": "*",
+      "resource": [
+        "cdxp:institution/<%= institution_id %>",
+        "cdxp:device?institution=<%= institution_id %>",
+        "cdxp:laboratory?laboratory=<%= institution_id %>"
+      ]
+    }
+  ],
+  "delegable": true
+}

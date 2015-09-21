@@ -5,21 +5,14 @@ include Policy::Actions
 
 describe ComputedPolicy do
 
-  let(:user)       { User.make }
+  let!(:user)       { User.make(skip_implicit_policy: true) }
 
   let!(:device)      { Device.make }
   let!(:device2)     { Device.make }
 
-  # Temporary hack until implicit policies with is_owner condition are reworked
-  around(:example) do |example|
-    User.skip_implicit_policies = true
-    example.run
-    User.skip_implicit_policies = false
-  end
-
   context "from superadmin" do
 
-    let!(:superadmin) { User.make(:superadmin) }
+    let!(:superadmin) { User.make(skip_implicit_policy: true) { |u| u.grant_superadmin_policy }}
 
     it "should create computed policy for single resource" do
       expect {
