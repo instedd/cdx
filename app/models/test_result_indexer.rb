@@ -15,6 +15,14 @@ class TestResultIndexer
     options = {index: Cdx::Api.index_name, type: type, body: fields, id: elasticsearch_id}
     options[:refresh] = true if refresh
     client.index(options)
+
+    percolate_result = client.percolate index: Cdx::Api.index_name,
+                                        type: type,
+                                        id: CGI.escape(elasticsearch_id)
+    percolate_result["matches"].each do |match|
+      subscriber_id = match["_id"]
+      NotifySubscriberJob.perform_later subscriber_id, test_result.uuid
+    end
   end
 
   def run_before_index_hooks(fields)

@@ -36,11 +36,9 @@ describe Subscriber, elasticsearch: true do
     url = "http://subscriber/cdp_trigger"
     subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'GET'
     callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5B0%5D%5Bcondition%5D=mtb&test%5Bassays%5D%5B1%5D%5Bname%5D=mtb&test%5Bassays%5D%5B2%5D%5Bresult%5D=positive"
-    callback_request = stub_request(:get, callback_query).to_return(:status => 200, :body => "", :headers => {})
+    callback_request = stub_request(:get, callback_query).to_return(status: 200, body: "", headers: {})
 
     submit_test
-
-    Subscriber.notify_all
 
     assert_requested(callback_request)
   end
@@ -58,8 +56,6 @@ describe Subscriber, elasticsearch: true do
 
     submit_test
 
-    Subscriber.notify_all
-
     assert_requested(callback_request)
   end
 
@@ -69,8 +65,6 @@ describe Subscriber, elasticsearch: true do
     callback_request = stub_request(:post, url).to_return(:status => 200, :body => "", :headers => {})
 
     submit_test
-
-    Subscriber.notify_all
 
     assert_requested(:post, url) do |req|
       response = JSON.parse(req.body)
@@ -91,14 +85,14 @@ describe Subscriber, elasticsearch: true do
   it "creates percolator for each subscriber" do
     subscriber = Subscriber.make filter: filter, user: institution.user
     percolator = Cdx::Api.client.get index: Cdx::Api.index_name_pattern, type: '.percolator', id: subscriber.id
-    expect(percolator["_source"]).to eq({query: filter.create_query.elasticsearch_query}.with_indifferent_access)
+    expect(percolator["_source"]).to eq({query: filter.create_query.elasticsearch_query, type: 'test'}.with_indifferent_access)
   end
 
   it "updates percolator when the filter changes" do
     subscriber = Subscriber.make filter: filter, user: institution.user
     filter.update_attributes! query: {"test.assays.condition" => "mtb"}
     percolator = Cdx::Api.client.get index: Cdx::Api.index_name_pattern, type: '.percolator', id: subscriber.id
-    expect(percolator["_source"]).to eq({query: filter.create_query.elasticsearch_query}.with_indifferent_access)
+    expect(percolator["_source"]).to eq({query: filter.create_query.elasticsearch_query, type: 'test'}.with_indifferent_access)
   end
 
   it "deletes percolator when the subscriber is deleted" do
@@ -121,8 +115,6 @@ describe Subscriber, elasticsearch: true do
       core_fields: {"assays" => ["result" => "positive", "condition" => "mtb", "name" => "mtb"]},
       device_messages: [device_message]
     )
-
-    refresh_index
 
     expect(TestResult.count).to eq(1)
   end

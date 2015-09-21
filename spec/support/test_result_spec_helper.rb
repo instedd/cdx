@@ -2,7 +2,7 @@
 TestResult; class TestResult
   def self.create_and_index params={}
     test = self.make params
-    TestResultIndexer.new(test).index
+    TestResultIndexer.new(test).index(true)
     test
   end
 end
