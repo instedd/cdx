@@ -151,11 +151,6 @@ class Policy < ActiveRecord::Base
     resource = apply_resource_filters(resource, statement["resource"])
     return nil unless resource
 
-    if (condition = statement["condition"])
-      resource = apply_condition(resource, condition, user, check_conditions)
-      return nil unless resource
-    end
-
     # Check that the granter's policies allow the action on the resource,
     # but only if the policy is not implicit (or superadmin)
     if !implicit? && !users_so_far.include?(granter)
@@ -315,23 +310,6 @@ class Policy < ActiveRecord::Base
     end
 
     nil
-  end
-
-  def apply_condition resource, condition, user, check_conditions
-    condition.each do |key, value|
-      case key
-      when "is_owner"
-        resource = if resource.is_a? Array
-          resource.map do |resource|
-            resource.filter_by_owner(user, check_conditions)
-          end
-        else
-          resource.filter_by_owner(user, check_conditions)
-        end
-      end
-    end
-
-    resource
   end
 
   def self.predefined_policy(name, args={})
