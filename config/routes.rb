@@ -11,6 +11,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :encounters, only: [:new, :create, :show]
+
   resources :locations, only: [:index, :show]
   resources :devices do
     member do

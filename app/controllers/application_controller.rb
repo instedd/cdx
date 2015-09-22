@@ -73,6 +73,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # filters/authorize @institutions by action. Assign calls resource.institution= if only one institution was left
+  def prepare_for_institution_and_authorize(resource, action)
+    @institutions = authorize_resource(@institutions, action)
+    if @institutions.one?
+      resource.institution = @institutions.first
+    end
+
+    @institutions
+  end
+
   protected
 
   def json_request?

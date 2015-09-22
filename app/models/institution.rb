@@ -5,6 +5,7 @@ class Institution < ActiveRecord::Base
   belongs_to :user
   has_many :laboratories, dependent: :destroy
   has_many :devices, dependent: :destroy
+  has_many :encounters, dependent: :destroy
   validates_presence_of :name
 
   def self.filter_by_owner(user, check_conditions)

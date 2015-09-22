@@ -6,15 +6,7 @@
           - @device.errors.full_messages.each do |msg|
             %li= msg
 
-  - if @device.new_record?
-    .row
-      .col.pe-3
-        = f.label :institution, class: 'label'
-        = f.collection_select :institution_id, @institutions, :id, :name
-  - else
-    %p
-      Institution:
-      = @device.institution
+  = render 'shared/select_institution_or_hidden', f: f
 
   .row
     .col.pe-3

@@ -1,8 +1,3 @@
-- content_for(:leftcolumn) do
-  - if @can_create
-    .centered
-      = link_to "+", new_device_path, class: 'btn-add fixed', title: 'Add Device'
-
 - unless @institutions.one?
   .row
     .col
@@ -24,6 +19,8 @@
 
 .row
   .col
+    - if @can_create
+      = link_to "+", new_device_path, class: 'btn-add side-link', title: 'Add Device'
     - cdx_table do
       %tr
         %th.tableheader{colspan:100} Devices

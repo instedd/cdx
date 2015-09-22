@@ -53,5 +53,11 @@ a {
 }
 
 .side-link {
+  float: left;
   margin-left: -43px;
+
+  &.btn-add {
+    margin-top: 30px;
+    margin-left: -73px;
+  }
 }
