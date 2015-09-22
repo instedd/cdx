@@ -48,6 +48,10 @@ end
 
 gem 'puma'
 
+# Use Sidekiq for background jobs
+gem 'sidekiq'
+gem 'sinatra'
+
 group :development do
   gem 'web-console', '~> 2.0'
   gem 'capistrano', '~> 3.1.0', require: false

@@ -41,6 +41,8 @@ Rails.application.configure do
 
   config.action_mailer.default_url_options = { host: Settings.host }
 
+  config.active_job.queue_adapter = :sidekiq
+
   config.authorized_keys_path = 'tmp/.ssh/authorized_keys'
   config.sync_dir_path = 'tmp/sync'
   config.ssh_server_host = 'localhost'
