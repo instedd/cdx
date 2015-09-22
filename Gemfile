@@ -91,6 +91,7 @@ group :test do
   gem 'guard-rspec'
   gem 'rspec'
   gem 'rspec-rails'
+  gem 'rspec-collection_matchers'
   gem 'vcr'
   gem 'webmock', require: false
   gem 'capybara-mechanize'
