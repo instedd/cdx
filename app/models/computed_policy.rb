@@ -2,8 +2,10 @@ class ComputedPolicy < ActiveRecord::Base
 
   belongs_to :user
 
+  scope :delegable, -> { where(delegable: true) }
+
   def self.update_user(user)
-    # Run in background
+    # TODO: Run in background
     PolicyComputer.new.update_user(user)
   end
 
@@ -18,7 +20,7 @@ class ComputedPolicy < ActiveRecord::Base
 
       return ComputedPolicy.new action: action, resource_id: resource_id,
         condition_laboratory_id: condition_laboratory_id, condition_institution_id: condition_institution_id,
-        resource_type: self.resource_type, user_id: self.user_id, allow: allow
+        resource_type: self.resource_type, user_id: self.user_id, allow: allow, delegable: self.delegable
     end
   end
 
@@ -27,7 +29,8 @@ class ComputedPolicy < ActiveRecord::Base
       && (self.resource_type.nil? || self.resource_type == p2.resource_type)\
       && (self.resource_id.nil? || self.resource_id == p2.resource_id)\
       && (self.allow == p2.allow)\
-      && (self.conditions.keys.all? {|c| self.conditions[c].nil? || self.conditions[c] == p2.conditions[c] })
+      && (self.conditions.keys.all? {|c| self.conditions[c].nil? || self.conditions[c] == p2.conditions[c] })\
+      && (self.delegable || !p2.delegable)
   end
 
   def equal_permissions(p2)
@@ -35,7 +38,8 @@ class ComputedPolicy < ActiveRecord::Base
       && self.resource_id == p2.resource_id\
       && self.resource_type == p2.resource_type\
       && self.allow == p2.allow\
-      && self.conditions.keys.all? {|c| self.conditions[c] == p2.conditions[c] }
+      && self.conditions.keys.all? {|c| self.conditions[c] == p2.conditions[c] }\
+      && self.delegable == p2.delegable
   end
 
   def conditions
@@ -97,11 +101,12 @@ class ComputedPolicy < ActiveRecord::Base
           allow: is_allow(statement['effect']),
           user: policy.user,
           condition_institution_id: filters["institution"],
-          condition_laboratory_id: filters["laboratory"]
+          condition_laboratory_id: filters["laboratory"],
+          delegable: policy.delegable
       end
 
       return granted if policy.granter.nil?
-      intersect(granted, policy.granter.computed_policies)
+      intersect(granted, policy.granter.computed_policies.delegable)
     end
 
     def is_allow(effect)

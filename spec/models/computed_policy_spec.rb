@@ -105,6 +105,17 @@ describe ComputedPolicy do
       expect(user.computed_policies.map(&:resource_id)).to match([device.id, device2.id])
     end
 
+    it "should create intersection from delegable resources" do
+      grant nil, granter, [device],  [READ_DEVICE]
+      grant nil, granter, [device2], [READ_DEVICE], delegable: false
+
+      expect {
+        grant granter, user, Device, [READ_DEVICE]
+      }.to change(ComputedPolicy, :count).by(1)
+
+      expect(user.computed_policies.first.resource_id).to eq(device.id)
+    end
+
     it "should create intersection from resources with conditions" do
       grant nil, granter, "cdxp:device?institution=#{device.institution.id}", [READ_DEVICE]
 
@@ -139,6 +150,42 @@ describe ComputedPolicy do
       expect {
         grant granter2, user, Device, [READ_DEVICE]
       }.to change(ComputedPolicy, :count).by(0)
+    end
+
+    it "should compact undelegable with delegable rules" do
+      grant nil, granter,  [device], [READ_DEVICE]
+      grant nil, granter2, [device], [READ_DEVICE]
+
+      expect {
+        grant granter, user, Device, [READ_DEVICE], delegable: true
+      }.to change(ComputedPolicy, :count).by(1)
+
+      expect {
+        grant granter2, user, Device, [READ_DEVICE], delegable: false
+      }.to change(ComputedPolicy, :count).by(0)
+
+      expect(user.reload.computed_policies.first.delegable).to be_truthy
+    end
+
+    it "should not compact undelegable with delegable rules on different resources" do
+      grant nil, granter,  [device], [READ_DEVICE]
+      grant nil, granter2, [device, device2], [READ_DEVICE]
+
+      expect {
+        grant granter, user, Device, [READ_DEVICE], delegable: true
+      }.to change(ComputedPolicy, :count).by(1)
+
+      expect {
+        grant granter2, user, Device, [READ_DEVICE], delegable: false
+      }.to change(ComputedPolicy, :count).by(1)
+
+      p1, p2 = user.reload.computed_policies.order(:id).all
+
+      expect(p1.resource_id).to eq(device.id)
+      expect(p1.delegable).to be_truthy
+
+      expect(p2.resource_id).to eq(device2.id)
+      expect(p2.delegable).to be_falsey
     end
 
     it "should compact subsumed rules in policies" do

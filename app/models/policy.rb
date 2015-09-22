@@ -18,6 +18,8 @@ class Policy < ActiveRecord::Base
     ComputedPolicy.update_user(user)
   end
 
+  scope :delegable, -> { where(delegable: true) }
+
   module Actions
     PREFIX = "cdxp"
 
@@ -68,10 +70,6 @@ class Policy < ActiveRecord::Base
       Laboratory,
       Institution
     ]
-  end
-
-  def self.delegable
-    where(delegable: true)
   end
 
   def self.superadmin
