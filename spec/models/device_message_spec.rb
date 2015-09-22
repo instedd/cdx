@@ -9,7 +9,7 @@ describe DeviceMessage, elasticsearch: true do
         "metadata": {
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : { "type" : "json"}
         },
         "field_mapping" : {
@@ -34,11 +34,11 @@ describe DeviceMessage, elasticsearch: true do
         "metadata": {
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : { "type" : "json"}
         },
         "field_mapping" : {
-          "test.assays[*].result" : {"lookup": "result"}
+          "test.assays.result" : {"lookup": "result"}
         }
       }
     }
@@ -49,8 +49,8 @@ describe DeviceMessage, elasticsearch: true do
 
     expect(message.save).to eq(true)
     expect(message.index_failed?).to eq(true)
-    expect(message.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'test.assays[*].result'")
-    expect(message.index_failure_data[:target_field]).to eq('test.assays[*].result')
+    expect(message.index_failure_reason).to eq("String 'null' is not permitted as value, in field 'test.assays.result'")
+    expect(message.index_failure_data[:target_field]).to eq('test.assays.result')
   end
 
   it 'parses a csv with a single row' do
@@ -59,12 +59,12 @@ describe DeviceMessage, elasticsearch: true do
         "metadata": {
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : { "type" : "csv"}
         },
         "field_mapping" : {
           "test.error_code" : {"lookup": "error_code"},
-          "test.assays[*].result" : {"lookup": "result"}
+          "test.assays.result" : {"lookup": "result"}
         }
       }
     }

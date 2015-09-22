@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "version" : "1.0.4",
-    "api_version" : "1.2.1",
+    "api_version" : "1.4.0",
     "conditions": ["malaria_pf", "malaria_pv"],
     "source": {
       "type" : "xml",
@@ -35,9 +35,9 @@
         ]
       ]
     },
-    "test.assays[*].result" : { "lowercase" : {"lookup" : "Test/Assay/Result/@qualitative"} },
-    "test.assays[*].name" : {"lookup" : "Test/Assay/@code"},
-    "test.assays[*].condition" : {
+    "test.assays.result" : { "lowercase" : {"lookup" : "Test/Assay/Result/@qualitative"} },
+    "test.assays.name" : {"lookup" : "Test/Assay/@code"},
+    "test.assays.condition" : {
       "case": [
         {"lookup" : "Test/Assay/@displayValue"},
         [

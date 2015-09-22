@@ -1,4 +1,7 @@
 class TestResultsController < ApplicationController
+  require 'barby'
+  require 'barby/barcode/code_93'
+
   expose(:laboratories) { check_access(Laboratory, QUERY_TEST) }
   expose(:institutions) { check_access(Institution, QUERY_TEST) }
   expose(:devices) { check_access(Device, QUERY_TEST) }
@@ -20,9 +23,22 @@ class TestResultsController < ApplicationController
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
 
-    result = TestResult.query(@query, current_user).result
+    result = TestResult.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["tests"]
+  end
+
+  def show
+    @main_column_width = 6
+
+    @test_result = TestResult.find_by(uuid: params[:id])
+    return unless authorize_test_result(@test_result)
+
+    @other_tests = @test_result.sample.test_results.where.not(id: @test_result.id)
+    @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
+
+    @sample_id = @test_result.sample.core_fields['id']
+    @sample_id_barcode = Barby::Code93.new(@sample_id)
   end
 
   def csv
@@ -45,4 +61,3 @@ class TestResultsController < ApplicationController
     filter
   end
 end
-

@@ -16,7 +16,7 @@ class Api::EventsController < ApiController
           build_csv 'Tests', query.csv_builder
           render :layout => false
         end
-        format.json { render_json query.result }
+        format.json { render_json query.execute }
       end
     end
   end

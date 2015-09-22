@@ -17,5 +17,27 @@
 //= require_tree .
 
 $(document).ready(function(){
-    $('.ddown').ddslick();
+  $('.ddown').ddslick();
+
+  function setFilledClass(elem) {
+    window.setTimeout(function(){
+      if(elem.val().length > 0) {
+          elem.addClass('filled');
+      } else {
+          elem.removeClass('filled');
+      }
+    }, 0);
+  }
+
+  $("input[type='email'], input[type='password']")
+    .on('keydown', function() {
+      setFilledClass($(this));
+    })
+    .each(function() {
+      setFilledClass($(this));
+    });
+
+  $(document).on('click', '.row-href tr[data-href]', function(){
+    window.location.href = $(this).data('href');
+  })
 });

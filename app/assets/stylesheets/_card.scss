@@ -1,0 +1,37 @@
+.card {
+  width: 600px;
+  height: 180px;
+  position: relative;
+  border: 1px solid $gray2;
+
+  border-radius: 3px;
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
+
+  .card-image {
+    position: absolute;
+    left: 0;
+    width: 180px;
+    height: 180px;
+    background-color: $gray3;
+
+    img {
+      background-size:cover;
+    }
+  }
+
+  .card-detail-top,
+  .card-detail-bottom {
+    position: absolute;
+    left: 200px;
+    right: 60px;
+  }
+
+  .card-detail-top {
+    top: 20px;
+  }
+
+  .card-detail-bottom {
+    bottom: 20px;
+  }
+
+}

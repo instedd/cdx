@@ -309,7 +309,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
             },
             "field_mapping" : {
               "test.error_code" : {"lookup" : "error_code"},
-              "test.assays[*].result" : {"lookup" : "result"}
+              "test.assays.result" : {"lookup" : "result"}
             }
           }
         }

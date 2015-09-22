@@ -6,7 +6,7 @@ class CSVMessageParser
   end
 
   def lookup(path, data, root = data)
-    if (path.split(Manifest::COLLECTION_SPLIT_TOKEN)).size > 1 || path.split(Manifest::PATH_SPLIT_TOKEN).size > 1
+    if path.split(Manifest::PATH_SPLIT_TOKEN).size > 1
       raise "path nesting is unsupported for CSV Messages"
     else
       data[path]

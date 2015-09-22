@@ -1,55 +1,54 @@
-class TestResultQuery
+class TestResultQuery < Cdx::Api::Elasticsearch::Query
   include Policy::Actions
 
-  def initialize params, user
+  class << self
+    private :new
+  end
+
+  def self.for params, user
     institutions = Policy.authorize(QUERY_TEST, Institution, user, user.policies).map(&:uuid)
-    institutions = institutions & Array(params["institution.uuid"]) if params["institution.uuid"]
-    params["institution.uuid"] = institutions
-
+    laboratories = Policy.authorize(QUERY_TEST, Laboratory, user, user.policies).map(&:uuid)
     devices = Policy.authorize(QUERY_TEST, Device, user, user.policies).map(&:uuid)
-    devices = devices & Array(params["device.uuid"]) if params["device.uuid"]
-    params["device.uuid"] = devices
 
-    if institutions.present?
-      @api_query = Cdx::Api::Elasticsearch::Query.for_indices([Cdx::Api.index_name], params)
-      @api_query.after_execute do |result|
-        add_names_to result, institutions
-      end
+    if institutions.present? || laboratories.present? || devices.present?
+      new params, institutions, laboratories, devices
     else
-      @api_query = Cdx::Api::Elasticsearch::NullQuery.new(params)
+      Cdx::Api::Elasticsearch::NullQuery.new(params)
     end
   end
 
-  def result
-    @result ||= @api_query.execute
+  def initialize(params, institutions, laboratories, devices)
+    super(params)
+    @institutions = institutions
+    @laboratories = laboratories
+    @devices = devices
   end
 
-  def next_page
-    return true unless @result
+  def process_conditions(*args)
+    query = super
+    policy_conditions = {}
+    policy_conditions["institution.uuid"] = @institutions if @institutions.present?
+    policy_conditions["laboratory.uuid"] = @laboratories if @laboratories.present?
+    policy_conditions["device.uuid"] = @devices if @devices.present?
+    query << or_conditions(super(policy_conditions))
+  end
 
-    current_count = @result["tests"].size
-    return false if current_count == 0
-
-    current_offset = @api_query.params["offset"] || 0
-    total_count = @result["total_count"]
-    return false if current_offset + current_count >= total_count
-
-    @result = nil
-    @api_query.params["offset"] = current_offset + current_count
-    true
+  def execute
+    result = super
+    add_names_to result
   end
 
   def csv_builder
-    if @api_query.grouped_by.empty?
-      CSVBuilder.new result["tests"]
+    if grouped_by.empty?
+      CSVBuilder.new execute["tests"]
     else
-      CSVBuilder.new result["tests"], column_names: @api_query.grouped_by.concat(["count"])
+      CSVBuilder.new execute["tests"], column_names: grouped_by.concat(["count"])
     end
   end
 
   private
 
-  def add_names_to result, institutions
+  def add_names_to result
     tests = result["tests"]
     institutions = indexed_model tests, Institution, ["institution", "uuid"]
     laboratories = indexed_model tests, Laboratory, ["laboratory", "uuid"]

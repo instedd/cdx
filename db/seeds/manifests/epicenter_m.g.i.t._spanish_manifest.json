@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "0.0.5",
-    "api_version": "1.2.1",
+    "api_version": "1.4.0",
     "signature": "",
     "conditions": [
       "mtb",
@@ -76,7 +76,7 @@
       ]
     },
     "test.name": { "lookup": "7" },
-    "test.assays[*].condition": {
+    "test.assays.condition": {
       "if" : [
         {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
         {
@@ -98,7 +98,7 @@
         "mtb"
       ]
     },
-    "test.assays[*].name": {
+    "test.assays.name": {
       "if" : [
         {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
         {
@@ -120,7 +120,7 @@
         "mycobacterium_tuberculosis"
       ]
     },
-    "test.assays[*].result": {
+    "test.assays.result": {
       "if" : [
         {"equals" : [{"lookup" : "11"}, "AST - MGIT"]},
         {

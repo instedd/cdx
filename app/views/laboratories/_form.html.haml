@@ -6,17 +6,7 @@
           - @laboratory.errors.full_messages.each do |msg|
             %li= msg
 
-  .row
-    - if @institutions.one?
-      = hidden_field :laboratory, :institution_id
-    - else
-      .col.pe-2
-        - if @laboratory.new_record?
-          = f.label :institution, class: 'control-label'
-          = f.collection_select :institution_id, @institutions, :id, :name, {}, class: 'ddown'
-        - else
-          %label Institution
-          %p= @laboratory.institution
+  = render 'shared/select_institution_or_hidden', f: f
 
   .row
     .col.pe-2
@@ -33,4 +23,3 @@
       = f.submit 'Save', class: 'btn-primary'
       - if @can_delete
         = link_to "Delete", [@institution, @laboratory], method: :delete, data: { confirm: "Are you sure you want to delete the laboratory '#{@laboratory.name}'" }, class: 'btn-secondary pull-right', title: 'Delete Laboratory'
-

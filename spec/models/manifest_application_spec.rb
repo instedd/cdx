@@ -51,14 +51,42 @@ describe Manifest, validate_manifest: false do
         "test" => {"core" => {}, "pii" => {}, "custom" => {"temperature" => "20"}}
     end
 
-    it "should apply to custom non-pii field inside results array" do
+    it "should apply to core field inside results array" do
       assert_manifest_application %{
           {
-            "test.assays[*].temperature" : {"lookup" : "temperature"}
+            "test.assays.name" : {"lookup" : "name"}
           }
         }, %{
           {
-            "test.assays[*].temperature": {}
+            "test.assays.name": {}
+          }
+        },
+        '{"name" : "MTB"}',
+        "test" => {"core" => {"assays" => [{"name" => "MTB"}]}, "pii" => {}, "custom" => {}}
+    end
+
+    it "should apply to core field to results array" do
+      assert_manifest_application %{
+          {
+            "test.assays" : {"script" : "var x = [{'name': 'MTB'}]; x"}
+          }
+        }, %{
+          {
+            "test.assays": {}
+          }
+        },
+        '{}',
+        "test" => {"core" => {"assays" => [{"name" => "MTB"}]}, "pii" => {}, "custom" => {}}
+    end
+
+    it "should apply to custom non-pii field inside results array" do
+      assert_manifest_application %{
+          {
+            "test.assays.temperature" : {"lookup" : "temperature"}
+          }
+        }, %{
+          {
+            "test.assays.temperature": {}
           }
         },
         '{"temperature" : "20"}',
@@ -163,79 +191,6 @@ describe Manifest, validate_manifest: false do
       }
 
       assert_manifest_application field_definition, custom_definition, {json: test, csv: csv}, expected
-    end
-
-    it "should apply to an array of custom field inside assays array" do
-      assert_manifest_application %{
-          {
-            "test.assays[*].instant_temperature[*].value": {
-              "lookup" : "tests[*].temperatures[*].value"
-            },
-            "test.assays[*].instant_temperature[*].sample_time": {
-              "lookup" : "tests[*].temperatures[*].time"
-            },
-            "test.assays[*].name": {
-              "lookup" : "tests[*].condition"
-            },
-            "test.assays[*].result": {
-              "lookup" : "tests[*].result"
-            },
-            "test.final_temperature": {
-              "lookup" : "temperature"
-            }
-          }
-        }, %{
-          {
-            "test.assays[*].instant_temperature[*].value": {},
-            "test.assays[*].instant_temperature[*].sample_time": {},
-            "test.final_temperature": {}
-          }
-        },
-        '{
-          "temperature" : 20,
-          "tests" : [
-            {
-              "result" : "positive",
-              "condition" : "mtb",
-              "temperatures" : [
-                { "time": "start", "value": 12},
-                { "time" : "end", "value": 23}
-              ]
-            },
-            {
-             "result" : "negative",
-              "condition" : "rif",
-              "temperatures" : [
-                {"time" : "start", "value": 22},
-                {"time" : "end", "value": 30}
-              ]
-            }
-          ]
-        }',
-        "test" => {
-          "core" => { "assays" => [
-            { "name" => "mtb", "result" => "positive" },
-            { "name" => "rif", "result" => "negative" }
-          ]},
-          "pii" => {},
-          "custom" => {
-            "final_temperature" => 20,
-            "assays" => [
-              {
-                "instant_temperature" => [
-                  {"sample_time" => "start", "value" => 12},
-                  {"sample_time" => "end", "value" => 23}
-                ]
-              },
-              {
-                "instant_temperature" => [
-                  {"sample_time" => "start", "value" => 22},
-                  {"sample_time" => "end", "value" => 30}
-                ]
-              }
-            ]
-          }
-        }
     end
 
     it "should apply to custom pii field" do
@@ -436,31 +391,31 @@ describe Manifest, validate_manifest: false do
     it "should apply to multiple indexed field" do
       assert_manifest_application %{
           {
-            "test.list[*].temperature" : {
-              "lookup" : "temperature_list[*].temperature"
+            "test.list.temperature" : {
+              "lookup" : "temperature_list.temperature"
             }
           }
         }, %{
           {
-            "test.list[*].temperature": {}
+            "test.list.temperature": {}
           }
         },
         '{"temperature_list" : [{"temperature" : 20}, {"temperature" : 10}]}',
-        "test" => {"core" => {}, "pii" => {}, "custom" => {"list" => [{"temperature" => 20}, {"temperature" => 10}]}}
+        "test" => {"core" => {}, "pii" => {}, "custom" => {"list" => {"temperature" => [20, 10]}}}
     end
 
     it "should map to multiple indexed fields to the same list" do
       assert_manifest_application %{{
-          "test.collection[*].temperature": {
-            "lookup" : "some_list[*].temperature"
+          "test.collection.temperature": {
+            "lookup" : "some_list.temperature"
           },
-          "test.collection[*].foo": {
-            "lookup" : "some_list[*].bar"
+          "test.collection.foo": {
+            "lookup" : "some_list.bar"
           }
         }}, %{
           {
-            "test.collection[*].temperature": {},
-            "test.collection[*].foo": {}
+            "test.collection.temperature": {},
+            "test.collection.foo": {}
           }
         },
         '{
@@ -475,47 +430,39 @@ describe Manifest, validate_manifest: false do
             }
           ]
         }',
-        "test" => {"core" => {}, "pii" => {}, "custom" => {"collection" => [
-          {
-            "temperature" => 20,
-            "foo" => 12
+        "test" => {"core" => {}, "pii" => {}, "custom" => {
+          "collection" => {
+            "temperature" => [20, 10],
+            "foo" => [12, 2],
           },
-          {
-            "temperature" => 10,
-            "foo" => 2
-          }]}}
+        }}
     end
 
     it "should map to multiple indexed fields to the same list accross multiple collections" do
       assert_manifest_application %{{
-          "test.collection[*].temperature": {
-            "lookup" : "temperature_list[*].temperature"
+          "test.collection.temperature": {
+            "lookup" : "temperature_list.temperature"
           },
-          "test.collection[*].foo": {
-            "lookup" : "other_list[*].bar"
+          "test.collection.foo": {
+            "lookup" : "other_list.bar"
           }
         }}, %{
           {
-            "test.collection[*].temperature": {},
-            "test.collection[*].foo": {}
+            "test.collection.temperature": {},
+            "test.collection.foo": {}
           }
         },
         '{
           "temperature_list" : [{"temperature" : 20}, {"temperature" : 10}],
           "other_list" : [{"bar" : 10}, {"bar" : 30}, {"bar" : 40}]
         }',
-        "test" => {"custom" => {"collection" => [
-          {
-            "temperature" => 20,
-            "foo" => 10
-          },
-          {
-            "temperature" => 10,
-            "foo" => 30
-          },
-          {
-            "foo" => 40
-          }]}, "pii" => {}, "core" => {}}
+        "test" => {
+          "custom" => {
+            "collection" => {
+              "temperature" => [20, 10],
+              "foo" => [10, 30, 40],
+            },
+          }, "pii" => {}, "core" => {}}
     end
 
     it "map custom fields to core fields" do

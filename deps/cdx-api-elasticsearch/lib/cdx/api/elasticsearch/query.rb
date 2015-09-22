@@ -38,6 +38,8 @@ class Cdx::Api::Elasticsearch::Query
     end
 
     results = query(@params)
+    @current_count = results["tests"].size
+    @total_count = results["total_count"]
 
     if @after_execute
       @after_execute.inject results do |resutls, block|
@@ -46,6 +48,19 @@ class Cdx::Api::Elasticsearch::Query
     else
       results
     end
+  end
+
+  def next_page
+    return true unless @current_count && @total_count
+
+    return false if @current_count == 0
+
+    current_offset = params["offset"] || 0
+    return false if current_offset + @current_count >= @total_count
+
+    params["offset"] = current_offset + @current_count
+    @current_count = @total_count = nil
+    true
   end
 
   def grouped_by

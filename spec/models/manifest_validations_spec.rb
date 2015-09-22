@@ -88,7 +88,7 @@ describe Manifest do
     it "checks the version number against the current api version" do
       expect {Manifest.make(definition: %{{
         "metadata" : {
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "api_version" : "1.1.1",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -164,7 +164,7 @@ describe Manifest do
         "metadata" : {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "conditions" : ["MTB"],
+          "conditions" : ["mtb"],
           "source" : {"type" : "json"}
         },
         "custom_fields": {

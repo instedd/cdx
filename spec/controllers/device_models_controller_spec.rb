@@ -3,6 +3,7 @@ require 'spec_helper'
 describe DeviceModelsController do
   let(:user) {User.make}
   before(:each) {sign_in user}
+  let!(:institution) { user.create Institution.make_unsaved }
 
   context "Creation" do
     it "shouldn't create if JSON is not valid" do
@@ -19,7 +20,7 @@ describe DeviceModelsController do
         "metadata": {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : { "type" : "json" }
         },
         "field_mapping": {

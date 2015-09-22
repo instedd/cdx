@@ -1,5 +1,12 @@
+require 'sidekiq/web'
+
 Rails.application.routes.draw do
-  devise_for :users, controllers: {omniauth_callbacks: "omniauth_callbacks"}
+  mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
+
+  devise_for :users, controllers: {
+    omniauth_callbacks: "omniauth_callbacks",
+    sessions: "sessions",
+  }
 
   resources :laboratories
   resources :institutions, except: :show do
@@ -8,6 +15,7 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :encounters, only: [:new, :create, :show]
   resources :locations, only: [:index, :show]
   resources :devices do
     member do
@@ -24,7 +32,7 @@ Rails.application.routes.draw do
     end
   end
   resources :device_models
-  resources :test_results do
+  resources :test_results , only: [:index, :show] do
     collection do
       get 'csv'
     end

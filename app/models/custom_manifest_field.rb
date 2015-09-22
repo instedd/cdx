@@ -1,17 +1,18 @@
 class CustomManifestField < ManifestField
   attr_reader :target_field, :custom_field
 
-  def self.for(manifest, target_field, field_mapping, custom_field)
+  def self.for(manifest, target_field, field_mapping, custom_field, scope)
     raise ManifestParsingError.custom_field_not_defined(target_field) unless custom_field
 
-    new manifest, target_field, field_mapping, custom_field
+    new manifest, target_field, field_mapping, custom_field, scope
   end
 
-  def initialize(manifest, target_field, field_mapping, custom_field)
+  def initialize(manifest, target_field, field_mapping, custom_field, scope)
     @manifest = manifest
     @target_field = target_field
     @field_mapping = field_mapping
     @custom_field = custom_field
+    @scope = scope
     @validation = ManifestFieldValidation.new(self)
   end
 
@@ -37,5 +38,9 @@ class CustomManifestField < ManifestField
 
   def pii?
     custom_field['pii'] || false
+  end
+
+  def scope
+    @scope
   end
 end

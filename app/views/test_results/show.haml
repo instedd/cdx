@@ -1,0 +1,97 @@
+.row
+  .col
+    %h1
+      = link_to "←", :back, class: 'side-link', title: 'Back'
+      = @test_result.core_fields[TestResult::NAME_FIELD]
+
+.row
+  .col
+    .card
+      .card-image
+        -# TODO select card image upon test result assays
+        = image_tag "card-unkown.png"
+      .card-detail-top
+        %b= @test_result.core_fields[TestResult::NAME_FIELD]
+        %br
+        %span= @test_result.core_fields[TestResult::START_TIME_FIELD].strftime('%B %e, %Y')
+
+      .card-detail-bottom
+        Patient
+        -# TODO add link to patient
+        = @test_result.patient.plain_sensitive_data['name']
+        %br
+        Test performed on
+        = link_to @test_result.device.name, edit_device_path(@test_result.device)
+        by
+        -# TODO add link to lab_user
+        = @test_result.core_fields[TestResult::LAB_USER_FIELD]
+        - if @test_result.device.laboratory
+          at
+          -# TODO add link to laboratory
+          = link_to @test_result.device.laboratory, edit_laboratory_path(@test_result.device.laboratory)
+
+.row
+  .col
+
+.row
+  .col.pe-3
+    %label Assays
+  .col
+    - @test_result.core_fields[TestResult::ASSAYS_FIELD].each do |assay|
+      .row
+        .col
+          %div.underline
+            %span
+              %b= assay['name'].upcase
+        .col.pe-8
+          %b= assay['result'].titleize
+
+
+.row
+  .col.pe-3
+    %label Additional data
+  .col
+    - @test_result.custom_fields.each do |key, value|
+      .row
+        .col
+          %div.underline
+            %span
+              = key.humanize
+        .col.pe-8.wrap-text
+          = value
+
+- @core_fields_scope.fields.each do |field|
+  - next if [TestResult::NAME_FIELD, TestResult::LAB_USER_FIELD, TestResult::ASSAYS_FIELD].include?(field.name)
+  - value = @test_result.core_field_value(field)
+  - next unless value
+  .row
+    .col.pe-2
+      %label= field.name.humanize
+    .col.wrap-text
+      %span= field.humanize(@test_result.core_field_value(field))
+
+.row
+  .col.pe-2
+    %label Sample
+  .col
+    -# TODO add print button
+    = @sample_id
+    %br
+    %br
+    = raw @sample_id_barcode.to_html
+
+
+.row
+  .col.pe-2
+    %label Other tests
+  .col
+    %span
+    - case @other_tests.count
+    - when 0
+      No other test was made with this sample
+    - when 1
+      = link_to @other_tests.first.core_fields[TestResult::NAME_FIELD], test_result_path(@other_tests.first.uuid)
+      was also made with this sample
+    - else
+      = @other_tests.map { |t| link_to t.core_fields[TestResult::NAME_FIELD], test_result_path(t.uuid) }.to_sentence.html_safe
+      were also made with this sample

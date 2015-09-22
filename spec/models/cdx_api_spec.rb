@@ -1,12 +1,10 @@
 require 'spec_helper'
 
-describe Cdx::Api do
-
-  include_context "elasticsearch index"
+describe Cdx::Api, elasticsearch: true do
   include_context "cdx api helpers"
 
-  let(:device) {Device.make}
-  let(:institution) { device.institution }
+  let!(:device) {Device.make}
+  let!(:institution) { device.institution }
 
   def index_with_test_result(test)
     test_result = TestResult.make device: device
@@ -831,8 +829,8 @@ describe Cdx::Api do
         Cdx::Api.searchable_fields.concat @extra_fields
 
         # Delete the index and recreate it to make ES grab the new template
-        Cdx::Api.client.indices.delete index: "cdx_test" rescue nil
-        Cdx::Api.initialize_template "cdx_tests_template"
+        Cdx::Api.client.indices.delete index: "cdx_test", ignore: 404
+        Cdx::Api.initialize_template "cdx_tests_template_test"
       end
 
       after(:all) do
@@ -846,8 +844,8 @@ describe Cdx::Api do
         end
 
         # Delete the index and recreate it to make ES grab the new template
-        Cdx::Api.client.indices.delete index: "cdx_test" rescue nil
-        Cdx::Api.initialize_template "cdx_tests_template"
+        Cdx::Api.client.indices.delete index: "cdx_test", ignore: 404
+        Cdx::Api.initialize_template "cdx_tests_template_test"
       end
 
       it "should allow searching by the new field" do

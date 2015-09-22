@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "version" : "0.0.9",
-    "api_version" : "1.2.1",
+    "api_version" : "1.4.0",
     "signature" : "",
     "conditions": ["mtb", "rif", "inh"],
     "source": { "type" : "csv", "separator" : ";" }
@@ -70,13 +70,13 @@
     },
     "test.lab_user" : {"lookup" : "WindowsUser"},
     "test.name" : {"lookup" : "TypeOfTest"},
-    "test.assays[*].condition" : {
+    "test.assays.condition" : {
       "script" : "['mtb', 'rif', 'inh']"
     },
-    "test.assays[*].name" : {
+    "test.assays.name" : {
       "script" : "['mtb', 'rif', 'inh']"
     },
-    "test.assays[*].result" : {
+    "test.assays.result" : {
       "script" : "
         if(message['Result'].match(/.*tuberculosis.*/)){
           mtb = 'positive'

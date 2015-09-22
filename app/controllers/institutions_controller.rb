@@ -1,6 +1,7 @@
 class InstitutionsController < ApplicationController
   layout "institutions"
   before_filter :load_institutions, except: :index
+  skip_before_filter :check_no_institution!, only: [:new, :create]
 
   def index
     @can_create = true
@@ -18,7 +19,7 @@ class InstitutionsController < ApplicationController
     unless has_access?(@institution, UPDATE_INSTITUTION)
       redirect_to institution_path(@institutions.first)
     end
-    
+
     @institutions = check_access(Institution, READ_INSTITUTION)
     @can_delete = has_access?(@institution, "cdpx:deleteInstitution")
 
@@ -31,12 +32,18 @@ class InstitutionsController < ApplicationController
     @institution = current_user.institutions.new
     @institution.user_id = current_user.id
     return unless authorize_resource(@institution, CREATE_INSTITUTION)
+
+    @first_institution_creation = @institutions.count == 0
+    @hide_user_settings = @hide_nav_bar = @first_institution_creation
   end
 
   def create
     @institution = Institution.new(institution_params)
     @institution.user_id = current_user.id
     return unless authorize_resource(@institution, CREATE_INSTITUTION)
+
+    @first_institution_creation = @institutions.count == 0
+    @hide_user_settings = @hide_nav_bar = @first_institution_creation
 
     respond_to do |format|
       if @institution.save

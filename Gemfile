@@ -46,7 +46,11 @@ end
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'
 
-# gem 'puma'
+gem 'puma'
+
+# Use Sidekiq for background jobs
+gem 'sidekiq'
+gem 'sinatra'
 
 group :development do
   gem 'web-console', '~> 2.0'
@@ -64,8 +68,8 @@ end
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-openid'
+gem 'omniauth-google-oauth2'
 gem 'elasticsearch'
-gem 'bunny'
 
 gem 'oj'
 gem 'guid'

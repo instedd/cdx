@@ -8,8 +8,17 @@ class ApplicationController < ActionController::Base
   skip_before_filter :verify_authenticity_token, if: :json_request?
 
   before_action :authenticate_user!
+  before_action :check_no_institution!
   before_action :load_current_user_policies
   before_action :load_js_global_settings
+
+  before_action do
+    @main_column_width = if params[:action] != 'index'
+      8
+    else
+      10
+    end
+  end
 
   decent_configuration do
     strategy DecentExposure::StrongParametersStrategy
@@ -47,6 +56,31 @@ class ApplicationController < ActionController::Base
       head :forbidden
       nil
     end
+  end
+
+  def authorize_test_result(test_result)
+    if [test_result.institution, test_result.laboratory, test_result.device].any? { |resource| Policy.can?(QUERY_TEST, resource, current_user, @current_user_policies) }
+      true
+    else
+      head :forbidden
+      false
+    end
+  end
+
+  def check_no_institution!
+    if current_user && current_user.institutions.empty?
+      redirect_to new_institution_path
+    end
+  end
+
+  # filters/authorize @institutions by action. Assign calls resource.institution= if only one institution was left
+  def prepare_for_institution_and_authorize(resource, action)
+    @institutions = authorize_resource(@institutions, action)
+    if @institutions.one?
+      resource.institution = @institutions.first
+    end
+
+    @institutions
   end
 
   protected

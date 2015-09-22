@@ -36,7 +36,7 @@ describe CSVMessageParser do
 
   it "does not support collections in lookup" do
     expect {
-      CSVMessageParser.new.lookup('results[*].result', {'error_code' => '4002', 'result' => 'negative'})
+      CSVMessageParser.new.lookup('results.result', {'error_code' => '4002', 'result' => 'negative'})
     }.to raise_error(RuntimeError, 'path nesting is unsupported for CSV Messages')
   end
 

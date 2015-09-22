@@ -7,10 +7,14 @@ h1 {
   font-size: 220%;
   font-weight: 300;
   color: $gray3;
+
+  a {
+    color: $gray4;
+  }
 }
 
 a {
-  color: $gray4;
+  color: $blue;
 }
 
 .centered {
@@ -34,4 +38,26 @@ a {
 .playground-error {
   color: $red;
   min-height: 30px;
+}
+
+.wrap-text {
+  word-wrap: break-word;
+}
+
+.underline {
+  border-bottom: 1px solid $gray2;
+  span {
+    border-bottom: 1px solid $white;
+    padding-right: 4px;
+  }
+}
+
+.side-link {
+  float: left;
+  margin-left: -43px;
+
+  &.btn-add {
+    margin-top: 30px;
+    margin-left: -73px;
+  }
 }

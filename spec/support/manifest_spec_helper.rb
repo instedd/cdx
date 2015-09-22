@@ -5,7 +5,7 @@ module ManifestSpecHelper
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "#{Manifest::CURRENT_VERSION}",
-        "conditions": ["MTB"],
+        "conditions": ["mtb"],
         "source" : {"type" : "#{source}"}
       },
       "custom_fields": #{custom_json},

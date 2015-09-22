@@ -15,12 +15,12 @@ describe Subscriber, elasticsearch: true do
         "metadata": {
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
-          "test.assays[*].result" : {"lookup" : "result"},
-          "test.assays[*].name" : {"lookup" : "condition"},
+          "test.assays.result" : {"lookup" : "result"},
+          "test.assays.name" : {"lookup" : "condition"},
           "patient.gender" : {"lookup" : "patient_gender"}
         }
       }

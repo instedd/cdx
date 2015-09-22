@@ -11,12 +11,11 @@ class Manifest < ActiveRecord::Base
   before_save :update_api_version
   before_save :update_conditions
 
-  COLLECTION_SPLIT_TOKEN = "[*]."
   PATH_SPLIT_TOKEN = "."
 
   NULL_STRING = "null"
 
-  CURRENT_VERSION = "1.2.1"
+  CURRENT_VERSION = "1.4.0"
 
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
@@ -171,9 +170,16 @@ class Manifest < ActiveRecord::Base
       return
     end
 
-    unless conditions.all? { |condition| condition.is_a?(String) }
-      self.errors.add(:conditions, "must be a json string array")
-      return
+    conditions.each do |condition|
+      unless condition.is_a?(String)
+        self.errors.add(:conditions, "must be a json string array")
+        return
+      end
+
+      unless Condition.valid_name?(condition)
+        self.errors.add(:conditions, "must be in snake case: #{condition}")
+        return
+      end
     end
   end
 

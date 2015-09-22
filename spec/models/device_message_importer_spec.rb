@@ -26,12 +26,12 @@ describe DeviceMessageImporter, elasticsearch: true do
       "metadata": {
         "version": "1",
         "api_version": "#{Manifest::CURRENT_VERSION}",
-        "conditions": ["MTB"],
+        "conditions": ["mtb"],
         "source" : { "type" : "#{source}"}
       },
       "field_mapping" : {
         "test.error_code" : {"lookup": "error_code"},
-        "test.assays[*].result" : {
+        "test.assays.result" : {
           "case": [
           {"lookup": "result"},
           [

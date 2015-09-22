@@ -52,7 +52,7 @@ class Subscriber < ActiveRecord::Base
     fields = self.fields
     query = self.filter.query.merge "page_size" => 10000, "test.updated_time_since" => last_run_at.iso8601
     Rails.logger.info "Filter : #{query}"
-    tests = TestResult.query(query, filter.user).result["tests"]
+    tests = TestResult.query(query, filter.user).execute["tests"]
 
     now = Time.now
     tests.each do |test|

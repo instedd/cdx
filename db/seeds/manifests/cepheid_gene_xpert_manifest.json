@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "1.1.1",
-    "api_version": "1.2.1",
+    "api_version": "1.4.0",
     "conditions": [
       "mtb"
     ],
@@ -85,8 +85,8 @@
         {"when" : "*", "then" : "error"}
       ]
     ]},
-    "test.assays[*].condition" : { "script" : "['mtb', 'rif']" },
-    "test.assays[*].result" : {
+    "test.assays.condition" : { "script" : "['mtb', 'rif']" },
+    "test.assays.result" : {
       "script": "
       if(message['event']['result'].match(/.*INVALID.*/) || message['event']['result'].match(/.*ERROR.*/) || message['event']['result'].match(/.*NO RESULT.*/)) {
         ['n/a', 'n/a']

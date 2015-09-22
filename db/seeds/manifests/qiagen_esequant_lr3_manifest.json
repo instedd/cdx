@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "0.0.12",
-    "api_version": "1.2.1",
+    "api_version": "1.4.0",
     "conditions": [
       "mtb", "rif", "inh"
     ],
@@ -24,7 +24,7 @@
     "test.error_code" : { "lookup": "error_code" },
     "test.name" : { "lookup": "ProductId" },
     "test.type" : { "lookup": "SampleName" },
-    "test.assays[*].condition" : {
+    "test.assays.condition" : {
       "script" : "
         if(message['ProductId'] == 'MTBDRplus') {
           ['mtb', 'rif', 'inh']
@@ -32,7 +32,7 @@
           ['mtb']
         }"
     },
-    "test.assays[*].name" : {
+    "test.assays.name" : {
       "script" : "
         if(message['ProductId'] == 'MTBDRplus') {
           ['mtb', 'rif', 'inh']
@@ -40,7 +40,7 @@
           ['mtb']
         }"
     },
-    "test.assays[*].result" : {
+    "test.assays.result" : {
       "script" : "
         result = message['results'][0]['result'];
         if(result.match(/positive.*/i)){

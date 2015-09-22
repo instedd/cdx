@@ -21,4 +21,8 @@ class CoreManifestField < ManifestField
   def custom?
     false
   end
+
+  def scope
+    core_field.scope
+  end
 end

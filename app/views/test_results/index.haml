@@ -1,8 +1,3 @@
-- content_for(:leftcolumn) do
-  .centered
-    = link_to "+", new_filter_path(query: @filter), class: 'btn-add fixed', title: 'Add filter'
-
-
 %form
   .row
     .col
@@ -13,35 +8,35 @@
         .col
           %label.block Institution
           %select.ddown(name="institution.uuid")
-            %option(value="") (all)
+            %option(value="") Show all
             = options_from_collection_for_select institutions, :uuid, :name, params["institution.uuid"]
       - if laboratories.size > 1
         .col
           %label.block Laboratory
           %select.ddown(name="laboratory.uuid")
-            %option(value="") (all)
+            %option(value="") Show all
             = options_from_collection_for_select laboratories, :uuid, :name, params["laboratory.uuid"]
       - if devices.size > 1
         .col
           %label.block Device
           %select.ddown(name="device.uuid")
-            %option(value="") (all)
+            %option(value="") Show all
             = options_from_collection_for_select devices, :uuid, :name, params["device.uuid"]
   .row
     .col
       %label.block Condition
       %select.ddown{name: "test.assays.condition", value: params["test.assays.condition"]}
-        %option(value="") (all)
+        %option(value="") Show all
         = options_for_select @conditions, params["test.assays.condition"]
     .col
       %label.block Result
       %select.ddown{name: "test.assays.result"}
-        %option(value="") (all)
+        %option(value="") Show all
         = options_for_select @results, params["test.assays.result"]
     .col
       %label.block Date
       %select.ddown{name: "since"}
-        %option(value="") (all)
+        %option(value="") Show all
         = options_for_select @date_options, params["since"]
     .col
       %label.block Sample Id
@@ -52,17 +47,20 @@
   .row
     .col
       %input.btn-primary.pull-right{type: "submit", value: "Filter"}
+      = link_to "Add filter", new_filter_path(query: @filter), class: 'btn pull-right'
 
   .row
     .col
-      %table.table
+      = link_to "+", new_encounter_path, class: 'btn-add side-link', title: 'Add encounter'
+
+      - cdx_table do
         %tr
           %th.tableheader{colspan:100}= pluralize @total, "Test"
         %tr
           - each_column do |id, title, sortable|
             %th= sortable ? order_by_column(title, id) : title
         - @tests.each do |test|
-          %tr
+          %tr{data: {href: test_result_path(test['test']['uuid']) }}
             - each_column do |id|
               %td= formatted_test_value(test, id, web: true)
       .pagination

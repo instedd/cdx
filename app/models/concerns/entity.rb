@@ -37,6 +37,10 @@ module Entity
     self.class.entity_scope
   end
 
+  def core_field_value(field)
+    core_fields[field.name]
+  end
+
   class_methods do
     def from_the_past_year(relative_to)
       where('created_at > ?', relative_to - 1.year)
