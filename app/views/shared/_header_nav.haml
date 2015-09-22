@@ -10,8 +10,8 @@
         = link_to "Labs", laboratories_path
       %li{:class => params[:controller] == "devices" && "active"}
         = link_to "Devices", devices_path
-      %li{:class => params[:controller] == "manifests" && "active"}
-        = link_to "Models", manifests_path
+      %li{:class => params[:controller] == "device_models" && "active"}
+        = link_to "Models", device_models_path
       %li{:class => params[:controller] == "test_results" && "active"}
         = link_to "Tests", test_results_path
       %li{:class => params[:controller] == "filters" && "active"}

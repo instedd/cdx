@@ -132,9 +132,9 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "applies an existing manifest" do
-      Manifest.create! definition: %{{
+      manifest = device.manifest
+      manifest.definition = %{{
         "metadata" : {
-          "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
@@ -144,6 +144,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
           "patient.id" : {"lookup" : "patient_id"}
         }
       }}
+      manifest.save
       post :create, Oj.dump(assay: {name: "GX4002"}, patient_id: 1234), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
@@ -153,9 +154,8 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "stores pii in the test according to manifest" do
-      Manifest.create! definition: %{{
+      device.manifest.update! definition: %{{
         "metadata" : {
-          "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
@@ -184,9 +184,8 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
     it "merges pii from different tests in the same sample across devices" do
       device2 = Device.make institution_id: institution.id, device_model: device.device_model
-      Manifest.create! definition: %{{
+      device.manifest.update! definition: %{{
         "metadata" : {
-          "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
@@ -220,9 +219,8 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "uses the last version of the manifest" do
-      Manifest.create! definition: %{{
+      device.manifest.update! definition: %{{
         "metadata" : {
-          "device_models" : ["#{device.device_model.name}"],
           "version" : 1,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
@@ -235,9 +233,8 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
         }
       }}
 
-      Manifest.create! definition: %{{
+      device.manifest.update! definition: %{{
         "metadata" : {
-          "device_models" : ["#{device.device_model.name}"],
           "version" : 2,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
@@ -255,9 +252,8 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "stores custom fields according to the manifest" do
-      Manifest.create! definition: %{{
+      device.manifest.update! definition: %{{
         "metadata" : {
-          "device_models" : ["#{device.device_model.name}"],
           "version" : 2,
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "source" : {"type" : "json"}
@@ -281,9 +277,8 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "validates the data type" do
-      Manifest.create! definition: %{{
+      device.manifest.update! definition: %{{
         "metadata" : {
-          "device_models" : ["#{device.device_model.name}"],
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -305,12 +300,11 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
     context "csv" do
 
-      let!(:manifest) do Manifest.create! definition: %{
+      let!(:manifest) do device.manifest.update! definition: %{
           {
             "metadata" : {
               "version" : "1",
               "api_version" : "#{Manifest::CURRENT_VERSION}",
-              "device_models" : "#{device.device_model.name}",
               "source" : { "type" : "csv" }
             },
             "field_mapping" : {

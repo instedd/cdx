@@ -4,7 +4,7 @@ class Api::MessagesController < ApiController
   skip_before_action :load_current_user_policies, only: :create
 
   def create
-    device = Device.includes(:manifests, :institution, :laboratory).find_by_uuid(params[:device_id])
+    device = Device.includes(:device_model, :manifest, :institution, :laboratory).find_by_uuid(params[:device_id])
 
     if authenticate_create(device)
       data = request.body.read rescue nil

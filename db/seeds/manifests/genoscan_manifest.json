@@ -3,7 +3,6 @@
     "version" : "0.0.9",
     "api_version" : "1.2.1",
     "signature" : "",
-    "device_models" : ["genoscan"],
     "conditions": ["mtb", "rif", "inh"],
     "source": { "type" : "csv", "separator" : ";" }
   },

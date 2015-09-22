@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150902154438) do
+ActiveRecord::Schema.define(version: 20150915164518) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -67,11 +67,6 @@ ActiveRecord::Schema.define(version: 20150902154438) do
     t.string   "name",       limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "device_models_manifests", id: false, force: :cascade do |t|
-    t.integer "manifest_id",     limit: 4
-    t.integer "device_model_id", limit: 4
   end
 
   create_table "devices", force: :cascade do |t|
@@ -146,11 +141,12 @@ ActiveRecord::Schema.define(version: 20150902154438) do
   end
 
   create_table "manifests", force: :cascade do |t|
-    t.string   "version",     limit: 255
-    t.text     "definition",  limit: 65535
+    t.string   "version",         limit: 255
+    t.text     "definition",      limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "api_version", limit: 255
+    t.string   "api_version",     limit: 255
+    t.integer  "device_model_id", limit: 4
   end
 
   create_table "patients", force: :cascade do |t|

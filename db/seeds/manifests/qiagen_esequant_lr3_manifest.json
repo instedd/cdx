@@ -2,9 +2,6 @@
   "metadata": {
     "version": "0.0.12",
     "api_version": "1.2.1",
-    "device_models": [
-      "esequant_lr3"
-    ],
     "conditions": [
       "mtb", "rif", "inh"
     ],

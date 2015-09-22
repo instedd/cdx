@@ -23,7 +23,7 @@ Rails.application.routes.draw do
       end
     end
   end
-  resources :manifests, except: [:update, :destroy]
+  resources :device_models
   resources :test_results do
     collection do
       get 'csv'

@@ -1,17 +1,16 @@
 require 'spec_helper'
 
-describe ManifestsController do
+describe DeviceModelsController do
   let(:user) {User.make}
   before(:each) {sign_in user}
 
   context "Creation" do
-
     it "shouldn't create if JSON is not valid" do
       json = {"definition" => %{
         { , , }
       } }
       expect(Manifest.count).to eq(0)
-      post :create, manifest: json
+      post :create, device_model: { name: "GX4001", manifest_attributes: json }
       expect(Manifest.count).to eq(0)
     end
 
@@ -20,7 +19,6 @@ describe ManifestsController do
         "metadata": {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["GX4001"],
           "conditions": ["MTB"],
           "source" : { "type" : "json" }
         },
@@ -38,7 +36,7 @@ describe ManifestsController do
         }
       }}}
       expect(Manifest.count).to eq(0)
-      post :create, manifest: json
+      post :create, device_model: { name: "GX4001", manifest_attributes: json }
       expect(Manifest.count).to eq(1)
     end
   end

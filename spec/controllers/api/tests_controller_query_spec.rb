@@ -208,9 +208,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
     context "Custom Fields" do
       it "should retrieve an test custom fields by uuid", context do
-        Manifest.create! definition: %{{
+        device.manifest.update! definition: %{{
           "metadata" : {
-            "device_models" : ["#{device.device_model.name}"],
             "version" : 2,
             "api_version" : "#{Manifest::CURRENT_VERSION}",
             "source" : {"type" : "json"}
@@ -242,7 +241,6 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
       it "should retrieve an test PII by uuid" do
         definition = %{{
           "metadata" : {
-            "device_models" : ["#{device.device_model.name}"],
             "api_version" : "#{Manifest::CURRENT_VERSION}",
             "version" : "1.0.0",
             "source" : {"type" : "json"}
@@ -259,7 +257,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           }
         }}
 
-        Manifest.create! definition: definition
+        device.manifest.update! definition: definition
 
         DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(assays: [result: :positive], patient_name: "jdoe")
         test = all_elasticsearch_tests.first["_source"]["test"]

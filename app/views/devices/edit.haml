@@ -1,4 +1,6 @@
-%h1 Editing #{@device.name}
+%h1
+  = link_to '←', devices_path
+  = @device.name
 %p
   %strong UUID:
   = @device.uuid

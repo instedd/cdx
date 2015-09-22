@@ -40,8 +40,17 @@ Device.blueprint do
   institution { laboratory.institution }
   name
   serial_number { name }
-  device_model { Manifest.make.device_models.first }
+  device_model { Manifest.make.device_model }
   time_zone { "UTC" }
+end
+
+DeviceModel.blueprint do
+  name
+end
+
+Manifest.blueprint do
+  device_model
+  definition { DefaultManifest.definition }
 end
 
 Encounter.blueprint do
@@ -70,16 +79,8 @@ DeviceMessage.blueprint do
   device
 end
 
-DeviceModel.blueprint do
-  name
-end
-
 Policy.blueprint do
   name
-end
-
-Manifest.blueprint do
-  definition { DefaultManifest.definition(Faker::Name.name) }
 end
 
 Subscriber.blueprint do

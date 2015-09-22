@@ -2,7 +2,6 @@
   "metadata" : {
     "version" : "1.0.4",
     "api_version" : "1.2.1",
-    "device_models" : ["FIO"],
     "conditions": ["malaria_pf", "malaria_pv"],
     "source": {
       "type" : "xml",

@@ -1,9 +1,9 @@
 class DefaultManifest
-  def self.for(device_model_name)
-    Manifest.create! definition: definition(device_model_name)
+  def self.for
+    Manifest.create! definition: definition
   end
 
-  def self.definition(device_model_name)
+  def self.definition
     core_mapping = {}
 
     Cdx.core_field_scopes.each do |scope|
@@ -18,7 +18,6 @@ class DefaultManifest
     Oj.dump({
       metadata: {
         source: { type: "json" },
-        device_models: [device_model_name],
         api_version: "#{Manifest::CURRENT_VERSION}",
         conditions: ["MTB"],
 

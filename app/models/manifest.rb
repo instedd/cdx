@@ -1,10 +1,12 @@
 class Manifest < ActiveRecord::Base
-  has_and_belongs_to_many :device_models
+  belongs_to :device_model, inverse_of: :manifest
   has_and_belongs_to_many :conditions
 
   validate :manifest_validation
+  validates_presence_of :device_model
 
-  before_save :update_models
+  validates_uniqueness_of :device_model
+
   before_save :update_version
   before_save :update_api_version
   before_save :update_conditions
@@ -30,14 +32,6 @@ class Manifest < ActiveRecord::Base
   def reload
     @loaded_definition = nil
     super
-  end
-
-  def current_models
-    self.device_models.to_a.select {|model| model.current_manifest.id == id}
-  end
-
-  def update_models
-    self.device_models = Array(metadata["device_models"] || []).map { |model| DeviceModel.find_or_create_by(name: model)}
   end
 
   def update_conditions
@@ -137,17 +131,21 @@ class Manifest < ActiveRecord::Base
   end
 
   def manifest_validation
-    if self.metadata.blank?
-      self.errors.add(:metadata, "can't be blank")
-    else
-      fields = %w(version api_version device_models conditions)
-      check_fields_in_metadata(fields)
-      check_api_version
-      check_conditions
-    end
+    if self.definition && self.loaded_definition
+      if self.metadata.blank?
+        self.errors.add(:metadata, "can't be blank")
+      else
+        fields = %w(version api_version conditions)
+        check_fields_in_metadata(fields)
+        check_api_version
+        check_conditions
+      end
 
-    check_field_mapping
-    check_custom_fields
+      check_field_mapping
+      check_custom_fields
+    else
+      self.errors.add(:deifinition, "can't be blank")
+    end
 
   rescue Oj::ParseError => ex
     self.errors.add(:parse_error, ex.message)
@@ -189,7 +187,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def check_field_mapping
-    unless loaded_definition["field_mapping"].is_a? Hash
+    unless field_mapping.is_a? Hash
       self.errors.add(:field_mapping, "must be a json object")
     end
   end

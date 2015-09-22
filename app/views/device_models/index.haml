@@ -1,0 +1,17 @@
+- content_for(:leftcolumn) do
+  .centered
+    = link_to "+", new_device_model_path, class: 'btn-add fixed', title: 'Add Device Model'
+
+.row
+  .col
+    %table.table
+      %tr
+        %th.tableheader{colspan:100} Device Models
+      %tr
+        %th Name
+        %th Version
+      - device_models.each do |device_model|
+        %tr
+          %td= link_to device_model.name, edit_device_model_path(device_model)
+          %td= link_to device_model.current_manifest.try(:version), edit_device_model_path(device_model)
+
