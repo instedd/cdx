@@ -1,7 +1,8 @@
 require 'spec_helper'
 require 'policy_spec_helper'
 
-describe TestResultQuery, elasticsearch: true do
+xdescribe TestResultQuery, elasticsearch: true do
+
   let(:user)            {User.make}
   let(:user_2)          {User.make}
 
