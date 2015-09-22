@@ -102,4 +102,5 @@ group :test do
   gem 'hashdiff'
   gem 'cucumber-rails', :require => false
   gem 'database_cleaner'
+  gem 'site_prism'
 end
