@@ -2,44 +2,24 @@ class ComputedPolicy < ActiveRecord::Base
 
   belongs_to :user
 
-  scope :delegable, -> { where(delegable: true) }
+  has_many :exceptions, class_name: "ComputedPolicyException", dependent: :destroy, inverse_of: :computed_policy
+
+  accepts_nested_attributes_for :exceptions
+
+  scope :delegable,  -> { where(delegable: true) }
+
 
   def self.update_user(user)
     # TODO: Run in background
     PolicyComputer.new.update_user(user)
   end
 
-  def &(p2)
-    catch(:empty_intersection) do
-      resource_id = intersect_attribute(self.resource_id, p2.resource_id)
-      resource_type = intersect_attribute(self.resource_type, p2.resource_type)
-      action = intersect_attribute(self.action, p2.action)
-
-      condition_institution_id = intersect_attribute(self.condition_institution_id, p2.condition_institution_id)
-      condition_laboratory_id = intersect_attribute(self.condition_laboratory_id, p2.condition_laboratory_id)
-
-      return ComputedPolicy.new action: action, resource_id: resource_id,
-        condition_laboratory_id: condition_laboratory_id, condition_institution_id: condition_institution_id,
-        resource_type: self.resource_type, user_id: self.user_id, allow: allow, delegable: self.delegable
-    end
-  end
-
   def contains(p2)
     return (self.action.nil? || self.action == p2.action)\
       && (self.resource_type.nil? || self.resource_type == p2.resource_type)\
       && (self.resource_id.nil? || self.resource_id == p2.resource_id)\
-      && (self.allow == p2.allow)\
       && (self.conditions.keys.all? {|c| self.conditions[c].nil? || self.conditions[c] == p2.conditions[c] })\
       && (self.delegable || !p2.delegable)
-  end
-
-  def equal_permissions(p2)
-    return self.action == p2.action\
-      && self.resource_id == p2.resource_id\
-      && self.resource_type == p2.resource_type\
-      && self.allow == p2.allow\
-      && self.conditions.keys.all? {|c| self.conditions[c] == p2.conditions[c] }\
-      && self.delegable == p2.delegable
   end
 
   def conditions
@@ -49,18 +29,6 @@ class ComputedPolicy < ActiveRecord::Base
     }
   end
 
-  private
-
-  def intersect_attribute(attr1, attr2)
-    if attr1.nil? || attr2.nil?
-      attr1 || attr2
-    elsif attr1 == attr2
-      attr1
-    else
-      throw(:empty_intersection)
-    end
-  end
-
 
   class PolicyComputer
 
@@ -68,15 +36,14 @@ class ComputedPolicy < ActiveRecord::Base
       computed_policies = user.policies.map{|p| compute_for(p)}.flatten
       computed_policies = compact_policies(computed_policies)
 
+      # TODO: Calculate difference using attributes
       existing_policies = user.computed_policies
-
       to_create = computed_policies - existing_policies
       to_drop   = existing_policies - computed_policies
-
       return if to_create.empty? && to_drop.empty?
 
       ComputedPolicy.transaction do
-        to_drop.each(&:delete)
+        to_drop.each(&:destroy)
         to_create.each(&:save!)
       end
 
@@ -90,27 +57,49 @@ class ComputedPolicy < ActiveRecord::Base
     end
 
     def compute_statement(statement, policy)
-      granted = Array(statement['action']).product(Array(statement['resource'])).map do |action, resource|
-        resource_type, resource_id, filters = resolve_resource(resource)
-        action = nil if action == '*'
+      actions = Array(statement['action'])
+      resources = Array(statement['resource'])
+      exceptions = Array(statement['except']).map{|ex| computed_policy_attributes_from(ex)}
 
-        ComputedPolicy.new\
-          action: action,
-          resource_type: resource_type,
-          resource_id: resource_id,
-          allow: is_allow(statement['effect']),
-          user: policy.user,
-          condition_institution_id: filters["institution"],
-          condition_laboratory_id: filters["laboratory"],
-          delegable: policy.delegable
+      granted_statements = actions.product(resources).map do |action, resource|
+        entry = computed_policy_attributes_from(resource, action)
+        applicable_exceptions = exceptions.reject{ |exception| intersect_attributes(entry, exception).nil? }
+        entry.merge(exceptions_attributes: applicable_exceptions)
       end
 
-      return granted if policy.granter.nil?
-      intersect(granted, policy.granter.computed_policies.delegable)
+      granted_statements = if policy.granter.nil?
+        granted_statements
+      else
+        granter_statements = policy.granter.computed_policies.delegable.map{|p| attributes_for(p)}
+        intersect(granted_statements, granter_statements)
+      end
+
+      granted_statements.map do |g|
+        ComputedPolicy.new(g.merge(user_id: policy.user_id, delegable: policy.delegable))
+      end
     end
 
-    def is_allow(effect)
-      true
+    def computed_policy_attributes_from(resource, action=nil)
+      resource_type, resource_id, filters = resolve_resource(resource)
+      return {
+        action: action == '*' ? nil : action,
+        resource_type: resource_type,
+        resource_id: resource_id.try(:to_i),
+        condition_institution_id: filters["institution"].try(:to_i),
+        condition_laboratory_id: filters["laboratory"].try(:to_i)
+      }
+    end
+
+    def attributes_for(computed_policy)
+      attrs = {
+        action: computed_policy.action,
+        resource_type: computed_policy.resource_type,
+        resource_id: computed_policy.resource_id,
+        condition_laboratory_id: computed_policy.condition_laboratory_id,
+        condition_institution_id: computed_policy.condition_institution_id
+      }
+      attrs[:exceptions_attributes] = computed_policy.exceptions.map{|e| attributes_for(e)} if computed_policy.respond_to?(:exceptions)
+      return attrs
     end
 
     def resolve_resource(resource_string)
@@ -125,8 +114,29 @@ class ComputedPolicy < ActiveRecord::Base
 
     def intersect(granted, granter)
       granted.product(granter).map do |p1, p2|
-        p1 & p2
+        intersect_attributes(p1, p2)
       end.compact
+    end
+
+    def intersect_attributes(p1, p2)
+      catch(:empty_intersection) do
+        intersection = Hash.new
+        [:resource_id, :resource_type, :action, :condition_institution_id, :condition_laboratory_id].each do |key|
+          intersection[key] = intersect_attribute(p1[key], p2[key])
+        end
+        intersection[:exceptions_attributes] = ((p1[:exceptions_attributes] || []) | (p2[:exceptions_attributes] || []))
+        return intersection
+      end
+    end
+
+    def intersect_attribute(attr1, attr2)
+      if attr1.nil? || attr2.nil?
+        attr1 || attr2
+      elsif attr1 == attr2
+        attr1
+      else
+        throw(:empty_intersection)
+      end
     end
 
     def compact_policies(computed_policies)

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150921222526) do
+ActiveRecord::Schema.define(version: 20150922204816) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -34,13 +34,21 @@ ActiveRecord::Schema.define(version: 20150921222526) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
-    t.boolean "allow"
     t.string  "action",                   limit: 255
     t.string  "resource_type",            limit: 255
     t.integer "resource_id",              limit: 4
     t.integer "condition_institution_id", limit: 4
     t.integer "condition_laboratory_id",  limit: 4
     t.boolean "delegable",                            default: false
+  end
+
+  create_table "computed_policy_exceptions", force: :cascade do |t|
+    t.integer "computed_policy_id",       limit: 4
+    t.string  "action",                   limit: 255
+    t.string  "resource_type",            limit: 255
+    t.integer "resource_id",              limit: 4
+    t.integer "condition_institution_id", limit: 4
+    t.integer "condition_laboratory_id",  limit: 4
   end
 
   create_table "conditions", force: :cascade do |t|

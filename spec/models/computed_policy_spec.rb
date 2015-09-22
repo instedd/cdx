@@ -21,7 +21,6 @@ describe ComputedPolicy do
 
       ComputedPolicy.last.tap do |p|
         expect(p.user).to eq(user)
-        expect(p.allow).to be_truthy
         expect(p.action).to eq(READ_DEVICE)
         expect(p.resource_type).to eq("Device")
         expect(p.resource_id).to eq(device.id)
@@ -87,6 +86,19 @@ describe ComputedPolicy do
       end
     end
 
+    it "should except a resource" do
+      expect {
+        grant superadmin, user, Device, [READ_DEVICE], except: [device]
+      }.to change(ComputedPolicy, :count).by(1)
+
+      expect(user).to have(1).computed_policies
+      p = user.computed_policies.first
+      expect(p.resource_id).to be_nil
+
+      expect(p).to have(1).exceptions
+      expect(p.exceptions.first.resource_id).to eq(device.id)
+    end
+
   end
 
 
@@ -102,7 +114,7 @@ describe ComputedPolicy do
         grant granter, user, Device, [READ_DEVICE]
       }.to change(ComputedPolicy, :count).by(2)
 
-      expect(user.computed_policies.map(&:resource_id)).to match([device.id, device2.id])
+      expect(user.computed_policies.map(&:resource_id)).to match_array([device.id, device2.id])
     end
 
     it "should create intersection from delegable resources" do
@@ -120,7 +132,7 @@ describe ComputedPolicy do
       grant nil, granter, "cdxp:device?institution=#{device.institution.id}", [READ_DEVICE]
 
       expect {
-        grant granter, user, "cdxp:device?laboratory=#{device.laboratory.id}?", [READ_DEVICE]
+        grant granter, user, "cdxp:device?laboratory=#{device.laboratory.id}", [READ_DEVICE]
       }.to change(ComputedPolicy, :count).by(1)
 
       user.computed_policies.first.tap do |p|
@@ -136,7 +148,7 @@ describe ComputedPolicy do
         grant granter, user, [device], '*'
       }.to change(ComputedPolicy, :count).by(2)
 
-      expect(user.computed_policies.map(&:action)).to match([READ_DEVICE, UPDATE_DEVICE])
+      expect(user.computed_policies.map(&:action)).to match_array([READ_DEVICE, UPDATE_DEVICE])
     end
 
     it "should compact identical rules in policies" do
@@ -203,6 +215,42 @@ describe ComputedPolicy do
       user.computed_policies.first.tap do |p|
         expect(p.resource_id).to be_nil
         expect(p.resource_type).to eq("Device")
+      end
+    end
+
+    it "should join exceptions when granting permissions" do
+      grant nil, granter, Device, [READ_DEVICE], except: [device]
+
+      expect {
+        grant granter, user, Device, [READ_DEVICE], except: [device2]
+      }.to change(ComputedPolicy, :count).by(1)
+
+      expect(user).to have(1).computed_policies
+      expect(user.computed_policies.first).to have(2).exceptions
+      exceptions = user.computed_policies.first.exceptions
+
+      expect(exceptions.map(&:resource_id)).to match_array([device.id, device2.id])
+    end
+
+    it "should not join exceptions when not applicable" do
+      grant nil, granter, [Laboratory, Device], [READ_LABORATORY, READ_DEVICE]
+
+      expect {
+        grant granter, user, [Laboratory, Device], [READ_LABORATORY, READ_DEVICE], except: [device]
+      }.to change(ComputedPolicy, :count).by(4)
+
+      expect(user).to have(4).computed_policies
+
+      lab_policies = user.computed_policies.where(resource_type: "Laboratory")
+      expect(lab_policies.size).to eq(2)
+      expect(lab_policies.map(&:exceptions).flatten).to be_empty
+
+      device_policies = user.computed_policies.where(resource_type: "Device")
+      expect(device_policies.size).to eq(2)
+
+      device_policies.each do |p|
+        expect(p).to have(1).exceptions
+        expect(p.exceptions.first.resource_id).to eq(device.id)
       end
     end
 
