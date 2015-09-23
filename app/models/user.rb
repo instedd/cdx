@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
   attr_accessor :skip_implicit_policy
   
   def timeout_in
-    2.minutes
+    5.minutes
   end
 
   def create(model)
