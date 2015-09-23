@@ -14,9 +14,8 @@ class Policy < ActiveRecord::Base
 
   before_save :set_delegable_from_definition
 
-  after_save do
-    ComputedPolicy.update_user(user)
-  end
+  after_save    :update_computed_policies
+  after_destroy :update_computed_policies
 
   scope :delegable, -> { where(delegable: true) }
 
@@ -85,19 +84,19 @@ class Policy < ActiveRecord::Base
   end
 
   def self.can? action, resource, user, policies=nil
-    check_all(action, resource, user, (policies || user.policies), Set.new, false).present?
+    ComputedPolicy.can?(action, resource, user)
   end
 
-  def self.cannot? action, resource, user
-    !can? action, resource, user
+  def self.cannot? action, resource, user, policies=nil
+    !can? action, resource, user, policies
   end
 
   def self.can_delegate? action, resource, granter
-    self.can? action, resource, granter, granter.policies.delegable
+    ComputedPolicy.can_delegate?(action, resource, granter)
   end
 
-  def self.authorize action, resource, user, policies=nil, users_so_far = Set.new
-    check_all action, resource, user, (policies || user.policies), users_so_far, true
+  def self.authorize action, resource, user, policies=nil
+    ComputedPolicy.authorize(action, resource, user)
   end
 
   def implicit?
@@ -308,6 +307,10 @@ class Policy < ActiveRecord::Base
     end
 
     nil
+  end
+
+  def update_computed_policies
+    ComputedPolicy.update_user(user)
   end
 
   def self.predefined_policy(name, args={})

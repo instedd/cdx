@@ -22,7 +22,7 @@ describe ComputedPolicy do
       ComputedPolicy.last.tap do |p|
         expect(p.user).to eq(user)
         expect(p.action).to eq(READ_DEVICE)
-        expect(p.resource_type).to eq("Device")
+        expect(p.resource_type).to eq('cdxp:device')
         expect(p.resource_id).to eq(device.id)
         expect(p.condition_institution_id).to be_nil
         expect(p.condition_laboratory_id).to be_nil
@@ -36,7 +36,7 @@ describe ComputedPolicy do
 
       ComputedPolicy.last.tap do |p|
         expect(p.action).to eq(READ_DEVICE)
-        expect(p.resource_type).to eq("Device")
+        expect(p.resource_type).to eq('cdxp:device')
         expect(p.resource_id).to be_nil
       end
     end
@@ -50,7 +50,7 @@ describe ComputedPolicy do
        [READ_DEVICE, device2.id],
        [UPDATE_DEVICE, device.id],
        [UPDATE_DEVICE, device2.id]].each do |action, id|
-        expect(user.computed_policies.where(action: action, resource_type: "Device", resource_id: id).first).not_to be_nil
+        expect(user.computed_policies.where(action: action, resource_type: 'cdxp:device', resource_id: id).first).not_to be_nil
       end
     end
 
@@ -214,7 +214,7 @@ describe ComputedPolicy do
 
       user.computed_policies.first.tap do |p|
         expect(p.resource_id).to be_nil
-        expect(p.resource_type).to eq("Device")
+        expect(p.resource_type).to eq('cdxp:device')
       end
     end
 
@@ -241,16 +241,78 @@ describe ComputedPolicy do
 
       expect(user).to have(4).computed_policies
 
-      lab_policies = user.computed_policies.where(resource_type: "Laboratory")
+      lab_policies = user.computed_policies.where(resource_type: "cdxp:laboratory")
       expect(lab_policies.size).to eq(2)
       expect(lab_policies.map(&:exceptions).flatten).to be_empty
 
-      device_policies = user.computed_policies.where(resource_type: "Device")
+      device_policies = user.computed_policies.where(resource_type: 'cdxp:device')
       expect(device_policies.size).to eq(2)
 
       device_policies.each do |p|
         expect(p).to have(1).exceptions
         expect(p.exceptions.first.resource_id).to eq(device.id)
+      end
+    end
+
+  end
+
+  context "recursively" do
+
+    let!(:granter)  { User.make }
+    let!(:granter2) { User.make }
+    let!(:granter3) { User.make }
+
+    it "should recompute policies" do
+      i1 = granter.institutions.make
+      i2 = granter2.institutions.make
+
+      expect {
+        grant granter2, user, Device, [READ_DEVICE]
+      }.to change(user.computed_policies, :count).by(1)
+
+      expect(user.computed_policies.first.condition_institution_id).to eq(i2.id)
+      expect(user.computed_policies.first.resource_id).to be_nil
+
+      expect {
+        grant granter, granter2, Device, [READ_DEVICE]
+      }.to change(user.computed_policies, :count).by(1)
+
+      expect(user.computed_policies.map(&:condition_institution_id)).to match_array([i1.id, i2.id])
+    end
+
+    it "should recompute policies when a policy is removed" do
+      i1 = granter.institutions.make
+      i2 = granter2.institutions.make
+
+      policies = []
+
+      expect {
+        policies << grant(granter, granter2, Device, [READ_DEVICE])
+        policies << grant(granter2, user, Device, [READ_DEVICE])
+      }.to change(user.computed_policies, :count).by(2)
+
+      expect(granter.computed_policies.on("cdxp:device").map(&:condition_institution_id)).to  match_array([i1.id])
+      expect(granter2.computed_policies.on("cdxp:device").map(&:condition_institution_id)).to match_array([i1.id, i2.id])
+      expect(user.computed_policies.on("cdxp:device").map(&:condition_institution_id)).to     match_array([i1.id, i2.id])
+
+      expect {
+        policies.first.reload.destroy!
+      }.to change(user.computed_policies, :count).by(-1)
+
+      expect(user.computed_policies.map(&:condition_institution_id)).to match_array([i2.id])
+    end
+
+    it "should support a loop of policies" do
+      i1 = granter.institutions.make
+      i2 = granter2.institutions.make
+      i3 = granter3.institutions.make
+
+      grant(granter, granter2, Device, [READ_DEVICE])
+      grant(granter2, granter3, Device, [READ_DEVICE])
+      grant(granter3, granter, Device, [READ_DEVICE])
+
+      [granter, granter2, granter3].each do |g|
+        expect(g.reload.computed_policies.on("cdxp:device").map(&:condition_institution_id)).to match_array([i1.id, i2.id, i3.id])
       end
     end
 

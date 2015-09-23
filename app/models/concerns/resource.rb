@@ -9,6 +9,12 @@ module Resource
     [Institution, Laboratory, Device, Location]
   end
 
+  def self.resolve(resource_string)
+    return all if resource_string == "*"
+    resource_class = all.find{|r| resource_string =~ r.resource_matcher} or raise "Resource not found"
+    [resource_class, $1, $2]
+  end
+
   def self.find(resource_string)
     if resource_string == "*"
       return all
@@ -85,12 +91,28 @@ module Resource
       /#{resource_name_prefix}(?:\/(.*))?(?:\?(.*))?/
     end
 
+    def self.resource_type
+      resource_name
+    end
+
+    def self.resource_class
+      self
+    end
+
     def self.resource_name
       resource_name_prefix
     end
 
+    def resource_type
+      self.class.resource_type
+    end
+
     def resource_name
       "#{self.class.resource_name_prefix}/#{id}"
+    end
+
+    def resource_class
+      self.class.resource_class
     end
   end
 end

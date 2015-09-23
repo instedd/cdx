@@ -18,6 +18,7 @@ def assert_cannot(user, resource, action)
 end
 
 def grant(granter, user, resource, action, opts = {})
+  [granter, user].compact.each(&:reload)
   policy = Policy.make_unsaved
   policy.definition = policy_definition(resource, action, opts.fetch(:delegable, true), opts.fetch(:except, []))
   policy.granter_id = granter.try(:id)
