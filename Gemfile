@@ -100,4 +100,7 @@ group :test do
   gem 'timecop'
   gem 'shoulda'
   gem 'hashdiff'
+  gem 'cucumber-rails', :require => false
+  gem 'database_cleaner'
+  gem 'site_prism'
 end
