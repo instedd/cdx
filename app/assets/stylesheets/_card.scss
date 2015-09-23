@@ -1,37 +1,39 @@
 .card {
-  width: 600px;
+  @include flexbox();
   height: 180px;
-  position: relative;
   border: 1px solid $gray2;
 
   border-radius: 3px;
   box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
 
+  > div {
+    @include flexbox();
+  }
+
   .card-image {
-    position: absolute;
-    left: 0;
-    width: 180px;
-    height: 180px;
     background-color: $gray3;
+    @include flex(0 0 180px);
 
     img {
       background-size:cover;
     }
   }
-
-  .card-detail-top,
-  .card-detail-bottom {
-    position: absolute;
-    left: 200px;
-    right: 60px;
+  .card-details {
+    @include flex-direction(column);
+    @include flex(1);
   }
 
   .card-detail-top {
-    top: 20px;
+    @include flex(1);
+    padding: 15px 0 10px 15px;
+    width: 100%;
   }
 
   .card-detail-bottom {
-    bottom: 20px;
+    @include flex(1);
+    padding: 0 0 10px 15px;
+    max-height: 80px;
+    overflow: hidden;
   }
 
 }

@@ -1,10 +1,9 @@
-%h2
-  = link_to '←', institutions_path unless @first_institution_creation
-  = @institution.name
+%h1
+  = link_to '←', institutions_path, title: 'Back' unless @first_institution_creation
 
 .row
   .col
-    %label Get access through API token.
+    %label.block Get access through API token.
     %p= link_to 'Request API token', request_api_token_institution_path(@institution)
 = render 'form'
 

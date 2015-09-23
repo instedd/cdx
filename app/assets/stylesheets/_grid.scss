@@ -2,9 +2,7 @@
   FLEXBOX GRID
 ============================================================================= */
 
-.grid {
-  // border: solid 1px;
-}
+.grid {}
 
 .row {
   @include flexbox();
@@ -17,7 +15,6 @@
   @include flex(1);
   padding: $col-padd;
   position: relative;
-  // border: solid 1px;
 
   /* forced '%' distribution */
   &.pe-2 {
