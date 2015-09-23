@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   # :timeoutable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable,
-         :validatable, :confirmable, :omniauthable,
+         :validatable, :confirmable, :omniauthable, :timeoutable,
          :lockable
 
   has_many :identities
@@ -18,6 +18,10 @@ class User < ActiveRecord::Base
 
   after_create :grant_implicit_policy
   attr_accessor :skip_implicit_policy
+  
+  def timeout_in
+    2.minutes
+  end
 
   def create(model)
     if model.respond_to?(:user=)
