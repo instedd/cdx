@@ -27,5 +27,6 @@ module Cdp
       g.test_framework :rspec
       g.assets = false
     end
+    config.autoload_paths << Rails.root.join("features", "support", "page_objects")
   end
 end
