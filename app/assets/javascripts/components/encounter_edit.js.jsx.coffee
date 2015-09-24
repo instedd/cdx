@@ -52,36 +52,58 @@
       </div>
     </div>`
 
-@SimpleItem = React.createClass
-  render: ->
-    return `<li>{this.props.data}</li>`
-
-
 @Sample = React.createClass
   render: ->
     # TODO add barcode
     # TODO add printer
-    `<li key={this.props.sample.id}>
+    `<li>
      {this.props.sample.entity_id} ({this.props.sample.institution})
     </li>`
 
+@TestResult = React.createClass
+  render: ->
+    test = this.props.test_result
+    `<li>
+     {test.name} ({test.device.name})
+    </li>`
+
 @AddItemSearch = React.createClass
+  getInitialState: ->
+    items: []
+
   chooseItem: (item) ->
     @props.onItemChosen(item)
 
+  # debounce: http://stackoverflow.com/a/24679479/30948
+  componentWillMount: ->
+    @handleSearchDebounced = _.debounce ->
+      @handleSearch.apply(@, [@state.query]);
+    , 500
+
+  onChange: (event) ->
+    @setState React.addons.update(@state, {
+      query: { $set: event.target.value }
+    })
+    @handleSearchDebounced()
+
+  handleSearch: (query) ->
+    $.ajax
+      url: @props.callback,
+      data:
+        q: query
+      success: (data) =>
+        @setState React.addons.update(@state, {
+          items: { $set: data }
+        })
+
   render: ->
-    items = [
-      {id: 43, entity_id: 'SDFSSD-7343', institution: 'ACME FOO Lab'},
-      {id: 44, entity_id: 'SDFSSD-7344', institution: 'ACME FOO Lab'},
-      {id: 45, entity_id: 'SDFSSD-7345', institution: 'Umbrella'}
-    ]
     templateFactory = React.createFactory(@props.itemTemplate)
     itemKey = @props.itemKey
 
     `<div className="item-search">
-      <input type="text"></input>
+      <input type="text" placeholder="Search" onChange={this.onChange}></input>
       <ul>
-        {items.map(function(item) {
+        {this.state.items.map(function(item) {
           return <li key={item[itemKey]} onClick={this.chooseItem.bind(this, item)}>{templateFactory({item: item})}</li>;
         }.bind(this))}
       </ul>
@@ -108,6 +130,15 @@
       }}
     })
     @refs.samplesModal.hide()
+    $.ajax
+      url: "/encounters/#{@state.encounter.id}/samples/#{sample.id}",
+      method: 'PUT'
+      success: (data) =>
+        if data.status == 'ok'
+          @setState React.addons.update(@state, {
+            encounter: { $set: data.encounter }
+          })
+        # TODO handle errors
 
   # <button onClick={this.closeSamplesModal}>Close</button>
   closeSamplesModal: (event) ->
@@ -136,9 +167,22 @@
           <a href="#" onClick={this.closeSamplesModal}>←</a>
           <h1>Add sample</h1>
 
-          <AddItemSearch callback="/foo" onItemChosen={this.appendSample}
+          <AddItemSearch callback="/encounters/search_sample" onItemChosen={this.appendSample}
             itemTemplate={AddItemSearchSampleTemplate}
             itemKey="id" />
         </Modal>
+      </div>
+
+      <div className="row">
+        <div className="col-p1">
+          <label>Test results</label>
+        </div>
+        <div className="col">
+          <ul>
+            {this.state.encounter.test_results.map(function(test_result) {
+               return <TestResult key={test_result.id} test_result={test_result}/>;
+            })}
+          </ul>
+        </div>
       </div>
     </div>`

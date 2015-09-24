@@ -3,7 +3,7 @@ class Encounter < ActiveRecord::Base
   include AutoUUID
   include AutoIdHash
 
-  has_many :samples
+  has_many :samples, before_add: :add_test_results
   has_many :test_results
 
   belongs_to :institution
@@ -19,13 +19,9 @@ class Encounter < ActiveRecord::Base
     "encounter"
   end
 
-  def as_json_edit
-    Jbuilder.new do |json|
-      json.(self, :id)
-      json.samples samples do |json, sample|
-        json.(sample, :id, :entity_id)
-        json.institution sample.institution.name
-      end
-    end.attributes!
+  private
+
+  def add_test_results(sample)
+    self.test_results << sample.test_results
   end
 end

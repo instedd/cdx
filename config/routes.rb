@@ -15,7 +15,14 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :encounters, only: [:new, :create, :edit]
+  resources :encounters, only: [:new, :create, :edit] do
+    member do
+      put 'samples/:sample_id' => 'encounters#add_sample'
+    end
+    collection do
+      get :search_sample
+    end
+  end
   resources :locations, only: [:index, :show]
   resources :devices do
     member do

@@ -4,20 +4,4 @@
       = link_to "←", :back, class: 'side-link', title: 'Back'
       Encounter
 
-= react_component('EncounterEdit', encounter: @encounter.as_json_edit)
-
-- unless @encounter.patient
-  .row
-    .col
-      .card
-        .card-image
-          = image_tag "card-unkown.png"
-        .card-detail-top
-          %span No patient information
-
-.row
-  .col
-    %a.side-link.btn-add(href='#') +
-
-    %h2
-      Test results
+= react_component('EncounterEdit', encounter: @encounter_as_json_edit)
