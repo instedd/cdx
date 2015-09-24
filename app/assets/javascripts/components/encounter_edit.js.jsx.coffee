@@ -77,14 +77,13 @@
     ]
     templateFactory = React.createFactory(@props.itemTemplate)
     itemKey = @props.itemKey
-    _this = @
 
     `<div className="item-search">
       <input type="text"></input>
       <ul>
         {items.map(function(item) {
-          return <li key={item[itemKey]} onClick={_this.chooseItem.bind(_this, item)}>{templateFactory({item: item})}</li>;
-        })}
+          return <li key={item[itemKey]} onClick={this.chooseItem.bind(this, item)}>{templateFactory({item: item})}</li>;
+        }.bind(this))}
       </ul>
      </div>`
 
