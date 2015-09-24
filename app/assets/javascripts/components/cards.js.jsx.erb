@@ -1,0 +1,14 @@
+var NoPatientCard = React.createClass({
+  render: function () {
+    return (
+      <div className="card">
+        <div className="card-image">
+          <img src="<%= asset_url('card-unkown.png') %>" />
+        </div>
+        <div className="card-detail-top">
+          <span>No patient information</span>
+        </div>
+      </div>
+    );
+  }
+});
