@@ -16,32 +16,53 @@ class ComputedPolicy < ActiveRecord::Base
   end
 
   def self.can?(action, resource, user)
-    query(action, resource, user).any?
+    applicable_policies(action, resource, user).any?
   end
 
   def self.can_delegate?(action, resource, user)
-    query(action, resource, user).where(delegable: true).any?
+    applicable_policies(action, resource, user).where(delegable: true).any?
+  end
+
+  def self.can_delegate_resource?(action, resource, user)
+    applicable_policies(action, resource, user).where(delegable: true).any?
   end
 
   def self.authorize(action, resource, user)
-    applicable_policies = query(action, resource, user)
-    return resource.none if applicable_policies.empty?
+    policies = applicable_policies(action, resource, user)
+    return resource.none if policies.empty?
 
-    filter = applicable_policies.map(&:arel_filter).inject { |filters, filter| filters.or(filter) }
+    filter = policies.map(&:arel_filter).inject { |filters, filter| filters.or(filter) }
     resource.filter(filter)
   end
 
-  def self.query(action, resource, user)
+  def self.applicable_policies(action, resource_or_string, user)
+    resource_attributes = resource_attributes_for(resource_or_string)
+
     query = self.where(user_id: user.id)
-      .where("action = ? OR action IS NULL", action)
-      .where("resource_type = ? OR resource_type IS NULL", resource.resource_type)
+      .where("resource_type = ? OR resource_type IS NULL", resource_attributes[:resource_type])
 
-    query = query.where("resource_id = ? OR resource_id IS NULL", resource.id) if resource.respond_to?(:id)
+    query = query.where("action = ? OR action IS NULL", action) if action && action != '*'
+    query = query.where("resource_id = ? OR resource_id IS NULL", resource_attributes[:id]) if resource_attributes[:id]
 
-    query = query.where("condition_laboratory_id = ?  OR condition_laboratory_id IS NULL",  resource.laboratory_id)  if resource.respond_to?(:laboratory_id)
-    query = query.where("condition_institution_id = ? OR condition_institution_id IS NULL", resource.institution_id) if resource.respond_to?(:institution_id)
+    query = query.where("condition_laboratory_id = ?  OR condition_laboratory_id IS NULL",  resource_attributes[:laboratory_id])  if resource_attributes[:laboratory_id]
+    query = query.where("condition_institution_id = ? OR condition_institution_id IS NULL", resource_attributes[:institution_id])  if resource_attributes[:institution_id]
 
     return query
+  end
+
+  def self.resource_attributes_for(resource_or_string)
+    if resource_or_string == "*"
+      Hash.new
+    elsif resource_or_string.kind_of?(String)
+      resource_klass, match, query = Resource.resolve(resource_or_string)
+      (query || {}).merge(resource_type: resource_klass.resource_type, id: match)
+    else
+      resource = resource_or_string
+      { resource_type: resource.resource_type,
+        id: (resource.id if resource.respond_to?(:id)),
+        laboratory_id: (resource.laboratory_id if resource.respond_to?(:laboratory_id)),
+        institution_id: (resource.institution_id if resource.respond_to?(:institution_id)) }
+    end
   end
 
   def resource_class
@@ -168,7 +189,7 @@ class ComputedPolicy < ActiveRecord::Base
 
       [resource_klass.resource_type,
        match == "*" ? nil : match,
-       Rack::Utils.parse_nested_query(query) || Hash.new]
+       query]
     end
 
     def intersect(granted, granter)

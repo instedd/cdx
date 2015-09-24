@@ -65,14 +65,6 @@ class Policy < ActiveRecord::Base
     Actions::REPORT_MESSAGE,
   ]
 
-  def self.resources
-    @resources ||= [
-      Device,
-      Laboratory,
-      Institution
-    ]
-  end
-
   def self.superadmin
     predefined_policy "superadmin"
   end
@@ -109,84 +101,7 @@ class Policy < ActiveRecord::Base
     self.user_id == self.granter_id
   end
 
-  def check action, resource, user, check_conditions=false, users_so_far=Set.new
-    allowed = []
-    denied = []
-    definition["statement"].each do |statement|
-      match = check_statement(statement, action, resource, user, users_so_far, check_conditions)
-      if match
-        if statement["effect"] == "allow"
-          allowed << match
-        else
-          denied << match
-        end
-      end
-    end
-    return allowed, denied
-  end
-
-  def self.check_all action, resource, user, policies, users_so_far, check_conditions
-    allowed = []
-    denied = []
-
-    policies.each do |policy|
-      match_allowed, match_denied = policy.check(action, resource, user, check_conditions, users_so_far)
-      allowed += match_allowed
-      denied += match_denied
-    end
-
-    classes = denied.select { |klass| klass.is_a?(Class) }
-    allowed -= classes
-    denied -= classes
-
-    load_results allowed, denied, !check_conditions
-  end
-
   private
-
-  def check_statement statement, action, resource, user, users_so_far, check_conditions
-    return nil unless action_matches?(action, statement["action"])
-
-    resource = apply_resource_filters(resource, statement["resource"])
-    return nil unless resource
-
-    # Check that the granter's policies allow the action on the resource,
-    # but only if the policy is not implicit (or superadmin)
-    if !implicit? && !users_so_far.include?(granter)
-      users_so_far.add granter
-      granter_result = Policy.check_all action, resource, granter, granter.policies.delegable, users_so_far, check_conditions
-      users_so_far.delete granter
-
-      return nil unless granter_result
-
-      resource = granter_result
-    end
-
-    resource
-  end
-
-  def self.load_results allowed, denied, keep_classes_if_empty=false
-    [allowed, denied].each do |resources|
-      resources.map! do |resource|
-        if resource.is_a?(Class)
-          all = resource.all
-          if keep_classes_if_empty && all.empty?
-            resource
-          else
-            all
-          end
-        else
-          resource
-        end
-      end
-      resources.flatten!
-      resources.uniq!
-    end
-
-    result = allowed - denied
-    result.delete nil
-    result
-  end
 
   def validate_owner_permissions
     return errors.add :owner, "permission can't be self granted" if self_granted?
@@ -195,14 +110,8 @@ class Policy < ActiveRecord::Base
     resources = definition["statement"].each do |statement|
       Array(statement["action"]).each do |action|
         Array(statement["resource"]).each do |resource_matcher|
-          match = Resource.find(resource_matcher)
-          if match
-            resources = Array(match)
-            resources.each do |resource|
-              unless (action == '*' ? ACTIONS : [action]).any?{ |action| self.class.can_delegate?(action, resource, granter) }
-                return errors.add :owner, "can't delegate permission over #{resource_matcher}"
-              end
-            end
+          unless self.class.can_delegate?(action, resource_matcher, granter)
+            return errors.add :owner, "can't delegate permission over #{resource_matcher}"
           end
         end
       end
@@ -266,9 +175,7 @@ class Policy < ActiveRecord::Base
 
   def validate_resource_statements(resource_statements)
     Array(resource_statements).each do |resource_statement|
-      found_resource = Resource.all.any? do |resource|
-        resource.filter_by_resource(resource_statement)
-      end
+      found_resource = Resource.resolve(resource_statement) rescue false
       unless found_resource
         return errors.add :definition, "has an unknown resource: `#{resource_statement}`"
       end
@@ -279,36 +186,6 @@ class Policy < ActiveRecord::Base
   def set_delegable_from_definition
     self.delegable = definition["delegable"]
     true
-  end
-
-  def action_matches? action, action_filters
-    action_filters = Array(action_filters)
-    action_filters.any? do |action_filter|
-      action_filter == "*" || action_filter == action
-    end
-  end
-
-  def apply_resource_filters resource, resource_filters
-    return unless resource
-    resource_filters = Array(resource_filters)
-    resource_filters.each do |resource_filter|
-      if resource_filter == "*"
-        return resource
-      end
-
-      new_resource = if resource.is_a?(ActiveRecord::Relation) || resource.is_a?(Array)
-        resource.to_a.map do |resource|
-          resource.filter_by_resource(resource_filter)
-        end.delete_if &:nil?
-      else
-        resource.filter_by_resource(resource_filter)
-      end
-      if new_resource.present?
-        return new_resource
-      end
-    end
-
-    nil
   end
 
   def update_computed_policies
