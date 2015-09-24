@@ -42,7 +42,7 @@ describe Manifest do
           "api_version" : "1.0.0"
         }
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:parse_error]).not_to eq(nil)
@@ -53,7 +53,7 @@ describe Manifest do
         "metadata" : {
         }
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:metadata].first).to eq("can't be blank")
@@ -62,12 +62,11 @@ describe Manifest do
     it "shouldn't pass validations if metadata doesn't include version" do
       definition = %{{
         "metadata" : {
-          "api_version" : "1.1.0",
-          "device_models" : ["GX4001"]
+          "api_version" : "1.1.0"
         },
         "field_mapping" : []
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:metadata].first).to eq("must include version field")
@@ -76,22 +75,20 @@ describe Manifest do
     it "shouldn't pass validations if metadata doesn't include api_version" do
       definition = %{{
         "metadata" : {
-          "version" : "1.0.0",
-          "device_models" : ["GX4001"]
+          "version" : "1.0.0"
         },
         "field_mapping" : []
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:metadata].first).to eq("must include api_version field")
     end
 
     it "checks the version number against the current api version" do
-      expect {Manifest.create!(definition: %{{
+      expect {Manifest.make(definition: %{{
         "metadata" : {
-          "device_models" : ["foo"],
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "api_version" : "1.1.1",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -100,29 +97,14 @@ describe Manifest do
       }})}.to raise_error("Validation failed: Api version must be #{Manifest::CURRENT_VERSION}")
     end
 
-    it "shouldn't pass validations if metadata doesn't include device_models" do
-      definition = %{{
-        "metadata" : {
-          "version" : "1.0.0",
-          "api_version" : "1.0.0"
-        },
-        "field_mapping" : []
-      }}
-      m = Manifest.new(definition: definition)
-      m.save
-      expect(Manifest.count).to eq(0)
-      expect(m.errors[:metadata].first).to eq("must include device_models field")
-    end
-
     it "shouldn't pass validations if field_mapping is not an array" do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.1.0",
-          "device_models" : ["GX4001"]
+          "api_version" : "1.1.0"
         }
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:field_mapping].first).to eq("must be a json object")
@@ -130,12 +112,11 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "1.1.0",
-          "device_models" : ["GX4001"]
+          "api_version" : "1.1.0"
         },
         "field_mapping" : []
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:field_mapping].first).to eq("must be a json object")
@@ -145,13 +126,12 @@ describe Manifest do
       definition = %{{
         "metadata" : {
           "version" : "1.0.0",
-          "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["GX4001"]
+          "api_version" : "#{Manifest::CURRENT_VERSION}"
         },
         "custom_fields": [],
         "field_mapping" : {}
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:custom_fields].first).to eq("must be a json object")
@@ -162,7 +142,6 @@ describe Manifest do
         "metadata" : {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
         "custom_fields": {
@@ -174,7 +153,7 @@ describe Manifest do
           "test.custom": {"lookup" : "test.custom"}
         }
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:invalid_type].first).to eq(": target 'test.custom'. Field can't specify a type.")
@@ -185,8 +164,7 @@ describe Manifest do
         "metadata" : {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["GX4001"],
-          "conditions" : ["MTB"],
+          "conditions" : ["mtb"],
           "source" : {"type" : "json"}
         },
         "custom_fields": {
@@ -201,7 +179,7 @@ describe Manifest do
           "patient.rbc_count": {"lookup": "patient.rbc_count"}
         }
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(1)
     end
@@ -211,14 +189,13 @@ describe Manifest do
         "metadata" : {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["GX4001"],
           "source" : {"type" : "json"}
         },
         "field_mapping" : {
           "custom": {"lookup" : "custom"}
         }
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:metadata].first).to eq("must include conditions field")
@@ -229,7 +206,6 @@ describe Manifest do
         "metadata" : {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["GX4001"],
           "conditions": 1,
           "source" : {"type" : "json"}
         },
@@ -237,7 +213,7 @@ describe Manifest do
           "custom": {"lookup" : "custom"}
         }
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:conditions].first).to eq("must be a json array")
@@ -248,7 +224,6 @@ describe Manifest do
         "metadata" : {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["GX4001"],
           "conditions": [],
           "source" : {"type" : "json"}
         },
@@ -256,7 +231,7 @@ describe Manifest do
           "custom": {"lookup" : "custom"}
         }
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:conditions].first).to eq("must be a non-empty json array")
@@ -267,7 +242,6 @@ describe Manifest do
         "metadata" : {
           "version" : "1.0.0",
           "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["GX4001"],
           "conditions": ["foo", 1],
           "source" : {"type" : "json"}
         },
@@ -275,7 +249,7 @@ describe Manifest do
           "custom": {"lookup" : "custom"}
         }
       }}
-      m = Manifest.new(definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:conditions].first).to eq("must be a json string array")

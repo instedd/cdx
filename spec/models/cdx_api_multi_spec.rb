@@ -1,8 +1,6 @@
 require 'spec_helper'
 
-describe "Cdx::Api Multi" do
-
-  include_context "elasticsearch index"
+describe "Cdx::Api Multi", elasticsearch: true do
   include_context "cdx api helpers"
 
   def multi_query(queries)

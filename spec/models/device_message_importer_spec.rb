@@ -6,7 +6,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
-  let(:device_model) { DeviceModel.make name: 'test_model', manifests: []}
+  let(:device_model) { DeviceModel.make name: 'test_model'}
   let(:device) {Device.make institution_id: institution.id, device_model: device_model}
   let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
 
@@ -21,13 +21,12 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
   end
 
-  let(:manifest) do Manifest.create! definition: %{
+  let(:manifest) do Manifest.create! device_model: device.device_model, definition: %{
     {
       "metadata": {
         "version": "1",
         "api_version": "#{Manifest::CURRENT_VERSION}",
-        "device_models": "#{device.device_model.name}",
-        "conditions": ["MTB"],
+        "conditions": ["mtb"],
         "source" : { "type" : "#{source}"}
       },
       "field_mapping" : {
@@ -158,12 +157,12 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     def load_manifest(name)
-      Manifest.create! definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', name))
+      Manifest.create! device_model: device_model, definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', name))
     end
 
     context 'epicenter headless_es' do
-      let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es', manifests: []}
-      let!(:manifest)    { load_manifest 'epicenter_headless_es_manifest.json' }
+      let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es' }
+      let!(:manifest)    { load_manifest 'epicenter_m.g.i.t._spanish_manifest.json' }
 
       it "parses csv in utf-16le" do
         copy_sample_csv 'epicenter_headless_sample_utf16.csv'
@@ -177,8 +176,8 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'cepheid' do
-      let!(:device_model) { DeviceModel.make name: "GX Model I", manifests: []}
-      let!(:manifest)    { load_manifest 'cepheid_demo_manifest.json' }
+      let!(:device_model) { DeviceModel.make name: "GX Model I" }
+      let!(:manifest)    { load_manifest 'cepheid_gene_xpert_manifest.json' }
 
       it "should parse cepheid's document" do
         copy_sample('cepheid_sample.json', 'jsons')
@@ -192,7 +191,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'genoscan' do
-      let(:device_model) { DeviceModel.make name: 'genoscan', manifests: []}
+      let(:device_model) { DeviceModel.make name: 'genoscan' }
       let!(:manifest) { load_manifest 'genoscan_manifest.json' }
 
       it 'parses csv' do
@@ -236,7 +235,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'fio' do
-      let(:device_model) { DeviceModel.make name: 'FIO', manifests: []}
+      let(:device_model) { DeviceModel.make name: 'FIO' }
       let!(:manifest) { load_manifest 'fio_manifest.json' }
 
       it 'parses xml' do

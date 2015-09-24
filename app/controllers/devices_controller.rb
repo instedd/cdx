@@ -3,6 +3,7 @@ class DevicesController < ApplicationController
   require 'barby/barcode/code_93'
   require 'barby/outputter/html_outputter'
 
+  before_filter :load_institutions, only: [:new, :create, :edit]
   before_filter :load_laboratories, only: [:index, :new, :create, :edit, :update]
   before_filter :load_institution, only: :create
 
@@ -30,9 +31,8 @@ class DevicesController < ApplicationController
   end
 
   def new
-    return unless authorize_resource(Institution, REGISTER_INSTITUTION_DEVICE)
     @device = Device.new
-    @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
+    return unless prepare_for_institution_and_authorize(@device, REGISTER_INSTITUTION_DEVICE)
   end
 
   def create
@@ -143,6 +143,10 @@ class DevicesController < ApplicationController
   def load_institution
     @institution = Institution.find params[:device][:institution_id]
     authorize_resource(@institution, READ_INSTITUTION)
+  end
+
+  def load_institutions
+    @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end
 
   def load_laboratories

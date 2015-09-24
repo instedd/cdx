@@ -7,8 +7,7 @@ describe Manifest do
     let (:definition) do
       %{{
         "metadata" : {
-          "device_models" : ["foo"],
-          "conditions": ["MTB", "RIFF"],
+          "conditions": ["mtb", "riff"],
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -17,20 +16,10 @@ describe Manifest do
       }}
     end
 
-    it "creates a device model named according to the manifest" do
-      Manifest.create!(definition: definition)
-
-      expect(Manifest.count).to eq(1)
-      expect(Manifest.first.definition).to eq(definition)
-      expect(DeviceModel.count).to eq(1)
-      expect(Manifest.first.device_models.first.name).to eq("foo")
-    end
-
     it "updates its version number" do
       updated_definition = %{{
         "metadata" : {
-          "device_models" : ["foo"],
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "api_version" : "#{Manifest::CURRENT_VERSION}",
           "version" : "2.0.1",
           "source" : {"type" : "json"}
@@ -38,7 +27,7 @@ describe Manifest do
         "field_mapping" : {}
       }}
 
-      Manifest.create!(definition: definition)
+      Manifest.make(definition: definition)
 
       manifest = Manifest.first
 
@@ -54,7 +43,6 @@ describe Manifest do
     it "updates its api_version number" do
       updated_definition = %{{
         "metadata" : {
-          "device_models" : ["foo"],
           "api_version" : "9.9.9",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -62,7 +50,7 @@ describe Manifest do
         "field_mapping" : {}
       }}
 
-      Manifest.new(definition: definition).save(:validate => false)
+      Manifest.new(device_model: DeviceModel.make, definition: definition).save(:validate => false)
 
       manifest = Manifest.first
 
@@ -78,7 +66,6 @@ describe Manifest do
     it "returns all the valid manifests" do
       Manifest.new(definition: %{{
         "metadata" : {
-          "device_models" : ["foo"],
           "api_version" : "0.1.1",
           "version" : 1,
           "source" : {"type" : "json"}
@@ -86,25 +73,13 @@ describe Manifest do
         "field_mapping" : {}
       }}).save(:validate => false)
 
-      manifest = Manifest.create!(definition: definition)
+      manifest = Manifest.make
 
       expect(Manifest.valid).to eq([manifest])
     end
 
-    it "reuses an existing device model if it already exists" do
-      Manifest.create definition: definition
-      Manifest.first.destroy
-
-      model = DeviceModel.first
-
-      Manifest.create definition: definition
-
-      expect(DeviceModel.count).to eq(1)
-      expect(DeviceModel.first.id).to eq(model.id)
-    end
-
     it "leaves device models after being deleted" do
-      Manifest.create definition: definition
+      Manifest.make definition: definition
 
       Manifest.first.destroy
 
@@ -112,66 +87,42 @@ describe Manifest do
       expect(DeviceModel.count).to eq(1)
     end
 
-    it "leaves no orphan model" do
-      Manifest.create!(definition: definition)
+    it "ensures one manifest per device model" do
+      Manifest.create!(device_model: DeviceModel.make(name: 'bar'), definition: definition)
 
       expect(Manifest.count).to eq(1)
       expect(DeviceModel.count).to eq(1)
-      Manifest.first.destroy()
-      expect(Manifest.count).to eq(0)
 
-      Manifest.create!(definition: definition)
+      Manifest.create(device_model: DeviceModel.first, definition: definition)
 
-      definition_bar = %{{
-        "metadata" : {
-          "version" : 1,
-          "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["bar"],
-          "conditions": ["MTB"],
-          "source" : {"type" : "json"}
-        },
-        "field_mapping" : {}
-      }}
-
-      Manifest.create!(definition: definition_bar)
-
-      expect(Manifest.count).to eq(2)
-      expect(DeviceModel.count).to eq(2)
-      Manifest.first.destroy()
       expect(Manifest.count).to eq(1)
-      expect(DeviceModel.count).to eq(2)
-
-      definition_version = %{{
-        "metadata" : {
-          "version" : 2,
-          "api_version" : "#{Manifest::CURRENT_VERSION}",
-          "device_models" : ["foo"],
-          "conditions": ["MTB"],
-          "source" : {"type" : "json"}
-        },
-        "field_mapping" : {}
-      }}
-
-      manifest = Manifest.first
-
-      expect(manifest.version).to eq("1")
-      manifest.definition = definition_version
-      manifest.save!
-
-      expect(DeviceModel.count).to eq(2)
-
-      expect(Manifest.first.device_models.first).to eq(DeviceModel.first)
-      expect(DeviceModel.first.name).to eq("foo")
+      expect(DeviceModel.count).to eq(1)
     end
 
     it "creates conditions from manifest" do
-      Manifest.create!(definition: definition)
+      Manifest.make(definition: definition)
 
       conditions = Condition.all
       expect(conditions.count).to eq(2)
-      expect(conditions.map(&:name).sort).to eq(["MTB", "RIFF"])
+      expect(conditions.map(&:name).sort).to eq(["mtb", "riff"])
 
       expect(Manifest.first.conditions.count).to eq(2)
+    end
+
+    it "errors if condition is not in snake case" do
+      definition = %{{
+        "metadata" : {
+          "conditions": ["MTB"],
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
+          "version" : 1,
+          "source" : {"type" : "json"}
+        },
+        "field_mapping" : {}
+      }}
+
+      manifest = Manifest.create(device_model: DeviceModel.make, definition: definition)
+      expect(manifest).not_to be_valid
+      expect(manifest.errors[:conditions]).to eq(["must be in snake case: MTB"])
     end
   end
 end

@@ -1,6 +1,6 @@
-%h2
+%h1
   = unless current_user.institutions.count == 0
-    = link_to '←', institutions_path
+    = link_to '←', institutions_path, title: 'Back'
   New Institution
 
 = render 'form'

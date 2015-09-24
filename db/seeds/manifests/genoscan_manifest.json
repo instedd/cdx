@@ -1,9 +1,8 @@
 {
   "metadata" : {
     "version" : "0.0.9",
-    "api_version" : "1.3.0",
+    "api_version" : "1.4.0",
     "signature" : "",
-    "device_models" : ["genoscan"],
     "conditions": ["mtb", "rif", "inh"],
     "source": { "type" : "csv", "separator" : ";" }
   },

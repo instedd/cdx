@@ -7,14 +7,12 @@
             %li= msg
   - unless @readonly
     .row
-      .col.pe-2
-      = f.label :name, :class => 'control-label'
-      = f.text_field :name, readonly: @readonly
-
+      .col
+        = f.label :name, :class => 'block'
+        = f.text_field :name, readonly: @readonly, :class => 'input-x-large'
+    %br
     .row
-      .col.pe-1
+      .col
         = f.submit 'Save', class: 'btn-primary'
-      .col.pe-10
-      .col.pe-1
         - if @can_delete
-          = link_to "Delete", @institution, method: :delete, data: { confirm: "Are you sure you want to delete the institution '#{@institution.name}'" }, class: 'btn-secondary', title: 'Delete Institution'
+          = link_to "Delete", @institution, method: :delete, data: { confirm: "Are you sure you want to delete the institution '#{@institution.name}'" }, class: 'btn-secondary pull-right', title: 'Delete Institution'

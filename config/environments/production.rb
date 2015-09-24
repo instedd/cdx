@@ -87,6 +87,8 @@ Rails.application.configure do
 
   config.action_mailer.default_url_options = { host: Settings.host }
 
+  config.active_job.queue_adapter = :sidekiq
+
   config.authorized_keys_path = ENV["SSH_KEYS_PATH"]
   config.sync_dir_path = ENV["SSH_SYNC_DIR"]
   config.ssh_server_host = ENV["SSH_SERVER_HOST"] || 'cdp-stg.instedd.org'

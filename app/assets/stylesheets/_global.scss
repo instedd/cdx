@@ -16,7 +16,9 @@ h1 {
 a {
   color: $blue;
 }
-
+.block {
+  display: block;
+}
 .centered {
   text-align: center;
 }
@@ -34,10 +36,19 @@ a {
 .text-left {
   text-align: left;
 }
-
+.align-top {
+  @include align-self(flex-start);
+}
+.align-bottom {
+  @include align-self(flex-end);
+}
 .playground-error {
   color: $red;
   min-height: 30px;
+}
+
+.wrap-text {
+  word-wrap: break-word;
 }
 
 .underline {
@@ -49,5 +60,19 @@ a {
 }
 
 .side-link {
+  float: left;
   margin-left: -43px;
+
+  &.btn-add {
+    margin-top: 30px;
+    margin-left: -73px;
+  }
+}
+
+a[title="Back"] {
+  margin-left: -42px;
+}
+
+.button-actions {
+  margin-top: 30px;
 }

@@ -19,16 +19,15 @@ class LaboratoriesController < ApplicationController
   end
 
   def new
-    return unless @institutions = authorize_resource(@institutions, CREATE_INSTITUTION_LABORATORY)
+    @main_column_width = 6
     @laboratory = Laboratory.new
-    if @institutions.one?
-      @laboratory.institution = @institutions.first
-    end
+    return unless prepare_for_institution_and_authorize(@laboratory, CREATE_INSTITUTION_LABORATORY)
   end
 
   # POST /laboratories
   # POST /laboratories.json
   def create
+    @main_column_width = 6
     @institution = Institution.find params[:laboratory][:institution_id]
     return unless authorize_resource(@institution, CREATE_INSTITUTION_LABORATORY)
 
@@ -46,6 +45,7 @@ class LaboratoriesController < ApplicationController
   end
 
   def edit
+    @main_column_width = 6
     @laboratory = Laboratory.find(params[:id])
     return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
@@ -55,6 +55,7 @@ class LaboratoriesController < ApplicationController
   # PATCH/PUT /laboratories/1
   # PATCH/PUT /laboratories/1.json
   def update
+    @main_column_width = 6
     @laboratory = Laboratory.find params[:id]
     return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 

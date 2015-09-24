@@ -10,13 +10,12 @@ describe Subscriber, elasticsearch: true do
 
   let!(:filter) { Filter.make query: {"condition" => "mtb", "laboratory" => laboratory.id.to_s}, user: institution.user}
   let!(:manifest) {
-    manifest = Manifest.create! definition: %{
+    manifest = Manifest.create! device_model: model, definition: %{
       {
         "metadata": {
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
-          "device_models": "#{model.name}",
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : {"type" : "json"}
         },
         "field_mapping" : {

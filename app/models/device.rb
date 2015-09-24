@@ -1,7 +1,7 @@
 class Device < ActiveRecord::Base
   include Resource
 
-  has_many :manifests, through: :device_model
+  has_one :manifest, through: :device_model
   belongs_to :device_model
   belongs_to :institution
   belongs_to :laboratory

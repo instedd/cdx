@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SubscribersController do
+describe SubscribersController, elasticsearch: true do
   let(:user) { User.make }
   let!(:institution) { user.create Institution.make_unsaved }
   let(:filter) { user.filters.make query: { laboratory: 1 } }

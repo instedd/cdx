@@ -1,16 +1,15 @@
 require 'spec_helper'
 
 describe DeviceMessage, elasticsearch: true do
-  let(:device) {Device.make device_model: DeviceModel.make(manifests: [])}
+  let(:device) { Device.make device_model: DeviceModel.make }
 
   it 'stores failed messages with raw data when it hits an issue parsing a manifest' do
-    manifest = Manifest.create! definition: %{
+    manifest = Manifest.create! device_model: device.device_model, definition: %{
       {
         "metadata": {
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
-          "device_models": "#{device.device_model.name}",
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : { "type" : "json"}
         },
         "field_mapping" : {
@@ -30,13 +29,12 @@ describe DeviceMessage, elasticsearch: true do
   end
 
   it "stores failed messages when the string 'null' is passed as value" do
-    manifest = Manifest.create! definition: %{
+    manifest = Manifest.create! device_model: device.device_model, definition: %{
       {
         "metadata": {
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
-          "device_models": "#{device.device_model.name}",
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : { "type" : "json"}
         },
         "field_mapping" : {
@@ -56,13 +54,12 @@ describe DeviceMessage, elasticsearch: true do
   end
 
   it 'parses a csv with a single row' do
-    manifest = Manifest.create! definition: %{
+    manifest = Manifest.create! device_model: device.device_model, definition: %{
       {
         "metadata": {
           "version": "1",
           "api_version": "#{Manifest::CURRENT_VERSION}",
-          "device_models": "#{device.device_model.name}",
-          "conditions": ["MTB"],
+          "conditions": ["mtb"],
           "source" : { "type" : "csv"}
         },
         "field_mapping" : {

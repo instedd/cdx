@@ -6,6 +6,9 @@ db:
 elasticsearch:
   image: elasticsearch:1.4.4
 
+redis:
+  image: redis
+
 smtp:
   image: instedd/smtp-debug
 
@@ -19,6 +22,7 @@ web:
     - elasticsearch
     - smtp
     - sshd
+    - redis
   env_file: docker-dev.env
   ports:
     - 80
@@ -44,3 +48,12 @@ csv_watch:
   env_file: docker-dev.env
   volumes_from:
     - sshd
+
+sidekiq:
+  build: .
+  command: bundle exec sidekiq
+  links:
+    - db
+    - elasticsearch
+    - redis
+  env_file: docker-dev.env

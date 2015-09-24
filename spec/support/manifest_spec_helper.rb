@@ -1,12 +1,11 @@
 module ManifestSpecHelper
 
-  def manifest_from_json_mappings(mappings_json, custom_json = '[]', source="json")
-    Manifest.new(definition: %{{
+  def manifest_from_json_mappings(mappings_json, custom_json = '{}', source="json")
+    Manifest.new(device_model: DeviceModel.new(name:"GX4001"), definition: %{{
       "metadata" : {
         "version" : "1.0.0",
         "api_version" : "#{Manifest::CURRENT_VERSION}",
-        "device_models" : ["GX4001"],
-        "conditions": ["MTB"],
+        "conditions": ["mtb"],
         "source" : {"type" : "#{source}"}
       },
       "custom_fields": #{custom_json},

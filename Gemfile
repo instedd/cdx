@@ -48,6 +48,10 @@ end
 
 gem 'puma'
 
+# Use Sidekiq for background jobs
+gem 'sidekiq'
+gem 'sinatra'
+
 group :development do
   gem 'web-console', '~> 2.0'
   gem 'capistrano', '~> 3.1.0', require: false
@@ -66,7 +70,6 @@ gem 'omniauth'
 gem 'omniauth-openid'
 gem 'omniauth-google-oauth2'
 gem 'elasticsearch'
-gem 'bunny'
 
 gem 'oj'
 gem 'guid'
@@ -98,4 +101,7 @@ group :test do
   gem 'timecop'
   gem 'shoulda'
   gem 'hashdiff'
+  gem 'cucumber-rails', :require => false
+  gem 'database_cleaner'
+  gem 'site_prism'
 end

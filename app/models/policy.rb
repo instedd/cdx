@@ -32,6 +32,8 @@ class Policy < ActiveRecord::Base
     UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory"
     DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory"
 
+    CREATE_INSTITUTION_ENCOUNTER = "#{PREFIX}:createInstitutionEncounter"
+
     REGISTER_INSTITUTION_DEVICE = "#{PREFIX}:registerInstitutionDevice"
     READ_DEVICE = "#{PREFIX}:readDevice"
     UPDATE_DEVICE = "#{PREFIX}:updateDevice"

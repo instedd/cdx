@@ -1,6 +1,6 @@
 - content_for(:leftcolumn) do
   .centered
-    = link_to "+", new_manifest_path, class: 'btn-add fixed', title: 'Add Manifest'
+    = link_to "+", new_device_model_path, class: 'btn-add fixed', title: 'Add Device Model'
 
 .row
   .col
@@ -10,7 +10,8 @@
       %tr
         %th Name
         %th Version
-      - @device_models.each do |device_model|
-        %tr{data: {href: manifest_path(device_model.current_manifest) }}
+      - device_models.each do |device_model|
+        %tr{data: {href: edit_device_model_path(device_model) }}
           %td= device_model.name
           %td= device_model.current_manifest.version
+

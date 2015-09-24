@@ -19,16 +19,23 @@ To start developing:
 
 4. Setup test database: `bundle exec rake db:test:prepare`
 
-5. Run tests: `bundle exec rspec`
+5. Setup elasticsearch index template: `bundle exec rake cdx_elasticsearch:initialize_template`
 
-6. Start development server: `bundle exec rails s`
+6. Run tests: `bundle exec rspec`
 
+7. Start development server: `bundle exec rails s`
+
+Additionally:
+
+8. Import manifests: `bundle exec rake manifests:load`
 
 ### Locations setup
 
-Locations are imported from GeoJSON files specified as `remote_shapefiles` in `config/settings.yml`. Upon running `rake geo:all`, these files will be downloaded, imported as Location entities, and converted to Topojson for usage from NNDD. Note that if there are CSV files with the same name as the GeoJSONs, they will be used for overriding the names of the locations; this is useful for GADM imports, which provide an extra CSV since the original Shapefiles cannot handle unicode chars.
+Locations are obtained from the [InSTEDD Location Service](https://github.com/instedd/location_service). You can specify a different path in config/settings/development.yml.local
 
-This task requires the executables `topojson` and `mapshaper` to be available, which can be installed via `npm`. The fullpath to the executables can be provided by the environment variables `TOPOJSON` and `MAPSHAPER` respectively.
+### Poirot
+
+CDX uses [Poirot](https://github.com/instedd/poirot_rails) for additional logging. You need to install zeromq library for it to work, or disable it in config/poirot.yml.
 
 ### NNDD
 

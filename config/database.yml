@@ -11,7 +11,7 @@ development:
   database: cdp_development
   reconnect: true
 
-test:
+test: &test
   <<: *default
   database: cdp_test
 
@@ -19,3 +19,6 @@ production:
   <<: *default
   database: cdp
   reconnect: true
+
+cucumber:
+  <<: *test

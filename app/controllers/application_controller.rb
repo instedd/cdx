@@ -59,15 +59,28 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_test_result(test_result)
-    head :forbidden unless [test_result.institution, test_result.laboratory, test_result.device].any? {
-      |resource| Policy.can?(QUERY_TEST, resource, current_user, @current_user_policies)
-    }
+    if [test_result.institution, test_result.laboratory, test_result.device].any? { |resource| Policy.can?(QUERY_TEST, resource, current_user, @current_user_policies) }
+      true
+    else
+      head :forbidden
+      false
+    end
   end
 
   def check_no_institution!
     if current_user && current_user.institutions.empty?
       redirect_to new_institution_path
     end
+  end
+
+  # filters/authorize @institutions by action. Assign calls resource.institution= if only one institution was left
+  def prepare_for_institution_and_authorize(resource, action)
+    @institutions = authorize_resource(@institutions, action)
+    if @institutions.one?
+      resource.institution = @institutions.first
+    end
+
+    @institutions
   end
 
   protected
