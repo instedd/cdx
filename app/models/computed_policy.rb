@@ -161,9 +161,10 @@ class ComputedPolicy < ActiveRecord::Base
 
       granted_statements = actions.product(resources).map do |action, resource|
         entry = computed_policy_attributes_from(resource, action)
+        next if action_unrelated_to_resource?(entry[:action], entry[:resource_type])
         applicable_exceptions = exceptions.reject{ |exception| intersect_attributes(entry, exception).nil? }
         entry.merge(exceptions_attributes: applicable_exceptions)
-      end
+      end.compact
 
       granted_statements = if policy.granter.nil?
         granted_statements
@@ -186,6 +187,10 @@ class ComputedPolicy < ActiveRecord::Base
         condition_institution_id: filters["institution"].try(:to_i),
         condition_laboratory_id: filters["laboratory"].try(:to_i)
       }
+    end
+
+    def action_unrelated_to_resource?(action, resource_type_string)
+      return action.presence && (action != '*') && !action.starts_with?(resource_type_string)
     end
 
     def resolve_resource(resource_string)

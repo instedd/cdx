@@ -54,6 +54,12 @@ describe ComputedPolicy do
       end
     end
 
+    it "should not create computed policy for unrelated actions and resources" do
+      expect {
+        grant superadmin, user, [device, device.laboratory], [READ_DEVICE, READ_LABORATORY]
+      }.to change(ComputedPolicy, :count).by(2)
+    end
+
     it "should add permissions from two policies" do
       expect {
         grant superadmin, user, Device, [READ_DEVICE]
@@ -237,16 +243,14 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, [Laboratory, Device], [READ_LABORATORY, READ_DEVICE], except: [device]
-      }.to change(ComputedPolicy, :count).by(4)
-
-      expect(user).to have(4).computed_policies
+      }.to change(user.computed_policies, :count).by(2)
 
       lab_policies = user.computed_policies.where(resource_type: "laboratory")
-      expect(lab_policies.size).to eq(2)
+      expect(lab_policies.size).to eq(1)
       expect(lab_policies.map(&:exceptions).flatten).to be_empty
 
       device_policies = user.computed_policies.where(resource_type: 'device')
-      expect(device_policies.size).to eq(2)
+      expect(device_policies.size).to eq(1)
 
       device_policies.each do |p|
         expect(p).to have(1).exceptions
