@@ -8,7 +8,7 @@ module Resource
 
   def self.resolve(resource_string)
     return all if resource_string == "*"
-    resource_class = all.find{|r| resource_string =~ r.resource_matcher} or raise "Resource not found"
+    resource_class = all.find{|r| resource_string =~ r.resource_matcher} or raise "Resource not found: #{resource_string}"
     match = ($1 == '*') ? nil : $1
     [resource_class, match.presence, Rack::Utils.parse_nested_query($2)]
   end
