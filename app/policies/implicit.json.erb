@@ -1,14 +1,12 @@
 {
   "statement": [
     {
-      "effect": "allow",
-      "action": ["cdxp:readInstitution"],
-      "resource": ["cdxp:institution/0"]
+      "action": ["institution:read"],
+      "resource": ["institution/0"]
     },
     {
-      "effect": "allow",
-      "action": ["cdxp:createInstitution"],
-      "resource": ["cdxp:institution"]
+      "action": ["institution:create"],
+      "resource": ["institution"]
     }
   ],
   "delegable": false

@@ -43,8 +43,7 @@ def policy_definition(resource, action, delegable = true, except = [])
         {
           "action": #{action.to_json},
           "resource": #{resource.to_json},
-          "except": #{except.to_json},
-          "effect": "allow"
+          "except": #{except.to_json}
         }
       ],
       "delegable": #{delegable}

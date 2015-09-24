@@ -192,10 +192,7 @@ class ComputedPolicy < ActiveRecord::Base
       return [nil, nil, {}] if resource_string == '*'
 
       resource_klass, match, query = Resource.resolve(resource_string)
-
-      [resource_klass.resource_type,
-       match == "*" ? nil : match,
-       query]
+      [resource_klass.resource_type, match, query]
     end
 
     def intersect(granted, granter)

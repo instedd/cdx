@@ -20,29 +20,30 @@ class Policy < ActiveRecord::Base
   scope :delegable, -> { where(delegable: true) }
 
   module Actions
-    PREFIX = "cdxp"
+    CREATE_INSTITUTION = "institution:create"
+    READ_INSTITUTION =   "institution:read"
+    UPDATE_INSTITUTION = "institution:update"
+    DELETE_INSTITUTION = "institution:delete"
 
-    CREATE_INSTITUTION = "#{PREFIX}:createInstitution"
-    READ_INSTITUTION = "#{PREFIX}:readInstitution"
-    UPDATE_INSTITUTION = "#{PREFIX}:updateInstitution"
-    DELETE_INSTITUTION = "#{PREFIX}:deleteInstitution"
+    CREATE_INSTITUTION_LABORATORY = "institution:createLaboratory"
+    CREATE_INSTITUTION_ENCOUNTER =  "institution:createEncounter"
+    REGISTER_INSTITUTION_DEVICE =   "institution:registerDevice"
 
-    CREATE_INSTITUTION_LABORATORY = "#{PREFIX}:createInstitutionLaboratory"
-    READ_LABORATORY = "#{PREFIX}:readLaboratory"
-    UPDATE_LABORATORY = "#{PREFIX}:updateLaboratory"
-    DELETE_LABORATORY = "#{PREFIX}:deleteLaboratory"
+    READ_LABORATORY =   "laboratory:read"
+    UPDATE_LABORATORY = "laboratory:update"
+    DELETE_LABORATORY = "laboratory:delete"
 
-    CREATE_INSTITUTION_ENCOUNTER = "#{PREFIX}:createInstitutionEncounter"
+    ASSIGN_DEVICE_LABORATORY = "laboratory:assignDevice" # This is not tested.
 
-    REGISTER_INSTITUTION_DEVICE = "#{PREFIX}:registerInstitutionDevice"
-    READ_DEVICE = "#{PREFIX}:readDevice"
-    UPDATE_DEVICE = "#{PREFIX}:updateDevice"
-    DELETE_DEVICE = "#{PREFIX}:deleteDevice"
-    ASSIGN_DEVICE_LABORATORY = "#{PREFIX}:assignDeviceLaboratory" # This is not tested.
-    REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey" # This is not tested.
-    GENERATE_ACTIVATION_TOKEN = "#{PREFIX}:generateActivationToken" # This is not tested.
-    QUERY_TEST = "#{PREFIX}:queryTest"
-    REPORT_MESSAGE = "#{PREFIX}:reportMessage"
+    READ_DEVICE =   "device:read"
+    UPDATE_DEVICE = "device:update"
+    DELETE_DEVICE = "device:delete"
+
+    REGENERATE_DEVICE_KEY =     "device:regenerateKey" # This is not tested.
+    GENERATE_ACTIVATION_TOKEN = "device:generateActivationToken" # This is not tested.
+    REPORT_MESSAGE =            "device:reportMessage"
+
+    QUERY_TEST = "test:query"
   end
 
   ACTIONS = [
@@ -130,16 +131,6 @@ class Policy < ActiveRecord::Base
     end
 
     definition["statement"].each do |statement|
-      statement["effect"] ||= "allow" # TODO: Remove effect altogether
-      effect = statement["effect"]
-      if effect
-        if effect != "allow" && effect != "deny"
-          return errors.add :definition, "has an invalid effect: `#{effect}`"
-        end
-      else
-        return errors.add :definition, "is missing efect in statement"
-      end
-
       actions = statement["action"]
       if actions
         actions = Array(actions)

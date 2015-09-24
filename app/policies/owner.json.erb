@@ -1,12 +1,11 @@
 {
   "statement": [
     {
-      "effect": "allow",
       "action": "*",
       "resource": [
-        "cdxp:institution/<%= institution_id %>",
-        "cdxp:device?institution=<%= institution_id %>",
-        "cdxp:laboratory?institution=<%= institution_id %>"
+        "institution/<%= institution_id %>",
+        "device?institution=<%= institution_id %>",
+        "laboratory?institution=<%= institution_id %>"
       ]
     }
   ],
