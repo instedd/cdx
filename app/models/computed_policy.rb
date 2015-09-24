@@ -15,37 +15,38 @@ class ComputedPolicy < ActiveRecord::Base
     PolicyComputer.new.update_user(user)
   end
 
-  def self.can?(action, resource, user)
-    applicable_policies(action, resource, user).any?
+  def self.can?(action, resource, user, opts={})
+    if resource.kind_of?(Resource)
+      !!authorize(action, resource, user, opts).any?
+    else
+      applicable_policies(action, resource, user, opts).any?
+    end
   end
 
   def self.can_delegate?(action, resource, user)
-    applicable_policies(action, resource, user).where(delegable: true).any?
+    can?(action, resource, user, delegable: true)
   end
 
-  def self.can_delegate_resource?(action, resource, user)
-    applicable_policies(action, resource, user).where(delegable: true).any?
-  end
-
-  def self.authorize(action, resource, user)
-    policies = applicable_policies(action, resource, user)
+  def self.authorize(action, resource, user, opts={})
+    policies = applicable_policies(action, resource, user, opts).includes(:exceptions)
     return resource.none if policies.empty?
 
     filter = policies.map(&:arel_filter).inject { |filters, filter| filters.or(filter) }
     resource.filter(filter)
   end
 
-  def self.applicable_policies(action, resource_or_string, user)
+  def self.applicable_policies(action, resource_or_string, user, opts={})
     resource_attributes = resource_attributes_for(resource_or_string)
 
     query = self.where(user_id: user.id)
       .where("resource_type = ? OR resource_type IS NULL", resource_attributes[:resource_type])
 
+    query = query.where(delegable: opts[:delegable]) if opts.has_key?(:delegable)
     query = query.where("action = ? OR action IS NULL", action) if action && action != '*'
     query = query.where("resource_id = ? OR resource_id IS NULL", resource_attributes[:id]) if resource_attributes[:id]
 
     query = query.where("condition_laboratory_id = ?  OR condition_laboratory_id IS NULL",  resource_attributes[:laboratory_id])  if resource_attributes[:laboratory_id]
-    query = query.where("condition_institution_id = ? OR condition_institution_id IS NULL", resource_attributes[:institution_id])  if resource_attributes[:institution_id]
+    query = query.where("condition_institution_id = ? OR condition_institution_id IS NULL", resource_attributes[:institution_id]) if resource_attributes[:institution_id]
 
     return query
   end
@@ -65,22 +66,24 @@ class ComputedPolicy < ActiveRecord::Base
     end
   end
 
-  def resource_class
-    Resource.resolve(self.resource_type)[0]
-  end
 
-  def arel_filter
-    table = resource_class.arel_table
-    filters = []
-    filters << table[:id].eq(self.resource_id) if self.resource_id
-    filters << table[:institution_id].eq(self.condition_institution_id) if self.condition_institution_id
-    filters << table[:laboratory_id].eq(self.condition_laboratory_id) if self.condition_laboratory_id
+  module ComputedPolicyMethods
 
-    return filters.inject{|agg, filter| agg.and(filter)}
-  end
+    def resource_class
+      Resource.resolve(self.resource_type)[0]
+    end
 
+    def arel_filter
+      table = resource_class.arel_table
+      filters = []
+      filters << table[:id].eq(self.resource_id) if self.resource_id
+      filters << table[:institution_id].eq(self.condition_institution_id) if self.condition_institution_id
+      filters << table[:laboratory_id].eq(self.condition_laboratory_id) if self.condition_laboratory_id
 
-  module ComputedPolicyAttributes
+      filters += exceptions.map(&:arel_filter).compact.map(&:not) if respond_to?(:exceptions)
+
+      return filters.compact.inject{|agg, filter| agg.and(filter)}
+    end
 
     def attributes_equal?(p2)
       self.delegable == p2.delegable && self.computed_attributes == p2.computed_attributes
@@ -115,7 +118,7 @@ class ComputedPolicy < ActiveRecord::Base
 
   end
 
-  include ComputedPolicyAttributes
+  include ComputedPolicyMethods
 
 
   class PolicyComputer

@@ -190,7 +190,6 @@ describe Policy do
 
         grant user, user2, institution, READ_INSTITUTION, except: institution
 
-        pending
         assert_cannot user2, institution, READ_INSTITUTION
       end
 
@@ -202,7 +201,6 @@ describe Policy do
 
         grant user, user2, Institution, READ_INSTITUTION, except: institution3
 
-        pending
         assert_can user2, Institution, READ_INSTITUTION, [institution, institution2]
       end
     end
