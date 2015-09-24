@@ -83,36 +83,43 @@ module Resource
       end
     end
 
-    def self.resource_name_prefix
-      "#{PREFIX}:#{name.underscore}"
-    end
-
-    def self.resource_matcher
-      /#{resource_name_prefix}(?:\/(.*))?(?:\?(.*))?/
-    end
-
-    def self.resource_type
-      resource_name
-    end
-
-    def self.resource_class
-      self
-    end
-
-    def self.resource_name
-      resource_name_prefix
-    end
-
-    def resource_type
-      self.class.resource_type
-    end
+    delegate :resource_type, :resource_class, to: :class
 
     def resource_name
       "#{self.class.resource_name_prefix}/#{id}"
     end
 
-    def resource_class
-      self.class.resource_class
+    def filter(conditions)
+      self.class.where(id: self.id).filter(conditions)
     end
+
+  end
+
+  class_methods do
+
+    def resource_name_prefix
+      "#{PREFIX}:#{name.underscore}"
+    end
+
+    def resource_matcher
+      /#{resource_name_prefix}(?:\/(.*))?(?:\?(.*))?/
+    end
+
+    def resource_type
+      resource_name
+    end
+
+    def resource_class
+      self
+    end
+
+    def resource_name
+      resource_name_prefix
+    end
+
+    def filter(conditions)
+      where(conditions)
+    end
+
   end
 end

@@ -24,7 +24,7 @@ class DevicesController < ApplicationController
 
     @devices_to_edit = check_access(Device, UPDATE_DEVICE)
     @devices_to_edit ||= []
-    @devices_to_edit.map!(&:id)
+    @devices_to_edit.pluck(:id)
 
     @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end

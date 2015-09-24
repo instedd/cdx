@@ -25,7 +25,7 @@ class ComputedPolicy < ActiveRecord::Base
 
   def self.authorize(action, resource, user)
     filter = query(action, resource, user).map(&:arel_filter).inject { |filters, filter| filters.or(filter) }
-    resource.resource_class.where(filter)
+    resource.filter(filter)
   end
 
   def self.query(action, resource, user)
@@ -97,7 +97,7 @@ class ComputedPolicy < ActiveRecord::Base
   class PolicyComputer
 
     def update_user(user)
-      computed_policies = user.policies(:reload).map{|p| compute_for(p)}.flatten
+      computed_policies = user.reload.policies.map{|p| compute_for(p)}.flatten
       computed_policies = compact_policies(computed_policies)
       existing_policies = user.computed_policies
 
