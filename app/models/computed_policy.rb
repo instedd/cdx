@@ -24,7 +24,10 @@ class ComputedPolicy < ActiveRecord::Base
   end
 
   def self.authorize(action, resource, user)
-    filter = query(action, resource, user).map(&:arel_filter).inject { |filters, filter| filters.or(filter) }
+    applicable_policies = query(action, resource, user)
+    return resource.none if applicable_policies.empty?
+
+    filter = applicable_policies.map(&:arel_filter).inject { |filters, filter| filters.or(filter) }
     resource.filter(filter)
   end
 

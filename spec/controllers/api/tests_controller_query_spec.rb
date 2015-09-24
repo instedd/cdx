@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-xdescribe Api::EventsController, elasticsearch: true, validate_manifest: false do
+describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
   let(:user) { User.make }
   let!(:institution) { Institution.make user_id: user.id }

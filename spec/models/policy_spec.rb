@@ -78,11 +78,7 @@ describe Policy do
 
       it "allows reading all institutions if superadmin" do
         user2, institution2 = create_user_and_institution
-
-        policy = Policy.superadmin
-        policy.granter_id = nil
-        policy.user_id = user.id
-        policy.save(validate: false)
+        user.grant_superadmin_policy
 
         assert_can user, Institution, READ_INSTITUTION, [institution, institution2]
       end
@@ -100,8 +96,6 @@ describe Policy do
       end
 
       it "allows a user to read institutions even if there are no institutions on the system" do
-        pending
-
         user2 = User.make
         can = Policy.can? READ_INSTITUTION, Institution, user2
         institutions = Policy.authorize READ_INSTITUTION, Institution, user2
@@ -117,22 +111,6 @@ describe Policy do
         grant user, user2, Institution, READ_INSTITUTION
 
         assert_can user2, Institution, READ_INSTITUTION, [institution]
-      end
-
-      it "allows to read institutions even if the granter doesn't have institutions created" do
-        pending
-
-        user.policies.destroy_all
-        user2 = User.make
-        create_user_and_institution
-        grant user2, user, Institution, READ_INSTITUTION
-        user.reload
-
-        can = Policy.can? READ_INSTITUTION, Institution, user
-        institutions = Policy.authorize READ_INSTITUTION, Institution, user
-
-        expect(can).to eq(true)
-        expect(institutions).to eq([])
       end
 
       it "disallows delegable" do
@@ -601,14 +579,14 @@ describe Policy do
     end
   end
 
-  xcontext "queryTest" do
+  context "queryTest" do
     context "Allow" do
       let!(:laboratory) {Laboratory.make institution_id: institution.id}
       let!(:device) {Device.make laboratory: laboratory, institution_id: institution.id}
 
       [Institution, Laboratory, Device].each do |resource|
         it "allows a user to query tests of it's own #{resource}" do
-          expect(Policy.authorize(QUERY_TEST, resource, user)).to eq(resource.all)
+          expect(Policy.authorize(QUERY_TEST, resource, user)).to match_array(resource.all)
         end
       end
     end

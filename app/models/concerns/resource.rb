@@ -83,7 +83,7 @@ module Resource
       end
     end
 
-    delegate :resource_type, :resource_class, to: :class
+    delegate :resource_type, :resource_class, :none, to: :class
 
     def resource_name
       "#{self.class.resource_name_prefix}/#{id}"
