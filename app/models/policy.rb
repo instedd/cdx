@@ -8,7 +8,7 @@ class Policy < ActiveRecord::Base
   validates :granter, presence: true, unless: :allows_implicit
 
   validate :validate_definition
-  validate :validate_owner_permissions
+  validate :validate_self_granted
 
   serialize :definition, JSON
 
@@ -101,10 +101,8 @@ class Policy < ActiveRecord::Base
     self.user_id == self.granter_id
   end
 
-  private
-
+  # Not evaluated as part of validations in ActiveModel lifecycle
   def validate_owner_permissions
-    return errors.add :owner, "permission can't be self granted" if self_granted?
     return if implicit?
 
     resources = definition["statement"].each do |statement|
@@ -118,6 +116,12 @@ class Policy < ActiveRecord::Base
     end
 
     true
+  end
+
+  private
+
+  def validate_self_granted
+    return errors.add :owner, "permission can't be self granted" if self_granted?
   end
 
   def validate_definition

@@ -138,26 +138,6 @@ describe Policy do
         assert_can user4, institution, READ_INSTITUTION
       end
 
-      it "disallows policy creation if granter can't delegate it" do
-        user2 = User.make
-        user3 = User.make
-
-        grant user, user2, institution, READ_INSTITUTION, delegable: false
-
-        policy = Policy.make_unsaved
-        policy.definition = policy_definition(institution, READ_INSTITUTION, false)
-        policy.granter_id = user2.id
-        policy.user_id = user3.id
-        expect(policy.save).to eq(false)
-
-        action = Policy::READ_INSTITUTION
-        resource = institution
-        policies = [policy]
-
-        result = Policy.can? action, resource, user3, policies
-        expect(result).to eq(false)
-      end
-
       it "disallows policy creation if self-granted" do
         policy = Policy.make_unsaved
         policy.definition = policy_definition(institution, READ_INSTITUTION, false)
