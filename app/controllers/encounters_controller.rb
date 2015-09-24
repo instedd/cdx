@@ -13,15 +13,15 @@ class EncountersController < ApplicationController
     @encounter = @institution.encounters.new
 
     if @encounter.save
-      redirect_to encounter_path(@encounter), notice: 'Encounter was successfully created.'
+      redirect_to edit_encounter_path(@encounter), notice: 'Encounter was successfully created.'
     else
       render 'new'
     end
   end
 
-  def show
+  def edit
     # TODO add policy for reading encounters
-    # TODO load encounter
+    @encounter = Encounter.find(params[:id])
   end
 
   private

@@ -14,6 +14,9 @@
 //= require jquery.turbolinks
 //= require jquery_ujs
 //= require select2
+//= require react
+//= require react_ujs
+//= require components
 //= require_tree .
 
 $(document).ready(function(){

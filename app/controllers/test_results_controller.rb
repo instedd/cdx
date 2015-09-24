@@ -37,7 +37,7 @@ class TestResultsController < ApplicationController
     @other_tests = @test_result.sample.test_results.where.not(id: @test_result.id)
     @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
 
-    @sample_id = @test_result.sample.core_fields['id']
+    @sample_id = @test_result.sample.entity_id
     @sample_id_barcode = Barby::Code93.new(@sample_id)
   end
 
