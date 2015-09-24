@@ -1,15 +1,19 @@
 include Policy::Actions
 
-def assert_can(user, resource, action, expected_result = [resource])
+def assert_can(user, resource, action, expected_result=nil)
   result = Policy.can? action, resource, user
 
   expect(result).to eq(true)
 
   result = Policy.authorize action, resource, user
-  result = result.sort_by &:id
-  expected_result = expected_result.sort_by &:id
 
-  expect(result).to eq(expected_result)
+  expected_result ||= resource
+
+  if expected_result.kind_of?(Resource)
+    expect(result).to eq(expected_result)
+  else
+    expect(result.to_a).to match_array(expected_result.to_a)
+  end
 end
 
 def assert_cannot(user, resource, action)

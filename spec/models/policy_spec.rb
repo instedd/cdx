@@ -268,13 +268,13 @@ describe Policy do
       it "allows reading self laboratory" do
         laboratory = institution.laboratories.make
 
-        assert_can user, laboratory, READ_LABORATORY, [laboratory]
+        assert_can user, laboratory, READ_LABORATORY
       end
 
       it "allows reading self laboratories" do
         laboratory = institution.laboratories.make
 
-        assert_can user, institution.laboratories, READ_LABORATORY, [laboratory]
+        assert_can user, institution.laboratories, READ_LABORATORY
       end
 
       it "allows reading an specific laboratory" do
@@ -283,7 +283,7 @@ describe Policy do
 
         grant user, user2, laboratory, READ_LABORATORY
 
-        assert_can user2, laboratory, READ_LABORATORY, [laboratory]
+        assert_can user2, laboratory, READ_LABORATORY
       end
 
       it "allows reading other laboratories" do
@@ -349,7 +349,7 @@ describe Policy do
 
         grant user, user2, laboratory, UPDATE_LABORATORY
 
-        assert_can user2, laboratory, UPDATE_LABORATORY, [laboratory]
+        assert_can user2, laboratory, UPDATE_LABORATORY
       end
 
       it "allows updating other user's laboratories" do
@@ -367,7 +367,7 @@ describe Policy do
 
         grant user, user2, Laboratory, UPDATE_LABORATORY
 
-        assert_can user2, laboratory, UPDATE_LABORATORY, [laboratory]
+        assert_can user2, laboratory, UPDATE_LABORATORY
       end
     end
 
@@ -385,7 +385,7 @@ describe Policy do
 
         grant user, user2, laboratory, DELETE_LABORATORY
 
-        assert_can user2, laboratory, DELETE_LABORATORY, [laboratory]
+        assert_can user2, laboratory, DELETE_LABORATORY
       end
 
       it "allows deleting other user's laboratories" do
@@ -403,7 +403,7 @@ describe Policy do
 
         grant user, user2, Laboratory, DELETE_LABORATORY
 
-        assert_can user2, laboratory, DELETE_LABORATORY, [laboratory]
+        assert_can user2, laboratory, DELETE_LABORATORY
       end
     end
   end
@@ -435,7 +435,7 @@ describe Policy do
       it "allows reading self device" do
         device = institution.devices.make
 
-        assert_can user, device, READ_DEVICE, [device]
+        assert_can user, device, READ_DEVICE
       end
 
       it "allows reading self devices" do
@@ -450,7 +450,7 @@ describe Policy do
 
         grant user, user2, device, READ_DEVICE
 
-        assert_can user2, device, READ_DEVICE, [device]
+        assert_can user2, device, READ_DEVICE
       end
 
       it "allows reading institution devices" do
@@ -518,7 +518,7 @@ describe Policy do
 
         grant user, user2, device, UPDATE_DEVICE
 
-        assert_can user2, device, UPDATE_DEVICE, [device]
+        assert_can user2, device, UPDATE_DEVICE
       end
 
       it "allows updating other user's devices" do
@@ -536,7 +536,7 @@ describe Policy do
 
         grant user, user2, Device, UPDATE_DEVICE
 
-        assert_can user2, device, UPDATE_DEVICE, [device]
+        assert_can user2, device, UPDATE_DEVICE
       end
     end
 
@@ -554,7 +554,7 @@ describe Policy do
 
         grant user, user2, device, DELETE_DEVICE
 
-        assert_can user2, device, DELETE_DEVICE, [device]
+        assert_can user2, device, DELETE_DEVICE
       end
 
       it "allows deleting other user's devices" do
@@ -572,7 +572,7 @@ describe Policy do
 
         grant user, user2, Device, DELETE_DEVICE
 
-        assert_can user2, device, DELETE_DEVICE, [device]
+        assert_can user2, device, DELETE_DEVICE
       end
     end
   end

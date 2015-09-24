@@ -16,11 +16,9 @@ class ComputedPolicy < ActiveRecord::Base
   end
 
   def self.can?(action, resource, user, opts={})
-    if resource.kind_of?(Resource)
-      !!authorize(action, resource, user, opts).any?
-    else
-      applicable_policies(action, resource, user, opts).any?
-    end
+    return resource.kind_of?(Resource)\
+      ? !!authorize(action, resource, user, opts)\
+      : applicable_policies(action, resource, user, opts).any?
   end
 
   def self.can_delegate?(action, resource, user)
@@ -28,6 +26,11 @@ class ComputedPolicy < ActiveRecord::Base
   end
 
   def self.authorize(action, resource, user, opts={})
+    scope = self.authorize_scope(action, resource, user, opts)
+    return resource.kind_of?(Resource) ? scope.first : scope
+  end
+
+  def self.authorize_scope(action, resource, user, opts={})
     policies = applicable_policies(action, resource, user, opts).includes(:exceptions)
     return resource.none if policies.empty?
 
