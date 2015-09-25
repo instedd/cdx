@@ -44,8 +44,10 @@ ActiveRecord::Schema.define(version: 20150925172725) do
   end
 
   create_table "device_logs", force: :cascade do |t|
-    t.integer "device_id", limit: 4
-    t.text    "message",   limit: 65535
+    t.integer  "device_id",  limit: 4
+    t.text     "message",    limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "device_messages", force: :cascade do |t|

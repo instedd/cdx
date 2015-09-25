@@ -13,6 +13,7 @@
     = link_to "Messages", device_device_messages_path(@device), class: 'btn'
     - if @device.current_manifest.fields.any?(&:custom?)
       = link_to "Custom Mappings", device_custom_mappings_path(@device), class: 'btn'
+    = link_to "Logs", device_device_logs_path(@device), class: 'btn'
 
 - if @can_regenerate_key
   %hr
