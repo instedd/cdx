@@ -1,6 +1,9 @@
 class LaboratoriesController < ApplicationController
   set_institution_tab :laboratories
   before_filter :load_institutions
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def index
     @laboratories = check_access(Laboratory, READ_LABORATORY)
@@ -81,6 +84,7 @@ class LaboratoriesController < ApplicationController
   end
 
   private
+
   def load_institutions
     @institutions = check_access(Institution, CREATE_INSTITUTION_LABORATORY)
   end

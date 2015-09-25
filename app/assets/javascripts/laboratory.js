@@ -15,6 +15,7 @@ $(function() {
   $('#laboratory_location_geoid').select2({
     placeholder: "Search locations",
     minimumInputLength: 2,
+    width: "element",
     ajax: {
       url: gon.location_service_url + "/suggest",
       dataType: 'json',

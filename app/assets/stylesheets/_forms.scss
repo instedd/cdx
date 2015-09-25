@@ -26,10 +26,13 @@ textarea {
 
 label {
   color: $gray3;
+  display: inline-block;
+  vertical-align: baseline;
+  padding: 5px 5px 0 0;
+}
 
-  &.block {
-    display: block;
-  }
+.value {
+  padding-top: 5px;
 }
 
 // DDslick select styles ---------------------------------------------------------//

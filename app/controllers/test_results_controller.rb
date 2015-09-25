@@ -1,6 +1,7 @@
 class TestResultsController < ApplicationController
   require 'barby'
   require 'barby/barcode/code_93'
+  require 'barby/outputter/html_outputter'
 
   expose(:laboratories) { check_access(Laboratory, QUERY_TEST) }
   expose(:institutions) { check_access(Institution, QUERY_TEST) }
