@@ -133,7 +133,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     expect(Sample.count).to eq(1)
     sample = Sample.first
-    expect(sample.entity_id_hash).to eq(MessageEncryption.hash SAMPLE_ID)
+    expect(sample.entity_id).to eq(SAMPLE_ID)
     assert_sample_data(sample)
   end
 
