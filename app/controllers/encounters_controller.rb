@@ -27,9 +27,14 @@ class EncountersController < ApplicationController
 
   def search_sample
     # TODO enforce policy
-    # TODO search by entity_id
-    samples = Sample.where(["id like ?", "%#{params[:q]}%"])
+    samples = Sample.where(["entity_id like ?", "%#{params[:q]}%"])
     render json: as_json_samples_search(samples).attributes!
+  end
+
+  def search_test
+    # TODO enforce policy
+    test_results = TestResult.where(["test_id like ?", "%#{params[:q]}%"])
+    render json: as_json_test_results_search(test_results).attributes!
   end
 
   def add_sample
@@ -73,8 +78,16 @@ class EncountersController < ApplicationController
     json.institution sample.institution.name
   end
 
+  def as_json_test_results_search(test_results)
+    Jbuilder.new do |json|
+      json.array! test_results do |json, test|
+        as_json_test_result(json, test)
+      end
+    end
+  end
+
   def as_json_test_result(json, test_result)
-    json.(test_result, :id)
+    json.(test_result, :id, :test_id)
     json.name test_result.core_fields[TestResult::NAME_FIELD]
     json.device do
       json.name test_result.device.name

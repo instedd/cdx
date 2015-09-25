@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     end
     collection do
       get :search_sample
+      get :search_test
     end
   end
   resources :locations, only: [:index, :show]

@@ -19,9 +19,16 @@ var TestResult = React.createClass({
   }
 });
 
+// TODO should not show institution if user has only one
 var AddItemSearchSampleTemplate = React.createClass({
   render: function() {
-    return (<span>{this.props.item.entity_id}</span>);
+    return (<span>{this.props.item.entity_id} ({this.props.item.institution})</span>);
+  }
+});
+
+var AddItemSearchTestTemplate = React.createClass({
+  render: function() {
+    return (<span>{this.props.item.test_id} - {this.props.item.name} ({this.props.item.device.name})</span>);
   }
 });
 
@@ -36,8 +43,12 @@ var EncounterEdit = React.createClass({
     event.preventDefault()
   },
 
+  closeSamplesModal: function (event) {
+    this.refs.samplesModal.hide();
+    event.preventDefault();
+  },
+
   appendSample: function(sample) {
-    // {id: 43, entity_id: 'SDFSSD-7343', institution: 'ACME FOO Lab'}
     this.setState(React.addons.update(this.state, {
       encounter : { samples : {
         $push : [sample]
@@ -58,9 +69,24 @@ var EncounterEdit = React.createClass({
     });
   },
 
-  closeSamplesModal: function (event) {
-    this.refs.samplesModal.hide();
-    event.preventDefault();
+  showTestsModal: function(event) {
+    this.refs.testsModal.show()
+    event.preventDefault()
+  },
+
+  closeTestsModal: function(event) {
+    this.refs.testsModal.hide()
+    event.preventDefault()
+  },
+
+  appendTest: function(test) {
+    this.setState(React.addons.update(this.state, {
+      encounter : { test_results : {
+        $push : [test]
+      }}
+    }));
+    this.refs.testsModal.hide()
+    // TODO goto server
   },
 
   render: function() {
@@ -70,6 +96,7 @@ var EncounterEdit = React.createClass({
         <NoPatientCard />
       </FlexFullRow>
       <FlexFullRow />
+
       <div className="row">
         <div className="col-p1">
           <a className="side-link btn-add" href='#' onClick={this.showSamplesModal}>+</a>
@@ -94,6 +121,7 @@ var EncounterEdit = React.createClass({
 
       <div className="row">
         <div className="col-p1">
+          <a className="side-link btn-add" href='#' onClick={this.showTestsModal}>+</a>
           <label>Test results</label>
         </div>
         <div className="col">
@@ -103,6 +131,15 @@ var EncounterEdit = React.createClass({
             })}
           </ul>
         </div>
+
+        <Modal ref="testsModal">
+          <a href="#" onClick={this.closeTestsModal}>←</a>
+          <h1>Add test</h1>
+
+          <AddItemSearch callback="/encounters/search_test" onItemChosen={this.appendTest}
+            itemTemplate={AddItemSearchTestTemplate}
+            itemKey="id" />
+        </Modal>
       </div>
     </div>);
   }
