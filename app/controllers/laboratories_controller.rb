@@ -1,6 +1,9 @@
 class LaboratoriesController < ApplicationController
   set_institution_tab :laboratories
   before_filter :load_institutions
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def index
     @laboratories = check_access(Laboratory, READ_LABORATORY)
@@ -15,7 +18,6 @@ class LaboratoriesController < ApplicationController
   end
 
   def new
-    @main_column_width = 6
     @laboratory = Laboratory.new
     prepare_for_institution_and_authorize(@laboratory, CREATE_INSTITUTION_LABORATORY)
   end
@@ -23,7 +25,6 @@ class LaboratoriesController < ApplicationController
   # POST /laboratories
   # POST /laboratories.json
   def create
-    @main_column_width = 6
     @institution = Institution.find params[:laboratory][:institution_id]
     return unless authorize_resource(@institution, CREATE_INSTITUTION_LABORATORY)
 
@@ -41,7 +42,6 @@ class LaboratoriesController < ApplicationController
   end
 
   def edit
-    @main_column_width = 6
     @laboratory = Laboratory.find(params[:id])
     return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
@@ -51,7 +51,6 @@ class LaboratoriesController < ApplicationController
   # PATCH/PUT /laboratories/1
   # PATCH/PUT /laboratories/1.json
   def update
-    @main_column_width = 6
     @laboratory = Laboratory.find params[:id]
     return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
