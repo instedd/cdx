@@ -1,10 +1,8 @@
-- content_for(:leftcolumn) do
-  - if @can_create
-    .centered
-      = link_to "+", new_filter_path, class: 'btn-add fixed', title: 'Add Filter'
 .row
   .col
-    %table.table
+    - if @can_create
+      = link_to "+", new_filter_path, class: 'btn-add side-link fix', title: 'Add Filter'
+    - cdx_table do
       %tr
         %th.tableheader{colspan:100} Filters
       %tr

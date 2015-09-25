@@ -1,6 +1,9 @@
 class DeviceModelsController < ApplicationController
   expose(:device_models) { DeviceModel.includes(:manifest) }
   expose(:device_model, attributes: :device_model_params)
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def create
     respond_to do |format|

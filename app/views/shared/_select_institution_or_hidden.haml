@@ -2,10 +2,13 @@
   - if @institutions.one?
     = f.hidden_field :institution_id
   - else
-    .col.pe-2
-      - if f.object.new_record?
-        = f.label :institution, class: 'control-label'
+    - if f.object.new_record?
+      .col.pe-2
+        = f.label :institution
+      .col
         = f.collection_select :institution_id, @institutions, :id, :name, {}, class: 'ddown'
-      - else
+    - else
+      .col.pe-2
         %label Institution
+      .col
         %p= f.object.institution

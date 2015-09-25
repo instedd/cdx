@@ -6,6 +6,9 @@ class TestResultsController < ApplicationController
   expose(:laboratories) { check_access(Laboratory, QUERY_TEST) }
   expose(:institutions) { check_access(Institution, QUERY_TEST) }
   expose(:devices) { check_access(Device, QUERY_TEST) }
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def index
     @results = Cdx.core_fields.find { |field| field.name == 'result' }.options
@@ -30,8 +33,6 @@ class TestResultsController < ApplicationController
   end
 
   def show
-    @main_column_width = 6
-
     @test_result = TestResult.find_by(uuid: params[:id])
     return unless authorize_test_result(@test_result)
 

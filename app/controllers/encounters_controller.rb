@@ -1,5 +1,8 @@
 class EncountersController < ApplicationController
   before_filter :load_institutions
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def new
     @encounter = Encounter.new

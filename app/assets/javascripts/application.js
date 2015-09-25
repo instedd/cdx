@@ -39,5 +39,28 @@ $(document).ready(function(){
 
   $(document).on('click', '.row-href tr[data-href]', function(){
     window.location.href = $(this).data('href');
-  })
+  });
+
+
+  /* Initialize sticky outside the event listener as a cached selector.
+   * Also, initialize any needed variables outside the listener for
+   * performance reasons - no variable instantiation is happening inside the listener.
+   */
+  var sticky = $('.fix'),
+      stickyTop = sticky.offset().top - 30,
+      scrollTop,
+      scrolled = false,
+      $window = $(window);
+
+  /* Bind the scroll Event */
+  $window.on('scroll', function (e) {
+      scrollTop = $window.scrollTop();
+
+      if (scrollTop >= stickyTop) {
+          sticky.addClass('fixed');
+      } else if (scrollTop < stickyTop) {
+          sticky.removeClass('fixed');
+      }
+  });
+
 });
