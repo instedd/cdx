@@ -34,7 +34,10 @@ class ComputedPolicy < ActiveRecord::Base
     policies = applicable_policies(action, resource, user, opts).includes(:exceptions)
     return resource.none if policies.empty?
 
-    filter = policies.map(&:arel_filter).inject { |filters, filter| filters.or(filter) }
+    filter = policies.map(&:arel_filter).inject do |filters, filter|
+      (filters && filter) ? filters.or(filter) : (filters or filter)
+    end
+
     resource.filter(filter)
   end
 
