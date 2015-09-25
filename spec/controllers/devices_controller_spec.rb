@@ -53,4 +53,12 @@ describe DevicesController do
     it { expect(token.value).not_to be_nil }
   end
 
+  describe "submit_log" do
+    it "logs" do
+      post :submit_log, "Some failure", id: device.uuid
+
+      expect(DeviceLog.count).to eq(1)
+    end
+  end
+
 end

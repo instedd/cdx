@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150915164518) do
+ActiveRecord::Schema.define(version: 20150925172725) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -41,6 +41,11 @@ ActiveRecord::Schema.define(version: 20150915164518) do
   create_table "conditions_manifests", id: false, force: :cascade do |t|
     t.integer "manifest_id",  limit: 4
     t.integer "condition_id", limit: 4
+  end
+
+  create_table "device_logs", force: :cascade do |t|
+    t.integer "device_id", limit: 4
+    t.text    "message",   limit: 65535
   end
 
   create_table "device_messages", force: :cascade do |t|

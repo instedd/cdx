@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     member do
       get  'regenerate_key'
       post 'generate_activation_token'
+      post 'submit_log'
     end
     resources :custom_mappings, only: [:index]
     resources :ssh_keys, only: [:create, :destroy]

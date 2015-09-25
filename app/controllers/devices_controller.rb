@@ -7,6 +7,9 @@ class DevicesController < ApplicationController
   before_filter :load_laboratories, only: [:index, :new, :create, :edit, :update]
   before_filter :load_institution, only: :create
 
+  skip_before_filter :verify_authenticity_token, only: [:submit_log]
+  skip_before_filter :authenticate_user!, only: [:submit_log]
+
   def index
     @devices = check_access(Device, READ_DEVICE)
     @devices ||= []
@@ -136,6 +139,15 @@ class DevicesController < ApplicationController
         format.json { render json: @token.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def submit_log
+    device = Device.find_by_uuid params[:id]
+    return head(:not_found) unless device
+
+    device.device_logs.create! message: request.raw_post
+
+    head :ok
   end
 
   private

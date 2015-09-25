@@ -9,6 +9,7 @@ class Device < ActiveRecord::Base
   has_many :device_messages
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
+  has_many :device_logs
 
   serialize :custom_mappings, JSON
 
