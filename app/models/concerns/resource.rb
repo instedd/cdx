@@ -3,7 +3,7 @@ module Resource
   include Policy::Actions
 
   def self.all
-    @all_resources ||= [Institution, Laboratory, Device].freeze
+    @all_resources ||= [Institution, Laboratory, Device, DeviceModel].freeze
   end
 
   def self.resolve(resource_string)
@@ -30,7 +30,7 @@ module Resource
   class_methods do
 
     def resource_name_prefix
-      name.underscore
+      name.camelize(:lower)
     end
 
     def resource_matcher

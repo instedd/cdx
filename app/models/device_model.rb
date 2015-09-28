@@ -1,4 +1,7 @@
 class DeviceModel < ActiveRecord::Base
+
+  include Resource
+
   has_one :manifest, dependent: :destroy, inverse_of: :device_model
   validates_uniqueness_of :name
   has_many :devices
