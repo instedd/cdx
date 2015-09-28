@@ -74,14 +74,10 @@ class Subscriber < ActiveRecord::Base
       end
 
       request = RestClient::Resource.new(callback_url, options)
-      begin
-        if self.verb == 'GET'
-          request.get
-        else
-          request.post filtered_test.to_json, content_type: :json
-        end
-      rescue Exception => ex
-        Rails.logger.warn "Could not #{verb} to subscriber #{id} at #{callback_url}: #{ex.message}\n#{ex.backtrace}"
+      if self.verb == 'GET'
+        request.get
+      else
+        request.post filtered_test.to_json, content_type: :json
       end
     end
   end
