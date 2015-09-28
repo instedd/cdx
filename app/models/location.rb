@@ -1,7 +1,5 @@
 class Location
 
-  include Resource
-
   alias_method :geo_id, :id
   alias_method :admin_level, :level
 

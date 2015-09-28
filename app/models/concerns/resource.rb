@@ -3,7 +3,7 @@ module Resource
   include Policy::Actions
 
   def self.all
-    @all_resources ||= [Institution, Laboratory, Device, Location].freeze
+    @all_resources ||= [Institution, Laboratory, Device].freeze
   end
 
   def self.resolve(resource_string)
