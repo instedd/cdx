@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'policy_spec_helper'
 
 describe Subscriber, elasticsearch: true do
 
@@ -93,6 +94,19 @@ describe Subscriber, elasticsearch: true do
     filter.update_attributes! query: {"test.assays.condition" => "mtb"}
     percolator = Cdx::Api.client.get index: Cdx::Api.index_name_pattern, type: '.percolator', id: subscriber.id
     expect(percolator["_source"]).to eq({query: filter.create_query.elasticsearch_query, type: 'test'}.with_indifferent_access)
+  end
+
+  it "updates percolator when policies are changed" do
+    user2 = User.make
+    filter2 = Filter.make query: {"test.assays.condition" => "mtb", "laboratory.uuid" => laboratory.uuid}, user: user2
+    url = "http://subscriber/cdp_trigger?token=48"
+    subscriber = Subscriber.make filter: filter2, user: user2, fields: [], url: url, verb: 'POST'
+    callback_request = stub_request(:post, url).to_return(:status => 200, :body => "", :headers => {})
+    grant(institution.user, user2, device, Policy::Actions::QUERY_TEST)
+
+    submit_test
+
+    assert_requested(callback_request)
   end
 
   it "deletes percolator when the subscriber is deleted" do
