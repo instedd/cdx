@@ -95,15 +95,6 @@ describe Policy do
         assert_cannot user2, institution3, READ_INSTITUTION
       end
 
-      it "allows a user to read institutions even if there are no institutions on the system" do
-        user2 = User.make
-        can = Policy.can? READ_INSTITUTION, Institution, user2
-        institutions = Policy.authorize READ_INSTITUTION, Institution, user2
-
-        expect(can).to eq(true)
-        expect(institutions).to eq([])
-      end
-
       it "disallows read all institution if granter doesn't have a permission for it" do
         user; institution
         user2 = User.make
