@@ -17,6 +17,11 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
     end
   end
 
+  def self.find_by_elasticsearch_id(id)
+    doc = Cdx::Api.client.get index: Cdx::Api.index_name, type: 'test', id: id
+    add_names_to([doc["_source"]]).first
+  end
+
   def initialize(params, institutions, laboratories, devices)
     super(params)
     @institutions = institutions
@@ -35,7 +40,8 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
 
   def execute
     result = super
-    add_names_to result
+    TestResultQuery.add_names_to result["tests"]
+    result
   end
 
   def csv_builder
@@ -48,8 +54,7 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
 
   private
 
-  def add_names_to result
-    tests = result["tests"]
+  def self.add_names_to tests
     institutions = indexed_model tests, Institution, ["institution", "uuid"]
     laboratories = indexed_model tests, Laboratory, ["laboratory", "uuid"]
     devices = indexed_model tests, Device, ["device", "uuid"]
@@ -59,10 +64,9 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
       event["device"]["name"] = devices[event["device"]["uuid"]].try(:name) if event["device"]
       event["laboratory"]["name"] = laboratories[event["laboratory"]["uuid"]].try(:name) if event["laboratory"]
     end
-    result
   end
 
-  def indexed_model(tests, model, es_field)
+  def self.indexed_model(tests, model, es_field)
     ids = tests.map { |test| es_field.inject(test) { |obj, field| obj[field] } rescue nil }.uniq
     model.where("uuid" => ids).index_by { |model| model["uuid"] }
   end

@@ -21,7 +21,7 @@ class TestResultIndexer
                                         id: CGI.escape(elasticsearch_id)
     percolate_result["matches"].each do |match|
       subscriber_id = match["_id"]
-      NotifySubscriberJob.perform_later subscriber_id, test_result.uuid
+      NotifySubscriberJob.perform_later subscriber_id, elasticsearch_id
     end
   end
 

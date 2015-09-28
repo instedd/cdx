@@ -1,9 +1,9 @@
 class NotifySubscriberJob < ActiveJob::Base
   queue_as :default
 
-  def perform(subscriber_id, test_uuid)
+  def perform(subscriber_id, test_elasticsearch_id)
     subscriber = Subscriber.includes(:filter => :user).find(subscriber_id)
-    test = TestResult.query({"test.uuid" => test_uuid}, subscriber.filter.user).execute["tests"].first
+    test = TestResultQuery.find_by_elasticsearch_id(test_elasticsearch_id)
     subscriber.notify_test(test)
   end
 end
