@@ -29,6 +29,14 @@ module Resource
 
   class_methods do
 
+    def supports_query?(query)
+      query.keys.all? { |key| supports_condition?(key) }
+    end
+
+    def supports_condition?(key)
+      column_names.include?("#{key.to_s}_id")
+    end
+
     def resource_name_prefix
       name.underscore
     end

@@ -19,6 +19,52 @@ describe Policy do
 
   end
 
+  context "Validations" do
+
+    let!(:user2) { User.make }
+
+    it "disallows policy creation if self-granted" do
+      policy = Policy.make_unsaved
+      policy.definition = policy_definition(institution, READ_INSTITUTION, false)
+      policy.granter_id = user.id
+      policy.user_id = user.id
+      expect(policy.save).to eq(false)
+    end
+
+    it "disallows policy creation if granter is nil" do
+      policy = Policy.make_unsaved
+      policy.definition = policy_definition(institution, READ_INSTITUTION, false)
+      policy.granter_id = nil
+      policy.user_id = user.id
+      expect(policy.save).to eq(false)
+    end
+
+    it "should not create policy with invalid resource" do
+      expect {
+        grant user, user2, "invalid", "*"
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should not create policy with invalid resource string" do
+      expect {
+        grant user, user2, "institution|1", "*"
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should not create policy with invalid resource condition" do
+      expect {
+        grant user, user2, "institution?laboratory_id=1", "*"
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should not create policy with invalid action" do
+      expect {
+        grant user, user2, "institution", "INVALID"
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+  end
+
   context "Institution" do
     context "Create" do
       it "allows creating institutions" do
@@ -127,22 +173,6 @@ describe Policy do
         grant user3, user4, institution, READ_INSTITUTION, delegable: true
 
         assert_can user4, institution, READ_INSTITUTION
-      end
-
-      it "disallows policy creation if self-granted" do
-        policy = Policy.make_unsaved
-        policy.definition = policy_definition(institution, READ_INSTITUTION, false)
-        policy.granter_id = user.id
-        policy.user_id = user.id
-        expect(policy.save).to eq(false)
-      end
-
-      it "disallows policy creation if granter is nil" do
-        policy = Policy.make_unsaved
-        policy.definition = policy_definition(institution, READ_INSTITUTION, false)
-        policy.granter_id = nil
-        policy.user_id = user.id
-        expect(policy.save).to eq(false)
       end
 
       it "allows checking when there's a loop" do

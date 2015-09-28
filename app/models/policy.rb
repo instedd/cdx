@@ -171,10 +171,10 @@ class Policy < ActiveRecord::Base
   def validate_resource_statements(resource_statements)
     Array(resource_statements).each do |resource_statement|
       found_resource = Resource.resolve(resource_statement) rescue false
-      unless found_resource
-        return errors.add :definition, "has an unknown resource: `#{resource_statement}`"
-      end
-      # TODO: validate resources
+      return errors.add :definition, "has an unknown resource: `#{resource_statement}`" unless found_resource
+
+      resource_class, resource_id, resource_query = found_resource
+      return errors.add :definition, "has an invalid condition in resource: `#{resource_statement}`" unless resource_class.supports_query?(resource_query)
     end
   end
 
