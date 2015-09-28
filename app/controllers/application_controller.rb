@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
 
   before_action do
     @main_column_width = if params[:action] != 'index'
-      8
+      6
     else
       10
     end

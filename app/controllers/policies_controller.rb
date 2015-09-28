@@ -1,5 +1,8 @@
 class PoliciesController < ApplicationController
   layout "application", only: [:index, :new]
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def index
     @policies = current_user.granted_policies.includes(:user).all

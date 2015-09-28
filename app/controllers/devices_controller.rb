@@ -6,6 +6,9 @@ class DevicesController < ApplicationController
   before_filter :load_institutions, only: [:new, :create, :edit]
   before_filter :load_laboratories, only: [:index, :new, :create, :edit, :update]
   before_filter :load_institution, only: :create
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def index
     @devices = check_access(Device, READ_DEVICE)

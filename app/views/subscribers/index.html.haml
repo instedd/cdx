@@ -1,9 +1,7 @@
-- content_for(:leftcolumn) do
-  .centered
-    = link_to "+", new_subscriber_path, class: 'btn-add fixed', title: 'Add Subscriber'
 .row
   .col
-    %table.table
+    = link_to "+", new_subscriber_path, class: 'btn-add side-link fix', title: 'Add Subscriber'
+    - cdx_table do
       %tr
         %th.tableheader{colspan:100} Subscribers
       %tr

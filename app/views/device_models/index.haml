@@ -1,9 +1,6 @@
-- content_for(:leftcolumn) do
-  .centered
-    = link_to "+", new_device_model_path, class: 'btn-add fixed', title: 'Add Device Model'
-
 .row
   .col
+    = link_to "+", new_device_model_path, class: 'btn-add side-link fix', title: 'Add Device Model'
     - cdx_table do
       %tr
         %th.tableheader{colspan:100} Device Models

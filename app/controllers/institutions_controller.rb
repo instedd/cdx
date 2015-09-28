@@ -2,6 +2,9 @@ class InstitutionsController < ApplicationController
   layout "institutions"
   before_filter :load_institutions, except: :index
   skip_before_filter :check_no_institution!, only: [:new, :create]
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def index
     @can_create = true

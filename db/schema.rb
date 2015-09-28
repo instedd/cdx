@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150922204816) do
+ActiveRecord::Schema.define(version: 20150925180545) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -196,15 +196,16 @@ ActiveRecord::Schema.define(version: 20150922204816) do
     t.binary   "sensitive_data", limit: 65535
     t.integer  "institution_id", limit: 4
     t.text     "custom_fields",  limit: 65535
-    t.string   "entity_id_hash", limit: 255
     t.text     "core_fields",    limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "patient_id",     limit: 4
     t.integer  "encounter_id",   limit: 4
+    t.string   "entity_id",      limit: 255
   end
 
-  add_index "samples", ["institution_id", "entity_id_hash"], name: "index_samples_on_institution_id_and_entity_id_hash", using: :btree
+  add_index "samples", ["institution_id", "entity_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree
+  add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id_hash", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
   add_index "samples", ["uuid"], name: "index_samples_on_uuid", using: :btree
 
