@@ -32,6 +32,25 @@ ActiveRecord::Schema.define(version: 20150925180545) do
 
   add_index "activations", ["activation_token_id"], name: "index_activations_on_activation_token_id", unique: true, using: :btree
 
+  create_table "computed_policies", force: :cascade do |t|
+    t.integer "user_id",                  limit: 4
+    t.string  "action",                   limit: 255
+    t.string  "resource_type",            limit: 255
+    t.integer "resource_id",              limit: 4
+    t.integer "condition_institution_id", limit: 4
+    t.integer "condition_laboratory_id",  limit: 4
+    t.boolean "delegable",                            default: false
+  end
+
+  create_table "computed_policy_exceptions", force: :cascade do |t|
+    t.integer "computed_policy_id",       limit: 4
+    t.string  "action",                   limit: 255
+    t.string  "resource_type",            limit: 255
+    t.integer "resource_id",              limit: 4
+    t.integer "condition_institution_id", limit: 4
+    t.integer "condition_laboratory_id",  limit: 4
+  end
+
   create_table "conditions", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at"

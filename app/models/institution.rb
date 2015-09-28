@@ -6,7 +6,10 @@ class Institution < ActiveRecord::Base
   has_many :laboratories, dependent: :destroy
   has_many :devices, dependent: :destroy
   has_many :encounters, dependent: :destroy
+
   validates_presence_of :name
+
+  after_create :grant_owner_policy
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
@@ -23,4 +26,11 @@ class Institution < ActiveRecord::Base
   def to_s
     name
   end
+
+  private
+
+  def grant_owner_policy
+    user.grant_predefined_policy "owner", institution_id: self.id
+  end
+
 end

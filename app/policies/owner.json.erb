@@ -1,0 +1,13 @@
+{
+  "statement": [
+    {
+      "action": "*",
+      "resource": [
+        "institution/<%= institution_id %>",
+        "device?institution=<%= institution_id %>",
+        "laboratory?institution=<%= institution_id %>"
+      ]
+    }
+  ],
+  "delegable": true
+}

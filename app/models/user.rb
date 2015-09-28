@@ -14,8 +14,10 @@ class User < ActiveRecord::Base
   has_many :subscribers
   has_many :policies
   has_many :granted_policies, class_name: "Policy", foreign_key: "granter_id"
+  has_many :computed_policies
 
   after_create :grant_implicit_policy
+  attr_accessor :skip_implicit_policy
 
   def create(model)
     if model.respond_to?(:user=)
@@ -24,17 +26,19 @@ class User < ActiveRecord::Base
     model.save ? model : nil
   end
 
+  def grant_predefined_policy(name, args={})
+    predefined = Policy.predefined_policy(name, args)
+    predefined.granter = nil
+    predefined.user = self
+    predefined.save!
+  end
+
   def grant_implicit_policy
-    implicit = Policy.implicit
-    implicit.granter = nil
-    implicit.user = self
-    implicit.save validate: false
+    return if skip_implicit_policy
+    grant_predefined_policy("implicit")
   end
 
   def grant_superadmin_policy
-    implicit = Policy.superadmin
-    implicit.granter = nil
-    implicit.user = self
-    implicit.save validate: false
+    grant_predefined_policy("superadmin")
   end
 end

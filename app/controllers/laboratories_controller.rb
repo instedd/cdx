@@ -7,23 +7,19 @@ class LaboratoriesController < ApplicationController
 
   def index
     @laboratories = check_access(Laboratory, READ_LABORATORY)
-    @laboratories ||= []
     @institutions = check_access(Institution, READ_INSTITUTION)
     @can_create = has_access?(@institutions, CREATE_INSTITUTION_LABORATORY)
 
     if (institution_id = params[:institution].presence)
-      institution_id = institution_id.to_i
-      @laboratories = @laboratories.select { |lab| lab.institution_id == institution_id }
+      @laboratories = @laboratories.where(institution_id: institution_id.to_i)
     end
 
-    @labs_to_edit = check_access(@laboratories, UPDATE_LABORATORY)
-    @labs_to_edit ||= []
-    @labs_to_edit.map!(&:id)
+    @labs_to_edit = check_access(@laboratories, UPDATE_LABORATORY).pluck(:id)
   end
 
   def new
     @laboratory = Laboratory.new
-    return unless prepare_for_institution_and_authorize(@laboratory, CREATE_INSTITUTION_LABORATORY)
+    prepare_for_institution_and_authorize(@laboratory, CREATE_INSTITUTION_LABORATORY)
   end
 
   # POST /laboratories

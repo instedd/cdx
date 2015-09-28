@@ -78,9 +78,13 @@ class ApplicationController < ActionController::Base
     @institutions = authorize_resource(@institutions, action)
     if @institutions.one?
       resource.institution = @institutions.first
+      @institutions
+    elsif @institutions.blank?
+      head :forbidden
+      nil
+    else
+      @institutions
     end
-
-    @institutions
   end
 
   protected
