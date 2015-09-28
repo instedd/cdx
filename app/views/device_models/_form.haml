@@ -5,7 +5,9 @@
         - if @device_model.errors.present?
           - @device_model.errors.full_messages.each do |msg|
             %li= msg
+
 = form_for(@device_model) do |f|
+  = render 'shared/select_institution_or_hidden', f: f
   = f.label :name, :class => 'label'
   = f.text_field :name, :rows => '5', :class => 'input-xx-large '
   = f.fields_for :manifest do |manifest_form|
