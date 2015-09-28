@@ -22,7 +22,7 @@
     .col.pe-2
       = f.label :device_model_id
     .col
-      = f.collection_select :device_model_id, DeviceModel.all, :id, :name, {}, :class => 'ddown'
+      = f.collection_select :device_model_id, DeviceModel.includes(:institution).all, :id, :full_name, {}, :class => 'ddown'
   .row
     .col.pe-2
       = f.label :laboratory

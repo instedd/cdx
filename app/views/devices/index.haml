@@ -36,5 +36,5 @@
           %td= device.name
           - unless @institutions.one?
             %td= device.institution.name
-          %td= device.device_model.name
+          %td= device.device_model.full_name
           %td= device.laboratory.try(:name)

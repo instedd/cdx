@@ -6,9 +6,13 @@
         %th.tableheader{colspan:100} Device Models
       %tr
         %th Name
+        - unless @institutions.one?
+          %th Institution
         %th Version
       - @device_models.each do |device_model|
         %tr{data: {href: edit_device_model_path(device_model) }}
           %td= device_model.name
+          - unless @institutions.one?
+            %td= device_model.institution.try(:name)
           %td= device_model.current_manifest.version
 

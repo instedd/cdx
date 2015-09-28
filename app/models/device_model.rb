@@ -12,4 +12,12 @@ class DeviceModel < ActiveRecord::Base
 
   #This is kept for forward compatibility (we will have multiple manifests, published and unpublished)
   alias_method :current_manifest, :manifest
+
+  def full_name
+    if institution
+      "#{name} (#{institution.name})"
+    else
+      name
+    end
+  end
 end

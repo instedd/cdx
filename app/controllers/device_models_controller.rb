@@ -1,6 +1,6 @@
 class DeviceModelsController < ApplicationController
 
-  before_filter :load_institutions,  except: [:index, :destroy]
+  before_filter :load_institutions
 
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
@@ -8,7 +8,7 @@ class DeviceModelsController < ApplicationController
 
   def index
     @device_models = authorize_resource(DeviceModel, READ_DEVICE_MODEL) or return
-    @device_models = @device_models.includes(:manifest)
+    @device_models = @device_models.includes(:manifest).includes(:institution)
   end
 
   def show
