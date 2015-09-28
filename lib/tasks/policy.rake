@@ -92,7 +92,7 @@ namespace :policy do
 
     def delete_implicit
       puts "Deleting all implicit policies"
-      Policy.where(granter_id: nil).where(name: 'implicit').delete_all
+      Policy.where(granter_id: nil).delete_all
     end
 
     def create_implicit
