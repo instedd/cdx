@@ -3,8 +3,10 @@ class DeviceModel < ActiveRecord::Base
   include Resource
 
   has_one :manifest, dependent: :destroy, inverse_of: :device_model
-  validates_uniqueness_of :name
+  belongs_to :institution
   has_many :devices
+
+  validates_uniqueness_of :name
 
   accepts_nested_attributes_for :manifest
 
