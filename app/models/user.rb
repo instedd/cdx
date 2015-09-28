@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable,
          :validatable, :confirmable, :omniauthable, :timeoutable,
-         :lockable
+         :lockable, :password_expirable
 
   has_many :identities
   has_many :institutions
