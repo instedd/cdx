@@ -7,7 +7,7 @@
       %tr
         %th Name
         %th Version
-      - device_models.each do |device_model|
+      - @device_models.each do |device_model|
         %tr{data: {href: edit_device_model_path(device_model) }}
           %td= device_model.name
           %td= device_model.current_manifest.version

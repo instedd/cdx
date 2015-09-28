@@ -1,18 +1,18 @@
-- if device_model.errors.present?
+- if @device_model.errors.present?
   .alert-container
     .alert.alert-error
       %ul
-        - if device_model.errors.present? 
-          - device_model.errors.full_messages.each do |msg|
+        - if @device_model.errors.present?
+          - @device_model.errors.full_messages.each do |msg|
             %li= msg
-= form_for(device_model) do |f|
+= form_for(@device_model) do |f|
   = f.label :name, :class => 'label'
   = f.text_field :name, :rows => '5', :class => 'input-xx-large '
   = f.fields_for :manifest do |manifest_form|
-    - if device_model.manifest.version
+    - if @device_model.manifest.version
       %p
         %strong Version:
-        = device_model.manifest.version
+        = @device_model.manifest.version
 
     .row
       .col
