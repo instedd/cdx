@@ -72,10 +72,14 @@ class Device < ActiveRecord::Base
   end
 
   def set_key
-    @plain_secret_key = MessageEncryption.secure_random(9)
-    self.secret_key_hash = MessageEncryption.hash(@plain_secret_key)
+    set_key_for_activation_token
     self.ssh_key.try :destroy
     self.activation_token.try :destroy
+  end
+
+  def set_key_for_activation_token
+    @plain_secret_key = MessageEncryption.secure_random(9)
+    self.secret_key_hash = MessageEncryption.hash(@plain_secret_key)
   end
 
   def set_uuid
