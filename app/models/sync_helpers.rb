@@ -20,7 +20,7 @@ module SyncHelpers
       CDXSync::Client.new(client_id(device), public_key)
     end
 
-    def client_settings(client_id, device_uuid)
+    def client_settings(client_id, device_uuid, device_secret_key)
       dir = CDXSync::SyncDirectory.new
       {
         host: Rails.application.config.ssh_server_host,
@@ -29,6 +29,7 @@ module SyncHelpers
         inbox_dir: dir.inbox_area,
         outbox_dir: dir.outbox_area,
         device_uuid: device_uuid,
+        device_key: device_secret_key,
       }
     end
   end

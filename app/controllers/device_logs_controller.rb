@@ -10,7 +10,13 @@ class DeviceLogsController < ApplicationController
 
   def create
     device = Device.find_by_uuid params[:device_id]
-    return head(:not_found) unless device
+    unless device
+      return head(:not_found)
+    end
+
+    unless device.validate_authentication(params[:key])
+      return head(:forbidden)
+    end
 
     device.device_logs.create! message: request.raw_post
 

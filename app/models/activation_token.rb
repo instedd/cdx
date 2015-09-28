@@ -19,7 +19,9 @@ class ActivationToken < ActiveRecord::Base
       self.activation = Activation.create!(activation_token: self)
       SshKey.regenerate_authorized_keys!
     end
-    SyncHelpers.client_settings(client_id, device.uuid)
+    device.set_key
+    device.save!
+    SyncHelpers.client_settings(client_id, device.uuid, device.plain_secret_key)
   end
 
   private
