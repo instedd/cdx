@@ -10,4 +10,8 @@ class Cdx::Api::Elasticsearch::NullQuery
   def grouped_by
     @params["group_by"].split(',')
   end
+
+  def elasticsearch_query
+    nil
+  end
 end

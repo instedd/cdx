@@ -6,4 +6,16 @@ class Filter < ActiveRecord::Base
   validates_presence_of :user
   validates_presence_of :name
   validates_presence_of :query
+
+  after_update :recreate_subscriber_percolators
+
+  def create_query
+    TestResult.query(self.query, self.user)
+  end
+
+  private
+
+  def recreate_subscriber_percolators
+    subscribers.each &:create_percolator
+  end
 end

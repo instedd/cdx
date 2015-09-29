@@ -145,6 +145,9 @@ class ComputedPolicy < ActiveRecord::Base
         to_create.each(&:save!)
       end
 
+      # Update subscriber percolators
+      user.subscribers.find_each &:create_percolator
+
       # Recursively update grantees
       Policy.where(granter_id: user.id).distinct.pluck(:user_id).each do |user_id|
         update_user(User.find(user_id))

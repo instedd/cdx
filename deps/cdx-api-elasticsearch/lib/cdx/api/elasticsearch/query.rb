@@ -67,10 +67,14 @@ class Cdx::Api::Elasticsearch::Query
     (@params["group_by"] || "").split(',')
   end
 
+  def elasticsearch_query
+    and_conditions(process_conditions(params))
+  end
+
   protected
 
   def query(params)
-    query = and_conditions(process_conditions(params))
+    query = elasticsearch_query
 
     if params["group_by"]
       tests = query_with_group_by(query, params["group_by"])

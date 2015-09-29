@@ -102,6 +102,7 @@ describe TestResultIndexer, elasticsearch: true do
         }
       },
       id: "#{test.device.uuid}_4")
+    expect(client).to receive(:percolate).and_return({"matches" => []})
 
     test_indexer.index
   end

@@ -29,15 +29,6 @@ web:
   volumes_from:
     - sshd
 
-subscribers:
-  build: .
-  user: nobody
-  links:
-    - db
-    - elasticsearch
-  command: bin/notify_subscribers
-  env_file: docker-dev.env
-
 csv_watch:
   build: .
   command: rake csv:watch
