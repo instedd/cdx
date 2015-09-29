@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150902154438) do
+ActiveRecord::Schema.define(version: 20150929202058) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
