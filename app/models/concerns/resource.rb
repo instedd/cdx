@@ -15,14 +15,10 @@ module Resource
 
   included do
 
-    delegate :resource_type, :resource_class, :none, to: :class
+    delegate :resource_type, :resource_class, to: :class
 
     def resource_name
       "#{self.class.resource_name_prefix}/#{id}"
-    end
-
-    def filter(conditions)
-      self.class.where(id: self.id).filter(conditions)
     end
 
   end
