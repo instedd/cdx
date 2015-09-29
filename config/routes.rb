@@ -77,6 +77,7 @@ Rails.application.routes.draw do
       match 'events' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3
     end
     resources :laboratories, only: :index
+    resources :institutions, only: :index
   end
 
   scope :api, format: 'json', except: [:new, :edit] do
