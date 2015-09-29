@@ -11,7 +11,7 @@ namespace :cdx_elasticsearch do
   task reindex: :setup do
     total_count = TestResult.count
     index = 0
-    TestResult.find_each do |test_result|
+    TestResult.includes({:device => [:device_model, :institution]}, :sample, :patient).find_each do |test_result|
       index += 1
       print "\rIndexing #{index} of #{total_count}"
       TestResultIndexer.new(test_result).index
