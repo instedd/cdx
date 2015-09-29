@@ -11,6 +11,8 @@ smtp:
 
 sshd:
   image: instedd/cdx-sync-sshd
+  environment:
+    SYNC_UID: 9999
 
 web:
   build: .
@@ -27,7 +29,7 @@ web:
 
 subscribers:
   build: .
-  user: nobody
+  user: app
   links:
     - db
     - elasticsearch
@@ -36,6 +38,7 @@ subscribers:
 
 csv_watch:
   build: .
+  user: app
   command: rake csv:watch
   links:
     - db

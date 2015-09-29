@@ -1,5 +1,11 @@
 FROM instedd/nginx-rails:2.2
 
+## Create a user for the web app.
+RUN \
+  addgroup --gid 9999 app && \
+  adduser --uid 9999 --gid 9999 --disabled-password --gecos "Application" app && \
+  usermod -L app
+
 # Install prerequisites
 RUN \
   apt-get update && \
@@ -18,7 +24,7 @@ ADD . /app
 RUN bundle exec rake assets:precompile RAILS_ENV=production
 
 # Set permissions for tmp and log directories
-RUN mkdir -p /app/tmp /app/log && chown -R nobody:nogroup /app/tmp /app/log
+RUN mkdir -p /app/tmp /app/log && chown -R app:app /app/tmp /app/log
 
 # Add config files
 ADD docker/web-run /etc/service/web/run
