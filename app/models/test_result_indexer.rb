@@ -12,16 +12,16 @@ class TestResultIndexer
   def index(refresh = false)
     fields = core_fields()
     run_before_index_hooks(fields)
-    options = {index: Cdx::Api.index_name, type: type, body: fields, id: elasticsearch_id}
+    options = {index: Cdx::Api.index_name, type: type, body: fields, id: test_result.uuid}
     options[:refresh] = true if refresh
     client.index(options)
 
     percolate_result = client.percolate index: Cdx::Api.index_name,
                                         type: type,
-                                        id: CGI.escape(elasticsearch_id)
+                                        id: test_result.uuid
     percolate_result["matches"].each do |match|
       subscriber_id = match["_id"]
-      NotifySubscriberJob.perform_later subscriber_id, elasticsearch_id
+      NotifySubscriberJob.perform_later subscriber_id, test_result.uuid
     end
   end
 
@@ -35,10 +35,6 @@ class TestResultIndexer
 
   def type
     'test'
-  end
-
-  def elasticsearch_id
-    "#{device.uuid}_#{test_result.test_id || test_result.uuid}"
   end
 
   def client

@@ -101,7 +101,7 @@ describe TestResultIndexer, elasticsearch: true do
           "uuid" => test.device.institution.uuid
         }
       },
-      id: "#{test.device.uuid}_4")
+      id: test.uuid)
     expect(client).to receive(:percolate).and_return({"matches" => []})
 
     test_indexer.index
