@@ -86,6 +86,9 @@ class LaboratoriesController < ApplicationController
   end
 
   def laboratory_params
+    location_details = Location.details(params[:laboratory][:location_geoid]).first
+    params[:laboratory][:lat] = location_details.lat
+    params[:laboratory][:lng] = location_details.lng
     params.require(:laboratory).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid)
   end
 end
