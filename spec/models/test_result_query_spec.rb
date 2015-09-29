@@ -13,23 +13,21 @@ describe TestResultQuery, elasticsearch: true do
   let(:laboratory)      {Laboratory.make institution: institution}
   let(:laboratory_2)    {Laboratory.make institution: institution_2}
   let(:laboratory_3)    {Laboratory.make institution: institution_3}
+  let(:laboratory_4)    {Laboratory.make institution: institution}
 
   let(:user_device)     {Device.make institution_id: institution.id, laboratory: laboratory}
   let(:user_device_2)   {Device.make institution_id: institution.id, laboratory: laboratory}
   let(:user_device_3)   {Device.make institution_id: institution_2.id, laboratory: laboratory_2}
   let(:user_device_4)   {Device.make institution_id: institution_3.id, laboratory: laboratory_3}
+  let(:user_device_5)   {Device.make institution_id: institution.id, laboratory: laboratory_4}
   let(:non_user_device) {Device.make}
+
+  let(:core_fields) { {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}} }
 
   context "policies" do
     it "applies institution policy" do
-      TestResult.create_and_index(
-        core_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
-      TestResult.create_and_index(
-        core_fields: {"results" =>["condition" => "mtb", "result" => :negative]},
-        device_messages:[DeviceMessage.make(device: non_user_device)]
-      )
+      TestResult.create_and_index(core_fields: {"results" =>["condition" => "mtb", "result" => :positive]}, device_messages:[DeviceMessage.make(device: user_device)])
+      TestResult.create_and_index(core_fields: {"results" =>["condition" => "mtb", "result" => :negative]}, device_messages:[DeviceMessage.make(device: non_user_device)])
 
       refresh_index
 
@@ -39,29 +37,20 @@ describe TestResultQuery, elasticsearch: true do
       expect(result['tests'].first['test']['results'].first['result']).to eq('positive')
     end
 
-    it "delegates institution policy" do
-      TestResult.create_and_index(
-        core_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
-      TestResult.create_and_index(
-        core_fields: {"results" =>["condition" => "mtb", "result" => :negative]},
-        device_messages:[DeviceMessage.make(device: user_device_3)]
-      )
+    it "delegates all tests from a user" do
+      TestResult.create_and_index(core_fields: {"results" =>["condition" => "mtb", "result" => :positive]}, device_messages:[DeviceMessage.make(device: user_device)])
+      TestResult.create_and_index(core_fields: {"results" =>["condition" => "mtb", "result" => :negative]}, device_messages:[DeviceMessage.make(device: user_device_3)])
 
       refresh_index
 
-      grant(user, user_2, institution, QUERY_TEST)
-      grant(user, user_2, laboratory, QUERY_TEST)
-      grant(user, user_2, user_device, QUERY_TEST)
+      grant(user, user_2, "testResult", QUERY_TEST)
 
       result = TestResultQuery.for({"condition" => 'mtb'}, user_2).execute
 
-      expect(result['total_count']).to eq(1)
-      expect(result['tests'].first['test']['results'].first['result']).to eq('positive')
+      expect(result['total_count']).to eq(2)
     end
 
-    it "doesn't fails if no device is indexed for the institution yet" do
+    it "does not fail if no device is indexed for the institution yet" do
       institution
 
       refresh_index
@@ -73,10 +62,7 @@ describe TestResultQuery, elasticsearch: true do
     end
 
     it "should not access any test if has no policy" do
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
 
       refresh_index
 
@@ -87,18 +73,9 @@ describe TestResultQuery, elasticsearch: true do
     end
 
     it "applies institution.id filter" do
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device_2)]
-      )
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device_3)]
-      )
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device_4)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device_2)])
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device_3)])
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device_4)])
 
       refresh_index
 
@@ -107,14 +84,8 @@ describe TestResultQuery, elasticsearch: true do
     end
 
     it "disallows viewing another institution's tests" do
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: non_user_device)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: non_user_device)])
 
       refresh_index
 
@@ -123,42 +94,36 @@ describe TestResultQuery, elasticsearch: true do
     end
 
     it "have access with policy by institution" do
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device_3)])
 
       refresh_index
 
-      grant(user, user_2, institution, QUERY_TEST)
+      grant(user, user_2, "testResult?institution=#{institution.id}", QUERY_TEST)
 
       result = TestResultQuery.for({"condition" => 'mtb'}, user_2).execute
       expect(result['total_count']).to eq(1)
     end
 
     it "have access with policy by laboratory" do
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device_5)])
 
       refresh_index
 
-      grant(user, user_2, laboratory, QUERY_TEST)
+      grant(user, user_2, "testResult?laboratory=#{laboratory.id}", QUERY_TEST)
 
       result = TestResultQuery.for({"condition" => 'mtb'}, user_2).execute
       expect(result['total_count']).to eq(1)
     end
 
     it "have access with policy by device" do
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device_2)])
 
       refresh_index
 
-      grant(user, user_2, user_device, QUERY_TEST)
+      grant(user, user_2, "testResult?device=#{user_device.id}", QUERY_TEST)
 
       result = TestResultQuery.for({"condition" => 'mtb'}, user_2).execute
       expect(result['total_count']).to eq(1)
@@ -169,19 +134,10 @@ describe TestResultQuery, elasticsearch: true do
       super_institution = user.create Institution.make_unsaved
       super_device = Device.make institution_id: super_institution.id
 
-      policy = Policy.superadmin
-      policy.granter_id = nil
-      policy.user_id = super_user.id
-      policy.save(validate: false)
+      super_user.grant_superadmin_policy
 
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: super_device)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: super_device)])
 
       refresh_index
 
@@ -192,10 +148,7 @@ describe TestResultQuery, elasticsearch: true do
 
   context "query adapting" do
     it "should include institution name, device name, and laboratory name in the tests" do
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
       refresh_index
 
       result = TestResultQuery.for({"condition" => 'mtb'}, user).execute
@@ -209,10 +162,7 @@ describe TestResultQuery, elasticsearch: true do
     it "should include names if there is no lab" do
       laboratory
       device = Device.make institution_id: institution.id, laboratory: nil
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: device)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: device)])
       refresh_index
 
       result = TestResultQuery.for({"condition" => 'mtb'}, user).execute
@@ -223,10 +173,7 @@ describe TestResultQuery, elasticsearch: true do
     end
 
     it "should include the updated institution name, device name, and laboratory name in the tests" do
-      TestResult.create_and_index(
-        core_fields: {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}},
-        device_messages:[DeviceMessage.make(device: user_device)]
-      )
+      TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
       refresh_index
 
       institution.name = 'abc'

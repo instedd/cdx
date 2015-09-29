@@ -56,8 +56,8 @@ module ComputedPolicyConcern
 
     def conditions
       return {
-        laboratory_id: condition_laboratory_id,
-        institution_id: condition_institution_id
+        laboratory: condition_laboratory_id,
+        institution: condition_institution_id
       }
     end
 

@@ -3,7 +3,7 @@ module Resource
   include Policy::Actions
 
   def self.all
-    @all_resources ||= [Institution, Laboratory, Device, DeviceModel].freeze
+    @all_resources ||= [Institution, Laboratory, Device, DeviceModel, TestResult].freeze
   end
 
   def self.resolve(resource_string)
@@ -12,6 +12,8 @@ module Resource
     match = ($1 == '*') ? nil : $1
     [resource_class, match.presence, Rack::Utils.parse_nested_query($2)]
   end
+
+  class NotSupportedException < StandardError; end
 
   included do
 

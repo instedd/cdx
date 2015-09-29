@@ -48,7 +48,7 @@ class Policy < ActiveRecord::Base
     GENERATE_ACTIVATION_TOKEN = "device:generateActivationToken" # This is not tested.
     REPORT_MESSAGE =            "device:reportMessage"
 
-    QUERY_TEST = "test:query"
+    QUERY_TEST = "testResult:query"
   end
 
   ACTIONS = [

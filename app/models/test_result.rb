@@ -1,6 +1,7 @@
 class TestResult < ActiveRecord::Base
   include AutoUUID
   include Entity
+  include Resource
 
   NAME_FIELD = 'name'
   LAB_USER_FIELD = 'lab_user'
@@ -43,6 +44,14 @@ class TestResult < ActiveRecord::Base
     data = data.deep_merge(sample.entity_scope => sample.custom_fields) if sample
     data = data.deep_merge(patient.entity_scope => patient.custom_fields) if patient
     data
+  end
+
+  def self.filter(conditions)
+    raise Resource::NotSupportedException.new, "Resource filter unsupported in test results resource"
+  end
+
+  def self.supports_condition?(key)
+    %W(institution laboratory device).include?(key.to_s)
   end
 
   def self.query params, user

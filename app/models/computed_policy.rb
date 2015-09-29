@@ -153,8 +153,7 @@ class ComputedPolicy < ActiveRecord::Base
 
     def action_unrelated_to_resource?(action, resource_type_string)
       return action.presence && (action != '*') &&\
-        !action.starts_with?(resource_type_string) &&\
-        !action.starts_with?("test")
+        !action.starts_with?(resource_type_string)
     end
 
     def resolve_resource(resource_string)
