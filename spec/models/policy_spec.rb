@@ -65,6 +65,44 @@ describe Policy do
 
   end
 
+  context "Authorize" do
+
+    let!(:user2) { User.make }
+
+    let!(:institution2a) { user2.institutions.make }
+    let!(:institution2b) { user2.institutions.make }
+    let!(:institution2c) { user2.institutions.make }
+
+    before(:each) do
+      user; institution
+      grant user2, user, [institution2a, institution2b], READ_INSTITUTION
+    end
+
+    it "should return a scope when queried over a class" do
+      authorized = Policy.authorize READ_INSTITUTION, Institution, user
+      expect(authorized).to be_kind_of(Institution::ActiveRecord_Relation)
+      expect(authorized.to_a).to contain_exactly(institution, institution2a, institution2b)
+    end
+
+    it "should return an empty scope when queried over an unauthorized class" do
+      authorized = Policy.authorize READ_INSTITUTION, Institution, User.make
+      expect(authorized).to be_kind_of(Institution::ActiveRecord_Relation)
+      expect(authorized.to_a).to be_empty
+    end
+
+    it "should return an instance when queried over an instance" do
+      authorized = Policy.authorize READ_INSTITUTION, institution2b, user
+      expect(authorized).to be_kind_of(Institution)
+      expect(authorized).to eq(institution2b)
+    end
+
+    it "should return nil when queried over an unauthorized instance" do
+      authorized = Policy.authorize READ_INSTITUTION, institution2c, user
+      expect(authorized).to be_nil
+    end
+
+  end
+
   context "Institution" do
     context "Create" do
       it "allows creating institutions" do
