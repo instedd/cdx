@@ -3,8 +3,10 @@ class Institution < ActiveRecord::Base
   include Resource
 
   belongs_to :user
+
   has_many :laboratories, dependent: :destroy
   has_many :devices, dependent: :destroy
+  has_many :device_models, dependent: :restrict_with_error
   has_many :encounters, dependent: :destroy
 
   validates_presence_of :name

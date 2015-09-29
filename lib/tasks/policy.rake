@@ -8,8 +8,12 @@ namespace :policy do
     end
 
     user = User.find args[:user_id]
-
     user.grant_superadmin_policy
+  end
+
+  desc "Recreates implicit and owner policies for all users"
+  task :implicit => :environment do
+    PoliciesMigrator.new.update_implicit!
   end
 
   desc "Migrates policies to the latest format"
@@ -80,18 +84,37 @@ namespace :policy do
       resource =~ /\A#{PREFIX}:(.+)/ ? $1 : resource
     end
 
-    def run!
-
-      # Do not calculate computed policies until we have migrated all policies
+    def skip_callbacks
       Policy.skip_callback :save, :after, :update_computed_policies
       Policy.skip_callback :destroy, :after, :update_computed_policies
       Institution.skip_callback :create, :after, :grant_owner_policy
+    end
 
-      # Wipe out all implicit policies
+    def delete_implicit
       puts "Deleting all implicit policies"
-      Policy.where(granter_id: nil).where(name: 'implicit').delete_all
+      Policy.where(granter_id: nil).delete_all
+    end
 
-      # Migrate custom ones
+    def create_implicit
+      puts "Creating new implicit and owner policies for users"
+      User.find_each do |user|
+        puts " #{user.email}"
+        user.grant_implicit_policy
+        user.institutions.each do |institution|
+          user.grant_predefined_policy "owner", institution_id: institution.id
+        end
+      end
+    end
+
+    def calculate_computed
+      puts "Recalculating computed policies for all users"
+      User.find_each do |user|
+        puts " #{user.email}"
+        ComputedPolicy.update_user(user)
+      end
+    end
+
+    def migrate_custom
       puts "Migrating custom policies"
       Policy.includes(:user).find_each do |policy|
         puts " #{policy.name} for user #{policy.user.email}"
@@ -104,26 +127,23 @@ namespace :policy do
         policy.allows_implicit = true
         policy.save!
       end
+    end
 
-      # Create new implicit ones
-      puts "Creating new implicit and owner policies for users"
-      User.find_each do |user|
-        puts " #{user.email}"
-        user.grant_implicit_policy
-        user.institutions.each do |institution|
-          user.grant_predefined_policy "owner", institution_id: institution.id
-        end
-      end
-
-      # Calculate computed policies
-      puts "Recalculating computed policies for all users"
-      User.find_each do |user|
-        puts " #{user.email}"
-        ComputedPolicy.update_user(user)
-      end
-
+    def run!
+      skip_callbacks
+      delete_implicit
+      migrate_custom
+      create_implicit
+      calculate_computed
       puts "\nSuccess!"
+    end
 
+    def update_implicit!
+      skip_callbacks
+      delete_implicit
+      create_implicit
+      calculate_computed
+      puts "\nSuccess!"
     end
 
   end

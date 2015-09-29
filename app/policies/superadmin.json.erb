@@ -2,11 +2,7 @@
   "statement": [
     {
       "action": "*",
-      "resource": [
-        "institution",
-        "laboratory",
-        "device"
-      ]
+      "resource": <%= Resource.all.map(&:resource_name).to_json %>
     }
   ],
   "delegable": true
