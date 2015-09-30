@@ -32,6 +32,7 @@ class Policy < ActiveRecord::Base
     ASSIGN_DEVICE_LABORATORY = "#{PREFIX}:assignDeviceLaboratory" # This is not tested.
     REGENERATE_DEVICE_KEY = "#{PREFIX}:regenerateDeviceKey" # This is not tested.
     GENERATE_ACTIVATION_TOKEN = "#{PREFIX}:generateActivationToken" # This is not tested.
+    SUPPORT_DEVICE = "#{PREFIX}:supportDevice" # This is not tested.
     QUERY_TEST = "#{PREFIX}:queryTest"
     REPORT_MESSAGE = "#{PREFIX}:reportMessage"
   end
@@ -51,6 +52,7 @@ class Policy < ActiveRecord::Base
     Actions::ASSIGN_DEVICE_LABORATORY,
     Actions::REGENERATE_DEVICE_KEY,
     Actions::GENERATE_ACTIVATION_TOKEN,
+    Actions::SUPPORT_DEVICE,
     Actions::QUERY_TEST,
     Actions::REPORT_MESSAGE,
   ]
