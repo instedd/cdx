@@ -26,9 +26,7 @@ class DevicesController < ApplicationController
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
 
-    @devices_to_edit = check_access(Device, UPDATE_DEVICE)
-    @devices_to_edit ||= []
-    @devices_to_edit.pluck(:id)
+    @devices_to_edit = check_access(Device, UPDATE_DEVICE).pluck(:id)
 
     @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end
@@ -60,7 +58,7 @@ class DevicesController < ApplicationController
   end
 
   def show
-    redirect_to edit_institution_device_path(@institution, params[:id])
+    redirect_to edit_device_path(params[:id])
   end
 
   def edit
