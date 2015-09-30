@@ -3,10 +3,10 @@
     %p#notice= notice
     %p
       %strong Version:
-      = device_model.manifest.try(:version)
+      = @device_model.manifest.try(:version)
     %p
       %strong Definition:
-      %pre= JSON.pretty_generate(Oj.load(device_model.manifest.definition)) rescue device_model.manifest.definition
+      %pre= JSON.pretty_generate(Oj.load(@device_model.manifest.definition)) rescue @device_model.manifest.definition
 
 .row
   .col

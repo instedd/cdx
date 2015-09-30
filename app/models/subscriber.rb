@@ -13,16 +13,23 @@ class Subscriber < ActiveRecord::Base
   validates_presence_of :verb
   validates_inclusion_of :verb, in: VALID_VERBS
 
-  def self.notify_all
-    PoirotRails::Activity.start("Subscriber.notify_all") do
-      Subscriber.find_each do |subscriber|
-        begin
-          subscriber.notify
-        rescue => ex
-          Rails.logger.error "#{ex.message} : #{ex.backtrace}"
-        end
-      end
-    end
+  after_create :create_percolator
+  after_destroy :delete_percolator
+
+  def create_percolator
+    es_query = filter.create_query.elasticsearch_query
+    return unless es_query
+    Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
+                          type: '.percolator',
+                          id: self.id,
+                          body: { query: es_query, type: 'test' }
+  end
+
+  def delete_percolator
+    Cdx::Api.client.delete index: Cdx::Api.index_name_pattern,
+                           type: '.percolator',
+                           id: self.id,
+                           ignore: 404
   end
 
   def self.available_field_names
@@ -48,48 +55,31 @@ class Subscriber < ActiveRecord::Base
     TestsSchema.new("en-US").build
   end
 
-  def notify
-    fields = self.fields
-    query = self.filter.query.merge "page_size" => 10000, "test.updated_time_since" => last_run_at.iso8601
-    Rails.logger.info "Filter : #{query}"
-    tests = TestResult.query(query, filter.user).execute["tests"]
+  def notify_test(test)
+    PoirotRails::Activity.start("Publish test to subscriber #{self.name}") do
+      filtered_test = filter_test(test, fields)
+      callback_url = self.url
 
-    now = Time.now
-    tests.each do |test|
-      PoirotRails::Activity.start("Publish test to subscriber #{self.name}") do
+      if self.verb == 'GET'
+        callback_url = URI.parse self.url
+        callback_query = Rack::Utils.parse_nested_query(callback_url.query || "")
+        merged_query = filtered_test.merge(callback_query)
+        callback_url = "#{callback_url.scheme}://#{callback_url.host}:#{callback_url.port}#{callback_url.path}?#{merged_query.to_query}"
+      end
 
-        filtered_test = filter_test(test, fields)
+      options = {}
+      if self.url_user && self.url_password
+        options[:user] = self.url_user
+        options[:password] = self.url_password
+      end
 
-        callback_url = self.url
-
-        if self.verb == 'GET'
-          callback_url = URI.parse self.url
-          callback_query = Rack::Utils.parse_nested_query(callback_url.query || "")
-          merged_query = filtered_test.merge(callback_query)
-          callback_url = "#{callback_url.scheme}://#{callback_url.host}:#{callback_url.port}#{callback_url.path}?#{merged_query.to_query}"
-        end
-
-        options = {}
-        if self.url_user && self.url_password
-          options[:user] = self.url_user
-          options[:password] = self.url_password
-        end
-
-        request = RestClient::Resource.new(callback_url, options)
-        begin
-          if self.verb == 'GET'
-            request.get
-          else
-            request.post filtered_test.to_json
-          end
-        rescue Exception => ex
-          Rails.logger.warn "Could not #{verb} to subscriber #{id} at #{callback_url}: #{ex.message}\n#{ex.backtrace}"
-        end
-
+      request = RestClient::Resource.new(callback_url, options)
+      if self.verb == 'GET'
+        request.get
+      else
+        request.post filtered_test.to_json, content_type: :json
       end
     end
-    self.last_run_at = now
-    self.save!
   end
 
   def filter_test(indexed_test, fields)

@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
 
   before_action do
     @main_column_width = if params[:action] != 'index'
-      8
+      6
     else
       10
     end
@@ -78,9 +78,13 @@ class ApplicationController < ActionController::Base
     @institutions = authorize_resource(@institutions, action)
     if @institutions.one?
       resource.institution = @institutions.first
+      @institutions
+    elsif @institutions.blank?
+      head :forbidden
+      nil
+    else
+      @institutions
     end
-
-    @institutions
   end
 
   protected

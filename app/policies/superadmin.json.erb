@@ -1,9 +1,8 @@
 {
   "statement": [
     {
-      "effect": "allow",
       "action": "*",
-      "resource": "*"
+      "resource": <%= Resource.all.map(&:resource_name).to_json %>
     }
   ],
   "delegable": true

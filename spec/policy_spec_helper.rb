@@ -1,15 +1,19 @@
 include Policy::Actions
 
-def assert_can(user, resource, action, expected_result = [resource])
+def assert_can(user, resource, action, expected_result=nil)
   result = Policy.can? action, resource, user
 
   expect(result).to eq(true)
 
   result = Policy.authorize action, resource, user
-  result = result.sort_by &:id
-  expected_result = expected_result.sort_by &:id
 
-  expect(result).to eq(expected_result)
+  expected_result ||= resource
+
+  if expected_result.kind_of?(Resource)
+    expect(result).to eq(expected_result)
+  else
+    expect(result.to_a).to match_array(expected_result.to_a)
+  end
 end
 
 def assert_cannot(user, resource, action)
@@ -17,34 +21,29 @@ def assert_cannot(user, resource, action)
   expect(result).to eq(true)
 end
 
-def grant(granter, user, resource, action, delegable = true)
-  grant_or_deny granter, user, resource, action, delegable, "allow"
-end
-
-def deny(granter, user, resource, action, delegable = true)
-  grant_or_deny granter, user, resource, action, delegable, "deny"
-end
-
-def grant_or_deny(granter, user, resource, action, delegable, effect)
+def grant(granter, user, resource, action, opts = {})
+  [granter, user].compact.each(&:reload)
   policy = Policy.make_unsaved
-  policy.definition = policy_definition(resource, action, delegable, effect)
-  policy.granter_id = granter.id
+  policy.definition = policy_definition(resource, action, opts.fetch(:delegable, true), opts.fetch(:except, []))
+  policy.granter_id = granter.try(:id)
   policy.user_id = user.id
+  policy.allows_implicit = true
   policy.save!
   policy
 end
 
-def policy_definition(resource, action, delegable = true, effect = "allow")
-  resource = Array(resource).map(&:resource_name)
+def policy_definition(resource, action, delegable = true, except = [])
+  resource = Array(resource).map{|r| r.kind_of?(String) ? r : r.resource_name}
+  except = Array(except).map{|r| r.kind_of?(String) ? r : r.resource_name}
   action = Array(action)
 
   JSON.parse %(
     {
       "statement":  [
         {
-          "effect": "#{effect}",
           "action": #{action.to_json},
-          "resource": #{resource.to_json}
+          "resource": #{resource.to_json},
+          "except": #{except.to_json}
         }
       ],
       "delegable": #{delegable}

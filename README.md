@@ -19,7 +19,7 @@ To start developing:
 
 4. Setup test database: `bundle exec rake db:test:prepare`
 
-5. Setup elasticsearch index template: `bundle exec rake cdx_elasticsearch:initialize_template`
+5. Setup elasticsearch index template: `bundle exec rake cdx_elasticsearch:setup`
 
 6. Run tests: `bundle exec rspec`
 
@@ -28,6 +28,26 @@ To start developing:
 Additionally:
 
 8. Import manifests: `bundle exec rake manifests:load`
+
+To create an initial set of tests:
+
+9. Navigate to the application
+
+10. Create a new account and sign in
+
+11. Create a new institution
+
+12. Create a new laboratory
+
+13. Create a new device, choosing Genoscan model
+
+14. Navigate to `/api/playground`
+
+15. Select your newly created device
+
+16. Copy the contents of `/spec/fixtures/csvs/genoscan_sample.csv` into the _Data_ field
+
+17. Run create message and navigate to _Tests_ to verify the tests were successfully imported
 
 ### Locations setup
 

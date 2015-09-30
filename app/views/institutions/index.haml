@@ -1,6 +1,8 @@
 .row
   .col
-    %table.table
+    = link_to "+", new_institution_path, class: 'btn-add side-link fix', title: 'Add Institution'
+
+    - cdx_table do
       %tr
         %th.tableheader{colspan:100} Institutions
       %tr
@@ -8,4 +10,3 @@
       - @institutions.each do |institution|
         %tr
           %td= link_to institution.name, edit_institution_path(institution)
-

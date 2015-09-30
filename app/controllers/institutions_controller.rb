@@ -2,6 +2,9 @@ class InstitutionsController < ApplicationController
   layout "institutions"
   before_filter :load_institutions, except: :index
   skip_before_filter :check_no_institution!, only: [:new, :create]
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def index
     @can_create = true
@@ -31,7 +34,7 @@ class InstitutionsController < ApplicationController
   def new
     @institution = current_user.institutions.new
     @institution.user_id = current_user.id
-    return unless authorize_resource(@institution, CREATE_INSTITUTION)
+    return unless authorize_resource(Institution, CREATE_INSTITUTION)
 
     @first_institution_creation = @institutions.count == 0
     @hide_user_settings = @hide_nav_bar = @first_institution_creation
@@ -40,7 +43,7 @@ class InstitutionsController < ApplicationController
   def create
     @institution = Institution.new(institution_params)
     @institution.user_id = current_user.id
-    return unless authorize_resource(@institution, CREATE_INSTITUTION)
+    return unless authorize_resource(Institution, CREATE_INSTITUTION)
 
     @first_institution_creation = @institutions.count == 0
     @hide_user_settings = @hide_nav_bar = @first_institution_creation

@@ -9,26 +9,31 @@
   = render 'shared/select_institution_or_hidden', f: f
 
   .row
-    .col.pe-3
-      = f.label :name, :class => 'label'
+    .col.pe-2
+      = f.label :name
+    .col
       = f.text_field :name
   .row
-    .col.pe-3
-      = f.label :serial_number, :class => 'label'
+    .col.pe-2
+      = f.label :serial_number
+    .col
       = f.text_field :serial_number
   .row
-    .col.pe-3
-      = f.label :device_model_id, :class => 'label'
-      = f.collection_select :device_model_id, DeviceModel.all, :id, :name, {}, :class => 'ddown'
+    .col.pe-2
+      = f.label :device_model_id
+    .col
+      = f.collection_select :device_model_id, DeviceModel.includes(:institution).all, :id, :full_name, {}, :class => 'ddown'
   .row
-    .col.pe-3
-      = f.label :laboratory, :class => 'label'
+    .col.pe-2
+      = f.label :laboratory
+    .col
       = f.collection_select(:laboratory_id, @laboratories, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
   .row
-    .col.pe-3
-      = f.label :time_zone, :class => 'label'
+    .col.pe-2
+      = f.label :time_zone
+    .col
       = f.time_zone_select(:time_zone, nil,{ default: "UTC"}, class: 'ddown')
-  .row
+  .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
       - if @can_delete

@@ -1,33 +1,30 @@
 class LaboratoriesController < ApplicationController
   set_institution_tab :laboratories
   before_filter :load_institutions
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def index
     @laboratories = check_access(Laboratory, READ_LABORATORY)
-    @laboratories ||= []
     @institutions = check_access(Institution, READ_INSTITUTION)
     @can_create = has_access?(@institutions, CREATE_INSTITUTION_LABORATORY)
 
     if (institution_id = params[:institution].presence)
-      institution_id = institution_id.to_i
-      @laboratories = @laboratories.select { |lab| lab.institution_id == institution_id }
+      @laboratories = @laboratories.where(institution_id: institution_id.to_i)
     end
 
-    @labs_to_edit = check_access(@laboratories, UPDATE_LABORATORY)
-    @labs_to_edit ||= []
-    @labs_to_edit.map!(&:id)
+    @labs_to_edit = check_access(@laboratories, UPDATE_LABORATORY).pluck(:id)
   end
 
   def new
-    @main_column_width = 6
     @laboratory = Laboratory.new
-    return unless prepare_for_institution_and_authorize(@laboratory, CREATE_INSTITUTION_LABORATORY)
+    prepare_for_institution_and_authorize(@laboratory, CREATE_INSTITUTION_LABORATORY)
   end
 
   # POST /laboratories
   # POST /laboratories.json
   def create
-    @main_column_width = 6
     @institution = Institution.find params[:laboratory][:institution_id]
     return unless authorize_resource(@institution, CREATE_INSTITUTION_LABORATORY)
 
@@ -45,7 +42,6 @@ class LaboratoriesController < ApplicationController
   end
 
   def edit
-    @main_column_width = 6
     @laboratory = Laboratory.find(params[:id])
     return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
@@ -55,7 +51,6 @@ class LaboratoriesController < ApplicationController
   # PATCH/PUT /laboratories/1
   # PATCH/PUT /laboratories/1.json
   def update
-    @main_column_width = 6
     @laboratory = Laboratory.find params[:id]
     return unless authorize_resource(@laboratory, UPDATE_LABORATORY)
 
@@ -85,6 +80,7 @@ class LaboratoriesController < ApplicationController
   end
 
   private
+
   def load_institutions
     @institutions = check_access(Institution, CREATE_INSTITUTION_LABORATORY)
   end

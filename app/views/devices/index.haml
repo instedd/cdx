@@ -20,7 +20,7 @@
 .row
   .col
     - if @can_create
-      = link_to "+", new_device_path, class: 'btn-add side-link', title: 'Add Device'
+      = link_to "+", new_device_path, class: 'btn-add side-link fix', title: 'Add Device'
     - cdx_table do
       %tr
         %th.tableheader{colspan:100} Devices
@@ -36,5 +36,5 @@
           %td= device.name
           - unless @institutions.one?
             %td= device.institution.name
-          %td= device.device_model.name
+          %td= device.device_model.full_name
           %td= device.laboratory.try(:name)

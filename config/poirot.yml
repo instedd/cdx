@@ -1,17 +1,17 @@
 common: &default_settings
-  server: localhost:2120
+  server: <%= ENV["POIROT_SERVER"] || "localhost:2120" %>
+  enabled: <%= !!ENV["POIROT_SERVER"] %>
   source: cdp
   debug: false
 
 development:
   <<: *default_settings
-  enabled: false
   mute:
    - /assets/
+   - /sidekiq
 
 production:
   <<: *default_settings
-  enabled: true
 
 test:
   <<: *default_settings

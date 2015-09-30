@@ -4,6 +4,9 @@ class FiltersController < ApplicationController
   expose(:filter, attributes: :filter_params)
   expose(:laboratory) { Laboratory.find(filter.query["laboratory.id"]) rescue nil }
   expose(:condition) { filter.query["test.assays.condition"] }
+  before_filter do
+    @main_column_width = 6 unless params[:action] == 'index'
+  end
 
   def index
     respond_with filters
