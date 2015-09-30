@@ -184,6 +184,15 @@ ActiveRecord::Schema.define(version: 20150929202058) do
     t.integer  "device_model_id", limit: 4
   end
 
+  create_table "old_passwords", force: :cascade do |t|
+    t.string   "encrypted_password",       limit: 255, null: false
+    t.string   "password_archivable_type", limit: 255, null: false
+    t.integer  "password_archivable_id",   limit: 4,   null: false
+    t.datetime "created_at"
+  end
+
+  add_index "old_passwords", ["password_archivable_type", "password_archivable_id"], name: "index_password_archivable", using: :btree
+
   create_table "patients", force: :cascade do |t|
     t.binary   "sensitive_data", limit: 65535
     t.text     "custom_fields",  limit: 65535

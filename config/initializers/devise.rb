@@ -273,10 +273,10 @@ Devise.setup do |config|
   # config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/
 
   # How many passwords to keep in archive
-  # config.password_archiving_count = 5
+  config.password_archiving_count = 5
 
   # Deny old password (true, false, count)
-  # config.deny_old_passwords = true
+  config.deny_old_passwords = 5
 
   # enable email validation for :secure_validatable. (true, false, validation_options)
   # dependency: need an email validator like rails_email_validator

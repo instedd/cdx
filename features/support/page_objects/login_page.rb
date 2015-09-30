@@ -1,5 +1,5 @@
 class LoginPage < SitePrism::Page
-  set_url 'users/sign_in'
+  set_url '/users/sign_in'
 
   section 'form', '#new_user' do
     element :user_name, '#user_email'
