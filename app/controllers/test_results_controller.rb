@@ -24,6 +24,10 @@ class TestResultsController < ApplicationController
     @query["page_size"] = @page_size
     @query["offset"] = offset
 
+    @filter["institution.uuid"] = institutions.first.uuid if institutions.size == 1
+    @filter["laboratory.uuid"] = laboratories.first.uuid if laboratories.size == 1
+    @filter["device.uuid"] = devices.first.uuid if devices.size == 1
+
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
 
