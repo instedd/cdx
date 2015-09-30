@@ -35,8 +35,8 @@
     %span.help-block Empty selection will send all fields
     .control
       - Subscriber.available_field_names.sort.each do |field|
-        %label
-          = check_box_tag "fields[#{field}]", true, subscriber.fields.include?(field)
+        = check_box_tag "fields[#{field}]", true, subscriber.fields.try {|f| f.include?(field)}, id: "fields.#{field}"
+        %label{for: "fields.#{field}"}
           = field
   .control-group
     .control
