@@ -11,9 +11,12 @@ module ComputedPolicyConcern
     def arel_filter
       table = resource_class.arel_table
       filters = []
+
       filters << table[:id].eq(self.resource_id) if self.resource_id
-      filters << table[:institution_id].eq(self.condition_institution_id) if self.condition_institution_id
-      filters << table[:laboratory_id].eq(self.condition_laboratory_id)   if self.condition_laboratory_id
+
+      conditions.each do |key, value|
+        filters << table["#{key}_id".to_sym].eq(value) if value
+      end
 
       filters += exceptions.map(&:arel_filter).compact.map(&:not) if respond_to?(:exceptions)
 
@@ -26,8 +29,7 @@ module ComputedPolicyConcern
       return (self.resource_id.nil? || self.resource_id == resource_attributes[:id])\
         && (self.resource_type.nil? || self.resource_type == resource_attributes[:resource_type])\
         && (self.action.nil? || self.action == resource_attributes[:action])\
-        && (self.condition_institution_id.nil? || self.condition_institution_id == resource_attributes[:institution_id])\
-        && (self.condition_laboratory_id.nil? || self.condition_laboratory_id == resource_attributes[:laboratory_id])
+        && (self.conditions.all? {|key, value| value.nil? || value == resource_attributes["#{key}_id".to_sym]})
     end
 
     def attributes_equal?(p2)
@@ -38,11 +40,17 @@ module ComputedPolicyConcern
       attrs = {
         action: self.action,
         resource_type: self.resource_type,
-        resource_id: self.resource_id,
-        condition_laboratory_id: self.condition_laboratory_id,
-        condition_institution_id: self.condition_institution_id
+        resource_id: self.resource_id
       }
-      attrs[:exceptions_attributes] = self.exceptions.map(&:computed_attributes) if self.respond_to?(:exceptions)
+
+      conditions.each do |key, value|
+        attrs["condition_#{key}_id".to_sym] = value
+      end
+
+      if self.respond_to?(:exceptions)
+        attrs[:exceptions_attributes] = self.exceptions.map(&:computed_attributes)
+      end
+
       return attrs
     end
 
@@ -55,10 +63,9 @@ module ComputedPolicyConcern
     end
 
     def conditions
-      return {
-        laboratory: condition_laboratory_id,
-        institution: condition_institution_id
-      }
+      ComputedPolicy::CONDITIONS.map do |key|
+        [key, send("condition_#{key}_id")]
+      end.to_h
     end
 
   end
