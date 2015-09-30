@@ -15,6 +15,7 @@ class Subscriber < ActiveRecord::Base
 
   after_create :create_percolator
   after_destroy :delete_percolator
+  before_update { self.fields = self.fields.presence }
 
   def create_percolator
     es_query = filter.create_query.elasticsearch_query
