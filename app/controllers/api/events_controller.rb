@@ -7,17 +7,13 @@ class Api::EventsController < ApiController
     params.delete(:action)
     body = Oj.load(request.body.read) || {}
     filters = params.merge(body)
-    if filters.blank?
-      render :status => :unprocessable_entity, :json => { :errors => "The query must contain at least one filter"}
-    else
-      query = TestResult.query(filters, current_user)
-      respond_to do |format|
-        format.csv do
-          build_csv 'Tests', query.csv_builder
-          render :layout => false
-        end
-        format.json { render_json query.execute }
+    query = TestResult.query(filters, current_user)
+    respond_to do |format|
+      format.csv do
+        build_csv 'Tests', query.csv_builder
+        render :layout => false
       end
+      format.json { render_json query.execute }
     end
   end
 
