@@ -5,7 +5,6 @@ describe Device do
   it { is_expected.to validate_presence_of :name }
   it { is_expected.to validate_presence_of :institution }
 
-
   context 'secret key' do
     let(:device) { Device.new }
 
@@ -23,6 +22,24 @@ describe Device do
       device.set_key
 
       expect(device.secret_key_hash).to eq(MessageEncryption.hash 'abc')
+    end
+  end
+
+  context 'commands' do
+    let(:device) { Device.make }
+
+    it "doesn't have pending log requests" do
+      expect(device.has_pending_log_requests?).to be(false)
+    end
+
+    it "has pending log requests" do
+      device.request_client_logs
+      expect(device.has_pending_log_requests?).to be(true)
+
+      commands = device.device_commands.all
+      expect(commands.count).to eq(1)
+      expect(commands[0].name).to eq("send_logs")
+      expect(commands[0].command).to be_nil
     end
   end
 end

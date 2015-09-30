@@ -23,9 +23,15 @@
 - if @can_generate_activation_token
   %hr
   %p
-    = link_to "Generate activation token",
-      generate_activation_token_device_path(@device),
-      method: :post,
-      class: 'btn'
+    = link_to "Generate activation token", generate_activation_token_device_path(@device), method: :post, class: 'btn'
 
+- if @can_request_logs
+  - if @device.has_pending_log_requests?
+    %hr
+    %p
+      Client logs requested. Please wait.
+  - else
+    %hr
+    %p
+      = link_to "Request client logs", request_client_logs_device_path(@device), method: :post, class: 'btn'
 
