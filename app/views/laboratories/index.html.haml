@@ -24,7 +24,7 @@
           %th Institution
         %th Location
       - @laboratories.each do |laboratory|
-        %tr{data: (@labs_to_edit.include?(laboratory.id) ? {href: edit_laboratory_path(laboratory) } : {})}
+        %tr{data: {href: laboratory_path(laboratory) }}
           %td= laboratory.name
           - unless @institutions.one?
             %td= laboratory.institution.name

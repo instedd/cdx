@@ -29,8 +29,7 @@
           = @test_result.core_fields[TestResult::LAB_USER_FIELD]
           - if @test_result.device.laboratory
             at
-            -# TODO add link to laboratory
-            = link_to @test_result.device.laboratory, edit_laboratory_path(@test_result.device.laboratory)
+            = link_to @test_result.device.laboratory, laboratory_path(@test_result.device.laboratory)
 
 
 .row

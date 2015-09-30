@@ -21,7 +21,6 @@ describe LaboratoriesController do
 
       expect(response).to be_success
       expect(assigns(:laboratories)).to contain_exactly(laboratory)
-      expect(assigns(:labs_to_edit)).to contain_exactly(laboratory.id)
       expect(assigns(:can_create)).to be_truthy
     end
 
@@ -32,7 +31,6 @@ describe LaboratoriesController do
 
       expect(response).to be_success
       expect(assigns(:laboratories)).to contain_exactly(laboratory2)
-      expect(assigns(:labs_to_edit)).to be_empty
     end
 
   end
