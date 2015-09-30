@@ -52,7 +52,7 @@ class EncountersController < ApplicationController
   def perform_encounter_action
     begin
       yield
-    rescue Encounter::MultiplePatientError => e
+    rescue => e
       render json: { status: :error, message: e.message, encounter: as_json_edit(@encounter).attributes! }
     else
       render json: { status: :ok, encounter: as_json_edit(@encounter).attributes! }
@@ -88,12 +88,16 @@ class EncountersController < ApplicationController
         as_json_institution(json, encounter.institution)
       end
       json.patient do
-        json.(encounter.patient, :uuid, :plain_sensitive_data) # TODO enforce policy
+        if encounter.patient
+          json.(encounter.patient, :uuid, :plain_sensitive_data) # TODO enforce policy
+        else
+          json.nil!
+        end
       end
-      json.samples encounter.samples do |json, sample|
+      json.samples encounter.samples.uniq do |sample|
         as_json_sample(json, sample)
       end
-      json.test_results encounter.test_results do |json, test_result|
+      json.test_results encounter.test_results.uniq do |test_result|
         as_json_test_result(json, test_result)
       end
     end
@@ -101,7 +105,7 @@ class EncountersController < ApplicationController
 
   def as_json_samples_search(samples)
     Jbuilder.new do |json|
-      json.array! samples do |json, sample|
+      json.array! samples do |sample|
         as_json_sample(json, sample)
       end
     end
@@ -116,7 +120,7 @@ class EncountersController < ApplicationController
 
   def as_json_test_results_search(test_results)
     Jbuilder.new do |json|
-      json.array! test_results do |json, test|
+      json.array! test_results do |test|
         as_json_test_result(json, test)
       end
     end

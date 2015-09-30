@@ -72,4 +72,42 @@ describe Encounter do
       encounter.samples << sample
     }.to raise_error(Encounter::MultiplePatientError)
   end
+
+  it "raises if assigning sample of other encounter" do
+    sample = Sample.make
+    Encounter.make samples: [sample]
+
+    expect {
+      encounter.samples << sample
+    }.to raise_error(Encounter::EncounterAlreadyAssignedError)
+  end
+
+  it "raises if assigning test_result of other encounter" do
+    test1 = TestResult.make
+    Encounter.make test_results: [test1]
+
+    expect {
+      encounter.test_results << test1
+    }.to raise_error(Encounter::EncounterAlreadyAssignedError)
+  end
+
+  it "should not raise if already belongs to self" do
+    test1 = TestResult.make
+    encounter.test_results << test1
+    encounter.test_results << test1
+  end
+
+  it "should add test_result without duplicated" do
+    test1 = TestResult.make
+    encounter.add_test_result_uniq test1
+    encounter.add_test_result_uniq test1
+    expect(encounter.test_results.count).to eq(1)
+  end
+
+  it "should add sample without duplicated" do
+    sample = Sample.make
+    encounter.add_sample_uniq sample
+    encounter.add_sample_uniq sample
+    expect(encounter.samples.count).to eq(1)
+  end
 end

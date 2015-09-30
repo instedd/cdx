@@ -26,4 +26,4 @@ var SamplesList = React.createClass({
       </ul>
     );
   }
-})
+});
