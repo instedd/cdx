@@ -9,6 +9,8 @@ class Device < ActiveRecord::Base
   has_many :device_messages
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
+  has_many :device_logs
+  has_many :device_commands
 
   serialize :custom_mappings, JSON
 
@@ -71,10 +73,14 @@ class Device < ActiveRecord::Base
   end
 
   def set_key
-    @plain_secret_key = MessageEncryption.secure_random(9)
-    self.secret_key_hash = MessageEncryption.hash(@plain_secret_key)
+    set_key_for_activation_token
     self.ssh_key.try :destroy
     self.activation_token.try :destroy
+  end
+
+  def set_key_for_activation_token
+    @plain_secret_key = MessageEncryption.secure_random(9)
+    self.secret_key_hash = MessageEncryption.hash(@plain_secret_key)
   end
 
   def set_uuid
@@ -86,5 +92,15 @@ class Device < ActiveRecord::Base
     self.activation_token.try :destroy
     SshKey.regenerate_authorized_keys!
     self.activation_token = ActivationToken.new(device: self)
+  end
+
+  def has_pending_log_requests?
+    device_commands.where(name: "send_logs").exists?
+  end
+
+  def request_client_logs
+    return if has_pending_log_requests?
+
+    device_commands.create! name: "send_logs"
   end
 end

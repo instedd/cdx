@@ -62,6 +62,21 @@ ActiveRecord::Schema.define(version: 20150929202058) do
     t.integer "condition_id", limit: 4
   end
 
+  create_table "device_commands", force: :cascade do |t|
+    t.integer  "device_id",  limit: 4
+    t.string   "name",       limit: 255
+    t.string   "command",    limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "device_logs", force: :cascade do |t|
+    t.integer  "device_id",  limit: 4
+    t.binary   "message",    limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "device_messages", force: :cascade do |t|
     t.binary   "raw_data",             limit: 65535
     t.integer  "device_id",            limit: 4

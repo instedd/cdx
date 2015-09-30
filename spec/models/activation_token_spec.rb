@@ -22,7 +22,6 @@ describe ActivationToken do
     let!(:settings) { token.use!(SampleSshKey) }
     context 'when it is unused' do
       it { expect(token.used?).to eq(true) }
-      it { expect(token.device.ssh_key).to eq(SshKey.last) }
       it { expect(token.activation).not_to be_nil }
 
       it { expect(settings[:host]).to eq('localhost') }

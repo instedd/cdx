@@ -72,6 +72,7 @@ class DevicesController < ApplicationController
     @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
     @can_generate_activation_token = has_access?(@device, GENERATE_ACTIVATION_TOKEN)
     @can_delete = has_access?(@device, DELETE_DEVICE)
+    @can_support = has_access?(@device, SUPPORT_DEVICE)
   end
 
   def update
@@ -137,6 +138,15 @@ class DevicesController < ApplicationController
         format.json { render json: @token.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def request_client_logs
+    @device = Device.find(params[:id])
+    return unless authorize_resource(@device, SUPPORT_DEVICE)
+
+    @device.request_client_logs
+
+    redirect_to devices_path, notice: "Client logs requested"
   end
 
   private

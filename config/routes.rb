@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     member do
       get  'regenerate_key'
       post 'generate_activation_token'
+      post  'request_client_logs'
     end
     resources :custom_mappings, only: [:index]
     resources :ssh_keys, only: [:create, :destroy]
@@ -28,6 +29,12 @@ Rails.application.routes.draw do
       member do
         get 'raw'
         post 'reprocess'
+      end
+    end
+    resources :device_logs
+    resources :device_commands do
+      member do
+        post 'reply'
       end
     end
   end
