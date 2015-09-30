@@ -82,6 +82,7 @@ group :development, :test do
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
   gem 'pry-clipboard'
+  gem 'rspec-rails'
 end
 
 group :test do
@@ -93,7 +94,6 @@ group :test do
   gem 'capybara'
   gem 'guard-rspec'
   gem 'rspec'
-  gem 'rspec-rails'
   gem 'rspec-collection_matchers'
   gem 'vcr'
   gem 'webmock', require: false
