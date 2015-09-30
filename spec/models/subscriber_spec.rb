@@ -102,7 +102,7 @@ describe Subscriber, elasticsearch: true do
     url = "http://subscriber/cdp_trigger?token=48"
     subscriber = Subscriber.make filter: filter2, user: user2, fields: [], url: url, verb: 'POST'
     callback_request = stub_request(:post, url).to_return(:status => 200, :body => "", :headers => {})
-    grant(institution.user, user2, device, Policy::Actions::QUERY_TEST)
+    grant(institution.user, user2, "testResult?device=#{device.id}", Policy::Actions::QUERY_TEST)
 
     submit_test
 
