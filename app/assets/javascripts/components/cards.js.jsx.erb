@@ -1,14 +1,27 @@
-var NoPatientCard = React.createClass({
+var PatientCard = React.createClass({
   render: function () {
-    return (
-      <div className="card">
-        <div className="card-image">
-          <img src="<%= asset_url('card-unkown.png') %>" />
+    if (this.props.patient == null) {
+      return (
+        <div className="card">
+          <div className="card-image">
+            <img src="<%= asset_url('card-unkown.png') %>" />
+          </div>
+          <div className="card-detail-top">
+            <span>No patient information</span>
+          </div>
         </div>
-        <div className="card-detail-top">
-          <span>No patient information</span>
+      );
+    } else {
+      return (
+        <div className="card">
+          <div className="card-image">
+            <img src="<%= asset_url('card-unkown.png') %>" />
+          </div>
+          <div className="card-detail-top">
+            <b>{this.props.patient.plain_sensitive_data.name}</b>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 });

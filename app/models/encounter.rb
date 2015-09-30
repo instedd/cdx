@@ -22,17 +22,25 @@ class Encounter < ActiveRecord::Base
     "encounter"
   end
 
+  def add_sample_uniq(sample)
+    self.samples << sample unless self.samples.include?(sample)
+  end
+
+  def add_test_result_uniq(test_result)
+    self.test_results << test_result unless self.test_results.include?(test_result)
+  end
+
   private
 
   def add_test_results(sample)
     @skip_add_sample = true
-    self.test_results << sample.test_results
+    self.add_test_result_uniq sample.test_results
     @skip_add_sample = false
   end
 
   def add_sample(test_result)
     return if @skip_add_sample
-    self.samples << test_result.sample if test_result.sample
+    self.add_sample_uniq test_result.sample if test_result.sample
   end
 
   def assign_patient(sample_or_test_result)
