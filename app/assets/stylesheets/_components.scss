@@ -1,0 +1,26 @@
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 99999;
+
+  .modal {
+    background: #ffffff;
+    margin: 10% auto;
+    width: 200px;
+    padding: 10px;
+  }
+}
+
+.item-search {
+  li {
+    cursor: pointer;
+
+    &:hover {
+      background-color: $gray2;
+    }
+  }
+}

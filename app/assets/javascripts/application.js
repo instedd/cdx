@@ -13,7 +13,11 @@
 //= require jquery
 //= require jquery.turbolinks
 //= require jquery_ujs
+//= require underscore
 //= require select2
+//= require react
+//= require react_ujs
+//= require components
 //= require_tree .
 
 $(document).ready(function(){

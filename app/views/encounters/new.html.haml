@@ -1,11 +1,3 @@
 %h1 New Encounter
 
-= form_for(@encounter) do |f|
-  = render 'shared/select_institution_or_hidden', f: f, record: @encounter
-
-  .row
-    %i In the next step you will be asked for sample or test ids to add to this encounter
-
-  .row
-    .col
-      = f.submit 'Save', class: 'btn-primary'
+= react_component('EncounterNew')
