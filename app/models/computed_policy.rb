@@ -75,6 +75,8 @@ class ComputedPolicy < ActiveRecord::Base
   def self.resource_attributes_for(resource_or_string)
     if resource_or_string == "*"
       Hash.new
+    elsif resource_or_string.kind_of?(Hash)
+      resource_or_string
     elsif resource_or_string.kind_of?(String)
       resource_klass, match, query = Resource.resolve(resource_or_string)
       (query || {}).merge(resource_type: resource_klass.resource_type, id: match)
@@ -88,6 +90,46 @@ class ComputedPolicy < ActiveRecord::Base
       end
       attrs
     end
+  end
+
+  def self.condition_resources_for(action, resource, user)
+    policies = self.applicable_policies(action, resource, user).includes(:exceptions)
+
+    return {
+      institution: Institution.none,
+      laboratory: Laboratory.none,
+      device: Device.none
+    } if policies.empty?
+
+    institution_table, laboratory_table, device_table = [Institution, Laboratory, Device].map(&:arel_table)
+
+    select = [institution_table[:id], laboratory_table[:id], device_table[:id]]
+    from = Institution.joins(laboratories: :devices).arel.source
+    filters = nil
+
+    policies.each do |policy|
+      institution_filter = institution_table[:id].eq(policy.condition_institution_id) if policy.condition_institution_id
+      laboratory_filter  = laboratory_table[:id].eq(policy.condition_laboratory_id) if policy.condition_laboratory_id
+      device_filter      = device_table[:id].eq(policy.condition_device_id) if policy.condition_device_id
+
+      filter = [institution_filter, laboratory_filter, device_filter].compact
+      next if filter.empty?
+      and_filter = filter.inject{|conj, f| conj.and(f)}
+      filters = filters ? filters.or(and_filter) : and_filter
+    end
+
+    arel_query = institution_table.project(*select).from(from).where(filters)
+    result = self.connection.execute(arel_query.to_sql)
+    institution_ids, laboratory_ids, device_ids = result.to_a.transpose
+
+    # FIXME: A policy for a test result by id would yield a nil filter, effectively returning all resources
+
+    return {
+      institution: Institution.find(institution_ids.uniq),
+      laboratory: Laboratory.find(laboratory_ids.uniq),
+      device: Device.find(device_ids.uniq)
+    }
+
   end
 
 
