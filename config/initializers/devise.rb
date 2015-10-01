@@ -267,7 +267,7 @@ Devise.setup do |config|
   # Configure security extension for devise
 
   # Should the password expire (e.g 3.months)
-  config.expire_password_after = 3.months
+  config.expire_password_after = Settings.user_password_expire_in_months.try { |time| time.to_i.months }
 
   # Need 1 char of A-Z, a-z and 0-9
   # config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/
