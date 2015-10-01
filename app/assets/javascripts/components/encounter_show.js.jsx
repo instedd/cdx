@@ -18,9 +18,6 @@ var EncounterShow = React.createClass({
         </div>
 
         <div className="row">
-          <div className="col-p1">
-            <label>Test results</label>
-          </div>
           <div className="col">
             <TestResultsList testResults={this.props.encounter.test_results} />
           </div>

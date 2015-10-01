@@ -123,14 +123,11 @@ var EncounterNew = React.createClass({
         </div>
 
         <div className="row">
-          <div className="col-p1">
-            <label>Test results</label>
+          <div className="col">
+            <TestResultsList testResults={this.state.encounter.test_results} />
             <p>
               <a className="btn-add btn-add-secondary" href='#' onClick={this.showTestsModal}>+</a>
             </p>
-          </div>
-          <div className="col">
-            <TestResultsList testResults={this.state.encounter.test_results} />
           </div>
 
           <Modal ref="testsModal">

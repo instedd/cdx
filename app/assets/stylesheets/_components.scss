@@ -24,3 +24,18 @@
     }
   }
 }
+
+.assay-result {
+  padding-right: 0.5em;
+
+  // TODO Add images to indicating status
+  &.assay-result-positive {
+    color: $red;
+  }
+  &.assay-result-negative {
+
+  }
+  &.assay-result-disabled {
+    color: $gray3;
+  }
+}

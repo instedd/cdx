@@ -179,10 +179,6 @@ RSpec.describe EncountersController, type: :controller do
     return {
       uuid: sample.uuid,
       entity_id: sample.entity_id,
-      institution: {
-        uuid: institution.uuid,
-        name: institution.name
-      }
     }
   end
 
@@ -191,9 +187,15 @@ RSpec.describe EncountersController, type: :controller do
       uuid: test_result.uuid,
       test_id: test_result.test_id,
       name: test_result.core_fields[TestResult::NAME_FIELD],
+      sample_entity_id: test_result.sample.entity_id,
+      start_time: test_result.core_fields[TestResult::START_TIME_FIELD].try { |d| d.strftime('%B %e, %Y') },
+      assays: [],
+      laboratory: {
+        name: test_result.device.laboratory.name
+      },
       device: {
         name: test_result.device.name
-      }
+      },
     }
   end
 end

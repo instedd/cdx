@@ -1,7 +1,6 @@
-// TODO should not show institution if user has only one
 var AddItemSearchSampleTemplate = React.createClass({
   render: function() {
-    return (<span>{this.props.item.entity_id} ({this.props.item.institution.name})</span>);
+    return (<span>{this.props.item.entity_id} ({this.props.item.uuid})</span>);
   }
 });
 
@@ -11,7 +10,7 @@ var Sample = React.createClass({
     // TODO add printer
     return (
     <li>
-     {this.props.sample.entity_id} ({this.props.sample.institution.name})
+     {this.props.sample.entity_id} ({this.props.sample.uuid})
     </li>);
   }
 });

@@ -116,9 +116,6 @@ class EncountersController < ApplicationController
 
   def as_json_sample(json, sample)
     json.(sample, :uuid, :entity_id)
-    json.institution do
-      as_json_institution(json, sample.institution)
-    end
   end
 
   def as_json_test_results_search(test_results)
@@ -132,6 +129,20 @@ class EncountersController < ApplicationController
   def as_json_test_result(json, test_result)
     json.(test_result, :uuid, :test_id)
     json.name test_result.core_fields[TestResult::NAME_FIELD]
+    json.sample_entity_id test_result.sample.entity_id
+    json.start_time(test_result.core_fields[TestResult::START_TIME_FIELD].try { |d| d.strftime('%B %e, %Y') })
+
+    json.assays test_result.core_fields[TestResult::ASSAYS_FIELD] do |assay|
+      json.name assay['name']
+      json.result assay['result']
+    end
+
+    if test_result.device.laboratory
+      json.laboratory do
+        json.name test_result.device.laboratory.name
+      end
+    end
+
     json.device do
       json.name test_result.device.name
     end
