@@ -11,7 +11,7 @@ var Sample = React.createClass({
     // TODO add printer
     return (
     <li>
-     {this.props.sample.entity_id} ({this.props.sample.institution})
+     {this.props.sample.entity_id} ({this.props.sample.institution.name})
     </li>);
   }
 });
