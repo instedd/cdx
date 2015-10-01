@@ -1,4 +1,2 @@
 nndd_url: "http://localhost:9000"
 location_service_url: "http://locations-stg.instedd.org"
-web_session_timeout: 3600
-

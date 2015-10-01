@@ -5,5 +5,4 @@ location_service_set: 'ne'
 sync_pattern: "*.{csv,bef,json,xml}"
 google_client_id:
 google_client_secret:
-web_session_timeout: 300
 google_maps_api_key:

@@ -18,9 +18,9 @@ class User < ActiveRecord::Base
 
   after_create :grant_implicit_policy
   attr_accessor :skip_implicit_policy
-  
+
   def timeout_in
-    Settings.web_session_timeout.to_i.seconds
+    Settings.web_session_timeout.try{ |timeout| timeout.to_i.seconds }
   end
 
   def create(model)
