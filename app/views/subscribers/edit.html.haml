@@ -1,8 +1,9 @@
-.span12
-  %h3 Edit #{subscriber.name}
+%h1
+  = link_to '←', subscribers_path, class: 'side-link', title: 'Back'
+  Edit #{subscriber.name}
 
-  = render 'form'
+= render 'form'
 
-  %hr
+%hr
 
-  = link_to "Delete this subscriber", subscriber, method: :delete, data: { confirm: "Are you sure you want to delete the location '#{subscriber.name}'" }
+= link_to "Delete this subscriber", subscriber, method: :delete, data: { confirm: "Are you sure you want to delete the location '#{subscriber.name}'" }

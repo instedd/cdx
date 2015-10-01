@@ -122,3 +122,7 @@
   font-weight: 300;
   vertical-align: baseline;
 }
+
+[class^="btn"] + [class^="btn"] {
+  margin-left: 30px;
+}

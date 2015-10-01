@@ -1,7 +1,5 @@
 .row
   .col
-    - if @can_create
-      = link_to "+", new_filter_path, class: 'btn-add side-link fix', title: 'Add Filter'
     - cdx_table do
       %tr
         %th.tableheader{colspan:100} Filters

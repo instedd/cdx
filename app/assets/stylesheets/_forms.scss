@@ -26,11 +26,21 @@ textarea {
 
 label {
   color: $gray3;
-  line-height: 30px;
+  line-height: 40px;
+  min-height: 40px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .value {
   padding-top: 5px;
+
+  &.annotation {
+    font-size: 80%;
+    color: $gray3;
+    max-width: 250px;
+    padding-top: 10px;
+  }
 }
 
 // DDslick select styles ---------------------------------------------------------//
@@ -61,6 +71,7 @@ label {
     padding: 0;
     margin: 0;
     height: auto;
+    min-height: auto;
   }
 }
 .dd-options {
@@ -111,13 +122,13 @@ input[type="checkbox"] {
       color: $white;
       font-weight: 300;
       font-size: 12px;
-      line-height: 14px;
+      line-height: 15px;
       text-align: center;
       width: 18px;
       height:18px;
       background: none;
       border: 2px solid $black;
-      top: 0;
+      top: 10px;
       left: -32px;
       position: absolute;
       border-radius: 2px;
@@ -169,7 +180,7 @@ input[type="radio"] {
       height:18px;
       background: none;
       border: 2px solid $black;
-      top: 0;
+      top: 10px;
       left: -32px;
       position: absolute;
       border-radius: 50%;
@@ -182,7 +193,7 @@ input[type="radio"] {
       height: 10px;
       position: absolute;
       left: -28px;
-      top: 4px;
+      top: 14px;
       border-radius: 50%;
       opacity: 0;
       transition: all 0.4s;
@@ -205,25 +216,27 @@ input[type="radio"] {
 }
 
 
-// Input email & password ---------------------------------------------------------//
+// Input email & password for Devise ---------------------------------------------------------//
 
-input[type="email"],
-input[type="password"] {
+body.devise {
+  input[type="email"],
+  input[type="password"] {
 
-  @include placeholder($sans, 25px);
-  background: url('ic-login.png') no-repeat $white;
+    @include placeholder($sans, 25px);
+    background: url('ic-login.png') no-repeat $white;
 
-  &.filled {
-    background: $white;
+    &.filled {
+      background: $white;
+    }
   }
-}
 
-input[type="email"] {
-  background-position: left top;
-}
+  input[type="email"] {
+    background-position: left top;
+  }
 
-input[type="password"] {
-  background-position: left -40px;
+  input[type="password"] {
+    background-position: left -40px;
+  }
 }
 
 .small-quote {
