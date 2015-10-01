@@ -33,6 +33,14 @@ GIT
     location_service (0.1.0)
       rest-client (~> 1.6)
 
+GIT
+  remote: https://github.com/phatworx/devise_security_extension
+  revision: ff691f63443c0af21d351d6d12c3f39f73274e61
+  specs:
+    devise_security_extension (0.10.0)
+      devise (>= 3.0.0, < 4.0)
+      railties (>= 3.2.6, < 5.0)
+
 PATH
   remote: .
   specs:
@@ -573,6 +581,7 @@ DEPENDENCIES
   database_cleaner
   decent_exposure
   devise
+  devise_security_extension!
   dotiw
   elasticsearch
   encryptor
