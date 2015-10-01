@@ -1,23 +1,27 @@
 = form_for @policy do |f|
   - if @policy.errors.any?
     #error_explanation
-      %h3= "#{pluralize(@policy.errors.count, "error")} prohibited this @policy from being saved:"
+      %p= "#{pluralize(@policy.errors.count, "error")} prohibited this @policy from being saved:"
       %ul
         - @policy.errors.full_messages.each do |msg|
           %li= msg
 
-  .control-group
-    = f.label :name, :class => 'control-label'
-    .controls
-      = f.text_field :name, :class => 'span2'
-  .control-group
-    = f.label :user_id, :class => 'control-label'
-    .controls
-      = f.collection_select :user_id, User.all.where('id != ?', current_user.id).sort_by(&:email), :id, :email,{}, {:class => 'span2'}
-  .control-group
-    = f.label :definition, :class => 'control-label'
-    .controls
-      = f.text_area :definition, :rows => 5, :class => 'span3'
-  .control-group
-    .controls
-      = f.submit 'Save', :class => 'btn'
+  .row
+    .col.pe-2
+      = f.label :name
+    .col
+      = f.text_field :name
+  .row
+    .col.pe-2
+      = f.label :user_id
+    .col
+      = f.collection_select :user_id, User.all.where('id != ?', current_user.id).sort_by(&:email), :id, :email, {include_blank: "Select user"}, {:class => 'ddown'}
+  .row
+    .col.pe-2
+      = f.label :definition
+    .col.pe-3
+      .value
+        = f.text_area :definition, :rows => 5, :class => 'input-block'
+  .row.button-actions
+    .col
+      = f.submit 'Save', :class => 'btn-primary'

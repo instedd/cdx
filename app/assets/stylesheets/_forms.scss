@@ -58,6 +58,8 @@ label {
   .dd-selected {
     font-weight: 400;
     padding: 10px 6px 10px 0px;
+    min-height: 39px;
+    min-width: 50px;
   }
   .dd-pointer-down {
     border-top-color: $gray2;
