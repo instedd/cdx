@@ -149,6 +149,23 @@ class DevicesController < ApplicationController
     redirect_to devices_path, notice: "Client logs requested"
   end
 
+  def custom_mappings
+    if params[:device_model_id].blank?
+      return render html: ""
+    end
+
+    if params[:device_id].present?
+      @device = Device.find(params[:device_id])
+      return unless authorize_resource(@device, UPDATE_DEVICE)
+    else
+      @device = Device.new
+    end
+
+    @device.device_model = DeviceModel.find(params[:device_model_id])
+
+    render partial: 'custom_mappings'
+  end
+
   private
 
   def load_institution

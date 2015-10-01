@@ -28,7 +28,10 @@ Rails.application.routes.draw do
     member do
       get  'regenerate_key'
       post 'generate_activation_token'
-      post  'request_client_logs'
+      post 'request_client_logs'
+    end
+    collection do
+      post 'custom_mappings'
     end
     resources :custom_mappings, only: [:index]
     resources :ssh_keys, only: [:create, :destroy]
