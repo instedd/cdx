@@ -104,8 +104,10 @@ var EncounterNew = React.createClass({
 
         <div className="row">
           <div className="col-p1">
-            <a className="side-link btn-add" href='#' onClick={this.showSamplesModal}>+</a>
             <label>Samples</label>
+            <p>
+              <a className="btn-add btn-add-secondary" href='#' onClick={this.showSamplesModal}>+</a>
+            </p>
           </div>
           <div className="col">
             <SamplesList samples={this.state.encounter.samples} />
@@ -122,8 +124,10 @@ var EncounterNew = React.createClass({
 
         <div className="row">
           <div className="col-p1">
-            <a className="side-link btn-add" href='#' onClick={this.showTestsModal}>+</a>
             <label>Test results</label>
+            <p>
+              <a className="btn-add btn-add-secondary" href='#' onClick={this.showTestsModal}>+</a>
+            </p>
           </div>
           <div className="col">
             <TestResultsList testResults={this.state.encounter.test_results} />
