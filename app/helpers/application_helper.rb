@@ -1,4 +1,6 @@
 module ApplicationHelper
+  extend ComponentsBuilder
+
   def has_access?(resource, action)
     Policy.can? action, resource, current_user, @current_user_policies
   end
@@ -30,4 +32,7 @@ module ApplicationHelper
   def cdx_table(&block)
     concat(content_tag(:table, capture(&block), class: "table row-href", cellpadding: "0", cellspacing: "0"))
   end
+
+  define_component :card, sections: [:top, :bottom], attributes: [:image]
+
 end

@@ -1,0 +1,10 @@
+.card
+  .card-image
+    = image_tag card[:image]
+
+  .card-details
+    .card-detail-top
+      = card[:top]
+    - if card[:bottom]
+      .card-detail-bottom
+        = card[:bottom]
