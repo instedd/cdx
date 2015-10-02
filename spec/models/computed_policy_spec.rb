@@ -412,7 +412,6 @@ describe ComputedPolicy do
     end
 
     it "should return resources in exceptions if allowed in another policy" do
-      pending
       grant nil, user, {:test_result => laboratory_i1_l1}, QUERY_TEST, except: [{test_result: device_i1_l1_d2}]
       grant nil, user, {:test_result => institution_i1},   QUERY_TEST
       institutions, laboratories, devices = condition_resources
@@ -423,7 +422,6 @@ describe ComputedPolicy do
     end
 
     it "should not return any resource if exception contains granted" do
-      pending
       grant nil, user, {:test_result => device_i1_l1_d1}, QUERY_TEST, except: [{test_result: laboratory_i1_l1}]
       institutions, laboratories, devices = condition_resources
 

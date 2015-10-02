@@ -23,6 +23,18 @@ module ComputedPolicyConcern
       return filters.compact.inject{|agg, filter| agg.and(filter)}
     end
 
+    def arel_condition_filter
+      filters = conditions.map do |key, value|
+        condition_class(key).arel_table[:id].eq(value) if value
+      end
+
+      if respond_to?(:exceptions)
+        filters += exceptions.map(&:arel_condition_filter).compact.map(&:not)
+      end
+
+      return filters.compact.inject{|agg, filter| agg.and(filter)}
+    end
+
     def applies_to?(resource_or_string, action, opts={})
       resource_attributes = ComputedPolicy.resource_attributes_for(resource_or_string)
 
@@ -66,6 +78,10 @@ module ComputedPolicyConcern
       ComputedPolicy::CONDITIONS.map do |key|
         [key, send("condition_#{key}_id")]
       end.to_h
+    end
+
+    def condition_class(key)
+      key.to_s.classify.constantize
     end
 
   end

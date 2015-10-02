@@ -93,7 +93,7 @@ class ComputedPolicy < ActiveRecord::Base
   end
 
   def self.condition_resources_for(action, resource, user)
-    policies = self.applicable_policies(action, resource, user).includes(:exceptions)
+    policies = self.applicable_policies(action, resource, user).where(resource_id: nil).includes(:exceptions)
 
     return {
       institution: Institution.none,
@@ -108,28 +108,19 @@ class ComputedPolicy < ActiveRecord::Base
     filters = nil
 
     policies.each do |policy|
-      institution_filter = institution_table[:id].eq(policy.condition_institution_id) if policy.condition_institution_id
-      laboratory_filter  = laboratory_table[:id].eq(policy.condition_laboratory_id) if policy.condition_laboratory_id
-      device_filter      = device_table[:id].eq(policy.condition_device_id) if policy.condition_device_id
-
-      filter = [institution_filter, laboratory_filter, device_filter].compact
-      next if filter.empty?
-      and_filter = filter.inject{|conj, f| conj.and(f)}
+      and_filter = policy.arel_condition_filter || "1=1"
       filters = filters ? filters.or(and_filter) : and_filter
     end
 
     arel_query = institution_table.project(*select).from(from).where(filters)
     result = self.connection.execute(arel_query.to_sql)
-    institution_ids, laboratory_ids, device_ids = result.to_a.transpose
-
-    # FIXME: A policy for a test result by id would yield a nil filter, effectively returning all resources
+    institution_ids, laboratory_ids, device_ids = result.to_a.transpose.map{|ids| ids.try(:uniq)}
 
     return {
-      institution: Institution.find(institution_ids.uniq),
-      laboratory: Laboratory.find(laboratory_ids.uniq),
-      device: Device.find(device_ids.uniq)
+      institution: Institution.where(id: institution_ids),
+      laboratory: Laboratory.where(id: laboratory_ids),
+      device: Device.where(id: device_ids)
     }
-
   end
 
 
