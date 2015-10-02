@@ -1,0 +1,2 @@
+web_session_timeout: 300
+user_password_expire_in_months: 3

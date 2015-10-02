@@ -1,0 +1,38 @@
+%h1
+  = link_to '←', laboratories_path, title: 'Back'
+  = @laboratory.name
+
+.row
+  .col
+    .card
+      .card-image
+        = map_tag @laboratory.lat, @laboratory.lng
+
+      .card-details
+        .card-detail-top
+          %b= @laboratory.name
+          - if @can_edit
+            -# TODO: show proper pencil icon
+            = link_to "✎", edit_laboratory_path(@laboratory), class: 'pull-right'
+
+        .card-detail-bottom
+          = @laboratory.address
+
+.row
+  .col
+    - if @laboratory.devices.empty?
+      %span This lab has no devices yet
+    - else
+      - cdx_table do
+        %tr
+          %th.tableheader{colspan:100} Devices
+        %tr
+          %th Name
+          %th Model
+          %th Lab
+        - @laboratory.devices.each do |device|
+          %tr
+          %tr{data: (@devices_to_edit.include?(device.id) ? {href: edit_device_path(device) } : {})}
+            %td= device.name
+            %td= device.device_model.name
+            %td= device.laboratory.try(:name)

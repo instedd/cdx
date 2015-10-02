@@ -12,7 +12,7 @@ gem 'awesome_nested_set', '~> 3.0.0.rc.3'
 gem 'csv_builder'
 gem 'decent_exposure'
 gem 'nokogiri'
-
+gem 'react-rails'
 gem 'foreman'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
@@ -66,6 +66,7 @@ group :development do
 end
 
 gem 'devise'
+gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
 gem 'omniauth'
 gem 'omniauth-openid'
 gem 'omniauth-google-oauth2'
@@ -82,6 +83,7 @@ group :development, :test do
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
   gem 'pry-clipboard'
+  gem 'rspec-rails'
 end
 
 group :test do
@@ -93,7 +95,6 @@ group :test do
   gem 'capybara'
   gem 'guard-rspec'
   gem 'rspec'
-  gem 'rspec-rails'
   gem 'rspec-collection_matchers'
   gem 'vcr'
   gem 'webmock', require: false

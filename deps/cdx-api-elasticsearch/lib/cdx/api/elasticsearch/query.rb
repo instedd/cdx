@@ -7,6 +7,7 @@ class Cdx::Api::Elasticsearch::Query
   include Cdx::Api::LocalTimeZoneConversion
 
   DEFAULT_PAGE_SIZE = 50
+  MAX_PAGE_SIZE = 100
 
   def self.for_indices indices, params
     query = new params
@@ -99,11 +100,11 @@ class Cdx::Api::Elasticsearch::Query
 
   def query_without_group_by(query, params)
     sort = process_order(params)
-    page_size = params["page_size"] || DEFAULT_PAGE_SIZE
+    page_size = [[params["page_size"].try(:to_i) || DEFAULT_PAGE_SIZE, 1].max , MAX_PAGE_SIZE].min
     offset = params["offset"]
 
     es_query = {body: {query: query, sort: sort}}
-    es_query[:size] = page_size if page_size.present?
+    es_query[:size] = page_size
     es_query[:from] = offset if offset.present?
 
     results = @api.search_elastic es_query.merge(index: indices)

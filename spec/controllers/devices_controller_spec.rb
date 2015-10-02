@@ -53,4 +53,25 @@ describe DevicesController do
     it { expect(token.value).not_to be_nil }
   end
 
+  describe "request_client_logs" do
+    it "creates command" do
+      post :request_client_logs, id: device.id
+
+      commands = device.device_commands.all
+      expect(commands.length).to eq(1)
+
+      command = commands[0]
+      expect(command.name).to eq("send_logs")
+      expect(command.command).to be_nil
+    end
+
+    it "doesn't create command twice" do
+      2.times do
+        post :request_client_logs, id: device.id
+      end
+
+      commands = device.device_commands.all
+      expect(commands.length).to eq(1)
+    end
+  end
 end

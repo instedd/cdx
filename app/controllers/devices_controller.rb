@@ -26,9 +26,7 @@ class DevicesController < ApplicationController
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
 
-    @devices_to_edit = check_access(Device, UPDATE_DEVICE)
-    @devices_to_edit ||= []
-    @devices_to_edit.pluck(:id)
+    @devices_to_edit = check_access(Device, UPDATE_DEVICE).pluck(:id)
 
     @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end
@@ -60,7 +58,7 @@ class DevicesController < ApplicationController
   end
 
   def show
-    redirect_to edit_institution_device_path(@institution, params[:id])
+    redirect_to edit_device_path(params[:id])
   end
 
   def edit
@@ -74,6 +72,7 @@ class DevicesController < ApplicationController
     @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
     @can_generate_activation_token = has_access?(@device, GENERATE_ACTIVATION_TOKEN)
     @can_delete = has_access?(@device, DELETE_DEVICE)
+    @can_support = has_access?(@device, SUPPORT_DEVICE)
   end
 
   def update
@@ -139,6 +138,32 @@ class DevicesController < ApplicationController
         format.json { render json: @token.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def request_client_logs
+    @device = Device.find(params[:id])
+    return unless authorize_resource(@device, SUPPORT_DEVICE)
+
+    @device.request_client_logs
+
+    redirect_to devices_path, notice: "Client logs requested"
+  end
+
+  def custom_mappings
+    if params[:device_model_id].blank?
+      return render html: ""
+    end
+
+    if params[:device_id].present?
+      @device = Device.find(params[:device_id])
+      return unless authorize_resource(@device, UPDATE_DEVICE)
+    else
+      @device = Device.new
+    end
+
+    @device.device_model = DeviceModel.find(params[:device_model_id])
+
+    render partial: 'custom_mappings'
   end
 
   private

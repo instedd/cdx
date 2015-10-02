@@ -10,6 +10,16 @@
 
   .row
     .col.pe-2
+      = f.label :device_model_id
+    .col
+      = f.collection_select :device_model_id, DeviceModel.includes(:institution).all, :id, :full_name, {include_blank: "Choose one"}
+  .row
+    .col.pe-2
+      = f.label :laboratory
+    .col
+      = f.collection_select(:laboratory_id, @laboratories, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
+  .row
+    .col.pe-2
       = f.label :name
     .col
       = f.text_field :name
@@ -20,21 +30,29 @@
       = f.text_field :serial_number
   .row
     .col.pe-2
-      = f.label :device_model_id
-    .col
-      = f.collection_select :device_model_id, DeviceModel.includes(:institution).all, :id, :full_name, {}, :class => 'ddown'
-  .row
-    .col.pe-2
-      = f.label :laboratory
-    .col
-      = f.collection_select(:laboratory_id, @laboratories, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
-  .row
-    .col.pe-2
       = f.label :time_zone
     .col
       = f.time_zone_select(:time_zone, nil,{ default: "UTC"}, class: 'ddown')
+  #custom_mappings
+    = render "custom_mappings" if @device.device_model
+
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
       - if @can_delete
         = link_to "Delete", @device, method: :delete, data: { confirm: "Are you sure you want to delete the device '#{@device.name}'" }, class: 'btn-secondary pull-right'
+
+:coffeescript
+  selected_device_model_id = #{@device.device_model_id.to_s.to_json}
+  $("#device_device_model_id").ddslick(
+    onSelected: (data) ->
+      device_model_id = data.selectedData.value
+      if device_model_id != selected_device_model_id
+        $("#custom_mappings").load(
+          "/devices/custom_mappings",
+          "device_model_id": device_model_id,
+          "device_id": #{@device.id.to_json}
+        )
+        selected_device_model_id = device_model_id
+  )
+

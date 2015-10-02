@@ -3,10 +3,10 @@ class User < ActiveRecord::Base
   # :timeoutable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable,
-         :validatable, :confirmable, :omniauthable,
-         :lockable
+         :validatable, :confirmable, :omniauthable, :timeoutable,
+         :lockable, :password_expirable, :password_archivable
 
-  has_many :identities
+  has_many :identities, dependent: :destroy
   has_many :institutions
   has_many :laboratories, through: :institutions
   has_many :devices, through: :institutions
@@ -18,6 +18,10 @@ class User < ActiveRecord::Base
 
   after_create :grant_implicit_policy
   attr_accessor :skip_implicit_policy
+
+  def timeout_in
+    Settings.web_session_timeout.try{ |timeout| timeout.to_i.seconds }
+  end
 
   def create(model)
     if model.respond_to?(:user=)

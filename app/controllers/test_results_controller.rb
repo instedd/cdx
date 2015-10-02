@@ -25,6 +25,10 @@ class TestResultsController < ApplicationController
     @query["page_size"] = @page_size
     @query["offset"] = offset
 
+    @filter["institution.uuid"] = @institutions.first.uuid if @institutions.size == 1
+    @filter["laboratory.uuid"] = @laboratories.first.uuid if @laboratories.size == 1
+    @filter["device.uuid"] = @devices.first.uuid if @devices.size == 1
+
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
 
@@ -40,7 +44,7 @@ class TestResultsController < ApplicationController
     @other_tests = @test_result.sample.test_results.where.not(id: @test_result.id)
     @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
 
-    @sample_id = @test_result.sample.core_fields['id']
+    @sample_id = @test_result.sample.entity_id
     @sample_id_barcode = Barby::Code93.new(@sample_id)
   end
 

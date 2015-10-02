@@ -1,0 +1,18 @@
+.row
+  .col.pe-2
+    = label_tag :custom_fields
+  .col
+    Specify how you use some of the device's fields
+.row
+  .col.pe-2
+  .col
+    = fields_for(:device) do |d|
+      = d.fields_for(:custom_mappings) do |m|
+        - custom_fields = @device.current_manifest.fields.select(&:custom?)
+        - custom_fields.each do |field|
+          .control-group
+            = m.label field.target_field, class: 'control-label'
+            .controls
+              = m.select field.target_field,
+                  options_for_target_field,
+                  selected: (@device.custom_mappings || {})[field.target_field]

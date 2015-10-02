@@ -6,32 +6,24 @@
 
 .row
   .col
-    .card
-      .card-image
-        -# TODO select card image upon test result assays
-        = image_tag "card-unkown.png"
-
-      .card-details
-        .card-detail-top
-          %b= @test_result.core_fields[TestResult::NAME_FIELD]
-          %br
-          %span= @test_result.core_fields[TestResult::START_TIME_FIELD].strftime('%B %e, %Y')
-
-        .card-detail-bottom
-          Patient
-          -# TODO add link to patient
-          = @test_result.patient.plain_sensitive_data['name']
-          %br
-          Test performed on
-          = link_to @test_result.device.name, edit_device_path(@test_result.device)
-          by
-          -# TODO add link to lab_user
-          = @test_result.core_fields[TestResult::LAB_USER_FIELD]
-          - if @test_result.device.laboratory
-            at
-            -# TODO add link to laboratory
-            = link_to @test_result.device.laboratory, edit_laboratory_path(@test_result.device.laboratory)
-
+    = card image: "card-unkown.png" do |c|
+      - c.top do
+        %b= @test_result.core_fields[TestResult::NAME_FIELD]
+        %br
+        %span= @test_result.core_fields[TestResult::START_TIME_FIELD].strftime('%B %e, %Y')
+      - c.bottom do
+        Patient
+        -# TODO add link to patient
+        = @test_result.patient.plain_sensitive_data['name']
+        %br
+        Test performed on
+        = link_to @test_result.device.name, edit_device_path(@test_result.device)
+        by
+        -# TODO add link to lab_user
+        = @test_result.core_fields[TestResult::LAB_USER_FIELD]
+        - if @test_result.device.laboratory
+          at
+          = link_to @test_result.device.laboratory, laboratory_path(@test_result.device.laboratory)
 
 .row
   .col.pe-3

@@ -43,6 +43,7 @@ class Policy < ActiveRecord::Base
     READ_DEVICE =   "device:read"
     UPDATE_DEVICE = "device:update"
     DELETE_DEVICE = "device:delete"
+    SUPPORT_DEVICE = "device:support"
 
     REGENERATE_DEVICE_KEY =     "device:regenerateKey" # This is not tested.
     GENERATE_ACTIVATION_TOKEN = "device:generateActivationToken" # This is not tested.
@@ -71,6 +72,7 @@ class Policy < ActiveRecord::Base
     Actions::ASSIGN_DEVICE_LABORATORY,
     Actions::REGENERATE_DEVICE_KEY,
     Actions::GENERATE_ACTIVATION_TOKEN,
+    Actions::SUPPORT_DEVICE,
     Actions::QUERY_TEST,
     Actions::REPORT_MESSAGE,
   ]

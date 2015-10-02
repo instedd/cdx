@@ -13,8 +13,6 @@ class LaboratoriesController < ApplicationController
     if (institution_id = params[:institution].presence)
       @laboratories = @laboratories.where(institution_id: institution_id.to_i)
     end
-
-    @labs_to_edit = check_access(@laboratories, UPDATE_LABORATORY).pluck(:id)
   end
 
   def new
@@ -39,6 +37,15 @@ class LaboratoriesController < ApplicationController
         format.json { render json: @laboratory.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def show
+    @laboratory = Laboratory.find(params[:id])
+    return unless authorize_resource(@laboratory, READ_LABORATORY)
+
+    @devices_to_edit = check_access(@laboratory.devices, UPDATE_DEVICE).pluck(:id)
+
+    @can_edit = has_access?(@laboratory, UPDATE_LABORATORY)
   end
 
   def edit
@@ -86,6 +93,9 @@ class LaboratoriesController < ApplicationController
   end
 
   def laboratory_params
+    location_details = Location.details(params[:laboratory][:location_geoid]).first
+    params[:laboratory][:lat] = location_details.lat
+    params[:laboratory][:lng] = location_details.lng
     params.require(:laboratory).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid)
   end
 end

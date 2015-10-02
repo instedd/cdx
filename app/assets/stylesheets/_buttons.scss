@@ -88,7 +88,7 @@
 }
 
 
-.btn-add {
+.btn-add, .btn-add-secondary {
   border-radius: 50%;
   background: $red;
   font-size: 150%;
@@ -107,6 +107,11 @@
   }
 }
 
+.btn-add-secondary {
+  background: $black;
+}
+
+
 .btn-link {
   @extend .btn;
   color: $gray3;
@@ -121,4 +126,8 @@
   line-height: 20px;
   font-weight: 300;
   vertical-align: baseline;
+}
+
+[class^="btn"] + [class^="btn"] {
+  margin-left: 30px;
 }

@@ -15,12 +15,23 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :encounters, only: [:new, :create, :show]
+  resources :encounters, only: [:new, :create, :show] do
+    collection do
+      get :search_sample
+      get :search_test
+      put 'new/sample/:sample_uuid' => 'encounters#add_sample'
+      put 'new/test/:test_uuid' => 'encounters#add_test'
+    end
+  end
   resources :locations, only: [:index, :show]
   resources :devices do
     member do
       get  'regenerate_key'
       post 'generate_activation_token'
+      post 'request_client_logs'
+    end
+    collection do
+      post 'custom_mappings'
     end
     resources :custom_mappings, only: [:index]
     resources :ssh_keys, only: [:create, :destroy]
@@ -28,6 +39,12 @@ Rails.application.routes.draw do
       member do
         get 'raw'
         post 'reprocess'
+      end
+    end
+    resources :device_logs, only: [:index, :show, :create]
+    resources :device_commands, only: [:index] do
+      member do
+        post 'reply'
       end
     end
   end
@@ -69,6 +86,7 @@ Rails.application.routes.draw do
       match 'events' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3
     end
     resources :laboratories, only: :index
+    resources :institutions, only: :index
   end
 
   scope :api, format: 'json', except: [:new, :edit] do

@@ -64,6 +64,21 @@ ActiveRecord::Schema.define(version: 20150930130533) do
     t.integer "condition_id", limit: 4
   end
 
+  create_table "device_commands", force: :cascade do |t|
+    t.integer  "device_id",  limit: 4
+    t.string   "name",       limit: 255
+    t.string   "command",    limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "device_logs", force: :cascade do |t|
+    t.integer  "device_id",  limit: 4
+    t.binary   "message",    limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "device_messages", force: :cascade do |t|
     t.binary   "raw_data",             limit: 65535
     t.integer  "device_id",            limit: 4
@@ -171,6 +186,15 @@ ActiveRecord::Schema.define(version: 20150930130533) do
     t.integer  "device_model_id", limit: 4
   end
 
+  create_table "old_passwords", force: :cascade do |t|
+    t.string   "encrypted_password",       limit: 255, null: false
+    t.string   "password_archivable_type", limit: 255, null: false
+    t.integer  "password_archivable_id",   limit: 4,   null: false
+    t.datetime "created_at"
+  end
+
+  add_index "old_passwords", ["password_archivable_type", "password_archivable_id"], name: "index_password_archivable", using: :btree
+
   create_table "patients", force: :cascade do |t|
     t.binary   "sensitive_data", limit: 65535
     t.text     "custom_fields",  limit: 65535
@@ -275,10 +299,12 @@ ActiveRecord::Schema.define(version: 20150930130533) do
     t.datetime "locked_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "password_changed_at"
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["password_changed_at"], name: "index_users_on_password_changed_at", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
