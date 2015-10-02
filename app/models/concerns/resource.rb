@@ -3,7 +3,7 @@ module Resource
   include Policy::Actions
 
   def self.all
-    @all_resources ||= [Institution, Laboratory, Device, DeviceModel].freeze
+    @all_resources ||= [Institution, Laboratory, Device, DeviceModel, TestResult].freeze
   end
 
   def self.resolve(resource_string)
@@ -13,16 +13,14 @@ module Resource
     [resource_class, match.presence, Rack::Utils.parse_nested_query($2)]
   end
 
+  class NotSupportedException < StandardError; end
+
   included do
 
-    delegate :resource_type, :resource_class, :none, to: :class
+    delegate :resource_type, :resource_class, to: :class
 
     def resource_name
       "#{self.class.resource_name_prefix}/#{id}"
-    end
-
-    def filter(conditions)
-      self.class.where(id: self.id).filter(conditions)
     end
 
   end
@@ -35,6 +33,10 @@ module Resource
 
     def supports_condition?(key)
       column_names.include?("#{key.to_s}_id")
+    end
+
+    def supports_identifier?(key)
+      key.blank? || key.kind_of?(Fixnum) || key.strip.match(/\A\d+\z/)
     end
 
     def resource_name_prefix

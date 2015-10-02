@@ -49,7 +49,7 @@ class Policy < ActiveRecord::Base
     GENERATE_ACTIVATION_TOKEN = "device:generateActivationToken" # This is not tested.
     REPORT_MESSAGE =            "device:reportMessage"
 
-    QUERY_TEST = "test:query"
+    QUERY_TEST = "testResult:query"
   end
 
   ACTIONS = [
@@ -103,6 +103,10 @@ class Policy < ActiveRecord::Base
 
   def self.authorize action, resource, user, policies=nil
     ComputedPolicy.authorize(action, resource, user)
+  end
+
+  def self.condition_resources_for(action, resource, user)
+    ComputedPolicy.condition_resources_for(action, resource, user)
   end
 
   def implicit?
@@ -185,7 +189,8 @@ class Policy < ActiveRecord::Base
       return errors.add :definition, "has an unknown resource: `#{resource_statement}`" unless found_resource
 
       resource_class, resource_id, resource_query = found_resource
-      return errors.add :definition, "has an invalid condition in resource: `#{resource_statement}`" unless resource_class.supports_query?(resource_query)
+      return errors.add :definition, "has an invalid condition in resource: `#{resource_statement}`"    unless resource_class.supports_query?(resource_query)
+      return errors.add :definition, "has unsupported identifier in resource: `#{resource_statement}`"  unless resource_class.supports_identifier?(resource_id)
     end
   end
 

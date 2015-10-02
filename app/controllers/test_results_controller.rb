@@ -3,9 +3,10 @@ class TestResultsController < ApplicationController
   require 'barby/barcode/code_93'
   require 'barby/outputter/html_outputter'
 
-  expose(:laboratories) { check_access(Laboratory, QUERY_TEST) }
-  expose(:institutions) { check_access(Institution, QUERY_TEST) }
-  expose(:devices) { check_access(Device, QUERY_TEST) }
+  include Policy::Actions
+
+  before_filter :load_filter_resources
+
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
   end
@@ -24,9 +25,9 @@ class TestResultsController < ApplicationController
     @query["page_size"] = @page_size
     @query["offset"] = offset
 
-    @filter["institution.uuid"] = institutions.first.uuid if institutions.size == 1
-    @filter["laboratory.uuid"] = laboratories.first.uuid if laboratories.size == 1
-    @filter["device.uuid"] = devices.first.uuid if devices.size == 1
+    @filter["institution.uuid"] = @institutions.first.uuid if @institutions.size == 1
+    @filter["laboratory.uuid"] = @laboratories.first.uuid if @laboratories.size == 1
+    @filter["device.uuid"] = @devices.first.uuid if @devices.size == 1
 
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
@@ -38,7 +39,7 @@ class TestResultsController < ApplicationController
 
   def show
     @test_result = TestResult.find_by(uuid: params[:id])
-    return unless authorize_test_result(@test_result)
+    return unless authorize_resource(@test_result, QUERY_TEST)
 
     @other_tests = @test_result.sample.test_results.where.not(id: @test_result.id)
     @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
@@ -54,7 +55,9 @@ class TestResultsController < ApplicationController
     render csv: true, layout: false
   end
 
-  private def create_filter
+  private
+
+  def create_filter
     filter = {}
     filter["institution.uuid"] = params["institution.uuid"] if params["institution.uuid"].present?
     filter["laboratory.uuid"] = params["laboratory.uuid"] if params["laboratory.uuid"].present?
@@ -65,5 +68,9 @@ class TestResultsController < ApplicationController
     filter["sample.id"] = params["sample.id"] if params["sample.id"].present?
     filter["since"] = params["since"] if params["since"].present?
     filter
+  end
+
+  def load_filter_resources
+    @institutions, @laboratories, @devices = Policy.condition_resources_for(QUERY_TEST, TestResult, current_user).values
   end
 end
