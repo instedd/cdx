@@ -41,8 +41,8 @@ Rails.application.routes.draw do
         post 'reprocess'
       end
     end
-    resources :device_logs
-    resources :device_commands do
+    resources :device_logs, only: [:index, :show, :create]
+    resources :device_commands, only: [:index] do
       member do
         post 'reply'
       end
