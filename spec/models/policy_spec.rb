@@ -63,6 +63,12 @@ describe Policy do
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
+    it "should not create policy with test result by id" do
+      expect {
+        grant user, user2, "testResult/1", "INVALID"
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
   end
 
   context "Authorize" do

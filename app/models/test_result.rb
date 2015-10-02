@@ -54,6 +54,10 @@ class TestResult < ActiveRecord::Base
     %W(institution laboratory device).include?(key.to_s)
   end
 
+  def self.supports_identifier?(key)
+    key.blank?
+  end
+
   def self.query params, user
     TestResultQuery.for params, user
   end

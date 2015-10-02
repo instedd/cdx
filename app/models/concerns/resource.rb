@@ -35,6 +35,10 @@ module Resource
       column_names.include?("#{key.to_s}_id")
     end
 
+    def supports_identifier?(key)
+      key.blank? || key.kind_of?(Fixnum) || key.strip.match(/\A\d+\z/)
+    end
+
     def resource_name_prefix
       name.camelize(:lower)
     end

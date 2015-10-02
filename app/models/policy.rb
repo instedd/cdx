@@ -183,7 +183,8 @@ class Policy < ActiveRecord::Base
       return errors.add :definition, "has an unknown resource: `#{resource_statement}`" unless found_resource
 
       resource_class, resource_id, resource_query = found_resource
-      return errors.add :definition, "has an invalid condition in resource: `#{resource_statement}`" unless resource_class.supports_query?(resource_query)
+      return errors.add :definition, "has an invalid condition in resource: `#{resource_statement}`"    unless resource_class.supports_query?(resource_query)
+      return errors.add :definition, "has unsupported identifier in resource: `#{resource_statement}`"  unless resource_class.supports_identifier?(resource_id)
     end
   end
 
