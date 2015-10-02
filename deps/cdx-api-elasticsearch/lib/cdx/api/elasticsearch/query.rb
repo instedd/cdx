@@ -100,7 +100,7 @@ class Cdx::Api::Elasticsearch::Query
 
   def query_without_group_by(query, params)
     sort = process_order(params)
-    page_size = [[params["page_size"] || DEFAULT_PAGE_SIZE, 1].max , MAX_PAGE_SIZE].min
+    page_size = [[params["page_size"].try(:to_i) || DEFAULT_PAGE_SIZE, 1].max , MAX_PAGE_SIZE].min
     offset = params["offset"]
 
     es_query = {body: {query: query, sort: sort}}
