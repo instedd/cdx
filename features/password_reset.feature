@@ -6,7 +6,7 @@ Feature: Password Reset
   Scenario: Using a previously used password
     Given the previous passwords
       | password    |
-      | foo123      |
+      | foo123dd    |
       | bar123445   |
       | baz767653   |
       | qux67873645 |
