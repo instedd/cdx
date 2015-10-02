@@ -103,6 +103,10 @@ class Policy < ActiveRecord::Base
     ComputedPolicy.authorize(action, resource, user)
   end
 
+  def self.condition_resources_for(action, resource, user)
+    ComputedPolicy.condition_resources_for(action, resource, user)
+  end
+
   def implicit?
     self.granter_id == nil
   end

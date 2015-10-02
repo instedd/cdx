@@ -622,30 +622,37 @@ describe Policy do
     end
   end
 
-  context "queryTest" do
-    context "Allow" do
-      let!(:laboratory) {Laboratory.make institution_id: institution.id}
-      let!(:device) {Device.make laboratory: laboratory, institution_id: institution.id}
+  context "Test Result" do
 
-      [Institution, Laboratory, Device].each do |resource|
-        it "allows a user to query tests of it's own #{resource}" do
-          expect(Policy.authorize(QUERY_TEST, resource, user)).to match_array(resource.all)
-        end
-      end
-    end
+    context "Query" do
 
-    context "Deny" do
       let!(:user2) { User.make }
-      let!(:institution2) { user2.create Institution.make_unsaved }
-      let!(:laboratory) { Laboratory.create institution_id: institution2.id }
-      let!(:device2) { Device.create laboratory: laboratory, institution_id: institution2.id }
 
-      [Institution, Laboratory, Device].each do |resource|
-        it "forbids a user to query tests of other user's #{resource}" do
-          expect(Policy.authorize(QUERY_TEST, resource, user)).to eq([])
-        end
+      let(:laboratory)  { Laboratory.make institution: institution }
+      let(:device)      { Device.make institution_id: institution.id, laboratory: laboratory }
+      let(:test_result) { TestResult.make device_messages: [DeviceMessage.make(device: device)]}
+
+      it "does not allow user to query test result" do
+        assert_cannot user2, test_result, QUERY_TEST
       end
+
+      it "allows to query test result by institution" do
+        grant user, user2, {test_result: institution}, QUERY_TEST
+        assert_can user2, test_result, QUERY_TEST
+      end
+
+      it "allows to query test result by laboratory" do
+        grant user, user2, {test_result: laboratory}, QUERY_TEST
+        assert_can user2, test_result, QUERY_TEST
+      end
+
+      it "allows to query test result by device" do
+        grant user, user2, {test_result: device}, QUERY_TEST
+        assert_can user2, test_result, QUERY_TEST
+      end
+
     end
+
   end
 
   def create_user_and_institution

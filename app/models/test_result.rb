@@ -19,7 +19,8 @@ class TestResult < ActiveRecord::Base
   # validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
   validate :same_patient_in_sample
 
-  delegate :device_model, :device_model_id, to: :device
+  delegate :device_model, :device_model_id, :laboratory_id, to: :device
+  delegate :institution_id, to: :laboratory
 
   def merge(test)
     super

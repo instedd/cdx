@@ -108,7 +108,7 @@ class ComputedPolicy < ActiveRecord::Base
     filters = nil
 
     policies.each do |policy|
-      and_filter = policy.arel_condition_filter || "1=1"
+      and_filter = policy.arel_condition_filter || "1=1" # So much arel and then it comes down to this...
       filters = filters ? filters.or(and_filter) : and_filter
     end
 
