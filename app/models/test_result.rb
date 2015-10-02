@@ -1,6 +1,7 @@
 class TestResult < ActiveRecord::Base
   include AutoUUID
   include Entity
+  include Resource
 
   NAME_FIELD = 'name'
   LAB_USER_FIELD = 'lab_user'
@@ -18,7 +19,8 @@ class TestResult < ActiveRecord::Base
   # validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
   validate :same_patient_in_sample
 
-  delegate :device_model, :device_model_id, to: :device
+  delegate :device_model, :device_model_id, :laboratory_id, to: :device
+  delegate :institution_id, to: :laboratory
 
   def merge(test)
     super
@@ -43,6 +45,18 @@ class TestResult < ActiveRecord::Base
     data = data.deep_merge(sample.entity_scope => sample.custom_fields) if sample
     data = data.deep_merge(patient.entity_scope => patient.custom_fields) if patient
     data
+  end
+
+  def self.filter(conditions)
+    raise Resource::NotSupportedException.new, "Resource filter unsupported in test results resource"
+  end
+
+  def self.supports_condition?(key)
+    %W(institution laboratory device).include?(key.to_s)
+  end
+
+  def self.supports_identifier?(key)
+    key.blank?
   end
 
   def self.query params, user

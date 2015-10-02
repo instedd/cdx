@@ -537,7 +537,7 @@ GEM
       coffee-rails
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    uglifier (2.7.1)
+    uglifier (2.7.2)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
     underscore-rails (1.8.3)
@@ -631,7 +631,7 @@ DEPENDENCIES
   timecop
   tire
   turbolinks
-  uglifier (>= 1.3.0)
+  uglifier (>= 2.7.2)
   underscore-rails
   vcr
   web-console (~> 2.0)

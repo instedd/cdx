@@ -58,15 +58,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def authorize_test_result(test_result)
-    if [test_result.institution, test_result.laboratory, test_result.device].any? { |resource| Policy.can?(QUERY_TEST, resource, current_user, @current_user_policies) }
-      true
-    else
-      head :forbidden
-      false
-    end
-  end
-
   def check_no_institution!
     return if current_user && current_user.need_change_password?
     if current_user && current_user.institutions.empty?

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150929202058) do
+ActiveRecord::Schema.define(version: 20150930130533) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 20150929202058) do
     t.integer "condition_institution_id", limit: 4
     t.integer "condition_laboratory_id",  limit: 4
     t.boolean "delegable",                            default: false
+    t.integer "condition_device_id",      limit: 4
   end
 
   create_table "computed_policy_exceptions", force: :cascade do |t|
@@ -49,6 +50,7 @@ ActiveRecord::Schema.define(version: 20150929202058) do
     t.integer "resource_id",              limit: 4
     t.integer "condition_institution_id", limit: 4
     t.integer "condition_laboratory_id",  limit: 4
+    t.integer "condition_device_id",      limit: 4
   end
 
   create_table "conditions", force: :cascade do |t|

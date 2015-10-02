@@ -326,4 +326,114 @@ describe ComputedPolicy do
 
   end
 
+
+  context "condition resources" do
+
+    let!(:institution_i1) { Institution.make }
+    let!(:institution_i2) { Institution.make }
+
+    let!(:laboratory_i1_l1) { institution_i1.laboratories.make }
+    let!(:laboratory_i1_l2) { institution_i1.laboratories.make }
+    let!(:laboratory_i2_l1) { institution_i2.laboratories.make }
+    let!(:laboratory_i2_l2) { institution_i2.laboratories.make }
+
+    let!(:device_i1_l1_d1) { laboratory_i1_l1.devices.make }
+    let!(:device_i1_l1_d2) { laboratory_i1_l1.devices.make }
+    let!(:device_i1_l2_d1) { laboratory_i1_l2.devices.make }
+    let!(:device_i1_l2_d2) { laboratory_i1_l2.devices.make }
+    let!(:device_i2_l1_d1) { laboratory_i2_l1.devices.make }
+    let!(:device_i2_l1_d2) { laboratory_i2_l1.devices.make }
+    let!(:device_i2_l2_d1) { laboratory_i2_l2.devices.make }
+    let!(:device_i2_l2_d2) { laboratory_i2_l2.devices.make }
+
+    def condition_resources(action=QUERY_TEST, resource=TestResult, u=nil)
+      resources = ComputedPolicy.condition_resources_for(action, resource, u || user)
+      [:institution, :laboratory, :device].map {|key| resources[key]}
+    end
+
+    it "should return empty if no policies" do
+      institutions, laboratories, devices = condition_resources
+      expect(institutions).to be_empty
+      expect(laboratories).to be_empty
+      expect(devices).to      be_empty
+    end
+
+    it "should return all institution assets when user has a policy by institution" do
+      grant nil, user, {:test_result => institution_i1}, QUERY_TEST
+      institutions, laboratories, devices = condition_resources
+
+      expect(institutions).to contain_exactly(institution_i1)
+      expect(laboratories).to contain_exactly(laboratory_i1_l1, laboratory_i1_l2)
+      expect(devices).to      contain_exactly(device_i1_l1_d1, device_i1_l1_d2, device_i1_l2_d1, device_i1_l2_d2)
+    end
+
+    it "should return all laboratory assets when user has a policy by lab" do
+      grant nil, user, {:test_result => laboratory_i1_l1}, QUERY_TEST
+      institutions, laboratories, devices = condition_resources
+
+      expect(institutions).to contain_exactly(institution_i1)
+      expect(laboratories).to contain_exactly(laboratory_i1_l1)
+      expect(devices).to      contain_exactly(device_i1_l1_d1, device_i1_l1_d2)
+    end
+
+    it "should return a device when user has a policy by device" do
+      grant nil, user, {:test_result => device_i1_l1_d1}, QUERY_TEST
+      institutions, laboratories, devices = condition_resources
+
+      expect(institutions).to contain_exactly(institution_i1)
+      expect(laboratories).to contain_exactly(laboratory_i1_l1)
+      expect(devices).to      contain_exactly(device_i1_l1_d1)
+    end
+
+    it "should return all relevant assets when has multiple policies" do
+      grant nil, user, {:test_result => institution_i1},   QUERY_TEST
+      grant nil, user, {:test_result => laboratory_i2_l1}, QUERY_TEST
+      grant nil, user, {:test_result => device_i2_l2_d1},  QUERY_TEST
+      institutions, laboratories, devices = condition_resources
+
+      expect(institutions).to contain_exactly(institution_i1, institution_i2)
+      expect(laboratories).to contain_exactly(laboratory_i1_l1, laboratory_i1_l2, laboratory_i2_l1, laboratory_i2_l2)
+      expect(devices).to      contain_exactly(device_i1_l1_d1, device_i1_l1_d2, device_i1_l2_d1, device_i1_l2_d2, device_i2_l1_d1, device_i2_l1_d2, device_i2_l2_d1)
+    end
+
+    it "should only return resources for the matching action" do
+      grant nil, user, {:device => laboratory_i1_l1}, READ_DEVICE
+      grant nil, user, {:device => laboratory_i1_l2}, UPDATE_DEVICE
+      institutions, laboratories, devices = condition_resources(READ_DEVICE, Device)
+
+      expect(institutions).to contain_exactly(institution_i1)
+      expect(laboratories).to contain_exactly(laboratory_i1_l1)
+      expect(devices).to      contain_exactly(device_i1_l1_d1, device_i1_l1_d2)
+    end
+
+    it "should not return resources in exceptions" do
+      grant nil, user, {:test_result => laboratory_i1_l1}, QUERY_TEST, except: [{test_result: device_i1_l1_d2}]
+      institutions, laboratories, devices = condition_resources
+
+      expect(institutions).to contain_exactly(institution_i1)
+      expect(laboratories).to contain_exactly(laboratory_i1_l1)
+      expect(devices).to      contain_exactly(device_i1_l1_d1)
+    end
+
+    it "should return resources in exceptions if allowed in another policy" do
+      grant nil, user, {:test_result => laboratory_i1_l1}, QUERY_TEST, except: [{test_result: device_i1_l1_d2}]
+      grant nil, user, {:test_result => institution_i1},   QUERY_TEST
+      institutions, laboratories, devices = condition_resources
+
+      expect(institutions).to contain_exactly(institution_i1)
+      expect(laboratories).to contain_exactly(laboratory_i1_l1, laboratory_i1_l2)
+      expect(devices).to      contain_exactly(device_i1_l1_d1, device_i1_l1_d2, device_i1_l2_d1, device_i1_l2_d2)
+    end
+
+    it "should not return any resource if exception contains granted" do
+      grant nil, user, {:test_result => device_i1_l1_d1}, QUERY_TEST, except: [{test_result: laboratory_i1_l1}]
+      institutions, laboratories, devices = condition_resources
+
+      expect(institutions).to be_empty
+      expect(laboratories).to be_empty
+      expect(devices).to      be_empty
+    end
+
+  end
+
 end

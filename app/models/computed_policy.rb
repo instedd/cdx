@@ -9,6 +9,9 @@ class ComputedPolicy < ActiveRecord::Base
   scope :delegable, -> { where(delegable: true) }
   scope :on,        -> (resource_type) { where(resource_type: resource_type) }
 
+  include ComputedPolicyConcern
+
+  CONDITIONS = [:institution, :laboratory, :device].freeze
 
   def self.update_user(user)
     # TODO: Run in background
@@ -26,8 +29,17 @@ class ComputedPolicy < ActiveRecord::Base
   end
 
   def self.authorize(action, resource, user, opts={})
-    scope = self.authorize_scope(action, resource, user, opts)
-    return resource.kind_of?(Resource) ? scope.first : scope
+    return resource.kind_of?(Resource)\
+      ? authorize_instance(action, resource, user, opts)\
+      : authorize_scope(action, resource, user, opts)
+  end
+
+  def self.authorize_instance(action, resource, user, opts={})
+    applicable_policies(action, resource, user, opts).includes(:exceptions).reject do |policy|
+      policy.exceptions.any? do |exception|
+        exception.applies_to?(resource, action, opts)
+      end
+    end.empty? ? nil : resource
   end
 
   def self.authorize_scope(action, resource, user, opts={})
@@ -51,8 +63,11 @@ class ComputedPolicy < ActiveRecord::Base
     query = query.where("action = ? OR action IS NULL", action) if action && action != '*'
     query = query.where("resource_id = ? OR resource_id IS NULL", resource_attributes[:id]) if resource_attributes[:id]
 
-    query = query.where("condition_laboratory_id = ?  OR condition_laboratory_id IS NULL",  resource_attributes[:laboratory_id])  if resource_attributes[:laboratory_id]
-    query = query.where("condition_institution_id = ? OR condition_institution_id IS NULL", resource_attributes[:institution_id]) if resource_attributes[:institution_id]
+    CONDITIONS.each do |condition|
+      if (value = resource_attributes["#{condition}_id".to_sym])
+        query = query.where("condition_#{condition}_id = ? OR condition_#{condition}_id IS NULL", value)
+      end
+    end
 
     return query
   end
@@ -60,71 +75,53 @@ class ComputedPolicy < ActiveRecord::Base
   def self.resource_attributes_for(resource_or_string)
     if resource_or_string == "*"
       Hash.new
+    elsif resource_or_string.kind_of?(Hash)
+      resource_or_string
     elsif resource_or_string.kind_of?(String)
       resource_klass, match, query = Resource.resolve(resource_or_string)
       (query || {}).merge(resource_type: resource_klass.resource_type, id: match)
     else
       resource = resource_or_string
-      { resource_type: resource.resource_type,
-        id: (resource.id if resource.respond_to?(:id)),
-        laboratory_id: (resource.laboratory_id if resource.respond_to?(:laboratory_id)),
-        institution_id: (resource.institution_id if resource.respond_to?(:institution_id)) }
+      attrs = { resource_type: resource.resource_type }
+      attrs[:id] = resource.id if resource.respond_to?(:id)
+      CONDITIONS.each do |condition|
+        key = "#{condition}_id".to_sym
+        attrs[key] = resource.send(key) if resource.respond_to?(key)
+      end
+      attrs
     end
   end
 
+  def self.condition_resources_for(action, resource, user)
+    policies = self.applicable_policies(action, resource, user).where(resource_id: nil).includes(:exceptions)
 
-  module ComputedPolicyMethods
+    return {
+      institution: Institution.none,
+      laboratory: Laboratory.none,
+      device: Device.none
+    } if policies.empty?
 
-    def resource_class
-      Resource.resolve(self.resource_type)[0]
+    institution_table, laboratory_table, device_table = [Institution, Laboratory, Device].map(&:arel_table)
+
+    select = [institution_table[:id], laboratory_table[:id], device_table[:id]]
+    from = Institution.joins(laboratories: :devices).arel.source
+    filters = nil
+
+    policies.each do |policy|
+      and_filter = policy.arel_condition_filter || "1=1" # So much arel and then it comes down to this...
+      filters = filters ? filters.or(and_filter) : and_filter
     end
 
-    def arel_filter
-      table = resource_class.arel_table
-      filters = []
-      filters << table[:id].eq(self.resource_id) if self.resource_id
-      filters << table[:institution_id].eq(self.condition_institution_id) if self.condition_institution_id
-      filters << table[:laboratory_id].eq(self.condition_laboratory_id) if self.condition_laboratory_id
+    arel_query = institution_table.project(*select).from(from).where(filters)
+    result = self.connection.execute(arel_query.to_sql)
+    institution_ids, laboratory_ids, device_ids = result.to_a.transpose.map{|ids| ids.try(:uniq)}
 
-      filters += exceptions.map(&:arel_filter).compact.map(&:not) if respond_to?(:exceptions)
-
-      return filters.compact.inject{|agg, filter| agg.and(filter)}
-    end
-
-    def attributes_equal?(p2)
-      self.delegable == p2.delegable && self.computed_attributes == p2.computed_attributes
-    end
-
-    def computed_attributes
-      attrs = {
-        action: self.action,
-        resource_type: self.resource_type,
-        resource_id: self.resource_id,
-        condition_laboratory_id: self.condition_laboratory_id,
-        condition_institution_id: self.condition_institution_id
-      }
-      attrs[:exceptions_attributes] = self.exceptions.map(&:computed_attributes) if self.respond_to?(:exceptions)
-      return attrs
-    end
-
-    def contains(p2)
-      return (self.action.nil? || self.action == p2.action)\
-        && (self.resource_type.nil? || self.resource_type == p2.resource_type)\
-        && (self.resource_id.nil? || self.resource_id == p2.resource_id)\
-        && (self.conditions.keys.all? {|c| self.conditions[c].nil? || self.conditions[c] == p2.conditions[c] })\
-        && (self.delegable || !p2.delegable)
-    end
-
-    def conditions
-      return {
-        laboratory_id: condition_laboratory_id,
-        institution_id: condition_institution_id
-      }
-    end
-
+    return {
+      institution: Institution.where(id: institution_ids),
+      laboratory: Laboratory.where(id: laboratory_ids),
+      device: Device.where(id: device_ids)
+    }
   end
-
-  include ComputedPolicyMethods
 
 
   class PolicyComputer
@@ -190,19 +187,23 @@ class ComputedPolicy < ActiveRecord::Base
 
     def computed_policy_attributes_from(resource, action=nil)
       resource_type, resource_id, filters = resolve_resource(resource)
-      return {
+
+      attrs = {
         action: action == '*' ? nil : action,
         resource_type: resource_type,
-        resource_id: resource_id.try(:to_i),
-        condition_institution_id: filters["institution"].try(:to_i),
-        condition_laboratory_id: filters["laboratory"].try(:to_i)
+        resource_id: resource_id.try(:to_i)
       }
+
+      ComputedPolicy::CONDITIONS.each do |condition|
+        attrs["condition_#{condition}_id".to_sym] = filters[condition.to_s].try(:to_i)
+      end
+
+      attrs
     end
 
     def action_unrelated_to_resource?(action, resource_type_string)
       return action.presence && (action != '*') &&\
-        !action.starts_with?(resource_type_string) &&\
-        !action.starts_with?("test")
+        !action.starts_with?(resource_type_string)
     end
 
     def resolve_resource(resource_string)
@@ -221,7 +222,8 @@ class ComputedPolicy < ActiveRecord::Base
     def intersect_attributes(p1, p2)
       catch(:empty_intersection) do
         intersection = Hash.new
-        [:resource_id, :resource_type, :action, :condition_institution_id, :condition_laboratory_id].each do |key|
+        conditions_attributes = ComputedPolicy::CONDITIONS.map{|condition| "condition_#{condition}_id".to_sym}
+        ([:resource_id, :resource_type, :action] + conditions_attributes).each do |key|
           intersection[key] = intersect_attribute(p1[key], p2[key])
         end
         intersection[:exceptions_attributes] = ((p1[:exceptions_attributes] || []) | (p2[:exceptions_attributes] || []))

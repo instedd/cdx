@@ -33,9 +33,9 @@ def grant(granter, user, resource, action, opts = {})
 end
 
 def policy_definition(resource, action, delegable = true, except = [])
-  resource = Array(resource).map{|r| r.kind_of?(String) ? r : r.resource_name}
-  except = Array(except).map{|r| r.kind_of?(String) ? r : r.resource_name}
-  action = Array(action)
+  resource = Array.wrap(resource).map{|r| policy_resource_string_for(r)}
+  except =   Array.wrap(except).map{|r| policy_resource_string_for(r)}
+  action =   Array.wrap(action)
 
   JSON.parse %(
     {
@@ -49,4 +49,26 @@ def policy_definition(resource, action, delegable = true, except = [])
       "delegable": #{delegable}
     }
   )
+end
+
+def policy_resource_string_for(resource)
+  case resource
+  when String
+    resource
+  when Symbol
+    resource.to_s.camelize(:lower)
+  when Hash
+    res, condition = resource.to_a[0]
+    str =  "#{policy_resource_string_for(res)}"
+    case condition
+    when Integer
+      "#{str}/#{condition}"
+    when Resource
+      "#{str}?#{condition.resource_type}=#{condition.id}"
+    else
+      "#{str}?#{condition}"
+    end
+  else
+    resource.resource_name
+  end
 end
