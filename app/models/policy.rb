@@ -77,16 +77,16 @@ class Policy < ActiveRecord::Base
     Actions::REPORT_MESSAGE,
   ]
 
-  def self.superadmin
-    predefined_policy "superadmin"
+  def self.superadmin(user)
+    predefined_policy "superadmin", user
   end
 
-  def self.implicit
-    predefined_policy "implicit"
+  def self.implicit(user)
+    predefined_policy "implicit", user
   end
 
-  def self.owner(institution_id)
-    predefined_policy "owner", institution_id: institution_id
+  def self.owner(user, institution_id)
+    predefined_policy "owner", user, institution_id: institution_id
   end
 
   def self.can? action, resource, user, policies=nil
@@ -198,12 +198,18 @@ class Policy < ActiveRecord::Base
     ComputedPolicy.update_user(user)
   end
 
-  def self.predefined_policy(name, args={})
+  def self.predefined_policy(name, user, args={})
     policy = Policy.new
     policy.allows_implicit = true
     policy.name = name.titleize
-    policy.definition = JSON.load(Erubis::Eruby.new(File.read("#{Rails.root}/app/policies/#{name}.json.erb")).result(args))
+    policy.definition = JSON.load(Erubis::Eruby.new(predefined_policy_template(name)).result(args))
     policy.delegable = policy.definition["delegable"]
+    policy.user = user
     policy
+  end
+
+  def self.predefined_policy_template(name)
+    @templates ||= {}
+    @templates[name] ||= File.read("#{Rails.root}/app/policies/#{name}.json.erb")
   end
 end

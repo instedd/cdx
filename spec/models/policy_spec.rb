@@ -6,19 +6,6 @@ describe Policy do
   let(:user) { User.make }
   let(:institution) { user.create Institution.make_unsaved }
 
-  context "Predefined" do
-
-    it "creates an implicity policy when user is created" do
-      expect(user.policies.count).to eq(1)
-    end
-
-    it "creates an owner policy when institution is created" do
-      user
-      expect { institution }.to change(user.policies, :count).by(1)
-    end
-
-  end
-
   context "Validations" do
 
     let!(:user2) { User.make }

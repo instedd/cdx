@@ -5,21 +5,25 @@ include Policy::Actions
 
 describe ComputedPolicy do
 
-  let!(:user)       { User.make(skip_implicit_policy: true) }
+  before(:each) { allow(Policy).to receive(:implicit).and_return(nil) }
 
-  let!(:device)      { Device.make }
-  let!(:device2)     { Device.make }
+  let!(:user) { User.make }
+
+  let!(:device)  { Device.make }
+  let!(:device2) { Device.make }
 
   context "from superadmin" do
 
-    let!(:superadmin) { User.make(skip_implicit_policy: true) { |u| u.grant_superadmin_policy }}
+    let!(:superadmin) do
+      User.make { |u| u.grant_superadmin_policy }
+    end
 
     it "should create computed policy for single resource" do
       expect {
         grant superadmin, user, device, [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
-      ComputedPolicy.last.tap do |p|
+      user.computed_policies(:reload).last.tap do |p|
         expect(p.user).to eq(user)
         expect(p.action).to eq(READ_DEVICE)
         expect(p.resource_type).to eq('device')
@@ -32,9 +36,9 @@ describe ComputedPolicy do
     it "should create computed policy for all resources" do
       expect {
         grant superadmin, user, Device, [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
-      ComputedPolicy.last.tap do |p|
+      user.computed_policies(:reload).last.tap do |p|
         expect(p.action).to eq(READ_DEVICE)
         expect(p.resource_type).to eq('device')
         expect(p.resource_id).to be_nil
@@ -44,7 +48,7 @@ describe ComputedPolicy do
     it "should create computed policy for multiple actions and resources" do
       expect {
         grant superadmin, user, [device, device2], [READ_DEVICE, UPDATE_DEVICE]
-      }.to change(ComputedPolicy, :count).by(4)
+      }.to change(user.computed_policies(:reload), :count).by(4)
 
       [[READ_DEVICE, device.id],
        [READ_DEVICE, device2.id],
@@ -57,17 +61,17 @@ describe ComputedPolicy do
     it "should not create computed policy for unrelated actions and resources" do
       expect {
         grant superadmin, user, [device, device.laboratory], [READ_DEVICE, READ_LABORATORY]
-      }.to change(ComputedPolicy, :count).by(2)
+      }.to change(user.computed_policies(:reload), :count).by(2)
     end
 
     it "should add permissions from two policies" do
       expect {
         grant superadmin, user, Device, [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect {
         grant superadmin, user, Device, [UPDATE_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect(user.computed_policies.map(&:action)).to match([READ_DEVICE, UPDATE_DEVICE])
     end
@@ -75,7 +79,7 @@ describe ComputedPolicy do
     it "should grant permissions filtered by institution" do
       expect {
         grant superadmin, user, "device?institution=#{device.institution.id}", [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       user.computed_policies.first.tap do |p|
         expect(p.condition_institution_id).to eq(device.institution.id)
@@ -85,7 +89,7 @@ describe ComputedPolicy do
     it "should grant permissions filtered by laboratory" do
       expect {
         grant superadmin, user, "device?laboratory=#{device.laboratory.id}", [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       user.computed_policies.first.tap do |p|
         expect(p.condition_laboratory_id).to eq(device.laboratory.id)
@@ -95,7 +99,7 @@ describe ComputedPolicy do
     it "should except a resource" do
       expect {
         grant superadmin, user, Device, [READ_DEVICE], except: [device]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect(user).to have(1).computed_policies
       p = user.computed_policies.first
@@ -118,7 +122,7 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, Device, [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(2)
+      }.to change(user.computed_policies(:reload), :count).by(2)
 
       expect(user.computed_policies.map(&:resource_id)).to match_array([device.id, device2.id])
     end
@@ -129,7 +133,7 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, Device, [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect(user.computed_policies.first.resource_id).to eq(device.id)
     end
@@ -139,7 +143,7 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, "device?laboratory=#{device.laboratory.id}", [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       user.computed_policies.first.tap do |p|
         expect(p.condition_laboratory_id).to eq(device.laboratory.id)
@@ -152,7 +156,7 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, [device], '*'
-      }.to change(ComputedPolicy, :count).by(2)
+      }.to change(user.computed_policies(:reload), :count).by(2)
 
       expect(user.computed_policies.map(&:action)).to match_array([READ_DEVICE, UPDATE_DEVICE])
     end
@@ -163,11 +167,11 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, Device, [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect {
         grant granter2, user, Device, [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(0)
+      }.to change(user.computed_policies(:reload), :count).by(0)
     end
 
     it "should compact undelegable with delegable rules" do
@@ -176,13 +180,13 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, Device, [READ_DEVICE], delegable: true
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect {
         grant granter2, user, Device, [READ_DEVICE], delegable: false
-      }.to change(ComputedPolicy, :count).by(0)
+      }.to change(user.computed_policies(:reload), :count).by(0)
 
-      expect(user.reload.computed_policies.first.delegable).to be_truthy
+      expect(user.computed_policies(:reload).first.delegable).to be_truthy
     end
 
     it "should not compact undelegable with delegable rules on different resources" do
@@ -191,13 +195,13 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, Device, [READ_DEVICE], delegable: true
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect {
         grant granter2, user, Device, [READ_DEVICE], delegable: false
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
-      p1, p2 = user.reload.computed_policies.order(:id).all
+      p1, p2 = user.computed_policies(:reload).order(:id).all
 
       expect(p1.resource_id).to eq(device.id)
       expect(p1.delegable).to be_truthy
@@ -212,11 +216,11 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, Device, [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect {
         grant granter2, user, device, [READ_DEVICE]
-      }.to change(ComputedPolicy, :count).by(0)
+      }.to change(user.computed_policies(:reload), :count).by(0)
 
       user.computed_policies.first.tap do |p|
         expect(p.resource_id).to be_nil
@@ -229,7 +233,7 @@ describe ComputedPolicy do
 
       expect {
         grant granter, user, Device, [READ_DEVICE], except: [device2]
-      }.to change(ComputedPolicy, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect(user).to have(1).computed_policies
       expect(user.computed_policies.first).to have(2).exceptions
@@ -272,16 +276,16 @@ describe ComputedPolicy do
 
       expect {
         grant granter2, user, Device, [READ_DEVICE]
-      }.to change(user.computed_policies, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
       expect(user.computed_policies.first.condition_institution_id).to eq(i2.id)
       expect(user.computed_policies.first.resource_id).to be_nil
 
       expect {
         grant granter, granter2, Device, [READ_DEVICE]
-      }.to change(user.computed_policies, :count).by(1)
+      }.to change(user.computed_policies(:reload), :count).by(1)
 
-      expect(user.computed_policies.map(&:condition_institution_id)).to match_array([i1.id, i2.id])
+      expect(user.computed_policies(:reload).map(&:condition_institution_id)).to match_array([i1.id, i2.id])
     end
 
     it "should recompute policies when a policy is removed" do
@@ -293,7 +297,7 @@ describe ComputedPolicy do
       expect {
         policies << grant(granter, granter2, Device, [READ_DEVICE])
         policies << grant(granter2, user, Device, [READ_DEVICE])
-      }.to change(user.computed_policies, :count).by(2)
+      }.to change(user.computed_policies(:reload), :count).by(2)
 
       expect(granter.computed_policies.on("device").map(&:condition_institution_id)).to  match_array([i1.id])
       expect(granter2.computed_policies.on("device").map(&:condition_institution_id)).to match_array([i1.id, i2.id])
@@ -301,9 +305,9 @@ describe ComputedPolicy do
 
       expect {
         policies.first.reload.destroy!
-      }.to change(user.computed_policies, :count).by(-1)
+      }.to change(user.computed_policies(:reload), :count).by(-1)
 
-      expect(user.computed_policies.map(&:condition_institution_id)).to match_array([i2.id])
+      expect(user.computed_policies(:reload).map(&:condition_institution_id)).to match_array([i2.id])
     end
 
     it "should support a loop of policies" do
