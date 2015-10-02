@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
          :validatable, :confirmable, :omniauthable, :timeoutable,
          :lockable, :password_expirable, :password_archivable
 
-  has_many :identities
+  has_many :identities, dependent: :destroy
   has_many :institutions
   has_many :laboratories, through: :institutions
   has_many :devices, through: :institutions
