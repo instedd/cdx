@@ -11,7 +11,7 @@ class Institution < ActiveRecord::Base
 
   validates_presence_of :name
 
-  after_create :grant_owner_policy
+  after_create :update_owner_policies
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
@@ -31,8 +31,8 @@ class Institution < ActiveRecord::Base
 
   private
 
-  def grant_owner_policy
-    user.grant_predefined_policy "owner", institution_id: self.id
+  def update_owner_policies
+    self.user.update_computed_policies
   end
 
 end

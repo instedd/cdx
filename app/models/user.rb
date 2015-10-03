@@ -16,8 +16,7 @@ class User < ActiveRecord::Base
   has_many :granted_policies, class_name: "Policy", foreign_key: "granter_id"
   has_many :computed_policies
 
-  after_create :grant_implicit_policy
-  attr_accessor :skip_implicit_policy
+  after_create :update_computed_policies
 
   def timeout_in
     Settings.web_session_timeout.try{ |timeout| timeout.to_i.seconds }
@@ -30,19 +29,25 @@ class User < ActiveRecord::Base
     model.save ? model : nil
   end
 
-  def grant_predefined_policy(name, args={})
-    predefined = Policy.predefined_policy(name, args)
-    predefined.granter = nil
-    predefined.user = self
-    predefined.save!
+  def implicit_policies
+    self.institutions.pluck(:id).map do |institution_id|
+      Policy.owner(self, institution_id)
+    end + [Policy.implicit(self)].compact
   end
 
-  def grant_implicit_policy
-    return if skip_implicit_policy
-    grant_predefined_policy("implicit")
+  def update_computed_policies
+    ComputedPolicy.update_user(self)
   end
 
   def grant_superadmin_policy
     grant_predefined_policy("superadmin")
   end
+
+  def grant_predefined_policy(name, args={})
+    predefined = Policy.predefined_policy(name, self, args)
+    predefined.granter = nil
+    predefined.user = self
+    predefined.save!
+  end
+
 end

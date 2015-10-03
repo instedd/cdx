@@ -95,17 +95,6 @@ namespace :policy do
       Policy.where(granter_id: nil).delete_all
     end
 
-    def create_implicit
-      puts "Creating new implicit and owner policies for users"
-      User.find_each do |user|
-        puts " #{user.email}"
-        user.grant_implicit_policy
-        user.institutions.each do |institution|
-          user.grant_predefined_policy "owner", institution_id: institution.id
-        end
-      end
-    end
-
     def calculate_computed
       puts "Recalculating computed policies for all users"
       User.find_each do |user|
@@ -133,7 +122,6 @@ namespace :policy do
       skip_callbacks
       delete_implicit
       migrate_custom
-      create_implicit
       calculate_computed
       puts "\nSuccess!"
     end
@@ -141,7 +129,6 @@ namespace :policy do
     def update_implicit!
       skip_callbacks
       delete_implicit
-      create_implicit
       calculate_computed
       puts "\nSuccess!"
     end

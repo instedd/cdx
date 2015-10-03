@@ -127,7 +127,7 @@ class ComputedPolicy < ActiveRecord::Base
   class PolicyComputer
 
     def update_user(user)
-      computed_policies = user.reload.policies.map{|p| compute_for(p)}.flatten
+      computed_policies = policies_for(user).map{|p| compute_for(p)}.flatten
       computed_policies = compact_policies(computed_policies)
       existing_policies = user.computed_policies
 
@@ -149,6 +149,10 @@ class ComputedPolicy < ActiveRecord::Base
       Policy.where(granter_id: user.id).distinct.pluck(:user_id).each do |user_id|
         update_user(User.find(user_id))
       end
+    end
+
+    def policies_for(user)
+      user.policies(:reload) + user.implicit_policies
     end
 
     def compute_for(policy)

@@ -133,7 +133,6 @@ describe TestResultQuery, elasticsearch: true do
       super_user = User.make
       super_institution = user.create Institution.make_unsaved
       super_device = Device.make institution_id: super_institution.id
-
       super_user.grant_superadmin_policy
 
       TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
