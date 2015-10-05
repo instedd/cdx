@@ -4,20 +4,15 @@
 
 .row
   .col
-    .card
-      .card-image
-        = map_tag @laboratory.lat, @laboratory.lng
-
-      .card-details
-        .card-detail-top
-          %b= @laboratory.name
-          - if @can_edit
-            .card-actions
-              = link_to edit_laboratory_path(@laboratory), :title => 'Edit' do
-                = image_tag "ic-pencil.png"
-
-        .card-detail-bottom
-          = @laboratory.address
+    = card image: map_url(@laboratory.lat, @laboratory.lng) do |c|
+      - c.top do
+        %b= @laboratory.name
+      - if @can_edit
+        - c.actions do
+          = link_to edit_laboratory_path(@laboratory), :title => 'Edit' do
+            = image_tag "ic-pencil.png"
+      - c.bottom do
+        = @laboratory.address
 
 .row
   .col

@@ -29,6 +29,7 @@ gem 'cdx-api-elasticsearch', path: '.'
 gem 'cdx-sync-server',  git: "https://github.com/instedd/cdx-sync-server.git", branch: 'master'
 gem 'geojson_import', git: "https://github.com/instedd/geojson_import", branch: 'master'
 gem 'location_service', git: "https://github.com/instedd/ruby-location_service.git", branch: 'master'
+gem 'view_components', git: "https://github.com/manastech/rails-view_components.git", branch: 'master'
 
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks

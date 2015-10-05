@@ -34,6 +34,14 @@ GIT
       rest-client (~> 1.6)
 
 GIT
+  remote: https://github.com/manastech/rails-view_components.git
+  revision: 97c2b1aef583a329d0a53c30c05a72e1a1efe6a7
+  branch: master
+  specs:
+    view_components (0.1.0)
+      rails
+
+GIT
   remote: https://github.com/phatworx/devise_security_extension
   revision: ff691f63443c0af21d351d6d12c3f39f73274e61
   specs:
@@ -634,6 +642,7 @@ DEPENDENCIES
   uglifier (>= 2.7.2)
   underscore-rails
   vcr
+  view_components!
   web-console (~> 2.0)
   webmock
 
