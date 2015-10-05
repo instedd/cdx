@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150930130533) do
+ActiveRecord::Schema.define(version: 20151005141913) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -212,7 +212,6 @@ ActiveRecord::Schema.define(version: 20150930130533) do
     t.integer  "user_id",    limit: 4
     t.integer  "granter_id", limit: 4
     t.text     "definition", limit: 65535
-    t.boolean  "delegable"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "name",       limit: 255

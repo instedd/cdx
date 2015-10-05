@@ -107,11 +107,13 @@ namespace :policy do
       puts "Migrating custom policies"
       Policy.includes(:user).find_each do |policy|
         puts " #{policy.name} for user #{policy.user.email}"
+        delegable = policy.definition.delete('delegable')
         policy.definition['statement'].each do |statement|
           statement.delete('condition')
           statement.delete('effect')
           statement['action'] = statement['action'].map{|a| translate_action(a)} if statement['action'].kind_of?(Array)
           statement['resource'] = statement['resource'].map{|r| translate_resource(r)} if statement['resource'].kind_of?(Array)
+          statement['delegable'] ||= delegable
         end
         policy.allows_implicit = true
         policy.save!

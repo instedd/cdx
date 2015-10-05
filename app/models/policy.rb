@@ -12,12 +12,8 @@ class Policy < ActiveRecord::Base
 
   serialize :definition, JSON
 
-  before_save :set_delegable_from_definition
-
   after_save    :update_computed_policies
   after_destroy :update_computed_policies
-
-  scope :delegable, -> { where(delegable: true) }
 
   module Actions
     CREATE_INSTITUTION = "institution:create"
@@ -171,15 +167,13 @@ class Policy < ActiveRecord::Base
       if except_statements
         validate_resource_statements(except_statements)
       end
-    end
 
-    delegable = definition["delegable"]
-    if !delegable.nil?
-      if delegable != true && delegable != false
-        return errors.add :definition, "has an invalid delegable value: `#{delegable}`"
+      delegable = statement["delegable"]
+      if !delegable.nil?
+        if delegable != true && delegable != false
+          return errors.add :definition, "has an invalid delegable value: `#{delegable}`"
+        end
       end
-    else
-      return errors.add :definition, "is missing delegable attribute"
     end
   end
 
@@ -194,11 +188,6 @@ class Policy < ActiveRecord::Base
     end
   end
 
-  def set_delegable_from_definition
-    self.delegable = definition["delegable"]
-    true
-  end
-
   def update_computed_policies
     ComputedPolicy.update_user(user)
   end
@@ -208,7 +197,6 @@ class Policy < ActiveRecord::Base
     policy.allows_implicit = true
     policy.name = name.titleize
     policy.definition = JSON.load(Erubis::Eruby.new(predefined_policy_template(name)).result(args))
-    policy.delegable = policy.definition["delegable"]
     policy.user = user
     policy
   end
