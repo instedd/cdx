@@ -4,21 +4,41 @@ require 'policy_spec_helper'
 describe DevicesController do
   let(:institution) {Institution.make}
   let(:user) {institution.user}
+  let(:laboratory) {institution.laboratories.make}
   let(:device_model) {DeviceModel.make}
-  let(:device) {Device.make institution: institution}
+  let(:device) {Device.make institution: institution, laboratory: laboratory}
 
   before(:each) {sign_in user}
 
   context "Index" do
-    it "should display index when other user grants admin permission" do
-      user2 = User.make
-      institution2 = Institution.make user: user2
-      institution2.devices.make
 
+    let!(:user2) {User.make}
+    let!(:institution2) {Institution.make user: user2}
+    let!(:laboratory2) {institution2.laboratories.make}
+    let!(:device2) {laboratory2.devices.make}
+
+    it "should diplay index" do
+      get :index
+      expect(response).to be_success
+      expect(assigns(:devices)).to contain_exactly(device)
+    end
+
+    it "should display index when other user grants permissions" do
       grant user2, user, [Institution.resource_name, Device.resource_name], "*"
 
-      get :index, institution_id: institution2.id
+      get :index
+      expect(response).to be_success
+      expect(assigns(:devices)).to contain_exactly(device, device2)
     end
+
+    it "should display index filtered by institution" do
+      grant user2, user, [Institution.resource_name, Device.resource_name], "*"
+
+      get :index, institution: institution2.id
+      expect(response).to be_success
+      expect(assigns(:devices)).to contain_exactly(device2)
+    end
+
   end
 
   context "Update" do

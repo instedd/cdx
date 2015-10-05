@@ -14,15 +14,8 @@ class DevicesController < ApplicationController
     @devices = check_access(Device, READ_DEVICE)
     @devices ||= []
 
-    if (institution_id = params[:institution].presence)
-      institution_id = institution_id.to_i
-      @devices.select! { |dev| dev.institution_id == institution_id }
-    end
-
-    if (laboratory_id = params[:laboratory].presence)
-      laboratory_id = laboratory_id.to_i
-      @devices.select! { |dev| dev.laboratory_id == laboratory_id }
-    end
+    @devices = @devices.where(institution_id: params[:institution].to_i) if params[:institution].presence
+    @devices = @devices.where(laboratory_id:  params[:laboratory].to_i)  if params[:laboratory].presence
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
 
