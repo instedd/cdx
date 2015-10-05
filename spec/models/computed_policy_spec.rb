@@ -434,6 +434,15 @@ describe ComputedPolicy do
       expect(devices).to      be_empty
     end
 
+    it "should return everything if user is superadmin" do
+      user.grant_superadmin_policy
+      institutions, laboratories, devices = condition_resources
+
+      expect(institutions).to match_array(Institution.all)
+      expect(laboratories).to match_array(Laboratory.all)
+      expect(devices).to      match_array(Device.all)
+    end
+
   end
 
 end

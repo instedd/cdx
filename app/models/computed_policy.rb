@@ -108,11 +108,12 @@ class ComputedPolicy < ActiveRecord::Base
     filters = nil
 
     policies.each do |policy|
-      and_filter = policy.arel_condition_filter || "1=1" # So much arel and then it comes down to this...
-      filters = filters ? filters.or(and_filter) : and_filter
+      filter  = policy.arel_condition_filter
+      filters = (filters && filter) ? filters.or(filter) : (filters or filter)
     end
 
-    arel_query = institution_table.project(*select).from(from).where(filters)
+    arel_query = institution_table.project(*select).from(from)
+    arel_query = arel_query.where(filters) if filters
     result = self.connection.execute(arel_query.to_sql)
     institution_ids, laboratory_ids, device_ids = result.to_a.transpose.map{|ids| ids.try(:uniq)}
 
