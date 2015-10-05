@@ -12,8 +12,9 @@
         .card-detail-top
           %b= @laboratory.name
           - if @can_edit
-            -# TODO: show proper pencil icon
-            = link_to "✎", edit_laboratory_path(@laboratory), class: 'pull-right'
+            .card-actions
+              = link_to edit_laboratory_path(@laboratory), :title => 'Edit' do
+                = image_tag "ic-pencil.png"
 
         .card-detail-bottom
           = @laboratory.address
