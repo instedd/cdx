@@ -39,14 +39,14 @@ def policy_definition(resource, action, delegable = true, except = [])
 
   JSON.parse %(
     {
-      "statement":  [
+      "statement": [
         {
           "action": #{action.to_json},
           "resource": #{resource.to_json},
-          "except": #{except.to_json}
+          "except": #{except.to_json},
+          "delegable": #{delegable}
         }
-      ],
-      "delegable": #{delegable}
+      ]
     }
   )
 end

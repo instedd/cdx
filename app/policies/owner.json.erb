@@ -2,6 +2,7 @@
   "statement": [
     {
       "action": "*",
+      "delegable": true,
       "resource": [
         "institution/<%= institution_id %>",
         "device?institution=<%= institution_id %>",
@@ -10,6 +11,5 @@
         "testResult?institution=<%= institution_id %>"
       ]
     }
-  ],
-  "delegable": true
+  ]
 }
