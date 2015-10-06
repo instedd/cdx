@@ -228,6 +228,19 @@ describe ComputedPolicy do
       end
     end
 
+    it "should not compact rules in policies if they are different due to exceptions" do
+      grant nil, granter,  Device, [READ_DEVICE]
+      grant nil, granter2, Device, [READ_DEVICE]
+
+      expect {
+        grant granter, user, Device, [READ_DEVICE], except: device
+      }.to change(user.computed_policies(:reload), :count).by(1)
+
+      expect {
+        grant granter2, user, device, [READ_DEVICE]
+      }.to change(user.computed_policies(:reload), :count).by(1)
+    end
+
     it "should join exceptions when granting permissions" do
       grant nil, granter, Device, [READ_DEVICE], except: [device]
 
@@ -436,6 +449,16 @@ describe ComputedPolicy do
 
     it "should return everything if user is superadmin" do
       user.grant_superadmin_policy
+      institutions, laboratories, devices = condition_resources
+
+      expect(institutions).to match_array(Institution.all)
+      expect(laboratories).to match_array(Laboratory.all)
+      expect(devices).to      match_array(Device.all)
+    end
+
+    it "should return all resources if allowed in an implicit policy" do
+      grant nil, user, TestResult, QUERY_TEST
+      grant nil, user, {:test_result => institution_i1}, "*"
       institutions, laboratories, devices = condition_resources
 
       expect(institutions).to match_array(Institution.all)

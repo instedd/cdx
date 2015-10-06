@@ -71,7 +71,8 @@ module ComputedPolicyConcern
         && (self.resource_type.nil? || self.resource_type == p2.resource_type)\
         && (self.resource_id.nil? || self.resource_id == p2.resource_id)\
         && (self.conditions.keys.all? {|c| self.conditions[c].nil? || self.conditions[c] == p2.conditions[c] })\
-        && (self.delegable || !p2.delegable)
+        && (self.delegable || !p2.delegable)\
+        && (!self.respond_to?(:exceptions) || self.exceptions.blank?)
     end
 
     def conditions

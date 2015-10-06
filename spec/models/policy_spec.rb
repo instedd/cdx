@@ -96,6 +96,55 @@ describe Policy do
 
   end
 
+
+  context "with complex grants" do
+
+    let!(:laboratory1) { institution.laboratories.make }
+    let!(:laboratory2) { institution.laboratories.make }
+
+    let!(:other_institution) { Institution.make }
+    let!(:other_laboratory)  { other_institution.laboratories.make }
+    let!(:other_device)      { other_laboratory.devices.make }
+
+    let!(:user2) { User.make }
+
+    it "should be able to see all laboratories if granted a policy for all and another by id" do
+      grant nil,  user2, Laboratory,  READ_LABORATORY
+      grant user, user2, laboratory1, '*'
+
+      assert_can user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2, other_laboratory]
+    end
+
+    it "should be able to see all laboratories minus exceptions if granted a policy for all and another by id" do
+      grant nil,  user2, Laboratory,  READ_LABORATORY, except: other_laboratory
+      grant user, user2, laboratory1, '*'
+
+      assert_can user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2]
+    end
+
+    it "should be able to see all laboratories minus exceptions if granted a policy for all" do
+      grant nil, user2, Laboratory, READ_LABORATORY, except: other_laboratory
+
+      assert_can user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2]
+    end
+
+    it "should be able to see all laboratories including exceptions if granted a policy for all and another covering exceptions" do
+      grant nil,  user2, Laboratory, READ_LABORATORY, except: laboratory1
+      grant user, user2, Laboratory, READ_LABORATORY
+
+      assert_can  user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2, other_laboratory]
+    end
+
+    it "should be able to see all laboratories including exceptions if granted a policy for all and another covering exceptions with all actions" do
+      grant nil,  user2, Laboratory, READ_LABORATORY, except: laboratory1
+      grant user, user2, Laboratory, "*"
+
+      assert_can  user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2, other_laboratory]
+    end
+
+  end
+
+
   context "Institution" do
     context "Create" do
       it "allows creating institutions" do
