@@ -3,10 +3,12 @@ class DevicesController < ApplicationController
   require 'barby/barcode/code_93'
   require 'barby/outputter/html_outputter'
 
+  before_filter :load_device, except: [:index, :new, :create, :show]
   before_filter :load_institutions, only: [:new, :create, :edit, :update]
   before_filter :load_laboratories, only: [:new, :create, :edit, :update]
   before_filter :load_institution, only: :create
-  before_filter :load_device_models, only: [:new, :create, :edit, :update]
+  before_filter :load_device_models_for_create, only: [:new, :create]
+  before_filter :load_device_models_for_update, only: [:edit, :update]
   before_filter :load_filter_resources, only: :index
 
   before_filter do
@@ -54,7 +56,6 @@ class DevicesController < ApplicationController
   end
 
   def edit
-    @device = Device.find(params[:id])
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     @uuid_barcode = Barby::Code93.new(@device.uuid)
@@ -68,7 +69,6 @@ class DevicesController < ApplicationController
   end
 
   def update
-    @device = Device.find(params[:id])
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     respond_to do |format|
@@ -83,7 +83,6 @@ class DevicesController < ApplicationController
   end
 
   def destroy
-    @device = Device.find(params[:id])
     return unless authorize_resource(@device, DELETE_DEVICE)
 
     @device.destroy
@@ -95,7 +94,6 @@ class DevicesController < ApplicationController
   end
 
   def regenerate_key
-    @device = Device.find(params[:id])
     return unless authorize_resource(@device, REGENERATE_DEVICE_KEY)
 
     @device.set_key
@@ -115,7 +113,6 @@ class DevicesController < ApplicationController
   end
 
   def generate_activation_token
-    @device = Device.find(params[:id])
     return unless authorize_resource(@device, GENERATE_ACTIVATION_TOKEN)
 
     @token = @device.new_activation_token
@@ -133,7 +130,6 @@ class DevicesController < ApplicationController
   end
 
   def request_client_logs
-    @device = Device.find(params[:id])
     return unless authorize_resource(@device, SUPPORT_DEVICE)
 
     @device.request_client_logs
@@ -178,10 +174,20 @@ class DevicesController < ApplicationController
     @institutions, @laboratories = Policy.condition_resources_for(READ_DEVICE, Device, current_user).values
   end
 
-  def load_device_models
+  def load_device
+    @device = Device.find(params[:id])
+  end
+
+  def load_device_models_for_create
     gon.device_models = @device_models = \
       (DeviceModel.includes(:institution).published.to_a + \
        DeviceModel.includes(:institution).unpublished.where(institution_id: @institutions.map(&:id)).to_a)
+  end
+
+  def load_device_models_for_update
+    @device_models = \
+      (DeviceModel.includes(:institution).published.to_a + \
+       DeviceModel.includes(:institution).unpublished.where(institution_id: @device.institution_id).to_a)
   end
 
   def device_params

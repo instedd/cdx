@@ -6,7 +6,7 @@ describe DevicesController do
   let(:user) {institution.user}
   let(:laboratory) {institution.laboratories.make}
   let(:device_model) {DeviceModel.make}
-  let(:device) {Device.make institution: institution, laboratory: laboratory}
+  let(:device) {Device.make institution: institution, laboratory: laboratory, device_model: device_model}
 
   before(:each) {sign_in user}
 
@@ -51,9 +51,28 @@ describe DevicesController do
     it "loads published device models and from allowed institutions" do
       published = device_model
       unpublished = institution.device_models.make(:unpublished)
-      other_unpublished = DeviceModel.make(:unpublished)
+      other_unpublished = DeviceModel.make(:unpublished, institution: Institution.make)
 
       get :new
+      expect(assigns(:device_models)).to contain_exactly(published, unpublished)
+    end
+
+  end
+
+  context "Edit" do
+
+    it "renders the edit page" do
+      get :edit, id: device.id
+      expect(response).to be_success
+    end
+
+    it "loads published device models and from device institution" do
+      published = device_model
+      unpublished = institution.device_models.make(:unpublished)
+      other_user_institution = user.institutions.make
+      other_unpublished = other_user_institution.device_models.make(:unpublished)
+
+      get :edit, id: device.id
       expect(assigns(:device_models)).to contain_exactly(published, unpublished)
     end
 

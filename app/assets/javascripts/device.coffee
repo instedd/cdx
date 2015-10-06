@@ -1,6 +1,6 @@
 $ ->
-  # Only run on device new or edit
-  if $('form.edit_device').length > 0 or $('form.new_device').length > 0
+  # Only run on device new with an institution dropdown
+  if $('form.new_device').length > 0 && $('#device_institution_id:visible').length > 0
 
     # Index device models by id
     deviceModelsById = _.indexBy(gon.device_models, 'id')

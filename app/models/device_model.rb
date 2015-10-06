@@ -3,8 +3,8 @@ class DeviceModel < ActiveRecord::Base
   include Resource
 
   has_one :manifest, dependent: :destroy, inverse_of: :device_model
-  belongs_to :institution
   has_many :devices
+  belongs_to :institution, inverse_of: :device_models
 
   scope :published,   -> { where.not(published_at: nil) }
   scope :unpublished, -> { where(published_at: nil) }
