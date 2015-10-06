@@ -1,9 +1,33 @@
 require 'spec_helper'
 
 describe Device do
-  it { is_expected.to validate_presence_of :device_model }
-  it { is_expected.to validate_presence_of :name }
-  it { is_expected.to validate_presence_of :institution }
+
+  context "validations" do
+
+    it { is_expected.to validate_presence_of :device_model }
+    it { is_expected.to validate_presence_of :name }
+    it { is_expected.to validate_presence_of :institution }
+
+    it "should validate unpublished device model to belong to the same institution" do
+      device = Device.make_unsaved
+      device.institution = Institution.make
+      device.device_model = DeviceModel.make(:unpublished, institution: Institution.make)
+      expect(device).to be_invalid
+
+      device.device_model = DeviceModel.make(:unpublished, institution: device.institution)
+      expect(device).to be_valid
+    end
+
+    it "should not validate published device model" do
+      device = Device.make_unsaved
+      device.institution = Institution.make
+      device.device_model = DeviceModel.make(institution: Institution.make)
+      expect(device).to be_valid
+    end
+
+  end
+
+
 
   context 'secret key' do
     let(:device) { Device.new }

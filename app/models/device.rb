@@ -22,6 +22,8 @@ class Device < ActiveRecord::Base
   validates_presence_of :serial_number
   validates_presence_of :device_model
 
+  validate :unpublished_device_model_from_institution
+
   before_create :set_key, :set_uuid
 
   delegate :current_manifest, to: :device_model
@@ -102,5 +104,13 @@ class Device < ActiveRecord::Base
     return if has_pending_log_requests?
 
     device_commands.create! name: "send_logs"
+  end
+
+  private
+
+  def unpublished_device_model_from_institution
+    if device_model && !device_model.published? && device_model.institution_id != self.institution_id
+      errors.add(:device_model, "Unpublished device models can only be used to setup devices from the same institution")
+    end
   end
 end
