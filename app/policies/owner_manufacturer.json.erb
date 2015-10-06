@@ -14,10 +14,16 @@
     {
       "resource": [
         "deviceModel?institution=<%= institution_id %>",
-        "device?institution=<%= institution_id %>",
-        "testResult?institution=<%= institution_id %>"
+        "device?institution=<%= institution_id %>"
       ],
       "action": "*",
+      "delegable": true
+    },
+    {
+      "resource": [
+        "testResult?institution=<%= institution_id %>"
+      ],
+      "action": "testResult:query",
       "delegable": true
     },
     {
