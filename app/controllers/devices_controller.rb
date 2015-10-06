@@ -3,9 +3,10 @@ class DevicesController < ApplicationController
   require 'barby/barcode/code_93'
   require 'barby/outputter/html_outputter'
 
-  before_filter :load_institutions, only: [:new, :create, :edit]
+  before_filter :load_institutions, only: [:new, :create, :edit, :update]
   before_filter :load_laboratories, only: [:new, :create, :edit, :update]
   before_filter :load_institution, only: :create
+  before_filter :load_device_models, only: [:new, :create, :edit, :update]
   before_filter :load_filter_resources, only: :index
 
   before_filter do
@@ -175,6 +176,12 @@ class DevicesController < ApplicationController
 
   def load_filter_resources
     @institutions, @laboratories = Policy.condition_resources_for(READ_DEVICE, Device, current_user).values
+  end
+
+  def load_device_models
+    gon.device_models = @device_models = \
+      (DeviceModel.includes(:institution).published.to_a + \
+       DeviceModel.includes(:institution).unpublished.where(institution_id: @institutions.map(&:id)).to_a)
   end
 
   def device_params

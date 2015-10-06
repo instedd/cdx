@@ -6,6 +6,9 @@ class DeviceModel < ActiveRecord::Base
   belongs_to :institution
   has_many :devices
 
+  scope :published,   -> { where.not(published_at: nil) }
+  scope :unpublished, -> { where(published_at: nil) }
+
   validates_uniqueness_of :name
 
   accepts_nested_attributes_for :manifest
@@ -19,5 +22,9 @@ class DeviceModel < ActiveRecord::Base
     else
       name
     end
+  end
+
+  def published?
+    !!published_at
   end
 end

@@ -46,6 +46,12 @@ end
 
 DeviceModel.blueprint do
   name
+  published_at { 1.day.ago }
+end
+
+DeviceModel.blueprint(:unpublished) do
+  name
+  published_at { nil }
 end
 
 Manifest.blueprint do
