@@ -1,0 +1,29 @@
+{
+  "statement": [
+    {
+      "resource": "institution/<%= institution_id %>",
+      "action": [
+        "institution:read",
+        "institution:update",
+        "institution:delete",
+        "institution:registerDeviceModel",
+        "institution:registerDevice"
+      ],
+      "delegable": true
+    },
+    {
+      "resource": [
+        "deviceModel?institution=<%= institution_id %>",
+        "device?institution=<%= institution_id %>",
+        "testResult?institution=<%= institution_id %>"
+      ],
+      "action": "*",
+      "delegable": true
+    },
+    {
+      "resource": "deviceModel",
+      "action": "deviceModel:read",
+      "delegable": true
+    }
+  ]
+}

@@ -46,6 +46,8 @@ class Policy < ActiveRecord::Base
     REPORT_MESSAGE =            "device:reportMessage"
 
     QUERY_TEST = "testResult:query"
+
+    MEDICAL_DASHBOARD = "testResult:medicalDashboard"
   end
 
   ACTIONS = [
@@ -81,8 +83,8 @@ class Policy < ActiveRecord::Base
     predefined_policy "implicit", user
   end
 
-  def self.owner(user, institution_id)
-    predefined_policy "owner", user, institution_id: institution_id
+  def self.owner(user, institution_id, kind)
+    predefined_policy "owner_#{kind}", user, institution_id: institution_id
   end
 
   def self.can? action, resource, user, policies=nil

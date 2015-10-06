@@ -4,11 +4,11 @@ require 'policy_spec_helper'
 describe DeviceModelsController do
 
   let!(:user)         { User.make }
-  let!(:institution)  { user.institutions.make }
+  let!(:institution)  { user.institutions.make kind: "manufacturer" }
   let!(:device_model) { institution.device_models.make }
 
   let!(:user2)         { User.make }
-  let!(:institution2)  { user2.institutions.make }
+  let!(:institution2)  { user2.institutions.make kind: "manufacturer" }
   let!(:device_model2) { institution2.device_models.make }
   let!(:device_model3) { institution2.device_models.make }
 
