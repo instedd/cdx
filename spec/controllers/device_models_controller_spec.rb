@@ -40,17 +40,9 @@ describe DeviceModelsController do
 
   context "index" do
 
-    it "should list institution device models" do
+    it "should list all device models for a manufacturer admin" do
       get :index
-      expect(assigns(:device_models)).to contain_exactly(device_model)
-      expect(response).to be_success
-    end
-
-    it "should list authorised device models" do
-      grant user2, user, [device_model2], [READ_DEVICE_MODEL]
-
-      get :index
-      expect(assigns(:device_models)).to contain_exactly(device_model, device_model2)
+      expect(assigns(:device_models)).to match_array(DeviceModel.all)
       expect(response).to be_success
     end
 
