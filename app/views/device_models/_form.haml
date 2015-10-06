@@ -8,8 +8,11 @@
 
 = form_for(@device_model) do |f|
   = render 'shared/select_institution_or_hidden', f: f
-  = f.label :name, :class => 'label'
-  = f.text_field :name, :rows => '5', :class => 'input-xx-large '
+  .row
+    .col.pe-2
+      = f.label :name
+    .col
+      = f.text_field :name
   = f.fields_for :manifest do |manifest_form|
     - if @device_model.manifest.version
       %p
@@ -17,10 +20,11 @@
         = @device_model.manifest.version
 
     .row
+      .col.pe-2
+        = manifest_form.label :definition
       .col
-        = manifest_form.label :definition, :class => 'label'
-        = manifest_form.text_area :definition, :rows => '5', :class => 'input-xx-large '
+        = manifest_form.text_area :definition, :rows => '5'
 
-  .row
+  .row.button-actions
     .col
       = f.submit class: 'btn-primary'
