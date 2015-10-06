@@ -146,3 +146,13 @@
     align-self: $val;
   }
 
+// =============================================================================
+// OTHER MIXINS
+// =============================================================================
+
+@mixin transform($value) {
+  -webkit-transform: $value;
+     -moz-transform: $value;
+       -o-transform: $value;
+          transform: $value;
+}

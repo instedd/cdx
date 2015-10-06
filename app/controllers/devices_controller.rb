@@ -4,31 +4,22 @@ class DevicesController < ApplicationController
   require 'barby/outputter/html_outputter'
 
   before_filter :load_institutions, only: [:new, :create, :edit]
-  before_filter :load_laboratories, only: [:index, :new, :create, :edit, :update]
+  before_filter :load_laboratories, only: [:new, :create, :edit, :update]
   before_filter :load_institution, only: :create
+  before_filter :load_filter_resources, only: :index
+
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
   end
 
   def index
     @devices = check_access(Device, READ_DEVICE)
-    @devices ||= []
 
-    if (institution_id = params[:institution].presence)
-      institution_id = institution_id.to_i
-      @devices.select! { |dev| dev.institution_id == institution_id }
-    end
-
-    if (laboratory_id = params[:laboratory].presence)
-      laboratory_id = laboratory_id.to_i
-      @devices.select! { |dev| dev.laboratory_id == laboratory_id }
-    end
+    @devices = @devices.where(institution_id: params[:institution].to_i) if params[:institution].presence
+    @devices = @devices.where(laboratory_id:  params[:laboratory].to_i)  if params[:laboratory].presence
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
-
     @devices_to_edit = check_access(Device, UPDATE_DEVICE).pluck(:id)
-
-    @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end
 
   def new
@@ -180,6 +171,10 @@ class DevicesController < ApplicationController
   def load_laboratories
     @laboratories = check_access(Laboratory, ASSIGN_DEVICE_LABORATORY)
     @laboratories ||= []
+  end
+
+  def load_filter_resources
+    @institutions, @laboratories = Policy.condition_resources_for(READ_DEVICE, Device, current_user).values
   end
 
   def device_params

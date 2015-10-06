@@ -27,6 +27,18 @@
     @include flex(1);
     padding: 15px 0 10px 15px;
     width: 100%;
+    position: relative;
+
+    .card-actions {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      opacity: 0.6;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
   }
 
   .card-detail-bottom {
