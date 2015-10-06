@@ -32,3 +32,7 @@
             %td= device.name
             %td= device.device_model.name
             %td= device.laboratory.try(:name)
+
+.row
+  .col
+    = test_results_table filter: { laboratory: @laboratory }

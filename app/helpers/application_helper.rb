@@ -32,4 +32,11 @@ module ApplicationHelper
   end
 
   define_component :card, sections: [:top, :actions, :bottom], attributes: [:image]
+
+  def test_results_table(attributes)
+    options = { filter: {} }
+    options[:filter]['laboratory.uuid'] = attributes[:filter][:laboratory].uuid if attributes[:filter][:laboratory]
+
+    react_component('TestResultsTable', filter: options[:filter])
+  end
 end

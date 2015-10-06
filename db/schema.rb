@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151005172622) do
+ActiveRecord::Schema.define(version: 20151006141537) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -273,8 +273,13 @@ ActiveRecord::Schema.define(version: 20151005172622) do
     t.integer  "patient_id",     limit: 4
     t.text     "core_fields",    limit: 65535
     t.integer  "encounter_id",   limit: 4
+    t.integer  "laboratory_id",  limit: 4
+    t.integer  "institution_id", limit: 4
   end
 
+  add_index "test_results", ["device_id"], name: "index_test_results_on_device_id", using: :btree
+  add_index "test_results", ["institution_id"], name: "index_test_results_on_institution_id", using: :btree
+  add_index "test_results", ["laboratory_id"], name: "index_test_results_on_laboratory_id", using: :btree
   add_index "test_results", ["patient_id"], name: "index_test_results_on_patient_id", using: :btree
   add_index "test_results", ["sample_id"], name: "index_test_results_on_sample_id", using: :btree
   add_index "test_results", ["uuid"], name: "index_test_results_on_uuid", using: :btree
