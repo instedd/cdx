@@ -24,7 +24,9 @@ var Pager = React.createClass({
   },
 
   fireShowPage: function() {
-    this.props.showPage(parseInt(this.state.page) || 1);
+    var pageNumber = parseInt(this.state.page) || 1;
+    pageNumber = Math.max(Math.min(pageNumber, this.props.totalPages), 1)
+    this.props.showPage(pageNumber);
   },
 
   prevPage: function(event) {
@@ -38,7 +40,6 @@ var Pager = React.createClass({
   },
 
   render: function() {
-    // TODO clamp page
     return (
       <div className="pagination">
         <a className="btn-link" href="#" onClick={this.prevPage} disabled={this.state.page == 1 ? "disabled" : ""}>&lt;</a>
