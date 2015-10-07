@@ -45,6 +45,21 @@ $(document).ready(function(){
     window.location.href = $(this).data('href');
   });
 
+  $(document).on('click', '.tabs .tabs-header a:not(".selected")', function(event) {
+    var target = $(event.target);
+    var tabsHeader = target.closest('ul');
+    $('a', tabsHeader).removeClass('selected');
+    target.addClass('selected');
+    var tabsContents = target.closest('.tabs').children('.tabs-content');
+    tabsContents.removeClass('selected');
+    tabsContents.eq(target.closest('li').index()).addClass('selected');
+  });
+
+  $(document).on('click', '.tabs .tabs-header a', function(event) {
+    event.preventDefault();
+  });
+
+  $(".tabs .tabs-header li:first-child a").trigger('click');
 
   /* Initialize sticky outside the event listener as a cached selector.
    * Also, initialize any needed variables outside the listener for
