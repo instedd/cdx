@@ -15,6 +15,10 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :prospects
+  get '/user/request_access' => 'prospects#new'
+
+  resources :laboratories
   resources :institutions, except: :show do
     member do
       get :request_api_token

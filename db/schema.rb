@@ -104,8 +104,8 @@ ActiveRecord::Schema.define(version: 20151019174509) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",      limit: 4
-    t.boolean  "supports_activation"
     t.datetime "published_at"
+    t.boolean  "supports_activation"
   end
 
   add_index "device_models", ["published_at"], name: "index_device_models_on_published_at", using: :btree
@@ -204,6 +204,21 @@ ActiveRecord::Schema.define(version: 20151019174509) do
     t.datetime "updated_at"
     t.string   "name",       limit: 255
   end
+
+  create_table "prospects", force: :cascade do |t|
+    t.string   "first_name",     limit: 255
+    t.string   "last_name",      limit: 255
+    t.string   "email",          limit: 255
+    t.string   "contact_number", limit: 255
+    t.string   "uuid",           limit: 255
+    t.string   "type",           limit: 255
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "prospects", ["email"], name: "index_prospects_on_email", using: :btree
+  add_index "prospects", ["type"], name: "index_prospects_on_type", using: :btree
+  add_index "prospects", ["uuid"], name: "index_prospects_on_uuid", using: :btree
 
   create_table "sample_identifiers", force: :cascade do |t|
     t.integer "sample_id", limit: 4
@@ -316,6 +331,14 @@ ActiveRecord::Schema.define(version: 20151019174509) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "password_changed_at"
+    t.string   "invitation_token",               limit: 255
+    t.datetime "invitation_created_at"
+    t.datetime "invitation_sent_at"
+    t.datetime "invitation_accepted_at"
+    t.integer  "invitation_limit",               limit: 4
+    t.integer  "invited_by_id",                  limit: 4
+    t.string   "invited_by_type",                limit: 255
+    t.integer  "invitations_count",              limit: 4,   default: 0
     t.string   "locale",                         limit: 255, default: "en"
     t.boolean  "timestamps_in_device_time_zone",             default: false
     t.string   "time_zone",                      limit: 255, default: "UTC"
@@ -323,6 +346,9 @@ ActiveRecord::Schema.define(version: 20151019174509) do
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["invitation_token"], name: "index_users_on_invitation_token", unique: true, using: :btree
+  add_index "users", ["invitations_count"], name: "index_users_on_invitations_count", using: :btree
+  add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["password_changed_at"], name: "index_users_on_password_changed_at", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
