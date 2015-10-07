@@ -38,12 +38,11 @@ var Pager = React.createClass({
   },
 
   render: function() {
-    // TODO disabled attr in links
     // TODO clamp page
     return (
       <div className="pagination">
-        <a className="btn-link" href="#" onClick={this.prevPage}>&lt;</a>
-        <a className="btn-link" href="#" onClick={this.nextPage}>&gt;</a>
+        <a className="btn-link" href="#" onClick={this.prevPage} disabled={this.state.page == 1 ? "disabled" : ""}>&lt;</a>
+        <a className="btn-link" href="#" onClick={this.nextPage} disabled={this.state.page == this.props.totalPages ? "disabled" : ""}>&gt;</a>
         <input className="input-x-small text-right" type="text" value={this.state.page} onChange={this.handlePageChange}/>
         <span>
           of {this.props.totalPages}
