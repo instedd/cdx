@@ -1,18 +1,17 @@
 .row
   .col
     = link_to "+", new_device_model_path, class: 'btn-add side-link fix', title: 'Add Device Model'
-    - cdx_table do
-      %tr
-        %th.tableheader{colspan:100} Device Models
-      %tr
-        %th Name
-        - unless @institutions.one?
-          %th Institution
-        %th Version
-      - @device_models.each do |device_model|
-        %tr{data: {href: edit_device_model_path(device_model) }}
-          %td= device_model.name
+    = cdx_table title: 'Device Models' do |t|
+      - t.thead do
+        %tr
+          %th Name
           - unless @institutions.one?
-            %td= device_model.institution.try(:name)
-          %td= device_model.current_manifest.version
-
+            %th Institution
+          %th Version
+      - t.tbody do
+        - @device_models.each do |device_model|
+          %tr{data: {href: edit_device_model_path(device_model) }}
+            %td= device_model.name
+            - unless @institutions.one?
+              %td= device_model.institution.try(:name)
+            %td= device_model.current_manifest.version

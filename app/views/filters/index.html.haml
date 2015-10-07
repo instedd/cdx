@@ -1,11 +1,10 @@
 .row
   .col
-    - cdx_table do
-      %tr
-        %th.tableheader{colspan:100} Filters
-      %tr
-        %th Name
-      - filters.each do |filter|
+    = cdx_table title: 'Filters' do |t|
+      - t.thead do
         %tr
-          %td= link_to filter.name, filter
-
+          %th Name
+      - t.tbody do
+        - filters.each do |filter|
+          %tr
+            %td= link_to filter.name, filter
