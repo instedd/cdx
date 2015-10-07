@@ -1,12 +1,11 @@
 .row
   .col
     = link_to "+", new_subscriber_path, class: 'btn-add side-link fix', title: 'Add Subscriber'
-    - cdx_table do
-      %tr
-        %th.tableheader{colspan:100} Subscribers
-      %tr
-        %th Name
-      - subscribers.each do |subscriber|
+    = cdx_table title: 'Subscribers' do |t|
+      - t.thead do
         %tr
-          %td= link_to subscriber.name, edit_subscriber_path(subscriber)
-
+          %th Name
+      - t.tbody do
+        - subscribers.each do |subscriber|
+          %tr
+            %td= link_to subscriber.name, edit_subscriber_path(subscriber)

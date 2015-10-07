@@ -1,0 +1,8 @@
+%table.table.row-href(cellpadding="0" cellspacing="0")
+  %thead
+    - if cdx_table[:title]
+      %tr
+        %th.tableheader{colspan:100}= cdx_table[:title]
+    = cdx_table[:thead]
+  %tbody
+    = cdx_table[:tbody]

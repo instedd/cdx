@@ -27,11 +27,8 @@ module ApplicationHelper
     res
   end
 
-  def cdx_table(&block)
-    concat(content_tag(:table, capture(&block), class: "table row-href", cellpadding: "0", cellspacing: "0"))
-  end
-
   define_component :card, sections: [:top, :actions, :bottom], attributes: [:image]
+  define_component :cdx_table, sections: [:thead, :tbody], attributes: [:title]
 
   def test_results_table(attributes)
     options = { filter: {} }
