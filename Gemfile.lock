@@ -35,7 +35,7 @@ GIT
 
 GIT
   remote: https://github.com/manastech/rails-view_components.git
-  revision: 23fd345e2f92b179a9658126b22fb5fae9a362cd
+  revision: 71b2d441e1d6339a3bcb9587eb2abfa7cf96775a
   branch: master
   specs:
     view_components (0.1.0)
