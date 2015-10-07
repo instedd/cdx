@@ -6,6 +6,14 @@
           - @institution.errors.full_messages.each do |msg|
             %li= msg
   - unless @readonly
+    - if @institution.new_record?
+      .row
+        .col
+          = f.label :kind, :class => 'block'
+          - Institution::KINDS.each do |kind|
+            = f.radio_button :kind, kind, checked: @institution.kind == kind
+            %label{for: "institution_kind_#{kind}"}
+              = kind.humanize
     .row
       .col
         = f.label :name, :class => 'block'

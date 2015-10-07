@@ -156,6 +156,7 @@ ActiveRecord::Schema.define(version: 20151006141537) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "uuid",       limit: 255
+    t.string   "kind",       limit: 255, default: "institution"
   end
 
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree

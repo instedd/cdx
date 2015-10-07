@@ -1,0 +1,18 @@
+{
+  "statement": [
+    {
+      "resource": "institution/<%= institution_id %>",
+      "action": [
+        "institution:read",
+        "institution:update",
+        "institution:delete"
+      ],
+      "delegable": true
+    },
+    {
+      "resource": "testResult?institution=<%= institution_id %>",
+      "action": "testResult:medicalDashboard",
+      "delegable": true
+    }
+  ]
+}

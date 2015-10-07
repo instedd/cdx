@@ -100,6 +100,6 @@ class InstitutionsController < ApplicationController
   end
 
   def institution_params
-    params.require(:institution).permit(:name)
+    params.require(:institution).permit(:name, :kind)
   end
 end
