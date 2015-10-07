@@ -8,13 +8,13 @@
         - if can?(Policy::Actions::MEDICAL_DASHBOARD, TestResult)
           %li{:class => params[:controller] == "dashboards" && "active"}
             = link_to "Dashboard", nndd_path
-        - if can?(Policy::Actions::UPDATE_LABORATORY, Laboratory) || can?(Policy::Actions::DELETE_LABORATORY, Laboratory)
+        - if can_index_laboratories?
           %li{:class => params[:controller] == "laboratories" && "active"}
             = link_to "Labs", laboratories_path
-        - if can?(Policy::Actions::UPDATE_DEVICE, Device) || can?(Policy::Actions::DELETE_DEVICE, Device)
+        - if can_index_devices?
           %li{:class => params[:controller] == "devices" && "active"}
             = link_to "Devices", devices_path
-        - if can?(Policy::Actions::UPDATE_DEVICE_MODEL, DeviceModel) || can?(Policy::Actions::DELETE_DEVICE_MODEL, DeviceModel)
+        - if can_index_device_models?
           %li{:class => params[:controller] == "device_models" && "active"}
             = link_to "Models", device_models_path
         %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}

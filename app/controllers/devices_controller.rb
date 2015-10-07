@@ -13,6 +13,8 @@ class DevicesController < ApplicationController
   end
 
   def index
+    return head :forbidden unless can_index_devices?
+
     @devices = check_access(Device, READ_DEVICE)
 
     @devices = @devices.where(institution_id: params[:institution].to_i) if params[:institution].presence

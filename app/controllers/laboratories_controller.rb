@@ -6,6 +6,8 @@ class LaboratoriesController < ApplicationController
   end
 
   def index
+    return head :forbidden unless can_index_laboratories?
+
     @laboratories = check_access(Laboratory, READ_LABORATORY)
     @institutions = check_access(Institution, READ_INSTITUTION)
     @can_create = has_access?(@institutions, CREATE_INSTITUTION_LABORATORY)
