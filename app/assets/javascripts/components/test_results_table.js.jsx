@@ -27,10 +27,13 @@ var TestResultsTable = React.createClass({
   },
 
   gotoPage: function(page) {
-    this.setState(React.addons.update(this.state, {
-      offset: { $set: (page - 1) * this.state.pageSize },
-    }));
-    this._fetchTests();
+    var targetOffset = (page - 1) * this.state.pageSize;
+    if (this.state.offset != targetOffset) {
+      this.setState(React.addons.update(this.state, {
+        offset: { $set: targetOffset },
+      }));
+      this._fetchTests();
+    }
   },
 
   render: function() {
