@@ -1,38 +1,5 @@
 %h1
   = link_to '←', devices_path, class: 'side-link', title: 'Back'
   = @device.name
-%p
-  %strong UUID:
-  = @device.uuid
-  = raw @uuid_barcode_for_html.to_html
 
 = render 'form'
-
-%hr
-  %p
-    = link_to "Messages", device_device_messages_path(@device), class: 'btn'
-    - if @device.current_manifest.fields.any?(&:custom?)
-      = link_to "Custom Mappings", device_custom_mappings_path(@device), class: 'btn'
-    - if @can_support
-      = link_to "Logs", device_device_logs_path(@device), class: 'btn'
-
-- if @can_regenerate_key
-  %hr
-  %p
-    = link_to "Generate new key", regenerate_key_device_path(@device), class: 'btn'
-
-- if @can_generate_activation_token
-  %hr
-  %p
-    = link_to "Generate activation token", generate_activation_token_device_path(@device), method: :post, class: 'btn'
-
-- if @can_support
-  - if @device.has_pending_log_requests?
-    %hr
-    %p
-      Client logs requested. Please wait.
-  - else
-    %hr
-    %p
-      = link_to "Request client logs", request_client_logs_device_path(@device), method: :post, class: 'btn'
-

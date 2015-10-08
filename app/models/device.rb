@@ -22,7 +22,7 @@ class Device < ActiveRecord::Base
   validates_presence_of :serial_number
   validates_presence_of :device_model
 
-  before_create :set_key, :set_uuid
+  before_create :set_uuid
 
   delegate :current_manifest, to: :device_model
 
@@ -102,5 +102,9 @@ class Device < ActiveRecord::Base
     return if has_pending_log_requests?
 
     device_commands.create! name: "send_logs"
+  end
+
+  def activated?
+    test_results.any?
   end
 end

@@ -34,7 +34,7 @@
       - t.tbody do
         - @devices.each do |device|
           %tr
-          %tr{data: (@devices_to_edit.include?(device.id) ? {href: edit_device_path(device) } : {})}
+          %tr{data: (@devices_to_read.include?(device.id) ? {href: device_path(device) } : {})}
             %td= device.name
             - unless @institutions.one?
               %td= device.institution.name

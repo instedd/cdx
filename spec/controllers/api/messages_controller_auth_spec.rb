@@ -41,6 +41,8 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "should create message authenticating via secret key" do
+      device.set_key
+      device.save!
       response = post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
       expect(response.status).to eq(200)
       assert_message_created
