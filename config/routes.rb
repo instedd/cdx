@@ -27,8 +27,9 @@ Rails.application.routes.draw do
   resources :devices do
     member do
       get  'regenerate_key'
-      post 'generate_activation_token'
+      get 'generate_activation_token'
       post 'request_client_logs'
+      get 'setup'
     end
     collection do
       post 'custom_mappings'

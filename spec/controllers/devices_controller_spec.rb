@@ -64,7 +64,7 @@ describe DevicesController do
   end
 
   describe "generate_activation_token" do
-    before { post :generate_activation_token, {"institution_id" => device.institution_id, "id" => device.id} }
+    before { post :generate_activation_token, {institution_id: device.institution_id, id: device.id, format: :json} }
     let(:token) { ActivationToken.find_by(device_id: device.id)  }
 
     it { expect(token).not_to be_nil }

@@ -1,0 +1,25 @@
+.row
+  .col
+    %h1
+      = link_to "←", devices_path, class: 'side-link', title: 'Back'
+      = @device.name
+
+.row
+  .col
+    = card image: "card-unkown.png" do |c|
+      - c.top do
+        %b= @device.name
+        %br
+        %span= @device.device_model.name
+      - c.actions do
+        = link_to edit_device_path(@device), :title => 'Edit' do
+          = image_tag "ic-pencil.png"
+
+      - c.bottom do
+        .serial
+          Serial no.
+          = @device.serial_number
+        .location
+          Device located at
+          = link_to @device.laboratory, laboratory_path(@device.laboratory)
+

@@ -21,7 +21,7 @@ class DevicesController < ApplicationController
     @devices = @devices.where(laboratory_id:  params[:laboratory].to_i)  if params[:laboratory].presence
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
-    @devices_to_edit = check_access(Device, UPDATE_DEVICE).pluck(:id)
+    @devices_to_read = check_access(Device, READ_DEVICE).pluck(:id)
   end
 
   def new
@@ -38,7 +38,7 @@ class DevicesController < ApplicationController
 
     respond_to do |format|
       if @device.save
-        format.html { redirect_to devices_path, notice: 'Device was successfully created.' }
+        format.html { redirect_to setup_device_path(@device), notice: 'Device was successfully created.' }
         format.json { render action: 'show', status: :created, location: @device }
       else
         format.html do
@@ -51,17 +51,30 @@ class DevicesController < ApplicationController
   end
 
   def show
-    redirect_to edit_device_path(params[:id])
+    @device = Device.find(params[:id])
+    return unless authorize_resource(@device, READ_DEVICE)
+    redirect_to setup_device_path(@device) unless @device.activated?
   end
+
+  def setup
+    @device = Device.find(params[:id])
+    return unless authorize_resource(@device, UPDATE_DEVICE)
+
+    unless @device.secret_key_hash?
+      # This is the first time the setup page is displayed (after create)
+      # Create a secret key to be shown to the user
+      @device.set_key
+      @device.new_activation_token
+      @device.save!
+    end
+  end
+
 
   def edit
     @device = Device.find(params[:id])
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
-    @uuid_barcode = Barby::Code93.new(@device.uuid)
-    @uuid_barcode_for_html = Barby::HtmlOutputter.new(@uuid_barcode)
     # TODO: check valid laboratories
-
     @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
     @can_generate_activation_token = has_access?(@device, GENERATE_ACTIVATION_TOKEN)
     @can_delete = has_access?(@device, DELETE_DEVICE)
@@ -101,15 +114,12 @@ class DevicesController < ApplicationController
 
     @device.set_key
 
-    @key_barcode = Barby::Code93.new(@device.plain_secret_key)
-    @key_barcode_for_html = Barby::HtmlOutputter.new(@key_barcode)
-
     respond_to do |format|
       if @device.save
-        format.html
+        format.js
         format.json { render json: {secret_key: @device.plain_secret_key }.to_json}
       else
-        format.html { render action: 'edit' }
+        format.js
         format.json { render json: @device.errors, status: :unprocessable_entity }
       end
     end
@@ -122,12 +132,10 @@ class DevicesController < ApplicationController
     @token = @device.new_activation_token
     respond_to do |format|
       if @token.save
-        format.html {
-          render 'devices/token'
-        }
+        format.js
         format.json { render action: 'show', location: @device }
       else
-        format.html { render action: 'edit', notice: "Could not generate activation token. #{@token.errors.first}"}
+        format.js
         format.json { render json: @token.errors, status: :unprocessable_entity }
       end
     end
