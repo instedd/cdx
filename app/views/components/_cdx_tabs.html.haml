@@ -4,5 +4,5 @@
       = header
 
   - cdx_tabs[:contents].each do |content|
-    .tabs-content
+    .tabs-content{class: ('loaded' unless content.blank?)}
       = content

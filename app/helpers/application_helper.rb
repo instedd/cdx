@@ -34,15 +34,15 @@ module ApplicationHelper
     c.section :headers, multiple: true, component: :cdx_tabs_header
     c.section :contents, multiple: true
   end
-  define_component :cdx_tabs_header, attributes: [:title]
+  define_component :cdx_tabs_header, attributes: [:title, :url]
+
   ViewComponents::ComponentsBuilder::Component.classes[:cdx_tabs].class_eval do
     def tab(options, &block)
       self.header options
       if block_given?
         self.content &block
       else
-        self.content do
-        end
+        self.content {}
       end
     end
   end

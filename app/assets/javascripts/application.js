@@ -52,7 +52,14 @@ $(document).ready(function(){
     target.addClass('selected');
     var tabsContents = target.closest('.tabs').children('.tabs-content');
     tabsContents.removeClass('selected');
-    tabsContents.eq(target.closest('li').index()).addClass('selected');
+    var selectedDiv = tabsContents.eq(target.closest('li').index());
+    selectedDiv.addClass('selected');
+    if(!selectedDiv.hasClass('loaded')) {
+      selectedDiv.addClass('loaded');
+      $.get(target.attr('href'), function(data) {
+        selectedDiv.html(data);
+      });
+    }
   });
 
   $(document).on('click', '.tabs .tabs-header a', function(event) {
