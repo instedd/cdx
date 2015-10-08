@@ -66,7 +66,8 @@ class DeviceModelsController < ApplicationController
   end
 
   def destroy
-    @device_model = authorize_resource(DeviceModel.find(params[:id]), DELETE_DEVICE_MODEL) or return
+    @device_model = DeviceModel.unpublished.find(params[:id])
+    @device_model = authorize_resource(@device_model, DELETE_DEVICE_MODEL) or return
     @device_model.destroy!
 
     respond_to do |format|
@@ -90,8 +91,8 @@ class DeviceModelsController < ApplicationController
   end
 
   def set_published_status(device_model)
-    device_model.set_published_at   if params[:publish]   && can_publish?(device_model)
-    device_model.unset_published_at if params[:unpublish] && can_unpublish?(device_model)
+    device_model.set_published_at   if params[:publish]   && can_publish_device_model?(device_model)
+    device_model.unset_published_at if params[:unpublish] && can_unpublish_device_model?(device_model)
   end
 
 end

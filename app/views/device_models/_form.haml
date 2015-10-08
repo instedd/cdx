@@ -28,15 +28,19 @@
   .row.button-actions
     .col
       = f.submit class: 'btn-primary', value: "Save"
+      - if can_delete_device_model?(@device_model)
+        = link_to "Delete", @device_model, method: :delete, data: { confirm: "Are you sure you want to delete this device model?" }
+
 
   %hr/
   - if @device_model.published?
+    - can_unpublish = can_unpublish_device_model?(@device_model)
     .row
       .col
         This device model is published; all institutions in CDX may register devices using it.
-        - if can_unpublish?(@device_model)
-          You may withdraw it as long as there are no devices outside this institution registered using this device model.
-    - if can_unpublish?(@device_model)
+        - if can_unpublish
+          You may withdraw it as long as there are no devices outside this institution using this device model.
+    - if can_unpublish
       .row.button-actions
         .col
           %button{type: 'submit', class: 'btn-secondary', name: 'unpublish', value: "1", id: 'device-model-publish'}
@@ -44,8 +48,8 @@
   -else
     .row
       .col
-        This device model not published; only devices from its manufacturer can be created using this model. Publishing it will make it available to all institutions in CDX.
-    - if can_publish?(@device_model)
+        This device model is not yet published; only devices from its manufacturer can be created using this model. Publishing it will make it available to all institutions in CDX.
+    - if can_publish_device_model?(@device_model)
       .row.button-actions
         .col
           %button{type: 'submit', class: 'btn-secondary', name: 'publish', value: "1", id: 'device-model-publish'}  Publish

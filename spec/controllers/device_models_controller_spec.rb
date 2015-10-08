@@ -240,6 +240,8 @@ describe DeviceModelsController do
 
   context "destroy" do
 
+    let(:published_device_model)  { institution.device_models.make }
+
     it "should delete a device model" do
       expect {
         delete :destroy, id: device_model.id
@@ -249,6 +251,12 @@ describe DeviceModelsController do
     it "should not delete a device model if unauthorised" do
       expect {
         delete :destroy, id: device_model2.id
+      }.to change(DeviceModel, :count).by(0)
+    end
+
+    it "should not delete a device model if published" do
+      expect {
+        delete :destroy, id: published_device_model.id
       }.to change(DeviceModel, :count).by(0)
     end
 
