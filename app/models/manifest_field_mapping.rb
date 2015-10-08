@@ -127,10 +127,10 @@ class ManifestFieldMapping
 
       if @device
         ctx["device"] = script_device(@device)
-        if laboratory = @device.laboratory
-          ctx["laboratory"] = script_laboratory(laboratory)
+        if site = @device.site
+          ctx["site"] = script_site(site)
         end
-        if location = laboratory.try(&:location)
+        if location = site.try(&:location)
           ctx["location"] = script_location(location)
         end
       end
@@ -167,18 +167,18 @@ class ManifestFieldMapping
     }
   end
 
-  def script_laboratory(laboratory)
+  def script_site(site)
     {
-      name: laboratory.name,
-      address: laboratory.address,
-      city: laboratory.city,
-      state: laboratory.state,
-      zip_code: laboratory.zip_code,
-      country: laboratory.country,
-      region: laboratory.region,
-      lat: laboratory.lat,
-      lng: laboratory.lng,
-      location_geoid: laboratory.location_geoid,
+      name: site.name,
+      address: site.address,
+      city: site.city,
+      state: site.state,
+      zip_code: site.zip_code,
+      country: site.country,
+      region: site.region,
+      lat: site.lat,
+      lng: site.lng,
+      location_geoid: site.location_geoid,
     }
   end
 

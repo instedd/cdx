@@ -1,12 +1,12 @@
 class Device < ActiveRecord::Base
   include Resource
 
-
   belongs_to :device_model
   belongs_to :institution
-  belongs_to :laboratory
+  belongs_to :site
 
   has_one :manifest, through: :device_model
+
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
 
@@ -42,7 +42,7 @@ class Device < ActiveRecord::Base
   end
 
   def locations(opts={})
-    laboratories.map{|l| l.location(opts)}.uniq
+    sites.map{|l| l.location(opts)}.uniq
   end
 
   def filter_by_owner(user, check_conditions)
@@ -114,6 +114,10 @@ class Device < ActiveRecord::Base
     self.destroy!
   end
 
+  def activated?
+    test_results.any?
+  end
+
   private
 
   def unpublished_device_model_from_institution
@@ -121,4 +125,5 @@ class Device < ActiveRecord::Base
       errors.add(:device_model, "Unpublished device models can only be used to setup devices from the same institution")
     end
   end
+
 end

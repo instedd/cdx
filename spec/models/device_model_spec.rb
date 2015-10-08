@@ -7,7 +7,7 @@ describe DeviceModel do
     let!(:device_model) { DeviceModel.make(:unpublished, institution: Institution.make) }
     let!(:published_device_model) { DeviceModel.make }
 
-    let(:laboratory) { Laboratory.make(institution: device_model.institution)}
+    let(:site) { Site.make(institution: device_model.institution)}
 
     it "should delete a device model" do
       expect {
@@ -37,7 +37,7 @@ describe DeviceModel do
     end
 
     it "should delete institution devices in cascade" do
-      device_model.devices.make(laboratory: laboratory)
+      device_model.devices.make(site: site)
 
       # We need the relation to materialise so we define the expectation over the same instance
       # that will be used during the before_destroy callback

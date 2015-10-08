@@ -4,9 +4,9 @@ require 'policy_spec_helper'
 describe DevicesController do
   let(:institution) {Institution.make}
   let(:user) {institution.user}
-  let(:laboratory) {institution.laboratories.make}
+  let(:site) {institution.sites.make}
   let(:device_model) {DeviceModel.make}
-  let(:device) {Device.make institution: institution, laboratory: laboratory, device_model: device_model}
+  let(:device) {Device.make institution: institution, site: site, device_model: device_model}
 
   before(:each) {sign_in user}
 
@@ -14,8 +14,8 @@ describe DevicesController do
 
     let!(:user2) {User.make}
     let!(:institution2) {Institution.make user: user2}
-    let!(:laboratory2) {institution2.laboratories.make}
-    let!(:device2) {laboratory2.devices.make}
+    let!(:site2) {institution2.sites.make}
+    let!(:device2) {site2.devices.make}
 
     it "should diplay index" do
       get :index
@@ -103,7 +103,7 @@ describe DevicesController do
   end
 
   describe "generate_activation_token" do
-    before { post :generate_activation_token, {"institution_id" => device.institution_id, "id" => device.id} }
+    before { post :generate_activation_token, {institution_id: device.institution_id, id: device.id, format: :json} }
     let(:token) { ActivationToken.find_by(device_id: device.id)  }
 
     it { expect(token).not_to be_nil }

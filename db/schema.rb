@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151006145712) do
+ActiveRecord::Schema.define(version: 20151008162340) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -38,7 +38,7 @@ ActiveRecord::Schema.define(version: 20151006145712) do
     t.string  "resource_type",            limit: 255
     t.integer "resource_id",              limit: 4
     t.integer "condition_institution_id", limit: 4
-    t.integer "condition_laboratory_id",  limit: 4
+    t.integer "condition_site_id",        limit: 4
     t.boolean "delegable",                            default: false
     t.integer "condition_device_id",      limit: 4
   end
@@ -49,7 +49,7 @@ ActiveRecord::Schema.define(version: 20151006145712) do
     t.string  "resource_type",            limit: 255
     t.integer "resource_id",              limit: 4
     t.integer "condition_institution_id", limit: 4
-    t.integer "condition_laboratory_id",  limit: 4
+    t.integer "condition_site_id",        limit: 4
     t.integer "condition_device_id",      limit: 4
   end
 
@@ -119,7 +119,7 @@ ActiveRecord::Schema.define(version: 20151006145712) do
     t.string   "secret_key_hash", limit: 255
     t.string   "time_zone",       limit: 255
     t.text     "custom_mappings", limit: 65535
-    t.integer  "laboratory_id",   limit: 4
+    t.integer  "site_id",         limit: 4
     t.string   "serial_number",   limit: 255
   end
 
@@ -163,23 +163,6 @@ ActiveRecord::Schema.define(version: 20151006145712) do
   end
 
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
-
-  create_table "laboratories", force: :cascade do |t|
-    t.string   "name",           limit: 255
-    t.integer  "institution_id", limit: 4
-    t.string   "address",        limit: 255
-    t.string   "city",           limit: 255
-    t.string   "state",          limit: 255
-    t.string   "zip_code",       limit: 255
-    t.string   "country",        limit: 255
-    t.string   "region",         limit: 255
-    t.float    "lat",            limit: 24
-    t.float    "lng",            limit: 24
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "location_geoid", limit: 60
-    t.string   "uuid",           limit: 255
-  end
 
   create_table "manifests", force: :cascade do |t|
     t.string   "version",         limit: 255
@@ -239,6 +222,23 @@ ActiveRecord::Schema.define(version: 20151006145712) do
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
   add_index "samples", ["uuid"], name: "index_samples_on_uuid", using: :btree
 
+  create_table "sites", force: :cascade do |t|
+    t.string   "name",           limit: 255
+    t.integer  "institution_id", limit: 4
+    t.string   "address",        limit: 255
+    t.string   "city",           limit: 255
+    t.string   "state",          limit: 255
+    t.string   "zip_code",       limit: 255
+    t.string   "country",        limit: 255
+    t.string   "region",         limit: 255
+    t.float    "lat",            limit: 24
+    t.float    "lng",            limit: 24
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "location_geoid", limit: 60
+    t.string   "uuid",           limit: 255
+  end
+
   create_table "ssh_keys", force: :cascade do |t|
     t.text     "public_key", limit: 65535
     t.integer  "device_id",  limit: 4
@@ -276,15 +276,15 @@ ActiveRecord::Schema.define(version: 20151006145712) do
     t.integer  "patient_id",     limit: 4
     t.text     "core_fields",    limit: 65535
     t.integer  "encounter_id",   limit: 4
-    t.integer  "laboratory_id",  limit: 4
+    t.integer  "site_id",        limit: 4
     t.integer  "institution_id", limit: 4
   end
 
   add_index "test_results", ["device_id"], name: "index_test_results_on_device_id", using: :btree
   add_index "test_results", ["institution_id"], name: "index_test_results_on_institution_id", using: :btree
-  add_index "test_results", ["laboratory_id"], name: "index_test_results_on_laboratory_id", using: :btree
   add_index "test_results", ["patient_id"], name: "index_test_results_on_patient_id", using: :btree
   add_index "test_results", ["sample_id"], name: "index_test_results_on_sample_id", using: :btree
+  add_index "test_results", ["site_id"], name: "index_test_results_on_site_id", using: :btree
   add_index "test_results", ["uuid"], name: "index_test_results_on_uuid", using: :btree
 
   create_table "users", force: :cascade do |t|

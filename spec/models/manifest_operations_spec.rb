@@ -90,25 +90,25 @@ describe Manifest, validate_manifest: false do
       {"sample" => {"custom" => {"fields" => "#{device.name},#{device.uuid}"}, "pii" => {}, "core" => {}}}, device
     end
 
-    it "has access to laboratory from script" do
+    it "has access to site from script" do
       device = Device.make
-      lab = device.laboratory
+      site = device.site
 
       assert_manifest_application %(
         {
-          "sample.fields": { "script": "laboratory.name + ',' + laboratory.address + ',' + laboratory.city + ',' + laboratory.state + ',' + laboratory.zip_code + ',' + laboratory.country + ',' + laboratory.region + ',' + parseInt(laboratory.lat) + ',' + parseInt(laboratory.lng) + ',' + laboratory.location_geoid" }
+          "sample.fields": { "script": "site.name + ',' + site.address + ',' + site.city + ',' + site.state + ',' + site.zip_code + ',' + site.country + ',' + site.region + ',' + parseInt(site.lat) + ',' + parseInt(site.lng) + ',' + site.location_geoid" }
         }
       ), %(
         {
           "sample.fields": {}
         }
       ), %({}),
-      {"sample" => {"custom" => {"fields" => "#{lab.name},#{lab.address},#{lab.city},#{lab.state},#{lab.zip_code},#{lab.country},#{lab.region},#{lab.lat.to_i},#{lab.lng.to_i},#{lab.location_geoid}"}, "pii" => {}, "core" => {}}}, device
+      {"sample" => {"custom" => {"fields" => "#{site.name},#{site.address},#{site.city},#{site.state},#{site.zip_code},#{site.country},#{site.region},#{site.lat.to_i},#{site.lng.to_i},#{site.location_geoid}"}, "pii" => {}, "core" => {}}}, device
     end
 
     it "has access to location from script" do
       device = Device.make
-      loc = device.laboratory.location
+      loc = device.site.location
 
       assert_manifest_application %(
         {

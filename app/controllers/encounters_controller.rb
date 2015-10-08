@@ -138,9 +138,9 @@ class EncountersController < ApplicationController
       json.result assay['result']
     end
 
-    if test_result.device.laboratory
-      json.laboratory do
-        json.name test_result.device.laboratory.name
+    if test_result.device.site
+      json.site do
+        json.name test_result.device.site.name
       end
     end
 

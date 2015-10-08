@@ -63,9 +63,9 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "filters sample of selected institution within permission" do
-      device1 = Device.make institution: i1 = Institution.make, laboratory: Laboratory.make(institution: i1)
-      device2 = Device.make institution: i2 = Institution.make, laboratory: Laboratory.make(institution: i2)
-      device3 = Device.make institution: i1, laboratory: Laboratory.make(institution: i1)
+      device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
+      device2 = Device.make institution: i2 = Institution.make, site: Site.make(institution: i2)
+      device3 = Device.make institution: i1, site: Site.make(institution: i1)
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'bab'})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'cac'})
@@ -102,7 +102,7 @@ RSpec.describe EncountersController, type: :controller do
   end
 
   describe "PUT #add_sample" do
-    let(:test1) { TestResult.make institution: institution, device: Device.make(laboratory: Laboratory.make(institution: institution)) }
+    let(:test1) { TestResult.make institution: institution, device: Device.make(site: Site.make(institution: institution)) }
 
     it "renders json response with filled encounter and status ok" do
       put :add_sample, sample_uuid: test1.sample.uuid, encounter: {
@@ -181,7 +181,7 @@ RSpec.describe EncountersController, type: :controller do
   end
 
   describe "PUT #add_test" do
-    let(:test1) { TestResult.make institution: institution, device: Device.make(laboratory: Laboratory.make(institution: institution)) }
+    let(:test1) { TestResult.make institution: institution, device: Device.make(site: Site.make(institution: institution)) }
 
     it "renders json response with filled encounter and status ok" do
       put :add_test, test_uuid: test1.uuid, encounter: {
@@ -217,8 +217,8 @@ RSpec.describe EncountersController, type: :controller do
       sample_entity_id: test_result.sample.entity_id,
       start_time: test_result.core_fields[TestResult::START_TIME_FIELD].try { |d| d.strftime('%B %e, %Y') },
       assays: [],
-      laboratory: {
-        name: test_result.device.laboratory.name
+      site: {
+        name: test_result.device.site.name
       },
       device: {
         name: test_result.device.name

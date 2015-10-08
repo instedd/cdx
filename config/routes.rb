@@ -8,7 +8,7 @@ Rails.application.routes.draw do
     sessions: "sessions",
   }
 
-  resources :laboratories
+  resources :sites
   resources :institutions, except: :show do
     member do
       get :request_api_token
@@ -27,8 +27,9 @@ Rails.application.routes.draw do
   resources :devices do
     member do
       get  'regenerate_key'
-      post 'generate_activation_token'
+      get 'generate_activation_token'
       post 'request_client_logs'
+      get 'setup'
     end
     collection do
       post 'custom_mappings'
@@ -85,7 +86,7 @@ Rails.application.routes.draw do
       resources :messages, only: [:create], shallow: true
       match 'events' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3
     end
-    resources :laboratories, only: :index
+    resources :sites, only: :index
     resources :institutions, only: :index
   end
 

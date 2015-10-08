@@ -10,16 +10,16 @@ describe TestResultQuery, elasticsearch: true do
   let(:institution_2)   {Institution.make user_id: user.id}
   let(:institution_3)   {Institution.make user_id: user.id}
 
-  let(:laboratory)      {Laboratory.make institution: institution}
-  let(:laboratory_2)    {Laboratory.make institution: institution_2}
-  let(:laboratory_3)    {Laboratory.make institution: institution_3}
-  let(:laboratory_4)    {Laboratory.make institution: institution}
+  let(:site)      {Site.make institution: institution}
+  let(:site_2)    {Site.make institution: institution_2}
+  let(:site_3)    {Site.make institution: institution_3}
+  let(:site_4)    {Site.make institution: institution}
 
-  let(:user_device)     {Device.make institution_id: institution.id, laboratory: laboratory}
-  let(:user_device_2)   {Device.make institution_id: institution.id, laboratory: laboratory}
-  let(:user_device_3)   {Device.make institution_id: institution_2.id, laboratory: laboratory_2}
-  let(:user_device_4)   {Device.make institution_id: institution_3.id, laboratory: laboratory_3}
-  let(:user_device_5)   {Device.make institution_id: institution.id, laboratory: laboratory_4}
+  let(:user_device)     {Device.make institution_id: institution.id, site: site}
+  let(:user_device_2)   {Device.make institution_id: institution.id, site: site}
+  let(:user_device_3)   {Device.make institution_id: institution_2.id, site: site_2}
+  let(:user_device_4)   {Device.make institution_id: institution_3.id, site: site_3}
+  let(:user_device_5)   {Device.make institution_id: institution.id, site: site_4}
   let(:non_user_device) {Device.make}
 
   let(:core_fields) { {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}} }
@@ -105,13 +105,13 @@ describe TestResultQuery, elasticsearch: true do
       expect(result['total_count']).to eq(1)
     end
 
-    it "have access with policy by laboratory" do
+    it "have access with policy by site" do
       TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
       TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device_5)])
 
       refresh_index
 
-      grant(user, user_2, "testResult?laboratory=#{laboratory.id}", QUERY_TEST)
+      grant(user, user_2, "testResult?site=#{site.id}", QUERY_TEST)
 
       result = TestResultQuery.for({"condition" => 'mtb'}, user_2).execute
       expect(result['total_count']).to eq(1)
@@ -146,7 +146,7 @@ describe TestResultQuery, elasticsearch: true do
   end
 
   context "query adapting" do
-    it "should include institution name, device name, and laboratory name in the tests" do
+    it "should include institution name, device name, and site name in the tests" do
       TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
       refresh_index
 
@@ -155,12 +155,12 @@ describe TestResultQuery, elasticsearch: true do
 
       expect(result['tests'].first['institution']['name']).to eq(institution.name)
       expect(result['tests'].first['device']['name']).to eq(user_device.name)
-      expect(result['tests'].first['laboratory']['name']).to eq(laboratory.name)
+      expect(result['tests'].first['site']['name']).to eq(site.name)
     end
 
-    it "should include names if there is no lab" do
-      laboratory
-      device = Device.make institution_id: institution.id, laboratory: nil
+    it "should include names if there is no site" do
+      site
+      device = Device.make institution_id: institution.id, site: nil
       TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: device)])
       refresh_index
 
@@ -168,10 +168,10 @@ describe TestResultQuery, elasticsearch: true do
 
       expect(result['tests'].first['institution']['name']).to eq(institution.name)
       expect(result['tests'].first['device']['name']).to eq(device.name)
-      expect(result['tests'].first['laboratory']['name']).to eq(nil)
+      expect(result['tests'].first['site']['name']).to eq(nil)
     end
 
-    it "should include the updated institution name, device name, and laboratory name in the tests" do
+    it "should include the updated institution name, device name, and site name in the tests" do
       TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
       refresh_index
 
@@ -182,7 +182,7 @@ describe TestResultQuery, elasticsearch: true do
 
       expect(result['tests'].first['institution']['name']).to eq(institution.name)
       expect(result['tests'].first['device']['name']).to eq(user_device.name)
-      expect(result['tests'].first['laboratory']['name']).to eq(laboratory.name)
+      expect(result['tests'].first['site']['name']).to eq(site.name)
     end
 
   end

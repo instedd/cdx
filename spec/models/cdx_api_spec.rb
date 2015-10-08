@@ -109,7 +109,7 @@ describe Cdx::Api, elasticsearch: true do
 
     [
       ['device.uuid', 'device.uuid', ["dev1", "dev2", "dev3"]],
-      ['laboratory.uuid', 'laboratory.uuid', ["1", "2", "3"]],
+      ['site.uuid', 'site.uuid', ["1", "2", "3"]],
       ['institution.uuid', 'institution.uuid', ["1", "2", "3"]],
       ['patient.gender', 'patient.gender', ["male", "female", "unknown"]],
     ].each do |query_name, index_name, values|
@@ -123,13 +123,13 @@ describe Cdx::Api, elasticsearch: true do
       end
     end
 
-    it "filters by lab_user" do
-      index test: {lab_user: "jdoe"}
-      index test: {lab_user: "mmajor"}
+    it "filters by site_user" do
+      index test: {site_user: "jdoe"}
+      index test: {site_user: "mmajor"}
 
-      expect_one_event_with_field "test", "lab_user", "jdoe", 'test.lab_user' => "jdoe"
-      expect_one_event_with_field "test", "lab_user", "mmajor", 'test.lab_user' => "mmajor"
-      expect_no_results "test.lab_user" => "ffoo"
+      expect_one_event_with_field "test", "site_user", "jdoe", 'test.site_user' => "jdoe"
+      expect_one_event_with_field "test", "site_user", "mmajor", 'test.site_user' => "mmajor"
+      expect_no_results "test.site_user" => "ffoo"
     end
 
     it "filters by min age" do
@@ -390,18 +390,18 @@ describe Cdx::Api, elasticsearch: true do
     end
 
     it "groups by system user" do
-      index test: {lab_user: "jdoe"}
-      index test: {lab_user: "jdoe"}
-      index test: {lab_user: "mmajor"}
-      index test: {lab_user: "mmajor"}
+      index test: {site_user: "jdoe"}
+      index test: {site_user: "jdoe"}
+      index test: {site_user: "mmajor"}
+      index test: {site_user: "mmajor"}
 
-      response = query_tests("group_by" => "test.lab_user").sort_by do |test|
-        test["test.lab_user"]
+      response = query_tests("group_by" => "test.site_user").sort_by do |test|
+        test["test.site_user"]
       end
 
       expect(response).to eq([
-        {"test.lab_user"=>"jdoe", "count" => 2},
-        {"test.lab_user"=>"mmajor", "count" => 2},
+        {"test.site_user"=>"jdoe", "count" => 2},
+        {"test.site_user"=>"mmajor", "count" => 2},
       ])
     end
 

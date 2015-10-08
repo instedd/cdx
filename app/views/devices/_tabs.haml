@@ -1,0 +1,6 @@
+- if @device.activated?
+  %ul
+    %li{ class: params[:action] == "show" && "active"  }= link_to 'Performance', device_path(@device)
+    %li{ class: params[:action] == "tests" && "active" }= link_to 'Tests'
+    %li{ class: params[:action] == "logs" && "active"  }= link_to 'Logs'
+    %li{ class: params[:action] == "setup" && "active" }= link_to 'Setup', setup_device_path(@device)

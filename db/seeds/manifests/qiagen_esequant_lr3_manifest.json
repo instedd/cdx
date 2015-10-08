@@ -20,7 +20,7 @@
       ]
     },
     "test.id" : { "lookup": "RunNumber" },
-    "test.lab_user" : { "lookup": "User" },
+    "test.site_user" : { "lookup": "User" },
     "test.error_code" : { "lookup": "error_code" },
     "test.name" : { "lookup": "ProductId" },
     "test.type" : { "lookup": "SampleName" },

@@ -7,14 +7,14 @@
         "institution:update",
         "institution:delete",
         "institution:registerDevice",
-        "institution:createLaboratory",
+        "institution:createSite",
         "institution:createEncounter"
       ],
       "delegable": true
     },
     {
       "resource": [
-        "laboratory?institution=<%= institution_id %>",
+        "site?institution=<%= institution_id %>",
         "device?institution=<%= institution_id %>",
         "testResult?institution=<%= institution_id %>"
       ],

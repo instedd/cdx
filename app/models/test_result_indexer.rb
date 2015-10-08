@@ -46,11 +46,11 @@ class TestResultIndexer
   end
 
   def core_fields
-    laboratory = device.laboratory
-    laboratory_uuid = laboratory.try &:uuid
-    laboratory_name = laboratory.try &:name
+    site = device.site
+    site_uuid = site.try &:uuid
+    site_name = site.try &:name
 
-    location = laboratory.try &:location
+    location = site.try &:location
     location_id = location.try(:geo_id)
     location_lat = location.try(:lat)
     location_lng = location.try(:lng)
@@ -81,8 +81,8 @@ class TestResultIndexer
         "institution" => {
           "uuid" => device.institution.uuid
         },
-        "laboratory" => {
-          "uuid" => laboratory_uuid
+        "site" => {
+          "uuid" => site_uuid
         }
       }).
       deep_merge(core_fields_from(test_result.sample)).

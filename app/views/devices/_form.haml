@@ -13,11 +13,12 @@
       = f.label :device_model_id
     .col
       = f.collection_select :device_model_id, @device_models, :id, :full_name, {include_blank: "Choose one"}
-  .row
-    .col.pe-2
-      = f.label :laboratory
-    .col
-      = f.collection_select(:laboratory_id, @laboratories, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
+  - if can?(Policy::Actions::READ_SITE, Site)
+    .row
+      .col.pe-2
+        = f.label :site
+      .col
+        = f.collection_select(:site_id, @sites, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
   .row
     .col.pe-2
       = f.label :name

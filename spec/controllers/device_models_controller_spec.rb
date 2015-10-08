@@ -150,8 +150,8 @@ describe DeviceModelsController do
     let(:published_device_model)  { institution.device_models.make }
     let(:published_device_model2) { institution2.device_models.make }
 
-    let(:laboratory)  { institution.laboratories.make }
-    let(:laboratory2) { institution2.laboratories.make }
+    let(:site)  { institution.sites.make }
+    let(:site2) { institution2.sites.make }
 
     it "should update a device model" do
       patch :update, id: device_model.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
@@ -224,13 +224,13 @@ describe DeviceModelsController do
     end
 
     it "should unpublish a device model if it has devices in the same institution" do
-      published_device_model.devices.make(laboratory: laboratory)
+      published_device_model.devices.make(site: site)
       patch :update, id: published_device_model.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(published_device_model.reload).to_not be_published
     end
 
     it "should not unpublish a device model if it has devices outside the institution" do
-      published_device_model.devices.make(laboratory: laboratory2)
+      published_device_model.devices.make(site: site2)
       patch :update, id: published_device_model.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(published_device_model.reload).to be_published
     end

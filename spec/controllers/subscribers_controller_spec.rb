@@ -3,7 +3,7 @@ require 'spec_helper'
 describe SubscribersController, elasticsearch: true do
   let(:user) { User.make }
   let!(:institution) { user.create Institution.make_unsaved }
-  let(:filter) { user.filters.make query: { laboratory: 1 } }
+  let(:filter) { user.filters.make query: { site: 1 } }
   before(:each) { sign_in user }
 
   it "list subscribers" do

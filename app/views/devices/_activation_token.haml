@@ -1,0 +1,8 @@
+- if @device.activation_token
+  .key= @device.activation_token.value
+  %p= barcode(@device.activation_token.value)
+- else
+  = link_to 'Reactivate',
+    generate_activation_token_device_path(@device, target: '#activation-token'),
+    remote: true,
+    data: { confirm: "Are you sure?" }

@@ -11,7 +11,7 @@ class ComputedPolicy < ActiveRecord::Base
 
   include ComputedPolicyConcern
 
-  CONDITIONS = [:institution, :laboratory, :device].freeze
+  CONDITIONS = [:institution, :site, :device].freeze
 
   def self.update_user(user)
     # TODO: Run in background
@@ -97,14 +97,14 @@ class ComputedPolicy < ActiveRecord::Base
 
     return {
       institution: Institution.none,
-      laboratory: Laboratory.none,
+      site: Site.none,
       device: Device.none
     } if policies.empty?
 
-    institution_table, laboratory_table, device_table = [Institution, Laboratory, Device].map(&:arel_table)
+    institution_table, site_table, device_table = [Institution, Site, Device].map(&:arel_table)
 
-    select = [institution_table[:id], laboratory_table[:id], device_table[:id]]
-    from = Institution.joins(laboratories: :devices).arel.source
+    select = [institution_table[:id], site_table[:id], device_table[:id]]
+    from = Institution.joins(sites: :devices).arel.source
 
     filters = policies.map(&:arel_condition_filter).inject do |filters, filter|
       (filters && filter) ? filters.or(filter) : nil
@@ -113,11 +113,11 @@ class ComputedPolicy < ActiveRecord::Base
     arel_query = institution_table.project(*select).from(from)
     arel_query = arel_query.where(filters) if filters
     result = self.connection.execute(arel_query.to_sql)
-    institution_ids, laboratory_ids, device_ids = result.to_a.transpose.map{|ids| ids.try(:uniq)}
+    institution_ids, site_ids, device_ids = result.to_a.transpose.map{|ids| ids.try(:uniq)}
 
     return {
       institution: Institution.where(id: institution_ids),
-      laboratory: Laboratory.where(id: laboratory_ids),
+      site: Site.where(id: site_ids),
       device: Device.where(id: device_ids)
     }
   end
