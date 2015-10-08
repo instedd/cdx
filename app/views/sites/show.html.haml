@@ -17,21 +17,6 @@
 .row
   .col
     = cdx_tabs do |t|
-      - t.tab title: 'Devices' do
-        - if @site.devices.empty?
-          %span This site has no devices yet
-        - else
-          = cdx_table title: 'Devices' do |t|
-            - t.thead do
-              %tr
-                %th Name
-                %th Model
-                %th Site
-            - t.tbody do
-              - @site.devices.each do |device|
-                %tr{data: (@devices_to_edit.include?(device.id) ? {href: edit_device_path(device) } : {})}
-                  %td= device.name
-                  %td= device.device_model.name
-                  %td= device.site.try(:name)
+      - t.tab title: 'Devices', url: devices_site_path(@site)
       - t.tab title: 'Tests' do
         = test_results_table filter: { site: @site }
