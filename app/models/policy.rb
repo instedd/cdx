@@ -73,6 +73,7 @@ class Policy < ActiveRecord::Base
     Actions::SUPPORT_DEVICE,
     Actions::QUERY_TEST,
     Actions::REPORT_MESSAGE,
+    Actions::CREATE_INSTITUTION_ENCOUNTER,
   ]
 
   def self.superadmin(user)

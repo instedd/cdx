@@ -22,9 +22,10 @@ class EncountersController < ApplicationController
   end
 
   def search_sample
-    # TODO enforce policy
     institution = institution_by_uuid(params[:institution_uuid])
-    samples = Sample.where(institution: institution).where(["entity_id like ?", "%#{params[:q]}%"])
+    samples = Sample.where("id in (#{authorize_resource(TestResult, QUERY_TEST).select(:sample_id).to_sql})")
+              .where(institution: institution)
+              .where(["entity_id like ?", "%#{params[:q]}%"])
     render json: as_json_samples_search(samples).attributes!
   end
 
