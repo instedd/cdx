@@ -50,7 +50,9 @@ class DeviceModelsController < ApplicationController
   end
 
   def update
-    @device_model = authorize_resource(DeviceModel.find(params[:id]), UPDATE_DEVICE_MODEL) or return
+    @device_model = (authorize_resource(DeviceModel.find(params[:id]), UPDATE_DEVICE_MODEL) or return)
+    @device_model = (authorize_resource(@device_model, PUBLISH_DEVICE_MODEL) or return) if @device_model.published?
+
     set_published_status(@device_model)
 
     respond_to do |format|

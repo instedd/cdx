@@ -212,7 +212,7 @@ describe DeviceModelsController do
     end
 
     it "should unpublish a device model if authorised" do
-      grant nil, user, published_device_model2, [UPDATE_DEVICE_MODEL, UNPUBLISH_DEVICE_MODEL]
+      grant nil, user, published_device_model2, [UPDATE_DEVICE_MODEL, PUBLISH_DEVICE_MODEL]
       patch :update, id: published_device_model2.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(published_device_model2.reload).to_not be_published
     end
@@ -233,6 +233,27 @@ describe DeviceModelsController do
       published_device_model.devices.make(laboratory: laboratory2)
       patch :update, id: published_device_model.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(published_device_model.reload).to be_published
+    end
+
+    it "should update a published device model" do
+      patch :update, id: published_device_model.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(published_device_model.reload.name).to eq("NEWNAME")
+      expect(published_device_model.reload).to be_published
+      expect(response).to be_redirect
+    end
+
+    it "should not update a published device model if unauthorised" do
+      grant user2, user, DeviceModel, UPDATE_DEVICE_MODEL
+      patch :update, id: published_device_model2.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(published_device_model2.reload.name).to_not eq("NEWNAME")
+      expect(published_device_model2.reload).to be_published
+    end
+
+    it "should update a published device model from another institution if authorised" do
+      grant user2, user, DeviceModel, [UPDATE_DEVICE_MODEL, PUBLISH_DEVICE_MODEL]
+      patch :update, id: published_device_model2.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(published_device_model2.reload.name).to eq("NEWNAME")
+      expect(published_device_model2.reload).to be_published
     end
 
   end
