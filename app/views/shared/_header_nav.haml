@@ -5,14 +5,18 @@
   %nav
     - if current_user && !@hide_nav_bar
       %ul
-        %li{:class => params[:controller] == "dashboards" && "active"}
-          = link_to "Dashboard", nndd_path
-        %li{:class => params[:controller] == "laboratories" && "active"}
-          = link_to "Labs", laboratories_path
-        %li{:class => params[:controller] == "devices" && "active"}
-          = link_to "Devices", devices_path
-        %li{:class => params[:controller] == "device_models" && "active"}
-          = link_to "Models", device_models_path
+        - if can?(Policy::Actions::MEDICAL_DASHBOARD, TestResult)
+          %li{:class => params[:controller] == "dashboards" && "active"}
+            = link_to "Dashboard", nndd_path
+        - if can_index_laboratories?
+          %li{:class => params[:controller] == "laboratories" && "active"}
+            = link_to "Labs", laboratories_path
+        - if can_index_devices?
+          %li{:class => params[:controller] == "devices" && "active"}
+            = link_to "Devices", devices_path
+        - if can_index_device_models?
+          %li{:class => params[:controller] == "device_models" && "active"}
+            = link_to "Models", device_models_path
         %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
           = link_to "Tests", test_results_path
         %li{:class => params[:controller] == "filters" && "active"}

@@ -30,8 +30,8 @@ class User < ActiveRecord::Base
   end
 
   def implicit_policies
-    self.institutions.pluck(:id).map do |institution_id|
-      Policy.owner(self, institution_id)
+    self.institutions.pluck(:id, :kind).map do |institution_id, kind|
+      Policy.owner(self, institution_id, kind)
     end + [Policy.implicit(self)].compact
   end
 

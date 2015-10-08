@@ -10,16 +10,19 @@ class TestResult < ActiveRecord::Base
 
   has_and_belongs_to_many :device_messages
   belongs_to :device
-  has_one :institution, through: :device
-  has_one :laboratory, through: :device
+  belongs_to :institution
+  belongs_to :laboratory
   belongs_to :sample
   belongs_to :patient
   belongs_to :encounter
+
   validates_presence_of :device
   # validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
   validate :same_patient_in_sample
 
-  delegate :device_model, :device_model_id, :laboratory_id, :institution_id, to: :device
+  before_save :set_foreign_keys
+
+  delegate :device_model, :device_model_id, to: :device
 
   def merge(test)
     super
@@ -46,14 +49,6 @@ class TestResult < ActiveRecord::Base
     data
   end
 
-  def self.filter(conditions)
-    raise Resource::NotSupportedException.new, "Resource filter unsupported in test results resource"
-  end
-
-  def self.supports_condition?(key)
-    %W(institution laboratory device).include?(key.to_s)
-  end
-
   def self.supports_identifier?(key)
     key.blank?
   end
@@ -72,5 +67,10 @@ class TestResult < ActiveRecord::Base
     if self.sample && self.sample.patient != self.patient
       errors.add(:patient_id, "should match sample's patient")
     end
+  end
+
+  def set_foreign_keys
+    self.laboratory_id = device.try(:laboratory_id)
+    self.institution_id = device.try(:institution_id)
   end
 end

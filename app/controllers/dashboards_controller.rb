@@ -1,3 +1,5 @@
 class DashboardsController < ApplicationController
-  def nndd; end
+  def nndd
+    return unless authorize_resource(TestResult, MEDICAL_DASHBOARD)
+  end
 end

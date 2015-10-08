@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'policy_spec_helper'
 
 RSpec.describe EncountersController, type: :controller do
   let(:institution) { Institution.make }
@@ -48,8 +49,12 @@ RSpec.describe EncountersController, type: :controller do
 
   describe "GET #search_sample" do
     it "returns sample by entity id" do
-      sample = Sample.make entity_id: 'bab', institution: institution
-      Sample.make entity_id: 'bcb', institution: institution
+      device = Device.make institution: institution
+
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'bab'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'bcb'})
+
+      sample = Sample.first
 
       get :search_sample, institution_uuid: institution.uuid, q: 'a'
 
@@ -57,7 +62,29 @@ RSpec.describe EncountersController, type: :controller do
       expect(response.body).to eq([sample_json(sample)].to_json)
     end
 
-    pending "filters sample of selected institution"
+    it "filters sample of selected institution within permission" do
+      device1 = Device.make institution: i1 = Institution.make, laboratory: Laboratory.make(institution: i1)
+      device2 = Device.make institution: i2 = Institution.make, laboratory: Laboratory.make(institution: i2)
+      device3 = Device.make institution: i1, laboratory: Laboratory.make(institution: i1)
+
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'bab'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'cac'})
+      DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'dad'})
+
+      grant device1.institution.user, user, device1.institution, CREATE_INSTITUTION_ENCOUNTER
+      grant device2.institution.user, user, device2.institution, CREATE_INSTITUTION_ENCOUNTER
+
+      grant device1.institution.user, user, {testResult: device1}, QUERY_TEST
+      grant device2.institution.user, user, {testResult: device2}, QUERY_TEST
+
+      get :search_sample, institution_uuid: device1.institution.uuid, q: 'a'
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
+      expect(json_response.length).to eq(1)
+      expect(json_response.first.with_indifferent_access[:entity_id]).to eq("bab")
+    end
+
   end
 
   describe "GET #search_test" do

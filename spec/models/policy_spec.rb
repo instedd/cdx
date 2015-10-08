@@ -96,6 +96,55 @@ describe Policy do
 
   end
 
+
+  context "with complex grants" do
+
+    let!(:laboratory1) { institution.laboratories.make }
+    let!(:laboratory2) { institution.laboratories.make }
+
+    let!(:other_institution) { Institution.make }
+    let!(:other_laboratory)  { other_institution.laboratories.make }
+    let!(:other_device)      { other_laboratory.devices.make }
+
+    let!(:user2) { User.make }
+
+    it "should be able to see all laboratories if granted a policy for all and another by id" do
+      grant nil,  user2, Laboratory,  READ_LABORATORY
+      grant user, user2, laboratory1, '*'
+
+      assert_can user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2, other_laboratory]
+    end
+
+    it "should be able to see all laboratories minus exceptions if granted a policy for all and another by id" do
+      grant nil,  user2, Laboratory,  READ_LABORATORY, except: other_laboratory
+      grant user, user2, laboratory1, '*'
+
+      assert_can user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2]
+    end
+
+    it "should be able to see all laboratories minus exceptions if granted a policy for all" do
+      grant nil, user2, Laboratory, READ_LABORATORY, except: other_laboratory
+
+      assert_can user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2]
+    end
+
+    it "should be able to see all laboratories including exceptions if granted a policy for all and another covering exceptions" do
+      grant nil,  user2, Laboratory, READ_LABORATORY, except: laboratory1
+      grant user, user2, Laboratory, READ_LABORATORY
+
+      assert_can  user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2, other_laboratory]
+    end
+
+    it "should be able to see all laboratories including exceptions if granted a policy for all and another covering exceptions with all actions" do
+      grant nil,  user2, Laboratory, READ_LABORATORY, except: laboratory1
+      grant user, user2, Laboratory, "*"
+
+      assert_can  user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2, other_laboratory]
+    end
+
+  end
+
+
   context "Institution" do
     context "Create" do
       it "allows creating institutions" do
@@ -615,12 +664,22 @@ describe Policy do
 
       let!(:user2) { User.make }
 
-      let(:laboratory)  { Laboratory.make institution: institution }
-      let(:device)      { Device.make institution_id: institution.id, laboratory: laboratory }
-      let(:test_result) { TestResult.make device_messages: [DeviceMessage.make(device: device)]}
+      let!(:laboratory)  { Laboratory.make institution: institution }
+      let!(:device)      { Device.make institution_id: institution.id, laboratory: laboratory }
+      let!(:test_result) { TestResult.make device_messages: [DeviceMessage.make(device: device)]}
+
+      let!(:institution2) { user.institutions.make }
+      let!(:laboratory2)  { Laboratory.make institution: institution2 }
+      let!(:device2)      { Device.make institution_id: institution2.id, laboratory: laboratory2 }
+      let!(:test_result2) { TestResult.make device_messages: [DeviceMessage.make(device: device2)]}
 
       it "does not allow user to query test result" do
         assert_cannot user2, test_result, QUERY_TEST
+      end
+
+      it "returns an empty scope when not authorised" do
+        actual = Policy.authorize QUERY_TEST, TestResult, user2
+        expect(actual.to_a).to be_empty
       end
 
       it "allows to query test result by institution" do
@@ -636,6 +695,37 @@ describe Policy do
       it "allows to query test result by device" do
         grant user, user2, {test_result: device}, QUERY_TEST
         assert_can user2, test_result, QUERY_TEST
+      end
+
+      it "returns a scope with tests authorised by institution" do
+        grant user, user2, {test_result: institution}, QUERY_TEST
+        assert_can user2, TestResult, QUERY_TEST, [test_result]
+      end
+
+      it "returns a scope with tests authorised by laboratory" do
+        grant user, user2, {test_result: laboratory}, QUERY_TEST
+        assert_can user2, TestResult, QUERY_TEST, [test_result]
+      end
+
+      it "returns a scope with tests authorised by device" do
+        grant user, user2, {test_result: device}, QUERY_TEST
+        assert_can user2, TestResult, QUERY_TEST, [test_result]
+      end
+
+      it "returns a scope with tests authorised by multiple criteria" do
+        grant user, user2, {test_result: institution}, QUERY_TEST
+        grant user, user2, {test_result: laboratory2}, QUERY_TEST
+        assert_can user2, TestResult, QUERY_TEST, [test_result, test_result2]
+      end
+
+      it "returns a scope with all tests" do
+        grant user, user2, TestResult, QUERY_TEST
+        assert_can user2, TestResult, QUERY_TEST, [test_result, test_result2]
+      end
+
+      it "returns a scope with all tests minus exceptions" do
+        grant user, user2, TestResult, QUERY_TEST, except: {test_result: laboratory2}
+        assert_can user2, TestResult, QUERY_TEST, [test_result]
       end
 
     end

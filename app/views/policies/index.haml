@@ -1,14 +1,13 @@
 .row
   .col
     = link_to "+", new_policy_path, class: 'btn-add side-link fix', title: 'Add Policy'
-    - cdx_table do
-      %tr
-        %th.tableheader{colspan:100} Policies
-      %tr
-        %th Name
-        %th User
-      - @policies.each do |policy|
+    = cdx_table title: 'Policies' do |t|
+      - t.thead do
         %tr
-          %td= link_to policy.name, edit_policy_path(policy)
-          %td= link_to policy.user.email, edit_policy_path(policy)
-
+          %th Name
+          %th User
+      - t.tbody do
+        - @policies.each do |policy|
+          %tr
+            %td= link_to policy.name, edit_policy_path(policy)
+            %td= link_to policy.user.email, edit_policy_path(policy)

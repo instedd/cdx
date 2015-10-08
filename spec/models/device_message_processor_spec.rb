@@ -119,6 +119,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(test.custom_fields).to eq("raw_result" => TEST_RAW_RESULT, "concentration" => TEST_CONCENTRATION)
   end
 
+  def assert_test_relations(test)
+    expect(test.device_id).to eq(device.id)
+    expect(test.laboratory_id).to eq(device.laboratory.id)
+    expect(test.institution_id).to eq(device.laboratory.institution.id)
+  end
+
   it "should create a test result" do
     device_message_processor.process
 
@@ -126,6 +132,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     test = TestResult.first
     expect(test.test_id).to eq(TEST_ID)
     assert_test_data(test)
+    assert_test_relations(test)
   end
 
   it "should create a sample" do

@@ -2,6 +2,8 @@ class Institution < ActiveRecord::Base
   include AutoUUID
   include Resource
 
+  KINDS = %w(institution manufacturer health_organization)
+
   belongs_to :user
 
   has_many :laboratories, dependent: :destroy
@@ -10,6 +12,8 @@ class Institution < ActiveRecord::Base
   has_many :encounters, dependent: :destroy
 
   validates_presence_of :name
+  validates_presence_of :kind
+  validates_inclusion_of :kind, in: KINDS
 
   after_create :update_owner_policies
 

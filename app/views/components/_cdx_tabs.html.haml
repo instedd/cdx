@@ -1,0 +1,8 @@
+.tabs
+  %ul.tabs-header
+    - cdx_tabs[:headers].each do |header|
+      = header
+
+  - cdx_tabs[:contents].each do |content|
+    .tabs-content
+      = content

@@ -7,6 +7,8 @@ class DeviceModelsController < ApplicationController
   end
 
   def index
+    return head :forbidden unless can_index_device_models?
+
     @device_models = authorize_resource(DeviceModel, READ_DEVICE_MODEL) or return
     @device_models = @device_models.includes(:manifest).includes(:institution)
   end

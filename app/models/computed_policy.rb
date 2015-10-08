@@ -47,7 +47,7 @@ class ComputedPolicy < ActiveRecord::Base
     return resource.none if policies.empty?
 
     filter = policies.map(&:arel_filter).inject do |filters, filter|
-      (filters && filter) ? filters.or(filter) : (filters or filter)
+      (filters && filter) ? filters.or(filter) : nil
     end
 
     resource.filter(filter)
@@ -105,11 +105,9 @@ class ComputedPolicy < ActiveRecord::Base
 
     select = [institution_table[:id], laboratory_table[:id], device_table[:id]]
     from = Institution.joins(laboratories: :devices).arel.source
-    filters = nil
 
-    policies.each do |policy|
-      filter  = policy.arel_condition_filter
-      filters = (filters && filter) ? filters.or(filter) : (filters or filter)
+    filters = policies.map(&:arel_condition_filter).inject do |filters, filter|
+      (filters && filter) ? filters.or(filter) : nil
     end
 
     arel_query = institution_table.project(*select).from(from)

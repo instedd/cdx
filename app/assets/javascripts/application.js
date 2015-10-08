@@ -51,21 +51,23 @@ $(document).ready(function(){
    * Also, initialize any needed variables outside the listener for
    * performance reasons - no variable instantiation is happening inside the listener.
    */
-  var sticky = $('.fix'),
-      stickyTop = sticky.offset().top - 30,
-      scrollTop,
-      scrolled = false,
-      $window = $(window);
+  var sticky = $('.fix');
+  if (sticky.length > 0) {
+    var stickyTop = sticky.offset().top - 30,
+        scrollTop,
+        scrolled = false,
+        $window = $(window);
 
-  /* Bind the scroll Event */
-  $window.on('scroll', function (e) {
-      scrollTop = $window.scrollTop();
+    /* Bind the scroll Event */
+    $window.on('scroll', function (e) {
+        scrollTop = $window.scrollTop();
 
-      if (scrollTop >= stickyTop) {
-          sticky.addClass('fixed');
-      } else if (scrollTop < stickyTop) {
-          sticky.removeClass('fixed');
-      }
-  });
+        if (scrollTop >= stickyTop) {
+            sticky.addClass('fixed');
+        } else if (scrollTop < stickyTop) {
+            sticky.removeClass('fixed');
+        }
+    });
+  }
 
 });

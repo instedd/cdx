@@ -53,16 +53,16 @@
     .col
       = link_to "+", new_encounter_path, class: 'btn-add side-link fix', title: 'Add encounter'
 
-      - cdx_table do
-        %tr
-          %th.tableheader{colspan:100}= pluralize @total, "Test"
-        %tr
-          - each_column do |id, title, sortable|
-            %th= sortable ? order_by_column(title, id) : title
-        - @tests.each do |test|
-          %tr{data: {href: test_result_path(test['test']['uuid']) }}
-            - each_column do |id|
-              %td= formatted_test_value(test, id, web: true)
+      = cdx_table title: pluralize(@total, "Test") do |t|
+        - t.thead do
+          %tr
+            - each_column do |id, title, sortable|
+              %th= sortable ? order_by_column(title, id) : title
+        - t.tbody do
+          - @tests.each do |test|
+            %tr{data: {href: test_result_path(test['test']['uuid']) }}
+              - each_column do |id|
+                %td= formatted_test_value(test, id, web: true)
       .pagination
         = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
         = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
