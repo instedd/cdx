@@ -29,7 +29,7 @@
     .col
       = f.submit class: 'btn-primary', value: "Save"
       - if can_delete_device_model?(@device_model)
-        = link_to "Delete", @device_model, method: :delete, data: { confirm: "Are you sure you want to delete this device model?" }
+        = link_to "Delete", @device_model, method: :delete, data: { confirm: 'Are you sure you want to delete this device model? All devices using this device model will be deleted as well, along with any tests they may have uploaded.' }
 
 
   %hr/

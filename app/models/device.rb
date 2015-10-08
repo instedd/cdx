@@ -1,14 +1,17 @@
 class Device < ActiveRecord::Base
   include Resource
 
-  has_one :manifest, through: :device_model
+
   belongs_to :device_model
   belongs_to :institution
   belongs_to :laboratory
-  has_many :test_results
-  has_many :device_messages
+
+  has_one :manifest, through: :device_model
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
+
+  has_many :test_results
+  has_many :device_messages
   has_many :device_logs
   has_many :device_commands
 
@@ -104,6 +107,11 @@ class Device < ActiveRecord::Base
     return if has_pending_log_requests?
 
     device_commands.create! name: "send_logs"
+  end
+
+  def destroy_cascade!
+    self.class.reflect_on_all_associations(:has_many).each { |a| self.send(a.name).destroy_all }
+    self.destroy!
   end
 
   private

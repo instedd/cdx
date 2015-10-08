@@ -27,7 +27,32 @@ describe Device do
 
   end
 
+  context 'cascade destroy', elasticsearch: true do
 
+    it "should delete device elements in cascade" do
+      device = Device.make
+
+      TestResult.create_and_index(
+        core_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
+        device_messages: [ DeviceMessage.make(device: device) ])
+      DeviceLog.make(device: device)
+      DeviceCommand.make(device: device)
+
+      device.destroy_cascade!
+
+      expect(Device.count).to eq(0)
+      expect(TestResult.count).to eq(0)
+      expect(DeviceMessage.count).to eq(0)
+      expect(DeviceLog.count).to eq(0)
+      expect(DeviceCommand.count).to eq(0)
+
+      refresh_index
+
+      result = Cdx::Api::Elasticsearch::Query.new({}).execute
+      expect(result['total_count']).to eq(0)
+    end
+
+  end
 
   context 'secret key' do
     let(:device) { Device.new }

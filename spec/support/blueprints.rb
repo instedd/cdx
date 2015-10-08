@@ -44,6 +44,14 @@ Device.blueprint do
   time_zone { "UTC" }
 end
 
+DeviceLog.blueprint do
+  device
+end
+
+DeviceCommand.blueprint do
+  device
+end
+
 DeviceModel.blueprint do
   name
   published_at { 1.day.ago }

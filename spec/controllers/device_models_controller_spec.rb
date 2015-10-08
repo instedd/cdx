@@ -255,9 +255,11 @@ describe DeviceModelsController do
     end
 
     it "should not delete a device model if published" do
+      published_device_model
       expect {
         delete :destroy, id: published_device_model.id
-      }.to change(DeviceModel, :count).by(0)
+      }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(published_device_model.reload.id).to be_not_nil
     end
 
     it "should delete a device model from another institution if authorised" do
