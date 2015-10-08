@@ -37,7 +37,7 @@ To create an initial set of tests:
 
 11. Create a new institution
 
-12. Create a new laboratory
+12. Create a new site
 
 13. Create a new device, choosing Genoscan model
 
@@ -96,4 +96,3 @@ Now, whenever a new csv file enters the sshd inbox, it will be imported into the
 ### Sync File Watcher - Client Side
 
 In the client side, you will need to run another filewatcher: [cdx-sync-client](https://github.com/instedd/cdx-sync-client). It is a Windos App. Install it using its NSI installer, restart your computer, and fill the form that will prompt after first restart.  You will be required to provide an activation token - you can generate it form the device manager in the CDP app.
-
