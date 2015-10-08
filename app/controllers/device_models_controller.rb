@@ -1,5 +1,7 @@
 class DeviceModelsController < ApplicationController
 
+  include DeviceModelsHelper
+
   before_filter :load_institutions
 
   before_filter do
@@ -29,7 +31,7 @@ class DeviceModelsController < ApplicationController
   def create
     authorize_resource(Institution.find(device_model_create_params[:institution_id]), REGISTER_INSTITUTION_DEVICE_MODEL) or return
     @device_model = DeviceModel.new(device_model_create_params)
-    @device_model.set_published_at if params[:publish] && can_publish?
+    set_published_status(@device_model)
 
     respond_to do |format|
       if @device_model.save
@@ -49,7 +51,7 @@ class DeviceModelsController < ApplicationController
 
   def update
     @device_model = authorize_resource(DeviceModel.find(params[:id]), UPDATE_DEVICE_MODEL) or return
-    @device_model.set_published_at if params[:publish] && can_publish?
+    set_published_status(@device_model)
 
     respond_to do |format|
       if @device_model.update(device_model_update_params)
@@ -87,7 +89,9 @@ class DeviceModelsController < ApplicationController
     params.require(:device_model).permit(:name, manifest_attributes: [:definition])
   end
 
-  def can_publish?
-    Policy.can?(PUBLISH_DEVICE_MODEL, @device_model, current_user)
+  def set_published_status(device_model)
+    device_model.set_published_at   if params[:publish]   && can_publish?(device_model)
+    device_model.unset_published_at if params[:unpublish] && can_unpublish?(device_model)
   end
+
 end

@@ -26,10 +26,11 @@ class Policy < ActiveRecord::Base
     REGISTER_INSTITUTION_DEVICE =       "institution:registerDevice"
     REGISTER_INSTITUTION_DEVICE_MODEL = "institution:registerDeviceModel"
 
-    READ_DEVICE_MODEL =   "deviceModel:read"
-    UPDATE_DEVICE_MODEL = "deviceModel:update"
-    DELETE_DEVICE_MODEL = "deviceModel:delete"
-    PUBLISH_DEVICE_MODEL = "deviceModel:publish"
+    READ_DEVICE_MODEL =      "deviceModel:read"
+    UPDATE_DEVICE_MODEL =    "deviceModel:update"
+    DELETE_DEVICE_MODEL =    "deviceModel:delete"
+    PUBLISH_DEVICE_MODEL =   "deviceModel:publish"
+    UNPUBLISH_DEVICE_MODEL = "deviceModel:unpublish"
 
     READ_LABORATORY =   "laboratory:read"
     UPDATE_LABORATORY = "laboratory:update"
@@ -69,6 +70,7 @@ class Policy < ActiveRecord::Base
     Actions::UPDATE_DEVICE_MODEL,
     Actions::DELETE_DEVICE_MODEL,
     Actions::PUBLISH_DEVICE_MODEL,
+    Actions::UNPUBLISH_DEVICE_MODEL,
     Actions::ASSIGN_DEVICE_LABORATORY,
     Actions::REGENERATE_DEVICE_KEY,
     Actions::GENERATE_ACTIVATION_TOKEN,

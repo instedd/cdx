@@ -5,7 +5,13 @@ $ ->
 
   # Request confirmation on publish
   $('#device-model-publish').on 'click', (evt) ->
-    msg =  "Publishing this device model will make it available to all institutions. Are you sure you want to proceed?"
-    msg += "\n\nAny pending changes will be saved before publishing." if form.hasClass('dirty')
+    msg = if evt.target.name == 'publish'
+      "Publishing this device model will make it available to all institutions."
+    else
+      "Withdrawing this device model will hide it from all institutions."
+
+    msg += " Are you sure you want to proceed?"
+    msg += "\n\nAny pending changes will be saved before proceeding." if form.hasClass('dirty')
+
     if not window.confirm(msg)
       evt.preventDefault()

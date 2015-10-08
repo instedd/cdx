@@ -31,4 +31,8 @@ class DeviceModel < ActiveRecord::Base
   def set_published_at
     self.published_at ||= DateTime.now
   end
+
+  def unset_published_at
+    self.published_at = nil
+  end
 end

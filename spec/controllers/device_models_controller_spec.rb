@@ -72,6 +72,7 @@ describe DeviceModelsController do
       expect {
         post :create, device_model: { name: "GX4001", institution_id: institution.id, manifest_attributes: manifest_attributes }
       }.to change(DeviceModel, :count).by(1)
+      expect(DeviceModel.last).to_not be_published
       expect(response).to be_redirect
     end
 
@@ -104,6 +105,20 @@ describe DeviceModelsController do
       expect(response).to be_redirect
     end
 
+    it "should publish on creation" do
+      expect {
+        post :create, publish: "1", device_model: { name: "GX4001", institution_id: institution.id, manifest_attributes: manifest_attributes }
+      }.to change(DeviceModel, :count).by(1)
+      expect(DeviceModel.last).to be_published
+      expect(response).to be_redirect
+    end
+
+    it "should not persist published mark if validation fails" do
+      json = {"definition" => %{ { , , } } }
+      post :create, publish: "1", device_model: { name: "GX4001", institution_id: institution.id, manifest_attributes: json }
+      expect(assigns(:device_model)).to_not be_published
+    end
+
   end
 
 
@@ -132,24 +147,30 @@ describe DeviceModelsController do
 
   context "update" do
 
+    let(:published_device_model)  { institution.device_models.make }
+    let(:published_device_model2) { institution2.device_models.make }
+
+    let(:laboratory)  { institution.laboratories.make }
+    let(:laboratory2) { institution2.laboratories.make }
+
     it "should update a device model" do
       patch :update, id: device_model.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(device_model.reload.name).to eq("NEWNAME")
-      expect(device_model.reload.published_at).to be_nil
+      expect(device_model.reload).to_not be_published
       expect(response).to be_redirect
     end
 
     it "should publish a device model" do
       patch :update, id: device_model.id, publish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(device_model.reload.name).to eq("NEWNAME")
-      expect(device_model.reload.published_at).to be_not_nil
+      expect(device_model.reload).to be_published
       expect(response).to be_redirect
     end
 
     it "should not update a device model if unauthorised" do
       patch :update, id: device_model2.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(device_model2.reload.name).to_not eq("NEWNAME")
-      expect(device_model2.reload.published_at).to be_nil
+      expect(device_model2.reload).to_not be_published
       expect(response).to be_forbidden
     end
 
@@ -157,14 +178,14 @@ describe DeviceModelsController do
       grant user2, user, device_model2, UPDATE_DEVICE_MODEL
       patch :update, id: device_model2.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(device_model2.reload.name).to eq("NEWNAME")
-      expect(device_model2.reload.published_at).to be_nil
+      expect(device_model2.reload).to_not be_published
       expect(response).to be_redirect
     end
 
     it "should not publish a device model from another institution if unauthorised" do
       grant user2, user, device_model2, [UPDATE_DEVICE_MODEL]
       patch :update, id: device_model2.id, publish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
-      expect(device_model2.reload.published_at).to be_nil
+      expect(device_model2.reload).to_not be_published
       expect(response).to be_redirect
     end
 
@@ -172,7 +193,7 @@ describe DeviceModelsController do
       grant user2, user, device_model2, [UPDATE_DEVICE_MODEL, PUBLISH_DEVICE_MODEL]
       patch :update, id: device_model2.id, publish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(device_model2.reload.name).to eq("NEWNAME")
-      expect(device_model2.reload.published_at).to be_not_nil
+      expect(device_model2.reload).to be_published
       expect(response).to be_redirect
     end
 
@@ -181,6 +202,37 @@ describe DeviceModelsController do
       patch :update, id: device_model.id, device_model: { name: "NEWNAME", institution_id: institution2.id, manifest_attributes: manifest_attributes }
       expect(device_model.reload.institution_id).to eq(institution.id)
       expect(response).to_not be_success
+    end
+
+    it "should unpublish a device model" do
+      patch :update, id: published_device_model.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(published_device_model.reload.name).to eq("NEWNAME")
+      expect(published_device_model.reload).to_not be_published
+      expect(response).to be_redirect
+    end
+
+    it "should unpublish a device model if authorised" do
+      grant nil, user, published_device_model2, [UPDATE_DEVICE_MODEL, UNPUBLISH_DEVICE_MODEL]
+      patch :update, id: published_device_model2.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(published_device_model2.reload).to_not be_published
+    end
+
+    it "should not unpublish a device model if unauthorised" do
+      grant nil, user, published_device_model2, [UPDATE_DEVICE_MODEL]
+      patch :update, id: published_device_model2.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(published_device_model2.reload).to be_published
+    end
+
+    it "should unpublish a device model if it has devices in the same institution" do
+      published_device_model.devices.make(laboratory: laboratory)
+      patch :update, id: published_device_model.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(published_device_model.reload).to_not be_published
+    end
+
+    it "should not unpublish a device model if it has devices outside the institution" do
+      published_device_model.devices.make(laboratory: laboratory2)
+      patch :update, id: published_device_model.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(published_device_model.reload).to be_published
     end
 
   end
