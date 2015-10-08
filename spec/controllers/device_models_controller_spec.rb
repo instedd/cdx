@@ -70,9 +70,11 @@ describe DeviceModelsController do
 
     it "should create a device model" do
       expect {
-        post :create, device_model: { name: "GX4001", institution_id: institution.id, manifest_attributes: manifest_attributes }
+        post :create, device_model: { name: "GX4001", institution_id: institution.id, manifest_attributes: manifest_attributes, supports_activation: true }
       }.to change(DeviceModel, :count).by(1)
-      expect(DeviceModel.last).to_not be_published
+      new_device_model = DeviceModel.last
+      expect(new_device_model).to_not be_published
+      expect(new_device_model.supports_activation).to be_truthy
       expect(response).to be_redirect
     end
 
@@ -154,8 +156,9 @@ describe DeviceModelsController do
     let(:site2) { institution2.sites.make }
 
     it "should update a device model" do
-      patch :update, id: device_model.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      patch :update, id: device_model.id, device_model: { name: "NEWNAME", supports_activation: true, manifest_attributes: manifest_attributes }
       expect(device_model.reload.name).to eq("NEWNAME")
+      expect(device_model.supports_activation).to be_truthy
       expect(device_model.reload).to_not be_published
       expect(response).to be_redirect
     end
