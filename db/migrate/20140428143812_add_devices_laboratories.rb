@@ -1,4 +1,4 @@
-class AddDevicesLaboratories < ActiveRecord::Migration
+class AddDevicesSites < ActiveRecord::Migration
   def change
     create_table :devices_laboratories, id: false do |t|
       t.belongs_to :device

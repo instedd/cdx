@@ -40,7 +40,7 @@ describe Policy do
 
     it "should not create policy with invalid resource condition" do
       expect {
-        grant user, user2, "institution?laboratory_id=1", "*"
+        grant user, user2, "institution?site_id=1", "*"
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
@@ -99,47 +99,47 @@ describe Policy do
 
   context "with complex grants" do
 
-    let!(:laboratory1) { institution.laboratories.make }
-    let!(:laboratory2) { institution.laboratories.make }
+    let!(:site1) { institution.sites.make }
+    let!(:site2) { institution.sites.make }
 
     let!(:other_institution) { Institution.make }
-    let!(:other_laboratory)  { other_institution.laboratories.make }
-    let!(:other_device)      { other_laboratory.devices.make }
+    let!(:other_site)  { other_institution.sites.make }
+    let!(:other_device)      { other_site.devices.make }
 
     let!(:user2) { User.make }
 
-    it "should be able to see all laboratories if granted a policy for all and another by id" do
-      grant nil,  user2, Laboratory,  READ_LABORATORY
-      grant user, user2, laboratory1, '*'
+    it "should be able to see all sites if granted a policy for all and another by id" do
+      grant nil,  user2, Site,  READ_SITE
+      grant user, user2, site1, '*'
 
-      assert_can user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2, other_laboratory]
+      assert_can user2, Site, READ_SITE, [site1, site2, other_site]
     end
 
-    it "should be able to see all laboratories minus exceptions if granted a policy for all and another by id" do
-      grant nil,  user2, Laboratory,  READ_LABORATORY, except: other_laboratory
-      grant user, user2, laboratory1, '*'
+    it "should be able to see all sites minus exceptions if granted a policy for all and another by id" do
+      grant nil,  user2, Site,  READ_SITE, except: other_site
+      grant user, user2, site1, '*'
 
-      assert_can user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2]
+      assert_can user2, Site, READ_SITE, [site1, site2]
     end
 
-    it "should be able to see all laboratories minus exceptions if granted a policy for all" do
-      grant nil, user2, Laboratory, READ_LABORATORY, except: other_laboratory
+    it "should be able to see all sites minus exceptions if granted a policy for all" do
+      grant nil, user2, Site, READ_SITE, except: other_site
 
-      assert_can user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2]
+      assert_can user2, Site, READ_SITE, [site1, site2]
     end
 
-    it "should be able to see all laboratories including exceptions if granted a policy for all and another covering exceptions" do
-      grant nil,  user2, Laboratory, READ_LABORATORY, except: laboratory1
-      grant user, user2, Laboratory, READ_LABORATORY
+    it "should be able to see all sites including exceptions if granted a policy for all and another covering exceptions" do
+      grant nil,  user2, Site, READ_SITE, except: site1
+      grant user, user2, Site, READ_SITE
 
-      assert_can  user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2, other_laboratory]
+      assert_can  user2, Site, READ_SITE, [site1, site2, other_site]
     end
 
-    it "should be able to see all laboratories including exceptions if granted a policy for all and another covering exceptions with all actions" do
-      grant nil,  user2, Laboratory, READ_LABORATORY, except: laboratory1
-      grant user, user2, Laboratory, "*"
+    it "should be able to see all sites including exceptions if granted a policy for all and another covering exceptions with all actions" do
+      grant nil,  user2, Site, READ_SITE, except: site1
+      grant user, user2, Site, "*"
 
-      assert_can  user2, Laboratory, READ_LABORATORY, [laboratory1, laboratory2, other_laboratory]
+      assert_can  user2, Site, READ_SITE, [site1, site2, other_site]
     end
 
   end
@@ -322,169 +322,169 @@ describe Policy do
     end
   end
 
-  context "Laboratory" do
+  context "Site" do
     context "Create" do
-      it "disallows creating institution laboratory" do
+      it "disallows creating institution site" do
         user2 = User.make
-        assert_cannot user2, institution, CREATE_INSTITUTION_LABORATORY
+        assert_cannot user2, institution, CREATE_INSTITUTION_SITE
       end
 
-      it "allows creating institution laboratory" do
+      it "allows creating institution site" do
         user2 = User.make
 
-        grant user, user2, institution, CREATE_INSTITUTION_LABORATORY
+        grant user, user2, institution, CREATE_INSTITUTION_SITE
 
-        assert_can user2, institution, CREATE_INSTITUTION_LABORATORY
+        assert_can user2, institution, CREATE_INSTITUTION_SITE
       end
     end
 
     context "Read" do
-      it "disallows reading institution laboratory" do
-        laboratory = institution.laboratories.make
+      it "disallows reading institution site" do
+        site = institution.sites.make
 
         user2 = User.make
-        assert_cannot user2, laboratory, READ_LABORATORY
+        assert_cannot user2, site, READ_SITE
       end
 
-      it "allows reading self laboratory" do
-        laboratory = institution.laboratories.make
+      it "allows reading self site" do
+        site = institution.sites.make
 
-        assert_can user, laboratory, READ_LABORATORY
+        assert_can user, site, READ_SITE
       end
 
-      it "allows reading self laboratories" do
-        laboratory = institution.laboratories.make
+      it "allows reading self sites" do
+        site = institution.sites.make
 
-        assert_can user, institution.laboratories, READ_LABORATORY
+        assert_can user, institution.sites, READ_SITE
       end
 
-      it "allows reading an specific laboratory" do
-        laboratory = institution.laboratories.make
+      it "allows reading an specific site" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, laboratory, READ_LABORATORY
+        grant user, user2, site, READ_SITE
 
-        assert_can user2, laboratory, READ_LABORATORY
+        assert_can user2, site, READ_SITE
       end
 
-      it "allows reading other laboratories" do
-        laboratory = institution.laboratories.make
+      it "allows reading other sites" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, Laboratory, READ_LABORATORY
+        grant user, user2, Site, READ_SITE
 
-        assert_can user2, Laboratory, READ_LABORATORY, [laboratory]
+        assert_can user2, Site, READ_SITE, [site]
       end
 
-      it "allows reading other laboratories" do
-        laboratory = institution.laboratories.make
+      it "allows reading other sites" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, Laboratory, READ_LABORATORY
+        grant user, user2, Site, READ_SITE
 
-        assert_can user2, institution.laboratories, READ_LABORATORY, [laboratory]
+        assert_can user2, institution.sites, READ_SITE, [site]
       end
 
-      it "allows reading other laboratory" do
-        laboratory = institution.laboratories.make
+      it "allows reading other site" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, Laboratory, READ_LABORATORY
+        grant user, user2, Site, READ_SITE
 
-        assert_can user2, laboratory, READ_LABORATORY
+        assert_can user2, site, READ_SITE
       end
 
-      it "allows reading other institution laboratories" do
-        laboratory = institution.laboratories.make
+      it "allows reading other institution sites" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, "#{Laboratory.resource_name}?institution=#{institution.id}", READ_LABORATORY
+        grant user, user2, "#{Site.resource_name}?institution=#{institution.id}", READ_SITE
 
-        assert_can user2, Laboratory, READ_LABORATORY, [laboratory]
-        assert_can user2, institution.laboratories, READ_LABORATORY, [laboratory]
+        assert_can user2, Site, READ_SITE, [site]
+        assert_can user2, institution.sites, READ_SITE, [site]
       end
 
-      it "disallows reading other institution laboratories when id is other" do
+      it "disallows reading other institution sites when id is other" do
         institution2 = user.create Institution.make_unsaved
 
-        laboratory = institution.laboratories.make
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, "#{Laboratory.resource_name}?institution=#{institution2.id}", READ_LABORATORY
+        grant user, user2, "#{Site.resource_name}?institution=#{institution2.id}", READ_SITE
 
-        assert_cannot user2, laboratory, READ_LABORATORY
+        assert_cannot user2, site, READ_SITE
       end
     end
 
     context "Update" do
-      it "disallows updating other user's laboratory" do
-        laboratory = institution.laboratories.make
+      it "disallows updating other user's site" do
+        site = institution.sites.make
         user2 = User.make
 
-        assert_cannot user2, laboratory, UPDATE_LABORATORY
+        assert_cannot user2, site, UPDATE_SITE
       end
 
-      it "allows updating an specific laboratory" do
-        laboratory = institution.laboratories.make
+      it "allows updating an specific site" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, laboratory, UPDATE_LABORATORY
+        grant user, user2, site, UPDATE_SITE
 
-        assert_can user2, laboratory, UPDATE_LABORATORY
+        assert_can user2, site, UPDATE_SITE
       end
 
-      it "allows updating other user's laboratories" do
-        laboratory = institution.laboratories.make
+      it "allows updating other user's sites" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, Laboratory, UPDATE_LABORATORY
+        grant user, user2, Site, UPDATE_SITE
 
-        assert_can user2, Laboratory, UPDATE_LABORATORY, [laboratory]
+        assert_can user2, Site, UPDATE_SITE, [site]
       end
 
-      it "allows updating other user's laboratory" do
-        laboratory = institution.laboratories.make
+      it "allows updating other user's site" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, Laboratory, UPDATE_LABORATORY
+        grant user, user2, Site, UPDATE_SITE
 
-        assert_can user2, laboratory, UPDATE_LABORATORY
+        assert_can user2, site, UPDATE_SITE
       end
     end
 
     context "Delete" do
-      it "disallows deleting other user's laboratory" do
-        laboratory = institution.laboratories.make
+      it "disallows deleting other user's site" do
+        site = institution.sites.make
         user2 = User.make
 
-        assert_cannot user2, laboratory, DELETE_LABORATORY
+        assert_cannot user2, site, DELETE_SITE
       end
 
-      it "allows deleting an specific laboratory" do
-        laboratory = institution.laboratories.make
+      it "allows deleting an specific site" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, laboratory, DELETE_LABORATORY
+        grant user, user2, site, DELETE_SITE
 
-        assert_can user2, laboratory, DELETE_LABORATORY
+        assert_can user2, site, DELETE_SITE
       end
 
-      it "allows deleting other user's laboratories" do
-        laboratory = institution.laboratories.make
+      it "allows deleting other user's sites" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, Laboratory, DELETE_LABORATORY
+        grant user, user2, Site, DELETE_SITE
 
-        assert_can user2, Laboratory, DELETE_LABORATORY, [laboratory]
+        assert_can user2, Site, DELETE_SITE, [site]
       end
 
-      it "allows deleting other user's laboratory" do
-        laboratory = institution.laboratories.make
+      it "allows deleting other user's site" do
+        site = institution.sites.make
         user2 = User.make
 
-        grant user, user2, Laboratory, DELETE_LABORATORY
+        grant user, user2, Site, DELETE_SITE
 
-        assert_can user2, laboratory, DELETE_LABORATORY
+        assert_can user2, site, DELETE_SITE
       end
     end
   end
@@ -664,13 +664,13 @@ describe Policy do
 
       let!(:user2) { User.make }
 
-      let!(:laboratory)  { Laboratory.make institution: institution }
-      let!(:device)      { Device.make institution_id: institution.id, laboratory: laboratory }
+      let!(:site)  { Site.make institution: institution }
+      let!(:device)      { Device.make institution_id: institution.id, site: site }
       let!(:test_result) { TestResult.make device_messages: [DeviceMessage.make(device: device)]}
 
       let!(:institution2) { user.institutions.make }
-      let!(:laboratory2)  { Laboratory.make institution: institution2 }
-      let!(:device2)      { Device.make institution_id: institution2.id, laboratory: laboratory2 }
+      let!(:site2)  { Site.make institution: institution2 }
+      let!(:device2)      { Device.make institution_id: institution2.id, site: site2 }
       let!(:test_result2) { TestResult.make device_messages: [DeviceMessage.make(device: device2)]}
 
       it "does not allow user to query test result" do
@@ -687,8 +687,8 @@ describe Policy do
         assert_can user2, test_result, QUERY_TEST
       end
 
-      it "allows to query test result by laboratory" do
-        grant user, user2, {test_result: laboratory}, QUERY_TEST
+      it "allows to query test result by site" do
+        grant user, user2, {test_result: site}, QUERY_TEST
         assert_can user2, test_result, QUERY_TEST
       end
 
@@ -702,8 +702,8 @@ describe Policy do
         assert_can user2, TestResult, QUERY_TEST, [test_result]
       end
 
-      it "returns a scope with tests authorised by laboratory" do
-        grant user, user2, {test_result: laboratory}, QUERY_TEST
+      it "returns a scope with tests authorised by site" do
+        grant user, user2, {test_result: site}, QUERY_TEST
         assert_can user2, TestResult, QUERY_TEST, [test_result]
       end
 
@@ -714,7 +714,7 @@ describe Policy do
 
       it "returns a scope with tests authorised by multiple criteria" do
         grant user, user2, {test_result: institution}, QUERY_TEST
-        grant user, user2, {test_result: laboratory2}, QUERY_TEST
+        grant user, user2, {test_result: site2}, QUERY_TEST
         assert_can user2, TestResult, QUERY_TEST, [test_result, test_result2]
       end
 
@@ -724,7 +724,7 @@ describe Policy do
       end
 
       it "returns a scope with all tests minus exceptions" do
-        grant user, user2, TestResult, QUERY_TEST, except: {test_result: laboratory2}
+        grant user, user2, TestResult, QUERY_TEST, except: {test_result: site2}
         assert_can user2, TestResult, QUERY_TEST, [test_result]
       end
 

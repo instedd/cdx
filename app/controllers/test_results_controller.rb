@@ -26,7 +26,7 @@ class TestResultsController < ApplicationController
     @query["offset"] = offset
 
     @filter["institution.uuid"] = @institutions.first.uuid if @institutions.size == 1
-    @filter["laboratory.uuid"] = @laboratories.first.uuid if @laboratories.size == 1
+    @filter["site.uuid"] = @sites.first.uuid if @sites.size == 1
     @filter["device.uuid"] = @devices.first.uuid if @devices.size == 1
 
     @order_by = params["order_by"] || "test.end_time"
@@ -60,7 +60,7 @@ class TestResultsController < ApplicationController
   def create_filter
     filter = {}
     filter["institution.uuid"] = params["institution.uuid"] if params["institution.uuid"].present?
-    filter["laboratory.uuid"] = params["laboratory.uuid"] if params["laboratory.uuid"].present?
+    filter["site.uuid"] = params["site.uuid"] if params["site.uuid"].present?
     filter["test.assays.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
     filter["device.uuid"] = params["device.uuid"] if params["device.uuid"].present?
     filter["test.assays.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
@@ -71,6 +71,6 @@ class TestResultsController < ApplicationController
   end
 
   def load_filter_resources
-    @institutions, @laboratories, @devices = Policy.condition_resources_for(QUERY_TEST, TestResult, current_user).values
+    @institutions, @sites, @devices = Policy.condition_resources_for(QUERY_TEST, TestResult, current_user).values
   end
 end

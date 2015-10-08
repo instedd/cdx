@@ -2,7 +2,7 @@
   .row
     .col
       %h1 Filters
-  - if @institutions.size > 1 || @laboratories.size > 1 || @devices.size > 1
+  - if @institutions.size > 1 || @sites.size > 1 || @devices.size > 1
     .row
       - if @institutions.size > 1
         .col
@@ -10,12 +10,12 @@
           %select.ddown(name="institution.uuid")
             %option(value="") Show all
             = options_from_collection_for_select @institutions, :uuid, :name, params["institution.uuid"]
-      - if @laboratories.size > 1
+      - if @sites.size > 1
         .col
-          %label.block Laboratory
-          %select.ddown(name="laboratory.uuid")
+          %label.block Site
+          %select.ddown(name="site.uuid")
             %option(value="") Show all
-            = options_from_collection_for_select @laboratories, :uuid, :name, params["laboratory.uuid"]
+            = options_from_collection_for_select @sites, :uuid, :name, params["site.uuid"]
       - if @devices.size > 1
         .col
           %label.block Device

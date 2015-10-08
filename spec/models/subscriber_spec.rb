@@ -7,9 +7,9 @@ describe Subscriber, elasticsearch: true do
   let(:device){Device.make device_model: model}
   let(:device_message){DeviceMessage.make(device: device)}
   let(:institution){device.institution}
-  let(:laboratory){device.laboratory}
+  let(:site){device.site}
 
-  let!(:filter) { Filter.make query: {"test.assays.condition" => "mtb", "laboratory.uuid" => laboratory.uuid}, user: institution.user}
+  let!(:filter) { Filter.make query: {"test.assays.condition" => "mtb", "site.uuid" => site.uuid}, user: institution.user}
   let!(:manifest) {
     manifest = Manifest.create! device_model: model, definition: %{
       {
@@ -69,16 +69,16 @@ describe Subscriber, elasticsearch: true do
 
     assert_requested(:post, url) do |req|
       response = JSON.parse(req.body)
-      expect(response.keys).to match_array(["device", "encounter", "institution", "laboratory", "location", "patient", "sample", "test"])
+      expect(response.keys).to match_array(["device", "encounter", "institution", "site", "location", "patient", "sample", "test"])
       expect(response["device"].keys).to match_array(["model", "uuid", "name", "serial_number"])
       expect(response["institution"].keys).to match_array(["uuid", "name"])
-      expect(response["laboratory"].keys).to match_array(["uuid", "name"])
+      expect(response["site"].keys).to match_array(["uuid", "name"])
       expect(response["location"].keys).to match_array(["id", "parents", "admin_levels", "lat", "lng"])
       expect(response["patient"].keys).to match_array(["gender"])
       expect(response["sample"].keys).to match_array(["uuid", "id", "type", "collection_date"])
-      expect(response["test"].keys).to match_array(["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "assays", "type", "lab_user"])
+      expect(response["test"].keys).to match_array(["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "assays", "type", "site_user"])
       expect(response["institution"]["name"]).to eq(institution.name)
-      expect(response["laboratory"]["name"]).to eq(laboratory.name)
+      expect(response["site"]["name"]).to eq(site.name)
       expect(response["device"]["name"]).to eq(device.name)
     end
   end
@@ -98,7 +98,7 @@ describe Subscriber, elasticsearch: true do
 
   it "updates percolator when policies are changed" do
     user2 = User.make
-    filter2 = Filter.make query: {"test.assays.condition" => "mtb", "laboratory.uuid" => laboratory.uuid}, user: user2
+    filter2 = Filter.make query: {"test.assays.condition" => "mtb", "site.uuid" => site.uuid}, user: user2
     url = "http://subscriber/cdp_trigger?token=48"
     subscriber = Subscriber.make filter: filter2, user: user2, fields: [], url: url, verb: 'POST'
     callback_request = stub_request(:post, url).to_return(:status => 200, :body => "", :headers => {})

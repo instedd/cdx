@@ -4,14 +4,14 @@ class TestResult < ActiveRecord::Base
   include Resource
 
   NAME_FIELD = 'name'
-  LAB_USER_FIELD = 'lab_user'
+  LAB_USER_FIELD = 'site_user'
   ASSAYS_FIELD = 'assays'
   START_TIME_FIELD = 'start_time'
 
   has_and_belongs_to_many :device_messages
   belongs_to :device
   belongs_to :institution
-  belongs_to :laboratory
+  belongs_to :site
   belongs_to :sample
   belongs_to :patient
   belongs_to :encounter
@@ -70,7 +70,7 @@ class TestResult < ActiveRecord::Base
   end
 
   def set_foreign_keys
-    self.laboratory_id = device.try(:laboratory_id)
+    self.site_id = device.try(:site_id)
     self.institution_id = device.try(:institution_id)
   end
 end

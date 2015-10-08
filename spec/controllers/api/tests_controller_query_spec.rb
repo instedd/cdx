@@ -4,8 +4,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
   let(:user) { User.make }
   let!(:institution) { Institution.make user_id: user.id }
-  let(:laboratory) { Laboratory.make institution: institution }
-  let(:device) { Device.make institution: institution, laboratory: laboratory }
+  let(:site) { Site.make institution: institution }
+  let(:device) { Device.make institution: institution, site: site }
   let(:data) { Oj.dump test:{assays: [result: :positive]} }
   before(:each) { sign_in user }
 
@@ -187,8 +187,8 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
         end
 
         it "returns a csv with columns for a given grouping even when there are no assays" do
-          get :index, "", format: 'csv', group_by: 'test.lab_user,test.error_code'
-          expect(response.body).to eq("test.lab_user,test.error_code,count\n")
+          get :index, "", format: 'csv', group_by: 'test.site_user,test.error_code'
+          expect(response.body).to eq("test.site_user,test.error_code,count\n")
         end
       end
     end

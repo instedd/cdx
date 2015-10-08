@@ -1,4 +1,4 @@
-class SetUuidForInstitutionsAndLaboratories < ActiveRecord::Migration
+class SetUuidForInstitutionsAndSites < ActiveRecord::Migration
   class Institution < ActiveRecord::Base; end
   class Laboratory < ActiveRecord::Base; end
 

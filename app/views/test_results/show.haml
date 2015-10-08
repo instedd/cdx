@@ -19,11 +19,11 @@
         Test performed on
         = link_to @test_result.device.name, edit_device_path(@test_result.device)
         by
-        -# TODO add link to lab_user
+        -# TODO add link to site_user
         = @test_result.core_fields[TestResult::LAB_USER_FIELD]
-        - if @test_result.device.laboratory
+        - if @test_result.device.site
           at
-          = link_to @test_result.device.laboratory, laboratory_path(@test_result.device.laboratory)
+          = link_to @test_result.device.site, site_path(@test_result.device.site)
 
 .row
   .col.pe-3

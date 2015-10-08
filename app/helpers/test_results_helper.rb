@@ -43,7 +43,7 @@ module TestResultsHelper
     yield "test.name", "Name", true
     yield "test.assays", "Result", false
     yield "institution.name", "Institution", false if @institutions.size > 1
-    yield "laboratory.name", "Laboratory", false if @laboratories.size > 1
+    yield "site.name", "Site", false if @sites.size > 1
     yield "device.name", "Device", false if @devices.size > 1
     yield "sample.id", "Sample Id", true
     yield "encounter.id", "Encounter Id", true

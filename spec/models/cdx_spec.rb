@@ -3,15 +3,15 @@ require 'spec_helper'
 describe Cdx do
   it "should provide a collection of fields" do
     expect(Cdx.core_fields.map(&:scoped_name).sort).to eq([
-      "test.lab_user",
+      "test.site_user",
       "device.model",
       "device.name",
       "device.serial_number",
       "device.uuid",
       "institution.uuid",
       "institution.name",
-      "laboratory.uuid",
-      "laboratory.name",
+      "site.uuid",
+      "site.name",
       "location.admin_levels",
       "location.id",
       "location.lat",

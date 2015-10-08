@@ -8,9 +8,9 @@
         - if can?(Policy::Actions::MEDICAL_DASHBOARD, TestResult)
           %li{:class => params[:controller] == "dashboards" && "active"}
             = link_to "Dashboard", nndd_path
-        - if can_index_laboratories?
-          %li{:class => params[:controller] == "laboratories" && "active"}
-            = link_to "Labs", laboratories_path
+        - if can_index_sites?
+          %li{:class => params[:controller] == "sites" && "active"}
+            = link_to "Sites", sites_path
         - if can_index_devices?
           %li{:class => params[:controller] == "devices" && "active"}
             = link_to "Devices", devices_path

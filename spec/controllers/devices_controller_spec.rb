@@ -4,9 +4,9 @@ require 'policy_spec_helper'
 describe DevicesController do
   let(:institution) {Institution.make}
   let(:user) {institution.user}
-  let(:laboratory) {institution.laboratories.make}
+  let(:site) {institution.sites.make}
   let(:device_model) {DeviceModel.make}
-  let(:device) {Device.make institution: institution, laboratory: laboratory}
+  let(:device) {Device.make institution: institution, site: site}
 
   before(:each) {sign_in user}
 
@@ -14,8 +14,8 @@ describe DevicesController do
 
     let!(:user2) {User.make}
     let!(:institution2) {Institution.make user: user2}
-    let!(:laboratory2) {institution2.laboratories.make}
-    let!(:device2) {laboratory2.devices.make}
+    let!(:site2) {institution2.sites.make}
+    let!(:device2) {site2.devices.make}
 
     it "should diplay index" do
       get :index

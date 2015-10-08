@@ -49,7 +49,7 @@ module ApplicationHelper
 
   def test_results_table(attributes)
     options = { filter: {} }
-    options[:filter]['laboratory.uuid'] = attributes[:filter][:laboratory].uuid if attributes[:filter][:laboratory]
+    options[:filter]['site.uuid'] = attributes[:filter][:site].uuid if attributes[:filter][:site]
 
     react_component('TestResultsTable', filter: options[:filter])
   end

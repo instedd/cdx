@@ -121,8 +121,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
   def assert_test_relations(test)
     expect(test.device_id).to eq(device.id)
-    expect(test.laboratory_id).to eq(device.laboratory.id)
-    expect(test.institution_id).to eq(device.laboratory.institution.id)
+    expect(test.site_id).to eq(device.site.id)
+    expect(test.institution_id).to eq(device.site.institution.id)
   end
 
   it "should create a test result" do

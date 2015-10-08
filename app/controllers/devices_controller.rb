@@ -4,7 +4,7 @@ class DevicesController < ApplicationController
   require 'barby/outputter/html_outputter'
 
   before_filter :load_institutions, only: [:new, :create, :edit]
-  before_filter :load_laboratories, only: [:new, :create, :edit, :update]
+  before_filter :load_sites, only: [:new, :create, :edit, :update]
   before_filter :load_institution, only: :create
   before_filter :load_filter_resources, only: :index
 
@@ -18,7 +18,7 @@ class DevicesController < ApplicationController
     @devices = check_access(Device, READ_DEVICE)
 
     @devices = @devices.where(institution_id: params[:institution].to_i) if params[:institution].presence
-    @devices = @devices.where(laboratory_id:  params[:laboratory].to_i)  if params[:laboratory].presence
+    @devices = @devices.where(site_id:  params[:site].to_i)  if params[:site].presence
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
     @devices_to_edit = check_access(Device, UPDATE_DEVICE).pluck(:id)
@@ -34,7 +34,7 @@ class DevicesController < ApplicationController
 
     @device = @institution.devices.new(device_params)
 
-    # TODO: check valid laboratories
+    # TODO: check valid sites
 
     respond_to do |format|
       if @device.save
@@ -60,7 +60,7 @@ class DevicesController < ApplicationController
 
     @uuid_barcode = Barby::Code93.new(@device.uuid)
     @uuid_barcode_for_html = Barby::HtmlOutputter.new(@uuid_barcode)
-    # TODO: check valid laboratories
+    # TODO: check valid sites
 
     @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
     @can_generate_activation_token = has_access?(@device, GENERATE_ACTIVATION_TOKEN)
@@ -170,17 +170,17 @@ class DevicesController < ApplicationController
     @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end
 
-  def load_laboratories
-    @laboratories = check_access(Laboratory, ASSIGN_DEVICE_LABORATORY)
-    @laboratories ||= []
+  def load_sites
+    @sites = check_access(Site, ASSIGN_DEVICE_SITE)
+    @sites ||= []
   end
 
   def load_filter_resources
-    @institutions, @laboratories = Policy.condition_resources_for(READ_DEVICE, Device, current_user).values
+    @institutions, @sites = Policy.condition_resources_for(READ_DEVICE, Device, current_user).values
   end
 
   def device_params
-    params.require(:device).permit(:name, :serial_number, :device_model_id, :time_zone, :laboratory_id).tap do |whitelisted|
+    params.require(:device).permit(:name, :serial_number, :device_model_id, :time_zone, :site_id).tap do |whitelisted|
       if custom_mappings = params[:device][:custom_mappings]
         whitelisted[:custom_mappings] = custom_mappings.select { |k, v| v.present? }
       end
