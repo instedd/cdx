@@ -38,7 +38,8 @@
     .row
       .col
         This device model not published; only devices from its manufacturer can be created using this model. Publishing it will make it available to all institutions in CDX.
-    .row.button-actions
-      .col
-        %button{type: 'submit', class: 'btn-secondary', name: 'publish', value: "1", id: 'device-model-publish'}
-          Publish
+    - if Policy.can?(Policy::Actions::PUBLISH_DEVICE_MODEL, @device_model, current_user)
+      .row.button-actions
+        .col
+          %button{type: 'submit', class: 'btn-secondary', name: 'publish', value: "1", id: 'device-model-publish'}
+            Publish
