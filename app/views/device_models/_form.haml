@@ -27,4 +27,18 @@
 
   .row.button-actions
     .col
-      = f.submit class: 'btn-primary'
+      = f.submit class: 'btn-primary', value: "Save"
+
+  %hr/
+  - if @device_model.published?
+    .row
+      .col
+        This device model is published; all institutions in CDX may register devices using it.
+  -else
+    .row
+      .col
+        This device model not published; only devices from its manufacturer can be created using this model. Publishing it will make it available to all institutions in CDX.
+    .row.button-actions
+      .col
+        %button{type: 'submit', class: 'btn-secondary', name: 'publish', value: "1", id: 'device-model-publish'}
+          Publish

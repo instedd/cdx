@@ -27,4 +27,8 @@ class DeviceModel < ActiveRecord::Base
   def published?
     !!published_at
   end
+
+  def set_published_at
+    self.published_at ||= DateTime.now
+  end
 end

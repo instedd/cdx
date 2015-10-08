@@ -5,12 +5,12 @@ describe DeviceModelsController do
 
   let!(:user)         { User.make }
   let!(:institution)  { user.institutions.make }
-  let!(:device_model) { institution.device_models.make }
+  let!(:device_model) { institution.device_models.make(:unpublished) }
 
   let!(:user2)         { User.make }
   let!(:institution2)  { user2.institutions.make }
-  let!(:device_model2) { institution2.device_models.make }
-  let!(:device_model3) { institution2.device_models.make }
+  let!(:device_model2) { institution2.device_models.make(:unpublished) }
+  let!(:device_model3) { institution2.device_models.make(:unpublished) }
 
   before(:each) {sign_in user}
 
@@ -143,12 +143,21 @@ describe DeviceModelsController do
     it "should update a device model" do
       patch :update, id: device_model.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(device_model.reload.name).to eq("NEWNAME")
+      expect(device_model.reload.published_at).to be_nil
+      expect(response).to be_redirect
+    end
+
+    it "should publish a device model" do
+      patch :update, id: device_model.id, publish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(device_model.reload.name).to eq("NEWNAME")
+      expect(device_model.reload.published_at).to be_not_nil
       expect(response).to be_redirect
     end
 
     it "should not update a device model if unauthorised" do
       patch :update, id: device_model2.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(device_model2.reload.name).to_not eq("NEWNAME")
+      expect(device_model2.reload.published_at).to be_nil
       expect(response).to be_forbidden
     end
 
@@ -156,6 +165,22 @@ describe DeviceModelsController do
       grant user2, user, device_model2, UPDATE_DEVICE_MODEL
       patch :update, id: device_model2.id, device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(device_model2.reload.name).to eq("NEWNAME")
+      expect(device_model2.reload.published_at).to be_nil
+      expect(response).to be_redirect
+    end
+
+    it "should not publish a device model from another institution if unauthorised" do
+      grant user2, user, device_model2, [UPDATE_DEVICE_MODEL]
+      patch :update, id: device_model2.id, publish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(device_model2.reload.published_at).to be_nil
+      expect(response).to be_redirect
+    end
+
+    it "should publish a device model from another institution if authorised" do
+      grant user2, user, device_model2, [UPDATE_DEVICE_MODEL, PUBLISH_DEVICE_MODEL]
+      patch :update, id: device_model2.id, publish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
+      expect(device_model2.reload.name).to eq("NEWNAME")
+      expect(device_model2.reload.published_at).to be_not_nil
       expect(response).to be_redirect
     end
 

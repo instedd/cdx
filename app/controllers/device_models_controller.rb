@@ -27,12 +27,14 @@ class DeviceModelsController < ApplicationController
   def create
     authorize_resource(Institution.find(device_model_create_params[:institution_id]), REGISTER_INSTITUTION_DEVICE_MODEL) or return
     @device_model = DeviceModel.new(device_model_create_params)
+    @device_model.set_published_at if params[:publish] && can_publish?
 
     respond_to do |format|
       if @device_model.save
         format.html { redirect_to device_models_path, notice: 'Device Model was successfully created.' }
         format.json { render action: 'show', status: :created, device_model: @device_model }
       else
+        @device_model.published_at = @device_model.published_at_was
         format.html { render action: 'new' }
         format.json { render json: @device_model.errors, status: :unprocessable_entity }
       end
@@ -45,12 +47,14 @@ class DeviceModelsController < ApplicationController
 
   def update
     @device_model = authorize_resource(DeviceModel.find(params[:id]), UPDATE_DEVICE_MODEL) or return
+    @device_model.set_published_at if params[:publish] && can_publish?
 
     respond_to do |format|
       if @device_model.update(device_model_update_params)
         format.html { redirect_to device_models_path, notice: 'Device Model was successfully updated.' }
         format.json { render action: 'show', status: :created, device_model: @device_model }
       else
+        @device_model.published_at = @device_model.published_at_was
         format.html { render action: 'new' }
         format.json { render json: @device_model.errors, status: :unprocessable_entity }
       end
@@ -79,5 +83,9 @@ class DeviceModelsController < ApplicationController
 
   def device_model_update_params
     params.require(:device_model).permit(:name, manifest_attributes: [:definition])
+  end
+
+  def can_publish?
+    Policy.can?(PUBLISH_DEVICE_MODEL, @device_model, current_user)
   end
 end
