@@ -19,7 +19,8 @@
         .serial
           Serial no.
           = @device.serial_number
-        .location
-          Device located at
-          = link_to @device.site, site_path(@device.site)
+        - if @device.site
+          .location
+            Device located at
+            = link_to @device.site, site_path(@device.site)
 
