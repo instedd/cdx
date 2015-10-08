@@ -63,9 +63,9 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "filters sample of selected institution within permission" do
-      device1 = Device.make institution: i1 = Institution.make, laboratory: Laboratory.make(institution: i1)
-      device2 = Device.make institution: i2 = Institution.make, laboratory: Laboratory.make(institution: i2)
-      device3 = Device.make institution: i1, laboratory: Laboratory.make(institution: i1)
+      device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
+      device2 = Device.make institution: i2 = Institution.make, site: Site.make(institution: i2)
+      device3 = Device.make institution: i1, site: Site.make(institution: i1)
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'bab'})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'cac'})
