@@ -20,7 +20,7 @@ describe Resource do
   end
 
   it "should parse a resource string with conditions" do
-    expect(Resource.resolve("institution?laboratory=1")).to eq([Institution, nil, {"laboratory" => "1"}])
+    expect(Resource.resolve("institution?site=1")).to eq([Institution, nil, {"site" => "1"}])
   end
 
 end

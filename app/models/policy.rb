@@ -21,7 +21,7 @@ class Policy < ActiveRecord::Base
     UPDATE_INSTITUTION = "institution:update"
     DELETE_INSTITUTION = "institution:delete"
 
-    CREATE_INSTITUTION_LABORATORY =     "institution:createLaboratory"
+    CREATE_INSTITUTION_SITE =     "institution:createSite"
     CREATE_INSTITUTION_ENCOUNTER =      "institution:createEncounter"
     REGISTER_INSTITUTION_DEVICE =       "institution:registerDevice"
     REGISTER_INSTITUTION_DEVICE_MODEL = "institution:registerDeviceModel"
@@ -30,11 +30,11 @@ class Policy < ActiveRecord::Base
     UPDATE_DEVICE_MODEL = "deviceModel:update"
     DELETE_DEVICE_MODEL = "deviceModel:delete"
 
-    READ_LABORATORY =   "laboratory:read"
-    UPDATE_LABORATORY = "laboratory:update"
-    DELETE_LABORATORY = "laboratory:delete"
+    READ_SITE =   "site:read"
+    UPDATE_SITE = "site:update"
+    DELETE_SITE = "site:delete"
 
-    ASSIGN_DEVICE_LABORATORY = "laboratory:assignDevice" # This is not tested.
+    ASSIGN_DEVICE_SITE = "site:assignDevice" # This is not tested.
 
     READ_DEVICE =   "device:read"
     UPDATE_DEVICE = "device:update"
@@ -55,10 +55,10 @@ class Policy < ActiveRecord::Base
     Actions::READ_INSTITUTION,
     Actions::UPDATE_INSTITUTION,
     Actions::DELETE_INSTITUTION,
-    Actions::CREATE_INSTITUTION_LABORATORY,
-    Actions::READ_LABORATORY,
-    Actions::UPDATE_LABORATORY,
-    Actions::DELETE_LABORATORY,
+    Actions::CREATE_INSTITUTION_SITE,
+    Actions::READ_SITE,
+    Actions::UPDATE_SITE,
+    Actions::DELETE_SITE,
     Actions::REGISTER_INSTITUTION_DEVICE,
     Actions::REGISTER_INSTITUTION_DEVICE_MODEL,
     Actions::READ_DEVICE,
@@ -67,7 +67,7 @@ class Policy < ActiveRecord::Base
     Actions::READ_DEVICE_MODEL,
     Actions::UPDATE_DEVICE_MODEL,
     Actions::DELETE_DEVICE_MODEL,
-    Actions::ASSIGN_DEVICE_LABORATORY,
+    Actions::ASSIGN_DEVICE_SITE,
     Actions::REGENERATE_DEVICE_KEY,
     Actions::GENERATE_ACTIVATION_TOKEN,
     Actions::SUPPORT_DEVICE,

@@ -87,13 +87,13 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
 
   def self.add_names_to tests
     institutions = indexed_model tests, Institution, ["institution", "uuid"]
-    laboratories = indexed_model tests, Laboratory, ["laboratory", "uuid"]
+    sites = indexed_model tests, Site, ["site", "uuid"]
     devices = indexed_model tests, Device, ["device", "uuid"]
 
     tests.each do |event|
       event["institution"]["name"] = institutions[event["institution"]["uuid"]].try(:name) if event["institution"]
       event["device"]["name"] = devices[event["device"]["uuid"]].try(:name) if event["device"]
-      event["laboratory"]["name"] = laboratories[event["laboratory"]["uuid"]].try(:name) if event["laboratory"]
+      event["site"]["name"] = sites[event["site"]["uuid"]].try(:name) if event["site"]
     end
   end
 

@@ -4,7 +4,7 @@ class Device < ActiveRecord::Base
   has_one :manifest, through: :device_model
   belongs_to :device_model
   belongs_to :institution
-  belongs_to :laboratory
+  belongs_to :site
   has_many :test_results
   has_many :device_messages
   has_one :activation_token, dependent: :destroy
@@ -37,7 +37,7 @@ class Device < ActiveRecord::Base
   end
 
   def locations(opts={})
-    laboratories.map{|l| l.location(opts)}.uniq
+    sites.map{|l| l.location(opts)}.uniq
   end
 
   def filter_by_owner(user, check_conditions)

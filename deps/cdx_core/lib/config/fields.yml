@@ -35,7 +35,7 @@ test:
     patient_age:
       type: duration
       searchable: true
-    lab_user:
+    site_user:
       searchable: true
     name:
       searchable: true
@@ -84,7 +84,7 @@ institution:
     uuid:
       searchable: true
     name:
-laboratory:
+site:
   fields:
     uuid:
       searchable: true

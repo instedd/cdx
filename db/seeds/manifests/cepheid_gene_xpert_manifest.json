@@ -57,7 +57,7 @@
         { "when" : "*", "then" : "unknown"}
       ]
     ]},
-    "test.lab_user" : { "lookup": "event.system_user" },
+    "test.site_user" : { "lookup": "event.system_user" },
     "test.patient_age" : { "lookup": "event.age" },
     "test.start_time" : { "lookup": "event.start_time" },
     "test.end_time" : { "lookup": "event.end_time" },

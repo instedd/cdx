@@ -29,15 +29,15 @@ namespace :policy do
       UPDATE_INSTITUTION = "institution:update"
       DELETE_INSTITUTION = "institution:delete"
 
-      CREATE_INSTITUTION_LABORATORY = "institution:createLaboratory"
+      CREATE_INSTITUTION_SITE = "institution:createSite"
       CREATE_INSTITUTION_ENCOUNTER =  "institution:createEncounter"
       REGISTER_INSTITUTION_DEVICE =   "institution:registerDevice"
 
-      READ_LABORATORY =   "laboratory:read"
-      UPDATE_LABORATORY = "laboratory:update"
-      DELETE_LABORATORY = "laboratory:delete"
+      READ_SITE =   "site:read"
+      UPDATE_SITE = "site:update"
+      DELETE_SITE = "site:delete"
 
-      ASSIGN_DEVICE_LABORATORY = "laboratory:assignDevice"
+      ASSIGN_DEVICE_SITE = "site:assignDevice"
 
       READ_DEVICE =   "device:read"
       UPDATE_DEVICE = "device:update"
@@ -58,10 +58,10 @@ namespace :policy do
       "#{PREFIX}:updateInstitution" => NewActions::UPDATE_INSTITUTION,
       "#{PREFIX}:deleteInstitution" => NewActions::DELETE_INSTITUTION,
 
-      "#{PREFIX}:createInstitutionLaboratory" => NewActions::CREATE_INSTITUTION_LABORATORY,
-      "#{PREFIX}:readLaboratory" => NewActions::READ_LABORATORY,
-      "#{PREFIX}:updateLaboratory" => NewActions::UPDATE_LABORATORY,
-      "#{PREFIX}:deleteLaboratory" => NewActions::DELETE_LABORATORY,
+      "#{PREFIX}:createInstitutionLaboratory" => NewActions::CREATE_INSTITUTION_SITE,
+      "#{PREFIX}:readLaboratory" => NewActions::READ_SITE,
+      "#{PREFIX}:updateLaboratory" => NewActions::UPDATE_SITE,
+      "#{PREFIX}:deleteLaboratory" => NewActions::DELETE_SITE,
 
       "#{PREFIX}:createInstitutionEncounter" => NewActions::CREATE_INSTITUTION_ENCOUNTER,
 
@@ -69,7 +69,7 @@ namespace :policy do
       "#{PREFIX}:readDevice" => NewActions::READ_DEVICE,
       "#{PREFIX}:updateDevice" => NewActions::UPDATE_DEVICE,
       "#{PREFIX}:deleteDevice" => NewActions::DELETE_DEVICE,
-      "#{PREFIX}:assignDeviceLaboratory" => NewActions::ASSIGN_DEVICE_LABORATORY,
+      "#{PREFIX}:assignDeviceLaboratory" => NewActions::ASSIGN_DEVICE_SITE,
       "#{PREFIX}:regenerateDeviceKey" => NewActions::REGENERATE_DEVICE_KEY,
       "#{PREFIX}:generateActivationToken" => NewActions::GENERATE_ACTIVATION_TOKEN,
       "#{PREFIX}:queryTest" => NewActions::QUERY_TEST,
@@ -81,7 +81,8 @@ namespace :policy do
     end
 
     def translate_resource(resource)
-      resource =~ /\A#{PREFIX}:(.+)/ ? $1 : resource
+      resource = resource =~ /\A#{PREFIX}:(.+)/ ? $1 : resource
+      resource.gsub("laboratory", "site")
     end
 
     def skip_callbacks

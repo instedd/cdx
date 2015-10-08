@@ -36,8 +36,8 @@ Institution.blueprint do
 end
 
 Device.blueprint do
-  laboratory
-  institution { laboratory.institution }
+  site
+  institution { site.institution }
   name
   serial_number { name }
   device_model { Manifest.make.device_model }
@@ -100,7 +100,7 @@ ActivationToken.blueprint do
   value { "token-#{Sham.sn}" }
 end
 
-Laboratory.blueprint do
+Site.blueprint do
   institution
   name
   location_geoid { LocationService.repository.make.id }

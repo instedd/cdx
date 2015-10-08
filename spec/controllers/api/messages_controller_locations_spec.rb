@@ -15,23 +15,23 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     let(:leaf_location2) {Location.make parent: parent_location}
     let(:upper_leaf_location) {Location.make}
 
-    let(:laboratory1) {Laboratory.make institution: institution, location_geoid: leaf_location1.id}
+    let(:site1) {Site.make institution: institution, location_geoid: leaf_location1.id}
 
-    it "should store the location id when the device is registered in only one laboratory" do
-      device.laboratory = laboratory1
+    it "should store the location id when the device is registered in only one site" do
+      device.site = site1
       device.save!
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
 
       test = all_elasticsearch_tests.first["_source"]
       expect(test["location"]["id"]).to eq(leaf_location1.geo_id)
-      expect(test["laboratory"]["uuid"]).to eq(laboratory1.uuid)
+      expect(test["site"]["uuid"]).to eq(site1.uuid)
       expect(test["location"]["parents"].sort).to eq([leaf_location1.geo_id, parent_location.geo_id].sort)
       expect(test["location"]["admin_levels"]['admin_level_0']).to eq(parent_location.geo_id)
       expect(test["location"]["admin_levels"]['admin_level_1']).to eq(leaf_location1.geo_id)
     end
 
     it "should store nil if no location was found" do
-      device.laboratory = nil
+      device.site = nil
       device.save!
 
       post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
@@ -40,7 +40,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       expect(test["location"]["id"]).to be_nil
       expect(test["location"]["lat"]).to be_nil
       expect(test["location"]["lng"]).to be_nil
-      expect(test["device"]["laboratory_id"]).to be_nil
+      expect(test["device"]["site_id"]).to be_nil
       expect(test["location"]["parents"]).to eq([])
       expect(test["location"]["admin_levels"]).to eq({})
     end

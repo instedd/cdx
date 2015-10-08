@@ -12,7 +12,7 @@ $(function() {
     }
   };
 
-  $('#laboratory_location_geoid').select2({
+  $('#site_location_geoid').select2({
     placeholder: "Search locations",
     minimumInputLength: 2,
     width: "element",

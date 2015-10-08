@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
 
   has_many :identities, dependent: :destroy
   has_many :institutions
-  has_many :laboratories, through: :institutions
+  has_many :sites, through: :institutions
   has_many :devices, through: :institutions
   has_many :filters
   has_many :subscribers

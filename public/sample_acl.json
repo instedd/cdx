@@ -36,19 +36,19 @@ Institution Admin:
         "cdxp:readInstitution",
         "cdxp:updateInstitution",
         "cdxp:deleteInstitution",
-        "cdxp:createInstitutionLaboratory",
+        "cdxp:createInstitutionSite",
         "cdxp:registerInstitutionDevice"
       ],
       "resource" : "cdxp:institution/1"
     },
     {
       "action" : [
-        "cdxp:readLaboratory",
-        "cdxp:updateLaboratory",
-        "cdxp:deleteLaboratory",
-        "cdxp:assignDeviceLaboratory"
+        "cdxp:readSite",
+        "cdxp:updateSite",
+        "cdxp:deleteSite",
+        "cdxp:assignDeviceSite"
       ],
-      "resource" : "cdxp:laboratory?institution=1"
+      "resource" : "cdxp:site?institution=1"
     },
     {
       "action" : [
@@ -92,9 +92,9 @@ Admin for devices under location 7:
     },
     {
       "action" : [
-        "cdxp:assignDeviceLaboratory"
+        "cdxp:assignDeviceSite"
       ],
-      "resource" : "cdxp:laboratory?institution=1&location=7"
+      "resource" : "cdxp:site?institution=1&location=7"
     },
     {
       "action" : [

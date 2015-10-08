@@ -1,0 +1,37 @@
+%h1
+  = link_to '←', sites_path, title: 'Back'
+  = @site.name
+
+.row
+  .col
+    = card image: map_url(@site.lat, @site.lng) do |c|
+      - c.top do
+        %b= @site.name
+      - if @can_edit
+        - c.actions do
+          = link_to edit_site_path(@site), :title => 'Edit' do
+            = image_tag "ic-pencil.png"
+      - c.bottom do
+        = @site.address
+
+.row
+  .col
+    - if @site.devices.empty?
+      %span This site has no devices yet
+    - else
+      = cdx_table title: 'Devices' do |t|
+        - t.thead do
+          %tr
+            %th Name
+            %th Model
+            %th Site
+        - t.tbody do
+          - @site.devices.each do |device|
+            %tr{data: (@devices_to_edit.include?(device.id) ? {href: edit_device_path(device) } : {})}
+              %td= device.name
+              %td= device.device_model.name
+              %td= device.site.try(:name)
+
+.row
+  .col
+    = test_results_table filter: { site: @site }

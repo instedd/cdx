@@ -1,4 +1,4 @@
-- if @institutions.size > 1 || @laboratories.size > 1
+- if @institutions.size > 1 || @sites.size > 1
   .row
     .col
       %h1 Filters
@@ -10,12 +10,12 @@
           %select.ddown(name="institution")
             %option(value="") (all)
             = options_from_collection_for_select @institutions, :id, :name, params["institution"]
-      - if @laboratories.size > 1
+      - if @sites.size > 1
         .col.pe-2
-          %label Laboratory
-          %select.ddown(name="laboratory")
+          %label Site
+          %select.ddown(name="site")
             %option(value="") (all)
-            = options_from_collection_for_select @laboratories, :id, :name, params["laboratory"]
+            = options_from_collection_for_select @sites, :id, :name, params["site"]
       .col
         %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 
@@ -30,7 +30,7 @@
           - unless @institutions.one?
             %th Institution
           %th Model
-          %th Lab
+          %th Site
       - t.tbody do
         - @devices.each do |device|
           %tr
@@ -39,4 +39,4 @@
             - unless @institutions.one?
               %td= device.institution.name
             %td= device.device_model.full_name
-            %td= device.laboratory.try(:name)
+            %td= device.site.try(:name)

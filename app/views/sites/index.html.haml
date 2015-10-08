@@ -14,8 +14,8 @@
 .row
   .col
     - if @can_create
-      = link_to "+", new_laboratory_path, class: 'btn-add side-link fix', title: 'Add Laboratory'
-    = cdx_table title: 'Laboratories' do |t|
+      = link_to "+", new_site_path, class: 'btn-add side-link fix', title: 'Add Site'
+    = cdx_table title: 'Sites' do |t|
       - t.thead do
         %tr
           %th Name
@@ -23,9 +23,9 @@
             %th Institution
           %th Location
       - t.tbody do
-        - @laboratories.each do |laboratory|
-          %tr{data: {href: laboratory_path(laboratory) }}
-            %td= laboratory.name
+        - @sites.each do |site|
+          %tr{data: {href: site_path(site) }}
+            %td= site.name
             - unless @institutions.one?
-              %td= laboratory.institution.name
-            %td= laboratory.location.try(:name)
+              %td= site.institution.name
+            %td= site.location.try(:name)

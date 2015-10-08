@@ -112,7 +112,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                   }
                 }
               },
-              "lab_user"=> {
+              "site_user"=> {
                 "type"=> "string",
                 "index"=> "not_analyzed"
               },
@@ -174,7 +174,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
               }
             }
           },
-          "laboratory" => {
+          "site" => {
             "properties" => {
               "uuid" => {
                 "type" => "string",

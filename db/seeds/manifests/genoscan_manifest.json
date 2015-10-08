@@ -68,7 +68,7 @@
           "%d.%m.%Y"
         ]
     },
-    "test.lab_user" : {"lookup" : "WindowsUser"},
+    "test.site_user" : {"lookup" : "WindowsUser"},
     "test.name" : {"lookup" : "TypeOfTest"},
     "test.assays.condition" : {
       "script" : "['mtb', 'rif', 'inh']"

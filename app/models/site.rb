@@ -1,4 +1,4 @@
-class Laboratory < ActiveRecord::Base
+class Site < ActiveRecord::Base
   include AutoUUID
   include Resource
 
@@ -38,8 +38,8 @@ class Laboratory < ActiveRecord::Base
     end
   end
 
-  def self.csv_builder(laboratories)
-    CSVBuilder.new laboratories
+  def self.csv_builder(sites)
+    CSVBuilder.new sites
   end
 
   def filter_by_query(query)

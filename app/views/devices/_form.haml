@@ -13,12 +13,12 @@
       = f.label :device_model_id
     .col
       = f.collection_select :device_model_id, DeviceModel.includes(:institution).all, :id, :full_name, {include_blank: "Choose one"}
-  - if can?(Policy::Actions::READ_LABORATORY, Laboratory)
+  - if can?(Policy::Actions::READ_SITE, Site)
     .row
       .col.pe-2
-        = f.label :laboratory
+        = f.label :site
       .col
-        = f.collection_select(:laboratory_id, @laboratories, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
+        = f.collection_select(:site_id, @sites, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
   .row
     .col.pe-2
       = f.label :name

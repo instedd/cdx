@@ -7,8 +7,8 @@ module PolicyHelper
     Policy.authorize(action, resource, current_user)
   end
 
-  def can_index_laboratories?
-    can?(Policy::Actions::CREATE_INSTITUTION_LABORATORY, Institution) || authorize(Policy::Actions::READ_LABORATORY, Laboratory).exists?
+  def can_index_sites?
+    can?(Policy::Actions::CREATE_INSTITUTION_SITE, Institution) || authorize(Policy::Actions::READ_SITE, Site).exists?
   end
 
   def can_index_devices?

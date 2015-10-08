@@ -2,7 +2,7 @@ class FiltersController < ApplicationController
   respond_to :html, :json
   expose(:filters) { current_user.filters }
   expose(:filter, attributes: :filter_params)
-  expose(:laboratory) { Laboratory.find_by_uuid(filter.query["laboratory.uuid"]) }
+  expose(:site) { Site.find_by_uuid(filter.query["site.uuid"]) }
   expose(:condition) { filter.query["test.assays.condition"] }
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
