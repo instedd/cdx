@@ -1,4 +1,4 @@
-class CreateSites < ActiveRecord::Migration
+class CreateLaboratories < ActiveRecord::Migration
   def change
     create_table :laboratories do |t|
       t.string   "name"
