@@ -14,5 +14,5 @@
           %td= device_model.name
           - unless @institutions.one?
             %td= device_model.institution.try(:name)
-          %td= device_model.current_manifest.version
+          %td= device_model.current_manifest.try(:version)
 
