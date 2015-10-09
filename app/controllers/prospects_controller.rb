@@ -3,6 +3,10 @@ class ProspectsController < ApplicationController
   skip_before_action :check_no_institution!
   skip_before_action :load_current_user_policies
 
+  def index
+    @prospects = Prospect.all
+  end
+
   def new
     @prospect = UserRequest.new
   end

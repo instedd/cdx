@@ -1,6 +1,30 @@
 require 'spec_helper'
 
 RSpec.describe ProspectsController, type: :controller do
+  describe 'GET #index' do
+    let!(:prospects) do
+      prospects = []
+      prospects << UserRequest.make
+      prospects << UserRequest.make
+    end
+
+    before do
+      get :index
+    end
+
+    it 'has status code 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'renders the :index template' do
+      expect(response).to render_template('prospects/index')
+    end
+
+    it 'assigns an array of Prospect objects' do
+      expect(assigns(:prospects)).to eq(prospects)
+    end
+  end
+
   describe 'GET #new' do
     before do
       get :new
@@ -22,12 +46,7 @@ RSpec.describe ProspectsController, type: :controller do
   describe 'POST #create' do
     context 'with valid params' do
       let(:prospect) do
-        {
-          first_name: Faker::Name.first_name,
-          last_name: Faker::Name.last_name,
-          email: Faker::Internet.email,
-          contact_number: Faker::PhoneNumber.phone_number
-        }
+        Prospect.make_unsaved.attributes
       end
 
       it 'adds a new :prospect request to the database' do

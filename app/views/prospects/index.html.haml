@@ -1,0 +1,14 @@
+%table#prospects
+  %tr
+    %th.tableheader{colspan:100} Prospects
+  %tr
+    %th First name
+    %th Last name
+    %th Email
+    %th Contact Number
+  - @prospects.each do |prospect|
+    %tr.prospect
+      %td= prospect.first_name
+      %td= prospect.last_name
+      %td= prospect.email
+      %td= prospect.contact_number

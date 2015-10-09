@@ -12,3 +12,11 @@ Feature: A user can request access to the application
     Given Bill Smith does not have an account
     When he provides the correct information
     Then Bill should see "Your request has been submitted for approval"
+
+  Scenario: Bob views pending requests
+    Given the following pending requests for access
+      | first_name | last_name | email              |
+      | John       | Lennon    | jonn@beatles.org   |
+      | George     | Harrison  | george@beatles.org |
+    When Bob visits the Prospects page
+    Then Bob should see the requests awaiting approval
