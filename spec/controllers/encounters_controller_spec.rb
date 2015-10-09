@@ -15,7 +15,11 @@ RSpec.describe EncountersController, type: :controller do
   end
 
   describe "POST #create" do
-    let(:sample) { Sample.make institution: institution }
+    let(:sample) {
+      device = Device.make institution: institution
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
+      Sample.first
+    }
 
     before(:each) {
       post :create, encounter: {
@@ -166,7 +170,11 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "it returns json status error if failed due to other encounter" do
-      sample_with_encounter = Sample.make institution: institution, encounter: Encounter.make
+      device = Device.make institution: institution
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
+      sample_with_encounter = Sample.first
+      sample_with_encounter.encounter = Encounter.make
+      sample_with_encounter.save!
 
       put :add_sample, sample_uuid: sample_with_encounter.uuid, encounter: {
         institution: { uuid: institution.uuid },
@@ -187,8 +195,11 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "it returns json status error if failed due to other patient" do
-      sample_with_patient1 = Sample.make institution: institution, patient: Patient.make
-      sample_with_patient2 = Sample.make institution: institution, patient: Patient.make
+      device = Device.make institution: institution
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'b'}, patient: {id: 'b'})
+
+      sample_with_patient1, sample_with_patient2 = Sample.all.to_a
 
       put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
         institution: { uuid: institution.uuid },
@@ -201,6 +212,31 @@ RSpec.describe EncountersController, type: :controller do
 
       expect(json_response['status']).to eq('error')
       expect(json_response['message']).to eq('Unable to add sample of multiple patients')
+    end
+
+    it "ensure only samples withing permissions can be used" do
+      device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
+      device2 = Device.make institution: i1, site: Site.make(institution: i1)
+
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'a'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'b'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'c'})
+      sample_a, sample_b, sample_c = Sample.all.to_a
+
+      grant device1.institution.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant device1.institution.user, user, {testResult: device1}, QUERY_TEST
+
+      put :add_sample, sample_uuid: sample_c.uuid, encounter: {
+        institution: { uuid: i1.uuid },
+        samples: [{uuid: sample_a.uuid}, {uuid: sample_b.uuid}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['encounter']['samples'][0]).to include(sample_json(sample_a))
+      expect(json_response['encounter']['samples'].count).to eq(1)
     end
 
   end

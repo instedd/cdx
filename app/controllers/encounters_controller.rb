@@ -23,28 +23,23 @@ class EncountersController < ApplicationController
   end
 
   def search_sample
-    institution = institution_by_uuid(params[:institution_uuid])
-    samples = Sample.where("id in (#{authorize_resource(TestResult, QUERY_TEST).select(:sample_id).to_sql})")
-              .where(institution: institution)
-              .where(["entity_id like ?", "%#{params[:q]}%"])
+    @institution = institution_by_uuid(params[:institution_uuid])
+    samples = scoped_samples.where(["entity_id like ?", "%#{params[:q]}%"])
     render json: as_json_samples_search(samples).attributes!
   end
 
   def search_test
-    institution = institution_by_uuid(params[:institution_uuid])
+    @institution = institution_by_uuid(params[:institution_uuid])
     test_results = authorize_resource(TestResult, QUERY_TEST)
-                    .where(institution: institution)
+                    .where(institution: @institution)
                     .where(["test_id like ?", "%#{params[:q]}%"])
     render json: as_json_test_results_search(test_results).attributes!
   end
 
   def add_sample
-    # TODO CREATE_INSTITUTION_ENCOUNTER
-
     perform_encounter_action do
       prepare_encounter_from_json
-      # TODO enforce policy. filter by institution
-      @encounter.add_sample_uniq Sample.find_by(uuid: params[:sample_uuid])
+      add_sample_by_uuid params[:sample_uuid]
     end
   end
 
@@ -83,13 +78,23 @@ class EncountersController < ApplicationController
     @encounter = Encounter.new
 
     encounter_param = JSON.parse(params[:encounter])
-    @encounter.institution = institution_by_uuid(encounter_param['institution']['uuid'])
+    @institution = institution_by_uuid(encounter_param['institution']['uuid'])
+    @encounter.institution = @institution
     encounter_param['samples'].each do |sample_param|
-      @encounter.add_sample_uniq Sample.find_by(uuid: sample_param['uuid'])
+      add_sample_by_uuid sample_param['uuid']
     end
     encounter_param['test_results'].each do |test_param|
       @encounter.add_test_result_uniq TestResult.find_by(uuid: test_param['uuid'])
     end
+  end
+
+  def scoped_samples
+    Sample.where("id in (#{authorize_resource(TestResult, QUERY_TEST).select(:sample_id).to_sql})")
+              .where(institution: @institution)
+  end
+
+  def add_sample_by_uuid(uuid)
+    @encounter.add_sample_uniq scoped_samples.find_by(uuid: uuid)
   end
 
   def as_json_edit(encounter)
