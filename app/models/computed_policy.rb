@@ -66,6 +66,8 @@ class ComputedPolicy < ActiveRecord::Base
     CONDITIONS.each do |condition|
       if (value = resource_attributes["#{condition}_id".to_sym])
         query = query.where("condition_#{condition}_id = ? OR condition_#{condition}_id IS NULL", value)
+      elsif resource_attributes.has_key?("#{condition}_id".to_sym)
+        query = query.where("condition_#{condition}_id IS NULL")
       end
     end
 
