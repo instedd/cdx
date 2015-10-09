@@ -10,7 +10,7 @@ var AssaysResult = React.createClass({
     return (
       <span>
         {this.props.assays.map(function(assay) {
-           return <AssayResult assay={assay}/>;
+           return <AssayResult key={assay.condition} assay={assay}/>;
         })}
       </span>
     );
@@ -33,16 +33,16 @@ var TestResult = React.createClass({
   render: function() {
     test = this.props.test_result
 
-    var laboratoryName = null;
-    if (test.laboratory)
-      laboratoryName = test.laboratory.name;
+    var siteName = null;
+    if (test.site)
+      siteName = test.site.name;
 
     return (
     <tr>
       <td>{test.name}</td>
       <td><AssaysResult assays={test.assays} /></td>
       <td>{test.sample_entity_id}</td>
-      <td>{laboratoryName}</td>
+      <td>{siteName}</td>
       <td>{test.start_time}</td>
     </tr>);
   }
@@ -60,7 +60,7 @@ var TestResultsList = React.createClass({
             <th>Test name</th>
             <th>Result</th>
             <th>Sample ID</th>
-            <th>Laboratory</th>
+            <th>Site</th>
             <th>Date</th>
           </tr>
         </thead>

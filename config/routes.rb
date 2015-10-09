@@ -8,7 +8,13 @@ Rails.application.routes.draw do
     sessions: "sessions",
   }
 
-  resources :sites
+  resources :sites do
+    member do
+      get :devices
+      get :tests
+    end
+  end
+
   resources :institutions, except: :show do
     member do
       get :request_api_token

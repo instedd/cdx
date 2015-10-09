@@ -1,0 +1,11 @@
+.tabs .tabs-content {
+  display: none;
+
+  &.selected {
+    display: inherit;
+  }
+}
+
+.tabs .tabs-header .selected {
+  font-weight: bold;
+}

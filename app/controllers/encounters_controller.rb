@@ -9,6 +9,7 @@ class EncountersController < ApplicationController
   end
 
   def create
+    # TODO CREATE_INSTITUTION_ENCOUNTER
     perform_encounter_action do
       prepare_encounter_from_json
       @encounter.save!
@@ -30,12 +31,16 @@ class EncountersController < ApplicationController
   end
 
   def search_test
-    # TODO enforce policy. filter by institution
-    test_results = TestResult.where(["test_id like ?", "%#{params[:q]}%"])
+    institution = institution_by_uuid(params[:institution_uuid])
+    test_results = authorize_resource(TestResult, QUERY_TEST)
+                    .where(institution: institution)
+                    .where(["test_id like ?", "%#{params[:q]}%"])
     render json: as_json_test_results_search(test_results).attributes!
   end
 
   def add_sample
+    # TODO CREATE_INSTITUTION_ENCOUNTER
+
     perform_encounter_action do
       prepare_encounter_from_json
       # TODO enforce policy. filter by institution
@@ -44,6 +49,8 @@ class EncountersController < ApplicationController
   end
 
   def add_test
+    # TODO CREATE_INSTITUTION_ENCOUNTER
+
     perform_encounter_action do
       prepare_encounter_from_json
       # TODO enforce policy. filter by institution
@@ -68,7 +75,7 @@ class EncountersController < ApplicationController
   end
 
   def institution_by_uuid(uuid)
-    @institutions.detect { |i| i.uuid == uuid } # TODO change to query
+    @institutions.where(uuid: uuid).first
   end
 
   def prepare_encounter_from_json
@@ -130,7 +137,9 @@ class EncountersController < ApplicationController
   def as_json_test_result(json, test_result)
     json.(test_result, :uuid, :test_id)
     json.name test_result.core_fields[TestResult::NAME_FIELD]
-    json.sample_entity_id test_result.sample.entity_id
+    if test_result.sample
+      json.sample_entity_id test_result.sample.entity_id
+    end
     json.start_time(test_result.core_fields[TestResult::START_TIME_FIELD].try { |d| d.strftime('%B %e, %Y') })
 
     json.assays test_result.core_fields[TestResult::ASSAYS_FIELD] do |assay|

@@ -45,8 +45,6 @@ class SitesController < ApplicationController
     @site = Site.find(params[:id])
     return unless authorize_resource(@site, READ_SITE)
 
-    @devices_to_edit = check_access(@site.devices, UPDATE_DEVICE).pluck(:id)
-
     @can_edit = has_access?(@site, UPDATE_SITE)
   end
 
@@ -86,6 +84,22 @@ class SitesController < ApplicationController
       format.html { redirect_to sites_path, notice: 'Site was successfully deleted.' }
       format.json { head :no_content }
     end
+  end
+
+  def devices
+    @site = Site.find(params[:id])
+    return unless authorize_resource(@site, READ_SITE)
+
+    @devices_to_edit = check_access(@site.devices, UPDATE_DEVICE).pluck(:id)
+
+    render layout: false
+  end
+
+  def tests
+    @site = Site.find(params[:id])
+    return unless authorize_resource(@site, READ_SITE)
+
+    render layout: false
   end
 
   private
