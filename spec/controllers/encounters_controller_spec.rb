@@ -89,8 +89,12 @@ RSpec.describe EncountersController, type: :controller do
 
   describe "GET #search_test" do
     it "returns test_result by test_id" do
-      test1 = TestResult.make test_id: 'bab', institution: institution, device: Device.make
-      TestResult.make test_id: 'bcb', institution: institution
+      device = Device.make institution: institution
+
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'bab'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'bcb'})
+
+      test1 = TestResult.first
 
       get :search_test, institution_uuid: institution.uuid, q: 'a'
 
@@ -98,7 +102,28 @@ RSpec.describe EncountersController, type: :controller do
       expect(response.body).to eq([test_result_json(test1)].to_json)
     end
 
-    pending "filters test_result of selected institution"
+    it "filters test_result of selected institution within permission" do
+      device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
+      device2 = Device.make institution: i2 = Institution.make, site: Site.make(institution: i2)
+      device3 = Device.make institution: i1, site: Site.make(institution: i1)
+
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'bab'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'cac'})
+      DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'dad'})
+
+      grant device1.institution.user, user, device1.institution, CREATE_INSTITUTION_ENCOUNTER
+      grant device2.institution.user, user, device2.institution, CREATE_INSTITUTION_ENCOUNTER
+
+      grant device1.institution.user, user, {testResult: device1}, QUERY_TEST
+      grant device2.institution.user, user, {testResult: device2}, QUERY_TEST
+
+      get :search_test, institution_uuid: device1.institution.uuid, q: 'a'
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
+      expect(json_response.length).to eq(1)
+      expect(json_response.first.with_indifferent_access[:test_id]).to eq("bab")
+    end
   end
 
   describe "PUT #add_sample" do
@@ -214,15 +239,20 @@ RSpec.describe EncountersController, type: :controller do
       uuid: test_result.uuid,
       test_id: test_result.test_id,
       name: test_result.core_fields[TestResult::NAME_FIELD],
-      sample_entity_id: test_result.sample.entity_id,
       start_time: test_result.core_fields[TestResult::START_TIME_FIELD].try { |d| d.strftime('%B %e, %Y') },
-      assays: [],
+      assays: (test_result.core_fields[TestResult::ASSAYS_FIELD] || []).map { |assay|
+        { name: assay['name'], result: assay['result'] }
+      },
       site: {
         name: test_result.device.site.name
       },
       device: {
         name: test_result.device.name
       },
-    }
+    }.tap do |res|
+      if test_result.sample
+        res.merge! sample_entity_id: test_result.sample.entity_id
+      end
+    end
   end
 end
