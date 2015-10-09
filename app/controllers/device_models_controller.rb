@@ -13,6 +13,9 @@ class DeviceModelsController < ApplicationController
 
     @device_models = authorize_resource(DeviceModel, READ_DEVICE_MODEL) or return
     @device_models = @device_models.includes(:manifest).includes(:institution)
+
+    @updateable_device_model_ids  = check_access(DeviceModel, UPDATE_DEVICE_MODEL).pluck(:id)
+    @publishable_device_model_ids = check_access(DeviceModel, PUBLISH_DEVICE_MODEL).pluck(:id)
   end
 
   def show
