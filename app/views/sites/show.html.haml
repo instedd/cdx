@@ -18,5 +18,4 @@
   .col
     = cdx_tabs do |t|
       - t.tab title: 'Devices', url: devices_site_path(@site)
-      - t.tab title: 'Tests' do
-        = test_results_table filter: { site: @site }
+      - t.tab title: 'Tests', url: tests_site_path(@site)

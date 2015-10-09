@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :sites do
     member do
       get :devices
+      get :tests
     end
   end
 

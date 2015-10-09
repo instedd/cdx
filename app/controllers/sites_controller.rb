@@ -95,6 +95,13 @@ class SitesController < ApplicationController
     render layout: false
   end
 
+  def tests
+    @site = Site.find(params[:id])
+    return unless authorize_resource(@site, READ_SITE)
+
+    render layout: false
+  end
+
   private
 
   def load_institutions
