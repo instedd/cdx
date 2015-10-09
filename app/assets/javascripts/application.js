@@ -59,6 +59,7 @@ $(document).ready(function(){
       selectedDiv.addClass('loaded');
       $.get(target.attr('href'), function(data) {
         selectedDiv.html(data);
+        ReactRailsUJS.mountComponents(selectedDiv);
       });
     }
   });
