@@ -39,10 +39,10 @@ var TestResultsTable = React.createClass({
   render: function() {
     return (
       <div>
-        <table className="table row-href" cellpadding="0" cellspacing="0">
+        <table className="table row-href" cellPadding="0" cellSpacing="0">
           <thead>
             <tr>
-              <th className="tableheader" colspan="100">{this.state.totalCount} Tests</th>
+              <th className="tableheader" colSpan="100">{this.state.totalCount} Tests</th>
             </tr>
             <tr>
               <th>Test</th>

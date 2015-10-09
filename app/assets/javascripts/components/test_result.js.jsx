@@ -10,7 +10,7 @@ var AssaysResult = React.createClass({
     return (
       <span>
         {this.props.assays.map(function(assay) {
-           return <AssayResult assay={assay}/>;
+           return <AssayResult key={assay.condition} assay={assay}/>;
         })}
       </span>
     );
