@@ -259,6 +259,66 @@ describe DeviceModelsController do
   end
 
 
+  context "publish" do
+
+    let(:published_device_model)  { institution.device_models.make }
+    let(:published_device_model2) { institution2.device_models.make }
+
+    let(:site)  { institution.sites.make }
+    let(:site2) { institution2.sites.make }
+
+    it "should publish a device model" do
+      put :publish, id: device_model.id, publish: "1"
+      expect(device_model.reload).to be_published
+      expect(response).to be_redirect
+    end
+
+    it "should not publish a device model from another institution if unauthorised" do
+      grant user2, user, device_model2, [UPDATE_DEVICE_MODEL]
+      put :publish, id: device_model2.id, publish: "1"
+      expect(device_model2.reload).to_not be_published
+    end
+
+    it "should publish a device model from another institution if authorised" do
+      grant user2, user, device_model2, [UPDATE_DEVICE_MODEL, PUBLISH_DEVICE_MODEL]
+      put :publish, id: device_model2.id, publish: "1"
+      expect(device_model2.reload).to be_published
+      expect(response).to be_redirect
+    end
+
+    it "should unpublish a device model" do
+      put :publish, id: published_device_model.id, unpublish: "1"
+      expect(published_device_model.reload).to_not be_published
+      expect(response).to be_redirect
+    end
+
+    it "should unpublish a device model if authorised" do
+      grant nil, user, published_device_model2, [UPDATE_DEVICE_MODEL, PUBLISH_DEVICE_MODEL]
+      put :publish, id: published_device_model2.id, unpublish: "1"
+      expect(published_device_model2.reload).to_not be_published
+    end
+
+    it "should not unpublish a device model if unauthorised" do
+      grant nil, user, published_device_model2, [UPDATE_DEVICE_MODEL]
+      put :publish, id: published_device_model2.id, unpublish: "1"
+      expect(published_device_model2.reload).to be_published
+    end
+
+    it "should unpublish a device model if it has devices in the same institution" do
+      published_device_model.devices.make(site: site)
+      put :publish, id: published_device_model.id, unpublish: "1"
+      expect(published_device_model.reload).to_not be_published
+    end
+
+    it "should not unpublish a device model if it has devices outside the institution" do
+      published_device_model.devices.make(site: site2)
+      put :publish, id: published_device_model.id, unpublish: "1"
+      expect(published_device_model.reload).to be_published
+    end
+
+  end
+
+
   context "destroy" do
 
     let(:published_device_model)  { institution.device_models.make }
