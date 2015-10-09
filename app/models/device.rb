@@ -1,14 +1,17 @@
 class Device < ActiveRecord::Base
   include Resource
 
-  has_one :manifest, through: :device_model
   belongs_to :device_model
   belongs_to :institution
   belongs_to :site
-  has_many :test_results
-  has_many :device_messages
+
+  has_one :manifest, through: :device_model
+
   has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
+
+  has_many :test_results
+  has_many :device_messages
   has_many :device_logs
   has_many :device_commands
 
@@ -22,7 +25,9 @@ class Device < ActiveRecord::Base
   validates_presence_of :serial_number
   validates_presence_of :device_model
 
-  before_create :set_uuid
+  validate :unpublished_device_model_from_institution
+
+  before_create :set_key, :set_uuid
 
   delegate :current_manifest, to: :device_model
 
@@ -104,7 +109,21 @@ class Device < ActiveRecord::Base
     device_commands.create! name: "send_logs"
   end
 
+  def destroy_cascade!
+    self.class.reflect_on_all_associations(:has_many).each { |a| self.send(a.name).destroy_all }
+    self.destroy!
+  end
+
   def activated?
     test_results.any?
   end
+
+  private
+
+  def unpublished_device_model_from_institution
+    if device_model && !device_model.published? && device_model.institution_id != self.institution_id
+      errors.add(:device_model, "Unpublished device models can only be used to setup devices from the same institution")
+    end
+  end
+
 end

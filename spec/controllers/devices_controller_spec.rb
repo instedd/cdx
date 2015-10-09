@@ -6,7 +6,7 @@ describe DevicesController do
   let(:user) {institution.user}
   let(:site) {institution.sites.make}
   let(:device_model) {DeviceModel.make}
-  let(:device) {Device.make institution: institution, site: site}
+  let(:device) {Device.make institution: institution, site: site, device_model: device_model}
 
   before(:each) {sign_in user}
 
@@ -41,7 +41,45 @@ describe DevicesController do
 
   end
 
+  context "New" do
+
+    it "renders the new page" do
+      get :new
+      expect(response).to be_success
+    end
+
+    it "loads published device models and from allowed institutions" do
+      published = device_model
+      unpublished = institution.device_models.make(:unpublished)
+      other_unpublished = DeviceModel.make(:unpublished, institution: Institution.make)
+
+      get :new
+      expect(assigns(:device_models)).to contain_exactly(published, unpublished)
+    end
+
+  end
+
+  context "Edit" do
+
+    it "renders the edit page" do
+      get :edit, id: device.id
+      expect(response).to be_success
+    end
+
+    it "loads published device models and from device institution" do
+      published = device_model
+      unpublished = institution.device_models.make(:unpublished)
+      other_user_institution = user.institutions.make
+      other_unpublished = other_user_institution.device_models.make(:unpublished)
+
+      get :edit, id: device.id
+      expect(assigns(:device_models)).to contain_exactly(published, unpublished)
+    end
+
+  end
+
   context "Update" do
+
     it "device is successfully updated if name is provided" do
       d = Device.find(device.id)
       expect(d.name).not_to eq("New device")
@@ -61,6 +99,7 @@ describe DevicesController do
       d = Device.find(device.id)
       expect(d.name).to eq(device.name)
     end
+
   end
 
   describe "generate_activation_token" do

@@ -9,6 +9,7 @@ class TestResult < ActiveRecord::Base
   START_TIME_FIELD = 'start_time'
 
   has_and_belongs_to_many :device_messages
+
   belongs_to :device
   belongs_to :institution
   belongs_to :site
@@ -20,7 +21,8 @@ class TestResult < ActiveRecord::Base
   # validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
   validate :same_patient_in_sample
 
-  before_save :set_foreign_keys
+  before_save   :set_foreign_keys
+  after_destroy :destroy_from_index
 
   delegate :device_model, :device_model_id, to: :device
 
@@ -62,6 +64,10 @@ class TestResult < ActiveRecord::Base
   end
 
   private
+
+  def destroy_from_index
+    TestResultIndexer.new(self).destroy
+  end
 
   def same_patient_in_sample
     if self.sample && self.sample.patient != self.patient

@@ -6,13 +6,13 @@
           - @device.errors.full_messages.each do |msg|
             %li= msg
 
-  = render 'shared/select_institution_or_hidden', f: f
+  = render 'shared/select_institution_or_hidden', f: f, select_class: ''
 
   .row
     .col.pe-2
       = f.label :device_model_id
     .col
-      = f.collection_select :device_model_id, DeviceModel.includes(:institution).all, :id, :full_name, {include_blank: "Choose one"}
+      = f.collection_select :device_model_id, @device_models, :id, :full_name, {include_blank: "Choose one"}
   - if can?(Policy::Actions::READ_SITE, Site)
     .row
       .col.pe-2
@@ -46,6 +46,7 @@
 :coffeescript
   selected_device_model_id = #{@device.device_model_id.to_s.to_json}
   $("#device_device_model_id").ddslick(
+    selectedText: "Choose one"
     onSelected: (data) ->
       device_model_id = data.selectedData.value
       if device_model_id != selected_device_model_id
@@ -56,4 +57,5 @@
         )
         selected_device_model_id = device_model_id
   )
+
 

@@ -33,6 +33,10 @@ class TestResultIndexer
     end
   end
 
+  def destroy
+    client.delete(index: Cdx::Api.index_name, type: type, id: test_result.uuid)
+  end
+
   def type
     'test'
   end

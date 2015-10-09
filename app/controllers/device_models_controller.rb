@@ -1,5 +1,7 @@
 class DeviceModelsController < ApplicationController
 
+  include DeviceModelsHelper
+
   before_filter :load_institutions
 
   before_filter do
@@ -29,12 +31,14 @@ class DeviceModelsController < ApplicationController
   def create
     authorize_resource(Institution.find(device_model_create_params[:institution_id]), REGISTER_INSTITUTION_DEVICE_MODEL) or return
     @device_model = DeviceModel.new(device_model_create_params)
+    set_published_status(@device_model)
 
     respond_to do |format|
       if @device_model.save
         format.html { redirect_to device_models_path, notice: 'Device Model was successfully created.' }
         format.json { render action: 'show', status: :created, device_model: @device_model }
       else
+        @device_model.published_at = @device_model.published_at_was
         format.html { render action: 'new' }
         format.json { render json: @device_model.errors, status: :unprocessable_entity }
       end
@@ -46,13 +50,17 @@ class DeviceModelsController < ApplicationController
   end
 
   def update
-    @device_model = authorize_resource(DeviceModel.find(params[:id]), UPDATE_DEVICE_MODEL) or return
+    @device_model = (authorize_resource(DeviceModel.find(params[:id]), UPDATE_DEVICE_MODEL) or return)
+    @device_model = (authorize_resource(@device_model, PUBLISH_DEVICE_MODEL) or return) if @device_model.published?
+
+    set_published_status(@device_model)
 
     respond_to do |format|
       if @device_model.update(device_model_update_params)
         format.html { redirect_to device_models_path, notice: 'Device Model was successfully updated.' }
         format.json { render action: 'show', status: :created, device_model: @device_model }
       else
+        @device_model.published_at = @device_model.published_at_was
         format.html { render action: 'new' }
         format.json { render json: @device_model.errors, status: :unprocessable_entity }
       end
@@ -60,7 +68,8 @@ class DeviceModelsController < ApplicationController
   end
 
   def destroy
-    @device_model = authorize_resource(DeviceModel.find(params[:id]), DELETE_DEVICE_MODEL) or return
+    @device_model = DeviceModel.unpublished.find(params[:id])
+    @device_model = authorize_resource(@device_model, DELETE_DEVICE_MODEL) or return
     @device_model.destroy!
 
     respond_to do |format|
@@ -82,4 +91,10 @@ class DeviceModelsController < ApplicationController
   def device_model_update_params
     params.require(:device_model).permit(:name, manifest_attributes: [:definition])
   end
+
+  def set_published_status(device_model)
+    device_model.set_published_at   if params[:publish]   && can_publish_device_model?(device_model)
+    device_model.unset_published_at if params[:unpublish] && can_unpublish_device_model?(device_model)
+  end
+
 end
