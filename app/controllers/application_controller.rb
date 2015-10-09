@@ -61,7 +61,7 @@ class ApplicationController < ActionController::Base
 
   def check_no_institution!
     return if current_user && current_user.need_change_password?
-    if current_user && current_user.institutions.empty?
+    if current_user && current_user.institutions.empty? && current_user.policies.empty?
       redirect_to new_institution_path
     end
   end
