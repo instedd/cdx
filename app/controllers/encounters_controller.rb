@@ -20,8 +20,8 @@ class EncountersController < ApplicationController
   end
 
   def show
-    # TODO add policy for reading encounters
     @encounter = Encounter.find(params[:id])
+    return unless authorize_resource(@encounter, READ_ENCOUNTER)
     @encounter_as_json = as_json_edit(@encounter).attributes!
   end
 

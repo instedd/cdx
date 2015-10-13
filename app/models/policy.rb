@@ -48,6 +48,8 @@ class Policy < ActiveRecord::Base
 
     QUERY_TEST = "testResult:query"
 
+    READ_ENCOUNTER = "encounter:read"
+
     MEDICAL_DASHBOARD = "testResult:medicalDashboard"
   end
 
@@ -76,6 +78,7 @@ class Policy < ActiveRecord::Base
     Actions::QUERY_TEST,
     Actions::REPORT_MESSAGE,
     Actions::CREATE_INSTITUTION_ENCOUNTER,
+    Actions::READ_ENCOUNTER
   ]
 
   def self.superadmin(user)

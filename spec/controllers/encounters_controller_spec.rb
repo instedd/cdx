@@ -14,6 +14,26 @@ RSpec.describe EncountersController, type: :controller do
     end
   end
 
+  describe "GET #show" do
+    it "returns http success if allowed" do
+      i1 = Institution.make
+      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant i1.user, user, {encounter: i1}, READ_ENCOUNTER
+
+      encounter = Encounter.make institution: i1
+      get :show, id: encounter.id
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns http forbidden if not allowed" do
+      i1 = Institution.make
+      encounter = Encounter.make institution: i1
+      get :show, id: encounter.id
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   describe "GET #institutions" do
     it "returns institutions where the use can create encounters" do
       i1 = Institution.make

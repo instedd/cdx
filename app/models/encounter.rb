@@ -2,6 +2,7 @@ class Encounter < ActiveRecord::Base
   include Entity
   include AutoUUID
   include AutoIdHash
+  include Resource
 
   has_many :samples, before_add: [:check_no_encounter, :assign_patient, :add_test_results]
   has_many :test_results, before_add: [:check_no_encounter, :assign_patient, :add_sample]
