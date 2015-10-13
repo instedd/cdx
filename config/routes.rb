@@ -110,4 +110,9 @@ Rails.application.routes.draw do
     end
     resources :subscribers
   end
+
+  scope :user do
+    get 'settings' => "users#settings"
+    patch 'settings' => "users#update_settings"
+  end
 end

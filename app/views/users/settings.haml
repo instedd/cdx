@@ -1,0 +1,17 @@
+.row
+  .col
+    %h1 Settings
+
+= form_for(current_user, url: settings_path) do |f|
+  .row
+    .col.pe-2
+      = f.label :locale
+    .col
+      = f.select :locale, options_for_select(@locales), {}, class: "ddown"
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary'
+
+.row
+  .col
+    = link_to "Institutions I belong to", institutions_path
