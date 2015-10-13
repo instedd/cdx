@@ -313,6 +313,10 @@ GEM
       turbolinks
     json (1.8.3)
     jwt (1.5.1)
+    launchy (2.4.3)
+      addressable (~> 2.3)
+    letter_opener (1.4.1)
+      launchy (~> 2.2)
     libv8 (3.16.14.11)
     listen (3.0.3)
       rb-fsevent (>= 0.9.3)
@@ -612,6 +616,7 @@ DEPENDENCIES
   jbuilder (~> 1.2)
   jquery-rails
   jquery-turbolinks
+  letter_opener
   location_service!
   lodash-rails
   machinist (~> 1.0)

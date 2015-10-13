@@ -62,6 +62,7 @@ group :development do
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'quiet_assets'
+  gem 'letter_opener'
   # gem "awesome_print", require: "ap"
   # gem 'meta_request'
 end
