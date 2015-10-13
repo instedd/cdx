@@ -115,7 +115,7 @@ class Device < ActiveRecord::Base
   end
 
   def activated?
-    test_results.any?
+    device_messages.any? || (device_model.supports_activation? && secret_key_hash && !activation_token)
   end
 
   private
