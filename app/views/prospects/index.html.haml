@@ -1,14 +1,16 @@
 %table#prospects
   %tr
-    %th.tableheader{colspan:100} Prospects
+    %th.tableheader{colspan:100}= I18n.t('access_request.prospects_list_heading')
   %tr
     %th First name
     %th Last name
     %th Email
     %th Contact Number
+    %th Actions
   - @prospects.each do |prospect|
     %tr.prospect
       %td= prospect.first_name
       %td= prospect.last_name
       %td= prospect.email
       %td= prospect.contact_number
+      %td= link_to('Approve', approve_prospect_path(prospect), method: :put)

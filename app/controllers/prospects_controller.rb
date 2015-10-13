@@ -3,6 +3,13 @@ class ProspectsController < ApplicationController
   skip_before_action :check_no_institution!
   skip_before_action :load_current_user_policies
 
+  def approve
+    Prospect.where(uuid: params[:id]).tap do |prospects|
+      invite(prospects.first) if prospects.any?
+      redirect_to prospects_path
+    end
+  end
+
   def index
     @prospects = Prospect.all
   end
@@ -22,6 +29,12 @@ class ProspectsController < ApplicationController
   end
 
   private
+
+  def invite(prospect)
+    User.invite!(email: prospect.email).tap do |user|
+      prospect.update_attribute(:uuid, nil)
+    end
+  end
 
   def prospect_params
     return {} unless params[:user_request].any?

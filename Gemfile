@@ -69,6 +69,7 @@ end
 
 gem 'devise'
 gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
+gem 'devise_invitable'
 gem 'omniauth'
 gem 'omniauth-openid'
 gem 'omniauth-google-oauth2'

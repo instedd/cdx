@@ -15,7 +15,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :prospects
+  resources :prospects do
+    member do
+      put :approve
+    end
+  end
   get '/user/request_access' => 'prospects#new'
 
   resources :laboratories
