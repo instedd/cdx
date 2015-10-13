@@ -27,7 +27,7 @@ class Device < ActiveRecord::Base
 
   validate :unpublished_device_model_from_institution
 
-  before_create :set_key, :set_uuid
+  before_create :set_uuid
 
   delegate :current_manifest, to: :device_model
 
