@@ -18,6 +18,9 @@
 //= require select2
 //= require react
 //= require react_ujs
+//= require classnames
+//= require react-input-autosize
+//= require react-select
 //= require components
 //= require_tree .
 

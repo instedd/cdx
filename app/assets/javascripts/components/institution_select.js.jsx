@@ -18,12 +18,12 @@ var InstitutionSelect = React.createClass({
     }.bind(this));
   },
 
-  handleInstitutionChange: function(event) {
+  handleInstitutionChange: function(uuid) {
     this.setState(React.addons.update(this.state, {
-      selectedInstitutionUuid: { $set: event.target.value }
+      selectedInstitutionUuid: { $set: uuid }
     }));
 
-    this.fireInstitutionChanged(event.target.value);
+    this.fireInstitutionChanged(uuid);
   },
 
   fireInstitutionChanged: function(institutionUuid) {
@@ -35,12 +35,16 @@ var InstitutionSelect = React.createClass({
       return (
       <div className="row">
         <div className="col pe-2">
-          <label className="control-label">Institution</label>
-          <select ref="select" value={this.state.selectedInstitutionUuid} onChange={this.handleInstitutionChange}>
-          {this.state.institutions.map(function(institution) {
-             return <option key={institution.uuid} value={institution.uuid}>{institution.name}</option>;
-          })}
-          </select>
+          <label>Institution</label>
+        </div>
+        <div className="col">
+          <Select className="input-large" ref="select"
+            value={this.state.selectedInstitutionUuid}
+            onChange={this.handleInstitutionChange}
+            options={this.state.institutions.map(function(institution) {
+              return {value: institution.uuid, label: institution.name};
+            })}>
+          </Select>
         </div>
       </div>);
     else
