@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   resources :prospects do
     member do
       put :approve
+      put :reject
     end
   end
   get '/user/request_access' => 'prospects#new'

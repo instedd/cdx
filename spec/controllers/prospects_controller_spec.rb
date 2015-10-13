@@ -21,7 +21,7 @@ RSpec.describe ProspectsController, type: :controller do
     end
 
     it 'assigns an array of Prospect objects' do
-      expect(assigns(:prospects)).to eq(prospects)
+      expect(assigns(:prospects)).to eq(Prospect.pending)
     end
   end
 
@@ -60,6 +60,16 @@ RSpec.describe ProspectsController, type: :controller do
       it 're-renders the :new action' do
         post :create, user_request: {}
         expect(response).to render_template(:new)
+      end
+    end
+  end
+
+  describe 'PUT #reject' do
+    context 'with valid Prospect' do
+      it 'Decrements pending prospect count' do
+        expect do
+          put :reject, id: prospects.first.uuid
+        end.to change(Prospect.pending, :count).by(-1)
       end
     end
   end

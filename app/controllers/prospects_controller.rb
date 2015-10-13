@@ -10,14 +10,6 @@ class ProspectsController < ApplicationController
     end
   end
 
-  def index
-    @prospects = Prospect.pending
-  end
-
-  def new
-    @prospect = UserRequest.new
-  end
-
   def create
     @prospect = UserRequest.new(prospect_params)
     if @prospect.valid?
@@ -28,7 +20,26 @@ class ProspectsController < ApplicationController
     end
   end
 
+  def index
+    @prospects = Prospect.pending
+  end
+
+  def new
+    @prospect = UserRequest.new
+  end
+
+  def reject
+    Prospect.where(uuid: params[:id]).tap do |prospects|
+      deny(prospects.first) if prospects.any?
+      redirect_to prospects_path
+    end
+  end
+
   private
+
+  def deny(prospect)
+    prospect.update_attribute(:uuid, nil)
+  end
 
   def invite(prospect)
     User.invite!(email: prospect.email).tap do |user|

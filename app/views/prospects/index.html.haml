@@ -6,7 +6,7 @@
     %th Last name
     %th Email
     %th Contact Number
-    %th Actions
+    %th{colspan:2} Actions
   - @prospects.each do |prospect|
     %tr.prospect
       %td= prospect.first_name
@@ -14,3 +14,4 @@
       %td= prospect.email
       %td= prospect.contact_number
       %td= link_to('Approve', approve_prospect_path(prospect), method: :put)
+      %td= link_to('Reject', reject_prospect_path(prospect), method: :put)
