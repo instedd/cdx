@@ -1,4 +1,10 @@
 var InstitutionSelect = React.createClass({
+  getDefaultProps: function() {
+    return {
+      url: '/api/institutions'
+    }
+  },
+
   getInitialState: function() {
     return {
       institutions: []
@@ -6,7 +12,7 @@ var InstitutionSelect = React.createClass({
   },
 
   componentDidMount: function() {
-    $.get('/api/institutions', function(result) {
+    $.get(this.props.url, function(result) {
       if (!this.isMounted()) return;
 
       this.setState(React.addons.update(this.state, {

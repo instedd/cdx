@@ -14,6 +14,25 @@ RSpec.describe EncountersController, type: :controller do
     end
   end
 
+  describe "GET #institutions" do
+    it "returns institutions where the use can create encounters" do
+      i1 = Institution.make
+      i2 = Institution.make
+
+      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant i1.user, user, {testResult: i1}, QUERY_TEST
+      grant i2.user, user, {testResult: i2}, QUERY_TEST
+
+      get :institutions
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
+      expect(json_response["total_count"]).to eq(2)
+
+      expect(json_response["institutions"].map(&:with_indifferent_access)).to contain_exactly(institution_json(institution),institution_json(i1))
+    end
+  end
+
   describe "POST #create" do
     let(:sample) {
       device = Device.make institution: institution
@@ -286,6 +305,13 @@ RSpec.describe EncountersController, type: :controller do
       expect(json_response['encounter']['test_results'][0]).to include(test_result_json(test_result_a))
       expect(json_response['encounter']['test_results'].count).to eq(1)
     end
+  end
+
+  def institution_json(institution)
+    return {
+      uuid: institution.uuid,
+      name: institution.name,
+    }
   end
 
   def sample_json(sample)

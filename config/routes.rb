@@ -23,6 +23,7 @@ Rails.application.routes.draw do
 
   resources :encounters, only: [:new, :create, :show] do
     collection do
+      get :institutions
       get :search_sample
       get :search_test
       put 'new/sample/:sample_uuid' => 'encounters#add_sample'

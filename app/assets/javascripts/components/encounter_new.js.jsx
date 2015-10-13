@@ -92,12 +92,14 @@ var EncounterNew = React.createClass({
   },
 
   render: function() {
+    var institutionSelect = <InstitutionSelect onChange={this.setInstitution} url="/encounters/institutions"/>;
+
     if (this.state.encounter.institution == null)
-      return <div><InstitutionSelect onChange={this.setInstitution}/></div>;
+      return (<div>{institutionSelect}</div>);
 
     return (
       <div>
-        <InstitutionSelect onChange={this.setInstitution}/>
+        {institutionSelect}
         <FlexFullRow>
           <PatientCard patient={this.state.encounter.patient} />
         </FlexFullRow>

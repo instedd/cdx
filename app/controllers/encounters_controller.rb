@@ -15,6 +15,10 @@ class EncountersController < ApplicationController
     end
   end
 
+  def institutions
+    render json: as_json_institution_list(@institutions).attributes!
+  end
+
   def show
     # TODO add policy for reading encounters
     @encounter = Encounter.find(params[:id])
@@ -125,6 +129,15 @@ class EncountersController < ApplicationController
     Jbuilder.new do |json|
       json.array! samples do |sample|
         as_json_sample(json, sample)
+      end
+    end
+  end
+
+  def as_json_institution_list(institutions)
+    Jbuilder.new do |json|
+      json.total_count institutions.size
+      json.institutions institutions do |institution|
+        as_json_institution(json, institution)
       end
     end
   end
