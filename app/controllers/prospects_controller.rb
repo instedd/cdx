@@ -11,7 +11,7 @@ class ProspectsController < ApplicationController
   end
 
   def index
-    @prospects = Prospect.all
+    @prospects = Prospect.pending
   end
 
   def new

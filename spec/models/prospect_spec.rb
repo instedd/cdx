@@ -16,4 +16,16 @@ RSpec.describe Prospect, type: :model do
       expect(prospect_one.uuid).to_not eq(prospect_two.uuid)
     end
   end
+
+  describe 'Scopes' do
+    describe ':pending' do
+      it 'is pending with non-nil :uuid' do
+        3.times do
+          Prospect.make
+        end
+        Prospect.last.update_attribute(:uuid, nil)
+        expect(Prospect.pending.size).to eq(2)
+      end
+    end
+  end
 end
