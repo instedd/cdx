@@ -1,5 +1,6 @@
 %h1
-  = link_to '←', policies_path, class: 'side-link', title: 'Back'
+  = link_to policies_path, class: 'side-link', title: 'Back' do
+    = image_tag "arrow-left.png"
   Editing #{@policy.name}
 
 = render 'form'

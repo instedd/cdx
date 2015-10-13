@@ -1,6 +1,7 @@
 %h1
   = unless current_user.institutions.count == 0
-    = link_to '←', institutions_path, class: 'side-link', title: 'Back'
+    = link_to institutions_path, class: 'side-link', title: 'Back' do
+      = image_tag "arrow-left.png"
   New Institution
 
 = render 'form'

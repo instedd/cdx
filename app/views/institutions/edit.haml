@@ -1,5 +1,7 @@
 %h1
-  = link_to '←', institutions_path, class: 'side-link', title: 'Back' unless @first_institution_creation
+  - unless @first_institution_creation
+    = link_to institutions_path, class: 'side-link', title: 'Back' do
+      = image_tag "arrow-left.png"
 
 .row
   .col

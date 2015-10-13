@@ -1,4 +1,5 @@
 %h1
-  = link_to '←', device_models_path, class: 'side-link', title: 'Back'
+  = link_to device_models_path, class: 'side-link', title: 'Back' do
+    = image_tag "arrow-left.png"
   Editing Device Model
 = render 'form'

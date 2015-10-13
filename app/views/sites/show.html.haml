@@ -1,5 +1,6 @@
 %h1
-  = link_to '←', sites_path, title: 'Back'
+  = link_to sites_path, class: 'side-link', title: 'Back' do
+    = image_tag "arrow-left.png"
   = @site.name
 
 .row

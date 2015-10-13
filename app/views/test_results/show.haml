@@ -1,7 +1,8 @@
 .row
   .col
     %h1
-      = link_to "←", :back, class: 'side-link', title: 'Back'
+      = link_to :back, class: 'side-link', title: 'Back' do
+        = image_tag "arrow-left.png"
       = @test_result.core_fields[TestResult::NAME_FIELD]
 
 .row

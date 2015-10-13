@@ -1,5 +1,6 @@
 %h1
-  = link_to '←', devices_path, class: 'side-link', title: 'Back'
+  = link_to devices_path, class: 'side-link', title: 'Back' do
+    = image_tag "arrow-left.png"
   = @device.name
 
 = render 'form'
