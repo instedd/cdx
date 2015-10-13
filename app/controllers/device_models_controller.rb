@@ -99,11 +99,11 @@ class DeviceModelsController < ApplicationController
   end
 
   def device_model_create_params
-    params.require(:device_model).permit(:name, :institution_id, manifest_attributes: [:definition])
+    params.require(:device_model).permit(:name, :institution_id, :supports_activation, manifest_attributes: [:definition])
   end
 
   def device_model_update_params
-    params.require(:device_model).permit(:name, manifest_attributes: [:definition])
+    params.require(:device_model).permit(:name, :supports_activation, manifest_attributes: [:definition])
   end
 
   def set_published_status(device_model)

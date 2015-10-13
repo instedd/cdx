@@ -102,6 +102,88 @@ describe DevicesController do
 
   end
 
+  context "Show" do
+    it "shows tests when there are device messages" do
+      device.device_messages.make
+      get :show, id: device.id
+      expect(response).to be_success
+    end
+
+    context "without device messages" do
+      it "redirects to setup if activation is not supported" do
+        get :show, id: device.id
+        expect(response).to redirect_to(setup_device_url(device))
+      end
+
+      context "if activation is supported" do
+        before { device.device_model.update_attributes! supports_activation: true }
+
+        it "redirects to setup if it doesn't have a secret key" do
+          expect(device.secret_key_hash).to be_nil
+          get :show, id: device.id
+          expect(response).to redirect_to(setup_device_url(device))
+        end
+
+        context "secret key is already generated" do
+          before { device.tap(&:set_key).save! }
+
+          it "show tests if there is no activation token" do
+            expect(device.activation_token).to be_nil
+            get :show, id: device.id
+            expect(response).to be_success
+          end
+
+          it "redirects to setup if there is activation token" do
+            device.new_activation_token
+            device.save!
+            get :show, id: device.id
+            expect(response).to redirect_to(setup_device_url(device))
+          end
+        end
+      end
+    end
+  end
+
+  context "Create" do
+    it "redirects to setup with neither token or secret key when the device model doesn't support activation" do
+      expect {
+        post :create, device: {
+          institution_id: institution.id,
+          device_model_id: device_model.id,
+          name: "foo",
+          serial_number: "123"
+        }
+      }.to change(Device, :count).by(1)
+
+      new_device = Device.last
+      expect(new_device.name).to eq("foo")
+      expect(new_device.serial_number).to eq("123")
+      expect(new_device.secret_key_hash).to be_nil
+      expect(new_device.activation_token).to be_nil
+      expect(response).to redirect_to(setup_device_url(new_device))
+    end
+
+    it "redirects to setup with new activation token but no secret key when the device model supports activation" do
+      device_model.supports_activation = true
+      device_model.save!
+      expect {
+        post :create, device: {
+          institution_id: institution.id,
+          device_model_id: device_model.id,
+          name: "foo",
+          serial_number: "123"
+        }
+      }.to change(Device, :count).by(1)
+
+      new_device = Device.last
+      expect(new_device.name).to eq("foo")
+      expect(new_device.serial_number).to eq("123")
+      expect(new_device.secret_key_hash).to be_nil
+      expect(new_device.activation_token).to_not be_nil
+      expect(response).to redirect_to(setup_device_url(new_device))
+    end
+  end
+
   describe "generate_activation_token" do
     before { post :generate_activation_token, {institution_id: device.institution_id, id: device.id, format: :json} }
     let(:token) { ActivationToken.find_by(device_id: device.id)  }

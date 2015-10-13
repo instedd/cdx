@@ -27,7 +27,7 @@ class Device < ActiveRecord::Base
 
   validate :unpublished_device_model_from_institution
 
-  before_create :set_key, :set_uuid
+  before_create :set_uuid
 
   delegate :current_manifest, to: :device_model
 
@@ -115,7 +115,7 @@ class Device < ActiveRecord::Base
   end
 
   def activated?
-    test_results.any?
+    device_messages.any? || (device_model.supports_activation? && secret_key_hash && !activation_token)
   end
 
   private

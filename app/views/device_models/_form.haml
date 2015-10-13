@@ -13,11 +13,20 @@
       = f.label :name
     .col
       = f.text_field :name
+  .row
+    .col.pe-2
+      = f.label :supports_activation
+    .col
+      = f.check_box :supports_activation
+      = f.label :supports_activation, "&nbsp;".html_safe
+
   = f.fields_for :manifest do |manifest_form|
     - if @device_model.manifest.version
-      %p
-        %strong Version:
-        = @device_model.manifest.version
+      .row
+        .col.pe-2
+          = manifest_form.label :version
+        .col
+          = @device_model.manifest.version
 
     .row
       .col.pe-2

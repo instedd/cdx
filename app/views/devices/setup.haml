@@ -13,19 +13,19 @@
     %p
       The Device Id and Secure Key allow your device to identify itself with CDx.
 
-.row
-  .col.pe-2 Device Id
-  .col
-    .uuid= @device.uuid
-    %p= barcode @device.uuid
+- if @device.device_model.supports_activation?
+  .row
+    .col.pe-2 Activation token
+    #activation-token.col
+      = render 'activation_token'
+- else
+  .row
+    .col.pe-2 Device Id
+    .col
+      .uuid= @device.uuid
+      %p= barcode @device.uuid
 
-.row
-  .col.pe-2 Secret Key
-  #secret-key.col
-    = render 'secret_key'
-
-.row
-  .col.pe-2 Activation token
-  #activation-token.col
-    = render 'activation_token'
-
+  .row
+    .col.pe-2 Secret Key
+    #secret-key.col
+      = render 'secret_key'

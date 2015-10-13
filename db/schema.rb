@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151008162340) do
+ActiveRecord::Schema.define(version: 20151008205841) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -100,10 +100,11 @@ ActiveRecord::Schema.define(version: 20151008162340) do
   add_index "device_messages_test_results", ["test_result_id"], name: "index_device_messages_test_results_on_test_result_id", using: :btree
 
   create_table "device_models", force: :cascade do |t|
-    t.string   "name",           limit: 255
+    t.string   "name",                limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "institution_id", limit: 4
+    t.integer  "institution_id",      limit: 4
+    t.boolean  "supports_activation"
     t.datetime "published_at"
   end
 

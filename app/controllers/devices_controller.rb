@@ -36,6 +36,9 @@ class DevicesController < ApplicationController
     return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
 
     @device = @institution.devices.new(device_params)
+    if @device.device_model.supports_activation?
+      @device.new_activation_token
+    end
 
     # TODO: check valid sites
 
