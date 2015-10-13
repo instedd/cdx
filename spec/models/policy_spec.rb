@@ -489,6 +489,16 @@ describe Policy do
     end
   end
 
+  context "Device Model" do
+    context "Update" do
+      it "should not allow to update by manufacturer admin if has no institution" do
+        device_model = DeviceModel.make
+        user.institutions.make(kind: :manufacturer)
+        assert_cannot user, device_model, UPDATE_DEVICE_MODEL
+      end
+    end
+  end
+
   context "Device" do
     context "Create" do
       it "disallows creating institution device" do

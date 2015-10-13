@@ -13,6 +13,9 @@ class DeviceModelsController < ApplicationController
 
     @device_models = authorize_resource(DeviceModel, READ_DEVICE_MODEL) or return
     @device_models = @device_models.includes(:manifest).includes(:institution)
+
+    @updateable_device_model_ids  = check_access(DeviceModel, UPDATE_DEVICE_MODEL).pluck(:id)
+    @publishable_device_model_ids = check_access(DeviceModel, PUBLISH_DEVICE_MODEL).pluck(:id)
   end
 
   def show
@@ -57,13 +60,24 @@ class DeviceModelsController < ApplicationController
 
     respond_to do |format|
       if @device_model.update(device_model_update_params)
-        format.html { redirect_to device_models_path, notice: 'Device Model was successfully updated.' }
+        format.html { redirect_to device_models_path, notice: 'Device Model #{@device_model.name} was successfully updated.' }
         format.json { render action: 'show', status: :created, device_model: @device_model }
       else
         @device_model.published_at = @device_model.published_at_was
         format.html { render action: 'new' }
         format.json { render json: @device_model.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def publish
+    @device_model = authorize_resource(DeviceModel.find(params[:id]), PUBLISH_DEVICE_MODEL) or return
+    set_published_status(@device_model)
+    @device_model.save!
+
+    respond_to do |format|
+      format.html { redirect_to device_models_path, notice: "Device Model #{@device_model.name} was successfully #{params[:publish] ? 'published' : 'withdrawn'}." }
+      format.json { render action: 'show', status: :created, device_model: @device_model }
     end
   end
 

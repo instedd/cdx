@@ -56,7 +56,11 @@ Rails.application.routes.draw do
       end
     end
   end
-  resources :device_models
+  resources :device_models do
+    member do
+      put 'publish'
+    end
+  end
   resources :test_results , only: [:index, :show] do
     collection do
       get 'csv'

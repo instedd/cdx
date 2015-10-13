@@ -5,8 +5,16 @@
       %strong Version:
       = @device_model.manifest.try(:version)
     %p
+      %strong Manufacturer:
+      = @device_model.institution.try(:name)
+    %p
       %strong Definition:
-      %pre= JSON.pretty_generate(Oj.load(@device_model.manifest.definition)) rescue @device_model.manifest.definition
+      %pre= JSON.pretty_generate(Oj.load(@device_model.manifest.definition)) rescue @device_model.manifest.try(:definition)
+
+= form_tag(publish_device_model_path(@device_model), method: :put) do |f|
+  = render 'publish'
+
+%hr/
 
 .row
   .col
