@@ -261,6 +261,31 @@ RSpec.describe EncountersController, type: :controller do
       expect(json_response['encounter']['test_results'][0]).to include(test_result_json(test1))
       expect(json_response['encounter']['test_results'].count).to eq(1)
     end
+
+    it "ensure only test_results withing permissions can be used" do
+      device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
+      device2 = Device.make institution: i1, site: Site.make(institution: i1)
+
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'bab'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'cac'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'dad'})
+
+      grant device1.institution.user, user, device1.institution, CREATE_INSTITUTION_ENCOUNTER
+      grant device1.institution.user, user, {testResult: device1}, QUERY_TEST
+
+      test_result_a, test_result_b, test_result_c = TestResult.all.to_a
+
+      put :add_test, test_uuid: test_result_c.uuid, encounter: {
+        institution: { uuid: i1.uuid },
+        samples: [],
+        test_results: [{uuid: test_result_a.uuid}, {uuid: test_result_b.uuid}],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+      expect(json_response['encounter']['test_results'][0]).to include(test_result_json(test_result_a))
+      expect(json_response['encounter']['test_results'].count).to eq(1)
+    end
   end
 
   def sample_json(sample)

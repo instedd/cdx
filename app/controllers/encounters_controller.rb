@@ -9,7 +9,6 @@ class EncountersController < ApplicationController
   end
 
   def create
-    # TODO CREATE_INSTITUTION_ENCOUNTER
     perform_encounter_action do
       prepare_encounter_from_json
       @encounter.save!
@@ -30,9 +29,7 @@ class EncountersController < ApplicationController
 
   def search_test
     @institution = institution_by_uuid(params[:institution_uuid])
-    test_results = authorize_resource(TestResult, QUERY_TEST)
-                    .where(institution: @institution)
-                    .where(["test_id like ?", "%#{params[:q]}%"])
+    test_results = scoped_test_results.where(["test_id like ?", "%#{params[:q]}%"])
     render json: as_json_test_results_search(test_results).attributes!
   end
 
@@ -44,12 +41,9 @@ class EncountersController < ApplicationController
   end
 
   def add_test
-    # TODO CREATE_INSTITUTION_ENCOUNTER
-
     perform_encounter_action do
       prepare_encounter_from_json
-      # TODO enforce policy. filter by institution
-      @encounter.add_test_result_uniq TestResult.find_by(uuid: params[:test_uuid])
+      add_test_result_by_uuid params[:test_uuid]
     end
   end
 
@@ -74,7 +68,6 @@ class EncountersController < ApplicationController
   end
 
   def prepare_encounter_from_json
-    # TODO enforce policy of samples and test_results while building encounter
     @encounter = Encounter.new
 
     encounter_param = JSON.parse(params[:encounter])
@@ -84,7 +77,7 @@ class EncountersController < ApplicationController
       add_sample_by_uuid sample_param['uuid']
     end
     encounter_param['test_results'].each do |test_param|
-      @encounter.add_test_result_uniq TestResult.find_by(uuid: test_param['uuid'])
+      add_test_result_by_uuid test_param['uuid']
     end
   end
 
@@ -97,6 +90,14 @@ class EncountersController < ApplicationController
     @encounter.add_sample_uniq scoped_samples.find_by(uuid: uuid)
   end
 
+  def scoped_test_results
+    authorize_resource(TestResult, QUERY_TEST).where(institution: @institution)
+  end
+
+  def add_test_result_by_uuid(uuid)
+    @encounter.add_test_result_uniq scoped_test_results.find_by(uuid: uuid)
+  end
+
   def as_json_edit(encounter)
     Jbuilder.new do |json|
       json.(encounter, :id)
@@ -105,7 +106,8 @@ class EncountersController < ApplicationController
       end
       json.patient do
         if encounter.patient
-          json.(encounter.patient, :uuid, :plain_sensitive_data) # TODO enforce policy
+          # TODO enforce policy regarding plain_sensitive_data going out
+          json.(encounter.patient, :uuid, :plain_sensitive_data)
         else
           json.nil!
         end
