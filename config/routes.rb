@@ -33,10 +33,13 @@ Rails.application.routes.draw do
   resources :locations, only: [:index, :show]
   resources :devices do
     member do
-      get  'regenerate_key'
-      get 'generate_activation_token'
-      post 'request_client_logs'
-      get 'setup'
+      get  :regenerate_key
+      get :generate_activation_token
+      post :request_client_logs
+      get :performance
+      get :tests
+      get :logs
+      get :setup
     end
     collection do
       post 'custom_mappings'

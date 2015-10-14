@@ -73,6 +73,8 @@ class DevicesController < ApplicationController
       @device.new_activation_token
       @device.save!
     end
+
+    render layout: false if request.xhr?
   end
 
 
@@ -167,6 +169,18 @@ class DevicesController < ApplicationController
     @device.device_model = DeviceModel.find(params[:device_model_id])
 
     render partial: 'custom_mappings'
+  end
+
+  def performance
+    render layout: false
+  end
+
+  def tests
+    render layout: false
+  end
+
+  def logs
+    render layout: false
   end
 
   private

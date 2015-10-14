@@ -1,5 +1,4 @@
-= render 'device_card'
-= render 'tabs'
+= render 'device_card' unless request.xhr?
 
 .row
   .col
