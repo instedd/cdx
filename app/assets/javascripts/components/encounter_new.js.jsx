@@ -1,10 +1,17 @@
 var EncounterNew = React.createClass({
+  getDefaultProps: function() {
+    return {
+      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: v};})
+    }
+  },
+
   getInitialState: function() {
     return {encounter: {
       institution: null,
       patient: null,
       samples: [],
       test_results: [],
+      assays: []
     }};
   },
 
@@ -91,6 +98,14 @@ var EncounterNew = React.createClass({
     this._ajax_put("/encounters/new/test/" + test.uuid);
   },
 
+  encounterAssayChanged: function(index){
+    return function(newValue) {
+      this.setState(React.addons.update(this.state, {
+        encounter : { assays : { [index] : { result : { $set : newValue } } } }
+      }));
+    }.bind(this);
+  },
+
   render: function() {
     var institutionSelect = <InstitutionSelect onChange={this.setInstitution} url="/encounters/institutions"/>;
 
@@ -103,6 +118,28 @@ var EncounterNew = React.createClass({
         <FlexFullRow>
           <PatientCard patient={this.state.encounter.patient} />
         </FlexFullRow>
+
+        <div className="row">
+          <div className="col pe-3">
+            <label>Diagnosis</label>
+          </div>
+          <div className="col">
+            {this.state.encounter.assays.map(function(assay, index){
+              return (
+                <div className="row" key={index}>
+                  <div className="col">
+                    <div className="underline">
+                      <span>{assay.condition}</span>
+                    </div>
+                  </div>
+                  <div className="col pe-8">
+                    <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index)} />
+                  </div>
+                </div>
+              );
+            }.bind(this))}
+          </div>
+        </div>
 
         <div className="row">
           <div className="col pe-1">

@@ -4,6 +4,8 @@ class Encounter < ActiveRecord::Base
   include AutoIdHash
   include Resource
 
+  ASSAYS_FIELD = 'assays'
+
   has_many :samples, before_add: [:check_no_encounter, :assign_patient, :add_test_results]
   has_many :test_results, before_add: [:check_no_encounter, :assign_patient, :add_sample]
 
@@ -32,6 +34,32 @@ class Encounter < ActiveRecord::Base
 
   def add_test_result_uniq(test_result)
     self.test_results << test_result unless self.test_results.include?(test_result)
+
+    self.core_fields[Encounter::ASSAYS_FIELD] = Encounter.merge_assays(
+      self.core_fields[Encounter::ASSAYS_FIELD],
+      test_result.core_fields[TestResult::ASSAYS_FIELD])
+  end
+
+  def self.merge_assays(assays1, assays2)
+    return assays2 unless assays1
+    return assays1 unless assays2
+
+    assays1.dup.tap do |res|
+      assays2.each do |assay2|
+        assay = res.find { |a| a[:name] == assay2[:name] }
+        if assay.nil?
+          res << assay2.dup
+        else
+          assay.merge! assay2 do |key, v1, v2|
+            if key == :result && v1 != v2
+              :indeterminate
+            else
+              v1
+            end
+          end
+        end
+      end
+    end
   end
 
   private
