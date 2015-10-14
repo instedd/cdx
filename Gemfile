@@ -61,9 +61,9 @@ group :development do
   gem 'capistrano-rvm',   '~> 0.1', require: false
   gem 'spring'
   gem 'spring-commands-rspec'
+  gem 'quiet_assets'
   # gem "awesome_print", require: "ap"
   # gem 'meta_request'
-  # gem 'quiet_assets'
 end
 
 gem 'devise'
