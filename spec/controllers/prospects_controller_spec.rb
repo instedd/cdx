@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe ProspectsController, type: :controller do
   let!(:prospects) do
     prospects = []
-    prospects << UserRequest.make
-    prospects << UserRequest.make
+    prospects << Prospect.make
+    prospects << Prospect.make
   end
 
   describe 'GET #index' do
@@ -39,7 +39,7 @@ RSpec.describe ProspectsController, type: :controller do
     end
 
     it 'assigns a new Prospect object' do
-      expect(assigns(:prospect)).to be_a_new(UserRequest)
+      expect(assigns(:prospect)).to be_a_new(Prospect)
     end
   end
 
@@ -51,14 +51,14 @@ RSpec.describe ProspectsController, type: :controller do
 
       it 'adds a new :prospect request to the database' do
         expect do
-          post :create, user_request: prospect
-        end.to change(UserRequest, :count).by(1)
+          post :create, prospect: prospect
+        end.to change(Prospect, :count).by(1)
       end
     end
 
     context 'with invalid params' do
       it 're-renders the :new action' do
-        post :create, user_request: {}
+        post :create, prospect: {}
         expect(response).to render_template(:new)
       end
     end

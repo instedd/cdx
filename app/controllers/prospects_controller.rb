@@ -5,13 +5,19 @@ class ProspectsController < ApplicationController
 
   def approve
     Prospect.where(uuid: params[:id]).tap do |prospects|
-      invite(prospects.first) if prospects.any?
-      redirect_to prospects_path
+      if prospects.any?
+        invite(prospects.first)
+        redirect_to prospects_url,
+                    notice: "Successfully approved #{prospects.first.email}"
+      else
+        redirect_to prospects_url,
+                    warn: 'Could not find request to approve'
+      end
     end
   end
 
   def create
-    @prospect = UserRequest.new(prospect_params)
+    @prospect = Prospect.new(prospect_params)
     if @prospect.valid?
       @prospect.save!
       redirect_to root_path, notice: I18n.t('access_request.submitted')
@@ -25,7 +31,7 @@ class ProspectsController < ApplicationController
   end
 
   def new
-    @prospect = UserRequest.new
+    @prospect = Prospect.new
   end
 
   def reject
@@ -48,8 +54,8 @@ class ProspectsController < ApplicationController
   end
 
   def prospect_params
-    return {} unless params[:user_request].any?
-    params.require(:user_request).permit(
+    return {} unless params[:prospect].any?
+    params.require(:prospect).permit(
       :first_name,
       :last_name,
       :email,

@@ -3,6 +3,11 @@ def visit_request_access_page
   @request_access.load
 end
 
+def visit_prospects_page
+  @prospects_page = ProspectsPage.new
+  @prospects_page.load
+end
+
 Given(/^an administrator called "(.*?)"$/) do |name|
   @administrator = User.make
 end
@@ -36,13 +41,12 @@ end
 Given(/^the following pending requests for access$/) do |table|
   @access_requests = []
   table.hashes.each do |hash|
-    @access_requests << UserRequest.make(hash)
+    @access_requests << Prospect.make(hash)
   end
 end
 
 When(/^Bob visits the Prospects page$/) do
-  @prospects_page = ProspectsPage.new
-  @prospects_page.load
+  visit_prospects_page
 end
 
 Then(/^Bob should see the requests awaiting approval$/) do
@@ -57,4 +61,13 @@ Then(/^Bob should see the requests awaiting approval$/) do
       expect(emails).to include(request.email)
     end
   end
+end
+
+When(/^Bob approves a request$/) do
+  visit_prospects_page
+  @prospects_page.results.all('tr td:nth-child(5) a').first.click
+end
+
+Then(/^Bob should see "(.*?)"$/) do |arg1|
+  page.should have_content(arg1)
 end

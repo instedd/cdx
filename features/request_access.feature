@@ -20,3 +20,5 @@ Feature: A user can request access to the application
       | George     | Harrison  | george@beatles.org |
     When Bob visits the Prospects page
     Then Bob should see the requests awaiting approval
+    When Bob approves a request
+    Then Bob should see "Successfully approved"

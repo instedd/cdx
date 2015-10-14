@@ -1,3 +1,0 @@
-class UserRequest < Prospect
-
-end
