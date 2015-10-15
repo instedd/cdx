@@ -105,7 +105,7 @@ var EncounterNew = React.createClass({
         </FlexFullRow>
 
         <div className="row">
-          <div className="col-p1">
+          <div className="col pe-1">
             <label>Samples</label>
             <p>
               <a className="btn-add btn-add-secondary" href='#' onClick={this.showSamplesModal}>+</a>
@@ -115,8 +115,10 @@ var EncounterNew = React.createClass({
             <SamplesList samples={this.state.encounter.samples} />
           </div>
           <Modal ref="samplesModal">
-            <a href="#" onClick={this.closeSamplesModal}>←</a>
-            <h1>Add sample</h1>
+            <h1>
+              <a href="#" className="modal-back" onClick={this.closeSamplesModal}><img src="/assets/arrow-left.png"/></a>
+              Add sample
+            </h1>
 
             <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendSample}
               itemTemplate={AddItemSearchSampleTemplate}
@@ -133,8 +135,10 @@ var EncounterNew = React.createClass({
           </div>
 
           <Modal ref="testsModal">
-            <a href="#" onClick={this.closeTestsModal}>←</a>
-            <h1>Add test</h1>
+            <h1>
+              <a href="#" className="modal-back" onClick={this.closeTestsModal}><img src="/assets/arrow-left.png"/></a>
+              Add test
+            </h1>
 
             <AddItemSearch callback="/encounters/search_test" onItemChosen={this.appendTest}
               itemTemplate={AddItemSearchTestResultTemplate}
