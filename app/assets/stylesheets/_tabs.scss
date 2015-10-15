@@ -1,11 +1,38 @@
-.tabs .tabs-content {
-  display: none;
+.tabs {
 
-  &.selected {
-    display: inherit;
+  .tabs-header {
+    font-family: $sanstitle;
+    text-transform: uppercase;
+    margin: 10px 0 30px;
+    border-bottom: 1px solid $gray1;
+
+    li {
+      display: inline-block;
+      vertical-align: baseline;
+
+      a {
+        color: $gray4;
+        font-weight: 300;
+        padding: 0 20px 10px;
+        display: block;
+        box-sizing: border-box;
+
+        &.selected {
+          color: $black;
+          font-weight: 700;
+          border-bottom: 5px solid $black;
+        }
+      }
+    }
+
   }
-}
 
-.tabs .tabs-header .selected {
-  font-weight: bold;
+  .tabs-content {
+    display: none;
+
+    &.selected {
+      display: inherit;
+    }
+  }
+
 }
