@@ -4,6 +4,7 @@ class DeviceMessagesController < ApplicationController
 
   def index
     @messages = @device.device_messages
+    render layout: false if request.xhr?
   end
 
   def raw
