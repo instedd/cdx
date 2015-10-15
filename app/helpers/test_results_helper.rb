@@ -1,9 +1,4 @@
 module TestResultsHelper
-  def format_datetime(value)
-    return nil unless value
-    Time.parse(value).strftime("%Y-%m-%d %H:%M")
-  end
-
   def order_by_column(title, field)
     desc_field = "-#{field}"
     link_order_by = @order_by == field ? desc_field : field

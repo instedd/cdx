@@ -7,6 +7,13 @@ module ApplicationHelper
     Policy.authorize action, resource, current_user, @current_user_policies
   end
 
+  def format_datetime(value)
+    return nil unless value
+
+    value = Time.parse(value) unless value.is_a?(Time)
+    I18n.localize(value, locale: current_user.locale, format: :long)
+  end
+
   def flash_message
     res = nil
 

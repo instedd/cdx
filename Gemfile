@@ -77,6 +77,7 @@ gem 'guid'
 gem 'encryptor'
 
 gem 'dotiw'
+gem 'rails-i18n', '~> 4.0.0'
 
 group :development, :test do
   gem 'pry-byebug'

@@ -1,4 +1,8 @@
 class UsersController < ApplicationController
+  LOCALES = [
+              ["English", "en"],
+            ]
+
   def settings
     load_locales
   end
@@ -20,8 +24,6 @@ class UsersController < ApplicationController
   end
 
   def load_locales
-    @locales = Hash[I18n.available_locales.map do |locale|
-      [I18n.t!(:language_name, locale: locale), locale] rescue nil
-    end.compact!]
+    @locales = LOCALES
   end
 end
