@@ -60,7 +60,7 @@ class DeviceModelsController < ApplicationController
 
     respond_to do |format|
       if @device_model.update(device_model_update_params)
-        format.html { redirect_to device_models_path, notice: 'Device Model #{@device_model.name} was successfully updated.' }
+        format.html { redirect_to device_models_path, notice: "Device Model #{@device_model.name} was successfully updated." }
         format.json { render action: 'show', status: :created, device_model: @device_model }
       else
         @device_model.published_at = @device_model.published_at_was
