@@ -590,7 +590,6 @@ DEPENDENCIES
   cdx!
   cdx-api-elasticsearch!
   cdx-sync-server!
-  coffee-rails (~> 4.0.0)
   config
   csv_builder
   cucumber-rails
