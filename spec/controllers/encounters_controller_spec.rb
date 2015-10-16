@@ -32,6 +32,38 @@ RSpec.describe EncountersController, type: :controller do
 
       expect(response).to have_http_status(:forbidden)
     end
+
+    it "redirects to edit if can edit" do
+      i1 = Institution.make
+      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant i1.user, user, {encounter: i1}, READ_ENCOUNTER
+      grant i1.user, user, {encounter: i1}, UPDATE_ENCOUNTER
+
+      encounter = Encounter.make institution: i1
+      get :show, id: encounter.id
+      
+      expect(response).to redirect_to(edit_encounter_path(encounter))
+    end
+  end
+
+  describe "GET #edit" do
+    it "returns http success if allowed" do
+      i1 = Institution.make
+      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant i1.user, user, {encounter: i1}, UPDATE_ENCOUNTER
+
+      encounter = Encounter.make institution: i1
+      get :edit, id: encounter.id
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns http forbidden if not allowed" do
+      i1 = Institution.make
+      encounter = Encounter.make institution: i1
+      get :edit, id: encounter.id
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe "GET #institutions" do

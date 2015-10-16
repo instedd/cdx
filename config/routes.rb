@@ -21,7 +21,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :encounters, only: [:new, :create, :show] do
+  resources :encounters, only: [:new, :create, :edit, :show] do
     collection do
       get :institutions
       get :search_sample
