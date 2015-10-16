@@ -31,8 +31,25 @@
               }
             ]
           }
+      .row
+        .col       
+          = "Test results to generate:"
+        .col
+          %input{:max => "10000", :min => "0", :value => "0", :id => "repeat_demo", :type => "number"}
+      .row
+        .col
+          = "Start date time:"
+        .col
+          = datetime_local_field("data", "start_datetime")
+      .row
+        .col
+          = "End date time:"
+        .col
+          = datetime_local_field("data", "end_datetime")
       .results.playground-error
-      %input#create_button.btn-primary(name="commit" type="submit" value="Create message")
+      .row 
+        %input#create_button.btn-primary(name="commit" type="submit" value="Create message")
+
   .col
     .row
       .col

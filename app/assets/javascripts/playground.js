@@ -13,8 +13,13 @@ $(function() {
       $create_button.val("Creating...");
       device = cdx_select_value("device");
       data = $("#data").val();
+
+      repeat_demo_times = $("#repeat_demo").val();
+      start_demo_datetime = $("#data_start_datetime").val();
+      end_demo_datetime = $("#data_end_datetime").val();
+
       $.ajax({
-        url: "/api/devices/" + device + "/messages",
+        url: "/api/devices/" + device + "/messages?repeat_demo="+repeat_demo_times+"&start_datetime="+start_demo_datetime+"&end_datetime="+end_demo_datetime,
         type: "POST",
         data: data,
         contentType: false,
