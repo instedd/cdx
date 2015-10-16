@@ -128,6 +128,9 @@ footer {
   padding: 0.5em 1em;
 }
 
+// Devise ---------------------------------------------------------//
+
+
 .devise {
     background: $gray1;
   .content {
@@ -151,5 +154,19 @@ footer {
 
   a {
     color: $blue;
+  }
+}
+
+.message {
+  text-align: center;
+
+  h1 {
+    color: $black;
+
+    small {
+      font-family: $sans;
+      font-size: 50%;
+      display: block;
+    }
   }
 }

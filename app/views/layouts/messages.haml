@@ -13,13 +13,10 @@
           .col
             .logo
             = image_tag 'cdx-logo.png'
-          .col
-            = link_to "Create an account", new_registration_path(:user), :class => 'btn-primary pull-right'
 
 
-      = flash_message
       .content
-        .devise-box
+        .messages
           = content_for?(:cdp_content) ? yield(:cdp_content) : yield
 
       %footer

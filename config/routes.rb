@@ -78,6 +78,7 @@ Rails.application.routes.draw do
   end
 
   root :to => 'home#index'
+  get 'verify' => 'home#verify'
 
   namespace :api, defaults: { format: 'json' } do
     resources :activations, only: :create
