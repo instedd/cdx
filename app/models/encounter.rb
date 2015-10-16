@@ -53,8 +53,17 @@ class Encounter < ActiveRecord::Base
           res << assay2.dup
         else
           assay.merge! assay2 do |key, v1, v2|
-            if key == "result" && v1 != v2
-              "indeterminate"
+            if key == "result"
+              values = []
+              values << v1 if v1 && v1 != "n/a"
+              values << v2 if v2 && v2 != "n/a"
+              values << "indeterminate" if values.empty?
+              values.uniq!
+              if values.length == 1
+                values.first
+              else
+                "indeterminate"
+              end
             else
               v1
             end

@@ -167,5 +167,30 @@ describe Encounter do
         .to eq([{"condition" => "a", "foo" => "foo", "bar" => "bar", "other" => "first"}])
     end
 
+    def merge_values(a, b)
+      merge([{"condition" => "a", "result" => a}], [{"condition" => "a", "result" => b}]).first["result"]
+    end
+
+    it "merge n/a n/a" do
+      expect(merge_values("n/a", "n/a")).to eq("indeterminate")
+    end
+
+    it "merge with same" do
+      expect(merge_values("any", "any")).to eq("any")
+    end
+
+    it "merge with different" do
+      expect(merge_values("any", "other")).to eq("indeterminate")
+    end
+
+    it "merge with n/a" do
+      expect(merge_values("any", "n/a")).to eq("any")
+      expect(merge_values("n/a", "any")).to eq("any")
+    end
+
+    it "merge with nil" do
+      expect(merge_values("any", nil)).to eq("any")
+      expect(merge_values(nil, "any")).to eq("any")
+    end
   end
 end
