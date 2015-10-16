@@ -35,7 +35,7 @@ GIT
 
 GIT
   remote: https://github.com/manastech/rails-view_components.git
-  revision: 71b2d441e1d6339a3bcb9587eb2abfa7cf96775a
+  revision: 59861a6e716944441b4cd5e584bb3f36d0a7c37e
   branch: master
   specs:
     view_components (0.1.0)
@@ -328,6 +328,8 @@ GEM
     listen (3.0.3)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
+    lodash-rails (3.10.1)
+      railties (>= 3.1)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.9)
@@ -559,7 +561,6 @@ GEM
     uglifier (2.7.2)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
-    underscore-rails (1.8.3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.1)
@@ -615,6 +616,7 @@ DEPENDENCIES
   jquery-rails
   jquery-turbolinks
   location_service!
+  lodash-rails
   machinist (~> 1.0)
   mysql2
   nokogiri
@@ -652,7 +654,6 @@ DEPENDENCIES
   tire
   turbolinks
   uglifier (>= 2.7.2)
-  underscore-rails
   vcr
   view_components!
   web-console (~> 2.0)

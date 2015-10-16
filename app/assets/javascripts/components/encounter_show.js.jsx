@@ -9,6 +9,15 @@ var EncounterShow = React.createClass({
         </FlexFullRow>
 
         <div className="row">
+          <div className="col pe-3">
+            <label>Diagnosis</label>
+          </div>
+          <div className="col">
+            <AssaysResultList assays={this.props.encounter.assays} />
+          </div>
+        </div>
+
+        <div className="row">
           <div className="col-p1">
             <label>Samples</label>
           </div>

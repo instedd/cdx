@@ -14,7 +14,7 @@
 //= require jquery.turbolinks
 //= require jquery_ujs
 //= require jquery.are-you-sure
-//= require underscore
+//= require lodash
 //= require select2
 //= require react
 //= require react_ujs

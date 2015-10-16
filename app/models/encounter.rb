@@ -14,6 +14,8 @@ class Encounter < ActiveRecord::Base
 
   validates_presence_of :institution
 
+  # TODO assign the encounter's patient to all test_result and sample.
+
   class MultiplePatientError < StandardError
   end
 
@@ -46,13 +48,13 @@ class Encounter < ActiveRecord::Base
 
     assays1.dup.tap do |res|
       assays2.each do |assay2|
-        assay = res.find { |a| a[:name] == assay2[:name] }
+        assay = res.find { |a| a["name"] == assay2["name"] }
         if assay.nil?
           res << assay2.dup
         else
           assay.merge! assay2 do |key, v1, v2|
-            if key == :result && v1 != v2
-              :indeterminate
+            if key == "result" && v1 != v2
+              "indeterminate"
             else
               v1
             end

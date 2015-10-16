@@ -30,15 +30,7 @@
   .col.pe-3
     %label Assays
   .col
-    - @test_result.core_fields[TestResult::ASSAYS_FIELD].each do |assay|
-      .row
-        .col
-          %div.underline
-            %span
-              %b= assay['name'].upcase
-        .col.pe-8
-          %b= assay['result'].titleize
-
+    = react_component("AssaysResultList", assays: @test_result.core_fields[TestResult::ASSAYS_FIELD])
 
 .row
   .col.pe-3

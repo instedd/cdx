@@ -17,6 +17,29 @@ var AssaysResult = React.createClass({
   }
 });
 
+var AssaysResultList = React.createClass({
+  render: function() {
+    return  (
+      <div>
+        {this.props.assays.map(function(assay) {
+          return (
+            <div className="row">
+              <div className="col">
+                <div className="underline">
+                  <span><b>{assay.name.toUpperCase()}</b></span>
+                </div>
+              </div>
+              <div className="col pe-8">
+                <b>{_.capitalize(assay.result)}</b>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+});
+
 var AssayResult = React.createClass({
   render: function() {
     var assay = this.props.assay;
@@ -54,7 +77,7 @@ var TestResultsList = React.createClass({
       <table className="table">
         <thead>
           <tr>
-            <th className="tableheader" colspan="5">Tests</th>
+            <th className="tableheader" colSpan="5">Tests</th>
           </tr>
           <tr>
             <th>Test name</th>

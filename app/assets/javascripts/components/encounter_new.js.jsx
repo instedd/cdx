@@ -1,7 +1,7 @@
 var EncounterNew = React.createClass({
   getDefaultProps: function() {
     return {
-      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: v};})
+      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: _.capitalize(v)};})
     }
   },
 
@@ -22,6 +22,7 @@ var EncounterNew = React.createClass({
         patient: { $set: null },
         samples: { $set: [] },
         test_results: { $set: [] },
+        assays: []
       }
     }));
   },
@@ -129,7 +130,7 @@ var EncounterNew = React.createClass({
                 <div className="row" key={index}>
                   <div className="col">
                     <div className="underline">
-                      <span>{assay.condition}</span>
+                      <span>{assay.condition.toUpperCase()}</span>
                     </div>
                   </div>
                   <div className="col pe-8">
