@@ -107,21 +107,21 @@ describe Encounter do
 
     it "should merge encounter assays" do
       encounter.core_fields[Encounter::ASSAYS_FIELD] = [
-        {"name" => "a", "result" => "positive"},
-        {"name" => "b", "result" => "positive"}]
+        {"condition" => "a", "result" => "positive"},
+        {"condition" => "b", "result" => "positive"}]
 
       test1 = TestResult.make
       test1.core_fields[TestResult::ASSAYS_FIELD] = [
-        {"name" => "b", "result" => "negative"},
-        {"name" => "c", "result" => "negative"}]
+        {"condition" => "b", "result" => "negative"},
+        {"condition" => "c", "result" => "negative"}]
       test1.save!
 
       encounter.add_test_result_uniq test1
 
       expect(encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([
-        {"name" => "a", "result" => "positive"},
-        {"name" => "b", "result" => "indeterminate"},
-        {"name" => "c", "result" => "negative"}
+        {"condition" => "a", "result" => "positive"},
+        {"condition" => "b", "result" => "indeterminate"},
+        {"condition" => "c", "result" => "negative"}
       ])
     end
   end
@@ -148,23 +148,23 @@ describe Encounter do
     end
 
     it "merge by condition preserving value if equal" do
-      expect(merge([{"name" => "a", "result" => "positive"}], [{"name" => "a", "result" => "positive"}]))
-        .to eq([{"name" => "a", "result" => "positive"}])
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "a", "result" => "positive"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}])
     end
 
     it "merge disjoint assays" do
-      expect(merge([{"name" => "a", "result" => "positive"}], [{"name" => "b", "result" => "negative"}]))
-        .to eq([{"name" => "a", "result" => "positive"}, {"name" => "b", "result" => "negative"}])
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "b", "result" => "negative"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}, {"condition" => "b", "result" => "negative"}])
     end
 
     it "merge with conflicts produce indeterminate" do
-      expect(merge([{"name" => "a", "result" => "positive"}], [{"name" => "a", "result" => "negative"}]))
-        .to eq([{"name" => "a", "result" => "indeterminate"}])
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "a", "result" => "negative"}]))
+        .to eq([{"condition" => "a", "result" => "indeterminate"}])
     end
 
     it "merge other properties priorizing first assay" do
-      expect(merge([{"name" => "a", "foo" => "foo", "other" => "first"}], [{"name" => "a", "bar" => "bar", "other" => "second"}]))
-        .to eq([{"name" => "a", "foo" => "foo", "bar" => "bar", "other" => "first"}])
+      expect(merge([{"condition" => "a", "foo" => "foo", "other" => "first"}], [{"condition" => "a", "bar" => "bar", "other" => "second"}]))
+        .to eq([{"condition" => "a", "foo" => "foo", "bar" => "bar", "other" => "first"}])
     end
 
   end

@@ -48,7 +48,7 @@ class Encounter < ActiveRecord::Base
 
     assays1.dup.tap do |res|
       assays2.each do |assay2|
-        assay = res.find { |a| a["name"] == assay2["name"] }
+        assay = res.find { |a| a["condition"] == assay2["condition"] }
         if assay.nil?
           res << assay2.dup
         else
