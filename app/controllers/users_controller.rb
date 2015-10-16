@@ -20,7 +20,7 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:locale)
+    params.require(:user).permit(:locale, :time_zone, :timestamps_in_device_time_zone)
   end
 
   def load_locales

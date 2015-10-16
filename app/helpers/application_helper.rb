@@ -7,10 +7,11 @@ module ApplicationHelper
     Policy.authorize action, resource, current_user, @current_user_policies
   end
 
-  def format_datetime(value)
+  def format_datetime(value, time_zone = nil)
     return nil unless value
 
     value = Time.parse(value) unless value.is_a?(Time)
+    value = value.in_time_zone(time_zone) if time_zone
     I18n.localize(value, locale: current_user.locale, format: :long)
   end
 

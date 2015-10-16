@@ -7,7 +7,17 @@
     .col.pe-2
       = f.label :locale
     .col
-      = f.select :locale, options_for_select(@locales), {}, class: "ddown"
+      = f.select :locale, @locales, {}, class: "ddown"
+  .row
+    .col.pe-2
+      = f.label :time_zone
+    .col
+      = f.time_zone_select :time_zone, nil, {}, class: "ddown"
+  .row
+    .col.pe-2
+      = f.label :timestamps_in_device_time_zone, "Show test results timestamps relative to"
+    .col
+      = f.select :timestamps_in_device_time_zone, [["My time zone", false], ["The device time zone", true]], {}, class: "ddown"
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'

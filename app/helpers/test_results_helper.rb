@@ -28,7 +28,12 @@ module TestResultsHelper
         results.join(", ")
       end
     when "test.start_time", "test.end_time"
-      format_datetime(value)
+      time_zone = current_user.time_zone
+      if current_user.timestamps_in_device_time_zone && (test_device = test["device"]) && (device = @devices_by_uuid[test_device["uuid"]]) && (device_time_zone = device.time_zone)
+        time_zone = device_time_zone
+      end
+
+      format_datetime(value, time_zone)
     else
       value
     end
