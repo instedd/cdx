@@ -65,7 +65,7 @@ var TestResult = React.createClass({
       siteName = test.site.name;
 
     return (
-    <tr>
+    <tr data-href={'/test_results/' + test.uuid}>
       <td>{test.name}</td>
       <td><AssaysResult assays={test.assays} /></td>
       <td>{test.sample_entity_id}</td>
@@ -78,7 +78,7 @@ var TestResult = React.createClass({
 var TestResultsList = React.createClass({
   render: function() {
     return (
-      <table className="table">
+      <table className="table row-href" cellPadding="0" cellSpacing="0">
         <thead>
           <tr>
             <th className="tableheader" colSpan="5">Tests</th>

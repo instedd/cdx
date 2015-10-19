@@ -5,6 +5,14 @@
         = image_tag "arrow-left.png"
       = @test_result.core_fields[TestResult::NAME_FIELD]
 
+- if @test_result.encounter
+  .row
+    .col
+      %span
+        This test belongs to an encounter.
+        = link_to 'Click here', encounter_path(@test_result.encounter)
+        to view it.
+
 .row
   .col
     = card image: "card-unkown.png" do |c|
