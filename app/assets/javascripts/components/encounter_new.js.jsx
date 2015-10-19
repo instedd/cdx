@@ -99,10 +99,23 @@ var EncounterNew = React.createClass({
     this._ajax_put("/encounters/new/test/" + test.uuid);
   },
 
-  encounterAssayChanged: function(index){
-    return function(newValue) {
+  encounterAssayChanged: function(index, field){
+    return function(event) {
+      var newValue;
+
+      if (field == 'result') {
+        newValue = event;
+      } else if (field == 'quantitative') {
+        newValue = parseInt(event.target.value)
+        if (isNaN(newValue)) {
+          newValue = null;
+        }
+      } else {
+        newValue = event.target.value;
+      }
+
       this.setState(React.addons.update(this.state, {
-        encounter : { assays : { [index] : { result : { $set : newValue } } } }
+        encounter : { assays : { [index] : { [field] : { $set : newValue } } } }
       }));
     }.bind(this);
   },
@@ -112,6 +125,37 @@ var EncounterNew = React.createClass({
 
     if (this.state.encounter.institution == null)
       return (<div>{institutionSelect}</div>);
+
+    var diagnosisEditor = null;
+
+    if (this.state.encounter.assays.length > 0) {
+      diagnosisEditor = (
+        <div className="col assays-editor">
+          {this.state.encounter.assays.map(function(assay, index){
+            return (
+              <div className="row" key={index}>
+                <div className="col pe-4">
+                  <div className="underline">
+                    <span>{assay.condition.toUpperCase()}</span>
+                  </div>
+                </div>
+                <div className="col pe-3">
+                  <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} />
+                </div>
+                <div className="col pe-1">
+                  <input type="text" className="quantitative" value={assay.quantitative} onChange={this.encounterAssayChanged(index, 'quantitative')} />
+                </div>
+              </div>
+            );
+          }.bind(this))}
+        </div>);
+    } else {
+      diagnosisEditor = (
+        <div className="col">
+          <i>Add samples or tests to edit the diagnosis associated with the encounter</i>
+        </div>);
+    }
+
 
     return (
       <div>
@@ -124,22 +168,7 @@ var EncounterNew = React.createClass({
           <div className="col pe-3">
             <label>Diagnosis</label>
           </div>
-          <div className="col">
-            {this.state.encounter.assays.map(function(assay, index){
-              return (
-                <div className="row" key={index}>
-                  <div className="col">
-                    <div className="underline">
-                      <span>{assay.condition.toUpperCase()}</span>
-                    </div>
-                  </div>
-                  <div className="col pe-8">
-                    <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index)} />
-                  </div>
-                </div>
-              );
-            }.bind(this))}
-          </div>
+          {diagnosisEditor}
         </div>
 
         <div className="row">

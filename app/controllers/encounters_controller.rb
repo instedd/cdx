@@ -117,7 +117,7 @@ class EncountersController < ApplicationController
   def as_json_edit(encounter)
     Jbuilder.new do |json|
       json.(encounter, :id)
-      include_assays json, encounter.core_fields[Encounter::ASSAYS_FIELD]
+      json.assays (encounter.core_fields[Encounter::ASSAYS_FIELD] || [])
 
       json.institution do
         as_json_institution(json, encounter.institution)
@@ -176,7 +176,7 @@ class EncountersController < ApplicationController
     end
     json.start_time(format_datetime(test_result.core_fields[TestResult::START_TIME_FIELD]))
 
-    include_assays json, test_result.core_fields[TestResult::ASSAYS_FIELD]
+    json.assays (test_result.core_fields[TestResult::ASSAYS_FIELD] || [])
 
     if test_result.device.site
       json.site do
@@ -186,14 +186,6 @@ class EncountersController < ApplicationController
 
     json.device do
       json.name test_result.device.name
-    end
-  end
-
-  def include_assays(json, assays)
-    json.assays assays do |assay|
-      json.condition assay['condition']
-      json.name assay['name']
-      json.result assay['result']
     end
   end
 

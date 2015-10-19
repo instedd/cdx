@@ -21,17 +21,21 @@ var AssaysResultList = React.createClass({
   render: function() {
     return  (
       <div>
-        {this.props.assays.map(function(assay) {
+        {this.props.assays.map(function(assay, index) {
           return (
-            <div className="row">
-              <div className="col">
+            <div className="row" key={index}>
+              <div className="col pe-4">
                 <div className="underline">
                   <span><b>{assay.name.toUpperCase()}</b></span>
                 </div>
               </div>
-              <div className="col pe-8">
+              <div className="col pe-3">
                 <b>{_.capitalize(assay.result)}</b>
               </div>
+              <div className="col pe-1">
+                {assay.quantitative}
+              </div>
+
             </div>
           );
         })}

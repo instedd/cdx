@@ -41,7 +41,7 @@ RSpec.describe EncountersController, type: :controller do
 
       encounter = Encounter.make institution: i1
       get :show, id: encounter.id
-      
+
       expect(response).to redirect_to(edit_encounter_path(encounter))
     end
   end
@@ -97,7 +97,7 @@ RSpec.describe EncountersController, type: :controller do
         institution: { uuid: institution.uuid },
         samples: [{ uuid: sample.uuid }],
         test_results: [],
-        assays: [{condition: 'mtb', result: 'positive'}]
+        assays: [{condition: 'mtb', result: 'positive', quantitative: 3}]
       }.to_json
 
       sample.reload
@@ -114,7 +114,7 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "assigns assays" do
-      expect(sample.encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive'}])
+      expect(sample.encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative' => 3}])
     end
 
     it "assigns returns a json status ok" do
@@ -384,9 +384,7 @@ RSpec.describe EncountersController, type: :controller do
       test_id: test_result.test_id,
       name: test_result.core_fields[TestResult::NAME_FIELD],
       start_time: test_result.core_fields[TestResult::START_TIME_FIELD].try { |d| d.strftime('%B %e, %Y') },
-      assays: (test_result.core_fields[TestResult::ASSAYS_FIELD] || []).map { |assay|
-        { condition: assay['condition'], name: assay['name'], result: assay['result'] }
-      },
+      assays: test_result.core_fields[TestResult::ASSAYS_FIELD] || [],
       site: {
         name: test_result.device.site.name
       },
