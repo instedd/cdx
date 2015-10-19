@@ -1,8 +1,5 @@
 - unless @first_institution_creation
   - if @can_create
-    %h1
-      = link_to settings_path, class: 'side-link', title: 'Back' do
-        = image_tag "arrow-left.png"
     = link_to "+", new_institution_path, class: 'btn-add side-link fix', title: 'Create Institution'
   - else
     %h1
