@@ -22,6 +22,16 @@ class EncountersController < ApplicationController
   def show
     @encounter = Encounter.find(params[:id])
     return unless authorize_resource(@encounter, READ_ENCOUNTER)
+    if Policy.can?(UPDATE_ENCOUNTER, @encounter, current_user, @current_user_policies)
+      redirect_to edit_encounter_path(@encounter)
+      return
+    end
+    @encounter_as_json = as_json_edit(@encounter).attributes!
+  end
+
+  def edit
+    @encounter = Encounter.find(params[:id])
+    return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
     @encounter_as_json = as_json_edit(@encounter).attributes!
   end
 
@@ -83,6 +93,9 @@ class EncountersController < ApplicationController
     encounter_param['test_results'].each do |test_param|
       add_test_result_by_uuid test_param['uuid']
     end
+
+    @encounter.core_fields[Encounter::ASSAYS_FIELD] = encounter_param['assays']
+    @encounter.core_fields[Encounter::OBSERVATIONS_FIELD] = encounter_param['observations']
   end
 
   def scoped_samples
@@ -105,6 +118,9 @@ class EncountersController < ApplicationController
   def as_json_edit(encounter)
     Jbuilder.new do |json|
       json.(encounter, :id)
+      json.assays (encounter.core_fields[Encounter::ASSAYS_FIELD] || [])
+      json.observations encounter.core_fields[Encounter::OBSERVATIONS_FIELD]
+
       json.institution do
         as_json_institution(json, encounter.institution)
       end
@@ -162,10 +178,7 @@ class EncountersController < ApplicationController
     end
     json.start_time(format_datetime(test_result.core_fields[TestResult::START_TIME_FIELD]))
 
-    json.assays test_result.core_fields[TestResult::ASSAYS_FIELD] do |assay|
-      json.name assay['name']
-      json.result assay['result']
-    end
+    json.assays (test_result.core_fields[TestResult::ASSAYS_FIELD] || [])
 
     if test_result.device.site
       json.site do

@@ -32,6 +32,38 @@ RSpec.describe EncountersController, type: :controller do
 
       expect(response).to have_http_status(:forbidden)
     end
+
+    it "redirects to edit if can edit" do
+      i1 = Institution.make
+      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant i1.user, user, {encounter: i1}, READ_ENCOUNTER
+      grant i1.user, user, {encounter: i1}, UPDATE_ENCOUNTER
+
+      encounter = Encounter.make institution: i1
+      get :show, id: encounter.id
+
+      expect(response).to redirect_to(edit_encounter_path(encounter))
+    end
+  end
+
+  describe "GET #edit" do
+    it "returns http success if allowed" do
+      i1 = Institution.make
+      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant i1.user, user, {encounter: i1}, UPDATE_ENCOUNTER
+
+      encounter = Encounter.make institution: i1
+      get :edit, id: encounter.id
+      expect(response).to have_http_status(:success)
+    end
+
+    it "returns http forbidden if not allowed" do
+      i1 = Institution.make
+      encounter = Encounter.make institution: i1
+      get :edit, id: encounter.id
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe "GET #institutions" do
@@ -56,7 +88,7 @@ RSpec.describe EncountersController, type: :controller do
   describe "POST #create" do
     let(:sample) {
       device = Device.make institution: institution
-      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
       Sample.first
     }
 
@@ -64,7 +96,9 @@ RSpec.describe EncountersController, type: :controller do
       post :create, encounter: {
         institution: { uuid: institution.uuid },
         samples: [{ uuid: sample.uuid }],
-        test_results: []
+        test_results: [],
+        assays: [{condition: 'mtb', result: 'positive', quantitative: 3}],
+        observations: 'Lorem ipsum',
       }.to_json
 
       sample.reload
@@ -78,6 +112,14 @@ RSpec.describe EncountersController, type: :controller do
 
     it "assigns samples" do
       expect(sample.encounter).to_not be_nil
+    end
+
+    it "assigns assays" do
+      expect(sample.encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative' => 3}])
+    end
+
+    it "assigns observations" do
+      expect(sample.encounter.core_fields[Encounter::OBSERVATIONS_FIELD]).to eq('Lorem ipsum')
     end
 
     it "assigns returns a json status ok" do
@@ -94,8 +136,8 @@ RSpec.describe EncountersController, type: :controller do
     it "returns sample by entity id" do
       device = Device.make institution: institution
 
-      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'bab'})
-      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'bcb'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'bab'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'bcb'})
 
       sample = Sample.first
 
@@ -110,9 +152,9 @@ RSpec.describe EncountersController, type: :controller do
       device2 = Device.make institution: i2 = Institution.make, site: Site.make(institution: i2)
       device3 = Device.make institution: i1, site: Site.make(institution: i1)
 
-      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'bab'})
-      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'cac'})
-      DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'dad'})
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'bab'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'cac'})
+      DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'dad'})
 
       grant device1.institution.user, user, device1.institution, CREATE_INSTITUTION_ENCOUNTER
       grant device2.institution.user, user, device2.institution, CREATE_INSTITUTION_ENCOUNTER
@@ -134,8 +176,8 @@ RSpec.describe EncountersController, type: :controller do
     it "returns test_result by test_id" do
       device = Device.make institution: institution
 
-      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'bab'})
-      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'bcb'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'bab'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'bcb'})
 
       test1 = TestResult.first
 
@@ -150,9 +192,9 @@ RSpec.describe EncountersController, type: :controller do
       device2 = Device.make institution: i2 = Institution.make, site: Site.make(institution: i2)
       device3 = Device.make institution: i1, site: Site.make(institution: i1)
 
-      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'bab'})
-      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'cac'})
-      DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'dad'})
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'bab'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'cac'})
+      DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'dad'})
 
       grant device1.institution.user, user, device1.institution, CREATE_INSTITUTION_ENCOUNTER
       grant device2.institution.user, user, device2.institution, CREATE_INSTITUTION_ENCOUNTER
@@ -210,7 +252,7 @@ RSpec.describe EncountersController, type: :controller do
 
     it "it returns json status error if failed due to other encounter" do
       device = Device.make institution: institution
-      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
       sample_with_encounter = Sample.first
       sample_with_encounter.encounter = Encounter.make
       sample_with_encounter.save!
@@ -235,8 +277,8 @@ RSpec.describe EncountersController, type: :controller do
 
     it "it returns json status error if failed due to other patient" do
       device = Device.make institution: institution
-      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
-      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'b'}, patient: {id: 'b'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'}, patient: {id: 'b'})
 
       sample_with_patient1, sample_with_patient2 = Sample.all.to_a
 
@@ -257,9 +299,9 @@ RSpec.describe EncountersController, type: :controller do
       device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
       device2 = Device.make institution: i1, site: Site.make(institution: i1)
 
-      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'a'})
-      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'b'})
-      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]}, sample: {id: 'c'})
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'c'})
       sample_a, sample_b, sample_c = Sample.all.to_a
 
       grant device1.institution.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
@@ -305,9 +347,9 @@ RSpec.describe EncountersController, type: :controller do
       device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
       device2 = Device.make institution: i1, site: Site.make(institution: i1)
 
-      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'bab'})
-      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'cac'})
-      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"], id: 'dad'})
+      DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'bab'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'cac'})
+      DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'dad'})
 
       grant device1.institution.user, user, device1.institution, CREATE_INSTITUTION_ENCOUNTER
       grant device1.institution.user, user, {testResult: device1}, QUERY_TEST
@@ -347,9 +389,7 @@ RSpec.describe EncountersController, type: :controller do
       test_id: test_result.test_id,
       name: test_result.core_fields[TestResult::NAME_FIELD],
       start_time: test_result.core_fields[TestResult::START_TIME_FIELD].try { |d| d.strftime('%B %e, %Y') },
-      assays: (test_result.core_fields[TestResult::ASSAYS_FIELD] || []).map { |assay|
-        { name: assay['name'], result: assay['result'] }
-      },
+      assays: test_result.core_fields[TestResult::ASSAYS_FIELD] || [],
       site: {
         name: test_result.device.site.name
       },

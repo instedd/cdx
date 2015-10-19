@@ -5,6 +5,14 @@
         = image_tag "arrow-left.png"
       = @test_result.core_fields[TestResult::NAME_FIELD]
 
+- if @test_result.encounter
+  .row
+    .col
+      %span
+        This test belongs to an encounter.
+        = link_to 'Click here', encounter_path(@test_result.encounter)
+        to view it.
+
 .row
   .col
     = card image: "card-unkown.png" do |c|
@@ -30,15 +38,7 @@
   .col.pe-3
     %label Assays
   .col
-    - @test_result.core_fields[TestResult::ASSAYS_FIELD].each do |assay|
-      .row
-        .col
-          %div.underline
-            %span
-              %b= assay['name'].upcase
-        .col.pe-8
-          %b= assay['result'].titleize
-
+    = react_component("AssaysResultList", assays: @test_result.core_fields[TestResult::ASSAYS_FIELD])
 
 .row
   .col.pe-3

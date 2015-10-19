@@ -17,6 +17,33 @@ var AssaysResult = React.createClass({
   }
 });
 
+var AssaysResultList = React.createClass({
+  render: function() {
+    return  (
+      <div>
+        {this.props.assays.map(function(assay, index) {
+          return (
+            <div className="row" key={index}>
+              <div className="col pe-4">
+                <div className="underline">
+                  <span><b>{assay.name.toUpperCase()}</b></span>
+                </div>
+              </div>
+              <div className="col pe-3">
+                <b>{_.capitalize(assay.result)}</b>
+              </div>
+              <div className="col pe-1">
+                {assay.quantitative}
+              </div>
+
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+});
+
 var AssayResult = React.createClass({
   render: function() {
     var assay = this.props.assay;
@@ -38,7 +65,7 @@ var TestResult = React.createClass({
       siteName = test.site.name;
 
     return (
-    <tr>
+    <tr data-href={'/test_results/' + test.uuid}>
       <td>{test.name}</td>
       <td><AssaysResult assays={test.assays} /></td>
       <td>{test.sample_entity_id}</td>
@@ -51,10 +78,10 @@ var TestResult = React.createClass({
 var TestResultsList = React.createClass({
   render: function() {
     return (
-      <table className="table">
+      <table className="table row-href" cellPadding="0" cellSpacing="0">
         <thead>
           <tr>
-            <th className="tableheader" colspan="5">Tests</th>
+            <th className="tableheader" colSpan="5">Tests</th>
           </tr>
           <tr>
             <th>Test name</th>

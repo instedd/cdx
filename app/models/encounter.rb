@@ -4,6 +4,9 @@ class Encounter < ActiveRecord::Base
   include AutoIdHash
   include Resource
 
+  ASSAYS_FIELD = 'assays'
+  OBSERVATIONS_FIELD = 'observations'
+
   has_many :samples, before_add: [:check_no_encounter, :assign_patient, :add_test_results]
   has_many :test_results, before_add: [:check_no_encounter, :assign_patient, :add_sample]
 
@@ -11,6 +14,8 @@ class Encounter < ActiveRecord::Base
   belongs_to :patient
 
   validates_presence_of :institution
+
+  # TODO assign the encounter's patient to all test_result and sample.
 
   class MultiplePatientError < StandardError
   end
@@ -32,6 +37,41 @@ class Encounter < ActiveRecord::Base
 
   def add_test_result_uniq(test_result)
     self.test_results << test_result unless self.test_results.include?(test_result)
+
+    self.core_fields[Encounter::ASSAYS_FIELD] = Encounter.merge_assays(
+      self.core_fields[Encounter::ASSAYS_FIELD],
+      test_result.core_fields[TestResult::ASSAYS_FIELD])
+  end
+
+  def self.merge_assays(assays1, assays2)
+    return assays2 unless assays1
+    return assays1 unless assays2
+
+    assays1.dup.tap do |res|
+      assays2.each do |assay2|
+        assay = res.find { |a| a["condition"] == assay2["condition"] }
+        if assay.nil?
+          res << assay2.dup
+        else
+          assay.merge! assay2 do |key, v1, v2|
+            if key == "result"
+              values = []
+              values << v1 if v1 && v1 != "n/a"
+              values << v2 if v2 && v2 != "n/a"
+              values << "indeterminate" if values.empty?
+              values.uniq!
+              if values.length == 1
+                values.first
+              else
+                "indeterminate"
+              end
+            else
+              v1
+            end
+          end
+        end
+      end
+    end
   end
 
   private
