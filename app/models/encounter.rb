@@ -5,6 +5,7 @@ class Encounter < ActiveRecord::Base
   include Resource
 
   ASSAYS_FIELD = 'assays'
+  OBSERVATIONS_FIELD = 'observations'
 
   has_many :samples, before_add: [:check_no_encounter, :assign_patient, :add_test_results]
   has_many :test_results, before_add: [:check_no_encounter, :assign_patient, :add_sample]

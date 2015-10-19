@@ -97,7 +97,8 @@ RSpec.describe EncountersController, type: :controller do
         institution: { uuid: institution.uuid },
         samples: [{ uuid: sample.uuid }],
         test_results: [],
-        assays: [{condition: 'mtb', result: 'positive', quantitative: 3}]
+        assays: [{condition: 'mtb', result: 'positive', quantitative: 3}],
+        observations: 'Lorem ipsum',
       }.to_json
 
       sample.reload
@@ -115,6 +116,10 @@ RSpec.describe EncountersController, type: :controller do
 
     it "assigns assays" do
       expect(sample.encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative' => 3}])
+    end
+
+    it "assigns observations" do
+      expect(sample.encounter.core_fields[Encounter::OBSERVATIONS_FIELD]).to eq('Lorem ipsum')
     end
 
     it "assigns returns a json status ok" do

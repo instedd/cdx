@@ -11,7 +11,8 @@ var EncounterNew = React.createClass({
       patient: null,
       samples: [],
       test_results: [],
-      assays: []
+      assays: [],
+      observations: ''
     }};
   },
 
@@ -22,7 +23,8 @@ var EncounterNew = React.createClass({
         patient: { $set: null },
         samples: { $set: [] },
         test_results: { $set: [] },
-        assays: []
+        assays: { $set: [] },
+        observations: { $set: '' }
       }
     }));
   },
@@ -99,6 +101,15 @@ var EncounterNew = React.createClass({
     this._ajax_put("/encounters/new/test/" + test.uuid);
   },
 
+  encounterChanged: function(field){
+    return function(event) {
+      var newValue = event.target.value;
+      this.setState(React.addons.update(this.state, {
+        encounter : { [field] : { $set : newValue } }
+      }));
+    }.bind(this);
+  },
+
   encounterAssayChanged: function(index, field){
     return function(event) {
       var newValue;
@@ -143,16 +154,20 @@ var EncounterNew = React.createClass({
                   <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} />
                 </div>
                 <div className="col pe-1">
-                  <input type="text" className="quantitative" value={assay.quantitative} onChange={this.encounterAssayChanged(index, 'quantitative')} />
+                  <input type="text" className="quantitative" value={assay.quantitative} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative')} />
                 </div>
               </div>
             );
           }.bind(this))}
+
+          <textarea value={this.state.encounter.observations} placeholder="Observations" onChange={this.encounterChanged('observations')} />
         </div>);
     } else {
       diagnosisEditor = (
         <div className="col">
-          <i>Add samples or tests to edit the diagnosis associated with the encounter</i>
+          <i>
+            <a href="#" onClick={this.showSamplesModal}>Add samples</a> or <a href="#" onClick={this.showTestsModal}>tests</a> to edit the diagnosis associated with the encounter
+          </i>
         </div>);
     }
 
@@ -165,14 +180,14 @@ var EncounterNew = React.createClass({
         </FlexFullRow>
 
         <div className="row">
-          <div className="col pe-3">
+          <div className="col pe-2">
             <label>Diagnosis</label>
           </div>
           {diagnosisEditor}
         </div>
 
         <div className="row">
-          <div className="col pe-1">
+          <div className="col pe-2">
             <label>Samples</label>
             <p>
               <a className="btn-add btn-add-secondary" href='#' onClick={this.showSamplesModal}>+</a>
@@ -195,10 +210,8 @@ var EncounterNew = React.createClass({
 
         <div className="row">
           <div className="col">
-            <TestResultsList testResults={this.state.encounter.test_results} />
-            <p>
-              <a className="btn-add btn-add-secondary" href='#' onClick={this.showTestsModal}>+</a>
-            </p>
+            <TestResultsList testResults={this.state.encounter.test_results} /><br/>
+            <a className="btn-add btn-add-secondary" href='#' onClick={this.showTestsModal}>+</a>
           </div>
 
           <Modal ref="testsModal">
