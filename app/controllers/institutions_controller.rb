@@ -1,30 +1,31 @@
 class InstitutionsController < ApplicationController
   layout "institutions"
-  before_filter :load_institutions, except: :index
+  before_filter :load_institutions
   skip_before_filter :check_no_institution!, only: [:new, :create]
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
   end
 
   def index
-    @can_create = true
-    @institutions = check_access(Institution, READ_INSTITUTION)
-    @institutions ||= []
-    if @institutions.one?
-      redirect_to edit_institution_path(@institutions.first)
+    @can_create = has_access?(Institution, CREATE_INSTITUTION)
+    if @institutions.size <= 1
+      if @institutions.one?
+        redirect_to edit_institution_path(@institutions.first)
+      else
+        redirect_to new_institution_path
+      end
     end
   end
 
   def edit
-    @institution = Institution.find(params[:id])
+    @institution = check_access(Institution.find(params[:id]), READ_INSTITUTION)
     @readonly = !has_access?(@institution, UPDATE_INSTITUTION)
 
     unless has_access?(@institution, UPDATE_INSTITUTION)
       redirect_to institution_path(@institutions.first)
     end
 
-    @institutions = check_access(Institution, READ_INSTITUTION)
-    @can_delete = has_access?(@institution, "cdpx:deleteInstitution")
+    @can_delete = has_access?(@institution, DELETE_INSTITUTION)
 
     if @institutions.one?
       @can_create = has_access?(Institution, CREATE_INSTITUTION)
@@ -96,7 +97,7 @@ class InstitutionsController < ApplicationController
   private
 
   def load_institutions
-    @institutions = check_access(Institution, READ_INSTITUTION)
+    @institutions = check_access(Institution, READ_INSTITUTION) || []
   end
 
   def institution_params
