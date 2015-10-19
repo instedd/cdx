@@ -5,7 +5,7 @@
   %nav
     - if current_user && !@hide_nav_bar
       %ul
-        - if has_access?(Policy::Actions::MEDICAL_DASHBOARD, TestResult)
+        - if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
           %li{:class => params[:controller] == "dashboards" && "active"}
             = link_to "Dashboard", nndd_path
         - if has_access_to_sites_index?

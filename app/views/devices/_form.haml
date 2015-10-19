@@ -13,7 +13,7 @@
       = f.label :device_model_id
     .col
       = f.collection_select :device_model_id, @device_models, :id, :full_name, {include_blank: "Choose one"}
-  - if has_access?(Policy::Actions::READ_SITE, Site)
+  - if has_access?(Site, Policy::Actions::READ_SITE)
     .row
       .col.pe-2
         = f.label :site
