@@ -2,7 +2,13 @@ require 'spec_helper'
 
 describe ActivationToken do
   let!(:device) { Device.make }
-  let!(:token) { ActivationToken.create!(device: device, value: 'foobar') }
+  let!(:token) { ActivationToken.create!(device: device) }
+
+  describe 'new' do
+    it 'generates the token value' do
+      expect(token.value).to match /[A-Z0-9]{16}/
+    end
+  end
 
   describe '#used?' do
     context 'when there is no activation' do

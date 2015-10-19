@@ -30,7 +30,9 @@ class ActivationToken < ActiveRecord::Base
     self.client_id = SyncHelpers.client_id(device) if device && !self.client_id
   end
 
+  TOKEN_CHARS = ('0'..'9').to_a + ('A'..'Z').to_a
+
   def set_value
-    self.value = Guid.new.to_s unless self.value
+    self.value ||= TOKEN_CHARS.sample(16, random: Random.new).join
   end
 end

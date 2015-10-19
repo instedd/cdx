@@ -15,6 +15,15 @@ describe Api::ActivationsController do
       it { expect(response_json['message']).to eq('Device activated') }
     end
 
+    context 'when token exists and device secret key is valid ignoring case and dashes' do
+      let!(:activation_token) { ActivationToken.make(value: 'AAAABBBB') }
+      before { post :create, { token: 'aaaa-bbbb', public_key: SampleSshKey }, format: :json  }
+      let(:response_json) { JSON.parse(response.body) }
+
+      it { expect(response_json['status']).to eq('success') }
+      it { expect(response_json['message']).to eq('Device activated') }
+    end
+
     context 'when token exists but device uuid does not match' do
       let!(:activation_token) { ActivationToken.make(value: '12345') }
       before { activation_token.device.tap(&:set_key).save }
