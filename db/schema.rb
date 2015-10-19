@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151016143640) do
+ActiveRecord::Schema.define(version: 20151019174509) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -205,8 +205,17 @@ ActiveRecord::Schema.define(version: 20151016143640) do
     t.string   "name",       limit: 255
   end
 
+  create_table "sample_identifiers", force: :cascade do |t|
+    t.integer "sample_id", limit: 4
+    t.string  "entity_id", limit: 255
+    t.string  "uuid",      limit: 255
+  end
+
+  add_index "sample_identifiers", ["entity_id"], name: "index_sample_identifiers_on_entity_id", using: :btree
+  add_index "sample_identifiers", ["sample_id"], name: "index_sample_identifiers_on_sample_id", using: :btree
+  add_index "sample_identifiers", ["uuid"], name: "index_sample_identifiers_on_uuid", unique: true, using: :btree
+
   create_table "samples", force: :cascade do |t|
-    t.string   "uuid",           limit: 255
     t.binary   "sensitive_data", limit: 65535
     t.integer  "institution_id", limit: 4
     t.text     "custom_fields",  limit: 65535
@@ -215,13 +224,11 @@ ActiveRecord::Schema.define(version: 20151016143640) do
     t.datetime "updated_at"
     t.integer  "patient_id",     limit: 4
     t.integer  "encounter_id",   limit: 4
-    t.string   "entity_id",      limit: 255
   end
 
-  add_index "samples", ["institution_id", "entity_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree
+  add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree
   add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id_hash", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
-  add_index "samples", ["uuid"], name: "index_samples_on_uuid", using: :btree
 
   create_table "sites", force: :cascade do |t|
     t.string   "name",           limit: 255
@@ -268,23 +275,23 @@ ActiveRecord::Schema.define(version: 20151016143640) do
   create_table "test_results", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uuid",           limit: 255
-    t.text     "custom_fields",  limit: 65535
-    t.string   "test_id",        limit: 255
-    t.integer  "sample_id",      limit: 4
-    t.binary   "sensitive_data", limit: 65535
-    t.integer  "device_id",      limit: 4
-    t.integer  "patient_id",     limit: 4
-    t.text     "core_fields",    limit: 65535
-    t.integer  "encounter_id",   limit: 4
-    t.integer  "site_id",        limit: 4
-    t.integer  "institution_id", limit: 4
+    t.string   "uuid",                 limit: 255
+    t.text     "custom_fields",        limit: 65535
+    t.string   "test_id",              limit: 255
+    t.binary   "sensitive_data",       limit: 65535
+    t.integer  "device_id",            limit: 4
+    t.integer  "patient_id",           limit: 4
+    t.text     "core_fields",          limit: 65535
+    t.integer  "encounter_id",         limit: 4
+    t.integer  "site_id",              limit: 4
+    t.integer  "institution_id",       limit: 4
+    t.integer  "sample_identifier_id", limit: 4
   end
 
   add_index "test_results", ["device_id"], name: "index_test_results_on_device_id", using: :btree
   add_index "test_results", ["institution_id"], name: "index_test_results_on_institution_id", using: :btree
   add_index "test_results", ["patient_id"], name: "index_test_results_on_patient_id", using: :btree
-  add_index "test_results", ["sample_id"], name: "index_test_results_on_sample_id", using: :btree
+  add_index "test_results", ["sample_identifier_id"], name: "index_test_results_on_sample_identifier_id", using: :btree
   add_index "test_results", ["site_id"], name: "index_test_results_on_site_id", using: :btree
   add_index "test_results", ["uuid"], name: "index_test_results_on_uuid", using: :btree
 

@@ -72,9 +72,12 @@ Encounter.blueprint do
   core_fields { { "id" => "encounter-#{Sham.sn}" } }
 end
 
+SampleIdentifier.blueprint do
+  sample
+end
+
 Sample.blueprint do
   institution
-  core_fields { { "uid" => "sample-#{Sham.sn}" } }
 end
 
 Patient.blueprint do
@@ -85,7 +88,7 @@ end
 TestResult.blueprint do
   device_messages { [ DeviceMessage.make ] }
   device { device_messages.first.device }
-  sample { Sample.make institution: device.institution }
+  sample_identifier { SampleIdentifier.make(sample: Sample.make(institution: device.institution)) }
   test_id { "test-#{Sham.sn}" }
 end
 

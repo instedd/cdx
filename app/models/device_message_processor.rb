@@ -40,15 +40,15 @@ class DeviceMessageProcessor
       old_patient = test.patient
       old_encounter = test.encounter
 
-      new_sample,    sample_core_fields    = find_or_initialize_sample
-      new_encounter, encounter_core_fields = find_or_initialize_encounter
-      new_patient,   patient_core_fields   = find_or_initialize_patient
+      new_sample,    sample_core_fields,   sample_entity_id = find_or_initialize_sample
+      new_encounter, encounter_core_fields                  = find_or_initialize_encounter
+      new_patient,   patient_core_fields                    = find_or_initialize_patient
 
       connect_before test, new_sample, new_encounter, new_patient
 
-      process_sample    test, new_sample      if new_sample
-      process_encounter test, new_encounter   if new_encounter
-      process_patient   test, new_patient     if new_patient
+      process_sample    test, new_sample, sample_entity_id if new_sample
+      process_encounter test, new_encounter                if new_encounter
+      process_patient   test, new_patient                  if new_patient
 
       connect_after test
 
@@ -79,29 +79,33 @@ class DeviceMessageProcessor
     end
 
     def find_or_initialize_sample
-      find_or_initialize_entity Sample, ((parsed_message["sample"] || {})["core"] || {})["id"]
+      find_or_initialize_entity(Sample, parsed_message.get_in('sample', 'core', 'id')) do |new_sample, id|
+        new_sample.sample_identifiers.build(entity_id: id)
+      end
     end
 
     def find_or_initialize_patient
-      find_or_initialize_entity Patient, ((parsed_message["patient"] || {})["pii"] || {})["id"]
+      find_or_initialize_entity Patient, parsed_message.get_in('patient', 'core', 'id')
     end
 
     def find_or_initialize_encounter
-      find_or_initialize_entity Encounter, ((parsed_message["encounter"] || {})["core"] || {})["id"]
+      find_or_initialize_entity Encounter, parsed_message.get_in('encounter', 'core', 'id')
     end
 
     def find_or_initialize_entity(klass, entity_id, scope_by_last_year = true)
       new_entity = klass.new institution_id: @parent.institution.id
       assign_fields parsed_message, new_entity
+      assign_entity_id entity_id, new_entity
+      yield new_entity, entity_id if block_given?
 
       if entity_id && (existing = find_entity_by_id(klass, entity_id, scope_by_last_year))
         existing_indexed = existing.core_fields.deep_dup
         existing.merge(new_entity)
-        [existing, existing_indexed]
+        [existing, existing_indexed, entity_id]
       elsif new_entity.empty_entity?
-        [nil, nil]
+        [nil, nil, entity_id]
       else
-        [new_entity, nil]
+        [new_entity, nil, entity_id]
       end
     end
 
@@ -113,23 +117,27 @@ class DeviceMessageProcessor
       query.find_by_entity_id(entity_id, @parent.institution.id)
     end
 
-    def process_sample(test, sample)
-      unless test.sample
-        test.sample = sample
+    def process_sample(test, sample, sample_entity_id)
+      sample_identifier = sample.sample_identifiers.find { |id| id.entity_id.try(:to_s) == sample_entity_id.try(:to_s) }
+      unless test.sample_identifier
+        test.sample_identifier = sample_identifier
         return
       end
 
-      if !sample.entity_id || same_uid?(sample, test.sample)
+      if !sample_entity_id || (same_sample_id?(sample, test.sample) && same_year?(sample, test.sample))
         test.sample.merge sample
         return
       end
 
-      unless test.sample.entity_id
+      # TODO: What if there was another test matched to the same sample?
+      # We can now unify samples manually, so two tests may share the same sample without identifier
+      # The same applies to encounters
+      unless test.sample_identifier.entity_id
         sample.merge test.sample
         test.sample.destroy
       end
 
-      test.sample = sample
+      test.sample_identifier = sample_identifier
     end
 
     def process_encounter(test, encounter)
@@ -138,7 +146,7 @@ class DeviceMessageProcessor
         return
       end
 
-      if !encounter.entity_id || same_uid?(encounter, test.encounter)
+      if !encounter.entity_id || (same_id?(encounter, test.encounter) && same_year?(encounter, test.encounter))
         test.encounter.merge encounter
         return
       end
@@ -158,7 +166,7 @@ class DeviceMessageProcessor
       end
 
       # Here we don't take the year into account
-      if !patient.entity_id || (patient.entity_id == test.patient.entity_id)
+      if !patient.entity_id || same_id?(patient, test.patient)
         test.patient.merge patient
         return
       end
@@ -171,9 +179,15 @@ class DeviceMessageProcessor
       test.patient = patient
     end
 
-    def same_uid?(new_entity, existing_entity)
-      return false unless new_entity.entity_id == existing_entity.entity_id
+    def same_id?(new_entity, existing_entity)
+      new_entity.entity_id == existing_entity.entity_id
+    end
 
+    def same_sample_id?(new_entity, existing_entity)
+      (new_entity.sample_identifiers.map(&:entity_id) & existing_entity.sample_identifiers.map(&:entity_id)).any?
+    end
+
+    def same_year?(new_entity, existing_entity)
       new_entity_created_at = new_entity.created_at || @parent.device_message.created_at
       (new_entity_created_at - existing_entity.created_at).abs < 1.year
     end
@@ -187,6 +201,10 @@ class DeviceMessageProcessor
       entity.core_fields          = (parsed_message[entity.entity_scope] || {})["core"] || {}
       entity.custom_fields        = (parsed_message[entity.entity_scope] || {})["custom"] || {}
       entity.plain_sensitive_data = (parsed_message[entity.entity_scope] || {})["pii"] || {}
+    end
+
+    def assign_entity_id(id, entity)
+      entity.entity_id = id if entity.respond_to?(:entity_id=)
     end
 
     def connect_before(test, sample, encounter, patient)
@@ -221,9 +239,9 @@ class DeviceMessageProcessor
 
       return unless old_core_fields && old_core_fields != entity.try(:core_fields)
 
-      response = client.search index: Cdx::Api.index_name, body:{query: { filtered: { filter: { term: { "#{entity.entity_scope}.uuid" => entity.uuid } } } }, fields: []}, size: 10000
+      response = client.search index: Cdx::Api.index_name, body: { query: { filtered: { filter: { terms: { "#{entity.entity_scope}.uuid" => entity.uuids } } } }, fields: [] }, size: 10000
       body = response["hits"]["hits"].map do |element|
-        { update: { _type: element["_type"], _id: element["_id"], data: { doc: {entity.entity_scope => entity.core_fields} } } }
+        { update: { _type: element["_type"], _id: element["_id"], data: { doc: { entity.entity_scope => entity.core_fields } } } }
       end
 
       client.bulk index: Cdx::Api.index_name, body: body unless body.blank?

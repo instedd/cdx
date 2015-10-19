@@ -44,8 +44,7 @@ class TestResultsController < ApplicationController
     @other_tests = @test_result.sample ? @test_result.sample.test_results.where.not(id: @test_result.id) : TestResult.none
     @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
 
-    @sample_id = @test_result.sample.entity_id
-    @sample_id_barcode = Barby::Code93.new(@sample_id)
+    @samples = @test_result.sample_identifiers.reject{|identifier| identifier.entity_id.blank?}.map {|identifier| [identifier.entity_id, Barby::Code93.new(identifier.entity_id)]}
   end
 
   def csv
