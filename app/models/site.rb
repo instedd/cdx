@@ -6,9 +6,12 @@ class Site < ActiveRecord::Base
   has_one :user, through: :institution
   has_many :devices
   has_many :test_results, through: :devices
+  belongs_to :parent, class_name: "Site"
 
   validates_presence_of :institution
   validates_presence_of :name
+
+  after_create :compute_prefix
 
   attr_writer :location
 
@@ -56,5 +59,16 @@ class Site < ActiveRecord::Base
 
   def to_s
     name
+  end
+
+  private
+
+  def compute_prefix
+    if parent
+      self.prefix = "#{parent.prefix}.#{id}"
+    else
+      self.prefix = id.to_s
+    end
+    self.save!
   end
 end
