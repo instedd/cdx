@@ -16,7 +16,7 @@ class DevicesController < ApplicationController
   end
 
   def index
-    return head :forbidden unless can_index_devices?
+    return head :forbidden unless has_access_to_devices_index?
 
     @devices = check_access(Device, READ_DEVICE)
 

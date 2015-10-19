@@ -6,7 +6,7 @@ class SitesController < ApplicationController
   end
 
   def index
-    return head :forbidden unless can_index_sites?
+    return head :forbidden unless has_access_to_sites_index?
 
     @sites = check_access(Site, READ_SITE)
     @institutions = check_access(Institution, READ_INSTITUTION)

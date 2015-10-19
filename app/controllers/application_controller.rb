@@ -1,6 +1,5 @@
 class ApplicationController < ActionController::Base
   include ApplicationHelper
-  include PolicyHelper
   include Policy::Actions
 
   # Prevent CSRF attacks by raising an exception.

@@ -7,6 +7,18 @@ module ApplicationHelper
     Policy.authorize action, resource, current_user, @current_user_policies
   end
 
+  def has_access_to_sites_index?
+    has_access?(Institution, Policy::Actions::CREATE_INSTITUTION_SITE) || check_access(Site, Policy::Actions::READ_SITE).exists?
+  end
+
+  def has_access_to_devices_index?
+    has_access?(Institution, Policy::Actions::REGISTER_INSTITUTION_DEVICE) || check_access(Device, Policy::Actions::READ_DEVICE).exists?
+  end
+
+  def has_access_to_device_models_index?
+    has_access?(Institution, Policy::Actions::REGISTER_INSTITUTION_DEVICE_MODEL) || check_access(DeviceModel, Policy::Actions::READ_DEVICE_MODEL).exists?
+  end
+
   def format_datetime(value, time_zone = nil)
     return nil unless value
 

@@ -5,16 +5,16 @@
   %nav
     - if current_user && !@hide_nav_bar
       %ul
-        - if can?(Policy::Actions::MEDICAL_DASHBOARD, TestResult)
+        - if has_access?(Policy::Actions::MEDICAL_DASHBOARD, TestResult)
           %li{:class => params[:controller] == "dashboards" && "active"}
             = link_to "Dashboard", nndd_path
-        - if can_index_sites?
+        - if has_access_to_sites_index?
           %li{:class => params[:controller] == "sites" && "active"}
             = link_to "Sites", sites_path
-        - if can_index_devices?
+        - if has_access_to_devices_index?
           %li{:class => params[:controller] == "devices" && "active"}
             = link_to "Devices", devices_path
-        - if can_index_device_models?
+        - if has_access_to_device_models_index?
           %li{:class => params[:controller] == "device_models" && "active"}
             = link_to "Models", device_models_path
         %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
