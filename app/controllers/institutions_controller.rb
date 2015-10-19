@@ -96,7 +96,7 @@ class InstitutionsController < ApplicationController
   private
 
   def load_institutions
-    @institutions = check_access(Institution, READ_INSTITUTION)
+    @institutions = check_access(Institution, READ_INSTITUTION) || []
   end
 
   def institution_params
