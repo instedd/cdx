@@ -1,9 +1,4 @@
 module TestResultsHelper
-  def format_datetime(value)
-    return nil unless value
-    Time.parse(value).strftime("%Y-%m-%d %H:%M")
-  end
-
   def order_by_column(title, field)
     desc_field = "-#{field}"
     link_order_by = @order_by == field ? desc_field : field
@@ -33,7 +28,12 @@ module TestResultsHelper
         results.join(", ")
       end
     when "test.start_time", "test.end_time"
-      format_datetime(value)
+      time_zone = current_user.time_zone
+      if current_user.timestamps_in_device_time_zone && (test_device = test["device"]) && (device = @devices_by_uuid[test_device["uuid"]]) && (device_time_zone = device.time_zone)
+        time_zone = device_time_zone
+      end
+
+      format_datetime(value, time_zone)
     else
       value
     end

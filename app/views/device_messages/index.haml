@@ -12,7 +12,7 @@
         %th Raw message
       - @messages.each do |message|
         %tr
-          %td= message.created_at.in_time_zone(@device.time_zone).strftime('%Y-%m-%d %H:%M:%S')
+          %td= format_datetime(message.created_at.in_time_zone(@device.time_zone))
           %td
             - if message.index_failed
               Failed

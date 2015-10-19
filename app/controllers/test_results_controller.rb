@@ -72,5 +72,6 @@ class TestResultsController < ApplicationController
 
   def load_filter_resources
     @institutions, @sites, @devices = Policy.condition_resources_for(QUERY_TEST, TestResult, current_user).values
+    @devices_by_uuid = @devices.index_by &:uuid
   end
 end

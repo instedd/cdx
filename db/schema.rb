@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151008205841) do
+ActiveRecord::Schema.define(version: 20151016143640) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -104,8 +104,8 @@ ActiveRecord::Schema.define(version: 20151008205841) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",      limit: 4
-    t.boolean  "supports_activation"
     t.datetime "published_at"
+    t.boolean  "supports_activation"
   end
 
   add_index "device_models", ["published_at"], name: "index_device_models_on_published_at", using: :btree
@@ -289,26 +289,29 @@ ActiveRecord::Schema.define(version: 20151008205841) do
   add_index "test_results", ["uuid"], name: "index_test_results_on_uuid", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  limit: 255, default: "", null: false
-    t.string   "encrypted_password",     limit: 255, default: "", null: false
-    t.string   "reset_password_token",   limit: 255
+    t.string   "email",                          limit: 255, default: "",    null: false
+    t.string   "encrypted_password",             limit: 255, default: "",    null: false
+    t.string   "reset_password_token",           limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          limit: 4,   default: 0,  null: false
+    t.integer  "sign_in_count",                  limit: 4,   default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip",     limit: 255
-    t.string   "last_sign_in_ip",        limit: 255
-    t.string   "confirmation_token",     limit: 255
+    t.string   "current_sign_in_ip",             limit: 255
+    t.string   "last_sign_in_ip",                limit: 255
+    t.string   "confirmation_token",             limit: 255
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
-    t.string   "unconfirmed_email",      limit: 255
-    t.integer  "failed_attempts",        limit: 4,   default: 0,  null: false
-    t.string   "unlock_token",           limit: 255
+    t.string   "unconfirmed_email",              limit: 255
+    t.integer  "failed_attempts",                limit: 4,   default: 0,     null: false
+    t.string   "unlock_token",                   limit: 255
     t.datetime "locked_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "password_changed_at"
+    t.string   "locale",                         limit: 255, default: "en"
+    t.boolean  "timestamps_in_device_time_zone",             default: false
+    t.string   "time_zone",                      limit: 255, default: "UTC"
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree

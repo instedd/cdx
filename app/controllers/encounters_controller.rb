@@ -160,7 +160,7 @@ class EncountersController < ApplicationController
     if test_result.sample
       json.sample_entity_id test_result.sample.entity_id
     end
-    json.start_time(test_result.core_fields[TestResult::START_TIME_FIELD].try { |d| d.strftime('%B %e, %Y') })
+    json.start_time(format_datetime(test_result.core_fields[TestResult::START_TIME_FIELD]))
 
     json.assays test_result.core_fields[TestResult::ASSAYS_FIELD] do |assay|
       json.name assay['name']
