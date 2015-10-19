@@ -27,7 +27,7 @@ class InstitutionsController < ApplicationController
     @can_delete = has_access?(@institution, "cdpx:deleteInstitution")
 
     if @institutions.one?
-      @can_create = true
+      @can_create = has_access?(Institution, CREATE_INSTITUTION)
     end
   end
 
