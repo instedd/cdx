@@ -5,8 +5,9 @@ describe DevicesController do
   let(:institution) {Institution.make}
   let(:user) {institution.user}
   let(:site) {institution.sites.make}
-  let(:device_model) {DeviceModel.make}
-  let(:device) {Device.make institution: institution, site: site, device_model: device_model}
+  let(:manifest) {Manifest.make}
+  let(:device_model) {manifest.device_model}
+  let!(:device) {Device.make institution: institution, site: site, device_model: device_model}
 
   before(:each) {sign_in user}
 

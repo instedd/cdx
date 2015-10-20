@@ -138,7 +138,7 @@ class DevicesController < ApplicationController
     respond_to do |format|
       if @token.save
         format.js
-        format.json { render action: 'show', location: @device }
+        format.json { render json: @token }
       else
         format.js
         format.json { render json: @token.errors, status: :unprocessable_entity }

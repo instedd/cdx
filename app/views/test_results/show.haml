@@ -21,10 +21,11 @@
         %br
         %span= format_datetime(@test_result.core_fields[TestResult::START_TIME_FIELD])
       - c.bottom do
-        Patient
-        -# TODO add link to patient
-        = @test_result.patient.plain_sensitive_data['name']
-        %br
+        - if @test_result.patient
+          Patient
+          -# TODO add link to patient
+          = @test_result.patient.plain_sensitive_data['name']
+          %br
         Test performed on
         = link_to @test_result.device.name, edit_device_path(@test_result.device)
         by
@@ -64,17 +65,16 @@
     .col.wrap-text
       .value= field.humanize(@test_result.core_field_value(field))
 
-.row
-  .col.pe-2
-    %label Sample
-  .col
-    -# TODO add print button
-    .value= @sample_id
-    %br
-    %br
-    = raw @sample_id_barcode.to_html
-
-
+- if @sample_id
+  .row
+    .col.pe-2
+      %label Sample
+    .col
+      -# TODO add print button
+      .value= @sample_id
+      %br
+      %br
+      = raw @sample_id_barcode.to_html
 
 .row
   .col.pe-2

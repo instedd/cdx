@@ -27,6 +27,7 @@ class ActiveRecord::Reflection::AssociationReflection
 end
 
 RSpec.configure do |config|
+  config.render_views
   config.infer_spec_type_from_file_location!
   # ## Mock Framework
   #

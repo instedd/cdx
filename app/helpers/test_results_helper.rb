@@ -21,7 +21,7 @@ module TestResultsHelper
     value = test_value(test, path)
     case path
     when "test.assays"
-      results = test["test"]["assays"].map {|assay| "#{assay["name"]}: #{assay["result"]}"}
+      results = (test["test"]["assays"] || []).map {|assay| "#{assay["name"]}: #{assay["result"]}"}
       if web
         results.join("<br>").html_safe
       else
