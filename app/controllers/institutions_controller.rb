@@ -13,6 +13,7 @@ class InstitutionsController < ApplicationController
       else
         redirect_to new_institution_path
       end
+    end
   end
 
   def edit
