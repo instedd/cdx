@@ -1,9 +1,11 @@
 // =============================================================================
 // GLOBAL
 // =============================================================================
+h1, h2, h3, h4, h5 {
+  font-family: $sanstitle;
+}
 
 h1 {
-  font-family: $sanstitle;
   font-size: 220%;
   font-weight: 300;
   color: $gray3;
@@ -12,7 +14,10 @@ h1 {
     color: $gray4;
   }
 }
-
+h2 {
+  font-size: 180%;
+  font-weight: 300;
+}
 a {
   color: $blue;
 }
@@ -77,3 +82,15 @@ a[title="Back"] {
   margin-top: 30px;
 }
 
+.box {
+  background: $white;
+  padding: 25px;
+
+  &.small {
+    padding: 10px;
+  }
+
+  &.big {
+    padding: 65px;
+  }
+}

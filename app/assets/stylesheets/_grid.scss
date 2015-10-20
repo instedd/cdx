@@ -8,6 +8,10 @@
   @include flexbox();
   @include clearfix();
   flex-direction: row;
+
+  &.center {
+    @include justify-content(center);
+  }
 }
 
 /* default for even distribution */
@@ -99,14 +103,8 @@
     @include flex(0 0 1000px);
   }
 
-  > .row > .col {
-    // margin-left: -$col-padd;
-  }
-}
 
-// form > .row > .col:first-child {
-//   margin-left: -$col-padd;
-// }
+}
 
 
 
