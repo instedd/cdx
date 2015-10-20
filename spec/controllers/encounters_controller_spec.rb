@@ -23,6 +23,8 @@ RSpec.describe EncountersController, type: :controller do
       encounter = Encounter.make institution: i1
       get :show, id: encounter.id
       expect(response).to have_http_status(:success)
+
+      expect(assigns[:can_update]).to be_falsy
     end
 
     it "returns http forbidden if not allowed" do
@@ -42,7 +44,8 @@ RSpec.describe EncountersController, type: :controller do
       encounter = Encounter.make institution: i1
       get :show, id: encounter.id
 
-      expect(response).to redirect_to(edit_encounter_path(encounter))
+      expect(response).to have_http_status(:success)
+      expect(assigns[:can_update]).to be_truthy
     end
   end
 
@@ -129,6 +132,57 @@ RSpec.describe EncountersController, type: :controller do
     it "assigns returns a json with encounter id" do
       encounter = Encounter.find(json_response['encounter']['id'])
       expect(encounter).to_not be_nil
+    end
+  end
+
+  describe "PUT update" do
+    let(:encounter) { Encounter.make institution: institution }
+
+    let(:sample) {
+      device = Device.make institution: institution
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
+      Sample.first
+    }
+
+    before(:each) {
+      put :update, id: encounter.id, encounter: {
+        id: encounter.id,
+        institution: { uuid: 'uuid-to-discard' },
+        samples: [{ uuid: sample.uuid }],
+        test_results: [],
+        assays: [{condition: 'mtb', result: 'positive', quantitative: 3}],
+        observations: 'Lorem ipsum',
+      }.to_json
+
+      sample.reload
+
+      encounter.reload
+    }
+
+    let(:json_response) { JSON.parse(response.body) }
+
+    it "succeed" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "assigns samples" do
+      expect(sample.encounter).to eq(encounter)
+    end
+
+    it "assigns assays" do
+      expect(encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative' => 3}])
+    end
+
+    it "assigns observations" do
+      expect(encounter.core_fields[Encounter::OBSERVATIONS_FIELD]).to eq('Lorem ipsum')
+    end
+
+    it "assigns returns a json status ok" do
+      expect(json_response['status']).to eq('ok')
+    end
+
+    it "assigns returns a json status ok" do
+      expect(json_response['encounter']['id']).to eq(encounter.id)
     end
   end
 
@@ -320,6 +374,30 @@ RSpec.describe EncountersController, type: :controller do
       expect(json_response['encounter']['samples'].count).to eq(1)
     end
 
+    it "can use existing encounter to add sample" do
+      encounter = Encounter.make institution: institution
+      device = Device.make institution: institution
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'})
+      sample_a, sample_b = Sample.all.to_a
+      encounter.add_sample_uniq sample_a
+      encounter.save!
+
+      put :add_sample, sample_uuid: sample_b.uuid, encounter: {
+        id: encounter.id,
+        institution: { uuid: institution.uuid },
+        samples: [{uuid: sample_a.uuid}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['samples'].count).to eq(2)
+      expect(json_response['encounter']['samples'][0]).to include(sample_json(sample_a))
+      expect(json_response['encounter']['samples'][1]).to include(sample_json(sample_b))
+    end
   end
 
   describe "PUT #add_test" do

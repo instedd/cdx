@@ -22,17 +22,23 @@ class EncountersController < ApplicationController
   def show
     @encounter = Encounter.find(params[:id])
     return unless authorize_resource(@encounter, READ_ENCOUNTER)
-    if Policy.can?(UPDATE_ENCOUNTER, @encounter, current_user, @current_user_policies)
-      redirect_to edit_encounter_path(@encounter)
-      return
-    end
     @encounter_as_json = as_json_edit(@encounter).attributes!
+    @can_update = has_access?(@encounter, UPDATE_ENCOUNTER)
   end
 
   def edit
     @encounter = Encounter.find(params[:id])
     return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
     @encounter_as_json = as_json_edit(@encounter).attributes!
+  end
+
+  def update
+    perform_encounter_action do
+      prepare_encounter_from_json
+      return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
+      raise "encounter.id does not match" if params[:id].to_i != @encounter.id
+      @encounter.save!
+    end
   end
 
   def search_sample
@@ -82,11 +88,16 @@ class EncountersController < ApplicationController
   end
 
   def prepare_encounter_from_json
-    @encounter = Encounter.new
-
     encounter_param = JSON.parse(params[:encounter])
-    @institution = institution_by_uuid(encounter_param['institution']['uuid'])
-    @encounter.institution = @institution
+    @encounter = encounter_param['id'] ? Encounter.find(encounter_param['id']) : Encounter.new
+
+    if @encounter.new_record?
+      @institution = institution_by_uuid(encounter_param['institution']['uuid'])
+      @encounter.institution = @institution
+    else
+      @institution = @encounter.institution
+    end
+
     encounter_param['samples'].each do |sample_param|
       add_sample_by_uuid sample_param['uuid']
     end
