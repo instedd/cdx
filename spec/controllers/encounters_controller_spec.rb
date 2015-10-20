@@ -23,6 +23,8 @@ RSpec.describe EncountersController, type: :controller do
       encounter = Encounter.make institution: i1
       get :show, id: encounter.id
       expect(response).to have_http_status(:success)
+
+      expect(assigns[:can_update]).to be_falsy
     end
 
     it "returns http forbidden if not allowed" do
@@ -42,7 +44,8 @@ RSpec.describe EncountersController, type: :controller do
       encounter = Encounter.make institution: i1
       get :show, id: encounter.id
 
-      expect(response).to redirect_to(edit_encounter_path(encounter))
+      expect(response).to have_http_status(:success)
+      expect(assigns[:can_update]).to be_truthy
     end
   end
 

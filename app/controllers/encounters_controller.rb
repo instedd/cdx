@@ -22,11 +22,8 @@ class EncountersController < ApplicationController
   def show
     @encounter = Encounter.find(params[:id])
     return unless authorize_resource(@encounter, READ_ENCOUNTER)
-    if Policy.can?(UPDATE_ENCOUNTER, @encounter, current_user, @current_user_policies) && params[:mode] != 'show'
-      redirect_to edit_encounter_path(@encounter)
-      return
-    end
     @encounter_as_json = as_json_edit(@encounter).attributes!
+    @can_update = has_access?(@encounter, UPDATE_ENCOUNTER)
   end
 
   def edit

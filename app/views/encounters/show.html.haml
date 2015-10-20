@@ -6,3 +6,8 @@
       Encounter
 
 = react_component('EncounterShow', encounter: @encounter_as_json)
+
+- if @can_update
+  .row
+    .col
+      = link_to 'Edit', edit_encounter_path(@encounter), class: 'btn-primary'
