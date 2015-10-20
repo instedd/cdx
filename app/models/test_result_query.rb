@@ -68,7 +68,7 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
 
   def conditions_for(computed_policy, preloaded_uuids)
     Hash[computed_policy.conditions.map do |field, value|
-      ["#{field}.uuid", preloaded_uuids[field][value]] unless value.nil?
+      ["#{field}.uuid", preloaded_uuids[field][value.to_i]] unless value.nil?
     end.compact]
   end
 
@@ -76,7 +76,7 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
     resource_ids = Hash.new { |h,k| h[k] = Set.new }
     (policies + policies.map(&:exceptions).flatten).each do |policy|
       policy.conditions.each do |field, value|
-        resource_ids[field] << value
+        resource_ids[field] << value.to_i
       end
     end
 

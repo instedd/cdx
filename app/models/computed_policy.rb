@@ -192,11 +192,11 @@ class ComputedPolicy < ActiveRecord::Base
       attrs = {
         action: action == '*' ? nil : action,
         resource_type: resource_type,
-        resource_id: resource_id.try(:to_i)
+        resource_id: resource_id(resource_id, resource_type)
       }
 
       ComputedPolicy::CONDITIONS.each do |condition|
-        attrs["condition_#{condition}_id".to_sym] = filters[condition.to_s].try(:to_i)
+        attrs["condition_#{condition}_id".to_sym] = condition_value(filters, condition)
       end
 
       attrs
@@ -224,28 +224,75 @@ class ComputedPolicy < ActiveRecord::Base
       catch(:empty_intersection) do
         intersection = Hash.new
         conditions_attributes = ComputedPolicy::CONDITIONS.map{|condition| "condition_#{condition}_id".to_sym}
+        resource_type_1 = p1[:resource_type]
+        resource_type_2 = p2[:resource_type]
         ([:resource_id, :resource_type, :action] + conditions_attributes).each do |key|
-          intersection[key] = intersect_attribute(p1[key], p2[key])
+          intersection[key] = intersect_attribute(p1[key], p2[key], key, resource_type_1, resource_type_2)
         end
         intersection[:exceptions_attributes] = ((p1[:exceptions_attributes] || []) | (p2[:exceptions_attributes] || []))
         return intersection
       end
     end
 
-    def intersect_attribute(attr1, attr2)
+    def intersect_attribute(attr1, attr2, key, resource_type_1, resource_type_2)
       if attr1.nil? || attr2.nil?
-        attr1 || attr2
-      elsif attr1 == attr2
-        attr1
-      else
-        throw(:empty_intersection)
+        return attr1 || attr2
       end
+
+      if attr1.to_s == attr2.to_s
+        return attr1
+      end
+
+      if (key == :resource_id && resource_type_1 == "site" && resource_type_2 == "site") || key == :condition_site_id
+        # Special case: when interescting site prefixes the result is the longest,
+        # if one is a prefix of the other.
+        #   - 1.2 | 1 -> 1.2
+        #   - 1.2.3 | 1.2 -> 1.2.3
+        #   - 1.2 | 3.4 -> :empty_intersection
+        attr1 = attr1.to_s
+        attr2 = attr2.to_s
+
+        if attr1.starts_with?(attr2)
+          return attr1
+        elsif attr2.starts_with?(attr1)
+          return attr2
+        end
+      end
+
+      throw(:empty_intersection)
     end
 
     def compact_policies(computed_policies)
       computed_policies.delete_if do |policy|
         computed_policies.any?{|p| !p.equal?(policy) && p.contains(policy) }
       end
+    end
+
+    def site_prefix(id)
+      @site_id_to_prefix ||= {}
+      @site_id_to_prefix[id] ||= Site.find(id).prefix
+    end
+
+    def resource_id(id, type)
+      id = id.try(:to_i)
+
+      # For a Site the resource_id need to be its prefix
+      if type == "site" && id
+        id = site_prefix(id)
+      end
+
+      id
+    end
+
+    def condition_value(filters, condition)
+      value = filters[condition.to_s].try(:to_i)
+
+      # For a site, the condition needs to be the prefix
+      if condition == :site && value
+        value = site_prefix(value)
+      end
+
+      value
     end
 
   end
