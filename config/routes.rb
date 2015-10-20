@@ -21,13 +21,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :encounters, only: [:new, :create, :edit, :show] do
+  resources :encounters, only: [:new, :create, :edit, :update, :show] do
     collection do
       get :institutions
       get :search_sample
       get :search_test
-      put 'new/sample/:sample_uuid' => 'encounters#add_sample'
-      put 'new/test/:test_uuid' => 'encounters#add_test'
+      put 'add/sample/:sample_uuid' => 'encounters#add_sample'
+      put 'add/test/:test_uuid' => 'encounters#add_test'
     end
   end
   resources :locations, only: [:index, :show]
