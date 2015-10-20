@@ -11,7 +11,7 @@ gem 'awesome_nested_set', '~> 3.0.0.rc.3'
 gem 'csv_builder'
 gem 'decent_exposure'
 gem 'nokogiri'
-gem 'react-rails', git: 'https://github.com/reactjs/react-rails.git', branch: 'master'
+gem 'react-rails'
 gem 'foreman'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
