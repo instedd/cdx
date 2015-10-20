@@ -62,10 +62,16 @@ class ComputedPolicy < ActiveRecord::Base
     query = query.where(delegable: opts[:delegable]) if opts.has_key?(:delegable)
     query = query.where("action = ? OR action IS NULL", action) if action && action != '*'
     query = query.where("resource_id = ? OR resource_id IS NULL", resource_attributes[:id]) if resource_attributes[:id]
+    query = query.where("? LIKE concat(resource_id, '%') OR resource_id IS NULL", "#{resource_attributes[:prefix]}%") if resource_attributes[:prefix]
 
     CONDITIONS.each do |condition|
       if (value = resource_attributes["#{condition}_id".to_sym])
-        query = query.where("condition_#{condition}_id = ? OR condition_#{condition}_id IS NULL", value)
+        if condition == :site
+          # For site we need to do a prefix query
+          query = query.where("? LIKE concat(condition_#{condition}_id, '%') OR condition_#{condition}_id IS NULL", value.to_s)
+        else
+          query = query.where("condition_#{condition}_id = ? OR condition_#{condition}_id IS NULL", value)
+        end
       elsif resource_attributes.has_key?("#{condition}_id".to_sym)
         query = query.where("condition_#{condition}_id IS NULL")
       end
@@ -85,10 +91,23 @@ class ComputedPolicy < ActiveRecord::Base
     else
       resource = resource_or_string
       attrs = { resource_type: resource.resource_type }
-      attrs[:id] = resource.id if resource.respond_to?(:id)
+
+      if resource.is_a?(Site)
+        attrs[:prefix] = resource.prefix
+      elsif resource.respond_to?(:id)
+        attrs[:id] = resource.id
+      end
+
       CONDITIONS.each do |condition|
         key = "#{condition}_id".to_sym
-        attrs[key] = resource.send(key) if resource.respond_to?(key)
+        if resource.respond_to?(key)
+          value = resource.send(key)
+          if condition == :site && value
+            # We need to get the site's prefix
+            value = Site.prefix(value)
+          end
+          attrs[key] = value
+        end
       end
       attrs
     end
@@ -270,7 +289,7 @@ class ComputedPolicy < ActiveRecord::Base
 
     def site_prefix(id)
       @site_id_to_prefix ||= {}
-      @site_id_to_prefix[id] ||= Site.find(id).prefix
+      @site_id_to_prefix[id] ||= Site.prefix(id)
     end
 
     def resource_id(id, type)

@@ -487,6 +487,41 @@ describe Policy do
         assert_can user2, site, DELETE_SITE
       end
     end
+
+    context "with subsites" do
+      let!(:site1) { Site.make }
+      let!(:site11) { Site.make parent_id: site1.id }
+      let!(:site111) { Site.make parent_id: site11.id }
+
+      let!(:device1) { Device.make site_id: site1.id }
+      let!(:device11) { Device.make site_id: site11.id }
+
+      let!(:user2) { User.make }
+
+      it "can access sub-sites" do
+        grant nil, user, site1, READ_SITE
+
+        assert_can user, site1, READ_SITE
+        assert_can user, site11, READ_SITE
+        assert_can user, site111, READ_SITE
+      end
+
+      it "can access sub-sites related to another site" do
+        grant nil, user, site1, READ_SITE
+        grant user, user2, site11, READ_SITE
+
+        assert_cannot user2, site1, READ_SITE
+        assert_can user2, site11, READ_SITE
+        assert_can user2, site111, READ_SITE
+      end
+
+      it "can access sub-site with condition" do
+        grant nil, user, "device?site=#{site1.id}", READ_DEVICE
+
+        assert_can user, device1, READ_DEVICE
+        assert_can user, device11, READ_DEVICE
+      end
+    end
   end
 
   context "Device Model" do

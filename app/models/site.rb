@@ -61,6 +61,10 @@ class Site < ActiveRecord::Base
     name
   end
 
+  def self.prefix(id)
+    Site.find(id).prefix
+  end
+
   private
 
   def compute_prefix
