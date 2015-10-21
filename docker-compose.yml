@@ -27,7 +27,7 @@ web:
     - redis
   env_file: docker-dev.env
   ports:
-    - 80
+    - 80:80
   volumes_from:
     - sshd
 
