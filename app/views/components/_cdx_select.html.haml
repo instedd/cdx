@@ -1,0 +1,3 @@
+- field_name = ActionView::Helpers::Tags::TextField.new(cdx_select[:form].object_name, cdx_select[:name], cdx_select[:form], {}).send :tag_name
+- field_value = cdx_select[:value] || cdx_select[:form].object.send(cdx_select[:name])
+= react_component('CdxSelect', name: field_name, items: cdx_select[:items], value: field_value)

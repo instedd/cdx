@@ -7,12 +7,14 @@
     .col.pe-2
       = f.label :locale
     .col
-      = f.select :locale, @locales, {}, class: "ddown"
+      = cdx_select form: f, name: :locale do |select|
+        - select.items(@locales, :second, :first)
   .row
     .col.pe-2
       = f.label :time_zone
     .col
-      = f.time_zone_select :time_zone, nil, {}, class: "ddown"
+      = cdx_select form: f, name: :time_zone do |select|
+        - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
   .row
     .col.pe-2
       = f.label :timestamps_in_device_time_zone, "Show test results timestamps relative to"
