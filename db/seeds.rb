@@ -6,7 +6,7 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-if ENV['USE_DEMO_DATA'] || Settings.use_demo_data
+if ENV['USE_DEMO_DATA'] || Settings.use_demo_data || Rails.env.test?
   user = User.create!email: "demo-user@demo.com", password: '11111111', password_confirmation: '11111111',  confirmed_at: Time.now
   institution = Institution.create! user_id: user.id, name: 'demo-institution'
   site =  Site.create! institution: institution, name: 'demo-site'
