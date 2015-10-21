@@ -51,7 +51,6 @@ module DemoData
       data.sub! '{decimal}', Faker::Number.between(0, 100).to_s
     end
 
-
     if data.include?('{start_datetime}') 
       #note: end date is the last demo sample , for the sample end time just add 1 minute to the start date for now
       start_datetime = Time.now() if start_datetime.to_s.length==0 
