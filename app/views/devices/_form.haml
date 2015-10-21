@@ -6,7 +6,7 @@
           - @device.errors.full_messages.each do |msg|
             %li= msg
 
-  = render 'shared/select_institution_or_hidden', f: f, select_class: ''
+  = render 'shared/select_institution_or_hidden', f: f
 
   .row
     .col.pe-2
@@ -57,5 +57,3 @@
         )
         selected_device_model_id = device_model_id
   )
-
-

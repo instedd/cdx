@@ -1,4 +1,3 @@
-- select_class ||= 'ddown'
 .row
   - if @institutions.one?
     = f.hidden_field :institution_id
@@ -7,7 +6,8 @@
       .col.pe-2
         = f.label :institution
       .col
-        = f.collection_select :institution_id, @institutions, :id, :name, {}, class: select_class
+        = cdx_select form: f, name: :institution_id, class: 'input-x-large' do |select|
+          - select.items @institutions, :id, :name
     - else
       .col.pe-2
         %label Institution
