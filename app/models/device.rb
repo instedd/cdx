@@ -31,7 +31,7 @@ class Device < ActiveRecord::Base
 
   delegate :current_manifest, to: :device_model
 
-  CUSTOM_FIELD_TARGETS = ["patient.id", "sample.id"]
+  CUSTOM_FIELD_TARGETS = ["patient.id", "sample.id", "encounter.id"]
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
