@@ -48,17 +48,17 @@
 
 .btn-primary {
   @extend .btn;
-  background: $red;
+  background: $blue;
   color: $white;
 
   &:hover,
   &:focus {
-    background: darken($red, 5%);
+    background: darken($blue, 5%);
   }
 
   &:active,
   &.active {
-    background: darken($red, 10%);
+    background: darken($blue, 10%);
   }
 
   &.disabled,
@@ -90,7 +90,7 @@
 
 .btn-add, .btn-add-secondary {
   border-radius: 50%;
-  background: $red;
+  background: $blue;
   font-size: 150%;
   font-weight: 300;
   color: $white;
