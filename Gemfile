@@ -22,6 +22,7 @@ gem 'barby'
 gem 'gon'
 gem 'rchardet'
 gem 'therubyracer'
+gem 'd3_rails'
 
 gem 'cdx', path: '.'
 gem 'cdx-api-elasticsearch', path: '.'

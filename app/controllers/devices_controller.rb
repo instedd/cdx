@@ -172,7 +172,14 @@ class DevicesController < ApplicationController
   end
 
   def performance
-    render layout: false
+    @device = Device.find(params[:id])
+    return unless authorize_resource(@device, READ_DEVICE)
+    since = (Date.today - 1.year).iso8601
+
+    @tests_histogram = query_tests_histogram
+    @tests_by_name = query_tests_by_name
+
+    render layout: false if request.xhr?
   end
 
   def tests
@@ -224,6 +231,40 @@ class DevicesController < ApplicationController
       if custom_mappings = params[:device][:custom_mappings]
         whitelisted[:custom_mappings] = custom_mappings.select { |k, v| v.present? }
       end
+    end
+  end
+
+  def query_tests_histogram
+    query = {
+      "group_by" => "month(test.reported_time)",
+      "since" => (Date.today - 1.year).iso8601
+    }
+    result = TestResult.query(query, current_user).execute
+    result = Hash[result["tests"].map { |i| [i["test.reported_time"], i["count"]] }]
+
+    tests_histogram = []
+    11.downto(0).each do |i|
+      date = Date.today - i.months
+      date_key = date.strftime("%Y-%m")
+      tests_histogram << {
+        label: "#{I18n.t("date.abbr_month_names")[date.month]}#{date.month == 1 ? " #{date.strftime("%y")}" : ""}",
+        value: result[date_key] || 0
+      }
+    end
+    tests_histogram
+  end
+
+  def query_tests_by_name
+    query = {
+      "group_by" => "test.name",
+      "since" => (Date.today - 1.year).iso8601
+    }
+    result = TestResult.query(query, current_user).execute
+    result["tests"].map do |test|
+      {
+        label: test["test.name"],
+        value: test["count"]
+      }
     end
   end
 end
