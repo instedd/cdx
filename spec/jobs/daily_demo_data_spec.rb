@@ -4,7 +4,11 @@ require 'sidekiq/testing'
 Sidekiq::Testing.fake!
 
 describe DailyDemoData do
-
+  
+  before(:each) do
+    load "#{Rails.root}/db/seeds.rb" 
+  end
+    
   let(:worker) { DailyDemoData.new }
   
   describe '#perform' do
@@ -12,18 +16,18 @@ describe DailyDemoData do
       ENV['USE_DEMO_DATA']='true'
 
       allow(worker).to receive("get_repeat_demo_per_device").and_return(4)
-      expect(TestResult.count).to be(0)  
+      expect(TestResult.count).to eq(0)  
       worker.perform
-      expect(TestResult.count).to be(4)  
+      expect(TestResult.count).to eq(4)  
     end
     
     it "generates no demo data when disabled" do      
       ENV['USE_DEMO_DATA']=nil
 
       allow(worker).to receive("get_repeat_demo_per_device").and_return(4)
-      expect(TestResult.count).to be(0)  
+      expect(TestResult.count).to eq(0)  
       worker.perform
-      expect(TestResult.count).to be(0)  
+      expect(TestResult.count).to eq(0)  
       end
       
   end
