@@ -67,11 +67,11 @@ module ApplicationHelper
     end
   end
 
-  define_component :cdx_select, attributes: [:form, :name, :value]
+  define_component :cdx_select, attributes: [:form, :name, :value, :class]
   ViewComponents::ComponentsBuilder::Component.classes[:cdx_select].class_eval do
     def item(value, label)
       @data[:items] ||= []
-      @data[:items] << {value: value, label: label}
+      @data[:items] << {value: value.to_s, label: label}
     end
 
     def items(values, value_attr = nil, label_attr = nil)

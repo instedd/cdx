@@ -7,19 +7,22 @@
     .col.pe-2
       = f.label :locale
     .col
-      = cdx_select form: f, name: :locale do |select|
+      = cdx_select form: f, name: :locale, class: 'input-xx-large' do |select|
         - select.items(@locales, :second, :first)
   .row
     .col.pe-2
       = f.label :time_zone
     .col
-      = cdx_select form: f, name: :time_zone do |select|
+      = cdx_select form: f, name: :time_zone, class: 'input-xx-large' do |select|
         - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
   .row
     .col.pe-2
       = f.label :timestamps_in_device_time_zone, "Show test results timestamps relative to"
     .col
-      = f.select :timestamps_in_device_time_zone, [["My time zone", false], ["The device time zone", true]], {}, class: "ddown"
+      = cdx_select form: f, name: :timestamps_in_device_time_zone, class: 'input-xx-large' do |select|
+        - select.item false, "My time zone"
+        - select.item true, "The device time zone"
+
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
