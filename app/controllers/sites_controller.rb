@@ -19,6 +19,7 @@ class SitesController < ApplicationController
 
   def new
     @site = Site.new
+    @sites = check_access(Site, READ_SITE)
     prepare_for_institution_and_authorize(@site, CREATE_INSTITUTION_SITE)
   end
 
@@ -112,6 +113,6 @@ class SitesController < ApplicationController
     location_details = Location.details(params[:site][:location_geoid]).first
     params[:site][:lat] = location_details.lat
     params[:site][:lng] = location_details.lng
-    params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid)
+    params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :parent_id)
   end
 end
