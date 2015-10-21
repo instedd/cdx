@@ -83,6 +83,8 @@ gem 'dotiw'
 gem 'rails-i18n', '~> 4.0.0'
 gem 'doorkeeper'
 
+gem 'faker'
+
 group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rescue'
@@ -95,7 +97,6 @@ group :test do
   gem 'test-unit'
   gem 'tire'
   # gem 'factory_girl_rails'
-  gem 'faker'
   gem 'machinist', '~> 1.0'
   gem 'capybara'
   gem 'guard-rspec'
