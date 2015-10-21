@@ -1,4 +1,4 @@
-require 'Faker'
+require 'faker'
 
 class Api::MessagesController < ApiController
   include DemoData
