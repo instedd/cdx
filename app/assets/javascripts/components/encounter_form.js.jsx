@@ -127,34 +127,35 @@ var EncounterForm = React.createClass({
 
     if (this.state.encounter.assays.length > 0) {
       diagnosisEditor = (
-        <div className="col assays-editor">
-          {this.state.encounter.assays.map(function(assay, index){
-            return (
-              <div className="row" key={index}>
-                <div className="col pe-4">
-                  <div className="underline">
-                    <span>{assay.condition.toUpperCase()}</span>
+        <div className="row">
+          <div className="col pe-2">
+            <label>Diagnosis</label>
+          </div>
+
+          <div className="col assays-editor">
+            {this.state.encounter.assays.map(function(assay, index){
+              return (
+                <div className="row" key={index}>
+                  <div className="col pe-4">
+                    <div className="underline">
+                      <span>{assay.condition.toUpperCase()}</span>
+                    </div>
+                  </div>
+                  <div className="col pe-3">
+                    <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} />
+                  </div>
+                  <div className="col pe-1">
+                    <input type="text" className="quantitative" value={assay.quantitative} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative')} />
                   </div>
                 </div>
-                <div className="col pe-3">
-                  <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} />
-                </div>
-                <div className="col pe-1">
-                  <input type="text" className="quantitative" value={assay.quantitative} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative')} />
-                </div>
-              </div>
-            );
-          }.bind(this))}
+              );
+            }.bind(this))}
 
-          <textarea value={this.state.encounter.observations} placeholder="Observations" onChange={this.encounterChanged('observations')} />
+            <textarea value={this.state.encounter.observations} placeholder="Observations" onChange={this.encounterChanged('observations')} />
+          </div>
         </div>);
     } else {
-      diagnosisEditor = (
-        <div className="col">
-          <i>
-            <a href="#" onClick={this.showSamplesModal}>Add samples</a> or <a href="#" onClick={this.showTestsModal}>tests</a> to edit the diagnosis associated with the encounter
-          </i>
-        </div>);
+      diagnosisEditor = null;
     }
 
 
@@ -164,18 +165,14 @@ var EncounterForm = React.createClass({
           <PatientCard patient={this.state.encounter.patient} />
         </FlexFullRow>
 
-        <div className="row">
-          <div className="col pe-2">
-            <label>Diagnosis</label>
-          </div>
-          {diagnosisEditor}
-        </div>
+        {diagnosisEditor}
 
         <div className="row">
           <div className="col pe-2">
             <label>Samples</label>
             <p>
-              <a className="btn-add btn-add-secondary" href='#' onClick={this.showSamplesModal}>+</a>
+              <a className="btn-href" href='#' onClick={this.showSamplesModal}><span className="icon-add"></span> Append sample</a>
+
             </p>
           </div>
           <div className="col">
@@ -196,7 +193,7 @@ var EncounterForm = React.createClass({
         <div className="row">
           <div className="col">
             <TestResultsList testResults={this.state.encounter.test_results} /><br/>
-            <a className="btn-add btn-add-secondary" href='#' onClick={this.showTestsModal}>+</a>
+            <a className="btn-href"  href='#' onClick={this.showTestsModal}><span className="icon-add"></span> Add tests</a>
           </div>
 
           <Modal ref="testsModal">

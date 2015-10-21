@@ -111,13 +111,20 @@
   background: $black;
 }
 
-
 .btn-link {
   @extend .btn;
   color: $gray3;
   padding: 5px;
   height: auto;
   line-height: inherit;
+}
+
+.btn-href {
+  display: inline-block;
+  color: inherit;
+  line-height: inherit;
+  padding: 5px;
+  white-space: nowrap;
 }
 
 .pager {
