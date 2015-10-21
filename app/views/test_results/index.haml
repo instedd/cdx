@@ -70,6 +70,17 @@
         %span
           of
           = (@total.to_f / @page_size).ceil
-        %select.ddown(name="page_size" onchange="this.form.submit()")
-          = options_for_page_sizes
+        %span(style="display: inline-block;")
+          = cdx_select name: "page_size", value: @page_size, class: 'input-x-large' do |select|
+            - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
+        :javascript
+          $(function(){
+            $(document).on('change', 'input[name=page_size]', function(){
+              var form = this.form;
+              window.setTimeout(function(){
+                form.submit();
+              }, 0);
+            });
+          })
+
         = link_to "download CSV", csv_test_results_path(@filter)

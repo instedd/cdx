@@ -5,6 +5,10 @@ var CdxSelect = React.createClass({
     };
   },
 
+  onChange: function(newValue) {
+    $('input:hidden', this.getDOMNode()).trigger('change');
+  },
+
   render: function() {
     var placeholder = "Select..."
     if (this.props.items.length > 0 && this.props.items[0].value === "") {
@@ -16,7 +20,8 @@ var CdxSelect = React.createClass({
       value={this.props.value}
       options={this.props.items}
       placeholder={placeholder}
-      clearable={false}>
+      clearable={false}
+      onChange={this.onChange}>
     </Select>);
   }
 });
