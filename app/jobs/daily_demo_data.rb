@@ -1,19 +1,22 @@
-class DemoDailyData
+class DailyDemoData
   include Sidekiq::Worker
   include DemoData
 
+  #just paste here, we can move this value into an env setting once we start to use this tool 
+  def get_repeat_demo_per_device
+      1000
+  end
+  
 ##
 # Note: it is assumed that rake demodata:generate has been called to load the seeds data generated.
 #
 # if say 1000 daily testresults are needed per device, then loop over the device templates (only two at the moment)
-
   def perform   
 
     #in case a job is stuck in the redis queue double check again it is not supposed to run to be 100% sure for production!
     # and check seed data is intialised
     if use_demo_data? and demo_seed_data?
-
-       repeat_demo_per_device =1000; #we can move this value into an env setting once we start to use this tool
+      repeat_demo_per_device =get_repeat_demo_per_device;    
       
       #use the demo templates in db/seeds/manifests_demo_template
       device_list =[ {device: 'demo-device_cepheid', template: 'cepheid.json'},{device: 'demo-device1_fifo', template: 'fio.xml'}]   
@@ -48,6 +51,8 @@ class DemoDailyData
 
 
 private
+
+  
   ##
   # basic check if see if demo seed data has been entered by the rake command demodata:generate
   #
@@ -73,5 +78,5 @@ end
 # note: an alternative gem for scheduling cron jobs could be:  http://github.com/javan/whenever but
 # the advantage of gem "sidekiq-cron" is that it appears in the sidekiq web url , http://localhost:3000/sidekiq/cron
 if use_demo_data?
-  Sidekiq::Cron::Job.create(name: 'Demo Data - daily 1am', cron: '* 1 * * *', klass: 'DemoDailyData')   #run daily 1am
+  Sidekiq::Cron::Job.create(name: 'Demo Data - daily 1am', cron: '* 1 * * *', klass: 'DailyDemoData')   #run daily 1am
 end
