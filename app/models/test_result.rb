@@ -13,7 +13,7 @@ class TestResult < ActiveRecord::Base
   belongs_to :device
   belongs_to :institution
   belongs_to :site
-  belongs_to :sample
+  belongs_to :sample_identifier, inverse_of: :test_results
   belongs_to :patient
   belongs_to :encounter
 
@@ -25,12 +25,13 @@ class TestResult < ActiveRecord::Base
   after_destroy :destroy_from_index
 
   delegate :device_model, :device_model_id, to: :device
+  delegate :sample, to: :sample_identifier, allow_nil: true
 
   def merge(test)
     super
 
     if test.is_a?(TestResult)
-      self.sample_id = test.sample_id unless test.sample_id.blank?
+      self.sample_identifier = test.sample_identifier unless test.sample_identifier.blank?
       self.device_messages |= test.device_messages
     end
 
@@ -61,6 +62,10 @@ class TestResult < ActiveRecord::Base
 
   def self.entity_scope
     "test"
+  end
+
+  def sample_identifiers
+    sample.try(:sample_identifiers) || []
   end
 
   private

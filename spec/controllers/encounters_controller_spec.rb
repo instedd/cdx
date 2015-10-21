@@ -221,7 +221,7 @@ RSpec.describe EncountersController, type: :controller do
       expect(response).to have_http_status(:success)
       json_response = JSON.parse(response.body)
       expect(json_response.length).to eq(1)
-      expect(json_response.first.with_indifferent_access[:entity_id]).to eq("bab")
+      expect(json_response.first.with_indifferent_access[:entity_ids]).to contain_exactly("bab")
     end
 
   end
@@ -269,7 +269,7 @@ RSpec.describe EncountersController, type: :controller do
     let(:test1) { TestResult.make institution: institution, device: Device.make(site: Site.make(institution: institution)) }
 
     it "renders json response with filled encounter and status ok" do
-      put :add_sample, sample_uuid: test1.sample.uuid, encounter: {
+      put :add_sample, sample_uuid: test1.sample.uuids[0], encounter: {
         institution: { uuid: institution.uuid },
         samples: [],
         test_results: [],
@@ -287,9 +287,9 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "does not add sample if present" do
-      put :add_sample, sample_uuid: test1.sample.uuid, encounter: {
+      put :add_sample, sample_uuid: test1.sample.uuids[0], encounter: {
         institution: { uuid: institution.uuid },
-        samples: [{uuid: test1.sample.uuid}],
+        samples: [{uuid: test1.sample.uuids[0]}],
         test_results: [],
       }.to_json
 
@@ -313,7 +313,7 @@ RSpec.describe EncountersController, type: :controller do
 
       put :add_sample, sample_uuid: sample_with_encounter.uuid, encounter: {
         institution: { uuid: institution.uuid },
-        samples: [{uuid: test1.sample.uuid}],
+        samples: [{uuid: test1.sample.uuids[0]}],
         test_results: [{uuid: test1.uuid}],
       }.to_json
 
@@ -457,7 +457,8 @@ RSpec.describe EncountersController, type: :controller do
   def sample_json(sample)
     return {
       uuid: sample.uuid,
-      entity_id: sample.entity_id,
+      uuids: sample.uuids,
+      entity_ids: sample.entity_ids,
     }
   end
 
@@ -476,7 +477,7 @@ RSpec.describe EncountersController, type: :controller do
       },
     }.tap do |res|
       if test_result.sample
-        res.merge! sample_entity_id: test_result.sample.entity_id
+        res.merge! sample_entity_ids: test_result.sample.entity_ids
       end
     end
   end

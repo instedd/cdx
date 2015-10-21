@@ -19,11 +19,15 @@ describe TestResultIndexer, elasticsearch: true do
         "culture_days" => "10"
       }
     }
-    Sample.make(uuid: 'abc', patient: patient, core_fields: sample_core_fields)
+    Sample.make(patient: patient, core_fields: sample_core_fields)
+  end
+
+  let(:sample_identifier) do
+    SampleIdentifier.make(sample: sample, uuid: 'abc')
   end
 
   let(:test){ TestResult.make(
-    "sample" => sample,
+    "sample_identifier" => sample_identifier,
     "patient" => patient,
     "test_id" => '4',
     "core_fields" => {
@@ -70,7 +74,7 @@ describe TestResultIndexer, elasticsearch: true do
         },
         "sample" => {
           "type" => "sputum",
-          "uuid" => 'abc',
+          "uuid" => ['abc'],
           "custom_fields" => {
             "culture_days" => "10",
           }

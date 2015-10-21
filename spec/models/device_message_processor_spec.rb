@@ -140,7 +140,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     expect(Sample.count).to eq(1)
     sample = Sample.first
-    expect(sample.entity_id).to eq(SAMPLE_ID)
+    expect(sample.sample_identifiers.first.entity_id).to eq(SAMPLE_ID)
     assert_sample_data(sample)
   end
 
@@ -175,9 +175,9 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     expect(TestResult.count).to eq(3)
     expect(TestResult.pluck(:test_id)).to match_array([TEST_ID, TEST_ID_2, TEST_ID_3])
-    expect(TestResult.pluck(:sample_id)).to eq([Sample.first.id] * 3)
+    expect(TestResult.all.map(&:sample).map(&:id)).to eq([Sample.first.id] * 3)
 
-    expect(all_elasticsearch_tests.map {|e| e['_source']['sample']['uuid']}).to eq([Sample.first.uuid] * 3)
+    expect(all_elasticsearch_tests.map {|e| e['_source']['sample']['uuid']}).to eq([Sample.first.uuids] * 3)
   end
 
   it "should update sample data and existing test results on new test result" do
@@ -188,12 +188,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
     )
 
     sample = Sample.make(
-      uuid: 'abc', institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood", "id" => SAMPLE_ID},
+      institution: device_message.institution, patient: patient,
+      core_fields: {"type" => "blood"},
     )
 
-    TestResult.create_and_index test_id: TEST_ID_2, sample: sample, patient: patient, device: device
-    TestResult.create_and_index test_id: TEST_ID_3, sample: sample, patient: patient, device: device
+    sample_identifier = SampleIdentifier.make(
+      sample: sample,
+      uuid: 'abc',
+      entity_id: SAMPLE_ID
+    )
+
+    TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
+    TestResult.create_and_index test_id: TEST_ID_3, sample_identifier: sample_identifier, patient: patient, device: device
 
     refresh_index
 
@@ -217,12 +223,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
     )
 
     sample = Sample.make(
-      uuid: 'abc', institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood", "id" => SAMPLE_ID},
+      institution: device_message.institution, patient: patient,
+      core_fields: {"type" => "blood"},
       created_at: 2.years.ago,
     )
 
-    TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
+    sample_identifier = SampleIdentifier.make(
+      sample: sample,
+      uuid: 'abc',
+      entity_id: SAMPLE_ID
+    )
+
+    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
 
     refresh_index
 
@@ -238,12 +250,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
       plain_sensitive_data: {"id" => PATIENT_ID},
     )
     sample = Sample.make(
-      uuid: 'abc', institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood", "id" => SAMPLE_ID},
+      institution: device_message.institution, patient: patient,
+      core_fields: {"type" => "blood"},
     )
 
-    TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
-    TestResult.create_and_index test_id: TEST_ID_2, sample: sample, patient: patient, device: device
+    sample_identifier = SampleIdentifier.make(
+      sample: sample,
+      uuid: 'abc',
+      entity_id: SAMPLE_ID
+    )
+
+    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+    TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
 
     refresh_index
 
@@ -266,12 +284,17 @@ describe DeviceMessageProcessor, elasticsearch: true do
       plain_sensitive_data: {"id" => PATIENT_ID},
     )
     sample = Sample.make(
-      uuid: 'abc', institution: device_message.institution, patient: patient,
+      institution: device_message.institution, patient: patient,
       core_fields: SAMPLE_CORE_FIELDS,
     )
 
-    TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
-    TestResult.create_and_index test_id: TEST_ID_2, sample: sample, patient: patient, device: device
+    sample_identifier = SampleIdentifier.make(
+      sample: sample,
+      uuid: 'abc',
+    )
+
+    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+    TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
 
     refresh_index
 
@@ -286,12 +309,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
   end
 
   it "shouldn't update sample from another institution" do
-    core_fields = {"type" => SAMPLE_TYPE, "custom_fields" => {"hiv" => PATIENT_HIV}, "id" => SAMPLE_ID}
+    core_fields = {"type" => SAMPLE_TYPE, "custom_fields" => {"hiv" => PATIENT_HIV}}
 
     sample = Sample.make(
-      uuid: 'abc',
       core_fields: core_fields,
     )
+
+    sample_identifier = SampleIdentifier.make(
+      sample: sample,
+      uuid: 'abc',
+      entity_id: SAMPLE_ID
+    )
+
     device_message_processor.process
 
     expect(Sample.count).to eq(2)
@@ -321,7 +350,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     # tests.first["_source"]["test"]["custom_fields"]["foo"].should eq("bar")
 
     expect(TestResult.count).to eq(1)
-    expect(TestResult.first.sample_id).to eq(Sample.last.id)
+    expect(TestResult.first.sample).to eq(Sample.last)
     # TestResult.first.custom_fields.should eq("raw_result" => TEST_RAW_RESULT)
     expect(TestResult.first.plain_sensitive_data).to eq("start_time" => TEST_START_TIME)
   end
@@ -356,7 +385,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         test = TestResult.first
         sample = test.sample
-        expect(sample.entity_id).to be_nil
+        expect(sample.sample_identifiers.map(&:entity_id)).to eq([nil])
 
         expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS)
         expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS)
@@ -365,11 +394,17 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should merge sample if test has a sample' do
         sample = Sample.make(
-          uuid: 'abc', institution: device_message.institution,
-          core_fields: {"existing_field" => "a value", "id" => SAMPLE_ID},
+          institution: device_message.institution,
+          core_fields: {"existing_field" => "a value"},
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
+        sample_identifier = SampleIdentifier.make(
+          sample: sample,
+          uuid: 'abc',
+          entity_id: SAMPLE_ID
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, device: device
 
         device_message_processor.process
 
@@ -380,7 +415,9 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS)
         expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS)
-        expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS.merge("existing_field" => "a value"))
+
+        # TODO: Should sample core fields include entity_ids?
+        expect(sample.core_fields).to eq(SAMPLE_CORE_FIELDS.merge("existing_field" => "a value").except("id"))
       end
     end
 
@@ -404,7 +441,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
+        sample_identifier = SampleIdentifier.make(
+          sample: sample
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
 
         device_message_processor.process
 
@@ -431,7 +472,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample = Sample.make patient: patient
 
-        TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
+        sample_identifier = SampleIdentifier.make(
+          sample: sample
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
 
         device_message_processor.process
 
@@ -449,11 +494,17 @@ describe DeviceMessageProcessor, elasticsearch: true do
         patient = Patient.make institution: device_message.institution
 
         sample = Sample.make(
-          uuid: 'abc', institution: device_message.institution, patient: patient,
-          core_fields: {"existing_field" => "a value", "id" => SAMPLE_ID},
+          institution: device_message.institution, patient: patient,
+          core_fields: {"existing_field" => "a value"},
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
+        sample_identifier = SampleIdentifier.make(
+          sample: sample,
+          uuid: 'abc',
+          entity_id: SAMPLE_ID
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
 
         device_message_processor.process
 
@@ -469,11 +520,16 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should create a new sample if the existing sample has a different sample id' do
         sample = Sample.make(
-          uuid: 'abc', institution: device_message.institution,
-          core_fields: {"id" => "def9772"},
+          institution: device_message.institution
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
+        sample_identifier = SampleIdentifier.make(
+          sample: sample,
+          uuid: 'abc',
+          entity_id: "def9772"
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, device: device
 
         device_message_processor.process
 
@@ -486,18 +542,23 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should not destroy existing sample if it has other references' do
         sample = Sample.make(
-          uuid: 'abc', institution: device_message.institution,
-          core_fields: {"id" => "def9772"},
+          institution: device_message.institution
         )
 
-        test_1 = TestResult.create_and_index test_id: TEST_ID_2, sample: sample, device: device
+        sample_identifier = SampleIdentifier.make(
+          sample: sample,
+          uuid: 'abc',
+          entity_id: "def9772"
+        )
+
+        test_1 = TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, device: device
 
         device_message_processor.process
 
         test_2 = TestResult.find_by(test_id: TEST_ID)
 
-        expect(test_1.reload.sample.entity_id).to eq('def9772')
-        expect(test_2.reload.sample.entity_id).to eq(SAMPLE_ID)
+        expect(test_1.reload.sample.sample_identifiers.map(&:entity_id)).to eq(['def9772'])
+        expect(test_2.reload.sample.sample_identifiers.map(&:entity_id)).to eq([SAMPLE_ID])
       end
 
       it "should assign existing sample's patient to the test" do
@@ -506,9 +567,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
           plain_sensitive_data: {"patient_id" => PATIENT_ID},
         )
 
-        Sample.make(
+        sample = Sample.make(
           institution: device_message.institution, patient: patient,
-          core_fields: {"id" => SAMPLE_ID},
+        )
+
+        sample_identifier = SampleIdentifier.make(
+          sample: sample,
+          uuid: 'abc',
+          entity_id: SAMPLE_ID
         )
 
         device_message_processor.process
@@ -537,7 +603,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: nil, device: device, patient: patient
 
         device_message_processor.process
 
@@ -561,10 +627,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample = Sample.make(
           institution: device_message.institution, patient: patient,
-          core_fields: {"id" => SAMPLE_ID},
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
+        sample_identifier = SampleIdentifier.make(
+          sample: sample,
+          entity_id: SAMPLE_ID
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
 
         device_message_processor.process
 
@@ -597,10 +667,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
       it 'should store patient data in patient if sample is present but doest not have a patient' do
         sample = Sample.make(
           institution: device_message.institution,
-          core_fields: {"id" => SAMPLE_ID},
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: sample, device: device
+        sample_identifier = SampleIdentifier.make(
+          sample: sample,
+          entity_id: SAMPLE_ID
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, device: device
 
         device_message_processor.process
 
@@ -631,7 +705,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
         )
 
         TestResult.create_and_index(
-          test_id: TEST_ID, sample: nil, patient: patient, device: device,
+          test_id: TEST_ID, sample_identifier: nil, patient: patient, device: device,
         )
 
         device_message_processor.process
@@ -660,7 +734,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
           plain_sensitive_data: SAMPLE_PII_FIELDS,
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: sample, patient: patient, device: device
+        sample_identifier = SampleIdentifier.make(
+          sample: sample
+        )
+
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
 
         device_message_processor.process
 
@@ -683,7 +761,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: nil, device: device, patient: patient
 
         device_message_processor.process
 
@@ -707,7 +785,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           created_at: 2.years.ago,
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: nil, device: device, patient: patient
 
         device_message_processor.process
 
@@ -728,7 +806,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           plain_sensitive_data: {"id" => "9000"},
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, patient: patient
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: nil, device: device, patient: patient
 
         device_message_processor.process
 
@@ -746,7 +824,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           plain_sensitive_data: {"id" => "9000"},
         )
 
-        test_1 = TestResult.create_and_index test_id: TEST_ID_2, sample: nil, device: device, patient: patient
+        test_1 = TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: nil, device: device, patient: patient
 
         device_message_processor.process
 
@@ -826,7 +904,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
         )
 
-        TestResult.create_and_index test_id: TEST_ID, sample: nil, device: device, encounter: encounter
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: nil, device: device, encounter: encounter
 
         device_message_processor.process
 

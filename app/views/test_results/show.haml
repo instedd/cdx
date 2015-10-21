@@ -65,16 +65,16 @@
     .col.wrap-text
       .value= field.humanize(@test_result.core_field_value(field))
 
-- if @sample_id
+- @samples.each do |sample_id, sample_id_barcode|
   .row
     .col.pe-2
       %label Sample
     .col
       -# TODO add print button
-      .value= @sample_id
+      .value= sample_id
       %br
       %br
-      = raw @sample_id_barcode.to_html
+      = raw sample_id_barcode.to_html
 
 .row
   .col.pe-2

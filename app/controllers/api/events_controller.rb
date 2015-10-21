@@ -18,7 +18,7 @@ class Api::EventsController < ApiController
   end
 
   def custom_fields
-    test = TestResult.includes(:sample).find_by_uuid(params[:id])
+    test = TestResult.includes(sample_identifier: :sample).find_by_uuid(params[:id])
     render_json "uuid" => params[:id], "custom_fields" => test.custom_fields_data
   end
 

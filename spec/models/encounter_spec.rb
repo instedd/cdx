@@ -6,28 +6,28 @@ describe Encounter do
   let(:encounter) { Encounter.make }
 
   it "adds all test_results of sample" do
-    sample = Sample.make
-    test1 = TestResult.make(sample: sample)
-    test2 = TestResult.make(sample: sample)
+    sample_identifier = SampleIdentifier.make
+    test1 = TestResult.make(sample_identifier: sample_identifier)
+    test2 = TestResult.make(sample_identifier: sample_identifier)
 
-    encounter.samples << sample
+    encounter.samples << sample_identifier.sample
 
     expect(encounter.test_results).to eq([test1, test2])
   end
 
   it "adds the sample of the test_result and the rest of the test_results" do
-    sample = Sample.make
-    test1 = TestResult.make(sample: sample)
-    test2 = TestResult.make(sample: sample)
+    sample_identifier = SampleIdentifier.make
+    test1 = TestResult.make(sample_identifier: sample_identifier)
+    test2 = TestResult.make(sample_identifier: sample_identifier)
 
     encounter.test_results << test1
 
-    expect(encounter.samples).to eq([sample])
+    expect(encounter.samples).to eq([sample_identifier.sample])
     expect(encounter.test_results).to eq([test1, test2])
   end
 
-  it "adds single test_result (without sample)" do
-    test1 = TestResult.make(sample: nil)
+  it "adds single test_result (without sample_identifier)" do
+    test1 = TestResult.make(sample_identifier: nil)
 
     encounter.test_results << test1
 
@@ -46,7 +46,7 @@ describe Encounter do
 
   it "assigns patient from test_result" do
     patient = Patient.make
-    test1 = TestResult.make(sample: nil, patient: patient)
+    test1 = TestResult.make(sample_identifier: nil, patient: patient)
 
     encounter.test_results << test1
 

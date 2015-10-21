@@ -43,7 +43,7 @@ class EncountersController < ApplicationController
 
   def search_sample
     @institution = institution_by_uuid(params[:institution_uuid])
-    samples = scoped_samples.where(["entity_id like ?", "%#{params[:q]}%"])
+    samples = scoped_samples.where(["sample_identifiers.entity_id like ?", "%#{params[:q]}%"])
     render json: as_json_samples_search(samples).attributes!
   end
 
@@ -110,12 +110,13 @@ class EncountersController < ApplicationController
   end
 
   def scoped_samples
-    Sample.where("id in (#{authorize_resource(TestResult, QUERY_TEST).select(:sample_id).to_sql})")
+    Sample.where("samples.id in (#{authorize_resource(TestResult, QUERY_TEST).joins(:sample_identifier).select('sample_identifiers.sample_id').to_sql})")
               .where(institution: @institution)
+              .joins(:sample_identifiers)
   end
 
   def add_sample_by_uuid(uuid)
-    @encounter.add_sample_uniq scoped_samples.find_by(uuid: uuid)
+    @encounter.add_sample_uniq scoped_samples.find_by("sample_identifiers.uuid" => uuid)
   end
 
   def scoped_test_results
@@ -170,7 +171,7 @@ class EncountersController < ApplicationController
   end
 
   def as_json_sample(json, sample)
-    json.(sample, :uuid, :entity_id)
+    json.(sample, :uuid, :uuids, :entity_ids)
   end
 
   def as_json_test_results_search(test_results)
@@ -185,7 +186,7 @@ class EncountersController < ApplicationController
     json.(test_result, :uuid, :test_id)
     json.name test_result.core_fields[TestResult::NAME_FIELD]
     if test_result.sample
-      json.sample_entity_id test_result.sample.entity_id
+      json.sample_entity_ids test_result.sample.entity_ids
     end
     json.start_time(format_datetime(test_result.core_fields[TestResult::START_TIME_FIELD]))
 

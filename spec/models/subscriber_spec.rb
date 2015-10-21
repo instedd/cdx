@@ -123,9 +123,10 @@ describe Subscriber, elasticsearch: true do
     )
 
     sample = Sample.make patient: patient
+    sample_identifier = SampleIdentifier.make sample: sample
 
     TestResult.create_and_index(
-      patient: patient, sample: sample,
+      patient: patient, sample_identifier: sample_identifier,
       core_fields: {"assays" => ["result" => "positive", "condition" => "mtb", "name" => "mtb"]},
       device_messages: [device_message]
     )

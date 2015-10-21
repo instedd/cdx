@@ -86,6 +86,7 @@ class TestResultIndexer
         }
       }).
       deep_merge(core_fields_from(test_result.sample)).
+      deep_merge(sample_identifiers).
       deep_merge(core_fields_from(test_result.encounter)).
       deep_merge(core_fields_from(test_result.patient)).
       deep_merge(all_custom_fields)
@@ -93,7 +94,9 @@ class TestResultIndexer
 
   def core_fields_from entity
     if entity && !entity.empty_entity?
-      {entity.entity_scope => entity.core_fields.deep_merge("uuid" => entity.uuid)}
+      fields = entity.core_fields
+      fields = fields.merge("uuid" => entity.uuid) if entity.respond_to?(:uuid)
+      {entity.entity_scope => fields}
     else
       {}
     end
@@ -124,5 +127,14 @@ class TestResultIndexer
       fields[entity.entity_scope] ||= { "custom_fields" => {} }
       fields[entity.entity_scope]["custom_fields"].deep_merge! entity.custom_fields
     end
+  end
+
+  def sample_identifiers
+    sample = {}
+    %W(uuid entity_id).each do |identifier|
+      values = test_result.sample_identifiers.map(&identifier.to_sym).compact
+      sample[identifier] = values unless values.blank?
+    end
+    { "sample" => sample }
   end
 end
