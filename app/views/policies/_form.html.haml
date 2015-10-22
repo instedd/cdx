@@ -15,7 +15,10 @@
     .col.pe-2
       = f.label :user_id
     .col
-      = f.collection_select :user_id, User.all.where('id != ?', current_user.id).sort_by(&:email), :id, :email, {include_blank: "Select user"}, {:class => 'ddown'}
+      = cdx_select form: f, name: :user_id, class: 'input-x-large' do |select|
+        - select.item "", "Select user"
+        - select.items User.all.where('id != ?', current_user.id).sort_by(&:email), :id, :email
+
   .row
     .col.pe-2
       = f.label :definition
