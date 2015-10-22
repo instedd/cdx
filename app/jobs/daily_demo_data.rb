@@ -78,5 +78,5 @@ end
 # note: an alternative gem for scheduling cron jobs could be:  http://github.com/javan/whenever but
 # the advantage of gem "sidekiq-cron" is that it appears in the sidekiq web url , http://localhost:3000/sidekiq/cron
 if use_demo_data?
-  Sidekiq::Cron::Job.create(name: 'Demo Data - daily 1am', cron: '* 1 * * *', klass: 'DailyDemoData')   #run daily 1am
+  Sidekiq::Cron::Job.create(name: 'Demo Data - daily 12:15am', cron: '15 0 * * *', klass: 'DailyDemoData')   #run daily at 15 after midnight
 end
