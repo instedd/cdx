@@ -215,4 +215,13 @@ describe DevicesController do
       expect(commands.length).to eq(1)
     end
   end
+
+  describe "custom mappsing" do
+    it "can request" do
+      get :custom_mappings, device_model_id: device_model.id
+      expect(response).to be_success
+      expect(assigns(:device).new_record?).to be_truthy
+      expect(assigns(:device).device_model).to eq(device_model)
+    end
+  end
 end
