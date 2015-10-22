@@ -4,10 +4,11 @@
     %h4 Submit message
     %form#report_form(method="post")
       %label.block(for="device") Device
-      %select.ddown#device
-        = @devices.map do |device|
-          %option(value="") Select device
-          %option{ value: device.uuid}=device.name
+
+      = cdx_select name: "device" do |select|
+        - select.item "", "Select device"
+        - select.items @devices, :uuid, :name
+
       %label.block(for="data") Data
       %textarea.input-block#data{:rows => "18"}
         :preserve

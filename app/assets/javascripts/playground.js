@@ -11,7 +11,7 @@ $(function() {
       $create_button.prop("disabled", true);
       $results_div.html("");
       $create_button.val("Creating...");
-      device = $("#device").val();
+      device = $(":hidden[name=device]").val();
       data = $("#data").val();
       $.ajax({
         url: "/api/devices/" + device + "/messages",
