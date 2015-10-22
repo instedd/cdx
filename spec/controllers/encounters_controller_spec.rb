@@ -98,7 +98,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     before(:each) {
       post :create, encounter: {
         institution: { uuid: institution.uuid },
-        samples: [{ uuid: sample.uuid }],
+        samples: [{ uuids: sample.uuids }],
         test_results: [],
         assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],
         observations: 'Lorem ipsum',
@@ -145,7 +145,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
   end
 
-  describe "PUT update" do
+  describe "PUT #update" do
     let(:encounter) { Encounter.make institution: institution }
 
     let(:sample) {
@@ -158,7 +158,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       put :update, id: encounter.id, encounter: {
         id: encounter.id,
         institution: { uuid: 'uuid-to-discard' },
-        samples: [{ uuid: sample.uuid }],
+        samples: [{ uuids: sample.uuids }],
         test_results: [],
         assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],
         observations: 'Lorem ipsum',
@@ -299,7 +299,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     it "does not add sample if present" do
       put :add_sample, sample_uuid: test1.sample.uuids[0], encounter: {
         institution: { uuid: institution.uuid },
-        samples: [{uuid: test1.sample.uuids[0]}],
+        samples: [{uuids: test1.sample.uuids[0]}],
         test_results: [],
       }.to_json
 
@@ -323,7 +323,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_with_encounter.uuid, encounter: {
         institution: { uuid: institution.uuid },
-        samples: [{uuid: test1.sample.uuids[0]}],
+        samples: [{uuids: test1.sample.uuids[0]}],
         test_results: [{uuid: test1.uuid}],
       }.to_json
 
@@ -348,7 +348,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
         institution: { uuid: institution.uuid },
-        samples: [{uuid: sample_with_patient1.uuid}],
+        samples: [{uuids: sample_with_patient1.uuids}],
         test_results: [],
       }.to_json
 
@@ -368,7 +368,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
         institution: { uuid: institution.uuid },
-        samples: [{uuid: sample_with_patient1.uuid}],
+        samples: [{uuids: sample_with_patient1.uuids}],
         test_results: [],
       }.to_json
 
@@ -389,7 +389,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
         institution: { uuid: institution.uuid },
-        samples: [{uuid: sample_with_patient1.uuid}],
+        samples: [{uuids: sample_with_patient1.uuids}],
         test_results: [],
       }.to_json
 
@@ -415,7 +415,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_c.uuid, encounter: {
         institution: { uuid: i1.uuid },
-        samples: [{uuid: sample_a.uuid}, {uuid: sample_b.uuid}],
+        samples: [{uuids: sample_a.uuids}, {uuids: sample_b.uuids}],
         test_results: [],
       }.to_json
 
@@ -439,7 +439,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       put :add_sample, sample_uuid: sample_b.uuid, encounter: {
         id: encounter.id,
         institution: { uuid: institution.uuid },
-        samples: [{uuid: sample_a.uuid}],
+        samples: [{uuids: sample_a.uuids}],
         test_results: [],
       }.to_json
 
@@ -499,6 +499,174 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       expect(json_response['encounter']['test_results'][0]).to include(test_result_json(test_result_a))
       expect(json_response['encounter']['test_results'].count).to eq(1)
     end
+  end
+
+  describe 'PUT #merge_samples' do
+
+    let(:samples) do
+      3.times.map do |x|
+        test = TestResult.make \
+          institution: institution,
+          device: Device.make(site: Site.make(institution: institution)),
+          sample_identifier: SampleIdentifier.make(entity_id: "ID#{x+1}", sample: Sample.make(institution: institution))
+        test.sample
+      end
+    end
+
+    let!(:sample1) { samples[0] }
+    let!(:sample3) { samples[2] }
+
+    let!(:sample2) do
+      test = TestResult.make \
+          institution: institution,
+          device: Device.make(site: Site.make(institution: institution)),
+          sample_identifier: SampleIdentifier.make(entity_id: "ID2B", sample: samples[1])
+
+      samples[1].reload
+    end
+
+    let(:sample_with_encounter) do
+      device = Device.make institution: institution
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
+      sample_with_encounter = Sample.first
+      sample_with_encounter.encounter = Encounter.make institution: institution
+      sample_with_encounter.save!
+      sample_with_encounter
+    end
+
+    it "renders json response with merged sample and status ok" do
+      put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
+        institution: { uuid: institution.uuid },
+        samples: [{uuids: sample1.uuids}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['samples'].count).to eq(1)
+
+      sample = json_response['encounter']['samples'][0]
+      expect(sample['entity_ids']).to contain_exactly('ID1', 'ID2', 'ID2B')
+    end
+
+    it "renders json response with merged samples from the same encounter" do
+      put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
+        institution: { uuid: institution.uuid },
+        samples: [{uuids: sample1.uuids}, {uuids: sample2.uuids}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['samples'].count).to eq(1)
+
+      sample = json_response['encounter']['samples'][0]
+      expect(sample['entity_ids']).to contain_exactly('ID1', 'ID2', 'ID2B')
+    end
+
+    it "renders json response with merged samples from the same existing encounter" do
+      encounter = Encounter.make institution: institution, samples: [sample1, sample2], patient: nil
+      put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
+        id: encounter.id,
+        institution: { uuid: institution.uuid },
+        samples: [{uuids: sample1.uuids}, {uuids: sample2.uuids}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['samples'].count).to eq(1)
+
+      sample = json_response['encounter']['samples'][0]
+      expect(sample['entity_ids']).to contain_exactly('ID1', 'ID2', 'ID2B')
+      expect(sample['uuids']).to match_array(sample1.uuids + sample2.uuids)
+    end
+
+    it "saves merged samples after a merge sample operation" do
+      encounter = Encounter.make institution: institution, samples: [sample1, sample2], patient: nil
+      put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
+        id: encounter.id,
+        institution: { uuid: institution.uuid },
+        samples: [{uuids: sample1.uuids}, {uuids: sample2.uuids}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+      expect(json_response['status']).to eq('ok')
+
+      put :update, id: encounter.id, encounter: json_response['encounter'].to_json
+      expect(response).to have_http_status(:success)
+      expect(JSON.parse(response.body).with_indifferent_access['status']).to eq('ok')
+
+      expect(encounter.reload).to have(1).sample
+      expect(sample1.reload.entity_ids).to contain_exactly('ID1', 'ID2', 'ID2B')
+      expect(Sample.find_by_id(sample2.id)).to be_nil
+    end
+
+
+    it "does not persist changes until saved" do
+      expect(sample1.reload.entity_ids).to contain_exactly('ID1')
+      expect(sample2.reload.entity_ids).to contain_exactly('ID2', 'ID2B')
+      expect(sample3.reload.entity_ids).to contain_exactly('ID3')
+
+      put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
+        institution: { uuid: institution.uuid },
+        samples: [{uuids: sample1.uuids}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(sample1.reload.entity_ids).to contain_exactly('ID1')
+      expect(sample2.reload.entity_ids).to contain_exactly('ID2', 'ID2B')
+      expect(sample3.reload.entity_ids).to contain_exactly('ID3')
+    end
+
+    it "it fails if a sample belongs to another encounter" do
+      put :merge_samples, sample_uuids: [sample1.uuid, sample_with_encounter.uuid], encounter: {
+        institution: { uuid: institution.uuid },
+        samples: [{uuids: sample1.uuids}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['message']).to eq('Cannot add a test or sample that belongs to a different encounter')
+      expect(json_response['status']).to eq('error')
+    end
+
+    it "it fails if a sample belongs to a different patient" do
+      device = Device.make institution: institution
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'SWP_ID1'}, patient: {id: 'a'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'SWP_ID2'}, patient: {id: 'b'})
+
+      sample_with_patient1, sample_with_patient2 = Sample.last(2)
+
+      expect(sample_with_patient1.patient).to eq(Patient.find_by_entity_id('a', institution))
+      expect(sample_with_patient2.patient).to eq(Patient.find_by_entity_id('b', institution))
+
+      put :merge_samples, sample_uuids: [sample_with_patient1.uuid, sample_with_patient2.uuid], encounter: {
+        institution: { uuid: institution.uuid },
+        samples: [{uuids: sample_with_patient1.uuids}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['message']).to eq('Cannot add a test or sample that belongs to a different patient')
+      expect(json_response['status']).to eq('error')
+    end
+
   end
 
   def institution_json(institution)

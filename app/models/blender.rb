@@ -20,6 +20,7 @@ class Blender
     @encounters = [] # of EncounterBlender
     @samples = [] # of SampleBlender
     @test_results = [] # of TestResult
+    @garbage = [] # of EntityBlender
   end
 
   def hierarchy
@@ -49,6 +50,22 @@ class Blender
       blender.parent.remove_child(blender)
       blender.children.each{ |c| remove(c) }
     end
+  end
+
+  def remove_blender(blender)
+    to_remove = blender.self_and_children
+
+    blender.parents.values.each do |p|
+      to_remove.each { |child| p.remove_child(child) }
+    end
+
+    to_remove.each do |child|
+      blenders_of(child.entity_type).delete(child)
+      child.mark_for_destruction
+      @garbage << child
+    end
+
+    blender
   end
 
   def blender_type_for(entity)
@@ -97,7 +114,18 @@ class Blender
     end
   end
 
+  def merge_blenders(target, to_merge)
+    Array.wrap(to_merge).inject(target) do |result, other|
+      next result if other == result
+      merge_parent(result, hierarchy.map{|t| other.parents[t]}.compact.first)
+      result.merge_blender(other, force: true)
+      remove_blender(other)
+      result
+    end
+  end
+
   def merge_parent(child_blender, parent_blender)
+    return if parent_blender.nil?
     merged_parents = []
 
     types_to_merge = hierarchy.drop_while{|type| type != parent_blender.entity_type}.reverse
@@ -123,9 +151,11 @@ class Blender
   end
 
   def save_without_index!
-    entities = @patients.map(&:save!) + @encounters.map(&:save!) + @samples.map(&:save!) + @test_results.map(&:save!)
-    blenders.values.flatten.each &:sweep
-    entities
+    ActiveRecord::Base.transaction do
+      entities = @patients.map(&:save!) + @encounters.map(&:save!) + @samples.map(&:save!) + @test_results.map(&:save!)
+      [blenders.values + @garbage].flatten.each &:sweep
+      entities
+    end
   end
 
   def save_and_index!
@@ -166,6 +196,49 @@ class Blender
       Array.wrap(entities).each { |p| add_entity(p) }
     end
 
+    def inspect
+      inspection = {
+        "entities" => '[' + @entities.map(&:inspect).join(", ") + ']',
+        "children" => '[' + @children.map(&:short_inspect).join(", ") + ']',
+        "parents" =>  '[' + @parents.map{|k, v| "#{k}: #{v.short_inspect}"}.join(", ") + ']',
+        "entity_id" => @entity_id
+      }
+      "#<#{self.class} #{inspection.to_s}>"
+    end
+
+    def short_inspect
+      "#<#{self.class} entity_count: #{@entities.count}>"
+    end
+
+    def pretty_print(pp)
+      pp.object_address_group(self) do
+        pp.breakable
+        pp.text "entity_id: #{@entity_id}"
+        pp.breakable
+        pp.group(1, "entities: ", "") do
+          pp.breakable
+          pp.seplist(@entities, proc { pp.text ', ' }) do |entity|
+            pp.pp(entity)
+          end
+        end
+        pp.breakable
+        pp.group(1, "children: ", "") do
+          pp.breakable
+          pp.seplist(@children, proc { pp.text ', ' }) do |entity|
+            pp.text(entity.short_inspect)
+          end
+        end
+        pp.breakable
+        pp.group(1, "parents: ", "") do
+          pp.breakable
+          pp.seplist(@parents.to_a, proc { pp.text ', ' }) do |key, entity|
+            pp.text "#{key}: "
+            pp.text(entity.short_inspect)
+          end
+        end
+      end
+    end
+
     def find_entity(entity)
       @entities.find { |existing| existing == entity || (existing.uuids & entity.uuids).any? }
     end
@@ -175,11 +248,20 @@ class Blender
     end
 
     def add_entity(entity, opts={})
-      add_or_set_entity(entity, true, opts)
-    end
+      return self if entity.nil? || contains?(entity)
+      raise InstitutionMismatchError, "Cannot set #{self.class.entity_type.entity_scope} from a different institution" if entity.institution && entity.institution != @institution
 
-    def set_entity(entity, opts={})
-      add_or_set_entity(entity, false, opts)
+      # Do not support merging two non-phantom entities by default
+      if (entity.not_phantom? || opts[:entity_id]) && (not_phantom = @entities.select(&:not_phantom?).any?) && !opts[:force]
+        raise MergeNonPhantomError.new("Cannot merge two identified #{self.class.entity_type.entity_scope}s", self.class.entity_type)
+      end
+
+      # Add entity to collection and merge its attributes and id
+      @entities << entity
+      merge_attributes(entity)
+      merge_entity_id(opts[:entity_id]) if opts[:entity_id]
+
+      self
     end
 
     def add_child(child)
@@ -201,12 +283,12 @@ class Blender
       parent
     end
 
-    def merge_blender(blender)
+    def merge_blender(blender, opts={})
       raise InstitutionMismatchError, "Cannot merge entity blender from a different institution" if blender.institution && self.institution && blender.institution != self.institution
       raise EntityTypeMismatchError, "Cannot merge entity blender from a different type" if blender.entity_type != self.entity_type
       return self if blender == self
-      blender.entities.each { |entity| self.add_entity(entity) }
-      blender.children.each { |child| @container.set_parent(child, self) }
+      blender.entities.each { |entity| self.add_entity(entity, opts) }
+      blender.children.clone.each { |child| child.set_parent(self) }
 
       @garbage += blender.garbage
       merge_attributes(blender)
@@ -282,13 +364,19 @@ class Blender
     end
 
     def sweep
-      @garbage.compact.each do |e|
+      @garbage.compact.uniq.each do |e|
         begin
-          e.destroy if e.phantom?
+          e.destroy if e.phantom? || @marked_for_destruction
         rescue ActiveRecord::RecordNotDestroyed
           # This entity still had associated children, move on to the next one
         end
       end
+    end
+
+    def mark_for_destruction
+      @garbage += @entities
+      @marked_for_destruction = true
+      self
     end
 
     def target
@@ -297,6 +385,10 @@ class Blender
 
     def self_and_parents
       [self] + @parents.values
+    end
+
+    def self_and_children
+      [self] + @children
     end
 
     def patient
@@ -346,29 +438,6 @@ class Blender
 
     def contains?(entity)
       self.uuids.include?(entity.uuid)
-    end
-
-    def add_or_set_entity(entity, is_add, opts={})
-      return self if entity.nil? || contains?(entity)
-      raise InstitutionMismatchError, "Cannot set #{self.class.entity_type.entity_scope} from a different institution" if entity.institution && entity.institution != @institution
-
-      # If there is already a non phantom entity, we either replace it (on set) or raise (on merge)
-      if (entity.not_phantom? || opts[:entity_id]) && (not_phantom = @entities.select(&:not_phantom?).any?)
-        if is_add
-          raise MergeNonPhantomError.new("Cannot merge two identified #{self.class.entity_type.entity_scope}s", self.class.entity_type)
-        else
-          @entities, rejected = @entities.partition(&:phantom?)
-          @garbage += rejected
-          rebuild_attributes
-        end
-      end
-
-      # Add entity to collection and merge its attributes and id
-      @entities << entity
-      merge_attributes(entity)
-      merge_entity_id(opts[:entity_id]) if opts[:entity_id]
-
-      self
     end
 
     private
@@ -464,6 +533,10 @@ class Blender
 
     def entity_ids
       @entities.map(&:entity_ids).flatten
+    end
+
+    def merge_entity_id(entity_id)
+      true
     end
 
     def self.entity_type

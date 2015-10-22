@@ -21,6 +21,10 @@ class Sample < ActiveRecord::Base
     joins(:sample_identifiers).where(sample_identifiers: {entity_id: entity_id.to_s}, institution_id: institution_id).first
   end
 
+  def self.find_all_by_any_uuid(uuids)
+    joins(:sample_identifiers).where(sample_identifiers: {uuid: uuids})
+  end
+
   def merge(other_sample)
     # Adds all sample_identifiers from other_sample if they have an uuid (ie they have been persisted)
     # or if they contain a new entity_id (ie not already in this sample.sample_identifiers)
