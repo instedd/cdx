@@ -1,0 +1,13 @@
+- if @sites.empty?
+  %span This site has no dependencies yet
+- else
+  = cdx_table title: 'Dependencies' do |t|
+    - t.thead do
+      %tr
+        %th Name
+        %th Location
+    - t.tbody do
+      - @sites.each do |site|
+        %tr{data: (@sites_to_edit.include?(site.id) ? {href: site_path(site) } : {})}
+          %td= site.name
+          %td= site.location.try(&:name)

@@ -7,6 +7,7 @@ class Site < ActiveRecord::Base
   has_many :devices
   has_many :test_results, through: :devices
   belongs_to :parent, class_name: "Site"
+  has_many :children, class_name: "Site", foreign_key: "parent_id"
 
   validates_presence_of :institution
   validates_presence_of :name
