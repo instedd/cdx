@@ -1,8 +1,4 @@
 class DevicesController < ApplicationController
-  require 'barby'
-  require 'barby/barcode/code_93'
-  require 'barby/outputter/html_outputter'
-
   before_filter :load_device, except: [:index, :new, :create, :show]
   before_filter :load_institutions, only: [:new, :create, :edit, :update]
   before_filter :load_sites, only: [:new, :create, :edit, :update]

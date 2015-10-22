@@ -1,8 +1,4 @@
 class TestResultsController < ApplicationController
-  require 'barby'
-  require 'barby/barcode/code_93'
-  require 'barby/outputter/html_outputter'
-
   include Policy::Actions
 
   before_filter :load_filter_resources
