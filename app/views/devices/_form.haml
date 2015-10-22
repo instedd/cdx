@@ -33,7 +33,8 @@
     .col.pe-2
       = f.label :time_zone
     .col
-      = f.time_zone_select(:time_zone, nil,{ default: "UTC"}, class: 'ddown')
+      = cdx_select form: f, name: :time_zone, class: 'input-xx-large' do |select|
+        - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
   #custom_mappings
     = render "custom_mappings" if @device.device_model
 
