@@ -53,7 +53,7 @@ gem 'puma'
 # Use Sidekiq for background jobs
 gem 'sidekiq'
 gem 'sinatra'
-gem "sidekiq-cron", "~> 0.3.1"
+gem 'sidekiq-cron', '~> 0.3.1'
 
 group :development do
   gem 'web-console', '~> 2.0'
