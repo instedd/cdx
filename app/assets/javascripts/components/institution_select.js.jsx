@@ -44,7 +44,7 @@ var InstitutionSelect = React.createClass({
           <label>Institution</label>
         </div>
         <div className="col">
-          <Select className="input-large" ref="select"
+          <Select className="input-large" ref="select" clearable={false}
             value={this.state.selectedInstitutionUuid}
             onChange={this.handleInstitutionChange}
             options={this.state.institutions.map(function(institution) {
