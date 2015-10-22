@@ -77,9 +77,7 @@
           $(function(){
             $(document).on('change', 'input[name=page_size]', function(){
               var form = this.form;
-              window.setTimeout(function(){
-                form.submit();
-              }, 0);
+              form.submit();
             });
           })
 

@@ -6,7 +6,11 @@ var CdxSelect = React.createClass({
   },
 
   onChange: function(newValue) {
-    $('input:hidden', this.getDOMNode()).trigger('change');
+    window.setTimeout(function(){
+      // this is deferred so a new input with the new value
+      // is rendered by the time the change event is triggered
+      $('input:hidden', this.getDOMNode()).trigger('change');
+    }.bind(this), 0);
   },
 
   render: function() {
