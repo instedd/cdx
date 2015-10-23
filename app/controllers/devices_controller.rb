@@ -1,5 +1,5 @@
 class DevicesController < ApplicationController
-  before_filter :load_device, except: [:index, :new, :create, :show]
+  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings]
   before_filter :load_institutions, only: [:new, :create, :edit, :update]
   before_filter :load_sites, only: [:new, :create, :edit, :update]
   before_filter :load_institution, only: :create
