@@ -97,4 +97,18 @@ $(document).ready(function(){
     });
   }
 
+  $(".institution-radio label").on('click', function() {
+      $(".institution-container, .institution-name").addClass('active');
+      position = $(window).scrollTop()
+      if (position < 180) {
+        $('html,body').animate({
+          scrollTop: position + (180 - position)
+        });
+      } else {
+        $('html,body').animate({
+          scrollTop: position - (position - 180)
+        });
+      }
+  });
+
 });

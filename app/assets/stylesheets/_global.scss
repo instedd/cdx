@@ -94,3 +94,45 @@ a[title="Back"] {
     padding: 65px;
   }
 }
+
+
+.institution-container {
+
+  &.active {
+    input[type="radio"] + .institution-option {
+      opacity: 0.3;
+    }
+    input[type="radio"]:checked + .institution-option {
+      opacity: 1;
+    }
+  }
+
+  .institution-radio {
+    display: inline-block;
+
+    label {
+      margin: 0 !important;
+
+      .btn-add {
+        cursor: pointer;
+      }
+
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+  }
+}
+
+.institution-name {
+  margin-top: 60px;
+  display: none;
+
+  &.active {
+    display: block;
+    margin-bottom: 400px;
+  }
+}
+
+
