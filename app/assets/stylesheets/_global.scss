@@ -18,6 +18,11 @@ h2 {
   font-size: 180%;
   font-weight: 300;
 }
+h4 {
+  font-size: 90%;
+  font-weight: 300;
+  text-transform: uppercase;
+}
 a {
   color: $blue;
 }
@@ -122,6 +127,9 @@ a[title="Back"] {
         display: none;
       }
     }
+  }
+  h4 {
+    font-weight: 700;
   }
 }
 
