@@ -6,7 +6,6 @@
       %label.block(for="device") Device
 
       = cdx_select name: "device" do |select|
-        - select.item "", "Select device"
         - select.items @devices, :uuid, :name
 
       %label.block(for="data") Data
