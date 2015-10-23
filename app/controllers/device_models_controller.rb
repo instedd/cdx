@@ -64,7 +64,7 @@ class DeviceModelsController < ApplicationController
         format.json { render action: 'show', status: :created, device_model: @device_model }
       else
         @device_model.published_at = @device_model.published_at_was
-        format.html { render action: 'new' }
+        format.html { render action: 'edit' }
         format.json { render json: @device_model.errors, status: :unprocessable_entity }
       end
     end
