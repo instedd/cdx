@@ -98,7 +98,7 @@ $(document).ready(function(){
   }
 
   $(".institution-radio label").on('click', function() {
-      $(".institution-container, .institution-name").addClass('active');
+      $(".institution-container").addClass('active');
       position = $(window).scrollTop()
       if (position < 180) {
         $('html,body').animate({
