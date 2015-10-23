@@ -1,6 +1,8 @@
 .chart {
   .bar {
-    fill: #03a9f4;
+    &.b0 { fill: #03A9F4; }
+    &.b1 { fill: #EC1561; }
+    &.b2 { fill: #3E4EB8; }
   }
 
   .axis {

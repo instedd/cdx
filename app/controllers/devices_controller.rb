@@ -184,6 +184,7 @@ class DevicesController < ApplicationController
 
     @tests_histogram = query_tests_histogram
     @tests_by_name = query_tests_by_name
+    @errors_histogram, @error_users = query_errors_histogram
 
     render layout: false if request.xhr?
   end
@@ -254,10 +255,36 @@ class DevicesController < ApplicationController
       date_key = date.strftime("%Y-%m")
       tests_histogram << {
         label: "#{I18n.t("date.abbr_month_names")[date.month]}#{date.month == 1 ? " #{date.strftime("%y")}" : ""}",
-        value: result[date_key] || 0
+        values: [result[date_key] || 0]
       }
     end
     tests_histogram
+  end
+
+  def query_errors_histogram
+    query = {
+      "test.status" => "error",
+      "group_by" => "month(test.reported_time),test.site_user",
+      "since" => (Date.today - 1.year).iso8601
+    }
+    result = TestResult.query(query, current_user).execute
+    users = result["tests"].index_by { |t| t["test.site_user"] }.keys
+    results_by_day = result["tests"].group_by { |t| t["test.reported_time"] }
+
+    errors_histogram = []
+    11.downto(0).each do |i|
+      date = Date.today - i.months
+      date_key = date.strftime("%Y-%m")
+      date_results = results_by_day[date_key].try { |r| r.index_by { |t| t["test.site_user"] } }
+      errors_histogram << {
+        label: "#{I18n.t("date.abbr_month_names")[date.month]}#{date.month == 1 ? " #{date.strftime("%y")}" : ""}",
+        values: users.map do |u|
+          user_result = date_results && date_results[u]
+          user_result ? user_result["count"] : 0
+        end
+      }
+    end
+    return errors_histogram, users
   end
 
   def query_tests_by_name

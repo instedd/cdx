@@ -2,7 +2,8 @@ var BarChart = React.createClass({
   getDefaultProps: function() {
     return {
       margin: {top: 20, right: 20, bottom: 30, left: 50},
-      height: 500
+      height: 500,
+      x_labels: []
     }
   },
 
@@ -36,44 +37,61 @@ var BarChart = React.createClass({
         .ticks(10, "s");
 
       x.domain(this.props.data.map(function(d) { return d.label; }));
-      y.domain([0, d3.max(this.props.data, function(d) { return d.value; })]);
+      y.domain([0, d3.max(this.props.data, function(d) { return d3.sum(d.values); })]);
     }
 
     return (
-      <svg className="chart"
-           width="100%"
-           height={this.props.height}
-           ref="svg">
-        { this.props.width ?
-          <g transform={"translate(" + this.props.margin.left + "," + this.props.margin.top + ")"}>
+      <div className="chart">
+        <svg width="100%"
+             height={this.props.height}
+             ref="svg">
+          { this.props.width ?
+            <g transform={"translate(" + this.props.margin.left + "," + this.props.margin.top + ")"}>
 
-            {/* Bars */}
-            {this.props.data.map(function (d, i) {
-              return (
-                <rect key={i}
-                      className="bar"
-                      x={x(d.label)}
-                      y={y(d.value)}
-                      width={x.rangeBand()}
-                      height={chartHeight - y(d.value)} />
-              )
-            })}
+              {/* Bars */}
+              {this.props.data.map(function (d, i) {
+                var sum = 0;
+                return d.values.map(function (v, j) {
+                  sum += v;
+                  return (
+                    <rect key={[i,j]}
+                          className={"bar b" + j}
+                          x={x(d.label)}
+                          y={y(sum)}
+                          width={x.rangeBand()}
+                          height={chartHeight - y(v)} />
+                  )
+                });
+              })}
 
-            {/* X Axis */}
-            <g className="x axis"
-               transform={"translate(0," + chartHeight + ")"}
-               ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(xAxis) }}} />
+              {/* X Axis */}
+              <g className="x axis"
+                 transform={"translate(0," + chartHeight + ")"}
+                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(xAxis) }}} />
 
-            {/* Y Axis */}
-            <g className="y axis"
-               transform={"translate(" + chartWidth + ",0)"}
-               ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(yAxis) }}} >
-              <text transform={"translate(" + (-chartWidth - this.props.margin.left) + ",0),rotate(-90)"}
-                    y="6" dy=".71em" style={{textAnchor: 'end'}}>Tests run</text>
+              {/* Y Axis */}
+              <g className="y axis"
+                 transform={"translate(" + chartWidth + ",0)"}
+                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(yAxis) }}} >
+                <text transform={"translate(" + (-chartWidth - this.props.margin.left) + ",0),rotate(-90)"}
+                      y="6" dy=".71em" style={{textAnchor: 'end'}}>{this.props.y_label}</text>
+              </g>
             </g>
-          </g>
-          : null }
-      </svg>
+            : null }
+        </svg>
+        <div className="legends">
+          {this.props.x_labels.map(function (d, i) {
+            return (
+              <span key={i}>
+                <svg width="16" height="16">
+                  <circle r="8" className={"bar b" + i} transform="translate(8, 8)" />
+                </svg>
+                {d}
+              </span>
+            );
+          })}
+        </div>
+      </div>
     );
   }
 });
