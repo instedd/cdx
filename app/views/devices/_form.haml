@@ -11,15 +11,14 @@
   .row
     .col.pe-2
       = f.label :device_model_id
-    .col
-      = cdx_select form: f, name: :device_model_id, class: 'input-xx-large' do |select|
-        - select.items(@device_models, :id, :full_name)
+    .col#device_models
+      = render "device_models"
   - if has_access?(Site, Policy::Actions::READ_SITE)
     .row
       .col.pe-2
         = f.label :site
       .col
-        = cdx_select form: f, name: :site_id, class: 'input-xx-large' do |select|
+        = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
           - select.items(@sites, :id, :name)
   .row
     .col.pe-2
@@ -49,13 +48,28 @@
 :coffeescript
   $ ->
     selected_device_model_id = #{@device.device_model_id.to_s.to_json}
-
-    $(document).on 'change', ":hidden[name='device[device_model_id]']", ->
-      device_model_id = $(this).val()
+    cdx_select_on_change "device[device_model_id]", (device_model_id) ->
       if device_model_id != selected_device_model_id
         $("#custom_mappings").load(
           "/devices/custom_mappings",
-          "device_model_id": device_model_id,
-          "device_id": #{@device.id.to_json}
+          {
+            "device_model_id": device_model_id,
+            "device_id": #{@device.id.to_json}
+          },
+          ->
+            cdx_init_components($("#custom_mappings"))
         )
         selected_device_model_id = device_model_id
+
+    if $('form.new_device').length > 0 && cdx_select_find("device[institution_id]").length > 0
+      selected_institution_id = #{@device.institution_id}
+      cdx_select_on_change "device[institution_id]", (institution_id) ->
+        if institution_id != selected_institution_id
+          $("#device_models").load(
+            "/devices/new/device_models",
+            {"institution_id": institution_id},
+            ->
+              cdx_init_components($("#device_models"))
+              $("#custom_mappings").empty()
+          )
+          selected_institution_id = institution_id

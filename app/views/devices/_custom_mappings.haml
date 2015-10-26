@@ -13,6 +13,6 @@
           .control-group
             = m.label field.target_field, class: 'control-label'
             .controls
-              = m.select field.target_field,
-                  options_for_target_field,
-                  selected: (@device.custom_mappings || {})[field.target_field]
+              = cdx_select form: m, name: field.target_field, value: (@device.custom_mappings || {})[field.target_field], class: 'input-x-large' do |select|
+                - select.item "", "None"
+                - select.items Device::CUSTOM_FIELD_TARGETS.map(&:to_s), :itself, :titleize
