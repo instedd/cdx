@@ -30,8 +30,6 @@ function cdx_init_components(dom) {
 }
 
 $(document).ready(function(){
-  $('.ddown').ddslick();
-
   function setFilledClass(elem) {
     window.setTimeout(function(){
       if(elem.val().length > 0) {
