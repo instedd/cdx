@@ -28,6 +28,7 @@ class Device < ActiveRecord::Base
   validate :unpublished_device_model_from_institution
 
   before_create :set_uuid
+  before_save :set_site_prefix
 
   delegate :current_manifest, to: :device_model
 
@@ -90,6 +91,10 @@ class Device < ActiveRecord::Base
 
   def set_uuid
     self.uuid = MessageEncryption.secure_random(9)
+  end
+
+  def set_site_prefix
+    self.site_prefix = site.try(:prefix)
   end
 
   def new_activation_token

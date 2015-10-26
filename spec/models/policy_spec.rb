@@ -718,6 +718,14 @@ describe Policy do
       let!(:device2)      { Device.make institution_id: institution2.id, site: site2 }
       let!(:test_result2) { TestResult.make device_messages: [DeviceMessage.make(device: device2)]}
 
+      let!(:institution3) { user.institutions.make }
+      let!(:site3) { Site.make institution: institution3 }
+      let!(:device3) { Device.make institution_id: institution3.id, site: site3 }
+      let!(:site3_1) { Site.make institution: institution3, parent_id: site3.id }
+      let!(:device3_1) { Device.make institution_id: institution3.id, site: site3_1 }
+      let!(:test_result3) { TestResult.make device_messages: [DeviceMessage.make(device: device3)]}
+      let!(:test_result3_1) { TestResult.make device_messages: [DeviceMessage.make(device: device3_1)]}
+
       it "does not allow user to query test result" do
         assert_cannot user2, test_result, QUERY_TEST
       end
@@ -752,6 +760,11 @@ describe Policy do
         assert_can user2, TestResult, QUERY_TEST, [test_result]
       end
 
+      it "returns a scope with tests authorised by site and subsite" do
+        grant user, user2, {test_result: site3}, QUERY_TEST
+        assert_can user2, TestResult, QUERY_TEST, [test_result3, test_result3_1]
+      end
+
       it "returns a scope with tests authorised by device" do
         grant user, user2, {test_result: device}, QUERY_TEST
         assert_can user2, TestResult, QUERY_TEST, [test_result]
@@ -765,12 +778,12 @@ describe Policy do
 
       it "returns a scope with all tests" do
         grant user, user2, TestResult, QUERY_TEST
-        assert_can user2, TestResult, QUERY_TEST, [test_result, test_result2]
+        assert_can user2, TestResult, QUERY_TEST, [test_result, test_result2, test_result3, test_result3_1]
       end
 
       it "returns a scope with all tests minus exceptions" do
         grant user, user2, TestResult, QUERY_TEST, except: {test_result: site2}
-        assert_can user2, TestResult, QUERY_TEST, [test_result]
+        assert_can user2, TestResult, QUERY_TEST, [test_result, test_result3, test_result3_1]
       end
 
     end

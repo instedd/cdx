@@ -22,4 +22,9 @@ describe TestResult do
     tests = TestResult.from_the_past_year(Time.now).all
     expect(tests).to eq([test2])
   end
+
+  it "sets the site_prefix" do
+    test = TestResult.make
+    expect(test.site_prefix).to eq(test.device.site.prefix)
+  end
 end

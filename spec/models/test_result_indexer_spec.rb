@@ -99,7 +99,8 @@ describe TestResultIndexer, elasticsearch: true do
           "serial_number" => test.device.serial_number
         },
         "site" => {
-          "uuid" => test.device.site.uuid
+          "uuid" => test.device.site.uuid,
+          "path" => [test.device.site.uuid],
         },
         "institution" => {
           "uuid" => test.device.institution.uuid

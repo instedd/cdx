@@ -91,4 +91,12 @@ describe Device do
       expect(commands[0].command).to be_nil
     end
   end
+
+  context 'site_prefix' do
+    let(:device) { Device.make }
+
+    it "has a site_prefix" do
+      expect(device.site_prefix).to eq(device.site.prefix)
+    end
+  end
 end

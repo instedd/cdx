@@ -92,7 +92,7 @@ describe ComputedPolicy do
       }.to change(user.computed_policies(:reload), :count).by(1)
 
       user.computed_policies.first.tap do |p|
-        expect(p.condition_site_id).to eq(device.site.id.to_s)
+        expect(p.condition_site_id).to eq(device.site.prefix)
       end
     end
 
@@ -106,7 +106,7 @@ describe ComputedPolicy do
       expect(p.resource_id).to be_nil
 
       expect(p).to have(1).exceptions
-      expect(p.exceptions.first.resource_id).to eq(device.id)
+      expect(p.exceptions.first.resource_id).to eq(device.id.to_s)
     end
 
   end
@@ -146,7 +146,7 @@ describe ComputedPolicy do
       }.to change(user.computed_policies(:reload), :count).by(1)
 
       user.computed_policies.first.tap do |p|
-        expect(p.condition_site_id).to eq(device.site.id.to_s)
+        expect(p.condition_site_id).to eq(device.site.prefix)
         expect(p.condition_institution_id).to eq(device.institution.id)
       end
     end
@@ -252,7 +252,7 @@ describe ComputedPolicy do
       expect(user.computed_policies.first).to have(2).exceptions
       exceptions = user.computed_policies.first.exceptions
 
-      expect(exceptions.map(&:resource_id)).to match_array([device.id, device2.id])
+      expect(exceptions.map(&:resource_id)).to match_array([device.id.to_s, device2.id.to_s])
     end
 
     it "should not join exceptions when not applicable" do
@@ -271,7 +271,7 @@ describe ComputedPolicy do
 
       device_policies.each do |p|
         expect(p).to have(1).exceptions
-        expect(p.exceptions.first.resource_id).to eq(device.id)
+        expect(p.exceptions.first.resource_id).to eq(device.id.to_s)
       end
     end
 

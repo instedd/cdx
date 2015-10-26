@@ -83,5 +83,6 @@ class TestResult < ActiveRecord::Base
   def set_foreign_keys
     self.site_id = device.try(:site_id)
     self.institution_id = device.try(:institution_id)
+    self.site_prefix = device.try(:site).try(:prefix)
   end
 end

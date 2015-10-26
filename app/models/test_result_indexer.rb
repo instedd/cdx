@@ -49,6 +49,7 @@ class TestResultIndexer
     site = device.site
     site_uuid = site.try &:uuid
     site_name = site.try &:name
+    site_path = site.try(&:path)
 
     location = site.try &:location
     location_id = location.try(:geo_id)
@@ -82,7 +83,8 @@ class TestResultIndexer
           "uuid" => device.institution.uuid
         },
         "site" => {
-          "uuid" => site_uuid
+          "uuid" => site_uuid,
+          "path" => site_path,
         }
       }).
       deep_merge(core_fields_from(test_result.sample)).

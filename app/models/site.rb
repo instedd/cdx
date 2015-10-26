@@ -58,6 +58,10 @@ class Site < ActiveRecord::Base
     end
   end
 
+  def path
+    prefix.split(".")
+  end
+
   def to_s
     name
   end
@@ -70,9 +74,9 @@ class Site < ActiveRecord::Base
 
   def compute_prefix
     if parent
-      self.prefix = "#{parent.prefix}.#{id}"
+      self.prefix = "#{parent.prefix}.#{uuid}"
     else
-      self.prefix = id.to_s
+      self.prefix = uuid
     end
     self.save!
   end

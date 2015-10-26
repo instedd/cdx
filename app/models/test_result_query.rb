@@ -34,13 +34,14 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
       negatives = policy.exceptions.map { |exception| super(conditions_for(exception, preloaded_uuids)) }
 
       if negatives.empty?
-        positive
+        and_conditions(positive)
       else
         { bool: { must: positive, must_not: negatives } }
       end
     end
 
     query << or_conditions(policies_conditions)
+    query
   end
 
   def execute
@@ -68,20 +69,31 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
 
   def conditions_for(computed_policy, preloaded_uuids)
     Hash[computed_policy.conditions.map do |field, value|
-      ["#{field}.uuid", preloaded_uuids[field][value.to_i]] unless value.nil?
+      if field == :site
+        # In the case of a site the resource_id is a prefix of all uuids
+        ["#{field}.path", value.split(".").last] unless value.nil?
+      else
+        ["#{field}.uuid", preloaded_uuids[field][value.to_i]] unless value.nil?
+      end
     end.compact]
   end
 
   def preload_uuids_for(policies)
     resource_ids = Hash.new { |h,k| h[k] = Set.new }
+
     (policies + policies.map(&:exceptions).flatten).each do |policy|
       policy.conditions.each do |field, value|
-        resource_ids[field] << value.to_i
+        resource_ids[field] << value
       end
     end
 
     Hash[resource_ids.map do |field, ids|
-      [field, Hash[field.to_s.classify.constantize.where(id: ids.to_a).pluck(:id, :uuid)]]
+      if field == :site
+        # In the case of a site the resource_id is a prefix of all uuids
+        [field, ids]
+      else
+        [field, Hash[field.to_s.classify.constantize.where(id: ids.to_a).pluck(:id, :uuid)]]
+      end
     end]
   end
 
