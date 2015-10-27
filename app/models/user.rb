@@ -50,4 +50,17 @@ class User < ActiveRecord::Base
     predefined.save!
   end
 
+  DEFAULT_OAUTH2_APPLICATION_NAME = "Default OAuth2 Application"
+
+  def default_oauth2_application
+    app = Doorkeeper::Application.where(owner_id: id, owner_type: self.class.name, name: DEFAULT_OAUTH2_APPLICATION_NAME).first
+    unless app
+      app = Doorkeeper::Application.new
+      app.owner = self
+      app.name = DEFAULT_OAUTH2_APPLICATION_NAME
+      app.redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
+      app.save!
+    end
+    app
+  end
 end
