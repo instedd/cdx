@@ -8,6 +8,9 @@
     = card image: map_url(@site.lat, @site.lng) do |c|
       - c.top do
         %b= @site.name
+        - if parent = @site.parent
+          %div
+            Site under #{link_to parent.name, site_path(parent)}
       - if @can_edit
         - c.actions do
           = link_to edit_site_path(@site), :title => 'Edit' do
@@ -20,3 +23,4 @@
     = cdx_tabs do |t|
       - t.tab title: 'Devices', url: devices_site_path(@site)
       - t.tab title: 'Tests', url: tests_site_path(@site)
+      - t.tab title: 'Dependencies', url: dependencies_site_path(@site)

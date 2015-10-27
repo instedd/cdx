@@ -89,6 +89,8 @@ site:
     uuid:
       searchable: true
     name:
+    path:
+      searchable: true
 patient:
   allows_custom: true
   fields:

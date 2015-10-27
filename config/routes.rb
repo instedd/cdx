@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     member do
       get :devices
       get :tests
+      get :dependencies
     end
   end
 

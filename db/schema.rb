@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151019174509) do
+ActiveRecord::Schema.define(version: 20151026193558) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -36,9 +36,9 @@ ActiveRecord::Schema.define(version: 20151019174509) do
     t.integer "user_id",                  limit: 4
     t.string  "action",                   limit: 255
     t.string  "resource_type",            limit: 255
-    t.integer "resource_id",              limit: 4
+    t.string  "resource_id",              limit: 255
     t.integer "condition_institution_id", limit: 4
-    t.integer "condition_site_id",        limit: 4
+    t.string  "condition_site_id",        limit: 255
     t.boolean "delegable",                            default: false
     t.integer "condition_device_id",      limit: 4
   end
@@ -47,9 +47,9 @@ ActiveRecord::Schema.define(version: 20151019174509) do
     t.integer "computed_policy_id",       limit: 4
     t.string  "action",                   limit: 255
     t.string  "resource_type",            limit: 255
-    t.integer "resource_id",              limit: 4
+    t.string  "resource_id",              limit: 255
     t.integer "condition_institution_id", limit: 4
-    t.integer "condition_site_id",        limit: 4
+    t.string  "condition_site_id",        limit: 255
     t.integer "condition_device_id",      limit: 4
   end
 
@@ -104,8 +104,8 @@ ActiveRecord::Schema.define(version: 20151019174509) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",      limit: 4
-    t.boolean  "supports_activation"
     t.datetime "published_at"
+    t.boolean  "supports_activation"
   end
 
   add_index "device_models", ["published_at"], name: "index_device_models_on_published_at", using: :btree
@@ -122,6 +122,7 @@ ActiveRecord::Schema.define(version: 20151019174509) do
     t.text     "custom_mappings", limit: 65535
     t.integer  "site_id",         limit: 4
     t.string   "serial_number",   limit: 255
+    t.string   "site_prefix",     limit: 255
   end
 
   create_table "encounters", force: :cascade do |t|
@@ -245,6 +246,8 @@ ActiveRecord::Schema.define(version: 20151019174509) do
     t.datetime "updated_at"
     t.string   "location_geoid", limit: 60
     t.string   "uuid",           limit: 255
+    t.integer  "parent_id",      limit: 4
+    t.string   "prefix",         limit: 255
   end
 
   create_table "ssh_keys", force: :cascade do |t|
@@ -285,6 +288,7 @@ ActiveRecord::Schema.define(version: 20151019174509) do
     t.integer  "encounter_id",         limit: 4
     t.integer  "site_id",              limit: 4
     t.integer  "institution_id",       limit: 4
+    t.string   "site_prefix",          limit: 255
     t.integer  "sample_identifier_id", limit: 4
   end
 

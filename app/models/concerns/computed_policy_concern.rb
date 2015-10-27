@@ -12,10 +12,20 @@ module ComputedPolicyConcern
       table = resource_class.arel_table
       filters = []
 
-      filters << table[:id].eq(self.resource_id) if self.resource_id
+      if self.resource_id
+        if resource_class == Site
+          filters << table[:prefix].matches("#{self.resource_id}%")
+        else
+          filters << table[:id].eq(self.resource_id)
+        end
+      end
 
       conditions.each do |key, value|
-        filters << table["#{key}_id".to_sym].eq(value) if value
+        if key == :site
+          filters << table["#{key}_prefix".to_sym].matches("#{value}%") if value
+        else
+          filters << table["#{key}_id".to_sym].eq(value) if value
+        end
       end
 
       filters += exceptions.map(&:arel_filter).compact.map(&:not) if respond_to?(:exceptions)
@@ -25,7 +35,11 @@ module ComputedPolicyConcern
 
     def arel_condition_filter
       filters = conditions.map do |key, value|
-        condition_class(key).arel_table[:id].eq(value) if value
+        if key == :site
+          condition_class(key).arel_table[:prefix].matches("#{value}%") if value
+        else
+          condition_class(key).arel_table[:id].eq(value) if value
+        end
       end
 
       if respond_to?(:exceptions)
@@ -38,10 +52,10 @@ module ComputedPolicyConcern
     def applies_to?(resource_or_string, action, opts={})
       resource_attributes = ComputedPolicy.resource_attributes_for(resource_or_string)
 
-      return (self.resource_id.nil? || self.resource_id == resource_attributes[:id])\
+      return (self.resource_id.nil? || self.resource_id.to_s == resource_attributes[:id].to_s)\
         && (self.resource_type.nil? || self.resource_type == resource_attributes[:resource_type])\
         && (self.action.nil? || self.action == resource_attributes[:action])\
-        && (self.conditions.all? {|key, value| value.nil? || value == resource_attributes["#{key}_id".to_sym]})
+        && (self.conditions.all? {|key, value| value.nil? || value.to_s == resource_attributes["#{key}_id".to_sym].to_s})
     end
 
     def attributes_equal?(p2)

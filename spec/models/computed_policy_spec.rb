@@ -27,7 +27,7 @@ describe ComputedPolicy do
         expect(p.user).to eq(user)
         expect(p.action).to eq(READ_DEVICE)
         expect(p.resource_type).to eq('device')
-        expect(p.resource_id).to eq(device.id)
+        expect(p.resource_id).to eq(device.id.to_s)
         expect(p.condition_institution_id).to be_nil
         expect(p.condition_site_id).to be_nil
       end
@@ -92,7 +92,7 @@ describe ComputedPolicy do
       }.to change(user.computed_policies(:reload), :count).by(1)
 
       user.computed_policies.first.tap do |p|
-        expect(p.condition_site_id).to eq(device.site.id)
+        expect(p.condition_site_id).to eq(device.site.prefix)
       end
     end
 
@@ -106,7 +106,7 @@ describe ComputedPolicy do
       expect(p.resource_id).to be_nil
 
       expect(p).to have(1).exceptions
-      expect(p.exceptions.first.resource_id).to eq(device.id)
+      expect(p.exceptions.first.resource_id).to eq(device.id.to_s)
     end
 
   end
@@ -124,7 +124,7 @@ describe ComputedPolicy do
         grant granter, user, Device, [READ_DEVICE]
       }.to change(user.computed_policies(:reload), :count).by(2)
 
-      expect(user.computed_policies.map(&:resource_id)).to match_array([device.id, device2.id])
+      expect(user.computed_policies.map(&:resource_id)).to match_array([device.id, device2.id].map(&:to_s))
     end
 
     it "should create intersection from delegable resources" do
@@ -135,7 +135,7 @@ describe ComputedPolicy do
         grant granter, user, Device, [READ_DEVICE]
       }.to change(user.computed_policies(:reload), :count).by(1)
 
-      expect(user.computed_policies.first.resource_id).to eq(device.id)
+      expect(user.computed_policies.first.resource_id).to eq(device.id.to_s)
     end
 
     it "should create intersection from resources with conditions" do
@@ -146,7 +146,7 @@ describe ComputedPolicy do
       }.to change(user.computed_policies(:reload), :count).by(1)
 
       user.computed_policies.first.tap do |p|
-        expect(p.condition_site_id).to eq(device.site.id)
+        expect(p.condition_site_id).to eq(device.site.prefix)
         expect(p.condition_institution_id).to eq(device.institution.id)
       end
     end
@@ -203,10 +203,10 @@ describe ComputedPolicy do
 
       p1, p2 = user.computed_policies(:reload).order(:id).all
 
-      expect(p1.resource_id).to eq(device.id)
+      expect(p1.resource_id).to eq(device.id.to_s)
       expect(p1.delegable).to be_truthy
 
-      expect(p2.resource_id).to eq(device2.id)
+      expect(p2.resource_id).to eq(device2.id.to_s)
       expect(p2.delegable).to be_falsey
     end
 
@@ -252,7 +252,7 @@ describe ComputedPolicy do
       expect(user.computed_policies.first).to have(2).exceptions
       exceptions = user.computed_policies.first.exceptions
 
-      expect(exceptions.map(&:resource_id)).to match_array([device.id, device2.id])
+      expect(exceptions.map(&:resource_id)).to match_array([device.id.to_s, device2.id.to_s])
     end
 
     it "should not join exceptions when not applicable" do
@@ -271,7 +271,7 @@ describe ComputedPolicy do
 
       device_policies.each do |p|
         expect(p).to have(1).exceptions
-        expect(p.exceptions.first.resource_id).to eq(device.id)
+        expect(p.exceptions.first.resource_id).to eq(device.id.to_s)
       end
     end
 
@@ -466,6 +466,78 @@ describe ComputedPolicy do
       expect(devices).to      match_array(Device.all)
     end
 
+  end
+
+  context "sites" do
+    let!(:site1) { Site.make }
+    let!(:site11) { Site.make parent_id: site1.id }
+    let!(:site111) { Site.make parent_id: site11.id }
+
+    let!(:device1) { Device.make site_id: site1.id }
+    let!(:device11) { Device.make site_id: site11.id }
+
+    let!(:granter)  { User.make }
+    let!(:granter2) { User.make }
+
+    it "grants access to same site" do
+      grant nil, granter, site1, [READ_SITE]
+
+      expect {
+        grant granter, granter2, site1, READ_SITE
+      }.to change(granter2.computed_policies(:reload), :count).by(1)
+
+      expect(granter2).to have(1).computed_policies
+      p = granter2.computed_policies.first
+      expect(p.resource_id).to eq(site1.prefix)
+    end
+
+    it "grants access to subsite" do
+      grant nil, granter, site1, [READ_SITE]
+
+      expect {
+        grant granter, granter2, site11, READ_SITE
+      }.to change(granter2.computed_policies(:reload), :count).by(1)
+
+      expect(granter2).to have(1).computed_policies
+      p = granter2.computed_policies.first
+      expect(p.resource_id).to eq(site11.prefix)
+    end
+
+    it "grants access to subsubsite" do
+      grant nil, granter, site1, [READ_SITE]
+
+      expect {
+        grant granter, granter2, site111, READ_SITE
+      }.to change(granter2.computed_policies(:reload), :count).by(1)
+
+      expect(granter2).to have(1).computed_policies
+      p = granter2.computed_policies.first
+      expect(p.resource_id).to eq(site111.prefix)
+    end
+
+    it "interesects no site condition with site condition" do
+      grant nil, granter, device11, [READ_DEVICE]
+
+      expect {
+        grant granter, granter2, "device?site=#{device11.site.id}", [READ_DEVICE]
+      }.to change(granter2.computed_policies(:reload), :count).by(1)
+
+      expect(granter2).to have(1).computed_policies
+      p = granter2.computed_policies.first
+      expect(p.condition_site_id).to eq(site11.prefix)
+    end
+
+    it "interesects two site conditions" do
+      grant nil, granter, "device?site=#{device1.site.id}", [READ_DEVICE]
+
+      expect {
+        grant granter, granter2, "device?site=#{device11.site.id}", [READ_DEVICE]
+      }.to change(granter2.computed_policies(:reload), :count).by(1)
+
+      expect(granter2).to have(1).computed_policies
+      p = granter2.computed_policies.first
+      expect(p.condition_site_id).to eq(site11.prefix)
+    end
   end
 
 end

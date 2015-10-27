@@ -179,6 +179,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
               "uuid" => {
                 "type" => "string",
                 "index" => "not_analyzed"
+              },
+              "path" => {
+                "type" => "string",
+                "index" => "not_analyzed"
               }
             }
           },

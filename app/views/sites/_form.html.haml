@@ -18,6 +18,18 @@
       = f.label :location_geoid, "Location"
     .col
       = f.hidden_field :location_geoid, class: 'input-large'
+  - if @site.new_record?
+    .row
+      .col.pe-2
+        = f.label :parent_id, "Supervisor"
+      .col
+        = f.collection_select(:parent_id, @sites, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
+  - elsif @site.parent
+    .row
+      .col.pe-2
+        = f.label :parent_id, "Supervisor"
+      .col
+        = @site.parent.name
 
   .row.button-actions
     .col

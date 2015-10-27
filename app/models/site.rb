@@ -6,9 +6,13 @@ class Site < ActiveRecord::Base
   has_one :user, through: :institution
   has_many :devices
   has_many :test_results, through: :devices
+  belongs_to :parent, class_name: "Site"
+  has_many :children, class_name: "Site", foreign_key: "parent_id"
 
   validates_presence_of :institution
   validates_presence_of :name
+
+  after_create :compute_prefix
 
   attr_writer :location
 
@@ -54,7 +58,26 @@ class Site < ActiveRecord::Base
     end
   end
 
+  def path
+    prefix.split(".")
+  end
+
   def to_s
     name
+  end
+
+  def self.prefix(id)
+    Site.find(id).prefix
+  end
+
+  private
+
+  def compute_prefix
+    if parent
+      self.prefix = "#{parent.prefix}.#{uuid}"
+    else
+      self.prefix = uuid
+    end
+    self.save!
   end
 end

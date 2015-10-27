@@ -12,6 +12,7 @@ describe Cdx do
       "institution.name",
       "site.uuid",
       "site.name",
+      "site.path",
       "location.admin_levels",
       "location.id",
       "location.lat",
