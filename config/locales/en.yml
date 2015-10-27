@@ -21,3 +21,6 @@
 
 en:
   hello: "Hello world"
+  access_request:
+    submitted: Your request has been submitted for approval
+    prospects_list_heading: The following have requested system access

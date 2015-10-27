@@ -1,0 +1,24 @@
+= form_for @prospect, url: prospects_path do |f|
+  .row
+    .col.pe-2
+      = f.label :first_name
+    .col
+      = f.text_field :first_name
+  .row
+    .col.pe-2
+      = f.label :last_name
+    .col
+      = f.text_field :last_name
+  .row
+    .col.pe-2
+      = f.label :email
+    .col
+      = f.text_field :email
+  .row
+    .col.pe-2
+      = f.label :contact_number
+    .col
+      = f.text_field :contact_number
+  .row.button-actions
+    .col
+      = f.submit 'Request Access', class: 'btn-primary'

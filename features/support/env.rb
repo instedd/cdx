@@ -60,3 +60,13 @@ require 'machinist/active_record'
 Dir[ File.dirname(__FILE__) + "/../../spec/support/blueprints*"].each {|file| require file }
 
 Before { Sham.reset }
+
+module Cucumber
+  module Rails
+    class World
+      def within_section(section)
+        yield section
+      end
+    end
+  end
+end
