@@ -159,6 +159,8 @@ describe Policy do
         user2 = User.make
 
         assert_cannot user2, Institution, CREATE_INSTITUTION
+
+        Settings.single_tenant = false
       end
     end
 
