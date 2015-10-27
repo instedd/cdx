@@ -6,11 +6,10 @@ class DeviceModelsController < ApplicationController
 
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
+    head :forbidden unless has_access_to_device_models_index?
   end
 
   def index
-    return head :forbidden unless has_access_to_device_models_index?
-
     @device_models = authorize_resource(DeviceModel, READ_DEVICE_MODEL) or return
     @device_models = @device_models.includes(:manifest).includes(:institution)
 

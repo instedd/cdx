@@ -6,6 +6,7 @@ class FiltersController < ApplicationController
   expose(:condition) { filter.query["test.assays.condition"] }
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
+    head :forbidden unless has_access_to_test_results_index?
   end
 
   def index

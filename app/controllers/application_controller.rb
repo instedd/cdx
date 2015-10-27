@@ -9,7 +9,6 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
   before_action :check_no_institution!
-  before_action :load_current_user_policies
   before_action :load_js_global_settings
 
   before_action do
@@ -38,20 +37,14 @@ class ApplicationController < ActionController::Base
     @institution_tab = key
   end
 
-  def load_current_user_policies
-    if current_user
-      @current_user_policies = current_user.policies.load
-    end
-  end
-
   def load_js_global_settings
     gon.location_service_url = Settings.location_service_url
     gon.location_service_set = Settings.location_service_set
   end
 
   def authorize_resource(resource, action)
-    if Policy.can?(action, resource, current_user, @current_user_policies)
-      Policy.authorize(action, resource, current_user, @current_user_policies)
+    if Policy.can?(action, resource, current_user)
+      Policy.authorize(action, resource, current_user)
     else
       head :forbidden
       nil
