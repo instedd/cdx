@@ -16,6 +16,7 @@ var PieChart = React.createClass({
     var svg = d3.select(this.refs.svg.getDOMNode());
     var data = this.props.data;
 
+    var total = _.sum(data, 'value');
 
     var arcs_path = svg.selectAll(".arc path").data(data);
     var g_legends = svg.selectAll("g.legend").data(data);
@@ -23,7 +24,8 @@ var PieChart = React.createClass({
     var main_total = svg.selectAll(".main.total");
     var details_total = svg.selectAll(".details.total");
     var details_total_number = svg.selectAll(".details.total.number");
-    var details_total_legend = svg.selectAll(".details.total.legend");
+    var details_total_legend_l = svg.selectAll(".details.total.legend .left");
+    var details_total_legend_r = svg.selectAll(".details.total.legend .right");
 
     var stopOngoingAnimations = function () {
       arcs_path.transition().duration(0);
@@ -48,7 +50,8 @@ var PieChart = React.createClass({
       var color = this.buildColorScale();
 
       details_total_number.text(hoverItem.value);
-      details_total_legend.text(hoverItem.label).each(wrapWithEllipsis);
+      details_total_legend_l.text(hoverItem.label).each(wrapWithEllipsis);
+      details_total_legend_r.text(_.round(hoverItem.value * 100.0 / total) + '%');
 
       main_total.transition().style('opacity', 0).each("end", function(){
         details_total.transition().style('opacity', 1);
@@ -111,8 +114,11 @@ var PieChart = React.createClass({
           {/* Details Count */}
           <text className="details total number"
                 dy=".35em"></text>
-          <text className="details total legend" width="135"
-                dy="2.5em"></text>
+          <text className="details total legend"
+                dy="2.5em">
+                <tspan className="left" width="120"></tspan>
+                <tspan className="right" dx=".35em"></tspan>
+                </text>
 
           {/* Pie Slices */}
           {pie(this.props.data).map(function(d) {
