@@ -39,8 +39,16 @@
     }
   }
 
-  .legend text {
-    fill: #555555;
+  .details {
+    opacity: 0;
+  }
+
+  .legend {
+    cursor: default;
+
+    text {
+      fill: #555555;
+    }
   }
 
   .legends > span > span {
