@@ -243,10 +243,9 @@ class DevicesController < ApplicationController
   end
 
   def query_tests_histogram
-    query = {
+    query = default_performance_query_options.merge({
       "group_by" => "month(test.reported_time)",
-      "since" => (Date.today - 1.year).iso8601
-    }
+    })
     result = TestResult.query(query, current_user).execute
     result = Hash[result["tests"].map { |i| [i["test.reported_time"], i["count"]] }]
 
@@ -263,11 +262,10 @@ class DevicesController < ApplicationController
   end
 
   def query_errors_histogram
-    query = {
+    query = default_performance_query_options.merge({
       "test.status" => "error",
       "group_by" => "month(test.reported_time),test.site_user",
-      "since" => (Date.today - 1.year).iso8601
-    }
+    })
     result = TestResult.query(query, current_user).execute
     users = result["tests"].index_by { |t| t["test.site_user"] }.keys
     results_by_day = result["tests"].group_by { |t| t["test.reported_time"] }
@@ -289,18 +287,16 @@ class DevicesController < ApplicationController
   end
 
   def query_errors_by_code
-    query = {
+    query = default_performance_query_options.merge({
       "test.status" => "error",
-      "since" => (Date.today - 1.year).iso8601,
-    }
+    })
     total_count = TestResult.query(query, current_user).execute["total_count"]
     no_error_code = total_count
 
-    query = {
+    query = default_performance_query_options.merge({
       "test.status" => "error",
       "group_by" => "test.error_code",
-      "since" => (Date.today - 1.year).iso8601
-    }
+    })
     result = TestResult.query(query, current_user).execute
     pie_data = result["tests"].map do |test|
       no_error_code -= test["count"]
@@ -317,10 +313,9 @@ class DevicesController < ApplicationController
   end
 
   def query_tests_by_name
-    query = {
+    query = default_performance_query_options.merge({
       "group_by" => "test.name",
-      "since" => (Date.today - 1.year).iso8601
-    }
+    })
     result = TestResult.query(query, current_user).execute
     result["tests"].map do |test|
       {
@@ -328,5 +323,12 @@ class DevicesController < ApplicationController
         value: test["count"]
       }
     end
+  end
+
+  def default_performance_query_options
+    {
+      "since" => (Date.today - 1.year).iso8601,
+      "device.uuid" => @device.uuid
+    }
   end
 end
