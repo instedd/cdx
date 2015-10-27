@@ -72,12 +72,12 @@ class ApplicationController < ActionController::Base
   # filters/authorize @institutions by action. Assign calls resource.institution= if only one institution was left
   def prepare_for_institution_and_authorize(resource, action)
     @institutions = authorize_resource(@institutions, action)
-    if @institutions.one?
-      resource.institution = @institutions.first
-      @institutions
-    elsif @institutions.blank?
+    if @institutions.blank?
       head :forbidden
       nil
+    elsif @institutions.one?
+      resource.institution = @institutions.first
+      @institutions
     else
       @institutions
     end
