@@ -1,6 +1,6 @@
 class DevicesController < ApplicationController
-  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings]
-  before_filter :load_institutions, only: [:new, :create, :edit, :update]
+  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models]
+  before_filter :load_institutions, only: [:new, :create, :edit, :update, :device_models]
   before_filter :load_sites, only: [:new, :create, :edit, :update]
   before_filter :load_institution, only: :create
   before_filter :load_device_models_for_create, only: [:new, :create]
@@ -25,6 +25,7 @@ class DevicesController < ApplicationController
 
   def new
     @device = Device.new
+    @device.time_zone = "UTC"
     return unless prepare_for_institution_and_authorize(@device, REGISTER_INSTITUTION_DEVICE)
   end
 
@@ -165,6 +166,15 @@ class DevicesController < ApplicationController
     @device.device_model = DeviceModel.find(params[:device_model_id])
 
     render partial: 'custom_mappings'
+  end
+
+  def device_models
+    load_device_models_for_create
+
+    institution_id = params[:institution_id].to_i
+    @device_models = @device_models.select { |device_model| device_model.published? || device_model.institution_id == institution_id }.to_a
+
+    render partial: 'device_models'
   end
 
   def performance

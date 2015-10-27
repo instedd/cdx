@@ -67,6 +67,34 @@ module ApplicationHelper
     end
   end
 
+  define_component :cdx_select, attributes: [:form, :name, :value, :class]
+  ViewComponents::ComponentsBuilder::Component.classes[:cdx_select].class_eval do
+    def item(value, label)
+      @data[:items] ||= []
+      @data[:items] << {value: value.to_s, label: label}
+    end
+
+    def items(values, value_attr = nil, label_attr = nil)
+      values.each do |value|
+        item_value = resolve(value, value_attr)
+        item_label = resolve(value, label_attr)
+        self.item(item_value, item_label)
+      end
+    end
+
+    private
+
+    def resolve(obj, attr)
+      if attr.nil?
+        obj
+      elsif obj.is_a?(Hash)
+        obj[attr]
+      else
+        obj.send(attr)
+      end
+    end
+  end
+
   def test_results_table(attributes)
     options = { filter: {} }
     options[:filter]['site.uuid'] = attributes[:filter][:site].uuid if attributes[:filter][:site]

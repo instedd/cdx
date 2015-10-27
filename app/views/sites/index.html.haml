@@ -6,9 +6,11 @@
     .row
       .col
         %label.block Institution
-        %select.ddown(name="institution")
-          %option(value="") (all)
-          = options_from_collection_for_select @institutions, :id, :name, params["institution"]
+
+        = cdx_select name: "institution", value: params["institution"] do |select|
+          - select.item "", "(all)"
+          - select.items @institutions, :id, :name
+
         %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 
 .row

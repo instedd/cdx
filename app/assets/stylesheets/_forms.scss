@@ -43,61 +43,7 @@ label {
   }
 }
 
-// DDslick select styles ---------------------------------------------------------//
-
-
-.dd-container {
-  display: inline-block;
-  vertical-align: middle;
-
-  .dd-select {
-    padding-right: 20px !important;
-    width: inherit;
-  }
-
-  .dd-selected {
-    font-weight: 400;
-    padding: 10px 6px 10px 0px;
-    min-height: 39px;
-    min-width: 50px;
-  }
-  .dd-pointer-down {
-    border-top-color: $gray2;
-  }
-  .dd-pointer-up {
-    border-bottom-color: $gray2 !important;
-  }
-
-  label {
-    line-height: 1;
-    padding: 0;
-    margin: 0;
-    height: auto;
-    min-height: auto;
-  }
-}
-.dd-options {
-  width: auto !important;
-  min-width: 100%;
-  white-space: nowrap;
-}
-.dd-container,
-.dd-option {
-  min-height: 40px;
-}
-.dd-select {
-  border: none !important;
-  background: none !important;
-
-  label {
-    color: $black;
-  }
-}
-.dd-options {
-  label {
-    color: $black;
-  }
-}
+// Select2 select styles ---------------------------------------------------------//
 
 .select2-container {
   a {

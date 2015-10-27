@@ -25,9 +25,11 @@
 //= require d3
 //= require_tree .
 
-$(document).ready(function(){
-  $('.ddown').ddslick();
+function cdx_init_components(dom) {
+  ReactRailsUJS.mountComponents(dom);
+}
 
+$(document).ready(function(){
   function setFilledClass(elem) {
     window.setTimeout(function(){
       if(elem.val().length > 0) {
@@ -63,7 +65,7 @@ $(document).ready(function(){
       selectedDiv.addClass('loaded');
       $.get(target.attr('href'), function(data) {
         selectedDiv.html(data);
-        ReactRailsUJS.mountComponents(selectedDiv);
+        cdx_init_components(selectedDiv);
       });
     }
   });

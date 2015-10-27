@@ -6,19 +6,20 @@
           - @device.errors.full_messages.each do |msg|
             %li= msg
 
-  = render 'shared/select_institution_or_hidden', f: f, select_class: ''
+  = render 'shared/select_institution_or_hidden', f: f
 
   .row
     .col.pe-2
       = f.label :device_model_id
-    .col
-      = f.collection_select :device_model_id, @device_models, :id, :full_name, {include_blank: "Choose one"}
+    .col#device_models
+      = render "device_models"
   - if has_access?(Site, Policy::Actions::READ_SITE)
     .row
       .col.pe-2
         = f.label :site
       .col
-        = f.collection_select(:site_id, @sites, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
+        = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+          - select.items(@sites, :id, :name)
   .row
     .col.pe-2
       = f.label :name
@@ -33,7 +34,8 @@
     .col.pe-2
       = f.label :time_zone
     .col
-      = f.time_zone_select(:time_zone, nil,{ default: "UTC"}, class: 'ddown')
+      = cdx_select form: f, name: :time_zone, class: 'input-xx-large' do |select|
+        - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
   #custom_mappings
     = render "custom_mappings" if @device.device_model
 
@@ -44,18 +46,30 @@
         = link_to "Delete", @device, method: :delete, data: { confirm: "Are you sure you want to delete the device '#{@device.name}'" }, class: 'btn-secondary pull-right'
 
 :coffeescript
-  selected_device_model_id = #{@device.device_model_id.to_s.to_json}
-  $("#device_device_model_id").ddslick(
-    selectedText: "Choose one"
-    onSelected: (data) ->
-      device_model_id = data.selectedData.value
+  $ ->
+    selected_device_model_id = #{@device.device_model_id.to_s.to_json}
+    cdx_select_on_change "device[device_model_id]", (device_model_id) ->
       if device_model_id != selected_device_model_id
         $("#custom_mappings").load(
           "/devices/custom_mappings",
-          "device_model_id": device_model_id,
-          "device_id": #{@device.id.to_json}
+          {
+            "device_model_id": device_model_id,
+            "device_id": #{@device.id.to_json}
+          },
+          ->
+            cdx_init_components($("#custom_mappings"))
         )
         selected_device_model_id = device_model_id
-  )
 
-
+    if $('form.new_device').length > 0 && cdx_select_find("device[institution_id]").length > 0
+      selected_institution_id = #{@device.institution_id}
+      cdx_select_on_change "device[institution_id]", (institution_id) ->
+        if institution_id != selected_institution_id
+          $("#device_models").load(
+            "/devices/new/device_models",
+            {"institution_id": institution_id},
+            ->
+              cdx_init_components($("#device_models"))
+              $("#custom_mappings").empty()
+          )
+          selected_institution_id = institution_id

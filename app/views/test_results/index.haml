@@ -7,37 +7,37 @@
       - if @institutions.size > 1
         .col
           %label.block Institution
-          %select.ddown(name="institution.uuid")
-            %option(value="") Show all
-            = options_from_collection_for_select @institutions, :uuid, :name, params["institution.uuid"]
+          = cdx_select name: "institution.uuid", value: params["institution.uuid"] do |select|
+            - select.item "", "Show all"
+            - select.items @institutions, :uuid, :name
       - if @sites.size > 1
         .col
           %label.block Site
-          %select.ddown(name="site.uuid")
-            %option(value="") Show all
-            = options_from_collection_for_select @sites, :uuid, :name, params["site.uuid"]
+          = cdx_select name: "site.uuid", value: params["site.uuid"] do |select|
+            - select.item "", "Show all"
+            - select.items @sites, :uuid, :name
       - if @devices.size > 1
         .col
           %label.block Device
-          %select.ddown(name="device.uuid")
-            %option(value="") Show all
-            = options_from_collection_for_select @devices, :uuid, :name, params["device.uuid"]
+          = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
+            - select.item "", "Show all"
+            - select.items @devices, :uuid, :name
   .row
     .col
       %label.block Condition
-      %select.ddown{name: "test.assays.condition", value: params["test.assays.condition"]}
-        %option(value="") Show all
-        = options_for_select @conditions, params["test.assays.condition"]
+      = cdx_select name: "test.assays.condition", value: params["test.assays.condition"] do |select|
+        - select.item "", "Show all"
+        - select.items @conditions
     .col
       %label.block Result
-      %select.ddown{name: "test.assays.result"}
-        %option(value="") Show all
-        = options_for_select @results, params["test.assays.result"]
+      = cdx_select name: "test.assays.result", value: params["test.assays.result"] do |select|
+        - select.item "", "Show all"
+        - select.items @results
     .col
       %label.block Date
-      %select.ddown{name: "since"}
-        %option(value="") Show all
-        = options_for_select @date_options, params["since"]
+      = cdx_select name: "since", value: params["since"] do |select|
+        - select.item "", "Show all"
+        - select.items @date_options
     .col
       %label.block Sample Id
       %input{type: "text", name: "sample.id", value: params["sample.id"]}
@@ -70,6 +70,15 @@
         %span
           of
           = (@total.to_f / @page_size).ceil
-        %select.ddown(name="page_size" onchange="this.form.submit()")
-          = options_for_page_sizes
+        %span(style="display: inline-block;")
+          = cdx_select name: "page_size", value: @page_size, class: 'input-x-large' do |select|
+            - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
+        :javascript
+          $(function(){
+            $(document).on('change', 'input[name=page_size]', function(){
+              var form = this.form;
+              form.submit();
+            });
+          })
+
         = link_to "download CSV", csv_test_results_path(@filter)
