@@ -185,6 +185,7 @@ class DevicesController < ApplicationController
     @tests_histogram = query_tests_histogram
     @tests_by_name = query_tests_by_name
     @errors_histogram, @error_users = query_errors_histogram
+    @errors_by_code = query_errors_by_code
 
     render layout: false if request.xhr?
   end
@@ -285,6 +286,34 @@ class DevicesController < ApplicationController
       }
     end
     return errors_histogram, users
+  end
+
+  def query_errors_by_code
+    query = {
+      "test.status" => "error",
+      "since" => (Date.today - 1.year).iso8601,
+    }
+    total_count = TestResult.query(query, current_user).execute["total_count"]
+    no_error_code = total_count
+
+    query = {
+      "test.status" => "error",
+      "group_by" => "test.error_code",
+      "since" => (Date.today - 1.year).iso8601
+    }
+    result = TestResult.query(query, current_user).execute
+    pie_data = result["tests"].map do |test|
+      no_error_code -= test["count"]
+
+      {
+        label: test["test.error_code"],
+        value: test["count"]
+      }
+    end
+
+    pie_data << {label: 'Unknown', value: no_error_code} if no_error_code > 0
+
+    pie_data
   end
 
   def query_tests_by_name
