@@ -2,6 +2,33 @@ require 'spec_helper'
 
 describe Device do
 
+  context "blueprint" do
+    def should_be_valid_with_instition_and_site(device)
+      expect(device.institution).to_not be_nil
+      expect(device.site).to_not be_nil
+      expect(device).to be_valid
+    end
+
+    it "should have an institution and site if not specified" do
+      should_be_valid_with_instition_and_site Device.make_unsaved
+    end
+
+    it "should allow institution override and keep a site" do
+      should_be_valid_with_instition_and_site Device.make_unsaved(institution: Institution.make)
+    end
+
+    it "should allow site override and keep an institution" do
+      should_be_valid_with_instition_and_site Device.make_unsaved(site: Site.make)
+    end
+
+    it "should allow creating a device from site association" do
+      site = Site.make
+      device = site.devices.make
+      should_be_valid_with_instition_and_site device
+      expect(device.site).to eq(site)
+    end
+  end
+
   context "validations" do
 
     it { is_expected.to validate_presence_of :device_model }
@@ -9,8 +36,7 @@ describe Device do
     it { is_expected.to validate_presence_of :institution }
 
     it "should validate unpublished device model to belong to the same institution" do
-      device = Device.make_unsaved
-      device.institution = Institution.make
+      device = Device.make_unsaved institution: Institution.make
       device.device_model = DeviceModel.make(:unpublished, institution: Institution.make)
       expect(device).to be_invalid
 
@@ -19,12 +45,30 @@ describe Device do
     end
 
     it "should not validate published device model" do
-      device = Device.make_unsaved
-      device.institution = Institution.make
+      device = Device.make_unsaved institution: Institution.make
       device.device_model = DeviceModel.make(institution: Institution.make)
       expect(device).to be_valid
     end
 
+    it "should not allow institution and institution of site be different" do
+      device = Device.make_unsaved
+      device.institution = Institution.make
+      device.site = Site.make
+      expect(device).to_not be_valid
+    end
+
+    it "should allow same institution and institution of site" do
+      device = Device.make_unsaved
+      device.institution = Institution.make
+      device.site = Site.make institution: device.institution
+      expect(device).to be_valid
+    end
+
+    it "should allow device without institution" do
+      device = Device.make_unsaved institution: Institution.make
+      device.site = nil
+      expect(device).to be_valid
+    end
   end
 
   context 'cascade destroy', elasticsearch: true do

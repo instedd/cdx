@@ -26,6 +26,7 @@ class Device < ActiveRecord::Base
   validates_presence_of :device_model
 
   validate :unpublished_device_model_from_institution
+  validate :same_institution_of_site
 
   before_create :set_uuid
 
@@ -123,6 +124,12 @@ class Device < ActiveRecord::Base
   def unpublished_device_model_from_institution
     if device_model && !device_model.published? && device_model.institution_id != self.institution_id
       errors.add(:device_model, "Unpublished device models can only be used to setup devices from the same institution")
+    end
+  end
+
+  def same_institution_of_site
+    if self.site && self.site.institution != self.institution
+      errors.add(:site, "must belongs to the institution of the device")
     end
   end
 
