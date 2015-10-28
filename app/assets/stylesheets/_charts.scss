@@ -1,6 +1,8 @@
 .chart {
   .bar {
-    fill: #03a9f4;
+    &.b0 { fill: #03A9F4; }
+    &.b1 { fill: #EC1561; }
+    &.b2 { fill: #3E4EB8; }
   }
 
   .axis {
@@ -37,7 +39,19 @@
     }
   }
 
-  .legend text {
-    fill: #555555;
+  .details {
+    opacity: 0;
+  }
+
+  .legend {
+    cursor: default;
+
+    text {
+      fill: #555555;
+    }
+  }
+
+  .legends > span > span {
+    padding: 0 1.4em 0 0.4em;
   }
 }

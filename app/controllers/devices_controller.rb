@@ -184,6 +184,8 @@ class DevicesController < ApplicationController
 
     @tests_histogram = query_tests_histogram
     @tests_by_name = query_tests_by_name
+    @errors_histogram, @error_users = query_errors_histogram
+    @errors_by_code = query_errors_by_code
 
     render layout: false if request.xhr?
   end
@@ -241,10 +243,9 @@ class DevicesController < ApplicationController
   end
 
   def query_tests_histogram
-    query = {
+    query = default_performance_query_options.merge({
       "group_by" => "month(test.reported_time)",
-      "since" => (Date.today - 1.year).iso8601
-    }
+    })
     result = TestResult.query(query, current_user).execute
     result = Hash[result["tests"].map { |i| [i["test.reported_time"], i["count"]] }]
 
@@ -254,17 +255,67 @@ class DevicesController < ApplicationController
       date_key = date.strftime("%Y-%m")
       tests_histogram << {
         label: "#{I18n.t("date.abbr_month_names")[date.month]}#{date.month == 1 ? " #{date.strftime("%y")}" : ""}",
-        value: result[date_key] || 0
+        values: [result[date_key] || 0]
       }
     end
     tests_histogram
   end
 
+  def query_errors_histogram
+    query = default_performance_query_options.merge({
+      "test.status" => "error",
+      "group_by" => "month(test.reported_time),test.site_user",
+    })
+    result = TestResult.query(query, current_user).execute
+    users = result["tests"].index_by { |t| t["test.site_user"] }.keys
+    results_by_day = result["tests"].group_by { |t| t["test.reported_time"] }
+
+    errors_histogram = []
+    11.downto(0).each do |i|
+      date = Date.today - i.months
+      date_key = date.strftime("%Y-%m")
+      date_results = results_by_day[date_key].try { |r| r.index_by { |t| t["test.site_user"] } }
+      errors_histogram << {
+        label: "#{I18n.t("date.abbr_month_names")[date.month]}#{date.month == 1 ? " #{date.strftime("%y")}" : ""}",
+        values: users.map do |u|
+          user_result = date_results && date_results[u]
+          user_result ? user_result["count"] : 0
+        end
+      }
+    end
+    return errors_histogram, users
+  end
+
+  def query_errors_by_code
+    query = default_performance_query_options.merge({
+      "test.status" => "error",
+    })
+    total_count = TestResult.query(query, current_user).execute["total_count"]
+    no_error_code = total_count
+
+    query = default_performance_query_options.merge({
+      "test.status" => "error",
+      "group_by" => "test.error_code",
+    })
+    result = TestResult.query(query, current_user).execute
+    pie_data = result["tests"].map do |test|
+      no_error_code -= test["count"]
+
+      {
+        label: test["test.error_code"],
+        value: test["count"]
+      }
+    end
+
+    pie_data << {label: 'Unknown', value: no_error_code} if no_error_code > 0
+
+    pie_data
+  end
+
   def query_tests_by_name
-    query = {
+    query = default_performance_query_options.merge({
       "group_by" => "test.name",
-      "since" => (Date.today - 1.year).iso8601
-    }
+    })
     result = TestResult.query(query, current_user).execute
     result["tests"].map do |test|
       {
@@ -272,5 +323,12 @@ class DevicesController < ApplicationController
         value: test["count"]
       }
     end
+  end
+
+  def default_performance_query_options
+    {
+      "since" => (Date.today - 1.year).iso8601,
+      "device.uuid" => @device.uuid
+    }
   end
 end
