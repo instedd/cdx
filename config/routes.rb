@@ -105,10 +105,7 @@ Rails.application.routes.draw do
     end
     resources :sites, only: :index
     resources :institutions, only: :index
-  end
-
-  scope :api, format: 'json', except: [:new, :edit] do
-    resources :filters do
+    resources :filters, only: [:index, :show] do
       resources :subscribers
     end
     resources :subscribers

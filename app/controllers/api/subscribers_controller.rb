@@ -1,7 +1,7 @@
-class SubscribersController < ApplicationController
+class Api::SubscribersController < ApiController
   include Concerns::SubscribersController
 
-  respond_to :html, :json
+  respond_to :json
   expose(:subscribers) do
     if params[:filter_id]
       current_user.filters.find(params[:filter_id]).subscribers
@@ -11,9 +11,6 @@ class SubscribersController < ApplicationController
   end
   expose(:subscriber, attributes: :subscriber_params)
   expose(:filters) { current_user.filters }
-  before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
-  end
 
   def index
     respond_with subscribers
@@ -23,23 +20,19 @@ class SubscribersController < ApplicationController
     respond_with subscriber
   end
 
-  def new
-    subscriber.fields = []
-  end
-
   def create
     subscriber.last_run_at = Time.now
-    flash[:notice] = "Subscriber was successfully created" if subscriber.save
-    respond_with subscriber, location: subscribers_path
+    subscriber.save!
+    respond_with subscriber
   end
 
   def update
-    flash[:notice] = "Subscriber was successfully updated" if subscriber.save
-    respond_with subscriber, location: subscribers_path
+    subscriber.save!
+    respond_with subscriber
   end
 
   def destroy
     subscriber.destroy
-    respond_with subscriber
+    render json: subscriber
   end
 end
