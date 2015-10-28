@@ -6,3 +6,4 @@ sync_pattern: "*.{csv,bef,json,xml}"
 google_client_id:
 google_client_secret:
 google_maps_api_key:
+single_tenant: false

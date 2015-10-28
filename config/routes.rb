@@ -17,7 +17,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :institutions, except: :show
+  resources :institutions, except: :show do
+    collection do
+      get :pending_approval
+    end
+  end
 
   resources :encounters, only: [:new, :create, :edit, :update, :show] do
     collection do

@@ -9,11 +9,10 @@ class DevicesController < ApplicationController
 
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
+    head :forbidden unless has_access_to_devices_index?
   end
 
   def index
-    return head :forbidden unless has_access_to_devices_index?
-
     @devices = check_access(Device, READ_DEVICE)
 
     @devices = @devices.where(institution_id: params[:institution].to_i) if params[:institution].presence

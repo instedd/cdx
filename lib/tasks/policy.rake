@@ -10,6 +10,12 @@ namespace :policy do
     user = User.find args[:user_id]
     user.grant_superadmin_policy
   end
+  
+  desc "Regenerates computed policies for all users"
+  task :calculate_computed => :environment do
+    PoliciesMigrator.new.calculate_computed
+    puts "\nSuccess!"
+  end
 
   desc "Recreates implicit and owner policies for all users"
   task :implicit => :environment do
@@ -135,8 +141,5 @@ namespace :policy do
       calculate_computed
       puts "\nSuccess!"
     end
-
   end
-
-
 end

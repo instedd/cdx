@@ -152,6 +152,16 @@ describe Policy do
 
         assert_can user2, Institution, CREATE_INSTITUTION, []
       end
+
+      it "doesn't allow to create institutions if single-tenant deploy" do
+        Settings.single_tenant = true
+
+        user2 = User.make
+
+        assert_cannot user2, Institution, CREATE_INSTITUTION
+
+        Settings.single_tenant = false
+      end
     end
 
     context "Read" do

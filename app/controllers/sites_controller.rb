@@ -3,11 +3,10 @@ class SitesController < ApplicationController
   before_filter :load_institutions
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
+    head :forbidden unless has_access_to_sites_index?
   end
 
   def index
-    return head :forbidden unless has_access_to_sites_index?
-
     @sites = check_access(Site, READ_SITE)
     @institutions = check_access(Institution, READ_INSTITUTION)
     @can_create = has_access?(@institutions, CREATE_INSTITUTION_SITE)

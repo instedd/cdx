@@ -9,7 +9,6 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
   before_action :check_no_institution!
-  before_action :load_current_user_policies
   before_action :load_js_global_settings
 
   before_action do
@@ -38,20 +37,14 @@ class ApplicationController < ActionController::Base
     @institution_tab = key
   end
 
-  def load_current_user_policies
-    if current_user
-      @current_user_policies = current_user.policies.load
-    end
-  end
-
   def load_js_global_settings
     gon.location_service_url = Settings.location_service_url
     gon.location_service_set = Settings.location_service_set
   end
 
   def authorize_resource(resource, action)
-    if Policy.can?(action, resource, current_user, @current_user_policies)
-      Policy.authorize(action, resource, current_user, @current_user_policies)
+    if Policy.can?(action, resource, current_user)
+      Policy.authorize(action, resource, current_user)
     else
       head :forbidden
       nil
@@ -61,19 +54,23 @@ class ApplicationController < ActionController::Base
   def check_no_institution!
     return if current_user && current_user.need_change_password?
     if current_user && current_user.institutions.empty? && current_user.policies.empty?
-      redirect_to new_institution_path
+      if has_access?(Institution, CREATE_INSTITUTION)
+        redirect_to new_institution_path
+      else
+        redirect_to pending_approval_institutions_path
+      end
     end
   end
 
   # filters/authorize @institutions by action. Assign calls resource.institution= if only one institution was left
   def prepare_for_institution_and_authorize(resource, action)
     @institutions = authorize_resource(@institutions, action)
-    if @institutions.one?
-      resource.institution = @institutions.first
-      @institutions
-    elsif @institutions.blank?
+    if @institutions.blank?
       head :forbidden
       nil
+    elsif @institutions.one?
+      resource.institution = @institutions.first
+      @institutions
     else
       @institutions
     end

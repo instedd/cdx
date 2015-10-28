@@ -1,10 +1,10 @@
 module ApplicationHelper
   def has_access?(resource, action)
-    Policy.can? action, resource, current_user, @current_user_policies
+    Policy.can? action, resource, current_user
   end
 
   def check_access(resource, action)
-    Policy.authorize action, resource, current_user, @current_user_policies
+    Policy.authorize action, resource, current_user
   end
 
   def has_access_to_sites_index?
@@ -17,6 +17,14 @@ module ApplicationHelper
 
   def has_access_to_device_models_index?
     has_access?(Institution, Policy::Actions::REGISTER_INSTITUTION_DEVICE_MODEL) || check_access(DeviceModel, Policy::Actions::READ_DEVICE_MODEL).exists?
+  end
+
+  def has_access_to_test_results_index?
+    has_access?(TestResult, Policy::Actions::QUERY_TEST)
+  end
+
+  def can_delegate_permissions?
+    current_user.computed_policies.any? &:delegable?
   end
 
   def format_datetime(value, time_zone = nil)
