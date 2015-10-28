@@ -1,6 +1,6 @@
 class InstitutionsController < ApplicationController
   before_filter :load_institutions
-  skip_before_filter :check_no_institution!, only: [:new, :create]
+  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
   before_filter do
     @main_column_width = 6 unless params[:action] == 'index'
   end
@@ -84,6 +84,10 @@ class InstitutionsController < ApplicationController
       format.html { redirect_to institutions_url }
       format.json { head :no_content }
     end
+  end
+
+  def pending_approval
+    @hide_nav_bar = true
   end
 
   private

@@ -57,7 +57,7 @@ class ApplicationController < ActionController::Base
       if has_access?(Institution, CREATE_INSTITUTION)
         redirect_to new_institution_path
       else
-        @hide_nav_bar = true
+        redirect_to pending_approval_institutions_path
       end
     end
   end

@@ -30,15 +30,9 @@ class User < ActiveRecord::Base
   end
 
   def implicit_policies
-    policies = self.institutions.pluck(:id, :kind).map do |institution_id, kind|
+    self.institutions.pluck(:id, :kind).map do |institution_id, kind|
       Policy.owner(self, institution_id, kind)
-    end
-
-    unless Settings.single_tenant
-      policies += [Policy.implicit(self)].compact
-    end
-
-    policies
+    end + [(Policy.implicit(self) unless Settings.single_tenant)].compact
   end
 
   def update_computed_policies
