@@ -2,11 +2,11 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe DevicesController do
-  let(:institution) {Institution.make}
-  let(:user) {institution.user}
-  let(:site) {institution.sites.make}
-  let(:device_model) {DeviceModel.make}
-  let(:device) {Device.make institution: institution, site: site, device_model: device_model}
+  let!(:institution) {Institution.make}
+  let!(:user) {institution.user}
+  let!(:site) {institution.sites.make}
+  let!(:device_model) {DeviceModel.make}
+  let!(:device) {Device.make institution: institution, site: site, device_model: device_model}
 
   before(:each) {sign_in user}
 
