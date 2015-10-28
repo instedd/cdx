@@ -63,4 +63,11 @@ class User < ActiveRecord::Base
     end
     app
   end
+
+  def create_api_token
+    token = default_oauth2_application.access_tokens.new
+    token.resource_owner_id = self.id
+    token.save!
+    token
+  end
 end
