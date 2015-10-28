@@ -79,6 +79,7 @@ gem 'encryptor'
 
 gem 'dotiw'
 gem 'rails-i18n', '~> 4.0.0'
+gem 'doorkeeper'
 
 group :development, :test do
   gem 'pry-byebug'

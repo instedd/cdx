@@ -1,6 +1,7 @@
 require 'sidekiq/web'
 
 Rails.application.routes.draw do
+  use_doorkeeper
   mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
 
   devise_for :users, controllers: {
@@ -16,11 +17,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :institutions, except: :show do
-    member do
-      get :request_api_token
-    end
-  end
+  resources :institutions, except: :show
 
   resources :encounters, only: [:new, :create, :edit, :update, :show] do
     collection do
@@ -74,6 +71,7 @@ Rails.application.routes.draw do
   resources :filters, format: 'html'
   resources :subscribers
   resources :policies
+  resources :api_tokens
 
   scope :dashboards, controller: :dashboards do
     get :nndd

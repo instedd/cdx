@@ -86,13 +86,6 @@ class InstitutionsController < ApplicationController
     end
   end
 
-  def request_api_token
-    @institution = Institution.find(params[:id])
-    return unless authorize_resource(@institution, READ_INSTITUTION)
-
-    @token = Guisso.generate_bearer_token current_user.email
-  end
-
   private
 
   def load_institutions
