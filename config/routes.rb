@@ -17,11 +17,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :institutions, except: :show do
-    member do
-      get :request_api_token
-    end
-  end
+  resources :institutions, except: :show
 
   resources :encounters, only: [:new, :create, :edit, :update, :show] do
     collection do

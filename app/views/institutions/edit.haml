@@ -6,9 +6,5 @@
       = link_to institutions_path, class: 'side-link', title: 'Back' do
         = image_tag "arrow-left.png"
 
-.row
-  .col
-    %label.block Get access through API token.
-    %p= link_to 'Request API token', request_api_token_institution_path(@institution)
 = render 'form'
 
