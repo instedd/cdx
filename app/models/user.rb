@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  include Resource
+  
   # Include default devise modules. Others available are:
   # :timeoutable
   devise :database_authenticatable, :registerable,
@@ -22,6 +24,14 @@ class User < ActiveRecord::Base
     Settings.web_session_timeout.try{ |timeout| timeout.to_i.seconds }
   end
 
+  scope :active, -> { where(active: true) }
+  scope :archived, -> { where(archived: true) }
+
+  #This method is called by devise to check for "active" state of the model
+  def active_for_authentication?
+    super and self.active? and !self.archived? 
+  end
+  
   def create(model)
     if model.respond_to?(:user=)
       model.user = self

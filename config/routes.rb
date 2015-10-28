@@ -1,7 +1,12 @@
 require 'sidekiq/web'
 
 Rails.application.routes.draw do
+
   use_doorkeeper
+
+  # Admin
+  ActiveAdmin.routes(self)
+   
   mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
 
   devise_for :users, controllers: {
@@ -9,6 +14,8 @@ Rails.application.routes.draw do
     sessions: "sessions",
   }
 
+  resources :users
+  
   resources :sites do
     member do
       get :devices

@@ -52,6 +52,8 @@ class Policy < ActiveRecord::Base
     UPDATE_ENCOUNTER = "encounter:update"
 
     MEDICAL_DASHBOARD = "testResult:medicalDashboard"
+    
+    MANAGE_USER = "user:manage"
   end
 
   ACTIONS = [
@@ -80,7 +82,8 @@ class Policy < ActiveRecord::Base
     Actions::REPORT_MESSAGE,
     Actions::CREATE_INSTITUTION_ENCOUNTER,
     Actions::READ_ENCOUNTER,
-    Actions::UPDATE_ENCOUNTER
+    Actions::UPDATE_ENCOUNTER,
+    Actions::MANAGE_USER
   ]
 
   def self.superadmin(user)
