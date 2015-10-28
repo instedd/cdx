@@ -9,9 +9,11 @@ class ApiController < ApplicationController
 
   # We redefine current_user to also take into account the oauth token
   def current_user
-    @doorkeeper_user ||= begin
-      super || User.find(doorkeeper_token.resource_owner_id)
+    unless @doorkeeper_user_cached
+      @doorkeeper_user_cached = true
+      @doorkeeper_user = super || (doorkeeper_token && User.find(doorkeeper_token.resource_owner_id))
     end
+    @doorkeeper_user
   end
 
   def build_csv prefix, builder
