@@ -36,7 +36,7 @@ Institution.blueprint do
 end
 
 Device.blueprint do
-  site
+  site { Site.make institution: institution }
   institution { site.institution }
   name
   serial_number { name }
