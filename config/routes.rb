@@ -46,6 +46,7 @@ Rails.application.routes.draw do
     collection do
       post 'custom_mappings'
       post 'new/device_models' => 'devices#device_models'
+      post 'sites'
     end
     resources :custom_mappings, only: [:index]
     resources :ssh_keys, only: [:create, :destroy]

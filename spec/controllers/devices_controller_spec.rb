@@ -9,6 +9,9 @@ describe DevicesController do
   let(:device_model) {manifest.device_model}
   let!(:device) {Device.make institution: institution, site: site, device_model: device_model}
 
+  let!(:other_institution) {Institution.make user: user}
+  let!(:other_site) {other_institution.sites.make}
+
   before(:each) {sign_in user}
 
   context "Index" do
@@ -58,6 +61,10 @@ describe DevicesController do
       expect(assigns(:device_models)).to contain_exactly(published, unpublished)
     end
 
+    it "loads all sites from allowed institutions" do
+      get :new
+      expect(assigns(:sites)).to contain_exactly(site, other_site)
+    end
   end
 
   context "Edit" do
@@ -75,6 +82,11 @@ describe DevicesController do
 
       get :edit, id: device.id
       expect(assigns(:device_models)).to contain_exactly(published, unpublished)
+    end
+
+    it "loads sites from device institution" do
+      get :edit, id: device.id
+      expect(assigns(:sites)).to contain_exactly(site)
     end
 
   end

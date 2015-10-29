@@ -1,5 +1,5 @@
 class DevicesController < ApplicationController
-  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models]
+  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models, :sites]
   before_filter :load_institutions, only: [:new, :create, :edit, :update, :device_models]
   before_filter :load_sites, only: [:new, :create, :edit, :update]
   before_filter :load_institution, only: :create
@@ -77,9 +77,10 @@ class DevicesController < ApplicationController
   def edit
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
+    @sites = @sites.where(institution_id: @device.institution_id)
+
     @uuid_barcode = Barby::Code93.new(@device.uuid)
     @uuid_barcode_for_html = Barby::HtmlOutputter.new(@uuid_barcode)
-    # TODO: check valid sites
     @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
     @can_generate_activation_token = has_access?(@device, GENERATE_ACTIVATION_TOKEN)
     @can_delete = has_access?(@device, DELETE_DEVICE)
@@ -174,6 +175,15 @@ class DevicesController < ApplicationController
     @device_models = @device_models.select { |device_model| device_model.published? || device_model.institution_id == institution_id }.to_a
 
     render partial: 'device_models'
+  end
+
+  def sites
+    load_sites
+
+    institution_id = params[:institution_id].to_i
+    @sites = @sites.where(institution_id: institution_id)
+
+    render partial: 'sites'
   end
 
   def performance

@@ -1,0 +1,2 @@
+= cdx_select name: 'device[site_id]', value: @device.try(&:site_id), class: 'input-x-large' do |select|
+  - select.items(@sites, :id, :name)
