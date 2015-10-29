@@ -19,6 +19,12 @@ class DeviceModel < ActiveRecord::Base
   #This is kept for forward compatibility (we will have multiple manifests, published and unpublished)
   alias_method :current_manifest, :manifest
 
+  has_attached_file :picture, styles: { card: "180x180>" }, default_url: "card-unkown.png"
+  validates_attachment_content_type :picture, content_type: /\Aimage\/.*\Z/
+  attr_accessor :delete_picture
+  attr_accessor :picture_content_type
+  before_validation { picture.clear if delete_picture == '1' }
+
   def full_name
     if institution
       "#{name} (#{institution.name})"

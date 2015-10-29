@@ -6,13 +6,25 @@
           - @device_model.errors.full_messages.each do |msg|
             %li= msg
 
-= form_for(@device_model) do |f|
+= form_for(@device_model, html: { multipart: true }) do |f|
   = render 'shared/select_institution_or_hidden', f: f
   .row
     .col.pe-2
       = f.label :name
     .col
       = f.text_field :name
+
+  .row
+    .col.pe-2
+      = f.label :picture
+    .col
+      - unless @device_model.picture.blank?
+        = image_tag @device_model.picture.url(:card)
+        = f.check_box :delete_picture
+        = f.label :delete_picture
+        %br
+      = f.file_field :picture
+
   .row
     .col.pe-2
       = f.label :supports_activation

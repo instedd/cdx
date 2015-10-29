@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151029165435) do
+ActiveRecord::Schema.define(version: 20151029184400) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -100,13 +100,17 @@ ActiveRecord::Schema.define(version: 20151029165435) do
   add_index "device_messages_test_results", ["test_result_id"], name: "index_device_messages_test_results_on_test_result_id", using: :btree
 
   create_table "device_models", force: :cascade do |t|
-    t.string   "name",                limit: 255
+    t.string   "name",                 limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "institution_id",      limit: 4
-    t.datetime "published_at"
+    t.integer  "institution_id",       limit: 4
     t.boolean  "supports_activation"
-    t.string   "support_url",         limit: 255
+    t.datetime "published_at"
+    t.string   "support_url",          limit: 255
+    t.string   "picture_file_name",    limit: 255
+    t.string   "picture_content_type", limit: 255
+    t.integer  "picture_file_size",    limit: 4
+    t.datetime "picture_updated_at"
   end
 
   add_index "device_models", ["published_at"], name: "index_device_models_on_published_at", using: :btree
@@ -332,8 +336,8 @@ ActiveRecord::Schema.define(version: 20151029165435) do
     t.integer  "encounter_id",         limit: 4
     t.integer  "site_id",              limit: 4
     t.integer  "institution_id",       limit: 4
-    t.string   "site_prefix",          limit: 255
     t.integer  "sample_identifier_id", limit: 4
+    t.string   "site_prefix",          limit: 255
   end
 
   add_index "test_results", ["device_id"], name: "index_test_results_on_device_id", using: :btree

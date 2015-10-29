@@ -13,6 +13,7 @@ gem 'decent_exposure'
 gem 'nokogiri'
 gem 'react-rails'
 gem 'foreman'
+gem 'paperclip'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'ruby-openid'
