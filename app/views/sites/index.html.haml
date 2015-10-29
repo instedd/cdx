@@ -2,7 +2,7 @@
   .row
     .col
       %h1 Filters
-  %form
+  %form(data-auto-submit)
     .row
       .col
         %label.block Institution
@@ -10,8 +10,6 @@
         = cdx_select name: "institution", value: params["institution"] do |select|
           - select.item "", "(all)"
           - select.items @institutions, :id, :name
-
-        %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 
 .row
   .col

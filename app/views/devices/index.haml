@@ -2,7 +2,7 @@
   .row
     .col
       %h1 Filters
-  %form
+  %form(data-auto-submit)
     .row
       - if @institutions.size > 1
         .col.pe-2
@@ -16,8 +16,6 @@
           = cdx_select name: "site", value: params["site"] do |select|
             - select.item "", "(all)"
             - select.items @sites, :id, :name
-      .col
-        %input.btn-primary.pull-right{type: "submit", value: "Filter"}
 
 .row
   .col
