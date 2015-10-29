@@ -1,4 +1,4 @@
-%form
+%form(data-auto-submit)
   .row
     .col
       %h1 Filters
@@ -46,7 +46,6 @@
       %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
   .row
     .col
-      %input.btn-primary.pull-right{type: "submit", value: "Filter"}
       = link_to "Add filter", new_filter_path(query: @filter), class: 'btn pull-right'
 
   .row

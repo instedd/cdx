@@ -52,6 +52,22 @@ $(document).ready(function(){
     window.location.href = $(this).data('href');
   });
 
+  $('form[data-auto-submit]').each(function(){
+    var form = $(this);
+    var payload = form.serialize();
+
+    var debouncedSubmit = _.debounce(function(){
+      form.submit();
+    }, 2000);
+
+    form.on('change', function(){
+      if (payload != form.serialize()) {
+        payload = form.serialize()
+        debouncedSubmit();
+      }
+    });
+  });
+
   $(document).on('click', '.tabs .tabs-header a:not(".selected")', function(event) {
     var target = $(event.target);
     var tabsHeader = target.closest('ul');
