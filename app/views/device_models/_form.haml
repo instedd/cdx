@@ -20,6 +20,12 @@
       = f.check_box :supports_activation
       = f.label :supports_activation, "&nbsp;".html_safe
 
+  .row
+    .col.pe-2
+      = f.label :support_url
+    .col
+      = f.text_field :support_url
+
   = f.fields_for :manifest do |manifest_form|
     - if @device_model.manifest.version
       .row

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151027175111) do
+ActiveRecord::Schema.define(version: 20151029165435) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -106,6 +106,7 @@ ActiveRecord::Schema.define(version: 20151027175111) do
     t.integer  "institution_id",      limit: 4
     t.datetime "published_at"
     t.boolean  "supports_activation"
+    t.string   "support_url",         limit: 255
   end
 
   add_index "device_models", ["published_at"], name: "index_device_models_on_published_at", using: :btree
