@@ -16,6 +16,7 @@ class Institution < ActiveRecord::Base
   validates_inclusion_of :kind, in: KINDS
 
   after_create :update_owner_policies
+  after_destroy :update_owner_policies
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions

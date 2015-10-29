@@ -323,6 +323,16 @@ describe ComputedPolicy do
       expect(user.computed_policies(:reload).map(&:condition_institution_id)).to match_array([i2.id])
     end
 
+    it "should recompute policies when an institution is destroyed (#453)" do
+      old_computed_policies = granter.computed_policies.to_a
+
+      i1 = granter.institutions.make
+      i1.destroy
+
+      granter.reload
+      expect(granter.computed_policies.to_a).to eq(old_computed_policies)
+    end
+
     it "should support a loop of policies" do
       i1 = granter.institutions.make
       i2 = granter2.institutions.make
