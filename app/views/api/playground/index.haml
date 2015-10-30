@@ -31,11 +31,14 @@
               }
             ]
           }
+      .results.playground-error
+      .row 
+        %input#create_button.btn-primary(name="commit" type="submit" value="Create message")
       .row
         .col       
           = "Test results to generate:"
         .col
-          %input{:max => "10000", :min => "0", :value => "0", :id => "repeat_demo", :type => "number"}
+          %input{:max => "500", :min => "1", :value => "1", :id => "repeat_demo", :type => "number"}
       .row
         .col
           = "Start date time:"
@@ -46,9 +49,8 @@
           = "End date time:"
         .col
           = datetime_local_field("data", "end_datetime")
-      .results.playground-error
       .row 
-        %input#create_button.btn-primary(name="commit" type="submit" value="Create message")
+        %input#create_button.btn-primary(id="demodata" type="submit" value="Create Demo Data messages")
 
   .col
     .row
@@ -65,7 +67,7 @@
           %textarea.input-block#post_body{:rows => "8"}
       .row
         .col
-          %input#query_button.btn-primary(name="commit" type="submit" value="Query")
+          %input#query_button.btn-primary(type="submit" value="Query")
     .row
       .col
         #response_div

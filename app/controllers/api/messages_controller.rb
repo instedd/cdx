@@ -10,27 +10,32 @@ class Api::MessagesController < ApiController
 
   def create
     device = Device.includes(:device_model, :manifest, :institution, :site).find_by_uuid(params[:device_id])
-
     if !authenticate_create(device)
       head :unauthorized
     else
       data = request.body.read rescue nil
-
-      if params['repeat_demo'].to_i > 0
-        saved_ok = true;  
-        repeatDemo =  params['repeat_demo'].to_i
-        repeatDemo.times do |n|        
-          changed_data=randomise_device_data(device, data.clone, params['start_datetime'], params['end_datetime'])
-          saved_ok = save_device_message(device, changed_data, false) 
-          break if saved_ok == false  
-        end
-        render :create, :json =>  {} ,:status => :ok if saved_ok == true
-      else
-        save_device_message(device, data, true)
+      save_device_message(device, data, true)
     end
   end
-end
 
+
+  def create_demo
+    device = Device.includes(:device_model, :manifest, :institution, :site).find_by_uuid(params[:device_id])
+    if !authenticate_create(device)
+      head :unauthorized
+    else
+      data = request.body.read rescue nil
+      saved_ok = true  
+      repeatDemo =  params['repeat_demo'].to_i
+      repeatDemo.times do |n|        
+        changed_data=randomise_device_data(device, data.clone, params['start_datetime'], params['end_datetime'])
+        saved_ok = save_device_message(device, changed_data, false) 
+        break if saved_ok == false  
+      end    
+      
+      render :create, :json =>  {} ,:status => :ok if saved_ok == true
+    end
+  end
 
   private
 

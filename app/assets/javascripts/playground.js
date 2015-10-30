@@ -18,8 +18,15 @@ $(function() {
       start_demo_datetime = $("#data_start_datetime").val();
       end_demo_datetime = $("#data_end_datetime").val();
 
+      var submit_button = $(this).find("input[type=submit]:focus" );
+      if ( $(submit_button).attr("id")=='create_button_demodata' ) {
+	    url= "/api/devices/" + device + "/demodata?repeat_demo="+repeat_demo_times+"&start_datetime="+start_demo_datetime+"&end_datetime="+end_demo_datetime;
+      } else {
+	    url= "/api/devices/" + device + "/messages";
+      }
+
       $.ajax({
-        url: "/api/devices/" + device + "/messages?repeat_demo="+repeat_demo_times+"&start_datetime="+start_demo_datetime+"&end_datetime="+end_demo_datetime,
+        url: url,
         type: "POST",
         data: data,
         contentType: false,
@@ -36,6 +43,7 @@ $(function() {
       });
       return false;
     });
+
 
     $query_form = $("#query_form");
     $query_button = $("#query_button");

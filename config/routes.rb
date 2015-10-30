@@ -107,8 +107,9 @@ Rails.application.routes.draw do
       end
     end
     resources :devices, only: [] do
-      resources :messages, only: [:create], shallow: true
+      resources :messages, only: [:create ], shallow: true
       match 'events' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3
+      match 'demodata' => "messages#create_demo", via: :post
     end
     resources :sites, only: :index
     resources :institutions, only: :index
