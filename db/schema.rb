@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151029184400) do
+ActiveRecord::Schema.define(version: 20151030211740) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -104,8 +104,8 @@ ActiveRecord::Schema.define(version: 20151029184400) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",       limit: 4
-    t.boolean  "supports_activation"
     t.datetime "published_at"
+    t.boolean  "supports_activation"
     t.string   "support_url",          limit: 255
     t.string   "picture_file_name",    limit: 255
     t.string   "picture_content_type", limit: 255
@@ -134,7 +134,7 @@ ActiveRecord::Schema.define(version: 20151029184400) do
     t.integer  "institution_id", limit: 4
     t.integer  "patient_id",     limit: 4
     t.string   "uuid",           limit: 255
-    t.string   "entity_id_hash", limit: 255
+    t.string   "entity_id",      limit: 255
     t.binary   "sensitive_data", limit: 65535
     t.text     "custom_fields",  limit: 65535
     t.text     "core_fields",    limit: 65535

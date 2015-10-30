@@ -149,7 +149,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
     expect(Encounter.count).to eq(1)
     encounter = Encounter.first
-    expect(encounter.entity_id_hash).to eq(MessageEncryption.hash ENCOUNTER_ID)
+    expect(encounter.entity_id).to eq(ENCOUNTER_ID)
     assert_encounter_data(encounter)
   end
 
