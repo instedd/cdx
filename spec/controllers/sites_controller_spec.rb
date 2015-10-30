@@ -60,6 +60,15 @@ describe SitesController do
       expect(response).to be_forbidden
     end
 
+    it "should create if no location geoid" do
+      expect {
+        site = Site.plan(institution: institution)
+        site.delete :location_geoid
+        post :create, site: site
+      }.to change(institution.sites, :count).by(1)
+      expect(response).to be_redirect
+    end
+
   end
 
   context "edit" do

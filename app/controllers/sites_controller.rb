@@ -111,8 +111,10 @@ class SitesController < ApplicationController
 
   def site_params
     location_details = Location.details(params[:site][:location_geoid]).first
-    params[:site][:lat] = location_details.lat
-    params[:site][:lng] = location_details.lng
+    if location_details
+      params[:site][:lat] = location_details.lat
+      params[:site][:lng] = location_details.lng
+    end
     params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid)
   end
 end
