@@ -11,8 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151027175111) do
-
+ActiveRecord::Schema.define(version: 20151028105235) do
+  
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
     t.string   "client_id",  limit: 255
@@ -31,6 +31,39 @@ ActiveRecord::Schema.define(version: 20151027175111) do
   end
 
   add_index "activations", ["activation_token_id"], name: "index_activations_on_activation_token_id", unique: true, using: :btree
+
+  create_table "active_admin_comments", force: :cascade do |t|
+    t.string   "namespace",     limit: 255
+    t.text     "body",          limit: 65535
+    t.string   "resource_id",   limit: 255,   null: false
+    t.string   "resource_type", limit: 255,   null: false
+    t.integer  "author_id",     limit: 4
+    t.string   "author_type",   limit: 255
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
+  add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
+  add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
+
+  create_table "admin_users", force: :cascade do |t|
+    t.string   "email",                  limit: 255, default: "", null: false
+    t.string   "encrypted_password",     limit: 255, default: "", null: false
+    t.string   "reset_password_token",   limit: 255
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",          limit: 4,   default: 0,  null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip",     limit: 255
+    t.string   "last_sign_in_ip",        limit: 255
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+  end
+
+  add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
+  add_index "admin_users", ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -331,8 +364,8 @@ ActiveRecord::Schema.define(version: 20151027175111) do
     t.integer  "encounter_id",         limit: 4
     t.integer  "site_id",              limit: 4
     t.integer  "institution_id",       limit: 4
-    t.string   "site_prefix",          limit: 255
     t.integer  "sample_identifier_id", limit: 4
+    t.string   "site_prefix",          limit: 255
   end
 
   add_index "test_results", ["device_id"], name: "index_test_results_on_device_id", using: :btree
@@ -362,10 +395,19 @@ ActiveRecord::Schema.define(version: 20151027175111) do
     t.datetime "locked_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "isActive",                                   default: true
+    t.boolean  "isArchived"
+    t.boolean  "isAdmin",                                    default: false
+    t.boolean  "is_admin",                                   default: false
+    t.boolean  "is_active",                                  default: true
+    t.boolean  "is_archived",                                default: false
     t.datetime "password_changed_at"
     t.string   "locale",                         limit: 255, default: "en"
     t.boolean  "timestamps_in_device_time_zone",             default: false
     t.string   "time_zone",                      limit: 255, default: "UTC"
+    t.datetime "deleted_at"
+    t.boolean  "archived",                                   default: false
+    t.boolean  "active",                                     default: true
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree

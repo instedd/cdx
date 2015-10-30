@@ -67,3 +67,6 @@ end
 Rails.application.assets.context_class.class_eval do
   include HTMLAssets::ViewContext
 end
+
+Rails.application.config.assets.precompile += ['active_admin.js', 'active_admin.css', 'active_admin/print.css']
+

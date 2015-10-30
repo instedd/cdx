@@ -53,6 +53,8 @@ gem 'puma'
 gem 'sidekiq'
 gem 'sinatra'
 
+gem 'activeadmin', github: 'activeadmin'
+
 group :development do
   gem 'web-console', '~> 2.0'
   gem 'capistrano', '~> 3.1.0', require: false
