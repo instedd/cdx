@@ -1,3 +1,10 @@
+<%
+  require 'config'
+  branch = `git rev-parse --abbrev-ref HEAD`.strip rescue nil
+  use_single_db = !Settings.db_per_branch || !branch || branch == 'master'
+  branch_spec = (use_single_db ? "" : "_#{branch}").underscore.gsub(/[\.\/\-]/, '_')
+%>
+
 default: &default
   adapter: mysql2
   encoding: utf8
@@ -8,7 +15,7 @@ default: &default
 
 development:
   <<: *default
-  database: cdp_development
+  database: cdp_development<%= branch_spec %>
   reconnect: true
 
 test: &test
