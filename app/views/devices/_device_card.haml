@@ -12,6 +12,9 @@
         %b= @device.name
         %br
         %span= @device.device_model.name
+        - if @show_institution
+          %div
+            Institution: #{@device.institution.name}
       - c.actions do
         = link_to edit_device_path(@device), :title => 'Edit' do
           = image_tag "ic-pencil.png"

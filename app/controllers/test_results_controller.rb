@@ -41,11 +41,14 @@ class TestResultsController < ApplicationController
     @test_result = TestResult.find_by(uuid: params[:id])
     return unless authorize_resource(@test_result, QUERY_TEST)
 
-    @other_tests = @test_result.sample.test_results.where.not(id: @test_result.id)
+    @other_tests = @test_result.sample ? @test_result.sample.test_results.where.not(id: @test_result.id) : TestResult.none
     @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
 
-    @sample_id = @test_result.sample.entity_id
-    @sample_id_barcode = Barby::Code93.new(@sample_id)
+    @sample_id = @test_result.sample.try(:entity_id)
+    if @sample_id
+      @sample_id_barcode = Barby::Code93.new(@sample_id)
+    end
+    @show_institution = show_institution?(Policy::Actions::QUERY_TEST, TestResult)
   end
 
   def csv

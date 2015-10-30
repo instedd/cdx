@@ -60,6 +60,8 @@ class DevicesController < ApplicationController
     @device = Device.find(params[:id])
     return unless authorize_resource(@device, READ_DEVICE)
     redirect_to setup_device_path(@device) unless @device.activated?
+
+    @show_institution = show_institution?(Policy::Actions::READ_DEVICE, Device)
   end
 
   def setup

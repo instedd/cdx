@@ -11,7 +11,12 @@
       - c.top do
         %b= @test_result.core_fields[TestResult::NAME_FIELD]
         %br
-        %span= @test_result.core_fields[TestResult::START_TIME_FIELD].strftime('%B %e, %Y')
+        - start_time = @test_result.core_fields[TestResult::START_TIME_FIELD]
+        - start_time = Time.parse(start_time) unless start_time.is_a?(Time)
+        %span= start_time.strftime('%B %e, %Y')
+        - if @show_institution
+          %div
+            Institution: #{@test_result.institution.name}
       - c.bottom do
         Patient
         -# TODO add link to patient
@@ -67,12 +72,13 @@
 .row
   .col.pe-2
     %label Sample
-  .col
-    -# TODO add print button
-    .value= @sample_id
-    %br
-    %br
-    = raw @sample_id_barcode.to_html
+  - if @sample_id
+    .col
+      -# TODO add print button
+      .value= @sample_id
+      %br
+      %br
+      = raw @sample_id_barcode.to_html
 
 
 

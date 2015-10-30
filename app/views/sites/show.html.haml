@@ -8,6 +8,9 @@
     = card image: map_url(@site.lat, @site.lng) do |c|
       - c.top do
         %b= @site.name
+        - if @show_institution
+          %div
+            Institution: #{@site.institution.name}
       - if @can_edit
         - c.actions do
           = link_to edit_site_path(@site), :title => 'Edit' do
