@@ -7,8 +7,9 @@ class DevicesController < ApplicationController
   before_filter :load_device_models_for_update, only: [:edit, :update]
   before_filter :load_filter_resources, only: :index
 
+  before_filter :set_width, except: [:edit, :new, :create, :update]
+
   before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
     head :forbidden unless has_access_to_devices_index?
   end
 
@@ -339,5 +340,9 @@ class DevicesController < ApplicationController
       "since" => (Date.today - 1.year).iso8601,
       "device.uuid" => @device.uuid
     }
+  end
+
+  def set_width
+    @main_column_width = 10
   end
 end
