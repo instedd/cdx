@@ -3,11 +3,8 @@
 .row
   .col
     %h4 Setup
-    %p
-      %a View instructions
-      on how to setup this device or
-      %a email setup instructions to a lab operator
-      \.
+
+    = react_component("DeviceSetup", device_model: @device.device_model)
 
     %p
       The Device Id and Secure Key allow your device to identify itself with CDx.

@@ -66,6 +66,7 @@ Rails.application.routes.draw do
   resources :device_models do
     member do
       put 'publish'
+      get 'manifest'
     end
   end
   resources :test_results , only: [:index, :show] do

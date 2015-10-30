@@ -32,6 +32,7 @@ class DeviceModelsController < ApplicationController
 
   def create
     authorize_resource(Institution.find(device_model_create_params[:institution_id]), REGISTER_INSTITUTION_DEVICE_MODEL) or return
+    load_manifest_upload
     @device_model = DeviceModel.new(device_model_create_params)
     set_published_status(@device_model)
 
@@ -56,6 +57,7 @@ class DeviceModelsController < ApplicationController
     @device_model = (authorize_resource(@device_model, PUBLISH_DEVICE_MODEL) or return) if @device_model.published?
 
     set_published_status(@device_model)
+    load_manifest_upload
 
     respond_to do |format|
       if @device_model.update(device_model_update_params)
@@ -91,6 +93,13 @@ class DeviceModelsController < ApplicationController
     end
   end
 
+  def manifest
+    @device_model = authorize_resource(DeviceModel.find(params[:id]), READ_DEVICE_MODEL) or return
+    @manifest = @device_model.current_manifest
+
+    send_data @manifest.definition, type: :json, disposition: "attachment", filename: @manifest.filename
+  end
+
   private
 
   def load_institutions
@@ -98,16 +107,28 @@ class DeviceModelsController < ApplicationController
   end
 
   def device_model_create_params
-    params.require(:device_model).permit(:name, :institution_id, :supports_activation, manifest_attributes: [:definition])
+    params.require(:device_model).permit(:name, :picture, :delete_picture, :institution_id, :supports_activation, :support_url, manifest_attributes: [:definition])
   end
 
   def device_model_update_params
-    params.require(:device_model).permit(:name, :supports_activation, manifest_attributes: [:definition])
+    params.require(:device_model).permit(:name, :picture, :delete_picture, :supports_activation, :support_url, manifest_attributes: [:definition])
   end
 
   def set_published_status(device_model)
     device_model.set_published_at   if params[:publish]   && can_publish_device_model?(device_model)
     device_model.unset_published_at if params[:unpublish] && can_unpublish_device_model?(device_model)
+  end
+
+  def load_manifest_upload
+    if params[:device_model][:manifest_attributes] && params[:device_model][:manifest_attributes][:definition]
+      # this is for testing. specs had String manifest. It should be migrated to temp file and fixture_file_upload
+      unless params[:device_model][:manifest_attributes][:definition].is_a?(String)
+        params[:device_model][:manifest_attributes][:definition] = params[:device_model][:manifest_attributes][:definition].read
+      end
+    else
+      params[:device_model][:manifest_attributes] ||= {}
+      params[:device_model][:manifest_attributes][:definition] = @device_model.try { |dm| dm.current_manifest.definition }
+    end
   end
 
 end

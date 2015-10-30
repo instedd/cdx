@@ -7,11 +7,12 @@
 
 .row
   .col.pe-7
-    = card image: "card-unkown.png" do |c|
+    = card image: @device.device_model.picture.url(:card) do |c|
       - c.top do
         %b= @device.name
         %br
         %span= @device.device_model.name
+
       - c.actions do
         = link_to edit_device_path(@device), :title => 'Edit' do
           = image_tag "ic-pencil.png"
@@ -24,4 +25,3 @@
           .location
             Device located at
             = link_to @device.site, site_path(@device.site)
-

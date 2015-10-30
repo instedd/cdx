@@ -6,33 +6,49 @@
           - @device_model.errors.full_messages.each do |msg|
             %li= msg
 
-= form_for(@device_model) do |f|
-  = render 'shared/select_institution_or_hidden', f: f
+= form_for(@device_model, html: { multipart: true }) do |f|
+  = render 'shared/select_institution_or_hidden', f: f, label_col_class: 'pe-3'
   .row
-    .col.pe-2
+    .col.pe-3
       = f.label :name
     .col
       = f.text_field :name
+
   .row
-    .col.pe-2
+    .col.pe-3
+      = f.label :picture
+    .col
+      - unless @device_model.picture.blank?
+        = image_tag @device_model.picture.url(:card)
+        = f.check_box :delete_picture
+        = f.label :delete_picture
+        %br
+      = f.file_field :picture
+
+  = f.fields_for :manifest do |manifest_form|
+    .row
+      .col.pe-3
+        = manifest_form.label :definition
+      .col
+        - if !@device_model.new_record? && @device_model.manifest.definition
+          = link_to @device_model.manifest.filename, manifest_device_model_path(@device_model)
+          %br
+          Upload new version
+        = manifest_form.file_field :definition
+
+  .row
+    .col.pe-3
       = f.label :supports_activation
     .col
       = f.check_box :supports_activation
       = f.label :supports_activation, "&nbsp;".html_safe
 
-  = f.fields_for :manifest do |manifest_form|
-    - if @device_model.manifest.version
-      .row
-        .col.pe-2
-          = manifest_form.label :version
-        .col
-          = @device_model.manifest.version
+  .row
+    .col.pe-3
+      = f.label :support_url
+    .col
+      = f.text_field :support_url
 
-    .row
-      .col.pe-2
-        = manifest_form.label :definition
-      .col
-        = manifest_form.text_area :definition, :rows => '5'
 
   .row.button-actions
     .col
