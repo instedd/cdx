@@ -139,9 +139,6 @@ GEM
     capybara-mechanize (1.4.0)
       capybara (~> 2.4.4)
       mechanize (~> 2.7.0)
-    capybara-screenshot (1.0.11)
-      capybara (>= 1.0, < 3)
-      launchy
     celluloid (0.17.1.2)
       bundler
       celluloid-essentials
@@ -186,7 +183,6 @@ GEM
     climate_control (0.0.3)
       activesupport (>= 3.0)
     clipboard (1.0.6)
-    cliver (0.3.2)
     cocaine (0.5.7)
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.0)
@@ -232,6 +228,9 @@ GEM
       responders
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
+    devise_invitable (1.5.3)
+      actionmailer (>= 3.2.6, < 5)
+      devise (>= 3.2.0)
     diff-lcs (1.2.5)
     domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
@@ -326,6 +325,8 @@ GEM
     jwt (1.5.1)
     launchy (2.4.3)
       addressable (~> 2.3)
+    letter_opener (1.4.1)
+      launchy (~> 2.2)
     libv8 (3.16.14.11)
     listen (3.0.3)
       rb-fsevent (>= 0.9.3)
@@ -364,7 +365,6 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (2.9.2)
     netrc (0.10.3)
-    newrelic_rpm (3.14.0.305)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     notiffany (0.0.7)
@@ -387,6 +387,9 @@ GEM
     omniauth-oauth2 (1.3.1)
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
+    omniauth-openid (1.0.1)
+      omniauth (~> 1.0)
+      rack-openid (~> 1.3.1)
     orm_adapter (0.5.0)
     paperclip (4.3.1)
       activemodel (>= 3.2.0)
@@ -394,13 +397,6 @@ GEM
       cocaine (~> 0.5.5)
       mime-types
       mimemagic (= 0.3.0)
-    paranoia (2.1.4)
-      activerecord (~> 4.0)
-    poltergeist (1.7.0)
-      capybara (~> 2.1)
-      cliver (~> 0.3.1)
-      multi_json (~> 1.0)
-      websocket-driver (>= 0.2.0)
     power_assert (0.2.4)
     pry (0.10.1)
       coderay (~> 1.1.0)
@@ -422,6 +418,9 @@ GEM
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.4)
+    rack-openid (1.3.1)
+      rack (>= 1.1.0)
+      ruby-openid (>= 2.1.8)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.3)
@@ -502,6 +501,7 @@ GEM
       rspec-mocks (~> 3.3.0)
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
+    ruby-openid (2.7.0)
     ruby_parser (3.7.1)
       sexp_processor (~> 4.1)
     rufus-scheduler (3.1.7)
@@ -598,9 +598,6 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
     webrobots (0.1.1)
-    websocket-driver (0.6.2)
-      websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.2)
     xpath (2.0.0)
       nokogiri (~> 1.3)
 
@@ -616,7 +613,6 @@ DEPENDENCIES
   capistrano-rvm (~> 0.1)
   capybara
   capybara-mechanize
-  capybara-screenshot
   cdx!
   cdx-api-elasticsearch!
   cdx-sync-server!
@@ -627,6 +623,7 @@ DEPENDENCIES
   database_cleaner
   decent_exposure
   devise
+  devise_invitable
   devise_security_extension!
   doorkeeper
   dotiw
@@ -643,19 +640,18 @@ DEPENDENCIES
   jbuilder (~> 1.2)
   jquery-rails
   jquery-turbolinks
+  letter_opener
   location_service!
   lodash-rails
   machinist (~> 1.0)
   mysql2
-  newrelic_rpm
   nokogiri
   oj
   omniauth
   omniauth-google-oauth2
+  omniauth-openid
   paperclip
-  paranoia
   poirot_rails!
-  poltergeist
   pry-byebug
   pry-clipboard
   pry-rescue
@@ -671,6 +667,7 @@ DEPENDENCIES
   rspec
   rspec-collection_matchers
   rspec-rails
+  ruby-openid
   sass-rails (~> 4.0.0)
   sdoc
   shoulda

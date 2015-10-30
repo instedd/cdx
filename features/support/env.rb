@@ -66,3 +66,4 @@ require 'capybara-screenshot/cucumber'
 Capybara.default_driver = :poltergeist
 
 Before { Sham.reset }
+

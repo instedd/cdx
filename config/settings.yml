@@ -6,6 +6,6 @@ sync_pattern: "*.{csv,bef,json,xml}"
 google_client_id:
 google_client_secret:
 google_maps_api_key:
-single_tenant: false
+single_tenant: <%= ENV['SINGLE_TENANT'] %>
 db_per_branch: false
 use_demo_data: false

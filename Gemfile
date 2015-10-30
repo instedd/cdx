@@ -57,6 +57,7 @@ gem 'sinatra'
 gem 'sidekiq-cron', '~> 0.3.1'
 
 group :development do
+  gem 'letter_opener'
   gem 'web-console', '~> 2.0'
   gem 'capistrano', '~> 3.1.0', require: false
   gem 'capistrano-rails',   '~> 1.1', require: false
@@ -71,6 +72,7 @@ end
 
 gem 'devise'
 gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
+gem 'devise_invitable'
 gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem 'elasticsearch'

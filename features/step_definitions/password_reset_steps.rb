@@ -2,22 +2,13 @@ def user
   @user ||= User.make
 end
 
-def login
-  login_page = LoginPage.new
-  login_page.load
-  form = login_page.form
-  form.user_name.set user.email
-  form.password.set user.password
-  form.login.click
-end
-
 Given(/^User foo@example\.com has not changed password for (\d+) months$/) do |arg1|
   user.password_changed_at = 3.months.ago
   user.save!
 end
 
 When(/^they log\-in to app$/) do
-  login
+  authenticate(user)
 end
 
 Given(/^the previous passwords$/) do |table|
@@ -32,7 +23,7 @@ Given(/^the previous passwords$/) do |table|
 end
 
 When(/^they try to use one of previous (\d+) passwords$/) do |arg1|
-  login
+  authenticate(user)
   password_change = PasswordChange.new
   password_change.load
   form = password_change.form
