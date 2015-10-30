@@ -21,3 +21,8 @@
 
 en:
   hello: "Hello world"
+
+  activerecord:
+    attributes:
+      manifest:
+        definition: Manifest

@@ -1,15 +1,16 @@
+- label_col_class ||= "pe-2"
 .row
   - if @institutions.one?
     = f.hidden_field :institution_id
   - else
     - if f.object.new_record?
-      .col.pe-2
+      .col{class: label_col_class}
         = f.label :institution
       .col
         = cdx_select form: f, name: :institution_id, class: 'input-x-large' do |select|
           - select.items @institutions, :id, :name
     - else
-      .col.pe-2
+      .col{class: label_col_class}
         %label Institution
       .col
         .value= f.object.institution

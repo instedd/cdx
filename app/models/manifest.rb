@@ -143,11 +143,15 @@ class Manifest < ActiveRecord::Base
       check_field_mapping
       check_custom_fields
     else
-      self.errors.add(:deifinition, "can't be blank")
+      self.errors.add(:definition, "can't be blank")
     end
 
   rescue Oj::ParseError => ex
     self.errors.add(:parse_error, ex.message)
+  end
+
+  def filename
+    "#{device_model.name}-#{version}.json"
   end
 
   private
