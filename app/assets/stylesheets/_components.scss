@@ -44,17 +44,25 @@
 }
 
 .assay-result {
-  padding-right: 0.5em;
+  background: url('assay-results.png') no-repeat right 20px;
+  padding-right: 24px;
+  display: inline-block;
+  vertical-align: middle;
+  height: 20px;
 
-  // TODO Add images to indicating status
+  &.assay-result-negative {
+    background-position: right 0px;
+  }
   &.assay-result-positive {
+    background-position: right -20px;
     color: $red;
   }
-  &.assay-result-negative {
-
-  }
   &.assay-result-disabled {
+    background-position: right -40px;
     color: $gray3;
+  }
+  & + .assay-result {
+    margin-left: 20px;
   }
 }
 
