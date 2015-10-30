@@ -20,6 +20,9 @@
         %b= @test_result.core_fields[TestResult::NAME_FIELD]
         %br
         %span= format_datetime(@test_result.core_fields[TestResult::START_TIME_FIELD])
+        - if @show_institution
+          %div
+            Institution: #{@test_result.institution.name}
       - c.bottom do
         - if @test_result.patient
           Patient

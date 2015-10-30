@@ -42,6 +42,7 @@ class TestResultsController < ApplicationController
     @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
 
     @samples = @test_result.sample_identifiers.reject{|identifier| identifier.entity_id.blank?}.map {|identifier| [identifier.entity_id, Barby::Code93.new(identifier.entity_id)]}
+    @show_institution = show_institution?(Policy::Actions::QUERY_TEST, TestResult)
   end
 
   def csv

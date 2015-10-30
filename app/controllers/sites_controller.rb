@@ -46,6 +46,7 @@ class SitesController < ApplicationController
     return unless authorize_resource(@site, READ_SITE)
 
     @can_edit = has_access?(@site, UPDATE_SITE)
+    @show_institution = show_institution?(Policy::Actions::READ_SITE, Site)
   end
 
   def edit
