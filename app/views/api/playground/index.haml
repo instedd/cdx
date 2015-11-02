@@ -32,13 +32,12 @@
             ]
           }
       .results.playground-error
-      .row 
-        %input#create_button.btn-primary(name="commit" type="submit" value="Create message")
+
       .row
         .col       
           = "Test results to generate:"
         .col
-          %input{:max => "500", :min => "1", :value => "1", :id => "repeat_demo", :type => "number"}
+          %input{:max => "500", :min => "0", :value => "0", :id => "repeat_demo", :type => "number"}
       .row
         .col
           = "Start date time:"
@@ -50,7 +49,8 @@
         .col
           = datetime_local_field("data", "end_datetime")
       .row 
-        %input#create_button.btn-primary(id="demodata" type="submit" value="Create Demo Data messages")
+        .col
+          %input#create_button.btn-primary(name="commit" type="submit" value="Create message")
 
   .col
     .row
