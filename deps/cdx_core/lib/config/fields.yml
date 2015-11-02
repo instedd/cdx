@@ -98,6 +98,9 @@ patient:
       pii: true
     name:
       pii: true
+    dob:
+      type: date
+      pii: true
     gender:
       type: enum
       searchable: true

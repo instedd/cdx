@@ -1,6 +1,6 @@
 class ManifestField
   attr_reader :target_field
-  subclass_responsibility :hash_key, :custom?
+  subclass_responsibility :store_target, :custom?
 
   def self.for(manifest, target_field, field_mapping)
     if core_field = core_field_from(target_field)
@@ -18,7 +18,7 @@ class ManifestField
 
   def store value, message
     if value.present?
-      index value, target_without_scope, message[scope_from_target][hash_key]
+      index value, target_without_scope, message.get_in(*store_target)
     end
     message
   end
@@ -45,7 +45,7 @@ class ManifestField
     @field_mapping
   end
 
-  private
+  protected
 
   def scope_from_target
     @target_field.split(Manifest::PATH_SPLIT_TOKEN).first

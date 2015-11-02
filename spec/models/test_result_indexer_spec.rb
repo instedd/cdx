@@ -3,23 +3,11 @@ require "spec_helper"
 describe TestResultIndexer, elasticsearch: true do
 
   let(:patient) do
-    patient_core_fields = {
-      "gender" => "male",
-      "custom_fields" => {
-        "hiv" => "positive"
-      }
-    }
-    Patient.make(uuid: 'abc', core_fields: patient_core_fields)
+    Patient.make(uuid: 'abc', core_fields: { 'gender' => 'male' }, custom_fields: { 'hiv' => 'positive' })
   end
 
   let(:sample) do
-    sample_core_fields = {
-      "type" => "sputum",
-      "custom_fields" => {
-        "culture_days" => "10"
-      }
-    }
-    Sample.make(patient: patient, core_fields: sample_core_fields)
+    Sample.make(patient: patient, core_fields: { 'type' => 'sputum' }, custom_fields: { 'culture_days' => '10' })
   end
 
   let(:sample_identifier) do
@@ -30,12 +18,12 @@ describe TestResultIndexer, elasticsearch: true do
     "sample_identifier" => sample_identifier,
     "patient" => patient,
     "test_id" => '4',
+    "custom_fields" => {
+      "concentration" => "15%"
+    },
     "core_fields" => {
       "id" => "4",
       "name" => "mtb",
-      "custom_fields" => {
-        "concentration" => "15%"
-      },
       "assays" => [
         {
           "result" => "positive",

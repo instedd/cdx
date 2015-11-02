@@ -22,7 +22,7 @@ describe TestResultsController, elasticsearch: true do
 
   it "should list test results" do
     test_result = TestResult.create_and_index(
-      core_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
+      core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
       device_messages: [ DeviceMessage.make(device: device) ])
 
     get :index
@@ -34,7 +34,7 @@ describe TestResultsController, elasticsearch: true do
     other_user; other_institution; other_site; other_device
 
     test_result = TestResult.create_and_index(
-      core_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
+      core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
       device_messages: [ DeviceMessage.make(device: device) ])
 
     get :index
@@ -54,7 +54,7 @@ describe TestResultsController, elasticsearch: true do
 
     let!(:test_result) do
       TestResult.create_and_index(
-        core_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
+        core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
         device_messages: [ DeviceMessage.make(device: device) ]
       )
     end

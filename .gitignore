@@ -34,3 +34,4 @@ VERSION
 bin/rspec
 config/settings/*.local.yml
 public/system
+examples.txt

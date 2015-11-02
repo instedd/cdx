@@ -111,6 +111,7 @@ RSpec.describe EncountersController, type: :controller do
 
     it "succeed" do
       expect(response).to have_http_status(:success)
+      expect(json_response['status']).to eq('ok')
     end
 
     it "assigns samples" do
@@ -122,7 +123,7 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "assigns observations" do
-      expect(sample.encounter.core_fields[Encounter::OBSERVATIONS_FIELD]).to eq('Lorem ipsum')
+      expect(sample.encounter.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]).to eq('Lorem ipsum')
     end
 
     it "assigns returns a json status ok" do
@@ -174,7 +175,7 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "assigns observations" do
-      expect(encounter.core_fields[Encounter::OBSERVATIONS_FIELD]).to eq('Lorem ipsum')
+      expect(encounter.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]).to eq('Lorem ipsum')
     end
 
     it "assigns returns a json status ok" do
