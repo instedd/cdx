@@ -8,6 +8,7 @@ Feature: Superadmin can invite users to the system
     And an institution name "Foo Labs Incorporated"
     And a prospective user called Bill Smith, with email "billsmith@copado.com"
 
+  @single_tenant
   Scenario: Bob invites Bill Smith to Foo Labs Incorporated
     Given Bill does not have an account
     When Bob sends an invitation to Bill Smith

@@ -64,6 +64,13 @@ require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
 
 Capybara.default_driver = :poltergeist
+Before('@single_tenant') do
+  Settings.single_tenant = true
+end
+
+After('@single_tenant') do
+  Settings.single_tenant = false
+end
 
 Before { Sham.reset }
 
