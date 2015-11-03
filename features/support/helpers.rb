@@ -19,7 +19,7 @@ module Helpers
               "device?institution=#{institution}"
             ],
             "except": [
-              "deviceModel/1",
+              "deviceModel/1"
             ],
             "action": "*",
             "delegable": true
