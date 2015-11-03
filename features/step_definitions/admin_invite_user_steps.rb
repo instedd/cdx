@@ -21,6 +21,7 @@ When(/^Bob sends an invitation to Bill Smith$/) do
   @policy = canned_policy(@institution.id)
   within(@invite_page.form) do |f|
     f.email.set @user.email
+    f.policy.set canned_policy
     f.invite.click
   end
 end
