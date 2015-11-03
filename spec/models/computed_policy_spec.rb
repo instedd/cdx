@@ -425,8 +425,46 @@ describe ComputedPolicy do
       institutions, sites, devices = condition_resources(READ_DEVICE, Device)
 
       expect(institutions).to contain_exactly(institution_i1)
-      expect(sites).to contain_exactly(site_i1_l1)
+      expect(sites).to        contain_exactly(site_i1_l1)
       expect(devices).to      contain_exactly(device_i1_l1_d1, device_i1_l1_d2)
+    end
+
+    it "should return devices with no sites if policy is by institution" do
+      device_i3_s0_d1 = Device.make(institution: Institution.make, site: nil)
+      device_i4_s0_d1 = Device.make(institution: Institution.make, site: nil)
+      expect(device_i3_s0_d1.site).to be_nil
+
+      grant nil, user, {:device => device_i3_s0_d1.institution}, READ_DEVICE
+      institutions, sites, devices = condition_resources(READ_DEVICE, Device)
+
+      expect(institutions).to contain_exactly(device_i3_s0_d1.institution)
+      expect(sites).to        be_empty
+      expect(devices).to      contain_exactly(device_i3_s0_d1)
+    end
+
+    it "should return devices with no sites if policy is by institution" do
+      device_i1_s0_d1 = Device.make(institution: institution_i1, site: nil)
+      expect(device_i1_s0_d1.site).to be_nil
+
+      grant nil, user, {:device => institution_i1}, READ_DEVICE
+      institutions, sites, devices = condition_resources(READ_DEVICE, Device)
+
+      expect(institutions).to contain_exactly(institution_i1)
+      expect(sites).to        contain_exactly(site_i1_l1, site_i1_l2)
+      expect(devices).to      contain_exactly(device_i1_l1_d1, device_i1_l1_d2, device_i1_l2_d1, device_i1_l2_d2, device_i1_s0_d1)
+    end
+
+    it "should not return devices with no sites if policy is by sites" do
+      device_i1_s0_d1 = Device.make(institution: institution_i1, site: nil)
+      expect(device_i1_s0_d1.site).to be_nil
+
+      grant nil, user, {:device => site_i1_l1}, READ_DEVICE
+      grant nil, user, {:device => site_i1_l2}, READ_DEVICE
+      institutions, sites, devices = condition_resources(READ_DEVICE, Device)
+
+      expect(institutions).to contain_exactly(institution_i1)
+      expect(sites).to        contain_exactly(site_i1_l1, site_i1_l2)
+      expect(devices).not_to  include(device_i1_s0_d1)
     end
 
     it "should not return resources in exceptions" do

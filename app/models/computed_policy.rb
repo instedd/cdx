@@ -125,7 +125,12 @@ class ComputedPolicy < ActiveRecord::Base
     institution_table, site_table, device_table = [Institution, Site, Device].map(&:arel_table)
 
     select = [institution_table[:id], site_table[:id], device_table[:id]]
-    from = Institution.joins(sites: :devices).arel.source
+    from = institution_table
+            .join(site_table, Arel::Nodes::OuterJoin)
+            .on(institution_table[:id].eq(site_table[:institution_id]))
+            .join(device_table, Arel::Nodes::OuterJoin)
+            .on(site_table[:id].eq(device_table[:site_id]))
+            .source
 
     filters = policies.map(&:arel_condition_filter).inject do |filters, filter|
       (filters && filter) ? filters.or(filter) : nil
@@ -133,7 +138,18 @@ class ComputedPolicy < ActiveRecord::Base
 
     arel_query = institution_table.project(*select).from(from)
     arel_query = arel_query.where(filters) if filters
-    result = self.connection.execute(arel_query.to_sql)
+
+    devices_without_sites_query = institution_table
+                      .project(*[institution_table[:id], Arel.sql('NULL'), device_table[:id]])
+                      .join(device_table)
+                      .on(institution_table[:id].eq(device_table[:institution_id]))
+                      .join(site_table, Arel::Nodes::OuterJoin)
+                      .on('1 = 0')
+                      .where(device_table[:site_id].eq(nil))
+
+    devices_without_sites_query = devices_without_sites_query.where(filters) if filters
+
+    result = self.connection.execute("#{arel_query.to_sql} UNION #{devices_without_sites_query.to_sql}")
     institution_ids, site_ids, device_ids = result.to_a.transpose.map{|ids| ids.try(:uniq)}
 
     return {
