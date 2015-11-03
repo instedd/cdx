@@ -46,8 +46,8 @@ module Entity
   end
 
   class_methods do
-    def from_the_past_year(relative_to)
-      where('created_at > ?', relative_to - 1.year)
+    def within_time(time_span, relative_to)
+      where('created_at > ?', relative_to - time_span)
     end
   end
 

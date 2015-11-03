@@ -30,6 +30,14 @@
         = f.label :parent_id, "Supervisor"
       .col
         = @site.parent.name
+  .row
+    .col.pe-2
+      = f.label :sample_id_reset_policy, "Sample ID reset policy"
+    .col
+      = cdx_select form: f, name: :sample_id_reset_policy, class: 'input-xx-large' do |select|
+        - select.item "yearly", "Yearly"
+        - select.item "monthly", "Monthly"
+        - select.item "weekly", "Weekly"
 
   .row.button-actions
     .col

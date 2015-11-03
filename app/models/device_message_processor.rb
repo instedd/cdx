@@ -32,6 +32,7 @@ class DeviceMessageProcessor
     def initialize(device_message_processor, parsed_message)
       @parent = device_message_processor
       @parsed_message = parsed_message
+      compute_sample_id_reset_policy
     end
 
     def process
@@ -70,7 +71,7 @@ class DeviceMessageProcessor
                             device: device
       assign_fields parsed_message, test
 
-      if test_id && existing = TestResult.from_the_past_year(@parent.device_message.created_at).find_by(test_id: test_id, device_id: test.device_id)
+      if test_id && existing = TestResult.within_time(1.year, @parent.device_message.created_at).find_by(test_id: test_id, device_id: test.device_id)
         existing.merge(test)
         existing
       else
@@ -92,13 +93,13 @@ class DeviceMessageProcessor
       find_or_initialize_entity Encounter, parsed_message.get_in('encounter', 'core', 'id')
     end
 
-    def find_or_initialize_entity(klass, entity_id, scope_by_last_year = true)
+    def find_or_initialize_entity(klass, entity_id, use_reset_policy = true)
       new_entity = klass.new institution_id: @parent.institution.id
       assign_fields parsed_message, new_entity
       assign_entity_id entity_id, new_entity
       yield new_entity, entity_id if block_given?
 
-      if entity_id && (existing = find_entity_by_id(klass, entity_id, scope_by_last_year))
+      if entity_id && (existing = find_entity_by_id(klass, entity_id, use_reset_policy))
         existing_indexed = existing.core_fields.deep_dup
         existing.merge(new_entity)
         [existing, existing_indexed, entity_id]
@@ -109,10 +110,11 @@ class DeviceMessageProcessor
       end
     end
 
-    def find_entity_by_id(klass, entity_id, scope_by_last_year = true)
+    def find_entity_by_id(klass, entity_id, use_reset_policy = true)
       query = klass
-      if scope_by_last_year
-        query = query.from_the_past_year(@parent.device_message.created_at)
+      if use_reset_policy
+        time_span = entity_reset_time_span klass
+        query = query.within_time(time_span, @parent.device_message.created_at)
       end
       query.find_by_entity_id(entity_id, @parent.institution.id)
     end
@@ -188,8 +190,9 @@ class DeviceMessageProcessor
     end
 
     def same_year?(new_entity, existing_entity)
+      time_span = entity_reset_time_span new_entity.class
       new_entity_created_at = new_entity.created_at || @parent.device_message.created_at
-      (new_entity_created_at - existing_entity.created_at).abs < 1.year
+      (new_entity_created_at - existing_entity.created_at).abs < time_span
     end
 
     def index_test(test)
@@ -245,6 +248,27 @@ class DeviceMessageProcessor
       end
 
       client.bulk index: Cdx::Api.index_name, body: body unless body.blank?
+    end
+
+    def compute_sample_id_reset_policy
+      sample_id_reset_policy = @parent.device_message.device.site.try(:sample_id_reset_policy)
+      @sample_id_reset_time_span =
+        case sample_id_reset_policy
+        when "monthly"
+           1.month
+        when "weekly"
+          1.week
+        else
+          1.year
+        end
+    end
+
+    def entity_reset_time_span(entity_class)
+      if entity_class == Sample
+        @sample_id_reset_time_span
+      else
+        1.year
+      end
     end
   end
 end

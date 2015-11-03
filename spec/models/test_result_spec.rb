@@ -19,7 +19,7 @@ describe TestResult do
     test1 = TestResult.make created_at: 2.years.ago
     test2 = TestResult.make created_at: 11.months.ago
 
-    tests = TestResult.from_the_past_year(Time.now).all
+    tests = TestResult.within_time(1.year, Time.now).all
     expect(tests).to eq([test2])
   end
 

@@ -243,6 +243,70 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(Sample.count).to eq(2)
   end
 
+  it "should create new sample if it has same sample id but not in the same month, with monthly reset policy" do
+    site = device.site
+    site.sample_id_reset_policy = "monthly"
+    site.save!
+
+    patient = Patient.make(
+      uuid: 'def', institution: device_message.institution,
+      core_fields: PATIENT_CORE_FIELDS,
+      plain_sensitive_data: {"id" => PATIENT_ID},
+    )
+
+    sample = Sample.make(
+      institution: device_message.institution, patient: patient,
+      core_fields: {"type" => "blood"},
+      created_at: 2.months.ago,
+    )
+
+    sample_identifier = SampleIdentifier.make(
+      sample: sample,
+      uuid: 'abc',
+      entity_id: SAMPLE_ID
+    )
+
+    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+
+    refresh_index
+
+    device_message_processor.process
+
+    expect(Sample.count).to eq(2)
+  end
+
+  it "should create new sample if it has same sample id but not in the same month, with weekly reset policy" do
+    site = device.site
+    site.sample_id_reset_policy = "weekly"
+    site.save!
+
+    patient = Patient.make(
+      uuid: 'def', institution: device_message.institution,
+      core_fields: PATIENT_CORE_FIELDS,
+      plain_sensitive_data: {"id" => PATIENT_ID},
+    )
+
+    sample = Sample.make(
+      institution: device_message.institution, patient: patient,
+      core_fields: {"type" => "blood"},
+      created_at: 2.weeks.ago,
+    )
+
+    sample_identifier = SampleIdentifier.make(
+      sample: sample,
+      uuid: 'abc',
+      entity_id: SAMPLE_ID
+    )
+
+    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+
+    refresh_index
+
+    device_message_processor.process
+
+    expect(Sample.count).to eq(2)
+  end
+
   it "should update sample data and existing test results on test result update" do
     patient = Patient.make(
       uuid: 'def', institution: device_message.institution,

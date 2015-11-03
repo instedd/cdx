@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151030211740) do
+ActiveRecord::Schema.define(version: 20151103193538) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -280,22 +280,23 @@ ActiveRecord::Schema.define(version: 20151030211740) do
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
 
   create_table "sites", force: :cascade do |t|
-    t.string   "name",           limit: 255
-    t.integer  "institution_id", limit: 4
-    t.string   "address",        limit: 255
-    t.string   "city",           limit: 255
-    t.string   "state",          limit: 255
-    t.string   "zip_code",       limit: 255
-    t.string   "country",        limit: 255
-    t.string   "region",         limit: 255
-    t.float    "lat",            limit: 24
-    t.float    "lng",            limit: 24
+    t.string   "name",                   limit: 255
+    t.integer  "institution_id",         limit: 4
+    t.string   "address",                limit: 255
+    t.string   "city",                   limit: 255
+    t.string   "state",                  limit: 255
+    t.string   "zip_code",               limit: 255
+    t.string   "country",                limit: 255
+    t.string   "region",                 limit: 255
+    t.float    "lat",                    limit: 24
+    t.float    "lng",                    limit: 24
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "location_geoid", limit: 60
-    t.string   "uuid",           limit: 255
-    t.integer  "parent_id",      limit: 4
-    t.string   "prefix",         limit: 255
+    t.string   "location_geoid",         limit: 60
+    t.string   "uuid",                   limit: 255
+    t.integer  "parent_id",              limit: 4
+    t.string   "prefix",                 limit: 255
+    t.string   "sample_id_reset_policy", limit: 255, default: "yearly"
   end
 
   create_table "ssh_keys", force: :cascade do |t|
