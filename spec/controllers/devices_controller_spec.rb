@@ -2,11 +2,11 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe DevicesController do
-  let(:institution) {Institution.make}
-  let(:user) {institution.user}
-  let(:site) {institution.sites.make}
-  let(:device_model) {DeviceModel.make}
-  let(:device) {Device.make institution: institution, site: site, device_model: device_model}
+  let!(:institution) {Institution.make}
+  let!(:user) {institution.user}
+  let!(:site) {institution.sites.make}
+  let!(:device_model) {DeviceModel.make}
+  let!(:device) {Device.make institution: institution, site: site, device_model: device_model}
 
   before(:each) {sign_in user}
 
@@ -37,6 +37,23 @@ describe DevicesController do
       get :index, institution: institution2.id
       expect(response).to be_success
       expect(assigns(:devices)).to contain_exactly(device2)
+    end
+  end
+
+  context "Index when devices have no sites" do
+    let!(:user2) {User.make}
+    let!(:institution2) {Institution.make user: user2}
+    let!(:device2) {institution2.devices.make site: nil}
+
+    it "should display filters when there are devices from more than one institution or site" do
+      grant user2, user, Resource.all.map(&:resource_name), "*"
+
+      get :index
+      expect(response).to be_success
+      expect(assigns(:devices)).to contain_exactly(device, device2)
+
+      expect(assigns(:institutions)).to contain_exactly(institution, institution2)
+      expect(assigns(:sites)).to contain_exactly(site)
     end
 
   end
