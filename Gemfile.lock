@@ -138,6 +138,9 @@ GEM
     capybara-mechanize (1.4.0)
       capybara (~> 2.4.4)
       mechanize (~> 2.7.0)
+    capybara-screenshot (1.0.11)
+      capybara (>= 1.0, < 3)
+      launchy
     celluloid (0.17.1.2)
       bundler
       celluloid-essentials
@@ -182,6 +185,7 @@ GEM
     climate_control (0.0.3)
       activesupport (>= 3.0)
     clipboard (1.0.6)
+    cliver (0.3.2)
     cocaine (0.5.7)
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.0)
@@ -319,6 +323,8 @@ GEM
       turbolinks
     json (1.8.3)
     jwt (1.5.1)
+    launchy (2.4.3)
+      addressable (~> 2.3)
     libv8 (3.16.14.11)
     listen (3.0.3)
       rb-fsevent (>= 0.9.3)
@@ -389,6 +395,11 @@ GEM
       cocaine (~> 0.5.5)
       mime-types
       mimemagic (= 0.3.0)
+    poltergeist (1.7.0)
+      capybara (~> 2.1)
+      cliver (~> 0.3.1)
+      multi_json (~> 1.0)
+      websocket-driver (>= 0.2.0)
     power_assert (0.2.4)
     pry (0.10.1)
       coderay (~> 1.1.0)
@@ -589,6 +600,9 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
     webrobots (0.1.1)
+    websocket-driver (0.6.2)
+      websocket-extensions (>= 0.1.0)
+    websocket-extensions (0.1.2)
     xpath (2.0.0)
       nokogiri (~> 1.3)
 
@@ -604,6 +618,7 @@ DEPENDENCIES
   capistrano-rvm (~> 0.1)
   capybara
   capybara-mechanize
+  capybara-screenshot
   cdx!
   cdx-api-elasticsearch!
   cdx-sync-server!
@@ -641,6 +656,7 @@ DEPENDENCIES
   omniauth-openid
   paperclip
   poirot_rails!
+  poltergeist
   pry-byebug
   pry-clipboard
   pry-rescue
