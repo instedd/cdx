@@ -14,10 +14,12 @@ class DevicesController < ApplicationController
   end
 
   def index
-    @devices = check_access(Device, READ_DEVICE)
+    @devices = check_access(Device, READ_DEVICE).joins(:device_model)
+    @manufacturers = Institution.where(id: @devices.select('device_models.institution_id'))
 
     @devices = @devices.where(institution_id: params[:institution].to_i) if params[:institution].presence
-    @devices = @devices.where(site_id:  params[:site].to_i)  if params[:site].presence
+    @devices = @devices.where(site_id: params[:site].to_i) if params[:site].presence
+    @devices = @devices.where(device_models: { institution_id: params[:manufacturer].to_i}) if params[:manufacturer].presence
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
     @devices_to_read = check_access(Device, READ_DEVICE).pluck(:id)
@@ -218,6 +220,7 @@ class DevicesController < ApplicationController
   end
 
   def load_institutions
+    # TODO FIX at :index @institutions should be institutions of devices that can be read
     @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end
 

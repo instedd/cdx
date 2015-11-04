@@ -42,6 +42,20 @@ describe DevicesController do
       expect(response).to be_success
       expect(assigns(:devices)).to contain_exactly(device2)
     end
+
+    it "should display index filtered by manufacturer" do
+      manufacturer = Institution.make
+      device2.device_model.tap do |device_model|
+        device_model.institution = manufacturer
+        device_model.save!
+      end
+
+      grant user2, user, [Institution.resource_name, Device.resource_name], "*"
+
+      get :index, manufacturer: manufacturer.id
+      expect(response).to be_success
+      expect(assigns(:devices)).to contain_exactly(device2)
+    end
   end
 
   context "Index when devices have no sites" do
