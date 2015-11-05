@@ -73,36 +73,36 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "should override test if test_id is the same" do
-      post :create, Oj.dump(test: {id: "1234", patient_age: {"years" => 20}}), device_id: device.uuid, authentication_token: device.plain_secret_key
+      post :create, Oj.dump(test: {id: "1234"}, encounter: {patient_age: {"years" => 20}}), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       expect(TestResult.count).to eq(1)
       test = TestResult.first
       expect(test.test_id).to eq("1234")
 
-      expect(Oj.load(DeviceMessage.first.plain_text_data)["test"]["patient_age"]["years"]).to eq(20)
+      expect(Oj.load(DeviceMessage.first.plain_text_data)["encounter"]["patient_age"]["years"]).to eq(20)
 
       tests = all_elasticsearch_tests
       expect(tests.size).to eq(1)
       test = tests.first
       expect(test["_source"]["test"]["id"]).to eq("1234")
       expect(test["_id"]).to eq(test["_source"]["test"]["uuid"])
-      expect(test["_source"]["test"]["patient_age"]["years"]).to eq(20)
+      expect(test["_source"]["encounter"]["patient_age"]["years"]).to eq(20)
 
-      post :create, Oj.dump(test: {id: "1234", patient_age: {"years" => 30}}), device_id: device.uuid, authentication_token: device.plain_secret_key
+      post :create, Oj.dump(test: {id: "1234"}, encounter: {patient_age: {"years" => 30}}), device_id: device.uuid, authentication_token: device.plain_secret_key
 
       expect(TestResult.count).to eq(1)
       test = TestResult.first
       expect(test.test_id).to eq("1234")
 
       expect(DeviceMessage.count).to eq(2)
-      expect(Oj.load(DeviceMessage.last.plain_text_data)["test"]["patient_age"]["years"]).to eq(30)
+      expect(Oj.load(DeviceMessage.last.plain_text_data)["encounter"]["patient_age"]["years"]).to eq(30)
 
       tests = all_elasticsearch_tests
       expect(tests.size).to eq(1)
       test = tests.first
       expect(test["_source"]["test"]["id"]).to eq("1234")
       expect(test["_id"]).to eq(test["_source"]["test"]["uuid"])
-      expect(test["_source"]["test"]["patient_age"]["years"]).to eq(30)
+      expect(test["_source"]["encounter"]["patient_age"]["years"]).to eq(30)
 
       a_device = Device.make(institution: institution)
       post :create, Oj.dump(test: {id: "1234", age: {"years" => 20}}), device_id: a_device.uuid, authentication_token: a_device.plain_secret_key

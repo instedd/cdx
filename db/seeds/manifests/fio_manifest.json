@@ -15,7 +15,7 @@
   "field_mapping" : {
     "patient.id" : {"lookup" : "Patient/Id/text()"},
     "patient.name" : {"lookup" : "Patient/Name/text()"},
-    "test.patient_age" : {
+    "encounter.patient_age" : {
       "duration" : {
         "years": {"lookup" : "Patient/Age/text()"}
       }

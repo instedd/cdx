@@ -29,7 +29,7 @@
           {"lookup" : "LastName"}
       ]
     },
-    "test.patient_age" : {
+    "encounter.patient_age" : {
       "if" : [
         {"equals" : [{"lookup" : "Birthday"}, "n.a."]},
         "",

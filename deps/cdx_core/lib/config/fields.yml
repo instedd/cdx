@@ -32,9 +32,6 @@ test:
       type: integer
       searchable: true
     error_description:
-    patient_age:
-      type: duration
-      searchable: true
     site_user:
       searchable: true
     name:
@@ -123,3 +120,6 @@ encounter:
   fields:
     id:
     uuid:
+    patient_age:
+      type: duration
+      searchable: true

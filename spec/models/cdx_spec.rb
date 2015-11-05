@@ -34,7 +34,6 @@ describe Cdx do
       "test.error_code",
       "test.error_description",
       "test.name",
-      "test.patient_age",
       "test.reported_time",
       "test.start_time",
       "test.status",
@@ -44,6 +43,7 @@ describe Cdx do
       "test.id",
       "encounter.id",
       "encounter.uuid",
+      "encounter.patient_age",
     ].sort)
   end
 end
