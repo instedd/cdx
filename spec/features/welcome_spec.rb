@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "the login process", :type => :feature, :js => true do
+describe "the login process" do
   it "existing user can login" do
     user = User.make institutions: [Institution.make]
 
@@ -15,19 +15,5 @@ describe "the login process", :type => :feature, :js => true do
     end
 
     expect(page).to have_content 'Signed in successfully'
-
-    # screenshot_and_open_image
-  end
-
-  def goto_page(klass)
-    page = klass.new
-    page.load
-    yield page
-  end
-
-  def expect_page(klass)
-    page = klass.new
-    expect(page).to be_displayed
-    yield page
   end
 end

@@ -64,6 +64,7 @@ RSpec.configure do |config|
   config.include Devise::TestHelpers, :type => :controller
   config.include ManifestSpecHelper
   config.include CdxFieldsHelper
+  config.include FeatureSpecHelpers, :type => :feature
 
   config.before(:each) do
     LocationService.fake!
