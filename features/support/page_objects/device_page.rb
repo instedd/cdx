@@ -10,6 +10,8 @@ class DevicePage < SitePrism::Page
   end
 
   class DeviceSetupPage < DevicePage
+    set_url '/devices/{id}/setup'
+
     def open_view_instructions
       click_link 'View instructions'
       remove_target_blank!

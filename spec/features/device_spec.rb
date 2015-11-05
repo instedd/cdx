@@ -6,11 +6,12 @@ describe "setup instructions of device" do
   let(:user) { device.institution.user }
 
   before(:each) {
-    DeviceMessage.make device: device
     sign_in(user)
   }
 
-  it "shows online support_url" do
+  it "shows online support_url in setup tab for activated device" do
+    DeviceMessage.make device: device
+
     expect(device).to be_activated
 
     goto_page DevicePage, id: device.id do |page|
@@ -18,6 +19,19 @@ describe "setup instructions of device" do
         modal.open_view_instructions
         click_link 'online support'
       end
+    end
+
+    expect(current_url).to eq(device_model.support_url)
+  end
+
+  it "shows online support_url directly for non activated device" do
+    expect(device).to_not be_activated
+
+    goto_page DevicePage, id: device.id
+    
+    expect_page DevicePage::DeviceSetupPage do |page|
+      page.open_view_instructions
+      click_link 'online support'
     end
 
     expect(current_url).to eq(device_model.support_url)
