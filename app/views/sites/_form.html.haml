@@ -23,7 +23,9 @@
       .col.pe-2
         = f.label :parent_id, "Supervisor"
       .col
-        = f.collection_select(:parent_id, @sites, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
+        = cdx_select form: f, name: :parent_id, class: 'input-x-large' do |select|
+          - select.item "", "Choose one"
+          - select.items @sites, :id, :name
   - elsif @site.parent
     .row
       .col.pe-2
