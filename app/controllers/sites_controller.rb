@@ -123,6 +123,6 @@ class SitesController < ApplicationController
       params[:site][:lat] = location_details.lat
       params[:site][:lng] = location_details.lng
     end
-    params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :parent_id)
+    params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :parent_id, :sample_id_reset_policy)
   end
 end
