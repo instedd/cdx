@@ -10,7 +10,7 @@
     .col
       = f.submit "Send me reset password instructions", class: "btn-secondary"
     .col
-      = link_to "Have and account? Log in", new_session_path(resource_name), class: "pull-right"
+      = link_to "Have an account? Log in", new_session_path(resource_name), class: "pull-right"
       %br
       = link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name), class: "pull-right"
 = devise_error_messages!
