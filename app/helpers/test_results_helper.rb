@@ -21,11 +21,11 @@ module TestResultsHelper
     value = test_value(test, path)
     case path
     when "test.assays"
-      results = (test["test"]["assays"] || []).map {|assay| "#{assay["name"]}: #{assay["result"]}"}
+      results = test["test"]["assays"] || []
       if web
-        results.join("<br>").html_safe
+        (results.map { |result| "<span class=\"#{result["result"]}\">#{result["name"]}</span>" } ).join(" ").html_safe
       else
-        results.join(", ")
+        (results.map { |assay| "#{assay["name"]}: #{assay["result"]}"}).join(", ")
       end
     when "test.start_time", "test.end_time"
       time_zone = current_user.time_zone
