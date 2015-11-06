@@ -495,6 +495,7 @@ GEM
     ruby-openid (2.7.0)
     ruby_parser (3.7.1)
       sexp_processor (~> 4.1)
+    rufus-scheduler (3.1.7)
     safe_yaml (1.0.4)
     sass (3.2.19)
     sass-rails (4.0.5)
@@ -519,6 +520,9 @@ GEM
       json (~> 1.0)
       redis (~> 3.2, >= 3.2.1)
       redis-namespace (~> 1.5, >= 1.5.2)
+    sidekiq-cron (0.3.1)
+      rufus-scheduler (>= 2.0.24)
+      sidekiq (>= 2.17.3)
     sinatra (1.4.6)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -656,6 +660,7 @@ DEPENDENCIES
   sdoc
   shoulda
   sidekiq
+  sidekiq-cron (~> 0.3.1)
   sinatra
   site_prism
   spring

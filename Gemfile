@@ -53,6 +53,7 @@ gem 'puma'
 # Use Sidekiq for background jobs
 gem 'sidekiq'
 gem 'sinatra'
+gem 'sidekiq-cron', '~> 0.3.1'
 
 group :development do
   gem 'web-console', '~> 2.0'
@@ -82,6 +83,8 @@ gem 'dotiw'
 gem 'rails-i18n', '~> 4.0.0'
 gem 'doorkeeper'
 
+gem 'faker'
+
 group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rescue'
@@ -94,7 +97,6 @@ group :test do
   gem 'test-unit'
   gem 'tire'
   # gem 'factory_girl_rails'
-  gem 'faker'
   gem 'machinist', '~> 1.0'
   gem 'capybara'
   gem 'guard-rspec'

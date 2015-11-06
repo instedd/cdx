@@ -1,0 +1,13 @@
+{
+  "event": {
+    "result": "{result}",
+    "assay_name": "MTB-RIF Assay G4_noQC1_2",
+    "sample_ID": "{sample_id}",
+    "system_user": "{system_user}",
+    "device_serial_number": "123456",
+    "end_time": "{end_datetime}",
+    "start_time": "{start_datetime}",
+    "event_id": "{event_id}",
+    "test_type": "{test_type}"
+  }
+}

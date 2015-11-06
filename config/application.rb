@@ -30,5 +30,6 @@ module Cdp
       g.assets = false
     end
     config.autoload_paths << Rails.root.join("features", "support", "page_objects")
+    config.autoload_paths += %W(#{config.root}/lib)
   end
 end
