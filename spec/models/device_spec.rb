@@ -92,7 +92,7 @@ describe Device do
 
       refresh_index
 
-      result = Cdx::Api::Elasticsearch::Query.new({}).execute
+      result = Cdx::Api::Elasticsearch::Query.new({}, Cdx::Fields.test_result, TestResultQuery::RESULT_NAME).execute
       expect(result['total_count']).to eq(0)
     end
 

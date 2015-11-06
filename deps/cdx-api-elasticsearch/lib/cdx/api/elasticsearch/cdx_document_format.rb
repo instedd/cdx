@@ -19,12 +19,20 @@ class Cdx::Api::Elasticsearch::CdxDocumentFormat
   end
 
   class TestResult < self
+    def entity_prefix
+      "test."
+    end
+
     def default_sort
       "test.reported_time"
     end
   end
 
   class Encounter < self
+    def entity_prefix
+      "encounter."
+    end
+
     def default_sort
       "encounter.uuid"
     end

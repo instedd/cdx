@@ -9,17 +9,12 @@ class Cdx::Api::Elasticsearch::Query
   DEFAULT_PAGE_SIZE = 50
   MAX_PAGE_SIZE = 100
 
-  def self.for_indices indices, params
-    query = new params
-    query.indices = indices.join ','
-    query
-  end
-
-  def initialize(params, api = Cdx::Api, fields = Cdx::Fields.test_result)
+  def initialize(params, fields, result_name, api = Cdx::Api)
     @params = params
+    @fields = fields
+    @result_name = result_name
     @api = api
     @indices ||= api.index_name_pattern
-    @fields = fields
   end
 
   def before_execute(&block)
@@ -40,7 +35,7 @@ class Cdx::Api::Elasticsearch::Query
     end
 
     results = query(@params)
-    @current_count = results["tests"].size
+    @current_count = results[@result_name].size
     @total_count = results["total_count"]
 
     if @after_execute
@@ -79,24 +74,22 @@ class Cdx::Api::Elasticsearch::Query
     query = elasticsearch_query
 
     if params["group_by"]
-      tests = query_with_group_by(query, params["group_by"])
+      entities = query_with_group_by(query, params["group_by"])
       if params["order_by"]
         all_orders = extract_multi_values(params["order_by"])
         all_orders.map do |order|
-          tests = tests.sort_by do |test|
-            test[order.delete('-')]
-          end
-          tests = tests.reverse if order[0] == "-"
+          entities = entities.sort_by { |entity| entity[order.delete('-')] }
+          entities = entities.reverse if order[0] == "-"
         end
       end
-      total_count = tests.inject(0) { |sum, result| sum + result["count"].to_i }
+      total_count = entities.inject(0) { |sum, result| sum + result["count"].to_i }
     else
-      tests, total_count = query_without_group_by(query, params)
+      entities, total_count = query_without_group_by(query, params)
     end
 
-    tests = @fields.translate_entities tests
+    entities = @fields.translate_entities entities
 
-    {"tests" => tests, "total_count" => total_count}
+    {@result_name => entities, "total_count" => total_count}
   end
 
   def query_without_group_by(query, params)
@@ -286,9 +279,9 @@ class Cdx::Api::Elasticsearch::Query
 
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
-    test = @api.search_elastic body: aggregations.to_hash.merge(query: query, size: 0), index: indices
-    if test["aggregations"]
-      process_group_by_buckets(test["aggregations"], aggregations.in_order, [], {}, 0)
+    result = @api.search_elastic body: aggregations.to_hash.merge(query: query, size: 0), index: indices
+    if result["aggregations"]
+      process_group_by_buckets(result["aggregations"], aggregations.in_order, [], {}, 0)
     else
       []
     end
@@ -308,7 +301,7 @@ class Cdx::Api::Elasticsearch::Query
     [name, value]
   end
 
-  def process_group_by_buckets(aggregations, group_by, tests, test, doc_count)
-    GroupingDetail.process_buckets(aggregations, group_by, tests, test, doc_count)
+  def process_group_by_buckets(aggregations, group_by, entities, entity, doc_count)
+    GroupingDetail.process_buckets(aggregations, group_by, entities, entity, doc_count)
   end
 end

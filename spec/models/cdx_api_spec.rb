@@ -808,7 +808,9 @@ describe Cdx::Api, elasticsearch: true do
                 "type" => 'location'
               }]
             }
-          ])
+          ],
+          Cdx::Api::Elasticsearch::CdxDocumentFormat::TestResult.new
+          )
         end
 
         Cdx::Fields.test_result.core_field_scopes.push @extra_scope

@@ -1,4 +1,6 @@
 class TestResultQuery < Cdx::Api::Elasticsearch::Query
+  RESULT_NAME = "tests"
+
   include Policy::Actions
 
   class << self
@@ -10,7 +12,7 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
     if policies.any?
       new params, policies
     else
-      Cdx::Api::Elasticsearch::NullQuery.new(params)
+      Cdx::Api::Elasticsearch::NullQuery.new(params, RESULT_NAME)
     end
   end
 
@@ -20,7 +22,7 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
   end
 
   def initialize(params, policies)
-    super(params)
+    super(params, Cdx::Fields.test_result, RESULT_NAME)
     @policies = policies
   end
 
