@@ -44,9 +44,7 @@
     .col
       %label.block Encounter Id
       %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
-  .row
-    .col
-      = link_to "Add filter", new_filter_path(query: @filter), class: 'btn pull-right'
+
 
   .row
     .col
@@ -70,7 +68,7 @@
           of
           = (@total.to_f / @page_size).ceil
         %span(style="display: inline-block;")
-          = cdx_select name: "page_size", value: @page_size, class: 'input-x-large' do |select|
+          = cdx_select name: "page_size", value: @page_size, class: 'input-large' do |select|
             - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
         :javascript
           $(function(){
@@ -81,3 +79,4 @@
           })
 
         = link_to "download CSV", csv_test_results_path(@filter)
+        = link_to "Add filter", new_filter_path(query: @filter), class: 'pull-right'

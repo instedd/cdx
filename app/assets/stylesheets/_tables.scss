@@ -37,8 +37,9 @@
   }
 
   .pagination {
-    a {
+    .btn-link {
       color: $gray4;
+      margin: 0;
     }
 
     a[class^="btn"] {
