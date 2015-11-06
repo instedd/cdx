@@ -13,8 +13,11 @@ To start developing:
 
 1. Clone the repo.
 
-2. Install dependencies: `bundle install`
-
+2. Install dependencies:
+	* `bundle install`.
+	* PhantomJS `>= 2.0` for [Poltergeist](https://github.com/teampoltergeist/poltergeist) (development and test only)
+	* ImageMagick for [Paperclip](https://github.com/thoughtbot/paperclip#image-processor).
+  
 3. Setup development database: `bundle exec rake db:setup`
 
 4. Setup test database: `bundle exec rake db:test:prepare`
