@@ -13,7 +13,6 @@ class DeviceSetupPage < CdxPageBase
     setup.view_instructions.click
     yield setup if block_given?
   end
-  
 end
 
 class DevicePage < DeviceSetupPage
