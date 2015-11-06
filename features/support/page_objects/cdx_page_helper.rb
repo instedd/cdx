@@ -6,11 +6,17 @@ module CdxPageHelper
     end
   end
 
+  def wait_for_submit
+    sleep 0.5
+    wait_for_ajax
+  end
+
   def finished_all_ajax_requests?
+    return true unless page.current_url.start_with?("http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}")
     page.evaluate_script('jQuery.active').zero?
   end
 
   def remove_target_blank!
     page.evaluate_script('$("a[target=_blank]").attr("target", null);')
-  end  
+  end
 end
