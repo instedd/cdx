@@ -121,6 +121,30 @@ module DemoData
       data.gsub! '{end_datetime}', (new_start_datetime + 1.minute).to_time.iso8601.to_s if data.include?('{end_datetime}') 
     end
 
+
+    #specific to the FIO device
+    if data.include?('{FIO_Postive_Negative_hrp}') 
+      pos_neg_type = ["Postive","Negative"].sample 
+      data.gsub! '{FIO_Postive_Negative_hrp}', pos_neg_type
+      
+      if pos_neg_type == 'Negative'
+        data.gsub! '{FIO_decimal_hrp}', 0.to_s
+      else
+        data.gsub! '{FIO_decimal_hrp}', Faker::Number.between(1, 10).to_s
+      end
+    end
+    if data.include?('{FIO_Postive_Negative_lpdh}') 
+      pos_neg_type = ["Postive","Negative"].sample 
+      data.gsub! '{FIO_Postive_Negative_lpdh}', pos_neg_type
+
+      if pos_neg_type == 'Negative'
+        data.gsub! '{FIO_decimal_lpdh}', 0.to_s
+      else
+        data.gsub! '{FIO_decimal_lpdh}', Faker::Number.between(1, 10).to_s
+      end
+    end    
+    
+    
     return data
   end
 

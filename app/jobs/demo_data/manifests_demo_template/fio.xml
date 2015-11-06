@@ -15,10 +15,10 @@
       <Code value="SD_MALPFPV_02_02" displayValue="SD Malaria P.f and P.v" />
       <Control qualitative="Valid" value="{decimal}" />
       <Assay code="HRPII" codingScheme="Fio" displayValue="P.f">
-        <Result qualitative="Positive" value="{decimal}" />
+        <Result qualitative="{FIO_Postive_Negative_hrp}" value="{FIO_decimal_hrp}" />
       </Assay>
       <Assay code="pLDH" codingScheme="Fio" displayValue="P.v">
-        <Result qualitative="Negative" value="0.0" />
+        <Result qualitative="{FIO_Postive_Negative_lpdh}" value="{FIO_decimal_lpdh}" />
       </Assay>
     </Test>
   </DiagnosticTest>
