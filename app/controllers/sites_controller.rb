@@ -14,6 +14,8 @@ class SitesController < ApplicationController
     if (institution_id = params[:institution].presence)
       @sites = @sites.where(institution_id: institution_id.to_i)
     end
+
+    @sites.preload_locations!
   end
 
   def new
@@ -107,7 +109,7 @@ class SitesController < ApplicationController
     site = Site.find(params[:id])
     @sites = check_access(site.children, READ_SITE)
     @sites_to_edit = check_access(site.children, UPDATE_SITE).pluck(:id)
-
+    @sites.preload_locations!
     render layout: false
   end
 

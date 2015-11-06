@@ -17,9 +17,16 @@ class Site < ActiveRecord::Base
   attr_writer :location
 
   def location(opts={})
-    @location = nil if @location_opts != opts
+    @location = nil if @location_opts.presence != opts.presence
     @location_opts = opts
     @location ||= Location.find(location_geoid, opts)
+  end
+
+  def self.preload_locations!
+    locations = Location.details(all.map(&:location_geoid).uniq).index_by(&:id)
+    all.to_a.each do |site|
+      site.location = locations[site.location_geoid]
+    end
   end
 
   def self.filter_by_owner(user, check_conditions)
