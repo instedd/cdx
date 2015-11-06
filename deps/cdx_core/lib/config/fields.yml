@@ -124,6 +124,12 @@ entities:
       patient_age:
         type: duration
         searchable: true
+      start_time:
+        type: date
+        searchable: true
+      end_time:
+        type: date
+        searchable: true
 test_result:
   sample:
     <<: *SAMPLE

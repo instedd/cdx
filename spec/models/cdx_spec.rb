@@ -44,6 +44,8 @@ describe Cdx do
       "encounter.id",
       "encounter.uuid",
       "encounter.patient_age",
+      "encounter.start_time",
+      "encounter.end_time",
     ].sort)
   end
 end

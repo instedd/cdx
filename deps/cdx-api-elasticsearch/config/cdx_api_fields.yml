@@ -21,29 +21,49 @@
 #   a) a filter with the same name
 #   b) a grouping with the name of '#{default_name}_admin_level'
 
-- name: test.start_time
-  filter_parameter_definition:
-    - name: since
-      type: range
-      boundary: from
-      options:
-        include_lower: true
-    - name: until
-      type: range
-      boundary: to
-      options:
-        include_lower: true
-- name: test.id
-  group_parameter_definition: none
-- name: test.uuid
-  filter_parameter_definition:
-    - type: match
-  group_parameter_definition: none
-- name: location.parents
-  filter_parameter_definition:
-    - name: location
-      type: match
-- name: location.admin_levels
-  group_parameter_definition:
-    - name: admin_level
-      type: location
+test_result:
+  - name: test.start_time
+    filter_parameter_definition:
+      - name: since
+        type: range
+        boundary: from
+        options:
+          include_lower: true
+      - name: until
+        type: range
+        boundary: to
+        options:
+          include_lower: true
+  - name: test.id
+    group_parameter_definition: none
+  - name: test.uuid
+    filter_parameter_definition:
+      - type: match
+    group_parameter_definition: none
+  - name: location.parents
+    filter_parameter_definition:
+      - name: location
+        type: match
+  - name: location.admin_levels
+    group_parameter_definition:
+      - name: admin_level
+        type: location
+encounter:
+  - name: encounter.start_time
+    filter_parameter_definition:
+      - name: since
+        type: range
+        boundary: from
+        options:
+          include_lower: true
+      - name: until
+        type: range
+        boundary: to
+        options:
+          include_lower: true
+  - name: encounter.id
+    group_parameter_definition: none
+  - name: encounter.uuid
+    filter_parameter_definition:
+      - type: match
+    group_parameter_definition: none

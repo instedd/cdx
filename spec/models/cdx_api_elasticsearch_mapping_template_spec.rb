@@ -210,6 +210,14 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                   }
                 }
               },
+              "start_time"=> {
+                "type"=> "date",
+                "index"=> "not_analyzed"
+              },
+              "end_time"=> {
+                "type"=> "date",
+                "index"=> "not_analyzed"
+              },
               "custom_fields" => {
                 "type" => "object",
               },

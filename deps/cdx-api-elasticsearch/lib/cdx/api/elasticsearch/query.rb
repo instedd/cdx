@@ -15,11 +15,11 @@ class Cdx::Api::Elasticsearch::Query
     query
   end
 
-  def initialize(params, api = Cdx::Api, entity_name = "test_result")
+  def initialize(params, api = Cdx::Api, fields = Cdx::Fields.test_result)
     @params = params
     @api = api
-    @indices ||= Cdx::Api.index_name_pattern
-    @entity_name = entity_name
+    @indices ||= api.index_name_pattern
+    @fields = fields
   end
 
   def before_execute(&block)
@@ -94,7 +94,7 @@ class Cdx::Api::Elasticsearch::Query
       tests, total_count = query_without_group_by(query, params)
     end
 
-    tests = @api.translate tests
+    tests = @fields.translate_entities tests
 
     {"tests" => tests, "total_count" => total_count}
   end
@@ -116,7 +116,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_conditions params, conditions=[]
-    conditions = process_fields(@api.searchable_fields(@entity_name), params, conditions)
+    conditions = process_fields(@fields.searchable_fields, params, conditions)
     if conditions.empty?
       [{match_all: []}]
     else
@@ -247,7 +247,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_order params
-    order = params["order_by"] || @api.default_sort
+    order = params["order_by"] || @fields.default_sort
 
     all_orders = extract_multi_values(order)
     all_orders.map do |order|
@@ -258,7 +258,7 @@ class Cdx::Api::Elasticsearch::Query
         sorting = "asc"
       end
 
-      duration_field = @api.searchable_fields(@entity_name).detect {|field| field.scoped_name == order and field.type == "duration"}
+      duration_field = @fields.searchable_fields.detect {|field| field.scoped_name == order and field.type == "duration"}
 
       order = "#{order}.in_millis" if duration_field
 
@@ -279,7 +279,7 @@ class Cdx::Api::Elasticsearch::Query
 
     group_by = group_by.map do |field|
       name, value = extract_group_by_criteria field
-      Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value, @api, @entity_name
+      Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value, @fields
     end
 
     raise "Unsupported group" if group_by.include? nil
