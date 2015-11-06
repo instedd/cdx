@@ -1,6 +1,4 @@
-class ItemSearchPage < SitePrism::Page
-  include CdxPageHelper
-
+class ItemSearchPage < CdxPageBase
   class Result < SitePrism::Section
     def select
       root_element.click

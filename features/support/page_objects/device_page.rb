@@ -1,20 +1,25 @@
-class DevicePage < SitePrism::Page
-  include CdxPageHelper
+class DeviceSetupSection < SitePrism::Section
+  element :view_instructions, :link, 'View instructions'
 
+  element :online_support, :link, 'online support'
+end
+
+class DeviceSetupPage < CdxPageBase
+  set_url '/devices/{id}/setup'
+
+  section :setup, DeviceSetupSection, '[data-react-class="DeviceSetup"]'
+
+  def open_view_instructions
+    setup.view_instructions.click
+    yield setup if block_given?
+  end
+  
+end
+
+class DevicePage < DeviceSetupPage
   set_url '/devices/{id}'
 
-  def open_device_setup_tab
-    click_link 'Setup'
-    wait_for_ajax
-    yield DeviceSetupPage.new
-  end
-
-  class DeviceSetupPage < DevicePage
-    set_url '/devices/{id}/setup'
-
-    def open_view_instructions
-      click_link 'View instructions'
-      remove_target_blank!
-    end
+  section :tab_header, '.tabs' do
+    element :setup, :link, 'Setup'
   end
 end

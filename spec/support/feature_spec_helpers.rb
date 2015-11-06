@@ -36,18 +36,3 @@ module FeatureSpecHelpers
     screenshot_and_open_image
   end
 end
-
-class Capybara::Node::Element
-  include CdxPageHelper
-
-  # Make every click in element wait for ajax to complete
-  def click_with_ajax
-    click_without_ajax
-    wait_for_ajax
-  end
-  alias_method_chain :click, :ajax
-
-  def page
-    session
-  end
-end

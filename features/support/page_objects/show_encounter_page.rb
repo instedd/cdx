@@ -1,6 +1,4 @@
-class ShowEncounterPage < SitePrism::Page
-  include CdxPageHelper
-
+class ShowEncounterPage < CdxPageBase
   set_url "/encounters/{id}"
 
   def id
