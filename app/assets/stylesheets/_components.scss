@@ -51,6 +51,7 @@
 
 .assay-result {
   background: url('assay-results.png') no-repeat right 20px;
+  text-transform: uppercase;
   padding-right: 24px;
   display: inline-block;
   vertical-align: middle;
@@ -68,7 +69,7 @@
     color: $gray3;
   }
   & + .assay-result {
-    margin-left: 20px;
+    margin-left: 10px;
   }
 }
 

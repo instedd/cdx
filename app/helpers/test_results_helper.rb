@@ -23,7 +23,7 @@ module TestResultsHelper
     when "test.assays"
       results = test["test"]["assays"] || []
       if web
-        (results.map { |result| "<span class=\"#{result["result"]}\">#{result["name"]}</span>" } ).join(" ").html_safe
+        (results.map { |result| "<span class=\"assay-result assay-result-#{result["result"]}\">#{result["name"]}</span>" } ).join(" ").html_safe
       else
         (results.map { |assay| "#{assay["name"]}: #{assay["result"]}"}).join(", ")
       end
