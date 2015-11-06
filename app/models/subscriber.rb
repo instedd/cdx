@@ -42,7 +42,7 @@ class Subscriber < ActiveRecord::Base
     # Sub fields, like in the case of `test.assays.result`, are
     # not returned: only the field of `test.assays` is.
     fields = []
-    Cdx.core_fields.each do |field|
+    Cdx::Fields.test_result.core_fields.each do |field|
       if field.scope.is_a?(Cdx::Field::NestedField)
         fields << field.scope
       else

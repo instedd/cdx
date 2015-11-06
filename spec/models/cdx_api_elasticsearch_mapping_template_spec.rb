@@ -25,7 +25,7 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
     end
 
     it "maps the core fields" do
-      expect(template.build_properties_mapping).to eq(
+      expect(template.build_properties_mapping("test_result")).to eq(
         {
           "sample"=> {
             "properties" => {

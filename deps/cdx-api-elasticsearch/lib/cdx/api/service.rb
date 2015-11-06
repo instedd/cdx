@@ -8,8 +8,8 @@ class Cdx::Api::Service
     Cdx::Api::Elasticsearch::MappingTemplate.new(self).initialize_template(template_name)
   end
 
-  def searchable_fields
-    config.searchable_fields
+  def searchable_fields(entity_name)
+    config.searchable_fields(entity_name)
   end
 
   def index_name_pattern

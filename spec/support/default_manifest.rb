@@ -6,7 +6,7 @@ class DefaultManifest
   def self.definition
     core_mapping = {}
 
-    Cdx.core_field_scopes.each do |scope|
+    Cdx::Fields.test_result.core_field_scopes.each do |scope|
       map(scope.fields).flatten.each do |field_definition|
         scoped_field_definition = "#{scope.name}#{Manifest::PATH_SPLIT_TOKEN}#{field_definition}"
         core_mapping[scoped_field_definition] = {

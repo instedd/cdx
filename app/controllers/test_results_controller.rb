@@ -8,7 +8,7 @@ class TestResultsController < ApplicationController
   end
 
   def index
-    @results = Cdx.core_fields.find { |field| field.name == 'result' }.options
+    @results = Cdx::Fields.test_result.core_fields.find { |field| field.name == 'result' }.options
     @conditions = Condition.all.map &:name
     @date_options = [["Previous month", 1.month.ago.beginning_of_month], ["Previous week", 1.week.ago.beginning_of_week],["Previous year", 1.year.ago.beginning_of_year]]
 
@@ -38,7 +38,7 @@ class TestResultsController < ApplicationController
     return unless authorize_resource(@test_result, QUERY_TEST)
 
     @other_tests = @test_result.sample ? @test_result.sample.test_results.where.not(id: @test_result.id) : TestResult.none
-    @core_fields_scope = Cdx.core_field_scopes.detect{|x| x.name == 'test'}
+    @core_fields_scope = Cdx::Fields.test_result.core_field_scopes.detect{|x| x.name == 'test'}
 
     @samples = @test_result.sample_identifiers.reject{|identifier| identifier.entity_id.blank?}.map {|identifier| [identifier.entity_id, Barby::Code93.new(identifier.entity_id)]}
     @show_institution = show_institution?(Policy::Actions::QUERY_TEST, TestResult)

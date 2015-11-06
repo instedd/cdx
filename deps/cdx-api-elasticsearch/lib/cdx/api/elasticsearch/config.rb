@@ -19,8 +19,9 @@ class Cdx::Api::Elasticsearch::Config
   attr_accessor :log
   attr_accessor :elasticsearch_url
 
-  def searchable_fields
-    @searchable_fields ||= Cdx.first_level_core_fields.select(&:searchable?).map do |core_field|
+  def searchable_fields(entity_name)
+    @searchable_fields ||= {}
+    @searchable_fields[entity_name] ||= Cdx::Fields[entity_name].first_level_core_fields.select(&:searchable?).map do |core_field|
       Cdx::Api::Elasticsearch::IndexedField.for(core_field, api_fields, document_format)
     end
   end

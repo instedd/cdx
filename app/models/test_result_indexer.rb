@@ -2,6 +2,7 @@ class TestResultIndexer < EntityIndexer
   attr_reader :test_result
 
   def initialize test_result
+    super("test_result")
     @test_result = test_result
   end
 

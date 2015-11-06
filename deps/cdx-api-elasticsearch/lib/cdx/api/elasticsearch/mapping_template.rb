@@ -12,26 +12,17 @@ class Cdx::Api::Elasticsearch::MappingTemplate
     {
       template: @api.config.template_name_pattern,
       mappings: {
-        test: mapping
+        test: mapping("test_result"),
+        encounter: mapping("encounter"),
       }
     }
   end
 
-  def mapping
+  def mapping(entity_name)
     {
       dynamic_templates: build_dynamic_templates,
-      properties: build_properties_mapping
+      properties: build_properties_mapping(entity_name),
     }
-  end
-
-  def update_indices
-    @api.client.indices.put_mapping({
-      index: @api.config.template_name_pattern,
-      body: mapping,
-      type: 'test'
-    })
-  rescue Elasticsearch::Transport::Transport::Errors::NotFound => ex
-    nil
   end
 
   def build_dynamic_templates
@@ -51,8 +42,8 @@ class Cdx::Api::Elasticsearch::MappingTemplate
     ]
   end
 
-  def build_properties_mapping
-    scoped_fields = Cdx.core_field_scopes.select(&:searchable?)
+  def build_properties_mapping(entity_name)
+    scoped_fields = Cdx::Fields[entity_name].core_field_scopes.select(&:searchable?)
 
     Hash[
       scoped_fields.map { |scope|

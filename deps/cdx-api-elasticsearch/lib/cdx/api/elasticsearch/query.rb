@@ -15,10 +15,11 @@ class Cdx::Api::Elasticsearch::Query
     query
   end
 
-  def initialize(params, api = Cdx::Api)
+  def initialize(params, api = Cdx::Api, entity_name = "test_result")
     @params = params
     @api = api
     @indices ||= Cdx::Api.index_name_pattern
+    @entity_name = entity_name
   end
 
   def before_execute(&block)
@@ -115,7 +116,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_conditions params, conditions=[]
-    conditions = process_fields(@api.searchable_fields, params, conditions)
+    conditions = process_fields(@api.searchable_fields(@entity_name), params, conditions)
     if conditions.empty?
       [{match_all: []}]
     else
@@ -257,7 +258,7 @@ class Cdx::Api::Elasticsearch::Query
         sorting = "asc"
       end
 
-      duration_field = @api.searchable_fields.detect {|field| field.scoped_name == order and field.type == "duration"}
+      duration_field = @api.searchable_fields(@entity_name).detect {|field| field.scoped_name == order and field.type == "duration"}
 
       order = "#{order}.in_millis" if duration_field
 
@@ -278,7 +279,7 @@ class Cdx::Api::Elasticsearch::Query
 
     group_by = group_by.map do |field|
       name, value = extract_group_by_criteria field
-      Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value, @api
+      Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value, @api, @entity_name
     end
 
     raise "Unsupported group" if group_by.include? nil

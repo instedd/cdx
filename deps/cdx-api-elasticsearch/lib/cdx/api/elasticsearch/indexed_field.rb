@@ -30,10 +30,10 @@ class Cdx::Api::Elasticsearch::IndexedField
     end
   end
 
-  def self.grouping_detail_for field_name, values=nil, api
+  def self.grouping_detail_for field_name, values=nil, api, entity_name
     grouping_detail = nil
 
-    api.searchable_fields.detect do |field|
+    api.searchable_fields(entity_name).detect do |field|
       grouping_detail = field.grouping_detail_for field_name, values
     end
 

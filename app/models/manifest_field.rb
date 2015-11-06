@@ -86,7 +86,7 @@ class ManifestField
   def self.scope_and_field(target_path)
     scope = target_path.shift
     field = target_path.shift
-    cdx_scope = Cdx.core_field_scopes.detect{|x| x.name == scope}
+    cdx_scope = Cdx::Fields.test_result.core_field_scopes.detect{|x| x.name == scope}
     cdx_field = cdx_scope.fields.detect{|x| x.name == field}
     [cdx_scope, cdx_field]
   end
