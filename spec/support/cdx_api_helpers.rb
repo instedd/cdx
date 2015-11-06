@@ -39,26 +39,19 @@ RSpec.shared_context "cdx api helpers" do
     test_result.core_fields = JSON.parse((test[:test] || {}).to_json)
 
     if test[:encounter]
-      encounter = Encounter.make institution: test_result.institution
+      encounter = Encounter.make_unsaved institution: test_result.institution
       encounter.core_fields.merge! JSON.parse(test[:encounter].to_json)
-      encounter.save!
       test_result.encounter = encounter
-      test_result.save!
     end
 
     if test[:patient]
-      patient = Patient.make institution: test_result.institution
+      patient = Patient.make_unsaved institution: test_result.institution
       patient.core_fields.merge! JSON.parse(test[:patient].to_json)
-      patient.save!
       test_result.patient = patient
-      test_result.sample.patient = patient
-      test_result.sample.save!
-      test_result.save!
     end
 
     if (reported_time = test_result.core_fields["reported_time"])
       test_result.created_at = Time.parse(reported_time)
-      test_result.save!
     end
 
     TestResultIndexer.new(test_result).index(refresh = true)
