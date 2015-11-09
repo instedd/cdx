@@ -27,4 +27,37 @@ describe TestResult do
     test = TestResult.make
     expect(test.site_prefix).to eq(test.device.site.prefix)
   end
+
+  context "field validations" do
+    let(:test) { TestResult.make_unsaved }
+
+    it "should support valid core fields" do
+      test.core_fields['name'] = 'test name'
+      expect(test).to be_valid
+    end
+
+    it "should support nested assays" do
+      test.core_fields['assays'] = [
+        { 'name' => 'assay/flu', 'condition' => 'flu', 'result' => 'positive' },
+        { 'name' => 'assay/mtb', 'condition' => 'mtb', 'result' => 'negative' }
+      ]
+      expect(test).to be_valid
+    end
+
+    it "should validate nested assays for inexistent fields" do
+      test.core_fields['assays'] = [
+        { 'name' => 'assay/flu', 'condition' => 'flu', 'result' => 'positive', 'inexistent' => 'value' },
+        { 'name' => 'assay/mtb', 'condition' => 'mtb', 'result' => 'negative' }
+      ]
+      expect(test).to be_invalid
+    end
+
+    it "should validate nested assays for invalid fields" do
+      test.core_fields['assays'] = [
+        { 'name' => 'assay/flu', 'condition' => 'flu', 'result' => 'positive' },
+        { 'name' => 'assay/mtb', 'condition' => 'mtb', 'result' => 'invalid-value' }
+      ]
+      expect(test).to be_invalid
+    end
+  end
 end

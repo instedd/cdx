@@ -106,7 +106,7 @@ class EncountersController < ApplicationController
     end
 
     @encounter.core_fields[Encounter::ASSAYS_FIELD] = encounter_param['assays']
-    @encounter.core_fields[Encounter::OBSERVATIONS_FIELD] = encounter_param['observations']
+    @encounter.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD] = encounter_param['observations']
   end
 
   def scoped_samples
@@ -131,7 +131,7 @@ class EncountersController < ApplicationController
     Jbuilder.new do |json|
       json.(encounter, :id)
       json.assays (encounter.core_fields[Encounter::ASSAYS_FIELD] || [])
-      json.observations encounter.core_fields[Encounter::OBSERVATIONS_FIELD]
+      json.observations encounter.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]
 
       json.institution do
         as_json_institution(json, encounter.institution)

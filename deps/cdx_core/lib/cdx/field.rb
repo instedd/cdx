@@ -55,7 +55,7 @@ class Cdx::Field
   end
 
   def valid_values
-    @definition["valid_values"]
+    nil
   end
 
   def pii?
@@ -64,6 +64,10 @@ class Cdx::Field
 
   def humanize(value)
     value
+  end
+
+  def validate(value)
+    nil
   end
 
   class NestedField < self
@@ -101,6 +105,12 @@ class Cdx::Field
     def options
       @definition["options"]
     end
+
+    def validate(value)
+      super or (if !value.nil? && !options.include?(value.to_s)
+        "#{value} is not within #{scoped_name} valid options (should be one of #{options.join(', ')})"
+      end)
+    end
   end
 
   class DynamicField < self
@@ -113,6 +123,10 @@ class Cdx::Field
       else
         super
       end
+    end
+
+    def validate(value)
+      # TODO: How should duration values be stored?
     end
   end
 end

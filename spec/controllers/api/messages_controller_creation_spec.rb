@@ -179,7 +179,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       raw_data = test.sensitive_data
       expect(test.plain_sensitive_data).not_to eq(raw_data)
       expect(test.patient.plain_sensitive_data["id"]).to be_nil
-      expect(test.patient.plain_sensitive_data["foo"]).to eq("1234")
+      expect(test.patient.plain_sensitive_data["custom"]['foo']).to eq("1234")
     end
 
     it "merges pii from different tests in the same sample across devices" do
@@ -215,7 +215,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       sample = Sample.first
 
       expect(sample.patient.plain_sensitive_data["id"]).to eq(3)
-      expect(sample.patient.plain_sensitive_data["telephone_number"]).to eq("2222222")
+      expect(sample.patient.plain_sensitive_data['custom']["telephone_number"]).to eq("2222222")
     end
 
     it "uses the last version of the manifest" do

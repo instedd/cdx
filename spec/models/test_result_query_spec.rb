@@ -25,24 +25,24 @@ describe TestResultQuery, elasticsearch: true do
   let(:user_device_6)   {Device.make institution_id: institution.id, site: site_sub_1}
   let(:non_user_device) {Device.make}
 
-  let(:core_fields) { {"test" => {"results" =>["condition" => "mtb", "result" => :positive]}} }
+  let(:core_fields) { {"assays" =>["condition" => "mtb", "result" => :positive]} }
 
   context "policies" do
     it "applies institution policy" do
-      TestResult.create_and_index(core_fields: {"results" =>["condition" => "mtb", "result" => :positive]}, device_messages:[DeviceMessage.make(device: user_device)])
-      TestResult.create_and_index(core_fields: {"results" =>["condition" => "mtb", "result" => :negative]}, device_messages:[DeviceMessage.make(device: non_user_device)])
+      TestResult.create_and_index(core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}, device_messages:[DeviceMessage.make(device: user_device)])
+      TestResult.create_and_index(core_fields: {"assays" =>["condition" => "mtb", "result" => :negative]}, device_messages:[DeviceMessage.make(device: non_user_device)])
 
       refresh_index
 
       result = TestResultQuery.for({"condition" => 'mtb'}, user).execute
 
       expect(result['total_count']).to eq(1)
-      expect(result['tests'].first['test']['results'].first['result']).to eq('positive')
+      expect(result['tests'].first['test']['assays'].first['result']).to eq('positive')
     end
 
     it "delegates all tests from a user" do
-      TestResult.create_and_index(core_fields: {"results" =>["condition" => "mtb", "result" => :positive]}, device_messages:[DeviceMessage.make(device: user_device)])
-      TestResult.create_and_index(core_fields: {"results" =>["condition" => "mtb", "result" => :negative]}, device_messages:[DeviceMessage.make(device: user_device_3)])
+      TestResult.create_and_index(core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}, device_messages:[DeviceMessage.make(device: user_device)])
+      TestResult.create_and_index(core_fields: {"assays" =>["condition" => "mtb", "result" => :negative]}, device_messages:[DeviceMessage.make(device: user_device_3)])
 
       refresh_index
 

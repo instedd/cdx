@@ -14,8 +14,8 @@ class CoreManifestField < ManifestField
     @validation = ManifestFieldValidation.new(self)
   end
 
-  def hash_key
-    pii? ? 'pii' : 'core'
+  def store_target
+    [scope_from_target, pii? ? 'pii' : 'core']
   end
 
   def custom?

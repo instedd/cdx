@@ -56,8 +56,12 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = "random"
 
+  # Store last run failures to support --only-failures option
+  config.example_status_persistence_file_path = 'examples.txt'
+
   config.include Devise::TestHelpers, :type => :controller
   config.include ManifestSpecHelper
+  config.include CdxFieldsHelper
 
   config.before(:each) do
     LocationService.fake!

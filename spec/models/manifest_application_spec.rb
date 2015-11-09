@@ -102,27 +102,28 @@ describe Manifest, validate_manifest: false do
         raw_result: "positivo 15%",       # test, no indexable, custom
         sample_id: "4002",                # sample id
         sample_type: "sputum",            # sample, indexable
-        collected_at: "2000/1/1 9:00:00", # sample, pii, non indexable
+        collected_at: "2000/1/1 9:00:00", # sample, pii, non indexable, custom
         culture_days: "10",               # sample, indexable, custom,
-        datagram: "010100011100",         # sample, non indexable, custom
+        datagram: "010100011100",         # sample, non indexable, custom,
         patient_id: "8000",               # patient id
         gender: "male",                   # patient, indexable
         dob: "2000/1/1",                  # patient, pii, non indexable
         hiv: "positive",                  # patient, indexable, custom
-        shirt_color: "blue"               # patient, non indexable, custom
+        shirt_color: "blue",              # patient, non indexable, custom,
+        ssn: "12345"                      # patient, pii, non indexable, custom
       })
 
-      csv = "test_id;assay;start_time;concentration;raw_result;sample_id;sample_type;collected_at;culture_days;datagram;patient_id;gender;dob;hiv;shirt_color" +
-      "\n4;mtb;2000/1/1 10:00:00;15%;positivo 15%;4002;sputum;2000/1/1 9:00:00;10;010100011100;8000;male;2000/1/1;positive;blue"
+      csv = "test_id;assay;start_time;concentration;raw_result;sample_id;sample_type;collected_at;culture_days;datagram;patient_id;gender;dob;hiv;shirt_color;ssn" +
+      "\n4;mtb;2000/1/1 10:00:00;15%;positivo 15%;4002;sputum;2000/1/1 9:00:00;10;010100011100;8000;male;2000/1/1;positive;blue;12345"
 
       custom_definition = %{
         {
           "sample.culture_days": { },
           "sample.datagram": { },
           "sample.collected_at": { "pii": true},
-          "patient.dob": { "pii": true},
           "patient.shirt_color": {},
           "patient.hiv": {},
+          "patient.ssn": { "pii": true},
           "test.raw_result": {},
           "test.concentration": {}
         }
@@ -136,9 +137,13 @@ describe Manifest, validate_manifest: false do
         "sample.collected_at": {"lookup" : "collected_at"},
         "patient.id": {"lookup" : "patient_id"},
         "patient.gender": {"lookup" : "gender"},
-        "patient.dob": {"lookup" : "dob"},
+        "patient.dob": {"parse_date": [
+          {"lookup" : "dob"},
+          "%Y/%m/%d"
+          ]},
         "patient.hiv": {"lookup" : "hiv"},
         "patient.shirt_color": {"lookup" : "shirt_color"},
+        "patient.ssn": {"lookup" : "ssn"},
         "test.uuid": {"lookup" : "test_id"},
         "test.name": {"lookup" : "assay"},
         "test.start_time": {"parse_date": [
@@ -160,7 +165,7 @@ describe Manifest, validate_manifest: false do
             "concentration" => "15%",
             "raw_result" => "positivo 15%"
           },
-          "pii" => {}
+          "pii" => { "custom" => {} }
         },
         "sample" => {
           "core" => {
@@ -172,7 +177,9 @@ describe Manifest, validate_manifest: false do
             "culture_days" => "10"
           },
           "pii" => {
-            "collected_at" => "2000/1/1 9:00:00"
+            "custom" => {
+              "collected_at" => "2000/1/1 9:00:00"
+            }
           }
         },
         "patient" => {
@@ -181,7 +188,10 @@ describe Manifest, validate_manifest: false do
           },
           "pii" => {
             "id" => "8000",
-            "dob" => "2000/1/1"
+            "dob" => Time.parse("2000-01-01 00:00:00 +0000"),
+            "custom" => {
+              "ssn" => "12345"
+            }
           },
           "custom" => {
             "hiv" => "positive",
@@ -204,7 +214,7 @@ describe Manifest, validate_manifest: false do
           }
         },
         '{"temperature" : 20}',
-        "test" => {"core" => {}, "pii" => {"temperature" => 20}, "custom" => {}}
+        "test" => {"core" => {}, "pii" => {"custom" => {"temperature" => 20}}, "custom" => {}}
     end
 
     it "doesn't raise on valid value in range" do

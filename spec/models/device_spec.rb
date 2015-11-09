@@ -77,7 +77,7 @@ describe Device do
       device = Device.make
 
       TestResult.create_and_index(
-        core_fields: {"results" =>["condition" => "mtb", "result" => :positive]},
+        core_fields: {"assays" =>["name" => "mtb", "condition" => "mtb", "result" => :positive]},
         device_messages: [ DeviceMessage.make(device: device) ])
       DeviceLog.make(device: device)
       DeviceCommand.make(device: device)

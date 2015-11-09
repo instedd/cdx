@@ -14,8 +14,17 @@ module Cdx
   end
 
   def self.core_field_scopes
-    @scopes ||= YAML.load_file(File.join(File.dirname(__FILE__), "config", "fields.yml")).map do |scope_name, definition|
+    @scopes ||= self.fields_data.map do |scope_name, definition|
       Scope.new(scope_name, definition)
     end
+  end
+
+  def self.fields_data
+    YAML.load_file(File.join(File.dirname(__FILE__), "config", "fields.yml"))
+  end
+
+  def self.reload
+    @scopes = nil
+    self
   end
 end
