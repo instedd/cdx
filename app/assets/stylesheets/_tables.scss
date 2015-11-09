@@ -3,9 +3,7 @@
 // =============================================================================
 
   .table {
-    border-radius: 3px;
     width: 100%;
-    border: 1px solid $gray1;
     margin: 15px auto;
 
     a {
@@ -13,9 +11,10 @@
     }
 
     th {
-      font-weight: 700;
+      font-weight: 400;
       color: $gray3;
       text-align: left;
+      text-transform: uppercase;
       padding: 14px 10px;
 
       &.tableheader {
@@ -24,6 +23,14 @@
         color: $black;
         font-weight: 400;
       }
+
+      a {
+        color: inherit;
+
+        &.ordered {
+          color: $black;
+        }
+      }
     }
 
     td {
@@ -31,6 +38,9 @@
       border-bottom: 1px solid $gray1;
     }
 
+    tr:last-child th {
+      border-bottom: 3px solid $black;
+    }
     tr:last-child td {
       border-bottom: none;
     }
