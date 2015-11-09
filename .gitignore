@@ -32,6 +32,7 @@ VERSION
 /public/nndd
 
 bin/rspec
+config/settings.local.yml
 config/settings/*.local.yml
 public/system
 examples.txt
