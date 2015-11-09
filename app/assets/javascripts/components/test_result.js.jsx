@@ -50,7 +50,7 @@ var AssayResult = React.createClass({
 
     return (
       <span className={"assay-result assay-result-" + assay.result}>
-        {assay.name.toUpperCase()}
+        {(assay.name || assay.condition).toUpperCase()}
       </span>);
   }
 });

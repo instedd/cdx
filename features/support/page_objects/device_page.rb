@@ -19,6 +19,7 @@ class DevicePage < DeviceSetupPage
   set_url '/devices/{id}'
 
   section :tab_header, '.tabs' do
+    element :tests, :link, 'Tests'
     element :setup, :link, 'Setup'
   end
 end

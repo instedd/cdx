@@ -8,12 +8,6 @@ describe "create encounter" do
     sign_in(user)
   }
 
-  def process(args)
-    DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(
-      args.deep_merge({test:{assays:[condition: "flu_a", name: "flu_a", result: "positive"]}})
-    )
-  end
-
   it "should search sample by id substring" do
     process sample: {id: "ab111"}
     process sample: {id: "22ab2"}
