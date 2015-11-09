@@ -14,6 +14,7 @@ gem 'nokogiri'
 gem 'react-rails'
 gem 'foreman'
 gem 'paperclip'
+gem 'newrelic_rpm'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'config'
