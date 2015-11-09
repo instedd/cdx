@@ -429,6 +429,29 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(TestResult.count).to eq(2)
   end
 
+  context "test_result_parsed_data" do
+    it "should store the parsed datum" do
+      device_message_processor.process
+
+      expect(TestResult.count).to eq(1)
+      test = TestResult.first
+      expect(test.test_result_parsed_data.count).to eq(1)
+      expect(test.test_result_parsed_data.first).to eq(test.test_result_parsed_datum)
+      expect(test.test_result_parsed_datum.data).to eq(parsed_message(TEST_ID))
+    end
+
+    it "should store all parsed data" do
+      device_message_processor.process
+      DeviceMessageProcessor.new(device_message).process
+
+      expect(TestResult.count).to eq(1)
+      test = TestResult.first
+      expect(test.test_result_parsed_data.count).to eq(2)
+      expect(test.test_result_parsed_data.last).to eq(test.test_result_parsed_datum)
+      expect(test.test_result_parsed_datum.data).to eq(parsed_message(TEST_ID))
+    end
+  end
+
   context 'sample, patient and encounter entities' do
     context 'without sample id' do
       before :each do

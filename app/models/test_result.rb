@@ -9,6 +9,7 @@ class TestResult < ActiveRecord::Base
   START_TIME_FIELD = 'start_time'
 
   has_and_belongs_to_many :device_messages
+  has_many :test_result_parsed_data
 
   belongs_to :device
   belongs_to :institution
@@ -33,6 +34,7 @@ class TestResult < ActiveRecord::Base
     if test.is_a?(TestResult)
       self.sample_identifier = test.sample_identifier unless test.sample_identifier.blank?
       self.device_messages |= test.device_messages
+      self.test_result_parsed_data << test.test_result_parsed_datum
     end
 
     self
@@ -66,6 +68,10 @@ class TestResult < ActiveRecord::Base
 
   def sample_identifiers
     sample.try(:sample_identifiers) || []
+  end
+
+  def test_result_parsed_datum
+    test_result_parsed_data.last
   end
 
   private

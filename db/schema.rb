@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151103193538) do
+ActiveRecord::Schema.define(version: 20151104202638) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -323,6 +323,13 @@ ActiveRecord::Schema.define(version: 20151103193538) do
   end
 
   add_index "subscribers", ["filter_id"], name: "index_subscribers_on_filter_id", using: :btree
+
+  create_table "test_result_parsed_data", force: :cascade do |t|
+    t.integer  "test_result_id", limit: 4
+    t.binary   "data",           limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "test_results", force: :cascade do |t|
     t.datetime "created_at"

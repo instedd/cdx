@@ -69,6 +69,8 @@ class DeviceMessageProcessor
       test = TestResult.new device_messages: [device_message],
                             test_id: test_id,
                             device: device
+      test.test_result_parsed_data << TestResultParsedDatum.new(data: @parsed_message)
+
       assign_fields parsed_message, test
 
       if test_id && existing = TestResult.within_time(1.year, @parent.device_message.created_at).find_by(test_id: test_id, device_id: test.device_id)
