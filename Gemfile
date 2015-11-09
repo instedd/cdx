@@ -16,7 +16,6 @@ gem 'foreman'
 gem 'paperclip'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
-gem 'ruby-openid'
 gem 'config'
 gem 'rest-client'
 gem 'barby'
@@ -71,7 +70,6 @@ end
 gem 'devise'
 gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
 gem 'omniauth'
-gem 'omniauth-openid'
 gem 'omniauth-google-oauth2'
 gem 'elasticsearch'
 
