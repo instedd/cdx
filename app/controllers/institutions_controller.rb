@@ -1,9 +1,6 @@
 class InstitutionsController < ApplicationController
   before_filter :load_institutions
   skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
-  before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
-  end
 
   def index
     @can_create = has_access?(Institution, CREATE_INSTITUTION)

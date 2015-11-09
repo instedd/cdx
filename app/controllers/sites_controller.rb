@@ -2,7 +2,6 @@ class SitesController < ApplicationController
   set_institution_tab :sites
   before_filter :load_institutions
   before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
     head :forbidden unless has_access_to_sites_index?
   end
 

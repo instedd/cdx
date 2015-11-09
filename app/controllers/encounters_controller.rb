@@ -1,8 +1,5 @@
 class EncountersController < ApplicationController
   before_filter :load_institutions
-  before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
-  end
 
   def new
     return unless authorize_resource(@institutions, CREATE_INSTITUTION_ENCOUNTER)

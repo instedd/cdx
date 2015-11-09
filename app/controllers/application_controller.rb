@@ -11,14 +11,6 @@ class ApplicationController < ActionController::Base
   before_action :check_no_institution!
   before_action :load_js_global_settings
 
-  before_action do
-    @main_column_width = if params[:action] != 'index'
-      6
-    else
-      10
-    end
-  end
-
   decent_configuration do
     strategy DecentExposure::StrongParametersStrategy
   end

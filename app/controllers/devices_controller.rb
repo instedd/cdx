@@ -7,7 +7,6 @@ class DevicesController < ApplicationController
   before_filter :load_device_models_for_update, only: [:edit, :update]
   before_filter :load_filter_resources, only: :index
 
-  before_filter :set_width, except: [:edit, :new, :create, :update]
 
   before_filter do
     head :forbidden unless has_access_to_devices_index?
@@ -344,7 +343,4 @@ class DevicesController < ApplicationController
     }
   end
 
-  def set_width
-    @main_column_width = 10
-  end
 end

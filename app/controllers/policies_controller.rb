@@ -1,8 +1,7 @@
 class PoliciesController < ApplicationController
   layout "application", only: [:index, :new]
   before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
-    head :forbidden unless can_delegate_permissions?    
+    head :forbidden unless can_delegate_permissions?
   end
 
   def index
