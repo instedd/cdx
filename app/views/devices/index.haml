@@ -17,6 +17,12 @@
             - select.item "", "(all)"
             - select.items @sites, :id, :name
 
+        .col.pe-2
+          %label.block Manufacturer
+          = cdx_select name: "manufacturer", value: params["manufacturer"] do |select|
+            - select.item "", "(all)"
+            - select.items @manufacturers, :id, :name
+
 .row
   .col
     - if @can_create
@@ -27,6 +33,7 @@
           %th Name
           - unless @institutions.one?
             %th Institution
+          %th Manufacturer
           %th Model
           %th Site
       - t.tbody do
@@ -36,5 +43,6 @@
             %td= device.name
             - unless @institutions.one?
               %td= device.institution.name
+            %td= device.device_model.institution.try :name
             %td= device.device_model.full_name
             %td= device.site.try(:name)
