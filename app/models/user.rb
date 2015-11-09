@@ -16,8 +16,6 @@ class User < ActiveRecord::Base
   has_many :granted_policies, class_name: "Policy", foreign_key: "granter_id"
   has_many :computed_policies
 
-  accepts_nested_attributes_for :policies
-
   after_create :update_computed_policies
 
   def timeout_in
@@ -39,6 +37,10 @@ class User < ActiveRecord::Base
 
   def update_computed_policies
     ComputedPolicy.update_user(self)
+  end
+
+  def full_name
+    [first_name, last_name].compact.join(' ')
   end
 
   def grant_superadmin_policy

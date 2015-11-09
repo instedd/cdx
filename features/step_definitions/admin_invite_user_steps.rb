@@ -13,7 +13,7 @@ Given(/^a prospective user called Bill Smith, with email "(.*?)"$/) do |email|
 end
 
 Given(/^Bill does not have an account$/) do
-  @invite_page = InvitePage.new
+  @invite_page = PolicyPage.new
   @invite_page.load
 end
 
@@ -21,6 +21,7 @@ When(/^Bob sends an invitation to Bill Smith$/) do
   @policy = canned_policy(@institution.id)
   within(@invite_page.form) do |f|
     f.email.set @user.email
+    f.name.set @user.full_name
     f.policy.set canned_policy
     f.invite.click
   end
