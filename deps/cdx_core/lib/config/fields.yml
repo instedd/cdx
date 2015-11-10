@@ -147,3 +147,10 @@ test:
     <<: *LOCATION
   encounter:
     <<: *ENCOUNTER
+encounter:
+  institution:
+    <<: *INSTITUTION
+  patient:
+    <<: *PATIENT
+  encounter:
+    <<: *ENCOUNTER

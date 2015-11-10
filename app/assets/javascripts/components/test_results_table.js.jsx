@@ -15,7 +15,7 @@ var TestResultsTable = React.createClass({
 
   _fetchTests: function() {
     var options = _.extend({offset: this.state.offset, page_size: this.state.pageSize}, this.props.filter);
-    $.get('/api/events', options, function(result) {
+    $.get('/api/tests', options, function(result) {
       if (!this.isMounted()) return;
 
       this.setState(React.addons.update(this.state, {

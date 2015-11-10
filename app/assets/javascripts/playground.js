@@ -18,7 +18,7 @@ $(function() {
       start_demo_datetime = $("#data_start_datetime").val();
       end_demo_datetime = $("#data_end_datetime").val();
 
-      //if a user enters a repeat value  > 0 they want the demo endpoint 
+      //if a user enters a repeat value  > 0 they want the demo endpoint
 	  if ( $("#repeat_demo").val() > 0 ) {
 	    url= "/api/devices/" + device + "/demodata?repeat_demo="+repeat_demo_times+"&start_datetime="+start_demo_datetime+"&end_datetime="+end_demo_datetime;
       } else {
@@ -54,7 +54,7 @@ $(function() {
       $query_button.val("Querying...");
 
       $.ajax({
-        url: "/api/events?" + query_string,
+        url: "/api/tests?" + query_string,
         type: "POST",
         data: post_body,
         contentType: "application/json; charset=utf-8",
