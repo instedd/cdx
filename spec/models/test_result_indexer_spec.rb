@@ -2,12 +2,20 @@ require "spec_helper"
 
 describe TestResultIndexer, elasticsearch: true do
 
+  let(:institution) do
+    Institution.make
+  end
+
   let(:patient) do
-    Patient.make(uuid: 'abc', core_fields: { 'gender' => 'male' }, custom_fields: { 'hiv' => 'positive' })
+    Patient.make(uuid: 'abc', core_fields: { 'gender' => 'male' }, custom_fields: { 'hiv' => 'positive' }, institution: institution)
+  end
+
+  let(:encounter) do
+    Encounter.make(patient: patient, core_fields: {}, custom_fields: { 'status' => 'completed' }, institution: institution)
   end
 
   let(:sample) do
-    Sample.make(patient: patient, core_fields: { 'type' => 'sputum' }, custom_fields: { 'culture_days' => '10' })
+    Sample.make(patient: patient, encounter: encounter, core_fields: { 'type' => 'sputum' }, custom_fields: { 'culture_days' => '10' }, institution: institution)
   end
 
   let(:sample_identifier) do
@@ -17,6 +25,8 @@ describe TestResultIndexer, elasticsearch: true do
   let(:test){ TestResult.make(
     "sample_identifier" => sample_identifier,
     "patient" => patient,
+    "encounter" => encounter,
+    "institution" => institution,
     "test_id" => '4',
     "custom_fields" => {
       "concentration" => "15%"
@@ -72,6 +82,12 @@ describe TestResultIndexer, elasticsearch: true do
           "gender" => "male",
           "custom_fields" => {
             "hiv" => "positive"
+          }
+        },
+        "encounter" => {
+          'uuid' => encounter.uuid,
+          'custom_fields' => {
+            'status' => 'completed'
           }
         },
         "location" => {

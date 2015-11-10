@@ -11,6 +11,8 @@ module Entity
     end
 
     before_save :encrypt_sensitive_data
+    before_save :set_phantom_flag
+
     validate    :valid_core_fields
     validate    :valid_sensitive_fields
   end
@@ -53,6 +55,14 @@ module Entity
     Array(self.uuid)
   end
 
+  def phantom?
+    self.is_phantom && !has_entity_id?
+  end
+
+  def not_phantom?
+    not phantom?
+  end
+
   def valid_core_fields
     valid_fields(self.core_fields, self.errors['core_fields'], entity_fields, false)
   end
@@ -87,6 +97,34 @@ module Entity
 
     def entity_fields
       Cdx.core_field_scopes.find{|s| s.name == entity_scope}.fields
+    end
+  end
+
+protected
+
+  def set_phantom_flag
+    self.is_phantom = phantom? if respond_to?(:'is_phantom=')
+    true
+  end
+
+  def validate_sample
+    if self.sample
+      errors.add(:sample, "must belong to the same institution as this #{self.model_name.singular.humanize}") if self.institution_id != sample.institution_id
+      errors.add(:sample, "must belong to the same encounter as this #{self.model_name.singular.humanize}") if self.encounter_id != sample.encounter_id
+      errors.add(:sample, "must belong to the same patient as this #{self.model_name.singular.humanize}") if self.patient_id != sample.patient_id
+    end
+  end
+
+  def validate_encounter
+    if self.encounter
+      errors.add(:encounter, "must belong to the same institution as this #{self.model_name.singular.humanize}") if self.institution_id != encounter.institution_id
+      errors.add(:encounter, "must belong to the same patient as this #{self.model_name.singular.humanize}") if self.patient_id != encounter.patient_id
+    end
+  end
+
+  def validate_patient
+    if self.patient
+      errors.add(:patient, "must belong to the same institution as this #{self.model_name.singular.humanize}") if self.institution_id != patient.institution_id
     end
   end
 

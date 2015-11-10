@@ -140,6 +140,7 @@ ActiveRecord::Schema.define(version: 20151110161047) do
     t.text     "core_fields",    limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "is_phantom",                   default: true
   end
 
   create_table "filters", force: :cascade do |t|
@@ -241,6 +242,7 @@ ActiveRecord::Schema.define(version: 20151110161047) do
     t.integer  "institution_id", limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "is_phantom",                   default: true
   end
 
   add_index "patients", ["institution_id"], name: "index_patients_on_institution_id", using: :btree
@@ -273,6 +275,7 @@ ActiveRecord::Schema.define(version: 20151110161047) do
     t.datetime "updated_at"
     t.integer  "patient_id",     limit: 4
     t.integer  "encounter_id",   limit: 4
+    t.boolean  "is_phantom",                   default: true
   end
 
   add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree

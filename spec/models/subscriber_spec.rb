@@ -119,16 +119,18 @@ describe Subscriber, elasticsearch: true do
 
   def submit_test
     patient = Patient.make(
-      core_fields: {"gender" => "male"}
+      core_fields: {"gender" => "male"},
+      institution: institution
     )
 
-    sample = Sample.make patient: patient
+    sample = Sample.make patient: patient, institution: institution
     sample_identifier = SampleIdentifier.make sample: sample
 
     TestResult.create_and_index(
       patient: patient, sample_identifier: sample_identifier,
       core_fields: {"assays" => ["result" => "positive", "condition" => "mtb", "name" => "mtb"]},
-      device_messages: [device_message]
+      device_messages: [device_message],
+      institution: institution
     )
 
     expect(TestResult.count).to eq(1)
