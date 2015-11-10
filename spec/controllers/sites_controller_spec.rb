@@ -125,6 +125,36 @@ describe SitesController do
       expect(response).to be_forbidden
     end
 
+    it "should not destroy site with associated devices" do
+      site.devices.make
+      expect(site.devices).not_to be_empty
+      expect {
+        expect {
+          delete :destroy, id: site.id
+        }.to raise_error(ActiveRecord::DeleteRestrictionError)
+      }.not_to change(institution.sites, :count)
+    end
+
+    it "should destroy a site after moving it's associated devices" do
+      site3 = institution.sites.make
+      site.devices.make
+      expect(site.devices).not_to be_empty
+      expect {
+        expect {
+          delete :destroy, id: site.id
+        }.to raise_error(ActiveRecord::DeleteRestrictionError)
+      }.not_to change(institution.sites, :count)
+
+      site.devices.each { |dev|
+        dev.site = site3
+        dev.save!
+      }
+
+      expect {
+        delete :destroy, id: site.id
+      }.to change(institution.sites, :count).by(-1)
+    end
+
   end
 
 end

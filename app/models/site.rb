@@ -4,7 +4,7 @@ class Site < ActiveRecord::Base
 
   belongs_to :institution
   has_one :user, through: :institution
-  has_many :devices
+  has_many :devices, dependent: :restrict_with_exception
   has_many :test_results, through: :devices
   belongs_to :parent, class_name: "Site"
   has_many :children, class_name: "Site", foreign_key: "parent_id"
