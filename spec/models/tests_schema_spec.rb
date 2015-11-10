@@ -24,7 +24,7 @@ describe TestsSchema do
 
     sample_scope = Cdx::Scope.new('sample', sample_fields)
     patient_scope = Cdx::Scope.new('patient', patient_fields)
-    allow(Cdx::Fields.test_result).to receive(:core_field_scopes).and_return([sample_scope, patient_scope])
+    allow(Cdx::Fields.test).to receive(:core_field_scopes).and_return([sample_scope, patient_scope])
 
     schema = TestsSchema.new("es-AR").build
 

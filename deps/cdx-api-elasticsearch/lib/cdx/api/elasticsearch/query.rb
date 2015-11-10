@@ -9,12 +9,12 @@ class Cdx::Api::Elasticsearch::Query
   DEFAULT_PAGE_SIZE = 50
   MAX_PAGE_SIZE = 100
 
-  def initialize(params, fields, result_name, api = Cdx::Api)
+  def initialize(params, fields, api = Cdx::Api)
     @params = params
     @fields = fields
-    @result_name = result_name
+    @result_name = fields.result_name
     @api = api
-    @indices ||= api.index_name_pattern
+    @indices = api.index_name_pattern
   end
 
   def before_execute(&block)

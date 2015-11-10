@@ -1,7 +1,7 @@
 class Cdx::Api::Elasticsearch::NullQuery
-  def initialize(params, result_name)
+  def initialize(params, fields)
     @params = params
-    @result_name = result_name
+    @result_name = fields.result_name
   end
 
   def execute

@@ -1,6 +1,6 @@
 class Cdx::Fields
-  def self.test_result
-    self["test_result"]
+  def self.test
+    self["test"]
   end
 
   def self.encounter
@@ -28,5 +28,9 @@ class Cdx::Fields
     @scopes ||= YAML.load_file(File.join(File.dirname(__FILE__), "..", "config", "fields.yml"))[@entity_name].map do |scope_name, definition|
       Cdx::Scope.new(scope_name, definition)
     end
+  end
+
+  def result_name
+    @entity_name.pluralize
   end
 end

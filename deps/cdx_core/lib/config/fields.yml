@@ -130,7 +130,7 @@ entities:
       end_time:
         type: date
         searchable: true
-test_result:
+test:
   sample:
     <<: *SAMPLE
   test:

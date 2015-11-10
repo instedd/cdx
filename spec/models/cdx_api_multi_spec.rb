@@ -7,7 +7,7 @@ describe "Cdx::Api Multi", elasticsearch: true do
   let!(:institution) { device.institution }
 
   def multi_query(queries)
-    Cdx::Api::Elasticsearch::MultiQuery.new(queries, Cdx::Fields.test_result, TestResultQuery::RESULT_NAME).execute
+    Cdx::Api::Elasticsearch::MultiQuery.new(queries, Cdx::Fields.test).execute
   end
 
   describe "with two different filters" do

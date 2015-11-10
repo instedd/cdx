@@ -813,10 +813,10 @@ describe Cdx::Api, elasticsearch: true do
           )
         end
 
-        Cdx::Fields.test_result.core_field_scopes.push @extra_scope
-        Cdx::Fields.test_result.core_fields.concat @extra_scope.flatten
+        Cdx::Fields.test.core_field_scopes.push @extra_scope
+        Cdx::Fields.test.core_fields.concat @extra_scope.flatten
 
-        Cdx::Fields.test_result.searchable_fields.concat @extra_fields
+        Cdx::Fields.test.searchable_fields.concat @extra_fields
 
         # Delete the index and recreate it to make ES grab the new template
         Cdx::Api.client.indices.delete index: "cdx_test", ignore: 404
@@ -824,13 +824,13 @@ describe Cdx::Api, elasticsearch: true do
       end
 
       after(:all) do
-        Cdx::Fields.test_result.core_field_scopes.delete @extra_scope
+        Cdx::Fields.test.core_field_scopes.delete @extra_scope
         @extra_scope.flatten.each do |field|
-          Cdx::Fields.test_result.core_fields.delete field
+          Cdx::Fields.test.core_fields.delete field
         end
 
         @extra_fields.each do |field|
-          Cdx::Fields.test_result.searchable_fields.delete field
+          Cdx::Fields.test.searchable_fields.delete field
         end
 
         # Delete the index and recreate it to make ES grab the new template

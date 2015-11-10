@@ -1,7 +1,7 @@
 class Cdx::Api::Elasticsearch::CdxDocumentFormat
   def self.[](entity_name)
     case entity_name
-    when "test_result"
+    when "test"
       TestResult.new
     when "encounter"
       Encounter.new

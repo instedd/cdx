@@ -12,7 +12,7 @@ class Cdx::Api::Elasticsearch::MappingTemplate
     {
       template: @api.config.template_name_pattern,
       mappings: {
-        test: mapping("test_result"),
+        test: mapping("test"),
         encounter: mapping("encounter"),
       }
     }
