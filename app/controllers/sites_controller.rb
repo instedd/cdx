@@ -55,6 +55,7 @@ class SitesController < ApplicationController
     return unless authorize_resource(@site, UPDATE_SITE)
 
     @can_delete = has_access?(@site, DELETE_SITE)
+    @can_be_deleted = @site.devices.empty?
   end
 
   # PATCH/PUT /sites/1
