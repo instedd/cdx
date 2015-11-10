@@ -51,6 +51,6 @@ describe "setup instructions of device" do
       page.tab_header.tests.click
     end
 
-    expect(page).to have_content '2 Tests'
+    expect(page).to have_content '2 TESTS'
   end
 end
