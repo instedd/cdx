@@ -101,7 +101,7 @@ class Cdx::Api::Elasticsearch::Query
     es_query[:size] = page_size
     es_query[:from] = offset if offset.present?
 
-    results = @api.search_elastic es_query.merge(index: indices)
+    results = @api.search_elastic es_query.merge(index: indices, type: search_type)
     hits = results["hits"]
     total = hits["total"]
     results = hits["hits"].map { |hit| hit["_source"] }
@@ -279,7 +279,7 @@ class Cdx::Api::Elasticsearch::Query
 
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
-    result = @api.search_elastic body: aggregations.to_hash.merge(query: query, size: 0), index: indices
+    result = @api.search_elastic body: aggregations.to_hash.merge(query: query, size: 0), index: indices, type: search_type
     if result["aggregations"]
       process_group_by_buckets(result["aggregations"], aggregations.in_order, [], {}, 0)
     else
@@ -303,5 +303,9 @@ class Cdx::Api::Elasticsearch::Query
 
   def process_group_by_buckets(aggregations, group_by, entities, entity, doc_count)
     GroupingDetail.process_buckets(aggregations, group_by, entities, entity, doc_count)
+  end
+
+  def search_type
+    @fields.entity_name
   end
 end

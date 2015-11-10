@@ -12,6 +12,8 @@ class Cdx::Fields
     @fields[entity_name] ||= new(entity_name)
   end
 
+  attr_reader :entity_name
+
   def initialize(entity_name)
     @entity_name = entity_name
   end
