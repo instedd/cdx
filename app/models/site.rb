@@ -9,6 +9,8 @@ class Site < ActiveRecord::Base
   belongs_to :parent, class_name: "Site"
   has_many :children, class_name: "Site", foreign_key: "parent_id"
 
+  acts_as_paranoid
+
   validates_presence_of :institution
   validates_presence_of :name
 

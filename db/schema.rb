@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151104202638) do
+ActiveRecord::Schema.define(version: 20151110161047) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -297,7 +297,10 @@ ActiveRecord::Schema.define(version: 20151104202638) do
     t.integer  "parent_id",              limit: 4
     t.string   "prefix",                 limit: 255
     t.string   "sample_id_reset_policy", limit: 255, default: "yearly"
+    t.datetime "deleted_at"
   end
+
+  add_index "sites", ["deleted_at"], name: "index_sites_on_deleted_at", using: :btree
 
   create_table "ssh_keys", force: :cascade do |t|
     t.text     "public_key", limit: 65535
