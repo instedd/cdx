@@ -11,6 +11,11 @@ class ItemSearchPage < CdxPageBase
     self.wait_for_ajax
   end
 
+  def search_and_select_first(text)
+    perform_search text
+    results.first.select
+  end
+
   element :search, ".item-search input"
 
   sections :results, Result, ".item-search ul li"

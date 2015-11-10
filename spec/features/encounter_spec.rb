@@ -38,10 +38,7 @@ describe "create encounter" do
     process sample: {id: "ab111"}
 
     goto_page NewEncounterPage do |page|
-      page.open_append_sample do |modal|
-        modal.perform_search "ab"
-        modal.results.first.select
-      end
+      page.open_append_sample.search_and_select_first "ab"
 
       page.submit
     end
@@ -56,17 +53,93 @@ describe "create encounter" do
     process test: {id: "ab111"}
 
     goto_page NewEncounterPage do |page|
-      page.open_add_tests do |modal|
-        modal.perform_search "ab"
-        modal.results.first.select
-      end
+      page.open_add_tests.search_and_select_first "ab"
 
       page.submit
     end
 
     expect_page ShowEncounterPage do |page|
-      encounter = Encounter.find(page.id)
-      expect(encounter.test_results).to match([TestResult.first])
+      expect(page.encounter.test_results).to match([TestResult.first])
     end
+  end
+
+  it "should create patient when adding test with information" do
+    process test: {id: "ab123"}, patient: {name: "John Doe"}
+
+    goto_page NewEncounterPage do |page|
+      page.open_add_tests.search_and_select_first "ab123"
+
+      page.submit
+    end
+
+    expect_page ShowEncounterPage do |page|
+      expect(page).to have_content "John Doe"
+      expect(page.encounter.patient.plain_sensitive_data["name"]).to match("John Doe")
+    end
+  end
+
+  pending "should merge patient information coming from different tests" do
+    process test: {id: "ab123"}, patient: {name: "John Doe"}
+    process test: {id: "ab456"}, patient: {gender: "male"}
+    process test: {id: "ab789"}
+
+    goto_page NewEncounterPage do |page|
+      page.open_add_tests.search_and_select_first "ab123"
+      page.open_add_tests.search_and_select_first "ab456" # this is not added due to multiple patients
+      page.open_add_tests.search_and_select_first "ab789"
+
+      page.submit
+    end
+
+    expect_page ShowEncounterPage do |page|
+      expect(page.encounter.test_results).to have(3).items
+      expect(page.encounter.patient.plain_sensitive_data["name"]).to match("John Doe")
+      expect(page.encounter.patient.core_fields["gender"]).to match("male")
+    end
+  end
+
+  it "should be able to change the assay result and quantity of encounter" do
+    process test: {id: "a"}
+    
+    goto_page NewEncounterPage do |page|
+      page.open_add_tests.search_and_select_first "a"
+
+      page.diagnosis.assays.first.result.set "Negative"
+      page.diagnosis.assays.first.quant.set 5
+
+      page.submit
+    end
+
+    expect_page ShowEncounterPage do |page|
+      expect(page).to have_content("Negative")
+      expect(page).to have_content("5")
+
+      page.submit
+    end
+
+    expect_page EditEncounterPage do |page|
+      expect(page.diagnosis.assays.first.result.value).to eq("Negative")
+      expect(page.diagnosis.assays.first.quant.value).to eq("5")
+
+      page.diagnosis.assays.first.result.set "Indeterminate"
+      page.diagnosis.assays.first.quant.set 3
+
+      page.submit
+    end
+
+    expect_page ShowEncounterPage do |page|
+      expect(page).to have_content("Indeterminate")
+      expect(page).to have_content("3")
+    end
+  end
+
+  context "adding test from other encounter" do
+    it "should leave one encounter"
+    it "should use encounter's diagnosis for merging"
+    it "should merge patient data"
+  end
+
+  context "adding test from many others encounter" do
+    it "should leave one encounter"
   end
 end
