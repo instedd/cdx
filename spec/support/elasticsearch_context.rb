@@ -34,6 +34,17 @@ shared_context "elasticsearch", elasticsearch: true do
       index: Cdx::Api.index_name,
       from: 0,
       size: 1000,
+      type: "test",
+    )
+    results["hits"]["hits"]
+  end
+
+  def all_elasticsearch_encounters
+    results = fresh_client.search(
+      index: Cdx::Api.index_name,
+      from: 0,
+      size: 1000,
+      type: "encounter",
     )
     results["hits"]["hits"]
   end

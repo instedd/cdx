@@ -28,7 +28,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
   PATIENT_CUSTOM_FIELDS   = {"shirt_color" => PATIENT_SHIRT_COLOR, "hiv" => PATIENT_HIV}.freeze
 
   ENCOUNTER_ID            = "1234"
-  ENCOUNTER_CORE_FIELDS   = {"id" => ENCOUNTER_ID}.freeze
+  ENCOUNTER_CORE_FIELDS   = {"id" => ENCOUNTER_ID, "patient_age" => {"years" => 20}}.freeze
   ENCOUNTER_PII_FIELDS    = {}.freeze
   ENCOUNTER_CUSTOM_FIELDS = {"time" => "2001-01-01T10:00:00"}.freeze
 
@@ -172,6 +172,18 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(TestResult.all.map(&:sample).map(&:id)).to eq([Sample.first.id] * 3)
 
     expect(all_elasticsearch_tests.map {|e| e['_source']['sample']['uuid']}).to eq([Sample.first.uuids] * 3)
+  end
+
+  it "should index an encounter" do
+    device_message_processor.process
+
+    results = all_elasticsearch_encounters
+    expect(results.length).to eq(1)
+
+    result = results.first
+    expect(result["_source"]["encounter"]["id"]).to eq(ENCOUNTER_ID)
+    expect(result["_source"]["encounter"]["custom_fields"]["time"]).to eq(ENCOUNTER_CUSTOM_FIELDS["time"])
+    expect(result["_source"]["patient"]["gender"]).to eq(PATIENT_GENDER)
   end
 
   context "sample identification" do

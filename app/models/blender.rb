@@ -133,6 +133,7 @@ class Blender
     entities.each do |entity|
       case entity
       when TestResult then TestResultIndexer.new(entity).index
+      when Encounter then EncounterIndexer.new(entity).index
       when Entity then EntityIndexUpdater.new(entity).update
       when nil then next
       else raise UnknownEntityError, "Unknown entity type #{entity.class.name}"
