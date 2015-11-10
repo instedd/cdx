@@ -102,10 +102,10 @@ class TestResultQuery < Cdx::Api::Elasticsearch::Query
     sites = indexed_model tests, Site, ["site", "uuid"]
     devices = indexed_model tests, Device, ["device", "uuid"]
 
-    tests.each do |event|
-      event["institution"]["name"] = institutions[event["institution"]["uuid"]].try(:name) if event["institution"]
-      event["device"]["name"] = devices[event["device"]["uuid"]].try(:name) if event["device"]
-      event["site"]["name"] = sites[event["site"]["uuid"]].try(:name) if event["site"]
+    tests.each do |test|
+      test["institution"]["name"] = institutions[test["institution"]["uuid"]].try(:name) if test["institution"]
+      test["device"]["name"] = devices[test["device"]["uuid"]].try(:name) if test["device"]
+      test["site"]["name"] = sites[test["site"]["uuid"]].try(:name) if test["site"]
     end
   end
 

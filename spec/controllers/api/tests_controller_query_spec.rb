@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::EventsController, elasticsearch: true, validate_manifest: false do
+describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
   let(:user) { User.make }
   let!(:institution) { Institution.make user_id: user.id }
@@ -166,7 +166,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           expect(r.status).to eq(200)
           expect(r.content_type).to eq("text/csv")
           expect(r.headers["Content-Disposition"]).to eq("attachment; filename=\"Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-          expect(r).to render_template("api/events/index")
+          expect(r).to render_template("api/tests/index")
         end
 
         render_views
