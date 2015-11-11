@@ -129,4 +129,10 @@ $(document).ready(function(){
       }
   });
 
+  $(".btn-toggle").click(function(){
+    $(".advanced").toggleClass('show');
+    $(this).toggleClass('up');
+    return false;
+  });
+
 });

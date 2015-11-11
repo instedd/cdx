@@ -8,6 +8,7 @@ input[type="email"],
 input[type="password"],
 input[type="number"] {
   @include placeholder-style(italic);
+  background-color: transparent;
   font-family: $sans;
   font-size: 100%;
   border: none;

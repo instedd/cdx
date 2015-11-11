@@ -75,8 +75,13 @@ a {
   margin-left: -43px;
 
   &.btn-add {
-    margin-top: 30px;
     margin-left: -73px;
+  }
+  &.ontop {
+    margin-top: 30px;
+    &.fixed {
+      top: 0px;
+    }
   }
 }
 
@@ -151,4 +156,29 @@ a[title="Back"] {
   margin-top: 60px;
 }
 
+.filters {
+  background: $gray1;
+  margin: -1.5em -1em;
+  padding: 0 1em 0.5em;
 
+  .filter {
+    @include flex(0 0 20%);
+    padding: $col-padd;
+
+    > label {
+      min-height: auto;
+      line-height: 15px;
+    }
+  }
+
+  .advanced {
+    @include transition(all ease .5s);
+    margin-top: 15px;
+    height: 0px;
+    overflow: hidden;
+
+    &.show {
+      height: 70px;
+    }
+  }
+}

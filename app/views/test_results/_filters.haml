@@ -1,0 +1,55 @@
+- content_for(:subheader) do
+  %form(data-auto-submit)
+    .row.center.filters
+      .col.pe-10
+        .row
+          .col
+            %h1
+              = link_to "+", new_encounter_path, class: 'btn-add side-link fix', title: 'Add encounter'
+              Tests
+        .row
+          .filter
+            %label.block Condition
+            = cdx_select name: "test.assays.condition", value: params["test.assays.condition"] do |select|
+              - select.item "", "Show all"
+              - select.items @conditions
+          .filter
+            %label.block Result
+            = cdx_select name: "test.assays.result", value: params["test.assays.result"] do |select|
+              - select.item "", "Show all"
+              - select.items @results
+          .filter
+            %label.block Date
+            = cdx_select name: "since", value: params["since"] do |select|
+              - select.item "", "Show all"
+              - select.items @date_options
+          .col
+            %a.btn-toggle.pull-right{:title => "Toggle advanced filters"}
+
+        .advanced
+          .row
+            .filter
+              %label.block Sample Id
+              %input{type: "text", name: "sample.id", value: params["sample.id"]}
+            .filter
+              %label.block Encounter Id
+              %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
+            - if @institutions.size > 1 || @sites.size > 1 || @devices.size > 1
+              - if @sites.size > 1
+                .filter
+                  %label.block Site
+                  = cdx_select name: "site.uuid", value: params["site.uuid"] do |select|
+                    - select.item "", "Show all"
+                    - select.items @sites, :uuid, :name
+              - if @institutions.size > 1
+                .filter
+                  %label.block Institution
+                  = cdx_select name: "institution.uuid", value: params["institution.uuid"] do |select|
+                    - select.item "", "Show all"
+                    - select.items @institutions, :uuid, :name
+              - if @devices.size > 1
+                .filter
+                  %label.block Device
+                  = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
+                    - select.item "", "Show all"
+                    - select.items @devices, :uuid, :name

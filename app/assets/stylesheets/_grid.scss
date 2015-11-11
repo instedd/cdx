@@ -2,11 +2,10 @@
   FLEXBOX GRID
 ============================================================================= */
 
-.grid {}
-
 .row {
   @include flexbox();
   @include clearfix();
+  @include flex-wrap(wrap);
   flex-direction: row;
 
   &.center {
@@ -21,6 +20,9 @@
   position: relative;
 
   /* forced '%' distribution */
+  &.pe-1 {
+    @include flex(0 0 8.333%);
+  }
   &.pe-2 {
     @include flex(0 0 16.666%);
   }
@@ -61,6 +63,9 @@
     @include flex(0 0 91.666%);
   }
 
+  &.pe-12 {
+    @include flex(0 0 100%);
+  }
 
   /* forced 'PX' distribution */
 

@@ -88,11 +88,13 @@
 }
 
 
-.btn-add, .btn-add-secondary {
+.btn-add,
+.btn-add-secondary {
+  font-family: $sans;
   border-radius: 50%;
   background: $blue;
-  font-size: 190%;
-  font-weight: 300;
+  font-size: 27px;
+  font-weight: 300 !important;
   color: $white;
   line-height: 48px;
   text-align: center;
@@ -103,7 +105,7 @@
 
   &.fixed {
     position: fixed;
-    top: 0px;
+    top: 30px;
   }
 }
 
@@ -125,6 +127,24 @@
   line-height: inherit;
   padding: 5px;
   white-space: nowrap;
+}
+
+.btn-toggle {
+  border-radius: 50%;
+  background: url("arr-select-down-inv.png") no-repeat center 5px $gray3;
+  color: $white;
+  line-height: 25px;
+  text-align: center;
+  display: inline-block;
+  vertical-align: middle;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+
+  &.up {
+    background-image: url("arr-select-up-inv.png");
+
+  }
 }
 
 .pager {

@@ -1,82 +1,35 @@
-%form(data-auto-submit)
-  .row
-    .col
-      %h1 Filters
-  - if @institutions.size > 1 || @sites.size > 1 || @devices.size > 1
-    .row
-      - if @institutions.size > 1
-        .col
-          %label.block Institution
-          = cdx_select name: "institution.uuid", value: params["institution.uuid"] do |select|
-            - select.item "", "Show all"
-            - select.items @institutions, :uuid, :name
-      - if @sites.size > 1
-        .col
-          %label.block Site
-          = cdx_select name: "site.uuid", value: params["site.uuid"] do |select|
-            - select.item "", "Show all"
-            - select.items @sites, :uuid, :name
-      - if @devices.size > 1
-        .col
-          %label.block Device
-          = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
-            - select.item "", "Show all"
-            - select.items @devices, :uuid, :name
-  .row
-    .col
-      %label.block Condition
-      = cdx_select name: "test.assays.condition", value: params["test.assays.condition"] do |select|
-        - select.item "", "Show all"
-        - select.items @conditions
-    .col
-      %label.block Result
-      = cdx_select name: "test.assays.result", value: params["test.assays.result"] do |select|
-        - select.item "", "Show all"
-        - select.items @results
-    .col
-      %label.block Date
-      = cdx_select name: "since", value: params["since"] do |select|
-        - select.item "", "Show all"
-        - select.items @date_options
-    .col
-      %label.block Sample Id
-      %input{type: "text", name: "sample.id", value: params["sample.id"]}
-    .col
-      %label.block Encounter Id
-      %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
+= render "filters"
 
+.row
+  .col
 
-  .row
-    .col
-      = link_to "+", new_encounter_path, class: 'btn-add side-link fix', title: 'Add encounter'
+    = cdx_table title: pluralize(@total, "Test") do |t|
+      - t.thead do
+        %tr
+          - each_column do |id, title, sortable|
+            %th= sortable ? order_by_column(title, id) : title
+      - t.tbody do
+        - @tests.each do |test|
+          %tr{data: {href: test_result_path(test['test']['uuid']) }}
+            - each_column do |id|
+              %td= formatted_test_value(test, id, web: true)
+    .pagination
+      = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
+      = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
+      %input.input-x-small.text-right{type: "text", name: "page", value: @page}
+      %span
+        of
+        = (@total.to_f / @page_size).ceil
+      %span(style="display: inline-block;")
+        = cdx_select name: "page_size", value: @page_size, class: 'input-large' do |select|
+          - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
+      :javascript
+        $(function(){
+          $(document).on('change', 'input[name=page_size]', function(){
+            var form = this.form;
+            form.submit();
+          });
+        })
 
-      = cdx_table title: pluralize(@total, "Test") do |t|
-        - t.thead do
-          %tr
-            - each_column do |id, title, sortable|
-              %th= sortable ? order_by_column(title, id) : title
-        - t.tbody do
-          - @tests.each do |test|
-            %tr{data: {href: test_result_path(test['test']['uuid']) }}
-              - each_column do |id|
-                %td= formatted_test_value(test, id, web: true)
-      .pagination
-        = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
-        = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
-        %input.input-x-small.text-right{type: "text", name: "page", value: @page}
-        %span
-          of
-          = (@total.to_f / @page_size).ceil
-        %span(style="display: inline-block;")
-          = cdx_select name: "page_size", value: @page_size, class: 'input-large' do |select|
-            - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
-        :javascript
-          $(function(){
-            $(document).on('change', 'input[name=page_size]', function(){
-              var form = this.form;
-              form.submit();
-            });
-          })
-
-        = link_to "download CSV", csv_test_results_path(@filter)
-        = link_to "Add filter", new_filter_path(query: @filter), class: 'pull-right'
+      = link_to "download CSV", csv_test_results_path(@filter)
+      = link_to "Add filter", new_filter_path(query: @filter), class: 'pull-right'

@@ -15,7 +15,6 @@
 }
 
 .Select-control {
-  background-color: #ffffff;
   color: #333333;
   position: relative;
   min-width: 60px;
@@ -34,7 +33,6 @@
 .is-open > .Select-control {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  background: #ffffff;
   border-color: #b3b3b3 #cccccc #d9d9d9;
   > .Select-arrow {
     background: url("arr-select-up.png") no-repeat;
