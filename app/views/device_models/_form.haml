@@ -18,7 +18,7 @@
     .col.pe-3
       = f.label :picture
     .col
-      - unless @device_model.picture.blank?
+      - unless @device_model.new_record? || @device_model.picture.blank?
         = image_tag @device_model.picture.url(:card)
         = f.check_box :delete_picture
         = f.label :delete_picture
