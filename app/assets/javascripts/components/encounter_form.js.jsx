@@ -102,7 +102,7 @@ var EncounterForm = React.createClass({
 
       if (field == 'result') {
         newValue = event;
-      } else if (field == 'quantitative') {
+      } else if (field == 'quantitative_result') {
         newValue = parseInt(event.target.value)
         if (isNaN(newValue)) {
           newValue = null;
@@ -145,7 +145,7 @@ var EncounterForm = React.createClass({
                     <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} />
                   </div>
                   <div className="col pe-1">
-                    <input type="text" className="quantitative" value={assay.quantitative} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative')} />
+                    <input type="text" className="quantitative" value={assay.quantitative_result} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative_result')} />
                   </div>
                 </div>
               );

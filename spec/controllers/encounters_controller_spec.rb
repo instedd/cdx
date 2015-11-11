@@ -100,7 +100,7 @@ RSpec.describe EncountersController, type: :controller do
         institution: { uuid: institution.uuid },
         samples: [{ uuid: sample.uuid }],
         test_results: [],
-        assays: [{condition: 'mtb', result: 'positive', quantitative: 3}],
+        assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],
         observations: 'Lorem ipsum',
       }.to_json
 
@@ -119,7 +119,7 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "assigns assays" do
-      expect(sample.encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative' => 3}])
+      expect(sample.encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative_result' => 3}])
     end
 
     it "assigns observations" do
@@ -151,7 +151,7 @@ RSpec.describe EncountersController, type: :controller do
         institution: { uuid: 'uuid-to-discard' },
         samples: [{ uuid: sample.uuid }],
         test_results: [],
-        assays: [{condition: 'mtb', result: 'positive', quantitative: 3}],
+        assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],
         observations: 'Lorem ipsum',
       }.to_json
 
@@ -171,7 +171,7 @@ RSpec.describe EncountersController, type: :controller do
     end
 
     it "assigns assays" do
-      expect(encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative' => 3}])
+      expect(encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative_result' => 3}])
     end
 
     it "assigns observations" do

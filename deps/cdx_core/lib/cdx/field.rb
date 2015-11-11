@@ -3,7 +3,7 @@ class Cdx::Field
 
   def self.for scope, name, definition
     definition = definition || {}
-    field_class = case definition["type"]
+    field_class = case definition["type"].try(:to_s)
       when "nested"
         NestedField
       when "multi_field"

@@ -193,4 +193,29 @@ describe Encounter do
       expect(merge_values(nil, "any")).to eq("any")
     end
   end
+
+  context "field validations" do
+
+    it "should allow observations pii field" do
+      encounter.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD] = "Observations"
+      expect(encounter).to be_valid
+    end
+
+    it "should not allow observations plain field" do
+      encounter.core_fields[Encounter::OBSERVATIONS_FIELD] = "Observations"
+      expect(encounter).to_not be_valid
+    end
+
+    it "should allow assays fields" do
+      encounter.core_fields[Encounter::ASSAYS_FIELD] = [{"name"=>"flu_a", "condition"=>"flu_a", "result"=>"indeterminate", "quantitative_result"=>3}]
+      expect(encounter).to be_valid
+    end
+
+    it "should not allow invalid fields within assays" do
+      encounter.core_fields[Encounter::ASSAYS_FIELD] = [{"name"=>"flu_a", "condition"=>"flu_a", "result"=>"indeterminate", "invalid"=>"invalid"}]
+      expect(encounter).to_not be_valid
+    end
+
+  end
+
 end

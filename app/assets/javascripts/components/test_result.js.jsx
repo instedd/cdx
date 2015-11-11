@@ -33,7 +33,7 @@ var AssaysResultList = React.createClass({
                 <b>{_.capitalize(assay.result)}</b>
               </div>
               <div className="col pe-1">
-                {assay.quantitative}
+                {assay.quantitative_result}
               </div>
 
             </div>

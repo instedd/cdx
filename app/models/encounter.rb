@@ -81,11 +81,12 @@ class Encounter < ActiveRecord::Base
     @additional_entity_fields ||= Cdx::Scope.new('encounter', { allows_custom: true, fields: {
       observations: { pii: true },
       assays: {
-        type: :nested,
+        type: "nested",
         sub_fields: {
+          name: {},
           condition: {},
           result: {},
-          quantitative: { type: :integer }
+          quantitative_result: { type: "integer" }
         }
       }
     }}.deep_stringify_keys).fields
