@@ -35,6 +35,10 @@ Institution.blueprint do
   name
 end
 
+Institution.blueprint(:manufacturer) do
+  kind { "manufacturer" }
+end
+
 Device.blueprint do
   site { Site.make institution: institution }
   institution { site.institution }
