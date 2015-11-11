@@ -1,7 +1,12 @@
-%h1
-  = link_to sites_path, class: 'side-link', title: 'Back' do
-    = image_tag "arrow-left.png"
-  = @site.name
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to sites_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            = @site.name
 
 = render 'form'
 

@@ -45,6 +45,7 @@ class PoliciesController < ApplicationController
   end
 
   def edit
+    @editing = true
     @policy = Policy.find params[:id]
     @policy.definition = JSON.pretty_generate(@policy.definition)
   end

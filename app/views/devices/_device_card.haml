@@ -1,9 +1,12 @@
-.row
-  .col
-    %h1
-      = link_to devices_path, class: 'side-link', title: 'Back' do
-        = image_tag "arrow-left.png"
-      = @device.name
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to devices_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            = @device.name
 
 .row
   .col.pe-7

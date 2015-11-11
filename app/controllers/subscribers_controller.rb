@@ -23,6 +23,10 @@ class SubscribersController < ApplicationController
     respond_with subscriber
   end
 
+  def edit
+    @editing = true
+  end
+
   def new
     subscriber.fields = []
   end

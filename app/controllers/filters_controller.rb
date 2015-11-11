@@ -13,6 +13,7 @@ class FiltersController < ApplicationController
   end
 
   def show
+    @editing = true
     render :edit
   end
 

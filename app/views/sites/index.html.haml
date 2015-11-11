@@ -1,21 +1,7 @@
-- unless @institutions.one?
-  .row
-    .col
-      %h1 Filters
-  %form(data-auto-submit)
-    .row
-      .col
-        %label.block Institution
-
-        = cdx_select name: "institution", value: params["institution"] do |select|
-          - select.item "", "(all)"
-          - select.items @institutions, :id, :name
-
+= render "filters"
 .row
   .col
-    - if @can_create
-      = link_to "+", new_site_path, class: 'btn-add side-link ontop fix', title: 'Add Site'
-    = cdx_table title: 'Sites' do |t|
+    = cdx_table do |t|
       - t.thead do
         %tr
           %th Name

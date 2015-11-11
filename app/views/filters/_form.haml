@@ -9,18 +9,26 @@
   = f.fields_for(:query) do |p|
     - filter.query.each do |key, value|
       = p.hidden_field key, value: value
-  %div
-    - if filter.new_record?
-      Create a filter:
-    - else
-      This is a filter:
-    %ul
-      %li Site: #{site.try(:name)}
-      %li Condition: #{condition}
-  .control-group
-    = f.label :name, :class => 'control-label'
-    .control
+
+  .row
+    .col.pe-2
+      %label Site
+    .col
+      #{site.try(:name)}
+  .row
+    .col.pe-2
+      %label Condition
+    .col
+      #{condition}
+  .row
+    .col.pe-2
+      = f.label :name, :class => 'block'
+    .col
       = f.text_field :name
-  .control-group
-    .control
-      = f.submit class: "btn"
+  .row.button-actions
+    .col
+      = f.submit class: "btn-primary"
+      = link_to 'Cancel', filters_path, class: 'btn-link'
+      - if @editing
+        = link_to "Delete", filter, method: :delete, data: { confirm: "Are you sure you want to delete the filter '#{filter.name}'" }, class: 'btn-secondary pull-right'
+

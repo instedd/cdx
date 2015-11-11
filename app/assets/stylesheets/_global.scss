@@ -182,3 +182,25 @@ a[title="Back"] {
     }
   }
 }
+
+.add-new {
+  background: $blue;
+  margin: -1.5em -1em 1em;
+  padding: 0 1em 0.5em;
+
+  h2 {
+    color: $white;
+    margin: 0.3em 0;
+  }
+}
+
+.edit {
+  border-bottom: 1px solid $gray2;
+  margin: -1.5em -1em 1em;
+  padding: 0 1em 0.5em;
+
+  h2 {
+    margin: 0.3em 0;
+  }
+
+}

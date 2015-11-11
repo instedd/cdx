@@ -44,6 +44,7 @@
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', sites_path, class: 'btn-link'
       - if @can_delete
         - if @can_be_deleted
           = link_to "Delete", [@institution, @site], method: :delete, data: { confirm: "Are you sure you want to delete the site '#{@site.name}'" }, class: 'btn-secondary pull-right', title: 'Delete Site'

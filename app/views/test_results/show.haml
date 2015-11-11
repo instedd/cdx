@@ -1,9 +1,12 @@
-.row
-  .col
-    %h1
-      = link_to :back, class: 'side-link', title: 'Back' do
-        = image_tag "arrow-left.png"
-      = @test_result.core_fields[TestResult::NAME_FIELD]
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to :back, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            = @test_result.core_fields[TestResult::NAME_FIELD]
 
 - if @test_result.encounter
   .row

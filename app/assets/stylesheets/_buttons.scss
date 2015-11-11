@@ -115,10 +115,16 @@
 
 .btn-link {
   @extend .btn;
+  background: none !important;
   color: $gray3;
   padding: 5px;
   height: auto;
   line-height: inherit;
+
+  &:hover,
+  &:focus {
+    color: $gray4;
+  }
 }
 
 .btn-href {

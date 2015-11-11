@@ -1,6 +1,11 @@
-%h1
-  = link_to policies_path, class: 'side-link', title: 'Back' do
-    = image_tag "arrow-left.png"
-  New Policy
+- content_for(:subheader) do
+  .row.center.add-new
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to policies_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left-white.png"
+            New Policy
 
 = render 'form'
