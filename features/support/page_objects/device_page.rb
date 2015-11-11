@@ -23,3 +23,11 @@ class DevicePage < DeviceSetupPage
     element :setup, :link, 'Setup'
   end
 end
+
+class NewDevicePage < CdxPageBase
+  set_url '/devices/new'
+
+  section :device_model, CdxSelect, "label", text: /Device Model/i
+  element :name, :field, "Name"
+  element :serial_number, :field, "Serial number"
+end

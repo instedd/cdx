@@ -14,11 +14,21 @@ describe "device" do
           page.support_url.set "example.org/support"
           page.supports_activation.set true
           page.manifest.attach "db/seeds/manifests/genoscan_manifest.json"
-
-          # page.submit
+          page.submit
         end
 
-        # TBD
+        goto_page NewDevicePage do |page|
+          page.device_model.set "MyModel"
+          page.name.set "MyDevice"
+          page.serial_number.set "1234"
+          page.submit
+        end
+
+        expect_page DeviceSetupPage do |page|
+          expect(page).to have_content("MyDevice")
+          expect(page).to have_content("MyModel")
+          expect(page).to have_content("Activation token")
+        end
       end
 
       it "can create model without activation and device show a secret ket only once"
