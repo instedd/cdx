@@ -53,11 +53,11 @@ class ComputedPolicy < ActiveRecord::Base
     resource.filter(filter)
   end
 
-  def self.applicable_policies(action, resource_or_string, user, opts={})
+  def self.applicable_policies(action, resource_or_string, user=nil, opts={})
     resource_attributes = resource_attributes_for(resource_or_string)
 
-    query = self.where(user_id: user.id)
-      .where("resource_type = ? OR resource_type IS NULL", resource_attributes[:resource_type])
+    query = self.where("resource_type = ? OR resource_type IS NULL", resource_attributes[:resource_type])
+    query = query.where(user_id: user.id) if user
 
     query = query.where(delegable: opts[:delegable]) if opts.has_key?(:delegable)
     query = query.where("action = ? OR action IS NULL", action) if action && action != '*'
@@ -157,6 +157,19 @@ class ComputedPolicy < ActiveRecord::Base
       site: Site.where(id: site_ids),
       device: Device.where(id: device_ids)
     }
+  end
+
+  def self.authorized_users(action, resource)
+    self.applicable_policies(action, resource)\
+      .includes(:user, :exceptions)\
+      .group_by(&:user)\
+      .select do |user, policies|
+        policies.any? do |policy|
+          not policy.exceptions.any? do |exception|
+            exception.applies_to?(resource, action)
+          end
+        end
+      end.keys
   end
 
 

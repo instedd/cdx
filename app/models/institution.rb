@@ -37,7 +37,7 @@ class Institution < ActiveRecord::Base
   private
 
   def update_owner_policies
-    self.user.update_computed_policies
+    self.user.try(:update_computed_policies)
   end
 
 end

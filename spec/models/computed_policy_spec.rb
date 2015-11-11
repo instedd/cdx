@@ -7,12 +7,12 @@ describe ComputedPolicy do
 
   before(:each) { allow(Policy).to receive(:implicit).and_return(nil) }
 
-  let!(:user) { User.make }
-
-  let!(:device)  { Device.make }
-  let!(:device2) { Device.make }
+  let!(:user) { User.make email: "user@example.com" }
 
   context "from superadmin" do
+
+    let!(:device)  { Device.make }
+    let!(:device2) { Device.make }
 
     let!(:superadmin) do
       User.make { |u| u.grant_superadmin_policy }
@@ -113,6 +113,9 @@ describe ComputedPolicy do
 
 
   context "from regular user" do
+
+    let!(:device)  { Device.make }
+    let!(:device2) { Device.make }
 
     let!(:granter)  { User.make }
     let!(:granter2) { User.make }
@@ -278,6 +281,9 @@ describe ComputedPolicy do
   end
 
   context "recursively" do
+
+    let!(:device)  { Device.make }
+    let!(:device2) { Device.make }
 
     let!(:granter)  { User.make }
     let!(:granter2) { User.make }
@@ -586,6 +592,107 @@ describe ComputedPolicy do
       p = granter2.computed_policies.first
       expect(p.condition_site_id).to eq(site11.prefix)
     end
+  end
+
+  context "authorised users" do
+
+    let!(:institution_i1) { Institution.make(user: nil) }
+    let!(:institution_i2) { Institution.make(user: nil) }
+
+    let!(:site_i1_l1) { institution_i1.sites.make }
+    let!(:site_i1_l2) { institution_i1.sites.make }
+    let!(:site_i2_l1) { institution_i2.sites.make }
+    let!(:site_i2_l2) { institution_i2.sites.make }
+
+    let!(:device_i1_l1_d1) { site_i1_l1.devices.make }
+    let!(:device_i1_l1_d2) { site_i1_l1.devices.make }
+    let!(:device_i1_l2_d1) { site_i1_l2.devices.make }
+    let!(:device_i1_l2_d2) { site_i1_l2.devices.make }
+    let!(:device_i2_l1_d1) { site_i2_l1.devices.make }
+    let!(:device_i2_l1_d2) { site_i2_l1.devices.make }
+    let!(:device_i2_l2_d1) { site_i2_l2.devices.make }
+    let!(:device_i2_l2_d2) { site_i2_l2.devices.make }
+
+    let!(:user2) { User.make email: "user2@example.com" }
+    let!(:user3) { User.make email: "user3@example.com" }
+
+    def authorized_users(action=[READ_DEVICE], resource=nil)
+      ComputedPolicy.authorized_users(action, resource || device_i1_l1_d1)
+    end
+
+    context "when querying by a single resource" do
+
+      it "should return users authorised by id" do
+
+        grant nil, user,  device_i1_l1_d1, [READ_DEVICE]
+        grant nil, user2, device_i1_l1_d1, [READ_DEVICE]
+        grant nil, user3, device_i1_l1_d2, [READ_DEVICE]
+
+        expect(authorized_users(READ_DEVICE, device_i1_l1_d1)).to contain_exactly(user, user2)
+      end
+
+      it "should return users authorised by site scope" do
+        grant nil, user,  {device: site_i1_l1}, [READ_DEVICE]
+        grant nil, user2, {device: site_i1_l1}, [READ_DEVICE]
+        grant nil, user3, {device: site_i1_l2}, [READ_DEVICE]
+
+        expect(authorized_users(READ_DEVICE, device_i1_l1_d1)).to contain_exactly(user, user2)
+      end
+
+      it "should return users authorised by institution scope" do
+        grant nil, user,  {device: institution_i1}, [READ_DEVICE]
+        grant nil, user2, {device: institution_i1}, [READ_DEVICE]
+        grant nil, user3, {device: institution_i2}, [READ_DEVICE]
+
+        expect(authorized_users(READ_DEVICE, device_i1_l1_d1)).to contain_exactly(user, user2)
+      end
+
+      it "should not return users with exception by id" do
+        grant nil, user,  {device: site_i1_l1}, [READ_DEVICE], except: [device_i1_l1_d1]
+        grant nil, user2, {device: site_i1_l1}, [READ_DEVICE], except: [device_i1_l1_d2]
+        grant nil, user3, {device: site_i1_l2}, [READ_DEVICE]
+
+        expect(authorized_users(READ_DEVICE, device_i1_l1_d1)).to contain_exactly(user2)
+      end
+
+      it "should not return users with exception by site" do
+        grant nil, user,  {device: institution_i1}, [READ_DEVICE], except: [{device: site_i1_l1}]
+        grant nil, user2, {device: institution_i1}, [READ_DEVICE], except: [{device: site_i1_l2}]
+        grant nil, user3, {device: institution_i2}, [READ_DEVICE]
+
+        expect(authorized_users(READ_DEVICE, device_i1_l1_d1)).to contain_exactly(user2)
+      end
+
+      it "should not return users with different action" do
+        grant nil, user,  device_i1_l1_d1, [READ_DEVICE]
+        grant nil, user2, device_i1_l1_d1, [READ_DEVICE]
+        grant nil, user3, device_i1_l1_d1, [UPDATE_DEVICE]
+
+        expect(authorized_users(READ_DEVICE, device_i1_l1_d1)).to contain_exactly(user, user2)
+      end
+
+      it "should return users with all actions for the resource" do
+        grant nil, user,  device_i1_l1_d1, [READ_DEVICE]
+        grant nil, user2, device_i1_l1_d1, "*"
+        grant nil, user3, device_i1_l1_d1, [UPDATE_DEVICE]
+
+        expect(authorized_users(READ_DEVICE, device_i1_l1_d1)).to contain_exactly(user, user2)
+      end
+
+    end
+
+    context "when querying by a class" do
+
+      it "should return users with access to any resource" do
+        grant nil, user,  device_i1_l1_d1,      [READ_DEVICE]
+        grant nil, user2, {device: site_i1_l1}, [READ_DEVICE]
+        grant nil, user3, site_i1_l1,           [READ_SITE]
+
+        expect(authorized_users(READ_DEVICE, Device)).to contain_exactly(user, user2)
+      end
+
+    end
+
   end
 
 end
