@@ -30,4 +30,17 @@ describe Site do
       site1.destroy
     }.to raise_error(ActiveRecord::DeleteRestrictionError)
   end
+
+  it "destroys sites logically" do
+    site1 = Site.make
+    expect(Site.count).to eq(1)
+
+    expect {
+      site1.destroy
+    }.to change(Site, :count).by(-1)
+
+    expect(Site.all).not_to include(site1)
+    expect(Site.with_deleted).to include(site1)
+    expect(site1).to be_deleted
+  end
 end
