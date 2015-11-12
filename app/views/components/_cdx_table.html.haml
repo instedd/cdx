@@ -2,7 +2,13 @@
   %thead
     - if cdx_table[:title]
       %tr
-        %th.tableheader{colspan:100}= cdx_table[:title]
+        %th.tableheader{colspan:100}
+          .table-title
+            = cdx_table[:title]
+          - if cdx_table[:actions]
+            .table-actions
+              = cdx_table[:actions]
+
     = cdx_table[:thead]
   %tbody
     = cdx_table[:tbody]

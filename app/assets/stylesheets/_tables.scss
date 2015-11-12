@@ -17,11 +17,19 @@
       text-transform: uppercase;
       padding: 14px 10px;
 
-      &.tableheader {
+      .table-title {
         font-family: $sanstitle;
         font-size: 200%;
-        color: $black;
         font-weight: 400;
+        color: $black;
+        vertical-align: baseline;
+        display: inline-block;
+      }
+
+      .table-actions {
+        display: inline-block;
+        vertical-align: baseline;
+        margin-left: 10px;
       }
 
       a {
