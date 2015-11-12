@@ -113,4 +113,8 @@ group :test do
   gem 'site_prism'
   gem 'poltergeist'
   gem 'capybara-screenshot'
+
+  source 'https://rails-assets.org' do
+    gem 'rails-assets-es5-shim'
+  end
 end
