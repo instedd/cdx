@@ -35,6 +35,10 @@ class User < ActiveRecord::Base
     end + [(Policy.implicit(self) unless Settings.single_tenant)].compact
   end
 
+  def invited_pending?
+    invitation_created_at && !invitation_accepted_at
+  end
+
   def update_computed_policies
     ComputedPolicy.update_user(self)
   end

@@ -5,9 +5,13 @@
       - t.thead do
         %tr
           %th Name
+          %th Policy Name
           %th User
+          %th Last Activity
       - t.tbody do
         - @policies.each do |policy|
           %tr
+            %td= policy.user.full_name
             %td= link_to policy.name, edit_policy_path(policy)
             %td= link_to policy.user.email, edit_policy_path(policy)
+            %td= last_activity(policy.user)

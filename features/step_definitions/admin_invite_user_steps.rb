@@ -18,6 +18,8 @@ Given(/^Bill does not have an account$/) do
 end
 
 When(/^Bob sends an invitation to Bill Smith$/) do
+  @invite_page = PolicyPage.new
+  @invite_page.load
   @policy = canned_policy(@institution.id)
   within(@invite_page.form) do |f|
     f.email.set @user.email

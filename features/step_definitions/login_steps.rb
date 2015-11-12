@@ -1,5 +1,8 @@
 def setup_user
-  @user ||= User.make(password_changed_at: Time.now)
+  @user ||= User.make(
+    password_changed_at: Time.now,
+    password: 'abc123abc'
+  )
 end
 
 Given(/^the user 'foouser@example\.com' has an account$/) do

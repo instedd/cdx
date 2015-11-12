@@ -399,6 +399,8 @@ GEM
       cocaine (~> 0.5.5)
       mime-types
       mimemagic (= 0.3.0)
+    paranoia (2.1.4)
+      activerecord (~> 4.0)
     poltergeist (1.7.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
@@ -658,6 +660,7 @@ DEPENDENCIES
   omniauth
   omniauth-google-oauth2
   paperclip
+  paranoia
   poirot_rails!
   poltergeist
   pry-byebug

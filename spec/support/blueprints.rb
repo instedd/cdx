@@ -32,6 +32,14 @@ User.blueprint do
   confirmed_at { Time.now - 1.day }
 end
 
+User.blueprint(:invited_pending) do
+  confirmed_at nil
+  invitation_token { SecureRandom.urlsafe_base64 }
+  invitation_created_at 1.day.ago
+  invitation_sent_at 1.day.ago
+  invitation_accepted_at nil
+end
+
 Institution.blueprint do
   user
   name

@@ -21,17 +21,17 @@ class PoliciesController < ApplicationController
     begin
       definition = JSON.parse @policy.definition
       @policy.definition = definition
+
+      unless @user.persisted?
+        @user.invite!
+        @_notice = "An invitation email has been sent to #{@user.email}"
+      end
     rescue => ex
       @policy.errors.add :definition, ex.message
       has_definition_error = true
     end
 
-    unless @user.persisted? && has_definition_error
-      @user.invite!
-      @policy.user_id = @user.id
-      @_notice = "An invitation email has been sent to #{@user.email}"
-    end
-
+    @policy.user_id = @user.id
     @policy.granter_id = current_user.id
 
     respond_to do |format|

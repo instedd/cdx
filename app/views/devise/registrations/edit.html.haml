@@ -1,16 +1,20 @@
 .row
   .col
-    %h1 Sign up
-= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f|
+    %h1 Edit account
+= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f|
   .row
     .col
       = f.text_field :first_name, autofocus: true, placeholder: 'First name', class: 'input-block'
   .row
     .col
       = f.text_field :last_name, placeholder: 'Last name', class: 'input-block'
+
   .row
     .col
       = f.email_field :email, placeholder: 'Email', class: "input-block"
+    - if devise_mapping.confirmable? && resource.pending_reconfirmation?
+      .row
+        Currently waiting confirmation for: #{resource.unconfirmed_email}
   .row
     .col
       = f.password_field :password, autocomplete: "off", placeholder: 'Password', class: "input-block"
@@ -20,12 +24,16 @@
   .row
     .col
       = f.password_field :password_confirmation, autocomplete: "off", placeholder: 'Confirm password', class: "input-block"
+  .row
+    .col
+      = f.password_field :current_password, autocomplete: "off", placeholder: 'Current password', class: "input-block"
   %br
   .row
     .col
-      = f.submit "Sign up", class: "btn-secondary input-block"
+      = f.submit "Update", class: "btn-secondary input-block"
     .col.text-right
       = link_to "Have an account? Log in", new_session_path(resource_name)
       %br
       = link_to "Login problems?", new_password_path(resource_name)
 = devise_error_messages!
+
