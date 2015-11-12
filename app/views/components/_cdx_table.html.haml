@@ -1,13 +1,12 @@
 %table.table.row-href(cellpadding="0" cellspacing="0")
   %thead
-    - if cdx_table[:title]
+    - if cdx_table[:title] || cdx_table[:actions]
       %tr
         %th.tableheader{colspan:100}
-          .table-title
-            = cdx_table[:title]
+          - if cdx_table[:title]
+            .table-title= cdx_table[:title]
           - if cdx_table[:actions]
-            .table-actions
-              = cdx_table[:actions]
+            .table-actions= cdx_table[:actions]
 
     = cdx_table[:thead]
   %tbody
