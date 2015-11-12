@@ -106,6 +106,7 @@ Rails.application.routes.draw do
         get :pii
       end
     end
+    match 'encounters(.:format)' => "encounters#index", via: [:get, :post]
     resources :devices, only: [] do
       resources :messages, only: [:create ], shallow: true
       match 'tests' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3

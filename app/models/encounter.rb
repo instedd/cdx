@@ -88,6 +88,10 @@ class Encounter < ActiveRecord::Base
     find_by(entity_id: entity_id.to_s, institution_id: institution_id)
   end
 
+  def self.query params, user
+    EncounterQuery.for params, user
+  end
+
   protected
 
   def ensure_entity_id
