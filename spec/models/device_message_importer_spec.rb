@@ -195,7 +195,6 @@ describe DeviceMessageImporter, elasticsearch: true do
       let!(:manifest) { load_manifest 'genoscan_manifest.json' }
 
       it 'parses csv' do
-        pending
         copy_sample_csv 'genoscan_sample.csv'
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
