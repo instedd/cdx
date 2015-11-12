@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'policy_spec_helper'
 
-RSpec.describe EncountersController, type: :controller do
+RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   let(:institution) { Institution.make }
   let(:user) { institution.user }
 
@@ -108,6 +108,7 @@ RSpec.describe EncountersController, type: :controller do
     }
 
     let(:json_response) { JSON.parse(response.body) }
+    let(:created_encounter) { Encounter.find(json_response['encounter']['id']) }
 
     it "succeed" do
       expect(response).to have_http_status(:success)
@@ -118,6 +119,10 @@ RSpec.describe EncountersController, type: :controller do
       expect(sample.encounter).to_not be_nil
     end
 
+    it "returns a json status ok" do
+      expect(json_response['status']).to eq('ok')
+    end
+
     it "assigns assays" do
       expect(sample.encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative_result' => 3}])
     end
@@ -126,13 +131,12 @@ RSpec.describe EncountersController, type: :controller do
       expect(sample.encounter.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]).to eq('Lorem ipsum')
     end
 
-    it "assigns returns a json status ok" do
-      expect(json_response['status']).to eq('ok')
+    it "assigns returns a json with encounter id" do
+      expect(created_encounter).to_not be_nil
     end
 
-    it "assigns returns a json with encounter id" do
-      encounter = Encounter.find(json_response['encounter']['id'])
-      expect(encounter).to_not be_nil
+    it "creates an encounter as non phantom" do
+      expect(created_encounter).to_not be_phantom
     end
   end
 
@@ -309,7 +313,7 @@ RSpec.describe EncountersController, type: :controller do
       device = Device.make institution: institution
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
       sample_with_encounter = Sample.first
-      sample_with_encounter.encounter = Encounter.make
+      sample_with_encounter.encounter = Encounter.make institution: institution, patient: Patient.last
       sample_with_encounter.save!
 
       put :add_sample, sample_uuid: sample_with_encounter.uuid, encounter: {
@@ -322,7 +326,7 @@ RSpec.describe EncountersController, type: :controller do
       json_response = JSON.parse(response.body).with_indifferent_access
 
       expect(json_response['status']).to eq('error')
-      expect(json_response['message']).to eq('Unable to add sample that already belongs to other encounter')
+      expect(json_response['message']).to eq('Cannot add a test or sample that belongs to a different encounter')
       expect(json_response['encounter']['samples'][0]).to include(sample_json(test1.sample))
       expect(json_response['encounter']['samples'].count).to eq(1)
 
@@ -347,7 +351,49 @@ RSpec.describe EncountersController, type: :controller do
       json_response = JSON.parse(response.body).with_indifferent_access
 
       expect(json_response['status']).to eq('error')
-      expect(json_response['message']).to eq('Unable to add sample of multiple patients')
+      expect(json_response['message']).to eq('Cannot add a test or sample that belongs to a different patient')
+    end
+
+    it "it merges data from another patient if both are phantom" do
+      device = Device.make institution: institution
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {gender: 'male'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'}, patient: {name: 'Doe'})
+
+      sample_with_patient1, sample_with_patient2 = Sample.all.to_a
+
+      put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
+        institution: { uuid: institution.uuid },
+        samples: [{uuid: sample_with_patient1.uuid}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['patient']['plain_sensitive_data']).to eq({"custom"=>{}, 'name' => 'Doe'})
+      expect(json_response['encounter']['patient']['core_fields']).to eq({'gender' => 'male'})
+    end
+
+    it "it merges data from another patient if one of them phantom" do
+      device = Device.make institution: institution
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {gender: 'male'})
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'}, patient: {name: 'Doe', id: 'P10'})
+
+      sample_with_patient1, sample_with_patient2 = Sample.all.to_a
+
+      put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
+        institution: { uuid: institution.uuid },
+        samples: [{uuid: sample_with_patient1.uuid}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['patient']['plain_sensitive_data']).to eq({'name' => 'Doe', 'id' => 'P10', "custom"=>{}})
+      expect(json_response['encounter']['patient']['core_fields']).to eq({'gender' => 'male'})
     end
 
     it "ensure only samples withing permissions can be used" do
@@ -381,7 +427,8 @@ RSpec.describe EncountersController, type: :controller do
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'})
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'})
       sample_a, sample_b = Sample.all.to_a
-      encounter.add_sample_uniq sample_a
+      encounter.samples << sample_a
+      sample_a.test_results.each {|tr| encounter.test_results << tr }
       encounter.save!
 
       put :add_sample, sample_uuid: sample_b.uuid, encounter: {
@@ -399,6 +446,7 @@ RSpec.describe EncountersController, type: :controller do
       expect(json_response['encounter']['samples'][0]).to include(sample_json(sample_a))
       expect(json_response['encounter']['samples'][1]).to include(sample_json(sample_b))
     end
+
   end
 
   describe "PUT #add_test" do
@@ -457,9 +505,9 @@ RSpec.describe EncountersController, type: :controller do
 
   def sample_json(sample)
     return {
-      uuid: sample.uuid,
       uuids: sample.uuids,
       entity_ids: sample.entity_ids,
+      uuid: sample.uuids.first
     }
   end
 

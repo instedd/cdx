@@ -1,14 +1,15 @@
 class EncountersController < ApplicationController
   before_filter :load_institutions
+  before_filter :load_encounter, only: %W(show edit)
 
   def new
     return unless authorize_resource(@institutions, CREATE_INSTITUTION_ENCOUNTER)
   end
 
   def create
-    perform_encounter_action do
+    perform_encounter_action "creating encounter" do
       prepare_encounter_from_json
-      @encounter.save!
+      @blender.save_and_index!
     end
   end
 
@@ -17,24 +18,20 @@ class EncountersController < ApplicationController
   end
 
   def show
-    @encounter = Encounter.find(params[:id])
     return unless authorize_resource(@encounter, READ_ENCOUNTER)
-    @encounter_as_json = as_json_edit(@encounter).attributes!
     @can_update = has_access?(@encounter, UPDATE_ENCOUNTER)
   end
 
   def edit
-    @encounter = Encounter.find(params[:id])
     return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
-    @encounter_as_json = as_json_edit(@encounter).attributes!
   end
 
   def update
-    perform_encounter_action do
+    perform_encounter_action "updating encounter" do
       prepare_encounter_from_json
       return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
       raise "encounter.id does not match" if params[:id].to_i != @encounter.id
-      @encounter.save!
+      @blender.save_and_index!
     end
   end
 
@@ -51,14 +48,14 @@ class EncountersController < ApplicationController
   end
 
   def add_sample
-    perform_encounter_action do
+    perform_encounter_action "adding sample" do
       prepare_encounter_from_json
       add_sample_by_uuid params[:sample_uuid]
     end
   end
 
   def add_test
-    perform_encounter_action do
+    perform_encounter_action "adding test result" do
       prepare_encounter_from_json
       add_test_result_by_uuid params[:test_uuid]
     end
@@ -66,18 +63,29 @@ class EncountersController < ApplicationController
 
   private
 
-  def perform_encounter_action
+  def perform_encounter_action(action)
     begin
       yield
+    rescue Blender::MergeNonPhantomError => e
+      render json: { status: :error, message: "Cannot add a test or sample that belongs to a different #{e.entity_type.model_name.singular}", encounter: as_json_edit.attributes! }
     rescue => e
-      render json: { status: :error, message: e.message, encounter: as_json_edit(@encounter).attributes! }
+      Rails.logger.error(e.backtrace.unshift(e.message).join("\n"))
+      render json: { status: :error, message: "Error #{action} #{e.class}", encounter: as_json_edit.attributes! }
     else
-      render json: { status: :ok, encounter: as_json_edit(@encounter).attributes! }
+      render json: { status: :ok, encounter: as_json_edit.attributes! }
     end
   end
 
   def load_institutions
     @institutions = check_access(Institution, CREATE_INSTITUTION_ENCOUNTER)
+  end
+
+  def load_encounter
+    @encounter = Encounter.find(params[:id])
+    @institution = @encounter.institution
+    @blender = Blender.new(@institution)
+    @encounter_blender = @blender.load(@encounter)
+    @encounter_as_json = as_json_edit.attributes!
   end
 
   def institution_by_uuid(uuid)
@@ -87,6 +95,7 @@ class EncountersController < ApplicationController
   def prepare_encounter_from_json
     encounter_param = JSON.parse(params[:encounter])
     @encounter = encounter_param['id'] ? Encounter.find(encounter_param['id']) : Encounter.new
+    @encounter.is_phantom = false
 
     if @encounter.new_record?
       @institution = institution_by_uuid(encounter_param['institution']['uuid'])
@@ -95,15 +104,21 @@ class EncountersController < ApplicationController
       @institution = @encounter.institution
     end
 
+    @blender = Blender.new(@institution)
+    @encounter_blender = @blender.load(@encounter)
+
     encounter_param['samples'].each do |sample_param|
       add_sample_by_uuid sample_param['uuid']
     end
+
     encounter_param['test_results'].each do |test_param|
       add_test_result_by_uuid test_param['uuid']
     end
 
-    @encounter.core_fields[Encounter::ASSAYS_FIELD] = encounter_param['assays']
-    @encounter.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD] = encounter_param['observations']
+    @encounter_blender.merge_attributes(
+      'core_fields' => { Encounter::ASSAYS_FIELD => encounter_param['assays'] },
+      'plain_sensitive_data' => { Encounter::OBSERVATIONS_FIELD => encounter_param['observations'] }
+    )
   end
 
   def scoped_samples
@@ -113,7 +128,11 @@ class EncountersController < ApplicationController
   end
 
   def add_sample_by_uuid(uuid)
-    @encounter.add_sample_uniq scoped_samples.find_by("sample_identifiers.uuid" => uuid)
+    sample = scoped_samples.find_by("sample_identifiers.uuid" => uuid)
+    return if sample.nil?
+    sample_blender = @blender.load(sample)
+    @blender.merge_parent(sample_blender, @encounter_blender)
+    sample_blender
   end
 
   def scoped_test_results
@@ -121,31 +140,33 @@ class EncountersController < ApplicationController
   end
 
   def add_test_result_by_uuid(uuid)
-    @encounter.add_test_result_uniq scoped_test_results.find_by(uuid: uuid)
+    test_result = scoped_test_results.find_by(uuid: uuid)
+    return if test_result.nil?
+    test_result_blender = @blender.load(test_result)
+    @blender.merge_parent(test_result_blender, @encounter_blender)
+    test_result_blender
   end
 
-  def as_json_edit(encounter)
+  def as_json_edit
     Jbuilder.new do |json|
-      json.(encounter, :id)
-      json.assays (encounter.core_fields[Encounter::ASSAYS_FIELD] || [])
-      json.observations encounter.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]
+      json.(@encounter, :id)
+      json.assays (@encounter_blender.core_fields[Encounter::ASSAYS_FIELD] || [])
+      json.observations @encounter_blender.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]
 
       json.institution do
-        as_json_institution(json, encounter.institution)
+        as_json_institution(json, @institution)
       end
+
       json.patient do
-        if encounter.patient
-          # TODO enforce policy regarding plain_sensitive_data going out
-          json.(encounter.patient, :uuid, :plain_sensitive_data)
-        else
-          json.nil!
-        end
+        @encounter_blender.patient.blank? ? json.nil! : json.(@encounter_blender.patient, :plain_sensitive_data, :core_fields)
       end
-      json.samples encounter.samples.uniq do |sample|
+
+      json.samples @encounter_blender.samples.uniq do |sample|
         as_json_sample(json, sample)
       end
-      json.test_results encounter.test_results.uniq do |test_result|
-        as_json_test_result(json, test_result)
+
+      json.test_results @encounter_blender.test_results.uniq do |test_result|
+        as_json_test_result(json, test_result.single_entity)
       end
     end
   end
@@ -168,7 +189,8 @@ class EncountersController < ApplicationController
   end
 
   def as_json_sample(json, sample)
-    json.(sample, :uuid, :uuids, :entity_ids)
+    json.(sample, :uuids, :entity_ids)
+    json.uuid sample.uuids[0]
   end
 
   def as_json_test_results_search(test_results)

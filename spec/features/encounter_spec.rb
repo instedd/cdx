@@ -78,7 +78,7 @@ describe "create encounter" do
     end
   end
 
-  pending "should merge patient information coming from different tests" do
+  it "should merge patient information coming from different tests" do
     process test: {id: "ab123"}, patient: {name: "John Doe"}
     process test: {id: "ab456"}, patient: {gender: "male"}
     process test: {id: "ab789"}
@@ -98,9 +98,9 @@ describe "create encounter" do
     end
   end
 
-  it "should be able to change the assay result and quantity of encounter" do
+  pending "should be able to change the assay result and quantity of encounter" do
     process test: {id: "a"}
-    
+
     goto_page NewEncounterPage do |page|
       page.open_add_tests.search_and_select_first "a"
 

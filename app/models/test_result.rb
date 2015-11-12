@@ -14,15 +14,19 @@ class TestResult < ActiveRecord::Base
   belongs_to :device
   belongs_to :institution
   belongs_to :site
-  belongs_to :sample_identifier, inverse_of: :test_results
+  belongs_to :sample_identifier, inverse_of: :test_results, autosave: true
   belongs_to :patient
   belongs_to :encounter
 
   validates_presence_of :device
   # validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
   validate :same_patient_in_sample
+  validate :validate_sample
+  validate :validate_encounter
+  validate :validate_patient
 
   before_save   :set_foreign_keys
+  before_save   :set_entity_id
   after_destroy :destroy_from_index
 
   delegate :device_model, :device_model_id, to: :device
@@ -70,6 +74,14 @@ class TestResult < ActiveRecord::Base
     sample.try(:sample_identifiers) || []
   end
 
+  def entity_id
+    core_fields['id']
+  end
+
+  def phantom?
+    false
+  end
+
   def test_result_parsed_datum
     test_result_parsed_data.last
   end
@@ -90,5 +102,9 @@ class TestResult < ActiveRecord::Base
     self.site_id = device.try(:site_id)
     self.institution_id = device.try(:institution_id)
     self.site_prefix = device.try(:site).try(:prefix)
+  end
+
+  def set_entity_id
+    self.test_id = entity_id unless entity_id.nil?
   end
 end

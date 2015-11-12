@@ -174,196 +174,175 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(all_elasticsearch_tests.map {|e| e['_source']['sample']['uuid']}).to eq([Sample.first.uuids] * 3)
   end
 
-  it "should update sample data and existing test results on new test result" do
-    patient = Patient.make(
-      uuid: 'def', institution: device_message.institution,
-      core_fields: PATIENT_CORE_FIELDS,
-      plain_sensitive_data: {"id" => PATIENT_ID},
-    )
+  context "sample identification" do
 
-    sample = Sample.make(
-      institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood"},
-    )
+    let(:sample_created_at) { DateTime.now }
 
-    sample_identifier = SampleIdentifier.make(
-      sample: sample,
-      uuid: 'abc',
-      entity_id: SAMPLE_ID
-    )
+    let(:patient) do
+      Patient.make(
+        uuid: 'def', institution: device_message.institution,
+        core_fields: PATIENT_CORE_FIELDS,
+        plain_sensitive_data: {"id" => PATIENT_ID},
+      )
+    end
 
-    TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
-    TestResult.create_and_index test_id: TEST_ID_3, sample_identifier: sample_identifier, patient: patient, device: device
+    let(:sample) do
+      Sample.make(
+        institution: device_message.institution, patient: patient,
+        core_fields: {"type" => "blood"},
+        created_at: sample_created_at
+      )
+    end
 
-    refresh_index
+    let(:sample_identifier) do
+      SampleIdentifier.make(
+        sample: sample,
+        uuid: 'abc',
+        entity_id: SAMPLE_ID
+      )
+    end
 
-    device_message_processor.process
+    it "should update sample data and existing test results on new test result" do
+      TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
+      TestResult.create_and_index test_id: TEST_ID_3, sample_identifier: sample_identifier, patient: patient, device: device
+      expect(TestResult.count).to eq(2)
 
-    expect(Sample.count).to eq(1)
-    expect(Patient.count).to eq(1)
-    sample = Sample.first
-    assert_sample_data(sample)
-    assert_patient_data(sample.patient)
+      refresh_index
 
-    tests = all_elasticsearch_tests
-    expect(tests.map { |test| test["_source"]["sample"]["type"] }).to eq([SAMPLE_TYPE] * 3)
-  end
+      device_message_processor.process
 
-  it "should create new sample if it has same sample id but not in the same year" do
-    patient = Patient.make(
-      uuid: 'def', institution: device_message.institution,
-      core_fields: PATIENT_CORE_FIELDS,
-      plain_sensitive_data: {"id" => PATIENT_ID},
-    )
+      expect(Sample.count).to eq(1)
+      expect(Patient.count).to eq(1)
+      expect(TestResult.count).to eq(3)
+      sample = Sample.first
+      assert_sample_data(sample)
+      assert_patient_data(sample.patient)
 
-    sample = Sample.make(
-      institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood"},
-      created_at: 2.years.ago,
-    )
+      tests = all_elasticsearch_tests
+      expect(tests.size).to eq(3)
+      expect(tests.map { |test| test["_source"]["sample"]["type"] }).to eq([SAMPLE_TYPE] * 3)
+    end
 
-    sample_identifier = SampleIdentifier.make(
-      sample: sample,
-      uuid: 'abc',
-      entity_id: SAMPLE_ID
-    )
+    it "should update sample data and existing test results on test result update" do
+      TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+      TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
 
-    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+      refresh_index
 
-    refresh_index
+      device_message_processor.process
 
-    device_message_processor.process
+      expect(Sample.count).to eq(1)
+      expect(Patient.count).to eq(1)
+      sample = Sample.first
+      assert_sample_data(sample)
+      assert_patient_data(sample.patient)
 
-    expect(Sample.count).to eq(2)
-  end
+      tests = all_elasticsearch_tests
+      expect(tests.map { |test| test["_source"]["sample"]["type"] }).to eq([SAMPLE_TYPE] * 2)
+    end
 
-  it "should create new sample if it has same sample id but not in the same month, with monthly reset policy" do
-    site = device.site
-    site.sample_id_reset_policy = "monthly"
-    site.save!
+    it "should not update existing tests if sample data indexed fields did not change" do
+      TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+      TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
 
-    patient = Patient.make(
-      uuid: 'def', institution: device_message.institution,
-      core_fields: PATIENT_CORE_FIELDS,
-      plain_sensitive_data: {"id" => PATIENT_ID},
-    )
+      refresh_index
 
-    sample = Sample.make(
-      institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood"},
-      created_at: 2.months.ago,
-    )
+      expect(device_message_processor.client).to receive(:bulk).never
+      device_message_processor.process
 
-    sample_identifier = SampleIdentifier.make(
-      sample: sample,
-      uuid: 'abc',
-      entity_id: SAMPLE_ID
-    )
+      expect(Sample.count).to eq(1)
+      expect(Patient.count).to eq(1)
+      sample = Sample.first
+      assert_sample_data(sample)
+      assert_patient_data(sample.patient)
+    end
 
-    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+    context "with sample from two months ago" do
 
-    refresh_index
+      let(:sample_created_at) { 2.months.ago }
 
-    device_message_processor.process
+      it "should create new sample if it has same sample id but not in the same month, with monthly reset policy" do
+        sample_identifier
 
-    expect(Sample.count).to eq(2)
-  end
+        site = device.site
+        site.sample_id_reset_policy = "monthly"
+        site.save!
 
-  it "should create new sample if it has same sample id but not in the same month, with weekly reset policy" do
-    site = device.site
-    site.sample_id_reset_policy = "weekly"
-    site.save!
+        TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
 
-    patient = Patient.make(
-      uuid: 'def', institution: device_message.institution,
-      core_fields: PATIENT_CORE_FIELDS,
-      plain_sensitive_data: {"id" => PATIENT_ID},
-    )
+        refresh_index
 
-    sample = Sample.make(
-      institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood"},
-      created_at: 2.weeks.ago,
-    )
+        device_message_processor.process
 
-    sample_identifier = SampleIdentifier.make(
-      sample: sample,
-      uuid: 'abc',
-      entity_id: SAMPLE_ID
-    )
+        expect(Sample.count).to eq(2)
+      end
 
-    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+      it "should not create new sample if it is a test update, even if it is not in from the same month" do
+        sample_identifier
 
-    refresh_index
+        site = device.site
+        site.sample_id_reset_policy = "monthly"
+        site.save!
 
-    device_message_processor.process
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
 
-    expect(Sample.count).to eq(2)
-  end
+        refresh_index
 
-  it "should update sample data and existing test results on test result update" do
-    patient = Patient.make(
-      uuid: 'def', institution: device_message.institution,
-      core_fields: PATIENT_CORE_FIELDS,
-      plain_sensitive_data: {"id" => PATIENT_ID},
-    )
-    sample = Sample.make(
-      institution: device_message.institution, patient: patient,
-      core_fields: {"type" => "blood"},
-    )
+        device_message_processor.process
 
-    sample_identifier = SampleIdentifier.make(
-      sample: sample,
-      uuid: 'abc',
-      entity_id: SAMPLE_ID
-    )
+        expect(Sample.count).to eq(1)
+      end
 
-    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
-    TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
+    end
 
-    refresh_index
+    context 'with sample from two weeks ago' do
 
-    device_message_processor.process
+      let(:sample_created_at) { 2.weeks.ago }
 
-    expect(Sample.count).to eq(1)
-    expect(Patient.count).to eq(1)
-    sample = Sample.first
-    assert_sample_data(sample)
-    assert_patient_data(sample.patient)
+      it "should create new sample if it has same sample id but not in the same month, with weekly reset policy" do
+        sample_identifier
 
-    tests = all_elasticsearch_tests
-    expect(tests.map { |test| test["_source"]["sample"]["type"] }).to eq([SAMPLE_TYPE] * 2)
-  end
+        site = device.site
+        site.sample_id_reset_policy = "weekly"
+        site.save!
 
-  it "should not update existing tests if sample data indexed fields did not change" do
-    patient = Patient.make(
-      uuid: 'def', institution: device_message.institution,
-      core_fields: PATIENT_CORE_FIELDS,
-      plain_sensitive_data: {"id" => PATIENT_ID},
-    )
-    sample = Sample.make(
-      institution: device_message.institution, patient: patient,
-      core_fields: SAMPLE_CORE_FIELDS,
-    )
+        TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
 
-    sample_identifier = SampleIdentifier.make(
-      sample: sample,
-      uuid: 'abc',
-    )
+        refresh_index
 
-    TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
-    TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: sample_identifier, patient: patient, device: device
+        device_message_processor.process
 
-    refresh_index
+        expect(Sample.count).to eq(2)
+      end
 
-    expect(device_message_processor.client).to receive(:bulk).never
-    device_message_processor.process
+    end
 
-    expect(Sample.count).to eq(1)
-    expect(Patient.count).to eq(1)
-    sample = Sample.first
-    assert_sample_data(sample)
-    assert_patient_data(sample.patient)
+    context "with sample from two years ago" do
+
+      let(:sample_created_at) { 2.years.ago }
+
+      it "should create new sample if it has same sample id" do
+        sample_identifier
+
+        refresh_index
+
+        device_message_processor.process
+
+        expect(Sample.count).to eq(2)
+      end
+
+      it "should not create new sample if it already belongs to the test" do
+        TestResult.create_and_index test_id: TEST_ID, sample_identifier: sample_identifier, patient: patient, device: device
+
+        refresh_index
+
+        device_message_processor.process
+
+        expect(Sample.count).to eq(1)
+      end
+
+    end
+
   end
 
   it "shouldn't update sample from another institution" do
@@ -391,14 +370,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(sample.custom_fields).to eq(custom_fields)
   end
 
-  it "should update tests with the same test_id and different sample_id" do
+  it "should update tests with the same test_id" do
     test = TestResult.create_and_index(
       test_id: TEST_ID, device: device,
       custom_fields: {"concentration" => "10%", "foo" => "bar"},
       core_fields: {"assays" => [result("flu", "flu", "negative"), result("mtb1", "mtb1", "positive")]},
     )
 
-    device_message_processor.process
+    expect { device_message_processor.process }.to change(TestResult, :count).by(0)
 
     expect(Sample.count).to eq(1)
 
@@ -413,7 +392,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(TestResult.count).to eq(1)
     expect(TestResult.first.sample).to eq(Sample.last)
     # TestResult.first.custom_fields.should eq("raw_result" => TEST_RAW_RESULT)
-    assert_test_data(TestResult.first, {}, 'foo' => 'bar')
+    expect(TestResult.first.core_fields).to include("start_time" => TEST_START_TIME)
+    expect(TestResult.first.sample_identifier.entity_id).to eq(SAMPLE_ID)
   end
 
   it "should take tests with the same test_id but different year as differents" do
@@ -527,6 +507,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         sample = Sample.make(
           patient: patient,
+          institution: device_message.institution,
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
           custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
@@ -566,7 +547,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
         )
 
-        sample = Sample.make patient: patient
+        sample = Sample.make patient: patient, institution: device_message.institution
 
         sample_identifier = SampleIdentifier.make(
           sample: sample
@@ -815,6 +796,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
           custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
+          institution: device_message.institution
         )
 
         TestResult.create_and_index(
@@ -856,10 +838,10 @@ describe DeviceMessageProcessor, elasticsearch: true do
         device_message_processor.process
 
         expect(TestResult.count).to eq(1)
-        expect(Sample.count).to eq(1)
+        expect(Sample.count).to eq(0)     # Sample ends up being empty and is collected by the blender
         expect(Patient.count).to eq(1)
 
-        patient = TestResult.first.sample.patient
+        patient = TestResult.first.patient
 
         expect(patient.plain_sensitive_data).to eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
         expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
@@ -948,7 +930,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should create patient and store reference in test and sample' do
-        TestResult.create_and_index test_id: TEST_ID, device: device
+        TestResult.create_and_index test_id: TEST_ID, device: device,\
+          sample_identifier: SampleIdentifier.make(entity_id: SAMPLE_ID, sample: Sample.make(institution: device_message_processor.institution))
 
         device_message_processor.process
 
@@ -957,8 +940,10 @@ describe DeviceMessageProcessor, elasticsearch: true do
         expect(Patient.count).to eq(1)
 
         test = TestResult.first
+        patient = Patient.first
 
-        expect(test.patient).to eq(test.sample.patient)
+        expect(test.patient).to eq(patient)
+        expect(test.sample.patient).to eq(patient)
       end
     end
 

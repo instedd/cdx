@@ -40,8 +40,8 @@ Institution.blueprint(:manufacturer) do
 end
 
 Device.blueprint do
-  site { Site.make institution: institution }
-  institution { site.institution }
+  site { Site.make(institution: (object.institution || Institution.make)) }
+  institution { object.site.try(:institution) || Institution.make }
   name
   serial_number { name }
   device_model { Manifest.make.device_model }
@@ -72,7 +72,7 @@ Manifest.blueprint do
 end
 
 Encounter.blueprint do
-  institution
+  institution { object.patient.try(:institution) || Institution.make }
   core_fields { { "id" => "encounter-#{Sham.sn}" } }
 end
 
@@ -81,7 +81,8 @@ SampleIdentifier.blueprint do
 end
 
 Sample.blueprint do
-  institution
+  institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make }
+  patient { object.encounter.try(:patient) }
 end
 
 Patient.blueprint do
@@ -90,10 +91,15 @@ Patient.blueprint do
 end
 
 TestResult.blueprint do
-  device_messages { [ DeviceMessage.make ] }
-  device { device_messages.first.device }
-  sample_identifier { SampleIdentifier.make(sample: Sample.make(institution: device.institution)) }
   test_id { "test-#{Sham.sn}" }
+
+  device_messages { [ DeviceMessage.make(device: object.device || Device.make) ] }
+  device { device_messages.first.device || Device.make }
+  institution { device.institution || Institution.make }
+  sample_identifier { SampleIdentifier.make(sample: Sample.make(institution: object.institution, patient: object.patient, encounter: object.encounter)) }
+
+  encounter { object.sample.try(:encounter) }
+  patient { object.sample.try(:patient) || object.encounter.try(:patient) }
 end
 
 DeviceMessage.blueprint do

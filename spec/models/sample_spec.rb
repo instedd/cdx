@@ -23,18 +23,6 @@ describe Sample do
       expect(sample.sample_identifiers.map(&:uuid)).to contain_exactly('uuid:A','uuid:B','uuid:C','uuid:D')
     end
 
-    it "should ignore repeated identifiers with no uuid" do
-      other_sample = Sample.make_unsaved(sample_identifiers: [
-        SampleIdentifier.new(entity_id: 'id:a', uuid: nil),
-        SampleIdentifier.new(entity_id: 'id:d', uuid: 'uuid:D')
-      ])
-
-      sample.merge(other_sample)
-
-      expect(sample.sample_identifiers.map(&:entity_id)).to contain_exactly('id:a','id:b','id:d')
-      expect(sample.sample_identifiers.map(&:uuid)).to contain_exactly('uuid:A','uuid:B','uuid:D')
-    end
-
     it "should add repeated identifiers with an uuid" do
       other_sample = Sample.make_unsaved(sample_identifiers: [
         SampleIdentifier.new(entity_id: 'id:a', uuid: 'uuid:X'),

@@ -41,8 +41,8 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       expect(test["location"]["lat"]).to be_nil
       expect(test["location"]["lng"]).to be_nil
       expect(test["device"]["site_id"]).to be_nil
-      expect(test["location"]["parents"]).to eq([])
-      expect(test["location"]["admin_levels"]).to eq({})
+      expect(test["location"]["parents"]).to be_nil
+      expect(test["location"]["admin_levels"]).to be_nil
     end
   end
 

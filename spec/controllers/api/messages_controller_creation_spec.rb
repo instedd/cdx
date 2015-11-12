@@ -173,7 +173,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
       test = all_elasticsearch_tests.first["_source"]
       expect(test["test"]["name"]).to eq("GX4002")
-      expect(test["patient"]).to eq("uuid" => Patient.first.uuid)
+      expect(test["patient"]['uuid']).to eq(Patient.first.uuid)
 
       test = TestResult.first
       raw_data = test.sensitive_data

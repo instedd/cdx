@@ -5,10 +5,13 @@ class Sample < ActiveRecord::Base
   belongs_to :patient
   belongs_to :encounter
 
-  has_many :sample_identifiers, inverse_of: :sample
+  has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy
   has_many :test_results, through: :sample_identifiers
 
   validates_presence_of :institution
+
+  validate :validate_encounter
+  validate :validate_patient
 
   def self.entity_scope
     "sample"
@@ -38,5 +41,13 @@ class Sample < ActiveRecord::Base
 
   def uuids
     self.sample_identifiers.map(&:uuid)
+  end
+
+  def empty_entity?
+    super && entity_ids.compact.empty?
+  end
+
+  def has_entity_id?
+    entity_ids.compact.any?
   end
 end
