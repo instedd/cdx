@@ -138,6 +138,11 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     it "creates an encounter as non phantom" do
       expect(created_encounter).to_not be_phantom
     end
+
+    it "creates an encounter as non phantom" do
+      expect(Time.parse(created_encounter.core_fields["start_time"])).to eq(created_encounter.created_at)
+      expect(Time.parse(created_encounter.core_fields["end_time"])).to eq(created_encounter.created_at)
+    end
   end
 
   describe "PUT update" do

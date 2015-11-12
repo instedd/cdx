@@ -90,12 +90,6 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
   let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
 
-  def assert_encounter_data(encounter)
-    expect(encounter.core_fields).to eq(ENCOUNTER_CORE_FIELDS)
-    expect(encounter.plain_sensitive_data).to eq(ENCOUNTER_PII_FIELDS)
-    expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS)
-  end
-
   def assert_sample_data(sample)
     expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS)
     expect(sample.custom_fields).to eq(SAMPLE_CUSTOM_FIELDS)
@@ -144,7 +138,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(Encounter.count).to eq(1)
     encounter = Encounter.first
     expect(encounter.entity_id).to eq(ENCOUNTER_ID)
-    assert_encounter_data(encounter)
+    expect(encounter.core_fields.except("start_time", "end_time")).to eq(ENCOUNTER_CORE_FIELDS)
+    expect(Time.parse(encounter.core_fields["start_time"]).at_beginning_of_day).to eq(Time.parse(TEST_START_TIME).at_beginning_of_day)
+    expect(Time.parse(encounter.core_fields["end_time"]).at_beginning_of_day).to eq(Time.parse(TEST_START_TIME).at_beginning_of_day)
+    expect(encounter.plain_sensitive_data).to eq(ENCOUNTER_PII_FIELDS)
+    expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS)
   end
 
   it "should create a patient" do
@@ -1049,6 +1047,45 @@ describe DeviceMessageProcessor, elasticsearch: true do
         encounter = Encounter.first
         encounter2 = TestResult.first.encounter
         expect(encounter).not_to eq(encounter2)
+      end
+    end
+
+    context 'with encounter id and multiple tests' do
+      it "sets encounter's times to test result times, with one" do
+        start_time = 2.years.ago.at_beginning_of_day
+        end_time = 2.years.from_now.at_beginning_of_day
+        message = parsed_message(TEST_ID, "test" => {"core" => {"start_time" => start_time, "end_time" => end_time}})
+        clear message, "patient", "sample"
+        allow(device_message).to receive(:parsed_messages).and_return([message])
+
+        device_message_processor.process
+
+        encounter = Encounter.first
+        expect(Time.parse(encounter.core_fields["start_time"]).at_beginning_of_day).to eq(start_time)
+        expect(Time.parse(encounter.core_fields["end_time"]).at_beginning_of_day).to eq(end_time)
+      end
+
+      it "sets encounter's times to test result times, with two" do
+        start_time_1 = 2.years.ago.at_beginning_of_day
+        end_time_1 = 2.years.from_now.at_beginning_of_day
+
+        start_time_2 = 3.years.ago.at_beginning_of_day
+        end_time_2 = 3.years.from_now.at_beginning_of_day
+
+        messages = [
+          parsed_message(TEST_ID, "test" => {"core" => {"start_time" => start_time_1, "end_time" => end_time_1}}, "encounter" => {"core" => {"uuid" => "1234"}}),
+          parsed_message(TEST_ID_2, "test" => {"core" => {"start_time" => start_time_2, "end_time" => end_time_2}}, "encounter" => {"core" => {"uuid" => "1234"}}),
+        ]
+        messages.each do |message|
+          clear message, "patient", "sample"
+        end
+        allow(device_message).to receive(:parsed_messages).and_return(messages)
+
+        device_message_processor.process
+
+        encounter = Encounter.first
+        expect(Time.parse(encounter.core_fields["start_time"]).at_beginning_of_day).to eq(start_time_2)
+        expect(Time.parse(encounter.core_fields["end_time"]).at_beginning_of_day).to eq(end_time_2)
       end
     end
   end
