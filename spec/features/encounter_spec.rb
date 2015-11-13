@@ -142,4 +142,24 @@ describe "create encounter" do
   context "adding test from many others encounter" do
     it "should leave one encounter"
   end
+
+  it "adding test to existing sample should leave new test in encounter" do
+    process sample: {id: "s"}
+
+    goto_page NewEncounterPage do |page|
+      page.open_append_sample.search_and_select_first "s"
+      page.submit
+    end
+
+    expect_page ShowEncounterPage do |page|
+      expect(page.encounter.test_results.count).to eq(1)
+    end
+
+    process sample: {id: "s"}
+
+    visit current_path
+    expect_page ShowEncounterPage do |page|
+      expect(page.encounter.test_results.count).to eq(2)
+    end
+  end
 end
