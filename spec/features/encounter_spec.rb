@@ -98,7 +98,7 @@ describe "create encounter" do
     end
   end
 
-  pending "should be able to change the assay result and quantity of encounter" do
+  it "should be able to change the assay result and quantity of encounter" do
     process test: {id: "a"}
 
     goto_page NewEncounterPage do |page|

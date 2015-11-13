@@ -37,13 +37,19 @@ class EncountersController < ApplicationController
 
   def search_sample
     @institution = institution_by_uuid(params[:institution_uuid])
-    samples = scoped_samples.where(["sample_identifiers.entity_id like ?", "%#{params[:q]}%"])
+    samples = scoped_samples\
+      .joins("LEFT JOIN encounters ON encounters.id = samples.encounter_id")\
+      .where("sample_identifiers.entity_id LIKE ?", "%#{params[:q]}%")\
+      .where("samples.encounter_id IS NULL OR encounters.is_phantom = TRUE OR sample_identifiers.uuid IN (?)", (params[:sample_uuids] || "").split(','))
     render json: as_json_samples_search(samples).attributes!
   end
 
   def search_test
     @institution = institution_by_uuid(params[:institution_uuid])
-    test_results = scoped_test_results.where(["test_id like ?", "%#{params[:q]}%"])
+    test_results = scoped_test_results\
+      .joins("LEFT JOIN encounters ON encounters.id = test_results.encounter_id")\
+      .where("test_results.encounter_id IS NULL OR encounters.is_phantom = TRUE")\
+      .where("test_results.test_id LIKE ?", "%#{params[:q]}%")
     render json: as_json_test_results_search(test_results).attributes!
   end
 
@@ -51,6 +57,7 @@ class EncountersController < ApplicationController
     perform_encounter_action "adding sample" do
       prepare_encounter_from_json
       add_sample_by_uuid params[:sample_uuid]
+      recalculate_diagnostic
     end
   end
 
@@ -58,6 +65,15 @@ class EncountersController < ApplicationController
     perform_encounter_action "adding test result" do
       prepare_encounter_from_json
       add_test_result_by_uuid params[:test_uuid]
+      recalculate_diagnostic
+    end
+  end
+
+  def merge_samples
+    perform_encounter_action "unifying samples" do
+      prepare_encounter_from_json
+      merge_samples_by_uuid params[:sample_uuids]
+      recalculate_diagnostic
     end
   end
 
@@ -93,7 +109,7 @@ class EncountersController < ApplicationController
   end
 
   def prepare_encounter_from_json
-    encounter_param = JSON.parse(params[:encounter])
+    encounter_param = @encounter_param = JSON.parse(params[:encounter])
     @encounter = encounter_param['id'] ? Encounter.find(encounter_param['id']) : Encounter.new
     @encounter.is_phantom = false
 
@@ -108,7 +124,7 @@ class EncountersController < ApplicationController
     @encounter_blender = @blender.load(@encounter)
 
     encounter_param['samples'].each do |sample_param|
-      add_sample_by_uuid sample_param['uuid']
+      add_sample_by_uuids sample_param['uuids']
     end
 
     encounter_param['test_results'].each do |test_param|
@@ -128,11 +144,23 @@ class EncountersController < ApplicationController
   end
 
   def add_sample_by_uuid(uuid)
-    sample = scoped_samples.find_by("sample_identifiers.uuid" => uuid)
-    return if sample.nil?
+    sample = scoped_samples.find_by!("sample_identifiers.uuid" => uuid)
     sample_blender = @blender.load(sample)
     @blender.merge_parent(sample_blender, @encounter_blender)
     sample_blender
+  end
+
+  def add_sample_by_uuids(uuids)
+    sample_blender = merge_samples_by_uuid(uuids)
+    @blender.merge_parent(sample_blender, @encounter_blender)
+    sample_blender
+  end
+
+  def merge_samples_by_uuid(uuids)
+    samples = scoped_samples.where("sample_identifiers.uuid" => uuids).to_a
+    raise ActiveRecord::RecordNotFound if samples.empty?
+    target, *to_merge = samples.map{|s| @blender.load(s)}
+    @blender.merge_blenders(target, to_merge)
   end
 
   def scoped_test_results
@@ -140,11 +168,25 @@ class EncountersController < ApplicationController
   end
 
   def add_test_result_by_uuid(uuid)
-    test_result = scoped_test_results.find_by(uuid: uuid)
-    return if test_result.nil?
+    test_result = scoped_test_results.find_by!(uuid: uuid)
     test_result_blender = @blender.load(test_result)
     @blender.merge_parent(test_result_blender, @encounter_blender)
     test_result_blender
+  end
+
+  def recalculate_diagnostic
+    previous_tests_uuids = @encounter_param['test_results'].map{|t| t['uuid']}
+    assays_to_merge = @blender.test_results\
+      .reject{|tr| (tr.uuids & previous_tests_uuids).any?}\
+      .map{|tr| tr.core_fields[TestResult::ASSAYS_FIELD]}
+
+    diagnostic_assays = assays_to_merge.inject(@encounter_param['assays']) do |merged, to_merge|
+      Encounter.merge_assays(merged, to_merge)
+    end
+
+    @encounter_blender.merge_attributes('core_fields' => {
+      Encounter::ASSAYS_FIELD => diagnostic_assays
+    })
   end
 
   def as_json_edit

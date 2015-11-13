@@ -21,49 +21,63 @@ var EncounterForm = React.createClass({
     }
   },
 
-  showSamplesModal: function(event) {
-    this.refs.samplesModal.show()
+  showAddSamplesModal: function(event) {
+    this.refs.addSamplesModal.show()
     event.preventDefault()
   },
 
-  closeSamplesModal: function (event) {
-    this.refs.samplesModal.hide();
+  closeAddSamplesModal: function (event) {
+    this.refs.addSamplesModal.hide();
     event.preventDefault();
   },
 
-  _ajax_put: function(url, success) {
-    this._ajax('PUT', url, success);
+  showUnifySamplesModal: function(sample) {
+    this.setState(React.addons.update(this.state, {
+      unifyingSample: { $set: sample }
+    }));
+
+    this.refs.unifySamplesModal.show()
+    event.preventDefault()
   },
 
-  _ajax: function(method, url, success) {
+  closeUnifySamplesModal: function (event) {
+    this.refs.unifySamplesModal.hide();
+    event.preventDefault();
+  },
+
+  _ajax_put: function(url, success, extra_data) {
+    this._ajax('PUT', url, success, extra_data);
+  },
+
+  _ajax: function(method, url, success, extra_data) {
     var _this = this;
     $.ajax({
       url: url,
       method: method,
-      data: { encounter: JSON.stringify(this.state.encounter) },
+      data: _.extend({ encounter: JSON.stringify(this.state.encounter) }, extra_data),
       success: function (data) {
         if (data.status == 'error') {
           alert(data.message); //TODO show errors nicely
+        } else {
+          _this.setState(React.addons.update(_this.state, {
+            encounter: { $set: data.encounter }
+          }), function(){
+            if (data.status == 'ok' && success) {
+              success.call(_this);
+            }
+          });
         }
-
-        _this.setState(React.addons.update(_this.state, {
-          encounter: { $set: data.encounter }
-        }), function(){
-          if (data.status == 'ok' && success) {
-            success.call(_this);
-          }
-        });
       }
     });
   },
 
+  unifySample: function(sample) {
+    this.refs.unifySamplesModal.hide();
+    this._ajax_put("/encounters/merge/sample/", null, { sample_uuids: [this.state.unifyingSample.uuid, sample.uuid] });
+  },
+
   appendSample: function(sample) {
-    this.setState(React.addons.update(this.state, {
-      encounter : { samples : {
-        $push : [sample]
-      }}
-    }));
-    this.refs.samplesModal.hide()
+    this.refs.addSamplesModal.hide()
     this._ajax_put("/encounters/add/sample/" + sample.uuid);
   },
 
@@ -78,11 +92,6 @@ var EncounterForm = React.createClass({
   },
 
   appendTest: function(test) {
-    this.setState(React.addons.update(this.state, {
-      encounter : { test_results : {
-        $push : [test]
-      }}
-    }));
     this.refs.testsModal.hide()
     this._ajax_put("/encounters/add/test/" + test.uuid);
   },
@@ -171,20 +180,33 @@ var EncounterForm = React.createClass({
           <div className="col pe-2">
             <label>Samples</label>
             <p>
-              <a className="btn-href" href='#' onClick={this.showSamplesModal}><span className="icon-add"></span> Append sample</a>
+              <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
 
             </p>
           </div>
           <div className="col">
-            <SamplesList samples={this.state.encounter.samples} />
+            <SamplesList samples={this.state.encounter.samples} onUnifySample={this.showUnifySamplesModal} />
           </div>
-          <Modal ref="samplesModal">
+
+          <Modal ref="addSamplesModal">
             <h1>
-              <a href="#" className="modal-back" onClick={this.closeSamplesModal}><img src="/assets/arrow-left.png"/></a>
+              <a href="#" className="modal-back" onClick={this.closeAddSamplesModal}><img src="/assets/arrow-left.png"/></a>
               Add sample
             </h1>
 
             <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendSample}
+              itemTemplate={AddItemSearchSampleTemplate}
+              itemKey="uuid" />
+          </Modal>
+
+          <Modal ref="unifySamplesModal">
+            <h1>
+              <a href="#" className="modal-back" onClick={this.closeUnifySamplesModal}><img src="/assets/arrow-left.png"/></a>
+              Unify sample
+            </h1>
+            <p>Unifying sample {this.state.unifyingSample ? this.state.unifyingSample.uuid : ""}</p>
+
+            <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid + "&sample_uuids=" + _.pluck(this.state.encounter.samples, 'uuid')} onItemChosen={this.unifySample}
               itemTemplate={AddItemSearchSampleTemplate}
               itemKey="uuid" />
           </Modal>

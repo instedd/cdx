@@ -97,6 +97,7 @@ TestResult.blueprint do
   device { device_messages.first.device || Device.make }
   institution { device.institution || Institution.make }
   sample_identifier { SampleIdentifier.make(sample: Sample.make(institution: object.institution, patient: object.patient, encounter: object.encounter)) }
+  # sample_identifier { SampleIdentifier.make(entity_id: "sample-#{Sham.sn}", sample: Sample.make(institution: device.institution)) }
 
   encounter { object.sample.try(:encounter) }
   patient { object.sample.try(:patient) || object.encounter.try(:patient) }
