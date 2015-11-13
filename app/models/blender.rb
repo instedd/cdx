@@ -133,6 +133,7 @@ class Blender
     entities.each do |entity|
       case entity
       when TestResult then TestResultIndexer.new(entity).index
+      when Encounter then EncounterIndexer.new(entity).index
       when Entity then EntityIndexUpdater.new(entity).update
       when nil then next
       else raise UnknownEntityError, "Unknown entity type #{entity.class.name}"
@@ -420,6 +421,32 @@ class Blender
 
     def self.parent_type
       Patient
+    end
+
+    protected
+
+    def before_save(entity)
+      created_at = entity.created_at
+      test_results = @children.select { |child| child.is_a?(TestResultBlender) }
+
+      start_times = fetch_times(test_results, "start_time")
+      end_times = fetch_times(test_results, "end_time")
+
+      if created_at
+        start_times << created_at
+        end_times << created_at
+      end
+
+      now = Time.now
+      min_start_time = start_times.min || now
+      max_end_time = end_times.max || min_start_time
+
+      entity.core_fields["start_time"] = min_start_time.iso8601
+      entity.core_fields["end_time"] = max_end_time.iso8601
+    end
+
+    def fetch_times(test_results, field)
+      test_results.map { |test| test.core_fields[field] }.compact.map { |time| time.is_a?(Time) ? time : Time.parse(time) }
     end
 
   end

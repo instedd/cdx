@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "1.1.1",
-    "api_version": "1.4.0",
+    "api_version": "1.5.0",
     "conditions": [
       "mtb"
     ],
@@ -58,7 +58,7 @@
       ]
     ]},
     "test.site_user" : { "lookup": "event.system_user" },
-    "test.patient_age" : { "lookup": "event.age" },
+    "encounter.patient_age" : { "lookup": "event.age" },
     "test.start_time" : { "lookup": "event.start_time" },
     "test.end_time" : { "lookup": "event.end_time" },
     "test.id" : { "lookup": "event.event_id" },

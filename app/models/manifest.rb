@@ -15,7 +15,7 @@ class Manifest < ActiveRecord::Base
 
   NULL_STRING = "null"
 
-  CURRENT_VERSION = "1.4.0"
+  CURRENT_VERSION = "1.5.0"
 
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 

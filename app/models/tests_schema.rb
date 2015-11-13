@@ -22,7 +22,7 @@ class TestsSchema
     schema["title"] = schema_title
     schema["properties"] = Hash.new
 
-    Cdx.core_field_scopes.each do |scope|
+    Cdx::Fields.test.core_field_scopes.each do |scope|
       scope_properties = {}
 
       scope.fields.each do |field|

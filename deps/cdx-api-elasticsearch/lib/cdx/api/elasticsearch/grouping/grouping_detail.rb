@@ -53,7 +53,7 @@ class GroupingDetail
     end
   end
 
-  def self.process_buckets(aggregations, group_by, tests, test, doc_count)
+  def self.process_buckets(aggregations, group_by, entities, entity, doc_count)
     count = aggregations["count"]
 
     if count
@@ -64,10 +64,10 @@ class GroupingDetail
       end
 
       buckets = head.preprocess_buckets count
-      head.process_bucket rest, tests, test, buckets
+      head.process_bucket rest, entities, entity, buckets
     else
-      test["count"] = doc_count
-      tests + [test]
+      entity["count"] = doc_count
+      entities + [entity]
     end
   end
 
@@ -75,10 +75,10 @@ class GroupingDetail
     count["buckets"]
   end
 
-  def process_bucket(group_by, tests, test, buckets)
-    buckets.inject tests do |tests, bucket|
-      test = test.merge yield_bucket(bucket)
-      GroupingDetail.process_buckets bucket, group_by, tests, test, bucket["doc_count"]
+  def process_bucket(group_by, entities, entity, buckets)
+    buckets.inject entities do |entities, bucket|
+      entity = entity.merge yield_bucket(bucket)
+      GroupingDetail.process_buckets bucket, group_by, entities, entity, bucket["doc_count"]
     end
   end
 end

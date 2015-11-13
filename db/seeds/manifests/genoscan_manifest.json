@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "version" : "0.0.9",
-    "api_version" : "1.4.0",
+    "api_version" : "1.5.0",
     "signature" : "",
     "conditions": ["mtb", "rif", "inh"],
     "source": { "type" : "csv", "separator" : ";" }
@@ -29,7 +29,7 @@
           {"lookup" : "LastName"}
       ]
     },
-    "test.patient_age" : {
+    "encounter.patient_age" : {
       "if" : [
         {"equals" : [{"lookup" : "Birthday"}, "n.a."]},
         "",

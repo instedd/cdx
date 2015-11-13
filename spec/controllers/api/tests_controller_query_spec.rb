@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Api::EventsController, elasticsearch: true, validate_manifest: false do
+describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
   let(:user) { User.make }
   let!(:institution) { Institution.make user_id: user.id }
@@ -166,7 +166,7 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
           expect(r.status).to eq(200)
           expect(r.content_type).to eq("text/csv")
           expect(r.headers["Content-Disposition"]).to eq("attachment; filename=\"Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv\"")
-          expect(r).to render_template("api/events/index")
+          expect(r).to render_template("api/tests/index")
         end
 
         render_views
@@ -195,15 +195,15 @@ describe Api::EventsController, elasticsearch: true, validate_manifest: false do
 
     context "Ordering" do
       it "should order by age" do
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :positive], patient_age: {"years" => 20}})
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :negative], patient_age: {"years" => 10}})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :positive]}, encounter: {patient_age: {"years" => 20}})
+        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :negative]}, encounter: {patient_age: {"years" => 10}})
 
-        response = get_updates(order_by: "test.patient_age")
+        response = get_updates(order_by: "encounter.patient_age")
 
         expect(response[0]["test"]["assays"].first["result"]).to eq("negative")
-        expect(response[0]["test"]["patient_age"]["years"]).to eq(10)
+        expect(response[0]["encounter"]["patient_age"]["years"]).to eq(10)
         expect(response[1]["test"]["assays"].first["result"]).to eq("positive")
-        expect(response[1]["test"]["patient_age"]["years"]).to eq(20)
+        expect(response[1]["encounter"]["patient_age"]["years"]).to eq(20)
       end
     end
 

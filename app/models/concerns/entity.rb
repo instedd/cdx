@@ -96,7 +96,7 @@ module Entity
     end
 
     def entity_fields
-      Cdx.core_field_scopes.find{|s| s.name == entity_scope}.fields
+      Cdx::Fields.entities.core_field_scopes.find{|s| s.name == entity_scope}.fields
     end
   end
 

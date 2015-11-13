@@ -4,6 +4,10 @@ class EntityIndexer
 
   subclass_responsibility :type, :document_id, :fields_to_index
 
+  def initialize(entity_name)
+    @entity_name = entity_name
+  end
+
   def index(refresh = false)
     fields = fields_to_index
     run_before_index_hooks(fields)
@@ -14,7 +18,7 @@ class EntityIndexer
   end
 
   def run_before_index_hooks(fields)
-    Cdx.core_field_scopes.each do |scope|
+    Cdx::Fields[@entity_name].core_field_scopes.each do |scope|
       scope.fields.each do |field|
         field.before_index fields
       end

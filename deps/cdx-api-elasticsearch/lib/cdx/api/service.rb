@@ -8,21 +8,8 @@ class Cdx::Api::Service
     Cdx::Api::Elasticsearch::MappingTemplate.new(self).initialize_template(template_name)
   end
 
-  def searchable_fields
-    config.searchable_fields
-  end
-
   def index_name_pattern
     config.index_name_pattern
-  end
-
-  def default_sort
-    config.document_format.default_sort
-  end
-
-  def translate(response)
-    format = config.document_format
-    response.map { |test| format.translate_test(test) }
   end
 
   def search_elastic options

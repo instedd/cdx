@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "version" : "1.0.4",
-    "api_version" : "1.4.0",
+    "api_version" : "1.5.0",
     "conditions": ["malaria_pf", "malaria_pv"],
     "source": {
       "type" : "xml",
@@ -15,7 +15,7 @@
   "field_mapping" : {
     "patient.id" : {"lookup" : "Patient/Id/text()"},
     "patient.name" : {"lookup" : "Patient/Name/text()"},
-    "test.patient_age" : {
+    "encounter.patient_age" : {
       "duration" : {
         "years": {"lookup" : "Patient/Age/text()"}
       }

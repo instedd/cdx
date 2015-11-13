@@ -6,18 +6,6 @@ describe Cdx::Api, elasticsearch: true do
   let!(:device) {Device.make}
   let!(:institution) { device.institution }
 
-  def index_with_test_result(test)
-    test_result = TestResult.make device: device
-    test_result.core_fields = JSON.parse(test[:test].to_json)
-
-    if (reported_time = test_result.core_fields["reported_time"])
-      test_result.created_at = Time.parse(reported_time)
-      test_result.save!
-    end
-
-    TestResultIndexer.new(test_result).index(refresh = true)
-  end
-
   describe "Filter" do
     it "should check for new tests since a date" do
       index test: {assays: [result: :positive], start_time: time(2013, 1, 1)}
@@ -99,12 +87,12 @@ describe Cdx::Api, elasticsearch: true do
     end
 
     it "should filter by test.patient_age, making sure in_millis is automatically created" do
-      index_with_test_result test: {assays: [result: :positive], "patient_age" => {years: 10}}
-      index_with_test_result test: {assays: [result: :negative], "patient_age" => {years: 15}}
+      index_with_test_result test: {assays: [result: :positive]}, encounter: {"patient_age" => {years: 10}}
+      index_with_test_result test: {assays: [result: :negative]}, encounter: {"patient_age" => {years: 15}}
 
-      expect_one_result "positive", "test.patient_age" => "..10yo"
-      expect_one_result "negative", "test.patient_age" => "12yo..18yo"
-      expect_no_results "test.patient_age" => "20yo.."
+      expect_one_result "positive", "encounter.patient_age" => "..10yo"
+      expect_one_result "negative", "encounter.patient_age" => "12yo..18yo"
+      expect_no_results "encounter.patient_age" => "20yo.."
     end
 
     [
@@ -133,29 +121,29 @@ describe Cdx::Api, elasticsearch: true do
     end
 
     it "filters by min age" do
-      index_with_test_result test: {assays: [result: :positive], patient_age: {years: 10}}
-      index_with_test_result test: {assays: [result: :negative], patient_age: {years: 20}}
+      index_with_test_result test: {assays: [result: :positive]}, encounter: {patient_age: {years: 10}}
+      index_with_test_result test: {assays: [result: :negative]}, encounter: {patient_age: {years: 20}}
 
-      expect_one_result "negative", "test.patient_age" => "15yo.."
-      expect_one_result "negative", "test.patient_age" => "20yo.."
-      expect_no_results "test.patient_age" => "21yo.."
+      expect_one_result "negative", "encounter.patient_age" => "15yo.."
+      expect_one_result "negative", "encounter.patient_age" => "20yo.."
+      expect_no_results "encounter.patient_age" => "21yo.."
     end
 
     it "filters by max age" do
-      index test: {assays: [result: :positive], patient_age: Cdx::Field::DurationField.years(10)}
-      index test: {assays: [result: :negative], patient_age: Cdx::Field::DurationField.years(20)}
+      index test: {assays: [result: :positive]}, encounter: {"uuid" => "1234", patient_age: Cdx::Field::DurationField.years(10)}
+      index test: {assays: [result: :negative]}, encounter: {"uuid" => "1234", patient_age: Cdx::Field::DurationField.years(20)}
 
-      expect_one_result "positive", "test.patient_age" => "..15yo"
-      expect_one_result "positive", "test.patient_age" => "..10yo"
-      expect_no_results "test.patient_age" => "..9yo"
+      expect_one_result "positive", "encounter.patient_age" => "..15yo"
+      expect_one_result "positive", "encounter.patient_age" => "..10yo"
+      expect_no_results "encounter.patient_age" => "..9yo"
     end
 
     it "filters by result" do
-      index test: {assays:[name: "MTB", result: :positive], patient_age: Cdx::Field::DurationField.years(10)}
-      index test: {assays:[name: "Flu", result: :negative], patient_age: Cdx::Field::DurationField.years(20)}
+      index test: {assays:[name: "MTB", result: :positive]}, encounter: {patient_age: Cdx::Field::DurationField.years(10)}
+      index test: {assays:[name: "Flu", result: :negative]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}
 
-      expect_one_event_with_field "test", "patient_age", Cdx::Field::DurationField.years(10), "test.assays.result" => :positive
-      expect_one_event_with_field "test", "patient_age", Cdx::Field::DurationField.years(20), "test.assays.result" => :negative
+      expect_one_event_with_field "encounter", "patient_age", Cdx::Field::DurationField.years(10), "test.assays.result" => :positive
+      expect_one_event_with_field "encounter", "patient_age", Cdx::Field::DurationField.years(20), "test.assays.result" => :negative
     end
 
     it "filters by a partial match" do
@@ -177,11 +165,11 @@ describe Cdx::Api, elasticsearch: true do
     end
 
     it "filters by result, age and name" do
-      index test: {assays:[name: "MTB", result: :positive], patient_age: Cdx::Field::DurationField.years(20)}
-      index test: {assays:[name: "MTB", result: :negative], patient_age: Cdx::Field::DurationField.years(20)}
-      index test: {assays:[name: "Flu", result: :negative], patient_age: Cdx::Field::DurationField.years(20)}
+      index test: {assays:[name: "MTB", result: :positive]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}
+      index test: {assays:[name: "MTB", result: :negative]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}
+      index test: {assays:[name: "Flu", result: :negative]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}
 
-      expect_one_result "negative", 'test.assays.result' => :negative, 'test.patient_age' => "..20yo", 'test.assays.name' => "Flu"
+      expect_one_result "negative", 'test.assays.result' => :negative, 'encountre.patient_age' => "..20yo", 'test.assays.name' => "Flu"
     end
 
     it "filters by test type" do
@@ -512,63 +500,63 @@ describe Cdx::Api, elasticsearch: true do
     end
 
     it "groups by age ranges" do
-      index test: {patient_age: Cdx::Field::DurationField.years(9)}
-      index test: {patient_age: Cdx::Field::DurationField.years(10)}
-      index test: {patient_age: Cdx::Field::DurationField.years(11)}
-      index test: {patient_age: Cdx::Field::DurationField.years(12)}
-      index test: {patient_age: Cdx::Field::DurationField.years(13)}
-      index test: {patient_age: Cdx::Field::DurationField.years(20)}
-      index test: {patient_age: Cdx::Field::DurationField.years(21)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(9)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(10)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(11)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(12)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(13)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(20)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(21)}
 
-      response = query_tests("group_by" => [{"test.patient_age" => ["..10yo", "15yo..", "10yo..15yo"]}]).sort_by do |test|
-        test["test.patient_age"]
+      response = query_tests("group_by" => [{"encounter.patient_age" => ["..10yo", "15yo..", "10yo..15yo"]}]).sort_by do |test|
+        test["encounter.patient_age"]
       end
 
       expect(response).to eq([
-        {"test.patient_age"=>"..10yo", "count" => 1},
-        {"test.patient_age"=>"10yo..15yo", "count" => 4},
-        {"test.patient_age"=>"15yo..", "count" => 2}
+        {"encounter.patient_age"=>"..10yo", "count" => 1},
+        {"encounter.patient_age"=>"10yo..15yo", "count" => 4},
+        {"encounter.patient_age"=>"15yo..", "count" => 2}
       ])
     end
 
     it "groups by age ranges using hashes" do
-      index test: {patient_age: Cdx::Field::DurationField.years(9)}
-      index test: {patient_age: Cdx::Field::DurationField.years(10)}
-      index test: {patient_age: Cdx::Field::DurationField.years(11)}
-      index test: {patient_age: Cdx::Field::DurationField.years(12)}
-      index test: {patient_age: Cdx::Field::DurationField.years(13)}
-      index test: {patient_age: Cdx::Field::DurationField.years(20)}
-      index test: {patient_age: Cdx::Field::DurationField.years(21)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(9)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(10)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(11)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(12)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(13)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(20)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(21)}
 
-      response = query_tests("group_by" => [{"test.patient_age" => ["..10yo", "10yo..15yo", "16yo..21yo", "21yo.."]}]).sort_by do |test|
-        test["test.patient_age"]
+      response = query_tests("group_by" => [{"encounter.patient_age" => ["..10yo", "10yo..15yo", "16yo..21yo", "21yo.."]}]).sort_by do |test|
+        test["encounter.patient_age"]
       end
 
       expect(response).to eq([
-        {"test.patient_age"=>"..10yo", "count" => 1},
-        {"test.patient_age"=>"10yo..15yo", "count" => 4},
-        {"test.patient_age"=>"16yo..21yo", "count" => 1},
-        {"test.patient_age"=>"21yo..", "count" => 1}
+        {"encounter.patient_age"=>"..10yo", "count" => 1},
+        {"encounter.patient_age"=>"10yo..15yo", "count" => 4},
+        {"encounter.patient_age"=>"16yo..21yo", "count" => 1},
+        {"encounter.patient_age"=>"21yo..", "count" => 1}
       ])
     end
 
     it "groups by age ranges without the array" do
-      index test: {patient_age: Cdx::Field::DurationField.years(9)}
-      index test: {patient_age: Cdx::Field::DurationField.years(10)}
-      index test: {patient_age: Cdx::Field::DurationField.years(11)}
-      index test: {patient_age: Cdx::Field::DurationField.years(12)}
-      index test: {patient_age: Cdx::Field::DurationField.years(13)}
-      index test: {patient_age: Cdx::Field::DurationField.years(20)}
-      index test: {patient_age: Cdx::Field::DurationField.years(21)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(9)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(10)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(11)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(12)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(13)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(20)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(21)}
 
-      response = query_tests("group_by" => {"test.patient_age" => ["..10yo", "15yo..120yo", "10yo..15yo"]}).sort_by do |test|
-        test["test.patient_age"]
+      response = query_tests("group_by" => {"encounter.patient_age" => ["..10yo", "15yo..120yo", "10yo..15yo"]}).sort_by do |test|
+        test["encounter.patient_age"]
       end
 
       expect(response).to eq([
-        {"test.patient_age"=>"..10yo", "count" => 1},
-        {"test.patient_age"=>"10yo..15yo", "count" => 4},
-        {"test.patient_age"=>"15yo..120yo", "count" => 2}
+        {"encounter.patient_age"=>"..10yo", "count" => 1},
+        {"encounter.patient_age"=>"10yo..15yo", "count" => 4},
+        {"encounter.patient_age"=>"15yo..120yo", "count" => 2}
       ])
     end
 
@@ -654,70 +642,70 @@ describe Cdx::Api, elasticsearch: true do
 
   describe "Ordering" do
     it "should order by age" do
-      index test: {assays:[result: :positive], patient_age: Cdx::Field::DurationField.years(20)}
-      index test: {assays:[result: :negative], patient_age: Cdx::Field::DurationField.years(10)}
+      index_with_test_result test: {assays:[result: :positive]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}
+      index_with_test_result test: {assays:[result: :negative]}, encounter: {patient_age: Cdx::Field::DurationField.years(10)}
 
-      response = query_tests("order_by" => 'test.patient_age')
+      response = query_tests("order_by" => 'encounter.patient_age')
 
       expect(response[0]["test"]["assays"].first["result"]).to eq("negative")
-      expect(response[0]["test"]["patient_age"]["years"]).to eq(10)
+      expect(response[0]["encounter"]["patient_age"]["years"]).to eq(10)
       expect(response[1]["test"]["assays"].first["result"]).to eq("positive")
-      expect(response[1]["test"]["patient_age"]["years"]).to eq(20)
+      expect(response[1]["encounter"]["patient_age"]["years"]).to eq(20)
     end
 
     it "should order by age desc" do
-      index test: {assays:[result: :positive], patient_age: Cdx::Field::DurationField.years(20)}
-      index test: {assays:[result: :negative], patient_age: Cdx::Field::DurationField.years(10)}
+      index_with_test_result test: {assays:[result: :positive]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}
+      index_with_test_result test: {assays:[result: :negative]}, encounter: {patient_age: Cdx::Field::DurationField.years(10)}
 
-      response = query_tests("order_by" => "-test.patient_age")
+      response = query_tests("order_by" => "-encounter.patient_age")
 
       expect(response[0]["test"]["assays"].first["result"]).to eq("positive")
-      expect(response[0]["test"]["patient_age"]["years"]).to eq(20)
+      expect(response[0]["encounter"]["patient_age"]["years"]).to eq(20)
       expect(response[1]["test"]["assays"].first["result"]).to eq("negative")
-      expect(response[1]["test"]["patient_age"]["years"]).to eq(10)
+      expect(response[1]["encounter"]["patient_age"]["years"]).to eq(10)
     end
 
     it "should order by age and gender" do
-      index test: {assays:[result: :positive], patient_age: Cdx::Field::DurationField.years(20)}, patient: {gender: :male}
-      index test: {assays:[result: :positive], patient_age: Cdx::Field::DurationField.years(10)}, patient: {gender: :male}
-      index test: {assays:[result: :negative], patient_age: Cdx::Field::DurationField.years(20)}, patient: {gender: :female}
-      index test: {assays:[result: :negative], patient_age: Cdx::Field::DurationField.years(10)}, patient: {gender: :female}
+      index_with_test_result test: {assays:[result: :positive]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}, patient: {gender: :male}
+      index_with_test_result test: {assays:[result: :positive]}, encounter: {patient_age: Cdx::Field::DurationField.years(10)}, patient: {gender: :male}
+      index_with_test_result test: {assays:[result: :negative]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}, patient: {gender: :female}
+      index_with_test_result test: {assays:[result: :negative]}, encounter: {patient_age: Cdx::Field::DurationField.years(10)}, patient: {gender: :female}
 
-      response = query_tests("order_by" => "test.patient_age,patient.gender")
+      response = query_tests("order_by" => "encounter.patient_age,patient.gender")
 
       expect(response[0]["test"]["assays"].first["result"]).to eq("negative")
-      expect(response[0]["test"]["patient_age"]["years"]).to eq(10)
+      expect(response[0]["encounter"]["patient_age"]["years"]).to eq(10)
       expect(response[0]["patient"]["gender"]).to eq("female")
       expect(response[1]["test"]["assays"].first["result"]).to eq("positive")
-      expect(response[1]["test"]["patient_age"]["years"]).to eq(10)
+      expect(response[1]["encounter"]["patient_age"]["years"]).to eq(10)
       expect(response[1]["patient"]["gender"]).to eq("male")
       expect(response[2]["test"]["assays"].first["result"]).to eq("negative")
-      expect(response[2]["test"]["patient_age"]["years"]).to eq(20)
+      expect(response[2]["encounter"]["patient_age"]["years"]).to eq(20)
       expect(response[2]["patient"]["gender"]).to eq("female")
       expect(response[3]["test"]["assays"].first["result"]).to eq("positive")
-      expect(response[3]["test"]["patient_age"]["years"]).to eq(20)
+      expect(response[3]["encounter"]["patient_age"]["years"]).to eq(20)
       expect(response[3]["patient"]["gender"]).to eq("male")
     end
 
     it "should order by age and gender desc" do
-      index test: {assays:[result: :positive], patient_age: Cdx::Field::DurationField.years(20)}, patient: {gender: :male}
-      index test: {assays:[result: :positive], patient_age: Cdx::Field::DurationField.years(10)}, patient: {gender: :male}
-      index test: {assays:[result: :negative], patient_age: Cdx::Field::DurationField.years(20)}, patient: {gender: :female}
-      index test: {assays:[result: :negative], patient_age: Cdx::Field::DurationField.years(10)}, patient: {gender: :female}
+      index_with_test_result test: {assays:[result: :positive]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}, patient: {gender: :male}
+      index_with_test_result test: {assays:[result: :positive]}, encounter: {patient_age: Cdx::Field::DurationField.years(10)}, patient: {gender: :male}
+      index_with_test_result test: {assays:[result: :negative]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)}, patient: {gender: :female}
+      index_with_test_result test: {assays:[result: :negative]}, encounter: {patient_age: Cdx::Field::DurationField.years(10)}, patient: {gender: :female}
 
-      response = query_tests("order_by" => "test.patient_age,-patient.gender")
+      response = query_tests("order_by" => "encounter.patient_age,-patient.gender")
 
       expect(response[0]["test"]["assays"].first["result"]).to eq("positive")
-      expect(response[0]["test"]["patient_age"]["years"]).to eq(10)
+      expect(response[0]["encounter"]["patient_age"]["years"]).to eq(10)
       expect(response[0]["patient"]["gender"]).to eq("male")
       expect(response[1]["test"]["assays"].first["result"]).to eq("negative")
-      expect(response[1]["test"]["patient_age"]["years"]).to eq(10)
+      expect(response[1]["encounter"]["patient_age"]["years"]).to eq(10)
       expect(response[1]["patient"]["gender"]).to eq("female")
       expect(response[2]["test"]["assays"].first["result"]).to eq("positive")
-      expect(response[2]["test"]["patient_age"]["years"]).to eq(20)
+      expect(response[2]["encounter"]["patient_age"]["years"]).to eq(20)
       expect(response[2]["patient"]["gender"]).to eq("male")
       expect(response[3]["test"]["assays"].first["result"]).to eq("negative")
-      expect(response[3]["test"]["patient_age"]["years"]).to eq(20)
+      expect(response[3]["encounter"]["patient_age"]["years"]).to eq(20)
       expect(response[3]["patient"]["gender"]).to eq("female")
     end
 
@@ -820,13 +808,15 @@ describe Cdx::Api, elasticsearch: true do
                 "type" => 'location'
               }]
             }
-          ])
+          ],
+          Cdx::Api::Elasticsearch::CdxDocumentFormat::TestResult.new
+          )
         end
 
-        Cdx.core_field_scopes.push @extra_scope
-        Cdx.core_fields.concat @extra_scope.flatten
+        Cdx::Fields.test.core_field_scopes.push @extra_scope
+        Cdx::Fields.test.core_fields.concat @extra_scope.flatten
 
-        Cdx::Api.searchable_fields.concat @extra_fields
+        Cdx::Fields.test.searchable_fields.concat @extra_fields
 
         # Delete the index and recreate it to make ES grab the new template
         Cdx::Api.client.indices.delete index: "cdx_test", ignore: 404
@@ -834,13 +824,13 @@ describe Cdx::Api, elasticsearch: true do
       end
 
       after(:all) do
-        Cdx.core_field_scopes.delete @extra_scope
+        Cdx::Fields.test.core_field_scopes.delete @extra_scope
         @extra_scope.flatten.each do |field|
-          Cdx.core_fields.delete field
+          Cdx::Fields.test.core_fields.delete field
         end
 
         @extra_fields.each do |field|
-          Cdx::Api.searchable_fields.delete field
+          Cdx::Fields.test.searchable_fields.delete field
         end
 
         # Delete the index and recreate it to make ES grab the new template
@@ -883,44 +873,44 @@ describe Cdx::Api, elasticsearch: true do
     end
 
     it "gets total count when there are no results" do
-      index test: {patient_age: Cdx::Field::DurationField.years(1)}
-      index test: {patient_age: Cdx::Field::DurationField.years(1)}
-      index test: {patient_age: Cdx::Field::DurationField.years(1)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(1)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(1)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(1)}
 
-      assays = query('test.patient_age' => "2yo..")
+      assays = query('encounter.patient_age' => "2yo..")
       expect(assays["tests"].length).to eq(0)
       expect(assays["total_count"]).to eq(0)
     end
 
     it "gets total count when paginated" do
-      index test: {patient_age: Cdx::Field::DurationField.years(1)}
-      index test: {patient_age: Cdx::Field::DurationField.years(1)}
-      index test: {patient_age: Cdx::Field::DurationField.years(1)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(1)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(1)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(1)}
 
-      assays = query('test.patient_age' => "1yo..", "page_size" => 2)
+      assays = query('encounter.patient_age' => "1yo..", "page_size" => 2)
       expect(assays["tests"].length).to eq(2)
       expect(assays["total_count"]).to eq(3)
     end
 
     it "gets total count when paginated with offset" do
-      index test: {patient_age: Cdx::Field::DurationField.years(2)}
-      index test: {patient_age: Cdx::Field::DurationField.years(3)}
-      index test: {patient_age: Cdx::Field::DurationField.years(1)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(2)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(3)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(1)}
 
-      assays = query("page_size" => 1, "offset" => 1, "order_by" => 'test.patient_age')
+      assays = query("page_size" => 1, "offset" => 1, "order_by" => 'encounter.patient_age')
 
       tests = assays["tests"]
       expect(tests.length).to eq(1)
-      expect(tests.first["test"]["patient_age"]["years"]).to eq(2)
+      expect(tests.first["encounter"]["patient_age"]["years"]).to eq(2)
       expect(assays["total_count"]).to eq(3)
     end
 
     it "can't group by duration fields without telling the clusters" do
-      index test: {patient_age: Cdx::Field::DurationField.years(1)}
-      index test: {patient_age: Cdx::Field::DurationField.years(1)}
-      index test: {patient_age: Cdx::Field::DurationField.years(2)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(1)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(1)}
+      index_with_test_result encounter: {patient_age: Cdx::Field::DurationField.years(2)}
 
-      expect { query("group_by" => 'test.patient_age') }.to raise_exception "Can't group by duration field without ranges"
+      expect { query("group_by" => 'encounter.patient_age') }.to raise_exception "Can't group by duration field without ranges"
     end
   end
 end

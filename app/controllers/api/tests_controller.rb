@@ -1,4 +1,4 @@
-class Api::EventsController < ApiController
+class Api::TestsController < ApiController
   wrap_parameters false
 
   def index

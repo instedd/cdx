@@ -96,8 +96,8 @@ Rails.application.routes.draw do
         get :simulator
       end
     end
-    match 'events(.:format)' => "events#index", via: [:get, :post]
-    resources :events, only: [] do
+    match 'tests(.:format)' => "tests#index", via: [:get, :post]
+    resources :tests, only: [] do
       collection do
         get :schema
       end
@@ -106,9 +106,10 @@ Rails.application.routes.draw do
         get :pii
       end
     end
+    match 'encounters(.:format)' => "encounters#index", via: [:get, :post]
     resources :devices, only: [] do
       resources :messages, only: [:create ], shallow: true
-      match 'events' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3
+      match 'tests' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3
       match 'demodata' => "messages#create_demo", via: :post
     end
     resources :sites, only: :index
