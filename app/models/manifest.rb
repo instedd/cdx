@@ -17,15 +17,14 @@ class Manifest < ActiveRecord::Base
 
   CURRENT_VERSION = "1.5.0"
 
+  SCOPES = [TestResult, Sample, Patient, Encounter].map(&:entity_scope).freeze
+
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
   def self.new_message
-    {
-      TestResult.entity_scope => {"core" => {}, "pii" => {"custom" => {}}, "custom" => {}},
-      Sample.entity_scope     => {"core" => {}, "pii" => {"custom" => {}}, "custom" => {}},
-      Patient.entity_scope    => {"core" => {}, "pii" => {"custom" => {}}, "custom" => {}},
-      Encounter.entity_scope  => {"core" => {}, "pii" => {"custom" => {}}, "custom" => {}},
-    }
+    Hash[SCOPES.map do |scope|
+      [scope, {"core" => {}, "pii" => {"custom" => {}}, "custom" => {}}]
+    end]
   end
 
   def reload
@@ -208,6 +207,7 @@ class Manifest < ActiveRecord::Base
     if loaded_definition["custom_fields"].is_a? Hash
       custom_fields.each do |custom_field_name, custom_field|
         check_no_type custom_field_name, custom_field
+        check_scope custom_field_name
       end
     else
       self.errors.add(:custom_fields, "must be a json object")
@@ -217,6 +217,15 @@ class Manifest < ActiveRecord::Base
   def check_no_type(custom_field_name, custom_field)
     if custom_field["type"]
       self.errors.add(:invalid_type, ": target '#{custom_field_name}'. Field can't specify a type.")
+    end
+  end
+
+  def check_scope(custom_field_name)
+    scope, name = custom_field_name.split(PATH_SPLIT_TOKEN)
+    if name.nil?
+      self.errors.add(:custom_fields, ": target '#{custom_field_name}'. A scope must be specified.")
+    elsif !SCOPES.include?(scope)
+      self.errors.add(:custom_fields, ": target '#{custom_field_name}'. Scope '#{scope}' is invalid.")
     end
   end
 end
