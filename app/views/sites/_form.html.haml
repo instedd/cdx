@@ -47,7 +47,7 @@
       = link_to 'Cancel', sites_path, class: 'btn-link'
       - if @can_delete
         - if @can_be_deleted
-          = link_to "Delete", [@institution, @site], method: :delete, data: { confirm: "Are you sure you want to delete the site '#{@site.name}'" }, class: 'btn-secondary pull-right', title: 'Delete Site'
+          = link_to "Delete", @site, method: :delete, data: { confirm: "Are you sure you want to delete the site '#{@site.name}'" }, class: 'btn-secondary pull-right', title: 'Delete Site'
         - else
           - # TODO: link to page with Devices tab always active - it's the current default, but may change
           = link_to "Delete", site_path(@site), data: { confirm: "The site '#{@site.name}' has #{@site.devices.count} associated #{"device".pluralize(@site.devices.count)}. You should delete or reassign them to another site before deleting this one.\n\nWould you like to go to the devices list?" }, class: 'btn-secondary pull-right', title: 'Delete Site'
