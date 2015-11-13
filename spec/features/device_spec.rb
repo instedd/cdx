@@ -26,10 +26,42 @@ describe "device" do
           expect(page).to have_content("MyDevice")
           expect(page).to have_content("MyModel")
           expect(page).to have_content("Activation token")
+          expect(page).to_not have_content("Secret Key")
         end
       end
 
-      it "can create model without activation and device show a secret ket only once"
+      it "can create model without activation and device show a secret ket only once" do
+        goto_page NewDeviceModelPage do |page|
+          page.name.set "MyModel"
+          page.support_url.set "example.org/support"
+          page.supports_activation.set false
+          page.manifest.attach "db/seeds/manifests/genoscan_manifest.json"
+          page.submit
+        end
+
+        goto_page NewDevicePage do |page|
+          page.device_model.set "MyModel"
+          page.name.set "MyDevice"
+          page.serial_number.set "1234"
+          page.submit
+        end
+
+        expect_page DeviceSetupPage do |page|
+          expect(page).to have_content("MyDevice")
+          expect(page).to have_content("MyModel")
+          expect(page).to_not have_content("Activation token")
+          expect(page).to have_content("Secret Key")
+          expect(page).to_not have_content("Regenerate Key")
+          expect(page).to have_content("This is the last time you will be able to view this key.")
+        end
+
+        visit current_path
+        expect_page DeviceSetupPage do |page|
+          expect(page).to have_content("Secret Key")
+          expect(page).to have_content("Regenerate Key")
+          expect(page).to_not have_content("This is the last time you will be able to view this key.")
+        end
+      end
     end
   end
 
