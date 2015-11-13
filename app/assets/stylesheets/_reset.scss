@@ -51,10 +51,12 @@ li {
 .select2-container {
 
   .select2-choice {
-    background: $white;
+    background: transparent;
     height: 30px;
     border: none;
+    border-bottom: 1px solid $gray1;
     border-radius: 0;
+    padding: 0;
 
     .select2-arrow {
       background: none;
@@ -72,15 +74,34 @@ li {
 
 .select2-drop {
   min-width: 250px;
+  border-radius: 0px 0px 4px 4px;
 
   .select2-search input {
     background: url("select2.png") no-repeat 100% -21px;
-    height: 32px !important;
+    height: 35px !important;
   }
 
   &.select2-drop-active {
-    border: none;
-    box-shadow:0px 1px 3px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #cccccc;
+
+    .select2-no-results {
+      height: 35px;
+      line-height: 35px;
+    }
+  }
+}
+
+.select2-results {
+  margin: 0;
+  padding: 0;
+
+  .select2-result {
+    padding: 3px 0;
+  }
+  .select2-highlighted {
+    background: $gray1;
+    color: $black;
   }
 }
 
