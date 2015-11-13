@@ -37,7 +37,7 @@ header {
     nav {
       @include align-self(stretch);
       @include flex-grow(2);
-      text-align: center;
+      margin-left: 25px;
 
       ul {
         margin: 0;
@@ -49,9 +49,7 @@ header {
           margin: 0;
 
           &.active a {
-            background: $gray-xdark;
             color: $white;
-            font-weight: 700;
             height: 60px;
           }
         }
