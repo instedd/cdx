@@ -47,3 +47,25 @@ module FeatureSpecHelpers
     screenshot_and_open_image
   end
 end
+
+class Capybara::Node::Element
+  include CdxPageHelper
+
+  # Make every click in element wait for ajax to complete
+  def click_with_ajax
+    click_without_ajax
+    wait_for_ajax
+  end
+  alias_method_chain :click, :ajax
+
+  # remove targe=_blank before clicking
+  def click_with_target_removed
+    page.evaluate_script('$("a[target=_blank]").attr("target", null);')
+    click_without_target_removed
+  end
+  alias_method_chain :click, :target_removed
+
+  def page
+    session
+  end
+end
