@@ -11,4 +11,7 @@ class HomeController < ApplicationController
   def join
     render layout: "clean"
   end
+
+  def design
+  end
 end
