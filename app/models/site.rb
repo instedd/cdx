@@ -15,6 +15,7 @@ class Site < ActiveRecord::Base
   validates_presence_of :name
 
   after_create :compute_prefix
+  # TODO validate self.institution == parent.institution ?
 
   attr_writer :location
 

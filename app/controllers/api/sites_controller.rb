@@ -6,8 +6,15 @@ class Api::SitesController < ApiController
       Site.all
     end
 
+    @uuids = Set.new
     @sites = check_access(@sites, READ_SITE).map do |site|
-      {"uuid" => site.uuid, "name" => site.name, "location" => site.location_geoid}
+      @uuids << site.uuid
+
+      {"uuid" => site.uuid, "name" => site.name, "location" => site.location_geoid, "parent_uuid" => site.parent.try(:uuid) }
+    end
+
+    @sites.each do |site|
+      site["parent_uuid"] = nil unless @uuids.include?(site["parent_uuid"])
     end
 
     respond_to do |format|
