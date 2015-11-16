@@ -36,10 +36,10 @@ describe Api::SitesController do
     context "hierarchical" do
       let!(:institution) { Institution.make }
       let!(:root) { Site.make institution: institution }
-      let!(:site_a) { Site.make institution: institution, parent: root }
-      let!(:site_a_1) { Site.make institution: institution, parent: site_a }
-      let!(:site_b) { Site.make institution: institution, parent: root }
-      let!(:site_b_1) { Site.make institution: institution, parent: site_b }
+      let!(:site_a) { Site.make :child, parent: root }
+      let!(:site_a_1) { Site.make :child, parent: site_a }
+      let!(:site_b) { Site.make :child, parent: root }
+      let!(:site_b_1) { Site.make :child, parent: site_b }
 
       let(:json_response) { Oj.load(response.body) }
       def response_of(site)

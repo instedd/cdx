@@ -142,6 +142,11 @@ Site.blueprint do
   lng { rand(-90..90) }
 end
 
+Site.blueprint :child do
+  parent { nil }
+  institution { parent.institution }
+end
+
 Location; class Location
   def self.make(params={})
     LocationService.repository.make(params)

@@ -524,8 +524,8 @@ describe ComputedPolicy do
 
   context "sites" do
     let!(:site1) { Site.make }
-    let!(:site11) { Site.make parent_id: site1.id }
-    let!(:site111) { Site.make parent_id: site11.id }
+    let!(:site11) { Site.make :child, parent: site1 }
+    let!(:site111) { Site.make :child, parent: site11 }
 
     let!(:device1) { Device.make site_id: site1.id }
     let!(:device11) { Device.make site_id: site11.id }

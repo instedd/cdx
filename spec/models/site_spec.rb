@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 describe Site do
+  it "validates self institution match parent institution" do
+    institution1 = Institution.make
+    institution2 = Institution.make
+    site1 = Site.make institution: institution1
+    site2 = Site.make_unsaved institution: institution2, parent: site1
+    expect(site2).to_not be_valid
+  end
+
   it "computes prefix for self" do
     site = Site.make
     expect(site.prefix).to eq(site.uuid.to_s)
@@ -8,14 +16,14 @@ describe Site do
 
   it "computes prefix for self with parent" do
     site1 = Site.make
-    site2 = Site.make parent_id: site1.id
+    site2 = Site.make :child, parent: site1
     expect(site2.prefix).to eq("#{site1.uuid}.#{site2.uuid}")
   end
 
   it "computes prefix for self with parent and grandparent" do
     site1 = Site.make
-    site2 = Site.make parent_id: site1.id
-    site3 = Site.make parent_id: site2.id
+    site2 = Site.make :child, parent: site1
+    site3 = Site.make :child, parent: site2
     expect(site3.prefix).to eq("#{site1.uuid}.#{site2.uuid}.#{site3.uuid}")
 
     expect(site3.path).to eq([site1.uuid, site2.uuid, site3.uuid])

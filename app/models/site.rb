@@ -12,10 +12,10 @@ class Site < ActiveRecord::Base
   acts_as_paranoid
 
   validates_presence_of :institution
+  validate :same_institution_as_parent
   validates_presence_of :name
 
   after_create :compute_prefix
-  # TODO validate self.institution == parent.institution ?
 
   attr_writer :location
 
@@ -89,5 +89,11 @@ class Site < ActiveRecord::Base
       self.prefix = uuid
     end
     self.save!
+  end
+
+  def same_institution_as_parent
+    if parent && parent.institution != self.institution
+      self.errors.add(:institution, "must match parent site institution")
+    end
   end
 end

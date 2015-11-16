@@ -30,6 +30,7 @@ class SitesController < ApplicationController
     return unless authorize_resource(@institution, CREATE_INSTITUTION_SITE)
 
     @site = @institution.sites.new(site_params)
+    @sites = check_access(Site, READ_SITE)
 
     respond_to do |format|
       if @site.save
