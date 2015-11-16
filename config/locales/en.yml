@@ -26,3 +26,5 @@ en:
     attributes:
       manifest:
         definition: Manifest
+      site:
+        parent: Supervisor
