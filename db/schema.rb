@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151110161047) do
+ActiveRecord::Schema.define(version: 20151116133521) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -279,7 +279,6 @@ ActiveRecord::Schema.define(version: 20151110161047) do
   end
 
   add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree
-  add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id_hash", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
 
   create_table "sites", force: :cascade do |t|
