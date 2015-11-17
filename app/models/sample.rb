@@ -17,8 +17,10 @@ class Sample < ActiveRecord::Base
     "sample"
   end
 
-  def self.find_by_entity_id(entity_id, institution_id)
-    joins(:sample_identifiers).where(sample_identifiers: {entity_id: entity_id.to_s}, institution_id: institution_id).first
+  def self.find_by_entity_id(entity_id, opts)
+    query = joins(:sample_identifiers).where(sample_identifiers: {entity_id: entity_id.to_s}, institution_id: opts.fetch(:institution_id))
+    query = query.where(sample_identifiers: {site_id: opts[:site_id]}) if opts[:site_id]
+    query.first
   end
 
   def self.find_all_by_any_uuid(uuids)

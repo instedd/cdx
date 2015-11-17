@@ -86,6 +86,11 @@ class TestResult < ActiveRecord::Base
     test_result_parsed_data.last
   end
 
+  def device=(value)
+    super
+    set_foreign_keys
+  end
+
   private
 
   def destroy_from_index

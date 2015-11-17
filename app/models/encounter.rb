@@ -84,8 +84,8 @@ class Encounter < ActiveRecord::Base
     }}.deep_stringify_keys).fields
   end
 
-  def self.find_by_entity_id(entity_id, institution_id)
-    find_by(entity_id: entity_id.to_s, institution_id: institution_id)
+  def self.find_by_entity_id(entity_id, opts)
+    find_by(entity_id: entity_id.to_s, institution_id: opts.fetch(:institution_id))
   end
 
   def self.query params, user

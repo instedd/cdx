@@ -586,15 +586,17 @@ class Blender
     def before_save(entity)
       sample = @parents[Sample].try(:target)
       sample_id = @sample_id
+      site_id = entity.site_id
 
       existing_identifier = entity.sample_identifier
-      existing_identifier_does_not_match =  existing_identifier && (existing_identifier.sample != sample || existing_identifier.sample_id != sample_id)
+      existing_identifier_does_not_match =  existing_identifier && (existing_identifier.sample != sample || existing_identifier.sample_id != sample_id || existing_identifier.site_id != site_id)
 
       if sample.nil?
         entity.sample_identifier = nil
         @garbage << existing_identifier
       elsif existing_identifier.nil? || existing_identifier_does_not_match
-        entity.sample_identifier = sample.sample_identifiers.where(entity_id: sample_id).first || SampleIdentifier.new(entity_id: sample_id, sample: sample)
+        matching_sample_identifier = sample.sample_identifiers.all.find { |si| si.entity_id == sample_id && si.site_id == site_id }
+        entity.sample_identifier = matching_sample_identifier || sample.sample_identifiers.build(entity_id: sample_id, site_id: site_id)
         @garbage << existing_identifier
       end
     end

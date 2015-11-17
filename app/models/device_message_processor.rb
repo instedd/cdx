@@ -59,7 +59,7 @@ class DeviceMessageProcessor
         new_entity_id = parsed_message.get_in(klazz.entity_scope, (klazz == Patient ? 'pii' : 'core'), 'id').try(:to_s)
         entity_id_does_not_match = original_entity_id && new_entity_id && original_entity_id != new_entity_id
 
-        new_entity = find_entity_by_id(klazz, new_entity_id, (klazz != Patient))
+        new_entity = find_entity_by_id(klazz, new_entity_id)
         original_blender = test_blender.send(klazz.entity_scope)
 
         new_entity ||= klazz.new(institution: institution) if entity_id_does_not_match || original_blender.nil?
@@ -84,11 +84,13 @@ class DeviceMessageProcessor
 
     private
 
-    def find_entity_by_id(klass, entity_id, use_reset_policy = true)
+    def find_entity_by_id(klass, entity_id)
       return nil if entity_id.nil?
       query = klass
-      query = query.within_time(entity_reset_time_span(klass), @parent.device_message.created_at) if use_reset_policy
-      query.find_by_entity_id(entity_id, @parent.institution.id)
+      query = query.within_time(entity_reset_time_span(klass), @parent.device_message.created_at) if klass != Patient
+      query_opts = { institution_id: @parent.institution.id }
+      query_opts[:site_id] = @parent.device.site_id unless @parent.device.site_id.nil? || @parent.institution.kind_manufacturer?
+      query.find_by_entity_id(entity_id, query_opts)
     end
 
     def attributes_for(scope)
