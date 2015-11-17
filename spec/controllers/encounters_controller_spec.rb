@@ -502,13 +502,14 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   end
 
   describe 'PUT #merge_samples' do
+    let(:site) { Site.make(institution: institution) }
 
     let(:samples) do
       3.times.map do |x|
         test = TestResult.make \
           institution: institution,
-          device: Device.make(site: Site.make(institution: institution)),
-          sample_identifier: SampleIdentifier.make(entity_id: "ID#{x+1}", sample: Sample.make(institution: institution))
+          device: Device.make(site: site),
+          sample_identifier: SampleIdentifier.make(site: site, entity_id: "ID#{x+1}", sample: Sample.make(institution: institution))
         test.sample
       end
     end
@@ -519,14 +520,14 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     let!(:sample2) do
       test = TestResult.make \
           institution: institution,
-          device: Device.make(site: Site.make(institution: institution)),
-          sample_identifier: SampleIdentifier.make(entity_id: "ID2B", sample: samples[1])
+          device: Device.make(site: site),
+          sample_identifier: SampleIdentifier.make(site: site, entity_id: "ID2B", sample: samples[1])
 
       samples[1].reload
     end
 
     let(:sample_with_encounter) do
-      device = Device.make institution: institution
+      device = Device.make institution: institution, site: site
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
       sample_with_encounter = Sample.first
       sample_with_encounter.encounter = Encounter.make institution: institution
@@ -651,8 +652,8 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       sample_with_patient1, sample_with_patient2 = Sample.last(2)
 
-      expect(sample_with_patient1.patient).to eq(Patient.find_by_entity_id('a', institution))
-      expect(sample_with_patient2.patient).to eq(Patient.find_by_entity_id('b', institution))
+      expect(sample_with_patient1.patient).to eq(Patient.find_by_entity_id('a', institution_id: institution.id))
+      expect(sample_with_patient2.patient).to eq(Patient.find_by_entity_id('b', institution_id: institution.id))
 
       put :merge_samples, sample_uuids: [sample_with_patient1.uuid, sample_with_patient2.uuid], encounter: {
         institution: { uuid: institution.uuid },

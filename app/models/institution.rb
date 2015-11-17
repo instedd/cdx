@@ -37,6 +37,12 @@ class Institution < ActiveRecord::Base
     name
   end
 
+  KINDS.each do |kind|
+    define_method "kind_#{kind}?" do
+      self.kind.try(:to_s) == kind
+    end
+  end
+
   private
 
   def update_owner_policies

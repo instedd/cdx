@@ -11,8 +11,8 @@ module AutoIdHash
   end
 
   class_methods do
-    def find_by_entity_id(entity_id, institution_id)
-      find_by(entity_id_hash: MessageEncryption.hash(entity_id.to_s), institution_id: institution_id)
+    def find_by_entity_id(entity_id, opts={})
+      find_by(entity_id_hash: MessageEncryption.hash(entity_id.to_s), institution_id: opts.fetch(:institution_id))
     end
   end
 end

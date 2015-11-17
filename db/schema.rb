@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151116133521) do
+ActiveRecord::Schema.define(version: 20151116134931) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -260,6 +260,7 @@ ActiveRecord::Schema.define(version: 20151116133521) do
     t.integer "sample_id", limit: 4
     t.string  "entity_id", limit: 255
     t.string  "uuid",      limit: 255
+    t.integer "site_id",   limit: 4
   end
 
   add_index "sample_identifiers", ["entity_id"], name: "index_sample_identifiers_on_entity_id", using: :btree

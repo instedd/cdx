@@ -77,9 +77,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
     end
   end
 
-  let(:device) {Device.make}
+  let(:institution) {Institution.make(kind: 'institution')}
 
-  let(:institution) {device.institution}
+  let(:site) {Site.make(institution: institution)}
+
+  let(:device) {Device.make(institution: institution, site: site)}
 
   let(:device_message) do
     device_message = DeviceMessage.new(device: device, plain_text_data: '{}')
@@ -208,7 +210,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
       SampleIdentifier.make(
         sample: sample,
         uuid: 'abc',
-        entity_id: SAMPLE_ID
+        entity_id: SAMPLE_ID,
+        site: site
       )
     end
 
@@ -355,29 +358,106 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
   end
 
-  it "shouldn't update sample from another institution" do
-    core_fields = {"type" => SAMPLE_TYPE}
-    custom_fields = {"hiv" => PATIENT_HIV}
+  context "sample identification scope" do
 
-    sample = Sample.make(
-      core_fields: core_fields,
-      custom_fields: custom_fields
-    )
+    let(:core_fields) { {"type" => SAMPLE_TYPE} }
+    let(:custom_fields) { {"hiv" => PATIENT_HIV} }
 
-    sample_identifier = SampleIdentifier.make(
-      sample: sample,
-      uuid: 'abc',
-      entity_id: SAMPLE_ID
-    )
+    it "shouldn't update sample from another institution" do
+      sample = Sample.make(
+        core_fields: core_fields,
+        custom_fields: custom_fields
+      )
 
-    device_message_processor.process
+      sample_identifier = SampleIdentifier.make(
+        sample: sample,
+        uuid: 'abc',
+        entity_id: SAMPLE_ID
+      )
 
-    expect(Sample.count).to eq(2)
+      device_message_processor.process
 
-    sample = sample.reload
+      expect(Sample.count).to eq(2)
 
-    expect(sample.core_fields).to eq(core_fields)
-    expect(sample.custom_fields).to eq(custom_fields)
+      sample = sample.reload
+
+      expect(sample.core_fields).to eq(core_fields)
+      expect(sample.custom_fields).to eq(custom_fields)
+    end
+
+    it "shouldn't update sample from another site" do
+      sample = Sample.make(
+        core_fields: core_fields,
+        custom_fields: custom_fields,
+        institution: institution
+      )
+
+      sample_identifier = SampleIdentifier.make(
+        sample: sample,
+        uuid: 'abc',
+        entity_id: SAMPLE_ID,
+        site: Site.make(institution: institution)
+      )
+
+      device_message_processor.process
+
+      expect(Sample.count).to eq(2)
+
+      sample = sample.reload
+
+      expect(sample.core_fields).to eq(core_fields)
+      expect(sample.custom_fields).to eq(custom_fields)
+    end
+
+    it "shouldn't update sample with no site" do
+      sample = Sample.make(
+        core_fields: core_fields,
+        custom_fields: custom_fields,
+        institution: institution
+      )
+
+      sample_identifier = SampleIdentifier.make(
+        sample: sample,
+        uuid: 'abc',
+        entity_id: SAMPLE_ID,
+        site: nil
+      )
+
+      device_message_processor.process
+
+      expect(Sample.count).to eq(2)
+
+      sample = sample.reload
+
+      expect(sample.core_fields).to eq(core_fields)
+      expect(sample.custom_fields).to eq(custom_fields)
+    end
+
+    it "should update sample from another site for manufacturer" do
+      institution.update_attributes! kind: 'manufacturer'
+
+      sample = Sample.make(
+        core_fields: core_fields,
+        custom_fields: custom_fields,
+        institution: institution
+      )
+
+      sample_identifier = SampleIdentifier.make(
+        sample: sample,
+        uuid: 'abc',
+        entity_id: SAMPLE_ID
+      )
+
+      device_message_processor.process
+
+      expect(Sample.count).to eq(1)
+
+      sample = sample.reload
+
+      expect(sample.core_fields).to eq(core_fields.merge(SAMPLE_CORE_FIELDS))
+      expect(sample.custom_fields).to eq(custom_fields.merge(SAMPLE_CUSTOM_FIELDS))
+    end
+
   end
 
   it "should update tests with the same test_id" do
@@ -665,7 +745,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
         sample_identifier = SampleIdentifier.make(
           sample: sample,
           uuid: 'abc',
-          entity_id: SAMPLE_ID
+          entity_id: SAMPLE_ID,
+          site: site
         )
 
         device_message_processor.process

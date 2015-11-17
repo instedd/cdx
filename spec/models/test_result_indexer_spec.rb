@@ -22,26 +22,32 @@ describe TestResultIndexer, elasticsearch: true do
     SampleIdentifier.make(sample: sample, uuid: 'abc')
   end
 
-  let(:test){ TestResult.make(
-    "sample_identifier" => sample_identifier,
-    "patient" => patient,
-    "encounter" => encounter,
-    "institution" => institution,
-    "test_id" => '4',
-    "custom_fields" => {
-      "concentration" => "15%"
-    },
-    "core_fields" => {
-      "id" => "4",
-      "name" => "mtb",
-      "assays" => [
-        {
-          "result" => "positive",
-          "name" => "mtb"
-        }
-      ]
-    }
-  )}
+  let(:device) do
+    Device.make(institution: institution)
+  end
+
+  let(:test) do
+    TestResult.make(
+      device: device,
+      sample_identifier: sample_identifier,
+      patient: patient,
+      encounter: encounter,
+      institution: institution,
+      test_id: '4',
+      custom_fields: {
+        "concentration" => "15%"
+      },
+      core_fields: {
+        "id" => "4",
+        "name" => "mtb",
+        "assays" => [
+          {
+            "result" => "positive",
+            "name" => "mtb"
+          }
+        ]
+      })
+  end
 
   let(:test_indexer) { TestResultIndexer.new(test)}
 
