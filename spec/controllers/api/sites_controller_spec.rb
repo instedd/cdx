@@ -13,7 +13,7 @@ describe Api::SitesController do
       institution = Institution.make user: user
       sites = 3.times.map do
         site = Site.make(institution: institution)
-        {'uuid' => site.uuid, 'name' => site.name, 'location' => site.location_geoid, 'parent_uuid' => site.parent.try(:uuid)}
+        {'uuid' => site.uuid, 'name' => site.name, 'location' => site.location_geoid, 'parent_uuid' => site.parent.try(:uuid), 'institution_uuid' => site.institution.uuid}
       end
 
       result = get :index, format: 'json'
@@ -24,7 +24,7 @@ describe Api::SitesController do
       institution = Institution.make user: user
       sites = 3.times.map do
         site = Site.make(institution: institution)
-        {'uuid' => site.uuid, 'name' => site.name, 'location' => site.location_geoid, 'parent_uuid' => site.parent.try(:uuid)}
+        {'uuid' => site.uuid, 'name' => site.name, 'location' => site.location_geoid, 'parent_uuid' => site.parent.try(:uuid), 'institution_uuid' => site.institution.uuid}
       end
 
       Site.make institution: (Institution.make user: user)
@@ -52,7 +52,7 @@ describe Api::SitesController do
         get :index, format: 'json'
         expect(json_response).to include({'total_count' => 5})
         [root, site_a, site_a_1, site_b, site_b_1].map { |site|
-          expect(response_of(site)).to eq({'uuid' => site.uuid, 'name' => site.name, 'location' => site.location_geoid, 'parent_uuid' => site.parent.try(:uuid)})
+          expect(response_of(site)).to eq({'uuid' => site.uuid, 'name' => site.name, 'location' => site.location_geoid, 'parent_uuid' => site.parent.try(:uuid), 'institution_uuid' => site.institution.uuid})
         }
       end
 
@@ -63,7 +63,7 @@ describe Api::SitesController do
 
         get :index, format: 'json'
         expect(json_response).to include({'total_count' => 1})
-        expect(response_of(site_a_1)).to eq({'uuid' => site_a_1.uuid, 'name' => site_a_1.name, 'location' => site_a_1.location_geoid, 'parent_uuid' => nil})
+        expect(response_of(site_a_1)).to eq({'uuid' => site_a_1.uuid, 'name' => site_a_1.name, 'location' => site_a_1.location_geoid, 'parent_uuid' => nil, 'institution_uuid' => site_a_1.institution.uuid})
       end
 
       it "READ_SITE should propagate to the childs" do
@@ -73,9 +73,9 @@ describe Api::SitesController do
 
         get :index, format: 'json'
         expect(json_response).to include({'total_count' => 3})
-        expect(response_of(site_a)).to eq({'uuid' => site_a.uuid, 'name' => site_a.name, 'location' => site_a.location_geoid, 'parent_uuid' => nil})
-        expect(response_of(site_a_1)).to eq({'uuid' => site_a_1.uuid, 'name' => site_a_1.name, 'location' => site_a_1.location_geoid, 'parent_uuid' => site_a_1.parent.uuid})
-        expect(response_of(site_b_1)).to eq({'uuid' => site_b_1.uuid, 'name' => site_b_1.name, 'location' => site_b_1.location_geoid, 'parent_uuid' => nil})
+        expect(response_of(site_a)).to eq({'uuid' => site_a.uuid, 'name' => site_a.name, 'location' => site_a.location_geoid, 'parent_uuid' => nil, 'institution_uuid' => site_a.institution.uuid})
+        expect(response_of(site_a_1)).to eq({'uuid' => site_a_1.uuid, 'name' => site_a_1.name, 'location' => site_a_1.location_geoid, 'parent_uuid' => site_a_1.parent.uuid, 'institution_uuid' => site_a_1.institution.uuid})
+        expect(response_of(site_b_1)).to eq({'uuid' => site_b_1.uuid, 'name' => site_b_1.name, 'location' => site_b_1.location_geoid, 'parent_uuid' => nil, 'institution_uuid' => site_b_1.institution.uuid})
       end
     end
 
@@ -101,7 +101,7 @@ describe Api::SitesController do
         get :index, format: 'csv'
 
         check_sites_csv response
-        expect(response.body).to eq("uuid,name,location\n#{site.uuid},#{site.name},#{site.location_geoid}\n")
+        expect(response.body).to eq("uuid,name,location,parent_uuid,institution_uuid\n#{site.uuid},#{site.name},#{site.location_geoid},\"#{site.parent.try(:uuid)}\",#{site.institution.uuid}\n")
       end
 
       it "renders column names even when there are no sites to render" do
@@ -110,7 +110,7 @@ describe Api::SitesController do
         get :index, format: 'csv'
 
         check_sites_csv response
-        expect(response.body).to eq("uuid,name,location\n")
+        expect(response.body).to eq("uuid,name,location,parent_uuid,institution_uuid\n")
       end
     end
   end
