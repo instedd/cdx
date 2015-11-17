@@ -15,7 +15,7 @@ var ContextSitePicker = React.createClass({
     return (
       <div>
         <p>
-        Selected: {this.state.site.name}
+        Selected: {this.state.site.name} - {this.state.site.uuid}
         </p>
         <SitePicker selected_uuid={this.props.site.uuid} onSiteSelected={this.changeContextSite} />
       </div>
@@ -26,7 +26,8 @@ var ContextSitePicker = React.createClass({
 var SitePicker = React.createClass({
   getDefaultProps: function() {
     return {
-      url: '/api/sites'
+      institutions_url: '/api/institutions',
+      sites_url: '/api/sites'
     }
   },
 
@@ -35,16 +36,26 @@ var SitePicker = React.createClass({
   },
 
   componentDidMount: function() {
-    $.get(this.props.url, function(result) {
-      if (!this.isMounted()) return;
+    $.get(this.props.institutions_url, function(institutions_result) {
+      $.get(this.props.sites_url, function(sites_result) {
+        if (!this.isMounted()) return;
 
-      roots_and_selected = this._buildTree(result.sites, '', this.props.selected_uuid);
+        var sites_and_institutions = sites_result.sites;
+        _.each(sites_and_institutions, function(site) {
+          site.parent_uuid = site.parent_uuid || site.institution_uuid;
+        });
+        _.each(institutions_result.institutions, function(institution) {
+          sites_and_institutions.push(institution);
+        });
 
-      this.setState(React.addons.update(this.state, {
-        sites: { $set: result.sites },
-        sites_tree: { $set: roots_and_selected[0] },
-        selected_site: { $set: roots_and_selected[1] }
-      }));
+        roots_and_selected = this._buildTree(sites_and_institutions, '', this.props.selected_uuid);
+
+        this.setState(React.addons.update(this.state, {
+          sites: { $set: sites_and_institutions },
+          sites_tree: { $set: roots_and_selected[0] },
+          selected_site: { $set: roots_and_selected[1] }
+        }));
+      }.bind(this));
     }.bind(this));
   },
 
