@@ -1,6 +1,6 @@
 var AddItemSearchSampleTemplate = React.createClass({
   render: function() {
-    return (<span>{this.props.item.entity_ids[0]} ({this.props.item.uuid})</span>);
+    return (<span title={this.props.item.uuid}>{this.props.item.entity_ids[0]}</span>);
   }
 });
 
@@ -13,13 +13,10 @@ var Sample = React.createClass({
 
 
   render: function() {
-    // TODO add barcode
-    // TODO add printer
-
     var unifiedSamples = null;
     if (this.props.sample.entity_ids.length > 1) {
       unifiedSamples = (
-        <div>
+        <div className="unified">
           <span>Unified samples</span>
           <ul>
             {_(this.props.sample.entity_ids).rest().map(function(entity_id) {
@@ -31,13 +28,13 @@ var Sample = React.createClass({
 
     var unifySampleAction = null;
     if (this.props.onUnifySample) {
-      unifySampleAction = (<div><a onClick={this.unifySample}>Unify sample</a><br/></div>);
+      unifySampleAction = (<a href="#" className="unify" onClick={this.unifySample}><span className="icon-unify"></span></a>);
     }
 
     return (
     <li>
       {unifySampleAction}
-      {this.props.sample.entity_ids[0]} ({this.props.sample.uuid})
+      {this.props.sample.entity_ids[0]}
       {unifiedSamples}
     </li>);
   }
@@ -47,7 +44,7 @@ var SamplesList = React.createClass({
   render: function() {
     var _this = this;
     return (
-      <ul>
+      <ul className="samples">
         {this.props.samples.map(function(sample) {
            return <Sample key={sample.uuid} sample={sample} onUnifySample={_this.props.onUnifySample}/>;
         })}

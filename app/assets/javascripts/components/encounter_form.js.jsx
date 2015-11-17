@@ -160,7 +160,7 @@ var EncounterForm = React.createClass({
               );
             }.bind(this))}
 
-            <textarea value={this.state.encounter.observations} placeholder="Observations" onChange={this.encounterChanged('observations')} />
+            <textarea className="observations" value={this.state.encounter.observations} placeholder="Observations" onChange={this.encounterChanged('observations')} />
           </div>
         </div>);
     } else {
@@ -179,13 +179,12 @@ var EncounterForm = React.createClass({
         <div className="row">
           <div className="col pe-2">
             <label>Samples</label>
-            <p>
-              <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
-
-            </p>
           </div>
           <div className="col">
             <SamplesList samples={this.state.encounter.samples} onUnifySample={this.showUnifySamplesModal} />
+            <p>
+              <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
+            </p>
           </div>
 
           <Modal ref="addSamplesModal">
@@ -204,7 +203,7 @@ var EncounterForm = React.createClass({
               <a href="#" className="modal-back" onClick={this.closeUnifySamplesModal}><img src="/assets/arrow-left.png"/></a>
               Unify sample
             </h1>
-            <p>Unifying sample {this.state.unifyingSample ? this.state.unifyingSample.uuid : ""}</p>
+            <p>Unifying sample {this.state.unifyingSample ? this.state.unifyingSample.entity_ids[0] : ""}</p>
 
             <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid + "&sample_uuids=" + _.pluck(this.state.encounter.samples, 'uuid')} onItemChosen={this.unifySample}
               itemTemplate={AddItemSearchSampleTemplate}
