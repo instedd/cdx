@@ -1,0 +1,20 @@
+{  
+  "id":"46",
+  "type":"2",
+  "idString":"Tobi1235-8_7",
+  "startTime":"2015-09-28 23:46:53",
+  "endTime":"2015-09-29 01:33:17",
+  "swRev":"00.02.03",
+  "cartExpiry":"2017-07-04",
+  "CartridgeSerialNumber":"6000704000001",
+  "InstrumentQCStatus":"TRUE",
+  "lastInstrQcPassed":"TRUE",
+  "lastInstrQcDate":"2017-07-04",
+  "TbFinalResultStr":"POS HIGH",
+  "TbCount1":"46.0",
+  "TbCount2":"56.0",
+  "TbPercent":"22.1",
+  "errors":"61",
+  "QcMagnification":"6.98",
+  "QcResolution":"5.0"
+}
