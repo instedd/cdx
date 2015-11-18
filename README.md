@@ -58,7 +58,7 @@ Locations are obtained from the [InSTEDD Location Service](https://github.com/in
 
 ### Poirot
 
-CDX uses [Poirot](https://github.com/instedd/poirot_rails) for additional logging. You need to install zeromq library for it to work, or disable it in config/poirot.yml.
+CDX uses [Poirot](https://github.com/instedd/poirot_rails) for additional logging. You need to install `zeromq` library version 3.2.0 for it to work, or disable it in config/poirot.yml. On Mac OS, run `brew install homebrew/versions/zeromq32`; if you have other versions of `zeromq` installed, it may be required to run `brew link zeromq32 --force` as well.
 
 ### NNDD
 
