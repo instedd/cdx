@@ -270,5 +270,44 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(db_test.test_id).to eq('12345678901234567890')
       end
     end
+
+
+    context 'BDMicroImager' do
+      let!(:device_model) { DeviceModel.make name: "BD MicroImager" }
+      let!(:manifest)    { load_manifest 'bdmicro_imager_manifest.json' }
+
+      it "should parse bdmicro's document" do
+        copy_sample('bdmicro_imager_sample.json', 'jsons')
+        DeviceMessageImporter.new("*.json").import_from sync_dir
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
+
+        tests = all_elasticsearch_tests
+                
+        expect(tests.size).to eq(1)
+                
+        expect(tests.first['_source']['test']['error_code']).to eq(61)
+        expect(tests.first['_source']['test']['id']).to eq("46")
+        expect(tests.first['_source']['test']['custom_fields']['device_software_version']).to eq("00.02.03")
+
+        expect(tests.first['_source']['test']['custom_fields']['tbcount1']).to eq("46.0")
+        expect(tests.first['_source']['test']['custom_fields']['tbcount2']).to eq("56.0")
+        expect(tests.first['_source']['test']['custom_fields']['tbpercent']).to eq("22.1")
+        expect(tests.first['_source']['test']['custom_fields']['qcmagnification']).to eq("6.98")
+        expect(tests.first['_source']['test']['custom_fields']['qcresolution']).to eq("5.0")
+        expect(tests.first['_source']['test']['custom_fields']['cartridge_expiration_date']).to eq("2017-07-04T00:00:00.000Z")
+        expect(tests.first['_source']['test']['custom_fields']['cartridge_number']).to eq("6000704000001")
+        expect(tests.first['_source']['test']['custom_fields']['qc_date']).to eq("2017-07-04T00:00:00.000Z")
+        expect(tests.first['_source']['test']['custom_fields']['qc_passed']).to eq("passed")
+
+        expect(tests.first['_source']['test']['type']).to eq("specimen")
+        expect(tests.first['_source']['test']['name']).to eq("TBMI")
+        expect(tests.first['_source']['test']['status']).to eq("success")
+        expect(tests.first['_source']['test']['start_time']).to eq('2015-09-28T23:46:53.000Z')
+        expect(tests.first['_source']['test']['end_time']).to eq('2015-09-29T01:33:17.000Z')
+
+        expect( tests.first['_source']['test']['assays']).to eq [{"condition"=>"mtb", "result"=>"positive"}]
+      end
+    end
+
   end
 end
