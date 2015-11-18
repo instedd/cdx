@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :check_no_institution!
   before_action :load_js_global_settings
+  before_action :load_context
 
   decent_configuration do
     strategy DecentExposure::StrongParametersStrategy
@@ -65,6 +66,21 @@ class ApplicationController < ActionController::Base
       @institutions
     else
       @institutions
+    end
+  end
+
+  def default_url_options(options={})
+    if current_user
+      default_context = params[:context_uuid] || check_access(Institution, READ_INSTITUTION).first.try(:uuid)
+      return {:context_uuid => default_context} if default_context
+    end
+
+    {}
+  end
+
+  def load_context
+    if current_user
+      @navigation_context = NavigationContext.new(current_user, params[:context_uuid])
     end
   end
 

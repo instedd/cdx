@@ -1,1 +1,4 @@
-= react_component('ContextSitePicker', {site: check_access(Site, Policy::Actions::READ_SITE).sample.tap{ |site| { uuid: site.uuid, name: site.name } } })
+= react_component('NavigationContextPicker', {context: @navigation_context.to_hash })
+
+
+%h1= @navigation_context.name

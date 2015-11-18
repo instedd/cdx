@@ -1,11 +1,11 @@
-var ContextSitePicker = React.createClass({
+var NavigationContextPicker = React.createClass({
   getInitialState: function() {
-    return { site: this.props.site };
+    return { context: this.props.context };
   },
 
   changeContextSite: function(site) {
     this.setState(React.addons.update(this.state, {
-      site: { $set: site }
+      context: { $set: site }
     }));
   },
 
@@ -15,9 +15,9 @@ var ContextSitePicker = React.createClass({
     return (
       <div>
         <p>
-        Selected: {this.state.site.name} - {this.state.site.uuid}
+        Selected: {this.state.context.name} - {this.state.context.uuid}
         </p>
-        <SitePicker selected_uuid={this.props.site.uuid} onSiteSelected={this.changeContextSite} />
+        <SitePicker selected_uuid={this.props.context.uuid} onSiteSelected={this.changeContextSite} />
       </div>
     );
   }

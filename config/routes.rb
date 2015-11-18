@@ -11,6 +11,10 @@ Rails.application.routes.draw do
     registrations: 'registrations'
   }
 
+  scope 'c/:context_uuid' do
+    get 'design' => 'home#design'
+  end
+
   resources :sites do
     member do
       get :devices
@@ -91,7 +95,6 @@ Rails.application.routes.draw do
   root :to => 'home#index'
   get 'verify' => 'home#verify'
   get 'join' => 'home#join'
-  get 'design' => 'home#design'
 
   namespace :api, defaults: { format: 'json' } do
     resources :activations, only: :create
