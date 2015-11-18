@@ -5,6 +5,8 @@ class SampleIdentifier < ActiveRecord::Base
   belongs_to :site, inverse_of: :sample_identifiers
   has_many :test_results, inverse_of: :sample_identifier, dependent: :restrict_with_error
 
+  acts_as_paranoid
+
   def phantom?
     entity_id.nil?
   end

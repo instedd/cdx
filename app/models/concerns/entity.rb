@@ -15,6 +15,8 @@ module Entity
 
     validate    :valid_core_fields
     validate    :valid_sensitive_fields
+
+    acts_as_paranoid
   end
 
   attr_writer :plain_sensitive_data

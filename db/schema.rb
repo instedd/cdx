@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151116134931) do
+ActiveRecord::Schema.define(version: 20151118155324) do
 
   create_table "activation_tokens", force: :cascade do |t|
     t.string   "value",      limit: 255
@@ -141,7 +141,10 @@ ActiveRecord::Schema.define(version: 20151116134931) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "is_phantom",                   default: true
+    t.datetime "deleted_at"
   end
+
+  add_index "encounters", ["deleted_at"], name: "index_encounters_on_deleted_at", using: :btree
 
   create_table "filters", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
@@ -243,8 +246,10 @@ ActiveRecord::Schema.define(version: 20151116134931) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "is_phantom",                   default: true
+    t.datetime "deleted_at"
   end
 
+  add_index "patients", ["deleted_at"], name: "index_patients_on_deleted_at", using: :btree
   add_index "patients", ["institution_id"], name: "index_patients_on_institution_id", using: :btree
 
   create_table "policies", force: :cascade do |t|
@@ -257,12 +262,14 @@ ActiveRecord::Schema.define(version: 20151116134931) do
   end
 
   create_table "sample_identifiers", force: :cascade do |t|
-    t.integer "sample_id", limit: 4
-    t.string  "entity_id", limit: 255
-    t.string  "uuid",      limit: 255
-    t.integer "site_id",   limit: 4
+    t.integer  "sample_id",  limit: 4
+    t.string   "entity_id",  limit: 255
+    t.string   "uuid",       limit: 255
+    t.integer  "site_id",    limit: 4
+    t.datetime "deleted_at"
   end
 
+  add_index "sample_identifiers", ["deleted_at"], name: "index_sample_identifiers_on_deleted_at", using: :btree
   add_index "sample_identifiers", ["entity_id"], name: "index_sample_identifiers_on_entity_id", using: :btree
   add_index "sample_identifiers", ["sample_id"], name: "index_sample_identifiers_on_sample_id", using: :btree
   add_index "sample_identifiers", ["uuid"], name: "index_sample_identifiers_on_uuid", unique: true, using: :btree
@@ -277,8 +284,10 @@ ActiveRecord::Schema.define(version: 20151116134931) do
     t.integer  "patient_id",     limit: 4
     t.integer  "encounter_id",   limit: 4
     t.boolean  "is_phantom",                   default: true
+    t.datetime "deleted_at"
   end
 
+  add_index "samples", ["deleted_at"], name: "index_samples_on_deleted_at", using: :btree
   add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
 
@@ -352,8 +361,10 @@ ActiveRecord::Schema.define(version: 20151116134931) do
     t.integer  "institution_id",       limit: 4
     t.integer  "sample_identifier_id", limit: 4
     t.string   "site_prefix",          limit: 255
+    t.datetime "deleted_at"
   end
 
+  add_index "test_results", ["deleted_at"], name: "index_test_results_on_deleted_at", using: :btree
   add_index "test_results", ["device_id"], name: "index_test_results_on_device_id", using: :btree
   add_index "test_results", ["institution_id"], name: "index_test_results_on_institution_id", using: :btree
   add_index "test_results", ["patient_id"], name: "index_test_results_on_patient_id", using: :btree
