@@ -28,12 +28,10 @@ class Api::TestsController < ApiController
   end
 
   def schema
-    schema = TestsSchema.for params["locale"]
+    schema = TestsSchema.new params["locale"]
     respond_to do |format|
       format.json { render_json schema.build }
     end
-  rescue ActiveRecord::RecordNotFound => ex
-    render :status => :unprocessable_entity, :json => { :errors => ex.message } and return
   end
 
 end

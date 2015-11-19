@@ -31,4 +31,14 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
       end
     end
   end
+
+  context "Schema" do
+    it "should return the encounters schema" do
+      get :schema, locale: 'es-AR', format: 'json'
+      expect(response).to be_success
+      schema = Oj.load(response.body)
+      expect(schema.keys).to contain_exactly('$schema', 'type', 'title', 'properties')
+      expect(schema['title']).to eq('es-AR')
+    end
+  end
 end

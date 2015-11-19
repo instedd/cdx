@@ -16,4 +16,11 @@ class Api::EncountersController < ApiController
       format.json { render_json query.execute }
     end
   end
+
+  def schema
+    schema = EncountersSchema.new params["locale"]
+    respond_to do |format|
+      format.json { render_json schema.build }
+    end
+  end
 end

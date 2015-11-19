@@ -277,10 +277,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
     context "Schema" do
 
       it "should return test schema" do
-        schema = double('schema')
-        expect(schema).to receive(:build).and_return('a schema definition')
-        expect(TestsSchema).to receive(:for).with('es-AR').and_return(schema)
-
+        allow_any_instance_of(TestsSchema).to receive(:build).and_return('a schema definition')
         response = get :schema, locale: "es-AR", format: 'json'
 
         response_schema = Oj.load response.body
