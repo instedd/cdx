@@ -14,6 +14,7 @@
 //= require jquery.turbolinks
 //= require jquery_ujs
 //= require jquery.are-you-sure
+//= require urijs
 //= require lodash
 //= require select2
 //= require react
@@ -24,6 +25,7 @@
 //= require components
 //= require d3
 //= require_tree .
+//= require turbolinks
 
 function cdx_init_components(dom) {
   ReactRailsUJS.mountComponents(dom);

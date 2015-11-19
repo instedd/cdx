@@ -168,3 +168,19 @@ footer {
     }
   }
 }
+
+#context_side_bar {
+  display: none;
+}
+
+.show-navigation-context-picker {
+  #context_side_bar {
+    position: absolute;
+    display: block;
+    width: 300px;
+  }
+
+  .content {
+    margin-left: 300px;
+  }
+}

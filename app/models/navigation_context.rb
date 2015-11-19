@@ -4,7 +4,7 @@ class NavigationContext
   attr_reader :institution
   attr_reader :site
 
-  def initialize(user, uuid)
+  def initialize(user = nil, uuid = nil)
     @user = user
 
     @institution = Institution.where(uuid: uuid).first
@@ -26,11 +26,11 @@ class NavigationContext
   end
 
   def name
-    entity.name
+    entity.try :name
   end
 
   def uuid
-    entity.uuid
+    entity.try :uuid
   end
 
   def to_hash

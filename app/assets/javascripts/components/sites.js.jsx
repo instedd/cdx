@@ -1,28 +1,3 @@
-var NavigationContextPicker = React.createClass({
-  getInitialState: function() {
-    return { context: this.props.context };
-  },
-
-  changeContextSite: function(site) {
-    this.setState(React.addons.update(this.state, {
-      context: { $set: site }
-    }));
-  },
-
-  render: function() {
-    // since the picker tracks the selected state
-    // there is no need to update the properties
-    return (
-      <div>
-        <p>
-        Selected: {this.state.context.name} - {this.state.context.uuid}
-        </p>
-        <SitePicker selected_uuid={this.props.context.uuid} onSiteSelected={this.changeContextSite} />
-      </div>
-    );
-  }
-});
-
 var SitePicker = React.createClass({
   getDefaultProps: function() {
     return {

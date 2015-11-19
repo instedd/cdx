@@ -1,4 +1,1 @@
-= react_component('NavigationContextPicker', {context: @navigation_context.to_hash })
-
-
-%h1= @navigation_context.name
+%h1= @navigation_context.name || 'No context'

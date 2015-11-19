@@ -2,6 +2,11 @@
   .logo
     = image_tag 'cdx-logo.png'
 
+  - if @navigation_context.entity
+    %a#nav-context(href='#')
+      at
+      = @navigation_context.name
+
   %nav
     - if current_user && !@hide_nav_bar
       %ul

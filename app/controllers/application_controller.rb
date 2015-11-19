@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :check_no_institution!
   before_action :load_js_global_settings
+  before_action :ensure_context_in_url
   before_action :load_context
 
   decent_configuration do
@@ -71,16 +72,25 @@ class ApplicationController < ActionController::Base
 
   def default_url_options(options={})
     if current_user
-      default_context = params[:context_uuid] || check_access(Institution, READ_INSTITUTION).first.try(:uuid)
-      return {:context_uuid => default_context} if default_context
+      default_context = params[:context] || check_access(Institution, READ_INSTITUTION).first.try(:uuid)
+      return {:context => default_context} if default_context
     end
 
     {}
   end
 
   def load_context
-    if current_user
-      @navigation_context = NavigationContext.new(current_user, params[:context_uuid])
+    @navigation_context = if current_user
+      NavigationContext.new(current_user, params[:context])
+    else
+      NavigationContext.new
+    end
+  end
+
+  def ensure_context_in_url
+    default_context = default_url_options[:context]
+    if params[:context].blank? && default_context
+      redirect_to url_for(params)
     end
   end
 

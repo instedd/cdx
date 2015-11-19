@@ -89,6 +89,10 @@ gem 'doorkeeper'
 
 gem 'faker'
 
+source 'https://rails-assets.org' do
+  gem 'rails-assets-urijs'
+end
+
 group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rescue'
