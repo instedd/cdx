@@ -11,7 +11,7 @@ before_script:
 - bundle exec rake db:setup
 - bundle exec rake db:test:prepare
 script:
-- bundle exec rake spec
+- bundle exec rake
 notifications:
   slack:
     secure: CmtQgO6TCT89jHc3DYEEtqM0n0BpN6QT8uey7grYAh2YBJJGoGYh0HgiCHiSNLnn+4sfDu91erys+R17fcc4aBaRMQawHebj4L0e0B2Wi99sIptfpkQRYjofiO0XZJUbBbXW+3jgsPui8u2gDVd/cBq3NxZd8jQvUMNr5MTpjf4=
