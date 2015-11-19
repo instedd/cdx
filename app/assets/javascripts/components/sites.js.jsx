@@ -114,7 +114,7 @@ var SitePicker = React.createClass({
   render: function() {
     return (
       <div>
-        <input type="text" onChange={this.onSearchChange} autoFocus="true" />
+        <input type="text" onChange={this.onSearchChange} autoFocus="true" placeholder="Search sites" />
         <SitesTreeView sites={this.state.sites_tree} onSiteClick={this.selectSite} />
       </div>
     )

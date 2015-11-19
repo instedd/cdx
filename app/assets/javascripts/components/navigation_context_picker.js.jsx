@@ -32,7 +32,9 @@ $(document).ready(function(){
     if (show_navigation_context) {
       $("body").addClass("show-navigation-context-picker");
     }
-    $('#context_side_bar').append(context_side_bar);
+    if (context_side_bar) {
+      $('#context_side_bar').append(context_side_bar.children());
+    }
   });
 });
 
@@ -55,9 +57,6 @@ var NavigationContextPicker = React.createClass({
     // there is no need to update the properties
     return (
       <div>
-        <p>
-        Selected: {this.state.context.name} - {this.state.context.uuid}
-        </p>
         <SitePicker selected_uuid={this.props.context.uuid} onSiteSelected={this.changeContextSite} />
       </div>
     );

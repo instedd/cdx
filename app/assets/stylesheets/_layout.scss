@@ -178,6 +178,34 @@ footer {
     position: absolute;
     display: block;
     width: 300px;
+    background-color: $gray4;
+    padding: 10px;
+    color: $white-dark;
+
+    input, input:focus {
+      color: $white-light;
+    }
+
+    a {
+      color: $white-dark;
+    }
+
+    .sites-tree-view {
+      .selected > a::before {
+        content: '';
+        background-color: $black;
+        right: 0;
+        left: 0;
+        position: absolute;
+        height: 1.4em;
+        z-index: -1;
+      }
+
+      .selected > a {
+        color: $white-light;
+        background-color: $black;
+      }
+    }
   }
 
   .content {
