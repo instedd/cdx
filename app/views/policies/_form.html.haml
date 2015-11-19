@@ -15,9 +15,7 @@
     .col.pe-2
       = f.label :user_id
     .col
-      = cdx_select form: f, name: :user_id, class: 'input-x-large' do |select|
-        - select.item "", "Select user"
-        - select.items User.all.where('id != ?', current_user.id).sort_by(&:email), :id, :email
+      = f.text_field :user_id
 
   .row
     .col.pe-2

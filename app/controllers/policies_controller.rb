@@ -15,21 +15,31 @@ class PoliciesController < ApplicationController
   # POST /policies
   # POST /policies.json
   def create
+    @user = User.find_or_initialize_by(email: policy_params[:user_id])
     @policy = Policy.new(policy_params)
 
     begin
       definition = JSON.parse @policy.definition
       @policy.definition = definition
+
+      unless @user.persisted?
+        @user.invite!
+        @_notice = "An invitation email has been sent to #{@user.email}"
+      end
     rescue => ex
       @policy.errors.add :definition, ex.message
       has_definition_error = true
     end
 
+    @policy.user_id = @user.id
     @policy.granter_id = current_user.id
 
     respond_to do |format|
       if @policy.errors.empty? && @policy.save
-        format.html { redirect_to policies_path, notice: 'Policy was successfully created.' }
+        format.html do
+          redirect_to policies_path,
+                      notice: @_notice || 'Policy was successfully created.'
+        end
         format.json { render action: 'show', status: :created, policy: @policy }
       else
         if has_definition_error

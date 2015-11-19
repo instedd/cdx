@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :timeoutable
-  devise :database_authenticatable, :registerable,
+  devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable,
          :validatable, :confirmable, :omniauthable, :timeoutable,
          :lockable, :password_expirable, :password_archivable
@@ -35,8 +35,16 @@ class User < ActiveRecord::Base
     end + [(Policy.implicit(self) unless Settings.single_tenant)].compact
   end
 
+  def invited_pending?
+    invitation_created_at && !invitation_accepted_at
+  end
+
   def update_computed_policies
     ComputedPolicy.update_user(self)
+  end
+
+  def full_name
+    [first_name, last_name].compact.join(' ')
   end
 
   def grant_superadmin_policy

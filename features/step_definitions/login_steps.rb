@@ -1,30 +1,26 @@
-def login_user
-  @login_user ||= User.make(password_changed_at: Time.now)
+def setup_user
+  @user ||= User.make(
+    password_changed_at: Time.now,
+    password: 'abc123abc'
+  )
 end
 
 Given(/^the user 'foouser@example\.com' has an account$/) do
-  @login = LoginPage.new
-  @login.load
+  setup_user
 end
 
 When(/^he attempts to log\-in with incorrect password$/) do
-  @login.form.user_name.set login_user.email
-  @login.form.password.set 'foouser'
-  @login.form.login.click
+  authenticate(@user, 'falsepassword')
 end
 
 When(/^he attempts to log\-in (\d+) times with incorrect password$/) do |cnt|
   cnt.to_i.times do
-    @login.form.user_name.set login_user.email
-    @login.form.password.set 'foouser'
-    @login.form.login.click
+    authenticate(@user, 'falsepassword')
   end
 end
 
 When(/^he attempts to log\-in with correct details$/) do
-  @login.form.user_name.set login_user.email
-  @login.form.password.set login_user.password
-  @login.form.login.click
+  authenticate(@user)
 end
 
 Then(/^he should see "(.*?)"$/) do |arg1|
