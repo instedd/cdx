@@ -13,6 +13,7 @@ describe DeviceModelsController do
   let!(:device_model3) { institution2.device_models.make(:unpublished) }
 
   before(:each) {sign_in user}
+  let(:default_params) { {context: institution.uuid} }
 
   let(:manifest_attributes) do
     {"definition" => %{{

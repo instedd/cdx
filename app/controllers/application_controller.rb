@@ -88,6 +88,7 @@ class ApplicationController < ActionController::Base
   end
 
   def ensure_context_in_url
+    return if request.xhr? || !request.get?
     default_context = default_url_options[:context]
     if params[:context].blank? && default_context
       redirect_to url_for(params)

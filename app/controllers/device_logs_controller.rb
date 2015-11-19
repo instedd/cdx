@@ -3,6 +3,7 @@ class DeviceLogsController < ApplicationController
 
   skip_before_filter :verify_authenticity_token, only: [:create]
   skip_before_filter :authenticate_user!, only: [:create]
+  skip_before_filter :ensure_context_in_url, only: [:create]
 
   def index
     @device_logs = @device.device_logs.order(created_at: :desc)

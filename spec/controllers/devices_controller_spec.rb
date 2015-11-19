@@ -12,6 +12,7 @@ describe DevicesController do
   let!(:other_site) {other_institution.sites.make}
 
   before(:each) {sign_in user}
+  let(:default_params) { {context: institution.uuid} }
 
   context "Index" do
 

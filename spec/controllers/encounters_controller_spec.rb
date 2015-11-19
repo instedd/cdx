@@ -6,6 +6,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   let(:user) { institution.user }
 
   before(:each) { sign_in user }
+  let(:default_params) { {context: institution.uuid} }
 
   describe "GET #new" do
     it "returns http success" do
