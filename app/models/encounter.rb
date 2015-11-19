@@ -3,7 +3,7 @@ class Encounter < ActiveRecord::Base
   include AutoUUID
   include Resource
 
-  ASSAYS_FIELD = 'assays'
+  ASSAYS_FIELD = 'diagnosis'
   OBSERVATIONS_FIELD = 'observations'
 
   has_many :samples, dependent: :restrict_with_error
