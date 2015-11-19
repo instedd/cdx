@@ -71,8 +71,8 @@ class Encounter < ActiveRecord::Base
 
   def self.additional_entity_fields
     @additional_entity_fields ||= Cdx::Scope.new('encounter', { allows_custom: true, fields: {
-      observations: { pii: true },
-      assays: {
+      OBSERVATIONS_FIELD.to_sym => { pii: true },
+      ASSAYS_FIELD.to_sym => {
         type: "nested",
         sub_fields: {
           name: {},
