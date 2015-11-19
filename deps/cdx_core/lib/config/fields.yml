@@ -130,6 +130,24 @@ entities:
       end_time:
         type: date
         searchable: true
+      observations:
+        pii: true
+      diagnosis:
+        type: nested
+        sub_fields:
+          name:
+            searchable: true
+          condition:
+            searchable: true
+          result:
+            type: enum
+            searchable: true
+            options:
+              - positive
+              - negative
+              - indeterminate
+          quantitative_result:
+            type: integer
 test:
   sample:
     <<: *SAMPLE

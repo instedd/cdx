@@ -65,25 +65,6 @@ class Encounter < ActiveRecord::Base
     "encounter"
   end
 
-  def self.entity_fields
-    super + additional_entity_fields
-  end
-
-  def self.additional_entity_fields
-    @additional_entity_fields ||= Cdx::Scope.new('encounter', { allows_custom: true, fields: {
-      OBSERVATIONS_FIELD.to_sym => { pii: true },
-      ASSAYS_FIELD.to_sym => {
-        type: "nested",
-        sub_fields: {
-          name: {},
-          condition: {},
-          result: {},
-          quantitative_result: { type: "integer" }
-        }
-      }
-    }}.deep_stringify_keys).fields
-  end
-
   def self.find_by_entity_id(entity_id, opts)
     find_by(entity_id: entity_id.to_s, institution_id: opts.fetch(:institution_id))
   end

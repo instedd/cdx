@@ -29,11 +29,11 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
         {
           "sample"=> {
             "properties" => {
-              "uuid"=> {
+              "id"=> {
                 "type"=> "string",
                 "index"=> "not_analyzed"
               },
-              "id"=> {
+              "uuid"=> {
                 "type"=> "string",
                 "index"=> "not_analyzed"
               },
@@ -217,6 +217,23 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
               "end_time"=> {
                 "type"=> "date",
                 "index"=> "not_analyzed"
+              },
+              "diagnosis" => {
+                "type" => "nested",
+                "properties" => {
+                  "name" => {
+                    "type" => "string",
+                    "index" => "not_analyzed"
+                  },
+                  "condition" => {
+                    "type" => "string",
+                    "index" => "not_analyzed"
+                  },
+                  "result"=> {
+                    "type"=> "string",
+                    "index"=> "not_analyzed"
+                  }
+                }
               },
               "custom_fields" => {
                 "type" => "object",
