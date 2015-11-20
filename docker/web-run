@@ -1,4 +1,4 @@
 #!/bin/bash
 source /etc/envvars
 cd /app
-exec sudo -u app -E -- /usr/local/bundle/bin/puma --preload -w 4 -e $RAILS_ENV -b unix:///app/tmp/app.sock
+exec su -p -c "/usr/local/bundle/bin/puma --preload -w 4 -e $RAILS_ENV -b unix:///app/tmp/app.sock" app

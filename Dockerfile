@@ -6,12 +6,6 @@ RUN \
   adduser --uid 9999 --gid 9999 --disabled-password --gecos "Application" app && \
   usermod -L app
 
-# Install prerequisites
-RUN \
-  apt-get update && \
-  apt-get install -y sudo && \
-  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 ENV POIROT_STDOUT true
 ENV POIROT_SUPPRESS_RAILS_LOG true
 
