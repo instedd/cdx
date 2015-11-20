@@ -150,6 +150,8 @@ var reactConfirmationModalConfirmationAction = null;
 $.rails.showConfirmationDialog = function(link){
   var message = link.data("confirm");
   var title = link.data("confirm-title");
+  var hideCancel = link.data("confirm-hide-cancel");
+  var confirmButtonMessage = link.data('confirm-button-message');
   var confirmationModalContainer = $('<div>');
 
   reactConfirmationModalConfirmationAction = function() {
@@ -174,7 +176,7 @@ $.rails.showConfirmationDialog = function(link){
 
   confirmationModalContainer.append($("<div>")
     .attr('data-react-class', 'ConfirmationModal')
-    .attr('data-react-props', JSON.stringify({message: message, title: title, target: 'reactConfirmationModalConfirmationAction', deletion: link.data('method') == 'delete' })));
+    .attr('data-react-props', JSON.stringify({message: message, title: title, target: 'reactConfirmationModalConfirmationAction', deletion: link.data('method') == 'delete', hideCancel: hideCancel, confirmMessage: confirmButtonMessage })));
   $("body").append(confirmationModalContainer);
   cdx_init_components(confirmationModalContainer);
 }
