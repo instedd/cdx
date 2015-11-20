@@ -8,6 +8,7 @@ RUN \
 
 ENV POIROT_STDOUT true
 ENV POIROT_SUPPRESS_RAILS_LOG true
+ENV PUMA_OPTIONS "--preload -w 4"
 
 # Install gem bundle
 ADD Gemfile /app/
