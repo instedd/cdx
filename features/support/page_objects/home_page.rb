@@ -1,4 +1,4 @@
-class HomePage < SitePrism::Page
+class HomePage < CdxPageBase
   set_url '/'
 
   element :sign_in, :link, "Sign in", match: :first
