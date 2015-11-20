@@ -152,7 +152,13 @@ $.rails.showConfirmationDialog = function(link){
   var title = link.data("confirm-title");
   var hideCancel = link.data("confirm-hide-cancel");
   var confirmButtonMessage = link.data('confirm-button-message');
-  var confirmationModalContainer = $('<div>');
+  var confirmationModalContainer = $('#confirmationModalContainer')
+  if(confirmationModalContainer.length == 0) {
+    confirmationModalContainer = $('<div id="confirmationModalContainer">');
+    $("body").append(confirmationModalContainer);
+  } else {
+    confirmationModalContainer.empty();
+  }
 
   reactConfirmationModalConfirmationAction = function() {
     var confirm_data = link.attr('data-confirm');
@@ -177,6 +183,5 @@ $.rails.showConfirmationDialog = function(link){
   confirmationModalContainer.append($("<div>")
     .attr('data-react-class', 'ConfirmationModal')
     .attr('data-react-props', JSON.stringify({message: message, title: title, target: 'reactConfirmationModalConfirmationAction', deletion: link.data('method') == 'delete', hideCancel: hideCancel, confirmMessage: confirmButtonMessage })));
-  $("body").append(confirmationModalContainer);
   cdx_init_components(confirmationModalContainer);
 }
