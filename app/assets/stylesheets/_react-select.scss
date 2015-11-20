@@ -35,7 +35,7 @@
   border-bottom-left-radius: 0;
   border-color: #b3b3b3 #cccccc #d9d9d9;
   > .Select-arrow {
-    background: url("arr-select-up.png") no-repeat;
+    background: image-url("arr-select-up.png") no-repeat;
   }
 }
 
@@ -154,7 +154,7 @@
 }
 
 .Select-arrow {
-  background: url("arr-select-down.png") no-repeat;
+  background: image-url("arr-select-down.png") no-repeat;
   content: " ";
   display: block;
   height: 14px;
