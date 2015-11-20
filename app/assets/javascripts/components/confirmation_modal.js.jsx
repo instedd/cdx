@@ -1,7 +1,7 @@
 var ConfirmationModal = React.createClass({
 
   modalTitle: function() {
-    return this.props.title || "Confirmation";
+    return this.props.title || (this.props.deletion ? "Delete confirmation" : "Confirmation");
   },
 
   cancelMessage: function() {
@@ -9,7 +9,7 @@ var ConfirmationModal = React.createClass({
   },
 
   confirmMessage: function() {
-    return this.props.confirmMessage || "Confirm";
+    return this.props.confirmMessage || (this.props.deletion ? "Delete" : "Confirm");
   },
 
   componentDidMount: function() {
@@ -29,6 +29,10 @@ var ConfirmationModal = React.createClass({
     return {__html: this.props.message};
   },
 
+  confirmButtonClass: function() {
+    return this.props.deletion ? "btn-primary btn-delete" : "btn-primary";
+  },
+
   render: function() {
     return (
       <Modal ref="confirmationModal" show="true">
@@ -36,8 +40,8 @@ var ConfirmationModal = React.createClass({
         <div className="modal-content" dangerouslySetInnerHTML={this.message()}>
         </div>
         <div className="modal-buttons button-actions">
-          <button type="button" className="btn-secondary" onClick={this.onCancel}>{this.cancelMessage()}</button>
-          <button type="button" className="btn-primary pull-right" onClick={this.onConfirm}>{this.confirmMessage()}</button>
+          <button type="button" className="btn-secondary pull-right" onClick={this.onCancel}>{this.cancelMessage()}</button>
+          <button type="button" className={this.confirmButtonClass()} onClick={this.onConfirm}>{this.confirmMessage()}</button>
         </div>
       </Modal>
     );
