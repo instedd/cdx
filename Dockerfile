@@ -9,8 +9,11 @@ RUN \
 # Install prerequisites
 RUN \
   apt-get update && \
-  apt-get install -y libzmq3-dev sudo && \
+  apt-get install -y sudo && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ENV POIROT_STDOUT true
+ENV POIROT_SUPPRESS_RAILS_LOG true
 
 # Install gem bundle
 ADD Gemfile /app/
