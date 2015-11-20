@@ -173,7 +173,7 @@ body.devise {
   input[type="password"] {
 
     @include placeholder($sans, 25px);
-    background: url('ic-login.png') no-repeat $white;
+    background: image-url('ic-login.png') no-repeat $white;
 
     &.filled {
       background: $white;
