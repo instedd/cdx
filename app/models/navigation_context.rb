@@ -10,14 +10,19 @@ class NavigationContext
     @institution = Institution.where(uuid: uuid).first
     @site = nil
 
-    if @institution
-      Policy.authorize Policy::Actions::READ_INSTITUTION, @institution, @user
-    else
+    unless @institution
       @site = Site.where(uuid: uuid).first
-      if @site
-        Policy.authorize Policy::Actions::READ_SITE, @site, @user
-        @institution = @site.institution
-      end
+      @institution = @site.try :institution
+    end
+  end
+
+  def can_read?
+    if @site
+      Policy.can?(Policy::Actions::READ_SITE, @site, @user)
+    elsif @institution
+      Policy.can?(Policy::Actions::READ_INSTITUTION, @institution, @user)
+    else
+      false
     end
   end
 

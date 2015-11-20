@@ -1,6 +1,6 @@
 class SubscribersController < ApplicationController
   include Concerns::SubscribersController
-  skip_before_action :ensure_context_in_url
+  skip_before_action :ensure_context
 
   respond_to :html, :json
   expose(:subscribers) do

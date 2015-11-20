@@ -394,6 +394,7 @@ ActiveRecord::Schema.define(version: 20151130130846) do
     t.integer  "invited_by_id",                  limit: 4
     t.string   "invited_by_type",                limit: 255
     t.integer  "invitations_count",              limit: 4,   default: 0
+    t.string   "last_navigation_context",        limit: 255
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree

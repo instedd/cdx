@@ -12,7 +12,7 @@
       %header
         = render "shared/header_nav"
 
-      #context_side_bar{"data-context-react-props": {context: @navigation_context.to_hash}.to_json}
+      #context_side_bar{"data-context-react-props": {context: @navigation_context.try(:to_hash) || {}}.to_json}
 
       .content
         = flash_message

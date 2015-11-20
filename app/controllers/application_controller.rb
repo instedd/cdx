@@ -10,8 +10,7 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :check_no_institution!
   before_action :load_js_global_settings
-  before_action :ensure_context_in_url
-  before_action :load_context
+  before_action :ensure_context
 
   decent_configuration do
     strategy DecentExposure::StrongParametersStrategy
@@ -71,27 +70,47 @@ class ApplicationController < ActionController::Base
   end
 
   def default_url_options(options={})
-    if current_user
-      default_context = params[:context] || check_access(Institution, READ_INSTITUTION).first.try(:uuid)
-      return {:context => default_context} if default_context
+    if params[:context].present?
+      return {:context => params[:context]}
     end
 
     {}
   end
 
-  def load_context
-    @navigation_context = if current_user
-      NavigationContext.new(current_user, params[:context])
-    else
-      NavigationContext.new
-    end
-  end
+  def ensure_context
+    return if request.xhr?
 
-  def ensure_context_in_url
-    return if request.xhr? || !request.get?
-    default_context = default_url_options[:context]
-    if params[:context].blank? && default_context
-      redirect_to url_for(params)
+    if current_user.nil?
+      return
+    end
+
+    if params[:context].blank?
+      # if there is no context information force it to be explicit
+      # this will trigger a redirect ?context=<institution_or_site_uuid>
+
+      # grab last context stored in user
+      default_context = current_user.last_navigation_context || check_access(Institution, READ_INSTITUTION).first.try(:uuid)
+
+      # if user has no longer access, reset it to anything that make sense
+      if !NavigationContext.new(current_user, default_context).can_read?
+        some_institution_uuid = check_access(Institution, READ_INSTITUTION).first.try(:uuid)
+        current_user.update_attribute(:last_navigation_context, some_institution_uuid)
+        default_context = some_institution_uuid
+      end
+
+      if default_context
+        redirect_to url_for(params.merge({context: default_context}))
+      end
+    else
+      # if there is an explicit context try to use it.
+      @navigation_context = NavigationContext.new(current_user, params[:context])
+
+      if !@navigation_context.can_read?
+        # if the user has no longer access to this context, reset it
+        redirect_to url_for(params.merge({context: nil}))
+      end
+
+      current_user.update_attribute(:last_navigation_context, params[:context])
     end
   end
 
