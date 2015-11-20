@@ -15,12 +15,11 @@ GIT
 
 GIT
   remote: https://github.com/instedd/poirot_rails.git
-  revision: a9d4c5fd413baf1caaf3cd56e805cd3c0268bd8c
+  revision: 43d7ee8bacbe4afe34c29f6ad7ec98475cc39b1e
   branch: master
   specs:
     poirot_rails (0.0.4)
       bertrpc
-      ffi-rzmq (~> 2.0.1)
       guid
       json
       rails (>= 3.2)
@@ -260,10 +259,6 @@ GEM
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.10)
-    ffi-rzmq (2.0.4)
-      ffi-rzmq-core (>= 1.0.1)
-    ffi-rzmq-core (1.0.3)
-      ffi (~> 1.9)
     filewatcher (0.3.6)
       trollop (~> 2.0)
     foreman (0.78.0)

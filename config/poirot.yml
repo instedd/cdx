@@ -1,8 +1,10 @@
 common: &default_settings
-  server: <%= ENV["POIROT_SERVER"] || "localhost:2120" %>
-  enabled: <%= !!ENV["POIROT_SERVER"] %>
-  source: cdp
+  server: <%= ENV["POIROT_SERVER"] %>
+  stdout: <%= ENV["POIROT_STDOUT"] %>
+  suppress_rails_log: <%= ENV["POIROT_SUPPRESS_RAILS_LOG"] %>
+  enabled: <%= !!ENV["POIROT_SERVER"] || !!ENV["POIROT_STDOUT"] %>
   debug: false
+  source: cdx
 
 development:
   <<: *default_settings
