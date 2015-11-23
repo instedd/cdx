@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'policy_spec_helper'
 
 describe Api::EncountersController, elasticsearch: true, validate_manifest: false do
 
@@ -44,15 +45,19 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
   end
 
   context "Pii" do
-    it "should return pii" do
+
+    before(:each) do
       register_cdx_fields encounter: { fields: { case_sn: { pii: true } } }
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(
         test: { assays:[{name: "mtb", result: :positive}] },
         encounter: { patient_age: Cdx::Field::DurationField.years(10), case_sn: "1234" },
         patient: { name: "John Doe" })
+    end
 
+    let(:encounter) { Encounter.first }
+
+    it "should return pii for institution owner" do
       expect(Encounter.count).to eq(1)
-      encounter = Encounter.first
 
       get :pii, id: encounter.uuid
 
@@ -62,6 +67,31 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
       expect(pii['uuid']).to eq(encounter.uuid)
       expect(pii['pii']['patient']['name']).to eq("John Doe")
       expect(pii['pii']['encounter']['case_sn']).to eq("1234")
+    end
+
+    context "permissions" do
+
+      it "should not return pii if unauthorised" do
+        expect(Encounter.count).to eq(1)
+
+        other_user = User.make
+        grant user, other_user, encounter, Policy::Actions::READ_ENCOUNTER
+        sign_in other_user
+        get :pii, id: encounter.uuid
+
+        expect(response).to be_forbidden
+      end
+
+      it "should return pii if unauthorised" do
+        expect(Encounter.count).to eq(1)
+
+        other_user = User.make
+        grant user, other_user, encounter, Policy::Actions::PII_ENCOUNTER
+        sign_in other_user
+        get :pii, id: encounter.uuid
+
+        expect(response).to be_success
+      end
     end
   end
 end

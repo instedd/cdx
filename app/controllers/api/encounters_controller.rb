@@ -19,6 +19,7 @@ class Api::EncountersController < ApiController
 
   def pii
     encounter = Encounter.find_by_uuid(params[:id])
+    return unless authorize_resource(encounter, Policy::Actions::PII_ENCOUNTER)
     render_json "uuid" => params[:id], "pii" => encounter.pii_data
   end
 

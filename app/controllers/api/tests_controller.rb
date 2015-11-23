@@ -19,6 +19,7 @@ class Api::TestsController < ApiController
 
   def pii
     test = TestResult.find_by_uuid(params[:id])
+    return unless authorize_resource(test, Policy::Actions::PII_TEST)
     render_json "uuid" => params[:id], "pii" => test.pii_data
   end
 
