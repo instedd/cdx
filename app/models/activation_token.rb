@@ -21,7 +21,9 @@ class ActivationToken < ActiveRecord::Base
     end
     device.set_key_for_activation_token
     device.save!
-    SyncHelpers.client_settings(client_id, device.uuid, device.plain_secret_key)
+    settings = SyncHelpers.client_settings(client_id, device.uuid, device.plain_secret_key)
+    destroy
+    settings
   end
 
   private
