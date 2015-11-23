@@ -13,6 +13,7 @@ describe Api::ActivationsController do
 
       it { expect(response_json['status']).to eq('success') }
       it { expect(response_json['message']).to eq('Device activated') }
+      it { expect(ActivationToken.count).to eq(0) }
     end
 
     context 'when token exists and device secret key is valid ignoring case and dashes' do
@@ -39,7 +40,7 @@ describe Api::ActivationsController do
       include_context :do_post
 
       it { expect(response_json['status']).to eq('failure') }
-      it { expect(response_json['message']).to eq('Activation token already used') }
+      it { expect(response_json['message']).to eq('Invalid activation token') }
     end
 
     context 'when token does not exist' do
