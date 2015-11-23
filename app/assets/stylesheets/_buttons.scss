@@ -153,6 +153,21 @@
   }
 }
 
+.btn-danger {
+  @extend .btn-primary;
+  background: $red;
+
+  &:hover,
+  &:focus {
+    background: darken($red, 5%);
+  }
+
+  &:active,
+  &.active {
+    background: darken($red, 10%);
+  }
+}
+
 .pager {
   color: $black;
   font-size: 20px;

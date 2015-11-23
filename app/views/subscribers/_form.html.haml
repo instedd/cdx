@@ -53,4 +53,4 @@
       = f.submit nil, class: "btn-primary"
       = link_to 'Cancel', subscribers_path, class: 'btn-link'
       - if @editing
-        = link_to "Delete", subscriber, method: :delete, data: { confirm: "Are you sure you want to delete the location '#{subscriber.name}'" }, class: 'btn-secondary pull-right'
+        = confirm_deletion_button subscriber, 'subscriber'
