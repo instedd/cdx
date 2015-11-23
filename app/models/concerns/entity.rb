@@ -53,6 +53,14 @@ module Entity
     core_fields[field.name]
   end
 
+  def pii_data
+    pii = {entity_scope => plain_sensitive_data}
+    pii = pii.deep_merge(sample.entity_scope => sample.plain_sensitive_data) if respond_to?(:sample) && sample
+    pii = pii.deep_merge(encounter.entity_scope => encounter.plain_sensitive_data) if respond_to?(:encounter) && encounter
+    pii = pii.deep_merge(patient.entity_scope => patient.plain_sensitive_data) if respond_to?(:patient) && patient
+    pii
+  end
+
   def uuids
     Array(self.uuid)
   end

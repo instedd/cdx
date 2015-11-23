@@ -31,6 +31,34 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         expect(response.size).to eq(1)
         expect(response.first["test"]["assays"].first["result"]).to eq("positive")
       end
+
+      context "Custom fields" do
+        it "should retrieve an test custom fields when querying", context do
+          device.manifest.update! definition: %{{
+            "metadata" : {
+              "version" : 2,
+              "api_version" : "#{Manifest::CURRENT_VERSION}",
+              "source" : {"type" : "json"}
+            },
+            "custom_fields": {
+              "test.foo": {
+                "type": "string"
+              }
+            },
+            "field_mapping" : {
+              "test.foo" : {"lookup" : "some_field"}
+            }
+          }}
+          DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(some_field: 1234)
+          test = all_elasticsearch_tests.first["_source"]["test"]
+
+          refresh_index
+
+          response = get_updates "id" => test["uuid"]
+          expect(response.size).to eq(1)
+          expect(response.first["test"]["custom_fields"]["foo"]).to eq(1234)
+        end
+      end
     end
 
     context "Filter" do
@@ -207,39 +235,8 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       end
     end
 
-    context "Custom Fields" do
-      it "should retrieve an test custom fields by uuid", context do
-        device.manifest.update! definition: %{{
-          "metadata" : {
-            "version" : 2,
-            "api_version" : "#{Manifest::CURRENT_VERSION}",
-            "source" : {"type" : "json"}
-          },
-          "custom_fields": {
-            "test.foo": {
-              "type": "string"
-            }
-          },
-          "field_mapping" : {
-            "test.foo" : {"lookup" : "some_field"}
-          }
-        }}
-        DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(some_field: 1234)
-        test = all_elasticsearch_tests.first["_source"]["test"]
-
-        refresh_index
-
-        response = get :custom_fields, id: test["uuid"]
-        expect(response.status).to eq(200)
-        response = Oj.load response.body
-
-        expect(response["custom_fields"]["test"]["foo"]).to eq(1234)
-        expect(response["uuid"]).to eq(test["uuid"])
-      end
-    end
-
     context "PII" do
-      it "should retrieve an test PII by uuid" do
+      before(:each) do
         definition = %{{
           "metadata" : {
             "api_version" : "#{Manifest::CURRENT_VERSION}",
@@ -261,26 +258,46 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         device.manifest.update! definition: definition
 
         DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(assays: [result: :positive], patient_name: "jdoe")
-        test = all_elasticsearch_tests.first["_source"]["test"]
-
         refresh_index
+      end
 
-        response = get :pii, id: test["uuid"]
+      let(:test) { TestResult.first }
+
+      it "should retrieve a test PII by uuid" do
+        response = get :pii, id: test.uuid
         expect(response.status).to eq(200)
         response = Oj.load response.body
 
         expect(response["pii"]["patient"]["name"]).to eq("jdoe")
         expect(response["uuid"]).to eq(test["uuid"])
       end
+
+      context "permissions" do
+
+        it "should not return pii if unauthorised" do
+          other_user = User.make
+          grant user, other_user, { testResult: institution }, Policy::Actions::QUERY_TEST
+          sign_in other_user
+          get :pii, id: test.uuid
+
+          expect(response).to be_forbidden
+        end
+
+        it "should return pii if unauthorised" do
+          other_user = User.make
+          grant user, other_user, { testResult: institution }, Policy::Actions::PII_TEST
+          sign_in other_user
+          get :pii, id: test.uuid
+
+          expect(response).to be_success
+        end
+      end
     end
 
     context "Schema" do
 
       it "should return test schema" do
-        schema = double('schema')
-        expect(schema).to receive(:build).and_return('a schema definition')
-        expect(TestsSchema).to receive(:for).with('es-AR').and_return(schema)
-
+        allow_any_instance_of(TestsSchema).to receive(:build).and_return('a schema definition')
         response = get :schema, locale: "es-AR", format: 'json'
 
         response_schema = Oj.load response.body

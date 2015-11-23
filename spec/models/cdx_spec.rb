@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Cdx do
   it "should provide a collection of fields" do
-    expect(Cdx::Fields.test.core_fields.map(&:scoped_name).sort).to eq([
+    expect(Cdx::Fields.test.core_fields.map(&:scoped_name).sort).to contain_exactly(
       "test.site_user",
       "device.model",
       "device.name",
@@ -46,6 +46,10 @@ describe Cdx do
       "encounter.patient_age",
       "encounter.start_time",
       "encounter.end_time",
-    ].sort)
+      "encounter.diagnosis.condition",
+      "encounter.diagnosis.name",
+      "encounter.diagnosis.quantitative_result",
+      "encounter.diagnosis.result",
+      "encounter.observations")
   end
 end

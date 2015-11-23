@@ -21,7 +21,7 @@ class Policy < ActiveRecord::Base
     UPDATE_INSTITUTION = "institution:update"
     DELETE_INSTITUTION = "institution:delete"
 
-    CREATE_INSTITUTION_SITE =     "institution:createSite"
+    CREATE_INSTITUTION_SITE =           "institution:createSite"
     CREATE_INSTITUTION_ENCOUNTER =      "institution:createEncounter"
     REGISTER_INSTITUTION_DEVICE =       "institution:registerDevice"
     REGISTER_INSTITUTION_DEVICE_MODEL = "institution:registerDeviceModel"
@@ -47,9 +47,11 @@ class Policy < ActiveRecord::Base
     REPORT_MESSAGE =            "device:reportMessage"
 
     QUERY_TEST = "testResult:query"
+    PII_TEST =   "testResult:pii"
 
-    READ_ENCOUNTER = "encounter:read"
+    READ_ENCOUNTER =   "encounter:read"
     UPDATE_ENCOUNTER = "encounter:update"
+    PII_ENCOUNTER =    "encounter:pii"
 
     MEDICAL_DASHBOARD = "testResult:medicalDashboard"
   end
@@ -77,10 +79,12 @@ class Policy < ActiveRecord::Base
     Actions::GENERATE_ACTIVATION_TOKEN,
     Actions::SUPPORT_DEVICE,
     Actions::QUERY_TEST,
+    Actions::PII_TEST,
     Actions::REPORT_MESSAGE,
     Actions::CREATE_INSTITUTION_ENCOUNTER,
     Actions::READ_ENCOUNTER,
-    Actions::UPDATE_ENCOUNTER
+    Actions::UPDATE_ENCOUNTER,
+    Actions::PII_ENCOUNTER
   ]
 
   def self.superadmin(user)

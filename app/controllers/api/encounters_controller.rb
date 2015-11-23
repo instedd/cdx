@@ -16,4 +16,17 @@ class Api::EncountersController < ApiController
       format.json { render_json query.execute }
     end
   end
+
+  def pii
+    encounter = Encounter.find_by_uuid(params[:id])
+    return unless authorize_resource(encounter, Policy::Actions::PII_ENCOUNTER)
+    render_json "uuid" => params[:id], "pii" => encounter.pii_data
+  end
+
+  def schema
+    schema = EncountersSchema.new params["locale"]
+    respond_to do |format|
+      format.json { render_json schema.build }
+    end
+  end
 end

@@ -17,23 +17,17 @@ class Api::TestsController < ApiController
     end
   end
 
-  def custom_fields
-    test = TestResult.includes(sample_identifier: :sample).find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "custom_fields" => test.custom_fields_data
-  end
-
   def pii
     test = TestResult.find_by_uuid(params[:id])
+    return unless authorize_resource(test, Policy::Actions::PII_TEST)
     render_json "uuid" => params[:id], "pii" => test.pii_data
   end
 
   def schema
-    schema = TestsSchema.for params["locale"]
+    schema = TestsSchema.new params["locale"]
     respond_to do |format|
       format.json { render_json schema.build }
     end
-  rescue ActiveRecord::RecordNotFound => ex
-    render :status => :unprocessable_entity, :json => { :errors => ex.message } and return
   end
 
 end
