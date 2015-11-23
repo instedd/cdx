@@ -50,4 +50,4 @@
           = link_to 'Cancel', institutions_path, class: 'btn-link'
 
           - if @can_delete
-            = link_to "Delete", @institution, method: :delete, data: { confirm: "You're about to permanently delete this institution. This action CANNOT be undone. Are you sure you want to proceed?" }, class: 'btn-secondary pull-right', title: 'Delete Institution'
+            = confirm_deletion_button @institution, 'institution'

@@ -30,4 +30,4 @@
       = f.submit class: "btn-primary"
       = link_to 'Cancel', filters_path, class: 'btn-link'
       - if @editing
-        = link_to "Delete", filter, method: :delete, data: { confirm: "You're about to permanently delete this filter. This action CANNOT be undone. Are you sure you want to proceed?" }, class: 'btn-secondary pull-right'
+        = confirm_deletion_button filter, 'filter'

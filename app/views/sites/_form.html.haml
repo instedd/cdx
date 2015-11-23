@@ -47,7 +47,7 @@
       = link_to 'Cancel', sites_path, class: 'btn-link'
       - if @can_delete
         - if @can_be_deleted
-          = link_to "Delete", @site, method: :delete, data: { confirm: "You're about to permanently delete this site. This action CANNOT be undone. Are you sure you want to proceed?" }, class: 'btn-secondary pull-right', title: 'Delete Site'
+          = confirm_deletion_button @site, 'site'
         - else
           - # TODO: link to page with Devices tab always active - it's the current default, but may change
           = content_tag 'a', "Delete", data: { confirm: "In order to delete this site you must first reassign the <a href=\"#{site_path(@site)}\">#{@site.devices.count} #{"device".pluralize(@site.devices.count)}</a> assigned to it.", confirm_title: 'Action required', confirm_hide_cancel: 'true', confirm_button_message: 'Understood' }, class: 'btn-secondary pull-right', title: 'Delete Site'

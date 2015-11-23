@@ -28,4 +28,4 @@
       = f.submit 'Save', :class => 'btn-primary'
       = link_to 'Cancel', policies_path, class: 'btn-link'
       - if @editing
-        = link_to "Delete", @policy, method: :delete, data: { confirm: "You're about to permanently delete this policy. This action CANNOT be undone. Are you sure you want to proceed?" }, :class => 'btn-secondary pull-right'
+        = confirm_deletion_button @policy, 'policy'
