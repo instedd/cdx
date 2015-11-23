@@ -5,6 +5,8 @@ class SshKey < ActiveRecord::Base
   validates_presence_of :public_key, :device
   validate :validate_public_key
 
+  before_save :delete_other_ssh_keys_with_same_public_key
+
   def validate_public_key
     to_client.validate! unless public_key.blank?
   rescue
@@ -21,5 +23,11 @@ class SshKey < ActiveRecord::Base
 
   def self.clients
     all.map(&:to_client)
+  end
+
+  private
+
+  def delete_other_ssh_keys_with_same_public_key
+    SshKey.where(public_key: public_key).delete_all
   end
 end

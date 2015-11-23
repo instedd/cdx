@@ -3,9 +3,8 @@ require 'spec_helper'
 require 'tempfile'
 
 describe SshKey do
-  let(:device) { Device.make }
-
-  before { device.ssh_key = SshKey.create!(
+  let!(:device) { Device.make }
+  let!(:ssh_key) { SshKey.create!(
       public_key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4'+
           'hzyCbJQ5RgrZPFz+rTscTuJ5NPuBIKiinXwkA38CE9+N37L8q9kMqxsbDumVFbamYVlS9fsmF1TqRRhobfJfZGpt'+
           'kcthQde83FWHQGaEQn8T4SG055N5SWNRjQTfMaK0uTTQ28BN44dhLluF/zp4UDHOKRVBrJY4SZq1M5ytkMc6mlZW'+
@@ -13,6 +12,8 @@ describe SshKey do
           'X8f1ohAZ9IG41hwIOvB5UcrFenqYIpMPBCCOnizUcyIFJhegJDWh2oWlBo041emGOX3VCRjtGug3 ' +
           'fbulgarelli@Manass-MacBook-2.local',
       device: device) }
+
+  before { device.ssh_key = ssh_key }
 
   describe '::clients' do
     let(:clients) { SshKey.clients }
@@ -38,5 +39,10 @@ describe SshKey do
     before { SshKey.regenerate_authorized_keys! }
 
     it { expect(File.readlines(CDXSync.default_authorized_keys_path).size).to eq 1 }
+  end
+
+  it "deletes other ssh keys with same public key" do
+    other_ssh_key = SshKey.create! public_key: ssh_key.public_key, device: Device.make
+    expect(SshKey.all.to_a).to eq([other_ssh_key])
   end
 end
