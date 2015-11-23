@@ -147,6 +147,28 @@ class DevicesController < ApplicationController
     end
   end
 
+  def send_setup_email
+    receiptment = params[:receiptment]
+
+    if @device.device_model.supports_activation?
+      if has_access?(@device, GENERATE_ACTIVATION_TOKEN) && @device.activation_token.blank?
+        @token = @device.new_activation_token
+        @token.save!
+      end
+    else
+      # regenerate secret key for devices that use them for activation
+      if has_access?(@device, REGENERATE_DEVICE_KEY)
+        @device.set_key
+        @device.save!
+      end
+    end
+
+    DeviceMailer.setup_instructions(current_user, receiptment, @device).deliver_now
+    flash[:notice] = "Setup instructions sent to #{receiptment}"
+
+    render json: {status: :ok}
+  end
+
   def request_client_logs
     return unless authorize_resource(@device, SUPPORT_DEVICE)
 
