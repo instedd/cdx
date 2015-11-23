@@ -30,7 +30,7 @@ var ConfirmationModal = React.createClass({
   },
 
   confirmButtonClass: function() {
-    return this.props.deletion ? "btn-primary btn-delete" : "btn-primary";
+    return this.props.deletion ? "btn-primary btn-danger" : "btn-primary";
   },
 
   showCancelButton: function() {
