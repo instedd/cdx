@@ -1,30 +1,29 @@
 - content_for(:subheader) do
-  - if @institutions.size > 1 || @sites.size > 1
-    %form(data-auto-submit)
-      .row.center.filters
-        .col.pe-10
-          .row
-            .col
-              %h1
-                - if @can_create
-                  = link_to "+", new_device_path, class: 'btn-add side-link fix', title: 'Add Device'
-                Devices
-          .row
-            - if @institutions.size > 1
-              .filter
-                %label.block Institution
-                = cdx_select name: "institution", value: params["institution"] do |select|
-                  - select.item "", "(all)"
-                  - select.items @institutions, :id, :name
-            - if @sites.size > 1
-              .filter
-                %label.block Site
-                = cdx_select name: "site", value: params["site"] do |select|
-                  - select.item "", "(all)"
-                  - select.items @sites, :id, :name
-
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            - if @can_create
+              = link_to "+", new_device_path, class: 'btn-add side-link fix', title: 'Add Device'
+            Devices
+      %form(data-auto-submit)
+        .row
+          - if @institutions.size > 1
             .filter
-              %label.block Manufacturer
-              = cdx_select name: "manufacturer", value: params["manufacturer"] do |select|
+              %label.block Institution
+              = cdx_select name: "institution", value: params["institution"] do |select|
                 - select.item "", "(all)"
-                - select.items @manufacturers, :id, :name
+                - select.items @institutions, :id, :name
+          - if @sites.size > 1
+            .filter
+              %label.block Site
+              = cdx_select name: "site", value: params["site"] do |select|
+                - select.item "", "(all)"
+                - select.items @sites, :id, :name
+
+          .filter
+            %label.block Manufacturer
+            = cdx_select name: "manufacturer", value: params["manufacturer"] do |select|
+              - select.item "", "(all)"
+              - select.items @manufacturers, :id, :name

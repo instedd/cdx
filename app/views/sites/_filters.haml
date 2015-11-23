@@ -1,14 +1,14 @@
 - content_for(:subheader) do
-  - unless @institutions.one?
-    %form(data-auto-submit)
-      .row.center.filters
-        .col.pe-10
-          .row
-            .col
-              %h1
-                - if @can_create
-                  = link_to "+", new_site_path, class: 'btn-add side-link fix', title: 'Add Site'
-                Sites
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            - if @can_create
+              = link_to "+", new_site_path, class: 'btn-add side-link fix', title: 'Add Site'
+            Sites
+      - unless @institutions.one?
+        %form(data-auto-submit)
           .row
             .filter
               %label.block Institution
