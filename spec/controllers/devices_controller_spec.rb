@@ -230,12 +230,8 @@ describe DevicesController do
 
   describe "generate_activation_token" do
     before { post :generate_activation_token, {institution_id: device.institution_id, id: device.id, format: :json} }
-    let(:token) { ActivationToken.find_by(device_id: device.id)  }
 
-    it { expect(token).not_to be_nil }
-    it { expect(token.device).to eq(device) }
-    it { expect(token.client_id).to eq(device.uuid) }
-    it { expect(token.value).not_to be_nil }
+    it { device.reload; expect(device.activation_token).not_to be_nil }
   end
 
   describe "request_client_logs" do

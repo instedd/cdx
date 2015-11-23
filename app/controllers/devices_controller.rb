@@ -137,12 +137,12 @@ class DevicesController < ApplicationController
 
     @token = @device.new_activation_token
     respond_to do |format|
-      if @token.save
+      if @device.save
         format.js
         format.json { render json: @token }
       else
         format.js
-        format.json { render json: @token.errors, status: :unprocessable_entity }
+        format.json { render json: @device.errors, status: :unprocessable_entity }
       end
     end
   end

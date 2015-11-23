@@ -11,26 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151123180754) do
-
-  create_table "activation_tokens", force: :cascade do |t|
-    t.string   "value",      limit: 255
-    t.string   "client_id",  limit: 255
-    t.integer  "device_id",  limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "activation_tokens", ["device_id"], name: "index_activation_tokens_on_device_id", using: :btree
-  add_index "activation_tokens", ["value"], name: "index_activation_tokens_on_value", unique: true, using: :btree
-
-  create_table "activations", force: :cascade do |t|
-    t.integer  "activation_token_id", limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "activations", ["activation_token_id"], name: "index_activations_on_activation_token_id", unique: true, using: :btree
+ActiveRecord::Schema.define(version: 20151123201511) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -104,8 +85,8 @@ ActiveRecord::Schema.define(version: 20151123180754) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",                  limit: 4
-    t.boolean  "supports_activation"
     t.datetime "published_at"
+    t.boolean  "supports_activation"
     t.string   "support_url",                     limit: 255
     t.string   "picture_file_name",               limit: 255
     t.string   "picture_content_type",            limit: 255
@@ -120,18 +101,19 @@ ActiveRecord::Schema.define(version: 20151123180754) do
   add_index "device_models", ["published_at"], name: "index_device_models_on_published_at", using: :btree
 
   create_table "devices", force: :cascade do |t|
-    t.string   "name",            limit: 255
+    t.string   "name",             limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uuid",            limit: 255
-    t.integer  "institution_id",  limit: 4
-    t.integer  "device_model_id", limit: 4
-    t.string   "secret_key_hash", limit: 255
-    t.string   "time_zone",       limit: 255
-    t.text     "custom_mappings", limit: 65535
-    t.integer  "site_id",         limit: 4
-    t.string   "serial_number",   limit: 255
-    t.string   "site_prefix",     limit: 255
+    t.string   "uuid",             limit: 255
+    t.integer  "institution_id",   limit: 4
+    t.integer  "device_model_id",  limit: 4
+    t.string   "secret_key_hash",  limit: 255
+    t.string   "time_zone",        limit: 255
+    t.text     "custom_mappings",  limit: 65535
+    t.integer  "site_id",          limit: 4
+    t.string   "serial_number",    limit: 255
+    t.string   "site_prefix",      limit: 255
+    t.string   "activation_token", limit: 255
   end
 
   create_table "encounters", force: :cascade do |t|

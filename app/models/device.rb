@@ -7,7 +7,6 @@ class Device < ActiveRecord::Base
 
   has_one :manifest, through: :device_model
 
-  has_one :activation_token, dependent: :destroy
   has_one :ssh_key, dependent: :destroy
 
   has_many :test_results
@@ -82,7 +81,7 @@ class Device < ActiveRecord::Base
   def set_key
     set_key_for_activation_token
     self.ssh_key.try :destroy
-    self.activation_token.try :destroy
+    self.activation_token = nil
   end
 
   def set_key_for_activation_token
@@ -98,11 +97,13 @@ class Device < ActiveRecord::Base
     self.site_prefix = site.try(:prefix)
   end
 
-  def new_activation_token
+  ACTIVATION_TOKEN_CHARS = ('0'..'9').to_a + ('A'..'Z').to_a
+
+  def new_activation_token(token_value = ACTIVATION_TOKEN_CHARS.sample(16, random: Random.new).join)
     self.ssh_key.try :destroy
-    self.activation_token.try :destroy
+    self.activation_token = nil
     SshKey.regenerate_authorized_keys!
-    self.activation_token = ActivationToken.new(device: self)
+    self.activation_token = token_value
   end
 
   def has_pending_log_requests?
@@ -122,6 +123,17 @@ class Device < ActiveRecord::Base
 
   def activated?
     device_messages.any? || (device_model.supports_activation? && secret_key_hash && !activation_token)
+  end
+
+  def use_activation_token!(public_key)
+    Device.transaction do
+      self.ssh_key = SshKey.create!(public_key: public_key, device: self)
+      SshKey.regenerate_authorized_keys!
+    end
+    self.activation_token = nil
+    self.set_key_for_activation_token
+    self.save!
+    SyncHelpers.client_settings(uuid, plain_secret_key)
   end
 
   private

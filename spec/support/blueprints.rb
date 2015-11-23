@@ -132,11 +132,6 @@ Filter.blueprint do
   name
 end
 
-ActivationToken.blueprint do
-  device
-  value { "token-#{Sham.sn}" }
-end
-
 Site.blueprint do
   institution
   name
