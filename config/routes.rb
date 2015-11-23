@@ -104,7 +104,6 @@ Rails.application.routes.draw do
         get :schema
       end
       member do
-        get :custom_fields
         get :pii
       end
     end
@@ -112,6 +111,9 @@ Rails.application.routes.draw do
     resources :encounters, only: [] do
       collection do
         get :schema
+      end
+      member do
+        get :pii
       end
     end
     resources :devices, only: [] do

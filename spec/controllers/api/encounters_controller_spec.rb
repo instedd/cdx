@@ -7,6 +7,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
   let(:site) { Site.make institution: institution }
   let(:device) { Device.make institution: institution, site: site }
   let(:data) { Oj.dump test:{assays: [result: :positive]} }
+
   before(:each) { sign_in user }
 
   def get_updates(options, body="")
@@ -39,6 +40,28 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
       schema = Oj.load(response.body)
       expect(schema.keys).to contain_exactly('$schema', 'type', 'title', 'properties')
       expect(schema['title']).to eq('es-AR')
+    end
+  end
+
+  context "Pii" do
+    it "should return pii" do
+      register_cdx_fields encounter: { fields: { case_sn: { pii: true } } }
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(
+        test: { assays:[{name: "mtb", result: :positive}] },
+        encounter: { patient_age: Cdx::Field::DurationField.years(10), case_sn: "1234" },
+        patient: { name: "John Doe" })
+
+      expect(Encounter.count).to eq(1)
+      encounter = Encounter.first
+
+      get :pii, id: encounter.uuid
+
+      expect(response).to be_success
+      pii = Oj.load(response.body)
+
+      expect(pii['uuid']).to eq(encounter.uuid)
+      expect(pii['pii']['patient']['name']).to eq("John Doe")
+      expect(pii['pii']['encounter']['case_sn']).to eq("1234")
     end
   end
 end

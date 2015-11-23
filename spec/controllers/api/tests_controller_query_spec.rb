@@ -31,6 +31,34 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         expect(response.size).to eq(1)
         expect(response.first["test"]["assays"].first["result"]).to eq("positive")
       end
+
+      context "Custom fields" do
+        it "should retrieve an test custom fields when querying", context do
+          device.manifest.update! definition: %{{
+            "metadata" : {
+              "version" : 2,
+              "api_version" : "#{Manifest::CURRENT_VERSION}",
+              "source" : {"type" : "json"}
+            },
+            "custom_fields": {
+              "test.foo": {
+                "type": "string"
+              }
+            },
+            "field_mapping" : {
+              "test.foo" : {"lookup" : "some_field"}
+            }
+          }}
+          DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(some_field: 1234)
+          test = all_elasticsearch_tests.first["_source"]["test"]
+
+          refresh_index
+
+          response = get_updates "id" => test["uuid"]
+          expect(response.size).to eq(1)
+          expect(response.first["test"]["custom_fields"]["foo"]).to eq(1234)
+        end
+      end
     end
 
     context "Filter" do
@@ -204,37 +232,6 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         expect(response[0]["encounter"]["patient_age"]["years"]).to eq(10)
         expect(response[1]["test"]["assays"].first["result"]).to eq("positive")
         expect(response[1]["encounter"]["patient_age"]["years"]).to eq(20)
-      end
-    end
-
-    context "Custom Fields" do
-      it "should retrieve an test custom fields by uuid", context do
-        device.manifest.update! definition: %{{
-          "metadata" : {
-            "version" : 2,
-            "api_version" : "#{Manifest::CURRENT_VERSION}",
-            "source" : {"type" : "json"}
-          },
-          "custom_fields": {
-            "test.foo": {
-              "type": "string"
-            }
-          },
-          "field_mapping" : {
-            "test.foo" : {"lookup" : "some_field"}
-          }
-        }}
-        DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(some_field: 1234)
-        test = all_elasticsearch_tests.first["_source"]["test"]
-
-        refresh_index
-
-        response = get :custom_fields, id: test["uuid"]
-        expect(response.status).to eq(200)
-        response = Oj.load response.body
-
-        expect(response["custom_fields"]["test"]["foo"]).to eq(1234)
-        expect(response["uuid"]).to eq(test["uuid"])
       end
     end
 

@@ -44,13 +44,6 @@ class TestResult < ActiveRecord::Base
     self
   end
 
-  def pii_data
-    pii = {entity_scope => plain_sensitive_data}
-    pii = pii.deep_merge(sample.entity_scope => sample.plain_sensitive_data) if sample
-    pii = pii.deep_merge(patient.entity_scope => patient.plain_sensitive_data) if patient
-    pii
-  end
-
   def custom_fields_data
     data = {entity_scope => custom_fields}
     data = data.deep_merge(sample.entity_scope => sample.custom_fields) if sample

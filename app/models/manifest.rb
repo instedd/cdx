@@ -57,7 +57,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def custom_fields
-    (loaded_definition['custom_fields'] || [])
+    (loaded_definition['custom_fields'] || {})
   end
 
   def apply_to(data, device)

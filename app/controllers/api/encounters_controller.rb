@@ -17,6 +17,11 @@ class Api::EncountersController < ApiController
     end
   end
 
+  def pii
+    encounter = Encounter.find_by_uuid(params[:id])
+    render_json "uuid" => params[:id], "pii" => encounter.pii_data
+  end
+
   def schema
     schema = EncountersSchema.new params["locale"]
     respond_to do |format|

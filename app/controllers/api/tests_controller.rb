@@ -17,11 +17,6 @@ class Api::TestsController < ApiController
     end
   end
 
-  def custom_fields
-    test = TestResult.includes(sample_identifier: :sample).find_by_uuid(params[:id])
-    render_json "uuid" => params[:id], "custom_fields" => test.custom_fields_data
-  end
-
   def pii
     test = TestResult.find_by_uuid(params[:id])
     render_json "uuid" => params[:id], "pii" => test.pii_data
