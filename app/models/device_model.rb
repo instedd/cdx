@@ -25,6 +25,12 @@ class DeviceModel < ActiveRecord::Base
   attr_accessor :picture_content_type
   before_validation { picture.clear if delete_picture == '1' }
 
+  has_attached_file :setup_instructions
+  validates_attachment_content_type :setup_instructions, :content_type =>['application/pdf'], message: 'must be a pdf file'
+  attr_accessor :delete_setup_instructions
+  attr_accessor :setup_instructions_content_type
+  before_validation { setup_instructions.clear if delete_setup_instructions == '1' }
+
   def full_name
     if institution
       "#{name} (#{institution.name})"

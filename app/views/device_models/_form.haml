@@ -38,6 +38,18 @@
 
   .row
     .col.pe-3
+      = f.label :setup_instructions
+    .col
+      - if !@device_model.new_record? && @device_model.setup_instructions.present? && !@device_model.errors.include?(:setup_instructions)
+        = link_to "download", @device_model.setup_instructions.url
+        = f.check_box :delete_setup_instructions
+        = f.label :delete_setup_instructions
+        %br
+        Upload new version
+      = f.file_field :setup_instructions
+
+  .row
+    .col.pe-3
       = f.label :supports_activation
     .col
       = f.check_box :supports_activation

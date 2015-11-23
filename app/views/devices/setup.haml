@@ -4,7 +4,7 @@
   .col
     %h4 Setup
 
-    = react_component("DeviceSetup", device_model: @device.device_model)
+    = react_component "DeviceSetup", device_model: @device.device_model.try { |device_model| { support_url: device_model.support_url, setup_instructions_url: device_model.setup_instructions.present? ? device_model.setup_instructions.url : "" } }
 
     %p
       The Device Id and Secure Key allow your device to identify itself with CDx.

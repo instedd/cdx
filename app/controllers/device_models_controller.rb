@@ -106,11 +106,11 @@ class DeviceModelsController < ApplicationController
   end
 
   def device_model_create_params
-    params.require(:device_model).permit(:name, :picture, :delete_picture, :institution_id, :supports_activation, :support_url, manifest_attributes: [:definition])
+    params.require(:device_model).permit(:name, :picture, :delete_picture, :setup_instructions, :delete_setup_instructions, :institution_id, :supports_activation, :support_url, manifest_attributes: [:definition])
   end
 
   def device_model_update_params
-    params.require(:device_model).permit(:name, :picture, :delete_picture, :supports_activation, :support_url, manifest_attributes: [:definition])
+    params.require(:device_model).permit(:name, :picture, :delete_picture, :setup_instructions, :delete_setup_instructions, :supports_activation, :support_url, manifest_attributes: [:definition])
   end
 
   def set_published_status(device_model)
