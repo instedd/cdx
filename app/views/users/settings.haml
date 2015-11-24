@@ -17,11 +17,11 @@
         - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
   .row
     .col.pe-2
-      = f.label :timestamps_in_device_time_zone, "Show test results timestamps relative to"
+      = f.label :timestamps_in_device_time_zone, "Test timestamps"
     .col
       = cdx_select form: f, name: :timestamps_in_device_time_zone, class: 'input-xx-large' do |select|
-        - select.item false, "My time zone"
-        - select.item true, "The device time zone"
+        - select.item false, "Relative to my time zone"
+        - select.item true, "Relative to the device time zone"
 
   .row.button-actions
     .col
