@@ -9,7 +9,11 @@ module Helpers
     end
   end
 
-  def canned_policy(institution=1)
+  def canned_policy(*args)
+    institution = args[0]
+    options = args.extract_options!
+    site = options[:site] || '*'
+
     policy = <<-JSON.strip_heredoc
      {
        "statement": [
@@ -17,6 +21,9 @@ module Helpers
             "resource": [
               "deviceModel?institution=#{institution}",
               "device?institution=#{institution}"
+            ],
+            "resource": [
+              "site/#{site}"
             ],
             "except": [
               "deviceModel/1"

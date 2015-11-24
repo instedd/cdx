@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       get :devices
       get :tests
       get :dependencies
+      get :users
     end
   end
 
