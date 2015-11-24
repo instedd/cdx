@@ -1,4 +1,7 @@
 class MoveActivationTokensToDevices < ActiveRecord::Migration
+  class Activation < ActiveRecord::Base
+  end
+
   class ActivationToken < ActiveRecord::Base
     has_one :activation, dependent: :destroy
 
