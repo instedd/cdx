@@ -46,6 +46,7 @@ Rails.application.routes.draw do
       get :tests
       get :logs
       get :setup
+      post :send_setup_email
     end
     collection do
       post 'custom_mappings'

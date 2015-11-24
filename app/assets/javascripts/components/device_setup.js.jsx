@@ -1,4 +1,10 @@
 var DeviceSetup = React.createClass({
+  getInitialState: function() {
+    return {
+      receiptment: '',
+    };
+  },
+
   showInstructionsModal: function() {
     this.refs.instructionsModal.show();
     event.preventDefault();
@@ -6,6 +12,39 @@ var DeviceSetup = React.createClass({
 
   hideInstructionsModal: function() {
     this.refs.instructionsModal.hide();
+    event.preventDefault();
+  },
+
+
+  showEmailModal: function() {
+    this.setState(React.addons.update(this.state, {
+      receiptment: { $set: '' }
+    }));
+    this.refs.emailModal.show();
+    event.preventDefault();
+  },
+
+  changeReceiptment: function(event) {
+    this.setState(React.addons.update(this.state, {
+      receiptment: { $set: event.target.value }
+    }));
+  },
+
+  sendEmail: function() {
+    $.ajax({
+      url: '/devices/' + this.props.device.id + '/send_setup_email',
+      method: 'POST',
+      data: {receiptment: this.state.receiptment},
+      success: function () {
+        this.closeEmailModal();
+        window.location.reload(true); // reload page in order to hide secret key
+      }.bind(this)
+    });
+    // TODO handle error maybe globally
+  },
+
+  closeEmailModal: function() {
+    this.refs.emailModal.hide();
     event.preventDefault();
   },
 
@@ -29,7 +68,7 @@ var DeviceSetup = React.createClass({
     return (
       <p>
         <a href='#' onClick={this.showInstructionsModal}>View instructions</a> on how to setup this device
-        or <a>email setup instructions to a lab operator</a>.
+        or <a href='#' onClick={this.showEmailModal}>email setup instructions to a lab operator</a>.
 
         <Modal ref="instructionsModal">
           <h1>
@@ -42,6 +81,20 @@ var DeviceSetup = React.createClass({
 
           <div className="modal-footer">
             <button className="btn btn-secondary" onClick={this.hideInstructionsModal}>Close</button>
+          </div>
+        </Modal>
+
+        <Modal ref="emailModal">
+          <h1>
+            Email instructions
+          </h1>
+
+          <label>Receiptment</label>
+          <input type="text" className="input-block" value={this.state.receiptment} onChange={this.changeReceiptment} />
+
+          <div className="modal-footer">
+            <button className="btn btn-primary" onClick={this.sendEmail}>Send</button>
+            <button className="btn btn-link" onClick={this.closeEmailModal}>Cancel</button>
           </div>
         </Modal>
       </p>

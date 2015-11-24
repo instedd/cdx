@@ -21,6 +21,7 @@ gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 
 gem 'config'
 gem 'rest-client'
 gem 'barby'
+gem 'chunky_png'
 gem 'gon'
 gem 'rchardet'
 gem 'therubyracer'
