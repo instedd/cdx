@@ -40,7 +40,7 @@
     .col.pe-3
       = f.label :setup_instructions
     .col
-      - if !@device_model.new_record? && @device_model.setup_instructions.present? && !@device_model.errors.include?(:setup_instructions)
+      - if !@device_model.new_record? && @device_model.setup_instructions.present?
         = link_to "download", @device_model.setup_instructions.url
         = f.check_box :delete_setup_instructions
         = f.label :delete_setup_instructions
