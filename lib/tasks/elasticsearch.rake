@@ -1,4 +1,4 @@
-namespace :cdx_elasticsearch do
+namespace :elasticsearch do
   desc "Initialize the cdx elasticsearch index template"
   task setup: :environment do
     Cdx::Api.config.log = false

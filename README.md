@@ -22,7 +22,7 @@ To start developing:
 
 4. Setup test database: `bundle exec rake db:test:prepare`
 
-5. Setup elasticsearch index template: `bundle exec rake cdx_elasticsearch:setup`
+5. Setup elasticsearch index template: `bundle exec rake elasticsearch:setup`
 
 6. Run tests: `bundle exec rspec`
 
