@@ -13,3 +13,16 @@ Feature: Superadmin can invite users to the system
     Given Bill does not have an account
     When Bob sends an invitation to Bill Smith
     Then Bob should see "An invitation email has been sent to billsmith@copado.com"
+
+  Scenario: Bob views users he added to a specific lab
+    Given the following users created by Bob
+      | first_name | last_name | lab_name |
+      | John       | Lennon    | Lab One  |
+      | George     | Harrison  | Lab One  |
+      | Ringo      | Starr     | Lab One  |
+      | Paul       | McCartney | Lab Two  |
+    When Bob view the users tab on Lab One
+    Then Bob should see "John Lennon"
+    And Bob should see "George Harrison"
+    And Bob should see "Ringo Starr"
+    But Bob should not see "Paul McCartney"

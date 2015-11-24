@@ -1,0 +1,14 @@
+- if @users.empty?
+  %span This site has no users yet
+- else
+  = cdx_table title: 'Users' do |t|
+    - t.thead do
+      %tr
+        %th Name
+        %th Last activity
+    - t.tbody do
+      - @users.each do |user|
+        %tr
+          %td= user.full_name
+          %td= last_activity(user)
+

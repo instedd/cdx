@@ -105,6 +105,14 @@ class SitesController < ApplicationController
 
     render layout: false
   end
+  
+  def users
+    @site = Site.find(params[:id])
+    return unless authorize_resource(@site, READ_SITE)
+
+    @users = ComputedPolicy.authorized_users(Policy::Actions::READ_SITE, @site)
+    render layout: false
+  end
 
   def dependencies
     site = Site.find(params[:id])
