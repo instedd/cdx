@@ -1,7 +1,7 @@
 - if @users.empty?
   %span This site has no users yet
 - else
-  = cdx_table title: 'Users' do |t|
+  = cdx_table do |t|
     - t.thead do
       %tr
         %th Name
