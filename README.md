@@ -66,7 +66,7 @@ To run [notifiable diseases](https://github.com/instedd/notifiable-diseases) on 
 
     $ cd $NOTIFIABLE_DISEASES/conf
     $ ln -s $CDP/etc/nndd/settings.local.json settings.local.json
-    $ ln -s $CDP/etc/nndd/custom.local.scss custom.local.scss
+    $ ln -s $CDP/etc/nndd/main.local.css main.local.css
 
 ### Sync Server
 
