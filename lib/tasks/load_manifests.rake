@@ -8,6 +8,7 @@ namespace :manifests do
       "Fio" => false,
       "Genoscan" => true,
       "Qiagen Esequant Lr3" => false,
+      "Bdmicro Imager" => false,
     }
 
     Dir.glob(File.join(Rails.root, 'db', 'seeds', 'manifests', '*.json')) do |path|
