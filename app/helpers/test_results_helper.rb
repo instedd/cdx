@@ -45,7 +45,6 @@ module TestResultsHelper
     yield "site.name", "Site", false if @sites.size > 1
     yield "device.name", "Device", false if @devices.size > 1
     yield "sample.id", "Sample Id", true
-    yield "encounter.id", "Encounter Id", true
     yield "test.start_time", "Start Time", true
     yield "test.end_time", "End Time", true
   end

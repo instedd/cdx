@@ -45,6 +45,10 @@
     td {
       padding: 14px 10px;
       border-bottom: 1px solid $gray1;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     tr:last-child th {
