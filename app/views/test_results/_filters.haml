@@ -1,6 +1,6 @@
 - content_for(:subheader) do
   %form#filters-form(data-auto-submit)
-    %input{type: "hidden", name: "page_size"}
+    %input{type: "hidden", name: "page_size", value: @page_size}
     .row.center.filters
       .col.pe-10
         .row
