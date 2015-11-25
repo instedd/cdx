@@ -9,19 +9,6 @@
             Devices
       %form(data-auto-submit)
         .row
-          - if @institutions.size > 1
-            .filter
-              %label.block Institution
-              = cdx_select name: "institution", value: params["institution"] do |select|
-                - select.item "", "(all)"
-                - select.items @institutions, :id, :name
-          - if @sites.size > 1
-            .filter
-              %label.block Site
-              = cdx_select name: "site", value: params["site"] do |select|
-                - select.item "", "(all)"
-                - select.items @sites, :id, :name
-
           .filter
             %label.block Manufacturer
             = cdx_select name: "manufacturer", value: params["manufacturer"] do |select|

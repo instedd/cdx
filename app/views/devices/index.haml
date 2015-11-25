@@ -6,8 +6,6 @@
       - t.thead do
         %tr
           %th Name
-          - unless @institutions.one?
-            %th Institution
           %th Manufacturer
           %th Model
           %th Site
@@ -16,8 +14,6 @@
           %tr
           %tr{data: (@devices_to_read.include?(device.id) ? {href: device_path(device) } : {})}
             %td= device.name
-            - unless @institutions.one?
-              %td= device.institution.name
             %td= device.device_model.institution.try :name
             %td= device.device_model.full_name
             %td= device.site.try(:name)
