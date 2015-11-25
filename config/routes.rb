@@ -90,7 +90,6 @@ Rails.application.routes.draw do
 
   root :to => 'home#index'
   get 'verify' => 'home#verify'
-  get 'confirm' => 'home#confirm'
   get 'join' => 'home#join'
 
   namespace :api, defaults: { format: 'json' } do

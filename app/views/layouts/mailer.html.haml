@@ -1,3 +1,27 @@
-%hmtl
+%html
+  %head
+    - if Rails.env.development?
+      -# https://github.com/fphilipe/premailer-rails/issues/108
+      :css
+        #{Rails.application.assets.find_asset('mailer.css').body}
+    - else
+      = stylesheet_link_tag "mailer", :media => "all"
   %body
-    = yield
+    .container
+      .email-logo.centered
+        = image_tag "cdx-logo-med.png"
+      .box.big.centered
+        = yield
+      .bottom-links.centered
+        -# -# .row
+        -# -#   .col
+        -# -#     Link not working? Paste this into your browser:
+        -# -#     %a.block{:href => "#"} http://cdx.org/confirm-email/809832498754
+        -#
+        -# .row
+        -#   .col
+        ©2015 Conected Diagnostics
+        %br
+        %a{:href => "#"} Privacy Policy
+        |
+        %a{:href => "#"} Terms and conditions
