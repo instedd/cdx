@@ -1,4 +1,4 @@
-{
+window.overrides = {
   "brand": "CDP",
   "api": "/api",
   "useLocalStorage" : true,
@@ -7,7 +7,6 @@
   "mapBounds": null,
   "onlyShowPositiveResults": false,
   "parentURL": "/dashboards/nndd",
-  "customStyles": "../conf/custom.local.scss",
   "showMarkersOnMap": false,
   "proxies": [
     {
@@ -16,4 +15,4 @@
       "port": 3000
     }
   ]
-}
+};

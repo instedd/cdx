@@ -65,8 +65,8 @@ CDX uses [Poirot](https://github.com/instedd/poirot_rails) for additional loggin
 To run [notifiable diseases](https://github.com/instedd/notifiable-diseases) on development, checkout the project and symlink the custom settings files in `/etc/nndd` on this project:
 
     $ cd $NOTIFIABLE_DISEASES/conf
-    $ ln -s $CDP/etc/nndd/settings.local.json settings.local.json
-    $ ln -s $CDP/etc/nndd/main.local.css main.local.css
+    $ ln -s $CDP/etc/nndd/overrides.js overrides.js
+    $ ln -s $CDP/etc/nndd/overrides.css overrides.css
 
 ### Sync Server
 
