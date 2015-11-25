@@ -56,36 +56,7 @@ class Policy < ActiveRecord::Base
     MEDICAL_DASHBOARD = "testResult:medicalDashboard"
   end
 
-  ACTIONS = [
-    Actions::CREATE_INSTITUTION,
-    Actions::READ_INSTITUTION,
-    Actions::UPDATE_INSTITUTION,
-    Actions::DELETE_INSTITUTION,
-    Actions::CREATE_INSTITUTION_SITE,
-    Actions::READ_SITE,
-    Actions::UPDATE_SITE,
-    Actions::DELETE_SITE,
-    Actions::REGISTER_INSTITUTION_DEVICE,
-    Actions::REGISTER_INSTITUTION_DEVICE_MODEL,
-    Actions::READ_DEVICE,
-    Actions::UPDATE_DEVICE,
-    Actions::DELETE_DEVICE,
-    Actions::READ_DEVICE_MODEL,
-    Actions::UPDATE_DEVICE_MODEL,
-    Actions::DELETE_DEVICE_MODEL,
-    Actions::PUBLISH_DEVICE_MODEL,
-    Actions::ASSIGN_DEVICE_SITE,
-    Actions::REGENERATE_DEVICE_KEY,
-    Actions::GENERATE_ACTIVATION_TOKEN,
-    Actions::SUPPORT_DEVICE,
-    Actions::QUERY_TEST,
-    Actions::PII_TEST,
-    Actions::REPORT_MESSAGE,
-    Actions::CREATE_INSTITUTION_ENCOUNTER,
-    Actions::READ_ENCOUNTER,
-    Actions::UPDATE_ENCOUNTER,
-    Actions::PII_ENCOUNTER
-  ]
+  ACTIONS = Actions.constants.map{|action| Actions.const_get(action)}
 
   def self.superadmin(user)
     predefined_policy "superadmin", user
