@@ -146,7 +146,7 @@ class Device < ActiveRecord::Base
 
   def same_institution_of_site
     if self.site && self.site.institution != self.institution
-      errors.add(:site, "must belongs to the institution of the device")
+      errors.add(:site, "must belong to the institution of the device")
     end
   end
 
