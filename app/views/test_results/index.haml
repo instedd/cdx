@@ -24,13 +24,13 @@
         of
         = (@total.to_f / @page_size).ceil
       %span(style="display: inline-block;")
-        = cdx_select name: "page_size", value: @page_size, class: 'input-large' do |select|
+        = cdx_select name: "page_size_select", value: @page_size, class: 'input-large' do |select|
           - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
       :javascript
         $(function(){
-          $(document).on('change', 'input[name=page_size]', function(){
-            var form = this.form;
-            form.submit();
+          $(document).on('change', 'input[name=page_size_select]', function(){
+            $('input[name=page_size]').val($(this).val());
+            $('#filters-form').submit();
           });
         })
 
