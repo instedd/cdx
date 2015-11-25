@@ -1,0 +1,36 @@
+= form_for @role do |f|
+  - if @role.errors.any?
+    #error_explanation
+      %p= "#{pluralize(@role.errors.count, "error")} prohibited this @role from being saved:"
+      %ul
+        - @role.errors.full_messages.each do |msg|
+          %li= msg
+
+  .row
+    .col.pe-2
+      = f.label :name
+    .col
+      = f.text_field :name
+  .row
+    .col.pe-2
+      = f.label :institution_id
+    .col
+      = f.text_field :institution_id
+  .row
+    .col.pe-2
+      = f.label :site_id
+    .col
+      = f.text_field :site_id
+
+  .row
+    .col.pe-2
+      = f.label :definition
+    .col.pe-3
+      .value
+        = f.text_area :definition, :rows => 5, :class => 'input-block'
+  .row.button-actions
+    .col
+      = f.submit 'Save', :class => 'btn-primary'
+      = link_to 'Cancel', roles_path, class: 'btn-link'
+      - if @editing
+        = confirm_deletion_button @role, 'role'

@@ -135,4 +135,6 @@ Rails.application.routes.draw do
     get 'settings' => "users#settings"
     patch 'settings' => "users#update_settings"
   end
+
+  resources :roles
 end
