@@ -32,6 +32,14 @@ class Device < ActiveRecord::Base
 
   delegate :current_manifest, to: :device_model
 
+  scope :within, -> (institution_or_site) {
+    if institution_or_site.is_a?(Institution)
+      where(institution: institution_or_site)
+    else
+      where("site_prefix LIKE concat(?, '%')", institution_or_site.prefix)
+    end
+  }
+
   CUSTOM_FIELD_TARGETS = ["patient.id", "sample.id", "encounter.id"]
 
   def self.filter_by_owner(user, check_conditions)
