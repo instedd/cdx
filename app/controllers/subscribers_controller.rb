@@ -22,6 +22,8 @@ class SubscribersController < ApplicationController
   end
 
   def new
+    redirect_to subscribers_path if filters.empty?
+
     subscriber.fields = []
   end
 
