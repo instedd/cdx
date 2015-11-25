@@ -1,5 +1,5 @@
 - content_for(:subheader) do
-  %form#filters-form(data-auto-submit)
+  %form#filters-form{action: test_results_path, "data-auto-submit" => true}
     %input{type: "hidden", name: "page_size", value: @page_size}
     .row.center.filters
       .col.pe-10

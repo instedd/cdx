@@ -59,7 +59,10 @@ $(document).ready(function(){
     var payload = form.serialize();
 
     var debouncedSubmit = _.debounce(function(){
-      form.submit();
+      var options = {};
+      var action = form.attr('action') || window.location.href;
+      var url = action + (action.indexOf('?') === -1 ? '?' : '&') + form.serialize();
+      Turbolinks.visit(url.toString(), options);
     }, 2000);
 
     form.on('change', function(){
