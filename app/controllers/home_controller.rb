@@ -8,10 +8,6 @@ class HomeController < ApplicationController
     render layout: "messages"
   end
 
-  def confirm
-    render layout: "clean"
-  end
-
   def join
     render layout: "clean"
   end

@@ -1,0 +1,29 @@
+@import "variables";
+@import "mixins";
+@import "reset";
+@import "global";
+@import "buttons";
+
+body {
+  background-color: #e6e6e6;
+  font-family: $sans;
+  font-size: 90%;
+}
+
+.container {
+  width: 480px;
+  margin: 3em auto;
+}
+
+.email-logo {
+  margin: 60px auto;
+}
+
+.bottom-links {
+  color: $gray3;
+  margin: 40px auto;
+
+  a {
+    color: inherit;
+  }
+}

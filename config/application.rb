@@ -31,5 +31,9 @@ module Cdp
     end
     config.autoload_paths << Rails.root.join("features", "support", "page_objects")
     config.autoload_paths += %W(#{config.root}/lib)
+
+    config.assets.precompile += %w( mailer.css )
+
+    config.action_mailer.asset_host = "http://#{Settings.host}"
   end
 end

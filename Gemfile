@@ -16,6 +16,7 @@ gem 'foreman'
 gem 'paperclip'
 gem 'newrelic_rpm'
 gem 'paranoia'
+gem 'premailer-rails'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'config'

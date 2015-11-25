@@ -1,19 +1,16 @@
 %h1= "Setup instructions for #{@device.name}"
 
-- if @device.device_model.supports_activation?
-  %h2 Activation token
-  .p= @device.activation_token.value.scan(/.{4}/).join("-")
-  = image_tag attachments['activation_token.png'].url
+%p
+  Please, contact the administrator for the
+  - if @device.device_model.supports_activation?
+    %b activation code
+  - else
+    %b secret key
 
-- else
-
+- if !@device.device_model.supports_activation?
   %h2 Device Id
   %p= @device.uuid
   = image_tag attachments['device_id.png'].url
-
-  %h2 Secret Key
-  %p= @device.plain_secret_key
-  = image_tag attachments['plain_secret_key.png'].url
 
 - if @device.device_model.support_url.present?
   %p
