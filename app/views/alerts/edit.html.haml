@@ -1,0 +1,12 @@
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to alerts_path(alert), class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            #{alert.name}
+
+= render 'form'
+

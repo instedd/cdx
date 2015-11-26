@@ -79,6 +79,7 @@ Rails.application.routes.draw do
   resources :subscribers
   resources :policies
   resources :api_tokens
+  resources :alerts
 
   scope :dashboards, controller: :dashboards do
     get :nndd

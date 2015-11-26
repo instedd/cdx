@@ -1,0 +1,22 @@
+.row
+  .col
+    = link_to "+", new_alert_path, class: 'btn-add side-link ontop fix', title: 'Add Alert'
+    = cdx_table title: 'Alerts - LIST' do |t|
+      - t.thead do
+        %tr
+          %th Ref
+          %th Name
+          %th Description
+          %th Enabled
+          %th Last Alert
+          %th Recipients
+          
+      - t.tbody do
+        - alerts.each do |alert|
+          %tr
+            %td= link_to alert.id, edit_alert_path(alert)
+            %td= link_to alert.name, edit_alert_path(alert)
+            %td= link_to alert.description, edit_alert_path(alert)
+            %td= link_to alert.enabled ? 'yes' : 'no', alert_path(alert)
+            %td= link_to alert.last_alert, edit_alert_path(alert)
+            %td= link_to alert.receipients, edit_alert_path(alert)

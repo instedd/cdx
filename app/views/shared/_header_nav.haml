@@ -29,6 +29,8 @@
             = link_to "Filters", filters_path
           %li{:class => params[:controller] == "subscribers" && "active"}
             = link_to "Apps", subscribers_path
+          %li{:class => params[:controller] == "alerts" && "active"}
+            = link_to "Alerts", alerts_path
         - if can_delegate_permissions?
           %li{:class => params[:controller] == "policies" && "active"}
             = link_to "Users", policies_path

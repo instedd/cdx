@@ -1,0 +1,25 @@
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to alerts_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            = alert.name
+.row
+  .col
+    %p#notice= notice
+    %p
+      %strong Name:
+      = alert.name
+    %p
+      %strong Description:
+      = alert.description
+
+
+%hr/
+
+.row
+  .col
+    = link_to 'Back', alerts_path, :class => 'btn-primary'
