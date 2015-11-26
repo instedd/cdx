@@ -31,8 +31,27 @@ var TestResultsTable = React.createClass({
     if (this.state.offset != targetOffset) {
       this.setState(React.addons.update(this.state, {
         offset: { $set: targetOffset },
-      }));
-      this._fetchTests();
+      }), function() {
+        this._fetchTests();
+      }.bind(this));
+    }
+  },
+
+  pageSizes: function() {
+    return (this.props.pageSizes || [2, 10, 50]).map(function(value) {
+      return {label: value + " results per row", value: value};
+    });
+  },
+
+  onPageSizeChange: function(targetPageSize) {
+    if (this.state.pageSize != targetPageSize) {
+      this.setState(React.addons.update(this.state, {
+        pageSize: { $set: targetPageSize },
+        offset: { $set: 0 }
+      }), function() {
+        this.refs.pager._setPage(1);
+        this._fetchTests();
+      }.bind(this));
     }
   },
 
@@ -67,10 +86,15 @@ var TestResultsTable = React.createClass({
           </tbody>
         </table>
 
-        <Pager
-          initialPage={Math.floor(this.state.offset / this.state.pageSize) + 1}
-          totalPages={Math.ceil(this.state.totalCount / this.state.pageSize)}
-          showPage={this.gotoPage} />
+        <div className="table-controls">
+          <Pager
+            ref="pager"
+            initialPage={Math.floor(this.state.offset / this.state.pageSize) + 1}
+            totalPages={Math.ceil(this.state.totalCount / this.state.pageSize)}
+            showPage={this.gotoPage} />
+
+          <CdxSelect items={this.pageSizes()} value={this.state.pageSize} onChange={this.onPageSizeChange} />
+        </div>
       </div>
     );
   }

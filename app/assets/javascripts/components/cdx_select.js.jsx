@@ -11,6 +11,9 @@ var CdxSelect = React.createClass({
       // is rendered by the time the change event is triggered
       $('input:hidden', this.getDOMNode()).trigger('change');
     }.bind(this), 0);
+    if(this.props.onChange) {
+      this.props.onChange(newValue, this);
+    }
   },
 
   render: function() {
