@@ -85,10 +85,10 @@ class ApplicationController < ActionController::Base
       # this will trigger a redirect ?context=<institution_or_site_uuid>
 
       # grab last context stored in user
-      default_context = current_user.last_navigation_context || check_access(Institution, READ_INSTITUTION).first.try(:uuid)
+      default_context = current_user.last_navigation_context
 
       # if user has no longer access, reset it to anything that make sense
-      if !NavigationContext.new(current_user, default_context).can_read?
+      if default_context.nil? || !NavigationContext.new(current_user, default_context).can_read?
         some_institution_uuid = check_access(Institution, READ_INSTITUTION).first.try(:uuid)
         current_user.update_attribute(:last_navigation_context, some_institution_uuid)
         default_context = some_institution_uuid
@@ -101,12 +101,12 @@ class ApplicationController < ActionController::Base
       # if there is an explicit context try to use it.
       @navigation_context = NavigationContext.new(current_user, params[:context])
 
-      if !@navigation_context.can_read?
+      if @navigation_context.can_read?
+        current_user.update_attribute(:last_navigation_context, params[:context])
+      else
         # if the user has no longer access to this context, reset it
         redirect_to url_for(params.merge({context: nil}))
       end
-
-      current_user.update_attribute(:last_navigation_context, params[:context])
     end
   end
 
