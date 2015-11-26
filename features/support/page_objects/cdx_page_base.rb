@@ -10,6 +10,7 @@ class CdxPageBase < SitePrism::Page
   element :navigation_context_handle, "#nav-context"
   section :navigation_context, NavigationContextSection, "#context_side_bar"
   element :primary, ".btn-primary"
+  element :content, ".content", match: :first
 
   def open_context_picker
     navigation_context_handle.click
@@ -19,5 +20,13 @@ class CdxPageBase < SitePrism::Page
   def submit
     primary.click
     wait_for_submit
+  end
+
+  def success?
+    status_code == 200
+  end
+
+  def forbidden?
+    status_code == 403
   end
 end

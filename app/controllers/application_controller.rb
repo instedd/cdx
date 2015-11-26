@@ -55,17 +55,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # filters/authorize @institutions by action. Assign calls resource.institution= if only one institution was left
+  # filters/authorize navigation_context institutions by action. Assign calls resource.institution= if action is allowed
   def prepare_for_institution_and_authorize(resource, action)
-    @institutions = authorize_resource(@institutions, action)
-    if @institutions.blank?
+    if authorize_resource(@navigation_context.institution, action).blank?
       head :forbidden
       nil
-    elsif @institutions.one?
-      resource.institution = @institutions.first
-      @institutions
     else
-      @institutions
+      resource.institution = @navigation_context.institution
     end
   end
 

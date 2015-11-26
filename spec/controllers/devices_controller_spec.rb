@@ -279,17 +279,6 @@ describe DevicesController do
 
     it "doesn't crash when there's no device model (#578)" do
       post :create, device: {
-        institution_id: institution.id,
-        name: "foo",
-        serial_number: "123"
-      }
-
-      expect(response).to be_ok
-    end
-
-    it "doesn't crash when there's no institution (#578)" do
-      post :create, device: {
-        device_model_id: device_model.id,
         name: "foo",
         serial_number: "123"
       }

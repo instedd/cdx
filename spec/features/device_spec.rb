@@ -1,6 +1,35 @@
 require 'spec_helper'
+require 'policy_spec_helper'
 
 describe "device" do
+  context "create" do
+    let(:user) { Institution.make.user }
+    let(:other_institution) { Institution.make }
+
+    before(:each) {
+      grant other_institution.user, user, other_institution, [READ_INSTITUTION]
+      sign_in(user)
+    }
+
+    it "can access if allowed" do
+      grant other_institution.user, user, Device, [READ_DEVICE]
+      grant other_institution.user, user, other_institution, [REGISTER_INSTITUTION_DEVICE]
+
+      goto_page NewDevicePage, query: { context: other_institution.uuid } do |page|
+        expect(page.content).to have_content(other_institution.name)
+        expect(page).to be_success
+      end
+    end
+
+    it "get's forbidden if not allowed" do
+      grant other_institution.user, user, Device, [READ_DEVICE]
+
+      goto_page NewDevicePage, query: { context: other_institution.uuid } do |page|
+        expect(page).to be_forbidden
+      end
+    end
+  end
+
   context "activation" do
     context "manufacturer" do
       let(:user) { Institution.make(:manufacturer).user }

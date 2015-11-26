@@ -25,7 +25,7 @@ class DevicePage < DeviceSetupPage
 end
 
 class NewDevicePage < CdxPageBase
-  set_url '/devices/new'
+  set_url '/devices/new{?query*}'
 
   section :device_model, CdxSelect, "label", text: /Device Model/i
   element :name, :field, "Name"

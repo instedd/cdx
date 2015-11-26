@@ -37,7 +37,7 @@ class DevicesController < ApplicationController
 
   def create
     @device = Device.new(device_params)
-    @institution = Institution.find_by_id params[:device][:institution_id]
+    @institution = @navigation_context.institution
     if @institution
       return unless authorize_resource(@institution, READ_INSTITUTION)
     end
