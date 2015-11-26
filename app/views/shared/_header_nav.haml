@@ -31,6 +31,8 @@
         - if has_access_to_test_results_index?
           %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
             = link_to "Tests", test_results_path
+          %li{:class => params[:controller] == "alerts" && "active"}
+            = link_to "Alerts", alerts_path
         - if can_delegate_permissions?
           %li{:class => params[:controller] == "policies" && "active"}
             = link_to "Policies", policies_path

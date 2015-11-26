@@ -91,6 +91,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :alerts
+
   scope :dashboards, controller: :dashboards do
     get :nndd
   end

@@ -1,0 +1,25 @@
+= form_for(alert) do |f|
+  - if alert.errors.any?
+    #error_explanation
+      %p= "#{pluralize(alert.errors.count, "error")} prohibited this alert from being saved:"
+      %ul
+        - alert.errors.full_messages.each do |msg|
+          %li= msg
+
+  .row
+    .col.pe-2
+      = f.label :name
+    .col
+      = f.text_field :name
+
+  .row
+    .col.pe-2
+      = f.label :description, :class => 'block'
+    .col
+      = f.text_field :description
+  .row.button-actions
+    .col
+      = f.submit class: "btn-primary"
+      = link_to 'Cancel', alerts_path, class: 'btn-link'
+      - if @editing
+        = confirm_deletion_button alert, 'alert'

@@ -13,6 +13,19 @@
 
 ActiveRecord::Schema.define(version: 20160215195614) do
 
+  create_table "alerts", force: :cascade do |t|
+    t.integer  "user_id",     limit: 4
+    t.string   "name",        limit: 255
+    t.string   "description", limit: 255
+    t.boolean  "enabled",                 default: true
+    t.integer  "receipients", limit: 4,   default: 0
+    t.datetime "last_alert"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "alerts", ["user_id"], name: "index_alerts_on_user_id", using: :btree
+
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
     t.string  "action",                   limit: 255
