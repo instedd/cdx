@@ -226,6 +226,26 @@ describe DevicesController do
       expect(new_device.activation_token).to_not be_nil
       expect(response).to redirect_to(setup_device_url(new_device))
     end
+
+    it "doesn't crash when there's no device model (#578)" do
+      post :create, device: {
+        institution_id: institution.id,
+        name: "foo",
+        serial_number: "123"
+      }
+
+      expect(response).to be_ok
+    end
+
+    it "doesn't crash when there's no institution (#578)" do
+      post :create, device: {
+        device_model_id: device_model.id,
+        name: "foo",
+        serial_number: "123"
+      }
+
+      expect(response).to be_ok
+    end
   end
 
   describe "generate_activation_token" do

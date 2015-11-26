@@ -11,11 +11,6 @@ ENV POIROT_SUPPRESS_RAILS_LOG true
 ENV PUMA_OPTIONS "--preload -w 4"
 ENV NNDD_VERSION "cdx-0.7-pre3"
 
-# Download NNDD
-RUN \
-  mkdir -p /app/public/ && \
-  curl -L https://github.com/instedd/notifiable-diseases/releases/download/$NNDD_VERSION/nndd.tar.gz | tar -xzv -C /app/public/
-
 # Install gem bundle
 ADD Gemfile /app/
 ADD Gemfile.lock /app/
@@ -29,6 +24,14 @@ RUN /app/docker/config-nndd
 
 # Precompile assets
 RUN bundle exec rake assets:precompile RAILS_ENV=production
+
+# Download NNDD
+RUN \
+  mkdir -p /app/public/ && \
+  curl -L https://github.com/instedd/notifiable-diseases/releases/download/$NNDD_VERSION/nndd.tar.gz | tar -xzv -C /app/public/
+
+# Configure NNDD
+RUN /app/docker/config-nndd
 
 # Set permissions for tmp and log directories
 RUN mkdir -p /app/tmp /app/log && chown -R app:app /app/tmp /app/log

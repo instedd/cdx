@@ -2,7 +2,6 @@ class DevicesController < ApplicationController
   before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models, :sites]
   before_filter :load_institutions, only: [:new, :create, :edit, :update, :device_models]
   before_filter :load_sites, only: [:new, :create, :edit, :update]
-  before_filter :load_institution, only: :create
   before_filter :load_device_models_for_create, only: [:new, :create]
   before_filter :load_device_models_for_update, only: [:edit, :update]
   before_filter :load_filter_resources, only: :index
@@ -31,10 +30,13 @@ class DevicesController < ApplicationController
   end
 
   def create
-    return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
-
-    @device = @institution.devices.new(device_params)
-    if @device.device_model.supports_activation?
+    @device = Device.new(device_params)
+    @institution = Institution.find_by_id params[:device][:institution_id]
+    if @institution
+      return unless authorize_resource(@institution, READ_INSTITUTION)
+    end
+    @device.institution = @institution
+    if @device.device_model.try(&:supports_activation?)
       @device.new_activation_token
     end
 
@@ -221,11 +223,6 @@ class DevicesController < ApplicationController
   end
 
   private
-
-  def load_institution
-    @institution = Institution.find params[:device][:institution_id]
-    authorize_resource(@institution, READ_INSTITUTION)
-  end
 
   def load_institutions
     # TODO FIX at :index @institutions should be institutions of devices that can be read
