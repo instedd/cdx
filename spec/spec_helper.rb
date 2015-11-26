@@ -73,6 +73,12 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+    stub_request(:get, "http://fonts.googleapis.com/css").
+         with(:query => hash_including(:family)).
+         to_return(:status => 200, :body => "", :headers => {})
+  end
+
+  config.before(:each) do
     Timecop.return
   end
 
