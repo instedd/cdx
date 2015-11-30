@@ -986,6 +986,30 @@ describe DeviceMessageProcessor, elasticsearch: true do
         expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
+      it "should merge patient with existing patient if patient id matches, even if it's a different site" do
+        patient = Patient.make(
+          institution: device_message.institution,
+          plain_sensitive_data: {"id" => PATIENT_ID, "existing_pii_field" => "existing_pii_field_value"},
+          core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
+          custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
+          created_at: 2.years.ago,
+        )
+        other_device = Device.make(institution: institution, site: Site.make(institution: institution))
+        TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: nil, device: other_device, patient: patient
+
+        device_message_processor.process
+
+        expect(TestResult.count).to eq(2)
+        expect(Sample.count).to eq(0)
+        expect(Patient.count).to eq(1)
+
+        patient = TestResult.first.patient
+
+        expect(patient.plain_sensitive_data).to eq(PATIENT_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        expect(patient.custom_fields).to eq(PATIENT_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        expect(patient.core_fields).to eq(PATIENT_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
+      end
+
       it 'should create a new patient if the existing patient has a differente patient id' do
         patient = Patient.make(
           institution: device_message.institution,
@@ -1111,6 +1135,36 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
         expect(encounter.plain_sensitive_data).to eq(ENCOUNTER_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
         expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+      end
+
+      it 'should merge encounter if id matches within institution on different sites' do
+        register_cdx_fields encounter: { fields: {
+          existing_indexed_field: {},
+          existing_pii_field: { pii: true },
+        } }
+
+        encounter = Encounter.make(
+          uuid: 'ghi', institution: device_message.institution,
+          core_fields: {"id" => ENCOUNTER_ID, "existing_indexed_field" => "existing_indexed_field_value"},
+          custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
+          plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
+        )
+
+        other_device = Device.make(institution: institution, site: Site.make(institution: institution))
+        TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: nil, device: other_device, encounter: encounter
+
+        device_message_processor.process
+
+        expect(TestResult.count).to eq(2)
+        expect(Sample.count).to eq(0)
+        expect(Patient.count).to eq(0)
+        expect(Encounter.count).to eq(1)
+
+        encounter = TestResult.first.encounter
+
+        expect(encounter.plain_sensitive_data).to eq(ENCOUNTER_PII_FIELDS.merge("existing_pii_field" => "existing_pii_field_value"))
+        expect(encounter.custom_fields).to eq(ENCOUNTER_CUSTOM_FIELDS.merge("existing_custom_field" => "existing_custom_field_value"))
+        expect(encounter.core_fields).to include(ENCOUNTER_CORE_FIELDS.merge("existing_indexed_field" => "existing_indexed_field_value"))
       end
 
       it "should update encounter if encounter_id changes" do
