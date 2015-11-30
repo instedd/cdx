@@ -11,16 +11,30 @@
       = f.label :name
     .col
       = f.text_field :name
-  .row
-    .col.pe-2
-      = f.label :institution_id
-    .col
-      = f.text_field :institution_id
-  .row
-    .col.pe-2
-      = f.label :site_id
-    .col
-      = f.text_field :site_id
+
+  - if @role.new_record?
+    = render 'shared/select_institution_or_hidden', f: f
+  - else
+    .row
+      .col.pe-2
+        = f.label :institution_id
+      .col
+        = @role.institution.name
+
+  - if @role.new_record?
+    .row
+      .col.pe-2
+        = f.label :site_id
+      .col
+        = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+          - select.item "", "Choose one"
+          - select.items @sites, :id, :name
+  - elsif @role.site_id
+    .row
+      .col.pe-2
+        = f.label :site_id
+      .col
+        = @role.site.try(:name)
 
   .row
     .col.pe-2

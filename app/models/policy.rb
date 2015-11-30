@@ -2,7 +2,7 @@ class Policy < ActiveRecord::Base
   belongs_to :user
   belongs_to :granter, class_name: 'User', foreign_key: 'granter_id'
 
-  validates_presence_of :name, :user, :definition
+  validates_presence_of :name, :definition
 
   attr_accessor :allows_implicit
   validates :granter, presence: true, unless: :allows_implicit
@@ -105,7 +105,7 @@ class Policy < ActiveRecord::Base
   end
 
   def self_granted?
-    self.user_id == self.granter_id
+    self.user_id && self.user_id == self.granter_id
   end
 
   # Not evaluated as part of validations in ActiveModel lifecycle
@@ -184,6 +184,8 @@ class Policy < ActiveRecord::Base
   end
 
   def update_computed_policies
+    return unless user
+
     ComputedPolicy.update_user(user)
   end
 

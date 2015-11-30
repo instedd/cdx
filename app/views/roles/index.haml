@@ -5,13 +5,7 @@
       - t.thead do
         %tr
           %th Name
-          %th Role Name
-          %th User
-          %th Last Activity
       - t.tbody do
         - @roles.each do |role|
           %tr
-            %td= role.user.full_name
             %td= link_to role.name, edit_role_path(role)
-            %td= link_to role.user.email, edit_role_path(role)
-            %td= last_activity(role.user)

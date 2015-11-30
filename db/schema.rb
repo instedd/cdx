@@ -247,6 +247,15 @@ ActiveRecord::Schema.define(version: 20151130130846) do
     t.string   "name",       limit: 255
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.string   "name",           limit: 255, null: false
+    t.integer  "institution_id", limit: 4,   null: false
+    t.integer  "site_id",        limit: 4
+    t.integer  "policy_id",      limit: 4,   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "sample_identifiers", force: :cascade do |t|
     t.integer  "sample_id",  limit: 4
     t.string   "entity_id",  limit: 255
@@ -406,5 +415,10 @@ ActiveRecord::Schema.define(version: 20151130130846) do
   add_index "users", ["password_changed_at"], name: "index_users_on_password_changed_at", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
+
+  create_table "users_roles", id: false, force: :cascade do |t|
+    t.integer "role_id", limit: 4
+    t.integer "user_id", limit: 4
+  end
 
 end
