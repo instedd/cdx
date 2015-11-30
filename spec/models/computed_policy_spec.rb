@@ -695,4 +695,30 @@ describe ComputedPolicy do
 
   end
 
+  context "roles" do
+
+    let!(:device)  { Device.make }
+
+    let!(:superadmin) do
+      User.make { |u| u.grant_superadmin_policy }
+    end
+
+    it "should create computed policy for single resource" do
+      policy = grant nil, nil, device, [READ_DEVICE]
+      role = Role.make institution: device.institution, policy: policy
+
+      expect {
+        role.users << user
+      }.to change(user.computed_policies(:reload), :count).by(1)
+
+      user.computed_policies(:reload).last.tap do |p|
+        expect(p.user).to eq(user)
+        expect(p.action).to eq(READ_DEVICE)
+        expect(p.resource_type).to eq('device')
+        expect(p.resource_id).to eq(device.id.to_s)
+        expect(p.condition_institution_id).to be_nil
+        expect(p.condition_site_id).to be_nil
+      end
+    end
+  end
 end

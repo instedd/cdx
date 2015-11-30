@@ -201,7 +201,9 @@ class ComputedPolicy < ActiveRecord::Base
     end
 
     def policies_for(user)
-      user.policies(:reload) + user.implicit_policies
+      user.policies(:reload) +
+        user.implicit_policies +
+        user.roles.includes(:policy).flat_map(&:policy).each { |p| p.user = user }
     end
 
     def compute_for(policy)
