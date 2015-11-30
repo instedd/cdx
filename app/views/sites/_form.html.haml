@@ -40,6 +40,21 @@
         - select.item "yearly", "Yearly"
         - select.item "monthly", "Monthly"
         - select.item "weekly", "Weekly"
+  .row
+    .col.pe-2
+      = f.label :address
+    .col
+      = f.text_field :address, :class => 'input-large'
+  .row
+    .col.pe-2
+      = f.label :main_phone_number
+    .col
+      = f.text_field :main_phone_number, :class => 'input-large'
+  .row
+    .col.pe-2
+      = f.label :email_address
+    .col
+      = f.email_field :email_address, :class => 'input-large'
 
   .row.button-actions
     .col

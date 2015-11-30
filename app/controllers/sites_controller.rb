@@ -105,7 +105,7 @@ class SitesController < ApplicationController
 
     render layout: false
   end
-  
+
   def users
     @site = Site.find(params[:id])
     return unless authorize_resource(@site, READ_SITE)
@@ -134,6 +134,6 @@ class SitesController < ApplicationController
       params[:site][:lat] = location_details.lat
       params[:site][:lng] = location_details.lng
     end
-    params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :parent_id, :sample_id_reset_policy)
+    params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :parent_id, :sample_id_reset_policy, :main_phone_number, :email_address)
   end
 end

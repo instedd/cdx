@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151123201511) do
+ActiveRecord::Schema.define(version: 20151130130846) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -296,6 +296,8 @@ ActiveRecord::Schema.define(version: 20151123201511) do
     t.string   "prefix",                 limit: 255
     t.string   "sample_id_reset_policy", limit: 255, default: "yearly"
     t.datetime "deleted_at"
+    t.string   "main_phone_number",      limit: 255
+    t.string   "email_address",          limit: 255
   end
 
   add_index "sites", ["deleted_at"], name: "index_sites_on_deleted_at", using: :btree
