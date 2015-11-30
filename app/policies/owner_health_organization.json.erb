@@ -5,13 +5,19 @@
       "action": [
         "institution:read",
         "institution:update",
-        "institution:delete"
+        "institution:delete",
+        "institution:createRole"
       ],
       "delegable": true
     },
     {
       "resource": "testResult?institution=<%= institution_id %>",
       "action": "testResult:medicalDashboard",
+      "delegable": true
+    },
+    {
+      "resource": "role?institution=<%= institution_id %>",
+      "action": "*",
       "delegable": true
     }
   ]

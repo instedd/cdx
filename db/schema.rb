@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151130130846) do
+ActiveRecord::Schema.define(version: 20151125151833) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -256,6 +256,11 @@ ActiveRecord::Schema.define(version: 20151130130846) do
     t.datetime "updated_at"
   end
 
+  create_table "roles_users", id: false, force: :cascade do |t|
+    t.integer "role_id", limit: 4
+    t.integer "user_id", limit: 4
+  end
+
   create_table "sample_identifiers", force: :cascade do |t|
     t.integer  "sample_id",  limit: 4
     t.string   "entity_id",  limit: 255
@@ -305,8 +310,6 @@ ActiveRecord::Schema.define(version: 20151130130846) do
     t.string   "prefix",                 limit: 255
     t.string   "sample_id_reset_policy", limit: 255, default: "yearly"
     t.datetime "deleted_at"
-    t.string   "main_phone_number",      limit: 255
-    t.string   "email_address",          limit: 255
   end
 
   add_index "sites", ["deleted_at"], name: "index_sites_on_deleted_at", using: :btree
@@ -415,10 +418,5 @@ ActiveRecord::Schema.define(version: 20151130130846) do
   add_index "users", ["password_changed_at"], name: "index_users_on_password_changed_at", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
-
-  create_table "users_roles", id: false, force: :cascade do |t|
-    t.integer "role_id", limit: 4
-    t.integer "user_id", limit: 4
-  end
 
 end

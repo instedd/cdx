@@ -1,7 +1,9 @@
 class Role < ActiveRecord::Base
+  include Resource
+
   belongs_to :institution
   belongs_to :site
-  belongs_to :policy
+  belongs_to :policy, dependent: :destroy
   has_and_belongs_to_many :users
 
   attr_accessor :definition

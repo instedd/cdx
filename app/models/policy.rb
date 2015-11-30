@@ -57,7 +57,9 @@ class Policy < ActiveRecord::Base
 
     MEDICAL_DASHBOARD = "testResult:medicalDashboard"
 
-    ROLE_DELETE = "role:delete"
+    READ_ROLE = "role:read"
+    UPDATE_ROLE = "role:update"
+    DELETE_ROLE = "role:delete"
     ASSIGN_USER_ROLE = "role:assignUser"
     REMOVE_USER_ROLE = "role:removeUser"
   end

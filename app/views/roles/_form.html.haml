@@ -46,5 +46,6 @@
     .col
       = f.submit 'Save', :class => 'btn-primary'
       = link_to 'Cancel', roles_path, class: 'btn-link'
-      - if @editing
-        = confirm_deletion_button @role, 'role'
+      - if @can_delete
+        - unless @role.new_record?
+          = confirm_deletion_button @role, 'role'

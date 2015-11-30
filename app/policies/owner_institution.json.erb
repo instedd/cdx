@@ -8,7 +8,8 @@
         "institution:delete",
         "institution:registerDevice",
         "institution:createSite",
-        "institution:createEncounter"
+        "institution:createEncounter",
+        "institution:createRole"
       ],
       "delegable": true
     },
@@ -19,6 +20,11 @@
         "testResult?institution=<%= institution_id %>",
         "encounter?institution=<%= institution_id %>"
       ],
+      "action": "*",
+      "delegable": true
+    },
+    {
+      "resource": "role?institution=<%= institution_id %>",
       "action": "*",
       "delegable": true
     }

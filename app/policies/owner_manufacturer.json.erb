@@ -7,7 +7,8 @@
         "institution:update",
         "institution:delete",
         "institution:registerDeviceModel",
-        "institution:registerDevice"
+        "institution:registerDevice",
+        "institution:createRole"
       ],
       "delegable": true
     },
@@ -29,6 +30,11 @@
     {
       "resource": "deviceModel",
       "action": "deviceModel:read",
+      "delegable": true
+    },
+    {
+      "resource": "role?institution=<%= institution_id %>",
+      "action": "*",
       "delegable": true
     }
   ]

@@ -2,12 +2,11 @@ class RolesController < ApplicationController
   before_filter :load_institutions_and_sites, only: [:new, :create, :edit, :update]
 
   def index
-    @roles = Role.all
+    @roles = check_access(Role, READ_ROLE)
   end
 
   def new
     @role = Role.new
-    @users = User.all
   end
 
   def create
@@ -39,11 +38,16 @@ class RolesController < ApplicationController
 
   def edit
     @role = Role.find params[:id]
+    return unless authorize_resource(@role, UPDATE_ROLE)
+
     @role.definition = JSON.pretty_generate(@role.policy.definition)
+    @can_delete = has_access?(@role, DELETE_ROLE)
   end
 
   def update
     @role = Role.find params[:id]
+    return unless authorize_resource(@role, UPDATE_ROLE)
+
     if (definition = role_params[:definition]).present?
       begin
         definition = JSON.parse(definition)
@@ -73,6 +77,14 @@ class RolesController < ApplicationController
     end
   end
 
+  def destroy
+    @role = Role.find params[:id]
+    return unless authorize_resource(@role, DELETE_ROLE)
+
+    @role.destroy
+    redirect_to roles_path, notice: 'Role was successfully deleted.'
+  end
+
   private
 
   def role_params
@@ -81,7 +93,7 @@ class RolesController < ApplicationController
 
   def load_institutions_and_sites
     # FIXME: review permissions
-    @institutions = check_access(Institution, READ_INSTITUTION)
-    @sites = check_access(Site, READ_SITE)
+    @institutions = check_access(Institution, CREATE_INSTITUTION_ROLE)
+    @sites = check_access(Site, CREATE_SITE_ROLE)
   end
 end
