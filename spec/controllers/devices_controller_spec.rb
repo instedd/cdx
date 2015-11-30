@@ -91,7 +91,7 @@ describe DevicesController do
 
     it "should download index CSV with current filters" do
       grant user2, user, [Institution.resource_name, Device.resource_name], "*"
-      get :index, institution: institution2.id, format: :csv
+      get :index, context: institution2.uuid, format: :csv
       expect(response).to be_success
 
       rows = CSV.parse(response.body, headers: :first_row)
@@ -123,6 +123,21 @@ describe DevicesController do
       get :index
       expect(response).to be_success
       expect(assigns(:devices)).to contain_exactly(device2)
+    end
+
+    it "should display manufacturers used by the devices in the current context despite manufacturer filter" do
+      device_model2 = DeviceModel.make institution: Institution.make
+      device2 = Device.make institution: institution, site: site, device_model: device_model2
+
+      site3 = institution.sites.make
+      device_model3 = DeviceModel.make institution: Institution.make
+      device3 = Device.make institution: institution, site: site3, device_model: device_model3
+
+      get :index, context: institution.uuid, manufacturer: device_model2.institution.id
+      expect(assigns(:manufacturers)).to match_array([device_model.institution, device_model2.institution, device_model3.institution])
+
+      get :index, context: site3.uuid
+      expect(assigns(:manufacturers)).to match_array([device_model3.institution])
     end
   end
 

@@ -12,9 +12,9 @@ class DevicesController < ApplicationController
 
   def index
     @devices = check_access(Device, READ_DEVICE).joins(:device_model).includes(:site, :institution, device_model: :institution)
+    @devices = @devices.within(@navigation_context.entity)
     @manufacturers = Institution.where(id: @devices.select('device_models.institution_id'))
 
-    @devices = @devices.within(@navigation_context.entity)
     @devices = @devices.where(device_models: { institution_id: params[:manufacturer].to_i}) if params[:manufacturer].presence
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
