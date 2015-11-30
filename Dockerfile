@@ -19,9 +19,6 @@ RUN bundle install --jobs 8 --deployment --without development test
 # Install the application
 ADD . /app
 
-# Configure NNDD
-RUN /app/docker/config-nndd
-
 # Precompile assets
 RUN bundle exec rake assets:precompile RAILS_ENV=production
 
