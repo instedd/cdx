@@ -103,10 +103,10 @@ module ApplicationHelper
     end
   end
 
-  def test_results_table(attributes)
+  def test_results_table(attributes = {})
     options = { filter: {} }
-    options[:filter]['site.uuid'] = attributes[:filter][:site].uuid if attributes[:filter][:site]
-    options[:filter]['device.uuid'] = attributes[:filter][:device].uuid if attributes[:filter][:device]
+    options[:filter]['site.uuid'] = attributes[:filter][:site].uuid if attributes[:filter].try :filter
+    options[:filter]['device.uuid'] = attributes[:filter][:device].uuid if attributes[:filter].try :device
 
     react_component('TestResultsTable', filter: options[:filter])
   end
