@@ -64,6 +64,7 @@ RSpec.configure do |config|
   config.example_status_persistence_file_path = 'examples.txt'
 
   config.include Devise::TestHelpers, :type => :controller
+  config.include DefaultParamsHelper, :type => :controller
   config.include ManifestSpecHelper
   config.include CdxFieldsHelper
   config.include FeatureSpecHelpers, :type => :feature

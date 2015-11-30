@@ -7,7 +7,12 @@
             %li= msg
 
 = form_for(@device_model, html: { multipart: true }) do |f|
-  = render 'shared/select_institution_or_hidden', f: f, label_col_class: 'pe-3'
+  .row
+    .col.pe-3
+      = f.label :institution
+    .col
+      .value= f.object.institution
+
   .row
     .col.pe-3
       = f.label :name

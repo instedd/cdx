@@ -12,6 +12,7 @@ describe DevicesController do
   let!(:other_site) {other_institution.sites.make}
 
   before(:each) {sign_in user}
+  let(:default_params) { {context: institution.uuid} }
 
   context "Index" do
 
@@ -29,17 +30,26 @@ describe DevicesController do
     it "should display index when other user grants permissions" do
       grant user2, user, [Institution.resource_name, Device.resource_name], "*"
 
-      get :index
+      get :index, context: institution2.uuid
       expect(response).to be_success
-      expect(assigns(:devices)).to contain_exactly(device, device2)
+      expect(assigns(:devices)).to contain_exactly(device2)
     end
 
     it "should display index filtered by institution" do
-      grant user2, user, [Institution.resource_name, Device.resource_name], "*"
+      other_device = Device.make institution: other_institution
 
-      get :index, institution: institution2.id
+      get :index, context: other_institution.uuid
       expect(response).to be_success
-      expect(assigns(:devices)).to contain_exactly(device2)
+      expect(assigns(:devices)).to contain_exactly(other_device)
+    end
+
+    it "should display index filtered by site" do
+      other_site = Site.make institution: institution
+      other_device = Device.make site: other_site
+
+      get :index, context: other_site.uuid
+      expect(response).to be_success
+      expect(assigns(:devices)).to contain_exactly(other_device)
     end
 
     it "should display index filtered by manufacturer" do
@@ -48,10 +58,11 @@ describe DevicesController do
         device_model.institution = manufacturer
         device_model.save!
       end
+      Device.make institution: institution2
 
       grant user2, user, [Institution.resource_name, Device.resource_name], "*"
 
-      get :index, manufacturer: manufacturer.id
+      get :index, context: institution2.uuid, manufacturer: manufacturer.id
       expect(response).to be_success
       expect(assigns(:devices)).to contain_exactly(device2)
     end
@@ -80,7 +91,7 @@ describe DevicesController do
 
     it "should download index CSV with current filters" do
       grant user2, user, [Institution.resource_name, Device.resource_name], "*"
-      get :index, institution: institution2.id, format: :csv
+      get :index, context: institution2.uuid, format: :csv
       expect(response).to be_success
 
       rows = CSV.parse(response.body, headers: :first_row)
@@ -104,18 +115,30 @@ describe DevicesController do
     let!(:user2) {User.make}
     let!(:institution2) {Institution.make user: user2}
     let!(:device2) {institution2.devices.make site: nil}
+    let(:default_params) { {context: institution2.uuid} }
 
-    it "should display filters when there are devices from more than one institution or site" do
+    it "should display devices without sites when selecting instituion" do
       grant user2, user, Resource.all.map(&:resource_name), "*"
 
       get :index
       expect(response).to be_success
-      expect(assigns(:devices)).to contain_exactly(device, device2)
-
-      expect(assigns(:institutions)).to contain_exactly(institution, institution2, other_institution)
-      expect(assigns(:sites)).to contain_exactly(site, other_site)
+      expect(assigns(:devices)).to contain_exactly(device2)
     end
 
+    it "should display manufacturers used by the devices in the current context despite manufacturer filter" do
+      device_model2 = DeviceModel.make institution: Institution.make
+      device2 = Device.make institution: institution, site: site, device_model: device_model2
+
+      site3 = institution.sites.make
+      device_model3 = DeviceModel.make institution: Institution.make
+      device3 = Device.make institution: institution, site: site3, device_model: device_model3
+
+      get :index, context: institution.uuid, manufacturer: device_model2.institution.id
+      expect(assigns(:manufacturers)).to match_array([device_model.institution, device_model2.institution, device_model3.institution])
+
+      get :index, context: site3.uuid
+      expect(assigns(:manufacturers)).to match_array([device_model3.institution])
+    end
   end
 
   context "New" do
@@ -271,17 +294,6 @@ describe DevicesController do
 
     it "doesn't crash when there's no device model (#578)" do
       post :create, device: {
-        institution_id: institution.id,
-        name: "foo",
-        serial_number: "123"
-      }
-
-      expect(response).to be_ok
-    end
-
-    it "doesn't crash when there's no institution (#578)" do
-      post :create, device: {
-        device_model_id: device_model.id,
         name: "foo",
         serial_number: "123"
       }

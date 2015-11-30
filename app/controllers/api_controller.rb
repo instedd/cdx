@@ -4,6 +4,7 @@ class ApiController < ApplicationController
 
   skip_before_filter :authenticate_user!
   skip_before_filter :verify_authenticity_token
+  skip_before_filter :ensure_context
 
   before_action :doorkeeper_authorize!, unless: lambda { current_user }
 

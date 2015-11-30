@@ -71,6 +71,40 @@ describe Device do
     end
   end
 
+  context "within institution or site scope" do
+    let(:institution) { Institution.make }
+    let(:other_institution) { Institution.make }
+
+    let(:site1)  { Site.make institution: institution }
+    let(:site11) { Site.make :child, parent: site1 }
+    let(:site12) { Site.make :child, parent: site1 }
+    let(:site2)  { Site.make institution: institution }
+
+    let(:device1)  { Device.make site: site1 }
+    let(:device11) { Device.make site: site11 }
+    let(:device12) { Device.make site: site12 }
+    let(:device2)  { Device.make site: site2 }
+
+    let(:other_device)  { Device.make institution: other_institution }
+
+    it "should filter by institution" do
+      expect(Device.within(institution)).to eq([device1, device11, device12, device2])
+    end
+
+    it "filtering by site should include self" do
+      expect(Device.within(site1)).to include(device1)
+    end
+
+    it "filtering by site should include descendants" do
+      expect(Device.within(site1)).to include(device11)
+      expect(Device.within(site1)).to include(device12)
+    end
+
+    it "filtering by site should not include sibling" do
+      expect(Device.within(site1)).to_not include(device2)
+    end
+  end
+
   context 'cascade destroy', elasticsearch: true do
 
     it "should delete device elements in cascade" do

@@ -78,3 +78,13 @@
     width: 4em;
   }
 }
+
+.sites-tree-view {
+  li li {
+    padding-left: 1em;
+  }
+
+  .selected > a {
+    background-color: #ccc;
+  }
+}

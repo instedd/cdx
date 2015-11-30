@@ -9,6 +9,7 @@ describe TestResultsController, elasticsearch: true do
   let(:device)      { Device.make institution_id: institution.id, site: site }
 
   before(:each) {sign_in user}
+  let(:default_params) { {context: institution.uuid} }
 
   let(:other_user)        { User.make }
   let(:other_institution) { Institution.make user_id: other_user.id }
@@ -65,6 +66,7 @@ describe TestResultsController, elasticsearch: true do
     let!(:other_device) { Device.make institution_id: other_institution.id, site: other_site }
 
     before(:each) { sign_in user }
+    let(:default_params) { {context: other_institution.uuid} }
 
     it "should not authorize outsider user" do
       get :show, id: test_result.uuid

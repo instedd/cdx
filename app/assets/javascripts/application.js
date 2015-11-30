@@ -14,6 +14,7 @@
 //= require jquery.turbolinks
 //= require jquery_ujs
 //= require jquery.are-you-sure
+//= require urijs
 //= require lodash
 //= require select2
 //= require react
@@ -24,6 +25,7 @@
 //= require components
 //= require d3
 //= require_tree .
+//= require turbolinks
 
 function cdx_init_components(dom) {
   ReactRailsUJS.mountComponents(dom);
@@ -57,7 +59,10 @@ $(document).ready(function(){
     var payload = form.serialize();
 
     var debouncedSubmit = _.debounce(function(){
-      form.submit();
+      var options = {};
+      var action = form.attr('action') || window.location.href;
+      var url = action + (action.indexOf('?') === -1 ? '?' : '&') + form.serialize();
+      Turbolinks.visit(url.toString(), options);
     }, 2000);
 
     form.on('change', function(){

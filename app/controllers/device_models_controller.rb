@@ -2,15 +2,14 @@ class DeviceModelsController < ApplicationController
 
   include DeviceModelsHelper
 
-  before_filter :load_institutions
-
   before_filter do
     head :forbidden unless has_access_to_device_models_index?
   end
 
   def index
     @device_models = authorize_resource(DeviceModel, READ_DEVICE_MODEL) or return
-    @device_models = @device_models.includes(:manifest).includes(:institution)
+    @device_models = @device_models.includes(:manifest)
+    @device_models = @device_models.where(institution:  @navigation_context.institution)
 
     @updateable_device_model_ids  = check_access(DeviceModel, UPDATE_DEVICE_MODEL).pluck(:id)
     @publishable_device_model_ids = check_access(DeviceModel, PUBLISH_DEVICE_MODEL).pluck(:id)
@@ -22,17 +21,16 @@ class DeviceModelsController < ApplicationController
   end
 
   def new
-    authorize_resource(Institution, REGISTER_INSTITUTION_DEVICE_MODEL) or return
-
     @device_model = DeviceModel.new
     @device_model.manifest = Manifest.new
-    @device_model.institution = @institutions.first if @institutions.one?
+
+    return unless prepare_for_institution_and_authorize(@device_model, REGISTER_INSTITUTION_DEVICE_MODEL)
   end
 
   def create
-    authorize_resource(Institution.find(device_model_create_params[:institution_id]), REGISTER_INSTITUTION_DEVICE_MODEL) or return
     load_manifest_upload
     @device_model = DeviceModel.new(device_model_create_params)
+    return unless prepare_for_institution_and_authorize(@device_model, REGISTER_INSTITUTION_DEVICE_MODEL)
     set_published_status(@device_model)
 
     respond_to do |format|
@@ -102,10 +100,6 @@ class DeviceModelsController < ApplicationController
   end
 
   private
-
-  def load_institutions
-    @institutions = authorize_resource(Institution, REGISTER_INSTITUTION_DEVICE_MODEL)
-  end
 
   def device_model_create_params
     params.require(:device_model).permit(:name, :picture, :delete_picture, :setup_instructions, :delete_setup_instructions, :institution_id, :supports_activation, :support_url, manifest_attributes: [:definition])

@@ -10,6 +10,7 @@ describe SitesController do
   let!(:site2)  { institution2.sites.make }
 
   before(:each) {sign_in user}
+  let(:default_params) { {context: institution.uuid} }
 
   context "index" do
 

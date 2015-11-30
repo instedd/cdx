@@ -91,6 +91,7 @@ Rails.application.routes.draw do
   root :to => 'home#index'
   get 'verify' => 'home#verify'
   get 'join' => 'home#join'
+  get 'design' => 'home#design'
 
   namespace :api, defaults: { format: 'json' } do
     resources :activations, only: :create
