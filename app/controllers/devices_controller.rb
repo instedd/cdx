@@ -6,13 +6,12 @@ class DevicesController < ApplicationController
   before_filter :load_device_models_for_update, only: [:edit, :update]
   before_filter :load_filter_resources, only: :index
 
-
   before_filter do
     head :forbidden unless has_access_to_devices_index?
   end
 
   def index
-    @devices = check_access(Device, READ_DEVICE).joins(:device_model)
+    @devices = check_access(Device, READ_DEVICE).joins(:device_model).includes(:site, :institution, device_model: :institution)
     @manufacturers = Institution.where(id: @devices.select('device_models.institution_id'))
 
     @devices = @devices.where(institution_id: params[:institution].to_i) if params[:institution].presence
