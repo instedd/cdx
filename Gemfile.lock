@@ -354,7 +354,7 @@ GEM
     method_source (0.8.2)
     mime-types (2.6.1)
     mimemagic (0.3.0)
-    mini_portile2 (2.0.0.rc2)
+    mini_portile2 (2.0.0)
     minitest (5.8.0)
     multi_json (1.11.2)
     multi_test (0.1.2)
@@ -369,7 +369,7 @@ GEM
     net-ssh (2.9.2)
     netrc (0.10.3)
     newrelic_rpm (3.14.0.305)
-    nokogiri (1.6.7.rc4)
+    nokogiri (1.6.7)
       mini_portile2 (~> 2.0.0.rc2)
     notiffany (0.0.7)
       nenv (~> 0.1)
@@ -661,7 +661,7 @@ DEPENDENCIES
   machinist (~> 1.0)
   mysql2
   newrelic_rpm
-  nokogiri (~> 1.6.7.rc4)
+  nokogiri (~> 1.6.7)
   oj
   omniauth
   omniauth-google-oauth2
