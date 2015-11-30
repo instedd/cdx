@@ -27,4 +27,4 @@ en:
       manifest:
         definition: Manifest
       site:
-        parent: Supervisor
+        parent: Parent site
