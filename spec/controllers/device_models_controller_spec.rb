@@ -6,6 +6,8 @@ describe DeviceModelsController do
   let!(:user)         { User.make }
   let!(:institution)  { user.institutions.make kind: "manufacturer"}
   let!(:device_model) { institution.device_models.make(:unpublished) }
+  let!(:institution1)  { user.institutions.make kind: "manufacturer"}
+  let!(:device_model1) { institution1.device_models.make(:unpublished) }
 
   let!(:user2)         { User.make }
   let!(:institution2)  { user2.institutions.make kind: "manufacturer"}
@@ -41,9 +43,9 @@ describe DeviceModelsController do
 
   context "index" do
 
-    it "should list all device models for a manufacturer admin" do
+    it "should list all device models of selected institution for a manufacturer admin" do
       get :index
-      expect(assigns(:device_models)).to match_array(DeviceModel.all)
+      expect(assigns(:device_models)).to match_array([device_model])
       expect(response).to be_success
     end
 
@@ -71,10 +73,11 @@ describe DeviceModelsController do
 
     it "should create a device model" do
       expect {
-        post :create, device_model: { name: "GX4001", institution_id: institution.id, manifest_attributes: manifest_attributes, supports_activation: true, support_url: "http://example.org/gx4001" }
+        post :create, device_model: { name: "GX4001", manifest_attributes: manifest_attributes, supports_activation: true, support_url: "http://example.org/gx4001" }
       }.to change(DeviceModel, :count).by(1)
       new_device_model = DeviceModel.last
       expect(new_device_model).to_not be_published
+      expect(new_device_model.institution).to eq(institution)
       expect(new_device_model.supports_activation).to be_truthy
       expect(new_device_model.support_url).to eq("http://example.org/gx4001")
       expect(response).to be_redirect
@@ -83,35 +86,31 @@ describe DeviceModelsController do
     it "should not create if JSON is not valid" do
       json = {"definition" => %{ { , , } } }
       expect {
-        post :create, device_model: { name: "GX4001", institution_id: institution.id, manifest_attributes: json }
+        post :create, device_model: { name: "GX4001", manifest_attributes: json }
       }.to change(DeviceModel, :count).by(0)
     end
 
-    it "should not create if institution is empty" do
-      expect {
-        post :create, device_model: { name: "GX4001", manifest_attributes: manifest_attributes }
-      }.to raise_error(ActiveRecord::RecordNotFound)
-      expect(DeviceModel.count).to eq(3)
-    end
-
     it "should not allow to create in unauthorised institution" do
+      grant user2, user, institution2, READ_INSTITUTION
       expect {
-        post :create, device_model: { name: "GX4001", institution_id: institution2.id, manifest_attributes: manifest_attributes }
+        post :create, context: institution2.uuid, device_model: { name: "GX4001", manifest_attributes: manifest_attributes }
       }.to change(DeviceModel, :count).by(0)
       expect(response).to be_forbidden
     end
 
     it "should create in other institution if authorised" do
+      grant user2, user, institution2, READ_INSTITUTION
       grant user2, user, institution2, REGISTER_INSTITUTION_DEVICE_MODEL
       expect {
-        post :create, device_model: { name: "GX4001", institution_id: institution2.id, manifest_attributes: manifest_attributes }
+        post :create, context: institution2.uuid, device_model: { name: "GX4001", manifest_attributes: manifest_attributes }
       }.to change(DeviceModel, :count).by(1)
+      expect(DeviceModel.last.institution).to eq(institution2)
       expect(response).to be_redirect
     end
 
     it "should publish on creation" do
       expect {
-        post :create, publish: "1", device_model: { name: "GX4001", institution_id: institution.id, manifest_attributes: manifest_attributes }
+        post :create, publish: "1", device_model: { name: "GX4001", manifest_attributes: manifest_attributes }
       }.to change(DeviceModel, :count).by(1)
       expect(DeviceModel.last).to be_published
       expect(response).to be_redirect
@@ -119,7 +118,7 @@ describe DeviceModelsController do
 
     it "should not persist published mark if validation fails" do
       json = {"definition" => %{ { , , } } }
-      post :create, publish: "1", device_model: { name: "GX4001", institution_id: institution.id, manifest_attributes: json }
+      post :create, publish: "1", device_model: { name: "GX4001", manifest_attributes: json }
       expect(assigns(:device_model)).to_not be_published
     end
 
