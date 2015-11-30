@@ -6,7 +6,7 @@ class SitesController < ApplicationController
   end
 
   def index
-    @sites = check_access(Site, READ_SITE)
+    @sites = check_access(Site.includes(:institution), READ_SITE)
     @institutions = check_access(Institution, READ_INSTITUTION)
     @can_create = has_access?(@institutions, CREATE_INSTITUTION_SITE)
 
