@@ -247,6 +247,20 @@ ActiveRecord::Schema.define(version: 20151130130846) do
     t.string   "name",       limit: 255
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.string   "name",           limit: 255, null: false
+    t.integer  "institution_id", limit: 4,   null: false
+    t.integer  "site_id",        limit: 4
+    t.integer  "policy_id",      limit: 4,   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "roles_users", id: false, force: :cascade do |t|
+    t.integer "role_id", limit: 4
+    t.integer "user_id", limit: 4
+  end
+
   create_table "sample_identifiers", force: :cascade do |t|
     t.integer  "sample_id",  limit: 4
     t.string   "entity_id",  limit: 255

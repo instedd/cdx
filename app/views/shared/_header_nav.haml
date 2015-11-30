@@ -39,6 +39,7 @@
       %ul
         - unless @hide_user_settings
           %li= link_to "Settings", settings_path
+          %li= link_to "Roles", roles_path
         - if current_user && !@hide_nav_bar
           %li= link_to "Edit institutions", institutions_path
           %li= link_to "API tokens", api_tokens_path

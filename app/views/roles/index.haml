@@ -1,0 +1,11 @@
+.row
+  .col
+    = link_to "+", new_role_path, class: 'btn-add side-link ontop fix', title: 'Add Role'
+    = cdx_table title: 'Roles' do |t|
+      - t.thead do
+        %tr
+          %th Name
+      - t.tbody do
+        - @roles.each do |role|
+          %tr
+            %td= link_to role.name, edit_role_path(role)

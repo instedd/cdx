@@ -120,6 +120,10 @@ Policy.blueprint do
   name
 end
 
+Role.blueprint do
+  name
+end
+
 Subscriber.blueprint do
   user
   name

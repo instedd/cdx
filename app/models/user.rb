@@ -15,6 +15,7 @@ class User < ActiveRecord::Base
   has_many :policies
   has_many :granted_policies, class_name: "Policy", foreign_key: "granter_id"
   has_many :computed_policies
+  has_and_belongs_to_many :roles
 
   after_create :update_computed_policies
 

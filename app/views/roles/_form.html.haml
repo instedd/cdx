@@ -1,0 +1,51 @@
+= form_for @role do |f|
+  - if @role.errors.any?
+    #error_explanation
+      %p= "#{pluralize(@role.errors.count, "error")} prohibited this @role from being saved:"
+      %ul
+        - @role.errors.full_messages.each do |msg|
+          %li= msg
+
+  .row
+    .col.pe-2
+      = f.label :name
+    .col
+      = f.text_field :name
+
+  - if @role.new_record?
+    = render 'shared/select_institution_or_hidden', f: f
+  - else
+    .row
+      .col.pe-2
+        = f.label :institution_id
+      .col
+        = @role.institution.name
+
+  - if @role.new_record?
+    .row
+      .col.pe-2
+        = f.label :site_id
+      .col
+        = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+          - select.item "", "Choose one"
+          - select.items @sites, :id, :name
+  - elsif @role.site_id
+    .row
+      .col.pe-2
+        = f.label :site_id
+      .col
+        = @role.site.try(:name)
+
+  .row
+    .col.pe-2
+      = f.label :definition
+    .col.pe-3
+      .value
+        = f.text_area :definition, :rows => 5, :class => 'input-block'
+  .row.button-actions
+    .col
+      = f.submit 'Save', :class => 'btn-primary'
+      = link_to 'Cancel', roles_path, class: 'btn-link'
+      - if @can_delete
+        - unless @role.new_record?
+          = confirm_deletion_button @role, 'role'
