@@ -20,6 +20,14 @@ class DevicesController < ApplicationController
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
     @devices_to_read = check_access(Device, READ_DEVICE).pluck(:id)
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        @filename = "Devices-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        @streaming = true
+      end
+    end
   end
 
   def new

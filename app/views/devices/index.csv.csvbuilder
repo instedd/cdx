@@ -1,0 +1,18 @@
+headers = ["UUID", "Name", "Serial Number", "Time Zone",
+  "Institution UUID", "Institution Name",
+  "Model Name",
+  "Manufacturer UUID", "Manufacturer Name",
+  "Site UUID", "Site Name"
+]
+
+csv << headers
+
+@devices.find_each do |device|
+  csv << [
+    device.uuid, device.name, device.serial_number, device.time_zone,
+    device.institution.try(:uuid), device.institution.try(:name),
+    device.device_model.try(:name),
+    device.device_model.try(:institution).try(:uuid), device.device_model.try(:institution).try(:name),
+    device.site.try(:uuid), device.site.try(:name)
+  ]
+end

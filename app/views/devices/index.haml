@@ -21,3 +21,6 @@
             %td= device.device_model.institution.try :name
             %td= device.device_model.full_name
             %td= device.site.try(:name)
+
+    .pagination
+      = link_to "Download as CSV", {format: :csv}, class: "pull-right"

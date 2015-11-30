@@ -5,10 +5,9 @@ describe DevicesController do
   let!(:institution) {Institution.make}
   let!(:user) {institution.user}
   let!(:site) {institution.sites.make}
-  let!(:manifest) {Manifest.make}
-  let!(:device_model) {manifest.device_model}
+  let!(:device_model) {DeviceModel.make(institution: Institution.make(:manufacturer))}
+  let!(:manifest) {Manifest.make(device_model: device_model)}
   let!(:device) {Device.make institution: institution, site: site, device_model: device_model}
-
   let!(:other_institution) {Institution.make user: user}
   let!(:other_site) {other_institution.sites.make}
 
@@ -56,9 +55,52 @@ describe DevicesController do
       expect(response).to be_success
       expect(assigns(:devices)).to contain_exactly(device2)
     end
+
+    it "should download CSV" do
+      get :index, format: :csv
+      expect(response).to be_success
+
+      CSV.parse(response.body, headers: :first_row) do |row|
+        expect(row.headers).to eq([
+          "UUID", "Name", "Serial Number", "Time Zone",
+          "Institution UUID", "Institution Name",
+          "Model Name",
+          "Manufacturer UUID", "Manufacturer Name",
+          "Site UUID", "Site Name"
+        ])
+        expect(row.fields).to eq([
+          device.uuid, device.name, device.serial_number, device.time_zone,
+          device.institution.uuid, device.institution.name,
+          device.device_model.name,
+          device.device_model.institution.uuid, device.device_model.institution.name,
+          device.site.uuid, device.site.name
+        ])
+      end
+    end
+
+    it "should download index CSV with current filters" do
+      grant user2, user, [Institution.resource_name, Device.resource_name], "*"
+      get :index, institution: institution2.id, format: :csv
+      expect(response).to be_success
+
+      rows = CSV.parse(response.body, headers: :first_row)
+      expect(rows).to have(1).item
+      expect(rows.first['UUID']).to eq(device2.uuid)
+    end
+
+    it "should download all pages" do
+      devices = 30.times.map { |i| Device.make institution: institution, site: site, device_model: device_model }
+      get :index, format: :csv
+      expect(response).to be_success
+
+      rows = CSV.parse(response.body, headers: :first_row)
+      expect(rows).to have(31).items
+      expect(rows.map{|r| r['UUID']}).to match_array(devices.map(&:uuid) + [device.uuid])
+    end
   end
 
   context "Index when devices have no sites" do
+
     let!(:user2) {User.make}
     let!(:institution2) {Institution.make user: user2}
     let!(:device2) {institution2.devices.make site: nil}
