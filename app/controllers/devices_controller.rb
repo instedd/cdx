@@ -17,6 +17,14 @@ class DevicesController < ApplicationController
 
     @devices = @devices.where(device_models: { institution_id: params[:manufacturer].to_i}) if params[:manufacturer].presence
 
+    @page_size = (params["page_size"] || 10).to_i
+    @page = (params["page"] || 1).to_i
+    offset = (@page - 1) * @page_size
+
+    @total = @devices.count
+
+    @devices = @devices.limit(@page_size).offset(offset)
+
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
     @devices_to_read = check_access(Device, READ_DEVICE).pluck(:id)
 
