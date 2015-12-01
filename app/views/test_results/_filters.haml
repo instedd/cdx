@@ -35,19 +35,7 @@
             .filter
               %label.block Encounter Id
               %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
-            - if @sites.size > 1
-              .filter
-                %label.block Site
-                = cdx_select name: "site.uuid", value: params["site.uuid"] do |select|
-                  - select.item "", "Show all"
-                  - select.items @sites, :uuid, :name
-            - if @institutions.size > 1
-              .filter
-                %label.block Institution
-                = cdx_select name: "institution.uuid", value: params["institution.uuid"] do |select|
-                  - select.item "", "Show all"
-                  - select.items @institutions, :uuid, :name
-            - if @devices.size > 1
+            - if (@devices.size > 1) || params['device.uuid']
               .filter
                 %label.block Device
                 = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
