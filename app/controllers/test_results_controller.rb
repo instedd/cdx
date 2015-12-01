@@ -18,19 +18,32 @@ class TestResultsController < ApplicationController
 
     @filter = create_filter
     @query = @filter.dup
-    @query["page_size"] = @page_size
-    @query["offset"] = offset
-
-    @filter["institution.uuid"] = @institutions.first.uuid if @institutions.size == 1
-    @filter["site.uuid"] = @sites.first.uuid if @sites.size == 1
-    @filter["device.uuid"] = @devices.first.uuid if @devices.size == 1
-
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
 
-    result = TestResult.query(@query, current_user).execute
-    @total = result["total_count"]
-    @tests = result["tests"]
+    respond_to do |format|
+      format.html do
+        @query["page_size"] = @page_size
+        @query["offset"] = offset
+
+        @filter["institution.uuid"] = @institutions.first.uuid if @institutions.size == 1
+        @filter["site.uuid"] = @sites.first.uuid if @sites.size == 1
+        @filter["device.uuid"] = @devices.first.uuid if @devices.size == 1
+
+        result = TestResult.query(@query, current_user).execute
+        @total = result["total_count"]
+        @tests = result["tests"]
+      end
+
+      format.csv do
+        query = TestResult.query(@query, current_user)
+        filename = "Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        csv = TestResultsCsvBuilder.new(query, filename)
+        @csvfile = csv.build
+        send_file(@csvfile.path, filename: filename)
+      end
+    end
+
   end
 
   def show
@@ -42,13 +55,6 @@ class TestResultsController < ApplicationController
 
     @samples = @test_result.sample_identifiers.reject{|identifier| identifier.entity_id.blank?}.map {|identifier| [identifier.entity_id, Barby::Code93.new(identifier.entity_id)]}
     @show_institution = show_institution?(Policy::Actions::QUERY_TEST, TestResult)
-  end
-
-  def csv
-    @query = TestResult.query(create_filter, current_user)
-    @filename = "Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
-    @streaming = true
-    render csv: true, layout: false
   end
 
   private

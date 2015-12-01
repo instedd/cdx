@@ -83,6 +83,7 @@ module Entity
 
   def valid_fields(fields, errors, field_definitions, are_sensitive)
     fields.each do |key, value|
+      key = key.to_s
       next if are_sensitive && key == 'custom'
       if (entity_field = field_definitions.find{|f| f.name == key}).nil?
         errors << "#{key} is not supported for entity #{self.class.name.humanize}"
