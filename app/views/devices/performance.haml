@@ -1,6 +1,7 @@
 .row
   .col
     %h1 Last 12 months usage
+    %span.explore-link= link_to 'Explore tests', test_results_path("device.uuid": @device.uuid)
 .row
   .col.pe-7
     = react_component('BarChart', data: @tests_histogram, height: 300, y_label: "Tests Run")

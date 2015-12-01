@@ -142,7 +142,7 @@ describe "device" do
       process_plain test: {assays:[condition: "flu_a", result: "positive"]}
 
       goto_page DevicePage, id: device.id do |page|
-        page.tab_header.tests.click
+        page.tabs_content.explore_tests.click
       end
 
       expect(page).to have_content '2 TESTS'
