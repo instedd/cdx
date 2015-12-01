@@ -139,7 +139,7 @@ end
 Site.blueprint do
   institution
   name
-  location_geoid { LocationService.repository.make.id }
+  location_geoid { object.location.try(:id) || LocationService.repository.make.id }
   address { Faker::Address.street_address }
   city { Faker::Address.city }
   state { Faker::Address.state }
