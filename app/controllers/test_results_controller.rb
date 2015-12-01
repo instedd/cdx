@@ -36,11 +36,12 @@ class TestResultsController < ApplicationController
       end
 
       format.csv do
-        query = TestResult.query(@query, current_user)
         filename = "Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
-        csv = TestResultsCsvBuilder.new(query, filename)
-        @csvfile = csv.build
-        send_file(@csvfile.path, filename: filename)
+        headers["Content-Type"] = "text/csv"
+        headers["Content-disposition"] = "attachment; filename=#{filename}"
+
+        query = TestResult.query(@query, current_user)
+        self.response_body = TestResultsCsvBuilder.new(query, filename)
       end
     end
 

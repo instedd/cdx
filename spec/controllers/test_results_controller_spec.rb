@@ -61,7 +61,7 @@ describe TestResultsController, elasticsearch: true do
         custom_fields: {"custom_a" => "test value 1"}).tap { |t| TestResultIndexer.new(t).index(true) }
     end
 
-    let(:csv) { CSV.read(assigns(:csvfile).path, headers: true) }
+    let(:csv) { CSV.parse(response.body, headers: true) }
 
     RSpec::Matchers.define :contain_field do |name, value|
       match do |csv_row|

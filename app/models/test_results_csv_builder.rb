@@ -8,7 +8,6 @@ class TestResultsCsvBuilder
     @multi_headers = Hash[multi_fields.map{|f| [f, 0]}] # e.g. Field(test.assays) => 4, Field(encounter.diagnosis) => 2
     @custom_headers = Hash[scopes.map{|s| [s.name, Set.new]}] # e.g. "test" => ["custom1", "custom2"], "sample" => ["custom3"]
     @data_tempfile = Tempfile.new("#{filename}.data", Rails.root.join('tmp'))
-    @csv_tempfile = Tempfile.new(filename, Rails.root.join('tmp'))
   end
 
   def build
@@ -26,20 +25,18 @@ class TestResultsCsvBuilder
       # the second pass writes the definitive headers, and expands all serialised fields
       # honouring the same order used for the headers
       @data_tempfile.rewind
-      final_csv = CSV.new(@csv_tempfile)
-      final_csv << build_headers
+      yield build_headers.to_csv
       data_csv.each do |line|
-        final_csv << expand_row(line)
+        yield expand_row(line).to_csv
       end
     ensure
       # Make sure the data tempfile is closed after building so it is collected
       @data_tempfile.close
       @data_tempfile.unlink
     end
-
-    @csv_tempfile.close
-    @csv_tempfile
   end
+
+  alias_method :each, :build
 
   private
 
