@@ -79,4 +79,8 @@ class User < ActiveRecord::Base
     token.save!
     token
   end
+
+  def active_for_authentication?
+    super && self.is_active?
+  end
 end

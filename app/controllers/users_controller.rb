@@ -1,7 +1,14 @@
 class UsersController < ApplicationController
+  skip_before_filter :ensure_context
   LOCALES = [
               ["English", "en"],
             ]
+
+  def toggle_access
+    user = User.find(params[:user_id])
+    user.update_attribute(:is_active, !user.is_active)
+    render nothing: true
+  end
 
   def settings
     load_locales
