@@ -6,7 +6,11 @@
           - @site.errors.full_messages.each do |msg|
             %li= msg
 
-  = render 'shared/select_institution_or_hidden', f: f
+  .row
+    .col.pe-2
+      = f.label :institution
+    .col
+      .value= f.object.institution
 
   .row
     .col.pe-2
@@ -24,7 +28,7 @@
         = f.label :parent
       .col
         = cdx_select form: f, name: :parent_id, class: 'input-x-large' do |select|
-          - select.item "", "Choose one"
+          - select.item "", "None"
           - select.items @sites, :id, :name
   - elsif @site.parent
     .row

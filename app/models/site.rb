@@ -22,6 +22,14 @@ class Site < ActiveRecord::Base
 
   attr_writer :location
 
+  scope :within, -> (institution_or_site) {
+    if institution_or_site.is_a?(Institution)
+      where(institution: institution_or_site)
+    else
+      where("prefix LIKE concat(?, '%')", institution_or_site.prefix)
+    end
+  }
+
   def location(opts={})
     @location = nil if @location_opts.presence != opts.presence
     @location_opts = opts
