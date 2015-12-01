@@ -5,11 +5,9 @@
       - t.thead do
         %tr
           %th Name
-          %th Institution
           %th Location
       - t.tbody do
         - @sites.each do |site|
           %tr{data: {href: site_path(site) }}
             %td= site.name
-            %td= site.institution.name
             %td= site.location.try(:name)
