@@ -51,4 +51,31 @@ describe Site do
     expect(Site.with_deleted).to include(site1)
     expect(site1).to be_deleted
   end
+
+  context "within institution or site scope" do
+    let(:institution) { Institution.make }
+    let(:other_institution) { Institution.make }
+
+    let(:site1)  { Site.make institution: institution }
+    let(:site11) { Site.make :child, parent: site1 }
+    let(:site12) { Site.make :child, parent: site1 }
+    let(:site2)  { Site.make institution: institution }
+
+    it "should filter by institution" do
+      expect(Site.within(institution)).to eq([site1, site11, site12, site2])
+    end
+
+    it "filtering by site should include self" do
+      expect(Site.within(site1)).to include(site1)
+    end
+
+    it "filtering by site should include descendants" do
+      expect(Site.within(site1)).to include(site11)
+      expect(Site.within(site1)).to include(site12)
+    end
+
+    it "filtering by site should not include sibling" do
+      expect(Site.within(site1)).to_not include(site2)
+    end
+  end
 end

@@ -1,18 +1,12 @@
 class SitesController < ApplicationController
   set_institution_tab :sites
-  before_filter :load_institutions
   before_filter do
     head :forbidden unless has_access_to_sites_index?
   end
 
   def index
-    @sites = check_access(Site.includes(:institution), READ_SITE)
-    @institutions = check_access(Institution, READ_INSTITUTION)
-    @can_create = has_access?(@institutions, CREATE_INSTITUTION_SITE)
-
-    if (institution_id = params[:institution].presence)
-      @sites = @sites.where(institution_id: institution_id.to_i)
-    end
+    @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
+    @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
 
     @sites.preload_locations!
   end
@@ -26,7 +20,7 @@ class SitesController < ApplicationController
   # POST /sites
   # POST /sites.json
   def create
-    @institution = Institution.find params[:site][:institution_id]
+    @institution = @navigation_context.institution
     return unless authorize_resource(@institution, CREATE_INSTITUTION_SITE)
 
     @site = @institution.sites.new(site_params)
@@ -123,10 +117,6 @@ class SitesController < ApplicationController
   end
 
   private
-
-  def load_institutions
-    @institutions = check_access(Institution, CREATE_INSTITUTION_SITE)
-  end
 
   def site_params
     location_details = Location.details(params[:site][:location_geoid]).first

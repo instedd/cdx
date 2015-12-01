@@ -26,9 +26,10 @@ describe SitesController do
     end
 
     it "should filter by institution if requested" do
+      grant institution2.user, user, Institution, [READ_INSTITUTION]
       grant nil, user, "site?institution=#{institution2.id}", [READ_SITE]
 
-      get :index, institution: institution2.id
+      get :index, context: institution2.uuid
 
       expect(response).to be_success
       expect(assigns(:sites)).to contain_exactly(site2)
@@ -47,16 +48,24 @@ describe SitesController do
 
   context "create" do
 
-    it "should create new site" do
+    it "should create new site in context institution" do
       expect {
-        post :create, site: Site.plan(institution: institution)
+        post :create, site: Site.plan
       }.to change(institution.sites, :count).by(1)
       expect(response).to be_redirect
     end
 
-    it "should not create site for another institution" do
+    it "should not create site in context institution despite params" do
       expect {
         post :create, site: Site.plan(institution: institution2)
+      }.to change(institution.sites, :count).by(1)
+      expect(response).to be_redirect
+    end
+
+    it "should not create site in institution without permission to create site" do
+      grant institution2.user, user, Institution, [READ_INSTITUTION]
+      expect {
+        post :create, context: institution2.uuid, site: Site.plan
       }.to change(institution.sites, :count).by(0)
       expect(response).to be_forbidden
     end
