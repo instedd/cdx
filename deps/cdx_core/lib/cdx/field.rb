@@ -118,7 +118,7 @@ class Cdx::Field
 
   class DurationField < self
     def humanize(value)
-      if value.is_a?(Hash) && value.length == 1
+      if value.is_a?(Hash) && value.length >= 1
         "#{value.values.first} #{value.keys.first}"
       else
         super
