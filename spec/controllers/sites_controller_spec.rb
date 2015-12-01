@@ -38,12 +38,24 @@ describe SitesController do
   end
 
   context "new" do
+    let!(:site) { institution.sites.make }
 
     it "should get new page" do
       get :new
       expect(response).to be_success
     end
 
+    it "should initialize no parent if context is institution" do
+      get :new, context: institution.uuid
+      expect(response).to be_success
+      expect(assigns(:site).parent).to be_nil
+    end
+
+    it "should initialize parent if context is site" do
+      get :new, context: site.uuid
+      expect(response).to be_success
+      expect(assigns(:site).parent).to eq(site)
+    end
   end
 
   context "create" do
