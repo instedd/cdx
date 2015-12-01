@@ -42,8 +42,16 @@ class Cdx::Field
     false
   end
 
+  def dynamic?
+    false
+  end
+
   def searchable?
     @definition["searchable"]
+  end
+
+  def multiple?
+    @definition["multiple"]
   end
 
   def scoped_name
@@ -114,6 +122,9 @@ class Cdx::Field
   end
 
   class DynamicField < self
+    def dynamic?
+      true
+    end
   end
 
   class DurationField < self
