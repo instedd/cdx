@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: https://github.com/instedd/poirot_rails.git
-  revision: 43d7ee8bacbe4afe34c29f6ad7ec98475cc39b1e
+  revision: c3e8ceeacd07a226b941a8cabb2dd762fa73846f
   branch: master
   specs:
     poirot_rails (0.0.4)
@@ -102,6 +102,11 @@ GEM
     arel (6.0.3)
     awesome_nested_set (3.0.2)
       activerecord (>= 4.0.0, < 5)
+    aws-sdk (1.66.0)
+      aws-sdk-v1 (= 1.66.0)
+    aws-sdk-v1 (1.66.0)
+      json (~> 1.4)
+      nokogiri (>= 1.4.4)
     babel-source (5.8.26)
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
@@ -620,6 +625,7 @@ PLATFORMS
 
 DEPENDENCIES
   awesome_nested_set (~> 3.0.0.rc.3)
+  aws-sdk (~> 1.6)
   barby
   capistrano (~> 3.1.0)
   capistrano-bundler (~> 1.1)
