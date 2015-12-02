@@ -74,11 +74,7 @@ Rails.application.routes.draw do
       get 'manifest'
     end
   end
-  resources :test_results , only: [:index, :show] do
-    collection do
-      get 'csv'
-    end
-  end
+  resources :test_results , only: [:index, :show]
   resources :filters, format: 'html'
   resources :subscribers
   resources :policies

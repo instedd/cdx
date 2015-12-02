@@ -6,6 +6,7 @@ entities:
         searchable: true
       uuid:
         searchable: true
+        multiple: true
       type:
         searchable: true
       collection_date:
@@ -88,6 +89,7 @@ entities:
         searchable: true
       name:
       path:
+        multiple: true
         searchable: true
   patient: &PATIENT
     allows_custom: true
@@ -111,6 +113,7 @@ entities:
       id:
       parents:
         searchable: true
+        multiple: true
       admin_levels:
         type: dynamic
         searchable: true
@@ -149,10 +152,10 @@ entities:
           quantitative_result:
             type: integer
 test:
-  sample:
-    <<: *SAMPLE
   test:
     <<: *TEST
+  sample:
+    <<: *SAMPLE
   device:
     <<: *DEVICE
   institution:

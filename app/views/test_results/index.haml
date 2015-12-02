@@ -5,7 +5,7 @@
 
     = cdx_table title: pluralize(@total, "Test") do |t|
       - t.actions do
-        = link_to "download CSV", csv_test_results_path(@filter)
+        = link_to "download CSV", test_results_path(@filter.merge(format: :csv))
 
       - t.thead do
         %tr

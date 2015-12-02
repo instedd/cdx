@@ -20,8 +20,6 @@ class Site < ActiveRecord::Base
 
   after_create :compute_prefix
 
-  attr_writer :location
-
   scope :within, -> (institution_or_site) {
     if institution_or_site.is_a?(Institution)
       where(institution: institution_or_site)
@@ -31,9 +29,14 @@ class Site < ActiveRecord::Base
   }
 
   def location(opts={})
-    @location = nil if @location_opts.presence != opts.presence
+    @location = nil if @location_opts.presence != opts.presence || @location.try(:geo_id) != location_geoid
     @location_opts = opts
     @location ||= Location.find(location_geoid, opts)
+  end
+
+  def location=(value)
+    @location = value
+    self.location_geoid = value.id
   end
 
   def self.preload_locations!
