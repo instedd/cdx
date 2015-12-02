@@ -21,7 +21,7 @@
     .col.pe-2
       = f.label :location_geoid, "Location"
     .col
-      = f.hidden_field :location_geoid, class: 'input-large'
+      = location_select form: f, name: :location_geoid, class: 'input-xx-large'
   - if @site.new_record?
     .row
       .col.pe-2

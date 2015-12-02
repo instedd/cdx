@@ -102,6 +102,14 @@ module ApplicationHelper
     end
   end
 
+  def test_results_table(attributes)
+    options = { filter: {} }
+    options[:filter]['site.uuid'] = attributes[:filter][:site].uuid if attributes[:filter][:site]
+    options[:filter]['device.uuid'] = attributes[:filter][:device].uuid if attributes[:filter][:device]
+
+    react_component('TestResultsTable', filter: options[:filter])
+  end
+
   def show_institution?(action, resource)
     ComputedPolicy.condition_resources_for(action, resource, current_user)[:institution].count > 1
   end
