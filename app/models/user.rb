@@ -83,4 +83,8 @@ class User < ActiveRecord::Base
   def active_for_authentication?
     super && self.is_active?
   end
+
+  def inactive_message
+    self.is_active? ? super : I18n.t('devise.failure.suspended')
+  end
 end
