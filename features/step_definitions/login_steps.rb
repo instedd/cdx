@@ -23,6 +23,10 @@ When(/^he attempts to log\-in with correct details$/) do
   authenticate(@user)
 end
 
+When(/^his account has been disabled$/) do
+  @user.update_attribute(:is_active, false)
+end
+
 Then(/^he should see "(.*?)"$/) do |arg1|
   @login.should have_content(arg1)
 end
