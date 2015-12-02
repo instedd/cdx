@@ -2,5 +2,10 @@ require 'spec_helper'
 
 describe Institution do
   let(:user) {User.make}
-  let(:institution) {Institution.make user_id: user.id}
+
+  it "creates predefined roles for institution" do
+    expect {
+      Institution.make user_id: user.id
+    }.to change(Role, :count).by(2)
+  end
 end

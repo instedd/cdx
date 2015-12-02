@@ -78,4 +78,12 @@ describe Site do
       expect(Site.within(site1)).to_not include(site2)
     end
   end
+
+  it "creates predefined roles for site" do
+    user = User.make
+    institution = Institution.make user_id: user.id
+    expect {
+      Site.make institution_id: institution.id
+    }.to change(Role, :count).by(4)
+  end
 end

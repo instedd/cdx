@@ -19,6 +19,7 @@ class Site < ActiveRecord::Base
   validates_presence_of :name
 
   after_create :compute_prefix
+  after_create :create_predefined_roles
 
   scope :within, -> (institution_or_site) {
     if institution_or_site.is_a?(Institution)
@@ -108,6 +109,15 @@ class Site < ActiveRecord::Base
   def same_institution_as_parent
     if parent && parent.institution != self.institution
       self.errors.add(:institution, "must match parent site institution")
+    end
+  end
+
+  def create_predefined_roles
+    roles = Policy.predefined_site_roles(self)
+    roles.each do |role|
+      role.institution = institution
+      role.site = self
+      role.save!
     end
   end
 end

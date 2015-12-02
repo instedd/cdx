@@ -18,6 +18,8 @@ class Institution < ActiveRecord::Base
   validates_presence_of :kind
   validates_inclusion_of :kind, in: KINDS
 
+  after_create :create_predefined_roles
+
   after_create :update_owner_policies
   after_destroy :update_owner_policies
 
@@ -44,6 +46,14 @@ class Institution < ActiveRecord::Base
   end
 
   private
+
+  def create_predefined_roles
+    roles = Policy.predefined_institution_roles(self)
+    roles.each do |role|
+      role.institution = self
+      role.save!
+    end
+  end
 
   def update_owner_policies
     self.user.try(:update_computed_policies)

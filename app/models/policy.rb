@@ -75,7 +75,15 @@ class Policy < ActiveRecord::Base
   end
 
   def self.owner(user, institution_id, kind)
-    predefined_policy "owner_#{kind}", user, institution_id: institution_id
+    predefined_policy "owner/#{kind}", user, institution_id: institution_id
+  end
+
+  def self.predefined_institution_roles(institution)
+    predefined_roles "institution/#{institution.kind}", institution_id: institution.id, institution_name: institution.name
+  end
+
+  def self.predefined_site_roles(site)
+    predefined_roles "site/#{site.institution.kind}", institution_id: site.institution.id, site_id: site.id, site_name: site.name
   end
 
   def self.can? action, resource, user, policies=nil
@@ -198,6 +206,22 @@ class Policy < ActiveRecord::Base
     policy.definition = JSON.load(Erubis::Eruby.new(predefined_policy_template(name)).result(args))
     policy.user = user
     policy
+  end
+
+  def self.predefined_roles(name, args={})
+    roles_json = JSON.load(Erubis::Eruby.new(predefined_policy_template("roles/#{name}")).result(args))
+    roles_json.map do |role_json|
+      role = Role.new
+      role.name = role_json["name"]
+
+      policy = Policy.new
+      policy.allows_implicit = true
+      policy.name = name.titleize
+      policy.definition = role_json["policy"]
+      role.policy = policy
+
+      role
+    end
   end
 
   def self.predefined_policy_template(name)
