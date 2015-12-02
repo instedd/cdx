@@ -133,8 +133,6 @@ var EncounterForm = React.createClass({
   },
 
   render: function() {
-    var institutionSelect = <InstitutionSelect onChange={this.setInstitution} url="/encounters/institutions"/>;
-
     if (this.state.encounter.institution == null)
       return (<div>{institutionSelect}</div>);
 
@@ -175,6 +173,20 @@ var EncounterForm = React.createClass({
 
     return (
       <div>
+        {(function(){
+          if (this.state.encounter.id == null) return;
+          
+          return (
+          <div className="row">
+            <div className="col pe-2">
+              <label>Site</label>
+            </div>
+            <div className="col">
+              <p>{this.props.encounter.site.name}</p>
+            </div>
+          </div>);
+        }.bind(this))()}
+
         <FlexFullRow>
           <PatientCard patient={this.state.encounter.patient} />
         </FlexFullRow>

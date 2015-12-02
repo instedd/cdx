@@ -8,6 +8,11 @@ describe "create encounter" do
     sign_in(user)
   }
 
+  it "should use current context site as default"
+  # TODO should create encounter permission be scoped by site instead of institution
+  #      if so, how to scope institutions where there is at least one site where the user can perform X
+  it "should only show sites with read permission of context institution"
+
   it "should search sample by id substring" do
     process sample: {id: "ab111"}
     process sample: {id: "22ab2"}

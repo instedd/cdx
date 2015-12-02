@@ -85,8 +85,8 @@ ActiveRecord::Schema.define(version: 20151210181714) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",                  limit: 4
-    t.datetime "published_at"
     t.boolean  "supports_activation"
+    t.datetime "published_at"
     t.string   "support_url",                     limit: 255
     t.string   "picture_file_name",               limit: 255
     t.string   "picture_content_type",            limit: 255
@@ -128,9 +128,11 @@ ActiveRecord::Schema.define(version: 20151210181714) do
     t.datetime "updated_at"
     t.boolean  "is_phantom",                   default: true
     t.datetime "deleted_at"
+    t.integer  "site_id",        limit: 4
   end
 
   add_index "encounters", ["deleted_at"], name: "index_encounters_on_deleted_at", using: :btree
+  add_index "encounters", ["site_id"], name: "index_encounters_on_site_id", using: :btree
 
   create_table "filters", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
@@ -422,4 +424,5 @@ ActiveRecord::Schema.define(version: 20151210181714) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
+  add_foreign_key "encounters", "sites"
 end

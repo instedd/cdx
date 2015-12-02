@@ -1,9 +1,8 @@
 class EncountersController < ApplicationController
-  before_filter :load_institutions
   before_filter :load_encounter, only: %W(show edit)
 
   def new
-    return unless authorize_resource(@institutions, CREATE_INSTITUTION_ENCOUNTER)
+    return unless authorize_resource(@navigation_context.institution, CREATE_INSTITUTION_ENCOUNTER)
   end
 
   def create
@@ -13,8 +12,8 @@ class EncountersController < ApplicationController
     end
   end
 
-  def institutions
-    render json: as_json_institution_list(@institutions).attributes!
+  def sites
+    render json: as_json_site_list(check_access(@navigation_context.institution.sites, READ_SITE)).attributes!
   end
 
   def show
@@ -92,10 +91,6 @@ class EncountersController < ApplicationController
     end
   end
 
-  def load_institutions
-    @institutions = check_access(Institution, CREATE_INSTITUTION_ENCOUNTER)
-  end
-
   def load_encounter
     @encounter = Encounter.where("id = :id OR uuid = :id", params).first
     @institution = @encounter.institution
@@ -105,7 +100,7 @@ class EncountersController < ApplicationController
   end
 
   def institution_by_uuid(uuid)
-    @institutions.where(uuid: uuid).first
+    check_access(Institution, CREATE_INSTITUTION_ENCOUNTER).where(uuid: uuid).first
   end
 
   def prepare_encounter_from_json
@@ -116,6 +111,7 @@ class EncountersController < ApplicationController
     if @encounter.new_record?
       @institution = institution_by_uuid(encounter_param['institution']['uuid'])
       @encounter.institution = @institution
+      @encounter.site = @institution.sites.where(uuid: encounter_param['site']['uuid']).first
     else
       @institution = @encounter.institution
     end
@@ -206,6 +202,10 @@ class EncountersController < ApplicationController
         as_json_institution(json, @institution)
       end
 
+      json.site do
+        as_json_site(json, @encounter.site)
+      end
+
       json.patient do
         @encounter_blender.patient.blank? ? json.nil! : json.(@encounter_blender.patient, :plain_sensitive_data, :core_fields)
       end
@@ -228,11 +228,11 @@ class EncountersController < ApplicationController
     end
   end
 
-  def as_json_institution_list(institutions)
+  def as_json_site_list(sites)
     Jbuilder.new do |json|
-      json.total_count institutions.size
-      json.institutions institutions do |institution|
-        as_json_institution(json, institution)
+      json.total_count sites.size
+      json.sites sites do |site|
+        as_json_site(json, site)
       end
     end
   end
@@ -273,5 +273,9 @@ class EncountersController < ApplicationController
 
   def as_json_institution(json, institution)
     json.(institution, :uuid, :name)
+  end
+
+  def as_json_site(json, site)
+    json.(site, :uuid, :name)
   end
 end

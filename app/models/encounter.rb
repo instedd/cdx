@@ -10,9 +10,12 @@ class Encounter < ActiveRecord::Base
   has_many :test_results, dependent: :restrict_with_error
 
   belongs_to :institution
+  belongs_to :site
   belongs_to :patient
 
   validates_presence_of :institution
+  validates_presence_of :site, if: Proc.new { |encounter| encounter.institution && !encounter.institution.kind_manufacturer? }
+  validate :same_institution_of_site
 
   validate :validate_patient
 
@@ -78,4 +81,11 @@ class Encounter < ActiveRecord::Base
   def ensure_entity_id
     self.entity_id = entity_id
   end
+
+  def same_institution_of_site
+    if self.site && self.site.institution != self.institution
+      errors.add(:site, "must belong to the institution of the device")
+    end
+  end
+
 end
