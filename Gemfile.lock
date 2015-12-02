@@ -107,7 +107,7 @@ GEM
     aws-sdk-v1 (1.66.0)
       json (~> 1.4)
       nokogiri (>= 1.4.4)
-    babel-source (5.8.26)
+    babel-source (5.8.34)
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
@@ -453,6 +453,7 @@ GEM
       railties (= 4.2.3)
       sprockets-rails
     rails-assets-es5-shim (4.3.1)
+    rails-assets-leaflet (0.7.7)
     rails-assets-urijs (1.17.0)
     rails-deprecated_sanitizer (1.0.3)
       activesupport (>= 4.2.0.alpha)
@@ -685,10 +686,11 @@ DEPENDENCIES
   quiet_assets
   rails (~> 4.2.0)
   rails-assets-es5-shim!
+  rails-assets-leaflet!
   rails-assets-urijs!
   rails-i18n (~> 4.0.0)
   rchardet
-  react-rails
+  react-rails (~> 1.3.2)
   rest-client
   rspec
   rspec-collection_matchers

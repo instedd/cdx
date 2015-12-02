@@ -19,11 +19,13 @@
 //= require select2
 //= require react
 //= require react_ujs
+//= require react-dom
 //= require classnames
 //= require react-input-autosize
 //= require react-select
 //= require components
 //= require d3
+//= require leaflet
 //= require_tree .
 //= require turbolinks
 Turbolinks.enableProgressBar()
