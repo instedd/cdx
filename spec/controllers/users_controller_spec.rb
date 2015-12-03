@@ -7,24 +7,42 @@ RSpec.describe UsersController, type: :controller do
   before do
     sign_in user
   end
+  
+  let(:user_to_edit) { User.make }
 
-  describe 'PUT toggle_access' do
-    let(:user_inactive) { User.make(is_active: false) }
-    let(:user_active) { User.make(is_active: true) }
-
-    context 'when user is active' do
-      it 'de-activates their account' do
-        put :toggle_access, user_id: user_active.id
-        user_active.reload
-        expect(user_active.is_active?).to be_falsey
-      end
+  describe 'GET :edit' do
+    before do
+      get :edit, id: user_to_edit.id
+    end
+    it 'assigns an instance of :user_to_edit' do
+      expect(assigns(:user)).to eq(user_to_edit)
     end
 
-    context 'when user is active' do
-      it 'activates their account' do
-        put :toggle_access, user_id: user_inactive.id
-        user_inactive.reload
-        expect(user_inactive.is_active?).to be_truthy
+    it 'renders the :edit template' do
+      expect(response).to render_template(:edit)
+    end
+  end
+
+  describe 'PUT :update' do
+    let(:user_params) { user_to_edit.attributes }
+    let(:admin_user_params) { user.attributes }
+
+    it 'assigns an instance of user' do
+      put :update, id: user_to_edit.id, user: user_params
+      expect(assigns(:user)).to eq(user_to_edit)
+    end
+
+    it 'does not change own (ie admin user) attributes' do
+      admin_user_params[:is_active] = false
+      put :update, id: user.id, user: admin_user_params
+      expect(user.reload.is_active).to be_truthy
+    end
+
+    context 'when the is active box is unchecked' do
+      it 'can suspend a users access' do
+        user_params[:is_active] = false
+        put :update, id: user_to_edit.id, user: user_params
+        expect(user_to_edit.reload.is_active).to be_falsey
       end
     end
   end

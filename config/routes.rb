@@ -131,7 +131,7 @@ Rails.application.routes.draw do
     get 'settings' => "users#settings"
     patch 'settings' => "users#update_settings"
   end
-  put 'toggle_access/:user_id' => 'users#toggle_access'
 
+  resources :users, only: [:edit, :update]
   resources :roles
 end
