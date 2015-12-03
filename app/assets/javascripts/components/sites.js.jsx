@@ -114,7 +114,7 @@ var SitePicker = React.createClass({
   render: function() {
     return (
       <div>
-        <input type="text" onChange={this.onSearchChange} autoFocus="true" placeholder="Search sites" />
+        <input type="text" className="input-block" onChange={this.onSearchChange} autoFocus="true" placeholder="Search sites" />
         <SitesTreeView sites={this.state.sites_tree} onSiteClick={this.selectSite} />
       </div>
     )
@@ -169,9 +169,15 @@ var SiteTreeViewNode = React.createClass({
 
     return (
       <li key={site.uuid} className={(this.state.expanded ? "expanded" : "") + " " + (site.selected ? "selected" : "")}>
-        <button onClick={this.toggle} />
 
-        <a href="#" onClick={this.onSiteClick}>{site.name}</a>
+        <a href="#" onClick={this.onSiteClick}>
+          {(function(){
+            if (site.children.length > 0) {
+              return <button onClick={this.toggle} />;
+            }
+          }.bind(this))()}
+          {site.name}
+        </a>
         {inner}
       </li>
     );

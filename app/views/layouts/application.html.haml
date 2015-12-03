@@ -12,16 +12,16 @@
       %header
         = render "shared/header_nav"
 
-      #context_side_bar{"data-context-react-props": {context: @navigation_context.try(:to_hash) || {}}.to_json}
-
-      .content
+      .content.row
         = flash_message
-        = yield(:subheader)
-        .row
-          .col= yield(:leftcolumn)
-          .col.pe-10
-            = content_for?(:cdp_content) ? yield(:cdp_content) : yield
-          .col= yield(:rightcolumn)
+        .col.px-3#context_side_bar{"data-context-react-props": {context: @navigation_context.try(:to_hash) || {}}.to_json}
+        .col
+          = yield(:subheader)
+          .row
+            .col= yield(:leftcolumn)
+            .col.pe-10
+              = content_for?(:cdp_content) ? yield(:cdp_content) : yield
+            .col= yield(:rightcolumn)
 
       %footer
         = render "shared/footer"

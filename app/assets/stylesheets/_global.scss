@@ -158,7 +158,7 @@ a[title="Back"] {
 
 .filters {
   background: $gray1;
-  margin: -1.5em -1em;
+  margin: -10px -10px 0;
   padding: 0 1em 0.5em;
 
   .filter {
@@ -185,7 +185,7 @@ a[title="Back"] {
 
 .add-new {
   background: $blue;
-  margin: -1.5em -1em 1em;
+  margin: -10px -10px 10px;
   padding: 0 1em 0.5em;
 
   h2 {
@@ -207,4 +207,14 @@ a[title="Back"] {
 
 #nav-context {
   color: $white;
+  margin-left: 10px;
+}
+
+.flash.flash_notice {
+  color: $gray3;
+  font-weight: 300;
+  position: absolute;
+  top: 65px;
+  right: 5px;
+  z-index: 1;
 }

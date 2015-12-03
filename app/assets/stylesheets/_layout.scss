@@ -169,46 +169,36 @@ footer {
   }
 }
 
+.content.row {
+  padding: 0;
+}
+
 #context_side_bar {
+  padding: 0;
   display: none;
 }
 
 .show-navigation-context-picker {
   #context_side_bar {
-    position: absolute;
-    display: block;
-    width: 300px;
-    background-color: $gray4;
-    padding: 10px;
+    @include flexbox();
+    @include align-self(stretch);
+    background-color: $gray5;
     color: $white-dark;
 
     input, input:focus {
+      background: image-url("ic-search.png") no-repeat 10px 10px;
       color: $white-light;
+      padding-left: 38px;
+      height: 40px;
     }
 
     a {
       color: $white-dark;
     }
 
-    .sites-tree-view {
-      .selected > a::before {
-        content: '';
-        background-color: $black;
-        right: 0;
-        left: 0;
-        position: absolute;
-        height: 1.4em;
-        z-index: -1;
-      }
-
-      .selected > a {
-        color: $white-light;
-        background-color: $black;
-      }
+    > div {
+      flex: 1;
     }
   }
 
-  .content {
-    margin-left: 300px;
-  }
 }

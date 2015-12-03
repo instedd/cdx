@@ -80,13 +80,68 @@
 }
 
 .sites-tree-view {
-  li li {
-    padding-left: 1em;
+  position: relative;
+  padding: 0 10px;
+
+  li {
+    line-height: 46px;
+
+    button {
+      background: image-url("arr-select-right-inv.png") no-repeat center #303030;
+      display: inline-block;
+      vertical-align: middle;
+      width: 20px;
+      height: 20px;
+      padding: 15px 0;
+      cursor: pointer;
+      border: none;
+      outline: 0;
+      position: absolute;
+      top: 8px;
+      left: 0;
+      z-index: 1;
+    }
+
+    a {
+      position: relative;
+      display: block;
+      padding-left: 24px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    ul {
+      margin: -15px 0 0 10px;
+      padding: 15px 0 0 15px;
+      border-left: 1px solid $white-translucent;
+    }
+
+    &.expanded > a > button {
+      background: image-url("arr-select-down-inv.png") no-repeat center 50% #303030;
+    }
+    &.selected {
+      > a > button {
+        background-color: #1D1D1D;
+      }
+    }
+  }
+
+
+  .selected:before {
+    content: '';
+    background-color: $gray3;
+    right: 0;
+    left: 0;
+    position: absolute;
+    height: 46px;
+    z-index: 0;
   }
 
   .selected > a {
-    background-color: #ccc;
+    color: $white-light;
   }
+
 }
 
 .table-controls > div {
