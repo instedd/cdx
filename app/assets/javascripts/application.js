@@ -16,7 +16,6 @@
 //= require jquery.are-you-sure
 //= require urijs
 //= require lodash
-//= require select2
 //= require react
 //= require react_ujs
 //= require react-dom
