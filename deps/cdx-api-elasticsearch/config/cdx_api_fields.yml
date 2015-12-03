@@ -22,6 +22,16 @@
 #   b) a grouping with the name of '#{default_name}_admin_level'
 
 test:
+  - name: test.error_code
+    filter_parameter_definition:
+      - include_default: true
+      - name: test.error_code.min
+        type: range-integer
+        boundary: gte
+      - name: test.error_code.max
+        type: range-integer
+        boundary: lte
+
   - name: test.start_time
     filter_parameter_definition:
       - name: since

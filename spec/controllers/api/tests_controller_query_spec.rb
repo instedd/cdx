@@ -137,6 +137,20 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       end
     end
 
+     context "ErrorCode" do
+     
+       it "filters by error code" do
+         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", result: :positive], type: :qc, error_code: '155'})
+         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", result: :negative], type: :specimen})
+
+         response = get_updates "test.error_code.min" => "100", "test.error_code.max"=>"500"
+
+         expect(response.size).to eq(1)
+         expect(response.first["test"]["assays"].first["result"]).to eq("positive")
+         expect(response.first["test"]["error_code"]).to eq(155)
+       end 
+    end
+    
     context "Grouping" do
       it "groups by gender in query params" do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :positive]}, patient: {gender: :male})
