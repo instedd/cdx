@@ -21,11 +21,11 @@ var LocationSelect = React.createClass({
     // If the initial value is just an id, issue an initial ajax request to get the label
     // and modify props.value accordingly
     var value = null;
-    var isLoading = null;
+    var isLoading = false;
     if (this.props.value && this.props.value.value) {
       value = this.props.value;
       isLoading = false;
-    } else {
+    } else if (this.props.value) {
       isLoading = true;
       value = { value: this.props.value, label: this.props.value };
       this.getDetails(this.props.value, function(location) {
@@ -63,7 +63,6 @@ var LocationSelect = React.createClass({
   },
 
   getOptions: function(input, callback) {
-    console.log("Invoking with " + JSON.stringify(input));
     var _this = this;
     $.get(gon.location_service_url + "/suggest", { name: input, limit: 100, ancestors: true, set: gon.location_service_set }, function(data) {
       callback(null, { options: _.map(data, _this.formatLocation), complete: data.length < 100 });

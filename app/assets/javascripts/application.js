@@ -25,9 +25,13 @@
 //= require components
 //= require d3
 //= require leaflet
+//= require leaflet-control-geocoder
 //= require_tree .
 //= require turbolinks
 Turbolinks.enableProgressBar()
+
+// Configure leaflet
+L.Icon.Default.imagePath = '/assets'
 
 function cdx_init_components(dom) {
   ReactRailsUJS.mountComponents(dom);
