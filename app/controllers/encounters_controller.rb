@@ -13,7 +13,8 @@ class EncountersController < ApplicationController
   end
 
   def sites
-    render json: as_json_site_list(check_access(@navigation_context.institution.sites, READ_SITE)).attributes!
+    sites = check_access(@navigation_context.institution.sites, READ_SITE)
+    render json: as_json_site_list(sites).attributes!
   end
 
   def show

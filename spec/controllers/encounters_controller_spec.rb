@@ -3,6 +3,7 @@ require 'policy_spec_helper'
 
 RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   let(:institution) { Institution.make }
+  let(:site) { Site.make institution: institution }
   let(:user) { institution.user }
 
   before(:each) { sign_in user }
@@ -70,22 +71,21 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
   end
 
-  describe "GET #institutions" do
-    it "returns institutions where the use can create encounters" do
+  describe "GET #sites" do
+    it "returns sites of the context institution if user has access to them" do
       i1 = Institution.make
-      i2 = Institution.make
+      s1 = Site.make institution: i1
+      s2 = Site.make institution: i1
 
-      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
-      grant i1.user, user, {testResult: i1}, QUERY_TEST
-      grant i2.user, user, {testResult: i2}, QUERY_TEST
+      grant i1.user, user, i1, READ_INSTITUTION
+      grant i1.user, user, s1, READ_SITE
 
-      get :institutions
+      get :sites, context: i1.uuid
 
       expect(response).to have_http_status(:success)
       json_response = JSON.parse(response.body)
-      expect(json_response["total_count"]).to eq(2)
-
-      expect(json_response["institutions"].map(&:with_indifferent_access)).to contain_exactly(institution_json(institution),institution_json(i1))
+      expect(json_response["total_count"]).to eq(1)
+      expect(json_response["sites"].map(&:with_indifferent_access)).to contain_exactly(site_json(s1))
     end
   end
 
@@ -99,6 +99,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     before(:each) {
       post :create, encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{ uuids: sample.uuids }],
         test_results: [],
         assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],
@@ -282,6 +283,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     it "renders json response with filled encounter and status ok" do
       put :add_sample, sample_uuid: test1.sample.uuids[0], encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [],
         test_results: [],
       }.to_json
@@ -300,6 +302,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     it "does not add sample if present" do
       put :add_sample, sample_uuid: test1.sample.uuids[0], encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: test1.sample.uuids[0]}],
         test_results: [],
       }.to_json
@@ -324,6 +327,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_with_encounter.uuid, encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: test1.sample.uuids[0]}],
         test_results: [{uuid: test1.uuid}],
       }.to_json
@@ -349,6 +353,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample_with_patient1.uuids}],
         test_results: [],
       }.to_json
@@ -369,6 +374,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample_with_patient1.uuids}],
         test_results: [],
       }.to_json
@@ -390,6 +396,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample_with_patient1.uuids}],
         test_results: [],
       }.to_json
@@ -416,6 +423,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_sample, sample_uuid: sample_c.uuid, encounter: {
         institution: { uuid: i1.uuid },
+        site: { uuid: i1.sites.first.uuid },
         samples: [{uuids: sample_a.uuids}, {uuids: sample_b.uuids}],
         test_results: [],
       }.to_json
@@ -440,6 +448,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       put :add_sample, sample_uuid: sample_b.uuid, encounter: {
         id: encounter.id,
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample_a.uuids}],
         test_results: [],
       }.to_json
@@ -461,6 +470,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     it "renders json response with filled encounter and status ok" do
       put :add_test, test_uuid: test1.uuid, encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [],
         test_results: [],
       }.to_json
@@ -491,6 +501,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :add_test, test_uuid: test_result_c.uuid, encounter: {
         institution: { uuid: i1.uuid },
+        site: { uuid: i1.sites.first.uuid },
         samples: [],
         test_results: [{uuid: test_result_a.uuid}, {uuid: test_result_b.uuid}],
       }.to_json
@@ -539,6 +550,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     it "renders json response with merged sample and status ok" do
       put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}],
         test_results: [],
       }.to_json
@@ -556,6 +568,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     it "renders json response with merged samples from the same encounter" do
       put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}, {uuids: sample2.uuids}],
         test_results: [],
       }.to_json
@@ -575,6 +588,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
         id: encounter.id,
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}, {uuids: sample2.uuids}],
         test_results: [],
       }.to_json
@@ -595,6 +609,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
         id: encounter.id,
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}, {uuids: sample2.uuids}],
         test_results: [],
       }.to_json
@@ -620,6 +635,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}],
         test_results: [],
       }.to_json
@@ -635,6 +651,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     it "it fails if a sample belongs to another encounter" do
       put :merge_samples, sample_uuids: [sample1.uuid, sample_with_encounter.uuid], encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}],
         test_results: [],
       }.to_json
@@ -658,6 +675,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
       put :merge_samples, sample_uuids: [sample_with_patient1.uuid, sample_with_patient2.uuid], encounter: {
         institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
         samples: [{uuids: sample_with_patient1.uuids}],
         test_results: [],
       }.to_json
@@ -675,6 +693,13 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     return {
       uuid: institution.uuid,
       name: institution.name,
+    }
+  end
+
+  def site_json(site)
+    return {
+      uuid: site.uuid,
+      name: site.name,
     }
   end
 

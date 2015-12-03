@@ -2,7 +2,7 @@ require 'faker'
 
 class Api::MessagesController < ApiController
   include DemoData
-  
+
   wrap_parameters false
   skip_before_action :doorkeeper_authorize!, only: :create
   skip_before_action :authenticate_user!, only: :create
@@ -25,14 +25,14 @@ class Api::MessagesController < ApiController
       head :unauthorized
     else
       data = request.body.read rescue nil
-      saved_ok = true  
+      saved_ok = true
       repeatDemo =  params['repeat_demo'].to_i
-      repeatDemo.times do |n|        
+      repeatDemo.times do |n|
         changed_data=randomise_device_data(device, data.clone, params['start_datetime'], params['end_datetime'])
-        saved_ok = save_device_message(device, changed_data, false) 
-        break if saved_ok == false  
-      end    
-      
+        saved_ok = save_device_message(device, changed_data, false)
+        break if saved_ok == false
+      end
+
       render :create, :json =>  {} ,:status => :ok if saved_ok == true
     end
   end
@@ -40,34 +40,37 @@ class Api::MessagesController < ApiController
   private
 
  ##
- # save the device test result and redender an error.  
+ # save the device test result and redender an error.
  #
- # if no error occurs [and render_ok=true] then do not render as this is used by 
+ # if no error occurs [and render_ok=true] then do not render as this is used by
  # the demo data generator.
  #
  # return true if the data was saved.
- 
+
  def save_device_message(device, data, render_ok)
     device_message = DeviceMessage.new(device: device, plain_text_data: data)
     saved_ok = false
-    
+
     if device_message.save
       if device_message.index_failed?
         render :status => :unprocessable_entity, :json => { :errors => device_message.index_failure_reason }
       else
-        device_message.process
-        saved_ok = true
-         
+        begin
+          device_message.process
+          saved_ok = true
+        rescue
+        end
+
         #only do a render now if not used to generate demo data
         render :status => :ok, :json => { :messages => device_message.parsed_messages } if render_ok == true
       end
     else
       render :status => :unprocessable_entity, :json => { :errors => device_message.errors.full_messages.join(', ') }
-    end 
-  
+    end
+
   return saved_ok
   end
-   
+
   def authenticate_create(device)
     token = params[:authentication_token]
     if current_user && !token

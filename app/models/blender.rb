@@ -492,6 +492,8 @@ class Blender
       Patient
     end
 
+    attr_accessor :site
+
     protected
 
     def before_save(entity)
@@ -512,6 +514,8 @@ class Blender
 
       entity.core_fields["start_time"] = min_start_time.iso8601
       entity.core_fields["end_time"] = max_end_time.iso8601
+
+      entity.site ||= self.site
     end
 
     def fetch_times(test_results, field)

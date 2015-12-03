@@ -2,9 +2,11 @@ require 'spec_helper'
 
 describe "create encounter" do
   let(:device) { Device.make }
+  let(:site) { device.institution.sites.first }
   let(:user) { device.institution.user }
 
   before(:each) {
+    user.update_attribute(:last_navigation_context, site.uuid)
     sign_in(user)
   }
 
@@ -12,6 +14,7 @@ describe "create encounter" do
   # TODO should create encounter permission be scoped by site instead of institution
   #      if so, how to scope institutions where there is at least one site where the user can perform X
   it "should only show sites with read permission of context institution"
+  it "should work when context is institution"
 
   it "should search sample by id substring" do
     process sample: {id: "ab111"}
