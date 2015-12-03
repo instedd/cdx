@@ -11,6 +11,7 @@ class Site < ActiveRecord::Base
 
   belongs_to :parent, class_name: "Site"
   has_many :children, class_name: "Site", foreign_key: "parent_id"
+  has_many :roles, dependent: :destroy
 
   acts_as_paranoid
 

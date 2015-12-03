@@ -79,11 +79,22 @@ describe Site do
     end
   end
 
-  it "creates predefined roles for site" do
-    user = User.make
-    institution = Institution.make user_id: user.id
-    expect {
-      Site.make institution_id: institution.id
-    }.to change(Role, :count).by(4)
+  describe "roles" do
+    it "creates predefined roles for site" do
+      user = User.make
+      institution = Institution.make user_id: user.id
+      expect {
+        Site.make institution_id: institution.id
+      }.to change(Role, :count).by(4)
+    end
+
+    it "deletes all roles when destroyed" do
+      user = User.make
+      institution = Institution.make user_id: user.id
+      site = Site.make institution_id: institution.id
+      expect {
+        site.destroy
+      }.to change(Role, :count).by(-4)
+    end
   end
 end

@@ -13,6 +13,7 @@ class Institution < ActiveRecord::Base
   has_many :patients, dependent: :destroy
   has_many :samples, dependent: :destroy
   has_many :test_results, dependent: :destroy
+  has_many :roles, dependent: :destroy
 
   validates_presence_of :name
   validates_presence_of :kind
