@@ -12,5 +12,5 @@
     - t.tbody do
       - @users.each do |user|
         %tr
-          %td= user.full_name
+          %td= link_to user.full_name, edit_user_path(user)
           %td= last_activity(user)

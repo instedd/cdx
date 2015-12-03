@@ -4,10 +4,18 @@ class UsersController < ApplicationController
               ["English", "en"],
             ]
 
-  def toggle_access
-    user = User.find(params[:user_id])
-    user.update_attribute(:is_active, !user.is_active)
-    render nothing: true
+  def edit
+    @user = User.find(params[:id])
+  end
+
+  def update
+    @user = User.find(params[:id])
+
+    if can_edit? && @user.update(admin_update_params)
+      @_message = "User updated"
+    end
+
+    redirect_to edit_user_path(@user), notice: @_message
   end
 
   def settings
@@ -25,6 +33,14 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def admin_update_params
+    params.require(:user).permit(:is_active)
+  end
+
+  def can_edit?
+    current_user.id != params[:id].to_i
+  end
 
   def user_params
     params.require(:user).permit(:locale, :time_zone, :timestamps_in_device_time_zone)
