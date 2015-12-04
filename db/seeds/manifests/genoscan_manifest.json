@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "0.0.9",
+    "version" : "0.0.10",
     "api_version" : "1.4.0",
     "signature" : "",
     "conditions": ["mtb", "rif", "inh"],
@@ -23,16 +23,22 @@
   "field_mapping" : {
     "patient.id" : {"lookup" : "PID"},
     "patient.name" : {
-      "concat" : [
-          {"lookup" : "Firstname"},
-          " ",
-          {"lookup" : "LastName"}
+      "if" : [
+        {"equals" : [{"lookup" : "LastName"}, "n.a."]},
+        null,
+        {
+          "concat" : [
+              {"lookup" : "Firstname"},
+              " ",
+              {"lookup" : "LastName"}
+          ]
+        }
       ]
     },
     "test.patient_age" : {
       "if" : [
         {"equals" : [{"lookup" : "Birthday"}, "n.a."]},
-        "",
+        null,
         {
           "duration" : {
             "years" : {
