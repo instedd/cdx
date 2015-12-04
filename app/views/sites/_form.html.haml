@@ -17,11 +17,6 @@
       = f.label :name
     .col
       = f.text_field :name, :class => 'input-large'
-  .row
-    .col.pe-2
-      = f.label :location_geoid, "Location"
-    .col
-      = location_select form: f, name: :location_geoid, class: 'input-xx-large'
   - if @site.new_record?
     .row
       .col.pe-2
@@ -40,15 +35,11 @@
     .col.pe-2
       = f.label :sample_id_reset_policy, "Sample ID reset policy"
     .col
-      = cdx_select form: f, name: :sample_id_reset_policy, class: 'input-xx-large' do |select|
+      = cdx_select form: f, name: :sample_id_reset_policy, class: 'input-large' do |select|
         - select.item "yearly", "Yearly"
         - select.item "monthly", "Monthly"
         - select.item "weekly", "Weekly"
-  .row
-    .col.pe-2
-      = f.label :address
-    .col
-      = f.text_field :address, :class => 'input-large'
+  = react_component('Address', defaultLocation: @site.location_geoid, defaultAddress: @site.address)
   .row
     .col.pe-2
       = f.label :main_phone_number
@@ -59,10 +50,6 @@
       = f.label :email_address
     .col
       = f.email_field :email_address, :class => 'input-large'
-
-  .row
-    .col
-      #map
 
   .row.button-actions
     .col

@@ -16,10 +16,11 @@
 //= require jquery.are-you-sure
 //= require urijs
 //= require lodash
+//= require classnames
 //= require react
 //= require react_ujs
 //= require react-dom
-//= require classnames
+//= require react-autosuggest
 //= require react-input-autosize
 //= require react-select
 //= require components

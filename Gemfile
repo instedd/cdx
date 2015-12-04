@@ -92,6 +92,7 @@ gem 'faker'
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs'
+  gem 'rails-assets-react-autosuggest'
 end
 
 group :development, :test do
