@@ -16,11 +16,20 @@ var SiteSelect = React.createClass({
     $.get(this.props.url, function(result) {
       if (!this.isMounted()) return;
 
-      this.setState(React.addons.update(this.state, {
+      var changes = {
         sites: { $set: result.sites }
-      }));
+      };
 
-      this.fireSiteChanged(this.state.selectedSiteUuid);
+      // if there is only one site in the institution, select it (without user intervention)
+      // since the control will be hidden.
+      if (result.total_count == 1 && !this.state.selectedSiteUuid) {
+        changes.selectedSiteUuid = { $set: result.sites[0].uuid }
+      }
+
+      this.setState(React.addons.update(this.state, changes), function(){
+        this.fireSiteChanged(this.state.selectedSiteUuid);
+      }.bind(this));
+
     }.bind(this));
   },
 
