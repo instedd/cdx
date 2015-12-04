@@ -1,1 +1,36 @@
-%h1= @navigation_context.name || 'No context'
+%h1 Grid
+
+%p 12 column divided row.
+
+.row
+  - 12.times do |i|
+    .col.pe-1= i
+
+%p
+  use
+  %code pe-1, pe-2, ... pe-12
+  classes to distribute the space with weight
+
+.row
+  .col.pe-4
+    %p
+      first column with
+      %code .pe-4
+  .col.pe-2
+    %p
+      first column with
+      %code .pe-2
+  .col.pe-6
+    %p
+      third column with rest of space
+      %code .pe-8
+
+%p Nested columns
+
+.row
+  .col.pe-4
+    .row
+      - 4.times do |i|
+        .col.pe-3= "1.#{i}"
+  .col.pe-2 2
+  .col.pe-6 3
