@@ -55,11 +55,8 @@ class Api::MessagesController < ApiController
       if device_message.index_failed?
         render :status => :unprocessable_entity, :json => { :errors => device_message.index_failure_reason }
       else
-        begin
-          device_message.process
-          saved_ok = true
-        rescue
-        end
+        device_message.process
+        saved_ok = true
 
         #only do a render now if not used to generate demo data
         render :status => :ok, :json => { :messages => device_message.parsed_messages } if render_ok == true

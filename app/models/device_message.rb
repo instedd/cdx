@@ -33,6 +33,9 @@ class DeviceMessage < ActiveRecord::Base
 
   def process
     DeviceMessageProcessor.new(self).process
+  rescue => e
+    self.record_failure e
+    self.save
   end
 
   def encrypt
