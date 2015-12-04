@@ -73,6 +73,7 @@ class Cdx::Api::Elasticsearch::Query
   def query(params)
     query = elasticsearch_query
 
+
     if params["group_by"]
       entities = query_with_group_by(query, params["group_by"])
       if params["order_by"]
@@ -155,6 +156,8 @@ class Cdx::Api::Elasticsearch::Query
       case filter_definition["type"]
       when "match"
         conditions.push process_match_field(field_definition.name, field_definition.type, field_value)
+      when "range-integer"
+        conditions.push range: {field_definition.name => ({filter_definition["boundary"] => field_value})}     
       when "range"
         field_value = convert_timezone_if_date(field_value)
         conditions.push range: {field_definition.name => ({filter_definition["boundary"] => field_value}.merge filter_definition["options"])}
