@@ -194,6 +194,7 @@ var EncounterForm = React.createClass({
             </h1>
 
             <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendSample}
+              placeholder="Search by sample id"
               itemTemplate={AddItemSearchSampleTemplate}
               itemKey="uuid" />
           </Modal>
@@ -206,6 +207,7 @@ var EncounterForm = React.createClass({
             <p>Unifying sample {this.state.unifyingSample ? this.state.unifyingSample.entity_ids[0] : ""}</p>
 
             <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid + "&sample_uuids=" + _.pluck(this.state.encounter.samples, 'uuid')} onItemChosen={this.unifySample}
+              placeholder="Search by sample id"
               itemTemplate={AddItemSearchSampleTemplate}
               itemKey="uuid" />
           </Modal>
@@ -224,6 +226,7 @@ var EncounterForm = React.createClass({
             </h1>
 
             <AddItemSearch callback={"/encounters/search_test?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendTest}
+              placeholder="Search by test id"
               itemTemplate={AddItemSearchTestResultTemplate}
               itemKey="uuid" />
           </Modal>

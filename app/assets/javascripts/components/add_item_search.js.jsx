@@ -1,4 +1,9 @@
 var AddItemSearch = React.createClass({
+  getDefaultProps: function() {
+    return {
+      placeholder: "Search"
+    }
+  },
 
   getInitialState: function(){
     return { items: [] }
@@ -41,7 +46,7 @@ var AddItemSearch = React.createClass({
 
     return (
       <div className="item-search">
-        <input type="text" placeholder="Search" className="input-block" onChange={this.onChange} autoFocus="true"></input>
+        <input type="text" placeholder={this.props.placeholder} className="input-block" onChange={this.onChange} autoFocus="true"></input>
         <ul>
           {this.state.items.map(function(item) {
             return <li key={item[itemKey]} onClick={this.chooseItem.bind(this, item)}>{templateFactory({item: item})}</li>;
