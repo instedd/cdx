@@ -2,7 +2,8 @@ require 'spec_helper'
 
 RSpec.describe UsersController, type: :controller do
   let(:user) { User.make }
-  let!(:institution)   { user.institutions.make }
+  let!(:institution) { user.institutions.make }
+  let(:default_params) { { context: institution.uuid } }
 
   before do
     sign_in user

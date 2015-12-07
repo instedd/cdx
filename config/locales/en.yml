@@ -28,3 +28,6 @@ en:
         definition: Manifest
       site:
         parent: Parent site
+  user:
+    settings:
+      updated: "Settings updated"
