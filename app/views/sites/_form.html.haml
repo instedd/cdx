@@ -39,7 +39,7 @@
         - select.item "yearly", "Yearly"
         - select.item "monthly", "Monthly"
         - select.item "weekly", "Weekly"
-  = react_component('Address', defaultLocation: @site.location_geoid, defaultAddress: @site.address)
+  = site_address_component(@site)
   .row
     .col.pe-2
       = f.label :main_phone_number

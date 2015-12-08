@@ -11,7 +11,9 @@ var Address = React.createClass({
   getDefaultProps: function() {
     return {
       addressName: "address",
-      locatioName: "location"
+      locatioName: "location",
+      latName: "lat",
+      lngName: "lng"
     };
   },
 
@@ -57,6 +59,8 @@ var Address = React.createClass({
       <div className="row">
         <div className="col pe-2"></div>
         <div className="col pe-8">
+          <input type="hidden" value={latlng ? latlng[0] : null} name={this.props.latName}></input>
+          <input type="hidden" value={latlng ? latlng[1] : null} name={this.props.lngName}></input>
           <ReactLeaflet.Map ref="map" center={position} zoom={zoom} bounds={bounds} className="map">
             <ReactLeaflet.TileLayer
               url='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
