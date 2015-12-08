@@ -34,6 +34,7 @@ class ApplicationController < ActionController::Base
     gon.location_service_url = Settings.location_service_url
     gon.location_service_set = Settings.location_service_set
     gon.location_geocoder = Settings.location_geocoder
+    gon.location_default = Settings.location_default
   end
 
   def authorize_resource(resource, action)

@@ -16,6 +16,8 @@
 //= require jquery.are-you-sure
 //= require urijs
 //= require lodash
+//= require leaflet
+//= require leaflet-control-geocoder
 //= require classnames
 //= require react
 //= require react_ujs
@@ -23,10 +25,9 @@
 //= require react-autosuggest
 //= require react-input-autosize
 //= require react-select
+//= require react-leaflet
 //= require components
 //= require d3
-//= require leaflet
-//= require leaflet-control-geocoder
 //= require_tree .
 //= require turbolinks
 Turbolinks.enableProgressBar()

@@ -3,6 +3,7 @@ nndd_url: "/nndd/"
 location_service_url: "http://locations-stg.instedd.org"
 location_service_set: 'ne'
 location_geocoder: 'Nominatim'
+location_default: { lat: 0.0, lng: 0.0 }
 sync_pattern: "*.{csv,bef,json,xml}"
 google_client_id:
 google_client_secret:
