@@ -26,6 +26,7 @@
 //= require d3
 //= require_tree .
 //= require turbolinks
+Turbolinks.enableProgressBar()
 
 function cdx_init_components(dom) {
   ReactRailsUJS.mountComponents(dom);
