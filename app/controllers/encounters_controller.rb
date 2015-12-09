@@ -133,7 +133,7 @@ class EncountersController < ApplicationController
 
     (encounter_param['assays'] || []).each do |assay|
       qr = assay["quantitative_result"]
-      if qr
+      if qr.is_a?(String)
         assay["quantitative_result"] = Integer(qr, 10) rescue nil
       end
     end
