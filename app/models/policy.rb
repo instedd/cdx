@@ -22,7 +22,6 @@ class Policy < ActiveRecord::Base
     DELETE_INSTITUTION = "institution:delete"
 
     CREATE_INSTITUTION_SITE =           "institution:createSite"
-    CREATE_INSTITUTION_ENCOUNTER =      "institution:createEncounter"
     REGISTER_INSTITUTION_DEVICE =       "institution:registerDevice"
     REGISTER_INSTITUTION_DEVICE_MODEL = "institution:registerDeviceModel"
     CREATE_INSTITUTION_ROLE =           "institution:createRole"
@@ -50,6 +49,8 @@ class Policy < ActiveRecord::Base
 
     QUERY_TEST = "testResult:query"
     PII_TEST =   "testResult:pii"
+
+    CREATE_SITE_ENCOUNTER = "site:createEncounter"
 
     READ_ENCOUNTER =   "encounter:read"
     UPDATE_ENCOUNTER = "encounter:update"

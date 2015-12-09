@@ -19,7 +19,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   describe "GET #show" do
     it "returns http success if allowed" do
       i1 = Institution.make
-      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant i1.user, user, {site: i1}, CREATE_SITE_ENCOUNTER
       grant i1.user, user, {encounter: i1}, READ_ENCOUNTER
 
       encounter = Encounter.make institution: i1
@@ -39,7 +39,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
     it "redirects to edit if can edit" do
       i1 = Institution.make
-      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant i1.user, user, {site: i1}, CREATE_SITE_ENCOUNTER
       grant i1.user, user, {encounter: i1}, READ_ENCOUNTER
       grant i1.user, user, {encounter: i1}, UPDATE_ENCOUNTER
 
@@ -54,7 +54,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   describe "GET #edit" do
     it "returns http success if allowed" do
       i1 = Institution.make
-      grant i1.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant i1.user, user, {site: i1}, CREATE_SITE_ENCOUNTER
       grant i1.user, user, {encounter: i1}, UPDATE_ENCOUNTER
 
       encounter = Encounter.make institution: i1
@@ -222,8 +222,11 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'cac'})
       DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'dad'})
 
-      grant device1.institution.user, user, device1.institution, CREATE_INSTITUTION_ENCOUNTER
-      grant device2.institution.user, user, device2.institution, CREATE_INSTITUTION_ENCOUNTER
+      grant device1.institution.user, user, device1.institution, READ_INSTITUTION
+      grant device2.institution.user, user, device2.institution, READ_INSTITUTION
+
+      grant device1.institution.user, user, {site: device1.institution}, CREATE_SITE_ENCOUNTER
+      grant device2.institution.user, user, {site: device2.institution}, CREATE_SITE_ENCOUNTER
 
       grant device1.institution.user, user, {testResult: device1}, QUERY_TEST
       grant device2.institution.user, user, {testResult: device2}, QUERY_TEST
@@ -262,8 +265,11 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'cac'})
       DeviceMessage.create_and_process device: device3, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'dad'})
 
-      grant device1.institution.user, user, device1.institution, CREATE_INSTITUTION_ENCOUNTER
-      grant device2.institution.user, user, device2.institution, CREATE_INSTITUTION_ENCOUNTER
+      grant device1.institution.user, user, device1.institution, READ_INSTITUTION
+      grant device2.institution.user, user, device2.institution, READ_INSTITUTION
+
+      grant device1.institution.user, user, {site: device1.institution}, CREATE_SITE_ENCOUNTER
+      grant device2.institution.user, user, {site: device2.institution}, CREATE_SITE_ENCOUNTER
 
       grant device1.institution.user, user, {testResult: device1}, QUERY_TEST
       grant device2.institution.user, user, {testResult: device2}, QUERY_TEST
@@ -418,7 +424,8 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'c'})
       sample_a, sample_b, sample_c = Sample.all.to_a
 
-      grant device1.institution.user, user, i1, CREATE_INSTITUTION_ENCOUNTER
+      grant device1.institution.user, user, i1, READ_INSTITUTION
+      grant device1.institution.user, user, {site: i1}, CREATE_SITE_ENCOUNTER
       grant device1.institution.user, user, {testResult: device1}, QUERY_TEST
 
       put :add_sample, sample_uuid: sample_c.uuid, encounter: {
@@ -494,7 +501,8 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'cac'})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'dad'})
 
-      grant device1.institution.user, user, device1.institution, CREATE_INSTITUTION_ENCOUNTER
+      grant device1.institution.user, user, i1, READ_INSTITUTION
+      grant device1.institution.user, user, {site: device1.institution}, CREATE_SITE_ENCOUNTER
       grant device1.institution.user, user, {testResult: device1}, QUERY_TEST
 
       test_result_a, test_result_b, test_result_c = TestResult.all.to_a

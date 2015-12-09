@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'policy_spec_helper'
 
 describe "create encounter" do
   let(:device) { Device.make }
@@ -21,11 +22,7 @@ describe "create encounter" do
     end
   end
 
-  # TODO should create encounter permission be scoped by site instead of institution
-  #      if so, how to scope institutions where there is at least one site where the user can perform X
-  it "should only show sites with read permission of context institution"
-
-  it "should work when context is institution with single" do
+  it "should work when context is institution with single site" do
     user.update_attribute(:last_navigation_context, institution.uuid)
 
     goto_page NewEncounterPage do |page|
@@ -50,6 +47,58 @@ describe "create encounter" do
 
     expect_page ShowEncounterPage do |page|
       expect(page.encounter.site).to eq(other_site)
+    end
+  end
+
+  context "within not owned institution" do
+    let(:other_institution) { Institution.make }
+    let(:site1) { other_institution.sites.make }
+    let(:site2) { other_institution.sites.make }
+    let(:site3) { other_institution.sites.make }
+
+    before(:each) {
+      grant other_institution.user, user, other_institution, READ_INSTITUTION
+      user.update_attribute(:last_navigation_context, other_institution.uuid)
+    }
+
+    it "should load empty new encounter when user has no create encounter permission for any site" do
+      goto_page NewEncounterPage do |page|
+        expect(page).to have_no_primary
+      end
+    end
+
+    it "should not ask for site if user sees single site for institution" do
+      grant other_institution.user, user, site1, READ_SITE
+      grant other_institution.user, user, site1, CREATE_SITE_ENCOUNTER
+      grant other_institution.user, user, {encounter: site1}, READ_ENCOUNTER
+
+      goto_page NewEncounterPage do |page|
+        page.submit
+      end
+
+      expect_page ShowEncounterPage do |page|
+        expect(page.encounter.site).to eq(site1)
+      end
+    end
+
+    it "should only show sites with create encounter permission of context institution" do
+      grant other_institution.user, user, site1, READ_SITE
+      grant other_institution.user, user, site1, CREATE_SITE_ENCOUNTER
+      grant other_institution.user, user, {encounter: site1}, READ_ENCOUNTER
+
+      grant other_institution.user, user, site2, READ_SITE
+      grant other_institution.user, user, site2, CREATE_SITE_ENCOUNTER
+      grant other_institution.user, user, {encounter: site2}, READ_ENCOUNTER
+
+      goto_page NewEncounterPage do |page|
+        expect(page.site.options).to match([site1.name, site2.name])
+        page.site.set site1.name
+        page.submit
+      end
+
+      expect_page ShowEncounterPage do |page|
+        expect(page.encounter.site).to eq(site1)
+      end
     end
   end
 

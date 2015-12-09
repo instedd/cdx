@@ -2,7 +2,7 @@ class EncountersController < ApplicationController
   before_filter :load_encounter, only: %W(show edit)
 
   def new
-    return unless authorize_resource(@navigation_context.institution, CREATE_INSTITUTION_ENCOUNTER)
+    return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
   end
 
   def create
@@ -101,7 +101,11 @@ class EncountersController < ApplicationController
   end
 
   def institution_by_uuid(uuid)
-    check_access(Institution, CREATE_INSTITUTION_ENCOUNTER).where(uuid: uuid).first
+    check_access(Institution, READ_INSTITUTION).where(uuid: uuid).first
+  end
+
+  def site_by_uuid(institution, uuid)
+    check_access(institution.sites, CREATE_SITE_ENCOUNTER).where(uuid: uuid).first
   end
 
   def prepare_encounter_from_json
@@ -112,7 +116,7 @@ class EncountersController < ApplicationController
     if @encounter.new_record?
       @institution = institution_by_uuid(encounter_param['institution']['uuid'])
       @encounter.institution = @institution
-      @encounter.site = @institution.sites.where(uuid: encounter_param['site']['uuid']).first
+      @encounter.site = site_by_uuid(@institution, encounter_param['site']['uuid'])
     else
       @institution = @encounter.institution
     end
