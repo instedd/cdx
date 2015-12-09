@@ -25,7 +25,7 @@ describe "create encounter" do
   #      if so, how to scope institutions where there is at least one site where the user can perform X
   it "should only show sites with read permission of context institution"
 
-  it "should work when context is institution with single " do
+  it "should work when context is institution with single" do
     user.update_attribute(:last_navigation_context, institution.uuid)
 
     goto_page NewEncounterPage do |page|
@@ -34,6 +34,22 @@ describe "create encounter" do
 
     expect_page ShowEncounterPage do |page|
       expect(page.encounter.site).to eq(site)
+    end
+  end
+
+  it "should obly user to choose site when context is institution with multiple sites" do
+    other_site = institution.sites.make
+    user.update_attribute(:last_navigation_context, institution.uuid)
+
+    goto_page NewEncounterPage do |page|
+      expect(page).to have_no_primary
+      page.site.set other_site.name
+      expect(page).to have_primary
+      page.submit
+    end
+
+    expect_page ShowEncounterPage do |page|
+      expect(page.encounter.site).to eq(other_site)
     end
   end
 
