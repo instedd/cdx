@@ -83,9 +83,30 @@ describe Site do
     it "creates predefined roles for site" do
       user = User.make
       institution = Institution.make user_id: user.id
+      site = nil
       expect {
-        Site.make institution_id: institution.id
+        site = Site.make institution_id: institution.id
       }.to change(Role, :count).by(4)
+      roles = Role.where(site_id: site.id).all
+      roles.each do |role|
+        expect(role.key).not_to eq(nil)
+      end
+    end
+
+    it "renames predefined roles for site on update" do
+      user = User.make
+      institution = Institution.make user_id: user.id
+      site = Site.make institution_id: institution.id
+      site.name = "New site"
+      site.save!
+
+      predefined = Policy.predefined_site_roles(site)
+      existing = site.roles.all
+
+      existing.each do |existing_role|
+        pre = predefined.find { |role| role.key == existing_role.key }
+        expect(existing_role.name).to eq(pre.name)
+      end
     end
 
     it "deletes all roles when destroyed" do

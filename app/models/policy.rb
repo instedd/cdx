@@ -213,6 +213,7 @@ class Policy < ActiveRecord::Base
     roles_json.map do |role_json|
       role = Role.new
       role.name = role_json["name"]
+      role.key = role_json["key"]
 
       policy = Policy.new
       policy.allows_implicit = true

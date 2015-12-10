@@ -21,6 +21,7 @@ class Site < ActiveRecord::Base
 
   after_create :compute_prefix
   after_create :create_predefined_roles
+  after_update :update_predefined_roles
 
   scope :within, -> (institution_or_site) {
     if institution_or_site.is_a?(Institution)
@@ -119,6 +120,18 @@ class Site < ActiveRecord::Base
       role.institution = institution
       role.site = self
       role.save!
+    end
+  end
+
+  def update_predefined_roles
+    existing_roles = roles.predefined.all
+    new_roles = Policy.predefined_site_roles(self)
+    existing_roles.each do |existing_role|
+      new_role = new_roles.find { |new_role| new_role.key == existing_role.key }
+      next unless new_role
+
+      existing_role.name = new_role.name
+      existing_role.save!
     end
   end
 end

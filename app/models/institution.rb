@@ -20,6 +20,7 @@ class Institution < ActiveRecord::Base
   validates_inclusion_of :kind, in: KINDS
 
   after_create :create_predefined_roles
+  after_update :update_predefined_roles
 
   after_create :update_owner_policies
   after_destroy :update_owner_policies
@@ -53,6 +54,18 @@ class Institution < ActiveRecord::Base
     roles.each do |role|
       role.institution = self
       role.save!
+    end
+  end
+
+  def update_predefined_roles
+    existing_roles = roles.predefined.where(site_id: nil).all
+    new_roles = Policy.predefined_institution_roles(self)
+    existing_roles.each do |existing_role|
+      new_role = new_roles.find { |new_role| new_role.key == existing_role.key }
+      next unless new_role
+
+      existing_role.name = new_role.name
+      existing_role.save!
     end
   end
 
