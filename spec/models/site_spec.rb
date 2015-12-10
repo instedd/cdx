@@ -118,4 +118,126 @@ describe Site do
       }.to change(Role, :count).by(-4)
     end
   end
+
+  describe "generate next sample entity id" do
+    let(:site) { Site.make }
+
+    it "should start with 100000 and go on" do
+      expect(site.generate_next_sample_entity_id!).to eq("100000")
+      expect(site.generate_next_sample_entity_id!).to eq("100001")
+      expect(site.generate_next_sample_entity_id!).to eq("100002")
+      expect(site.generate_next_sample_entity_id!).to eq("100003")
+      expect(site.generate_next_sample_entity_id!).to eq("100004")
+      expect(site.generate_next_sample_entity_id!).to eq("100005")
+      expect(site.generate_next_sample_entity_id!).to eq("100006")
+      expect(site.generate_next_sample_entity_id!).to eq("100007")
+      expect(site.generate_next_sample_entity_id!).to eq("100008")
+      expect(site.generate_next_sample_entity_id!).to eq("100009")
+      expect(site.generate_next_sample_entity_id!).to eq("100010")
+    end
+
+    it "should serialize sample creation on a threaded environment" do
+      threads = []
+      10.times do |i|
+        threads << Thread.new do
+          Site.find(site.id).generate_next_sample_entity_id!
+          ActiveRecord::Base.connection.close
+        end
+      end
+      threads.map(&:join)
+      expect(Site.find(site.id).generate_next_sample_entity_id!).to eq("100010")
+    end
+
+    describe "should recycle using the site policy" do
+      def it_recycle_within(start, before_next, start_next, start_next2)
+        Timecop.freeze(start)
+        expect(site.generate_next_sample_entity_id!).to eq("100000")
+        expect(site.generate_next_sample_entity_id!).to eq("100001")
+
+        Timecop.freeze(before_next)
+        expect(site.generate_next_sample_entity_id!).to eq("100002")
+
+        Timecop.freeze(start_next)
+        expect(site.generate_next_sample_entity_id!).to eq("100000")
+        expect(site.generate_next_sample_entity_id!).to eq("100001")
+
+        Timecop.freeze(start_next2)
+        expect(site.generate_next_sample_entity_id!).to eq("100000")
+        expect(site.generate_next_sample_entity_id!).to eq("100001")
+
+        Timecop.return
+      end
+
+      it "works weekly" do
+        site.sample_id_reset_policy = "weekly"
+        site.save!
+        it_recycle_within(
+          Time.utc(2015, 12,  7, 15,  0, 0),
+          Time.utc(2015, 12, 13, 23, 59, 0),
+          Time.utc(2015, 12, 14,  0,  0, 0),
+          Time.utc(2015, 12, 21,  0,  0, 0))
+      end
+
+      it "works monthly" do
+        site.sample_id_reset_policy = "monthly"
+        site.save!
+        it_recycle_within(
+          Time.utc(2015, 10,  3, 15,  0, 0),
+          Time.utc(2015, 10, 30, 23, 59, 0),
+          Time.utc(2015, 11,  1,  0,  0, 0),
+          Time.utc(2015, 12,  1,  0,  0, 0))
+      end
+
+      it "works yearly" do
+        site.sample_id_reset_policy = "yearly"
+        site.save!
+        it_recycle_within(
+          Time.utc(2015, 10,  3, 15,  0, 0),
+          Time.utc(2015, 12, 31, 23, 59, 0),
+          Time.utc(2016,  1,  1,  0,  0, 0),
+          Time.utc(2017,  2,  1,  0,  0, 0))
+      end
+    end
+
+    it "should be scoped by site" do
+      other_site = Site.make
+      expect(site.generate_next_sample_entity_id!).to eq(other_site.generate_next_sample_entity_id!)
+      expect(site.generate_next_sample_entity_id!).to eq(other_site.generate_next_sample_entity_id!)
+    end
+
+    it "should return a valid id to be used as sample identifier" do
+      entity_id = site.generate_next_sample_entity_id!
+      SampleIdentifier.create!(site: site, entity_id: entity_id)
+    end
+
+    it "should skip existing sample identifiers of site" do
+      SampleIdentifier.create!(site: site, entity_id: "100000")
+      SampleIdentifier.create!(site: site, entity_id: "100001")
+      SampleIdentifier.create!(site: site, entity_id: "100003")
+
+      other_site = Site.make
+      SampleIdentifier.create!(site: other_site, entity_id: "100002")
+
+      expect(site.generate_next_sample_entity_id!).to eq("100002")
+      expect(site.generate_next_sample_entity_id!).to eq("100004")
+      expect(site.generate_next_sample_entity_id!).to eq("100005")
+    end
+
+    it "should skip existing sample identifiers of site within time window" do
+      site.sample_id_reset_policy = "weekly"
+      site.save!
+      Timecop.freeze(Time.utc(2015, 12,  7, 15,  0, 0))
+      SampleIdentifier.create!(site: site, entity_id: "100000")
+      SampleIdentifier.create!(site: site, entity_id: "100001")
+
+      Timecop.freeze(Time.utc(2015, 12,  14, 15,  0, 0))
+      SampleIdentifier.create!(site: site, entity_id: "100002")
+
+      expect(site.generate_next_sample_entity_id!).to eq("100000")
+      expect(site.generate_next_sample_entity_id!).to eq("100001")
+      expect(site.generate_next_sample_entity_id!).to eq("100003")
+
+      Timecop.return
+    end
+  end
 end

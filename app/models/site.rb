@@ -97,6 +97,53 @@ class Site < ActiveRecord::Base
     Site.find(id).prefix
   end
 
+  def generate_next_sample_entity_id!
+    self.with_lock do
+      current_time = Time.now.utc
+      last_in_time_window = last_sample_identifier_entity_id
+      date = last_sample_identifier_date || current_time
+
+      next_window_start = self.time_window(date).end + 1.day
+
+      if current_time >= next_window_start
+        last_in_time_window = nil
+      end
+
+      next_entity_id = (last_in_time_window || "99999").succ
+
+      while self.sample_identifiers_on_time(current_time).exists?(entity_id: next_entity_id)
+        next_entity_id = next_entity_id.succ
+      end
+
+      update_attribute(:last_sample_identifier_entity_id, next_entity_id)
+      update_attribute(:last_sample_identifier_date, current_time)
+
+      next_entity_id
+    end
+  end
+
+  def time_window(date)
+    start_date = case sample_id_reset_policy
+      when "weekly"; date.beginning_of_week
+      when "monthly"; date.beginning_of_month
+      when "yearly"; date.beginning_of_year
+      else raise "#{sample_id_reset_policy} reset policy start date not implemented"
+    end
+
+    end_date = case sample_id_reset_policy
+      when "weekly"; date.end_of_week
+      when "monthly"; date.end_of_month
+      when "yearly"; date.end_of_year
+      else raise "#{sample_id_reset_policy} reset policy end date not implemented"
+    end
+
+    return start_date..end_date
+  end
+
+  def sample_identifiers_on_time(date)
+    self.sample_identifiers.where(created_at: self.time_window(date))
+  end
+
   private
 
   def compute_prefix
