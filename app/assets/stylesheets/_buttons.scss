@@ -137,14 +137,14 @@
 
 .btn-toggle {
   border-radius: 50%;
-  background: image-url("arr-select-down-inv.png") no-repeat center 5px $gray3;
+  background: image-url("arr-select-down-inv.png") no-repeat center 6px $gray3;
   color: $white;
   line-height: 25px;
   text-align: center;
   display: inline-block;
   vertical-align: middle;
-  width: 25px;
-  height: 25px;
+  width: 26px;
+  height: 26px;
   cursor: pointer;
 
   &.up {
