@@ -148,7 +148,7 @@
   cursor: pointer;
 
   &.up {
-    background-image: image-url("arr-select-up-inv.png");
+    background: image-url("arr-select-up-inv.png") no-repeat center 5px $gray3;
 
   }
 }
