@@ -94,6 +94,7 @@ gem 'leaflet-rails'
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs'
+  gem 'rails-assets-react-tabs'
 end
 
 group :development, :test do
