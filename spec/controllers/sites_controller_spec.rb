@@ -25,6 +25,14 @@ describe SitesController do
       expect(assigns(:can_create)).to be_truthy
     end
 
+    it "should list sites without location" do
+      unlocated_site = institution.sites.make(location: nil)
+      get :index
+
+      expect(response).to be_success
+      expect(assigns(:sites)).to contain_exactly(site, unlocated_site)
+    end
+
     it "should filter by institution if requested" do
       grant institution2.user, user, Institution, [READ_INSTITUTION]
       grant nil, user, "site?institution=#{institution2.id}", [READ_SITE]

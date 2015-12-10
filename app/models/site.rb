@@ -36,7 +36,7 @@ class Site < ActiveRecord::Base
 
   def location=(value)
     @location = value
-    self.location_geoid = value.id
+    self.location_geoid = value.try(:id)
   end
 
   def self.preload_locations!
