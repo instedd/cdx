@@ -210,11 +210,42 @@ a[title="Back"] {
   margin-left: 10px;
 }
 
-.flash.flash_notice {
-  color: $gray3;
-  font-weight: 300;
+.flash {
+  border-radius: 50px;
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
+  background: $white;
+  color: $gray4;
+  font-weight: 700;
+  border: 1px solid $gray1;
+  padding: 18px 30px;
+  height: 56px;
+  min-width: 380px;
   position: absolute;
-  top: 65px;
-  right: 5px;
+  bottom: 20px;
+  right: 20px;
   z-index: 1;
+
+  // &:before {
+  //   content: '';
+  //   background: image-url('ic-search.png') no-repeat center $black;
+  //   border-radius: 50%;
+  //   width: 45px;
+  //   height: 45px;
+  //   position: absolute;
+  //   left: 5px;
+  //   top: 5px;
+  // }
+
+  .close-notification {
+    font-family: $sans;
+    font-size: 18px;
+    color: $gray3;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    right: 18px;
+    top: 15px;
+    cursor: pointer;
+  }
+
 }

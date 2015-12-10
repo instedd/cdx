@@ -141,4 +141,15 @@ $(document).ready(function(){
     return false;
   });
 
+
+  var flashn = $(".flash.flash_notice");
+
+  flashn.append( "<a class='close-notification'>x</a>" );
+
+  flashn.delay(3000).fadeOut(300);
+
+  $(".close-notification").click(function(){
+    flashn.hide();
+  });
+
 });
