@@ -62,6 +62,9 @@ class Policy < ActiveRecord::Base
     DELETE_ROLE = "role:delete"
     ASSIGN_USER_ROLE = "role:assignUser"
     REMOVE_USER_ROLE = "role:removeUser"
+
+    READ_USER = 'user:read'
+    UPDATE_USER = 'user:edit'
   end
 
   ACTIONS = Actions.constants.map{|action| Actions.const_get(action)}
