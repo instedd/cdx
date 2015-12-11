@@ -13,10 +13,15 @@ body {
 .container {
   width: 480px;
   margin: 3em auto;
+  padding: 1px;
 }
 
 .email-logo {
   margin: 60px auto;
+}
+
+.box.big.centered {
+  margin-bottom: 45px;
 }
 
 .bottom-links {
