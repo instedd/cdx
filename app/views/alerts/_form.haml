@@ -1,9 +1,9 @@
-= form_for(alert) do |f|
-  - if alert.errors.any?
+= form_for(alert_info) do |f|
+  - if alert_info.errors.any?
     #error_explanation
       %p= "#{pluralize(alert.errors.count, "error")} prohibited this alert from being saved:"
       %ul
-        - alert.errors.full_messages.each do |msg|
+        - alert_info.errors.full_messages.each do |msg|
           %li= msg
 
   .row
@@ -17,6 +17,108 @@
       = f.label :description, :class => 'block'
     .col
       = f.text_field :description
+		
+  .row
+    .col.pe-2
+      = f.label :Categories
+    .col
+      = f.radio_button :category_type, Alert.category_types.keys[0]
+      = f.label :category_anomalies, "Anomalies"
+  .row
+    .col.pe-2
+      &nbsp;
+    .col
+      = f.radio_button :category_type, Alert.category_types.keys[1], checked: true
+      = f.label :category_device_errors, "Device Errors"
+  .row
+    .col.pe-2
+      &nbsp;
+    .col
+      = f.radio_button :category_type, Alert.category_types.keys[2]
+      = f.label :category_quality_assurance, "Quality Assurance"
+
+  .row
+    .col.pe-2
+      &nbsp;
+    .col
+      = f.radio_button :category_type, Alert.category_types.keys[3]
+      = f.label :category_test_results, "Test Results"
+	
+  .row
+    .col.pe-2
+      &nbsp;
+    .col
+      = f.radio_button :category_type, Alert.category_types.keys[4]
+      = f.label :category_utilization_efficiency, "Utilization Efficiency"
+	
+  .row
+    .col.pe-2
+      &nbsp;
+    .col
+      = f.radio_button :category_type, Alert.category_types.keys[5]
+      = f.label :category_workflow_delays, "Workflow Delays"
+
+  .row
+    .col.pe-2
+      = f.label :ERRORS
+    .col
+      'All error codes will be reported'
+  .row
+    .col.pe-2
+      &nbsp;
+    .col
+      =f.text_field :error_code
+
+  .row
+    .col.pe-2
+      = f.label :SCOPE
+    .col
+      &nbsp;
+
+
+  .row
+    .col.pe-2
+      = f.label :AGGREGATION
+    .col
+      = f.select :aggregation_type, Alert.aggregation_types.keys 
+
+  .row
+    .col.pe-2
+      = f.label :CHANNEL
+    .col
+      = f.select :channel_type, Alert.channel_types.keys 
+
+  .row
+    .col.pe-2
+      = f.label :RECIPIENTS
+    .col
+      = link_to "Add a recipient", alerts_path
+  .row
+  .col.pe-2
+    &nbsp;
+  .col
+    = f.fields_for :alert_recipients do |recipient|
+      = recipient.text_field :email
+      - if recipient.object.persisted?
+        = recipient.check_box :_destroy
+        = recipient.label :_destroy, "Destroy"
+	
+
+  .row
+    .col.pe-2
+      = f.label :LIMIT
+    .col
+      &nbsp;
+      = :SMS_per_day
+
+  .row
+    .col.pe-2
+      = f.label :MESSAGE
+    .col
+      =f.text_field :message
+ 
+
+
   .row.button-actions
     .col
       = f.submit class: "btn-primary"

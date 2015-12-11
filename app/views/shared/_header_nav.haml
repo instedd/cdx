@@ -31,6 +31,8 @@
             = link_to "Apps", subscribers_path
           %li{:class => params[:controller] == "alerts" && "active"}
             = link_to "Alerts", alerts_path
+          %li{:class => params[:controller] == "incidents" && "active"}
+            = link_to "Incidents", incidents_path
         - if can_delegate_permissions?
           %li{:class => params[:controller] == "policies" && "active"}
             = link_to "Users", policies_path

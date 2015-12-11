@@ -1,10 +1,19 @@
 class AlertsController < ApplicationController
   respond_to :html, :json
+  
+  #TODO [WARNING] You are exposing the `alert` method, which overrides an existing ActionController method of the same name. Consider a different exposure name
   expose(:alerts) { current_user.alerts }
-  expose(:alert, attributes: :alert_params)
+ # expose(:alert, attributes: :alert_params)
+  
+  #could not name it 'alert' as rails gave a warning as this is a reserved method.
+  expose(:alert_info, model: :alert, attributes: :alert_params)
 
   before_filter do
     head :forbidden unless has_access_to_test_results_index?
+  end
+
+  def new
+    alert_info.alert_recipients.build 
   end
 
   def index
@@ -20,20 +29,42 @@ class AlertsController < ApplicationController
     respond_with alert, location: alert_path
   end
 
+
   def create
-    flash[:notice] = "Alert was successfully created" if alert.save
-    respond_with alert, location: alerts_path
+    #TOADD add site, institution
+    #    alert.query =    {"test.error_code"=>"21", "institution.uuid"=>"5227a6f0-17de-ee28-cc66-45c7db5d1bd8", "site.uuid"=>"80bf2237-1a68-0357-2470-58d3706462f9"}
+
+    #TODO assume reactjs will validate errrocode for now
+    if alert_info.error_code.include? '-'
+      minmax=alert_info.error_code.split('-')
+      alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
+    else
+      alert_info.query =    {"test.error_code"=>alert_info.error_code }
+    end
+
+    alertRecipients = alert_info.alert_recipients
+    alertRecipients.each do |recipient|
+      user = User.find_by_email(recipient.email)
+      recipient.user = user
+    end  
+
+    flash[:notice] = "Alert was successfully created" if alert_info.save
+
+    alert_info.create_percolator
+         
+    respond_with alert_info, location: alerts_path
   end
 
+
   def update
-    flash[:notice] = "Alert was successfully updated" if alert.save
-    respond_with alert, location: alerts_path
+    flash[:notice] = "Alert was successfully updated" if alert_info.save
+    respond_with alert_info, location: alerts_path
   end
 
   def destroy
-    if alert.destroy
+    if alert_info.destroy
       flash[:notice] = "alert was successfully deleted"
-      respond_with alert
+      respond_with alert_info
     else
       render :edit
     end
@@ -42,6 +73,6 @@ class AlertsController < ApplicationController
   private
 
   def alert_params
-    params.require(:alert).permit(:name, :description)
+    params.require(:alert).permit(:name, :description, :error_code, :message, :category_type, :aggregation_type, :channel_type, alert_recipients_attributes: [:user, :user_id, :email] )
   end
 end

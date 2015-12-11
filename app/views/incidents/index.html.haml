@@ -1,0 +1,18 @@
+.row
+  .col
+    = cdx_table title: 'Incidents' do |t|
+      - t.thead do
+        %tr
+          %th Alert Name
+          %th View Alert
+          %th Email
+          %th Date Created
+          %th Test Result
+      - t.tbody do
+        - incidents.each do |incident|
+          %tr
+            %td= incident.alert.name
+            %td= link_to 'View', incident.alert
+            %td= incident.user.email
+            %td= incident.created_at
+            %td= link_to 'Result',test_result_path(incident.test_result.uuid)

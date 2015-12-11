@@ -80,6 +80,7 @@ Rails.application.routes.draw do
   resources :policies
   resources :api_tokens
   resources :alerts
+  resources :incidents, only: [:index, :show]
 
   scope :dashboards, controller: :dashboards do
     get :nndd
