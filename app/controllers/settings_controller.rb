@@ -1,5 +1,6 @@
 class SettingsController < ApplicationController
   before_filter :load_locales
+  skip_before_filter :ensure_context
 
   def edit; end
 
