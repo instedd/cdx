@@ -97,7 +97,7 @@ class EncountersController < ApplicationController
   end
 
   def load_encounter
-    @encounter = Encounter.find(params[:id])
+    @encounter = Encounter.where("id = :id OR uuid = :id", params).first
     @institution = @encounter.institution
     @blender = Blender.new(@institution)
     @encounter_blender = @blender.load(@encounter)

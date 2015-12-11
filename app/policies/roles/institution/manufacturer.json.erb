@@ -1,0 +1,53 @@
+[
+  {
+    "key": "admin",
+    "name": "Institution <%= institution_name %> Admin",
+    "policy": {
+      "statement": [
+        {
+          "resource": "institution/<%= institution_id %>",
+          "action": [
+            "institution:read",
+            "institution:update",
+            "institution:delete",
+            "institution:registerDevice",
+            "institution:createSite",
+            "institution:createEncounter",
+            "institution:createRole"
+          ],
+          "delegable": true
+        },
+        {
+          "resource": [
+            "site?institution=<%= institution_id %>",
+            "device?institution=<%= institution_id %>",
+            "testResult?institution=<%= institution_id %>",
+            "encounter?institution=<%= institution_id %>"
+          ],
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "role?institution=<%= institution_id %>",
+          "action": "*",
+          "delegable": true
+        }
+      ]
+    }
+  },
+  {
+    "key": "reader",
+    "name": "Institution <%= institution_name %> Reader",
+    "policy": {
+      "statement": [
+        {
+          "resource": "institution/<%= institution_id %>",
+          "action": [
+            "institution:read"
+          ],
+          "delegable": true
+        }
+      ]
+    }
+  }
+]

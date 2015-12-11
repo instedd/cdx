@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151130130846) do
+ActiveRecord::Schema.define(version: 20151210181714) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -254,6 +254,7 @@ ActiveRecord::Schema.define(version: 20151130130846) do
     t.integer  "policy_id",      limit: 4,   null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "key",            limit: 255
   end
 
   create_table "roles_users", id: false, force: :cascade do |t|

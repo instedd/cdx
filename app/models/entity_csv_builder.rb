@@ -1,8 +1,9 @@
 require 'tempfile'
 
-class TestResultsCsvBuilder
+class EntityCsvBuilder
 
-  def initialize(query, filename)
+  def initialize(scope, query, filename)
+    @fields = Cdx::Fields[scope]
     @query = query
     @dynamic_headers = Hash[dynamic_fields.map{|f| [f, Set.new]}] # e.g. Field(location.admin_levels) => ['admin_0', 'admin_1']
     @multi_headers = Hash[multi_fields.map{|f| [f, 0]}] # e.g. Field(test.assays) => 4, Field(encounter.diagnosis) => 2
@@ -16,7 +17,7 @@ class TestResultsCsvBuilder
       # with its custom fields serialised, and one field per multi field with all its values serialised as well
       data_csv = CSV.new(@data_tempfile)
       while @query.next_page
-        @query.execute["tests"].each do |test|
+        @query.execute[@fields.result_name].each do |test|
           data_csv << build_row(test)
         end
       end
@@ -102,7 +103,7 @@ class TestResultsCsvBuilder
     end
 
     # Serialise custom fields per scope and register headers
-    Cdx::Fields.test.core_field_scopes.each do |scope|
+    @fields.core_field_scopes.each do |scope|
       custom_fields = test[scope.name]['custom_fields'] || {}
       row << custom_fields.to_json
       custom_fields.each do |custom_key, custom_value|
@@ -166,24 +167,24 @@ class TestResultsCsvBuilder
   end
 
   def core_fields
-    @core_fields ||= Cdx::Fields.test.first_level_core_fields\
+    @core_fields ||= @fields.first_level_core_fields\
       .reject{|f| f.dynamic? || f.nested? || f.multiple? || blacklisted?(f)}
   end
 
   def multi_fields
-    @multi_fields ||= Cdx::Fields.test.first_level_core_fields\
+    @multi_fields ||= @fields.first_level_core_fields\
       .select{|f| f.nested? || f.multiple?}\
       .reject{|f| f.dynamic? || blacklisted?(f)}
   end
 
   def dynamic_fields
-    @dynamic_fields ||= Cdx::Fields.test.first_level_core_fields\
+    @dynamic_fields ||= @fields.first_level_core_fields\
       .select{|f| f.dynamic?}
       .reject{|f| blacklisted?(f)}
   end
 
   def scopes
-    @scopes ||= Cdx::Fields.test.core_field_scopes
+    @scopes ||= @fields.core_field_scopes
   end
 
   def blacklisted?(field)

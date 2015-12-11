@@ -8,6 +8,9 @@ class TestResultsController < ApplicationController
   end
 
   def index
+    @display_as = params["display_as"] || "test"
+    @display_as = "test" if @display_as != "test" && @display_as != "test_order"
+
     @results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
     @conditions = Condition.all.map &:name
     @date_options = [["Previous month", 1.month.ago.beginning_of_month], ["Previous week", 1.week.ago.beginning_of_week],["Previous year", 1.year.ago.beginning_of_year]]
@@ -17,6 +20,7 @@ class TestResultsController < ApplicationController
     offset = (@page - 1) * @page_size
 
     @filter = create_filter
+
     @query = @filter.dup
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
@@ -30,21 +34,16 @@ class TestResultsController < ApplicationController
         @filter["site.uuid"] = @sites.first.uuid if @sites.size == 1
         @filter["device.uuid"] = @devices.first.uuid if @devices.size == 1
 
-        result = TestResult.query(@query, current_user).execute
-        @total = result["total_count"]
-        @tests = result["tests"]
+        execute_query
       end
 
       format.csv do
-        filename = "Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        filename = "#{@display_as.pluralize.capitalize}-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
         headers["Content-Type"] = "text/csv"
         headers["Content-disposition"] = "attachment; filename=#{filename}"
-
-        query = TestResult.query(@query, current_user)
-        self.response_body = TestResultsCsvBuilder.new(query, filename)
+        self.response_body = execute_csv_query(filename)
       end
     end
-
   end
 
   def show
@@ -61,16 +60,74 @@ class TestResultsController < ApplicationController
   private
 
   def create_filter
+    if @display_as == "test"
+      create_filter_for_test
+    else
+      create_filter_for_test_order
+    end
+  end
+
+  def create_filter_for_test
     filter = {}
     filter["institution.uuid"] = params["institution.uuid"] if params["institution.uuid"].present?
     filter["site.uuid"] = params["site.uuid"] if params["site.uuid"].present?
-    filter["test.assays.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
     filter["device.uuid"] = params["device.uuid"] if params["device.uuid"].present?
     filter["test.assays.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
     filter["test.assays.result"] = params["test.assays.result"] if params["test.assays.result"].present?
     filter["sample.id"] = params["sample.id"] if params["sample.id"].present?
     filter["since"] = params["since"] if params["since"].present?
     filter
+  end
+
+  def create_filter_for_test_order
+    filter = {}
+    filter["institution.uuid"] = params["institution.uuid"] if params["institution.uuid"].present?
+    filter["encounter.uuid"] = params["encounter.id"] if params["encounter.id"].present?
+    # filter["site.uuid"] = params["site.uuid"] if params["site.uuid"].present?
+    # filter["device.uuid"] = params["device.uuid"] if params["device.uuid"].present?
+    filter["encounter.diagnosis.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
+    filter["encounter.diagnosis.result"] = params["test.assays.result"] if params["test.assays.result"].present?
+    # filter["sample.id"] = params["sample.id"] if params["sample.id"].present?
+    filter["since"] = params["since"] if params["since"].present?
+    filter
+  end
+
+  def execute_query
+    if @display_as == "test"
+      execute_test_query
+    else
+      execute_encounter_query
+    end
+  end
+
+  def execute_test_query
+    result = TestResult.query(@query, current_user).execute
+    @total = result["total_count"]
+    @tests = result["tests"]
+  end
+
+  def execute_encounter_query
+    result = Encounter.query(@query, current_user).execute
+    @total = result["total_count"]
+    @tests = result["encounters"]
+  end
+
+  def execute_csv_query(filename)
+    if @display_as == "test"
+      execute_csv_test_query(filename)
+    else
+      execute_csv_test_order_query(filename)
+    end
+  end
+
+  def execute_csv_test_query(filename)
+    query = TestResult.query(@query, current_user)
+    EntityCsvBuilder.new("test", query, filename)
+  end
+
+  def execute_csv_test_order_query(filename)
+    query = Encounter.query(@query, current_user)
+    self.response_body = EntityCsvBuilder.new("encounter", query, filename)
   end
 
   def load_filter_resources
