@@ -3,10 +3,12 @@ module TestResultsHelper
     desc_field = "-#{field}"
     link_order_by = @order_by == field ? desc_field : field
 
-    css_class = if @order_by == field
-      'order-asc'
+    if @order_by == field
+      css_class = 'ordered order-asc'
+      title = "#{title} ↑"
     elsif @order_by == desc_field
-      'order-desc'
+      css_class = 'ordered order-desc'
+      title = "#{title} ↓"
     end
 
     link_to title, params.merge(order_by: link_order_by), class: css_class
