@@ -11,6 +11,7 @@ class Site < ActiveRecord::Base
 
   belongs_to :parent, class_name: "Site"
   has_many :children, class_name: "Site", foreign_key: "parent_id"
+  has_many :roles, dependent: :destroy
 
   acts_as_paranoid
 
@@ -19,6 +20,8 @@ class Site < ActiveRecord::Base
   validates_presence_of :name
 
   after_create :compute_prefix
+  after_create :create_predefined_roles
+  after_update :update_predefined_roles, if: :name_changed?
 
   scope :within, -> (institution_or_site) {
     if institution_or_site.is_a?(Institution)
@@ -108,6 +111,27 @@ class Site < ActiveRecord::Base
   def same_institution_as_parent
     if parent && parent.institution != self.institution
       self.errors.add(:institution, "must match parent site institution")
+    end
+  end
+
+  def create_predefined_roles
+    roles = Policy.predefined_site_roles(self)
+    roles.each do |role|
+      role.institution = institution
+      role.site = self
+      role.save!
+    end
+  end
+
+  def update_predefined_roles
+    existing_roles = roles.predefined.all
+    new_roles = Policy.predefined_site_roles(self)
+    existing_roles.each do |existing_role|
+      new_role = new_roles.find { |new_role| new_role.key == existing_role.key }
+      next unless new_role
+
+      existing_role.name = new_role.name
+      existing_role.save!
     end
   end
 end

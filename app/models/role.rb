@@ -15,6 +15,8 @@ class Role < ActiveRecord::Base
   validates_presence_of :policy
   validate :validate_site
 
+  scope :predefined, ->{ where.not(key: nil) }
+
   private
 
   def validate_site

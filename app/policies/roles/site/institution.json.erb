@@ -1,0 +1,70 @@
+[
+  {
+    "key": "admin",
+    "name": "Site <%= site_name %> Admin",
+    "policy": {
+      "statement": [
+        {
+          "resource": "site/<%= site_id %>",
+          "action": [
+            "site:read",
+            "site:update",
+            "site:delete"
+          ],
+          "delegable": true
+        }
+      ]
+    }
+  },
+  {
+    "key": "reader",
+    "name": "Site <%=  %> Reader",
+    "policy": {
+      "statement": [
+        {
+          "resource": "site/<%= site_id %>",
+          "action": [
+            "site:read",
+            "site:update",
+            "site:delete"
+          ],
+          "delegable": true
+        }
+      ]
+    }
+  },
+  {
+    "key": "technician",
+    "name": "Site <%=  %> Technician",
+    "policy": {
+      "statement": [
+        {
+          "resource": "site/<%= site_id %>",
+          "action": [
+            "site:read",
+            "site:update",
+            "site:delete"
+          ],
+          "delegable": true
+        }
+      ]
+    }
+  },
+  {
+    "key": "supervisor",
+    "name": "Site <%=  %> Supervisor",
+    "policy": {
+      "statement": [
+        {
+          "resource": "site/<%= site_id %>",
+          "action": [
+            "site:read",
+            "site:update",
+            "site:delete"
+          ],
+          "delegable": true
+        }
+      ]
+    }
+  }
+]
