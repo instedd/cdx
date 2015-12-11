@@ -45,7 +45,9 @@ namespace :manifests do
 
         device_model = DeviceModel.find_or_create_by!(name: name.titleize) do |device_model|
           device_model.institution = Institution.find_or_create_by!(name: props[:institution]) do |institution|
-            owner = User.create_with(password: default_password).find_or_create_by!(email: props[:owner]).tap(&:confirm)
+            owner = User.create_with(password: default_password).find_or_create_by!(email: props[:owner]) do |u|
+              u.skip_confirmation!
+            end
             institution.user = owner
             institution.kind = 'manufacturer'
           end
