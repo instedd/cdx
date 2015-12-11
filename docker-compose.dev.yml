@@ -1,0 +1,31 @@
+web:
+  links:
+    - db
+    - elasticsearch
+    - smtp
+    - sshd
+    - redis
+  env_file: docker-dev.env
+  volumes_from:
+    - sshd
+  ports:
+    - 80:8080
+
+csv_watch:
+  links:
+    - db
+    - elasticsearch
+    - sshd
+  env_file: docker-dev.env
+  volumes_from:
+    - sshd
+
+sidekiq:
+  links:
+    - db
+    - elasticsearch
+    - redis
+  env_file: docker-dev.env
+
+smtp:
+  image: instedd/smtp-debug

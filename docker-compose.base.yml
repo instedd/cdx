@@ -1,0 +1,28 @@
+db:
+  image: mysql
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+
+elasticsearch:
+  image: elasticsearch:1.4.4
+
+redis:
+  image: redis
+
+sshd:
+  image: instedd/cdx-sync-sshd
+  environment:
+    SYNC_UID: 9999
+
+web:
+  build: .
+
+csv_watch:
+  build: .
+  command: rake csv:watch
+  user: app
+
+sidekiq:
+  build: .
+  command: bundle exec sidekiq
+  user: app
