@@ -21,7 +21,7 @@
     .col.pe-6
       .row
         .col.pe-2
-          = f.label :is_active, "Status"
+          .value= f.label :is_active, "Status"
         .col
           = f.check_box :is_active
           = f.label :is_active, "&nbsp; Can access Cdx?".html_safe
@@ -29,7 +29,7 @@
         .col.pe-2
           = f.label :last_sign_in_at, "Activity"
         .col
-          = last_activity(f.object)
+          .value = last_activity(f.object)
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
