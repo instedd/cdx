@@ -1,5 +1,0 @@
-sshd:
-  image: instedd/cdx-sync-sshd
-  volumes:
-    - 'tmp/sync:/home/cdx-sync/sync'
-    - 'tmp/ssh:/home/cdx-sync/.ssh'
