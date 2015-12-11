@@ -21,8 +21,9 @@ module TestResultsHelper
   def formatted_test_value(test, path, web: false)
     value = test_value(test, path)
     case path
-    when "test.assays"
-      results = test["test"]["assays"] || []
+    when "test.assays", "encounter.diagnosis"
+      scope, field = path.split('.')
+      results = test[scope][field] || []
       if web
         (results.map { |result| "<span class=\"assay-result assay-result-#{result["result"]}\">#{result["name"]}</span>" } ).join(" ").html_safe
       else
@@ -35,12 +36,22 @@ module TestResultsHelper
       end
 
       format_datetime(value, time_zone)
+    when "encounter.start_time", "encounter.end_time"
+      format_datetime(value, current_user.time_zone)
     else
       value
     end
   end
 
-  def each_column
+  def each_column(&block)
+    if @display_as == "test"
+      each_test_column(&block)
+    else
+      each_test_order_column(&block)
+    end
+  end
+
+  def each_test_column
     yield "test.name", "Name", true
     yield "test.assays", "Result", false
     yield "site.name", "Site", false if @sites.size > 1
@@ -48,5 +59,12 @@ module TestResultsHelper
     yield "sample.id", "Sample Id", true
     yield "test.start_time", "Start Time", true
     yield "test.end_time", "End Time", true
+  end
+
+  def each_test_order_column
+    yield "encounter.uuid", "ID", true
+    yield "encounter.diagnosis", "Diagnosis", false
+    yield "encounter.start_time", "Start Time", true
+    yield "encounter.end_time", "End Time", true
   end
 end

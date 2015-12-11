@@ -174,6 +174,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
           },
           "encounter" => {
             "properties" => {
+              "uuid" => {
+                "type" => "string",
+                "index" => "not_analyzed"
+              },
               "patient_age" => {
                 "properties" => {
                   "in_millis" => {

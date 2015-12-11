@@ -10,6 +10,11 @@
               Tests
         .row
           .filter
+            %label.block Display as
+            = cdx_select name: "display_as", value: @display_as do |select|
+              - select.item "test", "Tests"
+              - select.item "test_order", "Test Orders"
+          .filter
             %label.block Condition
             = cdx_select name: "test.assays.condition", value: params["test.assays.condition"] do |select|
               - select.item "", "Show all"
@@ -29,13 +34,14 @@
 
         .advanced
           .row
-            .filter
-              %label.block Sample Id
-              %input{type: "text", name: "sample.id", value: params["sample.id"]}
+            - if @display_as == "test"
+              .filter
+                %label.block Sample Id
+                %input{type: "text", name: "sample.id", value: params["sample.id"]}
             .filter
               %label.block Encounter Id
               %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
-            - if (@devices.size > 1) || params['device.uuid']
+            - if @display_as == "test" && ((@devices.size > 1) || params['device.uuid'])
               .filter
                 %label.block Device
                 = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
