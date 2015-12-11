@@ -17,6 +17,8 @@ class User < ActiveRecord::Base
   has_many :computed_policies
   has_and_belongs_to_many :roles
   has_many :alerts
+  has_many :alert_histories
+  has_many :alert_recipients
 
   include Resource
 

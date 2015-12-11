@@ -18,6 +18,7 @@ class Subscriber < ActiveRecord::Base
   before_update { self.fields = self.fields.presence }
 
   def create_percolator
+#    binding.pry
     es_query = filter.create_query.elasticsearch_query
     return unless es_query
     Cdx::Api.client.index index: Cdx::Api.index_name_pattern,

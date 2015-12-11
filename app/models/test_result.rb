@@ -16,6 +16,8 @@ class TestResult < ActiveRecord::Base
   belongs_to :sample_identifier, inverse_of: :test_results, autosave: true
   belongs_to :patient
   belongs_to :encounter
+  
+  has_many :alert_histories
 
   validates_presence_of :device
   # validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true

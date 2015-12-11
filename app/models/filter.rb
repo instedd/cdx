@@ -16,6 +16,7 @@ class Filter < ActiveRecord::Base
   private
 
   def recreate_subscriber_percolators
+#    binding.pry
     subscribers.each &:create_percolator
   end
 end

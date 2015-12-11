@@ -24,6 +24,7 @@ class TestResultsController < ApplicationController
     @query = @filter.dup
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
+# binding.pry
 
     respond_to do |format|
       format.html do
@@ -48,6 +49,8 @@ class TestResultsController < ApplicationController
 
   def show
     @test_result = TestResult.find_by(uuid: params[:id])
+
+#binding.pry
     return unless authorize_resource(@test_result, QUERY_TEST)
 
     @other_tests = @test_result.sample ? @test_result.sample.test_results.where.not(id: @test_result.id) : TestResult.none
@@ -79,6 +82,7 @@ class TestResultsController < ApplicationController
     filter["test.assays.result"] = params["test.assays.result"] if params["test.assays.result"].present?
     filter["sample.id"] = params["sample.id"] if params["sample.id"].present?
     filter["since"] = params["since"] if params["since"].present?
+
     filter
   end
 
