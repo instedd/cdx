@@ -17,6 +17,8 @@ class User < ActiveRecord::Base
   has_many :computed_policies
   has_and_belongs_to_many :roles
 
+  include Resource
+
   after_create :update_computed_policies
 
   def timeout_in

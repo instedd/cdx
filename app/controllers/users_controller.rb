@@ -1,9 +1,12 @@
 class UsersController < ApplicationController
   before_filter :load_resource
 
-  def edit; end
+  def edit
+    return unless authorize_resource(@user, READ_USER)
+  end
 
   def update
+    return unless authorize_resource(@user, UPDATE_USER)
     if can_edit? && @user.update(user_params)
       @_message = 'User updated'
     end

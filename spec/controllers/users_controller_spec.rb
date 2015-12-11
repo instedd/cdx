@@ -6,6 +6,7 @@ RSpec.describe UsersController, type: :controller do
   let(:default_params) { { context: institution.uuid } }
 
   before do
+    user.grant_superadmin_policy
     sign_in user
   end
   
