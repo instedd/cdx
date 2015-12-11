@@ -124,6 +124,7 @@ entities:
     fields:
       id:
       uuid:
+        searchable: true
       patient_age:
         type: duration
         searchable: true

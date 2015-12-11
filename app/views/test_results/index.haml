@@ -13,7 +13,7 @@
             %th= sortable ? order_by_column(title, id) : title
       - t.tbody do
         - @tests.each do |test|
-          %tr{data: {href: test_result_path(test['test']['uuid']) }}
+          %tr{data: {href: @display_as == "test" ? test_result_path(test['test']['uuid']) : encounter_path(test['encounter']['uuid']) }}
             - each_column do |id|
               %td= formatted_test_value(test, id, web: true)
     .pagination
