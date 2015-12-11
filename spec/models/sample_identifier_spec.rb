@@ -1,6 +1,28 @@
 require 'spec_helper'
 
 describe SampleIdentifier do
+  context "blueprint" do
+    let(:site) { Site.make }
+
+    it "should use site institution for sample" do
+      expect(SampleIdentifier.make(site: site).sample.institution).to eq(site.institution)
+    end
+
+    it "should be able to create without site for manufacturers" do
+      expect(SampleIdentifier.make(sample: Sample.make(institution: Institution.make(:manufacturer))).site).to be_nil
+    end
+
+    it "should create from samples" do
+      sample = Sample.make
+      sample_ident = sample.sample_identifiers.make
+
+      expect(sample.institution).to be_kind_institution
+      expect(sample_ident.sample).to eq(sample)
+      expect(sample_ident.site).to_not be_nil
+      expect(sample_ident.site.institution).to eq(sample.institution)
+    end
+  end
+
   context "validations" do
     it { is_expected.to validate_presence_of :sample }
 

@@ -211,7 +211,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
         sample: sample,
         uuid: 'abc',
         entity_id: SAMPLE_ID,
-        site: site
+        site: site,
+        created_at: sample_created_at
       )
     end
 
@@ -397,30 +398,6 @@ describe DeviceMessageProcessor, elasticsearch: true do
         uuid: 'abc',
         entity_id: SAMPLE_ID,
         site: Site.make(institution: institution)
-      )
-
-      device_message_processor.process
-
-      expect(Sample.count).to eq(2)
-
-      sample = sample.reload
-
-      expect(sample.core_fields).to eq(core_fields)
-      expect(sample.custom_fields).to eq(custom_fields)
-    end
-
-    it "shouldn't update sample with no site" do
-      sample = Sample.make(
-        core_fields: core_fields,
-        custom_fields: custom_fields,
-        institution: institution
-      )
-
-      sample_identifier = SampleIdentifier.make(
-        sample: sample,
-        uuid: 'abc',
-        entity_id: SAMPLE_ID,
-        site: nil
       )
 
       device_message_processor.process

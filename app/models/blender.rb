@@ -580,9 +580,9 @@ class Blender
 
     def merge_attributes(entity_or_attributes)
       super
-      @sample_id ||= entity_or_attributes.kind_of?(Hash) \
+      @sample_id = (entity_or_attributes.kind_of?(Hash) \
         ? entity_or_attributes[:sample_id].try(:to_s) \
-        : entity_or_attributes.sample_identifier.try(:entity_id)
+        : entity_or_attributes.sample_identifier.try(:entity_id)) || @sample_id
     end
 
     protected
@@ -593,7 +593,7 @@ class Blender
       site_id = entity.site_id
 
       existing_identifier = entity.sample_identifier
-      existing_identifier_does_not_match =  existing_identifier && (existing_identifier.sample != sample || existing_identifier.sample_id != sample_id || existing_identifier.site_id != site_id)
+      existing_identifier_does_not_match =  existing_identifier && (existing_identifier.sample != sample || existing_identifier.entity_id != sample_id || existing_identifier.site_id != site_id)
 
       if sample.nil?
         entity.sample_identifier = nil
@@ -602,6 +602,8 @@ class Blender
         matching_sample_identifier = sample.sample_identifiers.all.find { |si| si.entity_id == sample_id && si.site_id == site_id }
         entity.sample_identifier = matching_sample_identifier || sample.sample_identifiers.build(entity_id: sample_id, site_id: site_id)
         @garbage << existing_identifier
+      else
+        entity.sample_identifier.try :reload
       end
     end
 

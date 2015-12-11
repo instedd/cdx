@@ -207,16 +207,18 @@ describe Site do
 
     it "should return a valid id to be used as sample identifier" do
       entity_id = site.generate_next_sample_entity_id!
-      SampleIdentifier.create!(site: site, entity_id: entity_id)
+      expect {
+        SampleIdentifier.make(site: site, entity_id: entity_id)
+      }.to change(SampleIdentifier, :count).by(1)
     end
 
     it "should skip existing sample identifiers of site" do
-      SampleIdentifier.create!(site: site, entity_id: "100000")
-      SampleIdentifier.create!(site: site, entity_id: "100001")
-      SampleIdentifier.create!(site: site, entity_id: "100003")
+      SampleIdentifier.make(site: site, entity_id: "100000")
+      SampleIdentifier.make(site: site, entity_id: "100001")
+      SampleIdentifier.make(site: site, entity_id: "100003")
 
       other_site = Site.make
-      SampleIdentifier.create!(site: other_site, entity_id: "100002")
+      SampleIdentifier.make(site: other_site, entity_id: "100002")
 
       expect(site.generate_next_sample_entity_id!).to eq("100002")
       expect(site.generate_next_sample_entity_id!).to eq("100004")
@@ -227,11 +229,11 @@ describe Site do
       site.sample_id_reset_policy = "weekly"
       site.save!
       Timecop.freeze(Time.utc(2015, 12,  7, 15,  0, 0))
-      SampleIdentifier.create!(site: site, entity_id: "100000")
-      SampleIdentifier.create!(site: site, entity_id: "100001")
+      SampleIdentifier.make(site: site, entity_id: "100000")
+      SampleIdentifier.make(site: site, entity_id: "100001")
 
       Timecop.freeze(Time.utc(2015, 12,  14, 15,  0, 0))
-      SampleIdentifier.create!(site: site, entity_id: "100002")
+      SampleIdentifier.make(site: site, entity_id: "100002")
 
       expect(site.generate_next_sample_entity_id!).to eq("100000")
       expect(site.generate_next_sample_entity_id!).to eq("100001")

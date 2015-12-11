@@ -103,7 +103,7 @@ module Entity
 
   class_methods do
     def within_time(time_span, relative_to)
-      where('created_at > ?', relative_to - time_span)
+      where("#{table_name}.created_at > ?", relative_to - time_span)
     end
 
     def entity_fields
