@@ -20,7 +20,7 @@ class Institution < ActiveRecord::Base
   validates_inclusion_of :kind, in: KINDS
 
   after_create :create_predefined_roles
-  after_update :update_predefined_roles
+  after_update :update_predefined_roles, if: :name_changed?
 
   after_create :update_owner_policies
   after_destroy :update_owner_policies

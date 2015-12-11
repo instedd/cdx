@@ -21,7 +21,7 @@ class Site < ActiveRecord::Base
 
   after_create :compute_prefix
   after_create :create_predefined_roles
-  after_update :update_predefined_roles
+  after_update :update_predefined_roles, if: :name_changed?
 
   scope :within, -> (institution_or_site) {
     if institution_or_site.is_a?(Institution)
