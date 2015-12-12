@@ -19,11 +19,15 @@ DOCKER_OPTS="--log-opt max-size=1m --log-opt max-file=100"
 
 Then restart the docker service via `restart docker`.
 
-## Configuration files
+## Configuration
 
-Create a folder where all configuration files will be stored, such as `/u/apps/cdx/`, and there create the following files:
+Create a folder where all configuration files will be stored, such as `/u/apps/cdx/`, and there create the configuration files.
 
-### client_version.json
+### Files
+
+All the following files are required.
+
+#### client_version.json
 
 This file contains the information on the CDX SSH client to be used for this server.
 
@@ -34,7 +38,7 @@ This file contains the information on the CDX SSH client to be used for this ser
 }
 ```
 
-### settings.local.yml
+#### settings.local.yml
 
 This file contains miscellaneous settings for the server. Remember to change the `host` key to your own hostname.
 
@@ -51,11 +55,11 @@ user_password_expire_in_months: 12
 web_session_timeout: 360000000
 ```
 
-### docker.env
+#### docker.env
 
 This file contains all environment values to be injected into the Docker containers.
 
-Again, remember to change `cdx.example.com` to your corresponding hostname. As for the `SMTP` settings, set them to a valid SMTP server, such as [Google's Gmail](https://support.google.com/a/answer/176600?hl=en); in AWS, we suggest using [SES](https://aws.amazon.com/ses/). See _Local SMTP server_ below on how to use a local mail server instead.
+Again, remember to change `cdx.example.com` to your corresponding hostname.
 
 `DEVISE_MAILER_SENDER` should be the address from which user emails will be sent.
 
@@ -67,11 +71,6 @@ MYSQL_HOST=db
 MYSQL_PASSWORD=root
 REDIS_URL=redis://redis:6379
 ELASTICSEARCH_URL=elasticsearch:9200
-
-SMTP_HOST=
-SMTP_PORT=
-SMTP_USERNAME=
-SMTP_PASSWORD=
 
 DEVISE_MAILER_SENDER=info@cdx.example.com
 
@@ -85,7 +84,11 @@ SSH_SERVER_PORT=2223
 SSH_SERVER_HOST=cdx.example.com
 ```
 
-### docker-compose.yml
+#### VERSION
+
+A `VERSION` file containing the description of the deployed version, which will be visible in the web application footer, is required as well. If this file is not included, remove the corresponding volume from the `web` service in the `docker-compose` file, or a `Errno::EISDIR: Is a directory @ io_fread - /app/VERSION` error will be raised.
+
+#### docker-compose.yml
 
 Last but not least, set up the `docker-compose.yml` file for the application stack. The easiest way is to copy both `docker-compose.base.yml` and `docker-compose.prod.yml` from the project root, which contain the base configuration and the overrides for running in a production environment, respectively.
 
@@ -93,15 +96,45 @@ The `docker-compose.prod.yml` assumes there is `data` dir in the same folder as 
 
 Make sure to change the image from `instedd/cdx:latest` to the image you actually want to use for this deployment. You should never work on latest, but [choose a specific tag](https://hub.docker.com/r/instedd/cdx/tags/).
 
-### VERSION
+### Attachments
 
-A `VERSION` file containing the description of the deployed version, which will be visible in the web application footer, is required as well. If this file is not included, remove the corresponding volume from the `web` service in the `docker-compose` file, or a `Errno::EISDIR: Is a directory @ io_fread - /app/VERSION` error will be raised.
+Device models images and instructions are managed via [paperclip](https://github.com/thoughtbot/paperclip).
+
+#### S3
+
+If running on AWS, the recommended configuration is to use S3 for storage, setting the following variables in `docker.env`. The first is the name of the bucket where attachments will be stored, and the remaining two are the credentials used to upload them.
+```
+PAPERCLIP_S3_BUCKET=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+```
+
+#### Local storage
+
+Alternatively, attachments can be stored locally. Create a folder within the data directory owned by user `9999` and mount it in `/app/public/system`. Assuming the data directory is `/u/apps/cdx/data/uploads`, then:
+```bash
+mkdir -p /u/apps/cdx/data/uploads
+chown 9999:9999 /u/apps/cdx/data/uploads
+```
+
+And add the following entry to the `volumes` of the `web` service in `docker-compose.prod.yml`:
+```yml
+- './data/uploads:/app/public/system'
+```
+### SMTP
+
+The SMTP server for sending emails is managed via the `SMTP` settings in `docker.env`. It is recommended to set them to an external SMTP server, such as [Google's Gmail](https://support.google.com/a/answer/176600?hl=en); in AWS, we suggest using [SES](https://aws.amazon.com/ses/).
+
+```
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USERNAME=
+SMTP_PASSWORD=
+```
 
 ### Local SMTP server
 
-_This section is optional, and you should only configure it if you have not configured an external SMTP server, such as GMail or SES. It is strongly recommended to use an external server rather than a local one._
-
-To spin up a local SMTP server, add the following configuration to your `docker-compose.prod.yml` file, replacing `cdx.example.com` to your own domain:
+Alternatively, to spin up a local SMTP server, add the following configuration to your `docker-compose.prod.yml` file, replacing `cdx.example.com` to your own domain:
 
 ```yml
 smtp:
@@ -156,7 +189,3 @@ docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d --for
 To upgrade to a new version of CDX, simply change the tag for the docker image in the docker-compose file; for instance, change `instedd/cdx:0.6` to `instedd/cdx:0.7`.
 
 After the modification, restart the stack via the command listed in the previous section.
-
-## Pending
-
-- Manage paperclip attachments locally
