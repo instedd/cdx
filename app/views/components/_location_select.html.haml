@@ -1,0 +1,3 @@
+- field_name = location_select[:form] ? ActionView::Helpers::Tags::TextField.new(location_select[:form].object_name, location_select[:name], location_select[:form], {}).send(:tag_name) : location_select[:name]
+- field_value = location_select.fetch(:value) { location_select[:form] ? location_select[:form].object.send(location_select[:name]) : nil }.to_s
+= react_component('LocationSelect', name: field_name, defaultValue: field_value, className: location_select[:class])

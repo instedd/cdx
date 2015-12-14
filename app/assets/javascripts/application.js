@@ -16,17 +16,24 @@
 //= require jquery.are-you-sure
 //= require urijs
 //= require lodash
-//= require select2
+//= require leaflet
+//= require leaflet-control-geocoder
+//= require classnames
 //= require react
 //= require react_ujs
-//= require classnames
+//= require react-dom
+//= require react-autosuggest
 //= require react-input-autosize
 //= require react-select
+//= require react-leaflet
 //= require components
 //= require d3
 //= require_tree .
 //= require turbolinks
 Turbolinks.enableProgressBar()
+
+// Configure leaflet
+L.Icon.Default.imagePath = '/assets'
 
 function cdx_init_components(dom) {
   ReactRailsUJS.mountComponents(dom);

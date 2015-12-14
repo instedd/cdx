@@ -11,7 +11,7 @@ gem 'awesome_nested_set', '~> 3.0.0.rc.3'
 gem 'csv_builder'
 gem 'decent_exposure'
 gem 'nokogiri', '~> 1.6.7'
-gem 'react-rails'
+gem 'react-rails', '~> 1.3.2'
 gem 'foreman'
 gem 'paperclip'
 gem 'aws-sdk', '~> 1.6'
@@ -92,6 +92,7 @@ gem 'faker'
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs'
+  gem 'rails-assets-react-autosuggest'
 end
 
 group :development, :test do

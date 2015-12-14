@@ -123,9 +123,19 @@ describe SitesController do
     let!(:site) { institution.sites.make }
 
     it "should update site" do
-      expect(Location).to receive(:details) { [Location.new(lat: 10, lng: -42)] }
-      patch :update, id: site.id, site: { name: "newname" }
+      patch :update, id: site.id, site: { name: "newname", location_geoid: "LOCATION_GEOID", lat: 40, lng: 50 }
       expect(site.reload.name).to eq("newname")
+      expect(site.reload.lat).to eq(40)
+      expect(site.reload.lng).to eq(50)
+      expect(response).to be_redirect
+    end
+
+    it "should update site inferring latlng from geoid" do
+      expect(Location).to receive(:details).with("LOCATION_GEOID") { [Location.new.tap {|l| l.lat= 10; l.lng= -42}] }
+      patch :update, id: site.id, site: { name: "newname", location_geoid: "LOCATION_GEOID" }
+      expect(site.reload.name).to eq("newname")
+      expect(site.reload.lat).to eq(10)
+      expect(site.reload.lng).to eq(-42)
       expect(response).to be_redirect
     end
 
