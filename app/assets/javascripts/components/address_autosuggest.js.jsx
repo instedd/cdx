@@ -7,6 +7,7 @@ var AddressAutosuggest = React.createClass({
     className:    React.PropTypes.string,
     onChange:     React.PropTypes.func,
     onAddress:    React.PropTypes.func,
+    onError:      React.PropTypes.func
   },
 
   componentDidMount: function() {
@@ -43,9 +44,11 @@ var AddressAutosuggest = React.createClass({
 
   geolocate: _.debounce(function(value, callback) {
     var _this = this;
-    // TODO: Handle no suggestions
     this.geocoder.geocode(value, function(locations) {
       callback(null, locations);
+      if (locations.length == 0 && _this.props.onError) {
+        _this.props.onError("The address could not be found, please choose a city and a location in the map");
+      }
     }, this);
   }, 300),
 

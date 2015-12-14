@@ -4,7 +4,8 @@ var Address = React.createClass({
     return {
       address: this.props.defaultAddress,
       location: this.props.defaultLocation,
-      latlng: this.props.defaultLatLng
+      latlng: this.props.defaultLatLng,
+      error: null
     }
   },
 
@@ -22,14 +23,26 @@ var Address = React.createClass({
     _this.setState(React.addons.update(_this.state, {
       bounds: { $set: newAddress.bbox },
       address: { $set: newAddress.name },
-      latlng: { $set: newAddress.center }
+      latlng: { $set: newAddress.center },
+      error: { $set: null }
+    }));
+  },
+
+  handleAddressChange: function(newAddress) {
+    this.setState(React.addons.update(this.state, { address: { $set: newAddress } }));
+  },
+
+  handleError: function(err) {
+    var _this = this;
+    _this.setState(React.addons.update(_this.state, {
+      error: { $set: err }
     }));
   },
 
   render: function() {
     var latlng, position, zoom, marker, bound, _this = this;
     bounds = this.state.bounds;
-    latlng = this.state.latlng ? [this.state.latlng.lat, this.state.latlng.lng] : null;
+    latlng = (this.state.latlng && this.state.latlng.lat && this.state.latlng.lng) ? [this.state.latlng.lat, this.state.latlng.lng] : null;
     position = bounds ? null : (latlng || gon.location_default);
     zoom = bounds ? null : (latlng ? (this.state.zoom || 12) : 2);
 
@@ -50,10 +63,11 @@ var Address = React.createClass({
           <label>Address</label>
         </div>
         <div className="col pe-5">
-          <AddressAutosuggest name={this.props.addressName} value={this.state.address} onAddress={this.handleAddress} className="input-xx-large" />
+          <AddressAutosuggest name={this.props.addressName} value={this.state.address} onChange={this.handleAddressChange} onAddress={this.handleAddress} onError={this.handleError} className="input-xx-large" />
+          <div className="warn">{this.state.error}</div>
         </div>
         <div className="col pe-5">
-          <LocationSelect placeholder="Choose a location" name={this.props.locationName} defaultValue={this.state.location} className="input-x-large" />
+          <LocationSelect placeholder="Choose a location" name={this.props.locationName} defaultValue={this.state.location} revLatLng={this.state.latlng} onError={this.handleError} className="input-x-large" />
         </div>
       </div>
       <div className="row">

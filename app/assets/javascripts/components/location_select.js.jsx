@@ -25,8 +25,36 @@ var LocationSelect = React.createClass({
     return {
       className: "input-large",
       placeholder: "Choose one",
-      onChange: null
+      onChange: null,
+      onError: null
     };
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    var _this = this;
+    // Get revLatLng if specified and perform a reverse geo lookup on the location service,
+    // and set the current value to the returned location, or clear value and call onError if none is found
+    if (nextProps.revLatLng && nextProps.revLatLng != this.props.revLatLng) {
+      _this.setState(React.addons.update(_this.state, { isLoading: { $set: true } }));
+      $.ajax(gon.location_service_url + "/lookup", {
+        dataType: 'json',
+        data: { x: nextProps.revLatLng.lng, y: nextProps.revLatLng.lat, limit: 1, ancestors: true },
+        success: function(data) {
+          if (_this.isMounted()) {
+            var newState = { isLoading: { $set: false } };
+            if (data.length == 0) {
+              newState.value = { $set: null };
+              if (_this.props.onError) {
+                _this.props.onError("A city could not be found for this address, please choose one;")
+              }
+            } else {
+              newState.value = { $set: _this.formatLocation(data[0]) };
+            }
+            _this.setState(React.addons.update(_this.state, newState));
+          }
+        }
+      })
+    }
   },
 
   onChange: function(newValue) {

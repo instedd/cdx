@@ -120,11 +120,12 @@ class SitesController < ApplicationController
   private
 
   def site_params
-    location_details = Location.details(params[:site][:location_geoid]).first
-    if location_details
-      params[:site][:lat] = location_details.lat
-      params[:site][:lng] = location_details.lng
+    if params[:site] && (params[:site][:lat].blank? || params[:site][:lng].blank?) && !params[:site][:location_geoid].blank?
+      location_details = Location.details(params[:site][:location_geoid]).first
+      params[:site][:lat] = location_details.try(:lat)
+      params[:site][:lng] = location_details.try(:lng)
     end
+
     params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :parent_id, :sample_id_reset_policy, :main_phone_number, :email_address)
   end
 end
