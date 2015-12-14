@@ -89,12 +89,4 @@ class User < ActiveRecord::Base
   def inactive_message
     self.is_active? ? super : I18n.t('devise.failure.suspended')
   end
-
-  scope :within, -> (institution_or_site) {
-    if institution_or_site.is_a?(Institution)
-      where(institution: institution_or_site)
-    else
-      where("prefix LIKE concat(?, '%')", institution_or_site.prefix)
-    end
-  }
 end

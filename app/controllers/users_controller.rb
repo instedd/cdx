@@ -7,11 +7,12 @@ class UsersController < ApplicationController
 
   def update
     return unless authorize_resource(@user, UPDATE_USER)
-    if can_edit? && @user.update(user_params)
-      @_message = 'User updated'
-    end
+    return head :forbidden unless can_edit?
 
-    redirect_to edit_user_path(@user), notice: @_message
+    message = 'User updated' if @user.update(user_params)
+
+    redirect_to edit_user_path(@user),
+                notice: message || 'There was a problem updating this user'
   end
   private
 
@@ -25,6 +26,5 @@ class UsersController < ApplicationController
 
   def load_resource
     @user ||= User.find(params[:id])
-    @_message = 'Unable to load user' unless @user
   end
 end

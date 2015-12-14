@@ -106,7 +106,6 @@ class SitesController < ApplicationController
     return unless authorize_resource(@site, READ_SITE)
 
     @users = ComputedPolicy.authorized_users(Policy::Actions::READ_SITE, @site)
-    check_access(User.within(@navigation_context.entity), READ_SITE)
     render layout: false
   end
 
