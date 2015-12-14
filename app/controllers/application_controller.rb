@@ -74,13 +74,9 @@ class ApplicationController < ActionController::Base
   end
 
   def ensure_context
-    return if request.xhr?
+    return if current_user.nil?
 
-    if current_user.nil?
-      return
-    end
-
-    if params[:context].blank?
+    if params[:context].blank? && !request.xhr?
       # if there is no context information force it to be explicit
       # this will trigger a redirect ?context=<institution_or_site_uuid>
 
@@ -97,14 +93,18 @@ class ApplicationController < ActionController::Base
       if default_context
         redirect_to url_for(params.merge({context: default_context}))
       end
-    else
+    elsif !params[:context].blank?
       # if there is an explicit context try to use it.
       @navigation_context = NavigationContext.new(current_user, params[:context])
 
       if @navigation_context.can_read?
+        # store the navigation context as the last one used
         current_user.update_attribute(:last_navigation_context, params[:context])
+      elsif request.xhr?
+        # if the user has no longer access to this context, reset it for this request
+        @navigation_context = nil
       else
-        # if the user has no longer access to this context, reset it
+        # or redirect the user to an empty context so a new one is set
         redirect_to url_for(params.merge({context: nil}))
       end
     end
