@@ -21,12 +21,13 @@ Then(/^he should see New Institution$/)  do
 end
 
 
-
-
     Given(/^the user creates a new alert$/) do
 #      binding.pry
       @alert = AlertPage.new
       @alert.load
+      
+      screenshot_and_save_page
+      
       within(@alert.form) do |form|
  #         binding.pry
  #         form.title.set 'alert123'
@@ -34,7 +35,7 @@ end
         form.login.click
       end
       
-#      binding.pry
+
     end
 
     When(/^the user selects errorcode alert called "(.*?)"$/) do |arg1|
