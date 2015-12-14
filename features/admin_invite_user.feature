@@ -14,6 +14,7 @@ Feature: Superadmin can invite users to the system
     When Bob sends an invitation to Bill Smith
     Then Bob should see "An invitation email has been sent to billsmith@copado.com"
 
+  @debug
   Scenario: Bob views users he added to a specific lab
     Given the following users created by Bob
       | first_name | last_name | lab_name |
