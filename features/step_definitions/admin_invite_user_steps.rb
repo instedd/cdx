@@ -56,7 +56,8 @@ end
 When(/^Bob view the users tab on Lab One$/) do
   @site = Site.where(name: 'Lab One').first
   site_page = SiteViewPage.new
-  site_page.load(site_id: @site.id)
+  site_page.load(site_id: @site.id, query: { context: @site.uuid })
+  puts current_url
   within(site_page.tabs) do |tab|
     tab.users.click
   end
