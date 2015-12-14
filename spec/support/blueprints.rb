@@ -32,6 +32,19 @@ User.blueprint do
   confirmed_at { Time.now - 1.day }
 end
 
+Alert.blueprint do
+  name { Faker::Name.first_name }
+  description { Faker::Name.last_name }
+  user
+#  query { "test.error_code" => "11"}
+end
+
+AlertRecipient.blueprint do
+  user
+  alert
+end
+
+
 User.blueprint(:invited_pending) do
   confirmed_at nil
   invitation_token { SecureRandom.urlsafe_base64 }
