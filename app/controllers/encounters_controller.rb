@@ -8,6 +8,7 @@ class EncountersController < ApplicationController
   def create
     perform_encounter_action "creating encounter" do
       prepare_encounter_from_json
+      create_new_samples
       @blender.save_and_index!
     end
   end
@@ -31,6 +32,7 @@ class EncountersController < ApplicationController
       prepare_encounter_from_json
       return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
       raise "encounter.id does not match" if params[:id].to_i != @encounter.id
+      create_new_samples
       @blender.save_and_index!
     end
   end
@@ -77,9 +79,18 @@ class EncountersController < ApplicationController
     end
   end
 
+  def new_sample
+    perform_encounter_action "creating new sample" do
+      prepare_encounter_from_json
+      added_sample = new_sample_for_site
+      @extended_respone = { sample: added_sample }
+    end
+  end
+
   private
 
   def perform_encounter_action(action)
+    @extended_respone = {}
     begin
       yield
     rescue Blender::MergeNonPhantomError => e
@@ -88,7 +99,7 @@ class EncountersController < ApplicationController
       Rails.logger.error(e.backtrace.unshift(e.message).join("\n"))
       render json: { status: :error, message: "Error #{action} #{e.class}", encounter: as_json_edit.attributes! }
     else
-      render json: { status: :ok, encounter: as_json_edit.attributes! }
+      render json: { status: :ok, encounter: as_json_edit.attributes! }.merge(@extended_respone)
     end
   end
 
@@ -111,6 +122,7 @@ class EncountersController < ApplicationController
   def prepare_encounter_from_json
     encounter_param = @encounter_param = JSON.parse(params[:encounter])
     @encounter = encounter_param['id'] ? Encounter.find(encounter_param['id']) : Encounter.new
+    @encounter.new_samples = []
     @encounter.is_phantom = false
 
     if @encounter.new_record?
@@ -126,6 +138,10 @@ class EncountersController < ApplicationController
 
     encounter_param['samples'].each do |sample_param|
       add_sample_by_uuids sample_param['uuids']
+    end
+
+    encounter_param['new_samples'].each do |new_sample_param|
+      @encounter.new_samples << {entity_id: new_sample_param['entity_id']}
     end
 
     encounter_param['test_results'].each do |test_param|
@@ -145,10 +161,23 @@ class EncountersController < ApplicationController
     )
   end
 
+  def create_new_samples
+    @encounter.new_samples.each do |new_sample|
+      add_new_sample_by_entity_id new_sample[:entity_id]
+    end
+    @encounter.new_samples = []
+  end
+
   def scoped_samples
     Sample.where("samples.id in (#{authorize_resource(TestResult, QUERY_TEST).joins(:sample_identifier).select('sample_identifiers.sample_id').to_sql})")
               .where(institution: @institution)
               .joins(:sample_identifiers)
+  end
+
+  def new_sample_for_site
+    sample = { entity_id: @encounter.site.generate_next_sample_entity_id! }
+    @encounter.new_samples << sample
+    sample
   end
 
   def add_sample_by_uuid(uuid)
@@ -160,6 +189,15 @@ class EncountersController < ApplicationController
 
   def add_sample_by_uuids(uuids)
     sample_blender = merge_samples_by_uuid(uuids)
+    @blender.merge_parent(sample_blender, @encounter_blender)
+    sample_blender
+  end
+
+  def add_new_sample_by_entity_id(entity_id)
+    sample = Sample.new(institution: @encounter.institution)
+    sample.sample_identifiers.build(site: @encounter.site, entity_id: entity_id)
+
+    sample_blender = @blender.load(sample)
     @blender.merge_parent(sample_blender, @encounter_blender)
     sample_blender
   end
@@ -218,6 +256,8 @@ class EncountersController < ApplicationController
       json.samples @encounter_blender.samples.uniq do |sample|
         as_json_sample(json, sample)
       end
+
+      json.(@encounter, :new_samples)
 
       json.test_results @encounter_blender.test_results.uniq do |test_result|
         as_json_test_result(json, test_result.single_entity)

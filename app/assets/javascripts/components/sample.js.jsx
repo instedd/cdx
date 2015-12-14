@@ -52,3 +52,15 @@ var SamplesList = React.createClass({
     );
   }
 });
+
+var NewSamplesList = React.createClass({
+  render: function() {
+    return (
+      <ul className="samples">
+        {this.props.samples.map(function(sample) {
+           return <li key={sample.entity_id}>{sample.entity_id}</li>
+        })}
+      </ul>
+    );
+  }
+});

@@ -21,6 +21,8 @@ class Encounter < ActiveRecord::Base
 
   before_save :ensure_entity_id
 
+  attr_accessor :new_samples # Array({entity_id: String}) of new generated samples from UI.
+
   def entity_id
     core_fields["id"]
   end

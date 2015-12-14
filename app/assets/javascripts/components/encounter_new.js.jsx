@@ -5,6 +5,7 @@ var EncounterNew = React.createClass({
       site: null,
       patient: null,
       samples: [],
+      new_samples: [],
       test_results: [],
       assays: [],
       observations: ''
@@ -17,6 +18,7 @@ var EncounterNew = React.createClass({
         site: { $set: site },
         patient: { $set: null },
         samples: { $set: [] },
+        new_samples: { $set: [] },
         test_results: { $set: [] },
         assays: { $set: [] },
         observations: { $set: '' }

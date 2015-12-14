@@ -49,6 +49,13 @@ var EncounterForm = React.createClass({
     event.preventDefault();
   },
 
+  addNewSamplesModal: function(event) {
+    this._ajax_put('/encounters/add/new_sample', function(){
+      //TODO show notification of new sample
+    });
+    event.preventDefault();
+  },
+
   _ajax_put: function(url, success, extra_data) {
     this._ajax('PUT', url, success, extra_data);
   },
@@ -175,7 +182,7 @@ var EncounterForm = React.createClass({
       <div>
         {(function(){
           if (this.state.encounter.id == null) return;
-          
+
           return (
           <div className="row">
             <div className="col pe-2">
@@ -199,8 +206,12 @@ var EncounterForm = React.createClass({
           </div>
           <div className="col">
             <SamplesList samples={this.state.encounter.samples} onUnifySample={this.showUnifySamplesModal} />
+            <NewSamplesList samples={this.state.encounter.new_samples} />
             <p>
               <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
+            </p>
+            <p>
+              <a className="btn-href" href='#' onClick={this.addNewSamplesModal}><span className="icon-add"></span> Append new sample</a>
             </p>
           </div>
 

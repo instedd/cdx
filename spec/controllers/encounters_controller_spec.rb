@@ -101,6 +101,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{ uuids: sample.uuids }],
+        new_samples: [{entity_id: 'eid:1001'}, {entity_id: 'eid:1002'}],
         test_results: [],
         assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],
         observations: 'Lorem ipsum',
@@ -145,10 +146,24 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       expect(Time.parse(created_encounter.core_fields["start_time"])).to eq(created_encounter.created_at)
       expect(Time.parse(created_encounter.core_fields["end_time"])).to eq(created_encounter.created_at)
     end
+
+    it "creates new_samples assigned to encounter" do
+      expect(site.sample_identifiers.where(entity_id: 'eid:1001').first.sample.encounter).to eq(created_encounter)
+      expect(site.sample_identifiers.where(entity_id: 'eid:1002').first.sample.encounter).to eq(created_encounter)
+    end
+
+    it "should move new samples in samples" do
+      expect(json_response['encounter']['samples'].detect {|h| h['entity_ids'].include?('eid:1001') }).to_not be_nil
+      expect(json_response['encounter']['samples'].detect {|h| h['entity_ids'].include?('eid:1002') }).to_not be_nil
+    end
+
+    it "should leave new samples empty" do
+      expect(json_response['encounter']['new_samples']).to eq([])
+    end
   end
 
   describe "PUT #update" do
-    let(:encounter) { Encounter.make institution: institution }
+    let(:encounter) { Encounter.make institution: institution, site: site }
 
     let(:sample) {
       device = Device.make institution: institution
@@ -161,6 +176,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         id: encounter.id,
         institution: { uuid: 'uuid-to-discard' },
         samples: [{ uuids: sample.uuids }],
+        new_samples: [{entity_id: 'eid:1001'}, {entity_id: 'eid:1002'}],
         test_results: [],
         assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],
         observations: 'Lorem ipsum',
@@ -195,6 +211,20 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
     it "assigns returns a json status ok" do
       expect(json_response['encounter']['id']).to eq(encounter.id)
+    end
+
+    it "creates new_samples assigned to encounter" do
+      expect(site.sample_identifiers.where(entity_id: 'eid:1001').first.sample.encounter).to eq(encounter)
+      expect(site.sample_identifiers.where(entity_id: 'eid:1002').first.sample.encounter).to eq(encounter)
+    end
+
+    it "should move new samples in samples" do
+      expect(json_response['encounter']['samples'].detect {|h| h['entity_ids'].include?('eid:1001') }).to_not be_nil
+      expect(json_response['encounter']['samples'].detect {|h| h['entity_ids'].include?('eid:1002') }).to_not be_nil
+    end
+
+    it "should leave new samples empty" do
+      expect(json_response['encounter']['new_samples']).to eq([])
     end
   end
 
@@ -291,6 +321,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -310,6 +341,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: test1.sample.uuids[0]}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -335,6 +367,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: test1.sample.uuids[0]}],
+        new_samples: [],
         test_results: [{uuid: test1.uuid}],
       }.to_json
 
@@ -361,6 +394,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample_with_patient1.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -382,6 +416,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample_with_patient1.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -404,6 +439,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample_with_patient1.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -432,6 +468,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: i1.uuid },
         site: { uuid: i1.sites.first.uuid },
         samples: [{uuids: sample_a.uuids}, {uuids: sample_b.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -457,6 +494,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample_a.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -479,6 +517,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -511,6 +550,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: i1.uuid },
         site: { uuid: i1.sites.first.uuid },
         samples: [],
+        new_samples: [],
         test_results: [{uuid: test_result_a.uuid}, {uuid: test_result_b.uuid}],
       }.to_json
 
@@ -560,6 +600,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -578,6 +619,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}, {uuids: sample2.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -598,6 +640,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}, {uuids: sample2.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -619,6 +662,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}, {uuids: sample2.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -645,6 +689,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -661,6 +706,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample1.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -685,6 +731,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         institution: { uuid: institution.uuid },
         site: { uuid: site.uuid },
         samples: [{uuids: sample_with_patient1.uuids}],
+        new_samples: [],
         test_results: [],
       }.to_json
 
@@ -695,6 +742,48 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       expect(json_response['status']).to eq('error')
     end
 
+  end
+
+  describe 'PUT #new_sample' do
+    it "should return new sample" do
+      new_entity_id = "eid:1003"
+      allow_any_instance_of(Site).to receive(:generate_next_sample_entity_id!).and_return(new_entity_id)
+
+      put :new_sample, encounter: {
+        institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
+        samples: [],
+        new_samples: [],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['new_samples']).to eq([{'entity_id' => new_entity_id}])
+      expect(json_response['sample']['entity_id']).to eq(new_entity_id)
+    end
+
+    it "should append new samples" do
+      new_entity_id = "eid:1004"
+      allow_any_instance_of(Site).to receive(:generate_next_sample_entity_id!).and_return(new_entity_id)
+
+      put :new_sample, encounter: {
+        institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
+        samples: [],
+        new_samples: [{'entity_id' => 'eid:1003'}],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['new_samples']).to eq([{'entity_id' => 'eid:1003'},{'entity_id' => new_entity_id}])
+      expect(json_response['sample']['entity_id']).to eq(new_entity_id)
+    end
   end
 
   def institution_json(institution)
