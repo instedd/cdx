@@ -191,7 +191,7 @@ var EncounterForm = React.createClass({
 
           <Modal ref="addSamplesModal">
             <h1>
-              <a href="#" className="modal-back" onClick={this.closeAddSamplesModal}><img src="/assets/arrow-left.png"/></a>
+              <a href="#" className="modal-back" onClick={this.closeAddSamplesModal}></a>
               Add sample
             </h1>
 
@@ -203,7 +203,7 @@ var EncounterForm = React.createClass({
 
           <Modal ref="unifySamplesModal">
             <h1>
-              <a href="#" className="modal-back" onClick={this.closeUnifySamplesModal}><img src="/assets/arrow-left.png"/></a>
+              <a href="#" className="modal-back" onClick={this.closeUnifySamplesModal}></a>
               Unify sample
             </h1>
             <p>Unifying sample {this.state.unifyingSample ? this.state.unifyingSample.entity_ids[0] : ""}</p>
@@ -223,7 +223,7 @@ var EncounterForm = React.createClass({
 
           <Modal ref="testsModal">
             <h1>
-              <a href="#" className="modal-back" onClick={this.closeTestsModal}><img src="/assets/arrow-left.png"/></a>
+              <a href="#" className="modal-back" onClick={this.closeTestsModal}></a>
               Add test
             </h1>
 
