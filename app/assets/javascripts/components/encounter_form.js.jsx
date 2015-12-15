@@ -70,6 +70,14 @@ var EncounterForm = React.createClass({
     }));
   },
 
+  removeNewSample: function(sample) {
+    var filtered = _.filter(this.state.encounter.new_samples, function(s) { return s.entity_id != sample.entity_id });
+
+    this.setState(React.addons.update(this.state, {
+      encounter : { new_samples: { $set : filtered }},
+    }));
+  },
+
   _ajax_put: function(url, success, extra_data) {
     this._ajax('PUT', url, success, extra_data);
   },
@@ -220,7 +228,7 @@ var EncounterForm = React.createClass({
           </div>
           <div className="col">
             <SamplesList samples={this.state.encounter.samples} onUnifySample={this.showUnifySamplesModal} />
-            <NewSamplesList samples={this.state.encounter.new_samples} />
+            <NewSamplesList samples={this.state.encounter.new_samples} onRemoveSample={this.removeNewSample} />
 
             {(function(){
               var sample = this.state.added_sample;
