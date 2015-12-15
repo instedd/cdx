@@ -80,6 +80,8 @@ class ApplicationController < ActionController::Base
       return
     end
 
+#binding.pry
+
     if params[:context].blank?
       # if there is no context information force it to be explicit
       # this will trigger a redirect ?context=<institution_or_site_uuid>
@@ -98,7 +100,7 @@ class ApplicationController < ActionController::Base
         redirect_to url_for(params.merge({context: default_context}))
       end
     else
-      # if there is an explicit context try to use it.
+      # if there is an explicit context try to use it.  
       @navigation_context = NavigationContext.new(current_user, params[:context])
 
       if @navigation_context.can_read?

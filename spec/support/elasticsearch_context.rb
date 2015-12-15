@@ -2,6 +2,10 @@ shared_context "elasticsearch", elasticsearch: true do
 
   before(:each) do
     Cdx::Api.client.indices.delete index: Cdx::Api.index_name, ignore: 404
+    
+    Cdx::Api.client.indices.delete index: Cdx::Api.index_name, type: '.percolator', ignore: 404
+   
+                              
     Cdx::Api.client.indices.delete_template name: "cdx_tests_template_test*", ignore: 404
     Cdx::Api::Elasticsearch::MappingTemplate.new.initialize_template "cdx_tests_template_test"
     Cdx::Api.client.indices.create index: Cdx::Api.index_name,
