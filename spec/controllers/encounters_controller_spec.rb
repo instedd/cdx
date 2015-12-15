@@ -679,7 +679,6 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       put :update, id: encounter.id, encounter: json_response['encounter'].to_json
       expect(response).to have_http_status(:success)
       expect(JSON.parse(response.body).with_indifferent_access['status']).to eq('ok')
-
       expect(encounter.reload).to have(1).sample
       expect(sample1.reload.entity_ids).to contain_exactly('ID1', 'ID2', 'ID2B')
       expect(Sample.find_by_id(sample2.id)).to be_nil
