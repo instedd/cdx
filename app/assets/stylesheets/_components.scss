@@ -35,6 +35,10 @@
     .modal-back {
       position: absolute;
       margin-left: -30px;
+      background: image-url('arrow-left.png') no-repeat left center;
+      width: 16px;
+      height: 48px;
+      display: inline-block;
     }
 
     .item-search {
