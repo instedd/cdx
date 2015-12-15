@@ -171,11 +171,17 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       Sample.first
     }
 
+    let(:empty_sample) {
+      SampleIdentifier.make(site: site).sample.tap do |s|
+        s.update_attribute(:encounter_id, encounter.id)
+      end
+    }
+
     before(:each) {
       put :update, id: encounter.id, encounter: {
         id: encounter.id,
         institution: { uuid: 'uuid-to-discard' },
-        samples: [{ uuids: sample.uuids }],
+        samples: [{ uuids: sample.uuids }, { uuids: empty_sample.uuids }],
         new_samples: [{entity_id: 'eid:1001'}, {entity_id: 'eid:1002'}],
         test_results: [],
         assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],

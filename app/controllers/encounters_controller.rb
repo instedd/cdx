@@ -105,6 +105,7 @@ class EncountersController < ApplicationController
 
   def load_encounter
     @encounter = Encounter.where("id = :id OR uuid = :id", params).first
+    @encounter.new_samples = []
     @institution = @encounter.institution
     @blender = Blender.new(@institution)
     @encounter_blender = @blender.load(@encounter)
@@ -169,7 +170,10 @@ class EncountersController < ApplicationController
   end
 
   def scoped_samples
-    Sample.where("samples.id in (#{authorize_resource(TestResult, QUERY_TEST).joins(:sample_identifier).select('sample_identifiers.sample_id').to_sql})")
+    samples_in_encounter = "samples.encounter_id = #{@encounter.id} OR " if @encounter.try(:persisted?)
+    # TODO this logic is not enough to grab an empty sample from one encounter and move it to another. but is ok for CRUD experience
+
+    Sample.where("#{samples_in_encounter} samples.id in (#{authorize_resource(TestResult, QUERY_TEST).joins(:sample_identifier).select('sample_identifiers.sample_id').to_sql})")
               .where(institution: @institution)
               .joins(:sample_identifiers)
   end
