@@ -132,7 +132,7 @@ SMTP_USERNAME=
 SMTP_PASSWORD=
 ```
 
-### Local SMTP server
+#### Local SMTP server
 
 Alternatively, to spin up a local SMTP server, add the following configuration to your `docker-compose.prod.yml` file, replacing `cdx.example.com` to your own domain:
 
@@ -154,6 +154,18 @@ SMTP_PORT=25
 SMTP_USERNAME=cdx
 SMTP_PASSWORD=cdx
 SMTP_TLS=false
+```
+
+### Monitoring
+
+The CDX app already ships with the New Relic agent installed. In order to enable it, set the following environment variables in `docker.env`, using your New Relic license key:
+
+```bash
+NEW_RELIC_LOG=stdout
+NEW_RELIC_LOG_LEVEL=info
+NEW_RELIC_AGENT_ENABLED=1
+NEW_RELIC_APP_NAME=CDX
+NEW_RELIC_LICENSE_KEY=
 ```
 
 ## Setup
