@@ -6,7 +6,10 @@ var EncounterForm = React.createClass({
   },
 
   getInitialState: function() {
-    return {encounter: this.props.encounter};
+    return {
+      encounter: this.props.encounter,
+      added_sample: null
+    };
   },
 
   componentWillReceiveProps: function(nextProps) {
@@ -50,10 +53,21 @@ var EncounterForm = React.createClass({
   },
 
   addNewSamplesModal: function(event) {
-    this._ajax_put('/encounters/add/new_sample', function(){
-      //TODO show notification of new sample
+    this._ajax_put('/encounters/add/new_sample', function(data) {
+      this.setState(React.addons.update(this.state, {
+        added_sample : { $set : data.sample },
+      }), function(){
+        this.refs.addedSampleModal.show();
+      });
     });
     event.preventDefault();
+  },
+
+  closeAddedSampleModal: function() {
+    this.refs.addedSampleModal.hide();
+    this.setState(React.addons.update(this.state, {
+      added_sample : { $set : null },
+    }));
   },
 
   _ajax_put: function(url, success, extra_data) {
@@ -74,7 +88,7 @@ var EncounterForm = React.createClass({
             encounter: { $set: data.encounter }
           }), function(){
             if (data.status == 'ok' && success) {
-              success.call(_this);
+              success.call(_this, data);
             }
           });
         }
@@ -207,6 +221,24 @@ var EncounterForm = React.createClass({
           <div className="col">
             <SamplesList samples={this.state.encounter.samples} onUnifySample={this.showUnifySamplesModal} />
             <NewSamplesList samples={this.state.encounter.new_samples} />
+
+            {(function(){
+              var sample = this.state.added_sample;
+
+              if (sample == null) return;
+
+              return (
+                <Modal ref="addedSampleModal">
+                  <h2>Sample {sample.entity_id}</h2>
+                  <div className="modal-content">
+                    <i>This sample has not been used yet</i>
+                  </div>
+                  <div className="modal-buttons button-actions">
+                    <button type="button" className="btn-primary" onClick={this.closeAddedSampleModal}>OK</button>
+                  </div>
+                </Modal>);
+            }.bind(this))()}
+
             <p>
               <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
             </p>
