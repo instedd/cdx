@@ -73,7 +73,9 @@
     .col.pe-2
       = f.label :SCOPE
     .col
-      &nbsp;
+      = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+        - select.item "", "None"
+        - select.items @sites, :id, :name
 
 
   .row

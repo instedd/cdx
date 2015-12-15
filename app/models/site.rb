@@ -9,6 +9,7 @@ class Site < ActiveRecord::Base
   has_many :test_results
   has_many :sample_identifiers
   has_many :samples, through: :sample_identifiers
+  has_one :alert
 
   belongs_to :parent, class_name: "Site"
   has_many :children, class_name: "Site", foreign_key: "parent_id"

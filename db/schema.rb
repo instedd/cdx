@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(version: 20160215195614) do
     t.text     "query",            limit: 65535
     t.text     "message",          limit: 65535
     t.integer  "channel_type",     limit: 4,     default: 0
+    t.integer  "site_id",          limit: 4
   end
 
   add_index "alerts", ["user_id"], name: "index_alerts_on_user_id", using: :btree

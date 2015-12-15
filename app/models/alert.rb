@@ -1,5 +1,6 @@
 class Alert < ActiveRecord::Base
   belongs_to :user
+  belongs_to :site
  
   has_many :alert_histories
   has_many :alert_recipients
@@ -13,6 +14,7 @@ class Alert < ActiveRecord::Base
 #TODO  validates :error_code, format: { with: /^\d+/, message: "must start with a letter" }
   validates_presence_of :name
   validates_presence_of :description
+#  validates_presence_of :site
   
   enum category_type: [ :anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency, :workflow_delays]  
   enum aggregation_type: [ :per_record, :aggregated]
@@ -29,7 +31,7 @@ class Alert < ActiveRecord::Base
     Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
                           type: '.percolator',
                           id: 'alert_'+self.id.to_s,
-                          body: { query: es_query, type: 'test' }                                                                            
+                          body: { query: es_query, type: 'test' }                                                                         
    end
 
 =begin

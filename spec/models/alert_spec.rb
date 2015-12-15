@@ -31,11 +31,15 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
       alert.query = {"test.error_code"=>"155"}
       alert.user = institution.user
       result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
-      before_count=result["hits"]["total"] 
-
       alert.create_percolator
-      result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
-      expect(result["hits"]["total"]).to eq(before_count+1)
+      
+      percolator = Cdx::Api.client.get index: Cdx::Api.index_name_pattern, type: '.percolator', id: 'alert_'+alert.id.to_s
+      expect(percolator["_id"]).to eq('alert_'+alert.id.to_s)
+
+#     Note: I had these lines below but for soem reason the test woudl only pass when i had a binding.pry inserted here
+#      result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
+#      expect(result["hits"]["total"]).to eq(before_count+1)
+ 
    end 
   end
   

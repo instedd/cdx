@@ -1,6 +1,8 @@
 class AlertsController < ApplicationController
   respond_to :html, :json
   
+#  set_institution_tab :sites
+  
   #TODO [WARNING] You are exposing the `alert` method, which overrides an existing ActionController method of the same name. Consider a different exposure name
   expose(:alerts) { current_user.alerts }
  # expose(:alert, attributes: :alert_params)
@@ -13,6 +15,10 @@ class AlertsController < ApplicationController
   end
 
   def new
+
+#binding.pry    
+ #  @institution = @navigation_context.institution
+    @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
     alert_info.alert_recipients.build 
   end
 
@@ -42,12 +48,18 @@ class AlertsController < ApplicationController
       alert_info.query =    {"test.error_code"=>alert_info.error_code }
     end
 
+    if params[:alert][:site_id]
+       alert_info.site = Site.find_by_id(params[:alert][:site_id])  
+    end
+    
     alertRecipients = alert_info.alert_recipients
     alertRecipients.each do |recipient|
       user = User.find_by_email(recipient.email)
       recipient.user = user
     end  
 
+
+#binding.pry
     flash[:notice] = "Alert was successfully created" if alert_info.save
 
     alert_info.create_percolator
@@ -73,6 +85,6 @@ class AlertsController < ApplicationController
   private
 
   def alert_params
-    params.require(:alert).permit(:name, :description, :error_code, :message, :category_type, :aggregation_type, :channel_type, alert_recipients_attributes: [:user, :user_id, :email] )
+    params.require(:alert).permit(:name, :description, :error_code, :message, :site_id, :category_type, :aggregation_type, :channel_type, alert_recipients_attributes: [:user, :user_id, :email] )
   end
 end
