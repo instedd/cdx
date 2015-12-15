@@ -60,14 +60,20 @@ var Address = React.createClass({
     return <div>
       <div className="row">
         <div className="col pe-2">
+          <label>Region</label>
+        </div>
+        <div className="col">
+          <LocationSelect placeholder="Choose a location" name={this.props.locationName} defaultValue={this.state.location} revLatLng={this.state.latlng} onError={this.handleError} className="input-x-large" />
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col pe-2">
           <label>Address</label>
         </div>
-        <div className="col pe-5">
-          <AddressAutosuggest name={this.props.addressName} value={this.state.address} onChange={this.handleAddressChange} onAddress={this.handleAddress} onError={this.handleError} className="input-xx-large" />
+        <div className="col pe-8">
+          <AddressAutosuggest name={this.props.addressName} value={this.state.address} onChange={this.handleAddressChange} onAddress={this.handleAddress} onError={this.handleError} className="input-block" />
           <div className="warn">{this.state.error}</div>
-        </div>
-        <div className="col pe-5">
-          <LocationSelect placeholder="Choose a location" name={this.props.locationName} defaultValue={this.state.location} revLatLng={this.state.latlng} onError={this.handleError} className="input-x-large" />
         </div>
       </div>
       <div className="row">
