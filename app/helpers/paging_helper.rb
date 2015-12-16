@@ -15,5 +15,5 @@ module PagingHelper
     params.merge("page" => [@page + 1, (@total.to_f / @page_size).ceil].min)
   end
 
-  PAGE_SIZE_OPTIONS = [10, 50].map { |size| ["#{size} #{"row".pluralize(size)} per page", size] }
+  PAGE_SIZE_OPTIONS = [10, 50, 100].map { |size| ["#{size} #{"row".pluralize(size)} per page", size] }
 end
