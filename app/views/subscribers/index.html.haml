@@ -3,6 +3,8 @@
     - unless filters.empty?
       = link_to "+", new_subscriber_path, class: 'btn-add side-link ontop fix', title: 'Add Subscriber'
     = cdx_table title: 'Subscribers' do |t|
+      - t.columns do
+        %col{:width => "100%"}
       - t.thead do
         %tr
           %th Name

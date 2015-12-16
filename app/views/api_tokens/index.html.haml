@@ -2,6 +2,9 @@
   .col
     = link_to "+", new_api_token_path, class: 'btn-add side-link ontop fix', title: 'Add API Token'
     = cdx_table title: 'API Tokens' do |t|
+      - t.columns do
+        %col{:width => "90%"}
+        %col{:width => "10%"}
       - t.thead do
         %tr
           %th Token

@@ -1,6 +1,8 @@
 .row
   .col
     = cdx_table title: 'Filters' do |t|
+      - t.columns do
+        %col{:width => "100%"}
       - t.thead do
         %tr
           %th Name

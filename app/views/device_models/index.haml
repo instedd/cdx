@@ -2,6 +2,9 @@
   .col
     = link_to "+", new_device_model_path, class: 'btn-add side-link ontop fix', title: 'Add Device Model'
     = cdx_table title: 'Device Models' do |t|
+      - t.columns do
+        %col{:width => "80%"}
+        %col{:width => "20%"}
       - t.thead do
         %tr
           %th Name

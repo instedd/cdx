@@ -2,6 +2,11 @@
   .col
     = link_to "+", new_policy_path, class: 'btn-add side-link ontop fix', title: 'Add Policy'
     = cdx_table title: 'Policies' do |t|
+      - t.columns do
+        %col{:width => "25%"}
+        %col{:width => "20%"}
+        %col{:width => "20%"}
+        %col{:width => "35%"}
       - t.thead do
         %tr
           %th Name

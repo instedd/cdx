@@ -2,6 +2,9 @@
   %span This site has no users yet
 - else
   = cdx_table do |t|
+      - t.columns do
+        %col{:width => "50%"}
+        %col{:width => "50%"}
     - t.thead do
       %tr
         %th Name

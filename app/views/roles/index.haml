@@ -2,6 +2,8 @@
   .col
     = link_to "+", new_role_path, class: 'btn-add side-link ontop fix', title: 'Add Role'
     = cdx_table title: 'Roles' do |t|
+      - t.columns do
+        %col{:width => "100%"}
       - t.thead do
         %tr
           %th Name

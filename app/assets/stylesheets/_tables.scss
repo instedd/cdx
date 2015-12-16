@@ -5,6 +5,8 @@
   .table {
     width: 100%;
     margin: 15px auto;
+    table-layout: fixed;
+    white-space: nowrap;
 
     a {
       color: $gray4;
@@ -15,6 +17,8 @@
       color: $gray3;
       text-align: left;
       text-transform: uppercase;
+      overflow: hidden;
+      text-overflow: ellipsis;
       padding: 14px 10px;
 
       .table-title {
@@ -46,7 +50,7 @@
       padding: 14px 10px;
       border-bottom: 1px solid $gray1;
       text-overflow: ellipsis;
-      max-width: 200px;
+      // max-width: 200px;
       white-space: nowrap;
       overflow: hidden;
     }

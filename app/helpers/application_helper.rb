@@ -55,7 +55,7 @@ module ApplicationHelper
   end
 
   define_component :card, sections: [:top, :actions, :bottom], attributes: [:image]
-  define_component :cdx_table, sections: [:thead, :tbody, :actions], attributes: [:title]
+  define_component :cdx_table, sections: [:columns, :thead, :tbody, :actions], attributes: [:title]
 
   define_component :cdx_tabs do |c|
     c.section :headers, multiple: true, component: :cdx_tabs_header
