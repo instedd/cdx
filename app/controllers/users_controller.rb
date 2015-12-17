@@ -1,29 +1,30 @@
 class UsersController < ApplicationController
-  LOCALES = [
-              ["English", "en"],
-            ]
+  before_filter :load_resource
 
-  def settings
-    load_locales
+  def edit
+    return unless authorize_resource(@user, READ_USER)
   end
 
-  def update_settings
-    params = user_params
-    if current_user.update(params)
-      redirect_to settings_path, notice: "Settings updated"
-    else
-      load_locales
-      render :settings
+  def update
+    return unless authorize_resource(@user, UPDATE_USER)
+    if can_edit? && @user.update(user_params)
+      @_message = 'User updated'
     end
-  end
 
+    redirect_to edit_user_path(@user), notice: @_message
+  end
   private
 
   def user_params
-    params.require(:user).permit(:locale, :time_zone, :timestamps_in_device_time_zone)
+    params.require(:user).permit(:is_active)
   end
 
-  def load_locales
-    @locales = LOCALES
+  def can_edit?
+    current_user.id != @user.try(:id)
+  end
+
+  def load_resource
+    @user ||= User.find(params[:id])
+    @_message = 'Unable to load user' unless @user
   end
 end

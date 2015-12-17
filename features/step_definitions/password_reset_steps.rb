@@ -6,7 +6,6 @@ Given(/^User foo@example\.com has not changed password for (\d+) months$/) do |c
 end
 
 When(/^they log\-in to app$/) do
-  p @user.password
   authenticate(@user)
 end
 

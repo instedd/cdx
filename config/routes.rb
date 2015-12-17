@@ -128,9 +128,9 @@ Rails.application.routes.draw do
   end
 
   scope :user do
-    get 'settings' => "users#settings"
-    patch 'settings' => "users#update_settings"
+    resource :settings, only: [:edit, :update]
   end
 
+  resources :users, only: [:edit, :update]
   resources :roles
 end

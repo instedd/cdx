@@ -23,4 +23,11 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  describe '.active_for_authentication?' do
+    let(:user) { User.make(is_active: false) }
+    it 'is falsey when is_active flag is :false' do
+      expect(user.active_for_authentication?).to be_falsey
+    end
+  end
 end
