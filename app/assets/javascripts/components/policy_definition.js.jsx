@@ -1,22 +1,19 @@
-var Tab = ReactTabs.Tab;
-var Tabs = ReactTabs.Tabs;
-var TabList = ReactTabs.TabList;
-var TabPanel = ReactTabs.TabPanel;
-
 var PolicyDefinition = React.createClass({
   getInitialState: function() {
     return {
-      statements: (this.props.definition || {}).statement || []
+      statements: (this.props.definition || {}).statement || [],
+      activeTab: 0
     };
   },
 
   newPolicy: function() {
     this.setState(React.addons.update(this.state, {
-      statements: { $push: [{ delegable: false}] }
+      statements: { $push: [{ delegable: false, resourceType: null, includeSubsites: false}] }
     }));
   },
 
   toggleDelegable: function(index) {
+    console.log("FIXME - index always get bound to 0");
     this.setState(React.addons.update(this.state, {
       statements: {
         [index]: {
@@ -26,22 +23,38 @@ var PolicyDefinition = React.createClass({
     }));
   },
 
+  onResourceTypeChange: function(index, newValue) {
+    this.setState(React.addons.update(this.state, {
+      statements: {
+        [index]: {
+          resourceType: { $set: newValue }
+        }
+      }
+    }));
+  },
+
+  setActiveTab: function(index) {
+    this.setState(React.addons.update(this.state, {
+      activeTab: { $set: index }
+    }));
+  },
+
   render: function() {
     return (
       <div>
         <div className="left-column">
-          <Tabs>
-            <TabList>
+          <div className="tabs">
+            <ul className="tabs-header">
               {this.state.statements.map(function(statement, index){
-                return <Tab><PolicyItem statement={statement} /></Tab>;
-              })}
-              <Tab><a onClick={this.newPolicy} href="javascript:">Add policy</a></Tab>
-            </TabList>
-            {this.state.statements.map(function(statement, index){
-              return <TabPanel><PolicyItemDetail statement={statement} toggleDelegable={this.toggleDelegable.bind(this, index)} /></TabPanel>;
+                return <li key={index} onClick={this.setActiveTab.bind(this,index)}><PolicyItem statement={statement} /></li>;
+              }.bind(this))}
+              <li><a onClick={this.newPolicy} href="javascript:">Add policy</a></li>
+            </ul>
+            {this.state.statements.map(function(statement, index) {
+              var tabClass = "tabs-content" + (this.state.activeTab === index ? " selected" : "");
+              return (<div className={tabClass} key={index}><PolicyItemDetail statement={statement} toggleDelegable={this.toggleDelegable.bind(this, index)} onResourceTypeChange={this.onResourceTypeChange.bind(this, index)} /></div>);
             }.bind(this))}
-            <TabPanel>Add policy panel</TabPanel>
-          </Tabs>
+          </div>
         </div>
 
       </div>

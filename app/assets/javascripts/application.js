@@ -23,7 +23,6 @@
 //= require react_ujs
 //= require react-dom
 //= require react-autosuggest
-//= require react-tabs
 //= require react-input-autosize
 //= require react-select
 //= require react-leaflet

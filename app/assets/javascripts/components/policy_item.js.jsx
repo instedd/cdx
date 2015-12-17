@@ -1,12 +1,6 @@
 var PolicyItem = React.createClass({
-  getInitialState: function() {
-    return {
-      statement: this.props.statement || {type: null, delegable: false, resources: null, actions: []}
-    };
-  },
-
   render: function() {
-    if(this.state.type == null) {
+    if(this.props.statement.resourceType == null) {
       return (
         <div>
           <div className="resource-type">New Policy</div>
@@ -16,7 +10,7 @@ var PolicyItem = React.createClass({
     } else {
       return (
         <div>
-          <div className="resource-type">POLICY WITH TYPE</div>
+          <div className="resource-type">{this.props.statement.resourceType}</div>
           <div className="description">Device, aca, algo esto</div>
         </div>
       );
