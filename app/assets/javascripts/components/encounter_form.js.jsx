@@ -7,8 +7,7 @@ var EncounterForm = React.createClass({
 
   getInitialState: function() {
     return {
-      encounter: this.props.encounter,
-      added_sample: null
+      encounter: this.props.encounter
     };
   },
 
@@ -53,21 +52,8 @@ var EncounterForm = React.createClass({
   },
 
   addNewSamplesModal: function(event) {
-    this._ajax_put('/encounters/add/new_sample', function(data) {
-      this.setState(React.addons.update(this.state, {
-        added_sample : { $set : data.sample },
-      }), function(){
-        this.refs.addedSampleModal.show();
-      });
-    });
+    this._ajax_put('/encounters/add/new_sample');
     event.preventDefault();
-  },
-
-  closeAddedSampleModal: function() {
-    this.refs.addedSampleModal.hide();
-    this.setState(React.addons.update(this.state, {
-      added_sample : { $set : null },
-    }));
   },
 
   removeNewSample: function(sample) {
@@ -230,28 +216,11 @@ var EncounterForm = React.createClass({
             <SamplesList samples={this.state.encounter.samples} onUnifySample={this.showUnifySamplesModal} />
             <NewSamplesList samples={this.state.encounter.new_samples} onRemoveSample={this.removeNewSample} />
 
-            {(function(){
-              var sample = this.state.added_sample;
-
-              if (sample == null) return;
-
-              return (
-                <Modal ref="addedSampleModal">
-                  <h2>Sample {sample.entity_id}</h2>
-                  <div className="modal-content">
-                    <i>This sample has not been used yet</i>
-                  </div>
-                  <div className="modal-buttons button-actions">
-                    <button type="button" className="btn-primary" onClick={this.closeAddedSampleModal}>OK</button>
-                  </div>
-                </Modal>);
-            }.bind(this))()}
-
-            <p>
-              <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
-            </p>
             <p>
               <a className="btn-href" href='#' onClick={this.addNewSamplesModal}><span className="icon-add"></span> Append new sample</a>
+            </p>
+            <p>
+              <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
             </p>
           </div>
 
