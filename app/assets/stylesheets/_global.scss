@@ -206,8 +206,14 @@ a[title="Back"] {
 }
 
 #nav-context {
+  background: image-url('arrow-top-header.png') no-repeat right top;
+  line-height: 60px;
   color: $white;
   margin-left: 10px;
+  padding-right: 35px;
+  display: inline-block;
+  vertical-align: middle;
+  height: 60px;
 }
 
 .flash {
