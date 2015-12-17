@@ -1,7 +1,7 @@
 class DeviceMailer < ApplicationMailer
   include BarcodeHelper
 
-  def setup_instructions(sender, receiptment, device)
+  def setup_instructions(sender, recipient, device)
     @device = device
 
     if !@device.device_model.supports_activation?
@@ -10,6 +10,6 @@ class DeviceMailer < ApplicationMailer
       end
     end
 
-    mail(to: receiptment, cc: sender.email, subject: "Setup instructions for #{device.name}")
+    mail(to: recipient, cc: sender.email, subject: "Setup instructions for #{device.name}")
   end
 end
