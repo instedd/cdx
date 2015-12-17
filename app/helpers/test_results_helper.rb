@@ -63,6 +63,7 @@ module TestResultsHelper
 
   def each_test_order_column
     yield "encounter.uuid", "ID", true
+    yield "site.name", "Site", false if @sites.size > 1
     yield "encounter.diagnosis", "Diagnosis", false
     yield "encounter.start_time", "Start Time", true
     yield "encounter.end_time", "End Time", true

@@ -30,8 +30,6 @@ class TestResultsController < ApplicationController
         @query["page_size"] = @page_size
         @query["offset"] = offset
 
-        @filter["institution.uuid"] = @institutions.first.uuid if @institutions.size == 1
-        @filter["site.uuid"] = @sites.first.uuid if @sites.size == 1
         @filter["device.uuid"] = @devices.first.uuid if @devices.size == 1
 
         execute_query
@@ -68,9 +66,7 @@ class TestResultsController < ApplicationController
   end
 
   def create_filter_for_test
-    filter = {}
-    filter["institution.uuid"] = params["institution.uuid"] if params["institution.uuid"].present?
-    filter["site.uuid"] = params["site.uuid"] if params["site.uuid"].present?
+    filter = create_filter_for_navigation_context
     filter["device.uuid"] = params["device.uuid"] if params["device.uuid"].present?
     filter["test.assays.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
     filter["test.assays.result"] = params["test.assays.result"] if params["test.assays.result"].present?
@@ -80,15 +76,21 @@ class TestResultsController < ApplicationController
   end
 
   def create_filter_for_test_order
-    filter = {}
-    filter["institution.uuid"] = params["institution.uuid"] if params["institution.uuid"].present?
+    filter = create_filter_for_navigation_context
     filter["encounter.uuid"] = params["encounter.id"] if params["encounter.id"].present?
-    # filter["site.uuid"] = params["site.uuid"] if params["site.uuid"].present?
     # filter["device.uuid"] = params["device.uuid"] if params["device.uuid"].present?
     filter["encounter.diagnosis.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
     filter["encounter.diagnosis.result"] = params["test.assays.result"] if params["test.assays.result"].present?
     # filter["sample.id"] = params["sample.id"] if params["sample.id"].present?
     filter["since"] = params["since"] if params["since"].present?
+    filter
+  end
+
+  def create_filter_for_navigation_context
+    filter = {}
+    filter["institution.uuid"] = @navigation_context.institution.uuid if @navigation_context.institution
+    # site.path is used in order to select entitites of descending sites also
+    filter["site.path"] = @navigation_context.site.uuid if @navigation_context.site
     filter
   end
 

@@ -13,4 +13,20 @@ class EncounterQuery < EntityQuery
   def initialize(params, policies)
     super(params, Cdx::Fields.encounter, policies)
   end
+
+  def execute
+    result = super
+    TestResultQuery.add_names_to result["encounters"]
+    result
+  end
+
+  protected
+
+  def self.add_names_to encounters
+    sites = indexed_model encounters, Site, ["site", "uuid"]
+
+    encounters.each do |encounter|
+      encounter["site"]["name"] = sites[encounter["site"]["uuid"]].try(:name) if encounter["site"]
+    end
+  end
 end

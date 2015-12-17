@@ -6,6 +6,10 @@ describe EncounterIndexer, elasticsearch: true do
     Institution.make
   end
 
+  let(:site) do
+    Site.make institution: institution
+  end
+
   let(:patient) do
     Patient.make(uuid: 'abc', core_fields: { 'gender' => 'male' }, custom_fields: { 'hiv' => 'positive' }, institution: institution)
   end
@@ -26,6 +30,10 @@ describe EncounterIndexer, elasticsearch: true do
       body: {
         "institution" => {
           "uuid" => institution.uuid
+        },
+        "site" => {
+          "uuid" => site.uuid,
+          "path" => [site.uuid]
         },
         "encounter" => {
           'start_time' => DateTime.new(2015,1,1,0,0,0).utc.iso8601,

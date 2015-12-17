@@ -172,6 +172,8 @@ test:
 encounter:
   institution:
     <<: *INSTITUTION
+  site:
+    <<: *SITE
   patient:
     <<: *PATIENT
   encounter:

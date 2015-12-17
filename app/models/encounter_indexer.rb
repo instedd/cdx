@@ -21,6 +21,7 @@ class EncounterIndexer < EntityIndexer
   def fields_to_index
     return {
       'institution' => institution_fields(encounter.institution),
+      'site'        => site_fields(encounter.site),
       'encounter'   => encounter_fields(encounter),
       'patient'     => patient_fields(encounter.patient)
     }
