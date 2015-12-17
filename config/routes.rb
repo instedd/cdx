@@ -88,7 +88,9 @@ Rails.application.routes.draw do
     get :nndd
   end
 
-  root :to => 'home#index'
+  devise_scope :user do
+    root to: "devise/sessions#new"
+  end
   get 'verify' => 'home#verify'
   get 'join' => 'home#join'
 
