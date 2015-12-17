@@ -12,34 +12,12 @@ var PolicyDefinition = React.createClass({
     }));
   },
 
-  toggleDelegable: function(index) {
+  updateStatement: function(index, changes) {
     this.setState(React.addons.update(this.state, {
       statements: {
-        [index]: {
-          delegable: { $apply: function(current) { return !current; } }
-        }
+        [index]: changes
       }
-    }));
-  },
-
-  onResourceTypeChange: function(index, newValue) {
-    this.setState(React.addons.update(this.state, {
-      statements: {
-        [index]: {
-          resourceType: { $set: newValue }
-        }
-      }
-    }));
-  },
-
-  toggleIncludeSubsites: function(index) {
-    this.setState(React.addons.update(this.state, {
-      statements: {
-        [index]: {
-          includeSubsites: { $apply: function(current) { return !current; } }
-        }
-      }
-    }));
+    }))
   },
 
   setActiveTab: function(index) {
@@ -61,7 +39,7 @@ var PolicyDefinition = React.createClass({
             </ul>
             {this.state.statements.map(function(statement, index) {
               var tabClass = "tabs-content" + (this.state.activeTab === index ? " selected" : "");
-              return (<div className={tabClass} key={index}><PolicyItemDetail statement={statement} index={index} toggleDelegable={this.toggleDelegable.bind(this, index)} onResourceTypeChange={this.onResourceTypeChange.bind(this, index)} toggleIncludeSubsites={this.toggleIncludeSubsites.bind(this, index)} /></div>);
+              return (<div className={tabClass} key={index}><PolicyItemDetail statement={statement} index={index} updateStatement={this.updateStatement.bind(this, index)} /></div>);
             }.bind(this))}
           </div>
         </div>
