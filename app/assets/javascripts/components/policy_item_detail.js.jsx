@@ -16,6 +16,8 @@ var PolicyItemDetail = React.createClass({
         <div>
           <label>Type</label>
           <CdxSelect items={this.resourceTypes} value={this.props.statement.resourceType} onChange={this.props.onResourceTypeChange} />
+          <input type="checkbox" id="includeSubsites" checked={this.props.statement.includeSubsites} onChange={this.props.toggleIncludeSubsites} />
+          <label htmlFor="includeSubsites">Include subsites</label>
         </div>
       </div>
     );
