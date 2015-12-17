@@ -69,12 +69,28 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource_or_scope)
-    nndd_path
+    if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
+      nndd_path
+    elsif has_access_to_sites_index?
+      sites_path
+    elsif has_access_to_devices_index?
+      devices_path
+    elsif has_access_to_device_models_index?
+      device_models_path
+    elsif has_access_to_test_results_index?
+      test_results_path
+    elsif can_delegate_permissions?
+      policies_path
+    end
   end
 
   def after_sign_out_path_for(resource_or_scope)
     new_user_session_path
   end
+
+  def nndd
+    render text: "NNDD"
+  end if Rails.env.test?
 
   protected
 

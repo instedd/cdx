@@ -24,7 +24,7 @@ module FeatureSpecHelpers
       user.save!
     end
 
-    goto_page LoginPage do |page|
+    goto_page HomePage do |page|
       page.form.user_name.set user.email
       page.form.password.set user.password
       page.form.login.click

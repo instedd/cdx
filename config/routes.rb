@@ -136,4 +136,6 @@ Rails.application.routes.draw do
     get 'settings' => "users#settings"
     patch 'settings' => "users#update_settings"
   end
+
+  get 'nndd' => 'application#nndd' if Rails.env.test?
 end
