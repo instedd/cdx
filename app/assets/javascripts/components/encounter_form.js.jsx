@@ -9,6 +9,10 @@ var EncounterForm = React.createClass({
     return {encounter: this.props.encounter};
   },
 
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({encounter: nextProps.encounter});
+  },
+
   save: function() {
     var callback = function() {
       window.location.href = '/encounters/' + this.state.encounter.id;
@@ -168,7 +172,6 @@ var EncounterForm = React.createClass({
     } else {
       diagnosisEditor = null;
     }
-
 
     return (
       <div>
