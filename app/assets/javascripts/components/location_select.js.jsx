@@ -102,6 +102,11 @@ var LocationSelect = React.createClass({
   },
 
   getOptions: function(input, callback) {
+    // getOptions is sometimes called with an object with name/value rather than the actual string
+    if (typeof(input) != "string") {
+      callback(null, {options: []});
+      return;
+    }
     var _this = this;
     $.get(gon.location_service_url + "/suggest", { name: input, limit: 100, ancestors: true, set: gon.location_service_set }, function(data) {
       callback(null, { options: _.map(data, _this.formatLocation), complete: data.length < 100 });
