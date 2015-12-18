@@ -8,7 +8,7 @@
               = image_tag "arrow-left.png"
             Encounter
 
-= react_component('EncounterShow', encounter: @encounter_as_json)
+= react_component('EncounterShow', encounter: @encounter_as_json, can_update: @can_update)
 
 - if @can_update
   .row

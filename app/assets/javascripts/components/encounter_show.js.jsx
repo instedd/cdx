@@ -25,6 +25,21 @@ var EncounterShow = React.createClass({
             <AssaysResultList assays={this.props.encounter.assays} />
 
             <p>{this.props.encounter.observations}</p>
+
+            {(function(){
+              var link_or_text = null
+              if (this.props.can_update) {
+                link_or_text = (<span>
+                  <a href={"/encounters/" + this.props.encounter.id + "/edit"}>reviewed</a>
+                </span>);
+              } else {
+                link_or_text = "reviewed"
+              }
+
+              if (this.props.encounter.has_dirty_diagnostic) {
+                return <p><i>There are new conditions that need to be {link_or_text}.</i></p>;
+              }
+            }.bind(this))()}
           </div>
         </div>
 

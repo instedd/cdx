@@ -10,6 +10,7 @@ class EncountersController < ApplicationController
       prepare_encounter_from_json
       create_new_samples
       @blender.save_and_index!
+      @encounter.updated_diagnostic_timestamp!
     end
   end
 
@@ -24,6 +25,10 @@ class EncountersController < ApplicationController
   end
 
   def edit
+    if @encounter.has_dirty_diagnostic?
+      @encounter.core_fields[Encounter::ASSAYS_FIELD] = @encounter.updated_diagnostic
+      prepare_blender_and_json
+    end
     return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
   end
 
@@ -34,6 +39,7 @@ class EncountersController < ApplicationController
       raise "encounter.id does not match" if params[:id].to_i != @encounter.id
       create_new_samples
       @blender.save_and_index!
+      @encounter.updated_diagnostic_timestamp!
     end
   end
 
@@ -107,6 +113,10 @@ class EncountersController < ApplicationController
     @encounter = Encounter.where("id = :id OR uuid = :id", params).first
     @encounter.new_samples = []
     @institution = @encounter.institution
+    prepare_blender_and_json
+  end
+
+  def prepare_blender_and_json
     @blender = Blender.new(@institution)
     @encounter_blender = @blender.load(@encounter)
     @encounter_as_json = as_json_edit.attributes!
@@ -242,6 +252,7 @@ class EncountersController < ApplicationController
   def as_json_edit
     Jbuilder.new do |json|
       json.(@encounter, :id)
+      json.has_dirty_diagnostic @encounter.has_dirty_diagnostic?
       json.assays (@encounter_blender.core_fields[Encounter::ASSAYS_FIELD] || [])
       json.observations @encounter_blender.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]
 
