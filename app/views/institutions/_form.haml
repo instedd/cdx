@@ -44,6 +44,12 @@
           = f.label :name, :class => 'block'
         .col
           = f.text_field :name, readonly: @readonly, :class => 'input-block'
+      - if not f.object.new_record?
+        .row
+          .col.px-1
+            = label_tag "kind", "Type", :class => 'block'
+          .col
+            .value= f.object.kind.humanize.titleize
       .row.button-actions
         .col
           = f.submit 'Save', class: 'btn-primary'
