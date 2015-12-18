@@ -34,7 +34,7 @@ This file contains the information on the CDX SSH client to be used for this ser
 ```json
 {
   "version": "0.0.1",
-  "url": "https://www.dropbox.com/sh/41bnf3nhx93h89h/AACViQ0lQHhUXQ2kAoQ29NN5a/cdx-win32-0.0.1.exe?dl=1"
+  "url": "https://github.com/instedd/cdx-sync-client/releases/download/release-v0.1.0/cdx-win32-0.1.0.exe"
 }
 ```
 
@@ -61,7 +61,7 @@ This file contains all environment values to be injected into the Docker contain
 
 Again, remember to change `cdx.example.com` to your corresponding hostname.
 
-`DEVISE_MAILER_SENDER` should be the address from which user emails will be sent.
+`MAILER_SENDER` should be the address from which user emails will be sent.
 
 The last required setting is `SECRET_KEY_BASE`, which should be set to a random hex value to be kept secret; a sample value can be generated using Ruby by running `SecureRandom.hex(128)`.
 
@@ -72,7 +72,7 @@ MYSQL_PASSWORD=root
 REDIS_URL=redis://redis:6379
 ELASTICSEARCH_URL=elasticsearch:9200
 
-DEVISE_MAILER_SENDER=info@cdx.example.com
+MAILER_SENDER=info@cdx.example.com
 
 SECRET_KEY_BASE=
 
