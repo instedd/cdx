@@ -3,6 +3,7 @@ Given(/^User foo@example\.com has not changed password for (\d+) months$/) do |c
     password: 'abc123abc',
     password_changed_at: changed.to_i.months.ago
   )
+  Institution.make user: @user
 end
 
 When(/^they log\-in to app$/) do
