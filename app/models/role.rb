@@ -7,6 +7,8 @@ class Role < ActiveRecord::Base
   has_and_belongs_to_many :users,
     after_add: :update_user_computed_policies,
     after_remove: :update_user_computed_policies
+    
+  has_many :alert_recipients    
 
   attr_accessor :definition
 

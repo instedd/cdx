@@ -1,12 +1,12 @@
 Given(/^the user has an account$/) do
   institution = Institution.make
-  @user1 = User.make(password: '12345678', first_name: 'Bob')
-  @user1.grant_superadmin_policy
-  authenticate(@user1)
+  @user = User.make(password: '12345678', first_name: 'Bob', email: 'zaa1aa@ggg.com')
+  @user.grant_superadmin_policy
+  authenticate(@user)
   
   #needed for the @sites
   default_params =  {context: institution.uuid}
-  @navigation_context = NavigationContext.new(@user1, default_params[:context])
+  @navigation_context = NavigationContext.new(@user, default_params[:context])
 end
 
 

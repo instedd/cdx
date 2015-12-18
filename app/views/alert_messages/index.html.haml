@@ -1,0 +1,20 @@
+.row
+  .col
+    = cdx_table title: 'Alert Messages Sent' do |t|
+      - t.thead do
+        %tr
+          %th Alert Name
+          %th View Alert
+          %th Email
+          %th Date Created
+          %th channel
+          %th Message Body
+      - t.tbody do
+        - alertmessages.each do |alertmessage|
+          %tr
+            %td= alertmessage.alert.name
+            %td= link_to 'View', alertmessage.alert
+            %td= alertmessage.user.email
+            %td= alertmessage.created_at
+            %td= alertmessage.alert.channel_type
+            %td= alertmessage.message_sent

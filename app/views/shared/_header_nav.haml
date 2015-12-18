@@ -35,6 +35,8 @@
             = link_to "Alerts", alerts_path
           %li{:class => params[:controller] == "incidents" && "active"}
             = link_to "Incidents", incidents_path
+          %li{:class => params[:controller] == "incidents" && "active"}
+            = link_to "Alert Messages", alert_messages_path
         - if can_delegate_permissions?
           %li{:class => params[:controller] == "policies" && "active"}
             = link_to "Policies", policies_path

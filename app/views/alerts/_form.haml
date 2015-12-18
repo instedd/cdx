@@ -80,38 +80,49 @@
 
   .row
     .col.pe-2
+      = f.label :DEVICE
+    .col
+      = cdx_select form: f, name: :description, multi: '{true}', class: 'input-x-large' do |select|
+        - select.item "", "None"
+        - select.items @devices, :id, :name
+
+
+  .row
+    .col.pe-2
       = f.label :AGGREGATION
     .col
       = f.select :aggregation_type, Alert.aggregation_types.keys 
 
   .row
     .col.pe-2
+      = f.label :AGGREGATION_FREQUENCY
+    .col
+      = f.select :aggregation_frequency, Alert.aggregation_frequencies.keys
+	
+	
+  .row
+    .col.pe-2
       = f.label :CHANNEL
     .col
       = f.select :channel_type, Alert.channel_types.keys 
 
-  .row
-    .col.pe-2
-      = f.label :RECIPIENTS
-    .col
-      = link_to "Add a recipient", alerts_path
-  .row
-  .col.pe-2
-    &nbsp;
-  .col
-    = f.fields_for :alert_recipients do |recipient|
-      = recipient.text_field :email
-      - if recipient.object.persisted?
-        = recipient.check_box :_destroy
-        = recipient.label :_destroy, "Destroy"
-	
+
 
   .row
     .col.pe-2
-      = f.label :LIMIT
+      = f.label :ROLE
     .col
-      &nbsp;
-      = :SMS_per_day
+      / NOTE: could not get ':alert_recipient.id' working::  cdx_select form: f, name: alert_recipient, class: 'input-x-large11' do |select|
+      = cdx_select form: f, name: :roles, multi: '{true}', class: 'input-x-large' do |select|
+        - select.item "", "None"
+        - select.items @roles, :id, :name
+
+
+  .row
+    .col.pe-2
+      = f.label :SMS_PER_DAY_LIMIT
+    .col
+      =f.text_field :sms_limit
 
   .row
     .col.pe-2

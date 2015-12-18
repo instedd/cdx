@@ -4,6 +4,7 @@ class Alert < ActiveRecord::Base
  
   has_many :alert_histories
   has_many :alert_recipients
+  has_many  :recipient_notification_history
   
    
   accepts_nested_attributes_for :alert_recipients, reject_if: :all_blank, allow_destroy: true
@@ -15,10 +16,18 @@ class Alert < ActiveRecord::Base
   validates_presence_of :name
   validates_presence_of :description
 #  validates_presence_of :site
+ 
+ #in the view,could not get this working':alert_recipient.id' working::  cdx_select form: f, name: alert_recipient, class: 'input-x-large' do |select|
+ #so fix was to use a new varible
+#  attr_accessor :roles
   
   enum category_type: [ :anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency, :workflow_delays]  
   enum aggregation_type: [ :per_record, :aggregated]
+  enum aggregation_frequency: [ :per_hour, :per_day, :per_month]
   enum channel_type: [ :web, :sms, :sms_and_web]
+  
+  #for the alert _form, could not get the cdx_select element working when referencing a child table 
+  attr_accessor :roles
   
  after_update :recreate_alert_percolator
   
