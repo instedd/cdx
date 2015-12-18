@@ -3,20 +3,21 @@ require 'spec_helper'
 describe Sample do
 
   context "merge" do
+    let!(:institution) { Institution.make }
+    let!(:site) { institution.sites.make }
 
     let(:sample) do
-      Sample.make.tap do |s|
+      Sample.make(institution: institution).tap do |s|
         s.sample_identifiers.make(entity_id: 'id:a', uuid: 'uuid:A')
         s.sample_identifiers.make(entity_id: 'id:b', uuid: 'uuid:B')
       end
     end
 
     it "should join identifiers from both samples" do
-      other_sample = Sample.make_unsaved(sample_identifiers: [
-        SampleIdentifier.new(entity_id: 'id:c', uuid: 'uuid:C'),
-        SampleIdentifier.new(entity_id: 'id:d', uuid: 'uuid:D')
+      other_sample = Sample.make_unsaved(institution: institution, sample_identifiers: [
+        SampleIdentifier.new(site: site, entity_id: 'id:c', uuid: 'uuid:C'),
+        SampleIdentifier.new(site: site, entity_id: 'id:d', uuid: 'uuid:D')
       ])
-
       sample.merge(other_sample)
 
       expect(sample.sample_identifiers.map(&:entity_id)).to contain_exactly('id:a','id:b','id:c','id:d')
@@ -24,9 +25,10 @@ describe Sample do
     end
 
     it "should add repeated identifiers with an uuid" do
+      other_site = institution.sites.make
       other_sample = Sample.make_unsaved(sample_identifiers: [
-        SampleIdentifier.new(entity_id: 'id:a', uuid: 'uuid:X'),
-        SampleIdentifier.new(entity_id: 'id:d', uuid: 'uuid:D')
+        SampleIdentifier.new(site: other_site, entity_id: 'id:a', uuid: 'uuid:X'),
+        SampleIdentifier.new(site: other_site, entity_id: 'id:d', uuid: 'uuid:D')
       ])
 
       sample.merge(other_sample)

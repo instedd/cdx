@@ -39,6 +39,13 @@ class NavigationContext
   end
 
   def to_hash
-    entity ? {name: name, uuid: uuid} : {}
+    Hash.new.tap do |h|
+      if entity
+        h[:name] = name  
+        h[:uuid] = uuid
+      end
+      h[:institution] = { name: institution.name, uuid: institution.uuid } if institution
+      h[:site] = { name: site.name, uuid: site.uuid } if site
+    end
   end
 end

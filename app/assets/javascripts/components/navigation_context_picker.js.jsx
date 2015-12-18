@@ -47,7 +47,7 @@ var NavigationContextPicker = React.createClass({
     this.setState(React.addons.update(this.state, {
       context: { $set: site }
     }), function() {
-      var new_context_url = URI(window.location.href).search({context: site.uuid}).toString();
+      var new_context_url = URI(window.location.href).setSearch({context: site.uuid}).toString();
       Turbolinks.visit(new_context_url);
     });
   },

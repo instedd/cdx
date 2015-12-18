@@ -78,6 +78,8 @@ class DeviceMessageProcessor
         parent_blenders[klazz].merge_attributes attributes_for(klazz.entity_scope)
       end
 
+      parent_blenders[Encounter].site = device.site
+
       # Commit changes
       @blender.save_and_index!
     end

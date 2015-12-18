@@ -1,21 +1,24 @@
 var EncounterNew = React.createClass({
   getInitialState: function() {
     return {encounter: {
-      institution: null,
+      institution: this.props.context.institution,
+      site: null,
       patient: null,
       samples: [],
+      new_samples: [],
       test_results: [],
       assays: [],
       observations: ''
     }};
   },
 
-  setInstitution: function(institution) {
+  setSite: function(site) {
     this.setState(React.addons.update(this.state, {
       encounter: {
-        institution: { $set: institution },
+        site: { $set: site },
         patient: { $set: null },
         samples: { $set: [] },
+        new_samples: { $set: [] },
         test_results: { $set: [] },
         assays: { $set: [] },
         observations: { $set: '' }
@@ -24,16 +27,17 @@ var EncounterNew = React.createClass({
   },
 
   render: function() {
-    var institutionSelect = <InstitutionSelect onChange={this.setInstitution} url="/encounters/institutions"/>;
+    var sitesUrl = URI("/encounters/sites").query({context: this.props.context.institution.uuid});
+    var siteSelect = <SiteSelect onChange={this.setSite} url={sitesUrl} defaultSiteUuid={_.get(this.props.context.site, 'uuid')} />;
 
-    if (this.state.encounter.institution == null)
-      return (<div>{institutionSelect}</div>);
+    if (this.state.encounter.site == null)
+      return (<div>{siteSelect}</div>);
 
     return (
       <div>
-        {institutionSelect}
+        {siteSelect}
 
-        <EncounterForm encounter={this.state.encounter} />
+        <EncounterForm encounter={this.state.encounter} context={this.props.context} />
       </div>
     );
   },

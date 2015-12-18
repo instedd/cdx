@@ -83,11 +83,21 @@ end
 
 Encounter.blueprint do
   institution { object.patient.try(:institution) || Institution.make }
+  site { object.institution.sites.first || object.institution.sites.make }
   core_fields { { "id" => "encounter-#{Sham.sn}" } }
 end
 
+def first_or_make_site_unless_manufacturer(institution)
+  unless institution.kind_manufacturer?
+    institution.sites.first || institution.sites.make
+  end
+end
+
 SampleIdentifier.blueprint do
-  sample
+  sample { Sample.make_unsaved({}.tap do |h|
+    h[:institution] = object.site.institution if object.site
+  end)}
+  site { first_or_make_site_unless_manufacturer(object.sample.institution) }
 end
 
 Sample.blueprint do

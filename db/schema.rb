@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151210181714) do
+ActiveRecord::Schema.define(version: 20151210184357) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -85,8 +85,8 @@ ActiveRecord::Schema.define(version: 20151210181714) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",                  limit: 4
-    t.datetime "published_at"
     t.boolean  "supports_activation"
+    t.datetime "published_at"
     t.string   "support_url",                     limit: 255
     t.string   "picture_file_name",               limit: 255
     t.string   "picture_content_type",            limit: 255
@@ -128,9 +128,11 @@ ActiveRecord::Schema.define(version: 20151210181714) do
     t.datetime "updated_at"
     t.boolean  "is_phantom",                   default: true
     t.datetime "deleted_at"
+    t.integer  "site_id",        limit: 4
   end
 
   add_index "encounters", ["deleted_at"], name: "index_encounters_on_deleted_at", using: :btree
+  add_index "encounters", ["site_id"], name: "index_encounters_on_site_id", using: :btree
 
   create_table "filters", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
@@ -268,6 +270,8 @@ ActiveRecord::Schema.define(version: 20151210181714) do
     t.string   "uuid",       limit: 255
     t.integer  "site_id",    limit: 4
     t.datetime "deleted_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "sample_identifiers", ["deleted_at"], name: "index_sample_identifiers_on_deleted_at", using: :btree
@@ -293,26 +297,28 @@ ActiveRecord::Schema.define(version: 20151210181714) do
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
 
   create_table "sites", force: :cascade do |t|
-    t.string   "name",                   limit: 255
-    t.integer  "institution_id",         limit: 4
-    t.string   "address",                limit: 255
-    t.string   "city",                   limit: 255
-    t.string   "state",                  limit: 255
-    t.string   "zip_code",               limit: 255
-    t.string   "country",                limit: 255
-    t.string   "region",                 limit: 255
-    t.float    "lat",                    limit: 24
-    t.float    "lng",                    limit: 24
+    t.string   "name",                             limit: 255
+    t.integer  "institution_id",                   limit: 4
+    t.string   "address",                          limit: 255
+    t.string   "city",                             limit: 255
+    t.string   "state",                            limit: 255
+    t.string   "zip_code",                         limit: 255
+    t.string   "country",                          limit: 255
+    t.string   "region",                           limit: 255
+    t.float    "lat",                              limit: 24
+    t.float    "lng",                              limit: 24
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "location_geoid",         limit: 60
-    t.string   "uuid",                   limit: 255
-    t.integer  "parent_id",              limit: 4
-    t.string   "prefix",                 limit: 255
-    t.string   "sample_id_reset_policy", limit: 255, default: "yearly"
+    t.string   "location_geoid",                   limit: 60
+    t.string   "uuid",                             limit: 255
+    t.integer  "parent_id",                        limit: 4
+    t.string   "prefix",                           limit: 255
+    t.string   "sample_id_reset_policy",           limit: 255, default: "yearly"
     t.datetime "deleted_at"
-    t.string   "main_phone_number",      limit: 255
-    t.string   "email_address",          limit: 255
+    t.string   "main_phone_number",                limit: 255
+    t.string   "email_address",                    limit: 255
+    t.string   "last_sample_identifier_entity_id", limit: 255
+    t.date     "last_sample_identifier_date"
   end
 
   add_index "sites", ["deleted_at"], name: "index_sites_on_deleted_at", using: :btree
@@ -422,4 +428,5 @@ ActiveRecord::Schema.define(version: 20151210181714) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
+  add_foreign_key "encounters", "sites"
 end

@@ -65,6 +65,7 @@ class Blender
       @garbage << child
     end
 
+    blender.mark_for_destruction
     blender
   end
 
@@ -366,8 +367,9 @@ class Blender
     def sweep
       @garbage.compact.uniq.each do |e|
         begin
-          e.destroy if e.phantom? || @marked_for_destruction
-        rescue ActiveRecord::RecordNotDestroyed
+          # We need to reload the entity as some of its dependencies might have been removed
+          e.reload.destroy if e.phantom? || @marked_for_destruction
+        rescue ActiveRecord::RecordNotDestroyed, ActiveRecord::RecordNotFound => ex
           # This entity still had associated children, move on to the next one
         end
       end
@@ -492,6 +494,8 @@ class Blender
       Patient
     end
 
+    attr_accessor :site
+
     protected
 
     def before_save(entity)
@@ -512,6 +516,8 @@ class Blender
 
       entity.core_fields["start_time"] = min_start_time.iso8601
       entity.core_fields["end_time"] = max_end_time.iso8601
+
+      entity.site ||= self.site
     end
 
     def fetch_times(test_results, field)
@@ -576,9 +582,9 @@ class Blender
 
     def merge_attributes(entity_or_attributes)
       super
-      @sample_id ||= entity_or_attributes.kind_of?(Hash) \
+      @sample_id = (entity_or_attributes.kind_of?(Hash) \
         ? entity_or_attributes[:sample_id].try(:to_s) \
-        : entity_or_attributes.sample_identifier.try(:entity_id)
+        : entity_or_attributes.sample_identifier.try(:entity_id)) || @sample_id
     end
 
     protected
@@ -589,15 +595,20 @@ class Blender
       site_id = entity.site_id
 
       existing_identifier = entity.sample_identifier
-      existing_identifier_does_not_match =  existing_identifier && (existing_identifier.sample != sample || existing_identifier.sample_id != sample_id || existing_identifier.site_id != site_id)
 
       if sample.nil?
         entity.sample_identifier = nil
         @garbage << existing_identifier
-      elsif existing_identifier.nil? || existing_identifier_does_not_match
+      elsif existing_identifier.nil? || existing_identifier.entity_id != sample_id || existing_identifier.site_id != site_id
         matching_sample_identifier = sample.sample_identifiers.all.find { |si| si.entity_id == sample_id && si.site_id == site_id }
         entity.sample_identifier = matching_sample_identifier || sample.sample_identifiers.build(entity_id: sample_id, site_id: site_id)
         @garbage << existing_identifier
+      elsif existing_identifier.sample != sample
+        existing_identifier.sample = sample
+        existing_identifier.site_id = site_id
+        existing_identifier.save!
+      else
+        entity.sample_identifier.try :reload
       end
     end
 

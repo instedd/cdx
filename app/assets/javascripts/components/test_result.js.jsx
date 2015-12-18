@@ -26,7 +26,7 @@ var AssaysResultList = React.createClass({
             <div className="row" key={index}>
               <div className="col pe-4">
                 <div className="underline">
-                  <span><b>{assay.name.toUpperCase()}</b></span>
+                  <span><b>{(assay.name || assay.condition).toUpperCase()}</b></span>
                 </div>
               </div>
               <div className="col pe-3">

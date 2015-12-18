@@ -29,6 +29,8 @@ end
 
 class NewEncounterPage < EncounterFormPage
   set_url "/encounters/new"
+
+  section :site, CdxSelect, "label", text: /Site/i
 end
 
 class EditEncounterPage < EncounterFormPage

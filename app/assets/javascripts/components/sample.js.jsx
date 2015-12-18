@@ -52,3 +52,24 @@ var SamplesList = React.createClass({
     );
   }
 });
+
+var NewSamplesList = React.createClass({
+  render: function() {
+    return (
+      <ul className="samples">
+        {this.props.samples.map(function(sample) {
+          var removeSample = function(event) {
+            this.props.onRemoveSample(sample);
+            event.preventDefault();
+          }.bind(this);
+
+          return (<li key={sample.entity_id}>
+            {sample.entity_id}
+
+            <a className="unify" href="#" onClick={removeSample}><span className="icon-remove"></span></a>
+          </li>)
+        }.bind(this))}
+      </ul>
+    );
+  }
+});

@@ -1,20 +1,21 @@
 class EncountersController < ApplicationController
-  before_filter :load_institutions
   before_filter :load_encounter, only: %W(show edit)
 
   def new
-    return unless authorize_resource(@institutions, CREATE_INSTITUTION_ENCOUNTER)
+    return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
   end
 
   def create
     perform_encounter_action "creating encounter" do
       prepare_encounter_from_json
+      create_new_samples
       @blender.save_and_index!
     end
   end
 
-  def institutions
-    render json: as_json_institution_list(@institutions).attributes!
+  def sites
+    sites = check_access(@navigation_context.institution.sites, READ_SITE)
+    render json: as_json_site_list(sites).attributes!
   end
 
   def show
@@ -31,6 +32,7 @@ class EncountersController < ApplicationController
       prepare_encounter_from_json
       return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
       raise "encounter.id does not match" if params[:id].to_i != @encounter.id
+      create_new_samples
       @blender.save_and_index!
     end
   end
@@ -77,9 +79,18 @@ class EncountersController < ApplicationController
     end
   end
 
+  def new_sample
+    perform_encounter_action "creating new sample" do
+      prepare_encounter_from_json
+      added_sample = new_sample_for_site
+      @extended_respone = { sample: added_sample }
+    end
+  end
+
   private
 
   def perform_encounter_action(action)
+    @extended_respone = {}
     begin
       yield
     rescue Blender::MergeNonPhantomError => e
@@ -88,16 +99,13 @@ class EncountersController < ApplicationController
       Rails.logger.error(e.backtrace.unshift(e.message).join("\n"))
       render json: { status: :error, message: "Error #{action} #{e.class}", encounter: as_json_edit.attributes! }
     else
-      render json: { status: :ok, encounter: as_json_edit.attributes! }
+      render json: { status: :ok, encounter: as_json_edit.attributes! }.merge(@extended_respone)
     end
-  end
-
-  def load_institutions
-    @institutions = check_access(Institution, CREATE_INSTITUTION_ENCOUNTER)
   end
 
   def load_encounter
     @encounter = Encounter.where("id = :id OR uuid = :id", params).first
+    @encounter.new_samples = []
     @institution = @encounter.institution
     @blender = Blender.new(@institution)
     @encounter_blender = @blender.load(@encounter)
@@ -105,17 +113,23 @@ class EncountersController < ApplicationController
   end
 
   def institution_by_uuid(uuid)
-    @institutions.where(uuid: uuid).first
+    check_access(Institution, READ_INSTITUTION).where(uuid: uuid).first
+  end
+
+  def site_by_uuid(institution, uuid)
+    check_access(institution.sites, CREATE_SITE_ENCOUNTER).where(uuid: uuid).first
   end
 
   def prepare_encounter_from_json
     encounter_param = @encounter_param = JSON.parse(params[:encounter])
     @encounter = encounter_param['id'] ? Encounter.find(encounter_param['id']) : Encounter.new
+    @encounter.new_samples = []
     @encounter.is_phantom = false
 
     if @encounter.new_record?
       @institution = institution_by_uuid(encounter_param['institution']['uuid'])
       @encounter.institution = @institution
+      @encounter.site = site_by_uuid(@institution, encounter_param['site']['uuid'])
     else
       @institution = @encounter.institution
     end
@@ -125,6 +139,10 @@ class EncountersController < ApplicationController
 
     encounter_param['samples'].each do |sample_param|
       add_sample_by_uuids sample_param['uuids']
+    end
+
+    encounter_param['new_samples'].each do |new_sample_param|
+      @encounter.new_samples << {entity_id: new_sample_param['entity_id']}
     end
 
     encounter_param['test_results'].each do |test_param|
@@ -144,10 +162,26 @@ class EncountersController < ApplicationController
     )
   end
 
+  def create_new_samples
+    @encounter.new_samples.each do |new_sample|
+      add_new_sample_by_entity_id new_sample[:entity_id]
+    end
+    @encounter.new_samples = []
+  end
+
   def scoped_samples
-    Sample.where("samples.id in (#{authorize_resource(TestResult, QUERY_TEST).joins(:sample_identifier).select('sample_identifiers.sample_id').to_sql})")
+    samples_in_encounter = "samples.encounter_id = #{@encounter.id} OR " if @encounter.try(:persisted?)
+    # TODO this logic is not enough to grab an empty sample from one encounter and move it to another. but is ok for CRUD experience
+
+    Sample.where("#{samples_in_encounter} samples.id in (#{authorize_resource(TestResult, QUERY_TEST).joins(:sample_identifier).select('sample_identifiers.sample_id').to_sql})")
               .where(institution: @institution)
               .joins(:sample_identifiers)
+  end
+
+  def new_sample_for_site
+    sample = { entity_id: @encounter.site.generate_next_sample_entity_id! }
+    @encounter.new_samples << sample
+    sample
   end
 
   def add_sample_by_uuid(uuid)
@@ -159,6 +193,15 @@ class EncountersController < ApplicationController
 
   def add_sample_by_uuids(uuids)
     sample_blender = merge_samples_by_uuid(uuids)
+    @blender.merge_parent(sample_blender, @encounter_blender)
+    sample_blender
+  end
+
+  def add_new_sample_by_entity_id(entity_id)
+    sample = Sample.new(institution: @encounter.institution)
+    sample.sample_identifiers.build(site: @encounter.site, entity_id: entity_id)
+
+    sample_blender = @blender.load(sample)
     @blender.merge_parent(sample_blender, @encounter_blender)
     sample_blender
   end
@@ -206,6 +249,10 @@ class EncountersController < ApplicationController
         as_json_institution(json, @institution)
       end
 
+      json.site do
+        as_json_site(json, @encounter.site)
+      end
+
       json.patient do
         @encounter_blender.patient.blank? ? json.nil! : json.(@encounter_blender.patient, :plain_sensitive_data, :core_fields)
       end
@@ -213,6 +260,8 @@ class EncountersController < ApplicationController
       json.samples @encounter_blender.samples.uniq do |sample|
         as_json_sample(json, sample)
       end
+
+      json.(@encounter, :new_samples)
 
       json.test_results @encounter_blender.test_results.uniq do |test_result|
         as_json_test_result(json, test_result.single_entity)
@@ -228,11 +277,11 @@ class EncountersController < ApplicationController
     end
   end
 
-  def as_json_institution_list(institutions)
+  def as_json_site_list(sites)
     Jbuilder.new do |json|
-      json.total_count institutions.size
-      json.institutions institutions do |institution|
-        as_json_institution(json, institution)
+      json.total_count sites.size
+      json.sites sites do |site|
+        as_json_site(json, site)
       end
     end
   end
@@ -273,5 +322,9 @@ class EncountersController < ApplicationController
 
   def as_json_institution(json, institution)
     json.(institution, :uuid, :name)
+  end
+
+  def as_json_site(json, site)
+    json.(site, :uuid, :name)
   end
 end

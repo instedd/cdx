@@ -6,7 +6,9 @@ var EncounterForm = React.createClass({
   },
 
   getInitialState: function() {
-    return {encounter: this.props.encounter};
+    return {
+      encounter: this.props.encounter
+    };
   },
 
   componentWillReceiveProps: function(nextProps) {
@@ -49,6 +51,19 @@ var EncounterForm = React.createClass({
     event.preventDefault();
   },
 
+  addNewSamplesModal: function(event) {
+    this._ajax_put('/encounters/add/new_sample');
+    event.preventDefault();
+  },
+
+  removeNewSample: function(sample) {
+    var filtered = _.filter(this.state.encounter.new_samples, function(s) { return s.entity_id != sample.entity_id });
+
+    this.setState(React.addons.update(this.state, {
+      encounter : { new_samples: { $set : filtered }},
+    }));
+  },
+
   _ajax_put: function(url, success, extra_data) {
     this._ajax('PUT', url, success, extra_data);
   },
@@ -67,7 +82,7 @@ var EncounterForm = React.createClass({
             encounter: { $set: data.encounter }
           }), function(){
             if (data.status == 'ok' && success) {
-              success.call(_this);
+              success.call(_this, data);
             }
           });
         }
@@ -133,8 +148,6 @@ var EncounterForm = React.createClass({
   },
 
   render: function() {
-    var institutionSelect = <InstitutionSelect onChange={this.setInstitution} url="/encounters/institutions"/>;
-
     if (this.state.encounter.institution == null)
       return (<div>{institutionSelect}</div>);
 
@@ -175,6 +188,20 @@ var EncounterForm = React.createClass({
 
     return (
       <div>
+        {(function(){
+          if (this.state.encounter.id == null) return;
+
+          return (
+          <div className="row">
+            <div className="col pe-2">
+              <label>Site</label>
+            </div>
+            <div className="col">
+              <p>{this.props.encounter.site.name}</p>
+            </div>
+          </div>);
+        }.bind(this))()}
+
         <FlexFullRow>
           <PatientCard patient={this.state.encounter.patient} />
         </FlexFullRow>
@@ -187,6 +214,11 @@ var EncounterForm = React.createClass({
           </div>
           <div className="col">
             <SamplesList samples={this.state.encounter.samples} onUnifySample={this.showUnifySamplesModal} />
+            <NewSamplesList samples={this.state.encounter.new_samples} onRemoveSample={this.removeNewSample} />
+
+            <p>
+              <a className="btn-href" href='#' onClick={this.addNewSamplesModal}><span className="icon-add"></span> Append new sample</a>
+            </p>
             <p>
               <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
             </p>
