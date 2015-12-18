@@ -1,15 +1,14 @@
-class IncidentsController < ApplicationController
+class AlertMessagesController < ApplicationController
   respond_to :html, :json
-  expose(:incidents) { current_user.alert_histories.where({for_aggregation_calculation: false}) }
+  expose(:alertmessages) { current_user.recipient_notification_history }
 
-#  expose(:filter, attributes: :filter_params)
 
   before_filter do
     head :forbidden unless has_access_to_test_results_index?
   end
 
   def index
-    respond_with incidents
+    respond_with alertmessages
   end
 
   def show

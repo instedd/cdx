@@ -28,6 +28,7 @@ var CdxSelect = React.createClass({
       options={this.props.items}
       placeholder={placeholder}
       clearable={false}
+      multi={this.props.multi}
       onChange={this.onChange}>
     </Select>);
   }

@@ -15,4 +15,5 @@
             %td= link_to 'View', incident.alert
             %td= incident.user.email
             %td= incident.created_at
-            %td= link_to 'Result',test_result_path(incident.test_result.uuid)
+            - if incident.test_result != nil
+              %td= link_to 'Result',test_result_path(incident.test_result.uuid)

@@ -1,23 +1,36 @@
+include Alerts
+
 class AlertJob < ActiveJob::Base
   queue_as :default
 
   def perform(alert_id, test_elasticsearch_id)    
     alertHistory = AlertHistory.new
     alert_id.slice! "alert_"
-    @alert = Alert.find(alert_id)
+    @alert = Alert.includes(:alert_recipients).find(alert_id)
     
     alertHistory.alert = @alert
     alertHistory.user = @alert.user
     testResult = TestResult.find_by_uuid(test_elasticsearch_id)
     alertHistory.test_result = testResult
+    
+    #store that it is only used for alert aggregations if an aggregation type of alert
+    if @alert.aggregated?
+       alertHistory.for_aggregation_calculation  = true
+    end
+    
     alertHistory.save!
 
     #TODO, need to inform poirot  for example look at:
     # test = TestResultQuery.find_by_elasticsearch_id(test_elasticsearch_id)
     # subscriber.notify_test(test)
 
-    AlertMailer.alert_email(@alert).deliver_now
-
+    #only inform the recipients if the alert is a per_record type
+    
+    if @alert.per_record?
+# AlertMailer.alert_email(@alert).deliver_now
+      alert_inform_recipient(@alert, alertHistory, 0)
+    end
+   
     #TODO ,maybe use  AlertMailer.alert_email(@alert).deliver_later
   end
 end

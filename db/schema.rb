@@ -11,15 +11,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151214171318) do
+ActiveRecord::Schema.define(version: 20151216150910) do
 
   create_table "alert_histories", force: :cascade do |t|
-    t.boolean  "read",                     default: false
-    t.integer  "user_id",        limit: 4
-    t.integer  "alert_id",       limit: 4
-    t.integer  "test_result_id", limit: 4
+    t.boolean  "read",                                  default: false
+    t.integer  "user_id",                     limit: 4
+    t.integer  "alert_id",                    limit: 4
+    t.integer  "test_result_id",              limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "for_aggregation_calculation",           default: false
   end
 
   add_index "alert_histories", ["alert_id"], name: "index_alert_histories_on_alert_id", using: :btree
@@ -31,26 +32,29 @@ ActiveRecord::Schema.define(version: 20151214171318) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "email",      limit: 255
+    t.integer  "role_id",    limit: 4
   end
 
   add_index "alert_recipients", ["alert_id"], name: "index_alert_recipients_on_alert_id", using: :btree
   add_index "alert_recipients", ["user_id"], name: "index_alert_recipients_on_user_id", using: :btree
 
   create_table "alerts", force: :cascade do |t|
-    t.integer  "user_id",          limit: 4
-    t.string   "name",             limit: 255
-    t.string   "description",      limit: 255
-    t.boolean  "enabled",                        default: true
+    t.integer  "user_id",               limit: 4
+    t.string   "name",                  limit: 255
+    t.string   "description",           limit: 255
+    t.boolean  "enabled",                             default: true
     t.datetime "last_alert"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "error_code",       limit: 255
-    t.integer  "category_type",    limit: 4
-    t.integer  "aggregation_type", limit: 4,     default: 0
-    t.text     "query",            limit: 65535
-    t.text     "message",          limit: 65535
-    t.integer  "channel_type",     limit: 4,     default: 0
-    t.integer  "site_id",          limit: 4
+    t.string   "error_code",            limit: 255
+    t.integer  "category_type",         limit: 4
+    t.integer  "aggregation_type",      limit: 4,     default: 0
+    t.text     "query",                 limit: 65535
+    t.text     "message",               limit: 65535
+    t.integer  "channel_type",          limit: 4,     default: 0
+    t.integer  "site_id",               limit: 4
+    t.integer  "aggregation_frequency", limit: 4,     default: 0
+    t.integer  "sms_limit",             limit: 4,     default: 0
   end
 
   add_index "alerts", ["user_id"], name: "index_alerts_on_user_id", using: :btree
@@ -288,6 +292,19 @@ ActiveRecord::Schema.define(version: 20151214171318) do
     t.datetime "updated_at"
     t.string   "name",       limit: 255
   end
+
+  create_table "recipient_notification_histories", force: :cascade do |t|
+    t.integer  "user_id",            limit: 4
+    t.integer  "alert_recipient_id", limit: 4
+    t.integer  "alert_history_id",   limit: 4
+    t.integer  "alert_id",           limit: 4
+    t.integer  "channel_type",       limit: 4
+    t.string   "message_sent",       limit: 255
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "recipient_notification_histories", ["user_id"], name: "index_recipient_notification_histories_on_user_id", using: :btree
 
   create_table "roles", force: :cascade do |t|
     t.string   "name",           limit: 255, null: false
