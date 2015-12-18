@@ -131,6 +131,13 @@ class EncountersController < ApplicationController
       add_test_result_by_uuid test_param['uuid']
     end
 
+    (encounter_param['assays'] || []).each do |assay|
+      qr = assay["quantitative_result"]
+      if qr.is_a?(String)
+        assay["quantitative_result"] = Integer(qr, 10) rescue nil
+      end
+    end
+
     @encounter_blender.merge_attributes(
       'core_fields' => { Encounter::ASSAYS_FIELD => encounter_param['assays'] },
       'plain_sensitive_data' => { Encounter::OBSERVATIONS_FIELD => encounter_param['observations'] }

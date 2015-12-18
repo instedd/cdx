@@ -164,10 +164,10 @@ class DevicesController < ApplicationController
   end
 
   def send_setup_email
-    receiptment = params[:receiptment]
+    recipient = params[:recipient]
 
-    DeviceMailer.setup_instructions(current_user, receiptment, @device).deliver_now
-    flash[:notice] = "Setup instructions sent to #{receiptment}"
+    DeviceMailer.setup_instructions(current_user, recipient, @device).deliver_now
+    flash[:notice] = "Setup instructions sent to #{recipient}"
 
     render json: {status: :ok}
   end

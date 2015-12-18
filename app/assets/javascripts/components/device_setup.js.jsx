@@ -1,7 +1,7 @@
 var DeviceSetup = React.createClass({
   getInitialState: function() {
     return {
-      receiptment: '',
+      recipient: '',
     };
   },
 
@@ -18,15 +18,15 @@ var DeviceSetup = React.createClass({
 
   showEmailModal: function() {
     this.setState(React.addons.update(this.state, {
-      receiptment: { $set: '' }
+      recipient: { $set: '' }
     }));
     this.refs.emailModal.show();
     event.preventDefault();
   },
 
-  changeReceiptment: function(event) {
+  changeRecipient: function(event) {
     this.setState(React.addons.update(this.state, {
-      receiptment: { $set: event.target.value }
+      recipient: { $set: event.target.value }
     }));
   },
 
@@ -34,7 +34,7 @@ var DeviceSetup = React.createClass({
     $.ajax({
       url: '/devices/' + this.props.device.id + '/send_setup_email',
       method: 'POST',
-      data: {receiptment: this.state.receiptment},
+      data: {recipient: this.state.recipient},
       success: function () {
         this.closeEmailModal();
         window.location.reload(true); // reload page in order to hide secret key
@@ -89,8 +89,8 @@ var DeviceSetup = React.createClass({
             Email instructions
           </h1>
 
-          <label>Receiptment</label>
-          <input type="text" className="input-block" value={this.state.receiptment} onChange={this.changeReceiptment} />
+          <label>Recipient</label>
+          <input type="text" className="input-block" value={this.state.recipient} onChange={this.changeRecipient} />
 
           <div className="modal-footer">
             <button className="btn btn-primary" onClick={this.sendEmail}>Send</button>

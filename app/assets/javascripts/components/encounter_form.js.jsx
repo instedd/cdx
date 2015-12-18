@@ -9,6 +9,10 @@ var EncounterForm = React.createClass({
     return {encounter: this.props.encounter};
   },
 
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({encounter: nextProps.encounter});
+  },
+
   save: function() {
     var callback = function() {
       window.location.href = '/encounters/' + this.state.encounter.id;
@@ -112,9 +116,11 @@ var EncounterForm = React.createClass({
       if (field == 'result') {
         newValue = event;
       } else if (field == 'quantitative_result') {
-        newValue = parseInt(event.target.value)
-        if (isNaN(newValue)) {
-          newValue = null;
+        newValue = event.target.value
+        firstChar = newValue[0]
+        newValue = newValue.replace(/[^0-9]/g, '');
+        if (firstChar == '+' || firstChar == '-') {
+          newValue = firstChar + newValue;
         }
       } else {
         newValue = event.target.value;
@@ -154,7 +160,7 @@ var EncounterForm = React.createClass({
                     <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} clearable={false}/>
                   </div>
                   <div className="col pe-1">
-                    <input type="number" className="quantitative" value={assay.quantitative_result} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative_result')} />
+                    <input type="text" className="quantitative" value={assay.quantitative_result} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative_result')} />
                   </div>
                 </div>
               );
@@ -166,7 +172,6 @@ var EncounterForm = React.createClass({
     } else {
       diagnosisEditor = null;
     }
-
 
     return (
       <div>
@@ -194,6 +199,7 @@ var EncounterForm = React.createClass({
             </h1>
 
             <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendSample}
+              placeholder="Search by sample id"
               itemTemplate={AddItemSearchSampleTemplate}
               itemKey="uuid" />
           </Modal>
@@ -206,6 +212,7 @@ var EncounterForm = React.createClass({
             <p>Unifying sample {this.state.unifyingSample ? this.state.unifyingSample.entity_ids[0] : ""}</p>
 
             <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid + "&sample_uuids=" + _.pluck(this.state.encounter.samples, 'uuid')} onItemChosen={this.unifySample}
+              placeholder="Search by sample id"
               itemTemplate={AddItemSearchSampleTemplate}
               itemKey="uuid" />
           </Modal>
@@ -224,6 +231,7 @@ var EncounterForm = React.createClass({
             </h1>
 
             <AddItemSearch callback={"/encounters/search_test?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendTest}
+              placeholder="Search by test id"
               itemTemplate={AddItemSearchTestResultTemplate}
               itemKey="uuid" />
           </Modal>

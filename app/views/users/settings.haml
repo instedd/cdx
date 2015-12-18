@@ -3,6 +3,23 @@
     %h1 Settings
 
 = form_for(current_user, url: settings_path) do |f|
+  - if current_user.errors.present?
+    .alert-container
+      .alert.alert-error
+        %ul
+          - current_user.errors.full_messages.each do |msg|
+            %li= msg
+
+  .row
+    .col.pe-2
+      = f.label :password, "New password"
+    .col
+      = f.password_field :password, autocomplete: "off"
+  .row
+    .col.pe-2
+      = f.label :password_confirmation, "Retype new password"
+    .col
+      = f.password_field :password_confirmation
   .row
     .col.pe-2
       = f.label :locale

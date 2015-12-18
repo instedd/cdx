@@ -142,8 +142,19 @@ $(document).ready(function(){
       }
   });
 
+  var advancedTimeout = null;
   $(".btn-toggle").click(function(){
-    $(".advanced").toggleClass('show');
+
+    // We want to set overflow visible after the expand animation has completed
+    var advanced = $(".advanced");
+    if (advanced.hasClass('show')) {
+      if (advancedTimeout) window.clearTimeout(advancedTimeout);
+      advanced.css('overflow', 'hidden');
+    } else {
+      advancedTimeout = window.setTimeout(function() { advanced.css('overflow', 'visible'); }, 500);
+    }
+
+    advanced.toggleClass('show');
     $(this).toggleClass('up');
     return false;
   });

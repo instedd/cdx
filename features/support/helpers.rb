@@ -1,6 +1,6 @@
 module Helpers
   def authenticate(user, password=nil)
-    @login = LoginPage.new
+    @login = HomePage.new
     @login.load
     within(@login.form) do |form|
       form.user_name.set user.email
