@@ -22,8 +22,41 @@ var PolicyItemDetail = React.createClass({
     this.props.updateStatement({includeSubsites: { $apply: function(current) { return !current; } }});
   },
 
+  onResourcesChange: function(selected) {
+    this.props.updateStatement({resources: { $set: selected}});
+  },
+
   render: function() {
     var statement = this.props.statement;
+    var resourcesList = {
+      "except": <div className="without-resources-except-list" />,
+      "only": <div className="without-resources-only-list" />
+    }
+    var ifResourceTypeSelected = <div className="without-resource-type" />;
+    if(statement.resourceType != null) {
+      if(statement.resources != null && statement.resources != "all") {
+        // FIXME: actually list resources
+        resourcesList[statement.resources] = (<div className="resources-list">
+          Aca va la lista
+        </div>);
+      }
+
+      ifResourceTypeSelected = <div className="with-resource-type">
+        <div className="section">
+          <span className="section-name">Resources</span>
+          <div className="section-content">
+            <input type="radio" name="resources" value="all" id={this.idFor("resources-all")} checked={statement.resources == 'all'} onChange={this.onResourcesChange.bind(this, 'all')} />
+            <label htmlFor={this.idFor("resources-all")}>All resources</label>
+            <input type="radio" name="resources" value="except" id={this.idFor("resources-except")} checked={statement.resources == 'except'} onChange={this.onResourcesChange.bind(this, 'except')} />
+            <label htmlFor={this.idFor("resources-except")}>All resources except</label>
+            {resourcesList['except']}
+            <input type="radio" name="resources" value="only" id={this.idFor("resources-only")} checked={statement.resources == 'only'} onChange={this.onResourcesChange.bind(this, 'only')} />
+            <label htmlFor={this.idFor("resources-only")}>Only some</label>
+            {resourcesList['only']}
+          </div>
+        </div>
+      </div>;
+    }
     return (
       <div>
         <div className="section">
@@ -41,6 +74,7 @@ var PolicyItemDetail = React.createClass({
             <label htmlFor={this.idFor("includeSubsites")}>Include subsites</label>
           </div>
         </div>
+        {ifResourceTypeSelected}
       </div>
     );
   },
