@@ -1,0 +1,21 @@
+.row
+  .col
+    = cdx_table title: 'Users' do |t|
+      - t.columns do
+        %col{:width => "35%"}
+        %col{:width => "30%"}
+        %col{:width => "20%"}
+        / %col{:width => "35%"}
+      - t.thead do
+        %tr
+          %th Email
+          %th Full name
+          %th Pending invitation
+          / %th Last Activity
+      - t.tbody do
+        - @users.each do |user|
+          %tr
+            %td= user.email
+            %td= user.full_name
+            %td= user.invited_pending?
+            / %td=

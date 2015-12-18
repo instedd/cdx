@@ -19,6 +19,15 @@ class User < ActiveRecord::Base
 
   after_create :update_computed_policies
 
+  scope :within, -> (institution_or_site) {
+    if institution_or_site.is_a?(Institution)
+      User.joins(:roles).where("roles.institution_id = ?", institution_or_site.id)
+    else
+      ids = Site.within(institution_or_site).pluck(:id)
+      joins(:roles).where("roles.site_id IN (?)", ids)
+    end
+  }
+
   def timeout_in
     Settings.web_session_timeout.try{ |timeout| timeout.to_i.seconds }
   end
