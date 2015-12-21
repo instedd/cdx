@@ -2,44 +2,58 @@
 
 .row
   .col
+    - if @tests.empty?
+      = cdx_table do |t|
+        - t.columns do
+          %col{:width => "100%"}
+        - t.thead do
+          %tr
+            %th
+        - t.tbody do
+          %tr
+            %td.empty
+              .empty-icon
+                %span.ic140-tests
+              %h1 No tests has been reported
+              %p Setup your devices first in order to start reporting
+    - else
+      = cdx_table title: pluralize(@total, "Test") do |t|
+        - t.columns do
+          %col{:width => "30%"}
+          %col{:width => "20%"}
+          %col{:width => "10%"}
+          %col{:width => "10%"}
+          %col{:width => "15%"}
+          %col{:width => "15%"}
+        - t.actions do
+          = link_to "download CSV", test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
 
-    = cdx_table title: pluralize(@total, "Test") do |t|
-      - t.columns do
-        %col{:width => "30%"}
-        %col{:width => "20%"}
-        %col{:width => "10%"}
-        %col{:width => "10%"}
-        %col{:width => "15%"}
-        %col{:width => "15%"}
-      - t.actions do
-        = link_to "download CSV", test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
+        - t.thead do
+          %tr
+            - each_column do |id, title, sortable|
+              %th= sortable ? order_by_column(title, id) : title
+        - t.tbody do
+          - @tests.each do |test|
+            %tr{data: {href: @display_as == "test" ? test_result_path(test['test']['uuid']) : encounter_path(test['encounter']['uuid']) }}
+              - each_column do |id|
+                %td= formatted_test_value(test, id, web: true)
+      .pagination
+        = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
+        = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
+        %input.input-x-small.text-right{type: "text", name: "page", value: @page}
+        %span
+          of
+          = (@total.to_f / @page_size).ceil
+        %span(style="display: inline-block;")
+          = cdx_select name: "page_size_select", value: @page_size, class: 'input-large' do |select|
+            - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
+        :javascript
+          $(function(){
+            $(document).on('change', 'input[name=page_size_select]', function(){
+              $('input[name=page_size]').val($(this).val());
+              $('#filters-form').submit();
+            });
+          })
 
-      - t.thead do
-        %tr
-          - each_column do |id, title, sortable|
-            %th= sortable ? order_by_column(title, id) : title
-      - t.tbody do
-        - @tests.each do |test|
-          %tr{data: {href: @display_as == "test" ? test_result_path(test['test']['uuid']) : encounter_path(test['encounter']['uuid']) }}
-            - each_column do |id|
-              %td= formatted_test_value(test, id, web: true)
-    .pagination
-      = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
-      = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
-      %input.input-x-small.text-right{type: "text", name: "page", value: @page}
-      %span
-        of
-        = (@total.to_f / @page_size).ceil
-      %span(style="display: inline-block;")
-        = cdx_select name: "page_size_select", value: @page_size, class: 'input-large' do |select|
-          - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
-      :javascript
-        $(function(){
-          $(document).on('change', 'input[name=page_size_select]', function(){
-            $('input[name=page_size]').val($(this).val());
-            $('#filters-form').submit();
-          });
-        })
-
-      - if @display_as == "test"
-        = link_to "Add filter", new_filter_path(query: @filter), class: 'pull-right'
+        - if @display_as == "test"
+          = link_to "Add filter", new_filter_path(query: @filter), class: 'pull-right'

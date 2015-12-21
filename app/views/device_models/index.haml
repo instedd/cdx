@@ -1,16 +1,31 @@
 .row
   .col
     = link_to "+", new_device_model_path, class: 'btn-add side-link ontop fix', title: 'Add Device Model'
-    = cdx_table title: 'Device Models' do |t|
-      - t.columns do
-        %col{:width => "80%"}
-        %col{:width => "20%"}
-      - t.thead do
-        %tr
-          %th Name
-          %th Version
-      - t.tbody do
-        - @device_models.each do |device_model|
-          %tr{data: {href: try_edit_device_model_path(device_model) }}
-            %td= device_model.name
-            %td= device_model.current_manifest.try(:version)
+    - if @device_models.empty?
+      = cdx_table title: 'Device Models' do |t|
+        - t.columns do
+          %col{:width => "100%"}
+        - t.thead do
+          %tr
+            %th
+        - t.tbody do
+          %tr
+            %td.empty
+              .empty-icon
+                %span.ic140-device-model
+              %h1 There are no device models
+              %p Create device models and publish manifests that will allow test reporting on CDx platform
+    - else
+      = cdx_table title: 'Device Models' do |t|
+        - t.columns do
+          %col{:width => "80%"}
+          %col{:width => "20%"}
+        - t.thead do
+          %tr
+            %th Name
+            %th Version
+        - t.tbody do
+          - @device_models.each do |device_model|
+            %tr{data: {href: try_edit_device_model_path(device_model) }}
+              %td= device_model.name
+              %td= device_model.current_manifest.try(:version)

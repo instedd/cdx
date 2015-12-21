@@ -2,43 +2,58 @@
 
 .row
   .col
-    = cdx_table do |t|
-      - t.columns do
-        %col{:width => "20%"}
-        %col{:width => "50%"}
-        %col{:width => "20%"}
-        %col{:width => "10%"}
-      - t.thead do
-        %tr
-          %th Name
-          %th Manufacturer
-          %th Model
-          %th Site
-      - t.tbody do
-        - @devices.each do |device|
+    - if @devices.empty?
+      = cdx_table do |t|
+        - t.columns do
+          %col{:width => "100%"}
+        - t.thead do
           %tr
-          %tr{data: (@devices_to_read.include?(device.id) ? {href: device_path(device) } : {})}
-            %td= device.name
-            %td= device.device_model.institution.try :name
-            %td= device.device_model.full_name
-            %td= device.site.try(:name)
+            %th
+        - t.tbody do
+          %tr
+            %td.empty
+              .empty-icon
+                %span.ic140-devices
+              %h1 There are no devices reporting at this site
+              %p Follow the configuration steps to connect a device and start reporting
+    - else
+      = cdx_table do |t|
+        - t.columns do
+          %col{:width => "20%"}
+          %col{:width => "50%"}
+          %col{:width => "20%"}
+          %col{:width => "10%"}
+        - t.thead do
+          %tr
+            %th Name
+            %th Manufacturer
+            %th Model
+            %th Site
+        - t.tbody do
+          - @devices.each do |device|
+            %tr
+            %tr{data: (@devices_to_read.include?(device.id) ? {href: device_path(device) } : {})}
+              %td= device.name
+              %td= device.device_model.institution.try :name
+              %td= device.device_model.full_name
+              %td= device.site.try(:name)
 
-    .pagination
-      = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
-      = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
-      %input.input-x-small.text-right{type: "text", name: "page", value: @page}
-      %span
-        of
-        = (@total.to_f / @page_size).ceil
-      %span(style="display: inline-block;")
-        = cdx_select name: "page_size_select", value: @page_size, class: 'input-large' do |select|
-          - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
-      :javascript
-        $(function(){
-          $(document).on('change', 'input[name=page_size_select]', function(){
-            $('input[name=page_size]').val($(this).val());
-            $('#filters-form').submit();
-          });
-        })
+      .pagination
+        = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
+        = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
+        %input.input-x-small.text-right{type: "text", name: "page", value: @page}
+        %span
+          of
+          = (@total.to_f / @page_size).ceil
+        %span(style="display: inline-block;")
+          = cdx_select name: "page_size_select", value: @page_size, class: 'input-large' do |select|
+            - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
+        :javascript
+          $(function(){
+            $(document).on('change', 'input[name=page_size_select]', function(){
+              $('input[name=page_size]').val($(this).val());
+              $('#filters-form').submit();
+            });
+          })
 
-      = link_to "Download as CSV", {format: :csv}, class: "pull-right"
+        = link_to "Download as CSV", {format: :csv}, class: "pull-right"

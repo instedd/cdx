@@ -1,16 +1,31 @@
 = render "filters"
 .row
   .col
-    = cdx_table do |t|
-      - t.columns do
-        %col{:width => "50%"}
-        %col{:width => "50%"}
-      - t.thead do
-        %tr
-          %th Name
-          %th Location
-      - t.tbody do
-        - @sites.each do |site|
-          %tr{data: {href: site_path(site) }}
-            %td= site.name
-            %td= site.location.try(:name)
+    - if @sites.empty?
+      = cdx_table do |t|
+        - t.columns do
+          %col{:width => "100%"}
+        - t.thead do
+          %tr
+            %th
+        - t.tbody do
+          %tr
+            %td.empty
+              .empty-icon
+                %span.ic140-sites
+              %h1 This site has no dependencies
+              %p Create sites here to keep your institution's hierachy organized
+    - else
+      = cdx_table do |t|
+        - t.columns do
+          %col{:width => "50%"}
+          %col{:width => "50%"}
+        - t.thead do
+          %tr
+            %th Name
+            %th Location
+        - t.tbody do
+          - @sites.each do |site|
+            %tr{data: {href: site_path(site) }}
+              %td= site.name
+              %td= site.location.try(:name)

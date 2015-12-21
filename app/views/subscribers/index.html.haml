@@ -2,19 +2,32 @@
   .col
     - unless filters.empty?
       = link_to "+", new_subscriber_path, class: 'btn-add side-link ontop fix', title: 'Add Subscriber'
-    = cdx_table title: 'Subscribers' do |t|
-      - t.columns do
-        %col{:width => "100%"}
-      - t.thead do
-        %tr
-          %th Name
-      - t.tbody do
-        - if filters.empty?
+    - if subscribers.empty?
+      = cdx_table title: 'Subscribers' do |t|
+        - t.columns do
+          %col{:width => "100%"}
+        - t.thead do
           %tr
-            %td
-              You first need to create a filter to create a subscriber.
-              Go to #{link_to("Tests", test_results_path)}, apply a filter and create one.
-        - else
-          - subscribers.each do |subscriber|
+            %th
+        - t.tbody do
+          %tr
+            %td.empty
+              .empty-icon
+              %h1 There are no subscribers
+    - else
+      = cdx_table title: 'Subscribers' do |t|
+        - t.columns do
+          %col{:width => "100%"}
+        - t.thead do
+          %tr
+            %th Name
+        - t.tbody do
+          - if filters.empty?
             %tr
-              %td= link_to subscriber.name, edit_subscriber_path(subscriber)
+              %td
+                You first need to create a filter to create a subscriber.
+                Go to #{link_to("Tests", test_results_path)}, apply a filter and create one.
+          - else
+            - subscribers.each do |subscriber|
+              %tr
+                %td= link_to subscriber.name, edit_subscriber_path(subscriber)

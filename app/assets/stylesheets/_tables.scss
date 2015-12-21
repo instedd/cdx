@@ -50,9 +50,24 @@
       padding: 14px 10px;
       border-bottom: 1px solid $gray1;
       text-overflow: ellipsis;
-      // max-width: 200px;
       white-space: nowrap;
       overflow: hidden;
+
+      &.empty {
+        padding: 150px;
+        text-align: center;
+
+        .empty-icon {
+          height: 150px;
+        }
+
+        h1 {
+          color: $black;
+        }
+        p {
+          margin-top: -5px;
+        }
+      }
     }
 
     tr:last-child th {

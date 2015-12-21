@@ -2,7 +2,7 @@
 // SPRITES
 // =============================================================================
 
-/*---------------------- Icons ------------------------*/
+/*---------------------- Icons 20 x 20  ------------------------*/
 
 
 span[class^="icon-"],
@@ -23,3 +23,30 @@ span[class*=" icon-"] {
 .icon-print           {background-position:    -80px 0px};
 .icon-block           {background-position:   -100px 0px};
 .icon-ellipsis        {background-position:   -120px 0px};
+
+
+
+/*---------------------- Icons 140 x 140  ------------------------*/
+
+
+span[class^="ic140-"],
+span[class*=" ic140-"] {
+  display: inline-block;
+  width: 140px;
+  height: 140px;
+  line-height: 140px;
+  vertical-align: text-top;
+  background-image: image-url($icons-140x140-black);
+  background-repeat: no-repeat;
+}
+
+.ic140-device-model             {background-position:        0px 0px};
+.ic140-patients                 {background-position:     -140px 0px};
+.ic140-tests                    {background-position:     -280px 0px};
+.ic140-devices                  {background-position:     -420px 0px};
+.ic140-users                    {background-position:     -560px 0px};
+.ic140-sites                    {background-position:     -700px 0px};
+.ic140-alerts                   {background-position:     -840px 0px};
+.ic140-algorithms               {background-position:     -980px 0px};
+.ic140-categories               {background-position:    -1120px 0px};
+.ic140-sharing-requests         {background-position:    -1260px 0px};
