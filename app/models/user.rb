@@ -17,6 +17,8 @@ class User < ActiveRecord::Base
   has_many :computed_policies
   has_and_belongs_to_many :roles
 
+  include Resource
+
   after_create :update_computed_policies
 
   scope :within, -> (institution_or_site) {
@@ -87,5 +89,13 @@ class User < ActiveRecord::Base
     token.resource_owner_id = self.id
     token.save!
     token
+  end
+
+  def active_for_authentication?
+    super && self.is_active?
+  end
+
+  def inactive_message
+    self.is_active? ? super : I18n.t('devise.failure.suspended')
   end
 end
