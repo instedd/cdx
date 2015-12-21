@@ -146,6 +146,15 @@ smtp:
     smtp_user: cdx:cdx
 ```
 
+Add a link from the `web` container to the new `smtp`:
+
+```yml
+web:
+  links:
+     - smtp
+    ...
+```
+
 And set the `SMTP` section of your `docker.env` file to:
 
 ```bash
