@@ -148,9 +148,6 @@ var EncounterForm = React.createClass({
   },
 
   render: function() {
-    if (this.state.encounter.institution == null)
-      return (<div>{institutionSelect}</div>);
-
     var diagnosisEditor = null;
 
     if (this.state.encounter.assays.length > 0) {
