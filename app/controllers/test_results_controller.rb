@@ -31,6 +31,8 @@ class TestResultsController < ApplicationController
     result = TestResult.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["tests"]
+
+    @can_create_encounter = check_access(@institutions, CREATE_INSTITUTION_ENCOUNTER).size > 0
   end
 
   def show
