@@ -333,6 +333,7 @@ GEM
     jwt (1.5.1)
     launchy (2.4.3)
       addressable (~> 2.3)
+    leaflet-rails (0.7.4)
     letter_opener (1.4.1)
       launchy (~> 2.2)
     libv8 (3.16.14.11)
@@ -662,6 +663,7 @@ DEPENDENCIES
   jbuilder (~> 1.2)
   jquery-rails
   jquery-turbolinks
+  leaflet-rails
   letter_opener
   location_service!
   lodash-rails

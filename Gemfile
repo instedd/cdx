@@ -89,6 +89,7 @@ gem 'rails-i18n', '~> 4.0.0'
 gem 'doorkeeper'
 
 gem 'faker'
+gem 'leaflet-rails'
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs'
