@@ -5,19 +5,21 @@ Rails.application.routes.draw do
   use_doorkeeper
   mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
 
-  devise_for :users, controllers: {
-    omniauth_callbacks: 'omniauth_callbacks',
-    sessions: 'sessions',
-    registrations: 'registrations'
-  }
-  resources :users, only: [:index]
+  devise_for :users,
+    controllers: {
+      omniauth_callbacks: 'omniauth_callbacks',
+      sessions: 'sessions',
+      registrations: 'registrations'
+    },
+    path_names: {
+      registration: 'registration'
+    }
 
   resources :sites do
     member do
       get :devices
       get :tests
       get :dependencies
-      get :users
     end
   end
 
@@ -131,11 +133,7 @@ Rails.application.routes.draw do
     resources :subscribers
   end
 
-  scope :user do
-    get 'settings' => "users#settings"
-    patch 'settings' => "users#update_settings"
-  end
-
+  resources :users, only: [:index, :edit, :update]
   resources :roles
 
   get 'nndd' => 'application#nndd' if Rails.env.test?

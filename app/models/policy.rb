@@ -26,6 +26,8 @@ class Policy < ActiveRecord::Base
     REGISTER_INSTITUTION_DEVICE_MODEL = "institution:registerDeviceModel"
     CREATE_INSTITUTION_ROLE =           "institution:createRole"
 
+    READ_INSTITUTION_USERS = "institution:readUsers"
+
     READ_DEVICE_MODEL =      "deviceModel:read"
     UPDATE_DEVICE_MODEL =    "deviceModel:update"
     DELETE_DEVICE_MODEL =    "deviceModel:delete"
@@ -37,6 +39,8 @@ class Policy < ActiveRecord::Base
 
     ASSIGN_DEVICE_SITE = "site:assignDevice" # This is not tested.
     CREATE_SITE_ROLE = "site:createRole"
+    CREATE_SITE_ENCOUNTER = "site:createEncounter"
+    READ_SITE_USERS = "site:readUsers"
 
     READ_DEVICE =   "device:read"
     UPDATE_DEVICE = "device:update"
@@ -50,8 +54,6 @@ class Policy < ActiveRecord::Base
     QUERY_TEST = "testResult:query"
     PII_TEST =   "testResult:pii"
 
-    CREATE_SITE_ENCOUNTER = "site:createEncounter"
-
     READ_ENCOUNTER =   "encounter:read"
     UPDATE_ENCOUNTER = "encounter:update"
     PII_ENCOUNTER =    "encounter:pii"
@@ -63,6 +65,8 @@ class Policy < ActiveRecord::Base
     DELETE_ROLE = "role:delete"
     ASSIGN_USER_ROLE = "role:assignUser"
     REMOVE_USER_ROLE = "role:removeUser"
+
+    UPDATE_USER = 'user:update'
   end
 
   ACTIONS = Actions.constants.map{|action| Actions.const_get(action)}

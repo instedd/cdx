@@ -1,6 +1,7 @@
 Given(/^an authenticated superadmin called Bob$/) do
   @administrator = User.make(password: 'copado123', first_name: 'Bob')
   @administrator.grant_superadmin_policy
+  @administrator.reload.update_computed_policies
   authenticate(@administrator)
 end
 
@@ -37,29 +38,16 @@ Given(/^the following users created by Bob$/) do |users|
 
     user = User.make(
       first_name: user[:first_name],
-      last_name: user[:last_name]
+      last_name: user[:last_name],
+      roles: [site.roles.first]
     )
-
-    definition = canned_policy(
-      @institution.id,
-      site: site.id
-    )
-
-    policy = Policy.new(definition: JSON.parse(definition))
-    policy.name = "#{site.name} #{user.id}"
-    policy.user_id = user.id
-    policy.granter_id = @administrator.id
-    policy.save!
   end
 end
 
-When(/^Bob view the users tab on Lab One$/) do
+When(/^Bob view the users on Lab One$/) do
   @site = Site.where(name: 'Lab One').first
-  site_page = SiteViewPage.new
-  site_page.load(site_id: @site.id)
-  within(site_page.tabs) do |tab|
-    tab.users.click
-  end
+  user_page = UserViewPage.new
+  user_page.load(query: { context: @site.uuid })
 end
 
 Then(/^Bob should see "(.*?)"$/) do |message|

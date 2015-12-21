@@ -12,7 +12,7 @@
           %th Last Activity
       - t.tbody do
         - @users.each do |user|
-          %tr{class: user.invited_pending? ? "pending" : ""}
+          %tr{class: (user.invited_pending? ? "pending" : ""), data: (@users_to_edit.include?(user.id) ? {href: edit_user_path(user.id)} : {})}
             %td= user.full_name
             %td= user.roles.map(&:name).join(", ")
             %td

@@ -1,39 +1,59 @@
 .row
   .col
-    %h1 Edit account
+    %h1 Settings
+
 = form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f|
+  - if resource.errors.present?
+    .alert-container
+      .alert.alert-error
+        %ul
+          - resource.errors.full_messages.each do |msg|
+            %li= msg
   .row
+    .col.pe-2
+      = f.label :first_name
     .col
-      = f.text_field :first_name, autofocus: true, placeholder: 'First name', class: 'input-block'
+      = f.text_field :first_name, autofocus: true
   .row
+    .col.pe-2
+      = f.label :last_name
     .col
-      = f.text_field :last_name, placeholder: 'Last name', class: 'input-block'
+      = f.text_field :last_name
+  .row
+    .col.pe-2
+      = f.label :telephone
+    .col
+      = f.text_field :telephone
+  .row
+    .col.pe-2
+      = f.label :password, "New password"
+    .col
+      = f.password_field :password, autocomplete: "off"
+  .row
+    .col.pe-2
+      = f.label :password_confirmation, "Retype new password"
+    .col
+      = f.password_field :password_confirmation
+  .row
+    .col.pe-2
+      = f.label :locale
+    .col
+      = cdx_select form: f, name: :locale, class: 'input-xx-large' do |select|
+        - select.items(@locales, :second, :first)
+  .row
+    .col.pe-2
+      = f.label :time_zone
+    .col
+      = cdx_select form: f, name: :time_zone, class: 'input-xx-large' do |select|
+        - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
+  .row
+    .col.pe-2
+      = f.label :timestamps_in_device_time_zone, "Test timestamps"
+    .col
+      = cdx_select form: f, name: :timestamps_in_device_time_zone, class: 'input-xx-large' do |select|
+        - select.item false, "Relative to my time zone"
+        - select.item true, "Relative to the device time zone"
 
-  .row
+  .row.button-actions
     .col
-      = f.email_field :email, placeholder: 'Email', class: "input-block"
-    - if devise_mapping.confirmable? && resource.pending_reconfirmation?
-      .row
-        Currently waiting confirmation for: #{resource.unconfirmed_email}
-  .row
-    .col
-      = f.password_field :password, autocomplete: "off", placeholder: 'Password', class: "input-block"
-      - if @minimum_password_length
-        .small-quote.pull-right
-          (#{@minimum_password_length} characters minimum)
-  .row
-    .col
-      = f.password_field :password_confirmation, autocomplete: "off", placeholder: 'Confirm password', class: "input-block"
-  .row
-    .col
-      = f.password_field :current_password, autocomplete: "off", placeholder: 'Current password', class: "input-block"
-  %br
-  .row
-    .col
-      = f.submit "Update", class: "btn-secondary input-block"
-    .col.text-right
-      = link_to "Have an account? Log in", new_session_path(resource_name)
-      %br
-      = link_to "Login problems?", new_password_path(resource_name)
-= devise_error_messages!
-
+      = f.submit 'Save', class: 'btn-primary'

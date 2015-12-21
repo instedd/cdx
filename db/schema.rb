@@ -85,8 +85,8 @@ ActiveRecord::Schema.define(version: 20151210184357) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",                  limit: 4
-    t.boolean  "supports_activation"
     t.datetime "published_at"
+    t.boolean  "supports_activation"
     t.string   "support_url",                     limit: 255
     t.string   "picture_file_name",               limit: 255
     t.string   "picture_content_type",            limit: 255
@@ -416,6 +416,8 @@ ActiveRecord::Schema.define(version: 20151210184357) do
     t.string   "invited_by_type",                limit: 255
     t.integer  "invitations_count",              limit: 4,   default: 0
     t.string   "last_navigation_context",        limit: 255
+    t.boolean  "is_active",                                  default: true
+    t.string   "telephone",                      limit: 255
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree

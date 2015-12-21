@@ -25,6 +25,13 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe '.active_for_authentication?' do
+    let(:user) { User.make(is_active: false) }
+    it 'is falsey when is_active flag is :false' do
+      expect(user.active_for_authentication?).to be_falsey
+    end
+  end
+
   describe "scoping" do
     let(:granter_1) { User.make }
     let!(:institution_1) { granter_1.create Institution.make }
@@ -45,12 +52,12 @@ RSpec.describe User, type: :model do
     end
 
     it "should show institution users" do
-      User.within(institution_1).should eq([user_institution_1, user_site_1])
+      expect(User.within(institution_1)).to eq([user_institution_1, user_site_1])
     end
 
     it "should show institution users in site" do
-      User.within(site_1).should eq([user_site_1])
+      expect(User.within(site_1)).to eq([user_site_1])
     end
-
   end
+
 end

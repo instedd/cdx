@@ -15,3 +15,10 @@ Feature: Logging into system
     Then he should see "You have one more attempt before your account is locked"
     When he attempts to log-in 3 times with incorrect password
     Then he should see "Your account is locked"
+
+  Scenario: Admin disables account
+    Given the user 'foouser@example.com' has an account
+    When his account has been disabled
+    And he attempts to log-in with correct details
+    Then he should see "Access to your account has been suspended, please refer to your supervisor"
+

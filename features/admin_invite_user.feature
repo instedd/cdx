@@ -21,7 +21,7 @@ Feature: Superadmin can invite users to the system
       | George     | Harrison  | Lab One  |
       | Ringo      | Starr     | Lab One  |
       | Paul       | McCartney | Lab Two  |
-    When Bob view the users tab on Lab One
+    When Bob view the users on Lab One
     Then Bob should see "John Lennon"
     And Bob should see "George Harrison"
     And Bob should see "Ringo Starr"
