@@ -1,0 +1,22 @@
+.row
+  .col
+    = cdx_table title: 'Users' do |t|
+      - t.columns do
+        %col{:width => "30%"}
+        %col{:width => "30%"}
+        %col{:width => "30%"}
+      - t.thead do
+        %tr
+          %th Full name
+          %th Roles
+          %th Last Activity
+      - t.tbody do
+        - @users.each do |user|
+          %tr{class: user.invited_pending? ? "pending" : ""}
+            %td= user.full_name
+            %td= user.roles.map(&:name).join(", ")
+            %td
+              - if user.invited_pending?
+                ="invitation sent #{time_ago_in_words(user.invitation_sent_at, vague: true)} ago"
+              -elsif user.last_sign_in_at.present?
+                ="#{time_ago_in_words(user.last_sign_in_at, vague: true)} ago"

@@ -1,9 +1,13 @@
 class UsersController < ApplicationController
-  skip_before_filter :ensure_context
+  skip_before_filter :ensure_context, except: [:index]
 
   LOCALES = [
               ["English", "en"],
             ]
+
+  def index
+    @users = User.within(@navigation_context.entity)
+  end
 
   def settings
     load_locales
