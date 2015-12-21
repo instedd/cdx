@@ -6,7 +6,8 @@
         .row
           .col
             %h1
-              = link_to "+", new_encounter_path, class: 'btn-add side-link fix', title: 'Add encounter'
+              - if @can_create_encounter
+                = link_to "+", new_encounter_path, class: 'btn-add side-link fix', title: 'Add encounter'
               Tests
         .row
           .filter
