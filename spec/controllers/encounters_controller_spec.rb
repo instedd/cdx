@@ -72,13 +72,14 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   end
 
   describe "GET #sites" do
-    it "returns sites of the context institution if user has access to them" do
+    it "returns sites of the context institution if user has access to create them" do
       i1 = Institution.make
       s1 = Site.make institution: i1
       s2 = Site.make institution: i1
 
       grant i1.user, user, i1, READ_INSTITUTION
       grant i1.user, user, s1, READ_SITE
+      grant i1.user, user, s1, CREATE_SITE_ENCOUNTER
 
       get :sites, context: i1.uuid
 
