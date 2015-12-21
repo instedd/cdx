@@ -26,6 +26,10 @@ var PolicyItemDetail = React.createClass({
     this.props.updateStatement({resources: { $set: selected}});
   },
 
+  toggleAction: function(action) {
+    this.props.updateStatement({actions: { [action] : {$apply: function(current) { return !current; }} }});
+  },
+
   render: function() {
     var statement = this.props.statement;
     var resourcesList = {
@@ -41,6 +45,8 @@ var PolicyItemDetail = React.createClass({
         </div>);
       }
 
+      var actions = this.props.actions[statement.resourceType];
+
       ifResourceTypeSelected = <div className="with-resource-type">
         <div className="section">
           <span className="section-name">Resources</span>
@@ -53,6 +59,23 @@ var PolicyItemDetail = React.createClass({
             <input type="radio" name="resources" value="only" id={this.idFor("resources-only")} checked={statement.resources == 'only'} onChange={this.onResourcesChange.bind(this, 'only')} />
             <label htmlFor={this.idFor("resources-only")}>Only some</label>
             {resourcesList['only']}
+          </div>
+        </div>
+        <div className="section">
+          <span className="section-name">Actions</span>
+          <div className="section-content">
+            <input type="checkbox" id={this.idFor("action-inherit")} checked={statement.actions.inherit} onChange={this.toggleAction.bind(this, 'inherit')} />
+            <label htmlFor={this.idFor("action-inherit")}>Inherit permissions from granter</label>
+            { /** FIXME: disable actions if Inherit is selected */ }
+            { Object.keys(actions).map(function(action, index) {
+              var scopedAction = statement.resourceType + ":" + action;
+              return (
+                <div>
+                  <input type="checkbox" id={this.idFor("action-" + action)} checked={statement.actions[scopedAction]} onChange={this.toggleAction.bind(this, scopedAction)} />
+                  <label htmlFor={this.idFor("action-" + action)}>{actions[action]}</label>
+                </div>
+              );
+            }.bind(this)) }
           </div>
         </div>
       </div>;

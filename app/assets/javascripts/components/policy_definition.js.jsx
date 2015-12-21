@@ -8,7 +8,7 @@ var PolicyDefinition = React.createClass({
 
   newPolicy: function() {
     this.setState(React.addons.update(this.state, {
-      statements: { $push: [{ delegable: false, resourceType: null, includeSubsites: false}] },
+      statements: { $push: [{ delegable: false, resourceType: null, includeSubsites: false, actions: {} }] },
       activeTab: { $set: this.state.statements.length } // the new statement isn't on the array yet
     }));
   },
@@ -40,7 +40,7 @@ var PolicyDefinition = React.createClass({
             </ul>
             {this.state.statements.map(function(statement, index) {
               var tabClass = "tabs-content" + (this.state.activeTab === index ? " selected" : "");
-              return (<div className={tabClass} key={index}><PolicyItemDetail statement={statement} index={index} updateStatement={this.updateStatement.bind(this, index)} /></div>);
+              return (<div className={tabClass} key={index}><PolicyItemDetail statement={statement} index={index} updateStatement={this.updateStatement.bind(this, index)} actions={this.props.actions} /></div>);
             }.bind(this))}
           </div>
         </div>
