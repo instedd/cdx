@@ -1,5 +1,5 @@
 db:
-  image: mysql
+  image: mysql:5.7
   environment:
     MYSQL_ROOT_PASSWORD: root
 
@@ -7,7 +7,7 @@ elasticsearch:
   image: elasticsearch:1.4.4
 
 redis:
-  image: redis
+  image: redis:3.0.5
 
 sshd:
   image: instedd/cdx-sync-sshd
