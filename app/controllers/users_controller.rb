@@ -7,8 +7,6 @@ class UsersController < ApplicationController
 
   def index
     @users = User.within(@navigation_context.entity)
-    # sites_within = Site.within(@site).pluck(:id)
-    # @users = User.joins(:roles).where("roles.site_id IN (?)", sites_within)
   end
 
   def settings

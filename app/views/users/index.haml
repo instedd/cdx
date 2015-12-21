@@ -2,20 +2,21 @@
   .col
     = cdx_table title: 'Users' do |t|
       - t.columns do
-        %col{:width => "35%"}
         %col{:width => "30%"}
-        %col{:width => "20%"}
-        / %col{:width => "35%"}
+        %col{:width => "30%"}
+        %col{:width => "30%"}
       - t.thead do
         %tr
-          %th Email
           %th Full name
-          %th Pending invitation
-          / %th Last Activity
+          %th Roles
+          %th Last Activity
       - t.tbody do
         - @users.each do |user|
-          %tr
-            %td= user.email
+          %tr{class: user.invited_pending? ? "pending" : ""}
             %td= user.full_name
-            %td= user.invited_pending?
-            / %td=
+            %td= user.roles.map(&:name).join(", ")
+            %td
+              - if user.invited_pending?
+                ="invitation sent #{time_ago_in_words(user.invitation_sent_at, vague: true)} ago"
+              -elsif user.last_sign_in_at.present?
+                ="#{time_ago_in_words(user.last_sign_in_at, vague: true)} ago"
