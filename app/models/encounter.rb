@@ -66,6 +66,22 @@ class Encounter < ActiveRecord::Base
     end
   end
 
+  def self.merge_assays_without_values(assays1, assays2)
+    return assays2 unless assays1
+    return assays1 unless assays2
+
+    assays1.dup.tap do |res|
+      assays2.each do |assay2|
+        assay = res.find { |a| a["condition"] == assay2["condition"] }
+        if assay.nil?
+          res << (assay2.dup.tap do |h|
+            h["result"] = nil
+          end)
+        end
+      end
+    end
+  end
+
   def self.entity_scope
     "encounter"
   end
@@ -91,7 +107,7 @@ class Encounter < ActiveRecord::Base
       .map{|tr| tr.core_fields[TestResult::ASSAYS_FIELD]}
 
     assays_to_merge.inject(core_fields[Encounter::ASSAYS_FIELD]) do |merged, to_merge|
-      Encounter.merge_assays(merged, to_merge)
+      Encounter.merge_assays_without_values(merged, to_merge)
     end
   end
 

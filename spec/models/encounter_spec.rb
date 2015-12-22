@@ -66,6 +66,67 @@ describe Encounter do
     end
   end
 
+  describe "merge assays without values" do
+    def merge(a, b)
+      Encounter.merge_assays_without_values(a, b)
+    end
+
+    it "merge nils" do
+      expect(merge(nil, nil)).to be_nil
+    end
+
+    it "merge nil with empty" do
+      expect(merge(nil, [])).to eq([])
+      expect(merge([], nil)).to eq([])
+    end
+
+    it "merge by condition preserving original value if equal" do
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "a", "result" => "positive"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}])
+    end
+
+    it "merge disjoint assays" do
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "b", "result" => "negative"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}, {"condition" => "b", "result" => nil}])
+    end
+
+    it "merge with conflicts produce keeps original" do
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "a", "result" => "negative"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}])
+    end
+
+    it "merge other properties priorizing first assay" do
+      expect(merge([{"condition" => "a", "foo" => "foo", "other" => "first"}], [{"condition" => "a", "bar" => "bar", "other" => "second"}]))
+        .to eq([{"condition" => "a", "foo" => "foo", "other" => "first"}])
+    end
+
+    def merge_values(a, b)
+      merge([{"condition" => "a", "result" => a}], [{"condition" => "a", "result" => b}]).first["result"]
+    end
+
+    it "merge n/a n/a" do
+      expect(merge_values("n/a", "n/a")).to eq("n/a")
+    end
+
+    it "merge with same" do
+      expect(merge_values("any", "any")).to eq("any")
+    end
+
+    it "merge with different" do
+      expect(merge_values("any", "other")).to eq("any")
+    end
+
+    it "merge with n/a" do
+      expect(merge_values("any", "n/a")).to eq("any")
+      expect(merge_values("n/a", "any")).to eq("n/a")
+    end
+
+    it "merge with nil" do
+      expect(merge_values("any", nil)).to eq("any")
+      expect(merge_values(nil, "any")).to eq(nil)
+    end
+  end
+
   context "field validations" do
 
     it "should allow observations pii field" do
@@ -179,8 +240,8 @@ describe Encounter do
         expect(encounter.updated_diagnostic).to eq([
           {"condition" => "flu_a", "name" => "flu_a", "result" => "positive", "quantitative_result" => nil},
           {"condition" => "flu_c", "name" => "flu_c", "result" => "negative", "quantitative_result" => nil},
-          {"condition" => "mtb", "name" => "mtb", "result" => "indeterminate", "quantitative_result" => 32},
-          {"condition" => "flu_b", "name" => "flu_b", "result" => "positive", "quantitative_result" => nil},
+          {"condition" => "mtb", "name" => "mtb", "result" => "positive", "quantitative_result" => 32},
+          {"condition" => "flu_b", "name" => "flu_b", "result" => nil, "quantitative_result" => nil},
         ])
       end
 
