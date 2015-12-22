@@ -8,7 +8,11 @@ describe TestResultsController, elasticsearch: true do
   let(:root_location) { Location.make }
   let(:location) { Location.make parent: root_location }
   let(:site)     { Site.make institution: institution, location: location }
+  let(:subsite)  { Site.make institution: institution, location: location, parent: site }
   let(:device)   { Device.make institution_id: institution.id, site: site }
+
+  let(:site2)    { Site.make institution: institution, location: location }
+  let(:device2)  { Device.make institution_id: institution.id, site: site2 }
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }
@@ -33,18 +37,28 @@ describe TestResultsController, elasticsearch: true do
     expect(assigns(:tests).map{|t| t['test']['uuid']}).to contain_exactly(test_result.uuid)
   end
 
-  it "should load entities for filters" do
-    other_user; other_institution; other_site; other_device
+  context "loading entities" do
+    before(:each) do
+      other_user; other_institution; other_site; other_device
+      subsite; site2; device2
+      TestResult.create_and_index(
+        core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
+        device_messages: [ DeviceMessage.make(device: device) ])
+    end
 
-    test_result = TestResult.create_and_index(
-      core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
-      device_messages: [ DeviceMessage.make(device: device) ])
+    it "should load for filters" do
+      get :index
+      expect(response).to be_success
+      expect(assigns(:sites).to_a).to contain_exactly(site, site2, subsite)
+      expect(assigns(:devices).to_a).to contain_exactly(device, device2)
+    end
 
-    get :index
-    expect(response).to be_success
-    expect(assigns(:institutions).to_a).to contain_exactly(institution)
-    expect(assigns(:sites).to_a).to contain_exactly(site)
-    expect(assigns(:devices).to_a).to      contain_exactly(device)
+    it "should load for filters scoped by context" do
+      get :index, context: site.uuid
+      expect(response).to be_success
+      expect(assigns(:sites).to_a).to contain_exactly(site, subsite)
+      expect(assigns(:devices).to_a).to contain_exactly(device)
+    end
   end
 
   context "CSV" do
