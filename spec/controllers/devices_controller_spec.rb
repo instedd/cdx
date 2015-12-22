@@ -117,7 +117,7 @@ describe DevicesController do
     let!(:device2) {institution2.devices.make site: nil}
     let(:default_params) { {context: institution2.uuid} }
 
-    it "should display devices without sites when selecting instituion" do
+    it "should display devices without sites when selecting institution" do
       grant user2, user, Resource.all.map(&:resource_name), "*"
 
       get :index
@@ -157,9 +157,27 @@ describe DevicesController do
       expect(assigns(:device_models)).to contain_exactly(published, unpublished)
     end
 
-    it "loads all sites from allowed institutions" do
-      get :new
-      expect(assigns(:sites)).to contain_exactly(site, other_site)
+    it "loads unpublished device models only of context institution" do
+      published = device_model
+      unpublished = institution.device_models.make(:unpublished)
+      other_institution = Institution.make(user: user)
+      other_unpublished = DeviceModel.make(:unpublished, institution: other_institution)
+
+      get :new, context: other_institution.uuid
+      expect(assigns(:device_models)).to contain_exactly(published, other_unpublished)
+    end
+
+    it "loads all sites from allowed institutions in context" do
+      yet_another_institution = Institution.make
+      site1 = yet_another_institution.sites.make
+      site2 = yet_another_institution.sites.make
+
+      grant yet_another_institution.user, user, yet_another_institution, READ_INSTITUTION
+      grant yet_another_institution.user, user, yet_another_institution, REGISTER_INSTITUTION_DEVICE
+      grant yet_another_institution.user, user, site2, ASSIGN_DEVICE_SITE
+
+      get :new, context: yet_another_institution.uuid
+      expect(assigns(:sites)).to contain_exactly(site2)
     end
   end
 
