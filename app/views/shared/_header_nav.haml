@@ -32,9 +32,9 @@
         - if can_delegate_permissions?
           %li{:class => params[:controller] == "policies" && "active"}
             = link_to "Policies", policies_path
-        - if has_access?(Site, Policy::Actions::READ_SITE_USERS) || has_access?(Institution, Policy::Actions::READ_INSTITUTION_USERS)
-          %li{:class => params[:controller] == "users" && "active"}
-            = link_to "Users", users_path
+        -#- if has_access?(Site, Policy::Actions::READ_SITE_USERS) || has_access?(Institution, Policy::Actions::READ_INSTITUTION_USERS)
+          -#%li{:class => params[:controller] == "users" && "active"}
+            -#= link_to "Users", users_path
 
   .user{:tabindex => "0"}
     - if current_user
