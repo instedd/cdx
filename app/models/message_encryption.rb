@@ -1,6 +1,9 @@
 module MessageEncryption
   require 'securerandom'
 
+  DEFAULT_IV = "\xD7\xCA\xD5\x9D\x1D\xC0I\x01Sf\xC8\xFBa\x88\xE1\x03"
+  DEFAULT_SALT = "1403203711"
+
   def self.encrypt string
     Encryptor.encrypt string, :key => secret_key, :iv => iv, :salt => salt unless string.blank?
   end
@@ -21,6 +24,12 @@ module MessageEncryption
     Base64.urlsafe_encode64(SecureRandom.random_bytes(length))
   end
 
+  def self.reencrypt(string, old_key:, old_iv: DEFAULT_IV, old_salt: DEFAULT_SALT, new_key:, new_iv: DEFAULT_IV, new_salt: DEFAULT_SALT)
+    return '' if string.blank?
+    plain = Encryptor.decrypt(string, :key => old_key, :iv => old_iv, :salt => old_salt)
+    Encryptor.encrypt(plain, :key => new_key, :iv => new_iv, :salt => new_salt) unless plain.blank?
+  end
+
   private
 
   def self.secret_key
@@ -29,11 +38,11 @@ module MessageEncryption
 
   def self.iv
     # OpenSSL::Cipher::Cipher.new('aes-256-cbc').random_iv
-    ENV['MESSAGE_IV'] || "\xD7\xCA\xD5\x9D\x1D\xC0I\x01Sf\xC8\xFBa\x88\xE1\x03"
+    ENV['MESSAGE_IV'] || DEFAULT_IV
   end
 
   def self.salt
     # Time.now.to_i.to_s
-    ENV['MESSAGE_SALT'] || "1403203711"
+    ENV['MESSAGE_SALT'] || DEFAULT_SALT
   end
 end
