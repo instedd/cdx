@@ -19,23 +19,19 @@
     - else
       = cdx_table title: pluralize(@total, "Test") do |t|
         - t.columns do
-          %col{:width => "30%"}
-          %col{:width => "20%"}
-          %col{:width => "10%"}
-          %col{:width => "10%"}
-          %col{:width => "15%"}
-          %col{:width => "15%"}
+          - each_test_column do |id, title, opts|
+            %col{:width => opts[:width]}
         - t.actions do
           = link_to "download CSV", test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
 
         - t.thead do
           %tr
-            - each_column do |id, title, sortable|
-              %th= sortable ? order_by_column(title, id) : title
+            - each_test_column do |id, title, opts|
+              %th= opts[:sortable] ? order_by_column(title, id) : title
         - t.tbody do
           - @tests.each do |test|
             %tr{data: {href: @display_as == "test" ? test_result_path(test['test']['uuid']) : encounter_path(test['encounter']['uuid']) }}
-              - each_column do |id|
+              - each_test_column do |id|
                 %td= formatted_test_value(test, id, web: true)
       .pagination
         = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
