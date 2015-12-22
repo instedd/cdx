@@ -66,6 +66,22 @@ class Encounter < ActiveRecord::Base
     end
   end
 
+  def self.merge_assays_without_values(assays1, assays2)
+    return assays2 unless assays1
+    return assays1 unless assays2
+
+    assays1.dup.tap do |res|
+      assays2.each do |assay2|
+        assay = res.find { |a| a["condition"] == assay2["condition"] }
+        if assay.nil?
+          res << (assay2.dup.tap do |h|
+            h["result"] = nil
+          end)
+        end
+      end
+    end
+  end
+
   def self.entity_scope
     "encounter"
   end
@@ -76,6 +92,27 @@ class Encounter < ActiveRecord::Base
 
   def self.query params, user
     EncounterQuery.for params, user
+  end
+
+  def test_results_not_in_diagnostic
+    test_results.where("updated_at > ?", self.user_updated_at || self.created_at)
+  end
+
+  def has_dirty_diagnostic?
+    test_results_not_in_diagnostic.count > 0
+  end
+
+  def updated_diagnostic
+    assays_to_merge = test_results_not_in_diagnostic\
+      .map{|tr| tr.core_fields[TestResult::ASSAYS_FIELD]}
+
+    assays_to_merge.inject(core_fields[Encounter::ASSAYS_FIELD]) do |merged, to_merge|
+      Encounter.merge_assays_without_values(merged, to_merge)
+    end
+  end
+
+  def updated_diagnostic_timestamp!
+    update_attribute(:user_updated_at, Time.now.utc)
   end
 
   protected

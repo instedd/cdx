@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151210184357) do
+ActiveRecord::Schema.define(version: 20151218123655) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -85,8 +85,8 @@ ActiveRecord::Schema.define(version: 20151210184357) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",                  limit: 4
-    t.datetime "published_at"
     t.boolean  "supports_activation"
+    t.datetime "published_at"
     t.string   "support_url",                     limit: 255
     t.string   "picture_file_name",               limit: 255
     t.string   "picture_content_type",            limit: 255
@@ -117,18 +117,19 @@ ActiveRecord::Schema.define(version: 20151210184357) do
   end
 
   create_table "encounters", force: :cascade do |t|
-    t.integer  "institution_id", limit: 4
-    t.integer  "patient_id",     limit: 4
-    t.string   "uuid",           limit: 255
-    t.string   "entity_id",      limit: 255
-    t.binary   "sensitive_data", limit: 65535
-    t.text     "custom_fields",  limit: 65535
-    t.text     "core_fields",    limit: 65535
+    t.integer  "institution_id",  limit: 4
+    t.integer  "patient_id",      limit: 4
+    t.string   "uuid",            limit: 255
+    t.string   "entity_id",       limit: 255
+    t.binary   "sensitive_data",  limit: 65535
+    t.text     "custom_fields",   limit: 65535
+    t.text     "core_fields",     limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "is_phantom",                   default: true
+    t.boolean  "is_phantom",                    default: true
     t.datetime "deleted_at"
-    t.integer  "site_id",        limit: 4
+    t.integer  "site_id",         limit: 4
+    t.datetime "user_updated_at"
   end
 
   add_index "encounters", ["deleted_at"], name: "index_encounters_on_deleted_at", using: :btree
