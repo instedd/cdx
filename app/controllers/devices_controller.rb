@@ -197,15 +197,6 @@ class DevicesController < ApplicationController
     render partial: 'custom_mappings'
   end
 
-  def device_models
-    load_device_models_for_create
-
-    institution_id = params[:institution_id].to_i
-    @device_models = @device_models.select { |device_model| device_model.published? || device_model.institution_id == institution_id }.to_a
-
-    render partial: 'device_models'
-  end
-
   def performance
     @device = Device.find(params[:id])
     return unless authorize_resource(@device, READ_DEVICE)
@@ -250,7 +241,7 @@ class DevicesController < ApplicationController
   def load_device_models_for_create
     gon.device_models = @device_models = \
       (DeviceModel.includes(:institution).published.to_a + \
-       DeviceModel.includes(:institution).unpublished.where(institution_id: @institutions.map(&:id)).to_a)
+       DeviceModel.includes(:institution).unpublished.where(institution_id: @navigation_context.institution.id).to_a)
   end
 
   def load_device_models_for_update

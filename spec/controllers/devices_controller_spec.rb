@@ -157,6 +157,16 @@ describe DevicesController do
       expect(assigns(:device_models)).to contain_exactly(published, unpublished)
     end
 
+    it "loads unpublished device models only of context institution" do
+      published = device_model
+      unpublished = institution.device_models.make(:unpublished)
+      other_institution = Institution.make(user: user)
+      other_unpublished = DeviceModel.make(:unpublished, institution: other_institution)
+
+      get :new, context: other_institution.uuid
+      expect(assigns(:device_models)).to contain_exactly(published, other_unpublished)
+    end
+
     it "loads all sites from allowed institutions in context" do
       yet_another_institution = Institution.make
       site1 = yet_another_institution.sites.make
