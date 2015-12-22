@@ -21,8 +21,9 @@
     .row
       .col.pe-2
         = f.label :site
-      .col#device_sites
-        = render "sites"
+      .col
+        = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+          - select.items(@sites, :id, :name)
   .row
     .col.pe-2
       = f.label :name
@@ -63,23 +64,3 @@
             cdx_init_components($("#custom_mappings"))
         )
         selected_device_model_id = device_model_id
-
-    if $('form.new_device').length > 0 && cdx_select_find("device[institution_id]").length > 0
-      selected_institution_id = #{@device.institution_id}
-      cdx_select_on_change "device[institution_id]", (institution_id) ->
-        if institution_id != selected_institution_id
-          $("#device_models").load(
-            "/devices/new/device_models",
-            {"institution_id": institution_id},
-            ->
-              cdx_init_components($("#device_models"))
-              $("#custom_mappings").empty()
-          )
-
-          $("#device_sites").load(
-            "/devices/sites",
-            {"institution_id": institution_id},
-            ->
-              cdx_init_components($("#device_sites"))
-          )
-          selected_institution_id = institution_id

@@ -206,15 +206,6 @@ class DevicesController < ApplicationController
     render partial: 'device_models'
   end
 
-  def sites
-    load_sites
-
-    institution_id = params[:institution_id].to_i
-    @sites = @sites.where(institution_id: institution_id)
-
-    render partial: 'sites'
-  end
-
   def performance
     @device = Device.find(params[:id])
     return unless authorize_resource(@device, READ_DEVICE)
@@ -244,7 +235,7 @@ class DevicesController < ApplicationController
   end
 
   def load_sites
-    @sites = check_access(Site, ASSIGN_DEVICE_SITE)
+    @sites = check_access(@navigation_context.institution.sites, ASSIGN_DEVICE_SITE)
     @sites ||= []
   end
 
