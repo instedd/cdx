@@ -9,21 +9,31 @@
           "action": [
             "institution:read",
             "institution:update",
-            "institution:delete",
+            "institution:registerDeviceModel",
             "institution:registerDevice",
-            "institution:createSite",
-            "institution:createRole"
+            "institution:createRole",
+            "institution:readUsers"
           ],
           "delegable": true
         },
         {
-          "resource": [
-            "site?institution=<%= institution_id %>",
-            "device?institution=<%= institution_id %>",
-            "testResult?institution=<%= institution_id %>",
-            "encounter?institution=<%= institution_id %>"
-          ],
+          "resource": "device?institution=<%= institution_id %>",
           "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "deviceModel?institution=<%= institution_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "testResult:query",
+          "delegable": true
+        },
+        {
+          "resource": "deviceModel",
+          "action": "deviceModel:read",
           "delegable": true
         },
         {
@@ -42,9 +52,21 @@
         {
           "resource": "institution/<%= institution_id %>",
           "action": [
-            "institution:read"
-          ],
-          "delegable": true
+            "institution:read",
+            "institution:readUsers"
+          ]
+        },
+        {
+          "resource": "device?institution=<%= institution_id %>",
+          "action": "device:read"
+        },
+        {
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "testResult:query"
+        },
+        {
+          "resource": "deviceModel",
+          "action": "deviceModel:read"
         }
       ]
     }

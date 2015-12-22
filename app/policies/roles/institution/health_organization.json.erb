@@ -9,21 +9,14 @@
           "action": [
             "institution:read",
             "institution:update",
-            "institution:delete",
-            "institution:registerDevice",
-            "institution:createSite",
-            "institution:createRole"
+            "institution:createRole",
+            "institution:readUsers"
           ],
           "delegable": true
         },
         {
-          "resource": [
-            "site?institution=<%= institution_id %>",
-            "device?institution=<%= institution_id %>",
-            "testResult?institution=<%= institution_id %>",
-            "encounter?institution=<%= institution_id %>"
-          ],
-          "action": "*",
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "testResult:medicalDashboard",
           "delegable": true
         },
         {
@@ -40,11 +33,15 @@
     "policy": {
       "statement": [
         {
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "testResult:medicalDashboard"
+        },
+        {
           "resource": "institution/<%= institution_id %>",
           "action": [
-            "institution:read"
-          ],
-          "delegable": true
+            "institution:read",
+            "institution:readUsers"
+          ]
         }
       ]
     }

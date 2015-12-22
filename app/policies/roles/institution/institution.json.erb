@@ -9,20 +9,35 @@
           "action": [
             "institution:read",
             "institution:update",
-            "institution:delete",
             "institution:registerDevice",
             "institution:createSite",
-            "institution:createRole"
+            "institution:createRole",
+            "institution:readUsers"
           ],
           "delegable": true
         },
         {
-          "resource": [
-            "site?institution=<%= institution_id %>",
-            "device?institution=<%= institution_id %>",
-            "testResult?institution=<%= institution_id %>",
-            "encounter?institution=<%= institution_id %>"
-          ],
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "testResult:medicalDashboard",
+          "delegable": true
+        },
+        {
+          "resource": "site?institution=<%= institution_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "device?institution=<%= institution_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "encounter?institution=<%= institution_id %>",
           "action": "*",
           "delegable": true
         },
@@ -42,9 +57,29 @@
         {
           "resource": "institution/<%= institution_id %>",
           "action": [
-            "institution:read"
-          ],
-          "delegable": true
+            "institution:read",
+            "institution:readUsers"
+          ]
+        },
+        {
+          "resource": "site?institution=<%= institution_id %>",
+          "action": "site:read"
+        },
+        {
+          "resource": "device?institution=<%= institution_id %>",
+          "action": "device:read"
+        },
+        {
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "testResult:query"
+        },
+        {
+          "resource": "encounter?institution=<%= institution_id %>",
+          "action": "encounter:read"
+        },
+        {
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "testResult:medicalDashboard"
         }
       ]
     }
