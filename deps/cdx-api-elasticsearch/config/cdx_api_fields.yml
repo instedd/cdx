@@ -31,6 +31,8 @@ test:
       - name: test.error_code.max
         type: range-integer
         boundary: lte
+      - name: test.error_code.wildcard
+        type: wildcard
 
   - name: test.start_time
     filter_parameter_definition:
