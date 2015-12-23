@@ -1,7 +1,7 @@
 = form_for(alert_info) do |f|
   - if alert_info.errors.any?
     #error_explanation
-      %p= "#{pluralize(alert.errors.count, "error")} prohibited this alert from being saved:"
+      %p= "#{pluralize(alert_info.errors.count, "error")} prohibited this alert from being saved:"
       %ul
         - alert_info.errors.full_messages.each do |msg|
           %li= msg
@@ -71,21 +71,19 @@
 
   .row
     .col.pe-2
-      = f.label :SCOPE
+      = f.label :SITE
     .col
-      = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+      = cdx_select form: f, name: :sites_info, multi: '{true}', class: 'input-x-large' do |select|
         - select.item "", "None"
         - select.items @sites, :id, :name
-
 
   .row
     .col.pe-2
       = f.label :DEVICE
     .col
-      = cdx_select form: f, name: :description, multi: '{true}', class: 'input-x-large' do |select|
+      = cdx_select form: f, name: :devices_info, multi: '{true}', class: 'input-x-large' do |select|
         - select.item "", "None"
         - select.items @devices, :id, :name
-
 
   .row
     .col.pe-2
@@ -107,7 +105,6 @@
       = f.select :channel_type, Alert.channel_types.keys 
 
 
-
   .row
     .col.pe-2
       = f.label :ROLE
@@ -117,6 +114,20 @@
         - select.item "", "None"
         - select.items @roles, :id, :name
 
+  .row
+    .col.pe-2
+      = f.label :USER
+    .col
+      = cdx_select form: f, name: :description, multi: '{true}', class: 'input-x-large' do |select|
+        - select.item "", "None"
+        - select.items @users, :id, :email
+
+  .row
+    .col.pe-2
+      = f.label :ALL_PATIENTS
+    .col
+      = f.check_box :enabled
+      = f.label :ALL_PATIENTS, "&nbsp;".html_safe
 
   .row
     .col.pe-2
@@ -130,8 +141,6 @@
     .col
       =f.text_field :message
  
-
-
   .row.button-actions
     .col
       = f.submit class: "btn-primary"
