@@ -35,6 +35,9 @@
         -#- if has_access?(Site, Policy::Actions::READ_SITE_USERS) || has_access?(Institution, Policy::Actions::READ_INSTITUTION_USERS)
           -#%li{:class => params[:controller] == "users" && "active"}
             -#= link_to "Users", users_path
+        - if has_access?(Role, Policy::Actions::READ_ROLE)
+          %li{:class => params[:controller] == "roles" && "active"}
+            = link_to "Roles", roles_path
 
   .user{:tabindex => "0"}
     - if current_user

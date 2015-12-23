@@ -2,7 +2,8 @@ class RolesController < ApplicationController
   before_filter :load_institutions_and_sites, only: [:new, :create, :edit, :update]
 
   def index
-    @roles = check_access(Role, READ_ROLE)
+    @roles = check_access(Role, READ_ROLE).within(@navigation_context.entity)
+    @can_create = has_access?(Role, UPDATE_ROLE)
   end
 
   def new
