@@ -39,6 +39,8 @@
   .row
     .col.pe-3
       = f.label :setup_instructions
+      %p(style="font-size: 12px;")
+        %i Only PDF files below 5MB are allowed
     .col
       - if !@device_model.new_record? && @device_model.setup_instructions.present?
         = link_to "download", @device_model.setup_instructions.url
