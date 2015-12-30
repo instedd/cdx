@@ -8,4 +8,10 @@
               = image_tag "arrow-left-white.png"
             New Alert
 
+= react_component('AlertCategorySelect', category_types:Alert.category_types, aa:"vvv", url:"/alerts.json", sites:@sites, anomalie_types:Alert.anomalie_types)
+
+%br/
+%br/
+%hr/
+%hr/		
 = render 'form'

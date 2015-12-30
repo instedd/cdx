@@ -17,6 +17,10 @@ class AlertsController < ApplicationController
   end
 
   def index
+    @page_size = (params["page_size"] || 10).to_i
+    @page = (params["page"] || 1).to_i
+    offset = (@page - 1) * @page_size
+    
     respond_with alerts
   end
 
@@ -31,9 +35,10 @@ class AlertsController < ApplicationController
 
 
   def create
+    binding.pry
    alert_saved_ok = alert_info.save
    if alert_saved_ok
-
+     
    if params[:alert][:roles]
       roles = params[:alert][:roles].split(',')
       roles.each do |roleid|
@@ -45,6 +50,7 @@ class AlertsController < ApplicationController
         alertRecipient.save
       end
     end
+<<<<<<< HEAD
 
 
 =begin
@@ -54,6 +60,10 @@ elsif alert_info.error_code.include? '*'
    alert_info.query =    {"test.error_code.wildcard" => "*7"}
 =end
     if alert_info.error_code.include? '-'
+=======
+ 
+    if alert_info.error_code and alert_info.error_code.include? '-'
+>>>>>>> rewrote all the ,add alert page in reactjs
       minmax=alert_info.error_code.split('-')
       alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
     else
@@ -72,7 +82,7 @@ elsif alert_info.error_code.include? '*'
   
      alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
    end
-  
+   binding.pry
    #TODO you have the device uuid, you don’t even need the site uuid
    
    if params[:alert][:devices_info]
@@ -87,7 +97,7 @@ elsif alert_info.error_code.include? '*'
      
      alert_info.query=alert_info.query.merge ({"device.uuid"=>query_devices})
    end
-
+ binding.pry
     alert_info.create_percolator  #need to do this for per_record or an aggregation
   end
 
@@ -136,6 +146,7 @@ elsif alert_info.error_code.include? '*'
     user_ids = @roles.map { |user| user.id }
     user_ids = user_ids.uniq
     @users = User.where(id: user_ids)
+    
   end
 
 end

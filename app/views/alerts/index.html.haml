@@ -1,22 +1,42 @@
 .row
   .col
     = link_to "+", new_alert_path, class: 'btn-add side-link ontop fix', title: 'Add Alert'
-    = cdx_table title: 'Alerts - LIST' do |t|
+    = cdx_table title: alerts.size.to_s + ' Alert Groups' do |t|
       - t.thead do
         %tr
-          %th Ref
           %th Name
           %th Description
           %th Enabled
-          %th Last Alert
+          %th Sites
           %th Recipients
+          %th Last Incident
           
       - t.tbody do
         - alerts.each do |alert|
           %tr
-            %td= link_to alert.id, edit_alert_path(alert)
             %td= link_to alert.name, edit_alert_path(alert)
             %td= link_to alert.description, edit_alert_path(alert)
             %td= link_to alert.enabled ? 'yes' : 'no', alert_path(alert)
-            %td= link_to alert.last_alert, edit_alert_path(alert)
+            %td= display_sites(alert)
+            %td= display_roles(alert)
+            %td= display_latest_alert_date(alert)
+
+
+.pagination
+  = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
+  = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
+  %input.input-x-small.text-right{type: "text", name: "page", value: @page}
+  %span
+    of
+    = (@total.to_f / @page_size).ceil
+  %span(style="display: inline-block;")
+    = cdx_select name: "page_size_select", value: @page_size, class: 'input-large' do |select|
+      - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
+  :javascript
+    $(function(){
+      $(document).on('change', 'input[name=page_size_select]', function(){
+        $('input[name=page_size]').val($(this).val());
+        $('#filters-form').submit();
+      });
+    })
            

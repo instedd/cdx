@@ -23,9 +23,11 @@ class Alert < ActiveRecord::Base
   #  validates_presence_of :site
  
   enum category_type: [ :anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency, :workflow_delays]  
-  enum aggregation_type: [ :per_record, :aggregated]
-  enum aggregation_frequency: [ :per_hour, :per_day, :per_month]
+  enum aggregation_type: [ :record, :aggregated]
+  enum aggregation_frequency: [ :hour, :day, :month]
   enum channel_type: [ :web, :sms, :sms_and_web]
+  
+  enum anomalie_type: [:illogical_data_reported, :think_up_more]
   
   #for the alert _form, could not get the cdx_select element working when referencing a child table 
   attr_accessor :roles

@@ -5,7 +5,7 @@ class DailyAlertJob
 
   def perform   
 #   alert_history_check(1.hour)
- alert_history_check(5.minutes, Alert.per_hour)
+ alert_history_check(5.minutes, Alert.hour)
   end
 end
 
