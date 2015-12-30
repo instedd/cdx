@@ -62,12 +62,16 @@
     .col.pe-2
       = f.label :ERRORS
     .col
-      'All error codes will be reported'
+      =f.text_field :error_code, :placeholder => "All error codes will be reported"
+
+
   .row
     .col.pe-2
-      &nbsp;
+      = f.label :ANOMALIE_TYPE
     .col
-      =f.text_field :error_code
+      = cdx_select form: f, name: :anomalie_type, class: 'input-x-large' do |select|
+        - select.items Alert.anomalie_types.keys
+
 
   .row
     .col.pe-2
@@ -89,20 +93,26 @@
     .col.pe-2
       = f.label :AGGREGATION
     .col
-      = f.select :aggregation_type, Alert.aggregation_types.keys 
+      / = f.select :aggregation_type, Alert.aggregation_types.keys 
+      = cdx_select form: f, name: :aggregation_type, class: 'input-x-large' do |select|
+        - select.items Alert.aggregation_types.keys
 
   .row
     .col.pe-2
       = f.label :AGGREGATION_FREQUENCY
     .col
-      = f.select :aggregation_frequency, Alert.aggregation_frequencies.keys
+      /= f.select :aggregation_frequency, Alert.aggregation_frequencies.keys
+      = cdx_select form: f, name: :aggregation_frequency, class: 'input-x-large' do |select|
+        - select.items Alert.aggregation_frequencies.keys
 	
 	
   .row
     .col.pe-2
       = f.label :CHANNEL
     .col
-      = f.select :channel_type, Alert.channel_types.keys 
+      /= f.select :channel_type, Alert.channel_types.keys 
+      = cdx_select form: f, name: :channel_type, class: 'input-x-large' do |select|
+        - select.items Alert.channel_types.keys
 
 
   .row
