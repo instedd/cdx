@@ -24,6 +24,8 @@
 //= require react-select
 //= require components
 //= require d3
+//= require reflux
+//= require fetch
 //= require_tree .
 //= require turbolinks
 

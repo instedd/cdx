@@ -70,7 +70,7 @@ class AlertsController < ApplicationController
      #Note:  the institution uuid should not be necessary
      alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
    end
-   binding.pry
+   
    #TODO you have the device uuid, you don’t even need the site uuid
    if params[:alert][:devices_info]
      devices = params[:alert][:devices_info].split(',')
@@ -83,7 +83,7 @@ class AlertsController < ApplicationController
      #alert_info.query=alert_info.query.merge ({"device.uuid"=>device.uuid})
      alert_info.query=alert_info.query.merge ({"device.uuid"=>query_devices})
    end
- binding.pry
+ 
     alert_info.create_percolator  #need to do this for per_record or an aggregation
   end
 
