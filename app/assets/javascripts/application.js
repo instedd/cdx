@@ -30,6 +30,7 @@
 //= require components
 //= require d3
 //= require jquery.custom-file-input
+//= require reflux
 //= require_tree .
 //= require turbolinks
 Turbolinks.enableProgressBar()

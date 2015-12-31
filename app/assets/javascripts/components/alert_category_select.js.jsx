@@ -1,5 +1,9 @@
 //http://rny.io/rails/react/2014/07/31/reactjs-and-rails.html
 
+//var AlertStore = require('../../stores/AlertStore');
+//var AlertActions = require('../actions/AlertActions');
+
+
 var AlertCategorySelect = React.createClass({
 	mixins: [React.addons.LinkedStateMixin],
 	componentDidMount: function(){
@@ -47,8 +51,10 @@ var AlertCategorySelect = React.createClass({
 
 			this.setState({category1: current_category});
 
-
 			alert={ name: this.state.nameField, sites_info: this.state.siteField, error_code: this.state.errorCodeField};
+			
+AlertActions.createAlert(this.props.url,alert);		
+		/*	
 			$.ajax({
 				url: this.props.url,
 				dataType: 'json',
@@ -61,6 +67,7 @@ var AlertCategorySelect = React.createClass({
 					console.error(this.props.url, status, err.toString());
 				}.bind(this)
 			});
+			*/
 		},
 		render: function() {
 			return (

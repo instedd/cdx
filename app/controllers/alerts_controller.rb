@@ -82,7 +82,7 @@ elsif alert_info.error_code.include? '*'
   
      alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
    end
-   binding.pry
+   
    #TODO you have the device uuid, you don’t even need the site uuid
    
    if params[:alert][:devices_info]
@@ -97,7 +97,7 @@ elsif alert_info.error_code.include? '*'
      
      alert_info.query=alert_info.query.merge ({"device.uuid"=>query_devices})
    end
- binding.pry
+ 
     alert_info.create_percolator  #need to do this for per_record or an aggregation
   end
 
