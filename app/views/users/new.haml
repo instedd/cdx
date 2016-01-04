@@ -1,0 +1,27 @@
+- content_for(:subheader) do
+  .row.center.add-new
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to users_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left-white.png"
+            Invite Users
+
+= form_tag users_path do |f|
+  .row
+    .col.pe-2
+      = label_tag :role
+    .col
+      = cdx_select name: 'role' do |select|
+        - select.items @roles, :id, :name
+  .row
+    .col.pe-2
+      = label_tag :users
+    .col
+      = text_field_tag :users
+
+  .row.button-actions
+    .col
+      = submit_tag 'Send', :class => 'btn-primary'
+      = link_to 'Cancel', users_path, class: 'btn-link'

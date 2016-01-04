@@ -19,6 +19,22 @@ class UsersController < ApplicationController
     redirect_to users_path, notice: message || 'There was a problem updating this user'
   end
 
+  def new
+    @roles = Role.within(@navigation_context.entity)
+  end
+
+  def create
+    users = []
+    @role = Role.find(params[:role])
+    params[:users].split(',').each do |email|
+      email = email.strip
+      user = User.find_or_initialize_by(email: email)
+      user.invite! unless user.persisted?
+      user.roles << @role
+    end
+    redirect_to users_path
+  end
+
   private
 
   def user_params
