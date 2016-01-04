@@ -3,12 +3,8 @@
     %h1 Settings
 
 = form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f|
-  - if resource.errors.present?
-    .alert-container
-      .alert.alert-error
-        %ul
-          - resource.errors.full_messages.each do |msg|
-            %li= msg
+  = validation_errors resource
+
   .row
     .col.pe-2
       = f.label :first_name

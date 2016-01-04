@@ -1,10 +1,5 @@
 = form_for(@institution) do |f|
-  - if @institution.errors.present?
-    .alert-container
-      .alert.alert-error
-        %ul
-          - @institution.errors.full_messages.each do |msg|
-            %li= msg
+  = validation_errors @institution
   - unless @readonly
     - if @institution.new_record?
       .row.centered.institution-container

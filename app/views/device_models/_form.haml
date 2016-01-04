@@ -10,13 +10,7 @@
     });
   });
 
-- if @device_model.errors.present?
-  .alert-container
-    .alert.alert-error
-      %ul
-        - if @device_model.errors.present?
-          - @device_model.errors.full_messages.each do |msg|
-            %li= msg
+= validation_errors @device_model
 
 = form_for(@device_model, html: { multipart: true }) do |f|
   .row

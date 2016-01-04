@@ -113,4 +113,10 @@ module ApplicationHelper
   def show_institution?(action, resource)
     ComputedPolicy.condition_resources_for(action, resource, current_user)[:institution].count > 1
   end
+
+  def validation_errors(model)
+    if model.errors.present?
+      render partial: "shared/validation_errors", locals: { model: model }
+    end
+  end
 end

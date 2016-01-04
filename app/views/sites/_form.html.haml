@@ -1,11 +1,6 @@
 = form_for(@site) do |f|
-  - if @site.errors.present?
-    .alert-container
-      .alert.alert-error
-        %ul
-          - @site.errors.full_messages.each do |msg|
-            %li= msg
-
+  = validation_errors @site
+  
   .row
     .col.pe-2
       = f.label :institution
