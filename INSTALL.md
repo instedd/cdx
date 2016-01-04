@@ -46,6 +46,7 @@ Google client id and secret are required to enable login using Google, and you s
 
 ```yml
 host: cdx.example.com
+app_version: latest
 nndd_url: "/nndd/index.html"
 location_service_url: http://locations-stg.instedd.org
 google_client_id:
@@ -83,10 +84,6 @@ SSH_SYNC_DIR=/home/cdx-sync/sync
 SSH_SERVER_PORT=2223
 SSH_SERVER_HOST=cdx.example.com
 ```
-
-#### VERSION
-
-A `VERSION` file containing the description of the deployed version, which will be visible in the web application footer, is required as well. If this file is not included, remove the corresponding volume from the `web` service in the `docker-compose` file, or a `Errno::EISDIR: Is a directory @ io_fread - /app/VERSION` error will be raised.
 
 #### docker-compose.yml
 

@@ -35,7 +35,6 @@ web:
   volumes:
     - './settings.local.yml:/app/config/settings.local.yml'
     - './client_version.json:/app/public/client/version.json'
-    - './VERSION:/app/VERSION'
   volumes_from:
     - sshd
 
