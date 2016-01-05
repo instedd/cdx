@@ -20,4 +20,4 @@
 - if @device.device_model.setup_instructions.present?
   %p
     Download instructions as a
-    = link_to "pdf file", @device.device_model.setup_instructions.url
+    = link_to "pdf file", absolute_url(@device.device_model.setup_instructions.url)
