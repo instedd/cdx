@@ -95,7 +95,11 @@ class Encounter < ActiveRecord::Base
   end
 
   def test_results_not_in_diagnostic
-    test_results.where("updated_at > ?", self.user_updated_at || self.created_at)
+    diagnostic.present? ? test_results.where("updated_at > ?", self.user_updated_at || self.created_at) : test_results 
+  end
+
+  def diagnostic
+    core_fields[Encounter::ASSAYS_FIELD]
   end
 
   def has_dirty_diagnostic?
@@ -106,7 +110,7 @@ class Encounter < ActiveRecord::Base
     assays_to_merge = test_results_not_in_diagnostic\
       .map{|tr| tr.core_fields[TestResult::ASSAYS_FIELD]}
 
-    assays_to_merge.inject(core_fields[Encounter::ASSAYS_FIELD]) do |merged, to_merge|
+    assays_to_merge.inject(diagnostic) do |merged, to_merge|
       Encounter.merge_assays_without_values(merged, to_merge)
     end
   end

@@ -250,6 +250,24 @@ describe Encounter do
         expect(encounter).to_not have_dirty_diagnostic
       end
     end
-  end
 
+    context "when creating the encounter from the encounter_id reported in the test" do
+      def create_encounter_and_test()
+        DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(message.merge(encounter: {id: sample_entity_id}))
+      end
+
+      let(:sample_entity_id) { "1001" }
+      let(:message) { { test: { assays: [
+        {condition: "flu_a", name: "flu_a", result: "positive"}
+      ] } } }
+
+      before(:each) do
+        create_encounter_and_test
+      end
+      
+      it "should have a pending test" do
+        expect(Encounter.last.test_results_not_in_diagnostic).to eq([TestResult.last])
+      end
+    end
+  end
 end
