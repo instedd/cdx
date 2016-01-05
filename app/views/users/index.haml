@@ -1,6 +1,6 @@
 .row
   .col
-    = link_to "+", new_user_path, class: 'btn-add side-link ontop fix', title: 'Add Policy'
+    = react_component "AddUserLink", roles: @roles
     = cdx_table title: 'Users' do |t|
       - t.columns do
         %col{:width => "30%"}

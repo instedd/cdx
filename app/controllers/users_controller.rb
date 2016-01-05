@@ -5,6 +5,7 @@ class UsersController < ApplicationController
     return unless authorize_resource(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS))
     @users = User.within(@navigation_context.entity)
     @users_to_edit = check_access(@users, UPDATE_USER).pluck(:id)
+    @roles = Role.within(@navigation_context.entity).map{|r| {value: r.id, label: r.name}}
   end
 
   def edit
@@ -19,10 +20,6 @@ class UsersController < ApplicationController
     redirect_to users_path, notice: message || 'There was a problem updating this user'
   end
 
-  def new
-    @roles = Role.within(@navigation_context.entity)
-  end
-
   def create
     users = []
     @role = Role.find(params[:role])
@@ -30,9 +27,9 @@ class UsersController < ApplicationController
       email = email.strip
       user = User.find_or_initialize_by(email: email)
       user.invite! unless user.persisted?
-      user.roles << @role
+      user.roles << @role unless user.roles.include?(@role)
     end
-    redirect_to users_path
+    render nothing: true
   end
 
   private

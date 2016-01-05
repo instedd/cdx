@@ -131,7 +131,7 @@ Rails.application.routes.draw do
     resources :subscribers
   end
 
-  resources :users
+  resources :users, except: [:new]
   resources :roles
 
   get 'nndd' => 'application#nndd' if Rails.env.test?
