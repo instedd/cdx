@@ -63,6 +63,7 @@ var PolicyItemDetail = React.createClass({
       }
 
       var actions = this.props.actions[statement.resourceType];
+      var inheritAction = {id: '*', label: 'Inherit permissions from granter', value: '*'};
 
       ifResourceTypeSelected = <div className="with-resource-type">
         <div className="section">
@@ -81,14 +82,13 @@ var PolicyItemDetail = React.createClass({
         <div className="section">
           <span className="section-name">Actions</span>
           <div className="section-content">
-            <input type="checkbox" id={this.idFor("action-inherit")} checked={statement.actions.inherit} onChange={this.toggleAction.bind(this, 'inherit')} />
+            <input type="checkbox" id={this.idFor("action-inherit")} checked={statement.actions.inherit} onChange={this.toggleAction.bind(this, inheritAction)} />
             <label htmlFor={this.idFor("action-inherit")}>Inherit permissions from granter</label>
-            { /** FIXME: disable actions if Inherit is selected */ }
             { Object.keys(actions).map(function(actionKey, index) {
               var action = actions[actionKey];
               return (
                 <div key={actionKey}>
-                  <input type="checkbox" id={this.idFor("action-" + actionKey)} checked={this.statementHasAction(statement, action)} onChange={this.toggleAction.bind(this, action)} />
+                  <input type="checkbox" id={this.idFor("action-" + actionKey)} checked={this.statementHasAction(statement, action)} onChange={this.toggleAction.bind(this, action)} disabled={this.statementHasAction(statement, inheritAction)} />
                   <label htmlFor={this.idFor("action-" + actionKey)}>{action.label}</label>
                 </div>
               );
