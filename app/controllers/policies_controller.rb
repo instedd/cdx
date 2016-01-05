@@ -15,24 +15,20 @@ class PoliciesController < ApplicationController
   # POST /policies
   # POST /policies.json
   def create
-    @user = User.find_or_initialize_by(email: policy_params[:user_id])
     @policy = Policy.new(policy_params)
 
     begin
       definition = JSON.parse @policy.definition
       @policy.definition = definition
 
-      unless @user.persisted?
-        @user.invite!
-        @_notice = "An invitation email has been sent to #{@user.email}"
-      end
+      ensure_user
+      @policy.user_id = @user.id
+      @policy.granter_id = current_user.id
+
     rescue => ex
       @policy.errors.add :definition, ex.message
       has_definition_error = true
     end
-
-    @policy.user_id = @user.id
-    @policy.granter_id = current_user.id
 
     respond_to do |format|
       if @policy.errors.empty? && @policy.save
@@ -58,6 +54,7 @@ class PoliciesController < ApplicationController
     @editing = true
     @policy = Policy.find params[:id]
     @policy.definition = JSON.pretty_generate(@policy.definition)
+    @policy.user_id = @policy.user.email
   end
 
   # PATCH/PUT /policies/1
@@ -69,6 +66,8 @@ class PoliciesController < ApplicationController
     begin
       definition = JSON.parse @policy.definition
       @policy.definition = definition
+      ensure_user
+      @policy.user_id = @user.id
     rescue => ex
       @policy.errors.add :definition, ex.message
       has_definition_error = true
@@ -105,5 +104,13 @@ class PoliciesController < ApplicationController
 
   def policy_params
     params.require(:policy).permit(:name, :user_id, :definition, :delegable)
+  end
+
+  def ensure_user
+    @user = User.find_or_initialize_by(email: policy_params[:user_id])
+    unless @user.persisted?
+      @user.invite!
+      @_notice = "An invitation email has been sent to #{@user.email}"
+    end
   end
 end
