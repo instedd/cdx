@@ -1,7 +1,7 @@
 = form_for @policy do |f|
   - if @policy.errors.any?
     #error_explanation
-      %p= "#{pluralize(@policy.errors.count, "error")} prohibited this @policy from being saved:"
+      %p= "#{pluralize(@policy.errors.count, "error")} prohibited this policy from being saved:"
       %ul
         - @policy.errors.full_messages.each do |msg|
           %li= msg
