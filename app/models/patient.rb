@@ -22,4 +22,19 @@ class Patient < ActiveRecord::Base
   def self.entity_scope
     "patient"
   end
+
+  def self.attribute_field(*args)
+    args.each do |arg|
+      define_method arg do
+        self.plain_sensitive_data[arg.to_s]
+      end
+
+      define_method "#{arg}=" do |value|
+        self.plain_sensitive_data[arg.to_s] = value
+      end
+    end
+  end
+
+  attribute_field :name, :dob, :email, :phone
+
 end
