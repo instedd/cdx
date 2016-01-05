@@ -25,9 +25,9 @@ module TestResultsHelper
       scope, field = path.split('.')
       results = test[scope][field] || []
       if web
-        (results.map { |result| "<span class=\"assay-result assay-result-#{result["result"]}\">#{result["name"]}</span>" } ).join(" ").html_safe
+        (results.map { |result| "<span class=\"assay-result assay-result-#{result["result"]}\">#{result["condition"]}</span>" } ).join(" ").html_safe
       else
-        (results.map { |assay| "#{assay["name"]}: #{assay["result"]}"}).join(", ")
+        (results.map { |result| "#{result["condition"]}: #{result["result"]}"}).join(", ")
       end
     when "test.start_time", "test.end_time"
       time_zone = current_user.time_zone
