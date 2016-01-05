@@ -35,7 +35,8 @@ test:
         type: wildcard
 
   - name: test.start_time
-    filter_parameter_definition:
+    filter_parameter_definition:   
+      - include_default: true
       - name: since
         type: range
         boundary: from

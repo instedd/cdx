@@ -10,10 +10,7 @@
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
 # It's strongly recommended that you check this file into your version control system.
-
 ActiveRecord::Schema.define(version: 20160215195614) do
-
-
   create_table "alert_histories", force: :cascade do |t|
     t.boolean  "read",                                  default: false
     t.integer  "user_id",                     limit: 4
@@ -55,6 +52,7 @@ ActiveRecord::Schema.define(version: 20160215195614) do
     t.integer  "channel_type",          limit: 4,     default: 0
     t.integer  "aggregation_frequency", limit: 4,     default: 0
     t.integer  "sms_limit",             limit: 4,     default: 0
+    t.integer  "anomalie_type",         limit: 4,     default: 0
   end
 
   add_index "alerts", ["user_id"], name: "index_alerts_on_user_id", using: :btree

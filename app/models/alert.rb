@@ -27,7 +27,7 @@ class Alert < ActiveRecord::Base
   enum aggregation_frequency: [ :hour, :day, :month]
   enum channel_type: [ :web, :sms, :sms_and_web]
   
-  enum anomalie_type: [:illogical_data_reported, :think_up_more]
+  enum anomalie_type: [:missing_sample_id, :missing_start_time]
   
   #for the alert _form, could not get the cdx_select element working when referencing a child table 
   attr_accessor :roles
@@ -38,10 +38,10 @@ class Alert < ActiveRecord::Base
   def create_percolator
     es_query =  TestResult.query(self.query, self.user).elasticsearch_query
     return unless es_query
-    
+  
     Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
                           type: '.percolator',
-                          id: 'alert_'+self.id.to_s,
+                          id: 'alert_'+self.id.to_s+"_"+self.category_type.to_i.to_s,
                           body: { query: es_query, type: 'test' }                                                                         
    end
    
