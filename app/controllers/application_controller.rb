@@ -80,8 +80,6 @@ class ApplicationController < ActionController::Base
       return
     end
 
-#binding.pry
-
     if params[:context].blank?
       # if there is no context information force it to be explicit
       # this will trigger a redirect ?context=<institution_or_site_uuid>

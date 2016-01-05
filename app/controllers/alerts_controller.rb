@@ -34,7 +34,6 @@ class AlertsController < ApplicationController
 
 
   def create
-    binding.pry
    alert_saved_ok = alert_info.save
    if alert_saved_ok
      
@@ -50,6 +49,20 @@ class AlertsController < ApplicationController
       end
     end
  
+ 
+ 
+ if alert_info.category_type == "anomalies"
+   
+   # check that the start_time field is not missing
+   binding.pry
+   if alert_info.anomalie_type == "missing_sample_id"
+     alert_info.query =    {"sample.id"=>"null" }
+  elsif alert_info.anomalie_type == "missing_start_time"
+    alert_info.query =    {"test.start_time"=>"null" }
+  end
+ end
+ 
+  if alert_info.category_type == "device_errors"
     if alert_info.error_code and alert_info.error_code.include? '-'
       minmax=alert_info.error_code.split('-')
       alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
@@ -58,7 +71,8 @@ class AlertsController < ApplicationController
     else
       alert_info.query =    {"test.error_code"=>alert_info.error_code }
     end
-
+  end
+  
    if params[:alert][:sites_info]
      sites = params[:alert][:sites_info].split(',')
      query_sites=[]
@@ -119,7 +133,8 @@ class AlertsController < ApplicationController
   private
 
   def alert_params
-    params.require(:alert).permit(:name, :description, :error_code, :message, :site_id, :category_type, :aggregation_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+    
+    params.require(:alert).permit(:name, :description, :devices_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
   
   def new_alert_request_variables

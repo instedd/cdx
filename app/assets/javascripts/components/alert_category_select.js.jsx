@@ -28,15 +28,15 @@ var AlertCategorySelect = React.createClass({
 			//	var e1 = document.getElementById('xxx')
 			//   e1.style.display = (e1.style.display == 'block') ? 'none' : 'block';
 
-			if (e.currentTarget.value=='device_errors')
+			if (e.currentTarget.value=='device_errors') {
 			var e1 = document.getElementById('errorcoderow')
 			e1.style.display = 'block';
-			end
+			}
 
-			if (e.currentTarget.value=='anomalies')
+			if (e.currentTarget.value=='anomalies') {
 			var e1 = document.getElementById('anomalierow')
 			e1.style.display = 'block';
-			end
+			}
 
 			this.setState({
 				current_category: e.currentTarget.value

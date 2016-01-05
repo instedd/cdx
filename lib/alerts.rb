@@ -5,8 +5,7 @@ module Alerts
   #
   # if say 1000 daily testresults are needed per device, then loop over the device templates (only two at the moment)
   def alert_history_check(frequency, alert_type)
-    
-    binding.pry
+
     alerts = Alert.aggregated.hour.where({enabled: true})
 
     #for each alert check if it has occured in alert history in the last hour

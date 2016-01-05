@@ -7,6 +7,8 @@ var _notes = []; //This is private notes array
 
 
 var AlertStore = Reflux.createStore({
+ // listenables: [Actions],
+
   init: function() {
     // Here we listen to actions and register callbacks
     this.listenTo(AlertActions.createAlert, this.onCreate);
