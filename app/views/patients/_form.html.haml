@@ -1,0 +1,39 @@
+= form_for(@patient) do |f|
+  = validation_errors @patient
+
+  .row
+    .col.pe-2
+      = f.label :institution
+    .col
+      .value= f.object.institution
+
+  .row
+    .col.pe-2
+      = f.label :name
+    .col
+      = f.text_field :name, :class => 'input-large'
+
+  .row
+    .col.pe-2
+      = f.label :dob_text
+    .col
+      = f.text_field :dob_text, placeholder: @patient.dob_text_placeholder
+
+  = patient_address_component(@patient)
+
+  .row
+    .col.pe-2
+      = f.label :email
+    .col
+      = f.text_field :email, :class => 'input-large'
+
+  .row
+    .col.pe-2
+      = f.label :phone
+    .col
+      = f.text_field :phone, :class => 'input-large'
+
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', patients_path, class: 'btn-link'

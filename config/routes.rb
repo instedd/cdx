@@ -81,6 +81,7 @@ Rails.application.routes.draw do
   resources :subscribers
   resources :policies
   resources :api_tokens
+  resources :patients, only: [:index, :new, :create, :edit]
 
   scope :dashboards, controller: :dashboards do
     get :nndd

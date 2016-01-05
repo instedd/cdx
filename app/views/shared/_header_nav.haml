@@ -13,6 +13,9 @@
         - if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
           %li{:class => params[:controller] == "dashboards" && "active"}
             = link_to "Reports", nndd_path
+        - if has_access_to_patients_index?
+          %li{:class => params[:controller] == "patients" && "active"}
+            = link_to "Patients", patients_path
         - if has_access_to_sites_index?
           %li{:class => params[:controller] == "sites" && "active"}
             = link_to "Sites", sites_path

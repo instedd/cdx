@@ -1,0 +1,8 @@
+= render "filters"
+
+.row
+  .col
+    %ul
+      - @patients.each do |patient|
+        %li
+          = link_to patient.name, edit_patient_path(patient)

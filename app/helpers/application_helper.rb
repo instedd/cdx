@@ -7,6 +7,10 @@ module ApplicationHelper
     Policy.authorize action, resource, current_user
   end
 
+  def has_access_to_patients_index?
+    true # TODO change permission
+  end
+
   def has_access_to_sites_index?
     has_access?(Institution, Policy::Actions::CREATE_INSTITUTION_SITE) || check_access(Site, Policy::Actions::READ_SITE).exists?
   end
