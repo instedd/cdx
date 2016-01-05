@@ -27,17 +27,21 @@ var AddressAutosuggest = React.createClass({
     var inputAttributes = {
       name: this.props.name,
       onChange: this.props.onChange,
-      className: this.props.className
+      className: this.props.className,
+      autoComplete: "off"
     };
 
-    return <Autosuggest
-      value={this.props.value}
-      suggestions={this.geolocate}
-      suggestionRenderer={this.renderSuggestion}
-      suggestionValue={this.getSuggestionValue}
-      inputAttributes={inputAttributes}
-      onSuggestionSelected={this.props.onAddress}
-    />
+    return <div>
+      <label style={{ display: "none" }}>disableautocomplete</label>
+      <Autosuggest
+        value={this.props.value}
+        suggestions={this.geolocate}
+        suggestionRenderer={this.renderSuggestion}
+        suggestionValue={this.getSuggestionValue}
+        inputAttributes={inputAttributes}
+        onSuggestionSelected={this.props.onAddress}
+      />
+    </div>
   },
 
   // private
