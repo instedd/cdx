@@ -8,7 +8,7 @@ var PolicyDefinition = React.createClass({
 
   newPolicy: function() {
     this.setState(React.addons.update(this.state, {
-      statements: { $push: [{ delegable: false, resourceType: null, includeSubsites: false, actions: {} }] },
+      statements: { $push: [{ delegable: false, resourceType: null, includeSubsites: false, actions: [] }] },
       activeTab: { $set: this.state.statements.length } // the new statement isn't on the array yet
     }));
   },

@@ -27,7 +27,24 @@ var PolicyItemDetail = React.createClass({
   },
 
   toggleAction: function(action) {
-    this.props.updateStatement({actions: { [action] : {$apply: function(current) { return !current; }} }});
+    this.props.updateStatement({
+      actions: {
+        $apply: (function(actions) {
+          actions = actions.slice(); // clone the list - so we don't modify the original one
+          var actionIndex = actions.findIndex(function(anAction) { return anAction.id == action.id });
+          if(actionIndex < 0) {
+            actions.push(action);
+          } else {
+            actions.splice(actionIndex, 1);
+          }
+          return actions;
+        }).bind(this)
+      }
+    });
+  },
+
+  statementHasAction: function(statement, action) {
+    return statement.actions.find(function(anAction) { return anAction.id == action.id });
   },
 
   render: function() {
@@ -67,12 +84,12 @@ var PolicyItemDetail = React.createClass({
             <input type="checkbox" id={this.idFor("action-inherit")} checked={statement.actions.inherit} onChange={this.toggleAction.bind(this, 'inherit')} />
             <label htmlFor={this.idFor("action-inherit")}>Inherit permissions from granter</label>
             { /** FIXME: disable actions if Inherit is selected */ }
-            { Object.keys(actions).map(function(action, index) {
-              var scopedAction = statement.resourceType + ":" + action;
+            { Object.keys(actions).map(function(actionKey, index) {
+              var action = actions[actionKey];
               return (
-                <div>
-                  <input type="checkbox" id={this.idFor("action-" + action)} checked={statement.actions[scopedAction]} onChange={this.toggleAction.bind(this, scopedAction)} />
-                  <label htmlFor={this.idFor("action-" + action)}>{actions[action]}</label>
+                <div key={actionKey}>
+                  <input type="checkbox" id={this.idFor("action-" + actionKey)} checked={this.statementHasAction(statement, action)} onChange={this.toggleAction.bind(this, action)} />
+                  <label htmlFor={this.idFor("action-" + actionKey)}>{action.label}</label>
                 </div>
               );
             }.bind(this)) }

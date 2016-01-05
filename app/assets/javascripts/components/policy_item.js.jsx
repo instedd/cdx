@@ -20,7 +20,7 @@ var PolicyItem = React.createClass({
       return (
         <div>
           <div className="resource-type">{statement.resourceType}{withSubsites}</div>
-          <div className="description">Device, aca, algo esto</div>
+          <div className="description">{statement.actions.map(function(action) { return action.label; }).join(", ")}</div>
         </div>
       );
     }
