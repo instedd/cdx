@@ -5,4 +5,4 @@
     %ul
       - @patients.each do |patient|
         %li
-          = link_to patient.name, edit_patient_path(patient)
+          = link_to patient.name, patient_path(patient)

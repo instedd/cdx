@@ -1,0 +1,19 @@
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to patients_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            = @patient.name
+
+.row
+  .col
+    = card image: "card-unkown.png" do |c|
+      - c.top do
+        %b= @patient.name
+      - if @can_edit
+        - c.actions do
+          = link_to edit_patient_path(@patient), :title => 'Edit' do
+            = image_tag "ic-pencil.png"

@@ -1,6 +1,10 @@
 class PatientForm
   include ActiveModel::Model
 
+  def self.shared_attributes # shared editable attributes with patient model
+    [:institution, :name, :dob, :lat, :lng, :location_geoid, :address, :email, :phone]
+  end
+
   def self.model_name
     Patient.model_name
   end
@@ -14,21 +18,34 @@ class PatientForm
     Patient.human_attribute_name(*args)
   end
 
-  attr_accessor :institution, :name, :dob, :lat, :lng, :location_geoid, :address, :email, :phone
+  attr_accessor *shared_attributes
+  delegate :id, :new_record?, :persisted?, to: :patient
 
-  def attributes
-    [:institution, :name, :dob, :lat, :lng, :location_geoid, :address, :email, :phone].inject({}) do |hash, key|
-      hash[key] = self.send(key.to_s)
-      hash
+  def patient
+    @patient ||= Patient.new
+  end
+
+  def patient=(value)
+    @patient = value
+    self.class.assign_attributes(self, @patient)
+  end
+
+  def self.edit(patient)
+    new.tap do |form|
+      form.patient = patient
     end
   end
 
-  def to_patient
-    Patient.new(attributes)
+  def update(attributes)
+    attributes.each do |attr, value|
+      self.send("#{attr}=", value)
+    end
+
+    save
   end
 
   def save
-    valid? && to_patient.save
+    valid? && updated_patient.save
   end
 
   validates_presence_of :name
@@ -44,7 +61,14 @@ class PatientForm
   end
 
   def dob_text
-    self.dob.try { |v| v.is_a?(Time) ? v.strftime(date_format[:pattern]) : v }
+    value = self.dob
+    value = Time.parse(value) rescue value if value.is_a?(String) # dob attribute seems to be stored as YYYY-MM-DD string instead of a Time
+
+    if value.is_a?(Time)
+      return value.strftime(date_format[:pattern])
+    end
+
+    value
   end
 
   def dob_text=(value)
@@ -64,4 +88,16 @@ class PatientForm
   end
   # end dob
 
+  private
+
+  def self.assign_attributes(target, source)
+    shared_attributes.each do |attr|
+      target.send("#{attr}=", source.send(attr))
+    end
+  end
+
+  def updated_patient
+    self.class.assign_attributes(patient, self)
+    patient
+  end
 end

@@ -5,12 +5,14 @@ class PatientsController < ApplicationController
     @patients = Patient.where(institution: @navigation_context.institution).order(updated_at: :desc)
   end
 
+  def show
+    @patient = Patient.find(params[:id]) # TODO change permission
+    @can_edit = true # TODO change permission
+  end
+
   def new
     @patient = PatientForm.new
     prepare_for_institution_and_authorize(@patient, READ_INSTITUTION) # TODO change permission
-  end
-
-  def edit
   end
 
   def create
@@ -20,12 +22,35 @@ class PatientsController < ApplicationController
     @patient = PatientForm.new(patient_params)
     @patient.institution = @institution
 
-
     if @patient.save
-      redirect_to patients_path, notice: 'Patient was successfully created.'
+      redirect_to patient_path(@patient), notice: 'Patient was successfully created.'
     else
       render action: 'new'
     end
+  end
+
+  def edit
+    @patient = PatientForm.edit(Patient.find(params[:id])) # TODO permissions
+    @can_delete = true # TODO permissions
+  end
+
+  def update
+    @patient = PatientForm.edit(Patient.find(params[:id])) # TODO permissions
+
+    if @patient.update(patient_params)
+      redirect_to patient_path(@patient), notice: 'Patient was successfully updated.'
+    else
+      render action: 'edit'
+    end
+  end
+
+  def destroy
+    @patient = Patient.find(params[:id]) # TODO change permission
+    # return unless authorize_resource(@patient, DELETE_PATIENT)
+
+    @patient.destroy
+
+    redirect_to patients_path, notice: 'Patient was successfully deleted.'
   end
 
   private
