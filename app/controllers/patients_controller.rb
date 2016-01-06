@@ -1,23 +1,23 @@
 class PatientsController < ApplicationController
   def index
-    @can_create = true # TODO change permission
-    # @patients = check_access(Patient.where(institution: @navigation_context.institution).order(updated_at: :desc), READ_INSTITUTION) # TODO change permission
-    @patients = Patient.where(institution: @navigation_context.institution).order(updated_at: :desc)
+    @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_PATIENT)
+    @patients = check_access(Patient.where(institution: @navigation_context.institution), READ_PATIENT).order(updated_at: :desc)
   end
 
   def show
-    @patient = Patient.find(params[:id]) # TODO change permission
-    @can_edit = true # TODO change permission
+    @patient = Patient.find(params[:id])
+    return unless authorize_resource(@patient, READ_PATIENT)
+    @can_edit = has_access?(@patient, UPDATE_PATIENT)
   end
 
   def new
     @patient = PatientForm.new
-    prepare_for_institution_and_authorize(@patient, READ_INSTITUTION) # TODO change permission
+    prepare_for_institution_and_authorize(@patient, CREATE_INSTITUTION_PATIENT)
   end
 
   def create
     @institution = @navigation_context.institution
-    return unless authorize_resource(@institution, READ_INSTITUTION) # TODO change permission
+    return unless authorize_resource(@institution, CREATE_INSTITUTION_PATIENT)
 
     @patient = PatientForm.new(patient_params)
     @patient.institution = @institution
@@ -30,12 +30,17 @@ class PatientsController < ApplicationController
   end
 
   def edit
-    @patient = PatientForm.edit(Patient.find(params[:id])) # TODO permissions
-    @can_delete = true # TODO permissions
+    patient = Patient.find(params[:id])
+    @patient = PatientForm.edit(patient)
+    return unless authorize_resource(patient, UPDATE_PATIENT)
+
+    @can_delete = has_access?(patient, DELETE_PATIENT)
   end
 
   def update
-    @patient = PatientForm.edit(Patient.find(params[:id])) # TODO permissions
+    patient = Patient.find(params[:id])
+    @patient = PatientForm.edit(patient)
+    return unless authorize_resource(patient, UPDATE_PATIENT)
 
     if @patient.update(patient_params)
       redirect_to patient_path(@patient), notice: 'Patient was successfully updated.'
@@ -45,8 +50,8 @@ class PatientsController < ApplicationController
   end
 
   def destroy
-    @patient = Patient.find(params[:id]) # TODO change permission
-    # return unless authorize_resource(@patient, DELETE_PATIENT)
+    @patient = Patient.find(params[:id])
+    return unless authorize_resource(@patient, DELETE_PATIENT)
 
     @patient.destroy
 

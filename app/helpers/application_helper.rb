@@ -8,7 +8,7 @@ module ApplicationHelper
   end
 
   def has_access_to_patients_index?
-    true # TODO change permission
+    has_access?(Institution, Policy::Actions::CREATE_INSTITUTION_PATIENT) || check_access(Patient, Policy::Actions::READ_PATIENT).exists?
   end
 
   def has_access_to_sites_index?

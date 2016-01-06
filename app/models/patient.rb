@@ -2,6 +2,7 @@ class Patient < ActiveRecord::Base
   include Entity
   include AutoUUID
   include AutoIdHash
+  include Resource
 
   belongs_to :institution
 
