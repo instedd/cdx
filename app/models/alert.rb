@@ -1,7 +1,7 @@
 class Alert < ActiveRecord::Base
   belongs_to :user
   belongs_to :site
- 
+  
   has_many :alert_histories
   has_many :alert_recipients
   has_many  :recipient_notification_history
@@ -11,7 +11,7 @@ class Alert < ActiveRecord::Base
   
   after_update :recreate_alert_percolator
   after_destroy :delete_percolator
-     
+  
   accepts_nested_attributes_for :alert_recipients, reject_if: :all_blank, allow_destroy: true
 
   serialize :query, JSON
@@ -21,7 +21,7 @@ class Alert < ActiveRecord::Base
   validates_presence_of :name
   #  validates_presence_of :description
   #  validates_presence_of :site
- 
+  
   enum category_type: [ :anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency]  
   enum aggregation_type: [ :record, :aggregated]
   enum aggregation_frequency: [ :hour, :day, :month]
@@ -44,7 +44,7 @@ class Alert < ActiveRecord::Base
                           type: '.percolator',
                           id: 'alert_'+self.id.to_s+"_"+self.category_type.to_i.to_s,
                           body: { query: es_query, type: 'test' } 
-=end                          
+                          =end                          
     Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
                            type: '.percolator',
                            id: 'alert_'+self.id.to_s,

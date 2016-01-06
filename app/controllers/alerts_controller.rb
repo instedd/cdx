@@ -4,7 +4,6 @@ class AlertsController < ApplicationController
   expose(:alerts) { current_user.alerts }
   
   #could not name it 'alert' as rails gave a warning as this is a reserved method.
-  
   expose(:alert_info, model: :alert, attributes: :alert_params)
 
   before_filter do
@@ -13,6 +12,15 @@ class AlertsController < ApplicationController
 
   def new
     new_alert_request_variables
+
+=begin    
+    alert_info.name=""
+    alert_info.description=""
+    alert_info.error_code=""
+    alert_info.category_type=""
+    alert_info.message=""
+=end    
+   
     alert_info.alert_recipients.build 
   end
 
@@ -25,22 +33,36 @@ class AlertsController < ApplicationController
   end
 
   def edit
+    new_alert_request_variables
+  
     @editing = true
-    respond_with alert, location: alert_path
+    # alert_info.to_json(:include => :devices)
+ #   respond_with alert_info, location: alert_path
+## @aa=alert_info.to_json(:include => :devices)
+ 
+##self.alert_info = Alert.includes(:devices).find_by_id(130)
+
+@alert_devices=[]
+alert_info.devices.each do |device|
+   @alert_devices.push(device.id)
+end
+@alert_devices = @alert_devices.join(",")
+
+
+# respond_with alert_info.to_json(:include => :devices), location: alert_path
+respond_with alert_info, location: alert_path
+ 
   end
 
   def show
-    respond_with alert, location: alert_path
+    respond_with alert_info, location: alert_path
   end
 
 
   def create
    alert_saved_ok = alert_info.save
    if alert_saved_ok
-     
-  binding.pry   
-     
-   if params[:alert][:roles]
+    if params[:alert][:roles]
       roles = params[:alert][:roles].split(',')
       roles.each do |roleid|
         role = Role.find_by_id(roleid)
@@ -51,56 +73,47 @@ class AlertsController < ApplicationController
         alertRecipient.save
       end
     end
-<<<<<<< HEAD
-
-
-=begin
-how to do a wildcard
-
-elsif alert_info.error_code.include? '*' 
-   alert_info.query =    {"test.error_code.wildcard" => "*7"}
-=end
-    if alert_info.error_code.include? '-'
-=======
- 
- 
- 
- if alert_info.category_type == "anomalies"
-   
+    
+    
+    if alert_info.category_type == "anomalies"
+     
    # check that the start_time field is not missing
    if alert_info.anomalie_type == "missing_sample_id"
-     alert_info.query =    {"sample.id"=>"null" }
-  elsif alert_info.anomalie_type == "missing_start_time"
-    alert_info.query =    {"test.start_time"=>"null" }
+    # alert_info.query =    {"sample.id"=>"null" }
+     alert_info.query=alert_info.query.merge ({"sample.id"=>"null" })
+   elsif alert_info.anomalie_type == "missing_start_time"
+  #  alert_info.query =    {"test.start_time"=>"null" }
+    alert_info.query=alert_info.query.merge ({"test.start_time"=>"null" })
   end
- end
- 
-  if alert_info.category_type == "device_errors"
-    if alert_info.error_code and alert_info.error_code.include? '-'
->>>>>>> rewrote all the ,add alert page in reactjs
-      minmax=alert_info.error_code.split('-')
-      alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
-    else
-      alert_info.query =    {"test.error_code"=>alert_info.error_code }
-    end
+end
+
+if alert_info.category_type == "device_errors"
+  if alert_info.error_code and alert_info.error_code.include? '-'
+    minmax=alert_info.error_code.split('-')
+  #  alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
+     alert_info.query=alert_info.query.merge ({"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]})
+    #elsif alert_info.error_code.include? '*' 
+    #   alert_info.query =    {"test.error_code.wildcard" => "*7"}   
+  else
+  #  alert_info.query =    {"test.error_code"=>alert_info.error_code }
+    alert_info.query=alert_info.query.merge ({"test.error_code"=>alert_info.error_code });
   end
-  
-   if params[:alert][:sites_info]
-     sites = params[:alert][:sites_info].split(',')
-     query_sites=[]
-     sites.each do |siteid|
-       site = Site.find_by_id(siteid)
-       alert_info.sites << site
-       query_sites << site.uuid
-     end        
-    #Note:  the institution uuid should not be necessary
-  
+end
+
+if params[:alert][:sites_info]
+ sites = params[:alert][:sites_info].split(',')
+ query_sites=[]
+ sites.each do |siteid|
+   site = Site.find_by_id(siteid)
+   alert_info.sites << site
+   query_sites << site.uuid
+ end        
+     #Note:  the institution uuid should not be necessary
      alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
    end
    
    
    #TODO you have the device uuid, you don’t even need the site uuid
-   
    if params[:alert][:devices_info]
      devices = params[:alert][:devices_info].split(',')
      query_devices=[]
@@ -110,56 +123,73 @@ elsif alert_info.error_code.include? '*'
        query_devices << device.uuid
      end
      #alert_info.query=alert_info.query.merge ({"device.uuid"=>device.uuid})
-     
      alert_info.query=alert_info.query.merge ({"device.uuid"=>query_devices})
    end
    
     alert_info.create_percolator  #need to do this for per_record or an aggregation
   end
 
-  respond_to do |format|
+#  respond_to do |format|
     if alert_saved_ok
-      format.html { redirect_to alerts_path, notice: 'Alert was successfully created.' }
-      format.json { render action: 'show', status: :created, location: alert_info }
+      #format.html { redirect_to alerts_path, notice: 'Alert was successfully created.' }
+     # format.json { render action: 'show', status: :created, location: alert_info }
+     render json: alert_info
     else
-      new_alert_request_variables
-      format.html { render action: 'new' }
-      format.json { render json: alert_info.errors, status: :unprocessable_entity }
+##      new_alert_request_variables
+      #format.html { render action: 'new' }
+      #format.json { render json: alert_info.errors, status: :unprocessable_entity }  
+    render json: alert_info.errors, status: :unprocessable_entity
     end
-  end
+#  end
   
+end
+
+
+
+#def update
+#   if @customer.update(customer_params)
+#     render json: @customer
+#   else
+#     render json: @customer.errors, status: :unprocessable_entity
+#   end
+# end
+ 
+def update
+  flash[:notice] = "Alert was successfully updated" if alert_info.save
+  respond_with alert_info, location: alerts_path
+end
+
+
+def destroy
+  if alert_info.destroy
+    flash[:notice] = "alert was successfully deleted"
+    respond_with alert_info
+  else
+    render :edit
   end
+end
 
+=begin
+def devices
+ binding.pry
+ p 'ggg'
+ @devices = check_access(Device, READ_DEVICE)
+ render :json => @devices
+end
+=end
 
-  def update
-    flash[:notice] = "Alert was successfully updated" if alert_info.save
-    respond_with alert_info, location: alerts_path
-  end
+private
 
+def alert_params 
+  params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+end
 
-  def destroy
-    if alert_info.destroy
-      flash[:notice] = "alert was successfully deleted"
-      respond_with alert_info
-    else
-      render :edit
-    end
-  end
-
-  private
-
-  def alert_params 
-    binding.pry
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
-  end
-  
-  def new_alert_request_variables
-    @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
-    @roles = check_access(Role, READ_ROLE)
-    @devices = check_access(Device, READ_DEVICE)
+def new_alert_request_variables
+  @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
+  @roles = check_access(Role, READ_ROLE)
+  @devices = check_access(Device, READ_DEVICE)
 
     #find all users in all roles
-    
     user_ids = @roles.map { |user| user.id }
     user_ids = user_ids.uniq
     @users = User.where(id: user_ids)

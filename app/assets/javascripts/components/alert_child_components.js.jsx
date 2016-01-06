@@ -1,22 +1,3 @@
-
-var TestHide = React.createClass({
-	render: function() {
-		return (
-			<div className="row" id="xxx">
-			<div className="col pe-2">
-			Test hide
-			</div>
-			<div className="col">
-			<input type="text" placeholder="YYYYour name" ref="author" />
-			<input type="text" placeholder="SSSay something..." ref="comment" />
-			</div>
-			</div>
-		);
-	}
-});
-
-
-
 var AlertDescription = React.createClass({
 	render: function() {
 		return (
@@ -28,7 +9,7 @@ var AlertDescription = React.createClass({
 			<input type="text" placeholder="Description" ref="alert=description" />
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
@@ -42,12 +23,12 @@ var AlertErrorCode = React.createClass({
 			Errors
 			</label>
 			</div>
-	
+			
 			<div className="col">
 			<input type="text" placeholder="All error codes will be reported" valueLink={this.props.valueLink} />
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
@@ -91,16 +72,16 @@ var AlertSite = React.createClass({
 			</div>
 			<div className="col">
 			<Select
-					name="site"
-					value={value || valueLink.value}
-					options={siteOptions}			   
-					multi={true}		
-					placeholder="None"	    
-					onChange={this.onChange}
-					/>
+			name="site"
+			value={value || valueLink.value}
+			options={siteOptions}			   
+			multi={true}		
+			placeholder="None"	    
+			onChange={this.onChange}
+			/>
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
@@ -143,16 +124,16 @@ var AlertDevice = React.createClass({
 			</div>
 			<div className="col">
 			<Select
-					name="device"
-					value={value || valueLink.value}
-					options={deviceOptions}			   
-					multi={true}		
-					placeholder="None"	    
-					onChange={this.onChange}
-					/>
+			name="device"
+			value={value || valueLink.value}
+			options={deviceOptions}			   
+			multi={true}		
+			placeholder="None"	    
+			onChange={this.onChange}
+			/>
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
@@ -195,7 +176,7 @@ var AlertAnomalieType = React.createClass({
 			/>
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
@@ -216,35 +197,35 @@ var AlertAggregation = React.createClass({
 	//https://github.com/JedWatson/react-select/issues/256				
 	onChange(textValue, arrayValue) {					  
 	//	this.props.valueLink.requestChange(textValue);
-		this.props.valueLink.requestChange(arrayValue[0].label);
-	},
-	render: function() {
-		var options=[];
-		for (var i = 0; i < Object.keys(this.props.aggregation_types).length; i++) {
-			option={};
-			option["value"] = i;
-			option["label"] = Object.keys(this.props.aggregation_types)[i];
-			options.push(option);
-		}
-
-		var { valueLink, value, onChange, ...other } = this.props;
-		return (
-			<div className="row" id="aggregationrow">
-			<div className="col pe-2">
-			<label>Aggregation</label>
-			</div>
-			<div className="col">
-			<Select
-			name="anomalie"
-			value={value || valueLink.value}
-			options={options}			   
-			multi={false}			    
-			onChange={this.onChange}
-			/>
-			</div>
-			</div>
-		);
+	this.props.valueLink.requestChange(arrayValue[0].label);
+},
+render: function() {
+	var options=[];
+	for (var i = 0; i < Object.keys(this.props.aggregation_types).length; i++) {
+		option={};
+		option["value"] = i;
+		option["label"] = Object.keys(this.props.aggregation_types)[i];
+		options.push(option);
 	}
+
+	var { valueLink, value, onChange, ...other } = this.props;
+	return (
+		<div className="row" id="aggregationrow">
+		<div className="col pe-2">
+		<label>Aggregation</label>
+		</div>
+		<div className="col">
+		<Select
+		name="anomalie"
+		value={value || valueLink.value}
+		options={options}			   
+		multi={false}			    
+		onChange={this.onChange}
+		/>
+		</div>
+		</div>
+		);
+}
 });
 
 
@@ -260,34 +241,34 @@ var AlertAggregationFrequency = React.createClass({
 	onChange(textValue, arrayValue) {					  
 	//	this.props.valueLink.requestChange(textValue);
 	this.props.valueLink.requestChange(arrayValue[0].label);
-	},
-	render: function() {
-		var options=[];
-		for (var i = 0; i < Object.keys(this.props.aggregation_frequencies).length; i++) {
-			option={};
-			option["value"] = i;
-			option["label"] = Object.keys(this.props.aggregation_frequencies)[i];
-			options.push(option);
-		}
-
-		var { valueLink, value, onChange, ...other } = this.props;
-		return (
-			<div className="row" id="aggregationfrequenciesrow">
-			<div className="col pe-2">
-			<label>Aggregation frequencies</label>
-			</div>
-			<div className="col">
-			<Select
-			name="anomalie"
-			value={value || valueLink.value}
-			options={options}			   
-			multi={false}			    
-			onChange={this.onChange}
-			/>
-			</div>
-			</div>
-		);
+},
+render: function() {
+	var options=[];
+	for (var i = 0; i < Object.keys(this.props.aggregation_frequencies).length; i++) {
+		option={};
+		option["value"] = i;
+		option["label"] = Object.keys(this.props.aggregation_frequencies)[i];
+		options.push(option);
 	}
+
+	var { valueLink, value, onChange, ...other } = this.props;
+	return (
+		<div className="row" id="aggregationfrequenciesrow">
+		<div className="col pe-2">
+		<label>Aggregation frequencies</label>
+		</div>
+		<div className="col">
+		<Select
+		name="anomalie"
+		value={value || valueLink.value}
+		options={options}			   
+		multi={false}			    
+		onChange={this.onChange}
+		/>
+		</div>
+		</div>
+		);
+}
 });
 
 
@@ -302,34 +283,34 @@ var AlertChannel = React.createClass({
 	onChange(textValue, arrayValue) {					  
 	//	this.props.valueLink.requestChange(textValue);
 	this.props.valueLink.requestChange(arrayValue[0].label);
-	},
-	render: function() {
-		var options=[];
-		for (var i = 0; i < Object.keys(this.props.channel_types).length; i++) {
-			option={};
-			option["value"] = i;
-			option["label"] = Object.keys(this.props.channel_types)[i];
-			options.push(option);
-		}
-
-		var { valueLink, value, onChange, ...other } = this.props;
-		return (
-			<div className="row" id="channelrow">
-			<div className="col pe-2">
-			<label>Channel</label>
-			</div>
-			<div className="col">
-			<Select
-			name="channel"
-			value={value || valueLink.value}
-			options={options}			   
-			multi={false}			    
-			onChange={this.onChange}
-			/>
-			</div>
-			</div>
-		);
+},
+render: function() {
+	var options=[];
+	for (var i = 0; i < Object.keys(this.props.channel_types).length; i++) {
+		option={};
+		option["value"] = i;
+		option["label"] = Object.keys(this.props.channel_types)[i];
+		options.push(option);
 	}
+
+	var { valueLink, value, onChange, ...other } = this.props;
+	return (
+		<div className="row" id="channelrow">
+		<div className="col pe-2">
+		<label>Channel</label>
+		</div>
+		<div className="col">
+		<Select
+		name="channel"
+		value={value || valueLink.value}
+		options={options}			   
+		multi={false}			    
+		onChange={this.onChange}
+		/>
+		</div>
+		</div>
+		);
+}
 });
 
 
@@ -373,16 +354,16 @@ var AlertRole = React.createClass({
 			</div>
 			<div className="col">
 			<Select
-					name="role"
-					value={value || valueLink.value}
-					options={roleOptions}			   
-					multi={true}		
-					placeholder="None"	    
-					onChange={this.onChange}
-					/>
+			name="role"
+			value={value || valueLink.value}
+			options={roleOptions}			   
+			multi={true}		
+			placeholder="None"	    
+			onChange={this.onChange}
+			/>
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
@@ -426,16 +407,16 @@ var AlertUser = React.createClass({
 			</div>
 			<div className="col">
 			<Select
-					name="user"
-					value={value || valueLink.value}
-					options={userOptions}			   
-					multi={true}		
-					placeholder="None"	    
-					onChange={this.onChange}
-					/>
+			name="user"
+			value={value || valueLink.value}
+			options={userOptions}			   
+			multi={true}		
+			placeholder="None"	    
+			onChange={this.onChange}
+			/>
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
@@ -443,20 +424,20 @@ var AlertUser = React.createClass({
 
 var AlertPatient = React.createClass({
 	getInitialState: function() {
-	    return {
-	      isChecked: true
-	    };
-	  },
+		return {
+			isChecked: true
+		};
+	},
 	toggleChange: function() {
-	    this.setState({
+		this.setState({
 	      isChecked: !this.state.isChecked // flip boolean value	      
 	    }, function() {
-	      console.log(this.state);
-	        var valueLink = this.valueLink('patientField');
-		     valueLink.requestChange(isChecked);
-		
+	    	console.log(this.state);
+	    	var valueLink = this.valueLink('patientField');
+	    	valueLink.requestChange(isChecked);
+	    	
 	    }.bind(this));
-	  },
+	},
 	render: function() {
 		return (
 			<div className="row">
@@ -465,17 +446,17 @@ var AlertPatient = React.createClass({
 			</div>
 			<div className="col">
 			
-		        <input
-		          type="checkbox"
-		          checked={this.state.isChecked}
-		         
-		          onChange={this.toggleChange} />
-		       <label>
-		        &nbsp;
-		      </label>
+			<input
+			type="checkbox"
+			checked={this.state.isChecked}
+			
+			onChange={this.toggleChange} />
+			<label>
+			&nbsp;
+			</label>
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
@@ -493,12 +474,12 @@ var AlertSmsLimit = React.createClass({
 			SMS Per Day Limit
 			</label>
 			</div>
-	
+			
 			<div className="col">
 			<input type="text" placeholder="sms limit" valueLink={this.props.valueLink} />
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
@@ -511,12 +492,12 @@ var AlertMessage = React.createClass({
 			Message
 			</label>
 			</div>
-	
+			
 			<div className="col">
 			<input type="text" placeholder="message" valueLink={this.props.valueLink} />
 			</div>
 			</div>
-		);
+			);
 	}
 });
 
