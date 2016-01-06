@@ -8,15 +8,20 @@
           .value= f.object.full_name
       .row
         .col.pe-2
-          = f.label :telephone
-        .col
-          .value= f.object.telephone
-
-      .row
-        .col.pe-2
           = f.label :email
         .col
           .value= f.object.email
+      .row
+        .col.pe-2
+          = f.label :telephone, "Phone"
+        .col
+          .value= f.object.telephone
+      .row
+        .col.pe-2
+          = f.label :roles
+        .col
+          .value
+            = react_component 'OptionList', chosenOnes: @user_roles, userId: @user.id
     .col.pe-6
       .row
         .col.pe-2

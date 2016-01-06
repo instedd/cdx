@@ -131,8 +131,17 @@ Rails.application.routes.draw do
     resources :subscribers
   end
 
-  resources :users, except: [:new]
-  resources :roles
+  resources :users, except: [:new] do
+    member do
+      post :assign_role
+      post :unassign_role
+    end
+  end
+  resources :roles do
+    collection do
+      get :autocomplete
+    end
+  end
 
   get 'nndd' => 'application#nndd' if Rails.env.test?
 end

@@ -86,6 +86,12 @@ class RolesController < ApplicationController
     redirect_to roles_path, notice: 'Role was successfully deleted.'
   end
 
+  def autocomplete
+    roles = check_access(Role, READ_ROLE).where('name LIKE ?', "%#{params[:q]}%".gsub("'", "")).map{|r| {value: r.id, label: r.name}}
+    render json: roles
+  end
+
+
   private
 
   def role_params

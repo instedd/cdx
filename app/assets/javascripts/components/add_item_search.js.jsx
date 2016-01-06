@@ -10,7 +10,10 @@ var AddItemSearch = React.createClass({
   },
 
   chooseItem: function(item) {
-    this.props.onItemChosen(item)
+    this.props.onItemChosen(item);
+    this.setState(React.addons.update(this.state, {
+      items: { $set: [] }
+    }));
   },
 
   // debounce: http://stackoverflow.com/a/24679479/30948
@@ -28,16 +31,22 @@ var AddItemSearch = React.createClass({
   },
 
   handleSearch: function(query) {
-    var _this = this;
-    $.ajax({
-      url: this.props.callback,
-      data: { q: query },
-      success: function(data) {
-        _this.setState(React.addons.update(_this.state, {
-          items: { $set: data }
-        }));
-      }
-    });
+    if(query == '') {
+      console.log('hi!');
+      this.setState(React.addons.update(this.state, {
+        items: { $set: [] }
+      }));
+    } else {
+      $.ajax({
+        url: this.props.callback,
+        data: { q: query },
+        success: function(data) {
+          this.setState(React.addons.update(this.state, {
+            items: { $set: data }
+          }));
+        }.bind(this)
+      });
+    }
   },
 
   render: function() {
@@ -46,13 +55,13 @@ var AddItemSearch = React.createClass({
 
     return (
       <div className="item-search">
-        <input type="text" placeholder={this.props.placeholder} className="input-block" onChange={this.onChange} autoFocus="true"></input>
+        <input type="text" ref="input" placeholder={this.props.placeholder} className="input-block" onChange={this.onChange} onFocus={this.onChange} autoFocus="true"></input>
         <ul>
           {this.state.items.map(function(item) {
             return <li key={item[itemKey]} onClick={this.chooseItem.bind(this, item)}>{templateFactory({item: item})}</li>;
           }.bind(this))}
         </ul>
-       </div>
+      </div>
     );
   }
 

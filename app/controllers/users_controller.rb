@@ -1,15 +1,16 @@
 class UsersController < ApplicationController
-  before_filter :load_resource, only: [:edit, :update]
+  before_filter :load_resource, only: [:edit, :update, :assign_role, :unassign_role]
 
   def index
     return unless authorize_resource(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS))
     @users = User.within(@navigation_context.entity)
-    @users_to_edit = check_access(@users, UPDATE_USER).pluck(:id)
     @roles = Role.within(@navigation_context.entity).map{|r| {value: r.id, label: r.name}}
   end
 
   def edit
-    return unless authorize_resource(@user, UPDATE_USER)
+    @user_roles = @user.roles
+    return unless @user_roles.any?{|role| authorize_resource(role, ASSIGN_USER_ROLE)}
+    @user_roles = @user_roles.map{|r| {value: r.id, label: r.name}}
   end
 
   def update
@@ -29,6 +30,18 @@ class UsersController < ApplicationController
       user.invite! unless user.persisted?
       user.roles << @role unless user.roles.include?(@role)
     end
+    render nothing: true
+  end
+
+  def assign_role
+    @role = Role.find(params[:role])
+    @user.roles << @role
+    render nothing: true
+  end
+
+  def unassign_role
+    @role = Role.find(params[:role])
+    @user.roles.delete(@role)
     render nothing: true
   end
 

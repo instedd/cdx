@@ -1,0 +1,28 @@
+.option-list {
+  ul.box-list {
+    li {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+      box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+      padding: 14px;
+      margin-bottom: 8px;
+    }
+  }
+  a.add {
+    text-transform: uppercase;
+  }
+  a.remove {
+    float:right;
+    color:#999999;
+  }
+  span.box-autocomplete {
+    padding:8px;
+    display:list-item;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0px -1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .hidden {
+    display:none;
+  }
+}
