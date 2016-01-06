@@ -37,9 +37,9 @@ class AlertsController < ApplicationController
    alert_saved_ok = alert_info.save
    if alert_saved_ok
      
-  binding.pry   
-     
-   if params[:alert][:roles]
+    binding.pry   
+    
+    if params[:alert][:roles]
       roles = params[:alert][:roles].split(',')
       roles.each do |roleid|
         role = Role.find_by_id(roleid)
@@ -50,38 +50,38 @@ class AlertsController < ApplicationController
         alertRecipient.save
       end
     end
- 
- 
- 
- if alert_info.category_type == "anomalies"
-   
+    
+    
+    
+    if alert_info.category_type == "anomalies"
+     
    # check that the start_time field is not missing
    if alert_info.anomalie_type == "missing_sample_id"
      alert_info.query =    {"sample.id"=>"null" }
-  elsif alert_info.anomalie_type == "missing_start_time"
+   elsif alert_info.anomalie_type == "missing_start_time"
     alert_info.query =    {"test.start_time"=>"null" }
   end
- end
- 
-  if alert_info.category_type == "device_errors"
-    if alert_info.error_code and alert_info.error_code.include? '-'
-      minmax=alert_info.error_code.split('-')
-      alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
+end
+
+if alert_info.category_type == "device_errors"
+  if alert_info.error_code and alert_info.error_code.include? '-'
+    minmax=alert_info.error_code.split('-')
+    alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
     #elsif alert_info.error_code.include? '*' 
     #   alert_info.query =    {"test.error_code.wildcard" => "*7"}   
-    else
-      alert_info.query =    {"test.error_code"=>alert_info.error_code }
-    end
+  else
+    alert_info.query =    {"test.error_code"=>alert_info.error_code }
   end
-  
-   if params[:alert][:sites_info]
-     sites = params[:alert][:sites_info].split(',')
-     query_sites=[]
-     sites.each do |siteid|
-       site = Site.find_by_id(siteid)
-       alert_info.sites << site
-       query_sites << site.uuid
-     end        
+end
+
+if params[:alert][:sites_info]
+ sites = params[:alert][:sites_info].split(',')
+ query_sites=[]
+ sites.each do |siteid|
+   site = Site.find_by_id(siteid)
+   alert_info.sites << site
+   query_sites << site.uuid
+ end        
      #Note:  the institution uuid should not be necessary
      alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
    end
@@ -114,35 +114,35 @@ class AlertsController < ApplicationController
     end
   end
   
+end
+
+
+def update
+  flash[:notice] = "Alert was successfully updated" if alert_info.save
+  respond_with alert_info, location: alerts_path
+end
+
+
+def destroy
+  if alert_info.destroy
+    flash[:notice] = "alert was successfully deleted"
+    respond_with alert_info
+  else
+    render :edit
   end
+end
 
+private
 
-  def update
-    flash[:notice] = "Alert was successfully updated" if alert_info.save
-    respond_with alert_info, location: alerts_path
-  end
+def alert_params 
+  binding.pry
+  params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+end
 
-
-  def destroy
-    if alert_info.destroy
-      flash[:notice] = "alert was successfully deleted"
-      respond_with alert_info
-    else
-      render :edit
-    end
-  end
-
-  private
-
-  def alert_params 
-    binding.pry
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
-  end
-  
-  def new_alert_request_variables
-    @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
-    @roles = check_access(Role, READ_ROLE)
-    @devices = check_access(Device, READ_DEVICE)
+def new_alert_request_variables
+  @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
+  @roles = check_access(Role, READ_ROLE)
+  @devices = check_access(Device, READ_DEVICE)
 
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }
