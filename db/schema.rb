@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160104104519) do
+ActiveRecord::Schema.define(version: 20160106154918) do
 
   create_table "alert_histories", force: :cascade do |t|
     t.boolean  "read",                                  default: false
@@ -55,6 +55,7 @@ ActiveRecord::Schema.define(version: 20160104104519) do
     t.integer  "aggregation_frequency", limit: 4,     default: 0
     t.integer  "sms_limit",             limit: 4,     default: 0
     t.integer  "anomalie_type",         limit: 4,     default: 0
+    t.boolean  "notify_patients",                     default: false
   end
 
   add_index "alerts", ["user_id"], name: "index_alerts_on_user_id", using: :btree

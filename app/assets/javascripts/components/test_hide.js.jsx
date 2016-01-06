@@ -22,10 +22,10 @@ var AlertDescription = React.createClass({
 		return (
 			<div className="row">
 			<div className="col pe-2">
-			Description
+			<label>Description</label>
 			</div>
 			<div className="col">
-			<input type="text" placeholder="description" ref="alert=description" />
+			<input type="text" placeholder="Description" ref="alert=description" />
 			</div>
 			</div>
 		);
@@ -38,8 +38,11 @@ var AlertErrorCode = React.createClass({
 		return (
 			<div className="row" id="errorcoderow">
 			<div className="col pe-2">
+			<label>
 			Errors
+			</label>
 			</div>
+	
 			<div className="col">
 			<input type="text" placeholder="All error codes will be reported" valueLink={this.props.valueLink} />
 			</div>
@@ -66,6 +69,13 @@ var AlertSite = React.createClass({
 	},
 	render: function() {
 		var siteOptions=[];
+		
+		siteOption={};
+		siteOption["value"] = "";
+		siteOption["label"] = "None"
+		siteOptions.push(siteOption);
+		
+		
 		for (var i = 0; i < this.props.sites.length; i++) {
 			siteOption={};
 			siteOption["value"] = this.props.sites[i].id;
@@ -77,16 +87,17 @@ var AlertSite = React.createClass({
 		return (
 			<div className="row">
 			<div className="col pe-2">
-			&nbsp;
+			<label>Site</label>
 			</div>
 			<div className="col">
 			<Select
-			name="site"
-			value={value || valueLink.value}
-			options={siteOptions}			   
-			multi="true"			    
-			onChange={this.onChange}
-			/>
+					name="site"
+					value={value || valueLink.value}
+					options={siteOptions}			   
+					multi={true}		
+					placeholder="None"	    
+					onChange={this.onChange}
+					/>
 			</div>
 			</div>
 		);
@@ -94,6 +105,56 @@ var AlertSite = React.createClass({
 });
 
 
+
+
+
+var AlertDevice = React.createClass({	
+	getDefaultProps: function(){
+		return {
+			multiple: true,
+			name: 'selectDevice',
+		}
+	},									
+	onChange(textValue, arrayValue) {					  
+		// Multi select: grab values and send array of values to valueLink
+		this.props.valueLink.requestChange(_.pluck(arrayValue, 'value').join());
+	},
+	render: function() {
+		var deviceOptions=[];
+		
+		deviceOption={};
+		deviceOption["value"] = "";
+		deviceOption["label"] = "None"
+		deviceOptions.push(deviceOption);
+		
+		
+		for (var i = 0; i < this.props.devices.length; i++) {
+			deviceOption={};
+			deviceOption["value"] = this.props.devices[i].id;
+			deviceOption["label"] = this.props.devices[i].name;
+			deviceOptions.push(deviceOption);
+		}
+
+		var { valueLink, value, onChange, ...other } = this.props;
+		return (
+			<div className="row">
+			<div className="col pe-2">
+			<label>Device</label>
+			</div>
+			<div className="col">
+			<Select
+					name="device"
+					value={value || valueLink.value}
+					options={deviceOptions}			   
+					multi={true}		
+					placeholder="None"	    
+					onChange={this.onChange}
+					/>
+			</div>
+			</div>
+		);
+	}
+});
 
 
 
@@ -122,14 +183,14 @@ var AlertAnomalieType = React.createClass({
 		return (
 			<div className="row" id="anomalierow">
 			<div className="col pe-2">
-			Anomalies;
+			<label>Anomalies</label>
 			</div>
 			<div className="col">
 			<Select
 			name="anomalie"
 			value={value || valueLink.value}
 			options={options}			   
-			multi="false"			    
+			multi={false}			    
 			onChange={this.onChange}
 			/>
 			</div>
@@ -137,3 +198,326 @@ var AlertAnomalieType = React.createClass({
 		);
 	}
 });
+
+
+
+
+
+
+
+
+var AlertAggregation = React.createClass({	
+	getDefaultProps: function(){
+		return {
+			multiple: false,
+			name: 'Aggregation',
+		}
+	},					
+	//https://github.com/JedWatson/react-select/issues/256				
+	onChange(textValue, arrayValue) {					  
+	//	this.props.valueLink.requestChange(textValue);
+		this.props.valueLink.requestChange(arrayValue[0].label);
+	},
+	render: function() {
+		var options=[];
+		for (var i = 0; i < Object.keys(this.props.aggregation_types).length; i++) {
+			option={};
+			option["value"] = i;
+			option["label"] = Object.keys(this.props.aggregation_types)[i];
+			options.push(option);
+		}
+
+		var { valueLink, value, onChange, ...other } = this.props;
+		return (
+			<div className="row" id="aggregationrow">
+			<div className="col pe-2">
+			<label>Aggregation</label>
+			</div>
+			<div className="col">
+			<Select
+			name="anomalie"
+			value={value || valueLink.value}
+			options={options}			   
+			multi={false}			    
+			onChange={this.onChange}
+			/>
+			</div>
+			</div>
+		);
+	}
+});
+
+
+
+var AlertAggregationFrequency = React.createClass({	
+	getDefaultProps: function(){
+		return {
+			multiple: false,
+			name: 'Aggregation',
+		}
+	},					
+	//https://github.com/JedWatson/react-select/issues/256				
+	onChange(textValue, arrayValue) {					  
+	//	this.props.valueLink.requestChange(textValue);
+	this.props.valueLink.requestChange(arrayValue[0].label);
+	},
+	render: function() {
+		var options=[];
+		for (var i = 0; i < Object.keys(this.props.aggregation_frequencies).length; i++) {
+			option={};
+			option["value"] = i;
+			option["label"] = Object.keys(this.props.aggregation_frequencies)[i];
+			options.push(option);
+		}
+
+		var { valueLink, value, onChange, ...other } = this.props;
+		return (
+			<div className="row" id="aggregationfrequenciesrow">
+			<div className="col pe-2">
+			<label>Aggregation frequencies</label>
+			</div>
+			<div className="col">
+			<Select
+			name="anomalie"
+			value={value || valueLink.value}
+			options={options}			   
+			multi={false}			    
+			onChange={this.onChange}
+			/>
+			</div>
+			</div>
+		);
+	}
+});
+
+
+var AlertChannel = React.createClass({	
+	getDefaultProps: function(){
+		return {
+			multiple: false,
+			name: 'Channel',
+		}
+	},					
+	//https://github.com/JedWatson/react-select/issues/256				
+	onChange(textValue, arrayValue) {					  
+	//	this.props.valueLink.requestChange(textValue);
+	this.props.valueLink.requestChange(arrayValue[0].label);
+	},
+	render: function() {
+		var options=[];
+		for (var i = 0; i < Object.keys(this.props.channel_types).length; i++) {
+			option={};
+			option["value"] = i;
+			option["label"] = Object.keys(this.props.channel_types)[i];
+			options.push(option);
+		}
+
+		var { valueLink, value, onChange, ...other } = this.props;
+		return (
+			<div className="row" id="channelrow">
+			<div className="col pe-2">
+			<label>Channel</label>
+			</div>
+			<div className="col">
+			<Select
+			name="channel"
+			value={value || valueLink.value}
+			options={options}			   
+			multi={false}			    
+			onChange={this.onChange}
+			/>
+			</div>
+			</div>
+		);
+	}
+});
+
+
+
+
+
+// http://voidcanvas.com/react-tutorial-two-way-data-binding/
+var AlertRole = React.createClass({	
+	getDefaultProps: function(){
+		return {
+			multiple: true,
+			name: 'selectrole',
+		}
+	},					
+	//https://github.com/JedWatson/react-select/issues/256				
+	onChange(textValue, arrayValue) {					  
+		// Multi select: grab values and send array of values to valueLink
+		this.props.valueLink.requestChange(_.pluck(arrayValue, 'value').join());
+	},
+	render: function() {
+		var roleOptions=[];
+		
+		roleOption={};
+		roleOption["value"] = "";
+		roleOption["label"] = "None"
+		roleOptions.push(roleOption);
+		
+		
+		for (var i = 0; i < this.props.roles.length; i++) {
+			roleOption={};
+			roleOption["value"] = this.props.roles[i].id;
+			roleOption["label"] = this.props.roles[i].name;
+			roleOptions.push(roleOption);
+		}
+
+		var { valueLink, value, onChange, ...other } = this.props;
+		return (
+			<div className="row">
+			<div className="col pe-2">
+			<label>Role</label>
+			</div>
+			<div className="col">
+			<Select
+					name="role"
+					value={value || valueLink.value}
+					options={roleOptions}			   
+					multi={true}		
+					placeholder="None"	    
+					onChange={this.onChange}
+					/>
+			</div>
+			</div>
+		);
+	}
+});
+
+
+
+
+// http://voidcanvas.com/react-tutorial-two-way-data-binding/
+var AlertUser = React.createClass({	
+	getDefaultProps: function(){
+		return {
+			multiple: true,
+			name: 'selectuser',
+		}
+	},					
+	//https://github.com/JedWatson/react-select/issues/256				
+	onChange(textValue, arrayValue) {					  
+		// Multi select: grab values and send array of values to valueLink
+		this.props.valueLink.requestChange(_.pluck(arrayValue, 'value').join());
+	},
+	render: function() {
+		var userOptions=[];
+		
+		userOption={};
+		userOption["value"] = "";
+		userOption["label"] = "None"
+		userOptions.push(userOption);
+		
+		
+		for (var i = 0; i < this.props.users.length; i++) {
+			userOption={};
+			userOption["value"] = this.props.users[i].id;
+			userOption["label"] = this.props.users[i].email;
+			userOptions.push(userOption);
+		}
+
+		var { valueLink, value, onChange, ...other } = this.props;
+		return (
+			<div className="row">
+			<div className="col pe-2">
+			<label>User</label>
+			</div>
+			<div className="col">
+			<Select
+					name="user"
+					value={value || valueLink.value}
+					options={userOptions}			   
+					multi={true}		
+					placeholder="None"	    
+					onChange={this.onChange}
+					/>
+			</div>
+			</div>
+		);
+	}
+});
+
+
+
+var AlertPatient = React.createClass({
+	getInitialState: function() {
+	    return {
+	      isChecked: true
+	    };
+	  },
+	toggleChange: function() {
+	    this.setState({
+	      isChecked: !this.state.isChecked // flip boolean value	      
+	    }, function() {
+	      console.log(this.state);
+	        var valueLink = this.valueLink('patientField');
+		     valueLink.requestChange(isChecked);
+		
+	    }.bind(this));
+	  },
+	render: function() {
+		return (
+			<div className="row">
+			<div className="col pe-2">
+			<label>All Patients</label>
+			</div>
+			<div className="col">
+			
+		        <input
+		          type="checkbox"
+		          checked={this.state.isChecked}
+		         
+		          onChange={this.toggleChange} />
+		       <label>
+		        &nbsp;
+		      </label>
+			</div>
+			</div>
+		);
+	}
+});
+
+
+
+
+
+
+var AlertSmsLimit = React.createClass({
+	render: function() {
+		return (
+			<div className="row" id="smslimitrow">
+			<div className="col pe-2">
+			<label>
+			SMS Per Day Limit
+			</label>
+			</div>
+	
+			<div className="col">
+			<input type="text" placeholder="sms limit" valueLink={this.props.valueLink} />
+			</div>
+			</div>
+		);
+	}
+});
+
+var AlertMessage = React.createClass({
+	render: function() {
+		return (
+			<div className="row" id="messagerow">
+			<div className="col pe-2">
+			<label>
+			Message
+			</label>
+			</div>
+	
+			<div className="col">
+			<input type="text" placeholder="message" valueLink={this.props.valueLink} />
+			</div>
+			</div>
+		);
+	}
+});
+
+
