@@ -11,6 +11,7 @@ class UsersController < ApplicationController
     @user_roles = @user.roles
     return unless @user_roles.any?{|role| authorize_resource(role, ASSIGN_USER_ROLE)}
     @user_roles = @user_roles.map{|r| {value: r.id, label: r.name}}
+    @can_update = has_access?(User, UPDATE_USER)
   end
 
   def update

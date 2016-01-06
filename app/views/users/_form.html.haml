@@ -23,12 +23,13 @@
           .value
             = react_component 'OptionList', chosenOnes: @user_roles, userId: @user.id
     .col.pe-6
-      .row
-        .col.pe-2
-          .value= f.label :is_active, "Status"
-        .col
-          = f.check_box :is_active
-          = f.label :is_active, "&nbsp; Can access Cdx?".html_safe
+      - if @can_update
+        .row
+          .col.pe-2
+            .value= f.label :is_active, "Status"
+          .col
+            = f.check_box :is_active
+            = f.label :is_active, "&nbsp; Can access Cdx?".html_safe
       .row
         .col.pe-2
           = f.label :last_sign_in_at, "Activity"
