@@ -2,8 +2,9 @@ var LocationSelect = React.createClass({
 
   getInitialState: function() {
     return {
-      value: { value: this.props.defaultValue, label: (this.props.defaultLabel || this.props.defaultValue) },
-      isLoading: !!this.props.defaultValue
+      value: { value: (this.props.value || this.props.defaultValue), label: (this.props.label || this.props.defaultLabel) },
+      isLoading: !!(this.props.value || this.props.defaultValue),
+      latlng: this.props.latlng
     }
   },
 
@@ -32,23 +33,25 @@ var LocationSelect = React.createClass({
 
   componentWillReceiveProps: function(nextProps) {
     var _this = this;
-    // Get revLatLng if specified and perform a reverse geo lookup on the location service,
+    // Get latlng if specified and perform a reverse geo lookup on the location service,
     // and set the current value to the returned location, or clear value and call onError if none is found
-    if (nextProps.revLatLng && nextProps.revLatLng != this.props.revLatLng) {
+    if (nextProps.latlng && nextProps.latlng.lat && nextProps.latlng.lng && nextProps.latlng != this.state.latlng) {
       _this.setState(React.addons.update(_this.state, { isLoading: { $set: true } }));
       $.ajax(gon.location_service_url + "/lookup", {
         dataType: 'json',
-        data: { x: nextProps.revLatLng.lng, y: nextProps.revLatLng.lat, limit: 1, ancestors: true },
+        data: { x: nextProps.latlng.lng, y: nextProps.latlng.lat, limit: 1, ancestors: true },
         success: function(data) {
           if (_this.isMounted()) {
             var newState = { isLoading: { $set: false } };
             if (data.length == 0) {
               newState.value = { $set: null };
+              newState.latlng = { $set: null };
               if (_this.props.onError) {
-                _this.props.onError("A city could not be found for this address, please choose one;")
+                _this.props.onError("A region could not be found for this address, please choose one;")
               }
             } else {
               newState.value = { $set: _this.formatLocation(data[0]) };
+              newState.latlng = { $set: nextProps.latlng };
             }
             _this.setState(React.addons.update(_this.state, newState));
           }
@@ -57,31 +60,41 @@ var LocationSelect = React.createClass({
     }
   },
 
-  onChange: function(newValue) {
+  onChange: function(newValue, selection) {
     window.setTimeout(function(){
       // this is deferred so a new input with the new value
       // is rendered by the time the change event is triggered
       $('input:hidden', this.getDOMNode()).trigger('change');
     }.bind(this), 0);
 
-    if (this.props.onChange) {
-      this.props.onChange(newValue);
+    var _this = this;
+    var location = (selection && selection[0]) ? selection[0].location : null;
+    _this.setState(React.addons.update(_this.state, {
+      value: { $set: _this.formatLocation(location) },
+      latlng: { $set: { lat: location.lat, lng: location.lng} }
+    }));
+
+    if (_this.props.onChange) {
+      _this.props.onChange(newValue, location);
     }
   },
 
   render: function() {
     var _this = this;
 
-    return (<Select className={this.props.className}
-      name={this.props.name}
-      value={this.state.value}
-      placeholder={this.props.placeholder}
-      clearable={false}
-      asyncOptions={this.getOptions}
-      isLoading={this.state.isLoading}
-      autoload={false}
-      onChange={this.onChange}>
-    </Select>);
+    return <div>
+      <label style={{ display: "none" }}>disableautocomplete</label>
+      <Select className={this.props.className}
+        name={this.props.name}
+        value={this.state.value}
+        placeholder={this.props.placeholder}
+        clearable={false}
+        asyncOptions={this.getOptions}
+        isLoading={this.state.isLoading}
+        autoload={false}
+        onChange={this.onChange}>
+      </Select>
+    </div>;
   },
 
   // private
@@ -103,7 +116,7 @@ var LocationSelect = React.createClass({
 
   getOptions: function(input, callback) {
     // getOptions is sometimes called with an object with name/value rather than the actual string
-    if (typeof(input) != "string") {
+    if (typeof(input) != "string" || _.isEmpty(input)) {
       callback(null, {options: []});
       return;
     }
@@ -121,7 +134,8 @@ var LocationSelect = React.createClass({
     }
     return {
       value: location.id,
-      label: name
+      label: name,
+      location: location
     }
   }
 

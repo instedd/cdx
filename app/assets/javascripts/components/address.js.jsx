@@ -3,7 +3,6 @@ var Address = React.createClass({
   getInitialState: function() {
     return {
       address: this.props.defaultAddress,
-      location: this.props.defaultLocation,
       latlng: this.props.defaultLatLng,
       error: null
     }
@@ -32,6 +31,15 @@ var Address = React.createClass({
     this.setState(React.addons.update(this.state, { address: { $set: newAddress } }));
   },
 
+  handleLocationChange: function(value, newLocation) {
+    // Update lat lng upon a location change only if address is empty or did not resolve to a location
+    if (!this.hasValidAddress(this.state)) {
+      this.setState(React.addons.update(this.state, {
+        latlng: { $set: { lat: newLocation.lat, lng: newLocation.lng} }
+      }));
+    }
+  },
+
   handleError: function(err) {
     var _this = this;
     _this.setState(React.addons.update(_this.state, {
@@ -39,15 +47,20 @@ var Address = React.createClass({
     }));
   },
 
+  hasValidAddress: function(state) {
+    return !_.isEmpty(_.trim(state.address));
+  },
+
   render: function() {
-    var latlng, position, zoom, marker, bound, _this = this;
+    var latlng, revLatLng, position, zoom, marker, bounds, onMapClick, _this = this;
     bounds = this.state.bounds;
     latlng = (this.state.latlng && this.state.latlng.lat && this.state.latlng.lng) ? [this.state.latlng.lat, this.state.latlng.lng] : null;
+    revLatLng = this.hasValidAddress(this.state) ? this.state.latlng : null;
     position = bounds ? null : (latlng || gon.location_default);
     zoom = bounds ? null : (latlng ? (this.state.zoom || 12) : 2);
 
     if (latlng) {
-      var onMarkerDragEnd = function (event) {
+      var onMarkerDragEnd = function(event) {
         _this.setState(React.addons.update(_this.state, {
           bounds: { $set: null },
           latlng: { $set: event.target.getLatLng() },
@@ -55,6 +68,14 @@ var Address = React.createClass({
         }));
       };
       marker = <ReactLeaflet.Marker position={latlng} draggable={true} onLeafletDragend={onMarkerDragEnd} />;
+    } else {
+      onMapClick = function(event) {
+        _this.setState(React.addons.update(_this.state, {
+          bounds: { $set: null },
+          latlng: { $set: event.latlng },
+          zoom: { $set: _this.refs.map.getLeafletElement().getZoom() }
+        }));
+      };
     }
 
     return <div>
@@ -72,7 +93,7 @@ var Address = React.createClass({
           <label>Region</label>
         </div>
         <div className="col">
-          <LocationSelect placeholder="Choose a location" name={this.props.locationName} defaultValue={this.state.location} revLatLng={this.state.latlng} onError={this.handleError} className="input-x-large" />
+          <LocationSelect placeholder="Choose a location" name={this.props.locationName} defaultValue={this.props.defaultLocation} latlng={revLatLng} onChange={this.handleLocationChange} onError={this.handleError} className="input-x-large" />
         </div>
       </div>
       <div className="row">
@@ -80,7 +101,7 @@ var Address = React.createClass({
         <div className="col pe-8">
           <input type="hidden" value={latlng ? latlng[0] : null} name={this.props.latName}></input>
           <input type="hidden" value={latlng ? latlng[1] : null} name={this.props.lngName}></input>
-          <ReactLeaflet.Map ref="map" center={position} zoom={zoom} bounds={bounds} className="map">
+          <ReactLeaflet.Map ref="map" center={position} zoom={zoom} bounds={bounds} className="map" onLeafletClick={onMapClick}>
             <ReactLeaflet.TileLayer
               url='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
               attribution='&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
