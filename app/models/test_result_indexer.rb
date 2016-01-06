@@ -12,6 +12,7 @@ class TestResultIndexer < EntityIndexer
       binding.pry
       subscriber_id = match["_id"]
   
+  binding.pry
       if subscriber_id.include? 'alert'
         AlertJob.perform_later subscriber_id, test_result.uuid
       else

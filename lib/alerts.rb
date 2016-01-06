@@ -4,6 +4,15 @@ module Alerts
   # Note: it is assumed that rake db:seed has been called to load the seeds data generated.
   #
   # if say 1000 daily testresults are needed per device, then loop over the device templates (only two at the moment)
+  
+
+     #parse the message
+  def parse_alert_message(alert)
+    alert_message.gsub!(/\w+{alertname}/, alert.name)
+    alert_message.gsub!(/\w+{alertcategory}/, alert.category)
+  end
+    
+  
   def alert_history_check(frequency, alert_type)
 
     alerts = Alert.aggregated.hour.where({enabled: true})

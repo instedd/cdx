@@ -20,6 +20,8 @@ class AlertMailer < ApplicationMailer
         
         subject_text = alert.name
         
+      #  parse_alert_message(alert)
+        
         if alert.aggregated?
          subject_text += " :occured times: "+alert_count.to_s 
         end
@@ -40,7 +42,6 @@ class AlertMailer < ApplicationMailer
       end
     end
     
-     
   end
 
 end

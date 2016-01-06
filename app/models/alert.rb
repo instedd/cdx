@@ -22,7 +22,7 @@ class Alert < ActiveRecord::Base
   #  validates_presence_of :description
   #  validates_presence_of :site
  
-  enum category_type: [ :anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency, :workflow_delays]  
+  enum category_type: [ :anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency]  
   enum aggregation_type: [ :record, :aggregated]
   enum aggregation_frequency: [ :hour, :day, :month]
   enum channel_type: [ :web, :sms, :sms_and_web]
@@ -33,16 +33,23 @@ class Alert < ActiveRecord::Base
   attr_accessor :roles
   attr_accessor :sites_info
   attr_accessor :devices_info
+  attr_accessor :users_info
   
 
   def create_percolator
     es_query =  TestResult.query(self.query, self.user).elasticsearch_query
     return unless es_query
-  
+=begin  
     Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
                           type: '.percolator',
                           id: 'alert_'+self.id.to_s+"_"+self.category_type.to_i.to_s,
-                          body: { query: es_query, type: 'test' }                                                                         
+                          body: { query: es_query, type: 'test' } 
+=end                          
+    Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
+                           type: '.percolator',
+                           id: 'alert_'+self.id.to_s,
+                            body: { query: es_query, type: 'test' }
+                                                                                                                            
    end
    
    def recreate_alert_percolator

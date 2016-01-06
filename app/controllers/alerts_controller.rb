@@ -38,6 +38,8 @@ class AlertsController < ApplicationController
    alert_saved_ok = alert_info.save
    if alert_saved_ok
      
+  binding.pry   
+     
    if params[:alert][:roles]
       roles = params[:alert][:roles].split(',')
       roles.each do |roleid|
@@ -66,7 +68,6 @@ elsif alert_info.error_code.include? '*'
  if alert_info.category_type == "anomalies"
    
    # check that the start_time field is not missing
-   binding.pry
    if alert_info.anomalie_type == "missing_sample_id"
      alert_info.query =    {"sample.id"=>"null" }
   elsif alert_info.anomalie_type == "missing_start_time"
@@ -97,6 +98,7 @@ elsif alert_info.error_code.include? '*'
      alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
    end
    
+   
    #TODO you have the device uuid, you don’t even need the site uuid
    
    if params[:alert][:devices_info]
@@ -111,7 +113,7 @@ elsif alert_info.error_code.include? '*'
      
      alert_info.query=alert_info.query.merge ({"device.uuid"=>query_devices})
    end
- 
+   
     alert_info.create_percolator  #need to do this for per_record or an aggregation
   end
 
@@ -146,9 +148,9 @@ elsif alert_info.error_code.include? '*'
 
   private
 
-  def alert_params
-    
-    params.require(:alert).permit(:name, :description, :devices_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+  def alert_params 
+    binding.pry
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
   
   def new_alert_request_variables
@@ -161,7 +163,8 @@ elsif alert_info.error_code.include? '*'
     user_ids = @roles.map { |user| user.id }
     user_ids = user_ids.uniq
     @users = User.where(id: user_ids)
-    
   end
+  
+  
 
 end

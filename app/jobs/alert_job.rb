@@ -5,8 +5,15 @@ class AlertJob < ActiveJob::Base
 
   def perform(alert_id, test_elasticsearch_id)    
     alertHistory = AlertHistory.new
+    
+    #the id is in this format: alert_{alertID}_{categoryID}
+    
     alert_id.slice! "alert_"
     @alert = Alert.includes(:alert_recipients).find(alert_id)
+    
+    #index_parts = alert_id.split('_')
+    #alert_index = index_parts[1]
+    #@alert = Alert.includes(:alert_recipients).find(index_parts[1])
     
     alertHistory.alert = @alert
     alertHistory.user = @alert.user
