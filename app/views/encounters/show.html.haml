@@ -6,7 +6,7 @@
           %h2
             = link_to test_results_path(display_as: "test_order"), class: 'side-link', title: 'Back' do
               = image_tag "arrow-left.png"
-            Encounter
+            Test Order
 
 = react_component('EncounterShow', encounter: @encounter_as_json, can_update: @can_update)
 

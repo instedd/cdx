@@ -3,6 +3,7 @@ var Address = React.createClass({
   getInitialState: function() {
     return {
       address: this.props.defaultAddress,
+      addressSet: !!this.props.defaultAddress,
       latlng: this.props.defaultLatLng,
       error: null
     }
@@ -19,16 +20,21 @@ var Address = React.createClass({
 
   handleAddress: function(newAddress) {
     var _this = this;
-    _this.setState(React.addons.update(_this.state, {
-      bounds: { $set: newAddress.bbox },
-      address: { $set: newAddress.name },
-      latlng: { $set: newAddress.center },
-      error: { $set: null }
-    }));
+    _this.setState(function(state) {
+      return React.addons.update(state, {
+        bounds: { $set: newAddress.bbox },
+        addressSet: { $set: true },
+        address: { $set: newAddress.name },
+        latlng: { $set: { lat: newAddress.center.lat, lng: newAddress.center.lng } },
+        error: { $set: null }
+      })});
   },
 
   handleAddressChange: function(newAddress) {
-    this.setState(React.addons.update(this.state, { address: { $set: newAddress } }));
+    this.setState(function(state) { return React.addons.update(state, {
+      address: { $set: newAddress },
+      addressSet: { $set: (_.isEmpty(newAddress) ? false : state.addressSet) }
+    }) });
   },
 
   handleLocationChange: function(value, newLocation) {
@@ -55,7 +61,7 @@ var Address = React.createClass({
     var latlng, revLatLng, position, zoom, marker, bounds, onMapClick, _this = this;
     bounds = this.state.bounds;
     latlng = (this.state.latlng && this.state.latlng.lat && this.state.latlng.lng) ? [this.state.latlng.lat, this.state.latlng.lng] : null;
-    revLatLng = this.hasValidAddress(this.state) ? this.state.latlng : null;
+    revLatLng = this.state.addressSet ? this.state.latlng : null;
     position = bounds ? null : (latlng || gon.location_default);
     zoom = bounds ? null : (latlng ? (this.state.zoom || 12) : 2);
 
@@ -67,6 +73,7 @@ var Address = React.createClass({
           zoom: { $set: _this.refs.map.getLeafletElement().getZoom() }
         }));
       };
+      onMapClick = _.noop;
       marker = <ReactLeaflet.Marker position={latlng} draggable={true} onLeafletDragend={onMarkerDragEnd} />;
     } else {
       onMapClick = function(event) {

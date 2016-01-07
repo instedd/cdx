@@ -13,10 +13,10 @@ var LocationSelect = React.createClass({
     if (this.props.defaultValue) {
       this.getDetails(this.props.defaultValue, function(location) {
         if (_this.isMounted()) {
-          _this.setState(React.addons.update(_this.state, {
+          _this.setState(function(state) { return React.addons.update(state, {
             value: { $set: location },
             isLoading: { $set: false }
-          }));
+          })});
         }
       });
     }
@@ -35,8 +35,8 @@ var LocationSelect = React.createClass({
     var _this = this;
     // Get latlng if specified and perform a reverse geo lookup on the location service,
     // and set the current value to the returned location, or clear value and call onError if none is found
-    if (nextProps.latlng && nextProps.latlng.lat && nextProps.latlng.lng && nextProps.latlng != this.state.latlng) {
-      _this.setState(React.addons.update(_this.state, { isLoading: { $set: true } }));
+    if (nextProps.latlng && nextProps.latlng.lat && nextProps.latlng.lng && !_.isEqual(nextProps.latlng, this.state.latlng)) {
+      _this.setState(function(state) { return React.addons.update(state, { isLoading: { $set: true } }) });
       $.ajax(gon.location_service_url + "/lookup", {
         dataType: 'json',
         data: { x: nextProps.latlng.lng, y: nextProps.latlng.lat, limit: 1, ancestors: true },
@@ -53,7 +53,7 @@ var LocationSelect = React.createClass({
               newState.value = { $set: _this.formatLocation(data[0]) };
               newState.latlng = { $set: nextProps.latlng };
             }
-            _this.setState(React.addons.update(_this.state, newState));
+            _this.setState(function(state) { return React.addons.update(state, newState); });
           }
         }
       })
@@ -69,10 +69,10 @@ var LocationSelect = React.createClass({
 
     var _this = this;
     var location = (selection && selection[0]) ? selection[0].location : null;
-    _this.setState(React.addons.update(_this.state, {
+    _this.setState(function(state) { return React.addons.update(state, {
       value: { $set: _this.formatLocation(location) },
       latlng: { $set: { lat: location.lat, lng: location.lng} }
-    }));
+    })});
 
     if (_this.props.onChange) {
       _this.props.onChange(newValue, location);
