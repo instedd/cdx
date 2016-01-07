@@ -106,10 +106,23 @@ RSpec.describe PatientsController, type: :controller do
   context "create" do
     it "should create new patient in context institution" do
       expect {
-        post :create, patient: { name: 'Lorem', dob_text: '1/1/2000' }
+        post :create, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
       }.to change(institution.patients, :count).by(1)
 
       expect(response).to be_redirect
+    end
+
+    it "should save fields" do
+      post :create, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
+      patient = institution.patients.last
+
+      expect(patient.name).to eq('Lorem')
+      expect(patient.gender).to eq('female')
+      expect(Time.parse(patient.dob)).to eq(Time.parse("2000-01-01"))
+
+      expect(patient.plain_sensitive_data['name']).to eq('Lorem')
+      expect(patient.core_fields['gender']).to eq('female')
+      expect(Time.parse(patient.plain_sensitive_data['dob'])).to eq(Time.parse("2000-01-01"))
     end
 
     it "should create new patient in context institution if allowed" do
@@ -117,7 +130,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: { name: 'Lorem', dob_text: '1/1/2000' }
+        post :create, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
       }.to change(institution.patients, :count).by(1)
     end
 
@@ -155,6 +168,15 @@ RSpec.describe PatientsController, type: :controller do
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:dob_text)
+      expect(response).to render_template("patients/new")
+    end
+
+    it "should validate gender" do
+      expect {
+        post :create, patient: { name: '', gender: '' }
+      }.to change(institution.patients, :count).by(0)
+
+      expect(assigns(:patient).errors).to have_key(:gender)
       expect(response).to render_template("patients/new")
     end
   end
@@ -199,11 +221,12 @@ RSpec.describe PatientsController, type: :controller do
     let(:patient) { institution.patients.make }
 
     it "should update existing patient" do
-      post :update, id: patient.id, patient: { name: 'Lorem', dob_text: '1/1/2000' }
+      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
       expect(response).to be_redirect
 
       patient.reload
       expect(patient.name).to eq("Lorem")
+      expect(patient.gender).to eq("female")
       expect(Time.parse(patient.dob)).to eq(Time.parse("2000-01-01"))
     end
 
@@ -217,11 +240,12 @@ RSpec.describe PatientsController, type: :controller do
       grant user, other_user, Patient, UPDATE_PATIENT
 
       sign_in other_user
-      post :update, id: patient.id, patient: { name: 'Lorem', dob_text: '1/1/2000' }
+      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
       expect(response).to be_redirect
 
       patient.reload
       expect(patient.name).to eq("Lorem")
+      expect(patient.gender).to eq("female")
       expect(Time.parse(patient.dob)).to eq(Time.parse("2000-01-01"))
     end
 

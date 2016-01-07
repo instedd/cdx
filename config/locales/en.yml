@@ -28,7 +28,7 @@ en:
         parent: Parent site
       patient:
         dob_text: Birthday
-        
+
   user:
     settings:
       updated: "Settings updated"
@@ -36,10 +36,10 @@ en:
   date:
     input_format:
       pattern: "%m/%d/%Y"
-      placeholder: mm/dd/yyyy
+      placeholder: MM/DD/YYYY
 
 # es:
 #   date:
 #     input_format:
 #       pattern: "%d/%m/%Y"
-#       placeholder: dd/mm/yyyy
+#       placeholder: DD/MM/YYYY

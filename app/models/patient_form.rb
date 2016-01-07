@@ -2,7 +2,7 @@ class PatientForm
   include ActiveModel::Model
 
   def self.shared_attributes # shared editable attributes with patient model
-    [:institution, :name, :dob, :lat, :lng, :location_geoid, :address, :email, :phone]
+    [:institution, :name, :gender, :dob, :lat, :lng, :location_geoid, :address, :email, :phone]
   end
 
   def self.model_name
@@ -45,10 +45,13 @@ class PatientForm
   end
 
   def save
-    valid? && updated_patient.save
+    self.class.assign_attributes(patient, self)
+    self.valid? && patient.save
   end
 
   validates_presence_of :name
+  GENDER_VALUES = %w(male female other)
+  validates_inclusion_of :gender, in: GENDER_VALUES, message: "is not within valid options (should be one of #{GENDER_VALUES.join(', ')})"
 
   # begin dob
   # use dob_text from form. dob is parsed dob_text or just dob_text if not a valid date
@@ -94,10 +97,5 @@ class PatientForm
     shared_attributes.each do |attr|
       target.send("#{attr}=", source.send(attr))
     end
-  end
-
-  def updated_patient
-    self.class.assign_attributes(patient, self)
-    patient
   end
 end

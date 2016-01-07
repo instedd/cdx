@@ -26,16 +26,26 @@ class Patient < ActiveRecord::Base
 
   def self.attribute_field(*args)
     args.each do |arg|
-      define_method arg do
-        self.plain_sensitive_data[arg.to_s]
-      end
+      if self.entity_fields.detect { |f| f.name == arg.to_s }.pii?
+        define_method arg do
+          self.plain_sensitive_data[arg.to_s]
+        end
 
-      define_method "#{arg}=" do |value|
-        self.plain_sensitive_data[arg.to_s] = value
+        define_method "#{arg}=" do |value|
+          self.plain_sensitive_data[arg.to_s] = value
+        end
+      else
+        define_method arg do
+          self.core_fields[arg.to_s]
+        end
+
+        define_method "#{arg}=" do |value|
+          self.core_fields[arg.to_s] = value
+        end
       end
     end
   end
 
-  attribute_field :name, :dob, :email, :phone
+  attribute_field :name, :gender, :dob, :email, :phone
 
 end
