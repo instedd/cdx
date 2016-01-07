@@ -1,3 +1,15 @@
+:javascript
+  $(function(){
+    // recheck delete checkbox if user cancel the open file dialog
+    // and ensure delete checkbox is not checked if a files is selected
+    $('#device_model_setup_instructions, #device_model_picture').change(function(){
+      var fileInput = $(this);
+      var deleteCheckbox = $(fileInput.data('remove-checkbox'));
+      var isFileChosen = fileInput.val() != '';
+      deleteCheckbox.prop('checked', !isFileChosen);
+    });
+  });
+
 - if @device_model.errors.present?
   .alert-container
     .alert.alert-error
@@ -56,7 +68,7 @@
                   %label.cross{:for => 'device_model_delete_setup_instructions'}
                     = image_tag "ic-cross.png"
           .upload-new-file
-            = f.file_field :setup_instructions, :class => "inputfile"
+            = f.file_field :setup_instructions, :class => "inputfile", 'data-remove-checkbox' => '#device_model_delete_setup_instructions'
             %label{:for => 'device_model_setup_instructions'}
               %span
                 .iconb-upload
@@ -91,7 +103,7 @@
         .upload-new-file
           %span.ic140-picture
           %h2 Select a picture
-          = f.file_field :picture, :class => "inputfile"
+          = f.file_field :picture, :class => "inputfile", 'data-remove-checkbox' => '#device_model_delete_picture'
           %label{:for => 'device_model_picture'}
             %span
               .iconb-upload
