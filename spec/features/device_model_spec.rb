@@ -20,7 +20,7 @@ describe "device model" do
     end
 
     expect_page DeviceModelPage do |page|
-      expect(page).to have_content("MyModel")
+      expect(page.name.value).to eq("MyModel")
     end
   end
 end

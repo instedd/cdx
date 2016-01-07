@@ -9,6 +9,8 @@ end
 
 class DeviceModelPage < CdxPageBase
   set_url "/device_models/{id}/edit"
+
+  element :name, :field, "Name"
 end
 
 class DeviceModelsPage < CdxPageBase
