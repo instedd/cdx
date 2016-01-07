@@ -170,4 +170,14 @@ $(document).ready(function(){
     flashn.hide();
   });
 
+
+
+  $(".clear-label").on('click', function () {
+    $(this).closest('.file-uploaded').addClass('remove');
+  });
+
+
+
 });
+
+

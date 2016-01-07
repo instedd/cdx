@@ -2,7 +2,7 @@
 // SPRITES
 // =============================================================================
 
-/*---------------------- Icons 20 x 20  ------------------------*/
+/*---------------------- Icons 20 x 20 black ------------------------*/
 
 
 span[class^="icon-"],
@@ -24,6 +24,23 @@ span[class*=" icon-"] {
 .icon-block           {background-position:   -100px 0px};
 .icon-ellipsis        {background-position:   -120px 0px};
 
+
+
+/*---------------------- Icons 20 x 20 blue ------------------------*/
+
+
+[class^="iconb-"],
+[class*=" iconb-"] {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  vertical-align: text-top;
+  background-image: image-url($icons-20x20-blue);
+  background-repeat: no-repeat;
+}
+
+.iconb-upload           {background-position:      0px 0px};
 
 
 /*---------------------- Icons 140 x 140  ------------------------*/
@@ -50,3 +67,4 @@ span[class*=" ic140-"] {
 .ic140-algorithms               {background-position:     -980px 0px};
 .ic140-categories               {background-position:    -1120px 0px};
 .ic140-sharing-requests         {background-position:    -1260px 0px};
+.ic140-picture                  {background-position:    -1400px 0px};

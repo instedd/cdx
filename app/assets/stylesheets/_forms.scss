@@ -48,7 +48,12 @@ label {
 // Checkboxes ---------------------------------------------------------//
 
 input[type="checkbox"] {
-  display: none;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
 
   & + label {
     color: $black;
@@ -92,6 +97,15 @@ input[type="checkbox"] {
     cursor: not-allowed;
     pointer-events: none; // Future-proof disabling of clicks
     opacity: .35;
+  }
+  & + label.cross {
+    margin: 0;
+    padding: 0;
+    line-height: normal;
+
+    &:before {
+      display: none;
+    }
   }
 }
 
@@ -218,3 +232,91 @@ body.devise {
 .input-block {
   width: 100%;
 }
+
+// Input file style ---------------------------------------------------------//
+
+.inputfile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+label.input,
+.inputfile + label {
+    font-family: $sans;
+    font-weight: 400;
+    color: $blue;
+    display: inline-block;
+    cursor: pointer;
+    max-width: 350px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+
+}
+
+.clear-input,
+.clear-label {
+  line-height: normal;
+  display: none;
+  position: absolute;
+  right: 8px;
+  top: 12px;
+}
+
+label.on {
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
+  padding: 0 30px 0 10px;
+  width: 350px;
+  span {
+    color: $gray4;
+    text-transform: lowercase;
+  }
+  .clear-input,
+  .clear-label {
+    display: block;
+  }
+}
+.inputfile:focus + label,
+.inputfile + label:hover {
+    color: darken($blue, 10%);
+}
+
+.choose-picture {
+  text-align: center;
+  padding: 100px;
+  border: 2px dashed $gray1;
+  width: 540px;
+  height: 450px;
+  position: relative;
+
+  h2 {
+    margin: 0 0 8px 0;
+    color: $gray2;
+  }
+
+  .ic140-picture {
+    opacity: 0.4;
+  }
+
+  .clear-label {
+    display: block;
+  }
+}
+
+.file-uploaded + .upload-new-file {
+  display: none;
+}
+
+.file-uploaded.remove {
+  display: none;
+
+  + .upload-new-file {
+    display: block;
+  }
+}
+

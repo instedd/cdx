@@ -8,73 +8,107 @@
 
 = form_for(@device_model, html: { multipart: true }) do |f|
   .row
-    .col.pe-3
-      = f.label :institution
     .col
-      .value= f.object.institution
+      .row
+        .col.pe-4
+          = f.label :institution
+        .col
+          .value= f.object.institution
 
-  .row
-    .col.pe-3
-      = f.label :name
+      .row
+        .col.pe-4
+          = f.label :name
+        .col
+          = f.text_field :name
+
+
+
+      = f.fields_for :manifest do |manifest_form|
+        .row
+          .col.pe-4
+            = manifest_form.label :definition
+          .col
+            - if !@device_model.new_record? && @device_model.manifest.definition
+              .file-uploaded
+                %label.input.on
+                  = link_to @device_model.manifest.filename, manifest_device_model_path(@device_model)
+                  %a.clear-label{:href => "#"}
+                    = image_tag "ic-cross.png"
+            .upload-new-file
+              = manifest_form.file_field :definition, :class => "inputfile"
+              %label{:for => 'device_model_manifest_attributes_definition'}
+                %span
+                  .iconb-upload
+                  Choose a file to upload
+                %a.clear-input{:href => "#"}
+                  = image_tag "ic-cross.png"
+
+      .row
+        .col.pe-4
+          = f.label :setup_instructions
+        .col
+          - if !@device_model.new_record? && @device_model.setup_instructions.present?
+            .file-uploaded
+              %label.input.on
+                = link_to "download", @device_model.setup_instructions.url
+                .clear-label
+                  = f.check_box :delete_setup_instructions
+                  %label.cross{:for => 'device_model_delete_setup_instructions'}
+                    = image_tag "ic-cross.png"
+          .upload-new-file
+            = f.file_field :setup_instructions, :class => "inputfile"
+            %label{:for => 'device_model_setup_instructions'}
+              %span
+                .iconb-upload
+                Choose a file to upload
+              %a.clear-input{:href => "#"}
+                = image_tag "ic-cross.png"
+          .text-small.muted Only PDF files below 5MB are allowed
+
+
+      .row
+        .col.pe-4
+          = f.label :supports_activation
+        .col
+          = f.check_box :supports_activation
+          = f.label :supports_activation, "&nbsp;".html_safe
+
+      .row
+        .col.pe-4
+          = f.label :support_url
+        .col
+          = f.text_field :support_url
+
     .col
-      = f.text_field :name
-
-  .row
-    .col.pe-3
-      = f.label :picture
-    .col
-      - unless @device_model.new_record? || @device_model.picture.blank?
-        = image_tag @device_model.picture.url(:card)
-        = f.check_box :delete_picture
-        = f.label :delete_picture
-        %br
-      = f.file_field :picture
-
-  = f.fields_for :manifest do |manifest_form|
-    .row
-      .col.pe-3
-        = manifest_form.label :definition
-      .col
-        - if !@device_model.new_record? && @device_model.manifest.definition
-          = link_to @device_model.manifest.filename, manifest_device_model_path(@device_model)
-          %br
-          Upload new version
-        = manifest_form.file_field :definition
-
-  .row
-    .col.pe-3
-      = f.label :setup_instructions
-      %p(style="font-size: 12px;")
-        %i Only PDF files below 5MB are allowed
-    .col
-      - if !@device_model.new_record? && @device_model.setup_instructions.present?
-        = link_to "download", @device_model.setup_instructions.url
-        = f.check_box :delete_setup_instructions
-        = f.label :delete_setup_instructions
-        %br
-        Upload new version
-      = f.file_field :setup_instructions
-
-  .row
-    .col.pe-3
-      = f.label :supports_activation
-    .col
-      = f.check_box :supports_activation
-      = f.label :supports_activation, "&nbsp;".html_safe
-
-  .row
-    .col.pe-3
-      = f.label :support_url
-    .col
-      = f.text_field :support_url
+      .choose-picture
+        - unless @device_model.new_record? || @device_model.picture.blank?
+          .file-uploaded
+            .clear-label
+              = f.check_box :delete_picture
+              %label.cross{:for => 'device_model_delete_picture'}
+                = image_tag "ic-cross.png"
+            = image_tag @device_model.picture.url(:card)
+        .upload-new-file
+          %span.ic140-picture
+          %h2 Select a picture
+          = f.file_field :picture, :class => "inputfile"
+          %label{:for => 'device_model_picture'}
+            %span
+              .iconb-upload
+              Choose a file to upload
+            %a.clear-input{:href => "#"}
+              = image_tag "ic-cross.png"
 
 
   .row.button-actions
     .col
+      %hr
       = f.submit class: 'btn-primary', value: "Save"
+      = link_to 'Cancel', device_models_path, class: 'btn-link'
       - if can_delete_device_model?(@device_model)
-        = link_to "Delete", @device_model, method: :delete, data: { confirm: 'Are you sure you want to delete this device model? All devices using this device model will be deleted as well, along with any tests they may have uploaded.' }
+        = link_to "Delete", @device_model, method: :delete, data: { confirm: 'Are you sure you want to delete this device model? All devices using this device model will be deleted as well, along with any tests they may have uploaded.' }, class: 'btn-danger pull-right'
+  %br
+  .box.light
+    = render 'publish'
 
-
-  %hr/
-  = render 'publish'
+  %script{:src => "/assets/jquery.custom-file-input.js"}

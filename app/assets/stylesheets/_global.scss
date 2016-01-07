@@ -47,6 +47,12 @@ a {
 .text-left {
   text-align: left;
 }
+.text-small {
+  font-size: 70%;
+  &.muted {
+    color: $gray3;
+  }
+}
 .align-top {
   @include align-self(flex-start);
 }
@@ -91,6 +97,11 @@ a[title="Back"] {
 
 .button-actions {
   margin-top: 30px;
+
+  hr {
+    border-color: $gray1;
+    margin-bottom: 35px;
+  }
 }
 
 .box {
@@ -103,6 +114,10 @@ a[title="Back"] {
 
   &.big {
     padding: 65px;
+  }
+
+  &.light {
+    border: 1px solid $gray1;
   }
 }
 
