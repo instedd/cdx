@@ -51,7 +51,7 @@ class PatientForm
 
   validates_presence_of :name
   GENDER_VALUES = %w(male female other)
-  validates_inclusion_of :gender, in: GENDER_VALUES, message: "is not within valid options (should be one of #{GENDER_VALUES.join(', ')})"
+  validates_inclusion_of :gender, in: GENDER_VALUES, allow_blank: true, message: "is not within valid options (should be one of #{GENDER_VALUES.join(', ')})"
 
   # begin dob
   # use dob_text from form. dob is parsed dob_text or just dob_text if not a valid date
@@ -75,8 +75,10 @@ class PatientForm
   end
 
   def dob_text=(value)
+    value = nil if value.blank?
+
     self.dob = if value.is_a?(String)
-       Time.strptime(value, date_format[:pattern]) rescue value
+      Time.strptime(value, date_format[:pattern]) rescue value
     else
       value
     end
@@ -87,6 +89,7 @@ class PatientForm
   end
 
   def dob_is_a_date
+    return if dob.blank?
     errors.add(:dob_text, "should be a date in #{dob_text_placeholder}") unless dob.is_a?(Time)
   end
   # end dob

@@ -138,7 +138,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: { name: 'Lorem', dob_text: '1/1/2000' }
+        post :create, patient: { name: 'Lorem', dob_text: '1/1/2000', gender: 'female' }
       }.to change(institution.patients, :count).by(0)
 
       expect(response).to be_forbidden
@@ -146,23 +146,24 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should require name" do
       expect {
-        post :create, patient: { name: '', dob_text: '1/1/2000' }
+        post :create, patient: { name: '', dob_text: '1/1/2000', gender: 'female' }
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:name)
       expect(response).to render_template("patients/new")
     end
 
-    it "should require dob" do
+    it "should not require dob" do
       expect {
-        post :create, patient: { name: 'Jerry', dob_text: '' }
-      }.to change(institution.patients, :count).by(0)
+        post :create, patient: { name: 'Jerry', dob_text: '', gender: 'female' }
+      }.to change(institution.patients, :count).by(1)
 
-      expect(assigns(:patient).errors).to have_key(:dob_text)
-      expect(response).to render_template("patients/new")
+      patient = institution.patients.first
+      expect(patient.dob).to be_nil
+      expect(patient.plain_sensitive_data).to_not have_key('dob')
     end
 
-    it "should validate dob" do
+    it "should validate dob if present" do
       expect {
         post :create, patient: { name: 'Jerry', dob_text: '14/14/2000' }
       }.to change(institution.patients, :count).by(0)
@@ -173,11 +174,21 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should validate gender" do
       expect {
-        post :create, patient: { name: '', gender: '' }
+        post :create, patient: { name: 'Lorem', gender: 'invalid-value' }
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:gender)
       expect(response).to render_template("patients/new")
+    end
+
+    it "should not require gender" do
+      expect {
+        post :create, patient: { name: 'Lorem', gender: '', dob_text: '1/1/2000' }
+      }.to change(institution.patients, :count).by(1)
+
+      patient = institution.patients.first
+      expect(patient.gender).to be_nil
+      expect(patient.core_fields).to_not have_key('gender')
     end
   end
 

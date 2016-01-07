@@ -32,7 +32,11 @@ class Patient < ActiveRecord::Base
         end
 
         define_method "#{arg}=" do |value|
-          self.plain_sensitive_data[arg.to_s] = value
+          if value.blank?
+            self.plain_sensitive_data.delete(arg.to_s)
+          else
+            self.plain_sensitive_data[arg.to_s] = value
+          end
         end
       else
         define_method arg do
@@ -40,7 +44,11 @@ class Patient < ActiveRecord::Base
         end
 
         define_method "#{arg}=" do |value|
-          self.core_fields[arg.to_s] = value
+          if value.blank?
+            self.core_fields.delete(arg.to_s)
+          else
+            self.core_fields[arg.to_s] = value
+          end
         end
       end
     end
