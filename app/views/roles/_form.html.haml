@@ -12,14 +12,14 @@
     .col
       = f.text_field :name
 
-  - if @role.new_record?
-    = render 'shared/select_institution_or_hidden', f: f
+  - if @accessible_institutions == 1
+    = f.hidden_field :institution_id, value: @institution.id
   - else
     .row
       .col.pe-2
         = f.label :institution_id
       .col
-        = @role.institution.name
+        = @institution
 
   - if @role.new_record?
     .row

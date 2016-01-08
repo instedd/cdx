@@ -100,7 +100,8 @@ class RolesController < ApplicationController
 
   def load_institutions_and_sites
     # FIXME: review permissions
-    @institutions = check_access(Institution, CREATE_INSTITUTION_ROLE)
-    @sites = check_access(Site, CREATE_SITE_ROLE)
+    @institution = @navigation_context.institution
+    @accessible_institutions = check_access(Institution, READ_INSTITUTION).count
+    @sites = check_access(Site, CREATE_SITE_ROLE).within(@institution)
   end
 end
