@@ -97,8 +97,27 @@ class RolesController < ApplicationController
     render json: roles
   end
 
+  def search_device
+    # FIXME: ensure this correctly filters devices
+    devices = check_access(Device, READ_DEVICE).joins(:device_model).includes(:site, :institution, device_model: :institution)
+    devices = devices.within(NavigationContext.new(current_user, params[:context]).entity)
+    devices = devices.where('devices.name LIKE ? OR devices.uuid LIKE ? OR devices.serial_number LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+    render json: as_json_devices_search(devices).attributes!
+  end
 
   private
+
+  def as_json_devices_search(devices)
+    Jbuilder.new do |json|
+      json.array! devices do |device|
+        as_json_device(json, device)
+      end
+    end
+  end
+
+  def as_json_device(json, device)
+    json.(device, :uuid, :name, :serial_number)
+  end
 
   def role_params
     params.require(:role).permit(:name, :site_id, :definition)

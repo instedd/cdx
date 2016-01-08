@@ -47,6 +47,14 @@ var PolicyItemDetail = React.createClass({
     return statement.actions.find(function(anAction) { return anAction.id == action.id });
   },
 
+  removeResourceAtIndex: function(resourceIndex) {
+    this.props.updateStatement({resourceList: {[this.props.statement.resources] : {$splice: [[resourceIndex, 1]]} } })
+  },
+
+  addResource: function(resource) {
+    this.props.updateStatement({resourceList: {[this.props.statement.resources] : {$push: [resource]}}})
+  },
+
   render: function() {
     var statement = this.props.statement;
     var resourcesList = {
@@ -55,11 +63,19 @@ var PolicyItemDetail = React.createClass({
     }
     var ifResourceTypeSelected = <div className="without-resource-type" />;
     if(statement.resourceType != null) {
-      if(statement.resources != null && statement.resources != "all") {
-        // FIXME: actually list resources
-        resourcesList[statement.resources] = (<div className="resources-list">
-          Aca va la lista
-        </div>);
+      switch (statement.resourceType) {
+        case 'device':
+          // TODO: replace DeviceList with OptionList
+          resourcesList[statement.resources] = <div className={"with-resources-" + statement.resources + "-list"}><DeviceList devices={statement.resourceList[statement.resources]} addDevice={this.addResource} removeDevice={this.removeResourceAtIndex} context={this.props.context} isException={statement.resources == 'except'} /></div>;
+          break;
+        case 'site':
+          break;
+        case 'testResult':
+          break;
+        case 'encounter':
+          break;
+        default:
+
       }
 
       var actions = this.props.actions[statement.resourceType];
