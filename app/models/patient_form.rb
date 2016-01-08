@@ -50,7 +50,7 @@ class PatientForm
   end
 
   validates_presence_of :name
-  GENDER_VALUES = %w(male female other)
+  GENDER_VALUES = Patient.entity_fields.detect { |f| f.name == 'gender' }.options
   validates_inclusion_of :gender, in: GENDER_VALUES, allow_blank: true, message: "is not within valid options (should be one of #{GENDER_VALUES.join(', ')})"
 
   # begin dob
