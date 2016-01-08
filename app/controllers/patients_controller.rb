@@ -2,6 +2,11 @@ class PatientsController < ApplicationController
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_PATIENT)
     @patients = check_access(Patient.where(institution: @navigation_context.institution), READ_PATIENT).order(updated_at: :desc)
+
+    @page_size = (params["page_size"] || 10).to_i
+    @page = (params["page"] || 1).to_i
+    @patients = @patients.page(@page).per(@page_size)
+    @total = @patients.total_count
   end
 
   def show

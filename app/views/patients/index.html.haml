@@ -2,7 +2,34 @@
 
 .row
   .col
-    %ul
-      - @patients.each do |patient|
-        %li
-          = link_to patient.name, patient_path(patient)
+    - if @patients.empty?
+      = cdx_table do |t|
+        - t.columns do
+          %col{:width => "100%"}
+        - t.thead do
+          %tr
+            %th
+        - t.tbody do
+          %tr
+            %td.empty
+              .empty-icon
+                %span.ic140-patients
+              %h1 No patients registered at this institution
+              %p Keep your test orders organized under patients medical history
+    - else
+      = cdx_table do |t|
+        - t.columns do
+          %col{:width => "25%"}
+          %col{:width => "12%"}
+        - t.thead do
+          %tr
+            %th Name
+            %th Patient Id
+        - t.tbody do
+          - @patients.each do |patient|
+            %tr{data: {href: patient_path(patient) }}
+              %td= patient.name
+              %td= patient.entity_id
+
+    .pagination
+      = render 'shared/pagination'

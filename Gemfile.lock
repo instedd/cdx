@@ -331,6 +331,9 @@ GEM
       turbolinks
     json (1.8.3)
     jwt (1.5.1)
+    kaminari (0.16.3)
+      actionpack (>= 3.0.0)
+      activesupport (>= 3.0.0)
     launchy (2.4.3)
       addressable (~> 2.3)
     leaflet-rails (0.7.4)
@@ -663,6 +666,7 @@ DEPENDENCIES
   jbuilder (~> 1.2)
   jquery-rails
   jquery-turbolinks
+  kaminari
   leaflet-rails
   letter_opener
   location_service!
