@@ -107,7 +107,11 @@ end
 
 Patient.blueprint do
   institution
-  plain_sensitive_data { { "id" => "patient-#{Sham.sn}" } }
+  plain_sensitive_data {
+    { "id" => "patient-#{Sham.sn}" }.tap do |h|
+      h["name"] = object.name if object.name
+    end
+  }
 end
 
 TestResult.blueprint do

@@ -48,6 +48,16 @@ RSpec.describe PatientsController, type: :controller do
       get :index
       expect(assigns(:can_create)).to be_falsy
     end
+
+    it "should filter by name" do
+      institution.patients.make name: 'John'
+      institution.patients.make name: 'Clark'
+      institution.patients.make name: 'Mery johana'
+
+      get :index, name: 'jo'
+      expect(response).to be_success
+      expect(assigns(:patients).count).to eq(2)
+    end
   end
 
   context "show" do
