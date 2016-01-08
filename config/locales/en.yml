@@ -27,7 +27,7 @@ en:
       site:
         parent: Parent site
       patient:
-        dob_text: Birthday
+        dob: Birthday
 
   user:
     settings:

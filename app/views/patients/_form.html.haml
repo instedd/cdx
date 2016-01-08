@@ -22,9 +22,9 @@
 
   .row
     .col.pe-2
-      = f.label :dob_text
+      = f.label :dob
     .col
-      = f.text_field :dob_text, placeholder: @patient.dob_text_placeholder
+      = f.text_field :dob, placeholder: @patient.dob_placeholder
 
   = patient_address_component(@patient)
 

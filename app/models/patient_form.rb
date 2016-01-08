@@ -28,6 +28,7 @@ class PatientForm
   def patient=(value)
     @patient = value
     self.class.assign_attributes(self, @patient)
+    self.dob = Time.parse(@patient.dob) rescue nil # dob is stored as String, but in PatientForm it needs to be set as Time when editing
   end
 
   def self.edit(patient)
@@ -46,7 +47,10 @@ class PatientForm
 
   def save
     self.class.assign_attributes(patient, self)
-    self.valid? && patient.save
+    patient.dob = @dob  # we need to set a Time in patient insead of self.dob :: String
+    self.valid? && patient.save.tap do
+      puts patient.errors.full_messages
+    end
   end
 
   validates_presence_of :name
@@ -54,18 +58,17 @@ class PatientForm
   validates_inclusion_of :gender, in: GENDER_VALUES, allow_blank: true, message: "is not within valid options (should be one of #{GENDER_VALUES.join(', ')})"
 
   # begin dob
-  # use dob_text from form. dob is parsed dob_text or just dob_text if not a valid date
-  # since the store is @dob, dob_text acts as a wrapper when the value is a date and formats it
-  # for form rendering
+  # @dob is Time | Nil | String.
+  # PatientForm#dob will return always a string ready to be used by the user input with the user locale
+  # PatientForm#dob= will accept either String or Time. The String will be converted if possible to a Time using the user locale
   validate :dob_is_a_date
 
   def date_format
     { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
   end
 
-  def dob_text
-    value = self.dob
-    value = Time.parse(value) rescue value if value.is_a?(String) # dob attribute seems to be stored as YYYY-MM-DD string instead of a Time
+  def dob
+    value = @dob
 
     if value.is_a?(Time)
       return value.strftime(date_format[:pattern])
@@ -74,23 +77,23 @@ class PatientForm
     value
   end
 
-  def dob_text=(value)
+  def dob=(value)
     value = nil if value.blank?
 
-    self.dob = if value.is_a?(String)
+    @dob = if value.is_a?(String)
       Time.strptime(value, date_format[:pattern]) rescue value
     else
       value
     end
   end
 
-  def dob_text_placeholder
+  def dob_placeholder
     date_format[:placeholder]
   end
 
   def dob_is_a_date
-    return if dob.blank?
-    errors.add(:dob_text, "should be a date in #{dob_text_placeholder}") unless dob.is_a?(Time)
+    return if @dob.blank?
+    errors.add(:dob, "should be a date in #{dob_placeholder}") unless @dob.is_a?(Time)
   end
   # end dob
 

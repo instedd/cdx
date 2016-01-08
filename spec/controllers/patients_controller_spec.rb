@@ -106,14 +106,14 @@ RSpec.describe PatientsController, type: :controller do
   context "create" do
     it "should create new patient in context institution" do
       expect {
-        post :create, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
+        post :create, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
       }.to change(institution.patients, :count).by(1)
 
       expect(response).to be_redirect
     end
 
     it "should save fields" do
-      post :create, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
+      post :create, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
       patient = institution.patients.last
 
       expect(patient.name).to eq('Lorem')
@@ -130,7 +130,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
+        post :create, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
       }.to change(institution.patients, :count).by(1)
     end
 
@@ -138,7 +138,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: { name: 'Lorem', dob_text: '1/1/2000', gender: 'female' }
+        post :create, patient: { name: 'Lorem', dob: '1/1/2000', gender: 'female' }
       }.to change(institution.patients, :count).by(0)
 
       expect(response).to be_forbidden
@@ -146,7 +146,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should require name" do
       expect {
-        post :create, patient: { name: '', dob_text: '1/1/2000', gender: 'female' }
+        post :create, patient: { name: '', dob: '1/1/2000', gender: 'female' }
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:name)
@@ -155,7 +155,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should not require dob" do
       expect {
-        post :create, patient: { name: 'Jerry', dob_text: '', gender: 'female' }
+        post :create, patient: { name: 'Jerry', dob: '', gender: 'female' }
       }.to change(institution.patients, :count).by(1)
 
       patient = institution.patients.first
@@ -165,10 +165,10 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should validate dob if present" do
       expect {
-        post :create, patient: { name: 'Jerry', dob_text: '14/14/2000' }
+        post :create, patient: { name: 'Jerry', dob: '14/14/2000' }
       }.to change(institution.patients, :count).by(0)
 
-      expect(assigns(:patient).errors).to have_key(:dob_text)
+      expect(assigns(:patient).errors).to have_key(:dob)
       expect(response).to render_template("patients/new")
     end
 
@@ -183,7 +183,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should not require gender" do
       expect {
-        post :create, patient: { name: 'Lorem', gender: '', dob_text: '1/1/2000' }
+        post :create, patient: { name: 'Lorem', gender: '', dob: '1/1/2000' }
       }.to change(institution.patients, :count).by(1)
 
       patient = institution.patients.first
@@ -232,17 +232,17 @@ RSpec.describe PatientsController, type: :controller do
     let(:patient) { institution.patients.make }
 
     it "should update existing patient" do
-      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
+      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000' }
       expect(response).to be_redirect
 
       patient.reload
       expect(patient.name).to eq("Lorem")
       expect(patient.gender).to eq("female")
-      expect(Time.parse(patient.dob)).to eq(Time.parse("2000-01-01"))
+      expect(Time.parse(patient.dob)).to eq(Time.parse("2000-01-18"))
     end
 
     it "should require name" do
-      post :update, id: patient.id, patient: { name: '', dob_text: '1/1/2000' }
+      post :update, id: patient.id, patient: { name: '', dob: '1/1/2000' }
       expect(assigns(:patient).errors).to have_key(:name)
       expect(response).to render_template("patients/edit")
     end
@@ -251,7 +251,7 @@ RSpec.describe PatientsController, type: :controller do
       grant user, other_user, Patient, UPDATE_PATIENT
 
       sign_in other_user
-      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob_text: '1/1/2000' }
+      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
       expect(response).to be_redirect
 
       patient.reload
@@ -262,7 +262,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should not update existing patient if allowed" do
       sign_in other_user
-      post :update, id: patient.id, patient: { name: 'Lorem', dob_text: '1/1/2000' }
+      post :update, id: patient.id, patient: { name: 'Lorem', dob: '1/1/2000' }
       expect(response).to be_forbidden
 
       patient.reload
