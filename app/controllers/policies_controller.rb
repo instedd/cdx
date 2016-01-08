@@ -22,8 +22,8 @@ class PoliciesController < ApplicationController
       @policy.definition = definition
 
       ensure_user
-      @policy.user_id = @user.id
-      @policy.granter_id = current_user.id
+      @policy.user = @user
+      @policy.granter = current_user
 
     rescue => ex
       @policy.errors.add :definition, ex.message

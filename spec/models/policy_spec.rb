@@ -12,17 +12,14 @@ describe Policy do
 
     it "disallows policy creation if self-granted" do
       policy = Policy.make_unsaved
-      policy.definition = policy_definition(institution, READ_INSTITUTION, false)
-      policy.granter_id = user.id
-      policy.user_id = user.id
+      policy.granter = user
+      policy.user = user
       expect(policy.save).to eq(false)
     end
 
     it "disallows policy creation if granter is nil" do
       policy = Policy.make_unsaved
-      policy.definition = policy_definition(institution, READ_INSTITUTION, false)
-      policy.granter_id = nil
-      policy.user_id = user.id
+      policy.granter = nil
       expect(policy.save).to eq(false)
     end
 

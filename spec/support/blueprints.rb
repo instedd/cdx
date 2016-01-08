@@ -128,10 +128,16 @@ end
 
 Policy.blueprint do
   name
+  granter { Institution.make.user }
+  definition { policy_definition(object.granter.institutions.first, CREATE_INSTITUTION, true) }
+  user
 end
 
 Role.blueprint do
   name
+  policy
+  institution
+  site { Site.make institution: object.institution }
 end
 
 Subscriber.blueprint do

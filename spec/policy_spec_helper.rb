@@ -25,8 +25,8 @@ def grant(granter, user, resource, action, opts = {})
   [granter, user].compact.each(&:reload)
   policy = Policy.make_unsaved
   policy.definition = policy_definition(resource, action, opts.fetch(:delegable, true), opts.fetch(:except, []))
-  policy.granter_id = granter.try(:id)
-  policy.user_id = user.try(:id)
+  policy.granter = granter
+  policy.user = user
   policy.allows_implicit = true
   policy.save!
   policy
