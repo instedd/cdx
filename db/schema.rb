@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160105165742) do
+ActiveRecord::Schema.define(version: 20160108181427) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -240,6 +240,7 @@ ActiveRecord::Schema.define(version: 20160105165742) do
     t.float    "lat",            limit: 24
     t.float    "lng",            limit: 24
     t.string   "address",        limit: 255
+    t.string   "name",           limit: 255
   end
 
   add_index "patients", ["deleted_at"], name: "index_patients_on_deleted_at", using: :btree

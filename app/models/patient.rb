@@ -25,35 +25,40 @@ class Patient < ActiveRecord::Base
   end
 
   def self.attribute_field(*args)
+    options = args.extract_options!
+    options.reverse_merge! copy: false
+    db_attribute = options[:copy]
+
     args.each do |arg|
-      if self.entity_fields.detect { |f| f.name == arg.to_s }.pii?
-        define_method arg do
-          self.plain_sensitive_data[arg.to_s]
-        end
-
-        define_method "#{arg}=" do |value|
-          if value.blank?
-            self.plain_sensitive_data.delete(arg.to_s)
-          else
-            self.plain_sensitive_data[arg.to_s] = value
-          end
-        end
+      field_source = if self.entity_fields.detect { |f| f.name == arg.to_s }.pii?
+        "plain_sensitive_data"
       else
-        define_method arg do
-          self.core_fields[arg.to_s]
-        end
+        "core_fields"
+      end
 
-        define_method "#{arg}=" do |value|
-          if value.blank?
-            self.core_fields.delete(arg.to_s)
-          else
-            self.core_fields[arg.to_s] = value
-          end
+      define_method arg do
+        send(field_source)[arg.to_s]
+      end
+
+      define_method "#{arg}=" do |value|
+        write_attribute(arg, value) if db_attribute
+        if value.blank?
+          send(field_source).delete(arg.to_s)
+        else
+          send(field_source)[arg.to_s] = value
+        end
+      end
+
+      if db_attribute
+        # copy attribute to db, in case the entity_field was changed directly
+        before_validation do
+          write_attribute(arg, send(arg))
         end
       end
     end
   end
 
-  attribute_field :name, :gender, :dob, :email, :phone
+  attribute_field :name, copy: true
+  attribute_field :gender, :dob, :email, :phone
 
 end
