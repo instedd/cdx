@@ -63,19 +63,10 @@ var PolicyItemDetail = React.createClass({
     }
     var ifResourceTypeSelected = <div className="without-resource-type" />;
     if(statement.resourceType != null) {
-      switch (statement.resourceType) {
-        case 'device':
-          // TODO: replace DeviceList with OptionList
-          resourcesList[statement.resources] = <div className={"with-resources-" + statement.resources + "-list"}><DeviceList devices={statement.resourceList[statement.resources]} addDevice={this.addResource} removeDevice={this.removeResourceAtIndex} context={this.props.context} isException={statement.resources == 'except'} /></div>;
-          break;
-        case 'site':
-          break;
-        case 'testResult':
-          break;
-        case 'encounter':
-          break;
-        default:
-
+      // FIXME: filter resources for other types - ie, 'site'
+      if(['device', 'testResult', 'encounter'].includes(statement.resourceType)) {
+        // TODO: replace DeviceList with OptionList
+        resourcesList[statement.resources] = <div className={"with-resources-" + statement.resources + "-list"}><DeviceList devices={statement.resourceList[statement.resources]} addDevice={this.addResource} removeDevice={this.removeResourceAtIndex} context={this.props.context} isException={statement.resources == 'except'} /></div>;
       }
 
       var actions = this.props.actions[statement.resourceType];
