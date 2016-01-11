@@ -4,6 +4,7 @@ class PatientsController < ApplicationController
     @patients = check_access(Patient.where(institution: @navigation_context.institution), READ_PATIENT).order(updated_at: :desc)
 
     @patients = @patients.where("name LIKE concat('%', ?, '%')", params[:name]) unless params[:name].blank?
+    @patients = @patients.where("entity_id LIKE concat('%', ?, '%')", params[:entity_id]) unless params[:entity_id].blank?
 
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i

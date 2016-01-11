@@ -108,7 +108,8 @@ end
 Patient.blueprint do
   institution
   plain_sensitive_data {
-    { "id" => "patient-#{Sham.sn}" }.tap do |h|
+    {}.tap do |h|
+      h["id"] = object.entity_id || "patient-#{Sham.sn}"
       h["name"] = object.name if object.name
     end
   }
