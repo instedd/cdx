@@ -151,7 +151,7 @@ input[type="checkbox"] {
 // Radio buttons ---------------------------------------------------------//
 
 
-input[type="radio111"] {
+input[type="radio"] {
   display: none;
 
   & + label {
@@ -403,4 +403,3 @@ label.on {
     display: block;
   }
 }
-

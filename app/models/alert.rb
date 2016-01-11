@@ -44,7 +44,7 @@ class Alert < ActiveRecord::Base
                           type: '.percolator',
                           id: 'alert_'+self.id.to_s+"_"+self.category_type.to_i.to_s,
                           body: { query: es_query, type: 'test' } 
-                          =end                          
+=end                          
     Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
                            type: '.percolator',
                            id: 'alert_'+self.id.to_s,
