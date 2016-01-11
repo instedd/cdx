@@ -8,10 +8,10 @@
               = image_tag "arrow-left-white.png"
             New Alert
 
-= react_component('AlertCategorySelect', category_types:Alert.category_types, aa:"vvv", url:"/alerts.json", sites:@sites, devices:@devices, anomalie_types:Alert.anomalie_types, aggregation_types:Alert.aggregation_types,aggregation_frequencies:Alert.aggregation_frequencies,channel_types:Alert.channel_types,roles:@roles, users: @users)
+= react_component('AlertCategorySelect', edit: false, alert_info: alert_info, category_types:Alert.category_types, url:"/alerts.json", sites:@sites, devices:@devices, anomalie_types:Alert.anomalie_types, aggregation_types:Alert.aggregation_types,aggregation_frequencies:Alert.aggregation_frequencies,channel_types:Alert.channel_types,roles:@roles, users: @users)
 
-%br/
-%br/
-%hr/
-%hr/		
-= render 'form'
+/ %br/
+/ %br/
+/ %hr/
+/ %hr/		
+/ = render 'form'

@@ -1,3 +1,49 @@
+
+
+
+var AlertEnabled = React.createClass({
+	render: function() {
+		return (
+			<div className="row">
+			<div className="col pe-2">
+			<label>Enabled</label>
+			</div>
+			<div className="col">
+			
+			<input
+			type="checkbox"
+			checkedLink={this.props.checkedLink} 
+			/>
+			<label>
+			&nbsp;
+			</label>
+			</div>
+			</div>
+			);
+	}
+});
+
+
+
+
+var AlertName = React.createClass({
+	render: function() {
+		return (
+			<div className="row" id="namerow">
+			<div className="col pe-2">
+			<label>
+			Name
+			</label>
+			</div>
+			
+			<div className="col">
+			<input type="text" placeholder="Name" valueLink={this.props.valueLink} id="alertname"/>
+			</div>
+			</div>
+			);
+	}
+});
+
 var AlertDescription = React.createClass({
 	render: function() {
 		return (
@@ -6,7 +52,7 @@ var AlertDescription = React.createClass({
 			<label>Description</label>
 			</div>
 			<div className="col">
-			<input type="text" placeholder="Description" ref="alert=description" />
+			<input type="text" placeholder="Description" valueLink={this.props.valueLink} id="alertdescription"/>
 			</div>
 			</div>
 			);
@@ -25,7 +71,7 @@ var AlertErrorCode = React.createClass({
 			</div>
 			
 			<div className="col">
-			<input type="text" placeholder="All error codes will be reported" valueLink={this.props.valueLink} />
+			<input type="text" placeholder="All error codes will be reported" valueLink={this.props.valueLink} id="alerterrorcode"  />
 			</div>
 			</div>
 			);
@@ -46,7 +92,9 @@ var AlertSite = React.createClass({
 	//https://github.com/JedWatson/react-select/issues/256				
 	onChange(textValue, arrayValue) {					  
 		// Multi select: grab values and send array of values to valueLink
-		this.props.valueLink.requestChange(_.pluck(arrayValue, 'value').join());
+	//THURSDAY	this.props.valueLink.requestChange(_.pluck(arrayValue, 'value').join());
+		
+		this.props.updateValue(_.pluck(arrayValue, 'value').join());
 	},
 	render: function() {
 		var siteOptions=[];
@@ -64,7 +112,9 @@ var AlertSite = React.createClass({
 			siteOptions.push(siteOption);
 		}
 
-		var { valueLink, value, onChange, ...other } = this.props;
+	//THURSDAY	var { valueLink, value, onChange, ...other } = this.props;
+		var { value, onChange, ...other } = this.props;
+/*THURSDAY
 		return (
 			<div className="row">
 			<div className="col pe-2">
@@ -82,6 +132,27 @@ var AlertSite = React.createClass({
 			</div>
 			</div>
 			);
+			*/
+			
+			return (
+				<div className="row">
+				<div className="col pe-2">
+				<label>Site</label>
+				</div>
+				<div className="col">
+				<Select
+				name="site"
+				value={value}
+				options={siteOptions}			   
+				multi={true}		
+				placeholder="None"	    
+				onChange={this.onChange}
+				id="alertsite" 
+				/>
+				</div>
+				</div>
+				);
+				
 	}
 });
 
@@ -130,6 +201,7 @@ var AlertDevice = React.createClass({
 			multi={true}		
 			placeholder="None"	    
 			onChange={this.onChange}
+			 id="alertdevice" 
 			/>
 			</div>
 			</div>
@@ -173,6 +245,7 @@ var AlertAnomalieType = React.createClass({
 			options={options}			   
 			multi={false}			    
 			onChange={this.onChange}
+			id="alertanomalietype"
 			/>
 			</div>
 			</div>
@@ -221,6 +294,8 @@ render: function() {
 		options={options}			   
 		multi={false}			    
 		onChange={this.onChange}
+		disabled=true
+		id="alertaggregationtype"
 		/>
 		</div>
 		</div>
@@ -264,6 +339,7 @@ render: function() {
 		options={options}			   
 		multi={false}			    
 		onChange={this.onChange}
+		id="alertaggregationfrequency"
 		/>
 		</div>
 		</div>
@@ -306,6 +382,7 @@ render: function() {
 		options={options}			   
 		multi={false}			    
 		onChange={this.onChange}
+		id="alertchannel"
 		/>
 		</div>
 		</div>
@@ -360,6 +437,7 @@ var AlertRole = React.createClass({
 			multi={true}		
 			placeholder="None"	    
 			onChange={this.onChange}
+			id="alertrole"
 			/>
 			</div>
 			</div>
@@ -413,6 +491,7 @@ var AlertUser = React.createClass({
 			multi={true}		
 			placeholder="None"	    
 			onChange={this.onChange}
+			id="alertuser"
 			/>
 			</div>
 			</div>
@@ -423,6 +502,28 @@ var AlertUser = React.createClass({
 
 
 var AlertPatient = React.createClass({
+	render: function() {
+		return (
+			<div className="row">
+			<div className="col pe-2">
+			<label>All Patients</label>
+			</div>
+			<div className="col">
+			<input
+			type="checkbox"
+			checkedLink={this.props.checkedLink} 
+			id="alertpatient"
+			/>
+			<label>
+			&nbsp;
+			</label>
+			</div>
+			</div>
+			);
+	}
+});
+
+var AlertPatient11 = React.createClass({
 	getInitialState: function() {
 		return {
 			isChecked: true
@@ -432,7 +533,6 @@ var AlertPatient = React.createClass({
 		this.setState({
 	      isChecked: !this.state.isChecked // flip boolean value	      
 	    }, function() {
-	    	console.log(this.state);
 	    	var valueLink = this.valueLink('patientField');
 	    	valueLink.requestChange(isChecked);
 	    	
@@ -476,7 +576,7 @@ var AlertSmsLimit = React.createClass({
 			</div>
 			
 			<div className="col">
-			<input type="text" placeholder="sms limit" valueLink={this.props.valueLink} />
+			<input type="text" placeholder="sms limit" valueLink={this.props.valueLink}  id="alertsmslimit"/>
 			</div>
 			</div>
 			);
@@ -494,7 +594,7 @@ var AlertMessage = React.createClass({
 			</div>
 			
 			<div className="col">
-			<input type="text" placeholder="message" valueLink={this.props.valueLink} />
+			<input type="text" placeholder="message" valueLink={this.props.valueLink} id="alertmessage"/>
 			</div>
 			</div>
 			);

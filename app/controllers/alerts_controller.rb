@@ -12,6 +12,15 @@ class AlertsController < ApplicationController
 
   def new
     new_alert_request_variables
+
+=begin    
+    alert_info.name=""
+    alert_info.description=""
+    alert_info.error_code=""
+    alert_info.category_type=""
+    alert_info.message=""
+=end    
+    binding.pry
     alert_info.alert_recipients.build 
   end
 
@@ -24,21 +33,37 @@ class AlertsController < ApplicationController
   end
 
   def edit
+    new_alert_request_variables
+  
     @editing = true
-    respond_with alert, location: alert_path
+    # alert_info.to_json(:include => :devices)
+ #   respond_with alert_info, location: alert_path
+## @aa=alert_info.to_json(:include => :devices)
+ 
+##self.alert_info = Alert.includes(:devices).find_by_id(130)
+
+@alert_devices=[]
+alert_info.devices.each do |device|
+   @alert_devices.push(device.id)
+end
+@alert_devices = @alert_devices.join(",")
+
+binding.pry
+
+
+# respond_with alert_info.to_json(:include => :devices), location: alert_path
+respond_with alert_info, location: alert_path
+ 
   end
 
   def show
-    respond_with alert, location: alert_path
+    respond_with alert_info, location: alert_path
   end
 
 
   def create
    alert_saved_ok = alert_info.save
    if alert_saved_ok
-     
-    binding.pry   
-    
     if params[:alert][:roles]
       roles = params[:alert][:roles].split(',')
       roles.each do |roleid|
@@ -103,20 +128,31 @@ if params[:alert][:sites_info]
     alert_info.create_percolator  #need to do this for per_record or an aggregation
   end
 
-  respond_to do |format|
+#  respond_to do |format|
     if alert_saved_ok
-      format.html { redirect_to alerts_path, notice: 'Alert was successfully created.' }
-      format.json { render action: 'show', status: :created, location: alert_info }
+      #format.html { redirect_to alerts_path, notice: 'Alert was successfully created.' }
+     # format.json { render action: 'show', status: :created, location: alert_info }
+     render json: alert_info
     else
-      new_alert_request_variables
-      format.html { render action: 'new' }
-      format.json { render json: alert_info.errors, status: :unprocessable_entity }
+##      new_alert_request_variables
+      #format.html { render action: 'new' }
+      #format.json { render json: alert_info.errors, status: :unprocessable_entity }  
+    render json: alert_info.errors, status: :unprocessable_entity
     end
-  end
+#  end
   
 end
 
 
+
+#def update
+#   if @customer.update(customer_params)
+#     render json: @customer
+#   else
+#     render json: @customer.errors, status: :unprocessable_entity
+#   end
+# end
+ 
 def update
   flash[:notice] = "Alert was successfully updated" if alert_info.save
   respond_with alert_info, location: alerts_path
@@ -132,10 +168,18 @@ def destroy
   end
 end
 
+=begin
+def devices
+ binding.pry
+ p 'ggg'
+ @devices = check_access(Device, READ_DEVICE)
+ render :json => @devices
+end
+=end
+
 private
 
 def alert_params 
-  binding.pry
   params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
 end
 
