@@ -9,10 +9,10 @@ class TestResultIndexer < EntityIndexer
   def after_index(options)
     percolate_result = client.percolate index: Cdx::Api.index_name, type: type, id: test_result.uuid
     percolate_result["matches"].each do |match|
-      binding.pry
+     
       subscriber_id = match["_id"]
   
-  binding.pry
+
       if subscriber_id.include? 'alert'
         AlertJob.perform_later subscriber_id, test_result.uuid
       else
