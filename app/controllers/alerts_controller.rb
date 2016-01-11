@@ -74,7 +74,7 @@ respond_with alert_info, location: alert_path
       end
     end
     
-    
+
     if alert_info.category_type == "anomalies"
      
    # check that the start_time field is not missing
