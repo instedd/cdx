@@ -1,14 +1,22 @@
+= render "filters"
+
 .row
   .col
-    - if @can_create
-      = link_to "+", new_role_path, class: 'btn-add side-link ontop fix', title: 'Add Role'
-    = cdx_table title: 'Roles' do |t|
+    / = link_to "+", new_role_path, class: 'btn-add side-link ontop fix', title: 'Add Role'
+    = cdx_table do |t|
       - t.columns do
-        %col{:width => "100%"}
+        %col{:width => "50%"}
+        %col{:width => "40%"}
+        %col{:width => "10%"}
       - t.thead do
         %tr
           %th Name
+          %th Location
+          %th Users
       - t.tbody do
         - @roles.each do |role|
-          %tr
-            %td= link_to role.name, edit_role_path(role)
+          %tr{data: {href: edit_role_path(role)}}
+            %td= role.name
+            %td= role.site ? role.site.name : role.institution.name
+            %td= @user_counts[role.id]
+
