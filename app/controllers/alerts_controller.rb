@@ -20,7 +20,7 @@ class AlertsController < ApplicationController
     alert_info.category_type=""
     alert_info.message=""
 =end    
-    binding.pry
+   
     alert_info.alert_recipients.build 
   end
 
@@ -47,8 +47,6 @@ alert_info.devices.each do |device|
    @alert_devices.push(device.id)
 end
 @alert_devices = @alert_devices.join(",")
-
-binding.pry
 
 
 # respond_with alert_info.to_json(:include => :devices), location: alert_path
