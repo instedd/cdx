@@ -5,6 +5,8 @@ class PatientsController < ApplicationController
 
     @patients = @patients.where("name LIKE concat('%', ?, '%')", params[:name]) unless params[:name].blank?
     @patients = @patients.where("entity_id LIKE concat('%', ?, '%')", params[:entity_id]) unless params[:entity_id].blank?
+    # location_geoid is hierarchical so a prefix search works
+    @patients = @patients.where("location_geoid LIKE concat(?, '%')", params[:location]) unless params[:location].blank?
 
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i

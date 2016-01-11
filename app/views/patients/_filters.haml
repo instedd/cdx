@@ -16,3 +16,6 @@
           .filter
             %label.block Patient Id
             %input{type: "text", name: "entity_id", value: params["entity_id"]}
+          .filter
+            %label.block Location
+            = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"]
