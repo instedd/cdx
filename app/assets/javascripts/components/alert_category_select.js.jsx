@@ -6,7 +6,7 @@ var AlertCategorySelect = React.createClass({
    
     if (this.props.edit == true) {
 	
-	 document.getElementById("alertname").disabled = true;
+//	 document.getElementById("alertname").disabled = true;
    	 document.getElementById("alertdescription").disabled = true;
 document.getElementById("alertdescription").disabled = true;
 
@@ -15,40 +15,29 @@ document.getElementById("alertsmslimit").disabled = true;
 document.getElementById("alertmessage").disabled = true;
 document.getElementById("alerterrorcode").disabled = true;
 
- $('select').addAttr('disabled');
+ //$('select').addAttr('disabled');
  //$('select').removeAttr('disabled');
 
-//document.getElementById("alertaggregationtype").disabled = true;
 
-/*
+this.setState({disable_all_selects: true});
+
+
 category_keys = Object.keys(this.props.category_types);
-
 document.getElementById(category_keys[0]).disabled = true;
 document.getElementById(category_keys[1]).disabled = true;
 document.getElementById(category_keys[2]).disabled = true;
 document.getElementById(category_keys[3]).disabled = true;
-*/
-document.getElementById("alertsite").disabled = true;
-document.getElementById("alertdevice").disabled = true;
-/*
-document.getElementById("alertchannel").disabled = true;
 
-document.getElementById("alertaggregationtype").disabled = true;
-document.getElementById("alertaggregationfrequency").disabled = true;
-document.getElementById("alertanomalietype").disabled = true;
-document.getElementById("alertrole").disabled = true;
-document.getElementById("alertuser").disabled = true;
-*/
-
-
-   }
+   } else {  //new alert
+this.setState({disable_all_selects: false});
+}
 	},
 	getInitialState: function() {
 		category_keys = Object.keys(this.props.category_types);
 		
 		return {
 			// had issues with a structure such as alert1 -updating the data object field in the 'select' options library so used individual fields
-			edit: this.props.edit, all_devices: this.props.devices, current_category: this.props.alert_info.category_type, nameField:this.props.alert_info.name, descriptionField: this.props.alert_info.description, siteField:"", deviceField:this.props.alert_devices, errorCodeField:"", anomalieField:"",aggregationField:this.props.alert_info.aggregation_type,aggregationFrequencyField:this.props.alert_info.aggregation_frequency,channelField:this.props.alert_info.channel_type, roleField:"", userField:"", patientField:this.props.alert_info.notify_patients, smsLimitField:this.props.alert_info.sms_limit, messageField: this.props.alert_info.message, enabledField: this.props.alert_info.enabled
+			disable_all_selects: false, edit: this.props.edit, all_devices: this.props.devices, current_category: this.props.alert_info.category_type, nameField:this.props.alert_info.name, descriptionField: this.props.alert_info.description, siteField:"", deviceField:this.props.alert_devices, errorCodeField:"", anomalieField:"",aggregationField:this.props.alert_info.aggregation_type,aggregationFrequencyField:this.props.alert_info.aggregation_frequency,channelField:this.props.alert_info.channel_type, roleField:"", userField:"", patientField:this.props.alert_info.notify_patients, smsLimitField:this.props.alert_info.sms_limit, messageField: this.props.alert_info.message, enabledField: this.props.alert_info.enabled
 		};
 	},
 	categoryChanged: function (e) {
@@ -206,28 +195,28 @@ render: function() {
 		</div>
 
 
-		<AlertSite sites={this.props.sites}  value={this.state.siteField} updateValue={this.siteChanged} />
+		<AlertSite sites={this.props.sites}  value={this.state.siteField} updateValue={this.siteChanged} disable_all_selects={this.state.disable_all_selects} />
 		
-		<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} />
+		<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
 
-		<AlertErrorCode valueLink={this.linkState('errorCodeField')} />
+		<AlertErrorCode valueLink={this.linkState('errorCodeField')}  />
 
-		<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')}  />
+		<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
 
-		<AlertAggregation aggregation_types={this.props.aggregation_types} value={this.state.aggregationField} valueLink={this.linkState('aggregationField')}  />
-		<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} />
+		<AlertAggregation aggregation_types={this.props.aggregation_types} value={this.state.aggregationField} valueLink={this.linkState('aggregationField')} disable_all_selects={this.state.disable_all_selects} />
+		<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
 
-		<AlertChannel channel_types={this.props.channel_types}  valueLink={this.linkState('channelField')} />
+		<AlertChannel channel_types={this.props.channel_types}  valueLink={this.linkState('channelField')} disable_all_selects={this.state.disable_all_selects}/>
 		
-		<AlertRole roles={this.props.roles}  valueLink={this.linkState('roleField')} />
+		<AlertRole roles={this.props.roles}  valueLink={this.linkState('roleField')} disable_all_selects={this.state.disable_all_selects} />
 		
-		<AlertUser users={this.props.users}  valueLink={this.linkState('userField')} />
+		<AlertUser users={this.props.users}  valueLink={this.linkState('userField')} disable_all_selects={this.state.disable_all_selects} />
 		
-		<AlertPatient valueLink={this.linkState('patientField')} />
+		<AlertPatient valueLink={this.linkState('patientField')}  />
 		
 		<AlertSmsLimit valueLink={this.linkState('smsLimitField')} />
 		
-		<AlertMessage valueLink={this.linkState('messageField')} />
+		<AlertMessage valueLink={this.linkState('messageField')}  />
 		
 		<div className="row">
 		<div className="col pe-2">

@@ -75,25 +75,30 @@ respond_with alert_info, location: alert_path
     end
     
     
+     alert_info.query={"test.enabled"=>"false" }
     
     if alert_info.category_type == "anomalies"
      
    # check that the start_time field is not missing
    if alert_info.anomalie_type == "missing_sample_id"
-     alert_info.query =    {"sample.id"=>"null" }
+    # alert_info.query =    {"sample.id"=>"null" }
+     alert_info.query=alert_info.query.merge ({"sample.id"=>"null" })
    elsif alert_info.anomalie_type == "missing_start_time"
-    alert_info.query =    {"test.start_time"=>"null" }
+  #  alert_info.query =    {"test.start_time"=>"null" }
+    alert_info.query=alert_info.query.merge ({"test.start_time"=>"null" })
   end
 end
 
 if alert_info.category_type == "device_errors"
   if alert_info.error_code and alert_info.error_code.include? '-'
     minmax=alert_info.error_code.split('-')
-    alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
+  #  alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
+     alert_info.query=alert_info.query.merge ({"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]})
     #elsif alert_info.error_code.include? '*' 
     #   alert_info.query =    {"test.error_code.wildcard" => "*7"}   
   else
-    alert_info.query =    {"test.error_code"=>alert_info.error_code }
+  #  alert_info.query =    {"test.error_code"=>alert_info.error_code }
+    alert_info.query=alert_info.query.merge ({"test.error_code"=>alert_info.error_code });
   end
 end
 

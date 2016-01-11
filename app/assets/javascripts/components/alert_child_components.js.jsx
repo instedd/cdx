@@ -147,7 +147,7 @@ var AlertSite = React.createClass({
 				multi={true}		
 				placeholder="None"	    
 				onChange={this.onChange}
-				id="alertsite" 
+				disabled={this.props.disable_all_selects}
 				/>
 				</div>
 				</div>
@@ -201,7 +201,7 @@ var AlertDevice = React.createClass({
 			multi={true}		
 			placeholder="None"	    
 			onChange={this.onChange}
-			 id="alertdevice" 
+			disabled={this.props.disable_all_selects}
 			/>
 			</div>
 			</div>
@@ -245,7 +245,7 @@ var AlertAnomalieType = React.createClass({
 			options={options}			   
 			multi={false}			    
 			onChange={this.onChange}
-			id="alertanomalietype"
+			disabled={this.props.disable_all_selects}
 			/>
 			</div>
 			</div>
@@ -294,8 +294,7 @@ render: function() {
 		options={options}			   
 		multi={false}			    
 		onChange={this.onChange}
-		disabled=true
-		id="alertaggregationtype"
+		disabled={this.props.disable_all_selects}
 		/>
 		</div>
 		</div>
@@ -339,7 +338,7 @@ render: function() {
 		options={options}			   
 		multi={false}			    
 		onChange={this.onChange}
-		id="alertaggregationfrequency"
+		disabled={this.props.disable_all_selects}
 		/>
 		</div>
 		</div>
@@ -382,7 +381,7 @@ render: function() {
 		options={options}			   
 		multi={false}			    
 		onChange={this.onChange}
-		id="alertchannel"
+		disabled={this.props.disable_all_selects}
 		/>
 		</div>
 		</div>
@@ -437,7 +436,7 @@ var AlertRole = React.createClass({
 			multi={true}		
 			placeholder="None"	    
 			onChange={this.onChange}
-			id="alertrole"
+			disabled={this.props.disable_all_selects}
 			/>
 			</div>
 			</div>
@@ -491,7 +490,7 @@ var AlertUser = React.createClass({
 			multi={true}		
 			placeholder="None"	    
 			onChange={this.onChange}
-			id="alertuser"
+			disabled={this.props.disable_all_selects}
 			/>
 			</div>
 			</div>
