@@ -52,7 +52,11 @@ var PolicyItemDetail = React.createClass({
   },
 
   addResource: function(resource) {
-    this.props.updateStatement({resourceList: {[this.props.statement.resources] : {$push: [resource]}}})
+    if(this.props.statement.resourceList[this.props.statement.resources].findIndex(function(aResource) {
+      return aResource.uuid == resource.uuid;
+    }) < 0) {
+      this.props.updateStatement({resourceList: {[this.props.statement.resources] : {$push: [resource]}}})
+    }
   },
 
   render: function() {
