@@ -19,7 +19,7 @@
       .col.pe-2
         = f.label :institution_id
       .col
-        = @institution
+        .value= @institution
 
   - if @role.new_record?
     .row
@@ -34,7 +34,7 @@
       .col.pe-2
         = f.label :site_id
       .col
-        = @role.site.try(:name)
+        .value= @role.site.try(:name)
 
   .row
     .col.pe-2
