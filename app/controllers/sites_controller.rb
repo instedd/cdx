@@ -13,7 +13,7 @@ class SitesController < ApplicationController
 
   def new
     @site = Site.new
-    @sites = check_access(Site, READ_SITE)
+    @sites = check_access(Site, READ_SITE).within(@navigation_context.institution)
     @site.parent = @navigation_context.site
     prepare_for_institution_and_authorize(@site, CREATE_INSTITUTION_SITE)
   end
