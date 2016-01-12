@@ -1,9 +1,8 @@
 class Device < ActiveRecord::Base
   include Resource
+  include SiteContained
 
   belongs_to :device_model
-  belongs_to :institution
-  belongs_to :site
 
   has_one :manifest, through: :device_model
 
@@ -19,26 +18,15 @@ class Device < ActiveRecord::Base
   attr_reader :plain_secret_key
 
   validates_uniqueness_of :uuid
-  validates_presence_of :institution
   validates_presence_of :name
   validates_presence_of :serial_number
   validates_presence_of :device_model
 
   validate :unpublished_device_model_from_institution
-  validate :same_institution_of_site
 
   before_create :set_uuid
-  before_save :set_site_prefix
 
   delegate :current_manifest, to: :device_model
-
-  scope :within, -> (institution_or_site) {
-    if institution_or_site.is_a?(Institution)
-      where(institution: institution_or_site)
-    else
-      where("site_prefix LIKE concat(?, '%')", institution_or_site.prefix)
-    end
-  }
 
   CUSTOM_FIELD_TARGETS = ["patient.id", "sample.id", "encounter.id"]
 
@@ -101,10 +89,6 @@ class Device < ActiveRecord::Base
     self.uuid = MessageEncryption.secure_random(9)
   end
 
-  def set_site_prefix
-    self.site_prefix = site.try(:prefix)
-  end
-
   ACTIVATION_TOKEN_CHARS = ('0'..'9').to_a + ('A'..'Z').to_a
 
   def new_activation_token(token_value = ACTIVATION_TOKEN_CHARS.sample(16, random: Random.new).join)
@@ -149,12 +133,6 @@ class Device < ActiveRecord::Base
   def unpublished_device_model_from_institution
     if device_model && !device_model.published? && device_model.institution_id != self.institution_id
       errors.add(:device_model, "Unpublished device models can only be used to setup devices from the same institution")
-    end
-  end
-
-  def same_institution_of_site
-    if self.site && self.site.institution != self.institution
-      errors.add(:site, "must belong to the institution of the device")
     end
   end
 

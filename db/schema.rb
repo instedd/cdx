@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160108194936) do
+ActiveRecord::Schema.define(version: 20160112190503) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -130,6 +130,7 @@ ActiveRecord::Schema.define(version: 20160108194936) do
     t.datetime "deleted_at"
     t.integer  "site_id",         limit: 4
     t.datetime "user_updated_at"
+    t.string   "site_prefix",     limit: 255
   end
 
   add_index "encounters", ["deleted_at"], name: "index_encounters_on_deleted_at", using: :btree
