@@ -91,8 +91,8 @@ Rails.application.routes.draw do
     end
   end
 
+
   resources :alerts
-  
   resources :incidents, only: [:index, :show]
   resources :alert_messages, only: [:index]
 

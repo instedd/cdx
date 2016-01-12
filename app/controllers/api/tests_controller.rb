@@ -8,7 +8,6 @@ class Api::TestsController < ApiController
     body = Oj.load(request.body.read) || {}
     filters = params.merge(body)
     query = TestResult.query(filters, current_user)
-    
     respond_to do |format|
       format.csv do
         build_csv 'Tests', query.csv_builder

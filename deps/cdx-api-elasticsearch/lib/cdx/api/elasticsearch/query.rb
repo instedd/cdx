@@ -72,7 +72,6 @@ class Cdx::Api::Elasticsearch::Query
 
   def query(params)
     query = elasticsearch_query
-
     if params["group_by"]
       entities = query_with_group_by(query, params["group_by"])
       if params["order_by"]
@@ -128,7 +127,6 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_fields fields, params, conditions=[]
- 
     fields.inject conditions do |conditions, field_definition|
       if field_definition.nested?
         nested_conditions = self.process_fields(field_definition.sub_fields, params)

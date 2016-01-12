@@ -14,7 +14,6 @@ class TestResultIndexer < EntityIndexer
   
 
       if subscriber_id.include? 'alert'
-        binding.pry
         alert = Alert.includes(:alert_recipients).find(alert_id.slice "alert_")
         if alert.enabled
            AlertJob.perform_later subscriber_id, test_result.uuid

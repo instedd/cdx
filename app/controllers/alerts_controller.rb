@@ -11,16 +11,7 @@ class AlertsController < ApplicationController
   end
 
   def new
-    new_alert_request_variables
-
-=begin    
-    alert_info.name=""
-    alert_info.description=""
-    alert_info.error_code=""
-    alert_info.category_type=""
-    alert_info.message=""
-=end    
-   
+    new_alert_request_variables   
     alert_info.alert_recipients.build 
   end
 
@@ -35,13 +26,7 @@ class AlertsController < ApplicationController
   def edit
     new_alert_request_variables
   
-    @editing = true
-    # alert_info.to_json(:include => :devices)
- #   respond_with alert_info, location: alert_path
-## @aa=alert_info.to_json(:include => :devices)
- 
-##self.alert_info = Alert.includes(:devices).find_by_id(130)
-
+  #  @editing = true
 @alert_devices=[]
 alert_info.devices.each do |device|
    @alert_devices.push(device.id)
@@ -122,7 +107,6 @@ if params[:alert][:sites_info]
        alert_info.devices << device
        query_devices << device.uuid
      end
-     #alert_info.query=alert_info.query.merge ({"device.uuid"=>device.uuid})
      alert_info.query=alert_info.query.merge ({"device.uuid"=>query_devices})
    end
    
@@ -144,15 +128,6 @@ if params[:alert][:sites_info]
   
 end
 
-
-
-#def update
-#   if @customer.update(customer_params)
-#     render json: @customer
-#   else
-#     render json: @customer.errors, status: :unprocessable_entity
-#   end
-# end
  
 def update
   flash[:notice] = "Alert was successfully updated" if alert_info.save
@@ -169,14 +144,6 @@ def destroy
   end
 end
 
-=begin
-def devices
- binding.pry
- p 'ggg'
- @devices = check_access(Device, READ_DEVICE)
- render :json => @devices
-end
-=end
 
 private
 

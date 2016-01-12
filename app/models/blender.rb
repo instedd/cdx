@@ -161,7 +161,6 @@ class Blender
 
   def save_and_index!
     entities = save_without_index!
-    
     entities.each do |entity|
       case entity
       when TestResult then TestResultIndexer.new(entity).index
