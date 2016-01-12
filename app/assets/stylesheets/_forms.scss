@@ -35,10 +35,11 @@ label {
 }
 
 .value {
-  padding-top: 5px;
+  line-height: 2.9em;
 
   &.annotation {
     font-size: 80%;
+    line-height: 1.5em;
     color: $gray3;
     max-width: 250px;
     padding-top: 10px;
