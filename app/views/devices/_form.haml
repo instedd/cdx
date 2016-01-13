@@ -10,7 +10,7 @@
     .col.pe-2
       = f.label :institution
     .col
-      .value= f.object.institution
+      .value= @navigation_context.institution.name
 
   .row
     .col.pe-2
@@ -18,13 +18,16 @@
     .col
       = cdx_select form: f, name: :device_model_id, class: 'input-x-large' do |select|
         - select.items(@device_models, :id, :full_name)
-  - if has_access?(Site, Policy::Actions::READ_SITE)
+
+  - if has_access?(Site, Policy::Actions::READ_SITE) && @sites.count > 1
     .row
       .col.pe-2
         = f.label :site
       .col
         = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
           - select.items(@sites, :id, :name)
+  -elsif @sites.count == 1
+    = f.hidden_field :site_id, value: @sites.first.id
   .row
     .col.pe-2
       = f.label :name

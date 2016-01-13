@@ -82,6 +82,12 @@ describe UsersController, type: :controller do
       post :create, {users: user_to_edit.email, role: role.id}
       expect(user_to_edit.roles.count).to eq(1)
     end
+
+    it "refreshes computed policies" do
+      expect(user_to_edit.computed_policies.count).to eq(1)
+      post :create, {users: user_to_edit.email, role: role.id}
+      expect(user_to_edit.computed_policies.count).to_not eq(1)
+    end
   end
 
 end

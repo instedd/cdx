@@ -30,6 +30,7 @@ class UsersController < ApplicationController
       user = User.find_or_initialize_by(email: email)
       user.invite! unless user.persisted?
       user.roles << @role unless user.roles.include?(@role)
+      ComputedPolicy.update_user(user)
     end
     render nothing: true
   end
@@ -37,12 +38,15 @@ class UsersController < ApplicationController
   def assign_role
     @role = Role.find(params[:role])
     @user.roles << @role
+    # Since user is not being updated here, we need to force the new role's policy update
+    ComputedPolicy.update_user(@user)
     render nothing: true
   end
 
   def unassign_role
     @role = Role.find(params[:role])
     @user.roles.delete(@role)
+    ComputedPolicy.update_user(@user)
     render nothing: true
   end
 
