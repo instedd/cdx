@@ -15,28 +15,24 @@ class AlertsController < ApplicationController
     alert_info.alert_recipients.build 
   end
 
-  def index
+  def index  
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i
     offset = (@page - 1) * @page_size
-    
     respond_with alerts
   end
 
   def edit
     new_alert_request_variables
   
-  #  @editing = true
-@alert_devices=[]
-alert_info.devices.each do |device|
-   @alert_devices.push(device.id)
-end
-@alert_devices = @alert_devices.join(",")
+    @alert_devices=[]
+    alert_info.devices.each do |device|
+      @alert_devices.push(device.id)
+    end
+    @alert_devices = @alert_devices.join(",")
 
-
-# respond_with alert_info.to_json(:include => :devices), location: alert_path
-respond_with alert_info, location: alert_path
- 
+    # respond_with alert_info.to_json(:include => :devices), location: alert_path
+    respond_with alert_info, location: alert_path
   end
 
   def show
@@ -59,43 +55,43 @@ respond_with alert_info, location: alert_path
       end
     end
     
-
+    alert_info.query="{}";
     if alert_info.category_type == "anomalies"
      
-   # check that the start_time field is not missing
-   if alert_info.anomalie_type == "missing_sample_id"
-    # alert_info.query =    {"sample.id"=>"null" }
-     alert_info.query=alert_info.query.merge ({"sample.id"=>"null" })
-   elsif alert_info.anomalie_type == "missing_start_time"
-  #  alert_info.query =    {"test.start_time"=>"null" }
-    alert_info.query=alert_info.query.merge ({"test.start_time"=>"null" })
+    # check that the start_time field is not missing
+    if alert_info.anomalie_type == "missing_sample_id"
+      alert_info.query =    {"sample.id"=>"null" }
+      #  alert_info.query=alert_info.query{"sample.id"=>"null" })
+    elsif alert_info.anomalie_type == "missing_start_time"
+      alert_info.query =    {"test.start_time"=>"null" }
+      #   alert_info.query=alert_info.query.merge ({"test.start_time"=>"null" })
+    end
   end
-end
 
-if alert_info.category_type == "device_errors"
-  if alert_info.error_code and alert_info.error_code.include? '-'
-    minmax=alert_info.error_code.split('-')
-  #  alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
-     alert_info.query=alert_info.query.merge ({"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]})
-    #elsif alert_info.error_code.include? '*' 
-    #   alert_info.query =    {"test.error_code.wildcard" => "*7"}   
-  else
-  #  alert_info.query =    {"test.error_code"=>alert_info.error_code }
-    alert_info.query=alert_info.query.merge ({"test.error_code"=>alert_info.error_code });
-  end
-end
+  if alert_info.category_type == "device_errors"
+      if alert_info.error_code and alert_info.error_code.include? '-'
+        minmax=alert_info.error_code.split('-')
+        alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
+        #   alert_info.query=alert_info.query.merge ({"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]})
+        #elsif alert_info.error_code.include? '*' 
+        #   alert_info.query =    {"test.error_code.wildcard" => "*7"}   
+      else
+        alert_info.query =    {"test.error_code"=>alert_info.error_code }
+        #   alert_info.query=alert_info.query.merge ({"test.error_code"=>alert_info.error_code });
+       end
+    end
 
-if params[:alert][:sites_info]
- sites = params[:alert][:sites_info].split(',')
- query_sites=[]
- sites.each do |siteid|
-   site = Site.find_by_id(siteid)
-   alert_info.sites << site
-   query_sites << site.uuid
- end        
+    if params[:alert][:sites_info]
+      sites = params[:alert][:sites_info].split(',')
+      query_sites=[]
+      sites.each do |siteid|
+        site = Site.find_by_id(siteid)
+        alert_info.sites << site
+        query_sites << site.uuid
+      end        
      #Note:  the institution uuid should not be necessary
-     alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
-   end
+      alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
+  end
    
    
    #TODO you have the device uuid, you don’t even need the site uuid
@@ -110,11 +106,14 @@ if params[:alert][:sites_info]
      alert_info.query=alert_info.query.merge ({"device.uuid"=>query_devices})
    end
    
-    alert_info.create_percolator  #need to do this for per_record or an aggregation
+   #Note: alert_info.create_percolator is called from the model 
   end
 
 #  respond_to do |format|
-    if alert_saved_ok
+
+    alert_query_updated_ok = alert_info.update(query: alert_info.query)
+
+    if alert_saved_ok and alert_query_updated_ok
       #format.html { redirect_to alerts_path, notice: 'Alert was successfully created.' }
      # format.json { render action: 'show', status: :created, location: alert_info }
      render json: alert_info
@@ -122,39 +121,50 @@ if params[:alert][:sites_info]
 ##      new_alert_request_variables
       #format.html { render action: 'new' }
       #format.json { render json: alert_info.errors, status: :unprocessable_entity }  
-    render json: alert_info.errors, status: :unprocessable_entity
+      render json: alert_info.errors, status: :unprocessable_entity
     end
 #  end
   
 end
 
  
-def update
-  flash[:notice] = "Alert was successfully updated" if alert_info.save
-  respond_with alert_info, location: alerts_path
-end
+  def update
+    #update in model calls create 
+    if alert_info.enabled==false 
+     alert_info.delete_percolator
+    end
 
-
-def destroy
-  if alert_info.destroy
-    flash[:notice] = "alert was successfully deleted"
-    respond_with alert_info
-  else
-    render :edit
+    if alert_info.save
+      render json: alert_info
+    else
+      render json: alert_info.errors, status: :unprocessable_entity
+    end 
+    
+  #  flash[:notice] = "Alert was successfully updated" if alert_info.save
+  #  respond_with alert_info, location: alerts_path
   end
-end
 
 
-private
+  def destroy
+    if alert_info.destroy
+      flash[:notice] = "alert was successfully deleted"
+      respond_with alert_info
+    else
+      render :edit
+    end
+  end
 
-def alert_params 
-  params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
-end
 
-def new_alert_request_variables
-  @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
-  @roles = check_access(Role, READ_ROLE)
-  @devices = check_access(Device, READ_DEVICE)
+  private
+
+  def alert_params 
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+  end
+
+  def new_alert_request_variables
+    @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
+    @roles = check_access(Role, READ_ROLE)
+    @devices = check_access(Device, READ_DEVICE)
 
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }
@@ -162,6 +172,4 @@ def new_alert_request_variables
     @users = User.where(id: user_ids)
   end
   
-  
-
 end

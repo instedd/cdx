@@ -125,9 +125,14 @@ handleAlertSubmit: function(comment) {
 				message: this.state.messageField,
 				enabled: this.state.enabledField,
 			};
-			
-			
-			AlertActions.createAlert(this.props.url,new_alert_info, '/alerts/', this.submit_error);		
+
+if (this.props.edit==true ) {
+	var urlParam = this.props.url;
+	urlParam = urlParam+ '/'+this.props.alert_info.id;
+	AlertActions.updateAlert(urlParam ,new_alert_info, '/alerts/', this.submit_error);	
+} else {				
+	AlertActions.createAlert(this.props.url,new_alert_info, '/alerts/', this.submit_error);	
+}	
 		/*	
 			$.ajax({
 				url: this.props.url,

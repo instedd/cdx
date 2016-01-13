@@ -38,13 +38,7 @@ class Alert < ActiveRecord::Base
 
   def create_percolator
     es_query =  TestResult.query(self.query, self.user).elasticsearch_query
-    return unless es_query
-=begin  
-    Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
-                          type: '.percolator',
-                          id: 'alert_'+self.id.to_s+"_"+self.category_type.to_i.to_s,
-                          body: { query: es_query, type: 'test' } 
-=end                          
+    return unless es_query                       
     Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
                            type: '.percolator',
                            id: 'alert_'+self.id.to_s,
@@ -52,15 +46,18 @@ class Alert < ActiveRecord::Base
                                                                                                                             
    end
    
-   def recreate_alert_percolator
-     create_percolator
+  def recreate_alert_percolator
+     #when you disable an alert ,it will be deleted from elasticsearch
+    if self.enabled==true
+      create_percolator
     end
+   end
     
-   def delete_percolator
+  def delete_percolator
      Cdx::Api.client.delete index: Cdx::Api.index_name_pattern,
                             type: '.percolator',
                             id: 'alert_'+id.to_s,
                             ignore: 404
-   end
+  end
 
 end
