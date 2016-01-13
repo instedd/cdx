@@ -41,7 +41,24 @@ span[class*=" icon-"] {
 }
 
 .iconb-upload           {background-position:      0px 0px};
+.iconb-add              {background-position:    -20px 0px};
 
+
+/*---------------------- Icons 20 x 20 white ------------------------*/
+
+
+[class^="iconw-"],
+[class*=" iconw-"] {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  vertical-align: text-top;
+  background-image: image-url($icons-20x20-white);
+  background-repeat: no-repeat;
+}
+
+.iconw-mail            {background-position:      0px 0px};
 
 /*---------------------- Icons 140 x 140  ------------------------*/
 

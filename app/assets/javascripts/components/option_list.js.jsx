@@ -50,13 +50,13 @@ var OptionList = React.createClass({
       <div className="option-list">
         <ul className="box-list">
           {this.state.chosenOnes.map(function(item) {
-            return (<li key={item.value} className="input-block">
+            return (<li key={item.value}>
               <span>{item.label}</span>
-              <a className="remove" href="#" onClick={this.removeItem.bind(this, item)}>X</a>
+              <a className="remove" href="#" onClick={this.removeItem.bind(this, item)}><img src="/assets/ic-cross.png"/></a>
             </li>);
           }.bind(this))}
         </ul>
-        { this.state.showInput ? null : <a className="add" onClick={this.showInput} href="#">+ Add role</a> }
+        { this.state.showInput ? null : <a className="btn-add-link" onClick={this.showInput} href="#"><span className="iconb-add"></span> Add role</a> }
         { this.state.showInput ? <AddItemSearch callback={"/roles/autocomplete"} onItemChosen={this.appendItem}
                 placeholder="Search roles"
                 itemTemplate={AddItemOptionList}

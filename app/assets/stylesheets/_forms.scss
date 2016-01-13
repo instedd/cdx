@@ -247,17 +247,16 @@ body.devise {
 
 label.input,
 .inputfile + label {
-    font-family: $sans;
-    font-weight: 400;
-    color: $blue;
-    display: inline-block;
-    cursor: pointer;
-    max-width: 350px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    position: relative;
-
+  font-family: $sans;
+  font-weight: 400;
+  color: $blue;
+  display: inline-block;
+  cursor: pointer;
+  max-width: 350px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
 }
 
 .clear-input,

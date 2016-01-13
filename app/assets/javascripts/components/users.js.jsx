@@ -10,7 +10,7 @@ var AddUserLink = React.createClass({
 
   render: function() {
     return (<div>
-      <a className="btn-add side-link ontop fix" href='#' title="Add Policy" onClick={this.openInviteModal} >+</a>
+      <a className="btn-add icon side-link ontop fix" href='#' title="Add Policy" onClick={this.openInviteModal} ><span className="iconw-mail"></span></a>
 
       <Modal ref="inviteModal">
         <h1>Invite users</h1>
@@ -61,12 +61,12 @@ var UserInviteForm = React.createClass({
   render: function() {
     return (<div>
       <div className="row">
-        <div className="col pe-2"><label>Role</label></div>
+        <div className="col pe-3"><label>Role</label></div>
         <div className="col"><CdxSelect name="role" items={this.props.roles} value={this.state.role} onChange={this.changeRole} /></div>
       </div>
 
       <div className="row">
-        <div className="col pe-2"><label>Users</label></div>
+        <div className="col pe-3"><label>Users</label></div>
         <div className="col"><input type="text" className="input-block" value={this.state.users} onChange={this.addUser} /></div>
       </div>
 
