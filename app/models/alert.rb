@@ -18,7 +18,10 @@ class Alert < ActiveRecord::Base
 
   validates_presence_of :user
   #TODO  validates :error_code, format: { with: /^\d+/, message: "must start with a letter" }
+  
+  #html5 form validations also done
   validates_presence_of :name
+  validates_presence_of :message
   #  validates_presence_of :description
   #  validates_presence_of :site
   

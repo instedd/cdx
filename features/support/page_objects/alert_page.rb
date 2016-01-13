@@ -3,10 +3,13 @@ class AlertPage < SitePrism::Page
 
   section 'form', '#new_alert' do
  #   element :category, '[name="alert[cateogry_type]"]'
-      element :name, '#alert_name'
-      element :description, '#alert_description'
-     element :errors, '#alert_error_code'
+      element :name, '#alertname'
+      element :description, '#alertdescription'
+      element :errorcode_category, '#device_errors'
+  #     element :errors, '#alerterrorcode'
+     element :message, '#alertmessage'
    #   element :message, '#alert_MESSAGE'
+    element :submit, '#submit'
   end
 end
 

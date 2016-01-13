@@ -35,6 +35,7 @@ end
 Alert.blueprint do
   name { Faker::Name.first_name }
   description { Faker::Name.last_name }
+  message { 'test message' }
   user
 #  query { "test.error_code" => "11"}
 end

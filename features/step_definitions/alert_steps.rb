@@ -17,8 +17,12 @@ Given(/^the user creates a new alert with name "(.*?)"$/) do |arg1|
   within(@alert.form) do |form|
     form.name.set arg1
     form.description.set 'aaaaa'
-    form.errors.set '111'
-    form.find('input[name="commit"]').click
+   #   form.errors.set '111'
+    form.message.set 'bbb'
+   #   form.errorcode_category.select
+ #    form.find('input[name="commit"]').click
+      #  form.find('#submit').click
+      form.submit.click
   end
 end
 
