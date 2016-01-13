@@ -2,6 +2,13 @@
   .col
     = link_to "+", new_alert_path, class: 'btn-add side-link ontop fix', title: 'Add Alert'
     = cdx_table title: alerts.size.to_s + ' Alert Groups' do |t|
+      - t.columns do
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "15%"}
       - t.thead do
         %tr
           %th Name
