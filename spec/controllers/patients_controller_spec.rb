@@ -78,6 +78,23 @@ RSpec.describe PatientsController, type: :controller do
       expect(response).to be_success
       expect(assigns(:patients).count).to eq(2)
     end
+
+    it "should filter based con navigation_context site" do
+      site1 = institution.sites.make
+      site11 = Site.make :child, parent: site1
+      site2 = institution.sites.make
+
+      patient1 = institution.patients.make
+      patient2 = institution.patients.make
+
+      patient1.encounters.make site: site11
+      patient2.encounters.make site: site2
+
+      get :index, context: site1.uuid
+
+      expect(response).to be_success
+      expect(assigns(:patients).to_a).to eq([patient1])
+    end
   end
 
   context "show" do

@@ -3,6 +3,10 @@ class PatientsController < ApplicationController
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_PATIENT)
     @patients = check_access(Patient.where(institution: @navigation_context.institution), READ_PATIENT).order(updated_at: :desc)
 
+    if @navigation_context.site
+      @patients = @patients.where("id in (#{Encounter.within(@navigation_context.site).select(:patient_id).to_sql})")
+    end
+
     @patients = @patients.where("name LIKE concat('%', ?, '%')", params[:name]) unless params[:name].blank?
     @patients = @patients.where("entity_id LIKE concat('%', ?, '%')", params[:entity_id]) unless params[:entity_id].blank?
     # location_geoid is hierarchical so a prefix search works
