@@ -2,6 +2,7 @@ class Encounter < ActiveRecord::Base
   include Entity
   include AutoUUID
   include Resource
+  include SiteContained
 
   ASSAYS_FIELD = 'diagnosis'
   OBSERVATIONS_FIELD = 'observations'
@@ -9,17 +10,19 @@ class Encounter < ActiveRecord::Base
   has_many :samples, dependent: :restrict_with_error
   has_many :test_results, dependent: :restrict_with_error
 
-  belongs_to :institution
-  belongs_to :site
   belongs_to :patient
 
-  validates_presence_of :institution
   validates_presence_of :site, if: Proc.new { |encounter| encounter.institution && !encounter.institution.kind_manufacturer? }
-  validate :same_institution_of_site
 
   validate :validate_patient
 
   before_save :ensure_entity_id
+
+  def self.entity_scope
+    "encounter"
+  end
+
+  attribute_field :start_time, copy: true
 
   attr_accessor :new_samples # Array({entity_id: String}) of new generated samples from UI.
 
@@ -95,7 +98,7 @@ class Encounter < ActiveRecord::Base
   end
 
   def test_results_not_in_diagnostic
-    diagnostic.present? ? test_results.where("updated_at > ?", self.user_updated_at || self.created_at) : test_results 
+    diagnostic.present? ? test_results.where("updated_at > ?", self.user_updated_at || self.created_at) : test_results
   end
 
   def diagnostic
@@ -123,12 +126,6 @@ class Encounter < ActiveRecord::Base
 
   def ensure_entity_id
     self.entity_id = entity_id
-  end
-
-  def same_institution_of_site
-    if self.site && self.site.institution != self.institution
-      errors.add(:site, "must belong to the institution of the device")
-    end
   end
 
 end

@@ -14,7 +14,7 @@
             %td.empty
               .empty-icon
                 %span.ic140-patients
-              %h1 No patients registered at this institution
+              %h1 No patients registered
               %p Keep your test orders organized under patients medical history
     - else
       = cdx_table do |t|
@@ -25,11 +25,17 @@
           %tr
             %th Name
             %th Patient Id
+            %th Age
+            %th Location
+            %th Last encounter
         - t.tbody do
           - @patients.each do |patient|
             %tr{data: {href: patient_path(patient) }}
               %td= patient.name
               %td= patient.entity_id
+              %td= patient.age
+              %td= patient.location.try(:name)
+              %td= format_date(patient.last_encounter)
 
     .pagination
       = render 'shared/pagination'

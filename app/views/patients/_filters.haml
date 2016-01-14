@@ -11,3 +11,14 @@
         %input{type: "hidden", name: "page_size", value: @page_size}
         .row
           .filter
+            %label.block Name
+            %input{type: "text", name: "name", value: params["name"]}
+          .filter
+            %label.block Patient Id
+            %input{type: "text", name: "entity_id", value: params["entity_id"]}
+          .filter
+            %label.block Location
+            = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"]
+          .filter
+            %label.block Last encounter
+            %input{type: "text", name: "last_encounter", value: params["last_encounter"]}

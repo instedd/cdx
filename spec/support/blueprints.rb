@@ -84,7 +84,11 @@ end
 Encounter.blueprint do
   institution { object.patient.try(:institution) || Institution.make }
   site { object.institution.sites.first || object.institution.sites.make }
-  core_fields { { "id" => "encounter-#{Sham.sn}" } }
+  core_fields {
+    { "id" => "encounter-#{Sham.sn}" }.tap do |h|
+      h["start_time"] = object.start_time if object.start_time
+    end
+  }
 end
 
 def first_or_make_site_unless_manufacturer(institution)
@@ -107,7 +111,12 @@ end
 
 Patient.blueprint do
   institution
-  plain_sensitive_data { { "id" => "patient-#{Sham.sn}" } }
+  plain_sensitive_data {
+    {}.tap do |h|
+      h["id"] = object.entity_id || "patient-#{Sham.sn}"
+      h["name"] = object.name if object.name
+    end
+  }
 end
 
 TestResult.blueprint do

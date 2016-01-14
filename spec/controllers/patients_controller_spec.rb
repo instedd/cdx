@@ -48,6 +48,66 @@ RSpec.describe PatientsController, type: :controller do
       get :index
       expect(assigns(:can_create)).to be_falsy
     end
+
+    it "should filter by name" do
+      institution.patients.make name: 'John'
+      institution.patients.make name: 'Clark'
+      institution.patients.make name: 'Mery johana'
+
+      get :index, name: 'jo'
+      expect(response).to be_success
+      expect(assigns(:patients).count).to eq(2)
+    end
+
+    it "should filter by entity_id" do
+      institution.patients.make entity_id: '10110'
+      institution.patients.make entity_id: '21100'
+      institution.patients.make entity_id: '40440'
+
+      get :index, entity_id: '11'
+      expect(response).to be_success
+      expect(assigns(:patients).count).to eq(2)
+    end
+
+    it "should filter by entity_id" do
+      institution.patients.make location_geoid: 'ne:US3245'
+      institution.patients.make location_geoid: 'ne:US3432'
+      institution.patients.make location_geoid: 'ne:ARne:US'
+
+      get :index, location: 'ne:US'
+      expect(response).to be_success
+      expect(assigns(:patients).count).to eq(2)
+    end
+
+    it "should filter based con navigation_context site" do
+      site1 = institution.sites.make
+      site11 = Site.make :child, parent: site1
+      site2 = institution.sites.make
+
+      patient1 = institution.patients.make
+      patient2 = institution.patients.make
+
+      patient1.encounters.make site: site11
+      patient2.encounters.make site: site2
+
+      get :index, context: site1.uuid
+
+      expect(response).to be_success
+      expect(assigns(:patients).to_a).to eq([patient1])
+    end
+
+    it "should filter based con last encounter date" do
+      patient1 = institution.patients.make
+      patient2 = institution.patients.make
+
+      patient1.encounters.make start_time: Time.new(2016, 1, 14, 0, 0, 0)
+      patient2.encounters.make start_time: Time.new(2016, 1, 7, 0, 0, 0)
+
+      get :index, last_encounter: '1/10/2016'
+
+      expect(response).to be_success
+      expect(assigns(:patients).to_a).to eq([patient1])
+    end
   end
 
   context "show" do

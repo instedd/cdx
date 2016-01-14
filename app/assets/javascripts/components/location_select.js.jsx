@@ -69,9 +69,10 @@ var LocationSelect = React.createClass({
 
     var _this = this;
     var location = (selection && selection[0]) ? selection[0].location : null;
+    var latlng = location ? { lat: location.lat, lng: location.lng} : null;
     _this.setState(function(state) { return React.addons.update(state, {
       value: { $set: _this.formatLocation(location) },
-      latlng: { $set: { lat: location.lat, lng: location.lng} }
+      latlng: { $set: latlng }
     })});
 
     if (_this.props.onChange) {
@@ -127,6 +128,9 @@ var LocationSelect = React.createClass({
   },
 
   formatLocation: function(location) {
+    if (location == null) {
+      return {value: null, label: '', location: null};
+    }
     var name = location.name;
     if (location.ancestors && location.ancestors.length > 0) {
       var ancestorsNames = _.pluck(location.ancestors, 'name');

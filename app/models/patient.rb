@@ -3,6 +3,8 @@ class Patient < ActiveRecord::Base
   include AutoUUID
   include AutoIdHash
   include Resource
+  include DateDistanceHelper
+  include WithLocation
 
   belongs_to :institution
 
@@ -12,10 +14,6 @@ class Patient < ActiveRecord::Base
 
   validates_presence_of :institution
 
-  def entity_id
-    plain_sensitive_data["id"]
-  end
-
   def has_entity_id?
     entity_id_hash.not_nil?
   end
@@ -24,36 +22,15 @@ class Patient < ActiveRecord::Base
     "patient"
   end
 
-  def self.attribute_field(*args)
-    args.each do |arg|
-      if self.entity_fields.detect { |f| f.name == arg.to_s }.pii?
-        define_method arg do
-          self.plain_sensitive_data[arg.to_s]
-        end
+  attribute_field :name, copy: true
+  attribute_field :entity_id, field: :id, copy: true
+  attribute_field :gender, :dob, :email, :phone
 
-        define_method "#{arg}=" do |value|
-          if value.blank?
-            self.plain_sensitive_data.delete(arg.to_s)
-          else
-            self.plain_sensitive_data[arg.to_s] = value
-          end
-        end
-      else
-        define_method arg do
-          self.core_fields[arg.to_s]
-        end
-
-        define_method "#{arg}=" do |value|
-          if value.blank?
-            self.core_fields.delete(arg.to_s)
-          else
-            self.core_fields[arg.to_s] = value
-          end
-        end
-      end
-    end
+  def age
+    years_between Time.parse(dob), Time.now rescue nil
   end
 
-  attribute_field :name, :gender, :dob, :email, :phone
-
+  def last_encounter
+    encounters.order(start_time: :desc).first.try &:start_time
+  end
 end
