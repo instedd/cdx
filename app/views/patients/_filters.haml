@@ -19,3 +19,6 @@
           .filter
             %label.block Location
             = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"]
+          .filter
+            %label.block Last encounter
+            %input{type: "text", name: "last_encounter", value: params["last_encounter"]}

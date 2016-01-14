@@ -84,7 +84,11 @@ end
 Encounter.blueprint do
   institution { object.patient.try(:institution) || Institution.make }
   site { object.institution.sites.first || object.institution.sites.make }
-  core_fields { { "id" => "encounter-#{Sham.sn}" } }
+  core_fields {
+    { "id" => "encounter-#{Sham.sn}" }.tap do |h|
+      h["start_time"] = object.start_time if object.start_time
+    end
+  }
 end
 
 def first_or_make_site_unless_manufacturer(institution)

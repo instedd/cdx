@@ -95,6 +95,19 @@ RSpec.describe PatientsController, type: :controller do
       expect(response).to be_success
       expect(assigns(:patients).to_a).to eq([patient1])
     end
+
+    it "should filter based con last encounter date" do
+      patient1 = institution.patients.make
+      patient2 = institution.patients.make
+
+      patient1.encounters.make start_time: DateTime.new(2016, 1, 14, 0, 0, 0)
+      patient2.encounters.make start_time: DateTime.new(2016, 1, 7, 0, 0, 0)
+
+      get :index, last_encounter: '1/10/2016'
+
+      expect(response).to be_success
+      expect(assigns(:patients).to_a).to eq([patient1])
+    end
   end
 
   context "show" do
