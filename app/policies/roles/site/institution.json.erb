@@ -6,7 +6,11 @@
       "statement": [
         {
           "resource": "institution/<%= institution_id %>",
-          "action": "institution:read",
+          "action": [
+            "institution:read",
+            "institution:registerDevice",
+            "institution:createRole"
+          ],
           "delegable": true
         },
         {

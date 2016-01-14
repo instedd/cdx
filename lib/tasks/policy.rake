@@ -10,7 +10,7 @@ namespace :policy do
     user = User.find args[:user_id]
     user.grant_superadmin_policy
   end
-  
+
   desc "Regenerates computed policies for all users"
   task :calculate_computed => :environment do
     PoliciesMigrator.new.calculate_computed
@@ -25,6 +25,11 @@ namespace :policy do
   desc "Migrates policies to the latest format"
   task :migrate => :environment do
     PoliciesMigrator.new.run!
+  end
+
+  desc "Update policy for default roles from json.erbs"
+  task :update_roles => :environment do
+    PoliciesMigrator.new.update_roles
   end
 
   class PoliciesMigrator
@@ -140,6 +145,40 @@ namespace :policy do
       delete_implicit
       calculate_computed
       puts "\nSuccess!"
+    end
+
+    def update_roles
+      puts "Updating institution roles..."
+      Institution.all.each do |institution|
+        puts institution.name
+        roles = Policy.predefined_institution_roles(institution)
+        roles.each do |role|
+          existing_role = Role.find_by_name(role.name)
+          existing_role.policy.destroy
+          existing_role.policy = role.policy
+          existing_role.save!
+        end
+      end
+
+      puts "Updating site roles..."
+      Site.all.each do |site|
+        puts "site.name"
+        roles = Policy.predefined_site_roles(site)
+        roles.each do |role|
+          existing_role = Role.find_by_name(role.name)
+          existing_role.policy.destroy
+          existing_role.policy = role.policy
+          existing_role.save!
+        end
+      end
+
+      puts "All policies updated"
+      puts "Updating users' computed policies..."
+      User.joins("INNER JOIN roles_users ON users.id = roles_users.user_id").each do |user|
+        puts user.email
+        user.computed_policies.destroy_all
+        user.update_computed_policies
+      end
     end
   end
 end
