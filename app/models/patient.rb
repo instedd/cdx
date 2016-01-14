@@ -3,6 +3,8 @@ class Patient < ActiveRecord::Base
   include AutoUUID
   include AutoIdHash
   include Resource
+  include DateDistanceHelper
+  include WithLocation
 
   belongs_to :institution
 
@@ -24,4 +26,11 @@ class Patient < ActiveRecord::Base
   attribute_field :entity_id, field: :id, copy: true
   attribute_field :gender, :dob, :email, :phone
 
+  def age
+    years_between Time.parse(dob), Time.now rescue nil
+  end
+
+  def last_encounter
+    encounters.order(start_time: :desc).first.try &:start_time
+  end
 end

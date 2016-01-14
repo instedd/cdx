@@ -39,6 +39,14 @@ module ApplicationHelper
     I18n.localize(value, locale: current_user.locale, format: :long)
   end
 
+  def format_date(value, time_zone = nil)
+    return nil unless value
+
+    value = Time.parse(value) unless value.is_a?(Time)
+    value = value.in_time_zone(time_zone) if time_zone
+    I18n.localize(value, locale: current_user.locale, format: I18n.t('date.input_format.pattern'))
+  end
+
   def flash_message
     res = nil
 

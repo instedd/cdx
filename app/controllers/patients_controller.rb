@@ -19,6 +19,8 @@ class PatientsController < ApplicationController
       @patients = @patients.where("id in (#{Encounter.within(@navigation_context.entity).where("start_time > ?", @last_encounter).select(:patient_id).to_sql})")
     end
 
+    @patients.preload_locations!
+
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i
     @patients = @patients.page(@page).per(@page_size)
