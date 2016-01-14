@@ -25,6 +25,7 @@ class Policy < ActiveRecord::Base
     REGISTER_INSTITUTION_DEVICE =       "institution:registerDevice"
     REGISTER_INSTITUTION_DEVICE_MODEL = "institution:registerDeviceModel"
     CREATE_INSTITUTION_ROLE =           "institution:createRole"
+    CREATE_INSTITUTION_PATIENT =        "institution:createPatient"
 
     READ_INSTITUTION_USERS = "institution:readUsers"
 
@@ -32,6 +33,10 @@ class Policy < ActiveRecord::Base
     UPDATE_DEVICE_MODEL =    "deviceModel:update"
     DELETE_DEVICE_MODEL =    "deviceModel:delete"
     PUBLISH_DEVICE_MODEL =   "deviceModel:publish"
+
+    READ_PATIENT =   "patient:read"
+    UPDATE_PATIENT = "patient:update"
+    DELETE_PATIENT = "patient:delete"
 
     READ_SITE =   "site:read"
     UPDATE_SITE = "site:update"

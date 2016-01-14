@@ -10,6 +10,7 @@
             "institution:read",
             "institution:update",
             "institution:registerDevice",
+            "institution:createPatient",
             "institution:createSite",
             "institution:createRole",
             "institution:readUsers"
@@ -19,6 +20,11 @@
         {
           "resource": "testResult?institution=<%= institution_id %>",
           "action": "testResult:medicalDashboard",
+          "delegable": true
+        },
+        {
+          "resource": "patient?institution=<%= institution_id %>",
+          "action": "*",
           "delegable": true
         },
         {
@@ -60,6 +66,10 @@
             "institution:read",
             "institution:readUsers"
           ]
+        },
+        {
+          "resource": "patient?institution=<%= institution_id %>",
+          "action": "patient:read"
         },
         {
           "resource": "site?institution=<%= institution_id %>",

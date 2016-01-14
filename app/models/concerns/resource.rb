@@ -11,7 +11,8 @@ module Resource
       TestResult,
       Encounter,
       Role,
-      User
+      User,
+      Patient
     ].freeze
   end
 

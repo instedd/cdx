@@ -7,6 +7,10 @@ module ApplicationHelper
     Policy.authorize action, resource, current_user
   end
 
+  def has_access_to_patients_index?
+    has_access?(Institution, Policy::Actions::CREATE_INSTITUTION_PATIENT) || check_access(Patient, Policy::Actions::READ_PATIENT).exists?
+  end
+
   def has_access_to_sites_index?
     has_access?(Institution, Policy::Actions::CREATE_INSTITUTION_SITE) || check_access(Site, Policy::Actions::READ_SITE).exists?
   end
@@ -112,5 +116,11 @@ module ApplicationHelper
 
   def show_institution?(action, resource)
     ComputedPolicy.condition_resources_for(action, resource, current_user)[:institution].count > 1
+  end
+
+  def validation_errors(model)
+    if model.errors.present?
+      render partial: "shared/validation_errors", locals: { model: model }
+    end
   end
 end

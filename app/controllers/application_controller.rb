@@ -11,6 +11,11 @@ class ApplicationController < ActionController::Base
   before_action :check_no_institution!
   before_action :load_js_global_settings
   before_action :ensure_context
+  before_action :set_locale
+
+  def set_locale
+    I18n.locale = current_user.try(:locale) || I18n.default_locale
+  end
 
   decent_configuration do
     strategy DecentExposure::StrongParametersStrategy

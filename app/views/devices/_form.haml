@@ -1,10 +1,5 @@
 = form_for(@device) do |f|
-  - if @device.errors.present?
-    .alert-container
-      .alert.alert-error
-        %ul
-          - @device.errors.full_messages.each do |msg|
-            %li= msg
+  = validation_errors @device
 
   .row
     .col.pe-2

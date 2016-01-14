@@ -1,0 +1,13 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            - if @can_create
+              = link_to "+", new_patient_path, class: 'btn-add side-link fix', title: 'Add Patient'
+            Patients
+      %form#filters-form{action: patients_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
+        .row
+          .filter

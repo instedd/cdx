@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151218123655) do
+ActiveRecord::Schema.define(version: 20160105165742) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -85,8 +85,8 @@ ActiveRecord::Schema.define(version: 20151218123655) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",                  limit: 4
-    t.datetime "published_at"
     t.boolean  "supports_activation"
+    t.datetime "published_at"
     t.string   "support_url",                     limit: 255
     t.string   "picture_file_name",               limit: 255
     t.string   "picture_content_type",            limit: 255
@@ -236,6 +236,10 @@ ActiveRecord::Schema.define(version: 20151218123655) do
     t.datetime "updated_at"
     t.boolean  "is_phantom",                   default: true
     t.datetime "deleted_at"
+    t.string   "location_geoid", limit: 60
+    t.float    "lat",            limit: 24
+    t.float    "lng",            limit: 24
+    t.string   "address",        limit: 255
   end
 
   add_index "patients", ["deleted_at"], name: "index_patients_on_deleted_at", using: :btree

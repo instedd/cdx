@@ -108,6 +108,10 @@ entities:
           - male
           - female
           - other
+      email:
+        pii: true
+      phone:
+        pii: true
   location: &LOCATION
     fields:
       id:

@@ -8,6 +8,7 @@
         "institution:delete",
         "institution:registerDevice",
         "institution:createSite",
+        "institution:createPatient",
         "institution:createRole",
         "institution:readUsers"
       ],
@@ -15,6 +16,7 @@
     },
     {
       "resource": [
+        "patient?institution=<%= institution_id %>",
         "site?institution=<%= institution_id %>",
         "device?institution=<%= institution_id %>",
         "testResult?institution=<%= institution_id %>",
