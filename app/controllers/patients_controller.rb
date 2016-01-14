@@ -1,7 +1,7 @@
 class PatientsController < ApplicationController
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_PATIENT)
-    @patients = check_access(Patient.where(institution: @navigation_context.institution), READ_PATIENT).order(updated_at: :desc)
+    @patients = check_access(Patient.where(institution: @navigation_context.institution), READ_PATIENT).order(:name)
 
     if @navigation_context.site
       @patients = @patients.where("id in (#{Encounter.within(@navigation_context.site).select(:patient_id).to_sql})")
