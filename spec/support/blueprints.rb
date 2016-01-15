@@ -119,6 +119,16 @@ Patient.blueprint do
   }
 end
 
+Patient.blueprint :phantom do
+  name
+  plain_sensitive_data {
+    {}.tap do |h|
+      h["id"] = nil
+      h["name"] = object.name if object.name
+    end
+  }
+end
+
 TestResult.blueprint do
   test_id { "test-#{Sham.sn}" }
 

@@ -28,6 +28,7 @@ en:
         parent: Parent site
       patient:
         dob: Birthday
+        entity_id: Patient id
 
   user:
     settings:

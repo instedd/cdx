@@ -12,6 +12,8 @@ class Patient < ActiveRecord::Base
   has_many :encounters, dependent: :restrict_with_error
 
   validates_presence_of :institution
+  validates_uniqueness_of :entity_id, scope: :institution_id, allow_nil: true
+  validate :entity_id_not_changed
 
   scope :within, -> (institution_or_site) {
     if institution_or_site.is_a?(Institution)
@@ -39,5 +41,13 @@ class Patient < ActiveRecord::Base
 
   def last_encounter
     encounters.order(start_time: :desc).first.try &:start_time
+  end
+
+  private
+
+  def entity_id_not_changed
+    if entity_id_changed? && self.persisted? && entity_id_was.present?
+      errors.add(:entity_id, "can't be changed after assigned")
+    end
   end
 end

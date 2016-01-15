@@ -24,6 +24,12 @@ RSpec.describe PatientsController, type: :controller do
       expect(assigns(:patients).count).to eq(1)
     end
 
+    it "should ignore phantom patients" do
+      institution.patients.make :phantom
+      get :index
+      expect(assigns(:patients).count).to eq(0)
+    end
+
     it "should not list patients if can not read" do
       institution.patients.make
       sign_in other_user
@@ -178,25 +184,41 @@ RSpec.describe PatientsController, type: :controller do
   end
 
   context "create" do
+    let(:patient_form_plan) {
+      { name: 'Lorem', entity_id: '1001', gender: 'female', dob: '1/1/2000' }
+    }
+    let(:patient_form_plan_dob) { Time.parse("2000-01-01") }
+    def build_patient_form_plan(options)
+      patient_form_plan.dup.merge! options
+    end
+
     it "should create new patient in context institution" do
       expect {
-        post :create, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+        post :create, patient: patient_form_plan
       }.to change(institution.patients, :count).by(1)
 
       expect(response).to be_redirect
     end
 
     it "should save fields" do
-      post :create, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+      post :create, patient: patient_form_plan
       patient = institution.patients.last
 
-      expect(patient.name).to eq('Lorem')
-      expect(patient.gender).to eq('female')
-      expect(Time.parse(patient.dob)).to eq(Time.parse("2000-01-01"))
+      expect(patient.name).to eq(patient_form_plan[:name])
+      expect(patient.entity_id).to eq(patient_form_plan[:entity_id])
+      expect(patient.gender).to eq(patient_form_plan[:gender])
+      expect(Time.parse(patient.dob)).to eq(patient_form_plan_dob)
 
-      expect(patient.plain_sensitive_data['name']).to eq('Lorem')
-      expect(patient.core_fields['gender']).to eq('female')
-      expect(Time.parse(patient.plain_sensitive_data['dob'])).to eq(Time.parse("2000-01-01"))
+      expect(patient.plain_sensitive_data['name']).to eq(patient_form_plan[:name])
+      expect(patient.core_fields['gender']).to eq(patient_form_plan[:gender])
+      expect(patient.plain_sensitive_data['id']).to eq(patient_form_plan[:entity_id])
+      expect(Time.parse(patient.plain_sensitive_data['dob'])).to eq(patient_form_plan_dob)
+    end
+
+    it "should save it as non phantom" do
+      post :create, patient: patient_form_plan
+      patient = institution.patients.last
+      expect(patient).to_not be_phantom
     end
 
     it "should create new patient in context institution if allowed" do
@@ -204,7 +226,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+        post :create, patient: patient_form_plan
       }.to change(institution.patients, :count).by(1)
     end
 
@@ -212,7 +234,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: { name: 'Lorem', dob: '1/1/2000', gender: 'female' }
+        post :create, patient: patient_form_plan
       }.to change(institution.patients, :count).by(0)
 
       expect(response).to be_forbidden
@@ -220,16 +242,36 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should require name" do
       expect {
-        post :create, patient: { name: '', dob: '1/1/2000', gender: 'female' }
+        post :create, patient: build_patient_form_plan(name: '')
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:name)
       expect(response).to render_template("patients/new")
     end
 
+    it "should require entity_id" do
+      expect {
+        post :create, patient: build_patient_form_plan(entity_id: '')
+      }.to change(institution.patients, :count).by(0)
+
+      expect(assigns(:patient).errors).to have_key(:entity_id)
+      expect(response).to render_template("patients/new")
+    end
+
+    it "should validate entity_id uniqness" do
+      institution.patients.make entity_id: '1001'
+
+      expect {
+        post :create, patient: build_patient_form_plan(entity_id: '1001')
+      }.to change(institution.patients, :count).by(0)
+
+      expect(assigns(:patient).errors).to have_key(:entity_id)
+      expect(response).to render_template("patients/new")
+    end
+
     it "should not require dob" do
       expect {
-        post :create, patient: { name: 'Jerry', dob: '', gender: 'female' }
+        post :create, patient: build_patient_form_plan(dob: '')
       }.to change(institution.patients, :count).by(1)
 
       patient = institution.patients.first
@@ -239,7 +281,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should validate dob if present" do
       expect {
-        post :create, patient: { name: 'Jerry', dob: '14/14/2000' }
+        post :create, patient: build_patient_form_plan(dob: '14/14/2000')
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:dob)
@@ -248,7 +290,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should validate gender" do
       expect {
-        post :create, patient: { name: 'Lorem', gender: 'invalid-value' }
+        post :create, patient: build_patient_form_plan(gender: 'invalid-value')
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:gender)
@@ -257,7 +299,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should not require gender" do
       expect {
-        post :create, patient: { name: 'Lorem', gender: '', dob: '1/1/2000' }
+        post :create, patient: build_patient_form_plan(gender: '')
       }.to change(institution.patients, :count).by(1)
 
       patient = institution.patients.first
@@ -268,7 +310,7 @@ RSpec.describe PatientsController, type: :controller do
     it "should use navigation_context as patient site" do
       site = institution.sites.make
       expect {
-        post :create, context: site.uuid, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+        post :create, context: site.uuid, patient: patient_form_plan
       }.to change(institution.patients, :count).by(1)
 
       expect(Patient.last.site).to eq(site)
@@ -327,9 +369,55 @@ RSpec.describe PatientsController, type: :controller do
       expect(Time.parse(patient.dob)).to eq(Time.parse("2000-01-18"))
     end
 
+    it "should assign entity_id if previous is blank" do
+      patient = institution.patients.make :phantom
+      expect(patient.entity_id).to be_blank
+      expect(patient.entity_id_hash).to be_blank
+      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: 'other-id' }
+      expect(response).to be_redirect
+
+      patient.reload
+      expect(patient.entity_id).to eq('other-id')
+      expect(patient.entity_id_hash).to_not be_blank
+      expect(patient.plain_sensitive_data['id']).to eq('other-id')
+
+      expect(patient).to_not be_phantom
+    end
+
+    it "should not change entity_id from previous" do
+      old_entity_id = patient.entity_id
+      expect(patient.entity_id).to_not be_blank
+      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: 'other-id' }
+      expect(assigns(:patient).errors).to have_key(:entity_id)
+      expect(response).to render_template("patients/edit")
+
+      patient.reload
+      expect(patient.entity_id).to eq(old_entity_id)
+      expect(patient.plain_sensitive_data['id']).to eq(old_entity_id)
+    end
+
+    it "should not remove entity_id from previous" do
+      old_entity_id = patient.entity_id
+      expect(patient.entity_id).to_not be_blank
+      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: '' }
+      expect(assigns(:patient).errors).to have_key(:entity_id)
+      expect(response).to render_template("patients/edit")
+
+      expect(patient.entity_id).to eq(old_entity_id)
+      expect(patient.plain_sensitive_data['id']).to eq(old_entity_id)
+    end
+
     it "should require name" do
       post :update, id: patient.id, patient: { name: '', dob: '1/1/2000' }
       expect(assigns(:patient).errors).to have_key(:name)
+      expect(response).to render_template("patients/edit")
+    end
+
+    it "should require entity_id" do
+      patient = institution.patients.make :phantom
+
+      post :update, id: patient.id, patient: { entity_id: '' }
+      expect(assigns(:patient).errors).to have_key(:entity_id)
       expect(response).to render_template("patients/edit")
     end
 

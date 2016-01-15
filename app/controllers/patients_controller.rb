@@ -1,10 +1,10 @@
 class PatientsController < ApplicationController
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_PATIENT)
-    @patients = check_access(Patient.where(institution: @navigation_context.institution), READ_PATIENT).order(:name)
+    @patients = check_access(Patient.where(is_phantom: false).where(institution: @navigation_context.institution), READ_PATIENT).order(:name)
 
     @patients = @patients.within(@navigation_context.entity)
-    
+
     @patients = @patients.where("name LIKE concat('%', ?, '%')", params[:name]) unless params[:name].blank?
     @patients = @patients.where("entity_id LIKE concat('%', ?, '%')", params[:entity_id]) unless params[:entity_id].blank?
     # location_geoid is hierarchical so a prefix search works
@@ -83,6 +83,6 @@ class PatientsController < ApplicationController
   private
 
   def patient_params
-    params.require(:patient).permit(:name, :gender, :dob, :lat, :lng, :location_geoid, :address, :email, :phone)
+    params.require(:patient).permit(:name, :entity_id, :gender, :dob, :lat, :lng, :location_geoid, :address, :email, :phone)
   end
 end

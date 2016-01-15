@@ -15,6 +15,12 @@
 
   .row
     .col.pe-2
+      = f.label :entity_id
+    .col
+      = f.text_field :entity_id, :class => 'input-large'
+
+  .row
+    .col.pe-2
       = f.label :gender
     .col
       = cdx_select form: f, name: :gender do |select|

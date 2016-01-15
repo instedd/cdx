@@ -6,6 +6,25 @@ describe Patient do
 
     it "should make a valid patient" do
       expect(Patient.make_unsaved).to be_valid
+      expect(Patient.make_unsaved :phantom).to be_valid
+    end
+
+    it "should make phantom if required" do
+      expect(Patient.make :phantom).to be_phantom
+    end
+
+    it "should make non phantom if required" do
+      expect(Patient.make).to_not be_phantom
+    end
+
+    it "should validate uniqness of entity_id_hash and entity_id" do
+      institution = Institution.make
+      Patient.make entity_id: '1001', institution: institution
+      patient = Patient.make_unsaved entity_id: '1001', institution: institution
+
+      expect(patient).to be_invalid
+      expect(patient.errors).to have_key(:entity_id_hash)
+      expect(patient.errors).to have_key(:entity_id)
     end
 
     context "on fields" do
