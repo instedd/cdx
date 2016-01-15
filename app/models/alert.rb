@@ -21,7 +21,7 @@ class Alert < ActiveRecord::Base
   
   #html5 form validations also done
   validates_presence_of :name
-  validates_presence_of :message
+ #maybe a user just wants sms_message ,not an email message: validates_presence_of :message
   #  validates_presence_of :description
   #  validates_presence_of :site
   

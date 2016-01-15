@@ -56,6 +56,7 @@ var AlertCategorySelect = React.createClass({
 			patientField: this.props.alert_info.notify_patients,
 			smsLimitField: this.props.alert_info.sms_limit,
 			messageField: this.props.alert_info.message,
+			smsMessageField: this.props.alert_info.sms_message,
 			enabledField: this.props.alert_info.enabled
 		};
 	},
@@ -148,6 +149,7 @@ var AlertCategorySelect = React.createClass({
 			notify_patients: this.state.patientField,
 			sms_limit: this.state.smsLimitField,
 			message: this.state.messageField,
+			sms_message: this.state.smsMessageField,
 			enabled: this.state.enabledField,
 		};
 
@@ -341,8 +343,13 @@ var AlertCategorySelect = React.createClass({
 
 				<AlertSmsLimit valueLink={this.linkState('smsLimitField')} />
 
-				<AlertMessage valueLink = {
+				<AlertEmailMessage valueLink = {
 					this.linkState('messageField')
+				}
+				/>
+				
+				<AlertSmsMessage valueLink = {
+					this.linkState('smsMessageField')
 				}
 				/>
 

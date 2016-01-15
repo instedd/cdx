@@ -559,7 +559,7 @@ var AlertSite = React.createClass({
 										return (
 											< div className = "row" >
 											<div className = "col pe-2" >
-											<label >Internal User< /label>
+											<label >Internal Recipient< /label>
 											</div >
 											<div className = "col" >
 											<Select
@@ -680,26 +680,49 @@ var AlertSite = React.createClass({
 
 
 
-								var AlertMessage = React.createClass({
+								var AlertEmailMessage = React.createClass({
 									render: function() {
 										return (
 											<div className = "row" id = "messagerow" >
 											<div className = "col pe-2" >
 											<label >
-											Message
+											Email Message
 											< /label>
 											</div >
 
-											<div className = "col" >
-											<input type = "text" placeholder = "message" valueLink = {
+											<div className = "col pe-2" >
+											<textarea rows="5" cols="50" placeholder = "email message" valueLink = {
 												this.props.valueLink
 											}
-											id = "alertmessage" required  pattern=".{5,255}" />
+											id = "alertmessage" pattern=".{5,255}" />
 											</div>
 											</div>
 										);
 									}
 								});
+								
+								
+										var AlertSmsMessage = React.createClass({
+											render: function() {
+												return (
+													<div className = "row" id = "smsmessagerow" >
+													<div className = "col pe-2" >
+													<label >
+													SMS Message
+													< /label>
+													</div >
+
+													<div className = "col pe-2" >
+													<textarea rows="5" cols="50" placeholder = "SMS message" valueLink = {
+														this.props.valueLink
+													}
+													id = "alertmessage" pattern=".{5,160}" />
+													</div>
+													</div>
+												);
+											}
+										});
+								
 
 
 
@@ -739,7 +762,7 @@ var AlertSite = React.createClass({
 											< div className = "row" id = "newuserrow" >
 											<div className = "col pe-2" >
 											<label >
-											External User
+											Ad-hoc Recipient
 											< /label>
 											</div >
 
@@ -780,13 +803,13 @@ var AlertSite = React.createClass({
 																															<div className = "col" >
 																															<input type = "text" placeholder = "firstName" 
 																															valueLink = {this.props.firstnameLink} name="ggg"
-																															 pattern=".{2,255}"  required />  
+																															 pattern=".{2,255}"   />  
 																															</div>
 																															
 																																<div className = "col" >
 																																<input type = "text" placeholder = "lastName" 
 																																valueLink = {this.props.lastnameLink}
-																																 pattern=".{2,255}"  required/>
+																																 pattern=".{2,255}"  />
 																																</div>
 																																
 																																	<div className = "col" >

@@ -158,7 +158,7 @@ end
   private
 
   def alert_params 
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
 
   def new_alert_request_variables
