@@ -8,6 +8,16 @@ describe Patient do
       expect(Patient.make_unsaved).to be_valid
     end
 
+    it "should validate uniqness of entity_id_hash and entity_id" do
+      institution = Institution.make
+      Patient.make entity_id: '1001', institution: institution
+      patient = Patient.make_unsaved entity_id: '1001', institution: institution
+
+      expect(patient).to be_invalid
+      expect(patient.errors).to have_key(:entity_id_hash)
+      expect(patient.errors).to have_key(:entity_id)
+    end
+
     context "on fields" do
       let(:patient) { Patient.make_unsaved }
 

@@ -2,7 +2,7 @@ class PatientForm
   include ActiveModel::Model
 
   def self.shared_attributes # shared editable attributes with patient model
-    [:institution, :site, :name, :gender, :dob, :lat, :lng, :location_geoid, :address, :email, :phone]
+    [:institution, :site, :name, :entity_id, :gender, :dob, :lat, :lng, :location_geoid, :address, :email, :phone]
   end
 
   def self.model_name
@@ -48,12 +48,23 @@ class PatientForm
   def save
     self.class.assign_attributes(patient, self)
     patient.dob = @dob  # we need to set a Time in patient insead of self.dob :: String
-    self.valid? && patient.save.tap do
-      puts patient.errors.full_messages
+
+    # validate forms. stop if invalid
+    form_valid = self.valid?
+    return false unless form_valid
+
+    # validate/save patient. all done if succeeded
+    patient_valid = patient.save
+    return true if patient_valid
+
+    # copy validations from patient to form (form is valid, but patient is not)
+    patient.errors.each do |key, error|
+      errors.add(key, error) if self.class.shared_attributes.include?(key)
     end
+    return false
   end
 
-  validates_presence_of :name
+  validates_presence_of :name, :entity_id
   GENDER_VALUES = Patient.entity_fields.detect { |f| f.name == 'gender' }.options
   validates_inclusion_of :gender, in: GENDER_VALUES, allow_blank: true, message: "is not within valid options (should be one of #{GENDER_VALUES.join(', ')})"
 

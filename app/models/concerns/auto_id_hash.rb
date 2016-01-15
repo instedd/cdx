@@ -3,7 +3,7 @@ module AutoIdHash
 
   included do
     validates_uniqueness_of :entity_id_hash, scope: :institution_id, allow_nil: true
-    before_create :ensure_entity_id_hash
+    before_validation :ensure_entity_id_hash
   end
 
   def ensure_entity_id_hash
