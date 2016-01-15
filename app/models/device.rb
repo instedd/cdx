@@ -117,7 +117,7 @@ class Device < ActiveRecord::Base
     device_messages.any? || (device_model.supports_activation? && secret_key_hash && !activation_token)
   end
 
-  def use_activation_token!(public_key)
+  def use_activation_token_for_ssh_key!(public_key)
     Device.transaction do
       self.ssh_key = SshKey.create!(public_key: public_key, device: self)
       SshKey.regenerate_authorized_keys!
@@ -126,6 +126,12 @@ class Device < ActiveRecord::Base
     self.set_key_for_activation_token
     self.save!
     SyncHelpers.client_settings(uuid, plain_secret_key)
+  end
+
+  def use_activation_token_for_secret_key!
+    self.set_key
+    self.save!
+    @plain_secret_key
   end
 
   private

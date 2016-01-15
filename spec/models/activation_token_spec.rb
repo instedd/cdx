@@ -10,8 +10,8 @@ describe "ActivationToken" do
     end
   end
 
-  describe '#use_activation_token!' do
-    let!(:settings) { device.use_activation_token!(SampleSshKey) }
+  describe '#use_activation_token_for_ssh_key!' do
+    let!(:settings) { device.use_activation_token_for_ssh_key!(SampleSshKey) }
     context 'when it is unused' do
       it { expect(device.activation_token).to be_nil }
 
