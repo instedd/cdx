@@ -3,9 +3,9 @@ include Alerts
 class DailyAlertJob
   include Sidekiq::Worker
 
-  def perform   
-#   alert_history_check(1.hour)
- alert_history_check(5.minutes, Alert.hour)
+  def perform
+    #   alert_history_check(1.hour)
+    alert_history_check(5.minutes, Alert.hour)
   end
 end
 

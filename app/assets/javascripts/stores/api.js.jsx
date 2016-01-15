@@ -1,3 +1,6 @@
+//TODO  moce ajax calls from states into here
+
+
 //var Fetch = require('fetch');
 /*
 var rootUrl = 'http://localhost:3000/';
