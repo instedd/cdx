@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160114154732) do
+ActiveRecord::Schema.define(version: 20160115131955) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -244,10 +244,13 @@ ActiveRecord::Schema.define(version: 20160114154732) do
     t.string   "address",        limit: 255
     t.string   "name",           limit: 255
     t.string   "entity_id",      limit: 255
+    t.integer  "site_id",        limit: 4
+    t.string   "site_prefix",    limit: 255
   end
 
   add_index "patients", ["deleted_at"], name: "index_patients_on_deleted_at", using: :btree
   add_index "patients", ["institution_id"], name: "index_patients_on_institution_id", using: :btree
+  add_index "patients", ["site_id"], name: "index_patients_on_site_id", using: :btree
 
   create_table "policies", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
@@ -440,4 +443,5 @@ ActiveRecord::Schema.define(version: 20160114154732) do
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
   add_foreign_key "encounters", "sites"
+  add_foreign_key "patients", "sites"
 end

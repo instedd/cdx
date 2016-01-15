@@ -10,7 +10,7 @@ namespace :site do
     end
 
     # classes that includes SiteContained
-    [Device, Encounter, TestResult].each do |type|
+    [Device, Encounter, TestResult, Patient].each do |type|
       type.find_each do |record|
         begin
           record.set_site_prefix

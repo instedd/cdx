@@ -96,6 +96,20 @@ RSpec.describe PatientsController, type: :controller do
       expect(assigns(:patients).to_a).to eq([patient1])
     end
 
+    it "should filter based con navigation_context site if no encounter" do
+      site1 = institution.sites.make
+      site11 = Site.make :child, parent: site1
+      site2 = institution.sites.make
+
+      patient1 = institution.patients.make site: site11
+      patient2 = institution.patients.make site: site2
+
+      get :index, context: site1.uuid
+
+      expect(response).to be_success
+      expect(assigns(:patients).to_a).to eq([patient1])
+    end
+
     it "should filter based con last encounter date" do
       patient1 = institution.patients.make
       patient2 = institution.patients.make
@@ -250,6 +264,18 @@ RSpec.describe PatientsController, type: :controller do
       expect(patient.gender).to be_nil
       expect(patient.core_fields).to_not have_key('gender')
     end
+
+    it "should use navigation_context as patient site" do
+      site = institution.sites.make
+      expect {
+        post :create, context: site.uuid, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+      }.to change(institution.patients, :count).by(1)
+
+      expect(Patient.last.site).to eq(site)
+
+      expect(response).to be_redirect
+    end
+
   end
 
   context "edit" do

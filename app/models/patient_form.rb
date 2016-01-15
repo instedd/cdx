@@ -2,7 +2,7 @@ class PatientForm
   include ActiveModel::Model
 
   def self.shared_attributes # shared editable attributes with patient model
-    [:institution, :name, :gender, :dob, :lat, :lng, :location_geoid, :address, :email, :phone]
+    [:institution, :site, :name, :gender, :dob, :lat, :lng, :location_geoid, :address, :email, :phone]
   end
 
   def self.model_name
