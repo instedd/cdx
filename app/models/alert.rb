@@ -28,7 +28,7 @@ class Alert < ActiveRecord::Base
   enum category_type: [ :anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency]  
   enum aggregation_type: [ :record, :aggregated]
   enum aggregation_frequency: [ :hour, :day, :month]
-  enum channel_type: [ :web, :sms, :sms_and_web]
+  enum channel_type: [ :email, :sms, :email_and_sms]
   
   enum anomalie_type: [:missing_sample_id, :missing_start_time]
   

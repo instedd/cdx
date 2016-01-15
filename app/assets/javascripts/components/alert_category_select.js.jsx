@@ -5,12 +5,6 @@ var AlertCategorySelect = React.createClass({
 		this.doCategoryChange('device_errors');
 
 		if (this.props.edit == true) {
-
-			//	 document.getElementById("alertname").disabled = true;
-			document.getElementById("alertdescription").disabled = true;
-			document.getElementById("alertdescription").disabled = true;
-
-			document.getElementById("alertpatient").disabled = true;
 			document.getElementById("alertsmslimit").disabled = true;
 			document.getElementById("alertmessage").disabled = true;
 			document.getElementById("alerterrorcode").disabled = true;
@@ -21,6 +15,9 @@ var AlertCategorySelect = React.createClass({
 				disable_all_selects: true
 			});
 
+      	this.setState({
+					submit_button_text: 'Update Alert'
+				});
 
 			category_keys = Object.keys(this.props.category_types);
 			document.getElementById(category_keys[0]).disabled = true;
@@ -40,6 +37,7 @@ var AlertCategorySelect = React.createClass({
 
 		return {
 			// had issues with a structure such as alert1 -updating the data object field in the 'select' options library so used individual fields
+			submit_button_text: 'Create Alert',
 			disable_all_selects: false,
 			edit: this.props.edit,
 			all_devices: this.props.devices,
@@ -175,7 +173,7 @@ var AlertCategorySelect = React.createClass({
 		});
 		*/
 	},
-	
+	/*
 	getValueLink: function() {
 	    var valueLink = this.props.valueLink;
 	    var requestChange = valueLink.requestChange.bind(valueLink);
@@ -195,13 +193,15 @@ var AlertCategorySelect = React.createClass({
 
 	    return valueLink;
 	  },
-	
+	*/
 	render: function() {
 		return (
 			<div>
 			<form className = "alertForm" id="new_alert" onSubmit = {
 				this.handleAlertSubmit
 				} >
+
+        <input type='hidden' name='authenticity_token' value={this.props.authenticity_token} />
 
 				<AlertEnabled checkedLink = {
 					this.linkState('enabledField')
@@ -336,7 +336,8 @@ var AlertCategorySelect = React.createClass({
 				}
 				/>
 
-
+    
+       <AlertExternalUser />
 
 				<AlertSmsLimit valueLink={this.linkState('smsLimitField')} />
 
@@ -350,7 +351,8 @@ var AlertCategorySelect = React.createClass({
 				&nbsp;
 				</div>
 				<div className = "col">
-				<input type = "submit" value = "Create Alert" className = "btn-primary" id="submit" />
+				<input type = "submit" value = {this.state.submit_button_text} className = "btn-primary" id="submit" />
+			
 
 				<a className = "btn-link" href = "/alerts">Cancel</a>
 				</div>
