@@ -351,7 +351,8 @@ describe Blender do
     context "when phantom" do
 
       before(:each) do
-        @patient_p2.update_attributes!(is_phantom: true, plain_sensitive_data: Hash.new, entity_id_hash: nil)
+        @patient_p2.attributes = { is_phantom: true, plain_sensitive_data: Hash.new, entity_id_hash: nil }
+        @patient_p2.save(validate: false)
         blender.merge_parent(blender_p2e1s1t1, blender_p1e1)
       end
 
@@ -384,7 +385,8 @@ describe Blender do
     context "when merging on phantom" do
 
       before(:each) do
-        @patient_p2.update_attributes!(is_phantom: true, plain_sensitive_data: Hash.new, entity_id_hash: nil)
+        @patient_p2.attributes = { is_phantom: true, plain_sensitive_data: Hash.new, entity_id_hash: nil }
+        @patient_p2.save(validate: false)
         blender.merge_parent(blender_p1e1s1t1, blender_p2e1)
       end
 
