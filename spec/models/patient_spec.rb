@@ -6,6 +6,15 @@ describe Patient do
 
     it "should make a valid patient" do
       expect(Patient.make_unsaved).to be_valid
+      expect(Patient.make_unsaved :phantom).to be_valid
+    end
+
+    it "should make phantom if required" do
+      expect(Patient.make :phantom).to be_phantom
+    end
+
+    it "should make non phantom if required" do
+      expect(Patient.make).to_not be_phantom
     end
 
     it "should validate uniqness of entity_id_hash and entity_id" do

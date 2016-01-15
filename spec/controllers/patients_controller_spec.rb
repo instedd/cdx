@@ -24,6 +24,12 @@ RSpec.describe PatientsController, type: :controller do
       expect(assigns(:patients).count).to eq(1)
     end
 
+    it "should ignore phantom patients" do
+      institution.patients.make :phantom
+      get :index
+      expect(assigns(:patients).count).to eq(0)
+    end
+
     it "should not list patients if can not read" do
       institution.patients.make
       sign_in other_user
@@ -209,6 +215,12 @@ RSpec.describe PatientsController, type: :controller do
       expect(Time.parse(patient.plain_sensitive_data['dob'])).to eq(patient_form_plan_dob)
     end
 
+    it "should save it as non phantom" do
+      post :create, patient: patient_form_plan
+      patient = institution.patients.last
+      expect(patient).to_not be_phantom
+    end
+
     it "should create new patient in context institution if allowed" do
       grant user, other_user, institution, CREATE_INSTITUTION_PATIENT
       sign_in other_user
@@ -358,9 +370,7 @@ RSpec.describe PatientsController, type: :controller do
     end
 
     it "should assign entity_id if previous is blank" do
-      patient = institution.patients.make_unsaved
-      patient.entity_id = nil
-      patient.save!
+      patient = institution.patients.make :phantom
       expect(patient.entity_id).to be_blank
       expect(patient.entity_id_hash).to be_blank
       post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: 'other-id' }
@@ -370,6 +380,8 @@ RSpec.describe PatientsController, type: :controller do
       expect(patient.entity_id).to eq('other-id')
       expect(patient.entity_id_hash).to_not be_blank
       expect(patient.plain_sensitive_data['id']).to eq('other-id')
+
+      expect(patient).to_not be_phantom
     end
 
     it "should not change entity_id from previous" do
@@ -402,9 +414,7 @@ RSpec.describe PatientsController, type: :controller do
     end
 
     it "should require entity_id" do
-      patient = institution.patients.make_unsaved
-      patient.entity_id = nil
-      patient.save!
+      patient = institution.patients.make :phantom
 
       post :update, id: patient.id, patient: { entity_id: '' }
       expect(assigns(:patient).errors).to have_key(:entity_id)
