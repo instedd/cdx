@@ -58,7 +58,7 @@ $(document).ready(function(){
       setFilledClass($(this));
     });
 
-  $(document).on('click', '.row-href tr[data-href]', function(){
+  $(document).on('click', '*[data-href]', function(){
     Turbolinks.visit($(this).data('href'));
   });
 
@@ -211,5 +211,3 @@ $(document).ready(function(){
 
 
 });
-
-
