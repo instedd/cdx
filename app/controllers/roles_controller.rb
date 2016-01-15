@@ -116,7 +116,9 @@ class RolesController < ApplicationController
   end
 
   def as_json_device(json, device)
-    json.(device, :uuid, :name, :serial_number)
+    json.(device, :uuid, :name, :serial_number, :id)
+    json.type :device
+    json
   end
 
   def role_params

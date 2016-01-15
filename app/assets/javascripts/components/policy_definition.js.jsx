@@ -30,11 +30,13 @@ var PolicyDefinition = React.createClass({
   render: function() {
     return (
       <div>
+        <PolicyDefinitionField name="role[definition]" statements={this.state.statements} />
         <div className="left-column">
           <div className="tabs">
             <ul className="tabs-header">
               {this.state.statements.map(function(statement, index){
-                return <li key={index} onClick={this.setActiveTab.bind(this,index)}><PolicyItem statement={statement} /></li>;
+                var selectedClass = this.state.activeTab == index ? "selected" : "";
+                return <li key={index} onClick={this.setActiveTab.bind(this,index)} className={selectedClass}><PolicyItem statement={statement} /></li>;
               }.bind(this))}
               <li><a onClick={this.newPolicy} href="javascript:">Add policy</a></li>
             </ul>
