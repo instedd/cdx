@@ -29,8 +29,7 @@
       - c.bottom do
         - if @test_result.patient
           Patient
-          -# TODO add link to patient
-          = @test_result.patient.plain_sensitive_data['name']
+          = link_to @test_result.patient.name, @test_result.patient
           %br
         Test performed on
         = link_to @test_result.device.name, edit_device_path(@test_result.device)

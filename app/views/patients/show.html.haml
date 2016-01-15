@@ -17,3 +17,41 @@
         - c.actions do
           = link_to edit_patient_path(@patient), :title => 'Edit' do
             = image_tag "ic-pencil.png"
+
+- if @encounters.empty?
+  = empty_data icon: 'ic140-tests' do |c|
+    - c.body do
+      %h1 No medical history
+      %p Create test orders in order to start the medical history
+- else
+  .row
+    .col
+      %h1 Medical history
+  .row
+    .col
+      %ul.medical-history
+        - @encounters.each do |encounter|
+          %li{'data-href' => encounter_path(encounter)}
+            .row
+              .col.pe-2
+                %label Date
+              .col
+                .value= format_date(encounter.start_time)
+            .row
+              .col.pe-2
+                %label Diagnose
+              .col
+                .value
+                  - if encounter.diagnostic.blank?
+                    %i Pending
+                  - else
+                    = encounter.human_diagnose
+            .row
+              .col.pe-2
+                %label Comments
+              .col
+                .value
+                  - if encounter.observations.blank?
+                    %i No comments
+                  - else
+                    = encounter.observations

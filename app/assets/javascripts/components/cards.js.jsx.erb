@@ -12,7 +12,7 @@ var PatientCard = React.createClass({
       return (
         <%= to_jsx(card(image: asset_url('card-unkown.png')) do |c|
           c.top do
-            raw "<b>{this.props.patient.plain_sensitive_data.name}</b>"
+            raw "<a href={'/patients/' + this.props.patient.id}>{this.props.patient.plain_sensitive_data.name}</a>"
           end
         end) %>
       );

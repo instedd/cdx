@@ -1,0 +1,12 @@
+= cdx_table do |t|
+  - t.columns do
+    %col{:width => "100%"}
+  - t.thead do
+    %tr
+      %th
+  - t.tbody do
+    %tr
+      %td.empty
+        .empty-icon
+          %span{class: empty_data[:icon]}
+        = empty_data[:body]

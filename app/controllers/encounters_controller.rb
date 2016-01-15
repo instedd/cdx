@@ -265,7 +265,12 @@ class EncountersController < ApplicationController
       end
 
       json.patient do
-        @encounter_blender.patient.blank? ? json.nil! : json.(@encounter_blender.patient, :plain_sensitive_data, :core_fields)
+        if @encounter_blender.patient.blank?
+          json.nil!
+        else
+          json.(@encounter_blender.patient, :plain_sensitive_data, :core_fields)
+          json.id @encounter_blender.patient.entities.first.try :id
+        end
       end
 
       json.samples @encounter_blender.samples.uniq do |sample|

@@ -29,6 +29,7 @@ class PatientsController < ApplicationController
     @patient = Patient.find(params[:id])
     return unless authorize_resource(@patient, READ_PATIENT)
     @can_edit = has_access?(@patient, UPDATE_PATIENT)
+    @encounters = @patient.encounters.order(start_time: :desc)
   end
 
   def new
