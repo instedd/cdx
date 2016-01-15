@@ -178,25 +178,33 @@ RSpec.describe PatientsController, type: :controller do
   end
 
   context "create" do
+    let(:patient_form_plan) {
+      { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+    }
+    let(:patient_form_plan_dob) { Time.parse("2000-01-01") }
+    def build_patient_form_plan(options)
+      patient_form_plan.dup.merge! options
+    end
+
     it "should create new patient in context institution" do
       expect {
-        post :create, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+        post :create, patient: patient_form_plan
       }.to change(institution.patients, :count).by(1)
 
       expect(response).to be_redirect
     end
 
     it "should save fields" do
-      post :create, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+      post :create, patient: patient_form_plan
       patient = institution.patients.last
 
-      expect(patient.name).to eq('Lorem')
-      expect(patient.gender).to eq('female')
-      expect(Time.parse(patient.dob)).to eq(Time.parse("2000-01-01"))
+      expect(patient.name).to eq(patient_form_plan[:name])
+      expect(patient.gender).to eq(patient_form_plan[:gender])
+      expect(Time.parse(patient.dob)).to eq(patient_form_plan_dob)
 
-      expect(patient.plain_sensitive_data['name']).to eq('Lorem')
-      expect(patient.core_fields['gender']).to eq('female')
-      expect(Time.parse(patient.plain_sensitive_data['dob'])).to eq(Time.parse("2000-01-01"))
+      expect(patient.plain_sensitive_data['name']).to eq(patient_form_plan[:name])
+      expect(patient.core_fields['gender']).to eq(patient_form_plan[:gender])
+      expect(Time.parse(patient.plain_sensitive_data['dob'])).to eq(patient_form_plan_dob)
     end
 
     it "should create new patient in context institution if allowed" do
@@ -204,7 +212,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+        post :create, patient: patient_form_plan
       }.to change(institution.patients, :count).by(1)
     end
 
@@ -212,7 +220,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: { name: 'Lorem', dob: '1/1/2000', gender: 'female' }
+        post :create, patient: patient_form_plan
       }.to change(institution.patients, :count).by(0)
 
       expect(response).to be_forbidden
@@ -220,7 +228,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should require name" do
       expect {
-        post :create, patient: { name: '', dob: '1/1/2000', gender: 'female' }
+        post :create, patient: build_patient_form_plan(name: '')
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:name)
@@ -229,7 +237,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should not require dob" do
       expect {
-        post :create, patient: { name: 'Jerry', dob: '', gender: 'female' }
+        post :create, patient: build_patient_form_plan(dob: '')
       }.to change(institution.patients, :count).by(1)
 
       patient = institution.patients.first
@@ -239,7 +247,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should validate dob if present" do
       expect {
-        post :create, patient: { name: 'Jerry', dob: '14/14/2000' }
+        post :create, patient: build_patient_form_plan(dob: '14/14/2000')
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:dob)
@@ -248,7 +256,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should validate gender" do
       expect {
-        post :create, patient: { name: 'Lorem', gender: 'invalid-value' }
+        post :create, patient: build_patient_form_plan(gender: 'invalid-value')
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:gender)
@@ -257,7 +265,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should not require gender" do
       expect {
-        post :create, patient: { name: 'Lorem', gender: '', dob: '1/1/2000' }
+        post :create, patient: build_patient_form_plan(gender: '')
       }.to change(institution.patients, :count).by(1)
 
       patient = institution.patients.first
@@ -268,7 +276,7 @@ RSpec.describe PatientsController, type: :controller do
     it "should use navigation_context as patient site" do
       site = institution.sites.make
       expect {
-        post :create, context: site.uuid, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+        post :create, context: site.uuid, patient: patient_form_plan
       }.to change(institution.patients, :count).by(1)
 
       expect(Patient.last.site).to eq(site)
