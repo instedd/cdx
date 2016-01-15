@@ -13,7 +13,7 @@ class TestResultsController < ApplicationController
 
     @results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
     @conditions = Condition.all.map &:name
-    @date_options = [["Previous month", 1.month.ago.beginning_of_month], ["Previous week", 1.week.ago.beginning_of_week],["Previous year", 1.year.ago.beginning_of_year]]
+    @date_options = [{label: "Previous month", value: 1.month.ago.beginning_of_month}, {label: "Previous week", value: 1.week.ago.beginning_of_week},{label: "Previous year", value: 1.year.ago.beginning_of_year}]
 
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i

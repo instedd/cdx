@@ -22,6 +22,9 @@
         - if has_access_to_devices_index?
           %li{:class => params[:controller] == "devices" && "active"}
             = link_to "Devices", devices_path
+        - if has_access?(Device, Policy::Actions::SUPPORT_DEVICE)
+          %li{:class => params[:controller] == "devicelogs" && "active"}
+            = link_to "Logs", device_messages_path
         - if has_access_to_device_models_index?
           %li{:class => params[:controller] == "device_models" && "active"}
             = link_to "Models", device_models_path
