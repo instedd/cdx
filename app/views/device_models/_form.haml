@@ -94,17 +94,14 @@
               %label.cross{:for => 'device_model_delete_picture'}
                 = image_tag "ic-cross.png"
             = image_tag @device_model.picture.url(:card)
-        .upload-new-file
-          %span.ic140-picture
-          %h2 Select a picture
-          = f.file_field :picture, :class => "inputfile", 'data-remove-checkbox' => '#device_model_delete_picture'
-          %label{:for => 'device_model_picture'}
-            %span
-              .iconb-upload
-              Choose a file to upload
-            %a.clear-input{:href => "#"}
-              = image_tag "ic-cross.png"
-
+        .upload-new-file.picture{:onclick => "$('#device_model_picture').click()"}
+          .upload-picture-title
+            %span.ic140-picture
+            %h2
+              Drop a picture here
+              %br or click to upload a file
+          %img{:src => ""}
+          = f.file_field :picture, :class => "upload-picture", 'data-remove-checkbox' => '#device_model_delete_picture'
 
   .row.button-actions
     .col

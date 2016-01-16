@@ -306,6 +306,48 @@ label.on {
   .clear-label {
     display: block;
   }
+  &.on {
+    border-color: $blue;
+  }
+}
+
+.upload-new-file.picture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+
+  .upload-picture-title {
+    margin-top: 100px;
+  }
+
+  input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    z-index:2;
+    opacity:0;
+    cursor:pointer;
+  }
+  > img {
+    position:absolute;
+    width: 350px;
+    min-height: 300px;
+    max-height: 400px;
+    top: 20px;
+    left: 50%;
+    margin-left: -175px;
+    z-index:1;
+    border:none;
+  }
+
 }
 
 .file-uploaded + .upload-new-file {
@@ -317,6 +359,23 @@ label.on {
 
   + .upload-new-file {
     display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+
+    input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 100%;
+      width: 100%
+    }
   }
 }
 
