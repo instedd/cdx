@@ -1,9 +1,110 @@
 var PolicyDefinition = React.createClass({
   getInitialState: function() {
     return {
-      statements: (this.props.definition || {}).statement || [],
+      statements: this.policyDefinitionStatements(this.props.definition),
       activeTab: 0
     };
+  },
+
+  policyDefinitionStatements: function(definition) {
+    if(definition == null) {
+      return [];
+    }
+    definition = JSON.parse(definition);
+    return definition.statement.map(function(statement) {
+      var resourceList = {
+        'except': [],
+        'only': []
+      }
+
+      var statementType = null;
+      var resources = null;
+      var resourceType = null;
+
+      var _resourceComponents = function(resource) {
+        var parts;
+        if(parts = resource.match(/(.*)\?(.*)\=(.*)/)) {
+          // policyType?resourceType=resourceId
+          return {
+            policyResourceType: parts[1],
+            thisResourceType: parts[2],
+            thisResourceId: parts[3]
+          }
+        } else if(parts = resource.match(/(.*)\/(.*)/)) {
+          // resourceType/resourceId
+          return {
+            policyResourceType: parts[1],
+            thisResourceType: parts[1],
+            thisResourceId: parts[2]
+          }
+        } else {
+          // resourceType - ie, the whole class
+          return {
+            policyResourceType: resource,
+            thisResourceType: resource
+          }
+        }
+      }
+
+      if(Array.isArray(statement.except) && (statement.except.length > 0)) {
+        statementType = 'except';
+        resources = statement.except.map(function(resource) {
+          var components = _resourceComponents(resource);
+
+          if(!resourceType) {
+            resourceType = components.policyResourceType;
+          }
+          if(components.policyResourceType != resourceType) {
+            // FIXME - show this warnings to the user
+            console.warn("Resource type " + components.policyResourceType + " doesn't match previous resource's type " + resourceType +
+                " - the control may not work OK");
+          }
+          return {type: components.thisResourceType, id: components.thisResourceId};
+        });
+      } else {
+        if(Array.isArray(statement.resource) && (statement.resource.length > 0)) {
+          resources = statement.resource.map(function(resource) {
+            var components = _resourceComponents(resource);
+
+            if(!resourceType) {
+              resourceType = components.policyResourceType;
+            }
+            if(components.policyResourceType != resourceType) {
+              // FIXME - show this warnings to the user
+              console.warn("Resource type " + components.policyResourceType + " doesn't match previous resource's type " + resourceType +
+                  " - the control may not work OK");
+            }
+
+            var result = { type: components.thisResourceType };
+            if(components.thisResourceId) {
+              statementType = 'only';
+              result.id = components.thisResourceId;
+            } else {
+              statementType = 'all';
+            }
+            return result;
+          });
+        }
+      }
+
+      var _hydratateResources = function(resources) {
+        // FIXME: ask the server for the full resource objects
+        return resources;
+      }
+
+      if(statementType == "only" || statementType == "except") {
+        resourceList[statementType] = _hydratateResources(resources);
+      }
+
+      return {
+        delegable: statement.delegable == true,
+        includeSubsites: false, // TODO: still unsupported in policies definitions
+        actions: statement.action, // FIXME: map to action objects
+        resourceList: resourceList,
+        resourceType: resourceType,
+        resources: statementType
+      };
+    });
   },
 
   newPolicy: function() {
