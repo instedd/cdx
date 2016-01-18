@@ -10,13 +10,7 @@
 
 .row
   .col
-    = card image: "card-unkown.png" do |c|
-      - c.top do
-        %b= @patient.name
-      - if @can_edit
-        - c.actions do
-          = link_to edit_patient_path(@patient), :title => 'Edit' do
-            = image_tag "ic-pencil.png"
+    = react_component "PatientCard", patient: @patient_json, canEdit: @can_edit
 
 - if @encounters.empty?
   = empty_data icon: 'ic140-tests' do |c|

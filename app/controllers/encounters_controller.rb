@@ -268,8 +268,7 @@ class EncountersController < ApplicationController
         if @encounter_blender.patient.blank?
           json.nil!
         else
-          json.(@encounter_blender.patient, :plain_sensitive_data, :core_fields)
-          json.id @encounter_blender.patient.entities.first.try :id
+          @encounter_blender.patient.preview.as_json_card(json)
         end
       end
 

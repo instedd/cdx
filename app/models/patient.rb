@@ -43,6 +43,15 @@ class Patient < ActiveRecord::Base
     encounters.order(start_time: :desc).first.try &:start_time
   end
 
+  def as_json_card(json)
+    json.(self, :id, :name, :age, :gender, :address, :phone, :email)
+    json.dob dob_time.try { |d| d.strftime(I18n.t('date.input_format.pattern')) }
+  end
+
+  def dob_time
+    Time.parse(dob) rescue nil
+  end
+
   private
 
   def entity_id_not_changed

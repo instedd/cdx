@@ -431,8 +431,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       json_response = JSON.parse(response.body).with_indifferent_access
 
       expect(json_response['status']).to eq('ok')
-      expect(json_response['encounter']['patient']['plain_sensitive_data']).to eq({"custom"=>{}, 'name' => 'Doe'})
-      expect(json_response['encounter']['patient']['core_fields']).to eq({'gender' => 'male'})
+      expect(json_response['encounter']['patient']).to include({'name' => 'Doe', 'gender' => 'male'})
     end
 
     it "it merges data from another patient if one of them phantom" do
@@ -441,6 +440,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'}, patient: {name: 'Doe', id: 'P10'})
 
       sample_with_patient1, sample_with_patient2 = Sample.all.to_a
+      patient2 = sample_with_patient2.patient
 
       put :add_sample, sample_uuid: sample_with_patient2.uuid, encounter: {
         institution: { uuid: institution.uuid },
@@ -454,8 +454,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       json_response = JSON.parse(response.body).with_indifferent_access
 
       expect(json_response['status']).to eq('ok')
-      expect(json_response['encounter']['patient']['plain_sensitive_data']).to eq({'name' => 'Doe', 'id' => 'P10', "custom"=>{}})
-      expect(json_response['encounter']['patient']['core_fields']).to eq({'gender' => 'male'})
+      expect(json_response['encounter']['patient']).to include({'name' => 'Doe', 'id' => patient2.id, 'gender' => 'male'})
     end
 
     it "ensure only samples withing permissions can be used" do

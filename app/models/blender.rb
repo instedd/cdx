@@ -471,6 +471,18 @@ class Blender
       nil
     end
 
+    def preview
+      target = @entities.find(&:not_phantom?) || @entities.first
+      target = Patient.find(target.id) if target # grab a new patient in order to avoid dirty state
+      target = self.class.entity_type.new(institution: institution) unless target
+
+      target.plain_sensitive_data = plain_sensitive_data
+      target.custom_fields = custom_fields
+      target.core_fields = core_fields
+
+      target
+    end
+
     protected
 
     def get_entity_id(plain_sensitive_data, custom_fields, core_fields)
