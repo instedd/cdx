@@ -2,19 +2,10 @@
   .col
     = link_to "+", new_device_model_path, class: 'btn-add side-link ontop fix', title: 'Add Device Model'
     - if @device_models.empty?
-      = cdx_table title: 'Device Models' do |t|
-        - t.columns do
-          %col{:width => "100%"}
-        - t.thead do
-          %tr
-            %th
-        - t.tbody do
-          %tr
-            %td.empty
-              .empty-icon
-                %span.ic140-device-model
-              %h1 There are no device models
-              %p Create device models and publish manifests that will allow test reporting on CDx platform
+      = empty_data title: 'Device Models', icon: 'ic140-device-model' do |c|
+        - c.body do
+          %h1 There are no device models
+          %p Create device models and publish manifests that will allow test reporting on CDx platform
     - else
       = cdx_table title: 'Device Models' do |t|
         - t.columns do

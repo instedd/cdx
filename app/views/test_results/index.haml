@@ -3,19 +3,10 @@
 .row
   .col
     - if @tests.empty?
-      = cdx_table do |t|
-        - t.columns do
-          %col{:width => "100%"}
-        - t.thead do
-          %tr
-            %th
-        - t.tbody do
-          %tr
-            %td.empty
-              .empty-icon
-                %span.ic140-tests
-              %h1 No tests has been reported
-              %p Setup your devices first in order to start reporting
+      = empty_data icon: 'ic140-tests' do |c|
+        - c.body do
+          %h1 No tests has been reported
+          %p Setup your devices first in order to start reporting
     - else
       = cdx_table title: pluralize(@total, "Test") do |t|
         - t.columns do

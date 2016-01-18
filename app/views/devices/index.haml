@@ -3,19 +3,10 @@
 .row
   .col
     - if @devices.empty?
-      = cdx_table do |t|
-        - t.columns do
-          %col{:width => "100%"}
-        - t.thead do
-          %tr
-            %th
-        - t.tbody do
-          %tr
-            %td.empty
-              .empty-icon
-                %span.ic140-devices
-              %h1 There are no devices reporting at this site
-              %p Follow the configuration steps to connect a device and start reporting
+      = empty_data icon: 'ic140-devices' do |c|
+        - c.body do
+          %h1 There are no devices reporting at this site
+          %p Follow the configuration steps to connect a device and start reporting
     - else
       = cdx_table do |t|
         - t.columns do

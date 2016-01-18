@@ -59,7 +59,11 @@ $(document).ready(function(){
       setFilledClass($(this));
     });
 
-  $(document).on('click', '.row-href tr[data-href]', function(){
+  $(document).on('click', '*[data-href]', function(event){
+    if (event.metaKey || event.shiftKey) {
+      window.open($(this).data('href'), '_blank');
+      return;
+    }
     Turbolinks.visit($(this).data('href'));
   });
 

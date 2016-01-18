@@ -29,8 +29,7 @@
       - c.bottom do
         - if @test_result.patient
           Patient
-          -# TODO add link to patient
-          = @test_result.patient.plain_sensitive_data['name']
+          = link_to @test_result.patient.name, @test_result.patient
           %br
         Test performed on
         = link_to @test_result.device.name, edit_device_path(@test_result.device)
@@ -87,12 +86,12 @@
     %label Other tests
   .col
     .value
-    - case @other_tests.count
-    - when 0
-      No other test was made with this sample
-    - when 1
-      = link_to @other_tests.first.core_fields[TestResult::NAME_FIELD], test_result_path(@other_tests.first.uuid)
-      was also made with this sample
-    - else
-      = @other_tests.map { |t| link_to t.core_fields[TestResult::NAME_FIELD], test_result_path(t.uuid) }.to_sentence.html_safe
-      were also made with this sample
+      - case @other_tests.count
+      - when 0
+        No other test was made with this sample
+      - when 1
+        = link_to @other_tests.first.core_fields[TestResult::NAME_FIELD], test_result_path(@other_tests.first.uuid)
+        was also made with this sample
+      - else
+        = @other_tests.map { |t| link_to t.core_fields[TestResult::NAME_FIELD], test_result_path(t.uuid) }.to_sentence.html_safe
+        were also made with this sample

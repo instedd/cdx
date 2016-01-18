@@ -98,7 +98,7 @@
   }
 
 
-.row-href tr[data-href] {
+*[data-href] {
   cursor: pointer;
   &:hover{
     background:#f3f3f3;

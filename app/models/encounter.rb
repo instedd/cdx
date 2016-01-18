@@ -105,6 +105,27 @@ class Encounter < ActiveRecord::Base
     core_fields[Encounter::ASSAYS_FIELD]
   end
 
+  def human_diagnose
+    return unless diagnostic
+
+    positives = diagnostic.select {|a| a['result'] == 'positive'}.map { |a| a['condition'] }.to_a
+    negatives = diagnostic.select {|a| a['result'] == 'negative'}.map { |a| a['condition'] }.to_a
+
+    res = ""
+    res << positives.join(', ')
+    unless positives.empty?
+      res << " detected. "
+    end
+    res << negatives.join(', ')
+    unless negatives.empty?
+      res << " not detected. "
+    end
+
+    res
+  end
+
+  attribute_field OBSERVATIONS_FIELD
+
   def has_dirty_diagnostic?
     test_results_not_in_diagnostic.count > 0
   end

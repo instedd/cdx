@@ -2,19 +2,10 @@
   .col
     = link_to "+", new_policy_path, class: 'btn-add side-link ontop fix', title: 'Add Policy'
     - if @policies.empty?
-      = cdx_table title: 'Policies' do |t|
-        - t.columns do
-          %col{:width => "100%"}
-        - t.thead do
-          %tr
-            %th
-        - t.tbody do
-          %tr
-            %td.empty
-              .empty-icon
-                %span.ic140-users
-              %h1 There are no users with access to this site
-              %p Invite other users to join this site's team
+      = empty_data title: 'Policies', icon: 'ic140-users' do |c|
+        - c.body do
+          %h1 There are no users with access to this site
+          %p Invite other users to join this site's team
     - else
       = cdx_table title: 'Policies' do |t|
         - t.columns do

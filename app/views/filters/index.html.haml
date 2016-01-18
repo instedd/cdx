@@ -1,17 +1,9 @@
 .row
   .col
     - if filters.empty?
-      = cdx_table title: 'Filters' do |t|
-        - t.columns do
-          %col{:width => "100%"}
-        - t.thead do
-          %tr
-            %th
-        - t.tbody do
-          %tr
-            %td.empty
-              .empty-icon
-              %h1 There is no saved filters
+      = empty_data title: 'Filters' do |c|
+        - c.body do
+          %h1 There are no saved filters
     - else
       = cdx_table title: 'Filters' do |t|
         - t.columns do

@@ -78,7 +78,7 @@ var TestResult = React.createClass({
 var TestResultsList = React.createClass({
   render: function() {
     return (
-      <table className="table row-href" cellPadding="0" cellSpacing="0">
+      <table className="table" cellPadding="0" cellSpacing="0">
         <thead>
           <tr>
             <th className="tableheader" colSpan="5">Tests</th>
