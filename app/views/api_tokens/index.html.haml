@@ -2,17 +2,9 @@
   .col
     = link_to "+", new_api_token_path, class: 'btn-add side-link ontop fix', title: 'Add API Token'
     - if @api_tokens.empty?
-      = cdx_table title: 'API Tokens' do |t|
-        - t.columns do
-          %col{:width => "100%"}
-        - t.thead do
-          %tr
-            %th
-        - t.tbody do
-          %tr
-            %td.empty
-              .empty-icon
-              %h1 There are no api tokens
+      = empty_data title: 'API Tokens' do |c|
+        - c.body do
+          %h1 There are no api tokens
     - else
       = cdx_table title: 'API Tokens' do |t|
         - t.columns do
@@ -27,4 +19,3 @@
             %tr
               %td= token.token
               %td= link_to "Delete", api_token_path(token.id), method: :delete, data: {confirm: "Are you sure you want to delete the following token?\n#{token.token}"}
-

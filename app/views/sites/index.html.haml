@@ -2,19 +2,10 @@
 .row
   .col
     - if @sites.empty?
-      = cdx_table do |t|
-        - t.columns do
-          %col{:width => "100%"}
-        - t.thead do
-          %tr
-            %th
-        - t.tbody do
-          %tr
-            %td.empty
-              .empty-icon
-                %span.ic140-sites
-              %h1 This site has no dependencies
-              %p Create sites here to keep your institution's hierachy organized
+      = empty_data icon: 'ic140-sites' do |c|
+        - c.body do
+          %h1 This site has no dependencies
+          %p Create sites here to keep your institution's hierachy organized
     - else
       = cdx_table do |t|
         - t.columns do
