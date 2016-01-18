@@ -346,6 +346,10 @@ label.on {
     margin-left: -175px;
     z-index:1;
     border:none;
+    opacity: 0;
+    &.uploaded {
+      opacity: 1;
+    }
   }
 
 }
@@ -359,23 +363,6 @@ label.on {
 
   + .upload-new-file {
     display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 100%;
-    width: 100%;
-
-    input[type="file"] {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 100%;
-      width: 100%
-    }
   }
 }
 

@@ -28,6 +28,7 @@
 //= require react-leaflet
 //= require components
 //= require d3
+//= require jquery.custom-file-input
 //= require_tree .
 //= require turbolinks
 Turbolinks.enableProgressBar()
@@ -169,47 +170,4 @@ $(document).ready(function(){
   $(".close-notification").click(function(){
     flashn.hide();
   });
-
-
-
-  $(".clear-label").on('click', function () {
-    $(this).closest('.file-uploaded').addClass('remove');
-  });
-
-
-
-  // Drag Picture to an input file and preview it
-  if(document.getElementById('device_model_picture')) {
-    var imageLoader = document.getElementById('device_model_picture');
-        imageLoader.addEventListener('change', handleImage, false);
-
-    function handleImage(e) {
-        var reader = new FileReader();
-        reader.onload = function (event) {
-
-            $('.upload-new-file img').attr('src',event.target.result);
-        }
-        reader.readAsDataURL(e.target.files[0]);
-    }
-
-
-    // Change the class on the target zone when dragging a file over it
-
-    document.addEventListener("dragenter", function( event ) {
-      if ( event.target.className == "upload-picture" ) {
-          $('.choose-picture').addClass('on');
-      }
-
-    }, false);
-
-    document.addEventListener("dragleave", function( event ) {
-      if ( event.target.className == "upload-picture" ) {
-          $('.choose-picture').removeClass('on');
-      }
-    }, false);
-  }
-
-
 });
-
-

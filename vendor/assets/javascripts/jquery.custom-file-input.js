@@ -5,7 +5,7 @@
 
 'use strict';
 
-;( function( $, window, document, undefined )
+function custom_input_file( $, window, document, undefined )
 {
   $( '.inputfile' ).each( function()
   {
@@ -44,8 +44,6 @@
     }
 
     bindClearInput();
-
-
-
   });
-})( jQuery, window, document );
+}
+

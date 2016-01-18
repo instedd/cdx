@@ -9,6 +9,40 @@
       deleteCheckbox.prop('checked', !isFileChosen);
     });
   });
+  $(document).ready(function(){
+    // Drag Picture to an input file and preview it
+    var imageLoader = document.getElementById('device_model_picture');
+        imageLoader.addEventListener('change', handleImage, false);
+
+    function handleImage(e) {
+        var reader = new FileReader();
+        reader.onload = function (event) {
+
+            $('.upload-new-file img').attr('src',event.target.result).addClass('uploaded');
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+
+    // Change the class on the target zone when dragging a file over it
+
+    document.addEventListener("dragenter", function( event ) {
+      if ( event.target.className == "upload-picture" ) {
+          $('.choose-picture').addClass('on');
+      }
+
+    }, false);
+
+    document.addEventListener("dragleave", function( event ) {
+      if ( event.target.className == "upload-picture" ) {
+          $('.choose-picture').removeClass('on');
+      }
+    }, false);
+
+    $(".clear-label").on('click', function () {
+      $(this).closest('.file-uploaded').addClass('remove');
+    });
+  });
 
 = validation_errors @device_model
 
@@ -94,7 +128,7 @@
               %label.cross{:for => 'device_model_delete_picture'}
                 = image_tag "ic-cross.png"
             = image_tag @device_model.picture.url(:card)
-        .upload-new-file.picture{:onclick => "$('#device_model_picture').click()"}
+        .upload-new-file.picture
           .upload-picture-title
             %span.ic140-picture
             %h2
@@ -114,4 +148,6 @@
   .box.light
     = render 'publish'
 
-  %script{:src => "/assets/jquery.custom-file-input.js"}
+:javascript
+  custom_input_file( jQuery, window, document );
+
