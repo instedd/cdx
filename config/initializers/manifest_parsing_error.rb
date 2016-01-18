@@ -1,6 +1,6 @@
 class ManifestParsingError < RuntimeError
   attr_reader :target_field
-  attr_accessor :record_index
+  attr_accessor :number_of_failures
 
   def initialize(message, target_field = nil)
     super(message)

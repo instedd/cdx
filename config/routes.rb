@@ -58,12 +58,6 @@ Rails.application.routes.draw do
     end
     resources :custom_mappings, only: [:index]
     resources :ssh_keys, only: [:create, :destroy]
-    resources :device_messages, only: [:index], path: 'messages' do
-      member do
-        get 'raw'
-        post 'reprocess'
-      end
-    end
     resources :device_logs, only: [:index, :show, :create]
     resources :device_commands, only: [:index] do
       member do
@@ -75,6 +69,13 @@ Rails.application.routes.draw do
     member do
       put 'publish'
       get 'manifest'
+    end
+  end
+
+  resources :device_messages, only: [:index], path: 'messages' do
+    member do
+      get 'raw'
+      post 'reprocess'
     end
   end
   resources :test_results , only: [:index, :show]

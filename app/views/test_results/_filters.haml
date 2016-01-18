@@ -29,7 +29,7 @@
             %label.block Date
             = cdx_select name: "since", value: params["since"] do |select|
               - select.item "", "Show all"
-              - select.items @date_options
+              - select.items @date_options, :value, :label
           .col
             %a.btn-toggle.pull-right{:title => "Toggle advanced filters"}
 

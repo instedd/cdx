@@ -65,7 +65,7 @@ class Manifest < ActiveRecord::Base
     raise ManifestParsingError.invalid_manifest(self) if self.invalid?
 
     messages = []
-    parser.load(data, data_root).each_with_index do |record, record_index|
+    parser.load(data, data_root).each_with_index do |record, number_of_failures|
       begin
         message = self.class.new_message
         fields_for(device).each do |field|
@@ -74,7 +74,7 @@ class Manifest < ActiveRecord::Base
 
         messages << message
       rescue ManifestParsingError => err
-        err.record_index = record_index + 1
+        err.number_of_failures = number_of_failures + 1
         raise err
       end
     end

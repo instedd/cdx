@@ -21,7 +21,7 @@ class DeviceMessage < ActiveRecord::Base
   rescue ManifestParsingError => err
     self.record_failure err
     self.index_failure_data[:target_field] = err.target_field if err.target_field.present?
-    self.index_failure_data[:record_index] = err.record_index if err.record_index.present?
+    self.index_failure_data[:number_of_failures] = err.number_of_failures if err.number_of_failures.present?
   rescue => err
     self.record_failure err
   end
