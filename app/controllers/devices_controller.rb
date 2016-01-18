@@ -14,8 +14,10 @@ class DevicesController < ApplicationController
     @devices = check_access(Device, READ_DEVICE).joins(:device_model).includes(:site, :institution, device_model: :institution)
     @devices = @devices.within(@navigation_context.entity)
     @manufacturers = Institution.where(id: @devices.select('device_models.institution_id'))
+    @device_models = DeviceModel.all
 
     @devices = @devices.where(device_models: { institution_id: params[:manufacturer].to_i}) if params[:manufacturer].presence
+    @devices = @devices.where(device_model: params[:device_model].to_i) if params[:device_model].present?
 
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i

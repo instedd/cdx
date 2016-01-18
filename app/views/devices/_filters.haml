@@ -13,5 +13,10 @@
           .filter
             %label.block Manufacturer
             = cdx_select name: "manufacturer", value: params["manufacturer"] do |select|
-              - select.item "", "(all)"
+              - select.item "", "Show all"
               - select.items @manufacturers, :id, :name
+          .filter
+            %label.block Model
+            = cdx_select name: "device_model", value: params["device_model"] do |select|
+              - select.item "", "Show all"
+              - select.items @device_models, :id, :name
