@@ -7,6 +7,11 @@
             - if @can_create
               = link_to "+", new_site_path, class: 'btn-add side-link fix', title: 'Add Site'
             Sites
-        -# %form{action: sites_path, "data-auto-submit" => true}
-        -#   .row
-        -#      NB: No filters available right now, but the form should be that
+      %form{action: sites_path, "data-auto-submit" => true}
+        .row
+          .filter
+            %label.block Name
+            %input{type: "text", name: "name", value: params["name"]}
+          .filter
+            %label.block Location
+            = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"]

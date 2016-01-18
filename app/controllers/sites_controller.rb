@@ -7,6 +7,7 @@ class SitesController < ApplicationController
   def index
     @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
+    apply_filters
 
     @sites.preload_locations!
   end
@@ -119,5 +120,10 @@ class SitesController < ApplicationController
     end
 
     params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :parent_id, :sample_id_reset_policy, :main_phone_number, :email_address)
+  end
+
+  def apply_filters
+    @sites = @sites.where("location_geoid LIKE concat(?, '%')", params[:location]) if params[:location].present?
+    @sites = @sites.where("name LIKE ?", "%#{params[:name]}%") if params[:name].present?
   end
 end
