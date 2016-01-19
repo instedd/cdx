@@ -32,6 +32,8 @@ Rails.application.routes.draw do
 
   resources :encounters, only: [:new, :create, :edit, :update, :show] do
     collection do
+      get :new_index
+
       get :sites
       get :search_sample
       get :search_test
@@ -83,7 +85,11 @@ Rails.application.routes.draw do
   resources :subscribers
   resources :policies
   resources :api_tokens
-  resources :patients
+  resources :patients do
+    collection do
+      get :search
+    end
+  end
 
   scope :dashboards, controller: :dashboards do
     get :nndd

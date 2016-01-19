@@ -23,7 +23,7 @@
       %h1 Medical history
   .row
     .col
-      %ul.medical-history
+      %ul.nav-list
         - @encounters.each do |encounter|
           %li{'data-href' => encounter_path(encounter)}
             .row

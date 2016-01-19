@@ -1,4 +1,19 @@
 class PatientsController < ApplicationController
+  def search
+    @patients = check_access(Patient.where(is_phantom: false).where(institution: @navigation_context.institution), READ_PATIENT).order(:name)
+    @patients = @patients.within(@navigation_context.entity)
+    @patients = @patients.where("name LIKE concat('%', ?, '%') OR entity_id LIKE concat('%', ?, '%')", params[:q], params[:q])
+    @patients = @patients.page(1).per(10)
+
+    builder = Jbuilder.new do |json|
+      json.array! @patients do |patient|
+        patient.as_json_card(json)
+      end
+    end
+
+    render json: builder.attributes!
+  end
+
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_PATIENT)
     @patients = check_access(Patient.where(is_phantom: false).where(institution: @navigation_context.institution), READ_PATIENT).order(:name)

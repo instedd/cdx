@@ -4,8 +4,8 @@
       .row
         .col
           %h2
-            = link_to test_results_path(display_as: "test_order"), class: 'side-link', title: 'Back' do
+            = link_to new_index_encounters_path, class: 'side-link', title: 'Back' do
               = image_tag "arrow-left-white.png"
             New Test Order
 
-= react_component('EncounterNew', context: @navigation_context.to_hash )
+= react_component('EncounterNew', context: @navigation_context.to_hash, mode: @mode)

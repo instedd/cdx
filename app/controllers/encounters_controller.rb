@@ -1,8 +1,19 @@
 class EncountersController < ApplicationController
   before_filter :load_encounter, only: %W(show edit)
 
+  def new_index
+    return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
+  end
+
   def new
     return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
+    @mode = 'existing_tests'
+  end
+
+  def new_fresh
+    return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
+    @mode = 'fresh_tests'
+    render 'new'
   end
 
   def create
