@@ -2,7 +2,7 @@ class DevicesController < ApplicationController
   before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models, :sites]
   before_filter :load_institutions, only: [:new, :create, :edit, :update, :device_models]
   before_filter :load_sites, only: [:new, :create, :edit, :update]
-  before_filter :load_device_models_for_create, only: [:new, :create]
+  before_filter :load_device_models_for_create, only: [:index, :new, :create]
   before_filter :load_device_models_for_update, only: [:edit, :update]
   before_filter :load_filter_resources, only: :index
 
@@ -14,7 +14,6 @@ class DevicesController < ApplicationController
     @devices = check_access(Device, READ_DEVICE).joins(:device_model).includes(:site, :institution, device_model: :institution)
     @devices = @devices.within(@navigation_context.entity)
     @manufacturers = Institution.where(id: @devices.select('device_models.institution_id'))
-    @device_models = DeviceModel.all
 
     @devices = @devices.where(device_models: { institution_id: params[:manufacturer].to_i}) if params[:manufacturer].presence
     @devices = @devices.where(device_model: params[:device_model].to_i) if params[:device_model].present?
