@@ -451,7 +451,7 @@ var AlertRole = React.createClass({
 	getDefaultProps: function() {
 		return {
 			multiple: true,
-			name: 'selectrole',
+			name: 'selectRole',
 		}
 	},
 	onChange(textValue, arrayValue) {
@@ -650,7 +650,7 @@ var AlertSmsMessage = React.createClass({
 				</div>
 
 				<div className = "col pe-2" >
-					<textarea rows="5" cols="50" placeholder = "SMS message" valueLink = {
+					<textarea rows="2" cols="50" placeholder = "SMS message" valueLink = {
 							this.props.valueLink
 						}
 						id = "alertmessage" pattern=".{5,160}" />

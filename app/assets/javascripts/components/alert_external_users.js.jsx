@@ -2,7 +2,7 @@ var AlertExternalUser = React.createClass({
 	mixins: [React.addons.LinkedStateMixin],
 	getInitialState: function() {
 		return {
-			firstName:"", lastName:"", email:"",telephone:"", externalUsers:[],
+			firstName:"", lastName:"", email:"",telephone:"", externalUsers:[]
 		};
 	},
 	clickHandler: function() {
@@ -18,6 +18,8 @@ var AlertExternalUser = React.createClass({
 		this.setState({lastName: ""});
 		this.setState({email: ""});
 		this.setState({telephone: ""});
+
+		this.props.onChangeParentLevel(this.state.externalUsers);			
 	},
 	deleteClickHander: function(index) {
 		TempExternalUsers = this.state.externalUsers;

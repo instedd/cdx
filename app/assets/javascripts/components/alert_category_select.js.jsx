@@ -49,13 +49,14 @@ var AlertCategorySelect = React.createClass({
 			aggregationField: this.props.alert_info.aggregation_type,
 			aggregationFrequencyField: this.props.alert_info.aggregation_frequency,
 			channelField: this.props.alert_info.channel_type,
-			roleField: "",
-			userField: "",
+			roleField: this.props.alert_roles,
+			userField: this.props.alert_internal_users,
 			patientField: this.props.alert_info.notify_patients,
 			smsLimitField: this.props.alert_info.sms_limit,
 			messageField: this.props.alert_info.message,
 			smsMessageField: this.props.alert_info.sms_message,
-			enabledField: this.props.alert_info.enabled
+			enabledField: this.props.alert_info.enabled,
+			external_users:[]
 		};
 	},
 	categoryChanged: function(e) {
@@ -90,6 +91,13 @@ var AlertCategorySelect = React.createClass({
 
 
 	},
+		externalUsersChanged: function(updated_external_users) {
+		
+				this.setState({
+					external_users: updated_external_users
+				});
+		},
+		
 	siteChanged: function(e) {
 		this.setState({
 			siteField: e
@@ -141,6 +149,7 @@ var AlertCategorySelect = React.createClass({
 			message: this.state.messageField,
 			sms_message: this.state.smsMessageField,
 			enabled: this.state.enabledField,
+			external_users: this.state.external_users
 		};
 
 		if (this.props.edit == true) {
@@ -305,7 +314,7 @@ var AlertCategorySelect = React.createClass({
 														/>
 
 
-													<AlertExternalUser />
+												<AlertExternalUser onChangeParentLevel={this.externalUsersChanged} />
 
 													<AlertSmsLimit valueLink={this.linkState('smsLimitField')} />
 

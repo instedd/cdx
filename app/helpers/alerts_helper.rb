@@ -6,8 +6,10 @@ module AlertsHelper
   def display_roles(alert)
     role_names=[]
     alert.alert_recipients.each do |recipient|
-      role = Role.find(recipient.role_id)
-      role_names<< role.name
+      if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["role"]
+        role = Role.find(recipient.role_id)
+        role_names<< role.name
+      end
     end
     role_names.join(',')
   end

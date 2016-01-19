@@ -18,7 +18,7 @@ class User < ActiveRecord::Base
   has_and_belongs_to_many :roles
   has_many :alerts
   has_many :alert_histories
-#friday   has_many :alert_recipients
+  has_many :alert_recipients
   has_many  :recipient_notification_history
 
   include Resource

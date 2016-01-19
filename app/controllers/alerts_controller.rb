@@ -30,6 +30,25 @@ class AlertsController < ApplicationController
       @alert_devices.push(device.id)
     end
     @alert_devices = @alert_devices.join(",")
+    
+    
+    @alert_roles=[]
+    alert_info.alert_recipients.each do |recipient|
+       if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["role"]
+         @alert_roles.push(recipient.role.id)
+       end
+    end
+    @alert_roles = @alert_roles.join(",")
+    
+     @alert_internal_users=[]
+      alert_info.alert_recipients.each do |recipient|
+         if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["internal_user"]
+           @alert_internal_users.push(recipient.user.id)
+         end
+      end
+      @alert_internal_users = @alert_internal_users.join(",")
+      
+      
 
     respond_with alert_info, location: alert_path
   end
@@ -42,18 +61,57 @@ class AlertsController < ApplicationController
 
   def create
     alert_saved_ok = alert_info.save
-    if alert_saved_ok
+    if alert_saved_ok    
+      
       if params[:alert][:roles]
         roles = params[:alert][:roles].split(',')
-        roles.each do |roleid|
-          role = Role.find_by_id(roleid)
+        roles.each do |role_id|
+          role = Role.find_by_id(role_id)
           alertRecipient = AlertRecipient.new
+          alertRecipient.recipient_type = AlertRecipient.recipient_types["role"]
           alertRecipient.role = role
-          #  alertRecipient.user=current_user
           alertRecipient.alert=alert_info
           alertRecipient.save
         end
       end
+      
+      
+      
+      
+      #save internal users
+      if params[:alert][:users_info]
+        internal_users = params[:alert][:users_info].split(',')
+        internal_users.each do |user_id|
+
+          user = User.find_by_id(user_id)
+          alertRecipient = AlertRecipient.new
+          alertRecipient.recipient_type = AlertRecipient.recipient_types["internal_user"]
+          alertRecipient.user = user
+          alertRecipient.alert=alert_info
+          alertRecipient.save
+        end
+      end
+      
+      #save external users
+       if params[:alert][:external_users]
+         external_users = params[:alert][:external_users]
+      
+        # using key/pair as value returned in this format  :
+        # {"0"=>{"id"=>"0", "firstName"=>"a", "lastName"=>"b", "email"=>"c", "telephone"=>"d"}, "1"=>{"id"=>"1", "firstName"=>"aa", "lastName"=>"bb", "email"=>"cc", "telephone"=>"dd"}}       
+         external_users.each do |key, external_user_value|
+           alertRecipient = AlertRecipient.new
+            alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
+            alertRecipient.email = external_user_value["email"]
+            alertRecipient.telephone = external_user_value["telephone"]
+            alertRecipient.first_name = external_user_value["firstName"]
+            alertRecipient.last_name = external_user_value["lastName"]
+             alertRecipient.save
+         end
+         
+         
+      end
+      
+      
 
       alert_info.query="{}";
       if alert_info.category_type == "anomalies"
@@ -153,7 +211,7 @@ class AlertsController < ApplicationController
   private
 
   def alert_params
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :roles, :external_users, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
 
   def new_alert_request_variables

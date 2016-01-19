@@ -1,6 +1,6 @@
 class AlertRecipient < ActiveRecord::Base
 
-  #belongs_to :user
+  belongs_to :user
   belongs_to :alert
   belongs_to :role
 
