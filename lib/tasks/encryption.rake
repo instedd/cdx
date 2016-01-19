@@ -4,13 +4,13 @@ namespace :encryption do
     raise "Please specify OLD_SECRET_KEY and NEW_SECRET_KEY environment variables" if (ENV['OLD_SECRET_KEY'].blank? || ENV['NEW_SECRET_KEY'].blank?)
 
     reencrypt = proc do |str|
-      MessageEncryption.reencrypt str,
+      MessageEncryption.reencrypt(str,
         old_key: ENV['OLD_SECRET_KEY'],
         old_salt: ENV['OLD_SALT'] || MessageEncryption::DEFAULT_SALT,
         old_iv: ENV['OLD_IV'] || MessageEncryption::DEFAULT_IV,
         new_key: ENV['NEW_SECRET_KEY'],
         new_salt: ENV['NEW_SALT'] || MessageEncryption::DEFAULT_SALT,
-        new_iv: ENV['NEW_IV'] || MessageEncryption::DEFAULT_IV
+        new_iv: ENV['NEW_IV'] || MessageEncryption::DEFAULT_IV) rescue "Failed"
     end
 
     puts "Reencrypting raw device messages"
