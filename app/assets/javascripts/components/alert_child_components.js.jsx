@@ -653,7 +653,7 @@ var AlertSmsMessage = React.createClass({
 					<textarea rows="2" cols="50" placeholder = "SMS message" valueLink = {
 							this.props.valueLink
 						}
-						id = "alertmessage" pattern=".{5,160}" />
+						id = "alertsmsmessage" pattern=".{5,160}" />
 				</div>
 			</div>
 		);

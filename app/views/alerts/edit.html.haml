@@ -8,6 +8,6 @@
               = image_tag "arrow-left.png"
             #{alert_info.name}
 
-= react_component('AlertCategorySelect',authenticity_token: form_authenticity_token, edit: true, alert_internal_users: @alert_internal_users, alert_roles:@alert_roles, alert_devices:@alert_devices,  alert_info: alert_info, category_types:Alert.category_types, url:"/alerts", sites:@sites, devices:@devices, anomalie_types:Alert.anomalie_types, aggregation_types:Alert.aggregation_types,aggregation_frequencies:Alert.aggregation_frequencies,channel_types:Alert.channel_types,roles:@roles, users: @users)
+= react_component('AlertCategorySelect',authenticity_token: form_authenticity_token, edit: true, alert_internal_users: @alert_internal_users, alert_external_users: @alert_external_users, alert_roles:@alert_roles, alert_devices:@alert_devices,  alert_info: alert_info, category_types:Alert.category_types, url:"/alerts", sites:@sites, devices:@devices, anomalie_types:Alert.anomalie_types, aggregation_types:Alert.aggregation_types,aggregation_frequencies:Alert.aggregation_frequencies,channel_types:Alert.channel_types,roles:@roles, users: @users)
 
 

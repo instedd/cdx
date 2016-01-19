@@ -7,6 +7,7 @@ var AlertCategorySelect = React.createClass({
 		if (this.props.edit == true) {
 			document.getElementById("alertsmslimit").disabled = true;
 			document.getElementById("alertmessage").disabled = true;
+			document.getElementById("alertsmsmessage").disabled = true;
 			document.getElementById("alerterrorcode").disabled = true;
 
 			this.setState({
@@ -23,8 +24,7 @@ var AlertCategorySelect = React.createClass({
 			document.getElementById(category_keys[2]).disabled = true;
 			document.getElementById(category_keys[3]).disabled = true;
 
-		} else {
-			//new alert
+		} else { //new alert
 			this.setState({
 				disable_all_selects: false
 			});
@@ -91,13 +91,12 @@ var AlertCategorySelect = React.createClass({
 
 
 	},
-		externalUsersChanged: function(updated_external_users) {
-		
-				this.setState({
-					external_users: updated_external_users
-				});
-		},
-		
+	externalUsersChanged: function(updated_external_users) {
+		this.setState({
+			external_users: updated_external_users
+		});
+	},
+
 	siteChanged: function(e) {
 		this.setState({
 			siteField: e
@@ -200,148 +199,148 @@ var AlertCategorySelect = React.createClass({
 							<div className="col">
 								<input type="radio" name="category_type" value={category_keys[0]}  onChange={this.categoryChanged} id={category_keys[0]} / >
 									<label> Anomalies </label>
-									</div>
 								</div>
-								<div className="row">
-									<div className="col pe-2">
-										&nbsp;
-									</div >
-									<div className = "col" >
-										<input type = "radio" name = "category_type"value = {
-												category_keys[1]
-											}
-											onChange = {
-												this.categoryChanged
-											}
-											id = {
-												category_keys[1]
-											}
-											/>
-										<label>Device Errors</label>
+							</div>
+							<div className="row">
+								<div className="col pe-2">
+									&nbsp;
+								</div >
+								<div className = "col" >
+									<input type = "radio" name = "category_type"value = {
+											category_keys[1]
+										}
+										onChange = {
+											this.categoryChanged
+										}
+										id = {
+											category_keys[1]
+										}
+										/>
+									<label>Device Errors</label>
+								</div>
+							</div>
+
+							<div className = "row" >
+								<div className = "col pe-2" >
+									&nbsp;
+									< /div>
+									<div className="col">
+										<input type="radio" name="category_type" value={category_keys[2]} onChange={this.categoryChanged} id={category_keys[2]} / >
+											<label> Quality Assurance </label>
 										</div>
 									</div>
 
-									<div className = "row" >
-										<div className = "col pe-2" >
+
+									<div className="row">
+										<div className="col pe-2">
 											&nbsp;
-											< /div>
-											<div className="col">
-												<input type="radio" name="category_type" value={category_keys[2]} onChange={this.categoryChanged} id={category_keys[2]} / >
-													<label> Quality Assurance </label>
-													</div>
-												</div>
+										</div >
+										<div className = "col" >
+											<input type = "radio" name = "category_type" value = {
+													category_keys[3]
+												}
+												onChange = {
+													this.categoryChanged
+												}
+												id = {
+													category_keys[3]
+												}
+												/>
+											<label>Test Results</label>
+										</div>
+									</div>
+
+									<AlertSite sites = {
+											this.props.sites
+										}
+										value = {
+											this.state.siteField
+										}
+										updateValue = {
+											this.siteChanged
+										}
+										disable_all_selects = {
+											this.state.disable_all_selects
+										}
+										/>
+
+									<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
+
+									<AlertErrorCode valueLink = {
+											this.linkState('errorCodeField')
+										}
+										/>
+
+									<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
+
+									<AlertAggregation aggregation_types = {
+											this.props.aggregation_types
+										}
+										value = {
+											this.state.aggregationField
+										}
+										valueLink = {
+											this.linkState('aggregationField')
+										}
+										disable_all_selects = {
+											this.state.disable_all_selects
+										}
+										/>
+									<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
+
+									<AlertChannel channel_types = {
+											this.props.channel_types
+										}
+										valueLink = {
+											this.linkState('channelField')
+										}
+										disable_all_selects = {
+											this.state.disable_all_selects
+										}
+										/>
+
+									<AlertRole roles={this.props.roles}  valueLink={this.linkState('roleField')} disable_all_selects={this.state.disable_all_selects} />
+
+									<AlertUser users = {
+											this.props.users
+										}
+										valueLink = {
+											this.linkState('userField')
+										}
+										disable_all_selects = {
+											this.state.disable_all_selects
+										}
+										/>
 
 
-												<div className="row">
-													<div className="col pe-2">
-														&nbsp;
-													</div >
-													<div className = "col" >
-														<input type = "radio" name = "category_type" value = {
-																category_keys[3]
-															}
-															onChange = {
-																this.categoryChanged
-															}
-															id = {
-																category_keys[3]
-															}
-															/>
-														<label>Test Results</label>
-														</div>
-													</div>
+									<AlertExternalUser edit={this.props.edit} onChangeParentLevel={this.externalUsersChanged} existingExternalUsers={this.props.alert_external_users} />
 
-													<AlertSite sites = {
-															this.props.sites
-														}
-														value = {
-															this.state.siteField
-														}
-														updateValue = {
-															this.siteChanged
-														}
-														disable_all_selects = {
-															this.state.disable_all_selects
-														}
-														/>
+									<AlertSmsLimit valueLink={this.linkState('smsLimitField')} />
 
-													<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
+									<AlertEmailMessage valueLink = {
+											this.linkState('messageField')
+										}
+										/>
 
-													<AlertErrorCode valueLink = {
-															this.linkState('errorCodeField')
-														}
-														/>
+									<AlertSmsMessage valueLink = {
+											this.linkState('smsMessageField')
+										}
+										/>
 
-													<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
-
-													<AlertAggregation aggregation_types = {
-															this.props.aggregation_types
-														}
-														value = {
-															this.state.aggregationField
-														}
-														valueLink = {
-															this.linkState('aggregationField')
-														}
-														disable_all_selects = {
-															this.state.disable_all_selects
-														}
-														/>
-													<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
-
-													<AlertChannel channel_types = {
-															this.props.channel_types
-														}
-														valueLink = {
-															this.linkState('channelField')
-														}
-														disable_all_selects = {
-															this.state.disable_all_selects
-														}
-														/>
-
-													<AlertRole roles={this.props.roles}  valueLink={this.linkState('roleField')} disable_all_selects={this.state.disable_all_selects} />
-
-													<AlertUser users = {
-															this.props.users
-														}
-														valueLink = {
-															this.linkState('userField')
-														}
-														disable_all_selects = {
-															this.state.disable_all_selects
-														}
-														/>
+									<div className="row">
+										<div className="col pe-2">
+											&nbsp;
+										</div>
+										<div className = "col">
+											<input type = "submit" value = {this.state.submit_button_text} className = "btn-primary" id="submit" />
 
 
-												<AlertExternalUser onChangeParentLevel={this.externalUsersChanged} />
+											<a className = "btn-link" href = "/alerts">Cancel</a>
+										</div>
+									</div>
 
-													<AlertSmsLimit valueLink={this.linkState('smsLimitField')} />
-
-													<AlertEmailMessage valueLink = {
-															this.linkState('messageField')
-														}
-														/>
-
-													<AlertSmsMessage valueLink = {
-															this.linkState('smsMessageField')
-														}
-														/>
-
-													<div className="row">
-														<div className="col pe-2">
-															&nbsp;
-														</div>
-														<div className = "col">
-															<input type = "submit" value = {this.state.submit_button_text} className = "btn-primary" id="submit" />
-
-
-															<a className = "btn-link" href = "/alerts">Cancel</a>
-														</div>					
-													</div>
-
-												</form >
-											</div>
-										);
-									}
-								});
+								</form >
+							</div>
+						);
+					}
+				});

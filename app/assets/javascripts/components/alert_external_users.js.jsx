@@ -2,45 +2,62 @@ var AlertExternalUser = React.createClass({
 	mixins: [React.addons.LinkedStateMixin],
 	getInitialState: function() {
 		return {
-			firstName:"", lastName:"", email:"",telephone:"", externalUsers:[]
+			first_name:"", last_name:"", email:"",telephone:"", externalUsers:[]
 		};
 	},
-	clickHandler: function() {
-		externalPerson = { id:  this.state.externalUsers.length,"firstName": this.state.firstName,"lastName": this.state.lastName,"email": this.state.email,"telephone": this.state.telephone}
+	componentDidMount: function() {
+		if (this.props.existingExternalUsers !=null) {
+			this.setState({
+				externalUsers: this.props.existingExternalUsers});
+			}
+		},
+		clickHandler: function() {
 
-		//Note: maybe this might be a better way , https://facebook.github.io/react/docs/update.html
-		externalUsersTemp = this.state.externalUsers;
-		externalUsersTemp.push(externalPerson);
-		this.setState({
-			externalUsers: externalUsersTemp
-		});
-		this.setState({firstName: ""});
-		this.setState({lastName: ""});
-		this.setState({email: ""});
-		this.setState({telephone: ""});
 
-		this.props.onChangeParentLevel(this.state.externalUsers);			
-	},
-	deleteClickHander: function(index) {
-		TempExternalUsers = this.state.externalUsers;
-		TempExternalUsers.splice(index, 1);
-		this.setState({
-			externalUsers: TempExternalUsers
-		});
+			if (this.props.edit == true) {
+				return false;
+			}
 
-	},
-	render: function() {
-		return (
-			<div>
-				< div className = "row" id = "newuserrow" >
-				<div className = "col pe-2" >
-					<label>
-						Ad-hoc Recipient
+			externalPerson = { id:  this.state.externalUsers.length,"first_name": this.state.first_name,"last_name": this.state.last_name,"email": this.state.email,"telephone": this.state.telephone}
+
+			//Note: maybe this might be a better way , https://facebook.github.io/react/docs/update.html
+			externalUsersTemp = this.state.externalUsers;
+			externalUsersTemp.push(externalPerson);
+			this.setState({
+				externalUsers: externalUsersTemp
+			});
+			this.setState({first_name: ""});
+			this.setState({last_name: ""});
+			this.setState({email: ""});
+			this.setState({telephone: ""});
+
+			this.props.onChangeParentLevel(this.state.externalUsers);
+		},
+		deleteClickHander: function(index) {
+
+			if (this.props.edit == true) {
+				return false;
+			}
+
+			TempExternalUsers = this.state.externalUsers;
+			TempExternalUsers.splice(index, 1);
+			this.setState({
+				externalUsers: TempExternalUsers
+			});
+
+		},
+		render: function() {
+			return (
+				<div>
+					< div className = "row" id = "newuserrow" >
+					<div className = "col pe-2" >
+						<label>
+							Ad-hoc Recipient
 						</label>
 					</div >
 
 					<div className = "col" >
-						<AlertCreateExternalUser firstnameLink={this.linkState('firstName')}  lastnameLink={this.linkState('lastName')} emailLink={this.linkState('email')} telephoneLink={this.linkState('telephone')} onClick={this.clickHandler}  />
+						<AlertCreateExternalUser firstnameLink={this.linkState('first_name')}  lastnameLink={this.linkState('last_name')} emailLink={this.linkState('email')} telephoneLink={this.linkState('telephone')} onClick={this.clickHandler}  />
 					</div>
 				</div>
 
@@ -57,20 +74,20 @@ var AlertCreateExternalUser = React.createClass({
 		onClick:   React.PropTypes.func
 	},
 	clickHandler: function(e) {
-			this.props.onClick(e.target.value);
+		this.props.onClick(e.target.value);
 	},
 	render: function() {
 		return (
 			< div className = "row">
 
 			<div className = "col" >
-				<input type = "text" placeholder = "firstName"
+				<input type = "text" placeholder = "first name"
 					valueLink = {this.props.firstnameLink} name="ggg"
 					pattern=".{2,255}"   />
 			</div>
 
 			<div className = "col" >
-				<input type = "text" placeholder = "lastName"
+				<input type = "text" placeholder = "last name"
 					valueLink = {this.props.lastnameLink}
 					pattern=".{2,255}"  />
 			</div>
@@ -88,7 +105,7 @@ var AlertCreateExternalUser = React.createClass({
 			</div>
 
 			<div className = "col" >
-				<a className = "btn-link"  onClick={this.clickHandler} >Create User</a>
+				<a className = "btn-link"  onClick={this.clickHandler} id="newexternaluser">Create User</a>
 			</div>
 
 		</div>
@@ -109,7 +126,7 @@ var AlertListExternalUser = React.createClass({
 		var self = this;
 		var userNodes = this.props.data.map(function(eachuser,i) {
 			return (
-				<ExternalUser firstName={eachuser.firstName}  lastName={eachuser.lastName} email={eachuser.email}  telephone={eachuser.telephone} key={i} eachuserarrayindex={i} onClick={self.clickHandler.bind(self,i)}  />
+				<ExternalUser first_name={eachuser.first_name}  last_name={eachuser.last_name} email={eachuser.email}  telephone={eachuser.telephone} key={i} eachuserarrayindex={i} onClick={self.clickHandler.bind(self,i)}  />
 			);
 		});
 		return (
@@ -136,10 +153,10 @@ var ExternalUser = React.createClass({
 				&nbsp;
 			</div>
 			<div className = "col" >
-				{this.props.firstName}
+				{this.props.first_name}
 			</div>
 			<div className = "col" >
-				{this.props.lastName}
+				{this.props.last_name}
 			</div>
 			<div className = "col" >
 				{this.props.email}
@@ -148,7 +165,7 @@ var ExternalUser = React.createClass({
 				{this.props.telephone}
 			</div>
 			<div className = "col" >
-				<a className = "btn-link" onClick={this.clickHandler.bind(this,this.props.eachuserarrayindex)} >Delete</a>
+				<a className = "btn-link" onClick={this.clickHandler.bind(this,this.props.eachuserarrayindex)} id="externaluserdelete" >Delete</a>
 			</div>
 		</div>
 	);

@@ -30,25 +30,33 @@ class AlertsController < ApplicationController
       @alert_devices.push(device.id)
     end
     @alert_devices = @alert_devices.join(",")
-    
-    
+
+
     @alert_roles=[]
     alert_info.alert_recipients.each do |recipient|
-       if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["role"]
-         @alert_roles.push(recipient.role.id)
-       end
+      if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["role"]
+        @alert_roles.push(recipient.role.id)
+      end
     end
     @alert_roles = @alert_roles.join(",")
-    
-     @alert_internal_users=[]
-      alert_info.alert_recipients.each do |recipient|
-         if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["internal_user"]
-           @alert_internal_users.push(recipient.user.id)
-         end
+
+    @alert_internal_users=[]
+    alert_info.alert_recipients.each do |recipient|
+      if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["internal_user"]
+        @alert_internal_users.push(recipient.user.id)
       end
-      @alert_internal_users = @alert_internal_users.join(",")
-      
-      
+    end
+    @alert_internal_users = @alert_internal_users.join(",")
+
+
+    @alert_external_users=[]
+    alert_info.alert_recipients.each do |recipient|
+      if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["external_user"]
+        @alert_external_users.push(recipient)
+      end
+    end
+    #   @alert_external_users = @alert_internal_users.join(",")
+
 
     respond_with alert_info, location: alert_path
   end
@@ -61,8 +69,8 @@ class AlertsController < ApplicationController
 
   def create
     alert_saved_ok = alert_info.save
-    if alert_saved_ok    
-      
+    if alert_saved_ok
+
       if params[:alert][:roles]
         roles = params[:alert][:roles].split(',')
         roles.each do |role_id|
@@ -74,10 +82,10 @@ class AlertsController < ApplicationController
           alertRecipient.save
         end
       end
-      
-      
-      
-      
+
+
+
+
       #save internal users
       if params[:alert][:users_info]
         internal_users = params[:alert][:users_info].split(',')
@@ -91,27 +99,28 @@ class AlertsController < ApplicationController
           alertRecipient.save
         end
       end
-      
+
       #save external users
-       if params[:alert][:external_users]
-         external_users = params[:alert][:external_users]
-      
+      if params[:alert][:external_users]
+        external_users = params[:alert][:external_users]
+
         # using key/pair as value returned in this format  :
-        # {"0"=>{"id"=>"0", "firstName"=>"a", "lastName"=>"b", "email"=>"c", "telephone"=>"d"}, "1"=>{"id"=>"1", "firstName"=>"aa", "lastName"=>"bb", "email"=>"cc", "telephone"=>"dd"}}       
-         external_users.each do |key, external_user_value|
-           alertRecipient = AlertRecipient.new
-            alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
-            alertRecipient.email = external_user_value["email"]
-            alertRecipient.telephone = external_user_value["telephone"]
-            alertRecipient.first_name = external_user_value["firstName"]
-            alertRecipient.last_name = external_user_value["lastName"]
-             alertRecipient.save
-         end
-         
-         
+        # {"0"=>{"id"=>"0", "firstName"=>"a", "lastName"=>"b", "email"=>"c", "telephone"=>"d"}, "1"=>{"id"=>"1", "firstName"=>"aa", "lastName"=>"bb", "email"=>"cc", "telephone"=>"dd"}}
+        external_users.each do |key, external_user_value|
+          alertRecipient = AlertRecipient.new
+          alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
+          alertRecipient.email = external_user_value["email"]
+          alertRecipient.telephone = external_user_value["telephone"]
+          alertRecipient.first_name = external_user_value["first_name"]
+          alertRecipient.last_name = external_user_value["last_name"]
+          alertRecipient.alert=alert_info
+          alertRecipient.save
+        end
+
+
       end
-      
-      
+
+
 
       alert_info.query="{}";
       if alert_info.category_type == "anomalies"
@@ -206,7 +215,7 @@ class AlertsController < ApplicationController
       render :edit
     end
   end
-  
+
 
   private
 
