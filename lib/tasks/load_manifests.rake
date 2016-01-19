@@ -7,7 +7,7 @@ namespace :manifests do
 
     data = {
       'cepheid_gene_xpert' => {
-        activation: false,
+        activation: true,
         institution: 'Cepheid',
         owner: 'cepheid_admin@instedd.org'
       },
