@@ -1,12 +1,12 @@
 var PolicyDefinition = React.createClass({
   getInitialState: function() {
     return {
-      statements: this.policyDefinitionStatements(this.props.definition),
+      statements: this.policyDefinitionStatements(this.props.definition, this.props.actions),
       activeTab: 0
     };
   },
 
-  policyDefinitionStatements: function(definition) {
+  policyDefinitionStatements: function(definition, actionsDefinitions) {
     if(definition == null) {
       return [];
     }
@@ -96,10 +96,18 @@ var PolicyDefinition = React.createClass({
         resourceList[statementType] = _hydratateResources(resources);
       }
 
+      var _hydratateAction = function(actions, action) {
+        if(action == "*") {
+          return {id: '*', label: 'Inherit permissions from granter', value: '*'};
+        }
+        var components = action.split(":");
+        return actions[components[0]][components[1]];
+      }
+
       return {
         delegable: statement.delegable == true,
         includeSubsites: false, // TODO: still unsupported in policies definitions
-        actions: statement.action, // FIXME: map to action objects
+        actions: statement.action.map(_hydratateAction.bind(this, actionsDefinitions)),
         resourceList: resourceList,
         resourceType: resourceType,
         resources: statementType
