@@ -3,7 +3,7 @@ namespace :manifests do
   desc "Creates device models from seed manifests and creates their associated institutions with default users"
   task :load => :environment do |task, args|
     default_password = ENV['PASSWORD']
-    raise "Please specify `password` environment variable to be used as the default password for all admins" if default_password.blank?
+    raise "Please specify `PASSWORD` environment variable to be used as the default password for all admins" if default_password.blank?
 
     data = {
       'cepheid_gene_xpert' => {
