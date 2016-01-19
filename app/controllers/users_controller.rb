@@ -5,6 +5,17 @@ class UsersController < ApplicationController
     return unless authorize_resource(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS))
     @users = User.within(@navigation_context.entity)
     @roles = Role.within(@navigation_context.entity).map{|r| {value: r.id, label: r.name}}
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        filename = "Users-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        headers["Content-Type"] = "text/csv"
+        headers["Content-disposition"] = "attachment; filename=#{filename}"
+        self.response_body = build_csv
+      end
+    end
+
   end
 
   def edit
@@ -63,4 +74,15 @@ class UsersController < ApplicationController
   def load_resource
     @user ||= User.find(params[:id])
   end
+
+  def build_csv
+    CSV.generate do |csv|
+      csv << ["Full name", "Roles", "Last activity"]
+      @users.each do |u|
+        roles = u.roles.empty? ? nil : "#{u.roles.pluck(:name).join(",")}"
+        csv << [u.full_name, roles, ApplicationController.helpers.last_activity(u)]
+      end
+    end
+  end
+
 end

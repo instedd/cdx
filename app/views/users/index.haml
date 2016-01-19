@@ -1,11 +1,21 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          = react_component "AddUserLink", roles: @roles
+          %h1
+            Users
 .row
   .col
-    = react_component "AddUserLink", roles: @roles
-    = cdx_table title: 'Users' do |t|
+    = cdx_table do |t|
       - t.columns do
         %col{:width => "30%"}
         %col{:width => "30%"}
         %col{:width => "30%"}
+      - t.actions do
+        = link_to "download CSV", users_path(format: :csv)
+
       - t.thead do
         %tr
           %th Full name
@@ -16,8 +26,4 @@
           %tr{class: (user.invited_pending? ? "pending" : ""), data: {href: edit_user_path(user.id)}}
             %td= user.full_name
             %td= user.roles.map(&:name).join(", ")
-            %td
-              - if user.invited_pending?
-                ="invitation sent #{time_ago_in_words(user.invitation_sent_at, vague: true)} ago"
-              -elsif user.last_sign_in_at.present?
-                ="#{time_ago_in_words(user.last_sign_in_at, vague: true)} ago"
+            %td= last_activity(user)

@@ -90,4 +90,26 @@ describe UsersController, type: :controller do
     end
   end
 
+  describe "GET index" do
+
+    before(:each) do
+      user_to_edit.roles << Role.first
+      user_to_edit.update_computed_policies
+    end
+
+    it "should load index as HTML" do
+      get :index
+      users = assigns(:users)
+      expect(users).to eq([user_to_edit])
+    end
+
+    it "should return a valid CSV when requested" do
+      user_to_edit
+      get :index, format: :csv
+      csv = CSV.parse(response.body)
+      expect(csv[0]).to eq(["Full name", "Roles", "Last activity"])
+      expect(csv[1]).to eq([user_to_edit.full_name,Role.first.name,"Never logged in"])
+    end
+  end
+
 end
