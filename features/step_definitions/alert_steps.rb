@@ -17,14 +17,31 @@ Given(/^the user creates a new alert with name "(.*?)"$/) do |arg1|
   within(@alert.form) do |form|
     form.name.set arg1
     form.description.set 'aaaaa'
-   #   form.errors.set '111'
     form.message.set 'bbb'
+    form.submit.click
+  end
+end
+
+
+
+
+Given(/^the user creates a new alert with all fields with name "(.*?)"$/) do |arg1|
+  @alert = AlertPage.new
+  @alert.load
+      
+  within(@alert.form) do |form|
+    form.name.set arg1
+    form.description.set 'aaaaa'
+    form.message.set 'bbb'
+##     form.device_errors.choose
+    
    #   form.errorcode_category.select
  #    form.find('input[name="commit"]').click
       #  form.find('#submit').click
       form.submit.click
   end
 end
+
 
 
 Then (/^the user should see in list alerts "(.*?)"$/) do |arg1|
