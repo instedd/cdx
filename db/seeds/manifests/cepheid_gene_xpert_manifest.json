@@ -10,55 +10,10 @@
     }
   },
   "custom_fields" : {
-    "patient.ethnicity": {},
-    "patient.race": {},
-    "patient.race_ethnicity": {}
   },
   "field_mapping": {
     "sample.id" : { "lookup": "event.sample_ID" },
-    "patient.gender" : { "case" : [
-      { "lookup": "event.gender" },
-      [
-        { "when" : "M", "then" : "male"},
-        { "when" : "F", "then" : "female"},
-        { "when" : "*", "then" : "unknown"}
-      ]
-    ]},
-    "patient.ethnicity" : { "case" : [
-      { "lookup": "event.ethnicity" },
-      [
-        { "when" : "hispanic", "then" : "hispanic"},
-        { "when" : "not_hispanic", "then" : "not_hispanic"},
-        { "when" : "*", "then" : "unknown"}
-      ]
-    ]},
-    "patient.race" : { "case" : [
-      {"lookup": "event.race"},
-      [
-        { "when" : "2054-5", "then" : "black_or_african_american"},
-        { "when" : "1002-5", "then" : "american_indian_or_alaska_native"},
-        { "when" : "2028-9", "then" : "asian"},
-        { "when" : "2076-8", "then" : "native_hawaiian_or_other_pacific_islander"},
-        { "when" : "2106-3", "then" : "white"},
-        { "when" : "2131-1", "then" : "other"},
-        { "when" : "*", "then" : "unknown"}
-      ]
-    ]},
-    "patient.race_ethnicity" : { "case" : [
-      {"lookup": "event.race_ethnicity"},
-      [
-        { "when" : "2135-2", "then" : "hispanic"},
-        { "when" : "2054-5", "then" : "black_or_african_american"},
-        { "when" : "1002-5", "then" : "american_indian_or_alaska_native"},
-        { "when" : "2028-9", "then" : "asian"},
-        { "when" : "2076-8", "then" : "native_hawaiian_or_other_pacific_islander"},
-        { "when" : "2106-3", "then" : "white"},
-        { "when" : "2131-1", "then" : "other"},
-        { "when" : "*", "then" : "unknown"}
-      ]
-    ]},
     "test.site_user" : { "lookup": "event.system_user" },
-    "encounter.patient_age" : { "lookup": "event.age" },
     "test.start_time" : { "lookup": "event.start_time" },
     "test.end_time" : { "lookup": "event.end_time" },
     "test.id" : { "lookup": "event.event_id" },
