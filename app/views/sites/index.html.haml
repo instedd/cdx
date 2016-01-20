@@ -11,6 +11,8 @@
         - t.columns do
           %col{:width => "50%"}
           %col{:width => "50%"}
+        - t.actions do
+          = link_to "download CSV", sites_path(format: :csv)
         - t.thead do
           %tr
             %th Name

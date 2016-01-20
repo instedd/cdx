@@ -10,6 +10,16 @@ class SitesController < ApplicationController
     apply_filters
 
     @sites.preload_locations!
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        filename = "Sites-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        headers["Content-Type"] = "text/csv"
+        headers["Content-disposition"] = "attachment; filename=#{filename}"
+        self.response_body = build_csv
+      end
+    end
   end
 
   def new
@@ -125,5 +135,14 @@ class SitesController < ApplicationController
   def apply_filters
     @sites = @sites.where("location_geoid LIKE concat(?, '%')", params[:location]) if params[:location].present?
     @sites = @sites.where("name LIKE ?", "%#{params[:name]}%") if params[:name].present?
+  end
+
+  def build_csv
+    CSV.generate do |csv|
+      csv << ["Name", "Location"]
+      @sites.each do |s|
+        csv << [s.name, s.location.try(:name)]
+      end
+    end
   end
 end
