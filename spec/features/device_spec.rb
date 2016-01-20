@@ -145,7 +145,7 @@ describe "device" do
         page.tabs_content.explore_tests.click
       end
 
-      expect(page).to have_content '2 TESTS'
+      expect(page).to have_content '2 tests'
     end
   end
 end

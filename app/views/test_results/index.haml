@@ -8,7 +8,7 @@
           %h1 No tests has been reported
           %p Setup your devices first in order to start reporting
     - else
-      = cdx_table title: pluralize(@total, "Test") do |t|
+      = cdx_table title: pluralize(@total, "test") do |t|
         - t.columns do
           - each_test_column do |id, title, opts|
             %col{:width => opts[:width]}
