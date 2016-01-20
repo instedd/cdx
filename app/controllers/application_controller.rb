@@ -137,6 +137,10 @@ class ApplicationController < ActionController::Base
     new_user_session_path
   end
 
+  def date_options_for_filter
+    [{label: "Previous month", value: 1.month.ago.beginning_of_month}, {label: "Previous week", value: 1.week.ago.beginning_of_week},{label: "Previous year", value: 1.year.ago.beginning_of_year}]
+  end
+
   def nndd
     render text: "NNDD"
   end if Rails.env.test?

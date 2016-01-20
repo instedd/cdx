@@ -6,7 +6,7 @@ class DeviceMessagesController < ApplicationController
     @messages = DeviceMessage.where("device_id IN (?)", device_ids).joins(device: :device_model)
     apply_filters
 
-    @date_options = [{label: "Previous month", value: 1.month.ago.beginning_of_month}, {label: "Previous week", value: 1.week.ago.beginning_of_week},{label: "Previous year", value: 1.year.ago.beginning_of_year}]
+    @date_options = date_options_for_filter
     @devices = check_access(Device, READ_DEVICE).within(@navigation_context.entity)
     @device_models = DeviceModel.all
   end

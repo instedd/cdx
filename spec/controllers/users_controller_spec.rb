@@ -92,8 +92,9 @@ describe UsersController, type: :controller do
 
   describe "GET index" do
 
+    let(:role) { Role.first }
     before(:each) do
-      user_to_edit.roles << Role.first
+      user_to_edit.roles << role
       user_to_edit.update_computed_policies
     end
 
@@ -104,12 +105,46 @@ describe UsersController, type: :controller do
     end
 
     it "should return a valid CSV when requested" do
-      user_to_edit
       get :index, format: :csv
       csv = CSV.parse(response.body)
       expect(csv[0]).to eq(["Full name", "Roles", "Last activity"])
       expect(csv[1]).to eq([user_to_edit.full_name,Role.first.name,"Never logged in"])
     end
+
+    it "should filter by name" do
+      another_user = User.make first_name: "lulululu"
+      another_user.roles << role
+      another_user.update_computed_policies
+
+      get :index, name: "lululu"
+      users = assigns(:users)
+      expect(users).to eq([another_user])
+    end
+
+    it "should filter by role" do
+      another_user = User.make
+      expect(role).to_not eq(Role.last)
+      another_user.roles << Role.last
+      another_user.update_computed_policies
+
+      get :index, role: role.id
+      users = assigns(:users)
+      expect(users).to eq([user_to_edit])
+    end
+
+    it "should filter by last activity" do
+      another_user = User.make(:invited_pending)
+      another_user.roles << role
+      another_user.update_computed_policies
+      user_to_edit.last_sign_in_at = 3.weeks.ago
+      user_to_edit.save
+
+      get :index, last_activity: "#{1.week.ago.strftime('%Y-%m-%d')} 00:00:00 UTC"
+      users = assigns(:users)
+      expect(users).to eq([another_user])
+    end
+
+
   end
 
 end
