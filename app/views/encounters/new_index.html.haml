@@ -14,11 +14,11 @@
     %label Options
   .col
     %ul.nav-list
-      %li{'data-href' => new_encounter_path}
+      %li{'data-href' => new_encounter_path(mode: 'fresh_tests')}
         New test order
         %br
         %i Select an algorithm in order to submit a test order
-      %li{'data-href' => new_encounter_path}
+      %li{'data-href' => new_encounter_path(mode: 'existing_tests')}
         Already reportered tests
         %br
         %i Organize already reportered tests under a test order

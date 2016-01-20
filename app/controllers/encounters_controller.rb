@@ -7,13 +7,6 @@ class EncountersController < ApplicationController
 
   def new
     return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
-    @mode = 'existing_tests'
-  end
-
-  def new_fresh
-    return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
-    @mode = 'fresh_tests'
-    render 'new'
   end
 
   def create
@@ -158,6 +151,12 @@ class EncountersController < ApplicationController
     @blender = Blender.new(@institution)
     @encounter_blender = @blender.load(@encounter)
 
+    encounter_param['patient'].tap do |patient_param|
+      if patient_param.present? && patient_param['id'].present?
+        set_patient_by_id patient_param['id']
+      end
+    end
+
     encounter_param['samples'].each do |sample_param|
       add_sample_by_uuids sample_param['uuids']
     end
@@ -218,6 +217,13 @@ class EncountersController < ApplicationController
     sample_blender
   end
 
+  def set_patient_by_id(id)
+    patient = scoped_patients.find(id)
+    patient_blender = @blender.load(patient)
+    @blender.merge_parent(@encounter_blender, patient_blender)
+    patient_blender
+  end
+
   def add_new_sample_by_entity_id(entity_id)
     sample = Sample.new(institution: @encounter.institution)
     sample.sample_identifiers.build(site: @encounter.site, entity_id: entity_id)
@@ -236,6 +242,10 @@ class EncountersController < ApplicationController
 
   def scoped_test_results
     authorize_resource(TestResult, QUERY_TEST).where(institution: @institution)
+  end
+
+  def scoped_patients
+    authorize_resource(Patient, READ_PATIENT).where(institution: @institution)
   end
 
   def add_test_result_by_uuid(uuid)

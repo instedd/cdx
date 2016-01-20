@@ -27,8 +27,17 @@ class EncounterFormPage < CdxPageBase
   end
 end
 
+class NewFreshEncounterPage < CdxPageBase
+  set_url "/encounters/new?mode=fresh_tests"
+
+  section :site, CdxSelect, "label", text: /Site/i
+  section :patient, CdxSelect, "label", text: /Patient/i
+
+  element :add_sample, :link, "Add sample"
+end
+
 class NewEncounterPage < EncounterFormPage
-  set_url "/encounters/new"
+  set_url "/encounters/new?mode=existing_tests"
 
   section :site, CdxSelect, "label", text: /Site/i
 end

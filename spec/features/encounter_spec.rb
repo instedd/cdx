@@ -256,4 +256,22 @@ describe "create encounter" do
       expect(page.encounter.test_results.count).to eq(2)
     end
   end
+
+  it "should be able to create fresh encounter with existing patient" do
+    patient = institution.patients.make name: Faker::Name.name, site: site
+
+    goto_page NewFreshEncounterPage do |page|
+      page.patient.type_and_select patient.name
+      page.add_sample.click
+      page.add_sample.click
+
+      page.submit
+    end
+
+    expect_page ShowEncounterPage do |page|
+      expect(page.encounter.patient).to eq(patient)
+      expect(page.encounter.samples.count).to eq(2)
+      expect(page.encounter.test_results.count).to eq(0)
+    end
+  end
 end
