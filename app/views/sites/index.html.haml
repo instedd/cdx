@@ -7,7 +7,7 @@
           %h1 This site has no dependencies
           %p Create sites here to keep your institution's hierachy organized
     - else
-      = cdx_table do |t|
+      = cdx_table title: pluralize(@sites.count, "site") do |t|
         - t.columns do
           %col{:width => "50%"}
           %col{:width => "50%"}

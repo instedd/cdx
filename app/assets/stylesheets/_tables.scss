@@ -22,14 +22,13 @@
       padding: 14px 10px;
 
       .table-title {
-        font-family: $sanstitle;
-        font-size: 200%;
-        font-weight: 400;
+        font-size: 120%;
+        font-weight: bold;
         color: $black;
         vertical-align: baseline;
         display: inline-block;
         margin-right: 10px;
-
+        text-transform:none;
       }
 
       .table-actions {

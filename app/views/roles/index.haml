@@ -2,7 +2,7 @@
 
 .row
   .col
-    = cdx_table do |t|
+    = cdx_table title: pluralize(@roles.count, "role") do |t|
       - t.columns do
         %col{:width => "50%"}
         %col{:width => "40%"}

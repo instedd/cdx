@@ -1,6 +1,6 @@
 = render "filters"
 
-= cdx_table do |t|
+= cdx_table title: pluralize(@messages.count, "message") do |t|
   - t.columns do
     %col{:width => "10%"}
     %col{:width => "25%"}
