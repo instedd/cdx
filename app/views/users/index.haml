@@ -25,22 +25,28 @@
 
 .row
   .col
-    = cdx_table title: pluralize(@users.count, "user") do |t|
-      - t.columns do
-        %col{:width => "30%"}
-        %col{:width => "30%"}
-        %col{:width => "30%"}
-      - t.actions do
-        = link_to "download CSV", users_path(format: :csv)
+    - if @users.empty?
+      = empty_data icon: 'ic140-users' do |c|
+        - c.body do
+          %h1 There are no users with access to this location
+          %p Invite other users to join this team
+    - else
+      = cdx_table title: pluralize(@users.count, "user") do |t|
+        - t.columns do
+          %col{:width => "30%"}
+          %col{:width => "30%"}
+          %col{:width => "30%"}
+        - t.actions do
+          = link_to "download CSV", users_path(format: :csv)
 
-      - t.thead do
-        %tr
-          %th Full name
-          %th Roles
-          %th Last Activity
-      - t.tbody do
-        - @users.each do |user|
-          %tr{class: (user.invited_pending? ? "pending" : ""), data: {href: edit_user_path(user.id)}}
-            %td= user.full_name
-            %td= user.roles.map(&:name).join(", ")
-            %td= last_activity(user)
+        - t.thead do
+          %tr
+            %th Full name
+            %th Roles
+            %th Last Activity
+        - t.tbody do
+          - @users.each do |user|
+            %tr{class: (user.invited_pending? ? "pending" : ""), data: {href: edit_user_path(user.id)}}
+              %td= user.full_name
+              %td= user.roles.map(&:name).join(", ")
+              %td= last_activity(user)
