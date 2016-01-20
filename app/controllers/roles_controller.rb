@@ -48,6 +48,7 @@ class RolesController < ApplicationController
     return unless authorize_resource(@role, UPDATE_ROLE)
 
     @role.definition = JSON.pretty_generate(@role.policy.definition)
+    @policy_definition_resources = definition_resources_map
     @can_delete = has_access?(@role, DELETE_ROLE)
   end
 
@@ -107,6 +108,20 @@ class RolesController < ApplicationController
 
   private
 
+  def definition_resources_map
+    resources = {}
+    @role.policy.definition['statement'].each { |statement|
+      (Array.wrap(statement['resource']) + Array.wrap(statement['except'])).each { |resourceKey|
+        if matches = resourceKey.match(/device\/(\d+)/) || resourceKey.match(/.*\?device=(\d+)/)
+          device_id = matches[1]
+          device = Device.find(device_id)
+          resources[resourceKey] = as_json_device(device).attributes!
+        end
+      }
+    }
+    resources
+  end
+
   def as_json_devices_search(devices)
     Jbuilder.new do |json|
       json.array! devices do |device|
@@ -115,7 +130,7 @@ class RolesController < ApplicationController
     end
   end
 
-  def as_json_device(json, device)
+  def as_json_device(json = Jbuilder.new, device)
     json.(device, :uuid, :name, :serial_number, :id)
     json.type :device
     json

@@ -1,17 +1,18 @@
 var PolicyDefinition = React.createClass({
   getInitialState: function() {
     return {
-      statements: this.policyDefinitionStatements(this.props.definition, this.props.actions),
+      statements: this.policyDefinitionStatements(this.props),
       activeTab: 0
     };
   },
 
-  policyDefinitionStatements: function(definition, actionsDefinitions) {
+  policyDefinitionStatements: function(props) {
+    var definition = props.definition;
     if(definition == null) {
       return [];
     }
     definition = JSON.parse(definition);
-    return definition.statement.map(function(statement) {
+    var statements = definition.statement.map(function(statement) {
       var resourceList = {
         'except': [],
         'only': []
@@ -48,71 +49,59 @@ var PolicyDefinition = React.createClass({
 
       if(Array.isArray(statement.except) && (statement.except.length > 0)) {
         statementType = 'except';
-        resources = statement.except.map(function(resource) {
-          var components = _resourceComponents(resource);
-
-          if(!resourceType) {
-            resourceType = components.policyResourceType;
-          }
-          if(components.policyResourceType != resourceType) {
-            // FIXME - show this warnings to the user
-            console.warn("Resource type " + components.policyResourceType + " doesn't match previous resource's type " + resourceType +
-                " - the control may not work OK");
-          }
-          return {type: components.thisResourceType, id: components.thisResourceId};
-        });
+        resources = statement.except;
       } else {
         if(Array.isArray(statement.resource) && (statement.resource.length > 0)) {
-          resources = statement.resource.map(function(resource) {
-            var components = _resourceComponents(resource);
-
-            if(!resourceType) {
-              resourceType = components.policyResourceType;
-            }
-            if(components.policyResourceType != resourceType) {
-              // FIXME - show this warnings to the user
-              console.warn("Resource type " + components.policyResourceType + " doesn't match previous resource's type " + resourceType +
-                  " - the control may not work OK");
-            }
-
-            var result = { type: components.thisResourceType };
-            if(components.thisResourceId) {
-              statementType = 'only';
-              result.id = components.thisResourceId;
-            } else {
-              statementType = 'all';
-            }
-            return result;
-          });
+          resources = statement.resource;
+          if(_resourceComponents(resources[0]).thisResourceId) {
+            statementType = 'only';
+          } else {
+            statementType = 'all';
+          }
         }
       }
 
-      var _hydratateResources = function(resources) {
-        // FIXME: ask the server for the full resource objects
-        return resources;
+      var _hydratateResourceAndCheckType = function(resources, resourceKey) {
+        var components = _resourceComponents(resourceKey);
+
+        if(!resourceType) {
+          resourceType = components.policyResourceType;
+        }
+        if(components.policyResourceType != resourceType) {
+          // FIXME - show this warnings to the user
+          console.warn("Resource type " + components.policyResourceType + " doesn't match previous resource's type " + resourceType +
+              " - the control may not work OK");
+        }
+        return resources[resourceKey];
       }
 
       if(statementType == "only" || statementType == "except") {
-        resourceList[statementType] = _hydratateResources(resources);
+        resourceList[statementType] = resources.map(_hydratateResourceAndCheckType.bind(this, props.resources));
       }
 
       var _hydratateAction = function(actions, action) {
-        if(action == "*") {
-          return {id: '*', label: 'Inherit permissions from granter', value: '*'};
-        }
         var components = action.split(":");
         return actions[components[0]][components[1]];
+      }
+
+      var actions = null;
+      if (statement.action == '*') {
+        actions = [{id: '*', label: 'Inherit permissions from granter', value: '*'}];
+      } else {
+        actions = statement.action.map(_hydratateAction.bind(this, props.actions));
       }
 
       return {
         delegable: statement.delegable == true,
         includeSubsites: false, // TODO: still unsupported in policies definitions
-        actions: statement.action.map(_hydratateAction.bind(this, actionsDefinitions)),
+        actions: actions,
         resourceList: resourceList,
         resourceType: resourceType,
         resources: statementType
       };
     });
+
+    return statements;
   },
 
   newPolicy: function() {
