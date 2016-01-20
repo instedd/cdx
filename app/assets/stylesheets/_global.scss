@@ -246,17 +246,6 @@ a[title="Back"] {
   right: 20px;
   z-index: 1;
 
-  // &:before {
-  //   content: '';
-  //   background: image-url('ic-search.png') no-repeat center $black;
-  //   border-radius: 50%;
-  //   width: 45px;
-  //   height: 45px;
-  //   position: absolute;
-  //   left: 5px;
-  //   top: 5px;
-  // }
-
   .close-notification {
     font-family: $sans;
     font-size: 18px;
@@ -272,7 +261,9 @@ a[title="Back"] {
 }
 
 .explore-link {
+  background: image-url('ic-search-blue.png') no-repeat left 2px;
   font-family: "Titillium Web", sans-serif;
+  color: $gray3;
   text-transform: uppercase;
-  float:right;
+  padding-left: 22px;
 }

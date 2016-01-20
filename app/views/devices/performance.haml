@@ -2,7 +2,7 @@
   .col.pe-8
     %h1 Last 12 months usage
   .col
-    .explore-link
+    .explore-link.pull-right
       %span= link_to 'Explore tests', test_results_path("device.uuid": @device.uuid)
       or
       %span= link_to 'Logs', device_messages_path("device.uuid": @device.uuid)
