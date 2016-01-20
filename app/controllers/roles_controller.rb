@@ -23,7 +23,7 @@ class RolesController < ApplicationController
         definition = JSON.parse(definition)
       rescue => ex
         @role.errors.add :policy, ex.message
-        return render action: 'new'
+        return render_with_definitions 'new'
       end
 
       policy = Policy.new name: @role.name, definition: definition, allows_implicit: true
@@ -31,7 +31,7 @@ class RolesController < ApplicationController
         policy.errors[:definition].each do |error|
           @role.errors.add :policy, error
         end
-        return render action: 'new'
+        return render_with_definitions 'new'
       end
       @role.policy = policy
     end
@@ -39,7 +39,7 @@ class RolesController < ApplicationController
     if @role.save
       redirect_to roles_path, notice: 'Role was successfully created.'
     else
-      render action: 'new'
+      render_with_definitions 'new'
     end
   end
 
@@ -48,7 +48,6 @@ class RolesController < ApplicationController
     return unless authorize_resource(@role, UPDATE_ROLE)
 
     @role.definition = JSON.pretty_generate(@role.policy.definition)
-    @policy_definition_resources = definition_resources_map
     @can_delete = has_access?(@role, DELETE_ROLE)
   end
 
@@ -75,13 +74,13 @@ class RolesController < ApplicationController
           @role.errors.add :policy, error
         end
         @role.definition = role_params[:definition]
-        render action: 'edit'
+        render_with_definitions 'edit'
       end
     else
       @role.policy = nil
       @role.definition = role_params[:definition]
       @role.save
-      render action: 'edit'
+      render_with_definitions 'edit'
     end
   end
 
@@ -107,6 +106,11 @@ class RolesController < ApplicationController
   end
 
   private
+
+  def render_with_definitions action
+    @policy_definition_resources = definition_resources_map
+    render action: action
+  end
 
   def definition_resources_map
     resources = {}
