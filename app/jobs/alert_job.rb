@@ -33,7 +33,7 @@ class AlertJob < ActiveJob::Base
 
     #only inform the recipients if the alert is a per_record type
 
-    if @alert.record?
+    if @alert.record? and (@alert.email? or @alert.email_and_sms?)
       # AlertMailer.alert_email(@alert).deliver_now
       alert_inform_recipient(@alert, alertHistory, 0)
     end

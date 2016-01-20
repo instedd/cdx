@@ -66,23 +66,26 @@ var AlertCategorySelect = React.createClass({
 	},
 	doCategoryChange: function(val) {
 		document.getElementById(val).checked = true;
-		document.getElementById('errorcoderow').style.display = 'none';
-		document.getElementById('errorcoderow').style.visibility = 'hidden';
+//		document.getElementById('errorcoderow').style.display = 'none';
+//		document.getElementById('errorcoderow').style.visibility = 'hidden';
+		$('#errorcoderow').hide();
 
-		document.getElementById('anomalierow').style.display = 'none';
-		document.getElementById('anomalierow').style.visibility = 'hidden';
+	//	document.getElementById('anomalierow').style.display = 'none';
+	//	document.getElementById('anomalierow').style.visibility = 'hidden';
+	$('#anomalierow').hide();
 
 		if (val == 'device_errors') {
-			var e1 = document.getElementById('errorcoderow')
-			e1.style.display = 'flex';
-			e1.style.visibility = 'visible';
+//			var e1 = document.getElementById('errorcoderow')
+	//		e1.style.display = 'flex';
+	//		e1.style.visibility = 'visible';
+				$('#errorcoderow').show();
 		}
 
 		if (val == 'anomalies') {
-			var e1 = document.getElementById('anomalierow')
-			//	e1.style.display = 'block';
-			e1.style.display = 'flex';
-			e1.style.visibility = 'visible';
+	//		var e1 = document.getElementById('anomalierow')
+		//	e1.style.display = 'flex';
+		//	e1.style.visibility = 'visible';
+			$('#anomalierow').show();
 		}
 
 		this.setState({

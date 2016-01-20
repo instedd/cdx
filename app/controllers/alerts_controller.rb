@@ -69,6 +69,7 @@ class AlertsController < ApplicationController
 
   def create
     alert_saved_ok = alert_info.save
+    
     if alert_saved_ok
 
       if params[:alert][:roles]
@@ -82,9 +83,6 @@ class AlertsController < ApplicationController
           alertRecipient.save
         end
       end
-
-
-
 
       #save internal users
       if params[:alert][:users_info]
@@ -116,13 +114,11 @@ class AlertsController < ApplicationController
           alertRecipient.alert=alert_info
           alertRecipient.save
         end
-
-
       end
 
 
-
       alert_info.query="{}";
+      
       if alert_info.category_type == "anomalies"
 
         # check that the start_time field is not missing
@@ -227,7 +223,8 @@ class AlertsController < ApplicationController
     @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
     @roles = check_access(Role, READ_ROLE)
     @devices = check_access(Device, READ_DEVICE)
-
+    
+  
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }
     user_ids = user_ids.uniq

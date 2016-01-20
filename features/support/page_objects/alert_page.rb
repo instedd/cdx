@@ -1,23 +1,22 @@
 class AlertPage < SitePrism::Page
- set_url '/alerts/new'
+  set_url '/alerts/new'
 
   section 'form', '#new_alert' do
- #   element :category, '[name="alert[cateogry_type]"]'
-      element :name, '#alertname'
-      element :description, '#alertdescription'
-      element :errorcode_category, '#device_errors'
-  #     element :errors, '#alerterrorcode'
-  
-  
-  #element.choose('#device_errors')
-   element :device_errors, '#device_errors'
-   element :device_errors_value, '#alert_error_code'
-  
-     element :message, '#alertmessage'
-   #   element :message, '#alert_MESSAGE'
+    element :name, '#alertname'
+    element :description, '#alertdescription'
+    element :errorcode_category, '#device_errors'
+
+    section :anomalies, CdxSelect, "label", text: /Anomalie Type/i
+    element :device_errors_value, "#alerterrorcode"
+    
+    element :message, '#alertmessage'
+    element :smsmessage, '#alertsmsmessage'
+    element :smslimit, '#alertsmslimit'
+
+    section :aggregation, CdxSelect, "label", text: /Aggregation Type/i
+    section :aggregation_frequency, CdxSelect, "label", text: /Aggregation Frequency/i
+    section :channel, CdxSelect, "label", text: /Channel/i
+
     element :submit, '#submit'
   end
 end
-
-
-

@@ -25,11 +25,9 @@ var AlertEnabled = React.createClass({
 var AlertName = React.createClass({
 	render: function() {
 		return (
-			< div className = "row"id = "namerow" >
+			< div className = "row" id = "namerow" >
 			<div className = "col pe-2" >
-				<label >
-					Name
-					< /label>
+				<label>Name</label>
 				</div>
 
 				<div className = "col" >
@@ -67,16 +65,14 @@ var AlertErrorCode = React.createClass({
 		return (
 			< div className = "row" id = "errorcoderow" >
 			<div className = "col pe-2" >
-				<label>
-					Errors
-				</label>
+				<label>Errors</label>
 			</div >
 
 			<div className = "col" >
 				<input type = "text" placeholder = "All error codes will be reported" valueLink = {
 						this.props.valueLink
 					}
-					id = "alerterrorcode" />
+					id = "alerterrorcode"  name="alerterrorcode" />
 			</div>
 		</div >
 	);
@@ -120,8 +116,8 @@ var AlertSite = React.createClass({
 		return (
 			< div className = "row" >
 			<div className = "col pe-2" >
-				<label > Site < /label>
-				</div >
+				<label>Site</label>
+				</div>
 				<div className = "col" >
 					<Select
 						name = "site"
@@ -184,7 +180,7 @@ var AlertDevice = React.createClass({
 		return (
 			< div className = "row" >
 			<div className = "col pe-2" >
-				<label > Device < /label>
+				<label>Device</label>
 				</div >
 				<div className = "col" >
 					<Select
@@ -223,8 +219,7 @@ var AlertAnomalieType = React.createClass({
 	},
 	//https://github.com/JedWatson/react-select/issues/256
 	onChange(textValue, arrayValue) {
-		//	this.props.valueLink.requestChange(textValue);
-		this.props.valueLink.requestChange(_.pluck(arrayValue, 'value').join());
+	this.props.valueLink.requestChange(arrayValue[0].label);
 	},
 	render: function() {
 		var options = [];
@@ -242,10 +237,10 @@ var AlertAnomalieType = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row"id = "anomalierow" >
+			< div className = "row" id = "anomalierow" >
 			<div className = "col pe-2" >
-				<label > Anomalies < /label>
-				</div >
+				<label>Anomalie Type</label>
+				</div>
 				<div className = "col" >
 					<Select
 						name = "anomalie"
@@ -300,13 +295,13 @@ var AlertAggregation = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row"id = "aggregationrow" >
+			< div className = "row" id = "aggregationrow" >
 			<div className = "col pe-2" >
-				<label > Aggregation < /label>
-				</div >
+				<label>Aggregation Type</label>
+				</div>
 				<div className = "col" >
 					<Select
-						name = "anomalie"
+						name = "aggregation"
 						value = {
 							value || valueLink.value
 						}
@@ -358,13 +353,13 @@ var AlertAggregationFrequency = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row"id = "aggregationfrequenciesrow" >
+			< div className = "row" id = "aggregationfrequenciesrow" >
 			<div className = "col pe-2" >
-				<label > Aggregation frequencies < /label>
-				</div >
+				<label>Aggregation Frequency</label>
+				</div>
 				<div className = "col" >
 					<Select
-						name = "anomalie"
+						name = "aggregation_frequency"
 						value = {
 							value || valueLink.value
 						}
@@ -416,9 +411,9 @@ var AlertChannel = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row"id = "channelrow" >
+			< div className = "row" id = "channelrow" >
 			<div className = "col pe-2" >
-				<label > Channel < /label>
+				<label>Channel</label>
 				</div >
 				<div className = "col" >
 					<Select
@@ -603,7 +598,7 @@ id="alertpatient"
 var AlertSmsLimit = React.createClass({
 	render: function() {
 		return (
-			< div className = "row"id = "smslimitrow" >
+			< div className = "row" id = "smslimitrow" >
 			<div className = "col pe-2" >
 				<label>SMS Per Day Limit</label>
 			</div>
