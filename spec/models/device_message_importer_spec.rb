@@ -299,9 +299,9 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(tests.first['_source']['test']['custom_fields']['qc_date']).to eq("2017-07-04T00:00:00.000Z")
         expect(tests.first['_source']['test']['custom_fields']['qc_passed']).to eq("passed")
 
-        expect(tests.first['_source']['test']['type']).to eq("specimen")
-        expect(tests.first['_source']['test']['name']).to eq("TBMI")
-        expect(tests.first['_source']['test']['status']).to eq("success")
+        expect(tests.first['_source']['test']['type']).to eq('qc')
+        expect(tests.first['_source']['test']['name']).to eq('TBMI')
+        expect(tests.first['_source']['test']['status']).to eq('error')
         expect(tests.first['_source']['test']['start_time']).to eq('2015-09-28T23:46:53.000Z')
         expect(tests.first['_source']['test']['end_time']).to eq('2015-09-29T01:33:17.000Z')
 

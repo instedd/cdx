@@ -60,7 +60,15 @@
     "test.error_code": {
       "lookup": "errors"
     },
-    "test.type": "specimen",
+    "test.type": {
+      "case" : [
+        {"lookup" : "type"},
+        [
+          {"when": "1", "then" : "specimen"},
+          {"when": "2", "then" : "qc"}
+        ]
+      ]
+    },
     "test.tbcount1": {
       "lookup": "TbCount1"
     },
@@ -80,11 +88,17 @@
       "lookup": "swRev"
     },
     "test.cartridge_expiration_date": {
-      "parse_date": [
+      "if" : [
+        {"equals" : [{"lookup" : "cartExpiry"}, null]},
+        null,
         {
-          "lookup": "cartExpiry"
-        },
-        "%Y-%m-%d"
+          "parse_date": [
+            {
+              "lookup": "cartExpiry"
+            },
+            "%Y-%m-%d"
+          ]
+        }
       ]
     },
     "test.cartridge_number": {
@@ -98,7 +112,13 @@
         [
           {
             "when": "TRUE",
-            "then": "success"
+            "then": {
+              "if" : [
+                {"equals" : [{"lookup": "errors"}]},
+                "success",
+                "error"
+              ]
+            }
           },
           {
             "when": "FALSE",
@@ -108,11 +128,17 @@
       ]
     },
     "test.qc_date": {
-      "parse_date": [
+      "if" : [
+        {"equals" : [{"lookup" : "lastInstrQcDate"}, null]},
+        null,
         {
-          "lookup": "lastInstrQcDate"
-        },
-        "%Y-%m-%d"
+          "parse_date": [
+            {
+              "lookup": "lastInstrQcDate"
+            },
+            "%Y-%m-%d"
+          ]
+        }
       ]
     },
     "test.qc_passed": {
@@ -134,6 +160,9 @@
     },
     "device.serial_number": {
       "lookup": "unitSerial"
+    },
+    "test.site_user": {
+      "lookup": "operator"
     },
     "test.name": "TBMI",
     "test.assays.condition": "mtb",
@@ -172,3 +201,4 @@
     }
   }
 }
+
