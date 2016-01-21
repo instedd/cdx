@@ -114,15 +114,17 @@ class RolesController < ApplicationController
 
   def definition_resources_map
     resources = {}
-    @role.policy.definition['statement'].each { |statement|
-      (Array.wrap(statement['resource']) + Array.wrap(statement['except'])).each { |resourceKey|
-        if matches = resourceKey.match(/device\/(\d+)/) || resourceKey.match(/.*\?device=(\d+)/)
-          device_id = matches[1]
-          device = Device.find(device_id)
-          resources[resourceKey] = as_json_device(device).attributes!
-        end
+    if @role.policy.try :definition
+      @role.policy.definition['statement'].each { |statement|
+        (Array.wrap(statement['resource']) + Array.wrap(statement['except'])).each { |resourceKey|
+          if matches = resourceKey.match(/device\/(\d+)/) || resourceKey.match(/.*\?device=(\d+)/)
+            device_id = matches[1]
+            device = Device.find(device_id)
+            resources[resourceKey] = as_json_device(device).attributes!
+          end
+        }
       }
-    }
+    end
     resources
   end
 
