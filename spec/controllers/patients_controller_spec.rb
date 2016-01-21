@@ -480,4 +480,21 @@ RSpec.describe PatientsController, type: :controller do
       expect(response).to be_forbidden
     end
   end
+
+  context "search" do
+    it "should search in entire institution" do
+      site1 = institution.sites.make
+      site2 = institution.sites.make
+      other_institution = Institution.make user: user
+
+      patient1 = institution.patients.make name: 'john doe', site: site1
+      patient2 = institution.patients.make name: 'john foo', site: site2
+      other_institution.patients.make name: 'john alone'
+
+      get :search, q: 'john', context: site1.uuid
+
+      json_response = JSON.parse(response.body)
+      expect(json_response.map { |p| p["id"] }).to match([patient1.id, patient2.id])
+    end
+  end
 end

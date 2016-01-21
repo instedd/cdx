@@ -1,7 +1,6 @@
 class PatientsController < ApplicationController
   def search
     @patients = check_access(Patient.where(is_phantom: false).where(institution: @navigation_context.institution), READ_PATIENT).order(:name)
-    @patients = @patients.within(@navigation_context.entity)
     @patients = @patients.where("name LIKE concat('%', ?, '%') OR entity_id LIKE concat('%', ?, '%')", params[:q], params[:q])
     @patients = @patients.page(1).per(10)
 
