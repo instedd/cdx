@@ -1,6 +1,4 @@
-#location_service_url: "http://locations.instedd.org"
-location_service_url: "http://locations-stg.instedd.org"
-#location_service_set: "test"
-location_service_set: "ng"
+location_service_url: "http://locations.instedd.org"
+location_service_set: "test"
 web_session_timeout: 120
 user_password_expire_in_months: 3

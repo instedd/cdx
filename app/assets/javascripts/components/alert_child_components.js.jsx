@@ -114,11 +114,11 @@ var AlertSite = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row" >
-			<div className = "col pe-2" >
-				<label>Site</label>
+			< div className = "row">
+			<div className = "col pe-2">
+				<label>Sites</label>
 				</div>
-				<div className = "col" >
+				<div className = "col">
 					<Select
 						name = "site"
 						value = {
@@ -180,8 +180,8 @@ var AlertDevice = React.createClass({
 		return (
 			< div className = "row" >
 			<div className = "col pe-2" >
-				<label>Device</label>
-				</div >
+				<label>Devices</label>
+				</div>
 				<div className = "col" >
 					<Select
 						name = "device"
@@ -477,7 +477,7 @@ var AlertRole = React.createClass({
 		return (
 			< div className = "row" >
 			<div className = "col pe-2" >
-				<label > Role < /label>
+				<label>Roles</label>
 				</div >
 				<div className = "col" >
 					<Select

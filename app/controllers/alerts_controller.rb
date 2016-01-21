@@ -223,8 +223,7 @@ class AlertsController < ApplicationController
     @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
     @roles = check_access(Role, READ_ROLE)
     @devices = check_access(Device, READ_DEVICE)
-    
-  
+
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }
     user_ids = user_ids.uniq

@@ -3,11 +3,16 @@ class CdxSelect < SitePrism::Section
     select_elem.find(".Select-placeholder").click
     select_elem.find(".Select-option", text: text).click
   end
-  
+
   def set_exact(text)
-     select_elem.find(".Select-placeholder").click
-     select_elem.find(".Select-option", text: text, :match => :prefer_exact).click
-   end
+    select_elem.find(".Select-placeholder").click
+    select_elem.find(".Select-option", text: text, :match => :prefer_exact).click
+  end
+
+  def set_exact_multi(text)
+    select_elem.find(".Select-placeholder").trigger('click')
+    #  select_elem.find(".Select-option", text: text, :match => :prefer_exact).click
+  end
 
   def type_and_select(text)
     select_elem.find(".Select-control").click
@@ -44,5 +49,5 @@ class CdxSelect < SitePrism::Section
       elem.find(".Select")
     end
   end
-  
+
 end

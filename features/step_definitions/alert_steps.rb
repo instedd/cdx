@@ -26,12 +26,6 @@ end
 
 Given(/^the user creates a new error category alert with all fields with name "(.*?)"$/) do |arg1|
 
-=begin
-  institution2 = Institution.make user: @user
-  site2 = institution2.sites.make
-  device2 = site2.devices.make
-=end 
-
   @alert = AlertPage.new
   @alert.load
 
@@ -44,11 +38,25 @@ Given(/^the user creates a new error category alert with all fields with name "(
 
     form.choose 'device_errors'
     form.device_errors_value.set 2
+    
+    form.sites.set_exact_multi "Mrs. Terry Goyette"
+
+    form.devices.set_exact_multi "Mr. Alphonso Witting"
+
+    form.roles.set_exact_multi "Institution Aric Smith Reader"
+
+    form.internal_users.set_exact_multi @user.email
 
     form.aggregation.set "aggregated"
     form.aggregation_frequency.set "day"
 
     form.channel.set_exact "sms"
+
+    form.externaluser_firstname.set 'bob'
+    form.externaluser_lastname.set 'smith'
+    form.externaluser_email.set 'aa@bb.com'
+    form.externaluser_telephone.set '1234567'
+    form.new_externaluser.click
 
     form.submit.click
   end
@@ -57,10 +65,9 @@ end
 
 Given(/^the user creates a new anomalie category alert with all fields with name "(.*?)"$/) do |arg1|
 
-   institution2 = Institution.make user: @user
- #  site2 = institution2.sites.make
- #   site2= Site.make institution: (Institution.make user: @user)
-   #device2 = site2.devices.make
+  #  institution2 = Institution.make user: @user
+  site = @navigation_context.entity.sites.make
+  device = site.devices.make
 
 
   @alert = AlertPage.new
@@ -76,10 +83,24 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     form.choose 'anomalies'
     form.anomalies.set "missing_start_time"
 
+    form.sites.set_exact_multi "Mrs. Terry Goyette"
+
+    form.devices.set_exact_multi "Mr. Alphonso Witting"
+
+    form.roles.set_exact_multi "Institution Aric Smith Reader"
+
+    form.internal_users.set_exact_multi @user.email
+
     form.aggregation.set "aggregated"
     form.aggregation_frequency.set "day"
 
     form.channel.set_exact "sms"
+
+    form.externaluser_firstname.set 'bob'
+    form.externaluser_lastname.set 'smith'
+    form.externaluser_email.set 'aa@bb.com'
+    form.externaluser_telephone.set '1234567'
+    form.new_externaluser.click
 
     form.submit.click
   end

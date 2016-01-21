@@ -6,6 +6,7 @@
 
 require 'cucumber/rails'
 
+
 # Capybara defaults to CSS3 selectors rather than XPath.
 # If you'd prefer to use XPath, just uncomment this line and adjust any
 # selectors in your step definitions to use the XPath syntax.
@@ -57,13 +58,26 @@ end
 Cucumber::Rails::Database.javascript_strategy = :truncation
 require 'machinist/active_record'
 
-Dir[ File.dirname(__FILE__) + "/../../spec/support/blueprints*"].each {|file| require file }
+#Dir[ File.dirname(__FILE__) + "/../../spec/support/blueprints*"].each {|file| require file }
+Dir[ File.dirname(__FILE__) + "/../../spec/support/*"].each {|file| require file }
 
 require 'capybara/cucumber'
 require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
 
 Capybara.default_driver = :poltergeist
+ 
+=begin 
+ Capybara.register_driver :poltergeist do |app|
+     options = {
+:window_size => [4920, 6000]
+     }
+     Capybara::Poltergeist::Driver.new(app, options)
+ end
+=end 
+
+#needed for adding devices/sites to tests
+Before { LocationService.fake! }
 
 Before('@single_tenant') do
   Settings.single_tenant = true
