@@ -14,7 +14,10 @@ class RolesController < ApplicationController
   end
 
   def create
-    @role = Role.new(role_params)
+    @institution = @navigation_context.institution
+    return unless authorize_resource(@institution, CREATE_INSTITUTION_ROLE)
+    @role = @institution.roles.new(role_params)
+
     if @role.name.present? && (definition = role_params[:definition]).present?
       begin
         definition = JSON.parse(definition)
@@ -98,7 +101,7 @@ class RolesController < ApplicationController
   private
 
   def role_params
-    params.require(:role).permit(:name, :institution_id, :site_id, :definition)
+    params.require(:role).permit(:name, :site_id, :definition)
   end
 
   def load_institutions_and_sites

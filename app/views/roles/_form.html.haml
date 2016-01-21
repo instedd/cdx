@@ -12,9 +12,7 @@
     .col
       = f.text_field :name
 
-  - if @accessible_institutions == 1
-    = f.hidden_field :institution_id, value: @institution.id
-  - else
+  - if @accessible_institutions != 1
     .row
       .col.pe-2
         = f.label :institution_id
