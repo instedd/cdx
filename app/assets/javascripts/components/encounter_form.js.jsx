@@ -1,10 +1,4 @@
-var EncounterForm = React.createClass({
-  getDefaultProps: function() {
-    return {
-      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: _.capitalize(v)};})
-    }
-  },
-
+var BaseEncounterForm = {
   getInitialState: function() {
     return {
       encounter: this.props.encounter
@@ -27,31 +21,7 @@ var EncounterForm = React.createClass({
     }
   },
 
-  showAddSamplesModal: function(event) {
-    this.refs.addSamplesModal.show()
-    event.preventDefault()
-  },
-
-  closeAddSamplesModal: function (event) {
-    this.refs.addSamplesModal.hide();
-    event.preventDefault();
-  },
-
-  showUnifySamplesModal: function(sample) {
-    this.setState(React.addons.update(this.state, {
-      unifyingSample: { $set: sample }
-    }));
-
-    this.refs.unifySamplesModal.show()
-    event.preventDefault()
-  },
-
-  closeUnifySamplesModal: function (event) {
-    this.refs.unifySamplesModal.hide();
-    event.preventDefault();
-  },
-
-  addNewSamplesModal: function(event) {
+  addNewSamples: function(event) {
     this._ajax_put('/encounters/add/new_sample');
     event.preventDefault();
   },
@@ -88,6 +58,38 @@ var EncounterForm = React.createClass({
         }
       }
     });
+  },
+}
+
+var EncounterForm = React.createClass(_.merge({
+  getDefaultProps: function() {
+    return {
+      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: _.capitalize(v)};})
+    }
+  },
+
+  showAddSamplesModal: function(event) {
+    this.refs.addSamplesModal.show()
+    event.preventDefault()
+  },
+
+  closeAddSamplesModal: function (event) {
+    this.refs.addSamplesModal.hide();
+    event.preventDefault();
+  },
+
+  showUnifySamplesModal: function(sample) {
+    this.setState(React.addons.update(this.state, {
+      unifyingSample: { $set: sample }
+    }));
+
+    this.refs.unifySamplesModal.show()
+    event.preventDefault()
+  },
+
+  closeUnifySamplesModal: function (event) {
+    this.refs.unifySamplesModal.hide();
+    event.preventDefault();
   },
 
   unifySample: function(sample) {
@@ -215,7 +217,7 @@ var EncounterForm = React.createClass({
             <NewSamplesList samples={this.state.encounter.new_samples} onRemoveSample={this.removeNewSample} />
 
             <p>
-              <a className="btn-href" href='#' onClick={this.addNewSamplesModal}><span className="icon-add"></span> Append new sample</a>
+              <a className="btn-href" href='#' onClick={this.addNewSamples}><span className="icon-add"></span> Append new sample</a>
             </p>
             <p>
               <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
@@ -275,4 +277,4 @@ var EncounterForm = React.createClass({
     );
   },
 
-});
+}, BaseEncounterForm));

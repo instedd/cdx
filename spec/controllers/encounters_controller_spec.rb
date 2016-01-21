@@ -789,6 +789,26 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       expect(json_response['encounter']['new_samples']).to eq([{'entity_id' => 'eid:1003'},{'entity_id' => new_entity_id}])
       expect(json_response['sample']['entity_id']).to eq(new_entity_id)
     end
+
+    it "should preserve patient by id" do
+      patient = institution.patients.make
+
+      put :new_sample, encounter: {
+        institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
+        patient: { id: patient.id },
+        samples: [],
+        new_samples: [],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['patient']).to include({id: patient.id, name: patient.name})
+      expect(json_response['encounter']['new_samples'].count).to eq(1)
+    end
   end
 
   def institution_json(institution)

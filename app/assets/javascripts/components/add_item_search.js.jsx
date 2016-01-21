@@ -32,7 +32,6 @@ var AddItemSearch = React.createClass({
 
   handleSearch: function(query) {
     if(query == '') {
-      console.log('hi!');
       this.setState(React.addons.update(this.state, {
         items: { $set: [] }
       }));

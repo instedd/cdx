@@ -37,7 +37,13 @@ var EncounterNew = React.createClass({
       <div>
         {siteSelect}
 
-        <EncounterForm encounter={this.state.encounter} context={this.props.context} />
+        {(function(){
+          if (this.props.mode == 'existing_tests') {
+            return <EncounterForm encounter={this.state.encounter} context={this.props.context} />
+          } else {
+            return <FreshTestsEncounterForm encounter={this.state.encounter} context={this.props.context} />
+          }
+        }.bind(this))()}
       </div>
     );
   },

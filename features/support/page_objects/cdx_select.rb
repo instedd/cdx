@@ -4,6 +4,16 @@ class CdxSelect < SitePrism::Section
     select_elem.find(".Select-option", text: text).click
   end
 
+  def type_and_select(text)
+    select_elem.find(".Select-control").click
+    text.each_char do |char|
+      page.find("body").native.send_key char
+    end
+
+    select_elem.wait_for_ajax
+    select_elem.find(".Select-option").click
+  end
+
   def value
     select_elem.find(".Select-placeholder").text
   end

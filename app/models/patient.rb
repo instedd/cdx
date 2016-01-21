@@ -44,7 +44,7 @@ class Patient < ActiveRecord::Base
   end
 
   def as_json_card(json)
-    json.(self, :id, :name, :age, :gender, :address, :phone, :email)
+    json.(self, :id, :name, :age, :gender, :address, :phone, :email, :entity_id)
     json.dob dob_time.try { |d| d.strftime(I18n.t('date.input_format.pattern')) }
   end
 
