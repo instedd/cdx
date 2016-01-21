@@ -274,4 +274,29 @@ describe "create encounter" do
       expect(page.encounter.test_results.count).to eq(0)
     end
   end
+
+  it "should be able to create fresh encounter with new patient" do
+    goto_page NewFreshEncounterPage do |page|
+      page.new_patient.click
+    end
+
+    expect_page NewPatientPage do |page|
+      page.name.set "John Doe"
+      page.patient_id.set "1001"
+      page.submit
+    end
+
+    expect_page NewFreshEncounterPage do |page|
+      page.add_sample.click
+      page.add_sample.click
+      page.submit
+    end
+
+    expect_page ShowEncounterPage do |page|
+      expect(page.encounter.patient.name).to eq("John Doe")
+      expect(page.encounter.patient.entity_id).to eq("1001")
+      expect(page.encounter.samples.count).to eq(2)
+      expect(page.encounter.test_results.count).to eq(0)
+    end
+  end
 end

@@ -1,6 +1,6 @@
 var PatientSelect = React.createClass({
   getInitialState: function() {
-    return { patient : null };
+    return { patient : this.props.patient };
   },
 
   getDefaultProps: function() {
@@ -34,6 +34,12 @@ var PatientSelect = React.createClass({
           cacheAsyncResults={false}
           filterOptions={this.filterOptions}>
         </Select>
+
+        {(function(){
+          if (this.state.patient == null) {
+            return <a className="btn-add-link" href={"/patients/new?" + $.param({next_url: window.location.href})} title="Create new patient"><span className="iconb-add"></span></a>;
+          }
+        }.bind(this))()}
 
         <br/>
         <br/>

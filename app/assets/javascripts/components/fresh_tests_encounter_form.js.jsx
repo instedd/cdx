@@ -2,7 +2,7 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
   render: function() {
     return (
       <div>
-        <PatientSelect context={this.props.context} onPatientChanged={this.onPatientChanged} />
+        <PatientSelect patient={this.state.encounter.patient} context={this.props.context} onPatientChanged={this.onPatientChanged} />
 
         <div className="row">
           <div className="col pe-2">
