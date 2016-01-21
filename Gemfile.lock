@@ -378,7 +378,7 @@ GEM
     net-ssh (2.9.2)
     netrc (0.10.3)
     newrelic_rpm (3.14.0.305)
-    nokogiri (1.6.7.1)
+    nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
     notiffany (0.0.7)
       nenv (~> 0.1)
@@ -648,7 +648,7 @@ DEPENDENCIES
   d3_rails
   database_cleaner
   decent_exposure
-  devise
+  devise (~> 3.5.2)
   devise_invitable
   devise_security_extension!
   doorkeeper
@@ -674,7 +674,7 @@ DEPENDENCIES
   machinist (~> 1.0)
   mysql2
   newrelic_rpm
-  nokogiri (~> 1.6.7.1)
+  nokogiri (~> 1.6.7.2)
   oj
   omniauth
   omniauth-google-oauth2

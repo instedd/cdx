@@ -10,7 +10,7 @@ gem 'lodash-rails'
 gem 'awesome_nested_set', '~> 3.0.0.rc.3'
 gem 'csv_builder'
 gem 'decent_exposure'
-gem 'nokogiri', '~> 1.6.7.1'
+gem 'nokogiri', '~> 1.6.7.2'
 gem 'react-rails', '~> 1.3.2'
 gem 'foreman'
 gem 'paperclip'
@@ -74,7 +74,7 @@ group :development do
   # gem 'meta_request'
 end
 
-gem 'devise'
+gem 'devise', '~> 3.5.2'
 gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
 gem 'devise_invitable'
 gem 'omniauth'
