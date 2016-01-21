@@ -37,7 +37,8 @@
           %col{:width => "30%"}
           %col{:width => "30%"}
         - t.actions do
-          = link_to "download CSV", users_path(format: :csv)
+          = link_to users_path(format: :csv), title: 'Download CSV' do
+            .icon-download.icon-gray
 
         - t.thead do
           %tr

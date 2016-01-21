@@ -13,8 +13,8 @@
           - each_test_column do |id, title, opts|
             %col{:width => opts[:width]}
         - t.actions do
-          = link_to "download CSV", test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
-
+          = link_to test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as)), title: 'Download CSV' do
+            .icon-download.icon-gray
         - t.thead do
           %tr
             - each_test_column do |id, title, opts|

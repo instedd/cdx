@@ -5,8 +5,8 @@
 /*---------------------- Icons 20 x 20 black ------------------------*/
 
 
-span[class^="icon-"],
-span[class*=" icon-"] {
+[class^="icon-"],
+[class*=" icon-"] {
   display: inline-block;
   width: 20px;
   height: 20px;
@@ -14,6 +14,10 @@ span[class*=" icon-"] {
   vertical-align: text-top;
   background-image: image-url($icons-20x20-black);
   background-repeat: no-repeat;
+  /*------------ Gray Icons --------------*/
+  &.icon-gray {
+    opacity: 0.4;
+  }
 }
 
 .icon-add             {background-position:      0px 0px};
@@ -22,7 +26,8 @@ span[class*=" icon-"] {
 .icon-separe          {background-position:    -60px 0px};
 .icon-print           {background-position:    -80px 0px};
 .icon-block           {background-position:   -100px 0px};
-.icon-ellipsis        {background-position:   -120px 0px};
+.icon-download        {background-position:   -120px 0px};
+.icon-ellipsis        {background-position:   -140px 0px};
 
 
 
