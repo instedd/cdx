@@ -69,8 +69,13 @@ class AlertsController < ApplicationController
 
   def create
     alert_saved_ok = alert_info.save
-    
-    if alert_saved_ok
+    external_users_ok = true
+    error_text=Hash.new
+
+    if alert_saved_ok==false
+      error_text = alert_info.errors.messages
+    else
+      alert_saved_ok
 
       if params[:alert][:roles]
         roles = params[:alert][:roles].split(',')
@@ -112,13 +117,18 @@ class AlertsController < ApplicationController
           alertRecipient.first_name = external_user_value["first_name"]
           alertRecipient.last_name = external_user_value["last_name"]
           alertRecipient.alert=alert_info
-          alertRecipient.save
+
+          if alertRecipient.save == false
+            external_users_ok = false
+            error_text = error_text.merge alertRecipient.errors.messages
+          end
+
         end
       end
 
 
       alert_info.query="{}";
-      
+
       if alert_info.category_type == "anomalies"
 
         # check that the start_time field is not missing
@@ -173,7 +183,7 @@ class AlertsController < ApplicationController
 
     alert_query_updated_ok = alert_info.update(query: alert_info.query)
 
-    if alert_saved_ok and alert_query_updated_ok
+    if alert_saved_ok and alert_query_updated_ok and external_users_ok
       #format.html { redirect_to alerts_path, notice: 'Alert was successfully created.' }
       # format.json { render action: 'show', status: :created, location: alert_info }
       render json: alert_info
@@ -181,7 +191,7 @@ class AlertsController < ApplicationController
       ##      new_alert_request_variables
       #format.html { render action: 'new' }
       #format.json { render json: alert_info.errors, status: :unprocessable_entity }
-      render json: alert_info.errors, status: :unprocessable_entity
+      render json: error_text, status: :unprocessable_entity
     end
   end
 
