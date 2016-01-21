@@ -14,9 +14,7 @@
             %input{type: "text", name: "name", value: params["name"]}
           .filter
             %label.block Role
-            = cdx_select name: "role", value: params["role"] do |select|
-              - select.item "", "Show all"
-              - select.items @roles, :id, :name
+            = react_component('CdxSelect', items: @roles, value: params["role"], name: 'role')
           .filter
             %label.block Last activity
             = cdx_select name: "last_activity", value: params["last_activity"] do |select|

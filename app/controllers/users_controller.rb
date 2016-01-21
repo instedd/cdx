@@ -8,7 +8,6 @@ class UsersController < ApplicationController
     apply_filters
 
     @date_options = date_options_for_filter
-    @roles = check_access(Role, READ_ROLE).within(@navigation_context.entity)
 
     respond_to do |format|
       format.html
