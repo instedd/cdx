@@ -125,6 +125,7 @@ var PolicyDefinition = React.createClass({
   updateStatement: function(index, changes) {
     this.setState(React.addons.update(this.state, {
       statements: {
+        // TODO - check non-Chrome browsers compatibility (keyword: ES2015 dynamic indexes/keys)
         [index]: changes
       }
     }))
