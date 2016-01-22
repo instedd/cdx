@@ -1,42 +1,36 @@
+include Alerts
+
 class AlertMailer < ApplicationMailer
 
+  #TODO which  to use here?
   default from: 'notifications@cdx.com'
 
-  def alert_email(alert, alert_history, alert_count)
-    #TODO email_with_name = %("#{@user.name}" <#{@user.email}>)
+  def alert_email(alert, person, alert_history, alert_count)
+    email=  person[:email]
+    @alert = alert
+    @alert_body_text = parse_alert_message(alert, person)
+    subject_text = "CDX alert:"+alert.name
 
-    #just do the first recipient now
-
-    #get all the recipient email
-    recipients = alert.alert_recipients
-    recipients.each do |recipient|
-      role=Role.find_by_id(recipient.role_id)
-      users = role.users
-
-      users.each do |user|
-        #      email=  alert.alert_recipients[0].user.email
-        email=  user.email
-        @alert = alert
-
-        subject_text = alert.name
-
-        #  parse_alert_message(alert)
-
-        if alert.aggregated?
-          subject_text += " :occured times: "+alert_count.to_s
-        end
-
-        mail(to: email, subject: subject_text)
-
-        #record it was send
-        record_alert_message(alert, alert_history, user, subject_text)
-
-        #http://guides.rubyonrails.org/action_mailer_basics.html
-        #TODO check html, and palin text formats
-        #format.html { render 'another_template' }
-        #format.text { render text: 'Render text' }
-      end
+    if alert.aggregated?
+      subject_text += " :occured times: "+alert_count.to_s
     end
 
-  end  
+    email_with_name = %("#{person[:first_name]}" <#{person[:email]}>)
+    mail(to: email,subject: subject_text)
+
+    #record it was send
+    record_alert_message(alert, alert_history, person[:user_id], person[:recipient_id], subject_text)
+  end
+
+  private
+
+  def parse_alert_message(alert,person)
+    msg = alert.message
+    msg.gsub! '{firstname}', person[:first_name]
+    msg.gsub! '{lastname}', person[:last_name]
+    msg.gsub! '{alertname}', alert.name
+    msg.gsub! '{alertcategory}', alert.category_type
+    return msg
+  end
+
 end

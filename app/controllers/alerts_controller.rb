@@ -55,8 +55,6 @@ class AlertsController < ApplicationController
         @alert_external_users.push(recipient)
       end
     end
-    #   @alert_external_users = @alert_internal_users.join(",")
-
 
     respond_with alert_info, location: alert_path
   end
@@ -68,9 +66,10 @@ class AlertsController < ApplicationController
 
 
   def create
-    alert_saved_ok = alert_info.save
     external_users_ok = true
     error_text=Hash.new
+
+    alert_saved_ok = alert_info.save
 
     if alert_saved_ok==false
       error_text = alert_info.errors.messages
@@ -184,13 +183,8 @@ class AlertsController < ApplicationController
     alert_query_updated_ok = alert_info.update(query: alert_info.query)
 
     if alert_saved_ok and alert_query_updated_ok and external_users_ok
-      #format.html { redirect_to alerts_path, notice: 'Alert was successfully created.' }
-      # format.json { render action: 'show', status: :created, location: alert_info }
       render json: alert_info
     else
-      ##      new_alert_request_variables
-      #format.html { render action: 'new' }
-      #format.json { render json: alert_info.errors, status: :unprocessable_entity }
       render json: error_text, status: :unprocessable_entity
     end
   end
@@ -198,7 +192,7 @@ class AlertsController < ApplicationController
 
   def update
     #update in model calls create
-    if alert_info.enabled==false
+    if alert_info.enabled == false
       alert_info.delete_percolator
     end
 

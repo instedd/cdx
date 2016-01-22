@@ -82,29 +82,25 @@ var AlertCreateExternalUser = React.createClass({
 
 			<div className = "col" >
 				<input type = "text" placeholder = "first name"
-					valueLink = {this.props.firstnameLink} name="ggg"
-					pattern=".{2,255}"   
+					valueLink = {this.props.firstnameLink} 
 					id="externaluser_firstname" />
 			</div>
 
 			<div className = "col" >
 				<input type = "text" placeholder = "last name"
 					valueLink = {this.props.lastnameLink}
-					pattern=".{2,255}"
 					id="externaluser_lastname" />
 			</div>
 
 			<div className = "col" >
 				<input type = "text" placeholder = "email"
 					valueLink = {this.props.emailLink}
-					pattern=".{2,255}"
 					id="externaluser_email" />
 			</div>
 
 			<div className = "col" >
 				<input type = "text" placeholder = "telephone"
 					valueLink = {this.props.telephoneLink}
-					pattern=".{2,255}" 
 					id="externaluser_telephone" />
 			</div>
 

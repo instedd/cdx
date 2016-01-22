@@ -2,8 +2,6 @@ require 'spec_helper'
 
 RSpec.describe Alert, :type => :model, elasticsearch: true do
   let!(:user) { User.make }
-
-
   let(:model){DeviceModel.make}
   let(:device){Device.make device_model: model}
   let(:device_message){DeviceMessage.make(device: device)}

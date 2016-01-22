@@ -1,6 +1,12 @@
 .row
   .col
     = cdx_table title: 'Incidents' do |t|
+      - t.columns do
+        %col{:width => "20%"}
+        %col{:width => "20%"}
+        %col{:width => "20%"}
+        %col{:width => "20%"}
+        %col{:width => "20%"}
       - t.thead do
         %tr
           %th Alert Name

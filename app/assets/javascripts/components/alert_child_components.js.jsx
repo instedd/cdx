@@ -34,7 +34,7 @@ var AlertName = React.createClass({
 					<input type = "text" placeholder = "Name" valueLink = {
 							this.props.valueLink
 						}
-						id = "alertname" required  pattern=".{5,255}" />
+						id = "alertname" required  pattern=".{2,255}" />
 				</div>
 			</div>
 		);

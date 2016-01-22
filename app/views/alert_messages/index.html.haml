@@ -1,6 +1,13 @@
 .row
   .col
     = cdx_table title: 'Alert Messages Sent' do |t|
+      - t.columns do
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "15%"}
       - t.thead do
         %tr
           %th Alert Name

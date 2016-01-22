@@ -36,13 +36,18 @@ Alert.blueprint do
   name { Faker::Name.first_name }
   description { Faker::Name.last_name }
   message { 'test message' }
+  category_type {"anomalies"}
   user
-#  query { "test.error_code" => "11"}
 end
 
 AlertRecipient.blueprint do
   user
   alert
+  recipient_type {AlertRecipient.recipient_types["external_user"]}
+  email {"aaa@aaa.com"}
+  telephone {123}
+  first_name {"bob"}
+  last_name {'smith'}
 end
 
 

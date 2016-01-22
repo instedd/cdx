@@ -12,7 +12,9 @@ class TestResultIndexer < EntityIndexer
       subscriber_id = match["_id"]
 
       if subscriber_id.include? 'alert'
-        alert = Alert.includes(:alert_recipients).find(alert_id.slice "alert_")
+        #the alert id is in this format: alert_{alertID}
+        subscriber_id.slice! "alert_"
+        alert = Alert.includes(:alert_recipients).find(subscriber_id)
         if alert.enabled
           AlertJob.perform_later subscriber_id, test_result.uuid
         end

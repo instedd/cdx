@@ -26,6 +26,9 @@ end
 
 Given(/^the user creates a new error category alert with all fields with name "(.*?)"$/) do |arg1|
 
+  site = @navigation_context.entity.sites.make
+  device = site.devices.make
+  
   @alert = AlertPage.new
   @alert.load
 
@@ -65,10 +68,8 @@ end
 
 Given(/^the user creates a new anomalie category alert with all fields with name "(.*?)"$/) do |arg1|
 
-  #  institution2 = Institution.make user: @user
   site = @navigation_context.entity.sites.make
   device = site.devices.make
-
 
   @alert = AlertPage.new
   @alert.load

@@ -13,13 +13,5 @@ class AlertMessagesController < ApplicationController
   def show
     #    render :edit
   end
-  
-  private
-
-  def filter_params
-    # params.require(:filter).permit(:name).tap do |whitelisted|
-    #    whitelisted[:query] = params[:filter][:query] || {}
-    #  end
-  end
 
 end

@@ -6,15 +6,7 @@ class AlertJob < ActiveJob::Base
   def perform(alert_id, test_elasticsearch_id)
     alertHistory = AlertHistory.new
 
-    #the id is in this format: alert_{alertID}_{categoryID}
-
-    alert_id.slice! "alert_"
     @alert = Alert.includes(:alert_recipients).find(alert_id)
-
-    #index_parts = alert_id.split('_')
-    #alert_index = index_parts[1]
-    #@alert = Alert.includes(:alert_recipients).find(index_parts[1])
-
     alertHistory.alert = @alert
     alertHistory.user = @alert.user
     testResult = TestResult.find_by_uuid(test_elasticsearch_id)
@@ -27,17 +19,9 @@ class AlertJob < ActiveJob::Base
 
     alertHistory.save!
 
-    #TODO, need to inform poirot  for example look at:
-    # test = TestResultQuery.find_by_elasticsearch_id(test_elasticsearch_id)
-    # subscriber.notify_test(test)
-
-    #only inform the recipients if the alert is a per_record type
-
+    #only inform the recipients if the alert is a per_record type, the background jobs will handle the aggregation
     if @alert.record? and (@alert.email? or @alert.email_and_sms?)
-      # AlertMailer.alert_email(@alert).deliver_now
-      alert_inform_recipient(@alert, alertHistory, 0)
+      alert_inform_recipient(@alert, alertHistory)
     end
-
-    #TODO ,maybe use  AlertMailer.alert_email(@alert).deliver_later
   end
 end
