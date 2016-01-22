@@ -58,6 +58,9 @@ var PolicyDefinition = React.createClass({
           } else {
             statementType = 'all';
           }
+        } else if(statement.resource && statement.resource.length > 0) {
+          statementType = 'all';
+          resources = [statement.resource];
         }
       }
 
@@ -75,8 +78,16 @@ var PolicyDefinition = React.createClass({
         return resources[resourceKey];
       }
 
-      if(statementType == "only" || statementType == "except") {
-        resourceList[statementType] = resources.map(_hydratateResourceAndCheckType.bind(this, props.resources));
+      switch (statementType) {
+        case "only":
+        case "except":
+          resourceList[statementType] = resources.map(_hydratateResourceAndCheckType.bind(this, props.resources));
+          break;
+        case "all":
+          resourceType = resources[0];
+          break;
+        default:
+
       }
 
       var _hydratateAction = function(actions, action) {
