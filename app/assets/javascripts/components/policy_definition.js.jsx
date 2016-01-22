@@ -147,7 +147,7 @@ var PolicyDefinition = React.createClass({
                 var selectedClass = this.state.activeTab == index ? "selected" : "";
                 return <li key={index} onClick={this.setActiveTab.bind(this,index)} className={selectedClass}><PolicyItem statement={statement} /></li>;
               }.bind(this))}
-              <li><a onClick={this.newPolicy} href="javascript:">Add policy</a></li>
+              <li><span onClick={this.newPolicy} href="javascript:">Add policy</span></li>
             </ul>
             {this.state.statements.map(function(statement, index) {
               var tabClass = "tabs-content" + (this.state.activeTab === index ? " selected" : "");
