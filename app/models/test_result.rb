@@ -24,7 +24,7 @@ class TestResult < ActiveRecord::Base
   validate :validate_encounter
   validate :validate_patient
 
-  before_save   :set_foreign_keys, prepend: true
+  before_create   :set_foreign_keys, prepend: true
   before_save   :set_entity_id
   after_destroy :destroy_from_index
 
