@@ -30,7 +30,7 @@ var PolicyDefinitionField = React.createClass({
         } else {
           var statement_resources = statement.resourceList[statement.resources].map(_resource_to_policy_identifier);
 
-          if(statement.resources == "only") {
+          if(statement.resources == "except") {
             result.resource = statement.resourceType;
             result.except = statement_resources;
           } else {
