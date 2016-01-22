@@ -48,6 +48,7 @@ class RolesController < ApplicationController
     return unless authorize_resource(@role, UPDATE_ROLE)
 
     @role.definition = JSON.pretty_generate(@role.policy.definition)
+    @policy_definition_resources = definition_resources_map
     @can_delete = has_access?(@role, DELETE_ROLE)
   end
 
