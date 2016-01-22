@@ -3,7 +3,7 @@ var EncounterNew = React.createClass({
     return {encounter: {
       institution: this.props.context.institution,
       site: null,
-      patient: null,
+      patient: this.props.patient,
       samples: [],
       new_samples: [],
       test_results: [],
@@ -16,7 +16,7 @@ var EncounterNew = React.createClass({
     this.setState(React.addons.update(this.state, {
       encounter: {
         site: { $set: site },
-        patient: { $set: null },
+        patient: { $set: this.props.patient },
         samples: { $set: [] },
         new_samples: { $set: [] },
         test_results: { $set: [] },

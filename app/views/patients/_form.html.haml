@@ -1,4 +1,7 @@
 = form_for(@patient) do |f|
+  - unless params[:next_url].blank?
+    = hidden_field_tag :next_url, params[:next_url]
+
   = validation_errors @patient
 
   .row

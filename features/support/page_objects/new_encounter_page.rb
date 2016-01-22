@@ -29,9 +29,11 @@ end
 
 class NewFreshEncounterPage < CdxPageBase
   set_url "/encounters/new?mode=fresh_tests"
+  set_url_matcher /\/encounters\/new?.*mode=fresh_tests/
 
   section :site, CdxSelect, "label", text: /Site/i
   section :patient, CdxSelect, "label", text: /Patient/i
+  element :new_patient, "a[title='Create new patient']"
 
   element :add_sample, :link, "Add sample"
 end

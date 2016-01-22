@@ -6,6 +6,13 @@ class EncountersController < ApplicationController
   end
 
   def new
+    if params[:patient_id].present?
+      @institution = @navigation_context.institution
+      @patient_json = Jbuilder.new { |json|
+        scoped_patients.find(params[:patient_id]).as_json_card(json)
+      }.attributes!
+    end
+
     return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
   end
 

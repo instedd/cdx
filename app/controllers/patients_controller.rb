@@ -61,7 +61,13 @@ class PatientsController < ApplicationController
     @patient.site = @navigation_context.site
 
     if @patient.save
-      redirect_to patient_path(@patient), notice: 'Patient was successfully created.'
+      next_url = if params[:next_url].blank?
+        patient_path(@patient)
+      else
+        "#{params[:next_url]}#{params[:next_url].include?('?') ? '&' : '?'}patient_id=#{@patient.id}"
+      end
+
+      redirect_to next_url, notice: 'Patient was successfully created.'
     else
       render action: 'new'
     end

@@ -181,6 +181,12 @@ RSpec.describe PatientsController, type: :controller do
       get :new
       expect(response).to be_forbidden
     end
+
+    it "should preserve next_url" do
+      next_url = 'http://example.org/some_next_url'
+      get :new, next_url: next_url
+      expect(response.body).to include(next_url)
+    end
   end
 
   context "create" do
@@ -197,7 +203,7 @@ RSpec.describe PatientsController, type: :controller do
         post :create, patient: patient_form_plan
       }.to change(institution.patients, :count).by(1)
 
-      expect(response).to be_redirect
+      expect(response).to redirect_to patient_path(Patient.last)
     end
 
     it "should save fields" do
@@ -318,6 +324,22 @@ RSpec.describe PatientsController, type: :controller do
       expect(response).to be_redirect
     end
 
+    it "should preserve next_url" do
+      next_url = 'http://example.org/some_next_url'
+      post :create, patient: build_patient_form_plan(name: ''), next_url: next_url
+
+      expect(assigns(:patient)).to be_invalid
+      expect(response).to render_template("patients/new")
+      expect(response.body).to include(next_url)
+    end
+
+    it "should redirects to next_url on creation with patient_id" do
+      next_url = 'http://example.org/some_next_url?foo=bar'
+      post :create, patient: build_patient_form_plan({}), next_url: next_url
+
+      patient = Patient.last
+      expect(response).to redirect_to "#{next_url}&patient_id=#{patient.id}"
+    end
   end
 
   context "edit" do
