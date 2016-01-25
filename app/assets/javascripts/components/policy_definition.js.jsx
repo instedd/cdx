@@ -140,22 +140,21 @@ var PolicyDefinition = React.createClass({
     return (
       <div>
         <PolicyDefinitionField name="role[definition]" statements={this.state.statements} />
-        <div className="left-column">
-          <div className="tabs">
-            <ul className="tabs-header">
-              {this.state.statements.map(function(statement, index){
-                var selectedClass = this.state.activeTab == index ? "selected" : "";
-                return <li key={index} onClick={this.setActiveTab.bind(this,index)} className={selectedClass}><PolicyItem statement={statement} /></li>;
-              }.bind(this))}
-              <li><span onClick={this.newPolicy} href="javascript:">Add policy</span></li>
-            </ul>
+        <div className="tabs">
+          <ul className="tabs-header left-column">
+            {this.state.statements.map(function(statement, index){
+              var selectedClass = this.state.activeTab == index ? "selected" : "";
+              return <li key={index} onClick={this.setActiveTab.bind(this,index)} className={selectedClass}><PolicyItem statement={statement} /></li>;
+            }.bind(this))}
+            <li><span onClick={this.newPolicy} href="javascript:">Add policy</span></li>
+          </ul>
+          <div className="right-column">
             {this.state.statements.map(function(statement, index) {
               var tabClass = "tabs-content" + (this.state.activeTab === index ? " selected" : "");
               return (<div className={tabClass} key={index}><PolicyItemDetail statement={statement} index={index} updateStatement={this.updateStatement.bind(this, index)} actions={this.props.actions} resourceTypes={this.props.resourceTypes} context={this.props.context} /></div>);
             }.bind(this))}
           </div>
         </div>
-
       </div>
     )
   }
