@@ -137,7 +137,6 @@ class AlertsController < ApplicationController
           alert_info.query = {"test.start_time"=>"null" }
         end
       end
-
       if alert_info.category_type == "device_errors"
         if alert_info.error_code and alert_info.error_code.include? '-'
           minmax=alert_info.error_code.split('-')
@@ -179,7 +178,6 @@ class AlertsController < ApplicationController
       #Note: alert_info.create_percolator is called from the model
     end
 
-
     alert_query_updated_ok = alert_info.update(query: alert_info.query)
 
     if alert_saved_ok and alert_query_updated_ok and external_users_ok
@@ -215,7 +213,7 @@ class AlertsController < ApplicationController
       render :edit
     end
   end
-
+  
 
   private
 

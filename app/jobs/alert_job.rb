@@ -20,8 +20,16 @@ class AlertJob < ActiveJob::Base
     alertHistory.save!
 
     #only inform the recipients if the alert is a per_record type, the background jobs will handle the aggregation
-    if @alert.record? and (@alert.email? or @alert.email_and_sms?)
-      alert_inform_recipient(@alert, alertHistory)
+    if @alert.record? 
+      recipients_list=build_mailing_list(@alert.alert_recipients)
+      if (@alert.email? or @alert.email_and_sms?)
+        alert_email_inform_recipient(@alert, alertHistory, recipients_list)
+      end
+    
+      if (@alert.sms? or @alert.email_and_sms?)
+        alert_sms_inform_recipient(@alert, alertHistory, recipients_list)
+      end
     end
+    
   end
 end

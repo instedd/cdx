@@ -1,5 +1,6 @@
 module Alerts
 
+  include SMS
 
   def alert_history_check(frequency, alert_type)
     alerts = Alert.aggregated.hour.where({enabled: true})
@@ -14,22 +15,42 @@ module Alerts
         alertHistory.for_aggregation_calculation  = false
         alertHistory.save!
 
-        alert_inform_recipient(alert, alertHistory, alertHistorycount)
+        recipients_list=build_mailing_list(alert.alert_recipients)
+        alert_email_inform_recipient(alert, alertHistory, recipients_list, alertHistorycount)
       end
     end
   end
 
-  def alert_inform_recipient(alert, alert_history, alert_count=0)
-    email_list=build_mailing_list(alert.alert_recipients)
+  def alert_email_inform_recipient(alert, alert_history, recipients_list, alert_count=0)
 
     #TODO look at Sending Email To Multiple Recipients, http://guides.rubyonrails.org/action_mailer_basics.html
-    email_list.each do |person|
-      AlertMailer.alert_email(alert, person, alert_history, alert_count).deliver_now
-    end
+    recipients_list.each do |person|
+      message_body= parse_alert_message(alert, alert.message, person)
 
+      subject_text = "CDX alert:"+alert.name
+      if alert.aggregated?
+        subject_text += " :occured times: "+alert_count.to_s
+      end
+
+      AlertMailer.alert_email(alert, person, alert_history, message_body, subject_text, alert_count).deliver_now
+    end
   end
 
-  def record_alert_message(alert, alert_history, user_id, alert_recipient_id, messagebody)
+
+  def alert_sms_inform_recipient(alert, alert_history, recipients_list, alert_count=0)
+    
+    #TODO Can also send many messages at once. https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home
+    recipients_list.each do |person|
+      text_msg=parse_alert_message(alert, alert.sms_message, person)
+      sms_response_fields=send_sms(person[:telephone], text_msg)
+
+binding.pry
+      #record it was send
+      record_alert_message(alert, alert_history, person[:user_id], person[:recipient_id], text_msg, sms_response_fields)
+    end
+  end
+
+  def record_alert_message(alert, alert_history, user_id, alert_recipient_id, messagebody, sms_response_fields=nil)
     recipientNotificationHistory = RecipientNotificationHistory.new
     recipientNotificationHistory.alert = alert
     recipientNotificationHistory.alert_history = alert_history
@@ -37,6 +58,13 @@ module Alerts
     recipientNotificationHistory.alert_recipient_id = alert_recipient_id
     recipientNotificationHistory.message_sent = messagebody
     recipientNotificationHistory.channel_type = alert.channel_type
+
+    if sms_response_fields != nil
+      recipientNotificationHistory.sms_response_id = sms_response_fields[:id].to_i
+      recipientNotificationHistory.sms_response_guid = sms_response_fields[:guid]
+      recipientNotificationHistory.sms_response_token = sms_response_fields[:token]
+    end
+
     recipientNotificationHistory.save
   end
 
@@ -81,5 +109,14 @@ module Alerts
     email_list
   end
 
+
+  def parse_alert_message(alert, message, person)
+    msg = message
+    msg.gsub! '{firstname}', person[:first_name]
+    msg.gsub! '{lastname}', person[:last_name]
+    msg.gsub! '{alertname}', alert.name
+    msg.gsub! '{alertcategory}', alert.category_type
+    return msg
+  end
 
 end

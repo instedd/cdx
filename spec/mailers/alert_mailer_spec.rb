@@ -26,7 +26,10 @@ RSpec.describe AlertMailer, type: :mailer do
     alert_history.alert = alert
 
     alert_count=0
-    AlertMailer.alert_email(alert, person, alert_history, alert_count).deliver_now
+    message_body= parse_alert_message(alert, alert.message, person)
+    subject_text = "CDX alert:"+alert.name
+    
+    AlertMailer.alert_email(alert, person, alert_history, message_body, subject_text, alert_count).deliver_now
   end
 
   after(:each) do

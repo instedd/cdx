@@ -384,6 +384,9 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     ntlm-http (0.1.1)
+    nuntium_api (0.21)
+      json
+      rest-client
     oauth2 (1.0.0)
       faraday (>= 0.8, < 0.10)
       jwt (~> 1.0)
@@ -675,6 +678,7 @@ DEPENDENCIES
   mysql2
   newrelic_rpm
   nokogiri (~> 1.6.7.2)
+  nuntium_api (~> 0.21)
   oj
   omniauth
   omniauth-google-oauth2

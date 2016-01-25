@@ -68,9 +68,6 @@ ActiveRecord::Schema.define(version: 20160215195614) do
     t.integer "device_id", limit: 4, null: false
   end
 
-  add_index "alerts_devices", ["alert_id", "device_id"], name: "index_alerts_devices_on_alert_id_and_device_id", using: :btree
-  add_index "alerts_devices", ["device_id", "alert_id"], name: "index_alerts_devices_on_device_id_and_alert_id", using: :btree
-
   create_table "alerts_sites", id: false, force: :cascade do |t|
     t.integer "alert_id", limit: 4, null: false
     t.integer "site_id",  limit: 4, null: false
@@ -362,6 +359,9 @@ ActiveRecord::Schema.define(version: 20160215195614) do
     t.string   "message_sent",       limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "sms_response_id",    limit: 4
+    t.string   "sms_response_guid",  limit: 255
+    t.string   "sms_response_token", limit: 255
   end
 
   add_index "recipient_notification_histories", ["user_id"], name: "index_recipient_notification_histories_on_user_id", using: :btree
