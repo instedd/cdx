@@ -11,6 +11,7 @@ class TestResultIndexer < EntityIndexer
     percolate_result["matches"].each do |match|
       subscriber_id = match["_id"]
 
+      #TODO   do we remove the subscroiber code, needed any more??
       if subscriber_id.include? 'alert'
         #the alert id is in this format: alert_{alertID}
         subscriber_id.slice! "alert_"

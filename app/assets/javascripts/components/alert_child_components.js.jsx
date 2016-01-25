@@ -4,7 +4,7 @@ var AlertEnabled = React.createClass({
 			< div className = "row" >
 			<div className = "col pe-2" >
 				<label>Enabled</label>
-			</div >
+			</div>
 			<div className = "col">
 				<input
 					type = "checkbox"
@@ -54,7 +54,7 @@ var AlertDescription = React.createClass({
 					}
 					id = "alertdescription" />
 			</div>
-		</div >
+		</div>
 	);
 }
 });
@@ -66,7 +66,7 @@ var AlertErrorCode = React.createClass({
 			< div className = "row" id = "errorcoderow" >
 			<div className = "col pe-2" >
 				<label>Errors</label>
-			</div >
+			</div>
 
 			<div className = "col" >
 				<input type = "text" placeholder = "All error codes will be reported" valueLink = {
@@ -74,7 +74,7 @@ var AlertErrorCode = React.createClass({
 					}
 					id = "alerterrorcode"  name="alerterrorcode" />
 			</div>
-		</div >
+		</div>
 	);
 }
 });
@@ -138,7 +138,7 @@ var AlertSite = React.createClass({
 							this.props.disable_all_selects
 						}
 						/>
-				</div >
+				</div>
 			</div>
 		);
 	}
@@ -178,7 +178,7 @@ var AlertDevice = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row" >
+			<div className = "row" >
 			<div className = "col pe-2" >
 				<label>Devices</label>
 				</div>
@@ -202,7 +202,7 @@ var AlertDevice = React.createClass({
 							this.props.disable_all_selects
 						}
 						/>
-				</div >
+				</div>
 			</div>
 		);
 	}
@@ -414,7 +414,7 @@ var AlertChannel = React.createClass({
 			< div className = "row" id = "channelrow" >
 			<div className = "col pe-2" >
 				<label>Channel</label>
-				</div >
+				</div>
 				<div className = "col" >
 					<Select
 						name = "channel"
@@ -478,7 +478,7 @@ var AlertRole = React.createClass({
 			< div className = "row" >
 			<div className = "col pe-2" >
 				<label>Roles</label>
-				</div >
+				</div>
 				<div className = "col" >
 					<Select
 						name = "role"
@@ -543,7 +543,7 @@ var AlertUser = React.createClass({
 			< div className = "row" >
 			<div className = "col pe-2" >
 				<label >Internal Recipient< /label>
-				</div >
+				</div>
 				<div className = "col" >
 					<Select
 						name = "user"

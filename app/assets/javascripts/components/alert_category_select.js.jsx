@@ -207,7 +207,7 @@ var AlertCategorySelect = React.createClass({
 							<div className="row">
 								<div className="col pe-2">
 									&nbsp;
-								</div >
+								</div>
 								<div className = "col" >
 									<input type = "radio" name = "category_type"value = {
 											category_keys[1]
@@ -237,7 +237,7 @@ var AlertCategorySelect = React.createClass({
 									<div className="row">
 										<div className="col pe-2">
 											&nbsp;
-										</div >
+										</div>
 										<div className = "col" >
 											<input type = "radio" name = "category_type" value = {
 													category_keys[3]

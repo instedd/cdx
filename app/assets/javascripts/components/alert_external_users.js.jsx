@@ -54,7 +54,7 @@ var AlertExternalUser = React.createClass({
 						<label>
 							Ad-hoc Recipient
 						</label>
-					</div >
+					</div>
 
 					<div className = "col" >
 						<AlertCreateExternalUser firstnameLink={this.linkState('first_name')}  lastnameLink={this.linkState('last_name')} emailLink={this.linkState('email')} telephoneLink={this.linkState('telephone')} onClick={this.clickHandler}  />
