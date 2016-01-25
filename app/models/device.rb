@@ -15,6 +15,8 @@ class Device < ActiveRecord::Base
 
   serialize :custom_mappings, JSON
 
+  composed_of :ftp_info, mapping: FtpInfo.mapping('ftp_')
+
   attr_reader :plain_secret_key
 
   validates_uniqueness_of :uuid
