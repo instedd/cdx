@@ -101,12 +101,15 @@ class DeviceModelsController < ApplicationController
 
   private
 
+  CREATE_PARAMS = [:institution_id]
+  UPDATE_PARAMS = [:name, :picture, :delete_picture, :setup_instructions, :delete_setup_instructions, :supports_ftp, :filename_pattern, :supports_activation, :support_url, manifest_attributes: [:definition]]
+
   def device_model_create_params
-    params.require(:device_model).permit(:name, :picture, :delete_picture, :setup_instructions, :delete_setup_instructions, :institution_id, :supports_activation, :support_url, manifest_attributes: [:definition])
+    params.require(:device_model).permit(*(UPDATE_PARAMS + CREATE_PARAMS))
   end
 
   def device_model_update_params
-    params.require(:device_model).permit(:name, :picture, :delete_picture, :setup_instructions, :delete_setup_instructions, :supports_activation, :support_url, manifest_attributes: [:definition])
+    params.require(:device_model).permit(*UPDATE_PARAMS)
   end
 
   def set_published_status(device_model)
