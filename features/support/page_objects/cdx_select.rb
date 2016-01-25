@@ -8,13 +8,13 @@ class CdxSelect < SitePrism::Section
     select_elem.find(".Select-placeholder").click
     select_elem.find(".Select-option", text: text, :match => :prefer_exact).click
   end
-
+  
   # https://www.bountysource.com/issues/3457481-scroll-click-firing-at-wrong-coordinates-poltergeist-detected-another-element-with-css-selector-at-this-position
   def set_exact_multi(text)
     select_elem.find(".Select-placeholder").trigger('click')
-    #  select_elem.find(".Select-option", text: text, :match => :prefer_exact).click
+    #  select_elem.find(".Select-option", text: text, :match => :prefer_exact).click 
   end
-
+  
   def type_and_select(text)
     select_elem.find(".Select-control").click
     text.each_char do |char|
@@ -50,5 +50,4 @@ class CdxSelect < SitePrism::Section
       elem.find(".Select")
     end
   end
-
 end
