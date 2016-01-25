@@ -110,7 +110,7 @@ var PolicyDefinition = React.createClass({
         actions: actions,
         resourceList: resourceList,
         resourceType: resourceType,
-        resources: statementType
+        statementType: statementType
       };
     });
 

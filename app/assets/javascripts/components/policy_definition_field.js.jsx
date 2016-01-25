@@ -16,7 +16,7 @@ var PolicyDefinitionField = React.createClass({
           .map(function(action) { return action.id });
       }
 
-      if(statement.resources) {
+      if(statement.statementType) {
         var _resource_to_policy_identifier = function(resource) {
           if(resource.type == statement.resourceType) {
             return resource.type + "/" + resource.id;
@@ -25,12 +25,12 @@ var PolicyDefinitionField = React.createClass({
           }
         };
 
-        if(statement.resources == "all") {
+        if(statement.statementType == "all") {
           result.resource = statement.resourceType;
         } else {
-          var statement_resources = statement.resourceList[statement.resources].map(_resource_to_policy_identifier);
+          var statement_resources = statement.resourceList[statement.statementType].map(_resource_to_policy_identifier);
 
-          if(statement.resources == "except") {
+          if(statement.statementType == "except") {
             result.resource = statement.resourceType;
             result.except = statement_resources;
           } else {
