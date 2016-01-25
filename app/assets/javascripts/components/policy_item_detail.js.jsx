@@ -52,6 +52,11 @@ var PolicyItemDetail = React.createClass({
     }
   },
 
+  resourcesLabel: function() {
+    var currentResourceType = this.props.resourceTypes.find((function(resourceType) { return resourceType.value == this.props.statement.resourceType }).bind(this));
+    return (currentResourceType.label + "s").toLowerCase();
+  },
+
   render: function() {
     var statement = this.props.statement;
     var resourcesList = {
@@ -68,18 +73,19 @@ var PolicyItemDetail = React.createClass({
 
       var actions = this.props.actions[statement.resourceType];
       var inheritAction = {id: '*', label: 'Inherit permissions from granter', value: '*'};
+      var resourcesLabel = this.resourcesLabel();
 
       ifResourceTypeSelected = <div className="with-resource-type">
         <div className="section">
           <span className="section-name">Resources</span>
           <div className="section-content">
             <input type="radio" name="statementType" value="all" id={this.idFor("statement-type-all")} checked={statement.statementType == 'all'} onChange={this.onStatementTypeChange.bind(this, 'all')} />
-            <label htmlFor={this.idFor("statement-type-all")}>All resources</label>
+            <label htmlFor={this.idFor("statement-type-all")}>All {resourcesLabel}</label>
             <input type="radio" name="statementType" value="except" id={this.idFor("statement-type-except")} checked={statement.statementType == 'except'} onChange={this.onStatementTypeChange.bind(this, 'except')} />
-            <label htmlFor={this.idFor("statement-type-except")}>All resources except</label>
+            <label htmlFor={this.idFor("statement-type-except")}>All {resourcesLabel} except</label>
             {resourcesList['except']}
             <input type="radio" name="statementType" value="only" id={this.idFor("statement-type-only")} checked={statement.statementType == 'only'} onChange={this.onStatementTypeChange.bind(this, 'only')} />
-            <label htmlFor={this.idFor("statement-type-only")}>Only some</label>
+            <label htmlFor={this.idFor("statement-type-only")}>Only some {resourcesLabel}</label>
             {resourcesList['only']}
           </div>
         </div>
