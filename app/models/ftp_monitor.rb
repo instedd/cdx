@@ -17,7 +17,8 @@ class FtpMonitor
   def process!
     PoirotRails::Activity.start("FtpMonitor process batch") do
       device_groups.each do |ftp, devices|
-        PoirotRails::Activity.start("FtpProcessor process", ftp: ftp_info.to_h.except(:password), devices: devices.map(&:id)) do
+        next if ftp.hostname.blank?
+        PoirotRails::Activity.start("FtpProcessor process", ftp: ftp.to_h.except(:password), devices: devices.map(&:id)) do
           FtpProcessor.new(ftp, devices).process!
         end
       end
