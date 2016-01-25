@@ -25,6 +25,9 @@ class Device < ActiveRecord::Base
   validates_presence_of :serial_number
   validates_presence_of :device_model
 
+  validates :ftp_hostname, presence: { message: " is required if any other FTP setting is present" }, unless: Proc.new { |d| [d.ftp_port, d.ftp_username, d.ftp_password, d.ftp_directory].all?(&:blank?) }
+  validates :ftp_port, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 65535 }, allow_blank: true
+
   validate :unpublished_device_model_from_institution
 
   before_create :set_uuid
