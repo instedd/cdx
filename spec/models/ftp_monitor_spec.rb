@@ -5,7 +5,7 @@ describe FtpMonitor do
   context 'orchestration' do
 
     it "should group devices by ftp info" do
-      dm = DeviceModel.make(supports_ftp: true)
+      dm = DeviceModel.make(supports_ftp: true, filename_pattern: '(?<sn>.+)')
       d1 = Device.make(device_model: dm, ftp_hostname: 'example.com')
       d2 = Device.make(device_model: dm, ftp_hostname: 'example.com')
       d3 = Device.make(device_model: dm, ftp_hostname: 'example.com', ftp_port: 1000)
