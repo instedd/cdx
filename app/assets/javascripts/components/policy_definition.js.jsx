@@ -104,7 +104,7 @@ var PolicyDefinition = React.createClass({
 
       return {
         delegable: statement.delegable == true,
-        includeSubsites: false, // TODO: still unsupported in policies definitions
+        includeSubsites: true, // TODO: still unsupported in policies definitions
         actions: actions,
         resourceList: resourceList,
         resourceType: resourceType,
@@ -117,7 +117,7 @@ var PolicyDefinition = React.createClass({
 
   newPolicy: function() {
     this.setState(React.addons.update(this.state, {
-      statements: { $push: [{ delegable: false, resourceType: null, includeSubsites: false, actions: [], resourceList: {'except': [], 'only': []} }] },
+      statements: { $push: [{ delegable: false, resourceType: null, includeSubsites: true, actions: [], resourceList: {'except': [], 'only': []} }] },
       activeTab: { $set: this.state.statements.length } // the new statement isn't on the array yet
     }));
   },
