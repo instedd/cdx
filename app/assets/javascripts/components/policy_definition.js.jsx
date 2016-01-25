@@ -6,10 +6,12 @@ var PolicyDefinition = React.createClass({
     };
   },
 
+  emptyPolicy: { delegable: false, resourceType: null, includeSubsites: true, actions: [], resourceList: {'except': [], 'only': []} },
+
   policyDefinitionStatements: function(props) {
     var definition = props.definition;
     if(definition == null) {
-      return [];
+      return [this.emptyPolicy];
     }
     definition = JSON.parse(definition);
     var statements = definition.statement.map(function(statement) {
@@ -112,12 +114,16 @@ var PolicyDefinition = React.createClass({
       };
     });
 
-    return statements;
+    if(statements.length == 0) {
+      return [this.emptyPolicy];
+    } else {
+      return statements;
+    }
   },
 
   newPolicy: function() {
     this.setState(React.addons.update(this.state, {
-      statements: { $push: [{ delegable: false, resourceType: null, includeSubsites: true, actions: [], resourceList: {'except': [], 'only': []} }] },
+      statements: { $push: [this.emptyPolicy] },
       activeTab: { $set: this.state.statements.length } // the new statement isn't on the array yet
     }));
   },
