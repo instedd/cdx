@@ -39,7 +39,7 @@
       = f.label :definition
     .col
       .value
-        = react_component 'PolicyDefinition', definition: @role.definition, actions: actions_per_resource_type, context: params['context'], resources: @policy_definition_resources
+        = react_component 'PolicyDefinition', definition: @role.definition, actions: actions_per_resource_type, context: params['context'], resources: @policy_definition_resources, resourceTypes: resource_types
   .row.button-actions
     .col
       = f.submit 'Save', :class => 'btn-primary'

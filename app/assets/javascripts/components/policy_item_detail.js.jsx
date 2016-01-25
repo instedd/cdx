@@ -1,11 +1,4 @@
 var PolicyItemDetail = React.createClass({
-  resourceTypes: [
-    {value: 'site', label: 'Site'},
-    {value: 'device', label: 'Device'},
-    {value: 'testResult', label: 'Test Result'},
-    {value: 'encounter', label: 'Encounter'}
-  ],
-
   idFor: function(name) {
     return name + "-" + this.props.index;
   },
@@ -120,7 +113,7 @@ var PolicyItemDetail = React.createClass({
         <div className="section">
           <span className="section-name">Type</span>
           <div className="section-content">
-            <CdxSelect items={this.resourceTypes} value={statement.resourceType} onChange={this.onResourceTypeChange} />
+            <CdxSelect items={this.props.resourceTypes} value={statement.resourceType} onChange={this.onResourceTypeChange} />
             <input type="checkbox" id={this.idFor("includeSubsites")} checked={statement.includeSubsites} onChange={this.toggleIncludeSubsites} />
             <label htmlFor={this.idFor("includeSubsites")}>Include subsites</label>
           </div>

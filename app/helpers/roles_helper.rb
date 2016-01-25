@@ -8,4 +8,13 @@ module RolesHelper
       hash
     }
   end
+
+  def resource_types
+    Resource.all.map { |resource|
+      {
+        value: resource.name.camelize(:lower),
+        label: resource.name.titleize
+      }
+    }
+  end
 end
