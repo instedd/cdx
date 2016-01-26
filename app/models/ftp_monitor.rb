@@ -3,7 +3,7 @@ require 'tempfile'
 
 class FtpMonitor
 
-  def initialize(sleep_interval_in_seconds=60)
+  def initialize(sleep_interval_in_seconds=300)
     @sleep_interval = sleep_interval_in_seconds
   end
 
@@ -18,6 +18,7 @@ class FtpMonitor
     PoirotRails::Activity.start("FtpMonitor process batch") do
       device_groups.each do |ftp, devices|
         next if ftp.hostname.blank?
+        # TODO: Should we move these actions to a background task?
         PoirotRails::Activity.start("FtpProcessor process", ftp: ftp.to_h.except(:password), devices: devices.map(&:id)) do
           FtpProcessor.new(ftp, devices).process!
         end
@@ -42,6 +43,7 @@ class FtpMonitor
       # Connect and list files
       open_ftp!
       files = ftp.nlst
+      Rails.logger.info("Listed files from #{ftp_info.hostname}: #{files.join(", ")}")
 
       # Remove files already seen
       reviewed = FileMessage.where(ftp_hostname: ftp_info.hostname, ftp_port: ftp_info.port, ftp_directory: ftp_info.directory, status: ['failed', 'success']).pluck(:filename)
@@ -49,7 +51,7 @@ class FtpMonitor
 
       # Download all files
       downloaded = download_files(files)
-      Rails.logger.info("Downloaded files: #{downloaded.map(&:first).join(" ")}")
+      Rails.logger.info("Downloaded files from #{ftp_info.hostname}: #{downloaded.map(&:first).join(", ")}")
 
       # Done with remote server
       ftp.quit rescue nil
