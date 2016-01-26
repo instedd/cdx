@@ -108,6 +108,29 @@ input[type="checkbox"] {
       display: none;
     }
   }
+  &.power {
+    & + label {
+      background: url('ic-on-off.png') no-repeat right top;
+      display: inline-block;
+      vertical-align: middle;
+      width: 32px;
+      height: 20px;
+      margin: 0;
+      min-height: auto;
+      &:before {
+        display: none !important;
+      }
+      &:hover {
+        background-position: right bottom;
+      }
+    }
+    &:checked + label {
+      background-position: left top;
+    }
+    &:checked:hover + label {
+      background-position: left bottom;
+    }
+  }
 }
 
 

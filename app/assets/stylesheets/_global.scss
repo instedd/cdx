@@ -119,6 +119,10 @@ a[title="Back"] {
   &.light {
     border: 1px solid $gray1;
   }
+  &.gray {
+    background: $gray1;
+    border-radius: 3px;
+  }
 }
 
 
