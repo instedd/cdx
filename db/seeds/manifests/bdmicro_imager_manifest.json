@@ -89,7 +89,7 @@
     },
     "test.cartridge_expiration_date": {
       "if" : [
-        {"equals" : [{"lookup" : "cartExpiry"}, null]},
+        {"equals" : [{"lookup" : "cartExpiry"}, ""]},
         null,
         {
           "parse_date": [
@@ -129,7 +129,7 @@
     },
     "test.qc_date": {
       "if" : [
-        {"equals" : [{"lookup" : "lastInstrQcDate"}, null]},
+        {"equals" : [{"lookup" : "lastInstrQcDate"}, ""]},
         null,
         {
           "parse_date": [
