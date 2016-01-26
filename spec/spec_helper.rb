@@ -70,17 +70,15 @@ RSpec.configure do |config|
   config.include FeatureSpecHelpers, :type => :feature
 
   config.before(:each) do
-    LocationService.fake!
-  end
-
-  config.before(:each) do
     stub_request(:get, "http://fonts.googleapis.com/css").
          with(:query => hash_including(:family)).
          to_return(:status => 200, :body => "", :headers => {})
   end
 
   config.before(:each) do
+    LocationService.fake!
     Timecop.return
+    ActionMailer::Base.deliveries.clear
   end
 
   config.after(:each) do
