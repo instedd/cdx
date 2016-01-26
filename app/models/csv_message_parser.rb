@@ -14,9 +14,10 @@ class CSVMessageParser
   end
 
   def load(data, root_path = nil)
-    csv = CSV.new(data, col_sep: @separator)
+    csv = CSV.new(data, col_sep: @separator, skip_blanks: true)
     headers = csv.shift
     csv.map do |row|
+      # binding.pry
       result = {}
       headers.each_with_index do |header, index|
         result[header] = row[index]
