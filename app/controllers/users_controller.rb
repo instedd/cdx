@@ -10,7 +10,9 @@ class UsersController < ApplicationController
     @date_options = date_options_for_filter
 
     respond_to do |format|
-      format.html
+      format.html do
+        @users = perform_pagination(@users)
+      end
       format.csv do
         filename = "Users-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
         headers["Content-Type"] = "text/csv"

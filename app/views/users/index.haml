@@ -49,3 +49,6 @@
               %td= user.full_name
               %td= user.roles.map(&:name).join(", ")
               %td= last_activity(user)
+
+      .pagination
+        = render 'shared/pagination'

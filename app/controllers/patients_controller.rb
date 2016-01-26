@@ -32,11 +32,7 @@ class PatientsController < ApplicationController
     end
 
     @patients.preload_locations!
-
-    @page_size = (params["page_size"] || 10).to_i
-    @page = (params["page"] || 1).to_i
-    @patients = @patients.page(@page).per(@page_size)
-    @total = @patients.total_count
+    @patients = perform_pagination(@patients)
   end
 
   def show

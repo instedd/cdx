@@ -150,4 +150,12 @@ class ApplicationController < ActionController::Base
   def json_request?
     request.format.json?
   end
+
+  def perform_pagination(rel)
+    @page_size = (params["page_size"] || 10).to_i
+    @page = (params["page"] || 1).to_i
+    rel = rel.page(@page).per(@page_size)
+    @total = rel.total_count
+    rel
+  end
 end
