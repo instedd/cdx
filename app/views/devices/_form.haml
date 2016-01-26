@@ -42,20 +42,14 @@
   - if @device.new_record? || @device.device_model.try(:supports_ftp)
     .device-ftp-config{class: ('nodisplay' unless @device.device_model.try(:supports_ftp))}
       .row
-        .col.pe-2= f.label :ftp_hostname, 'FTP Host'
-        .col= f.text_field :ftp_hostname
+        .col.pe-2= f.label :ftp_hostname, 'FTP'
+        .col.pe-2= f.text_field :ftp_hostname, placeholder: 'Hostname'
+        .col.pe-2= f.number_field :ftp_port, min: 0, max: 65535, placeholder: 'Port'
+        .col.pe-2= f.text_field :ftp_directory, placeholder: 'Folder'
       .row
-        .col.pe-2= f.label :ftp_port, 'FTP Port'
-        .col= f.number_field :ftp_port, min: 0, max: 65535
-      .row
-        .col.pe-2= f.label :ftp_directory, 'FTP Folder'
-        .col= f.text_field :ftp_directory
-      .row
-        .col.pe-2= f.label :ftp_username, 'FTP Username'
-        .col= f.text_field :ftp_username
-      .row
-        .col.pe-2= f.label :ftp_password, 'FTP Password'
-        .col= f.password_field :ftp_password, value: @device.ftp_password
+        .col.pe-2= f.label :ftp_username, 'Login'
+        .col.pe-2= f.text_field :ftp_username, placeholder: 'Username', autocomplete: 'off'
+        .col.pe-2= f.password_field :ftp_password, value: @device.ftp_password, placeholder: 'Password', autocomplete: 'off'
   #custom_mappings
     = render "custom_mappings" if @device.device_model
 
