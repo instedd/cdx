@@ -1,7 +1,7 @@
 module Alerts
 
   include SMS
-
+  
   def alert_history_check(frequency, alert_type)
     alerts = Alert.aggregated.hour.where({enabled: true})
 
@@ -26,25 +26,24 @@ module Alerts
     #TODO look at Sending Email To Multiple Recipients, http://guides.rubyonrails.org/action_mailer_basics.html
     recipients_list.each do |person|
       message_body= parse_alert_message(alert, alert.message, person)
-
+      
       subject_text = "CDX alert:"+alert.name
       if alert.aggregated?
         subject_text += " :occured times: "+alert_count.to_s
-      end
-
+      end  
+      
       AlertMailer.alert_email(alert, person, alert_history, message_body, subject_text, alert_count).deliver_now
     end
   end
-
-
+  
+  
   def alert_sms_inform_recipient(alert, alert_history, recipients_list, alert_count=0)
     
-    #TODO Can also send many messages at once. https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home
+      #TODO Can also send many messages at once. https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home
     recipients_list.each do |person|
       text_msg=parse_alert_message(alert, alert.sms_message, person)
       sms_response_fields=send_sms(person[:telephone], text_msg)
-
-binding.pry
+      
       #record it was send
       record_alert_message(alert, alert_history, person[:user_id], person[:recipient_id], text_msg, sms_response_fields)
     end
@@ -58,13 +57,13 @@ binding.pry
     recipientNotificationHistory.alert_recipient_id = alert_recipient_id
     recipientNotificationHistory.message_sent = messagebody
     recipientNotificationHistory.channel_type = alert.channel_type
-
+    
     if sms_response_fields != nil
       recipientNotificationHistory.sms_response_id = sms_response_fields[:id].to_i
       recipientNotificationHistory.sms_response_guid = sms_response_fields[:guid]
       recipientNotificationHistory.sms_response_token = sms_response_fields[:token]
     end
-
+    
     recipientNotificationHistory.save
   end
 
@@ -118,5 +117,5 @@ binding.pry
     msg.gsub! '{alertcategory}', alert.category_type
     return msg
   end
-
+  
 end

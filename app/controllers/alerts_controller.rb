@@ -31,7 +31,6 @@ class AlertsController < ApplicationController
     end
     @alert_devices = @alert_devices.join(",")
 
-
     @alert_roles=[]
     alert_info.alert_recipients.each do |recipient|
       if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["role"]
