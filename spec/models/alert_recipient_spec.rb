@@ -17,6 +17,33 @@ RSpec.describe AlertRecipient, :type => :model do
       expect(alertRecipient).to_not be_valid
     end
 
+    it "cannot create for invalid email field" do
+      alert = Alert.create
+      alertRecipient = AlertRecipient.new
+      alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
+      alertRecipient.email = "aa"
+      alertRecipient.telephone = "12456"
+      alertRecipient.first_name = ""
+      alertRecipient.last_name = "s"
+      alertRecipient.alert=alert
+
+      expect(alertRecipient).to_not be_valid
+    end
+
+    it "cannot create for empty email and telephone fields" do
+      alert = Alert.create
+      alertRecipient = AlertRecipient.new
+      alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
+      alertRecipient.email = ""
+      alertRecipient.telephone = ""
+      alertRecipient.first_name = ""
+      alertRecipient.last_name = "s"
+      alertRecipient.alert=alert
+
+      expect(alertRecipient).to_not be_valid
+    end
+
+
     it "can create for valid fields" do
       alert = Alert.create
       alertRecipient = AlertRecipient.new
