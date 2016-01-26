@@ -57,3 +57,12 @@ csv_watch:
   env_file: docker.env
   volumes_from:
     - sshd
+
+ftp_monitor:
+  image: instedd/cdx:latest
+  restart: always
+  links:
+    - db
+    - sshd
+    - elasticsearch
+  env_file: docker.env

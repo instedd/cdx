@@ -20,6 +20,12 @@ csv_watch:
   volumes_from:
     - sshd
 
+ftp_monitor:
+  links:
+    - db
+    - elasticsearch
+  env_file: docker-dev.env
+
 sidekiq:
   links:
     - db

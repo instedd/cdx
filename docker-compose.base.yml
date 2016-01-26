@@ -22,6 +22,11 @@ csv_watch:
   command: rake csv:watch
   user: app
 
+ftp_monitor:
+  build: .
+  command: rake ftp:start
+  user: app
+
 sidekiq:
   build: .
   command: bundle exec sidekiq
