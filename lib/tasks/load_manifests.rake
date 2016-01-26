@@ -39,7 +39,14 @@ namespace :manifests do
       'alere_pima' => {
         activation: false,
         ftp: true,
-        pattern: '(?<sn>[A-Za-z\-0-9]+)_(?<ts>\d\d\d\d-\d\d-\d\d_\d\d-\d\d-\d\d)_AssayID_(?<assayid>\d+|X)_\((?<assayname>[A-Za-z0-9_\-]+)\)\.csv',
+        pattern: '(?<sn>[A-Za-z\-0-9]+)_(?<ts>\d\d\d\d-\d\d-\d\d_\d\d-\d\d-\d\d)_AssayID_(?<assayid>\d+|X)_\((?<assayname>[A-Za-z0-9_\-]+)\)\.csv$',
+        institution: 'Alere',
+        owner: 'alere_admin@instedd.org'
+      },
+      'alere_q' => {
+        activation: false,
+        ftp: true,
+        pattern: '(?<assayid>[A-Za-z0-9\-]+)_(?<sn>[A-Za-z\-0-9]+)_(?<ts>\d\d\d\d-\d\d-\d\d_\d\d-\d\d-\d\d)\.csv$',
         institution: 'Alere',
         owner: 'alere_admin@instedd.org'
       }
@@ -64,7 +71,7 @@ namespace :manifests do
           supports_activation: props[:activation],
           supports_ftp: props[:ftp],
           filename_pattern: props[:pattern]
-          
+
         device_model.tap(&:set_published_at).save!
       end
     end
