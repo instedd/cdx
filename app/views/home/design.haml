@@ -70,3 +70,18 @@
   .col
     %input(type="checkbox" id="chk2")
     %label(for="chk2") &nbsp;
+
+%h2 Radio buttons
+
+.row
+  .col
+    %input(type="radio" name="gender" id="opt_male" value="male")
+    %label(for="opt_male") Male
+.row
+  .col
+    %input(type="radio" name="gender" id="opt_female" value="female")
+    %label(for="opt_female") Female
+.row
+  .col
+    %input(type="radio" name="gender" id="opt_other" value="other")
+    %label(for="opt_other") Other
