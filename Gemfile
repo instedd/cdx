@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.0'
+gem 'rails', '~> 4.2.5.1'
 gem 'mysql2'
 gem 'sass-rails', '~> 4.0.0'
 gem 'uglifier', '>= 2.7.2'
@@ -74,7 +74,7 @@ group :development do
   # gem 'meta_request'
 end
 
-gem 'devise', '~> 3.5.2'
+gem 'devise', '~> 3.5.5'
 gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
 gem 'devise_invitable'
 gem 'omniauth'
