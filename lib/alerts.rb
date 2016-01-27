@@ -3,12 +3,32 @@ module Alerts
   include SMS
   
   def alert_history_check(frequency, alert_type)
+    
+    if alert_type == Alert.hour
     alerts = Alert.aggregated.hour.where({enabled: true})
-
+  else
+    alerts = Alert.aggregated.day.where({enabled: true})
+   end
+   
+    # :hour, :day, :week, :month]
+=begin
+    if alert_type == Alert.hour
+       alerts = Alert.aggregated.hour.where({enabled: true})
+    elsif alert_type == Alert.day
+     alerts=Alert.where("created_at:  ? and enabled: ?",(Time.now - 24.hours)..Time.now,true )
+    elsif alert_type == Alert.week
+      alerts=Alert.where("created_at:  ? and enabled: ?",1.week.ago,true )
+    else #monthly
+       alerts=Alert.where("created_at:  ? and enabled: ?",1.month.ago,true )
+    end
+=end
+    
+    
     #for each alert check if it has occured in alert history in the last hour
     # if it has just alert the user
     alerts.each do |alert|
-      if ( (alertHistorycount=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', frequency.ago).where('for_aggregation_calculation=true').count ) > 0 )
+      alertHistorycount=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', frequency.ago).where('for_aggregation_calculation=true').count 
+      if (alertHistorycount > 0)
         alertHistory = AlertHistory.new
         alertHistory.alert = alert
         alertHistory.user = alert.user

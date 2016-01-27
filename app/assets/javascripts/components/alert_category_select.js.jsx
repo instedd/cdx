@@ -200,7 +200,7 @@ var AlertCategorySelect = React.createClass({
 							</div>
 							<div className="col" >
 								<input type="radio" name="category_type" value={category_keys[0]}  onChange={this.categoryChanged} id={category_keys[0]} />
-									<label for={category_keys[0]}>Anomalies</label>
+									<label>Anomalies</label>
 								</div>
 							</div>
 							<div className="row">
@@ -218,7 +218,7 @@ var AlertCategorySelect = React.createClass({
 											category_keys[1]
 										}
 										/>
-									<label for={category_keys[1]}>Device Errors</label>
+									<label>Device Errors</label>
 								</div>
 							</div>
 
@@ -228,7 +228,7 @@ var AlertCategorySelect = React.createClass({
 									< /div>
 									<div className="col">
 										<input type="radio" name="category_type" value={category_keys[2]} onChange={this.categoryChanged} id={category_keys[2]} />
-											<label for={category_keys[2]}>Quality Assurance</label>
+											<label>Quality Assurance</label>
 										</div>
 									</div>
 
@@ -248,7 +248,7 @@ var AlertCategorySelect = React.createClass({
 													category_keys[3]
 												}
 												/>
-											<label for={category_keys[3]}>Test Results</label>
+											<label>Test Results</label>
 										</div>
 									</div>
 
