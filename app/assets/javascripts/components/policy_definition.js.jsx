@@ -13,8 +13,27 @@ var PolicyDefinition = React.createClass({
     if(definition == null) {
       return [this.emptyPolicy];
     }
+
     definition = JSON.parse(definition);
-    var statements = definition.statement.map(function(statement) {
+
+    var statements = definition.statement.map(function(definitionStatement) {
+
+      // ensure delegable is a boolean, and action, resource and except are arrays
+      var statement = {
+        delegable: definitionStatement.delegable == true
+      };
+
+      ['action', 'resource', 'except'].forEach(function(property) {
+        var definitionProperty = definitionStatement[property] || [];
+        if(Array.isArray(definitionProperty)) {
+          statement[property] = definitionProperty;
+        } else if(definitionProperty == null) {
+          statement[property] = [];
+        } else {
+          statement[property] = [definitionProperty];
+        }
+      });
+
       var resourceList = {
         'except': [],
         'only': []
@@ -49,21 +68,16 @@ var PolicyDefinition = React.createClass({
         }
       }
 
-      if(Array.isArray(statement.except) && (statement.except.length > 0)) {
+      if(statement.except.length > 0) {
         statementType = 'except';
         resources = statement.except;
       } else {
-        if(Array.isArray(statement.resource) && (statement.resource.length > 0)) {
-          resources = statement.resource;
-          if(_resourceComponents(resources[0]).thisResourceId) {
-            statementType = 'only';
-          } else {
-            statementType = 'all';
-          }
-        } else if(statement.resource && statement.resource.length > 0) {
+        resources = statement.resource;
+        if(_resourceComponents(resources[0]).thisResourceId) {
+          statementType = 'only';
+        } else {
           statementType = 'all';
-          resources = [statement.resource];
-          resourceType = statement.resource;
+          resourceType = resources[0];
         }
       }
 
@@ -86,21 +100,17 @@ var PolicyDefinition = React.createClass({
       }
 
       var _hydratateAction = function(actions, action) {
+        if (action == '*') {
+          return {id: '*', label: 'Inherit permissions from granter', value: '*'};
+        }
         var components = action.split(":");
         return actions[components[0]][components[1]];
-      }
-
-      var actions = null;
-      if (statement.action == '*') {
-        actions = [{id: '*', label: 'Inherit permissions from granter', value: '*'}];
-      } else {
-        actions = statement.action.map(_hydratateAction.bind(this, props.actions));
       }
 
       return {
         delegable: statement.delegable == true,
         includeSubsites: true, // TODO: still unsupported in policies definitions
-        actions: actions,
+        actions: statement.action.map(_hydratateAction.bind(this, props.actions)),
         resourceList: resourceList,
         resourceType: resourceType,
         statementType: statementType
