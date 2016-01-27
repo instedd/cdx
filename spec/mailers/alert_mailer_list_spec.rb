@@ -3,6 +3,10 @@ require "spec_helper"
 RSpec.describe AlertMailer, type: :mailer do
 
 
+  after(:each) do
+     ActionMailer::Base.deliveries.clear
+   end
+   
 
   it 'should send an email' do
 

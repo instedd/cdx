@@ -63,6 +63,8 @@ end
 context "sms exceeded" do 
   
    it "should test exceeding sms limit" do
+    
+     
      alert = Alert.make
      alert.name="test alert"
      alert.sms_message="welcome mr {lastname}"
@@ -84,21 +86,44 @@ context "sms exceeded" do
      alert_history.alert = alert
      
      alert.sms_limit=2
+     
+     alert.error_code=155
+     binding.pry
+     alert.category_type= "device_errors"
      alert.save
+ 
+ 
+#insert test result
+binding.pry
+     user = User.make 
+      institution = Institution.make user_id: user.id 
+      site =  Site.make institution: institution 
+      device =  Device.make institution: institution, site: site 
+      data = Oj.dump test:{assays: [result: :positive]} 
+      
+
+#  DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
+
+     DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 155}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
+    
+    
+    
      
-     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
-     binding.pry
-     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
-     binding.pry
-     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
-     binding.pry
-    alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
-     
+  
+#     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
+#     binding.pry
+#     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
+#     binding.pry
+#     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
+#     binding.pry
+#    alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
+    
      binding.pry
      expect(RecipientNotificationHistory.count).to eq(2)
      
    end
 end
 =end
+
   
 end
