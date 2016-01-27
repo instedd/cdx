@@ -28,7 +28,7 @@ class AlertRecipient < ActiveRecord::Base
 
   #the email or the phone number must be present
   def email_telephone_validation_presence
-    if (email.length==0) && (telephone.length==0)
+    if (email==nil || email.length==0) && (telephone==nil || telephone.length==0)
       errors.add(:email, "email and telephone cannot both be empty")
     end
   end

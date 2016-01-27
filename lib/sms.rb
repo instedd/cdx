@@ -10,7 +10,7 @@ module SMS
 
     #api = Nuntium.new "service_url", "account_name", "application_name", "application_password"
     api = Nuntium.new Settings.alert_sms_service_url, Settings.alert_sms_account_name, Settings.alert_sms_application_name, Settings.alert_sms_application_password
-    
+
     from_tel = Settings.alert_sms_from_tel
     to_tel = "sms://"+telephone
 
