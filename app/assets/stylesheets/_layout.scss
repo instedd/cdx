@@ -141,13 +141,17 @@ footer {
 .devise-box {
   background: $white;
   border-radius: 3px;
-  padding: 5px 15px;
+  padding: 25px;
   min-width: 440px;
 
   h1 {
     color: $black;
     margin: 0;
     padding: 0 0 25px 0;
+
+    & + p {
+      color: $gray3;
+    }
   }
 
   a {
