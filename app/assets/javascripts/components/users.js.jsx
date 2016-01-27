@@ -46,19 +46,20 @@ var UserInviteForm = React.createClass({
   },
 
   addUser: function() {
-    this.setState(React.addons.update(this.state, {
-      users: { $set: event.target.value }
-    }));
+    console.log("hi!");
+    // this.setState(React.addons.update(this.state, {
+    //   users: { $set: event.target.value }
+    // }));
   },
 
   changeRole: function(newValue) {
-    console.log(newValue);
     this.setState(React.addons.update(this.state, {
       role: { $set: newValue }
     }));
   },
 
   render: function() {
+    // <div className="col"><OptionList chosenOnes={[]} callback={this.addUser} autocompleteCallback="/users/autocomplete" /></div>
     return (<div>
       <div className="row">
         <div className="col pe-3"><label>Role</label></div>

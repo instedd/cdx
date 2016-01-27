@@ -8,34 +8,48 @@ var OptionList = React.createClass({
 
   removeItem: function(item, event) {
     event.preventDefault();
+    var old = _.clone(this.state.chosenOnes);
     var index = this.state.chosenOnes.indexOf(item);
     var filtered = this.state.chosenOnes;
     filtered.splice(index, 1);
     this.setState(React.addons.update(this.state, {
       chosenOnes: { $set: filtered }
     }));
-    $.ajax({
-      url: '/users/' + this.props.userId + '/unassign_role',
-      method: 'POST',
-      data: {role: item.value},
-      error: function () {
-        this.appendItem(item);
-      }.bind(this)
-    });
+    if(typeof(this.props.callback) == "string") {
+      $.ajax({
+        url: this.props.callback,
+        method: 'POST',
+        data: {remove: item.value},
+        error: function () {
+          this.setState(React.addons.update(this.state, {
+            chosenOnes: { $set: old }
+          }));
+        }.bind(this)
+      });
+    } else {
+      this.props.callback();
+    }
   },
 
   appendItem: function(item) {
+    var old = _.clone(this.state.chosenOnes);
     this.setState(React.addons.update(this.state, {
       chosenOnes: { $push: [item] }
     }));
-    $.ajax({
-      url: '/users/' + this.props.userId + '/assign_role',
-      method: 'POST',
-      data: {role: item.value},
-      error: function () {
-        this.removeItem(item);
-      }.bind(this)
-    });
+    if(typeof(this.props.callback) == "string") {
+      $.ajax({
+        url: this.props.url,
+        method: 'POST',
+        data: {add: item.value},
+        error: function () {
+          this.setState(React.addons.update(this.state, {
+            chosenOnes: { $set: old }
+          }));
+        }.bind(this)
+      });
+    } else {
+      this.props.callback();
+    }
   },
 
   showInput: function(event) {
@@ -56,9 +70,9 @@ var OptionList = React.createClass({
             </li>);
           }.bind(this))}
         </ul>
-        { this.state.showInput ? null : <a className="btn-add-link" onClick={this.showInput} href="#"><span className="iconb-add"></span> Add role</a> }
-        { this.state.showInput ? <AddItemSearch callback={"/roles/autocomplete"} onItemChosen={this.appendItem}
-                placeholder="Search roles"
+        { this.state.showInput ? null : <a className="btn-add-link" onClick={this.showInput} href="#"><span className="iconb-add"></span>Add</a> }
+        { this.state.showInput ? <AddItemSearch callback={this.props.autocompleteCallback} onItemChosen={this.appendItem}
+                placeholder="Search"
                 itemTemplate={AddItemOptionList}
                 itemKey="value" /> : null }
       </div>

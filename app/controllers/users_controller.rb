@@ -3,7 +3,7 @@ class UsersController < ApplicationController
 
   def index
     return unless authorize_resource(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS))
-    @users = User.within(@navigation_context.entity)
+    @users = User.uniq.within(@navigation_context.entity)
     @roles = Role.within(@navigation_context.entity).map{|r| {value: r.id, label: r.name}}
     apply_filters
 
@@ -52,18 +52,20 @@ class UsersController < ApplicationController
   end
 
   def assign_role
-    @role = Role.find(params[:role])
-    @user.roles << @role
+    if params[:add]
+      @user.roles << Role.find(params[:add].to_i)
+    else
+      role = Role.find(params[:remove].to_i)
+      @user.roles.delete(role)
+    end
     # Since user is not being updated here, we need to force the new role's policy update
     ComputedPolicy.update_user(@user)
     render nothing: true
   end
 
-  def unassign_role
-    @role = Role.find(params[:role])
-    @user.roles.delete(@role)
-    ComputedPolicy.update_user(@user)
-    render nothing: true
+  def autocomplete
+    users = check_access(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS)).where('name LIKE ?', "%#{params[:q]}%".gsub("'", "")).map{|r| {value: r.id, label: r.name}}
+    render json: users
   end
 
   private

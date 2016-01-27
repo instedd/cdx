@@ -147,6 +147,9 @@ Rails.application.routes.draw do
       post :assign_role
       post :unassign_role
     end
+    collection do
+      get :autocomplete
+    end
   end
   resources :roles do
     collection do
