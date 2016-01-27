@@ -1,7 +1,7 @@
 var AlertEnabled = React.createClass({
 	render: function() {
 		return (
-			< div className = "row" >
+			< div className = "row">
 			<div className = "col pe-2" >
 				<label>Enabled</label>
 			</div>

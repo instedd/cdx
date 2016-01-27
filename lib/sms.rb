@@ -2,11 +2,10 @@ module SMS
 
   require 'nuntium'
 
-  #to send an sms go direct to numtium, no need to go via hub/mbuilder.
-  # https://rubygems.org/gems/nuntium_api/versions/0.21
-  # https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home
-
-  #http://nuntium.instedd.org/channels
+  # To send an sms go direct to numtium, no need to go via hub/mbuilder.
+  #   https://rubygems.org/gems/nuntium_api/versions/0.21
+  #   https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home
+  #   http://nuntium.instedd.org/channels
   def send_sms(telephone, text_msg)
 
     #api = Nuntium.new "service_url", "account_name", "application_name", "application_password"
@@ -21,7 +20,6 @@ module SMS
       :body => text_msg
     }
 
-    # Send an Application Originated message.
     response = api.send_ao sms_message
   end
 

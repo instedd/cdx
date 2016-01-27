@@ -4,6 +4,17 @@ include Alerts
 
 describe "SmsLib" do
 
+  before(:each) do
+      stub_request(:get, "https://CDx%2FCDx-Dev:cdx123cdx@nuntium.instedd.org/CDx/CDx-Dev/send_ao?body=welcome%20mr%20smith&from=sms://442393162302&to=sms://123444").
+      with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
+      to_return(:status => 200, :body => "{'id'=>'2051719', 'guid'=>'69abea50-840e-50a0-77f9-547b38b2943e', 'token'=>'76beefab-9686-cd17-a3bc-d79dec6e0544'}", :headers => {})
+
+      stub_request(:get, "https://CDx%2FCDx-Dev:cdx123cdx@nuntium.instedd.org/CDx/CDx-Dev/send_ao?body=welcome%20mr%20smith&from=sms://442393162302&to=sms://456777").
+      with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
+      to_return(:status => 200, :body => "{'id'=>'2051719', 'guid'=>'69abea50-840e-50a0-77f9-547b38b2943e', 'token'=>'76beefab-9686-cd17-a3bc-d79dec6e0544'}", :headers => {})
+  end
+  
+context "sms operation" do
   it "should test sending sms" do
 
     alert = Alert.make
@@ -40,16 +51,54 @@ describe "SmsLib" do
     alert_history = AlertHistory.new
     alert_history.alert = alert
 
-    stub_request(:get, "https://CDx%2FCDx-Dev:cdx123cdx@nuntium.instedd.org/CDx/CDx-Dev/send_ao?body=welcome%20mr%20smith&from=sms://442393162302&to=sms://123444").
-    with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
-    to_return(:status => 200, :body => "{'id'=>'2051719', 'guid'=>'69abea50-840e-50a0-77f9-547b38b2943e', 'token'=>'76beefab-9686-cd17-a3bc-d79dec6e0544'}", :headers => {})
-
-    stub_request(:get, "https://CDx%2FCDx-Dev:cdx123cdx@nuntium.instedd.org/CDx/CDx-Dev/send_ao?body=welcome%20mr%20smith&from=sms://442393162302&to=sms://456777").
-    with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
-    to_return(:status => 200, :body => "{'id'=>'2051719', 'guid'=>'69abea50-840e-50a0-77f9-547b38b2943e', 'token'=>'76beefab-9686-cd17-a3bc-d79dec6e0544'}", :headers => {})
 
     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
 
     expect(RecipientNotificationHistory.count).to eq(2)
   end
+ 
+end
+
+=begin
+context "sms exceeded" do 
+  
+   it "should test exceeding sms limit" do
+     alert = Alert.make
+     alert.name="test alert"
+     alert.sms_message="welcome mr {lastname}"
+
+     recipient = AlertRecipient.make
+     recipient.recipient_type = AlertRecipient.recipient_types["external_user"]
+     recipient.alert=alert
+
+     tel_list=[]
+     person = Hash.new
+     person[:telephone] = "123444"
+     person[:first_name] = recipient.first_name
+     person[:last_name] = recipient.last_name
+     person[:user_id] = nil
+     person[:recipient_id] = recipient.id
+     tel_list.push person
+     
+     alert_history = AlertHistory.new
+     alert_history.alert = alert
+     
+     alert.sms_limit=2
+     alert.save
+     
+     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
+     binding.pry
+     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
+     binding.pry
+     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
+     binding.pry
+    alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
+     
+     binding.pry
+     expect(RecipientNotificationHistory.count).to eq(2)
+     
+   end
+end
+=end
+  
 end

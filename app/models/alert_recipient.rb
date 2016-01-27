@@ -12,7 +12,7 @@ class AlertRecipient < ActiveRecord::Base
   validates_format_of :email,:with => Devise.email_regexp
 
   #TODO valid phone number: see  https://www.twilio.com/blog/2015/04/validate-phone-numbers-in-ruby-using-the-lookup-api.html
-
+  
   private
 
   def name_validation
@@ -28,7 +28,7 @@ class AlertRecipient < ActiveRecord::Base
 
   #the email or the phone number must be present
   def email_telephone_validation_presence
-    if (email.length==0) and (telephone.length==0)
+    if (email.length==0) && (telephone.length==0)
       errors.add(:email, "email and telephone cannot both be empty")
     end
   end

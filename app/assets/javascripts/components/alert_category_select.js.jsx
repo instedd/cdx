@@ -60,7 +60,6 @@ var AlertCategorySelect = React.createClass({
 		};
 	},
 	categoryChanged: function(e) {
-
 		var val = e.currentTarget.value;
 		this.doCategoryChange(val);
 	},
@@ -199,9 +198,9 @@ var AlertCategorySelect = React.createClass({
 						<div className="col pe-2">
 							<label>Categories</label >
 							</div>
-							<div className="col">
-								<input type="radio" name="category_type" value={category_keys[0]}  onChange={this.categoryChanged} id={category_keys[0]} / >
-									<label> Anomalies </label>
+							<div className="col" >
+								<input type="radio" name="category_type" value={category_keys[0]}  onChange={this.categoryChanged} id={category_keys[0]} />
+									<label for={category_keys[0]}>Anomalies</label>
 								</div>
 							</div>
 							<div className="row">
@@ -209,7 +208,7 @@ var AlertCategorySelect = React.createClass({
 									&nbsp;
 								</div>
 								<div className = "col" >
-									<input type = "radio" name = "category_type"value = {
+									<input type = "radio" name = "category_type" value = {
 											category_keys[1]
 										}
 										onChange = {
@@ -219,7 +218,7 @@ var AlertCategorySelect = React.createClass({
 											category_keys[1]
 										}
 										/>
-									<label>Device Errors</label>
+									<label for={category_keys[1]}>Device Errors</label>
 								</div>
 							</div>
 
@@ -228,8 +227,8 @@ var AlertCategorySelect = React.createClass({
 									&nbsp;
 									< /div>
 									<div className="col">
-										<input type="radio" name="category_type" value={category_keys[2]} onChange={this.categoryChanged} id={category_keys[2]} / >
-											<label> Quality Assurance </label>
+										<input type="radio" name="category_type" value={category_keys[2]} onChange={this.categoryChanged} id={category_keys[2]} />
+											<label for={category_keys[2]}>Quality Assurance</label>
 										</div>
 									</div>
 
@@ -249,7 +248,7 @@ var AlertCategorySelect = React.createClass({
 													category_keys[3]
 												}
 												/>
-											<label>Test Results</label>
+											<label for={category_keys[3]}>Test Results</label>
 										</div>
 									</div>
 

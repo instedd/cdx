@@ -21,6 +21,7 @@ module Alerts
     end
   end
 
+
   def alert_email_inform_recipient(alert, alert_history, recipients_list, alert_count=0)
 
     #TODO look at Sending Email To Multiple Recipients, http://guides.rubyonrails.org/action_mailer_basics.html
@@ -41,13 +42,20 @@ module Alerts
     
       #TODO Can also send many messages at once. https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home
     recipients_list.each do |person|
-      text_msg=parse_alert_message(alert, alert.sms_message, person)
-      sms_response_fields=send_sms(person[:telephone], text_msg)
       
-      #record it was send
-      record_alert_message(alert, alert_history, person[:user_id], person[:recipient_id], text_msg, sms_response_fields)
+      number_sms_sent_today = AlertHistory.calculate_number_sms_sent_today(alert.id)
+      
+      if (number_sms_sent_today <= alert.sms_limit)
+        text_msg=parse_alert_message(alert, alert.sms_message, person)
+        sms_response_fields=send_sms(person[:telephone], text_msg)
+      
+        record_alert_message(alert, alert_history, person[:user_id], person[:recipient_id], text_msg, sms_response_fields)
+      else
+        Rails.logger.info("sms limit exceeded for alert "+alert.id.to_s)
+      end
     end
   end
+
 
   def record_alert_message(alert, alert_history, user_id, alert_recipient_id, messagebody, sms_response_fields=nil)
     recipientNotificationHistory = RecipientNotificationHistory.new

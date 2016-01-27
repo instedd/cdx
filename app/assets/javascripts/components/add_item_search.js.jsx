@@ -21,6 +21,15 @@ var AddItemSearch = React.createClass({
     this.handleSearchDebounced = _.debounce(function(){
       this.handleSearch.apply(this, [this.state.query]);
     }, 500);
+
+		 $("input[@type=radio]").css("margin-left", "200px");
+	    $("input[@type=radio]").css("display", "all");
+	
+
+  },
+  componentDidMount: function() {
+   $("input[@type=radio]").css("margin-left", "200px");
+    $("input[@type=radio]").css("display", "all");
   },
 
   onChange: function(event) {

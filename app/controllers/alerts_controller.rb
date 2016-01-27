@@ -106,7 +106,7 @@ class AlertsController < ApplicationController
         external_users = params[:alert][:external_users]
 
         # using key/pair as value returned in this format  :
-        # {"0"=>{"id"=>"0", "firstName"=>"a", "lastName"=>"b", "email"=>"c", "telephone"=>"d"}, "1"=>{"id"=>"1", "firstName"=>"aa", "lastName"=>"bb", "email"=>"cc", "telephone"=>"dd"}}
+        #  {"0"=>{"id"=>"0", "firstName"=>"a", "lastName"=>"b", "email"=>"c", "telephone"=>"d"}, "1"=>{"id"=>"1", "firstName"=>"aa", "lastName"=>"bb", "email"=>"cc", "telephone"=>"dd"}}
         external_users.each do |key, external_user_value|
           alertRecipient = AlertRecipient.new
           alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
@@ -137,7 +137,7 @@ class AlertsController < ApplicationController
         end
       end
       if alert_info.category_type == "device_errors"
-        if alert_info.error_code and alert_info.error_code.include? '-'
+        if alert_info.error_code && (alert_info.error_code.include? '-')
           minmax=alert_info.error_code.split('-')
           alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
           #   alert_info.query=alert_info.query.merge ({"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]})
@@ -179,7 +179,7 @@ class AlertsController < ApplicationController
 
     alert_query_updated_ok = alert_info.update(query: alert_info.query)
 
-    if alert_saved_ok and alert_query_updated_ok and external_users_ok
+    if alert_saved_ok && alert_query_updated_ok && external_users_ok
       render json: alert_info
     else
       render json: error_text, status: :unprocessable_entity

@@ -37,6 +37,7 @@ Alert.blueprint do
   description { Faker::Name.last_name }
   message { 'test message' }
   category_type {"anomalies"}
+  sms_limit {10000}
   user
 end
 
