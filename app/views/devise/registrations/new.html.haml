@@ -17,9 +17,6 @@
       - if @minimum_password_length
         .small-quote.pull-right
           (#{@minimum_password_length} characters minimum)
-  .row
-    .col
-      = f.password_field :password_confirmation, autocomplete: "off", placeholder: 'Confirm password', class: "input-block"
   %br
   .row
     .col
