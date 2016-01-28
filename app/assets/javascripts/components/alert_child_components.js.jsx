@@ -1,8 +1,32 @@
+var AlertDelete = React.createClass({
+	clickHandler: function() {
+		//TODO popup confirm alert
+		this.props.onChangeParentLevel();
+	},
+	render: function() {
+
+		if(this.props.edit) {
+			return (
+				< div className = "row">
+				<div className = "col pe-2" >
+					&nbsp;
+				</div>
+				<div className = "col">
+					<a className = "btn-link" onClick={this.clickHandler}>Delete Alert</a>
+				</div>
+			</div>
+		);
+	} else {
+		return null;
+	}
+}
+});
+
 var AlertEnabled = React.createClass({
 	render: function() {
 		return (
 			< div className = "row">
-			<div className = "col pe-2" >
+			<div className = "col pe-2">
 				<label>Enabled</label>
 			</div>
 			<div className = "col">
@@ -11,10 +35,10 @@ var AlertEnabled = React.createClass({
 					checkedLink = {
 						this.props.checkedLink
 					}
+					id="AlertEnabled"
 					/>
-				<label>
-					&nbsp;
-				</label>
+					<label htmlFor="AlertEnabled">&nbsp;</label>
+				
 			</div>
 		</div>
 	);
@@ -28,17 +52,17 @@ var AlertName = React.createClass({
 			< div className = "row" id = "namerow" >
 			<div className = "col pe-2" >
 				<label>Name</label>
-				</div>
-
-				<div className = "col" >
-					<input type = "text" placeholder = "Name" valueLink = {
-							this.props.valueLink
-						}
-						id = "alertname" required  pattern=".{2,255}" />
-				</div>
 			</div>
-		);
-	}
+
+			<div className = "col" >
+				<input type = "text" placeholder = "Name" valueLink = {
+						this.props.valueLink
+					}
+					id = "alertname" required  pattern=".{2,255}" />
+			</div>
+		</div>
+	);
+}
 });
 
 var AlertDescription = React.createClass({
@@ -117,31 +141,31 @@ var AlertSite = React.createClass({
 			< div className = "row">
 			<div className = "col pe-2">
 				<label>Sites</label>
-				</div>
-				<div className = "col">
-					<Select
-						name = "site"
-						value = {
-							value
-						}
-						options = {
-							siteOptions
-						}
-						multi = {
-							true
-						}
-						placeholder = "None"
-						onChange = {
-							this.onChange
-						}
-						disabled = {
-							this.props.disable_all_selects
-						}
-						/>
-				</div>
 			</div>
-		);
-	}
+			<div className = "col">
+				<Select
+					name = "site"
+					value = {
+						value
+					}
+					options = {
+						siteOptions
+					}
+					multi = {
+						true
+					}
+					placeholder = "None"
+					onChange = {
+						this.onChange
+					}
+					disabled = {
+						this.props.disable_all_selects
+					}
+					/>
+			</div>
+		</div>
+	);
+}
 });
 
 
@@ -179,8 +203,8 @@ var AlertDevice = React.createClass({
 		} = this.props;
 		return (
 			<div className = "row" >
-			<div className = "col pe-2" >
-				<label>Devices</label>
+				<div className = "col pe-2" >
+					<label>Devices</label>
 				</div>
 				<div className = "col" >
 					<Select
@@ -219,7 +243,7 @@ var AlertAnomalieType = React.createClass({
 	},
 	//https://github.com/JedWatson/react-select/issues/256
 	onChange(textValue, arrayValue) {
-	this.props.valueLink.requestChange(arrayValue[0].label);
+		this.props.valueLink.requestChange(arrayValue[0].label);
 	},
 	render: function() {
 		var options = [];
@@ -240,30 +264,30 @@ var AlertAnomalieType = React.createClass({
 			< div className = "row" id = "anomalierow" >
 			<div className = "col pe-2" >
 				<label>Anomalie Type</label>
-				</div>
-				<div className = "col" >
-					<Select
-						name = "anomalie"
-						value = {
-							value || valueLink.value
-						}
-						options = {
-							options
-						}
-						multi = {
-							false
-						}
-						onChange = {
-							this.onChange
-						}
-						disabled = {
-							this.props.disable_all_selects
-						}
-						/>
-				</div>
 			</div>
-		);
-	}
+			<div className = "col" >
+				<Select
+					name = "anomalie"
+					value = {
+						value || valueLink.value
+					}
+					options = {
+						options
+					}
+					multi = {
+						false
+					}
+					onChange = {
+						this.onChange
+					}
+					disabled = {
+						this.props.disable_all_selects
+					}
+					/>
+			</div>
+		</div>
+	);
+}
 });
 
 
@@ -298,30 +322,30 @@ var AlertAggregation = React.createClass({
 			< div className = "row" id = "aggregationrow" >
 			<div className = "col pe-2" >
 				<label>Aggregation Type</label>
-				</div>
-				<div className = "col" >
-					<Select
-						name = "aggregation"
-						value = {
-							value || valueLink.value
-						}
-						options = {
-							options
-						}
-						multi = {
-							false
-						}
-						onChange = {
-							this.onChange
-						}
-						disabled = {
-							this.props.disable_all_selects
-						}
-						/>
-				</div>
 			</div>
-		);
-	}
+			<div className = "col" >
+				<Select
+					name = "aggregation"
+					value = {
+						value || valueLink.value
+					}
+					options = {
+						options
+					}
+					multi = {
+						false
+					}
+					onChange = {
+						this.onChange
+					}
+					disabled = {
+						this.props.disable_all_selects
+					}
+					/>
+			</div>
+		</div>
+	);
+}
 });
 
 
@@ -356,30 +380,30 @@ var AlertAggregationFrequency = React.createClass({
 			< div className = "row" id = "aggregationfrequenciesrow" >
 			<div className = "col pe-2" >
 				<label>Aggregation Frequency</label>
-				</div>
-				<div className = "col" >
-					<Select
-						name = "aggregation_frequency"
-						value = {
-							value || valueLink.value
-						}
-						options = {
-							options
-						}
-						multi = {
-							false
-						}
-						onChange = {
-							this.onChange
-						}
-						disabled = {
-							this.props.disable_all_selects
-						}
-						/>
-				</div>
 			</div>
-		);
-	}
+			<div className = "col" >
+				<Select
+					name = "aggregation_frequency"
+					value = {
+						value || valueLink.value
+					}
+					options = {
+						options
+					}
+					multi = {
+						false
+					}
+					onChange = {
+						this.onChange
+					}
+					disabled = {
+						this.props.disable_all_selects
+					}
+					/>
+			</div>
+		</div>
+	);
+}
 });
 
 
@@ -414,30 +438,30 @@ var AlertChannel = React.createClass({
 			< div className = "row" id = "channelrow" >
 			<div className = "col pe-2" >
 				<label>Channel</label>
-				</div>
-				<div className = "col" >
-					<Select
-						name = "channel"
-						value = {
-							value || valueLink.value
-						}
-						options = {
-							options
-						}
-						multi = {
-							false
-						}
-						onChange = {
-							this.onChange
-						}
-						disabled = {
-							this.props.disable_all_selects
-						}
-						/>
-				</div>
 			</div>
-		);
-	}
+			<div className = "col" >
+				<Select
+					name = "channel"
+					value = {
+						value || valueLink.value
+					}
+					options = {
+						options
+					}
+					multi = {
+						false
+					}
+					onChange = {
+						this.onChange
+					}
+					disabled = {
+						this.props.disable_all_selects
+					}
+					/>
+			</div>
+		</div>
+	);
+}
 });
 
 
@@ -478,31 +502,31 @@ var AlertRole = React.createClass({
 			< div className = "row" >
 			<div className = "col pe-2" >
 				<label>Roles</label>
-				</div>
-				<div className = "col" >
-					<Select
-						name = "role"
-						value = {
-							value || valueLink.value
-						}
-						options = {
-							roleOptions
-						}
-						multi = {
-							true
-						}
-						placeholder = "None"
-						onChange = {
-							this.onChange
-						}
-						disabled = {
-							this.props.disable_all_selects
-						}
-						/>
-				</div>
 			</div>
-		);
-	}
+			<div className = "col" >
+				<Select
+					name = "role"
+					value = {
+						value || valueLink.value
+					}
+					options = {
+						roleOptions
+					}
+					multi = {
+						true
+					}
+					placeholder = "None"
+					onChange = {
+						this.onChange
+					}
+					disabled = {
+						this.props.disable_all_selects
+					}
+					/>
+			</div>
+		</div>
+	);
+}
 });
 
 

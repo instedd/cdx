@@ -206,13 +206,14 @@ class AlertsController < ApplicationController
 
   def destroy
     if alert_info.destroy
-      flash[:notice] = "alert was successfully deleted"
-      respond_with alert_info
+      render json: alert_info
     else
-      render :edit
+      render json: alert_info.errors, status: :unprocessable_entity
     end
+
+
   end
-  
+
 
   private
 

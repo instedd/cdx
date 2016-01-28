@@ -8,6 +8,8 @@ class Alert < ActiveRecord::Base
 
   has_and_belongs_to_many :sites
   has_and_belongs_to_many :devices
+  
+  acts_as_paranoid
 
   after_update :recreate_alert_percolator
   after_destroy :delete_percolator

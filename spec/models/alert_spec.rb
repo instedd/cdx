@@ -21,6 +21,23 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
 
   end
 
+  context "validate soft delete" do
+    it "soft deletes an alert" do
+      alert = Alert.make
+      alert.destroy
+      deleted_alert_id = Alert.where(id: alert.id).pluck(:id)
+      expect(deleted_alert_id).to eq([])
+    end
+
+    it "soft deletes an alert and alert still exists" do
+      alert = Alert.make
+      alert.destroy
+      deleted_alert_id = Alert.with_deleted.where(id: alert.id).pluck(:id)
+      expect(deleted_alert_id).to eq([alert.id])
+    end
+
+  end
+
   context "validate perculator" do
 
     it "creates a perculator" do

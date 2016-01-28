@@ -1,4 +1,5 @@
 var AlertActions = Reflux.createActions([
   'createAlert',
-  'updateAlert'
+  'updateAlert',
+  'deleteAlert'
 ]);

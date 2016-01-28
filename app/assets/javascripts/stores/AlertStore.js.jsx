@@ -7,6 +7,7 @@ var AlertStore = Reflux.createStore({
     // Here we listen to actions and register callbacks
     this.listenTo(AlertActions.createAlert, this.onCreate);
     this.listenTo(AlertActions.updateAlert, this.onUpdate);
+    this.listenTo(AlertActions.deleteAlert, this.onDelete);
   },
   onCreate: function(url,alert_info, successUrl, errorCallback) {
     $.ajax({
@@ -28,6 +29,19 @@ var AlertStore = Reflux.createStore({
       dataType: 'json',
       type: 'PUT',
       data: {"alert" : alert_info},
+      success: function(data) {
+        window.location.href = successUrl;
+      }.bind(this),
+      error: function(xhr, status, err) {
+        errorCallback(xhr.responseText);
+      }.bind(this)
+    });
+  },
+ onDelete: function(url,successUrl, errorCallback) {
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      type: 'DELETE',
       success: function(data) {
         window.location.href = successUrl;
       }.bind(this),
