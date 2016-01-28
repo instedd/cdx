@@ -172,7 +172,7 @@ class Policy < ActiveRecord::Base
       end
 
       resource_statements = statement["resource"]
-      if resource_statements
+      if resource_statements && !resource_statements.empty?
         validate_resource_statements(resource_statements)
       else
         return errors.add :definition, "is missing resource in statement"
