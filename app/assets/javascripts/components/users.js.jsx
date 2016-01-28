@@ -30,16 +30,15 @@ var UserInviteForm = React.createClass({
   },
 
   sendInvitation: function() {
-    console.log(this.state.users);
-    // $.ajax({
-    //   url: '/users',
-    //   method: 'POST',
-    //   data: {users: this.state.users, role: this.state.role},
-    //   success: function () {
-    //     this.closeModal();
-    //     window.location.reload(true); // reload page to update users table
-    //   }.bind(this)
-    // });
+    $.ajax({
+      url: '/users',
+      method: 'POST',
+      data: {users: this.state.users.map(function(i){return i.value}), role: this.state.role},
+      success: function () {
+        this.closeModal();
+        window.location.reload(true); // reload page to update users table
+      }.bind(this)
+    });
   },
 
   closeModal: function() {

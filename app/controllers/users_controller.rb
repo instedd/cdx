@@ -41,7 +41,7 @@ class UsersController < ApplicationController
   def create
     users = []
     @role = Role.find(params[:role])
-    params[:users].split(',').each do |email|
+    params[:users].each do |email|
       email = email.strip
       user = User.find_or_initialize_by(email: email)
       user.invite! unless user.persisted?
@@ -67,7 +67,7 @@ class UsersController < ApplicationController
     users = User.within(@navigation_context.institution)
                 .uniq
                 .where("first_name LIKE ? OR last_name LIKE ? OR (email LIKE ? AND first_name IS NULL AND last_name IS NULL)", "%#{params["q"]}%", "%#{params["q"]}%", "%#{params["q"]}%")
-                .map{|r| {value: r.id, label: r.full_name}}
+                .map{|r| {value: r.email, label: r.full_name}}
     render json: users
   end
 

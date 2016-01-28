@@ -79,6 +79,13 @@
       background-color: $gray2;
     }
   }
+
+  ul.add-item-search-autocomplete {
+    z-index: 20;
+    background-color: white;
+    position: absolute;
+    width: inherit;
+  }
 }
 
 .assay-result {

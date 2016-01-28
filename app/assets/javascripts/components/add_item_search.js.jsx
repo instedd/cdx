@@ -67,7 +67,7 @@ var AddItemSearch = React.createClass({
     return (
       <div className="item-search">
         <input type="text" ref="input" placeholder={this.props.placeholder} className="input-block" onChange={this.onChange} onFocus={this.onChange} onKeyPress={this.onEnter} autoFocus="true"></input>
-        <ul>
+        <ul className="add-item-search-autocomplete">
           {this.state.items.map(function(item) {
             return <li key={item[itemKey]} onClick={this.chooseItem.bind(this, item)}>{templateFactory({item: item})}</li>;
           }.bind(this))}

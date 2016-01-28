@@ -56,7 +56,7 @@ var OptionList = React.createClass({
 
   appendNonExistantItem: function(text) {
     if(this.props.allowNonExistent) {
-      var nonExistantItem = {value: null, label: text};
+      var nonExistantItem = {value: text, label: text};
       this.appendItem(nonExistantItem);
     }
   },
