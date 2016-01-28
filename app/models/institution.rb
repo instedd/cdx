@@ -6,9 +6,10 @@ class Institution < ActiveRecord::Base
 
   belongs_to :user
 
-  has_many :sites, dependent: :destroy
-  has_many :devices, dependent: :destroy
+  has_many :sites, dependent: :restrict_with_error
+  has_many :devices, dependent: :restrict_with_error
   has_many :device_models, dependent: :restrict_with_error, inverse_of: :institution
+  
   has_many :encounters, dependent: :destroy
   has_many :patients, dependent: :destroy
   has_many :samples, dependent: :destroy
