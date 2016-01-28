@@ -52,8 +52,6 @@ describe UsersController, type: :controller do
   describe 'POST create' do
     let(:role) { institution.roles.first }
 
-    after(:each) { ActionMailer::Base.deliveries.clear }
-
     it "sends an invitation to a new user" do
       post :create, {users: 'new@example.com', role: role.id}
       expect(ActionMailer::Base.deliveries.count).to eq(1)
