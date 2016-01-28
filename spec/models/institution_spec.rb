@@ -35,5 +35,17 @@ describe Institution do
         institution.destroy
       }.to change(Role, :count).by(-2)
     end
+
+    it "does not destroy if it has devices associated" do
+      institution = Institution.make
+      device = Device.make institution: institution
+      expect(institution.destroy).to be_falsey
+    end
+
+    it "does not destroy if it has sites associated" do
+      institution = Institution.make
+      site = Site.make institution: institution
+      expect(institution.destroy).to be_falsey
+    end
   end
 end
