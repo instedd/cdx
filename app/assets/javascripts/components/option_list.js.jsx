@@ -1,7 +1,7 @@
 var OptionList = React.createClass({
   getInitialState: function() {
     return {
-      chosenOnes: this.props.chosenOnes,
+      chosenOnes: this.props.chosenOnes ? this.props.chosenOnes : [],
       showInput: false
     }
   },
@@ -27,7 +27,7 @@ var OptionList = React.createClass({
         }.bind(this)
       });
     } else {
-      this.props.callback();
+      this.props.callback(filtered);
     }
   },
 
@@ -35,10 +35,14 @@ var OptionList = React.createClass({
     var old = _.clone(this.state.chosenOnes);
     this.setState(React.addons.update(this.state, {
       chosenOnes: { $push: [item] }
-    }));
+    }), function() {
+      if(typeof(this.props.callback) == "function") {
+        this.props.callback(this.state.chosenOnes);
+      }
+    });
     if(typeof(this.props.callback) == "string") {
       $.ajax({
-        url: this.props.url,
+        url: this.props.callback,
         method: 'POST',
         data: {add: item.value},
         error: function () {
@@ -47,8 +51,13 @@ var OptionList = React.createClass({
           }));
         }.bind(this)
       });
-    } else {
-      this.props.callback();
+    }
+  },
+
+  appendNonExistantItem: function(text) {
+    if(this.props.allowNonExistent) {
+      var nonExistantItem = {value: null, label: text};
+      this.appendItem(nonExistantItem);
     }
   },
 
@@ -71,10 +80,10 @@ var OptionList = React.createClass({
           }.bind(this))}
         </ul>
         { this.state.showInput ? null : <a className="btn-add-link" onClick={this.showInput} href="#"><span className="iconb-add"></span>Add</a> }
-        { this.state.showInput ? <AddItemSearch callback={this.props.autocompleteCallback} onItemChosen={this.appendItem}
-                placeholder="Search"
+        { this.state.showInput ? <AddItemSearch callback={this.props.autocompleteCallback} onItemChosen={this.appendItem} context={this.props.context}
                 itemTemplate={AddItemOptionList}
-                itemKey="value" /> : null }
+                itemKey="value"
+                onNonExistentItem={this.appendNonExistantItem} /> : null }
       </div>
     );
   }

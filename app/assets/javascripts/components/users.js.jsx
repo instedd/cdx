@@ -15,7 +15,7 @@ var AddUserLink = React.createClass({
       <Modal ref="inviteModal">
         <h1>Invite users</h1>
 
-        <UserInviteForm onFinished={this.closeInviteModal} roles={this.props.roles} />
+        <UserInviteForm onFinished={this.closeInviteModal} roles={this.props.roles} context={this.props.context} />
       </Modal>
     </div>);
   }
@@ -30,26 +30,27 @@ var UserInviteForm = React.createClass({
   },
 
   sendInvitation: function() {
-    $.ajax({
-      url: '/users',
-      method: 'POST',
-      data: {users: this.state.users, role: this.state.role},
-      success: function () {
-        this.closeModal();
-        window.location.reload(true); // reload page to update users table
-      }.bind(this)
-    });
+    console.log(this.state.users);
+    // $.ajax({
+    //   url: '/users',
+    //   method: 'POST',
+    //   data: {users: this.state.users, role: this.state.role},
+    //   success: function () {
+    //     this.closeModal();
+    //     window.location.reload(true); // reload page to update users table
+    //   }.bind(this)
+    // });
   },
 
   closeModal: function() {
     this.props.onFinished();
   },
 
-  addUser: function() {
-    console.log("hi!");
-    // this.setState(React.addons.update(this.state, {
-    //   users: { $set: event.target.value }
-    // }));
+  addUser: function(users) {
+    console.log(users);
+    this.setState(React.addons.update(this.state, {
+      users: { $set: users }
+    }));
   },
 
   changeRole: function(newValue) {
@@ -59,7 +60,6 @@ var UserInviteForm = React.createClass({
   },
 
   render: function() {
-    // <div className="col"><OptionList chosenOnes={[]} callback={this.addUser} autocompleteCallback="/users/autocomplete" /></div>
     return (<div>
       <div className="row">
         <div className="col pe-3"><label>Role</label></div>
@@ -68,7 +68,7 @@ var UserInviteForm = React.createClass({
 
       <div className="row">
         <div className="col pe-3"><label>Users</label></div>
-        <div className="col"><input type="text" name="Users" className="input-block" value={this.state.users} onChange={this.addUser} /></div>
+        <div className="col"><OptionList callback={this.addUser} autocompleteCallback="/users/autocomplete" context={this.props.context} allowNonExistent={true} /></div>
       </div>
 
       <div className="modal-footer">

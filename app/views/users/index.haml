@@ -3,7 +3,7 @@
     .col.pe-10
       .row
         .col
-          = react_component "AddUserLink", roles: @roles
+          = react_component "AddUserLink", roles: @roles, context: @navigation_context.to_hash
           %h1
             Users
       %form#filters-form{action: users_path, "data-auto-submit" => true}

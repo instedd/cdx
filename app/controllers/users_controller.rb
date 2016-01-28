@@ -64,7 +64,10 @@ class UsersController < ApplicationController
   end
 
   def autocomplete
-    users = check_access(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS)).where('name LIKE ?', "%#{params[:q]}%".gsub("'", "")).map{|r| {value: r.id, label: r.name}}
+    users = User.within(@navigation_context.institution)
+                .uniq
+                .where("first_name LIKE ? OR last_name LIKE ? OR (email LIKE ? AND first_name IS NULL AND last_name IS NULL)", "%#{params["q"]}%", "%#{params["q"]}%", "%#{params["q"]}%")
+                .map{|r| {value: r.id, label: r.full_name}}
     render json: users
   end
 
