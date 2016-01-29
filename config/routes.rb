@@ -149,6 +149,7 @@ Rails.application.routes.draw do
   resources :roles do
     collection do
       get :autocomplete
+      get :search_device
     end
   end
 

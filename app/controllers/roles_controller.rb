@@ -23,7 +23,7 @@ class RolesController < ApplicationController
         definition = JSON.parse(definition)
       rescue => ex
         @role.errors.add :policy, ex.message
-        return render action: 'new'
+        return render_with_definitions 'new'
       end
 
       policy = Policy.new name: @role.name, definition: definition, allows_implicit: true
@@ -31,7 +31,7 @@ class RolesController < ApplicationController
         policy.errors[:definition].each do |error|
           @role.errors.add :policy, error
         end
-        return render action: 'new'
+        return render_with_definitions 'new'
       end
       @role.policy = policy
     end
@@ -39,7 +39,7 @@ class RolesController < ApplicationController
     if @role.save
       redirect_to roles_path, notice: 'Role was successfully created.'
     else
-      render action: 'new'
+      render_with_definitions 'new'
     end
   end
 
@@ -48,6 +48,7 @@ class RolesController < ApplicationController
     return unless authorize_resource(@role, UPDATE_ROLE)
 
     @role.definition = JSON.pretty_generate(@role.policy.definition)
+    @policy_definition_resources = definition_resources_map
     @can_delete = has_access?(@role, DELETE_ROLE)
   end
 
@@ -74,13 +75,13 @@ class RolesController < ApplicationController
           @role.errors.add :policy, error
         end
         @role.definition = role_params[:definition]
-        render action: 'edit'
+        render_with_definitions 'edit'
       end
     else
       @role.policy = nil
       @role.definition = role_params[:definition]
       @role.save
-      render action: 'edit'
+      render_with_definitions 'edit'
     end
   end
 
@@ -97,8 +98,50 @@ class RolesController < ApplicationController
     render json: roles
   end
 
+  def search_device
+    # FIXME: ensure this correctly filters devices
+    devices = check_access(Device, READ_DEVICE).joins(:device_model).includes(:site, :institution, device_model: :institution)
+    devices = devices.within(NavigationContext.new(current_user, params[:context]).entity)
+    devices = devices.where('devices.name LIKE ? OR devices.uuid LIKE ? OR devices.serial_number LIKE ?', "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%")
+    render json: as_json_devices_search(devices).attributes!
+  end
 
   private
+
+  def render_with_definitions action
+    @policy_definition_resources = definition_resources_map
+    render action: action
+  end
+
+  def definition_resources_map
+    resources = {}
+    if @role.policy.try :definition
+      @role.policy.definition['statement'].each { |statement|
+        (Array.wrap(statement['resource']) + Array.wrap(statement['except'])).each { |resourceKey|
+          if matches = resourceKey.match(/device\/(\d+)/) || resourceKey.match(/.*\?device=(\d+)/)
+            device_id = matches[1]
+            device = Device.find(device_id)
+            resources[resourceKey] = as_json_device(device).attributes!
+          end
+        }
+      }
+    end
+    resources
+  end
+
+  def as_json_devices_search(devices)
+    Jbuilder.new do |json|
+      json.array! devices do |device|
+        as_json_device(json, device)
+      end
+    end
+  end
+
+  def as_json_device(json = Jbuilder.new, device)
+    json.(device, :uuid, :name, :serial_number, :id)
+    json.type :device
+    json
+  end
 
   def role_params
     params.require(:role).permit(:name, :site_id, :definition)
