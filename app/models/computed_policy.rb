@@ -224,11 +224,14 @@ class ComputedPolicy < ActiveRecord::Base
         entry.merge(exceptions_attributes: applicable_exceptions)
       end.compact
 
-      granted_statements = if policy.granter.nil?
-        granted_statements
-      else
+      granted_statements = if policy.granter
         granter_statements = policy.granter.computed_policies.delegable.map(&:computed_attributes)
         intersect(granted_statements, granter_statements)
+      elsif policy.role
+        granter_statements = Policy.owner(nil, policy.role.institution.id, policy.role.institution.kind).to_computed_policies.select(&:delegable).map(&:computed_attributes)
+        intersect(granted_statements, granter_statements)
+      else
+        granted_statements
       end
 
       granted_statements.map do |g|
