@@ -21,7 +21,11 @@ var ConfirmationModal = React.createClass({
   },
 
   onConfirm: function() {
+	if (this.props.use_without_window==true) {
+	  this.props.target();	
+	} else {
     window[this.props.target]();
+  }
     this.refs.confirmationModal.hide();
   },
 
