@@ -87,7 +87,6 @@
 
 }
 
-
 .btn-add,
 .btn-add-secondary {
   font-family: $sans;
@@ -130,6 +129,11 @@
   &:hover,
   &:focus {
     color: $gray4;
+  }
+
+  &.not-allowed {
+    color: $gray3;
+    cursor: default;
   }
 }
 
