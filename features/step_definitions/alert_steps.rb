@@ -113,3 +113,13 @@ Then (/^the user should see in list alerts "(.*?)"$/) do |arg1|
   @alertIndex.load
   expect(@alertIndex).to have_content(arg1)
 end
+
+
+
+Then (/^the user should edit "(.*?)"$/) do |arg1|
+  @alertIndex = AlertsIndexPage.new
+  @alertIndex.load
+  expect(@alertIndex).to have_content(arg1)
+end
+
+

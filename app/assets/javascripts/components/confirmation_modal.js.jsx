@@ -18,10 +18,14 @@ var ConfirmationModal = React.createClass({
 
   onCancel: function() {
     this.refs.confirmationModal.hide();
+		if (this.props.target instanceof Function ) {
+		this.props.cancel_target();	
+	}
+
   },
 
   onConfirm: function() {
-	if (this.props.use_without_window==true) {
+		if (this.props.target instanceof Function ) {
 	  this.props.target();	
 	} else {
     window[this.props.target]();

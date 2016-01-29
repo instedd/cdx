@@ -8,10 +8,15 @@ Feature: create an alert
     Then the user should see in list alerts "errorcodealer"
 
   Scenario: Successful create error category alert with all fields
-#    Given the user creates a new error category alert with all fields with name "errorcodealer1"
-#    Then the user should see in list alerts "errorcodealer1"
+    Given the user creates a new error category alert with all fields with name "errorcodealer1"
+    Then the user should see in list alerts "errorcodealer1"
 
 
   Scenario: Successful create anomalie category alert with all fields
-#    Given the user creates a new anomalie category alert with all fields with name "errorcodealer1"
-#    Then the user should see in list alerts "errorcodealer1"
+    Given the user creates a new anomalie category alert with all fields with name "errorcodealer1"
+    Then the user should see in list alerts "errorcodealer1"
+
+  Scenario: Successful create and edit alert
+    Given the user creates a new alert with name "errorcodealer"
+    Then the user should see in list alerts "errorcodealer"
+#    Then the user should edit "errorcodealer"

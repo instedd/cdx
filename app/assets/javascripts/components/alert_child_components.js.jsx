@@ -1,10 +1,33 @@
 var AlertDelete = React.createClass({
+	getInitialState: function() {
+		return {
+					displayConfirm: false
+				};
+			},
+			
 	clickHandler: function() {
-		//TODO popup confirm alert
+			this.setState({
+				displayConfirm: true
+			});
+			
+	},
+	cancelDeleteClickHandler: function() {
+			this.setState({
+				displayConfirm: false
+			});
+			
+	},
+	confirmClickHandler: function() {
 		this.props.onChangeParentLevel();
 	},
 	render: function() {
-
+		
+		if (this.state.displayConfirm==true) {
+			return (
+				<ConfirmationModal message= {'You are about to permanently delete this alert. Are you sure you want to proceed?'} title= {'Delete confirmation'} cancel_target= {this.cancelDeleteClickHandler} target= {this.confirmClickHandler} deletion= {true} hideCancel= {false} confirmMessage= {'Delete'} />
+				);
+		}
+    else
 		if(this.props.edit) {
 			return (
 				< div className = "row">
