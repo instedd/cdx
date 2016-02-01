@@ -20,6 +20,7 @@ describe "invite user" do
         page.logout
       end
 
+      expect(email_count).to eq(1)
       visit extract_invite_url(last_email)
       expect_page AcceptInvitiation do |page|
         page.password.set 'passw0rd'
@@ -28,6 +29,7 @@ describe "invite user" do
       end
 
       expect(page).to have_content 'You are now signed in'
+      expect(email_count).to eq(1)
     end
   end
 
@@ -37,5 +39,9 @@ describe "invite user" do
 
   def last_email
     ActionMailer::Base.deliveries.last
+  end
+
+  def email_count
+    ActionMailer::Base.deliveries.count
   end
 end
