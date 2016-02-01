@@ -12,13 +12,15 @@
 .row
   .col.pe-2
     %label Options
-  .col
+  .col.pe-8
     %ul.nav-list
       %li{'data-href' => new_encounter_path(mode: 'fresh_tests')}
-        New test order
-        %br
-        %i Generate sample ids to assign to new samples for future analysis
+        %span New test order
+        .icon-arrow-right.icon-gray
+        .text-small.muted
+          %i Generate sample ids to assign to new samples for future analysis
       %li{'data-href' => new_encounter_path(mode: 'existing_tests')}
-        Already reportered tests
-        %br
-        %i Organize already reportered tests under a test order
+        %span Already reportered tests
+        .icon-arrow-right.icon-gray
+        .text-small.muted
+          %i Organize already reportered tests under a test order

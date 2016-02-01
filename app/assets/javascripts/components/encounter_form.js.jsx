@@ -217,10 +217,10 @@ var EncounterForm = React.createClass(_.merge({
             <NewSamplesList samples={this.state.encounter.new_samples} onRemoveSample={this.removeNewSample} />
 
             <p>
-              <a className="btn-href" href='#' onClick={this.addNewSamples}><span className="icon-add"></span> Append new sample</a>
+              <a className="btn-add-link" href='#' onClick={this.addNewSamples}><span className="iconb-add"></span> Append new sample</a>
             </p>
             <p>
-              <a className="btn-href" href='#' onClick={this.showAddSamplesModal}><span className="icon-add"></span> Append sample</a>
+              <a className="btn-add-link" href='#' onClick={this.showAddSamplesModal}><span className="iconb-add"></span> Append sample</a>
             </p>
           </div>
 
@@ -253,7 +253,7 @@ var EncounterForm = React.createClass(_.merge({
         <div className="row">
           <div className="col">
             <TestResultsList testResults={this.state.encounter.test_results} /><br/>
-            <a className="btn-href"  href='#' onClick={this.showTestsModal}><span className="icon-add"></span> Add tests</a>
+            <a className="btn-add-link"  href='#' onClick={this.showTestsModal}><span className="iconb-add"></span> Add tests</a>
           </div>
 
           <Modal ref="testsModal">

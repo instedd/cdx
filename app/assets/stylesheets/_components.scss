@@ -275,3 +275,65 @@
     display:none;
   }
 }
+
+// =============================================================================
+// NAV LIST
+// =============================================================================
+
+.nav-list {
+  border-radius: 3px;
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.3);
+
+  li {
+    padding: 15px;
+    border-bottom: 1px solid $gray2;
+    position: relative;
+    &:last-child {
+      border-bottom: none;
+    }
+    [class^="icon-"],
+    [class*=" icon-"] {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      margin-top: -10px;
+    }
+  }
+}
+
+
+// =============================================================================
+// SAMPLES
+// =============================================================================
+
+ul.samples {
+  > li {
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.3);
+    padding: 15px;
+    width: 400px;
+    margin-bottom: 5px;
+    .unify {
+      float: right;
+    }
+    .unified {
+      color: $gray3;
+      margin-top: 10px;
+      li {
+        margin: 3px 0;
+      }
+    }
+  }
+}
+
+textarea.observations {
+  width: 300px;
+}
+
+
+// =============================================================================
+// MAPS
+// =============================================================================
+.map {
+  width: 100%;
+  height: 400px;
+}

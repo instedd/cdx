@@ -12,8 +12,8 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
             <NewSamplesList samples={this.state.encounter.new_samples} onRemoveSample={this.removeNewSample} />
 
             <p>
-              <a className="btn-href" href='#' onClick={this.addNewSamples}>
-                <span className="icon-add"></span> Add sample
+              <a className="btn-add-link" href='#' onClick={this.addNewSamples}>
+                <span className="iconb-add"></span> Add sample
               </a>
             </p>
           </div>

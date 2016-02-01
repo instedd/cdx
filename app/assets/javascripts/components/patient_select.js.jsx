@@ -23,7 +23,7 @@ var PatientSelect = React.createClass({
         <label style={{ display: "none" }}>disableautocomplete</label>
         <Select
           value={this.state.patient}
-          className="input-xx-large"
+          className="input-xx-large patients"
           placeholder={this.props.placeholder}
           clearable={true}
           asyncOptions={this.search}
