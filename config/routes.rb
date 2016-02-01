@@ -99,8 +99,10 @@ Rails.application.routes.draw do
     root to: "devise/sessions#new"
   end
   get 'verify' => 'home#verify'
-  get 'join' => 'home#join'
-  get 'design' => 'home#design'
+  if Rails.env.development?
+    get 'join' => 'home#join'
+    get 'design' => 'home#design'
+  end
 
   namespace :api, defaults: { format: 'json' } do
     resources :activations, only: :create
