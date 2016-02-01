@@ -6,6 +6,7 @@ class UsersController < ApplicationController
     @users = User.uniq.within(@navigation_context.entity)
     @roles = Role.within(@navigation_context.entity).map{|r| {value: r.id, label: r.name}}
     apply_filters
+    @total = @users.count
 
     @date_options = date_options_for_filter
 

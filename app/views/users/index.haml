@@ -29,7 +29,7 @@
           %h1 There are no users with access to this location
           %p Invite other users to join this team
     - else
-      = cdx_table title: pluralize(@users.count, "user") do |t|
+      = cdx_table title: pluralize(@total, "user") do |t|
         - t.columns do
           %col{:width => "30%"}
           %col{:width => "30%"}
