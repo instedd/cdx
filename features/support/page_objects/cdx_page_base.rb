@@ -11,6 +11,12 @@ class CdxPageBase < SitePrism::Page
   section :navigation_context, NavigationContextSection, "#context_side_bar"
   element :primary, ".btn-primary"
   element :content, ".content", match: :first
+  element :logout_link, :link, "Log out"
+
+  def logout
+    logout_link.trigger('click')
+    wait_for_submit
+  end
 
   def open_context_picker
     navigation_context_handle.click
