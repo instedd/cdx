@@ -27,7 +27,7 @@ describe "AlertLib" do
     recipient1.first_name="boba"
     recipient1a.last_name="smitha"
     recipient1a.email="aa@aaa.com"
-    recipient1a.telephone="123a"
+    recipient1a.telephone="1234444"
     recipient1a.alert=alert
     recipient1a.save
 
