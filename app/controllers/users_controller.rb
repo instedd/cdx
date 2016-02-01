@@ -41,10 +41,18 @@ class UsersController < ApplicationController
   def create
     users = []
     @role = Role.find(params[:role])
+    message = params[:message]
     params[:users].each do |email|
       email = email.strip
       user = User.find_or_initialize_by(email: email)
-      user.invite! unless user.persisted?
+      puts params[:message]
+      unless user.persisted?
+        user.invite! do |u|
+          u.skip_invitation = true
+        end
+        InvitationMailer.invite_message(user, message).deliver_now if user.errors.empty?
+        user.invitation_sent_at = Time.now.utc # mark invitation as delivered
+      end
       user.roles << @role unless user.roles.include?(@role)
       ComputedPolicy.update_user(user)
     end
