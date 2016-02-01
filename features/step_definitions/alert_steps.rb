@@ -39,7 +39,10 @@ Given(/^the user creates a new error category alert with all fields with name "(
     form.smsmessage.set 'sms msg'
     form.smslimit.set 2
 
-    form.choose 'device_errors'
+   #Note: this did not work due to the CSS for 'radio': form.choose 'device_errors'
+  find('label[for=device_errors]').click
+  
+  
     form.device_errors_value.set 2
     
     form.sites.set_exact_multi "Mrs. Terry Goyette"
@@ -80,8 +83,10 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     form.message.set 'web msg'
     form.smsmessage.set 'sms msg'
     form.smslimit.set 2
-
-    form.choose 'anomalies'
+    
+     #Note: this did not work due to the CSS for 'radio': form.choose 'anomalies'
+    find('label[for=anomalies]').click
+    
     form.anomalies.set "missing_start_time"
 
     form.sites.set_exact_multi "Mrs. Terry Goyette"
