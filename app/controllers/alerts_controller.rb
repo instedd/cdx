@@ -79,11 +79,11 @@ class AlertsController < ApplicationController
         roles = params[:alert][:roles].split(',')
         roles.each do |role_id|
           role = Role.find_by_id(role_id)
-          alertRecipient = AlertRecipient.new
-          alertRecipient.recipient_type = AlertRecipient.recipient_types["role"]
-          alertRecipient.role = role
-          alertRecipient.alert=alert_info
-          alertRecipient.save
+          alert_recipient = AlertRecipient.new
+          alert_recipient.recipient_type = AlertRecipient.recipient_types["role"]
+          alert_recipient.role = role
+          alert_recipient.alert=alert_info
+          alert_recipient.save
         end
       end
 
@@ -93,11 +93,11 @@ class AlertsController < ApplicationController
         internal_users.each do |user_id|
 
           user = User.find_by_id(user_id)
-          alertRecipient = AlertRecipient.new
-          alertRecipient.recipient_type = AlertRecipient.recipient_types["internal_user"]
-          alertRecipient.user = user
-          alertRecipient.alert=alert_info
-          alertRecipient.save
+          alert_recipient = AlertRecipient.new
+          alert_recipient.recipient_type = AlertRecipient.recipient_types["internal_user"]
+          alert_recipient.user = user
+          alert_recipient.alert=alert_info
+          alert_recipient.save
         end
       end
 
@@ -108,17 +108,17 @@ class AlertsController < ApplicationController
         # using key/pair as value returned in this format  :
         #  {"0"=>{"id"=>"0", "firstName"=>"a", "lastName"=>"b", "email"=>"c", "telephone"=>"d"}, "1"=>{"id"=>"1", "firstName"=>"aa", "lastName"=>"bb", "email"=>"cc", "telephone"=>"dd"}}
         external_users.each do |key, external_user_value|
-          alertRecipient = AlertRecipient.new
-          alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
-          alertRecipient.email = external_user_value["email"]
-          alertRecipient.telephone = external_user_value["telephone"]
-          alertRecipient.first_name = external_user_value["first_name"]
-          alertRecipient.last_name = external_user_value["last_name"]
-          alertRecipient.alert=alert_info
+          alert_recipient = AlertRecipient.new
+          alert_recipient.recipient_type = AlertRecipient.recipient_types["external_user"]
+          alert_recipient.email = external_user_value["email"]
+          alert_recipient.telephone = external_user_value["telephone"]
+          alert_recipient.first_name = external_user_value["first_name"]
+          alert_recipient.last_name = external_user_value["last_name"]
+          alert_recipient.alert=alert_info
 
-          if alertRecipient.save == false
+          if alert_recipient.save == false
             external_users_ok = false
-            error_text = error_text.merge alertRecipient.errors.messages
+            error_text = error_text.merge alert_recipient.errors.messages
           end
 
         end
