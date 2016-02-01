@@ -716,7 +716,7 @@ describe ComputedPolicy do
         expect(p.action).to eq(READ_DEVICE)
         expect(p.resource_type).to eq('device')
         expect(p.resource_id).to eq(device.id.to_s)
-        expect(p.condition_institution_id).to be_nil
+        expect(p.condition_institution_id).to eq(role.institution.id)
         expect(p.condition_site_id).to be_nil
       end
     end

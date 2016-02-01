@@ -2,6 +2,8 @@ class Policy < ActiveRecord::Base
   belongs_to :user
   belongs_to :granter, class_name: 'User', foreign_key: 'granter_id'
 
+  has_one :role, inverse_of: :policy
+
   validates_presence_of :name, :definition
 
   attr_accessor :allows_implicit
@@ -127,6 +129,11 @@ class Policy < ActiveRecord::Base
   def self_granted?
     self.user_id && self.user_id == self.granter_id
   end
+
+  def to_computed_policies
+    ComputedPolicy::PolicyComputer.new.compute_for(self)
+  end
+
 
   # Not evaluated as part of validations in ActiveModel lifecycle
   def validate_owner_permissions
