@@ -58,6 +58,7 @@ input[type="checkbox"] {
 
   & + label {
     color: $black;
+    text-transform: none;
     display: table;
     position: relative;
     margin-left: 32px;
@@ -142,6 +143,7 @@ input[type="radio"] {
 
   & + label {
     color: $black;
+    text-transform: none;
     display: table;
     position: relative;
     margin-left: 32px;
