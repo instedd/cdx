@@ -46,7 +46,6 @@ class UsersController < ApplicationController
     params[:users].each do |email|
       email = email.strip
       user = User.find_or_initialize_by(email: email)
-      puts params[:message]
       unless user.persisted?
         user.invite! do |u|
           u.skip_invitation = true
