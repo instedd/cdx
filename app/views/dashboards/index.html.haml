@@ -1,0 +1,5 @@
+.row
+  .col.pe-7
+    = react_component('BarChart', data: query_tests_chart, height: 300, y_label: "Tests Run")
+  .col
+    = react_component('PieChart', data: tests_by_name, height: 250, label: "Tests Run")

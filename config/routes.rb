@@ -97,6 +97,7 @@ Rails.application.routes.draw do
   resources :alert_messages, only: [:index]
 
   scope :dashboards, controller: :dashboards do
+    get :index, as: :dashboard
     get :nndd
   end
 
