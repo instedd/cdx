@@ -16,7 +16,15 @@ Feature: create an alert
     Given the user creates a new anomalie category alert with all fields with name "errorcodealer1"
     Then the user should see in list alerts "errorcodealer1"
 
-  Scenario: Successful create and edit alert
-    Given the user creates a new alert with name "errorcodealer"
-    Then the user should see in list alerts "errorcodealer"
-#    Then the user should edit "errorcodealer"
+  Scenario: Successful create and view alert
+    Given the user creates a new alert with name "errorcodealer2"
+    And the user should see in list alerts "errorcodealer2"
+    And the user should click edit "errorcodealer2"
+    Then the user should view edit page "errorcodealer2"
+
+  Scenario: Successful create, view and delete alert 
+    Given the user creates a new alert with name "errorcodealer4"
+    And the user should see in list alerts "errorcodealer4"
+    And the user should click edit "errorcodealer4"
+    And delete the alert  
+    Then the user should not see in list alerts "errorcodealer4"

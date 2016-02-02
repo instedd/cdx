@@ -11,7 +11,7 @@ end
 
 
 Given(/^the user creates a new alert with name "(.*?)"$/) do |arg1|
-  @alert = AlertPage.new
+  @alert = NewAlertPage.new
   @alert.load
 
   within(@alert.form) do |form|
@@ -25,11 +25,10 @@ end
 
 
 Given(/^the user creates a new error category alert with all fields with name "(.*?)"$/) do |arg1|
-
   site = @navigation_context.entity.sites.make
   device = site.devices.make
-  
-  @alert = AlertPage.new
+
+  @alert = NewAlertPage.new
   @alert.load
 
   within(@alert.form) do |form|
@@ -39,12 +38,11 @@ Given(/^the user creates a new error category alert with all fields with name "(
     form.smsmessage.set 'sms msg'
     form.smslimit.set 2
 
-   #Note: this did not work due to the CSS for 'radio': form.choose 'device_errors'
-  find('label[for=device_errors]').click
-  
-  
+    #Note: this did not work due to the CSS for 'radio': form.choose 'device_errors'
+    find('label[for=device_errors]').click
+
     form.device_errors_value.set 2
-    
+
     form.sites.set_exact_multi "Mrs. Terry Goyette"
 
     form.devices.set_exact_multi "Mr. Alphonso Witting"
@@ -74,7 +72,7 @@ Given(/^the user creates a new anomalie category alert with all fields with name
   site = @navigation_context.entity.sites.make
   device = site.devices.make
 
-  @alert = AlertPage.new
+  @alert = NewAlertPage.new
   @alert.load
 
   within(@alert.form) do |form|
@@ -83,10 +81,10 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     form.message.set 'web msg'
     form.smsmessage.set 'sms msg'
     form.smslimit.set 2
-    
-     #Note: this did not work due to the CSS for 'radio': form.choose 'anomalies'
+
+    #Note: this did not work due to the CSS for 'radio': form.choose 'anomalies'
     find('label[for=anomalies]').click
-    
+
     form.anomalies.set "missing_start_time"
 
     form.sites.set_exact_multi "Mrs. Terry Goyette"
@@ -120,11 +118,30 @@ Then (/^the user should see in list alerts "(.*?)"$/) do |arg1|
 end
 
 
-
-Then (/^the user should edit "(.*?)"$/) do |arg1|
+Then (/^the user should click edit "(.*?)"$/) do |arg1|
   @alertIndex = AlertsIndexPage.new
   @alertIndex.load
-  expect(@alertIndex).to have_content(arg1)
+  click_link(arg1)
+end
+
+And (/^the user should view edit page "(.*?)"$/) do |arg1|
+  find_field('alertname').value.should eq arg1
 end
 
 
+Then (/^delete the alert$/) do
+  click_link("delete_alert")
+
+  # To click on the modal confirm, had to use the line below:
+  # https://github.com/teampoltergeist/poltergeist/issues/50
+  # https://github.com/thoughtbot/capybara-webkit/issues/519
+  # http://stackoverflow.com/questions/18170205/testing-a-modal-dialog-with-rspec-and-capybara
+  find('.btn-danger').click
+end
+
+
+Then (/^the user should not see in list alerts "(.*?)"$/) do |arg1|
+  @alertIndex = AlertsIndexPage.new
+  @alertIndex.load
+  expect(@alertIndex).not_to have_content(arg1)
+end

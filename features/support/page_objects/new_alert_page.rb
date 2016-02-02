@@ -1,4 +1,4 @@
-class AlertPage < SitePrism::Page
+class NewAlertPage < SitePrism::Page
   set_url '/alerts/new'
 
   section 'form', '#new_alert' do
@@ -30,5 +30,7 @@ class AlertPage < SitePrism::Page
     element :new_externaluser, '#newexternaluser'
 
     element :submit, '#submit'
+    
+    element :delete, '#delete_alert'
   end
 end

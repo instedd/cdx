@@ -35,7 +35,7 @@ var AlertDelete = React.createClass({
 					&nbsp;
 				</div>
 				<div className = "col">
-					<a className = "btn-link" onClick={this.clickHandler}>Delete Alert</a>
+					<a className = "btn-link" onClick={this.clickHandler} id="delete_alert" href="#">Delete Alert</a>
 				</div>
 			</div>
 		);

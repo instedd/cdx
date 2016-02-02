@@ -180,9 +180,6 @@ var AlertCategorySelect = React.createClass({
 		});
 		*/
 	},
-	confirmDelete: function() {
-		console.log("DELETE ALERT!!!!!	")
-	},
 	render: function() {
 		return (
 			<div>

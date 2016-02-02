@@ -8,7 +8,7 @@ module Helpers
       form.login.click
     end
   end
-
+  
   def canned_policy(*args)
     institution = args[0]
     options = args.extract_options!
