@@ -205,7 +205,7 @@ class ManifestFieldMapping
 
       mappings.each do |mapping|
         else_mapping ||= mapping["else"]
-        if (when_value = mapping["when"]) && value.match(when_value.gsub("*", ".*"))
+        if (when_value = mapping["when"]) && value.to_s.match(when_value.gsub("*", ".*"))
           return traverse(mapping["then"], data)
         end
       end
