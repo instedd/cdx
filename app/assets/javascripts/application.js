@@ -174,4 +174,11 @@ $(document).ready(function(){
   $(".close-notification").click(function(){
     flashn.hide();
   });
+
+    // Autoresize for textareas, must have class="resizeable"
+  $('body').on('keydown', 'textarea.resizeable', function(e){
+      var textarea = $(e.target);
+      textarea.css('height', 'auto').css('height', e.target.scrollHeight);
+  })
 });
+
