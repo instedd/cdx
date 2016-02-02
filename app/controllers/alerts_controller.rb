@@ -208,6 +208,8 @@ class AlertsController < ApplicationController
     if alert_info.destroy
       render json: alert_info
     else
+      flash.now[:error] = alert_info.errors
+    
       render json: alert_info.errors, status: :unprocessable_entity
     end
 

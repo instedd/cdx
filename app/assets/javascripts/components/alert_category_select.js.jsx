@@ -56,7 +56,8 @@ var AlertCategorySelect = React.createClass({
 			messageField: this.props.alert_info.message,
 			smsMessageField: this.props.alert_info.sms_message,
 			enabledField: this.props.alert_info.enabled,
-			external_users:[]
+			external_users:[],
+			error_messages:[]
 		};
 	},
 	categoryChanged: function(e) {
@@ -65,26 +66,17 @@ var AlertCategorySelect = React.createClass({
 	},
 	doCategoryChange: function(val) {
 		document.getElementById(val).checked = true;
-		//		document.getElementById('errorcoderow').style.display = 'none';
-		//		document.getElementById('errorcoderow').style.visibility = 'hidden';
 		$('#errorcoderow').hide();
-
-		//	document.getElementById('anomalierow').style.display = 'none';
-		//	document.getElementById('anomalierow').style.visibility = 'hidden';
 		$('#anomalierow').hide();
 
 		if (val == 'device_errors') {
-			//			var e1 = document.getElementById('errorcoderow')
-			//		e1.style.display = 'flex';
-			//		e1.style.visibility = 'visible';
 			$('#errorcoderow').show();
 		}
-
-		if (val == 'anomalies') {
-			//		var e1 = document.getElementById('anomalierow')
-			//	e1.style.display = 'flex';
-			//	e1.style.visibility = 'visible';
+		else if (val == 'anomalies') {
 			$('#anomalierow').show();
+		}
+		else if (val == 'test_results') {
+
 		}
 
 		this.setState({
@@ -125,8 +117,12 @@ var AlertCategorySelect = React.createClass({
 			});
 		}
 	},
-	submit_error: function(errStr) {
-		alert(errStr);
+	submit_error: function(errorArray) {
+	
+			this.setState({
+				error_messages: errorArray
+			});
+		$('body').scrollTop(0);
 	},
 	AlertDeleteHandler: function() {
 		var urlParam = this.props.url;
@@ -183,6 +179,8 @@ var AlertCategorySelect = React.createClass({
 	render: function() {
 		return (
 			<div>
+			 <FlashErrorMessages messages={this.state.error_messages} />
+			
 				<form className = "alertForm" id="new_alert" onSubmit = {this.handleAlertSubmit} >
 
 					<input type='hidden' name='authenticity_token' value={this.props.authenticity_token} />

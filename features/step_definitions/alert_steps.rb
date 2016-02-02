@@ -86,20 +86,13 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     find('label[for=anomalies]').click
 
     form.anomalies.set "missing_start_time"
-
     form.sites.set_exact_multi "Mrs. Terry Goyette"
-
     form.devices.set_exact_multi "Mr. Alphonso Witting"
-
     form.roles.set_exact_multi "Institution Aric Smith Reader"
-
     form.internal_users.set_exact_multi @user.email
-
     form.aggregation.set "aggregated"
     form.aggregation_frequency.set "day"
-
     form.channel.set_exact "sms"
-
     form.externaluser_firstname.set 'bob'
     form.externaluser_lastname.set 'smith'
     form.externaluser_email.set 'aa@bb.com'
@@ -133,9 +126,6 @@ Then (/^delete the alert$/) do
   click_link("delete_alert")
 
   # To click on the modal confirm, had to use the line below:
-  # https://github.com/teampoltergeist/poltergeist/issues/50
-  # https://github.com/thoughtbot/capybara-webkit/issues/519
-  # http://stackoverflow.com/questions/18170205/testing-a-modal-dialog-with-rspec-and-capybara
   find('.btn-danger').click
 end
 
