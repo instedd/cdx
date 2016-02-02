@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "1.1.1",
+    "version": "1.1.2",
     "api_version": "1.5.0",
     "conditions": [
       "mtb"
@@ -28,16 +28,24 @@
       ]
     ]},
     "test.status" : { "case" : [
-      { "lookup": "event.result" },
+      { "lookup": "event.error_code"},
       [
-        {"when" : "INVALID", "then" : "invalid" },
-        {"when" : "ERROR", "then" : "error" },
-        {"when" : "NO RESULT", "then" : "no_result" },
-        {"when" : "MTB NOT DETECTED", "then" : "success" },
-        {"when" : "Rif Resistance DETECTED", "then" : "success" },
-        {"when" : "Rif Resistance INDETERMINATE", "then" : "success" },
-        {"when" : "MTB DETECTED", "then" : "success" },
-        {"when" : "*", "then" : "error"}
+        {"when": "*", "then": "error"},
+        {"else":
+          [
+            { "lookup": "event.result" },
+            [
+              {"when" : "INVALID", "then" : "invalid" },
+              {"when" : "ERROR", "then" : "error" },
+              {"when" : "NO RESULT", "then" : "no_result" },
+              {"when" : "MTB NOT DETECTED", "then" : "success" },
+              {"when" : "Rif Resistance DETECTED", "then" : "success" },
+              {"when" : "Rif Resistance INDETERMINATE", "then" : "success" },
+              {"when" : "MTB DETECTED", "then" : "success" },
+              {"when" : "*", "then" : "error"}
+            ]
+          ]
+        }
       ]
     ]},
     "test.assays.condition" : { "script" : "['mtb', 'rif']" },
