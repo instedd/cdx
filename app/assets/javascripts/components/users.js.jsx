@@ -101,7 +101,7 @@ var UserInviteForm = React.createClass({
       { this.state.includeMessage ?
         <div className="row">
           <div className="col pe-3"><label>Message</label></div>
-          <div className="col"><textarea value={this.state.message} onChange={this.writeMessage} /></div>
+          <div className="col"><textarea value={this.state.message} onChange={this.writeMessage} className="input-block" /></div>
         </div> : null }
 
       <div className="modal-footer">
