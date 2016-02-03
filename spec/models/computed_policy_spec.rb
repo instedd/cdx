@@ -520,6 +520,24 @@ describe ComputedPolicy do
       expect(devices).to      match_array(Device.all)
     end
 
+    context "sites and subsites" do
+      let!(:subsite1) { Site.make :child, parent: site_i1_l1}
+
+      it "grants access only to the given site" do
+        grant nil, user, {:device => site_i1_l1}, '*'
+
+        institutions, sites, devices = condition_resources(READ_DEVICE, Device)
+        expect(sites).to contain_exactly(site_i1_l1)
+      end
+
+      it "grants access to subsites" do
+        grant nil, user, {:device => site_i1_l1}, '*', include_subsites: true
+
+        institutions, sites, devices = condition_resources(READ_DEVICE, Device)
+        expect(sites).to contain_exactly(site_i1_l1, subsite1)
+      end
+    end
+
   end
 
   context "sites" do

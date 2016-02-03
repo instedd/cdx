@@ -36,7 +36,7 @@ module ComputedPolicyConcern
     def arel_condition_filter
       filters = conditions.map do |key, value|
         if key == :site
-          condition_class(key).arel_table[:prefix].matches("#{value}%") if value
+          condition_class(key).arel_table[:prefix].matches("#{value}#{'%' if include_subsites}") if value
         else
           condition_class(key).arel_table[:id].eq(value) if value
         end

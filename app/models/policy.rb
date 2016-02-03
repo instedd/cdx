@@ -190,10 +190,12 @@ class Policy < ActiveRecord::Base
         validate_resource_statements(except_statements)
       end
 
-      delegable = statement["delegable"]
-      if !delegable.nil?
-        if delegable != true && delegable != false
-          return errors.add :definition, "has an invalid delegable value: `#{delegable}`"
+      ["delegable", "includeSubsites"].each do |key|
+        statement_value = statement[key]
+        if !statement_value.nil?
+          if statement_value != true && statement_value != false
+            return errors.add :definition, "has an invalid #{key} value: `#{statement_value}`"
+          end
         end
       end
     end

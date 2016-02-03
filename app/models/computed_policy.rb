@@ -235,7 +235,7 @@ class ComputedPolicy < ActiveRecord::Base
       end
 
       granted_statements.map do |g|
-        ComputedPolicy.new(g.merge(user_id: policy.user_id, delegable: statement.fetch('delegable', false)))
+        ComputedPolicy.new(g.merge(user_id: policy.user_id, delegable: statement.fetch('delegable', false), include_subsites: statement.fetch('includeSubsites', false)))
       end
     end
 
