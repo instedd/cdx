@@ -88,7 +88,13 @@ var UserInviteForm = React.createClass({
 
       <div className="row">
         <div className="col pe-3"><label>Users</label></div>
-        <div className="col"><OptionList callback={this.addUser} autocompleteCallback="/users/autocomplete" context={this.props.context} allowNonExistent={true} /></div>
+        <div className="col"><OptionList
+          callback={this.addUser}
+          autocompleteCallback="/users/autocomplete"
+          context={this.props.context}
+          allowNonExistent={true}
+          showInput={true}
+          placeholder="Type email and press enter" /></div>
       </div>
 
       <div className="row">

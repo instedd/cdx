@@ -2,7 +2,8 @@ var OptionList = React.createClass({
   getInitialState: function() {
     return {
       chosenOnes: this.props.chosenOnes ? this.props.chosenOnes : [],
-      showInput: false
+      showInput: this.props.showInput ? this.props.showInput : false,
+      placeholder: this.props.placeholder ? this.props.placeholder : "Search"
     }
   },
 
@@ -83,7 +84,8 @@ var OptionList = React.createClass({
         { this.state.showInput ? <AddItemSearch callback={this.props.autocompleteCallback} onItemChosen={this.appendItem} context={this.props.context}
                 itemTemplate={AddItemOptionList}
                 itemKey="value"
-                onNonExistentItem={this.appendNonExistantItem} /> : null }
+                onNonExistentItem={this.appendNonExistantItem}
+                placeholder={this.state.placeholder} /> : null }
       </div>
     );
   }
