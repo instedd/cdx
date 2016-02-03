@@ -12,7 +12,9 @@ describe "invite user" do
       goto_page UserViewPage do |page|
         page.open_invite_users do |modal|
           modal.role.set "#{institution.name} Admin"
-          modal.users.set "sarah@acme.org"
+          modal.add_user.click
+          modal.users.set("sarah@acme.org")
+          modal.users.native.send_keys :enter
           modal.submit
         end
 

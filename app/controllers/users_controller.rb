@@ -40,10 +40,10 @@ class UsersController < ApplicationController
   end
 
   def create
-    users = []
     @role = Role.find(params[:role])
     message = params[:message]
-    params[:users].each do |email|
+    puts @role, params[:users]
+    (params[:users] || []).each do |email|
       email = email.strip
       user = User.find_or_initialize_by(email: email)
       unless user.persisted?

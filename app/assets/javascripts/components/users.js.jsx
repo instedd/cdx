@@ -24,7 +24,7 @@ var AddUserLink = React.createClass({
 var UserInviteForm = React.createClass({
   getInitialState: function() {
     return {
-      users: '',
+      users: [],
       role: null,
       includeMessage: false,
       message: ""
