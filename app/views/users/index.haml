@@ -20,6 +20,11 @@
             = cdx_select name: "last_activity", value: params["last_activity"] do |select|
               - select.item "", "Show all"
               - select.items @date_options, :value, :label
+          - if @can_update
+            .filter
+              %label.block Status
+              = cdx_select name: "is_active", value: params["is_active"] do |select|
+                - select.items @status, :value, :label
 
 .row
   .col
@@ -33,6 +38,8 @@
         - t.columns do
           %col{:width => "30%"}
           %col{:width => "30%"}
+          - if @can_update
+            %col{:width => "10%"}
           %col{:width => "30%"}
         - t.actions do
           = link_to users_path(format: :csv), title: 'Download CSV' do
@@ -42,12 +49,16 @@
           %tr
             %th Full name
             %th Roles
+            - if @can_update
+              %th Status
             %th Last Activity
         - t.tbody do
           - @users.each do |user|
-            %tr{class: (user.invited_pending? ? "pending" : ""), data: {href: edit_user_path(user.id)}}
+            %tr{class: (user.invited_pending? || !user.is_active? ? "pending" : ""), data: {href: edit_user_path(user.id)}}
               %td= user.full_name
               %td= user.roles.map(&:name).join(", ")
+              - if @can_update
+                %td= user.is_active? ? "" : "Blocked"
               %td= last_activity(user)
 
       .pagination

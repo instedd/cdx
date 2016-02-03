@@ -5,9 +5,11 @@ class UsersController < ApplicationController
     return unless authorize_resource(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS))
     @users = User.within(@navigation_context.entity)
     @roles = Role.within(@navigation_context.entity).map{|r| {value: r.id, label: r.name}}
+    @can_update = has_access?(User, UPDATE_USER)
     apply_filters
 
     @date_options = date_options_for_filter
+    @status = [{value: "", label: "Show all"}, {value: "1", label: "Active"}, {value: "0", label: "Blocked"}]
 
     respond_to do |format|
       format.html do
@@ -95,6 +97,7 @@ class UsersController < ApplicationController
     # There's no need to redo the join to roles_users because it was done by the scope "within"
     @users = @users.where("roles_users.role_id = ?", params["role"].to_i) if params["role"].present?
     @users = @users.where("last_sign_in_at > ? OR (last_sign_in_at IS NULL AND invitation_accepted_at IS NULL AND invitation_created_at > ?)", params["last_activity"], params["last_activity"]) if params["last_activity"].present?
+    @users = @users.where("is_active = ?", params["is_active"].to_i) if params["is_active"].present?
   end
 
 end
