@@ -42,7 +42,6 @@ class UsersController < ApplicationController
   def create
     @role = Role.find(params[:role])
     message = params[:message]
-    puts @role, params[:users]
     (params[:users] || []).each do |email|
       email = email.strip
       user = User.find_or_initialize_by(email: email)
