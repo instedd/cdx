@@ -84,8 +84,14 @@ class SitesController < ApplicationController
         new_site = institution.sites.new(site_params(true))
         begin
           Site.transaction do
-            @site.destroy
             new_site.save!
+            @site.devices.each do |device|
+              device.site = new_site
+              device.save!
+            end
+            @site.devices.clear
+
+            @site.destroy
             update_or_save = true
           end
         rescue => e
