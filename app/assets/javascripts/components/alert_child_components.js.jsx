@@ -1,33 +1,33 @@
 var AlertDelete = React.createClass({
 	getInitialState: function() {
 		return {
-					displayConfirm: false
-				};
-			},
-			
+			displayConfirm: false
+		};
+	},
+
 	clickHandler: function() {
-			this.setState({
-				displayConfirm: true
-			});
-			
+		this.setState({
+			displayConfirm: true
+		});
+
 	},
 	cancelDeleteClickHandler: function() {
-			this.setState({
-				displayConfirm: false
-			});
-			
+		this.setState({
+			displayConfirm: false
+		});
+
 	},
 	confirmClickHandler: function() {
 		this.props.onChangeParentLevel();
 	},
 	render: function() {
-		
+
 		if (this.state.displayConfirm==true) {
 			return (
 				<ConfirmationModal message= {'You are about to permanently delete this alert. Are you sure you want to proceed?'} title= {'Delete confirmation'} cancel_target= {this.cancelDeleteClickHandler} target= {this.confirmClickHandler} deletion= {true} hideCancel= {false} confirmMessage= {'Delete'} />
-				);
+			);
 		}
-    else
+		else
 		if(this.props.edit) {
 			return (
 				< div className = "row">
@@ -60,8 +60,8 @@ var AlertEnabled = React.createClass({
 					}
 					id="AlertEnabled"
 					/>
-					<label htmlFor="AlertEnabled">&nbsp;</label>
-				
+				<label htmlFor="AlertEnabled">&nbsp;</label>
+
 			</div>
 		</div>
 	);
@@ -110,8 +110,8 @@ var AlertDescription = React.createClass({
 var AlertErrorCode = React.createClass({
 	render: function() {
 		return (
-			< div className = "row" id = "errorcoderow" >
-			<div className = "col pe-2" >
+			< div className = "row" id="errorcoderow">
+			<div className = "col pe-2">
 				<label>Errors</label>
 			</div>
 
@@ -125,6 +125,8 @@ var AlertErrorCode = React.createClass({
 	);
 }
 });
+
+
 
 
 // http://voidcanvas.com/react-tutorial-two-way-data-binding/
@@ -145,7 +147,7 @@ var AlertSite = React.createClass({
 
 		siteOption = {};
 		siteOption["value"] = "";
-		siteOption["label"] = "None"
+		siteOption["label"] = "All"
 		siteOptions.push(siteOption);
 
 		for (var i = 0; i < this.props.sites.length; i++) {
@@ -177,7 +179,7 @@ var AlertSite = React.createClass({
 					multi = {
 						true
 					}
-					placeholder = "None"
+					placeholder = "All"
 					onChange = {
 						this.onChange
 					}
@@ -208,7 +210,7 @@ var AlertDevice = React.createClass({
 
 		deviceOption = {};
 		deviceOption["value"] = "";
-		deviceOption["label"] = "None"
+		deviceOption["label"] = "All"
 		deviceOptions.push(deviceOption);
 
 		for (var i = 0; i < this.props.devices.length; i++) {
@@ -241,7 +243,7 @@ var AlertDevice = React.createClass({
 						multi = {
 							true
 						}
-						placeholder = "None"
+						placeholder = "All"
 						onChange = {
 							this.onChange
 						}
@@ -291,122 +293,6 @@ var AlertAnomalieType = React.createClass({
 			<div className = "col" >
 				<Select
 					name = "anomalie"
-					value = {
-						value || valueLink.value
-					}
-					options = {
-						options
-					}
-					multi = {
-						false
-					}
-					onChange = {
-						this.onChange
-					}
-					disabled = {
-						this.props.disable_all_selects
-					}
-					/>
-			</div>
-		</div>
-	);
-}
-});
-
-
-
-var AlertAggregation = React.createClass({
-	getDefaultProps: function(){
-		return {
-			multiple: false,
-			name: 'Aggregation',
-		}
-	},
-	//github.com/JedWatson/react-select/issues/256
-	onChange(textValue, arrayValue) {
-		this.props.valueLink.requestChange(arrayValue[0].label);
-	},
-	render: function() {
-		var options = [];
-		for (var i = 0; i < Object.keys(this.props.aggregation_types).length; i++) {
-			option = {};
-			option["value"] = i;
-			option["label"] = Object.keys(this.props.aggregation_types)[i];
-			options.push(option);
-		}
-
-		var {
-			valueLink,
-			value,
-			onChange,
-			...other
-		} = this.props;
-		return (
-			< div className = "row" id = "aggregationrow" >
-			<div className = "col pe-2" >
-				<label>Aggregation Type</label>
-			</div>
-			<div className = "col" >
-				<Select
-					name = "aggregation"
-					value = {
-						value || valueLink.value
-					}
-					options = {
-						options
-					}
-					multi = {
-						false
-					}
-					onChange = {
-						this.onChange
-					}
-					disabled = {
-						this.props.disable_all_selects
-					}
-					/>
-			</div>
-		</div>
-	);
-}
-});
-
-
-
-var AlertAggregationFrequency = React.createClass({
-	getDefaultProps: function(){
-		return {
-			multiple: false,
-			name: 'Aggregation',
-		}
-	},
-	//github.com/JedWatson/react-select/issues/256
-	onChange(textValue, arrayValue) {
-		this.props.valueLink.requestChange(arrayValue[0].label);
-	},
-	render: function() {
-		var options = [];
-		for (var i = 0; i < Object.keys(this.props.aggregation_frequencies).length; i++) {
-			option = {};
-			option["value"] = i;
-			option["label"] = Object.keys(this.props.aggregation_frequencies)[i];
-			options.push(option);
-		}
-
-		var {
-			valueLink,
-			value,
-			onChange,
-			...other
-		} = this.props;
-		return (
-			< div className = "row" id = "aggregationfrequenciesrow" >
-			<div className = "col pe-2" >
-				<label>Aggregation Frequency</label>
-			</div>
-			<div className = "col" >
-				<Select
-					name = "aggregation_frequency"
 					value = {
 						value || valueLink.value
 					}

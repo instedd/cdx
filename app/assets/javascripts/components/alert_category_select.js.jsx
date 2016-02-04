@@ -9,6 +9,9 @@ var AlertCategorySelect = React.createClass({
 			document.getElementById("alertmessage").disabled = true;
 			document.getElementById("alertsmsmessage").disabled = true;
 			document.getElementById("alerterrorcode").disabled = true;
+			document.getElementById("alertminthreshold").disabled = true;
+			document.getElementById("alertmaxthreshold").disabled = true;
+			document.getElementById("alertaggregationthresholdlimit").disabled = true;
 
 			this.setState({
 				disable_all_selects: true
@@ -23,7 +26,6 @@ var AlertCategorySelect = React.createClass({
 			document.getElementById(category_keys[1]).disabled = true;
 			document.getElementById(category_keys[2]).disabled = true;
 			document.getElementById(category_keys[3]).disabled = true;
-
 		} else { //new alert
 			this.setState({
 				disable_all_selects: false
@@ -39,15 +41,20 @@ var AlertCategorySelect = React.createClass({
 			disable_all_selects: false,
 			edit: this.props.edit,
 			all_devices: this.props.devices,
+			all_conditions: this.props.conditions,
+			all_condition_results: this.props.condition_results,
 			current_category: this.props.alert_info.category_type,
 			nameField: this.props.alert_info.name,
 			descriptionField: this.props.alert_info.description,
 			siteField: "",
 			deviceField: this.props.alert_devices,
+			conditionField: this.props.alert_conditons,
+			conditionResultsField: this.props.alert_conditon_results,
 			errorCodeField: "",
 			anomalieField: "",
 			aggregationField: this.props.alert_info.aggregation_type,
 			aggregationFrequencyField: this.props.alert_info.aggregation_frequency,
+			aggregation_thresholdField: this.props.alert_info.aggregation_threshold,
 			channelField: this.props.alert_info.channel_type,
 			roleField: this.props.alert_roles,
 			userField: this.props.alert_internal_users,
@@ -57,7 +64,9 @@ var AlertCategorySelect = React.createClass({
 			smsMessageField: this.props.alert_info.sms_message,
 			enabledField: this.props.alert_info.enabled,
 			external_users:[],
-			error_messages:[]
+			error_messages:[],
+			test_result_min_thresholdField: this.props.alert_info.test_result_min_threshold,
+			test_result_max_thresholdField: this.props.alert_info.test_result_max_threshold,
 		};
 	},
 	categoryChanged: function(e) {
@@ -68,6 +77,9 @@ var AlertCategorySelect = React.createClass({
 		document.getElementById(val).checked = true;
 		$('#errorcoderow').hide();
 		$('#anomalierow').hide();
+		$('#conditionrow').hide();
+		$('#conditionresultrow').hide();
+		$('#thresholdrow').hide();
 
 		if (val == 'device_errors') {
 			$('#errorcoderow').show();
@@ -76,7 +88,9 @@ var AlertCategorySelect = React.createClass({
 			$('#anomalierow').show();
 		}
 		else if (val == 'test_results') {
-
+			$('#conditionrow').show();
+			$('#conditionresultrow').show();
+			$('#thresholdrow').show();
 		}
 
 		this.setState({
@@ -118,10 +132,10 @@ var AlertCategorySelect = React.createClass({
 		}
 	},
 	submit_error: function(errorArray) {
-	
-			this.setState({
-				error_messages: errorArray
-			});
+
+		this.setState({
+			error_messages: errorArray
+		});
 		$('body').scrollTop(0);
 	},
 	AlertDeleteHandler: function() {
@@ -140,9 +154,12 @@ var AlertCategorySelect = React.createClass({
 			description: this.state.descriptionField,
 			category_type: this.state.current_category,
 			devices_info: this.state.deviceField,
+			conditions_info: this.state.conditionField,
+			condition_results_info: this.state.conditionResultsField,
 			anomalie_type: this.state.anomalieField,
 			aggregation_type: this.state.aggregationField,
 			aggregation_frequency: this.state.aggregationFrequencyField,
+			aggregation_threshold: this.state.aggregation_thresholdField,
 			channel_type: this.state.channelField,
 			roles: this.state.roleField,
 			users_info: this.state.userField,
@@ -151,7 +168,9 @@ var AlertCategorySelect = React.createClass({
 			message: this.state.messageField,
 			sms_message: this.state.smsMessageField,
 			enabled: this.state.enabledField,
-			external_users: this.state.external_users
+			external_users: this.state.external_users,
+			test_result_min_threshold: this.state.test_result_min_thresholdField,
+			test_result_max_threshold: this.state.test_result_max_thresholdField
 		};
 
 		if (this.props.edit == true) {
@@ -179,8 +198,8 @@ var AlertCategorySelect = React.createClass({
 	render: function() {
 		return (
 			<div>
-			 <FlashErrorMessages messages={this.state.error_messages} />
-			
+				<FlashErrorMessages messages={this.state.error_messages} />
+
 				<form className = "alertForm" id="new_alert" onSubmit = {this.handleAlertSubmit} >
 
 					<input type='hidden' name='authenticity_token' value={this.props.authenticity_token} />
@@ -278,6 +297,11 @@ var AlertCategorySelect = React.createClass({
 
 							<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
 
+							<AlertCondition conditions={this.state.all_conditions} valueLink={this.linkState('conditionField')} disable_all_selects={this.state.disable_all_selects} />
+							<AlertConditionResults condition_results ={this.state.all_condition_results} valueLink={this.linkState('conditionResultsField')} disable_all_selects={this.state.disable_all_selects} />
+							<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} />
+
+
 							<AlertAggregation aggregation_types = {
 									this.props.aggregation_types
 								}
@@ -292,6 +316,7 @@ var AlertCategorySelect = React.createClass({
 								}
 								/>
 							<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
+              <AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} />
 
 							<AlertChannel channel_types = {
 									this.props.channel_types

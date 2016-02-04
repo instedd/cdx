@@ -13,7 +13,7 @@ module Alerts
     # if it has just alert the user
     alerts.each do |alert|
       alertHistorycount=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', frequency.ago).where('for_aggregation_calculation=true').count
-      if (alertHistorycount > 0)
+      if ( (alertHistorycount > 0)  && (alert.aggregation_threshold > alertHistorycount) )
         alertHistory = AlertHistory.new
         alertHistory.alert = alert
         alertHistory.user = alert.user

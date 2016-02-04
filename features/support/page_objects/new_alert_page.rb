@@ -15,11 +15,16 @@ class NewAlertPage < SitePrism::Page
 
     section :aggregation, CdxSelect, "label", text: /Aggregation Type/i
     section :aggregation_frequency, CdxSelect, "label", text: /Aggregation Frequency/i
+    element :aggregationthresholdlimit, '#alertaggregationthresholdlimit'
+    
     section :channel, CdxSelect, "label", text: /Channel/i
 
     section :sites, CdxSelect, "label", text: /Sites/i
     section :devices, CdxSelect, "label", text: /Devices/i
     section :roles, CdxSelect, "label", text: /Roles/i
+    
+    section :conditions, CdxSelect, "label", text: /Conditions/i
+    section :condition_results, CdxSelect, "label", text: /Condition Results/i
 
     section :internal_users, CdxSelect, "label", text: /Internal Recipient/i
 

@@ -11,10 +11,13 @@ Feature: create an alert
     Given the user creates a new error category alert with all fields with name "errorcodealer1"
     Then the user should see in list alerts "errorcodealer1"
 
-
   Scenario: Successful create anomalie category alert with all fields
     Given the user creates a new anomalie category alert with all fields with name "errorcodealer1"
     Then the user should see in list alerts "errorcodealer1"
+
+  Scenario: Successful create testresult category alert with all fields
+    Given the user creates a new testresult alert with all fields with name "errorcodealer5"
+    Then the user should see in list alerts "errorcodealer5"
 
   Scenario: Successful create and view alert
     Given the user creates a new alert with name "errorcodealer2"

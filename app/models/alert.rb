@@ -4,10 +4,12 @@ class Alert < ActiveRecord::Base
 
   has_many :alert_histories
   has_many :alert_recipients
-  has_many  :recipient_notification_history
+  has_many :recipient_notification_history
+  has_many :alert_condition_results
 
   has_and_belongs_to_many :sites
   has_and_belongs_to_many :devices
+  has_and_belongs_to_many :conditions
   
   acts_as_paranoid
 
@@ -39,6 +41,8 @@ class Alert < ActiveRecord::Base
   attr_accessor :sites_info
   attr_accessor :devices_info
   attr_accessor :users_info
+  attr_accessor :conditions_info
+  attr_accessor :condition_results_info
 
 
   def create_percolator

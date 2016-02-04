@@ -11,6 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 ActiveRecord::Schema.define(version: 20160215195614) do
+  create_table "alert_condition_results", force: :cascade do |t|
+    t.string  "result",   limit: 255
+    t.integer "alert_id", limit: 4
+  end
+
   create_table "alert_histories", force: :cascade do |t|
     t.boolean  "read",                                  default: false
     t.integer  "user_id",                     limit: 4
@@ -41,29 +46,40 @@ ActiveRecord::Schema.define(version: 20160215195614) do
   add_index "alert_recipients", ["user_id"], name: "index_alert_recipients_on_user_id", using: :btree
 
   create_table "alerts", force: :cascade do |t|
-    t.integer  "user_id",               limit: 4
-    t.string   "name",                  limit: 255
-    t.string   "description",           limit: 255
-    t.boolean  "enabled",                             default: true
+    t.integer  "user_id",                   limit: 4
+    t.string   "name",                      limit: 255
+    t.string   "description",               limit: 255
+    t.boolean  "enabled",                                 default: true
     t.datetime "last_alert"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "error_code",            limit: 255
-    t.integer  "category_type",         limit: 4
-    t.integer  "aggregation_type",      limit: 4,     default: 0
-    t.text     "query",                 limit: 65535
-    t.text     "message",               limit: 65535
-    t.integer  "channel_type",          limit: 4,     default: 0
-    t.integer  "aggregation_frequency", limit: 4,     default: 0
-    t.integer  "sms_limit",             limit: 4,     default: 0
-    t.integer  "anomalie_type",         limit: 4,     default: 0
-    t.boolean  "notify_patients",                     default: false
-    t.text     "sms_message",           limit: 65535
+    t.string   "error_code",                limit: 255
+    t.integer  "category_type",             limit: 4
+    t.integer  "aggregation_type",          limit: 4,     default: 0
+    t.text     "query",                     limit: 65535
+    t.text     "message",                   limit: 65535
+    t.integer  "channel_type",              limit: 4,     default: 0
+    t.integer  "aggregation_frequency",     limit: 4,     default: 0
+    t.integer  "sms_limit",                 limit: 4,     default: 0
+    t.integer  "anomalie_type",             limit: 4,     default: 0
+    t.boolean  "notify_patients",                         default: false
+    t.text     "sms_message",               limit: 65535
     t.datetime "deleted_at"
+    t.integer  "test_result_min_threshold", limit: 4
+    t.integer  "test_result_max_threshold", limit: 4
+    t.integer  "aggregation_threshold",     limit: 4,     default: 0
   end
 
   add_index "alerts", ["deleted_at"], name: "index_alerts_on_deleted_at", using: :btree
   add_index "alerts", ["user_id"], name: "index_alerts_on_user_id", using: :btree
+
+  create_table "alerts_conditions", id: false, force: :cascade do |t|
+    t.integer "alert_id",     limit: 4, null: false
+    t.integer "condition_id", limit: 4, null: false
+  end
+
+  add_index "alerts_conditions", ["alert_id", "condition_id"], name: "index_alerts_conditions_on_alert_id_and_condition_id", using: :btree
+  add_index "alerts_conditions", ["condition_id", "alert_id"], name: "index_alerts_conditions_on_condition_id_and_alert_id", using: :btree
 
   create_table "alerts_devices", id: false, force: :cascade do |t|
     t.integer "alert_id",  limit: 4, null: false
