@@ -145,6 +145,78 @@ describe SitesController do
       expect(response).to be_forbidden
     end
 
+    it "should not update parent site if user has no institution:createSite but yes other properties" do
+      new_parent = institution.sites.make
+
+      other_user = User.make
+      grant user, other_user, institution, [READ_INSTITUTION]
+      grant user, other_user, "site?institution=#{institution.id}", [READ_SITE]
+      grant user, other_user, "site?institution=#{institution.id}", [UPDATE_SITE]
+
+      sign_in other_user
+      expect {
+        patch :update, id: site.id, site: { name: 'newname', parent_id: new_parent.id }
+      }.to change(Site, :count).by(0)
+
+      expect(site.reload.name).to eq("newname")
+      expect(site.reload.parent).to_not eq(new_parent)
+    end
+
+    context "change parent site by user with institution:createSite policy" do
+      let!(:new_parent) { institution.sites.make }
+
+      before(:each) {
+        patch :update, id: site.id, site: (
+          Site.plan(institution: institution).merge({ parent_id: new_parent.id, name: site.name })
+        )
+
+        site.reload
+      }
+
+      it "should create a new site with the name of the edited" do
+        expect(Site.last.id).to_not eq(new_parent.id)
+        expect(Site.last.id).to_not eq(site.id)
+        expect(Site.last.name).to eq(site.name)
+      end
+
+      it "should redirect to sites_path" do
+        expect(response).to redirect_to(sites_path)
+      end
+
+      it "should soft delete original site" do
+        expect(site).to be_deleted
+      end
+
+    end
+
+    context "changing parent site and with some validation errors" do
+      let!(:new_parent) { institution.sites.make }
+
+      before(:each) {
+        patch :update, id: site.id, site: (
+          Site.plan(institution: institution).merge({ parent_id: new_parent.id, name: '' })
+        )
+
+        site.reload
+      }
+
+      it "should not create a new site" do
+        expect(Site.last.id).to eq(new_parent.id)
+      end
+
+      it "should not delete the original site" do
+        expect(site).to_not be_deleted
+      end
+
+      it "should try to update the original site in the form" do
+        expect(response.body).to include(%(class="edit_site" id="edit_site_#{site.id}" action="/sites/#{site.id}))
+      end
+
+      it "should keep edited values of attributes" do
+        expect(assigns(:site).name).to eq('')
+      end
+    end
+
   end
 
   context "destroy" do
