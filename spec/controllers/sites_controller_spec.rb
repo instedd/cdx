@@ -164,6 +164,9 @@ describe SitesController do
 
     context "change parent site by user with institution:createSite policy" do
       let!(:new_parent) { institution.sites.make }
+      let(:new_site) { Site.last }
+      let!(:device) { Device.make site: site }
+      let!(:test) { TestResult.make device: device }
 
       before(:each) {
         patch :update, id: site.id, site: (
@@ -174,9 +177,9 @@ describe SitesController do
       }
 
       it "should create a new site with the name of the edited" do
-        expect(Site.last.id).to_not eq(new_parent.id)
-        expect(Site.last.id).to_not eq(site.id)
-        expect(Site.last.name).to eq(site.name)
+        expect(new_site.id).to_not eq(new_parent.id)
+        expect(new_site.id).to_not eq(site.id)
+        expect(new_site.name).to eq(site.name)
       end
 
       it "should redirect to sites_path" do
@@ -187,6 +190,21 @@ describe SitesController do
         expect(site).to be_deleted
       end
 
+      it "should leave original without devices" do
+        expect(site.devices).to be_empty
+      end
+
+      it "should leave test in original site" do
+        expect(site.test_results).to eq([test])
+      end
+
+      it "should leave devices in new site" do
+        expect(new_site.devices).to eq([device])
+      end
+
+      it "should leave no test in new site" do
+        expect(new_site.test_results).to be_empty
+      end
     end
 
     context "changing parent site and with some validation errors" do
