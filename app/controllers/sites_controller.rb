@@ -35,8 +35,8 @@ class SitesController < ApplicationController
     @institution = @navigation_context.institution
     return unless authorize_resource(@institution, CREATE_INSTITUTION_SITE)
 
-    @site = @institution.sites.new(site_params)
-    @sites = check_access(Site, READ_SITE)
+    @site = @institution.sites.new(site_params(true))
+    @sites = check_access(@institution.sites, READ_SITE)
 
     respond_to do |format|
       if @site.save
@@ -63,19 +63,50 @@ class SitesController < ApplicationController
 
     @can_delete = has_access?(@site, DELETE_SITE)
     @can_be_deleted = @site.devices.empty?
+    @can_move = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
+    @sites = check_access(@navigation_context.institution.sites, READ_SITE) if @can_move
   end
 
   # PATCH/PUT /sites/1
   # PATCH/PUT /sites/1.json
   def update
     @site = Site.find params[:id]
+    institution = @site.institution
+
     return unless authorize_resource(@site, UPDATE_SITE)
 
+    @can_move = has_access?(institution, CREATE_INSTITUTION_SITE)
+
     respond_to do |format|
-      if @site.update(site_params)
+      update_or_save = false
+
+      if site_params(@can_move).has_key?(:parent_id)
+        new_site = institution.sites.new(site_params(true))
+        begin
+          Site.transaction do
+            @site.destroy
+            new_site.save!
+            update_or_save = true
+          end
+        rescue => e
+          update_or_save = false
+          # propagate errors from site to be created to original site
+          new_site.errors.each do |k, m|
+            @site.errors.add(k, m)
+          end
+          # mimic that attributes have been edited in the original site
+          @site.assign_attributes(site_params)
+        end
+      else
+        update_or_save = @site.update(site_params)
+      end
+
+      if update_or_save
         format.html { redirect_to sites_path, notice: 'Site was successfully updated.' }
         format.json { head :no_content }
       else
+        @sites = check_access(institution.sites, READ_SITE) if @can_move
+
         format.html { render action: 'edit' }
         format.json { render json: @site.errors, status: :unprocessable_entity }
       end
@@ -122,14 +153,17 @@ class SitesController < ApplicationController
 
   private
 
-  def site_params
+  def site_params(with_parent_id = false)
     if params[:site] && (params[:site][:lat].blank? || params[:site][:lng].blank?) && !params[:site][:location_geoid].blank?
       location_details = Location.details(params[:site][:location_geoid]).first
       params[:site][:lat] = location_details.try(:lat)
       params[:site][:lng] = location_details.try(:lng)
     end
 
-    params.require(:site).permit(:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :parent_id, :sample_id_reset_policy, :main_phone_number, :email_address)
+    allowed_params = [:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :sample_id_reset_policy, :main_phone_number, :email_address]
+    allowed_params << :parent_id if with_parent_id
+
+    params.require(:site).permit(*allowed_params)
   end
 
   def apply_filters
