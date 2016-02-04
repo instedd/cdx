@@ -11,6 +11,10 @@ class ManifestParsingError < RuntimeError
     new "'#{value}' is not a valid value for '#{target_field}' (must be an integer)", target_field
   end
 
+  def self.invalid_numeric_value(value, target_field)
+    new "'#{value}' is not a valid value for '#{target_field}' (must be an number)", target_field
+  end
+
   def self.invalid_mapping(value, target_field, mappings)
     new "'#{value}' is not a valid value for '#{target_field}' (valid value must be in one of these forms: #{mappings.map(){|f| f["when"]}.join(", ")})", target_field
   end

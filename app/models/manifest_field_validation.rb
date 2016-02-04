@@ -14,6 +14,10 @@ class ManifestFieldValidation
       unless self.class.is_an_integer?(value)
         raise ManifestParsingError.invalid_value_for_integer(value, target_field)
       end
+    when 'float'
+      unless self.class.is_a_float?(value)
+        raise ManifestParsingError.invalid_numeric_value(value, target_field)
+      end
     when 'date'
       check_value_is_an_iso_date value
     end
@@ -38,6 +42,16 @@ class ManifestFieldValidation
       end
     else
       value.is_a?(Integer) || value.to_i.to_s == value
+    end
+  end
+
+  def self.is_a_float? value
+    if value.is_a?(Array)
+      !value.empty? && value.all? do |element|
+        element.nil? || is_a_float?(element)
+      end
+    else
+      value.is_a?(Float) || value.to_f.to_s == value
     end
   end
 

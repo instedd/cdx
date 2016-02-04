@@ -260,8 +260,10 @@ describe DeviceMessageImporter, elasticsearch: true do
         assays = test['test']['assays']
         expect(assays.size).to eq(2)
         expect(assays.first['result']).to eq('positive')
+        expect(assays.first['quantitative_result']).to eq(23.45)
         expect(assays.first['name']).to eq('HRPII')
         expect(assays.second['result']).to eq('negative')
+        expect(assays.second['quantitative_result']).to eq(0)
         expect(assays.second['name']).to eq('pLDH')
 
         expect(TestResult.count).to eq(1)

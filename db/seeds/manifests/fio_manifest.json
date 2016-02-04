@@ -1,6 +1,6 @@
 {
   "metadata" : {
-    "version" : "1.0.4",
+    "version" : "1.0.5",
     "api_version" : "1.5.0",
     "conditions": ["malaria_pf", "malaria_pv"],
     "source": {
@@ -20,7 +20,7 @@
         "years": {"lookup" : "Patient/Age/text()"}
       }
     },
-    "patient.gender" : { "lowercase": { "lookup" : "Patient/Gender/text()" } },
+    "patient.gender" : {"lowercase": {"lookup" : "Patient/Gender/text()" }},
     "patient.pregnancy_status" : {"lookup" : "Patient/PregnancyStatus/text()"},
     "sample.id" : {"lookup" : "SampleId/text()"},
     "test.start_time" : {"lookup" : "TestDate/text()"},
@@ -28,14 +28,15 @@
     "test.name" : {"lookup" : "Test/Code/@value"},
     "test.status" : {
       "case" : [
-        { "lookup": "Test/Control/@qualitative" },
+        {"lookup": "Test/Control/@qualitative"},
         [
-          { "when" : "Valid", "then" : "success"},
-          { "when" : "*", "then" : "error"}
+          {"when" : "Valid", "then" : "success"},
+          {"when" : "*", "then" : "error"}
         ]
       ]
     },
-    "test.assays.result" : { "lowercase" : {"lookup" : "Test/Assay/Result/@qualitative"} },
+    "test.assays.result" : {"lowercase" : {"lookup" : "Test/Assay/Result/@qualitative"}},
+    "test.assays.quantitative_result" : {"lookup" : "Test/Assay/Result/@value"},
     "test.assays.name" : {"lookup" : "Test/Assay/@code"},
     "test.assays.condition" : {
       "case": [

@@ -62,7 +62,7 @@ entities:
               - negative
               - n/a
           quantitative_result:
-            type: integer
+            type: float
       type:
         type: enum
         searchable: true
@@ -155,7 +155,7 @@ entities:
               - negative
               - indeterminate
           quantitative_result:
-            type: integer
+            type: float
 test:
   test:
     <<: *TEST

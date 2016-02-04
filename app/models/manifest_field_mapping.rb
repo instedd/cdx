@@ -334,6 +334,14 @@ class ManifestFieldMapping
       else
         value.to_i
       end
+    elsif @field.type == 'float' &&  ManifestFieldValidation.is_a_float?(value)
+      if value.is_a? Array
+        value.map do |value|
+          value && value.to_f
+        end
+      else
+        value.to_f
+      end
     else
       value
     end
