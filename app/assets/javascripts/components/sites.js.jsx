@@ -7,7 +7,7 @@ var SitePicker = React.createClass({
   },
 
   getInitialState: function() {
-    return { sites: [], sites_tree: [], selected_site: null, query: '' };
+    return { sites: [], sites_tree: [], selected_site: null, query: '', subsites_selected: true };
   },
 
   componentDidMount: function() {
@@ -111,10 +111,20 @@ var SitePicker = React.createClass({
     }));
   },
 
+  onSubsiteCheckboxChange: function() {
+    var oldValue = this.state.subsites_selected;
+    this.setState(React.addons.update(this.state, {
+      subsites_selected: { $set: !oldValue },
+    }));
+    this.props.onSubsitesToggled(!oldValue);
+  },
+
   render: function() {
     return (
       <div>
         <input type="text" className="input-block" onChange={this.onSearchChange} autoFocus="true" placeholder="Search sites" />
+        <input type="checkbox" id="include-subsites" onChange={this.onSubsiteCheckboxChange} />
+        <label htmlFor="include-subsites">Selection includes all subsites</label>
         <SitesTreeView sites={this.state.sites_tree} onSiteClick={this.selectSite} />
       </div>
     )

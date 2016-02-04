@@ -4,8 +4,10 @@ class NavigationContext
   attr_reader :institution
   attr_reader :site
 
-  def initialize(user = nil, uuid = nil)
+  def initialize(user = nil, context = nil)
     @user = user
+    @include_subsites = !context.end_with?("-!")
+    uuid = context.end_with?("-*") || context.end_with?("-!") ? context[0..-3] : context
 
     @institution = Institution.where(uuid: uuid).first
     @site = nil
@@ -41,7 +43,7 @@ class NavigationContext
   def to_hash
     Hash.new.tap do |h|
       if entity
-        h[:name] = name  
+        h[:name] = name
         h[:uuid] = uuid
       end
       h[:institution] = { name: institution.name, uuid: institution.uuid } if institution

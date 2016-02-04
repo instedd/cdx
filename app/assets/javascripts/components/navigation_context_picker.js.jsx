@@ -40,16 +40,29 @@ $(document).ready(function(){
 
 var NavigationContextPicker = React.createClass({
   getInitialState: function() {
-    return { context: this.props.context };
+    return { context: this.props.context, subsitesIncluded: true };
   },
 
   changeContextSite: function(site) {
     this.setState(React.addons.update(this.state, {
       context: { $set: site }
-    }), function() {
-      var new_context_url = URI(window.location.href).setSearch({context: site.uuid}).toString();
-      Turbolinks.visit(new_context_url);
-    });
+    }), this.toggleSubsites(this.state.subsitesIncluded));
+  },
+
+  onSubsitesToggled: function(showSubsites) {
+    this.setState(React.addons.update(this.state, {
+      subsitesIncluded: { $set: showSubsites }
+    }), this.toggleSubsites(this.state.subsitesIncluded));
+  },
+
+  toggleSubsites: function(showSubsites) {
+    var new_context_url = URI(window.location.href).setSearch({context: this.state.context.uuid}).toString();
+    if(showSubsites) {
+      new_context_url += "-*";
+    } else {
+      new_context_url += "-!";
+    }
+    Turbolinks.visit(new_context_url);
   },
 
   render: function() {
@@ -57,7 +70,7 @@ var NavigationContextPicker = React.createClass({
     // there is no need to update the properties
     return (
       <div>
-        <SitePicker selected_uuid={this.props.context.uuid} onSiteSelected={this.changeContextSite} />
+        <SitePicker selected_uuid={this.props.context.uuid} onSiteSelected={this.changeContextSite} onSubsitesToggled={this.onSubsitesToggled} />
       </div>
     );
   }
