@@ -22,6 +22,18 @@
 #   b) a grouping with the name of '#{default_name}_admin_level'
 
 test:
+  - name: test.assays.quantitative_result
+    filter_parameter_definition:
+      - include_default: true
+      - name: test.assays.quantitative_result.min
+        type: range-integer
+        boundary: gte
+      - name: test.assays.quantitative_result.max 
+        type: range-integer
+        boundary: lte
+      - name: test.assays.quantitative_result.wildcard
+        type: wildcard
+        
   - name: test.error_code
     filter_parameter_definition:
       - include_default: true

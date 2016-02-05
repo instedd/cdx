@@ -55,6 +55,19 @@ class AlertsController < ApplicationController
       end
     end
 
+    @alert_conditions=[]
+    alert_info.conditions.each do |condition|
+      @alert_conditions.push(condition.id)
+    end
+    @alert_conditions = @alert_conditions.join(",")
+
+    @alert_condition_results=[]
+    alert_info.alert_condition_results.each do |condition_result|
+      @alert_condition_results.push(condition_result.result)
+    end
+    @alert_condition_results = @alert_condition_results.join(",")
+
+
     respond_with alert_info, location: alert_path
   end
 
@@ -152,7 +165,7 @@ class AlertsController < ApplicationController
 
 
       if alert_info.category_type == "test_results"
-     #   alert_info.query =    {"test.error_code"=> 100 }
+        #   alert_info.query =    {"test.error_code"=> 100 }
 
         # core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}
         if params[:alert][:conditions_info]
@@ -163,7 +176,7 @@ class AlertsController < ApplicationController
             alert_info.conditions << condition
             query_conditions << condition.name
           end
-         # alert_info.query=alert_info.query.merge ({"assays"=>query_conditions})
+          # alert_info.query=alert_info.query.merge ({"assays"=>query_conditions})
         end
 
         if params[:alert][:condition_results_info]
@@ -181,16 +194,23 @@ class AlertsController < ApplicationController
 
             query_condition_results << condition_result_name
           end
-       #   alert_info.query=alert_info.query.merge ({"assays"=>query_condition_results})
+          #   alert_info.query=alert_info.query.merge ({"assays"=>query_condition_results})
         end
-        
-       
-     #   alert_info.query= {"assays"=>["condition" =>query_conditions, "result" => query_condition_results]}
-  #  alert_info.query=  {core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}}
+
+
+        #   alert_info.query= {"assays"=>["condition" =>query_conditions, "result" => query_condition_results]}
+        #  alert_info.query=  {core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}}
+
+        #  alert_info.query= {"test.assays.condition" => 'mtb'}
+    #works    alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
  
- #  alert_info.query= {"test.assays.condition" => 'mtb'}
-alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
-#alert_info.query=alert_info.query.merge ({"test.assays.result" => query_condition_results})
+    
+    alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
+ # alert_info.query =    {"test.assays.quantitative_result" => "8"}
+        
+#     alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results, "test.quantitative_result.min" => 11, "test.quantitative_result.max"=>18  }          
+        
+        #alert_info.query=alert_info.query.merge ({"test.assays.result" => query_condition_results})
       end
 
 
@@ -258,9 +278,9 @@ alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.resu
 
 
   private
-  
+
   def alert_params
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :test_result_min_threshold, :test_result_max_threshold, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
 
   def new_alert_request_variables
@@ -270,8 +290,8 @@ alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.resu
 
     @conditions = Condition.all
     @condition_results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
-    
-    @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
+#    @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
+
 
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }

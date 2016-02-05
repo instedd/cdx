@@ -2,7 +2,12 @@ var AlertCategorySelect = React.createClass({
 	mixins: [React.addons.LinkedStateMixin],
 
 	componentDidMount: function() {
-		this.doCategoryChange('device_errors');
+
+		if ( this.props.alert_info.category_type == null ) {
+			this.doCategoryChange('device_errors');
+		} else {
+			this.doCategoryChange(this.props.alert_info.category_type);
+		}
 
 		if (this.props.edit == true) {
 			document.getElementById("alertsmslimit").disabled = true;
@@ -43,13 +48,15 @@ var AlertCategorySelect = React.createClass({
 			all_devices: this.props.devices,
 			all_conditions: this.props.conditions,
 			all_condition_results: this.props.condition_results,
+			all_condition_result_statuses: this.props.condition_result_statuses,
 			current_category: this.props.alert_info.category_type,
 			nameField: this.props.alert_info.name,
 			descriptionField: this.props.alert_info.description,
 			siteField: "",
 			deviceField: this.props.alert_devices,
-			conditionField: this.props.alert_conditons,
-			conditionResultsField: this.props.alert_conditon_results,
+			conditionField: this.props.alert_conditions,
+			conditionResultsField: this.props.alert_condition_results,
+			conditionResultStatusesField: this.props.alert_condition_result_statuses,
 			errorCodeField: "",
 			anomalieField: "",
 			aggregationField: this.props.alert_info.aggregation_type,
@@ -156,6 +163,7 @@ var AlertCategorySelect = React.createClass({
 			devices_info: this.state.deviceField,
 			conditions_info: this.state.conditionField,
 			condition_results_info: this.state.conditionResultsField,
+			condition_results_statuses_info: this.state.conditionResultStatusesField,
 			anomalie_type: this.state.anomalieField,
 			aggregation_type: this.state.aggregationField,
 			aggregation_frequency: this.state.aggregationFrequencyField,
@@ -316,7 +324,7 @@ var AlertCategorySelect = React.createClass({
 								}
 								/>
 							<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
-              <AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} />
+							<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} />
 
 							<AlertChannel channel_types = {
 									this.props.channel_types

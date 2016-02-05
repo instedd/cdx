@@ -128,6 +128,71 @@ var AlertConditionResults = React.createClass({
 });
 
 
+var AlertConditionResultStatuses = React.createClass({
+	getDefaultProps: function(){
+		return {
+			multiple: true,
+			name: 'selectConditionResultStatuses'
+		}
+	},
+	onChange(textValue, arrayValue) {
+		// Multi select: grab values and send array of values to valueLink
+		this.props.valueLink.requestChange(_.pluck(arrayValue, 'value').join());
+	},
+	render: function() {
+		var conditionOptions = [];
+
+		conditionOption = {};
+		conditionOption["value"] = "";
+		conditionOption["label"] = "All"
+		conditionOptions.push(conditionOption);
+
+		for (var i = 0; i < this.props.condition_result_statuses.length; i++) {
+			conditionOption = {};
+			conditionOption["value"] = this.props.condition_result_statuses[i];
+			conditionOption["label"] = this.props.condition_result_statuses[i];
+			conditionOptions.push(conditionOption);
+		}
+
+		var {
+			valueLink,
+			value,
+			onChange,
+			...other
+		} = this.props;
+		return (
+			<div className = "row" id = "conditionresultstatusesrow">
+				<div className = "col pe-2" >
+					<label>Condition Result Statuses</label>
+				</div>
+				<div className = "col" >
+					<Select
+						name = "conditionresultstatuses"
+						value = {
+							value || valueLink.value
+						}
+						options = {
+							conditionOptions
+						}
+						multi = {
+							true
+						}
+						placeholder = "All"
+						onChange = {
+							this.onChange
+						}
+						disabled = {
+							this.props.disable_all_selects
+						}
+						/>
+				</div>
+			</div>
+		);
+	}
+});
+
+
+
 var AlertConditionThreshold = React.createClass({
 	render: function() {
 		return (
