@@ -40,23 +40,23 @@ $(document).ready(function(){
 
 var NavigationContextPicker = React.createClass({
   getInitialState: function() {
-    return { context: this.props.context, subsitesIncluded: true };
+    return { context: this.props.context, subsitesIncluded: !this.props.context.full_context.endsWith("-!") };
   },
 
   changeContextSite: function(site) {
     this.setState(React.addons.update(this.state, {
       context: { $set: site }
-    }), this.toggleSubsites(this.state.subsitesIncluded));
+    }), this.toggleSubsites(site, this.state.subsitesIncluded));
   },
 
   onSubsitesToggled: function(showSubsites) {
     this.setState(React.addons.update(this.state, {
       subsitesIncluded: { $set: showSubsites }
-    }), this.toggleSubsites(this.state.subsitesIncluded));
+    }), this.toggleSubsites(this.state.context, showSubsites));
   },
 
-  toggleSubsites: function(showSubsites) {
-    var new_context_url = URI(window.location.href).setSearch({context: this.state.context.uuid}).toString();
+  toggleSubsites: function(site, showSubsites) {
+    var new_context_url = URI(window.location.href).setSearch({context: site.uuid}).toString();
     if(showSubsites) {
       new_context_url += "-*";
     } else {
@@ -70,7 +70,7 @@ var NavigationContextPicker = React.createClass({
     // there is no need to update the properties
     return (
       <div>
-        <SitePicker selected_uuid={this.props.context.uuid} onSiteSelected={this.changeContextSite} onSubsitesToggled={this.onSubsitesToggled} />
+        <SitePicker selected_uuid={this.props.context.uuid} onSiteSelected={this.changeContextSite} onSubsitesToggled={this.onSubsitesToggled} subsitesIncluded={this.state.subsitesIncluded} />
       </div>
     );
   }

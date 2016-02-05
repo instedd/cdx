@@ -17,7 +17,7 @@ class PatientsController < ApplicationController
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_PATIENT)
     @patients = check_access(Patient.where(is_phantom: false).where(institution: @navigation_context.institution), READ_PATIENT).order(:name)
 
-    @patients = @patients.within(@navigation_context.entity)
+    @patients = @patients.within(@navigation_context.entity, @navigation_context.exclude_subsites)
 
     @patients = @patients.where("name LIKE concat('%', ?, '%')", params[:name]) unless params[:name].blank?
     @patients = @patients.where("entity_id LIKE concat('%', ?, '%')", params[:entity_id]) unless params[:entity_id].blank?

@@ -12,7 +12,7 @@ module SiteContained
     validate :same_institution_of_site
     before_save :set_site_prefix
 
-    scope :within, -> (institution_or_site) {
+    scope :within, -> (institution_or_site, exclude_subsites = false) {
       if institution_or_site.is_a?(Institution)
         where(institution: institution_or_site)
       else
