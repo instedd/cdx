@@ -12,7 +12,7 @@ input[type="number"] {
   font-family: $sans;
   font-size: 100%;
   border: none;
-  border-bottom: 1px solid $gray2;
+  border-bottom: 1px solid $gray1;
   padding: 0 5px;
   height: 30px;
   outline: 0 !important;
@@ -111,24 +111,29 @@ input[type="checkbox"] {
   }
   &.power {
     & + label {
-      background: url('ic-on-off.png') no-repeat right top;
       display: inline-block;
       vertical-align: middle;
-      width: 32px;
-      height: 20px;
       margin: 0;
+      padding-left: 40px;
       min-height: auto;
       &:before {
-        display: none !important;
+        background: url('ic-on-off.png') no-repeat right top;
+        width: 32px;
+        height: 20px;
+        top: 12px;
+        left: 0px;
+        border: none;
+        transition: none;
       }
-      &:hover {
+      &:hover:before {
         background-position: right bottom;
       }
     }
-    &:checked + label {
+    &:checked + label:before {
+      content: '';
       background-position: left top;
     }
-    &:checked:hover + label {
+    &:checked:hover + label:before {
       background-position: left bottom;
     }
   }

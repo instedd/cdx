@@ -75,50 +75,66 @@ var PolicyItemDetail = React.createClass({
       var resourcesLabel = this.resourcesLabel();
 
       ifResourceTypeSelected = <div className="with-resource-type">
-        <div className="section">
-          <span className="section-name">Resources</span>
-          <div className="section-content">
-            <input type="radio" name="statementType" value="all" id={this.idFor("statement-type-all")} checked={statement.statementType == 'all'} onChange={this.onStatementTypeChange.bind(this, 'all')} />
-            <label htmlFor={this.idFor("statement-type-all")}>All {resourcesLabel}</label>
-            <input type="radio" name="statementType" value="except" id={this.idFor("statement-type-except")} checked={statement.statementType == 'except'} onChange={this.onStatementTypeChange.bind(this, 'except')} />
-            <label htmlFor={this.idFor("statement-type-except")}>All {resourcesLabel} except</label>
-            {resourcesList['except']}
-            <input type="radio" name="statementType" value="only" id={this.idFor("statement-type-only")} checked={statement.statementType == 'only'} onChange={this.onStatementTypeChange.bind(this, 'only')} />
-            <label htmlFor={this.idFor("statement-type-only")}>Only some {resourcesLabel}</label>
-            {resourcesList['only']}
+        <div className="row section">
+          <div className="col px-1">
+            <label className="section-name">Resources</label>
+          </div>
+          <div className="col">
+            <div className="section-content">
+              <input type="radio" name="statementType" value="all" id={this.idFor("statement-type-all")} checked={statement.statementType == 'all'} onChange={this.onStatementTypeChange.bind(this, 'all')} />
+              <label htmlFor={this.idFor("statement-type-all")}>All {resourcesLabel}</label>
+              <input type="radio" name="statementType" value="except" id={this.idFor("statement-type-except")} checked={statement.statementType == 'except'} onChange={this.onStatementTypeChange.bind(this, 'except')} />
+              <label htmlFor={this.idFor("statement-type-except")}>All {resourcesLabel} except</label>
+              {resourcesList['except']}
+              <input type="radio" name="statementType" value="only" id={this.idFor("statement-type-only")} checked={statement.statementType == 'only'} onChange={this.onStatementTypeChange.bind(this, 'only')} />
+              <label htmlFor={this.idFor("statement-type-only")}>Only some {resourcesLabel}</label>
+              {resourcesList['only']}
+            </div>
           </div>
         </div>
-        <div className="section">
-          <span className="section-name">Actions</span>
-          <div className="section-content">
-            { Object.keys(actions).map(function(actionKey, index) {
-              var action = actions[actionKey];
-              return (
-                <div key={actionKey}>
-                  <input type="checkbox" id={this.idFor("action-" + actionKey)} checked={this.statementHasAction(statement, action)} onChange={this.toggleAction.bind(this, action)} />
-                  <label htmlFor={this.idFor("action-" + actionKey)}>{action.label}</label>
-                </div>
-              );
-            }.bind(this)) }
+        <div className="row section">
+          <div className="col px-1">
+            <label className="section-name">Actions</label>
+          </div>
+          <div className="col">
+            <div className="section-content">
+              { Object.keys(actions).map(function(actionKey, index) {
+                var action = actions[actionKey];
+                return (
+                  <div key={actionKey}>
+                    <input type="checkbox" id={this.idFor("action-" + actionKey)} checked={this.statementHasAction(statement, action)} onChange={this.toggleAction.bind(this, action)} />
+                    <label htmlFor={this.idFor("action-" + actionKey)}>{action.label}</label>
+                  </div>
+                );
+              }.bind(this)) }
+            </div>
           </div>
         </div>
       </div>;
     }
     return (
       <div>
-        <div className="section">
-          <span className="section-name">Delegable</span>
-          <div className="section-content">
-            <input type="checkbox" id={this.idFor("delegable")} checked={statement.delegable} onChange={this.toggleDelegable} />
-            <label htmlFor={this.idFor("delegable")}>Users CAN{statement.delegable ? "" : "NOT"} delegate permissions on this policy</label>
+        <div className="row section">
+          <div className="col px-1">
+            <label className="section-name">Delegable</label>
+          </div>
+          <div className="col">
+            <div className="section-content">
+              <input type="checkbox" id={this.idFor("delegable")} checked={statement.delegable} onChange={this.toggleDelegable} className="power" />
+              <label htmlFor={this.idFor("delegable")}>Users CAN{statement.delegable ? "" : "NOT"} delegate permissions on this policy</label>
+            </div>
           </div>
         </div>
-        <div className="section">
-          <span className="section-name">Type</span>
-          <div className="section-content">
-            <CdxSelect items={this.props.resourceTypes} value={statement.resourceType} onChange={this.onResourceTypeChange} />
-            <input type="checkbox" disabled="true" id={this.idFor("includeSubsites")} checked={statement.includeSubsites} onChange={this.toggleIncludeSubsites} />
-            <label htmlFor={this.idFor("includeSubsites")}>Include subsites</label>
+        <div className="row section">
+          <div className="col px-1">
+            <label className="section-name">Type</label>
+          </div>
+          <div className="col">
+            <div className="section-content">
+              <CdxSelect items={this.props.resourceTypes} value={statement.resourceType} onChange={this.onResourceTypeChange} />
+              <input type="checkbox" disabled="true" id={this.idFor("includeSubsites")} checked={statement.includeSubsites} onChange={this.toggleIncludeSubsites} />
+              <label htmlFor={this.idFor("includeSubsites")}>Include subsites</label>
+            </div>
           </div>
         </div>
         {ifResourceTypeSelected}

@@ -33,13 +33,16 @@
         = f.label :site_id
       .col
         .value= @role.site.try(:name)
-
+  %br
+  %br
+  %hr
+  %br
   .row
-    .col.pe-2
-      = f.label :definition
     .col
-      .value
-        = react_component 'PolicyDefinition', definition: @role.definition, actions: actions_per_resource_type, context: params['context'], resources: @policy_definition_resources, resourceTypes: resource_types
+      %h1 Policies
+      %p.text-small.muted
+        %i Policies grant users permisions over specific resources
+  = react_component 'PolicyDefinition', definition: @role.definition, actions: actions_per_resource_type, context: params['context'], resources: @policy_definition_resources, resourceTypes: resource_types
   .row.button-actions
     .col
       = f.submit 'Save', :class => 'btn-primary'
