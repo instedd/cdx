@@ -17,7 +17,11 @@ class Patient < ActiveRecord::Base
 
   scope :within, -> (institution_or_site, exclude_subsites = false) {
     if institution_or_site.is_a?(Institution)
-      where(institution: institution_or_site)
+      if exclude_subsites
+        where(institution: institution_or_site, site: nil)
+      else
+        where(institution: institution_or_site)
+      end
     elsif exclude_subsites
       where("site_id = ? OR id in (#{Encounter.within(institution_or_site, true).select(:patient_id).to_sql})", institution_or_site)
     else

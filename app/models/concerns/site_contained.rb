@@ -14,9 +14,17 @@ module SiteContained
 
     scope :within, -> (institution_or_site, exclude_subsites = false) {
       if institution_or_site.is_a?(Institution)
-        where(institution: institution_or_site)
+        if exclude_subsites
+          where(institution: institution_or_site, site: nil)
+        else
+          where(institution: institution_or_site)
+        end
       else
-        where("site_prefix LIKE concat(?, '%')", institution_or_site.prefix)
+        if exclude_subsites
+          where("site_id = ?", institution_or_site.id)
+        else
+          where("site_prefix LIKE concat(?, '%')", institution_or_site.prefix)
+        end
       end
     }
 
