@@ -72,6 +72,7 @@ class SitesController < ApplicationController
   def update
     @site = Site.find params[:id]
     institution = @site.institution
+    redirect_options = {}
 
     return unless authorize_resource(@site, UPDATE_SITE)
 
@@ -93,6 +94,7 @@ class SitesController < ApplicationController
 
             @site.destroy
             update_or_save = true
+            redirect_options = { context: new_site.uuid } if @navigation_context.entity.uuid == @site.uuid
           end
         rescue => e
           update_or_save = false
@@ -108,7 +110,7 @@ class SitesController < ApplicationController
       end
 
       if update_or_save
-        format.html { redirect_to sites_path, notice: 'Site was successfully updated.' }
+        format.html { redirect_to sites_path(redirect_options), notice: 'Site was successfully updated.' }
         format.json { head :no_content }
       else
         @sites = check_access(institution.sites, READ_SITE) if @can_move

@@ -169,7 +169,7 @@ describe SitesController do
       let!(:test) { TestResult.make device: device }
 
       before(:each) {
-        patch :update, id: site.id, site: (
+        patch :update, id: site.id, context: site.uuid, site: (
           Site.plan(institution: institution).merge({ parent_id: new_parent.id, name: site.name })
         )
 
@@ -183,7 +183,7 @@ describe SitesController do
       end
 
       it "should redirect to sites_path" do
-        expect(response).to redirect_to(sites_path)
+        expect(response).to redirect_to(sites_path(context: new_site.uuid))
       end
 
       it "should soft delete original site" do
@@ -196,6 +196,10 @@ describe SitesController do
 
       it "should leave test in original site" do
         expect(site.test_results).to eq([test])
+      end
+
+      it "should remove roles from " do
+        expect(site.roles).to be_empty
       end
 
       it "should leave devices in new site" do
