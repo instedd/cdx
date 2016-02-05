@@ -66,7 +66,8 @@ module ComputedPolicyConcern
       attrs = {
         action: self.action,
         resource_type: self.resource_type,
-        resource_id: self.resource_id
+        resource_id: self.resource_id,
+        include_subsites: self.include_subsites
       }
 
       conditions.each do |key, value|
