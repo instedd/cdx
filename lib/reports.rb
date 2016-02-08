@@ -1,3 +1,4 @@
 module Reports
-  autoload :Base, 'reports/base'
+  require 'reports/base'
+  require 'reports/all_tests'
 end
