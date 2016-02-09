@@ -119,7 +119,7 @@ var AlertAggregationThreshold = React.createClass({
 		return (
 			< div className = "row" id = "aggregationthresholdrow" >
 			<div className = "col pe-2" >
-				<label>Trigger Aggreation Threshold</label>
+				<label>Aggregation Threshold</label>
 			</div>
 
 			<div className = "col" >

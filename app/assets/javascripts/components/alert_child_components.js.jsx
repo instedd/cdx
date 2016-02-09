@@ -116,7 +116,7 @@ var AlertErrorCode = React.createClass({
 			</div>
 
 			<div className = "col" >
-				<input type = "text" placeholder = "All error codes will be reported" valueLink = {
+				<input type = "text" placeholder = "Error code range" valueLink = {
 						this.props.valueLink
 					}
 					id = "alerterrorcode"  name="alerterrorcode" />
@@ -126,6 +126,72 @@ var AlertErrorCode = React.createClass({
 }
 });
 
+
+var AlertUtilizationEfficiency = React.createClass({
+	getDefaultProps: function(){
+		return {
+			multiple: false,
+			name: 'Aggregation',
+		}
+	},
+	//github.com/JedWatson/react-select/issues/256
+	onChange(textValue, arrayValue) {
+		this.props.valueLink.requestChange(arrayValue[0].label);
+	},
+	render: function() {
+		var options = [];
+				for (var i = 0; i < Object.keys(this.props.aggregation_frequencies).length; i++) {
+					option = {};
+					option["value"] = i;
+					option["label"] = Object.keys(this.props.aggregation_frequencies)[i];
+					options.push(option);
+				}
+
+				var {
+					valueLink,
+					value,
+					onChange,
+					...other
+				} = this.props;
+				
+		return (
+			< div className = "row" id="utilizationefficiencyrow">
+			<div className = "col pe-2">
+				<label>TIMESPAN</label>
+			</div>
+
+			<div className = "col pe-4">
+				<input type = "text" placeholder = "Amount" valueLink = {
+						this.props.valueLink
+					}
+					id = "alertutilizationefficiency"  name="alertutilizationefficiency" />
+		
+	  &nbsp;	 &nbsp;	 &nbsp;	 &nbsp;	
+	 						<Select
+								name = "utilization_efficiency_frequency"
+								value = {
+									value || valueLink.value
+								}
+								options = {
+									options
+								}
+								multi = {
+									false
+								}
+								onChange = {
+									this.onChange
+								}
+								disabled = {
+									this.props.disable_all_selects
+								}
+								/>
+						</div>
+			
+			
+		</div>
+	);
+}
+});
 
 
 
@@ -538,7 +604,7 @@ var AlertSampleId = React.createClass({
 			</div>
 
 			<div className = "col" >
-				<input type = "text" placeholder = "sample id" valueLink = {
+				<input type = "text" placeholder = "sample ID" valueLink = {
 						this.props.valueLink
 					}
 					id = "alertsampleid" />

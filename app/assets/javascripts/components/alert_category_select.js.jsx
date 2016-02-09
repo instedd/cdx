@@ -89,6 +89,7 @@ var AlertCategorySelect = React.createClass({
 		$('#conditionrow').hide();
 		$('#conditionresultrow').hide();
 		$('#thresholdrow').hide();
+		$('#utilizationefficiencyrow').hide();
 
 		if (val == 'device_errors') {
 			$('#errorcoderow').show();
@@ -101,7 +102,10 @@ var AlertCategorySelect = React.createClass({
 			$('#conditionresultrow').show();
 			$('#thresholdrow').show();
 		}
-
+		else if (val == 'utilization_efficiency') {
+				$('#utilizationefficiencyrow').show();
+		}
+		
 		this.setState({
 			current_category: val
 		});
@@ -255,17 +259,6 @@ var AlertCategorySelect = React.createClass({
 							</div>
 						</div>
 
-						<div className = "row" >
-							<div className = "col pe-2" >
-								&nbsp;
-								< /div>
-								<div className="col">
-									<input type="radio" name="category_type" value={category_keys[2]} onChange={this.categoryChanged} id={category_keys[2]} />
-									<label htmlFor={category_keys[2]}>Quality Assurance</label>
-								</div>
-							</div>
-
-
 							<div className="row">
 								<div className="col pe-2">
 									&nbsp;
@@ -284,6 +277,28 @@ var AlertCategorySelect = React.createClass({
 									<label htmlFor={category_keys[3]}>Test Results</label>
 								</div>
 							</div>
+
+
+									<div className="row">
+										<div className="col pe-2">
+											&nbsp;
+										</div>
+										<div className = "col" >
+											<input type = "radio" name = "category_type" value = {
+													category_keys[4]
+												}
+												onChange = {
+													this.categoryChanged
+												}
+												id = {
+													category_keys[4]
+												}
+												/>
+											<label htmlFor={category_keys[4]}>Utilization Efficiency</label>
+										</div>
+									</div>
+								
+								
 
 							<AlertSite sites = {
 									this.props.sites
@@ -315,6 +330,10 @@ var AlertCategorySelect = React.createClass({
 							<AlertConditionResults condition_results ={this.state.all_condition_results} valueLink={this.linkState('conditionResultsField')} disable_all_selects={this.state.disable_all_selects} />
 							<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} />
 
+              	<AlertUtilizationEfficiency aggregation_frequencies={this.props.aggregation_frequencies} valueLink = {
+										this.linkState('aggregation_thresholdField')
+									}
+									/>
 
 							<AlertAggregation aggregation_types = {
 									this.props.aggregation_types

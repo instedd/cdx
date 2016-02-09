@@ -205,8 +205,8 @@ class AlertsController < ApplicationController
           end
         end
 
-     alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
-        ##     alert_info.query =    {"assays.quantitative_result.min" => "8"}
+     ##   alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
+          alert_info.query =    {"assays.quantitative_result.min" => "8"}
     
   ####TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
       end

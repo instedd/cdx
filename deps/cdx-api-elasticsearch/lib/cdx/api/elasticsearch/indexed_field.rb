@@ -6,6 +6,7 @@ class Cdx::Api::Elasticsearch::IndexedField
     definition = api_fields.detect do |definition|
       definition['name'] == core_field.scoped_name
     end
+  
     new(core_field, (definition || {}), document_format)
   end
 

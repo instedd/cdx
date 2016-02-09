@@ -3,7 +3,6 @@ module Alerts
   include SMS
 
   def alert_history_check(frequency, alert_type)
-
     if alert_type == Alert.hour
       alerts = Alert.aggregated.hour.where({enabled: true})
     else
