@@ -11,6 +11,7 @@ var AlertCategorySelect = React.createClass({
 
 		if (this.props.edit == true) {
 			document.getElementById("alertsmslimit").disabled = true;
+			document.getElementById("alertsampleid").disabled = true;
 			document.getElementById("alertmessage").disabled = true;
 			document.getElementById("alertsmsmessage").disabled = true;
 			document.getElementById("alerterrorcode").disabled = true;
@@ -67,6 +68,7 @@ var AlertCategorySelect = React.createClass({
 			userField: this.props.alert_internal_users,
 			patientField: this.props.alert_info.notify_patients,
 			smsLimitField: this.props.alert_info.sms_limit,
+			sampleIdField: this.props.alert_info.sample_id,
 			messageField: this.props.alert_info.message,
 			smsMessageField: this.props.alert_info.sms_message,
 			enabledField: this.props.alert_info.enabled,
@@ -173,6 +175,7 @@ var AlertCategorySelect = React.createClass({
 			users_info: this.state.userField,
 			notify_patients: this.state.patientField,
 			sms_limit: this.state.smsLimitField,
+			sample_id: this.state.sampleIdField,
 			message: this.state.messageField,
 			sms_message: this.state.smsMessageField,
 			enabled: this.state.enabledField,
@@ -297,6 +300,9 @@ var AlertCategorySelect = React.createClass({
 								/>
 
 							<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
+
+              <AlertSampleId valueLink={this.linkState('sampleIdField')} />
+
 
 							<AlertErrorCode valueLink = {
 									this.linkState('errorCodeField')

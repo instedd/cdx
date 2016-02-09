@@ -23,6 +23,8 @@ class NewAlertPage < SitePrism::Page
     section :devices, CdxSelect, "label", text: /Devices/i
     section :roles, CdxSelect, "label", text: /Roles/i
     
+    element :sampleid, '#alertsampleid'
+    
     section :conditions, CdxSelect, "label", text: /Conditions/i
     section :condition_results, CdxSelect, "label", text: /Condition Results/i
 

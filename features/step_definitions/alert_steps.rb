@@ -37,6 +37,7 @@ Given(/^the user creates a new error category alert with all fields with name "(
     form.message.set 'web msg'
     form.smsmessage.set 'sms msg'
     form.smslimit.set 2
+    form.sampleid.set 'ABC'
 
     #Note: this did not work due to the CSS for 'radio': form.choose 'device_errors'
     find('label[for=device_errors]').click
@@ -81,6 +82,7 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     form.message.set 'web msg'
     form.smsmessage.set 'sms msg'
     form.smslimit.set 2
+    form.sampleid.set 'ABC'
 
     #Note: this did not work due to the CSS for 'radio': form.choose 'anomalies'
     find('label[for=anomalies]').click
@@ -117,7 +119,8 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
     form.message.set 'web msg'
     form.smsmessage.set 'sms msg'
     form.smslimit.set 2
-
+    form.sampleid.set 'ABC'
+    
     find('label[for=test_results]').click
     form.sites.set_exact_multi "Mrs. Terry Goyette"
     form.devices.set_exact_multi "Mr. Alphonso Witting"

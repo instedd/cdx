@@ -65,15 +65,15 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def elasticsearch_query
-#    binding.pry
     and_conditions(process_conditions(params))
   end
 
   protected
 
   def query(params)
-#    binding.pry
     query = elasticsearch_query
+
+
     if params["group_by"]
       entities = query_with_group_by(query, params["group_by"])
       if params["order_by"]
@@ -110,12 +110,10 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_conditions params, conditions=[]
-#    binding.pry
     conditions = process_fields(@fields.searchable_fields, params, conditions)
     if conditions.empty?
       [{match_all: []}]
     else
-      binding.pry
       conditions
     end
   end
@@ -132,13 +130,11 @@ class Cdx::Api::Elasticsearch::Query
 
   def process_fields fields, params, conditions=[]
     fields.inject conditions do |conditions, field_definition|
-#      binding.pry
       if field_definition.nested?
         nested_conditions = self.process_fields(field_definition.sub_fields, params)
         if nested_conditions.empty?
           conditions
         else
-          binding.pry
           conditions +
           [
             {nested: {
@@ -148,7 +144,6 @@ class Cdx::Api::Elasticsearch::Query
           ]
         end
       else
-        binding.pry
         (field_definition.filter_definitions || []).inject conditions do |conditions, filter_definition|
           process_field(field_definition, filter_definition, params, conditions)
         end
@@ -157,7 +152,6 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_field field_definition, filter_definition, params, conditions
-#    binding.pry
     if field_value = params[filter_definition["name"]]
       case filter_definition["type"]
       when "match"

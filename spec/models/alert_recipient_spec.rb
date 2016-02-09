@@ -26,17 +26,17 @@ RSpec.describe AlertRecipient, :type => :model do
 
       expect(alertRecipient).to_not be_valid
     end
-    
-      it "cannot create for invalid telephone field" do
-        alert = Alert.create
-        alertRecipient = AlertRecipient.new
-        alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
-        alertRecipient.telephone = "124a56"
 
-        alertRecipient.alert=alert
+    it "cannot create for invalid telephone field" do
+      alert = Alert.create
+      alertRecipient = AlertRecipient.new
+      alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
+      alertRecipient.telephone = "124a56"
 
-        expect(alertRecipient).to_not be_valid
-      end
+      alertRecipient.alert=alert
+
+      expect(alertRecipient).to_not be_valid
+    end
 
     it "cannot create for empty email and telephone fields" do
       alert = Alert.create
@@ -49,6 +49,28 @@ RSpec.describe AlertRecipient, :type => :model do
       expect(alertRecipient).to_not be_valid
     end
 
+    it "cannot create for nil email and telephone fields" do
+      alert = Alert.create
+      alertRecipient = AlertRecipient.new
+      alertRecipient.recipient_type = AlertRecipient.recipient_types["external_user"]
+      alertRecipient.email = nil
+      alertRecipient.telephone = nil
+      alertRecipient.alert=alert
+
+      expect(alertRecipient).to_not be_valid
+    end
+
+
+    it "can create for nil email and telephone fields with internal users" do
+      alert = Alert.create
+      alertRecipient = AlertRecipient.new
+      alertRecipient.recipient_type = AlertRecipient.recipient_types["internal_user"]
+      alertRecipient.email = nil
+      alertRecipient.telephone = nil
+      alertRecipient.alert=alert
+
+      expect(alertRecipient).to be_valid
+    end
 
     it "can create for valid fields" do
       alert = Alert.create

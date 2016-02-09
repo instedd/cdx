@@ -1,6 +1,13 @@
 module AlertsHelper
   def display_sites(alert)
     alert.sites.inject {|site,n| site.name + ','+n.name}
+    
+    if alert.sites.length==0
+      ""
+    else
+      alert.sites
+    end
+    
   end
 
   def display_roles(alert)
@@ -15,9 +22,13 @@ module AlertsHelper
   end
 
   def display_latest_alert_date(alert)
-    latest_date='-'
     alertHistory=AlertHistory.where("alert_id=?",alert.id).order(:created_at).last
-    latest_date = alertHistory.created_at.to_formatted_s(:long) if alertHistory!=nil
+    
+    if alertHistory==nil
+      'Never'
+    else
+      alertHistory.created_at.to_formatted_s(:long)
+    end
   end
 
 end

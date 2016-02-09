@@ -528,6 +528,28 @@ id="alertpatient"
 });
 */
 
+
+var AlertSampleId = React.createClass({
+	render: function() {
+		return (
+			< div className = "row" id = "sampleidrow" >
+			<div className = "col pe-2" >
+				<label>Sample Id</label>
+			</div>
+
+			<div className = "col" >
+				<input type = "text" placeholder = "sample id" valueLink = {
+						this.props.valueLink
+					}
+					id = "alertsampleid" />
+			</div>
+		</div>
+	);
+}
+});
+
+
+
 var AlertSmsLimit = React.createClass({
 	render: function() {
 		return (

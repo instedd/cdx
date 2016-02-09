@@ -32,7 +32,6 @@ module Alerts
     #TODO look at Sending Email To Multiple Recipients, http://guides.rubyonrails.org/action_mailer_basics.html
     recipients_list.each do |person|
       message_body= parse_alert_message(alert, alert.message, person)
-
       subject_text = "CDX alert:"+alert.name
       if alert.aggregated?
         subject_text += " :occured times: "+alert_count.to_s
@@ -47,7 +46,6 @@ module Alerts
 
     #TODO Can also send many messages at once. https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home
     recipients_list.each do |person|
-
       number_sms_sent_today = AlertHistory.calculate_number_sms_sent_today(alert.id)
 
       if (number_sms_sent_today <= alert.sms_limit)
