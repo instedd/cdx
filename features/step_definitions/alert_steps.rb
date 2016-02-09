@@ -1,11 +1,11 @@
 Given(/^the user has an account$/) do
-  institution = Institution.make
   @user = User.make(password: '12345678', first_name: 'Bob', email: 'zaa1aa@ggg.com')
+  @institution = Institution.make user_id: @user.id
   @user.grant_superadmin_policy
   authenticate(@user)
 
   #needed for the @sites
-  default_params =  {context: institution.uuid}
+  default_params =  {context: @institution.uuid}
   @navigation_context = NavigationContext.new(@user, default_params[:context])
 end
 
@@ -46,7 +46,7 @@ Given(/^the user creates a new error category alert with all fields with name "(
 
     form.sites.set_exact_multi "Mrs. Terry Goyette"
 
-    form.devices.set_exact_multi "Mr. Alphonso Witting"
+   form.devices.set_exact_multi "Mr. Alphonso Witting"
 
     form.roles.set_exact_multi "Institution Aric Smith Reader"
 
@@ -175,3 +175,31 @@ Then (/^the user should not see in list alerts "(.*?)"$/) do |arg1|
   @alertIndex.load
   expect(@alertIndex).not_to have_content(arg1)
 end
+
+
+=begin
+
+#require 'sidekiq/testing/inline'
+
+
+    Then the user should have alert result "errorcodealer1"
+    
+    
+Then (/^the user should have alert result "(.*?)"$/) do |arg1|
+ 
+    parent_location = Location.make
+    leaf_location1 = Location.make parent: parent_location
+     upper_leaf_location = Location.make
+
+    before_test_history_count = AlertHistory.count
+     site1 = Site.make institution: @institution, location_geoid: leaf_location1.id
+   device1 = Device.make institution: @institution, site: site1
+   
+    DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
+
+
+binding.pry
+    after_test_history_count = AlertHistory.count
+  
+end
+=end

@@ -30,8 +30,8 @@ var AlertCategorySelect = React.createClass({
 			category_keys = Object.keys(this.props.category_types);
 			document.getElementById(category_keys[0]).disabled = true;
 			document.getElementById(category_keys[1]).disabled = true;
-			document.getElementById(category_keys[2]).disabled = true;
 			document.getElementById(category_keys[3]).disabled = true;
+			document.getElementById(category_keys[4]).disabled = true;
 		} else { //new alert
 			this.setState({
 				disable_all_selects: false
