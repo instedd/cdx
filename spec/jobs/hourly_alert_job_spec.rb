@@ -48,9 +48,26 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
       after_test_history_count = AlertHistory.count
       after_test_recipient_count= RecipientNotificationHistory.count
-      
+
       expect(before_test_history_count+2).to eq(after_test_history_count)
       expect(before_test_recipient_count+1).to eq(after_test_recipient_count)
+    end
+
+    it "test result with different error code does not trigger alert filter" do
+      before_test_history_count = AlertHistory.count
+      before_test_recipient_count=RecipientNotificationHistory.count
+
+      @alert.create_percolator
+
+      device1 = Device.make institution: institution, site: site1
+      DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 888}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
+      worker.perform
+
+      after_test_history_count = AlertHistory.count
+      after_test_recipient_count= RecipientNotificationHistory.count
+
+      expect(before_test_history_count).to eq(after_test_history_count)
+      expect(before_test_recipient_count).to eq(after_test_recipient_count)
     end
 
 
