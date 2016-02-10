@@ -198,3 +198,8 @@ Then (/^the user should have an incident$/) do
 
   expect(page).to have_xpath('//table/tbody/tr', :count => 1)
 end
+
+
+Then (/^the user should see no edit alert incidents$/) do
+  expect(page).to have_css('div#incidents', :text => 'NEVER')
+end

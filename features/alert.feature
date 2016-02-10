@@ -26,6 +26,7 @@ Feature: create an alert
     And the user should see in list alerts "errorcodealer2"
     And the user should click edit "errorcodealer2"
     Then the user should view edit page "errorcodealer2"
+    Then the user should see no edit alert incidents
 
   Scenario: Successful create, view and delete alert 
     Given the user creates a new alert with name "errorcodealer4"

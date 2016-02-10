@@ -16,7 +16,7 @@ AlertDisplayIncidentInfo = React.createClass({
 				<div className = "col pe-2">
 					<label>Last Incidents</label>
 				</div>
-				<div className = "col">
+				<div className = "col" id="incidents">
 					<label>{this.props.alert_last_incident}</label>
 				</div>
 			</div>
