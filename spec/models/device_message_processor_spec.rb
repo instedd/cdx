@@ -463,6 +463,40 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(TestResult.first.sample_identifier.entity_id).to eq(SAMPLE_ID)
   end
 
+  it "should not update test with same test_id if device has moved from original test site" do
+    test = TestResult.create_and_index(
+      test_id: TEST_ID, device: device, site: site,
+      custom_fields: {"concentration" => "10%", "foo" => "bar"},
+      core_fields: {"assays" => [result("flu", "flu", "negative"), result("mtb1", "mtb1", "positive")]},
+    )
+
+    new_device_site = Site.make institution: institution
+    device.site = new_device_site
+    device.save!
+
+    expect { device_message_processor.process }.to change(TestResult, :count).by(1)
+
+    expect(TestResult.last.site).to eq(new_device_site)
+  end
+
+  it "should not update test with same test_id if the original site has moved (ie soft deleted)" do
+    test = TestResult.create_and_index(
+      test_id: TEST_ID, device: device, site: site,
+      custom_fields: {"concentration" => "10%", "foo" => "bar"},
+      core_fields: {"assays" => [result("flu", "flu", "negative"), result("mtb1", "mtb1", "positive")]},
+    )
+
+    new_device_site = Site.make institution: institution
+    device.site = new_device_site
+    device.save!
+
+    site.destroy!
+
+    expect { device_message_processor.process }.to change(TestResult, :count).by(1)
+
+    expect(TestResult.last.site).to eq(new_device_site)
+  end
+
   it "should take tests with the same test_id but different year as differents" do
     test = TestResult.create_and_index(
       created_at: 2.years.ago,
