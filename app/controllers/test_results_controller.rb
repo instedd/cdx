@@ -69,7 +69,12 @@ class TestResultsController < ApplicationController
 
   def create_filter_for_test
     filter = create_filter_for_navigation_context
-    filter["device.uuid"] = params["device.uuid"] if params["device.uuid"].present?
+    if params["device.uuid"].present?
+      filter["device.uuid"] = params["device.uuid"]
+      # display only test results of the current site of the device
+      device = Device.find_by_uuid params["device.uuid"]
+      filter["site.uuid"] = device.site.uuid if device.try(:site)
+    end
     filter["test.assays.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
     filter["test.assays.result"] = params["test.assays.result"] if params["test.assays.result"].present?
     filter["sample.id"] = params["sample.id"] if params["sample.id"].present?
