@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160115131955) do
+ActiveRecord::Schema.define(version: 20160210193741) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -68,9 +68,11 @@ ActiveRecord::Schema.define(version: 20160115131955) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "index_failure_data",   limit: 65535
+    t.integer  "site_id",              limit: 4
   end
 
   add_index "device_messages", ["device_id"], name: "index_device_messages_on_device_id", using: :btree
+  add_index "device_messages", ["site_id"], name: "index_device_messages_on_site_id", using: :btree
 
   create_table "device_messages_test_results", force: :cascade do |t|
     t.integer "device_message_id", limit: 4
@@ -442,6 +444,7 @@ ActiveRecord::Schema.define(version: 20160115131955) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
+  add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
   add_foreign_key "patients", "sites"
 end

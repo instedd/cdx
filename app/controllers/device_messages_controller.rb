@@ -4,6 +4,7 @@ class DeviceMessagesController < ApplicationController
   def index
     device_ids = check_access(Device, SUPPORT_DEVICE).pluck(:id)
     @messages = DeviceMessage.where("device_id IN (?)", device_ids).joins(device: :device_model)
+      .where('devices.site_id = device_messages.site_id')
     apply_filters
 
     @date_options = date_options_for_filter
