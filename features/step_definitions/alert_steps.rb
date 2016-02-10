@@ -1,3 +1,6 @@
+require 'sidekiq/testing'
+Sidekiq::Testing.inline!
+
 Given(/^the user has an account$/) do
   @user = User.make(password: '12345678', first_name: 'Bob', email: 'zaa1aa@ggg.com')
   @institution = Institution.make user_id: @user.id
@@ -37,7 +40,6 @@ Given(/^the user creates a new error category alert with all fields with name "(
     form.message.set 'web msg'
     form.smsmessage.set 'sms msg'
     form.smslimit.set 2
-    form.sampleid.set 'ABC'
 
     #Note: this did not work due to the CSS for 'radio': form.choose 'device_errors'
     find('label[for=device_errors]').click
@@ -46,14 +48,13 @@ Given(/^the user creates a new error category alert with all fields with name "(
 
     form.sites.set_exact_multi "Mrs. Terry Goyette"
 
-   form.devices.set_exact_multi "Mr. Alphonso Witting"
+    form.devices.set_exact_multi "Mr. Alphonso Witting"
 
     form.roles.set_exact_multi "Institution Aric Smith Reader"
 
     form.internal_users.set_exact_multi @user.email
 
-    form.aggregation.set "aggregated"
-    form.aggregation_frequency.set "day"
+    form.aggregation.set "record"
 
     form.channel.set_exact "sms"
 
@@ -120,7 +121,7 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
     form.smsmessage.set 'sms msg'
     form.smslimit.set 2
     form.sampleid.set 'ABC'
-    
+
     find('label[for=test_results]').click
     form.sites.set_exact_multi "Mrs. Terry Goyette"
     form.devices.set_exact_multi "Mr. Alphonso Witting"
@@ -134,10 +135,10 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
     form.externaluser_lastname.set 'smith'
     form.externaluser_email.set 'aa@bb.com'
     form.externaluser_telephone.set '1234567'
-    
+
     form.conditions.set_exact_multi "mtb"
     form.condition_results.set_exact_multi "positive"
-    
+
     form.new_externaluser.click
 
     form.submit.click
@@ -177,29 +178,25 @@ Then (/^the user should not see in list alerts "(.*?)"$/) do |arg1|
 end
 
 
-=begin
 
-#require 'sidekiq/testing/inline'
+Then (/^the user should have alert result$/) do
+  parent_location = Location.make
+  leaf_location1 = Location.make parent: parent_location
+  upper_leaf_location = Location.make
 
+  before_test_history_count = AlertHistory.count
+  site1 = Site.make institution: @institution, location_geoid: leaf_location1.id
+  device1 = Device.make institution: @institution, site: site1
 
-    Then the user should have alert result "errorcodealer1"
-    
-    
-Then (/^the user should have alert result "(.*?)"$/) do |arg1|
- 
-    parent_location = Location.make
-    leaf_location1 = Location.make parent: parent_location
-     upper_leaf_location = Location.make
-
-    before_test_history_count = AlertHistory.count
-     site1 = Site.make institution: @institution, location_geoid: leaf_location1.id
-   device1 = Device.make institution: @institution, site: site1
-   
-    DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
-
-
-binding.pry
-    after_test_history_count = AlertHistory.count
-  
+  DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
+  after_test_history_count = AlertHistory.count
+  expect(before_test_history_count+1).to eq(after_test_history_count)
 end
-=end
+
+
+Then (/^the user should have an incident$/) do
+  @incidents = IncidentsPage.new
+  @incidents.load
+
+  expect(page).to have_xpath('//table/tbody/tr', :count => 1)
+end

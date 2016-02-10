@@ -240,7 +240,6 @@ class AlertsController < ApplicationController
     end
     
     
-
     alert_query_updated_ok = alert_info.update(query: alert_info.query)
 
     if alert_saved_ok && alert_query_updated_ok && external_users_ok && internal_users_ok && condition_result_ok
