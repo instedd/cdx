@@ -67,12 +67,6 @@ class AlertsController < ApplicationController
     end
     @alert_condition_results = @alert_condition_results.join(",")
 
-
-    respond_with alert_info, location: alert_path
-  end
-
-
-  def show
     respond_with alert_info, location: alert_path
   end
 

@@ -10,8 +10,4 @@ class IncidentsController < ApplicationController
     respond_with incidents
   end
 
-  def show
-    #    render :edit
-  end
-
 end

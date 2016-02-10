@@ -4,7 +4,7 @@
       .row
         .col
           %h2
-            = link_to alerts_path, class: 'side-link', title: 'Back' do
+            = link_to  request.referer.present? ? request.referer : alerts_path, class: 'side-link', title: 'Back' do
               = image_tag "arrow-left.png"
             #{alert_info.name}
 
