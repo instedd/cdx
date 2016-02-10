@@ -346,7 +346,10 @@ class DevicesController < ApplicationController
     {
       "since" => (Date.today - 1.year).iso8601,
       "device.uuid" => @device.uuid
-    }
+    }.tap do |h|
+      # display only test results of the current site of the device
+      h["site.uuid"] = @device.site.uuid if @device.site
+    end
   end
 
 end
