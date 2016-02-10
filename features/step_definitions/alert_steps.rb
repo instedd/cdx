@@ -1,6 +1,3 @@
-require 'sidekiq/testing'
-Sidekiq::Testing.inline!
-
 Given(/^the user has an account$/) do
   @user = User.make(password: '12345678', first_name: 'Bob', email: 'zaa1aa@ggg.com')
   @institution = Institution.make user_id: @user.id
@@ -188,6 +185,7 @@ Then (/^the user should have alert result$/) do
   site1 = Site.make institution: @institution, location_geoid: leaf_location1.id
   device1 = Device.make institution: @institution, site: site1
 
+  #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
   DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
   after_test_history_count = AlertHistory.count
   expect(before_test_history_count+1).to eq(after_test_history_count)

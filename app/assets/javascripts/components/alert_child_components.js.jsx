@@ -45,6 +45,8 @@ var AlertDelete = React.createClass({
 }
 });
 
+
+
 var AlertEnabled = React.createClass({
 	render: function() {
 		return (
@@ -140,20 +142,20 @@ var AlertUtilizationEfficiency = React.createClass({
 	},
 	render: function() {
 		var options = [];
-				for (var i = 0; i < Object.keys(this.props.aggregation_frequencies).length; i++) {
-					option = {};
-					option["value"] = i;
-					option["label"] = Object.keys(this.props.aggregation_frequencies)[i];
-					options.push(option);
-				}
+		for (var i = 0; i < Object.keys(this.props.aggregation_frequencies).length; i++) {
+			option = {};
+			option["value"] = i;
+			option["label"] = Object.keys(this.props.aggregation_frequencies)[i];
+			options.push(option);
+		}
 
-				var {
-					valueLink,
-					value,
-					onChange,
-					...other
-				} = this.props;
-				
+		var {
+			valueLink,
+			value,
+			onChange,
+			...other
+		} = this.props;
+
 		return (
 			< div className = "row" id="utilizationefficiencyrow">
 			<div className = "col pe-2">
@@ -165,29 +167,29 @@ var AlertUtilizationEfficiency = React.createClass({
 						this.props.valueLink
 					}
 					id = "alertutilizationefficiency"  name="alertutilizationefficiency" />
-		
-	  &nbsp;	 &nbsp;	 &nbsp;	 &nbsp;	
-	 						<Select
-								name = "utilization_efficiency_frequency"
-								value = {
-									value || valueLink.value
-								}
-								options = {
-									options
-								}
-								multi = {
-									false
-								}
-								onChange = {
-									this.onChange
-								}
-								disabled = {
-									this.props.disable_all_selects
-								}
-								/>
-						</div>
-			
-			
+
+				&nbsp;	 &nbsp;	 &nbsp;	 &nbsp;
+				<Select
+					name = "utilization_efficiency_frequency"
+					value = {
+						value || valueLink.value
+					}
+					options = {
+						options
+					}
+					multi = {
+						false
+					}
+					onChange = {
+						this.onChange
+					}
+					disabled = {
+						this.props.disable_all_selects
+					}
+					/>
+			</div>
+
+
 		</div>
 	);
 }

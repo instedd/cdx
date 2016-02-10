@@ -1,4 +1,6 @@
 class AlertsController < ApplicationController
+  include AlertsHelper
+
   respond_to :html, :json
 
   expose(:alerts) { current_user.alerts }
@@ -67,6 +69,9 @@ class AlertsController < ApplicationController
     end
     @alert_condition_results = @alert_condition_results.join(",")
 
+    @alert_number_incidents = current_user.alert_histories.where("alert_id=? and for_aggregation_calculation=?", alert_info.id, false).count
+    @alert_last_incident = display_latest_alert_date(alert_info)
+    @alert_created_at  = alert_info.created_at.to_formatted_s(:long)
     respond_with alert_info, location: alert_path
   end
 
@@ -92,12 +97,12 @@ class AlertsController < ApplicationController
           alert_recipient.recipient_type = AlertRecipient.recipient_types["role"]
           alert_recipient.role = role
           alert_recipient.alert=alert_info
-          
+
           if alert_recipient.save == false
             internal_users_ok = false
             error_text = error_text.merge alert_recipient.errors.messages
           end
-          
+
         end
       end
 
@@ -111,16 +116,16 @@ class AlertsController < ApplicationController
           alert_recipient.recipient_type = AlertRecipient.recipient_types["internal_user"]
           alert_recipient.user = user
           alert_recipient.alert=alert_info
-          
+
           if alert_recipient.save == false
             internal_users_ok = false
             error_text = error_text.merge alert_recipient.errors.messages
           end
-          
+
         end
       end
-  
-  
+
+
       #save external users
       if params[:alert][:external_users]
         external_users = params[:alert][:external_users]
@@ -199,10 +204,10 @@ class AlertsController < ApplicationController
           end
         end
 
-     ##   alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
-          alert_info.query =    {"assays.quantitative_result.min" => "8"}
-    
-  ####TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
+        ##   alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
+        alert_info.query =    {"assays.quantitative_result.min" => "8"}
+
+        ####TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
       end
 
 
@@ -215,7 +220,7 @@ class AlertsController < ApplicationController
           query_sites << site.uuid
         end
         #Note:  the institution uuid should not be necessary
-        
+
         alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
       end
 
@@ -233,13 +238,13 @@ class AlertsController < ApplicationController
       end
       #Note: alert_info.create_percolator is called from the model
     end
-    
+
 
     if params[:alert][:sample_id]
       alert_info.query=alert_info.query.merge ({"sample.id"=>params[:alert][:sample_id]})
     end
-    
-    
+
+
     alert_query_updated_ok = alert_info.update(query: alert_info.query)
 
     if alert_saved_ok && alert_query_updated_ok && external_users_ok && internal_users_ok && condition_result_ok
@@ -288,7 +293,7 @@ class AlertsController < ApplicationController
 
     @conditions = Condition.all
     @condition_results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
-#    @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
+    #    @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
 
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }

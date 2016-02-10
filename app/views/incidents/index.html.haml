@@ -1,6 +1,6 @@
 .row
   .col
-    = cdx_table title: 'Incidents' do |t|
+    = cdx_table title: incidents.size.to_s + ' Incidents' do |t|
       - t.columns do
         %col{:width => "25%"}
         %col{:width => "25%"}
@@ -8,9 +8,9 @@
         %col{:width => "25%"}
       - t.thead do
         %tr
-          %th Alert Name
+          %th Alert Group
           %th Alert Creator
-          %th Date Created
+          %th Date 
           %th Test Result
       - t.tbody do
         - incidents.each do |incident|
