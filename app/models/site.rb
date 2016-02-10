@@ -77,7 +77,7 @@ class Site < ActiveRecord::Base
   end
 
   def self.prefix(id)
-    Site.find(id).prefix
+    Site.unscoped.find(id).prefix
   end
 
   def generate_next_sample_entity_id!
