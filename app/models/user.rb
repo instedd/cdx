@@ -21,13 +21,17 @@ class User < ActiveRecord::Base
 
   after_create :update_computed_policies
 
-  scope :within, -> (institution_or_site) {
-    if institution_or_site.is_a?(Institution)
-      User.joins(:roles).where("roles.institution_id = ?", institution_or_site.id)
+  scope :within, -> (institution_or_site, exclude_subsites = false) {
+    if institution_or_site.is_a?(Institution) && exclude_subsites
+      joins(:roles).where("roles.institution_id = ? AND roles.site_id IS NULL", institution_or_site.id)
+    elsif institution_or_site.is_a?(Institution)
+      joins(:roles).where("roles.institution_id = ?", institution_or_site.id)
+    elsif institution_or_site.is_a?(Site) && exclude_subsites
+      joins(:roles).where("roles.site_id = ?", institution_or_site.id)
     else
       ids = Site.within(institution_or_site).pluck(:id)
       joins(:roles).where("roles.site_id IN (?)", ids)
-    end
+    end.uniq
   }
 
   def timeout_in

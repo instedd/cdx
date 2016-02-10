@@ -24,9 +24,13 @@ class Site < ActiveRecord::Base
   after_create :create_predefined_roles
   after_update :update_predefined_roles, if: :name_changed?
 
-  scope :within, -> (institution_or_site) {
-    if institution_or_site.is_a?(Institution)
+  scope :within, -> (institution_or_site, exclude_subsites = false) {
+    if institution_or_site.is_a?(Institution) && exclude_subsites
+      where(institution: institution_or_site, parent: nil)
+    elsif institution_or_site.is_a?(Institution)
       where(institution: institution_or_site)
+    elsif institution_or_site.is_a?(Site) && exclude_subsites
+      where(parent: institution_or_site)
     else
       where("prefix LIKE concat(?, '%')", institution_or_site.prefix)
     end

@@ -56,13 +56,13 @@ var NavigationContextPicker = React.createClass({
   },
 
   toggleSubsites: function(site, showSubsites) {
-    var new_context_url = URI(window.location.href).setSearch({context: site.uuid}).toString();
+    var new_context_url = URI(window.location.href);
     if(showSubsites) {
-      new_context_url += "-*";
+      new_context_url.setSearch({context: site.uuid + "-*"});
     } else {
-      new_context_url += "-!";
+      new_context_url.setSearch({context: site.uuid + "-!"});
     }
-    Turbolinks.visit(new_context_url);
+    Turbolinks.visit(new_context_url.toString());
   },
 
   render: function() {

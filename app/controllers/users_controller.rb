@@ -3,8 +3,8 @@ class UsersController < ApplicationController
 
   def index
     return unless authorize_resource(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS))
-    @users = User.uniq.within(@navigation_context.entity)
-    @roles = Role.within(@navigation_context.entity).map{|r| {value: r.id, label: r.name}}
+    @users = User.within(@navigation_context.entity, @navigation_context.exclude_subsites)
+    @roles = Role.within(@navigation_context.entity, @navigation_context.exclude_subsites).map{|r| {value: r.id, label: r.name}}
     @can_update = has_access?(User, UPDATE_USER)
     apply_filters
     @total = @users.count

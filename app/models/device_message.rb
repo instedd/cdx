@@ -14,6 +14,18 @@ class DeviceMessage < ActiveRecord::Base
 
   attr_writer :plain_text_data
 
+  scope :within, -> (institution_or_site, exclude_subsites = false) {
+    if institution_or_site.is_a?(Institution) && exclude_subsites
+      joins(:device).where("devices.institution_id = ? AND devices.site_id IS NULL", institution_or_site.id)
+    elsif institution_or_site.is_a?(Institution) && !exclude_subsites
+      joins(:device).where("devices.institution_id = ?", institution_or_site.id)
+    elsif institution_or_site.is_a?(Site) && exclude_subsites
+      joins(:device).where("devices.site_id = ?", institution_or_site.id)
+    else
+      joins(:device).where("devices.site_prefix LIKE concat(?, '%')", institution_or_site.prefix)
+    end
+  }
+
   def plain_text_data
     @plain_text_data ||= MessageEncryption.decrypt self.raw_data
   end
