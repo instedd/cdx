@@ -246,14 +246,12 @@ describe TestResultsController, elasticsearch: true do
         site.destroy!
       }
 
-      # this requires a change in the computed policy:
-      # if the resource to be authorized is SiteContained
-      # only the Devices with the site of the resource should be used
-      pending "should not authorize user with access to device" do
+      it "should authorize user with access to device" do
         grant owner, user, { :test_result => device }, QUERY_TEST
 
         get :show, id: test_result.uuid
-        expect(response).to be_forbidden
+        expect(assigns(:test_result)).to eq(test_result)
+        expect(response).to be_success
       end
 
       it "should authorize user with access to institution" do
