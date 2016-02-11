@@ -242,4 +242,26 @@ describe Site do
       Timecop.return
     end
   end
+
+  context "within" do
+    let!(:site) { Site.make }
+    let!(:subsite) { Site.make parent: site, institution: site.institution }
+    let!(:other_site) { Site.make }
+
+    it "institution, no exclusion, should show all sites assigned" do
+      expect(Site.within(site.institution).to_a).to eq([site, subsite])
+    end
+
+    it "institution, with exclusion, should show only direct children" do
+      expect(Site.within(site.institution,true).to_a).to eq([site])
+    end
+
+    it "site, with exclusion, should show only direct children" do
+      expect(Site.within(site,true).to_a).to eq([subsite])
+    end
+
+    it "institution should not show sites from other institutions" do
+      expect(Site.within(other_site.institution).to_a).to eq([other_site])
+    end
+  end
 end

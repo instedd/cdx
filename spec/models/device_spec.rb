@@ -177,4 +177,34 @@ describe Device do
       expect(device.site_prefix).to eq(device.site.prefix)
     end
   end
+
+  context "within" do
+    let!(:site) { Site.make }
+    let!(:subsite) { Site.make parent: site, institution: site.institution }
+    let!(:other_site) { Site.make }
+    let!(:device1) { Device.make site: site, institution: site.institution }
+    let!(:device2) { Device.make site: subsite, institution: site.institution }
+    let!(:device3) { Device.make site: other_site, institution: other_site.institution }
+    let!(:device4) { Device.make site: nil, institution: site.institution }
+
+    it "institution, no exclusion, should show devices from site, subsites and no site" do
+      expect(Device.within(site.institution).to_a).to eq([device1, device2, device4])
+    end
+
+    it "institution, with exclusion, should show device with no site" do
+      expect(Device.within(site.institution,true).to_a).to eq([device4])
+    end
+
+    it "site, no exclusion, should show devices from site and subsite" do
+      expect(Device.within(site).to_a).to eq([device1, device2])
+    end
+
+    it "site, with exclusion, should show devices from site only" do
+      expect(Device.within(site,true).to_a).to eq([device1])
+    end
+
+    it "institution should not show devices from other institutions" do
+      expect(Device.within(other_site.institution).to_a).to eq([device3])
+    end
+  end
 end
