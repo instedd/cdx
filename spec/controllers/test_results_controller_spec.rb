@@ -37,6 +37,47 @@ describe TestResultsController, elasticsearch: true do
     expect(assigns(:tests).map{|t| t['test']['uuid']}).to contain_exactly(test_result.uuid)
   end
 
+  context "scoping" do
+    it "should show all tests for institution" do
+      user.update_attribute(:last_navigation_context, institution.uuid)
+
+      test_result = TestResult.create_and_index(
+      core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
+      device_messages: [ DeviceMessage.make(device: device) ])
+
+      get :index, context: site.uuid
+      expect(assigns(:tests).map{|t| t['test']['uuid']}).to contain_exactly(test_result.uuid)
+    end
+
+    it "with exclusion should show no tests (devices with no site can't have tests)" do
+      test_result = TestResult.create_and_index device: device
+
+      get :index, context: institution.uuid+"-!"
+      expect(assigns(:tests)).to be_empty
+    end
+
+    it "should show all tests for site" do
+      user.update_attribute(:last_navigation_context, site.uuid)
+      device2 = Device.make institution_id: institution.id, site: subsite
+
+      test_result = TestResult.create_and_index device: device
+      test_result_subsite = TestResult.create_and_index device: device2
+
+      get :index, context: site.uuid+"-*"
+      expect(assigns(:tests).map{|t| t['test']['uuid']}).to eq([test_result.uuid, test_result_subsite.uuid])
+    end
+
+    it "with exclusion should show only tests for site, not subsites" do
+      device2 = Device.make institution_id: institution.id, site: subsite
+
+      test_result = TestResult.create_and_index device: device
+      test_result_subsite = TestResult.create_and_index device: device2
+
+      get :index, context: site.uuid+"-!"
+      expect(assigns(:tests).map{|t| t['test']['uuid']}).to contain_exactly(test_result.uuid)
+    end
+  end
+
   context "loading entities" do
     before(:each) do
       other_user; other_institution; other_site; other_device
