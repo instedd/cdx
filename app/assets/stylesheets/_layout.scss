@@ -181,28 +181,3 @@ footer {
   padding: 0;
   display: none;
 }
-
-.show-navigation-context-picker {
-  #context_side_bar {
-    @include flexbox();
-    @include align-self(stretch);
-    background-color: $gray5;
-    color: $white-dark;
-
-    input, input:focus {
-      background: image-url("ic-search.png") no-repeat 10px 10px;
-      color: $white-light;
-      padding-left: 38px;
-      height: 40px;
-    }
-
-    a {
-      color: $white-dark;
-    }
-
-    > div {
-      flex: 1;
-    }
-  }
-
-}
