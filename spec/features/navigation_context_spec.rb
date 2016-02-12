@@ -23,7 +23,7 @@ describe "navigation context" do
     end
 
     user.reload
-    expect(user.last_navigation_context).to eq(other_institution.uuid)
+    expect(user.last_navigation_context).to eq(other_institution.uuid+"-*")
 
     goto_page HomePage do |page|
       expect(page).to have_content(other_institution.name)
