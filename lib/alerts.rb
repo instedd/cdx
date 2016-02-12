@@ -1,5 +1,4 @@
 module Alerts
-
   include SMS
 
   def alert_history_check(frequency, alert_type)
@@ -11,23 +10,27 @@ module Alerts
 
     # if it has just alert the user
     alerts.each do |alert|
-      alertHistorycount=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', frequency.ago).where('for_aggregation_calculation=true').count
-      if ( (alertHistorycount > 0)  && (alert.aggregation_threshold > alertHistorycount) )
-        alertHistory = AlertHistory.new
-        alertHistory.alert = alert
-        alertHistory.user = alert.user
-        alertHistory.for_aggregation_calculation  = false
-        alertHistory.save!
-
-        recipients_list=build_mailing_list(alert.alert_recipients)
-        alert_email_inform_recipient(alert, alertHistory, recipients_list, alertHistorycount)
+      alert_history_count=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', frequency.ago).where('for_aggregation_calculation=true').count
+      if ( (alert_history_count > 0)  && (alert.aggregation_threshold > alert_history_count) )
+        alert_history_triggered(alert, alert_history_count)
       end
     end
   end
 
 
-  def alert_email_inform_recipient(alert, alert_history, recipients_list, alert_count=0)
+  def alert_history_triggered(alert, alert_history_count)
+     alertHistory = AlertHistory.new
+      alertHistory.alert = alert
+      alertHistory.user = alert.user
+      alertHistory.for_aggregation_calculation = false
+      alertHistory.save!
 
+      recipients_list=build_mailing_list(alert.alert_recipients)
+      alert_email_inform_recipient(alert, alertHistory, recipients_list, alert_history_count)
+  end
+
+
+  def alert_email_inform_recipient(alert, alert_history, recipients_list, alert_count=0)
     #TODO look at Sending Email To Multiple Recipients, http://guides.rubyonrails.org/action_mailer_basics.html
     recipients_list.each do |person|
       message_body= parse_alert_message(alert, alert.message, person)
@@ -42,7 +45,6 @@ module Alerts
 
 
   def alert_sms_inform_recipient(alert, alert_history, recipients_list, alert_count=0)
-
     #TODO Can also send many messages at once. https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home
     recipients_list.each do |person|
       number_sms_sent_today = AlertHistory.calculate_number_sms_sent_today(alert.id)

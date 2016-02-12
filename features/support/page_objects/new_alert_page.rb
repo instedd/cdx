@@ -17,6 +17,7 @@ class NewAlertPage < SitePrism::Page
     section :aggregation_frequency, CdxSelect, "label", text: /Aggregation Frequency/i
     element :aggregationthresholdlimit, '#alertaggregationthresholdlimit'
     
+    element :timespan, '#alertutilizationefficiencynumber'
     section :channel, CdxSelect, "label", text: /Channel/i
 
     section :sites, CdxSelect, "label", text: /Sites/i
@@ -27,9 +28,8 @@ class NewAlertPage < SitePrism::Page
     
     section :conditions, CdxSelect, "label", text: /Conditions/i
     section :condition_results, CdxSelect, "label", text: /Condition Results/i
-
+    
     section :internal_users, CdxSelect, "label", text: /Internal Recipient/i
-
     element :externaluser_firstname, '#externaluser_firstname'
     element :externaluser_lastname, '#externaluser_lastname'
     element :externaluser_email, '#externaluser_email'

@@ -19,6 +19,12 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
       expect(alert).to be_valid
     end
 
+    it "cannot create for missing fields with utilisation category" do
+      alert = Alert.make
+      alert.category_type = "utilization_efficiency"
+      expect(alert).to_not be_valid
+    end
+
   end
 
   context "validate soft delete" do

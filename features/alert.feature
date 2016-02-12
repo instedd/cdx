@@ -21,6 +21,10 @@ Feature: create an alert
     Given the user creates a new testresult alert with all fields with name "errorcodealer5"
     Then the user should see in list alerts "errorcodealer5"
 
+  Scenario: Successful create utilization efficiency category alert with all fields
+    Given the user Successful creates a new utilization efficiency category with all fields with name "errorcodealer6"
+    Then the user should see in list alerts "errorcodealer6"
+
   Scenario: Successful create and view alert
     Given the user creates a new alert with name "errorcodealer2"
     And the user should see in list alerts "errorcodealer2"

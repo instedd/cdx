@@ -18,6 +18,7 @@ var AlertCategorySelect = React.createClass({
 			document.getElementById("alertminthreshold").disabled = true;
 			document.getElementById("alertmaxthreshold").disabled = true;
 			document.getElementById("alertaggregationthresholdlimit").disabled = true;
+			document.getElementById("alertutilizationefficiencynumber").disabled = true;
 
 			this.setState({
 				disable_all_selects: true
@@ -76,6 +77,7 @@ var AlertCategorySelect = React.createClass({
 			error_messages:[],
 			test_result_min_thresholdField: this.props.alert_info.test_result_min_threshold,
 			test_result_max_thresholdField: this.props.alert_info.test_result_max_threshold,
+			utilization_efficiency_numberField: this.props.alert_info.utilization_efficiency_number
 		};
 	},
 	categoryChanged: function(e) {
@@ -91,6 +93,8 @@ var AlertCategorySelect = React.createClass({
 		$('#thresholdrow').hide();
 		$('#utilizationefficiencyrow').hide();
 
+		$('#aggregationtyperow').show();
+
 		if (val == 'device_errors') {
 			$('#errorcoderow').show();
 		}
@@ -104,20 +108,18 @@ var AlertCategorySelect = React.createClass({
 		}
 		else if (val == 'utilization_efficiency') {
 			$('#utilizationefficiencyrow').show();
+			$('#aggregationtyperow').hide();
 		}
 
 		this.setState({
 			current_category: val
 		});
-
-
 	},
 	externalUsersChanged: function(updated_external_users) {
 		this.setState({
 			external_users: updated_external_users
 		});
 	},
-
 	siteChanged: function(e) {
 		this.setState({
 			siteField: e
@@ -185,7 +187,8 @@ var AlertCategorySelect = React.createClass({
 			enabled: this.state.enabledField,
 			external_users: this.state.external_users,
 			test_result_min_threshold: this.state.test_result_min_thresholdField,
-			test_result_max_threshold: this.state.test_result_max_thresholdField
+			test_result_max_threshold: this.state.test_result_max_thresholdField,
+			utilization_efficiency_number: this.state.utilization_efficiency_numberField
 		};
 
 		if (this.props.edit == true) {
@@ -195,20 +198,6 @@ var AlertCategorySelect = React.createClass({
 		} else {
 			AlertActions.createAlert(this.props.url, new_alert_info, '/alerts/', this.submit_error);
 		}
-		/*
-		$.ajax({
-		url: this.props.url,
-		dataType: 'json',
-		type: 'POST',
-		data: {"category": this.state.current_category, "alert" : alert},
-		success: function(data) {
-		//   this.loadCommentsFromServer();
-		}.bind(this),
-		error: function(xhr, status, err) {
-		console.error(this.props.url, status, err.toString());
-		}.bind(this)
-		});
-		*/
 	},
 	render: function() {
 		return (
@@ -219,9 +208,7 @@ var AlertCategorySelect = React.createClass({
 
 					<input type='hidden' name='authenticity_token' value={this.props.authenticity_token} />
 
-
 					<AlertDisplayIncidentInfo edit={this.props.edit} alert_number_incidents={this.props.alert_number_incidents} alert_last_incident={this.props.alert_last_incident} alert_created_at={this.props.alert_created_at}/>
-
 
 					<AlertEnabled checkedLink = {
 							this.linkState('enabledField')
@@ -282,7 +269,6 @@ var AlertCategorySelect = React.createClass({
 							</div>
 						</div>
 
-
 						<div className="row">
 							<div className="col pe-2">
 								&nbsp;
@@ -301,7 +287,6 @@ var AlertCategorySelect = React.createClass({
 								<label htmlFor={category_keys[4]}>Utilization Efficiency</label>
 							</div>
 						</div>
-
 
 
 						<AlertSite sites = {
@@ -334,10 +319,7 @@ var AlertCategorySelect = React.createClass({
 						<AlertConditionResults condition_results ={this.state.all_condition_results} valueLink={this.linkState('conditionResultsField')} disable_all_selects={this.state.disable_all_selects} />
 						<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} />
 
-						<AlertUtilizationEfficiency aggregation_frequencies={this.props.aggregation_frequencies} valueLink = {
-								this.linkState('aggregation_thresholdField')
-							}
-							/>
+						<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} />
 
 						<AlertAggregation aggregation_types = {
 								this.props.aggregation_types
@@ -379,7 +361,6 @@ var AlertCategorySelect = React.createClass({
 							}
 							/>
 
-
 						<AlertExternalUser edit={this.props.edit} onChangeParentLevel={this.externalUsersChanged} existingExternalUsers={this.props.alert_external_users} />
 
 						<AlertSmsLimit valueLink={this.linkState('smsLimitField')} />
@@ -408,11 +389,7 @@ var AlertCategorySelect = React.createClass({
 							<div className = "col">
 								<AlertDelete edit={this.props.edit} onChangeParentLevel={this.AlertDeleteHandler} />
 							</div>
-
 						</div>
-
-
-
 					</form >
 				</div>
 			);

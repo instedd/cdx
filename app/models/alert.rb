@@ -10,7 +10,7 @@ class Alert < ActiveRecord::Base
   has_and_belongs_to_many :sites
   has_and_belongs_to_many :devices
   has_and_belongs_to_many :conditions
-  
+
   acts_as_paranoid
 
   after_update :recreate_alert_percolator
@@ -21,20 +21,16 @@ class Alert < ActiveRecord::Base
   serialize :query, JSON
 
   validates_presence_of :user
-  #TODO  validates :error_code, format: { with: /^\d+/, message: "must start with a letter" }
-
-  #html5 form validations also done
-  validates_presence_of :name
-  #maybe a user just wants sms_message ,not an email message: validates_presence_of :message
-  #  validates_presence_of :description
-  #  validates_presence_of :site
+  validates_presence_of :name    #html5 form validations also done
+  validate :category_validation
 
   enum category_type: [:anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency]
   enum aggregation_type: [:record, :aggregated]
   enum aggregation_frequency: [:hour, :day]
   enum channel_type: [:email, :sms, :email_and_sms]
-
   enum anomalie_type: [:missing_sample_id, :missing_start_time]
+
+  enum utilization_efficiency_type: [:sample]
 
   #for the alert _form, could not get the cdx_select element working when referencing a child table
   attr_accessor :roles
@@ -52,7 +48,6 @@ class Alert < ActiveRecord::Base
     type: '.percolator',
     id: 'alert_'+self.id.to_s,
     body: { query: es_query, type: 'test' }
-
   end
 
   def recreate_alert_percolator
@@ -67,6 +62,19 @@ class Alert < ActiveRecord::Base
     type: '.percolator',
     id: 'alert_'+id.to_s,
     ignore: 404
+  end
+
+  private
+
+  def category_validation
+    if category_type == "utilization_efficiency"
+      if (utilization_efficiency_number==0)
+        errors.add(:utilization_efficiency_number, "Timespan cannot be zero")
+      end
+      if ( (sample_id == nil) || (sample_id.length==0)  )
+        errors.add(:sample_id, "Sample ID cannot be empty")
+      end
+    end
   end
 
 end

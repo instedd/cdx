@@ -27,7 +27,7 @@ var AlertAggregation = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row" id = "aggregationrow" >
+			< div className = "row" id = "aggregationtyperow" >
 			<div className = "col pe-2" >
 				<label>Aggregation Type</label>
 			</div>

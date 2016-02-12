@@ -9,7 +9,7 @@ AlertDisplayIncidentInfo = React.createClass({
 						<label>Incidents</label>
 					</div>
 					<div className = "col">
-						<label>{this.props.alert_number_incidents}</label>
+						<a className = "btn-link" href="/incidents"><label>{this.props.alert_number_incidents}</label></a>
 					</div>
 				</div>
 				< div className = "row">

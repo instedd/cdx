@@ -49,7 +49,6 @@ class AlertsController < ApplicationController
     end
     @alert_internal_users = @alert_internal_users.join(",")
 
-
     @alert_external_users=[]
     alert_info.alert_recipients.each do |recipient|
       if AlertRecipient.recipient_types[recipient.recipient_type] == AlertRecipient.recipient_types["external_user"]
@@ -102,7 +101,6 @@ class AlertsController < ApplicationController
             internal_users_ok = false
             error_text = error_text.merge alert_recipient.errors.messages
           end
-
         end
       end
 
@@ -110,21 +108,17 @@ class AlertsController < ApplicationController
       if params[:alert][:users_info]
         internal_users = params[:alert][:users_info].split(',')
         internal_users.each do |user_id|
-
           user = User.find_by_id(user_id)
           alert_recipient = AlertRecipient.new
           alert_recipient.recipient_type = AlertRecipient.recipient_types["internal_user"]
           alert_recipient.user = user
           alert_recipient.alert=alert_info
-
           if alert_recipient.save == false
             internal_users_ok = false
             error_text = error_text.merge alert_recipient.errors.messages
           end
-
         end
       end
-
 
       #save external users
       if params[:alert][:external_users]
@@ -145,10 +139,8 @@ class AlertsController < ApplicationController
             external_users_ok = false
             error_text = error_text.merge alert_recipient.errors.messages
           end
-
         end
       end
-
 
       alert_info.query="{}";
 
@@ -159,9 +151,8 @@ class AlertsController < ApplicationController
         elsif alert_info.anomalie_type == "missing_start_time"
           alert_info.query = {"test.start_time"=>"null" }
         end
-      end
 
-      if alert_info.category_type == "device_errors"
+      elsif alert_info.category_type == "device_errors"
         if alert_info.error_code && (alert_info.error_code.include? '-')
           minmax=alert_info.error_code.split('-')
           alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
@@ -172,10 +163,8 @@ class AlertsController < ApplicationController
           alert_info.query =    {"test.error_code"=>alert_info.error_code }
           #   alert_info.query=alert_info.query.merge ({"test.error_code"=>alert_info.error_code });
         end
-      end
 
-
-      if alert_info.category_type == "test_results"
+      elsif alert_info.category_type == "test_results"
         # core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}
         if params[:alert][:conditions_info]
           conditions = params[:alert][:conditions_info].split(',')
@@ -206,10 +195,18 @@ class AlertsController < ApplicationController
 
         ##   alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
         alert_info.query =    {"assays.quantitative_result.min" => "8"}
-
         ####TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
+
+      elsif alert_info.category_type == "utilization_efficiency"
+        alert_info.aggregation_type = Alert.aggregation_types.key(1)  #for utilization, it is always an aggregation
+        alert_info.utilization_efficiency_last_checked = Time.now
       end
 
+
+      if params[:alert][:sample_id]
+        alert_info.query=append_query(alert_info, {"sample.id"=>params[:alert][:sample_id]})
+        #     alert_info.query=alert_info.query.merge ({"sample.id"=>params[:alert][:sample_id]})
+      end
 
       if params[:alert][:sites_info]
         sites = params[:alert][:sites_info].split(',')
@@ -220,10 +217,8 @@ class AlertsController < ApplicationController
           query_sites << site.uuid
         end
         #Note:  the institution uuid should not be necessary
-
         alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
       end
-
 
       #TODO you have the device uuid, you don’t even need the site uuid
       if params[:alert][:devices_info]
@@ -240,13 +235,7 @@ class AlertsController < ApplicationController
     end
 
 
-    if params[:alert][:sample_id]
-      alert_info.query=alert_info.query.merge ({"sample.id"=>params[:alert][:sample_id]})
-    end
-
-
     alert_query_updated_ok = alert_info.update(query: alert_info.query)
-
     if alert_saved_ok && alert_query_updated_ok && external_users_ok && internal_users_ok && condition_result_ok
       render json: alert_info
     else
@@ -266,7 +255,6 @@ class AlertsController < ApplicationController
     else
       render json: alert_info.errors, status: :unprocessable_entity
     end
-
   end
 
 
@@ -276,14 +264,13 @@ class AlertsController < ApplicationController
     else
       render json: alert_info.errors, status: :unprocessable_entity
     end
-
   end
 
 
   private
 
   def alert_params
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, :utilization_efficiency_number, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
 
   def new_alert_request_variables
@@ -293,12 +280,20 @@ class AlertsController < ApplicationController
 
     @conditions = Condition.all
     @condition_results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
-    #    @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
+    #  @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
 
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }
     user_ids = user_ids.uniq
     @users = User.where(id: user_ids)
+  end
+
+  def append_query(alert, query)
+    if  alert.query != "{}"
+      alert.query.merge (query)
+    else
+      query
+    end
   end
 
 end
