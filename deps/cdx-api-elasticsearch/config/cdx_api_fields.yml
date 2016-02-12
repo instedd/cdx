@@ -20,18 +20,18 @@
 # 12) If a field of type location is defined, the filters and groupings are going to be the following:
 #   a) a filter with the same name
 #   b) a grouping with the name of '#{default_name}_admin_level'
+
+#    - name: test.assays.quantitative_result
+#      filter_parameter_definition:
+#        - include_default: true
+#        - name: test.assays.quantitative_result.min
+#          type: range-integer
+#          boundary: gte
+#        - name: test.assays.quantitative_result.max 
+#          type: range-integer
+#          boundary: lte
         
-test:
-  - name: test.assays.quantitative_result
-    filter_parameter_definition:
-      - include_default: true
-      - name: test.assays.quantitative_result.min
-        type: range-integer
-        boundary: gte
-      - name: test.assays.quantitative_result.max 
-        type: range-integer
-        boundary: lte
-        
+test:   
   - name: test.error_code
     filter_parameter_definition:
       - include_default: true
