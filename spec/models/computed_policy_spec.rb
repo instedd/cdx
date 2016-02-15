@@ -520,6 +520,24 @@ describe ComputedPolicy do
       expect(devices).to      match_array(Device.all)
     end
 
+    context "sites and subsites" do
+      let!(:subsite1) { Site.make :child, parent: site_i1_l1}
+
+      it "grants access only to the given site" do
+        grant nil, user, {:device => site_i1_l1}, '*'
+
+        institutions, sites, devices = condition_resources(READ_DEVICE, Device)
+        expect(sites).to contain_exactly(site_i1_l1)
+      end
+
+      it "grants access to subsites" do
+        grant nil, user, {:device => site_i1_l1}, '*', include_subsites: true
+
+        institutions, sites, devices = condition_resources(READ_DEVICE, Device)
+        expect(sites).to contain_exactly(site_i1_l1, subsite1)
+      end
+    end
+
   end
 
   context "sites" do
@@ -546,7 +564,7 @@ describe ComputedPolicy do
     end
 
     it "grants access to subsite" do
-      grant nil, granter, site1, [READ_SITE]
+      grant nil, granter, site1, [READ_SITE], include_subsites: true
 
       expect {
         grant granter, granter2, site11, READ_SITE
@@ -558,7 +576,7 @@ describe ComputedPolicy do
     end
 
     it "grants access to subsubsite" do
-      grant nil, granter, site1, [READ_SITE]
+      grant nil, granter, site1, [READ_SITE], include_subsites: true
 
       expect {
         grant granter, granter2, site111, READ_SITE
@@ -582,7 +600,7 @@ describe ComputedPolicy do
     end
 
     it "interesects two site conditions" do
-      grant nil, granter, "device?site=#{device1.site.id}", [READ_DEVICE]
+      grant nil, granter, "device?site=#{device1.site.id}", [READ_DEVICE], include_subsites: true
 
       expect {
         grant granter, granter2, "device?site=#{device11.site.id}", [READ_DEVICE]
@@ -591,6 +609,16 @@ describe ComputedPolicy do
       expect(granter2.reload).to have(1).computed_policies
       p = granter2.computed_policies.first
       expect(p.condition_site_id).to eq(site11.prefix)
+    end
+
+    it "interesects two site conditions without subsites into empty intersection" do
+      grant nil, granter, "device?site=#{device1.site.id}", [READ_DEVICE]
+
+      expect {
+        grant granter, granter2, "device?site=#{device11.site.id}", [READ_DEVICE]
+      }.to_not change(granter2.computed_policies(:reload), :count)
+
+      expect(granter2.reload.computed_policies).to be_empty
     end
   end
 
@@ -721,4 +749,55 @@ describe ComputedPolicy do
       end
     end
   end
+end
+
+describe ComputedPolicy::PolicyComputer do
+  let!(:computer) { ComputedPolicy::PolicyComputer.new }
+
+  def statement(resource_id, include_subsites)
+    {
+      resource_id: resource_id,
+      resource_type: 'site',
+      include_subsites: include_subsites
+    }
+  end
+
+  [
+    {grant: ["1.1", true], granter: ["1", true], expected: ["1.1", true]},
+    {grant: ["1.1", false], granter: ["1", true], expected: ["1.1", false]},
+    {grant: ["1", true], granter: ["1", true], expected: ["1", true]},
+    {grant: ["1", false], granter: ["1", true], expected: ["1", false]},
+
+    {grant: ["1", true], granter: ["1.1", true], expected: ["1.1", true]},
+    {grant: ["1", false], granter: ["1.1", true], expected: nil},
+    {grant: ["1.1", true], granter: ["1.1", true], expected: ["1.1", true]},
+    {grant: ["1.1", false], granter: ["1.1", true], expected: ["1.1", false]},
+
+    {grant: ["1.1", true], granter: ["1", false], expected: nil},
+    {grant: ["1.1", false], granter: ["1", false], expected: nil},
+    {grant: ["1", true], granter: ["1", false], expected: ["1", false]},
+    {grant: ["1", false], granter: ["1", false], expected: ["1", false]},
+
+    {grant: ["1", true], granter: ["1.1", false], expected: ["1.1", false]},
+    {grant: ["1", false], granter: ["1.1", false], expected: nil},
+    {grant: ["1.1", true], granter: ["1.1", false], expected: ["1.1", false]},
+    {grant: ["1.1", false], granter: ["1.1", false], expected: ["1.1", false]},
+  ].each do |data|
+
+    if data[:expected]
+      it "should grant #{data[:grant]} from #{data[:granter]} and yield #{data[:expected]}" do
+        actual = computer.intersect_attributes statement(*data[:granter]), statement(*data[:grant])
+        expect(actual).to be_not_nil
+        expect(actual[:resource_id]).to eq(data[:expected][0])
+        expect(actual[:include_subsites]).to eq(data[:expected][1])
+      end
+    else
+      it "should grant #{data[:grant]} from #{data[:granter]} and yield empty intersection" do
+        actual = computer.intersect_attributes statement(*data[:granter]), statement(*data[:grant])
+        expect(actual).to be_nil
+      end
+    end
+
+  end
+
 end

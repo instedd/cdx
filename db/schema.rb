@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(version: 20160210193741) do
     t.string  "condition_site_id",        limit: 255
     t.boolean "delegable",                            default: false
     t.integer "condition_device_id",      limit: 4
+    t.boolean "include_subsites",                     default: false
   end
 
   create_table "computed_policy_exceptions", force: :cascade do |t|

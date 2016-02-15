@@ -6,6 +6,10 @@ class ComputedPolicy < ActiveRecord::Base
 
   accepts_nested_attributes_for :exceptions
 
+  def exceptions_attributes=(values)
+    super(values.map {|value| value.except(:include_subsites)})
+  end
+
   scope :delegable, -> { where(delegable: true) }
   scope :on,        -> (resource_type) { where(resource_type: resource_type) }
 
@@ -62,13 +66,14 @@ class ComputedPolicy < ActiveRecord::Base
     query = query.where(delegable: opts[:delegable]) if opts.has_key?(:delegable)
     query = query.where("action = ? OR action IS NULL", action) if action && action != '*'
     query = query.where("resource_id = ? OR resource_id IS NULL", resource_attributes[:id]) if resource_attributes[:id]
-    query = query.where("? LIKE concat(resource_id, '%') OR resource_id IS NULL", "#{resource_attributes[:prefix]}%") if resource_attributes[:prefix]
+    query = query.where("(? = resource_id) OR (include_subsites AND ? LIKE concat(resource_id, '%')) OR resource_id IS NULL", "#{resource_attributes[:prefix]}", "#{resource_attributes[:prefix]}") if resource_attributes[:prefix]
 
     CONDITIONS.each do |condition|
       if (value = resource_attributes["#{condition}_id".to_sym])
         if condition == :site
           # For site we need to do a prefix query
-          query = query.where("? LIKE concat(condition_#{condition}_id, '%') OR condition_#{condition}_id IS NULL", value.to_s)
+
+          query = query.where("(include_subsites AND ? LIKE concat('%', condition_#{condition}_id, '%')) OR (? = condition_#{condition}_id) OR condition_#{condition}_id IS NULL", value.to_s, value.to_s)
         else
           query = query.where("condition_#{condition}_id = ? OR condition_#{condition}_id IS NULL", value)
         end
@@ -235,7 +240,7 @@ class ComputedPolicy < ActiveRecord::Base
       end
 
       granted_statements.map do |g|
-        ComputedPolicy.new(g.merge(user_id: policy.user_id, delegable: statement.fetch('delegable', false)))
+        ComputedPolicy.new(g.merge(user_id: policy.user_id, delegable: statement.fetch('delegable', false), include_subsites: statement.fetch('includeSubsites', false)))
       end
     end
 
@@ -277,17 +282,19 @@ class ComputedPolicy < ActiveRecord::Base
       catch(:empty_intersection) do
         intersection = Hash.new
         conditions_attributes = ComputedPolicy::CONDITIONS.map{|condition| "condition_#{condition}_id".to_sym}
-        resource_type_1 = p1[:resource_type]
-        resource_type_2 = p2[:resource_type]
         ([:resource_id, :resource_type, :action] + conditions_attributes).each do |key|
-          intersection[key] = intersect_attribute(p1[key], p2[key], key, resource_type_1, resource_type_2)
+          intersection[key] = intersect_attribute(p1, p2, key)
         end
         intersection[:exceptions_attributes] = ((p1[:exceptions_attributes] || []) | (p2[:exceptions_attributes] || []))
+        intersection[:include_subsites] = p1[:include_subsites] && p2[:include_subsites]
         return intersection
       end
     end
 
-    def intersect_attribute(attr1, attr2, key, resource_type_1, resource_type_2)
+    def intersect_attribute(policy_1, policy_2, key)
+      attr1 = policy_1[key]
+      attr2 = policy_2[key]
+
       if attr1.nil? || attr2.nil?
         return attr1 || attr2
       end
@@ -296,7 +303,7 @@ class ComputedPolicy < ActiveRecord::Base
         return attr1
       end
 
-      if (key == :resource_id && resource_type_1 == "site" && resource_type_2 == "site") || key == :condition_site_id
+      if (key == :resource_id && policy_1[:resource_type] == "site" && policy_2[:resource_type] == "site") || key == :condition_site_id
         # Special case: when interescting site prefixes the result is the longest,
         # if one is a prefix of the other.
         #   - 1.2 | 1 -> 1.2
@@ -305,9 +312,9 @@ class ComputedPolicy < ActiveRecord::Base
         attr1 = attr1.to_s
         attr2 = attr2.to_s
 
-        if attr1.starts_with?(attr2)
+        if attr1.starts_with?(attr2) && policy_2[:include_subsites]
           return attr1
-        elsif attr2.starts_with?(attr1)
+        elsif attr2.starts_with?(attr1) && policy_1[:include_subsites]
           return attr2
         end
       end

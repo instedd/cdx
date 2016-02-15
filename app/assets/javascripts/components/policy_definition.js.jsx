@@ -6,7 +6,7 @@ var PolicyDefinition = React.createClass({
     };
   },
 
-  emptyPolicy: { delegable: false, resourceType: null, includeSubsites: true, actions: [], resourceList: {'except': [], 'only': []} },
+  emptyPolicy: { delegable: false, resourceType: null, includeSubsites: false, actions: [], resourceList: {'except': [], 'only': []} },
 
   policyDefinitionStatements: function(props) {
     var definition = props.definition;
@@ -20,7 +20,8 @@ var PolicyDefinition = React.createClass({
 
       // ensure delegable is a boolean, and action, resource and except are arrays
       var statement = {
-        delegable: definitionStatement.delegable == true
+        delegable: definitionStatement.delegable == true,
+        includeSubsites: definitionStatement.includeSubsites == true
       };
 
       ['action', 'resource', 'except'].forEach(function(property) {
@@ -106,7 +107,7 @@ var PolicyDefinition = React.createClass({
 
       return {
         delegable: statement.delegable == true,
-        includeSubsites: true, // TODO: still unsupported in policies definitions
+        includeSubsites: statement.includeSubsites == true,
         actions: statement.action.map(_hydratateAction.bind(this, props.actions)),
         resourceList: resourceList,
         resourceType: resourceType,

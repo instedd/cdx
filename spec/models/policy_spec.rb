@@ -511,8 +511,16 @@ describe Policy do
 
       let!(:user2) { User.make }
 
-      it "can access sub-sites" do
+      it "can't access sub-sites" do
         grant nil, user, site1, READ_SITE
+
+        assert_can user, site1, READ_SITE
+        assert_cannot user, site11, READ_SITE
+        assert_cannot user, site111, READ_SITE
+      end
+
+      it "can access sub-sites when specified" do
+        grant nil, user, site1, READ_SITE, include_subsites: true
 
         assert_can user, site1, READ_SITE
         assert_can user, site11, READ_SITE
@@ -523,13 +531,39 @@ describe Policy do
         grant nil, user, site1, READ_SITE
         grant user, user2, site11, READ_SITE
 
+
+        assert_cannot user2, site1, READ_SITE
+        assert_cannot user2, site11, READ_SITE
+        assert_cannot user2, site111, READ_SITE
+      end
+
+      it "can access sub-sites related to another site" do
+        grant nil, user, site1, READ_SITE, include_subsites: true
+        grant user, user2, site11, READ_SITE
+
+        assert_cannot user2, site1, READ_SITE
+        assert_can user2, site11, READ_SITE
+        assert_cannot user2, site111, READ_SITE
+      end
+
+      it "can't access parent site when granted access to children only" do
+        grant nil, user, site1, READ_SITE, include_subsites: true
+        grant user, user2, site11, READ_SITE, include_subsites: true
+
         assert_cannot user2, site1, READ_SITE
         assert_can user2, site11, READ_SITE
         assert_can user2, site111, READ_SITE
       end
 
-      it "can access sub-site with condition" do
+      it "can't access sub-site with condition when granted a single site" do
         grant nil, user, "device?site=#{site1.id}", READ_DEVICE
+
+        assert_can user, device1, READ_DEVICE
+        assert_cannot user, device11, READ_DEVICE
+      end
+
+      it "can access sub-site with condition" do
+        grant nil, user, "device?site=#{site1.id}", READ_DEVICE, include_subsites: true
 
         assert_can user, device1, READ_DEVICE
         assert_can user, device11, READ_DEVICE

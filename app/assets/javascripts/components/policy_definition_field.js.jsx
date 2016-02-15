@@ -5,7 +5,8 @@ var PolicyDefinitionField = React.createClass({
         delegable: statement.delegable,
         action: [],
         resource: [],
-        except: []
+        except: [],
+        includeSubsites: statement.includeSubsites
       };
 
       result.action = statement.actions
