@@ -161,10 +161,9 @@ var PolicyDefinition = React.createClass({
             </div>
           </div>
           <div className="col">
-            {this.state.statements.map(function(statement, index) {
-              var tabClass = "items-content" + (this.state.activeTab === index ? " selected" : "");
-              return (<div className={tabClass} key={index}><PolicyItemDetail statement={statement} index={index} updateStatement={this.updateStatement.bind(this, index)} actions={this.props.actions} resourceTypes={this.props.resourceTypes} context={this.props.context} /></div>);
-            }.bind(this))}
+            <div className="items-content selected">
+              <PolicyItemDetail statement={this.state.statements[this.state.activeTab]} index={this.state.activeTab} updateStatement={this.updateStatement.bind(this, this.state.activeTab)} actions={this.props.actions} resourceTypes={this.props.resourceTypes} context={this.props.context} />
+            </div>
           </div>
         </div>
       </div>
