@@ -1,6 +1,6 @@
 = form_for(@site) do |f|
   = validation_errors @site
-  
+
   .row
     .col.pe-2
       = f.label :institution
@@ -26,6 +26,7 @@
         = f.label :parent
       .col
         = @site.parent.name
+  = site_address_component(@site)
   .row
     .col.pe-2
       = f.label :sample_id_reset_policy, "Sample ID reset policy"
@@ -34,7 +35,6 @@
         - select.item "yearly", "Yearly"
         - select.item "monthly", "Monthly"
         - select.item "weekly", "Weekly"
-  = site_address_component(@site)
   .row
     .col.pe-2
       = f.label :main_phone_number
