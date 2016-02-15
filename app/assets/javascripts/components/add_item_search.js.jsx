@@ -30,15 +30,27 @@ var AddItemSearch = React.createClass({
     this.handleSearchDebounced();
   },
 
+  onEnter: function(event) {
+    if(event.key != "Enter") return;
+    event.preventDefault();
+    if(this.state.items.length == 1) {
+      this.chooseItem(this.state.items[0]);
+    } else if(this.state.items.length == 0 && this.props.onNonExistentItem) {
+      this.props.onNonExistentItem(this.state.query)
+    }
+  },
+
   handleSearch: function(query) {
     if(query == '') {
       this.setState(React.addons.update(this.state, {
         items: { $set: [] }
       }));
     } else {
+      var data = { q: query };
+      if(this.props.context != null) { data.context = this.props.context.uuid };
       $.ajax({
         url: this.props.callback,
-        data: { q: query },
+        data: data,
         success: function(data) {
           this.setState(React.addons.update(this.state, {
             items: { $set: data }
@@ -54,8 +66,8 @@ var AddItemSearch = React.createClass({
 
     return (
       <div className="item-search">
-        <input type="text" ref="input" placeholder={this.props.placeholder} className="input-block" onChange={this.onChange} onFocus={this.onChange} autoFocus="true"></input>
-        <ul>
+        <input type="text" ref="input" placeholder={this.props.placeholder} className="input-block" onChange={this.onChange} onFocus={this.onChange} onKeyPress={this.onEnter} autoFocus="true"></input>
+        <ul className="add-item-search-autocomplete">
           {this.state.items.map(function(item) {
             return <li key={item[itemKey]} onClick={this.chooseItem.bind(this, item)}>{templateFactory({item: item})}</li>;
           }.bind(this))}

@@ -21,7 +21,7 @@
           = f.label :roles
         .col
           .value
-            = react_component 'OptionList', chosenOnes: @user_roles, userId: @user.id
+            = react_component 'OptionList', chosenOnes: @user_roles, callback: "/users/#{@user.id}/assign_role", autocompleteCallback: "/roles/autocomplete"
     .col
       .box.small.gray
         - if @can_update

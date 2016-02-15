@@ -1,41 +1,65 @@
 var OptionList = React.createClass({
   getInitialState: function() {
     return {
-      chosenOnes: this.props.chosenOnes,
-      showInput: false
+      chosenOnes: this.props.chosenOnes ? this.props.chosenOnes : [],
+      showInput: this.props.showInput ? this.props.showInput : false,
+      placeholder: this.props.placeholder ? this.props.placeholder : "Search"
     }
   },
 
   removeItem: function(item, event) {
     event.preventDefault();
+    var old = _.clone(this.state.chosenOnes);
     var index = this.state.chosenOnes.indexOf(item);
     var filtered = this.state.chosenOnes;
     filtered.splice(index, 1);
     this.setState(React.addons.update(this.state, {
       chosenOnes: { $set: filtered }
     }));
-    $.ajax({
-      url: '/users/' + this.props.userId + '/unassign_role',
-      method: 'POST',
-      data: {role: item.value},
-      error: function () {
-        this.appendItem(item);
-      }.bind(this)
-    });
+    if(typeof(this.props.callback) == "string") {
+      $.ajax({
+        url: this.props.callback,
+        method: 'POST',
+        data: {remove: item.value},
+        error: function () {
+          this.setState(React.addons.update(this.state, {
+            chosenOnes: { $set: old }
+          }));
+        }.bind(this)
+      });
+    } else {
+      this.props.callback(filtered);
+    }
   },
 
   appendItem: function(item) {
+    var old = _.clone(this.state.chosenOnes);
     this.setState(React.addons.update(this.state, {
       chosenOnes: { $push: [item] }
-    }));
-    $.ajax({
-      url: '/users/' + this.props.userId + '/assign_role',
-      method: 'POST',
-      data: {role: item.value},
-      error: function () {
-        this.removeItem(item);
-      }.bind(this)
+    }), function() {
+      if(typeof(this.props.callback) == "function") {
+        this.props.callback(this.state.chosenOnes);
+      }
     });
+    if(typeof(this.props.callback) == "string") {
+      $.ajax({
+        url: this.props.callback,
+        method: 'POST',
+        data: {add: item.value},
+        error: function () {
+          this.setState(React.addons.update(this.state, {
+            chosenOnes: { $set: old }
+          }));
+        }.bind(this)
+      });
+    }
+  },
+
+  appendNonExistantItem: function(text) {
+    if(this.props.allowNonExistent) {
+      var nonExistantItem = {value: text, label: text};
+      this.appendItem(nonExistantItem);
+    }
   },
 
   showInput: function(event) {
@@ -56,11 +80,12 @@ var OptionList = React.createClass({
             </li>);
           }.bind(this))}
         </ul>
-        { this.state.showInput ? null : <a className="btn-add-link" onClick={this.showInput} href="#"><span className="iconb-add"></span> Add role</a> }
-        { this.state.showInput ? <AddItemSearch callback={"/roles/autocomplete"} onItemChosen={this.appendItem}
-                placeholder="Search roles"
+        { this.state.showInput ? null : <a className="btn-add-link" onClick={this.showInput} href="#"><span className="iconb-add"></span>Add</a> }
+        { this.state.showInput ? <AddItemSearch callback={this.props.autocompleteCallback} onItemChosen={this.appendItem} context={this.props.context}
                 itemTemplate={AddItemOptionList}
-                itemKey="value" /> : null }
+                itemKey="value"
+                onNonExistentItem={this.appendNonExistantItem}
+                placeholder={this.state.placeholder} /> : null }
       </div>
     );
   }

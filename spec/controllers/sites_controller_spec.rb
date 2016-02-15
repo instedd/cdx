@@ -25,6 +25,13 @@ describe SitesController do
       expect(assigns(:can_create)).to be_truthy
     end
 
+    it "should return a valid CSV when requested" do
+      get :index, format: :csv
+      csv = CSV.parse(response.body)
+      expect(csv[0]).to eq(["Name", "Location"])
+      expect(csv[1]).to eq([site.name, site.location.name])
+    end
+
     it "should list sites without location" do
       unlocated_site = institution.sites.make(location: nil)
       get :index

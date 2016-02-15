@@ -3,7 +3,7 @@
     .col.pe-10
       .row
         .col
-          = react_component "AddUserLink", roles: @roles
+          = react_component "AddUserLink", roles: @roles, context: @navigation_context.to_hash
           %h1
             Users
       %form#filters-form{action: users_path, "data-auto-submit" => true}
@@ -34,7 +34,7 @@
           %h1 There are no users with access to this location
           %p Invite other users to join this team
     - else
-      = cdx_table title: pluralize(@users.count, "user") do |t|
+      = cdx_table title: pluralize(@total, "user") do |t|
         - t.columns do
           %col{:width => "30%"}
           %col{:width => "30%"}

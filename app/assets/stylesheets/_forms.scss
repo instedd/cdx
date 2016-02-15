@@ -22,6 +22,14 @@ textarea {
   @include placeholder-style(italic);
   font-family: $sans;
   font-size: 100%;
+  border-color: $gray2;
+  outline: none;
+  &.resizeable {
+    border: none;
+    border-bottom: 1px solid $gray2;
+    overflow: hidden;
+    resize: none;
+  }
 }
 
 

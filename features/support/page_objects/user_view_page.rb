@@ -14,7 +14,8 @@ end
 
 class InviteUsersPage < CdxPageBase
   section :role, CdxSelect, ".modal label", text: /Role/i
-  element :users, :field, "Users"
+  element :add_user, :link, "Add"
+  element :users, ".item-search input"
 
   element :primary, ".modal .btn-primary"
 end

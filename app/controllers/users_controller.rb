@@ -3,10 +3,11 @@ class UsersController < ApplicationController
 
   def index
     return unless authorize_resource(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS))
-    @users = User.within(@navigation_context.entity)
+    @users = User.uniq.within(@navigation_context.entity)
     @roles = Role.within(@navigation_context.entity).map{|r| {value: r.id, label: r.name}}
     @can_update = has_access?(User, UPDATE_USER)
     apply_filters
+    @total = @users.count
 
     @date_options = date_options_for_filter
     @status = [{value: "", label: "Show all"}, {value: "1", label: "Active"}, {value: "0", label: "Blocked"}]
@@ -41,12 +42,18 @@ class UsersController < ApplicationController
   end
 
   def create
-    users = []
     @role = Role.find(params[:role])
-    params[:users].split(',').each do |email|
+    message = params[:message]
+    (params[:users] || []).each do |email|
       email = email.strip
       user = User.find_or_initialize_by(email: email)
-      user.invite! unless user.persisted?
+      unless user.persisted?
+        user.invite! do |u|
+          u.skip_invitation = true
+        end
+        InvitationMailer.invite_message(user, message).deliver_now if user.errors.empty?
+        user.invitation_sent_at = Time.now.utc # mark invitation as delivered
+      end
       user.roles << @role unless user.roles.include?(@role)
       ComputedPolicy.update_user(user)
     end
@@ -54,18 +61,23 @@ class UsersController < ApplicationController
   end
 
   def assign_role
-    @role = Role.find(params[:role])
-    @user.roles << @role
+    if params[:add]
+      @user.roles << Role.find(params[:add].to_i)
+    else
+      role = Role.find(params[:remove].to_i)
+      @user.roles.delete(role)
+    end
     # Since user is not being updated here, we need to force the new role's policy update
     ComputedPolicy.update_user(@user)
     render nothing: true
   end
 
-  def unassign_role
-    @role = Role.find(params[:role])
-    @user.roles.delete(@role)
-    ComputedPolicy.update_user(@user)
-    render nothing: true
+  def autocomplete
+    users = User.within(@navigation_context.institution)
+                .uniq
+                .where("first_name LIKE ? OR last_name LIKE ? OR (email LIKE ? AND first_name IS NULL AND last_name IS NULL)", "%#{params["q"]}%", "%#{params["q"]}%", "%#{params["q"]}%")
+                .map{|r| {value: r.email, label: r.full_name}}
+    render json: users
   end
 
   private
