@@ -148,4 +148,61 @@ describe "device" do
       expect(page).to have_content '2 tests'
     end
   end
+
+  context "moving site" do
+    let(:institution) { Institution.make }
+    let(:user) { institution.user }
+    let!(:old_parent) { institution.sites.make }
+    let!(:new_parent) { institution.sites.make }
+    let(:site) { Site.make :child, parent: old_parent }
+
+    let(:device_model) { DeviceModel.make name: 'genoscan' }
+
+    let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
+    let!(:device) { Device.make site: site, device_model: device_model }
+
+    def copy_sample_csv(name)
+      copy_sample(name, 'csvs')
+    end
+
+    def copy_sample(name, format)
+      FileUtils.cp File.join(Rails.root, 'spec', 'fixtures', format, name), sync_dir.inbox_path(device.uuid)
+    end
+
+    def load_manifest(device_model, name)
+      Manifest.create! device_model: device_model, definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', name))
+    end
+
+    before(:each) {
+      sync_dir.ensure_sync_path!
+      sync_dir.ensure_client_sync_paths! device.uuid
+
+      load_manifest device_model, 'genoscan_manifest.json'
+
+      copy_sample_csv 'genoscan_sample.csv'
+      DeviceMessageImporter.new("*.csv").import_from sync_dir
+      expect(TestResult.count).to eq(13)
+
+      sign_in(user)
+    }
+
+    it "can process same message payload successfully after moving" do
+      goto_page SiteEditPage, site_id: site.id, query: { context: institution.uuid } do |page|
+        page.parent_site.set new_parent.name
+        page.submit
+      end
+
+      site.reload
+      expect(site).to be_deleted
+      new_site = Site.last
+      expect(new_site.parent).to eq(new_parent)
+
+      copy_sample_csv 'genoscan_sample.csv'
+      DeviceMessageImporter.new("*.csv").import_from sync_dir
+
+      expect(Sample.count).to eq(10)
+      expect(SampleIdentifier.count).to eq(10)
+      expect(TestResult.count).to eq(26)
+    end
+  end
 end
