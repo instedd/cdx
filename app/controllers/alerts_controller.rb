@@ -82,7 +82,6 @@ class AlertsController < ApplicationController
     error_text=Hash.new
 
     alert_saved_ok = alert_info.save
-
     if alert_saved_ok==false
       error_text = alert_info.errors.messages
     else
