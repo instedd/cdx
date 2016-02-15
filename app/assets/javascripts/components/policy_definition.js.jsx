@@ -74,7 +74,7 @@ var PolicyDefinition = React.createClass({
         resources = statement.except;
       } else {
         resources = statement.resource;
-        if(_resourceComponents(resources[0]).thisResourceId) {
+        if(resources[0] && _resourceComponents(resources[0]).thisResourceId) {
           statementType = 'only';
         } else {
           statementType = 'all';
