@@ -16,7 +16,7 @@ Rails.application.routes.draw do
       registration: 'registration'
     }
 
-  resources :sites do
+  resources :sites, except: [:show] do
     member do
       get :devices
       get :tests
