@@ -132,7 +132,7 @@ var PolicyItemDetail = React.createClass({
           <div className="col">
             <div className="section-content">
               <CdxSelect items={this.props.resourceTypes} value={statement.resourceType} onChange={this.onResourceTypeChange} />
-              <input type="checkbox" disabled="true" id={this.idFor("includeSubsites")} checked={statement.includeSubsites} onChange={this.toggleIncludeSubsites} />
+              <input type="checkbox" id={this.idFor("includeSubsites")} checked={statement.includeSubsites} onChange={this.toggleIncludeSubsites} />
               <label htmlFor={this.idFor("includeSubsites")}>Include subsites</label>
             </div>
           </div>
