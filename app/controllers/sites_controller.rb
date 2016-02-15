@@ -49,22 +49,19 @@ class SitesController < ApplicationController
     end
   end
 
-  def show
+  def edit
     @site = Site.find(params[:id])
     return unless authorize_resource(@site, READ_SITE)
 
     @can_edit = has_access?(@site, UPDATE_SITE)
-    @show_institution = show_institution?(Policy::Actions::READ_SITE, Site)
-  end
-
-  def edit
-    @site = Site.find(params[:id])
-    return unless authorize_resource(@site, UPDATE_SITE)
-
-    @can_delete = has_access?(@site, DELETE_SITE)
-    @can_be_deleted = @site.devices.empty?
-    @can_move = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
-    @sites = check_access(@navigation_context.institution.sites, READ_SITE) if @can_move
+    if @can_edit
+      @can_delete = has_access?(@site, DELETE_SITE)
+      @can_be_deleted = @site.devices.empty?
+      @can_move = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
+      @sites = check_access(@navigation_context.institution.sites, READ_SITE) if @can_move
+    else
+      @show_institution = show_institution?(Policy::Actions::READ_SITE, Site)
+    end
   end
 
   # PATCH/PUT /sites/1
