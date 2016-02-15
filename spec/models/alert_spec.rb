@@ -25,6 +25,13 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
       expect(alert).to_not be_valid
     end
 
+    it "cannot create for invalid error_code with device_errors category" do
+      alert = Alert.make
+      alert.category_type = "device_errors"
+      alert.error_code="aa"
+      expect(alert).to_not be_valid
+    end
+
   end
 
   context "validate soft delete" do

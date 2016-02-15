@@ -66,8 +66,27 @@ class Alert < ActiveRecord::Base
 
   private
 
+  def  is_integer?(str_val)
+    str_val.to_i.to_s == str_val
+  end
+
+
   def category_validation
-    if category_type == "utilization_efficiency"
+    if category_type == "device_errors"
+      error=false;
+      if error_code.include? '-'
+        minmax=error_code.split('-')
+        error = true if !is_integer?(minmax[0])
+        error = true if !is_integer?(minmax[1]) 
+      else
+        error = true if !is_integer?(error_code)
+      end
+
+      if error
+        errors.add(:error_code, "errorcode must be an integer")
+      end
+
+    elsif category_type == "utilization_efficiency"
       if (utilization_efficiency_number==0)
         errors.add(:utilization_efficiency_number, "Timespan cannot be zero")
       end

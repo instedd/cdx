@@ -12,22 +12,9 @@ Given(/^the user has an account$/) do
 end
 
 
-Given(/^the user creates a new alert with name "(.*?)"$/) do |arg1|
-  @alert = NewAlertPage.new
-  @alert.load
-
-  within(@alert.form) do |form|
-    alert_form_fillin_basic(form, arg1)
-    form.submit.click
-  end
-end
-
-
-
 Given(/^the user creates a new error category alert with all fields with name "(.*?)"$/) do |arg1|
   site = @navigation_context.entity.sites.make
   device = site.devices.make
-
   @alert = NewAlertPage.new
   @alert.load
 

@@ -40,13 +40,6 @@ header {
       @include flex-grow(2);
       margin-left: 25px;
 
-     fixed {    /*anthony start*/
-	width: 100%;
-	position: fixed;
-	top: 0;
-	left: 0;
-	}      /*anthony end */
-
       ul {
         margin: 0;
         padding: 0;
