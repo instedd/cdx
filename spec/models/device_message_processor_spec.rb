@@ -79,7 +79,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
   let(:institution) {Institution.make(kind: 'institution')}
 
-  let(:site) {Site.make(institution: institution)}
+  let(:site) {Site.make(institution: institution, location_geoid: 'ne:ARG_1300')}
 
   let(:device) {Device.make(institution: institution, site: site)}
 
@@ -172,6 +172,22 @@ describe DeviceMessageProcessor, elasticsearch: true do
     expect(TestResult.all.map(&:sample).map(&:id)).to eq([Sample.first.id] * 3)
 
     expect(all_elasticsearch_tests.map {|e| e['_source']['sample']['uuid']}).to eq([Sample.first.uuids] * 3)
+  end
+
+  it "should create multiple test results with a single request to the location service" do
+    allow(device_message).to receive(:parsed_messages).and_return([parsed_message(TEST_ID), parsed_message(TEST_ID_2), parsed_message(TEST_ID_3)])
+
+    LocationService.reload!
+
+    stub = stub_request(:get, "http://locations.instedd.org/details?ancestors=true&id=ne:ARG_1300").
+      to_return(:status => 200, :body => '[{"id":"ne:ARG_1300","name":"Catamarca","type":"Province","ancestorsIds":["ne:ARG"],"ancestors":[{"id":"ne:ARG","name":"Argentina","type":"Sovereign country","level":0,"lat":0,"lng":0,"set":""}],"level":1,"lat":-27.649319756801297,"lng":-67.51184361556845,"set":"ne"}]', :headers => {})
+
+    device_message_processor.process
+
+    expect(stub).to have_been_requested.at_most_once
+
+    expect(Sample.count).to eq(1)
+    expect(TestResult.count).to eq(3)
   end
 
   it "should index an encounter" do
