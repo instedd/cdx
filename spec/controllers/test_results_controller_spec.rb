@@ -235,5 +235,32 @@ describe TestResultsController, elasticsearch: true do
       expect(assigns(:test_result)).to eq(test_result)
       expect(response).to be_success
     end
+
+    context "when original site was moved (ie soft deleted + device changed)" do
+      let!(:new_site) { Site.make institution: institution }
+
+      before(:each) {
+        device.site = new_site
+        device.save!
+
+        site.destroy!
+      }
+
+      it "should authorize user with access to device" do
+        grant owner, user, { :test_result => device }, QUERY_TEST
+
+        get :show, id: test_result.uuid
+        expect(assigns(:test_result)).to eq(test_result)
+        expect(response).to be_success
+      end
+
+      it "should authorize user with access to institution" do
+        grant owner, user, { :test_result => institution }, QUERY_TEST
+
+        get :show, id: test_result.uuid
+        expect(assigns(:test_result)).to eq(test_result)
+        expect(response).to be_success
+      end
+    end
   end
 end

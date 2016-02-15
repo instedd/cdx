@@ -12,7 +12,7 @@
       = f.label :name
     .col
       = f.text_field :name, :class => 'input-large'
-  - if @site.new_record?
+  - if @site.new_record? || @can_move
     .row
       .col.pe-2
         = f.label :parent

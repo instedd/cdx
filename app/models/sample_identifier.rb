@@ -2,7 +2,7 @@ class SampleIdentifier < ActiveRecord::Base
   include AutoUUID
 
   belongs_to :sample, inverse_of: :sample_identifiers
-  belongs_to :site, inverse_of: :sample_identifiers
+  belongs_to :site, -> { with_deleted }, inverse_of: :sample_identifiers
   has_many :test_results, inverse_of: :sample_identifier, dependent: :restrict_with_error
 
   validates_presence_of :sample
