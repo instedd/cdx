@@ -63,7 +63,6 @@ entities:
               - n/a
           quantitative_result:
             type: float
-            searchable: true
       type:
         type: enum
         searchable: true

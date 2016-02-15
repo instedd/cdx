@@ -30,8 +30,8 @@
 #        - name: test.assays.quantitative_result.max 
 #          type: range-integer
 #          boundary: lte
-        
-test:   
+
+test:
   - name: test.error_code
     filter_parameter_definition:
       - include_default: true
@@ -41,12 +41,9 @@ test:
       - name: test.error_code.max
         type: range-integer
         boundary: lte
-      - name: test.error_code.wildcard
-        type: wildcard
 
   - name: test.start_time
-    filter_parameter_definition:   
-      - include_default: true
+    filter_parameter_definition:
       - name: since
         type: range
         boundary: from
