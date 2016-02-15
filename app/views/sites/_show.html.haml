@@ -25,7 +25,8 @@
   .col.pe-2
     = label_tag :region
   .col
-    .value= @site.location_geoid
+    .value
+      = react_component "LocationLabel", id: @site.location_geoid
 .row
   .col.pe-2
   .col.pe-8
