@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160210193741) do
+ActiveRecord::Schema.define(version: 20160215195614) do
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -124,7 +124,10 @@ ActiveRecord::Schema.define(version: 20160210193741) do
     t.string   "ftp_password",     limit: 255
     t.string   "ftp_directory",    limit: 255
     t.integer  "ftp_port",         limit: 4
+    t.datetime "deleted_at"
   end
+
+  add_index "devices", ["deleted_at"], name: "index_devices_on_deleted_at", using: :btree
 
   create_table "encounters", force: :cascade do |t|
     t.integer  "institution_id",  limit: 4

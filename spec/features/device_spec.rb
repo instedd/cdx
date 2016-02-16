@@ -149,6 +149,39 @@ describe "device" do
     end
   end
 
+  context "device with test" do
+    let(:institution) { Institution.make }
+    let(:user) { institution.user }
+    let(:site) { institution.sites.make }
+
+    let(:device_spec_helper) { DeviceSpecHelper.new 'genoscan' }
+    let(:device) { device_spec_helper.make site: site }
+
+    before(:each) {
+      device_spec_helper.import_sample_csv device, 'genoscan_sample.csv'
+      sign_in(user)
+    }
+
+    context "when deleted" do
+      before(:each) {
+        goto_page DevicePage, id: device.id do |page|
+          page.edit.click
+        end
+
+        expect_page DeviceEditPage do |page|
+          page.delete.click
+          page.confirmation.delete.click
+        end
+      }
+
+      it "test details can be views if device is deleted" do
+        goto_page TestResultsPage do |page|
+          page.table.items.first.click
+        end
+      end
+    end
+  end
+
   context "moving site" do
     let(:institution) { Institution.make }
     let(:user) { institution.user }
@@ -156,33 +189,12 @@ describe "device" do
     let!(:new_parent) { institution.sites.make }
     let(:site) { Site.make :child, parent: old_parent }
 
-    let(:device_model) { DeviceModel.make name: 'genoscan' }
-
-    let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
-    let!(:device) { Device.make site: site, device_model: device_model }
-
-    def copy_sample_csv(name)
-      copy_sample(name, 'csvs')
-    end
-
-    def copy_sample(name, format)
-      FileUtils.cp File.join(Rails.root, 'spec', 'fixtures', format, name), sync_dir.inbox_path(device.uuid)
-    end
-
-    def load_manifest(device_model, name)
-      Manifest.create! device_model: device_model, definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', name))
-    end
+    let!(:device_spec_helper) { DeviceSpecHelper.new 'genoscan' }
+    let!(:device) { device_spec_helper.make site: site }
 
     before(:each) {
-      sync_dir.ensure_sync_path!
-      sync_dir.ensure_client_sync_paths! device.uuid
-
-      load_manifest device_model, 'genoscan_manifest.json'
-
-      copy_sample_csv 'genoscan_sample.csv'
-      DeviceMessageImporter.new("*.csv").import_from sync_dir
+      device_spec_helper.import_sample_csv device, 'genoscan_sample.csv'
       expect(TestResult.count).to eq(13)
-
       sign_in(user)
     }
 
@@ -197,8 +209,7 @@ describe "device" do
       new_site = Site.last
       expect(new_site.parent).to eq(new_parent)
 
-      copy_sample_csv 'genoscan_sample.csv'
-      DeviceMessageImporter.new("*.csv").import_from sync_dir
+      device_spec_helper.import_sample_csv device, 'genoscan_sample.csv'
 
       expect(Sample.count).to eq(10)
       expect(SampleIdentifier.count).to eq(10)

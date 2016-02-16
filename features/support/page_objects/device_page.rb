@@ -18,6 +18,8 @@ end
 class DevicePage < DeviceSetupPage
   set_url '/devices/{id}'
 
+  element :edit, "a[title='Edit']"
+
   section :tab_header, '.tabs' do
     element :setup, :link, 'Setup'
   end
@@ -25,6 +27,12 @@ class DevicePage < DeviceSetupPage
   section :tabs_content, '.tabs-content' do
     element :explore_tests, :link, 'Explore tests'
   end
+end
+
+class DeviceEditPage < CdxPageBase
+  set_url '/devices/{id}/edit{?query*}'
+
+  element :delete, :link, 'Delete'
 end
 
 class NewDevicePage < CdxPageBase

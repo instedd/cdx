@@ -7,11 +7,16 @@ class CdxPageBase < SitePrism::Page
     end
   end
 
+  class ConfirmationSection < SitePrism::Section
+    element :delete, :button, 'Delete'
+  end
+
   element :navigation_context_handle, "#nav-context"
   section :navigation_context, NavigationContextSection, "#context_side_bar"
   element :primary, ".btn-primary"
   element :content, ".content", match: :first
   element :logout_link, :link, "Log out"
+  section :confirmation, ConfirmationSection, '[data-react-class="ConfirmationModal"]'
 
   def logout
     logout_link.trigger('click')
