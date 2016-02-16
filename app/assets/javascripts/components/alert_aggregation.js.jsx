@@ -126,7 +126,7 @@ var AlertAggregationThreshold = React.createClass({
 				<input type = "text"  type="number" min="0" max="10000" placeholder = "Agg Threshold" valueLink = {
 						this.props.valueLink
 					}
-					id = "alertaggregationthresholdlimit" />
+					id = "alertaggregationthresholdlimit" disabled={this.props.edit} />
 			</div>
 		</div>
 	);

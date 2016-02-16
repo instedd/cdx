@@ -10,7 +10,7 @@ var AlertUtilizationEfficiency = React.createClass({
 				<input type = "text"  type="number" min="0" max="10000" placeholder = "Amount" valueLink = {
 						this.props.valueLink
 					}
-					id = "alertutilizationefficiencynumber" />
+					id = "alertutilizationefficiencynumber" disabled={this.props.edit} />
 			</div>
 		</div>
 	);

@@ -10,16 +10,6 @@ var AlertCategorySelect = React.createClass({
 		}
 
 		if (this.props.edit == true) {
-			document.getElementById("alertsmslimit").disabled = true;
-			document.getElementById("alertsampleid").disabled = true;
-			document.getElementById("alertmessage").disabled = true;
-			document.getElementById("alertsmsmessage").disabled = true;
-			document.getElementById("alerterrorcode").disabled = true;
-			document.getElementById("alertminthreshold").disabled = true;
-			document.getElementById("alertmaxthreshold").disabled = true;
-			document.getElementById("alertaggregationthresholdlimit").disabled = true;
-			document.getElementById("alertutilizationefficiencynumber").disabled = true;
-
 			this.setState({
 				disable_all_selects: true
 			});
@@ -27,12 +17,6 @@ var AlertCategorySelect = React.createClass({
 			this.setState({
 				submit_button_text: 'Update Alert'
 			});
-
-			category_keys = Object.keys(this.props.category_types);
-			document.getElementById(category_keys[0]).disabled = true;
-			document.getElementById(category_keys[1]).disabled = true;
-			document.getElementById(category_keys[3]).disabled = true;
-			document.getElementById(category_keys[4]).disabled = true;
 		} else { //new alert
 			this.setState({
 				disable_all_selects: false
@@ -227,7 +211,11 @@ var AlertCategorySelect = React.createClass({
 							<label>Categories</label >
 							</div>
 							<div className="col" >
-								<input type="radio" name="category_type" value={category_keys[0]}  onChange={this.categoryChanged} id={category_keys[0]} />
+								<input type="radio" name="category_type" value={category_keys[0]}  
+								 onChange={this.categoryChanged} 
+								 id={category_keys[0]} 
+								 disabled={this.props.edit} 
+								/>
 								<label htmlFor={category_keys[0]}>Anomalies</label>
 							</div>
 						</div>
@@ -236,15 +224,10 @@ var AlertCategorySelect = React.createClass({
 								&nbsp;
 							</div>
 							<div className = "col" >
-								<input type = "radio" name = "category_type" value = {
-										category_keys[1]
-									}
-									onChange = {
-										this.categoryChanged
-									}
-									id = {
-										category_keys[1]
-									}
+								<input type = "radio" name = "category_type" value = {category_keys[1]}
+									onChange = {this.categoryChanged}
+									id = {category_keys[1]}
+									disabled={this.props.edit}
 									/>
 								<label htmlFor={category_keys[1]}>Device Errors</label>
 							</div>
@@ -255,15 +238,10 @@ var AlertCategorySelect = React.createClass({
 								&nbsp;
 							</div>
 							<div className = "col" >
-								<input type = "radio" name = "category_type" value = {
-										category_keys[3]
-									}
-									onChange = {
-										this.categoryChanged
-									}
-									id = {
-										category_keys[3]
-									}
+								<input type = "radio" name = "category_type" value = {category_keys[3]}
+									onChange = {this.categoryChanged}
+									id = {category_keys[3]}
+									disabled={this.props.edit}
 									/>
 								<label htmlFor={category_keys[3]}>Test Results</label>
 							</div>
@@ -274,15 +252,10 @@ var AlertCategorySelect = React.createClass({
 								&nbsp;
 							</div>
 							<div className = "col" >
-								<input type = "radio" name = "category_type" value = {
-										category_keys[4]
-									}
-									onChange = {
-										this.categoryChanged
-									}
-									id = {
-										category_keys[4]
-									}
+								<input type = "radio" name = "category_type" value = {category_keys[4]}
+									onChange = {this.categoryChanged}
+									id = {category_keys[4]}
+									disabled={this.props.edit}
 									/>
 								<label htmlFor={category_keys[4]}>Utilization Efficiency</label>
 							</div>
@@ -305,21 +278,17 @@ var AlertCategorySelect = React.createClass({
 
 						<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
 
-						<AlertSampleId valueLink={this.linkState('sampleIdField')} />
+						<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={this.props.edit} />
 
-
-						<AlertErrorCode valueLink = {
-								this.linkState('errorCodeField')
-							}
-							/>
+						<AlertErrorCode valueLink = {this.linkState('errorCodeField')} edit={this.props.edit} />
 
 						<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
 
 						<AlertCondition conditions={this.state.all_conditions} valueLink={this.linkState('conditionField')} disable_all_selects={this.state.disable_all_selects} />
 						<AlertConditionResults condition_results ={this.state.all_condition_results} valueLink={this.linkState('conditionResultsField')} disable_all_selects={this.state.disable_all_selects} />
-						<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} />
+						<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} edit={this.props.edit} />
 
-						<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} />
+						<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} edit={this.props.edit} />
 
 						<AlertAggregation aggregation_types = {
 								this.props.aggregation_types
@@ -335,7 +304,7 @@ var AlertCategorySelect = React.createClass({
 							}
 							/>
 						<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
-						<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} />
+						<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} edit={this.props.edit} />
 
 						<AlertChannel channel_types = {
 								this.props.channel_types
@@ -363,16 +332,16 @@ var AlertCategorySelect = React.createClass({
 
 						<AlertExternalUser edit={this.props.edit} onChangeParentLevel={this.externalUsersChanged} existingExternalUsers={this.props.alert_external_users} />
 
-						<AlertSmsLimit valueLink={this.linkState('smsLimitField')} />
+						<AlertSmsLimit valueLink={this.linkState('smsLimitField')} edit={this.props.edit} />
 
 						<AlertEmailMessage valueLink = {
 								this.linkState('messageField')
-							}
+							}  edit={this.props.edit}
 							/>
 
 						<AlertSmsMessage valueLink = {
 								this.linkState('smsMessageField')
-							}
+							} edit={this.props.edit}
 							/>
 
 						<div className="row">

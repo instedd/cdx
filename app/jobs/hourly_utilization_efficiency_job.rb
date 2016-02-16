@@ -9,8 +9,6 @@ class HourlyUtilizationEfficiencyJob
   def perform
     alerts = Alert.utilization_efficiency.where("enabled=?",true)
 
-    p 'inside utilisation job - debug message'
-
     # if it has just alert the user
     alerts.each do |alert|
 
@@ -30,8 +28,7 @@ class HourlyUtilizationEfficiencyJob
       if hour_difference > utilization_efficiency_hours
         alert.update_column("utilization_efficiency_last_checked", Time.now)
 
-   #     alert_history_count=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', hour_difference.hours.ago).where('for_aggregation_calculation=true').count
-         alert_history_count=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', alert.utilization_efficiency_last_checked).where('for_aggregation_calculation=true').count
+        alert_history_count=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', alert.utilization_efficiency_last_checked).where('for_aggregation_calculation=true').count
                 
         # minimum value for the threshold is one
         if alert_history_count <= alert.aggregation_threshold

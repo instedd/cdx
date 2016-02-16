@@ -4,12 +4,10 @@ var AlertDelete = React.createClass({
 			displayConfirm: false
 		};
 	},
-
 	clickHandler: function() {
 		this.setState({
 			displayConfirm: true
 		});
-
 	},
 	cancelDeleteClickHandler: function() {
 		this.setState({
@@ -20,7 +18,6 @@ var AlertDelete = React.createClass({
 		this.props.onChangeParentLevel();
 	},
 	render: function() {
-
 		if (this.state.displayConfirm==true) {
 			return (
 				<ConfirmationModal message= {'You are about to permanently delete this alert. Are you sure you want to proceed?'} title= {'Delete confirmation'} cancel_target= {this.cancelDeleteClickHandler} target= {this.confirmClickHandler} deletion= {true} hideCancel= {false} confirmMessage= {'Delete'} />
@@ -120,7 +117,7 @@ var AlertErrorCode = React.createClass({
 				<input type = "text" placeholder = "Error code range" valueLink = {
 						this.props.valueLink
 					}
-					id = "alerterrorcode"  name="alerterrorcode" />
+					id = "alerterrorcode"  name="alerterrorcode" disabled={this.props.edit} />
 			</div>
 		</div>
 	);
@@ -144,7 +141,6 @@ var AlertSite = React.createClass({
 	},
 	render: function() {
 		var siteOptions = [];
-
 		siteOption = {};
 		siteOption["value"] = "";
 		siteOption["label"] = "All"
@@ -458,7 +454,6 @@ var AlertUser = React.createClass({
 		userOption["label"] = "None"
 		userOptions.push(userOption);
 
-
 		for (var i = 0; i < this.props.users.length; i++) {
 			userOption = {};
 			userOption["value"] = this.props.users[i].id;
@@ -541,7 +536,7 @@ var AlertSampleId = React.createClass({
 				<input type = "text" placeholder = "sample ID" valueLink = {
 						this.props.valueLink
 					}
-					id = "alertsampleid" />
+					id = "alertsampleid" disabled={this.props.edit} />
 			</div>
 		</div>
 	);
@@ -562,7 +557,7 @@ var AlertSmsLimit = React.createClass({
 				<input type = "text"  type="number" min="0" max="10000" placeholder = "sms limit" valueLink = {
 						this.props.valueLink
 					}
-					id = "alertsmslimit" />
+					id = "alertsmslimit" disabled={this.props.edit} />
 			</div>
 		</div>
 	);
@@ -583,7 +578,7 @@ var AlertEmailMessage = React.createClass({
 					<textarea rows="5" cols="50" placeholder = "email message" valueLink = {
 							this.props.valueLink
 						}
-						id = "alertmessage" pattern=".{5,255}" />
+						id = "alertmessage" pattern=".{5,255}" disabled={this.props.edit} />
 				</div>
 			</div>
 		);
@@ -603,7 +598,7 @@ var AlertSmsMessage = React.createClass({
 					<textarea rows="2" cols="50" placeholder = "SMS message" valueLink = {
 							this.props.valueLink
 						}
-						id = "alertsmsmessage" pattern=".{5,160}" />
+						id = "alertsmsmessage" pattern=".{5,160}" disabled={this.props.edit} />
 				</div>
 			</div>
 		);

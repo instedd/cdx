@@ -205,7 +205,7 @@ var AlertConditionThreshold = React.createClass({
 				<input type = "text"  type="number" min="0" max="10000" placeholder = "min" valueLink = {
 						this.props.min_valueLink
 					}
-					id = "alertminthreshold" />
+					id = "alertminthreshold" disabled={this.props.edit} />
 				&nbsp;&nbsp;&nbsp;&nbsp;
 				<input type = "text"  type="number" min="0" max="10000" placeholder = "max" valueLink = {
 						this.props.max_valueLink
