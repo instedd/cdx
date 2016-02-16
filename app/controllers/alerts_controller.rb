@@ -233,7 +233,6 @@ class AlertsController < ApplicationController
       #Note: alert_info.create_percolator is called from the model
     end
 
-
     alert_query_updated_ok = alert_info.update(query: alert_info.query)
     if alert_saved_ok && alert_query_updated_ok && external_users_ok && internal_users_ok && condition_result_ok
       render json: alert_info

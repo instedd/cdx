@@ -10,7 +10,7 @@
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
 # It's strongly recommended that you check this file into your version control system.
-ActiveRecord::Schema.define(version: 20160215195614) do
+ActiveRecord::Schema.define(version: 20160216125851) do
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
     t.integer "alert_id", limit: 4
@@ -30,16 +30,17 @@ ActiveRecord::Schema.define(version: 20160215195614) do
   add_index "alert_histories", ["user_id"], name: "index_alert_histories_on_user_id", using: :btree
 
   create_table "alert_recipients", force: :cascade do |t|
-    t.integer  "user_id",        limit: 4
-    t.integer  "alert_id",       limit: 4
+    t.integer  "user_id",           limit: 4
+    t.integer  "alert_id",          limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "email",          limit: 255
-    t.integer  "role_id",        limit: 4
-    t.integer  "recipient_type", limit: 4,   default: 0
-    t.string   "telephone",      limit: 255
-    t.string   "first_name",     limit: 255
-    t.string   "last_name",      limit: 255
+    t.string   "email",             limit: 255
+    t.integer  "role_id",           limit: 4
+    t.integer  "recipient_type",    limit: 4,   default: 0
+    t.string   "telephone",         limit: 255
+    t.string   "first_name",        limit: 255
+    t.string   "last_name",         limit: 255
+    t.integer  "recipient_user_id", limit: 4
   end
 
   add_index "alert_recipients", ["alert_id"], name: "index_alert_recipients_on_alert_id", using: :btree

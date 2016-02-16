@@ -65,7 +65,8 @@ module Alerts
     recipientNotificationHistory = RecipientNotificationHistory.new
     recipientNotificationHistory.alert = alert
     recipientNotificationHistory.alert_history = alert_history
-    recipientNotificationHistory.user_id = user_id if user_id != nil
+    recipientNotificationHistory.user_id = alert.user.id
+  #  recipientNotificationHistory.recipient_user_id = user_id if user_id != nil
     recipientNotificationHistory.alert_recipient_id = alert_recipient_id
     recipientNotificationHistory.message_sent = messagebody
     recipientNotificationHistory.channel_type = alert.channel_type
