@@ -3,11 +3,32 @@
     "version" : "0.0.1",
     "api_version" : "1.5.0",
     "signature" : "",
-    "conditions": ["hiv"],
+    "conditions": ["cd4_count"],
     "source": { "type" : "csv", "separator" : "," }
   },
   "field_mapping" : {
-    "test.id": { "lookup": "Test ID" },
-    "sample.id": { "lookup": "Sample" }
+    "test.name" : { "lookup" : "Assay Name" },
+    "sample.id" : { "lookup" : "Sample" },
+    "test.type" : {"if" : [{"equals" : [{"lookup": "Assay Name" }, "PIMA BEADS"]}, "qc", "specimen"]},
+    "test.assays.name" : { "lookup" : "Assay Name" },
+    "test.assays.condition" : "cd4_count",
+    "test.assays.result" : "n/a",
+    "test.assays.quantitative_result" : { "script" : "
+      if( message['ErrorMessage'] != '') {
+        message['CD3+CD4+ Value [cells/mm3]']
+      } else {
+        null
+      }
+    "},
+    "test.error_description" : { "lookup" : "ErrorMessage" },
+    "test.site_user" : { "lookup" : "Operator" },
+    "test.start_time" : {"parse_date": [{"concat": [{"lookup": "Result Date"}, { "lookup" : "Start Time" }]}, "%Y-%m-%d%H:%M"]},
+    "test.status" : { "script" : "
+      if( message['ErrorMessage'] != '') {
+        'error'
+      } else {
+        'success'
+      }
+    "}
   }
 }

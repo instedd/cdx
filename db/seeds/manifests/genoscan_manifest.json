@@ -84,13 +84,7 @@
     },
     "test.site_user" : {"lookup" : "WindowsUser"},
     "test.name" : {"lookup" : "TypeOfTest"},
-    "test.assays.condition" : {
-      "script" : "['mtb', 'rif', 'inh']"
-    },
-    "test.assays.name" : {
-      "script" : "['mtb', 'rif', 'inh']"
-    },
-    "test.assays.result" : {
+    "test.assays" : {
       "script" : "
         if(message['Result'].match(/.*tuberculosis.*/)){
           mtb = 'positive'
@@ -107,7 +101,24 @@
         } else {
           inh = 'negative'
         };
-        [mtb, rif, inh]"
+        [
+          {
+            'condition' : 'mtb',
+            'name' : 'mtb',
+            'result' : mtb
+          },
+          {
+            'condition' : 'rif',
+            'name' : 'rif',
+            'result' : rif
+          },
+          {
+            'condition' : 'inh',
+            'name' : 'inh',
+            'result' : inh
+          }
+        ]
+      "
     },
     "test.type" : {
       "case" : [

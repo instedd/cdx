@@ -206,30 +206,126 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         test = tests[0]["_source"]["test"]
         expect(test["assays"][0]["name"]).to eq("mtb")
+        expect(test["assays"][0]["condition"]).to eq("mtb")
         expect(test["assays"][0]["result"]).to eq("negative")
         expect(test["assays"][1]["name"]).to eq("rif")
+        expect(test["assays"][1]["condition"]).to eq("rif")
         expect(test["assays"][1]["result"]).to eq("negative")
         expect(test["assays"][2]["name"]).to eq("inh")
+        expect(test["assays"][2]["condition"]).to eq("inh")
         expect(test["assays"][2]["result"]).to eq("negative")
 
         test = tests[1]["_source"]["test"]
         expect(test["assays"][0]["name"]).to eq("mtb")
+        expect(test["assays"][0]["condition"]).to eq("mtb")
         expect(test["assays"][0]["result"]).to eq("positive")
         expect(test["assays"][1]["name"]).to eq("rif")
+        expect(test["assays"][1]["condition"]).to eq("rif")
         expect(test["assays"][1]["result"]).to eq("negative")
         expect(test["assays"][2]["name"]).to eq("inh")
+        expect(test["assays"][2]["condition"]).to eq("inh")
         expect(test["assays"][2]["result"]).to eq("negative")
 
         test = tests.last["_source"]["test"]
         expect(test["assays"][0]["name"]).to eq("mtb")
+        expect(test["assays"][0]["condition"]).to eq("mtb")
         expect(test["assays"][0]["result"]).to eq("positive")
         expect(test["assays"][1]["name"]).to eq("rif")
+        expect(test["assays"][1]["condition"]).to eq("rif")
         expect(test["assays"][1]["result"]).to eq("positive")
         expect(test["assays"][2]["name"]).to eq("inh")
+        expect(test["assays"][2]["condition"]).to eq("inh")
         expect(test["assays"][2]["result"]).to eq("positive")
 
         dbtests = TestResult.all
         expect(dbtests.size).to eq(13)
+        expect(dbtests.map(&:uuid)).to match_array(tests.map {|e| e['_source']['test']['uuid']})
+      end
+    end
+
+    context 'alere q' do
+      let(:device_model) { DeviceModel.make name: 'alere q' }
+      let!(:manifest) { load_manifest 'alere_q_manifest.json' }
+
+      it 'parses csv' do
+        copy_sample_csv 'alere_q.csv'
+        DeviceMessageImporter.new("*.csv").import_from sync_dir
+
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
+        tests = all_elasticsearch_tests.sort_by do |test|
+          test["_source"]["test"]["assays"][0]['result'] + test["_source"]["test"]["assays"][1]['result'] + test["_source"]["test"]["assays"][2]['result']
+        end
+        expect(tests.size).to eq(73)
+
+        test = tests[0]["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("HIV-1 M/N")
+        expect(test["assays"][0]["condition"]).to eq("hiv_1_m_n")
+        expect(test["assays"][0]["result"]).to eq("negative")
+        expect(test["assays"][1]["name"]).to eq("HIV-1 O")
+        expect(test["assays"][1]["condition"]).to eq("hiv_1_o")
+        expect(test["assays"][1]["result"]).to eq("negative")
+        expect(test["assays"][2]["name"]).to eq("HIV-2")
+        expect(test["assays"][2]["condition"]).to eq("hiv_2")
+        expect(test["assays"][2]["result"]).to eq("negative")
+
+        test = tests[1]["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("HIV-1 M/N")
+        expect(test["assays"][0]["condition"]).to eq("hiv_1_m_n")
+        expect(test["assays"][0]["result"]).to eq("negative")
+        expect(test["assays"][1]["name"]).to eq("HIV-1 O")
+        expect(test["assays"][1]["condition"]).to eq("hiv_1_o")
+        expect(test["assays"][1]["result"]).to eq("negative")
+        expect(test["assays"][2]["name"]).to eq("HIV-2")
+        expect(test["assays"][2]["condition"]).to eq("hiv_2")
+        expect(test["assays"][2]["result"]).to eq("negative")
+
+        test = tests.last["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("HIV-1 M/N")
+        expect(test["assays"][0]["condition"]).to eq("hiv_1_m_n")
+        expect(test["assays"][0]["result"]).to eq("positive")
+        expect(test["assays"][1]["name"]).to eq("HIV-1 O")
+        expect(test["assays"][1]["condition"]).to eq("hiv_1_o")
+        expect(test["assays"][1]["result"]).to eq("negative")
+        expect(test["assays"][2]["name"]).to eq("HIV-2")
+        expect(test["assays"][2]["condition"]).to eq("hiv_2")
+        expect(test["assays"][2]["result"]).to eq("negative")
+
+        dbtests = TestResult.all
+        expect(dbtests.size).to eq(73)
+        expect(dbtests.map(&:uuid)).to match_array(tests.map {|e| e['_source']['test']['uuid']})
+      end
+    end
+
+    context 'alere pima' do
+      let(:device_model) { DeviceModel.make name: 'alere pima' }
+      let!(:manifest) { load_manifest 'alere_pima_manifest.json' }
+
+      it 'parses csv' do
+        copy_sample_csv 'alere_pima.csv'
+        DeviceMessageImporter.new("*.csv").import_from sync_dir
+
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
+        tests = all_elasticsearch_tests.sort_by do |test|
+          (test["_source"]["test"]["error_description"] || "") +
+            (test["_source"]["test"]["assays"].first['quantitative_result'].to_s || "")
+        end
+        expect(tests.size).to eq(559)
+
+        test = tests[0]["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("PIMA CD4")
+        expect(test["assays"][0]["condition"]).to eq("cd4_count")
+        expect(test["assays"][0]["result"]).to eq("n/a")
+        expect(test["assays"][0]["quantitative_result"]).to eq(1)
+
+        test = tests.last["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("PIMA CD4")
+        expect(test["assays"][0]["condition"]).to eq("cd4_count")
+        expect(test["assays"][0]["result"]).to eq("n/a")
+        expect(test["assays"][0]["quantitative_result"]).to eq(nil)
+        expect(test["error_description"]).to eq('Test not finished Error 200')
+
+        dbtests = TestResult.all
+        expect(dbtests.size).to eq(559)
         expect(dbtests.map(&:uuid)).to match_array(tests.map {|e| e['_source']['test']['uuid']})
       end
     end
@@ -284,9 +380,9 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(DeviceMessage.first.index_failure_reason).to be_nil
 
         tests = all_elasticsearch_tests
-                
+
         expect(tests.size).to eq(1)
-                
+
         expect(tests.first['_source']['test']['error_code']).to eq(61)
         expect(tests.first['_source']['test']['id']).to eq("46")
         expect(tests.first['_source']['test']['custom_fields']['device_software_version']).to eq("00.02.03")
