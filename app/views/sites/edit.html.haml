@@ -8,7 +8,7 @@
               = image_tag "arrow-left.png"
             = @site.name
 
-- if @can_edit
+- if @can_move
   = render 'form'
 - else
   = render 'show'

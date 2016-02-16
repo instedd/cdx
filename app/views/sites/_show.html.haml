@@ -10,12 +10,23 @@
   .col
     .value= @site.name
 
-- if @site.parent
+- if @site.parent && !@can_edit_parent
   .row
     .col.pe-2
       = label_tag :parent
     .col
       .value= @site.parent.name
+- elsif @can_edit_parent
+  = form_for(@site) do |f|
+    = validation_errors @site
+    .row
+      .col.pe-2
+        = label_tag :parent
+      .col
+        = cdx_select form: f, name: :parent_id, class: 'input-x-large' do |select|
+          - select.item "", "None"
+          - select.items @sites, :id, :name
+
 .row
   .col.pe-2
     = label_tag :address

@@ -53,14 +53,12 @@ class SitesController < ApplicationController
     @site = Site.find(params[:id])
     return unless authorize_resource(@site, READ_SITE)
 
+    @can_move = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
     @can_edit = has_access?(@site, UPDATE_SITE)
     if @can_edit
       @can_delete = has_access?(@site, DELETE_SITE)
       @can_be_deleted = @site.devices.empty?
-      @can_move = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
       @sites = check_access(@navigation_context.institution.sites, READ_SITE) if @can_move
-    else
-      @show_institution = show_institution?(Policy::Actions::READ_SITE, Site)
     end
   end
 
