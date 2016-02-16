@@ -1,56 +1,3 @@
-:javascript
-  $(function(){
-    // recheck delete checkbox if user cancel the open file dialog
-    // and ensure delete checkbox is not checked if a files is selected
-    $('#device_model_setup_instructions, #device_model_picture').change(function(){
-      var fileInput = $(this);
-      var deleteCheckbox = $(fileInput.data('remove-checkbox'));
-      var isFileChosen = fileInput.val() != '';
-      deleteCheckbox.prop('checked', !isFileChosen);
-    });
-
-    // Show filename pattern block only if ftp is checked
-    $('#device_model_supports_ftp').change(function() {
-      var checked = $(this).is(':checked');
-      $('.device-model-filename-pattern').toggle(checked).find('input').prop('disabled', !checked);
-    }).trigger('change');
-  });
-
-  $(document).ready(function(){
-    // Drag Picture to an input file and preview it
-    var imageLoader = document.getElementById('device_model_picture');
-        imageLoader.addEventListener('change', handleImage, false);
-
-    function handleImage(e) {
-        var reader = new FileReader();
-        reader.onload = function (event) {
-
-            $('.upload-new-file img').attr('src',event.target.result).addClass('uploaded');
-        }
-        reader.readAsDataURL(e.target.files[0]);
-    }
-
-
-    // Change the class on the target zone when dragging a file over it
-
-    document.addEventListener("dragenter", function( event ) {
-      if ( event.target.className == "upload-picture" ) {
-          $('.choose-picture').addClass('on');
-      }
-
-    }, false);
-
-    document.addEventListener("dragleave", function( event ) {
-      if ( event.target.className == "upload-picture" ) {
-          $('.choose-picture').removeClass('on');
-      }
-    }, false);
-
-    $(".clear-label").on('click', function () {
-      $(this).closest('.file-uploaded').addClass('remove');
-    });
-  });
-
 = validation_errors @device_model
 
 = form_for(@device_model, html: { multipart: true }) do |f|
@@ -85,7 +32,7 @@
               = manifest_form.file_field :definition, :class => "inputfile"
               %label{:for => 'device_model_manifest_attributes_definition'}
                 %span
-                  .iconb-upload
+                  .icon-upload.icon-blue
                   Choose a file to upload
                 %a.clear-input{:href => "#"}
                   = image_tag "ic-cross.png"
@@ -106,7 +53,7 @@
             = f.file_field :setup_instructions, :class => "inputfile", 'data-remove-checkbox' => '#device_model_delete_setup_instructions'
             %label{:for => 'device_model_setup_instructions'}
               %span
-                .iconb-upload
+                .icon-upload.icon-blue
                 Choose a file to upload
               %a.clear-input{:href => "#"}
                 = image_tag "ic-cross.png"
@@ -150,7 +97,7 @@
             = image_tag @device_model.picture.url(:card)
         .upload-new-file.picture
           .upload-picture-title
-            %span.ic140-picture
+            %span.icon-outline-picture.xx-large
             %h2
               Drop a picture here
               %br or click to upload a file

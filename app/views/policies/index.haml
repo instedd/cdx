@@ -2,7 +2,7 @@
   .col
     = link_to "+", new_policy_path, class: 'btn-add side-link ontop fix', title: 'Add Policy'
     - if @policies.empty?
-      = empty_data title: 'Policies', icon: 'ic140-users' do |c|
+      = empty_data title: 'Policies', icon: 'icon-outline-user xx-large' do |c|
         - c.body do
           %h1 There are no users with access to this site
           %p Invite other users to join this site's team

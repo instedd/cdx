@@ -13,7 +13,7 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
 
             <p>
               <a className="btn-add-link" href='#' onClick={this.addNewSamples}>
-                <span className="iconb-add"></span> Add sample
+                <span className="icon-circle-plus icon-blue"></span> Add sample
               </a>
             </p>
           </div>

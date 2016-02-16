@@ -37,7 +37,7 @@ var PatientSelect = React.createClass({
 
         {(function(){
           if (this.state.patient == null) {
-            return <a className="btn-add-link" href={"/patients/new?" + $.param({next_url: window.location.href})} title="Create new patient"><span className="iconb-add"></span></a>;
+            return <a className="btn-add-link" href={"/patients/new?" + $.param({next_url: window.location.href})} title="Create new patient"><span className="icon-circle-plus icon-blue"></span></a>;
           }
         }.bind(this))()}
 

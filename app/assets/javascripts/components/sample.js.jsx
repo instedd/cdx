@@ -28,7 +28,7 @@ var Sample = React.createClass({
 
     var unifySampleAction = null;
     if (this.props.onUnifySample) {
-      unifySampleAction = (<a href="#" className="unify" onClick={this.unifySample}><span className="icon-unify"></span></a>);
+      unifySampleAction = (<a href="#" className="unify" onClick={this.unifySample}><span className="icond-unify"></span></a>);
     }
 
     return (
@@ -66,7 +66,7 @@ var NewSamplesList = React.createClass({
           return (<li key={sample.entity_id}>
             {sample.entity_id}
 
-            <a className="unify" href="#" onClick={removeSample}><span className="icon-remove icon-gray"></span></a>
+            <a className="unify" href="#" onClick={removeSample}><span className="icon-break icon-gray"></span></a>
           </li>)
         }.bind(this))}
       </ul>

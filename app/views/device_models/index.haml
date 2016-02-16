@@ -2,7 +2,7 @@
   .col
     = link_to "+", new_device_model_path, class: 'btn-add side-link ontop fix', title: 'Add Device Model'
     - if @device_models.empty?
-      = empty_data title: 'Device Models', icon: 'ic140-device-model' do |c|
+      = empty_data title: 'Device Models', icon: 'icon-outline-instructions xx-large' do |c|
         - c.body do
           %h1 There are no device models
           %p Create device models and publish manifests that will allow test reporting on CDx platform

@@ -13,7 +13,7 @@
     = react_component "PatientCard", patient: @patient_json, canEdit: @can_edit
 
 - if @encounters.empty?
-  = empty_data icon: 'ic140-tests' do |c|
+  = empty_data icon: 'icon-outline-test xx-large' do |c|
     - c.body do
       %h1 No medical history
       %p Create test orders in order to start the medical history

@@ -80,7 +80,7 @@ var OptionList = React.createClass({
             </li>);
           }.bind(this))}
         </ul>
-        { this.state.showInput ? null : <a className="btn-add-link" onClick={this.showInput} href="#"><span className="iconb-add"></span>Add</a> }
+        { this.state.showInput ? null : <a className="btn-add-link" onClick={this.showInput} href="#"><span className="icon-circle-plus icon-blue"></span>Add</a> }
         { this.state.showInput ? <AddItemSearch callback={this.props.autocompleteCallback} onItemChosen={this.appendItem} context={this.props.context}
                 itemTemplate={AddItemOptionList}
                 itemKey="value"
