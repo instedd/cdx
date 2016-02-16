@@ -12,7 +12,7 @@ class TestResult < ActiveRecord::Base
   has_and_belongs_to_many :device_messages
   has_many :test_result_parsed_data
 
-  belongs_to :device
+  belongs_to :device, -> { with_deleted }
   belongs_to :sample_identifier, inverse_of: :test_results, autosave: true
   belongs_to :patient
   belongs_to :encounter

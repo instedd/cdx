@@ -1,7 +1,8 @@
 class Device < ActiveRecord::Base
   include Resource
   include SiteContained
-
+  acts_as_paranoid
+  
   belongs_to :device_model
 
   has_one :manifest, through: :device_model
