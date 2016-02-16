@@ -2,30 +2,36 @@
   = validation_errors @site
 
   .row
-    .col.pe-2
-      = f.label :institution
     .col
-      .value= f.object.institution
+      .row
+        .col.pe-4
+          = f.label :institution
+        .col
+          .value= f.object.institution
 
-  .row
-    .col.pe-2
-      = f.label :name
+      .row
+        .col.pe-4
+          = f.label :name
+        .col
+          = f.text_field :name, :class => 'input-large'
+      - if @site.new_record? || @can_move
+        .row
+          .col.pe-4
+            = f.label :parent
+          .col
+            = cdx_select form: f, name: :parent_id, class: 'input-x-large' do |select|
+              - select.item "", "None"
+              - select.items @sites, :id, :name
+      - elsif @site.parent
+        .row
+          .col.pe-4
+            = f.label :parent
+          .col
+            = @site.parent.name
+
     .col
-      = f.text_field :name, :class => 'input-large'
-  - if @site.new_record? || @can_move
-    .row
-      .col.pe-2
-        = f.label :parent
-      .col
-        = cdx_select form: f, name: :parent_id, class: 'input-x-large' do |select|
-          - select.item "", "None"
-          - select.items @sites, :id, :name
-  - elsif @site.parent
-    .row
-      .col.pe-2
-        = f.label :parent
-      .col
-        = @site.parent.name
+      = render 'side'
+
   = site_address_component(@site)
   .row
     .col.pe-2

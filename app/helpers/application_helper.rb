@@ -27,6 +27,10 @@ module ApplicationHelper
     has_access?(TestResult, Policy::Actions::QUERY_TEST)
   end
 
+  def has_access_to_users_index?
+    has_access?(Site, Policy::Actions::READ_SITE_USERS) || has_access?(Institution, Policy::Actions::READ_INSTITUTION_USERS)
+  end
+
   def can_delegate_permissions?
     current_user.computed_policies.any? &:delegable?
   end

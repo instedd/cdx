@@ -1,31 +1,35 @@
 .row
-  .col.pe-2
-    = label_tag :institution
   .col
-    .value= @site.institution.name
-
-.row
-  .col.pe-2
-    = label_tag :name
-  .col
-    .value= @site.name
-
-- if @site.parent && !@can_edit_parent
-  .row
-    .col.pe-2
-      = label_tag :parent
-    .col
-      .value= @site.parent.name
-- elsif @can_edit_parent
-  = form_for(@site) do |f|
-    = validation_errors @site
     .row
-      .col.pe-2
-        = label_tag :parent
+      .col.pe-4
+        = label_tag :institution
       .col
-        = cdx_select form: f, name: :parent_id, class: 'input-x-large' do |select|
-          - select.item "", "None"
-          - select.items @sites, :id, :name
+        .value= @site.institution.name
+
+    .row
+      .col.pe-4
+        = label_tag :name
+      .col
+        .value= @site.name
+
+    - if @site.parent && !@can_edit_parent
+      .row
+        .col.pe-4
+          = label_tag :parent
+        .col
+          .value= @site.parent.name
+    - elsif @can_edit_parent
+      = form_for(@site) do |f|
+        = validation_errors @site
+        .row
+          .col.pe-4
+            = label_tag :parent
+          .col
+            = cdx_select form: f, name: :parent_id, class: 'input-x-large' do |select|
+              - select.item "", "None"
+              - select.items @sites, :id, :name
+  .col
+    = render 'side'
 
 .row
   .col.pe-2
@@ -57,5 +61,3 @@
     = label_tag :email_address
   .col
     .value= @site.email_address
-
-
