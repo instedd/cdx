@@ -41,6 +41,7 @@ class DevicesController < ApplicationController
   def new
     @device = Device.new
     @device.time_zone = "UTC"
+    @device.site = check_access(@navigation_context.site, ASSIGN_DEVICE_SITE) if @navigation_context.site
     return unless prepare_for_institution_and_authorize(@device, REGISTER_INSTITUTION_DEVICE)
   end
 

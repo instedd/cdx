@@ -148,6 +148,18 @@ describe DevicesController do
       expect(response).to be_success
     end
 
+    it "should initialize no site if context is institution" do
+      get :new, context: institution.uuid
+      expect(response).to be_success
+      expect(assigns(:device).site).to be_nil
+    end
+
+    it "should initialize site if context is site" do
+      get :new, context: site.uuid
+      expect(response).to be_success
+      expect(assigns(:device).site).to eq(site)
+    end
+
     it "loads published device models and from allowed institutions" do
       published = device_model
       unpublished = institution.device_models.make(:unpublished)
