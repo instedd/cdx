@@ -88,6 +88,8 @@ header {
     width: 100%;
     padding: 2px;
     position: absolute;
+    right: 0;
+    min-width: 150px;
     visibility: hidden;
     z-index: 1;
     transition: visibility 0.2s;
@@ -97,6 +99,7 @@ header {
       color: $gray-xdark;
       display: block;
       padding: 10px;
+      white-space: nowrap;
       &:hover {
         background: $white-light;
         color: $black;

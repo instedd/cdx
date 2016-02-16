@@ -43,7 +43,7 @@
 
   .user{:tabindex => "0"}
     - if current_user
-      %span= current_user.email
+      %span.icon-user.medium.icon-gray-light{title: current_user.email}
       %ul
         - unless @hide_user_settings
           %li= link_to "Settings", edit_user_registration_path
