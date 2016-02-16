@@ -12,9 +12,13 @@ module SiteContained
     validate :same_institution_of_site
     before_save :set_site_prefix
 
-    scope :within, -> (institution_or_site) {
-      if institution_or_site.is_a?(Institution)
+    scope :within, -> (institution_or_site, exclude_subsites = false) {
+      if institution_or_site.is_a?(Institution) && exclude_subsites
+        where(institution: institution_or_site, site: nil)
+      elsif institution_or_site.is_a?(Institution) && !exclude_subsites
         where(institution: institution_or_site)
+      elsif institution_or_site.is_a?(Site) && exclude_subsites
+        where("site_id = ?", institution_or_site.id)
       else
         where("site_prefix LIKE concat(?, '%')", institution_or_site.prefix)
       end

@@ -16,6 +16,7 @@
 //= require jquery.are-you-sure
 //= require urijs
 //= require lodash
+//= require polyfills
 //= require leaflet
 //= require leaflet-control-geocoder
 //= require classnames

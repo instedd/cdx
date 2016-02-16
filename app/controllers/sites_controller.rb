@@ -5,7 +5,7 @@ class SitesController < ApplicationController
   end
 
   def index
-    @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
+    @sites = check_access(Site.within(@navigation_context.entity, @navigation_context.exclude_subsites), READ_SITE)
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
     apply_filters
 

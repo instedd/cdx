@@ -15,9 +15,15 @@ class Patient < ActiveRecord::Base
   validates_uniqueness_of :entity_id, scope: :institution_id, allow_nil: true
   validate :entity_id_not_changed
 
-  scope :within, -> (institution_or_site) {
+  scope :within, -> (institution_or_site, exclude_subsites = false) {
     if institution_or_site.is_a?(Institution)
-      where(institution: institution_or_site)
+      if exclude_subsites
+        where(institution: institution_or_site, site: nil)
+      else
+        where(institution: institution_or_site)
+      end
+    elsif exclude_subsites
+      where("site_id = ? OR id in (#{Encounter.within(institution_or_site, true).select(:patient_id).to_sql})", institution_or_site)
     else
       where("site_prefix LIKE concat(?, '%') OR id in (#{Encounter.within(institution_or_site).select(:patient_id).to_sql})", institution_or_site.prefix)
     end

@@ -96,8 +96,14 @@ class TestResultsController < ApplicationController
   def create_filter_for_navigation_context
     filter = {}
     filter["institution.uuid"] = @navigation_context.institution.uuid if @navigation_context.institution
-    # site.path is used in order to select entitites of descending sites also
-    filter["site.path"] = @navigation_context.site.uuid if @navigation_context.site
+    if @navigation_context.exclude_subsites && @navigation_context.site
+      filter["site.uuid"] = @navigation_context.site.uuid
+    elsif !@navigation_context.exclude_subsites && @navigation_context.site
+      # site.path is used in order to select entitites of descending sites also
+      filter["site.path"] = @navigation_context.site.uuid
+    elsif @navigation_context.exclude_subsites
+      filter["site.uuid"] = "null"
+    end
     filter
   end
 
@@ -141,8 +147,8 @@ class TestResultsController < ApplicationController
 
   def load_filter_resources
     _institutions, @sites, @devices = Policy.condition_resources_for(QUERY_TEST, TestResult, current_user).values
-    @sites = @sites.within(@navigation_context.entity)
-    @devices = @devices.within(@navigation_context.entity)
+    @sites = @sites.within(@navigation_context.entity, @navigation_context.exclude_subsites)
+    @devices = @devices.within(@navigation_context.entity, @navigation_context.exclude_subsites)
     @devices_by_uuid = @devices.index_by &:uuid
   end
 end

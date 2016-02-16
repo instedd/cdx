@@ -17,9 +17,13 @@ class Role < ActiveRecord::Base
 
   scope :predefined, ->{ where.not(key: nil) }
 
-  scope :within, -> (institution_or_site) {
-    if institution_or_site.is_a?(Institution)
+  scope :within, -> (institution_or_site, exclude_subsites = false) {
+    if institution_or_site.is_a?(Institution) && exclude_subsites
+      where(institution: institution_or_site, site: nil)
+    elsif institution_or_site.is_a?(Institution) && !exclude_subsites
       where(institution: institution_or_site)
+    elsif institution_or_site.is_a?(Site) && exclude_subsites
+      where("roles.site_id = ?", institution_or_site.id)
     else
       ids = Site.within(institution_or_site).pluck(:id)
       where("roles.site_id IN (?)", ids)

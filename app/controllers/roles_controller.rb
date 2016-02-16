@@ -2,8 +2,8 @@ class RolesController < ApplicationController
   before_filter :load_institutions_and_sites, only: [:new, :create, :edit, :update]
 
   def index
-    @roles = check_access(Role, READ_ROLE).within(@navigation_context.entity).includes(:institution, :site)
-    @user_counts = check_access(Role, READ_ROLE).within(@navigation_context.entity).joins("LEFT JOIN roles_users ON roles.id = roles_users.role_id").group("roles.id").count(:user_id)
+    @roles = check_access(Role, READ_ROLE).within(@navigation_context.entity, @navigation_context.exclude_subsites).includes(:institution, :site)
+    @user_counts = check_access(Role, READ_ROLE).within(@navigation_context.entity, @navigation_context.exclude_subsites).joins("LEFT JOIN roles_users ON roles.id = roles_users.role_id").group("roles.id").count(:user_id)
     @can_create = has_access?(Role, UPDATE_ROLE)
 
     @roles = @roles.where("name LIKE ?", "%#{params[:name]}%") if params[:name].present?
