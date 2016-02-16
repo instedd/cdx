@@ -309,7 +309,7 @@ describe DeviceMessageImporter, elasticsearch: true do
           (test["_source"]["test"]["error_description"] || "") +
             (test["_source"]["test"]["assays"].first['quantitative_result'].to_s || "")
         end
-        expect(tests.size).to eq(559)
+        expect(tests.size).to eq(38)
 
         test = tests[0]["_source"]["test"]
         expect(test["assays"][0]["name"]).to eq("PIMA CD4")
@@ -325,7 +325,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(test["error_description"]).to eq('Test not finished Error 200')
 
         dbtests = TestResult.all
-        expect(dbtests.size).to eq(559)
+        expect(dbtests.size).to eq(38)
         expect(dbtests.map(&:uuid)).to match_array(tests.map {|e| e['_source']['test']['uuid']})
       end
     end
