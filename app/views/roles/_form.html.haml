@@ -1,7 +1,7 @@
 = form_for @role do |f|
   - if @role.errors.any?
     #error_explanation
-      %p= "#{pluralize(@role.errors.count, "error")} prohibited this @role from being saved:"
+      %p= "#{pluralize(@role.errors.count, "error")} prohibited this role from being saved:"
       %ul
         - @role.errors.full_messages.each do |msg|
           %li= msg
