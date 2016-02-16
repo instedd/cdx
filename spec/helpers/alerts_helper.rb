@@ -59,8 +59,5 @@ RSpec.describe AlertsHelper, type: :helper do
       expect(StrFormat.count(',')).to eq(1)
     end
 
-
   end
 end
-
-

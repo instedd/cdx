@@ -208,13 +208,13 @@ var AlertCategorySelect = React.createClass({
 
 					<div className="row">
 						<div className="col pe-2">
-							<label>Categories</label >
+							<label>Categories</label>
 							</div>
 							<div className="col" >
-								<input type="radio" name="category_type" value={category_keys[0]}  
-								 onChange={this.categoryChanged} 
-								 id={category_keys[0]} 
-								 disabled={this.props.edit} 
+								<input type="radio" name="category_type" value={category_keys[0]}
+								 onChange={this.categoryChanged}
+								 id={category_keys[0]}
+								 disabled={this.props.edit}
 								/>
 								<label htmlFor={category_keys[0]}>Anomalies</label>
 							</div>
@@ -359,7 +359,7 @@ var AlertCategorySelect = React.createClass({
 								<AlertDelete edit={this.props.edit} onChangeParentLevel={this.AlertDeleteHandler} />
 							</div>
 						</div>
-					</form >
+					</form>
 				</div>
 			);
 		}

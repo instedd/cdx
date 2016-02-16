@@ -3,7 +3,6 @@ var FlashErrorMessages = React.createClass({
   getInitialState: function() {
     return {messages: this.props.messages};
   },
-
   render: function() {
     return (
 	    <div id="#flash_messages" >
@@ -21,5 +20,4 @@ var FlashErrorMessages = React.createClass({
       </div>
     )
   }
-
 });

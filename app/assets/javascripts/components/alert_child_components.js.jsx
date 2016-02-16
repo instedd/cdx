@@ -468,11 +468,11 @@ var AlertUser = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row" >
-			<div className = "col pe-2" >
-				<label >Internal Recipient< /label>
+			<div className = "row">
+			<div className = "col pe-2">
+				<label>Internal Recipient</label>
 				</div>
-				<div className = "col" >
+				<div className = "col">
 					<Select
 						name = "user"
 						value = {
