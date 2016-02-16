@@ -8,7 +8,14 @@
       var isFileChosen = fileInput.val() != '';
       deleteCheckbox.prop('checked', !isFileChosen);
     });
+
+    // Show filename pattern block only if ftp is checked
+    $('#device_model_supports_ftp').change(function() {
+      var checked = $(this).is(':checked');
+      $('.device-model-filename-pattern').toggle(checked).find('input').prop('disabled', !checked);
+    }).trigger('change');
   });
+
   $(document).ready(function(){
     // Drag Picture to an input file and preview it
     var imageLoader = document.getElementById('device_model_picture');
@@ -119,6 +126,19 @@
         .col
           = f.text_field :support_url
 
+      .row
+        .col.pe-4
+          = f.label :supports_ftp
+        .col
+          = f.check_box :supports_ftp
+          = f.label :supports_ftp, "&nbsp;".html_safe
+
+      .row.device-model-filename-pattern
+        .col.pe-4
+          = f.label :filename_pattern
+        .col
+          = f.text_field :filename_pattern
+
     .col
       .choose-picture
         - unless @device_model.new_record? || @device_model.picture.blank?
@@ -150,4 +170,3 @@
 
 :javascript
   custom_input_file( jQuery, window, document );
-

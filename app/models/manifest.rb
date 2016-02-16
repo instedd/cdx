@@ -110,7 +110,7 @@ class Manifest < ActiveRecord::Base
     when "json"
       JsonMessageParser.new
     when "csv"
-      CSVMessageParser.new metadata["source"]["separator"] || CSVMessageParser::DEFAULT_SEPARATOR
+      CSVMessageParser.new(metadata["source"]["separator"] || CSVMessageParser::DEFAULT_SEPARATOR, metadata["source"]["skip_lines_at_top"] || CSVMessageParser::DEFAULT_TOP_LINES_SKIPPED)
     when "headless_csv"
       HeadlessCSVMessageParser.new metadata["source"]["separator"] || CSVMessageParser::DEFAULT_SEPARATOR
     when "xml"

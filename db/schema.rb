@@ -99,6 +99,8 @@ ActiveRecord::Schema.define(version: 20160210193741) do
     t.string   "setup_instructions_content_type", limit: 255
     t.integer  "setup_instructions_file_size",    limit: 4
     t.datetime "setup_instructions_updated_at"
+    t.boolean  "supports_ftp"
+    t.string   "filename_pattern",                limit: 255
   end
 
   add_index "device_models", ["published_at"], name: "index_device_models_on_published_at", using: :btree
@@ -117,6 +119,11 @@ ActiveRecord::Schema.define(version: 20160210193741) do
     t.string   "serial_number",    limit: 255
     t.string   "site_prefix",      limit: 255
     t.string   "activation_token", limit: 255
+    t.string   "ftp_hostname",     limit: 255
+    t.string   "ftp_username",     limit: 255
+    t.string   "ftp_password",     limit: 255
+    t.string   "ftp_directory",    limit: 255
+    t.integer  "ftp_port",         limit: 4
   end
 
   create_table "encounters", force: :cascade do |t|
@@ -139,6 +146,22 @@ ActiveRecord::Schema.define(version: 20160210193741) do
 
   add_index "encounters", ["deleted_at"], name: "index_encounters_on_deleted_at", using: :btree
   add_index "encounters", ["site_id"], name: "index_encounters_on_site_id", using: :btree
+
+  create_table "file_messages", force: :cascade do |t|
+    t.string  "filename",          limit: 255
+    t.string  "status",            limit: 255
+    t.text    "message",           limit: 65535
+    t.integer "device_id",         limit: 4
+    t.integer "device_message_id", limit: 4
+    t.string  "ftp_hostname",      limit: 255
+    t.string  "ftp_username",      limit: 255
+    t.string  "ftp_password",      limit: 255
+    t.string  "ftp_directory",     limit: 255
+    t.integer "ftp_port",          limit: 4
+  end
+
+  add_index "file_messages", ["device_id"], name: "index_file_messages_on_device_id", using: :btree
+  add_index "file_messages", ["ftp_hostname", "ftp_port", "ftp_directory", "status"], name: "index_file_messages_on_ftp_and_status", using: :btree
 
   create_table "filters", force: :cascade do |t|
     t.integer  "user_id",    limit: 4

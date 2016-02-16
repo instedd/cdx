@@ -12,8 +12,11 @@ class Device < ActiveRecord::Base
   has_many :device_messages
   has_many :device_logs
   has_many :device_commands
+  has_many :file_messages
 
   serialize :custom_mappings, JSON
+
+  composed_of :ftp_info, mapping: FtpInfo.mapping('ftp_')
 
   attr_reader :plain_secret_key
 
@@ -21,6 +24,9 @@ class Device < ActiveRecord::Base
   validates_presence_of :name
   validates_presence_of :serial_number
   validates_presence_of :device_model
+
+  validates :ftp_hostname, presence: { message: " is required if any other FTP setting is present" }, unless: Proc.new { |d| [d.ftp_port, d.ftp_username, d.ftp_password, d.ftp_directory].all?(&:blank?) }
+  validates :ftp_port, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 65535 }, allow_blank: true
 
   validate :unpublished_device_model_from_institution
 

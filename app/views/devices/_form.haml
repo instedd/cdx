@@ -39,6 +39,17 @@
     .col
       = cdx_select form: f, name: :time_zone, class: 'input-x-large' do |select|
         - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
+  - if @device.new_record? || @device.device_model.try(:supports_ftp)
+    .device-ftp-config{class: ('nodisplay' unless @device.device_model.try(:supports_ftp))}
+      .row
+        .col.pe-2= f.label :ftp_hostname, 'FTP'
+        .col.pe-2= f.text_field :ftp_hostname, placeholder: 'Hostname'
+        .col.pe-2= f.number_field :ftp_port, min: 0, max: 65535, placeholder: 'Port'
+        .col.pe-2= f.text_field :ftp_directory, placeholder: 'Folder'
+      .row
+        .col.pe-2= f.label :ftp_username, 'Login'
+        .col.pe-2= f.text_field :ftp_username, placeholder: 'Username', autocomplete: 'off'
+        .col.pe-2= f.password_field :ftp_password, value: @device.ftp_password, placeholder: 'Password', autocomplete: 'off'
   #custom_mappings
     = render "custom_mappings" if @device.device_model
 
@@ -52,6 +63,11 @@
   $ ->
     selected_device_model_id = #{@device.device_model_id.to_s.to_json}
     cdx_select_on_change "device[device_model_id]", (device_model_id) ->
+      # Hide/show ftp config info
+      supports_ftp = _.find(gon.device_models, (dm) -> dm.id == parseInt(device_model_id)).supports_ftp
+      $('.device-ftp-config').toggle(!!supports_ftp).find('input').prop('disabled', !supports_ftp)
+
+      # Load custom mappings
       if device_model_id != selected_device_model_id
         $("#custom_mappings").load(
           "/devices/custom_mappings",

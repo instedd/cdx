@@ -14,6 +14,9 @@ class DeviceModel < ActiveRecord::Base
 
   validates_uniqueness_of :name
 
+  validates_presence_of :filename_pattern, if: :supports_ftp
+  validate :valid_filename_pattern
+
   accepts_nested_attributes_for :manifest
 
   #This is kept for forward compatibility (we will have multiple manifests, published and unpublished)
@@ -60,4 +63,13 @@ class DeviceModel < ActiveRecord::Base
     devices.each(&:destroy_cascade!)
     devices(true) # Reload devices relation so destroy:restrict does not prevent the record from being destroyed
   end
+
+  def valid_filename_pattern
+    return if filename_pattern.blank?
+    regex = Regexp.new(filename_pattern)
+    errors.add(:filename_pattern, "must capture device serial number as 'sn', for example: (?<sn>[A-Z0-9]+).*\\.csv") unless regex.names.include?('sn')
+  rescue RegexpError => ex
+    errors.add(:filename_pattern, "must be a valid pattern (#{ex.message})")
+  end
+
 end

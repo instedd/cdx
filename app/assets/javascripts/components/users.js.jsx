@@ -54,7 +54,6 @@ var UserInviteForm = React.createClass({
   },
 
   addUser: function(users) {
-    console.log(users);
     this.setState(React.addons.update(this.state, {
       users: { $set: users }
     }));

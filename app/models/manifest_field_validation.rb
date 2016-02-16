@@ -52,7 +52,7 @@ class ManifestFieldValidation
       end
     else
       value.is_a?(Float) || value.to_f.to_s == value
-    end
+    end || is_an_integer?(value)
   end
 
   def verify_value_is_not_null_string value
