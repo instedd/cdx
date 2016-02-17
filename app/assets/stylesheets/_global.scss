@@ -71,6 +71,9 @@ hr {
   min-height: 30px;
 }
 
+.wrap-text {
+  word-wrap: break-word;
+}
 
 .underline {
   border-bottom: 1px solid $gray2;
@@ -268,7 +271,7 @@ a[title="Back"] {
 
 }
 
-.flash-error-reactjs { 
+.flash-error-reactjs {
   @extend .flash;
   position: inherit;
 }
