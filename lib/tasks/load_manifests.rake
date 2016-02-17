@@ -6,7 +6,7 @@ namespace :manifests do
     raise "Please specify `PASSWORD` environment variable to be used as the default password for all admins" if default_password.blank?
 
     data = {
-      'gene_xpert' => {
+      'genexpert' => {
         title: 'GeneXpert',
         activation: true,
         institution: 'Cepheid',
@@ -27,7 +27,7 @@ namespace :manifests do
         institution: 'Hain Lifescience',
         owner: 'hain_admin@instedd.org'
       },
-      'ese_quant_lr3' => {
+      'esequant_lr3' => {
         title: 'EseQuant LR3',
         activation: false,
         institution: 'Qiagen',
