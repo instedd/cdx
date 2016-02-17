@@ -36,6 +36,11 @@ var UserInviteForm = React.createClass({
       users: this.state.users.map(function(i){return i.value}),
       role: this.state.role
     };
+
+    if (data.users.length == 0) {
+      data.users = [this.refs.usersList.currentSearch()];
+    }
+
     if(this.state.includeMessage)
       data.message = this.state.message;
     $.ajax({
@@ -87,7 +92,7 @@ var UserInviteForm = React.createClass({
 
       <div className="row">
         <div className="col pe-3"><label>Users</label></div>
-        <div className="col"><OptionList
+        <div className="col"><OptionList ref="usersList"
           callback={this.addUser}
           autocompleteCallback="/users/autocomplete"
           context={this.props.context}

@@ -32,6 +32,21 @@ describe "invite user" do
       expect(page).to have_content 'You are now signed in'
       expect(email_count).to eq(1)
     end
+
+    it "should invite single user without pressing enter" do
+      goto_page UserViewPage do |page|
+        page.open_invite_users do |modal|
+          modal.role.set "#{institution.name} Admin"
+          modal.users.set("sarah@acme.org")
+          modal.submit
+        end
+
+        snapshot
+
+        expect(page).to have_content 'Invitation sent'
+        expect(page).to have_content 'sarah@acme.org'
+      end
+    end
   end
 
   def extract_invite_url(email)

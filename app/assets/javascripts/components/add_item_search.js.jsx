@@ -27,6 +27,9 @@ var AddItemSearch = React.createClass({
     this.setState(React.addons.update(this.state, {
       query: { $set: event.target.value }
     }));
+    if (this.props.onSearchChanged != null) {
+      this.props.onSearchChanged(event.target.value);
+    }
     this.handleSearchDebounced();
   },
 

@@ -3,7 +3,8 @@ var OptionList = React.createClass({
     return {
       chosenOnes: this.props.chosenOnes ? this.props.chosenOnes : [],
       showInput: this.props.showInput ? this.props.showInput : false,
-      placeholder: this.props.placeholder ? this.props.placeholder : "Search"
+      placeholder: this.props.placeholder ? this.props.placeholder : "Search",
+      currentSearch: ""
     }
   },
 
@@ -69,6 +70,16 @@ var OptionList = React.createClass({
     }));
   },
 
+  onSearchChanged: function(value) {
+    this.setState(React.addons.update(this.state, {
+      currentSearch : { $set : value },
+    }));
+  },
+
+  currentSearch: function() {
+    return this.state.currentSearch;
+  },
+
   render: function() {
     return (
       <div className="option-list">
@@ -85,7 +96,8 @@ var OptionList = React.createClass({
                 itemTemplate={AddItemOptionList}
                 itemKey="value"
                 onNonExistentItem={this.appendNonExistantItem}
-                placeholder={this.state.placeholder} /> : null }
+                placeholder={this.state.placeholder}
+                onSearchChanged={this.onSearchChanged} /> : null }
       </div>
     );
   }
