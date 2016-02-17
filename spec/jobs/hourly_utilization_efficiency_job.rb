@@ -9,7 +9,7 @@ describe HourlyUtilizationEfficiencyJob, elasticsearch: true do
   let(:worker) { HourlyUtilizationEfficiencyJob.new }
 
   context "end to end alert Utilization Efficiency test" do
-    before(:each) do
+    before(:example) do
       @alert = Alert.make
       @alert.user = institution.user
       @alert.category_type = "utilization_efficiency"
@@ -28,7 +28,7 @@ describe HourlyUtilizationEfficiencyJob, elasticsearch: true do
       @alert.save
     end
 
-    after(:each) do
+    after(:example) do
       @alert.destroy
     end
 

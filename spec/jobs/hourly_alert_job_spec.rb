@@ -10,7 +10,7 @@ describe HourlyAlertJob, elasticsearch: true do
   let(:worker) { HourlyAlertJob.new }
 
   context "end to end alert aggregation test" do
-    before(:each) do
+    before(:example) do
       @alert = Alert.make
       @alert.user = institution.user
       @alert.category_type == "device_errors"
@@ -26,7 +26,7 @@ describe HourlyAlertJob, elasticsearch: true do
       @alert.save
     end
 
-    after(:each) do
+    after(:example) do
       @alert.destroy
     end
 

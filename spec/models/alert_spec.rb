@@ -31,7 +31,6 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
       alert.error_code="aa"
       expect(alert).to_not be_valid
     end
-
   end
 
   context "validate soft delete" do
@@ -48,11 +47,9 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
       deleted_alert_id = Alert.with_deleted.where(id: alert.id).pluck(:id)
       expect(deleted_alert_id).to eq([alert.id])
     end
-
   end
 
   context "validate perculator" do
-
     it "creates a perculator" do
       alert = Alert.make
       alert.query = {"test.error_code"=>"155"}
@@ -66,7 +63,6 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
       #     Note: I had these lines below but for soem reason the test woudl only pass when i had a binding.pry inserted here
       #      result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
       #      expect(result["hits"]["total"]).to eq(before_count+1)
-
     end
   end
 
@@ -96,6 +92,7 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
     expect(result["hits"]["total"]).to eq(0)
   end
 
+
   it "deletes percolator when the alert is disabled" do
     alert = Alert.make
     alert.query = {"test.error_code"=>"155"}
@@ -112,5 +109,4 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
     result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
     expect(result["hits"]["total"]).to eq(0)
   end
-
 end
