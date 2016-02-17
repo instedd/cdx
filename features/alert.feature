@@ -10,8 +10,8 @@ Feature: create an alert
     Then the user should have an incident
 
   Scenario: Successful create anomalie category alert with all fields
-    Given the user creates a new anomalie category alert with all fields with name "errorcodealer1"
-    Then the user should see in list alerts "errorcodealer1"
+    Given the user creates a new anomalie category alert with all fields with name "errorcodealer1a"
+    Then the user should see in list alerts "errorcodealer1a"
 
   Scenario: Successful create testresult category alert with all fields
     Given the user creates a new testresult alert with all fields with name "errorcodealer5"

@@ -33,7 +33,8 @@ Given(/^the user creates a new error category alert with all fields with name "(
     form.channel.set_exact "sms"
     alert_form_fillin_externaluser(form)
     form.new_externaluser.click
-    form.submit.click
+ #   form.submit.click
+     find_button("submit").trigger('click')
   end
 end
 
@@ -62,7 +63,8 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     alert_form_fillin_externaluser(form)
     form.new_externaluser.click
 
-    form.submit.click
+#    form.submit.click
+find_button("submit").trigger('click')
   end
 end
 
@@ -92,7 +94,8 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
     form.condition_results.set_exact_multi "positive"
 
     form.new_externaluser.click
-    form.submit.click
+  #  form.submit.click
+  find_button("submit").trigger('click')
   end
 end
 
@@ -120,7 +123,8 @@ Given(/^the user Successful creates a new utilization efficiency category with a
     form.sampleid.set 'ABC'
 
     form.new_externaluser.click
-    form.submit.click
+ #   form.submit.click
+ find_button("submit").trigger('click')
   end
 end
 
