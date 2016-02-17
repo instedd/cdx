@@ -82,11 +82,10 @@ class RolesController < ApplicationController
             throw ex
           end
         end
-        
+
         redirect_to roles_path, notice: 'Role was successfully updated.'
       end
     rescue
-      @role.policy = nil
       @role.definition = role_params[:definition]
       render_with_definitions 'edit'
     end
