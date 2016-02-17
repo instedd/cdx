@@ -94,8 +94,8 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
     form.condition_results.set_exact_multi "positive"
 
     form.new_externaluser.click
-  #  form.submit.click
-  find_button("submit").trigger('click')
+    #  form.submit.click
+    find_button("submit").trigger('click')
   end
 end
 
@@ -123,8 +123,8 @@ Given(/^the user Successful creates a new utilization efficiency category with a
     form.sampleid.set 'ABC'
 
     form.new_externaluser.click
- #   form.submit.click
- find_button("submit").trigger('click')
+    # form.submit.click
+    find_button("submit").trigger('click')
   end
 end
 
