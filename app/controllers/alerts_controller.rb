@@ -146,25 +146,23 @@ class AlertsController < ApplicationController
       if alert_info.category_type == "anomalies"
         # check that the start_time field is not missing
         if alert_info.anomalie_type == "missing_sample_id"
-          alert_info.query = {"sample.id"=>"null" }
+          alert_info.query = {"sample.id"=>"not(null)" }
         elsif alert_info.anomalie_type == "missing_start_time"
-          alert_info.query = {"test.start_time"=>"null" }
+          alert_info.query = {"test.start_time"=>"not(null)" }
         end
 
       elsif alert_info.category_type == "device_errors"
         if alert_info.error_code && (alert_info.error_code.include? '-')
           minmax=alert_info.error_code.split('-')
           alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
-          #   alert_info.query=alert_info.query.merge ({"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]})
           #elsif alert_info.error_code.include? '*'
           #   alert_info.query =    {"test.error_code.wildcard" => "*7"}
         else
-          alert_info.query =    {"test.error_code"=>alert_info.error_code }
-          #   alert_info.query=alert_info.query.merge ({"test.error_code"=>alert_info.error_code });
+          alert_info.query = {"test.error_code"=>alert_info.error_code }
         end
 
       elsif alert_info.category_type == "test_results"
-        # core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}
+        #this will generate a query like: core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}
         if params[:alert][:conditions_info]
           conditions = params[:alert][:conditions_info].split(',')
           query_conditions=[]
@@ -182,29 +180,27 @@ class AlertsController < ApplicationController
             alert_condition_result = AlertConditionResult.new
             alert_condition_result.result = condition_result_name
             alert_condition_result.alert=alert_info
-
             if alert_condition_result.save == false
               condition_result_ok = false
               error_text = error_text.merge alert_condition_result.errors.messages
             end
-
             query_condition_results << condition_result_name
           end
         end
 
-        ##   alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
-        alert_info.query =    {"assays.quantitative_result.min" => "8"}
-        ####TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
+       alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
+        #TEST  alert_info.query =    {"assays.quantitative_result.min" => "8"}
+        #TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
 
       elsif alert_info.category_type == "utilization_efficiency"
         alert_info.aggregation_type = Alert.aggregation_types.key(1)  #for utilization, it is always an aggregation
         alert_info.utilization_efficiency_last_checked = Time.now
+        #Note: the sampleid must be set for this category -in a validation
       end
 
 
-      if params[:alert][:sample_id]
+      if (params[:alert][:sample_id]) && (params[:alert][:sample_id].length > 0) 
         alert_info.query=append_query(alert_info, {"sample.id"=>params[:alert][:sample_id]})
-        #     alert_info.query=alert_info.query.merge ({"sample.id"=>params[:alert][:sample_id]})
       end
 
       if params[:alert][:sites_info]
@@ -243,7 +239,7 @@ class AlertsController < ApplicationController
 
 
   def update
-    #update in model calls create
+    #note: the update in the alert model calls create
     if alert_info.enabled == false
       alert_info.delete_percolator
     end
@@ -278,7 +274,7 @@ class AlertsController < ApplicationController
 
     @conditions = Condition.all
     @condition_results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
-    #  @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
+    #Note: in case you need to specify the exact N/A:  @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
 
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }

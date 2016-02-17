@@ -201,10 +201,7 @@ var AlertCategorySelect = React.createClass({
 
 					<AlertName valueLink={this.linkState('nameField')} />
 
-					<AlertDescription valueLink = {
-							this.linkState('descriptionField')
-						}
-						/>
+					<AlertDescription valueLink={this.linkState('descriptionField')} />
 
 					<div className="row">
 						<div className="col pe-2">
@@ -286,8 +283,11 @@ var AlertCategorySelect = React.createClass({
 
 						<AlertCondition conditions={this.state.all_conditions} valueLink={this.linkState('conditionField')} disable_all_selects={this.state.disable_all_selects} />
 						<AlertConditionResults condition_results ={this.state.all_condition_results} valueLink={this.linkState('conditionResultsField')} disable_all_selects={this.state.disable_all_selects} />
+{				
+/*						
 						<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} edit={this.props.edit} />
-
+*/
+}
 						<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} edit={this.props.edit} />
 
 						<AlertAggregation aggregation_types = {

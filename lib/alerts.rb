@@ -10,23 +10,27 @@ module Alerts
 
     # if it has just alert the user
     alerts.each do |alert|
-      alert_history_count=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', frequency.ago).where('for_aggregation_calculation=true').count
-      if ( (alert_history_count > 0)  && (alert.aggregation_threshold > alert_history_count) )
-        alert_history_triggered(alert, alert_history_count)
+      begin
+        alert_history_count=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', frequency.ago).where('for_aggregation_calculation=true').count
+        if ( (alert_history_count > 0)  && (alert.aggregation_threshold > alert_history_count) )
+          alert_history_triggered(alert, alert_history_count)
+        end
+      rescue => e
+        Rails.logger.error { "Encountered an error when trying to run alert_history_check : #{alert.id}, #{e.message} #{e.backtrace.join("\n")}" }
       end
     end
   end
 
 
   def alert_history_triggered(alert, alert_history_count)
-     alertHistory = AlertHistory.new
-      alertHistory.alert = alert
-      alertHistory.user = alert.user
-      alertHistory.for_aggregation_calculation = false
-      alertHistory.save!
+    alertHistory = AlertHistory.new
+    alertHistory.alert = alert
+    alertHistory.user = alert.user
+    alertHistory.for_aggregation_calculation = false
+    alertHistory.save!
 
-      recipients_list=build_mailing_list(alert.alert_recipients)
-      alert_email_inform_recipient(alert, alertHistory, recipients_list, alert_history_count)
+    recipients_list=build_mailing_list(alert.alert_recipients)
+    alert_email_inform_recipient(alert, alertHistory, recipients_list, alert_history_count)
   end
 
 
@@ -66,7 +70,7 @@ module Alerts
     recipientNotificationHistory.alert = alert
     recipientNotificationHistory.alert_history = alert_history
     recipientNotificationHistory.user_id = alert.user.id
-  #  recipientNotificationHistory.recipient_user_id = user_id if user_id != nil
+    #  recipientNotificationHistory.recipient_user_id = user_id if user_id != nil
     recipientNotificationHistory.alert_recipient_id = alert_recipient_id
     recipientNotificationHistory.message_sent = messagebody
     recipientNotificationHistory.channel_type = alert.channel_type

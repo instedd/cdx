@@ -46,32 +46,32 @@ ActiveRecord::Schema.define(version: 20160216125851) do
   add_index "alert_recipients", ["user_id"], name: "index_alert_recipients_on_user_id", using: :btree
 
   create_table "alerts", force: :cascade do |t|
-    t.integer  "user_id",                          limit: 4
-    t.string   "name",                             limit: 255
-    t.string   "description",                      limit: 255
-    t.boolean  "enabled",                                        default: true
+    t.integer  "user_id",                             limit: 4
+    t.string   "name",                                limit: 255
+    t.string   "description",                         limit: 255
+    t.boolean  "enabled",                                           default: true
     t.datetime "last_alert"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "error_code",                       limit: 255
-    t.integer  "category_type",                    limit: 4
-    t.integer  "aggregation_type",                 limit: 4,     default: 0
-    t.text     "query",                            limit: 65535
-    t.text     "message",                          limit: 65535
-    t.integer  "channel_type",                     limit: 4,     default: 0
-    t.integer  "aggregation_frequency",            limit: 4,     default: 0
-    t.integer  "sms_limit",                        limit: 4,     default: 0
-    t.integer  "anomalie_type",                    limit: 4,     default: 0
-    t.boolean  "notify_patients",                                default: false
-    t.text     "sms_message",                      limit: 65535
+    t.string   "error_code",                          limit: 255
+    t.integer  "category_type",                       limit: 4
+    t.integer  "aggregation_type",                    limit: 4,     default: 0
+    t.text     "query",                               limit: 65535
+    t.text     "message",                             limit: 65535
+    t.integer  "channel_type",                        limit: 4,     default: 0
+    t.integer  "aggregation_frequency",               limit: 4,     default: 0
+    t.integer  "sms_limit",                           limit: 4,     default: 0
+    t.integer  "anomalie_type",                       limit: 4,     default: 0
+    t.boolean  "notify_patients",                                   default: false
+    t.text     "sms_message",                         limit: 65535
     t.datetime "deleted_at"
-    t.integer  "test_result_min_threshold",        limit: 4
-    t.integer  "test_result_max_threshold",        limit: 4
-    t.integer  "aggregation_threshold",            limit: 4,     default: 0
-    t.string   "sample_id",                        limit: 255
-    t.integer  "utilization_efficiency_frequency", limit: 4,     default: 0
-    t.integer  "utilization_efficiency_type",      limit: 4,     default: 0
-    t.integer  "utilization_efficiency_number",    limit: 4
+    t.integer  "test_result_min_threshold",           limit: 4
+    t.integer  "test_result_max_threshold",           limit: 4
+    t.integer  "aggregation_threshold",               limit: 4,     default: 0
+    t.string   "sample_id",                           limit: 255
+    t.integer  "utilization_efficiency_type",         limit: 4,     default: 0
+    t.integer  "utilization_efficiency_number",       limit: 4
+    t.datetime "utilization_efficiency_last_checked"
   end
 
   add_index "alerts", ["deleted_at"], name: "index_alerts_on_deleted_at", using: :btree
