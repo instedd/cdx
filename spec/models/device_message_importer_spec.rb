@@ -177,10 +177,10 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'cepheid' do
       let!(:device_model) { DeviceModel.make name: "GX Model I" }
-      let!(:manifest)    { load_manifest 'cepheid_gene_xpert_manifest.json' }
+      let!(:manifest)    { load_manifest 'genexpert_manifest.json' }
 
       it "should parse cepheid's document" do
-        copy_sample('cepheid_sample.json', 'jsons')
+        copy_sample('genexpert_sample.json', 'jsons')
         DeviceMessageImporter.new("*.json").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -332,10 +332,10 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'fio' do
       let(:device_model) { DeviceModel.make name: 'FIO' }
-      let!(:manifest) { load_manifest 'fio_manifest.json' }
+      let!(:manifest) { load_manifest 'deki_reader_manifest.json' }
 
       it 'parses xml' do
-        copy_sample_xml 'fio_sample.xml'
+        copy_sample_xml 'deki_reader_sample.xml'
         DeviceMessageImporter.new("*.xml").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -372,10 +372,10 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'BDMicroImager' do
       let!(:device_model) { DeviceModel.make name: "BD MicroImager" }
-      let!(:manifest)    { load_manifest 'bdmicro_imager_manifest.json' }
+      let!(:manifest)    { load_manifest 'micro_imager_manifest.json' }
 
-      it "should parse bdmicro's document" do
-        copy_sample('bdmicro_imager_sample.json', 'jsons')
+      it "should parse bd micro's document" do
+        copy_sample('micro_imager_sample.json', 'jsons')
         DeviceMessageImporter.new("*.json").import_from sync_dir
         expect(DeviceMessage.first.index_failure_reason).to be_nil
 
