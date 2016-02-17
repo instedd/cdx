@@ -57,31 +57,37 @@ class RolesController < ApplicationController
     @role = Role.find params[:id]
     return unless authorize_resource(@role, UPDATE_ROLE)
 
-    if (definition = role_params[:definition]).present?
-      begin
-        definition = JSON.parse(definition)
-      rescue => ex
-        @role.definition = role_params[:definition]
-        @role.errors.add :policy, ex.message
-        return render action: 'edit'
-      end
+    begin
+      Role.transaction do
+        @role.name = role_params[:name]
+        @role.save!
 
-      policy = @role.policy
-      policy.definition = definition
-      policy.allows_implicit = true
-      if policy.save
-        redirect_to roles_path, notice: 'Role was successfully updated.'
-      else
-        policy.errors[:definition].each do |error|
-          @role.errors.add :policy, error
+        if (definition = role_params[:definition]).present?
+          begin
+            definition = JSON.parse(definition)
+          rescue => ex
+            @role.errors.add :policy, ex.message
+            throw ex
+          end
+
+          policy = @role.policy
+          policy.definition = definition
+          policy.allows_implicit = true
+          begin
+            policy.save!
+          rescue => ex
+            policy.errors[:definition].each do |error|
+              @role.errors.add :policy, error
+            end
+            throw ex
+          end
         end
-        @role.definition = role_params[:definition]
-        render_with_definitions 'edit'
+        
+        redirect_to roles_path, notice: 'Role was successfully updated.'
       end
-    else
+    rescue
       @role.policy = nil
       @role.definition = role_params[:definition]
-      @role.save
       render_with_definitions 'edit'
     end
   end

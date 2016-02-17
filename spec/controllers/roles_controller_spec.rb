@@ -52,6 +52,68 @@ describe RolesController do
 
   end
 
+  context "update" do
+    let!(:role) { Role.make institution: institution }
+    let!(:initial_action) { role.policy.definition["statement"][0]["action"][0] }
+
+    it "should begin with non * action" do
+      expect(initial_action).to_not eq("*")
+    end
+
+    it "should be able to update the policy definition" do
+      put :update, id: role.id, role: { name: role.name, definition: policy_definition('device', '*').to_json }
+      role.reload
+      expect(role.policy.definition["statement"][0]["action"][0]).to eq("*")
+    end
+
+    it "should be able to update name" do
+      put :update, id: role.id, role: { name: "new-name", definition: policy_definition('device', '*').to_json }
+      role.reload
+      expect(role.name).to eq("new-name")
+      expect(role.policy.definition["statement"][0]["action"][0]).to eq("*")
+    end
+
+    it "should not change policy if name is invalid" do
+      put :update, id: role.id, role: { name: "", definition: policy_definition('device', '*').to_json }
+      role.reload
+      expect(role.name).to_not eq("")
+      expect(role.policy.definition["statement"][0]["action"][0]).to eq(initial_action)
+
+      expect(response).to render_template(:edit)
+      expect(assigns(:role).name).to eq("")
+      expect(JSON.parse(assigns(:role).definition)["statement"][0]["action"][0]).to eq("*")
+    end
+
+    it "should not change name if policy is empty" do
+      put :update, id: role.id, role: { name: "new-name", definition: "{statement:[]}" }
+      role.reload
+      expect(role.name).to_not eq("new-name")
+      expect(role.policy.definition["statement"][0]["action"][0]).to eq(initial_action)
+
+      expect(response).to render_template(:edit)
+      expect(assigns(:role).name).to eq("new-name")
+      expect(assigns(:role).definition).to eq("{statement:[]}")
+    end
+
+    it "should not change name if policy is invalid json" do
+      put :update, id: role.id, role: { name: "new-name", definition: "i am not a json" }
+      role.reload
+      expect(role.name).to_not eq("new-name")
+      expect(role.policy.definition["statement"][0]["action"][0]).to eq(initial_action)
+
+      expect(response).to render_template(:edit)
+      expect(assigns(:role).name).to eq("new-name")
+      expect(assigns(:role).definition).to eq("i am not a json")
+    end
+
+    it "should change name only if policy is empty" do
+      put :update, id: role.id, role: { name: "new-name", definition: "" }
+      role.reload
+      expect(role.name).to eq("new-name")
+      expect(role.policy.definition["statement"][0]["action"][0]).to eq(initial_action)
+    end
+  end
+
   context "authorizations" do
 
     let(:grantee) { User.make }
