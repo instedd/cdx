@@ -17,7 +17,7 @@ namespace :manifests do
         institution: 'BD',
         owner: 'bd_admin@instedd.org'
       },
-      'fio' => {
+      'deki_reader' => {
         activation: false,
         institution: "Fio Corporation",
         owner: "fio_admin@instedd.org"
