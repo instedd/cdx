@@ -11,6 +11,7 @@ class RolesController < ApplicationController
 
   def new
     @role = Role.new
+    @preselected_site = @navigation_context.site.try(:id) || nil
   end
 
   def create

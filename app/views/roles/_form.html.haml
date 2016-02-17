@@ -24,7 +24,7 @@
       .col.pe-2
         = f.label :site_id
       .col
-        = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+        = cdx_select form: f, name: :site_id, value: @preselected_site, class: 'input-x-large' do |select|
           - select.item "", "Choose one"
           - select.items @sites, :id, :name
   - elsif @role.site_id
