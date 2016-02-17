@@ -75,5 +75,4 @@ var AddItemSearch = React.createClass({
       </div>
     );
   }
-
 });

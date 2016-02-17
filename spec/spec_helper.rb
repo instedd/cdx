@@ -13,6 +13,7 @@ require 'capybara-screenshot/rspec'
 
 Capybara.javascript_driver = :poltergeist
 
+
 # HTTPI.log = false
 # Savon.log = false
 

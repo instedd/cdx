@@ -32,6 +32,26 @@ User.blueprint do
   confirmed_at { Time.now - 1.day }
 end
 
+Alert.blueprint do
+  name { Faker::Name.first_name }
+  description { Faker::Name.last_name }
+  message { 'test message' }
+  category_type {"anomalies"}
+  sms_limit {10000}
+  user
+end
+
+AlertRecipient.blueprint do
+  user
+  alert
+  recipient_type {AlertRecipient.recipient_types["external_user"]}
+  email {"aaa@aaa.com"}
+  telephone {123}
+  first_name {"bob"}
+  last_name {'smith'}
+end
+
+
 User.blueprint(:invited_pending) do
   confirmed_at nil
   invitation_token { SecureRandom.urlsafe_base64 }

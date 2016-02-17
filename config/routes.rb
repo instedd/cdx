@@ -91,6 +91,11 @@ Rails.application.routes.draw do
     end
   end
 
+
+  resources :alerts, except: [:show]
+  resources :incidents, only: [:index]
+  resources :alert_messages, only: [:index]
+
   scope :dashboards, controller: :dashboards do
     get :nndd
   end

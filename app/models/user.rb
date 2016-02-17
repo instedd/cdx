@@ -16,6 +16,10 @@ class User < ActiveRecord::Base
   has_many :granted_policies, class_name: "Policy", foreign_key: "granter_id"
   has_many :computed_policies
   has_and_belongs_to_many :roles
+  has_many :alerts
+  has_many :alert_histories
+  has_many :alert_recipients
+  has_many  :recipient_notification_history
 
   include Resource
 

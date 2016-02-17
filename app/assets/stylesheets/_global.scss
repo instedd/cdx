@@ -71,9 +71,6 @@ hr {
   min-height: 30px;
 }
 
-.wrap-text {
-  word-wrap: break-word;
-}
 
 .underline {
   border-bottom: 1px solid $gray2;
@@ -269,6 +266,11 @@ a[title="Back"] {
     cursor: pointer;
   }
 
+}
+
+.flash-error-reactjs { 
+  @extend .flash;
+  position: inherit;
 }
 
 .explore-link {

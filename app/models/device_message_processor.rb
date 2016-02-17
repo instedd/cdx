@@ -46,7 +46,6 @@ class DeviceMessageProcessor
       test_result = original_test || TestResult.new(institution: institution, device: device)
       test_result.device_messages << device_message
       test_result.test_result_parsed_data << TestResultParsedDatum.new(data: @parsed_message)
-
       test_blender = @blender.load(test_result)
 
       # Merge new attributes and sample id

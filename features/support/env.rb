@@ -57,13 +57,16 @@ end
 Cucumber::Rails::Database.javascript_strategy = :truncation
 require 'machinist/active_record'
 
-Dir[ File.dirname(__FILE__) + "/../../spec/support/blueprints*"].each {|file| require file }
+Dir[ File.dirname(__FILE__) + "/../../spec/support/*"].each {|file| require file }
 
 require 'capybara/cucumber'
 require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
 
 Capybara.default_driver = :poltergeist
+
+#needed for adding devices/sites to alert tests
+Before { LocationService.fake! }
 
 Before('@single_tenant') do
   Settings.single_tenant = true

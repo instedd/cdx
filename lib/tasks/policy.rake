@@ -2,12 +2,14 @@ namespace :policy do
 
   desc "Make a user a superadmin"
   task :make_superadmin, [:user_id] => :environment do |task, args|
+
     unless args[:user_id]
       puts "Usage: $> rake policy:make_superadmin[{user_id}] RAILS_ENV={env}"
       exit
     end
 
     user = User.find args[:user_id]
+
     user.grant_superadmin_policy
   end
 
@@ -154,7 +156,7 @@ namespace :policy do
         roles = Policy.predefined_institution_roles(institution)
         roles.each do |role|
           existing_role = Role.find_by_name(role.name)
-          existing_role.policy.try(:destroy)
+          existing_role.policy.destroy
           existing_role.policy = role.policy
           existing_role.save!
         end
@@ -166,7 +168,7 @@ namespace :policy do
         roles = Policy.predefined_site_roles(site)
         roles.each do |role|
           existing_role = Role.find_by_name(role.name)
-          existing_role.policy.try(:destroy)
+          existing_role.policy.destroy
           existing_role.policy = role.policy
           existing_role.save!
         end

@@ -119,8 +119,7 @@ GEM
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
     builder (3.2.2)
-    byebug (5.0.0)
-      columnize (= 0.9.0)
+    byebug (8.2.1)
     capistrano (3.1.0)
       i18n
       rake (>= 10.0.0)
@@ -203,7 +202,6 @@ GEM
       execjs
     coffee-script-source (1.9.1.1)
     colorize (0.7.7)
-    columnize (0.9.0)
     config (1.0.0)
       activesupport (>= 3.0)
       deep_merge (~> 1.0.0)
@@ -384,6 +382,9 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     ntlm-http (0.1.1)
+    nuntium_api (0.21)
+      json
+      rest-client
     oauth2 (1.0.0)
       faraday (>= 0.8, < 0.10)
       jwt (~> 1.0)
@@ -425,8 +426,8 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    pry-byebug (3.2.0)
-      byebug (~> 5.0)
+    pry-byebug (3.3.0)
+      byebug (~> 8.0)
       pry (~> 0.10)
     pry-clipboard (0.1.1)
       clipboard
@@ -675,6 +676,7 @@ DEPENDENCIES
   mysql2
   newrelic_rpm
   nokogiri (~> 1.6.7.2)
+  nuntium_api (~> 0.21)
   oj
   omniauth
   omniauth-google-oauth2

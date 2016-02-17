@@ -92,6 +92,10 @@ gem 'doorkeeper'
 gem 'faker'
 gem 'leaflet-rails'
 
+#send sms
+gem 'nuntium_api', '~> 0.21'
+
+
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs'
 end

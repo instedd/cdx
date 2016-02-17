@@ -11,3 +11,12 @@ google_maps_api_key:
 single_tenant: <%= ENV['SINGLE_TENANT'] %>
 db_per_branch: false
 use_demo_data: false
+
+alert_from_email: 'notifications@cdx.com'
+
+alert_sms_service_url: "https://nuntium.instedd.org"
+alert_sms_account_name: "CDx"
+alert_sms_application_name: "CDx-Dev"
+alert_sms_application_password: "cdx123cdx" 
+alert_sms_from_tel: "sms://442393162302"
+

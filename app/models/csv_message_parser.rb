@@ -22,7 +22,6 @@ class CSVMessageParser
     end
     headers = csv.shift
     csv.map do |row|
-      # binding.pry
       result = {}
       headers.each_with_index do |header, index|
         result[header] = row[index]

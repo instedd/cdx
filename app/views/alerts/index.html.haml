@@ -1,0 +1,49 @@
+.row
+  .col
+    = link_to "+", new_alert_path, class: 'btn-add side-link ontop fix', title: 'Add Alert'
+    = cdx_table title: alerts.size.to_s + ' Alert Groups' do |t|
+      - t.columns do
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "10%"}
+        %col{:width => "15%"}
+        %col{:width => "15%"}
+        %col{:width => "20%"}
+      - t.thead do
+        %tr
+          %th Name
+          %th Description
+          %th Enabled
+          %th Sites
+          %th Roles
+          %th Last Incident
+          
+      - t.tbody do
+        - alerts.each do |alert|
+          %tr
+            %td= link_to truncate(alert.name, length: 20), edit_alert_path(alert)
+            %td= link_to truncate(alert.description, length: 20), edit_alert_path(alert)
+            %td= link_to alert.enabled ? 'yes' : 'no', edit_alert_path(alert)
+            %td= link_to display_sites(alert), edit_alert_path(alert)
+            %td= link_to display_roles(alert), edit_alert_path(alert)
+            %td= link_to display_latest_alert_date(alert), edit_alert_path(alert)
+
+
+.pagination
+  = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
+  = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
+  %input.input-x-small.text-right{type: "text", name: "page", value: @page}
+  %span
+    of
+    = (@total.to_f / @page_size).ceil
+  %span(style="display: inline-block;")
+    = cdx_select name: "page_size_select", value: @page_size, class: 'input-large' do |select|
+      - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
+  :javascript
+    $(function(){
+      $(document).on('change', 'input[name=page_size_select]', function(){
+        $('input[name=page_size]').val($(this).val());
+        $('#filters-form').submit();
+      });
+    })
+           
