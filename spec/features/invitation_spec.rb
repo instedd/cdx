@@ -41,8 +41,6 @@ describe "invite user" do
           modal.submit
         end
 
-        snapshot
-
         expect(page).to have_content 'Invitation sent'
         expect(page).to have_content 'sarah@acme.org'
       end
