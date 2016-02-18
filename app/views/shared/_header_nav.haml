@@ -23,7 +23,7 @@
           %li{:class => params[:controller] == "devices" && "active"}
             = link_to "Devices", devices_path
         - if has_access?(Device, Policy::Actions::SUPPORT_DEVICE)
-          %li{:class => params[:controller] == "devicelogs" && "active"}
+          %li{:class => params[:controller] == "device_messages" && "active"}
             = link_to "Logs", device_messages_path
         - if has_access_to_device_models_index?
           %li{:class => params[:controller] == "device_models" && "active"}
@@ -35,7 +35,7 @@
             = link_to "Alerts", alerts_path
           %li{:class => params[:controller] == "incidents" && "active"}
             = link_to "Incidents", incidents_path
-          %li{:class => params[:controller] == "incidents" && "active"}
+          %li{:class => params[:controller] == "alert_messages" && "active"}
             = link_to "Alert Messages", alert_messages_path
         - if can_delegate_permissions?
           %li{:class => params[:controller] == "policies" && "active"}
