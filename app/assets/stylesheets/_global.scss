@@ -240,6 +240,10 @@ a[title="Back"] {
   display: inline-block;
   vertical-align: middle;
   height: 60px;
+  width: 180px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .flash {

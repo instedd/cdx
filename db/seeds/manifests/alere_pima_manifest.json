@@ -14,17 +14,17 @@
     "test.assays.condition" : "cd4_count",
     "test.assays.result" : "n/a",
     "test.assays.quantitative_result" : { "script" : "
-      if( message['ErrorMessage'] != '') {
-        message['CD3+CD4+ Value [cells/mm3]']
-      } else {
+      if( message['ErrorMessage'] != null) {
         null
+      } else {
+        message['CD3+CD4+ Value [cells/mm3]']
       }
     "},
     "test.error_description" : { "lookup" : "ErrorMessage" },
     "test.site_user" : { "lookup" : "Operator" },
     "test.start_time" : {"parse_date": [{"concat": [{"lookup": "Result Date"}, { "lookup" : "Start Time" }]}, "%Y-%m-%d%H:%M"]},
     "test.status" : { "script" : "
-      if( message['ErrorMessage'] != '') {
+      if( message['ErrorMessage'] != null) {
         'error'
       } else {
         'success'

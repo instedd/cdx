@@ -155,7 +155,7 @@ namespace :policy do
         puts institution.name
         roles = Policy.predefined_institution_roles(institution)
         roles.each do |role|
-          existing_role = Role.find_by_name(role.name)
+          existing_role = Role.find_or_create_by(name: role.name)
           existing_role.policy.destroy
           existing_role.policy = role.policy
           existing_role.save!
@@ -164,10 +164,10 @@ namespace :policy do
 
       puts "Updating site roles..."
       Site.all.each do |site|
-        puts "site.name"
+        puts site.name
         roles = Policy.predefined_site_roles(site)
         roles.each do |role|
-          existing_role = Role.find_by_name(role.name)
+          existing_role = Role.find_or_create_by(name: role.name)
           existing_role.policy.destroy
           existing_role.policy = role.policy
           existing_role.save!

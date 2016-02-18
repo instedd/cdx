@@ -3,7 +3,7 @@
     = image_tag 'cdx-logo.png'
 
   - if @navigation_context.try(:entity)
-    %a#nav-context(href='#')
+    %a#nav-context(href='#'){title: @navigation_context.name}
       at
       = @navigation_context.name
 
