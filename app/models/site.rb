@@ -87,7 +87,7 @@ class Site < ActiveRecord::Base
   end
 
   def generate_next_sample_entity_id!
-    self.with_lock do
+    self.with_lock do # if with_lock is removed, serialization will be lost (ref 46ccfd) fix #712
       current_time = Time.now.utc
       last_in_time_window = last_sample_identifier_entity_id
       date = last_sample_identifier_date || current_time
