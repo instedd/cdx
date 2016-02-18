@@ -169,6 +169,31 @@ describe SitesController do
       expect(site.reload.parent).to_not eq(new_parent)
     end
 
+    context "not changing parent site by user with institution:createSite policy" do
+      let!(:parent) { institution.sites.make }
+      let!(:site) { Site.make :child, parent: parent }
+      let!(:device) { Device.make site: site }
+      let!(:test) { TestResult.make device: device }
+
+      before(:each) {
+        patch :update, id: site.id, context: site.uuid, site: (
+          Site.plan(institution: institution).merge({ parent_id: parent.id, name: "new-name" })
+        )
+
+        site.reload
+      }
+
+      it "should update existing site with the new name" do
+        expect(site.parent_id).to eq(parent.id)
+        expect(site.name).to eq("new-name")
+      end
+
+      it "should keep devices and test" do
+        expect(site.devices).to eq([device])
+        expect(site.test_results).to eq([test])
+      end
+    end
+
     context "change parent site by user with institution:createSite policy" do
       let!(:new_parent) { institution.sites.make }
       let(:new_site) { Site.last }
