@@ -5,6 +5,6 @@ class InvitationMailer < ApplicationMailer
     @message = message
     invitation_link = accept_user_invitation_url(:invitation_token => @token)
 
-    mail(:from => 'from', :to => @user.email, :subject => "Invitation to Connected Diagnostics")
+    mail(:to => @user.email, :subject => "Invitation to Connected Diagnostics")
   end
 end
