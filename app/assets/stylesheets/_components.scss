@@ -69,6 +69,9 @@
 
 #confirmationModalContainer .modal {
   max-width: 480px;
+  .modal-content {
+    word-wrap: break-word;
+  }
 }
 
 .item-search {
