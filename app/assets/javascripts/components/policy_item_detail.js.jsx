@@ -1,4 +1,8 @@
 var PolicyItemDetail = React.createClass({
+  selectableResources: function() {
+    return ['device', 'testResult', 'encounter'];
+  },
+
   idFor: function(name) {
     return name + "-" + this.props.index;
   },
@@ -8,7 +12,11 @@ var PolicyItemDetail = React.createClass({
   },
 
   onResourceTypeChange: function(newValue) {
-    this.props.updateStatement({resourceType: { $set: newValue }});
+    var data = {resourceType: { $set: newValue }};
+    if(!this.selectableResources().includes(newValue)) {
+      data.statementType = { $set: 'all'};
+    };
+    this.props.updateStatement(data);
   },
 
   toggleIncludeSubsites: function() {
@@ -64,18 +72,17 @@ var PolicyItemDetail = React.createClass({
       "only": <div className="without-statement-type-only-list" />
     }
     var ifResourceTypeSelected = <div className="without-resource-type" />;
+    var ifResourcesSelectable = "";
     if(statement.resourceType != null) {
-      // FIXME: filter resources for other types - ie, 'site'
-      if(['device', 'testResult', 'encounter'].includes(statement.resourceType)) {
-        // TODO: replace DeviceList with OptionList
-        resourcesList[statement.statementType] = <div className={"with-statement-type-" + statement.statementType + "-list"}><DeviceList devices={statement.resourceList[statement.statementType]} addDevice={this.addResource} removeDevice={this.removeResourceAtIndex} context={this.props.context} isException={statement.statementType == 'except'} /></div>;
-      }
-
       var actions = this.props.actions[statement.resourceType];
       var resourcesLabel = this.resourcesLabel();
 
-      ifResourceTypeSelected = <div className="with-resource-type">
-        <div className="row section">
+      // FIXME: filter resources for other types - ie, 'site'
+      if(this.selectableResources().includes(statement.resourceType)) {
+        // TODO: replace DeviceList with OptionList
+        resourcesList[statement.statementType] = <div className={"with-statement-type-" + statement.statementType + "-list"}><DeviceList devices={statement.resourceList[statement.statementType]} addDevice={this.addResource} removeDevice={this.removeResourceAtIndex} context={this.props.context} isException={statement.statementType == 'except'} /></div>;
+
+        ifResourcesSelectable = (<div className="row section">
           <div className="col px-1">
             <label className="section-name">Resources</label>
           </div>
@@ -91,7 +98,12 @@ var PolicyItemDetail = React.createClass({
               {resourcesList['only']}
             </div>
           </div>
-        </div>
+        </div>);
+      }
+
+
+      ifResourceTypeSelected = <div className="with-resource-type">
+        {ifResourcesSelectable}
         <div className="row section">
           <div className="col px-1">
             <label className="section-name">Actions</label>
