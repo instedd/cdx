@@ -24,7 +24,7 @@ module Reports
       11.downto(0).each do |i|
         date = Date.today - i.months
         date_key = date.strftime('%Y-%m')
-        date_results = results_by_day[date_key]
+        date_results = results_by_month[date_key]
         data << {
           label: label_monthly(date),
           values: [date_results ? date_results.count : 0]
@@ -36,14 +36,18 @@ module Reports
     private
 
     def label_monthly(date)
-      "#{I18n.t("date.abbr_month_names")[date.month]}#{date.month == 1 ? " #{date.strftime("%y")}" : ""}"
+      "#{I18n.t('date.abbr_month_names')[date.month]}#{date.month == 1 ? " #{date.strftime('%y')}" : ""}"
+    end
+
+    def report_between
+      filter['range'] = options['date_range']
     end
 
     def report_since
       filter['since'] = options['since'] || (Date.today - 1.year).iso8601
     end
 
-    def results_by_day
+    def results_by_month
       results['tests'].group_by do |t|
         Date.parse(t['test']['start_time']).strftime('%Y-%m')
       end
@@ -51,7 +55,11 @@ module Reports
 
     def setup
       site_or_institution
-      report_since
+      date_constraints
+    end
+
+    def date_constraints
+      options['date_range'] ? report_between : report_since
     end
 
     def site_or_institution
