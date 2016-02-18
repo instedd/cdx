@@ -31,21 +31,11 @@
         - if has_access_to_test_results_index?
           %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
             = link_to "Tests", test_results_path
-          %li{:class => params[:controller] == "alerts" && "active"}
-            = link_to "Alerts", alerts_path
-          %li{:class => params[:controller] == "incidents" && "active"}
-            = link_to "Incidents", incidents_path
-          %li{:class => params[:controller] == "alert_messages" && "active"}
-            = link_to "Alert Messages", alert_messages_path
-        - if can_delegate_permissions?
-          %li{:class => params[:controller] == "policies" && "active"}
-            = link_to "Policies", policies_path
         - if has_access_to_users_index?
           %li{:class => params[:controller] == "users" && "active"}
             = link_to "Users", users_path
-        - if has_access?(Role, Policy::Actions::READ_ROLE)
-          %li{:class => params[:controller] == "roles" && "active"}
-            = link_to "Roles", roles_path
+        %li{:class => (["roles", "policies", "alerts", "incidents", "alert_messages"].include?(params[:controller]) || params[:action] == "settings") && "active"}
+          = link_to "Settings", settings_path
 
   .user{:tabindex => "0"}
     - if current_user
