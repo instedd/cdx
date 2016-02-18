@@ -31,6 +31,10 @@ module ApplicationHelper
     has_access?(Site, Policy::Actions::READ_SITE_USERS) || has_access?(Institution, Policy::Actions::READ_INSTITUTION_USERS)
   end
 
+  def has_access_to_roles_index?
+    has_access?(Role, Policy::Actions::READ_ROLE)
+  end
+
   def can_delegate_permissions?
     current_user.computed_policies.any? &:delegable?
   end
@@ -73,6 +77,7 @@ module ApplicationHelper
   define_component :card, sections: [:top, :actions, :bottom], attributes: [:image]
   define_component :cdx_table, sections: [:columns, :thead, :tbody, :actions], attributes: [:title]
   define_component :empty_data, sections: [:body] ,attributes: [:icon, :title]
+  define_component :setting_card, sections: [:body], attributes: [:title, :href, :icon]
 
   define_component :cdx_tabs do |c|
     c.section :headers, multiple: true, component: :cdx_tabs_header

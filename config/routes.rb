@@ -16,6 +16,8 @@ Rails.application.routes.draw do
       registration: 'registration'
     }
 
+  get 'settings' => 'home#settings'
+
   resources :sites, except: [:show] do
     member do
       get :devices

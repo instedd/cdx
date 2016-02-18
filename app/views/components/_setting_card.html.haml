@@ -1,0 +1,9 @@
+.col.px-3.centered
+  .box.small.shadow{data: {href: setting_card[:href] }, style: 'height: 370px'}
+    %h2
+      = setting_card[:title]
+
+    .empty-icon.centered
+      %span{class: setting_card[:icon]}
+
+    = setting_card[:body]
