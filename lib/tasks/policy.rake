@@ -156,9 +156,10 @@ namespace :policy do
         roles = Policy.predefined_institution_roles(institution)
         roles.each do |role|
           existing_role = Role.find_or_create_by(name: role.name)
-          existing_role.policy.destroy
+          old_policy = existing_role.policy
           existing_role.policy = role.policy
           existing_role.save!
+          old_policy.try(:destroy)
         end
       end
 
@@ -168,9 +169,10 @@ namespace :policy do
         roles = Policy.predefined_site_roles(site)
         roles.each do |role|
           existing_role = Role.find_or_create_by(name: role.name)
-          existing_role.policy.destroy
+          old_policy = existing_role.policy
           existing_role.policy = role.policy
           existing_role.save!
+          old_policy.try(:destroy)
         end
       end
 
