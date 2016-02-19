@@ -28,7 +28,10 @@ class Alert < ActiveRecord::Base
   enum aggregation_type: [:record, :aggregated]
   enum aggregation_frequency: [:hour, :day]
   enum channel_type: [:email, :sms, :email_and_sms]
-  enum anomalie_type: [:missing_sample_id, :missing_start_time]
+  
+  #Note: elasticsearch filter issue  with start_time, for some reason, {"test.start_time"=>"null"}, does not work.
+  #enum anomalie_type: [:missing_sample_id, :missing_start_time]
+  enum anomalie_type: [:missing_sample_id]
 
   enum utilization_efficiency_type: [:sample]
 

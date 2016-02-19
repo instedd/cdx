@@ -4,33 +4,44 @@ Feature: create an alert
     Given the user has an account
 
   Scenario: Successful create error category alert with all fields
-    Given the user creates a new error category alert with all fields with name "errorcodealer1"
-    Then the user should see in list alerts "errorcodealer1"
-    Then the user should have alert result 
+    Given the user creates a new error category alert with all fields with name "errorcategory"
+    Then the user should see in list alerts "errorcategory"
+    Then the user should have error_code alert result 
     Then the user should have an incident
 
   Scenario: Successful create anomalie category alert with all fields
-    Given the user creates a new anomalie category alert with all fields with name "errorcodealer1a"
-    Then the user should see in list alerts "errorcodealer1a"
+    Given the user creates a new anomalie category alert with all fields with name "anomaliecategory"
+    Then the user should see in list alerts "anomaliecategory"
+    Then the user should have no_sample_id alert result 
+    Then the user should have an incident
 
   Scenario: Successful create testresult category alert with all fields
-    Given the user creates a new testresult alert with all fields with name "errorcodealer5"
-    Then the user should see in list alerts "errorcodealer5"
+    Given the user creates a new testresult alert with all fields with name "testresultcategory"
+    Then the user should see in list alerts "testresultcategory"
 
   Scenario: Successful create utilization efficiency category alert with all fields
-    Given the user Successful creates a new utilization efficiency category with all fields with name "errorcodealer6"
-    Then the user should see in list alerts "errorcodealer6"
+    Given the user Successful creates a new utilization efficiency category with all fields with name "utilisationcategory"
+    Then the user should see in list alerts "utilisationcategory"
 
   Scenario: Successful create and view alert
-    Given the user creates a new error category alert with all fields with name "errorcodealer2"
-    And the user should see in list alerts "errorcodealer2"
-    And the user should click edit "errorcodealer2"
-    Then the user should view edit page "errorcodealer2"
+    Given the user creates a new error category alert with all fields with name "viewalert"
+    And the user should see in list alerts "viewalert"
+    And the user should click edit "viewalert"
+    Then the user should view edit page "viewalert"
     Then the user should see no edit alert incidents
 
   Scenario: Successful create, view and delete alert 
-    Given the user creates a new error category alert with all fields with name "errorcodealer4"
-    And the user should see in list alerts "errorcodealer4"
-    And the user should click edit "errorcodealer4"
+    Given the user creates a new error category alert with all fields with name "deletealert"
+    And the user should see in list alerts "deletealert"
+    And the user should click edit "deletealert"
     And delete the alert  
-    Then the user should not see in list alerts "errorcodealer4"
+    Then the user should not see in list alerts "deletealert"
+
+  Scenario: Successful create error category alert with email limit 2 and verify only two email sent 
+   Given the user creates a new error category alert with all fields with name "verifyemaillimit"
+   Then the user should see in list alerts "verifyemaillimit"
+   Then the user should have error_code alert result 
+   Then the user should have error_code alert result 
+   Then the user should have error_code alert result 
+   Then the user should have error_code alert result 
+   Then the user should have two emails

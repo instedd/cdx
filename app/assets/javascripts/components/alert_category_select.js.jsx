@@ -53,6 +53,7 @@ var AlertCategorySelect = React.createClass({
 			userField: this.props.alert_internal_users,
 			patientField: this.props.alert_info.notify_patients,
 			smsLimitField: this.props.alert_info.sms_limit,
+			emailLimitField: this.props.alert_info.email_limit,
 			sampleIdField: this.props.alert_info.sample_id,
 			messageField: this.props.alert_info.message,
 			smsMessageField: this.props.alert_info.sms_message,
@@ -165,6 +166,7 @@ var AlertCategorySelect = React.createClass({
 			users_info: this.state.userField,
 			notify_patients: this.state.patientField,
 			sms_limit: this.state.smsLimitField,
+			email_limit: this.state.emailLimitField,
 			sample_id: this.state.sampleIdField,
 			message: this.state.messageField,
 			sms_message: this.state.smsMessageField,
@@ -332,13 +334,13 @@ var AlertCategorySelect = React.createClass({
 
 						<AlertExternalUser edit={this.props.edit} onChangeParentLevel={this.externalUsersChanged} existingExternalUsers={this.props.alert_external_users} />
 
-						<AlertSmsLimit valueLink={this.linkState('smsLimitField')} edit={this.props.edit} />
-
+						<AlertEmailLimit valueLink={this.linkState('emailLimitField')} edit={this.props.edit} />
 						<AlertEmailMessage valueLink = {
 								this.linkState('messageField')
 							}  edit={this.props.edit}
 							/>
 
+            <AlertSmsLimit valueLink={this.linkState('smsLimitField')} edit={this.props.edit} />
 						<AlertSmsMessage valueLink = {
 								this.linkState('smsMessageField')
 							} edit={this.props.edit}

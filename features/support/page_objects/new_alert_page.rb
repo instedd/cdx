@@ -9,6 +9,7 @@ class NewAlertPage < SitePrism::Page
     section :anomalies, CdxSelect, "label", text: /Anomalie Type/i
     element :device_errors_value, "#alerterrorcode"
 
+    element :emaillimit, '#alertemaillimit'
     element :message, '#alertmessage'
     element :smsmessage, '#alertsmsmessage'
     element :smslimit, '#alertsmslimit'

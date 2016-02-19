@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160215195614) do
+ActiveRecord::Schema.define(version: 20160218104352) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -72,8 +72,9 @@ ActiveRecord::Schema.define(version: 20160215195614) do
     t.integer  "aggregation_threshold",               limit: 4,     default: 0
     t.string   "sample_id",                           limit: 255
     t.integer  "utilization_efficiency_type",         limit: 4,     default: 0
-    t.integer  "utilization_efficiency_number",       limit: 4,     default: 0
+    t.integer  "utilization_efficiency_number",       limit: 4
     t.datetime "utilization_efficiency_last_checked"
+    t.integer  "email_limit",                         limit: 4,     default: 0
   end
 
   add_index "alerts", ["deleted_at"], name: "index_alerts_on_deleted_at", using: :btree

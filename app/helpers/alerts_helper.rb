@@ -1,13 +1,11 @@
 module AlertsHelper
   def display_sites(alert)
-    alert.sites.inject {|site,n| site.name + ','+n.name}
-    
-    if alert.sites.length==0
+    site_names = alert.sites.inject {|site,n| site.name + ','+n.name}
+    if site_names == nil
       ""
     else
-      alert.sites
-    end
-    
+      site_names
+    end  
   end
 
   def display_roles(alert)
@@ -20,10 +18,18 @@ module AlertsHelper
     end
     role_names.join(',')
   end
+  
+  def display_devices(alert)
+    device_names=[]
+    alert.devices.each do |device|
+        device_names<< device.name
+    end
+    device_names.join(',')
+  end
+  
 
   def display_latest_alert_date(alert)
     alertHistory=AlertHistory.where("alert_id=?",alert.id).order(:created_at).last
-    
     if alertHistory==nil
       'Never'
     else

@@ -93,8 +93,8 @@ var AlertDescription = React.createClass({
 			<div className = "col pe-2" >
 				<label>Description</label>
 			</div>
-			<div className = "col" >
-				<input type = "text" placeholder = "Description" valueLink = {
+			<div className = "col pe-4" >
+				<input type = "text" size="44" placeholder = "Description" valueLink = {
 						this.props.valueLink
 					}
 					id = "alertdescription" />
@@ -114,7 +114,7 @@ var AlertErrorCode = React.createClass({
 			</div>
 
 			<div className = "col" >
-				<input type = "text" placeholder = "Error code range" valueLink = {
+				<input type = "text" placeholder = "Error code (range)" valueLink = {
 						this.props.valueLink
 					}
 					id = "alerterrorcode"  name="alerterrorcode" disabled={this.props.edit} />
@@ -155,8 +155,7 @@ var AlertSite = React.createClass({
 
 		var {
 			value,
-			onChange,
-			...other
+			onChange
 		} = this.props;
 		return (
 			< div className = "row">
@@ -219,8 +218,7 @@ var AlertDevice = React.createClass({
 		var {
 			valueLink,
 			value,
-			onChange,
-			...other
+			onChange
 		} = this.props;
 		return (
 			<div className = "row" >
@@ -268,6 +266,7 @@ var AlertAnomalieType = React.createClass({
 	},
 	render: function() {
 		var options = [];
+		
 		for (var i = 0; i < Object.keys(this.props.anomalie_types).length; i++) {
 			option = {};
 			option["value"] = i;
@@ -278,15 +277,14 @@ var AlertAnomalieType = React.createClass({
 		var {
 			valueLink,
 			value,
-			onChange,
-			...other
+			onChange
 		} = this.props;
 		return (
-			< div className = "row" id = "anomalierow" >
+			< div className = "row" id = "anomalierow">
 			<div className = "col pe-2" >
 				<label>Anomalie Type</label>
 			</div>
-			<div className = "col" >
+			<div className = "col">
 				<Select
 					name = "anomalie"
 					value = {
@@ -304,6 +302,7 @@ var AlertAnomalieType = React.createClass({
 					disabled = {
 						this.props.disable_all_selects
 					}
+					placeholder="Select"
 					/>
 			</div>
 		</div>
@@ -336,8 +335,7 @@ var AlertChannel = React.createClass({
 		var {
 			valueLink,
 			value,
-			onChange,
-			...other
+			onChange
 		} = this.props;
 		return (
 			< div className = "row" id = "channelrow" >
@@ -400,8 +398,7 @@ var AlertRole = React.createClass({
 		var {
 			valueLink,
 			value,
-			onChange,
-			...other
+			onChange
 		} = this.props;
 		return (
 			< div className = "row" >
@@ -464,8 +461,7 @@ var AlertUser = React.createClass({
 		var {
 			valueLink,
 			value,
-			onChange,
-			...other
+			onChange
 		} = this.props;
 		return (
 			<div className = "row">
@@ -533,7 +529,7 @@ var AlertSampleId = React.createClass({
 			</div>
 
 			<div className = "col" >
-				<input type = "text" placeholder = "sample ID" valueLink = {
+				<input type = "text" placeholder = "Sample ID" valueLink = {
 						this.props.valueLink
 					}
 					id = "alertsampleid" disabled={this.props.edit} />
@@ -565,6 +561,25 @@ var AlertSmsLimit = React.createClass({
 });
 
 
+var AlertEmailLimit = React.createClass({
+	render: function() {
+		return (
+			< div className = "row" id = "emaillimitrow" >
+			<div className = "col pe-2" >
+				<label>Email Per Day Limit</label>
+			</div>
+
+			<div className = "col" >
+				<input type = "text"  type="number" min="0" max="10000" placeholder = "email limit" valueLink = {
+						this.props.valueLink
+					}
+					id = "alertemaillimit" disabled={this.props.edit} />
+			</div>
+		</div>
+	);
+}
+});
+
 
 var AlertEmailMessage = React.createClass({
 	render: function() {
@@ -575,7 +590,7 @@ var AlertEmailMessage = React.createClass({
 				</div>
 
 				<div className = "col pe-2" >
-					<textarea rows="5" cols="50" placeholder = "email message" valueLink = {
+					<textarea rows="5" cols="50" placeholder = "Email message" valueLink = {
 							this.props.valueLink
 						}
 						id = "alertmessage" pattern=".{5,255}" disabled={this.props.edit} />

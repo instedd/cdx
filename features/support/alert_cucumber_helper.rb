@@ -4,6 +4,7 @@ def alert_form_fillin_basic(form, arg)
   form.message.set 'web msg'
   form.smsmessage.set 'sms msg'
   form.smslimit.set 2
+  form.emaillimit.set 2
 end
 
 def alert_form_fillin_externaluser(form)

@@ -1,6 +1,6 @@
 .row
   .col
-    = cdx_table title: incidents.size.to_s + ' Incidents' do |t|
+    = cdx_table title: pluralize(@total, "Incident") do |t|
       - t.columns do
         %col{:width => "25%"}
         %col{:width => "25%"}
@@ -9,16 +9,20 @@
       - t.thead do
         %tr
           %th Alert Group
-          %th Alert Creator
-          %th Date 
+          %th Devices
+          %th Date
           %th Test Result
       - t.tbody do
-        - incidents.each do |incident|
+        - @incidents.each do |incident|
           %tr
-            %td= link_to incident.alert.name, edit_alert_path(incident.alert)  
-            %td= link_to incident.user.email, edit_user_path(incident.user.id)
+            %td= link_to truncate(incident.alert.name, length: 20), edit_alert_path(incident.alert)
+            %td= link_to display_devices(incident.alert), edit_alert_path(incident.alert)
             %td= link_to incident.created_at.to_formatted_s(:long), edit_alert_path(incident.alert)
             - if incident.test_result != nil
               %td= link_to 'View',test_result_path(incident.test_result.uuid)
             -else
               %td 'No Result'
+
+    .pagination
+      = render 'shared/pagination'
+    
