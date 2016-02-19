@@ -12,6 +12,7 @@ class DeviceMessagesController < ApplicationController
   end
 
   def raw
+    return unless authorize_resource(@message.device, READ_DEVICE)
     ext, type = case @message.device.current_manifest.data_type
     when 'json'
       ['json', 'application/json']
@@ -27,6 +28,7 @@ class DeviceMessagesController < ApplicationController
   end
 
   def reprocess
+    return unless authorize_resource(@message.device, READ_DEVICE)
     @message.reprocess
     redirect_to device_messages_path,
                 notice: 'The message will be reprocessed'

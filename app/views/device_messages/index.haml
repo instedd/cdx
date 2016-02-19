@@ -43,7 +43,7 @@
               %td= message.index_failure_data[:number_of_failures]
               %td= message.index_failure_data[:target_field]
               %td= format_datetime(message.created_at.in_time_zone(message.device.time_zone))
-              %td= link_to 'Download', raw_device_message_path(message.device, message)
+              %td= link_to 'Download', raw_device_message_path(message)
 
       .pagination
         = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
