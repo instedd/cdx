@@ -79,28 +79,45 @@ var PolicyItemDetail = React.createClass({
 
       // FIXME: filter resources for other types - ie, 'site'
       if(this.selectableResources().includes(statement.resourceType)) {
-        // TODO: replace DeviceList with OptionList
-        resourcesList[statement.statementType] = <div className={"with-statement-type-" + statement.statementType + "-list"}><DeviceList devices={statement.resourceList[statement.statementType]} addDevice={this.addResource} removeDevice={this.removeResourceAtIndex} context={this.props.context} isException={statement.statementType == 'except'} /></div>;
-
-        ifResourcesSelectable = (<div className="row section">
-          <div className="col px-1">
-            <label className="section-name">Resources</label>
-          </div>
-          <div className="col">
-            <div className="section-content">
-              <input type="radio" name="statementType" value="all" id={this.idFor("statement-type-all")} checked={statement.statementType == 'all'} onChange={this.onStatementTypeChange.bind(this, 'all')} />
-              <label htmlFor={this.idFor("statement-type-all")}>All {resourcesLabel}</label>
-              <input type="radio" name="statementType" value="except" id={this.idFor("statement-type-except")} checked={statement.statementType == 'except'} onChange={this.onStatementTypeChange.bind(this, 'except')} />
-              <label htmlFor={this.idFor("statement-type-except")}>All {resourcesLabel} except</label>
-              {resourcesList['except']}
-              <input type="radio" name="statementType" value="only" id={this.idFor("statement-type-only")} checked={statement.statementType == 'only'} onChange={this.onStatementTypeChange.bind(this, 'only')} />
-              <label htmlFor={this.idFor("statement-type-only")}>Only some {resourcesLabel}</label>
-              {resourcesList['only']}
+        if (_.get(statement, ['resourceList', statement.statementType, 0, 'type']) == 'institution') {
+          // HACK for statements scoped for institution
+          ifResourcesSelectable = (<div className="row section">
+            <div className="col px-1">
+              <label className="section-name">Resources</label>
             </div>
-          </div>
-        </div>);
+            <div className="col">
+              <input type="radio" name="statementType" value="all" id={this.idFor("statement-type-all")} checked={true} readOnly={true} />
+              <label htmlFor={this.idFor("statement-type-all")}>All {resourcesLabel} from {statement.resourceList[statement.statementType][0].name}</label>
+            </div>
+          </div>);
+        } else {
+          // TODO: replace DeviceList with OptionList
+          resourcesList[statement.statementType] = <div className={"with-statement-type-" + statement.statementType + "-list"}><DeviceList devices={statement.resourceList[statement.statementType]} addDevice={this.addResource} removeDevice={this.removeResourceAtIndex} context={this.props.context} isException={statement.statementType == 'except'} /></div>;
+
+          ifResourcesSelectable = (<div className="row section">
+            <div className="col px-1">
+              <label className="section-name">Resources</label>
+            </div>
+            <div className="col">
+              <div className="section-content">
+                <input type="radio" name="statementType" value="all" id={this.idFor("statement-type-all")} checked={statement.statementType == 'all'} onChange={this.onStatementTypeChange.bind(this, 'all')} />
+                <label htmlFor={this.idFor("statement-type-all")}>All {resourcesLabel}</label>
+                <input type="radio" name="statementType" value="except" id={this.idFor("statement-type-except")} checked={statement.statementType == 'except'} onChange={this.onStatementTypeChange.bind(this, 'except')} />
+                <label htmlFor={this.idFor("statement-type-except")}>All {resourcesLabel} except</label>
+                {resourcesList['except']}
+                <input type="radio" name="statementType" value="only" id={this.idFor("statement-type-only")} checked={statement.statementType == 'only'} onChange={this.onStatementTypeChange.bind(this, 'only')} />
+                <label htmlFor={this.idFor("statement-type-only")}>Only some {resourcesLabel}</label>
+                {resourcesList['only']}
+              </div>
+            </div>
+          </div>);
+        }
       }
 
+      var actions = this.props.actions[statement.resourceType];
+      var allAction = {id: '*', label: 'All', value: '*'};
+      var resourcesLabel = this.resourcesLabel();
+      var hasAllAction = this.statementHasAction(statement, allAction);
 
       ifResourceTypeSelected = <div className="with-resource-type">
         {ifResourcesSelectable}
@@ -110,11 +127,14 @@ var PolicyItemDetail = React.createClass({
           </div>
           <div className="col">
             <div className="section-content">
+              <input type="checkbox" id={this.idFor("action-all")} checked={hasAllAction} onChange={this.toggleAction.bind(this, allAction)} />
+              <label htmlFor={this.idFor("action-all")}>All</label>
+
               { Object.keys(actions).map(function(actionKey, index) {
                 var action = actions[actionKey];
                 return (
                   <div key={actionKey}>
-                    <input type="checkbox" id={this.idFor("action-" + actionKey)} checked={this.statementHasAction(statement, action)} onChange={this.toggleAction.bind(this, action)} />
+                    <input type="checkbox" id={this.idFor("action-" + actionKey)} checked={this.statementHasAction(statement, action)} onChange={this.toggleAction.bind(this, action)} disabled={hasAllAction} />
                     <label htmlFor={this.idFor("action-" + actionKey)}>{action.label}</label>
                   </div>
                 );

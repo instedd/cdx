@@ -9,9 +9,13 @@ var PolicyDefinitionField = React.createClass({
         includeSubsites: statement.includeSubsites
       };
 
-      result.action = statement.actions
-        .filter(function(action) { return action.resource == statement.resourceType })
-        .map(function(action) { return action.id });
+      if(statement.actions.findIndex(function(action) { return action.id == "*" }) >=0) {
+        result.action = "*";
+      } else {
+        result.action = statement.actions
+          .filter(function(action) { return action.resource == statement.resourceType })
+          .map(function(action) { return action.id });
+      }
 
       if(statement.statementType) {
         var _resource_to_policy_identifier = function(resource) {
