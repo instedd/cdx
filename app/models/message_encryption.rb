@@ -21,7 +21,7 @@ module MessageEncryption
   end
 
   def self.secure_random length
-    Base64.urlsafe_encode64(SecureRandom.random_bytes(length))
+    Base58.encode(SecureRandom.random_number(58**length))
   end
 
   def self.reencrypt(string, old_key:, old_iv: DEFAULT_IV, old_salt: DEFAULT_SALT, new_key:, new_iv: DEFAULT_IV, new_salt: DEFAULT_SALT)

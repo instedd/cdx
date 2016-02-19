@@ -2,7 +2,7 @@ class Device < ActiveRecord::Base
   include Resource
   include SiteContained
   acts_as_paranoid
-  
+
   belongs_to :device_model
 
   has_one :manifest, through: :device_model
@@ -89,12 +89,12 @@ class Device < ActiveRecord::Base
   end
 
   def set_key_for_activation_token
-    @plain_secret_key = MessageEncryption.secure_random(9)
+    @plain_secret_key = MessageEncryption.secure_random(10)
     self.secret_key_hash = MessageEncryption.hash(@plain_secret_key)
   end
 
   def set_uuid
-    self.uuid = MessageEncryption.secure_random(9)
+    self.uuid = MessageEncryption.secure_random(10)
   end
 
   ACTIVATION_TOKEN_CHARS = ('0'..'9').to_a + ('A'..'Z').to_a
