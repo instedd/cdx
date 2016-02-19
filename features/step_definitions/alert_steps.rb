@@ -172,7 +172,8 @@ Then (/^the user should have error_code alert result$/) do
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
   DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
   after_test_history_count = AlertHistory.count
-  expect(before_test_history_count+1).to eq(after_test_history_count)
+  
+  expect(after_test_history_count).to be > before_test_history_count
 end
 
 
@@ -188,6 +189,7 @@ Then (/^the user should have no_sample_id alert result$/) do
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
   DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative]}, sample: {}, patient: {id: 'a',gender: :male})
   after_test_history_count = AlertHistory.count
+ 
   expect(before_test_history_count+1).to eq(after_test_history_count)
 end
 

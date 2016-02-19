@@ -37,7 +37,7 @@ Feature: create an alert
     And delete the alert  
     Then the user should not see in list alerts "deletealert"
 
-  Scenario: Successful create error category alert with email limit 2 and verify only two email sent 
+  Scenario: Successful create error category alert with email limit 2 and verify only 2 emails sent 
    Given the user creates a new error category alert with all fields with name "verifyemaillimit"
    Then the user should see in list alerts "verifyemaillimit"
    Then the user should have error_code alert result 

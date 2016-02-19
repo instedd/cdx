@@ -17,7 +17,7 @@ describe HourlyAlertJob, elasticsearch: true do
       @alert.aggregation_type = Alert.aggregation_types.key(1)
       @alert.aggregation_frequency = Alert.aggregation_frequencies.key(0)
       @alert.aggregation_threshold = 99
-      @alert.email_limit=100
+      @alert.email_limit=1000
       @alert.query = {"test.error_code"=>"155"}
       alert_recipient = AlertRecipient.new
       alert_recipient.recipient_type = AlertRecipient.recipient_types["internal_user"]
