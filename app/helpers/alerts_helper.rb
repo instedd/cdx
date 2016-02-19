@@ -31,7 +31,7 @@ module AlertsHelper
   def display_latest_alert_date(alert)
     alertHistory=AlertHistory.where("alert_id=?",alert.id).order(:created_at).last
     if alertHistory==nil
-      'Never'
+      'never'
     else
       alertHistory.created_at.to_formatted_s(:long)
     end

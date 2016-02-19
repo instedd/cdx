@@ -205,6 +205,25 @@ var AlertCategorySelect = React.createClass({
 
 					<AlertDescription valueLink={this.linkState('descriptionField')} />
 
+					<AlertSite sites = {
+							this.props.sites
+						}
+						value = {
+							this.state.siteField
+						}
+						updateValue = {
+							this.siteChanged
+						}
+						disable_all_selects = {
+							this.state.disable_all_selects
+						}
+						/>
+
+					<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
+
+					<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={this.props.edit} />
+
+
 					<div className="row">
 						<div className="col pe-2">
 							<label>Categories</label>
@@ -260,25 +279,6 @@ var AlertCategorySelect = React.createClass({
 							</div>
 						</div>
 
-
-						<AlertSite sites = {
-								this.props.sites
-							}
-							value = {
-								this.state.siteField
-							}
-							updateValue = {
-								this.siteChanged
-							}
-							disable_all_selects = {
-								this.state.disable_all_selects
-							}
-							/>
-
-						<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
-
-						<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={this.props.edit} />
-
 						<AlertErrorCode valueLink = {this.linkState('errorCodeField')} edit={this.props.edit} />
 
 						<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
@@ -307,6 +307,8 @@ var AlertCategorySelect = React.createClass({
 							/>
 						<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
 						<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} edit={this.props.edit} />
+
+            <hr />
 
 						<AlertChannel channel_types = {
 								this.props.channel_types
