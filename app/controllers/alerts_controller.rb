@@ -14,6 +14,7 @@ class AlertsController < ApplicationController
     new_alert_request_variables
     alert_info.sms_limit=100
     alert_info.email_limit=100
+    alert_info.utilization_efficiency_number=1
     alert_info.alert_recipients.build
   end
 
@@ -280,7 +281,9 @@ class AlertsController < ApplicationController
   def new_alert_request_variables
     @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
     @roles = check_access(Role, READ_ROLE)
-    @devices = check_access(Device, READ_DEVICE)
+ 
+ #   @devices = check_access(Device, READ_DEVICE)
+   @devices = check_access(Device.within(@navigation_context.entity), READ_DEVICE)
 
     @conditions = Condition.all
     @condition_results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options

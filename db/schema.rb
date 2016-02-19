@@ -72,7 +72,7 @@ ActiveRecord::Schema.define(version: 20160218104352) do
     t.integer  "aggregation_threshold",               limit: 4,     default: 0
     t.string   "sample_id",                           limit: 255
     t.integer  "utilization_efficiency_type",         limit: 4,     default: 0
-    t.integer  "utilization_efficiency_number",       limit: 4
+    t.integer  "utilization_efficiency_number",       limit: 4,     default: 0
     t.datetime "utilization_efficiency_last_checked"
     t.integer  "email_limit",                         limit: 4,     default: 0
   end
