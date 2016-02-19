@@ -34,7 +34,7 @@
               %td
                 - if message.index_failed
                   Failed
-                  = link_to '(reprocess)', reprocess_device_message_path(message.device, message), method: 'post'
+                  = link_to '(reprocess)', reprocess_device_message_path(message), method: 'post'
                 - else
                   Success
               %td= message.index_failure_reason
