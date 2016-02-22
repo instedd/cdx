@@ -3,6 +3,18 @@
 // =============================================================================
 
 
+input[type="text"][disabled] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: .4;
+}
+input[type="number"][disabled] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: .4;
+}
+
+
 input[type="text"],
 input[type="email"],
 input[type="password"],
