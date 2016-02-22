@@ -38,7 +38,7 @@
         = @test_result.core_fields[TestResult::LAB_USER_FIELD]
         - if @test_result.device.site
           at
-          = link_to @test_result.device.site, site_path(@test_result.device.site)
+          = link_to @test_result.device.site, edit_site_path(@test_result.device.site)
 
 .row
   .col.pe-3

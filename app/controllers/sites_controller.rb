@@ -146,14 +146,6 @@ class SitesController < ApplicationController
     render layout: false
   end
 
-  def dependencies
-    site = Site.find(params[:id])
-    @sites = check_access(site.children, READ_SITE)
-    @sites_to_edit = check_access(site.children, UPDATE_SITE).pluck(:id)
-    @sites.preload_locations!
-    render layout: false
-  end
-
   private
 
   def site_params(with_parent_id = false)
