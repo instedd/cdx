@@ -2,8 +2,8 @@ class DeviceMessagesController < ApplicationController
   before_filter :load_message, only: [:raw, :reprocess]
 
   def index
-    device_ids = check_access(Device, SUPPORT_DEVICE).pluck(:id)
-    @messages = DeviceMessage.within(@navigation_context.entity, @navigation_context.exclude_subsites).where("device_id IN (?)", device_ids).joins(device: :device_model).where('devices.site_id = device_messages.site_id')
+    device_ids = check_access(Device, SUPPORT_DEVICE).within(@navigation_context.entity, @navigation_context.exclude_subsites).pluck(:id)
+    @messages = DeviceMessage.where("device_id IN (?)", device_ids).joins(device: :device_model).where('devices.site_id = device_messages.site_id OR (devices.site_id IS NULL AND device_messages.site_id IS NULL)')
     apply_filters
 
     @date_options = date_options_for_filter
