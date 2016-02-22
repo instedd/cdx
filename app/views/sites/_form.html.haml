@@ -2,7 +2,7 @@
   = validation_errors @site
 
   .row
-    .col
+    .col.pe-6
       .row
         .col.pe-4
           = f.label :institution
@@ -29,8 +29,9 @@
           .col
             = @site.parent.name
 
-    .col
-      = render 'side'
+    .col.pe-4
+      - unless @site.new_record?
+        = render 'side'
 
   = site_address_component(@site)
   .row
@@ -61,4 +62,4 @@
           = confirm_deletion_button @site, 'site'
         - else
           - # TODO: link to page with Devices tab always active - it's the current default, but may change
-          = link_to "Delete", '#', data: { confirm: "In order to delete this site you must first reassign the <a href=\"#{site_path(@site)}\">#{@site.devices.count} #{"device".pluralize(@site.devices.count)}</a> assigned to it.", confirm_title: 'Action required', confirm_hide_cancel: 'true', confirm_button_message: 'Understood' }, class: 'btn-secondary pull-right', title: 'Delete Site'
+          = link_to "Delete", '#', data: { confirm: "In order to delete this site you must first reassign the <a href=\"#{edit_site_path(@site)}\">#{@site.devices.count} #{"device".pluralize(@site.devices.count)}</a> assigned to it.", confirm_title: 'Action required', confirm_hide_cancel: 'true', confirm_button_message: 'Understood' }, class: 'btn-secondary pull-right', title: 'Delete Site'
