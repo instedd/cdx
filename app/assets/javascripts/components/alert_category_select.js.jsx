@@ -43,7 +43,7 @@ var AlertCategorySelect = React.createClass({
 			conditionField: this.props.alert_conditions,
 			conditionResultsField: this.props.alert_condition_results,
 			conditionResultStatusesField: this.props.alert_condition_result_statuses,
-			errorCodeField: "",
+			errorCodeField: this.props.alert_info.name,
 			anomalieField: "",
 			aggregationField: this.props.alert_info.aggregation_type,
 			aggregationFrequencyField: this.props.alert_info.aggregation_frequency,
