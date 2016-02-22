@@ -33,6 +33,12 @@ class AlertsController < ApplicationController
 
   def edit
     new_alert_request_variables
+    
+    @alert_sites=[]
+    alert_info.sites.each do |site|
+      @alert_sites.push(site.id)
+    end
+    @alert_sites = @alert_sites.join(",")
 
     @alert_devices=[]
     alert_info.devices.each do |device|
