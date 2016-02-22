@@ -17,12 +17,17 @@ var PolicyItem = React.createClass({
           withSubsites = " at site and subsites";
         }
       }
-      var actions = statement.actions.filter(function(action) { return action.resource == statement.resourceType });
+      var inherits = statement.actions.find(function(action) { return action.id == '*' });
       var description = null;
-      if(actions.length == 0) {
-        description = "No actions granted";
+      if(inherits) {
+        description = inherits.label;
       } else {
-        description = actions.map(function(action) { return action.label; }).join(", ");
+        var actions = statement.actions.filter(function(action) { return action.resource == statement.resourceType });
+        if(actions.length == 0) {
+          description = "No actions granted";
+        } else {
+          description = actions.map(function(action) { return action.label; }).join(", ");
+        }
       }
       return (
         <div>

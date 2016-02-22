@@ -129,6 +129,12 @@ class RolesController < ApplicationController
             device = Device.find(device_id)
             resources[resourceKey] = as_json_device(device).attributes!
           end
+
+          if matches = resourceKey.match(/institution\/(\d+)/) || resourceKey.match(/.*\?institution=(\d+)/)
+            institution_id = matches[1]
+            institution = Institution.find(institution_id)
+            resources[resourceKey] = as_json_institution(institution).attributes!
+          end
         }
       }
     end
@@ -146,6 +152,12 @@ class RolesController < ApplicationController
   def as_json_device(json = Jbuilder.new, device)
     json.(device, :uuid, :name, :serial_number, :id)
     json.type :device
+    json
+  end
+
+  def as_json_institution(json = Jbuilder.new, institution)
+    json.(institution, :uuid, :name, :id)
+    json.type :institution
     json
   end
 

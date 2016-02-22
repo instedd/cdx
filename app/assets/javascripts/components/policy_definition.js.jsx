@@ -101,6 +101,9 @@ var PolicyDefinition = React.createClass({
       }
 
       var _hydratateAction = function(actions, action) {
+        if (action == '*') {
+          return {id: '*', label: 'All', value: '*'};
+        }
         var components = action.split(":");
         return actions[components[0]][components[1]];
       }
