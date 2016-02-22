@@ -49,6 +49,26 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       expect(response).to have_http_status(:success)
       expect(assigns[:can_update]).to be_truthy
     end
+
+    it "should load encounter by uuid" do
+      encounter = Encounter.make institution: institution
+      get :show, id: encounter.uuid
+      expect(assigns(:encounter)).to eq(encounter)
+    end
+
+    it "should load encounter by id" do
+      encounter = Encounter.make institution: institution
+      get :show, id: encounter.id
+      expect(assigns(:encounter)).to eq(encounter)
+    end
+
+    it "should load encounter first by uuid" do
+      encounter = Encounter.make institution: institution
+      encounter2 = Encounter.make institution: institution, uuid: "#{encounter.id}lorem"
+
+      get :show, id: encounter2.uuid
+      expect(assigns(:encounter)).to eq(encounter2)
+    end
   end
 
   describe "GET #edit" do

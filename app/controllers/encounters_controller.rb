@@ -121,7 +121,7 @@ class EncountersController < ApplicationController
   end
 
   def load_encounter
-    @encounter = Encounter.where("id = :id OR uuid = :id", params).first
+    @encounter = Encounter.where("uuid = :id", params).first || Encounter.where("id = :id", params).first
     @encounter.new_samples = []
     @institution = @encounter.institution
     prepare_blender_and_json
