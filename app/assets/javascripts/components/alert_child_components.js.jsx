@@ -360,6 +360,7 @@ var AlertChannel = React.createClass({
 					disabled = {
 						this.props.disable_all_selects
 					}
+					clearable = { false }
 					/>
 			</div>
 		</div>
