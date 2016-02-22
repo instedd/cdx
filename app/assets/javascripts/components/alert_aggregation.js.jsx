@@ -49,6 +49,7 @@ var AlertAggregation = React.createClass({
 					disabled = {
 						this.props.disable_all_selects
 					}
+					clearable = { false }
 					/>
 			</div>
 		</div>
@@ -107,6 +108,7 @@ var AlertAggregationFrequency = React.createClass({
 					disabled = {
 						this.props.disable_all_selects
 					}
+					clearable = { false }
 					/>
 			</div>
 		</div>

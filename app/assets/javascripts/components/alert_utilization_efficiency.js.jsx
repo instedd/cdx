@@ -6,8 +6,8 @@ var AlertUtilizationEfficiency = React.createClass({
 				<label>TIMESPAN</label>
 			</div>
 
-			<div className = "col" >
-				<input type = "text"  type="number" min="0" max="10000" placeholder = "Amount" valueLink = {
+			<div className = "col pe">
+				<input type = "text" type="number" min="0" max="10000" placeholder = "Number" valueLink = {
 						this.props.valueLink
 					}
 					id = "alertutilizationefficiencynumber" disabled={this.props.edit} />

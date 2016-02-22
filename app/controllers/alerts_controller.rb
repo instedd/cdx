@@ -3,8 +3,6 @@ class AlertsController < ApplicationController
 
   respond_to :html, :json
 
-  expose(:alerts) { current_user.alerts }
-
   #could not name it 'alert' as rails gave a warning as this is a reserved method.
   expose(:alert_info, model: :alert, attributes: :alert_params)
 
@@ -14,6 +12,9 @@ class AlertsController < ApplicationController
 
   def new
     new_alert_request_variables
+    alert_info.sms_limit=100
+    alert_info.email_limit=100
+    alert_info.utilization_efficiency_number=1
     alert_info.alert_recipients.build
   end
 
@@ -21,11 +22,23 @@ class AlertsController < ApplicationController
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i
     offset = (@page - 1) * @page_size
-    respond_with alerts
+    
+    @alerts = current_user.alerts
+    @total = @alerts.count
+    @alerts = @alerts.limit(@page_size).offset(offset)
+    
+    respond_with @alerts
   end
+
 
   def edit
     new_alert_request_variables
+    
+    @alert_sites=[]
+    alert_info.sites.each do |site|
+      @alert_sites.push(site.id)
+    end
+    @alert_sites = @alert_sites.join(",")
 
     @alert_devices=[]
     alert_info.devices.each do |device|
@@ -81,6 +94,8 @@ class AlertsController < ApplicationController
     condition_result_ok = true
     error_text=Hash.new
 
+    alert_info.user = current_user
+    
     alert_saved_ok = alert_info.save
     if alert_saved_ok==false
       error_text = alert_info.errors.messages
@@ -146,9 +161,10 @@ class AlertsController < ApplicationController
       if alert_info.category_type == "anomalies"
         # check that the start_time field is not missing
         if alert_info.anomalie_type == "missing_sample_id"
-          alert_info.query = {"sample.id"=>"not(null)" }
+         # alert_info.query = {"sample.id"=>"not(null)" }
+          alert_info.query = {"sample.id"=>"null"}
         elsif alert_info.anomalie_type == "missing_start_time"
-          alert_info.query = {"test.start_time"=>"not(null)" }
+          alert_info.query = {"test.start_time"=>"null"}
         end
 
       elsif alert_info.category_type == "device_errors"
@@ -264,13 +280,16 @@ class AlertsController < ApplicationController
   private
 
   def alert_params
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, :utilization_efficiency_number, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :email_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, :utilization_efficiency_number, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
+
 
   def new_alert_request_variables
     @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
     @roles = check_access(Role, READ_ROLE)
-    @devices = check_access(Device, READ_DEVICE)
+ 
+ #   @devices = check_access(Device, READ_DEVICE)
+   @devices = check_access(Device.within(@navigation_context.entity), READ_DEVICE)
 
     @conditions = Condition.all
     @condition_results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
@@ -281,6 +300,7 @@ class AlertsController < ApplicationController
     user_ids = user_ids.uniq
     @users = User.where(id: user_ids)
   end
+
 
   def append_query(alert, query)
     if  alert.query != "{}"
