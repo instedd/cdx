@@ -11,7 +11,10 @@
     - if current_user && !@hide_nav_bar
       %ul
         - if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
-          %li{:class => params[:controller] == "dashboards" && "active"}
+          %li{:class => params[:controller] == "dashboards" && params[:action] == "index" && "active"}
+            = link_to "Home", dashboard_path
+        - if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
+          %li{:class => params[:controller] == "dashboards" && params[:action] == "nndd" && "active"}
             = link_to "Reports", nndd_path
         - if has_access_to_patients_index?
           %li{:class => params[:controller] == "patients" && "active"}
