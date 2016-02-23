@@ -11,7 +11,7 @@
         .row
           .filter
             %label.block Name
-            %input{type: "text", name: "name", value: params["name"]}
+            %input.input-block{type: "text", name: "name", value: params["name"]}
           .filter
             %label.block Role
             = react_component('CdxSelect', items: @roles, value: params["role"], name: 'role')
