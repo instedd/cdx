@@ -13,6 +13,7 @@ class DeviceModelsController < ApplicationController
 
     @updateable_device_model_ids  = check_access(DeviceModel, UPDATE_DEVICE_MODEL).pluck(:id)
     @publishable_device_model_ids = check_access(DeviceModel, PUBLISH_DEVICE_MODEL).pluck(:id)
+    @can_create = has_access?(@navigation_context.institution, REGISTER_INSTITUTION_DEVICE_MODEL)
   end
 
   def show

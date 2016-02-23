@@ -1,12 +1,20 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            = link_to "+", new_api_token_path, class: 'btn-add side-link fix', title: 'Add API Token'
+            API tokens
+
 .row
   .col
-    = link_to "+", new_api_token_path, class: 'btn-add side-link ontop fix', title: 'Add API Token'
     - if @api_tokens.empty?
-      = empty_data title: 'API Tokens' do |c|
+      = empty_data title: 'No API tokens' do |c|
         - c.body do
           %h1 There are no api tokens
     - else
-      = cdx_table title: 'API Tokens' do |t|
+      = cdx_table title: pluralize(@api_tokens.count, "API token") do |t|
         - t.columns do
           %col{:width => "90%"}
           %col{:width => "10%"}
