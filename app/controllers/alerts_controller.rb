@@ -3,17 +3,18 @@ class AlertsController < ApplicationController
 
   respond_to :html, :json
 
-  expose(:alerts) { current_user.alerts }
-
   #could not name it 'alert' as rails gave a warning as this is a reserved method.
   expose(:alert_info, model: :alert, attributes: :alert_params)
 
   before_filter do
     head :forbidden unless has_access_to_test_results_index?
   end
-
+  
   def new
     new_alert_request_variables
+    alert_info.sms_limit=100
+    alert_info.email_limit=100
+    alert_info.utilization_efficiency_number=1
     alert_info.alert_recipients.build
   end
 
@@ -21,11 +22,23 @@ class AlertsController < ApplicationController
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i
     offset = (@page - 1) * @page_size
-    respond_with alerts
+
+    @alerts = current_user.alerts
+    @total = @alerts.count
+    @alerts = @alerts.limit(@page_size).offset(offset)
+
+    respond_with @alerts
   end
+
 
   def edit
     new_alert_request_variables
+
+    @alert_sites=[]
+    alert_info.sites.each do |site|
+      @alert_sites.push(site.id)
+    end
+    @alert_sites = @alert_sites.join(",")
 
     @alert_devices=[]
     alert_info.devices.each do |device|
@@ -75,11 +88,15 @@ class AlertsController < ApplicationController
   end
 
 
+
+
   def create
     external_users_ok = true
     internal_users_ok = true
     condition_result_ok = true
     error_text=Hash.new
+
+    alert_info.user = current_user
 
     alert_saved_ok = alert_info.save
     if alert_saved_ok==false
@@ -87,68 +104,17 @@ class AlertsController < ApplicationController
     else
       alert_saved_ok
 
-      if params[:alert][:roles]
-        roles = params[:alert][:roles].split(',')
-        roles.each do |role_id|
-          role = Role.find_by_id(role_id)
-          alert_recipient = AlertRecipient.new
-          alert_recipient.recipient_type = AlertRecipient.recipient_types["role"]
-          alert_recipient.role = role
-          alert_recipient.alert=alert_info
-
-          if alert_recipient.save == false
-            internal_users_ok = false
-            error_text = error_text.merge alert_recipient.errors.messages
-          end
-        end
-      end
-
-      #save internal users
-      if params[:alert][:users_info]
-        internal_users = params[:alert][:users_info].split(',')
-        internal_users.each do |user_id|
-          user = User.find_by_id(user_id)
-          alert_recipient = AlertRecipient.new
-          alert_recipient.recipient_type = AlertRecipient.recipient_types["internal_user"]
-          alert_recipient.user = user
-          alert_recipient.alert=alert_info
-          if alert_recipient.save == false
-            internal_users_ok = false
-            error_text = error_text.merge alert_recipient.errors.messages
-          end
-        end
-      end
-
-      #save external users
-      if params[:alert][:external_users]
-        external_users = params[:alert][:external_users]
-
-        # using key/pair as value returned in this format  :
-        #  {"0"=>{"id"=>"0", "firstName"=>"a", "lastName"=>"b", "email"=>"c", "telephone"=>"d"}, "1"=>{"id"=>"1", "firstName"=>"aa", "lastName"=>"bb", "email"=>"cc", "telephone"=>"dd"}}
-        external_users.each do |key, external_user_value|
-          alert_recipient = AlertRecipient.new
-          alert_recipient.recipient_type = AlertRecipient.recipient_types["external_user"]
-          alert_recipient.email = external_user_value["email"]
-          alert_recipient.telephone = external_user_value["telephone"]
-          alert_recipient.first_name = external_user_value["first_name"]
-          alert_recipient.last_name = external_user_value["last_name"]
-          alert_recipient.alert=alert_info
-
-          if alert_recipient.save == false
-            external_users_ok = false
-            error_text = error_text.merge alert_recipient.errors.messages
-          end
-        end
-      end
+      internal_users_ok,external_users_ok,error_text = common_channel_info_for_edit_and_create(params, alert_info, internal_users_ok, external_users_ok, error_text, false)
 
       alert_info.query="{}";
 
       if alert_info.category_type == "anomalies"
         # check that the start_time field is not missing
         if alert_info.anomalie_type == "missing_sample_id"
-          alert_info.query = {"sample.id"=>"not(null)" }
+          # alert_info.query = {"sample.id"=>"not(null)" }
+          alert_info.query = {"sample.id"=>"null"}
         elsif alert_info.anomalie_type == "missing_start_time"
-          alert_info.query = {"test.start_time"=>"not(null)" }
+          alert_info.query = {"test.start_time"=>"null"}
         end
 
       elsif alert_info.category_type == "device_errors"
@@ -188,7 +154,7 @@ class AlertsController < ApplicationController
           end
         end
 
-       alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
+        alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
         #TEST  alert_info.query =    {"assays.quantitative_result.min" => "8"}
         #TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
 
@@ -199,7 +165,7 @@ class AlertsController < ApplicationController
       end
 
 
-      if (params[:alert][:sample_id]) && (params[:alert][:sample_id].length > 0) 
+      if (params[:alert][:sample_id]) && (params[:alert][:sample_id].length > 0)
         alert_info.query=append_query(alert_info, {"sample.id"=>params[:alert][:sample_id]})
       end
 
@@ -238,16 +204,30 @@ class AlertsController < ApplicationController
   end
 
 
+
   def update
-    #note: the update in the alert model calls create
-    if alert_info.enabled == false
-      alert_info.delete_percolator
+    external_users_ok = true
+    internal_users_ok = true
+    error_text=Hash.new
+
+    alert_saved_ok = alert_info.save
+    if alert_saved_ok==false
+      error_text = alert_info.errors.messages
+    else
+      alert_saved_ok
+
+      #note: the update in the alert model calls create
+      if alert_info.enabled == false
+        alert_info.delete_percolator
+      end
+
+      internal_users_ok,external_users_ok,error_text = common_channel_info_for_edit_and_create(params, alert_info, internal_users_ok, external_users_ok, error_text, true)
     end
 
-    if alert_info.save
+    if alert_saved_ok && external_users_ok && internal_users_ok
       render json: alert_info
     else
-      render json: alert_info.errors, status: :unprocessable_entity
+      render json: error_text, status: :unprocessable_entity
     end
   end
 
@@ -264,13 +244,14 @@ class AlertsController < ApplicationController
   private
 
   def alert_params
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, :utilization_efficiency_number, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :email_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, :utilization_efficiency_number, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
+
 
   def new_alert_request_variables
     @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
     @roles = check_access(Role, READ_ROLE)
-    @devices = check_access(Device, READ_DEVICE)
+    @devices = check_access(Device.within(@navigation_context.entity), READ_DEVICE)
 
     @conditions = Condition.all
     @condition_results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
@@ -282,6 +263,7 @@ class AlertsController < ApplicationController
     @users = User.where(id: user_ids)
   end
 
+
   def append_query(alert, query)
     if  alert.query != "{}"
       alert.query.merge (query)
@@ -289,5 +271,71 @@ class AlertsController < ApplicationController
       query
     end
   end
+
+
+
+  def common_channel_info_for_edit_and_create(params, alert_info, internal_users_ok, external_users_ok, error_text, is_edit)
+    #destroy all recipients before adding them in again on an update
+    if (is_edit==true)
+      AlertRecipient.destroy_all(alert_id: alert_info.id)
+    end
+
+    if params[:alert][:roles]
+      roles = params[:alert][:roles].split(',')
+      roles.each do |role_id|
+        role = Role.find_by_id(role_id)
+        alert_recipient = AlertRecipient.new
+        alert_recipient.recipient_type = AlertRecipient.recipient_types["role"]
+        alert_recipient.role = role
+        alert_recipient.alert=alert_info
+
+        if alert_recipient.save == false
+          internal_users_ok = false
+          error_text = error_text.merge alert_recipient.errors.messages
+        end
+      end
+    end
+
+    #save internal users
+    if params[:alert][:users_info]
+      internal_users = params[:alert][:users_info].split(',')
+      internal_users.each do |user_id|
+        user = User.find_by_id(user_id)
+        alert_recipient = AlertRecipient.new
+        alert_recipient.recipient_type = AlertRecipient.recipient_types["internal_user"]
+        alert_recipient.user = user
+        alert_recipient.alert=alert_info
+        if alert_recipient.save == false
+          internal_users_ok = false
+          error_text = error_text.merge alert_recipient.errors.messages
+        end
+      end
+    end
+
+    #save external users
+    if params[:alert][:external_users]
+      external_users = params[:alert][:external_users]
+
+      # using key/pair as value returned in this format  :
+      #  {"0"=>{"id"=>"0", "firstName"=>"a", "lastName"=>"b", "email"=>"c", "telephone"=>"d"}, "1"=>{"id"=>"1", "firstName"=>"aa", "lastName"=>"bb", "email"=>"cc", "telephone"=>"dd"}}
+      external_users.each do |key, external_user_value|
+        alert_recipient = AlertRecipient.new
+        alert_recipient.recipient_type = AlertRecipient.recipient_types["external_user"]
+        alert_recipient.email = external_user_value["email"]
+        alert_recipient.telephone = external_user_value["telephone"]
+        alert_recipient.first_name = external_user_value["first_name"]
+        alert_recipient.last_name = external_user_value["last_name"]
+        alert_recipient.alert=alert_info
+
+        if alert_recipient.save == false
+          external_users_ok = false
+          error_text = error_text.merge alert_recipient.errors.messages
+        end
+      end
+    end
+
+    return internal_users_ok,external_users_ok,error_text
+  end
+
 
 end

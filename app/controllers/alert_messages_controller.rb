@@ -1,17 +1,19 @@
 class AlertMessagesController < ApplicationController
   respond_to :html, :json
-  expose(:alertmessages) { current_user.recipient_notification_history }
 
   before_filter do
     head :forbidden unless has_access_to_test_results_index?
   end
 
   def index
-    respond_with alertmessages
-  end
+    @page_size = (params["page_size"] || 10).to_i
+    @page = (params["page"] || 1).to_i
+    offset = (@page - 1) * @page_size
 
-  def show
-    #    render :edit
-  end
+    @alertmessages =  current_user.recipient_notification_history
+    @total = @alertmessages.count
+    @alertmessages = @alertmessages.limit(@page_size).offset(offset)
 
+    respond_with @alertmessages
+  end
 end

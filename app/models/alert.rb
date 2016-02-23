@@ -28,7 +28,10 @@ class Alert < ActiveRecord::Base
   enum aggregation_type: [:record, :aggregated]
   enum aggregation_frequency: [:hour, :day]
   enum channel_type: [:email, :sms, :email_and_sms]
-  enum anomalie_type: [:missing_sample_id, :missing_start_time]
+  
+  #Note: elasticsearch filter issue  with start_time, for some reason, {"test.start_time"=>"null"}, does not work.
+  #enum anomalie_type: [:missing_sample_id, :missing_start_time]
+  enum anomalie_type: [:missing_sample_id]
 
   enum utilization_efficiency_type: [:sample]
 
@@ -63,13 +66,13 @@ class Alert < ActiveRecord::Base
     id: 'alert_'+id.to_s,
     ignore: 404
   end
-
+  
+  
   private
 
   def  is_integer?(str_val)
     str_val.to_i.to_s == str_val
   end
-
 
   def category_validation
     if category_type == "device_errors"

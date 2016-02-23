@@ -1,27 +1,24 @@
 .row
   .col
-    = cdx_table title: 'Alert Messages Sent' do |t|
+    = cdx_table title: pluralize(@total, "Alert Message") do |t|
       - t.columns do
         %col{:width => "15%"}
         %col{:width => "15%"}
         %col{:width => "15%"}
-        %col{:width => "15%"}
-        %col{:width => "15%"}
-        %col{:width => "15%"}
+        %col{:width => "30%"}
       - t.thead do
         %tr
-          %th Alert Name
-          %th View Alert
-          %th Email
-          %th Date Created
-          %th channel
-          %th Message Body
+          %th Alert Group
+          %th Date
+          %th Channel
+          %th Message 
       - t.tbody do
-        - alertmessages.each do |alertmessage|
+        - @alertmessages.each do |alertmessage|
           %tr
-            %td= alertmessage.alert.name
-            %td= link_to 'View', alertmessage.alert
-            %td= alertmessage.user.email
-            %td= alertmessage.created_at
-            %td= alertmessage.alert.channel_type
-            %td= alertmessage.message_sent
+            %td= link_to truncate(alertmessage.alert.name, length: 20), alertmessage.alert
+            %td= alertmessage.created_at.to_formatted_s(:long)
+            %td=  Alert.channel_types.keys[Alert.channel_types["email"]]
+            %td= truncate(alertmessage.message_sent, length: 60)
+
+    .pagination
+      = render 'shared/pagination'
