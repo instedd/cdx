@@ -193,11 +193,7 @@ a[title="Back"] {
 
   .filter {
     @include flex(0 0 16%);
-    // display: inline-block;
-    // vertical-align: top;
-    // width: 18%;
     margin: 0 2%;
-    // padding: $col-padd 25px $col-padd;
 
     > label {
       min-height: auto;

@@ -144,10 +144,6 @@
       height: 40px;
     }
 
-    a {
-      color: $white-dark;
-    }
-
     > div {
       flex: 1;
       position: absolute;
@@ -158,9 +154,13 @@
       overflow: auto;
       overflow-x: hidden;
     }
+    .search-sites {
+      border-color: $white-translucent;
+    }
 
     #include-subsites {
       color: $white-light;
+      margin: 4px 0 4px 45px;
     }
   }
 }
@@ -189,6 +189,7 @@
     }
 
     a {
+      color: $white-dark;
       position: relative;
       display: block;
       padding-left: 24px;
@@ -200,7 +201,7 @@
     ul {
       margin: -15px 0 0 10px;
       padding: 15px 0 0 15px;
-      border-left: 1px solid $white-translucent;
+      border-left: 2px solid $white-translucent;
     }
 
     &.expanded > a > button {
