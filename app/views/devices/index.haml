@@ -14,6 +14,9 @@
           %col{:width => "50%"}
           %col{:width => "20%"}
           %col{:width => "10%"}
+        - t.actions do
+          = link_to devices_path(format: :csv), title: 'Download CSV' do
+            .icon-download.icon-gray
         - t.thead do
           %tr
             %th Name
@@ -30,4 +33,3 @@
 
       .pagination
         = render 'shared/pagination'
-        = link_to "Download as CSV", {format: :csv}, class: "pull-right"

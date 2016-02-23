@@ -192,12 +192,21 @@ a[title="Back"] {
   padding: 0 1em 0.5em;
 
   .filter {
-    @include flex(0 0 20%);
-    padding: $col-padd;
+    @include flex(0 0 16%);
+    margin: 0 2%;
 
     > label {
       min-height: auto;
       line-height: 15px;
+    }
+
+    > input {
+      height: 36px;
+    }
+    .select.input-large,
+    .Select.is-searchable,
+    .LocationSelect {
+      width: 100%;
     }
   }
 

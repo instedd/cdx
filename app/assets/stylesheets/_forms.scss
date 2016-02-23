@@ -108,10 +108,18 @@ input[type="checkbox"] {
       margin-right: 10px;
     }
   }
+  & + label#include-subsites {
+    margin-left: 45px;
+    &:before {
+      border-color: rgb(105,105,105);;
+    }
+  }
   &:checked + label:before {
     content: '\2714';
     background: $black;
-
+  }
+  &:checked + label#include-subsites:before {
+    background: none;
   }
   &.disabled + label,
   &[disabled] + label,
