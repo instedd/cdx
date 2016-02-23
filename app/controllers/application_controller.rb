@@ -119,7 +119,7 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource_or_scope)
     if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
-      nndd_path
+      dashboard_path
     elsif has_access_to_sites_index?
       sites_path
     elsif has_access_to_devices_index?
