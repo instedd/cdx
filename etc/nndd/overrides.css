@@ -1,3 +1,94 @@
+@import url(//fonts.googleapis.com/css?family=Open+Sans:400,300,700);
+@import url(//fonts.googleapis.com/css?family=Titillium+Web:400,300,700);
+body {
+  font-family: 'Open Sans', sans-serif !important;
+  font-size: 90% !important;
+  text-rendering: optimizeLegibility;
+  text-rendering: geometricPrecision;
+  font-smooth: always;
+
+  font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
 .navbar {
   display: none !important;
+}
+ul.nav.nav-tabs {
+  // display: none;
+}
+.row.report.ng-scope form > div {
+  margin-bottom: 15px;
+}
+.row.report.ng-scope form label {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 40px;
+  color: rgba(0,0,0,.4) !important;
+  text-transform: uppercase;
+  min-height: 40px;
+  display: inline-block;
+  vertical-align: middle;
+  width: 250px;
+  // -webkit-text-stroke: 0.6px;
+}
+.row.report.ng-scope form label + br {
+  display: none;
+}
+.row.report.ng-scope form input#name {
+  background-color: transparent;
+  font-family: 'Open Sans', sans-serif !important;
+  font-size: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  padding: 0 5px;
+  height: 30px;
+  outline: 0 !important;
+  vertical-align: middle;
+  width: 350px;
+}
+.row.report.ng-scope form textarea#description {
+  background-color: transparent;
+  font-family: 'Open Sans', sans-serif !important;
+  font-size: 100%;
+  outline: none;
+  border-color: rgba(0,0,0,.1);
+  width: 350px;
+}
+.row.report.ng-scope form select {
+  background: white;
+  border: 1px solid rgba(0,0,0,.1);
+  width: 350px;
+  height: 30px;
+  margin-right: 15px;
+  outline: 0 !important;
+}
+
+h3 {
+  font-family: 'Titillium Web', sans-serif !important;
+  font-size: 28px !important;
+  font-weight: 300 !important;
+  color: rgba(0,0,0,.4) !important;
+  margin: 25px 0 !important;
+  // -webkit-text-stroke: 0.6px;
+}
+button {
+  border-radius: 2px !important;
+  background: rgba(33,150,243,1) !important;
+  font-family: 'Titillium Web', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: white !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  line-height: 48px !important;
+  border: 1px solid transparent !important;
+  display: inline-block !important;
+  padding: 0 24px !important;
+  height: 48px !important;
+  margin-bottom: 0 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
 }
