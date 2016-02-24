@@ -23,14 +23,9 @@ class PatientsController < ApplicationController
     @patients = @patients.where("entity_id LIKE concat('%', ?, '%')", params[:entity_id]) unless params[:entity_id].blank?
     # location_geoid is hierarchical so a prefix search works
     @patients = @patients.where("location_geoid LIKE concat(?, '%')", params[:location]) unless params[:location].blank?
+    @patients = @patients.joins(:encounters).where("encounters.start_time > ?", params["last_encounter"]) if params["last_encounter"].present?
 
-    unless params[:last_encounter].blank?
-      date_pattern = I18n.t('date.input_format.pattern')
-      @last_encounter = Time.strptime(params[:last_encounter], date_pattern) rescue nil
-      params[:last_encounter] = @last_encounter.strftime(date_pattern) rescue nil
-      @patients = @patients.where("id in (#{Encounter.within(@navigation_context.entity).where("start_time > ?", @last_encounter).select(:patient_id).to_sql})")
-    end
-
+    @date_options = date_options_for_filter
     @patients.preload_locations!
     @patients = perform_pagination(@patients)
   end

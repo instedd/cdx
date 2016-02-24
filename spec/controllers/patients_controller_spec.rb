@@ -123,7 +123,7 @@ RSpec.describe PatientsController, type: :controller do
       patient1.encounters.make start_time: Time.new(2016, 1, 14, 0, 0, 0)
       patient2.encounters.make start_time: Time.new(2016, 1, 7, 0, 0, 0)
 
-      get :index, last_encounter: '1/10/2016'
+      get :index, last_encounter: '2016-01-10 00:00:00 UTC'
 
       expect(response).to be_success
       expect(assigns(:patients).to_a).to eq([patient1])

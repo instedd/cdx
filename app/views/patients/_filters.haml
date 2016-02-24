@@ -21,4 +21,6 @@
             = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"]
           .filter
             %label.block Last encounter
-            %input.input-block{type: "text", name: "last_encounter", value: params["last_encounter"]}
+            = cdx_select name: "last_encounter", value: params["last_encounter"] do |select|
+              - select.item "", "Show all"
+              - select.items @date_options, :value, :label
