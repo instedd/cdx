@@ -25,7 +25,7 @@ To start developing:
 
 5. Setup elasticsearch index template: `bundle exec rake elasticsearch:setup`
 
-6. Run tests: `bundle exec rake spec`
+6. Run tests: `bundle exec rake` (this will run `rspec` and `cucumber`)
 
 7. Start development server: `bundle exec rails s`
 
