@@ -20,6 +20,7 @@
         = f.label :site
       .col
         = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+          - select.item "", "None"
           - select.items(@sites, :id, :name)
   - elsif f.object.new_record?
     = f.hidden_field :site_id
