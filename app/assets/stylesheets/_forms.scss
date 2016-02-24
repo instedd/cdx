@@ -433,3 +433,9 @@ label.on {
     display: block;
   }
 }
+
+#edit_user {
+  input[type="text"], input[type="password"] {
+    width: 400px;
+  }
+}

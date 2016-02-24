@@ -9,7 +9,7 @@ RUN \
 ENV POIROT_STDOUT true
 ENV POIROT_SUPPRESS_RAILS_LOG true
 ENV PUMA_OPTIONS "--preload -w 4"
-ENV NNDD_VERSION "cdx-0.7-pre9"
+ENV NNDD_VERSION "cdx-0.11-pre3"
 
 # Install gem bundle
 ADD Gemfile /app/
