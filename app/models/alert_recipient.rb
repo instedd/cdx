@@ -3,6 +3,8 @@ class AlertRecipient < ActiveRecord::Base
   belongs_to :alert
   belongs_to :role
 
+  acts_as_paranoid
+  
   enum recipient_type: [:role, :internal_user, :external_user]
 
   validates_format_of :email,:with => Devise.email_regexp ,allow_nil: true

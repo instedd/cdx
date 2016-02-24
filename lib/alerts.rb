@@ -16,7 +16,7 @@ module Alerts
           alert_history_triggered(alert, alert_history_count)
         end
       rescue => e
-        Rails.logger.error { "Encountered an error when trying to run alert_history_check : #{alert.id}, #{e.message} #{e.backtrace.join("\n")}" }
+        Rails.logger.error {"Encountered an error when trying to run alert_history_check : #{alert.id}, #{e.message} #{e.backtrace.join("\n")}" }
       end
     end
   end
@@ -37,13 +37,19 @@ module Alerts
   def alert_email_inform_recipient(alert, alert_history, recipients_list, alert_count=0)
     #TODO look at Sending Email To Multiple Recipients, http://guides.rubyonrails.org/action_mailer_basics.html
     recipients_list.each do |person|
-      message_body= parse_alert_message(alert, alert.message, person)
-      subject_text = "CDX alert:"+alert.name
-      if alert.aggregated?
-        subject_text += " :occured times: "+alert_count.to_s
-      end
+      number_alert_messages_sent_today = AlertHistory.calculate_number_alert_messages_sent_today(alert.id)
+      
+      if (number_alert_messages_sent_today <= alert.email_limit)
+        message_body= parse_alert_message(alert, alert.message, person)
+        subject_text = "CDX alert:"+alert.name
+        if alert.aggregated?
+          subject_text += " :occured times: "+alert_count.to_s
+        end
 
-      AlertMailer.alert_email(alert, person, alert_history, message_body, subject_text, alert_count).deliver_now
+        AlertMailer.alert_email(alert, person, alert_history, message_body, subject_text, alert_count).deliver_now
+      else
+        Rails.logger.info("email limit exceeded for alert "+alert.id.to_s)
+      end
     end
   end
 
@@ -51,13 +57,11 @@ module Alerts
   def alert_sms_inform_recipient(alert, alert_history, recipients_list, alert_count=0)
     #TODO Can also send many messages at once. https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home
     recipients_list.each do |person|
-      number_sms_sent_today = AlertHistory.calculate_number_sms_sent_today(alert.id)
-
-      if (number_sms_sent_today <= alert.sms_limit)
+      number_alert_messages_sent_today = AlertHistory.calculate_number_alert_messages_sent_today(alert.id)
+      if (number_alert_messages_sent_today <= alert.sms_limit)
         text_msg=parse_alert_message(alert, alert.sms_message, person)
         sms_response_fields=send_sms(person[:telephone], text_msg)
-
-        record_alert_message(alert, alert_history, person[:user_id], person[:recipient_id], text_msg, sms_response_fields)
+        record_alert_message(alert, alert_history, person[:user_id], person[:recipient_id], text_msg, Alert.channel_types["sms"], sms_response_fields)
       else
         Rails.logger.info("sms limit exceeded for alert "+alert.id.to_s)
       end
@@ -65,15 +69,14 @@ module Alerts
   end
 
 
-  def record_alert_message(alert, alert_history, user_id, alert_recipient_id, messagebody, sms_response_fields=nil)
+  def record_alert_message(alert, alert_history, user_id, alert_recipient_id, messagebody, channel_type, sms_response_fields=nil)
     recipientNotificationHistory = RecipientNotificationHistory.new
     recipientNotificationHistory.alert = alert
     recipientNotificationHistory.alert_history = alert_history
     recipientNotificationHistory.user_id = alert.user.id
-    #  recipientNotificationHistory.recipient_user_id = user_id if user_id != nil
     recipientNotificationHistory.alert_recipient_id = alert_recipient_id
     recipientNotificationHistory.message_sent = messagebody
-    recipientNotificationHistory.channel_type = alert.channel_type
+    recipientNotificationHistory.channel_type = channel_type
 
     if sms_response_fields != nil
       recipientNotificationHistory.sms_response_id = sms_response_fields[:id].to_i

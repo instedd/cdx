@@ -17,6 +17,7 @@ RSpec.describe AlertMailer, type: :mailer do
     alert = Alert.make
     alert.name="test alert"
     alert.message="welcome mr {lastname}"
+    alert.email_limit=99
 
     recipient = AlertRecipient.make
     recipient.recipient_type = AlertRecipient.recipient_types["external_user"]

@@ -30,12 +30,14 @@ Given(/^the user creates a new error category alert with all fields with name "(
     form.roles.set_exact_multi "Institution Aric Smith Reader"
     form.internal_users.set_exact_multi @user.email
     form.aggregation.set "record"
-    form.channel.set_exact "sms"
+    form.channel.set_exact "email"
+    form.emaillimit.set 2
     alert_form_fillin_externaluser(form)
     form.new_externaluser.click
  #   form.submit.click
      find_button("submit").trigger('click')
   end
+  
 end
 
 
@@ -51,22 +53,21 @@ Given(/^the user creates a new anomalie category alert with all fields with name
 
     #Note: this did not work due to the CSS for 'radio': form.choose 'anomalies'
     find('label[for=anomalies]').click
-
-    form.anomalies.set "missing_start_time"
+    
+    form.anomalies.set "missing_sample_id"
     form.sites.set_exact_multi "Mrs. Terry Goyette"
     form.devices.set_exact_multi "Mr. Alphonso Witting"
     form.roles.set_exact_multi "Institution Aric Smith Reader"
     form.internal_users.set_exact_multi @user.email
-    form.aggregation.set "aggregated"
-    form.aggregation_frequency.set "day"
-    form.channel.set_exact "sms"
+    form.aggregation.set "record"
+    form.channel.set_exact "email"
     alert_form_fillin_externaluser(form)
     form.new_externaluser.click
 
-#    form.submit.click
-find_button("submit").trigger('click')
+    find_button("submit").trigger('click')
   end
 end
+
 
 Given(/^the user creates a new testresult alert with all fields with name "(.*?)"$/) do |arg1|
   site = @navigation_context.entity.sites.make
@@ -106,7 +107,6 @@ Given(/^the user Successful creates a new utilization efficiency category with a
   @alert = NewAlertPage.new
   @alert.load
 
-  
   within(@alert.form) do |form|
     alert_form_fillin_basic(form, arg1)
     
@@ -162,7 +162,7 @@ Then (/^the user should not see in list alerts "(.*?)"$/) do |arg1|
 end
 
 
-Then (/^the user should have alert result$/) do
+Then (/^the user should have error_code alert result$/) do
   parent_location = Location.make
   leaf_location1 = Location.make parent: parent_location
   upper_leaf_location = Location.make
@@ -174,6 +174,24 @@ Then (/^the user should have alert result$/) do
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
   DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
   after_test_history_count = AlertHistory.count
+  
+  expect(after_test_history_count).to be > before_test_history_count
+end
+
+
+Then (/^the user should have no_sample_id alert result$/) do
+  parent_location = Location.make
+  leaf_location1 = Location.make parent: parent_location
+  upper_leaf_location = Location.make
+
+  before_test_history_count = AlertHistory.count
+  site1 = Site.make institution: @institution, location_geoid: leaf_location1.id
+  device1 = Device.make institution: @institution, site: site1
+
+  #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
+  DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative]}, sample: {}, patient: {id: 'a',gender: :male})
+  after_test_history_count = AlertHistory.count
+ 
   expect(before_test_history_count+1).to eq(after_test_history_count)
 end
 
@@ -187,4 +205,11 @@ end
 
 Then (/^the user should see no edit alert incidents$/) do
   expect(page).to have_css('div#incidents', :text => 'NEVER')
+end
+
+
+Then (/^the user should have two emails$/) do
+  after_test_notification_count = RecipientNotificationHistory.count
+  after_test_history_count = AlertHistory.count
+   expect(after_test_notification_count).to eq(2)
 end

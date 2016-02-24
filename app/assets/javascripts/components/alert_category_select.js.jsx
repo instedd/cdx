@@ -10,8 +10,9 @@ var AlertCategorySelect = React.createClass({
 		}
 
 		if (this.props.edit == true) {
+			// allowed all fields to be editable for now
 			this.setState({
-				disable_all_selects: true
+				disable_all_selects: false
 			});
 
 			this.setState({
@@ -38,13 +39,13 @@ var AlertCategorySelect = React.createClass({
 			current_category: this.props.alert_info.category_type,
 			nameField: this.props.alert_info.name,
 			descriptionField: this.props.alert_info.description,
-			siteField: "",
+			siteField: this.props.alert_sites,
 			deviceField: this.props.alert_devices,
 			conditionField: this.props.alert_conditions,
 			conditionResultsField: this.props.alert_condition_results,
 			conditionResultStatusesField: this.props.alert_condition_result_statuses,
-			errorCodeField: "",
-			anomalieField: "",
+			errorCodeField: this.props.alert_info.error_code,
+			anomalieField: this.props.alert_info.anomalie_type,
 			aggregationField: this.props.alert_info.aggregation_type,
 			aggregationFrequencyField: this.props.alert_info.aggregation_frequency,
 			aggregation_thresholdField: this.props.alert_info.aggregation_threshold,
@@ -53,6 +54,7 @@ var AlertCategorySelect = React.createClass({
 			userField: this.props.alert_internal_users,
 			patientField: this.props.alert_info.notify_patients,
 			smsLimitField: this.props.alert_info.sms_limit,
+			emailLimitField: this.props.alert_info.email_limit,
 			sampleIdField: this.props.alert_info.sample_id,
 			messageField: this.props.alert_info.message,
 			smsMessageField: this.props.alert_info.sms_message,
@@ -165,6 +167,7 @@ var AlertCategorySelect = React.createClass({
 			users_info: this.state.userField,
 			notify_patients: this.state.patientField,
 			sms_limit: this.state.smsLimitField,
+			email_limit: this.state.emailLimitField,
 			sample_id: this.state.sampleIdField,
 			message: this.state.messageField,
 			sms_message: this.state.smsMessageField,
@@ -203,6 +206,25 @@ var AlertCategorySelect = React.createClass({
 
 					<AlertDescription valueLink={this.linkState('descriptionField')} />
 
+					<AlertSite sites = {
+							this.props.sites
+						}
+						value = {
+							this.state.siteField
+						}
+						updateValue = {
+							this.siteChanged
+						}
+						disable_all_selects = {
+							this.state.disable_all_selects
+						}
+						/>
+
+					<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
+
+					<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={false} />
+
+
 					<div className="row">
 						<div className="col pe-2">
 							<label>Categories</label>
@@ -211,7 +233,7 @@ var AlertCategorySelect = React.createClass({
 								<input type="radio" name="category_type" value={category_keys[0]}
 								 onChange={this.categoryChanged}
 								 id={category_keys[0]}
-								 disabled={this.props.edit}
+								 disabled={false}
 								/>
 								<label htmlFor={category_keys[0]}>Anomalies</label>
 							</div>
@@ -224,7 +246,7 @@ var AlertCategorySelect = React.createClass({
 								<input type = "radio" name = "category_type" value = {category_keys[1]}
 									onChange = {this.categoryChanged}
 									id = {category_keys[1]}
-									disabled={this.props.edit}
+									disabled={false}
 									/>
 								<label htmlFor={category_keys[1]}>Device Errors</label>
 							</div>
@@ -238,7 +260,7 @@ var AlertCategorySelect = React.createClass({
 								<input type = "radio" name = "category_type" value = {category_keys[3]}
 									onChange = {this.categoryChanged}
 									id = {category_keys[3]}
-									disabled={this.props.edit}
+									disabled={false}
 									/>
 								<label htmlFor={category_keys[3]}>Test Results</label>
 							</div>
@@ -252,32 +274,13 @@ var AlertCategorySelect = React.createClass({
 								<input type = "radio" name = "category_type" value = {category_keys[4]}
 									onChange = {this.categoryChanged}
 									id = {category_keys[4]}
-									disabled={this.props.edit}
+									disabled={false}
 									/>
 								<label htmlFor={category_keys[4]}>Utilization Efficiency</label>
 							</div>
 						</div>
 
-
-						<AlertSite sites = {
-								this.props.sites
-							}
-							value = {
-								this.state.siteField
-							}
-							updateValue = {
-								this.siteChanged
-							}
-							disable_all_selects = {
-								this.state.disable_all_selects
-							}
-							/>
-
-						<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
-
-						<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={this.props.edit} />
-
-						<AlertErrorCode valueLink = {this.linkState('errorCodeField')} edit={this.props.edit} />
+						<AlertErrorCode valueLink = {this.linkState('errorCodeField')} edit={false} />
 
 						<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
 
@@ -288,7 +291,7 @@ var AlertCategorySelect = React.createClass({
 						<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} edit={this.props.edit} />
 */
 }
-						<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} edit={this.props.edit} />
+						<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} edit={false} />
 
 						<AlertAggregation aggregation_types = {
 								this.props.aggregation_types
@@ -304,7 +307,9 @@ var AlertCategorySelect = React.createClass({
 							}
 							/>
 						<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
-						<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} edit={this.props.edit} />
+						<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} edit={false} />
+
+            <hr />
 
 						<AlertChannel channel_types = {
 								this.props.channel_types
@@ -313,11 +318,11 @@ var AlertCategorySelect = React.createClass({
 								this.linkState('channelField')
 							}
 							disable_all_selects = {
-								this.state.disable_all_selects
+								false
 							}
 							/>
 
-						<AlertRole roles={this.props.roles}  valueLink={this.linkState('roleField')} disable_all_selects={this.state.disable_all_selects} />
+						<AlertRole roles={this.props.roles}  valueLink={this.linkState('roleField')} disable_all_selects={false} />
 
 						<AlertUser users = {
 								this.props.users
@@ -326,22 +331,22 @@ var AlertCategorySelect = React.createClass({
 								this.linkState('userField')
 							}
 							disable_all_selects = {
-								this.state.disable_all_selects
+								false
 							}
 							/>
 
-						<AlertExternalUser edit={this.props.edit} onChangeParentLevel={this.externalUsersChanged} existingExternalUsers={this.props.alert_external_users} />
+						<AlertExternalUser edit={false} onChangeParentLevel={this.externalUsersChanged} existingExternalUsers={this.props.alert_external_users} />
 
-						<AlertSmsLimit valueLink={this.linkState('smsLimitField')} edit={this.props.edit} />
-
+						<AlertEmailLimit valueLink={this.linkState('emailLimitField')} edit={false} />
 						<AlertEmailMessage valueLink = {
 								this.linkState('messageField')
-							}  edit={this.props.edit}
+							}  edit={false}
 							/>
 
+            <AlertSmsLimit valueLink={this.linkState('smsLimitField')} edit={false} />
 						<AlertSmsMessage valueLink = {
 								this.linkState('smsMessageField')
-							} edit={this.props.edit}
+							} edit={false}
 							/>
 
 						<div className="row">

@@ -13,7 +13,7 @@ class AlertMailer < ApplicationMailer
     mail(to: email,subject: subject_text)
 
     #record it was send
-    record_alert_message(alert, alert_history, person[:user_id], person[:recipient_id], subject_text)
+    record_alert_message(alert, alert_history, person[:user_id], person[:recipient_id], subject_text, Alert.channel_types["email"])
   end
 
 end
