@@ -50,11 +50,11 @@ class SitesController < ApplicationController
   end
 
   def edit
-    @site = Site.find(params[:id])
+    @site = Site.with_deleted.find(params[:id])
     return unless authorize_resource(@site, READ_SITE)
 
-    @can_move = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
-    @can_edit = has_access?(@site, UPDATE_SITE)
+    @can_move = !@site.deleted? && has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
+    @can_edit = !@site.deleted? && has_access?(@site, UPDATE_SITE)
     if @can_edit
       @can_delete = has_access?(@site, DELETE_SITE)
       @can_be_deleted = @site.devices.empty?

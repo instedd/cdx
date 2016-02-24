@@ -3,7 +3,7 @@
     .col.pe-10
       .row
         .col
-          %h2
+          %h2{entity_html_options(@device)}
             = link_to devices_path, class: 'side-link', title: 'Back' do
               = image_tag "arrow-left.png"
             = @device.name

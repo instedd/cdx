@@ -1,5 +1,5 @@
 class DevicesController < ApplicationController
-  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models, :sites]
+  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models, :sites, :setup, :performance]
   before_filter :load_institutions, only: [:new, :create, :edit, :update, :device_models]
   before_filter :load_sites, only: [:new, :create, :edit, :update]
   before_filter :load_device_models_for_create, only: [:index, :new, :create]
@@ -74,7 +74,7 @@ class DevicesController < ApplicationController
   end
 
   def show
-    @device = Device.find(params[:id])
+    @device = Device.with_deleted.find(params[:id])
     return unless authorize_resource(@device, READ_DEVICE)
     redirect_to setup_device_path(@device) unless @device.activated?
 
@@ -82,7 +82,7 @@ class DevicesController < ApplicationController
   end
 
   def setup
-    @device = Device.find(params[:id])
+    @device = Device.with_deleted.find(params[:id])
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     unless @device.secret_key_hash?
@@ -202,7 +202,7 @@ class DevicesController < ApplicationController
   end
 
   def performance
-    @device = Device.find(params[:id])
+    @device = Device.with_deleted.find(params[:id])
     return unless authorize_resource(@device, READ_DEVICE)
     since = (Date.today - 1.year).iso8601
 

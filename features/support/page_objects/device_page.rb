@@ -24,7 +24,7 @@ class DeviceSetupPage < CdxPageBase
 end
 
 class DevicePage < DeviceSetupPage
-  set_url '/devices/{id}'
+  set_url '/devices/{id}{?query*}'
 
   element :edit, "a[title='Edit']"
 
@@ -34,6 +34,10 @@ class DevicePage < DeviceSetupPage
 
   section :tabs_content, '.tabs-content' do
     element :explore_tests, :link, 'Explore tests'
+  end
+
+  def shows_deleted?
+    page.has_css?('h2.deleted')
   end
 end
 

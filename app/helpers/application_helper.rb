@@ -141,4 +141,10 @@ module ApplicationHelper
       render partial: "shared/validation_errors", locals: { model: model }
     end
   end
+
+  def entity_html_options(entity)
+    res = {}
+    res[:class] = "deleted" if entity.deleted?
+    res
+  end
 end

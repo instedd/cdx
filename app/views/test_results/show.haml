@@ -32,7 +32,7 @@
           = link_to @test_result.patient.name, @test_result.patient
           %br
         Test performed on
-        = link_to @test_result.device.name, edit_device_path(@test_result.device)
+        = link_to @test_result.device.name, device_path(@test_result.device)
         by
         -# TODO add link to site_user
         = @test_result.core_fields[TestResult::LAB_USER_FIELD]

@@ -308,3 +308,11 @@ a[title="Back"] {
 .nodisplay {
   display: none;
 }
+
+.deleted {
+  color: $gray3;
+  &::after {
+    content: "(DELETED)";
+    color: $red;
+  }
+}

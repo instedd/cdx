@@ -3,7 +3,7 @@
     .col.pe-10
       .row
         .col
-          %h2
+          %h2{entity_html_options(@site)}
             = link_to sites_path, class: 'side-link', title: 'Back' do
               = image_tag "arrow-left.png"
             = @site.name
@@ -12,4 +12,3 @@
   = render 'form'
 - else
   = render 'show'
-
