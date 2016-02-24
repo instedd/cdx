@@ -1,15 +1,11 @@
 require "spec_helper"
 
 RSpec.describe AlertMailer, type: :mailer do
-
-
   after(:each) do
      ActionMailer::Base.deliveries.clear
    end
-   
 
   it 'should send an email' do
-
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.deliveries = []
@@ -17,7 +13,7 @@ RSpec.describe AlertMailer, type: :mailer do
     alert = Alert.make
     alert.name="test alert"
     alert.message="welcome mr {lastname}"
-    alert.email_limit=1000
+    alert.email_limit=99
 
     recipient = AlertRecipient.make
     recipient.recipient_type = AlertRecipient.recipient_types["external_user"]
@@ -32,12 +28,10 @@ RSpec.describe AlertMailer, type: :mailer do
     person[:recipient_id] = recipient.id
     email_list.push person
 
-
     recipient2 = AlertRecipient.make
     recipient2.recipient_type = AlertRecipient.recipient_types["external_user"]
     recipient2.email="ddd@ggg.com"
     recipient2.alert=alert
-
     person2 = Hash.new
     person2[:email] = recipient2.email
     person2[:first_name] = recipient2.first_name
@@ -52,7 +46,4 @@ RSpec.describe AlertMailer, type: :mailer do
 
     expect(ActionMailer::Base.deliveries.count).to eq(2)
   end
-
-
-
 end

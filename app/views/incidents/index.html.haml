@@ -14,7 +14,7 @@
           %h1 There are incidents on this site
           %p Create alert groups in order to keep your team notified on current events
     - else
-      = cdx_table title: pluralize(@total, "incident") do |t|
+      = cdx_table title: pluralize(@total, "Incident") do |t|
         - t.columns do
           %col{:width => "25%"}
           %col{:width => "25%"}
@@ -39,4 +39,3 @@
 
       .pagination
         = render 'shared/pagination'
-

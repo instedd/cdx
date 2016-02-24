@@ -15,7 +15,7 @@
           %h1 There are no alert groups on this site
           %p Create alert groups in order to keep your team notified on current events
     - else
-      = cdx_table title: pluralize(@total, "alert group") do |t|
+      = cdx_table title: pluralize(@total, "Alert Group") do |t|
         - t.columns do
           %col{:width => "15%"}
           %col{:width => "15%"}
@@ -42,7 +42,5 @@
               %td= link_to display_roles(alert), edit_alert_path(alert)
               %td= link_to display_latest_alert_date(alert), edit_alert_path(alert)
 
-
       .pagination
         = render 'shared/pagination'
-

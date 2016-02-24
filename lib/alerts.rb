@@ -44,7 +44,6 @@ module Alerts
         if alert.aggregated?
           subject_text += " :occured times: "+alert_count.to_s
         end
-        
         AlertMailer.alert_email(alert, person, alert_history, message_body, subject_text, alert_count).deliver_now
       else
         Rails.logger.info("email limit exceeded for alert "+alert.id.to_s)
@@ -67,7 +66,6 @@ module Alerts
     end
   end
 
-
   def record_alert_message(alert, alert_history, user_id, alert_recipient_id, messagebody, channel_type, sms_response_fields=nil)
     recipientNotificationHistory = RecipientNotificationHistory.new
     recipientNotificationHistory.alert = alert
@@ -85,8 +83,6 @@ module Alerts
 
     recipientNotificationHistory.save
   end
-
-
 
   #build the email ist from roles, internal users,external users
   def build_mailing_list(recipients)
@@ -127,7 +123,6 @@ module Alerts
     email_list
   end
 
-
   def parse_alert_message(alert, message, person)
     msg = message
     msg.gsub! '{firstname}', person[:first_name]
@@ -136,5 +131,4 @@ module Alerts
     msg.gsub! '{alertcategory}', alert.category_type
     return msg
   end
-
 end

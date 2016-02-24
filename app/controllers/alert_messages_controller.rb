@@ -16,5 +16,4 @@ class AlertMessagesController < ApplicationController
 
     respond_with @alert_messages
   end
-
 end

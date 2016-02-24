@@ -66,13 +66,13 @@ class Alert < ActiveRecord::Base
     id: 'alert_'+id.to_s,
     ignore: 404
   end
-
+  
+  
   private
 
   def  is_integer?(str_val)
     str_val.to_i.to_s == str_val
   end
-
 
   def category_validation
     if category_type == "device_errors"

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160218104352) do
+ActiveRecord::Schema.define(version: 20160223111818) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -42,9 +42,11 @@ ActiveRecord::Schema.define(version: 20160218104352) do
     t.string   "telephone",      limit: 255
     t.string   "first_name",     limit: 255
     t.string   "last_name",      limit: 255
+    t.datetime "deleted_at"
   end
 
   add_index "alert_recipients", ["alert_id"], name: "index_alert_recipients_on_alert_id", using: :btree
+  add_index "alert_recipients", ["deleted_at"], name: "index_alert_recipients_on_deleted_at", using: :btree
   add_index "alert_recipients", ["user_id"], name: "index_alert_recipients_on_user_id", using: :btree
 
   create_table "alerts", force: :cascade do |t|

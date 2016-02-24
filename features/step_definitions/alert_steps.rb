@@ -12,7 +12,6 @@ Given(/^the user has an account$/) do
   @navigation_context = NavigationContext.new(@user, default_params[:context])
 end
 
-
 Given(/^the user creates a new error category alert with all fields with name "(.*?)"$/) do |arg1|
   site = @navigation_context.entity.sites.make
   device = site.devices.make
@@ -31,7 +30,8 @@ Given(/^the user creates a new error category alert with all fields with name "(
     form.roles.set_exact_multi "Institution Aric Smith Reader"
     form.internal_users.set_exact_multi @user.email
     form.aggregation.set "record"
-    form.channel.set_exact "sms"
+    form.channel.set_exact "email"
+    form.emaillimit.set 2
     alert_form_fillin_externaluser(form)
     form.new_externaluser.click
   # form.submit.click
@@ -39,7 +39,6 @@ Given(/^the user creates a new error category alert with all fields with name "(
     wait_for_submit
   end
 end
-
 
 Given(/^the user creates a new anomalie category alert with all fields with name "(.*?)"$/) do |arg1|
   site = @navigation_context.entity.sites.make
@@ -67,7 +66,6 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     find_button("submit").trigger('click')
   end
 end
-
 
 Given(/^the user creates a new testresult alert with all fields with name "(.*?)"$/) do |arg1|
   site = @navigation_context.entity.sites.make
@@ -128,13 +126,11 @@ Given(/^the user Successful creates a new utilization efficiency category with a
   end
 end
 
-
 Then (/^the user should see in list alerts "(.*?)"$/) do |arg1|
   @alertIndex = AlertsIndexPage.new
   @alertIndex.load
   expect(@alertIndex).to have_content(arg1)
 end
-
 
 Then (/^the user should click edit "(.*?)"$/) do |arg1|
   @alertIndex = AlertsIndexPage.new
@@ -146,7 +142,6 @@ And (/^the user should view edit page "(.*?)"$/) do |arg1|
   find_field('alertname').value.should eq arg1
 end
 
-
 Then (/^delete the alert$/) do
   click_link("delete_alert")
 
@@ -154,13 +149,11 @@ Then (/^delete the alert$/) do
   find('.btn-danger').click
 end
 
-
 Then (/^the user should not see in list alerts "(.*?)"$/) do |arg1|
   @alertIndex = AlertsIndexPage.new
   @alertIndex.load
   expect(@alertIndex).not_to have_content(arg1)
 end
-
 
 Then (/^the user should have error_code alert result$/) do
   parent_location = Location.make
@@ -178,7 +171,6 @@ Then (/^the user should have error_code alert result$/) do
   expect(after_test_history_count).to be > before_test_history_count
 end
 
-
 Then (/^the user should have no_sample_id alert result$/) do
   parent_location = Location.make
   leaf_location1 = Location.make parent: parent_location
@@ -195,18 +187,15 @@ Then (/^the user should have no_sample_id alert result$/) do
   expect(before_test_history_count+1).to eq(after_test_history_count)
 end
 
-
 Then (/^the user should have an incident$/) do
   @incidents = IncidentsPage.new
   @incidents.load
   expect(page).to have_xpath('//table/tbody/tr', :count => 1)
 end
 
-
 Then (/^the user should see no edit alert incidents$/) do
   expect(page).to have_css('div#incidents', :text => 'NEVER')
 end
-
 
 Then (/^the user should have two emails$/) do
   after_test_notification_count = RecipientNotificationHistory.count
