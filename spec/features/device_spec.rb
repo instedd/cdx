@@ -30,6 +30,61 @@ describe "device" do
     end
   end
 
+  context "creating a device by a lab user (fix #830, #677)" do
+    let!(:device_spec_helper) { DeviceSpecHelper.new 'genoscan' }
+    let(:user) { Institution.make.user }
+    let(:other_institution) { Institution.make }
+
+    before(:each) {
+      grant other_institution.user, user, other_institution, [READ_INSTITUTION]
+      grant other_institution.user, user, other_institution, [REGISTER_INSTITUTION_DEVICE]
+      grant other_institution.user, user, {site: other_institution}, ASSIGN_DEVICE_SITE
+      grant other_institution.user, user, {device: other_institution}, [UPDATE_DEVICE]
+      sign_in(user)
+    }
+
+    def create_device
+      goto_page NewDevicePage, query: { context: other_institution.uuid } do |page|
+        page.device_model.set "genoscan"
+        page.name.set "MyDevice"
+        page.serial_number.set "1234"
+        yield page if block_given?
+        page.submit
+      end
+
+
+      expect_page DeviceSetupPage do |page|
+        return page.device
+      end
+    end
+
+    context "with a single site" do
+      let!(:site) { other_institution.sites.make }
+
+      it "should assign the device to the sole site" do
+        expect(create_device.site).to eq(site)
+      end
+    end
+
+    context "with multiple sites" do
+      let!(:site) { other_institution.sites.make }
+      let!(:site2) { other_institution.sites.make }
+
+      it "should assign the device to no site" do
+        expect(create_device.site).to be_nil
+      end
+
+      it "should be able to specify a site" do
+        device = create_device do |page|
+          page.site.set site2.name
+        end
+
+        expect(device.site).to eq(site2)
+      end
+    end
+  end
+
+
   context "activation" do
     context "manufacturer" do
       let(:user) { Institution.make(:manufacturer).user }

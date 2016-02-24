@@ -42,6 +42,7 @@ class DevicesController < ApplicationController
     @device = Device.new
     @device.time_zone = "UTC"
     @device.site = check_access(@navigation_context.site, ASSIGN_DEVICE_SITE) if @navigation_context.site
+    @device.site = @sites[0] if !@allow_to_pick_site && @sites.count == 1
     return unless prepare_for_institution_and_authorize(@device, REGISTER_INSTITUTION_DEVICE)
   end
 
@@ -110,6 +111,7 @@ class DevicesController < ApplicationController
   end
 
   def update
+    # TODO should validate that selected site, if changed is among @sites (due to ASSIGN_DEVICE_SITE)
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     respond_to do |format|
@@ -230,6 +232,7 @@ class DevicesController < ApplicationController
   def load_sites
     @sites = check_access(@navigation_context.institution.sites, ASSIGN_DEVICE_SITE)
     @sites ||= []
+    @allow_to_pick_site = @sites.count > 1 || check_access(@navigation_context.institution, CREATE_INSTITUTION_SITE)
   end
 
   def load_filter_resources
