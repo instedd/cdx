@@ -1,4 +1,5 @@
 include AlertsHelper
+include CdxPageHelper
 
 Given(/^the user has an account$/) do
   @user = User.make(password: '12345678', first_name: 'Bob', email: 'zaa1aa@ggg.com')
@@ -20,10 +21,10 @@ Given(/^the user creates a new error category alert with all fields with name "(
 
   within(@alert.form) do |form|
     alert_form_fillin_basic(form, arg1)
-    
+
     #Note: this did not work due to the CSS for 'radio': form.choose 'device_errors'
     find('label[for=device_errors]').click
-    
+
     form.device_errors_value.set 2
     form.sites.set_exact_multi "Mrs. Terry Goyette"
     form.devices.set_exact_multi "Mr. Alphonso Witting"
@@ -33,8 +34,9 @@ Given(/^the user creates a new error category alert with all fields with name "(
     form.channel.set_exact "sms"
     alert_form_fillin_externaluser(form)
     form.new_externaluser.click
- #   form.submit.click
-     find_button("submit").trigger('click')
+  # form.submit.click
+    find_button("submit").trigger('click')
+    wait_for_submit
   end
 end
 
@@ -51,7 +53,7 @@ Given(/^the user creates a new anomalie category alert with all fields with name
 
     #Note: this did not work due to the CSS for 'radio': form.choose 'anomalies'
     find('label[for=anomalies]').click
-    
+
     form.anomalies.set "missing_sample_id"
     form.sites.set_exact_multi "Mrs. Terry Goyette"
     form.devices.set_exact_multi "Mr. Alphonso Witting"
@@ -78,7 +80,7 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
     alert_form_fillin_basic(form, arg1)
 
     find('label[for=test_results]').click
-    
+
     form.sites.set_exact_multi "Mrs. Terry Goyette"
     form.devices.set_exact_multi "Mr. Alphonso Witting"
     form.roles.set_exact_multi "Institution Aric Smith Reader"
@@ -107,7 +109,7 @@ Given(/^the user Successful creates a new utilization efficiency category with a
 
   within(@alert.form) do |form|
     alert_form_fillin_basic(form, arg1)
-    
+
     find('label[for=utilization_efficiency]').click
     form.sites.set_exact_multi "Mrs. Terry Goyette"
     form.devices.set_exact_multi "Mr. Alphonso Witting"
@@ -172,7 +174,7 @@ Then (/^the user should have error_code alert result$/) do
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
   DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
   after_test_history_count = AlertHistory.count
-  
+
   expect(after_test_history_count).to be > before_test_history_count
 end
 
@@ -189,7 +191,7 @@ Then (/^the user should have no_sample_id alert result$/) do
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
   DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative]}, sample: {}, patient: {id: 'a',gender: :male})
   after_test_history_count = AlertHistory.count
- 
+
   expect(before_test_history_count+1).to eq(after_test_history_count)
 end
 
