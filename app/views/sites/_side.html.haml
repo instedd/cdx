@@ -1,24 +1,24 @@
 .box.small.gray
   .row
-    .col.pe-3
+    .col.pe-5
       %label Creation date
     .col
       .value= format_datetime @site.created_at
   - if has_access_to_devices_index?
     .row
-      .col.pe-3
+      .col.pe-5
         %label Devices
       .col
         .value= link_to @site.devices.count, devices_path(context: @site.uuid)
   - if has_access_to_test_results_index?
     .row
-      .col.pe-3
+      .col.pe-5
         %label Tests
       .col
         .value= link_to @site.test_results.count, test_results_path(context: @site.uuid)
   - if has_access_to_users_index?
     .row
-      .col.pe-3
+      .col.pe-5
         %label Users
       .col
         .value= link_to User.within(@site).count, users_path(context: @site.uuid)
