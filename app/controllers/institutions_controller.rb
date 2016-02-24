@@ -48,6 +48,15 @@ class InstitutionsController < ApplicationController
 
     respond_to do |format|
       if @institution.save
+        new_context = @institution.uuid
+
+        # Set the new context to the newly created institution
+        current_user.last_navigation_context = new_context
+        current_user.save!
+
+        # This is needed for the next redirect, which will use it
+        params[:context] = new_context
+
         format.html { redirect_to root_path, notice: 'Institution was successfully created.' }
         format.json { render action: 'show', status: :created, location: @institution }
       else
