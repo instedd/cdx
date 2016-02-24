@@ -8,6 +8,20 @@ var PatientCard = React.createClass({
   render: function () {
     var patient = this.props.patient;
 
+    function patientInfo(patient) {
+      var string = "";
+      if (patient.gender) {
+        string += patient.gender;
+        if (patient.dob) {
+          string += " - "
+        }
+      }
+      if (patient.dob) {
+        string += patient.dob + " (" + patient.age + ")";
+      }
+      return string;
+    }
+
     if (patient == null) {
       return (
         <%= to_jsx(card(image: asset_url('card-unkown.png')) do |c|
@@ -22,7 +36,7 @@ var PatientCard = React.createClass({
           c.top do
             raw <<-JSX
               <a href={"/patients/" + patient.id}>{patient.name}</a><br/>
-              {patient.gender || "n/a"} - {patient.dob || "n/a"} ({patient.age || "n/a"})
+              {patientInfo(patient)}
             JSX
           end
 
