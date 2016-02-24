@@ -46,6 +46,7 @@ class ApplicationController < ActionController::Base
     if Policy.can?(action, resource, current_user)
       Policy.authorize(action, resource, current_user)
     else
+      log_authorization_warn resource, action
       head :forbidden
       nil
     end
@@ -65,6 +66,7 @@ class ApplicationController < ActionController::Base
   # filters/authorize navigation_context institutions by action. Assign calls resource.institution= if action is allowed
   def prepare_for_institution_and_authorize(resource, action)
     if authorize_resource(@navigation_context.institution, action).blank?
+      log_authorization_warn resource, action
       head :forbidden
       nil
     else
@@ -158,5 +160,8 @@ class ApplicationController < ActionController::Base
     @total = rel.total_count
     rel
   end
-end
 
+  def log_authorization_warn(resource, action)
+    logger.warn "Authorization failed. #{action} requested by #{current_user.email} in #{resource.class} (id=#{resource.id})"
+  end
+end
