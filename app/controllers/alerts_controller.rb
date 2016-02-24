@@ -22,18 +22,18 @@ class AlertsController < ApplicationController
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i
     offset = (@page - 1) * @page_size
-    
+
     @alerts = current_user.alerts
     @total = @alerts.count
     @alerts = @alerts.limit(@page_size).offset(offset)
-    
+
     respond_with @alerts
   end
 
 
   def edit
     new_alert_request_variables
-    
+
     @alert_sites=[]
     alert_info.sites.each do |site|
       @alert_sites.push(site.id)
@@ -95,7 +95,7 @@ class AlertsController < ApplicationController
     error_text=Hash.new
 
     alert_info.user = current_user
-    
+
     alert_saved_ok = alert_info.save
     if alert_saved_ok==false
       error_text = alert_info.errors.messages
@@ -215,7 +215,7 @@ class AlertsController < ApplicationController
       end
 
 
-      if (params[:alert][:sample_id]) && (params[:alert][:sample_id].length > 0) 
+      if (params[:alert][:sample_id]) && (params[:alert][:sample_id].length > 0)
         alert_info.query=append_query(alert_info, {"sample.id"=>params[:alert][:sample_id]})
       end
 
@@ -287,7 +287,7 @@ class AlertsController < ApplicationController
   def new_alert_request_variables
     @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
     @roles = check_access(Role, READ_ROLE)
- 
+
  #   @devices = check_access(Device, READ_DEVICE)
    @devices = check_access(Device.within(@navigation_context.entity), READ_DEVICE)
 
