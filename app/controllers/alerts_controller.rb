@@ -9,7 +9,7 @@ class AlertsController < ApplicationController
   before_filter do
     head :forbidden unless has_access_to_test_results_index?
   end
-  
+
   def new
     new_alert_request_variables
     alert_info.sms_limit=100
@@ -89,113 +89,25 @@ class AlertsController < ApplicationController
 
 
 
-
   def create
     external_users_ok = true
     internal_users_ok = true
     condition_result_ok = true
     error_text=Hash.new
-
     alert_info.user = current_user
-
     alert_saved_ok = alert_info.save
     if alert_saved_ok==false
       error_text = alert_info.errors.messages
     else
-      alert_saved_ok
-
-      internal_users_ok,external_users_ok,error_text = common_channel_info_for_edit_and_create(params, alert_info, internal_users_ok, external_users_ok, error_text, false)
-
       alert_info.query="{}";
-
-      if alert_info.category_type == "anomalies"
-        # check that the start_time field is not missing
-        if alert_info.anomalie_type == "missing_sample_id"
-          # alert_info.query = {"sample.id"=>"not(null)" }
-          alert_info.query = {"sample.id"=>"null"}
-        elsif alert_info.anomalie_type == "missing_start_time"
-          alert_info.query = {"test.start_time"=>"null"}
-        end
-
-      elsif alert_info.category_type == "device_errors"
-        if alert_info.error_code && (alert_info.error_code.include? '-')
-          minmax=alert_info.error_code.split('-')
-          alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
-          #elsif alert_info.error_code.include? '*'
-          #   alert_info.query =    {"test.error_code.wildcard" => "*7"}
-        else
-          alert_info.query = {"test.error_code"=>alert_info.error_code }
-        end
-
-      elsif alert_info.category_type == "test_results"
-        #this will generate a query like: core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}
-        if params[:alert][:conditions_info]
-          conditions = params[:alert][:conditions_info].split(',')
-          query_conditions=[]
-          conditions.each do |conditionid|
-            condition = Condition.find_by_id(conditionid)
-            alert_info.conditions << condition
-            query_conditions << condition.name
-          end
-        end
-
-        if params[:alert][:condition_results_info]
-          condition_results = params[:alert][:condition_results_info].split(',')
-          query_condition_results=[]
-          condition_results.each do |condition_result_name|
-            alert_condition_result = AlertConditionResult.new
-            alert_condition_result.result = condition_result_name
-            alert_condition_result.alert=alert_info
-            if alert_condition_result.save == false
-              condition_result_ok = false
-              error_text = error_text.merge alert_condition_result.errors.messages
-            end
-            query_condition_results << condition_result_name
-          end
-        end
-
-        alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
-        #TEST  alert_info.query =    {"assays.quantitative_result.min" => "8"}
-        #TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
-
-      elsif alert_info.category_type == "utilization_efficiency"
-        alert_info.aggregation_type = Alert.aggregation_types.key(1)  #for utilization, it is always an aggregation
-        alert_info.utilization_efficiency_last_checked = Time.now
-        #Note: the sampleid must be set for this category -in a validation
-      end
-
-
-      if (params[:alert][:sample_id]) && (params[:alert][:sample_id].length > 0)
-        alert_info.query=append_query(alert_info, {"sample.id"=>params[:alert][:sample_id]})
-      end
-
-      if params[:alert][:sites_info]
-        sites = params[:alert][:sites_info].split(',')
-        query_sites=[]
-        sites.each do |siteid|
-          site = Site.find_by_id(siteid)
-          alert_info.sites << site
-          query_sites << site.uuid
-        end
-        #Note:  the institution uuid should not be necessary
-        alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
-      end
-
-      #TODO you have the device uuid, you don’t even need the site uuid
-      if params[:alert][:devices_info]
-        devices = params[:alert][:devices_info].split(',')
-        query_devices=[]
-        devices.each do |deviceid|
-          device = Device.find_by_id(deviceid)
-          alert_info.devices << device
-          query_devices << device.uuid
-        end
-        alert_info.query=alert_info.query.merge ({"device.uuid"=>query_devices})
-      end
-      #Note: alert_info.create_percolator is called from the model
+      edit = false
+      internal_users_ok,external_users_ok,error_text = set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, edit)
+      condition_result_ok, error_text = set_category(params, alert_info, error_text, condition_result_ok, edit)
+      set_sample_id(params, alert_info)
+      set_sites_devices(params, alert_info, edit)
+      alert_query_updated_ok = alert_info.update(query: alert_info.query)
     end
 
-    alert_query_updated_ok = alert_info.update(query: alert_info.query)
     if alert_saved_ok && alert_query_updated_ok && external_users_ok && internal_users_ok && condition_result_ok
       render json: alert_info
     else
@@ -208,23 +120,28 @@ class AlertsController < ApplicationController
   def update
     external_users_ok = true
     internal_users_ok = true
+    condition_result_ok = true
     error_text=Hash.new
 
     alert_saved_ok = alert_info.save
     if alert_saved_ok==false
       error_text = alert_info.errors.messages
     else
-      alert_saved_ok
-
       #note: the update in the alert model calls create
       if alert_info.enabled == false
         alert_info.delete_percolator
       end
 
-      internal_users_ok,external_users_ok,error_text = common_channel_info_for_edit_and_create(params, alert_info, internal_users_ok, external_users_ok, error_text, true)
+      alert_info.query="{}";
+      edit = true
+      internal_users_ok,external_users_ok,error_text = set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, edit)
+      error_text, condition_result_ok = set_category(params, alert_info, error_text, condition_result_ok, edit)
+      set_sample_id(params, alert_info)
+      set_sites_devices(params, alert_info, edit)
+      alert_query_updated_ok = alert_info.update(query: alert_info.query)
     end
 
-    if alert_saved_ok && external_users_ok && internal_users_ok
+    if alert_saved_ok && alert_query_updated_ok && external_users_ok && internal_users_ok && condition_result_ok
       render json: alert_info
     else
       render json: error_text, status: :unprocessable_entity
@@ -273,8 +190,113 @@ class AlertsController < ApplicationController
   end
 
 
+  def set_sample_id(params, alert_info)
+    if (params[:alert][:sample_id]) && (params[:alert][:sample_id].length > 0)
+      alert_info.query=append_query(alert_info, {"sample.id"=>params[:alert][:sample_id]})
+    end
+  end
 
-  def common_channel_info_for_edit_and_create(params, alert_info, internal_users_ok, external_users_ok, error_text, is_edit)
+
+  def set_sites_devices(params, alert_info, is_edit)
+    if is_edit==true
+      alert_info.devices.destroy_all
+      alert_info.sites.destroy_all
+    end
+
+    if params[:alert][:sites_info]
+      sites = params[:alert][:sites_info].split(',')
+      query_sites=[]
+      sites.each do |siteid|
+        site = Site.find_by_id(siteid)
+        alert_info.sites << site
+        query_sites << site.uuid
+      end
+      #Note:  the institution uuid should not be necessary
+      alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
+    end
+
+    #TODO you have the device uuid, you don’t even need the site uuid
+    if params[:alert][:devices_info]
+      devices = params[:alert][:devices_info].split(',')
+      query_devices=[]
+      devices.each do |deviceid|
+        device = Device.find_by_id(deviceid)
+        alert_info.devices << device
+        query_devices << device.uuid
+      end
+      alert_info.query=alert_info.query.merge ({"device.uuid"=>query_devices})
+    end
+    #Note: alert_info.create_percolator is called from the model
+  end
+
+
+  def set_category(params, alert_info, error_text, condition_result_ok, is_edit)
+    if is_edit==true
+      alert_info.conditions.destroy_all
+    end
+
+    if alert_info.category_type == "anomalies"
+      # check that the start_time field is not missing
+      if alert_info.anomalie_type == "missing_sample_id"
+        # alert_info.query = {"sample.id"=>"not(null)" }
+        alert_info.query = {"sample.id"=>"null"}
+      elsif alert_info.anomalie_type == "missing_start_time"
+        alert_info.query = {"test.start_time"=>"null"}
+      end
+
+    elsif alert_info.category_type == "device_errors"
+      if alert_info.error_code && (alert_info.error_code.include? '-')
+        minmax=alert_info.error_code.split('-')
+        alert_info.query =    {"test.error_code.min" => minmax[0], "test.error_code.max"=>minmax[1]}
+        #elsif alert_info.error_code.include? '*'
+        #   alert_info.query =    {"test.error_code.wildcard" => "*7"}
+      else
+        alert_info.query = {"test.error_code"=>alert_info.error_code }
+      end
+
+    elsif alert_info.category_type == "test_results"
+      #this will generate a query like: core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}
+      if params[:alert][:conditions_info]
+        conditions = params[:alert][:conditions_info].split(',')
+        query_conditions=[]
+        conditions.each do |conditionid|
+          condition = Condition.find_by_id(conditionid)
+          alert_info.conditions << condition
+          query_conditions << condition.name
+        end
+      end
+
+      if params[:alert][:condition_results_info]
+        condition_results = params[:alert][:condition_results_info].split(',')
+        query_condition_results=[]
+        condition_results.each do |condition_result_name|
+          alert_condition_result = AlertConditionResult.new
+          alert_condition_result.result = condition_result_name
+          alert_condition_result.alert=alert_info
+          if alert_condition_result.save == false
+            condition_result_ok = false
+            error_text = error_text.merge alert_condition_result.errors.messages
+          end
+          query_condition_results << condition_result_name
+        end
+      end
+
+      alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
+      #TEST  alert_info.query =    {"assays.quantitative_result.min" => "8"}
+      #TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
+
+    elsif alert_info.category_type == "utilization_efficiency"
+      alert_info.aggregation_type = Alert.aggregation_types.key(1)  #for utilization, it is always an aggregation
+      alert_info.utilization_efficiency_last_checked = Time.now
+      #Note: the sampleid must be set for this category -in a validation
+    end
+
+    return condition_result_ok,error_text
+  end
+
+
+
+  def set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, is_edit)
     #destroy all recipients before adding them in again on an update
     if (is_edit==true)
       AlertRecipient.destroy_all(alert_id: alert_info.id)
@@ -336,6 +358,5 @@ class AlertsController < ApplicationController
 
     return internal_users_ok,external_users_ok,error_text
   end
-
 
 end

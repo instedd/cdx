@@ -10,8 +10,9 @@ var AlertCategorySelect = React.createClass({
 		}
 
 		if (this.props.edit == true) {
+			// allowed all fields to be editable for now
 			this.setState({
-				disable_all_selects: true
+				disable_all_selects: false
 			});
 
 			this.setState({
@@ -221,7 +222,7 @@ var AlertCategorySelect = React.createClass({
 
 					<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
 
-					<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={this.props.edit} />
+					<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={false} />
 
 
 					<div className="row">
@@ -232,7 +233,7 @@ var AlertCategorySelect = React.createClass({
 								<input type="radio" name="category_type" value={category_keys[0]}
 								 onChange={this.categoryChanged}
 								 id={category_keys[0]}
-								 disabled={this.props.edit}
+								 disabled={false}
 								/>
 								<label htmlFor={category_keys[0]}>Anomalies</label>
 							</div>
@@ -245,7 +246,7 @@ var AlertCategorySelect = React.createClass({
 								<input type = "radio" name = "category_type" value = {category_keys[1]}
 									onChange = {this.categoryChanged}
 									id = {category_keys[1]}
-									disabled={this.props.edit}
+									disabled={false}
 									/>
 								<label htmlFor={category_keys[1]}>Device Errors</label>
 							</div>
@@ -259,7 +260,7 @@ var AlertCategorySelect = React.createClass({
 								<input type = "radio" name = "category_type" value = {category_keys[3]}
 									onChange = {this.categoryChanged}
 									id = {category_keys[3]}
-									disabled={this.props.edit}
+									disabled={false}
 									/>
 								<label htmlFor={category_keys[3]}>Test Results</label>
 							</div>
@@ -273,13 +274,13 @@ var AlertCategorySelect = React.createClass({
 								<input type = "radio" name = "category_type" value = {category_keys[4]}
 									onChange = {this.categoryChanged}
 									id = {category_keys[4]}
-									disabled={this.props.edit}
+									disabled={false}
 									/>
 								<label htmlFor={category_keys[4]}>Utilization Efficiency</label>
 							</div>
 						</div>
 
-						<AlertErrorCode valueLink = {this.linkState('errorCodeField')} edit={this.props.edit} />
+						<AlertErrorCode valueLink = {this.linkState('errorCodeField')} edit={false} />
 
 						<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
 
@@ -290,7 +291,7 @@ var AlertCategorySelect = React.createClass({
 						<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} edit={this.props.edit} />
 */
 }
-						<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} edit={this.props.edit} />
+						<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} edit={false} />
 
 						<AlertAggregation aggregation_types = {
 								this.props.aggregation_types
@@ -306,7 +307,7 @@ var AlertCategorySelect = React.createClass({
 							}
 							/>
 						<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
-						<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} edit={this.props.edit} />
+						<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} edit={false} />
 
             <hr />
 
