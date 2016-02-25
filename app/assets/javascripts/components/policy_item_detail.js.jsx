@@ -13,7 +13,7 @@ var PolicyItemDetail = React.createClass({
 
   onResourceTypeChange: function(newValue) {
     var data = {resourceType: { $set: newValue }};
-    if(!this.selectableResources().includes(newValue)) {
+    if(!_.includes(this.selectableResources(), newValue)) {
       data.statementType = { $set: 'all'};
     };
     this.props.updateStatement(data);
@@ -45,7 +45,7 @@ var PolicyItemDetail = React.createClass({
   },
 
   statementHasAction: function(statement, action) {
-    return statement.actions.find(function(anAction) { return anAction.id == action.id });
+    return _.find(statement.actions, function(anAction) { return anAction.id == action.id });
   },
 
   removeResourceAtIndex: function(resourceIndex) {
@@ -61,7 +61,7 @@ var PolicyItemDetail = React.createClass({
   },
 
   resourcesLabel: function() {
-    var currentResourceType = this.props.resourceTypes.find((function(resourceType) { return resourceType.value == this.props.statement.resourceType }).bind(this));
+    var currentResourceType = _.find(this.props.resourceTypes, (function(resourceType) { return resourceType.value == this.props.statement.resourceType }).bind(this));
     return (currentResourceType.label + "s").toLowerCase();
   },
 
@@ -78,8 +78,8 @@ var PolicyItemDetail = React.createClass({
       var resourcesLabel = this.resourcesLabel();
 
       // FIXME: filter resources for other types - ie, 'site'
-      if(this.selectableResources().includes(statement.resourceType)) {
-        if (_.get(statement, ['resourceList', statement.statementType, 0, 'type']) == 'institution') {
+      if(_.includes(this.selectableResources(), statement.resourceType)) {
+        if (_.includes(['institution', 'site'], _.get(statement, ['resourceList', statement.statementType, 0, 'type']))) {
           // HACK for statements scoped for institution
           ifResourcesSelectable = (<div className="row section">
             <div className="col px-1">

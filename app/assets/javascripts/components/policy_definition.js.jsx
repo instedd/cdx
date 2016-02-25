@@ -96,7 +96,7 @@ var PolicyDefinition = React.createClass({
         return resources[resourceKey];
       }
 
-      if(['only', 'except'].includes(statementType)) {
+      if(_.includes(['only', 'except'], statementType)) {
         resourceList[statementType] = resources.map(_hydratateResourceAndCheckType.bind(this, props.resources));
       }
 

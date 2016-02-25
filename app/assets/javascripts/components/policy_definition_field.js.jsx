@@ -9,7 +9,7 @@ var PolicyDefinitionField = React.createClass({
         includeSubsites: statement.includeSubsites
       };
 
-      if(statement.actions.findIndex(function(action) { return action.id == "*" }) >=0) {
+      if(_.findIndex(statement.actions, function(action) { return action.id == "*" }) >=0) {
         result.action = "*";
       } else {
         result.action = statement.actions
