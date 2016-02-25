@@ -164,22 +164,25 @@ var EncounterForm = React.createClass(_.merge({
             {this.state.encounter.assays.map(function(assay, index){
               return (
                 <div className="row" key={index}>
-                  <div className="col pe-4">
+                  <div className="col px-4">
                     <div className="underline">
                       <span>{assay.condition.toUpperCase()}</span>
                     </div>
                   </div>
-                  <div className="col pe-3">
-                    <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} clearable={false}/>
+                  <div className="col px-2">
+                    <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} clearable={false} className="input-block"/>
                   </div>
-                  <div className="col pe-1">
-                    <input type="text" className="quantitative" value={assay.quantitative_result} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative_result')} />
+                  <div className="col px-2">
+                    <input type="text" className="quantitative pull-right" value={assay.quantitative_result} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative_result')} />
                   </div>
                 </div>
               );
             }.bind(this))}
-
-            <textarea className="observations" value={this.state.encounter.observations} placeholder="Observations" onChange={this.encounterChanged('observations')} />
+            <div className="row">
+              <div className="col px-6">
+                <textarea className="observations input-block" value={this.state.encounter.observations} placeholder="Observations" onChange={this.encounterChanged('observations')} />
+              </div>
+            </div>
           </div>
         </div>);
     } else {

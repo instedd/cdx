@@ -375,10 +375,6 @@ ul.samples {
   }
 }
 
-textarea.observations {
-  width: 300px;
-}
-
 
 // =============================================================================
 // MAPS
@@ -443,3 +439,22 @@ textarea.observations {
   }
 
 }
+
+.assays-editor {
+
+  .underline {
+    line-height: 35px;
+    height: 35px;
+    border-bottom: 1px solid $gray2;
+    span {
+      border-bottom: 1px solid $white;
+      padding-right: 4px;
+    }
+  }
+
+  input[type="text"].quantitative {
+    height: 35px;
+  }
+
+}
+
