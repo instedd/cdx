@@ -2,9 +2,16 @@ var PieChart = React.createClass({
   getDefaultProps: function() {
     return {
       height: 250,
-      width: 600,
       colors: ["#9D1CB2", "#F6B500", "#47B04B", "#009788", "#A05D56", "#D0743C", "#FF8C00"],
       offcolor: "#434343",
+    }
+  },
+
+  componentDidMount: function() {
+    if (!this.props.width) {
+      this.setProps({
+        width: this.refs.svg.getDOMNode().clientWidth
+      })
     }
   },
 
@@ -84,7 +91,7 @@ var PieChart = React.createClass({
   },
 
   render: function() {
-    var radius = Math.min(this.props.width, this.props.height) / 2;
+    var radius = Math.min(this.props.width || this.props.height, this.props.height) / 2;
 
     var color = this.buildColorScale();
 
@@ -102,8 +109,9 @@ var PieChart = React.createClass({
 
     return (
       <svg className="chart"
-           width={this.props.width}
-           height={this.props.height} ref="svg">
+           width="100%"
+           height={this.props.height} ref="svg"
+           viewBox={"0 0 " + (this.props.width) + " " + this.props.height}>
         <g transform={"translate(" + radius + "," + this.props.height / 2 + ")"}>
           {/* Total Count */}
           <text className="main total"

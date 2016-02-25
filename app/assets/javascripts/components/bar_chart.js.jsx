@@ -44,7 +44,8 @@ var BarChart = React.createClass({
       <div className="chart">
         <svg width="100%"
              height={this.props.height}
-             ref="svg">
+             ref="svg"
+             viewBox={"0 0 " + this.props.width + " " + this.props.height} >
           { this.props.width ?
             <g transform={"translate(" + this.props.margin.left + "," + this.props.margin.top + ")"}>
 
