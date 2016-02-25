@@ -152,10 +152,12 @@ var SiteTreeViewNode = React.createClass({
     return { expanded: true };
   },
 
-  toggle: function() {
+  toggle: function(event) {
     this.setState(React.addons.update(this.state, {
       expanded: { $set: !this.state.expanded }
     }));
+
+    event.stopPropagation();
   },
 
   onSiteClick: function(event) {
