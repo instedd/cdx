@@ -73,7 +73,7 @@ h3 {
   margin: 25px 0 !important;
   // -webkit-text-stroke: 0.6px;
 }
-button {
+button.btn.btn-primary {
   border-radius: 2px !important;
   background: rgba(33,150,243,1) !important;
   font-family: 'Titillium Web', sans-serif !important;
