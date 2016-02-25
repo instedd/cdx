@@ -135,6 +135,12 @@ class RolesController < ApplicationController
             institution = Institution.find(institution_id)
             resources[resourceKey] = as_json_institution(institution).attributes!
           end
+
+          if matches = resourceKey.match(/site\/(\d+)/) || resourceKey.match(/.*\?site=(\d+)/)
+            site_id = matches[1]
+            site = Site.find(site_id)
+            resources[resourceKey] = as_json_site(site).attributes!
+          end
         }
       }
     end
@@ -158,6 +164,12 @@ class RolesController < ApplicationController
   def as_json_institution(json = Jbuilder.new, institution)
     json.(institution, :uuid, :name, :id)
     json.type :institution
+    json
+  end
+
+  def as_json_site(json = Jbuilder.new, site)
+    json.(site, :uuid, :name, :id)
+    json.type :site
     json
   end
 

@@ -69,6 +69,29 @@ describe Device do
       device.site = nil
       expect(device).to be_valid
     end
+
+    it "should require all FTP fields for Alere device" do
+      device = Device.make_unsaved institution: Institution.make
+      device.device_model = DeviceModel.make(institution: Institution.make, name: "Alere")
+      expect(device).to be_invalid
+    end
+
+    it "should be valid with all FTP fields filled for Alere device" do
+      device = Device.make_unsaved institution: Institution.make
+      device.device_model = DeviceModel.make(institution: Institution.make, name: "Alere")
+      device.ftp_password = "12345678"
+      device.ftp_hostname = "Test"
+      device.ftp_port = 3000
+      device.ftp_directory = "test/"
+      device.ftp_username = "Mary"
+      expect(device).to be_valid
+    end
+
+    it "should not require FTP fields at all for non Alere device" do
+      device = Device.make_unsaved institution: Institution.make
+      device.device_model = DeviceModel.make(institution: Institution.make, name: "Not lere")
+      expect(device).to be_valid
+    end
   end
 
   context "within institution or site scope" do
