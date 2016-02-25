@@ -107,11 +107,16 @@ var PieChart = React.createClass({
       .domain(this.props.data.map(function(x, i) { return i; }))
       .rangePoints([-25 * (this.props.data.length - 1) / 2, 25 * (this.props.data.length - 1) / 2]);
 
+    var svgProps = {}
+    if (this.props.width) {
+      svgProps.viewBox = "0 0 " + this.props.width + " " + this.props.height
+    }
+
     return (
       <svg className="chart"
            width="100%"
            height={this.props.height} ref="svg"
-           viewBox={"0 0 " + (this.props.width) + " " + this.props.height}>
+           {...svgProps}>
         <g transform={"translate(" + radius + "," + this.props.height / 2 + ")"}>
           {/* Total Count */}
           <text className="main total"

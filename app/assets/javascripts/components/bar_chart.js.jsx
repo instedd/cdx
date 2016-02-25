@@ -40,12 +40,17 @@ var BarChart = React.createClass({
       y.domain([0, d3.max(this.props.data, function(d) { return d3.sum(d.values); })]);
     }
 
+    var svgProps = {}
+    if (this.props.width) {
+      svgProps.viewBox = "0 0 " + this.props.width + " " + this.props.height
+    }
+
     return (
       <div className="chart">
         <svg width="100%"
              height={this.props.height}
              ref="svg"
-             viewBox={"0 0 " + this.props.width + " " + this.props.height} >
+             {...svgProps} >
           { this.props.width ?
             <g transform={"translate(" + this.props.margin.left + "," + this.props.margin.top + ")"}>
 
