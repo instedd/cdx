@@ -1,4 +1,6 @@
 module AlertsHelper
+  include ActionView::Helpers::DateHelper
+  
   def display_sites(alert)
     site_names = alert.sites.inject {|site,n| site.name + ','+n.name}
     if site_names == nil
@@ -33,7 +35,8 @@ module AlertsHelper
     if alertHistory==nil
       'never'
     else
-      alertHistory.created_at.to_formatted_s(:long)
+      time_ago_in_words(alertHistory.created_at)
+      #alertHistory.created_at.to_formatted_s(:long)
     end
   end
 

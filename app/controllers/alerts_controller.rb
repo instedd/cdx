@@ -1,5 +1,6 @@
 class AlertsController < ApplicationController
   include AlertsHelper
+
   respond_to :html, :json
 
   #could not name it 'alert' as rails gave a warning as this is a reserved method.
@@ -81,6 +82,7 @@ class AlertsController < ApplicationController
 
     @alert_number_incidents = current_user.alert_histories.where("alert_id=? and for_aggregation_calculation=?", alert_info.id, false).count
     @alert_last_incident = display_latest_alert_date(alert_info)
+    
     @alert_created_at  = alert_info.created_at.to_formatted_s(:long)
     respond_with alert_info, location: alert_path
   end
@@ -164,7 +166,7 @@ class AlertsController < ApplicationController
     @conditions = Condition.all
     @condition_results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
     #Note: in case you need to specify the exact N/A:  @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
-
+    
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }
     user_ids = user_ids.uniq
@@ -184,7 +186,6 @@ class AlertsController < ApplicationController
       alert_info.query=append_query(alert_info, {"sample.id"=>params[:alert][:sample_id]})
     end
   end
-
 
   def set_sites_devices(params, alert_info, is_edit)
     if is_edit==true
@@ -217,7 +218,6 @@ class AlertsController < ApplicationController
     end
     #Note: alert_info.create_percolator is called from the model
   end
-
 
   def set_category(params, alert_info, error_text, condition_result_ok, is_edit)
     if is_edit==true
@@ -279,7 +279,6 @@ class AlertsController < ApplicationController
       alert_info.utilization_efficiency_last_checked = Time.now
       #Note: the sampleid must be set for this category -in a validation
     end
-
     return condition_result_ok,error_text
   end
 
@@ -345,4 +344,5 @@ class AlertsController < ApplicationController
 
     return internal_users_ok,external_users_ok,error_text
   end
+
 end
