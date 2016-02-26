@@ -2,12 +2,13 @@ var AlertCategorySelect = React.createClass({
 	mixins: [React.addons.LinkedStateMixin],
 
 	componentDidMount: function() {
-
 		if ( this.props.alert_info.category_type == null ) {
 			this.doCategoryChange('device_errors');
 		} else {
 			this.doCategoryChange(this.props.alert_info.category_type);
 		}
+
+		this.aggregationTypeChanged(this.props.alert_info.aggregation_type);
 
 		if (this.props.edit == true) {
 			// allowed all fields to be editable for now
@@ -72,29 +73,31 @@ var AlertCategorySelect = React.createClass({
 	},
 	doCategoryChange: function(val) {
 		document.getElementById(val).checked = true;
-		$('#errorcoderow').hide();
-		$('#anomalierow').hide();
-		$('#conditionrow').hide();
-		$('#conditionresultrow').hide();
-		$('#thresholdrow').hide();
-		$('#utilizationefficiencyrow').hide();
+		$('#errorCodeRow').hide();
+		$('#anomalieRow').hide();
+		$('#conditionRow').hide();
+		$('#conditionResultRow').hide();
+		$('#thresholdRow').hide();
+		$('#utilizationEfficiencyRow').hide();
 
-		$('#aggregationtyperow').show();
+		$('#aggregationTypeRow').show();
 
 		if (val == 'device_errors') {
-			$('#errorcoderow').show();
+			$('#errorCodeRow').show();
 		}
 		else if (val == 'anomalies') {
-			$('#anomalierow').show();
+			$('#anomalieRow').show();
 		}
 		else if (val == 'test_results') {
-			$('#conditionrow').show();
-			$('#conditionresultrow').show();
-			$('#thresholdrow').show();
+			$('#conditionRow').show();
+			$('#conditionResultRow').show();
+			$('#thresholdRow').show();
 		}
 		else if (val == 'utilization_efficiency') {
-			$('#utilizationefficiencyrow').show();
-			$('#aggregationtyperow').hide();
+			$('#utilizationEfficiencyRow').show();
+			$('#aggregationTypeRow').hide();
+			$('#aggregationFrequenciesRow').show();
+			$('#aggregationThresholdRow').show();
 		}
 
 		this.setState({
@@ -105,6 +108,19 @@ var AlertCategorySelect = React.createClass({
 		this.setState({
 			external_users: updated_external_users
 		});
+	},
+	aggregationTypeChanged: function(aggregation_type) {
+		this.setState({
+			aggregationField: aggregation_type
+		});
+		if (aggregation_type=="aggregated") {
+			$('#aggregationFrequenciesRow').show();
+			$('#aggregationThresholdRow').show();
+		}
+		else {
+			$('#aggregationFrequenciesRow').hide();
+			$('#aggregationThresholdRow').hide();
+		}
 	},
 	siteChanged: function(e) {
 		this.setState({
@@ -189,122 +205,195 @@ var AlertCategorySelect = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<FlashErrorMessages messages={this.state.error_messages} />
-				<form className = "alertForm" id="new_alert" onSubmit = {this.handleAlertSubmit} >
-					<input type='hidden' name='authenticity_token' value={this.props.authenticity_token} />
-					<AlertDisplayIncidentInfo edit={this.props.edit} alert_number_incidents={this.props.alert_number_incidents} alert_last_incident={this.props.alert_last_incident} alert_created_at={this.props.alert_created_at}/>
-					<AlertEnabled checkedLink = { this.linkState('enabledField') } />
-					<AlertName valueLink={this.linkState('nameField')} />
-					<AlertDescription valueLink={this.linkState('descriptionField')} />
-					<AlertSite sites = { this.props.sites } value = { this.state.siteField } updateValue = { this.siteChanged } disable_all_selects = { this.state.disable_all_selects } />
-					<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
-					<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={false} />
-					<div className="row">
-						<div className="col pe-2">
-							<label>Categories</label>
-						</div>
-						<div className="col" >
-							<input type="radio" name="category_type" value={category_keys[0]}
-							 onChange={this.categoryChanged}
-							 id={category_keys[0]}
-							 disabled={false}
-							/>
-							<label htmlFor={category_keys[0]}>Anomalies</label>
-						</div>
-					</div>
-					<div className="row">
-						<div className="col pe-2">
-							&nbsp;
-						</div>
-						<div className = "col" >
-							<input type = "radio" name = "category_type" value = {category_keys[1]}
-								onChange = {this.categoryChanged}
-								id = {category_keys[1]}
-								disabled={false}
+
+				<div className="row">
+					<div className="col">
+
+						<FlashErrorMessages messages={this.state.error_messages} />
+
+						<form className = "alertForm" id="new_alert" onSubmit = {this.handleAlertSubmit} >
+
+							<input type='hidden' name='authenticity_token' value={this.props.authenticity_token} />
+
+							<AlertEnabled checkedLink = {
+									this.linkState('enabledField')
+								}
 								/>
-							<label htmlFor={category_keys[1]}>Device Errors</label>
-						</div>
-					</div>
 
-					<div className="row">
-						<div className="col pe-2">
-							&nbsp;
-						</div>
-						<div className = "col" >
-							<input type = "radio" name = "category_type" value = {category_keys[3]}
-								onChange = {this.categoryChanged}
-								id = {category_keys[3]}
-								disabled={false}
+							<AlertName valueLink={this.linkState('nameField')} />
+
+							<AlertDescription valueLink={this.linkState('descriptionField')} />
+
+							<AlertSite sites = {
+									this.props.sites
+								}
+								value = {
+									this.state.siteField
+								}
+								updateValue = {
+									this.siteChanged
+								}
+								disable_all_selects = {
+									this.state.disable_all_selects
+								}
 								/>
-							<label htmlFor={category_keys[3]}>Test Results</label>
-						</div>
-					</div>
 
-					<div className="row">
-						<div className="col pe-2">
-							&nbsp;
-						</div>
-						<div className = "col" >
-							<input type = "radio" name = "category_type" value = {category_keys[4]}
-								onChange = {this.categoryChanged}
-								id = {category_keys[4]}
-								disabled={false}
+							<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
+
+							<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={false} />
+
+
+							<div className="row">
+								<div className="col pe-3">
+									<label>Categories</label>
+								</div>
+								<div className="col" >
+									<input type="radio" name="category_type" value={category_keys[0]}
+										onChange={this.categoryChanged}
+										id={category_keys[0]}
+										disabled={false}
+										/>
+									<label htmlFor={category_keys[0]}>Anomalies</label>
+								</div>
+							</div>
+							<div className="row">
+								<div className="col pe-3">
+									&nbsp;
+								</div>
+								<div className = "col" >
+									<input type = "radio" name = "category_type" value = {category_keys[1]}
+										onChange = {this.categoryChanged}
+										id = {category_keys[1]}
+										disabled={false}
+										/>
+									<label htmlFor={category_keys[1]}>Device Errors</label>
+								</div>
+							</div>
+
+							<div className="row">
+								<div className="col pe-3">
+									&nbsp;
+								</div>
+								<div className = "col" >
+									<input type = "radio" name = "category_type" value = {category_keys[3]}
+										onChange = {this.categoryChanged}
+										id = {category_keys[3]}
+										disabled={false}
+										/>
+									<label htmlFor={category_keys[3]}>Test Results</label>
+								</div>
+							</div>
+
+							<div className="row">
+								<div className="col pe-3">
+									&nbsp;
+								</div>
+								<div className = "col" >
+									<input type = "radio" name = "category_type" value = {category_keys[4]}
+										onChange = {this.categoryChanged}
+										id = {category_keys[4]}
+										disabled={false}
+										/>
+									<label htmlFor={category_keys[4]}>Utilization Efficiency</label>
+								</div>
+							</div>
+
+							<AlertErrorCode valueLink = {this.linkState('errorCodeField')} edit={false} />
+
+							<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
+
+							<AlertCondition conditions={this.state.all_conditions} valueLink={this.linkState('conditionField')} disable_all_selects={this.state.disable_all_selects} />
+							<AlertConditionResults condition_results ={this.state.all_condition_results} valueLink={this.linkState('conditionResultsField')} disable_all_selects={this.state.disable_all_selects} />
+							{
+								/*
+								<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} edit={this.props.edit} />
+								*/
+							}
+							<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} edit={false} />
+
+
+							<AlertAggregation aggregation_types = {
+									this.props.aggregation_types
+								}
+								value = {
+									this.state.aggregationField
+								}
+								disable_all_selects = {
+									this.state.disable_all_selects
+								}
+								aggregationField = {
+									this.state.aggregationField
+								}
+								onChange = {
+									this.aggregationTypeChanged
+								}
 								/>
-							<label htmlFor={category_keys[4]}>Utilization Efficiency</label>
-						</div>
+
+							<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies} valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
+							<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} edit={false} />
+
+							<hr />
+
+							<AlertChannel channel_types = {
+									this.props.channel_types
+								}
+								valueLink = {
+									this.linkState('channelField')
+								}
+								disable_all_selects = {
+									false
+								}
+								/>
+
+							<AlertRole roles={this.props.roles}  valueLink={this.linkState('roleField')} disable_all_selects={false} />
+
+							<AlertUser users = {
+									this.props.users
+								}
+								valueLink = {
+									this.linkState('userField')
+								}
+								disable_all_selects = {
+									false
+								}
+								/>
+
+							<AlertExternalUser edit={false} onChangeParentLevel={this.externalUsersChanged} existingExternalUsers={this.props.alert_external_users} />
+
+							<AlertEmailLimit valueLink={this.linkState('emailLimitField')} edit={false} />
+							<AlertEmailMessage valueLink = {
+									this.linkState('messageField')
+								}  edit={false}
+								/>
+
+							<AlertSmsLimit valueLink={this.linkState('smsLimitField')} edit={false} />
+							<AlertSmsMessage valueLink = {
+									this.linkState('smsMessageField')
+								} edit={false}
+								/>
+
+							<div className="row">
+								<div className="col pe-2">
+									&nbsp;
+								</div>
+								<div className = "col">
+									<input type = "submit" value = {this.state.submit_button_text} className = "btn-primary" id="submit" />
+									<a className = "btn-link" href = "/alerts">Cancel</a>
+								</div>
+
+								<div className = "col">
+									<AlertDelete edit={this.props.edit} onChangeParentLevel={this.AlertDeleteHandler} />
+								</div>
+							</div>
+						</form>
+
 					</div>
-					<AlertErrorCode valueLink = {this.linkState('errorCodeField')} edit={false} />
-					<AlertAnomalieType anomalie_types={this.props.anomalie_types}  valueLink={this.linkState('anomalieField')} disable_all_selects={this.state.disable_all_selects} />
 
-					<AlertCondition conditions={this.state.all_conditions} valueLink={this.linkState('conditionField')} disable_all_selects={this.state.disable_all_selects} />
-					<AlertConditionResults condition_results ={this.state.all_condition_results} valueLink={this.linkState('conditionResultsField')} disable_all_selects={this.state.disable_all_selects} />
-{
-/*
-					<AlertConditionThreshold min_valueLink={this.linkState('test_result_min_thresholdField')} max_valueLink={this.linkState('test_result_max_thresholdField')} edit={this.props.edit} />
-*/
-}
-					<AlertUtilizationEfficiency valueLink={this.linkState('utilization_efficiency_numberField')} edit={false} />
-
-					<AlertAggregation aggregation_types = {
-							this.props.aggregation_types
-						}
-						value = {
-							this.state.aggregationField
-						}
-						valueLink = {
-							this.linkState('aggregationField')
-						}
-						disable_all_selects = {
-							this.state.disable_all_selects
-						}
-						/>
-					<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies}  valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
-					<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} edit={false} />
-          <hr />
-          <hr />
-					<AlertChannel channel_types = { this.props.channel_types } valueLink = { this.linkState('channelField') } disable_all_selects = { false } />
-
-					<AlertRole roles={this.props.roles}  valueLink={this.linkState('roleField')} disable_all_selects={false} />
-					<AlertUser users = { this.props.users } valueLink = { this.linkState('userField') } disable_all_selects = { false } />
-
-					<AlertExternalUser edit={false} onChangeParentLevel={this.externalUsersChanged} existingExternalUsers={this.props.alert_external_users} />
-					<AlertEmailLimit valueLink={this.linkState('emailLimitField')} edit={false} />
-					<AlertEmailMessage valueLink = { this.linkState('messageField') }  edit={false} />
-          <AlertSmsLimit valueLink={this.linkState('smsLimitField')} edit={false} />
-					<AlertSmsMessage valueLink = { this.linkState('smsMessageField') } edit={false} />
-					<div className="row">
-						<div className="col pe-2">
-							&nbsp;
-						</div>
-						<div className = "col">
-							<input type = "submit" value = {this.state.submit_button_text} className = "btn-primary" id="submit" />
-							<a className = "btn-link" href = "/alerts">Cancel</a>
-						</div>
-						<div className = "col">
-							<AlertDelete edit={this.props.edit} onChangeParentLevel={this.AlertDeleteHandler} />
-						</div>
+					<div className="col">
+						<AlertDisplayIncidentInfo alert_info={this.props.alert_info} edit={this.props.edit} alert_number_incidents={this.props.alert_number_incidents} alert_last_incident={this.props.alert_last_incident} alert_created_at={this.props.alert_created_at}/>
 					</div>
-				</form>
+				</div>
+
 			</div>
 		);
 	}

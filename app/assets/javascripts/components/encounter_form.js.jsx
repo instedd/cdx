@@ -43,7 +43,7 @@ var BaseEncounterForm = {
     $.ajax({
       url: url,
       method: method,
-      data: _.extend({ encounter: JSON.stringify(this.state.encounter) }, extra_data),
+      data: _.extend({ encounter: JSON.stringify(this.state.encounter), context: this.props.context.full_context }, extra_data),
       success: function (data) {
         if (data.status == 'error') {
           alert(data.message); //TODO show errors nicely

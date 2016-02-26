@@ -54,6 +54,12 @@ class ApplicationController < ActionController::Base
 
   def check_no_institution!
     return if current_user && current_user.need_change_password?
+
+    if current_user && Institution.all.empty? && has_access?(Institution, CREATE_INSTITUTION)
+      redirect_to new_institution_path
+      return
+    end
+
     if current_user && current_user.institutions.empty? && current_user.policies.empty? && current_user.roles.empty?
       if has_access?(Institution, CREATE_INSTITUTION)
         redirect_to new_institution_path

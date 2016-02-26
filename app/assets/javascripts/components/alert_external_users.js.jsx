@@ -50,7 +50,7 @@ var AlertExternalUser = React.createClass({
 			return (
 				<div>
 					< div className = "row" id = "newuserrow" >
-					<div className = "col pe-2" >
+					<div className = "col pe-3" >
 						<label>
 							Ad-hoc Recipient
 						</label>
@@ -82,7 +82,7 @@ var AlertCreateExternalUser = React.createClass({
 
 			<div className = "col" >
 				<input type = "text" placeholder = "first name"
-					valueLink = {this.props.firstnameLink} 
+					valueLink = {this.props.firstnameLink}
 					id="externaluser_firstname" />
 			</div>
 
@@ -104,7 +104,7 @@ var AlertCreateExternalUser = React.createClass({
 					id="externaluser_telephone" />
 			</div>
 
-			<div className = "col" >
+			<div className = "col pe-2" >
 				<a className = "btn-link"  onClick={this.clickHandler} id="newexternaluser">Create User</a>
 			</div>
 
