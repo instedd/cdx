@@ -54,6 +54,7 @@
 
     .item-search {
       width: 100%;
+      position:relative;
     }
 
     .modal-footer {
@@ -323,6 +324,10 @@
 
   .hidden {
     display:none;
+  }
+
+  .item-search {
+    max-width: 350px;
   }
 }
 
