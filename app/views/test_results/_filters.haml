@@ -33,7 +33,7 @@
           .col
             %a.btn-toggle.pull-right{:title => "Toggle advanced filters"}
 
-        .advanced
+        .advanced{class: (params["sample.id"].present? || params["encounter.id"].present? || params["device.uuid"].present? ? "show" : "") }
           .row
             - if @display_as == "test"
               .filter
