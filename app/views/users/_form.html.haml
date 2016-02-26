@@ -37,7 +37,8 @@
             = f.label :last_sign_in_at, "Activity"
           .col
             .value= last_activity(f.object)
-  .row.button-actions
-    .col
-      = f.submit 'Save', class: 'btn-primary'
-      = link_to 'Cancel', users_path,  class: 'btn-link'
+  - if @can_update
+    .row.button-actions
+      .col
+        = f.submit 'Save', class: 'btn-primary'
+        = link_to 'Cancel', users_path,  class: 'btn-link'
