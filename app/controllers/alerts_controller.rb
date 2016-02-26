@@ -1,5 +1,6 @@
 class AlertsController < ApplicationController
   include AlertsHelper
+
   respond_to :html, :json
 
   #could not name it 'alert' as rails gave a warning as this is a reserved method.
@@ -28,6 +29,7 @@ class AlertsController < ApplicationController
 
     respond_with @alerts
   end
+
 
   def edit
     new_alert_request_variables
@@ -81,9 +83,12 @@ class AlertsController < ApplicationController
 
     @alert_number_incidents = current_user.alert_histories.where("alert_id=? and for_aggregation_calculation=?", alert_info.id, false).count
     @alert_last_incident = display_latest_alert_date(alert_info)
+    
     @alert_created_at  = alert_info.created_at.to_formatted_s(:long)
     respond_with alert_info, location: alert_path
   end
+
+
 
   def create
     external_users_ok = true
@@ -110,6 +115,8 @@ class AlertsController < ApplicationController
       render json: error_text, status: :unprocessable_entity
     end
   end
+
+
 
   def update
     external_users_ok = true
@@ -142,6 +149,7 @@ class AlertsController < ApplicationController
     end
   end
 
+
   def destroy
     if alert_info.destroy
       render json: alert_info
@@ -150,11 +158,13 @@ class AlertsController < ApplicationController
     end
   end
 
+
   private
 
   def alert_params
     params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :email_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, :utilization_efficiency_number, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
+
 
   def new_alert_request_variables
     @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
@@ -164,12 +174,13 @@ class AlertsController < ApplicationController
     @conditions = Condition.all
     @condition_results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
     #Note: in case you need to specify the exact N/A:  @condition_result_statuses = Cdx::Fields.test.core_fields.find { |field| field.name == 'status' }.options
-
+    
     #find all users in all roles
     user_ids = @roles.map { |user| user.id }
     user_ids = user_ids.uniq
     @users = User.where(id: user_ids)
   end
+
 
   def append_query(alert, query)
     if  alert.query != "{}"
@@ -178,6 +189,7 @@ class AlertsController < ApplicationController
       query
     end
   end
+
 
   def set_sample_id(params, alert_info)
     if (params[:alert][:sample_id]) && (params[:alert][:sample_id].length > 0)
@@ -283,6 +295,8 @@ class AlertsController < ApplicationController
     return condition_result_ok,error_text
   end
 
+
+
   def set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, is_edit)
     #destroy all recipients before adding them in again on an update
     if (is_edit==true)
@@ -345,4 +359,5 @@ class AlertsController < ApplicationController
 
     return internal_users_ok,external_users_ok,error_text
   end
+
 end

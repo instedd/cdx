@@ -9,7 +9,8 @@ var AlertAggregation = React.createClass({
 	},
 	//github.com/JedWatson/react-select/issues/256
 	onChange(textValue, arrayValue) {
-		this.props.valueLink.requestChange(arrayValue[0].label);
+		//this.props.valueLink.requestChange(arrayValue[0].label);
+		this.props.onChange(arrayValue[0].label);
 	},
 	render: function() {
 		var options = [];
@@ -28,14 +29,14 @@ var AlertAggregation = React.createClass({
 		} = this.props;
 		return (
 			< div className = "row" id = "aggregationtyperow" >
-			<div className = "col pe-2" >
+			<div className = "col pe-3" >
 				<label>Aggregation Type</label>
 			</div>
 			<div className = "col" >
 				<Select
 					name = "aggregation"
 					value = {
-						value || valueLink.value
+						value || this.props.aggregationFrequencyField
 					}
 					options = {
 						options
@@ -87,7 +88,7 @@ var AlertAggregationFrequency = React.createClass({
 		} = this.props;
 		return (
 			< div className = "row" id = "aggregationfrequenciesrow" >
-			<div className = "col pe-2" >
+			<div className = "col pe-3" >
 				<label>Aggregation Frequency</label>
 			</div>
 			<div className = "col" >
@@ -120,7 +121,7 @@ var AlertAggregationThreshold = React.createClass({
 	render: function() {
 		return (
 			< div className = "row" id = "aggregationthresholdrow" >
-			<div className = "col pe-2" >
+			<div className = "col pe-3" >
 				<label>Aggregation Threshold</label>
 			</div>
 
