@@ -20,11 +20,25 @@ module Reports
       return self
     end
 
+    def sort_by_day
+      6.downto(0).each do |i|
+        day = Date.today - i.days
+        dayname = day.strftime('%A')
+        key = day.strftime('%Y-%m-%d')
+        day_results = results_by_period('%Y-%m-%d')[key]
+        data << {
+          label: dayname,
+          values: [day_results ? day_results.count : 0]
+        }
+      end
+      return data
+    end
+
     def sort_by_month
       11.downto(0).each do |i|
         date = Date.today - i.months
         date_key = date.strftime('%Y-%m')
-        date_results = results_by_month[date_key]
+        date_results = results_by_period[date_key]
         data << {
           label: label_monthly(date),
           values: [date_results ? date_results.count : 0]
@@ -47,9 +61,9 @@ module Reports
       filter['since'] = options['since'] || (Date.today - 1.year).iso8601
     end
 
-    def results_by_month
+    def results_by_period(format = '%Y-%m')
       results['tests'].group_by do |t|
-        Date.parse(t['test']['start_time']).strftime('%Y-%m')
+        Date.parse(t['test']['start_time']).strftime(format)
       end
     end
 

@@ -8,6 +8,8 @@ RSpec.describe Reports::Base do
   end
 
   let(:current_user) { User.make }
+  let(:site_user) { "#{current_user.first_name} #{current_user.last_name}" }
+  let(:user_device) { Device.make institution_id: institution.id, site: site }
   let(:institution) { Institution.make(user_id: current_user.id) }
   let(:site) { Site.make(institution: institution) }
   let(:query) { {} }
@@ -92,6 +94,33 @@ RSpec.describe Reports::Base do
         options['since'] = since
         allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
         DummyReport.process(current_user, nav_context, options)
+      end
+    end
+
+    context 'when the range is a week' do
+      before do
+        6.downto(0).each do |i|
+          TestResult.create_and_index(
+            core_fields: {
+              'assays' => ['condition' => 'mtb', 'result' => :positive],
+              'start_time' => Date.today - i.days,
+              'name' => 'mtb',
+              'status' => 'error',
+              'site_user' => site_user
+            },
+            device_messages: [DeviceMessage.make(device: user_device)]
+          )
+        end
+      end
+
+      it 'can sort the results by day' do
+        options['since'] = (Date.today - 7.days).iso8601
+        @data = DummyReport.process(
+          current_user, nav_context, options
+        ).sort_by_day
+        expect(@data.count).to eq(7)
+        expect(@data.first[:label]).to eq((Date.today - 6.days).strftime('%A'))
+        expect(@data.last[:label]).to eq(Date.today.strftime('%A'))
       end
     end
   end
