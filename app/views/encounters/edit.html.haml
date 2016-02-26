@@ -1,0 +1,11 @@
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to test_results_path(display_as: "test_order"), class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            Test Order
+
+= react_component('EncounterForm', encounter: @encounter_as_json, context: @navigation_context.to_hash)

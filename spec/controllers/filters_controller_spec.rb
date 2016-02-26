@@ -5,6 +5,7 @@ describe FiltersController do
   let!(:institution) { user.create Institution.make_unsaved }
   let!(:filter) { user.filters.make query: { site: 1 } }
   before(:each) { sign_in user }
+  let(:default_params) { {context: institution.uuid} }
 
   it "list filters" do
     get :index, format: :json

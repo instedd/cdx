@@ -16,8 +16,8 @@ class CustomManifestField < ManifestField
     @validation = ManifestFieldValidation.new(self)
   end
 
-  def hash_key
-    pii? ? 'pii' : 'custom'
+  def store_target
+    [scope_from_target] + (pii? ? ['pii', 'custom'] : ['custom'])
   end
 
   def valid_values

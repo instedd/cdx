@@ -2,44 +2,52 @@ require "spec_helper"
 
 describe TestResultIndexer, elasticsearch: true do
 
+  let(:institution) do
+    Institution.make
+  end
+
   let(:patient) do
-    patient_core_fields = {
-      "gender" => "male",
-      "custom_fields" => {
-        "hiv" => "positive"
-      }
-    }
-    Patient.make(uuid: 'abc', core_fields: patient_core_fields)
+    Patient.make(uuid: 'abc', core_fields: { 'gender' => 'male' }, custom_fields: { 'hiv' => 'positive' }, institution: institution)
+  end
+
+  let(:encounter) do
+    Encounter.make(patient: patient, core_fields: {}, custom_fields: { 'status' => 'completed' }, institution: institution)
   end
 
   let(:sample) do
-    sample_core_fields = {
-      "type" => "sputum",
-      "custom_fields" => {
-        "culture_days" => "10"
-      }
-    }
-    Sample.make(uuid: 'abc', patient: patient, core_fields: sample_core_fields)
+    Sample.make(patient: patient, encounter: encounter, core_fields: { 'type' => 'sputum' }, custom_fields: { 'culture_days' => '10' }, institution: institution)
   end
 
-  let(:test){ TestResult.make(
-    "sample" => sample,
-    "patient" => patient,
-    "test_id" => '4',
-    "core_fields" => {
-      "id" => "4",
-      "name" => "mtb",
-      "custom_fields" => {
+  let(:sample_identifier) do
+    SampleIdentifier.make(sample: sample, uuid: 'abc')
+  end
+
+  let(:device) do
+    Device.make(institution: institution)
+  end
+
+  let(:test) do
+    TestResult.make(
+      device: device,
+      sample_identifier: sample_identifier,
+      patient: patient,
+      encounter: encounter,
+      institution: institution,
+      test_id: '4',
+      custom_fields: {
         "concentration" => "15%"
       },
-      "assays" => [
-        {
-          "result" => "positive",
-          "name" => "mtb"
-        }
-      ]
-    }
-  )}
+      core_fields: {
+        "id" => "4",
+        "name" => "mtb",
+        "assays" => [
+          {
+            "result" => "positive",
+            "name" => "mtb"
+          }
+        ]
+      })
+  end
 
   let(:test_indexer) { TestResultIndexer.new(test)}
 
@@ -70,7 +78,7 @@ describe TestResultIndexer, elasticsearch: true do
         },
         "sample" => {
           "type" => "sputum",
-          "uuid" => 'abc',
+          "uuid" => ['abc'],
           "custom_fields" => {
             "culture_days" => "10",
           }
@@ -80,6 +88,12 @@ describe TestResultIndexer, elasticsearch: true do
           "gender" => "male",
           "custom_fields" => {
             "hiv" => "positive"
+          }
+        },
+        "encounter" => {
+          'uuid' => encounter.uuid,
+          'custom_fields' => {
+            'status' => 'completed'
           }
         },
         "location" => {
@@ -95,7 +109,8 @@ describe TestResultIndexer, elasticsearch: true do
           "serial_number" => test.device.serial_number
         },
         "site" => {
-          "uuid" => test.device.site.uuid
+          "uuid" => test.device.site.uuid,
+          "path" => [test.device.site.uuid],
         },
         "institution" => {
           "uuid" => test.device.institution.uuid

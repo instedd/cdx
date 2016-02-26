@@ -12,17 +12,14 @@ describe Policy do
 
     it "disallows policy creation if self-granted" do
       policy = Policy.make_unsaved
-      policy.definition = policy_definition(institution, READ_INSTITUTION, false)
-      policy.granter_id = user.id
-      policy.user_id = user.id
+      policy.granter = user
+      policy.user = user
       expect(policy.save).to eq(false)
     end
 
     it "disallows policy creation if granter is nil" do
       policy = Policy.make_unsaved
-      policy.definition = policy_definition(institution, READ_INSTITUTION, false)
-      policy.granter_id = nil
-      policy.user_id = user.id
+      policy.granter = nil
       expect(policy.save).to eq(false)
     end
 
@@ -53,6 +50,12 @@ describe Policy do
     it "should not create policy with test result by id" do
       expect {
         grant user, user2, "testResult/1", "INVALID"
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'should not create policy with no resource' do
+      expect {
+        grant user, user2, [], "*"
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
@@ -151,6 +154,16 @@ describe Policy do
         user2 = User.make
 
         assert_can user2, Institution, CREATE_INSTITUTION, []
+      end
+
+      it "doesn't allow to create institutions if single-tenant deploy" do
+        Settings.single_tenant = true
+
+        user2 = User.make
+
+        assert_cannot user2, Institution, CREATE_INSTITUTION
+
+        Settings.single_tenant = false
       end
     end
 
@@ -487,6 +500,75 @@ describe Policy do
         assert_can user2, site, DELETE_SITE
       end
     end
+
+    context "with subsites" do
+      let!(:site1) { Site.make }
+      let!(:site11) { Site.make :child, parent: site1 }
+      let!(:site111) { Site.make :child, parent: site11 }
+
+      let!(:device1) { Device.make site_id: site1.id }
+      let!(:device11) { Device.make site_id: site11.id }
+
+      let!(:user2) { User.make }
+
+      it "can't access sub-sites" do
+        grant nil, user, site1, READ_SITE
+
+        assert_can user, site1, READ_SITE
+        assert_cannot user, site11, READ_SITE
+        assert_cannot user, site111, READ_SITE
+      end
+
+      it "can access sub-sites when specified" do
+        grant nil, user, site1, READ_SITE, include_subsites: true
+
+        assert_can user, site1, READ_SITE
+        assert_can user, site11, READ_SITE
+        assert_can user, site111, READ_SITE
+      end
+
+      it "can access sub-sites related to another site" do
+        grant nil, user, site1, READ_SITE
+        grant user, user2, site11, READ_SITE
+
+
+        assert_cannot user2, site1, READ_SITE
+        assert_cannot user2, site11, READ_SITE
+        assert_cannot user2, site111, READ_SITE
+      end
+
+      it "can access sub-sites related to another site" do
+        grant nil, user, site1, READ_SITE, include_subsites: true
+        grant user, user2, site11, READ_SITE
+
+        assert_cannot user2, site1, READ_SITE
+        assert_can user2, site11, READ_SITE
+        assert_cannot user2, site111, READ_SITE
+      end
+
+      it "can't access parent site when granted access to children only" do
+        grant nil, user, site1, READ_SITE, include_subsites: true
+        grant user, user2, site11, READ_SITE, include_subsites: true
+
+        assert_cannot user2, site1, READ_SITE
+        assert_can user2, site11, READ_SITE
+        assert_can user2, site111, READ_SITE
+      end
+
+      it "can't access sub-site with condition when granted a single site" do
+        grant nil, user, "device?site=#{site1.id}", READ_DEVICE
+
+        assert_can user, device1, READ_DEVICE
+        assert_cannot user, device11, READ_DEVICE
+      end
+
+      it "can access sub-site with condition" do
+        grant nil, user, "device?site=#{site1.id}", READ_DEVICE, include_subsites: true
+
+        assert_can user, device1, READ_DEVICE
+        assert_can user, device11, READ_DEVICE
+      end
+    end
   end
 
   context "Device Model" do
@@ -683,6 +765,14 @@ describe Policy do
       let!(:device2)      { Device.make institution_id: institution2.id, site: site2 }
       let!(:test_result2) { TestResult.make device_messages: [DeviceMessage.make(device: device2)]}
 
+      let!(:institution3) { user.institutions.make }
+      let!(:site3) { Site.make institution: institution3 }
+      let!(:device3) { Device.make institution_id: institution3.id, site: site3 }
+      let!(:site3_1) { Site.make institution: institution3, parent_id: site3.id }
+      let!(:device3_1) { Device.make institution_id: institution3.id, site: site3_1 }
+      let!(:test_result3) { TestResult.make device_messages: [DeviceMessage.make(device: device3)]}
+      let!(:test_result3_1) { TestResult.make device_messages: [DeviceMessage.make(device: device3_1)]}
+
       it "does not allow user to query test result" do
         assert_cannot user2, test_result, QUERY_TEST
       end
@@ -717,6 +807,11 @@ describe Policy do
         assert_can user2, TestResult, QUERY_TEST, [test_result]
       end
 
+      it "returns a scope with tests authorised by site and subsite" do
+        grant user, user2, {test_result: site3}, QUERY_TEST
+        assert_can user2, TestResult, QUERY_TEST, [test_result3, test_result3_1]
+      end
+
       it "returns a scope with tests authorised by device" do
         grant user, user2, {test_result: device}, QUERY_TEST
         assert_can user2, TestResult, QUERY_TEST, [test_result]
@@ -730,12 +825,12 @@ describe Policy do
 
       it "returns a scope with all tests" do
         grant user, user2, TestResult, QUERY_TEST
-        assert_can user2, TestResult, QUERY_TEST, [test_result, test_result2]
+        assert_can user2, TestResult, QUERY_TEST, [test_result, test_result2, test_result3, test_result3_1]
       end
 
       it "returns a scope with all tests minus exceptions" do
         grant user, user2, TestResult, QUERY_TEST, except: {test_result: site2}
-        assert_can user2, TestResult, QUERY_TEST, [test_result]
+        assert_can user2, TestResult, QUERY_TEST, [test_result, test_result3, test_result3_1]
       end
 
     end

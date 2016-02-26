@@ -1,5 +1,5 @@
 headers = []
-each_column do |_, title|
+each_test_column do |_, title|
   headers << title
 end
 csv << headers
@@ -7,7 +7,7 @@ csv << headers
 while @query.next_page
   @query.execute["tests"].each_with_index do |test, i|
     row = []
-    each_column do |path, _|
+    each_test_column do |path, _|
       row << formatted_test_value(test, path)
     end
     csv << row

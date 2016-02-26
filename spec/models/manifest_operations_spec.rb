@@ -1533,6 +1533,28 @@ describe Manifest, validate_manifest: false do
 
     end
 
+    it "supports case with numeric fields" do
+      assert_manifest_application %{
+        {
+          "test.status": {
+            "case" : [
+              {"lookup" : "error_code"},
+              [
+                {"when": "*", "then": "error"},
+                {"else": "success"}
+              ]
+            ]
+          }
+        }}, %{
+          {
+          }
+        },
+        '{
+          "error_code" : 4005
+        }',
+        "test" => { "core" => {"status" => "error"} }
+    end
+
   end
 
 end

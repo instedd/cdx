@@ -1,6 +1,6 @@
 class ManifestParsingError < RuntimeError
   attr_reader :target_field
-  attr_accessor :record_index
+  attr_accessor :number_of_failures
 
   def initialize(message, target_field = nil)
     super(message)
@@ -9,6 +9,10 @@ class ManifestParsingError < RuntimeError
 
   def self.invalid_value_for_integer(value, target_field)
     new "'#{value}' is not a valid value for '#{target_field}' (must be an integer)", target_field
+  end
+
+  def self.invalid_numeric_value(value, target_field)
+    new "'#{value}' is not a valid value for '#{target_field}' (must be an number)", target_field
   end
 
   def self.invalid_mapping(value, target_field, mappings)

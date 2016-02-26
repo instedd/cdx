@@ -24,15 +24,15 @@ end
 def grant(granter, user, resource, action, opts = {})
   [granter, user].compact.each(&:reload)
   policy = Policy.make_unsaved
-  policy.definition = policy_definition(resource, action, opts.fetch(:delegable, true), opts.fetch(:except, []))
-  policy.granter_id = granter.try(:id)
-  policy.user_id = user.id
+  policy.definition = policy_definition(resource, action, opts.fetch(:delegable, true), opts.fetch(:except, []), opts.fetch(:include_subsites, false))
+  policy.granter = granter
+  policy.user = user
   policy.allows_implicit = true
   policy.save!
   policy
 end
 
-def policy_definition(resource, action, delegable = true, except = [])
+def policy_definition(resource, action, delegable = true, except = [], include_subsites = false)
   resource = Array.wrap(resource).map{|r| policy_resource_string_for(r)}
   except =   Array.wrap(except).map{|r| policy_resource_string_for(r)}
   action =   Array.wrap(action)
@@ -44,7 +44,8 @@ def policy_definition(resource, action, delegable = true, except = [])
           "action": #{action.to_json},
           "resource": #{resource.to_json},
           "except": #{except.to_json},
-          "delegable": #{delegable}
+          "delegable": #{delegable},
+          "includeSubsites": #{include_subsites}
         }
       ]
     }

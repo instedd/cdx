@@ -6,6 +6,10 @@ class ComputedPolicy < ActiveRecord::Base
 
   accepts_nested_attributes_for :exceptions
 
+  def exceptions_attributes=(values)
+    super(values.map {|value| value.except(:include_subsites)})
+  end
+
   scope :delegable, -> { where(delegable: true) }
   scope :on,        -> (resource_type) { where(resource_type: resource_type) }
 
@@ -53,19 +57,26 @@ class ComputedPolicy < ActiveRecord::Base
     resource.filter(filter)
   end
 
-  def self.applicable_policies(action, resource_or_string, user, opts={})
+  def self.applicable_policies(action, resource_or_string, user=nil, opts={})
     resource_attributes = resource_attributes_for(resource_or_string)
 
-    query = self.where(user_id: user.id)
-      .where("resource_type = ? OR resource_type IS NULL", resource_attributes[:resource_type])
+    query = self.where("resource_type = ? OR resource_type IS NULL", resource_attributes[:resource_type])
+    query = query.where(user_id: user.id) if user
 
     query = query.where(delegable: opts[:delegable]) if opts.has_key?(:delegable)
     query = query.where("action = ? OR action IS NULL", action) if action && action != '*'
     query = query.where("resource_id = ? OR resource_id IS NULL", resource_attributes[:id]) if resource_attributes[:id]
+    query = query.where("(? = resource_id) OR (include_subsites AND ? LIKE concat(resource_id, '%')) OR resource_id IS NULL", "#{resource_attributes[:prefix]}", "#{resource_attributes[:prefix]}") if resource_attributes[:prefix]
 
     CONDITIONS.each do |condition|
       if (value = resource_attributes["#{condition}_id".to_sym])
-        query = query.where("condition_#{condition}_id = ? OR condition_#{condition}_id IS NULL", value)
+        if condition == :site
+          # For site we need to do a prefix query
+
+          query = query.where("(include_subsites AND ? LIKE concat('%', condition_#{condition}_id, '%')) OR (? = condition_#{condition}_id) OR condition_#{condition}_id IS NULL", value.to_s, value.to_s)
+        else
+          query = query.where("condition_#{condition}_id = ? OR condition_#{condition}_id IS NULL", value)
+        end
       elsif resource_attributes.has_key?("#{condition}_id".to_sym)
         query = query.where("condition_#{condition}_id IS NULL")
       end
@@ -85,10 +96,23 @@ class ComputedPolicy < ActiveRecord::Base
     else
       resource = resource_or_string
       attrs = { resource_type: resource.resource_type }
-      attrs[:id] = resource.id if resource.respond_to?(:id)
+
+      if resource.is_a?(Site)
+        attrs[:prefix] = resource.prefix
+      elsif resource.respond_to?(:id)
+        attrs[:id] = resource.id
+      end
+
       CONDITIONS.each do |condition|
         key = "#{condition}_id".to_sym
-        attrs[key] = resource.send(key) if resource.respond_to?(key)
+        if resource.respond_to?(key)
+          value = resource.send(key)
+          if condition == :site && value
+            # We need to get the site's prefix
+            value = Site.prefix(value)
+          end
+          attrs[key] = value
+        end
       end
       attrs
     end
@@ -140,6 +164,19 @@ class ComputedPolicy < ActiveRecord::Base
     }
   end
 
+  def self.authorized_users(action, resource)
+    self.applicable_policies(action, resource)\
+      .includes(:user, :exceptions)\
+      .group_by(&:user)\
+      .select do |user, policies|
+        policies.any? do |policy|
+          not policy.exceptions.any? do |exception|
+            exception.applies_to?(resource, action)
+          end
+        end
+      end.keys
+  end
+
 
   class PolicyComputer
 
@@ -169,7 +206,9 @@ class ComputedPolicy < ActiveRecord::Base
     end
 
     def policies_for(user)
-      user.policies(:reload) + user.implicit_policies
+      user.policies(:reload) +
+        user.implicit_policies +
+        user.roles.includes(:policy).flat_map(&:policy).each { |p| p.user = user }
     end
 
     def compute_for(policy)
@@ -190,15 +229,18 @@ class ComputedPolicy < ActiveRecord::Base
         entry.merge(exceptions_attributes: applicable_exceptions)
       end.compact
 
-      granted_statements = if policy.granter.nil?
-        granted_statements
-      else
+      granted_statements = if policy.granter
         granter_statements = policy.granter.computed_policies.delegable.map(&:computed_attributes)
         intersect(granted_statements, granter_statements)
+      elsif policy.role
+        granter_statements = Policy.owner(nil, policy.role.institution.id, policy.role.institution.kind).to_computed_policies.select(&:delegable).map(&:computed_attributes)
+        intersect(granted_statements, granter_statements)
+      else
+        granted_statements
       end
 
       granted_statements.map do |g|
-        ComputedPolicy.new(g.merge(user_id: policy.user_id, delegable: statement.fetch('delegable', false)))
+        ComputedPolicy.new(g.merge(user_id: policy.user_id, delegable: statement.fetch('delegable', false), include_subsites: statement.fetch('includeSubsites', false)))
       end
     end
 
@@ -208,11 +250,11 @@ class ComputedPolicy < ActiveRecord::Base
       attrs = {
         action: action == '*' ? nil : action,
         resource_type: resource_type,
-        resource_id: resource_id.try(:to_i)
+        resource_id: resource_id(resource_id, resource_type)
       }
 
       ComputedPolicy::CONDITIONS.each do |condition|
-        attrs["condition_#{condition}_id".to_sym] = filters[condition.to_s].try(:to_i)
+        attrs["condition_#{condition}_id".to_sym] = condition_value(filters, condition)
       end
 
       attrs
@@ -241,27 +283,76 @@ class ComputedPolicy < ActiveRecord::Base
         intersection = Hash.new
         conditions_attributes = ComputedPolicy::CONDITIONS.map{|condition| "condition_#{condition}_id".to_sym}
         ([:resource_id, :resource_type, :action] + conditions_attributes).each do |key|
-          intersection[key] = intersect_attribute(p1[key], p2[key])
+          intersection[key] = intersect_attribute(p1, p2, key)
         end
         intersection[:exceptions_attributes] = ((p1[:exceptions_attributes] || []) | (p2[:exceptions_attributes] || []))
+        intersection[:include_subsites] = p1[:include_subsites] && p2[:include_subsites]
         return intersection
       end
     end
 
-    def intersect_attribute(attr1, attr2)
+    def intersect_attribute(policy_1, policy_2, key)
+      attr1 = policy_1[key]
+      attr2 = policy_2[key]
+
       if attr1.nil? || attr2.nil?
-        attr1 || attr2
-      elsif attr1 == attr2
-        attr1
-      else
-        throw(:empty_intersection)
+        return attr1 || attr2
       end
+
+      if attr1.to_s == attr2.to_s
+        return attr1
+      end
+
+      if (key == :resource_id && policy_1[:resource_type] == "site" && policy_2[:resource_type] == "site") || key == :condition_site_id
+        # Special case: when interescting site prefixes the result is the longest,
+        # if one is a prefix of the other.
+        #   - 1.2 | 1 -> 1.2
+        #   - 1.2.3 | 1.2 -> 1.2.3
+        #   - 1.2 | 3.4 -> :empty_intersection
+        attr1 = attr1.to_s
+        attr2 = attr2.to_s
+
+        if attr1.starts_with?(attr2) && policy_2[:include_subsites]
+          return attr1
+        elsif attr2.starts_with?(attr1) && policy_1[:include_subsites]
+          return attr2
+        end
+      end
+
+      throw(:empty_intersection)
     end
 
     def compact_policies(computed_policies)
       computed_policies.delete_if do |policy|
         computed_policies.any?{|p| !p.equal?(policy) && p.contains(policy) }
       end
+    end
+
+    def site_prefix(id)
+      @site_id_to_prefix ||= {}
+      @site_id_to_prefix[id] ||= Site.prefix(id)
+    end
+
+    def resource_id(id, type)
+      id = id.try(:to_i)
+
+      # For a Site the resource_id need to be its prefix
+      if type == "site" && id
+        id = site_prefix(id)
+      end
+
+      id
+    end
+
+    def condition_value(filters, condition)
+      value = filters[condition.to_s].try(:to_i)
+
+      # For a site, the condition needs to be the prefix
+      if condition == :site && value
+        value = site_prefix(value)
+      end
+
+      value
     end
 
   end

@@ -2,12 +2,15 @@
   FLEXBOX GRID
 ============================================================================= */
 
-.grid {}
-
 .row {
   @include flexbox();
   @include clearfix();
+  @include flex-wrap(wrap);
   flex-direction: row;
+
+  &.center {
+    @include justify-content(center);
+  }
 }
 
 /* default for even distribution */
@@ -17,6 +20,9 @@
   position: relative;
 
   /* forced '%' distribution */
+  &.pe-1 {
+    @include flex(0 0 8.333%);
+  }
   &.pe-2 {
     @include flex(0 0 16.666%);
   }
@@ -57,6 +63,9 @@
     @include flex(0 0 91.666%);
   }
 
+  &.pe-12 {
+    @include flex(0 0 100%);
+  }
 
   /* forced 'PX' distribution */
 
@@ -99,14 +108,8 @@
     @include flex(0 0 1000px);
   }
 
-  > .row > .col {
-    // margin-left: -$col-padd;
-  }
-}
 
-// form > .row > .col:first-child {
-//   margin-left: -$col-padd;
-// }
+}
 
 
 
@@ -128,3 +131,7 @@
   }
 }
 
+.pending {
+  color: $white-dark;
+  font-style:italic;
+}

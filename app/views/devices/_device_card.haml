@@ -1,13 +1,16 @@
-.row
-  .col
-    %h1
-      = link_to devices_path, class: 'side-link', title: 'Back' do
-        = image_tag "arrow-left.png"
-      = @device.name
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2{entity_html_options(@device)}
+            = link_to devices_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            = @device.name
 
 .row
-  .col
-    = card image: "card-unkown.png" do |c|
+  .col.pe-12
+    = card image: @device.device_model.picture.url(:card) do |c|
       - c.top do
         %b= @device.name
         %br
@@ -26,5 +29,4 @@
         - if @device.site
           .location
             Device located at
-            = link_to @device.site, site_path(@device.site)
-
+            = link_to @device.site, edit_site_path(@device.site)

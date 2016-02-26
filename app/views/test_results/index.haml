@@ -1,75 +1,31 @@
-%form
-  .row
-    .col
-      %h1 Filters
-  - if @institutions.size > 1 || @sites.size > 1 || @devices.size > 1
-    .row
-      - if @institutions.size > 1
-        .col
-          %label.block Institution
-          %select.ddown(name="institution.uuid")
-            %option(value="") Show all
-            = options_from_collection_for_select @institutions, :uuid, :name, params["institution.uuid"]
-      - if @sites.size > 1
-        .col
-          %label.block Site
-          %select.ddown(name="site.uuid")
-            %option(value="") Show all
-            = options_from_collection_for_select @sites, :uuid, :name, params["site.uuid"]
-      - if @devices.size > 1
-        .col
-          %label.block Device
-          %select.ddown(name="device.uuid")
-            %option(value="") Show all
-            = options_from_collection_for_select @devices, :uuid, :name, params["device.uuid"]
-  .row
-    .col
-      %label.block Condition
-      %select.ddown{name: "test.assays.condition", value: params["test.assays.condition"]}
-        %option(value="") Show all
-        = options_for_select @conditions, params["test.assays.condition"]
-    .col
-      %label.block Result
-      %select.ddown{name: "test.assays.result"}
-        %option(value="") Show all
-        = options_for_select @results, params["test.assays.result"]
-    .col
-      %label.block Date
-      %select.ddown{name: "since"}
-        %option(value="") Show all
-        = options_for_select @date_options, params["since"]
-    .col
-      %label.block Sample Id
-      %input{type: "text", name: "sample.id", value: params["sample.id"]}
-    .col
-      %label.block Encounter Id
-      %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
-  .row
-    .col
-      %input.btn-primary.pull-right{type: "submit", value: "Filter"}
-      = link_to "Add filter", new_filter_path(query: @filter), class: 'btn pull-right'
+= render "filters"
 
-  .row
-    .col
-      = link_to "+", new_encounter_path, class: 'btn-add side-link fix', title: 'Add encounter'
-
-      = cdx_table title: pluralize(@total, "Test") do |t|
+.row
+  .col
+    - if @tests.empty?
+      = empty_data icon: 'icon-outline-test xx-large' do |c|
+        - c.body do
+          %h1 No tests has been reported
+          %p Setup your devices first in order to start reporting
+    - else
+      = cdx_table title: pluralize(@total, "test") do |t|
+        - t.columns do
+          - each_test_column do |id, title, opts|
+            %col{:width => opts[:width]}
+        - t.actions do
+          = link_to test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as)), title: 'Download CSV' do
+            .icon-download.icon-gray
         - t.thead do
           %tr
-            - each_column do |id, title, sortable|
-              %th= sortable ? order_by_column(title, id) : title
+            - each_test_column do |id, title, opts|
+              %th= opts[:sortable] ? order_by_column(title, id) : title
         - t.tbody do
           - @tests.each do |test|
-            %tr{data: {href: test_result_path(test['test']['uuid']) }}
-              - each_column do |id|
+            %tr{data: {href: @display_as == "test" ? test_result_path(test['test']['uuid']) : encounter_path(test['encounter']['uuid']) }}
+              - each_test_column do |id|
                 %td= formatted_test_value(test, id, web: true)
+
       .pagination
-        = link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
-        = link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
-        %input.input-x-small.text-right{type: "text", name: "page", value: @page}
-        %span
-          of
-          = (@total.to_f / @page_size).ceil
-        %select.ddown(name="page_size" onchange="this.form.submit()")
-          = options_for_page_sizes
-        = link_to "download CSV", csv_test_results_path(@filter)
+        = render 'shared/pagination'
+        - if @display_as == "test"
+          = link_to "Add filter", new_filter_path(query: @filter), class: 'pull-right'

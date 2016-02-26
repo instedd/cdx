@@ -8,3 +8,11 @@ class PasswordChange < SitePrism::Page
     element :submit, '[name="commit"]'
   end
 end
+
+class AcceptInvitiation < CdxPageBase
+  set_url '/users/invitation/accept{?query*}'
+
+  element :password, :field, 'Password'
+  element :password_confirmation, :field, 'Password confirmation'
+  element :primary, '[value="Set my password"]'
+end

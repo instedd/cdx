@@ -3,42 +3,84 @@
 // =============================================================================
 
   .table {
-    border-radius: 3px;
     width: 100%;
-    border: 1px solid $gray1;
     margin: 15px auto;
+    table-layout: fixed;
+    white-space: nowrap;
 
     a {
       color: $gray4;
     }
 
     th {
-      font-weight: 700;
+      font-weight: 400;
       color: $gray3;
       text-align: left;
+      text-transform: uppercase;
+      overflow: hidden;
+      text-overflow: ellipsis;
       padding: 14px 10px;
 
-      &.tableheader {
-        font-family: $sanstitle;
-        font-size: 200%;
+      .table-title {
+        font-size: 120%;
+        font-weight: bold;
         color: $black;
-        font-weight: 400;
+        vertical-align: baseline;
+        display: inline-block;
+        margin-right: 10px;
+        text-transform:none;
+      }
+
+      .table-actions {
+        display: inline-block;
+        vertical-align: baseline;
+      }
+
+      a {
+        color: inherit;
+
+        &.ordered {
+          color: $black;
+        }
       }
     }
 
     td {
       padding: 14px 10px;
       border-bottom: 1px solid $gray1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+
+      &.empty {
+        padding: 150px;
+        text-align: center;
+
+        .empty-icon {
+          height: 150px;
+        }
+
+        h1 {
+          color: $black;
+        }
+        p {
+          margin-top: -5px;
+        }
+      }
     }
 
+    tr:last-child th {
+      border-bottom: 3px solid $black;
+    }
     tr:last-child td {
       border-bottom: none;
     }
   }
 
   .pagination {
-    a {
+    .btn-link {
       color: $gray4;
+      margin: 0;
     }
 
     a[class^="btn"] {
@@ -55,7 +97,7 @@
   }
 
 
-.row-href tr[data-href] {
+*[data-href] {
   cursor: pointer;
   &:hover{
     background:#f3f3f3;

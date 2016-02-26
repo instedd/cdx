@@ -1,10 +1,7 @@
 class InstitutionsController < ApplicationController
-  layout "institutions"
   before_filter :load_institutions
-  skip_before_filter :check_no_institution!, only: [:new, :create]
-  before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
-  end
+  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
+  skip_before_action :ensure_context
 
   def index
     @can_create = has_access?(Institution, CREATE_INSTITUTION)
@@ -28,7 +25,7 @@ class InstitutionsController < ApplicationController
     @can_delete = has_access?(@institution, DELETE_INSTITUTION)
 
     if @institutions.one?
-      @can_create = has_access?(Institution, CREATE_INSTITUTION)
+      @can_create = true
     end
   end
 
@@ -51,7 +48,16 @@ class InstitutionsController < ApplicationController
 
     respond_to do |format|
       if @institution.save
-        format.html { redirect_to institutions_path, notice: 'Institution was successfully created.' }
+        new_context = @institution.uuid
+
+        # Set the new context to the newly created institution
+        current_user.last_navigation_context = new_context
+        current_user.save!
+
+        # This is needed for the next redirect, which will use it
+        params[:context] = new_context
+
+        format.html { redirect_to root_path, notice: 'Institution was successfully created.' }
         format.json { render action: 'show', status: :created, location: @institution }
       else
         format.html { render action: 'new' }
@@ -66,7 +72,7 @@ class InstitutionsController < ApplicationController
 
     respond_to do |format|
       if @institution.update(institution_params)
-        format.html { redirect_to institutions_path, notice: 'Institution was successfully updated.' }
+        format.html { redirect_to root_path, notice: 'Institution was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -87,11 +93,8 @@ class InstitutionsController < ApplicationController
     end
   end
 
-  def request_api_token
-    @institution = Institution.find(params[:id])
-    return unless authorize_resource(@institution, READ_INSTITUTION)
-
-    @token = Guisso.generate_bearer_token current_user.email
+  def pending_approval
+    @hide_nav_bar = true
   end
 
   private

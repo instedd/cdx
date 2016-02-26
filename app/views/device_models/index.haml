@@ -1,18 +1,31 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            - if @can_create
+              = link_to "+", new_device_model_path, class: 'btn-add side-link fix', title: 'Add Device Model'
+            Device models
+
 .row
   .col
-    = link_to "+", new_device_model_path, class: 'btn-add side-link fix', title: 'Add Device Model'
-    = cdx_table title: 'Device Models' do |t|
-      - t.thead do
-        %tr
-          %th Name
-          - unless @institutions.one?
-            %th Institution
-          %th Version
-      - t.tbody do
-        - @device_models.each do |device_model|
-          %tr{data: {href: try_edit_device_model_path(device_model) }}
-            %td= device_model.name
-            - unless @institutions.one?
-              %td= device_model.institution.try(:name)
-            %td= device_model.current_manifest.try(:version)
-
+    - if @device_models.empty?
+      = empty_data title: 'No device models', icon: 'icon-outline-instructions xx-large' do |c|
+        - c.body do
+          %h1 There are no device models
+          %p Create device models and publish manifests that will allow test reporting on CDx platform
+    - else
+      = cdx_table title: pluralize(@device_models.count, "device model") do |t|
+        - t.columns do
+          %col{:width => "80%"}
+          %col{:width => "20%"}
+        - t.thead do
+          %tr
+            %th Name
+            %th Version
+        - t.tbody do
+          - @device_models.each do |device_model|
+            %tr{data: {href: try_edit_device_model_path(device_model) }}
+              %td= device_model.name
+              %td= device_model.current_manifest.try(:version)

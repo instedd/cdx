@@ -1,31 +1,25 @@
-- unless @institutions.one?
-  .row
-    .col
-      %h1 Filters
-  %form
-    .row
-      .col
-        %label.block Institution
-        %select.ddown(name="institution")
-          %option(value="") (all)
-          = options_from_collection_for_select @institutions, :id, :name, params["institution"]
-        %input.btn-primary.pull-right{type: "submit", value: "Filter"}
-
+= render "filters"
 .row
   .col
-    - if @can_create
-      = link_to "+", new_site_path, class: 'btn-add side-link fix', title: 'Add Site'
-    = cdx_table title: 'Sites' do |t|
-      - t.thead do
-        %tr
-          %th Name
-          - unless @institutions.one?
-            %th Institution
-          %th Location
-      - t.tbody do
-        - @sites.each do |site|
-          %tr{data: {href: site_path(site) }}
-            %td= site.name
-            - unless @institutions.one?
-              %td= site.institution.name
-            %td= site.location.try(:name)
+    - if @sites.empty?
+      = empty_data icon: 'icon-outline-site xx-large' do |c|
+        - c.body do
+          %h1 This site has no dependencies
+          %p Create sites here to keep your institution's hierachy organized
+    - else
+      = cdx_table title: pluralize(@sites.count, "site") do |t|
+        - t.columns do
+          %col{:width => "50%"}
+          %col{:width => "50%"}
+        - t.actions do
+          = link_to sites_path(format: :csv), title: 'Download CSV' do
+            .icon-download.icon-gray
+        - t.thead do
+          %tr
+            %th Name
+            %th Location
+        - t.tbody do
+          - @sites.each do |site|
+            %tr{data: {href: edit_site_path(site) }}
+              %td= site.name
+              %td= site.location.try(:name)

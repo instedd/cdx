@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Cdx do
   it "should provide a collection of fields" do
-    expect(Cdx.core_fields.map(&:scoped_name).sort).to eq([
+    expect(Cdx::Fields.test.core_fields.map(&:scoped_name).sort).to contain_exactly(
       "test.site_user",
       "device.model",
       "device.name",
@@ -12,6 +12,7 @@ describe Cdx do
       "institution.name",
       "site.uuid",
       "site.name",
+      "site.path",
       "location.admin_levels",
       "location.id",
       "location.lat",
@@ -20,6 +21,9 @@ describe Cdx do
       "patient.gender",
       "patient.id",
       "patient.name",
+      "patient.dob",
+      "patient.email",
+      "patient.phone",
       "sample.collection_date",
       "sample.id",
       "sample.type",
@@ -32,7 +36,6 @@ describe Cdx do
       "test.error_code",
       "test.error_description",
       "test.name",
-      "test.patient_age",
       "test.reported_time",
       "test.start_time",
       "test.status",
@@ -42,6 +45,13 @@ describe Cdx do
       "test.id",
       "encounter.id",
       "encounter.uuid",
-    ].sort)
+      "encounter.patient_age",
+      "encounter.start_time",
+      "encounter.end_time",
+      "encounter.diagnosis.condition",
+      "encounter.diagnosis.name",
+      "encounter.diagnosis.quantitative_result",
+      "encounter.diagnosis.result",
+      "encounter.observations")
   end
 end

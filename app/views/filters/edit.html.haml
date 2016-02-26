@@ -1,8 +1,12 @@
-.span12
-  %h3 Edit #{filter.name}
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to filters_path(@device), class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            #{filter.name}
 
-  = render 'form'
+= render 'form'
 
-  %hr
-
-  = link_to "Delete this filter", filter, method: :delete, data: { confirm: "Are you sure you want to delete the filter '#{filter.name}'" }

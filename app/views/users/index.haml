@@ -1,0 +1,67 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          = react_component "AddUserLink", roles: @roles, context: @navigation_context.to_hash
+          %h1
+            Users
+      %form#filters-form{action: users_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
+        .row
+          .filter
+            %label.block Name
+            %input.input-block{type: "text", name: "name", value: params["name"]}
+          .filter
+            %label.block Role
+            = cdx_select name: "role", value: params["role"] do |select|
+              - select.item "", "Show all"
+              - select.items @roles, :value, :label
+          .filter
+            %label.block Last activity
+            = cdx_select name: "last_activity", value: params["last_activity"] do |select|
+              - select.item "", "Show all"
+              - select.items @date_options, :value, :label
+          - if @can_update
+            .filter
+              %label.block Status
+              = cdx_select name: "is_active", value: params["is_active"] do |select|
+                - select.items @status, :value, :label
+
+.row
+  .col
+    - if @users.empty?
+      = empty_data icon: 'icon-outline-user xx-large' do |c|
+        - c.body do
+          %h1 There are no users with access to this location
+          %p Invite other users to join this team
+    - else
+      = cdx_table title: pluralize(@total, "user") do |t|
+        - t.columns do
+          %col{:width => "30%"}
+          %col{:width => "30%"}
+          - if @can_update
+            %col{:width => "10%"}
+          %col{:width => "30%"}
+        - t.actions do
+          = link_to users_path(format: :csv), title: 'Download CSV' do
+            .icon-download.icon-gray
+
+        - t.thead do
+          %tr
+            %th Full name
+            %th Roles
+            - if @can_update
+              %th Status
+            %th Last Activity
+        - t.tbody do
+          - @users.each do |user|
+            %tr{class: (user.invited_pending? || !user.is_active? ? "pending" : ""), data: {href: edit_user_path(user.id)}}
+              %td= user.full_name
+              %td= user.roles.map(&:name).join(", ")
+              - if @can_update
+                %td= user.is_active? ? "" : "Blocked"
+              %td= last_activity(user)
+
+      .pagination
+        = render 'shared/pagination'

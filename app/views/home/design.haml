@@ -1,0 +1,87 @@
+%h1 Grid
+
+%p 12 column divided row.
+
+.row
+  - 12.times do |i|
+    .col.pe-1= i
+
+%p
+  use
+  %code pe-1, pe-2, ... pe-12
+  classes to distribute the space with weight
+
+.row
+  .col.pe-4
+    %p
+      first column with
+      %code .pe-4
+  .col.pe-2
+    %p
+      first column with
+      %code .pe-2
+  .col.pe-6
+    %p
+      third column with rest of space
+      %code .pe-8
+
+%p Nested columns
+
+.row
+  .col.pe-4
+    .row
+      - 4.times do |i|
+        .col.pe-3= "1.#{i}"
+  .col.pe-2 2
+  .col.pe-6 3
+
+%p Pixel fixed width and equaly distributed
+
+.row
+  .col.px-3
+    300px width
+  .col.pe-1
+    flex column equaly divided
+  .col.pe-1
+    flex column equaly divided
+  .col.px-4
+    400px width
+
+%h1 Controls
+
+%h2 Checkboxes
+
+%p
+  Checkboxes can be used with associated labels positioned either before of after the
+  %code input
+  \. Always include the
+  %code for/id
+  attributes in order to make the respond to click events.
+  If positioned before, as the later example, add an whitespace label.
+
+.row
+  .col
+    %input(type="checkbox" id="chk1")
+    %label(for="chk1") Lorem ipsum dolor sit amet
+
+.row
+  .col.px-3
+    %label(for="chk2") Lorem ipsum dolor sit amet
+  .col
+    %input(type="checkbox" id="chk2")
+    %label(for="chk2") &nbsp;
+
+%h2 Radio buttons
+
+.row
+  .col
+    %input(type="radio" name="gender" id="opt_male" value="male")
+    %label(for="opt_male") Male
+.row
+  .col
+    %input(type="radio" name="gender" id="opt_female" value="female")
+    %label(for="opt_female") Female
+.row
+  .col
+    %input(type="radio" name="gender" id="opt_other" value="other")
+    %label(for="opt_other") Other

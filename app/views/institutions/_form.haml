@@ -1,26 +1,54 @@
 = form_for(@institution) do |f|
-  - if @institution.errors.present?
-    .alert-container
-      .alert.alert-error
-        %ul
-          - @institution.errors.full_messages.each do |msg|
-            %li= msg
+  = validation_errors @institution
   - unless @readonly
     - if @institution.new_record?
-      .row
+      .row.centered.institution-container
         .col
-          = f.label :kind, :class => 'block'
-          - Institution::KINDS.each do |kind|
-            = f.radio_button :kind, kind, checked: @institution.kind == kind
-            %label{for: "institution_kind_#{kind}"}
-              = kind.humanize
-    .row
-      .col
-        = f.label :name, :class => 'block'
-        = f.text_field :name, readonly: @readonly, :class => 'input-x-large'
-    %br
-    .row
-      .col
-        = f.submit 'Save', class: 'btn-primary'
-        - if @can_delete
-          = link_to "Delete", @institution, method: :delete, data: { confirm: "Are you sure you want to delete the institution '#{@institution.name}'" }, class: 'btn-secondary pull-right', title: 'Delete Institution'
+          = f.radio_button :kind, "health_organization", checked: @institution.kind == "health_organization", class: 'institution'
+          .institution-option
+            = image_tag "ic-health-organization.png"
+            %h4 Health organization
+            %p I work for a Health Organization that wants to have access to shared diagnostic results to do disease surveillance.
+            .institution-radio
+              %label{for: "institution_kind_health_organization"}
+                .btn-add
+                  = image_tag "arrow-down.png"
+        .col
+          = f.radio_button :kind, "institution", checked: @institution.kind == "institution", class: 'institution'
+          .institution-option
+            = image_tag "ic-institution.png"
+            %h4 Institution
+            %p I work in an institution that performs diagnostics and want to connect our devices to this platform.
+            .institution-radio
+              %label{for: "institution_kind_institution"}
+                .btn-add
+                  = image_tag "arrow-down.png"
+        .col
+          = f.radio_button :kind, "manufacturer", checked: @institution.kind == "manufacturer", class: 'institution'
+          .institution-option
+            = image_tag "ic-manufacturer.png"
+            %h4 Manufacturer
+            %p I work for a device manufacturer and want to test the integration of our devices and provide support to our customers.
+            .institution-radio
+              %label{for: "institution_kind_manufacturer"}
+                .btn-add
+                  = image_tag "arrow-down.png"
+    .institution-name
+      .row
+        .col.px-1
+          = f.label :name, :class => 'block'
+        .col
+          = f.text_field :name, readonly: @readonly, :class => 'input-block'
+      - if not f.object.new_record?
+        .row
+          .col.px-1
+            = label_tag "kind", "Type", :class => 'block'
+          .col
+            .value= f.object.kind.humanize.titleize
+      .row.button-actions
+        .col
+          = f.submit 'Save', class: 'btn-primary'
+          = link_to 'Cancel', institutions_path, class: 'btn-link'
+
+          - if @can_delete
+            = confirm_deletion_button @institution

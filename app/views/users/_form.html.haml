@@ -1,0 +1,43 @@
+= form_for(@user) do |f|
+  .row
+    .col
+      .row
+        .col.pe-2
+          = f.label :name
+        .col
+          .value= f.object.full_name
+      .row
+        .col.pe-2
+          = f.label :email
+        .col
+          .value= f.object.email
+      .row
+        .col.pe-2
+          = f.label :telephone, "Phone"
+        .col
+          .value= f.object.telephone
+      .row
+        .col.pe-2
+          = f.label :roles
+        .col
+          .value
+            = react_component 'OptionList', chosenOnes: @user_roles, callback: "/users/#{@user.id}/assign_role", autocompleteCallback: "/roles/autocomplete"
+    .col
+      .box.small.gray
+        - if @can_update
+          .row
+            .col.pe-2
+              .value= f.label :is_active, "Status"
+            .col
+              .value
+                = f.check_box :is_active, class: 'power'
+                %label{:for => 'user_is_active'} Can access Cdx?
+        .row
+          .col.pe-2
+            = f.label :last_sign_in_at, "Activity"
+          .col
+            .value= last_activity(f.object)
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', users_path,  class: 'btn-link'

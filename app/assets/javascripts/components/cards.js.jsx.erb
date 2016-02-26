@@ -1,6 +1,28 @@
 var PatientCard = React.createClass({
+  getDefaultProps: function() {
+    return {
+      canEdit: false
+    }
+  },
+
   render: function () {
-    if (this.props.patient == null) {
+    var patient = this.props.patient;
+
+    function patientInfo(patient) {
+      var string = "";
+      if (patient.gender) {
+        string += patient.gender;
+        if (patient.dob) {
+          string += " - "
+        }
+      }
+      if (patient.dob) {
+        string += patient.dob + " (" + patient.age + ")";
+      }
+      return string;
+    }
+
+    if (patient == null) {
       return (
         <%= to_jsx(card(image: asset_url('card-unkown.png')) do |c|
           c.top do
@@ -12,7 +34,35 @@ var PatientCard = React.createClass({
       return (
         <%= to_jsx(card(image: asset_url('card-unkown.png')) do |c|
           c.top do
-            raw "<b>{this.props.patient.plain_sensitive_data.name}</b>"
+            raw <<-JSX
+              <a href={"/patients/" + patient.id}>{patient.name}</a><br/>
+              {patientInfo(patient)}
+            JSX
+          end
+
+          c.bottom do
+            raw <<-JSX
+              {patient.address}<br/>
+              {patient.phone}<br/>
+              {(function(){
+                if (patient.email) {
+                  return <a href={"mailto:" + patient.email}>{patient.email}</a>;
+                }
+              }.bind(this))()}
+            JSX
+          end
+
+          c.actions do
+            raw <<-JSX
+            {(function(){
+              if (!this.props.canEdit) return;
+
+              return (
+                <a href={"/patients/" + patient.id + "/edit"} title="Edit">
+                  <img src="#{asset_url("ic-pencil.png")}"/>
+                </a>);
+            }.bind(this))()}
+            JSX
           end
         end) %>
       );

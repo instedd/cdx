@@ -1,0 +1,51 @@
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to patients_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            = @patient.name
+
+.row
+  .col
+    = react_component "PatientCard", patient: @patient_json, canEdit: @can_edit
+
+- if @encounters.empty?
+  = empty_data icon: 'icon-outline-test xx-large' do |c|
+    - c.body do
+      %h1 No medical history
+      %p Create test orders in order to start the medical history
+- else
+  .row
+    .col
+      %h1 Medical history
+  .row
+    .col
+      %ul.nav-list
+        - @encounters.each do |encounter|
+          %li{'data-href' => encounter_path(encounter)}
+            .row
+              .col.pe-2
+                %label Date
+              .col
+                .value= format_date(encounter.start_time)
+            .row
+              .col.pe-2
+                %label Diagnose
+              .col
+                .value
+                  - if encounter.diagnostic.blank?
+                    %i Pending
+                  - else
+                    = encounter.human_diagnose
+            .row
+              .col.pe-2
+                %label Comments
+              .col
+                .value
+                  - if encounter.observations.blank?
+                    %i No comments
+                  - else
+                    = encounter.observations

@@ -1,4 +1,7 @@
 class SubscribersController < ApplicationController
+  include Concerns::SubscribersController
+  skip_before_action :ensure_context
+
   respond_to :html, :json
   expose(:subscribers) do
     if params[:filter_id]
@@ -10,7 +13,7 @@ class SubscribersController < ApplicationController
   expose(:subscriber, attributes: :subscriber_params)
   expose(:filters) { current_user.filters }
   before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
+    head :forbidden unless has_access_to_test_results_index?
   end
 
   def index
@@ -19,6 +22,10 @@ class SubscribersController < ApplicationController
 
   def show
     respond_with subscriber
+  end
+
+  def edit
+    @editing = true
   end
 
   def new
@@ -41,19 +48,5 @@ class SubscribersController < ApplicationController
   def destroy
     subscriber.destroy
     respond_with subscriber
-  end
-
-  private
-
-  def subscriber_params
-    params.require(:subscriber).permit(:name, :url, :verb, :url_user, :url_password, :filter_id).tap do |whitelisted|
-      whitelisted[:fields] ||= begin
-        case fields = params[:subscriber][:fields] || params[:fields]
-        when Array then fields
-        when Hash then fields.keys
-        else []
-        end
-      end
-    end
   end
 end

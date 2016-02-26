@@ -1,0 +1,60 @@
+.row
+  .col
+    %h1 Settings
+
+= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f|
+  = validation_errors resource
+
+  .row
+    .col.pe-2
+      = f.label :first_name
+    .col
+      = f.text_field :first_name, autofocus: true
+  .row
+    .col.pe-2
+      = f.label :last_name
+    .col
+      = f.text_field :last_name
+  .row
+    .col.pe-2
+      = f.label :email
+    .col
+      = f.text_field :email, readonly: true
+  .row
+    .col.pe-2
+      = f.label :telephone
+    .col
+      = f.text_field :telephone
+  .row
+    .col.pe-2
+      = f.label :password, "New password"
+    .col
+      = f.password_field :password, autocomplete: "off"
+  .row
+    .col.pe-2
+      = f.label :password_confirmation, "Retype new password"
+    .col
+      = f.password_field :password_confirmation
+  .row
+    .col.pe-2
+      = f.label :locale
+    .col
+      = cdx_select form: f, name: :locale, class: 'input-xx-large' do |select|
+        - select.items(@locales, :second, :first)
+  .row
+    .col.pe-2
+      = f.label :time_zone
+    .col
+      = cdx_select form: f, name: :time_zone, class: 'input-xx-large' do |select|
+        - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
+  .row
+    .col.pe-2
+      = f.label :timestamps_in_device_time_zone, "Test timestamps"
+    .col
+      = cdx_select form: f, name: :timestamps_in_device_time_zone, class: 'input-xx-large' do |select|
+        - select.item false, "Relative to my time zone"
+        - select.item true, "Relative to the device time zone"
+
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary'

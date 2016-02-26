@@ -1,0 +1,57 @@
+.chart {
+  .bar {
+    &.b0 { fill: #03A9F4; }
+    &.b1 { fill: #EC1561; }
+    &.b2 { fill: #3E4EB8; }
+  }
+
+  .axis {
+    color: #555555;
+    font-size: 10px;
+    font-family: 'Open Sans', sans-serif;
+    text-transform: uppercase;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    opacity: 0.1;
+    shape-rendering: crispEdges;
+  }
+
+
+  .y.axis path,
+  .x.axis path,
+  .x.axis line {
+    stroke:none;
+  }
+
+  .total {
+    text-anchor: middle;
+    fill: #555555;
+    font-size: 3.5em;
+    font-weight: bold;
+
+    &.legend {
+      font-size: 1em;
+      text-transform: uppercase;
+    }
+  }
+
+  .details {
+    opacity: 0;
+  }
+
+  .legend {
+    cursor: default;
+
+    text {
+      fill: #555555;
+    }
+  }
+
+  .legends > span > span {
+    padding: 0 1.4em 0 0.4em;
+  }
+}

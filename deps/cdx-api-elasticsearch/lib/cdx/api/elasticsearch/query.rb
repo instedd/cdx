@@ -9,16 +9,12 @@ class Cdx::Api::Elasticsearch::Query
   DEFAULT_PAGE_SIZE = 50
   MAX_PAGE_SIZE = 100
 
-  def self.for_indices indices, params
-    query = new params
-    query.indices = indices.join ','
-    query
-  end
-
-  def initialize(params, api = Cdx::Api)
+  def initialize(params, fields, api = Cdx::Api)
     @params = params
+    @fields = fields
+    @result_name = fields.result_name
     @api = api
-    @indices ||= Cdx::Api.index_name_pattern
+    @indices = api.index_name_pattern
   end
 
   def before_execute(&block)
@@ -39,7 +35,7 @@ class Cdx::Api::Elasticsearch::Query
     end
 
     results = query(@params)
-    @current_count = results["tests"].size
+    @current_count = results[@result_name].size
     @total_count = results["total_count"]
 
     if @after_execute
@@ -77,25 +73,24 @@ class Cdx::Api::Elasticsearch::Query
   def query(params)
     query = elasticsearch_query
 
+
     if params["group_by"]
-      tests = query_with_group_by(query, params["group_by"])
+      entities = query_with_group_by(query, params["group_by"])
       if params["order_by"]
         all_orders = extract_multi_values(params["order_by"])
         all_orders.map do |order|
-          tests = tests.sort_by do |test|
-            test[order.delete('-')]
-          end
-          tests = tests.reverse if order[0] == "-"
+          entities = entities.sort_by { |entity| entity[order.delete('-')] }
+          entities = entities.reverse if order[0] == "-"
         end
       end
-      total_count = tests.inject(0) { |sum, result| sum + result["count"].to_i }
+      total_count = entities.inject(0) { |sum, result| sum + result["count"].to_i }
     else
-      tests, total_count = query_without_group_by(query, params)
+      entities, total_count = query_without_group_by(query, params)
     end
 
-    tests = @api.translate tests
+    entities = @fields.translate_entities entities
 
-    {"tests" => tests, "total_count" => total_count}
+    {@result_name => entities, "total_count" => total_count}
   end
 
   def query_without_group_by(query, params)
@@ -107,7 +102,7 @@ class Cdx::Api::Elasticsearch::Query
     es_query[:size] = page_size
     es_query[:from] = offset if offset.present?
 
-    results = @api.search_elastic es_query.merge(index: indices)
+    results = @api.search_elastic es_query.merge(index: indices, type: search_type)
     hits = results["hits"]
     total = hits["total"]
     results = hits["hits"].map { |hit| hit["_source"] }
@@ -115,7 +110,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_conditions params, conditions=[]
-    conditions = process_fields(@api.searchable_fields, params, conditions)
+    conditions = process_fields(@fields.searchable_fields, params, conditions)
     if conditions.empty?
       [{match_all: []}]
     else
@@ -161,6 +156,8 @@ class Cdx::Api::Elasticsearch::Query
       case filter_definition["type"]
       when "match"
         conditions.push process_match_field(field_definition.name, field_definition.type, field_value)
+      when "range-integer"
+        conditions.push range: {field_definition.name => ({filter_definition["boundary"] => field_value})}     
       when "range"
         field_value = convert_timezone_if_date(field_value)
         conditions.push range: {field_definition.name => ({filter_definition["boundary"] => field_value}.merge filter_definition["options"])}
@@ -246,7 +243,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_order params
-    order = params["order_by"] || @api.default_sort
+    order = params["order_by"] || @fields.default_sort
 
     all_orders = extract_multi_values(order)
     all_orders.map do |order|
@@ -257,7 +254,7 @@ class Cdx::Api::Elasticsearch::Query
         sorting = "asc"
       end
 
-      duration_field = @api.searchable_fields.detect {|field| field.scoped_name == order and field.type == "duration"}
+      duration_field = @fields.searchable_fields.detect {|field| field.scoped_name == order and field.type == "duration"}
 
       order = "#{order}.in_millis" if duration_field
 
@@ -278,16 +275,16 @@ class Cdx::Api::Elasticsearch::Query
 
     group_by = group_by.map do |field|
       name, value = extract_group_by_criteria field
-      Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value, @api
+      Cdx::Api::Elasticsearch::IndexedField.grouping_detail_for name, value, @fields
     end
 
     raise "Unsupported group" if group_by.include? nil
 
     aggregations = Cdx::Api::Elasticsearch::Aggregations.new group_by
 
-    test = @api.search_elastic body: aggregations.to_hash.merge(query: query, size: 0), index: indices
-    if test["aggregations"]
-      process_group_by_buckets(test["aggregations"], aggregations.in_order, [], {}, 0)
+    result = @api.search_elastic body: aggregations.to_hash.merge(query: query, size: 0), index: indices, type: search_type
+    if result["aggregations"]
+      process_group_by_buckets(result["aggregations"], aggregations.in_order, [], {}, 0)
     else
       []
     end
@@ -307,7 +304,11 @@ class Cdx::Api::Elasticsearch::Query
     [name, value]
   end
 
-  def process_group_by_buckets(aggregations, group_by, tests, test, doc_count)
-    GroupingDetail.process_buckets(aggregations, group_by, tests, test, doc_count)
+  def process_group_by_buckets(aggregations, group_by, entities, entity, doc_count)
+    GroupingDetail.process_buckets(aggregations, group_by, entities, entity, doc_count)
+  end
+
+  def search_type
+    @fields.entity_name
   end
 end

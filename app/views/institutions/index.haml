@@ -1,8 +1,10 @@
 .row
   .col
-    = link_to "+", new_institution_path, class: 'btn-add side-link fix', title: 'Add Institution'
+    = link_to "+", new_institution_path, class: 'btn-add side-link ontop fix', title: 'Add Institution'
 
     = cdx_table title: 'Institutions' do |t|
+      - t.columns do
+        %col{:width => "100%"}
       - t.thead do
         %tr
           %th Name

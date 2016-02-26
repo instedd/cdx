@@ -1,0 +1,50 @@
+- content_for(:subheader) do
+  %form#filters-form{action: test_results_path, "data-auto-submit" => true}
+    %input{type: "hidden", name: "page_size", value: @page_size}
+    .row.center.filters
+      .col.pe-10
+        .row
+          .col
+            %h1
+              - if @can_create_encounter
+                = link_to "+", new_index_encounters_path, class: 'btn-add side-link fix', title: 'Add test order'
+              Tests
+        .row
+          .filter
+            %label.block Display as
+            = cdx_select name: "display_as", value: @display_as do |select|
+              - select.item "test", "Tests"
+              - select.item "test_order", "Test Orders"
+          .filter
+            %label.block Condition
+            = cdx_select name: "test.assays.condition", value: params["test.assays.condition"] do |select|
+              - select.item "", "Show all"
+              - select.items @conditions
+          .filter
+            %label.block Result
+            = cdx_select name: "test.assays.result", value: params["test.assays.result"] do |select|
+              - select.item "", "Show all"
+              - select.items @results
+          .filter
+            %label.block Date
+            = cdx_select name: "since", value: params["since"] do |select|
+              - select.item "", "Show all"
+              - select.items @date_options, :value, :label
+          .col
+            %a.btn-toggle.pull-right{:title => "Toggle advanced filters"}
+
+        .advanced
+          .row
+            - if @display_as == "test"
+              .filter
+                %label.block Sample Id
+                %input{type: "text", name: "sample.id", value: params["sample.id"]}
+            .filter
+              %label.block Encounter Id
+              %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
+            - if @display_as == "test" && ((@devices.size > 1) || params['device.uuid'])
+              .filter
+                %label.block Device
+                = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
+                  - select.item "", "Show all"
+                  - select.items @devices, :uuid, :name

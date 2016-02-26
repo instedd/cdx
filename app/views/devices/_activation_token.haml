@@ -1,6 +1,6 @@
 - if @device.activation_token
-  .key= @device.activation_token.value
-  %p= barcode(@device.activation_token.value)
+  .key= @device.activation_token.scan(/.{4}/).join("-")
+  %p= barcode(@device.activation_token)
 - else
   = link_to 'Reactivate',
     generate_activation_token_device_path(@device, target: '#activation-token'),

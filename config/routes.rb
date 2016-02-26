@@ -1,14 +1,24 @@
 require 'sidekiq/web'
+require 'sidekiq/cron/web'
 
 Rails.application.routes.draw do
+  use_doorkeeper
   mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
 
-  devise_for :users, controllers: {
-    omniauth_callbacks: "omniauth_callbacks",
-    sessions: "sessions",
-  }
+  devise_for :users,
+    controllers: {
+      omniauth_callbacks: 'omniauth_callbacks',
+      sessions: 'sessions',
+      registrations: 'registrations',
+      invitations: 'users/invitations'
+    },
+    path_names: {
+      registration: 'registration'
+    }
 
-  resources :sites do
+  get 'settings' => 'home#settings'
+
+  resources :sites, except: [:show] do
     member do
       get :devices
       get :tests
@@ -16,18 +26,22 @@ Rails.application.routes.draw do
   end
 
   resources :institutions, except: :show do
-    member do
-      get :request_api_token
+    collection do
+      get :pending_approval
     end
   end
 
-  resources :encounters, only: [:new, :create, :show] do
+  resources :encounters, only: [:new, :create, :edit, :update, :show] do
     collection do
-      get :institutions
+      get :new_index
+
+      get :sites
       get :search_sample
       get :search_test
-      put 'new/sample/:sample_uuid' => 'encounters#add_sample'
-      put 'new/test/:test_uuid' => 'encounters#add_test'
+      put 'add/sample/:sample_uuid' => 'encounters#add_sample'
+      put 'add/new_sample' => 'encounters#new_sample'
+      put 'add/test/:test_uuid' => 'encounters#add_test'
+      put 'merge/sample/' => 'encounters#merge_samples'
     end
   end
   resources :locations, only: [:index, :show]
@@ -40,18 +54,13 @@ Rails.application.routes.draw do
       get :tests
       get :logs
       get :setup
+      post :send_setup_email
     end
     collection do
       post 'custom_mappings'
     end
     resources :custom_mappings, only: [:index]
     resources :ssh_keys, only: [:create, :destroy]
-    resources :device_messages, only: [:index], path: 'messages' do
-      member do
-        get 'raw'
-        post 'reprocess'
-      end
-    end
     resources :device_logs, only: [:index, :show, :create]
     resources :device_commands, only: [:index] do
       member do
@@ -62,22 +71,45 @@ Rails.application.routes.draw do
   resources :device_models do
     member do
       put 'publish'
+      get 'manifest'
     end
   end
-  resources :test_results , only: [:index, :show] do
-    collection do
-      get 'csv'
+
+  resources :device_messages, only: [:index], path: 'messages' do
+    member do
+      get 'raw'
+      post 'reprocess'
     end
   end
+  resources :test_results , only: [:index, :show]
   resources :filters, format: 'html'
   resources :subscribers
   resources :policies
+  resources :api_tokens
+  resources :patients do
+    collection do
+      get :search
+    end
+  end
+
+
+  resources :alerts, except: [:show]
+  resources :incidents, only: [:index]
+  resources :alert_messages, only: [:index]
 
   scope :dashboards, controller: :dashboards do
+    get :index, as: :dashboard
     get :nndd
   end
 
-  root :to => 'home#index'
+  devise_scope :user do
+    root to: "devise/sessions#new"
+  end
+  get 'verify' => 'home#verify'
+  if Rails.env.development?
+    get 'join' => 'home#join'
+    get 'design' => 'home#design'
+  end
 
   namespace :api, defaults: { format: 'json' } do
     resources :activations, only: :create
@@ -86,28 +118,52 @@ Rails.application.routes.draw do
         get :simulator
       end
     end
-    match 'events(.:format)' => "events#index", via: [:get, :post]
-    resources :events, only: [] do
+    match 'tests(.:format)' => "tests#index", via: [:get, :post]
+    resources :tests, only: [] do
       collection do
         get :schema
       end
       member do
-        get :custom_fields
+        get :pii
+      end
+    end
+    match 'encounters(.:format)' => "encounters#index", via: [:get, :post]
+    resources :encounters, only: [] do
+      collection do
+        get :schema
+      end
+      member do
         get :pii
       end
     end
     resources :devices, only: [] do
-      resources :messages, only: [:create], shallow: true
-      match 'events' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3
+      resources :messages, only: [:create ], shallow: true
+      match 'tests' => "messages#create", via: :post # For backwards compatibility with Qiagen-Esequant-LR3
+      match 'demodata' => "messages#create_demo", via: :post
     end
     resources :sites, only: :index
     resources :institutions, only: :index
-  end
-
-  scope :api, format: 'json', except: [:new, :edit] do
-    resources :filters do
+    resources :filters, only: [:index, :show] do
       resources :subscribers
     end
     resources :subscribers
   end
+
+  resources :users, except: [:new] do
+    member do
+      post :assign_role
+      post :unassign_role
+    end
+    collection do
+      get :autocomplete
+    end
+  end
+  resources :roles do
+    collection do
+      get :autocomplete
+      get :search_device
+    end
+  end
+
+  get 'nndd' => 'application#nndd' if Rails.env.test?
 end

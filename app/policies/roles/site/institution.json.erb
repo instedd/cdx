@@ -1,0 +1,142 @@
+[
+  {
+    "key": "admin",
+    "name": "Site <%= site_name %> Admin",
+    "policy": {
+      "statement": [
+        {
+          "resource": "institution/<%= institution_id %>",
+          "action": [
+            "institution:read",
+            "institution:registerDevice",
+            "institution:createRole"
+          ],
+          "delegable": true
+        },
+        {
+          "resource": "site/<%= site_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "device?site=<%= site_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "testResult?site=<%= site_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "encounter?site=<%= site_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "role?site=<%= site_id %>",
+          "action": "*",
+          "delegable": true
+        }
+      ]
+    }
+  },
+  {
+    "key": "reader",
+    "name": "Site <%= site_name %> Reader",
+    "policy": {
+      "statement": [
+        {
+          "resource": "institution/<%= institution_id %>",
+          "action": "institution:read"
+        },
+        {
+          "resource": "site/<%= site_id %>",
+          "action": "site:read"
+        },
+        {
+          "resource": "device?site=<%= site_id %>",
+          "action": "device:read"
+        },
+        {
+          "resource": "testResult?site=<%= site_id %>",
+          "action": "testResult:query"
+        },
+        {
+          "resource": "encounter?site=<%= site_id %>",
+          "action": "encounter:read"
+        }
+      ]
+    }
+  },
+  {
+    "key": "technician",
+    "name": "Site <%= site_name %> Technician",
+    "policy": {
+      "statement": [
+        {
+          "resource": "institution/<%= institution_id %>",
+          "action": "institution:read"
+        },
+        {
+          "resource": "site/<%= site_id %>",
+          "action": [
+            "site:read",
+            "site:createEncounter"
+          ]
+        },
+        {
+          "resource": "device?site=<%= site_id %>",
+          "action": "device:read"
+        },
+        {
+          "resource": "testResult?site=<%= site_id %>",
+          "action": "*"
+        },
+        {
+          "resource": "encounter?site=<%= site_id %>",
+          "action": [
+            "encounter:read",
+            "encounter:update",
+            "encounter:pii"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "key": "supervisor",
+    "name": "Site <%= site_name %> Supervisor",
+    "policy": {
+      "statement": [
+        {
+          "resource": "institution/<%= institution_id %>",
+          "action": "institution:read"
+        },
+        {
+          "resource": "site/<%= site_id %>",
+          "action": [
+            "site:read",
+            "site:createEncounter"
+          ]
+        },
+        {
+          "resource": "device?site=<%= site_id %>",
+          "action": [
+            "device:read",
+            "device:regenerateKey",
+            "device:generateActivationToken"
+          ]
+        },
+        {
+          "resource": "testResult?site=<%= site_id %>",
+          "action": "*"
+        },
+        {
+          "resource": "encounter?site=<%= site_id %>",
+          "action": "*"
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,30 @@
+- content_for(:subheader) do
+  %form#filters-form{action: incidents_path, "data-auto-submit" => true}
+    %input{type: "hidden", name: "page_size", value: @page_size}
+    .row.center.filters
+      .col.pe-10
+        .row
+          .col
+            %h1
+              Incidents
+        .row
+          .filter
+            %label.block Alert Group
+            = cdx_select name: "alert.id", value: params["alert.id"] do |select|
+              - select.item "", "Show all"
+              - select.items @alerts, :id, :name
+          .filter
+            %label.block Date
+            = cdx_select name: "since", value: params["since"] do |select|
+              - select.item "", "Show all"
+              - select.items @date_options, :value, :label
+          .col
+            %a.btn-toggle.pull-right{:title => "Toggle advanced filters"}
+
+        .advanced
+          .row
+            .filter
+              %label.block Sample Id
+              %input{type: "text", name: "sample.id", value: params["sample.id"]}
+
+

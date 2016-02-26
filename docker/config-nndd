@@ -1,0 +1,20 @@
+#!/usr/local/bin/ruby
+require 'fileutils'
+require 'digest'
+
+# Get application root path
+app_root = File.expand_path("../../", __FILE__)
+
+# Get source path and digestify name
+css_path, js_path = %w(css js).map { |ext| File.join(app_root, "etc/nndd", "overrides.#{ext}") }
+css_name = "overrides-#{Digest::MD5.new.file(css_path).hexdigest}.css"
+js_name  = "overrides-#{Digest::MD5.new.file(js_path).hexdigest}.js"
+
+# Copy them
+FileUtils.cp(css_path, File.join(app_root, "public/nndd/styles", css_name))
+FileUtils.cp(js_path,  File.join(app_root, "public/nndd/scripts", js_name))
+
+# Alter names in index.html
+index_path = File.join(app_root, "public/nndd", "index.html")
+index_content = File.read(index_path).gsub('overrides.css', css_name).gsub('overrides.js', js_name)
+File.open(index_path, 'w') { |file| file.puts index_content }
