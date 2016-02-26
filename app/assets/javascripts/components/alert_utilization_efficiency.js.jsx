@@ -1,7 +1,7 @@
 var AlertUtilizationEfficiency = React.createClass({
 	render: function() {
 		return (
-			< div className = "row" id = "utilizationefficiencyrow" >
+			< div className = "row" id = "utilizationEfficiencyRow" >
 			<div className = "col pe-2" >
 				<label>TIMESPAN</label>
 			</div>

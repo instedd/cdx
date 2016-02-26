@@ -30,7 +30,6 @@ class AlertsController < ApplicationController
     respond_with @alerts
   end
 
-
   def edit
     new_alert_request_variables
 
@@ -88,8 +87,6 @@ class AlertsController < ApplicationController
     respond_with alert_info, location: alert_path
   end
 
-
-
   def create
     external_users_ok = true
     internal_users_ok = true
@@ -115,8 +112,6 @@ class AlertsController < ApplicationController
       render json: error_text, status: :unprocessable_entity
     end
   end
-
-
 
   def update
     external_users_ok = true
@@ -149,7 +144,6 @@ class AlertsController < ApplicationController
     end
   end
 
-
   def destroy
     if alert_info.destroy
       render json: alert_info
@@ -158,13 +152,11 @@ class AlertsController < ApplicationController
     end
   end
 
-
   private
 
   def alert_params
     params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :email_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, :utilization_efficiency_number, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
-
 
   def new_alert_request_variables
     @sites = check_access(Site.within(@navigation_context.entity), READ_SITE)
@@ -181,7 +173,6 @@ class AlertsController < ApplicationController
     @users = User.where(id: user_ids)
   end
 
-
   def append_query(alert, query)
     if  alert.query != "{}"
       alert.query.merge (query)
@@ -190,13 +181,11 @@ class AlertsController < ApplicationController
     end
   end
 
-
   def set_sample_id(params, alert_info)
     if (params[:alert][:sample_id]) && (params[:alert][:sample_id].length > 0)
       alert_info.query=append_query(alert_info, {"sample.id"=>params[:alert][:sample_id]})
     end
   end
-
 
   def set_sites_devices(params, alert_info, is_edit)
     if is_edit==true
@@ -229,7 +218,6 @@ class AlertsController < ApplicationController
     end
     #Note: alert_info.create_percolator is called from the model
   end
-
 
   def set_category(params, alert_info, error_text, condition_result_ok, is_edit)
     if is_edit==true
@@ -291,11 +279,8 @@ class AlertsController < ApplicationController
       alert_info.utilization_efficiency_last_checked = Time.now
       #Note: the sampleid must be set for this category -in a validation
     end
-
     return condition_result_ok,error_text
   end
-
-
 
   def set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, is_edit)
     #destroy all recipients before adding them in again on an update

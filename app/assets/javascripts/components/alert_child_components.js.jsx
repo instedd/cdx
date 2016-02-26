@@ -103,7 +103,7 @@ var AlertDescription = React.createClass({
 var AlertErrorCode = React.createClass({
 	render: function() {
 		return (
-			< div className = "row" id="errorcoderow">
+			< div className = "row" id="errorCodeRow">
 			<div className = "col pe-3">
 				<label>Errors</label>
 			</div>
@@ -275,7 +275,7 @@ var AlertAnomalieType = React.createClass({
 			onChange
 		} = this.props;
 		return (
-			< div className = "row" id = "anomalierow">
+			< div className = "row" id = "anomalieRow">
 			<div className = "col pe-3" >
 				<label>Anomalie Type</label>
 			</div>

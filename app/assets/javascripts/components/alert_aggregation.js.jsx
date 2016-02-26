@@ -28,7 +28,7 @@ var AlertAggregation = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row" id = "aggregationtyperow" >
+			< div className = "row" id = "aggregationTypeRow" >
 			<div className = "col pe-3" >
 				<label>Aggregation Type</label>
 			</div>
@@ -87,7 +87,7 @@ var AlertAggregationFrequency = React.createClass({
 			...other
 		} = this.props;
 		return (
-			< div className = "row" id = "aggregationfrequenciesrow" >
+			< div className = "row" id = "aggregationFrequenciesRow" >
 			<div className = "col pe-3" >
 				<label>Aggregation Frequency</label>
 			</div>
@@ -120,7 +120,7 @@ var AlertAggregationFrequency = React.createClass({
 var AlertAggregationThreshold = React.createClass({
 	render: function() {
 		return (
-			< div className = "row" id = "aggregationthresholdrow" >
+			< div className = "row" id = "aggregationThresholdRow" >
 			<div className = "col pe-3" >
 				<label>Aggregation Threshold</label>
 			</div>

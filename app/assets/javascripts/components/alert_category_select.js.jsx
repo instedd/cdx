@@ -73,31 +73,31 @@ var AlertCategorySelect = React.createClass({
 	},
 	doCategoryChange: function(val) {
 		document.getElementById(val).checked = true;
-		$('#errorcoderow').hide();
-		$('#anomalierow').hide();
-		$('#conditionrow').hide();
-		$('#conditionresultrow').hide();
-		$('#thresholdrow').hide();
-		$('#utilizationefficiencyrow').hide();
+		$('#errorCodeRow').hide();
+		$('#anomalieRow').hide();
+		$('#conditionRow').hide();
+		$('#conditionResultRow').hide();
+		$('#thresholdRow').hide();
+		$('#utilizationEfficiencyRow').hide();
 
-		$('#aggregationtyperow').show();
+		$('#aggregationTypeRow').show();
 
 		if (val == 'device_errors') {
-			$('#errorcoderow').show();
+			$('#errorCodeRow').show();
 		}
 		else if (val == 'anomalies') {
-			$('#anomalierow').show();
+			$('#anomalieRow').show();
 		}
 		else if (val == 'test_results') {
-			$('#conditionrow').show();
-			$('#conditionresultrow').show();
-			$('#thresholdrow').show();
+			$('#conditionRow').show();
+			$('#conditionResultRow').show();
+			$('#thresholdRow').show();
 		}
 		else if (val == 'utilization_efficiency') {
-			$('#utilizationefficiencyrow').show();
-			$('#aggregationtyperow').hide();
-			$('#aggregationfrequenciesrow').show();
-			$('#aggregationthresholdrow').show();
+			$('#utilizationEfficiencyRow').show();
+			$('#aggregationTypeRow').hide();
+			$('#aggregationFrequenciesRow').show();
+			$('#aggregationThresholdRow').show();
 		}
 
 		this.setState({
@@ -114,12 +114,12 @@ var AlertCategorySelect = React.createClass({
 			aggregationField: aggregation_type
 		});
 		if (aggregation_type=="aggregated") {
-			$('#aggregationfrequenciesrow').show();
-			$('#aggregationthresholdrow').show();
+			$('#aggregationFrequenciesRow').show();
+			$('#aggregationThresholdRow').show();
 		}
 		else {
-			$('#aggregationfrequenciesrow').hide();
-			$('#aggregationthresholdrow').hide();
+			$('#aggregationFrequenciesRow').hide();
+			$('#aggregationThresholdRow').hide();
 		}
 	},
 	siteChanged: function(e) {

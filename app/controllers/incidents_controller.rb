@@ -30,7 +30,6 @@ class IncidentsController < ApplicationController
       = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
         - select.item "", "Show all"
         - select.items @devices, :uuid, :name
-
 =end
         #works:  Alert.joins(:devices).where("devices.uuid=?","dd").count
         @incidents = @incidents.where("alerts.device.uuid=?",params["device.uuid"])
