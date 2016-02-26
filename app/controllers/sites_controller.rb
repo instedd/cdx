@@ -9,11 +9,13 @@ class SitesController < ApplicationController
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
     apply_filters
 
-    @sites.preload_locations!
-
     respond_to do |format|
-      format.html
+      format.html do
+        @sites = perform_pagination(@sites)
+        @sites.preload_locations!
+      end
       format.csv do
+        @sites.preload_locations!
         filename = "Sites-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
         headers["Content-Type"] = "text/csv"
         headers["Content-disposition"] = "attachment; filename=#{filename}"

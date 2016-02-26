@@ -7,7 +7,8 @@
             - if @can_create
               = link_to "+", new_site_path, class: 'btn-add side-link fix', title: 'Add Site'
             Sites
-      %form{action: sites_path, "data-auto-submit" => true}
+      %form#filters-form{action: sites_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
         .row
           .filter
             %label.block Name
