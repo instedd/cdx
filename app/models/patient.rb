@@ -46,7 +46,18 @@ class Patient < ActiveRecord::Base
   end
 
   def last_encounter
-    encounters.order(start_time: :desc).first.try &:start_time
+    @last_encounter || encounters.order(start_time: :desc).first.try(&:start_time)
+  end
+
+  def last_encounter=(value)
+    @last_encounter = value
+  end
+
+  def self.preload_last_encounter!
+    last_encounter_by_patient_id = Hash[Encounter.where(patient_id: all.pluck(:id)).group("patient_id").pluck("patient_id, max(start_time)")]
+    all.to_a.each do |record|
+      record.last_encounter = last_encounter_by_patient_id[record.id]
+    end
   end
 
   def as_json_card(json)
