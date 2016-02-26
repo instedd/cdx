@@ -75,7 +75,8 @@ hr {
 }
 
 .wrap-text {
-  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 400px;
 }
 
 .side-link {

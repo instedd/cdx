@@ -52,12 +52,12 @@
   .col
     - @test_result.custom_fields.each do |key, value|
       .row
-        .col
+        .col.pe-4
           .underline
             %span
               = key.humanize
-        .col.pe-8.wrap-text
-          .value= value
+        .col.wrap-text
+          = value
 
 
 - @core_fields_scope.fields.each do |field|
