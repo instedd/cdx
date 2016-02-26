@@ -40,7 +40,10 @@ hr {
 .centered {
   text-align: center;
 }
-
+.absolute-right {
+  position: absolute;
+  right: 0px;
+}
 .pull-right {
   float: right;
 }
@@ -314,5 +317,30 @@ a[title="Back"] {
   span {
     border-bottom: 1px solid $white;
     padding-right: 4px;
+  }
+}
+
+.custom-fields-title > .col {
+  @extend label;
+  line-height: 24px;
+  border-bottom: 3px solid $black;
+  padding-top: 0;
+}
+.custom-fields-line > .col {
+  border-bottom: 1px solid $gray1;
+  padding: 5px 10px;
+
+  label {
+    color: $black;
+    text-transform: none;
+  }
+  span.absolute-right {
+    top: 15px;
+  }
+  .Select {
+    border-bottom: none;
+  }
+  .Select-placeholder {
+    padding-top: 10px;
   }
 }

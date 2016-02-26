@@ -4,17 +4,24 @@
     .col.pe-2
       = label_tag :custom_fields
     .col
-      Specify how you use some of the device's fields
+      .value Specify how you use some of the device's fields
   .row
     .col.pe-2
     .col
+      .row.custom-fields-title
+        .col.px-2
+          I use the device field
+        .col.px-2
+          to enter the
       = fields_for(:device) do |d|
         = d.fields_for(:custom_mappings) do |m|
           - custom_fields.each do |field|
-            .control-group
-              = m.label field.target_field, class: 'control-label'
-              .controls
-                = cdx_select form: m, name: field.target_field, value: (@device.custom_mappings || {})[field.target_field], class: 'input-x-large' do |select|
+            .row.custom-fields-line
+              .col.px-2
+                = m.label field.target_field
+                %span.icon-arrow-right.absolute-right
+              .col.px-2
+                = cdx_select form: m, name: field.target_field, value: (@device.custom_mappings || {})[field.target_field], class: 'input-medium' do |select|
                   - select.item "", "None"
                   - select.items Device::CUSTOM_FIELD_TARGETS.map(&:to_s), :itself, :titleize
 - rescue ManifestParsingError => ex
