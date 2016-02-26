@@ -2,7 +2,7 @@
 
 .row
   .col
-    = cdx_table title: pluralize(@roles.count, "role") do |t|
+    = cdx_table title: pluralize(@total, "role") do |t|
       - t.columns do
         %col{:width => "50%"}
         %col{:width => "40%"}
@@ -19,3 +19,5 @@
             %td= role.site ? role.site.name : role.institution.name
             %td= @user_counts[role.id]
 
+    .pagination
+      = render 'shared/pagination'
