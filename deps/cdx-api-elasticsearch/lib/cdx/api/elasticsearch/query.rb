@@ -39,7 +39,7 @@ class Cdx::Api::Elasticsearch::Query
     @total_count = results["total_count"]
 
     if @after_execute
-      @after_execute.inject results do |resutls, block|
+      @after_execute.inject results do |results, block|
         block.call results
       end
     else
@@ -190,8 +190,8 @@ class Cdx::Api::Elasticsearch::Query
     end
   end
 
-  def process_duration_field(field_name, field_value)
-    {range: {"#{field_name}.in_millis" => Cdx::Field::DurationField.parse_range(field_value)}}
+  def process_single_duration_field(field_name, field_value)
+    { range: { "#{field_name}.in_millis" => Cdx::Field::DurationField.parse_range(field_value) } }
   end
 
   def process_wildcard_field(field_definition, field_value)
