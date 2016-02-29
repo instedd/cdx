@@ -140,9 +140,9 @@ RSpec.describe Reports::Base do
         end
       end
 
-      it 'can sort the results by day' do
-        options['range'] = {}
-        options['range']['timestamp'] = { gt: 'now-24h' }
+      it 'can sort the results by hour' do
+        options['date_range'] = {}
+        options['date_range']['timestamp'] = { gt: 'now-24h' }
         @data = DummyReport.process(
           current_user, nav_context, options
         ).sort_by_hour

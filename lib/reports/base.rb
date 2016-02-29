@@ -35,7 +35,16 @@ module Reports
     end
     
     def sort_by_hour
-      []
+      23.downto(0) do |i|
+        now = (Time.now - i.hours)
+        hourname = now.strftime('%H')
+        hour_results = results_by_period('%H')[hourname]
+        data << {
+          label: hourname,
+          values: [hour_results ? hour_results.count : 0]
+        }
+      end
+      return data
     end
 
     def sort_by_month
@@ -67,6 +76,7 @@ module Reports
 
     def results_by_period(format = '%Y-%m')
       results['tests'].group_by do |t|
+      require 'pry'; binding.pry
         Date.parse(t['test']['start_time']).strftime(format)
       end
     end
