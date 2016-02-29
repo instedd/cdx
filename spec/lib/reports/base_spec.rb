@@ -123,5 +123,32 @@ RSpec.describe Reports::Base do
         expect(@data.last[:label]).to eq(Date.today.strftime('%A'))
       end
     end
+
+    context 'when the range is a day' do
+      before do
+        23.downto(0).each do |i|
+          TestResult.create_and_index(
+            core_fields: {
+              'assays' => ['condition' => 'mtb', 'result' => :positive],
+              'start_time' => Date.today - i.hours,
+              'name' => 'mtb',
+              'status' => 'error',
+              'site_user' => site_user
+            },
+            device_messages: [DeviceMessage.make(device: user_device)]
+          )
+        end
+      end
+
+      it 'can sort the results by day' do
+        options['range'] = {}
+        options['range']['timestamp'] = { gt: 'now-24h' }
+        @data = DummyReport.process(
+          current_user, nav_context, options
+        ).sort_by_hour
+        expect(@data).to be_a(Array)
+        expect(@data.count).to eq(24)
+      end
+    end
   end
 end

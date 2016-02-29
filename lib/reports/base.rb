@@ -33,6 +33,10 @@ module Reports
       end
       return data
     end
+    
+    def sort_by_hour
+      []
+    end
 
     def sort_by_month
       11.downto(0).each do |i|
