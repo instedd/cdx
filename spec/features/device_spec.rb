@@ -232,6 +232,7 @@ describe "device" do
       it "test details can be views if device is deleted" do
         goto_page TestResultsPage do |page|
           page.table.items.first.click
+          expect(page).to be_success
         end
       end
     end

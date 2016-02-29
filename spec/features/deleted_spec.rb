@@ -20,6 +20,7 @@ describe "deleted entities should be accessible", elasticsearch: true do
     before(:each) {
       goto_page TestResultsPage do |page|
         page.table.items.first.click
+        expect(page).to be_success
       end
     }
 
