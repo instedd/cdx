@@ -78,11 +78,17 @@ $(document).ready(function(){
       Turbolinks.visit(url.toString(), {});
     }, 2000);
 
-    form.on('change', function(){
+    var submitIfChanged = function() {
       if (payload != form.serialize()) {
-        payload = form.serialize()
+        payload = form.serialize();
         debouncedSubmit();
       }
+    };
+
+    form.on('change', submitIfChanged);
+    form.on('keyup', 'input[type=text]', function(){
+      // defer the keyup event so the changes due to the pressed key occur.
+      window.setTimeout(submitIfChanged, 0);
     });
   });
 
