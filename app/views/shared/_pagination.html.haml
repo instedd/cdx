@@ -11,6 +11,7 @@
   $(function(){
     $(document).on('change', 'input[name=page_size_select]', function(){
       $('input[name=page_size]').val($(this).val());
-      $('#filters-form').submit();
+      var url = window.buildUrl($('form#filters-form'));
+      Turbolinks.visit(url.toString(), {});
     });
   })
