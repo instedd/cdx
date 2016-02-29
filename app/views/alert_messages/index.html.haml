@@ -28,8 +28,8 @@
             %th Message
         - t.tbody do
           - @alert_messages.each do |alert_message|
-            %tr
-              %td= link_to truncate(alert_message.alert.name, length: 20), alert_message.alert
+            %tr{data: {href: edit_alert_path(alert_message.alert) }}
+              %td= truncate(alert_message.alert.name, length: 20)
               %td= alert_message.created_at.to_formatted_s(:long)
               %td=  Alert.channel_types.keys[Alert.channel_types["email"]]
               %td= truncate(alert_message.message_sent, length: 60)

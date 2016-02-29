@@ -7,6 +7,7 @@ class RolesController < ApplicationController
     @can_create = has_access?(Role, UPDATE_ROLE)
 
     @roles = @roles.where("name LIKE ?", "%#{params[:name]}%") if params[:name].present?
+    @roles = perform_pagination(@roles)
   end
 
   def new
