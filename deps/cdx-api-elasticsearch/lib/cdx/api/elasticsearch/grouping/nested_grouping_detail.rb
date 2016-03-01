@@ -1,4 +1,4 @@
-require "cdx/api/elasticsearch/grouping/grouping_detail"
+require 'cdx/api/elasticsearch/grouping/grouping_detail'
 
 class NestedGroupingDetail < GroupingDetail
   attr_reader :child_grouping
@@ -24,11 +24,11 @@ class NestedGroupingDetail < GroupingDetail
   end
 
   def preprocess_buckets(count)
-    (count["count"] || count)["buckets"]
+    (count['count'] || (count['filtered'] && count['filtered']['count']) || count)['buckets']
   end
 
   def yield_bucket(bucket)
-    {uri_param => bucket["key"]}
+    { uri_param => bucket['key'] }
   end
 
   def self.create(indexed_field, child_field_name, values)

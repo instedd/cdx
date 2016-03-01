@@ -16,6 +16,10 @@ class Cdx::Fields
     end
   end
 
+  def flattened_searchable_fields
+    searchable_fields.map(&:flatten).flatten
+  end
+
   def document_format=(document_format)
     @document_format = document_format
   end
