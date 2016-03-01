@@ -1,14 +1,14 @@
 - content_for(:subheader) do
+
   .row.center.filters
     .col.pe-10
       .row
         .col
           %h1
-            - if @can_create
-              = link_to "+", new_alert_path, class: 'btn-add side-link fix', title: 'Add Alert'
-            Alerts
+            = link_to "+", new_alert_path, class: 'btn-add side-link fix', title: 'Add Alert'
+            Alert groups
+              
       %form#filters-form{action: alerts_path, "data-auto-submit" => true}
         %input{type: "hidden", name: "page_size", value: @page_size}
         .row
           .filter
-

@@ -74,19 +74,29 @@ $(document).ready(function(){
     var payload = form.serialize();
 
     var debouncedSubmit = _.debounce(function(){
-      var options = {};
-      var action = form.attr('action') || window.location.href;
-      var url = action + (action.indexOf('?') === -1 ? '?' : '&') + form.serialize();
-      Turbolinks.visit(url.toString(), options);
+      var url = buildUrl(form);
+      Turbolinks.visit(url.toString(), {});
     }, 2000);
 
-    form.on('change', function(){
+    var submitIfChanged = function() {
       if (payload != form.serialize()) {
-        payload = form.serialize()
+        payload = form.serialize();
         debouncedSubmit();
       }
+    };
+
+    form.on('change', submitIfChanged);
+    form.on('keyup', 'input[type=text]', function(){
+      // defer the keyup event so the changes due to the pressed key occur.
+      window.setTimeout(submitIfChanged, 0);
     });
   });
+
+  window.buildUrl = function(form) {
+    var action = form.attr('action') || window.location.href;
+    var url = action + (action.indexOf('?') === -1 ? '?' : '&') + form.serialize();
+    return url;
+  }
 
   $(document).on('click', '.tabs .tabs-header a:not(".selected")', function(event) {
     var target = $(event.target);
