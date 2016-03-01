@@ -108,8 +108,8 @@ class Encounter < ActiveRecord::Base
   def human_diagnose
     return unless diagnostic
 
-    positives = diagnostic.select {|a| a['result'] == 'positive'}.map { |a| a['condition'] }.to_a
-    negatives = diagnostic.select {|a| a['result'] == 'negative'}.map { |a| a['condition'] }.to_a
+    positives = diagnostic.select {|a| a['result'] == 'positive'}.map { |a| a['condition'].try(:upcase) }.to_a
+    negatives = diagnostic.select {|a| a['result'] == 'negative'}.map { |a| a['condition'].try(:upcase) }.to_a
 
     res = ""
     res << positives.join(', ')
@@ -121,7 +121,7 @@ class Encounter < ActiveRecord::Base
       res << " not detected. "
     end
 
-    res
+    res.strip
   end
 
   attribute_field OBSERVATIONS_FIELD

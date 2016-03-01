@@ -19,7 +19,7 @@
             %label.block Condition
             = cdx_select name: "test.assays.condition", value: params["test.assays.condition"] do |select|
               - select.item "", "Show all"
-              - select.items @conditions
+              - select.items(@conditions.map { |name| [name.upcase, name] })
           .filter
             %label.block Result
             = cdx_select name: "test.assays.result", value: params["test.assays.result"] do |select|

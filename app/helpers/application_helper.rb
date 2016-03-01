@@ -104,10 +104,23 @@ module ApplicationHelper
     end
 
     def items(values, value_attr = nil, label_attr = nil)
+      if values.is_a?(Hash)
+        # Mimic `options_for_select` behaviour
+        values.each do |label, value|
+          self.item(value, label)
+        end
+        return values
+      end
+
       values.each do |value|
-        item_value = resolve(value, value_attr)
-        item_label = resolve(value, label_attr)
-        self.item(item_value, item_label)
+        if value.is_a?(Array)
+          # Mimic `options_for_select` behaviour
+          self.item(value[1], value[0])
+        else
+          item_value = resolve(value, value_attr)
+          item_label = resolve(value, label_attr)
+          self.item(item_value, item_label)
+        end
       end
     end
 
