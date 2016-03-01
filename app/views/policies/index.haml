@@ -12,7 +12,7 @@
     - if @policies.empty?
       = empty_data title: "No policies", icon: 'icon-outline-user xx-large' do |c|
         - c.body do
-          %h1 There are no users with access to this site
+          %h1 There are no users with access to #{truncated_navigation_context_entity_name}
           %p Invite other users to join this site's team
     - else
       = cdx_table title: pluralize(@policies.count, "policy") do |t|

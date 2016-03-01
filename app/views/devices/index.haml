@@ -5,7 +5,7 @@
     - if @devices.empty?
       = empty_data icon: 'icon-outline-device xx-large' do |c|
         - c.body do
-          %h1 There are no devices reporting at this site
+          %h1 There are no devices reporting at #{truncated_navigation_context_entity_name}
           %p Follow the configuration steps to connect a device and start reporting
     - else
       = cdx_table title: pluralize(@total, "device") do |t|

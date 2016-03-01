@@ -147,4 +147,20 @@ module ApplicationHelper
     res[:class] = "deleted" if entity.deleted?
     res
   end
+
+  def navigation_context_is_site?
+    @navigation_context.try(:site)
+  end
+
+  def navigation_context_entity_name
+    navigation_context_is_site? ? "site" : "institution"
+  end
+
+  def truncated_navigation_context_entity_name
+    truncate(navigation_context_name, length: 25)
+  end
+
+  def navigation_context_name
+    @navigation_context.try(:site).try(:name) || @navigation_context.institution.name
+  end
 end

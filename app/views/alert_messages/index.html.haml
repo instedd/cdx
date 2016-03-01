@@ -11,7 +11,7 @@
     - if @alert_messages.empty?
       = empty_data title: "No alert messages", icon: 'icon-outline-alert xx-large' do |c|
         - c.body do
-          %h1 There are no alert messages on this site
+          %h1 There are no alert messages at #{truncated_navigation_context_entity_name}
           %p Create alert groups in order to keep your team notified on current events
     - else
       = cdx_table title: pluralize(@total, "Alert Message") do |t|
