@@ -35,16 +35,19 @@ var SitePicker = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    console.log(nextProps.selected_uuid, this.state.selected_site.uuid)
     if (nextProps.selected_uuid != this.state.selected_site.uuid) {
-      console.log("next", nextProps)
-
       this.state.selected_site.selected = false;
       var nextSelected = _.find(this.state.sites, {'uuid': nextProps.selected_uuid});
       nextSelected.selected = true;
 
       this.setState(React.addons.update(this.state, {
-        selected_site: { $set: nextSelected }
+        selected_site: { $set: nextSelected },
+        subsites_selected: { $set: nextProps.subsitesIncluded }
+      }));
+    } else {
+      // if selected_site has not changed, the include subsites flag might.
+      this.setState(React.addons.update(this.state, {
+        subsites_selected: { $set: nextProps.subsitesIncluded }
       }));
     }
   },
