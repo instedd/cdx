@@ -35,13 +35,14 @@ module Reports
     end
     
     def sort_by_hour
+      hour_results = results_by_period('%H')
       23.downto(0) do |i|
         now = (Time.now - i.hours)
         hourname = now.strftime('%H')
-        hour_results = results_by_period('%H')[hourname]
+        hourname = "0"+hourname if hourname.length==1
         data << {
           label: hourname,
-          values: [hour_results ? hour_results.count : 0]
+          values: [hour_results ? hour_results[hourname].count : 0]
         }
       end
       return data
@@ -76,8 +77,7 @@ module Reports
 
     def results_by_period(format = '%Y-%m')
       results['tests'].group_by do |t|
-      require 'pry'; binding.pry
-        Date.parse(t['test']['start_time']).strftime(format)
+        DateTime.strptime(t['test']['start_time'], '%Y-%m-%dT%H:%M:%S').strftime("%H") 
       end
     end
 

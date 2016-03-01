@@ -127,16 +127,19 @@ RSpec.describe Reports::Base do
     context 'when the range is a day' do
       before do
         23.downto(0).each do |i|
-          TestResult.create_and_index(
-            core_fields: {
-              'assays' => ['condition' => 'mtb', 'result' => :positive],
-              'start_time' => Date.today - i.hours,
-              'name' => 'mtb',
-              'status' => 'error',
-              'site_user' => site_user
-            },
-            device_messages: [DeviceMessage.make(device: user_device)]
-          )
+          #do two times each hour [could not do more due to,DEFAULT_PAGE_SIZE = 50, limit]
+          (0..1).each do |inner|
+            TestResult.create_and_index(
+              core_fields: {
+                'assays' => ['condition' => 'mtb', 'result' => :positive],
+                'start_time' => Date.today - i.hours,
+                'name' => 'mtb',
+                'status' => 'error',
+                'site_user' => site_user
+              },
+              device_messages: [DeviceMessage.make(device: user_device)]
+            )
+          end
         end
       end
 

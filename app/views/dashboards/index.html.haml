@@ -17,3 +17,10 @@
     = react_component('BarChart', data: query_errors_data, height: 300, y_label: 'Tests With Errors', x_labels: query_errors_users)
   .col
     = react_component('PieChart', data: errors_by_code, height: 250, label: 'Errors')
+
+
+
+.row
+  .col
+    %h1 devices in the last 12 months
+    = react_component('PieChart', data: errors_by_device, height: 250, label: 'Devices')
