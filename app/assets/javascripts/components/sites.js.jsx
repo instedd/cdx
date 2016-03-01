@@ -34,6 +34,21 @@ var SitePicker = React.createClass({
     }.bind(this));
   },
 
+  componentWillReceiveProps: function(nextProps) {
+    console.log(nextProps.selected_uuid, this.state.selected_site.uuid)
+    if (nextProps.selected_uuid != this.state.selected_site.uuid) {
+      console.log("next", nextProps)
+
+      this.state.selected_site.selected = false;
+      var nextSelected = _.find(this.state.sites, {'uuid': nextProps.selected_uuid});
+      nextSelected.selected = true;
+
+      this.setState(React.addons.update(this.state, {
+        selected_site: { $set: nextSelected }
+      }));
+    }
+  },
+
   _siteMatch: function(site, query) {
     return _.deburr(site.name.toLowerCase()).indexOf(query) != -1;
   },
@@ -83,9 +98,9 @@ var SitePicker = React.createClass({
 
     this.setState(React.addons.update(this.state, {
       selected_site: { $set: site }
-    }));
-
-    this.props.onSiteSelected(site);
+    }), function() {
+      this.props.onSiteSelected(site);
+    }.bind(this));
   },
 
   // debounce: http://stackoverflow.com/a/24679479/30948
