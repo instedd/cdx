@@ -576,19 +576,31 @@ describe Cdx::Api, elasticsearch: true do
       ])
     end
 
-    it "groups by assays result and name" do
-      index test: {assays:[
-        {name: "MTB", result: :positive},
-        {name: "Flu", result: :negative},
-      ]}
+    it 'groups by assays result and name' do
+      index test: { assays: [{ name: 'MTB', result: :positive }, { name: 'Flu', result: :negative }] }
 
-      response = query_tests("group_by" => "test.assays.result,test.assays.name").sort_by do |test|
-        test["test.assays.result"] + test["test.assays.name"]
+      response = query_tests('group_by' => 'test.assays.result,test.assays.name').sort_by do |test|
+        test['test.assays.result'] + test['test.assays.name']
       end
 
       expect(response).to eq([
-        {"test.assays.result"=>"negative", "test.assays.name" => "Flu", "count" => 1},
-        {"test.assays.result"=>"positive", "test.assays.name" => "MTB", "count" => 1}
+        { 'test.assays.result' => 'negative', 'test.assays.name' => 'Flu', 'count' => 1 },
+        { 'test.assays.result' => 'positive', 'test.assays.name' => 'MTB', 'count' => 1 }
+      ])
+    end
+
+    it 'groups multiple elements by assays result and name' do
+      index test: { assays: [{ condition: 'mtb', result: :positive }, { condition: 'rif', result: :negative }] }
+      index test: { assays: [{ condition: 'mtb', result: :positive }, { condition: 'rif', result: :positive }] }
+      index test: { assays: [{ condition: 'mtb', result: :negative }, { condition: 'rif', result: :positive }] }
+
+      response = query_tests('test.assays.condition' => 'mtb', 'group_by' => 'test.assays.result,test.assays.condition').sort_by do |test|
+        test['test.assays.result'] + test['test.assays.condition']
+      end
+
+      expect(response).to eq([
+        { 'test.assays.result' => 'negative', 'test.assays.condition' => 'mtb', 'count' => 1 },
+        { 'test.assays.result' => 'positive', 'test.assays.condition' => 'mtb', 'count' => 2 }
       ])
     end
 

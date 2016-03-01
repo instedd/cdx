@@ -27,7 +27,7 @@
 #        - name: test.assays.quantitative_result.min
 #          type: range-integer
 #          boundary: gte
-#        - name: test.assays.quantitative_result.max 
+#        - name: test.assays.quantitative_result.max
 #          type: range-integer
 #          boundary: lte
 
@@ -41,7 +41,6 @@ test:
       - name: test.error_code.max
         type: range-integer
         boundary: lte
-
   - name: test.start_time
     filter_parameter_definition:
       - name: since

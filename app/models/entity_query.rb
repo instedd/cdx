@@ -16,8 +16,8 @@ class EntityQuery < Cdx::Api::Elasticsearch::Query
     preloaded_uuids = preload_uuids_for(@policies)
 
     policies_conditions = @policies.map do |policy|
-      positive  = super(conditions_for(policy, preloaded_uuids))
-      negatives = policy.exceptions.map { |exception| super(conditions_for(exception, preloaded_uuids)) }
+      positive  = super(params_for(policy, preloaded_uuids))
+      negatives = policy.exceptions.map { |exception| super(params_for(exception, preloaded_uuids)) }
 
       if negatives.empty?
         and_conditions(positive)
@@ -34,22 +34,17 @@ class EntityQuery < Cdx::Api::Elasticsearch::Query
     if grouped_by.empty?
       CSVBuilder.new execute[@fields.result_name]
     else
-      CSVBuilder.new execute[@fields.result_name], column_names: grouped_by.concat(["count"])
+      CSVBuilder.new execute[@fields.result_name], column_names: grouped_by.concat(['count'])
     end
   end
 
   protected
 
-  def not_conditions conditions
-    return conditions.first if conditions.size == 1
-    {bool: {must_not: conditions}}
-  end
-
-  def conditions_for(computed_policy, preloaded_uuids)
+  def params_for(computed_policy, preloaded_uuids)
     Hash[computed_policy.conditions.map do |field, value|
       if field == :site
         # In the case of a site the resource_id is a prefix of all uuids
-        ["#{field}.path", value.split(".").last] unless value.nil?
+        ["#{field}.path", value.split('.').last] unless value.nil?
       else
         ["#{field}.uuid", preloaded_uuids[field][value.to_i]] unless value.nil?
       end
@@ -57,7 +52,7 @@ class EntityQuery < Cdx::Api::Elasticsearch::Query
   end
 
   def preload_uuids_for(policies)
-    resource_ids = Hash.new { |h,k| h[k] = Set.new }
+    resource_ids = Hash.new { |h, k| h[k] = Set.new }
 
     (policies + policies.map(&:exceptions).flatten).each do |policy|
       policy.conditions.each do |field, value|
