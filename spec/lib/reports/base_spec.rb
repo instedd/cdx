@@ -115,9 +115,6 @@ RSpec.describe Reports::Base do
 
       it 'can sort the results by day' do
         options['since'] = (Date.today - 7.days).iso8601
-        
-        binding.pry
-        
         @data = DummyReport.process(
           current_user, nav_context, options
         ).sort_by_day
