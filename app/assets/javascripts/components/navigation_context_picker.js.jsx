@@ -1,5 +1,5 @@
 $(document).on('ready', function(){
-  $("#nav-context").click(function(event){
+  $(document).on('click', "#nav-context", function(event){
     var container = $("#context_side_bar");
     if ($("[data-react-class=NavigationContextPicker]:first").length == 0) {
       // initialize react component for context picker
