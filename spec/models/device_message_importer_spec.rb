@@ -205,6 +205,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(tests.size).to eq(13)
 
         test = tests[0]["_source"]["test"]
+        expect(test["status"]).to eq("success")
         expect(test["assays"][0]["name"]).to eq("mtb")
         expect(test["assays"][0]["condition"]).to eq("mtb")
         expect(test["assays"][0]["result"]).to eq("negative")
@@ -216,6 +217,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(test["assays"][2]["result"]).to eq("negative")
 
         test = tests[1]["_source"]["test"]
+        expect(test["status"]).to eq("success")
         expect(test["assays"][0]["name"]).to eq("mtb")
         expect(test["assays"][0]["condition"]).to eq("mtb")
         expect(test["assays"][0]["result"]).to eq("positive")
@@ -227,6 +229,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(test["assays"][2]["result"]).to eq("negative")
 
         test = tests.last["_source"]["test"]
+        expect(test["status"]).to eq("success")
         expect(test["assays"][0]["name"]).to eq("mtb")
         expect(test["assays"][0]["condition"]).to eq("mtb")
         expect(test["assays"][0]["result"]).to eq("positive")
