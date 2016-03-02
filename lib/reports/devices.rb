@@ -9,7 +9,7 @@ module Reports
         
       total_count = TestResult.query(filter, current_user).execute['total_count']
       no_device_models = total_count
-      filter['group_by'] = 'device.model'
+ #     filter['group_by'] = 'device.model'
       results = TestResult.query(filter, current_user).execute
       data = results['tests'].map do |test|
         no_device_models -= test['count']

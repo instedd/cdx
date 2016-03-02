@@ -76,8 +76,12 @@ module Reports
     end
 
     def results_by_period(format = '%Y-%m')
-      results['tests'].group_by do |t|
-        DateTime.strptime(t['test']['start_time'], '%Y-%m-%dT%H:%M:%S').strftime("%H") 
+      results['tests'].group_by do |t|      
+        if format == "%Y-%m-%d"
+          Date.parse(t['test']['start_time']).strftime(format) 
+        else  
+          DateTime.strptime(t['test']['start_time'], '%Y-%m-%dT%H:%M:%S').strftime("%H") 
+        end
       end
     end
 
