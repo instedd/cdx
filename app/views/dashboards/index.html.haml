@@ -1,7 +1,7 @@
 .row
   .col.pe-8
     %h1 Usage in the last 12 months
-.row
+.row#tests_run
   .col.pe-7
     = react_component('BarChart', data: query_tests_chart, height: 300, y_label: 'Tests Run')
   .col

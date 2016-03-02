@@ -36,6 +36,8 @@ class DevicePage < DeviceSetupPage
     element :explore_tests, :link, 'Explore tests'
   end
 
+  section :tests_run, TestsRun, '#tests_run'
+
   def shows_deleted?
     page.has_css?('h2.deleted')
   end

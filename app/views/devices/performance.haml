@@ -6,7 +6,7 @@
       %span= link_to 'Explore tests', test_results_path("device.uuid": @device.uuid)
       or
       %span= link_to 'Logs', device_messages_path("device.uuid": @device.uuid)
-.row
+.row#tests_run
   .col.pe-7
     = react_component('BarChart', data: @tests_histogram, height: 300, y_label: "Tests Run")
   .col

@@ -10,7 +10,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
   let(:site_two) { Site.make(institution: institution_two) }
   let(:user_device) { Device.make institution_id: institution.id, site: site }
   let(:user_device_two) { Device.make institution_id: institution_two.id, site: site_two }
-  
+
   let(:nav_context) { NavigationContext.new(current_user, institution.uuid) }
 
   before do
@@ -20,6 +20,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
         'start_time' => Time.now,
         'name' => 'mtb',
         'status' => 'error',
+        'type' => 'specimen',
         'site_user' => site_user
       },
       device_messages:[DeviceMessage.make(device: user_device)]
@@ -31,6 +32,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
         'start_time' => Time.now - 1.month,
         'name' => 'mtb',
         'status' => 'error',
+        'type' => 'specimen',
         'site_user' => site_user
       },
       device_messages:[DeviceMessage.make(device: user_device)]
@@ -41,7 +43,8 @@ RSpec.describe Reports::Errors, elasticsearch: true do
         'assays' => ['condition' => 'man_flu', 'result' => :negative],
         'start_time' => Time.now - 1.month,
         'name' => 'man_flu',
-        'status' => 'error'
+        'status' => 'error',
+        'type' => 'specimen'
       },
       device_messages:[DeviceMessage.make(device: user_device)]
     )

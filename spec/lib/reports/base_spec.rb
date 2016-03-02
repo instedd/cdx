@@ -26,6 +26,7 @@ RSpec.describe Reports::Base do
       it 'queries for site.path and institution.id' do
         query['institution.uuid'] = institution.uuid
         query['site.path'] = site.uuid
+        query['test.type'] = "specimen"
         allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
         DummyReport.process(current_user, nav_context, options)
       end
@@ -35,6 +36,7 @@ RSpec.describe Reports::Base do
       let(:nav_context) { NavigationContext.new(current_user, institution.uuid) }
       it 'queries for institution.uuid' do
         query['institution.uuid'] = institution.uuid
+        query['test.type'] = "specimen"
         allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
         DummyReport.process(current_user, nav_context, options)
       end
@@ -47,6 +49,7 @@ RSpec.describe Reports::Base do
       it 'defaults to 1 year ago' do
         query['institution.uuid'] = institution.uuid
         query['since'] = since
+        query['test.type'] = "specimen"
         allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
         DummyReport.process(current_user, nav_context, options)
       end
@@ -56,6 +59,7 @@ RSpec.describe Reports::Base do
       it 'includes that date in query' do
         query['institution.uuid'] = institution.uuid
         query['since'] = '2005-12-12'
+        query['test.type'] = "specimen"
         options['since'] = '2005-12-12'
         allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
         DummyReport.process(current_user, nav_context, options)
@@ -74,6 +78,7 @@ RSpec.describe Reports::Base do
       it 'includes them in the query' do
         query['institution.uuid'] = institution.uuid
         query['range'] = date_range
+        query['test.type'] = "specimen"
         options['date_range'] = date_range
         allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
         DummyReport.process(current_user, nav_context, options)
@@ -82,6 +87,7 @@ RSpec.describe Reports::Base do
       it 'does not include :since in query' do
         query['institution.uuid'] = institution.uuid
         query['range'] = date_range
+        query['test.type'] = "specimen"
         options['date_range'] = date_range
         options['since'] = since
         allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
