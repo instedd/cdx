@@ -20,8 +20,8 @@ module Reports
       return self
     end
 
-    def sort_by_day
-      6.downto(0).each do |i|
+    def sort_by_day(cnt=6)
+      cnt.downto(0).each do |i|
         day = Date.today - i.days
         dayname = day.strftime('%A')
         key = day.strftime('%Y-%m-%d')
@@ -33,13 +33,12 @@ module Reports
       end
       return data
     end
-    
-    def sort_by_hour
+
+    def sort_by_hour(cnt=23)
       hour_results = results_by_hour_period('%H')
-      23.downto(0) do |i|
+      cnt.downto(0) do |i|
         now = (Time.now - i.hours)
-        hourname = now.strftime('%H')
-        hourname = "0"+hourname if hourname.length==1
+        hourname = '%02d' % now.strftime('%H')
         data << {
           label: hourname,
           values: [hour_results ? hour_results[hourname].count : 0]
@@ -48,8 +47,8 @@ module Reports
       return data
     end
 
-    def sort_by_month
-      11.downto(0).each do |i|
+    def sort_by_month(cnt = 11)
+      cnt.downto(0).each do |i|
         date = Date.today - i.months
         date_key = date.strftime('%Y-%m')
         date_results = results_by_day_period[date_key]
@@ -74,16 +73,16 @@ module Reports
     def report_since
       filter['since'] = options['since'] || (Date.today - 1.year).iso8601
     end
-    
+
     def results_by_day_period(format = '%Y-%m')
-      results['tests'].group_by do |t|      
-        Date.parse(t['test']['start_time']).strftime(format) 
+      results['tests'].group_by do |t|
+        Date.parse(t['test']['start_time']).strftime(format)
       end
     end
-    
+
     def results_by_hour_period(format = '%H')
-      results['tests'].group_by do |t|      
-        DateTime.strptime(t['test']['start_time'], '%Y-%m-%dT%H:%M:%S').strftime("%H") 
+      results['tests'].group_by do |t|
+        DateTime.strptime(t['test']['start_time'], '%Y-%m-%dT%H:%M:%S').strftime('%H')
       end
     end
 

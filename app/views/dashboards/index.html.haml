@@ -1,4 +1,23 @@
 .row
+  .col.pe-6
+    %form#filters-form{ action: dashboard_path, 'data-auto-submit' => true }
+      .filter
+        %label.block Date
+        = cdx_select name: 'since', value: params['since'] do |select|
+          - select.items options_for_date, :value, :label
+  .col.pe-6
+    %form#filters-form{ action: dashboard_path }
+      .row
+        .col.pe-2
+          %label.block Date From
+          = date_field('range','start_time[gte]')
+        .col.pe-2
+          %label.block Date To
+          = date_field('range','start_time[lte]')
+        .col.pe-2
+          %label.block ''
+          %input#query_button.btn-primary(type='submit' value='Query')
+.row
   .col.pe-8
     %h1 Usage in the last 12 months
 .row#tests_run
@@ -18,9 +37,9 @@
   .col
     = react_component('PieChart', data: errors_by_code, height: 250, label: 'Errors')
 
-
-
 .row
-  .col
-    %h1 devices in the last 12 months
+  .col.pe-8
+    %h1 Devices in the last 12 months
+.row
+  .col.pe-7
     = react_component('PieChart', data: errors_by_device, height: 250, label: 'Devices')

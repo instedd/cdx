@@ -27,9 +27,9 @@ module Reports
       super
     end
 
-    def sort_by_month
+    def sort_by_month(cnt=11)
       users = results['tests'].index_by { |t| t['test.site_user'] }.keys
-      11.downto(0).each do |i|
+      cnt.downto(0).each do |i|
         date = Date.today - i.months
         date_key = date.strftime('%Y-%m')
         date_results = results_by_day[date_key].try { |r| r.index_by { |t| t['test.site_user'] } }
