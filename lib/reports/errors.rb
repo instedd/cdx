@@ -47,11 +47,10 @@ module Reports
     end
 
     def by_successful
-      filter['test.status'] = 'successful'
+      filter['test.status'] = 'success'
       total_count = TestResult.query(filter, current_user).execute['total_count']
       no_error_code = total_count
       filter['group_by'] = 'test.status'
-  
       results = TestResult.query(filter, current_user).execute
       data = results['tests'].map do |test|
       no_error_code -= test['count']
@@ -83,7 +82,7 @@ module Reports
 =end
       #  filter['test.status'] = 'not(successful)'
       
-      filter['test.status'] = 'invalid,error,no_result,in_progress'
+      filter['test.status'] = 'invalid,no_result,in_progress'
         total_count = TestResult.query(filter, current_user).execute['total_count']
         no_error_code = total_count
         filter['group_by'] = 'test.status'

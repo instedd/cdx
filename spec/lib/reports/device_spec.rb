@@ -72,6 +72,5 @@ RSpec.describe Reports::Devices, elasticsearch: true do
       number_devices = Reports::Devices.total_devices(Time.now-1.week)
       expect(number_devices).to eql(2)
     end
-
   end
 end
