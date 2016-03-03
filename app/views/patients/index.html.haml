@@ -27,7 +27,7 @@
             %tr{data: {href: patient_path(patient) }}
               %td= patient.name
               %td= patient.entity_id
-              %td= patient.dob_description
+              %td= patient.dob_description(I18n.t('date.input_format.pattern'))
               %td= patient.location.try(:name)
               %td= format_date(patient.last_encounter)
 

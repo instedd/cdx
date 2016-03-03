@@ -45,9 +45,9 @@ class Patient < ActiveRecord::Base
     years_between Time.parse(dob), Time.now rescue nil
   end
 
-  def dob_description
+  def dob_description(date_pattern)
     if dob && (dob_time = self.dob_time)
-      "#{dob_time.strftime("%m/%d/%Y")} (#{age} y/o)"
+      "#{dob_time.strftime(date_pattern)} (#{age} y/o)"
     else
       ""
     end

@@ -104,12 +104,12 @@ describe Patient do
 
     patient = Patient.make
     patient.dob = "1983-10-20"
-    expect(patient.dob_description).to eq("10/20/1983 (31 y/o)")
+    expect(patient.dob_description("%m/%d/%Y")).to eq("10/20/1983 (31 y/o)")
 
     patient.dob = nil
-    expect(patient.dob_description).to eq("")
+    expect(patient.dob_description("%m/%d/%Y")).to eq("")
 
     patient.dob = "wrong"
-    expect(patient.dob_description).to eq("")
+    expect(patient.dob_description("%m/%d/%Y")).to eq("")
   end
 end
