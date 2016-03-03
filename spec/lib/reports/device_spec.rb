@@ -67,6 +67,11 @@ RSpec.describe Reports::Devices, elasticsearch: true do
     it 'matches the two device models' do
       expect(@data[1]).to eql([DeviceModel.find(user_device.device_model_id).name])
     end
+    
+    it 'returns the total number of devices' do
+      number_devices = Reports::Devices.total_devices(Time.now-1.week)
+      expect(number_devices).to eql(2)
+    end
 
   end
 end

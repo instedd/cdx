@@ -43,3 +43,18 @@
 .row
   .col.pe-7
     = react_component('PieChart', data: errors_by_device, height: 250, label: 'Devices')
+
+.row
+  .col
+    %h1 models in the last 12 months
+    = react_component('PieChart', data: errors_by_model, height: 250, label: 'By Models')
+
+.row
+  .col
+    %h1 successful in the last 12 months
+    = react_component('PieChart', data: errors_by_successful, height: 250, label: 'By success')
+	
+.row
+  .col
+    %h1 successful in the last 12 months
+    = react_component('PieChart', data: errors_by_not_successful, height: 250, label: 'By not success')

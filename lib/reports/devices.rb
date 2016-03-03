@@ -4,6 +4,10 @@ module Reports
       new(*args).by_device
     end
 
+    def self.total_devices(time_created)
+      DeviceModel.where("created_at >= ?", time_created).count
+    end
+    
     def by_device
       filter = {'test.reported_time_since' => Time.now - 1.week,'test.reported_time_until' => Time.now,"group_by" => "device.model,day(test.reported_time)" }
       total_count = TestResult.query(filter, current_user).execute['total_count']
