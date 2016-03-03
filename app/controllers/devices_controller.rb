@@ -78,6 +78,7 @@ class DevicesController < ApplicationController
     return unless authorize_resource(@device, READ_DEVICE)
     redirect_to setup_device_path(@device) unless @device.activated?
 
+    @can_edit = has_access?(@device, UPDATE_DEVICE)
     @show_institution = show_institution?(Policy::Actions::READ_DEVICE, Device)
   end
 
