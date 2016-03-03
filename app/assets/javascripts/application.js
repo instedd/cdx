@@ -18,6 +18,7 @@
 //= require lodash
 //= require polyfills
 //= require leaflet
+//= require Leaflet.Sleep
 //= require leaflet-control-geocoder
 //= require classnames
 //= require react
@@ -37,6 +38,15 @@ Turbolinks.enableProgressBar()
 
 // Configure leaflet
 L.Icon.Default.imagePath = '/assets'
+
+L.Map.mergeOptions({
+  sleep: true,
+  sleepTime: 500,
+  wakeTime: 750,
+  sleepNote: false,
+  hoverToWake: true,
+  sleepOpacity:.7
+});
 
 function cdx_init_components(dom) {
   ReactRailsUJS.mountComponents(dom);
