@@ -20,7 +20,7 @@ module Reports
       data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
       data
     end
-     
+
     def self.by_model(*args)
       new(*args).by_model
     end
@@ -40,8 +40,8 @@ module Reports
       end
       data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
       data
-    end   
-       
+    end
+
     def self.by_successful(*args)
       new(*args).by_successful
     end
@@ -62,7 +62,6 @@ module Reports
       data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
       data
     end
-
 
     def self.by_not_successful(*args)
       new(*args).by_not_successful
@@ -92,9 +91,6 @@ module Reports
           label: test['test.status'],
           value: test['count']
         }
-        end
-        data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
-        data
       end
 
 

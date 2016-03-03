@@ -9,7 +9,7 @@ module Reports
     end
     
     def by_device
-      filter = {'test.reported_time_since' => Time.now - 1.week,'test.reported_time_until' => Time.now,"group_by" => "device.model,day(test.reported_time)" }
+      filter['group_by'] = 'device.model,day(test.start_time)'
       total_count = TestResult.query(filter, current_user).execute['total_count']
       no_device_models = total_count
       results = TestResult.query(filter, current_user).execute
@@ -25,7 +25,7 @@ module Reports
     end
 
     def process
-      filter['group_by'] = 'month(test.reported_time),device.model'
+      filter['group_by'] = 'month(test.start_time),device.model'
       super
     end
 
@@ -49,7 +49,7 @@ module Reports
     private
 
     def results_by_day
-      results['tests'].group_by { |t| t['test.reported_time'] }
+      results['tests'].group_by { |t| t['test.start_time'] }
     end
   end
 end

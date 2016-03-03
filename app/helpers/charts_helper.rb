@@ -65,7 +65,6 @@ module ChartsHelper
   end
 
   def query_errors
-    require 'pry'; binding.pry
     data = Reports::Errors.process(current_user, @navigation_context, options)
     return data.sort_by_month unless params['since']
     return data.sort_by_month(number_of_months - 1) if number_of_months > 1
