@@ -80,13 +80,11 @@ module Reports
            - success
            - in_progress
 =end
-      #  filter['test.status'] = 'not(successful)'
       
-      filter['test.status'] = 'invalid,no_result,in_progress'
+      filter['test.status'] = 'invalid,error,no_result,in_progress'
         total_count = TestResult.query(filter, current_user).execute['total_count']
         no_error_code = total_count
         filter['group_by'] = 'test.status'
-      
         results = TestResult.query(filter, current_user).execute
         data = results['tests'].map do |test|
         no_error_code -= test['count']
@@ -98,8 +96,6 @@ module Reports
         data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
         data
       end
-
-
 
 
     def process
