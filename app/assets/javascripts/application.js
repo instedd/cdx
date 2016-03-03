@@ -41,7 +41,7 @@ L.Icon.Default.imagePath = '/assets'
 
 L.Map.mergeOptions({
   sleep: true,
-  sleepTime: 750,
+  sleepTime: 500,
   wakeTime: 750,
   sleepNote: false,
   hoverToWake: true,
