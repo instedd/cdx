@@ -45,6 +45,14 @@ class Patient < ActiveRecord::Base
     years_between Time.parse(dob), Time.now rescue nil
   end
 
+  def dob_description
+    if dob && (dob_time = self.dob_time)
+      "#{dob_time.strftime("%m/%d/%Y")} (#{age} y/o)"
+    else
+      ""
+    end
+  end
+
   def last_encounter
     @last_encounter || encounters.order(start_time: :desc).first.try(&:start_time)
   end
