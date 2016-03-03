@@ -111,7 +111,7 @@
     background-position: right -20px;
     color: $red;
   }
-  &.assay-result-disabled {
+  &.assay-result-indeterminate {
     background-position: right -40px;
     color: $gray3;
   }
@@ -462,4 +462,3 @@ ul.samples {
   }
 
 }
-
