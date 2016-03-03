@@ -64,7 +64,8 @@ var BaseEncounterForm = {
 var EncounterForm = React.createClass(_.merge({
   getDefaultProps: function() {
     return {
-      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: _.capitalize(v)};})
+      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: _.capitalize(v)};}),
+      assayUndefinedResult: 'indeterminate'
     }
   },
 
@@ -162,6 +163,7 @@ var EncounterForm = React.createClass(_.merge({
 
           <div className="col assays-editor">
             {this.state.encounter.assays.map(function(assay, index){
+              assay.result = _.includes(_.map(this.props.assayResultOptions,function(e){ return e.value }), assay.result) ? assay.result : this.props.assayUndefinedResult;
               return (
                 <div className="row" key={index}>
                   <div className="col px-4">
