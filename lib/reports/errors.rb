@@ -4,6 +4,18 @@ module Reports
       new(*args).by_code
     end
 
+    def self.by_model(*args)
+      new(*args).by_model
+    end
+
+    def self.by_not_successful(*args)
+      new(*args).by_not_successful
+    end
+
+    def self.by_successful(*args)
+      new(*args).by_successful
+    end
+
     def by_code
       filter['test.status'] = 'error'
       total_count = TestResult.query(filter, current_user).execute['total_count']
@@ -19,10 +31,6 @@ module Reports
       end
       data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
       data
-    end
-
-    def self.by_model(*args)
-      new(*args).by_model
     end
 
     def by_model
@@ -42,10 +50,6 @@ module Reports
       data
     end
 
-    def self.by_successful(*args)
-      new(*args).by_successful
-    end
-
     def by_successful
       filter['test.status'] = 'success'
       total_count = TestResult.query(filter, current_user).execute['total_count']
@@ -61,10 +65,6 @@ module Reports
       end
       data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
       data
-    end
-
-    def self.by_not_successful(*args)
-      new(*args).by_not_successful
     end
 
     def by_not_successful
@@ -96,28 +96,25 @@ module Reports
 
     def process
       filter['test.status'] = 'error'
-      filter['group_by'] = 'month(test.start_time),test.site_user'
+      # filter['group_by'] = 'month(test.start_time),test.site_user'
       super
     end
 
-    def sort_by_month(cnt=11)
-      users = results['tests'].index_by { |t| t['test.site_user'] }.keys
-      cnt.downto(0).each do |i|
-        date = Date.today - i.months
-        date_key = date.strftime('%Y-%m')
-        date_results = results_by_day[date_key].try { |r| r.index_by { |t| t['test.site_user'] } }
-        data << {
-          label: label_monthly(date),
-          values: users.map do |u|
-            user_result = date_results && date_results[u]
-            user_result ? user_result['count'] : 0
-          end
-        }
-      end
-      return data, users
+    def users
+      @users = results['tests'].index_by { |t| t['test.site_user'] }.keys
     end
 
     private
+
+    def data_hash_month(date, date_results)
+      {
+        label: label_monthly(date),
+        values: users.map do |u|
+          user_result = date_results && date_results[u]
+          user_result ? user_result['count'] : 0
+        end
+      }
+    end
 
     def results_by_day
       results['tests'].group_by { |t| t['test.start_time'] }

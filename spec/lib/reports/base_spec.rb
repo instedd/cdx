@@ -115,12 +115,12 @@ RSpec.describe Reports::Base do
 
       it 'can sort the results by day' do
         options['since'] = (Date.today - 7.days).iso8601
-        @data = DummyReport.process(
+        tests = DummyReport.process(
           current_user, nav_context, options
         ).sort_by_day
-        expect(@data.count).to eq(7)
-        expect(@data.first[:label]).to eq((Date.today - 6.days).strftime('%A'))
-        expect(@data.last[:label]).to eq(Date.today.strftime('%A'))
+        expect(tests.data.count).to eq(7)
+        expect(tests.data.first[:label]).to eq((Date.today - 6.days).strftime('%d/%m'))
+        expect(tests.data.last[:label]).to eq(Date.today.strftime('%d/%m'))
       end
     end
 
