@@ -73,6 +73,10 @@ class Patient < ActiveRecord::Base
     json.dob dob_time.try { |d| d.strftime(I18n.t('date.input_format.pattern')) }
   end
 
+  def name_or_unknown
+    name || "(Unknown name)"
+  end
+
   def dob_time
     Time.parse(dob) rescue nil
   end

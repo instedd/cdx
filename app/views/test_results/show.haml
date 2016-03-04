@@ -29,7 +29,7 @@
       - c.bottom do
         - if @test_result.patient
           Patient
-          = link_to @test_result.patient.name, @test_result.patient
+          = link_to @test_result.patient.name_or_unknown, @test_result.patient
           %br
         Test performed on
         = link_to @test_result.device.name, device_path(@test_result.device)

@@ -35,7 +35,7 @@ var PatientCard = React.createClass({
         <%= to_jsx(card(image: asset_url('card-unkown.png')) do |c|
           c.top do
             raw <<-JSX
-              <a href={"/patients/" + patient.id}>{patient.name}</a><br/>
+              <a href={"/patients/" + patient.id}>{patient.name || "(Unknown name)"}</a><br/>
               {patientInfo(patient)}
             JSX
           end
