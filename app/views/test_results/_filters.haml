@@ -45,9 +45,10 @@
               .filter
                 %label.block Sample Id
                 %input{type: "text", name: "sample.id", value: params["sample.id"]}
-            .filter
-              %label.block Test Order Id
-              %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
+            - else
+              .filter
+                %label.block Test Order Id
+                %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
             - if @display_as == "test" && ((@devices.size > 1) || params['device.uuid'])
               .filter
                 %label.block Device
