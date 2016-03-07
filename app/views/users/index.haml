@@ -33,7 +33,7 @@
     - if @users.empty?
       = empty_data icon: 'icon-outline-user xx-large' do |c|
         - c.body do
-          %h1 There are no users with access to this location
+          %h1 There are no users with access to #{truncated_navigation_context_entity_name}
           %p Invite other users to join this team
     - else
       = cdx_table title: pluralize(@total, "user") do |t|

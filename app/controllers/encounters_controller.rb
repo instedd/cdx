@@ -280,6 +280,7 @@ class EncountersController < ApplicationController
   def as_json_edit
     Jbuilder.new do |json|
       json.(@encounter, :id)
+      json.(@encounter, :uuid)
       json.has_dirty_diagnostic @encounter.has_dirty_diagnostic?
       json.assays (@encounter_blender.core_fields[Encounter::ASSAYS_FIELD] || [])
       json.observations @encounter_blender.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]

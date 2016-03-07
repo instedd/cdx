@@ -23,6 +23,11 @@ class DeviceSpecHelper
     DeviceMessageImporter.new("*.csv").import_from @sync_dir
   end
 
+  def import_sample_json(device, name)
+    copy_sample_json device, name
+    DeviceMessageImporter.new("*.json").import_from @sync_dir
+  end
+
   private
 
   def load_manifest(device_model, name)
@@ -31,6 +36,10 @@ class DeviceSpecHelper
 
   def copy_sample_csv(device, name)
     copy_sample(device, name, 'csvs')
+  end
+
+  def copy_sample_json(device, name)
+    copy_sample(device, name, 'jsons')
   end
 
   def copy_sample(device, name, format)

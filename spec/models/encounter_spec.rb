@@ -5,6 +5,11 @@ describe Encounter do
 
   let(:encounter) { Encounter.make }
 
+  it "#human_diagnose" do
+    encounter.core_fields[Encounter::ASSAYS_FIELD] = [{"condition" => "flu_a", "name" => "flu_a", "result" => "positive", "quantitative_result" => nil}]
+    encounter.human_diagnose.should eq("FLU_A detected.")
+  end
+
   describe "merge assays" do
     def merge(a, b)
       Encounter.merge_assays(a, b)
@@ -264,7 +269,7 @@ describe Encounter do
       before(:each) do
         create_encounter_and_test
       end
-      
+
       it "should have a pending test" do
         expect(Encounter.last.test_results_not_in_diagnostic).to eq([TestResult.last])
       end

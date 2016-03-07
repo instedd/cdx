@@ -44,8 +44,8 @@
     - if current_user
       %span.icon-user.medium.icon-gray-light{title: current_user.email}
       %ul
-        - unless @hide_user_settings
-          %li= link_to "Settings", edit_user_registration_path
+        - unless @hide_my_account
+          %li= link_to "My Account", edit_user_registration_path
         - if current_user && !@hide_nav_bar
           %li= link_to "Edit institutions", institutions_path
           %li= link_to "API tokens", api_tokens_path

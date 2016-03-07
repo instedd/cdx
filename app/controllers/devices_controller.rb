@@ -78,6 +78,7 @@ class DevicesController < ApplicationController
     return unless authorize_resource(@device, READ_DEVICE)
     redirect_to setup_device_path(@device) unless @device.activated?
 
+    @can_edit = has_access?(@device, UPDATE_DEVICE)
     @show_institution = show_institution?(Policy::Actions::READ_DEVICE, Device)
   end
 
@@ -349,7 +350,9 @@ class DevicesController < ApplicationController
   def default_performance_query_options
     {
       "since" => (Date.today - 1.year).iso8601,
-      "device.uuid" => @device.uuid
+      "device.uuid" => @device.uuid,
+      # TODO post mvp: should generate list of all types but qc, or support query by !=
+      "test.type" => "specimen"
     }.tap do |h|
       # display only test results of the current site of the device
       h["site.uuid"] = @device.site.uuid if @device.site

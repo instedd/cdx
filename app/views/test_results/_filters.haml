@@ -1,4 +1,5 @@
 - content_for(:subheader) do
+  - show_expanded = ["test.type", "sample.id", "encounter.id", "device.uuid"].any? { |key| params[key].present? }
   %form#filters-form{action: test_results_path, "data-auto-submit" => true}
     %input{type: "hidden", name: "page_size", value: @page_size}
     .row.center.filters
@@ -19,7 +20,7 @@
             %label.block Condition
             = cdx_select name: "test.assays.condition", value: params["test.assays.condition"] do |select|
               - select.item "", "Show all"
-              - select.items @conditions
+              - select.items(@conditions.map { |name| [name.upcase, name] })
           .filter
             %label.block Result
             = cdx_select name: "test.assays.result", value: params["test.assays.result"] do |select|
@@ -31,17 +32,23 @@
               - select.item "", "Show all"
               - select.items @date_options, :value, :label
           .col
-            %a.btn-toggle.pull-right{:title => "Toggle advanced filters"}
+            %a.btn-toggle.pull-right{:class => (show_expanded ? "up" : ""), :title => "Toggle advanced filters"}
 
-        .advanced{class: (params["sample.id"].present? || params["encounter.id"].present? || params["device.uuid"].present? ? "show" : "") }
+        .advanced{class: (show_expanded ? "show" : ""), style: (show_expanded ? "overflow: visible" : "") }
           .row
             - if @display_as == "test"
               .filter
+                %label.block Type
+                = cdx_select name: "test.type", value: params["test.type"] do |select|
+                  - select.item "", "Show all"
+                  - select.items @test_types
+              .filter
                 %label.block Sample Id
                 %input{type: "text", name: "sample.id", value: params["sample.id"]}
-            .filter
-              %label.block Encounter Id
-              %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
+            - else
+              .filter
+                %label.block Test Order Id
+                %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
             - if @display_as == "test" && ((@devices.size > 1) || params['device.uuid'])
               .filter
                 %label.block Device

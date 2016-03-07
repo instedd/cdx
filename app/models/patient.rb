@@ -45,6 +45,14 @@ class Patient < ActiveRecord::Base
     years_between Time.parse(dob), Time.now rescue nil
   end
 
+  def dob_description(date_pattern)
+    if dob && (dob_time = self.dob_time)
+      "#{dob_time.strftime(date_pattern)} (#{age} y/o)"
+    else
+      ""
+    end
+  end
+
   def last_encounter
     @last_encounter || encounters.order(start_time: :desc).first.try(&:start_time)
   end
@@ -63,6 +71,10 @@ class Patient < ActiveRecord::Base
   def as_json_card(json)
     json.(self, :id, :name, :age, :gender, :address, :phone, :email, :entity_id)
     json.dob dob_time.try { |d| d.strftime(I18n.t('date.input_format.pattern')) }
+  end
+
+  def name_or_unknown
+    name || "(Unknown name)"
   end
 
   def dob_time

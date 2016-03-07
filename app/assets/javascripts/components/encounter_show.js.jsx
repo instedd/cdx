@@ -13,6 +13,15 @@ var EncounterShow = React.createClass({
           </div>
         </div>
 
+        <div className="row">
+          <div className="col pe-2">
+            <label>Test Order ID</label>
+          </div>
+          <div className="col">
+            <p>{this.props.encounter.uuid}</p>
+          </div>
+        </div>
+
         <FlexFullRow>
           <PatientCard patient={this.props.encounter.patient} />
         </FlexFullRow>

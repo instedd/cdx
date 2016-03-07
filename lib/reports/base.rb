@@ -56,6 +56,7 @@ module Reports
     def setup
       site_or_institution
       date_constraints
+      ignore_qc
     end
 
     def date_constraints
@@ -65,6 +66,11 @@ module Reports
     def site_or_institution
       filter['institution.uuid'] = context.institution.uuid if context.institution
       filter['site.path'] = context.site.uuid if context.site
+    end
+
+    def ignore_qc
+      # TODO post mvp: should generate list of all types but qc, or support query by !=
+      filter["test.type"] = "specimen"
     end
 
     def users

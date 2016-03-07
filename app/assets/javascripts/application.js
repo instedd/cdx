@@ -18,6 +18,7 @@
 //= require lodash
 //= require polyfills
 //= require leaflet
+//= require Leaflet.Sleep
 //= require leaflet-control-geocoder
 //= require classnames
 //= require react
@@ -38,9 +39,30 @@ Turbolinks.enableProgressBar()
 // Configure leaflet
 L.Icon.Default.imagePath = '/assets'
 
+L.Map.mergeOptions({
+  sleep: true,
+  sleepTime: 500,
+  wakeTime: 750,
+  sleepNote: false,
+  hoverToWake: true,
+  sleepOpacity:.7
+});
+
 function cdx_init_components(dom) {
   ReactRailsUJS.mountComponents(dom);
 }
+
+// Don't use $(document).ready so click handlers don't accumulate
+// and we end up firing multiple requests on each click.
+$(document).on("ready", function(){
+  $(document).on('click', '*[data-href]', function(event){
+    if (event.metaKey || event.shiftKey) {
+      window.open($(this).data('href'), '_blank');
+      return;
+    }
+    Turbolinks.visit($(this).data('href'));
+  });
+})
 
 $(document).ready(function(){
   function setFilledClass(elem) {
@@ -60,14 +82,6 @@ $(document).ready(function(){
     .each(function() {
       setFilledClass($(this));
     });
-
-  $(document).on('click', '*[data-href]', function(event){
-    if (event.metaKey || event.shiftKey) {
-      window.open($(this).data('href'), '_blank');
-      return;
-    }
-    Turbolinks.visit($(this).data('href'));
-  });
 
   $('form[data-auto-submit]').each(function(){
     var form = $(this);

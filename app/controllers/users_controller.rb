@@ -2,8 +2,14 @@ class UsersController < ApplicationController
   before_filter :load_resource, only: [:edit, :update, :assign_role, :unassign_role]
 
   def index
-    return unless authorize_resource(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS))
+    site_admin = !has_access?(@navigation_context.entity, READ_INSTITUTION_USERS) && @navigation_context.entity.kind_of?(Institution)
+    if site_admin
+      ids = check_access(Site.within(@navigation_context.entity), READ_SITE_USERS).pluck(:id)
+    end
+    return unless has_access?(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS)) || !ids.empty?
+
     @users = User.within(@navigation_context.entity, @navigation_context.exclude_subsites)
+    @users = @users.where("roles.site_id IN (?)", ids) if site_admin
     @roles = Role.within(@navigation_context.entity, @navigation_context.exclude_subsites).map{|r| {value: r.id, label: r.name}}
     @can_update = has_access?(User, UPDATE_USER)
     apply_filters

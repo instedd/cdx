@@ -128,9 +128,8 @@
   color: #999999;
   cursor: pointer;
   display: inline-block;
-  // display: none;
-  font-size: 16px;
-  padding: 6px 10px;
+  font-size: 18px;
+  padding: 8px 14px;
   position: absolute;
   right: 17px;
   top: 0;
@@ -228,14 +227,8 @@
 }
 
 .Select.is-multi {
-  .Select-control {
-    padding: 2px 52px 2px 3px;
-  }
   .Select-input {
     vertical-align: middle;
-    border: 1px solid transparent;
-    margin: 2px;
-    padding: 3px 0;
   }
 }
 
