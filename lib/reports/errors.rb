@@ -1,5 +1,7 @@
 module Reports
   class Errors < Base
+    attr_accessor :users
+
     def self.by_code(*args)
       new(*args).by_code
     end
@@ -96,28 +98,43 @@ module Reports
 
     def process
       filter['test.status'] = 'error'
-      # filter['group_by'] = 'month(test.start_time),test.site_user'
       super
     end
 
     def users
-      @users = results['tests'].index_by { |t| t['test.site_user'] }.keys
+      results['tests'].group_by { |t| t['test']['site_user'] }.keys
     end
 
     private
 
-    def data_hash_month(date, date_results)
-      {
-        label: label_monthly(date),
-        values: users.map do |u|
-          user_result = date_results && date_results[u]
-          user_result ? user_result['count'] : 0
-        end
-      }
+    # def data_hash_day(dayname, day_results)
+    #   {
+    #     label: dayname,
+    #     values: users.map do |u|
+    #       user_result = day_results && day_results[u]
+    #       user_result ? user_result['count'] : 0
+    #     end
+    #   }
+    # end
+
+    # def data_hash_month(date, date_results)
+    #   {
+    #     label: label_monthly(date),
+    #     values: users.map do |u|
+    #       user_result = date_results && date_results[u]
+    #       user_result ? user_result['count'] : 0
+    #     end
+    #   }
+    # end
+
+    def day_results(format='%Y-%m-%d', key)
+      results_by_period( format )[key].try do
+        |r| r.index_by { |t| t['test']['site_user'] }
+      end
     end
 
-    def results_by_day
-      results['tests'].group_by { |t| t['test.start_time'] }
-    end
+    # def month_results()
+    #   results_by_period[key].try { |r| r.index_by { |t| t['test.site_user'] } }
+    # end
   end
 end

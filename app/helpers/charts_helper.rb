@@ -3,22 +3,56 @@ module ChartsHelper
     Reports::Errors.by_code(current_user, @navigation_context, options)
   end
 
+  def errors_by_device_chart
+    data = Reports::DeviceErrors.process(current_user, @navigation_context, options)
+    return data.sort_by_month unless params['since']
+    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
+    return data.sort_by_day(days_since)
+  end
+
   def errors_by_device
     Reports::Devices.by_device(current_user, @navigation_context, options)
+  end
+
+  def errors_by_model_chart
+    data = Reports::ModelErrors.process(current_user, @navigation_context, options)
+    return data.sort_by_month unless params['since']
+    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
+    return data.sort_by_day(days_since)
   end
 
   def errors_by_model
     Reports::Errors.by_model(current_user, @navigation_context, options)
   end
 
-  def errors_by_successful
+  def successful_tests_chart
+    data = Reports::Successful.process(current_user, @navigation_context, options)
+    return data.sort_by_month unless params['since']
+    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
+    return data.sort_by_day(days_since)
+  end
+
+  def unsuccessful_tests_chart
+    options['test.status'] = 'invalid,error,no_result,in_progress'
+    data = Reports::Successful.process(current_user, @navigation_context, options)
+    return data.sort_by_month unless params['since']
+    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
+    return data.sort_by_day(days_since)
+  end
+
+  def successful_tests
     Reports::Errors.by_successful(current_user, @navigation_context, options)
   end
-  
+
+  def unsuccessful_tests
+    options['test.status'] = 'invalid,error,no_result,in_progress'
+    Reports::Errors.by_successful(current_user, @navigation_context, options)
+  end
+
   def errors_by_not_successful
     Reports::Errors.by_not_successful(current_user, @navigation_context, options)
   end
-  
+
   def chart_heading
     stdate = start_date.strftime("%a %d %b %Y")
     endate = end_date.strftime("%a %d %b %Y")
@@ -89,10 +123,6 @@ module ChartsHelper
     return data.sort_by_month unless params['since']
     return data.sort_by_month(number_of_months - 1) if number_of_months > 1
     return data.sort_by_day(days_since)
-  end
-
-  def query_errors_data
-    query_errors[0]
   end
 
   def since

@@ -33,27 +33,42 @@
     %h1 Error rate #{chart_heading}
 .row
   .col.pe-7
-    = react_component('BarChart', data: query_errors.data, height: 300, y_label: 'Tests With Errors', x_labels: query_errors.users)
+    = react_component('BarChart', data: query_errors.data, height: 300, y_label: 'Tests With Errors')
   .col
     = react_component('PieChart', data: errors_by_code, height: 250, label: 'Errors')
 %hr
 .row
   .col.pe-8
-    %h1 Devices in the last 12 months
+    %h1 Devices #{chart_heading}
 .row
   .col.pe-7
+    = react_component('BarChart', data: errors_by_device_chart.data, height: 300, y_label: 'Errors By Device', x_labels: errors_by_device_chart.statuses)
+  .col
     = react_component('PieChart', data: errors_by_device, height: 250, label: 'Devices')
 %hr
 .row
+  .col.pe-8
+    %h1 Models #{chart_heading}
+.row
+  .col.pe-7
+    = react_component('BarChart', data: errors_by_model_chart.data, height: 300, y_label: 'Errors By Model')
   .col
-    %h1 models in the last 12 months
     = react_component('PieChart', data: errors_by_model, height: 250, label: 'By Models')
 %hr
 .row
   .col
-    %h1 successful in the last 12 months
-    = react_component('PieChart', data: errors_by_successful, height: 250, label: 'By success')
+    %h1 Successful tests #{chart_heading}
+.row
+  .col.pe-7
+    = react_component('BarChart', data: successful_tests_chart.data, height: 300, y_label: 'successful Tests')
+  .col
+    = react_component('PieChart', data: successful_tests, height: 250, label: 'By success')
+%hr
 .row
   .col
-    %h1 successful in the last 12 months
-    = react_component('PieChart', data: errors_by_not_successful, height: 250, label: 'By not success')
+    %h1 Unsuccessful tests #{chart_heading}
+.row
+  .col.pe-7
+    = react_component('BarChart', data: unsuccessful_tests_chart.data, height: 300, y_label: 'successful Tests')
+  .col
+    = react_component('PieChart', data: unsuccessful_tests, height: 250, label: 'By success')

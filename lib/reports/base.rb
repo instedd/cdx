@@ -26,8 +26,7 @@ module Reports
         day = Date.today - i.days
         dayname = day.strftime('%d/%m')
         key = day.strftime('%Y-%m-%d')
-        day_results = results_by_period('%Y-%m-%d')[key]
-        data << data_hash_day(dayname, day_results)
+        data << data_hash_day(dayname, day_results('%Y-%m-%d', key))
       end
       return self
     end
@@ -49,8 +48,7 @@ module Reports
       cnt.downto(0).each do |i|
         date = Date.today - i.months
         date_key = date.strftime('%Y-%m')
-        date_results = results_by_period[date_key]
-        data << data_hash_month(date, date_results)
+        data << data_hash_month(date, month_results(date_key))
       end
       return self
     end
@@ -71,8 +69,20 @@ module Reports
       }
     end
 
+    def date_constraints
+      options['date_range'] ? report_between : report_since
+    end
+
+    def day_results(format, key)
+      results_by_period(format)[key]
+    end
+
     def label_monthly(date)
       "#{I18n.t('date.abbr_month_names')[date.month]}#{date.month == 1 ? " #{date.strftime('%y')}" : ""}"
+    end
+
+    def month_results(key)
+      results_by_period[key]
     end
 
     def report_between
@@ -88,8 +98,11 @@ module Reports
         if(format == '%H')
           DateTime.strptime(t['test']['start_time'], '%Y-%m-%dT%H:%M:%S')
         else
-          Date.parse(t['test']['start_time'])
-        end.strftime(format)
+          begin
+            Date.parse(t['test']['start_time']).strftime(format)
+          rescue Exception
+          end
+        end
       end
     end
 
@@ -97,10 +110,6 @@ module Reports
       site_or_institution
       date_constraints
       ignore_qc
-    end
-
-    def date_constraints
-      options['date_range'] ? report_between : report_since
     end
 
     def site_or_institution
@@ -114,7 +123,7 @@ module Reports
     end
 
     def users
-      results['tests'].group_by { |t| t['test.start_time'] }
+      results['tests'].index_by { |t| t['test.site_user'] }.keys
     end
   end
 end
