@@ -62,12 +62,6 @@ var BaseEncounterForm = {
 }
 
 var EncounterForm = React.createClass(_.merge({
-  getDefaultProps: function() {
-    return {
-      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: _.capitalize(v)};}),
-      assayUndefinedResult: 'indeterminate'
-    }
-  },
 
   showAddSamplesModal: function(event) {
     this.refs.addSamplesModal.show()
@@ -153,6 +147,7 @@ var EncounterForm = React.createClass(_.merge({
   render: function() {
     var diagnosisEditor = null;
 
+    var assayResultOptions = _.map(this.props.possible_assay_results, function(v){return {value: v, label: _.capitalize(v)};})
     if (this.state.encounter.assays.length > 0) {
       diagnosisEditor = (
         <div className="row">
@@ -163,7 +158,7 @@ var EncounterForm = React.createClass(_.merge({
 
           <div className="col assays-editor">
             {this.state.encounter.assays.map(function(assay, index){
-              assay.result = _.includes(_.map(this.props.assayResultOptions,function(e){ return e.value }), assay.result) ? assay.result : this.props.assayUndefinedResult;
+              assay.result = assay.result;
               return (
                 <div className="row" key={index}>
                   <div className="col px-4">
@@ -172,7 +167,7 @@ var EncounterForm = React.createClass(_.merge({
                     </div>
                   </div>
                   <div className="col px-2">
-                    <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} clearable={false} className="input-block"/>
+                    <Select value={assay.result} options={assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} clearable={false} className="input-block"/>
                   </div>
                   <div className="col px-2">
                     <input type="text" className="quantitative pull-right" value={assay.quantitative_result} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative_result')} />
@@ -197,15 +192,27 @@ var EncounterForm = React.createClass(_.merge({
           if (this.state.encounter.id == null) return;
 
           return (
-          <div className="row">
-            <div className="col pe-2">
-              <label>Site</label>
+          <div>
+            <div className="row">
+              <div className="col pe-2">
+                <label>Site</label>
+              </div>
+              <div className="col">
+                <p>{this.props.encounter.site.name}</p>
+              </div>
             </div>
-            <div className="col">
-              <p>{this.props.encounter.site.name}</p>
+
+            <div className="row">
+              <div className="col pe-2">
+                <label>Test Order ID</label>
+              </div>
+              <div className="col">
+                <p>{this.props.encounter.uuid}</p>
+              </div>
             </div>
           </div>);
         }.bind(this))()}
+
 
         <FlexFullRow>
           <PatientCard patient={this.state.encounter.patient} />

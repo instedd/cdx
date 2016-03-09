@@ -50,13 +50,12 @@ class Encounter < ActiveRecord::Base
         else
           assay.merge! assay2 do |key, v1, v2|
             if key == "result"
-              values = []
-              values << v1 if v1 && v1 != "n/a"
-              values << v2 if v2 && v2 != "n/a"
-              values << "indeterminate" if values.empty?
-              values.uniq!
-              if values.length == 1
-                values.first
+              if v1 == v2
+                v1
+              elsif v1 == "indeterminate" || v1.blank? || (v1 == "n/a" && v2 != "indeterminate")
+                v2
+              elsif v2 == "indeterminate" || v2.blank? || (v2 == "n/a" && v1 != "indeterminate")
+                v1
               else
                 "indeterminate"
               end

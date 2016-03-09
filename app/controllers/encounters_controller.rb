@@ -13,6 +13,7 @@ class EncountersController < ApplicationController
       }.attributes!
     end
 
+    @possible_assay_results = TestResult.possible_results_for_assay
     return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
   end
 
@@ -40,6 +41,7 @@ class EncountersController < ApplicationController
       @encounter.core_fields[Encounter::ASSAYS_FIELD] = @encounter.updated_diagnostic
       prepare_blender_and_json
     end
+    @possible_assay_results = TestResult.possible_results_for_assay
     return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
   end
 

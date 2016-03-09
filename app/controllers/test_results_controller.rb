@@ -11,7 +11,13 @@ class TestResultsController < ApplicationController
     @display_as = params["display_as"] || "test"
     @display_as = "test" if @display_as != "test" && @display_as != "test_order"
 
-    @results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
+    @results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options.map do |result|
+      if result == "n/a"
+        {value: 'n/a', label: 'Not Applicable'}
+      else
+        {value: result, label: result.capitalize}
+      end
+    end
     @test_types = Cdx::Fields.test.core_fields.find { |field| field.name == 'type' }.options
     @conditions = Condition.all.map &:name
     @date_options = date_options_for_filter

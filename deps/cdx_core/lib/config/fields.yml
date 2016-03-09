@@ -60,6 +60,7 @@ entities:
             options:
               - positive
               - negative
+              - indeterminate
               - n/a
           quantitative_result:
             type: float

@@ -25,7 +25,7 @@
             %label.block Result
             = cdx_select name: "test.assays.result", value: params["test.assays.result"] do |select|
               - select.item "", "Show all"
-              - select.items @results
+              - select.items @results, :value, :label
           .filter
             %label.block Date
             = cdx_select name: "since", value: params["since"] do |select|
