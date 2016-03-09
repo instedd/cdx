@@ -39,9 +39,9 @@ var EncounterNew = React.createClass({
 
         {(function(){
           if (this.props.mode == 'existing_tests') {
-            return <EncounterForm encounter={this.state.encounter} context={this.props.context} assay_results={this.props.possible_assay_results} />
+            return <EncounterForm encounter={this.state.encounter} context={this.props.context} possible_assay_results={this.props.possible_assay_results} />
           } else {
-            return <FreshTestsEncounterForm encounter={this.state.encounter} context={this.props.context} assay_results={this.props.possible_assay_results} />
+            return <FreshTestsEncounterForm encounter={this.state.encounter} context={this.props.context} possible_assay_results={this.props.possible_assay_results} />
           }
         }.bind(this))()}
       </div>
