@@ -53,7 +53,7 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     #Note: this did not work due to the CSS for 'radio': form.choose 'anomalies'
     find('label[for=anomalies]').click
 
-    form.anomalies.set "missing_sample_id"
+    form.anomalies.set_exact_multi "missing_sample_id"
     form.sites.set_exact_multi "Mrs. Terry Goyette"
     form.devices.set_exact_multi "Mr. Alphonso Witting"
     form.roles.set_exact_multi "Institution Aric Smith Reader"
@@ -64,6 +64,7 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     form.new_externaluser.click
 
     find_button("submit").trigger('click')
+    wait_for_submit
   end
 end
 
@@ -95,6 +96,7 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
     form.new_externaluser.click
     #  form.submit.click
     find_button("submit").trigger('click')
+    wait_for_submit
   end
 end
 
@@ -123,6 +125,7 @@ Given(/^the user Successful creates a new utilization efficiency category with a
     form.new_externaluser.click
     # form.submit.click
     find_button("submit").trigger('click')
+    wait_for_submit
   end
 end
 
