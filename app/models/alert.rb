@@ -1,6 +1,7 @@
 class Alert < ActiveRecord::Base
   belongs_to :user
   belongs_to :site
+  belongs_to :institution
 
   has_many :alert_histories
   has_many :alert_recipients
@@ -23,6 +24,7 @@ class Alert < ActiveRecord::Base
   validates_presence_of :user
   validates_presence_of :name    #html5 form validations also done
   validate :category_validation
+  validate :aggregation_percentage_validation
 
   enum category_type: [:anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency]
   enum aggregation_type: [:record, :aggregated]
@@ -96,6 +98,12 @@ class Alert < ActiveRecord::Base
       if ( (sample_id == nil) || (sample_id.length==0)  )
         errors.add(:sample_id, "Sample ID cannot be empty")
       end
+    end
+  end
+  
+  def aggregation_percentage_validation
+    if (use_aggregation_percentage?) && (aggregation_threshold > 100)
+      errors.add(:aggregation_threshold, "Value cannot be greater than 100%")
     end
   end
 

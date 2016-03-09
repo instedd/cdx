@@ -79,20 +79,19 @@ var AlertCreateExternalUser = React.createClass({
 	render: function() {
 		return (
 			< div className = "row">
-
 			<div className = "col" >
 				<input type = "text" placeholder = "first name"
 					valueLink = {this.props.firstnameLink}
 					id="externaluser_firstname" />
 			</div>
 
-			<div className = "col" >
+			<div className = "col pe-2" >
 				<input type = "text" placeholder = "last name"
 					valueLink = {this.props.lastnameLink}
 					id="externaluser_lastname" />
 			</div>
 
-			<div className = "col" >
+			<div className = "col pe-4" >
 				<input type = "text" placeholder = "email"
 					valueLink = {this.props.emailLink}
 					id="externaluser_email" />
@@ -104,7 +103,7 @@ var AlertCreateExternalUser = React.createClass({
 					id="externaluser_telephone" />
 			</div>
 
-			<div className = "col pe-2" >
+			<div className = "col" >
 				<a className = "btn-link"  onClick={this.clickHandler} id="newexternaluser">Create User</a>
 			</div>
 
@@ -149,16 +148,16 @@ var ExternalUser = React.createClass({
 	render: function() {
 		return (
 			< div className = "row"id = "namerow" >
-			<div className = "col pe-2" >
+			<div className = "col pe-3" >
 				&nbsp;
 			</div>
 			<div className = "col" >
 				{this.props.first_name}
 			</div>
-			<div className = "col" >
+			<div className = "col pe-2" >
 				{this.props.last_name}
 			</div>
-			<div className = "col" >
+			<div className = "col pe-4" >
 				{this.props.email}
 			</div>
 			<div className = "col" >

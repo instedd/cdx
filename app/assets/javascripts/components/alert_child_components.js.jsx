@@ -54,7 +54,6 @@ var AlertEnabled = React.createClass({
 					id="AlertEnabled"
 					/>
 				<label htmlFor="AlertEnabled">&nbsp;</label>
-
 			</div>
 		</div>
 	);
