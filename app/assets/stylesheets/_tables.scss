@@ -67,6 +67,11 @@
           margin-top: -5px;
         }
       }
+
+      &.unknown-name {
+        color: $gray2;
+        font-style: italic;
+      }
     }
 
     tr:last-child th {

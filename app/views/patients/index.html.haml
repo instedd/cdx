@@ -25,7 +25,7 @@
         - t.tbody do
           - @patients.each do |patient|
             %tr{data: {href: patient_path(patient) }}
-              %td= patient.name
+              %td{class: patient.name.blank? ? "unknown-name" : ""}= patient.name || "(Unknown name)"
               %td= patient.entity_id
               %td= patient.dob_description(I18n.t('date.input_format.pattern'))
               %td= patient.location.try(:name)
