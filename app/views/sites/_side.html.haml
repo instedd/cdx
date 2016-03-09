@@ -3,7 +3,7 @@
     .col.pe-5
       %label Creation date
     .col
-      .value= format_datetime @site.created_at
+      .value= @localization_helper.format_datetime(@site.created_at)
   - if has_access_to_devices_index?
     .row
       .col.pe-5

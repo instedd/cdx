@@ -60,35 +60,62 @@ var TestResult = React.createClass({
   render: function() {
     test = this.props.test_result
 
-    var siteName = null;
-    if (test.site)
-      siteName = test.site.name;
-
     return (
     <tr data-href={'/test_results/' + test.uuid}>
       <td>{test.name}</td>
       <td><AssaysResult assays={test.assays} /></td>
-      <td>{test.sample_entity_id}</td>
-      <td>{siteName}</td>
+      <td>{test.site ? test.site.name : null}</td>
+      <td>{test.device ? test.device.name : null}</td>
+      <td>{test.sample_entity_ids}</td>
       <td>{test.start_time}</td>
+      <td>{test.end_time}</td>
     </tr>);
   }
 });
 
 var TestResultsList = React.createClass({
+  getDefaultProps: function() {
+    return {
+      title: "Tests",
+      titleClassName: "",
+      downloadCsvPath: null,
+      // TODO add showDevice, showSite toggle
+    }
+  },
+
   render: function() {
     return (
       <table className="table" cellPadding="0" cellSpacing="0">
+        <colgroup>
+          <col width="20%" />
+          <col width="20%" />
+          <col width="10%" />
+          <col width="10%" />
+          <col width="10%" />
+          <col width="15%" />
+          <col width="15%" />
+        </colgroup>
         <thead>
           <tr>
-            <th className="tableheader" colSpan="5">Tests</th>
+            <th className="tableheader" colSpan="7">
+              <span className={this.props.titleClassName}>{this.props.title}</span>
+
+              { this.props.downloadCsvPath ? (
+                <span className="table-actions">
+                  <a href={this.props.downloadCsvPath} title="Download CSV">
+                    <span className="icon-download icon-gray" />
+                  </a>
+                </span>) : null }
+            </th>
           </tr>
           <tr>
-            <th>Test name</th>
+            <th>Name</th>
             <th>Result</th>
-            <th>Sample ID</th>
             <th>Site</th>
-            <th>Date</th>
+            <th>Device</th>
+            <th>Sample ID</th>
+            <th>Start time</th>
+            <th>End time</th>
           </tr>
         </thead>
         <tbody>
@@ -98,5 +125,11 @@ var TestResultsList = React.createClass({
         </tbody>
       </table>
     );
+  }
+});
+
+var TestResultsIndexTable = React.createClass({
+  render: function() {
+    return <TestResultsList testResults={this.props.tests} title={this.props.title} downloadCsvPath={this.props.downloadCsvPath} titleClassName="table-title" />
   }
 });

@@ -35,9 +35,9 @@ module TestResultsHelper
         time_zone = device_time_zone
       end
 
-      format_datetime(value, time_zone)
+      @localization_helper.format_datetime_time_zone(value, time_zone)
     when "encounter.start_time", "encounter.end_time"
-      format_datetime(value, current_user.time_zone)
+      @localization_helper.format_datetime_time_zone(value, current_user.time_zone)
     else
       value
     end

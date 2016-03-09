@@ -127,6 +127,13 @@ class TestResultsController < ApplicationController
     result = TestResult.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["tests"]
+
+    json = Jbuilder.new do |json|
+      json.array! result["tests"] do |test|
+        TestResult.as_json_from_query(json, test, @localization_helper)
+      end
+    end
+    @json = json.attributes!
   end
 
   def execute_encounter_query
@@ -157,6 +164,6 @@ class TestResultsController < ApplicationController
     _institutions, @sites, @devices = Policy.condition_resources_for(QUERY_TEST, TestResult, current_user).values
     @sites = @sites.within(@navigation_context.entity, @navigation_context.exclude_subsites)
     @devices = @devices.within(@navigation_context.entity, @navigation_context.exclude_subsites)
-    @devices_by_uuid = @devices.index_by &:uuid
+    @localization_helper.devices_by_uuid = @devices_by_uuid = @devices.index_by &:uuid
   end
 end

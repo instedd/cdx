@@ -8,6 +8,7 @@ class TestResult < ActiveRecord::Base
   LAB_USER_FIELD = 'site_user'
   ASSAYS_FIELD = 'assays'
   START_TIME_FIELD = 'start_time'
+  END_TIME_FIELD = 'end_time'
 
   has_and_belongs_to_many :device_messages
   has_many :test_result_parsed_data
@@ -87,6 +88,52 @@ class TestResult < ActiveRecord::Base
 
   def self.possible_results_for_assay
     entity_fields.detect { |f| f.name == 'assays' }.sub_fields.detect { |f| f.name == 'result' }.options
+  end
+
+  def as_json(json, localization_helper)
+    json.(self, :uuid, :test_id)
+    json.name self.core_fields[TestResult::NAME_FIELD]
+    if self.sample
+      json.sample_entity_ids self.sample.entity_ids
+    end
+
+    device_uuid = self.device.uuid
+    json.start_time(localization_helper.format_datetime_device(self.core_fields[TestResult::START_TIME_FIELD], device_uuid))
+    json.end_time(localization_helper.format_datetime_device(self.core_fields[TestResult::END_TIME_FIELD], device_uuid))
+
+    json.assays (self.core_fields[TestResult::ASSAYS_FIELD] || [])
+
+    if self.device.site
+      json.site do
+        json.name self.device.site.name
+      end
+    end
+
+    json.device do
+      json.name self.device.name
+    end
+  end
+
+  def self.as_json_from_query(json, test_result_query_result, localization_helper)
+    test = test_result_query_result["test"]
+    json.uuid test["uuid"]
+    json.name test["name"]
+    json.assays test["assays"]
+    json.test_id test["id"]
+
+    json.sample_entity_ids test_result_query_result["sample"]["entity_id"]
+
+    device_uuid = test_result_query_result["device"]["uuid"]
+    json.start_time(localization_helper.format_datetime_device(test_result_query_result["test"]["start_time"], device_uuid))
+    json.end_time(localization_helper.format_datetime_device(test_result_query_result["test"]["end_time"], device_uuid))
+
+    json.site do
+      json.name test_result_query_result["site"]["name"]
+    end
+
+    json.device do
+      json.name test_result_query_result["device"]["name"]
+    end
   end
 
   private
