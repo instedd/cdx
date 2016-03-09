@@ -14,6 +14,7 @@ class AlertsController < ApplicationController
     new_alert_request_variables
     alert_info.sms_limit=100
     alert_info.email_limit=100
+    alert_info.institution_id = @navigation_context.institution.id
     alert_info.utilization_efficiency_number=1
     alert_info.alert_recipients.build
   end
@@ -93,6 +94,7 @@ class AlertsController < ApplicationController
     condition_result_ok = true
     error_text=Hash.new
     alert_info.user = current_user
+    
     alert_saved_ok = alert_info.save
     if alert_saved_ok==false
       error_text = alert_info.errors.messages
@@ -102,7 +104,7 @@ class AlertsController < ApplicationController
       internal_users_ok,external_users_ok,error_text = set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, edit)
       condition_result_ok, error_text = set_category(params, alert_info, error_text, condition_result_ok, edit)
       set_sample_id(params, alert_info)
-      set_sites_devices(params, alert_info, edit)
+      set_sites_devices_institutions(params, alert_info, edit)
       alert_query_updated_ok = alert_info.update(query: alert_info.query)
     end
 
@@ -133,7 +135,7 @@ class AlertsController < ApplicationController
       internal_users_ok,external_users_ok,error_text = set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, edit)
       error_text, condition_result_ok = set_category(params, alert_info, error_text, condition_result_ok, edit)
       set_sample_id(params, alert_info)
-      set_sites_devices(params, alert_info, edit)
+      set_sites_devices_institutions(params, alert_info, edit)
       alert_query_updated_ok = alert_info.update(query: alert_info.query)
     end
 
@@ -155,7 +157,13 @@ class AlertsController < ApplicationController
   private
 
   def alert_params
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :email_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, :utilization_efficiency_number, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, 
+                                  :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, 
+                                  :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :email_limit, 
+                                  :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, 
+                                  :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, 
+                                  :utilization_efficiency_number, :use_aggregation_percentage, :institution_id,
+                                  alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
 
   def new_alert_request_variables
@@ -187,11 +195,15 @@ class AlertsController < ApplicationController
     end
   end
 
-  def set_sites_devices(params, alert_info, is_edit)
+  def set_sites_devices_institutions(params, alert_info, is_edit)
     if is_edit==true
       alert_info.devices.destroy_all
       alert_info.sites.destroy_all
     end
+
+    #add the institution to the query
+    inst = Institution.find(alert_info.institution_id)
+    alert_info.query=alert_info.query.merge ({"institution.uuid"=>inst.uuid})
 
     if params[:alert][:sites_info]
       sites = params[:alert][:sites_info].split(',')

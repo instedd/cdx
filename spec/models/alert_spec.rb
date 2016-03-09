@@ -31,6 +31,16 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
       alert.error_code="aa"
       expect(alert).to_not be_valid
     end
+    
+    it "cannot create for aggregation threshold greater than 100%" do
+      alert = Alert.make
+      alert.category_type = "device_errors"
+      alert.error_code="11"
+      alert.use_aggregation_percentage = true
+      alert.aggregation_threshold = 101
+      expect(alert).to_not be_valid
+    end    
+      
   end
 
   context "validate soft delete" do
