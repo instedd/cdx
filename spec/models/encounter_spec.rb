@@ -49,7 +49,7 @@ describe Encounter do
     end
 
     it "merge n/a n/a" do
-      expect(merge_values("n/a", "n/a")).to eq("indeterminate")
+      expect(merge_values("n/a", "n/a")).to eq("n/a")
     end
 
     it "merge with same" do
@@ -63,6 +63,16 @@ describe Encounter do
     it "merge with n/a" do
       expect(merge_values("any", "n/a")).to eq("any")
       expect(merge_values("n/a", "any")).to eq("any")
+    end
+
+    it "merges with indeterminate" do
+      expect(merge_values("any", "indeterminate")).to eq("any")
+      expect(merge_values("indeterminate", "any")).to eq("any")
+    end
+
+    it "merges with n/a with indeterminate" do
+      expect(merge_values("n/a", "indeterminate")).to eq("n/a")
+      expect(merge_values("indeterminate", "n/a")).to eq("n/a")
     end
 
     it "merge with nil" do

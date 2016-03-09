@@ -16,7 +16,7 @@ class TestResult < ActiveRecord::Base
   belongs_to :sample_identifier, inverse_of: :test_results, autosave: true
   belongs_to :patient
   belongs_to :encounter
-  
+
   has_many :alert_histories
 
   validates_presence_of :device
@@ -83,6 +83,10 @@ class TestResult < ActiveRecord::Base
   def device=(value)
     super
     set_foreign_keys
+  end
+
+  def self.possible_results_for_assay
+    entity_fields.detect { |f| f.name == 'assays' }.sub_fields.detect { |f| f.name == 'result' }.options
   end
 
   private
