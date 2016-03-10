@@ -11,7 +11,7 @@ body {
 }
 
 .container {
-  width: 480px;
+  width: 650px;
   margin: 3em auto;
   padding: 1px;
 }
@@ -22,6 +22,21 @@ body {
 
 .box.big.centered {
   margin-bottom: 45px;
+
+  h1 {
+    font-family: $sanstitle;
+    color:$gray5;
+    margin-bottom:55px;
+    line-height:1.6em;
+  }
+
+  p.custom-message {
+    margin-bottom: 75px;
+    color:$gray4;
+    font-style: italic;
+    font-size:19px;
+    font-family: $sanstitle;
+  }
 }
 
 .bottom-links {
@@ -30,5 +45,11 @@ body {
 
   a {
     color: inherit;
+  }
+}
+
+.footer {
+  a {
+    text-decoration: underline;
   }
 }

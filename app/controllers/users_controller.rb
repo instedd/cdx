@@ -57,8 +57,9 @@ class UsersController < ApplicationController
         user.invite! do |u|
           u.skip_invitation = true
         end
-        InvitationMailer.invite_message(user, message).deliver_now if user.errors.empty?
         user.invitation_sent_at = Time.now.utc # mark invitation as delivered
+        user.invited_by_id = current_user.id
+        InvitationMailer.invite_message(user, @role, message).deliver_now
       end
       user.roles << @role unless user.roles.include?(@role)
       ComputedPolicy.update_user(user)

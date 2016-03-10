@@ -13,15 +13,14 @@
       .box.big.centered
         = yield
       .bottom-links.centered
-        -# -# .row
-        -# -#   .col
-        -# -#     Link not working? Paste this into your browser:
-        -# -#     %a.block{:href => "#"} http://cdx.org/confirm-email/809832498754
-        -#
-        -# .row
-        -#   .col
-        ©2015 Conected Diagnostics
-        %br
-        %a{:href => "#"} Privacy Policy
-        |
-        %a{:href => "#"} Terms and conditions
+        .row
+          .col
+            = yield :footer
+        .row
+          .col
+            .footer
+              ©2015 Conected Diagnostics
+              %br
+              %a{:href => "#"} Privacy Policy
+              |
+              %a{:href => "#"} Terms and conditions
