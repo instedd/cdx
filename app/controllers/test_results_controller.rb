@@ -32,6 +32,9 @@ class TestResultsController < ApplicationController
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
 
+    @show_sites = @sites.size > 1
+    @show_devices = @devices.size > 1
+
     respond_to do |format|
       format.html do
         @query["page_size"] = @page_size

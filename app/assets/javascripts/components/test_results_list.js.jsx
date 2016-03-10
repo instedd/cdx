@@ -6,8 +6,8 @@ var TestResultRow = React.createClass({
     <tr data-href={'/test_results/' + test.uuid}>
       <td>{test.name}</td>
       <td><AssaysResult assays={test.assays} /></td>
-      <td>{test.site ? test.site.name : null}</td>
-      <td>{test.device ? test.device.name : null}</td>
+      { this.props.showSites ? <td>{test.site ? test.site.name : null}</td> : null }
+      { this.props.showDevices ? <td>{test.device ? test.device.name : null}</td> : null }
       <td>{test.sample_entity_ids}</td>
       <td>{test.start_time}</td>
       <td>{test.end_time}</td>
@@ -22,8 +22,9 @@ var TestResultsList = React.createClass({
       titleClassName: "",
       downloadCsvPath: null,
       allowSorting: false,
-      orderBy: ""
-      // TODO add showDevice, showSite toggle
+      orderBy: "",
+      showSites: true,
+      showDevices: true
     }
   },
 
@@ -36,16 +37,25 @@ var TestResultsList = React.createClass({
       }
     }.bind(this);
 
+    var timeWidth;
+    if (this.props.showSites && this.props.showDevices) {
+      timeWidth = "15%";
+    } else if (this.props.showSites || this.props.showDevices) {
+      timeWidth = "20%";
+    } else {
+      timeWidth = "25%";
+    }
+
     return (
       <table className="table" cellPadding="0" cellSpacing="0">
         <colgroup>
           <col width="20%" />
           <col width="20%" />
+          { this.props.showSites ? <col width="10%" /> : null }
+          { this.props.showDevices ? <col width="10%" /> : null }
           <col width="10%" />
-          <col width="10%" />
-          <col width="10%" />
-          <col width="15%" />
-          <col width="15%" />
+          <col width={timeWidth} />
+          <col width={timeWidth} />
         </colgroup>
         <thead>
           <tr>
@@ -63,8 +73,8 @@ var TestResultsList = React.createClass({
           <tr>
             {sortableHeader("Name", "test.name")}
             <th>Result</th>
-            <th>Site</th>
-            <th>Device</th>
+            { this.props.showSites ? <th>Site</th> : null }
+            { this.props.showDevices ? <th>Device</th> : null }
             {sortableHeader("Sample ID", "sample.id")}
             {sortableHeader("Start time", "test.start_time")}
             {sortableHeader("End time", "test.end_time")}
@@ -72,8 +82,9 @@ var TestResultsList = React.createClass({
         </thead>
         <tbody>
           {this.props.testResults.map(function(test_result) {
-             return <TestResultRow key={test_result.uuid} test_result={test_result}/>;
-          })}
+             return <TestResultRow key={test_result.uuid} test_result={test_result}
+              showSites={this.props.showSites} showDevices={this.props.showDevices}/>;
+          }.bind(this))}
         </tbody>
       </table>
     );
@@ -85,6 +96,7 @@ var TestResultsIndexTable = React.createClass({
     return <TestResultsList testResults={this.props.tests}
               downloadCsvPath={this.props.downloadCsvPath}
               title={this.props.title} titleClassName="table-title"
-              allowSorting={true} orderBy={this.props.orderBy}/>
+              allowSorting={true} orderBy={this.props.orderBy}
+              showSites={this.props.showSites} showDevices={this.props.showDevices} />
   }
 });

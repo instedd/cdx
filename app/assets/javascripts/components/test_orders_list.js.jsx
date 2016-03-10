@@ -5,7 +5,7 @@ var TestOrderRow = React.createClass({
     return (
     <tr data-href={'/encounters/' + test_order.encounter.uuid}>
       <td>{test_order.encounter.uuid}</td>
-      <td>{test_order.site ? test_order.site.name : null}</td>
+      { this.props.showSites ? <td>{test_order.site ? test_order.site.name : null}</td> : null }
       <td><AssaysResult assays={test_order.encounter.diagnosis} /></td>
       <td>{test_order.encounter.start_time}</td>
       <td>{test_order.encounter.end_time}</td>
@@ -20,8 +20,8 @@ var TestOrdersList = React.createClass({
       titleClassName: "",
       downloadCsvPath: null,
       allowSorting: false,
-      orderBy: ""
-      // TODO add showSite toggle
+      orderBy: "",
+      showSites: true
     }
   },
 
@@ -34,14 +34,16 @@ var TestOrdersList = React.createClass({
       }
     }.bind(this);
 
+    var timeWidth = this.props.showSites ? "15%" : "25%";
+
     return (
       <table className="table" cellPadding="0" cellSpacing="0">
         <colgroup>
           <col width="15%" />
-          <col width="20%" />
+          { this.props.showSites ? <col width="20%" /> : null }
           <col width="30%" />
-          <col width="15%" />
-          <col width="15%" />
+          <col width={timeWidth} />
+          <col width={timeWidth} />
         </colgroup>
         <thead>
           <tr>
@@ -58,7 +60,7 @@ var TestOrdersList = React.createClass({
           </tr>
           <tr>
             {sortableHeader("ID", "encounter.uuid")}
-            <th>Site</th>
+            { this.props.showSites ? <th>Site</th> : null }
             <th>Diagnosis</th>
             {sortableHeader("Start time", "encounter.start_time")}
             {sortableHeader("End time", "encounter.end_time")}
@@ -66,8 +68,9 @@ var TestOrdersList = React.createClass({
         </thead>
         <tbody>
           {this.props.testOrders.map(function(test_order) {
-             return <TestOrderRow key={test_order.uuid} test_order={test_order}/>;
-          })}
+             return <TestOrderRow key={test_order.uuid} test_order={test_order}
+              showSites={this.props.showSites} showDevices={this.props.showDevices}/>;
+          }.bind(this))}
         </tbody>
       </table>
     );
@@ -79,6 +82,7 @@ var TestOrdersIndexTable = React.createClass({
     return <TestOrdersList testOrders={this.props.tests}
               downloadCsvPath={this.props.downloadCsvPath}
               title={this.props.title} titleClassName="table-title"
-              allowSorting={true} orderBy={this.props.orderBy}/>
+              allowSorting={true} orderBy={this.props.orderBy}
+              showSites={this.props.showSites} showDevices={this.props.showDevices} />
   }
 });

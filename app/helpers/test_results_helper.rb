@@ -1,19 +1,4 @@
 module TestResultsHelper
-  def order_by_column(title, field)
-    desc_field = "-#{field}"
-    link_order_by = @order_by == field ? desc_field : field
-
-    if @order_by == field
-      css_class = 'ordered order-asc'
-      title = "#{title} ↑"
-    elsif @order_by == desc_field
-      css_class = 'ordered order-desc'
-      title = "#{title} ↓"
-    end
-
-    link_to title, params.merge(order_by: link_order_by), class: css_class
-  end
-
   def test_value(test, path)
     path.split(".").inject(test) { |obj, step| obj && obj[step] }
   end
