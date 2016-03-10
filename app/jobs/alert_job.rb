@@ -7,10 +7,21 @@ class AlertJob < ActiveJob::Base
     alertHistory = AlertHistory.new
 
     @alert = Alert.includes(:alert_recipients).find(alert_id)
+    testResult = TestResult.find_by_uuid(test_elasticsearch_id)
+    
+    #check if the test result for an alert exists, if it does and the test_result updated at 
+    # is different the updated_at already stored then create a new alert history
+    process_test = true
+    alert_history_with_test_results = AlertHistory.where({test_result: testResult.id})
+    alert_history_with_test_results.each do |alert_history|
+      process_test = false if alert_history.test_result_updated_at == testResult.updated_at
+    end
+    
+    if process_test == true
     alertHistory.alert = @alert
     alertHistory.user = @alert.user
-    testResult = TestResult.find_by_uuid(test_elasticsearch_id)
     alertHistory.test_result = testResult
+    alertHistory.test_result_updated_at = testResult.updated_at
 
     #store that it is only used for alert aggregations if an aggregation type of alert
     if @alert.aggregated?
@@ -30,5 +41,6 @@ class AlertJob < ActiveJob::Base
         alert_sms_inform_recipient(@alert, alertHistory, recipients_list)
       end
     end 
+  end
   end
 end
