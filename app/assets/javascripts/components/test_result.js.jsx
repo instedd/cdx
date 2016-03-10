@@ -79,11 +79,21 @@ var TestResultsList = React.createClass({
       title: "Tests",
       titleClassName: "",
       downloadCsvPath: null,
+      allowSorting: false,
+      orderBy: ""
       // TODO add showDevice, showSite toggle
     }
   },
 
   render: function() {
+    var sortableHeader = function (title, field) {
+      if (this.props.allowSorting) {
+        return <SortableColumnHeader title={title} field={field} orderBy={this.props.orderBy} />
+      } else {
+        return <th>{title}</th>;
+      }
+    }.bind(this);
+
     return (
       <table className="table" cellPadding="0" cellSpacing="0">
         <colgroup>
@@ -109,13 +119,13 @@ var TestResultsList = React.createClass({
             </th>
           </tr>
           <tr>
-            <th>Name</th>
+            {sortableHeader("Name", "test.name")}
             <th>Result</th>
             <th>Site</th>
             <th>Device</th>
-            <th>Sample ID</th>
-            <th>Start time</th>
-            <th>End time</th>
+            {sortableHeader("Sample ID", "sample.id")}
+            {sortableHeader("Start time", "test.start_time")}
+            {sortableHeader("End time", "test.end_time")}
           </tr>
         </thead>
         <tbody>
@@ -128,8 +138,40 @@ var TestResultsList = React.createClass({
   }
 });
 
+var SortableColumnHeader = React.createClass({
+  render: function() {
+    var field = this.props.field;
+    var descField = "-" + field;
+    var orderByThis = false;
+    var orderByThisDir = null;
+    var appendTitle = null;
+
+    var nextOrder = field;
+
+    if (this.props.orderBy == field) {
+      orderByThis = true;
+      orderByThisDir = 'asc';
+      nextOrder = descField;
+      appendTitle = " ↑";
+    } else if (this.props.orderBy == descField) {
+      orderByThis = true;
+      orderByThisDir = 'desc';
+      appendTitle = " ↓";
+    }
+
+    var sortUrl = URI(window.location.href).setSearch({"order_by": nextOrder});
+
+    return (<th>
+        <a href={sortUrl} className={classNames({ordered: orderByThis, ["ordered-" + orderByThisDir]: orderByThis})}>{this.props.title} {appendTitle}</a>
+      </th>);
+  },
+});
+
 var TestResultsIndexTable = React.createClass({
   render: function() {
-    return <TestResultsList testResults={this.props.tests} title={this.props.title} downloadCsvPath={this.props.downloadCsvPath} titleClassName="table-title" />
+    return <TestResultsList testResults={this.props.tests}
+              downloadCsvPath={this.props.downloadCsvPath}
+              title={this.props.title} titleClassName="table-title"
+              allowSorting={true} orderBy={this.props.orderBy}/>
   }
 });
