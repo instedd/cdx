@@ -13,7 +13,7 @@
             orderBy: @order_by, showSites: @show_sites, showDevices: @show_devices,
             downloadCsvPath: test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
       - else
-        = react_component "TestOrdersIndexTable", tests: @json, title: pluralize(@total, "test result"),
+        = react_component "TestOrdersIndexTable", tests: @json, title: pluralize(@total, "test order"),
             orderBy: @order_by, showSites: @show_sites, showDevices: @show_devices,
             downloadCsvPath: test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
 
