@@ -124,8 +124,8 @@ class TestResult < ActiveRecord::Base
     json.sample_entity_ids test_result_query_result["sample"]["entity_id"]
 
     device_uuid = test_result_query_result["device"]["uuid"]
-    json.start_time(localization_helper.format_datetime_device(test_result_query_result["test"]["start_time"], device_uuid))
-    json.end_time(localization_helper.format_datetime_device(test_result_query_result["test"]["end_time"], device_uuid))
+    json.start_time(localization_helper.format_datetime_device(test["start_time"], device_uuid))
+    json.end_time(localization_helper.format_datetime_device(test["end_time"], device_uuid))
 
     json.site do
       json.name test_result_query_result["site"]["name"]

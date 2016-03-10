@@ -127,19 +127,23 @@ class TestResultsController < ApplicationController
     result = TestResult.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["tests"]
-
-    json = Jbuilder.new do |json|
-      json.array! result["tests"] do |test|
-        TestResult.as_json_from_query(json, test, @localization_helper)
-      end
-    end
-    @json = json.attributes!
+    @json = build_json_array TestResult, @tests
   end
 
   def execute_encounter_query
     result = Encounter.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["encounters"]
+    @json = build_json_array Encounter, @tests
+  end
+
+  def build_json_array(entity_class, tests)
+    json = Jbuilder.new do |json|
+      json.array! tests do |test|
+        entity_class.as_json_from_query(json, test, @localization_helper)
+      end
+    end
+    json.attributes!
   end
 
   def execute_csv_query(filename)
