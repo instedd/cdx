@@ -28,7 +28,7 @@ class Alert < ActiveRecord::Base
 
   enum category_type: [:anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency]
   enum aggregation_type: [:record, :aggregated]
-  enum aggregation_frequency: [:hour, :day]
+  enum aggregation_frequency: [:hour, :day, :week, :month]
   enum channel_type: [:email, :sms, :email_and_sms]
   
   #Note: elasticsearch filter issue  with start_time, for some reason, {"test.start_time"=>"null"}, does not work.
@@ -72,13 +72,13 @@ class Alert < ActiveRecord::Base
   
   private
 
-  def  is_integer?(str_val)
+  def is_integer?(str_val)
     str_val.to_i.to_s == str_val
   end
 
   def category_validation
     if category_type == "device_errors"
-      error=false;
+      error=false
       if error_code.include? '-'
         minmax=error_code.split('-')
         error = true if !is_integer?(minmax[0])
@@ -90,7 +90,6 @@ class Alert < ActiveRecord::Base
       if error
         errors.add(:error_code, "errorcode must be an integer")
       end
-
     elsif category_type == "utilization_efficiency"
       if (utilization_efficiency_number==0)
         errors.add(:utilization_efficiency_number, "Timespan cannot be zero")

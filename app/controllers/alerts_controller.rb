@@ -94,12 +94,13 @@ class AlertsController < ApplicationController
     condition_result_ok = true
     error_text=Hash.new
     alert_info.user = current_user
+    alert_info.time_last_aggregation_checked = Time.now
     
     alert_saved_ok = alert_info.save
     if alert_saved_ok==false
       error_text = alert_info.errors.messages
     else
-      alert_info.query="{}";
+      alert_info.query="{}"
       edit = false
       internal_users_ok,external_users_ok,error_text = set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, edit)
       condition_result_ok, error_text = set_category(params, alert_info, error_text, condition_result_ok, edit)
@@ -130,7 +131,7 @@ class AlertsController < ApplicationController
         alert_info.delete_percolator
       end
 
-      alert_info.query="{}";
+      alert_info.query="{}"
       edit = true
       internal_users_ok,external_users_ok,error_text = set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, edit)
       error_text, condition_result_ok = set_category(params, alert_info, error_text, condition_result_ok, edit)

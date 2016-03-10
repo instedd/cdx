@@ -17,7 +17,6 @@ class NewAlertPage < SitePrism::Page
     section :aggregation, CdxSelect, "label", text: /Aggregation Type/i
     section :aggregation_frequency, CdxSelect, "label", text: /Aggregation Frequency/i
     element :aggregationthresholdlimit, '#alertaggregationthresholdlimit'
-    element :aggregationthresholdpercentage, '#alertaggregationpercentage'
     
     element :timespan, '#alertutilizationefficiencynumber'
     section :channel, CdxSelect, "label", text: /Channel/i

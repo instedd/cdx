@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160308134157) do
+ActiveRecord::Schema.define(version: 20160310151033) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20160308134157) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "for_aggregation_calculation",           default: false
+    t.datetime "test_result_updated_at"
   end
 
   add_index "alert_histories", ["alert_id"], name: "index_alert_histories_on_alert_id", using: :btree
@@ -79,6 +80,7 @@ ActiveRecord::Schema.define(version: 20160308134157) do
     t.integer  "email_limit",                         limit: 4,     default: 0
     t.boolean  "use_aggregation_percentage",                        default: false
     t.integer  "institution_id",                      limit: 4
+    t.datetime "time_last_aggregation_checked"
   end
 
   add_index "alerts", ["deleted_at"], name: "index_alerts_on_deleted_at", using: :btree

@@ -2,29 +2,45 @@ module Alerts
   include SMS
 
   def alert_history_check(frequency, alert_type)
-    if alert_type == Alert.hour
-      alerts = Alert.aggregated.hour.where({enabled: true})
-    else
+    if alert_type == Alert.aggregation_frequencies["month"]
+      alerts = Alert.aggregated.month.where({enabled: true})
+    elsif alert_type == Alert.aggregation_frequencies["week"]
+      alerts = Alert.aggregated.week.where({enabled: true})
+    elsif alert_type == Alert.aggregation_frequencies["day"]
       alerts = Alert.aggregated.day.where({enabled: true})
+    else
+      alerts = Alert.aggregated.hour.where({enabled: true})
     end
 
     # if it has just alert the user
     alerts.each do |alert|
       begin
-        alert_history_count=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', frequency.ago).where('for_aggregation_calculation=true').count
-        if alert_history_count > 0
-          if !alert.use_aggregation_percentage?
-            if alert.aggregation_threshold > alert_history_count
-              alert_history_triggered(alert, alert_history_count)
-            end
+        do_check = true
+        #the weekly/monthly aggregation runs each day, check if say a week/month since last time checked
+        if (alert_type == Alert.aggregation_frequencies["week"]) || (alert_type == Alert.aggregation_frequencies["month"])
+          time_diff_last_checked = Time.now - alert.time_last_aggregation_checked
+          if time_diff_last_checked < frequency
+            do_check = false
           else
-            total_results = find_number_test_results_since(alert, frequency)
-            if total_results > 0
-              percentage = (alert_history_count.to_f / total_results.to_f) * 100
+            alert.update_column("time_last_aggregation_checked", Time.now)
+          end
+        end
 
-              if percentage >= alert.aggregation_threshold
-                #store percentage
-                alert_history_triggered(alert, alert_history_count, percentage.round(2))
+        if do_check
+          alert_history_count=AlertHistory.where('alert_id=?', alert.id).where('created_at >= ?', frequency.ago).where('for_aggregation_calculation=true').count
+          if alert_history_count > 0
+            if !alert.use_aggregation_percentage?
+              if alert.aggregation_threshold > alert_history_count
+                alert_history_triggered(alert, alert_history_count)
+              end
+            else
+              total_results = find_number_test_results_since(alert, frequency)
+              if total_results > 0
+                percentage = (alert_history_count.to_f / total_results.to_f) * 100
+                if percentage >= alert.aggregation_threshold
+                  #store percentage
+                  alert_history_triggered(alert, alert_history_count, percentage.round(2))
+                end
               end
             end
           end
@@ -90,7 +106,7 @@ module Alerts
       end
     end
   end
-  
+
 
   def alert_sms_inform_recipient(alert, alert_history, recipients_list, alert_count=0, percentage=0)
     #TODO Can also send many messages at once. https://bitbucket.org/instedd/nuntium-api-ruby/wiki/Home

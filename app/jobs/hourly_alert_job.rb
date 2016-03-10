@@ -4,10 +4,7 @@ class HourlyAlertJob
   include Sidekiq::Worker
 
   def perform
-    alert_history_check(1.hour, Alert.hour)
-    
-    #for tests
-    #alert_history_check(5.minutes, Alert.hour)
+    alert_history_check(1.hour, Alert.aggregation_frequencies["hour"])
   end
 end
 
