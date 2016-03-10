@@ -10,7 +10,8 @@
     .col.pe-2
       = f.label :filter
     .col
-      = f.collection_select :filter_id, filters, :id, :name, {}, :class => 'ddown'
+      = cdx_select form: f, name: :filter_id do |select|
+        - select.items filters, :id, :name
   .row
     .col.pe-2
       = f.label :name
@@ -26,7 +27,8 @@
       = f.label :verb, "HTTP Verb"
     .col
       .value.annotation GET will send fields in query string. POST will send a JSON object in the request body.
-      = f.collection_select :verb, Subscriber::VALID_VERBS, :to_s, :to_s, {include_blank: false}, :class => 'ddown'
+      = cdx_select form: f, name: :verb do |select|
+        - select.items Subscriber::VALID_VERBS
   .row
     .col.pe-2
       = f.label :url_user, "User (optional)"
@@ -49,3 +51,6 @@
   .row.button-actions
     .col
       = f.submit nil, class: "btn-primary"
+      = link_to 'Cancel', subscribers_path, class: 'btn-link'
+      - if @editing
+        = confirm_deletion_button subscriber, 'subscriber'

@@ -1,7 +1,7 @@
 class PoliciesController < ApplicationController
   layout "application", only: [:index, :new]
   before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
+    head :forbidden unless can_delegate_permissions?
   end
 
   def index
@@ -20,16 +20,22 @@ class PoliciesController < ApplicationController
     begin
       definition = JSON.parse @policy.definition
       @policy.definition = definition
+
+      ensure_user
+      @policy.user = @user
+      @policy.granter = current_user
+
     rescue => ex
       @policy.errors.add :definition, ex.message
       has_definition_error = true
     end
 
-    @policy.granter_id = current_user.id
-
     respond_to do |format|
       if @policy.errors.empty? && @policy.save
-        format.html { redirect_to policies_path, notice: 'Policy was successfully created.' }
+        format.html do
+          redirect_to policies_path,
+                      notice: @_notice || 'Policy was successfully created.'
+        end
         format.json { render action: 'show', status: :created, policy: @policy }
       else
         if has_definition_error
@@ -45,8 +51,10 @@ class PoliciesController < ApplicationController
   end
 
   def edit
+    @editing = true
     @policy = Policy.find params[:id]
     @policy.definition = JSON.pretty_generate(@policy.definition)
+    @policy.user_id = @policy.user.email
   end
 
   # PATCH/PUT /policies/1
@@ -58,6 +66,8 @@ class PoliciesController < ApplicationController
     begin
       definition = JSON.parse @policy.definition
       @policy.definition = definition
+      ensure_user
+      @policy.user_id = @user.id
     rescue => ex
       @policy.errors.add :definition, ex.message
       has_definition_error = true
@@ -94,5 +104,13 @@ class PoliciesController < ApplicationController
 
   def policy_params
     params.require(:policy).permit(:name, :user_id, :definition, :delegable)
+  end
+
+  def ensure_user
+    @user = User.find_or_initialize_by(email: policy_params[:user_id])
+    unless @user.persisted?
+      @user.invite!
+      @_notice = "An invitation email has been sent to #{@user.email}"
+    end
   end
 end

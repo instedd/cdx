@@ -1,22 +1,18 @@
 .row
   .col
-    %h1 Change your password
+    %h1 Password reset
+    %p Choose a strong password and don't reuse it for other accounts.
 = form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f|
   = f.hidden_field :reset_password_token
   .row
     .col
-      = f.password_field :password, autofocus: true, autocomplete: "off", placeholder: 'New password', class: "input-block"
+      = f.password_field :password, autofocus: true, autocomplete: "off", placeholder: 'Password', class: "input-block"
       - if @minimum_password_length
         .small-quote
           (#{@minimum_password_length} characters minimum)
-  .row
-    .col
-      = f.password_field :password_confirmation, autocomplete: "off", placeholder: 'Confirm new password', class: "input-block"
   %br
   .row
     .col
-      = f.submit "Change my password", class: "btn-secondary"
-    .col
-      %br
-      = link_to "Have and account? Log in", new_session_path(resource_name), class: "pull-right"
+      = f.submit "Reset my password", class: "btn-secondary input-block"
+
 = devise_error_messages!

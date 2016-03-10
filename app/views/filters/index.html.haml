@@ -1,10 +1,17 @@
 .row
   .col
-    = cdx_table title: 'Filters' do |t|
-      - t.thead do
-        %tr
-          %th Name
-      - t.tbody do
-        - filters.each do |filter|
+    - if filters.empty?
+      = empty_data title: 'Filters' do |c|
+        - c.body do
+          %h1 There are no saved filters
+    - else
+      = cdx_table title: 'Filters' do |t|
+        - t.columns do
+          %col{:width => "100%"}
+        - t.thead do
           %tr
-            %td= link_to filter.name, filter
+            %th Name
+        - t.tbody do
+          - filters.each do |filter|
+            %tr
+              %td= link_to filter.name, filter

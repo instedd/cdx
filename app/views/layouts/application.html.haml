@@ -4,6 +4,7 @@
     %title Connected Diagnostics Platform
     = Gon::Base.render_data({})
     = stylesheet_link_tag "application", :media => "all"
+    = javascript_include_tag "es5-shim" if Rails.env.test?
     = javascript_include_tag "application"
     = csrf_meta_tags
   %body{class: @body_class}
@@ -11,13 +12,16 @@
       %header
         = render "shared/header_nav"
 
-      .content
+      .content.row
         = flash_message
-        .row
-          .col= yield(:leftcolumn)
-          %div{class: "col pe-#{@main_column_width}"}
-            = content_for?(:cdp_content) ? yield(:cdp_content) : yield
-          .col= yield(:rightcolumn)
+        .col.px-3#context_side_bar{"data-context-react-props": {context: @navigation_context.try(:to_hash) || {}}.to_json}
+        .col
+          = yield(:subheader)
+          .row
+            .col= yield(:leftcolumn)
+            .col.pe-10
+              = content_for?(:cdp_content) ? yield(:cdp_content) : yield
+            .col= yield(:rightcolumn)
 
       %footer
         = render "shared/footer"

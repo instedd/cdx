@@ -7,18 +7,19 @@
 */
 
 .Select {
+  border-bottom: 1px solid $gray1;
   position: relative;
   display: inline-block;
+  vertical-align: middle;
   white-space: nowrap;
 }
 
 .Select-control {
-  background-color: #ffffff;
   color: #333333;
   position: relative;
   min-width: 60px;
   white-space: nowrap;
-  padding: 8px 120px 8px 10px;
+  padding: 8px 120px 8px 0px;
   overflow: hidden;
   box-sizing: border-box;
   cursor: default;
@@ -32,11 +33,9 @@
 .is-open > .Select-control {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  background: #ffffff;
   border-color: #b3b3b3 #cccccc #d9d9d9;
   > .Select-arrow {
-    border-color: transparent transparent #999999;
-    border-width: 0 5px 5px;
+    background: image-url("arr-select-up.png") no-repeat;
   }
 }
 
@@ -47,7 +46,7 @@
 
 .Select-placeholder {
   color: #aaaaaa;
-  padding: 8px 52px 8px 10px;
+  padding: 8px 52px 8px 0px;
   position: absolute;
   top: 0;
   left: 0;
@@ -65,7 +64,7 @@
 
 .Select-value {
   color: #aaaaaa;
-  padding: 8px 52px 8px 10px;
+  padding: 8px 52px 8px 0px;
   position: absolute;
   top: 0;
   left: 0;
@@ -128,10 +127,9 @@
 .Select-clear {
   color: #999999;
   cursor: pointer;
-  // display: inline-block;
-  display: none;
-  font-size: 16px;
-  padding: 6px 10px;
+  display: inline-block;
+  font-size: 18px;
+  padding: 8px 14px;
   position: absolute;
   right: 17px;
   top: 0;
@@ -155,20 +153,25 @@
 }
 
 .Select-arrow {
-  border-color: #999999 transparent transparent;
-  border-style: solid;
-  border-width: 5px 5px 0;
+  background: image-url("arr-select-down.png") no-repeat;
   content: " ";
   display: block;
-  height: 0;
+  height: 14px;
+  width: 14px;
   margin-top: -ceil(2.5px);
   position: absolute;
   right: 10px;
   top: 14px;
-  width: 0;
   cursor: pointer;
 }
-
+.Select.patients .Select-arrow {
+  display: none !important;
+}
+.Select.patients + .btn-add-link {
+  margin-left: -20px;
+  position: relative;
+  z-index: 1;
+}
 .Select-menu-outer {
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
@@ -182,7 +185,7 @@
   position: absolute;
   top: 100%;
   min-width: 100%;
-  z-index: 1000;
+  z-index: 2000;
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
 }
@@ -213,6 +216,8 @@
   }
 }
 
+
+
 .Select-noresults, .Select-search-prompt, .Select-searching {
   box-sizing: border-box;
   color: #999999;
@@ -222,14 +227,8 @@
 }
 
 .Select.is-multi {
-  .Select-control {
-    padding: 2px 52px 2px 3px;
-  }
   .Select-input {
     vertical-align: middle;
-    border: 1px solid transparent;
-    margin: 2px;
-    padding: 3px 0;
   }
 }
 

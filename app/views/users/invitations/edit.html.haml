@@ -1,0 +1,17 @@
+.row
+  .col
+    %h1= t 'devise.invitations.edit.header'
+= form_for resource, :as => resource_name, :url => invitation_path(resource_name), :html => { :method => :put } do |f|
+  = f.hidden_field :invitation_token
+  .row
+    .col
+      = f.password_field :password, autofocus: true, placeholder: 'Password', class: "input-block"
+  .row
+    .col
+      = f.password_field :password_confirmation, autofocus: true, placeholder: 'Password confirmation', class: "input-block"
+  %br
+  .row
+    .col
+      = f.submit t("devise.invitations.edit.submit_button"), class: "btn-secondary input-block"
+= devise_error_messages!
+

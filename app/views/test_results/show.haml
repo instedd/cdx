@@ -1,9 +1,20 @@
-.row
-  .col
-    %h1
-      = link_to :back, class: 'side-link', title: 'Back' do
-        = image_tag "arrow-left.png"
-      = @test_result.core_fields[TestResult::NAME_FIELD]
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to "javascript:history.back();", class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            = @test_result.core_fields[TestResult::NAME_FIELD]
+
+- if @test_result.encounter && !@test_result.encounter.phantom?
+  .row
+    .col
+      %span
+        This test belongs to an encounter.
+        = link_to 'Click here', encounter_path(@test_result.encounter)
+        to view it.
 
 .row
   .col
@@ -11,39 +22,29 @@
       - c.top do
         %b= @test_result.core_fields[TestResult::NAME_FIELD]
         %br
-        - start_time = @test_result.core_fields[TestResult::START_TIME_FIELD]
-        - start_time = Time.parse(start_time) unless start_time.is_a?(Time)
-        %span= start_time.strftime('%B %e, %Y')
+        %span= format_datetime(@test_result.core_fields[TestResult::START_TIME_FIELD])
         - if @show_institution
           %div
             Institution: #{@test_result.institution.name}
       - c.bottom do
-        Patient
-        -# TODO add link to patient
-        = @test_result.patient.plain_sensitive_data['name']
-        %br
+        - if @test_result.patient
+          Patient
+          = link_to @test_result.patient.name_or_unknown, @test_result.patient
+          %br
         Test performed on
-        = link_to @test_result.device.name, edit_device_path(@test_result.device)
+        = link_to @test_result.device.name, device_path(@test_result.device)
         by
         -# TODO add link to site_user
         = @test_result.core_fields[TestResult::LAB_USER_FIELD]
         - if @test_result.device.site
           at
-          = link_to @test_result.device.site, site_path(@test_result.device.site)
+          = link_to @test_result.device.site, edit_site_path(@test_result.device.site)
 
 .row
   .col.pe-3
     %label Assays
   .col
-    - @test_result.core_fields[TestResult::ASSAYS_FIELD].each do |assay|
-      .row
-        .col
-          %div.underline
-            %span
-              %b= assay['name'].upcase
-        .col.pe-8
-          %b= assay['result'].titleize
-
+    = react_component("AssaysResultList", assays: @test_result.core_fields[TestResult::ASSAYS_FIELD])
 
 .row
   .col.pe-3
@@ -51,12 +52,12 @@
   .col
     - @test_result.custom_fields.each do |key, value|
       .row
-        .col
-          %div.underline
+        .col.pe-4
+          .underline
             %span
               = key.humanize
-        .col.pe-8.wrap-text
-          .value= value
+        .col.wrap-text
+          = value
 
 
 - @core_fields_scope.fields.each do |field|
@@ -69,30 +70,28 @@
     .col.wrap-text
       .value= field.humanize(@test_result.core_field_value(field))
 
-.row
-  .col.pe-2
-    %label Sample
-  - if @sample_id
+- @samples.each do |sample_id, sample_id_barcode|
+  .row
+    .col.pe-2
+      %label Sample
     .col
       -# TODO add print button
-      .value= @sample_id
+      .value= sample_id
       %br
       %br
-      = raw @sample_id_barcode.to_html
-
-
+      = raw sample_id_barcode.to_html
 
 .row
   .col.pe-2
     %label Other tests
   .col
     .value
-    - case @other_tests.count
-    - when 0
-      No other test was made with this sample
-    - when 1
-      = link_to @other_tests.first.core_fields[TestResult::NAME_FIELD], test_result_path(@other_tests.first.uuid)
-      was also made with this sample
-    - else
-      = @other_tests.map { |t| link_to t.core_fields[TestResult::NAME_FIELD], test_result_path(t.uuid) }.to_sentence.html_safe
-      were also made with this sample
+      - case @other_tests.count
+      - when 0
+        No other test was made with this sample
+      - when 1
+        = link_to @other_tests.first.core_fields[TestResult::NAME_FIELD], test_result_path(@other_tests.first.uuid)
+        was also made with this sample
+      - else
+        = @other_tests.map { |t| link_to t.core_fields[TestResult::NAME_FIELD], test_result_path(t.uuid) }.to_sentence.html_safe
+        were also made with this sample

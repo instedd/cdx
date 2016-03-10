@@ -1,0 +1,68 @@
+db:
+  restart: always
+  volumes:
+    - './data/mysql:/var/lib/mysql'
+
+redis:
+  restart: always
+
+sshd:
+  restart: always
+  ports:
+    - "2223:22"
+  volumes:
+    - './data/sshd/server_keys:/etc/ssh/keys'
+    - './data/sshd/user_keys:/home/cdx-sync/.ssh'
+    - './data/sshd/sync:/home/cdx-sync/sync'
+
+elasticsearch:
+  restart: always
+  command: elasticsearch -Des.cluster.name=cdx
+  volumes:
+    - './data/elasticsearch:/usr/share/elasticsearch/data'
+
+web:
+  image: instedd/cdx:latest
+  restart: always
+  links:
+    - db
+    - sshd
+    - redis
+    - elasticsearch
+  env_file: docker.env
+  ports:
+    - 80:80
+  volumes:
+    - './settings.local.yml:/app/config/settings.local.yml'
+    - './client_version.json:/app/public/client/version.json'
+  volumes_from:
+    - sshd
+
+sidekiq:
+  image: instedd/cdx:latest
+  restart: always
+  links:
+    - db
+    - elasticsearch
+    - redis
+  env_file: docker.env
+
+csv_watch:
+  image: instedd/cdx:latest
+  restart: always
+  links:
+    - db
+    - sshd
+    - elasticsearch
+  env_file: docker.env
+  volumes_from:
+    - sshd
+
+ftp_monitor:
+  image: instedd/cdx:latest
+  restart: always
+  links:
+    - db
+    - sshd
+    - elasticsearch
+  env_file: docker.env

@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "version": "1.1.2",
+    "api_version": "1.5.0",
+    "conditions": [
+      "mtb"
+    ],
+    "source": {
+      "type": "json"
+    }
+  },
+  "custom_fields" : {
+  },
+  "field_mapping": {
+    "sample.id" : { "lookup": "event.sample_ID" },
+    "test.site_user" : { "lookup": "event.system_user" },
+    "test.start_time" : { "lookup": "event.start_time" },
+    "test.end_time" : { "lookup": "event.end_time" },
+    "test.id" : { "lookup": "event.event_id" },
+    "test.error_code" : { "lookup": "event.error_code" },
+    "test.error_description" : { "lookup": "event.error_description" },
+    "test.name" : { "lookup": "event.assay_name" },
+    "test.type" : { "case" : [
+      { "lookup": "event.test_type" },
+      [
+        { "when" : "0", "then" : "specimen"},
+        { "when" : "*", "then" : "qc"}
+      ]
+    ]},
+    "test.status" : { "case" : [
+      { "lookup": "event.error_code"},
+      [
+        {"when": "*", "then": "error"},
+        {"else":
+          [
+            { "lookup": "event.result" },
+            [
+              {"when" : "INVALID", "then" : "invalid" },
+              {"when" : "ERROR", "then" : "error" },
+              {"when" : "NO RESULT", "then" : "no_result" },
+              {"when" : "MTB NOT DETECTED", "then" : "success" },
+              {"when" : "Rif Resistance DETECTED", "then" : "success" },
+              {"when" : "Rif Resistance INDETERMINATE", "then" : "success" },
+              {"when" : "MTB DETECTED", "then" : "success" },
+              {"when" : "*", "then" : "error"}
+            ]
+          ]
+        }
+      ]
+    ]},
+    "test.assays.condition" : { "script" : "['mtb', 'rif']" },
+    "test.assays.result" : {
+      "script": "
+      if(message['event']['result'].match(/.*INVALID.*/) || message['event']['result'].match(/.*ERROR.*/) || message['event']['result'].match(/.*NO RESULT.*/)) {
+        ['n/a', 'n/a']
+      } else {
+        if(message['event']['result'].match(/.*MTB DETECTED.*/)){
+          mtb = 'positive'
+        } else {
+          mtb = 'negative'
+        };
+        if(message['event']['result'].match(/.*Rif Resistance DETECTED.*/)){
+          rif = 'positive'
+        } else {
+          rif = 'negative'
+        };
+        [mtb, rif]
+      }"
+    }
+  }
+}

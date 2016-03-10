@@ -1,42 +1,35 @@
-- if @institutions.size > 1 || @sites.size > 1
-  .row
-    .col
-      %h1 Filters
-  %form
-    .row
-      - if @institutions.size > 1
-        .col.pe-2
-          %label Institution
-          %select.ddown(name="institution")
-            %option(value="") (all)
-            = options_from_collection_for_select @institutions, :id, :name, params["institution"]
-      - if @sites.size > 1
-        .col.pe-2
-          %label Site
-          %select.ddown(name="site")
-            %option(value="") (all)
-            = options_from_collection_for_select @sites, :id, :name, params["site"]
-      .col
-        %input.btn-primary.pull-right{type: "submit", value: "Filter"}
+= render "filters"
 
 .row
   .col
-    - if @can_create
-      = link_to "+", new_device_path, class: 'btn-add side-link fix', title: 'Add Device'
-    = cdx_table title: 'Devices' do |t|
-      - t.thead do
-        %tr
-          %th Name
-          - unless @institutions.one?
-            %th Institution
-          %th Model
-          %th Site
-      - t.tbody do
-        - @devices.each do |device|
+    - if @devices.empty?
+      = empty_data icon: 'icon-outline-device xx-large' do |c|
+        - c.body do
+          %h1 There are no devices reporting at #{truncated_navigation_context_entity_name}
+          %p Follow the configuration steps to connect a device and start reporting
+    - else
+      = cdx_table title: pluralize(@total, "device") do |t|
+        - t.columns do
+          %col{:width => "20%"}
+          %col{:width => "50%"}
+          %col{:width => "20%"}
+          %col{:width => "10%"}
+        - t.actions do
+          = link_to devices_path(format: :csv), title: 'Download CSV' do
+            .icon-download.icon-gray
+        - t.thead do
           %tr
-          %tr{data: (@devices_to_read.include?(device.id) ? {href: device_path(device) } : {})}
-            %td= device.name
-            - unless @institutions.one?
-              %td= device.institution.name
-            %td= device.device_model.full_name
-            %td= device.site.try(:name)
+            %th Name
+            %th Manufacturer
+            %th Model
+            %th Site
+        - t.tbody do
+          - @devices.each do |device|
+            %tr{data: (@devices_to_read.include?(device.id) ? {href: device_path(device) } : {})}
+              %td= device.name
+              %td= device.device_model.institution.try :name
+              %td= device.device_model.full_name
+              %td= device.site.try(:name)
+
+      .pagination
+        = render 'shared/pagination'

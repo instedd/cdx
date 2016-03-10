@@ -1,20 +1,24 @@
 class Api::ActivationsController < ApiController
-  skip_before_action :authenticate_user!
+  skip_before_action :doorkeeper_authorize!
 
   def create
-    activation_token = ActivationToken.find_by(value: params[:token])
-    response = if activation_token.nil?
-      { status: :failure, message: 'Invalid activation token' }
-    elsif activation_token.used?
-      { status: :failure, message: 'Activation token already used' }
-    else
-      begin
-        settings = activation_token.use!(params.require(:public_key))
-        { status: :success, message: 'Device activated', settings: settings }
-      rescue CDXSync::InvalidPublicKeyError => e
-        { status: :failure, message: 'Invalid public key' }
+    device = Device.find_by(activation_token: params[:token].delete("-"))
+    response = if device.nil?
+        { status: :failure, message: 'Invalid activation token' }
+      elsif params[:public_key]
+        begin
+          settings = device.use_activation_token_for_ssh_key!(params[:public_key])
+          { status: :success, message: 'Device activated', settings: settings }
+        rescue CDXSync::InvalidPublicKeyError => e
+          { status: :failure, message: 'Invalid public key' }
+        end
+      elsif params[:generate_key]
+        secret_key = device.use_activation_token_for_secret_key!
+        { status: :success, message: 'Device activated', settings: { device_key: secret_key, device_uuid: device.uuid } }
+      else
+        { status: :failure, message: 'Missing public_key or generate_key parameter' }
       end
-    end
+
     logger.info "Response for activation request #{params[:token]}: #{response}"
     render json: response
   end

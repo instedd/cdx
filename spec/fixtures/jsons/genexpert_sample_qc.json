@@ -1,0 +1,13 @@
+{
+  "event": {
+    "result": "MTB DETECTED MEDIUM|Rif Resistance NOT DETECTED",
+    "assay_name": "MTB-RIF Assay G4_noQC1_2",
+    "sample_ID": "A-1234-6",
+    "system_user": "JaneDoe",
+    "device_serial_number": "123456",
+    "end_time": "2015-04-08T20:08:41-05:00",
+    "start_time": "2015-04-08T18:31:20-05:00",
+    "event_id": "C6A54C7053C0458184325B1A6132A1A5",
+    "test_type": "1"
+  }
+}

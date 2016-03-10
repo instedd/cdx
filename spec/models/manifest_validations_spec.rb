@@ -159,6 +159,48 @@ describe Manifest do
       expect(m.errors[:invalid_type].first).to eq(": target 'test.custom'. Field can't specify a type.")
     end
 
+    it "shouldn't create if a custom field has a nonexistent scope" do
+      definition = %{{
+        "metadata" : {
+          "version" : "1.0.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
+          "conditions" : ["mtb"],
+          "source" : {"type" : "json"}
+        },
+        "custom_fields": {
+          "nonexistent.custom": {
+          }
+        },
+        "field_mapping" : {
+          "nonexistent.custom": {"lookup" : "test.custom"}
+        }
+      }}
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      expect(m).to be_invalid
+      expect(m.errors[:custom_fields]).to contain_exactly(": target 'nonexistent.custom'. Scope 'nonexistent' is invalid.")
+    end
+
+    it "shouldn't create if a custom field has no scope" do
+      definition = %{{
+        "metadata" : {
+          "version" : "1.0.0",
+          "api_version" : "#{Manifest::CURRENT_VERSION}",
+          "conditions" : ["mtb"],
+          "source" : {"type" : "json"}
+        },
+        "custom_fields": {
+          "custom": {
+          }
+        },
+        "field_mapping" : {
+          "custom": {"lookup" : "test.custom"}
+        }
+      }}
+      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      expect(m).to be_invalid
+      expect(m.errors[:custom_fields]).to contain_exactly(": target 'custom'. A scope must be specified.")
+    end
+
     it "should create when fields are provided with no types" do
       definition = %{{
         "metadata" : {

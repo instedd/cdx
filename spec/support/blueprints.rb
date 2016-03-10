@@ -26,8 +26,38 @@ end
 User.blueprint do
   email
   password
+  first_name { Faker::Name.first_name }
+  last_name { Faker::Name.last_name }
   password_confirmation { password }
   confirmed_at { Time.now - 1.day }
+end
+
+Alert.blueprint do
+  name { Faker::Name.first_name }
+  description { Faker::Name.last_name }
+  message { 'test message' }
+  category_type {"anomalies"}
+  sms_limit {10000}
+  user
+end
+
+AlertRecipient.blueprint do
+  user
+  alert
+  recipient_type {AlertRecipient.recipient_types["external_user"]}
+  email {"aaa@aaa.com"}
+  telephone {123}
+  first_name {"bob"}
+  last_name {'smith'}
+end
+
+
+User.blueprint(:invited_pending) do
+  confirmed_at nil
+  invitation_token { SecureRandom.urlsafe_base64 }
+  invitation_created_at 1.day.ago
+  invitation_sent_at 1.day.ago
+  invitation_accepted_at nil
 end
 
 Institution.blueprint do
@@ -35,9 +65,13 @@ Institution.blueprint do
   name
 end
 
+Institution.blueprint(:manufacturer) do
+  kind { "manufacturer" }
+end
+
 Device.blueprint do
-  site { Site.make institution: institution }
-  institution { site.institution }
+  site { Site.make(institution: (object.institution || Institution.make)) }
+  institution { object.site.try(:institution) || Institution.make }
   name
   serial_number { name }
   device_model { Manifest.make.device_model }
@@ -68,25 +102,63 @@ Manifest.blueprint do
 end
 
 Encounter.blueprint do
-  institution
-  core_fields { { "id" => "encounter-#{Sham.sn}" } }
+  institution { object.patient.try(:institution) || Institution.make }
+  site { object.institution.sites.first || object.institution.sites.make }
+  core_fields {
+    { "id" => "encounter-#{Sham.sn}" }.tap do |h|
+      h["start_time"] = object.start_time if object.start_time
+    end
+  }
+end
+
+def first_or_make_site_unless_manufacturer(institution)
+  unless institution.kind_manufacturer?
+    institution.sites.first || institution.sites.make
+  end
+end
+
+SampleIdentifier.blueprint do
+  sample { Sample.make_unsaved({}.tap do |h|
+    h[:institution] = object.site.institution if object.site
+  end)}
+  site { first_or_make_site_unless_manufacturer(object.sample.institution) }
 end
 
 Sample.blueprint do
-  institution
-  core_fields { { "uid" => "sample-#{Sham.sn}" } }
+  institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make }
+  patient { object.encounter.try(:patient) }
 end
 
 Patient.blueprint do
   institution
-  plain_sensitive_data { { "id" => "patient-#{Sham.sn}" } }
+  plain_sensitive_data {
+    {}.tap do |h|
+      h["id"] = object.entity_id || "patient-#{Sham.sn}"
+      h["name"] = object.name if object.name
+    end
+  }
+end
+
+Patient.blueprint :phantom do
+  name
+  plain_sensitive_data {
+    {}.tap do |h|
+      h["id"] = nil
+      h["name"] = object.name if object.name
+    end
+  }
 end
 
 TestResult.blueprint do
-  device_messages { [ DeviceMessage.make ] }
-  device { device_messages.first.device }
-  sample { Sample.make institution: device.institution }
   test_id { "test-#{Sham.sn}" }
+
+  device_messages { [ DeviceMessage.make(device: object.device || Device.make) ] }
+  device { object.device_messages.first.try(:device) || Device.make }
+  institution { object.device.try(:institution) || Institution.make }
+  sample_identifier { SampleIdentifier.make(site: object.device.try(:site), sample: Sample.make(institution: object.institution, patient: object.patient, encounter: object.encounter)) }
+
+  encounter { object.sample.try(:encounter) }
+  patient { object.sample.try(:patient) || object.encounter.try(:patient) }
 end
 
 DeviceMessage.blueprint do
@@ -95,6 +167,16 @@ end
 
 Policy.blueprint do
   name
+  granter { Institution.make.user }
+  definition { policy_definition(object.granter.institutions.first, CREATE_INSTITUTION, true) }
+  user
+end
+
+Role.blueprint do
+  name
+  policy
+  institution
+  site { Site.make institution: object.institution }
 end
 
 Subscriber.blueprint do
@@ -109,15 +191,10 @@ Filter.blueprint do
   name
 end
 
-ActivationToken.blueprint do
-  device
-  value { "token-#{Sham.sn}" }
-end
-
 Site.blueprint do
   institution
   name
-  location_geoid { LocationService.repository.make.id }
+  location_geoid { object.location.try(:id) || LocationService.repository.make.id }
   address { Faker::Address.street_address }
   city { Faker::Address.city }
   state { Faker::Address.state }
@@ -126,6 +203,11 @@ Site.blueprint do
   region { Faker::Address.state }
   lat { rand(-180..180) }
   lng { rand(-90..90) }
+end
+
+Site.blueprint :child do
+  parent { nil }
+  institution { parent.institution }
 end
 
 Location; class Location

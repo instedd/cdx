@@ -2,36 +2,53 @@
   .logo
     = image_tag 'cdx-logo.png'
 
+  - if @navigation_context.try(:entity)
+    %a#nav-context(href='#'){title: @navigation_context.name}
+      at
+      = @navigation_context.name
+
   %nav
     - if current_user && !@hide_nav_bar
       %ul
-        - if can?(Policy::Actions::MEDICAL_DASHBOARD, TestResult)
-          %li{:class => params[:controller] == "dashboards" && "active"}
-            = link_to "Dashboard", nndd_path
-        - if can_index_sites?
+        - if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
+          %li{:class => params[:controller] == "dashboards" && params[:action] == "index" && "active"}
+            = link_to "Home", dashboard_path
+        - if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
+          %li{:class => params[:controller] == "dashboards" && params[:action] == "nndd" && "active"}
+            = link_to "Reports", nndd_path
+        - if has_access_to_patients_index?
+          %li{:class => params[:controller] == "patients" && "active"}
+            = link_to "Patients", patients_path
+        - if has_access_to_sites_index?
           %li{:class => params[:controller] == "sites" && "active"}
             = link_to "Sites", sites_path
-        - if can_index_devices?
+        - if has_access_to_devices_index?
           %li{:class => params[:controller] == "devices" && "active"}
             = link_to "Devices", devices_path
-        - if can_index_device_models?
+        - if has_access?(Device, Policy::Actions::SUPPORT_DEVICE)
+          %li{:class => params[:controller] == "device_messages" && "active"}
+            = link_to "Logs", device_messages_path
+        - if has_access_to_device_models_index?
           %li{:class => params[:controller] == "device_models" && "active"}
             = link_to "Models", device_models_path
-        %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
-          = link_to "Tests", test_results_path
-        %li{:class => params[:controller] == "filters" && "active"}
-          = link_to "Filters", filters_path
-        %li{:class => params[:controller] == "subscribers" && "active"}
-          = link_to "Apps", subscribers_path
-        %li{:class => params[:controller] == "policies" && "active"}
-          = link_to "Users", policies_path
+        - if has_access_to_test_results_index?
+          %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
+            = link_to "Tests", test_results_path
+        - if has_access_to_users_index?
+          %li{:class => params[:controller] == "users" && "active"}
+            = link_to "Users", users_path
+        %li{:class => (["roles", "policies", "alerts", "incidents", "alert_messages"].include?(params[:controller]) || params[:action] == "settings") && "active"}
+          = link_to "Settings", settings_path
 
   .user{:tabindex => "0"}
     - if current_user
-      %span= current_user.email
+      %span.icon-user.medium.icon-gray-light{title: current_user.email}
       %ul
-        - unless @hide_user_settings
-          %li= link_to "Settings", institutions_path
-        %li= link_to "Sign out", destroy_session_path(:user), method: :delete
+        - unless @hide_my_account
+          %li= link_to "My Account", edit_user_registration_path
+        - if current_user && !@hide_nav_bar
+          %li= link_to "Edit institutions", institutions_path
+          %li= link_to "API tokens", api_tokens_path
+        %li= link_to "Log out", destroy_session_path(:user), method: :delete
     - else
-      = link_to "Sign in", new_session_path(:user)
+      = link_to "Log in", new_session_path(:user)

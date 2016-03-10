@@ -99,4 +99,39 @@ describe DeviceMessage, elasticsearch: true do
       device_message.reprocess
     end
   end
+
+  context "within" do
+    let!(:site) { Site.make }
+    let!(:subsite) { Site.make parent: site, institution: site.institution }
+    let!(:other_site) { Site.make }
+    let!(:device1) { Device.make site: site, institution: site.institution }
+    let!(:device2) { Device.make site: subsite, institution: site.institution }
+    let!(:device3) { Device.make site: other_site, institution: other_site.institution }
+    let!(:device4) { Device.make site: nil, institution: site.institution }
+    let!(:device_message1) { DeviceMessage.make device: device1 }
+    let!(:device_message2) { DeviceMessage.make device: device2 }
+    let!(:device_message3) { DeviceMessage.make device: device3 }
+    let!(:device_message4) { DeviceMessage.make device: device4 }
+
+    it "institution, no exclusion, should show device messages from site, subsites and no site" do
+      expect(DeviceMessage.within(site.institution).to_a).to eq([device_message1, device_message2, device_message4])
+    end
+
+    it "institution, with exclusion, should show device messages with no site" do
+      expect(DeviceMessage.within(site.institution,true).to_a).to eq([device_message4])
+    end
+
+    it "site, no exclusion, should show device messages from site and subsite" do
+      expect(DeviceMessage.within(site).to_a).to eq([device_message1, device_message2])
+    end
+
+    it "site, with exclusion, should show device messages from site only" do
+      expect(DeviceMessage.within(site,true).to_a).to eq([device_message1])
+    end
+
+    it "institution should not show device messages from other institutions" do
+      expect(DeviceMessage.within(other_site.institution).to_a).to eq([device_message3])
+    end
+
+  end
 end

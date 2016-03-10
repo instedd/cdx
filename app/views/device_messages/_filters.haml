@@ -1,0 +1,28 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            Device logs
+      %form#filters-form{action: device_messages_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
+        .row
+          .filter
+            %label.block Message
+            %input{type: "text", name: "message", value: params["message"]}
+          .filter
+            %label.block Device Model
+            = cdx_select name: "device_model", value: params["device_model"] do |select|
+              - select.item "", "Show all"
+              - select.items @device_models, :id, :name
+          .filter
+            %label.block Device
+            = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
+              - select.item "", "Show all"
+              - select.items @devices, :uuid, :name
+          .filter
+            %label.block Date
+            = cdx_select name: "created_at", value: params["created_at"] do |select|
+              - select.item "", "Show all"
+              - select.items @date_options, :value, :label

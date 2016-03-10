@@ -1,0 +1,204 @@
+{
+  "metadata": {
+    "version": "0.0.2",
+    "api_version": "1.5.0",
+    "device_models": [
+      "BDMicroImager"
+    ],
+    "source": {
+      "type": "json"
+    },
+    "conditions": [
+      "mtb"
+    ]
+  },
+  "custom_fields": {
+    "test.device_software_version": {
+    },
+    "test.cartridge_expiration_date": {
+    },
+    "test.cartridge_number": {
+    },
+    "test.qc_date": {
+    },
+    "test.qc_passed": {
+    },
+    "test.tbcount1": {
+    },
+    "test.tbcount2": {
+    },
+    "test.tbpercent": {
+    },
+    "test.qcmagnification": {
+    },
+    "test.qcresolution": {
+    }
+  },
+  "field_mapping": {
+    "sample.id": {
+      "lookup": "idString"
+    },
+    "test.id": {
+      "lookup": "id"
+    },
+    "test.start_time": {
+      "parse_date": [
+        {
+          "lookup": "startTime"
+        },
+        "%Y-%m-%d %H:%M:%S"
+      ]
+    },
+    "test.end_time": {
+      "parse_date": [
+        {
+          "lookup": "endTime"
+        },
+        "%Y-%m-%d %H:%M:%S"
+      ]
+    },
+    "test.error_code": {
+      "lookup": "errors"
+    },
+    "test.type": {
+      "case" : [
+        {"lookup" : "type"},
+        [
+          {"when": "1", "then" : "specimen"},
+          {"when": "2", "then" : "qc"}
+        ]
+      ]
+    },
+    "test.tbcount1": {
+      "lookup": "TbCount1"
+    },
+    "test.tbcount2": {
+      "lookup": "TbCount2"
+    },
+    "test.tbpercent": {
+      "lookup": "TbPercent"
+    },
+    "test.qcmagnification": {
+      "lookup": "QcMagnification"
+    },
+    "test.qcresolution": {
+      "lookup": "QcResolution"
+    },
+    "test.device_software_version": {
+      "lookup": "swRev"
+    },
+    "test.cartridge_expiration_date": {
+      "if" : [
+        {"equals" : [{"lookup" : "cartExpiry"}, ""]},
+        null,
+        {
+          "parse_date": [
+            {
+              "lookup": "cartExpiry"
+            },
+            "%Y-%m-%d"
+          ]
+        }
+      ]
+    },
+    "test.cartridge_number": {
+      "lookup": "CartridgeSerialNumber"
+    },
+    "test.status": {
+      "case": [
+        {
+          "lookup": "InstrumentQCStatus"
+        },
+        [
+          {
+            "when": "TRUE",
+            "then": {
+              "if" : [
+                {"equals" : [{"lookup": "errors"}]},
+                "success",
+                "error"
+              ]
+            }
+          },
+          {
+            "when": "FALSE",
+            "then": "invalid"
+          }
+        ]
+      ]
+    },
+    "test.qc_date": {
+      "if" : [
+        {"equals" : [{"lookup" : "lastInstrQcDate"}, ""]},
+        null,
+        {
+          "parse_date": [
+            {
+              "lookup": "lastInstrQcDate"
+            },
+            "%Y-%m-%d"
+          ]
+        }
+      ]
+    },
+    "test.qc_passed": {
+      "case": [
+        {
+          "lookup": "lastInstrQcPassed"
+        },
+        [
+          {
+            "when": "TRUE",
+            "then": "passed"
+          },
+          {
+            "when": "FALSE",
+            "then": "not passed"
+          }
+        ]
+      ]
+    },
+    "device.serial_number": {
+      "lookup": "unitSerial"
+    },
+    "test.site_user": {
+      "lookup": "operator"
+    },
+    "test.name": "TBMI",
+    "test.assays.condition": "mtb",
+    "test.assays.result": {
+      "case": [
+        {
+          "lookup": "TbFinalResultStr"
+        },
+        [
+          {
+            "when": "NEG",
+            "then": "negative"
+          },
+          {
+            "when": "POS HIGH",
+            "then": "positive"
+          },
+          {
+            "when": "POS LOW",
+            "then": "positive"
+          },
+          {
+            "when": "IND",
+            "then": "n/a"
+          },
+          {
+            "when": "XXX",
+            "then": "n/a"
+          },
+          {
+            "when": "",
+            "then": "n/a"
+          }
+        ]
+      ]
+    }
+  }
+}
+

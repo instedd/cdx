@@ -1,3 +1,7 @@
+// =============================================================================
+// MODAL WRAPPER
+// =============================================================================
+
 .modal-wrapper {
   @include flexbox();
   @include align-items(center);
@@ -12,24 +16,62 @@
 
   .modal {
     background: $white;
-    min-width: 480px;
+    min-width: 500px;
     min-height: 400px;
-    padding: 5px 45px 20px 45px;
+    padding: 0px 50px 100px 50px;
     box-shadow: 0px 1px 15px 0px rgba(0, 0, 0, 0.6);
     margin-top: -5%;
+    position: relative;
+
+    .close-modal {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      cursor: pointer;
+    }
 
     h1 {
-      color: $black;
+      color: $gray4;
+      margin: 0 -45px 30px;
+      padding: 30px 45px;
+      border-bottom: 1px solid $gray1;
+    }
+
+    h2 {
+      margin: 0 -45px 30px;
+      padding: 30px 45px;
+      border-bottom: 1px solid $gray1;
     }
 
     .modal-back {
       position: absolute;
       margin-left: -30px;
+      background: image-url('arrow-left.png') no-repeat left center;
+      width: 16px;
+      height: 48px;
+      display: inline-block;
     }
 
     .item-search {
       width: 100%;
+      position:relative;
     }
+
+    .modal-footer {
+      position: absolute;
+      bottom: 40px;
+      width: 100%;
+    }
+    &.small {
+      min-width: 250px;
+    }
+  }
+}
+
+#confirmationModalContainer .modal {
+  max-width: 480px;
+  .modal-content {
+    word-wrap: break-word;
   }
 }
 
@@ -41,19 +83,382 @@
       background-color: $gray2;
     }
   }
+
+  ul.add-item-search-autocomplete {
+    z-index: 20;
+    background-color: white;
+    position: absolute;
+    width: inherit;
+  }
+
+  .include-message {
+    text-transform: none;
+  }
 }
 
 .assay-result {
-  padding-right: 0.5em;
+  background: image-url('assay-results.png') no-repeat right 20px;
+  text-transform: uppercase;
+  padding-right: 24px;
+  display: inline-block;
+  vertical-align: middle;
+  height: 20px;
 
-  // TODO Add images to indicating status
+  &.assay-result-negative {
+    background-position: right 0px;
+  }
   &.assay-result-positive {
+    background-position: right -20px;
     color: $red;
   }
-  &.assay-result-negative {
-
-  }
-  &.assay-result-disabled {
+  &.assay-result-indeterminate {
+    background-position: right -40px;
     color: $gray3;
   }
+  & + .assay-result {
+    margin-left: 10px;
+  }
+}
+
+.assays-editor {
+  .quantitative {
+    width: 4em;
+  }
+}
+
+
+// =============================================================================
+// SITES TREE VIEW
+// =============================================================================
+
+.show-navigation-context-picker {
+  #context_side_bar {
+    @include flexbox();
+    @include align-self(stretch);
+    background-color: $gray5;
+    color: $white-dark;
+
+    input, input:focus {
+      background: image-url("ic-search.png") no-repeat 10px 10px;
+      color: $white-light;
+      padding-left: 38px;
+      height: 40px;
+    }
+
+    > div {
+      flex: 1;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow: auto;
+      overflow-x: hidden;
+    }
+    .search-sites {
+      border-color: $white-translucent;
+    }
+
+    #include-subsites {
+      color: $white-light;
+      margin: 4px 0 4px 45px;
+    }
+  }
+}
+
+.sites-tree-view {
+  position: relative;
+  padding: 0 10px;
+
+  li {
+    line-height: 46px;
+
+    button {
+      background: image-url("arr-select-right-inv.png") no-repeat center #303030;
+      display: inline-block;
+      vertical-align: middle;
+      width: 20px;
+      height: 20px;
+      padding: 15px 0;
+      cursor: pointer;
+      border: none;
+      outline: 0;
+      position: absolute;
+      top: 8px;
+      left: 0;
+      z-index: 1;
+    }
+
+    a {
+      color: $white-dark;
+      position: relative;
+      display: block;
+      padding-left: 24px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    ul {
+      margin: -15px 0 0 10px;
+      padding: 15px 0 0 15px;
+      border-left: 2px solid $white-translucent;
+    }
+
+    &.expanded > a > button {
+      background: image-url("arr-select-down-inv.png") no-repeat center 50% #303030;
+    }
+    &.selected {
+      > a > button {
+        background-color: #1D1D1D;
+      }
+    }
+  }
+
+
+  .selected:before {
+    content: '';
+    background-color: $gray3;
+    right: 0;
+    left: 0;
+    position: absolute;
+    height: 46px;
+    z-index: 0;
+  }
+
+  .selected > a {
+    color: $white-light;
+  }
+
+}
+
+.table-controls > div {
+  float: left;
+}
+
+
+// =============================================================================
+// REACT AUTOSUGGEST
+// =============================================================================
+
+.react-autosuggest {
+  position: relative;
+}
+
+.react-autosuggest__suggestions {
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  border-top-color: #e6e6e6;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  margin-top: 4px;
+  max-height: 200px;
+  position: absolute;
+  top: 100%;
+  min-width: 400px;
+  z-index: 2000;
+  white-space: nowrap;
+
+  li {
+    box-sizing: border-box;
+    color: #666666;
+    cursor: pointer;
+    display: block;
+    padding: 8px 10px;
+    white-space: nowrap;
+    &:last-child {
+      border-bottom-right-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+    &:hover {
+      background: #f2f9fc;
+    }
+  }
+}
+.warn {
+  font-family: $sanstitle;
+  font-size: 12px;
+  font-weight: 300;
+  font-style: normal;
+  color: $red;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+
+// =============================================================================
+// OPTION LIST
+// =============================================================================
+.option-list {
+  ul.box-list {
+    li {
+      box-shadow: 0px 1px 3px rgba(0,0,0,0.3);
+      line-height: 40px;
+      padding: 0 30px 0 10px;
+      max-width: 350px;
+      min-height: 40px;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      position: relative;
+    }
+  }
+  a.add {
+    text-transform: uppercase;
+  }
+  a.remove {
+    line-height: normal;
+    position: absolute;
+    right: 8px;
+    top: 12px;
+  }
+  span.box-autocomplete {
+    padding:8px;
+    display:list-item;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0px -1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .hidden {
+    display:none;
+  }
+
+  .item-search {
+    max-width: 350px;
+  }
+}
+
+// =============================================================================
+// NAV LIST
+// =============================================================================
+
+.nav-list {
+  border-radius: 3px;
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.3);
+
+  li {
+    padding: 15px;
+    border-bottom: 1px solid $gray2;
+    position: relative;
+    &:last-child {
+      border-bottom: none;
+    }
+    [class^="icon-"],
+    [class*=" icon-"] {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      margin-top: -10px;
+    }
+  }
+}
+
+
+// =============================================================================
+// SAMPLES
+// =============================================================================
+
+ul.samples {
+  > li {
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.3);
+    padding: 15px;
+    width: 400px;
+    margin-bottom: 5px;
+    .unify {
+      float: right;
+    }
+    .unified {
+      color: $gray3;
+      margin-top: 10px;
+      li {
+        margin: 3px 0;
+      }
+    }
+  }
+}
+
+
+// =============================================================================
+// MAPS
+// =============================================================================
+.map {
+  width: 100%;
+  height: 400px;
+}
+
+
+// =============================================================================
+// ITEMS EDITOR - 2 COLUMNS and FIX POSITION on TOP when SCROLL
+// =============================================================================
+.items-editor {
+
+  ul {
+    border-right: 1px solid $gray1;
+    padding-bottom: 25px;
+
+    li {
+      display: block;
+      vertical-align: baseline;
+      padding-bottom: 15px;
+      margin-bottom: 10px;
+
+      &.selected {
+        border-right: 4px solid $black;
+      }
+      .resource-type {
+        font-weight: 700;
+        margin-bottom: 6px;
+        cursor: pointer;
+        > span:first-child {
+         text-transform: capitalize;
+        }
+      }
+      .description {
+        font-size: 80%;
+        color: $gray3;
+        font-style: italic;
+        padding-left: 30px;
+      }
+    }
+
+  }
+
+  .items-content {
+    display: none;
+
+    &.selected {
+      display: inherit;
+    }
+  }
+
+  .fix.fixed {
+    position: fixed;
+    margin-left: -10px;
+    padding: 10px;
+    width: 400px;
+    z-index: 1;
+    top: 10px;
+  }
+
+}
+
+.assays-editor {
+
+  .underline {
+    line-height: 35px;
+    height: 35px;
+    border-bottom: 1px solid $gray2;
+    span {
+      border-bottom: 1px solid $white;
+      padding-right: 4px;
+    }
+  }
+
+  input[type="text"].quantitative {
+    height: 35px;
+  }
+
 }

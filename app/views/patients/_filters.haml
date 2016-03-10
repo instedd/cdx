@@ -1,0 +1,26 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            - if @can_create
+              = link_to "+", new_patient_path, class: 'btn-add side-link fix', title: 'Add Patient'
+            Patients
+      %form#filters-form{action: patients_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
+        .row
+          .filter
+            %label.block Name
+            %input.input-block{type: "text", name: "name", value: params["name"]}
+          .filter
+            %label.block Patient Id
+            %input.input-block{type: "text", name: "entity_id", value: params["entity_id"]}
+          .filter
+            %label.block Location
+            = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"]
+          .filter
+            %label.block Last encounter
+            = cdx_select name: "last_encounter", value: params["last_encounter"] do |select|
+              - select.item "", "Show all"
+              - select.items @date_options, :value, :label

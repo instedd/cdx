@@ -2,16 +2,39 @@
 // FORMS
 // =============================================================================
 
+input[type="text"][disabled] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: .4;
+}
+input[type="number"][disabled] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: .4;
+}
+
+input[type="text"][disabled] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: .4;
+}
+input[type="number"][disabled] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: .4;
+}
+
 
 input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="number"] {
   @include placeholder-style(italic);
+  background-color: transparent;
   font-family: $sans;
   font-size: 100%;
   border: none;
-  border-bottom: 1px solid $gray2;
+  border-bottom: 1px solid $gray1;
   padding: 0 5px;
   height: 30px;
   outline: 0 !important;
@@ -21,97 +44,51 @@ textarea {
   @include placeholder-style(italic);
   font-family: $sans;
   font-size: 100%;
+  border-color: $gray2;
+  outline: none;
+  &.resizeable {
+    border: none;
+    border-bottom: 1px solid $gray2;
+    overflow: hidden;
+    resize: none;
+  }
 }
 
 
 label {
   color: $gray3;
   line-height: 40px;
+  text-transform: uppercase;
   min-height: 40px;
   display: inline-block;
   vertical-align: middle;
 }
 
 .value {
-  padding-top: 5px;
+  line-height: 2.9em;
 
   &.annotation {
     font-size: 80%;
+    line-height: 1.5em;
     color: $gray3;
     max-width: 250px;
     padding-top: 10px;
   }
 }
 
-// DDslick select styles ---------------------------------------------------------//
-
-
-.dd-container {
-  display: inline-block;
-  vertical-align: middle;
-
-  .dd-select {
-    padding-right: 20px !important;
-    width: inherit;
-  }
-
-  .dd-selected {
-    font-weight: 400;
-    padding: 10px 6px 10px 0px;
-    min-height: 39px;
-    min-width: 50px;
-  }
-  .dd-pointer-down {
-    border-top-color: $gray2;
-  }
-  .dd-pointer-up {
-    border-bottom-color: $gray2 !important;
-  }
-
-  label {
-    line-height: 1;
-    padding: 0;
-    margin: 0;
-    height: auto;
-    min-height: auto;
-  }
-}
-.dd-options {
-  width: auto !important;
-  min-width: 100%;
-  white-space: nowrap;
-}
-.dd-container,
-.dd-option {
-  min-height: 40px;
-}
-.dd-select {
-  border: none !important;
-  background: none !important;
-
-  label {
-    color: $black;
-  }
-}
-.dd-options {
-  label {
-    color: $black;
-  }
-}
-
-.select2-container {
-  a {
-    color: $gray4
-  }
-}
-
 // Checkboxes ---------------------------------------------------------//
 
 input[type="checkbox"] {
-  display: none;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
 
   & + label {
     color: $black;
+    text-transform: none;
     display: table;
     position: relative;
     margin-left: 32px;
@@ -141,10 +118,18 @@ input[type="checkbox"] {
       margin-right: 10px;
     }
   }
+  & + label#include-subsites {
+    margin-left: 45px;
+    &:before {
+      border-color: rgb(105,105,105);;
+    }
+  }
   &:checked + label:before {
     content: '\2714';
     background: $black;
-
+  }
+  &:checked + label#include-subsites:before {
+    background: none;
   }
   &.disabled + label,
   &[disabled] + label,
@@ -152,6 +137,43 @@ input[type="checkbox"] {
     cursor: not-allowed;
     pointer-events: none; // Future-proof disabling of clicks
     opacity: .35;
+  }
+  & + label.cross {
+    margin: 0;
+    padding: 0;
+    line-height: normal;
+
+    &:before {
+      display: none;
+    }
+  }
+  &.power {
+    & + label {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0;
+      padding-left: 40px;
+      min-height: auto;
+      &:before {
+        background: image-url('ic-on-off.png') no-repeat right top;
+        width: 32px;
+        height: 20px;
+        top: 12px;
+        left: 0px;
+        border: none;
+        transition: none;
+      }
+      &:hover:before {
+        background-position: right bottom;
+      }
+    }
+    &:checked + label:before {
+      content: '';
+      background-position: left top;
+    }
+    &:checked:hover + label:before {
+      background-position: left bottom;
+    }
   }
 }
 
@@ -164,6 +186,7 @@ input[type="radio"] {
 
   & + label {
     color: $black;
+    text-transform: none;
     display: table;
     position: relative;
     margin-left: 32px;
@@ -277,4 +300,142 @@ body.devise {
 }
 .input-block {
   width: 100%;
+}
+
+// Input file style ---------------------------------------------------------//
+
+.inputfile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+label.input,
+.inputfile + label {
+  font-family: $sans;
+  font-weight: 400;
+  color: $blue;
+  display: inline-block;
+  cursor: pointer;
+  max-width: 350px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+}
+
+.clear-input,
+.clear-label {
+  line-height: normal;
+  display: none;
+  position: absolute;
+  right: 8px;
+  top: 12px;
+}
+
+label.on {
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
+  padding: 0 30px 0 10px;
+  width: 350px;
+  span {
+    color: $gray4;
+    text-transform: lowercase;
+  }
+  .clear-input,
+  .clear-label {
+    display: block;
+  }
+}
+.inputfile:focus + label,
+.inputfile + label:hover {
+    color: darken($blue, 10%);
+}
+
+.choose-picture {
+  text-align: center;
+  padding: 100px;
+  border: 2px dashed $gray1;
+  width: 540px;
+  height: 450px;
+  position: relative;
+
+  h2 {
+    margin: 0 0 8px 0;
+    color: $gray2;
+  }
+
+  .ic140-picture {
+    opacity: 0.4;
+  }
+
+  .clear-label {
+    display: block;
+  }
+  &.on {
+    border-color: $blue;
+  }
+}
+
+.upload-new-file.picture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+
+  .upload-picture-title {
+    margin-top: 100px;
+  }
+
+  input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    z-index:2;
+    opacity:0;
+    cursor:pointer;
+  }
+  > img {
+    position:absolute;
+    width: 350px;
+    min-height: 300px;
+    max-height: 400px;
+    top: 20px;
+    left: 50%;
+    margin-left: -175px;
+    z-index:1;
+    border:none;
+    opacity: 0;
+    &.uploaded {
+      opacity: 1;
+    }
+  }
+
+}
+
+.file-uploaded + .upload-new-file {
+  display: none;
+}
+
+.file-uploaded.remove {
+  display: none;
+
+  + .upload-new-file {
+    display: block;
+  }
+}
+
+#edit_user {
+  input[type="text"], input[type="password"] {
+    width: 400px;
+  }
 }

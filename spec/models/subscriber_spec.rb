@@ -72,11 +72,11 @@ describe Subscriber, elasticsearch: true do
       expect(response.keys).to match_array(["device", "encounter", "institution", "site", "location", "patient", "sample", "test"])
       expect(response["device"].keys).to match_array(["model", "uuid", "name", "serial_number"])
       expect(response["institution"].keys).to match_array(["uuid", "name"])
-      expect(response["site"].keys).to match_array(["uuid", "name"])
+      expect(response["site"].keys).to match_array(["uuid", "name", "path"])
       expect(response["location"].keys).to match_array(["id", "parents", "admin_levels", "lat", "lng"])
       expect(response["patient"].keys).to match_array(["gender"])
       expect(response["sample"].keys).to match_array(["uuid", "id", "type", "collection_date"])
-      expect(response["test"].keys).to match_array(["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "patient_age", "name", "status", "assays", "type", "site_user"])
+      expect(response["test"].keys).to match_array(["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "name", "status", "assays", "type", "site_user"])
       expect(response["institution"]["name"]).to eq(institution.name)
       expect(response["site"]["name"]).to eq(site.name)
       expect(response["device"]["name"]).to eq(device.name)
@@ -119,15 +119,18 @@ describe Subscriber, elasticsearch: true do
 
   def submit_test
     patient = Patient.make(
-      core_fields: {"gender" => "male"}
+      core_fields: {"gender" => "male"},
+      institution: institution
     )
 
-    sample = Sample.make patient: patient
+    sample = Sample.make patient: patient, institution: institution
+    sample_identifier = SampleIdentifier.make sample: sample
 
     TestResult.create_and_index(
-      patient: patient, sample: sample,
+      patient: patient, sample_identifier: sample_identifier,
       core_fields: {"assays" => ["result" => "positive", "condition" => "mtb", "name" => "mtb"]},
-      device_messages: [device_message]
+      device_messages: [device_message],
+      institution: institution
     )
 
     expect(TestResult.count).to eq(1)

@@ -1,10 +1,11 @@
 class Cdx::Api::Elasticsearch::NullQuery
-  def initialize(params)
+  def initialize(params, fields)
     @params = params
+    @result_name = fields.result_name
   end
 
   def execute
-    {"tests" => [], "total_count" => 0}
+    {@result_name => [], "total_count" => 0}
   end
 
   def grouped_by

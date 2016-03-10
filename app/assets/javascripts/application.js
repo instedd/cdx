@@ -14,19 +14,57 @@
 //= require jquery.turbolinks
 //= require jquery_ujs
 //= require jquery.are-you-sure
-//= require underscore
-//= require select2
+//= require urijs
+//= require lodash
+//= require polyfills
+//= require leaflet
+//= require Leaflet.Sleep
+//= require leaflet-control-geocoder
+//= require classnames
 //= require react
 //= require react_ujs
-//= require classnames
+//= require react-dom
+//= require react-autosuggest
 //= require react-input-autosize
 //= require react-select
+//= require react-leaflet
 //= require components
+//= require d3
+//= require jquery.custom-file-input
+//= require reflux
 //= require_tree .
+//= require turbolinks
+Turbolinks.enableProgressBar()
+
+// Configure leaflet
+L.Icon.Default.imagePath = '/assets'
+
+L.Map.mergeOptions({
+  sleep: true,
+  sleepTime: 500,
+  wakeTime: 750,
+  sleepNote: false,
+  hoverToWake: true,
+  sleepOpacity:.7
+});
+
+function cdx_init_components(dom) {
+  ReactRailsUJS.mountComponents(dom);
+}
+
+// Don't use $(document).ready so click handlers don't accumulate
+// and we end up firing multiple requests on each click.
+$(document).on("ready", function(){
+  $(document).on('click', '*[data-href]', function(event){
+    if (event.metaKey || event.shiftKey) {
+      window.open($(this).data('href'), '_blank');
+      return;
+    }
+    Turbolinks.visit($(this).data('href'));
+  });
+})
 
 $(document).ready(function(){
-  $('.ddown').ddslick();
-
   function setFilledClass(elem) {
     window.setTimeout(function(){
       if(elem.val().length > 0) {
@@ -45,9 +83,34 @@ $(document).ready(function(){
       setFilledClass($(this));
     });
 
-  $(document).on('click', '.row-href tr[data-href]', function(){
-    window.location.href = $(this).data('href');
+  $('form[data-auto-submit]').each(function(){
+    var form = $(this);
+    var payload = form.serialize();
+
+    var debouncedSubmit = _.debounce(function(){
+      var url = buildUrl(form);
+      Turbolinks.visit(url.toString(), {});
+    }, 2000);
+
+    var submitIfChanged = function() {
+      if (payload != form.serialize()) {
+        payload = form.serialize();
+        debouncedSubmit();
+      }
+    };
+
+    form.on('change', submitIfChanged);
+    form.on('keyup', 'input[type=text]', function(){
+      // defer the keyup event so the changes due to the pressed key occur.
+      window.setTimeout(submitIfChanged, 0);
+    });
   });
+
+  window.buildUrl = function(form) {
+    var action = form.attr('action') || window.location.href;
+    var url = action + (action.indexOf('?') === -1 ? '?' : '&') + form.serialize();
+    return url;
+  }
 
   $(document).on('click', '.tabs .tabs-header a:not(".selected")', function(event) {
     var target = $(event.target);
@@ -62,7 +125,7 @@ $(document).ready(function(){
       selectedDiv.addClass('loaded');
       $.get(target.attr('href'), function(data) {
         selectedDiv.html(data);
-        ReactRailsUJS.mountComponents(selectedDiv);
+        cdx_init_components(selectedDiv);
       });
     }
   });
@@ -96,4 +159,50 @@ $(document).ready(function(){
     });
   }
 
+  $(".institution-radio label").on('click', function() {
+      $(".institution-container").addClass('active');
+      position = $(window).scrollTop()
+      if (position < 180) {
+        $('html,body').animate({
+          scrollTop: position + (180 - position)
+        });
+      } else {
+        $('html,body').animate({
+          scrollTop: position - (position - 180)
+        });
+      }
+  });
+
+  var advancedTimeout = null;
+  $(".btn-toggle").click(function(){
+
+    // We want to set overflow visible after the expand animation has completed
+    var advanced = $(".advanced");
+    if (advanced.hasClass('show')) {
+      if (advancedTimeout) window.clearTimeout(advancedTimeout);
+      advanced.css('overflow', 'hidden');
+    } else {
+      advancedTimeout = window.setTimeout(function() { advanced.css('overflow', 'visible'); }, 500);
+    }
+
+    advanced.toggleClass('show');
+    $(this).toggleClass('up');
+    return false;
+  });
+
+
+  var flashn = $(".flash.flash_notice");
+
+  flashn.append( "<a class='close-notification'>x</a>" );
+
+  flashn.delay(3000).fadeOut(300);
+
+  $(".close-notification").click(function(){
+    flashn.hide();
+  });
+
+  $('body').on('keydown', 'textarea.resizeable', function(e){
+    var textarea = $(e.target);
+    textarea.css('height', 'auto').css('height', e.target.scrollHeight);
+  });
 });

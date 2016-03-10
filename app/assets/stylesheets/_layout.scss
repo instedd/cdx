@@ -13,6 +13,7 @@ body {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   height: 100%;
+  min-width: 1330px;
 }
 
 header {
@@ -37,7 +38,7 @@ header {
     nav {
       @include align-self(stretch);
       @include flex-grow(2);
-      text-align: center;
+      margin-left: 15px;
 
       ul {
         margin: 0;
@@ -49,9 +50,7 @@ header {
           margin: 0;
 
           &.active a {
-            background: $gray-xdark;
             color: $white;
-            font-weight: 700;
             height: 60px;
           }
         }
@@ -89,6 +88,8 @@ header {
     width: 100%;
     padding: 2px;
     position: absolute;
+    right: 0;
+    min-width: 150px;
     visibility: hidden;
     z-index: 1;
     transition: visibility 0.2s;
@@ -98,6 +99,7 @@ header {
       color: $gray-xdark;
       display: block;
       padding: 10px;
+      white-space: nowrap;
       &:hover {
         background: $white-light;
         color: $black;
@@ -128,6 +130,9 @@ footer {
   padding: 0.5em 1em;
 }
 
+// Devise ---------------------------------------------------------//
+
+
 .devise {
     background: $gray1;
   .content {
@@ -140,16 +145,43 @@ footer {
 .devise-box {
   background: $white;
   border-radius: 3px;
-  padding: 5px 15px;
+  padding: 25px;
   min-width: 440px;
 
   h1 {
     color: $black;
     margin: 0;
     padding: 0 0 25px 0;
+
+    & + p {
+      color: $gray3;
+    }
   }
 
   a {
     color: $blue;
   }
+}
+
+.message {
+  text-align: center;
+
+  h1 {
+    color: $black;
+
+    small {
+      font-family: $sans;
+      font-size: 50%;
+      display: block;
+    }
+  }
+}
+
+.content.row {
+  padding: 0;
+}
+
+#context_side_bar {
+  padding: 0;
+  display: none;
 }

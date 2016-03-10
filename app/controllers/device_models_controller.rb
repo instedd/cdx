@@ -2,20 +2,18 @@ class DeviceModelsController < ApplicationController
 
   include DeviceModelsHelper
 
-  before_filter :load_institutions
-
   before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
+    head :forbidden unless has_access_to_device_models_index?
   end
 
   def index
-    return head :forbidden unless can_index_device_models?
-
     @device_models = authorize_resource(DeviceModel, READ_DEVICE_MODEL) or return
-    @device_models = @device_models.includes(:manifest).includes(:institution)
+    @device_models = @device_models.includes(:manifest)
+    @device_models = @device_models.where(institution:  @navigation_context.institution)
 
     @updateable_device_model_ids  = check_access(DeviceModel, UPDATE_DEVICE_MODEL).pluck(:id)
     @publishable_device_model_ids = check_access(DeviceModel, PUBLISH_DEVICE_MODEL).pluck(:id)
+    @can_create = has_access?(@navigation_context.institution, REGISTER_INSTITUTION_DEVICE_MODEL)
   end
 
   def show
@@ -24,16 +22,16 @@ class DeviceModelsController < ApplicationController
   end
 
   def new
-    authorize_resource(Institution, REGISTER_INSTITUTION_DEVICE_MODEL) or return
-
     @device_model = DeviceModel.new
     @device_model.manifest = Manifest.new
-    @device_model.institution = @institutions.first if @institutions.one?
+
+    return unless prepare_for_institution_and_authorize(@device_model, REGISTER_INSTITUTION_DEVICE_MODEL)
   end
 
   def create
-    authorize_resource(Institution.find(device_model_create_params[:institution_id]), REGISTER_INSTITUTION_DEVICE_MODEL) or return
+    load_manifest_upload
     @device_model = DeviceModel.new(device_model_create_params)
+    return unless prepare_for_institution_and_authorize(@device_model, REGISTER_INSTITUTION_DEVICE_MODEL)
     set_published_status(@device_model)
 
     respond_to do |format|
@@ -42,6 +40,7 @@ class DeviceModelsController < ApplicationController
         format.json { render action: 'show', status: :created, device_model: @device_model }
       else
         @device_model.published_at = @device_model.published_at_was
+        @device_model.setup_instructions = nil
         format.html { render action: 'new' }
         format.json { render json: @device_model.errors, status: :unprocessable_entity }
       end
@@ -57,6 +56,7 @@ class DeviceModelsController < ApplicationController
     @device_model = (authorize_resource(@device_model, PUBLISH_DEVICE_MODEL) or return) if @device_model.published?
 
     set_published_status(@device_model)
+    load_manifest_upload
 
     respond_to do |format|
       if @device_model.update(device_model_update_params)
@@ -64,6 +64,7 @@ class DeviceModelsController < ApplicationController
         format.json { render action: 'show', status: :created, device_model: @device_model }
       else
         @device_model.published_at = @device_model.published_at_was
+        @device_model.setup_instructions = DeviceModel.find(params[:id]).setup_instructions
         format.html { render action: 'edit' }
         format.json { render json: @device_model.errors, status: :unprocessable_entity }
       end
@@ -92,23 +93,41 @@ class DeviceModelsController < ApplicationController
     end
   end
 
-  private
+  def manifest
+    @device_model = authorize_resource(DeviceModel.find(params[:id]), READ_DEVICE_MODEL) or return
+    @manifest = @device_model.current_manifest
 
-  def load_institutions
-    @institutions = authorize_resource(Institution, REGISTER_INSTITUTION_DEVICE_MODEL)
+    send_data @manifest.definition, type: :json, disposition: "attachment", filename: @manifest.filename
   end
 
+  private
+
+  CREATE_PARAMS = [:institution_id]
+  UPDATE_PARAMS = [:name, :picture, :delete_picture, :setup_instructions, :delete_setup_instructions, :supports_ftp, :filename_pattern, :supports_activation, :support_url, manifest_attributes: [:definition]]
+
   def device_model_create_params
-    params.require(:device_model).permit(:name, :institution_id, :supports_activation, manifest_attributes: [:definition])
+    params.require(:device_model).permit(*(UPDATE_PARAMS + CREATE_PARAMS))
   end
 
   def device_model_update_params
-    params.require(:device_model).permit(:name, :supports_activation, manifest_attributes: [:definition])
+    params.require(:device_model).permit(*UPDATE_PARAMS)
   end
 
   def set_published_status(device_model)
     device_model.set_published_at   if params[:publish]   && can_publish_device_model?(device_model)
     device_model.unset_published_at if params[:unpublish] && can_unpublish_device_model?(device_model)
+  end
+
+  def load_manifest_upload
+    if params[:device_model][:manifest_attributes] && params[:device_model][:manifest_attributes][:definition]
+      # this is for testing. specs had String manifest. It should be migrated to temp file and fixture_file_upload
+      unless params[:device_model][:manifest_attributes][:definition].is_a?(String)
+        params[:device_model][:manifest_attributes][:definition] = params[:device_model][:manifest_attributes][:definition].read
+      end
+    else
+      params[:device_model][:manifest_attributes] ||= {}
+      params[:device_model][:manifest_attributes][:definition] = @device_model.try { |dm| dm.current_manifest.definition }
+    end
   end
 
 end

@@ -21,29 +21,68 @@
 #   a) a filter with the same name
 #   b) a grouping with the name of '#{default_name}_admin_level'
 
-- name: test.start_time
-  filter_parameter_definition:
-    - name: since
-      type: range
-      boundary: from
-      options:
-        include_lower: true
-    - name: until
-      type: range
-      boundary: to
-      options:
-        include_lower: true
-- name: test.id
-  group_parameter_definition: none
-- name: test.uuid
-  filter_parameter_definition:
-    - type: match
-  group_parameter_definition: none
-- name: location.parents
-  filter_parameter_definition:
-    - name: location
-      type: match
-- name: location.admin_levels
-  group_parameter_definition:
-    - name: admin_level
-      type: location
+#    - name: test.assays.quantitative_result
+#      filter_parameter_definition:
+#        - include_default: true
+#        - name: test.assays.quantitative_result.min
+#          type: range-integer
+#          boundary: gte
+#        - name: test.assays.quantitative_result.max
+#          type: range-integer
+#          boundary: lte
+
+test:
+  - name: test.error_code
+    filter_parameter_definition:
+      - include_default: true
+      - name: test.error_code.min
+        type: range-integer
+        boundary: gte
+      - name: test.error_code.max
+        type: range-integer
+        boundary: lte
+  - name: test.start_time
+    filter_parameter_definition:
+      - name: since
+        type: range
+        boundary: from
+        options:
+          include_lower: true
+      - name: until
+        type: range
+        boundary: to
+        options:
+          include_lower: true
+  - name: test.id
+    group_parameter_definition: none
+  - name: test.uuid
+    filter_parameter_definition:
+      - type: match
+    group_parameter_definition: none
+  - name: location.parents
+    filter_parameter_definition:
+      - name: location
+        type: match
+  - name: location.admin_levels
+    group_parameter_definition:
+      - name: admin_level
+        type: location
+encounter:
+  - name: encounter.start_time
+    filter_parameter_definition:
+      - name: since
+        type: range
+        boundary: from
+        options:
+          include_lower: true
+      - name: until
+        type: range
+        boundary: to
+        options:
+          include_lower: true
+  - name: encounter.id
+    group_parameter_definition: none
+  - name: encounter.uuid
+    filter_parameter_definition:
+      - type: match
+    group_parameter_definition: none

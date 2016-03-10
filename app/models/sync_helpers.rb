@@ -12,15 +12,11 @@ module SyncHelpers
       end
     end
 
-    def client_id(device)
-      device.uuid
-    end
-
     def to_client(device, public_key)
-      CDXSync::Client.new(client_id(device), public_key)
+      CDXSync::Client.new(device.uuid, public_key)
     end
 
-    def client_settings(client_id, device_uuid, device_secret_key)
+    def client_settings(device_uuid, device_secret_key)
       dir = CDXSync::SyncDirectory.new
       {
         host: Rails.application.config.ssh_server_host,

@@ -1,0 +1,23 @@
+%h1= "Setup instructions for #{@device.name}"
+
+%p
+  Please, contact the administrator for the
+  - if @device.device_model.supports_activation?
+    %b activation code
+  - else
+    %b secret key
+
+- if !@device.device_model.supports_activation?
+  %h2 Device Id
+  %p= @device.uuid
+  = image_tag attachments['device_id.png'].url
+
+- if @device.device_model.support_url.present?
+  %p
+    Online support
+    = link_to @device.device_model.support_url, @device.device_model.support_url
+
+- if @device.device_model.setup_instructions.present?
+  %p
+    Download instructions as a
+    = link_to "pdf file", absolute_url(@device.device_model.setup_instructions.url)

@@ -1,0 +1,18 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            - if @can_create
+              = link_to "+", new_site_path, class: 'btn-add side-link fix', title: 'Add Site'
+            Sites
+      %form#filters-form{action: sites_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
+        .row
+          .filter
+            %label.block Name
+            %input{type: "text", name: "name", value: params["name"]}
+          .filter
+            %label.block Location
+            = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"]

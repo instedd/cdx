@@ -1,0 +1,5 @@
+.alert-container
+  .alert.alert-error
+    %ul
+      - model.errors.full_messages.each do |msg|
+        %li= msg

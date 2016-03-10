@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "version" : "0.0.10",
-    "api_version" : "1.4.0",
+    "api_version" : "1.5.0",
     "signature" : "",
     "conditions": ["mtb", "rif", "inh"],
     "source": { "type" : "csv", "separator" : ";" }
@@ -35,7 +35,7 @@
         }
       ]
     },
-    "test.patient_age" : {
+    "encounter.patient_age" : {
       "if" : [
         {"equals" : [{"lookup" : "Birthday"}, "n.a."]},
         null,
@@ -67,7 +67,15 @@
         ]
       ]
     },
-    "sample.id" : {"lookup" : "SampleNo."},
+    "sample.id" : {
+      "case" : [
+        {"lookup" : "SampleNo."},
+        [
+          {"when": "n.a.", "then" : null},
+          {"when": "*", "then" : {"lookup" : "SampleNo."}}
+        ]
+      ]
+    },
     "test.start_time" : {
       "parse_date" : [
           {"lookup" : "DateOfAnalysis"},
@@ -76,13 +84,7 @@
     },
     "test.site_user" : {"lookup" : "WindowsUser"},
     "test.name" : {"lookup" : "TypeOfTest"},
-    "test.assays.condition" : {
-      "script" : "['mtb', 'rif', 'inh']"
-    },
-    "test.assays.name" : {
-      "script" : "['mtb', 'rif', 'inh']"
-    },
-    "test.assays.result" : {
+    "test.assays" : {
       "script" : "
         if(message['Result'].match(/.*tuberculosis.*/)){
           mtb = 'positive'
@@ -99,8 +101,26 @@
         } else {
           inh = 'negative'
         };
-        [mtb, rif, inh]"
+        [
+          {
+            'condition' : 'mtb',
+            'name' : 'mtb',
+            'result' : mtb
+          },
+          {
+            'condition' : 'rif',
+            'name' : 'rif',
+            'result' : rif
+          },
+          {
+            'condition' : 'inh',
+            'name' : 'inh',
+            'result' : inh
+          }
+        ]
+      "
     },
+    "test.status" : "success",
     "test.type" : {
       "case" : [
         {"lookup" : "Strip-Type"},

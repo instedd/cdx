@@ -1,0 +1,63 @@
+.row
+  .col
+    .row
+      .col.pe-4
+        = label_tag :institution
+      .col
+        .value= @site.institution.name
+
+    .row
+      .col.pe-4
+        = label_tag :name
+      .col
+        .value= @site.name
+
+    - if @site.parent && !@can_edit_parent
+      .row
+        .col.pe-4
+          = label_tag :parent
+        .col
+          .value= @site.parent.name
+    - elsif @can_edit_parent
+      = form_for(@site) do |f|
+        = validation_errors @site
+        .row
+          .col.pe-4
+            = label_tag :parent
+          .col
+            = cdx_select form: f, name: :parent_id, class: 'input-x-large' do |select|
+              - select.item "", "None"
+              - select.items @sites, :id, :name
+  .col
+    = render 'side'
+
+.row
+  .col.pe-2
+    = label_tag :address
+  .col
+    .value= @site.address
+.row
+  .col.pe-2
+    = label_tag :region
+  .col
+    .value
+      = react_component "LocationLabel", id: @site.location_geoid
+.row
+  .col.pe-2
+  .col.pe-8
+    = react_component "NonEditableMap", position:[@site.lat, @site.lng], zoom:12
+.row
+  .col.pe-2
+    = label_tag :sample_id_reset_policy, "Sample ID reset policy"
+  .col
+    .value= @site.sample_id_reset_policy
+.row
+  .col.pe-2
+    = label_tag :main_phone_number
+  .col
+    .value= @site.main_phone_number
+.row
+  .col.pe-2
+    = label_tag :email_address
+  .col
+    .value= @site.email_address

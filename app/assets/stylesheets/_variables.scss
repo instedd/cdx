@@ -2,33 +2,42 @@
 // COLOURS
 // =============================================================================
 
-  $white: rgb(255,255,255);
-  $white-light: rgb(248,248,248);
-  $white-dark: rgb(204,204,204);
-  $gray-dark: rgb(64,64,64);
-  $gray-xdark: rgb(48,48,48);
+$white: rgb(255,255,255);
+$white-light: rgb(248,248,248);
+$white-dark: rgb(204,204,204);
+$white-translucent: rgba(255,255,255,.1);
+$gray-dark: rgb(64,64,64);
+$gray-xdark: rgb(48,48,48);
+$gray-medium: rgb(153,153,153);
+$gray-light: rgb(200,200,200);
 
-  $blue: rgba(33,150,243,1);
-  $red: rgba(238,43,36,1);
+$blue: rgba(33,150,243,1);
+$red: rgba(238,43,36,1);
+$orange: rgba(255,165,0,1);
 
-  $black: rgba(0,0,0,1);
-  $gray4: rgba(0,0,0,.75);
-  $gray3: rgba(0,0,0,.4);
-  $gray2: rgba(0,0,0,.2);
-  $gray1: rgba(0,0,0,.1);
+$black: rgba(0,0,0,1);
+$gray5: rgba(0,0,0,.81);
+$gray4: rgba(0,0,0,.75);
+$gray3: rgba(0,0,0,.4);
+$gray2: rgba(0,0,0,.2);
+$gray1: rgba(0,0,0,.1);
 
 
 // =============================================================================
 // OTHERS
 // =============================================================================
-  $col-padd: 10px;
+$col-padd: 10px;
 
+$icons-20x20-black:          "icons-20x20-black.png";
+$icons-20x20-blue:           "icons-20x20-blue.png";
+$icons-20x20-white:           "icons-20x20-white.png";
+$icons-140x140-black:        "icons-140x140-black.png";
 
 
 // =============================================================================
 // FONTS
 // =============================================================================
-  @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,700);
-  @import url(http://fonts.googleapis.com/css?family=Titillium+Web:400,300,700);
-  $sans: 'Open Sans', sans-serif;
-  $sanstitle: 'Titillium Web', sans-serif;
+@import url(//fonts.googleapis.com/css?family=Open+Sans:400,300,700);
+@import url(//fonts.googleapis.com/css?family=Titillium+Web:400,300,700);
+$sans: 'Open Sans', sans-serif;
+$sanstitle: 'Titillium Web', sans-serif;

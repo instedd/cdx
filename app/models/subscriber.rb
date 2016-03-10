@@ -42,7 +42,7 @@ class Subscriber < ActiveRecord::Base
     # Sub fields, like in the case of `test.assays.result`, are
     # not returned: only the field of `test.assays` is.
     fields = []
-    Cdx.core_fields.each do |field|
+    Cdx::Fields.test.core_fields.each do |field|
       if field.scope.is_a?(Cdx::Field::NestedField)
         fields << field.scope
       else
@@ -84,7 +84,7 @@ class Subscriber < ActiveRecord::Base
   end
 
   def filter_test(indexed_test, fields)
-    test = TestResult.includes(:sample, :device, :institution).find_by_uuid(indexed_test["test"]["uuid"])
+    test = TestResult.includes(:device, :institution).includes(sample_identifier: :sample).find_by_uuid(indexed_test["test"]["uuid"])
     merged_test = indexed_test.deep_merge(test.entity_scope => test.plain_sensitive_data)
     merged_test = merged_test.deep_merge(test.sample.entity_scope => test.sample.plain_sensitive_data) if test.sample
     fields = Subscriber.available_field_names if fields.nil? || fields.empty? # use all fields if none is specified

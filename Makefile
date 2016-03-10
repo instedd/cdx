@@ -16,5 +16,5 @@ public/nndd:
 	docker run --rm \
 		-v $(shell pwd)/public/nndd:/nndd/dist/nndd \
 		-v $(shell pwd)/etc/nndd/settings.local.json:/nndd/conf/settings.local.json \
-		-v $(shell pwd)/etc/nndd/custom.local.scss:/nndd/conf/custom.local.scss \
+		-v $(shell pwd)/etc/nndd/main.local.css:/nndd/conf/main.local.css \
 		instedd/nndd-builder

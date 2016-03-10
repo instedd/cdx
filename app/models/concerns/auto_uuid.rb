@@ -2,7 +2,7 @@ module AutoUUID
   extend ActiveSupport::Concern
 
   included do
-    before_create :generate_uuid
+    after_initialize :generate_uuid
   end
 
 private

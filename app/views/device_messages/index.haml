@@ -1,25 +1,49 @@
+= render "filters"
+
 .row
   .col
-    %table.table
-      %tr
-        %th.tableheader{colspan:100} #{@device.name} - Device Messages
-      %tr
-        %th Created at
-        %th Status
-        %th Error Description
-        %th Error Record Index
-        %th Error Field
-        %th Raw message
-      - @messages.each do |message|
-        %tr
-          %td= message.created_at.in_time_zone(@device.time_zone).strftime('%Y-%m-%d %H:%M:%S')
-          %td
-            - if message.index_failed
-              Failed
-              = link_to '(reprocess)', reprocess_device_device_message_path(@device, message), method: 'post'
-            - else
-              Success
-          %td= message.index_failure_reason
-          %td= message.index_failure_data[:record_index]
-          %td= message.index_failure_data[:target_field]
-          %td= link_to 'Download', raw_device_device_message_path(@device, message)
+    - if @messages.empty?
+      = empty_data icon: 'icon-outline-instructions xx-large' do |c|
+        - c.body do
+          %h1 There are no logs to report at this time
+          %p Connect a device and upload tests to see the progress here
+    - else
+      = cdx_table title: pluralize(@messages.count, "message") do |t|
+        - t.columns do
+          %col{:width => "10%"}
+          %col{:width => "25%"}
+          %col{:width => "10%"}
+          %col{:width => "10%"}
+          %col{:width => "10%"}
+          %col{:width => "10%"}
+          %col{:width => "15%"}
+          %col{:width => "10%"}
+        - t.thead do
+          %tr
+            %th Status
+            %th Message
+            %th Model
+            %th Device
+            %th Failures
+            %th Error Field
+            %th Date
+            %th Raw
+        - t.tbody do
+          - @messages.each do |message|
+            %tr
+              %td
+                - if message.index_failed
+                  Failed
+                  = link_to '(reprocess)', reprocess_device_message_path(message), method: 'post'
+                - else
+                  Success
+              %td= message.index_failure_reason
+              %td= message.device.device_model.name
+              %td= message.device.name
+              %td= message.index_failure_data[:number_of_failures]
+              %td= message.index_failure_data[:target_field]
+              %td= format_datetime(message.created_at.in_time_zone(message.device.time_zone))
+              %td= link_to 'Download', raw_device_message_path(message)
+
+      .pagination
+        = render 'shared/pagination'

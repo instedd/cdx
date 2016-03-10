@@ -1,42 +1,59 @@
 class DevicesController < ApplicationController
-  require 'barby'
-  require 'barby/barcode/code_93'
-  require 'barby/outputter/html_outputter'
-
-  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings]
-  before_filter :load_institutions, only: [:new, :create, :edit, :update]
+  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models, :sites, :setup, :performance]
+  before_filter :load_institutions, only: [:new, :create, :edit, :update, :device_models]
   before_filter :load_sites, only: [:new, :create, :edit, :update]
-  before_filter :load_institution, only: :create
-  before_filter :load_device_models_for_create, only: [:new, :create]
+  before_filter :load_device_models_for_create, only: [:index, :new, :create]
   before_filter :load_device_models_for_update, only: [:edit, :update]
   before_filter :load_filter_resources, only: :index
 
   before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
+    head :forbidden unless has_access_to_devices_index?
   end
 
   def index
-    return head :forbidden unless can_index_devices?
+    @devices = check_access(Device, READ_DEVICE).joins(:device_model).includes(:site, :institution, device_model: :institution)
+    @devices = @devices.within(@navigation_context.entity, @navigation_context.exclude_subsites)
+    @manufacturers = Institution.where(id: @devices.select('device_models.institution_id'))
 
-    @devices = check_access(Device, READ_DEVICE)
+    @devices = @devices.where(device_models: { institution_id: params[:manufacturer].to_i}) if params[:manufacturer].presence
+    @devices = @devices.where(device_model: params[:device_model].to_i) if params[:device_model].present?
 
-    @devices = @devices.where(institution_id: params[:institution].to_i) if params[:institution].presence
-    @devices = @devices.where(site_id:  params[:site].to_i)  if params[:site].presence
+    @page_size = (params["page_size"] || 10).to_i
+    @page = (params["page"] || 1).to_i
+    offset = (@page - 1) * @page_size
+
+    @total = @devices.count
+
+    @devices = @devices.limit(@page_size).offset(offset)
 
     @can_create = has_access?(Institution, REGISTER_INSTITUTION_DEVICE)
     @devices_to_read = check_access(Device, READ_DEVICE).pluck(:id)
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        @filename = "Devices-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        @streaming = true
+      end
+    end
   end
 
   def new
     @device = Device.new
+    @device.time_zone = "UTC"
+    @device.site = check_access(@navigation_context.site, ASSIGN_DEVICE_SITE) if @navigation_context.site
+    @device.site = @sites[0] if !@allow_to_pick_site && @sites.count == 1
     return unless prepare_for_institution_and_authorize(@device, REGISTER_INSTITUTION_DEVICE)
   end
 
   def create
-    return unless authorize_resource(@institution, REGISTER_INSTITUTION_DEVICE)
-
-    @device = @institution.devices.new(device_params)
-    if @device.device_model.supports_activation?
+    @device = Device.new(device_params)
+    @institution = @navigation_context.institution
+    if @institution
+      return unless authorize_resource(@institution, READ_INSTITUTION)
+    end
+    @device.institution = @institution
+    if @device.device_model.try(&:supports_activation?)
       @device.new_activation_token
     end
 
@@ -57,15 +74,16 @@ class DevicesController < ApplicationController
   end
 
   def show
-    @device = Device.find(params[:id])
+    @device = Device.with_deleted.find(params[:id])
     return unless authorize_resource(@device, READ_DEVICE)
     redirect_to setup_device_path(@device) unless @device.activated?
 
+    @can_edit = has_access?(@device, UPDATE_DEVICE)
     @show_institution = show_institution?(Policy::Actions::READ_DEVICE, Device)
   end
 
   def setup
-    @device = Device.find(params[:id])
+    @device = Device.with_deleted.find(params[:id])
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     unless @device.secret_key_hash?
@@ -83,9 +101,10 @@ class DevicesController < ApplicationController
   def edit
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
+    @sites = @sites.where(institution_id: @device.institution_id)
+
     @uuid_barcode = Barby::Code93.new(@device.uuid)
     @uuid_barcode_for_html = Barby::HtmlOutputter.new(@uuid_barcode)
-    # TODO: check valid sites
     @can_regenerate_key = has_access?(@device, REGENERATE_DEVICE_KEY)
     @can_generate_activation_token = has_access?(@device, GENERATE_ACTIVATION_TOKEN)
     @can_delete = has_access?(@device, DELETE_DEVICE)
@@ -93,6 +112,7 @@ class DevicesController < ApplicationController
   end
 
   def update
+    # TODO should validate that selected site, if changed is among @sites (due to ASSIGN_DEVICE_SITE)
     return unless authorize_resource(@device, UPDATE_DEVICE)
 
     respond_to do |format|
@@ -138,14 +158,23 @@ class DevicesController < ApplicationController
 
     @token = @device.new_activation_token
     respond_to do |format|
-      if @token.save
+      if @device.save
         format.js
-        format.json { render action: 'show', location: @device }
+        format.json { render json: @token }
       else
         format.js
-        format.json { render json: @token.errors, status: :unprocessable_entity }
+        format.json { render json: @device.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def send_setup_email
+    recipient = params[:recipient]
+
+    DeviceMailer.setup_instructions(current_user, recipient, @device).deliver_now
+    flash[:notice] = "Setup instructions sent to #{recipient}"
+
+    render json: {status: :ok}
   end
 
   def request_client_logs
@@ -174,7 +203,16 @@ class DevicesController < ApplicationController
   end
 
   def performance
-    render layout: false
+    @device = Device.with_deleted.find(params[:id])
+    return unless authorize_resource(@device, READ_DEVICE)
+    since = (Date.today - 1.year).iso8601
+
+    @tests_histogram = query_tests_histogram
+    @tests_by_name = query_tests_by_name
+    @errors_histogram, @error_users = query_errors_histogram
+    @errors_by_code = query_errors_by_code
+
+    render layout: false if request.xhr?
   end
 
   def tests
@@ -187,18 +225,15 @@ class DevicesController < ApplicationController
 
   private
 
-  def load_institution
-    @institution = Institution.find params[:device][:institution_id]
-    authorize_resource(@institution, READ_INSTITUTION)
-  end
-
   def load_institutions
+    # TODO FIX at :index @institutions should be institutions of devices that can be read
     @institutions = check_access(Institution, REGISTER_INSTITUTION_DEVICE)
   end
 
   def load_sites
-    @sites = check_access(Site, ASSIGN_DEVICE_SITE)
+    @sites = check_access(@navigation_context.institution.sites, ASSIGN_DEVICE_SITE)
     @sites ||= []
+    @allow_to_pick_site = @sites.count > 1 || check_access(@navigation_context.institution, CREATE_INSTITUTION_SITE)
   end
 
   def load_filter_resources
@@ -212,7 +247,7 @@ class DevicesController < ApplicationController
   def load_device_models_for_create
     gon.device_models = @device_models = \
       (DeviceModel.includes(:institution).published.to_a + \
-       DeviceModel.includes(:institution).unpublished.where(institution_id: @institutions.map(&:id)).to_a)
+       DeviceModel.includes(:institution).unpublished.where(institution_id: @navigation_context.institution.id).to_a)
   end
 
   def load_device_models_for_update
@@ -222,10 +257,106 @@ class DevicesController < ApplicationController
   end
 
   def device_params
-    params.require(:device).permit(:name, :serial_number, :device_model_id, :time_zone, :site_id).tap do |whitelisted|
+    params.require(:device).permit(:name, :serial_number, :device_model_id, :time_zone, :site_id, :ftp_hostname, :ftp_port, :ftp_username, :ftp_password, :ftp_directory).tap do |whitelisted|
       if custom_mappings = params[:device][:custom_mappings]
         whitelisted[:custom_mappings] = custom_mappings.select { |k, v| v.present? }
       end
     end
   end
+
+  def query_tests_histogram
+    query = default_performance_query_options.merge({
+      "group_by" => "month(test.reported_time)",
+    })
+    result = TestResult.query(query, current_user).execute
+    result = Hash[result["tests"].map { |i| [i["test.reported_time"], i["count"]] }]
+
+    tests_histogram = []
+    11.downto(0).each do |i|
+      date = Date.today - i.months
+      date_key = date.strftime("%Y-%m")
+      tests_histogram << {
+        label: "#{I18n.t("date.abbr_month_names")[date.month]}#{date.month == 1 ? " #{date.strftime("%y")}" : ""}",
+        values: [result[date_key] || 0]
+      }
+    end
+    tests_histogram
+  end
+
+  def query_errors_histogram
+    query = default_performance_query_options.merge({
+      "test.status" => "error",
+      "group_by" => "month(test.reported_time),test.site_user",
+    })
+    result = TestResult.query(query, current_user).execute
+    users = result["tests"].index_by { |t| t["test.site_user"] }.keys
+    results_by_day = result["tests"].group_by { |t| t["test.reported_time"] }
+
+    errors_histogram = []
+    11.downto(0).each do |i|
+      date = Date.today - i.months
+      date_key = date.strftime("%Y-%m")
+      date_results = results_by_day[date_key].try { |r| r.index_by { |t| t["test.site_user"] } }
+      errors_histogram << {
+        label: "#{I18n.t("date.abbr_month_names")[date.month]}#{date.month == 1 ? " #{date.strftime("%y")}" : ""}",
+        values: users.map do |u|
+          user_result = date_results && date_results[u]
+          user_result ? user_result["count"] : 0
+        end
+      }
+    end
+    return errors_histogram, users
+  end
+
+  def query_errors_by_code
+    query = default_performance_query_options.merge({
+      "test.status" => "error",
+    })
+    total_count = TestResult.query(query, current_user).execute["total_count"]
+    no_error_code = total_count
+
+    query = default_performance_query_options.merge({
+      "test.status" => "error",
+      "group_by" => "test.error_code",
+    })
+    result = TestResult.query(query, current_user).execute
+    pie_data = result["tests"].map do |test|
+      no_error_code -= test["count"]
+
+      {
+        label: test["test.error_code"],
+        value: test["count"]
+      }
+    end
+
+    pie_data << {label: 'Unknown', value: no_error_code} if no_error_code > 0
+
+    pie_data
+  end
+
+  def query_tests_by_name
+    query = default_performance_query_options.merge({
+      "group_by" => "test.name",
+    })
+    result = TestResult.query(query, current_user).execute
+    result["tests"].map do |test|
+      {
+        label: test["test.name"],
+        value: test["count"]
+      }
+    end
+  end
+
+  def default_performance_query_options
+    {
+      "since" => (Date.today - 1.year).iso8601,
+      "device.uuid" => @device.uuid,
+      # TODO post mvp: should generate list of all types but qc, or support query by !=
+      "test.type" => "specimen"
+    }.tap do |h|
+      # display only test results of the current site of the device
+      h["site.uuid"] = @device.site.uuid if @device.site
+    end
+  end
+
 end

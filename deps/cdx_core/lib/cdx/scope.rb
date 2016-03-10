@@ -1,7 +1,7 @@
 class Cdx::Scope
   attr_accessor :name, :fields
 
-  def initialize name, definition
+  def initialize(name, definition)
     @name = name
     @definition = definition
     @fields = @definition['fields'].map do |name, definition|
@@ -22,7 +22,15 @@ class Cdx::Scope
   end
 
   def searchable?
-    fields.any? &:searchable?
+    fields.any?(&:searchable?)
+  end
+
+  def inside_nested?
+    false
+  end
+
+  def nested?
+    false
   end
 
   def root_scope

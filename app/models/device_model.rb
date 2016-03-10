@@ -14,10 +14,25 @@ class DeviceModel < ActiveRecord::Base
 
   validates_uniqueness_of :name
 
+  validates_presence_of :filename_pattern, if: :supports_ftp
+  validate :valid_filename_pattern
+
   accepts_nested_attributes_for :manifest
 
   #This is kept for forward compatibility (we will have multiple manifests, published and unpublished)
   alias_method :current_manifest, :manifest
+
+  has_attached_file :picture, styles: { card: "180x180>" }, default_url: "card-unkown.png"
+  validates_attachment_content_type :picture, content_type: /\Aimage\/.*\Z/
+  attr_accessor :delete_picture
+  attr_accessor :picture_content_type
+  before_validation { picture.clear if delete_picture == '1' }
+
+  has_attached_file :setup_instructions
+  validates_attachment_content_type :setup_instructions, :content_type =>['application/pdf'], message: 'must be a pdf file'
+  attr_accessor :delete_setup_instructions
+  attr_accessor :setup_instructions_content_type
+  before_validation { setup_instructions.clear if delete_setup_instructions == '1' }
 
   def full_name
     if institution
@@ -48,4 +63,13 @@ class DeviceModel < ActiveRecord::Base
     devices.each(&:destroy_cascade!)
     devices(true) # Reload devices relation so destroy:restrict does not prevent the record from being destroyed
   end
+
+  def valid_filename_pattern
+    return if filename_pattern.blank?
+    regex = Regexp.new(filename_pattern)
+    errors.add(:filename_pattern, "must capture device serial number as 'sn', for example: (?<sn>[A-Z0-9]+).*\\.csv") unless regex.names.include?('sn')
+  rescue RegexpError => ex
+    errors.add(:filename_pattern, "must be a valid pattern (#{ex.message})")
+  end
+
 end

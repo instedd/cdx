@@ -1,5 +1,6 @@
 class DeviceMessage < ActiveRecord::Base
   belongs_to :device
+  belongs_to :site
   has_one :institution, through: :device
   has_and_belongs_to_many :test_results
 
@@ -7,10 +8,23 @@ class DeviceMessage < ActiveRecord::Base
 
   before_save :parsed_messages
   before_save :encrypt
+  before_create :copy_site_from_device
 
   store :index_failure_data, coder: JSON
 
   attr_writer :plain_text_data
+
+  scope :within, -> (institution_or_site, exclude_subsites = false) {
+    if institution_or_site.is_a?(Institution) && exclude_subsites
+      joins(:device).where("devices.institution_id = ? AND devices.site_id IS NULL", institution_or_site.id)
+    elsif institution_or_site.is_a?(Institution) && !exclude_subsites
+      joins(:device).where("devices.institution_id = ?", institution_or_site.id)
+    elsif institution_or_site.is_a?(Site) && exclude_subsites
+      joins(:device).where("devices.site_id = ?", institution_or_site.id)
+    else
+      joins(:device).where("devices.site_prefix LIKE concat(?, '%')", institution_or_site.prefix)
+    end
+  }
 
   def plain_text_data
     @plain_text_data ||= MessageEncryption.decrypt self.raw_data
@@ -21,7 +35,7 @@ class DeviceMessage < ActiveRecord::Base
   rescue ManifestParsingError => err
     self.record_failure err
     self.index_failure_data[:target_field] = err.target_field if err.target_field.present?
-    self.index_failure_data[:record_index] = err.record_index if err.record_index.present?
+    self.index_failure_data[:number_of_failures] = err.number_of_failures if err.number_of_failures.present?
   rescue => err
     self.record_failure err
   end
@@ -33,6 +47,9 @@ class DeviceMessage < ActiveRecord::Base
 
   def process
     DeviceMessageProcessor.new(self).process
+  rescue => e
+    self.record_failure e
+    self.save
   end
 
   def encrypt
@@ -53,5 +70,9 @@ class DeviceMessage < ActiveRecord::Base
     self.index_failed = false
     self.index_failure_reason = nil
     self.index_failure_data = {}
+  end
+
+  def copy_site_from_device
+    self.site = self.device.site
   end
 end

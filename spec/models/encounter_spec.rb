@@ -5,109 +5,284 @@ describe Encounter do
 
   let(:encounter) { Encounter.make }
 
-  it "adds all test_results of sample" do
-    sample = Sample.make
-    test1 = TestResult.make(sample: sample)
-    test2 = TestResult.make(sample: sample)
-
-    encounter.samples << sample
-
-    expect(encounter.test_results).to eq([test1, test2])
+  it "#human_diagnose" do
+    encounter.core_fields[Encounter::ASSAYS_FIELD] = [{"condition" => "flu_a", "name" => "flu_a", "result" => "positive", "quantitative_result" => nil}]
+    encounter.human_diagnose.should eq("FLU_A detected.")
   end
 
-  it "adds the sample of the test_result and the rest of the test_results" do
-    sample = Sample.make
-    test1 = TestResult.make(sample: sample)
-    test2 = TestResult.make(sample: sample)
+  describe "merge assays" do
+    def merge(a, b)
+      Encounter.merge_assays(a, b)
+    end
 
-    encounter.test_results << test1
+    it "merge nils" do
+      expect(merge(nil, nil)).to be_nil
+    end
 
-    expect(encounter.samples).to eq([sample])
-    expect(encounter.test_results).to eq([test1, test2])
+    it "merge nil with empty" do
+      expect(merge(nil, [])).to eq([])
+      expect(merge([], nil)).to eq([])
+    end
+
+    it "merge by condition preserving value if equal" do
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "a", "result" => "positive"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}])
+    end
+
+    it "merge disjoint assays" do
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "b", "result" => "negative"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}, {"condition" => "b", "result" => "negative"}])
+    end
+
+    it "merge with conflicts produce indeterminate" do
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "a", "result" => "negative"}]))
+        .to eq([{"condition" => "a", "result" => "indeterminate"}])
+    end
+
+    it "merge other properties priorizing first assay" do
+      expect(merge([{"condition" => "a", "foo" => "foo", "other" => "first"}], [{"condition" => "a", "bar" => "bar", "other" => "second"}]))
+        .to eq([{"condition" => "a", "foo" => "foo", "bar" => "bar", "other" => "first"}])
+    end
+
+    def merge_values(a, b)
+      merge([{"condition" => "a", "result" => a}], [{"condition" => "a", "result" => b}]).first["result"]
+    end
+
+    it "merge n/a n/a" do
+      expect(merge_values("n/a", "n/a")).to eq("n/a")
+    end
+
+    it "merge with same" do
+      expect(merge_values("any", "any")).to eq("any")
+    end
+
+    it "merge with different" do
+      expect(merge_values("any", "other")).to eq("indeterminate")
+    end
+
+    it "merge with n/a" do
+      expect(merge_values("any", "n/a")).to eq("any")
+      expect(merge_values("n/a", "any")).to eq("any")
+    end
+
+    it "merges with indeterminate" do
+      expect(merge_values("any", "indeterminate")).to eq("any")
+      expect(merge_values("indeterminate", "any")).to eq("any")
+    end
+
+    it "merges with n/a with indeterminate" do
+      expect(merge_values("n/a", "indeterminate")).to eq("n/a")
+      expect(merge_values("indeterminate", "n/a")).to eq("n/a")
+    end
+
+    it "merge with nil" do
+      expect(merge_values("any", nil)).to eq("any")
+      expect(merge_values(nil, "any")).to eq("any")
+    end
   end
 
-  it "adds single test_result (without sample)" do
-    test1 = TestResult.make(sample: nil)
+  describe "merge assays without values" do
+    def merge(a, b)
+      Encounter.merge_assays_without_values(a, b)
+    end
 
-    encounter.test_results << test1
+    it "merge nils" do
+      expect(merge(nil, nil)).to be_nil
+    end
 
-    expect(encounter.samples).to eq([])
-    expect(encounter.test_results).to eq([test1])
+    it "merge nil with empty" do
+      expect(merge(nil, [])).to eq([])
+      expect(merge([], nil)).to eq([])
+    end
+
+    it "merge by condition preserving original value if equal" do
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "a", "result" => "positive"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}])
+    end
+
+    it "merge disjoint assays" do
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "b", "result" => "negative"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}, {"condition" => "b", "result" => nil}])
+    end
+
+    it "merge with conflicts produce keeps original" do
+      expect(merge([{"condition" => "a", "result" => "positive"}], [{"condition" => "a", "result" => "negative"}]))
+        .to eq([{"condition" => "a", "result" => "positive"}])
+    end
+
+    it "merge other properties priorizing first assay" do
+      expect(merge([{"condition" => "a", "foo" => "foo", "other" => "first"}], [{"condition" => "a", "bar" => "bar", "other" => "second"}]))
+        .to eq([{"condition" => "a", "foo" => "foo", "other" => "first"}])
+    end
+
+    def merge_values(a, b)
+      merge([{"condition" => "a", "result" => a}], [{"condition" => "a", "result" => b}]).first["result"]
+    end
+
+    it "merge n/a n/a" do
+      expect(merge_values("n/a", "n/a")).to eq("n/a")
+    end
+
+    it "merge with same" do
+      expect(merge_values("any", "any")).to eq("any")
+    end
+
+    it "merge with different" do
+      expect(merge_values("any", "other")).to eq("any")
+    end
+
+    it "merge with n/a" do
+      expect(merge_values("any", "n/a")).to eq("any")
+      expect(merge_values("n/a", "any")).to eq("n/a")
+    end
+
+    it "merge with nil" do
+      expect(merge_values("any", nil)).to eq("any")
+      expect(merge_values(nil, "any")).to eq(nil)
+    end
   end
 
-  it "assigns patient from sample" do
-    patient = Patient.make
-    sample = Sample.make patient: patient
+  context "field validations" do
 
-    encounter.samples << sample
+    it "should allow observations pii field" do
+      encounter.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD] = "Observations"
+      expect(encounter).to be_valid
+    end
 
-    expect(encounter.patient).to eq(patient)
+    it "should not allow observations plain field" do
+      encounter.core_fields[Encounter::OBSERVATIONS_FIELD] = "Observations"
+      expect(encounter).to_not be_valid
+    end
+
+    it "should allow assays fields" do
+      encounter.core_fields[Encounter::ASSAYS_FIELD] = [{"name"=>"flu_a", "condition"=>"flu_a", "result"=>"indeterminate", "quantitative_result"=>3}]
+      expect(encounter).to be_valid
+    end
+
+    it "should not allow invalid fields within assays" do
+      encounter.core_fields[Encounter::ASSAYS_FIELD] = [{"name"=>"flu_a", "condition"=>"flu_a", "result"=>"indeterminate", "invalid"=>"invalid"}]
+      expect(encounter).to_not be_valid
+    end
+
   end
 
-  it "assigns patient from test_result" do
-    patient = Patient.make
-    test1 = TestResult.make(sample: nil, patient: patient)
+  context "update diagnostic" do
+    let(:device) { Device.make site: encounter.site }
 
-    encounter.test_results << test1
+    before(:each) { Timecop.freeze(Time.now) }
+    after(:each) { Timecop.return }
+    it "by default shold not be marked as dirty" do
+      expect(encounter).to_not have_dirty_diagnostic
+    end
 
-    expect(encounter.patient).to eq(patient)
-  end
+    def add_sample_and_process_later(sample_entity_id, message)
+      encounter.samples.make sample_identifiers: [SampleIdentifier.make_unsaved(site: encounter.site, entity_id: sample_entity_id)]
 
-  it "keeps patient if some sample does not have it" do
-    patient = Patient.make
-    sample1 = Sample.make patient: patient
-    sample2 = Sample.make
+      Timecop.freeze(Time.now + 1.second)
 
-    encounter.samples << sample1
-    encounter.samples << sample2
+      DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(message.merge(sample: {id: sample_entity_id}))
+    end
 
-    expect(encounter.patient).to eq(patient)
-  end
+    def saved_diagnostic
+      encounter.core_fields[Encounter::ASSAYS_FIELD]
+    end
 
-  it "raises if multiple patient are set" do
-    encounter.patient = Patient.make
+    context "when processing new message from a sample in the encounter" do
+      let(:sample_entity_id) { "1001" }
+      let(:message) { { test: { assays: [
+        {condition: "flu_a", name: "flu_a", result: "positive"}
+      ] } } }
 
-    sample = Sample.make patient: Patient.make
-    expect {
-      encounter.samples << sample
-    }.to raise_error(Encounter::MultiplePatientError)
-  end
+      before(:each) {
+        add_sample_and_process_later(sample_entity_id, message)
+        encounter.reload
+      }
 
-  it "raises if assigning sample of other encounter" do
-    sample = Sample.make
-    Encounter.make samples: [sample]
+      it "should not update de diagnostic" do
+        expect(saved_diagnostic).to be_nil
+      end
 
-    expect {
-      encounter.samples << sample
-    }.to raise_error(Encounter::EncounterAlreadyAssignedError)
-  end
+      it "should have sample and test_results" do
+        expect(encounter.samples.count).to eq(1)
+        expect(encounter.test_results.count).to eq(1)
+      end
 
-  it "raises if assigning test_result of other encounter" do
-    test1 = TestResult.make
-    Encounter.make test_results: [test1]
+      it "should be marked as dirty" do
+        expect(encounter).to have_dirty_diagnostic
+      end
 
-    expect {
-      encounter.test_results << test1
-    }.to raise_error(Encounter::EncounterAlreadyAssignedError)
-  end
+      it "should suggest new diagnosis" do
+        expect(encounter.updated_diagnostic).to eq([{"condition" => "flu_a", "name" => "flu_a", "result" => "positive", "quantitative_result" => nil}])
+      end
+    end
 
-  it "should not raise if already belongs to self" do
-    test1 = TestResult.make
-    encounter.test_results << test1
-    encounter.test_results << test1
-  end
+    context "when processing new message from a sample in the encounter with existing diagnostic" do
+      let(:sample_entity_id) { "1001" }
+      let(:message) { { test: { assays: [
+        {condition: "flu_a", name: "flu_a", result: "positive"},
+        {condition: "flu_b", name: "flu_b", result: "positive"},
+        {condition: "mtb", name: "mtb", result: "negative"},
+      ] } } }
 
-  it "should add test_result without duplicated" do
-    test1 = TestResult.make
-    encounter.add_test_result_uniq test1
-    encounter.add_test_result_uniq test1
-    expect(encounter.test_results.count).to eq(1)
-  end
+      before(:each) {
+        add_sample_and_process_later("999", { test: { assays: [
+          {condition: "flu_a", name: "flu_a", result: "negative"},
+        ] } })
 
-  it "should add sample without duplicated" do
-    sample = Sample.make
-    encounter.add_sample_uniq sample
-    encounter.add_sample_uniq sample
-    expect(encounter.samples.count).to eq(1)
+        Timecop.freeze(Time.now + 1.second)
+
+        encounter.core_fields[Encounter::ASSAYS_FIELD] = [
+          {"condition" => "flu_a", "name" => "flu_a", "result" => "positive", "quantitative_result" => nil},
+          {"condition" => "flu_c", "name" => "flu_c", "result" => "negative", "quantitative_result" => nil},
+          {"condition" => "mtb", "name" => "mtb", "result" => "positive", "quantitative_result" => 32},
+        ]
+        encounter.save!
+        encounter.updated_diagnostic_timestamp!
+
+        add_sample_and_process_later(sample_entity_id, message)
+        encounter.reload
+      }
+
+      it "should only have messaged after timestamp as pending" do
+        expect(encounter.test_results_not_in_diagnostic).to eq([TestResult.last])
+      end
+
+      it "should be marked as dirty" do
+        expect(encounter).to have_dirty_diagnostic
+      end
+
+      it "should suggest new diagnosis" do
+        expect(encounter.updated_diagnostic).to eq([
+          {"condition" => "flu_a", "name" => "flu_a", "result" => "positive", "quantitative_result" => nil},
+          {"condition" => "flu_c", "name" => "flu_c", "result" => "negative", "quantitative_result" => nil},
+          {"condition" => "mtb", "name" => "mtb", "result" => "positive", "quantitative_result" => 32},
+          {"condition" => "flu_b", "name" => "flu_b", "result" => nil, "quantitative_result" => nil},
+        ])
+      end
+
+      it "should remove dirty after updated_diagnostic_timestamp" do
+        encounter.updated_diagnostic_timestamp!
+        expect(encounter).to_not have_dirty_diagnostic
+      end
+    end
+
+    context "when creating the encounter from the encounter_id reported in the test" do
+      def create_encounter_and_test()
+        DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(message.merge(encounter: {id: sample_entity_id}))
+      end
+
+      let(:sample_entity_id) { "1001" }
+      let(:message) { { test: { assays: [
+        {condition: "flu_a", name: "flu_a", result: "positive"}
+      ] } } }
+
+      before(:each) do
+        create_encounter_and_test
+      end
+
+      it "should have a pending test" do
+        expect(Encounter.last.test_results_not_in_diagnostic).to eq([TestResult.last])
+      end
+    end
   end
 end

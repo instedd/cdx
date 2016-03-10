@@ -1,6 +1,7 @@
 .row
   .col
-    %h1 Forgot your password?
+    %h1 Login problems?
+    %p Enter your email and we'll send you a link to reset your password
 = form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f|
   .row
     .col
@@ -8,9 +9,12 @@
   %br
   .row
     .col
-      = f.submit "Send me reset password instructions", class: "btn-secondary"
+      = f.submit "Request a password reset", class: "btn-secondary input-block"
+  .row
     .col
-      = link_to "Have and account? Log in", new_session_path(resource_name), class: "pull-right"
+      = link_to "I've remembered my password", new_session_path(resource_name), class: "pull-right"
       %br
       = link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name), class: "pull-right"
+      %br
+      = link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name), class: "pull-right"
 = devise_error_messages!
