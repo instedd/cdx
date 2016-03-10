@@ -1,6 +1,6 @@
 module Reports
   class Devices < Base
-    attr_reader :device_models
+    attr_reader :device_uuids
 
     def self.by_device(*args)
       new(*args).by_device
@@ -26,35 +26,49 @@ module Reports
       data
     end
 
-    def process
-      filter['group_by'] = 'month(test.start_time),device.model'
-      super
+    def device_uuids
+      results['tests'].index_by { |t| t['device.uuid'] }.keys
     end
 
-    def device_models
-      results['tests'].index_by { |t| t['device.model'] }.keys
+    def process
+      filter['group_by'] = 'device.uuid,day(test.start_time)'
+      super
     end
 
     private
 
-    def data_hash_day(dayname, day_results)
+    def data_hash_day(dayname, devices)
+      if devices
+        device_results = devices.index_by {|d| d['device.uuid'] }
+      end
+
       {
         label: dayname,
-        values: device_models.map do |u|
-          device_model_result = date_results && date_results[u]
-          device_model_result ? device_model_result['count'] : 0
+        values: device_uuids.map do |d|
+          device_result = device_results && device_results[d]
+          device_result ? device_result['count'] : 0
         end
       }
     end
 
-    def data_hash_month(date, date_results)
+    def data_hash_month(date, devices)
+      if devices
+        device_results = devices.index_by {|d| d['device.uuid'] }
+      end
+
       {
         label: label_monthly(date),
-        values: device_models.map do |u|
-          device_model_result = date_results && date_results[u]
-          device_model_result ? device_model_result['count'] : 0
+        values: device_uuids.map do |d|
+          device_result = device_results && device_results[d]
+          device_result ? device_result['count'] : 0
         end
       }
+    end
+
+    def results_by_period(format)
+      results['tests'].group_by do |t|
+        Date.parse(t['test.start_time']).strftime(format)
+      end
     end
   end
 end

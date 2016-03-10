@@ -1,13 +1,20 @@
 module ChartsHelper
+  def devices_reporting_chart
+    results = Reports::Devices.process(current_user, @navigation_context, options)
+    return results.sort_by_month unless params['since']
+    return results.sort_by_month(number_of_months - 1) if number_of_months > 1
+    return results.sort_by_day(days_since)
+  end
+
   def errors_by_code
     Reports::Errors.by_code(current_user, @navigation_context, options)
   end
 
   def errors_by_device_chart
-    data = Reports::DeviceErrors.process(current_user, @navigation_context, options)
-    return data.sort_by_month unless params['since']
-    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
-    return data.sort_by_day(days_since)
+    results = Reports::DeviceErrors.process(current_user, @navigation_context, options)
+    return results.sort_by_month unless params['since']
+    return results.sort_by_month(number_of_months - 1) if number_of_months > 1
+    return results.sort_by_day(days_since)
   end
 
   def errors_by_device

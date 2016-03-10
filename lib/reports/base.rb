@@ -81,8 +81,8 @@ module Reports
       "#{I18n.t('date.abbr_month_names')[date.month]}#{date.month == 1 ? " #{date.strftime('%y')}" : ""}"
     end
 
-    def month_results(key)
-      results_by_period[key]
+    def month_results(period)
+      results_by_period('%Y-%m')[period]
     end
 
     def report_between
