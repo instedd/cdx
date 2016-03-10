@@ -1,9 +1,8 @@
 module ChartsHelper
   def devices_reporting_chart
     results = Reports::Devices.process(current_user, @navigation_context, options)
-    return results.sort_by_month unless params['since']
-    return results.sort_by_month(number_of_months - 1) if number_of_months > 1
-    return results.sort_by_day(days_since)
+    return results.sort_by_month if results.number_of_months > 1
+    return results.sort_by_day
   end
 
   def errors_by_code
@@ -12,9 +11,8 @@ module ChartsHelper
 
   def errors_by_device_chart
     results = Reports::DeviceErrors.process(current_user, @navigation_context, options)
-    return results.sort_by_month unless params['since']
-    return results.sort_by_month(number_of_months - 1) if number_of_months > 1
-    return results.sort_by_day(days_since)
+    return results.sort_by_month if results.number_of_months > 1
+    return results.sort_by_day
   end
 
   def errors_by_device
@@ -22,10 +20,9 @@ module ChartsHelper
   end
 
   def errors_by_model_chart
-    data = Reports::ModelErrors.process(current_user, @navigation_context, options)
-    return data.sort_by_month unless params['since']
-    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
-    return data.sort_by_day(days_since)
+    results = Reports::ModelErrors.process(current_user, @navigation_context, options)
+    return results.sort_by_month if results.number_of_months > 1
+    return results.sort_by_day
   end
 
   def errors_by_model
@@ -33,18 +30,16 @@ module ChartsHelper
   end
 
   def successful_tests_chart
-    data = Reports::Successful.process(current_user, @navigation_context, options)
-    return data.sort_by_month unless params['since']
-    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
-    return data.sort_by_day(days_since)
+    results = Reports::Successful.process(current_user, @navigation_context, options)
+    return results.sort_by_month if results.number_of_months > 1
+    return results.sort_by_day
   end
 
   def unsuccessful_tests_chart
     options['test.status'] = 'invalid,error,no_result,in_progress'
-    data = Reports::Successful.process(current_user, @navigation_context, options)
-    return data.sort_by_month unless params['since']
-    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
-    return data.sort_by_day(days_since)
+    results = Reports::Successful.process(current_user, @navigation_context, options)
+    return results.sort_by_month if results.number_of_months > 1
+    return results.sort_by_day
   end
 
   def successful_tests
@@ -72,10 +67,9 @@ module ChartsHelper
   end
 
   def query_tests_chart
-    data = Reports::AllTests.process(current_user, @navigation_context, options)
-    return data.sort_by_month unless params['since']
-    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
-    return data.sort_by_day(days_since)
+    results = Reports::AllTests.process(current_user, @navigation_context, options)
+    return results.sort_by_month if results.number_of_months > 1
+    return results.sort_by_day
   end
 
   def tests_by_name
@@ -91,11 +85,11 @@ module ChartsHelper
   end
 
   def start_date
-    params['range'] ? Date.parse(params['range']['gte']) : since
+    params['range'] ? Date.parse(params['range']['start_time']['gte']) : since
   end
 
   def end_date
-    params['range'] ? params['range']['lte'] : Date.today
+    params['range'] ? Date.parse(params['range']['start_time']['lte']) : Date.today
   end
 
   def options
@@ -126,10 +120,9 @@ module ChartsHelper
   end
 
   def query_errors
-    data = Reports::Errors.process(current_user, @navigation_context, options)
-    return data.sort_by_month unless params['since']
-    return data.sort_by_month(number_of_months - 1) if number_of_months > 1
-    return data.sort_by_day(days_since)
+    results = Reports::Errors.process(current_user, @navigation_context, options)
+    return results.sort_by_month if results.number_of_months > 1
+    return results.sort_by_day
   end
 
   def since

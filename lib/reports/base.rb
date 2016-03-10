@@ -4,8 +4,8 @@ module Reports
       new(*args).process
     end
 
-    attr_reader :current_user, :context, :data, :date_results, :filter
-    attr_reader :options, :results
+    attr_reader :current_user, :context, :data, :date_results, :end_date
+    attr_reader :filter, :options, :results, :start_date
 
     def initialize(current_user, context, options={})
       @filter ||= {}
@@ -21,12 +21,12 @@ module Reports
       return self
     end
 
-    def sort_by_day(cnt=6)
-      cnt.downto(0).each do |i|
-        day = Date.today - i.days
-        dayname = day.strftime('%d/%m')
+    def sort_by_day
+      nod = number_of_days - 1
+      nod.downto(0).each do |i|
+        day = Date.parse(end_date) - i.days
         key = day.strftime('%Y-%m-%d')
-        data << data_hash_day(dayname, day_results('%Y-%m-%d', key))
+        data << data_hash_day(day, day_results('%Y-%m-%d', key))
       end
       return self
     end
@@ -44,20 +44,42 @@ module Reports
       return data
     end
 
-    def sort_by_month(cnt = 11)
-      cnt.downto(0).each do |i|
-        date = Date.today - i.months
+    def sort_by_month
+      nom = number_of_months.abs - 1
+      nom.downto(0).each do |i|
+        date = Date.parse(end_date) - i.months
         date_key = date.strftime('%Y-%m')
         data << data_hash_month(date, month_results(date_key))
       end
       return self
     end
 
+    def start_date
+      return options['range']['start_time']['gte'] if options['range']
+      return options['since'] if options['since']
+      return report_since
+    end
+
+    def end_date
+      return options['range']['start_time']['lte'] if options['range']
+      Date.today.iso8601
+    end
+
+    def number_of_days
+      Date.parse(end_date).jd - Date.parse(start_date).jd
+    end
+
+    def number_of_months
+      sd = Date.parse(start_date)
+      ed = Date.parse(end_date)
+      (ed.year * 12 + ed.month) - (sd.year * 12 + sd.month)
+    end
+
     private
 
     def data_hash_day(dayname, day_results)
       {
-        label: dayname,
+        label: label_daily(dayname),
         values: [day_results ? day_results.count : 0]
       }
     end
@@ -75,6 +97,10 @@ module Reports
 
     def day_results(format, key)
       results_by_period(format)[key]
+    end
+
+    def label_daily(day)
+      day.strftime('%d/%m')
     end
 
     def label_monthly(date)
