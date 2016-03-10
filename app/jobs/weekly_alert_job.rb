@@ -9,3 +9,4 @@ class WeeklyAlertJob
 end
 
 Sidekiq::Cron::Job.create(name: 'Alert Weekly - daily 12:15am', cron: '25 0 * * *', klass: 'WeekyAlertJob')   #run daily at 25 after midnight
+
