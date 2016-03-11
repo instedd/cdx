@@ -8,7 +8,7 @@ module Reports
     attr_reader :filter, :options, :results, :start_date
 
     def initialize(current_user, context, options={})
-      @filter ||= {}
+      @filter ||= { 'group_by' => 'day(test.start_time)'}
       @current_user = current_user
       @context = context
       @data = []
@@ -22,7 +22,7 @@ module Reports
     end
 
     def sort_by_day
-      nod = number_of_days
+      nod = number_of_days - 1
       nod.downto(0).each do |i|
         day = Date.parse(end_date) - i.days
         key = day.strftime('%Y-%m-%d')
@@ -121,14 +121,7 @@ module Reports
 
     def results_by_period(format = '%Y-%m')
       results['tests'].group_by do |t|
-        if(format == '%H')
-          DateTime.strptime(t['test']['start_time'], '%Y-%m-%dT%H:%M:%S')
-        else
-          begin
-            Date.parse(t['test']['start_time']).strftime(format)
-          rescue Exception
-          end
-        end
+        Date.parse(t['test.start_time']).strftime(format)
       end
     end
 

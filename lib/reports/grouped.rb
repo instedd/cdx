@@ -1,0 +1,37 @@
+module Reports
+  class Grouped < Base
+
+    def self.method_missing(sym, *args, &block)
+      return new(*args).grouped_by($1.to_sym) if /^by_(.*)/.match(sym.to_s) && groupings[$1.to_sym]
+      super
+    end
+
+    def grouped_by(symbol)
+      filter['group_by'] = groupings[symbol][0]
+      filter['test.status'] = groupings[symbol][1]
+      total_count = TestResult.query(filter, current_user).execute['total_count']
+      no_error_code = total_count
+      results = TestResult.query(filter, current_user).execute
+      data = results['tests'].map do |test|
+        no_error_code -= test['count']
+        {
+          label: test[groupings[symbol]],
+          value: test['count']
+        }
+      end
+      data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
+      data
+    end
+
+    private
+
+    def groupings
+      {
+        code: ['test.error_code','error'],
+        model: ['device.model','error'],
+        successful: ['test.status','success'],
+        unsuccessful: ['test.status','invalid,error,no_result,in_progress']
+      }
+    end
+  end
+end

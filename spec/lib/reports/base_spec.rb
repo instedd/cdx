@@ -19,6 +19,7 @@ RSpec.describe Reports::Base do
 
   describe 'contextual query' do
     before do
+      query['group_by'] = 'day(test.start_time)'
       options['since'] = since
       query['since'] = since
     end
@@ -46,6 +47,10 @@ RSpec.describe Reports::Base do
   end
 
   describe 'date range' do
+    before do
+      query['group_by'] = 'day(test.start_time)'
+    end
+
     let(:nav_context) { NavigationContext.new(current_user, institution.uuid) }
 
     context 'when no date given' do
@@ -119,7 +124,7 @@ RSpec.describe Reports::Base do
         tests = DummyReport.process(
           current_user, nav_context, options
         ).sort_by_day
-        expect(tests.data.count).to eq(7)
+        expect(tests.results['total_count']).to eq(7)
         expect(tests.data.first[:label]).to eq((Date.today - 6.days).strftime('%d/%m'))
         expect(tests.data.last[:label]).to eq(Date.today.strftime('%d/%m'))
       end
@@ -243,8 +248,8 @@ RSpec.describe Reports::Base do
 
     describe '.number_of_months' do
       it 'calculates the difference in months' do
-        date_range['start_time']['gte'] = (Date.today).iso8601
-        date_range['start_time']['lte'] = (Date.today - 6.months).iso8601
+        date_range['start_time']['lte'] = (Date.today).iso8601
+        date_range['start_time']['gte'] = (Date.today - 6.months).iso8601
         options['range'] = date_range
         number_of_months = DummyReport.process(
           current_user, nav_context, options

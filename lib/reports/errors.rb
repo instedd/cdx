@@ -18,55 +18,18 @@ module Reports
       new(*args).by_successful
     end
 
-    def by_code
-      filter['test.status'] = 'error'
-      total_count = TestResult.query(filter, current_user).execute['total_count']
-      no_error_code = total_count
-      filter['group_by'] = 'test.error_code'
-      results = TestResult.query(filter, current_user).execute
-      data = results['tests'].map do |test|
-        no_error_code -= test['count']
-        {
-          label: test['test.error_code'],
-          value: test['count']
-        }
-      end
-      data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
-      data
+    def method_missing(sym, *args, &block)
+      return grouped_by($1.to_sym) if /^by_(.*)/.match(sym.to_s) && groupings[$1.to_sym]
+      super
     end
 
-    def by_model
-      filter['test.status'] = 'error'
-      total_count = TestResult.query(filter, current_user).execute['total_count']
-      no_error_code = total_count
-      filter['group_by'] = 'device.model'
-      results = TestResult.query(filter, current_user).execute
-      data = results['tests'].map do |test|
-        no_error_code -= test['count']
-        {
-          label: test['device.model'],
-          value: test['count']
-        }
-      end
-      data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
-      data
-    end
-
-    def by_successful
-      filter['test.status'] = 'success'
-      total_count = TestResult.query(filter, current_user).execute['total_count']
-      no_error_code = total_count
-      filter['group_by'] = 'test.status'
-      results = TestResult.query(filter, current_user).execute
-      data = results['tests'].map do |test|
-      no_error_code -= test['count']
+    def groupings
       {
-        label: test['test.status'],
-        value: test['count']
+        code: ['test.error_code','error'],
+        model: ['device.model','error'],
+        successful: ['test.status','success'],
+        unsuccessful: ['test.status','invalid,error,no_result,in_progress']
       }
-      end
-      data << { label: 'Unknown', value: no_error_code } if no_error_code > 0
-      data
     end
 
     def by_not_successful
@@ -90,7 +53,7 @@ module Reports
         data = results['tests'].map do |test|
         no_error_code -= test['count']
         {
-          label: test['test.status'],
+          label: test[groupings[symbol]],
           value: test['count']
         }
       end
@@ -107,7 +70,7 @@ module Reports
     end
 
     private
-    
+
     def data_hash_day(dayname, user_errors)
       {
         label: dayname,
