@@ -44,7 +44,7 @@
             %col{:width => "10%"}
           %col{:width => "30%"}
         - t.actions do
-          = link_to users_path(format: :csv), title: 'Download CSV' do
+          = link_to users_path(filters_params.merge(format: :csv)), title: 'Download CSV' do
             .icon-download.icon-gray
 
         - t.thead do
