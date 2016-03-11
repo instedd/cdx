@@ -10,14 +10,14 @@
     - else
       = cdx_table title: pluralize(@messages.count, "message") do |t|
         - t.columns do
-          %col{:width => "10%"}
+          %col{:width => "15%"}
           %col{:width => "25%"}
           %col{:width => "10%"}
           %col{:width => "10%"}
           %col{:width => "10%"}
           %col{:width => "10%"}
           %col{:width => "15%"}
-          %col{:width => "10%"}
+          %col{:width => "5%"}
         - t.thead do
           %tr
             %th Status
@@ -37,13 +37,15 @@
                   = link_to '(reprocess)', reprocess_device_message_path(message), method: 'post'
                 - else
                   Success
-              %td= message.index_failure_reason
+              %td{title: message.index_failure_reason}= message.index_failure_reason
               %td= message.device.device_model.name
               %td= message.device.name
               %td= message.index_failure_data[:number_of_failures]
               %td= message.index_failure_data[:target_field]
               %td= format_datetime(message.created_at.in_time_zone(message.device.time_zone))
-              %td= link_to 'Download', raw_device_message_path(message)
+              %td
+                = link_to raw_device_message_path(message) do
+                  .icon-download.icon-gray
 
       .pagination
         = render 'shared/pagination'
