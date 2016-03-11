@@ -33,7 +33,7 @@
     %h1 Error rate #{chart_heading}
 .row
   .col.pe-7
-    = react_component('BarChart', data: query_errors.data, height: 300, y_label: 'Tests With Errors')
+    = react_component('BarChart', data: query_errors.data, height: 300, y_label: 'Tests With Errors', x_labels: query_errors.users)
   .col
     = react_component('PieChart', data: errors_by_code, height: 250, label: 'Errors')
 %hr

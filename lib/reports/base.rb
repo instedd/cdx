@@ -22,7 +22,7 @@ module Reports
     end
 
     def sort_by_day
-      nod = number_of_days - 1
+      nod = number_of_days
       nod.downto(0).each do |i|
         day = Date.parse(end_date) - i.days
         key = day.strftime('%Y-%m-%d')
