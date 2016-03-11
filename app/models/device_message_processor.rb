@@ -84,9 +84,37 @@ class DeviceMessageProcessor
 
       # Commit changes
       @blender.save_and_index!
+      
+      check_invalid_start_time_alert(test_result)
     end
 
     private
+    
+    def check_invalid_start_time_alert(test_result)
+      start_time = @parsed_message["test"]["core"]["start_time"]
+      end_time = @parsed_message["test"]["core"]["end_time"]
+       
+      start_time = Time.now if start_time==nil   
+      end_time = Time.now if end_time==nil      
+      if (start_time > Time.now + 1.day) || (end_time < start_time)
+        #CHECK does not return diaabled alerts
+        any_alerts_with_invalid_test_date_count= Alert.invalid_test_date.where({enabled: true, institution_id: test_result.institution_id}).count
+        if any_alerts_with_invalid_test_date_count > 0
+          any_alerts_with_invalid_test_date= Alert.invalid_test_date.where({enabled: true, institution_id: test_result.institution_id})
+          any_alerts_with_invalid_test_date.each do |alert|  
+            if ((alert.sample_id.length==0) || (alert.sample_id == SampleIdentifier.where(id: test_result.sample_identifier_id).pluck(:entity_id)[0])) 
+              sites=alert.sites.map{|site| site.id} 
+              if (sites.length==0) || ((sites.length > 0) and (sites.include? test_result.site_id))
+                devices=alert.devices.map{|device| device.id} 
+                if (devices.length==0) || ((devices.length > 0) and (devices.include? test_result.device_id))
+                  AlertJob.perform_later alert.id, test_result.uuid
+                end
+              end
+            end                        
+          end
+        end
+      end
+    end
 
     def find_entity_by_id(klass, entity_id)
       return nil if entity_id.nil?

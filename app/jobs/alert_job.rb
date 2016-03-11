@@ -22,7 +22,6 @@ class AlertJob < ActiveJob::Base
       alertHistory.user = @alert.user
       alertHistory.test_result = testResult
       alertHistory.test_result_updated_at = testResult.updated_at
-
       #store that it is only used for alert aggregations if an aggregation type of alert
       if @alert.aggregated?
         alertHistory.for_aggregation_calculation  = true

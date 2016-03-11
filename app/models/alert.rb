@@ -33,7 +33,7 @@ class Alert < ActiveRecord::Base
   
   #Note: elasticsearch filter issue  with start_time, for some reason, {"test.start_time"=>"null"}, does not work.
   #enum anomalie_type: [:missing_sample_id, :missing_start_time]
-  enum anomalie_type: [:missing_sample_id]
+  enum anomalie_type: [:missing_sample_id, :invalid_test_date]
 
   enum utilization_efficiency_type: [:sample]
 
@@ -47,26 +47,34 @@ class Alert < ActiveRecord::Base
 
 
   def create_percolator
-    es_query =  TestResult.query(self.query, self.user).elasticsearch_query
-    return unless es_query
-    Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
-    type: '.percolator',
-    id: 'alert_'+self.id.to_s,
-    body: { query: es_query, type: 'test' }
+     # for invalid_test_date, no percolator is used, done for each test result received as could not find
+     # a way to do it with elasticsearch
+    if anomalie_type != "invalid_test_date"
+      es_query =  TestResult.query(self.query, self.user).elasticsearch_query
+      return unless es_query
+      Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
+      type: '.percolator',
+      id: 'alert_'+self.id.to_s,
+      body: { query: es_query, type: 'test' }
+    end
   end
 
   def recreate_alert_percolator
     #when you disable an alert ,it will be deleted from elasticsearch
-    if self.enabled==true
-      create_percolator
+    if anomalie_type != "invalid_test_date"
+      if self.enabled==true
+        create_percolator
+      end
     end
   end
 
   def delete_percolator
-    Cdx::Api.client.delete index: Cdx::Api.index_name_pattern,
-    type: '.percolator',
-    id: 'alert_'+id.to_s,
-    ignore: 404
+    if anomalie_type != "invalid_test_date"
+      Cdx::Api.client.delete index: Cdx::Api.index_name_pattern,
+      type: '.percolator',
+      id: 'alert_'+id.to_s,
+      ignore: 404
+    end
   end
   
   

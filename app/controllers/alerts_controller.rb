@@ -232,20 +232,16 @@ class AlertsController < ApplicationController
     #Note: alert_info.create_percolator is called from the model
   end
 
-  def set_category(params, alert_info, error_text, condition_result_ok, is_edit)
+
+  def set_category(params, alert_info, error_text, condition_result_ok, is_edit)    
     if is_edit==true
       alert_info.conditions.destroy_all
     end
 
     if alert_info.category_type == "anomalies"
-      # check that the start_time field is not missing
       if alert_info.anomalie_type == "missing_sample_id"
-        # alert_info.query = {"sample.id"=>"not(null)" }
         alert_info.query = {"sample.id"=>"null"}
-      elsif alert_info.anomalie_type == "missing_start_time"
-        alert_info.query = {"test.start_time"=>"null"}
       end
-
     elsif alert_info.category_type == "device_errors"
       if alert_info.error_code && (alert_info.error_code.include? '-')
         minmax=alert_info.error_code.split('-')
@@ -255,7 +251,6 @@ class AlertsController < ApplicationController
       else
         alert_info.query = {"test.error_code"=>alert_info.error_code }
       end
-
     elsif alert_info.category_type == "test_results"
       #this will generate a query like: core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}
       if params[:alert][:conditions_info]
@@ -282,7 +277,6 @@ class AlertsController < ApplicationController
           query_condition_results << condition_result_name
         end
       end
-
       alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
       #TEST  alert_info.query =    {"assays.quantitative_result.min" => "8"}
       #TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}
