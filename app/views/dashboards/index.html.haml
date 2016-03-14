@@ -51,7 +51,7 @@
     %h1 Models #{chart_heading}
 .row
   .col.pe-7
-    = react_component('BarChart', data: errors_by_model_chart.data, height: 300, y_label: 'Errors By Model')
+    = react_component('BarChart', data: errors_by_model_chart.data, height: 300, y_label: 'Errors By Model', x_labels: errors_by_model_chart.device_models)
   .col
     = react_component('PieChart', data: errors_by_model, height: 250, label: 'By Models')
 %hr
