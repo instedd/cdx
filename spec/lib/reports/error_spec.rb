@@ -64,8 +64,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
       },
       device_messages: [DeviceMessage.make(device: user_device)]
     )
-    
-      
+
       TestResult.create_and_index(
         core_fields: {
           'assays' => ['condition' => 'man_flu1', 'result' => :negative],
@@ -76,7 +75,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
         },
         device_messages: [DeviceMessage.make(device: user_device)]
       )
-      
+
         TestResult.create_and_index(
           core_fields: {
             'assays' => ['condition' => 'man_flu2', 'result' => :negative],
@@ -87,7 +86,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
           },
           device_messages:[DeviceMessage.make(device: user_device)]
         )
-        
+
          TestResult.create_and_index(
             core_fields: {
               'assays' => ['condition' => 'man_flu4', 'result' => :negative],
@@ -98,9 +97,6 @@ RSpec.describe Reports::Errors, elasticsearch: true do
             },
             device_messages:[DeviceMessage.make(device: user_device)]
           )
-          
- 
-      
 
     refresh_index
   end
@@ -117,24 +113,4 @@ RSpec.describe Reports::Errors, elasticsearch: true do
       expect(tests.users).to include(site_user)
     end
   end
-  
-  
-  describe 'check status results' do
-    it 'returns succcessful results' do
-      @data = Reports::Errors.process(current_user, nav_context).by_successful
-      expect(@data[0][:value]).to eql(1)
-    end
-      
-    it 'returns unsucccessful results' do
-      @data = Reports::Errors.process(current_user, nav_context).by_not_successful
-
-      # [{:label=>"error", :value=>3}, {:label=>"in_progress", :value=>1}, {:label=>"invalid", :value=>1}, {:label=>"no_result", :value=>1}]
-      expect(@data[0][:value]).to eql(3)
-      expect(@data[1][:value]).to eql(1)
-      expect(@data[2][:value]).to eql(1)
-      expect(@data[3][:value]).to eql(1)
-      expect(@data.size).to eql(4)
-    end    
-  end
-  
 end

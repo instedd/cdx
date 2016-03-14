@@ -112,7 +112,8 @@ RSpec.describe Reports::Base do
               'start_time' => Date.today - i.days,
               'name' => 'mtb',
               'status' => 'error',
-              'site_user' => site_user
+              'site_user' => site_user,
+              'type' => 'specimen'
             },
             device_messages: [DeviceMessage.make(device: user_device)]
           )
@@ -136,7 +137,7 @@ RSpec.describe Reports::Base do
           #do two times each hour [could not do more due to,DEFAULT_PAGE_SIZE = 50, limit]
           (0..1).each do |inner|
             TestResult.create_and_index(
-              core_fields: { 
+              core_fields: {
                 'assays' => ['condition' => 'mtb', 'result' => :positive],
                 'start_time' => Date.today - i.hours,
                 'name' => 'mtb',
