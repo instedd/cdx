@@ -77,6 +77,10 @@ module Reports
 
     private
 
+    def count_total(results)
+      results.inject(0) {|sum,hash| sum + hash['count']}
+    end
+
     def data_hash_day(dayname, day_results)
       {
         label: label_daily(dayname),

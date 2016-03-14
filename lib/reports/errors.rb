@@ -76,7 +76,7 @@ module Reports
         label: dayname,
         values: users.map do |u|
           user_result = user_errors && user_errors[u]
-          user_result ? user_result['count'] : 0
+          user_result ? count_total(user_result) : 0
         end
       }
     end
@@ -86,7 +86,7 @@ module Reports
         label: label_monthly(date),
         values: users.map do |u|
           user_result = user_errors && user_errors[u]
-          user_result ? user_result['count'] : 0
+          user_result ? count_total(user_result) : 0
         end
       }
     end

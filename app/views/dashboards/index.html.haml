@@ -44,7 +44,7 @@
   .col.pe-7
     = react_component('BarChart', data: devices_reporting_chart.data, height: 300, y_label: 'Errors By Device', x_labels: devices_reporting_chart.device_uuids)
   .col
-    = react_component('PieChart', data: errors_by_device, height: 250, label: 'Devices')
+    = react_component('PieChart', data: devices_grouped, height: 250, label: 'Devices')
 %hr
 .row
   .col.pe-8

@@ -15,8 +15,8 @@ module ChartsHelper
     return results.sort_by_day
   end
 
-  def errors_by_device
-    Reports::Devices.by_device(current_user, @navigation_context, options)
+  def devices_grouped
+    Reports::Grouped.by_device(current_user, @navigation_context, options)
   end
 
   def errors_by_model_chart
