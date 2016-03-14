@@ -88,14 +88,13 @@ class DeviceMessageProcessor
       check_invalid_start_time_alert(test_result)
     end
 
-    private
+   private
     
     def check_invalid_start_time_alert(test_result)
       start_time = @parsed_message["test"]["core"]["start_time"]
-      end_time = @parsed_message["test"]["core"]["end_time"]
-       
+      end_time = @parsed_message["test"]["core"]["end_time"]     
       start_time = Time.now if start_time==nil   
-      end_time = Time.now if end_time==nil      
+      end_time = Time.now if end_time==nil     
       if (start_time > Time.now + 1.day) || (end_time < start_time)
         #CHECK does not return diaabled alerts
         any_alerts_with_invalid_test_date_count= Alert.invalid_test_date.where({enabled: true, institution_id: test_result.institution_id}).count
@@ -115,6 +114,7 @@ class DeviceMessageProcessor
         end
       end
     end
+
 
     def find_entity_by_id(klass, entity_id)
       return nil if entity_id.nil?

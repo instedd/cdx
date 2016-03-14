@@ -37,7 +37,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       "test" => {
         "core" => {
           "id" => test_id,
-          "start_time" => TEST_START_TIME,
+          "start_time" => @check_invalid_test == nil ? TEST_START_TIME : Time.now+1.day,
           "assays" => [
             { "name" => "mtb", "condition" => "mtb", "result" => "positive"}
           ]
@@ -1251,4 +1251,22 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
     end
   end
+    
+   context 'check invalid time' do
+      let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
+     
+      it "the start time is greater than today and generates and alert" do
+        alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
+        alert.query = {"test.error_code"=>"155"}
+        alert.institution_id = institution.id
+        alert.sample_id=""
+        alert.user = institution.user
+        alert.save!
+
+        @check_invalid_test=TRUE
+        device_message_processor.process
+        expect(AlertHistory.count).to equal (1)
+      end
+    end
+  
 end
