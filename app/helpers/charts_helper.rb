@@ -6,7 +6,7 @@ module ChartsHelper
   end
 
   def errors_by_code
-    Reports::Errors.by_code(current_user, @navigation_context, options)
+    Reports::Grouped.by_error_code(current_user, @navigation_context, options)
   end
 
   def errors_by_device_chart
@@ -26,7 +26,7 @@ module ChartsHelper
   end
 
   def errors_by_model
-    Reports::Errors.by_model(current_user, @navigation_context, options)
+    Reports::Grouped.by_model(current_user, @navigation_context, options)
   end
 
   def successful_tests_chart
@@ -43,16 +43,15 @@ module ChartsHelper
   end
 
   def successful_tests
-    Reports::Errors.by_successful(current_user, @navigation_context, options)
+    Reports::Grouped.by_successful(current_user, @navigation_context, options)
   end
 
   def unsuccessful_tests
-    options['test.status'] = 'invalid,error,no_result,in_progress'
-    Reports::Errors.by_successful(current_user, @navigation_context, options)
+    Reports::Grouped.by_successful(current_user, @navigation_context, options)
   end
 
   def errors_by_not_successful
-    Reports::Errors.by_not_successful(current_user, @navigation_context, options)
+    Reports::Grouped.by_unsuccessful(current_user, @navigation_context, options)
   end
 
   def chart_heading

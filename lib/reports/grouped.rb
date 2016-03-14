@@ -7,15 +7,16 @@ module Reports
     end
 
     def grouped_by(symbol)
+      groupings = Reports::Grouped.groupings
       filter['group_by'] = groupings[symbol][0]
       filter['test.status'] = groupings[symbol][1]
-      total_count = TestResult.query(filter, current_user).execute['total_count']
-      no_error_code = total_count
       results = TestResult.query(filter, current_user).execute
+      total_count = results['total_count']
+      no_error_code = total_count
       data = results['tests'].map do |test|
         no_error_code -= test['count']
         {
-          label: test[groupings[symbol]],
+          label: test[groupings[symbol][0]],
           value: test['count']
         }
       end
@@ -25,9 +26,9 @@ module Reports
 
     private
 
-    def groupings
+    def self.groupings
       {
-        code: ['test.error_code','error'],
+        error_code: ['test.error_code','error'],
         model: ['device.model','error'],
         successful: ['test.status','success'],
         unsuccessful: ['test.status','invalid,error,no_result,in_progress']

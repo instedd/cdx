@@ -26,7 +26,7 @@ module Reports
 
     def process
       filter['test.status'] = 'error'
-      filter['group_by'] = 'month(test.start_time),device.model'
+      filter['group_by'] = 'day(test.start_time),device.model'
       super
     end
 

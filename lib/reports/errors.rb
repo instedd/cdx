@@ -81,14 +81,26 @@ module Reports
       }
     end
 
+    def data_hash_month(date, user_errors)
+      {
+        label: label_monthly(date),
+        values: users.map do |u|
+          user_result = user_errors && user_errors[u]
+          user_result ? user_result['count'] : 0
+        end
+      }
+    end
+
     def day_results(format='%Y-%m-%d', key)
       results_by_period(format)[key].try do |r|
-        r.index_by { |t| t['test.site_user'] }
+        r.group_by { |t| t['test.site_user'] }
       end
     end
 
-    def results_by_period(format)
-      results['tests'].group_by {|t| t['test.start_time'] }
+    def month_results(format='%Y-%m', key)
+      results_by_period(format)[key].try do |r|
+        r.group_by { |t| t['test.site_user'] }
+      end
     end
   end
 end
