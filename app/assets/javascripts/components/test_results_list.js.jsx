@@ -1,11 +1,25 @@
 var TestResultRow = React.createClass({
   render: function() {
-    test = this.props.test_result
+    var test = this.props.test_result;
+
+    var assays = splitAssays(test.assays);
+    var fillQualitative = this.props.qualitativeColspan - assays.qualitative.length;
+    var fillQuantitative = this.props.quantitativeColspan - assays.quantitative.length;
 
     return (
     <tr data-href={'/test_results/' + test.uuid}>
       <td>{test.name}</td>
-      <td><AssaysResult assays={test.assays} /></td>
+
+      {assays.qualitative.map(function(assay) {
+         return <td key={assay.condition}><AssayResult assay={assay}/></td>;
+      })}
+      { fillQualitative > 0 ? <td colSpan={fillQualitative}></td> : null }
+
+      {assays.quantitative.map(function(assay) {
+         return <td key={assay.condition}><AssayQuantitativeResult assay={assay}/></td>;
+      })}
+      { fillQuantitative > 0 ? <td colSpan={fillQuantitative}></td> : null }
+
       { this.props.showSites ? <td>{test.site ? test.site.name : null}</td> : null }
       { this.props.showDevices ? <td>{test.device ? test.device.name : null}</td> : null }
       <td>{test.sample_entity_ids}</td>
@@ -37,6 +51,14 @@ var TestResultsList = React.createClass({
       }
     }.bind(this);
 
+    var qualitativeCount = 1, quantitativeCount = 1;
+    for(var i = 0; i < this.props.testResults.length; i++) {
+      var assays = splitAssays(this.props.testResults[i].assays);
+      qualitativeCount = Math.max(qualitativeCount, assays.qualitative.length);
+      quantitativeCount = Math.max(quantitativeCount, assays.quantitative.length);
+    }
+    var totalAssaysColCount = qualitativeCount + quantitativeCount;
+
     var timeWidth;
     if (this.props.showSites && this.props.showDevices) {
       timeWidth = "15%";
@@ -49,8 +71,10 @@ var TestResultsList = React.createClass({
     return (
       <table className="table" cellPadding="0" cellSpacing="0">
         <colgroup>
-          <col width="20%" />
-          <col width="20%" />
+          <col width="15%" />
+          {_.range(totalAssaysColCount).map(function(i){
+            return (<col key={i} width={(25 / totalAssaysColCount) + "%"} />);
+          }.bind(this))}
           { this.props.showSites ? <col width="10%" /> : null }
           { this.props.showDevices ? <col width="10%" /> : null }
           <col width="10%" />
@@ -72,7 +96,8 @@ var TestResultsList = React.createClass({
           </tr>
           <tr>
             {sortableHeader("Name", "test.name")}
-            <th>Result</th>
+            <th colSpan={qualitativeCount}>Qualitative</th>
+            <th colSpan={quantitativeCount}>Quantitative</th>
             { this.props.showSites ? <th>Site</th> : null }
             { this.props.showDevices ? <th>Device</th> : null }
             {sortableHeader("Sample ID", "sample.id")}
@@ -83,7 +108,8 @@ var TestResultsList = React.createClass({
         <tbody>
           {this.props.testResults.map(function(test_result) {
              return <TestResultRow key={test_result.uuid} test_result={test_result}
-              showSites={this.props.showSites} showDevices={this.props.showDevices}/>;
+              showSites={this.props.showSites} showDevices={this.props.showDevices}
+              qualitativeColspan={qualitativeCount} quantitativeColspan={quantitativeCount} />;
           }.bind(this))}
         </tbody>
       </table>

@@ -4,19 +4,6 @@ var AddItemSearchTestResultTemplate = React.createClass({
   }
 });
 
-var AssaysResult = React.createClass({
-  // TODO allow assaysLayout so among different test results, the assays results are rendered in the same order and missing ones can be detected.
-  render: function() {
-    return (
-      <span>
-        {this.props.assays.map(function(assay) {
-           return <AssayResult key={assay.condition} assay={assay}/>;
-        })}
-      </span>
-    );
-  }
-});
-
 var AssaysResultList = React.createClass({
   render: function() {
     return  (
@@ -54,3 +41,28 @@ var AssayResult = React.createClass({
       </span>);
   }
 });
+
+var AssayQuantitativeResult = React.createClass({
+  render: function() {
+    var assay = this.props.assay;
+
+    return (
+      <span>
+        {(assay.name || assay.condition).toUpperCase()}:
+        &nbsp;
+        {assay.quantitative_result}
+      </span>);
+  }
+});
+
+function splitAssays(assays) {
+  var res = { qualitative: [], quantitative: [] }
+
+  for(var i = 0; i < assays.length; i++) {
+    var a = assays[i]
+    if (a.result && a.result != "n/a") { res.qualitative.push(a); }
+    if (a.quantitative_result && a.quantitative_result != "") { res.quantitative.push(a); }
+  }
+
+  return res;
+}
