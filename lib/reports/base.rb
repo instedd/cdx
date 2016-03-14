@@ -91,7 +91,7 @@ module Reports
     def data_hash_month(date, date_results)
       {
         label: label_monthly(date),
-        values: [date_results ? date_results.count : 0]
+        values: [date_results ? count_total(date_results) : 0]
       }
     end
 
