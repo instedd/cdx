@@ -2,24 +2,18 @@ var TestOrderRow = React.createClass({
   render: function() {
     var test_order = this.props.test_order;
 
-    var assays = splitAssays(test_order.encounter.diagnosis);
-    var fillQualitative = this.props.qualitativeColspan - assays.qualitative.length;
-    var fillQuantitative = this.props.quantitativeColspan - assays.quantitative.length;
+    var assays = test_order.encounter.diagnosis;
+    var fillAssays = this.props.assaysColspan - assays.length;
 
     return (
     <tr data-href={'/encounters/' + test_order.encounter.uuid}>
       <td>{test_order.encounter.uuid}</td>
       { this.props.showSites ? <td>{test_order.site ? test_order.site.name : null}</td> : null }
 
-      {assays.qualitative.map(function(assay) {
-         return <td key={assay.condition}><AssayResult assay={assay}/></td>;
+      {assays.map(function(assay) {
+         return <td key={assay.condition} className="text-right"><AssayResult assay={assay}/></td>;
       })}
-      { fillQualitative > 0 ? <td colSpan={fillQualitative}></td> : null }
-
-      {assays.quantitative.map(function(assay) {
-         return <td key={assay.condition}><AssayQuantitativeResult assay={assay}/></td>;
-      })}
-      { fillQuantitative > 0 ? <td colSpan={fillQuantitative}></td> : null }
+      { fillAssays > 0 ? <td colSpan={fillAssays}></td> : null }
 
       <td>{test_order.encounter.start_time}</td>
       <td>{test_order.encounter.end_time}</td>
@@ -48,14 +42,9 @@ var TestOrdersList = React.createClass({
       }
     }.bind(this);
 
-    var qualitativeCount = 1, quantitativeCount = 1;
-    for(var i = 0; i < this.props.testOrders.length; i++) {
-      var assays = splitAssays(this.props.testOrders[i].encounter.diagnosis);
-      qualitativeCount = Math.max(qualitativeCount, assays.qualitative.length);
-      quantitativeCount = Math.max(quantitativeCount, assays.quantitative.length);
-    }
-    var totalAssaysColCount = qualitativeCount + quantitativeCount;
-    console.log(totalAssaysColCount,qualitativeCount,quantitativeCount);
+    var totalAssaysColCount = _.reduce(this.props.testOrders, function(m, test_order) {
+      return Math.max(m, test_order.encounter.diagnosis.length);
+    }, 1);
 
     var timeWidth = this.props.showSites ? "15%" : "25%";
 
@@ -86,8 +75,7 @@ var TestOrdersList = React.createClass({
           <tr>
             {sortableHeader("ID", "encounter.uuid")}
             { this.props.showSites ? <th>Site</th> : null }
-            <th colSpan={qualitativeCount}>Qualitative</th>
-            <th colSpan={quantitativeCount}>Quantitative</th>
+            <th colSpan={totalAssaysColCount} className="text-right">Results</th>
             {sortableHeader("Start time", "encounter.start_time")}
             {sortableHeader("End time", "encounter.end_time")}
           </tr>
@@ -96,7 +84,7 @@ var TestOrdersList = React.createClass({
           {this.props.testOrders.map(function(test_order) {
              return <TestOrderRow key={test_order.encounter.uuid} test_order={test_order}
               showSites={this.props.showSites} showDevices={this.props.showDevices}
-              qualitativeColspan={qualitativeCount} quantitativeColspan={quantitativeCount} />;
+              assaysColspan={totalAssaysColCount} />;
           }.bind(this))}
         </tbody>
       </table>

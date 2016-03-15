@@ -38,31 +38,8 @@ var AssayResult = React.createClass({
     return (
       <span className={"assay-result assay-result-" + assay.result}>
         {(assay.name || assay.condition).toUpperCase()}
-      </span>);
-  }
-});
-
-var AssayQuantitativeResult = React.createClass({
-  render: function() {
-    var assay = this.props.assay;
-
-    return (
-      <span>
-        {(assay.name || assay.condition).toUpperCase()}:
-        &nbsp;
+        {assay.quantitative_result ? ": " : null }
         {assay.quantitative_result}
       </span>);
   }
 });
-
-function splitAssays(assays) {
-  var res = { qualitative: [], quantitative: [] }
-
-  for(var i = 0; i < assays.length; i++) {
-    var a = assays[i]
-    if (a.result && a.result != "n/a") { res.qualitative.push(a); }
-    if (a.quantitative_result && a.quantitative_result != "") { res.quantitative.push(a); }
-  }
-
-  return res;
-}

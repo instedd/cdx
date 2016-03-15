@@ -2,23 +2,17 @@ var TestResultRow = React.createClass({
   render: function() {
     var test = this.props.test_result;
 
-    var assays = splitAssays(test.assays);
-    var fillQualitative = this.props.qualitativeColspan - assays.qualitative.length;
-    var fillQuantitative = this.props.quantitativeColspan - assays.quantitative.length;
+    var assays = test.assays;
+    var fillAssays = this.props.assaysColspan - assays.length;
 
     return (
     <tr data-href={'/test_results/' + test.uuid}>
       <td>{test.name}</td>
 
-      {assays.qualitative.map(function(assay) {
-         return <td key={assay.condition}><AssayResult assay={assay}/></td>;
+      {assays.map(function(assay) {
+         return <td key={assay.condition} className="text-right"><AssayResult assay={assay}/></td>;
       })}
-      { fillQualitative > 0 ? <td colSpan={fillQualitative}></td> : null }
-
-      {assays.quantitative.map(function(assay) {
-         return <td key={assay.condition}><AssayQuantitativeResult assay={assay}/></td>;
-      })}
-      { fillQuantitative > 0 ? <td colSpan={fillQuantitative}></td> : null }
+      { fillAssays > 0 ? <td colSpan={fillAssays}></td> : null }
 
       { this.props.showSites ? <td>{test.site ? test.site.name : null}</td> : null }
       { this.props.showDevices ? <td>{test.device ? test.device.name : null}</td> : null }
@@ -51,13 +45,9 @@ var TestResultsList = React.createClass({
       }
     }.bind(this);
 
-    var qualitativeCount = 1, quantitativeCount = 1;
-    for(var i = 0; i < this.props.testResults.length; i++) {
-      var assays = splitAssays(this.props.testResults[i].assays);
-      qualitativeCount = Math.max(qualitativeCount, assays.qualitative.length);
-      quantitativeCount = Math.max(quantitativeCount, assays.quantitative.length);
-    }
-    var totalAssaysColCount = qualitativeCount + quantitativeCount;
+    var totalAssaysColCount = _.reduce(this.props.testResults, function(m, test) {
+      return Math.max(m, test.assays.length);
+    }, 1);
 
     var timeWidth;
     if (this.props.showSites && this.props.showDevices) {
@@ -96,8 +86,7 @@ var TestResultsList = React.createClass({
           </tr>
           <tr>
             {sortableHeader("Name", "test.name")}
-            <th colSpan={qualitativeCount}>Qualitative</th>
-            <th colSpan={quantitativeCount}>Quantitative</th>
+            <th colSpan={totalAssaysColCount} className="text-right">Results</th>
             { this.props.showSites ? <th>Site</th> : null }
             { this.props.showDevices ? <th>Device</th> : null }
             {sortableHeader("Sample ID", "sample.id")}
@@ -109,7 +98,7 @@ var TestResultsList = React.createClass({
           {this.props.testResults.map(function(test_result) {
              return <TestResultRow key={test_result.uuid} test_result={test_result}
               showSites={this.props.showSites} showDevices={this.props.showDevices}
-              qualitativeColspan={qualitativeCount} quantitativeColspan={quantitativeCount} />;
+              assaysColspan={totalAssaysColCount} />;
           }.bind(this))}
         </tbody>
       </table>
