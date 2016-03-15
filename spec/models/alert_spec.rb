@@ -31,6 +31,16 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
       alert.error_code="aa"
       expect(alert).to_not be_valid
     end
+    
+    it "cannot create for aggregation threshold greater than 100%" do
+      alert = Alert.make
+      alert.category_type = "device_errors"
+      alert.error_code="11"
+      alert.use_aggregation_percentage = true
+      alert.aggregation_threshold = 101
+      expect(alert).to_not be_valid
+    end    
+      
   end
 
   context "validate soft delete" do
@@ -109,4 +119,35 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
     result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
     expect(result["hits"]["total"]).to eq(0)
   end
+  
+  
+  it "does not create a percolator for invalid_test_date anomalie" do 
+    alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
+    alert.query = {"test.error_code"=>"155"}
+    alert.user = institution.user
+    alert.save!
+
+    begin
+      percolator = Cdx::Api.client.get index: Cdx::Api.index_name_pattern, type: '.percolator', id: "alert_"+alert.id.to_s
+    rescue
+    end
+    expect(percolator).to eq nil
+  end
+  
+  it "does not give an error when you delete a percolator for invalid_test_date anomalie" do
+    alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
+    alert.query = {"test.error_code"=>"155"}
+    alert.user = institution.user
+
+    alert.save!
+
+    alert.enabled=false
+    alert.delete_percolator
+
+    alert.save
+    refresh_index
+    result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
+    expect(result["hits"]["total"]).to eq(0)
+  end
+  
 end

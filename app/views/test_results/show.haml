@@ -33,9 +33,10 @@
           %br
         Test performed on
         = link_to @test_result.device.name, device_path(@test_result.device)
-        by
-        -# TODO add link to site_user
-        = @test_result.core_fields[TestResult::LAB_USER_FIELD]
+        - if @test_result.core_fields[TestResult::LAB_USER_FIELD].present?
+          by
+          / TODO add link to site_user
+          = @test_result.core_fields[TestResult::LAB_USER_FIELD]
         - if @test_result.device.site
           at
           = link_to @test_result.device.site, edit_site_path(@test_result.device.site)

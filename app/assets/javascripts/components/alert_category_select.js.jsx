@@ -64,7 +64,9 @@ var AlertCategorySelect = React.createClass({
 			error_messages:[],
 			test_result_min_thresholdField: this.props.alert_info.test_result_min_threshold,
 			test_result_max_thresholdField: this.props.alert_info.test_result_max_threshold,
-			utilization_efficiency_numberField: this.props.alert_info.utilization_efficiency_number
+			utilization_efficiency_numberField: this.props.alert_info.utilization_efficiency_number,
+			use_aggregation_percentageField: this.props.alert_info.use_aggregation_percentage,
+			institution_idField : this.props.alert_info.institution_id
 		};
 	},
 	categoryChanged: function(e) {
@@ -149,7 +151,6 @@ var AlertCategorySelect = React.createClass({
 		}
 	},
 	submit_error: function(errorArray) {
-
 		this.setState({
 			error_messages: errorArray
 		});
@@ -163,7 +164,6 @@ var AlertCategorySelect = React.createClass({
 	handleAlertSubmit: function(event) {
 		event.preventDefault();
 		var current_category = this.state.current_category;
-
 		var new_alert_info = {
 			name: this.state.nameField,
 			sites_info: this.state.siteField,
@@ -191,7 +191,9 @@ var AlertCategorySelect = React.createClass({
 			external_users: this.state.external_users,
 			test_result_min_threshold: this.state.test_result_min_thresholdField,
 			test_result_max_threshold: this.state.test_result_max_thresholdField,
-			utilization_efficiency_number: this.state.utilization_efficiency_numberField
+			utilization_efficiency_number: this.state.utilization_efficiency_numberField,
+			use_aggregation_percentage: this.state.use_aggregation_percentageField,
+			institution_id: this.state.institution_idField
 		};
 
 		if (this.props.edit == true) {
@@ -205,14 +207,10 @@ var AlertCategorySelect = React.createClass({
 	render: function() {
 		return (
 			<div>
-
 				<div className="row">
 					<div className="col">
-
 						<FlashErrorMessages messages={this.state.error_messages} />
-
 						<form className = "alertForm" id="new_alert" onSubmit = {this.handleAlertSubmit} >
-
 							<input type='hidden' name='authenticity_token' value={this.props.authenticity_token} />
 
 							<AlertEnabled checkedLink = {
@@ -241,7 +239,6 @@ var AlertCategorySelect = React.createClass({
 							<AlertDevice devices={this.state.all_devices} valueLink={this.linkState('deviceField')} disable_all_selects={this.state.disable_all_selects} />
 
 							<AlertSampleId valueLink={this.linkState('sampleIdField')} edit={false} />
-
 
 							<div className="row">
 								<div className="col pe-3">
@@ -330,8 +327,9 @@ var AlertCategorySelect = React.createClass({
 								/>
 
 							<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies} valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
-							<AlertAggregationThreshold valueLink={this.linkState('aggregation_thresholdField')} edit={false} />
-
+							<AlertAggregationThreshold checkedLink={this.linkState('use_aggregation_percentageField')} textLink={this.linkState('aggregation_thresholdField')}
+							 edit={false} />
+											
 							<hr />
 
 							<AlertChannel channel_types = {
@@ -373,10 +371,10 @@ var AlertCategorySelect = React.createClass({
 								/>
 
 							<div className="row">
-								<div className="col pe-2">
+								<div className="col pe-3">
 									&nbsp;
 								</div>
-								<div className = "col">
+								<div className = "col pe-8">
 									<input type = "submit" value = {this.state.submit_button_text} className = "btn-primary" id="submit" />
 									<a className = "btn-link" href = "/alerts">Cancel</a>
 								</div>
@@ -386,14 +384,12 @@ var AlertCategorySelect = React.createClass({
 								</div>
 							</div>
 						</form>
-
 					</div>
 
 					<div className="col">
 						<AlertDisplayIncidentInfo alert_info={this.props.alert_info} edit={this.props.edit} alert_number_incidents={this.props.alert_number_incidents} alert_last_incident={this.props.alert_last_incident} alert_created_at={this.props.alert_created_at}/>
 					</div>
 				</div>
-
 			</div>
 		);
 	}

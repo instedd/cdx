@@ -176,4 +176,12 @@ module ApplicationHelper
   def navigation_context_name
     @navigation_context.try(:site).try(:name) || @navigation_context.institution.name
   end
+
+  def filters_params
+    filters_params = params
+    ['controller', 'action', 'page_size', 'page'].each do |param|
+      filters_params.delete(param)
+    end
+    filters_params
+  end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160301180433) do
+ActiveRecord::Schema.define(version: 20160310151033) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20160301180433) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "for_aggregation_calculation",           default: false
+    t.datetime "test_result_updated_at"
   end
 
   add_index "alert_histories", ["alert_id"], name: "index_alert_histories_on_alert_id", using: :btree
@@ -77,9 +78,13 @@ ActiveRecord::Schema.define(version: 20160301180433) do
     t.integer  "utilization_efficiency_number",       limit: 4,     default: 0
     t.datetime "utilization_efficiency_last_checked"
     t.integer  "email_limit",                         limit: 4,     default: 0
+    t.boolean  "use_aggregation_percentage",                        default: false
+    t.integer  "institution_id",                      limit: 4
+    t.datetime "time_last_aggregation_checked"
   end
 
   add_index "alerts", ["deleted_at"], name: "index_alerts_on_deleted_at", using: :btree
+  add_index "alerts", ["institution_id"], name: "index_alerts_on_institution_id", using: :btree
   add_index "alerts", ["user_id"], name: "index_alerts_on_user_id", using: :btree
 
   create_table "alerts_conditions", id: false, force: :cascade do |t|
@@ -178,8 +183,8 @@ ActiveRecord::Schema.define(version: 20160301180433) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",                  limit: 4
-    t.boolean  "supports_activation"
     t.datetime "published_at"
+    t.boolean  "supports_activation"
     t.string   "support_url",                     limit: 255
     t.string   "picture_file_name",               limit: 255
     t.string   "picture_content_type",            limit: 255
@@ -578,6 +583,7 @@ ActiveRecord::Schema.define(version: 20160301180433) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
+  add_foreign_key "alerts", "institutions"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
   add_foreign_key "patients", "sites"

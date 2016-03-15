@@ -26,7 +26,6 @@ class AlertRecipient < ActiveRecord::Base
     end
   end
 
-
   #the email or the phone number must be present
   def email_telephone_validation_presence
     if recipient_type == "external_user"
@@ -35,6 +34,5 @@ class AlertRecipient < ActiveRecord::Base
       end
     end
   end
-
 
 end

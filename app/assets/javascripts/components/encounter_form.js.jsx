@@ -153,7 +153,7 @@ var EncounterForm = React.createClass(_.merge({
         <div className="row">
           <div className="col pe-2">
             <label>Diagnosis</label>
-            <p style={{fontSize: "12px"}}><i>Each time a new test arrives, the list of conditions will be updated for you to diagnostic</i></p>
+            <p style={{fontSize: "12px"}}><i>When new tests are reported for this order, you'll be able to diagnose the corresponding condition here.</i></p>
           </div>
 
           <div className="col assays-editor">

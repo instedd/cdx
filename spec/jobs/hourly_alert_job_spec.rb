@@ -71,7 +71,26 @@ describe HourlyAlertJob, elasticsearch: true do
       expect(before_test_recipient_count).to eq(after_test_recipient_count)
     end
 
+  
+    it "check non-repeat logic for when same smaple id but different event-id that multiple alert triggers are not generated" do
+      before_test_history_count = AlertHistory.count
+      before_test_recipient_count=RecipientNotificationHistory.count
+
+      @alert.create_percolator
+
+      device1 = Device.make institution: institution, site: site1
+      DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 155}, sample: {id: 'aa',entity_id: "111"}, patient: {id: 'a',gender: :male})
+      DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 155}, sample: {id: 'aa',entity_id: "112"}, patient: {id: 'a',gender: :male})
+
+      worker.perform
+
+      after_test_history_count = AlertHistory.count
+      after_test_recipient_count= RecipientNotificationHistory.count
+
+      expect(before_test_history_count+3).to eq(after_test_history_count)
+      expect(before_test_recipient_count+1).to eq(after_test_recipient_count)
+    end
+    
 
   end
-
 end

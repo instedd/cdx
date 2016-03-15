@@ -12,13 +12,18 @@ class HourlyUtilizationEfficiencyJob
     # if it has just alert the user
     alerts.each do |alert|
       begin
-        #calculate in hour the frequency
-        utilization_efficiency_hours =0;
+        #calculate in hours the frequency
+        utilization_efficiency_hours = 0
         amount = alert.utilization_efficiency_number
 
         #convert the aggregation [days or hours] into hours for calculations
-        if alert.aggregation_frequency == "day"
-          utilization_efficiency_hours = amount * 24 #24 hours in a day
+        hours_per_day = 24
+        if alert.aggregation_frequency == "month"
+          utilization_efficiency_hours = amount * hours_per_day * 30 
+        elsif alert.aggregation_frequency == "week"
+          utilization_efficiency_hours = amount * hours_per_day * 7 
+        elsif alert.aggregation_frequency == "day"
+          utilization_efficiency_hours = amount * hours_per_day 
         else
           utilization_efficiency_hours = amount
         end
