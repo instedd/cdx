@@ -73,11 +73,11 @@ var TestResultsList = React.createClass({
         <colgroup>
           <col width="15%" />
           {_.range(totalAssaysColCount).map(function(i){
-            return (<col key={i} width={(25 / totalAssaysColCount) + "%"} />);
+            return (<col key={i} width={(34 / totalAssaysColCount) + "%"} />);
           }.bind(this))}
-          { this.props.showSites ? <col width="10%" /> : null }
-          { this.props.showDevices ? <col width="10%" /> : null }
-          <col width="10%" />
+          { this.props.showSites ? <col width="7%" /> : null }
+          { this.props.showDevices ? <col width="7%" /> : null }
+          <col width="7%" />
           <col width={timeWidth} />
           <col width={timeWidth} />
         </colgroup>
