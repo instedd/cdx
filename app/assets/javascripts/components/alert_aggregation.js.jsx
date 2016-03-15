@@ -1,5 +1,3 @@
-
-
 var AlertAggregation = React.createClass({
 	getDefaultProps: function(){
 		return {
@@ -59,7 +57,6 @@ var AlertAggregation = React.createClass({
 });
 
 
-
 var AlertAggregationFrequency = React.createClass({
 	getDefaultProps: function(){
 		return {
@@ -117,6 +114,7 @@ var AlertAggregationFrequency = React.createClass({
 }
 });
 
+
 var AlertAggregationThreshold = React.createClass({
 	render: function() {
 		return (
@@ -126,12 +124,30 @@ var AlertAggregationThreshold = React.createClass({
 			</div>
 
 			<div className = "col" >
-				<input type = "text"  type="number" min="0" max="10000" placeholder = "Agg Threshold" valueLink = {
-						this.props.valueLink
-					}
-					id = "alertaggregationthresholdlimit" disabled={this.props.edit} />
+					<input type = "text" type="number" min="0" max="10000" 
+					  placeholder = "Agg Threshold" 
+					  valueLink = {
+							this.props.textLink
+						}
+						id="alertaggregationthresholdlimit" />
 			</div>
+					
+			<div className = "col">
+				<label>Use Percentage</label>
+			</div>
+			<div className = "col">
+			  <input
+					type = "checkbox"
+					checkedLink = {
+						this.props.checkedLink
+					}
+					id="alertaggregationpercentage"
+					disabled={this.props.edit}
+					/>		
+				 <label htmlFor="alertaggregationpercentage">&nbsp;</label>
+			</div>		
 		</div>
 	);
 }
 });
+

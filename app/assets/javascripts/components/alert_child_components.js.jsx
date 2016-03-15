@@ -54,7 +54,6 @@ var AlertEnabled = React.createClass({
 					id="AlertEnabled"
 					/>
 				<label htmlFor="AlertEnabled">&nbsp;</label>
-
 			</div>
 		</div>
 	);
@@ -298,6 +297,7 @@ var AlertAnomalieType = React.createClass({
 						this.props.disable_all_selects
 					}
 					placeholder="Select"
+					clearable = { false }
 					/>
 			</div>
 		</div>

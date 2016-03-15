@@ -14,6 +14,7 @@ class AlertsController < ApplicationController
     new_alert_request_variables
     alert_info.sms_limit=100
     alert_info.email_limit=100
+    alert_info.institution_id = @navigation_context.institution.id
     alert_info.utilization_efficiency_number=1
     alert_info.alert_recipients.build
   end
@@ -93,16 +94,18 @@ class AlertsController < ApplicationController
     condition_result_ok = true
     error_text=Hash.new
     alert_info.user = current_user
+    alert_info.time_last_aggregation_checked = Time.now
+    
     alert_saved_ok = alert_info.save
     if alert_saved_ok==false
       error_text = alert_info.errors.messages
     else
-      alert_info.query="{}";
+      alert_info.query="{}"
       edit = false
       internal_users_ok,external_users_ok,error_text = set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, edit)
       condition_result_ok, error_text = set_category(params, alert_info, error_text, condition_result_ok, edit)
       set_sample_id(params, alert_info)
-      set_sites_devices(params, alert_info, edit)
+      set_sites_devices_institutions(params, alert_info, edit)
       alert_query_updated_ok = alert_info.update(query: alert_info.query)
     end
 
@@ -128,12 +131,12 @@ class AlertsController < ApplicationController
         alert_info.delete_percolator
       end
 
-      alert_info.query="{}";
+      alert_info.query="{}"
       edit = true
       internal_users_ok,external_users_ok,error_text = set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, edit)
       error_text, condition_result_ok = set_category(params, alert_info, error_text, condition_result_ok, edit)
       set_sample_id(params, alert_info)
-      set_sites_devices(params, alert_info, edit)
+      set_sites_devices_institutions(params, alert_info, edit)
       alert_query_updated_ok = alert_info.update(query: alert_info.query)
     end
 
@@ -155,7 +158,13 @@ class AlertsController < ApplicationController
   private
 
   def alert_params
-    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :email_limit, :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, :utilization_efficiency_number, alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
+    params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, 
+                                  :message, :sms_message, :sample_id, :site_id, :category_type, :notify_patients, :aggregation_type, 
+                                  :anomalie_type, :aggregation_frequency, :channel_type, :sms_limit, :email_limit, 
+                                  :aggregation_threshold, :roles, :external_users, :conditions_info, :condition_results_info, 
+                                  :condition_result_statuses_info, :test_result_min_threshold, :test_result_max_threshold, 
+                                  :utilization_efficiency_number, :use_aggregation_percentage, :institution_id,
+                                  alert_recipients_attributes: [:user, :user_id, :email, :role, :role_id, :id] )
   end
 
   def new_alert_request_variables
@@ -187,11 +196,15 @@ class AlertsController < ApplicationController
     end
   end
 
-  def set_sites_devices(params, alert_info, is_edit)
+  def set_sites_devices_institutions(params, alert_info, is_edit)
     if is_edit==true
       alert_info.devices.destroy_all
       alert_info.sites.destroy_all
     end
+
+    #add the institution to the query
+    inst = Institution.find(alert_info.institution_id)
+    alert_info.query=alert_info.query.merge ({"institution.uuid"=>inst.uuid})
 
     if params[:alert][:sites_info]
       sites = params[:alert][:sites_info].split(',')
@@ -219,20 +232,16 @@ class AlertsController < ApplicationController
     #Note: alert_info.create_percolator is called from the model
   end
 
-  def set_category(params, alert_info, error_text, condition_result_ok, is_edit)
+
+  def set_category(params, alert_info, error_text, condition_result_ok, is_edit)    
     if is_edit==true
       alert_info.conditions.destroy_all
     end
 
     if alert_info.category_type == "anomalies"
-      # check that the start_time field is not missing
       if alert_info.anomalie_type == "missing_sample_id"
-        # alert_info.query = {"sample.id"=>"not(null)" }
         alert_info.query = {"sample.id"=>"null"}
-      elsif alert_info.anomalie_type == "missing_start_time"
-        alert_info.query = {"test.start_time"=>"null"}
       end
-
     elsif alert_info.category_type == "device_errors"
       if alert_info.error_code && (alert_info.error_code.include? '-')
         minmax=alert_info.error_code.split('-')
@@ -242,7 +251,6 @@ class AlertsController < ApplicationController
       else
         alert_info.query = {"test.error_code"=>alert_info.error_code }
       end
-
     elsif alert_info.category_type == "test_results"
       #this will generate a query like: core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]}
       if params[:alert][:conditions_info]
@@ -269,7 +277,6 @@ class AlertsController < ApplicationController
           query_condition_results << condition_result_name
         end
       end
-
       alert_info.query= {"test.assays.condition" => query_conditions,"test.assays.result" => query_condition_results}
       #TEST  alert_info.query =    {"assays.quantitative_result.min" => "8"}
       #TEST  alert_info.query =    {"test.assays.condition" => query_conditions, "test.assays.quantitative_result.min" => "8"}

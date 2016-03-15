@@ -12,12 +12,9 @@ var AlertExternalUser = React.createClass({
 			}
 		},
 		clickHandler: function() {
-
-
 			if (this.props.edit == true) {
 				return false;
 			}
-
 			externalPerson = { id:  this.state.externalUsers.length,"first_name": this.state.first_name,"last_name": this.state.last_name,"email": this.state.email,"telephone": this.state.telephone}
 
 			//Note: maybe this might be a better way , https://facebook.github.io/react/docs/update.html
@@ -34,7 +31,6 @@ var AlertExternalUser = React.createClass({
 			this.props.onChangeParentLevel(this.state.externalUsers);
 		},
 		deleteClickHander: function(index) {
-
 			if (this.props.edit == true) {
 				return false;
 			}
@@ -44,7 +40,6 @@ var AlertExternalUser = React.createClass({
 			this.setState({
 				externalUsers: TempExternalUsers
 			});
-
 		},
 		render: function() {
 			return (
@@ -68,7 +63,6 @@ var AlertExternalUser = React.createClass({
 });
 
 
-
 var AlertCreateExternalUser = React.createClass({
 	propTypes: {
 		onClick:   React.PropTypes.func
@@ -79,32 +73,31 @@ var AlertCreateExternalUser = React.createClass({
 	render: function() {
 		return (
 			< div className = "row">
-
-			<div className = "col" >
+			<div className = "col pe-2"  >
 				<input type = "text" placeholder = "first name"
 					valueLink = {this.props.firstnameLink}
 					id="externaluser_firstname" />
 			</div>
 
-			<div className = "col" >
+			<div className = "col pe-3"  >
 				<input type = "text" placeholder = "last name"
 					valueLink = {this.props.lastnameLink}
 					id="externaluser_lastname" />
 			</div>
 
-			<div className = "col" >
+			<div className = "col pe-4" >
 				<input type = "text" placeholder = "email"
 					valueLink = {this.props.emailLink}
 					id="externaluser_email" />
 			</div>
 
-			<div className = "col" >
+			<div className = "col pe-2" >
 				<input type = "text" placeholder = "telephone"
 					valueLink = {this.props.telephoneLink}
 					id="externaluser_telephone" />
 			</div>
 
-			<div className = "col pe-2" >
+			<div className = "col" >
 				<a className = "btn-link"  onClick={this.clickHandler} id="newexternaluser">Create User</a>
 			</div>
 
@@ -112,7 +105,6 @@ var AlertCreateExternalUser = React.createClass({
 	);
 }
 });
-
 
 
 var AlertListExternalUser = React.createClass({
@@ -138,7 +130,6 @@ var AlertListExternalUser = React.createClass({
 });
 
 
-
 var ExternalUser = React.createClass({
 	propTypes: {
 		onClick:   React.PropTypes.func
@@ -149,16 +140,16 @@ var ExternalUser = React.createClass({
 	render: function() {
 		return (
 			< div className = "row"id = "namerow" >
-			<div className = "col pe-2" >
+			<div className = "col pe-3" >
 				&nbsp;
 			</div>
 			<div className = "col" >
 				{this.props.first_name}
 			</div>
-			<div className = "col" >
+			<div className = "col pe-2" >
 				{this.props.last_name}
 			</div>
-			<div className = "col" >
+			<div className = "col pe-4" >
 				{this.props.email}
 			</div>
 			<div className = "col" >
