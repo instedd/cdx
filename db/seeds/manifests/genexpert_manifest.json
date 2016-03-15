@@ -44,11 +44,15 @@
       } else {
         if(message['event']['result'].match(/.*MTB DETECTED.*/)){
           mtb = 'positive'
+        } else if(message['event']['result'].match(/.*MTB INDETERMINATE.*/)) {
+          mtb = 'indeterminate'
         } else {
           mtb = 'negative'
         };
         if(message['event']['result'].match(/.*Rif Resistance DETECTED.*/)){
           rif = 'positive'
+        } else if(message['event']['result'].match(/.*Rif Resistance INDETERMINATE.*/)) {
+          rif = 'indeterminate'
         } else {
           rif = 'negative'
         };
