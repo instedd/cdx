@@ -71,8 +71,8 @@ module ChartsHelper
     return results.sort_by_day
   end
 
-  def tests_by_name
-    Reports::AllTests.by_name(current_user, @navigation_context, options)
+  def tests_by_status
+    Reports::Grouped.by_status(current_user, @navigation_context, options)
   end
 
   def days_since

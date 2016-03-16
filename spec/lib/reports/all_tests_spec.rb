@@ -58,12 +58,4 @@ RSpec.describe Reports::AllTests, elasticsearch: true do
       expect(count).to eq(3)
     end
   end
-
-  describe '.by_name' do
-    it 'groups tests by name in current context' do
-      data = Reports::AllTests.by_name(current_user, nav_context)
-      expect(data).to include({ :label => 'mtb', :value => 2 })
-      expect(data).to include({ :label => 'man_flu', :value => 1 })
-    end
-  end
 end

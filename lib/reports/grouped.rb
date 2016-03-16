@@ -9,7 +9,7 @@ module Reports
     def grouped_by(symbol)
       groupings = Reports::Grouped.groupings
       filter['group_by'] = groupings[symbol][0]
-      filter['test.status'] = groupings[symbol][1]
+      filter['test.status'] = groupings[symbol][1] if groupings[symbol][1]
       results = TestResult.query(filter, current_user).execute
       total_count = results['total_count']
       no_error_code = total_count
@@ -28,9 +28,10 @@ module Reports
 
     def self.groupings
       {
-        device: ['device.uuid',''],
+        device: ['device.uuid'],
         error_code: ['test.error_code','error'],
         model: ['device.model','error'],
+        status: ['test.status'],
         successful: ['test.status','success'],
         unsuccessful: ['test.status','invalid,error,no_result,in_progress']
       }

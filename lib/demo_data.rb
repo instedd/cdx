@@ -20,7 +20,6 @@ module DemoData
     device_list.each do |device_list_info| 
       device = Device.includes(:device_model, :manifest, :institution, :site).find_by_name(device_list_info[:device]) 
       data= IO.read(File.join(Rails.root, 'app', 'jobs',  'demo_data', 'manifests_demo_template', device_list_info[:template]))
-
       repeat_demo_per_device.times do     
         changed_data=randomise_device_data(device, data.clone)
         device_message = DeviceMessage.new(device: device, plain_text_data: changed_data)
@@ -64,8 +63,10 @@ module DemoData
   end
 
   def randomise_device_data(device, data, start_datetime='', end_datetime='')
+    result = results.sample
+    model = device.device_model.name
+
     if data.include?('{result}') 
-      result = conditions = ["INVALID", "ERROR", "NO RESULT","MTB NOT DETECTED","Rif Resistance DETECTED","Rif Resistance INDETERMINATE","MTB DETECTED","*"].sample
       data.gsub! '{result}', result
     end
 
@@ -153,8 +154,14 @@ module DemoData
         data.gsub! '{FIO_decimal_lpdh}', Faker::Number.between(1, 10).to_s
       end
     end    
-    
-    
+    if model == 'GeneXpert'
+      message = JSON.parse(data)
+      result = message['event']['result']
+      if result == 'ERROR'
+        message['event']['error_code'] = [100, 200, 300, 400].sample
+      end
+      data = message.to_json
+    end
     return data
   end
 
@@ -166,6 +173,18 @@ module DemoData
       users << Faker::Name.name
     end
     users
+  end
+
+  def results
+     [
+      'INVALID',
+      'ERROR',
+      'NO RESULT',
+      'MTB NOT DETECTED',
+      'Rif Resistance DETECTED',
+      'Rif Resistance INDETERMINATE',
+      'MTB DETECTED'
+    ]
   end
 
   def system_users
