@@ -1,9 +1,7 @@
 require 'spec_helper'
 include Alerts
 
-
 describe "SMS" do
-
   before(:each) do
     stub_request(:get, "https://CDx%2FCDx-Dev:cdx123cdx@nuntium.instedd.org/CDx/CDx-Dev/send_ao?body=welcome%20mr%20smith&from=sms://442393162302&to=sms://123444").
     with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
@@ -16,7 +14,6 @@ describe "SMS" do
 
   context "sms operation" do
     it "should test sending sms" do
-
       alert = Alert.make
       alert.name="test alert"
       alert.sms_message="welcome mr {lastname}"
@@ -33,7 +30,6 @@ describe "SMS" do
       person[:user_id] = nil
       person[:recipient_id] = recipient.id
       tel_list.push person
-
 
       recipient2 = AlertRecipient.make
       recipient2.recipient_type = AlertRecipient.recipient_types["external_user"]
@@ -51,80 +47,9 @@ describe "SMS" do
       alert_history = AlertHistory.new
       alert_history.alert = alert
 
-
       alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
 
       expect(RecipientNotificationHistory.count).to eq(2)
     end
-
   end
-
-
-=begin
-  context "sms exceeded" do
-
-    it "should test exceeding sms limit" do
-
-
-      alert = Alert.make
-      alert.name="test alert"
-      alert.sms_message="welcome mr {lastname}"
-
-      recipient = AlertRecipient.make
-      recipient.recipient_type = AlertRecipient.recipient_types["external_user"]
-      recipient.alert=alert
-
-      tel_list=[]
-      person = Hash.new
-      person[:telephone] = "123444"
-      person[:first_name] = recipient.first_name
-      person[:last_name] = recipient.last_name
-      person[:user_id] = nil
-      person[:recipient_id] = recipient.id
-      tel_list.push person
-
-      alert_history = AlertHistory.new
-      alert_history.alert = alert
-
-      alert.sms_limit=2
-
-      alert.error_code=155
-      binding.pry
-      alert.category_type= "device_errors"
-      alert.save
-
-
-      #insert test result
-      binding.pry
-      user = User.make
-      institution = Institution.make user_id: user.id
-      site =  Site.make institution: institution
-      device =  Device.make institution: institution, site: site
-      data = Oj.dump test:{assays: [result: :positive]}
-
-
-      #  DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
-
-      DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 155}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
-
-
-
-
-
-      #     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
-      #     binding.pry
-      #     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
-      #     binding.pry
-      #     alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
-      #     binding.pry
-      #    alert_sms_inform_recipient(alert, alert_history, tel_list, alert_count=0)
-
-      binding.pry
-      expect(RecipientNotificationHistory.count).to eq(2)
-
-    end
-  end
-=end
-
-
 end
