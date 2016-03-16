@@ -106,6 +106,7 @@ class AlertsController < ApplicationController
       condition_result_ok, error_text = set_category(params, alert_info, error_text, condition_result_ok, edit)
       set_sample_id(params, alert_info)
       set_sites_devices_institutions(params, alert_info, edit)
+      only_allow_specimen_test_type(alert_info)
       alert_query_updated_ok = alert_info.update(query: alert_info.query)
     end
 
@@ -196,6 +197,10 @@ class AlertsController < ApplicationController
     end
   end
 
+  def only_allow_specimen_test_type(alert_info)
+    alert_info.query=alert_info.query.merge ({"test.type"=>"specimen"})
+  end
+  
   def set_sites_devices_institutions(params, alert_info, is_edit)
     if is_edit==true
       alert_info.devices.destroy_all
@@ -214,7 +219,7 @@ class AlertsController < ApplicationController
         alert_info.sites << site
         query_sites << site.uuid
       end
-      #Note:  the institution uuid should not be necessary
+      
       alert_info.query=alert_info.query.merge ({"site.uuid"=>query_sites})
     end
 

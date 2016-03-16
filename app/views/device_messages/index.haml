@@ -42,7 +42,7 @@
               %td= message.device.name
               %td= message.index_failure_data[:number_of_failures]
               %td= message.index_failure_data[:target_field]
-              %td= format_datetime(message.created_at.in_time_zone(message.device.time_zone))
+              %td= @localization_helper.format_datetime_time_zone(message.created_at, message.device.time_zone)
               %td
                 = link_to raw_device_message_path(message) do
                   .icon-download.icon-gray

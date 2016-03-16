@@ -22,7 +22,7 @@
       - c.top do
         %b= @test_result.core_fields[TestResult::NAME_FIELD]
         %br
-        %span= format_datetime(@test_result.core_fields[TestResult::START_TIME_FIELD])
+        %span= @localization_helper.format_datetime(@test_result.core_fields[TestResult::START_TIME_FIELD]) # TODO should use device timezone (?)
         - if @show_institution
           %div
             Institution: #{@test_result.institution.name}

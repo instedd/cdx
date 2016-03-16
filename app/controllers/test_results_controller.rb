@@ -32,6 +32,9 @@ class TestResultsController < ApplicationController
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
 
+    @show_sites = @sites.size > 1
+    @show_devices = @devices.size > 1
+
     respond_to do |format|
       format.html do
         @query["page_size"] = @page_size
@@ -127,12 +130,23 @@ class TestResultsController < ApplicationController
     result = TestResult.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["tests"]
+    @json = build_json_array TestResult, @tests
   end
 
   def execute_encounter_query
     result = Encounter.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["encounters"]
+    @json = build_json_array Encounter, @tests
+  end
+
+  def build_json_array(entity_class, tests)
+    json = Jbuilder.new do |json|
+      json.array! tests do |test|
+        entity_class.as_json_from_query(json, test, @localization_helper)
+      end
+    end
+    json.attributes!
   end
 
   def execute_csv_query(filename)
@@ -157,6 +171,6 @@ class TestResultsController < ApplicationController
     _institutions, @sites, @devices = Policy.condition_resources_for(QUERY_TEST, TestResult, current_user).values
     @sites = @sites.within(@navigation_context.entity, @navigation_context.exclude_subsites)
     @devices = @devices.within(@navigation_context.entity, @navigation_context.exclude_subsites)
-    @devices_by_uuid = @devices.index_by &:uuid
+    @localization_helper.devices_by_uuid = @devices_by_uuid = @devices.index_by &:uuid
   end
 end
