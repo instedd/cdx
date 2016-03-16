@@ -188,6 +188,16 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(tests.size).to eq(1)
         expect(tests.first['_source']['test']['start_time']).to eq('2015-04-07T18:31:20-05:00')
       end
+
+      it "should parse status" do
+        copy_sample('genexpert_sample.json', 'jsons')
+        DeviceMessageImporter.new("*.json").import_from sync_dir
+
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
+        tests = all_elasticsearch_tests
+        expect(tests.size).to eq(1)
+        expect(tests.first['_source']['test']['status']).to eq('success')
+      end
     end
 
     context 'genoscan' do
