@@ -142,6 +142,21 @@ class Encounter < ActiveRecord::Base
     update_attribute(:user_updated_at, Time.now.utc)
   end
 
+  def self.as_json_from_query(json, encounter_query_result, localization_helper)
+    encounter = encounter_query_result["encounter"]
+
+    json.encounter do
+      json.uuid encounter["uuid"]
+      json.diagnosis encounter["diagnosis"] || []
+      json.start_time(localization_helper.format_datetime(encounter["start_time"]))
+      json.end_time(localization_helper.format_datetime(encounter["end_time"]))
+    end
+
+    json.site do
+      json.name encounter_query_result["site"]["name"]
+    end
+  end
+
   protected
 
   def ensure_entity_id

@@ -264,7 +264,7 @@ var EncounterForm = React.createClass(_.merge({
 
         <div className="row">
           <div className="col">
-            <TestResultsList testResults={this.state.encounter.test_results} /><br/>
+            <TestResultsList testResults={this.state.encounter.test_results} showSites={false} showDevices={true} /><br/>
             <a className="btn-add-link"  href='#' onClick={this.showTestsModal}><span className="icon-circle-plus icon-blue"></span> Add tests</a>
           </div>
 

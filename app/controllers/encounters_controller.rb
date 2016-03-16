@@ -315,8 +315,9 @@ class EncountersController < ApplicationController
 
       json.(@encounter, :new_samples)
 
+      @localization_helper.devices_by_uuid = @encounter_blender.test_results.map{|tr| tr.single_entity.device}.uniq.index_by &:uuid
       json.test_results @encounter_blender.test_results.uniq do |test_result|
-        as_json_test_result(json, test_result.single_entity)
+        test_result.single_entity.as_json(json, @localization_helper)
       end
     end
   end
@@ -346,29 +347,8 @@ class EncountersController < ApplicationController
   def as_json_test_results_search(test_results)
     Jbuilder.new do |json|
       json.array! test_results do |test|
-        as_json_test_result(json, test)
+        test.as_json(json, @localization_helper)
       end
-    end
-  end
-
-  def as_json_test_result(json, test_result)
-    json.(test_result, :uuid, :test_id)
-    json.name test_result.core_fields[TestResult::NAME_FIELD]
-    if test_result.sample
-      json.sample_entity_ids test_result.sample.entity_ids
-    end
-    json.start_time(format_datetime(test_result.core_fields[TestResult::START_TIME_FIELD]))
-
-    json.assays (test_result.core_fields[TestResult::ASSAYS_FIELD] || [])
-
-    if test_result.device.site
-      json.site do
-        json.name test_result.device.site.name
-      end
-    end
-
-    json.device do
-      json.name test_result.device.name
     end
   end
 
