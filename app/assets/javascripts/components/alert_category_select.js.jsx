@@ -30,7 +30,7 @@ var AlertCategorySelect = React.createClass({
 
 		return {
 			// had issues with a structure such as alert1 -updating the data object field in the 'select' options library so used individual fields
-			submit_button_text: 'Create Alert',
+			submit_button_text: 'Save',
 			disable_all_selects: false,
 			edit: this.props.edit,
 			all_devices: this.props.devices,
