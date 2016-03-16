@@ -168,10 +168,26 @@ Then (/^the user should have error_code alert result$/) do
   device1 = Device.make institution: @institution, site: site1
 
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
-  DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
+  DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2, type: 'specimen'}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
   after_test_history_count = AlertHistory.count
 
   expect(after_test_history_count).to be > before_test_history_count
+end
+
+Then (/^the user should have no error_code alert result for qc test$/) do
+  parent_location = Location.make
+  leaf_location1 = Location.make parent: parent_location
+  upper_leaf_location = Location.make
+
+  before_test_history_count = AlertHistory.count
+  site1 = Site.make institution: @institution, location_geoid: leaf_location1.id
+  device1 = Device.make institution: @institution, site: site1
+
+  #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
+  DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2, type: 'qc'}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
+  after_test_history_count = AlertHistory.count
+
+  expect(after_test_history_count).to equal(before_test_history_count)
 end
 
 Then (/^the user should have no_sample_id alert result$/) do
@@ -184,7 +200,7 @@ Then (/^the user should have no_sample_id alert result$/) do
   device1 = Device.make institution: @institution, site: site1
 
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
-  DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative]}, sample: {}, patient: {id: 'a',gender: :male})
+  DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], type: 'specimen'}, sample: {}, patient: {id: 'a',gender: :male})
   after_test_history_count = AlertHistory.count
 
   expect(before_test_history_count+1).to eq(after_test_history_count)
