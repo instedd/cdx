@@ -371,9 +371,6 @@ var AlertCategorySelect = React.createClass({
 								/>
 
 							<div className="row">
-								<div className="col pe-3">
-									&nbsp;
-								</div>
 								<div className = "col pe-8">
 									<input type = "submit" value = {this.state.submit_button_text} className = "btn-primary" id="submit" />
 									<a className = "btn-link" href = "/alerts">Cancel</a>
