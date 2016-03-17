@@ -329,7 +329,7 @@ var AlertCategorySelect = React.createClass({
 							<AlertAggregationFrequency aggregation_frequencies={this.props.aggregation_frequencies} valueLink={this.linkState('aggregationFrequencyField')} disable_all_selects={this.state.disable_all_selects} />
 							<AlertAggregationThreshold checkedLink={this.linkState('use_aggregation_percentageField')} textLink={this.linkState('aggregation_thresholdField')}
 							 edit={false} />
-											
+
 							<hr />
 
 							<AlertChannel channel_types = {
@@ -386,9 +386,7 @@ var AlertCategorySelect = React.createClass({
 						</form>
 					</div>
 
-					<div className="col">
-						<AlertDisplayIncidentInfo alert_info={this.props.alert_info} edit={this.props.edit} alert_number_incidents={this.props.alert_number_incidents} alert_last_incident={this.props.alert_last_incident} alert_created_at={this.props.alert_created_at}/>
-					</div>
+					<AlertDisplayIncidentInfo alert_info={this.props.alert_info} edit={this.props.edit} alert_number_incidents={this.props.alert_number_incidents} alert_last_incident={this.props.alert_last_incident} alert_created_at={this.props.alert_created_at}/>
 				</div>
 			</div>
 		);
