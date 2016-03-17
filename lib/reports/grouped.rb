@@ -29,7 +29,7 @@ module Reports
     def self.groupings
       {
         device: ['device.uuid'],
-        error_code: ['test.error_code','error'],
+        error_code: ['test.error_code','invalid,error,no_result,in_progress'],
         model: ['device.model','error'],
         status: ['test.status'],
         successful: ['test.status','success'],

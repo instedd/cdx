@@ -4,12 +4,12 @@ module Reports
 
     def process
       filter['test.status'] = 'invalid,error,no_result,in_progress'
-      filter['group_by'] = 'day(test.start_time),test.site_user'
+      filter['group_by'] = 'day(test.start_time),test.error_code'
       super
     end
 
     def users
-      results['tests'].group_by { |t| t['test.site_user'] }.keys
+      results['tests'].group_by { |t| t['test.error_code'] }.keys
     end
 
     private
@@ -36,13 +36,13 @@ module Reports
 
     def day_results(format='%Y-%m-%d', key)
       results_by_period(format)[key].try do |r|
-        r.group_by { |t| t['test.site_user'] }
+        r.group_by { |t| t['test.error_code'] }
       end
     end
 
     def month_results(format='%Y-%m', key)
       results_by_period(format)[key].try do |r|
-        r.group_by { |t| t['test.site_user'] }
+        r.group_by { |t| t['test.error_code'] }
       end
     end
   end
