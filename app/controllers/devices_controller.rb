@@ -85,6 +85,8 @@ class DevicesController < ApplicationController
   def setup
     @device = Device.with_deleted.find(params[:id])
     return unless authorize_resource(@device, UPDATE_DEVICE)
+    @can_edit = has_access?(@device, UPDATE_DEVICE)
+    @show_institution = show_institution?(Policy::Actions::READ_DEVICE, Device)
 
     unless @device.secret_key_hash?
       # This is the first time the setup page is displayed (after create)
@@ -96,7 +98,6 @@ class DevicesController < ApplicationController
 
     render layout: false if request.xhr?
   end
-
 
   def edit
     return unless authorize_resource(@device, UPDATE_DEVICE)
