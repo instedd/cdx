@@ -1,35 +1,35 @@
 module Reports
   class Errors < Base
-    attr_accessor :users
+    attr_accessor :error_codes
 
     def process
-      filter['test.status'] = 'invalid,error,no_result,in_progress'
+      filter['test.status'] = 'error'
       filter['group_by'] = 'day(test.start_time),test.error_code'
       super
     end
 
-    def users
+    def error_codes
       results['tests'].group_by { |t| t['test.error_code'] }.keys
     end
 
     private
 
-    def data_hash_day(dayname, user_errors)
+    def data_hash_day(dayname, errors)
       {
         label: dayname,
-        values: users.map do |u|
-          user_result = user_errors && user_errors[u]
-          user_result ? count_total(user_result) : 0
+        values: error_codes.map do |u|
+          result = errors && errors[u]
+          result ? count_total(result) : 0
         end
       }
     end
 
-    def data_hash_month(date, user_errors)
+    def data_hash_month(date, errors)
       {
         label: label_monthly(date),
-        values: users.map do |u|
-          user_result = user_errors && user_errors[u]
-          user_result ? count_total(user_result) : 0
+        values: error_codes.map do |u|
+          result = errors && errors[u]
+          result ? count_total(result) : 0
         end
       }
     end

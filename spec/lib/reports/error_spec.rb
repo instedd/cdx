@@ -20,6 +20,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
         'start_time' => Time.now,
         'name' => 'mtb',
         'status' => 'error',
+        'error_code' => 300,
         'type' => 'specimen',
         'site_user' => site_user
       },
@@ -32,6 +33,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
         'start_time' => Time.now - 1.month,
         'name' => 'mtb',
         'status' => 'error',
+        'error_code' => 300,
         'type' => 'specimen',
         'site_user' => site_user
       },
@@ -44,6 +46,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
         'start_time' => Time.now - 1.month,
         'name' => 'man_flu',
         'status' => 'error',
+        'error_code' => 200,
         'type' => 'specimen'
       },
       device_messages: [DeviceMessage.make(device: user_device)]
@@ -69,7 +72,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
         core_fields: {
           'assays' => ['condition' => 'man_flu1', 'result' => :negative],
           'start_time' => Time.now - 1.month,
-          'reported_time' => Time.now+1.hour,
+          'reported_time' => Time.now + 1.hour,
           'name' => 'man_flu1',
           'status' => 'no_result'
         },
@@ -80,7 +83,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
           core_fields: {
             'assays' => ['condition' => 'man_flu2', 'result' => :negative],
             'start_time' => Time.now - 1.month,
-            'reported_time' => Time.now+1.hour,
+            'reported_time' => Time.now + 1.hour,
             'name' => 'man_flu2',
             'status' => 'in_progress'
           },
@@ -91,7 +94,7 @@ RSpec.describe Reports::Errors, elasticsearch: true do
             core_fields: {
               'assays' => ['condition' => 'man_flu4', 'result' => :negative],
               'start_time' => Time.now - 1.month,
-              'reported_time' => Time.now+1.hour,
+              'reported_time' => Time.now + 1.hour,
               'name' => 'man_flu4',
               'status' => 'invalid'
             },
@@ -101,16 +104,18 @@ RSpec.describe Reports::Errors, elasticsearch: true do
     refresh_index
   end
 
-  describe 'process results and sort by month' do
-    let!(:tests) { Reports::Errors.process(current_user, nav_context).sort_by_month }
-
-    xit 'finds 2 tests when scoped to user/site one' do
-      count = tests.data.map { |x| x[:values].sum }.sum
-      expect(count).to eq(2)
+  describe 'process results' do
+    before do
+      @tests = Reports::Errors.process(current_user, nav_context)
     end
 
-    xit 'includes the name of relevant site user' do
-      expect(tests.users).to include(site_user)
+    it 'finds 2 tests when scoped to user/site one' do
+      expect(@tests.results['total_count']).to eq(3)
+    end
+
+    it 'includes the relevant :error_code' do
+      expect(@tests.error_codes).to include(200)
+      expect(@tests.error_codes).to include(300)
     end
   end
 end
