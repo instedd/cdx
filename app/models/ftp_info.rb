@@ -1,4 +1,4 @@
-class FtpInfo < Struct.new(:hostname, :port, :directory, :username, :password)
+class FtpInfo < Struct.new(:hostname, :port, :directory, :username, :password, :passive)
   def self.new(*args)
     if args.length == 1 && args[0].kind_of?(Hash)
       unexpected = args[0].keys - self.members

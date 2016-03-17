@@ -258,7 +258,7 @@ class DevicesController < ApplicationController
   end
 
   def device_params
-    params.require(:device).permit(:name, :serial_number, :device_model_id, :time_zone, :site_id, :ftp_hostname, :ftp_port, :ftp_username, :ftp_password, :ftp_directory).tap do |whitelisted|
+    params.require(:device).permit(:name, :serial_number, :device_model_id, :time_zone, :site_id, :ftp_hostname, :ftp_port, :ftp_username, :ftp_password, :ftp_directory, :ftp_passive).tap do |whitelisted|
       if custom_mappings = params[:device][:custom_mappings]
         whitelisted[:custom_mappings] = custom_mappings.select { |k, v| v.present? }
       end
