@@ -32,7 +32,7 @@ module Reports
         error_code: ['test.error_code','invalid,error,no_result,in_progress'],
         model: ['device.model','error'],
         status: ['test.status'],
-        successful: ['test.status','success'],
+        successful: ['test.name','success'],
         unsuccessful: ['test.status','invalid,error,no_result,in_progress']
       }
     end

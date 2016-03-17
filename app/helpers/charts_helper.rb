@@ -37,7 +37,7 @@ module ChartsHelper
 
   def unsuccessful_tests_chart
     options['test.status'] = 'invalid,error,no_result,in_progress'
-    results = Reports::Successful.process(current_user, @navigation_context, options)
+    results = Reports::Unsuccessful.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
     return results.sort_by_day
   end
@@ -47,7 +47,7 @@ module ChartsHelper
   end
 
   def unsuccessful_tests
-    Reports::Grouped.by_successful(current_user, @navigation_context, options)
+    Reports::Grouped.by_unsuccessful(current_user, @navigation_context, options)
   end
 
   def errors_by_not_successful
