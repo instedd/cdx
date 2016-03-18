@@ -1,10 +1,8 @@
 require 'spec_helper'
 
 describe FtpMonitor do
-
   context 'orchestration' do
-
-    it "should group devices by ftp info" do
+    it 'should group devices by ftp info' do
       dm = DeviceModel.make(supports_ftp: true, filename_pattern: '(?<sn>.+)')
       d1 = Device.make(device_model: dm, ftp_hostname: 'example.com')
       d2 = Device.make(device_model: dm, ftp_hostname: 'example.com')
@@ -19,14 +17,14 @@ describe FtpMonitor do
         [FtpInfo.new(hostname: 'example.com', port: 1000), [d3, d4]],
         [FtpInfo.new(hostname: 'example.com', port: 2000), [d5]]
     end
-
   end
 
   context FtpMonitor::FtpProcessor do
-
     let(:ftp) do
       instance_double('Net::FTP').tap do |ftp|
-        %i(connect login chdir quit passive=).each { |msg| allow(ftp).to receive(msg) }
+        %i(connect login chdir quit passive=).each do |msg|
+          allow(ftp).to receive(msg)
+        end
         allow(ftp).to receive(:nlst).and_return(files)
       end
     end
@@ -44,16 +42,16 @@ describe FtpMonitor do
 
     let(:subject) { FtpMonitor::FtpProcessor.new(ftp_info, [device1, device2, device3]) }
 
-    context "when listing" do
+    context 'when listing' do
 
-      let(:files) { %W(/foo/f1.csv /foo/f2.csv /bar/f1.csv /bar/f2.csv) }
+      let(:files) { %w(/foo/f1.csv /foo/f2.csv /bar/f1.csv /bar/f2.csv) }
 
-      it "should request to download all files" do
+      it 'should request to download all files' do
         expect(subject).to receive(:download_files).with(files).and_return([])
         expect(subject.process!).to be_nil
       end
 
-      it "should request to download unseen files" do
+      it 'should request to download unseen files' do
         FileMessage.create!(ftp_info: ftp_info, filename: files[0], status: 'success')
         FileMessage.create!(ftp_info: ftp_info, filename: files[1], status: 'failed')
         FileMessage.create!(ftp_info: ftp_info, filename: files[2], status: 'error')
@@ -61,27 +59,23 @@ describe FtpMonitor do
         expect(subject).to receive(:download_files).with(files[2..3]).and_return([])
         expect(subject.process!).to be_nil
       end
-
     end
 
-    context "when connecting" do
-
+    context 'when connecting' do
       let(:ftp_info) { FtpInfo.new('example.com', 2000, '/foo/bar', 'jdoe', 'pass') }
 
-      it "should use provided ftp info" do
+      it 'should use provided ftp info' do
         expect(ftp).to receive(:connect).with('example.com', 2000)
         expect(ftp).to receive(:login).with('jdoe', 'pass')
         expect(ftp).to receive(:chdir).with('/foo/bar')
         subject.open_ftp!
       end
-
     end
 
-    context "when downloading" do
+    context 'when downloading' do
+      let(:files) { %w(/foo/f1.csv /bar/f1.csv) }
 
-      let(:files) { %W(/foo/f1.csv /bar/f1.csv) }
-
-      it "should download all files from ftp" do
+      it 'should download all files from ftp' do
         files.each do |f|
           expect(ftp).to receive(:gettextfile).with(f, kind_of(String)) do |remote, local|
             File.open(local, 'w') { |f| f.write("CONTENTS OF #{remote}") }
@@ -99,25 +93,25 @@ describe FtpMonitor do
           expect(file.read).to eq("CONTENTS OF #{remote}")
         end
       end
-
     end
 
-    context "when processing" do
-
+    context 'when processing' do
       let(:file_messages) { FileMessage.all }
 
       # Expect ftp client to receive a request to download a remote file,
       # and write the mock contents to the requested temp file location
       before(:each) do
         files.each do |f|
-          expect(ftp).to receive(:gettextfile).with(f, kind_of(String)) do |remote, local|
+          expect(ftp).to(receive(:gettextfile).with(f, kind_of(String))) do |remote, local|
             File.open(local, 'w') { |f| f.write("CONTENTS OF #{remote}") }
           end
         end
       end
 
       def receive_new_for(device, remote, &block)
-        receive(:new).with(device: device, plain_text_data: "CONTENTS OF #{remote}").and_wrap_original do |m, *args|
+        receive(:new)
+          .with(device: device, plain_text_data: "CONTENTS OF #{remote}")
+          .and_wrap_original do |m, *args|
           dm = m.call(*args)
           allow(dm).to receive(:parsed_messages).and_return([])
           allow(dm).to receive(:process).and_return([])
@@ -126,11 +120,15 @@ describe FtpMonitor do
         end
       end
 
-      context "for a single device" do
+      context 'for a single device' do
+        let(:files) do
+          %w(
+            /foo/M1_A1000_20160101.csv
+            /foo/M1_A1000_20160102.csv
+          )
+        end
 
-        let(:files) { %W(/foo/M1_A1000_20160101.csv /foo/M1_A1000_20160102.csv) }
-
-        it "should process all files" do
+        it 'should process all files' do
           expect(DeviceMessage).to receive_new_for(device1, files[0])
           expect(DeviceMessage).to receive_new_for(device1, files[1])
 
@@ -146,14 +144,20 @@ describe FtpMonitor do
             expect(file_message.device_message.plain_text_data).to eq("CONTENTS OF #{file_name}")
           end
         end
-
       end
 
-      context "for multiple devices" do
+      context 'for multiple devices' do
+        let(:files) do
+          %w(
+            /foo/M1_A1000_20160101.csv
+            /foo/M1_A1000_20160102.csv
+            /foo/M2_A2000_A.csv
+            /foo/M2_A2000_B.csv
+            /foo/M2_A3000_A.csv
+          )
+        end
 
-        let(:files) { %W(/foo/M1_A1000_20160101.csv /foo/M1_A1000_20160102.csv /foo/M2_A2000_A.csv /foo/M2_A2000_B.csv /foo/M2_A3000_A.csv) }
-
-        it "should match each file to the corresponding device" do
+        it 'should match each file to the corresponding device' do
           expected_devices = [device1, device1, device2, device2, device3]
           files.zip(expected_devices).each do |file, device|
             expect(DeviceMessage).to receive_new_for(device, file)
@@ -171,11 +175,11 @@ describe FtpMonitor do
           end
         end
 
-        it "should mark failed files" do
+        it 'should mark failed files' do
           expected_devices = [device1, device1, device2, device2, device3]
           files.zip(expected_devices).each do |file, device|
-            expect(DeviceMessage).to (receive_new_for(device, file) do |dm|
-              allow(dm).to receive(:process).and_raise("Custom error") if device == device1
+            expect(DeviceMessage).to(receive_new_for(device, file) do |dm|
+              allow(dm).to receive(:process).and_raise('Custom error') if device == device1
               allow(dm).to receive(:save).and_return(false) if device == device2
             end)
           end
@@ -188,17 +192,21 @@ describe FtpMonitor do
             expect(file_message.status).to eq(device == device3 ? 'success' : 'failed')
             expect(file_message.filename).to eq(file_name)
             expect(file_message.device).to eq(device)
-            expect(file_message.device_message).to (device == device2 ? be_nil : be_not_nil)
+            expect(file_message.device_message).to(device == device2 ? be_nil : be_not_nil)
           end
         end
-
       end
 
-      context "with non matching files" do
+      context 'with non matching files' do
+        let(:files) do
+          %w(
+            /foo/M1_A1000_20160101.csv
+            /foo/M1_A1000.csv
+            /foo/M2_A1000.csv
+          )
+        end
 
-        let(:files) { %W(/foo/M1_A1000_20160101.csv /foo/M1_A1000.csv /foo/M2_A1000.csv) }
-
-        it "should skip non matching files" do
+        it 'should skip non matching files' do
           expect(DeviceMessage).to receive_new_for(device1, files[0])
 
           expect(subject.process!).to be_nil
@@ -206,9 +214,6 @@ describe FtpMonitor do
           expect(file_messages[0].filename).to eq(files[0])
         end
       end
-
     end
-
   end
-
 end
