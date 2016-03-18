@@ -1,9 +1,8 @@
 %h1
-  Alert occurred #{@alert.name}
-  %p
-  Time occurred #{@alert.created_at}
+  = "Alert notification for #{@alert.name}"
+
+%p.custom-message
+  = "Raised at #{@alert.created_at.strftime('%m/%d/%Y %H:%M')}"
   %br/
-  %br/
-  %p
   = @alert_body_text
 
