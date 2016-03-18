@@ -67,7 +67,7 @@ RSpec.describe Reports::Base do
       it 'includes that date in query' do
         query['institution.uuid'] = institution.uuid
         query['since'] = '2005-12-12'
-        query['test.type'] = "specimen"
+        query['test.type'] = 'specimen'
         options['since'] = '2005-12-12'
         allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
         DummyReport.process(current_user, nav_context, options)
@@ -85,19 +85,10 @@ RSpec.describe Reports::Base do
 
       it 'includes them in the query' do
         query['institution.uuid'] = institution.uuid
-        query['range'] = date_range
+        query['since'] = date_range['start_time']['gte']
+        query['until'] = date_range['start_time']['lte']
         query['test.type'] = "specimen"
         options['date_range'] = date_range
-        allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
-        DummyReport.process(current_user, nav_context, options)
-      end
-
-      it 'does not include :since in query' do
-        query['institution.uuid'] = institution.uuid
-        query['range'] = date_range
-        query['test.type'] = "specimen"
-        options['date_range'] = date_range
-        options['since'] = since
         allow(TestResult).to receive(:query).with(query, current_user).and_return(TestResult)
         DummyReport.process(current_user, nav_context, options)
       end
@@ -186,11 +177,11 @@ RSpec.describe Reports::Base do
 
       context 'when range of dates given' do
         it 'is the same as the start_time[gte] value' do
-          options['range'] = date_range
+          options['date_range'] = date_range
           stdate = DummyReport.process(
             current_user, nav_context, options
           ).start_date
-          expect(stdate).to eq(options['range']['start_time']['gte'])
+          expect(stdate).to eq(options['date_range']['start_time']['gte'])
         end
       end
 
@@ -201,17 +192,6 @@ RSpec.describe Reports::Base do
             current_user, nav_context, options
           ).start_date
           expect(stdate).to eq(options['since'])
-        end
-      end
-
-      context 'when range of dates given and since value' do
-        it 'gives preferance to the start_time[gte] value' do
-          options['range'] = date_range
-          options['since'] = date_since
-          stdate = DummyReport.process(
-            current_user, nav_context, options
-          ).start_date
-          expect(stdate).to eq(options['range']['start_time']['gte'])
         end
       end
     end
@@ -228,18 +208,18 @@ RSpec.describe Reports::Base do
 
       context 'when range of dates given' do
         it 'is the same as the start_time[lte] value' do
-          options['range'] = date_range
+          options['date_range'] = date_range
           endate = DummyReport.process(
             current_user, nav_context, options
           ).end_date
-          expect(endate).to eq(options['range']['start_time']['lte'])
+          expect(endate).to eq(options['date_range']['start_time']['lte'])
         end
       end
     end
 
     describe '.number_of_days' do
       it 'calculates the difference in days' do
-        options['range'] = date_range
+        options['date_range'] = date_range
         number_of_days = DummyReport.process(
           current_user, nav_context, options
         ).number_of_days
@@ -251,7 +231,7 @@ RSpec.describe Reports::Base do
       it 'calculates the difference in months' do
         date_range['start_time']['lte'] = (Date.today).iso8601
         date_range['start_time']['gte'] = (Date.today - 6.months).iso8601
-        options['range'] = date_range
+        options['date_range'] = date_range
         number_of_months = DummyReport.process(
           current_user, nav_context, options
         ).number_of_months

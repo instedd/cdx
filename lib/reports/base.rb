@@ -55,13 +55,13 @@ module Reports
     end
 
     def start_date
-      return options['range']['start_time']['gte'] if options['range']
+      return options['date_range']['start_time']['gte'] if options['date_range']
       return options['since'] if options['since']
       return report_since
     end
 
     def end_date
-      return options['range']['start_time']['lte'] if options['range']
+      return options['date_range']['start_time']['lte'] if options['date_range']
       Date.today.iso8601
     end
 
@@ -116,7 +116,8 @@ module Reports
     end
 
     def report_between
-      filter['range'] = options['date_range']
+      filter['since'] = options['date_range']['start_time']['gte']
+      filter['until'] = options['date_range']['start_time']['lte']
     end
 
     def report_since
