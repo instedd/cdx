@@ -26,7 +26,7 @@ describe FtpMonitor do
 
     let(:ftp) do
       instance_double('Net::FTP').tap do |ftp|
-        %i(connect login chdir quit).each { |msg| allow(ftp).to receive(msg) }
+        %i(connect login chdir quit passive=).each { |msg| allow(ftp).to receive(msg) }
         allow(ftp).to receive(:nlst).and_return(files)
       end
     end
