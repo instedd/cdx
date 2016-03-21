@@ -1,10 +1,18 @@
 var PolicyItem = React.createClass({
+  remove: function(e) {
+    this.props.onRemove(this.props.statement);
+    e.stopPropagation();
+  },
+
   render: function() {
     var statement = this.props.statement;
     if(statement.resourceType == null) {
       return (
         <div>
-          <div className="resource-type">New Policy</div>
+          <div className="resource-type">
+            New Policy
+            <img src="<%= asset_url('ic-cross.png') %>" className="pull-right" onClick={this.remove} />
+          </div>
           <div className="description">Type, resource, and actions are not defined yet</div>
         </div>
       );
@@ -31,7 +39,10 @@ var PolicyItem = React.createClass({
       }
       return (
         <div>
-          <div className="resource-type">{statement.resourceType}{withSubsites}</div>
+          <div className="resource-type">
+            {statement.resourceType}{withSubsites}
+            <img src="<%= asset_url('ic-cross.png') %>" className="pull-right" onClick={this.remove} />
+          </div>
           <div className="description">{description}</div>
         </div>
       );
