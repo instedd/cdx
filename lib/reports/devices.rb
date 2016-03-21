@@ -1,6 +1,6 @@
 module Reports
   class Devices < Base
-    attr_reader :device_uuids
+    attr_reader :device_uuids, :device_names
 
     def self.total_devices(time_created)
       DeviceModel.where("created_at >= ?", time_created).count
@@ -8,6 +8,10 @@ module Reports
 
     def device_uuids
       results['tests'].index_by { |t| t['device.uuid'] }.keys
+    end
+
+    def device_names
+      device_uuids.map { |uuid| lookup_device(uuid) }
     end
 
     def process

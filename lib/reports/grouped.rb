@@ -16,7 +16,7 @@ module Reports
       data = results['tests'].map do |test|
         no_error_code -= test['count']
         {
-          label: test[groupings[symbol][0]],
+          label: label(test[groupings[symbol][0]], symbol),
           value: test['count']
         }
       end
@@ -35,6 +35,11 @@ module Reports
         successful: ['test.name','success'],
         unsuccessful: ['test.status','invalid,error,no_result,in_progress']
       }
+    end
+
+    def label(uuid, symbol)
+      return lookup_device(uuid) if symbol == :device
+      uuid
     end
   end
 end

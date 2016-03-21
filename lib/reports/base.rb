@@ -111,6 +111,11 @@ module Reports
       "#{I18n.t('date.abbr_month_names')[date.month]}#{date.month == 1 ? " #{date.strftime('%y')}" : ""}"
     end
 
+    def lookup_device(uuid)
+      device = Device.where(uuid: uuid).first
+      return device.name if device
+    end
+
     def month_results(period)
       results_by_period('%Y-%m')[period]
     end

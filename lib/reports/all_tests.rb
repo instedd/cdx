@@ -17,6 +17,16 @@ module Reports
 
     private
 
+    def data_hash_day(dayname, test_results)
+      {
+        label: dayname,
+        values: statuses.map do |u|
+          result = test_results && test_results[u]
+          result ? count_total(result) : 0
+        end
+      }
+    end
+
     def data_hash_month(date, test_results)
       {
         label: label_monthly(date),
