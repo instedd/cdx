@@ -27,8 +27,20 @@ class Device < ActiveRecord::Base
   validates_presence_of :serial_number
   validates_presence_of :device_model
 
-  validates :ftp_hostname, :ftp_username, :ftp_password, :ftp_directory, :ftp_port, presence: { message: " is required to complete FTP settings" }, if: Proc.new { |d| d.device_model.name.include?("Alere") rescue false }
-  validates :ftp_port, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 65535 }, allow_blank: true
+  validates :ftp_hostname,
+            :ftp_username,
+            :ftp_password,
+            :ftp_directory,
+            :ftp_port,
+            presence: { message: ' is required to complete FTP settings' },
+            if: proc { |d| d.device_model.name.include?('Alere') rescue false }
+  validates :ftp_port,
+            numericality: {
+              only_integer: true,
+              greater_than_or_equal_to: 0,
+              less_than_or_equal_to: 65_535
+            },
+            allow_blank: true
 
   validate :unpublished_device_model_from_institution
 
@@ -36,34 +48,34 @@ class Device < ActiveRecord::Base
 
   delegate :current_manifest, to: :device_model
 
-  CUSTOM_FIELD_TARGETS = ["patient.id", "sample.id", "encounter.id"]
+  CUSTOM_FIELD_TARGETS = ['patient.id', 'sample.id', 'encounter.id']
 
   def self.filter_by_owner(user, check_conditions)
     if check_conditions
-      joins(:institution).where(institutions: {user_id: user.id})
+      joins(:institution).where(institutions: { user_id: user.id })
     else
       self
     end
   end
 
-  def locations(opts={})
-    sites.map{|l| l.location(opts)}.uniq
+  def locations(opts = {})
+    sites.map { |l| l.location(opts) }.uniq
   end
 
-  def filter_by_owner(user, check_conditions)
+  def filter_by_owner(user, _check_conditions)
     institution.user_id == user.id ? self : nil
   end
 
   def self.filter_by_query(query)
     result = self
-    if institution = query["institution"]
+    if (institution = query['institution'])
       result = result.where(institution_id: institution)
     end
     result
   end
 
   def filter_by_query(query)
-    if institution = query["institution"]
+    if (institution = query['institution'])
       if institution_id == institution.to_i
         self
       else
@@ -99,11 +111,15 @@ class Device < ActiveRecord::Base
 
   ACTIVATION_TOKEN_CHARS = ('0'..'9').to_a + ('A'..'Z').to_a
 
-  def new_activation_token(token_value = ACTIVATION_TOKEN_CHARS.sample(16, random: Random.new).join)
+  def new_activation_token(token_value = default_activation_token)
     self.ssh_key.try :destroy
     self.activation_token = nil
     SshKey.regenerate_authorized_keys!
     self.activation_token = token_value
+  end
+
+  def default_activation_token
+    ACTIVATION_TOKEN_CHARS.sample(16, random: Random.new).join
   end
 
   def has_pending_log_requests?

@@ -92,9 +92,9 @@ module Alerts
 
       if (number_alert_messages_sent_today <= alert.email_limit)
         message_body= parse_alert_message(alert, alert.message, person, alert_count, percentage)
-        subject_text = "CDX alert:"+alert.name
+        subject_text = "CDX alert: "+alert.name
         if alert.aggregated?
-          subject_text += " occured "+alert_count.to_s + " times."
+          subject_text += " occurred "+alert_count.to_s + " times."
 
           if alert.use_aggregation_percentage?
             subject_text += " Percentage "+percentage.to_s

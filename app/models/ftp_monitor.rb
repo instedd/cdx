@@ -2,7 +2,6 @@ require 'net/ftp'
 require 'tempfile'
 
 class FtpMonitor
-
   def initialize(sleep_interval_in_seconds=300)
     @sleep_interval = sleep_interval_in_seconds
   end
@@ -31,7 +30,6 @@ class FtpMonitor
   end
 
   class FtpProcessor
-
     attr_reader :ftp_info, :devices, :ftp
 
     def initialize(ftp_info, devices)
@@ -76,6 +74,7 @@ class FtpMonitor
       @ftp = Net::FTP.new
       @ftp.connect ftp_info[:hostname], ftp_info[:port]
       @ftp.login ftp_info[:username], ftp_info[:password] if ftp_info[:username]
+      @ftp.passive = ftp_info[:passive].present?
       @ftp.chdir ftp_info[:directory] if ftp_info[:directory]
       @ftp
     end

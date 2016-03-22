@@ -411,9 +411,15 @@ ul.samples {
       .resource-type {
         font-weight: 700;
         margin-bottom: 6px;
+        margin-right: 8px;
         cursor: pointer;
         > span:first-child {
          text-transform: capitalize;
+        }
+      }
+      &.selected {
+        .resource-type {
+          margin-right: 4px;
         }
       }
       .description {
