@@ -13,7 +13,7 @@ describe RegistrationsController do
   context "edit settings" do
 
     it "should load page" do
-      get :edit
+      get :edit, context: institution.uuid
       expect(response).to be_success
       expect(assigns(:locales)).to be_a(Array)
     end
