@@ -1,7 +1,7 @@
 class InstitutionsController < ApplicationController
   before_filter :load_institutions
   skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
-  skip_before_action :ensure_context
+  skip_before_action :ensure_context, except: [:no_data_allowed]
 
   def index
     @can_create = has_access?(Institution, CREATE_INSTITUTION)
@@ -95,6 +95,17 @@ class InstitutionsController < ApplicationController
 
   def pending_approval
     @hide_nav_bar = true
+  end
+
+  def no_data_allowed
+    # the no_data_allowed page make sense when the logged user has no access
+    # to any of the resources listed in the navbar.
+    # Otherwise there is a home to display different from no_data_allowed
+    # which filter the data shown per current institution.
+    home = after_sign_in_path_for(current_user)
+    if home != no_data_allowed_institutions_path
+      redirect_to home
+    end
   end
 
   private

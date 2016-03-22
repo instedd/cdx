@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   resources :institutions, except: :show do
     collection do
       get :pending_approval
+      get :no_data_allowed
     end
   end
 
