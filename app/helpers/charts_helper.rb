@@ -1,4 +1,19 @@
 module ChartsHelper
+  def query_site_tests_chart
+    results = Reports::Site.process(current_user, @navigation_context, options) 
+    found_data = results.sort_by_site.data
+    all_sites = check_access(Site.within(@navigation_context.entity), Policy::Actions::READ_SITE)
+    sites = all_sites.map { | site | [site.name,0] }
+    sites.each do | site | 
+      found_data.each do | found_site_data |  
+        if site[0].include? found_site_data[0]
+          site[1] = found_site_data[1]
+        end
+      end   
+    end 
+    return sites
+  end
+ 
   def devices_reporting_chart
     results = Reports::Devices.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
