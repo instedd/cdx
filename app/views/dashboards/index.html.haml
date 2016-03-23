@@ -18,6 +18,7 @@
           %label.block
           %input#query_button.btn-primary(type='submit' value='Query')
 
+
 .row
   .col.pe-8
     %h1 Site Tests #{chart_heading}
@@ -25,6 +26,7 @@
   .col.pe-7
   = react_component('HorizontalBarChart', data: query_site_tests_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses)
 #chart
+
 .row
   .col.pe-8
     %h1 Usage #{chart_heading}
