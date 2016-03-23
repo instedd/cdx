@@ -3,12 +3,12 @@ require 'spec_helper'
 require 'fileutils'
 
 describe DeviceMessageImporter, elasticsearch: true do
-
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
   let(:device_model) { DeviceModel.make name: 'test_model'}
   let(:device) {Device.make institution_id: institution.id, device_model: device_model}
   let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
+  let(:inbox) { sync_dir.inbox_path(device.uuid) }
 
   before do
     sync_dir.ensure_sync_path!
@@ -143,29 +143,12 @@ describe DeviceMessageImporter, elasticsearch: true do
   end
 
   context "real scenarios" do
-
-    def copy_sample_csv(name)
-      copy_sample(name, 'csvs')
-    end
-
-    def copy_sample_xml(name)
-      copy_sample(name, 'xmls')
-    end
-
-    def copy_sample(name, format)
-      FileUtils.cp File.join(Rails.root, 'spec', 'fixtures', format, name), sync_dir.inbox_path(device.uuid)
-    end
-
-    def load_manifest(name)
-      Manifest.create! device_model: device_model, definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', name))
-    end
-
     context 'epicenter headless_es' do
       let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es' }
-      let!(:manifest)    { load_manifest 'epicenter_m.g.i.t._spanish_manifest.json' }
+      let!(:manifest)     { load_manifest 'epicenter_m.g.i.t._spanish_manifest.json', device_model }
 
       it "parses csv in utf-16le" do
-        copy_sample_csv 'epicenter_headless_sample_utf16.csv'
+        copy_sample_csv 'epicenter_headless_sample_utf16.csv', inbox
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -177,10 +160,11 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'cepheid' do
       let!(:device_model) { DeviceModel.make name: "GX Model I" }
-      let!(:manifest)    { load_manifest 'genexpert_manifest.json' }
+      let!(:manifest)     { load_manifest 'genexpert_manifest.json', device_model }
+
 
       it "should parse cepheid's document" do
-        copy_sample('genexpert_sample.json', 'jsons')
+        copy_sample_json('genexpert_sample.json', inbox)
         DeviceMessageImporter.new("*.json").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -190,7 +174,7 @@ describe DeviceMessageImporter, elasticsearch: true do
       end
 
       it "should parse status" do
-        copy_sample('genexpert_sample.json', 'jsons')
+        copy_sample_json('genexpert_sample.json', inbox)
         DeviceMessageImporter.new("*.json").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -202,10 +186,10 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'genoscan' do
       let(:device_model) { DeviceModel.make name: 'genoscan' }
-      let!(:manifest) { load_manifest 'genoscan_manifest.json' }
+      let!(:manifest) { load_manifest 'genoscan_manifest.json', device_model }
 
       it 'parses csv' do
-        copy_sample_csv 'genoscan_sample.csv'
+        copy_sample_csv 'genoscan_sample.csv', inbox
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -258,10 +242,10 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'alere q' do
       let(:device_model) { DeviceModel.make name: 'alere q' }
-      let!(:manifest) { load_manifest 'alere_q_manifest.json' }
+      let!(:manifest) { load_manifest 'alere_q_manifest.json', device_model }
 
       it 'parses csv' do
-        copy_sample_csv 'alere_q.csv'
+        copy_sample_csv 'alere_q.csv', inbox
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -311,10 +295,10 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'alere pima' do
       let(:device_model) { DeviceModel.make name: 'alere pima' }
-      let!(:manifest) { load_manifest 'alere_pima_manifest.json' }
+      let!(:manifest) { load_manifest 'alere_pima_manifest.json', device_model }
 
       it 'parses csv' do
-        copy_sample_csv 'alere_pima.csv'
+        copy_sample_csv 'alere_pima.csv', inbox
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -345,10 +329,10 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'fio' do
       let(:device_model) { DeviceModel.make name: 'FIO' }
-      let!(:manifest) { load_manifest 'deki_reader_manifest.json' }
+      let!(:manifest) { load_manifest 'deki_reader_manifest.json', device_model }
 
       it 'parses xml' do
-        copy_sample_xml 'deki_reader_sample.xml'
+        copy_sample_xml 'deki_reader_sample.xml', inbox
         DeviceMessageImporter.new("*.xml").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -385,10 +369,10 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'BDMicroImager' do
       let!(:device_model) { DeviceModel.make name: "BD MicroImager" }
-      let!(:manifest)    { load_manifest 'micro_imager_manifest.json' }
+      let!(:manifest)    { load_manifest 'micro_imager_manifest.json', device_model }
 
       it "should parse bd micro's document" do
-        copy_sample('micro_imager_sample.json', 'jsons')
+        copy_sample_json('micro_imager_sample.json', inbox)
         DeviceMessageImporter.new("*.json").import_from sync_dir
         expect(DeviceMessage.first.index_failure_reason).to be_nil
 

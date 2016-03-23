@@ -41,14 +41,14 @@ namespace :manifests do
       'alere_pima' => {
         activation: false,
         ftp: true,
-        pattern: '(?<sn>[A-Za-z\-0-9]+)_(?<ts>\d\d\d\d-\d\d-\d\d_\d\d-\d\d-\d\d)_AssayID_(?<assayid>\d+|X)_\((?<assayname>[A-Za-z0-9_\-]+)\)\.csv$',
+        pattern: '(?<sn>[A-Za-z\-0-9]+)_(?<ts>\d{1,4}-\d{1,4}-\d{1,4}_\d{1,2}-\d{1,2}-\d{1,2})_AssayID_(?<assayid>\d+|X)_\((?<assayname>[A-Za-z0-9_\-]+)\)\.csv$',
         institution: 'Alere',
         owner: 'alere_admin@instedd.org'
       },
       'alere_q' => {
         activation: false,
         ftp: true,
-        pattern: '(?<assayid>[A-Za-z0-9\-]+)_(?<sn>[A-Za-z\-0-9]+)_(?<ts>\d\d\d\d-\d\d-\d\d_\d\d-\d\d-\d\d)\.csv$',
+        pattern: '(?<ts>\d{1,4}-\d{1,4}-\d{1,4}_\d{1,2}-\d{1,2}-\d{1,2})_(?<assayid>[A-Za-z0-9\-]+)_(?<sn>[A-Za-z\-0-9]+)\.csv$',
         institution: 'Alere',
         owner: 'alere_admin@instedd.org'
       }
