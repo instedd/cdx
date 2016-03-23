@@ -24,7 +24,6 @@ var Address = React.createClass({
       return React.addons.update(state, {
         bounds: { $set: newAddress.bbox },
         addressSet: { $set: true },
-        address: { $set: newAddress.name },
         latlng: { $set: { lat: newAddress.center.lat, lng: newAddress.center.lng } },
         error: { $set: null }
       })});
