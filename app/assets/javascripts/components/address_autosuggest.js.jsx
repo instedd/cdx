@@ -33,35 +33,27 @@ var AddressAutosuggest = React.createClass({
 
     return <div>
       <label style={{ display: "none" }}>disableautocomplete</label>
-      <Autosuggest
-        value={this.props.value}
-        suggestions={this.geolocate}
-        suggestionRenderer={this.renderSuggestion}
-        suggestionValue={this.getSuggestionValue}
-        inputAttributes={inputAttributes}
-        onSuggestionSelected={this.props.onAddress}
-      />
+      <input type="text" name={this.props.name} onBlur={this.handleBlur} onChange={this.handleChange} className={this.props.className} autoComplete="off" value={this.props.value} />
     </div>
   },
 
   // private
 
-  geolocate: _.debounce(function(value, callback) {
-    var _this = this;
-    this.geocoder.geocode(value, function(locations) {
-      callback(null, locations);
-      if (locations.length == 0 && _this.props.onError) {
-        _this.props.onError("The address could not be found, please choose a city and a location in the map");
-      }
-    }, this);
-  }, 300),
-
-  renderSuggestion: function(suggestion, input) {
-    return suggestion.name;
+  handleChange: function(evt) {
+    if (this.props.onChange) {
+      this.props.onChange(evt.target.value);
+    }
   },
 
-  getSuggestionValue: function(suggestion) {
-    return suggestion.name;
+  handleBlur: function() {
+    var _this = this;
+    this.geocoder.geocode(_this.props.value, function(locations) {
+      if (locations.length == 0 && _this.props.onError) {
+        _this.props.onError("The address could not be found, please choose a city and a location in the map");
+      } else if (locations.length > 0) {
+        _this.props.onAddress(locations[0]);
+      }
+    }, this);
   }
 
 });
