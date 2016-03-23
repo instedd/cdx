@@ -1,3 +1,38 @@
+svg {
+  shape-rendering: crispEdges;
+}
+
+.horizontal-bar {
+  fill: #03A9F4;
+}
+
+.horizontal-bar-value {
+  font-family: "Exo 2", sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  fill: #333;
+}
+
+.horizontal-bar-label {
+  font-size: 18px;
+  fill: #333;
+}
+
+.horizontal-bar-axis {
+  path {
+    fill: none;
+    //stroke: #333;
+  }
+  .tick line {
+    stroke-width: 1;
+    stroke: rgba(0,0,0,0.1);
+  }
+  //fill: #333;
+  font-size: 12px;
+}
+
+
+
 .chart {
   .bar {
     &.b0 { fill: #03A9F4; }
