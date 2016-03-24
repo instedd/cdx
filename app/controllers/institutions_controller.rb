@@ -5,12 +5,11 @@ class InstitutionsController < ApplicationController
 
   def index
     @can_create = has_access?(Institution, CREATE_INSTITUTION)
-    if @institutions.size <= 1
-      if @institutions.one?
-        redirect_to edit_institution_path(@institutions.first)
-      else
-        redirect_to new_institution_path
-      end
+
+    if @institutions.one?
+      redirect_to edit_institution_path(@institutions.first)
+    elsif @institutions.empty?
+      redirect_to new_institution_path
     end
   end
 
@@ -18,15 +17,9 @@ class InstitutionsController < ApplicationController
     @institution = check_access(Institution.find(params[:id]), READ_INSTITUTION)
     @readonly = !has_access?(@institution, UPDATE_INSTITUTION)
 
-    unless has_access?(@institution, UPDATE_INSTITUTION)
-      redirect_to institution_path(@institutions.first)
-    end
-
     @can_delete = has_access?(@institution, DELETE_INSTITUTION)
 
-    if @institutions.one?
-      @can_create = true
-    end
+    @can_create = @institutions.one? && has_access?(Institution, CREATE_INSTITUTION)
   end
 
   def new
@@ -34,8 +27,7 @@ class InstitutionsController < ApplicationController
     @institution.user_id = current_user.id
     return unless authorize_resource(Institution, CREATE_INSTITUTION)
 
-    @first_institution_creation = @institutions.count == 0
-    @hide_my_account = @hide_nav_bar = @first_institution_creation
+    @hide_my_account = @hide_nav_bar = @institutions.count == 0
   end
 
   def create
@@ -43,8 +35,7 @@ class InstitutionsController < ApplicationController
     @institution.user_id = current_user.id
     return unless authorize_resource(Institution, CREATE_INSTITUTION)
 
-    @first_institution_creation = @institutions.count == 0
-    @hide_my_account = @hide_nav_bar = @first_institution_creation
+    @hide_my_account = @hide_nav_bar = @institutions.count == 0
 
     respond_to do |format|
       if @institution.save

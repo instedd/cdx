@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include Policy::Actions
+
   def has_access?(resource, action)
     Policy.can? action, resource, current_user
   end
@@ -167,6 +169,17 @@ module ApplicationHelper
 
   def navigation_context_name
     @navigation_context.try(:site).try(:name) || @navigation_context.institution.name
+  end
+
+  def institution_name
+    institutions = check_access(Institution, READ_INSTITUTION) || []
+    if institutions.one?
+      institutions.first.name
+    elsif has_access?(Institution, CREATE_INSTITUTION)
+      'Edit institutions'
+    else
+      'Show institutions'
+    end
   end
 
   def filters_params
