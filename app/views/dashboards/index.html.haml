@@ -19,14 +19,32 @@
           %input#query_button.btn-primary(type='submit' value='Query')
 
 
+
+= react_component('OutstandingTestsTable', title: "title", allowSorting: "true", orderBy: "-test_order", data: outstanding_orders)
+%hr
+
+
+
 .row
   .col.pe-8
-    %h1 Site Tests #{chart_heading}
+    %h1 Device Error Codes 
 .row
   .col.pe-7
-  = react_component('HorizontalBarChart', data: query_site_tests_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses)
-#chart
+  = react_component('DeviceErrorTable', title: "title", allowSorting: "true", orderBy: "-device", data: error_codes_by_device)
+%hr
 
+
+.row
+  .col.pe-8
+    %h1 Devices Not Reporting 
+.row
+  .col.pe-7
+= react_component('HorizontalBarChart', data: query_devices_not_reporting_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses, chart_div: 'chart_not_responding', label: 'DAYS')
+#chart_not_responding
+%hr
+
+		
+		
 .row
   .col.pe-8
     %h1 Usage #{chart_heading}
@@ -37,6 +55,16 @@
     = react_component('PieChart', data: tests_by_status, height: 250, label: 'Tests Run')
 
 %hr
+.row
+  .col.pe-8
+    %h1 Site Tests #{chart_heading}
+.row
+  .col.pe-7
+  = react_component('HorizontalBarChart', data: query_site_tests_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses, chart_div: 'chart_site_tests', label: 'Total Tests by Site')
+#chart_site_tests
+
+%hr
+
 .row
   .col
     %h1 Error rate #{chart_heading}
