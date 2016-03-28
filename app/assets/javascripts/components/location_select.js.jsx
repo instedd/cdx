@@ -27,7 +27,8 @@ var LocationSelect = React.createClass({
       className: "input-large",
       placeholder: "Choose one",
       onChange: null,
-      onError: null
+      onError: null,
+      clearable: false,
     };
   },
 
@@ -89,7 +90,7 @@ var LocationSelect = React.createClass({
         name={this.props.name}
         value={this.state.value}
         placeholder={this.props.placeholder}
-        clearable={false}
+        clearable={this.props.clearable}
         asyncOptions={this.getOptions}
         isLoading={this.state.isLoading}
         autoload={false}

@@ -23,9 +23,12 @@ class CdxPageBase < SitePrism::Page
     wait_for_submit
   end
 
-  def open_context_picker
-    navigation_context_handle.click
+  def get_context_picker
     yield navigation_context
+  end
+
+  def close_context_picker
+    navigation_context_handle.trigger('click')
   end
 
   def submit

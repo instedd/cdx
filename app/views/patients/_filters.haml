@@ -18,7 +18,7 @@
             %input.input-block{type: "text", name: "entity_id", value: params["entity_id"]}
           .filter
             %label.block Location
-            = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"]
+            = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"], clearable: true
           .filter
             %label.block Last encounter
             = cdx_select name: "last_encounter", value: params["last_encounter"] do |select|

@@ -15,4 +15,4 @@
             %input{type: "text", name: "name", value: params["name"]}
           .filter
             %label.block Location
-            = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"]
+            = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"], clearable: true
