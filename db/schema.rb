@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160318120245) do
+ActiveRecord::Schema.define(version: 20160322190646) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -183,8 +183,8 @@ ActiveRecord::Schema.define(version: 20160318120245) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "institution_id",                  limit: 4
-    t.datetime "published_at"
     t.boolean  "supports_activation"
+    t.datetime "published_at"
     t.string   "support_url",                     limit: 255
     t.string   "picture_file_name",               limit: 255
     t.string   "picture_content_type",            limit: 255
@@ -573,6 +573,7 @@ ActiveRecord::Schema.define(version: 20160318120245) do
     t.string   "last_navigation_context",        limit: 255
     t.boolean  "is_active",                                  default: true
     t.string   "telephone",                      limit: 255
+    t.boolean  "sidebar_open",                               default: true
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree

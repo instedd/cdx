@@ -87,6 +87,11 @@ class UsersController < ApplicationController
     render json: users
   end
 
+  def update_setting
+    current_user.update_attributes({sidebar_open: params[:sidebar_open]})
+    render nothing: true
+  end
+
   private
 
   def user_params

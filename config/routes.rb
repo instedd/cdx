@@ -157,6 +157,7 @@ Rails.application.routes.draw do
     end
     collection do
       get :autocomplete
+      post :update_setting
     end
   end
   resources :roles do

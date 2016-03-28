@@ -54,6 +54,6 @@ class NewDevicePage < CdxPageBase
 
   section :device_model, CdxSelect, "label", text: /Device Model/i
   element :name, :field, "Name"
-  section :site, CdxSelect, "label", text: /Site/i
+  section :site, CdxSelect, "label", text: "SITE"
   element :serial_number, :field, "Serial number"
 end

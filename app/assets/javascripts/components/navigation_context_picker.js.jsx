@@ -1,5 +1,5 @@
 $(document).on('ready', function(){
-  $(document).on('click', "#nav-context", function(event){
+  function initializeContext() {
     var container = $("#context_side_bar");
     if ($("[data-react-class=NavigationContextPicker]:first").length == 0) {
       // initialize react component for context picker
@@ -18,12 +18,29 @@ $(document).on('ready', function(){
     $("input:first", container).focus();
     event.preventDefault();
     return false;
+  }
+  // This is the case after a reload, or on loading the site.
+  // By default it shows the sidebar as open. It does not apply if there is a saved tree state which to use
+  var props = $("#context_side_bar").attr("data-context-react-props");
+  if(props) {
+    var sidebarOpen = JSON.parse($("#context_side_bar").attr("data-context-react-props")).context.sidebar_open;
+    if (context_side_bar == null && sidebarOpen) {
+      initializeContext();
+    }
+  }
+  $(document).on('click', "#nav-context", function(event){
+    initializeContext();
+    $.ajax({
+      url: '/users/update_setting',
+      method: 'POST',
+      data: { sidebar_open: $("body").hasClass("show-navigation-context-picker") }
+    });
   });
 
   // preserve the #context_side_bar element
   // and preserve the status of the body.show-navigation-context-picker css class
   var context_side_bar = null;
-  var show_navigation_context = false;
+  var show_navigation_context = sidebarOpen;
   var saveCurrentContextForNextChange = function() {
     context_side_bar = $('#context_side_bar');
     show_navigation_context = $("body").hasClass("show-navigation-context-picker");
