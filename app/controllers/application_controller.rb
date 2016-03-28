@@ -1,6 +1,5 @@
 class ApplicationController < ActionController::Base
   include ApplicationHelper
-  include Policy::Actions
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -140,6 +139,16 @@ class ApplicationController < ActionController::Base
       test_results_path
     elsif can_delegate_permissions?
       policies_path
+    elsif has_access_to_patients_index?
+      patients_path
+    elsif has_access_to_users_index?
+      users_path
+    elsif has_access?(Device, Policy::Actions::SUPPORT_DEVICE)
+      device_messages_path
+    elsif has_access_to_settings?
+      settings_path
+    else
+      no_data_allowed_institutions_path
     end
   end
 

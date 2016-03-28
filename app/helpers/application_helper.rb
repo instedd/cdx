@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include Policy::Actions
+
   def has_access?(resource, action)
     Policy.can? action, resource, current_user
   end
@@ -33,6 +35,10 @@ module ApplicationHelper
 
   def has_access_to_roles_index?
     has_access?(Role, Policy::Actions::READ_ROLE)
+  end
+
+  def has_access_to_settings?
+    has_access_to_test_results_index? || has_access_to_roles_index? || can_delegate_permissions?
   end
 
   def can_delegate_permissions?
@@ -167,6 +173,17 @@ module ApplicationHelper
 
   def navigation_context_name
     @navigation_context.try(:site).try(:name) || @navigation_context.institution.name
+  end
+
+  def institution_name
+    institutions = check_access(Institution, READ_INSTITUTION) || []
+    if institutions.one?
+      institutions.first.name
+    elsif has_access?(Institution, CREATE_INSTITUTION)
+      'Edit institutions'
+    else
+      'Show institutions'
+    end
   end
 
   def filters_params

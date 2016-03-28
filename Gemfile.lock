@@ -526,6 +526,7 @@ GEM
     rspec-support (3.3.0)
     ruby_parser (3.7.1)
       sexp_processor (~> 4.1)
+    rubyzip (1.2.0)
     rufus-scheduler (3.1.7)
     safe_yaml (1.0.4)
     sass (3.2.19)
@@ -703,6 +704,7 @@ DEPENDENCIES
   rspec
   rspec-collection_matchers
   rspec-rails
+  rubyzip (>= 1.0.0)
   sass-rails (~> 4.0.0)
   sdoc
   shoulda

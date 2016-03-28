@@ -20,6 +20,7 @@ gem 'paranoia'
 gem 'premailer-rails'
 gem 'kaminari'
 gem 'base58'
+gem 'rubyzip', '>= 1.0.0'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'config'
@@ -33,11 +34,10 @@ gem 'd3_rails'
 
 gem 'cdx', path: '.'
 gem 'cdx-api-elasticsearch', path: '.'
-gem 'cdx-sync-server',  git: "https://github.com/instedd/cdx-sync-server.git", branch: 'master'
-gem 'geojson_import', git: "https://github.com/instedd/geojson_import", branch: 'master'
-gem 'location_service', git: "https://github.com/instedd/ruby-location_service.git", branch: 'master'
-gem 'view_components', git: "https://github.com/manastech/rails-view_components.git", branch: 'master'
-
+gem 'cdx-sync-server', git: 'https://github.com/instedd/cdx-sync-server.git', branch: 'master'
+gem 'geojson_import', git: 'https://github.com/instedd/geojson_import', branch: 'master'
+gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'
+gem 'view_components', git: 'https://github.com/manastech/rails-view_components.git', branch: 'master'
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
@@ -65,14 +65,12 @@ group :development do
   gem 'letter_opener'
   gem 'web-console', '~> 2.0'
   gem 'capistrano', '~> 3.1.0', require: false
-  gem 'capistrano-rails',   '~> 1.1', require: false
+  gem 'capistrano-rails', '~> 1.1', require: false
   gem 'capistrano-bundler', '~> 1.1', require: false
-  gem 'capistrano-rvm',   '~> 0.1', require: false
+  gem 'capistrano-rvm', '~> 0.1', require: false
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'quiet_assets'
-  # gem "awesome_print", require: "ap"
-  # gem 'meta_request'
 end
 
 gem 'devise', '~> 3.5.5'
@@ -93,9 +91,7 @@ gem 'doorkeeper'
 gem 'faker'
 gem 'leaflet-rails'
 
-#send sms
 gem 'nuntium_api', '~> 0.21'
-
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs'

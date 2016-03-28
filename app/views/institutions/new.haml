@@ -4,7 +4,7 @@
       .row
         .col
           %h2
-            - unless current_user.institutions.count == 0
+            - unless @institutions.size == 0
               = link_to institutions_path, class: 'side-link', title: 'Back' do
                 = image_tag "arrow-left-white.png"
             New Institution
