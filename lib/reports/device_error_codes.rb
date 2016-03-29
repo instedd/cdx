@@ -7,17 +7,20 @@ module Reports
     end
 
     def process
-      filter['test.status'] = 'error'
- #      filter['group_by'] = 'month(test.start_time),device.model'
-  
-  #  filter['group_by'] = 'test.error_code,device.uuid,month(test.start_time)'
-   filter['group_by'] = 'device.model,test.error_code'
-   
+      filter['test.status'] = 'error'  
+      filter['group_by'] = 'device.uuid,test.error_code,location.id'
       super
     end
-
-    def statuses
-      results['tests'].index_by { |t| t['test.status'] }.keys
+    
+    def get_device_location_details
+      data = results['tests'].map do |result|
+      {
+        device: Device.where(uuid: result["device.uuid"]).pluck(:name)[0],
+        error_code: result["test.error_code"],
+        count: result["count"],
+        location: Site.where(location_geoid: result["location.id"]).pluck(:name)
+      }
+      end
     end
 
     private

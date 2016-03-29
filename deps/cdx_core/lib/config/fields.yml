@@ -116,6 +116,7 @@ entities:
   location: &LOCATION
     fields:
       id:
+        searchable: true
       parents:
         searchable: true
         multiple: true
