@@ -131,6 +131,8 @@ entities:
       id:
       uuid:
         searchable: true
+      user_email:
+        searchable: true
       patient_age:
         type: duration
         searchable: true
