@@ -21,6 +21,7 @@ module EntityIndexableFields
     fields
   end
 
+
   def encounter_fields(encounter)
     return Hash.new if encounter.nil?
     if encounter.user_id != nil
