@@ -3,7 +3,7 @@
     .col.pe-10
       .row
         .col
-          = react_component "AddUserLink", roles: @roles, context: @navigation_context.to_hash
+          = react_component "AddUserLink", roles: @available_roles_hash, context: @navigation_context.to_hash
           %h1
             Users
       %form#filters-form{action: users_path, "data-auto-submit" => true}
@@ -16,7 +16,7 @@
             %label.block Role
             = cdx_select name: "role", value: params["role"] do |select|
               - select.item "", "Show all"
-              - select.items @roles, :value, :label
+              - select.items @context_roles_hash, :value, :label
           .filter
             %label.block Last activity
             = cdx_select name: "last_activity", value: params["last_activity"] do |select|
@@ -60,7 +60,7 @@
           - @users.each do |user|
             %tr{class: (user.invited_pending? || !user.is_active? ? "pending" : ""), data: {href: edit_user_path(user.id)}}
               %td= user.full_name
-              %td= user.roles.map(&:name).join(", ")
+              %td= (user.roles & @context_roles).map(&:name).join(", ")
               - if @can_update
                 %td= user.is_active? ? "" : "Blocked"
               %td= last_activity(user)

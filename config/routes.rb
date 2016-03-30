@@ -158,6 +158,7 @@ Rails.application.routes.draw do
     collection do
       get :autocomplete
       post :update_setting
+      get :no_data_allowed
     end
   end
   resources :roles do

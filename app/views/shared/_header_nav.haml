@@ -35,7 +35,8 @@
           %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
             = link_to "Tests", test_results_path
         - if has_access_to_users_index?
-          %li{:class => params[:controller] == "users" && "active"}
+          -# Devise clears the controller param for users index
+          %li{:class => (params[:controller] == "users" || !params[:controller]) && "active"}
             = link_to "Users", users_path
         - if has_access_to_settings?
           %li{:class => (["roles", "policies", "alerts", "incidents", "alert_messages"].include?(params[:controller]) || params[:action] == "settings") && "active"}
