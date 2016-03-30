@@ -21,6 +21,7 @@ class EncountersController < ApplicationController
     perform_encounter_action "creating encounter" do
       prepare_encounter_from_json
       create_new_samples
+      @encounter.user = current_user
       @blender.save_and_index!
       @encounter.updated_diagnostic_timestamp!
     end
