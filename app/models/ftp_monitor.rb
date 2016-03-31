@@ -44,13 +44,17 @@ class FtpMonitor
       open_ftp!
       files = ftp.nlst
       Rails.logger.info("Listed files from #{ftp_info.hostname}: #{files.join(', ')}")
-
       # Remove files already seen
       files -= already_reviewed_files
 
       # Download all files
       downloaded = download_files(files)
-      Rails.logger.info("Downloaded files from #{ftp_info.hostname}: #{downloaded.map(&:first).join(', ')}")
+      unless downloaded.present?
+        Rails.logger.info("Error downloading files from #{ftp_info.hostname}: #{files.join(', ')}")
+        return nil
+      end
+
+      Rails.logger.info("Downloaded files from #{ftp_info.hostname}: #{downloaded.join(', ')}")
 
       # Done with remote server
       ftp.quit rescue nil
@@ -90,10 +94,10 @@ class FtpMonitor
 
     def open_ftp!
       @ftp = Net::FTP.new
-      @ftp.connect ftp_info[:hostname], ftp_info[:port]
-      @ftp.login ftp_info[:username], ftp_info[:password] if ftp_info[:username]
-      @ftp.passive = ftp_info[:passive].present?
-      @ftp.chdir ftp_info[:directory] if ftp_info[:directory]
+      @ftp.connect ftp_info.hostname, ftp_info.port
+      @ftp.login ftp_info.username, ftp_info.password if ftp_info.username
+      @ftp.passive = ftp_info.passive.present?
+      @ftp.chdir ftp_info.directory if ftp_info.directory
       @ftp
     end
 
@@ -108,7 +112,7 @@ class FtpMonitor
       end
     ensure
       file.close
-      file.unlink
+      file.unlink rescue nil
     end
 
     def create_and_process_device_message_for(remote_name, device, file)
@@ -140,7 +144,7 @@ class FtpMonitor
       files.map do |filename|
         begin
           tempfile = Tempfile.new(File.basename(filename), Rails.root.join('tmp'))
-          ftp.gettextfile filename, tempfile.path
+          ftp.getbinaryfile filename, tempfile.path
           [filename, tempfile]
         rescue => ex
           failed_file(filename, "Error downloading file", ex)

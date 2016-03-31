@@ -65,7 +65,7 @@ class DeviceMessage < ActiveRecord::Base
   end
 
   def error_description
-    device_message.index_failure_reason.presence || device_message.errors.full_messages.join(', ')
+    index_failure_reason.presence || errors.full_messages.join(', ')
   end
 
   private

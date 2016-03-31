@@ -1,5 +1,4 @@
 class Array
-
   def substract(other_array, &are_equal)
     self.reject do |elem|
       other_array.any? do |other_elem|
@@ -13,7 +12,6 @@ class Array
     value = self[step]
     return value if path.empty?
     return nil if value.nil?
-    return value.get_in(*path)
+    value.get_in(*path)
   end
-
 end

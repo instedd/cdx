@@ -76,7 +76,7 @@ describe FtpMonitor, elasticsearch: true do
 
       it 'should download all files from ftp' do
         files.each do |f|
-          expect(ftp).to receive(:gettextfile).with(f, kind_of(String)) do |remote, local|
+          expect(ftp).to receive(:getbinaryfile).with(f, kind_of(String)) do |remote, local|
             File.open(local, 'w') { |f| f.write("CONTENTS OF #{remote}") }
           end
         end
@@ -101,7 +101,7 @@ describe FtpMonitor, elasticsearch: true do
       # and write the mock contents to the requested temp file location
       before(:each) do
         files.each do |f|
-          expect(ftp).to(receive(:gettextfile).with(f, kind_of(String))) do |remote, local|
+          expect(ftp).to(receive(:getbinaryfile).with(f, kind_of(String))) do |remote, local|
             File.open(local, 'w') { |f| f.write("CONTENTS OF #{remote}") }
           end
         end
