@@ -102,6 +102,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                   "result"=> {
                     "type"=> "string",
                     "index"=> "not_analyzed"
+                  },
+                  "quantitative_result"=> {
+                    "type"=> "string",
+                    "index"=> "not_analyzed"
                   }
                 }
               },
@@ -234,6 +238,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                     "index" => "not_analyzed"
                   },
                   "result"=> {
+                    "type"=> "string",
+                    "index"=> "not_analyzed"
+                  },
+                  "quantitative_result"=> {
                     "type"=> "string",
                     "index"=> "not_analyzed"
                   }

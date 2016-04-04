@@ -15,7 +15,7 @@ describe EncounterIndexer, elasticsearch: true do
   end
 
   let(:encounter) do
-    Encounter.make(patient: patient, core_fields: { 'start_time' => DateTime.new(2015,1,1,0,0,0).utc.iso8601, 'diagnosis' => [{ "condition" => "mtb", "name" => "mtb", "result" => "negative", "quantitative_result" => 20}] }, custom_fields: { 'status' => 'completed' }, plain_sensitive_data: { 'observations' => 'Diagnosis positive'}, institution: institution)
+    Encounter.make(patient: patient, core_fields: { 'start_time' => DateTime.new(2015,1,1,0,0,0).utc.iso8601, 'diagnosis' => [{ "condition" => "mtb", "name" => "mtb", "result" => "negative", "quantitative_result" => "20"}] }, custom_fields: { 'status' => 'completed' }, plain_sensitive_data: { 'observations' => 'Diagnosis positive'}, institution: institution)
   end
 
   let(:encounter_indexer) { EncounterIndexer.new(encounter)}
@@ -38,7 +38,7 @@ describe EncounterIndexer, elasticsearch: true do
         "encounter" => {
           'start_time' => DateTime.new(2015,1,1,0,0,0).utc.iso8601,
           'diagnosis' => [
-            { "condition" => "mtb", "name" => "mtb", "result" => "negative", "quantitative_result" => 20}
+            { "condition" => "mtb", "name" => "mtb", "result" => "negative", "quantitative_result" => "20"}
           ],
           'custom_fields' => {
             'status' => 'completed'

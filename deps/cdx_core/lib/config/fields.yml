@@ -63,7 +63,7 @@ entities:
               - indeterminate
               - n/a
           quantitative_result:
-            type: float
+            searchable: true
       type:
         type: enum
         searchable: true
@@ -156,7 +156,8 @@ entities:
               - negative
               - indeterminate
           quantitative_result:
-            type: float
+            searchable: true
+            type: string
 test:
   test:
     <<: *TEST
