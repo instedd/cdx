@@ -32,7 +32,6 @@
 //= require d3
 //= require jquery.custom-file-input
 //= require reflux
-//= require jquery.scrollTableBody-1.0.0
 //= require_tree .
 //= require turbolinks
 Turbolinks.enableProgressBar()
