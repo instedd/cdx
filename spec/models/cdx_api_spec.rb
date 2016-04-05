@@ -104,6 +104,11 @@ describe Cdx::Api, elasticsearch: true do
       expect_one_result "negative", "encounter.patient_age" => "12yo..18yo"
       expect_no_results "encounter.patient_age" => "20yo.."
     end
+    
+    it "should filter by test.user_mail" do
+      index_with_test_result test: {assays: [result: :positive]}, encounter: {user_email: institution.user.email}
+      expect_one_result "positive", "encounter.user_email" => institution.user.email
+    end
 
     [
       ['device.uuid', 'device.uuid', ["dev1", "dev2", "dev3"]],

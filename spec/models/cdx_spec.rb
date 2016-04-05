@@ -44,6 +44,7 @@ describe Cdx do
       "test.uuid",
       "test.id",
       "encounter.id",
+      "encounter.user_email",
       "encounter.uuid",
       "encounter.patient_age",
       "encounter.start_time",

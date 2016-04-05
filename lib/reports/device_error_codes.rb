@@ -13,10 +13,6 @@ module Reports
     end
     
     def get_device_location_details     
-      
-    #  latest_encounter
-      
-       
       data = results['tests'].map do |result|
       {
         device: ::Device.where(uuid: result["device.uuid"]).pluck(:name)[0],
@@ -29,13 +25,6 @@ module Reports
     end
 
     private
-    
-     def latest_encounter
-        filter = {}
-        filter["since"] = '2016-01-01'
-        result = Encounter.query(filter, current_user).execute
-      end
-      
       
     def latest_error_date(result)
       filter = {}
