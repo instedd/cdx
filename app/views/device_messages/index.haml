@@ -8,7 +8,7 @@
           %h1 There are no logs to report at this time
           %p Connect a device and upload tests to see the progress here
     - else
-      = cdx_table title: pluralize(@messages.count, "message") do |t|
+      = cdx_table title: pluralize(@total, "message") do |t|
         - t.columns do
           %col{:width => "15%"}
           %col{:width => "25%"}

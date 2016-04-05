@@ -162,26 +162,48 @@ describe DeviceMessageImporter, elasticsearch: true do
       let!(:device_model) { DeviceModel.make name: "GX Model I" }
       let!(:manifest)     { load_manifest 'genexpert_manifest.json', device_model }
 
+      context 'sample' do
+        before do
+          copy_sample_json('genexpert_sample.json', inbox)
+          DeviceMessageImporter.new("*.json").import_from sync_dir
+        end
 
-      it "should parse cepheid's document" do
-        copy_sample_json('genexpert_sample.json', inbox)
-        DeviceMessageImporter.new("*.json").import_from sync_dir
+        it "should parse cepheid's document" do
+          expect(DeviceMessage.first.index_failure_reason).to be_nil
+          tests = all_elasticsearch_tests
+          expect(tests.size).to eq(1)
+          expect(tests.first['_source']['test']['start_time']).to eq('2015-04-07T18:31:20-05:00')
+        end
 
-        expect(DeviceMessage.first.index_failure_reason).to be_nil
-        tests = all_elasticsearch_tests
-        expect(tests.size).to eq(1)
-        expect(tests.first['_source']['test']['start_time']).to eq('2015-04-07T18:31:20-05:00')
+        it "should parse status" do
+          tests = all_elasticsearch_tests
+          expect(tests.size).to eq(1)
+          expect(tests.first['_source']['test']['status']).to eq('success')
+        end
+
+        it "should parse result case insensitevly" do
+          # Sample has Rif Resistance DETECTED, manifest has RIF Resistance
+          tests = all_elasticsearch_tests
+          expect(tests.size).to eq(1)
+          #  MTB
+          expect(tests.first['_source']['test']['assays'][0]['result']).to eq('positive')
+          # RIF
+          expect(tests.first['_source']['test']['assays'][1]['result']).to eq('positive')
+        end
+
+        it "should save result's quantifier in quantitative field" do
+          tests = all_elasticsearch_tests
+          expect(tests.first['_source']['test']['assays'][0]['quantitative_result']).to eq('MEDIUM')
+        end
       end
 
-      it "should parse status" do
-        copy_sample_json('genexpert_sample.json', inbox)
+      it "should save result's quantifier in quantitative field for several words" do
+        copy_sample_json('genexpert_sample_mtb_very_low.json', inbox)
         DeviceMessageImporter.new("*.json").import_from sync_dir
-
-        expect(DeviceMessage.first.index_failure_reason).to be_nil
         tests = all_elasticsearch_tests
-        expect(tests.size).to eq(1)
-        expect(tests.first['_source']['test']['status']).to eq('success')
+        expect(tests.first['_source']['test']['assays'][0]['quantitative_result']).to eq('VERY LOW')
       end
+
     end
 
     context 'genoscan' do
@@ -312,7 +334,7 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(test["assays"][0]["name"]).to eq("PIMA CD4")
         expect(test["assays"][0]["condition"]).to eq("cd4_count")
         expect(test["assays"][0]["result"]).to eq("n/a")
-        expect(test["assays"][0]["quantitative_result"]).to eq(1)
+        expect(test["assays"][0]["quantitative_result"]).to eq('1')
 
         test = tests.last["_source"]["test"]
         expect(test["assays"][0]["name"]).to eq("PIMA CD4")
@@ -353,10 +375,10 @@ describe DeviceMessageImporter, elasticsearch: true do
         assays = test['test']['assays']
         expect(assays.size).to eq(2)
         expect(assays.first['result']).to eq('positive')
-        expect(assays.first['quantitative_result']).to eq(23.45)
+        expect(assays.first['quantitative_result']).to eq('23.45')
         expect(assays.first['name']).to eq('HRPII')
         expect(assays.second['result']).to eq('negative')
-        expect(assays.second['quantitative_result']).to eq(0)
+        expect(assays.second['quantitative_result']).to eq('0.0')
         expect(assays.second['name']).to eq('pLDH')
 
         expect(TestResult.count).to eq(1)

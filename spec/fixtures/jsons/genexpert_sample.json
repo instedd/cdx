@@ -1,6 +1,6 @@
 {
   "event": {
-    "result": "MTB DETECTED MEDIUM|Rif Resistance NOT DETECTED",
+    "result": "MTB DETECTED MEDIUM|Rif Resistance DETECTED",
     "assay_name": "MTB-RIF Assay G4_noQC1_2",
     "sample_ID": "A-1234-5",
     "system_user": "JaneDoe",

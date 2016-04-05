@@ -124,7 +124,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         samples: [{ uuids: sample.uuids }],
         new_samples: [{entity_id: 'eid:1001'}, {entity_id: 'eid:1002'}],
         test_results: [],
-        assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],
+        assays: [{condition: 'mtb', result: 'positive', quantitative_result: "3"}],
         observations: 'Lorem ipsum',
       }.to_json
 
@@ -148,7 +148,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "assigns assays" do
-      expect(sample.encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative_result' => 3}])
+      expect(sample.encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative_result' => "3"}])
     end
 
     it "assigns observations" do
@@ -205,7 +205,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
         samples: [{ uuids: sample.uuids }, { uuids: empty_sample.uuids }],
         new_samples: [{entity_id: 'eid:1001'}, {entity_id: 'eid:1002'}],
         test_results: [],
-        assays: [{condition: 'mtb', result: 'positive', quantitative_result: 3}],
+        assays: [{condition: 'mtb', result: 'positive', quantitative_result: "3"}],
         observations: 'Lorem ipsum',
       }.to_json
 
@@ -225,7 +225,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "assigns assays" do
-      expect(encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative_result' => 3}])
+      expect(encounter.core_fields[Encounter::ASSAYS_FIELD]).to eq([{'condition' => 'mtb', 'result' => 'positive', 'quantitative_result' => "3"}])
     end
 
     it "assigns observations" do
