@@ -120,6 +120,8 @@ describe RolesController do
 
     let!(:site)  { Site.make(institution: institution) }
     let!(:site2) { Site.make(institution: institution2) }
+    let!(:device) { Device.make(site: site, institution: institution) }
+    let!(:device2) { Device.make(site: site2, institution: institution2) }
 
     def create_role(args)
       expect {
@@ -156,6 +158,15 @@ describe RolesController do
       add_grantee_to_role "Device models"
 
       assert_cannot grantee, device_model, 'deviceModel:read'
+    end
+
+    it "should update computed policies when updating a role which users already have" do
+      create_role name: "All sites", definition: policy_definition('site', '*').to_json
+      add_grantee_to_role 'All sites'
+      post :update, id: Role.find_by_name('All sites').id, role: { name: "All sites", definition: policy_definition('device', '*').to_json }
+
+      assert_cannot grantee, device2, 'device:read'
+      assert_can grantee, device, 'device:read'
     end
 
   end

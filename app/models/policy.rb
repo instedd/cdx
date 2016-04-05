@@ -213,9 +213,11 @@ class Policy < ActiveRecord::Base
   end
 
   def update_computed_policies
-    return unless user
-
-    ComputedPolicy.update_user(user)
+    if user
+      ComputedPolicy.update_user(user)
+    elsif role
+      role.update_computed_policies
+    end
   end
 
   def self.predefined_policy(name, user, args={})

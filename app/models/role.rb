@@ -16,9 +16,16 @@ class Role < ActiveRecord::Base
 
   scope :predefined, ->{ where.not(key: nil) }
 
+  def update_computed_policies
+    users.each do |user|
+      user.update_computed_policies
+    end
+  end
+
   private
 
   def update_user_computed_policies(user)
     user.update_computed_policies
   end
+
 end
