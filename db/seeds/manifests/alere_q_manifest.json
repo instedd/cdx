@@ -51,6 +51,7 @@
       ]"
     },
     "test.error_code" : { "lookup" : "Error Code" },
+    "test.type" : "specimen",
     "test.site_user" : { "lookup" : "Operator" },
     "test.start_time" : {"parse_date" : [{"lookup": "Timestamp"}, "%Y-%m-%d %H:%M"]},
     "test.status" : { "script" : "
