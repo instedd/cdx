@@ -61,6 +61,7 @@ var SitePicker = React.createClass({
     var roots = [];
     var selected = null;
     var matched_sites = [];
+    var exp = JSON.parse(localStorage.getItem('sidebar_state') || '{}');
     query = _.deburr(query).toLowerCase();
 
     // prepares a matched_sites with all sites that match query
@@ -72,6 +73,7 @@ var SitePicker = React.createClass({
       sites_by_uuid[site.uuid] = site;
       site.children = [];
       site.selected = site.uuid == selected_uuid;
+      site.expanded = exp[site.uuid]=='open' || false;
       if (site.selected) {
         selected = site;
       }
@@ -155,7 +157,6 @@ var SitesTreeView = React.createClass({
   onSiteClick: function(site) {
     this.props.onSiteClick(site);
   },
-
   render: function() {
     return (
       <ul className="sites-tree-view">
@@ -169,20 +170,30 @@ var SitesTreeView = React.createClass({
 
 var SiteTreeViewNode = React.createClass({
   getInitialState: function() {
-    return { expanded: true };
+    return { expanded: this.props.site.expanded };
   },
 
   toggle: function(event) {
     this.setState(React.addons.update(this.state, {
       expanded: { $set: !this.state.expanded }
     }));
-
+    var zs = JSON.parse( localStorage.getItem('sidebar_state') );
+    zs[ this.props.site.uuid ] = this.state.expanded?'closed':'open';
+    localStorage.setItem('sidebar_state', JSON.stringify(zs) );
     event.stopPropagation();
   },
 
+  // This handles a click on an entry in the sidebar.
+  // This has been modified to do a call as jquery ajax instead of a page refresh
   onSiteClick: function(event) {
-    this.props.onSiteClick(this.props.site);
+    //this.props.onSiteClick(this.props.site);
     event.preventDefault();
+    var url = window.location.href.split('?')[0];
+    var ctx = this.props.site.uuid;
+    $('div.col.maincol').load(url+'?nav=false&context='+ctx);
+    $('li').removeClass('selected');
+    $('li[data-reactid*="'+this.props.site.uuid+'"]').first().addClass('selected');
+    $('#nav-context').attr('title',this.props.site.name).text('at '+this.props.site.name);
   },
 
   render: function() {
@@ -192,9 +203,10 @@ var SiteTreeViewNode = React.createClass({
     if (site.children.length > 0 && this.state.expanded) {
       inner = (
         <ul>
-        {site.children.map(function(site){
+        {site.children.map( function(site){
           return <SiteTreeViewNode onSiteClick={this.props.onSiteClick} key={site.uuid} site={site} />;
-        }.bind(this))}
+          }.bind(this))
+        }
         </ul>
       );
     }

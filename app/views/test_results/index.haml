@@ -19,5 +19,6 @@
 
       .pagination
         = render 'shared/pagination'
-        - if @display_as == "test"
-          = link_to "Add filter", new_filter_path(query: @filter), class: 'pull-right'
+        -# if @display_as == "test"
+        -#  = link_to "Add filter", new_filter_path(query: @filter), class: 'pull-right'
+

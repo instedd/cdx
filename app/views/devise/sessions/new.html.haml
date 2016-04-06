@@ -19,7 +19,7 @@
         = f.label :remember_me
     .col
       = link_to "Login problems?", new_password_path(resource_name), class: "pull-right"
-      - if devise_mapping.omniauthable?
+      -# if devise_mapping.omniauthable?
         - resource_class.omniauth_providers.each do |provider|
           - if provider.to_s =~ /google/i
             %br

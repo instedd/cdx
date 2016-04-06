@@ -1,8 +1,13 @@
 class Api::InstitutionsController < ApiController
+
+  #================================================================================================================
   def index
     @institutions = check_access(Institution, READ_INSTITUTION).map do |institution|
       {"uuid" => institution.uuid, "name" => institution.name}
     end
+
+    # do some ordering here (dave)
+    @institutions.sort! {|a,b| a['name']<=>b['name']}
 
     respond_to do |format|
       format.csv do
