@@ -3,7 +3,7 @@ module ChartsHelper
     results = Reports::Site.process(current_user, @navigation_context, options) 
     found_data = results.sort_by_site.data
     all_sites = check_access(Site.within(@navigation_context.entity), Policy::Actions::READ_SITE)
-    sites=all_sites.map { | site | [site.name,0] }
+    sites = all_sites.map { | site | [site.name,0] }
     sites.each do | site | 
       found_data.each do | found_site_data |  
         if site[0].include? found_site_data[0]

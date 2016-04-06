@@ -2,7 +2,7 @@ var HorizontalBarChart = React.createClass({
 	getInitialState: function() {
 	var width_value = this.props.width || 0;
 	return {
-		width: width_value
+	  width: width_value
 	};
 	},
 	getDefaultProps: function() {
@@ -13,12 +13,8 @@ var HorizontalBarChart = React.createClass({
   },	
   render: function() {
     var data = this.props.data;
-
-	
-			
-
 		var chart = document.getElementById(this.props.chart_div),
-		    axisMargin = 20,
+        axisMargin = 20,
 		    margin = 20,
 		    valueMargin = 4,
 		    width = this.state.width,
@@ -103,35 +99,32 @@ var HorizontalBarChart = React.createClass({
 			   return Math.max(width + valueMargin, scale(d[1]));
 			  });
 			
-			
-			
-						var canvasWidth = this.props.width,
-						          canvasHeight = this.props.height,
-						          otherMargins = canvasWidth * 0.1,
-						          leftMargin = canvasWidth * 0.25,
-						          maxBarWidth = canvasHeight - - otherMargins - leftMargin
-						          maxChartHeight = canvasHeight - (otherMargins * 2);
+			var canvasWidth = this.props.width,
+				  canvasHeight = this.props.height,
+			    otherMargins = canvasWidth * 0.1,
+				  leftMargin = canvasWidth * 0.25,
+				  maxBarWidth = canvasHeight - - otherMargins - leftMargin
+				  maxChartHeight = canvasHeight - (otherMargins * 2);
 						
 				//x axis title        
-				          svg.append("text")
-				                .attr("x", (maxBarWidth / 2) + leftMargin)
-				                .attr("y", this.props.height - (otherMargins / 8))
-				                .attr("text-anchor", "middle")
-				                .attr("font-family", "sans-serif")
-				                .attr("font-size", "14px")
-				                .attr("font-weight", "bold")
-				                .attr("fill", "black")
-				                .text(this.props.label);
-				
+			svg.append("text")
+				 .attr("x", (maxBarWidth / 2) + leftMargin)
+				 .attr("y", this.props.height - (otherMargins / 8))
+		     .attr("text-anchor", "middle")
+			  .attr("font-family", "sans-serif")
+			  .attr("font-size", "14px")
+			  .attr("font-weight", "bold")
+			  .attr("fill", "black")
+			  .text(this.props.label);
 												
 
-		svg.insert("g",":first-child")
-		 .attr("class", "horizontal-bar-axis")
-		 .attr("transform", "translate(" + (margin + labelWidth) + ","+ (height - axisMargin - margin)+")")
-		 .call(xAxis);	  
+		  svg.insert("g",":first-child")
+		   .attr("class", "horizontal-bar-axis")
+		   .attr("transform", "translate(" + (margin + labelWidth) + ","+ (height - axisMargin - margin)+")")
+		   .call(xAxis);	  
 
     return (
-      <div >
+      <div>
       </div>
     );
   }
