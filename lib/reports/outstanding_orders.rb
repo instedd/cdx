@@ -22,6 +22,7 @@ module Reports
       end
 
       results = TestResult.query(filter, current_user).execute
+
       results["tests"].each do |result|
         encounter = result["encounter"]
         uuid = encounter["uuid"]
@@ -29,8 +30,8 @@ module Reports
         if matched_encounter == nil
           Rails.logger.info("no matched encounter for "+ uuid)
         else
-       #   end_time = encounter["end_time"]
-          end_time = result["test"]["reported_time"]         
+          end_time = encounter["end_time"]
+       #   end_time = result["test"]["reported_time"]         
           if (matched_encounter[:test_result_encounter_end_time]==0) || (matched_encounter[:test_result_encounter_end_time]>end_time)
             matched_encounter[:test_result_encounter_end_time] = end_time
             diff = (to_diff_time -  Time.parse(end_time.to_s))
