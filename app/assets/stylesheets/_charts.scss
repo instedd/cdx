@@ -90,3 +90,62 @@ svg {
     padding: 0 1.4em 0 0.4em;
   }
 }
+
+.filterbar{
+	background:#E5E5E5;
+	padding:15px;
+	padding-left:40px;
+	margin-left:-10px;
+	margin-top:-10px;
+}
+
+.filterbar .title{
+	font-size:28px;
+}
+
+.filterbar .showing{
+	height:22px;
+}
+
+.filterbar .showing .highlight{
+	font-size:14px;
+	float:left;
+	color:#888;
+}
+
+.filterbar .showing .dates{
+	font-size:14px;
+	float:left;
+	margin-left:10px;
+}
+
+.chart-container{
+	-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	margin:40px;
+	padding:20px;
+	padding-top:10px;
+}
+
+.col{
+	padding:0px;
+}
+
+.pe-10{
+	flex:100% !important;
+}
+
+.maincol{
+	margin-left:10px;
+	margin-top:10px;
+}
+
+.maincol .side-link.btn-add {
+    margin-left: 0px;
+    margin-right:10px;
+}
+
+.maincol h1 {
+    margin:20px 20px 30px 20px;
+}

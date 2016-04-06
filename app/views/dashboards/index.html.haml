@@ -65,47 +65,62 @@
 
 %hr
 
-.row
-  .col
-    %h1 Error rate #{chart_heading}
-.row
-  .col.pe-7
-    = react_component('BarChart', data: query_errors.data, height: 300, y_label: 'Tests With Errors', x_labels: query_errors.error_codes)
-  .col
-    = react_component('PieChart', data: errors_by_code, height: 250, label: 'Errors')
-%hr
-.row
-  .col.pe-8
-    %h1 Devices #{chart_heading}
-.row
-  .col.pe-7
-    = react_component('BarChart', data: devices_reporting_chart.data, height: 300, y_label: 'Errors By Device', x_labels: devices_reporting_chart.device_names)
-  .col
-    = react_component('PieChart', data: devices_grouped, height: 250, label: 'Devices')
-%hr
-.row
-  .col.pe-8
-    %h1 Models #{chart_heading}
-.row
-  .col.pe-7
-    = react_component('BarChart', data: errors_by_model_chart.data, height: 300, y_label: 'Errors By Model', x_labels: errors_by_model_chart.device_models)
-  .col
-    = react_component('PieChart', data: errors_by_model, height: 250, label: 'By Models')
-%hr
-.row
-  .col
-    %h1 Successful tests #{chart_heading}
-.row
-  .col.pe-7
-    = react_component('BarChart', data: successful_tests_chart.data, height: 300, y_label: 'successful Tests', x_labels: successful_tests_chart.test_names)
-  .col
-    = react_component('PieChart', data: successful_tests, height: 250, label: 'Successful')
-%hr
-.row
-  .col
-    %h1 Unsuccessful tests #{chart_heading}
-.row
-  .col.pe-7
-    = react_component('BarChart', data: unsuccessful_tests_chart.data, height: 300, y_label: 'Successful Tests', x_labels: unsuccessful_tests_chart.statuses)
-  .col
-    = react_component('PieChart', data: unsuccessful_tests, height: 250, label: 'Unsuccessful')
+.chart-container
+  .row
+    .col.pe-8
+      %h1 Usage
+  .row#tests_run
+    .col.pe-7
+      = react_component('BarChart', data: query_tests_chart.data, height: 300, y_label: 'Tests Run', x_labels: query_tests_chart.statuses)
+    .col
+      = react_component('PieChart', data: tests_by_status, height: 250, label: 'Tests Run')
+
+.chart-container
+  .row
+    .col
+      %h1 Error rate 
+  .row
+    .col.pe-7
+      = react_component('BarChart', data: query_errors.data, height: 300, y_label: 'Tests With Errors', x_labels: query_errors.error_codes)
+    .col
+      = react_component('PieChart', data: errors_by_code, height: 250, label: 'Errors')
+
+.chart-container
+  .row
+    .col.pe-8
+      %h1 Devices 
+  .row
+    .col.pe-7
+      = react_component('BarChart', data: devices_reporting_chart.data, height: 300, y_label: 'Errors By Device', x_labels: devices_reporting_chart.device_names)
+    .col
+      = react_component('PieChart', data: devices_grouped, height: 250, label: 'Devices')
+
+.chart-container
+  .row
+    .col.pe-8
+      %h1 Models 
+  .row
+    .col.pe-7
+      = react_component('BarChart', data: errors_by_model_chart.data, height: 300, y_label: 'Errors By Model', x_labels: errors_by_model_chart.device_models)
+    .col
+      = react_component('PieChart', data: errors_by_model, height: 250, label: 'By Models')
+
+.chart-container
+  .row
+    .col
+      %h1 Successful tests 
+  .row
+    .col.pe-7
+      = react_component('BarChart', data: successful_tests_chart.data, height: 300, y_label: 'successful Tests', x_labels: successful_tests_chart.test_names)
+    .col
+      = react_component('PieChart', data: successful_tests, height: 250, label: 'Successful')
+
+.chart-container
+  .row
+    .col
+      %h1 Unsuccessful tests
+  .row
+    .col.pe-7
+      = react_component('BarChart', data: unsuccessful_tests_chart.data, height: 300, y_label: 'Successful Tests', x_labels: unsuccessful_tests_chart.statuses)
+    .col
+      = react_component('PieChart', data: unsuccessful_tests, height: 250, label: 'Unsuccessful')

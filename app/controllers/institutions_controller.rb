@@ -3,6 +3,7 @@ class InstitutionsController < ApplicationController
   skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
   skip_before_action :ensure_context, except: [:no_data_allowed]
 
+  #================================================================================================================
   def index
     @can_create = has_access?(Institution, CREATE_INSTITUTION)
 
@@ -13,6 +14,7 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  #================================================================================================================
   def edit
     @institution = check_access(Institution.find(params[:id]), READ_INSTITUTION)
     @readonly = !has_access?(@institution, UPDATE_INSTITUTION)
@@ -22,6 +24,7 @@ class InstitutionsController < ApplicationController
     @can_create = @institutions.one? && has_access?(Institution, CREATE_INSTITUTION)
   end
 
+  #================================================================================================================
   def new
     @institution = current_user.institutions.new
     @institution.user_id = current_user.id
@@ -30,6 +33,7 @@ class InstitutionsController < ApplicationController
     @hide_my_account = @hide_nav_bar = @institutions.count == 0
   end
 
+  #================================================================================================================
   def create
     @institution = Institution.new(institution_params)
     @institution.user_id = current_user.id
@@ -57,6 +61,7 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  #================================================================================================================
   def update
     @institution = Institution.find(params[:id])
     return unless authorize_resource(@institution, UPDATE_INSTITUTION)
@@ -72,6 +77,7 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  #================================================================================================================
   def destroy
     @institution = Institution.find(params[:id])
     return unless authorize_resource(@institution, DELETE_INSTITUTION)
@@ -84,6 +90,7 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  #================================================================================================================
   def pending_approval
     @hide_nav_bar = true
   end
@@ -99,10 +106,12 @@ class InstitutionsController < ApplicationController
 
   private
 
+  #================================================================================================================
   def load_institutions
     @institutions = check_access(Institution, READ_INSTITUTION) || []
   end
 
+  #================================================================================================================
   def institution_params
     params.require(:institution).permit(:name, :kind)
   end
