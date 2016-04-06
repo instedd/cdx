@@ -20,8 +20,6 @@ RSpec.describe Reports::OutstandingOrders, elasticsearch: true do
 
   let(:nav_context) { NavigationContext.new(current_user, institution.uuid) }
 
-  #   let(:blender) { Blender.new(@institution) }
-
   before do
     encounter.start_time=DateTime.new(Time.now.year,Time.now.month,Time.now.day,11,11,0).utc.iso8601
     encounter_indexer = EncounterIndexer.new(encounter).index
