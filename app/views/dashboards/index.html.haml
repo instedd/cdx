@@ -1,3 +1,10 @@
+.filterbar
+  .heading
+    .title DASHBOARD
+    .showing
+      .highlight SHOWING :
+      .dates in the last 12 months
+
 .row
   .col.pe-6
     %form#filters-form{ action: dashboard_path, 'data-auto-submit' => true }
@@ -18,52 +25,43 @@
           %label.block
           %input#query_button.btn-primary(type='submit' value='Query')
 
-
-
 = react_component('OutstandingTestsTable', title: "title", allowSorting: "true", orderBy: "-test_order", data: outstanding_orders)
-%hr
 
+.chart-container
+  .row
+    .col.pe-8
+      %h1 Device Error Codes 
+  .row
+    .col.pe-7
+    = react_component('DeviceErrorTable', title: "title", allowSorting: "true", orderBy: "-device", data: error_codes_by_device)
 
+.chart-container
+  .row
+    .col.pe-8
+      %h1 Devices Not Reporting 
+  .row
+    .col.pe-7
+  = react_component('HorizontalBarChart', data: query_devices_not_reporting_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses, chart_div: 'chart_not_responding', label: 'DAYS')
+  #chart_not_responding
+  		
+.chart-container
+  .row
+    .col.pe-8
+      %h1 Usage #{chart_heading}
+  .row#tests_run
+    .col.pe-7
+      = react_component('BarChart', data: query_tests_chart.data, height: 300, y_label: 'Tests Run', x_labels: query_tests_chart.statuses)
+    .col
+      = react_component('PieChart', data: tests_by_status, height: 250, label: 'Tests Run')
 
-.row
-  .col.pe-8
-    %h1 Device Error Codes 
-.row
-  .col.pe-7
-  = react_component('DeviceErrorTable', title: "title", allowSorting: "true", orderBy: "-device", data: error_codes_by_device)
-%hr
-
-
-.row
-  .col.pe-8
-    %h1 Devices Not Reporting 
-.row
-  .col.pe-7
-= react_component('HorizontalBarChart', data: query_devices_not_reporting_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses, chart_div: 'chart_not_responding', label: 'DAYS')
-#chart_not_responding
-%hr
-
-		
-		
-.row
-  .col.pe-8
-    %h1 Usage #{chart_heading}
-.row#tests_run
-  .col.pe-7
-    = react_component('BarChart', data: query_tests_chart.data, height: 300, y_label: 'Tests Run', x_labels: query_tests_chart.statuses)
-  .col
-    = react_component('PieChart', data: tests_by_status, height: 250, label: 'Tests Run')
-
-%hr
-.row
-  .col.pe-8
-    %h1 Site Tests #{chart_heading}
-.row
-  .col.pe-7
-  = react_component('HorizontalBarChart', data: query_site_tests_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses, chart_div: 'chart_site_tests', label: 'Total Tests by Site')
-#chart_site_tests
-
-%hr
+.chart-container
+  .row
+    .col.pe-8
+      %h1 Site Tests #{chart_heading}
+  .row
+    .col.pe-7
+    = react_component('HorizontalBarChart', data: query_site_tests_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses, chart_div: 'chart_site_tests', label: 'Total Tests by Site')
+  #chart_site_tests
 
 .chart-container
   .row
