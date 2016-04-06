@@ -1,20 +1,19 @@
 module ChartsHelper
   def query_site_tests_chart
-    results = Reports::Site.process(current_user, @navigation_context, options) 
+    results = Reports::Site.process(current_user, @navigation_context, options)
     found_data = results.sort_by_site.data
     all_sites = check_access(Site.within(@navigation_context.entity), Policy::Actions::READ_SITE)
     sites = all_sites.map { | site | [site.name,0] }
-    sites.each do | site | 
-      found_data.each do | found_site_data |  
+    sites.each do | site |
+      found_data.each do | found_site_data |
         if site[0].include? found_site_data[0]
           site[1] = found_site_data[1]
         end
-      end   
-    end 
+      end
+    end
     return sites
   end
- 
-  
+
   def query_devices_not_reporting_chart
     @devices = check_access(Device.within(@navigation_context.entity), Policy::Actions::READ_DEVICE)
     if options["since"] !=nil
@@ -22,9 +21,9 @@ module ChartsHelper
     else
       since = (Time.now - 12.months).strftime('%Y-%m-%d')
     end
-        
+
     data=[]
-    @devices.each do |device| 
+    @devices.each do |device|
       if options["date_range"] ==nil
         day_range =  (Date.parse(Time.now.strftime('%Y-%m-%d')) -  Date.parse(since) ).to_i
         device_message = DeviceMessage.where(:device_id => device.id).where("created_at > ?", since).order(:created_at).first
@@ -32,7 +31,7 @@ module ChartsHelper
         day_range = ( Date.parse(options["date_range"]["start_time"]["lte"]) -  Date.parse(options["date_range"]["start_time"]["gte"]) ).to_i
         device_message = DeviceMessage.where(:device_id => device.id).where("created_at > ? and created_at < ?",options["date_range"]["start_time"]["lge"],options["date_range"]["start_time"]["lte"]).order(:created_at).first
       end
-      
+
       if device_message==nil
         data << [device.name, day_range]
       else
@@ -40,11 +39,9 @@ module ChartsHelper
         data << [device.name, days_diff]
       end
     end
-    
     data
   end
-  
-  
+
   def devices_reporting_chart
     results = Reports::Devices.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
@@ -55,17 +52,15 @@ module ChartsHelper
     Reports::Grouped.by_error_code(current_user, @navigation_context, options)
   end
 
-
   def error_codes_by_device
-    data = Reports::DeviceErrorCodes.process(current_user, @navigation_context, options) 
-    data.get_device_location_details      
+    data = Reports::DeviceErrorCodes.process(current_user, @navigation_context, options)
+    data.get_device_location_details
   end
 
   def outstanding_orders
-    data = Reports::OutstandingOrders.process(current_user, @navigation_context, options) 
+    data = Reports::OutstandingOrders.process(current_user, @navigation_context, options)
     data.latest_encounter
   end
-  
 
   def errors_by_device_chart
     results = Reports::DeviceErrors.process(current_user, @navigation_context, options)
