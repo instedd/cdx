@@ -60,7 +60,7 @@ var AlertCategorySelect = React.createClass({
 			messageField: this.props.alert_info.message,
 			smsMessageField: this.props.alert_info.sms_message,
 			enabledField: this.props.alert_info.enabled,
-			external_users:[],
+			external_users:this.props.alert_external_users,
 			error_messages:[],
 			test_result_min_thresholdField: this.props.alert_info.test_result_min_threshold,
 			test_result_max_thresholdField: this.props.alert_info.test_result_max_threshold,

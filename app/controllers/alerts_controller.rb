@@ -135,7 +135,8 @@ class AlertsController < ApplicationController
       alert_info.query="{}"
       edit = true
       internal_users_ok,external_users_ok,error_text = set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, edit)
-      error_text, condition_result_ok = set_category(params, alert_info, error_text, condition_result_ok, edit)
+    
+      condition_result_ok,error_text = set_category(params, alert_info, error_text, condition_result_ok, edit)
       set_sample_id(params, alert_info)
       set_sites_devices_institutions(params, alert_info, edit)
       alert_query_updated_ok = alert_info.update(query: alert_info.query)
@@ -296,6 +297,7 @@ class AlertsController < ApplicationController
 
   def set_channel_info(params, alert_info, internal_users_ok, external_users_ok, error_text, is_edit)
     #destroy all recipients before adding them in again on an update
+   
     if (is_edit==true)
       AlertRecipient.destroy_all(alert_id: alert_info.id)
     end
@@ -346,14 +348,12 @@ class AlertsController < ApplicationController
         alert_recipient.first_name = external_user_value["first_name"]
         alert_recipient.last_name = external_user_value["last_name"]
         alert_recipient.alert=alert_info
-
         if alert_recipient.save == false
           external_users_ok = false
           error_text = error_text.merge alert_recipient.errors.messages
         end
       end
     end
-
     return internal_users_ok,external_users_ok,error_text
   end
 
