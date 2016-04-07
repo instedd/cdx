@@ -1,0 +1,286 @@
+
+.filterbar{
+	background:#E5E5E5;
+	padding:15px;
+	padding-left:40px;
+	margin-left:-10px;
+	margin-top:-10px;
+}
+
+.filterbar .title{
+	font-size:28px;
+}
+
+.filterbar .showing{
+	height:22px;
+}
+
+.filterbar .showing .highlight{
+	font-size:14px;
+	float:left;
+	color:#888;
+}
+
+.filterbar .showing .dates{
+	font-size:14px;
+	float:left;
+	margin-left:10px;
+}
+
+.chart-container{
+	-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	margin: 40px 40px 0px 32px;
+	padding:20px;
+	padding-top:10px;
+}
+
+.chart-container-bar{
+	-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	margin:40px 0px 0px 32px;
+	padding:20px;
+	padding-top:10px;
+	float:left;
+	width:60%;
+	min-height:450px;
+}
+
+.chart-container-pie{
+	-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+	margin:40px 40px 0px 0px;
+	padding:20px;
+	padding-top:10px;	
+	float:right;
+	width:33%;
+	min-height:450px;
+	overflow:hidden;
+}
+
+.tests_run, .pe-7{
+	margin:auto;
+	flex:100% !important;
+}
+
+
+.chart-container-clear{
+	clear:both;
+}
+
+.chart-container .pe-8 h1{
+	margin:0px;
+	margin-top:10px;
+}
+
+.chart-container-pie .chart{
+	margin-left:40px;
+}
+
+#chart_site_tests, #chart_not_responding{
+text-align:center;
+}
+
+.col{
+	padding:0px;
+}
+
+.pe-10{
+	flex:100% !important;
+}
+
+.maincol{
+	margin-left:10px;
+	margin-top:10px;
+}
+
+.maincol .side-link.btn-add {
+    margin-left: 0px;
+    margin-right:10px;
+}
+
+.maincol h1 {
+    margin:20px 20px 30px 20px;
+}
+
+.filterbar{
+height:95px;
+}
+
+.filterbar .heading{
+float:left;
+}
+
+.filterbar .topfilters{
+margin-left:250px;
+}
+
+.filterbar .topfilters .topdateto{
+float:right;
+margin-left:15px;
+}
+
+.filterbar .topfilters .topdatefrom{
+float:right;
+margin-left:30px;
+}
+
+.filterbar .topfilters .topbutton{
+float:right;
+margin-top:7px;
+text-align:right;
+margin-left:40px;
+margin-right: 20px;
+}
+
+.filterbar .topfilters .topdateperiod{
+float:right;
+margin-left:20px;
+border-right:1px solid #aaa;
+padding-right:30px;
+padding-bottom:10px;
+}
+
+.filterbar .topfilters .block{
+min-height:30px;
+line-height:30px;
+color:#000;
+}
+
+.filterbar .topfilters .Select-control,
+.filterbar .topfilters .Select-control *{
+padding-top:1px;
+padding-bottom:0px;
+}
+
+.filterbar .topfilters .Select-control .Select-arrow{
+top:5px;
+}
+
+.filterbar .topfilters .topbutton .btn-primary{
+line-height: 45px !important;
+}
+
+
+
+
+
+
+
+
+.row .newtestoptions{
+background:#E5E5E5;
+text-align:left;
+justify-content: flex-start;
+-webkit-justify-content: flex-start;
+padding-left:70px;
+height:95px;
+padding-top:8px;
+margin:-10px 0px 0px -10px;
+}
+
+.row .newtestoptions h2{
+color:black;
+width:100%;
+height:20px;
+}
+
+.row .newtestoptions h2 .side-link{
+color:black;
+}
+
+.row .newtestoptions .subheading{
+color:#777;
+margin-top:-8px;
+font-size:13px;
+}
+
+.optionsarea{
+width:100%;
+}
+
+
+.optionsarea ul.nav-list{
+height:200px;
+border-radius: 0px;
+box-shadow: 0 0px 0px;
+width:100%;
+}
+
+.optionsarea ul.nav-list li{
+float:left;
+width:45%;
+height:180px;
+-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+margin:40px 20px 20px 20px;
+text-align:center;
+}
+
+.optionsarea ul.nav-list li span{
+font-size:27px;
+line-height:70px;
+}
+
+.optionsarea ul.nav-list li .text-small{
+font-size:12px;
+padding:15px;
+color:#777;
+}
+
+
+
+
+
+.filters{
+margin:0px;
+margin-left:-10px;
+background:#888;
+}
+
+.filters .advanced{
+width:100%;
+}
+
+.filters label {
+color:#fff;
+}
+
+.has-value > .Select-control > .Select-placeholder, .Select-control > .Select-placeholder, input[type="text"] {
+color:#fff;
+}
+
+.filters .filter{
+flex: 0 0 5%;
+}
+
+
+.filters{
+height:85px;
+display:none;
+}
+
+.filters .advanced{
+height:85px;
+}
+
+.topfilteropt{
+float:right;
+}
+
+.topfilteropt #query_button{
+    height: 51px;
+    line-height: 41px;
+}
+
+.filterbartest{
+    padding: 20px 15px 15px 40px;
+}
+
+.filters .advanced {
+    height: 500px;
+}

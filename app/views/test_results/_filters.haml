@@ -1,15 +1,24 @@
 - content_for(:subheader) do
-  - show_expanded = ["test.type", "sample.id", "encounter.id", "device.uuid"].any? { |key| params[key].present? }
-  %form#filters-form{action: test_results_path, "data-auto-submit" => true}
+
+  .filterbar.filterbartest
+    .heading
+      .title
+        - if @can_create_encounter
+          = link_to "+", new_index_encounters_path, class: 'btn-add side-link fix', title: 'Add test order'
+        Tests
+
+    
+	
+    .topfilteropt
+      %input#query_button.btn-primary.filtershow(type='button' value='Show Filters')
+  
+  %form.filteroptions#filters-form{action: test_results_path, "data-auto-submit" => true}
     %input{type: "hidden", name: "page_size", value: @page_size}
     .row.center.filters
       .col.pe-10
-        .row
-          .col
-            %h1
-              - if @can_create_encounter
-                = link_to "+", new_index_encounters_path, class: 'btn-add side-link fix', title: 'Add test order'
-              Tests
+	  
+      .advanced
+	  
         .row
           .filter
             %label.block Display as
@@ -31,27 +40,23 @@
             = cdx_select name: "since", value: params["since"] do |select|
               - select.item "", "Show all"
               - select.items @date_options, :value, :label
-          .col
-            %a.btn-toggle.pull-right{:class => (show_expanded ? "up" : ""), :title => "Toggle advanced filters"}
-
-        .advanced{class: (show_expanded ? "show" : ""), style: (show_expanded ? "overflow: visible" : "") }
-          .row
-            - if @display_as == "test"
-              .filter
-                %label.block Type
-                = cdx_select name: "test.type", value: params["test.type"] do |select|
-                  - select.item "", "Show all"
-                  - select.items @test_types
-              .filter
-                %label.block Sample Id
-                %input{type: "text", name: "sample.id", value: params["sample.id"]}
-            - else
-              .filter
-                %label.block Test Order Id
-                %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
-            - if @display_as == "test" && ((@devices.size > 1) || params['device.uuid'])
-              .filter
-                %label.block Device
-                = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
-                  - select.item "", "Show all"
-                  - select.items @devices, :uuid, :name
+          
+          - if @display_as == "test"
+            .filter
+              %label.block Type
+              = cdx_select name: "test.type", value: params["test.type"] do |select|
+                - select.item "", "Show all"
+                - select.items @test_types
+            .filter
+              %label.block Sample Id
+              %input{type: "text", name: "sample.id", value: params["sample.id"]}
+          - else
+            .filter
+              %label.block Test Order Id
+              %input{type: "text", name: "encounter.id", value: params["encounter.id"]}
+          - if @display_as == "test" && ((@devices.size > 1) || params['device.uuid'])
+            .filter
+              %label.block Device
+              = cdx_select name: "device.uuid", value: params["device.uuid"] do |select|
+                - select.item "", "Show all"
+                - select.items @devices, :uuid, :name

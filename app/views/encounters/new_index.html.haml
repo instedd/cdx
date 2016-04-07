@@ -1,26 +1,20 @@
 - content_for(:subheader) do
-  .row.center.add-new
-    .col.pe-10
-      .row
-        .col
-          %h2
-            = link_to test_results_path(display_as: "test_order"), class: 'side-link', title: 'Back' do
-              = image_tag "arrow-left-white.png"
-            New Tests
+  .row.center.add-new.newtestoptions
+    %h2
+      = link_to test_results_path(display_as: "test_order"), class: 'side-link', title: 'Back' do
+        = image_tag "arrow-left.png"
+      New Tests
+    .subheading Please select one of the options below.
 
 
 .row
-  .col.pe-2
-    %label Options
-  .col.pe-8
+  .optionsarea
     %ul.nav-list
       %li{'data-href' => new_encounter_path(mode: 'fresh_tests')}
         %span New test order
-        .icon-keyboard-arrow-right.icon-gray
         .text-small.muted
-          %i Generate sample ids to assign to new samples for future analysis
+          %i Order diagnostic tests against patients and samples. Specify sample type, test type, reason for examination and due date. Add sample IDs or use the sample ID generator.
       %li{'data-href' => new_encounter_path(mode: 'existing_tests')}
         %span Already reported tests
-        .icon-keyboard-arrow-right.icon-gray
         .text-small.muted
-          %i Organize already reported tests under a test order
+          %i Organise and assign test results to patients. Review results and provide diagnosis. 
