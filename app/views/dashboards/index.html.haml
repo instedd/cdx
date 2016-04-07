@@ -4,6 +4,29 @@
     .showing
       .highlight SHOWING :
       .dates in the last 12 months
+	  
+  .topfilters  
+    %form#filters-form{ action: dashboard_path }
+  
+      .topbutton
+        %input#query_button.btn-primary(type='submit' value='Filter')
+
+      .topdateto
+        %label.block Date To
+        = date_field('range','start_time[lte]')
+    
+      .topdatefrom
+        %label.block Date From
+        = date_field('range','start_time[gte]')
+    
+      .topdateperiod
+        %form#filters-form{ action: dashboard_path, 'data-auto-submit' => true }
+          .filter
+            %label.block Date Period
+            = cdx_select name: 'since', value: params['since'] do |select| 
+              - select.items options_for_date, :value, :label
+	
+	
 
   .topfilters
     %form#filters-form{ action: dashboard_path }
@@ -104,6 +127,9 @@
     .col.pe-8
       %h1 Average Tests per Technician
   .row
+    .col.pe-8
+      %h1 Error rate
+  .row#tests_run
     .col.pe-7
       = react_component('GroupedHorizontalBarChart', data: average_tests_per_technician_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_average_tests', label: 'DAYS')
       #chart_average_tests
@@ -161,6 +187,8 @@
   .row#tests_run
     .col.pe-7
       = react_component('PieChart', data: successful_tests, height: 250, label: 'Successful')
+	  
+.chart-container-clear
 
 .chart-container-clear
 
