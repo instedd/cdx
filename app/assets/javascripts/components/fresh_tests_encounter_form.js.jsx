@@ -19,6 +19,60 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
           </div>
         </div>
 
+        <div className="row">
+          <div className="col pe-2">
+            <label>Reason for Examination</label>
+          </div>
+          <div className="col">
+            <p>
+              <input onChange={this.reason_chooser(0)} type="radio" name="exam_reason" value="diag" /><label>Diagnosis</label>
+              <input onChange={this.reason_chooser(1)} type="radio" name="exam_reason" value="follow" /><label>Follow-Up</label>
+            </p>
+          </div>
+        </div>
+        <div id="if_reason_diag" className="row hidden">
+          <div className="col pe-2">
+            <label>Comment</label>
+          </div>
+          <div className="col">
+            <textarea name="diag_comment"></textarea>
+          </div>
+        </div>
+        <div id="if_reason_follow" className="row hidden">
+          <div className="col pe-2">
+            <label>Month of Treatment</label>
+          </div>
+          <div className="col">
+            <p>dateselector_year_month</p>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col pe-2">
+            <label>Tests Requested</label>
+          </div>
+          <div className="col">
+            <ul>
+              <li><label>Microscopy</label>                   <input type="checkbox" name="requested_microscopy"/>  </li>
+              <li><label>Xpert MTB/RIF</label>                <input type="checkbox" name="requested_xpert"/>       </li>
+              <li><label>Culture Drug susceptibility</label>  <input type="checkbox" name="requested_culture"/>     </li>
+              <li><label>Line probe assay</label>             <input type="checkbox" name="requested_lineprobe"/>   </li>
+              <li><label>CD4 Count</label>                    <input type="checkbox" name="requested_cd4"/>         </li>
+              <li><label>Viral Load Count</label>             <input type="checkbox" name="requested_viral"/>       </li>
+              <li><label>HIV 1/2 Detect</label>               <input type="checkbox" name="requested_hiv"/>         </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col pe-2">
+            <label>Test Due Date</label>
+          </div>
+          <div className="col">
+            <input type="date" id="testdue_date" className="datepicker"/>
+          </div>
+        </div>
+
         <hr/>
 
         <FlexFullRow>
@@ -38,6 +92,25 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
 
       </div>
     );
+  },
+
+  handleDPEvent: function(event, picker)
+  {
+    console.log(picker.startDate);
+  },
+
+  reason_chooser: function(choice)
+  {
+    if(choice==0)
+    {
+      $('#if_reason_diag').removeClass('hidden');
+      $('#if_reason_follow').addClass('hidden');
+    }
+    else
+    {
+      $('#if_reason_follow').removeClass('hidden');
+      $('#if_reason_diag').addClass('hidden');
+    }
   },
 
   onPatientChanged: function(patient) {

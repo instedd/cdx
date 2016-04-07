@@ -15,7 +15,7 @@
           %li{:class => params[:controller] == "dashboards" && params[:action] == "index" && "active"}
             = link_to "Home", dashboard_path
 
-        -# ------------ REPORTS
+        -# ------------ REPORTS (just unindent the lines below to reactivate)
           - if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
             %li{:class => params[:controller] == "dashboards" && params[:action] == "nndd" && "active"}
               = link_to "Reports", nndd_path

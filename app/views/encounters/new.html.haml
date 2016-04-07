@@ -1,11 +1,14 @@
 - content_for(:subheader) do
   .row.center.add-new
-    .col.pe-10
-      .row
-        .col
-          %h2
-            = link_to new_index_encounters_path, class: 'side-link', title: 'Back' do
-              = image_tag "arrow-left-white.png"
-            New Test Order
+  .col.pe-10
+    .row
+    .col
+      %h2
+        = link_to new_index_encounters_path, class: 'side-link', title: 'Back' do
+          = image_tag "arrow-left-white.png"
+        - if params[:mode] == 'existing_tests'
+          = 'Existing Tests'
+        - else 
+          = 'New test'
 
 = react_component('EncounterNew', context: @navigation_context.to_hash, patient: @patient_json, mode: params[:mode], possible_assay_results: @possible_assay_results)
