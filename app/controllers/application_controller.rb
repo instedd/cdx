@@ -179,6 +179,12 @@ class ApplicationController < ActionController::Base
   end
 
   def log_authorization_warn(resource, action)
-    logger.warn "Authorization failed. #{action} requested by #{current_user.email} in #{resource.class} (id=#{resource.id})"
+    resource_name =
+      if resource.is_a? Class
+        "#{resource} class"
+      else
+        "#{resource.class} (id=#{resource.id})"
+      end
+    logger.warn "Authorization failed. #{action} requested by #{current_user.email} in #{resource_name}"
   end
 end
