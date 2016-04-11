@@ -120,13 +120,13 @@
       = react_component('PieChart', data: tests_by_failed, height: 250, label: 'Total tests')
 .chart-container-clear
 
-.chart-container-bar
+.chart-container-pie
   .row
     .col.pe-8
       %h1 Average Tests per Technician
   .row
     .col.pe-8
-      %h1 Error rate
+      %h1 &nbsp;
   .row#tests_run
     .col.pe-7
       = react_component('GroupedHorizontalBarChart', data: average_tests_per_technician_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_average_tests', label: 'DAYS')
