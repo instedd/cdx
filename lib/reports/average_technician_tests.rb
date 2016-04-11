@@ -1,26 +1,25 @@
 module Reports
-  class AverageTechnicianTests  < Base
+  class AverageTechnicianTests < Base
 
     def average_tests
       filter['group_by'] = "test.site_user,#{day_or_month}(test.reported_time)"
       test_users_list=[]
       results = TestResult.query(@filter, current_user).execute
-      results["tests"].each do |result|
-        test_user = result["test.site_user"]
-        count = result["count"]
-        matched_test_user= test_users_list.find {|x| x[:site_user] == test_user}
+      results['tests'].each do |result|
+        test_user = result['test.site_user']
+        matched_test_user= test_users_list.find { |x| x[:site_user] == test_user }
 
         if matched_test_user
-          matched_test_user[:total] += result["count"]
+          matched_test_user[:total] += result['count']
           matched_test_user[:number_results] += 1
-          matched_test_user[:peak] = result["count"] if matched_test_user[:peak] < result["count"]
+          matched_test_user[:peak] = result['count'] if matched_test_user[:peak] < result['count']
         else
           test_users_list << {
-            :site_user => test_user,
-            :total => result["count"],
-            :peak => result["count"],
-            :average => 0,
-            :number_results => 1
+            site_user: test_user,
+            total: result['count'],
+            peak: result['count'],
+            average: 0,
+            number_results: 1
           }
         end
       end

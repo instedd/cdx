@@ -150,7 +150,7 @@ module Reports
 
     def ignore_qc
       # TODO post mvp: should generate list of all types but qc, or support query by !=
-      filter["test.type"] = "specimen"
+      filter['test.type'] = 'specimen'
     end
 
     def users
