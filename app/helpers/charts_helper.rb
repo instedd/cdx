@@ -56,7 +56,7 @@ module ChartsHelper
     data = Reports::DeviceErrorCodes.process(current_user, @navigation_context, options)
     data.get_device_location_details
   end
-  
+
   def average_tests_per_technician_chart
     data = Reports::AverageTechnicianTests.process(current_user, @navigation_context, options)
     data.average_tests
@@ -131,6 +131,14 @@ module ChartsHelper
 
   def tests_by_status
     Reports::Grouped.by_status(current_user, @navigation_context, options)
+  end
+
+  def tests_by_failed
+    Reports::Grouped.by_failed(current_user, @navigation_context, options)
+  end
+
+  def  failed_tests
+    Reports::Failed.process(current_user, @navigation_context, options).data
   end
 
   def days_since
