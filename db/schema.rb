@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160322190646) do
+ActiveRecord::Schema.define(version: 20160405192357) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -474,6 +474,7 @@ ActiveRecord::Schema.define(version: 20160322190646) do
     t.string   "email_address",                    limit: 255
     t.string   "last_sample_identifier_entity_id", limit: 255
     t.date     "last_sample_identifier_date"
+    t.boolean  "allows_manual_entry"
   end
 
   add_index "sites", ["deleted_at"], name: "index_sites_on_deleted_at", using: :btree

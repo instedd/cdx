@@ -157,7 +157,7 @@ class SitesController < ApplicationController
       params[:site][:lng] = location_details.try(:lng)
     end
 
-    allowed_params = [:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :sample_id_reset_policy, :main_phone_number, :email_address]
+    allowed_params = [:name, :address, :city, :state, :zip_code, :country, :region, :lat, :lng, :location_geoid, :sample_id_reset_policy, :main_phone_number, :email_address, :allows_manual_entry]
     allowed_params << :parent_id if with_parent_id
 
     params.require(:site).permit(*allowed_params)

@@ -1,7 +1,8 @@
 var BaseEncounterForm = {
   getInitialState: function() {
     return {
-      encounter: this.props.encounter
+      encounter: this.props.encounter,
+      manual_sample_entry: this.props.manual_sample_entry
     };
   },
 
@@ -22,7 +23,29 @@ var BaseEncounterForm = {
   },
 
   addNewSamples: function(event) {
-    this._ajax_put('/encounters/add/new_sample');
+    if(this.state.manual_sample_entry) {
+      this.refs.addNewSamplesModal.show();
+    } else {
+      this._ajax_put('/encounters/add/new_sample');
+    }
+    event.preventDefault();
+  },
+
+  closeAddNewSamplesModal: function (event) {
+    this.refs.addNewSamplesModal.hide();
+    event.preventDefault();
+  },
+
+  validateAndSetManualEntry: function (event) {
+    var sampleId = React.findDOMNode(this.refs.manualSampleEntry).value;
+    if(this.state.encounter.new_samples.filter(function(el){return el.entity_id == sampleId}).length > 0) {
+      // Error handling as done in the ajax responses
+      alert("This sample has already been added");
+    } else {
+      this._ajax_put('/encounters/add/manual_sample_entry', function() {
+        this.refs.addNewSamplesModal.hide();
+      }, {entity_id: sampleId});
+    }
     event.preventDefault();
   },
 
@@ -246,6 +269,16 @@ var EncounterForm = React.createClass(_.merge({
               placeholder="Search by sample id"
               itemTemplate={AddItemSearchSampleTemplate}
               itemKey="uuid" />
+          </Modal>
+
+          <Modal ref="addNewSamplesModal">
+            <h1>
+              <a href="#" className="modal-back" onClick={this.closeAddNewSamplesModal}></a>
+              Add sample
+            </h1>
+
+            <p><input type="text" className="input-block" placeholder="Sample ID" ref="manualSampleEntry" /></p>
+            <p><button type="button" className="btn-primary pull-right" onClick={this.validateAndSetManualEntry}>OK</button></p>
           </Modal>
 
           <Modal ref="unifySamplesModal">

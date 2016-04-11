@@ -41,6 +41,7 @@ Rails.application.routes.draw do
       get :search_test
       put 'add/sample/:sample_uuid' => 'encounters#add_sample'
       put 'add/new_sample' => 'encounters#new_sample'
+      put 'add/manual_sample_entry' => 'encounters#add_sample_manually'
       put 'add/test/:test_uuid' => 'encounters#add_test'
       put 'merge/sample/' => 'encounters#merge_samples'
     end

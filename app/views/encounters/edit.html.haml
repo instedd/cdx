@@ -8,4 +8,4 @@
               = image_tag "arrow-left.png"
             Test Order
 
-= react_component('EncounterForm', encounter: @encounter_as_json, context: @navigation_context.to_hash, possible_assay_results: @possible_assay_results)
+= react_component('EncounterForm', encounter: @encounter_as_json, context: @navigation_context.to_hash, possible_assay_results: @possible_assay_results, manual_sample_entry: @encounter.site.allows_manual_entry)
