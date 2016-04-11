@@ -7,30 +7,40 @@ var HorizontalBarChart = React.createClass({
 	},
 	getDefaultProps: function() {
     return {
-      margin: {top: 20, right: 20, bottom: 30, left: 50},
-      height: 500
+      margin: {top: 20, right: 20, bottom: 30, left: 50}
     }
   },	
   render: function() {
     var data = this.props.data;
+
+		barHeight        = 30,
+    groupHeight      = barHeight * data.length,
+    gapBetweenGroups = 20,
+    spaceForLabels   = 150,
+    spaceForLegend   = 200;
+
+
 		var chart = document.getElementById(this.props.chart_div),
         axisMargin = 20,
 		    margin = 20,
 		    valueMargin = 4,
 		    width = this.state.width,
-		    height = this.props.height,
-		    barHeight = (height-axisMargin-margin*2)* 0.4/data.length,
-		    barPadding = (height-axisMargin-margin*2)*0.6/data.length,
-		    data, bar, svg, scale, xAxis, labelWidth = 0;
+		    barPadding = 20,
+		    data, bar, svg, scale, xAxis, labelWidth = 0,
+		    chartHeight = (barHeight * (data.length+1)) + (gapBetweenGroups * (data.length+1));
 
 		max = d3.max(data.map(function(i){ 
 		  return i[1];
 		}));
+		
+		if (data.length==0) {
+	     chartHeight = 200;
+    }
 
 		svg = d3.select(chart)
 		  .append("svg")
 		  .attr("width", this.state.width)
-		  .attr("height", this.props.height);
+		  .attr("height", chartHeight);
 
 		bar = svg.selectAll("g")
 		  .data(data)
@@ -59,7 +69,7 @@ var HorizontalBarChart = React.createClass({
 
 		xAxis = d3.svg.axis()
 		  .scale(scale)
-		  .tickSize(-height + 2*margin + axisMargin)
+		  .tickSize(-chartHeight + 2*margin + axisMargin)
 		  .orient("bottom");
 
 		bar.append("rect")
@@ -100,7 +110,7 @@ var HorizontalBarChart = React.createClass({
 			  });
 			
 			var canvasWidth = this.props.width,
-				  canvasHeight = this.props.height,
+				  canvasHeight = chartHeight,
 			    otherMargins = canvasWidth * 0.1,
 				  leftMargin = canvasWidth * 0.25,
 				  maxBarWidth = canvasHeight - - otherMargins - leftMargin
@@ -109,18 +119,27 @@ var HorizontalBarChart = React.createClass({
 				//x axis title        
 			svg.append("text")
 				 .attr("x", (maxBarWidth / 2) + leftMargin)
-				 .attr("y", this.props.height - (otherMargins / 8))
+				 .attr("y", chartHeight - (otherMargins / 8))
 		     .attr("text-anchor", "middle")
 			  .attr("font-family", "sans-serif")
 			  .attr("font-size", "14px")
 			  .attr("font-weight", "bold")
 			  .attr("fill", "black")
-			  .text(this.props.label);
-												
+			  .text(this.props.label);																
 
+			if (data.length==0) {
+				 svg.append("text")
+				       .attr("x", this.state.width / 2)
+				       .attr("y", chartHeight/2)
+				       .attr("dy", "-.7em")
+			        .attr("class", "horizontal-bar-value")
+			        .style("text-anchor", "middle")
+			        .text("There is no data to display");
+				 }
+				
 		  svg.insert("g",":first-child")
 		   .attr("class", "horizontal-bar-axis")
-		   .attr("transform", "translate(" + (margin + labelWidth) + ","+ (height - axisMargin - margin)+")")
+		   .attr("transform", "translate(" + (margin + labelWidth) + ","+ (chartHeight - axisMargin - margin)+")")
 		   .call(xAxis);	  
 
     return (

@@ -64,7 +64,7 @@
       %h1 Devices Not Reporting 
   .row
     .col.pe-7
-  = react_component('HorizontalBarChart', data: query_devices_not_reporting_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses, chart_div: 'chart_not_responding', label: 'DAYS')
+  = react_component('HorizontalBarChart', data: query_devices_not_reporting_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_not_responding', label: 'DAYS')
   #chart_not_responding
   		
 
@@ -97,7 +97,8 @@
       %h1 Site Tests
   .row
     .col.pe-7
-    = react_component('HorizontalBarChart', data: query_site_tests_chart, height: 350, width: 700, y_label: 'XXXXX', x_labels:query_tests_chart.statuses, chart_div: 'chart_site_tests', label: 'Total Tests by Site')
+    = react_component('HorizontalBarChart', data: query_site_tests_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_site_tests', label: 'Total Tests by Site')
+
   #chart_site_tests
 
   
@@ -163,6 +164,16 @@
 	  
 .chart-container-clear
 
+
+.chart-container-bar
+  .row
+    .col.pe-8
+      %h1 Average Tests per Technician 
+  .row
+    .col.pe-7
+      = react_component('GroupedHorizontalBarChart', data: average_tests_per_technician_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_average_tests', label: 'DAYS')         
+      #chart_average_tests
+.chart-container-clear
 
 
 .chart-container-bar

@@ -18,7 +18,6 @@ module Reports
       end
 
       results = TestResult.query(filter, current_user).execute
-
       results["tests"].each do |result|
         encounter = result["encounter"]
         uuid = encounter["uuid"]
@@ -37,7 +36,7 @@ module Reports
         end
       end
       @outstanding_orders_size = encounter_uuid_list.length
-      return encounter_uuid_list
+     return encounter_uuid_list
     end
 
     private

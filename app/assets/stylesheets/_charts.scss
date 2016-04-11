@@ -1,3 +1,7 @@
+.bar:hover {
+  fill: grey;
+}
+
 svg {
   shape-rendering: crispEdges;
 }
@@ -60,6 +64,12 @@ svg {
   .x.axis path,
   .x.axis line {
     stroke:none;
+  }
+
+  .label {
+    fill: black;
+    font: 14px sans-serif;
+    text-anchor: end;
   }
 
   .total {

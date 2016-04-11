@@ -36,7 +36,7 @@ module ChartsHelper
         data << [device.name, day_range]
       else
         days_diff = ( (Time.now - (device_message.created_at) ) / (1.day)).round
-        data << [device.name, days_diff]
+        data << [device.name.truncate(13), days_diff]
       end
     end
     data
@@ -55,6 +55,11 @@ module ChartsHelper
   def error_codes_by_device
     data = Reports::DeviceErrorCodes.process(current_user, @navigation_context, options)
     data.get_device_location_details
+  end
+  
+  def average_tests_per_technician_chart
+    data = Reports::AverageTechnicianTests.process(current_user, @navigation_context, options)
+    data.average_tests
   end
 
   def outstanding_orders

@@ -1,4 +1,15 @@
 var BarChart = React.createClass({
+	getInitialState: function() {
+		if (this.props.data.length==0) {
+			shouldHide=true;
+		} else {
+			shouldHide=false;
+		};
+
+    return {
+      shouldHide: shouldHide
+    };
+  },
   getDefaultProps: function() {
     return {
       margin: {top: 20, right: 20, bottom: 30, left: 50},
@@ -55,7 +66,12 @@ var BarChart = React.createClass({
     }
 
     return (
-      <div className="chart">
+	<div>
+			<div className={this.state.shouldHide ? '' : 'hidden'}>
+			<span className="horizontal-bar-value">There is no data to display</span>
+			</div>
+		  <div className={this.state.shouldHide ? 'hidden' : ''}>
+       <div className="chart">
         <svg width="100%"
              height={this.props.height}
              ref="svg"
@@ -107,6 +123,9 @@ var BarChart = React.createClass({
           })}
         </div>
       </div>
+
+     </div>
+    </div>
     );
   }
 });

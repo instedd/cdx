@@ -29,11 +29,18 @@ var TestOrdersRow = React.createClass({
       {"ordered_by":false},
       {"outstanding":false}];
 
+			if (this.props.data.length==0) {
+				shouldHide=true;
+			} else {
+				shouldHide=false;
+			}
+
       return {
         data: this.props.data,
         appendTitle: appendTitle,
         appendTitleDirection: appendTitleDirection,
-        appendTitleSelected: appendTitleSelected
+        appendTitleSelected: appendTitleSelected,
+        shouldHide: shouldHide
       };
     },
     getDefaultProps: function() {
@@ -88,6 +95,10 @@ var TestOrdersRow = React.createClass({
             </div>
             <div className="row">
               <div className="col pe-12">
+								<div className={this.state.shouldHide ? '' : 'hidden'}>
+								<span className="horizontal-bar-value">There is no data to display</span>
+								</div>
+							<div className={this.state.shouldHide ? 'hidden' : ''}>
                 <table className="table" cellPadding="0" cellSpacing="0" >
                   <colgroup>
                     <col width="25%" />
@@ -119,6 +130,7 @@ var TestOrdersRow = React.createClass({
                       }.bind(this))}
                     </tbody>
                   </table>
+                 </div>
                 </div>
               </div>
             </div>

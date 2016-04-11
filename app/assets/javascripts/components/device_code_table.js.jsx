@@ -32,11 +32,19 @@ var DeviceRow = React.createClass({
 			{"error_code":false},
 			{"count":false},
 			{"last_error":false} ];
+			
+			if (this.props.data.length==0) {
+				shouldHide=true;
+			} else {
+				shouldHide=false;
+			}
+			
 			return {
 				data: this.props.data,
 				appendTitle: appendTitle,
 				appendTitleDirection: appendTitleDirection,
-				appendTitleSelected: appendTitleSelected
+				appendTitleSelected: appendTitleSelected,
+				shouldHide: shouldHide
 			};
 		},
 		getDefaultProps: function() {
@@ -82,6 +90,10 @@ var DeviceRow = React.createClass({
 
 				return (
 					<div>
+						<div className={this.state.shouldHide ? '' : 'hidden'}>
+						<span className="horizontal-bar-value">There is no data to display</span>
+						</div>
+					  <div className={this.state.shouldHide ? 'hidden' : ''}>
 						<table className="table" cellPadding="0" cellSpacing="0"  id="device_code_table_chart"  >
 							<colgroup>
 								<col width="20%" />
@@ -102,7 +114,7 @@ var DeviceRow = React.createClass({
 							</thead>
 						</table>
 						<div className="table_scroll_container">
-							<table className="table scroll" cellPadding="0" cellSpacing="0"    >
+							<table className="table scroll" cellPadding="0" cellSpacing="0" >
 								<colgroup>
 									<col width="20%" />
 									<col width="20%" />
@@ -117,6 +129,7 @@ var DeviceRow = React.createClass({
 								</tbody>
 							</table>
 						</div>
+			     </div>
 					</div>
 				);
 			}

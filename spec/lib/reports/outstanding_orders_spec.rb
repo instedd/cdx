@@ -41,8 +41,8 @@ RSpec.describe Reports::OutstandingOrders, elasticsearch: true do
             custom_fields: {"custom_a" => "test value 1"}).tap { |t| TestResultIndexer.new(t).index(true) }
 
             blender = Blender.new(institution)
-            blender = blender.load(test_result)
-            blender.save!
+            blender.load(test_result)
+            blender.save_and_index!
             refresh_index
           end
 
@@ -53,7 +53,7 @@ RSpec.describe Reports::OutstandingOrders, elasticsearch: true do
               @data = Reports::OutstandingOrders.process(current_user, nav_context, options)
             end
 
-            xit 'returns correct order results' do
+            it 'returns correct order results' do
               result=@data.latest_encounter
               expect(result.length).to eq(2)
             end
