@@ -30,6 +30,7 @@ module Reports
       {
         device: ['device.uuid'],
         error_code: ['test.error_code','invalid,error,no_result,in_progress'],
+        failed: ['test.error_code','invalid,error,no_result'],
         model: ['device.model','error'],
         status: ['test.status'],
         successful: ['test.name','success'],

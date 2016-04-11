@@ -26,7 +26,7 @@ module Reports
           Rails.logger.info("no matched encounter for #{uuid}")
         else
           end_time = encounter["end_time"]
-       #   end_time = result["test"]["reported_time"]         
+       #   end_time = result["test"]["reported_time"]
           if (matched_encounter[:test_result_encounter_end_time]==0) || (matched_encounter[:test_result_encounter_end_time]>end_time)
             matched_encounter[:test_result_encounter_end_time] = end_time
             diff = (to_diff_time -  Time.parse(end_time.to_s))
