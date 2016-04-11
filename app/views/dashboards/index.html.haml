@@ -4,29 +4,27 @@
     .showing
       .highlight SHOWING :
       .dates in the last 12 months
-	  
-  .topfilters  
+
+  .topfilters
     %form#filters-form{ action: dashboard_path }
-  
+
       .topbutton
         %input#query_button.btn-primary(type='submit' value='Filter')
 
       .topdateto
         %label.block Date To
         = date_field('range','start_time[lte]')
-    
+
       .topdatefrom
         %label.block Date From
         = date_field('range','start_time[gte]')
-    
+
       .topdateperiod
         %form#filters-form{ action: dashboard_path, 'data-auto-submit' => true }
           .filter
             %label.block Date Period
-            = cdx_select name: 'since', value: params['since'] do |select| 
+            = cdx_select name: 'since', value: params['since'] do |select|
               - select.items options_for_date, :value, :label
-	
-	
 
   .topfilters
     %form#filters-form{ action: dashboard_path }
