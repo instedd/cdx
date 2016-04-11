@@ -53,7 +53,7 @@ RSpec.describe Reports::OutstandingOrders, elasticsearch: true do
               @data = Reports::OutstandingOrders.process(current_user, nav_context, options)
             end
 
-            xit 'returns correct order results' do
+            it 'returns correct order results' do
               result=@data.latest_encounter
               expect(result.length).to eq(2)
             end

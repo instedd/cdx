@@ -56,6 +56,11 @@ module ChartsHelper
     data = Reports::DeviceErrorCodes.process(current_user, @navigation_context, options)
     data.get_device_location_details
   end
+  
+  def average_tests_per_technician_chart
+    data = Reports::AverageTechnicianTests.process(current_user, @navigation_context, options)
+    data.average_tests
+  end
 
   def average_tests_per_technician_chart
     data = Reports::AverageTechnicianTests.process(current_user, @navigation_context, options)

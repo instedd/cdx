@@ -171,6 +171,16 @@
 
 .chart-container-clear
 
+.chart-container-bar
+  .row
+    .col.pe-8
+      %h1 Average Tests per Technician 
+  .row
+    .col.pe-7
+      = react_component('GroupedHorizontalBarChart', data: average_tests_per_technician_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_average_tests', label: 'DAYS')         
+      #chart_average_tests
+.chart-container-clear
+
 
 .chart-container-bar
   .row
