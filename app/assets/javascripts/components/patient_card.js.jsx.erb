@@ -17,7 +17,11 @@ var PatientCard = React.createClass({
         }
       }
       if (patient.dob) {
-        string += patient.dob + " (" + patient.age + " y/o)";
+        string += patient.dob
+        if( patient.age > 0)
+          string += " (" + patient.age + " y/o)";
+        else // months only
+          string += " (" + patient.age_months + " m/o)";
       }
       return string;
     }
