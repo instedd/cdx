@@ -106,6 +106,22 @@ class EncountersController < ApplicationController
     end
   end
 
+  def add_sample_manually
+    perform_encounter_action "adding manual sample" do
+      prepare_encounter_from_json
+      sample = { entity_id: params[:entity_id] }
+      if validate_manual_sample_non_existant(sample)
+        @encounter.new_samples << sample
+        @extended_respone = { sample: sample }
+      else
+        render json: {
+          message: "This sample ID has already been used for another patient",
+          status: 'error'
+        }, status: 200 and return
+      end
+    end
+  end
+
   private
 
   def perform_encounter_action(action)
@@ -278,6 +294,13 @@ class EncountersController < ApplicationController
     })
   end
 
+  def validate_manual_sample_non_existant(sample)
+    matching_id = Sample.joins(:sample_identifiers)\
+      .where("sample_identifiers.entity_id = ?", "#{sample[:entity_id]}")
+    matching_id = matching_id.joins("LEFT JOIN encounters ON encounters.id = samples.encounter_id").where(patient_id: @encounter.patient_id) if @encounter.patient_id
+    matching_id.count == 0
+  end
+
   def as_json_edit
     Jbuilder.new do |json|
       json.(@encounter, :id)
@@ -350,6 +373,6 @@ class EncountersController < ApplicationController
   end
 
   def as_json_site(json, site)
-    json.(site, :uuid, :name)
+    json.(site, :uuid, :name, :allows_manual_entry)
   end
 end

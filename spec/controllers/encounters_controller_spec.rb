@@ -831,6 +831,47 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
   end
 
+  describe "PUT add_sample_manually" do
+    it "renders json response of encounter with new sample and status ok" do
+      put :add_sample_manually, entity_id: '12345678', encounter: {
+        institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
+        samples: [],
+        new_samples: [],
+        test_results: [],
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+
+      expect(json_response['status']).to eq('ok')
+      expect(json_response['encounter']['new_samples'][0]).to include({entity_id: '12345678'})
+      expect(json_response['encounter']['new_samples'].count).to eq(1)
+    end
+
+    it "return error if sample ID already exists for same patient" do
+      patient = institution.patients.make
+      TestResult.make \
+        institution: institution,
+        device: Device.make(site: site),
+        sample_identifier: SampleIdentifier.make(site: site, entity_id: "12345678", sample: Sample.make(institution: institution))
+
+      put :add_sample_manually, entity_id: '12345678', encounter: {
+        institution: { uuid: institution.uuid },
+        site: { uuid: site.uuid },
+        samples: [],
+        new_samples: [],
+        test_results: [],
+        patient: { id: patient.id }
+      }.to_json
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body).with_indifferent_access
+      expect(json_response['status']).to eq('error')
+      expect(json_response['message']).to eq('This sample ID has already been used for another patient')
+    end
+  end
+
   def institution_json(institution)
     return {
       uuid: institution.uuid,
@@ -842,6 +883,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     return {
       uuid: site.uuid,
       name: site.name,
+      allows_manual_entry: nil
     }
   end
 
