@@ -19,12 +19,14 @@ describe "performance", elasticsearch: true do
   end
 
   it "dashboard charts should hide qc tests" do
+    Timecop.travel(Time.utc(2015, 9, 1))
     goto_page DashboardPage do |page|
       expect(page.tests_run.pie_chart.total.text).to eq("1")
     end
   end
 
   it "device charts should hide qc tests" do
+    Timecop.travel(Time.utc(2015, 9, 1))
     goto_page DevicePage, id: device.id do |page|
       expect(page.tests_run.pie_chart.total.text).to eq("1")
     end
