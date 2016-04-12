@@ -236,17 +236,17 @@ color:#777;
 
 
 
-.filters{
+.custom_filters{
 margin:0px;
 margin-left:-10px;
 background:#888;
 }
 
-.filters .advanced{
+.custom_filters .advanced{
 width:100%;
 }
 
-.filters label {
+.custom_filters label {
 color:#fff;
 }
 
@@ -254,17 +254,17 @@ color:#fff;
 color:#fff;
 }
 
-.filters .filter{
+.custom_filters .filter{
 flex: 0 0 5%;
 }
 
 
-.filters{
+.custom_filters{
 height:85px;
 display:none;
 }
 
-.filters .advanced{
+.custom_filters .advanced{
 height:85px;
 }
 
@@ -281,6 +281,6 @@ float:right;
     padding: 20px 15px 15px 40px;
 }
 
-.filters .advanced {
+.custom_filters .advanced {
     height: 500px;
 }
