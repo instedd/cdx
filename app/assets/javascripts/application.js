@@ -117,6 +117,13 @@ $(document).ready(function(){
     return url;
   }
 
+  $(document).on('click','.datepicker_single', function(){
+    $(this).daterangepicker({
+      singleDatePicker: true,
+      showDropdowns: true
+    });
+  });
+
   $(document).on('click','.datepicker', function(){
     $(this).daterangepicker();
   });
@@ -219,7 +226,7 @@ $(document).ready(function(){
 	// Handle the filter hide/show on the test page
 	$(".filtershow").click(function(){
 		// We want to set overflow visible after the expand animation has completed
-		$(".filters").toggle();
+		$(".custom_filters").toggle();
 	});
 	
 	
