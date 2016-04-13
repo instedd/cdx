@@ -143,9 +143,9 @@ module Reports
 
     def site_or_institution
       filter['institution.uuid'] = context.institution.uuid if context.institution
-      filter["site.uuid"] = context.site.uuid if context.site && context.exclude_subsites
-      filter['site.path'] = context.site.uuid if context.site && !context.exclude_subsites    
-      filter["site.uuid"] = "null" if context.exclude_subsites && !context.site
+      filter['site.uuid'] = context.site.uuid if context.site && context.exclude_subsites
+      filter['site.path'] = context.site.uuid if context.site && !context.exclude_subsites
+      filter['site.uuid'] = 'null' if context.exclude_subsites && !context.site
     end
 
     def ignore_qc
