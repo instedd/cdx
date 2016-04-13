@@ -24,6 +24,7 @@ class EncountersController < ApplicationController
     perform_encounter_action "creating encounter" do
       prepare_encounter_from_json
       create_new_samples
+      #binding.pry current_user   # crashes the server with Timeouts!!!!!
       @encounter.user = current_user
       @blender.save_and_index!
       @encounter.updated_diagnostic_timestamp!
@@ -144,12 +145,18 @@ class EncountersController < ApplicationController
     begin
       yield
     rescue Blender::MergeNonPhantomError => e
-      render json: { status: :error, message: "Cannot add a test or sample that belongs to a different #{e.entity_type.model_name.singular}", encounter: as_json_edit.attributes! }
+      render json: {  status: :error, 
+                      message: "Cannot add a test or sample that belongs to a different #{e.entity_type.model_name.singular}", 
+                      encounter: as_json_edit.attributes! }
     rescue => e
       Rails.logger.error(e.backtrace.unshift(e.message).join("\n"))
-      render json: { status: :error, message: "Error #{action} #{e.class}", encounter: as_json_edit.attributes! }
+      render json: {  status: :error, 
+                      message: "Error #{action} #{e.class}", 
+                      encounter: as_json_edit.attributes! }
     else
-      render json: { status: :ok, encounter: as_json_edit.attributes! }.merge(@extended_respone)
+      render json: {  status: :ok, 
+                      encounter: as_json_edit.attributes! 
+                    }.merge(@extended_respone)
     end
   end
 
