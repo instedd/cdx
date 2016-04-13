@@ -45,6 +45,11 @@ class Patient < ActiveRecord::Base
     years_between Time.parse(dob), Time.now rescue nil
   end
 
+  def age_months
+    months_between Time.parse(dob), Time.now rescue nil
+  end
+
+
   def dob_description(date_pattern)
     if dob && (dob_time = self.dob_time)
       "#{dob_time.strftime(date_pattern)} (#{age} y/o)"
@@ -69,7 +74,7 @@ class Patient < ActiveRecord::Base
   end
 
   def as_json_card(json)
-    json.(self, :id, :name, :age, :gender, :address, :phone, :email, :entity_id)
+    json.(self, :id, :name, :age, :age_months, :gender, :address, :phone, :email, :entity_id)
     json.dob dob_time.try { |d| d.strftime(I18n.t('date.input_format.pattern')) }
   end
 
