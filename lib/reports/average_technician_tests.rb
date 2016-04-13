@@ -2,7 +2,7 @@ module Reports
   class AverageTechnicianTests < Base
 
     def average_tests
-      filter['group_by'] = "test.site_user,#{day_or_month}(test.reported_time)"
+      filter['group_by'] = "test.site_user,#{day_or_month}(test.start_time)"
       test_users_list=[]
       results = TestResult.query(@filter, current_user).execute
       results['tests'].each do |result|
