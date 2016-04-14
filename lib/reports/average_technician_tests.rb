@@ -26,27 +26,24 @@ module Reports
 
       calculate_average(test_users_list)
       data = format_data(test_users_list)
-      return data[0]
+      data[0]
     end
 
     private
+
     def calculate_average(test_result_data)
       test_result_data.map do |test_user_data|
-        if (test_user_data[:total]>0) && (test_user_data[:number_results]>0)
+        if (test_user_data[:total] > 0) && (test_user_data[:number_results] > 0)
           test_user_data[:average] = test_user_data[:total] / test_user_data[:number_results]
         end
       end
     end
-    
-    def day_or_month
-      number_of_days > 60 ? 'month' : 'day'
-    end
 
     def format_data(test_result_data)
-      chart_data=[]
-      labels=[]
-      peaks=[]
-      averages=[]
+      chart_data = []
+      labels = []
+      peaks = []
+      averages = []
       test_result_data.map do |test_user_data|
         labels << test_user_data[:site_user].truncate(12)
         peaks << test_user_data[:peak]

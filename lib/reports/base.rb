@@ -95,6 +95,10 @@ module Reports
       }
     end
 
+    def day_or_month
+      number_of_days > 60 ? 'month' : 'day'
+    end
+
     def date_constraints
       options['date_range'] ? report_between : report_since
     end

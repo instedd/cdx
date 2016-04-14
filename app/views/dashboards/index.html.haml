@@ -245,9 +245,6 @@
         -# = react_component('PieChart', data: tests_by_status, height: 250, label: 'Tests Run')
   .chart-container-clear
   
-  
-  
-  
 .chart-container-row
   .chart-container-barleft
     .row
@@ -322,4 +319,14 @@
   .chart-container
     = react_component('OutstandingTestsTable', title: "title", allowSorting: "true", orderBy: "-test_order", data: outstanding_orders)
   .chart-container-clear
-  
+
+.chart-container-bar
+  .row
+    .col.pe-8
+      %h1 Average Tests per Site
+  .row#tests_run
+    .col.pe-7
+      = react_component('GroupedVerticalBarChart', height: 300, width: 600, chart_div: 'chart_average_test_per_site_chart', data: average_test_per_site_chart)
+  #chart_average_test_per_site_chart
+.chart-container-clear
+

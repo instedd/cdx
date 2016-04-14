@@ -11,7 +11,7 @@ module ChartsHelper
         end
       end
     end
-    return sites
+    sites
   end
 
   def query_devices_not_reporting_chart
@@ -45,7 +45,7 @@ module ChartsHelper
   def devices_reporting_chart
     results = Reports::Devices.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
-    return results.sort_by_day
+    results.sort_by_day
   end
 
   def errors_by_code
@@ -75,7 +75,7 @@ module ChartsHelper
   def errors_by_device_chart
     results = Reports::DeviceErrors.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
-    return results.sort_by_day
+    results.sort_by_day
   end
 
   def devices_grouped
@@ -85,7 +85,7 @@ module ChartsHelper
   def errors_by_model_chart
     results = Reports::ModelErrors.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
-    return results.sort_by_day
+    results.sort_by_day
   end
 
   def errors_by_model
@@ -95,14 +95,14 @@ module ChartsHelper
   def successful_tests_chart
     results = Reports::Successful.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
-    return results.sort_by_day
+    results.sort_by_day
   end
 
   def unsuccessful_tests_chart
     options['test.status'] = 'invalid,error,no_result,in_progress'
     results = Reports::Unsuccessful.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
-    return results.sort_by_day
+    results.sort_by_day
   end
 
   def successful_tests
@@ -118,20 +118,20 @@ module ChartsHelper
   end
 
   def chart_heading
-    stdate = start_date.strftime("%a %d %b %Y")
-    endate = end_date.strftime("%a %d %b %Y")
+    stdate = start_date.strftime('%a %d %b %Y')
+    endate = end_date.strftime('%a %d %b %Y')
     if days_since <= 7
       message = "in the previous #{days_since} days"
     else
       message = "between #{stdate} and #{endate}"
     end
-    return message
+    message
   end
 
   def query_tests_chart
     results = Reports::AllTests.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
-    return results.sort_by_day
+    results.sort_by_day
   end
 
   def tests_by_status
@@ -142,7 +142,7 @@ module ChartsHelper
     Reports::Grouped.by_failed(current_user, @navigation_context, options)
   end
 
-  def  failed_tests
+  def failed_tests
     Reports::Failed.process(current_user, @navigation_context, options).data
   end
 
@@ -192,10 +192,18 @@ module ChartsHelper
   def query_errors
     results = Reports::Errors.process(current_user, @navigation_context, options)
     return results.sort_by_month if results.number_of_months > 1
-    return results.sort_by_day
+    results.sort_by_day
   end
 
   def since
     params['since'] ? Date.parse(params['since']) : Date.today - 1.year
+  end
+
+  def average_test_per_site_chart
+    Reports::AverageSiteTests.process(
+      current_user,
+      @navigation_context,
+      options
+    ).show
   end
 end
