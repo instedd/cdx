@@ -10,6 +10,8 @@ class EncountersController < ApplicationController
   def new
     if params[:patient_id].present?
       @institution = @navigation_context.institution
+      #this.state.encounter.site
+      #@encounter.site = @institution
       @patient_json = Jbuilder.new { |json|
         scoped_patients.find(params[:patient_id]).as_json_card(json)
       }.attributes!
@@ -24,7 +26,6 @@ class EncountersController < ApplicationController
     perform_encounter_action "creating encounter" do
       prepare_encounter_from_json
       create_new_samples
-      #binding.pry current_user   # crashes the server with Timeouts!!!!!
       @encounter.user = current_user
       @blender.save_and_index!
       @encounter.updated_diagnostic_timestamp!
