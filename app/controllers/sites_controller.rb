@@ -14,6 +14,7 @@ class SitesController < ApplicationController
       format.html do
         @sites = perform_pagination(@sites)
         @sites.preload_locations!
+        render layout: false if request.xhr?
       end
       format.csv do
         @sites.preload_locations!
