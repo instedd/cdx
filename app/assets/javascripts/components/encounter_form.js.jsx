@@ -127,13 +127,6 @@ var EncounterForm = React.createClass(_.merge({
 
       if (field == 'result') {
         newValue = event;
-      } else if (field == 'quantitative_result') {
-        newValue = event.target.value
-        firstChar = newValue[0]
-        newValue = newValue.replace(/[^0-9]/g, '');
-        if (firstChar == '+' || firstChar == '-') {
-          newValue = firstChar + newValue;
-        }
       } else {
         newValue = event.target.value;
       }
