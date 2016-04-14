@@ -21,7 +21,7 @@
             %th Patient Id
             %th Date of Birth
             %th Location
-            %th Last encounter
+            %th Last test order
         - t.tbody do
           - @patients.each do |patient|
             %tr{data: {href: patient_path(patient) }}
