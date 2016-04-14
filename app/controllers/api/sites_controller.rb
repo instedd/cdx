@@ -1,6 +1,5 @@
 class Api::SitesController < ApiController
   
-  #================================================================================================================
   def index
     @sites = if params[:institution_uuid]
       Institution.find_by_uuid(params[:institution_uuid]).sites
@@ -19,8 +18,7 @@ class Api::SitesController < ApiController
       site["parent_uuid"] = nil unless @uuids.include?(site["parent_uuid"])
     end
 
-    # do some ordering here (dave)
-    @sites.sort! {|a,b| a['name']<=>b['name']}
+    @sites.sort! { |a,b| a['name']<=>b['name'] }
 
     respond_to do |format|
       format.csv do

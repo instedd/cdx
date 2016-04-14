@@ -10,7 +10,6 @@
   %nav#nav-bar
     - if current_user && !@hide_nav_bar
       %ul
-        -# ------------ HOME
         - if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
           %li{:class => params[:controller] == "dashboards" && params[:action] == "index" && "active"}
             = link_to "Home", dashboard_path
@@ -20,37 +19,30 @@
             %li{:class => params[:controller] == "dashboards" && params[:action] == "nndd" && "active"}
               = link_to "Reports", nndd_path
 
-        -# ------------ PATIENTS
         - if has_access_to_patients_index?
           %li{:class => params[:controller] == "patients" && "active"}
             = link_to "Patients", patients_path
 
-        -# ------------ SITES
         - if has_access_to_sites_index?
           %li{:class => params[:controller] == "sites" && "active"}
             = link_to "Sites", sites_path
 
-        -# ------------ DEVICES
         - if has_access_to_devices_index?
           %li{:class => params[:controller] == "devices" && "active"}
             = link_to "Devices", devices_path
 
-        -# ------------ LOGS
         - if has_access?(Device, Policy::Actions::SUPPORT_DEVICE)
           %li{:class => params[:controller] == "device_messages" && "active"}
             = link_to "Logs", device_messages_path
 
-        -# ------------ MODELS
         - if has_access_to_device_models_index?
           %li{:class => params[:controller] == "device_models" && "active"}
             = link_to "Models", device_models_path
 
-        -# ------------ TESTS
         - if has_access_to_test_results_index?
           %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
             = link_to "Tests", test_results_path
 
-        -# ------------ USERS
         - if has_access_to_users_index?
           -# Devise clears the controller param for users index
           %li{:class => (params[:controller] == "users" || !params[:controller]) && "active"}

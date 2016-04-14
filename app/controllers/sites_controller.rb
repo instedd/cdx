@@ -4,7 +4,6 @@ class SitesController < ApplicationController
     head :forbidden unless has_access_to_sites_index?
   end
 
-  #================================================================================================================
   def index
     @sites = check_access(Site.within(@navigation_context.entity, @navigation_context.exclude_subsites), READ_SITE)
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
@@ -25,7 +24,6 @@ class SitesController < ApplicationController
     end
   end
 
-  #================================================================================================================
   def new
     @site = Site.new
     @sites = check_access(Site, READ_SITE).within(@navigation_context.institution)
@@ -33,7 +31,6 @@ class SitesController < ApplicationController
     prepare_for_institution_and_authorize(@site, CREATE_INSTITUTION_SITE)
   end
 
-  #================================================================================================================
   # POST /sites
   # POST /sites.json
   def create
@@ -54,7 +51,6 @@ class SitesController < ApplicationController
     end
   end
 
-  #================================================================================================================
   def edit
     @site = Site.with_deleted.find(params[:id])
     return unless authorize_resource(@site, READ_SITE)
@@ -68,7 +64,6 @@ class SitesController < ApplicationController
     end
   end
 
-  #================================================================================================================
   # PATCH/PUT /sites/1
   # PATCH/PUT /sites/1.json
   def update
@@ -123,7 +118,6 @@ class SitesController < ApplicationController
     end
   end
 
-  #================================================================================================================
   # DELETE /sites/1
   # DELETE /sites/1.json
   def destroy
@@ -138,7 +132,6 @@ class SitesController < ApplicationController
     end
   end
 
-  #================================================================================================================
   def devices
     @site = Site.find(params[:id])
     return unless authorize_resource(@site, READ_SITE)
@@ -148,7 +141,6 @@ class SitesController < ApplicationController
     render layout: false
   end
 
-  #================================================================================================================
   def tests
     @site = Site.find(params[:id])
     return unless authorize_resource(@site, READ_SITE)
@@ -158,7 +150,6 @@ class SitesController < ApplicationController
 
   private
 
-  #================================================================================================================
   def site_params(with_parent_id = false)
     if params[:site] && (params[:site][:lat].blank? || params[:site][:lng].blank?) && !params[:site][:location_geoid].blank?
       location_details = Location.details(params[:site][:location_geoid]).first
@@ -172,13 +163,11 @@ class SitesController < ApplicationController
     params.require(:site).permit(*allowed_params)
   end
 
-  #================================================================================================================
   def apply_filters
     @sites = @sites.where("location_geoid LIKE concat(?, '%')", params[:location]) if params[:location].present?
     @sites = @sites.where("name LIKE ?", "%#{params[:name]}%") if params[:name].present?
   end
 
-  #================================================================================================================
   def build_csv
     CSV.generate do |csv|
       csv << ["Name", "Location"]

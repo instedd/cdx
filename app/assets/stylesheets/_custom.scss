@@ -1,132 +1,131 @@
-
 .filterbar{
-	background:#E5E5E5;
-	padding:15px;
-	padding-left:40px;
-	margin-left:-10px;
-	margin-top:-10px;
+  background:#E5E5E5;
+  padding:15px;
+  padding-left:40px;
+  margin-left:-10px;
+  margin-top:-10px;
 }
 
 .filterbar .title{
-	font-size:28px;
+  font-size:28px;
 }
 
 .filterbar .showing{
-	height:22px;
+  height:22px;
 }
 
 .filterbar .showing .highlight{
-	font-size:14px;
-	float:left;
-	color:#888;
+  font-size:14px;
+  float:left;
+  color:#888;
 }
 
 .filterbar .showing .dates{
-	font-size:14px;
-	float:left;
-	margin-left:10px;
+  font-size:14px;
+  float:left;
+  margin-left:10px;
 }
 
 
 .chart-container-row{
-	position:relative;
-	height:480px;
-	margin-bottom:20px;
+  position:relative;
+  height:480px;
+  margin-bottom:20px;
 }
 
 
 .chart-container{
-	-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	margin: 40px 16px 0 16px;
-	padding:20px;
-	padding-top:10px;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  margin: 40px 16px 0 16px;
+  padding:20px;
+  padding-top:10px;
 }
 
 .chart-container-bar{
-	-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	margin:40px 0px 0px 1%;
-	padding:20px;
-	padding-top:10px;
-	float:left;
-	width:65%;
-	position:relative;
-	height:100%; 
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  margin:40px 0px 0px 1%;
+  padding:20px;
+  padding-top:10px;
+  float:left;
+  width:65%;
+  position:relative;
+  height:100%; 
 }
 
 .chart-container-pie{
-	-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	margin:40px 1% 0px 0px;
-	padding:20px;
-	padding-top:10px;	
-	float:right;
-	width:31%;
-	overflow:hidden;
-	position:relative;
-	height:100%; 
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  margin:40px 1% 0px 0px;
+  padding:20px;
+  padding-top:10px;  
+  float:right;
+  width:31%;
+  overflow:hidden;
+  position:relative;
+  height:100%; 
 }
 
 .chart-container-barleft{
-	-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	margin:40px 0px 0px 1%;
-	padding:20px;
-	padding-top:10px;
-	float:left;
-	width:49%;
-	position:relative;
-	height:100%; 
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  margin:40px 0px 0px 1%;
+  padding:20px;
+  padding-top:10px;
+  float:left;
+  width:49%;
+  position:relative;
+  height:100%; 
 }
 
 .chart-container-barright{
-	-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-	margin:40px 1% 0px 0px;
-	padding:20px;
-	padding-top:10px;	
-	float:right;
-	width:47%;
-	position:relative;
-	height:100%; 
-	overflow:auto;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  margin:40px 1% 0px 0px;
+  padding:20px;
+  padding-top:10px;  
+  float:right;
+  width:47%;
+  position:relative;
+  height:100%; 
+  overflow:auto;
 }
 
 
 .pieleft{
-	float:left;
-	width:48%;
+  float:left;
+  width:48%;
 }
 
 .pieright{
-	float:right;
-	width:48%;
+  float:right;
+  width:48%;
 }
 
 
 .tests_run, .pe-7{
-	margin:auto;
-	flex:100% !important;
+  margin:auto;
+  flex:100% !important;
 }
 
 
 .chart-container-clear{
-	clear:both;
+  clear:both;
 }
 
 .chart-container .pe-8 h1{
-	margin:0px;
-	margin-top:10px;
+  margin:0px;
+  margin-top:10px;
 }
 
 .chart-container-pie .chart{
-	margin-left:40px;
+  margin-left:40px;
 }
 
 #chart_site_tests, #chart_not_responding{
@@ -134,83 +133,83 @@ text-align:center;
 }
 
 .col{
-	padding:0px;
+  padding:0px;
 }
 
 .pe-10{
-	flex:100% !important;
+  flex:100% !important;
 }
 
 .maincol{
-	margin-left:10px;
-	margin-top:10px;
+  margin-left:10px;
+  margin-top:10px;
 }
 
 .maincol .side-link.btn-add {
-    margin-left: 0px;
-    margin-right:10px;
+  margin-left: 0px;
+  margin-right:10px;
 }
 
 .maincol h1 {
-    margin:20px 20px 30px 20px;
+  margin:20px 20px 30px 20px;
 }
 
 .filterbar{
-height:95px;
+  height:95px;
 }
 
 .filterbar .heading{
-float:left;
+  float:left;
 }
 
 .filterbar .topfilters{
-margin-left:250px;
+  margin-left:250px;
 }
 
 .filterbar .topfilters .topdateto{
-float:right;
-margin-left:15px;
+  float:right;
+  margin-left:15px;
 }
 
 .filterbar .topfilters .topdatefrom{
-float:right;
-margin-left:30px;
+  float:right;
+  margin-left:30px;
 }
 
 .filterbar .topfilters .topbutton{
-float:right;
-margin-top:7px;
-text-align:right;
-margin-left:40px;
-margin-right: 20px;
+  float:right;
+  margin-top:7px;
+  text-align:right;
+  margin-left:40px;
+  margin-right: 20px;
 }
 
 .filterbar .topfilters .topdateperiod{
-float:right;
-margin-left:20px;
-border-right:1px solid #aaa;
-padding-right:30px;
-padding-bottom:10px;
+  float:right;
+  margin-left:20px;
+  border-right:1px solid #aaa;
+  padding-right:30px;
+  padding-bottom:10px;
 }
 
 .filterbar .topfilters .block{
-min-height:30px;
-line-height:30px;
-color:#000;
+  min-height:30px;
+  line-height:30px;
+  color:#000;
 }
 
 .filterbar .topfilters .Select-control,
 .filterbar .topfilters .Select-control *{
-padding-top:1px;
-padding-bottom:0px;
+  padding-top:1px;
+  padding-bottom:0px;
 }
 
 .filterbar .topfilters .Select-control .Select-arrow{
-top:5px;
+  top:5px;
 }
 
 .filterbar .topfilters .topbutton .btn-primary{
-line-height: 45px !important;
+  line-height: 45px !important;
 }
 
 
@@ -221,64 +220,64 @@ line-height: 45px !important;
 
 
 .row .newtestoptions{
-background:#E5E5E5;
-text-align:left;
-justify-content: flex-start;
--webkit-justify-content: flex-start;
-padding-left:70px;
-height:95px;
-padding-top:8px;
-margin:-10px 0px 0px -10px;
+  background:#E5E5E5;
+  text-align:left;
+  justify-content: flex-start;
+  -webkit-justify-content: flex-start;
+  padding-left:70px;
+  height:95px;
+  padding-top:8px;
+  margin:-10px 0px 0px -10px;
 }
 
 .row .newtestoptions h2{
-color:black;
-width:100%;
-height:20px;
+  color:black;
+  width:100%;
+  height:20px;
 }
 
 .row .newtestoptions h2 .side-link{
-color:black;
+  color:black;
 }
 
 .row .newtestoptions .subheading{
-color:#777;
-margin-top:-8px;
-font-size:13px;
+  color:#777;
+  margin-top:-8px;
+  font-size:13px;
 }
 
 .optionsarea{
-width:100%;
+  width:100%;
 }
 
 
 .optionsarea ul.nav-list{
-height:200px;
-border-radius: 0px;
-box-shadow: 0 0px 0px;
-width:100%;
+  height:200px;
+  border-radius: 0px;
+  box-shadow: 0 0px 0px;
+  width:100%;
 }
 
 .optionsarea ul.nav-list li{
-float:left;
-width:45%;
-height:180px;
--webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
--moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
-margin:40px 20px 20px 20px;
-text-align:center;
+  float:left;
+  width:45%;
+  height:180px;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.35);
+  margin:40px 20px 20px 20px;
+  text-align:center;
 }
 
 .optionsarea ul.nav-list li span{
-font-size:27px;
-line-height:70px;
+  font-size:27px;
+  line-height:70px;
 }
 
 .optionsarea ul.nav-list li .text-small{
-font-size:12px;
-padding:15px;
-color:#777;
+  font-size:12px;
+  padding:15px;
+  color:#777;
 }
 
 
@@ -286,53 +285,53 @@ color:#777;
 
 
 .custom_filters{
-margin:0px;
-margin-left:-10px;
-background:#888;
+  margin:0px;
+  margin-left:-10px;
+  background:#888;
 }
 
 .custom_filters .advanced{
-width:100%;
+  width:100%;
 }
 
 .custom_filters label {
-color:#fff;
+  color:#fff;
 }
 
 .has-value > .Select-control > .Select-placeholder, .Select-control > .Select-placeholder, input[type="text"] {
-color:#fff;
+  color:#fff;
 }
 
 .custom_filters .filter{
-flex: 0 0 5%;
+  flex: 0 0 5%;
 }
 
 
 .custom_filters{
-height:85px;
-display:none;
-padding-left:20px;
+  height:85px;
+  display:none;
+  padding-left:20px;
 }
 
 .custom_filters .advanced{
-height:85px;
+  height:85px;
 }
 
 .topfilteropt{
-float:right;
+  float:right;
 }
 
 .topfilteropt #query_button{
-    height: 51px;
-    line-height: 41px;
+  height: 51px;
+  line-height: 41px;
 }
 
 .filterbartest{
-    padding: 20px 15px 15px 40px;
+  padding: 20px 15px 15px 40px;
 }
 
 .custom_filters .advanced {
-    height: 500px;
+  height: 500px;
 }
 
 .custom_filters .filter {
@@ -356,12 +355,12 @@ float:right;
 
 
 .side-link{
-margin-left:10px !important;
-margin-right:20px !important;
+  margin-left:10px !important;
+  margin-right:20px !important;
 }
 
 
 .newtestoptions .side-link {
-    margin-left: -42px !important;
-    margin-right: 0px !important;
+  margin-left: -42px !important;
+  margin-right: 0px !important;
 }

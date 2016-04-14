@@ -1,27 +1,24 @@
 class EncountersController < ApplicationController
   before_filter :load_encounter, only: %W(show edit)
 
-  #-----------------------------------------------------------------------------------------------------
   def new_index
     return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def new
     if params[:patient_id].present?
       @institution = @navigation_context.institution
-      @patient_json = Jbuilder.new { |json|
+      @patient_json = Jbuilder.new do |json|
         scoped_patients.find(params[:patient_id]).as_json_card(json)
-      }.attributes!
+      end.attributes!
     end
 
     @possible_assay_results = TestResult.possible_results_for_assay
     return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def create
-    perform_encounter_action "creating encounter" do
+    perform_encounter_action 'creating encounter' do
       prepare_encounter_from_json
       create_new_samples
       @encounter.user = current_user
@@ -30,19 +27,16 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def sites
     sites = check_access(@navigation_context.institution.sites, CREATE_SITE_ENCOUNTER)
     render json: as_json_site_list(sites).attributes!
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def show
     return unless authorize_resource(@encounter, READ_ENCOUNTER)
     @can_update = has_access?(@encounter, UPDATE_ENCOUNTER)
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def edit
     if @encounter.has_dirty_diagnostic?
       @encounter.core_fields[Encounter::ASSAYS_FIELD] = @encounter.updated_diagnostic
@@ -52,7 +46,6 @@ class EncountersController < ApplicationController
     return unless authorize_resource(@encounter, UPDATE_ENCOUNTER)
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def update
     perform_encounter_action "updating encounter" do
       prepare_encounter_from_json
@@ -64,7 +57,6 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def search_sample
     @institution = institution_by_uuid(params[:institution_uuid])
     samples = scoped_samples\
@@ -74,7 +66,6 @@ class EncountersController < ApplicationController
     render json: as_json_samples_search(samples).attributes!
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def search_test
     @institution = institution_by_uuid(params[:institution_uuid])
     test_results = scoped_test_results\
@@ -84,7 +75,6 @@ class EncountersController < ApplicationController
     render json: as_json_test_results_search(test_results).attributes!
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def add_sample
     perform_encounter_action "adding sample" do
       prepare_encounter_from_json
@@ -93,7 +83,6 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def add_test
     perform_encounter_action "adding test result" do
       prepare_encounter_from_json
@@ -102,7 +91,6 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def merge_samples
     perform_encounter_action "unifying samples" do
       prepare_encounter_from_json
@@ -111,7 +99,6 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def new_sample
     perform_encounter_action "creating new sample" do
       prepare_encounter_from_json
@@ -138,7 +125,6 @@ class EncountersController < ApplicationController
 
   private
 
-  #-----------------------------------------------------------------------------------------------------
   def perform_encounter_action(action)
     @extended_respone = {}
     begin
@@ -153,7 +139,6 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def load_encounter
     @encounter = Encounter.where('uuid = :id', params).first ||
                  Encounter.where('id = :id', params).first
@@ -167,24 +152,20 @@ class EncountersController < ApplicationController
     prepare_blender_and_json
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def prepare_blender_and_json
     @blender = Blender.new(@institution)
     @encounter_blender = @blender.load(@encounter)
     @encounter_as_json = as_json_edit.attributes!
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def institution_by_uuid(uuid)
     check_access(Institution, READ_INSTITUTION).where(uuid: uuid).first
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def site_by_uuid(institution, uuid)
     check_access(institution.sites, CREATE_SITE_ENCOUNTER).where(uuid: uuid).first
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def prepare_encounter_from_json
     encounter_param = @encounter_param = JSON.parse(params[:encounter])
     @encounter = encounter_param['id'] ? Encounter.find(encounter_param['id']) : Encounter.new
@@ -226,7 +207,6 @@ class EncountersController < ApplicationController
     )
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def create_new_samples
     @encounter.new_samples.each do |new_sample|
       add_new_sample_by_entity_id new_sample[:entity_id]
@@ -234,7 +214,6 @@ class EncountersController < ApplicationController
     @encounter.new_samples = []
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def scoped_samples
     samples_in_encounter = "samples.encounter_id = #{@encounter.id} OR " if @encounter.try(:persisted?)
     # TODO this logic is not enough to grab an empty sample from one encounter and move it to another. but is ok for CRUD experience
@@ -244,14 +223,12 @@ class EncountersController < ApplicationController
               .joins(:sample_identifiers)
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def new_sample_for_site
     sample = { entity_id: @encounter.site.generate_next_sample_entity_id! }
     @encounter.new_samples << sample
     sample
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def add_sample_by_uuid(uuid)
     sample = scoped_samples.find_by!("sample_identifiers.uuid" => uuid)
     sample_blender = @blender.load(sample)
@@ -259,14 +236,12 @@ class EncountersController < ApplicationController
     sample_blender
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def add_sample_by_uuids(uuids)
     sample_blender = merge_samples_by_uuid(uuids)
     @blender.merge_parent(sample_blender, @encounter_blender)
     sample_blender
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def set_patient_by_id(id)
     patient = scoped_patients.find(id)
     patient_blender = @blender.load(patient)
@@ -274,7 +249,6 @@ class EncountersController < ApplicationController
     patient_blender
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def add_new_sample_by_entity_id(entity_id)
     sample = Sample.new(institution: @encounter.institution)
     sample.sample_identifiers.build(site: @encounter.site, entity_id: entity_id)
@@ -284,7 +258,6 @@ class EncountersController < ApplicationController
     sample_blender
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def merge_samples_by_uuid(uuids)
     samples = scoped_samples.where("sample_identifiers.uuid" => uuids).to_a
     raise ActiveRecord::RecordNotFound if samples.empty?
@@ -292,17 +265,14 @@ class EncountersController < ApplicationController
     @blender.merge_blenders(target, to_merge)
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def scoped_test_results
     authorize_resource(TestResult, QUERY_TEST).where(institution: @institution)
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def scoped_patients
     authorize_resource(Patient, READ_PATIENT).where(institution: @institution)
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def add_test_result_by_uuid(uuid)
     test_result = scoped_test_results.find_by!(uuid: uuid)
     test_result_blender = @blender.load(test_result)
@@ -310,7 +280,6 @@ class EncountersController < ApplicationController
     test_result_blender
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def recalculate_diagnostic
     previous_tests_uuids = @encounter_param['test_results'].map{|t| t['uuid']}
     assays_to_merge = @blender.test_results\
@@ -370,7 +339,6 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def as_json_samples_search(samples)
     Jbuilder.new do |json|
       json.array! samples do |sample|
@@ -379,7 +347,6 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def as_json_site_list(sites)
     Jbuilder.new do |json|
       json.total_count sites.size
@@ -389,13 +356,11 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def as_json_sample(json, sample)
     json.(sample, :uuids, :entity_ids)
     json.uuid sample.uuids[0]
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def as_json_test_results_search(test_results)
     Jbuilder.new do |json|
       json.array! test_results do |test|
@@ -404,12 +369,10 @@ class EncountersController < ApplicationController
     end
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def as_json_institution(json, institution)
     json.(institution, :uuid, :name)
   end
 
-  #-----------------------------------------------------------------------------------------------------
   def as_json_site(json, site)
     json.(site, :uuid, :name, :allows_manual_entry)
   end
