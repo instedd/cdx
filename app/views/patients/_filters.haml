@@ -20,7 +20,7 @@
             %label.block Location
             = react_component "LocationSelect", placeholder: "Choose a location", name: "location", defaultValue: params["location"], clearable: true
           .filter
-            %label.block Last encounter
+            %label.block Last test order
             = cdx_select name: "last_encounter", value: params["last_encounter"] do |select|
               - select.item "", "Show all"
               - select.items @date_options, :value, :label
