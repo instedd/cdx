@@ -267,10 +267,10 @@ class DevicesController < ApplicationController
 
   def query_tests_histogram
     query = default_performance_query_options.merge({
-      "group_by" => "month(test.reported_time)",
+      "group_by" => "month(test.start_time)",
     })
     result = TestResult.query(query, current_user).execute
-    result = Hash[result["tests"].map { |i| [i["test.reported_time"], i["count"]] }]
+    result = Hash[result["tests"].map { |i| [i["test.start_time"], i["count"]] }]
 
     tests_histogram = []
     11.downto(0).each do |i|
@@ -287,11 +287,11 @@ class DevicesController < ApplicationController
   def query_errors_histogram
     query = default_performance_query_options.merge({
       "test.status" => "error",
-      "group_by" => "month(test.reported_time),test.site_user",
+      "group_by" => "month(test.start_time),test.site_user",
     })
     result = TestResult.query(query, current_user).execute
     users = result["tests"].index_by { |t| t["test.site_user"] }.keys
-    results_by_day = result["tests"].group_by { |t| t["test.reported_time"] }
+    results_by_day = result["tests"].group_by { |t| t["test.start_time"] }
 
     errors_histogram = []
     11.downto(0).each do |i|
