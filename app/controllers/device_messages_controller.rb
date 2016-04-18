@@ -3,9 +3,8 @@ class DeviceMessagesController < ApplicationController
 
   def index
     device_ids = check_access(Device, SUPPORT_DEVICE).within(@navigation_context.entity, @navigation_context.exclude_subsites).pluck(:id)
-    @messages = DeviceMessage.where("device_id IN (?)", device_ids).joins(device: :device_model).where('devices.site_id = device_messages.site_id OR (devices.site_id IS NULL AND device_messages.site_id IS NULL)')
+    @messages = DeviceMessage.where("device_id IN (?)", device_ids).joins(device: :device_model).where('devices.site_id = device_messages.site_id OR (devices.site_id IS NULL AND device_messages.site_id IS NULL)').reverse_order
     apply_filters
-
     @date_options = date_options_for_filter
     @devices = check_access(Device, READ_DEVICE).within(@navigation_context.entity)
     @device_models = DeviceModel.all
