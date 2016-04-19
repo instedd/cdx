@@ -40,10 +40,10 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
 
           <div id="if_reason_follow" className="row">
             <div className="col pe-2">
-              <label>Month of Treatment</label>
+              <label>Weeks in Treatment</label>
             </div>
             <div className="col">
-              <p><input type="date" className="datepicker_single" onChange={this.treatmentdate_change} id="date_of_treatment" name="date_of_treatment"/></p>
+              <p><input type="number" min="0" max="52" onChange={this.treatmentdate_change} id="treatment_weeks" name="treatment_weeks"/></p>
             </div>
           </div>
 {/*         { this.state.reasonDiag ? <ReasonDiag onChange={this.diag_comment_change}/> : null }
@@ -87,7 +87,7 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
             <label>Test Due Date</label>
           </div>
           <div className="col">
-            <input type="date" id="testdue_date" className="datepicker_single" onChange={this.testduedate_change} value={this.state.encounter.testdue_date}/>
+            <input type="date" id="testdue_date" onChange={this.testduedate_change} value={this.state.encounter.testdue_date}/>
           </div>
         </div>
 
@@ -174,14 +174,21 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
     this.setState(React.addons.update(this.state, {
       encounter : { diag_comment: { $set : xx } },
     }));
+
+//anthony added
+//this.state.encounter.diag_comment = xx;
+
   }, 
 
   treatmentdate_change: function()
   {
-    var xx = $('#date_of_treatment').val();
+    var xx = $('#treatment_weeks').val();
     this.setState(React.addons.update(this.state, {
-      encounter : { date_of_treatment: { $set : xx } },
+      encounter : { treatment_weeks: { $set : xx } },
     }));
+
+//anthony added
+//this.state.encounter.treatment_weeks = xx;
   }, 
 
   testduedate_change: function()
@@ -190,6 +197,9 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
     this.setState(React.addons.update(this.state, {
       encounter : { testdue_date: { $set : xx } },
     }));
+
+		//anthony added
+		this.state.encounter.testdue_date = xx;
   },
 
   sample_type_change: function()
@@ -263,10 +273,10 @@ var ReasonFollow = React.createClass(_.merge({
         return (
           <div id="if_reason_follow" className="row">
             <div className="col pe-2">
-              <label>Month of Treatment</label>
+              <label>Weeks in Treatment</label>
             </div>
             <div className="col">
-              <p><input type="date" className="datepicker_single" name="date_of_treatment" onChange={onChange}/></p>
+              <p><input type="date" className="datepicker_single" name="treatment_weeks" onChange={onChange}/></p>
             </div>
           </div>
         );

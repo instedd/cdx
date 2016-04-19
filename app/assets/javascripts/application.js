@@ -124,6 +124,7 @@ $(document).ready(function(){
     });
   });
 
+
   $(document).on('click','.datepicker', function(){
     $(this).daterangepicker();
   });

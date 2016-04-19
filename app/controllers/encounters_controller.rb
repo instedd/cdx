@@ -203,6 +203,14 @@ class EncountersController < ApplicationController
       @institution = institution_by_uuid(encounter_param['institution']['uuid'])
       @encounter.institution = @institution
       @encounter.site = site_by_uuid(@institution, encounter_param['site']['uuid'])
+      
+      @encounter.exam_reason = encounter_param['exam_reason']
+      @encounter.tests_requested = encounter_param['tests_requested']
+      @encounter.coll_sample_type = encounter_param['coll_sample_type']
+      @encounter.coll_sample_other = encounter_param['coll_sample_other']
+      @encounter.diag_comment = encounter_param['diag_comment']
+      @encounter.treatment_weeks = encounter_param['treatment_weeks']
+      @encounter.testdue_date = encounter_param['testdue_date'] 
     else
       @institution = @encounter.institution
     end
@@ -345,6 +353,15 @@ class EncountersController < ApplicationController
     Jbuilder.new do |json|
       json.(@encounter, :id)
       json.(@encounter, :uuid)
+      
+      json.(@encounter, :exam_reason)
+      json.(@encounter, :tests_requested)
+      json.(@encounter, :coll_sample_type)
+      json.(@encounter, :coll_sample_other)
+      json.(@encounter, :diag_comment)
+      json.(@encounter, :treatment_weeks)
+      json.(@encounter, :testdue_date)
+      
       json.has_dirty_diagnostic @encounter.has_dirty_diagnostic?
       json.assays (@encounter_blender.core_fields[Encounter::ASSAYS_FIELD] || [])
       json.observations @encounter_blender.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]

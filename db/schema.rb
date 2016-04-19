@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160405192357) do
+ActiveRecord::Schema.define(version: 20160419123349) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -241,17 +241,19 @@ ActiveRecord::Schema.define(version: 20160405192357) do
     t.datetime "user_updated_at"
     t.string   "site_prefix",       limit: 255
     t.datetime "start_time"
+    t.integer  "user_id",           limit: 4
     t.string   "exam_reason",       limit: 255
     t.string   "tests_requested",   limit: 255
     t.string   "coll_sample_type",  limit: 255
     t.string   "coll_sample_other", limit: 255
     t.string   "diag_comment",      limit: 255
-    t.date     "date_of_treatment"
     t.date     "testdue_date"
+    t.integer  "treatment_weeks",   limit: 4
   end
 
   add_index "encounters", ["deleted_at"], name: "index_encounters_on_deleted_at", using: :btree
   add_index "encounters", ["site_id"], name: "index_encounters_on_site_id", using: :btree
+  add_index "encounters", ["user_id"], name: "index_encounters_on_user_id", using: :btree
 
   create_table "file_messages", force: :cascade do |t|
     t.string  "filename",          limit: 255
@@ -597,5 +599,6 @@ ActiveRecord::Schema.define(version: 20160405192357) do
   add_foreign_key "alerts", "institutions"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
+  add_foreign_key "encounters", "users"
   add_foreign_key "patients", "sites"
 end

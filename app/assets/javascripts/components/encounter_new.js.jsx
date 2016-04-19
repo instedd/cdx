@@ -14,7 +14,7 @@ var EncounterNew = React.createClass({
       exam_reason: '',
       tests_requested: '',
       diag_comment: '',
-      date_of_treatment: '',
+      treatment_weeks: 0,
       testdue_date: ''
     }};
   },
@@ -34,7 +34,7 @@ var EncounterNew = React.createClass({
         exam_reason: { $set: '' },
         tests_requested: { $set: '' },
         diag_comment: { $set: '' },
-        date_of_treatment: { $set: '' },
+        treatment_weeks: { $set: 0 },
         testdue_date: { $set: '' }
       }
     }));
