@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160405192357) do
+ActiveRecord::Schema.define(version: 20160412110000) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -226,22 +226,29 @@ ActiveRecord::Schema.define(version: 20160405192357) do
   add_index "devices", ["deleted_at"], name: "index_devices_on_deleted_at", using: :btree
 
   create_table "encounters", force: :cascade do |t|
-    t.integer  "institution_id",  limit: 4
-    t.integer  "patient_id",      limit: 4
-    t.string   "uuid",            limit: 255
-    t.string   "entity_id",       limit: 255
-    t.binary   "sensitive_data",  limit: 65535
-    t.text     "custom_fields",   limit: 65535
-    t.text     "core_fields",     limit: 65535
+    t.integer  "institution_id",    limit: 4
+    t.integer  "patient_id",        limit: 4
+    t.string   "uuid",              limit: 255
+    t.string   "entity_id",         limit: 255
+    t.binary   "sensitive_data",    limit: 65535
+    t.text     "custom_fields",     limit: 65535
+    t.text     "core_fields",       limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "is_phantom",                    default: true
+    t.boolean  "is_phantom",                      default: true
     t.datetime "deleted_at"
-    t.integer  "site_id",         limit: 4
+    t.integer  "site_id",           limit: 4
     t.datetime "user_updated_at"
-    t.string   "site_prefix",     limit: 255
+    t.string   "site_prefix",       limit: 255
     t.datetime "start_time"
-    t.integer  "user_id",         limit: 4
+    t.integer  "user_id",           limit: 4
+    t.string   "exam_reason",       limit: 255
+    t.string   "tests_requested",   limit: 255
+    t.string   "coll_sample_type",  limit: 255
+    t.string   "coll_sample_other", limit: 255
+    t.string   "diag_comment",      limit: 255
+    t.date     "date_of_treatment"
+    t.date     "testdue_date"
   end
 
   add_index "encounters", ["deleted_at"], name: "index_encounters_on_deleted_at", using: :btree

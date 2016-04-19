@@ -33,7 +33,7 @@
     .row
       .col.pe-8
         %h1 Total Tests
-    .row#tests_run
+    .row
       .col.pe-7
         = react_component('BarChart', data: query_tests_chart.data, height: 300, y_label: 'Tests Run', x_labels: query_tests_chart.statuses)
 
@@ -52,7 +52,7 @@
     .row
       .col.pe-8
         %h1 Total Tests by Site
-    .row#tests_run
+    .row
       .col.pe-7
         = react_component('HorizontalBarChart', data: query_site_tests_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_site_tests', label: 'Total Tests by Site')
         #chart_site_tests
@@ -61,7 +61,7 @@
     .row
       .col.pe-8
         %h1 Average Tests by Site
-    .row#tests_run
+    .row
       .col.pe-7
         = react_component('GroupedVerticalBarChart', height: 300, width: 600, chart_div: 'chart_average_test_per_site_chart', data: average_test_per_site_chart)
         #chart_average_test_per_site_chart
@@ -72,7 +72,7 @@
     .row
       .col.pe-8
         %h1 Failed Tests
-    .row#tests_run
+    .row
       .col.pe-7
         .pieleft
           = react_component('PieChart', data: failed_tests, height: 250, label: 'Total tests')
@@ -83,7 +83,7 @@
     .row
       .col.pe-8
         %h1 Average Tests by Technician
-    .row#tests_run
+    .row
       .col.pe-7
         = react_component('GroupedHorizontalBarChart', data: average_tests_per_technician_chart, width: 600, x_labels:query_tests_chart.statuses, chart_div: 'chart_average_tests', label: 'DAYS')
         #chart_average_tests
@@ -94,7 +94,7 @@
     .row
       .col.pe-8
         %h1 Devices Not Responding
-    .row#tests_run
+    .row
       .col.pe-7
         = react_component('HorizontalBarChart', data: query_devices_not_reporting_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_not_responding', label: 'DAYS')
         #chart_not_responding
@@ -103,7 +103,7 @@
     .row
       .col.pe-8
         %h1 Device Error Codes
-    .row#tests_run
+    .row
       .col.pe-7
         = react_component('DeviceErrorTable', title: "title", allowSorting: "true", orderBy: "-device", data: error_codes_by_device)
   .chart-container-clear

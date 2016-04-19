@@ -11,7 +11,6 @@ var GroupedHorizontalBarChart = React.createClass({
         d = document,
         e = d.documentElement,
         g = d.getElementsByTagName('body')[0];
-    
         x = w.innerWidth || e.clientWidth || g.clientWidth;
         y = w.innerHeight|| e.clientHeight|| g.clientHeight;
   },
@@ -167,13 +166,13 @@ var GroupedHorizontalBarChart = React.createClass({
           .style("text-anchor", "middle")
           .text("There is no data to display");
        }
-      
+
       svg.insert("g",":first-child")
         .attr("class", "horizontal-bar-axis")
         .attr("transform", "translate(" + (margin + spaceForLabels - 20) + ","+ (chartHeight - axisMargin + 8)+")")
         .call(xAxis);
 
-     window.onresize = this.updateWindow;
+      window.onresize = this.updateWindow;
 
       return (
         <div></div>

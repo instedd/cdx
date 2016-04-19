@@ -1,3 +1,4 @@
+@wip
 Feature: Superadmin can invite users to the system
   As a user with superadmin privileges
   I want to invite new users to the system
@@ -10,6 +11,7 @@ Feature: Superadmin can invite users to the system
 
   @single_tenant
   Scenario: Bob invites Bill Smith to Foo Labs Incorporated
+    skip_this_scenario
     Given Bill does not have an account
     When Bob sends an invitation to Bill Smith
     Then Bob should see "An invitation email has been sent to billsmith@copado.com"
