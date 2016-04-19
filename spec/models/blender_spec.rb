@@ -44,29 +44,31 @@ describe Blender do
     end
 
     before(:each) do
-      [@institution,
-      @patient_p1,
-      @patient_p2,
-      @encounter_p1e1,
-      @encounter_p1e2,
-      @encounter_p1e3,
-      @encounter_p2e1,
-      @sample_p1e1s1,
-      @sample_p1e1s2,
-      @sample_p1e2s1,
-      @sample_p2e1s1,
-      @test_p1e1s1t1,
-      @test_p1e1s1t2,
-      @test_p1e1s2t1,
-      @test_p1e2s1t1,
-      @test_p1e3s0t1,
-      @test_p1e0s0t1,
-      @test_p2e1s1t1,
-      @other_institution,
-      @other_patient,
-      @other_encounter,
-      @other_sample,
-      @other_test].each(&:reload)
+      [
+        @institution,
+        @patient_p1,
+        @patient_p2,
+        @encounter_p1e1,
+        @encounter_p1e2,
+        @encounter_p1e3,
+        @encounter_p2e1,
+        @sample_p1e1s1,
+        @sample_p1e1s2,
+        @sample_p1e2s1,
+        @sample_p2e1s1,
+        @test_p1e1s1t1,
+        @test_p1e1s1t2,
+        @test_p1e1s2t1,
+        @test_p1e2s1t1,
+        @test_p1e3s0t1,
+        @test_p1e0s0t1,
+        @test_p2e1s1t1,
+        @other_institution,
+        @other_patient,
+        @other_encounter,
+        @other_sample,
+        @other_test
+      ].each(&:reload)
     end
 
     let(:blender) { Blender.new(@institution) }
@@ -77,18 +79,27 @@ describe Blender do
       end
 
       it "should load encounters" do
-        expect(blender.encounters.map(&:single_entity)).to contain_exactly(@encounter_p1e1, @encounter_p1e2, @encounter_p1e3)
+        expect(blender.encounters.map(&:single_entity))
+          .to contain_exactly(@encounter_p1e1, @encounter_p1e2, @encounter_p1e3)
       end
 
       it "should load samples" do
-        expect(blender.samples.map(&:single_entity)).to contain_exactly(@sample_p1e1s1, @sample_p1e1s2, @sample_p1e2s1)
+        expect(blender.samples.map(&:single_entity))
+          .to contain_exactly(@sample_p1e1s1, @sample_p1e1s2, @sample_p1e2s1)
       end
 
       it "should load tests" do
-        expect(blender.test_results.map(&:single_entity)).to contain_exactly(@test_p1e1s1t1, @test_p1e1s1t2, @test_p1e1s2t1, @test_p1e3s0t1, @test_p1e0s0t1, @test_p1e2s1t1)
+        expect(blender.test_results.map(&:single_entity))
+          .to contain_exactly(
+            @test_p1e1s1t1,
+            @test_p1e1s1t2,
+            @test_p1e1s2t1,
+            @test_p1e3s0t1,
+            @test_p1e0s0t1,
+            @test_p1e2s1t1
+          )
       end
     end
-
 
     shared_examples "has valid invariant" do
       let(:blenders) { blender.blenders.values.flatten }
@@ -146,15 +157,27 @@ describe Blender do
       end
 
       it "should have created five encounters" do
-        expect(Encounter.all).to contain_exactly(@encounter_p1e1, @encounter_p1e2, @encounter_p1e3, @encounter_p2e1, @other_encounter)
+        expect(Encounter.all)
+          .to contain_exactly(@encounter_p1e1, @encounter_p1e2, @encounter_p1e3, @encounter_p2e1, @other_encounter)
       end
 
       it "should have created five samples" do
-        expect(Sample.all).to contain_exactly(@sample_p1e1s1, @sample_p1e1s2, @sample_p2e1s1, @sample_p1e2s1, @other_sample)
+        expect(Sample.all)
+          .to contain_exactly(@sample_p1e1s1, @sample_p1e1s2, @sample_p2e1s1, @sample_p1e2s1, @other_sample)
       end
 
       it "should have created eight tests" do
-        expect(TestResult.all).to contain_exactly(@test_p1e1s1t1, @test_p1e1s1t2, @test_p1e1s2t1, @test_p1e3s0t1, @test_p2e1s1t1, @test_p1e0s0t1, @test_p1e2s1t1, @other_test)
+        expect(TestResult.all)
+          .to contain_exactly(
+            @test_p1e1s1t1,
+            @test_p1e1s1t2,
+            @test_p1e1s2t1,
+            @test_p1e3s0t1,
+            @test_p2e1s1t1,
+            @test_p1e0s0t1,
+            @test_p1e2s1t1,
+            @other_test
+          )
       end
     end
 
@@ -220,7 +243,6 @@ describe Blender do
       end
     end
 
-
     context "changing a sample to another encounter from a different patient" do
       let(:blender_p2)       { blender.load(@patient_p2)     }
       let(:blender_p2e1)     { blender.load(@encounter_p2e1) }
@@ -274,7 +296,7 @@ describe Blender do
 
       context "when phantom" do
         before(:each) do
-          @encounter_p1e2.update_attributes!(is_phantom: true, core_fields: Hash.new)
+          @encounter_p1e2.update_attributes!(is_phantom: true, core_fields: {})
           blender.merge_parent(blender_p1e2s1t1, blender_p1e1)
         end
 
@@ -303,17 +325,16 @@ describe Blender do
 
       context "when non phantom" do
         it "should not be able to merge encounters" do
-          expect {
+          expect do
             blender.merge_parent(blender_p1e2s1t1, blender_p1e1)
-          }.to raise_error(Blender::MergeNonPhantomError)
+          end.to raise_error(Blender::MergeNonPhantomError)
         end
       end
     end
 
-
     context "merging a test result encounter from another patient" do
       before(:each) do
-        @encounter_p2e1.update_attributes!(is_phantom: true, core_fields: Hash.new)
+        @encounter_p2e1.update_attributes!(is_phantom: true, core_fields: {})
       end
 
       let(:blender_p1) { blender.load(@patient_p1) }
@@ -330,7 +351,7 @@ describe Blender do
 
       context "when phantom" do
         before(:each) do
-          @patient_p2.attributes = { is_phantom: true, plain_sensitive_data: Hash.new, entity_id_hash: nil }
+          @patient_p2.attributes = { is_phantom: true, plain_sensitive_data: {}, entity_id_hash: nil }
           @patient_p2.save(validate: false)
           blender.merge_parent(blender_p2e1s1t1, blender_p1e1)
         end
@@ -362,7 +383,7 @@ describe Blender do
 
       context "when merging on phantom" do
         before(:each) do
-          @patient_p2.attributes = { is_phantom: true, plain_sensitive_data: Hash.new, entity_id_hash: nil }
+          @patient_p2.attributes = { is_phantom: true, plain_sensitive_data: {}, entity_id_hash: nil }
           @patient_p2.save(validate: false)
           blender.merge_parent(blender_p1e1s1t1, blender_p2e1)
         end
@@ -399,18 +420,18 @@ describe Blender do
           expect(@encounter_p2e1.reload.test_results.to_a).to be_empty
           expect(@encounter_p2e1.reload.samples.to_a).to be_empty
 
-          expect(@test_p1e1s1t1.reload.patient).to  eq(@patient_p1)
-          expect(@test_p1e1s1t2.reload.patient).to  eq(@patient_p1)
-          expect(@test_p1e1s2t1.reload.patient).to  eq(@patient_p1)
-          expect(@sample_p1e1s1.reload.patient).to  eq(@patient_p1)
-          expect(@sample_p1e1s2.reload.patient).to  eq(@patient_p1)
+          expect(@test_p1e1s1t1.reload.patient).to eq(@patient_p1)
+          expect(@test_p1e1s1t2.reload.patient).to eq(@patient_p1)
+          expect(@test_p1e1s2t1.reload.patient).to eq(@patient_p1)
+          expect(@sample_p1e1s1.reload.patient).to eq(@patient_p1)
+          expect(@sample_p1e1s2.reload.patient).to eq(@patient_p1)
           expect(@encounter_p1e1.reload.patient).to eq(@patient_p1)
 
-          expect(@test_p1e1s1t1.reload.encounter).to  eq(@encounter_p1e1)
-          expect(@test_p1e1s1t2.reload.encounter).to  eq(@encounter_p1e1)
-          expect(@test_p1e1s2t1.reload.encounter).to  eq(@encounter_p1e1)
-          expect(@sample_p1e1s1.reload.encounter).to  eq(@encounter_p1e1)
-          expect(@sample_p1e1s2.reload.encounter).to  eq(@encounter_p1e1)
+          expect(@test_p1e1s1t1.reload.encounter).to eq(@encounter_p1e1)
+          expect(@test_p1e1s1t2.reload.encounter).to eq(@encounter_p1e1)
+          expect(@test_p1e1s2t1.reload.encounter).to eq(@encounter_p1e1)
+          expect(@sample_p1e1s1.reload.encounter).to eq(@encounter_p1e1)
+          expect(@sample_p1e1s2.reload.encounter).to eq(@encounter_p1e1)
 
           expect(@test_p2e1s1t1.reload.patient).to eq(@patient_p1)
           expect(@sample_p2e1s1.reload.patient).to eq(@patient_p1)
@@ -422,24 +443,65 @@ describe Blender do
 
       context "when non phantom" do
         it "should not be able to merge patients" do
-          expect {
+          expect do
             blender.merge_parent(blender_p2e1s1t1, blender_p1e1)
-          }.to raise_error(Blender::MergeNonPhantomError)
+          end.to raise_error(Blender::MergeNonPhantomError)
         end
+      end
+    end
+
+    context "when changing an encounter to another patient" do
+      let(:blender_p2)       { blender.load(@patient_p2)     }
+      let(:blender_p1)       { blender.load(@patient_p1)     }
+      let(:blender_p1e1s1)   { blender.load(@sample_p1e1s1)  }
+      let(:blender_p1e1s1t1) { blender.load(@test_p1e1s1t1)  }
+      let(:blender_p1e1)     { blender.load(@encounter_p1e1) }
+      let(:blender_p1e2)     { blender.load(@encounter_p1e2) }
+
+      before(:each) do
+        blender.set_parent(blender_p1e1, blender_p2)
+      end
+
+      include_examples "has valid invariant"
+
+      it "should reassign its patient" do
+        expect(blender_p1e1.patient).to eq(blender_p2)
+      end
+
+      it "should reassign the patient of its samples" do
+        expect(blender_p1e1s1.patient).to eq(blender_p2)
+      end
+
+      it "should reassign the patient of its tests" do
+        expect(blender_p1e1s1t1.patient).to eq(blender_p2)
+      end
+
+      it "should not modify the patient of other encounters" do
+        expect(blender_p1e2.patient).to eq(blender_p1)
+      end
+
+      it "should save changes" do
+        blender.save_without_index!
+
+        expect(@sample_p1e1s1.reload.patient).to eq(@patient_p2)
+        expect(@encounter_p1e1.reload.patient).to eq(@patient_p2)
+        expect(@test_p1e1s1t1.reload.patient).to eq(@patient_p2)
       end
     end
   end
 
   context "not merging" do
     context "when the device was moved from one site to another" do
-      let(:message) {{
-        test: { assays: [ {condition: "flu_a", name: "flu_a", result: "positive"} ] },
-        patient: { id: 1 },
-        sample: { id: 2 }
-      }}
-      let(:site1) {Site.make}
-      let(:site2) {Site.make institution: site1.institution}
-      let(:device) {Device.make institution: site1.institution, site: site1}
+      let(:message) do
+        {
+          test: { assays: [{ condition: "flu_a", name: "flu_a", result: "positive" }] },
+          patient: { id: 1 },
+          sample: { id: 2 }
+        }
+      end
+      let(:site1) { Site.make }
+      let(:site2) { Site.make institution: site1.institution }
+      let(:device) { Device.make institution: site1.institution, site: site1 }
 
       it "should not link the samples" do
         DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(message)

@@ -160,6 +160,12 @@ var EncounterForm = React.createClass(_.merge({
     }.bind(this);
   },
 
+  onPatientChanged: function(patient) {
+    this.setState(React.addons.update(this.state, {
+      encounter : { patient: { $set : patient } },
+    }));
+  },
+
   render: function() {
     var diagnosisEditor = null;
 
@@ -169,7 +175,7 @@ var EncounterForm = React.createClass(_.merge({
         <div className="row">
           <div className="col pe-2">
             <label>Diagnosis</label>
-            <p style={{fontSize: "12px"}}><i>When new tests are reported for this order, you'll be able to diagnose the corresponding condition here.</i></p>
+            <p style={{fontSize: "12px"}}><i>When new tests are reported for this order, you''ll be able to diagnose the corresponding condition here.</i></p>
           </div>
 
           <div className="col assays-editor">
@@ -230,9 +236,7 @@ var EncounterForm = React.createClass(_.merge({
         }.bind(this))()}
 
 
-        <FlexFullRow>
-          <PatientCard patient={this.state.encounter.patient} />
-        </FlexFullRow>
+        <PatientSelect patient={this.state.encounter.patient} context={this.props.context} onPatientChanged={this.onPatientChanged} />
 
         {diagnosisEditor}
 
@@ -314,5 +318,4 @@ var EncounterForm = React.createClass(_.merge({
       </div>
     );
   },
-
 }, BaseEncounterForm));
