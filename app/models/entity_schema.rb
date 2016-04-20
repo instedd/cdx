@@ -1,5 +1,5 @@
 class EntitySchema
-  def initialize(locale)
+  def initialize(locale="en-US")
     @locale = locale || "en-US"
   end
 
