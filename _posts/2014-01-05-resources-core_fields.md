@@ -1,0 +1,83 @@
+---
+category: Resources
+title: 'Core Fields'
+---
+
+The core fields are:
+
+- *sample.id* - This field represents the identifier of the sample exactly as entered by the lab user on the diagnostics machine. Its purpose is to keep track of the originally reported sample identifier. Note that the values in this field may not be unique across different laboratories or even over time.
+- *sample.uuid* - The internal id in CDX. An automatically generated UUID to unequivocally identify the sample in CDX.
+- *sample.type* - The type of the sample. String.
+- *sample.collection_date* - The date when the sample was collected.
+- *test.id* - The id given by the device. If the device reports two tests with the same test.id, then the first one will be updated.
+- *test.uuid* - The internal id in CDX. an automatically generated UUID to unequivocally identify the test in CDX.
+- *test.start_time* - The timestamp when the test started running in the device.
+- *test.end_time* - The timestamp when the test finished running in the device.
+- *test.reported_time* - The creation timestamp in CDX.
+- *test.updated_time* - The last update timestamp in CDX (if two tests are reported with the same test.id, this field will be updated).
+- *test.error_code* - A numeric result code. This will follow the manufacturer's own coding and won't be standardized.
+- *test.error_description* - User friendly error description.
+- *test.site_user* - The user that ran the test. This is not necessarily a cdx user.
+- *test.name* - The name of the test as provided by the device.
+- *test.status* - An enumerated global result of the test.
+  - The possible values are:
+    - invalid
+    - error
+    - no_result
+    - success
+    - in_progress
+- *test.assays* - A single test can run multiple assays.
+- *test.assays.name* - The code name of the assay used in the test as provided by the device.
+- *test.assays.condition* - The condition that this particular assay tests. It must be one of the conditions listed in the manifest's metadata, with the same notation.
+- *test.assays.result* - An enumerated result of the assay, if available.
+  - The possible values are:
+    - positive
+    - negative
+    - indeterminate
+    - n/a
+- *test.assays.quantitative_result* - The result of the test, if measurable, in a numeric scale. This scale will follow the manufacturer's convention.
+- *test.type* - If the test is from a real sample or if it's just a quality control test.
+  - The possible values are:
+    - specimen
+    - qc
+- *device.uuid* - The internal id that identifies the device in CDX.
+- *device.name* - The name of the device in CDX.
+- *device.lab_user* - The name of the user running the tests.
+- *device.serial_number* - The serial number of the device, identifiable in any external system.
+- *institution.uuid* - The internal CDX id of the Institution that owns the device.
+- *institution.name* - The name of that Institution.
+- *site.uuid* - The internal CDX id of the Laboratory where the device is located.
+- *site.name* - The name of that Laboratory.
+- *patient.id* - The id of the patient in CDX.
+- *patient.name* - The patient's name.
+- *patient.dob* - The patient's date of birth.
+- *patient.gender* - The birth gender of the patient.
+  - The possible values are:
+    - male
+    - female
+    - other
+- *patient.email* - The patient's email.
+- *patient.phone* - The patient's phone.
+- *location.id* - The Natural Earth geo id of the device location at the moment of the test.
+- *location.parents* - The list of parents, in Natural Earth geo ids, of the device location at the moment of the test.
+- *location.admin_levels* - The list of parents, in Natural Earth geo ids indexed by administrative level, of the device location at the moment of the test.
+- *location.lat* - The latitude of the device location at the moment of the test.
+- *location.lng* - The longitude of the device location at the moment of the test.
+- *encounter.id* - This field represents the identifier of the encounter exactly as entered by the lab user on the diagnostics machine.
+- *encounter.uuid* - The internal id in CDX. an automatically generated UUID to unequivocally identify the test in CDX.
+- *encounter.patient_age* - The age of the patient at the moment the test order was generated.
+- *encounter.start_time* - The start time of the first test of the test order.
+- *encounter.end_time* - The end time of the last test of the test order.
+- *encounter.observations* - A field for the technician to write down any observations about the test order.
+- *encounter.diagnosis* - A single Encounter can have multiple diagnosis, one per condition.
+- *encounter.diagnosis.name* - The code name of the assay used in the test as provided by the device.
+- *encounter.diagnosis.condition* - The condition that this particular assay tests. It must be one of the conditions listed in the manifest's metadata, with the same notation.
+- *encounter.diagnosis.result* - An enumerated result of the assay, if available.
+  - The possible values are:
+    - positive
+    - negative
+    - indeterminate
+    - n/a
+- *encounter.diagnosis.quantitative_result* - The result of the test, if measurable, in a numeric scale. This scale will follow the manufacturer's convention.
+
+All location, site and institution information will be automatically filled by CDX when a test is reported using the information already available in the system.

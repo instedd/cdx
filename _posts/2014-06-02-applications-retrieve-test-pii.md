@@ -3,8 +3,6 @@ category: Applications
 path: '/tests/[test_uuid]/pii'
 title: 'Retrieve PII'
 type: 'GET'
-
-layout: nil
 ---
 
 Retrieves the private patient information for a given test.

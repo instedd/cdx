@@ -3,8 +3,6 @@ category: Resources
 path: '/tests/schema[.format]'
 title: 'Tests schema'
 type: 'GET'
-
-layout: nil
 ---
 
 Returns the schema of the Tests endpoint
@@ -30,7 +28,8 @@ The _locale_ will determine the language of the labels, detailed in the _values_
 
 The response will include a list of the supported fields with the details of each one.
 
-`{
+```
+{
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "MTB_RIF.es_AR",
   "type": "object",
@@ -41,7 +40,8 @@ The response will include a list of the supported fields with the details of eac
     ...
   },
   "required": ["result_group"]
-}`
+}
+```
 
 ## Enum
 
@@ -54,7 +54,8 @@ For the Enum fields we added an extra _values_ field that will include one of th
 
 When the value provides a uri, the endpoint will provide the values according to the following schema:
 
-`{
+```
+{
   “title”: “Results”,
   “additionalProperties”: {
     “title”: “Result”,
@@ -65,13 +66,15 @@ When the value provides a uri, the endpoint will provide the values according to
     },
     “required”: [“name”, “kind”]
   }
-}`
+}
+```
 
 In the case of results, the _values_ metadata will include a _name_ or localized label, and a _kind_ that will categorize the result positivity in 3 possible values: positive, negative, or error.
 
 Other enumerations will include different properties, or the implementation may define _"additionalProperties": true_ to allow dynamic injection of properties.
 
-`{
+```
+{
   “title”: "Conditions",
   “additionalProperties”: {
     “title”: “Condition”,
@@ -82,19 +85,22 @@ Other enumerations will include different properties, or the implementation may 
     "additionalProperties" : true,
     “required”: [“name”]
   }
-}`
+}
+```
 
 In any case, to obtain the schema of a given endpoint, the uri will be the same as the endpoint with an additional `/schema[.format]`
 
 #### Example
 
-`"result_group": {
+```
+"result_group": {
   "title": "Result"
   "description": "Grouped result",
   "type": "string",
   "enum": ["pos_with_RIF", "negative"],
   "values": "http//example.com/values"
-}`
+}
+```
 
 In this case, the endpoint "http//example.com/values" will provide the possible values, and the endpoint "http//example.com/values/schema.json" will provide the schema of such values.
 
@@ -102,7 +108,8 @@ In this case, the endpoint "http//example.com/values" will provide the possible 
 
 The "values" field will include the metadata inlined inside the definition.
 
-`"result_group": {
+```
+"result_group": {
   "title": "Result"
   "description": "Grouped result",
   "type": "string",
@@ -111,7 +118,8 @@ The "values" field will include the metadata inlined inside the definition.
     "pos_with_RIF": {"name": "MTB Detected", "kind": "positive"},
     "negative": {"name": "Negative", "kind": "negative"}
   }
-}`
+}
+```
 
 
 The inlined values must follow the default values schema. If a different implementation is needed, it can only be provided with the external uri and schema.
@@ -122,7 +130,8 @@ The location fields, such as the laboratory location or the patient location, wi
 
 ### Locations Schema
 
-`{
+```
+{
   “title”: “Location hierarchies”,
   “additionalProperties”: {
     “title”: “Location hierarchy”,
@@ -142,16 +151,19 @@ The location fields, such as the laboratory location or the patient location, wi
     },
     “required”: [“name”]
   }
-}`
+}
+```
 
 #### Example
 
-`"patient_location": {
+```
+"patient_location": {
   "title": "Patient Location",
   "description": "Location of the patient",
   "type": "string",
   “locations”: “uri”
-}`
+}
+```
 
 ### Locations Dictionary
 
@@ -159,7 +171,8 @@ Locations inlined inside the field definition. This will be feasible only for sm
 
 #### Example
 
-`"patient_location": {
+```
+"patient_location": {
   "title": "Patient Location",
   "description": "Location of the patient",
   "type": "string",
@@ -188,7 +201,8 @@ Locations inlined inside the field definition. This will be feasible only for sm
       parent_id: "LOC001"
     }
   }
-}`
+}
+```
 
 ## Integer
 The integer fields will follow the JSON Schema convention.
@@ -197,12 +211,14 @@ For convenience and simplicity, the implementations should avoid the use of "exc
 
 #### Example
 
-`"age": {
+```
+"age": {
   "title": "Age",
   "type": "integer",
   "minimum": 0,
   "maximum": 199
-}`
+}
+```
 
 ## Date
 
@@ -222,9 +238,11 @@ For resolution values of second, minute, and hour, a timezone must be included i
 
 #### Example
 
-`"created_at": {
+```
+"created_at": {
   "title": "Creation date",
   "type": "string",
   "format":"date-time",
   "resolution": "day"
-}`
+}
+```

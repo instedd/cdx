@@ -3,8 +3,6 @@ category: Applications
 path: '/tests/[test_uuid]/custom_fields'
 title: 'Retrieve Custom Fields'
 type: 'GET'
-
-layout: nil
 ---
 
 Retrieves the not indexed user defined custom fields for a given test.

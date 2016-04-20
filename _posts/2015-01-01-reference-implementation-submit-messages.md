@@ -3,8 +3,6 @@ category: Reference Implementation
 path: '/devices/[device_uuid]/messages'
 title: 'Submit messages'
 type: 'POST'
-
-layout: nil
 ---
 
 # Authentication

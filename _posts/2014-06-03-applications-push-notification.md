@@ -1,8 +1,6 @@
 ---
 category: Applications
 title: 'Push Notifications'
-
-layout: nil
 ---
 
 Allows an application to subscribe for new reports of a particular disease.

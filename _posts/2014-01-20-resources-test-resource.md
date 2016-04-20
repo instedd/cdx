@@ -1,13 +1,12 @@
 ---
 category: Resources
 title: 'Test'
-
-layout: nil
 ---
 
 The Test resource contains the fields related to the test reported by the device. No personal identifiable information is contained in this resource.
 
-`{
+```
+{
   "sample" : {
     "id" : "",
     "uid" : "9d68e8fd-3ebe-a163-2ad6-7a675dac5dde",
@@ -113,8 +112,8 @@ The Test resource contains the fields related to the test reported by the device
       "0400000US08",
       "0500000US08021"
   ],
-
-}`
+}
+```
 
 Non standard fields reported by the device will be included inside the "custom_fields" section.
 

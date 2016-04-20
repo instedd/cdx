@@ -3,8 +3,6 @@ category: Devices
 path: '/devices/[device_uuid]/messages'
 title: 'Submit messages'
 type: 'POST'
-
-layout: nil
 ---
 
 Allows devices to submit messages.
