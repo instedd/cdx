@@ -70,10 +70,10 @@ var PatientCard = React.createClass({
             }.bind(this))()}
             {(function(){
               if (!this.props.canAddTest) return;
-
+              if (this.props.showTestLink != true) return;
               return (
                 <a href={"/encounters/new?mode=fresh_tests&patient_id=" + patient.id } title="Add Test">
-                  <img src="#{asset_url("ic-positive.png")}"/>
+                  Add Test
                 </a>);
             }.bind(this))()}
             JSX
