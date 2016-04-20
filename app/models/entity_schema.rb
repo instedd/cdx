@@ -148,7 +148,7 @@ class EntitySchema
 
   def set_location_service(schema)
     # TODO: dehardcode location service in location scope
-    rerturn unless schema['properties']['location'].present?
+    return unless schema['properties']['location'].present?
     schema['properties']['location']['location-service'] = {
       'url' => Settings.location_service_url,
       'set' => Settings.location_service_set
