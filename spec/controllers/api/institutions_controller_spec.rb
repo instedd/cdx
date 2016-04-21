@@ -21,8 +21,8 @@ describe Api::InstitutionsController do
         Institution.make user: User.make
         result = get :index, format: 'json'
         expect(Oj.load(result.body)).to eq({'total_count' => 2, 'institutions' => [
-          {'uuid' => institution.uuid, 'name' => institution.name},
-          {'uuid' => other_institution.uuid, 'name' => other_institution.name}
+          {'uuid' => other_institution.uuid, 'name' => other_institution.name},
+          {'uuid' => institution.uuid, 'name' => institution.name}
         ]})
       end
 
