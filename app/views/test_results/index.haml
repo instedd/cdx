@@ -14,7 +14,7 @@
             downloadCsvPath: test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
       - else
         = react_component "TestOrdersIndexTable", tests: @json, title: pluralize(@total, "test order"),
-            orderBy: @order_by, showSites: @show_sites, showDevices: @show_devices,
+            orderBy: @order_by, showSites: @show_sites, showDevices: @show_devices, all_test_orders: @test_orders,
             downloadCsvPath: test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
 
       .pagination

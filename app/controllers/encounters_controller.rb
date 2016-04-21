@@ -352,8 +352,8 @@ class EncountersController < ApplicationController
   def as_json_edit
     Jbuilder.new do |json|
       json.(@encounter, :id)
-      json.(@encounter, :uuid)
-      
+      json.(@encounter, :uuid)   
+      json.(@encounter, :user)
       json.(@encounter, :exam_reason)
       json.(@encounter, :tests_requested)
       json.(@encounter, :coll_sample_type)

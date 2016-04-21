@@ -145,9 +145,8 @@ class Encounter < ActiveRecord::Base
 
   def self.as_json_from_query(json, encounter_query_result, localization_helper)
     encounter = encounter_query_result["encounter"]
-
     json.encounter do
-      json.uuid encounter["uuid"]
+      json.uuid encounter["uuid"]                  
       json.diagnosis encounter["diagnosis"] || []
       json.start_time(localization_helper.format_datetime(encounter["start_time"]))
       json.end_time(localization_helper.format_datetime(encounter["end_time"]))

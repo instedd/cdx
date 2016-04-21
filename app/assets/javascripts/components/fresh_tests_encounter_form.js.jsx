@@ -1,5 +1,13 @@
 var FreshTestsEncounterForm = React.createClass(_.merge({
+	componentDidMount: function() {
+   $('#sample_other').hide();
+  },
   render: function() {
+		var now = new Date();
+		var day = ("0" + now.getDate()).slice(-2);
+		var month = ("0" + (now.getMonth() + 1)).slice(-2);
+		var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+		
     return (
       <div>
         <PatientSelect patient={this.state.encounter.patient} context={this.props.context} onPatientChanged={this.onPatientChanged} />
@@ -22,9 +30,11 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
           <div className="col pe-2">
             <label>Reason for Examination</label>
           </div>
-          <div className="col">
+          <div className="col pe-2">
             <input type="radio" onChange={this.reason_clicked.bind(this,0)} checked={this.state.encounter.exam_reason == 'diag'}
               name="exam_reason" id="exam_reason_diag" value="diag"/><label htmlFor="exam_reason_diag">Diagnosis</label>
+</div>
+<div className="col pe-2">
             <input type="radio" onChange={this.reason_clicked.bind(this,1)} checked={this.state.encounter.exam_reason == 'follow'}
               name="exam_reason" id="exam_reason_follow" value="follow"/><label htmlFor="exam_reason_follow">Follow-Up</label>
           </div>
@@ -38,14 +48,6 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
             </div>
           </div>
 
-          <div id="if_reason_follow" className="row">
-            <div className="col pe-2">
-              <label>Weeks in Treatment</label>
-            </div>
-            <div className="col">
-              <p><input type="number" min="0" max="52" onChange={this.treatmentdate_change} id="treatment_weeks" name="treatment_weeks"/></p>
-            </div>
-          </div>
 {/*         { this.state.reasonDiag ? <ReasonDiag onChange={this.diag_comment_change}/> : null }
         { this.state.reasonFollow ? <ReasonFollow onChange={this.treatmentdate_change}/> : null }
  */}
@@ -66,28 +68,47 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
           </div>
         </div>
 
+				<div id="if_reason_follow" className="row">
+	        <div className="col pe-2">
+	          <label>Weeks in Treatment</label>
+	         </div>
+	         <div className="col">
+	           <input type="number" min="0" max="52" onChange={this.treatmentdate_change} id="treatment_weeks" name="treatment_weeks"/>
+	         </div>
+	       </div>
+	
         <div className="row">
           <div className="col pe-2">
             <label>Collection Sample Type</label>
           </div>
           <div className="col">
+<label>
             <select className="input-large" id="coll_sample_type" name="coll_sample_type" onChange={this.sample_type_change} datavalue={this.state.encounter.coll_sample_type}>
               <option value="">Please Select...</option>
               <option value="sputum">Sputum</option>
               <option value="blood">Blood</option>
               <option value="other">Other - Please Specify</option>
             </select>
-            <br/>
+</label>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col pe-2">
+           &nbsp;
+          </div>
+          <div className="col">
             <textarea name="sample_other" id="sample_other" onChange={this.sample_other_change}></textarea>
           </div>
         </div>
+
 
         <div className="row">
           <div className="col pe-2">
             <label>Test Due Date</label>
           </div>
           <div className="col">
-            <input type="date" id="testdue_date" onChange={this.testduedate_change} value={this.state.encounter.testdue_date}/>
+            <input type="date" id="testdue_date"  min={today} onChange={this.testduedate_change} value={this.state.encounter.testdue_date}/>
           </div>
         </div>
 
@@ -210,7 +231,6 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
       encounter : { coll_sample_type: { $set : xx } },
     }));
   },
-
   sample_other_change: function()
   {
     var xx = $('#sample_other').val();

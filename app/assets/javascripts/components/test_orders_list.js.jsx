@@ -76,6 +76,7 @@ var TestOrdersList = React.createClass({
             {sortableHeader("ID", "encounter.uuid")}
             { this.props.showSites ? <th>Site</th> : null }
             <th colSpan={totalAssaysColCount} className="text-right">Results</th>
+
             {sortableHeader("Start time", "encounter.start_time")}
             {sortableHeader("End time", "encounter.end_time")}
           </tr>
@@ -94,7 +95,7 @@ var TestOrdersList = React.createClass({
 
 var TestOrdersIndexTable = React.createClass({
   render: function() {
-    return <TestOrdersList testOrders={this.props.tests}
+    return <TestOrdersList testOrders={this.props.tests}  aaa={this.props.all_test_orders}
               downloadCsvPath={this.props.downloadCsvPath}
               title={this.props.title} titleClassName="table-title"
               allowSorting={true} orderBy={this.props.orderBy}

@@ -72,8 +72,8 @@ var PatientCard = React.createClass({
               if (!this.props.canAddTest) return;
               if (this.props.showTestLink != true) return;
               return (
-                <a href={"/encounters/new?mode=fresh_tests&patient_id=" + patient.id } title="Add Test">
-                  Add Test
+                <a href={"/encounters/new?mode=fresh_tests&patient_id=" + patient.id } title="Create Test Order" className="label">
+                  Create Test Order
                 </a>);
             }.bind(this))()}
             JSX

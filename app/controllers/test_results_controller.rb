@@ -137,6 +137,20 @@ class TestResultsController < ApplicationController
     @total = result["total_count"]
     @tests = result["encounters"]
     @json = build_json_array Encounter, @tests
+
+=begin
+#anthony start
+    all_test_orders = Encounter.select("id, uuid, user_id, testdue_date, exam_reason, custom_fields, core_fields")
+    all_test_orders.each do |test_order|
+      test_order.core_fields={}
+      test_order.custom_fields={}
+    end
+        
+    @test_orders = all_test_orders.as_json
+    binding.pry
+#anthony end
+=end
+
   end
 
   def build_json_array(entity_class, tests)

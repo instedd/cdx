@@ -1,8 +1,14 @@
 var BaseEncounterForm = {
   getInitialState: function() {
+		var user_email='';
+		if (this.props.encounter["user"] != null) {
+			user_email= this.props.encounter["user"].email
+		};
+		
     return {
       encounter: this.props.encounter,
-      manual_sample_entry: this.props.manual_sample_entry
+      manual_sample_entry: this.props.manual_sample_entry,
+      user_email: user_email
     };
   },
 
@@ -159,7 +165,6 @@ var EncounterForm = React.createClass(_.merge({
       }));
     }.bind(this);
   },
-
   render: function() {
     var diagnosisEditor = null;
 
@@ -224,6 +229,15 @@ var EncounterForm = React.createClass(_.merge({
                   </div>
                   <div className="col">
                     <p>{this.props.encounter.uuid}</p>
+                  </div>
+                </div>
+
+								<div className="row">
+                  <div className="col pe-2">
+                    <label>Requested By:</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.state.user_email}</p>
                   </div>
                 </div>
 
@@ -306,78 +320,7 @@ var EncounterForm = React.createClass(_.merge({
               <PatientCard patient={this.state.encounter.patient} />
             </FlexFullRow>
 
-            {diagnosisEditor}
-
-            <div className="row">
-              <div className="col pe-2">
-                <label>Samples</label>
-              </div>
-              <div className="col">
-                <SamplesList samples={this.state.encounter.samples} onUnifySample={this.showUnifySamplesModal} />
-                <NewSamplesList samples={this.state.encounter.new_samples} onRemoveSample={this.removeNewSample} />
-
-                <p>
-                  <a className="btn-add-link" href='#' onClick={this.addNewSamples}><span className="icon-circle-plus icon-blue"></span> Append new sample</a>
-                </p>
-                <p>
-                  <a className="btn-add-link" href='#' onClick={this.showAddSamplesModal}><span className="icon-circle-plus icon-blue"></span> Append sample</a>
-                </p>
-              </div>
-
-              <Modal ref="addSamplesModal">
-                <h1>
-                  <a href="#" className="modal-back" onClick={this.closeAddSamplesModal}></a>
-                  Add sample
-                </h1>
-
-                <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendSample}
-                  placeholder="Search by sample id"
-                  itemTemplate={AddItemSearchSampleTemplate}
-                  itemKey="uuid" />
-              </Modal>
-
-              <Modal ref="addNewSamplesModal">
-                <h1>
-                  <a href="#" className="modal-back" onClick={this.closeAddNewSamplesModal}></a>
-                  Add sample
-                </h1>
-
-                <p><input type="text" className="input-block" placeholder="Sample ID" ref="manualSampleEntry" /></p>
-                <p><button type="button" className="btn-primary pull-right" onClick={this.validateAndSetManualEntry}>OK</button></p>
-              </Modal>
-
-              <Modal ref="unifySamplesModal">
-                <h1>
-                  <a href="#" className="modal-back" onClick={this.closeUnifySamplesModal}></a>
-                  Unify sample
-                </h1>
-                <p>Unifying sample {this.state.unifyingSample ? this.state.unifyingSample.entity_ids[0] : ""}</p>
-
-                <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid + "&sample_uuids=" + _.pluck(this.state.encounter.samples, 'uuid')} onItemChosen={this.unifySample}
-                  placeholder="Search by sample id"
-                  itemTemplate={AddItemSearchSampleTemplate}
-                  itemKey="uuid" />
-              </Modal>
-            </div>
-
-            <div className="row">
-              <div className="col">
-                <TestResultsList testResults={this.state.encounter.test_results} showSites={false} showDevices={true} /><br/>
-                <a className="btn-add-link"  href='#' onClick={this.showTestsModal}><span className="icon-circle-plus icon-blue"></span> Add tests</a>
-              </div>
-
-              <Modal ref="testsModal">
-                <h1>
-                  <a href="#" className="modal-back" onClick={this.closeTestsModal}></a>
-                  Add test
-                </h1>
-
-                <AddItemSearch callback={"/encounters/search_test?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendTest}
-                  placeholder="Search by test id"
-                  itemTemplate={AddItemSearchTestResultTemplate}
-                  itemKey="uuid" />
-              </Modal>
-            </div>
+           <br />
 
             <FlexFullRow>
               <button type="button" className="btn-primary" onClick={this.save}>Save</button>

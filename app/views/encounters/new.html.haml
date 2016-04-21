@@ -9,6 +9,6 @@
         - if params[:mode] == 'existing_tests'
           = 'Existing Tests'
         - else 
-          = 'New test'
+          = 'New Test'
 
 = react_component('EncounterNew', context: @navigation_context.to_hash, patient: @patient_json, mode: params[:mode], possible_assay_results: @possible_assay_results)
