@@ -12,7 +12,7 @@ describe "navigation context" do
     expect(user.last_navigation_context).to eq(institution.uuid)
   end
 
-  it "user get last context by default" do
+  xit "user get last context by default" do
     other_institution = Institution.make user: user
     goto_page HomePage do |page|
       # Context panel is now open by default
