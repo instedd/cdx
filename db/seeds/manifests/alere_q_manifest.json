@@ -54,6 +54,7 @@
     "test.type" : "specimen",
     "test.site_user" : { "lookup" : "Operator" },
     "test.start_time" : {"parse_date" : [{"lookup": "Timestamp"}, "%Y-%m-%d %H:%M"]},
+    "test.type" : "specimen",
     "test.status" : { "script" : "
       if(  message['Sample Detection'] == 'Fail'
         || message['HIV-1 Positive Control'] == 'Fail'

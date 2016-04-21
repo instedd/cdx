@@ -26,6 +26,7 @@
     "test.start_time" : {"lookup" : "TestDate/text()"},
     "test.id" : {"lookup" : "@id"},
     "test.name" : {"lookup" : "Test/Code/@value"},
+    "test.type" : "specimen",
     "test.status" : {
       "case" : [
         {"lookup": "Test/Control/@qualitative"},
