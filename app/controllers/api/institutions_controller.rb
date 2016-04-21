@@ -4,6 +4,9 @@ class Api::InstitutionsController < ApiController
       {"uuid" => institution.uuid, "name" => institution.name}
     end
 
+    # do some ordering here 
+    @institutions.sort! {|a,b| a['name']<=>b['name']}
+
     respond_to do |format|
       format.csv do
         build_csv 'Institutions', CSVBuilder.new(@institutions, column_names: ["uuid", "name"])

@@ -11,6 +11,7 @@ class Encounter < ActiveRecord::Base
   has_many :test_results, dependent: :restrict_with_error
 
   belongs_to :patient
+  belongs_to :user
 
   validates_presence_of :site, if: Proc.new { |encounter| encounter.institution && !encounter.institution.kind_manufacturer? }
 

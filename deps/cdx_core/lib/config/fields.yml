@@ -116,6 +116,7 @@ entities:
   location: &LOCATION
     fields:
       id:
+        searchable: true
       parents:
         searchable: true
         multiple: true
@@ -129,6 +130,8 @@ entities:
     fields:
       id:
       uuid:
+        searchable: true
+      user_email:
         searchable: true
       patient_age:
         type: duration

@@ -306,11 +306,11 @@ Devise.setup do |config|
   # config.omniauth_path_prefix = '/my_engine/users/auth'
 
   # Enable login with Google
-  config.omniauth :google_oauth2,
-    Settings.google_client_id,
-    Settings.google_client_secret,
-    name: :google,
-    access_type: :online
+#  config.omniauth :google_oauth2,
+#    Settings.google_client_id,
+#    Settings.google_client_secret,
+#    name: :google,
+#    access_type: :online
 
   # ==> Security Extension
   # Configure security extension for devise

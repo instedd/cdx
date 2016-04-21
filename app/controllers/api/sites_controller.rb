@@ -17,6 +17,8 @@ class Api::SitesController < ApiController
       site["parent_uuid"] = nil unless @uuids.include?(site["parent_uuid"])
     end
 
+    @sites.sort! {|a,b| a['name']<=>b['name']}
+
     respond_to do |format|
       format.csv do
         build_csv 'Sites', CSVBuilder.new(@sites, column_names: ["uuid", "name", "location", "parent_uuid", "institution_uuid"])
