@@ -1,13 +1,36 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            = link_to "+", new_policy_path, class: 'btn-add side-link fix', title: 'Add Policy'
+            Policies
+
 .row
   .col
-    = link_to "+", new_policy_path, class: 'btn-add side-link fix', title: 'Add Policy'
-    = cdx_table title: 'Policies' do |t|
-      - t.thead do
-        %tr
-          %th Name
-          %th User
-      - t.tbody do
-        - @policies.each do |policy|
+    - if @policies.empty?
+      = empty_data title: "No policies", icon: 'icon-outline-user xx-large' do |c|
+        - c.body do
+          %h1 There are no users with access to #{truncated_navigation_context_entity_name}
+          %p Invite other users to join this site's team
+    - else
+      = cdx_table title: pluralize(@policies.count, "policy") do |t|
+        - t.columns do
+          %col{:width => "25%"}
+          %col{:width => "20%"}
+          %col{:width => "25%"}
+          %col{:width => "30%"}
+        - t.thead do
           %tr
-            %td= link_to policy.name, edit_policy_path(policy)
-            %td= link_to policy.user.email, edit_policy_path(policy)
+            %th Name
+            %th Policy Name
+            %th User
+            %th Last Activity
+        - t.tbody do
+          - @policies.each do |policy|
+            %tr
+              %td= policy.user.full_name
+              %td= link_to policy.name, edit_policy_path(policy)
+              %td= link_to policy.user.email, edit_policy_path(policy)
+              %td= last_activity(policy.user)

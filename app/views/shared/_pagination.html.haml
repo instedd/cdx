@@ -1,0 +1,17 @@
+= link_to "<", previous_page_params, disabled: !has_previous_page, class: 'btn-link'
+= link_to ">", next_page_params, disabled: !has_next_page, class: 'btn-link'
+%input.input-x-small.text-right{type: "text", name: "page", value: @page}
+%span
+  of
+  = (@total.to_f / @page_size).ceil
+%span(style="display: inline-block;")
+  = cdx_select name: "page_size_select", value: @page_size, class: 'input-large' do |select|
+    - select.items PagingHelper::PAGE_SIZE_OPTIONS, :second, :first
+:javascript
+  $(function(){
+    $(document).on('change', 'input[name=page_size_select]', function(){
+      $('input[name=page_size]').val($(this).val());
+      var url = window.buildUrl($('form#filters-form'));
+      Turbolinks.visit(url.toString(), {});
+    });
+  })

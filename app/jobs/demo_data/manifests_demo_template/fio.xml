@@ -1,0 +1,25 @@
+<DiagnosticTests>
+  <DiagnosticTest id="{general_id}">
+    <Patient>
+      <Id>{general_id}</Id>
+      <Name>{system_user}</Name>
+      <Gender>{gender_long}</Gender>
+      <Age>{age}</Age>
+      <AgeUnit>years</AgeUnit>
+      <PregnancyStatus>Not Pregnant</PregnancyStatus>
+    </Patient>
+    <SampleId>{sample_id}</SampleId>
+    <Facility>Rural Clinic {city}</Facility>
+    <TestDate>{start_datetime}</TestDate>
+    <Test type="RDT">
+      <Code value="SD_MALPFPV_02_02" displayValue="SD Malaria P.f and P.v" />
+      <Control qualitative="Valid" value="{decimal}" />
+      <Assay code="HRPII" codingScheme="Fio" displayValue="P.f">
+        <Result qualitative="{FIO_Postive_Negative_hrp}" value="{FIO_decimal_hrp}" />
+      </Assay>
+      <Assay code="pLDH" codingScheme="Fio" displayValue="P.v">
+        <Result qualitative="{FIO_Postive_Negative_lpdh}" value="{FIO_decimal_lpdh}" />
+      </Assay>
+    </Test>
+  </DiagnosticTest>
+</DiagnosticTests>

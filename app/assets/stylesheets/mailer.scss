@@ -1,0 +1,55 @@
+@import "variables";
+@import "mixins";
+@import "reset";
+@import "global";
+@import "buttons";
+
+body {
+  background-color: #e6e6e6;
+  font-family: $sans;
+  font-size: 90%;
+}
+
+.container {
+  width: 650px;
+  margin: 3em auto;
+  padding: 1px;
+}
+
+.email-logo {
+  margin: 60px auto;
+}
+
+.box.big.centered {
+  margin-bottom: 45px;
+
+  h1 {
+    font-family: $sanstitle;
+    color:$gray5;
+    margin-bottom:55px;
+    line-height:1.6em;
+  }
+
+  p.custom-message {
+    margin-bottom: 75px;
+    color:$gray4;
+    font-style: italic;
+    font-size:19px;
+    font-family: $sanstitle;
+  }
+}
+
+.bottom-links {
+  color: $gray3;
+  margin: 40px auto;
+
+  a {
+    color: inherit;
+  }
+}
+
+.footer {
+  a {
+    text-decoration: underline;
+  }
+}

@@ -1,19 +1,15 @@
 class InstitutionsController < ApplicationController
-  layout "institutions"
   before_filter :load_institutions
-  skip_before_filter :check_no_institution!, only: [:new, :create]
-  before_filter do
-    @main_column_width = 6 unless params[:action] == 'index'
-  end
+  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
+  skip_before_action :ensure_context, except: [:no_data_allowed]
 
   def index
     @can_create = has_access?(Institution, CREATE_INSTITUTION)
-    if @institutions.size <= 1
-      if @institutions.one?
-        redirect_to edit_institution_path(@institutions.first)
-      else
-        redirect_to new_institution_path
-      end
+
+    if @institutions.one?
+      redirect_to edit_institution_path(@institutions.first)
+    elsif @institutions.empty?
+      redirect_to new_institution_path
     end
   end
 
@@ -21,15 +17,9 @@ class InstitutionsController < ApplicationController
     @institution = check_access(Institution.find(params[:id]), READ_INSTITUTION)
     @readonly = !has_access?(@institution, UPDATE_INSTITUTION)
 
-    unless has_access?(@institution, UPDATE_INSTITUTION)
-      redirect_to institution_path(@institutions.first)
-    end
-
     @can_delete = has_access?(@institution, DELETE_INSTITUTION)
 
-    if @institutions.one?
-      @can_create = has_access?(Institution, CREATE_INSTITUTION)
-    end
+    @can_create = @institutions.one? && has_access?(Institution, CREATE_INSTITUTION)
   end
 
   def new
@@ -37,8 +27,7 @@ class InstitutionsController < ApplicationController
     @institution.user_id = current_user.id
     return unless authorize_resource(Institution, CREATE_INSTITUTION)
 
-    @first_institution_creation = @institutions.count == 0
-    @hide_user_settings = @hide_nav_bar = @first_institution_creation
+    @hide_my_account = @hide_nav_bar = @institutions.count == 0
   end
 
   def create
@@ -46,12 +35,20 @@ class InstitutionsController < ApplicationController
     @institution.user_id = current_user.id
     return unless authorize_resource(Institution, CREATE_INSTITUTION)
 
-    @first_institution_creation = @institutions.count == 0
-    @hide_user_settings = @hide_nav_bar = @first_institution_creation
+    @hide_my_account = @hide_nav_bar = @institutions.count == 0
 
     respond_to do |format|
       if @institution.save
-        format.html { redirect_to institutions_path, notice: 'Institution was successfully created.' }
+        new_context = @institution.uuid
+
+        # Set the new context to the newly created institution
+        current_user.last_navigation_context = new_context
+        current_user.save!
+
+        # This is needed for the next redirect, which will use it
+        params[:context] = new_context
+
+        format.html { redirect_to root_path, notice: 'Institution was successfully created.' }
         format.json { render action: 'show', status: :created, location: @institution }
       else
         format.html { render action: 'new' }
@@ -66,7 +63,7 @@ class InstitutionsController < ApplicationController
 
     respond_to do |format|
       if @institution.update(institution_params)
-        format.html { redirect_to institutions_path, notice: 'Institution was successfully updated.' }
+        format.html { redirect_to root_path, notice: 'Institution was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -87,11 +84,19 @@ class InstitutionsController < ApplicationController
     end
   end
 
-  def request_api_token
-    @institution = Institution.find(params[:id])
-    return unless authorize_resource(@institution, READ_INSTITUTION)
+  def pending_approval
+    @hide_nav_bar = true
+  end
 
-    @token = Guisso.generate_bearer_token current_user.email
+  def no_data_allowed
+    # the no_data_allowed page make sense when the logged user has no access
+    # to any of the resources listed in the navbar.
+    # Otherwise there is a home to display different from no_data_allowed
+    # which filter the data shown per current institution.
+    home = after_sign_in_path_for(current_user)
+    if home != no_data_allowed_institutions_path
+      redirect_to home
+    end
   end
 
   private

@@ -1,0 +1,35 @@
+= render "filters"
+
+.row
+  .col
+    - if @patients.empty?
+      = empty_data icon: 'icon-outline-patient xx-large' do |c|
+        - c.body do
+          %h1 No patients registered
+          %p Keep your test orders organized under patients medical history
+    - else
+      = cdx_table title: pluralize(@total, "patient") do |t|
+        - t.columns do
+          %col{:width => "25%"}
+          %col{:width => "12%"}
+          %col{:width => "13%"}
+          %col{:width => "32%"}
+          %col{:width => "18%"}
+        - t.thead do
+          %tr
+            %th Name
+            %th Patient Id
+            %th Date of Birth
+            %th Location
+            %th Last test order
+        - t.tbody do
+          - @patients.each do |patient|
+            %tr{data: {href: patient_path(patient) }}
+              %td{class: patient.name.blank? ? "unknown-name" : ""}= patient.name || "(Unknown name)"
+              %td= patient.entity_id
+              %td= patient.dob_description(I18n.t('date.input_format.pattern'))
+              %td= patient.location.try(:name)
+              %td= format_date(patient.last_encounter)
+
+      .pagination
+        = render 'shared/pagination'

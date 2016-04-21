@@ -1,69 +1,166 @@
 class Encounter < ActiveRecord::Base
   include Entity
   include AutoUUID
-  include AutoIdHash
   include Resource
+  include SiteContained
 
-  has_many :samples, before_add: [:check_no_encounter, :assign_patient, :add_test_results]
-  has_many :test_results, before_add: [:check_no_encounter, :assign_patient, :add_sample]
+  ASSAYS_FIELD = 'diagnosis'
+  OBSERVATIONS_FIELD = 'observations'
 
-  belongs_to :institution
+  has_many :samples, dependent: :restrict_with_error
+  has_many :test_results, dependent: :restrict_with_error
+
   belongs_to :patient
 
-  validates_presence_of :institution
+  validates_presence_of :site, if: Proc.new { |encounter| encounter.institution && !encounter.institution.kind_manufacturer? }
 
-  class MultiplePatientError < StandardError
+  validate :validate_patient
+
+  before_save :ensure_entity_id
+
+  def self.entity_scope
+    "encounter"
   end
 
-  class EncounterAlreadyAssignedError < StandardError
-  end
+  attribute_field :start_time, copy: true
+
+  attr_accessor :new_samples # Array({entity_id: String}) of new generated samples from UI.
 
   def entity_id
     core_fields["id"]
+  end
+
+  def has_entity_id?
+    entity_id.not_nil?
+  end
+
+  def phantom?
+    super && core_fields[ASSAYS_FIELD].blank? && plain_sensitive_data[OBSERVATIONS_FIELD].blank?
+  end
+
+  def self.merge_assays(assays1, assays2)
+    return assays2 unless assays1
+    return assays1 unless assays2
+
+    assays1.dup.tap do |res|
+      assays2.each do |assay2|
+        assay = res.find { |a| a["condition"] == assay2["condition"] }
+        if assay.nil?
+          res << assay2.dup
+        else
+          assay.merge! assay2 do |key, v1, v2|
+            if key == "result"
+              if v1 == v2
+                v1
+              elsif v1 == "indeterminate" || v1.blank? || (v1 == "n/a" && v2 != "indeterminate")
+                v2
+              elsif v2 == "indeterminate" || v2.blank? || (v2 == "n/a" && v1 != "indeterminate")
+                v1
+              else
+                "indeterminate"
+              end
+            else
+              v1
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def self.merge_assays_without_values(assays1, assays2)
+    return assays2 unless assays1
+    return assays1 unless assays2
+
+    assays1.dup.tap do |res|
+      assays2.each do |assay2|
+        assay = res.find { |a| a["condition"] == assay2["condition"] }
+        if assay.nil?
+          res << (assay2.dup.tap do |h|
+            h["result"] = nil
+          end)
+        end
+      end
+    end
   end
 
   def self.entity_scope
     "encounter"
   end
 
-  def add_sample_uniq(sample)
-    self.samples << sample unless self.samples.include?(sample)
+  def self.find_by_entity_id(entity_id, opts)
+    find_by(entity_id: entity_id.to_s, institution_id: opts.fetch(:institution_id))
   end
 
-  def add_test_result_uniq(test_result)
-    self.test_results << test_result unless self.test_results.include?(test_result)
+  def self.query params, user
+    EncounterQuery.for params, user
   end
 
-  private
+  def test_results_not_in_diagnostic
+    diagnostic.present? ? test_results.where("updated_at > ?", self.user_updated_at || self.created_at) : test_results
+  end
 
-  def add_test_results(sample)
-    @skip_add_sample = true
-    sample.test_results.each do |test_result|
-      self.add_test_result_uniq test_result
+  def diagnostic
+    core_fields[Encounter::ASSAYS_FIELD]
+  end
+
+  def human_diagnose
+    return unless diagnostic
+
+    positives = diagnostic.select {|a| a['result'] == 'positive'}.map { |a| a['condition'].try(:upcase) }.to_a
+    negatives = diagnostic.select {|a| a['result'] == 'negative'}.map { |a| a['condition'].try(:upcase) }.to_a
+
+    res = ""
+    res << positives.join(', ')
+    unless positives.empty?
+      res << " detected. "
     end
-    @skip_add_sample = false
+    res << negatives.join(', ')
+    unless negatives.empty?
+      res << " not detected. "
+    end
+
+    res.strip
   end
 
-  def add_sample(test_result)
-    return if @skip_add_sample
-    self.add_sample_uniq test_result.sample if test_result.sample
+  attribute_field OBSERVATIONS_FIELD
+
+  def has_dirty_diagnostic?
+    test_results_not_in_diagnostic.count > 0
   end
 
-  def check_no_encounter(sample_or_test_result)
-    return if sample_or_test_result.encounter.nil?
-    if sample_or_test_result.encounter_id != self.id
-      raise EncounterAlreadyAssignedError, "Unable to add #{sample_or_test_result.model_name.human.downcase} that already belongs to other encounter"
+  def updated_diagnostic
+    assays_to_merge = test_results_not_in_diagnostic\
+      .map{|tr| tr.core_fields[TestResult::ASSAYS_FIELD]}
+
+    assays_to_merge.inject(diagnostic) do |merged, to_merge|
+      Encounter.merge_assays_without_values(merged, to_merge)
     end
   end
 
-  def assign_patient(sample_or_test_result)
-    new_patient = sample_or_test_result.patient
-    return unless new_patient
+  def updated_diagnostic_timestamp!
+    update_attribute(:user_updated_at, Time.now.utc)
+  end
 
-    if self.patient.nil?
-      self.patient = new_patient
-    elsif self.patient != new_patient
-      raise MultiplePatientError, "Unable to add #{sample_or_test_result.model_name.human.downcase} of multiple patients"
+  def self.as_json_from_query(json, encounter_query_result, localization_helper)
+    encounter = encounter_query_result["encounter"]
+
+    json.encounter do
+      json.uuid encounter["uuid"]
+      json.diagnosis encounter["diagnosis"] || []
+      json.start_time(localization_helper.format_datetime(encounter["start_time"]))
+      json.end_time(localization_helper.format_datetime(encounter["end_time"]))
+    end
+
+    json.site do
+      json.name encounter_query_result["site"]["name"]
     end
   end
+
+  protected
+
+  def ensure_entity_id
+    self.entity_id = entity_id
+  end
+
 end

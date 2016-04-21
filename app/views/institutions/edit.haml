@@ -1,14 +1,15 @@
-- unless @first_institution_creation
-  - if @can_create
-    = link_to "+", new_institution_path, class: 'btn-add side-link fix', title: 'Create Institution'
-  - else
-    %h1
-      = link_to institutions_path, class: 'side-link', title: 'Back' do
-        = image_tag "arrow-left.png"
+- if @can_create
+  = link_to "+", new_institution_path, class: 'btn-add side-link ontop fix', title: 'Create Institution'
+- else
+  - content_for(:subheader) do
+    .row.center.edit
+      .col.pe-10
+        .row
+          .col
+            %h2
+              - unless @institutions.one?
+                = link_to institutions_path, class: 'side-link', title: 'Back' do
+                  = image_tag "arrow-left.png"
+              = @institution.name
 
-.row
-  .col
-    %label.block Get access through API token.
-    %p= link_to 'Request API token', request_api_token_institution_path(@institution)
 = render 'form'
-

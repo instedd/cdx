@@ -20,4 +20,27 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  activerecord:
+    attributes:
+      manifest:
+        definition: Manifest
+      site:
+        parent: Parent site
+      patient:
+        dob: Birthday
+        entity_id: Patient id
+
+  user:
+    settings:
+      updated: "Settings updated"
+
+  date:
+    input_format:
+      pattern: "%m/%d/%Y"
+      placeholder: MM/DD/YYYY
+
+# es:
+#   date:
+#     input_format:
+#       pattern: "%d/%m/%Y"
+#       placeholder: DD/MM/YYYY

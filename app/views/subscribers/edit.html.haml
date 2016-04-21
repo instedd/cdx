@@ -1,10 +1,11 @@
-%h1
-  = link_to subscribers_path, class: 'side-link', title: 'Back' do
-    = image_tag "arrow-left.png"
-  Edit #{subscriber.name}
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to subscribers_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            #{subscriber.name}
 
 = render 'form'
-
-%hr
-
-= link_to "Delete this subscriber", subscriber, method: :delete, data: { confirm: "Are you sure you want to delete the location '#{subscriber.name}'" }

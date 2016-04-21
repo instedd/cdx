@@ -1,7 +1,7 @@
 = form_for @policy do |f|
   - if @policy.errors.any?
     #error_explanation
-      %p= "#{pluralize(@policy.errors.count, "error")} prohibited this @policy from being saved:"
+      %p= "#{pluralize(@policy.errors.count, "error")} prohibited this policy from being saved:"
       %ul
         - @policy.errors.full_messages.each do |msg|
           %li= msg
@@ -15,7 +15,8 @@
     .col.pe-2
       = f.label :user_id
     .col
-      = f.collection_select :user_id, User.all.where('id != ?', current_user.id).sort_by(&:email), :id, :email, {include_blank: "Select user"}, {:class => 'ddown'}
+      = f.text_field :user_id
+
   .row
     .col.pe-2
       = f.label :definition
@@ -25,3 +26,6 @@
   .row.button-actions
     .col
       = f.submit 'Save', :class => 'btn-primary'
+      = link_to 'Cancel', policies_path, class: 'btn-link'
+      - if @editing
+        = confirm_deletion_button @policy, 'policy'

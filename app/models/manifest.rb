@@ -15,17 +15,16 @@ class Manifest < ActiveRecord::Base
 
   NULL_STRING = "null"
 
-  CURRENT_VERSION = "1.4.0"
+  CURRENT_VERSION = "1.5.0"
+
+  SCOPES = [TestResult, Sample, Patient, Encounter].map(&:entity_scope).freeze
 
   scope :valid, -> { where(api_version: CURRENT_VERSION) }
 
   def self.new_message
-    {
-      TestResult.entity_scope => {"core" => {}, "pii" => {}, "custom" => {}},
-      Sample.entity_scope     => {"core" => {}, "pii" => {}, "custom" => {}},
-      Patient.entity_scope    => {"core" => {}, "pii" => {}, "custom" => {}},
-      Encounter.entity_scope  => {"core" => {}, "pii" => {}, "custom" => {}},
-    }
+    Hash[SCOPES.map do |scope|
+      [scope, {"core" => {}, "pii" => {"custom" => {}}, "custom" => {}}]
+    end]
   end
 
   def reload
@@ -58,7 +57,7 @@ class Manifest < ActiveRecord::Base
   end
 
   def custom_fields
-    (loaded_definition['custom_fields'] || [])
+    (loaded_definition['custom_fields'] || {})
   end
 
   def apply_to(data, device)
@@ -66,7 +65,7 @@ class Manifest < ActiveRecord::Base
     raise ManifestParsingError.invalid_manifest(self) if self.invalid?
 
     messages = []
-    parser.load(data, data_root).each_with_index do |record, record_index|
+    parser.load(data, data_root).each_with_index do |record, number_of_failures|
       begin
         message = self.class.new_message
         fields_for(device).each do |field|
@@ -75,7 +74,7 @@ class Manifest < ActiveRecord::Base
 
         messages << message
       rescue ManifestParsingError => err
-        err.record_index = record_index + 1
+        err.number_of_failures = number_of_failures + 1
         raise err
       end
     end
@@ -111,7 +110,7 @@ class Manifest < ActiveRecord::Base
     when "json"
       JsonMessageParser.new
     when "csv"
-      CSVMessageParser.new metadata["source"]["separator"] || CSVMessageParser::DEFAULT_SEPARATOR
+      CSVMessageParser.new(metadata["source"]["separator"] || CSVMessageParser::DEFAULT_SEPARATOR, metadata["source"]["skip_lines_at_top"] || CSVMessageParser::DEFAULT_TOP_LINES_SKIPPED)
     when "headless_csv"
       HeadlessCSVMessageParser.new metadata["source"]["separator"] || CSVMessageParser::DEFAULT_SEPARATOR
     when "xml"
@@ -143,11 +142,15 @@ class Manifest < ActiveRecord::Base
       check_field_mapping
       check_custom_fields
     else
-      self.errors.add(:deifinition, "can't be blank")
+      self.errors.add(:definition, "can't be blank")
     end
 
   rescue Oj::ParseError => ex
     self.errors.add(:parse_error, ex.message)
+  end
+
+  def filename
+    "#{device_model.name}-#{version}.json"
   end
 
   private
@@ -204,6 +207,7 @@ class Manifest < ActiveRecord::Base
     if loaded_definition["custom_fields"].is_a? Hash
       custom_fields.each do |custom_field_name, custom_field|
         check_no_type custom_field_name, custom_field
+        check_scope custom_field_name
       end
     else
       self.errors.add(:custom_fields, "must be a json object")
@@ -213,6 +217,15 @@ class Manifest < ActiveRecord::Base
   def check_no_type(custom_field_name, custom_field)
     if custom_field["type"]
       self.errors.add(:invalid_type, ": target '#{custom_field_name}'. Field can't specify a type.")
+    end
+  end
+
+  def check_scope(custom_field_name)
+    scope, name = custom_field_name.split(PATH_SPLIT_TOKEN)
+    if name.nil?
+      self.errors.add(:custom_fields, ": target '#{custom_field_name}'. A scope must be specified.")
+    elsif !SCOPES.include?(scope)
+      self.errors.add(:custom_fields, ": target '#{custom_field_name}'. Scope '#{scope}' is invalid.")
     end
   end
 end

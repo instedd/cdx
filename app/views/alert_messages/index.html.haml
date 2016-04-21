@@ -1,0 +1,38 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            Alert messages
+
+.row
+  .col
+    - if @alert_messages.empty?
+      = empty_data title: "No alert messages", icon: 'icon-outline-alert xx-large' do |c|
+        - c.body do
+          %h1 There are no alert messages at #{truncated_navigation_context_entity_name}
+          %p Create alert groups in order to keep your team notified on current events
+    - else
+      = cdx_table title: pluralize(@total, "Alert Message") do |t|
+        - t.columns do
+          %col{:width => "20%"}
+          %col{:width => "25%"}
+          %col{:width => "15%"}
+          %col{:width => "40%"}
+        - t.thead do
+          %tr
+            %th Alert Group
+            %th Date
+            %th Channel
+            %th Message
+        - t.tbody do
+          - @alert_messages.each do |alert_message|
+            %tr{data: {href: edit_alert_path(alert_message.alert) }}
+              %td= truncate(alert_message.alert.name, length: 20)
+              %td= alert_message.created_at.to_formatted_s(:long)
+              %td=  Alert.channel_types.keys[Alert.channel_types["email"]]
+              %td= truncate(alert_message.message_sent, length: 60)
+
+      .pagination
+        = render 'shared/pagination'

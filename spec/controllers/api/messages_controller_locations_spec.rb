@@ -30,19 +30,16 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       expect(test["location"]["admin_levels"]['admin_level_1']).to eq(leaf_location1.geo_id)
     end
 
-    it "should store nil if no location was found" do
+    it "should not index if no location/site was found but must keep the DeviceMessage" do
       device.site = nil
       device.save!
 
-      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
+      expect {
+        post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
+      }.to change{DeviceMessage.count}.by(1)
 
-      test = all_elasticsearch_tests.first["_source"]
-      expect(test["location"]["id"]).to be_nil
-      expect(test["location"]["lat"]).to be_nil
-      expect(test["location"]["lng"]).to be_nil
-      expect(test["device"]["site_id"]).to be_nil
-      expect(test["location"]["parents"]).to eq([])
-      expect(test["location"]["admin_levels"]).to eq({})
+      expect(all_elasticsearch_tests).to be_empty
+      expect(DeviceMessage.last.index_failed).to be_truthy
     end
   end
 

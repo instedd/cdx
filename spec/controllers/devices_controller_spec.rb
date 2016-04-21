@@ -5,10 +5,14 @@ describe DevicesController do
   let!(:institution) {Institution.make}
   let!(:user) {institution.user}
   let!(:site) {institution.sites.make}
-  let!(:device_model) {DeviceModel.make}
+  let!(:device_model) {DeviceModel.make(institution: Institution.make(:manufacturer))}
+  let!(:manifest) {Manifest.make(device_model: device_model)}
   let!(:device) {Device.make institution: institution, site: site, device_model: device_model}
+  let!(:other_institution) {Institution.make user: user}
+  let!(:other_site) {other_institution.sites.make}
 
   before(:each) {sign_in user}
+  let(:default_params) { {context: institution.uuid} }
 
   context "Index" do
 
@@ -26,36 +30,115 @@ describe DevicesController do
     it "should display index when other user grants permissions" do
       grant user2, user, [Institution.resource_name, Device.resource_name], "*"
 
-      get :index
+      get :index, context: institution2.uuid
       expect(response).to be_success
-      expect(assigns(:devices)).to contain_exactly(device, device2)
+      expect(assigns(:devices)).to contain_exactly(device2)
     end
 
     it "should display index filtered by institution" do
+      other_device = Device.make institution: other_institution
+
+      get :index, context: other_institution.uuid
+      expect(response).to be_success
+      expect(assigns(:devices)).to contain_exactly(other_device)
+    end
+
+    it "should display index filtered by site" do
+      other_site = Site.make institution: institution
+      other_device = Device.make site: other_site
+
+      get :index, context: other_site.uuid
+      expect(response).to be_success
+      expect(assigns(:devices)).to contain_exactly(other_device)
+    end
+
+    it "should display index filtered by manufacturer" do
+      manufacturer = Institution.make
+      device2.device_model.tap do |device_model|
+        device_model.institution = manufacturer
+        device_model.save!
+      end
+      Device.make institution: institution2
+
       grant user2, user, [Institution.resource_name, Device.resource_name], "*"
 
-      get :index, institution: institution2.id
+      get :index, context: institution2.uuid, manufacturer: manufacturer.id
       expect(response).to be_success
       expect(assigns(:devices)).to contain_exactly(device2)
+    end
+
+    it "should download CSV" do
+      get :index, format: :csv
+      expect(response).to be_success
+
+      CSV.parse(response.body, headers: :first_row) do |row|
+        expect(row.headers).to eq([
+          "UUID", "Name", "Serial Number", "Time Zone",
+          "Institution UUID", "Institution Name",
+          "Model Name",
+          "Manufacturer UUID", "Manufacturer Name",
+          "Site UUID", "Site Name"
+        ])
+        expect(row.fields).to eq([
+          device.uuid, device.name, device.serial_number, device.time_zone,
+          device.institution.uuid, device.institution.name,
+          device.device_model.name,
+          device.device_model.institution.uuid, device.device_model.institution.name,
+          device.site.uuid, device.site.name
+        ])
+      end
+    end
+
+    it "should download index CSV with current filters" do
+      grant user2, user, [Institution.resource_name, Device.resource_name], "*"
+      get :index, context: institution2.uuid, format: :csv
+      expect(response).to be_success
+
+      rows = CSV.parse(response.body, headers: :first_row)
+      expect(rows).to have(1).item
+      expect(rows.first['UUID']).to eq(device2.uuid)
+    end
+
+    it "should download all pages" do
+      devices = 30.times.map { |i| Device.make institution: institution, site: site, device_model: device_model }
+      get :index, format: :csv
+      expect(response).to be_success
+
+      rows = CSV.parse(response.body, headers: :first_row)
+      expect(rows).to have(31).items
+      expect(rows.map{|r| r['UUID']}).to match_array(devices.map(&:uuid) + [device.uuid])
     end
   end
 
   context "Index when devices have no sites" do
+
     let!(:user2) {User.make}
     let!(:institution2) {Institution.make user: user2}
     let!(:device2) {institution2.devices.make site: nil}
+    let(:default_params) { {context: institution2.uuid} }
 
-    it "should display filters when there are devices from more than one institution or site" do
+    it "should display devices without sites when selecting institution" do
       grant user2, user, Resource.all.map(&:resource_name), "*"
 
       get :index
       expect(response).to be_success
-      expect(assigns(:devices)).to contain_exactly(device, device2)
-
-      expect(assigns(:institutions)).to contain_exactly(institution, institution2)
-      expect(assigns(:sites)).to contain_exactly(site)
+      expect(assigns(:devices)).to contain_exactly(device2)
     end
 
+    it "should display manufacturers used by the devices in the current context despite manufacturer filter" do
+      device_model2 = DeviceModel.make institution: Institution.make
+      device2 = Device.make institution: institution, site: site, device_model: device_model2
+
+      site3 = institution.sites.make
+      device_model3 = DeviceModel.make institution: Institution.make
+      device3 = Device.make institution: institution, site: site3, device_model: device_model3
+
+      get :index, context: institution.uuid, manufacturer: device_model2.institution.id
+      expect(assigns(:manufacturers)).to match_array([device_model.institution, device_model2.institution, device_model3.institution])
+
+      get :index, context: site3.uuid
+      expect(assigns(:manufacturers)).to match_array([device_model3.institution])
+    end
   end
 
   context "New" do
@@ -63,6 +146,18 @@ describe DevicesController do
     it "renders the new page" do
       get :new
       expect(response).to be_success
+    end
+
+    it "should initialize no site if context is institution" do
+      get :new, context: institution.uuid
+      expect(response).to be_success
+      expect(assigns(:device).site).to be_nil
+    end
+
+    it "should initialize site if context is site" do
+      get :new, context: site.uuid
+      expect(response).to be_success
+      expect(assigns(:device).site).to eq(site)
     end
 
     it "loads published device models and from allowed institutions" do
@@ -74,6 +169,28 @@ describe DevicesController do
       expect(assigns(:device_models)).to contain_exactly(published, unpublished)
     end
 
+    it "loads unpublished device models only of context institution" do
+      published = device_model
+      unpublished = institution.device_models.make(:unpublished)
+      other_institution = Institution.make(user: user)
+      other_unpublished = DeviceModel.make(:unpublished, institution: other_institution)
+
+      get :new, context: other_institution.uuid
+      expect(assigns(:device_models)).to contain_exactly(published, other_unpublished)
+    end
+
+    it "loads all sites from allowed institutions in context" do
+      yet_another_institution = Institution.make
+      site1 = yet_another_institution.sites.make
+      site2 = yet_another_institution.sites.make
+
+      grant yet_another_institution.user, user, yet_another_institution, READ_INSTITUTION
+      grant yet_another_institution.user, user, yet_another_institution, REGISTER_INSTITUTION_DEVICE
+      grant yet_another_institution.user, user, site2, ASSIGN_DEVICE_SITE
+
+      get :new, context: yet_another_institution.uuid
+      expect(assigns(:sites)).to contain_exactly(site2)
+    end
   end
 
   context "Edit" do
@@ -91,6 +208,11 @@ describe DevicesController do
 
       get :edit, id: device.id
       expect(assigns(:device_models)).to contain_exactly(published, unpublished)
+    end
+
+    it "loads sites from device institution" do
+      get :edit, id: device.id
+      expect(assigns(:sites)).to contain_exactly(site)
     end
 
   end
@@ -199,16 +321,21 @@ describe DevicesController do
       expect(new_device.activation_token).to_not be_nil
       expect(response).to redirect_to(setup_device_url(new_device))
     end
+
+    it "doesn't crash when there's no device model (#578)" do
+      post :create, device: {
+        name: "foo",
+        serial_number: "123"
+      }
+
+      expect(response).to be_ok
+    end
   end
 
   describe "generate_activation_token" do
     before { post :generate_activation_token, {institution_id: device.institution_id, id: device.id, format: :json} }
-    let(:token) { ActivationToken.find_by(device_id: device.id)  }
 
-    it { expect(token).not_to be_nil }
-    it { expect(token.device).to eq(device) }
-    it { expect(token.client_id).to eq(device.uuid) }
-    it { expect(token.value).not_to be_nil }
+    it { device.reload; expect(device.activation_token).not_to be_nil }
   end
 
   describe "request_client_logs" do

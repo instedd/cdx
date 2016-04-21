@@ -35,6 +35,11 @@ describe InstitutionsController do
       expect(Institution.count).to eq(0)
     end
 
+    it "sets the newly created institution in context (#796)" do
+      post :create, {"institution" => {"name" => "foo"}}
+      expect(user.reload.last_navigation_context).to eq(Institution.last.uuid)
+    end
+
   end
 
   context "new" do

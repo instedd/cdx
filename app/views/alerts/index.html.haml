@@ -1,0 +1,39 @@
+= render "filters"
+
+.row
+  .col
+    - if @alerts.empty?
+      = empty_data title: "No alert groups", icon: 'icon-outline-alert xx-large' do |c|
+        - c.body do
+          %h1 There are no alert groups at #{truncated_navigation_context_entity_name}
+          %p Create alert groups in order to keep your team notified on current events
+    - else
+      = cdx_table title: pluralize(@total, "Alert Group") do |t|
+        - t.columns do
+          %col{:width => "15%"}
+          %col{:width => "20%"}
+          %col{:width => "10%"}
+          %col{:width => "15%"}
+          %col{:width => "15%"}
+          %col{:width => "25%"}
+        - t.thead do
+          %tr
+            %th Name
+            %th Description
+            %th Enabled
+            %th Sites
+            %th Roles
+            %th Last Incident
+
+        - t.tbody do
+          - @alerts.each do |alert|
+            %tr
+              %td= link_to truncate(alert.name, length: 20), edit_alert_path(alert)
+              %td= link_to truncate(alert.description, length: 20), edit_alert_path(alert)
+              %td= link_to alert.enabled ? 'yes' : 'no', edit_alert_path(alert)
+              %td= link_to display_sites(alert), edit_alert_path(alert)
+              %td= link_to display_roles(alert), edit_alert_path(alert)
+              %td= link_to display_latest_alert_date(alert), edit_alert_path(alert)
+
+      .pagination
+        = render 'shared/pagination'

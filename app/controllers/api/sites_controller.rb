@@ -6,13 +6,20 @@ class Api::SitesController < ApiController
       Site.all
     end
 
+    @uuids = Set.new
     @sites = check_access(@sites, READ_SITE).map do |site|
-      {"uuid" => site.uuid, "name" => site.name, "location" => site.location_geoid}
+      @uuids << site.uuid
+
+      {"uuid" => site.uuid, "name" => site.name, "location" => site.location_geoid, "parent_uuid" => site.parent.try(:uuid), "institution_uuid" => site.institution.uuid }
+    end
+
+    @sites.each do |site|
+      site["parent_uuid"] = nil unless @uuids.include?(site["parent_uuid"])
     end
 
     respond_to do |format|
       format.csv do
-        build_csv 'Sites', CSVBuilder.new(@sites, column_names: ["uuid", "name", "location"])
+        build_csv 'Sites', CSVBuilder.new(@sites, column_names: ["uuid", "name", "location", "parent_uuid", "institution_uuid"])
         render :layout => false
       end
       format.json do

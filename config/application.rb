@@ -22,7 +22,7 @@ module Cdp
     # config.i18n.default_locale = :de
 
     config.react.addons = true
-    
+
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
     config.generators do |g|
@@ -30,5 +30,12 @@ module Cdp
       g.assets = false
     end
     config.autoload_paths << Rails.root.join("features", "support", "page_objects")
+    config.autoload_paths += %W(#{config.root}/lib)
+
+    config.assets.precompile += %w( mailer.css )
+
+    config.action_mailer.asset_host = "http://#{Settings.host}"
+
+    config.assets.paths << Rails.root.join("app", "assets", "fonts")
   end
 end

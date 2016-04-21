@@ -1,0 +1,23 @@
+= render "filters"
+
+.row
+  .col
+    = cdx_table title: pluralize(@total, "role") do |t|
+      - t.columns do
+        %col{:width => "45%"}
+        %col{:width => "45%"}
+        %col{:width => "10%"}
+      - t.thead do
+        %tr
+          %th Name
+          %th Location
+          %th Users
+      - t.tbody do
+        - @roles.each do |role|
+          %tr{data: {href: edit_role_path(role)}}
+            %td= role.name
+            %td= role.site ? role.site.name : role.institution.name
+            %td= @user_counts[role.id]
+
+    .pagination
+      = render 'shared/pagination'

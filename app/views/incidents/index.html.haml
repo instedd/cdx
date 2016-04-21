@@ -1,0 +1,35 @@
+= render "filters"
+
+.row
+  .col
+    - if @incidents.empty?
+      = empty_data title: "No incidents", icon: 'icon-outline-alert xx-large' do |c|
+        - c.body do
+          %h1 There are incidents on this site
+          %p Create alert groups in order to keep your team notified on current events
+    - else
+      = cdx_table title: pluralize(@total, "Incident") do |t|
+        - t.columns do
+          %col{:width => "25%"}
+          %col{:width => "25%"}
+          %col{:width => "25%"}
+          %col{:width => "25%"}
+        - t.thead do
+          %tr
+            %th Alert Group
+            %th Devices
+            %th Date
+            %th Test Result
+        - t.tbody do
+          - @incidents.each do |incident|
+            %tr{data: {href: edit_alert_path(incident.alert) }}
+              %td= truncate(incident.alert.name, length: 20)
+              %td= display_devices(incident.alert)
+              %td= incident.created_at.to_formatted_s(:long)
+              - if incident.test_result != nil
+                %td= link_to 'View', test_result_path(incident.test_result.uuid)
+              -else
+                %td 'No Result'
+
+      .pagination
+        = render 'shared/pagination'

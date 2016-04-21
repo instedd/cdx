@@ -1,0 +1,60 @@
+{
+  "metadata" : {
+    "version" : "0.0.1",
+    "api_version" : "1.5.0",
+    "signature" : "",
+    "conditions": ["hiv_1_m_n", "hiv_1_o", "hiv_2"],
+    "source": { "type" : "csv", "separator" : ";", "skip_lines_at_top" : 1 }
+  },
+  "field_mapping" : {
+    "test.name" : { "lookup" : "Test Name" },
+    "sample.id" : { "lookup" : "Sample ID" },
+    "test.assays" : { "script" : "
+      hiv1mn = 'negative';
+      hiv1o = 'negative';
+      hiv2 = 'negative';
+
+      if(message['HIV-1 M/N'] == 'Detected'){
+        hiv1mn = 'positive'
+      };
+      if(message['HIV-1 O'] == 'Detected'){
+        hiv1o = 'positive'
+      };
+      if(message['HIV-2'] == 'Detected'){
+        hiv2 = 'positive'
+      };
+      [
+        {
+          'condition' : 'hiv_1_m_n',
+          'name' : 'HIV-1 M/N',
+          'result' : hiv1mn
+        },
+        {
+          'condition' : 'hiv_1_o',
+          'name' : 'HIV-1 O',
+          'result' : hiv1o
+        },
+        {
+          'condition' : 'hiv_2',
+          'name' : 'HIV-2',
+          'result' : hiv2
+        }
+      ]"
+    },
+    "test.error_code" : { "lookup" : "Error Code" },
+    "test.site_user" : { "lookup" : "Operator" },
+    "test.start_time" : {"parse_date" : [{"lookup": "Timestamp"}, "%Y-%m-%d %H:%M"]},
+    "test.type" : "specimen",
+    "test.status" : { "script" : "
+      if(  message['Sample Detection'] == 'Fail'
+        || message['HIV-1 Positive Control'] == 'Fail'
+        || message['HIV-2 Positive Control'] == 'Fail'
+        || message['Negative Control'] == 'Fail'
+        || message['Analysis'] == 'Fail' ){
+        'error'
+      } else {
+        'success'
+      }
+    "}
+  }
+}

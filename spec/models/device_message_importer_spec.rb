@@ -3,12 +3,12 @@ require 'spec_helper'
 require 'fileutils'
 
 describe DeviceMessageImporter, elasticsearch: true do
-
   let(:user) {User.make}
   let(:institution) {Institution.make user_id: user.id}
   let(:device_model) { DeviceModel.make name: 'test_model'}
   let(:device) {Device.make institution_id: institution.id, device_model: device_model}
   let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
+  let(:inbox) { sync_dir.inbox_path(device.uuid) }
 
   before do
     sync_dir.ensure_sync_path!
@@ -143,29 +143,12 @@ describe DeviceMessageImporter, elasticsearch: true do
   end
 
   context "real scenarios" do
-
-    def copy_sample_csv(name)
-      copy_sample(name, 'csvs')
-    end
-
-    def copy_sample_xml(name)
-      copy_sample(name, 'xmls')
-    end
-
-    def copy_sample(name, format)
-      FileUtils.cp File.join(Rails.root, 'spec', 'fixtures', format, name), sync_dir.inbox_path(device.uuid)
-    end
-
-    def load_manifest(name)
-      Manifest.create! device_model: device_model, definition: IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', name))
-    end
-
     context 'epicenter headless_es' do
       let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es' }
-      let!(:manifest)    { load_manifest 'epicenter_m.g.i.t._spanish_manifest.json' }
+      let!(:manifest)     { load_manifest 'epicenter_m.g.i.t._spanish_manifest.json', device_model }
 
       it "parses csv in utf-16le" do
-        copy_sample_csv 'epicenter_headless_sample_utf16.csv'
+        copy_sample_csv 'epicenter_headless_sample_utf16.csv', inbox
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -177,25 +160,58 @@ describe DeviceMessageImporter, elasticsearch: true do
 
     context 'cepheid' do
       let!(:device_model) { DeviceModel.make name: "GX Model I" }
-      let!(:manifest)    { load_manifest 'cepheid_gene_xpert_manifest.json' }
+      let!(:manifest)     { load_manifest 'genexpert_manifest.json', device_model }
 
-      it "should parse cepheid's document" do
-        copy_sample('cepheid_sample.json', 'jsons')
-        DeviceMessageImporter.new("*.json").import_from sync_dir
+      context 'sample' do
+        before do
+          copy_sample_json('genexpert_sample.json', inbox)
+          DeviceMessageImporter.new("*.json").import_from sync_dir
+        end
 
-        expect(DeviceMessage.first.index_failure_reason).to be_nil
-        tests = all_elasticsearch_tests
-        expect(tests.size).to eq(1)
-        expect(tests.first['_source']['test']['start_time']).to eq('2015-04-07T18:31:20-05:00')
+        it "should parse cepheid's document" do
+          expect(DeviceMessage.first.index_failure_reason).to be_nil
+          tests = all_elasticsearch_tests
+          expect(tests.size).to eq(1)
+          expect(tests.first['_source']['test']['start_time']).to eq('2015-04-07T18:31:20-05:00')
+        end
+
+        it "should parse status" do
+          tests = all_elasticsearch_tests
+          expect(tests.size).to eq(1)
+          expect(tests.first['_source']['test']['status']).to eq('success')
+        end
+
+        it "should parse result case insensitevly" do
+          # Sample has Rif Resistance DETECTED, manifest has RIF Resistance
+          tests = all_elasticsearch_tests
+          expect(tests.size).to eq(1)
+          #  MTB
+          expect(tests.first['_source']['test']['assays'][0]['result']).to eq('positive')
+          # RIF
+          expect(tests.first['_source']['test']['assays'][1]['result']).to eq('positive')
+        end
+
+        it "should save result's quantifier in quantitative field" do
+          tests = all_elasticsearch_tests
+          expect(tests.first['_source']['test']['assays'][0]['quantitative_result']).to eq('MEDIUM')
+        end
       end
+
+      it "should save result's quantifier in quantitative field for several words" do
+        copy_sample_json('genexpert_sample_mtb_very_low.json', inbox)
+        DeviceMessageImporter.new("*.json").import_from sync_dir
+        tests = all_elasticsearch_tests
+        expect(tests.first['_source']['test']['assays'][0]['quantitative_result']).to eq('VERY LOW')
+      end
+
     end
 
     context 'genoscan' do
       let(:device_model) { DeviceModel.make name: 'genoscan' }
-      let!(:manifest) { load_manifest 'genoscan_manifest.json' }
+      let!(:manifest) { load_manifest 'genoscan_manifest.json', device_model }
 
       it 'parses csv' do
-        copy_sample_csv 'genoscan_sample.csv'
+        copy_sample_csv 'genoscan_sample.csv', inbox
         DeviceMessageImporter.new("*.csv").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -205,27 +221,39 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(tests.size).to eq(13)
 
         test = tests[0]["_source"]["test"]
+        expect(test["status"]).to eq("success")
         expect(test["assays"][0]["name"]).to eq("mtb")
+        expect(test["assays"][0]["condition"]).to eq("mtb")
         expect(test["assays"][0]["result"]).to eq("negative")
         expect(test["assays"][1]["name"]).to eq("rif")
+        expect(test["assays"][1]["condition"]).to eq("rif")
         expect(test["assays"][1]["result"]).to eq("negative")
         expect(test["assays"][2]["name"]).to eq("inh")
+        expect(test["assays"][2]["condition"]).to eq("inh")
         expect(test["assays"][2]["result"]).to eq("negative")
 
         test = tests[1]["_source"]["test"]
+        expect(test["status"]).to eq("success")
         expect(test["assays"][0]["name"]).to eq("mtb")
+        expect(test["assays"][0]["condition"]).to eq("mtb")
         expect(test["assays"][0]["result"]).to eq("positive")
         expect(test["assays"][1]["name"]).to eq("rif")
+        expect(test["assays"][1]["condition"]).to eq("rif")
         expect(test["assays"][1]["result"]).to eq("negative")
         expect(test["assays"][2]["name"]).to eq("inh")
+        expect(test["assays"][2]["condition"]).to eq("inh")
         expect(test["assays"][2]["result"]).to eq("negative")
 
         test = tests.last["_source"]["test"]
+        expect(test["status"]).to eq("success")
         expect(test["assays"][0]["name"]).to eq("mtb")
+        expect(test["assays"][0]["condition"]).to eq("mtb")
         expect(test["assays"][0]["result"]).to eq("positive")
         expect(test["assays"][1]["name"]).to eq("rif")
+        expect(test["assays"][1]["condition"]).to eq("rif")
         expect(test["assays"][1]["result"]).to eq("positive")
         expect(test["assays"][2]["name"]).to eq("inh")
+        expect(test["assays"][2]["condition"]).to eq("inh")
         expect(test["assays"][2]["result"]).to eq("positive")
 
         dbtests = TestResult.all
@@ -234,12 +262,99 @@ describe DeviceMessageImporter, elasticsearch: true do
       end
     end
 
+    context 'alere q' do
+      let(:device_model) { DeviceModel.make name: 'alere q' }
+      let!(:manifest) { load_manifest 'alere_q_manifest.json', device_model }
+
+      it 'parses csv' do
+        copy_sample_csv 'alere_q.csv', inbox
+        DeviceMessageImporter.new("*.csv").import_from sync_dir
+
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
+        tests = all_elasticsearch_tests.sort_by do |test|
+          test["_source"]["test"]["assays"][0]['result'] + test["_source"]["test"]["assays"][1]['result'] + test["_source"]["test"]["assays"][2]['result']
+        end
+        expect(tests.size).to eq(73)
+
+        test = tests[0]["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("HIV-1 M/N")
+        expect(test["assays"][0]["condition"]).to eq("hiv_1_m_n")
+        expect(test["assays"][0]["result"]).to eq("negative")
+        expect(test["assays"][1]["name"]).to eq("HIV-1 O")
+        expect(test["assays"][1]["condition"]).to eq("hiv_1_o")
+        expect(test["assays"][1]["result"]).to eq("negative")
+        expect(test["assays"][2]["name"]).to eq("HIV-2")
+        expect(test["assays"][2]["condition"]).to eq("hiv_2")
+        expect(test["assays"][2]["result"]).to eq("negative")
+
+        test = tests[1]["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("HIV-1 M/N")
+        expect(test["assays"][0]["condition"]).to eq("hiv_1_m_n")
+        expect(test["assays"][0]["result"]).to eq("negative")
+        expect(test["assays"][1]["name"]).to eq("HIV-1 O")
+        expect(test["assays"][1]["condition"]).to eq("hiv_1_o")
+        expect(test["assays"][1]["result"]).to eq("negative")
+        expect(test["assays"][2]["name"]).to eq("HIV-2")
+        expect(test["assays"][2]["condition"]).to eq("hiv_2")
+        expect(test["assays"][2]["result"]).to eq("negative")
+
+        test = tests.last["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("HIV-1 M/N")
+        expect(test["assays"][0]["condition"]).to eq("hiv_1_m_n")
+        expect(test["assays"][0]["result"]).to eq("positive")
+        expect(test["assays"][1]["name"]).to eq("HIV-1 O")
+        expect(test["assays"][1]["condition"]).to eq("hiv_1_o")
+        expect(test["assays"][1]["result"]).to eq("negative")
+        expect(test["assays"][2]["name"]).to eq("HIV-2")
+        expect(test["assays"][2]["condition"]).to eq("hiv_2")
+        expect(test["assays"][2]["result"]).to eq("negative")
+
+        dbtests = TestResult.all
+        expect(dbtests.size).to eq(73)
+        expect(dbtests.map(&:uuid)).to match_array(tests.map {|e| e['_source']['test']['uuid']})
+      end
+    end
+
+    context 'alere pima' do
+      let(:device_model) { DeviceModel.make name: 'alere pima' }
+      let!(:manifest) { load_manifest 'alere_pima_manifest.json', device_model }
+
+      it 'parses csv' do
+        copy_sample_csv 'alere_pima.csv', inbox
+        DeviceMessageImporter.new("*.csv").import_from sync_dir
+
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
+        tests = all_elasticsearch_tests.sort_by do |test|
+          (test["_source"]["test"]["error_description"] || "") +
+            (test["_source"]["test"]["assays"].first['quantitative_result'].to_s || "")
+        end
+        expect(tests.size).to eq(38)
+
+        test = tests[0]["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("PIMA CD4")
+        expect(test["assays"][0]["condition"]).to eq("cd4_count")
+        expect(test["assays"][0]["result"]).to eq("n/a")
+        expect(test["assays"][0]["quantitative_result"]).to eq('1')
+
+        test = tests.last["_source"]["test"]
+        expect(test["assays"][0]["name"]).to eq("PIMA CD4")
+        expect(test["assays"][0]["condition"]).to eq("cd4_count")
+        expect(test["assays"][0]["result"]).to eq("n/a")
+        expect(test["assays"][0]["quantitative_result"]).to eq(nil)
+        expect(test["error_description"]).to eq('Test not finished Error 200')
+
+        dbtests = TestResult.all
+        expect(dbtests.size).to eq(38)
+        expect(dbtests.map(&:uuid)).to match_array(tests.map {|e| e['_source']['test']['uuid']})
+      end
+    end
+
     context 'fio' do
       let(:device_model) { DeviceModel.make name: 'FIO' }
-      let!(:manifest) { load_manifest 'fio_manifest.json' }
+      let!(:manifest) { load_manifest 'deki_reader_manifest.json', device_model }
 
       it 'parses xml' do
-        copy_sample_xml 'fio_sample.xml'
+        copy_sample_xml 'deki_reader_sample.xml', inbox
         DeviceMessageImporter.new("*.xml").import_from sync_dir
 
         expect(DeviceMessage.first.index_failure_reason).to be_nil
@@ -250,7 +365,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
         expect(test['test']['id']).to eq('12345678901234567890')
         expect(test['patient']['gender']).to eq('female')
-        expect(test['test']['patient_age']["years"]).to eq(25)
+        expect(test['encounter']['patient_age']["years"]).to eq(25)
         expect(test['patient']['custom_fields']['pregnancy_status']).to eq('Not Pregnant')
         expect(test['sample']['id']).to eq('0987654321')
         expect(test['test']['start_time']).to  eq('2015-05-18T12:34:56+05:00')
@@ -260,8 +375,10 @@ describe DeviceMessageImporter, elasticsearch: true do
         assays = test['test']['assays']
         expect(assays.size).to eq(2)
         expect(assays.first['result']).to eq('positive')
+        expect(assays.first['quantitative_result']).to eq('23.45')
         expect(assays.first['name']).to eq('HRPII')
         expect(assays.second['result']).to eq('negative')
+        expect(assays.second['quantitative_result']).to eq('0.0')
         expect(assays.second['name']).to eq('pLDH')
 
         expect(TestResult.count).to eq(1)
@@ -270,5 +387,44 @@ describe DeviceMessageImporter, elasticsearch: true do
         expect(db_test.test_id).to eq('12345678901234567890')
       end
     end
+
+
+    context 'BDMicroImager' do
+      let!(:device_model) { DeviceModel.make name: "BD MicroImager" }
+      let!(:manifest)    { load_manifest 'micro_imager_manifest.json', device_model }
+
+      it "should parse bd micro's document" do
+        copy_sample_json('micro_imager_sample.json', inbox)
+        DeviceMessageImporter.new("*.json").import_from sync_dir
+        expect(DeviceMessage.first.index_failure_reason).to be_nil
+
+        tests = all_elasticsearch_tests
+
+        expect(tests.size).to eq(1)
+
+        expect(tests.first['_source']['test']['error_code']).to eq(61)
+        expect(tests.first['_source']['test']['id']).to eq("46")
+        expect(tests.first['_source']['test']['custom_fields']['device_software_version']).to eq("00.02.03")
+
+        expect(tests.first['_source']['test']['custom_fields']['tbcount1']).to eq("46.0")
+        expect(tests.first['_source']['test']['custom_fields']['tbcount2']).to eq("56.0")
+        expect(tests.first['_source']['test']['custom_fields']['tbpercent']).to eq("22.1")
+        expect(tests.first['_source']['test']['custom_fields']['qcmagnification']).to eq("6.98")
+        expect(tests.first['_source']['test']['custom_fields']['qcresolution']).to eq("5.0")
+        expect(tests.first['_source']['test']['custom_fields']['cartridge_expiration_date']).to eq("2017-07-04T00:00:00.000Z")
+        expect(tests.first['_source']['test']['custom_fields']['cartridge_number']).to eq("6000704000001")
+        expect(tests.first['_source']['test']['custom_fields']['qc_date']).to eq("2017-07-04T00:00:00.000Z")
+        expect(tests.first['_source']['test']['custom_fields']['qc_passed']).to eq("passed")
+
+        expect(tests.first['_source']['test']['type']).to eq('qc')
+        expect(tests.first['_source']['test']['name']).to eq('TBMI')
+        expect(tests.first['_source']['test']['status']).to eq('error')
+        expect(tests.first['_source']['test']['start_time']).to eq('2015-09-28T23:46:53.000Z')
+        expect(tests.first['_source']['test']['end_time']).to eq('2015-09-29T01:33:17.000Z')
+
+        expect( tests.first['_source']['test']['assays']).to eq [{"condition"=>"mtb", "result"=>"positive"}]
+      end
+    end
+
   end
 end

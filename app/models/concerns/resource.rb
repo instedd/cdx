@@ -3,7 +3,17 @@ module Resource
   include Policy::Actions
 
   def self.all
-    @all_resources ||= [Institution, Site, Device, DeviceModel, TestResult, Encounter].freeze
+    @all_resources ||= [
+      Institution,
+      Site,
+      Device,
+      DeviceModel,
+      TestResult,
+      Encounter,
+      Role,
+      User,
+      Patient
+    ].freeze
   end
 
   def self.resolve(resource_string)

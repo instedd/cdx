@@ -9,6 +9,6 @@
         %th
       - @device_logs.each do |log|
         %tr
-          %td= log.created_at.in_time_zone(@device.time_zone).strftime('%Y-%m-%d %H:%M:%S')
+          %td= @localization_helper.format_datetime_time_zone(log.created_at, @device.time_zone)
           %td= truncate log.message, length: 100
           %td= link_to "Download", device_device_log_path(@device, log)

@@ -1,26 +1,65 @@
 = form_for(@site) do |f|
-  - if @site.errors.present?
-    .alert-container
-      .alert.alert-error
-        %ul
-          - @site.errors.full_messages.each do |msg|
-            %li= msg
-
-  = render 'shared/select_institution_or_hidden', f: f
+  = validation_errors @site
 
   .row
-    .col.pe-2
-      = f.label :name
-    .col
-      = f.text_field :name, :class => 'input-large'
+    .col.pe-6
+      .row
+        .col.pe-4
+          = f.label :institution
+        .col
+          .value= f.object.institution
+
+      .row
+        .col.pe-4
+          = f.label :name
+        .col
+          = f.text_field :name, :class => 'input-large'
+      - if @site.new_record? || @can_move
+        .row
+          .col.pe-4
+            = f.label :parent
+          .col
+            = cdx_select form: f, name: :parent_id, class: 'input-x-large' do |select|
+              - select.item "", "None"
+              - select.items @sites, :id, :name
+      - elsif @site.parent
+        .row
+          .col.pe-4
+            = f.label :parent
+          .col
+            = @site.parent.name
+
+    .col.pe-4
+      - unless @site.new_record?
+        = render 'side'
+
+  = site_address_component(@site)
   .row
     .col.pe-2
-      = f.label :location_geoid, "Location"
+      = f.label :sample_id_reset_policy, "Sample ID reset policy"
     .col
-      = f.hidden_field :location_geoid, class: 'input-large'
+      = cdx_select form: f, name: :sample_id_reset_policy, class: 'input-large' do |select|
+        - select.item "yearly", "Yearly"
+        - select.item "monthly", "Monthly"
+        - select.item "weekly", "Weekly"
+  .row
+    .col.pe-2
+      = f.label :main_phone_number
+    .col
+      = f.text_field :main_phone_number, :class => 'input-large'
+  .row
+    .col.pe-2
+      = f.label :email_address
+    .col
+      = f.email_field :email_address, :class => 'input-large'
 
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', sites_path, class: 'btn-link'
       - if @can_delete
-        = link_to "Delete", [@institution, @site], method: :delete, data: { confirm: "Are you sure you want to delete the site '#{@site.name}'" }, class: 'btn-secondary pull-right', title: 'Delete Site'
+        - if @can_be_deleted
+          = confirm_deletion_button @site, 'site'
+        - else
+          - # TODO: link to page with Devices tab always active - it's the current default, but may change
+          = link_to "Delete", '#', data: { confirm: "In order to delete this site you must first reassign the <a href=\"#{edit_site_path(@site)}\">#{@site.devices.count} #{"device".pluralize(@site.devices.count)}</a> assigned to it.", confirm_title: 'Action required', confirm_hide_cancel: 'true', confirm_button_message: 'Understood' }, class: 'btn-secondary pull-right', title: 'Delete Site'

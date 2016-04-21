@@ -1,0 +1,58 @@
+= form_for(@patient) do |f|
+  - unless params[:next_url].blank?
+    = hidden_field_tag :next_url, params[:next_url]
+
+  = validation_errors @patient
+
+  .row
+    .col.pe-2
+      = f.label :institution
+    .col
+      .value= f.object.institution
+
+  .row
+    .col.pe-2
+      = f.label :name
+    .col
+      = f.text_field :name, :class => 'input-large'
+
+  .row
+    .col.pe-2
+      = f.label :entity_id
+    .col
+      = f.text_field :entity_id, :class => 'input-large'
+
+  .row
+    .col.pe-2
+      = f.label :gender
+    .col
+      = cdx_select form: f, name: :gender do |select|
+        - select.items PatientForm::GENDER_VALUES
+
+  .row
+    .col.pe-2
+      = f.label :dob
+    .col
+      = f.text_field :dob, placeholder: @patient.dob_placeholder
+
+  = patient_address_component(@patient)
+
+  .row
+    .col.pe-2
+      = f.label :email
+    .col
+      = f.text_field :email, :class => 'input-large'
+
+  .row
+    .col.pe-2
+      = f.label :phone
+    .col
+      = f.text_field :phone, :class => 'input-large'
+
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', patients_path, class: 'btn-link'
+
+      - if @can_delete
+        = confirm_deletion_button @patient, 'patient'

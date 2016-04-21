@@ -1,20 +1,38 @@
 // =============================================================================
 // GLOBAL
 // =============================================================================
+h1, h2, h3, h4, h5 {
+  font-family: $sanstitle;
+}
 
 h1 {
-  font-family: $sanstitle;
-  font-size: 220%;
+  font-size: 205%;
   font-weight: 300;
   color: $gray3;
+  margin: 0;
 
   a {
     color: $gray4;
   }
+  + .text-small {
+    margin-top: -4px;
+  }
 }
-
+h2 {
+  font-size: 180%;
+  font-weight: 300;
+}
+h4 {
+  font-size: 90%;
+  font-weight: 300;
+  text-transform: uppercase;
+}
 a {
   color: $blue;
+}
+hr {
+  border: none;
+  border-bottom: 1px solid $gray1;
 }
 .block {
   display: block;
@@ -22,7 +40,10 @@ a {
 .centered {
   text-align: center;
 }
-
+.absolute-right {
+  position: absolute;
+  right: 0px;
+}
 .pull-right {
   float: right;
 }
@@ -33,8 +54,17 @@ a {
 .text-right {
   text-align: right;
 }
+th.text-right {
+  text-align: right !important;
+}
 .text-left {
   text-align: left;
+}
+.text-small {
+  font-size: 70%;
+  &.muted {
+    color: $gray3;
+  }
 }
 .align-top {
   @include align-self(flex-start);
@@ -48,7 +78,242 @@ a {
 }
 
 .wrap-text {
-  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 400px;
+}
+
+.side-link {
+  float: left;
+  margin-left: -43px;
+
+  &.btn-add {
+    margin-left: -73px;
+  }
+  &.ontop {
+    margin-top: 30px;
+    &.fixed {
+      top: 0px;
+    }
+  }
+}
+
+a[title="Back"] {
+  margin-left: -42px;
+}
+
+.button-actions {
+  margin-top: 30px;
+
+  hr {
+    border-color: $gray1;
+    margin-bottom: 35px;
+  }
+}
+
+.box {
+  background: $white;
+  padding: 25px;
+
+  &.small {
+    padding: 10px;
+  }
+
+  &.big {
+    padding: 65px;
+  }
+
+  &.light {
+    border: 1px solid $gray1;
+  }
+  &.gray {
+    background: $gray1;
+    border-radius: 3px;
+  }
+  &.shadow {
+    border-radius: 3px;
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
+  }
+}
+
+
+.institution-container {
+
+  + .institution-name {
+    display: none;
+  }
+
+  &.active {
+    input[type="radio"] + .institution-option {
+      opacity: 0.3;
+    }
+    input[type="radio"]:checked + .institution-option {
+      opacity: 1;
+    }
+    + .institution-name {
+      display: block;
+      margin-bottom: 400px;
+    }
+  }
+
+  .institution-radio {
+    display: inline-block;
+
+    label {
+      margin: 0 !important;
+
+      .btn-add {
+        cursor: pointer;
+      }
+
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+  }
+
+  h4 {
+    font-weight: 700;
+  }
+
+  p {
+    min-height: 90px;
+  }
+}
+
+.institution-name {
+  margin-top: 60px;
+}
+
+.filters {
+  background: $gray1;
+  margin: -10px -10px 0;
+  padding: 0 1em 0.5em;
+
+  .filter {
+    @include flex(0 0 16%);
+    margin: 0 2%;
+
+    > label {
+      min-height: auto;
+      line-height: 15px;
+    }
+
+    > input {
+      height: 36px;
+    }
+    .select.input-large,
+    .Select.is-searchable,
+    .LocationSelect {
+      width: 100%;
+    }
+  }
+
+  .advanced {
+    @include transition(all ease .5s);
+    margin-top: 15px;
+    height: 0px;
+    overflow: hidden;
+
+    &.show {
+      height: 70px;
+    }
+  }
+}
+
+.add-new {
+  background: $blue;
+  margin: -10px -10px 10px;
+  padding: 0 1em 0.5em;
+
+  h2 {
+    color: $white;
+    margin: 0.3em 0;
+  }
+}
+
+.edit {
+  border-bottom: 1px solid $gray2;
+  margin: -1.5em -1em 1em;
+  padding: 0 1em 0.5em;
+
+  h2 {
+    margin: 0.3em 0;
+  }
+
+}
+
+#nav-context {
+  background: image-url('arrow-top-header.png') no-repeat right top;
+  line-height: 60px;
+  color: $white;
+  margin-left: 10px;
+  padding-right: 35px;
+  display: inline-block;
+  vertical-align: middle;
+  height: 60px;
+  width: 180px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.flash {
+  border-radius: 50px;
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
+  background: $white;
+  color: $gray4;
+  font-weight: 700;
+  border: 1px solid $gray1;
+  padding: 18px 30px;
+  height: 56px;
+  min-width: 380px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1;
+
+  .close-notification {
+    font-family: $sans;
+    font-size: 18px;
+    color: $gray3;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    right: 18px;
+    top: 15px;
+    cursor: pointer;
+  }
+
+}
+
+.flash-error-reactjs {
+  @extend .flash;
+  position: inherit;
+}
+
+.explore-link {
+  background: image-url('ic-search-blue.png') no-repeat left 2px;
+  font-family: "Titillium Web", sans-serif;
+  color: $gray3;
+  text-transform: uppercase;
+  padding-left: 22px;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.nodisplay {
+  display: none;
+}
+
+.deleted {
+  color: $gray3;
+  &::after {
+    content: "(DELETED)";
+    color: $red;
+  }
 }
 
 .underline {
@@ -59,21 +324,27 @@ a {
   }
 }
 
-.side-link {
-  float: left;
-  margin-left: -43px;
+.custom-fields-title > .col {
+  @extend label;
+  line-height: 24px;
+  border-bottom: 3px solid $black;
+  padding-top: 0;
+}
+.custom-fields-line > .col {
+  border-bottom: 1px solid $gray1;
+  padding: 5px 10px;
 
-  &.btn-add {
-    margin-top: 30px;
-    margin-left: -73px;
+  label {
+    color: $black;
+    text-transform: none;
+  }
+  span.absolute-right {
+    top: 15px;
+  }
+  .Select {
+    border-bottom: none;
+  }
+  .Select-placeholder {
+    padding-top: 10px;
   }
 }
-
-a[title="Back"] {
-  margin-left: -42px;
-}
-
-.button-actions {
-  margin-top: 30px;
-}
-

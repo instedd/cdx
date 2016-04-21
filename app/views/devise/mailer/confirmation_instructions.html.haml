@@ -1,0 +1,7 @@
+%h2
+  Welcome
+  = @email
+%p
+  Confirm your email and start using our platform
+.button-actions
+  = link_to 'Confirm email', confirmation_url(@resource, confirmation_token: @token), class: 'btn btn-primary'

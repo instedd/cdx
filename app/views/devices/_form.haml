@@ -1,24 +1,35 @@
 = form_for(@device) do |f|
-  - if @device.errors.present?
-    .alert-container
-      .alert.alert-error
-        %ul
-          - @device.errors.full_messages.each do |msg|
-            %li= msg
+  = validation_errors @device
 
-  = render 'shared/select_institution_or_hidden', f: f, select_class: ''
+  .row
+    .col.pe-2
+      = f.label :institution
+    .col
+      .value= @navigation_context.institution.name
 
   .row
     .col.pe-2
       = f.label :device_model_id
     .col
-      = f.collection_select :device_model_id, @device_models, :id, :full_name, {include_blank: "Choose one"}
-  - if can?(Policy::Actions::READ_SITE, Site)
+      = cdx_select form: f, name: :device_model_id, class: 'input-x-large' do |select|
+        - select.items(@device_models, :id, :full_name)
+
+  - if @allow_to_pick_site
     .row
       .col.pe-2
         = f.label :site
       .col
-        = f.collection_select(:site_id, @sites, :id, :name, {include_blank: "Choose one"}, class: 'ddown')
+        = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+          - select.item "", "None"
+          - select.items(@sites, :id, :name)
+  - elsif f.object.new_record?
+    = f.hidden_field :site_id
+  - else # once created is better to show site name, otherwise user might have read access to many site's device, and we should avoid not showing site name in that scenario
+    .row
+      .col.pe-2
+        = f.label :site
+      .col
+        .value= f.object.site.name
   .row
     .col.pe-2
       = f.label :name
@@ -33,7 +44,24 @@
     .col.pe-2
       = f.label :time_zone
     .col
-      = f.time_zone_select(:time_zone, nil,{ default: "UTC"}, class: 'ddown')
+      = cdx_select form: f, name: :time_zone, class: 'input-x-large' do |select|
+        - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
+  - if @device.new_record? || @device.device_model.try(:supports_ftp)
+    .device-ftp-config{class: ('nodisplay' unless @device.device_model.try(:supports_ftp))}
+      .row
+        .col.pe-2= f.label :ftp_hostname, 'FTP'
+        .col.pe-2= f.text_field :ftp_hostname, placeholder: 'Hostname'
+        .col.pe-2= f.number_field :ftp_port, min: 0, max: 65535, placeholder: 'Port'
+        .col.pe-1
+          = f.label :ftp_passive, "Passive"
+        .col.pe-1
+          = f.check_box :ftp_passive
+          = f.label :ftp_passive, "&nbsp;".html_safe
+        .col.pe-2= f.text_field :ftp_directory, placeholder: 'Folder'
+      .row
+        .col.pe-2= f.label :ftp_username, 'Login'
+        .col.pe-2= f.text_field :ftp_username, placeholder: 'Username', autocomplete: 'off'
+        .col.pe-2= f.password_field :ftp_password, value: @device.ftp_password, placeholder: 'Password', autocomplete: 'off'
   #custom_mappings
     = render "custom_mappings" if @device.device_model
 
@@ -41,21 +69,25 @@
     .col
       = f.submit 'Save', class: 'btn-primary'
       - if @can_delete
-        = link_to "Delete", @device, method: :delete, data: { confirm: "Are you sure you want to delete the device '#{@device.name}'" }, class: 'btn-secondary pull-right'
+        = link_to "Delete", @device, method: :delete, data: { confirm: "You are about to permanently delete this site. This action CANNOT be undone. Are you sure you want to proceed?" }, class: 'btn-secondary pull-right'
 
 :coffeescript
-  selected_device_model_id = #{@device.device_model_id.to_s.to_json}
-  $("#device_device_model_id").ddslick(
-    selectedText: "Choose one"
-    onSelected: (data) ->
-      device_model_id = data.selectedData.value
+  $ ->
+    selected_device_model_id = #{@device.device_model_id.to_s.to_json}
+    cdx_select_on_change "device[device_model_id]", (device_model_id) ->
+      # Hide/show ftp config info
+      supports_ftp = _.find(gon.device_models, (dm) -> dm.id == parseInt(device_model_id)).supports_ftp
+      $('.device-ftp-config').toggle(!!supports_ftp).find('input').prop('disabled', !supports_ftp)
+
+      # Load custom mappings
       if device_model_id != selected_device_model_id
         $("#custom_mappings").load(
           "/devices/custom_mappings",
-          "device_model_id": device_model_id,
-          "device_id": #{@device.id.to_json}
+          {
+            "device_model_id": device_model_id,
+            "device_id": #{@device.id.to_json}
+          },
+          ->
+            cdx_init_components($("#custom_mappings"))
         )
         selected_device_model_id = device_model_id
-  )
-
-

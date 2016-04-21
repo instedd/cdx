@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "version": "1.1.2",
+    "api_version": "1.5.0",
+    "conditions": [
+      "mtb"
+    ],
+    "source": {
+      "type": "json"
+    }
+  },
+  "custom_fields" : {
+  },
+  "field_mapping": {
+    "sample.id" : { "lookup": "event.sample_ID" },
+    "test.site_user" : { "lookup": "event.system_user" },
+    "test.start_time" : { "lookup": "event.start_time" },
+    "test.end_time" : { "lookup": "event.end_time" },
+    "test.id" : { "lookup": "event.event_id" },
+    "test.error_code" : { "lookup": "event.error_code" },
+    "test.error_description" : { "lookup": "event.error_description" },
+    "test.name" : { "lookup": "event.assay_name" },
+    "test.type" : { "case" : [
+      { "lookup": "event.test_type" },
+      [
+        { "when" : "0", "then" : "specimen"},
+        { "when" : "*", "then" : "qc"}
+      ]
+    ]},
+    "test.status" : { "script" : "
+      if( message['event']['error_code'] != null) { 'error' }
+      else if ( message['event']['result'].match(/.*INVALID.*/i) ) { 'invalid' }
+      else if ( message['event']['result'].match(/.*ERROR.*/i) ) { 'error' }
+      else if ( message['event']['result'].match(/.*NO RESULT.*/i) ) { 'no_result' }
+      else if ( message['event']['result'].match(/.*Rif Resistance.*/i) ) { 'success' }
+      else if ( message['event']['result'].match(/.*MTB DETECTED.*/i) ) { 'success' }
+      else { 'error' }
+    "},
+    "test.assays.condition" : { "script" : "['mtb', 'rif']" },
+    "test.assays.result" : {
+      "script": "
+      if(message['event']['result'].match(/.*INVALID.*/i) || message['event']['result'].match(/.*ERROR.*/) || message['event']['result'].match(/.*NO RESULT.*/)) {
+        ['n/a', 'n/a']
+      } else {
+        if(message['event']['result'].match(/.*MTB DETECTED.*/i)){
+          mtb = 'positive'
+        } else if(message['event']['result'].match(/.*MTB INDETERMINATE.*/i)) {
+          mtb = 'indeterminate'
+        } else {
+          mtb = 'negative'
+        };
+        if(message['event']['result'].match(/.*RIF Resistance DETECTED.*/i)){
+          rif = 'positive'
+        } else if(message['event']['result'].match(/.*RIF Resistance INDETERMINATE.*/i)) {
+          rif = 'indeterminate'
+        } else {
+          rif = 'negative'
+        };
+        [mtb, rif]
+      }"
+    },
+    "test.assays.quantitative_result" : { "script" : "
+      var match = [];
+      if(match = message['event']['result'].match(/.*MTB DETECTED ([\\w\\s]+)|.*/i)) {
+        match[1]
+      } else {
+        null
+      }
+    "}
+  }
+}

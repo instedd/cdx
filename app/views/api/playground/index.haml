@@ -4,35 +4,33 @@
     %h4 Submit message
     %form#report_form(method="post")
       %label.block(for="device") Device
-      %select.ddown#device
-        = @devices.map do |device|
-          %option(value="") Select device
-          %option{ value: device.uuid}=device.name
+
+      = cdx_select name: "device" do |select|
+        - select.items @devices, :uuid, :name
+
       %label.block(for="data") Data
       %textarea.input-block#data{:rows => "18"}
-        :preserve
-          {
-            //"start_time" : "2014-08-05T20:29:19Z",
-            "patient_id" : 2,
-            "patient_name" : "Lorem Ipsum",
-            "patient_telephone_number" : "12345678",
-            "patient_zip_code" : "1234",
-            //"test_id" : "1",
-            "assay_name" : "MTB Assay",
-            "age" : 20,
-            "system_user" : "jdoe",
-            "test_type" : "specimen",
-            "gender" : "male",
-            //"error_code" : "1234",
-            "results": [
-              {
-                "condition": "mtb",
-                "result": "positive"
-              }
-            ]
-          }
       .results.playground-error
-      %input#create_button.btn-primary(name="commit" type="submit" value="Create message")
+
+      .row
+        .col
+          = "Test results to generate:"
+        .col
+          %input{:max => "500", :min => "0", :value => "0", :id => "repeat_demo", :type => "number"}
+      .row
+        .col
+          = "Start date time:"
+        .col
+          = datetime_local_field("data", "start_datetime")
+      .row
+        .col
+          = "End date time:"
+        .col
+          = datetime_local_field("data", "end_datetime")
+      .row
+        .col
+          %input#create_button.btn-primary(name="commit" type="submit" value="Create message")
+
   .col
     .row
       .col
@@ -48,7 +46,7 @@
           %textarea.input-block#post_body{:rows => "8"}
       .row
         .col
-          %input#query_button.btn-primary(name="commit" type="submit" value="Query")
+          %input#query_button.btn-primary(type="submit" value="Query")
     .row
       .col
         #response_div

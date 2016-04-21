@@ -1,0 +1,49 @@
+[
+  {
+    "key": "admin",
+    "name": "Institution <%= institution_name %> Admin",
+    "policy": {
+      "statement": [
+        {
+          "resource": "institution/<%= institution_id %>",
+          "action": [
+            "institution:read",
+            "institution:update",
+            "institution:createRole",
+            "institution:readUsers"
+          ],
+          "delegable": true
+        },
+        {
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "testResult:medicalDashboard",
+          "delegable": true
+        },
+        {
+          "resource": "role?institution=<%= institution_id %>",
+          "action": "*",
+          "delegable": true
+        }
+      ]
+    }
+  },
+  {
+    "key": "reader",
+    "name": "Institution <%= institution_name %> Reader",
+    "policy": {
+      "statement": [
+        {
+          "resource": "testResult?institution=<%= institution_id %>",
+          "action": "testResult:medicalDashboard"
+        },
+        {
+          "resource": "institution/<%= institution_id %>",
+          "action": [
+            "institution:read",
+            "institution:readUsers"
+          ]
+        }
+      ]
+    }
+  }
+]

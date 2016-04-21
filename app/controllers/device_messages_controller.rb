@@ -1,14 +1,18 @@
 class DeviceMessagesController < ApplicationController
-  before_filter :load_device
   before_filter :load_message, only: [:raw, :reprocess]
 
   def index
-    @messages = @device.device_messages
-    render layout: false if request.xhr?
+    device_ids = check_access(Device, SUPPORT_DEVICE).within(@navigation_context.entity, @navigation_context.exclude_subsites).pluck(:id)
+    @messages = DeviceMessage.where("device_id IN (?)", device_ids).joins(device: :device_model).where('devices.site_id = device_messages.site_id OR (devices.site_id IS NULL AND device_messages.site_id IS NULL)').reverse_order
+    apply_filters
+    @date_options = date_options_for_filter
+    @devices = check_access(Device, READ_DEVICE).within(@navigation_context.entity)
+    @device_models = DeviceModel.all
   end
 
   def raw
-    ext, type = case @device.current_manifest.data_type
+    return unless authorize_resource(@message.device, READ_DEVICE)
+    ext, type = case @message.device.current_manifest.data_type
     when 'json'
       ['json', 'application/json']
     when 'csv', 'headless_csv'
@@ -23,19 +27,28 @@ class DeviceMessagesController < ApplicationController
   end
 
   def reprocess
+    return unless authorize_resource(@message.device, READ_DEVICE)
     @message.reprocess
-    redirect_to device_device_messages_path(@device),
+    redirect_to device_messages_path,
                 notice: 'The message will be reprocessed'
   end
 
   private
 
-  def load_device
-    @device = Device.find params[:device_id]
-    authorize_resource(@device, READ_DEVICE)
+  def apply_filters
+    @messages = @messages.where("devices.uuid = ?", params["device.uuid"]) if params["device.uuid"].present?
+    @messages = @messages.where("device_models.id = ?", params["device_model"]) if params["device_model"].present?
+    @messages = @messages.where("index_failure_reason LIKE ?", "%#{params["message"]}%") if params["message"].present?
+    @messages = @messages.where("device_messages.created_at > ?", params["created_at"]) if params["created_at"].present?
+
+    @total = @messages.count
+    @page_size = (params["page_size"] || 10).to_i
+    @page = (params["page"] || 1).to_i
+    offset = (@page - 1) * @page_size
+    @messages = @messages.limit(@page_size).offset(offset)
   end
 
   def load_message
-    @message = @device.device_messages.find(params[:id])
+    @message = DeviceMessage.find(params[:id])
   end
 end

@@ -25,15 +25,15 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
     end
 
     it "maps the core fields" do
-      expect(template.build_properties_mapping).to eq(
+      expect(template.build_properties_mapping("test")).to eq(
         {
           "sample"=> {
             "properties" => {
-              "uuid"=> {
+              "id"=> {
                 "type"=> "string",
                 "index"=> "not_analyzed"
               },
-              "id"=> {
+              "uuid"=> {
                 "type"=> "string",
                 "index"=> "not_analyzed"
               },
@@ -76,42 +76,6 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "type"=> "integer",
                 "index"=> "not_analyzed"
               },
-              "patient_age" => {
-                "properties" => {
-                  "in_millis" => {
-                    "type" => "long",
-                    "index" => "not_analyzed"
-                  },
-                  "milliseconds" => {
-                    "type" => "integer",
-                    "index" => "not_analyzed"
-                  },
-                  "seconds" => {
-                    "type" => "integer",
-                    "index" => "not_analyzed"
-                  },
-                  "minutes" => {
-                    "type" => "integer",
-                    "index" => "not_analyzed"
-                  },
-                  "hours" => {
-                    "type" => "integer",
-                    "index" => "not_analyzed"
-                  },
-                  "days" => {
-                    "type" => "integer",
-                    "index" => "not_analyzed"
-                  },
-                  "months" => {
-                    "type" => "integer",
-                    "index" => "not_analyzed"
-                  },
-                  "years" => {
-                    "type" => "integer",
-                    "index" => "not_analyzed"
-                  }
-                }
-              },
               "site_user"=> {
                 "type"=> "string",
                 "index"=> "not_analyzed"
@@ -136,6 +100,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                     "index" => "not_analyzed"
                   },
                   "result"=> {
+                    "type"=> "string",
+                    "index"=> "not_analyzed"
+                  },
+                  "quantitative_result"=> {
                     "type"=> "string",
                     "index"=> "not_analyzed"
                   }
@@ -179,6 +147,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
               "uuid" => {
                 "type" => "string",
                 "index" => "not_analyzed"
+              },
+              "path" => {
+                "type" => "string",
+                "index" => "not_analyzed"
               }
             }
           },
@@ -202,6 +174,82 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
               "admin_levels" => {
                 "properties" => {}
               }
+            }
+          },
+          "encounter" => {
+            "properties" => {
+              "uuid" => {
+                "type" => "string",
+                "index" => "not_analyzed"
+              },
+              "patient_age" => {
+                "properties" => {
+                  "in_millis" => {
+                    "type" => "long",
+                    "index" => "not_analyzed"
+                  },
+                  "milliseconds" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "seconds" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "minutes" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "hours" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "days" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "months" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  },
+                  "years" => {
+                    "type" => "integer",
+                    "index" => "not_analyzed"
+                  }
+                }
+              },
+              "start_time"=> {
+                "type"=> "date",
+                "index"=> "not_analyzed"
+              },
+              "end_time"=> {
+                "type"=> "date",
+                "index"=> "not_analyzed"
+              },
+              "diagnosis" => {
+                "type" => "nested",
+                "properties" => {
+                  "name" => {
+                    "type" => "string",
+                    "index" => "not_analyzed"
+                  },
+                  "condition" => {
+                    "type" => "string",
+                    "index" => "not_analyzed"
+                  },
+                  "result"=> {
+                    "type"=> "string",
+                    "index"=> "not_analyzed"
+                  },
+                  "quantitative_result"=> {
+                    "type"=> "string",
+                    "index"=> "not_analyzed"
+                  }
+                }
+              },
+              "custom_fields" => {
+                "type" => "object",
+              },
             }
           }
         }

@@ -6,7 +6,7 @@
       - if can_unpublish
         You may withdraw it as long as there are no devices outside this institution using this device model.
   - if can_unpublish
-    .row.button-actions
+    .row
       .col
         %button{type: 'submit', class: 'btn-secondary', name: 'unpublish', value: "1", id: 'device-model-publish'}
           Withdraw
@@ -18,6 +18,6 @@
       - if can_publish
         Publishing it will make it available to all institutions in CDX.
   - if can_publish
-    .row.button-actions
+    .row
       .col
         %button{type: 'submit', class: 'btn-secondary', name: 'publish', value: "1", id: 'device-model-publish'}  Publish

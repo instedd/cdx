@@ -1,5 +1,6 @@
 [![Stories in Ready](https://badge.waffle.io/instedd/cdx.png?label=ready&title=Ready)](https://waffle.io/instedd/cdx)
 [![Build Status](https://travis-ci.org/instedd/cdx.svg?branch=master)](https://travis-ci.org/instedd/cdx)
+[![Dependency Status](https://gemnasium.com/instedd/cdx.svg)](https://gemnasium.com/instedd/cdx)
 
 # CDX
 
@@ -13,15 +14,18 @@ To start developing:
 
 1. Clone the repo.
 
-2. Install dependencies: `bundle install`
+2. Install dependencies:
+	* `bundle install`.
+	* PhantomJS 1.9.8 for [Poltergeist](https://github.com/teampoltergeist/poltergeist) (development and test only)
+	* ImageMagick for [Paperclip](https://github.com/thoughtbot/paperclip#image-processor).
 
 3. Setup development database: `bundle exec rake db:setup`
 
 4. Setup test database: `bundle exec rake db:test:prepare`
 
-5. Setup elasticsearch index template: `bundle exec rake cdx_elasticsearch:setup`
+5. Setup elasticsearch index template: `bundle exec rake elasticsearch:setup`
 
-6. Run tests: `bundle exec rspec`
+6. Run tests: `bundle exec rake` (this will run `rspec` and `cucumber`)
 
 7. Start development server: `bundle exec rails s`
 
@@ -55,15 +59,15 @@ Locations are obtained from the [InSTEDD Location Service](https://github.com/in
 
 ### Poirot
 
-CDX uses [Poirot](https://github.com/instedd/poirot_rails) for additional logging. You need to install zeromq library for it to work, or disable it in config/poirot.yml.
+CDX uses [Poirot](https://github.com/instedd/poirot_rails) for additional logging. You need to install `zeromq` library version 3.2.0 for it to work, or disable it in config/poirot.yml. On Mac OS, run `brew install homebrew/versions/zeromq32`; if you have other versions of `zeromq` installed, it may be required to run `brew link zeromq32 --force` as well.
 
 ### NNDD
 
 To run [notifiable diseases](https://github.com/instedd/notifiable-diseases) on development, checkout the project and symlink the custom settings files in `/etc/nndd` on this project:
 
     $ cd $NOTIFIABLE_DISEASES/conf
-    $ ln -s $CDP/etc/nndd/settings.local.json settings.local.json
-    $ ln -s $CDP/etc/nndd/custom.local.scss custom.local.scss
+    $ ln -s $CDP/etc/nndd/overrides.js overrides.js
+    $ ln -s $CDP/etc/nndd/overrides.css overrides.css
 
 ### Sync Server
 

@@ -1,5 +1,5 @@
 class ManifestFieldMapping
-  include ActionView::Helpers::DateHelper
+  include DateDistanceHelper
 
   def initialize(manifest, field, device, data)
     @manifest = manifest
@@ -205,7 +205,7 @@ class ManifestFieldMapping
 
       mappings.each do |mapping|
         else_mapping ||= mapping["else"]
-        if (when_value = mapping["when"]) && value.match(when_value.gsub("*", ".*"))
+        if (when_value = mapping["when"]) && value.to_s.match(when_value.gsub("*", ".*"))
           return traverse(mapping["then"], data)
         end
       end
@@ -264,40 +264,6 @@ class ManifestFieldMapping
         [key, traverse(value, data).to_i]
       end
     ]
-  end
-
-  def years_between(first_date, second_date)
-    distance_between(first_date, second_date, :years)
-  end
-
-  def months_between(first_date, second_date)
-    distance_between(first_date, second_date, :months)
-  end
-
-  def days_between(first_date, second_date)
-    distance_between(first_date, second_date, :days)
-  end
-
-  def hours_between(first_date, second_date)
-    distance_between(first_date, second_date, :hours)
-  end
-
-  def minutes_between(first_date, second_date)
-    distance_between(first_date, second_date, :minutes)
-  end
-
-  def seconds_between(first_date, second_date)
-    distance_between(first_date, second_date, :seconds)
-  end
-
-  def milliseconds_between(first_date, second_date)
-    seconds_between(first_date, second_date) * 1000
-  end
-
-  def distance_between(first_date, second_date, unit)
-    second_date = DateTime.parse(second_date.to_s)
-    first_date = DateTime.parse(first_date.to_s)
-    distance_of_time_in_words_hash(first_date, second_date, accumulate_on: unit)[unit]
   end
 
   def convert_time(time_interval, source_unit, desired_unit)
@@ -367,6 +333,14 @@ class ManifestFieldMapping
         end
       else
         value.to_i
+      end
+    elsif @field.type == 'float' &&  ManifestFieldValidation.is_a_float?(value)
+      if value.is_a? Array
+        value.map do |value|
+          value && value.to_f
+        end
+      else
+        value.to_f
       end
     else
       value

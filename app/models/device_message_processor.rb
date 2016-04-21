@@ -7,8 +7,10 @@ class DeviceMessageProcessor
   end
 
   def process
-    @device_message.parsed_messages.map do |parsed_message|
-      SingleMessageProcessor.new(self, parsed_message).process
+    Location.with_cache do
+      @device_message.parsed_messages.map do |parsed_message|
+        SingleMessageProcessor.new(self, parsed_message).process
+      end
     end
   end
 
@@ -27,206 +29,146 @@ class DeviceMessageProcessor
   class SingleMessageProcessor
     attr_reader :parsed_message, :parent
 
-    delegate :device, :device_message, :client, to: :parent
+    delegate :institution, :device, :device_message, :client, to: :parent
 
     def initialize(device_message_processor, parsed_message)
       @parent = device_message_processor
       @parsed_message = parsed_message
+      compute_sample_id_reset_policy
+      @blender = Blender.new(institution)
     end
+
 
     def process
-      test = find_or_initialize_test
-      old_sample = test.sample
-      old_patient = test.patient
-      old_encounter = test.encounter
+      # Load original test if we are updating one
+      test_id = parsed_message.get_in('test', 'core', 'id')
+      original_test = test_id && TestResult.within_time(1.year, @parent.device_message.created_at).find_by(test_id: test_id, device_id: device.id, site_id: device.site_id)
+      test_result = original_test || TestResult.new(institution: institution, device: device) 
+      
+      test_result.device_messages << device_message
+      test_result.test_result_parsed_data << TestResultParsedDatum.new(data: @parsed_message)
+      test_blender = @blender.load(test_result)
 
-      new_sample,    sample_core_fields    = find_or_initialize_sample
-      new_encounter, encounter_core_fields = find_or_initialize_encounter
-      new_patient,   patient_core_fields   = find_or_initialize_patient
+      # Merge new attributes and sample id
+      sample_id = parsed_message.get_in('sample', 'core', 'id').try(:to_s)
+      test_blender.merge_attributes attributes_for('test').merge(sample_id: sample_id)
 
-      connect_before test, new_sample, new_encounter, new_patient
+      # Re-assign each entity if present and does not match the original test's
+      parent_blenders = {}
+      [Sample, Encounter, Patient].each do |klazz|
 
-      process_sample    test, new_sample      if new_sample
-      process_encounter test, new_encounter   if new_encounter
-      process_patient   test, new_patient     if new_patient
+        original_entity_id = entity_id_for(original_test, klazz)
+        new_entity_id = parsed_message.get_in(klazz.entity_scope, (klazz == Patient ? 'pii' : 'core'), 'id').try(:to_s)
+        entity_id_does_not_match = original_entity_id && new_entity_id && original_entity_id != new_entity_id
 
-      connect_after test
+        new_entity = find_entity_by_id(klazz, new_entity_id)
+        original_blender = test_blender.send(klazz.entity_scope)
 
-      save_entity test.sample,    sample_core_fields
-      save_entity test.encounter, encounter_core_fields
-      save_entity test.patient,   patient_core_fields
+        new_entity ||= klazz.new(institution: institution) if entity_id_does_not_match || original_blender.nil?
 
-      test.save!
+        parent_blenders[klazz] = if new_entity
+          @blender.load(new_entity)
+        else
+           original_blender
+        end
 
-      index_test test
+        @blender.set_parent(test_blender, parent_blenders[klazz])
+      end
+
+      # Merge entity attributes from this device message
+      [Sample, Encounter, Patient].each do |klazz|
+        parent_blenders[klazz].merge_attributes attributes_for(klazz.entity_scope)
+      end
+
+      parent_blenders[Encounter].site = device.site
+
+      # Commit changes
+      @blender.save_and_index!
+      
+      check_invalid_start_time_alert(test_result)
     end
 
-    private
-
-    def find_or_initialize_test
-      test_id = parsed_message["test"]["core"]["id"]
-      test = TestResult.new device_messages: [device_message],
-                            test_id: test_id,
-                            device: device
-      assign_fields parsed_message, test
-
-      if test_id && existing = TestResult.from_the_past_year(@parent.device_message.created_at).find_by(test_id: test_id, device_id: test.device_id)
-        existing.merge(test)
-        existing
-      else
-        test
+   private
+    
+    def check_invalid_start_time_alert(test_result)
+      start_time = @parsed_message["test"]["core"]["start_time"]
+      end_time = @parsed_message["test"]["core"]["end_time"]     
+      start_time = Time.now if start_time==nil   
+      end_time = Time.now if end_time==nil     
+      if (start_time > Time.now + 1.day) || (end_time < start_time)
+        #CHECK does not return diaabled alerts
+        any_alerts_with_invalid_test_date_count= Alert.invalid_test_date.where({enabled: true, institution_id: test_result.institution_id}).count
+        if any_alerts_with_invalid_test_date_count > 0
+          any_alerts_with_invalid_test_date= Alert.invalid_test_date.where({enabled: true, institution_id: test_result.institution_id})
+          any_alerts_with_invalid_test_date.each do |alert|  
+            if ((alert.sample_id.length==0) || (alert.sample_id == SampleIdentifier.where(id: test_result.sample_identifier_id).pluck(:entity_id)[0])) 
+              sites=alert.sites.map{|site| site.id} 
+              if (sites.length==0) || ((sites.length > 0) and (sites.include? test_result.site_id))
+                devices=alert.devices.map{|device| device.id} 
+                if (devices.length==0) || ((devices.length > 0) and (devices.include? test_result.device_id))
+                  AlertJob.perform_later alert.id, test_result.uuid
+                end
+              end
+            end                        
+          end
+        end
       end
     end
 
-    def find_or_initialize_sample
-      find_or_initialize_entity Sample, ((parsed_message["sample"] || {})["core"] || {})["id"]
-    end
 
-    def find_or_initialize_patient
-      find_or_initialize_entity Patient, ((parsed_message["patient"] || {})["pii"] || {})["id"]
-    end
-
-    def find_or_initialize_encounter
-      find_or_initialize_entity Encounter, ((parsed_message["encounter"] || {})["core"] || {})["id"]
-    end
-
-    def find_or_initialize_entity(klass, entity_id, scope_by_last_year = true)
-      new_entity = klass.new institution_id: @parent.institution.id
-      assign_fields parsed_message, new_entity
-
-      if entity_id && (existing = find_entity_by_id(klass, entity_id, scope_by_last_year))
-        existing_indexed = existing.core_fields.deep_dup
-        existing.merge(new_entity)
-        [existing, existing_indexed]
-      elsif new_entity.empty_entity?
-        [nil, nil]
-      else
-        [new_entity, nil]
-      end
-    end
-
-    def find_entity_by_id(klass, entity_id, scope_by_last_year = true)
+    def find_entity_by_id(klass, entity_id)
+      return nil if entity_id.nil?
       query = klass
-      if scope_by_last_year
-        query = query.from_the_past_year(@parent.device_message.created_at)
-      end
-      query.find_by_entity_id(entity_id, @parent.institution.id)
+      query = query.within_time(entity_reset_time_span(klass), @parent.device_message.created_at) if klass != Patient
+      query_opts = { institution_id: @parent.institution.id }
+      query_opts[:site_id] = @parent.device.site_id unless @parent.device.site_id.nil? || @parent.institution.kind_manufacturer?
+      query.find_by_entity_id(entity_id, query_opts)
     end
 
-    def process_sample(test, sample)
-      unless test.sample
-        test.sample = sample
-        return
-      end
-
-      if !sample.entity_id || same_uid?(sample, test.sample)
-        test.sample.merge sample
-        return
-      end
-
-      unless test.sample.entity_id
-        sample.merge test.sample
-        test.sample.destroy
-      end
-
-      test.sample = sample
+    def attributes_for(scope)
+      keys = {'core' => 'core_fields', 'custom' => 'custom_fields', 'pii' => 'plain_sensitive_data'}
+      Hash[keys.map do |msg_key, attr_key|
+        [attr_key, parsed_message.get_in(scope, msg_key) || {}]
+      end]
     end
 
-    def process_encounter(test, encounter)
-      unless test.encounter
-        test.encounter = encounter
-        return
-      end
-
-      if !encounter.entity_id || same_uid?(encounter, test.encounter)
-        test.encounter.merge encounter
-        return
-      end
-
-      unless test.encounter.entity_id
-        encounter.merge test.encounter
-        test.encounter.destroy
-      end
-
-      test.encounter = encounter
+    def assign(entity, attributes)
+      attributes = attributes.with_indifferent_access
+      entity.core_fields = attributes[:core_fields]
+      entity.custom_fields = attributes[:custom_fields]
+      entity.plain_sensitive_data = attributes[:plain_sensitive_data]
+      entity
     end
 
-    def process_patient(test, patient)
-      unless test.patient
-        test.patient = patient
-        return
+    def entity_id_for(test, klass)
+      return nil if test.nil?
+      if klass == Sample
+        test.sample_identifier.try(:entity_id)
+      else
+        test.send(klass.entity_scope).try(:entity_id)
       end
-
-      # Here we don't take the year into account
-      if !patient.entity_id || (patient.entity_id == test.patient.entity_id)
-        test.patient.merge patient
-        return
-      end
-
-      unless test.patient.entity_id
-        patient.merge test.patient
-        test.patient.destroy
-      end
-
-      test.patient = patient
     end
 
-    def same_uid?(new_entity, existing_entity)
-      return false unless new_entity.entity_id == existing_entity.entity_id
-
-      new_entity_created_at = new_entity.created_at || @parent.device_message.created_at
-      (new_entity_created_at - existing_entity.created_at).abs < 1.year
-    end
-
-    def index_test(test)
-      indexer = TestResultIndexer.new(test)
-      indexer.index
-    end
-
-    def assign_fields(parsed_message, entity)
-      entity.core_fields          = (parsed_message[entity.entity_scope] || {})["core"] || {}
-      entity.custom_fields        = (parsed_message[entity.entity_scope] || {})["custom"] || {}
-      entity.plain_sensitive_data = (parsed_message[entity.entity_scope] || {})["pii"] || {}
-    end
-
-    def connect_before(test, sample, encounter, patient)
-      unless test.patient
-        if encounter && encounter.patient
-          test.patient = encounter.patient
-        elsif sample && sample.patient
-          test.patient = sample.patient
+    def compute_sample_id_reset_policy
+      sample_id_reset_policy = @parent.device_message.device.site.try(:sample_id_reset_policy)
+      @sample_id_reset_time_span =
+        case sample_id_reset_policy
+        when "monthly"
+           1.month
+        when "weekly"
+          1.week
+        else
+          1.year
         end
-      end
+    end
 
-      unless test.encounter
-        if sample && sample.encounter
-          test.encounter = sample.encounter
-        end
+    def entity_reset_time_span(entity_class)
+      if entity_class == Sample
+        @sample_id_reset_time_span
+      else
+        1.year
       end
     end
 
-    def connect_after(test)
-      if test.encounter
-        test.encounter.patient = test.patient
-      end
-
-      if test.sample
-        test.sample.encounter = test.encounter
-        test.sample.patient   = test.patient
-      end
-    end
-
-    def save_entity(entity, old_core_fields)
-      entity.try :save!
-
-      return unless old_core_fields && old_core_fields != entity.try(:core_fields)
-
-      response = client.search index: Cdx::Api.index_name, body:{query: { filtered: { filter: { term: { "#{entity.entity_scope}.uuid" => entity.uuid } } } }, fields: []}, size: 10000
-      body = response["hits"]["hits"].map do |element|
-        { update: { _type: element["_type"], _id: element["_id"], data: { doc: {entity.entity_scope => entity.core_fields} } } }
-      end
-
-      client.bulk index: Cdx::Api.index_name, body: body unless body.blank?
-    end
   end
 end

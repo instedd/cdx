@@ -1,11 +1,12 @@
 class Cdx::Api::Elasticsearch::IndexedField
   attr_reader :name, :core_field, :sub_fields, :group_definitions, :filter_definitions
-  delegate :scoped_name, :type, :nested?, :valid_values, to: :core_field
+  delegate :scoped_name, :type, :nested?, :valid_values, :inside_nested?, to: :core_field
 
-  def self.for(core_field, api_fields, document_format = Cdx::Api::Elasticsearch::CdxDocumentFormat.new)
+  def self.for(core_field, api_fields, document_format)
     definition = api_fields.detect do |definition|
       definition['name'] == core_field.scoped_name
     end
+
     new(core_field, (definition || {}), document_format)
   end
 
@@ -15,7 +16,7 @@ class Cdx::Api::Elasticsearch::IndexedField
     @name = if already_nested
       scoped_name
     else
-      "test." + scoped_name
+      "#{document_format.entity_prefix}#{scoped_name}"
     end
 
     @name = document_format.indexed_field_name(@name)
@@ -30,21 +31,29 @@ class Cdx::Api::Elasticsearch::IndexedField
     end
   end
 
-  def self.grouping_detail_for field_name, values=nil, api
+  def self.grouping_detail_for field_name, values=nil, fields
     grouping_detail = nil
 
-    api.searchable_fields.detect do |field|
+    fields.searchable_fields.detect do |field|
       grouping_detail = field.grouping_detail_for field_name, values
     end
 
     grouping_detail
   end
 
+  def flatten
+    if nested?
+      sub_fields.map(&:flatten).flatten
+    else
+      self
+    end
+  end
+
   def grouping_detail_for field_name, values=nil
     GroupingDetail.for self, field_name, values
   end
 
-private
+  private
 
   def default_filter_definition
     case type

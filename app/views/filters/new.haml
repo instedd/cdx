@@ -1,5 +1,11 @@
-.row-fluid
-  .span12
-    %h3 New Filter
+- content_for(:subheader) do
+  .row.center.add-new
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to filters_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left-white.png"
+            New Filter
 
-    = render 'form'
+= render 'form'

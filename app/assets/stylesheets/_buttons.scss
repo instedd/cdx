@@ -48,17 +48,17 @@
 
 .btn-primary {
   @extend .btn;
-  background: $red;
+  background: $blue;
   color: $white;
 
   &:hover,
   &:focus {
-    background: darken($red, 5%);
+    background: darken($blue, 5%);
   }
 
   &:active,
   &.active {
-    background: darken($red, 10%);
+    background: darken($blue, 10%);
   }
 
   &.disabled,
@@ -87,12 +87,13 @@
 
 }
 
-
-.btn-add, .btn-add-secondary {
+.btn-add,
+.btn-add-secondary {
+  font-family: $sans;
   border-radius: 50%;
-  background: $red;
-  font-size: 150%;
-  font-weight: 300;
+  background: $blue;
+  font-size: 27px;
+  font-weight: 300 !important;
   color: $white;
   line-height: 48px;
   text-align: center;
@@ -103,7 +104,13 @@
 
   &.fixed {
     position: fixed;
-    top: 0px;
+    top: 30px;
+    z-index: 1;
+  }
+
+  &.icon span[class^="icon"] {
+    margin-top: -2px;
+
   }
 }
 
@@ -111,13 +118,64 @@
   background: $black;
 }
 
-
 .btn-link {
   @extend .btn;
+  background: none !important;
   color: $gray3;
   padding: 5px;
   height: auto;
   line-height: inherit;
+
+  &:hover,
+  &:focus {
+    color: $gray4;
+  }
+
+  &.not-allowed {
+    color: $gray3;
+    cursor: default;
+  }
+}
+
+.btn-href {
+  display: inline-block;
+  color: inherit;
+  line-height: inherit;
+  padding: 5px;
+  white-space: nowrap;
+}
+
+.btn-toggle {
+  border-radius: 50%;
+  background: image-url("arr-select-down-inv.png") no-repeat center 6px $gray3;
+  color: $white;
+  line-height: 25px;
+  text-align: center;
+  display: inline-block;
+  vertical-align: middle;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+
+  &.up {
+    background: image-url("arr-select-up-inv.png") no-repeat center 5px $gray3;
+
+  }
+}
+
+.btn-danger {
+  @extend .btn-primary;
+  background: $red;
+
+  &:hover,
+  &:focus {
+    background: darken($red, 5%);
+  }
+
+  &:active,
+  &.active {
+    background: darken($red, 10%);
+  }
 }
 
 .pager {
@@ -130,4 +188,16 @@
 
 [class^="btn"] + [class^="btn"] {
   margin-left: 30px;
+}
+
+.btn-add-link {
+  font-family: $sanstitle;
+  font-size: 80%;
+  font-weight: 300;
+  color: $blue !important;
+  text-transform: uppercase;
+
+  span[class^="icon"] {
+    margin-right: 8px;
+  }
 }
