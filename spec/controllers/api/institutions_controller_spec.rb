@@ -16,6 +16,7 @@ describe Api::InstitutionsController do
         ]})
       end
 
+
       it "should list the institutions for given user" do
         other_institution = Institution.make user: user
         Institution.make user: User.make
