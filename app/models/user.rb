@@ -3,10 +3,10 @@ class User < ActiveRecord::Base
   # :timeoutable
   devise :invitable, :database_authenticatable,
          :recoverable, :rememberable, :trackable,
-         :validatable, :confirmable, :omniauthable, :timeoutable,
+         :validatable, :confirmable, :timeoutable,
          :lockable, :password_expirable, :password_archivable
 
-  devise :registerable unless Settings.single_tenant
+  devise :omniauthable, :registerable unless Settings.single_tenant
 
   has_many :identities, dependent: :destroy
   has_many :institutions
