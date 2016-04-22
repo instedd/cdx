@@ -21,10 +21,16 @@ describe Api::InstitutionsController do
         other_institution = Institution.make user: user
         Institution.make user: User.make
         result = get :index, format: 'json'
-        expect(Oj.load(result.body)).to eq({'total_count' => 2, 'institutions' => [
+        
+        all_institutions = [
           {'uuid' => institution.uuid, 'name' => institution.name},
           {'uuid' => other_institution.uuid, 'name' => other_institution.name}
-        ]})
+        ]
+        new_sorted_institutions = all_institutions.sort_by { |f| f['name'] }
+
+        expect(Oj.load(result.body)).to eq({'total_count' => 2, 'institutions' =>
+          new_sorted_institutions
+        })
       end
 
       context 'CSV' do
