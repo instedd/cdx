@@ -1,7 +1,8 @@
 var PatientCard = React.createClass({
   getDefaultProps: function() {
     return {
-      canEdit: false
+      canEdit: false,
+      canAddTest: true
     }
   },
 
@@ -65,6 +66,14 @@ var PatientCard = React.createClass({
               return (
                 <a href={"/patients/" + patient.id + "/edit"} title="Edit">
                   <img src="#{asset_url("ic-pencil.png")}"/>
+                </a>);
+            }.bind(this))()}
+            {(function(){
+              if (!this.props.canAddTest) return;
+              if (this.props.showTestLink != true) return;
+              return (
+                <a href={"/encounters/new?mode=fresh_tests&patient_id=" + patient.id } title="Create Test Order" className="label">
+                  Create Test Order
                 </a>);
             }.bind(this))()}
             JSX

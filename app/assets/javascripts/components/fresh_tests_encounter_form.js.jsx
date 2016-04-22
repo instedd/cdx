@@ -44,8 +44,8 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
           </div>
           <div className="col">
             <p>dateselector_year_month</p>
+            </div>
           </div>
-        </div>
 
         <div className="row">
           <div className="col pe-2">

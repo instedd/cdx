@@ -188,12 +188,17 @@ var SiteTreeViewNode = React.createClass({
   onSiteClick: function(event) {
     //this.props.onSiteClick(this.props.site);
     event.preventDefault();
-    var url = window.location.href.split('?')[0];
     var ctx = this.props.site.uuid;
+    var url = window.location.href.split('?')[0];
+    //var bits = url.split('/');
+    //var trg = bits.pop();
+    //url = bits.join('/');
+    //$('div.col.maincol').load(url+'/api/'+trg+'?context='+ctx);
     $('div.col.maincol').load(url+'?nav=false&context='+ctx);
     $('li').removeClass('selected');
     $('li[data-reactid*="'+this.props.site.uuid+'"]').first().addClass('selected');
     $('#nav-context').attr('title',this.props.site.name).text('at '+this.props.site.name);
+    this.props.site.selected = true;
   },
 
   render: function() {
@@ -211,9 +216,10 @@ var SiteTreeViewNode = React.createClass({
       );
     }
 
+    if(site.selected) document.getElementById('nav-context').innerHTML = 'at '+site.name;
+
     return (
       <li key={site.uuid} className={(this.state.expanded ? "expanded" : "") + " " + (site.selected ? "selected" : "")}>
-
         <a href="#" onClick={this.onSiteClick}>
           {(function(){
             if (site.children.length > 0) {

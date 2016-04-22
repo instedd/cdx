@@ -8,7 +8,14 @@ var EncounterNew = React.createClass({
       new_samples: [],
       test_results: [],
       assays: [],
-      observations: ''
+      observations: '',
+      coll_sample_type: '',
+      coll_sample_other: '',
+      exam_reason: '',
+      tests_requested: '',
+      diag_comment: '',
+      treatment_weeks: 0,
+      testdue_date: ''
     }};
   },
 
@@ -21,7 +28,14 @@ var EncounterNew = React.createClass({
         new_samples: { $set: [] },
         test_results: { $set: [] },
         assays: { $set: [] },
-        observations: { $set: '' }
+        observations: { $set: '' },
+        coll_sample_type: { $set: '' },
+        coll_sample_other: { $set: '' },
+        exam_reason: { $set: '' },
+        tests_requested: { $set: '' },
+        diag_comment: { $set: '' },
+        treatment_weeks: { $set: 0 },
+        testdue_date: { $set: '' }
       }
     }));
   },
