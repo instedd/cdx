@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::InstitutionsController do
   let!(:user) { User.make }
-  let!(:institution) { Institution.make user: user }
+  let!(:institution) { Institution.make user: user, name: 'Acme Institution' }
 
   context "with signed in user" do
     before(:each) { sign_in user }
@@ -17,7 +17,7 @@ describe Api::InstitutionsController do
       end
 
       it "should list the institutions for given user" do
-        other_institution = Institution.make user: user
+        other_institution = Institution.make user: user, name: 'Other Institution'
         Institution.make user: User.make
         result = get :index, format: 'json'
         expect(Oj.load(result.body)).to eq({'total_count' => 2, 'institutions' => [

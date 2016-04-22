@@ -8,9 +8,9 @@ class EncountersController < ApplicationController
   def new
     if params[:patient_id].present?
       @institution = @navigation_context.institution
-      @patient_json = Jbuilder.new { |json|
+      @patient_json = Jbuilder.new do |json|
         scoped_patients.find(params[:patient_id]).as_json_card(json)
-      }.attributes!
+      end.attributes!
     end
 
     @possible_assay_results = TestResult.possible_results_for_assay
@@ -18,9 +18,10 @@ class EncountersController < ApplicationController
   end
 
   def create
-    perform_encounter_action "creating encounter" do
+    perform_encounter_action 'creating encounter' do
       prepare_encounter_from_json
       create_new_samples
+      @encounter.user = current_user
       @blender.save_and_index!
       @encounter.updated_diagnostic_timestamp!
     end
