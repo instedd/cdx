@@ -1,7 +1,7 @@
 class RegistrationsController < Devise::RegistrationsController
 
   before_filter :load_locales
-  skip_before_filter :ensure_context, except: [:edit, :update]
+  skip_before_filter :ensure_context, except: :edit
 
   protected
 
