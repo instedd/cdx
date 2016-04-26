@@ -20,7 +20,6 @@ module DemoData
     device_list.each do |device_list_info| 
       device = Device.includes(:device_model, :manifest, :institution, :site).find_by_name(device_list_info[:device]) 
       data= IO.read(File.join(Rails.root, 'app', 'jobs',  'demo_data', 'manifests_demo_template', device_list_info[:template]))
-
       repeat_demo_per_device.times do     
         changed_data=randomise_device_data(device, data.clone)
         device_message = DeviceMessage.new(device: device, plain_text_data: changed_data)
@@ -63,50 +62,63 @@ module DemoData
     ENV['USE_DEMO_DATA'] || Settings.use_demo_data
   end
 
+  def randomise_device_data(device, data, start_datetime='', end_datetime='')
+    result = results.sample
+    model = device.device_model.name
 
-  def randomise_device_data(device, data,start_datetime="", end_datetime="")
     if data.include?('{result}') 
-      result = conditions = ["INVALID", "ERROR", "NO RESULT","MTB NOT DETECTED","Rif Resistance DETECTED","Rif Resistance INDETERMINATE","MTB DETECTED","*"].sample
       data.gsub! '{result}', result
     end
+
     if data.include?('{system_user}') 
-      data.gsub! '{system_user}', 'demo-'+Faker::Name.name 
+      data.gsub! '{system_user}', system_users.sample
     end
+
     if data.include?('{sample_id}') 
       data.gsub! '{sample_id}', Faker::Number.number(6) 
     end
+
     if data.include?('{general_id}') 
       data.gsub! '{general_id}', Faker::Number.number(6) 
     end
+
     if data.include?('{city}') 
       data.gsub! '{city}', Faker::Address.city
     end
+
     if data.include?('{event_id}') 
       data.gsub! '{event_id}', Faker::Number.hexadecimal(10)  
     end
+
     if data.include?('{test_type}') 
       test_types = ["0","*"]
       data.gsub! '{test_type}', test_types.sample 
     end
+
     if data.include?('{gender_long}')   #fio device
       gender_long_types = ["Male","Female","*"]
       data.gsub! '{gender_long}', gender_long_types.sample 
     end
+
     if data.include?('{gender}') 
       gender_types = ["M","F","*"]
       data.gsub! '{gender}', gender_types.sample 
     end
+
     if data.include?('{race}') 
       race_types = ["2054-5","1002-5","2028-9","2076-8","2106-3","2131-1","*"]
       data.gsub! '{race}', race_types.sample 
     end
+
     if data.include?('{ethnicity}') 
       ethnicity_types = ["hispanic","not_hispanic","*"]
       data.gsub! '{ethnicity}', ethnicity_types.sample 
     end
+
     if data.include?('{age}') 
       data.gsub! '{age}', Faker::Number.between(5, 90).to_s
     end
+
     if data.include?('{decimal}') 
       data.gsub! '{decimal}', Faker::Number.between(0, 100).to_s
     end
@@ -120,7 +132,6 @@ module DemoData
       data.gsub! '{start_datetime}', new_start_datetime.to_time.iso8601.to_s
       data.gsub! '{end_datetime}', (new_start_datetime + 1.minute).to_time.iso8601.to_s if data.include?('{end_datetime}') 
     end
-
 
     #specific to the FIO device
     if data.include?('{FIO_Postive_Negative_hrp}') 
@@ -143,9 +154,40 @@ module DemoData
         data.gsub! '{FIO_decimal_lpdh}', Faker::Number.between(1, 10).to_s
       end
     end    
-    
-    
+    if model == 'GeneXpert'
+      message = JSON.parse(data)
+      result = message['event']['result']
+      if result == 'ERROR'
+        message['event']['error_code'] = [100, 200, 300, 400].sample
+      end
+      data = message.to_json
+    end
     return data
   end
 
+  private
+
+  def create_system_users
+    users = []
+    5.times do
+      users << Faker::Name.name
+    end
+    users
+  end
+
+  def results
+     [
+      'INVALID',
+      'ERROR',
+      'NO RESULT',
+      'MTB NOT DETECTED',
+      'Rif Resistance DETECTED',
+      'Rif Resistance INDETERMINATE',
+      'MTB DETECTED'
+    ]
+  end
+
+  def system_users
+    @system_uers ||= create_system_users
+  end
 end

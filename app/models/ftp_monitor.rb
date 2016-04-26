@@ -76,6 +76,7 @@ class FtpMonitor
     def process_zip_file(tempfile)
       Zip::File.open(tempfile) do |zip_file|
         zip_file.each do |file|
+          next if file.name.match(/__MACOSX/)
           tempfile = Tempfile.new(File.basename(file.name), Rails.root.join('tmp'))
           file.extract(tempfile.path)
           process_file file.name, tempfile
@@ -129,8 +130,8 @@ class FtpMonitor
 
     def match_device(remote_name)
       # Extract device message info
-      matches = patterns.map { |p,ds| [File.basename(remote_name).match(p), ds] }
-      devices = matches.flat_map { |m,ds| m ? ds.select{|d| d.serial_number == m[:sn]} : [] }
+      matches = patterns.map { |p, ds| [File.basename(remote_name).match(p), ds] }
+      devices = matches.flat_map { |m, ds| m ? ds.select { |d| d.serial_number == m[:sn] } : [] }
 
       # Skip file if no device or multiple devices have matched its name
       return skip_file(remote_name, 'No device matched') if devices.empty?

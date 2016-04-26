@@ -44,8 +44,8 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_resource(resource, action)
-    if Policy.can?(action, resource, current_user)
-      Policy.authorize(action, resource, current_user)
+    if has_access?(resource, action)
+      check_access(resource, action)
     else
       log_authorization_warn resource, action
       head :forbidden

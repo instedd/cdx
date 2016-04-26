@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "version": "1.1.2",
+    "api_version": "1.5.0",
+    "conditions": [
+      "mtb", "hiv", "rif", "ct", "ng"
+    ],
+    "source": {
+      "type": "csv", "separator": ","
+    }
+  },
+  "custom_fields" : {
+  },
+  "field_mapping": {
+    "test.start_time" : {
+      "if" : [
+        {"equals" : [{"lookup" : "End time"}, null]},
+        null,
+        {
+          "parse_date" : [
+            {"lookup" : "End time"},
+            "%m/%d/%y %k:%M"
+          ]
+        }
+      ]
+    },
+    "test.end_time" : {
+      "if" : [
+        {"equals" : [{"lookup" : "End time"}, null]},
+        null,
+        {
+          "parse_date" : [
+            {"lookup" : "End time"},
+            "%m/%d/%y %k:%M"
+          ]
+        }
+      ]
+    },
+    "test.name" : { "lookup": "Assay name" },
+    "test.type" : {"lowercase" : { "lookup": "Test type" }},
+    "test.status" : { "script" : "
+      if( message['Result category'].match(/.*ERROR.*/i)) { 'error' }
+      else if(message['Result category'].match(/.*INVALID.*/i)) { 'invalid' }
+      else if(message['Result category'].match(/.*NO RESULT.*/i) && message['Status'].match(/.*Stopped.*/i)) { 'no_result' }
+      else if(message['Result category'].match(/.*NO RESULT.*/i) && message['Status'].match(/.*Running.*/i)) { 'in_progress' }
+      else if(message['Result category'].match(/.*NO RESULT.*/i) && message['Status'].match(/.*Incomplete.*/i)) { 'in_progress' }
+      else if(message['Result category'].match(/.*NO RESULT.*/i) && message['Status'].match(/.*Aborted.*/i)) { 'invalid' }
+      else { 'success' }
+    "},
+    "test.assays" : {
+      "script": "
+      if(message['Assay name'].match(/.*CT_NG.*/i)) {
+        if(message['Result category'].match(/.*INVALID.*/i) || message['Result category'].match(/.*ERROR.*/) || message['Result category'].match(/.*NO RESULT.*/)) {
+          [
+            {'condition' : 'ct', 'name' : 'Chlamydia trachomatis', 'result' : 'n/a'},
+            {'condition' : 'ng', 'name' : 'Neisseria gonorrhoeae', 'result' : 'n/a'}
+          ]
+        } else {
+          if(message['Result category'].match(/.*CT only detected.*/i) || message['Result category'].match(/.*CT & NG Detected.*/i)){
+            ct = 'positive'
+          } else {
+            ct = 'negative'
+          };
+          if(message['Result category'].match(/.*NG only detected.*/i) || message['Result category'].match(/.*CT & NG Detected.*/i)){
+            ng = 'positive'
+          } else {
+            ng = 'negative'
+          };
+          [
+            {'condition' : 'ct', 'name' : 'Chlamydia trachomatis', 'result' : ct},
+            {'condition' : 'ng', 'name' : 'Neisseria gonorrhoeae', 'result' : ng}
+          ]
+        }
+      } else if(message['Assay name'].match(/.*HIV-1.*/i)) {
+        if(message['Result category'].match(/.*INVALID.*/i) || message['Result category'].match(/.*ERROR.*/) || message['Result category'].match(/.*NO RESULT.*/)) {
+          [{'condition' : 'hiv', 'name' : 'hiv-1', 'result' : 'n/a'}]
+        } else {
+          if(message['Result category'].match(/.*HIV DETECTED.*/i)){
+            hiv = 'positive'
+          } else {
+            hiv = 'negative'
+          };
+          [{'condition' : 'hiv', 'name' : 'hiv-1', 'result' : hiv}]
+        }
+      } else if(message['Assay name'].match(/.*MTB.*/i)) {
+        if(message['Result category'].match(/.*INVALID.*/i) || message['Result category'].match(/.*ERROR.*/) || message['Result category'].match(/.*NO RESULT.*/)) {
+          [
+            {'condition' : 'mtb', 'name' : 'mtb', 'result' : 'n/a'},
+            {'condition' : 'rif', 'name' : 'rif', 'result' : 'n/a'}
+          ]
+        } else {
+          if(message['Result category'].match(/.*MTB DETECTED.*/i)){
+            mtb = 'positive'
+          } else if(message['Result category'].match(/.*MTB INDETERMINATE.*/i)) {
+            mtb = 'indeterminate'
+          } else {
+            mtb = 'negative'
+          };
+          if(message['Result category'].match(/.*RIF DETECTED.*/i)){
+            rif = 'positive'
+          } else if(message['Result category'].match(/.*RIF INDETERMINATE.*/i)) {
+            rif = 'indeterminate'
+          } else {
+            rif = 'negative'
+          };
+          [
+            {'condition' : 'mtb', 'name' : 'mtb', 'result' : mtb},
+            {'condition' : 'rif', 'name' : 'rif', 'result' : rif}
+          ]
+        }
+      }"
+    }
+  }
+}

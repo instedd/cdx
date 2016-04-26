@@ -1,0 +1,12 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            Users
+.row
+  .col
+    = empty_data icon: 'icon-outline-user xx-large' do |c|
+      - c.body do
+        %h1 You have no access to users of the selected institution.

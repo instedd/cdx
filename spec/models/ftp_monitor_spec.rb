@@ -220,11 +220,12 @@ describe FtpMonitor, elasticsearch: true do
       let(:files) { %w(alere_q.csv.zip) }
       let(:temp_dir) { Dir.mktmpdir('ftp') }
       let(:device_model) do
+        # if this pattern change, also update it in load_manifests.rake
         DeviceModel.make(
           name: 'alere_q',
           supports_ftp: true,
           filename_pattern:
-            '(?<ts>\d{1,4}-\d{1,4}-\d{1,4}_\d{1,2}-\d{1,2}-\d{1,2})_(?<assayid>[A-Za-z0-9\-]+)_(?<sn>[A-Za-z\-0-9]+)\.csv$'
+            '^(?<assayid>[A-Za-z0-9\-]+)_(?<sn>[A-Za-z\-0-9]+)_(?<ts>\d{1,4}-\d{1,4}-\d{1,4}-\d{1,2}-\d{1,2}-\d{1,2})\.csv$'
         )
       end
       let!(:manifest) { load_manifest 'alere_q_manifest.json', device_model }
@@ -233,7 +234,7 @@ describe FtpMonitor, elasticsearch: true do
           device_model: device_model,
           ftp_hostname: 'example.com',
           ftp_port: 2000,
-          serial_number: 'NAT-90000001'
+          serial_number: 'NAT-04000443'
         )
       end
       let(:tempfile) { Tempfile.new('alere_q.csv.zip', temp_dir) }
@@ -249,7 +250,7 @@ describe FtpMonitor, elasticsearch: true do
         expect(subject.process!).to be_nil
 
         expect(file_messages).to have(1).item
-        expect(file_messages[0].filename).to eq('24-03-2015_00-14-24_2_NAT-90000001.csv')
+        expect(file_messages[0].filename).to eq('01-02_NAT-04000443_2016-03-29-13-24-39.csv')
 
         tests = all_elasticsearch_tests.sort_by { |test| test['_source']['test']['assays'].first['result'] }
         test = tests.first['_source']['test']

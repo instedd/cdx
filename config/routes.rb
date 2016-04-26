@@ -5,16 +5,35 @@ Rails.application.routes.draw do
   use_doorkeeper
   mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
 
-  devise_for :users,
-    controllers: {
-      omniauth_callbacks: 'omniauth_callbacks',
-      sessions: 'sessions',
-      registrations: 'registrations',
-      invitations: 'users/invitations'
-    },
-    path_names: {
-      registration: 'registration'
-    }
+  if Settings.single_tenant
+    devise_for(
+      :users,
+      controllers: {
+        sessions: 'sessions',
+        invitations: 'users/invitations'
+      }
+    )
+    as :user do
+      get 'users/registration/edit', to: 'registrations#edit', as: :edit_user_registration, defaults: { format: 'html' }
+      match 'users/registration/update(.:model)',
+            to: 'registrations#update',
+            as: :registration,
+            via: [:post, :put]
+    end
+  else
+    devise_for(
+      :users,
+      controllers: {
+        omniauth_callbacks: 'omniauth_callbacks',
+        sessions: 'sessions',
+        registrations: 'registrations',
+        invitations: 'users/invitations'
+      },
+      path_names: {
+        registration: 'registration'
+      }
+    )
+  end
 
   get 'settings' => 'home#settings'
 
@@ -41,6 +60,7 @@ Rails.application.routes.draw do
       get :search_test
       put 'add/sample/:sample_uuid' => 'encounters#add_sample'
       put 'add/new_sample' => 'encounters#new_sample'
+      put 'add/manual_sample_entry' => 'encounters#add_sample_manually'
       put 'add/test/:test_uuid' => 'encounters#add_test'
       put 'merge/sample/' => 'encounters#merge_samples'
     end
@@ -158,6 +178,7 @@ Rails.application.routes.draw do
     collection do
       get :autocomplete
       post :update_setting
+      get :no_data_allowed
     end
   end
   resources :roles do

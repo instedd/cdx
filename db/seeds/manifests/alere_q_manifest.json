@@ -6,6 +6,15 @@
     "conditions": ["hiv_1_m_n", "hiv_1_o", "hiv_2"],
     "source": { "type" : "csv", "separator" : ";", "skip_lines_at_top" : 1 }
   },
+  "custom_fields" : {
+    "test.sample_detection" : {},
+    "test.device_control" : {},
+    "test.hiv_1_positive_control" : {},
+    "test.hiv_2_positive_control" : {},
+    "test.negative_control" : {},
+    "test.analysis" : {},
+    "test.device_software" : {}
+  },
   "field_mapping" : {
     "test.name" : { "lookup" : "Test Name" },
     "sample.id" : { "lookup" : "Sample ID" },
@@ -42,6 +51,7 @@
       ]"
     },
     "test.error_code" : { "lookup" : "Error Code" },
+    "test.type" : "specimen",
     "test.site_user" : { "lookup" : "Operator" },
     "test.start_time" : {"parse_date" : [{"lookup": "Timestamp"}, "%Y-%m-%d %H:%M"]},
     "test.type" : "specimen",
@@ -55,6 +65,13 @@
       } else {
         'success'
       }
-    "}
+    "},
+    "test.sample_detection" : {"lookup" : "Sample Detection"},
+    "test.device_control" : {"lookup" : "Device"},
+    "test.hiv_1_positive_control" : {"lookup" : "HIV-1 Positive Control"},
+    "test.hiv_2_positive_control" : {"lookup" : "HIV-2 Positive Control"},
+    "test.negative_control" : {"lookup" : "Negative Control"},
+    "test.analysis" : {"lookup" : "Analysis"},
+    "test.device_software" : {"lookup" : "Device Software"}
   }
 }

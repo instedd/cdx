@@ -1,37 +1,34 @@
 module Reports
-  class AllTests < Base
-    def self.by_name(*args)
-      new(*args).by_name
-    end
-
+  class Unsuccessful < Base
     attr_reader :statuses
 
-    def statuses
-      results['tests'].group_by { |t| t['test.status'] }.keys
-    end
-
     def process
+      filter['test.status'] = 'invalid,error,no_result,in_progress'
       filter['group_by'] = 'day(test.start_time),test.status'
       super
     end
 
+    def statuses
+      results['tests'].index_by { |t| t['test.status'] }.keys
+    end
+
     private
 
-    def data_hash_day(dayname, test_results)
+    def data_hash_day(dayname, results)
       {
         label: dayname,
         values: statuses.map do |u|
-          result = test_results && test_results[u]
+          result = results && results[u]
           result ? count_total(result) : 0
         end
       }
     end
 
-    def data_hash_month(date, test_results)
+    def data_hash_month(date, results)
       {
         label: label_monthly(date),
-        values: statuses.map do |s|
-          result = test_results && test_results[s]
+        values: statuses.map do |u|
+          result = results && results[u]
           result ? count_total(result) : 0
         end
       }

@@ -6,11 +6,16 @@ class UsersController < ApplicationController
     if site_admin
       ids = check_access(Site.within(@navigation_context.entity), READ_SITE_USERS).pluck(:id)
     end
-    return unless has_access?(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS)) || !ids.empty?
+    redirect_to no_data_allowed_users_path unless has_access?(@navigation_context.entity, (@navigation_context.entity.kind_of?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS)) || !ids.empty?
 
     @users = User.within(@navigation_context.entity, @navigation_context.exclude_subsites)
     @users = @users.where("roles.site_id IN (?)", ids) if site_admin
-    @roles = Role.within(@navigation_context.entity, @navigation_context.exclude_subsites).map{|r| {value: r.id, label: r.name}}
+    @context_roles = Role.within(@navigation_context.entity, @navigation_context.exclude_subsites)
+    @available_roles = @context_roles.select do |role|
+      has_access?(role, ASSIGN_USER_ROLE)
+    end
+    @available_roles_hash = @available_roles.map { |r| { value: r.id, label: r.name } }
+    @context_roles_hash = @context_roles.map { |r| { value: r.id, label: r.name } }
     @can_update = has_access?(User, UPDATE_USER)
     apply_filters
     @total = @users.count
@@ -29,13 +34,11 @@ class UsersController < ApplicationController
         self.response_body = build_csv
       end
     end
-
   end
 
   def edit
-    @user_roles = @user.roles
-    return unless @user_roles.any?{|role| authorize_resource(role, ASSIGN_USER_ROLE)}
-    @user_roles = @user_roles.map{|r| {value: r.id, label: r.name}}
+    @user_roles = @user.roles.select { |role| has_access?(role, ASSIGN_USER_ROLE) }
+    @user_roles = @user_roles.map { |r| { value: r.id, label: r.name } }
     @can_update = has_access?(User, UPDATE_USER)
   end
 
@@ -92,6 +95,14 @@ class UsersController < ApplicationController
     render nothing: true
   end
 
+  def no_data_allowed
+    # the no_data_allowed page make sense when the logged user has no access
+    # to the resource selected in the navbar.
+    redirect_to users_path if has_access?(
+      @navigation_context.entity,
+      (@navigation_context.entity.is_a?(Institution) ? READ_INSTITUTION_USERS : READ_SITE_USERS))
+  end
+
   private
 
   def user_params
@@ -123,5 +134,4 @@ class UsersController < ApplicationController
     @users = @users.where("last_sign_in_at > ? OR (last_sign_in_at IS NULL AND invitation_accepted_at IS NULL AND invitation_created_at > ?)", params["last_activity"], params["last_activity"]) if params["last_activity"].present?
     @users = @users.where("is_active = ?", params["is_active"].to_i) if params["is_active"].present?
   end
-
 end

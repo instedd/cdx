@@ -6,10 +6,18 @@
     "conditions": ["cd4_count"],
     "source": { "type" : "csv", "separator" : "," }
   },
+  "custom_fields" : {
+    "test.barcode" : {},
+    "test.expire_date" : {},
+    "test.volume" : {},
+    "test.device" : {},
+    "test.reagent" : {},
+    "test.software_version" : {}
+  },
   "field_mapping" : {
     "test.name" : { "lookup" : "Assay Name" },
     "sample.id" : { "lookup" : "Sample" },
-    "test.type" : {"if" : [{"equals" : [{"lookup": "Assay Name" }, "PIMA BEADS"]}, "qc", "specimen"]},
+    "test.type" : {"if" : [{"equals" : [{"lookup": "Assay ID" }, "3"]}, "qc", "specimen"]},
     "test.assays.name" : { "lookup" : "Assay Name" },
     "test.assays.condition" : "cd4_count",
     "test.assays.result" : "n/a",
@@ -29,6 +37,12 @@
       } else {
         'success'
       }
-    "}
+    "},
+    "test.barcode" : {"lookup" : "Barcode"},
+    "test.expire_date" : {"lookup" : "ExpireDate"},
+    "test.volume" : {"lookup" : "Volume"},
+    "test.device" : {"lookup" : "Device"},
+    "test.reagent" : {"lookup" : "Reagent"},
+    "test.software_version" :{"lookup" : "Software Version"}
   }
 }

@@ -14,8 +14,9 @@
           .col
             .logo
             = image_tag 'cdx-logo.png'
-          .col
-            = link_to "Create an account", new_registration_path(:user), :class => 'btn-primary pull-right'
+          - unless Settings.single_tenant
+            .col
+              = link_to "Create an account", new_registration_path(:user), :class => 'btn-primary pull-right'
 
 
       = flash_message

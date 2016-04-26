@@ -26,6 +26,16 @@ var FreshTestsEncounterForm = React.createClass(_.merge({
           <a href="/encounters/new_index" className="btn btn-link">Cancel</a>
         </FlexFullRow>
 
+        <Modal ref="addNewSamplesModal">
+          <h1>
+            <a href="#" className="modal-back" onClick={this.closeAddNewSamplesModal}></a>
+            Add sample
+          </h1>
+
+          <p><input type="text" className="input-block" placeholder="Sample ID" ref="manualSampleEntry" /></p>
+          <p><button type="button" className="btn-primary pull-right" onClick={this.validateAndSetManualEntry}>OK</button></p>
+        </Modal>
+
       </div>
     );
   },

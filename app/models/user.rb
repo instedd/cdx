@@ -1,10 +1,12 @@
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :timeoutable
-  devise :invitable, :database_authenticatable, :registerable,
+  devise :invitable, :database_authenticatable,
          :recoverable, :rememberable, :trackable,
-         :validatable, :confirmable, :omniauthable, :timeoutable,
+         :validatable, :confirmable, :timeoutable,
          :lockable, :password_expirable, :password_archivable
+
+  devise :omniauthable, :registerable unless Settings.single_tenant
 
   has_many :identities, dependent: :destroy
   has_many :institutions
@@ -19,7 +21,7 @@ class User < ActiveRecord::Base
   has_many :alerts
   has_many :alert_histories
   has_many :alert_recipients
-  has_many  :recipient_notification_history
+  has_many :recipient_notification_history
 
   include Resource
 
