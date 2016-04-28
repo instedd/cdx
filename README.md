@@ -17,7 +17,15 @@ To start developing:
 2. Install dependencies:
 	* `bundle install`.
 	* PhantomJS 1.9.8 for [Poltergeist](https://github.com/teampoltergeist/poltergeist) (development and test only)
-	* ImageMagick for [Paperclip](https://github.com/thoughtbot/paperclip#image-processor).
+		* Install it in mac with: `brew install phantomjs`
+	* ImageMagick for [Paperclip](https://github.com/thoughtbot/paperclip#image-processor)
+		* Install it in mac with: `brew install imagemagick`
+	* [Redis](http://redis.io/download) is [used](https://github.com/mperham/sidekiq/wiki/Using-Redis) by [sidekiq](http://sidekiq.org/). CDX uses sidekiq as [ActiveJob](http://guides.rubyonrails.org/active_job_basics.html#backends) backend
+		* Install it in mac with: `brew install redis`
+		* you can start it with `redis-server --daemonize yes`
+	* [Elasticsearch](https://www.elastic.co/) is used as the main index for test results.
+		* We support elasticsearch versions < 2.x
+		* Install it in mac with: `brew install elasticsearch17`
 
 3. Setup development database: `bundle exec rake db:setup`
 
