@@ -57,10 +57,6 @@ class Site < ActiveRecord::Base
     end
   end
 
-  def self.csv_builder(sites)
-    CSVBuilder.new sites
-  end
-
   def filter_by_query(query)
     if institution = query["institution"]
       if institution_id == institution.to_i

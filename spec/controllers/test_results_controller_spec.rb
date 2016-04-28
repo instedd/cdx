@@ -103,17 +103,53 @@ describe TestResultsController, elasticsearch: true do
   end
 
   context "CSV" do
-
-    let!(:patient)   { Patient.make(institution: institution, core_fields: {"gender" => "male"}, custom_fields: {"custom" => "patient value"}, plain_sensitive_data: {"name": "Doe"}) }
-    let!(:encounter) { Encounter.make(institution: institution, patient: patient, core_fields: {"patient_age" => {"years"=>12}, "diagnosis" =>["name" => "mtb", "condition" => "mtb", "result" => "positive"] }, custom_fields: {"custom" => "encounter value"}, plain_sensitive_data: {"observations": "HIV POS"}) }
-    let!(:sample)    { Sample.make(institution: institution, encounter: encounter, patient: patient, core_fields: {"type" => "blood"}, custom_fields: {"custom" => "sample value"}) }
+    let!(:patient) do
+      Patient.make(
+        institution: institution,
+        core_fields: { "gender" => "male" },
+        custom_fields: { "custom" => "patient value" },
+        plain_sensitive_data: { "name": "Doe" }
+      )
+    end
+    let!(:encounter) do
+      Encounter.make(
+        institution: institution,
+        patient: patient,
+        core_fields: {
+          "patient_age" => { "years" => 12 },
+          "diagnosis" => [
+            "name" => "mtb",
+            "condition" => "mtb",
+            "result" => "positive"
+          ]
+        },
+        custom_fields: { "custom" => "encounter value" },
+        plain_sensitive_data: { "observations": "HIV POS" }
+      )
+    end
+    let!(:sample) do
+      Sample.make(
+        institution: institution,
+        encounter: encounter,
+        patient: patient,
+        core_fields: { "type" => "blood" },
+        custom_fields: { "custom" => "sample value" }
+      )
+    end
     let!(:sample_id) { sample.sample_identifiers.make }
-
     let!(:test) do
-      TestResult.make_from_sample(sample, device: device,
-        core_fields: {"name" => "test1", "error_description" => "No error",
-          "assays" =>[{"condition" => "mtb", "result" => "positive", "name" => "mtb"}, {"condition" => "flu", "result" => "negative", "name" => "flu"}]},
-        custom_fields: {"custom_a" => "test value 1"}).tap { |t| TestResultIndexer.new(t).index(true) }
+      TestResult.make_from_sample(
+        sample,
+        device: device,
+        core_fields: {
+          "name" => "test1", "error_description" => "No error",
+          "assays" => [
+            { "condition" => "mtb", "result" => "positive", "name" => "mtb" },
+            { "condition" => "flu", "result" => "negative", "name" => "flu" }
+          ]
+        },
+        custom_fields: { "custom_a" => "test value 1" }
+      ).tap { |t| TestResultIndexer.new(t).index(true) }
     end
 
     let(:csv) { CSV.parse(response.body, headers: true) }
@@ -132,7 +168,6 @@ describe TestResultsController, elasticsearch: true do
     end
 
     context "single test" do
-
       before(:each) do
         get :index, format: :csv
       end

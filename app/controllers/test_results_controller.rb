@@ -163,7 +163,7 @@ class TestResultsController < ApplicationController
 
   def execute_csv_test_order_query(filename)
     query = Encounter.query(@query, current_user)
-    self.response_body = EntityCsvBuilder.new("encounter", query, filename)
+    EntityCsvBuilder.new("encounter", query, filename)
   end
 
   def load_filter_resources
