@@ -10,8 +10,18 @@ class Api::TestsController < ApiController
     query = TestResult.query(filters, current_user)
     respond_to do |format|
       format.csv do
-        build_csv 'Tests', query.csv_builder
-        render :layout => false
+        @filename = "Tests-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        headers["Content-Type"] = "text/csv"
+        headers["Content-disposition"] = "attachment; filename=#{@filename}"
+        if query.grouped_by.empty?
+          self.response_body = EntityCsvBuilder.new("test", query, @filename)
+        else
+          @csv_options = { col_sep: ',' }
+          @csv_builder = CSVBuilder.new(
+            query.execute[Cdx::Fields.test.result_name],
+            column_names: query.grouped_by.concat(['count'])
+          )
+        end
       end
       format.json { render_json query.execute }
     end
@@ -29,5 +39,4 @@ class Api::TestsController < ApiController
       format.json { render_json schema.build }
     end
   end
-
 end

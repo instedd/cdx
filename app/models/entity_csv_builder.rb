@@ -1,7 +1,6 @@
 require 'tempfile'
 
 class EntityCsvBuilder
-
   def initialize(scope, query, filename)
     @fields = Cdx::Fields[scope]
     @query = query

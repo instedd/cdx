@@ -32,17 +32,6 @@ class EntityQuery < Cdx::Api::Elasticsearch::Query
     query
   end
 
-  def csv_builder
-    if grouped_by.empty?
-      CSVBuilder.new execute[@fields.result_name]
-    else
-      CSVBuilder.new(
-        execute[@fields.result_name],
-        column_names: grouped_by.concat(['count'])
-      )
-    end
-  end
-
   protected
 
   def params_for(computed_policy, preloaded_uuids)
