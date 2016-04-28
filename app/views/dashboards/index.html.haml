@@ -47,14 +47,14 @@
         -# = react_component('PieChart', data: tests_by_status, height: 250, label: 'Tests Run')
   .chart-container-clear
 
-.chart-container-row
+.chart-container-nofixed-height-row
   .chart-container-barleft
     .row
       .col.pe-8
         %h1 Total Tests by Site
     .row
       .col.pe-7
-        = react_component('HorizontalBarChart', data: query_site_tests_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_site_tests', label: 'Total Tests by Site')
+        = react_component('HorizontalBarChart', data: query_site_tests_chart, width: 600, x_labels:query_tests_chart.statuses, chart_div: 'chart_site_tests', label: 'Total Tests by Site')
         #chart_site_tests
 
   .chart-container-barright
@@ -67,7 +67,7 @@
         #chart_average_test_per_site_chart
   .chart-container-clear
 
-.chart-container-row
+.chart-container-nofixed-height-row
   .chart-container-barleft
     .row
       .col.pe-8
@@ -89,14 +89,14 @@
         #chart_average_tests
   .chart-container-clear
 
-.chart-container-row
+.chart-container-nofixed-height-row
   .chart-container-barleft
     .row
       .col.pe-8
         %h1 Devices Not Responding
     .row
       .col.pe-7
-        = react_component('HorizontalBarChart', data: query_devices_not_reporting_chart, width: 700, x_labels:query_tests_chart.statuses, chart_div: 'chart_not_responding', label: 'DAYS')
+        = react_component('HorizontalBarChart', data: query_devices_not_reporting_chart, width: 600, x_labels:query_tests_chart.statuses, chart_div: 'chart_not_responding', label: 'DAYS')
         #chart_not_responding
 
   .chart-container-barright

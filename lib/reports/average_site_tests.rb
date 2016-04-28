@@ -41,9 +41,9 @@ module Reports
 
     def lookup_site(uuid)
       site = ::Site.where(uuid: uuid).first
-      return site.name if site
+      return site.name.truncate(10) if site
     end
-
+    
     def period_results
       filter.delete('group_by')
       @period_results ||= TestResult.query(filter, current_user).execute
