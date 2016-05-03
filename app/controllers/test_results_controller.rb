@@ -27,7 +27,6 @@ class TestResultsController < ApplicationController
     offset = (@page - 1) * @page_size
 
     @filter = create_filter
-
     @query = @filter.dup
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by

@@ -10,7 +10,7 @@
 
 .row
   .col
-    = react_component "PatientCard", patient: @patient_json, canEdit: @can_edit
+    = react_component "PatientCard", patient: @patient_json, canEdit: @can_edit, showTestLink: true
 
 - if @encounters.empty?
   = empty_data icon: 'icon-outline-test xx-large' do |c|

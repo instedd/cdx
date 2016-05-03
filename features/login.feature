@@ -1,3 +1,4 @@
+@wip
 Feature: Logging into system
   Scenario: Successful login
     Given the user 'foouser@example.com' has an account

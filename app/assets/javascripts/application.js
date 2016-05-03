@@ -34,6 +34,11 @@
 //= require reflux
 //= require_tree .
 //= require turbolinks
+
+//= require moment.min
+//= require jquery-ui.min
+//= require jquery.comiseo.daterangepicker.min
+
 Turbolinks.enableProgressBar()
 
 // Configure leaflet
@@ -111,6 +116,17 @@ $(document).ready(function(){
     var url = action + (action.indexOf('?') === -1 ? '?' : '&') + form.serialize();
     return url;
   }
+
+  $(document).on('click','.datepicker_single', function(){
+    $(this).daterangepicker({
+      singleDatePicker: true,
+      showDropdowns: true
+    });
+  });
+
+  $(document).on('click','.datepicker', function(){
+    $(this).daterangepicker();
+  });
 
   $(document).on('click', '.tabs .tabs-header a:not(".selected")', function(event) {
     var target = $(event.target);
@@ -205,4 +221,17 @@ $(document).ready(function(){
     var textarea = $(e.target);
     textarea.css('height', 'auto').css('height', e.target.scrollHeight);
   });
+
+
+	// Handle the filter hide/show on the test page
+	$(".filtershow").click(function(){
+		// We want to set overflow visible after the expand animation has completed
+		$(".custom_filters").toggle();
+	});
+
+
+	$('input[type=date]').click(function(){
+		$(this).datepicker();
+	});
+
 });

@@ -249,8 +249,7 @@ class Cdx::Api::Elasticsearch::Query
   end
 
   def process_order
-    order = @params['order_by'] || @fields.default_sort
-
+    order = @params['order_by'] || @fields.default_sort 
     all_orders = self.class.extract_multi_values(order)
     all_orders.map do |order|
       if order[0] == '-'
