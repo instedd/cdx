@@ -47,7 +47,7 @@
         -# = react_component('PieChart', data: tests_by_status, height: 250, label: 'Tests Run')
   .chart-container-clear
 
-.chart-container-nofixed-height-row
+.chart-container-row
   .chart-container-barleft
     .row
       .col.pe-8
@@ -67,8 +67,8 @@
         #chart_average_test_per_site_chart
   .chart-container-clear
 
-.chart-container-nofixed-height-row
-  .chart-container-barleft
+.chart-container-row
+  .chart-container-pieleft
     .row
       .col.pe-8
         %h1 Failed Tests
@@ -79,7 +79,7 @@
         .pieright
           = react_component('PieChart', data: tests_by_failed, height: 250, label: 'Failed tests')
 
-  .chart-container-barright
+  .chart-container-piebarright
     .row
       .col.pe-8
         %h1 Average Tests by Technician
@@ -89,7 +89,7 @@
         #chart_average_tests
   .chart-container-clear
 
-.chart-container-nofixed-height-row
+.chart-container-row
   .chart-container-barleft
     .row
       .col.pe-8
