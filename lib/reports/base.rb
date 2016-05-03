@@ -55,13 +55,13 @@ module Reports
     end
 
     def start_date
-      return options['date_range']['start_time']['gte'] if options['date_range']
+      return options['date_range']['start_time']['gte'] if valid_start_date?
       return options['since'] if options['since']
       report_since
     end
 
     def end_date
-      return options['date_range']['start_time']['lte'] if options['date_range']
+      return options['date_range']['start_time']['lte'] if valid_end_date?
       Date.today.iso8601
     end
 
@@ -100,7 +100,19 @@ module Reports
     end
 
     def date_constraints
-      options['date_range'] ? report_between : report_since
+      valid_date_range? ? report_between : report_since
+    end
+
+    def valid_date_range?
+      valid_start_date? && valid_end_date?
+    end
+
+    def valid_start_date?
+      options['date_range'] && options['date_range']['start_time']['gte'].present?
+    end
+
+    def valid_end_date?
+      options['date_range'] && options['date_range']['start_time']['lte'].present?
     end
 
     def day_results(format, key)

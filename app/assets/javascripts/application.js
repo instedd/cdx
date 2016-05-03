@@ -223,15 +223,14 @@ $(document).ready(function(){
   });
 
 
-	// Handle the filter hide/show on the test page
-	$(".filtershow").click(function(){
-		// We want to set overflow visible after the expand animation has completed
-		$(".custom_filters").toggle();
-	});
+  // Handle the filter hide/show on the test page
+  $(".filtershow").click(function(){
+    // We want to set overflow visible after the expand animation has completed
+    $(".custom_filters").toggle();
+  });
 
 
-	$('input[type=date]').click(function(){
-		$(this).datepicker();
-	});
-
+  $('input[type=date]').click(function(){
+    $(this).datepicker({ dateFormat: 'dd-mm-yy' });
+  });
 });
