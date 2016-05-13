@@ -74,7 +74,7 @@ describe "device" do
         expect(create_device.site).to be_nil
       end
 
-      it "should be able to specify a site" do
+      it "should be able to specify a site", testrail: 1185 do
         device = create_device do |page|
           page.site.set site2.name
         end
@@ -229,7 +229,7 @@ describe "device" do
         end
       }
 
-      it "test details can be views if device is deleted" do
+      it "test details can be views if device is deleted", testrail: 1184 do
         goto_page TestResultsPage do |page|
           page.table.items.first.click
           expect(page).to be_success

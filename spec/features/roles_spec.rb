@@ -41,7 +41,7 @@ describe "roles", elasticsearch: true do
       sign_in(site_admin)
     }
 
-    it "should load for site admin" do
+    it "should load for site admin", testrail: 1194 do
       goto_page RolesPage do |page|
         expect(page.table.items.count).to eq(site.roles.count)
       end

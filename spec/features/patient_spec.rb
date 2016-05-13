@@ -15,7 +15,7 @@ describe "Patients", elasticsearch: true do
       sign_in(user)
     }
 
-    it "should display 'Unknown name' in test result and in patient page" do
+    it "should display 'Unknown name' in test result and in patient page", testrail: 1189 do
       goto_page TestResultsPage do |page|
         page.table.items[6].click
       end

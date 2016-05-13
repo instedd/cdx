@@ -7,7 +7,7 @@ describe "invite user" do
     sign_in(user)
   }
 
-  describe "from users list" do
+  describe "from users list", testrail: 451 do
     it "should allow invitee to login right after password setup" do
       goto_page UserViewPage do |page|
         page.open_invite_users do |modal|
