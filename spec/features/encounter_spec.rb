@@ -34,7 +34,7 @@ describe "create encounter" do
     end
   end
 
-  it "should obly user to choose site when context is institution with multiple sites" do
+  it "should obly user to choose site when context is institution with multiple sites", testrail: 432 do
     other_site = institution.sites.make
     user.update_attribute(:last_navigation_context, institution.uuid)
 
@@ -112,7 +112,7 @@ describe "create encounter" do
     it "should leave one encounter"
   end
 
-  it "should be able to create fresh encounter with existing patient" do
+  it "should be able to create fresh encounter with existing patient", testrail: 1192 do
     patient = institution.patients.make name: Faker::Name.name, site: site
 
     goto_page NewFreshEncounterPage do |page|
@@ -130,7 +130,7 @@ describe "create encounter" do
     end
   end
 
-  it "should be able to create fresh encounter with new patient" do
+  it "should be able to create fresh encounter with new patient", testrail: 1193 do
     goto_page NewFreshEncounterPage do |page|
       page.new_patient.click
     end

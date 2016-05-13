@@ -155,14 +155,16 @@ module ChartsHelper
   end
 
   def start_date
-    params['range'] ? Date.parse(params['range']['start_time']['gte']) : since
+    params['range']['start_time']['gte'].present? ? Date.parse(params['range']['start_time']['gte']) : since
   end
 
   def end_date
-    params['range'] ? Date.parse(params['range']['start_time']['lte']) : Date.today
+    params['range']['start_time']['lte'].present? ? Date.parse(params['range']['start_time']['lte']) : Date.today
   end
 
   def options
+    params.delete('range') if params['range'] && params['range']['start_time']['lte'].empty?
+    params.delete('range') if params['range'] && params['range']['start_time']['gte'].empty?
     return { 'date_range' => params['range'] } if params['range']
     return { 'since' => params['since'] } if params['since']
     {}

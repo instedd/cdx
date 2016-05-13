@@ -4,7 +4,7 @@ describe "device model" do
   let(:user) { Institution.make(:manufacturer).user }
   before(:each) { sign_in(user) }
 
-  it "can create model and access to it's details" do
+  it "can create model and access to it's details", testrail: 424 do
     goto_page NewDeviceModelPage do |page|
       page.name.set "MyModel"
       page.support_url.set "example.org/support"
