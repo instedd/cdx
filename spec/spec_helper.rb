@@ -86,6 +86,16 @@ RSpec.configure do |config|
   config.after(:each) do
     Timecop.return
   end
+
+  if config.respond_to?(:testrail_formatter_options)
+    if ENV["CI"]
+      tag = `git describe --exact-match 2>/dev/null`.strip
+      config.testrail_formatter_options[:run_name] = tag
+      config.testrail_formatter_options[:disabled] = tag.blank?
+    else
+      config.testrail_formatter_options[:disabled] = true
+    end
+  end
 end
 
 require "bundler/setup"
