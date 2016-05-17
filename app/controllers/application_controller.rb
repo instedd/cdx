@@ -116,6 +116,12 @@ class ApplicationController < ActionController::Base
       end
 
     elsif !params[:context].blank?
+    
+    #if an iframe exists [site selected from nav tree] then do not show the nav header as the nav header appeared twice. 
+    if params["iframepresent"]=='true'
+      @usenav =  false
+    end
+      
       # if there is an explicit context try to use it.
       @navigation_context = NavigationContext.new(current_user, params[:context])
 
