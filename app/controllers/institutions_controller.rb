@@ -1,7 +1,6 @@
 class InstitutionsController < ApplicationController
   before_filter :load_institutions
   skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
-
   skip_before_action :ensure_context, except: [:no_data_allowed, :index]
 
   def index

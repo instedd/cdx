@@ -65,7 +65,6 @@ $(document).on("ready", function(){
       window.open($(this).data('href'), '_blank');
       return;
     }
-
     Turbolinks.visit($(this).data('href'));
   });
 })
@@ -102,7 +101,6 @@ $(document).ready(function(){
 
     var debouncedSubmit = _.debounce(function(){
       var url = buildUrl(form);
-
       Turbolinks.visit(url.toString(), {});
     }, 2000);
 
