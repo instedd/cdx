@@ -65,11 +65,19 @@ $(document).on("ready", function(){
       window.open($(this).data('href'), '_blank');
       return;
     }
+
     Turbolinks.visit($(this).data('href'));
   });
 })
 
+
 $(document).ready(function(){
+	// for the navigation tree when a new site is selected an iframe is created, and a hidden
+	// field added in the filters form to let the backend know an iframe exists as the nav header appeared twice. 
+  if ((parent.frames.length==1) && ($('#filters-form').length==1) ) {
+    $('#filters-form').append('<input type="hidden" name="iframepresent" value="true" />');	
+  }
+
   function setFilledClass(elem) {
     window.setTimeout(function(){
       if(elem.val().length > 0) {
@@ -94,6 +102,7 @@ $(document).ready(function(){
 
     var debouncedSubmit = _.debounce(function(){
       var url = buildUrl(form);
+
       Turbolinks.visit(url.toString(), {});
     }, 2000);
 

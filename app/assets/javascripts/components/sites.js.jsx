@@ -193,8 +193,23 @@ var SiteTreeViewNode = React.createClass({
     //var bits = url.split('/');
     //var trg = bits.pop();
     //url = bits.join('/');
-    //$('div.col.maincol').load(url+'/api/'+trg+'?context='+ctx);
-    $('div.col.maincol').load(url+'?nav=false&context='+ctx);
+
+    var link = url+'?nav=false&context='+ctx;
+    $("#iframeid").remove();
+    var iframe = document.createElement('iframe');
+    iframe.frameBorder=0;
+    iframe.width="100%";
+    iframe.height="950px";
+    iframe.id="iframeid";
+    iframe.setAttribute("src", link);
+    $( "#contentcontainer").append(iframe);
+    document.getElementById('iframeid').onload = function() {
+      return function() {
+        $( "#contentsection").remove(); 
+        $("#contentcontainer").removeClass('maincol');
+      }
+    }();
+
     $('li').removeClass('selected');
     $('li[data-reactid*="'+this.props.site.uuid+'"]').first().addClass('selected');
     $('#nav-context').attr('title',this.props.site.name).text('at '+this.props.site.name);

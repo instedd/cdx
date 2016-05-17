@@ -1,11 +1,11 @@
 class InstitutionsController < ApplicationController
   before_filter :load_institutions
   skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
-  skip_before_action :ensure_context, except: [:no_data_allowed]
+
+  skip_before_action :ensure_context, except: [:no_data_allowed, :index]
 
   def index
     @can_create = has_access?(Institution, CREATE_INSTITUTION)
-
     if @institutions.one?
       redirect_to edit_institution_path(@institutions.first)
     elsif @institutions.empty?

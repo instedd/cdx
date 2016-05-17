@@ -7,12 +7,14 @@ describe InstitutionsController do
   context "index" do
 
     let!(:institution)   { user.institutions.make }
+    let(:default_params) { {context: institution.uuid} }
     let!(:other_institution) { Institution.make }
 
     it "should list insitutions" do
       institution2 = user.institutions.make
       get :index
       expect(response).to be_success
+      binding.pry
       expect(assigns(:institutions)).to contain_exactly(institution, institution2)
     end
 

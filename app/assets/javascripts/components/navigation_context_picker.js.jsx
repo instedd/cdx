@@ -97,6 +97,19 @@ var NavigationContextPicker = React.createClass({
     } else {
       new_context_url.setSearch({context: site.uuid + "-!"});
     }
+
+		if (window.parent.frames.length > 0) {
+			console.log("hhhhh");
+		}
+
+		if(typeof(parent) == 'undefined') {
+		   console.log('Not Iframe');
+		}
+		else {
+		   console('iframe');
+		}
+		
+		
     Turbolinks.visit(new_context_url.toString());
   },
 

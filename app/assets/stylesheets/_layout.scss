@@ -2,6 +2,20 @@
   LAYOUT
 ============================================================================= */
 
+iframe
+{
+  margin:0;
+  padding:0;
+  border:none;
+  overflow:hidden;
+  position:absolute;
+}
+
+maincol
+{
+  margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px;padding:0;
+}
+
 body {
   font-family: $sans;
   font-size: 90%;
