@@ -14,7 +14,6 @@ describe InstitutionsController do
       institution2 = user.institutions.make
       get :index
       expect(response).to be_success
-      binding.pry
       expect(assigns(:institutions)).to contain_exactly(institution, institution2)
     end
 
