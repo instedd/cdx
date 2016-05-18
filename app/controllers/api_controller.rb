@@ -7,6 +7,7 @@ class ApiController < ApplicationController
   skip_before_filter :ensure_context
 
   before_action :doorkeeper_authorize!, unless: lambda { current_user }
+  before_action :set_nav
 
   # We redefine current_user to also take into account the oauth token
   def current_user
@@ -21,5 +22,11 @@ class ApiController < ApplicationController
     @csv_options = { :col_sep => ',' }
     @csv_builder = builder
     @filename = "#{prefix}-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+  end
+
+  private
+
+  def set_nav
+    @usenav = true
   end
 end
