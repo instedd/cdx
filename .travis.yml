@@ -4,7 +4,7 @@ addons:
   apt:
     packages:
     - libzmq3-dev
-bundler_args: --jobs=8 --without development
+bundler_args: "--jobs=8 --without development"
 services:
 - elasticsearch
 - redis-server
@@ -15,7 +15,7 @@ script:
 - travis_retry bundle exec rake
 notifications:
   slack:
-    secure: CmtQgO6TCT89jHc3DYEEtqM0n0BpN6QT8uey7grYAh2YBJJGoGYh0HgiCHiSNLnn+4sfDu91erys+R17fcc4aBaRMQawHebj4L0e0B2Wi99sIptfpkQRYjofiO0XZJUbBbXW+3jgsPui8u2gDVd/cBq3NxZd8jQvUMNr5MTpjf4=
+    secure: OUmgxxoNfNClzSjz3ewU1OwNV1Te71CHh1Il/3mV37SuegCeZyt3lqe7ejofzYMvdzMH3X0efAoiqf75Wd4gGs1lCgGBwBThtrsnuRSRT3uf1aw7V5CtqDw5TKQcszrV1ChFqafqV7G4rd2V7H/iZmUFKf3kcNzdmwtqNN1SkW1xXoizbqWqYgLE45sWAEpmExFJ1zOvOX5SwCSXqZps0HZV+Bj7McmQjzaB8pWWANfH59OshJfULp6blD9rPt/vOasEuuDPBzsz+cYR4K8svyDdML1Hqpjm1VQ8kv54f3tnDXO8iZLQhv7KZRJnC1mOU98fz3q9dC4tkcjogeYA2USHFT84TEv2wBdJ9gk8hfMpj7Vd42NL+CybTDj4ib5K0EotKqVSahoBfckgGIsiSuuR8iItOX8HgqisO9DrYHYD6c+ELhJAeo5mbIOlwkNsfudxLd2XgtJTYlGJLUDFdIDBvHh8TFsGsOG/e5GeniYsEi9DzSw9Z4Q7pSE8ItGjVO8naG4khDBw+DVFX22ucDJ6gZow9DfPDq6P1d18dhVCZ+MpKKRTQ0Qa0ZqeYEu/r7j6k0dFRS+lWaT/ETHGZ35tQbj/xkxT1UBV7T1d5hev1Sn6AkpHfD1V2cS6pPdbJMlOmYj5L8rrT6DV85Np+Q0ev49iBj5bz0CTL3ptsvY=
   on_success: change
   on_failure: change
 sudo: false
