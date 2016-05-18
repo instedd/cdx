@@ -22,7 +22,6 @@ gem 'kaminari'
 gem 'base58'
 gem 'rubyzip', '>= 1.0.0'
 
-gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'config'
 gem 'rest-client'
 gem 'barby'

@@ -57,29 +57,27 @@ class Subscriber < ActiveRecord::Base
   end
 
   def notify_test(test)
-    PoirotRails::Activity.start("Publish test to subscriber #{self.name}") do
-      filtered_test = filter_test(test, fields)
-      callback_url = self.url
+    filtered_test = filter_test(test, fields)
+    callback_url = self.url
 
-      if self.verb == 'GET'
-        callback_url = URI.parse self.url
-        callback_query = Rack::Utils.parse_nested_query(callback_url.query || "")
-        merged_query = filtered_test.merge(callback_query)
-        callback_url = "#{callback_url.scheme}://#{callback_url.host}:#{callback_url.port}#{callback_url.path}?#{merged_query.to_query}"
-      end
+    if self.verb == 'GET'
+      callback_url = URI.parse self.url
+      callback_query = Rack::Utils.parse_nested_query(callback_url.query || "")
+      merged_query = filtered_test.merge(callback_query)
+      callback_url = "#{callback_url.scheme}://#{callback_url.host}:#{callback_url.port}#{callback_url.path}?#{merged_query.to_query}"
+    end
 
-      options = {}
-      if self.url_user && self.url_password
-        options[:user] = self.url_user
-        options[:password] = self.url_password
-      end
+    options = {}
+    if self.url_user && self.url_password
+      options[:user] = self.url_user
+      options[:password] = self.url_password
+    end
 
-      request = RestClient::Resource.new(callback_url, options)
-      if self.verb == 'GET'
-        request.get
-      else
-        request.post filtered_test.to_json, content_type: :json
-      end
+    request = RestClient::Resource.new(callback_url, options)
+    if self.verb == 'GET'
+      request.get
+    else
+      request.post filtered_test.to_json, content_type: :json
     end
   end
 
