@@ -38,11 +38,8 @@ class TestResultsController < ApplicationController
       format.html do
         @query["page_size"] = @page_size
         @query["offset"] = offset
-
         @filter["device.uuid"] = @devices.first.uuid if @devices.size == 1
-
         @can_create_encounter = check_access(@navigation_context.institution.sites, CREATE_SITE_ENCOUNTER).size > 0
-
         execute_query
       end
 
