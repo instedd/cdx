@@ -1,28 +1,50 @@
+%link{:href => "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css", :rel => "stylesheet", :type => "text/css"}/
+
 - content_for(:subheader) do
-  .row.center
-    .col
-      %h1.centered
-        Settings
-      %hr
+  .container
+    .section.group
+      .col.col-12
+        %h1 Settings
 
-.row.center
-  - if has_access_to_test_results_index?
-    = setting_card title: pluralize(@alerts_count, "Alert Group"), href: alerts_path, icon: 'icon-outline-alert xx-large' do |c|
-      - c.body do
-        Keep your team notified about important stuff.
-        %br
-        %br
-        Check
-        = link_to "alert messages sent", alert_messages_path
-        sent about registered
-        = link_to "incidents", incidents_path
+    .section.settings.centered
+      -# ------------ ALERTS
+      - if has_access_to_test_results_index?
+        = setting_card title: pluralize(@alerts_count, "Alert Group"), href: alerts_path, icon: 'fa-exclamation-triangle', colour: 'red' do |c|
+          - c.body do
+            Keep your team notified about important stuff.
+            %br
+            %br
+            Check
+            = link_to "alert messages sent", alert_messages_path
+            sent about registered
+            = link_to "incidents", incidents_path
 
-  - if has_access_to_roles_index?
-    = setting_card title: pluralize(@roles_count, "Role"), href: roles_path, icon: 'icon-outline-role xx-large' do |c|
-      - c.body do
-        Manage users permissions with reusable policies
+      -# ------------ ROLES
+      - if has_access_to_roles_index?
+        = setting_card title: pluralize(@roles_count, "Role"), href: roles_path, icon: 'fa-toggle-on', colour:'silver' do |c|
+          - c.body do
+            Manage users permissions with reusable policies
 
-  - if can_delegate_permissions?
-    = setting_card title: pluralize(@policies_count, "Policy"), href: policies_path, icon: 'icon-outline-sharing-request xx-large' do |c|
-      - c.body do
-        Share test results with health organization
+      -# ------------ SITES
+      - if has_access_to_sites_index?
+        = setting_card title: "Sites", href: sites_path, icon: 'fa-university', colour:'blue' do | c |
+          - c.body do
+            Manage the Sites
+
+      -# ------------ LOGS
+      - if has_access?(Device, Policy::Actions::SUPPORT_DEVICE)
+        = setting_card title: "Messages", href: device_messages_path, icon: 'fa-bell', colour:'orange' do | c |
+          - c.body do
+            Manage the Logs
+
+      -# ------------ MODELS
+      - if has_access_to_device_models_index?
+        = setting_card title: "Models", href: device_models_path, icon: 'fa-mobile', colour:'light-green' do | c |
+          - c.body do
+            Manage Device Models
+
+      -# ------------ USERS
+      - if has_access_to_users_index?
+        = setting_card title: "Users", href: users_path, icon: 'fa-users', colour:'blue' do | c |
+          - c.body do
+            Manager Users

@@ -1,8 +1,7 @@
 var BaseEncounterForm = {
   getInitialState: function() {
     return {
-      encounter: this.props.encounter,
-      manual_sample_entry: this.props.manual_sample_entry
+      encounter: this.props.encounter
     };
   },
 
@@ -23,29 +22,7 @@ var BaseEncounterForm = {
   },
 
   addNewSamples: function(event) {
-    if(this.state.manual_sample_entry) {
-      this.refs.addNewSamplesModal.show();
-    } else {
-      this._ajax_put('/encounters/add/new_sample');
-    }
-    event.preventDefault();
-  },
-
-  closeAddNewSamplesModal: function (event) {
-    this.refs.addNewSamplesModal.hide();
-    event.preventDefault();
-  },
-
-  validateAndSetManualEntry: function (event) {
-    var sampleId = React.findDOMNode(this.refs.manualSampleEntry).value;
-    if(this.state.encounter.new_samples.filter(function(el){return el.entity_id == sampleId}).length > 0) {
-      // Error handling as done in the ajax responses
-      alert("This sample has already been added");
-    } else {
-      this._ajax_put('/encounters/add/manual_sample_entry', function() {
-        this.refs.addNewSamplesModal.hide();
-      }, {entity_id: sampleId});
-    }
+    this._ajax_put('/encounters/add/new_sample');
     event.preventDefault();
   },
 
@@ -85,6 +62,11 @@ var BaseEncounterForm = {
 }
 
 var EncounterForm = React.createClass(_.merge({
+  getDefaultProps: function() {
+    return {
+      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: _.capitalize(v)};})
+    }
+  },
 
   showAddSamplesModal: function(event) {
     this.refs.addSamplesModal.show()
@@ -150,6 +132,13 @@ var EncounterForm = React.createClass(_.merge({
 
       if (field == 'result') {
         newValue = event;
+      } else if (field == 'quantitative_result') {
+        newValue = event.target.value
+        firstChar = newValue[0]
+        newValue = newValue.replace(/[^0-9]/g, '');
+        if (firstChar == '+' || firstChar == '-') {
+          newValue = firstChar + newValue;
+        }
       } else {
         newValue = event.target.value;
       }
@@ -160,27 +149,19 @@ var EncounterForm = React.createClass(_.merge({
     }.bind(this);
   },
 
-  onPatientChanged: function(patient) {
-    this.setState(React.addons.update(this.state, {
-      encounter : { patient: { $set : patient } },
-    }));
-  },
-
   render: function() {
     var diagnosisEditor = null;
 
-    var assayResultOptions = _.map(this.props.possible_assay_results, function(v){return {value: v, label: _.capitalize(v)};})
     if (this.state.encounter.assays.length > 0) {
       diagnosisEditor = (
         <div className="row">
           <div className="col pe-2">
             <label>Diagnosis</label>
-            <p style={{fontSize: "12px"}}><i>When new tests are reported for this order, you''ll be able to diagnose the corresponding condition here.</i></p>
+            <p style={{fontSize: "12px"}}><i>Each time a new test arrives, the list of conditions will be updated for you to diagnostic</i></p>
           </div>
 
           <div className="col assays-editor">
             {this.state.encounter.assays.map(function(assay, index){
-              assay.result = assay.result;
               return (
                 <div className="row" key={index}>
                   <div className="col px-4">
@@ -189,7 +170,7 @@ var EncounterForm = React.createClass(_.merge({
                     </div>
                   </div>
                   <div className="col px-2">
-                    <Select value={assay.result} options={assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} clearable={false} className="input-block"/>
+                    <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} clearable={false} className="input-block"/>
                   </div>
                   <div className="col px-2">
                     <input type="text" className="quantitative pull-right" value={assay.quantitative_result} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative_result')} />
@@ -214,29 +195,19 @@ var EncounterForm = React.createClass(_.merge({
           if (this.state.encounter.id == null) return;
 
           return (
-          <div>
-            <div className="row">
-              <div className="col pe-2">
-                <label>Site</label>
-              </div>
-              <div className="col">
-                <p>{this.props.encounter.site.name}</p>
-              </div>
+          <div className="row">
+            <div className="col pe-2">
+              <label>Site</label>
             </div>
-
-            <div className="row">
-              <div className="col pe-2">
-                <label>Test Order ID</label>
-              </div>
-              <div className="col">
-                <p>{this.props.encounter.uuid}</p>
-              </div>
+            <div className="col">
+              <p>{this.props.encounter.site.name}</p>
             </div>
           </div>);
         }.bind(this))()}
 
-
-        <PatientSelect patient={this.state.encounter.patient} context={this.props.context} onPatientChanged={this.onPatientChanged} />
+        <FlexFullRow>
+          <PatientCard patient={this.state.encounter.patient} />
+        </FlexFullRow>
 
         {diagnosisEditor}
 
@@ -268,16 +239,6 @@ var EncounterForm = React.createClass(_.merge({
               itemKey="uuid" />
           </Modal>
 
-          <Modal ref="addNewSamplesModal">
-            <h1>
-              <a href="#" className="modal-back" onClick={this.closeAddNewSamplesModal}></a>
-              Add sample
-            </h1>
-
-            <p><input type="text" className="input-block" placeholder="Sample ID" ref="manualSampleEntry" /></p>
-            <p><button type="button" className="btn-primary pull-right" onClick={this.validateAndSetManualEntry}>OK</button></p>
-          </Modal>
-
           <Modal ref="unifySamplesModal">
             <h1>
               <a href="#" className="modal-back" onClick={this.closeUnifySamplesModal}></a>
@@ -294,7 +255,7 @@ var EncounterForm = React.createClass(_.merge({
 
         <div className="row">
           <div className="col">
-            <TestResultsList testResults={this.state.encounter.test_results} showSites={false} showDevices={true} /><br/>
+            <TestResultsList testResults={this.state.encounter.test_results} /><br/>
             <a className="btn-add-link"  href='#' onClick={this.showTestsModal}><span className="icon-circle-plus icon-blue"></span> Add tests</a>
           </div>
 
@@ -318,4 +279,5 @@ var EncounterForm = React.createClass(_.merge({
       </div>
     );
   },
+
 }, BaseEncounterForm));

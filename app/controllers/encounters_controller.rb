@@ -8,9 +8,9 @@ class EncountersController < ApplicationController
   def new
     if params[:patient_id].present?
       @institution = @navigation_context.institution
-      @patient_json = Jbuilder.new { |json|
+      @patient_json = Jbuilder.new do |json|
         scoped_patients.find(params[:patient_id]).as_json_card(json)
-      }.attributes!
+      end.attributes!
     end
 
     @possible_assay_results = TestResult.possible_results_for_assay
@@ -18,9 +18,10 @@ class EncountersController < ApplicationController
   end
 
   def create
-    perform_encounter_action "creating encounter" do
+    perform_encounter_action 'creating encounter' do
       prepare_encounter_from_json
       create_new_samples
+      @encounter.user = current_user
       @blender.save_and_index!
       @encounter.updated_diagnostic_timestamp!
     end
@@ -175,6 +176,14 @@ class EncountersController < ApplicationController
       @institution = institution_by_uuid(encounter_param['institution']['uuid'])
       @encounter.institution = @institution
       @encounter.site = site_by_uuid(@institution, encounter_param['site']['uuid'])
+      
+      @encounter.exam_reason = encounter_param['exam_reason']
+      @encounter.tests_requested = encounter_param['tests_requested']
+      @encounter.coll_sample_type = encounter_param['coll_sample_type']
+      @encounter.coll_sample_other = encounter_param['coll_sample_other']
+      @encounter.diag_comment = encounter_param['diag_comment']
+      @encounter.treatment_weeks = encounter_param['treatment_weeks']
+      @encounter.testdue_date = encounter_param['testdue_date'] 
     else
       @institution = @encounter.institution
     end
@@ -304,7 +313,16 @@ class EncountersController < ApplicationController
   def as_json_edit
     Jbuilder.new do |json|
       json.(@encounter, :id)
-      json.(@encounter, :uuid)
+      json.(@encounter, :uuid)   
+      json.(@encounter, :user)
+      json.(@encounter, :exam_reason)
+      json.(@encounter, :tests_requested)
+      json.(@encounter, :coll_sample_type)
+      json.(@encounter, :coll_sample_other)
+      json.(@encounter, :diag_comment)
+      json.(@encounter, :treatment_weeks)
+      json.(@encounter, :testdue_date)
+      
       json.has_dirty_diagnostic @encounter.has_dirty_diagnostic?
       json.assays (@encounter_blender.core_fields[Encounter::ASSAYS_FIELD] || [])
       json.observations @encounter_blender.plain_sensitive_data[Encounter::OBSERVATIONS_FIELD]

@@ -16,8 +16,9 @@ describe Api::SitesController do
         {'uuid' => site.uuid, 'name' => site.name, 'location' => site.location_geoid, 'parent_uuid' => site.parent.try(:uuid), 'institution_uuid' => site.institution.uuid}
       end
 
+      new_sorted_sites = sites.sort_by { |f| f['name'] }
       result = get :index, format: 'json'
-      expect(Oj.load(result.body)).to eq({'total_count' => 3, 'sites' => sites})
+      expect(Oj.load(result.body)).to eq({'total_count' => 3, 'sites' => new_sorted_sites})
     end
 
     it "should list the sites for a given institution" do
@@ -29,8 +30,9 @@ describe Api::SitesController do
 
       Site.make institution: (Institution.make user: user)
 
+      new_sorted_sites = sites.sort_by { |f| f['name'] }
       get :index, institution_uuid: institution.uuid, format: 'json'
-      expect(Oj.load(response.body)).to eq({'total_count' => 3, 'sites' => sites})
+      expect(Oj.load(response.body)).to eq({'total_count' => 3, 'sites' => new_sorted_sites})
     end
 
     context "hierarchical" do

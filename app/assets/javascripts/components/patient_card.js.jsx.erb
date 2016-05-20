@@ -1,7 +1,8 @@
 var PatientCard = React.createClass({
   getDefaultProps: function() {
     return {
-      canEdit: false
+      canEdit: false,
+      canAddTest: true
     }
   },
 
@@ -17,7 +18,11 @@ var PatientCard = React.createClass({
         }
       }
       if (patient.dob) {
-        string += patient.dob + " (" + patient.age + " y/o)";
+        string += patient.dob
+        if( patient.age > 0)
+          string += " (" + patient.age + " y/o)";
+        else // months only
+          string += " (" + patient.age_months + " m/o)";
       }
       return string;
     }
@@ -35,7 +40,8 @@ var PatientCard = React.createClass({
         <%= to_jsx(card(image: asset_url('card-unkown.png')) do |c|
           c.top do
             raw <<-JSX
-              <a href={"/patients/" + patient.id}>{patient.name || "(Unknown name)"}</a><br/>
+              {patient.name || "(Unknown name)"}
+              <br/>
               {patientInfo(patient)}
             JSX
           end
@@ -60,6 +66,14 @@ var PatientCard = React.createClass({
               return (
                 <a href={"/patients/" + patient.id + "/edit"} title="Edit">
                   <img src="#{asset_url("ic-pencil.png")}"/>
+                </a>);
+            }.bind(this))()}
+            {(function(){
+              if (!this.props.canAddTest) return;
+              if (this.props.showTestLink != true) return;
+              return (
+                <a href={"/encounters/new?mode=fresh_tests&patient_id=" + patient.id } title="Create Test Order" className="label">
+                  Create Test Order
                 </a>);
             }.bind(this))()}
             JSX

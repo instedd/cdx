@@ -167,6 +167,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
           },
           "location" => {
             "properties" => {
+              "id" => {
+                "type" => "string",
+                "index" => "not_analyzed"
+              },
               "parents" => {
                 "type" => "string",
                 "index" => "not_analyzed"
@@ -181,6 +185,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
               "uuid" => {
                 "type" => "string",
                 "index" => "not_analyzed"
+              },
+              "user_email"=> {
+                "type"=> "string",
+                "index"=> "not_analyzed"
               },
               "patient_age" => {
                 "properties" => {

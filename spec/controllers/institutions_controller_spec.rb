@@ -7,6 +7,7 @@ describe InstitutionsController do
   context "index" do
 
     let!(:institution)   { user.institutions.make }
+    let(:default_params) { {context: institution.uuid} }
     let!(:other_institution) { Institution.make }
 
     it "should list insitutions" do

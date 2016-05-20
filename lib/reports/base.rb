@@ -7,8 +7,8 @@ module Reports
     attr_reader :current_user, :context, :data, :date_results, :end_date
     attr_reader :filter, :options, :results, :start_date
 
-    def initialize(current_user, context, options={})
-      @filter ||= { 'group_by' => 'day(test.start_time)'}
+    def initialize(current_user, context, options = {})
+      @filter ||= { 'group_by' => 'day(test.start_time)' }
       @current_user = current_user
       @context = context
       @data = []
@@ -18,7 +18,7 @@ module Reports
 
     def process
       @results = TestResult.query(filter, current_user).execute
-      return self
+      self
     end
 
     def sort_by_day
@@ -28,10 +28,10 @@ module Reports
         key = day.strftime('%Y-%m-%d')
         data << data_hash_day(day, day_results('%Y-%m-%d', key))
       end
-      return self
+      self
     end
 
-    def sort_by_hour(cnt=23)
+    def sort_by_hour(cnt = 23)
       hour_results = results_by_period('%H')
       cnt.downto(0) do |i|
         now = (Time.now - i.hours)
@@ -41,7 +41,7 @@ module Reports
           values: [hour_results ? hour_results[hourname].count : 0]
         }
       end
-      return data
+      data
     end
 
     def sort_by_month
@@ -51,17 +51,17 @@ module Reports
         date_key = date.strftime('%Y-%m')
         data << data_hash_month(date, month_results(date_key))
       end
-      return self
+      self
     end
 
     def start_date
-      return options['date_range']['start_time']['gte'] if options['date_range']
+      return options['date_range']['start_time']['gte'] if valid_start_date?
       return options['since'] if options['since']
-      return report_since
+      report_since
     end
 
     def end_date
-      return options['date_range']['start_time']['lte'] if options['date_range']
+      return options['date_range']['start_time']['lte'] if valid_end_date?
       Date.today.iso8601
     end
 
@@ -78,7 +78,7 @@ module Reports
     private
 
     def count_total(results)
-      results.inject(0) {|sum,hash| sum + hash['count']}
+      results.inject(0) { |a, e| a + e['count'] }
     end
 
     def data_hash_day(dayname, day_results)
@@ -95,8 +95,24 @@ module Reports
       }
     end
 
+    def day_or_month
+      number_of_days > 60 ? 'month' : 'day'
+    end
+
     def date_constraints
-      options['date_range'] ? report_between : report_since
+      valid_date_range? ? report_between : report_since
+    end
+
+    def valid_date_range?
+      valid_start_date? && valid_end_date?
+    end
+
+    def valid_start_date?
+      options['date_range'] && options['date_range']['start_time']['gte'].present?
+    end
+
+    def valid_end_date?
+      options['date_range'] && options['date_range']['start_time']['lte'].present?
     end
 
     def day_results(format, key)
@@ -108,7 +124,7 @@ module Reports
     end
 
     def label_monthly(date)
-      "#{I18n.t('date.abbr_month_names')[date.month]}#{date.month == 1 ? " #{date.strftime('%y')}" : ""}"
+      "#{I18n.t('date.abbr_month_names')[date.month]}#{date.month == 1 ? " #{date.strftime('%y')}" : ''}"
     end
 
     def lookup_device(uuid)
@@ -143,14 +159,14 @@ module Reports
 
     def site_or_institution
       filter['institution.uuid'] = context.institution.uuid if context.institution
-      filter["site.uuid"] = context.site.uuid if context.site && context.exclude_subsites
-      filter['site.path'] = context.site.uuid if context.site && !context.exclude_subsites    
-      filter["site.uuid"] = "null" if context.exclude_subsites && !context.site
+      filter['site.uuid'] = context.site.uuid if context.site && context.exclude_subsites
+      filter['site.path'] = context.site.uuid if context.site && !context.exclude_subsites
+      filter.delete('site.uuid') if context.exclude_subsites && !context.site
     end
 
     def ignore_qc
       # TODO post mvp: should generate list of all types but qc, or support query by !=
-      filter["test.type"] = "specimen"
+      filter['test.type'] = 'specimen'
     end
 
     def users

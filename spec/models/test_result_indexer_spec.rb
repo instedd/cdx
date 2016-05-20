@@ -92,6 +92,7 @@ describe TestResultIndexer, elasticsearch: true do
         },
         "encounter" => {
           'uuid' => encounter.uuid,
+          'user_email' => institution.user.email,
           'custom_fields' => {
             'status' => 'completed'
           }

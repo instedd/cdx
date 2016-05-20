@@ -2,6 +2,15 @@
   LAYOUT
 ============================================================================= */
 
+iframe
+{
+  margin:0;
+  padding:0;
+  border:none;
+  overflow:hidden;
+  position:absolute;
+}
+
 body {
   font-family: $sans;
   font-size: 90%;

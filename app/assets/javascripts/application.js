@@ -34,6 +34,11 @@
 //= require reflux
 //= require_tree .
 //= require turbolinks
+
+//= require moment.min
+//= require jquery-ui.min
+//= require jquery.comiseo.daterangepicker.min
+
 Turbolinks.enableProgressBar()
 
 // Configure leaflet
@@ -64,7 +69,14 @@ $(document).on("ready", function(){
   });
 })
 
+
 $(document).ready(function(){
+	// for the navigation tree when a new site is selected an iframe is created, and a hidden
+	// field added in the filters form to let the backend know an iframe exists as the nav header appeared twice. 
+  if ( (parent.frames !=null) && (parent.frames.length==1) && ($('#filters-form').length==1) ) {
+    $('#filters-form').append('<input type="hidden" name="iframepresent" value="true" />');	
+  }
+
   function setFilledClass(elem) {
     window.setTimeout(function(){
       if(elem.val().length > 0) {
@@ -111,6 +123,17 @@ $(document).ready(function(){
     var url = action + (action.indexOf('?') === -1 ? '?' : '&') + form.serialize();
     return url;
   }
+
+  $(document).on('click','.datepicker_single', function(){
+    $(this).daterangepicker({
+      singleDatePicker: true,
+      showDropdowns: true
+    });
+  });
+
+  $(document).on('click','.datepicker', function(){
+    $(this).daterangepicker();
+  });
 
   $(document).on('click', '.tabs .tabs-header a:not(".selected")', function(event) {
     var target = $(event.target);
@@ -204,5 +227,17 @@ $(document).ready(function(){
   $('body').on('keydown', 'textarea.resizeable', function(e){
     var textarea = $(e.target);
     textarea.css('height', 'auto').css('height', e.target.scrollHeight);
+  });
+
+
+  // Handle the filter hide/show on the test page
+  $(".filtershow").click(function(){
+    // We want to set overflow visible after the expand animation has completed
+    $(".custom_filters").toggle();
+  });
+
+
+  $('input[type=date]').click(function(){
+    $(this).datepicker({ dateFormat: 'dd-mm-yy' });
   });
 });

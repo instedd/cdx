@@ -14,17 +14,6 @@ GIT
     geojson_import (0.0.2)
 
 GIT
-  remote: https://github.com/instedd/poirot_rails.git
-  revision: c3e8ceeacd07a226b941a8cabb2dd762fa73846f
-  branch: master
-  specs:
-    poirot_rails (0.0.4)
-      bertrpc
-      guid
-      json
-      rails (>= 3.2)
-
-GIT
   remote: https://github.com/instedd/ruby-location_service.git
   revision: 830800eec4c4c7874dd6eb9ace576460fba7ba1e
   branch: master
@@ -114,9 +103,6 @@ GEM
     barby (0.6.2)
     base58 (0.1.0)
     bcrypt (3.1.10)
-    bert (1.1.6)
-    bertrpc (1.3.1)
-      bert (>= 1.1.0, < 2.0.0)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
     builder (3.2.2)
@@ -685,7 +671,6 @@ DEPENDENCIES
   omniauth-google-oauth2
   paperclip (~> 4.3.6)
   paranoia
-  poirot_rails!
   poltergeist
   premailer-rails
   pry-byebug

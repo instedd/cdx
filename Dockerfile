@@ -6,8 +6,6 @@ RUN \
   adduser --uid 9999 --gid 9999 --disabled-password --gecos "Application" app && \
   usermod -L app
 
-ENV POIROT_STDOUT true
-ENV POIROT_SUPPRESS_RAILS_LOG true
 ENV PUMA_OPTIONS "--preload -w 4"
 ENV NNDD_VERSION "cdx-0.11-pre7"
 

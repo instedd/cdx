@@ -27,7 +27,6 @@ class TestResultsController < ApplicationController
     offset = (@page - 1) * @page_size
 
     @filter = create_filter
-
     @query = @filter.dup
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
@@ -39,11 +38,8 @@ class TestResultsController < ApplicationController
       format.html do
         @query["page_size"] = @page_size
         @query["offset"] = offset
-
         @filter["device.uuid"] = @devices.first.uuid if @devices.size == 1
-
         @can_create_encounter = check_access(@navigation_context.institution.sites, CREATE_SITE_ENCOUNTER).size > 0
-
         execute_query
       end
 

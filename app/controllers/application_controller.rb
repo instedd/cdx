@@ -91,6 +91,11 @@ class ApplicationController < ActionController::Base
 
   def ensure_context
     return if current_user.nil?
+    
+    @usenav =  true
+    if params['nav'] == 'false'
+      @usenav =  false
+    end
 
     if params[:context].blank? && !request.xhr?
       # if there is no context information force it to be explicit
@@ -109,7 +114,14 @@ class ApplicationController < ActionController::Base
       if default_context
         redirect_to url_for(params.merge({context: default_context}))
       end
+
     elsif !params[:context].blank?
+    
+    #if an iframe exists [site selected from nav tree] then do not show the nav header as the nav header appeared twice. 
+    if params["iframepresent"]=='true'
+      @usenav =  false
+    end
+      
       # if there is an explicit context try to use it.
       @navigation_context = NavigationContext.new(current_user, params[:context])
 
