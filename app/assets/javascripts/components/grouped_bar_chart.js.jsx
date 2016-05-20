@@ -6,6 +6,21 @@ var GroupedHorizontalBarChart = React.createClass({
     };
   },
 
+  getDefaultProps: function() {
+    return {
+      margin: {top: 20, right: 20, bottom: 30, left: 50},
+      height: 250,
+      bar_height: 30,
+      bar_gap: 20,
+      space_for_labels: 160,
+      space_for_ticks: 60,
+      space_for_legend: 200,
+      fill_colour: '#03A9F4',
+      colors: ["#9D1CB2", "#F6B500", "#47B04B", "#009788", "#A05D56", "#D0743C", "#FF8C00"],
+      offcolor: "#434343",
+    }
+  },
+
   updateWindow: function(){
     var w = window,
         d = document,
@@ -16,12 +31,12 @@ var GroupedHorizontalBarChart = React.createClass({
   },
   render: function() {
     var data = this.props.data;
-    var barHeight = 20,
+    var barHeight = this.props.bar_height,
       groupHeight = barHeight * data.series.length,
-      gapBetweenGroups = 10,
-      spaceForLabels = 160,
-      spaceForTicks = 20,
-      spaceForLegend = 150,
+      gapBetweenGroups = this.props.bar_gap,
+      spaceForLabels = this.props.space_for_labels,
+      spaceForTicks = this.props.space_for_ticks,
+      spaceForLegend = this.props.space_for_legend,
       x_title_spacing = 12;
 
     var chart = document.getElementById(this.props.chart_div),
@@ -93,7 +108,7 @@ var GroupedHorizontalBarChart = React.createClass({
 
     // Add text label in bar
     bar.append("text")
-      .attr("class", "horizontal-bar-value")
+      .attr("class", "chart-value-item")
       .attr("x", function(d) { return x(d) + 2; })
       .attr("y", barHeight / 2)
       .attr("fill", "black")
@@ -103,7 +118,7 @@ var GroupedHorizontalBarChart = React.createClass({
     // Draw labels
     var labels_offset=100;
     bar.append("text")
-      .attr("class", "horizontal-bar-value")
+      .attr("class", "chart-value-item")
       .attr("x", function(d) { return - labels_offset; })
       .attr("y", groupHeight / 2)
       .attr("dy", ".35em")
@@ -152,7 +167,7 @@ var GroupedHorizontalBarChart = React.createClass({
         .style('stroke', function (d, i) { return color(i); });
 
       legend.append('text')
-        .attr("class", "horizontal-bar-value")
+        .attr("class", "chart-value-item")
         .attr('x', legendRectSize + legendSpacing)
         .attr('y', legendRectSize - legendSpacing)
         .text(function (d) { return d.label; });
@@ -162,13 +177,13 @@ var GroupedHorizontalBarChart = React.createClass({
           .attr("x", this.state.width / 2)
           .attr("y", chartHeight/2)
           .attr("dy", "-.7em")
-          .attr("class", "horizontal-bar-value")
+          .attr("class", "chart-value-item")
           .style("text-anchor", "middle")
           .text("There is no data to display");
        }
 
       svg.insert("g",":first-child")
-        .attr("class", "horizontal-bar-axis")
+        .attr("class", "chart-axis")
         .attr("transform", "translate(" + (margin + spaceForLabels - 20) + ","+ (chartHeight - axisMargin + 8)+")")
         .call(xAxis);
 

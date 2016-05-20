@@ -10,9 +10,17 @@ var PieChart = React.createClass({
       shouldHide: shouldHide
     };
   },
+
   getDefaultProps: function() {
     return {
+      margin: {top: 20, right: 20, bottom: 30, left: 50},
       height: 250,
+      bar_height: 30,
+      bar_gap: 20,
+      space_for_labels: 160,
+      space_for_ticks: 60,
+      space_for_legend: 200,
+      fill_colour: '#03A9F4',
       colors: ["#9D1CB2", "#F6B500", "#47B04B", "#009788", "#A05D56", "#D0743C", "#FF8C00"],
       offcolor: "#434343",
     }
@@ -126,14 +134,14 @@ var PieChart = React.createClass({
     return (
       <div>
         <div className={this.state.shouldHide ? '' : 'hidden'}>
-        <span className="horizontal-bar-value">There is no data to display</span>
+          <span className="chart-value-item">There is no data to display</span>
         </div>
         <div className={this.state.shouldHide ? 'hidden' : ''}>    
          <svg className="chart"
            width="100%"
            height={this.props.height} ref="svg"
            {...svgProps}>
-        <g transform={"translate(" + radius + "," + this.props.height / 2 + ")"}>
+          <g transform={"translate(" + radius + "," + this.props.height / 2 + ")"}>
           {/* Total Count */}
           <text className="main total"
                 dy=".35em">{d3.sum(this.props.data, function(d) { return d.value })}</text>
@@ -160,11 +168,12 @@ var PieChart = React.createClass({
 
           {/* Legends */}
           {this.props.data.map(function(d, i) {
+            var txt = d.label+' ('+d.value+')';
             return (
               <g className="legend" key={d.label}
                  transform={"translate(" + (radius + 30) + "," + legendPos(i) + ")"}>
                 <circle r="8" fill={color(d.label)} />
-                <text dx="15" dy=".35em">{d.label}</text>
+                <text dx="15" dy=".35em">{txt}</text>
               </g>
             )
           })}

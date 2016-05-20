@@ -68,7 +68,7 @@ var BarChart = React.createClass({
     return (
 	<div>
 			<div className={this.state.shouldHide ? '' : 'hidden'}>
-			<span className="horizontal-bar-value">There is no data to display</span>
+			<span className="chart-value-item">There is no data to display</span>
 			</div>
 		  <div className={this.state.shouldHide ? 'hidden' : ''}>
        <div className="chart">
@@ -94,7 +94,7 @@ var BarChart = React.createClass({
                   )
                 });
               })}
-
+              
               {/* X Axis */}
               <g className="x axis"
                  transform={"translate(0," + chartHeight + ")"}

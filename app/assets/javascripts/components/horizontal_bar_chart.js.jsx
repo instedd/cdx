@@ -7,18 +7,27 @@ var HorizontalBarChart = React.createClass({
   },
   getDefaultProps: function() {
     return {
-      margin: {top: 20, right: 20, bottom: 30, left: 50}
+      margin: {top: 20, right: 20, bottom: 30, left: 50},
+      height: 250,
+      bar_height: 30,
+      bar_gap: 20,
+      space_for_labels: 160,
+      space_for_ticks: 60,
+      space_for_legend: 200,
+      fill_colour: '#03A9F4',
+      colors: ["#9D1CB2", "#F6B500", "#47B04B", "#009788", "#A05D56", "#D0743C", "#FF8C00"],
+      offcolor: "#434343",
     }
-  },  
+  },
+
   render: function() {
     var data = this.props.data;
 
-    barHeight        = 30,
+    barHeight        = this.props.bar_height,
     groupHeight      = barHeight * data.length,
-    gapBetweenGroups = 20,
-    spaceForLabels   = 150,
-    spaceForLegend   = 200;
-
+    gapBetweenGroups = this.props.bar_gap,
+    spaceForLabels   = this.props.space_for_labels,
+    spaceForLegend   = this.props.space_for_legend;
 
     var chart = document.getElementById(this.props.chart_div),
     axisMargin = 20,
@@ -47,7 +56,7 @@ var HorizontalBarChart = React.createClass({
       .enter()
       .append("g");
 
-    bar.attr("class", "horizontal-bar")
+    bar.attr("class", "chart-base")
       .attr("cx",0)
       .attr("transform", function(d, i) { 
         return "translate(" + margin + "," + (i * (barHeight + barPadding) + barPadding) + ")";
@@ -83,16 +92,16 @@ var HorizontalBarChart = React.createClass({
     })
     .on("mouseover",  function() {
       d3.select(this)
-        .attr("fill", "grey");      
+        .attr("fill", this.props.offcolor);
     })
     .on("mouseout", function(d, i) {
       // this.id
       d3.select(this)
-        .attr("fill","#03A9F4");
+        .attr("fill",this.props.fill_colour);
     });
 
     bar.append("text")
-      .attr("class", "horizontal-bar-value")
+      .attr("class", "chart-value-item")
       .attr("y", barHeight / 2)
       .attr("dx", -valueMargin + labelWidth) //margin right
       .attr("dy", ".35em") //vertical align middle
@@ -132,13 +141,13 @@ var HorizontalBarChart = React.createClass({
         .attr("x", this.state.width / 2)
         .attr("y", chartHeight/2)
         .attr("dy", "-.7em")
-        .attr("class", "horizontal-bar-value")
+        .attr("class", "chart-value-item")
         .style("text-anchor", "middle")
         .text("There is no data to display");
     }
 
     svg.insert("g",":first-child")
-      .attr("class", "horizontal-bar-axis")
+      .attr("class", "chart-axis")
       .attr("transform", "translate(" + (margin + labelWidth) + ","+ (chartHeight - axisMargin - margin)+")")
       .call(xAxis);    
 

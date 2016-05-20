@@ -3,12 +3,63 @@
 }
 
 svg {
-  shape-rendering: crispEdges;
+  shape-rendering: geometricPrecision;
 }
 
-.horizontal-bar {
-  fill: #03A9F4;
+//------------------------------------------------
+// New design - Standardised chart elements
+//------------------------------------------------
+.chart-base
+{
+  
 }
+
+.chart-value-item
+{
+  font-family: "Exo 2", sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  fill: #333;
+}
+
+.chart-axis
+{
+  path {
+    fill: none;
+  }
+  .tick line {
+    stroke-width: 1;
+    stroke: rgba(0,0,0,0.1);
+  }
+  font-size: 12px;
+}
+
+.chart-axis-label
+{
+  font-size: 14px;
+  fill: #333;
+  text-align: right;
+}
+
+.chart-axis-label-small
+{
+  font-size: 12px;
+  fill: #666;
+}
+
+.chart-axis-title
+{
+  font-size: 18px;
+  fill: #333;
+  font-weight: bold;
+}
+
+
+
+
+
+// ----- OLD
+.horizontal-bar {}
 
 .horizontal-bar-value {
   font-family: "Exo 2", sans-serif;

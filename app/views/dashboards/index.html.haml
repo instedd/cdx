@@ -1,116 +1,170 @@
-.filterbar
-  .heading
-    .title DASHBOARD
-    .showing
-      .highlight SHOWING :
-      .dates in the last 12 months
+-#query_tests_chart = [[{'aaa':23},{'bbb':42}, {'site':90}], [{'aaa':33},{'bbb':32}, {'site':30}]];
+-#devices_grouped = [{label:'Sally',value:42},{label:'Bobby',value:25},{label:'George',value:15},{label:'Site',value:8},{label:'Another Site',value:4}];
+-#query_site_tests_chart = [['Sally',42],['Bobby',25],['George',15],['Site',8],['Another Site',4]];
+-#average_test_per_site_chart = {'site':'Splodge','tests':{'name':'slkj','values':[23,46,124]}};
+-#failed_labels = ['Total','Failed'];
+-failed_tests = [['Total',55,'chart-box-tick'],['Failed',5,'chart-box-exclam']];
+-#average_tests_per_technician_chart = [1];
+-#query_devices_not_reporting_chart = [1];
+-#error_codes_by_device = [1];
 
-  .topfilters
-    %form#filters-form{ action: dashboard_path }
+-standard_colours = ["#00A8AB", "#B7D6B7", "#D8B49C", "#DE6023", "#47B04B", "#009788", "#A05D56", "#D0743C", "#FF8C00"];
 
-      .topbutton
-        %input#query_button.btn-primary(type='submit' value='Filter')
+.container
+  .section.group
+    .col.col-12
+      %h1 Dashboard
 
-      .topdateto
-        %label.block Date To
-        = date_field('range','start_time[lte]')
+  .section.group
+    .col.col-3.teal.summary
+      %img{:alt => "", :src => "/assets/img/test-tube-rack.png"}
+        %h2 Total Tests
+        .stat
+          %span 102
+          %p.label this year
+    .col.col-3.light-green.summary
+      %img{:alt => "", :src => "/assets/img/test-tube.png"}
+        %h2 Outstanding Tests
+        .stat
+          %span 50
+          %p.label this month
+    .col.col-3.sand.summary
+      %img{:alt => "", :src => "/assets/img/user.png"}
+        %h2 Total Technicians
+        .stat
+          %span 58
+          %p.label 4% increase
+    .col.col-3.orange.summary
+      %img{:alt => "", :src => "/assets/img/site.png"}
+        %h2 Total Sites
+        .stat
+          %span 21
+          %p.label in the UK
 
-      .topdatefrom
-        %label.block Date From
-        = date_field('range','start_time[gte]')
+  .section.group
+    .col.col-12.title
+      %h2 WHO Institution
+      %span SHOWING: in the last 12 months
 
-      .topdateperiod
-        %form#filters-form{ action: dashboard_path, 'data-auto-submit' => true }
-          .filter
-            %label.block Date Period
-            = cdx_select name: 'since', value: params['since'] do |select|
-              - select.items options_for_date, :value, :label
+  .section.group
+    .col.col-12
+      %form#filters-form{ action: dashboard_path }
+        %fieldset
+          %label{:for => "date"} Date Period:
+          = cdx_select name: 'since', value: params['since'] do |select|
+            - select.items options_for_date, :value, :label
+        %fieldset
+          %label{:for => "from"} Date From:
+          = date_field('range','start_time[gte]')
+          %label{:for => "to"} To:
+          = date_field('range','start_time[lte]')
+        %input#query_button.btn-primary{:type => "submit", :value => "filter"}
+ 
+  .section.group
+    -if(query_tests_chart.present?)
+      .col.col-8.box
+        %header
+          %img{:alt => "", :src => "/assets/img/test-tube-rack.png"}
+            %h3 Total Tests
+        .box-content
+          -#= react_component('BarChart', data: query_tests_chart, height: 300, y_label: 'Tests Run', colors: standard_colours)
+          %img{:alt => "", :src => "/assets/img/charts/total-tests.png"}
 
-.row
+    -if(failed_tests.present?)
+      .col.col-4.box
+        %header
+          %img{:alt => "", :src => "/assets/img/fail.png"}
+            %h3 Failed Tests
+        .box-content
+          = react_component('HorizontalNiceBarChartImages', data: failed_tests, width: 400, label: 'Failed tests', chart_div: 'chart_failed_tests_graph', colors: ["#00A8AB", "#F15754"] )
+          #chart_failed_tests_graph
+          -#%img{:alt => "", :src => "/assets/img/charts/failed-tests.png"}
+          %p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum cumque ut at voluptates. Excepturi minus maiores atque earum ad placeat beatae! Quidem placeat atque corrupti! Incidunt repudiandae, quam neque dicta.
 
-.chart-container-row
-  .chart-container-bar
-    .row
-      .col.pe-8
-        %h1 Total Tests
-    .row
-      .col.pe-7
-        = react_component('BarChart', data: query_tests_chart.data, height: 300, y_label: 'Tests Run', x_labels: query_tests_chart.statuses)
+    -if(query_site_tests_chart.present?)
+      .col.col-6.box
+        %header
+          %img{:alt => "", :src => "/assets/img/site.png"}
+            %h3 Total Tests by Site
+        .box-content
+          = react_component('HorizontalNiceBarChart', data: query_site_tests_chart, width: 600, chart_div: 'chart_site_tests', label: 'Total Tests by Site', colors: standard_colours)
+          #chart_site_tests
+          -#%img{:alt => "", :src => "/assets/img/charts/tests-site.png"}
 
-  .chart-container-pie
-    .row
-      .col.pe-8
-        %h1 Total Tests by Device
-    .row#tests_run
-      .col.pe-7
-        = react_component('PieChart', data: devices_grouped, height: 250, label: 'Tests Run')
-        -# = react_component('PieChart', data: tests_by_status, height: 250, label: 'Tests Run')
-  .chart-container-clear
+    -if(average_test_per_site_chart.present?)
+      .col.col-6.box
+        %header
+          %img{:alt => "", :src => "/assets/img/site.png"}
+            %h3 Average Tests by Site
+        .box-content
+          = react_component('GroupedVerticalBarChart', height: 300, width: 600, chart_div: 'chart_average_test_per_site_chart', data: average_test_per_site_chart, colors: standard_colours)
+          #chart_average_test_per_site_chart
+          %img{:alt => "", :src => "/assets/img/charts/avg-tests-site.png"}
 
-.chart-container-row
-  .chart-container-barleft
-    .row
-      .col.pe-8
-        %h1 Total Tests by Site
-    .row
-      .col.pe-7
-        = react_component('HorizontalBarChart', data: query_site_tests_chart, width: 600, x_labels:query_tests_chart.statuses, chart_div: 'chart_site_tests', label: 'Total Tests by Site')
-        #chart_site_tests
+    -if(devices_grouped.present?)
+      .col.col-4.box
+        %header
+          %img{:alt => "", :src => "/assets/img/device.png"}
+            %h3 Total Tests by Device
+        .box-content
+          = react_component('SnailPieChart', data: devices_grouped, height: 250, label: 'Tests Run', colors: standard_colours)
+          -#%img{:alt => "", :src => "/assets/img/charts/tests-device.png"}
 
-  .chart-container-barright
-    .row
-      .col.pe-8
-        %h1 Average Tests by Site
-    .row
-      .col.pe-7
-        = react_component('GroupedVerticalBarChart', height: 300, width: 600, chart_div: 'chart_average_test_per_site_chart', data: average_test_per_site_chart)
-        #chart_average_test_per_site_chart
-  .chart-container-clear
+    -if(average_tests_per_technician_chart.present?)
+      .col.col-8.box
+        %header
+          %img{:alt => "", :src => "/assets/img/user.png"}
+            %h3 Average Tests by Technician
+        .box-content
+          = react_component('GroupedHorizontalBarChart', data: average_tests_per_technician_chart, width: 600, chart_div: 'chart_average_tests', label: 'DAYS', colors: standard_colours)
+          #chart_average_tests
+          %img{:alt => "", :src => "/assets/img/charts/tests-technician.png"}
 
-.chart-container-row
-  .chart-container-pieleft
-    .row
-      .col.pe-8
-        %h1 Failed Tests
-    .row
-      .col.pe-7
-        .pieleft
-          = react_component('PieChart', data: failed_tests, height: 250, label: 'Total tests')
-        .pieright
-          = react_component('PieChart', data: tests_by_failed, height: 250, label: 'Failed tests')
-
-  .chart-container-piebarright
-    .row
-      .col.pe-8
-        %h1 Average Tests by Technician
-    .row
-      .col.pe-7
-        = react_component('GroupedHorizontalBarChart', data: average_tests_per_technician_chart, width: 600, x_labels:query_tests_chart.statuses, chart_div: 'chart_average_tests', label: 'DAYS')
-        #chart_average_tests
-  .chart-container-clear
-
-.chart-container-row
-  .chart-container-barleft
-    .row
-      .col.pe-8
-        %h1 Devices Not Responding
-    .row
-      .col.pe-7
-        = react_component('HorizontalBarChart', data: query_devices_not_reporting_chart, width: 600, x_labels:query_tests_chart.statuses, chart_div: 'chart_not_responding', label: 'DAYS')
-        #chart_not_responding
-
-  .chart-container-barright
-    .row
-      .col.pe-8
-        %h1 Device Error Codes
-    .row
-      .col.pe-7
-        = react_component('DeviceErrorTable', title: "title", allowSorting: "true", orderBy: "-device", data: error_codes_by_device)
-  .chart-container-clear
-
-.chart-container-clear
-
-.chart-container-row
-  .chart-container
-    = react_component('OutstandingTestsTable', title: "title", allowSorting: "true", orderBy: "-test_order", data: outstanding_orders)
-  .chart-container-clear
+      .col.col-12.box
+        %header
+          %img{:alt => "", :src => "/assets/img/test-tube.png"}
+            %h3 Outstanding Tests
+        .box-content
+          %table
+            %thead
+              %th Test Order Number
+              %th
+                Date Ordered
+                %img{:alt => "", :src => "/assets/img/filter-arrow.png"}/
+              %th
+                Ordered By
+                %img{:alt => "", :src => "/assets/img/filter-arrow.png"}/
+              %th
+                Outstanding Days
+                %img{:alt => "", :src => "/assets/img/filter-arrow.png"}/
+            %tbody
+              %tr
+                %td 02468aff-2cdb-af93-d6a9-df78d4fbdd13
+                %td 16-05-2016
+                %td Jane Doe
+                %td 88
+              %tr
+                %td 073b4d77-3f0b-3487-4a44-db3b41bb8c2a
+                %td 14-05-2016
+                %td Cornelia
+                %td 86
+              %tr
+                %td 0acb86c9-9eb7-97a5-1799-d4322bb71d4b
+                %td 01-05-2016
+                %td Harris
+                %td 71
+              %tr
+                %td 0cff0bc4-a10d-55ef-604f-09c14802f40f
+                %td 21-04-2016
+                %td John Doe
+                %td 69
+              %tr
+                %td 152770e8-4f18-16ac-1c0c-35f270f14ac1
+                %td 17-04-2016
+                %td Trintass
+                %td 57
+              %tr
+                %td 25a7b3a9-e6de-c00b-d97e-c0fc7dffe9b0
+                %td 03-04-2016
+                %td Christiana
+                %td 45
