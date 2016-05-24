@@ -51,6 +51,17 @@ describe "Patients", elasticsearch: true do
       end
     end
 
+    it "should filter patients by id" do
+      goto_page PatientPage do |page|
+
+        within patient_filter do
+          fill_in  "entity_id", :with => foo_patient.id
+        end
+
+        expect(page).to have_content(foo_patient.name)
+        expect(page).to_not have_content(bar_patient.name)
+      end
+    end
   end
 
 end
