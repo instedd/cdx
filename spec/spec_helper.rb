@@ -22,7 +22,7 @@ Capybara.javascript_driver = :poltergeist
 Dir[Rails.root.join("features/support/page_objects/*.rb")].each {|f| require f}
 Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
-WebMock.disable_net_connect!(:allow_localhost => true, allow: /fonts\.googleapis\.com/)
+WebMock.disable_net_connect!(:allow_localhost => true, allow: [/fonts\.googleapis\.com/, /manastech\.testrail\.com/])
 
 # This is to make machinist work with Rails 4
 class ActiveRecord::Reflection::AssociationReflection
@@ -85,6 +85,16 @@ RSpec.configure do |config|
 
   config.after(:each) do
     Timecop.return
+  end
+
+  if config.respond_to?(:testrail_formatter_options)
+    if ENV["CI"]
+      tag = `git describe --exact-match 2>/dev/null`.strip
+      config.testrail_formatter_options[:run_name] = tag
+      config.testrail_formatter_options[:disabled] = tag.blank?
+    else
+      config.testrail_formatter_options[:disabled] = true
+    end
   end
 end
 
