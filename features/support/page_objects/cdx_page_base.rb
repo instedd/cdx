@@ -36,6 +36,14 @@ class CdxPageBase < SitePrism::Page
     wait_for_submit
   end
 
+  def update_filters
+    within filters do
+      yield
+    end
+    self.wait_for_submit
+  end
+
+
   def success?
     status_code == 200
   end
