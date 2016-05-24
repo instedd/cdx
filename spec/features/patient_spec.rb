@@ -3,12 +3,14 @@ require 'policy_spec_helper'
 
 describe "Patients", elasticsearch: true do
   let(:institution) { Institution.make }
-  let(:user) { institution.user }
+ 
   let(:site) { institution.sites.make }
 
   let!(:device_spec_helper) { DeviceSpecHelper.new 'genoscan' }
   let!(:device) { device_spec_helper.make site: site }
 
+  let!(:user) { institution.user }
+  
   context "without name" do
     before(:each) {
       device_spec_helper.import_sample_csv device, 'genoscan_sample.csv'
@@ -28,4 +30,27 @@ describe "Patients", elasticsearch: true do
       end
     end
   end
+
+  context "filters" do
+    let!(:foo_patient) { Patient.make(institution: institution, core_fields: {"gender" => "male"}, custom_fields: {"custom" => "patient value"}, is_phantom: false, plain_sensitive_data: {"name": "Doe"}) }
+    let!(:bar_patient) { Patient.make(institution: institution, core_fields: {"gender" => "male"}, custom_fields: {"custom" => "patient value"}, is_phantom: false, plain_sensitive_data: {"name": "Lane"}) }
+
+    before(:each) {
+      sign_in(user)
+    }
+
+    it "should filter patients by name" do
+      goto_page PatientPage do |page|
+
+        within patient_filter do
+          fill_in  "name", :with => foo_patient.name
+        end
+
+        expect(page).to have_content(foo_patient.id)
+        expect(page).to_not have_content(bar_patient.id)
+      end
+    end
+
+  end
+
 end
