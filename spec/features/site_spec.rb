@@ -5,7 +5,7 @@ describe "site" do
   let(:institution) { Institution.make }
   let!(:user) { institution.user }
 
-    context "filters" do
+  context "filters" do
     let!(:foo_site) {institution.sites.make }
     let!(:bar_site) {institution.sites.make }
    
@@ -16,12 +16,12 @@ describe "site" do
     it "should filter sites by name" do
       goto_page SitesPage do |page|
 
-        within filters do
+        page.update_filters do
           fill_in  "name", :with => foo_site.name
         end
-
-        expect(page).to have_content(foo_site.id)
-        expect(page).to_not have_content(bar_site.id)
+        
+        expect(page).to have_content(foo_site.location.name)
+        expect(page).to_not have_content(bar_site.location.name)
       end
     end
   end
