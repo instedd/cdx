@@ -2,6 +2,6 @@ class PatientPage < CdxPageBase
   set_url '/patients{/patient_id}{?query*}'
 end
 
-def patient_filter
+def filters
   "form#filters-form"
 end

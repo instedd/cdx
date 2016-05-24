@@ -42,7 +42,7 @@ describe "Patients", elasticsearch: true do
     it "should filter patients by name" do
       goto_page PatientPage do |page|
 
-        within patient_filter do
+        within filters do
           fill_in  "name", :with => foo_patient.name
         end
 
@@ -54,7 +54,7 @@ describe "Patients", elasticsearch: true do
     it "should filter patients by id" do
       goto_page PatientPage do |page|
 
-        within patient_filter do
+        within filters do
           fill_in  "entity_id", :with => foo_patient.id
         end
 
