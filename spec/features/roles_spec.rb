@@ -4,6 +4,8 @@ describe "roles", elasticsearch: true do
   let!(:institution) { Institution.make }
   let!(:user) { institution.user }
   let!(:site) { institution.sites.make }
+  let!(:role) { Role.first }
+  let!(:other_role) { Role.second }
 
   context "Site owner" do
 
@@ -44,6 +46,25 @@ describe "roles", elasticsearch: true do
     it "should load for site admin", testrail: 1194 do
       goto_page RolesPage do |page|
         expect(page.table.items.count).to eq(site.roles.count)
+      end
+    end
+  end
+
+  context "filters" do   
+    before(:each) {
+      sign_in(user)
+    }
+
+    it "should filter roles by name", testrail: 1112 do
+      goto_page RolesPage do |page|
+        expect(page).to have_content(role.name)
+
+        page.update_filters do
+          fill_in  "name", :with => role.name
+        end
+
+        expect(page).to have_content(role.name)
+        expect(page).to_not have_content(other_role.name)
       end
     end
   end
