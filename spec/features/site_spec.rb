@@ -13,7 +13,7 @@ describe "site" do
       sign_in(user)
     }
 
-    it "should filter sites by name" do
+    it "should filter sites by name", testrail: 394 do
       goto_page SitesPage do |page|
 
         page.update_filters do

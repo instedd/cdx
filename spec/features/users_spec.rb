@@ -15,7 +15,7 @@ describe "Users", elasticsearch: true do
       sign_in(user)
     }
 
-    it "should filter users by name" do
+    it "should filter users by name", testrail: 471 do
       goto_page UsersPage do |page|
         expect(page).to have_content(foo_user.first_name)
 

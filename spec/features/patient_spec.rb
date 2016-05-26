@@ -39,7 +39,7 @@ describe "Patients", elasticsearch: true do
       sign_in(user)
     }
 
-    it "should filter patients by name" do
+    it "should filter patients by name", testrail: 387 do
       goto_page PatientPage do |page|
 
         page.update_filters do
@@ -51,7 +51,7 @@ describe "Patients", elasticsearch: true do
       end
     end
 
-    it "should filter patients by id" do
+    it "should filter patients by id", testrail: 385 do
       goto_page PatientPage do |page|
 
         page.update_filters do
