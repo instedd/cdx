@@ -25,4 +25,23 @@ describe "site" do
       end
     end
   end
+
+  context "site view" do
+
+    before(:each) {
+      sign_in(user)
+    }
+
+    it "should add site", testrail: 398 do
+      goto_page SitesPage do |page|
+
+      click_link "Add Site"
+      fill_in  "site[name]", :with => "Vietnam"
+      page.submit  
+
+
+      expect(page).to have_content("Vietnam")
+      end
+    end
+  end
 end
