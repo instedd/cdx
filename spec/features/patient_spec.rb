@@ -62,6 +62,26 @@ describe "Patients", elasticsearch: true do
         expect(page).to_not have_content(bar_patient.name)
       end
     end
+
+  end
+
+  context "patient view" do
+    before(:each) {
+      sign_in(user)
+    }
+
+    it "should create patient", testrail: 389 do
+      goto_page PatientsPage do |page|
+      click_link "Add Patient"
+      fill_in  "patient[name]", :with => "Peter Durkheim"
+      fill_in  "patient[entity_id]", :with => "123"
+      page.submit  
+
+
+      expect(page).to have_content("Peter Durkheim")
+      end
+    end
+
   end
 
 end
