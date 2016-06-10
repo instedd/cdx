@@ -8,7 +8,7 @@ describe "invite user" do
   }
 
   describe "from users list", testrail: 451 do
-    it "should allow invitee to login right after password setup" do
+    it "should allow invitee to login right after password setup", testrail: 450 do
       goto_page UserViewPage do |page|
         page.open_invite_users do |modal|
           modal.role.set "#{institution.name} Admin"
