@@ -27,6 +27,7 @@ describe "site" do
   end
 
   context "site view" do
+    let!(:foo_site) {institution.sites.make }
 
     before(:each) {
       sign_in(user)
@@ -34,14 +35,29 @@ describe "site" do
 
     it "should add site", testrail: 398 do
       goto_page SitesPage do |page|
-
-      click_link "Add Site"
-      fill_in  "site[name]", :with => "Vietnam"
-      page.submit  
-
-
-      expect(page).to have_content("Vietnam")
+        click_link "Add Site"
       end
+
+      expect_page SiteNewPage do |page|
+        fill_in  "site[name]", :with => "Vietnam"
+        page.submit 
+        expect(page).to have_content("Vietnam")
+      end          
+    end
+
+    it "should delete site", testrail: 399 do
+      goto_page SitesPage do |page|
+        page.table.items.first.click
+      end
+
+      expect_page SiteEditPage do |page|
+        page.delete.click
+        page.confirmation.delete.click
+      end
+
+      expect_page SitesPage do |page|  
+        expect(page).to_not have_content(foo_site.name)
+      end 
     end
   end
 end
