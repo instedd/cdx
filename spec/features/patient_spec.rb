@@ -66,6 +66,8 @@ describe "Patients", elasticsearch: true do
   end
 
   context "patient view" do
+    let!(:foo_patient) { Patient.make(institution: institution, core_fields: {"gender" => "male"}, custom_fields: {"custom" => "patient value"}, is_phantom: false, plain_sensitive_data: {"name": "Doe"}) }
+    
     before(:each) {
       sign_in(user)
     }
@@ -80,6 +82,19 @@ describe "Patients", elasticsearch: true do
 
       expect(page).to have_content("Peter Durkheim")
       end
+    end
+
+    it "should delete patient", testrail: 391 do
+      goto_page PatientsPage do |page|
+        page.table.items.first.click
+        click_link "Edit" 
+      end
+
+        expect_page PatientEditPage do |page|
+          page.delete.click
+          page.confirmation.delete.click
+        end
+      
     end
 
   end
