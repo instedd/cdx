@@ -13,10 +13,8 @@ $(document).on('ready', function(){
       )
       cdx_init_components(container);
     }
-
     $("body").toggleClass("show-navigation-context-picker");
     $("input:first", container).focus();
-    event.preventDefault();
     return false;
   }
   // This is the case after a reload, or on loading the site.
@@ -30,6 +28,7 @@ $(document).on('ready', function(){
   }
   $(document).on('click', "#nav-context", function(event){
     initializeContext();
+    event.preventDefault();
     $.ajax({
       url: '/users/update_setting',
       method: 'POST',
