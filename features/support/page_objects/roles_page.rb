@@ -3,3 +3,9 @@ class RolesPage < CdxPageBase
 
   section :table, CdxTable, "table"
 end
+
+class RoleEditPage < CdxPageBase
+  set_url '/roles{/role_id}/edit{?query*}'
+
+  element :delete, :link, 'Delete'
+end

@@ -31,6 +31,21 @@ describe "roles", elasticsearch: true do
         end
       end
     end
+
+    it "should delete role", testrail: 1376 do
+      goto_page RolesPage do |page|
+        page.table.items.first.click
+      end
+
+      expect_page RoleEditPage do |page|
+        page.delete.click
+        page.confirmation.delete.click
+      end
+
+      expect_page RolesPage do |page|  
+        expect(page).to_not have_content(role.name)
+      end 
+    end
   end
 
   context "site admin" do
