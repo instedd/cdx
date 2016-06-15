@@ -74,14 +74,14 @@ describe "Patients", elasticsearch: true do
 
     it "should create patient", testrail: 389 do
       goto_page PatientsPage do |page|
-      click_link "Add Patient"
-      fill_in  "patient[name]", :with => "Peter Durkheim"
-      fill_in  "patient[entity_id]", :with => "123"
-      page.submit  
+        click_link "Add Patient"
+        fill_in  "patient[name]", :with => "Peter Durkheim"
+        fill_in  "patient[entity_id]", :with => "123"
+        page.submit  
 
-
-      expect(page).to have_content("Peter Durkheim")
+        expect(page).to have_content("Peter Durkheim")
       end
+
     end
 
     it "should delete patient", testrail: 391 do
@@ -90,11 +90,10 @@ describe "Patients", elasticsearch: true do
         click_link "Edit" 
       end
 
-        expect_page PatientEditPage do |page|
-          page.delete.click
-          page.confirmation.delete.click
-        end
-      
+      expect_page PatientEditPage do |page|
+        page.delete.click
+        page.confirmation.delete.click
+      end   
     end
 
   end
