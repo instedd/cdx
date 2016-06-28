@@ -19,3 +19,11 @@ class InviteUsersPage < CdxPageBase
 
   element :primary, ".modal .btn-primary"
 end
+
+class UserEditPage < CdxPageBase
+  set_url '/users{/user_id}/edit{?query*}'
+
+  element :add_role, ".btn-add-link"
+  element :autocomplete, ".box-autocomplete"
+end
+
