@@ -11,7 +11,7 @@ require 'capybara/poltergeist'
 require 'webmock/rspec'
 require 'capybara-screenshot/rspec'
 
-Capybara.javascript_driver = :poltergeist
+# Capybara.javascript_driver = :poltergeist
 
 
 # HTTPI.log = false

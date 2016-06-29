@@ -18,9 +18,11 @@ class CdxPageBase < SitePrism::Page
   element :content, ".content", match: :first
   element :logout_link, :link, "Log out"
   section :confirmation, ConfirmationSection, '[data-react-class="ConfirmationModal"]'
+  element :avatar, ".user"
 
   def logout
-    logout_link.trigger('click')
+    avatar.click_or_trigger_click
+    logout_link.click_or_trigger_click
     wait_for_submit
   end
 
@@ -62,5 +64,15 @@ class CdxPageBase < SitePrism::Page
 
   def forbidden?
     status_code == 403
+  end
+end
+
+class Capybara::Node::Element
+  def click_or_trigger_click
+    if Capybara.javascript_driver == :poltergeist
+      trigger('click')
+    else
+      click
+    end
   end
 end

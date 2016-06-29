@@ -6,4 +6,6 @@ class HomePage < CdxPageBase
     element :password, '#user_password'
     element :login, '[name="commit"]'
   end
+
+  
 end

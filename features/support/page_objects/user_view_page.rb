@@ -4,7 +4,7 @@ class UserViewPage < CdxPageBase
   element :invite_users, "a[title='Invite users']"
 
   def open_invite_users
-    invite_users.trigger('click')
+    invite_users.click
     modal = InviteUsersPage.new
     yield modal if block_given?
     modal

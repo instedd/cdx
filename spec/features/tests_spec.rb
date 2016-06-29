@@ -28,6 +28,22 @@ describe "tests", elasticsearch: true do
         expect(page).to_not have_content("4")
       end
     end
+  
+    it "should filter tests by device" do
+      goto_page TestResultsPage do |page|
+        
+        p device.name
+        sleep 8
+        expect(page).to have_content(device.name)
+
+        page.submit 
+        page.update_filters do
+          fill_in  "device.uuid", :with => device.name
+        end
+
+        expect(page).to have_content(device.name)
+      end
+    end
   end
 
 end
