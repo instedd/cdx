@@ -11,6 +11,8 @@ class DeviceModelPage < CdxPageBase
   set_url "/device_models/{id}/edit"
 
   element :name, :field, "Name"
+  element :support_url, :field, "Support url"
+  section :manifest, FileInput, :field, "Manifest"
 end
 
 class DeviceModelsPage < CdxPageBase

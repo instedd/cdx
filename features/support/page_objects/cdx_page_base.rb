@@ -14,6 +14,7 @@ class CdxPageBase < SitePrism::Page
   element :navigation_context_handle, "#nav-context"
   section :navigation_context, NavigationContextSection, "#context_side_bar"
   element :primary, ".btn-primary"
+  element :secondary, ".btn-secondary"
   element :content, ".content", match: :first
   element :logout_link, :link, "Log out"
   section :confirmation, ConfirmationSection, '[data-react-class="ConfirmationModal"]'
@@ -36,6 +37,11 @@ class CdxPageBase < SitePrism::Page
     wait_for_submit
   end
 
+  def press_secondary_button
+    secondary.click
+    wait_for_submit
+  end
+
   def update_filters
     within filters do
       yield
@@ -43,6 +49,12 @@ class CdxPageBase < SitePrism::Page
     self.wait_for_submit
   end
 
+  def accept_confirm
+    page.evaluate_script('window.__old_confirm = window.confirm;')
+    page.evaluate_script('window.confirm = function() { return true; };')
+    yield
+    page.evaluate_script('window.confirm = window.__old_confirm;')
+  end
 
   def success?
     status_code == 200
