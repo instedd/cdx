@@ -217,6 +217,33 @@ describe "device" do
       sign_in(user)
     }
 
+   context "device view" do
+      before(:each) {
+        goto_page DevicePage, id: device.id do |page|
+          page.edit.click
+        end
+      }
+
+      it "should rename device", testrail: 408 do
+        expect_page DeviceEditPage do |page|
+          page.name.set "Renamed_Device"
+          page.submit
+        end
+  
+        expect_page DevicesPage do |page|
+          page.table.items.first.tap do |item|
+            expect(item).to have_content("Renamed_Device")
+            item.click
+          end
+        end
+  
+        expect_page DevicePage do |page|
+          expect(page).to have_content("Renamed_Device")
+        end
+      end
+    end
+
+
     context "when deleted" do
       before(:each) {
         goto_page DevicePage, id: device.id do |page|

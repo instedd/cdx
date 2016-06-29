@@ -27,6 +27,7 @@ class DevicePage < DeviceSetupPage
   set_url '/devices/{id}{?query*}'
 
   element :edit, "a[title='Edit']"
+  element :name, :field, "Name"
 
   section :tab_header, '.tabs' do
     element :setup, :link, 'Setup'
@@ -47,6 +48,7 @@ class DeviceEditPage < CdxPageBase
   set_url '/devices/{id}/edit{?query*}'
 
   element :delete, :link, 'Delete'
+  element :name, :field, "Name"
 end
 
 class NewDevicePage < CdxPageBase
@@ -56,4 +58,10 @@ class NewDevicePage < CdxPageBase
   element :name, :field, "Name"
   section :site, CdxSelect, "label", text: "SITE"
   element :serial_number, :field, "Serial number"
+end
+
+class DevicesPage < CdxPageBase
+  set_url "/devices"
+
+  section :table, CdxTable, "table"
 end
