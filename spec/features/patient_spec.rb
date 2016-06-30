@@ -66,7 +66,7 @@ describe "Patients", elasticsearch: true do
   end
 
   context "patient view" do
-    let!(:foo_patient) { Patient.make(institution: institution, core_fields: {"gender" => "male"}, custom_fields: {"custom" => "patient value"}, is_phantom: false, plain_sensitive_data: {"name": "Doe"}) }
+    let!(:foo_patient) { Patient.make(institution: institution, core_fields: {"gender" => "male"}, custom_fields: {"custom" => "patient value"}, is_phantom: false, plain_sensitive_data: {"name": "Doe", "id": "123"}) }
     
     before(:each) {
       sign_in(user)
@@ -93,6 +93,22 @@ describe "Patients", elasticsearch: true do
       expect_page PatientEditPage do |page|
         page.delete.click
         page.confirmation.delete.click
+      end   
+    end
+
+    it "should rename patient", testrail: 390 do
+      goto_page PatientsPage do |page|
+        page.table.items.first.click
+        click_link "Edit" 
+      end
+
+      expect_page PatientEditPage do |page|
+        page.name.set "Renamed_Patient"
+        page.submit
+      end 
+
+      expect_page PatientPage do |page|
+        expect(page).to have_content("Renamed_Patient")
       end   
     end
 

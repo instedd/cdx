@@ -6,6 +6,7 @@ class PatientEditPage < CdxPageBase
   set_url '/patients/{id}/edit{?query*}'
 
   element :delete, :link, 'Delete'
+  element :name, :field, "Name"
 end
 
 class PatientsPage < CdxPageBase
