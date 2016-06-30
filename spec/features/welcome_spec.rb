@@ -18,7 +18,7 @@ describe "the login process" do
 	  	sign_in(user)
   	}
 	
-  	it "can logout" do
+  	it "can logout", testrail: 482 do
       goto_page HomePage do |page|
         page.logout
       end
