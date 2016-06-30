@@ -46,6 +46,23 @@ describe "roles", elasticsearch: true do
         expect(page).to_not have_content(role.name)
       end 
     end
+
+    it "should rename role", testrail: 464 do
+      goto_page RolesPage do |page|
+        expect(page).to have_content(role.name)
+        page.table.items.first.click
+      end
+
+      expect_page RoleEditPage do |page|
+        page.name.set "Renamed_Role"
+        page.submit
+      end 
+
+      expect_page RolesPage do |page|
+        expect(page).to_not have_content(role.name)
+        expect(page).to have_content("Renamed_Role")
+      end   
+    end
   end
 
   context "site admin" do
