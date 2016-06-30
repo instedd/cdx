@@ -2,6 +2,7 @@ class SiteEditPage < CdxPageBase
   set_url '/sites{/site_id}/edit{?query*}'
 
   element :delete, :link, 'Delete'
+  element :name, :field, "Name"
 
   def shows_deleted?
     page.has_css?('h2.deleted')

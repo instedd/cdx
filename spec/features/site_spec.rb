@@ -59,5 +59,22 @@ describe "site" do
         expect(page).to_not have_content(foo_site.name)
       end 
     end
+
+    it "should rename site", testrail: 396 do
+      goto_page SitesPage do |page|
+        expect(page).to have_content(foo_site.name)
+        page.table.items.first.click
+      end
+
+      expect_page SiteEditPage do |page|
+        page.name.set "Renamed_Site"
+        page.submit
+      end 
+
+      expect_page SitesPage do |page|
+        expect(page).to_not have_content(foo_site.name)
+        expect(page).to have_content("Renamed_Site")
+      end   
+    end
   end
 end
