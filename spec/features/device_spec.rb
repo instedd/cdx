@@ -62,7 +62,7 @@ describe "device" do
       let!(:site) { other_institution.sites.make }
 
       it "should assign the device to the sole site" do
-        expect(device.site).to eq(site)
+        expect(create_device.site).to eq(site)
       end
     end
 
