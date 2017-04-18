@@ -1,75 +1,79 @@
 sep=;
 Result No;Device Serial;Test Name;Cartridge ID;Sample ID;HIV-1 M/N;HIV-1 O;HIV-2;Error Code;Operator;Timestamp;Sample Detection;Device;HIV-1 Positive Control;HIV-2 Positive Control;Negative Control;Analysis;Device Software
-124;nat-04000263;Alere q HIV-1/2 Detect;0463802377;1826-2852;Undetected;Undetected;Undetected;0;MARTIN;2015-12-02 13:03:17;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-123;nat-04000263;Alere q HIV-1/2 Detect;0463802304;1826-2851;Undetected;Undetected;Undetected;0;MARTIN;2015-12-02 12:03:29;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-122;nat-04000263;Alere q HIV-1/2 Detect;0463802365;1827-2547;Undetected;Undetected;Undetected;0;ULEMU;2015-12-01 10:41:07;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-121;nat-04000263;Alere q HIV-1/2 Detect;0463802301;1827-2792;Undetected;Undetected;Undetected;0;ULEMU;2015-12-01 08:39:13;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-120;nat-04000263;Alere q HIV-1/2 Detect;0463802334;1827-2859-TJRAXJ;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-11-30 10:48:33;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-119;nat-04000263;Alere q HIV-1/2 Detect;0463802372;1827-2848-TW2X9N;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-11-27 11:58:53;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-118;nat-04000263;Alere q HIV-1/2 Detect;0463802373;1827-2849-P71XNT;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-11-27 10:56:41;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-117;nat-04000263;Alere q HIV-1/2 Detect;0463802324;1827-2849-P71XNT;---;---;---;23206;Chimango;2015-11-27 10:19:15;----;Fail;----;----;----;----;0.21.3
-116;nat-04000263;Alere q HIV-1/2 Detect;0463802361;1827-2391;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-11-24 11:54:05;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-115;nat-04000263;Alere q HIV-1/2 Detect;0463802333;1827-2844-8D5F8F;Undetected;Undetected;Undetected;0;ULEMU;2015-11-24 10:53:26;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-114;nat-04000263;Alere q HIV-1/2 Detect;0463802364;1827-2843-HOLKME;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-11-23 14:21:31;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-113;nat-04000263;Alere q HIV-1/2 Detect;0463802362;1827-2841;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-11-23 12:25:07;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-112;nat-04000263;Alere q HIV-1/2 Detect;0463802360;1827-2842;Detected;Undetected;Undetected;0;J. CHIMWALA;2015-11-23 11:22:16;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-111;nat-04000263;Alere q HIV-1/2 Detect;0463802303;1827-2842;Detected;Undetected;Undetected;0;J. CHIMWALA;2015-11-23 10:17:50;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-110;nat-04000263;Alere q HIV-1/2 Detect;0463802335;1827-2840;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-11-23 08:42:49;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-109;nat-04000263;Alere q HIV-1/2 Detect;0463802302;1827-2839;Undetected;Undetected;Undetected;0;Kalowe;2015-11-20 12:52:52;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-108;nat-04000263;Alere q HIV-1/2 Detect;0463802322;1827-2835;Undetected;Undetected;Undetected;0;TIMOTHY;2015-11-17 13:28:54;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-107;nat-04000263;Alere q HIV-1/2 Detect;0463802313;1827-2834;Undetected;Undetected;Undetected;0;TIMOTHY;2015-11-17 12:11:59;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-106;nat-04000263;Alere q HIV-1/2 Detect;0463802316;1827-2833;Undetected;Undetected;Undetected;0;TIMOTHY;2015-11-17 11:05:21;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-105;nat-04000263;Alere q HIV-1/2 Detect;0463802375;1827-2452;Undetected;Undetected;Undetected;0;TIMOTHY;2015-11-17 09:58:40;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-104;nat-04000263;Alere q HIV-1/2 Detect;0463802305;1827-2832;Undetected;Undetected;Undetected;0;TIMOTHY;2015-11-13 11:29:50;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-103;nat-04000263;Alere q HIV-1/2 Detect;0463802323;1827-2601;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-11-12 14:03:49;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-102;nat-04000263;Alere q HIV-1/2 Detect;0463802312;1827-2726;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-11-12 13:02:05;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-63;nat-04000263;Alere q HIV-1/2 Detect;0437001095;1827-2778;---;---;---;23206;J. CHIMWALA;2015-10-20 11:18:54;----;Fail;----;----;----;----;0.21.3
-62;nat-04000263;Alere q HIV-1/2 Detect;0437001044;1827-2776;Undetected;Undetected;Undetected;0;TIMOTHY;2015-10-20 10:05:28;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-61;nat-04000263;Alere q HIV-1/2 Detect;0437000735;1827-2774;Undetected;Undetected;Undetected;0;J0SHUA;2015-10-20 09:04:47;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-60;nat-04000263;Alere q HIV-1/2 Detect;0437001516;1827-2773;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-19 11:51:50;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-59;nat-04000263;Alere q HIV-1/2 Detect;0437001098;1827-2772;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-19 10:27:02;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-58;nat-04000263;Alere q HIV-1/2 Detect;0437001004;1827-2771;Undetected;Undetected;Undetected;0;TIMOTHY;2015-10-19 09:16:40;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-57;nat-04000263;Alere q HIV-1/2 Detect;0437000947;1827-2668;Undetected;Undetected;Undetected;0;TIMOTHY;2015-10-16 12:00:11;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-56;nat-04000263;Alere q HIV-1/2 Detect;0437001514;1827-2667;Undetected;Undetected;Undetected;0;TIMOTHY;2015-10-16 10:59:10;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-55;nat-04000263;Alere q HIV-1/2 Detect;0437001030;1827-2770;None;None;None;23026;TIMOTHY;2015-10-14 15:45:01;Pass;Pass;Fail;Pass;Pass;Pass;0.21.3
-54;nat-04000263;Alere q HIV-1/2 Detect;0437000740;1827-2770;None;None;None;23025;J. CHIMWALA;2015-10-14 14:28:09;Pass;Pass;Fail;Fail;Pass;Fail;0.21.3
-53;nat-04000263;Alere q HIV-1/2 Detect;0437000799;1827-2769;Detected;Undetected;Undetected;0;J. CHIMWALA;2015-10-14 13:14:28;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-52;nat-04000263;Alere q HIV-1/2 Detect;0437000701;1827-2770;---;---;---;23206;J. CHIMWALA;2015-10-14 12:34:47;----;Fail;----;----;----;----;0.21.3
-51;nat-04000263;Alere q HIV-1/2 Detect;0437000715;1827-2682;Undetected;Undetected;Undetected;0;Chimango;2015-10-14 10:38:11;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-50;nat-04000263;Alere q HIV-1/2 Detect;0437001549;1827-2767;Undetected;Undetected;Undetected;0;Chimango;2015-10-14 09:38:07;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-49;nat-04000263;Alere q HIV-1/2 Detect;0437001091;2768;Undetected;Undetected;Undetected;0;Chimango;2015-10-14 08:34:38;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-48;nat-04000263;Alere q HIV-1/2 Detect;0437001506;1827-2397;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-13 12:18:38;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-47;nat-04000263;Alere q HIV-1/2 Detect;0437000749;1827-2529;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-13 11:15:40;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-46;nat-04000263;Alere q HIV-1/2 Detect;0437000797;1827-2764;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-13 09:56:27;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-45;nat-04000263;Alere q HIV-1/2 Detect;0437000293;1827-2764;Undetected;Undetected;Undetected;0;TIMOTHY;2015-10-13 08:49:11;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-44;nat-04000263;Alere q HIV-1/2 Detect;0437001048;1827-2763;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-12 12:55:00;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-43;nat-04000263;Alere q HIV-1/2 Detect;0437000716;1827-2762;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-12 11:59:53;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-42;nat-04000263;Alere q HIV-1/2 Detect;0437001576;1827-2761;Undetected;Undetected;Undetected;0;TIMOTHY;2015-10-12 11:01:37;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-41;nat-04000263;Alere q HIV-1/2 Detect;0437000747;1827-2760;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-12 10:00:39;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-40;nat-04000263;Alere q HIV-1/2 Detect;0437000704;1827-2759;Undetected;Undetected;Undetected;0;TIMOTHY;2015-10-12 09:04:38;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-39;nat-04000263;Alere q HIV-1/2 Detect;0437000592;1827-2758;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-08 10:04:25;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-38;nat-04000263;Alere q HIV-1/2 Detect;0437000375;1827-2757;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-06 14:41:10;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-37;nat-04000263;Alere q HIV-1/2 Detect;0437000771;1827-2757;None;None;None;23026;MARTIN;2015-10-06 13:24:26;Pass;Pass;Fail;Fail;Pass;Pass;0.21.3
-36;nat-04000263;Alere q HIV-1/2 Detect;0437000451;1827-2756;Undetected;Undetected;Undetected;0;Kalowe;2015-10-06 12:16:56;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-35;nat-04000263;Alere q HIV-1/2 Detect;0437000337;1827-2855;Detected;Undetected;Undetected;0;Kalowe;2015-10-06 11:17:41;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-34;nat-04000263;Alere q HIV-1/2 Detect;0437000473;1827-2855;---;---;---;23206;MARTIN;2015-10-06 10:35:47;----;Fail;----;----;----;----;0.21.3
-33;nat-04000263;Alere q HIV-1/2 Detect;0437000386;1827-2754;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-05 13:28:48;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-32;nat-04000263;Alere q HIV-1/2 Detect;0437000603;1827-2395;Undetected;Undetected;Undetected;0;ELIAS;2015-10-03 11:20:50;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-31;nat-04000263;Alere q HIV-1/2 Detect;0437000475;1827-2748;Undetected;Undetected;Undetected;0;TIMOTHY;2015-10-01 14:47:47;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-30;nat-04000263;Alere q HIV-1/2 Detect;0437000598;1827-2749;Undetected;Undetected;Undetected;0;TIMOTHY;2015-10-01 13:10:46;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-29;nat-04000263;Alere q HIV-1/2 Detect;0437000488;1827-2747;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-10-01 12:08:18;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-28;nat-04000263;Alere q HIV-1/2 Detect;0437000464;1827-2746;Detected;Undetected;Undetected;0;TIMOTHY;2015-09-30 13:54:14;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-27;nat-04000263;Alere q HIV-1/2 Detect;0437000479;1827-2744;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-09-30 12:19:11;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-26;nat-04000263;Alere q HIV-1/2 Detect;0437000434;1827-361;Detected;Undetected;Undetected;0;ELIAS;2015-09-30 09:04:33;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-25;nat-04000263;Alere q HIV-1/2 Detect;0437000457;1827-2694TOL-TPH;Undetected;Undetected;Undetected;0;J. CHIMWALA;2015-09-29 14:36:02;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-24;nat-04000263;Alere q HIV-1/2 Detect;0437001261;1827-2741;Undetected;Undetected;Undetected;0;kalowe;2015-09-29 13:31:54;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-23;nat-04000263;Alere q HIV-1/2 Detect;0437000439;1827-2740;Undetected;Undetected;Undetected;0;Chimango;2015-09-29 12:07:15;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-22;nat-04000263;Alere q HIV-1/2 Detect;0437000462;1827-2737;Undetected;Undetected;Undetected;0;TIMOTHY;2015-09-29 11:05:47;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-21;nat-04000263;Alere q HIV-1/2 Detect;0437000492;1827-2739;Undetected;Undetected;Undetected;0;TIMOTHY;2015-09-25 12:37:50;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-20;nat-04000263;Alere q HIV-1/2 Detect;0437000477;1827-2738;Undetected;Undetected;Undetected;0;TIMOTHY;2015-09-25 11:22:49;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-19;nat-04000263;Alere q HIV-1/2 Detect;0437000590;1827-26982YA-LC3;Undetected;Undetected;Undetected;0;JOSEPH CHIMWALA;2015-09-25 10:15:16;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-18;nat-04000263;Alere q HIV-1/2 Detect;0437000455;1827-2736;Undetected;Undetected;Undetected;0;TIMOTHY;2015-09-24 13:15:59;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-17;nat-04000263;Alere q HIV-1/2 Detect;0437000474;1827-2733;Undetected;Undetected;Undetected;0;DOROTHY NTONYA;2015-09-24 12:18:32;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-16;nat-04000263;Alere q HIV-1/2 Detect;0437000478;1827-2727;Undetected;Undetected;Undetected;0;JOSEPH CHIMWALA;2015-09-24 11:21:24;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-15;nat-04000263;Alere q HIV-1/2 Detect;0437000480;1827-2574J76-JJ2;Undetected;Undetected;Undetected;0;dorothy;2015-09-24 10:23:37;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
-14;nat-04000263;Alere q HIV-1/2 Detect;0437000448;1827-2734;Detected;Undetected;Undetected;0;BERNADETTA;2015-09-24 09:15:55;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+106;NAT-04000443;Alere q HIV-1/2 Detect;0463802509;0738_1683;---;---;---;23205;HARRIS;2015-12-28 12:32:47;----;Fail;----;----;----;----;0.21.3
+105;NAT-04000443;Alere q HIV-1/2 Detect;0463801448;0738-1639;---;---;---;23206;TRINTASS;2015-12-21 10:07:24;----;Fail;----;----;----;----;0.21.3
+104;NAT-04000443;Alere q HIV-1/2 Detect;0463802563;0738_1668;Undetected;Undetected;Undetected;0;HARRIS;2015-12-15 13:34:36;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+103;NAT-04000443;Alere q HIV-1/2 Detect;0463801451;0738-1655;---;---;---;23206;ELIJAH;2015-12-07 13:24:34;----;Fail;----;----;----;----;0.21.3
+102;NAT-04000443;Alere q HIV-1/2 Detect;0463801435;0738-1655;---;---;---;51777;ELIJAH;2015-12-07 13:01:23;----;Fail;----;----;----;----;0.21.3
+101;NAT-04000443;Alere q HIV-1/2 Detect;0463801452;0738-1654;---;---;---;23206;0738-1654;2015-12-07 09:29:26;----;Fail;----;----;----;----;0.21.3
+100;NAT-04000443;Alere q HIV-1/2 Detect;0463801443;0701-2237;---;---;---;23206;ELIJAH;2015-12-07 08:22:16;----;Fail;----;----;----;----;0.21.3
+99;NAT-04000443;Alere q HIV-1/2 Detect;0463801493;0738-2237;---;---;---;23205;ELIJAH;2015-12-04 15:21:45;----;Fail;----;----;----;----;0.21.3
+98;NAT-04000443;Alere q HIV-1/2 Detect;0463801487;0701-2061;Undetected;Undetected;Undetected;0;THEMBA LUWE;2015-12-04 14:21:29;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+97;NAT-04000443;Alere q HIV-1/2 Detect;0463801496;0701-2188;---;---;---;23206;ELIJAH;2015-12-04 12:17:25;----;Fail;----;----;----;----;0.21.3
+96;NAT-04000443;Alere q HIV-1/2 Detect;0463801500;0701-2188;---;---;---;23206;TRINTASS;2015-12-04 11:39:53;----;Fail;----;----;----;----;0.21.3
+95;NAT-04000443;Alere q HIV-1/2 Detect;0463801491;0738-1653;Undetected;Undetected;Undetected;0;TRINTASS;2015-12-04 10:37:12;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+94;NAT-04000443;Alere q HIV-1/2 Detect;0463801440;07012176;Undetected;Undetected;Undetected;0;TRINTASS;2015-12-04 09:30:28;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+93;NAT-04000443;Alere q HIV-1/2 Detect;0463801492;070-2237;;;;23020;TRINTASS;2015-12-03 14:38:05;Pass;Pass;Pass;Pass;Pass;Fail;0.21.3
+92;NAT-04000443;Alere q HIV-1/2 Detect;0463801042;0738-1649;Undetected;Undetected;Undetected;0;TRINTASS;2015-12-01 11:46:14;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+91;NAT-04000443;Alere q HIV-1/2 Detect;0463801047;0701-1398;Detected;Undetected;Undetected;0;TRINTASS;2015-12-01 10:02:00;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+90;NAT-04000443;Alere q HIV-1/2 Detect;0463801048;0701-2228;Undetected;Undetected;Undetected;0;ELIJAH;2015-11-30 11:22:27;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+89;NAT-04000443;Alere q HIV-1/2 Detect;0463801445;0701-2172;Undetected;Undetected;Undetected;0;ELIJAH;2015-11-30 10:16:45;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+88;NAT-04000443;Alere q HIV-1/2 Detect;0463801043;0701-2172;---;---;---;23206;ELIJAH;2015-11-30 09:25:00;----;Fail;----;----;----;----;0.21.3
+87;NAT-04000443;Alere q HIV-1/2 Detect;0463801049;0738-1648;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-25 12:43:56;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+86;NAT-04000443;Alere q HIV-1/2 Detect;0463801051;0701-2171;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-25 11:33:08;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+85;NAT-04000443;Alere q HIV-1/2 Detect;0463801003;0701-2171;---;---;---;23206;TRINTASS;2015-11-25 10:54:35;----;Fail;----;----;----;----;0.21.3
+84;NAT-04000443;Alere q HIV-1/2 Detect;0463801023;O738-1460;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-25 09:41:19;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+83;NAT-04000443;Alere q HIV-1/2 Detect;0463801021;MZHC-2174;Undetected;Undetected;Undetected;0;VERYDEAR;2015-11-24 09:54:05;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+82;NAT-04000443;Alere q HIV-1/2 Detect;0463801009;0738-1644;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-20 09:22:00;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+81;NAT-04000443;Alere q HIV-1/2 Detect;0463801031;0738-1643;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-19 15:27:03;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+80;NAT-04000443;Alere q HIV-1/2 Detect;0463801011;0738-1642;Detected;Undetected;Undetected;0;TRINTASS;2015-11-19 12:30:22;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+79;NAT-04000443;Alere q HIV-1/2 Detect;0463801014;0738-91;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-19 11:09:06;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+78;NAT-04000443;Alere q HIV-1/2 Detect;0463801030;0701-2213;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-19 08:58:01;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+77;NAT-04000443;Alere q HIV-1/2 Detect;0463801035;0701-2157;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-16 15:04:39;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+76;NAT-04000443;Alere q HIV-1/2 Detect;0463801027;0701-1262;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-16 13:59:15;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+75;NAT-04000443;Alere q HIV-1/2 Detect;0463801008;0738-164O;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-16 11:36:58;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+74;NAT-04000443;Alere q HIV-1/2 Detect;0463801028;0738-1508;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-16 10:19:22;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+73;NAT-04000443;Alere q HIV-1/2 Detect;0463801005;0738-15O8;;;;23026;TRINTASS;2015-11-16 09:02:22;Pass;Pass;Fail;Fail;Pass;Pass;0.21.3
+72;NAT-04000443;Alere q HIV-1/2 Detect;0463801037;0701-2207;Undetected;Undetected;Undetected;0;ELIJAH;2015-11-13 13:10:50;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+71;NAT-04000443;Alere q HIV-1/2 Detect;0463801026;0701_2194;Undetected;Undetected;Undetected;0;HARRIS;2015-11-13 09:02:14;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+70;NAT-04000443;Alere q HIV-1/2 Detect;0463801013;0738_1638;Undetected;Undetected;Undetected;0;HARRIS;2015-11-12 09:33:27;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+69;NAT-04000443;Alere q HIV-1/2 Detect;0463801025;MZUNI-90;Undetected;Undetected;Undetected;0;VERYDEAR;2015-11-11 14:48:58;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+68;NAT-04000443;Alere q HIV-1/2 Detect;0463801024;MHC-2179;Undetected;Undetected;Undetected;0;VERYDEAR;2015-11-11 13:39:49;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+67;NAT-04000443;Alere q HIV-1/2 Detect;0463801010;0738_1507;---;---;---;23205;HARRIS;2015-11-11 11:54:31;----;Fail;----;----;----;----;0.21.3
+66;NAT-04000443;Alere q HIV-1/2 Detect;0463801022;0738-1507;;;;23020;TRINTASS;2015-11-11 10:45:53;Pass;Pass;Pass;Pass;Pass;Fail;0.21.3
+65;NAT-04000443;Alere q HIV-1/2 Detect;0463801033;O7O1_2198;Undetected;Undetected;Undetected;0;HARRIS;2015-11-11 09:29:05;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+64;NAT-04000443;Alere q HIV-1/2 Detect;0463801007;0701-2153;Undetected;Undetected;Undetected;0;ELIJAH;2015-11-11 08:02:22;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+63;NAT-04000443;Alere q HIV-1/2 Detect;0458200048;0701-2599;Undetected;Undetected;Undetected;0;HARRIS;2015-11-09 14:01:48;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+62;NAT-04000443;Alere q HIV-1/2 Detect;0458200064;0701_2093;Undetected;Undetected;Undetected;0;HARRIS;2015-11-09 10:01:43;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+61;NAT-04000443;Alere q HIV-1/2 Detect;0458200070;O7O1-2106;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-06 13:30:39;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+60;NAT-04000443;Alere q HIV-1/2 Detect;0458200188;0701-2193;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-06 12:25:13;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+59;NAT-04000443;Alere q HIV-1/2 Detect;0458200185;0738-152O;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-04 12:41:17;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+58;NAT-04000443;Alere q HIV-1/2 Detect;0458200182;0701_2138;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-03 09:30:02;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+57;NAT-04000443;Alere q HIV-1/2 Detect;0458200075;0701-2137;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-02 12:54:12;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+56;NAT-04000443;Alere q HIV-1/2 Detect;0458200071;071-2115;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-02 11:37:48;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+55;NAT-04000443;Alere q HIV-1/2 Detect;0458200062;0738-1522;Undetected;Undetected;Undetected;0;TRINTASS;2015-11-02 09:33:44;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+54;NAT-04000443;Alere q HIV-1/2 Detect;0458200060;0738-1516;Undetected;Undetected;Undetected;0;VERYDEAR;2015-10-30 10:14:34;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+53;NAT-04000443;Alere q HIV-1/2 Detect;0458200056;0738-1516;---;---;---;21501;VERYDEAR;2015-10-30 09:55:06;Fail;Pass;----;----;----;----;0.21.3
+52;NAT-04000443;Alere q HIV-1/2 Detect;0458200198;0701-3489;Undetected;Undetected;Undetected;0;ALFRED G BANDA;2015-10-29 11:03:33;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+51;NAT-04000443;Alere q HIV-1/2 Detect;0458200066;07O1-2052;Undetected;Undetected;Undetected;0;TRINTASS;2015-10-29 09:50:08;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+50;NAT-04000443;Alere q HIV-1/2 Detect;0458200079;0;---;---;---;53004;ELIJAH;2015-10-29 09:34:52;----;Fail;----;----;----;----;0.21.3
+49;NAT-04000443;Alere q HIV-1/2 Detect;0458200073;0738-1518;Detected;Undetected;Undetected;0;ELIJAH;2015-10-27 15:43:05;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+48;NAT-04000443;Alere q HIV-1/2 Detect;0458200181;0737-1518;---;---;---;23206;ELIJAH;2015-10-27 12:44:59;----;Fail;----;----;----;----;0.21.3
+47;NAT-04000443;Alere q HIV-1/2 Detect;0458200197;0738-1518;---;---;---;23206;ELIJAH;2015-10-27 11:49:43;----;Fail;----;----;----;----;0.21.3
+45;NAT-04000443;Alere q HIV-1/2 Detect;0458200046;0738/1518;Detected;Undetected;Undetected;0;THEMBA LUWE;2015-10-26 15:50:55;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+44;NAT-04000443;Alere q HIV-1/2 Detect;0458200044;0738/1517;Undetected;Undetected;Undetected;0;TRINTASS;2015-10-26 14:29:00;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+43;NAT-04000443;Alere q HIV-1/2 Detect;0458200068;0701/2154;Undetected;Undetected;Undetected;0;THEMBA LUWE;2015-10-26 12:25:28;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+42;NAT-04000443;Alere q HIV-1/2 Detect;0458200067;738_1515;Undetected;Undetected;Undetected;0;HARRIS;2015-10-26 11:14:17;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+41;NAT-04000443;Alere q HIV-1/2 Detect;0458200076;738_1493;Undetected;Undetected;Undetected;0;HARRIS;2015-10-26 10:13:24;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+40;NAT-04000443;Alere q HIV-1/2 Detect;0458200078;0701-;Undetected;Undetected;Undetected;0;ELIJAH;2015-10-23 13:02:15;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+39;NAT-04000443;Alere q HIV-1/2 Detect;0458200081;0701-;---;---;---;23206;ELIJAH;2015-10-23 12:00:58;----;Fail;----;----;----;----;0.21.3
+38;NAT-04000443;Alere q HIV-1/2 Detect;0458200054;0701-2122;Undetected;Undetected;Undetected;0;THEMBA LUWE;2015-10-22 10:20:35;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+37;NAT-04000443;Alere q HIV-1/2 Detect;0458200065;0738-2146;Undetected;Undetected;Undetected;0;ELIJAH;2015-10-21 12:56:07;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+36;NAT-04000443;Alere q HIV-1/2 Detect;0458200194;0738-1487;Undetected;Undetected;Undetected;0;ELIJAH;2015-10-21 11:44:40;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+35;NAT-04000443;Alere q HIV-1/2 Detect;0458200190;0738_2129;Undetected;Undetected;Undetected;0;HARRIS;2015-10-21 10:38:23;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+34;NAT-04000443;Alere q HIV-1/2 Detect;0458200195;0738-1488;Undetected;Undetected;Undetected;0;ELIJAH;2015-10-16 09:15:49;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+33;NAT-04000443;Alere q HIV-1/2 Detect;0458200053;0701-2111;Undetected;Undetected;Undetected;0;ELIJAH;2015-10-13 11:40:27;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+32;NAT-04000443;Alere q HIV-1/2 Detect;0458200069;0701-2111;---;---;---;23206;ELIJAH;2015-10-13 10:35:20;----;Fail;----;----;----;----;0.21.3
+31;NAT-04000443;Alere q HIV-1/2 Detect;0458200189;0738-1512;Undetected;Undetected;Undetected;0;TRINTASS;2015-10-13 09:35:09;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+30;NAT-04000443;Alere q HIV-1/2 Detect;0458200199;KARONGA;Undetected;Undetected;Undetected;0;ELIJAH;2015-10-08 11:22:44;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3
+29;NAT-04000443;Alere q HIV-1/2 Detect;0458200057;HCC-1388;Undetected;Undetected;Undetected;0;DR PHIRI;2015-10-08 10:27:57;Pass;Pass;Pass;Pass;Pass;Pass;0.21.3

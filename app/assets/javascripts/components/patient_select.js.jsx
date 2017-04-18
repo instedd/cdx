@@ -25,12 +25,13 @@ var PatientSelect = React.createClass({
           value={this.state.patient}
           className="input-xx-large patients"
           placeholder={this.props.placeholder}
-          clearable={true}
+          clearable={false}
           asyncOptions={this.search}
           autoload={false}
           onChange={this.onPatientChanged}
           optionRenderer={this.renderOption}
           valueRenderer={this.renderValue}
+          valueKey='id'
           cacheAsyncResults={false}
           filterOptions={this.filterOptions}>
         </Select>
@@ -58,15 +59,18 @@ var PatientSelect = React.createClass({
 
   onPatientChanged: function(newValue, selection) {
     var patient = (selection && selection[0]) ? selection[0] : null;
-
-    this.setState(React.addons.update(this.state, {
-      patient : { $set : patient }
-    }), function() {
-      if (this.props.onPatientChanged) {
-        this.props.onPatientChanged(patient);
+    this.setState(
+      function(state) {
+        return React.addons.update(state, {
+          patient: { $set : patient }
+        })
       }
-    }.bind(this));
-  },
+      , function() {
+        if (this.props.onPatientChanged) {
+          this.props.onPatientChanged(patient);
+        }
+      }.bind(this));
+    },
 
   search: function(value, callback) {
     $.ajax({

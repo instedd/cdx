@@ -1,3 +1,15 @@
+table.scroll tbody {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.table_scroll_container {
+    display: inline-block;
+    overflow-y: scroll;
+    max-height:275px;
+}
+
+
 // =============================================================================
 // TABLES
 // =============================================================================
@@ -66,6 +78,11 @@
         p {
           margin-top: -5px;
         }
+      }
+
+      &.unknown-name {
+        color: $gray2;
+        font-style: italic;
       }
     }
 

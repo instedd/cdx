@@ -98,4 +98,18 @@ describe Patient do
       expect(Patient.within(other_site.institution).to_a).to eq([patient3])
     end
   end
+
+  it "#dob_description" do
+    Timecop.freeze(Time.utc(2015, 1, 1, 12, 0, 0))
+
+    patient = Patient.make
+    patient.dob = "1983-10-20"
+    expect(patient.dob_description("%m/%d/%Y")).to eq("10/20/1983 (31 y/o)")
+
+    patient.dob = nil
+    expect(patient.dob_description("%m/%d/%Y")).to eq("")
+
+    patient.dob = "wrong"
+    expect(patient.dob_description("%m/%d/%Y")).to eq("")
+  end
 end

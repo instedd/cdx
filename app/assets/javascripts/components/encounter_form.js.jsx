@@ -1,7 +1,14 @@
 var BaseEncounterForm = {
   getInitialState: function() {
+		var user_email='';
+		if (this.props.encounter["user"] != null) {
+			user_email= this.props.encounter["user"].email
+		};
+		
     return {
-      encounter: this.props.encounter
+      encounter: this.props.encounter,
+      manual_sample_entry: this.props.manual_sample_entry,
+      user_email: user_email
     };
   },
 
@@ -22,7 +29,29 @@ var BaseEncounterForm = {
   },
 
   addNewSamples: function(event) {
-    this._ajax_put('/encounters/add/new_sample');
+    if(this.state.manual_sample_entry) {
+      this.refs.addNewSamplesModal.show();
+    } else {
+      this._ajax_put('/encounters/add/new_sample');
+    }
+    event.preventDefault();
+  },
+
+  closeAddNewSamplesModal: function (event) {
+    this.refs.addNewSamplesModal.hide();
+    event.preventDefault();
+  },
+
+  validateAndSetManualEntry: function (event) {
+    var sampleId = React.findDOMNode(this.refs.manualSampleEntry).value;
+    if(this.state.encounter.new_samples.filter(function(el){return el.entity_id == sampleId}).length > 0) {
+      // Error handling as done in the ajax responses
+      alert("This sample has already been added");
+    } else {
+      this._ajax_put('/encounters/add/manual_sample_entry', function() {
+        this.refs.addNewSamplesModal.hide();
+      }, {entity_id: sampleId});
+    }
     event.preventDefault();
   },
 
@@ -62,11 +91,6 @@ var BaseEncounterForm = {
 }
 
 var EncounterForm = React.createClass(_.merge({
-  getDefaultProps: function() {
-    return {
-      assayResultOptions: _.map(['positive', 'negative', 'indeterminate'], function(v){return {value: v, label: _.capitalize(v)};})
-    }
-  },
 
   showAddSamplesModal: function(event) {
     this.refs.addSamplesModal.show()
@@ -111,7 +135,7 @@ var EncounterForm = React.createClass(_.merge({
     this.refs.testsModal.hide()
     event.preventDefault()
   },
-
+  
   appendTest: function(test) {
     this.refs.testsModal.hide()
     this._ajax_put("/encounters/add/test/" + test.uuid);
@@ -132,13 +156,6 @@ var EncounterForm = React.createClass(_.merge({
 
       if (field == 'result') {
         newValue = event;
-      } else if (field == 'quantitative_result') {
-        newValue = event.target.value
-        firstChar = newValue[0]
-        newValue = newValue.replace(/[^0-9]/g, '');
-        if (firstChar == '+' || firstChar == '-') {
-          newValue = firstChar + newValue;
-        }
       } else {
         newValue = event.target.value;
       }
@@ -148,20 +165,21 @@ var EncounterForm = React.createClass(_.merge({
       }));
     }.bind(this);
   },
-
   render: function() {
     var diagnosisEditor = null;
 
+    var assayResultOptions = _.map(this.props.possible_assay_results, function(v){return {value: v, label: _.capitalize(v)};})
     if (this.state.encounter.assays.length > 0) {
       diagnosisEditor = (
         <div className="row">
           <div className="col pe-2">
             <label>Diagnosis</label>
-            <p style={{fontSize: "12px"}}><i>Each time a new test arrives, the list of conditions will be updated for you to diagnostic</i></p>
+            <p style={{fontSize: "12px"}}><i>When new tests are reported for this order, you'll be able to diagnose the corresponding condition here.</i></p>
           </div>
 
           <div className="col assays-editor">
             {this.state.encounter.assays.map(function(assay, index){
+              assay.result = assay.result;
               return (
                 <div className="row" key={index}>
                   <div className="col px-4">
@@ -170,7 +188,7 @@ var EncounterForm = React.createClass(_.merge({
                     </div>
                   </div>
                   <div className="col px-2">
-                    <Select value={assay.result} options={this.props.assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} clearable={false} className="input-block"/>
+                    <Select value={assay.result} options={assayResultOptions} onChange={this.encounterAssayChanged(index, 'result')} clearable={false} className="input-block"/>
                   </div>
                   <div className="col px-2">
                     <input type="text" className="quantitative pull-right" value={assay.quantitative_result} placeholder="Quant." onChange={this.encounterAssayChanged(index, 'quantitative_result')} />
@@ -185,99 +203,131 @@ var EncounterForm = React.createClass(_.merge({
             </div>
           </div>
         </div>);
-    } else {
-      diagnosisEditor = null;
-    }
+      } else {
+        diagnosisEditor = null;
+      }
 
-    return (
-      <div>
-        {(function(){
-          if (this.state.encounter.id == null) return;
+      return (
+        <div>
+          {(function(){
+            if (this.state.encounter.id == null) return;
 
-          return (
-          <div className="row">
-            <div className="col pe-2">
-              <label>Site</label>
-            </div>
-            <div className="col">
-              <p>{this.props.encounter.site.name}</p>
-            </div>
-          </div>);
-        }.bind(this))()}
+            return (
+              <div>
+                <div className="row">
+                  <div className="col pe-2">
+                    <label>Site</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.props.encounter.site.name}</p>
+                  </div>
+                </div>
 
-        <FlexFullRow>
-          <PatientCard patient={this.state.encounter.patient} />
-        </FlexFullRow>
+                <div className="row">
+                  <div className="col pe-2">
+                    <label>Test Order ID</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.props.encounter.uuid}</p>
+                  </div>
+                </div>
 
-        {diagnosisEditor}
+								<div className="row">
+                  <div className="col pe-2">
+                    <label>Requested By:</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.state.user_email}</p>
+                  </div>
+                </div>
 
-        <div className="row">
-          <div className="col pe-2">
-            <label>Samples</label>
+
+
+                <div className="row">
+                  <div className="col pe-2">
+                    <label>Reason For:</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.props.encounter.exam_reason}</p>
+                  </div>
+                </div>
+
+
+                <div className="row">
+                  <div className="col pe-2">
+                    <label>Diagnosis Comment:</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.props.encounter.diag_comment}</p>
+                  </div>
+                </div>
+
+
+                <div className="row">
+                  <div className="col pe-2">
+                    <label>Weeks In Treatment:</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.props.encounter.treatment_weeks}</p>
+                  </div>
+                </div>
+
+
+                <div className="row">
+                  <div className="col pe-2">
+                    <label>Tests Requested:</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.props.encounter.tests_requested}</p>
+                  </div>
+                </div>
+
+
+                <div className="row">
+                  <div className="col pe-2">
+                    <label>Sample Type:</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.props.encounter.coll_sample_type}</p>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="col pe-2">
+                    <label>Sample comment:</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.props.encounter.coll_sample_other}</p>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="col pe-2">
+                    <label>Test Due Date:</label>
+                  </div>
+                  <div className="col">
+                    <p>{this.props.encounter.testdue_date}</p>
+                  </div>
+                </div>
+
+
+              </div>);
+
+            }.bind(this))()}
+
+
+            <FlexFullRow>
+              <PatientCard patient={this.state.encounter.patient} />
+            </FlexFullRow>
+
+           <br />
+
+            <FlexFullRow>
+              <button type="button" className="btn-primary" onClick={this.save}>Save</button>
+            </FlexFullRow>
+
           </div>
-          <div className="col">
-            <SamplesList samples={this.state.encounter.samples} onUnifySample={this.showUnifySamplesModal} />
-            <NewSamplesList samples={this.state.encounter.new_samples} onRemoveSample={this.removeNewSample} />
+        );
+      },
 
-            <p>
-              <a className="btn-add-link" href='#' onClick={this.addNewSamples}><span className="icon-circle-plus icon-blue"></span> Append new sample</a>
-            </p>
-            <p>
-              <a className="btn-add-link" href='#' onClick={this.showAddSamplesModal}><span className="icon-circle-plus icon-blue"></span> Append sample</a>
-            </p>
-          </div>
-
-          <Modal ref="addSamplesModal">
-            <h1>
-              <a href="#" className="modal-back" onClick={this.closeAddSamplesModal}></a>
-              Add sample
-            </h1>
-
-            <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendSample}
-              placeholder="Search by sample id"
-              itemTemplate={AddItemSearchSampleTemplate}
-              itemKey="uuid" />
-          </Modal>
-
-          <Modal ref="unifySamplesModal">
-            <h1>
-              <a href="#" className="modal-back" onClick={this.closeUnifySamplesModal}></a>
-              Unify sample
-            </h1>
-            <p>Unifying sample {this.state.unifyingSample ? this.state.unifyingSample.entity_ids[0] : ""}</p>
-
-            <AddItemSearch callback={"/encounters/search_sample?institution_uuid=" + this.state.encounter.institution.uuid + "&sample_uuids=" + _.pluck(this.state.encounter.samples, 'uuid')} onItemChosen={this.unifySample}
-              placeholder="Search by sample id"
-              itemTemplate={AddItemSearchSampleTemplate}
-              itemKey="uuid" />
-          </Modal>
-        </div>
-
-        <div className="row">
-          <div className="col">
-            <TestResultsList testResults={this.state.encounter.test_results} /><br/>
-            <a className="btn-add-link"  href='#' onClick={this.showTestsModal}><span className="icon-circle-plus icon-blue"></span> Add tests</a>
-          </div>
-
-          <Modal ref="testsModal">
-            <h1>
-              <a href="#" className="modal-back" onClick={this.closeTestsModal}></a>
-              Add test
-            </h1>
-
-            <AddItemSearch callback={"/encounters/search_test?institution_uuid=" + this.state.encounter.institution.uuid} onItemChosen={this.appendTest}
-              placeholder="Search by test id"
-              itemTemplate={AddItemSearchTestResultTemplate}
-              itemKey="uuid" />
-          </Modal>
-        </div>
-
-        <FlexFullRow>
-          <button type="button" className="btn-primary" onClick={this.save}>Save</button>
-        </FlexFullRow>
-
-      </div>
-    );
-  },
-
-}, BaseEncounterForm));
+    }, BaseEncounterForm));

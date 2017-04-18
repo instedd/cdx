@@ -11,6 +11,7 @@ class Encounter < ActiveRecord::Base
   has_many :test_results, dependent: :restrict_with_error
 
   belongs_to :patient
+  belongs_to :user
 
   validates_presence_of :site, if: Proc.new { |encounter| encounter.institution && !encounter.institution.kind_manufacturer? }
 
@@ -50,13 +51,12 @@ class Encounter < ActiveRecord::Base
         else
           assay.merge! assay2 do |key, v1, v2|
             if key == "result"
-              values = []
-              values << v1 if v1 && v1 != "n/a"
-              values << v2 if v2 && v2 != "n/a"
-              values << "indeterminate" if values.empty?
-              values.uniq!
-              if values.length == 1
-                values.first
+              if v1 == v2
+                v1
+              elsif v1 == "indeterminate" || v1.blank? || (v1 == "n/a" && v2 != "indeterminate")
+                v2
+              elsif v2 == "indeterminate" || v2.blank? || (v2 == "n/a" && v1 != "indeterminate")
+                v1
               else
                 "indeterminate"
               end
@@ -141,6 +141,20 @@ class Encounter < ActiveRecord::Base
 
   def updated_diagnostic_timestamp!
     update_attribute(:user_updated_at, Time.now.utc)
+  end
+
+  def self.as_json_from_query(json, encounter_query_result, localization_helper)
+    encounter = encounter_query_result["encounter"]
+    json.encounter do
+      json.uuid encounter["uuid"]                  
+      json.diagnosis encounter["diagnosis"] || []
+      json.start_time(localization_helper.format_datetime(encounter["start_time"]))
+      json.end_time(localization_helper.format_datetime(encounter["end_time"]))
+    end
+
+    json.site do
+      json.name encounter_query_result["site"]["name"]
+    end
   end
 
   protected

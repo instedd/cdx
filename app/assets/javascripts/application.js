@@ -18,6 +18,7 @@
 //= require lodash
 //= require polyfills
 //= require leaflet
+//= require Leaflet.Sleep
 //= require leaflet-control-geocoder
 //= require classnames
 //= require react
@@ -33,14 +34,40 @@
 //= require reflux
 //= require_tree .
 //= require turbolinks
+
+//= require moment.min
+//= require jquery-ui.min
+//= require jquery.comiseo.daterangepicker.min
+
 Turbolinks.enableProgressBar()
 
 // Configure leaflet
 L.Icon.Default.imagePath = '/assets'
 
+L.Map.mergeOptions({
+  sleep: true,
+  sleepTime: 500,
+  wakeTime: 750,
+  sleepNote: false,
+  hoverToWake: true,
+  sleepOpacity:.7
+});
+
 function cdx_init_components(dom) {
   ReactRailsUJS.mountComponents(dom);
 }
+
+// Don't use $(document).ready so click handlers don't accumulate
+// and we end up firing multiple requests on each click.
+$(document).on("ready", function(){
+  $(document).on('click', '*[data-href]', function(event){
+    if (event.metaKey || event.shiftKey) {
+      window.open($(this).data('href'), '_blank');
+      return;
+    }
+    Turbolinks.visit($(this).data('href'));
+  });
+})
 
 $(document).ready(function(){
   function setFilledClass(elem) {
@@ -60,14 +87,6 @@ $(document).ready(function(){
     .each(function() {
       setFilledClass($(this));
     });
-
-  $(document).on('click', '*[data-href]', function(event){
-    if (event.metaKey || event.shiftKey) {
-      window.open($(this).data('href'), '_blank');
-      return;
-    }
-    Turbolinks.visit($(this).data('href'));
-  });
 
   $('form[data-auto-submit]').each(function(){
     var form = $(this);
@@ -97,6 +116,18 @@ $(document).ready(function(){
     var url = action + (action.indexOf('?') === -1 ? '?' : '&') + form.serialize();
     return url;
   }
+
+  $(document).on('click','.datepicker_single', function(){
+    $(this).daterangepicker({
+      singleDatePicker: true,
+      showDropdowns: true
+    });
+  });
+
+
+  $(document).on('click','.datepicker', function(){
+    $(this).daterangepicker();
+  });
 
   $(document).on('click', '.tabs .tabs-header a:not(".selected")', function(event) {
     var target = $(event.target);
@@ -191,4 +222,17 @@ $(document).ready(function(){
     var textarea = $(e.target);
     textarea.css('height', 'auto').css('height', e.target.scrollHeight);
   });
+  
+  
+	// Handle the filter hide/show on the test page
+	$(".filtershow").click(function(){
+		// We want to set overflow visible after the expand animation has completed
+		$(".custom_filters").toggle();
+	});
+	
+	
+	$('input[type=date]').click(function(){		
+		$(this).datepicker();
+	});	
+  
 });

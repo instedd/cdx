@@ -54,7 +54,6 @@ var AlertEnabled = React.createClass({
 					id="AlertEnabled"
 					/>
 				<label htmlFor="AlertEnabled">&nbsp;</label>
-
 			</div>
 		</div>
 	);
@@ -298,6 +297,7 @@ var AlertAnomalieType = React.createClass({
 						this.props.disable_all_selects
 					}
 					placeholder="Select"
+					clearable = { false }
 					/>
 			</div>
 		</div>
@@ -585,8 +585,8 @@ var AlertEmailMessage = React.createClass({
 					<label>Email Message</label>
 				</div>
 
-				<div className = "col pe-2" >
-					<textarea rows="5" cols="65" placeholder = "Email message" valueLink = {
+				<div className = "col pe-4" >
+					<textarea rows="6" cols="35" placeholder = "Email message" valueLink = {
 							this.props.valueLink
 						}
 						id = "alertmessage" pattern=".{5,1024}" disabled={this.props.edit} />
@@ -606,7 +606,7 @@ var AlertSmsMessage = React.createClass({
 				</div>
 
 				<div className = "col pe-2" >
-					<textarea rows="2" cols="65" placeholder = "SMS message" valueLink = {
+					<textarea rows="4" cols="35" placeholder = "SMS message" valueLink = {
 							this.props.valueLink
 						}
 						id = "alertsmsmessage" pattern=".{5,160}" disabled={this.props.edit} />

@@ -192,7 +192,7 @@ GEM
       activesupport (>= 3.0)
     clipboard (1.0.6)
     cliver (0.3.2)
-    cocaine (0.5.7)
+    cocaine (0.5.8)
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.0)
     coffee-rails (4.0.1)
@@ -403,7 +403,7 @@ GEM
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
     orm_adapter (0.5.0)
-    paperclip (4.3.1)
+    paperclip (4.3.6)
       activemodel (>= 3.2.0)
       activesupport (>= 3.2.0)
       cocaine (~> 0.5.5)
@@ -526,6 +526,7 @@ GEM
     rspec-support (3.3.0)
     ruby_parser (3.7.1)
       sexp_processor (~> 4.1)
+    rubyzip (1.2.0)
     rufus-scheduler (3.1.7)
     safe_yaml (1.0.4)
     sass (3.2.19)
@@ -682,7 +683,7 @@ DEPENDENCIES
   oj
   omniauth
   omniauth-google-oauth2
-  paperclip
+  paperclip (~> 4.3.6)
   paranoia
   poirot_rails!
   poltergeist
@@ -703,6 +704,7 @@ DEPENDENCIES
   rspec
   rspec-collection_matchers
   rspec-rails
+  rubyzip (>= 1.0.0)
   sass-rails (~> 4.0.0)
   sdoc
   shoulda

@@ -1,6 +1,7 @@
 class Alert < ActiveRecord::Base
   belongs_to :user
   belongs_to :site
+  belongs_to :institution
 
   has_many :alert_histories
   has_many :alert_recipients
@@ -23,15 +24,16 @@ class Alert < ActiveRecord::Base
   validates_presence_of :user
   validates_presence_of :name    #html5 form validations also done
   validate :category_validation
+  validate :aggregation_percentage_validation
 
   enum category_type: [:anomalies, :device_errors, :quality_assurance, :test_results, :utilization_efficiency]
   enum aggregation_type: [:record, :aggregated]
-  enum aggregation_frequency: [:hour, :day]
+  enum aggregation_frequency: [:hour, :day, :week, :month]
   enum channel_type: [:email, :sms, :email_and_sms]
   
   #Note: elasticsearch filter issue  with start_time, for some reason, {"test.start_time"=>"null"}, does not work.
   #enum anomalie_type: [:missing_sample_id, :missing_start_time]
-  enum anomalie_type: [:missing_sample_id]
+  enum anomalie_type: [:missing_sample_id, :invalid_test_date]
 
   enum utilization_efficiency_type: [:sample]
 
@@ -45,38 +47,46 @@ class Alert < ActiveRecord::Base
 
 
   def create_percolator
-    es_query =  TestResult.query(self.query, self.user).elasticsearch_query
-    return unless es_query
-    Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
-    type: '.percolator',
-    id: 'alert_'+self.id.to_s,
-    body: { query: es_query, type: 'test' }
+     # for invalid_test_date, no percolator is used, done for each test result received as could not find
+     # a way to do it with elasticsearch
+    if anomalie_type != "invalid_test_date"
+      es_query =  TestResult.query(self.query, self.user).elasticsearch_query
+      return unless es_query
+      Cdx::Api.client.index index: Cdx::Api.index_name_pattern,
+      type: '.percolator',
+      id: 'alert_'+self.id.to_s,
+      body: { query: es_query, type: 'test' }
+    end
   end
 
   def recreate_alert_percolator
     #when you disable an alert ,it will be deleted from elasticsearch
-    if self.enabled==true
-      create_percolator
+    if anomalie_type != "invalid_test_date"
+      if self.enabled==true
+        create_percolator
+      end
     end
   end
 
   def delete_percolator
-    Cdx::Api.client.delete index: Cdx::Api.index_name_pattern,
-    type: '.percolator',
-    id: 'alert_'+id.to_s,
-    ignore: 404
+    if anomalie_type != "invalid_test_date"
+      Cdx::Api.client.delete index: Cdx::Api.index_name_pattern,
+      type: '.percolator',
+      id: 'alert_'+id.to_s,
+      ignore: 404
+    end
   end
   
   
   private
 
-  def  is_integer?(str_val)
+  def is_integer?(str_val)
     str_val.to_i.to_s == str_val
   end
 
   def category_validation
     if category_type == "device_errors"
-      error=false;
+      error=false
       if error_code.include? '-'
         minmax=error_code.split('-')
         error = true if !is_integer?(minmax[0])
@@ -88,7 +98,6 @@ class Alert < ActiveRecord::Base
       if error
         errors.add(:error_code, "errorcode must be an integer")
       end
-
     elsif category_type == "utilization_efficiency"
       if (utilization_efficiency_number==0)
         errors.add(:utilization_efficiency_number, "Timespan cannot be zero")
@@ -96,6 +105,12 @@ class Alert < ActiveRecord::Base
       if ( (sample_id == nil) || (sample_id.length==0)  )
         errors.add(:sample_id, "Sample ID cannot be empty")
       end
+    end
+  end
+  
+  def aggregation_percentage_validation
+    if (use_aggregation_percentage?) && (aggregation_threshold > 100)
+      errors.add(:aggregation_threshold, "Value cannot be greater than 100%")
     end
   end
 

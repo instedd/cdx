@@ -29,4 +29,25 @@ module ManifestSpecHelper
     manifest = manifest = manifest_from_json_mappings(mappings_json, custom_json)
     expect { manifest.apply_to(data, device).first }.to raise_error(message)
   end
+
+  def load_manifest(name, device_model)
+    definition = IO.read(File.join(Rails.root, 'db', 'seeds', 'manifests', name))
+    Manifest.create!(device_model: device_model, definition: definition)
+  end
+
+  def copy_sample_csv(name, destination)
+    copy_sample(name, 'csvs', destination)
+  end
+
+  def copy_sample_xml(name, destination)
+    copy_sample(name, 'xmls', destination)
+  end
+
+  def copy_sample_json(name, destination)
+    copy_sample(name, 'jsons', destination)
+  end
+
+  def copy_sample(name, format, destination)
+    FileUtils.cp File.join(Rails.root, 'spec', 'fixtures', format, name), destination
+  end
 end

@@ -42,6 +42,10 @@ class Cdx::Field
     false
   end
 
+  def inside_nested?
+    scope.nested? || scope.inside_nested?
+  end
+
   def dynamic?
     false
   end

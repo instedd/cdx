@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include Policy::Actions
+
   def has_access?(resource, action)
     Policy.can? action, resource, current_user
   end
@@ -35,16 +37,12 @@ module ApplicationHelper
     has_access?(Role, Policy::Actions::READ_ROLE)
   end
 
-  def can_delegate_permissions?
-    current_user.computed_policies.any? &:delegable?
+  def has_access_to_settings?
+    has_access_to_test_results_index? || has_access_to_roles_index? || can_delegate_permissions?
   end
 
-  def format_datetime(value, time_zone = nil)
-    return nil unless value
-
-    value = Time.parse(value) unless value.is_a?(Time)
-    value = value.in_time_zone(time_zone) if time_zone
-    I18n.localize(value, locale: current_user.locale, format: :long)
+  def can_delegate_permissions?
+    current_user.computed_policies.any? &:delegable?
   end
 
   def format_date(value, time_zone = nil)
@@ -175,5 +173,24 @@ module ApplicationHelper
 
   def navigation_context_name
     @navigation_context.try(:site).try(:name) || @navigation_context.institution.name
+  end
+
+  def institution_name
+    institutions = check_access(Institution, READ_INSTITUTION) || []
+    if institutions.one?
+      institutions.first.name
+    elsif has_access?(Institution, CREATE_INSTITUTION)
+      'Edit institutions'
+    else
+      'Show institutions'
+    end
+  end
+
+  def filters_params
+    filters_params = params
+    ['controller', 'action', 'page_size', 'page'].each do |param|
+      filters_params.delete(param)
+    end
+    filters_params
   end
 end

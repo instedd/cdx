@@ -13,21 +13,21 @@
           %col{:width => "25%"}
           %col{:width => "12%"}
           %col{:width => "13%"}
-          %col{:width => "38%"}
-          %col{:width => "12%"}
+          %col{:width => "32%"}
+          %col{:width => "18%"}
         - t.thead do
           %tr
             %th Name
             %th Patient Id
-            %th Age
+            %th Date of Birth
             %th Location
-            %th Last encounter
+            %th Last test order
         - t.tbody do
           - @patients.each do |patient|
             %tr{data: {href: patient_path(patient) }}
-              %td= patient.name
+              %td{class: patient.name.blank? ? "unknown-name" : ""}= patient.name || "(Unknown name)"
               %td= patient.entity_id
-              %td= patient.age
+              %td= patient.dob_description(I18n.t('date.input_format.pattern'))
               %td= patient.location.try(:name)
               %td= format_date(patient.last_encounter)
 

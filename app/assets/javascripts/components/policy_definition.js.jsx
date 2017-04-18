@@ -147,6 +147,31 @@ var PolicyDefinition = React.createClass({
     }));
   },
 
+  _removeStatement: function(statement) {
+    var index = _.indexOf(this.state.statements, statement);
+    var activeTab = this.state.activeTab;
+
+    if (activeTab == index) {
+      var lengthAfter = this.state.statements.length - 1;
+      if (activeTab >= lengthAfter) {
+        activeTab--; // the last item was selected, so select the previous one
+        if (activeTab == -1) {
+          // last policy was removed
+          this.setState(React.addons.update(this.state, {
+            statements: { $set: [this.emptyPolicy] },
+            activeTab: { $set : 0 },
+          }));
+          return
+        }
+      }
+    }
+
+    this.setState(React.addons.update(this.state, {
+      statements : { $splice : [[index, 1]] },
+      activeTab : { $set : activeTab }
+    }));
+  },
+
   render: function() {
     return (
       <div>
@@ -157,7 +182,7 @@ var PolicyDefinition = React.createClass({
               <ul>
                 {this.state.statements.map(function(statement, index){
                   var selectedClass = this.state.activeTab == index ? "selected" : "";
-                  return <li key={index} onClick={this.setActiveTab.bind(this,index)} className={selectedClass}><PolicyItem statement={statement} /></li>;
+                  return <li key={index} onClick={this.setActiveTab.bind(this,index)} className={selectedClass}><PolicyItem statement={statement} onRemove={this._removeStatement} /></li>;
                 }.bind(this))}
                 <li><a onClick={this.newPolicy} href="javascript:" className="btn-add-link"><span className="icon-circle-plus icon-blue"></span>Add policy</a></li>
               </ul>

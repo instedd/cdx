@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160223111818) do
+ActiveRecord::Schema.define(version: 20160419123349) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20160223111818) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "for_aggregation_calculation",           default: false
+    t.datetime "test_result_updated_at"
   end
 
   add_index "alert_histories", ["alert_id"], name: "index_alert_histories_on_alert_id", using: :btree
@@ -77,9 +78,13 @@ ActiveRecord::Schema.define(version: 20160223111818) do
     t.integer  "utilization_efficiency_number",       limit: 4,     default: 0
     t.datetime "utilization_efficiency_last_checked"
     t.integer  "email_limit",                         limit: 4,     default: 0
+    t.boolean  "use_aggregation_percentage",                        default: false
+    t.integer  "institution_id",                      limit: 4
+    t.datetime "time_last_aggregation_checked"
   end
 
   add_index "alerts", ["deleted_at"], name: "index_alerts_on_deleted_at", using: :btree
+  add_index "alerts", ["institution_id"], name: "index_alerts_on_institution_id", using: :btree
   add_index "alerts", ["user_id"], name: "index_alerts_on_user_id", using: :btree
 
   create_table "alerts_conditions", id: false, force: :cascade do |t|
@@ -215,30 +220,40 @@ ActiveRecord::Schema.define(version: 20160223111818) do
     t.string   "ftp_directory",    limit: 255
     t.integer  "ftp_port",         limit: 4
     t.datetime "deleted_at"
+    t.boolean  "ftp_passive"
   end
 
   add_index "devices", ["deleted_at"], name: "index_devices_on_deleted_at", using: :btree
 
   create_table "encounters", force: :cascade do |t|
-    t.integer  "institution_id",  limit: 4
-    t.integer  "patient_id",      limit: 4
-    t.string   "uuid",            limit: 255
-    t.string   "entity_id",       limit: 255
-    t.binary   "sensitive_data",  limit: 65535
-    t.text     "custom_fields",   limit: 65535
-    t.text     "core_fields",     limit: 65535
+    t.integer  "institution_id",    limit: 4
+    t.integer  "patient_id",        limit: 4
+    t.string   "uuid",              limit: 255
+    t.string   "entity_id",         limit: 255
+    t.binary   "sensitive_data",    limit: 65535
+    t.text     "custom_fields",     limit: 65535
+    t.text     "core_fields",       limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "is_phantom",                    default: true
+    t.boolean  "is_phantom",                      default: true
     t.datetime "deleted_at"
-    t.integer  "site_id",         limit: 4
+    t.integer  "site_id",           limit: 4
     t.datetime "user_updated_at"
-    t.string   "site_prefix",     limit: 255
+    t.string   "site_prefix",       limit: 255
     t.datetime "start_time"
+    t.integer  "user_id",           limit: 4
+    t.string   "exam_reason",       limit: 255
+    t.string   "tests_requested",   limit: 255
+    t.string   "coll_sample_type",  limit: 255
+    t.string   "coll_sample_other", limit: 255
+    t.string   "diag_comment",      limit: 255
+    t.date     "testdue_date"
+    t.integer  "treatment_weeks",   limit: 4
   end
 
   add_index "encounters", ["deleted_at"], name: "index_encounters_on_deleted_at", using: :btree
   add_index "encounters", ["site_id"], name: "index_encounters_on_site_id", using: :btree
+  add_index "encounters", ["user_id"], name: "index_encounters_on_user_id", using: :btree
 
   create_table "file_messages", force: :cascade do |t|
     t.string  "filename",          limit: 255
@@ -251,6 +266,7 @@ ActiveRecord::Schema.define(version: 20160223111818) do
     t.string  "ftp_password",      limit: 255
     t.string  "ftp_directory",     limit: 255
     t.integer "ftp_port",          limit: 4
+    t.boolean "ftp_passive"
   end
 
   add_index "file_messages", ["device_id"], name: "index_file_messages_on_device_id", using: :btree
@@ -404,6 +420,7 @@ ActiveRecord::Schema.define(version: 20160223111818) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "key",            limit: 255
+    t.string   "site_prefix",    limit: 255
   end
 
   create_table "roles_users", id: false, force: :cascade do |t|
@@ -466,6 +483,7 @@ ActiveRecord::Schema.define(version: 20160223111818) do
     t.string   "email_address",                    limit: 255
     t.string   "last_sample_identifier_entity_id", limit: 255
     t.date     "last_sample_identifier_date"
+    t.boolean  "allows_manual_entry"
   end
 
   add_index "sites", ["deleted_at"], name: "index_sites_on_deleted_at", using: :btree
@@ -565,6 +583,7 @@ ActiveRecord::Schema.define(version: 20160223111818) do
     t.string   "last_navigation_context",        limit: 255
     t.boolean  "is_active",                                  default: true
     t.string   "telephone",                      limit: 255
+    t.boolean  "sidebar_open",                               default: true
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
@@ -577,7 +596,9 @@ ActiveRecord::Schema.define(version: 20160223111818) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
+  add_foreign_key "alerts", "institutions"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
+  add_foreign_key "encounters", "users"
   add_foreign_key "patients", "sites"
 end

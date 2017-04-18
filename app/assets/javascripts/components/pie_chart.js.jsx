@@ -1,4 +1,15 @@
 var PieChart = React.createClass({
+	getInitialState: function() {
+		if (this.props.data.length==0) {
+			shouldHide=true;
+		} else {
+			shouldHide=false;
+		};
+
+    return {
+      shouldHide: shouldHide
+    };
+  },
   getDefaultProps: function() {
     return {
       height: 250,
@@ -113,7 +124,12 @@ var PieChart = React.createClass({
     }
 
     return (
-      <svg className="chart"
+			<div>
+				<div className={this.state.shouldHide ? '' : 'hidden'}>
+				<span className="horizontal-bar-value">There is no data to display</span>
+				</div>
+			  <div className={this.state.shouldHide ? 'hidden' : ''}>		
+         <svg className="chart"
            width="100%"
            height={this.props.height} ref="svg"
            {...svgProps}>
@@ -154,6 +170,8 @@ var PieChart = React.createClass({
           })}
         </g>
       </svg>
+    </div>
+   </div>
     );
   }
 

@@ -1,6 +1,5 @@
 class ApplicationController < ActionController::Base
   include ApplicationHelper
-  include Policy::Actions
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -15,6 +14,8 @@ class ApplicationController < ActionController::Base
 
   def set_locale
     I18n.locale = current_user.try(:locale) || I18n.default_locale
+    @localization_helper = LocalizationHelper.new(current_user.try(:time_zone), I18n.locale,
+      current_user.try(:timestamps_in_device_time_zone))
   end
 
   decent_configuration do
@@ -43,8 +44,8 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_resource(resource, action)
-    if Policy.can?(action, resource, current_user)
-      Policy.authorize(action, resource, current_user)
+    if has_access?(resource, action)
+      check_access(resource, action)
     else
       log_authorization_warn resource, action
       head :forbidden
@@ -90,6 +91,11 @@ class ApplicationController < ActionController::Base
 
   def ensure_context
     return if current_user.nil?
+    
+    @usenav =  true
+    if params['nav'] == 'false'
+      @usenav =  false
+    end
 
     if params[:context].blank? && !request.xhr?
       # if there is no context information force it to be explicit
@@ -108,6 +114,7 @@ class ApplicationController < ActionController::Base
       if default_context
         redirect_to url_for(params.merge({context: default_context}))
       end
+
     elsif !params[:context].blank?
       # if there is an explicit context try to use it.
       @navigation_context = NavigationContext.new(current_user, params[:context])
@@ -138,6 +145,16 @@ class ApplicationController < ActionController::Base
       test_results_path
     elsif can_delegate_permissions?
       policies_path
+    elsif has_access_to_patients_index?
+      patients_path
+    elsif has_access_to_users_index?
+      users_path
+    elsif has_access?(Device, Policy::Actions::SUPPORT_DEVICE)
+      device_messages_path
+    elsif has_access_to_settings?
+      settings_path
+    else
+      no_data_allowed_institutions_path
     end
   end
 
@@ -168,6 +185,12 @@ class ApplicationController < ActionController::Base
   end
 
   def log_authorization_warn(resource, action)
-    logger.warn "Authorization failed. #{action} requested by #{current_user.email} in #{resource.class} (id=#{resource.id})"
+    resource_name =
+      if resource.is_a? Class
+        "#{resource} class"
+      else
+        "#{resource.class} (id=#{resource.id})"
+      end
+    logger.warn "Authorization failed. #{action} requested by #{current_user.email} in #{resource_name}"
   end
 end

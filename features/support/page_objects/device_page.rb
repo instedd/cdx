@@ -36,6 +36,8 @@ class DevicePage < DeviceSetupPage
     element :explore_tests, :link, 'Explore tests'
   end
 
+  section :tests_run, TestsRun, '#tests_run'
+
   def shows_deleted?
     page.has_css?('h2.deleted')
   end
@@ -52,6 +54,6 @@ class NewDevicePage < CdxPageBase
 
   section :device_model, CdxSelect, "label", text: /Device Model/i
   element :name, :field, "Name"
-  section :site, CdxSelect, "label", text: /Site/i
+  section :site, CdxSelect, "label", text: "SITE"
   element :serial_number, :field, "Serial number"
 end

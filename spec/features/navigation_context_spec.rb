@@ -15,11 +15,13 @@ describe "navigation context" do
   it "user get last context by default" do
     other_institution = Institution.make user: user
     goto_page HomePage do |page|
-      expect(page).to_not have_content(other_institution.name)
-
-      page.open_context_picker do |context|
+      # Context panel is now open by default
+      page.get_context_picker do |context|
         context.select other_institution.name
       end
+
+      page.close_context_picker
+      # This saves the picker as closed, when loading again other_institution should not be there
     end
 
     user.reload

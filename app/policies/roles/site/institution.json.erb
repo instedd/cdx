@@ -16,27 +16,32 @@
         {
           "resource": "site/<%= site_id %>",
           "action": "*",
-          "delegable": true
+          "delegable": true,
+          "includeSubsites": true
         },
         {
           "resource": "device?site=<%= site_id %>",
           "action": "*",
-          "delegable": true
+          "delegable": true,
+          "includeSubsites": true
         },
         {
           "resource": "testResult?site=<%= site_id %>",
           "action": "*",
-          "delegable": true
+          "delegable": true,
+          "includeSubsites": true
         },
         {
           "resource": "encounter?site=<%= site_id %>",
           "action": "*",
-          "delegable": true
+          "delegable": true,
+          "includeSubsites": true
         },
         {
           "resource": "role?site=<%= site_id %>",
           "action": "*",
-          "delegable": true
+          "delegable": true,
+          "includeSubsites": true
         }
       ]
     }

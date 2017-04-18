@@ -11,7 +11,14 @@ class TestResultsController < ApplicationController
     @display_as = params["display_as"] || "test"
     @display_as = "test" if @display_as != "test" && @display_as != "test_order"
 
-    @results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
+    @results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options.map do |result|
+      if result == "n/a"
+        {value: 'n/a', label: 'Not Applicable'}
+      else
+        {value: result, label: result.capitalize}
+      end
+    end
+    @test_types = Cdx::Fields.test.core_fields.find { |field| field.name == 'type' }.options
     @conditions = Condition.all.map &:name
     @date_options = date_options_for_filter
 
@@ -20,10 +27,12 @@ class TestResultsController < ApplicationController
     offset = (@page - 1) * @page_size
 
     @filter = create_filter
-
     @query = @filter.dup
     @order_by = params["order_by"] || "test.end_time"
     @query["order_by"] = @order_by
+
+    @show_sites = @sites.size > 1
+    @show_devices = @devices.size > 1
 
     respond_to do |format|
       format.html do
@@ -77,6 +86,7 @@ class TestResultsController < ApplicationController
     end
     filter["test.assays.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
     filter["test.assays.result"] = params["test.assays.result"] if params["test.assays.result"].present?
+    filter["test.type"] = params["test.type"] if params["test.type"].present?
     filter["sample.id"] = params["sample.id"] if params["sample.id"].present?
     filter["since"] = params["since"] if params["since"].present?
     filter
@@ -119,12 +129,37 @@ class TestResultsController < ApplicationController
     result = TestResult.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["tests"]
+    @json = build_json_array TestResult, @tests
   end
 
   def execute_encounter_query
     result = Encounter.query(@query, current_user).execute
     @total = result["total_count"]
     @tests = result["encounters"]
+    @json = build_json_array Encounter, @tests
+
+=begin
+#anthony start
+    all_test_orders = Encounter.select("id, uuid, user_id, testdue_date, exam_reason, custom_fields, core_fields")
+    all_test_orders.each do |test_order|
+      test_order.core_fields={}
+      test_order.custom_fields={}
+    end
+        
+    @test_orders = all_test_orders.as_json
+    binding.pry
+#anthony end
+=end
+
+  end
+
+  def build_json_array(entity_class, tests)
+    json = Jbuilder.new do |json|
+      json.array! tests do |test|
+        entity_class.as_json_from_query(json, test, @localization_helper)
+      end
+    end
+    json.attributes!
   end
 
   def execute_csv_query(filename)
@@ -149,6 +184,6 @@ class TestResultsController < ApplicationController
     _institutions, @sites, @devices = Policy.condition_resources_for(QUERY_TEST, TestResult, current_user).values
     @sites = @sites.within(@navigation_context.entity, @navigation_context.exclude_subsites)
     @devices = @devices.within(@navigation_context.entity, @navigation_context.exclude_subsites)
-    @devices_by_uuid = @devices.index_by &:uuid
+    @localization_helper.devices_by_uuid = @devices_by_uuid = @devices.index_by &:uuid
   end
 end

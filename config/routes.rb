@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   resources :institutions, except: :show do
     collection do
       get :pending_approval
+      get :no_data_allowed
     end
   end
 
@@ -40,6 +41,7 @@ Rails.application.routes.draw do
       get :search_test
       put 'add/sample/:sample_uuid' => 'encounters#add_sample'
       put 'add/new_sample' => 'encounters#new_sample'
+      put 'add/manual_sample_entry' => 'encounters#add_sample_manually'
       put 'add/test/:test_uuid' => 'encounters#add_test'
       put 'merge/sample/' => 'encounters#merge_samples'
     end
@@ -156,6 +158,8 @@ Rails.application.routes.draw do
     end
     collection do
       get :autocomplete
+      post :update_setting
+      get :no_data_allowed
     end
   end
   resources :roles do

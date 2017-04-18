@@ -1,12 +1,12 @@
 class Cdx::Api::Elasticsearch::IndexedField
   attr_reader :name, :core_field, :sub_fields, :group_definitions, :filter_definitions
-  delegate :scoped_name, :type, :nested?, :valid_values, to: :core_field
+  delegate :scoped_name, :type, :nested?, :valid_values, :inside_nested?, to: :core_field
 
   def self.for(core_field, api_fields, document_format)
     definition = api_fields.detect do |definition|
       definition['name'] == core_field.scoped_name
     end
-  
+
     new(core_field, (definition || {}), document_format)
   end
 
@@ -41,11 +41,19 @@ class Cdx::Api::Elasticsearch::IndexedField
     grouping_detail
   end
 
+  def flatten
+    if nested?
+      sub_fields.map(&:flatten).flatten
+    else
+      self
+    end
+  end
+
   def grouping_detail_for field_name, values=nil
     GroupingDetail.for self, field_name, values
   end
 
-private
+  private
 
   def default_filter_definition
     case type

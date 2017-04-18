@@ -65,11 +65,21 @@ describe Cdx::Api, elasticsearch: true do
       expect_one_result "positive", "until" => time(2013, 1, 2)
     end
 
-    it "filters by reported_time_since and reported_time_until" do
-      index test: {assays: [result: :positive], reported_time: time(2013, 1, 1)}
-      index test: {assays: [result: :positive], reported_time: time(2013, 1, 3)}
+    it 'filters by reported_time_since and reported_time_until' do
+      index test: {
+        assays: [result: :positive],
+        reported_time: time(2013, 1, 1)
+      }
+      index test: {
+        assays: [result: :positive],
+        reported_time: time(2013, 1, 3)
+      }
+      query = {
+        'test.reported_time_since' => time(2013, 1, 2),
+        'test.reported_time_until' => time(2013, 1, 3)
+      }
 
-      expect_one_result "positive", 'test.reported_time_since' => time(2013, 1, 2), 'test.reported_time_until' => time(2013, 1, 3)
+      expect_one_result 'positive', query
     end
 
     [
@@ -93,6 +103,11 @@ describe Cdx::Api, elasticsearch: true do
       expect_one_result "positive", "encounter.patient_age" => "..10yo"
       expect_one_result "negative", "encounter.patient_age" => "12yo..18yo"
       expect_no_results "encounter.patient_age" => "20yo.."
+    end
+    
+    it "should filter by test.user_mail" do
+      index_with_test_result test: {assays: [result: :positive]}, encounter: {user_email: institution.user.email}
+      expect_one_result "positive", "encounter.user_email" => institution.user.email
     end
 
     [
@@ -576,19 +591,117 @@ describe Cdx::Api, elasticsearch: true do
       ])
     end
 
-    it "groups by assays result and name" do
-      index test: {assays:[
-        {name: "MTB", result: :positive},
-        {name: "Flu", result: :negative},
-      ]}
+    it 'groups by assays result and name' do
+      index test: {
+        assays: [
+          { name: 'MTB', result: :positive },
+          { name: 'Flu', result: :negative }
+        ]
+      }
 
-      response = query_tests("group_by" => "test.assays.result,test.assays.name").sort_by do |test|
-        test["test.assays.result"] + test["test.assays.name"]
+      response = query_tests(
+        'group_by' => 'test.assays.result,test.assays.name'
+      ).sort_by do |test|
+        test['test.assays.result'] + test['test.assays.name']
       end
 
       expect(response).to eq([
-        {"test.assays.result"=>"negative", "test.assays.name" => "Flu", "count" => 1},
-        {"test.assays.result"=>"positive", "test.assays.name" => "MTB", "count" => 1}
+        {
+          'test.assays.result' => 'negative',
+          'test.assays.name' => 'Flu',
+          'count' => 1
+        },
+        {
+          'test.assays.result' => 'positive',
+          'test.assays.name' => 'MTB',
+          'count' => 1
+        }
+      ])
+    end
+
+    it 'groups multiple elements by assays result and name' do
+      index test: {
+        assays: [
+          { condition: 'mtb', result: :positive },
+          { condition: 'rif', result: :negative }
+        ]
+      }
+      index test: {
+        assays: [
+          { condition: 'mtb', result: :positive },
+          { condition: 'rif', result: :positive }
+        ]
+      }
+      index test: {
+        assays: [
+          { condition: 'mtb', result: :negative },
+          { condition: 'rif', result: :positive }
+        ]
+      }
+
+      response = query_tests(
+        'test.assays.condition' => 'mtb',
+        'group_by' => 'test.assays.result,test.assays.condition'
+      ).sort_by do |test|
+        test['test.assays.result'] + test['test.assays.condition']
+      end
+
+      expect(response).to eq([
+        {
+          'test.assays.result' => 'negative',
+          'test.assays.condition' => 'mtb',
+          'count' => 1
+        },
+        {
+          'test.assays.result' => 'positive',
+          'test.assays.condition' => 'mtb',
+          'count' => 2
+        }
+      ])
+    end
+
+    it 'groups multiple elements by assays result and name filtering by two conditions' do
+      index test: {
+        assays: [
+          { condition: 'mtb', result: :positive },
+          { condition: 'rif', result: :negative },
+          { condition: 'mtb', result: 'n/a' }
+        ]
+      }
+      index test: {
+        assays: [
+          { condition: 'mtb', result: :positive },
+          { condition: 'rif', result: :positive },
+          { condition: 'mtb', result: 'n/a' }
+        ]
+      }
+      index test: {
+        assays: [
+          { condition: 'mtb', result: :negative },
+          { condition: 'rif', result: :positive },
+          { condition: 'mtb', result: 'n/a' }
+        ]
+      }
+
+      response = query_tests(
+        'test.assays.condition' => 'mtb',
+        'test.assays.result' => 'positive,negative',
+        'group_by' => 'test.assays.result,test.assays.condition'
+      ).sort_by do |test|
+        test['test.assays.result'] + test['test.assays.condition']
+      end
+
+      expect(response).to eq([
+        {
+          'test.assays.result' => 'negative',
+          'test.assays.condition' => 'mtb',
+          'count' => 1
+        },
+        {
+          'test.assays.result' => 'positive',
+          'test.assays.condition' => 'mtb',
+          'count' => 2
+        }
       ])
     end
 

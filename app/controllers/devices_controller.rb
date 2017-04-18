@@ -78,12 +78,15 @@ class DevicesController < ApplicationController
     return unless authorize_resource(@device, READ_DEVICE)
     redirect_to setup_device_path(@device) unless @device.activated?
 
+    @can_edit = has_access?(@device, UPDATE_DEVICE)
     @show_institution = show_institution?(Policy::Actions::READ_DEVICE, Device)
   end
 
   def setup
     @device = Device.with_deleted.find(params[:id])
     return unless authorize_resource(@device, UPDATE_DEVICE)
+    @can_edit = has_access?(@device, UPDATE_DEVICE)
+    @show_institution = show_institution?(Policy::Actions::READ_DEVICE, Device)
 
     unless @device.secret_key_hash?
       # This is the first time the setup page is displayed (after create)
@@ -95,7 +98,6 @@ class DevicesController < ApplicationController
 
     render layout: false if request.xhr?
   end
-
 
   def edit
     return unless authorize_resource(@device, UPDATE_DEVICE)
@@ -256,7 +258,7 @@ class DevicesController < ApplicationController
   end
 
   def device_params
-    params.require(:device).permit(:name, :serial_number, :device_model_id, :time_zone, :site_id, :ftp_hostname, :ftp_port, :ftp_username, :ftp_password, :ftp_directory).tap do |whitelisted|
+    params.require(:device).permit(:name, :serial_number, :device_model_id, :time_zone, :site_id, :ftp_hostname, :ftp_port, :ftp_username, :ftp_password, :ftp_directory, :ftp_passive).tap do |whitelisted|
       if custom_mappings = params[:device][:custom_mappings]
         whitelisted[:custom_mappings] = custom_mappings.select { |k, v| v.present? }
       end
@@ -265,10 +267,10 @@ class DevicesController < ApplicationController
 
   def query_tests_histogram
     query = default_performance_query_options.merge({
-      "group_by" => "month(test.reported_time)",
+      "group_by" => "month(test.start_time)",
     })
     result = TestResult.query(query, current_user).execute
-    result = Hash[result["tests"].map { |i| [i["test.reported_time"], i["count"]] }]
+    result = Hash[result["tests"].map { |i| [i["test.start_time"], i["count"]] }]
 
     tests_histogram = []
     11.downto(0).each do |i|
@@ -285,11 +287,11 @@ class DevicesController < ApplicationController
   def query_errors_histogram
     query = default_performance_query_options.merge({
       "test.status" => "error",
-      "group_by" => "month(test.reported_time),test.site_user",
+      "group_by" => "month(test.start_time),test.site_user",
     })
     result = TestResult.query(query, current_user).execute
     users = result["tests"].index_by { |t| t["test.site_user"] }.keys
-    results_by_day = result["tests"].group_by { |t| t["test.reported_time"] }
+    results_by_day = result["tests"].group_by { |t| t["test.start_time"] }
 
     errors_histogram = []
     11.downto(0).each do |i|
@@ -349,7 +351,9 @@ class DevicesController < ApplicationController
   def default_performance_query_options
     {
       "since" => (Date.today - 1.year).iso8601,
-      "device.uuid" => @device.uuid
+      "device.uuid" => @device.uuid,
+      # TODO post mvp: should generate list of all types but qc, or support query by !=
+      "test.type" => "specimen"
     }.tap do |h|
       # display only test results of the current site of the device
       h["site.uuid"] = @device.site.uuid if @device.site

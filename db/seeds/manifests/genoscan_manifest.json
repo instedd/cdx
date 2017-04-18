@@ -120,6 +120,7 @@
         ]
       "
     },
+    "test.status" : "success",
     "test.type" : {
       "case" : [
         {"lookup" : "Strip-Type"},

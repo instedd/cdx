@@ -52,6 +52,7 @@ class NavigationContext
         h[:uuid] = uuid
       end
       h[:full_context] = @context
+      h[:sidebar_open] = @user.sidebar_open
       h[:institution] = { name: institution.name, uuid: institution.uuid } if institution
       h[:site] = { name: site.name, uuid: site.uuid } if site
     end

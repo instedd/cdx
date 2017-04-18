@@ -18,9 +18,10 @@
         - if @show_institution
           %div
             Institution: #{@device.institution.name}
-      - c.actions do
-        = link_to edit_device_path(@device), :title => 'Edit' do
-          = image_tag "ic-pencil.png"
+      - if @can_edit
+        - c.actions do
+          = link_to edit_device_path(@device), :title => 'Edit' do
+            = image_tag "ic-pencil.png"
 
       - c.bottom do
         .serial

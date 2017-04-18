@@ -49,7 +49,7 @@ describe Encounter do
     end
 
     it "merge n/a n/a" do
-      expect(merge_values("n/a", "n/a")).to eq("indeterminate")
+      expect(merge_values("n/a", "n/a")).to eq("n/a")
     end
 
     it "merge with same" do
@@ -63,6 +63,16 @@ describe Encounter do
     it "merge with n/a" do
       expect(merge_values("any", "n/a")).to eq("any")
       expect(merge_values("n/a", "any")).to eq("any")
+    end
+
+    it "merges with indeterminate" do
+      expect(merge_values("any", "indeterminate")).to eq("any")
+      expect(merge_values("indeterminate", "any")).to eq("any")
+    end
+
+    it "merges with n/a with indeterminate" do
+      expect(merge_values("n/a", "indeterminate")).to eq("n/a")
+      expect(merge_values("indeterminate", "n/a")).to eq("n/a")
     end
 
     it "merge with nil" do
@@ -145,7 +155,7 @@ describe Encounter do
     end
 
     it "should allow assays fields" do
-      encounter.core_fields[Encounter::ASSAYS_FIELD] = [{"name"=>"flu_a", "condition"=>"flu_a", "result"=>"indeterminate", "quantitative_result"=>3}]
+      encounter.core_fields[Encounter::ASSAYS_FIELD] = [{"name"=>"flu_a", "condition"=>"flu_a", "result"=>"indeterminate", "quantitative_result"=>"3"}]
       expect(encounter).to be_valid
     end
 
@@ -224,7 +234,7 @@ describe Encounter do
         encounter.core_fields[Encounter::ASSAYS_FIELD] = [
           {"condition" => "flu_a", "name" => "flu_a", "result" => "positive", "quantitative_result" => nil},
           {"condition" => "flu_c", "name" => "flu_c", "result" => "negative", "quantitative_result" => nil},
-          {"condition" => "mtb", "name" => "mtb", "result" => "positive", "quantitative_result" => 32},
+          {"condition" => "mtb", "name" => "mtb", "result" => "positive", "quantitative_result" => "32"},
         ]
         encounter.save!
         encounter.updated_diagnostic_timestamp!
@@ -245,7 +255,7 @@ describe Encounter do
         expect(encounter.updated_diagnostic).to eq([
           {"condition" => "flu_a", "name" => "flu_a", "result" => "positive", "quantitative_result" => nil},
           {"condition" => "flu_c", "name" => "flu_c", "result" => "negative", "quantitative_result" => nil},
-          {"condition" => "mtb", "name" => "mtb", "result" => "positive", "quantitative_result" => 32},
+          {"condition" => "mtb", "name" => "mtb", "result" => "positive", "quantitative_result" => "32"},
           {"condition" => "flu_b", "name" => "flu_b", "result" => nil, "quantitative_result" => nil},
         ])
       end

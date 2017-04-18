@@ -1,4 +1,15 @@
 var BarChart = React.createClass({
+	getInitialState: function() {
+		if (this.props.data.length==0) {
+			shouldHide=true;
+		} else {
+			shouldHide=false;
+		};
+
+    return {
+      shouldHide: shouldHide
+    };
+  },
   getDefaultProps: function() {
     return {
       margin: {top: 20, right: 20, bottom: 30, left: 50},
@@ -30,6 +41,15 @@ var BarChart = React.createClass({
         .scale(x)
         .orient("bottom");
 
+      var rotateLabels = function(dom) {
+        d3.select(dom.getDOMNode()).selectAll("text")
+          .attr("y", 0)
+          .attr("x", 9)
+          .attr("dy", ".35em")
+          .attr("transform", "rotate(-65)")
+          .style("text-anchor", "start");
+      }
+
       var yAxis = d3.svg.axis()
         .scale(y)
         .tickSize(chartWidth)
@@ -46,7 +66,12 @@ var BarChart = React.createClass({
     }
 
     return (
-      <div className="chart">
+	<div>
+			<div className={this.state.shouldHide ? '' : 'hidden'}>
+			<span className="horizontal-bar-value">There is no data to display</span>
+			</div>
+		  <div className={this.state.shouldHide ? 'hidden' : ''}>
+       <div className="chart">
         <svg width="100%"
              height={this.props.height}
              ref="svg"
@@ -73,7 +98,7 @@ var BarChart = React.createClass({
               {/* X Axis */}
               <g className="x axis"
                  transform={"translate(0," + chartHeight + ")"}
-                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(xAxis) }}} />
+                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(xAxis); rotateLabels(ref); }}} />
 
               {/* Y Axis */}
               <g className="y axis"
@@ -98,6 +123,9 @@ var BarChart = React.createClass({
           })}
         </div>
       </div>
+
+     </div>
+    </div>
     );
   }
 });

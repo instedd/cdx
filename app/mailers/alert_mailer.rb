@@ -5,7 +5,7 @@ class AlertMailer < ApplicationMailer
   default from: ENV['ALERT_MAILER_SENDER'] || ENV['MAILER_SENDER'] || 'info@instedd.org'
 
   def alert_email(alert, person, alert_history, message_body, subject_text, alert_count)
-    email=  person[:email]
+    email = person[:email]
     @alert = alert
     @alert_body_text = message_body
 

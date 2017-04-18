@@ -44,6 +44,12 @@
         - select.item "weekly", "Weekly"
   .row
     .col.pe-2
+      = f.label :allows_manual_entry, "Allow manual entry"
+    .col
+      = f.check_box :allows_manual_entry
+      %label{for: 'site_allows_manual_entry'} &nbsp;
+  .row
+    .col.pe-2
       = f.label :main_phone_number
     .col
       = f.text_field :main_phone_number, :class => 'input-large'

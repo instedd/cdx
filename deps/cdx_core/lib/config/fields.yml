@@ -60,9 +60,10 @@ entities:
             options:
               - positive
               - negative
+              - indeterminate
               - n/a
           quantitative_result:
-            type: float
+            searchable: true
       type:
         type: enum
         searchable: true
@@ -115,6 +116,7 @@ entities:
   location: &LOCATION
     fields:
       id:
+        searchable: true
       parents:
         searchable: true
         multiple: true
@@ -128,6 +130,8 @@ entities:
     fields:
       id:
       uuid:
+        searchable: true
+      user_email:
         searchable: true
       patient_age:
         type: duration
@@ -155,7 +159,8 @@ entities:
               - negative
               - indeterminate
           quantitative_result:
-            type: float
+            searchable: true
+            type: string
 test:
   test:
     <<: *TEST
