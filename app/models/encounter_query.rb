@@ -1,7 +1,7 @@
 class EncounterQuery < EntityQuery
   include Policy::Actions
 
-  def self.for params, user
+  def self.for(params, user)
     policies = ComputedPolicy.applicable_policies(READ_ENCOUNTER, Encounter, user).includes(:exceptions)
     if policies.any?
       new params, policies
@@ -16,17 +16,15 @@ class EncounterQuery < EntityQuery
 
   def execute
     result = super
-    TestResultQuery.add_names_to result["encounters"]
+    TestResultQuery.add_names_to result['encounters']
     result
   end
 
-  protected
-
-  def self.add_names_to encounters
-    sites = indexed_model encounters, Site, ["site", "uuid"]
+  def self.add_names_to(encounters)
+    sites = indexed_model encounters, Site, %w(site uuid)
 
     encounters.each do |encounter|
-      encounter["site"]["name"] = sites[encounter["site"]["uuid"]].try(:name) if encounter["site"]
+      encounter['site']['name'] = sites[encounter['site']['uuid']].try(:name) if encounter['site']
     end
   end
 end

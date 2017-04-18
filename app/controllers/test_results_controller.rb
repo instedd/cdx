@@ -12,6 +12,7 @@ class TestResultsController < ApplicationController
     @display_as = "test" if @display_as != "test" && @display_as != "test_order"
 
     @results = Cdx::Fields.test.core_fields.find { |field| field.name == 'result' }.options
+    @test_types = Cdx::Fields.test.core_fields.find { |field| field.name == 'type' }.options
     @conditions = Condition.all.map &:name
     @date_options = date_options_for_filter
 
@@ -77,6 +78,7 @@ class TestResultsController < ApplicationController
     end
     filter["test.assays.condition"] = params["test.assays.condition"] if params["test.assays.condition"].present?
     filter["test.assays.result"] = params["test.assays.result"] if params["test.assays.result"].present?
+    filter["test.type"] = params["test.type"] if params["test.type"].present?
     filter["sample.id"] = params["sample.id"] if params["sample.id"].present?
     filter["since"] = params["since"] if params["since"].present?
     filter

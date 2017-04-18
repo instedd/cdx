@@ -35,7 +35,7 @@ class InstitutionsController < ApplicationController
     return unless authorize_resource(Institution, CREATE_INSTITUTION)
 
     @first_institution_creation = @institutions.count == 0
-    @hide_user_settings = @hide_nav_bar = @first_institution_creation
+    @hide_my_account = @hide_nav_bar = @first_institution_creation
   end
 
   def create
@@ -44,7 +44,7 @@ class InstitutionsController < ApplicationController
     return unless authorize_resource(Institution, CREATE_INSTITUTION)
 
     @first_institution_creation = @institutions.count == 0
-    @hide_user_settings = @hide_nav_bar = @first_institution_creation
+    @hide_my_account = @hide_nav_bar = @first_institution_creation
 
     respond_to do |format|
       if @institution.save

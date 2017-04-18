@@ -5,10 +5,10 @@
     - if @tests.empty?
       = empty_data icon: 'icon-outline-test xx-large' do |c|
         - c.body do
-          %h1 No tests have been reported
+          %h1 No #{@display_as == "test" ? "tests" : "test results"} have been reported
           %p Setup your devices first in order to start reporting
     - else
-      = cdx_table title: pluralize(@total, "test") do |t|
+      = cdx_table title: pluralize(@total, (@display_as == "test" ? "test" : "test result")) do |t|
         - t.columns do
           - each_test_column do |id, title, opts|
             %col{:width => opts[:width]}

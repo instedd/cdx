@@ -1,5 +1,5 @@
-$(document).ready(function(){
-  $("#nav-context").click(function(event){
+$(document).on('ready', function(){
+  $(document).on('click', "#nav-context", function(event){
     var container = $("#context_side_bar");
     if ($("[data-react-class=NavigationContextPicker]:first").length == 0) {
       // initialize react component for context picker
@@ -24,23 +24,41 @@ $(document).ready(function(){
   // and preserve the status of the body.show-navigation-context-picker css class
   var context_side_bar = null;
   var show_navigation_context = false;
-  $(document).on("page:fetch", function() {
+  var saveCurrentContextForNextChange = function() {
     context_side_bar = $('#context_side_bar');
     show_navigation_context = $("body").hasClass("show-navigation-context-picker");
-  });
+  }
+  $(document).on("page:fetch", saveCurrentContextForNextChange);
   $(document).on("page:change", function() {
     if (show_navigation_context) {
       $("body").addClass("show-navigation-context-picker");
     }
     if (context_side_bar) {
-      $('#context_side_bar').append(context_side_bar.children());
+      $('#context_side_bar')
+        .append(context_side_bar.children())
+        .trigger("context:sync");
     }
+
+    // history back does not triggers a page:fetch, so we need to keep track of current status
+    // ideally should be before history back
+    saveCurrentContextForNextChange();
   });
 });
 
 var NavigationContextPicker = React.createClass({
+  buildState: function(props) {
+    return { context: props.context, subsitesIncluded: !props.context.full_context.endsWith("-!") }
+  },
+
   getInitialState: function() {
-    return { context: this.props.context, subsitesIncluded: !this.props.context.full_context.endsWith("-!") };
+    return this.buildState(this.props);
+  },
+
+  componentDidMount: function() {
+    $(document).on("context:sync", function(){
+      var new_props = JSON.parse($("#context_side_bar").attr("data-context-react-props"));
+      this.setState(this.buildState(new_props));
+    }.bind(this));
   },
 
   changeContextSite: function(site) {
@@ -70,7 +88,7 @@ var NavigationContextPicker = React.createClass({
     // there is no need to update the properties
     return (
       <div>
-        <SitePicker selected_uuid={this.props.context.uuid} onSiteSelected={this.changeContextSite} onSubsitesToggled={this.onSubsitesToggled} subsitesIncluded={this.state.subsitesIncluded} />
+        <SitePicker selected_uuid={this.state.context.uuid} onSiteSelected={this.changeContextSite} onSubsitesToggled={this.onSubsitesToggled} subsitesIncluded={this.state.subsitesIncluded} />
       </div>
     );
   }
