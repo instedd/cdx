@@ -14,6 +14,10 @@ ENV NNDD_VERSION "cdx-0.11-pre7"
 # Install gem bundle
 ADD Gemfile /app/
 ADD Gemfile.lock /app/
+ADD cdx.gemspec /app/
+ADD cdx-api-elasticsearch.gemspec /app/
+ADD deps/ /app/deps/
+
 RUN bundle install --jobs 8 --deployment --without development test
 
 # Install the application
