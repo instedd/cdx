@@ -1,0 +1,67 @@
+version: '2.0'
+
+services:
+  base: &base
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    env_file: docker-dev.env
+    depends_on:
+      - db
+    working_dir: /src
+    volumes:
+      - .:/src
+      - bundle:/usr/local/bundle
+    command: /bin/true
+
+  web:
+    <<: *base
+    pid: host
+    volumes_from:
+      - sshd
+    # tty: true
+    ports:
+      - "3000:3000"
+    command: /bin/sh -c './bin/rails s -b 0.0.0.0'
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db:/var/lib/mysql
+
+  elasticsearch:
+    image: elasticsearch:1.7.5
+    command: elasticsearch -Des.cluster.name=cdx
+    volumes:
+      - es01:/usr/share/elasticsearch/data
+
+  redis:
+    image: redis:3.0.5
+
+  sshd:
+    image: instedd/cdx-sync-sshd
+    environment:
+      SYNC_UID: 9999
+
+  csv_watch:
+    <<: *base
+    volumes_from:
+      - sshd
+    command: /bin/sh -c 'rake csv:watch'
+
+  ftp_monitor:
+    <<: *base
+    command: /bin/sh -c 'rake ftp:start'
+
+  sidekiq:
+    <<: *base
+    depends_on:
+      - redis
+    command: /bin/sh -c 'bundle exec sidekiq'
+
+volumes:
+  db:
+  bundle:
+  es01:
