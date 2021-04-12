@@ -1,1 +1,1 @@
---color --format progress --format TestrailRspecFormatter::Formatter
+--color --format progress --format TestrailRspecFormatter::Formatter --require spec_helper
