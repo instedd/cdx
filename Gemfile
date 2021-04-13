@@ -1,22 +1,23 @@
 source 'https://rubygems.org'
 
 gem 'rails', '~> 4.2.5'
+# gem 'rails', '>= 5.0.0', '< 5.1'
 gem 'mysql2'
 gem 'sass-rails', '~> 4.0.0'
 gem 'uglifier', '>= 2.7.2'
 gem 'jquery-rails'
 gem 'haml-rails'
 gem 'lodash-rails'
-gem 'awesome_nested_set', '~> 3.0.0.rc.3'
+gem 'awesome_nested_set', '~> 3.1.0' #'~> 3.0.0.rc.3'
 gem 'csv_builder'
 gem 'decent_exposure'
-gem 'nokogiri', '~> 1.6.7.2'
+gem 'nokogiri', '~> 1.6.8.1'
 gem 'react-rails', '~> 1.3.2'
 gem 'foreman'
 gem 'paperclip', git: 'https://github.com/instedd/paperclip', branch: 'fix/v4.3.6-no-mimemagic'
 gem 'aws-sdk', '~> 1.6'
 gem 'newrelic_rpm'
-gem 'paranoia'
+gem 'paranoia', '~> 2.2.0'
 gem 'premailer-rails'
 gem 'kaminari'
 gem 'base58'
@@ -55,7 +56,7 @@ end
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'
 
-gem 'puma'
+gem 'puma', '~> 5.2.2'
 
 # Use Sidekiq for background jobs
 gem 'sidekiq'
@@ -81,7 +82,7 @@ gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem 'elasticsearch'
 
-gem 'oj'
+gem 'oj', '~> 3.11.3'
 gem 'guid'
 gem 'encryptor'
 
@@ -99,7 +100,7 @@ source 'https://rails-assets.org' do
 end
 
 group :development, :test do
-  gem 'pry-byebug'
+  gem 'pry-byebug', '~> 3.9.0'
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
   gem 'pry-clipboard'

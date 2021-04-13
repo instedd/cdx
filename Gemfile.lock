@@ -110,9 +110,9 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.3.8)
     ansi (1.5.0)
-    arel (6.0.3)
-    awesome_nested_set (3.0.2)
-      activerecord (>= 4.0.0, < 5)
+    arel (6.0.4)
+    awesome_nested_set (3.1.4)
+      activerecord (>= 4.0.0, < 5.3)
     aws-sdk (1.66.0)
       aws-sdk-v1 (= 1.66.0)
     aws-sdk-v1 (1.66.0)
@@ -130,8 +130,8 @@ GEM
       bert (>= 1.1.0, < 2.0.0)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
-    builder (3.2.2)
-    byebug (8.2.1)
+    builder (3.2.4)
+    byebug (11.1.3)
     capistrano (3.1.0)
       i18n
       rake (>= 10.0.0)
@@ -204,7 +204,7 @@ GEM
     cliver (0.3.2)
     cocaine (0.5.8)
       climate_control (>= 0.0.3, < 1.0)
-    coderay (1.1.0)
+    coderay (1.1.3)
     coffee-rails (4.0.1)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0, < 5.0)
@@ -213,6 +213,7 @@ GEM
       execjs
     coffee-script-source (1.9.1.1)
     colorize (0.7.7)
+    concurrent-ruby (1.1.8)
     config (1.2.1)
       activesupport (>= 3.0)
       deep_merge (~> 1.0, >= 1.0.1)
@@ -326,7 +327,8 @@ GEM
     htmlentities (4.3.4)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
-    i18n (0.7.0)
+    i18n (0.9.5)
+      concurrent-ruby (~> 1.0)
     interception (0.5)
     jbuilder (1.5.3)
       activesupport (>= 3.0.0)
@@ -338,7 +340,7 @@ GEM
     jquery-turbolinks (2.1.0)
       railties (>= 3.1.0)
       turbolinks
-    json (1.8.3)
+    json (1.8.6)
     jwt (1.5.1)
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
@@ -369,10 +371,10 @@ GEM
       nokogiri (~> 1.4)
       ntlm-http (~> 0.1, >= 0.1.1)
       webrobots (>= 0.0.9, < 0.2)
-    method_source (0.8.2)
+    method_source (1.0.0)
     mime-types (2.99.1)
-    mini_portile2 (2.0.0)
-    minitest (5.8.4)
+    mini_portile2 (2.1.0)
+    minitest (5.14.4)
     multi_json (1.11.2)
     multi_test (0.1.2)
     multi_xml (0.5.5)
@@ -386,8 +388,9 @@ GEM
     net-ssh (2.9.2)
     netrc (0.10.3)
     newrelic_rpm (3.14.0.305)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
+    nio4r (2.5.7)
+    nokogiri (1.6.8.1)
+      mini_portile2 (~> 2.1.0)
     notiffany (0.0.7)
       nenv (~> 0.1)
       shellany (~> 0.0)
@@ -401,7 +404,7 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (~> 1.2)
-    oj (2.12.12)
+    oj (3.11.3)
     omniauth (1.2.2)
       hashie (>= 1.2, < 4)
       rack (~> 1.0)
@@ -412,8 +415,8 @@ GEM
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
     orm_adapter (0.5.0)
-    paranoia (2.1.4)
-      activerecord (~> 4.0)
+    paranoia (2.2.1)
+      activerecord (>= 4.0, < 5.1)
     poltergeist (1.7.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
@@ -426,13 +429,12 @@ GEM
     premailer-rails (1.8.2)
       actionmailer (>= 3, < 5)
       premailer (~> 1.7, >= 1.7.9)
-    pry (0.10.1)
-      coderay (~> 1.1.0)
-      method_source (~> 0.8.1)
-      slop (~> 3.4)
-    pry-byebug (3.3.0)
-      byebug (~> 8.0)
-      pry (~> 0.10)
+    pry (0.13.1)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
+    pry-byebug (3.9.0)
+      byebug (~> 11.0)
+      pry (~> 0.13.0)
     pry-clipboard (0.1.1)
       clipboard
       pry
@@ -442,7 +444,8 @@ GEM
     pry-stack_explorer (0.4.9.2)
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
-    puma (2.13.4)
+    puma (5.2.2)
+      nio4r (~> 2.0)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.4)
@@ -484,7 +487,7 @@ GEM
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
     rchardet (1.6.1)
-    rdoc (4.2.0)
+    rdoc (6.3.0)
     react-rails (1.3.2)
       babel-transpiler (>= 0.7.0)
       coffee-script-source (~> 1.8)
@@ -538,9 +541,8 @@ GEM
       sass (~> 3.2.2)
       sprockets (~> 2.8, < 3.0)
       sprockets-rails (~> 2.0)
-    sdoc (0.4.1)
-      json (~> 1.7, >= 1.7.7)
-      rdoc (~> 4.0)
+    sdoc (2.1.0)
+      rdoc (>= 5.0)
     sexp_processor (4.6.0)
     shellany (0.0.1)
     shoulda (3.5.0)
@@ -565,7 +567,6 @@ GEM
     site_prism (2.7)
       addressable (>= 2.3.3, < 3.0)
       capybara (>= 2.1, < 3.0)
-    slop (3.6.0)
     spring (1.3.6)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
@@ -590,7 +591,7 @@ GEM
       libv8 (~> 3.16.14.0)
       ref
     thor (0.19.1)
-    thread_safe (0.3.5)
+    thread_safe (0.3.6)
     tilt (1.4.1)
     timecop (0.8.0)
     timers (4.1.1)
@@ -606,7 +607,7 @@ GEM
     trollop (2.1.2)
     turbolinks (2.5.3)
       coffee-rails
-    tzinfo (1.2.2)
+    tzinfo (1.2.9)
       thread_safe (~> 0.1)
     uglifier (2.7.2)
       execjs (>= 0.3.0)
@@ -638,7 +639,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  awesome_nested_set (~> 3.0.0.rc.3)
+  awesome_nested_set (~> 3.1.0)
   aws-sdk (~> 1.6)
   barby
   base58
@@ -685,21 +686,21 @@ DEPENDENCIES
   machinist (~> 1.0)
   mysql2
   newrelic_rpm
-  nokogiri (~> 1.6.7.2)
+  nokogiri (~> 1.6.8.1)
   nuntium_api (~> 0.21)
-  oj
+  oj (~> 3.11.3)
   omniauth
   omniauth-google-oauth2
   paperclip!
-  paranoia
+  paranoia (~> 2.2.0)
   poirot_rails!
   poltergeist
   premailer-rails
-  pry-byebug
+  pry-byebug (~> 3.9.0)
   pry-clipboard
   pry-rescue
   pry-stack_explorer
-  puma
+  puma (~> 5.2.2)
   quiet_assets
   rails (~> 4.2.5)
   rails-assets-es5-shim!
