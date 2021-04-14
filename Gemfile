@@ -72,11 +72,11 @@ group :development do
   gem 'capistrano-rvm', '~> 0.1', require: false
   gem 'spring'
   gem 'spring-commands-rspec'
-  gem 'quiet_assets'
+  # gem 'quiet_assets'
 end
 
-gem 'devise', '~> 3.5.5'
-gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
+gem 'devise', '~> 4.7.3' #'~> 3.5.5'
+gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension', tag: 'v0.7.2'
 gem 'devise_invitable'
 gem 'omniauth'
 gem 'omniauth-google-oauth2'
@@ -87,7 +87,7 @@ gem 'guid'
 gem 'encryptor'
 
 gem 'dotiw'
-gem 'rails-i18n', '~> 4.0.0'
+gem 'rails-i18n', '~> 4.0.9' # '5.1.1' #'~> 4.0.0'
 gem 'doorkeeper'
 
 gem 'faker'
