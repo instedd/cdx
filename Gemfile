@@ -104,7 +104,7 @@ group :development, :test do
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
   gem 'pry-clipboard'
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 4.1.2'
 end
 
 group :test do
@@ -115,7 +115,7 @@ group :test do
   gem 'machinist', '~> 1.0'
   gem 'capybara', '~> 3.35.3'
   gem 'guard-rspec'
-  gem 'rspec'
+  gem 'rspec', '~> 3.10.0'
   gem 'rspec-collection_matchers'
   gem 'vcr'
   gem 'webmock', require: false
