@@ -101,9 +101,9 @@ end
 
 group :development, :test do
   gem 'pry-byebug', '~> 3.9.0'
-  gem 'pry-rescue'
-  gem 'pry-stack_explorer'
-  gem 'pry-clipboard'
+  gem 'pry-rescue', '~> 1.5.2'
+  gem 'pry-stack_explorer', '~> 0.6.1'
+  gem 'pry-clipboard', '~> 0.1.1'
   gem 'rspec-rails', '~> 4.1.2'
 end
 
