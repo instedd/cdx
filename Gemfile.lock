@@ -410,7 +410,7 @@ GEM
     multi_test (0.1.2)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
-    mysql2 (0.3.19)
+    mysql2 (0.5.3)
     nenv (0.3.0)
     net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.1)
@@ -716,7 +716,7 @@ DEPENDENCIES
   location_service!
   lodash-rails (~> 4.17.15)
   machinist (~> 1.0)
-  mysql2
+  mysql2 (~> 0.5.3)
   newrelic_rpm (~> 6.15.0)
   nokogiri (~> 1.11.3)
   nuntium_api (~> 0.21)

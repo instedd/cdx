@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 # gem 'rails', '~> 4.2.5'
 gem 'rails', '~> 5.0.7'
-gem 'mysql2'
+gem 'mysql2', '~> 0.5.3'
 gem 'sass-rails', '~> 5.0.0'
 gem 'uglifier', '>= 2.7.2'
 gem 'jquery-rails', '~> 4.4.0'
