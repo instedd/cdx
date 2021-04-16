@@ -24,7 +24,7 @@ gem 'base58', '~> 0.2.3'
 gem 'rubyzip', '~> 2.3.0' #'>= 1.0.0'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
-gem 'config', '~> 3.1.0'
+gem 'config', '~> 1.5.0' #'~> 3.1.0'
 gem 'rest-client', '~> 1.6' #'~> 2.1.0' TODO: update location_service
 gem 'barby', '~> 0.6.8'
 gem 'chunky_png', '~> 1.4.0'
