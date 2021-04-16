@@ -15,7 +15,7 @@ gem 'nokogiri', '~> 1.11.3' #'~> 1.6.8.1'
 gem 'react-rails', '~> 2.6.1' #'~> 1.3.2'
 gem 'foreman', '~> 0.87.2'
 gem 'paperclip', git: 'https://github.com/instedd/paperclip', branch: 'fix/v4.3.6-no-mimemagic'
-gem 'aws-sdk', '~> 3.0.2' #'~> 1.6'
+gem 'aws-sdk-s3', '~> 1.93.1' #'~> 3.0.2' #'~> 1.6'
 gem 'newrelic_rpm', '~> 6.15.0'
 gem 'paranoia', '~> 2.4.3' #'~> 2.2.0'
 gem 'premailer-rails', '~> 1.11.1'
@@ -24,7 +24,7 @@ gem 'base58', '~> 0.2.3'
 gem 'rubyzip', '~> 2.3.0' #'>= 1.0.0'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
-gem 'config', '~> 1.2.0'
+gem 'config', '~> 3.1.0'
 gem 'rest-client', '~> 1.6' #'~> 2.1.0' TODO: update location_service
 gem 'barby', '~> 0.6.8'
 gem 'chunky_png', '~> 1.4.0'
@@ -64,7 +64,7 @@ gem 'sidekiq', '~> 5.1.3'
 gem 'sidekiq-cron', '~> 1.2.0' #'~> 0.3.1'
 
 group :development do
-  gem 'letter_opener'
+  gem 'letter_opener', '~> 1.7.0'
   gem 'web-console', '~> 2.0'
   gem 'capistrano', '~> 3.1.0', require: false
   gem 'capistrano-rails', '~> 1.1', require: false
