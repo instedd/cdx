@@ -27,6 +27,7 @@ RUN \
     libfreetype6-dev \
     libfontconfig1 \
     libfontconfig1-dev \
+    libv8-dev \
     # wkhtmltopdf dependencies \
     xfonts-75dpi \
     xfonts-base \
