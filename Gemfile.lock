@@ -275,7 +275,7 @@ GEM
       i18n (~> 0.5)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
-    ffi (1.9.10)
+    ffi (1.15.0)
     filewatcher (0.3.6)
       trollop (~> 2.0)
     foreman (0.78.0)
