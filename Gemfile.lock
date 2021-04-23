@@ -598,8 +598,8 @@ GEM
       power_assert
     testrail_rspec_formatter (0.2.0)
       rspec (~> 3.0)
-    therubyracer (0.12.2)
-      libv8 (~> 3.16.14.0)
+    therubyracer (0.12.3)
+      libv8 (~> 3.16.14.15)
       ref
     thor (1.1.0)
     thread_safe (0.3.6)
@@ -728,7 +728,7 @@ DEPENDENCIES
   spring-commands-rspec
   test-unit
   testrail_rspec_formatter
-  therubyracer
+  therubyracer (~> 0.12.3)
   timecop
   tire
   turbolinks (~> 5.2.1)
