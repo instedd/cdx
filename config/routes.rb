@@ -102,6 +102,7 @@ Rails.application.routes.draw do
       post 'reprocess'
     end
   end
+  resources :samples, only: [:index, :new]
   resources :test_results , only: [:index, :show]
   resources :filters, format: 'html'
   resources :subscribers

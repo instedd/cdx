@@ -1,0 +1,24 @@
+= render "filters"
+
+.row
+  .col
+    - if @samples.empty?
+      = empty_data icon: 'icon-outline-test xx-large' do |c|
+        - c.body do
+          %h1 There are no samples
+          %p Every sample will have a UUID and a barcode
+    - else
+      %p List of samples
+      -# - if @display_as == "test"
+      -#   = react_component "TestResultsIndexTable", tests: @json, title: pluralize(@total, "test"),
+      -#       orderBy: @order_by, showSites: @show_sites, showDevices: @show_devices,
+      -#       downloadCsvPath: test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
+      -# - else
+      -#   = react_component "TestOrdersIndexTable", tests: @json, title: pluralize(@total, "test order"),
+      -#       orderBy: @order_by, showSites: @show_sites, showDevices: @show_devices,
+      -#       downloadCsvPath: test_results_path(@filter.merge(format: :csv).merge(display_as: @display_as))
+
+      -# .pagination
+      -#   = render 'shared/pagination'
+      -#   - if @display_as == "test"
+      -#     = link_to "Add filter", new_filter_path(query: @filter), class: 'pull-right'

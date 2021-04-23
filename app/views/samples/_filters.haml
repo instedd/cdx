@@ -1,0 +1,10 @@
+- content_for(:subheader) do
+  %form#filters-form{action: samples_path, "data-auto-submit" => true}
+    %input{type: "hidden", name: "page_size", value: @page_size}
+    .row.center.filters
+      .col.pe-10
+        .row
+          .col
+            %h1
+              = link_to "+", new_sample_path, class: 'btn-add side-link fix', title: 'Add sample'
+              Samples

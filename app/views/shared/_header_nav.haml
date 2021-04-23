@@ -19,6 +19,11 @@
         - if has_access_to_patients_index?
           %li{:class => params[:controller] == "patients" && "active"}
             = link_to "Patients", patients_path
+        %li{:class => params[:controller] == "samples" && "active"}
+          = link_to "Samples", samples_path
+        - if has_access_to_test_results_index?
+          %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
+            = link_to "Tests", test_results_path
         - if has_access_to_sites_index?
           %li{:class => params[:controller] == "sites" && "active"}
             = link_to "Sites", sites_path
@@ -31,9 +36,6 @@
         - if has_access_to_device_models_index?
           %li{:class => params[:controller] == "device_models" && "active"}
             = link_to "Models", device_models_path
-        - if has_access_to_test_results_index?
-          %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
-            = link_to "Tests", test_results_path
         - if has_access_to_users_index?
           -# Devise clears the controller param for users index
           %li{:class => (params[:controller] == "users" || !params[:controller]) && "active"}
