@@ -1,6 +1,9 @@
 class LaboratorySamplesController < ApplicationController
 
   def index
-    @samples = []
+    @samples = [
+      LaboratorySample.new,
+      LaboratorySample.new
+    ]
   end
 end
