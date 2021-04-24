@@ -1,9 +1,10 @@
 class LaboratorySamplesController < ApplicationController
 
   def index
-    @samples = [
-      LaboratorySample.new,
-      LaboratorySample.new
-    ]
+    # TODO: filter by Institution
+    @samples = LaboratorySample.all
+
+    # paginate samples
+    @samples = perform_pagination(@samples)
   end
 end
