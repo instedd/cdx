@@ -1,10 +1,15 @@
 - content_for(:subheader) do
-  %form#filters-form{action: laboratory_samples_path, "data-auto-submit" => true}
-    %input{type: "hidden", name: "page_size", value: @page_size}
-    .row.center.filters
-      .col.pe-10
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            = link_to "+", new_laboratory_sample_path, class: 'btn-add side-link fix', title: 'Add sample'
+            Samples
+
+      %form#filters-form{action: laboratory_samples_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
         .row
-          .col
-            %h1
-              = link_to "+", new_laboratory_sample_path, class: 'btn-add side-link fix', title: 'Add sample'
-              Samples
+          .filter
+            %label.block Sample Id
+            %input.input-block{type: "text", name: "uuid", value: params["uuid"]}
