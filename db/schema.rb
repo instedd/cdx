@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210424172045) do
+ActiveRecord::Schema.define(version: 20210425195132) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -296,6 +296,7 @@ ActiveRecord::Schema.define(version: 20210424172045) do
     t.string   "uuid",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.string   "type",       limit: 255
   end
 
   create_table "manifests", force: :cascade do |t|
