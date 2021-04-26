@@ -36,9 +36,28 @@ class LaboratorySamplesController < ApplicationController
     end
   end
 
+  def edit
+    @sample = LaboratorySample.find(params[:id])
+    @can_delete = true
+  end
+
+  def update
+    @sample = LaboratorySample.find(params[:id])
+
+    if @sample.update(update_sample_params)
+      redirect_to laboratory_samples_path, notice: 'Sample was successfully updated.'
+    else
+      render action: 'edit'
+    end
+  end
+
   private
 
   def sample_params
+    params.require(:laboratory_sample).permit(:sample_type)
+  end
+
+  def update_sample_params
     params.require(:laboratory_sample).permit(:sample_type)
   end
 end

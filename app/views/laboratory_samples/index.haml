@@ -18,7 +18,7 @@
             %th Type
         - t.tbody do
           - @samples.each do |sample|
-            %tr{data: {href: "#" }}
+            %tr{data: {href: edit_laboratory_sample_path(sample) }}
               %td= sample.uuid
               %td= sample.sample_type.blank? ? "Unknown" : sample.sample_type
 

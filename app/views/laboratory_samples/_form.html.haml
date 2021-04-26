@@ -21,7 +21,7 @@
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
-      = link_to 'Cancel', patients_path, class: 'btn-link'
+      = link_to 'Cancel', laboratory_samples_path, class: 'btn-link'
 
       - if @can_delete
         = confirm_deletion_button @sample, 'sample'
