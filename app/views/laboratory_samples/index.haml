@@ -20,7 +20,7 @@
           - @samples.each do |sample|
             %tr{data: {href: "#" }}
               %td= sample.uuid
-              %td= sample.type.blank? ? "Unknown" : sample.type
+              %td= sample.sample_type.blank? ? "Unknown" : sample.sample_type
 
       .pagination
         = render 'shared/pagination'

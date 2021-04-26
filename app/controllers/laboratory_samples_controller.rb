@@ -23,7 +23,7 @@ class LaboratorySamplesController < ApplicationController
       return
     end
 
-    @sample = LaboratorySample.new({:uuid => uuid})
+    @sample = LaboratorySample.new(sample_params.merge(uuid: uuid))
 
     if @sample.save
       session.delete(:creating_sample_uuid)
@@ -33,5 +33,11 @@ class LaboratorySamplesController < ApplicationController
     else
       render action: 'new'
     end
+  end
+
+  private
+
+  def sample_params
+    params.require(:laboratory_sample).permit(:sample_type)
   end
 end
