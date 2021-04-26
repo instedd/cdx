@@ -5,6 +5,7 @@ class LaboratorySamplesController < ApplicationController
     @samples = LaboratorySample.all.order('created_at DESC')
 
     @samples = @samples.where("uuid LIKE concat('%', ?, '%')", params[:uuid]) unless params[:uuid].blank?
+    @samples = @samples.where("sample_type = ?", params[:sample_type]) unless params[:sample_type].blank?
 
     # paginate samples
     @samples = perform_pagination(@samples)
