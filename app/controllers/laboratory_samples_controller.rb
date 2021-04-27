@@ -38,17 +38,30 @@ class LaboratorySamplesController < ApplicationController
 
   def edit
     @sample = LaboratorySample.find(params[:id])
+    # TODO: Implement user authorized to delete
     @can_delete = true
   end
 
   def update
     @sample = LaboratorySample.find(params[:id])
+    # TODO:
+    # return unless authorize_resource(patient, UPDATE_PATIENT)
 
     if @sample.update(update_sample_params)
       redirect_to laboratory_samples_path, notice: 'Sample was successfully updated.'
     else
       render action: 'edit'
     end
+  end
+
+  def destroy
+    @sample = LaboratorySample.find(params[:id])
+    # TODO:
+    # return unless authorize_resource(@patient, DELETE_PATIENT)
+
+    @sample.destroy
+
+    redirect_to laboratory_samples_path, notice: 'Sample was successfully deleted.'
   end
 
   private
