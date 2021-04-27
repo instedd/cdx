@@ -213,9 +213,9 @@ GEM
       execjs
     coffee-script-source (1.9.1.1)
     colorize (0.7.7)
-    config (1.0.0)
+    config (1.2.1)
       activesupport (>= 3.0)
-      deep_merge (~> 1.0.0)
+      deep_merge (~> 1.0, >= 1.0.1)
     connection_pool (2.2.0)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
@@ -240,7 +240,7 @@ GEM
     database_cleaner (1.4.0)
     debug_inspector (0.0.2)
     decent_exposure (2.3.2)
-    deep_merge (1.0.1)
+    deep_merge (1.2.1)
     devise (3.5.5)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -651,7 +651,7 @@ DEPENDENCIES
   cdx-api-elasticsearch!
   cdx-sync-server!
   chunky_png
-  config
+  config (~> 1.2.0)
   csv_builder
   cucumber-rails
   d3_rails

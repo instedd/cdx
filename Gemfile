@@ -23,7 +23,7 @@ gem 'base58'
 gem 'rubyzip', '>= 1.0.0'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
-gem 'config'
+gem 'config', '~> 1.2.0'
 gem 'rest-client'
 gem 'barby'
 gem 'chunky_png'
