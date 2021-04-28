@@ -1,0 +1,15 @@
+.barcode-card
+  .row.barcode-content
+    .row
+      .title
+        = @institution.name
+    .row
+      = image_tag barcode_img_data_url(@sample.uuid)
+      .code Sample ID #{@sample.uuid}
+    .row.logo
+      = image_tag 'cdx-logo-med.png', size: '30%'
+      .label http://cdx.io
+  .row.actions
+    = link_to laboratory_samples_path, class: 'btn-link' do
+      .icon-print.btn-icon
+      %span Print
