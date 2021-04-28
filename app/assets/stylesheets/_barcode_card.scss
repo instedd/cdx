@@ -1,0 +1,49 @@
+.barcode-card {
+  @include flexbox();
+  @include flex-direction(column);
+
+  background: $gray1;
+  border-radius: 3px;
+  //padding: 15px;
+
+  .barcode-content {
+    background: $white;
+    padding: 5px 7px;
+    margin: 15px;
+  }
+
+  .title {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 5px;
+  }
+
+  .code {
+    font-size: 12px;
+    padding: 0 5px;
+  }
+
+  .logo {
+    font-size: 12px;
+    padding: 0 5px;
+    margin-top: 10px;
+
+    img {
+      width: 20%;
+    }
+
+    .label {
+      margin-left: 5px;
+    }
+  }
+
+  .actions {
+    margin: 0 15px 15px;
+
+    .btn-icon {
+      background: none !important;
+      color: inherit;
+      margin: -3px 0 0;
+    }
+  }
+}

@@ -38,6 +38,7 @@ class LaboratorySamplesController < ApplicationController
 
   def edit
     @sample = LaboratorySample.find(params[:id])
+    @institution = @navigation_context.institution
     # TODO: Implement user authorized to delete
     @can_delete = true
   end

@@ -6,17 +6,37 @@
   -#    .value= f.object.institution
 
   .row
-    .col.pe-2
-      = f.label :uuid
     .col
-      .value= f.object.uuid
+      .row
+        .col.pe-2
+          = f.label :uuid
+        .col
+          .value= f.object.uuid
+      .row
+        .col.pe-2
+          = f.label :type
+        .col
+          = cdx_select form: f, name: :sample_type, searchable: false do |select|
+            - select.items LaboratorySample.sample_types
 
-  .row
-    .col.pe-2
-      = f.label :type
     .col
-      = cdx_select form: f, name: :sample_type, searchable: false do |select|
-        - select.items LaboratorySample.sample_types
+      -#%p= image_barcode(@sample.uuid)
+      .barcode-card
+        .row.barcode-content
+          .row
+            .title
+              = @institution.name
+          .row
+            = image_tag barcode_img_data_url(@sample.uuid)
+            .code Sample ID #{@sample.uuid}
+          .row.logo
+            = image_tag 'cdx-logo-med.png', size: '30%'
+            .label http://cdx.io
+        .row.actions
+          = link_to laboratory_samples_path, class: 'btn-link' do
+            .icon-print.btn-icon
+            %span Print
+
 
   .row.button-actions
     .col

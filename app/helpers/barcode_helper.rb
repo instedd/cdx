@@ -20,4 +20,11 @@ module BarcodeHelper
     file.close
     file.unlink
   end
+
+  def barcode_img_data_url(code)
+    barcode = Barby::Code93.new(code)
+    outputter = Barby::PngOutputter.new(barcode)
+    outputter.xdim = 2
+    outputter.to_image.to_data_url
+  end
 end
