@@ -33,7 +33,7 @@ This file contains the information on the CDX SSH client to be used for this ser
 
 ```json
 {
-  "version": "0.0.1",
+  "version": "0.1.0",
   "url": "https://github.com/instedd/cdx-sync-client/releases/download/release-v0.1.0/cdx-win32-0.1.0.exe"
 }
 ```
@@ -48,7 +48,7 @@ Google client id and secret are required to enable login using Google, and you s
 host: cdx.example.com
 app_version: latest
 nndd_url: "/nndd/index.html"
-location_service_url: http://locations-stg.instedd.org
+location_service_url: https://locations-stg.instedd.org
 google_client_id:
 google_client_secret:
 google_maps_api_key:
@@ -91,7 +91,7 @@ Last but not least, set up the `docker-compose.yml` file for the application sta
 
 The `docker-compose.prod.yml` assumes there is `data` dir in the same folder as the compose config file, where mysql, elasticsearch and ssh clients will store their persistent data.
 
-Make sure to change the image from `instedd/cdx:latest` to the image you actually want to use for this deployment. You should never work on latest, but [choose a specific tag](https://hub.docker.com/r/instedd/cdx/tags/).
+Make sure to change the image from `instedd/cdx:dev` to the image you actually want to use for this deployment. You should never work on dev, but [choose a specific tag](https://hub.docker.com/r/instedd/cdx/tags/).
 
 ### Attachments
 
