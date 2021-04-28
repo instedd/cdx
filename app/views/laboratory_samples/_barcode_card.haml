@@ -7,7 +7,7 @@
       = image_tag barcode_img_data_url(@sample.uuid)
       .code Sample ID #{@sample.uuid}
     .row.logo
-      = image_tag 'cdx-logo-med.png', size: '30%'
+      = image_tag 'cdx-logo-bw.png', style: 'width: 20%;'
       .label http://cdx.io
   .row.actions
     = link_to laboratory_samples_path, class: 'btn-link' do
