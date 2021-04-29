@@ -1,0 +1,11 @@
+!!!
+%html
+  %head
+    %title Connected Diagnostics Platform
+    = wicked_pdf_stylesheet_link_tag "application", :media => "all"
+
+  %body{class: @body_class}
+    .wrapper
+      .content.row
+        .col
+          = yield

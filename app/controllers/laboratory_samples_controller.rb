@@ -37,11 +37,27 @@ class LaboratorySamplesController < ApplicationController
     end
   end
 
+  def print
+    @sample = LaboratorySample.find(params[:id])
+    @institution = @navigation_context.institution
+
+    @show_print_action = false
+
+    render pdf: "#{@sample.uuid}",
+      template: 'laboratory_samples/barcode.pdf',
+      layout: 'layouts/pdf.html',
+      margin: { top: 10, bottom: 10, left: 10, right: 10 },
+      disable_smart_shrinking: true,
+      orientation: 'Landscape',
+      show_as_html: params.key?('debug')
+  end
+
   def edit
     @sample = LaboratorySample.find(params[:id])
     @institution = @navigation_context.institution
 
     @show_barcode_preview = true
+    @show_print_action = true
 
     # TODO: Implement user authorized to delete
     @can_delete = true

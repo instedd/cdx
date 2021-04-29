@@ -1,38 +1,42 @@
+@mixin barcode-content() {
+  .barcode-content {
+    font-family: $roboto;
+
+    background: $white;
+    padding: 5px 7px;
+    margin: 15px;
+
+    .title {
+      font-size: 14px;
+      font-weight: bold;
+      padding: 0 5px;
+    }
+
+    .code {
+      font-size: 12px;
+      padding: 0 5px;
+    }
+
+    .logo {
+      font-size: 12px;
+      padding: 0 5px;
+      margin-top: 10px;
+
+      .label {
+        margin-left: 5px;
+      }
+    }
+  }
+}
+
 .barcode-card {
   @include flexbox();
   @include flex-direction(column);
 
-  font-family: $roboto;
-
   background: $gray1;
   border-radius: 3px;
 
-  .barcode-content {
-    background: $white;
-    padding: 5px 7px;
-    margin: 15px;
-  }
-
-  .title {
-    font-size: 14px;
-    font-weight: bold;
-    padding: 0 5px;
-  }
-
-  .code {
-    font-size: 12px;
-    padding: 0 5px;
-  }
-
-  .logo {
-    font-size: 12px;
-    padding: 0 5px;
-    margin-top: 10px;
-
-    .label {
-      margin-left: 5px;
-    }
-  }
+  @include barcode-content();
 
   .actions {
     margin: 0 15px 15px;
@@ -42,5 +46,18 @@
       color: inherit;
       margin: -3px 0 0;
     }
+  }
+}
+
+// Print
+
+.barcode-card-print {
+  @include flexbox();
+  @include flex-direction(column);
+
+  @include barcode-content();
+
+  .barcode {
+    border: 1px solid red;
   }
 }

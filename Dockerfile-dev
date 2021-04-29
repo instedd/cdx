@@ -30,6 +30,13 @@ RUN \
   mv ${PHANTOM_JS_VERSION} ${LOCAL_SHARE} && \
   ln -sf ${LOCAL_SHARE}/${PHANTOM_JS_VERSION}/bin/phantomjs /usr/local/bin
 
+# wkhtmltopdf
+RUN \
+  mkdir -p /tmp/wkhtmltopdf && \
+  curl -L https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz | tar -xJC /tmp/wkhtmltopdf && \
+  mv /tmp/wkhtmltopdf/wkhtmltox/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf && \
+  chmod +x /usr/local/bin/wkhtmltopdf
+
 RUN \
   # cleanup
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
