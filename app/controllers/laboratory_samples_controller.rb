@@ -14,6 +14,7 @@ class LaboratorySamplesController < ApplicationController
   def new
     @sample = LaboratorySample.new
     session[:creating_sample_uuid] = @sample.uuid
+    @show_barcode_preview = false
   end
 
   def create
@@ -39,6 +40,9 @@ class LaboratorySamplesController < ApplicationController
   def edit
     @sample = LaboratorySample.find(params[:id])
     @institution = @navigation_context.institution
+
+    @show_barcode_preview = true
+
     # TODO: Implement user authorized to delete
     @can_delete = true
   end

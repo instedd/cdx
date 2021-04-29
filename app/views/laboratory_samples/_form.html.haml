@@ -19,8 +19,9 @@
           = cdx_select form: f, name: :sample_type, searchable: false do |select|
             - select.items LaboratorySample.sample_types
 
-    .col
-      = render "barcode_card"
+    - if @show_barcode_preview
+      .col
+        = render "barcode_card"
 
   .row.button-actions
     .col
