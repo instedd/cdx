@@ -1,16 +1,12 @@
 .barcode-card-print
-  .row
-    .barcode-content
-      .row
-        .title
-          = @institution.name
-      .row
-        .barcode
-          = image_tag barcode_img_data_url(@sample.uuid)
-      .row
-        .code
-          Sample ID #{@sample.uuid}
-      .row
-        .logo
-          = wicked_pdf_image_tag 'cdx-logo-bw.png', style: 'width: 20%;'
-          .label http://cdx.io
+  .barcode-content
+    .title
+      = @institution.name
+    .barcode
+      = image_tag barcode_img_data_url(@sample.uuid)
+    .code
+      Sample ID #{@sample.uuid}
+    .logo
+      = image_tag 'cdx-logo-bw.png'
+      -# = wicked_pdf_image_tag 'cdx-logo-bw.png'
+      .label http://cdx.io

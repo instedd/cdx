@@ -1,4 +1,10 @@
-@mixin barcode-content() {
+.barcode-card {
+  @include flexbox();
+  @include flex-direction(column);
+
+  background: $gray1;
+  border-radius: 3px;
+
   .barcode-content {
     font-family: $roboto;
 
@@ -27,16 +33,6 @@
       }
     }
   }
-}
-
-.barcode-card {
-  @include flexbox();
-  @include flex-direction(column);
-
-  background: $gray1;
-  border-radius: 3px;
-
-  @include barcode-content();
 
   .actions {
     margin: 0 15px 15px;
@@ -55,7 +51,50 @@
   @include flexbox();
   @include flex-direction(column);
 
-  @include barcode-content();
+  height: 100%;
+  width: 100%;
+
+  justify-content: center;
+  align-items: center;
+
+  // width: 1000px;
+
+  .barcode-content {
+    font-family: $roboto;
+
+    background: $white;
+    padding: 5px 7px;
+    margin: 15px;
+
+    .title {
+      font-size: 14px;
+      font-weight: bold;
+      padding: 0 5px;
+    }
+
+    .code {
+      font-size: 12px;
+      padding: 0 5px;
+    }
+
+    .logo {
+      @include flexbox();
+      align-items: center;
+
+      font-size: 12px;
+      padding: 0 5px;
+      margin-top: 10px;
+
+      img {
+        width: 35px;
+        height: auto;
+      }
+
+      .label {
+        margin-left: 5px;
+      }
+    }
+  }
 
   .barcode {
     border: 1px solid red;
