@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160405192357) do
+ActiveRecord::Schema.define(version: 20210424172045) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -291,6 +291,12 @@ ActiveRecord::Schema.define(version: 20160405192357) do
   end
 
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
+
+  create_table "laboratory_samples", force: :cascade do |t|
+    t.string   "uuid",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "manifests", force: :cascade do |t|
     t.string   "version",         limit: 255
