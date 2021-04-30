@@ -46,11 +46,11 @@ class LaboratorySamplesController < ApplicationController
     render pdf: "#{@sample.uuid}",
       template: 'laboratory_samples/barcode.pdf',
       layout: 'layouts/pdf.html',
-      margin: { top: 5, bottom: 5, left: 5, right: 5 },
-      page_height: 300,
-      page_width: 80,
-      disable_smart_shrinking: true,
-      orientation: 'Landscape',
+      margin: { top: 2, bottom: 0, left: 0, right: 0 },
+      page_width: '4in',
+      page_height: '1.5in',
+      # disable_smart_shrinking: true,
+      # orientation: 'Landscape',
       show_as_html: params.key?('debug')
   end
 

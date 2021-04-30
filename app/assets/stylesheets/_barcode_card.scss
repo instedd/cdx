@@ -45,7 +45,7 @@
   }
 }
 
-// Print
+// Print Barcode style
 
 .barcode-card-print {
   @include flexbox();
@@ -60,7 +60,7 @@
   // width: 1000px;
 
   .barcode-content {
-    font-family: $roboto;
+    font-family: 'Roboto Mono', monospace;
 
     background: $white;
     padding: 5px 7px;
@@ -71,6 +71,13 @@
       font-weight: bold;
       padding: 0 5px;
     }
+
+    // .barcode {
+    //   border: 1px solid red; // For testing barcode width
+    //   // img {
+    //   //   width: 500px;
+    //   // }
+    // }
 
     .code {
       font-size: 12px;
@@ -94,9 +101,5 @@
         margin-left: 5px;
       }
     }
-  }
-
-  .barcode {
-    border: 1px solid red;
   }
 }
