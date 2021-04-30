@@ -43,7 +43,7 @@ class LaboratorySamplesController < ApplicationController
 
     @show_print_action = false
 
-    render pdf: "#{@sample.uuid}",
+    render pdf: "cdx_sample_#{@sample.uuid}",
       template: 'laboratory_samples/barcode.pdf',
       layout: 'layouts/pdf.html',
       margin: { top: 2, bottom: 0, left: 0, right: 0 },
