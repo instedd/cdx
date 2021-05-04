@@ -14,12 +14,6 @@
   .row
     .col.pe-2
       = f.label :type
-    -#.col
-    -#  = f.collection_radio_buttons :type, LaboratorySample.types, :second, :first do |b|
-    -#    .row
-    -#      .col
-    -#        = b.radio_button
-    -#        = b.label
     .col
       = cdx_select form: f, name: :sample_type, searchable: false do |select|
         - select.items LaboratorySample.sample_types
