@@ -1,0 +1,20 @@
+= form_for(@sample) do |f|
+  -#.row
+  -#  .col.pe-2
+  -#    = f.label :institution
+  -#  .col
+  -#    .value= f.object.institution
+
+  .row
+    .col.pe-2
+      = f.label :uuid
+    .col
+      .value= f.object.uuid
+
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', patients_path, class: 'btn-link'
+
+      - if @can_delete
+        = confirm_deletion_button @sample, 'sample'
