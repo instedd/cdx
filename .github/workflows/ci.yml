@@ -12,7 +12,7 @@ jobs:
         run: |
           docker-compose build
           docker-compose run --rm -e RAILS_ENV=test web bundle install
-          docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare
+          docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
           docker-compose up -d db elasticsearch redis sshd csv_watch ftp_monitor sidekiq
       - name: Run specs
         run: docker-compose run --rm -e RAILS_ENV=test web bundle exec rake

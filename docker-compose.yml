@@ -22,6 +22,9 @@ services:
     # tty: true
     ports:
       - "3000:3000"
+    depends_on:
+      - db
+      - elasticsearch
     command: /bin/sh -c './bin/rails s -b 0.0.0.0'
 
   db:
