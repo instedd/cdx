@@ -5,6 +5,7 @@ class LaboratorySamplesController < ApplicationController
     @samples = LaboratorySample.all.order('created_at DESC')
 
     @samples = @samples.where("uuid LIKE concat('%', ?, '%')", params[:uuid]) unless params[:uuid].blank?
+    @samples = @samples.where("sample_type = ?", params[:sample_type]) unless params[:sample_type].blank?
 
     # paginate samples
     @samples = perform_pagination(@samples)
@@ -23,7 +24,7 @@ class LaboratorySamplesController < ApplicationController
       return
     end
 
-    @sample = LaboratorySample.new({:uuid => uuid})
+    @sample = LaboratorySample.new(sample_params.merge(uuid: uuid))
 
     if @sample.save
       session.delete(:creating_sample_uuid)
@@ -33,5 +34,11 @@ class LaboratorySamplesController < ApplicationController
     else
       render action: 'new'
     end
+  end
+
+  private
+
+  def sample_params
+    params.require(:laboratory_sample).permit(:sample_type)
   end
 end
