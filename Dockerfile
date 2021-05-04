@@ -1,5 +1,19 @@
 FROM instedd/nginx-rails:2.2
 
+RUN \
+  apt-get update && \
+  apt-get install -y \
+    # wkhtmltopdf dependencies \
+    xfonts-75dpi \
+    xfonts-base \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# wkhtmltopdf
+RUN \
+  curl -L https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.jessie_amd64.deb --output wkhtmltopdf.deb && \
+    dpkg -i wkhtmltopdf.deb && \
+    rm -f wkhtmltopdf.deb
+
 ## Create a user for the web app.
 RUN \
   addgroup --gid 9999 app && \
