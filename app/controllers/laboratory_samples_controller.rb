@@ -34,10 +34,4 @@ class LaboratorySamplesController < ApplicationController
       render action: 'new'
     end
   end
-
-  private
-
-  def uuid_param
-    params.require(:uuid)
-  end
 end
