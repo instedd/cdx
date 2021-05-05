@@ -2,3 +2,12 @@
   color: $orange;
   font-style: italic;
 }
+
+form {
+  .error {
+    font-size: 12px;
+    font-style: italic;
+    color: $red;
+    margin-top: 5px;
+  }
+}
