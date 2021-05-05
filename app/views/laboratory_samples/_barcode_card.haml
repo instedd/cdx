@@ -8,7 +8,7 @@
       .code Sample ID #{@sample.uuid}
     .row.logo
       = image_tag 'cdx-logo-bw.png', style: 'width: 20%;'
-      .label http://cdx.io
+      .label https://cdx.io
   - if @show_print_action
     .row.actions
       = link_to print_laboratory_sample_path(@sample), download: "cdx_sample_#{@sample.uuid}.pdf", target: "_blank", class: 'btn-link' do

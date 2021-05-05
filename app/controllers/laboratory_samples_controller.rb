@@ -49,8 +49,6 @@ class LaboratorySamplesController < ApplicationController
       margin: { top: 2, bottom: 0, left: 0, right: 0 },
       page_width: '4in',
       page_height: '1.5in',
-      # disable_smart_shrinking: true,
-      # orientation: 'Landscape',
       show_as_html: params.key?('debug')
   end
 
