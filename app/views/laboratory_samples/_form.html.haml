@@ -6,17 +6,22 @@
   -#    .value= f.object.institution
 
   .row
-    .col.pe-2
-      = f.label :uuid
     .col
-      .value= f.object.uuid
+      .row
+        .col.pe-2
+          = f.label :uuid
+        .col
+          .value= f.object.uuid
+      .row
+        .col.pe-2
+          = f.label :type
+        .col
+          = cdx_select form: f, name: :sample_type, searchable: false do |select|
+            - select.items LaboratorySample.sample_types
 
-  .row
-    .col.pe-2
-      = f.label :type
-    .col
-      = cdx_select form: f, name: :sample_type, searchable: false do |select|
-        - select.items LaboratorySample.sample_types
+    - if @show_barcode_preview
+      .col
+        = render "barcode_card"
 
   .row.button-actions
     .col

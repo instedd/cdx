@@ -14,6 +14,7 @@ class LaboratorySamplesController < ApplicationController
   def new
     @sample = LaboratorySample.new
     session[:creating_sample_uuid] = @sample.uuid
+    @show_barcode_preview = false
   end
 
   def create
@@ -36,8 +37,28 @@ class LaboratorySamplesController < ApplicationController
     end
   end
 
+  def print
+    @sample = LaboratorySample.find(params[:id])
+    @institution = @navigation_context.institution
+
+    @show_print_action = false
+
+    render pdf: "cdx_sample_#{@sample.uuid}",
+      template: 'laboratory_samples/barcode.pdf',
+      layout: 'layouts/pdf.html',
+      margin: { top: 2, bottom: 0, left: 0, right: 0 },
+      page_width: '4in',
+      page_height: '1.5in',
+      show_as_html: params.key?('debug')
+  end
+
   def edit
     @sample = LaboratorySample.find(params[:id])
+    @institution = @navigation_context.institution
+
+    @show_barcode_preview = true
+    @show_print_action = true
+
     # TODO: Implement user authorized to delete
     @can_delete = true
   end

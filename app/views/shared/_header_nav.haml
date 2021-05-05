@@ -19,7 +19,7 @@
         - if has_access_to_patients_index?
           %li{:class => params[:controller] == "patients" && "active"}
             = link_to "Patients", patients_path
-        %li{:class => params[:controller] == "samples" && "active"}
+        %li{:class => params[:controller] == "laboratory_samples" && "active"}
           = link_to "Samples", laboratory_samples_path
         - if has_access_to_test_results_index?
           %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}

@@ -18,18 +18,31 @@ ENV LOCAL_SHARE "/usr/local/share"
 
 RUN \
   apt-get update && \
-  apt-get install -y build-essential chrpath libssl-dev libxft-dev && \
-  apt-get install -y libfreetype6 libfreetype6-dev && \
-  apt-get install -y libfontconfig1 libfontconfig1-dev
+  apt-get install -y \
+    build-essential \
+    chrpath \
+    libssl-dev \
+    libxft-dev \
+    libfreetype6 \
+    libfreetype6-dev \
+    libfontconfig1 \
+    libfontconfig1-dev \
+    # wkhtmltopdf dependencies \
+    xfonts-75dpi \
+    xfonts-base \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN \
   mkdir ${PHANTOM_JS_TMP} && \
   cd ${PHANTOM_JS_TMP} && \
-  wget ${PHANTOM_JS_DOWNLOAD} && \
+  curl -L ${PHANTOM_JS_DOWNLOAD} --output ${PHANTOM_JS_VERSION}.tar.bz2 && \
   tar xvjf ${PHANTOM_JS_VERSION}.tar.bz2 && \
   mv ${PHANTOM_JS_VERSION} ${LOCAL_SHARE} && \
-  ln -sf ${LOCAL_SHARE}/${PHANTOM_JS_VERSION}/bin/phantomjs /usr/local/bin
+  ln -sf ${LOCAL_SHARE}/${PHANTOM_JS_VERSION}/bin/phantomjs /usr/local/bin && \
+  rm -f ${PHANTOM_JS_VERSION}.tar.bz2
 
+# wkhtmltopdf
 RUN \
-  # cleanup
-  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  curl -L https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.jessie_amd64.deb --output wkhtmltopdf.deb && \
+    dpkg -i wkhtmltopdf.deb && \
+    rm -f wkhtmltopdf.deb

@@ -102,7 +102,11 @@ Rails.application.routes.draw do
       post 'reprocess'
     end
   end
-  resources :laboratory_samples
+  resources :laboratory_samples do
+    member do
+      get 'print'
+    end
+  end
   resources :test_results , only: [:index, :show]
   resources :filters, format: 'html'
   resources :subscribers
