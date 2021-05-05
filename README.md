@@ -6,60 +6,64 @@
 
 Reference implementation for the Connected Diagnostics API (http://dxapi.org/)
 
-## Getting Started
+## CDX Core Server. Getting Started
 
-### CDX Core Server
-
-To start developing:
+### Development environment (with Docker)
 
 1. Clone the repo.
 
-2. Install dependencies:
-	* `bundle install`.
-	* PhantomJS 1.9.8 for [Poltergeist](https://github.com/teampoltergeist/poltergeist) (development and test only)
-		* Install it in mac with: `brew install phantomjs`
-	* ImageMagick for [Paperclip](https://github.com/thoughtbot/paperclip#image-processor)
-		* Install it in mac with: `brew install imagemagick`
-	* [Redis](http://redis.io/download) is [used](https://github.com/mperham/sidekiq/wiki/Using-Redis) by [sidekiq](http://sidekiq.org/). CDX uses sidekiq as [ActiveJob](http://guides.rubyonrails.org/active_job_basics.html#backends) backend
-		* Install it in mac with: `brew install redis`
-		* you can start it with `redis-server --daemonize yes`
-	* [Elasticsearch](https://www.elastic.co/) is used as the main index for test results.
-		* We support elasticsearch versions < 2.x
-		* Install it in mac with: `brew install elasticsearch17`
+2. Install Docker.
 
-3. Setup development database: `bundle exec rake db:setup`
+3. Install `gems`:
+	```
+	$ docker-compose build
+	$ docker-compose run --rm web bundle install
+	```
 
-4. Setup test database: `bundle exec rake db:test:prepare`
+4. Setup development db, test db and elasticsearch index template:
+	```
+	$ docker-compose run --rm web rake db:setup db:test:prepare elasticsearch:setup
+	```
 
-5. Setup elasticsearch index template: `bundle exec rake elasticsearch:setup`
+### Additionally setup for working with devices
 
-6. Run tests: `bundle exec rake` (this will run `rspec` and `cucumber`)
-
-7. Start development server: `bundle exec rails s`
-
-Additionally:
-
-8. Import manifests: `bundle exec rake manifests:load`
+1. Import manifests: `bundle exec rake manifests:load`
 
 To create an initial set of tests:
 
-9. Navigate to the application
+2. Navigate to the application
 
-10. Create a new account and sign in
+3. Create a new account and sign in
 
-11. Create a new institution
+4. Create a new institution
 
-12. Create a new site
+5. Create a new site
 
-13. Create a new device, choosing Genoscan model
+6. Create a new device, choosing Genoscan model
 
-14. Navigate to `/api/playground`
+7. Navigate to `/api/playground`
 
-15. Select your newly created device
+8. Select your newly created device
 
-16. Copy the contents of `/spec/fixtures/csvs/genoscan_sample.csv` into the _Data_ field
+9. Copy the contents of `/spec/fixtures/csvs/genoscan_sample.csv` into the _Data_ field
 
-17. Run create message and navigate to _Tests_ to verify the tests were successfully imported
+10. Run create message and navigate to _Tests_ to verify the tests were successfully imported
+
+### Running the environment
+
+```
+$ docker-compose up
+```
+
+### Useful commands
+
+```
+# Open a terminal in the web server directory
+$ docker-compose exec web bash
+
+# Reload web server container
+$ docker-compose restart web
+```
 
 ### Locations setup
 
@@ -108,3 +112,29 @@ Now, whenever a new csv file enters the sshd inbox, it will be imported into the
 ### Sync File Watcher - Client Side
 
 In the client side, you will need to run another filewatcher: [cdx-sync-client](https://github.com/instedd/cdx-sync-client). It is a Windos App. Install it using its NSI installer, restart your computer, and fill the form that will prompt after first restart.  You will be required to provide an activation token - you can generate it form the device manager in the CDP app.
+
+### Legacy setup (local installation, without Docker)
+1. Clone the repo.
+
+2. Install dependencies:
+	* `bundle install`.
+	* PhantomJS 1.9.8 for [Poltergeist](https://github.com/teampoltergeist/poltergeist) (development and test only)
+		* Install it in mac with: `brew install phantomjs`
+	* ImageMagick for [Paperclip](https://github.com/thoughtbot/paperclip#image-processor)
+		* Install it in mac with: `brew install imagemagick`
+	* [Redis](http://redis.io/download) is [used](https://github.com/mperham/sidekiq/wiki/Using-Redis) by [sidekiq](http://sidekiq.org/). CDX uses sidekiq as [ActiveJob](http://guides.rubyonrails.org/active_job_basics.html#backends) backend
+		* Install it in mac with: `brew install redis`
+		* you can start it with `redis-server --daemonize yes`
+	* [Elasticsearch](https://www.elastic.co/) is used as the main index for test results.
+		* We support elasticsearch versions < 2.x
+		* Install it in mac with: `brew install elasticsearch17`
+
+3. Setup development database: `bundle exec rake db:setup`
+
+4. Setup test database: `bundle exec rake db:test:prepare`
+
+5. Setup elasticsearch index template: `bundle exec rake elasticsearch:setup`
+
+6. Run tests: `bundle exec rake` (this will run `rspec` and `cucumber`)
+
+7. Start development server: `bundle exec rails s`
