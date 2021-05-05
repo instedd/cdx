@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210425195132) do
+ActiveRecord::Schema.define(version: 20210505201523) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -293,11 +293,14 @@ ActiveRecord::Schema.define(version: 20210425195132) do
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
 
   create_table "laboratory_samples", force: :cascade do |t|
-    t.string   "uuid",        limit: 255
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-    t.string   "sample_type", limit: 255
+    t.string   "uuid",           limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.string   "sample_type",    limit: 255
+    t.integer  "institution_id", limit: 4
   end
+
+  add_index "laboratory_samples", ["institution_id"], name: "index_laboratory_samples_on_institution_id", using: :btree
 
   create_table "manifests", force: :cascade do |t|
     t.string   "version",         limit: 255
@@ -597,5 +600,6 @@ ActiveRecord::Schema.define(version: 20210425195132) do
   add_foreign_key "alerts", "institutions"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
+  add_foreign_key "laboratory_samples", "institutions"
   add_foreign_key "patients", "sites"
 end

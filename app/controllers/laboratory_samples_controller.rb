@@ -25,7 +25,10 @@ class LaboratorySamplesController < ApplicationController
       return
     end
 
-    @sample = LaboratorySample.new(sample_params.merge(uuid: uuid))
+    @sample = LaboratorySample.new(sample_params.merge({
+      uuid: uuid,
+      institution: @navigation_context.institution
+    }))
 
     if @sample.save
       session.delete(:creating_sample_uuid)
@@ -37,7 +40,6 @@ class LaboratorySamplesController < ApplicationController
 
   def print
     @sample = LaboratorySample.find(params[:id])
-    @institution = @navigation_context.institution
 
     @show_print_action = false
 
@@ -52,7 +54,6 @@ class LaboratorySamplesController < ApplicationController
 
   def edit
     @sample = LaboratorySample.find(params[:id])
-    @institution = @navigation_context.institution
 
     @show_barcode_preview = true
     @show_print_action = true

@@ -1,7 +1,7 @@
 .barcode-card-print
   .barcode-content
     .title
-      = @institution.name
+      = @sample.institution
     .barcode
       = image_tag barcode_img_data_url(@sample.uuid)
     .code
