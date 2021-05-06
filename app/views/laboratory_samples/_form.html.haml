@@ -1,9 +1,6 @@
 = form_for(@sample) do |f|
-  -#.row
-  -#  .col.pe-2
-  -#    = f.label :institution
-  -#  .col
-  -#    .value= f.object.institution
+
+  = validation_errors @sample
 
   .row
     .col
@@ -18,8 +15,6 @@
         .col
           = cdx_select form: f, name: :sample_type, searchable: false do |select|
             - select.items LaboratorySample.sample_types
-          - unless @sample.errors[:sample_type].blank?
-            .error= "Please choose a sample's type"
 
     - if @show_barcode_preview
       .col

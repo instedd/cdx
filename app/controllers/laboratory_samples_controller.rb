@@ -27,13 +27,12 @@ class LaboratorySamplesController < ApplicationController
 
     @sample = LaboratorySample.new(sample_params.merge(uuid: uuid))
 
-    @sample.save!
-    session.delete(:creating_sample_uuid)
-    redirect_to laboratory_samples_path, notice: 'Sample was successfully created.'
-
-  rescue ActiveRecord::RecordInvalid => ex
-    @sample.errors.add :sample_type, ex.message
-    render action: 'new'
+    if @sample.save
+      session.delete(:creating_sample_uuid)
+      redirect_to edit_laboratory_sample_path(@sample), notice: 'Sample was successfully created.'
+    else
+      render action: 'new'
+    end
   end
 
   def print
