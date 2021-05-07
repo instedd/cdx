@@ -1,4 +1,4 @@
-class Manifest < ActiveRecord::Base
+class Manifest < ApplicationRecord
   belongs_to :device_model, inverse_of: :manifest
   has_and_belongs_to_many :conditions
 

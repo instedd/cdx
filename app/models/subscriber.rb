@@ -1,4 +1,4 @@
-class Subscriber < ActiveRecord::Base
+class Subscriber < ApplicationRecord
   VALID_VERBS = %w(GET POST)
 
   belongs_to :user

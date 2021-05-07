@@ -1,4 +1,4 @@
-class ComputedPolicy < ActiveRecord::Base
+class ComputedPolicy < ApplicationRecord
 
   belongs_to :user
 

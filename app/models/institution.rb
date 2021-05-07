@@ -1,4 +1,4 @@
-class Institution < ActiveRecord::Base
+class Institution < ApplicationRecord
   include AutoUUID
   include Resource
 
@@ -9,7 +9,7 @@ class Institution < ActiveRecord::Base
   has_many :sites, dependent: :restrict_with_error
   has_many :devices, dependent: :restrict_with_error
   has_many :device_models, dependent: :restrict_with_error, inverse_of: :institution
-  
+
   has_many :encounters, dependent: :destroy
   has_many :patients, dependent: :destroy
   has_many :samples, dependent: :destroy

@@ -1,4 +1,4 @@
-class Encounter < ActiveRecord::Base
+class Encounter < ApplicationRecord
   include Entity
   include AutoUUID
   include Resource

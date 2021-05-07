@@ -1,4 +1,4 @@
-class SampleIdentifier < ActiveRecord::Base
+class SampleIdentifier < ApplicationRecord
   include AutoUUID
 
   belongs_to :sample, inverse_of: :sample_identifiers

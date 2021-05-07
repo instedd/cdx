@@ -1,5 +1,5 @@
 # Represents a file in a remote location containing a device message to be processed
-class FileMessage < ActiveRecord::Base
+class FileMessage < ApplicationRecord
   validates :status, inclusion: { in: %w(success failed skipped error) }
 
   belongs_to :device
