@@ -1,9 +1,6 @@
 = form_for(@sample) do |f|
-  -#.row
-  -#  .col.pe-2
-  -#    = f.label :institution
-  -#  .col
-  -#    .value= f.object.institution
+
+  = validation_errors @sample
 
   .row
     .col

@@ -29,9 +29,7 @@ class LaboratorySamplesController < ApplicationController
 
     if @sample.save
       session.delete(:creating_sample_uuid)
-
-      next_url = laboratory_samples_path(@sample)
-      redirect_to next_url, notice: 'Sample was successfully created.'
+      redirect_to edit_laboratory_sample_path(@sample), notice: 'Sample was successfully created.'
     else
       render action: 'new'
     end
