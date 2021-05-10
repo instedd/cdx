@@ -2,7 +2,7 @@
   .row.barcode-content
     .row
       .title
-        = @institution.name
+        = @sample.institution
     .row
       = image_tag barcode_img_data_url(@sample.uuid)
       .code Sample ID #{@sample.uuid}
