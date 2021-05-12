@@ -205,4 +205,8 @@ $(document).ready(function(){
     var textarea = $(e.target);
     textarea.css('height', 'auto').css('height', e.target.scrollHeight);
   });
+
+  $(".laboratory-sample-row input, .laboratory-sample-row label").click(function (e) {
+    e.stopPropagation();
+  });
 });

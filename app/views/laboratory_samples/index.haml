@@ -1,26 +1,35 @@
 = render "filters"
 
-.row
-  .col
-    - if @samples.empty?
-      = empty_data icon: 'icon-outline-test xx-large' do |c|
-        - c.body do
-          %h1 There are no samples
-          %p Every sample will have a UUID and a barcode
-    - else
-      = cdx_table title: pluralize(@total, "sample") do |t|
-        - t.columns do
-          %col{:width => "50%"}
-          %col{:width => "50%"}
-        - t.thead do
-          %tr
-            %th Sample Id
-            %th Type
-        - t.tbody do
-          - @samples.each do |sample|
-            %tr{data: {href: edit_laboratory_sample_path(sample) }}
-              %td= sample.uuid
-              %td= sample.sample_type.blank? ? "Unknown" : sample.sample_type
+=form_tag bulk_print_laboratory_samples_path, :method => :get do
+  .row
+    .col
+      - if @samples.empty?
+        = empty_data icon: 'icon-outline-test xx-large' do |c|
+          - c.body do
+            %h1 There are no samples
+            %p Every sample will have a UUID and a barcode
+      - else
+        = cdx_table title: pluralize(@total, "sample") do |t|
+          - t.actions do
+            =button_tag class: 'btn-link', :formtarget => "_blank" do
+              .icon-print.btn-icon
+          - t.columns do
+            %col{:width => "5%"}
+            %col{:width => "50%"}
+            %col{:width => "45%"}
+          - t.thead do
+            %tr
+              %th
+              %th Sample Id
+              %th Type
+          - t.tbody do
+            - @samples.each do |sample|
+              %tr.laboratory-sample-row{data: {href: edit_laboratory_sample_path(sample) }}
+                %td
+                  =check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
+                  %label.row{for: "sample_ids.#{sample.id}"}
+                %td= sample.uuid
+                %td= sample.sample_type.blank? ? "Unknown" : sample.sample_type
 
-      .pagination
-        = render 'shared/pagination'
+        .pagination
+          = render 'shared/pagination'

@@ -106,6 +106,9 @@ Rails.application.routes.draw do
     member do
       get 'print'
     end
+    collection do
+      get 'bulk_print'
+    end
   end
   resources :test_results , only: [:index, :show]
   resources :filters, format: 'html'
