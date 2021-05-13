@@ -115,6 +115,12 @@ class LaboratorySamplesController < ApplicationController
     redirect_to laboratory_samples_path, notice: 'Sample was successfully deleted.'
   end
 
+  def bulk_destroy
+    LaboratorySample.where(id: params[:sample_ids]).destroy_all
+
+    redirect_to laboratory_samples_path, notice: 'Samples were successfully deleted.'
+  end
+
   private
 
   def sample_params
