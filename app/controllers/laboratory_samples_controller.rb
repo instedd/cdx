@@ -73,7 +73,7 @@ class LaboratorySamplesController < ApplicationController
       page_height: '1.5in'
     }
     pdf_file = MultipagePdfRenderer.combine(sample_strings, options)
-    send_data pdf_file, type: 'application/pdf', disposition: 'inline'
+    send_data pdf_file, type: 'application/pdf', filename: 'cdx_samples_print.pdf'
   end
 
   def edit

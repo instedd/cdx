@@ -34,6 +34,10 @@
       .table-actions {
         display: inline-block;
         vertical-align: middle;
+
+        .btn-icon {
+          color: inherit;
+        }
       }
 
       a {
