@@ -124,6 +124,9 @@ input[type="checkbox"] {
       border-color: rgb(105,105,105);;
     }
   }
+  & + label.row {
+    margin-bottom: 0px;
+  }
   &:checked + label:before {
     content: '\2714';
     background: $black;

@@ -1,11 +1,11 @@
 .barcode-card-print
   .barcode-content
     .title
-      = @sample.institution
+      = sample.institution
     .barcode
-      = image_tag barcode_img_data_url(@sample.uuid)
+      = image_tag barcode_img_data_url(sample.uuid)
     .code
-      Sample ID #{@sample.uuid}
+      Sample ID #{sample.uuid}
     .logo
       -# = image_tag 'cdx-logo-bw.png'
       = wicked_pdf_image_tag 'cdx-logo-bw.png'
