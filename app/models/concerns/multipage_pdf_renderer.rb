@@ -17,10 +17,10 @@ class MultipagePdfRenderer
 
     wickedPdf = WickedPdf.new
     binary = wickedPdf.send(:find_wkhtmltopdf_binary_path)
-    options = wickedPdf.send(:parse_options, options)
+    pdf_options = wickedPdf.send(:parse_options, options)
 
     command = [binary, '-q']
-    command += options
+    command += pdf_options
     filepaths.each { |fp| command << fp }
     command << outfile.path.to_s
     err = Open3.popen3(*command) do |stdin, stdout, stderr|

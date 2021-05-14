@@ -72,10 +72,15 @@ class LaboratorySamplesController < ApplicationController
       page_width: '4in',
       page_height: '1.5in'
     }
-    pdf_file = MultipagePdfRenderer.combine(sample_strings, options)
-    pdf_filename = "cdx_samples_#{@samples.size}_#{DateTime.now.strftime('%Y%m%d-%H%M')}.pdf"
 
-    send_data pdf_file, type: 'application/pdf', filename: pdf_filename
+    begin
+      pdf_file = MultipagePdfRenderer.combine(sample_strings, options)
+      pdf_filename = "cdx_samples_#{@samples.size}_#{DateTime.now.strftime('%Y%m%d-%H%M')}.pdf"
+
+      send_data pdf_file, type: 'application/pdf', filename: pdf_filename
+    rescue
+      redirect_to laboratory_samples_path, notice: 'There was an error creating the print file.'
+    end
   end
 
   def edit
