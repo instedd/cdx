@@ -73,7 +73,9 @@ class LaboratorySamplesController < ApplicationController
       page_height: '1.5in'
     }
     pdf_file = MultipagePdfRenderer.combine(sample_strings, options)
-    send_data pdf_file, type: 'application/pdf', filename: 'cdx_samples_print.pdf'
+    pdf_filename = "cdx_samples_#{@samples.size}_#{DateTime.now.strftime('%Y%m%d-%H%M')}.pdf"
+
+    send_data pdf_file, type: 'application/pdf', filename: pdf_filename
   end
 
   def edit
