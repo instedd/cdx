@@ -13,7 +13,7 @@
           - t.actions do
             =button_tag class: 'btn-link', name: 'bulk_action', value: 'print' do
               .icon-print.btn-icon
-            =button_tag class: 'btn-link', name: 'bulk_action', value: 'destroy' do
+            =button_tag class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected samples. This action CANNOT be undone. Are you sure you want to proceed?" } do
               .icon-trash.btn-icon
           - t.columns do
             %col{:width => "5%"}
