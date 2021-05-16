@@ -487,6 +487,10 @@ GEM
       sprockets-rails (>= 2.0.0)
     rails-assets-es5-shim (4.3.1)
     rails-assets-urijs (1.17.0)
+    rails-controller-testing (1.0.5)
+      actionpack (>= 5.0.1.rc1)
+      actionview (>= 5.0.1.rc1)
+      activesupport (>= 5.0.1.rc1)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
@@ -710,6 +714,7 @@ DEPENDENCIES
   rails (~> 5.0.7)
   rails-assets-es5-shim!
   rails-assets-urijs!
+  rails-controller-testing (~> 1.0, >= 1.0.5)
   rails-i18n (~> 5.0.0)
   rchardet (~> 1.8.0)
   react-rails (~> 2.6.1)
