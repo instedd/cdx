@@ -107,7 +107,8 @@ Rails.application.routes.draw do
       get 'print'
     end
     collection do
-      get 'bulk_print'
+      get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'print' }, action: :bulk_print
+      get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end
   resources :test_results , only: [:index, :show]

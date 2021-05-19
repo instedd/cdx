@@ -8,11 +8,13 @@
           %h1 There are no samples
           %p Every sample will have a UUID and a barcode
     - else
-      =form_tag bulk_print_laboratory_samples_path, :id => 'laboratory_samples_form' , :method => :get do
+      =form_tag bulk_action_laboratory_samples_path, :id => 'laboratory_samples_form' , :method => :get do
         = cdx_table title: pluralize(@total, "sample") do |t|
           - t.actions do
-            =button_tag class: 'btn-link' do
+            =button_tag class: 'btn-link', name: 'bulk_action', value: 'print' do
               .icon-print.btn-icon
+            =button_tag class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected samples. This action CANNOT be undone. Are you sure you want to proceed?" } do
+              .icon-trash.btn-icon
           - t.columns do
             %col{:width => "5%"}
             %col{:width => "50%"}
