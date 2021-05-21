@@ -14,7 +14,7 @@
           = f.label :type
         .col
           = cdx_select form: f, name: :sample_type, searchable: false do |select|
-            - select.items LaboratorySample.sample_types
+            - select.items LaboratorySample.entity_fields.detect { |f| f.name == 'sample_type' }.options
 
     - if @show_barcode_preview
       .col

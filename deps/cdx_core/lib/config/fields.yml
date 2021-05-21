@@ -11,6 +11,15 @@ entities:
         searchable: true
       collection_date:
         type: date
+  laboratory_sample: &LABORATORY_SAMPLE
+    allows_custom: true
+    fields:
+      sample_type:
+        type: enum
+        searchable: true
+        options:
+          - qc
+          - specimen
   test: &TEST
     allows_custom: true
     fields:
