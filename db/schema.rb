@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210505201523) do
+ActiveRecord::Schema.define(version: 20210519210302) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -294,12 +294,17 @@ ActiveRecord::Schema.define(version: 20210505201523) do
 
   create_table "laboratory_samples", force: :cascade do |t|
     t.string   "uuid",           limit: 255
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
     t.string   "sample_type",    limit: 255
     t.integer  "institution_id", limit: 4
+    t.text     "core_fields",    limit: 65535
+    t.text     "custom_fields",  limit: 65535
+    t.binary   "sensitive_data", limit: 65535
+    t.datetime "deleted_at"
   end
 
+  add_index "laboratory_samples", ["deleted_at"], name: "index_laboratory_samples_on_deleted_at", using: :btree
   add_index "laboratory_samples", ["institution_id"], name: "index_laboratory_samples_on_institution_id", using: :btree
 
   create_table "manifests", force: :cascade do |t|
