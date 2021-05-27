@@ -1,0 +1,36 @@
+
+.row
+  .col
+    - if @batches.empty?
+      = empty_data title: 'No batches', icon: 'icon-outline-test xx-large' do |c|
+        - c.body do
+          %h1 There are no batches
+          %p Every batch will hold multiple samples
+    - else
+      = cdx_table title: pluralize(@total, "batch") do |t|
+        - t.columns do
+          %col{:width => "5%"}
+          %col{:width => "35%"}
+          %col{:width => "20%"}
+          %col{:width => "20%"}
+          %col{:width => "20%"}
+        - t.thead do
+          %tr
+            %th
+            %th Isolate name
+            %th Lab Technician
+            %th Inactivation Method
+            %th Date Produced
+        - t.tbody do
+          - @batches.each do |batch|
+            %tr
+              %td
+                =check_box_tag 'batch_ids[]', batch.id, false, { id: "batch_ids.#{batch.id}" }
+                %label.row{for: "batch_ids.#{batch.id}"}
+              %td= batch.isolate_name
+              %td= batch.lab_technician
+              %td= batch.inactivation_method
+              %td= batch.date_produced
+
+      .pagination
+        = render 'shared/pagination'
