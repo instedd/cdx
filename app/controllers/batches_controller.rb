@@ -9,4 +9,7 @@ class BatchesController < ApplicationController
     @batches = perform_pagination(@batches)
   end
 
+  def new
+    @batch = Batch.new
+  end
 end

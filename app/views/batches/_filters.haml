@@ -4,7 +4,7 @@
       .row
         .col
           %h1
-            -# = link_to "+", new_laboratory_sample_path, class: 'btn-add side-link fix', title: 'Add sample'
+            = link_to "+", new_batch_path, class: 'btn-add side-link fix', title: 'Add batch'
             Batches
 
       %form#filters-form{action: batches_path, "data-auto-submit" => true}

@@ -102,7 +102,7 @@ Rails.application.routes.draw do
       post 'reprocess'
     end
   end
-  resources :batches, only: [:index]
+  resources :batches, only: [:index, :new]
   resources :laboratory_samples do
     member do
       get 'print'
