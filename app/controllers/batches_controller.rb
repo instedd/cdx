@@ -18,13 +18,16 @@ class BatchesController < ApplicationController
   def create
     params = batch_params
 
-    samples_quantity = params.delete(:samples_quantity).to_i
+    @batch = Batch.new({
+      institution: @navigation_context.institution,
+      isolate_name: params[:isolate_name],
+      date_produced: to_date(params[:date_produced]),
+      inactivation_method: params[:inactivation_method],
+      volume: params[:volume],
+      lab_technician: params[:lab_technician]
+    })
 
-    @batch = Batch.new(params.merge({
-      institution: @navigation_context.institution
-    }))
-
-    @batch.laboratory_samples = (1..samples_quantity).map {
+    @batch.laboratory_samples = (1..params[:samples_quantity].to_i).map {
       LaboratorySample.new({
         institution: @navigation_context.institution,
         sample_type: 'specimen' # TODO: remove sample_type when adding QC-check
@@ -46,6 +49,10 @@ class BatchesController < ApplicationController
 
   def date_produced_placeholder
     date_format[:placeholder]
+  end
+
+  def to_date(value)
+    Time.strptime(value, date_format[:pattern]) rescue value
   end
 
   def batch_params

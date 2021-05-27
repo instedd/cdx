@@ -23,7 +23,15 @@ class Batch < ActiveRecord::Base
   validates_presence_of :volume
   validates_presence_of :lab_technician
 
+  validate :date_produced_is_a_date
+
   def samples_quantity
     laboratory_samples.size
+  end
+
+  private
+
+  def date_produced_is_a_date
+    errors.add(:date_produced, "should be a date") unless date_produced.is_a?(Time)
   end
 end
