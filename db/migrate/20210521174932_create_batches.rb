@@ -5,6 +5,8 @@ class CreateBatches < ActiveRecord::Migration
       t.text :core_fields
       t.text :custom_fields
       t.binary :sensitive_data
+      t.string :isolate_name
+
       t.datetime :deleted_at
       t.references :institution, index: true
 
@@ -12,6 +14,7 @@ class CreateBatches < ActiveRecord::Migration
     end
 
     add_index :batches, :deleted_at
+    add_index :batches, :isolate_name
   end
 end
 
