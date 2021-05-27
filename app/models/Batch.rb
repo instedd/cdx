@@ -5,6 +5,8 @@ class Batch < ActiveRecord::Base
   belongs_to :institution
   validates_presence_of :institution
 
+  has_many :laboratory_samples
+
   def self.entity_scope
     "batch"
   end
@@ -20,4 +22,8 @@ class Batch < ActiveRecord::Base
   validates_presence_of :date_produced
   validates_presence_of :volume
   validates_presence_of :lab_technician
+
+  def samples_quantity
+    laboratory_samples.size
+  end
 end

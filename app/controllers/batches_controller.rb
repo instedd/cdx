@@ -11,5 +11,17 @@ class BatchesController < ApplicationController
 
   def new
     @batch = Batch.new
+
+    @date_produced_placeholder = date_produced_placeholder
+  end
+
+  private
+
+  def date_format
+    { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
+  end
+
+  def date_produced_placeholder
+    date_format[:placeholder]
   end
 end
