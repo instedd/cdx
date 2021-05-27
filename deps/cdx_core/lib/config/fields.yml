@@ -20,6 +20,24 @@ entities:
         options:
           - qc
           - specimen
+  batch: &BATCH
+    fields:
+      isolate_name:
+        searchable: true
+      date_produced:
+        type: date
+        searchable: true
+      inactivation_method:
+        type: enum
+        searchable: true
+        options:
+          - option1
+          - option2
+          - option3
+      volume:
+        type: float
+        searchable: true
+      lab_technician:
   test: &TEST
     allows_custom: true
     fields:
