@@ -24,7 +24,7 @@
         .col.pe-3
           = f.label :volume
         .col
-          = f.number_field :volume, min: 0, max: 65535
+          = f.number_field :volume, min: 0, max: 65535, step: :any
       .row
         .col.pe-3
           = f.label :lab_technician
