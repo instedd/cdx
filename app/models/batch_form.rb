@@ -1,4 +1,4 @@
-class BatchFrom
+class BatchForm
   include ActiveModel::Model
 
   # shared editable attributes with model
@@ -25,7 +25,7 @@ class BatchFrom
   end
 
   attr_accessor *shared_attributes
-  attr_accessor samples_quantity
+  attr_accessor :samples_quantity
   delegate :id, :new_record?, :persisted?, to: :batch
 
   def batch
@@ -73,10 +73,12 @@ class BatchFrom
     return false
   end
 
-  validates_presence_of :isolate_name, :date_produced, :volume, :lab_technician, :samples_quantity, :entity_id
-
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
+
+
+  validates_numericality_of :volume, :greater_than => 0, :less_than_or_equal_to => 100, :message => "Volume value must be between 0 and 100"
+  validates :samples_quantity, :inclusion => { :in => 1..100 }
 
   # begin date_produced
   # @date_produced is Time | Nil | String.
