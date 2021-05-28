@@ -1,0 +1,45 @@
+= form_for(@batch_form) do |f|
+
+  = validation_errors @batch_form
+
+  .row
+    .col
+      .row
+        .col.pe-3
+          = f.label :isolate_name
+        .col
+          = f.text_field :isolate_name
+      .row
+        .col.pe-3
+          = f.label :date_produced
+        .col
+          = f.text_field :date_produced, placeholder: @batch_form.date_produced_placeholder
+      .row
+        .col.pe-3
+          = f.label :inactivation_method
+        .col
+          = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
+            - select.items BatchForm::INACTIVATION_METHOD_VALUES
+      .row
+        .col.pe-3
+          = f.label :volume
+        .col
+          = f.number_field :volume, min: 0, max: 65535, step: :any
+      .row
+        .col.pe-3
+          = f.label :lab_technician
+        .col
+          = f.text_field :lab_technician
+      .row
+        .col.pe-3
+          = f.label :samples_quantity
+        .col
+          = f.number_field :samples_quantity, min: 0, max: 65535
+
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', laboratory_samples_path, class: 'btn-link'
+
+      - if @can_delete
+        = confirm_deletion_button @sample, 'sample'

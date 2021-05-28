@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210521174932) do
+ActiveRecord::Schema.define(version: 20210527215913) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -318,8 +318,10 @@ ActiveRecord::Schema.define(version: 20210521174932) do
     t.text     "custom_fields",  limit: 65535
     t.binary   "sensitive_data", limit: 65535
     t.datetime "deleted_at"
+    t.integer  "batch_id",       limit: 4
   end
 
+  add_index "laboratory_samples", ["batch_id"], name: "index_laboratory_samples_on_batch_id", using: :btree
   add_index "laboratory_samples", ["deleted_at"], name: "index_laboratory_samples_on_deleted_at", using: :btree
   add_index "laboratory_samples", ["institution_id"], name: "index_laboratory_samples_on_institution_id", using: :btree
 
@@ -621,6 +623,7 @@ ActiveRecord::Schema.define(version: 20210521174932) do
   add_foreign_key "alerts", "institutions"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
+  add_foreign_key "laboratory_samples", "batches"
   add_foreign_key "laboratory_samples", "institutions"
   add_foreign_key "patients", "sites"
 end

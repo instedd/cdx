@@ -5,6 +5,9 @@ class LaboratorySample < ActiveRecord::Base
   belongs_to :institution
   validates_presence_of :institution
 
+  belongs_to :batch
+  validates_presence_of :batch
+
   def self.entity_scope
     "laboratory_sample"
   end

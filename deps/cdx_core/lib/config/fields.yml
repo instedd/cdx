@@ -31,9 +31,9 @@ entities:
         type: enum
         searchable: true
         options:
-          - option1
-          - option2
-          - option3
+          - Formaldehyde
+          - Heat
+          - UV-C
       volume:
         type: float
         searchable: true

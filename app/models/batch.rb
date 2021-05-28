@@ -5,6 +5,8 @@ class Batch < ActiveRecord::Base
   belongs_to :institution
   validates_presence_of :institution
 
+  has_many :laboratory_samples
+
   def self.entity_scope
     "batch"
   end
@@ -20,4 +22,20 @@ class Batch < ActiveRecord::Base
   validates_presence_of :date_produced
   validates_presence_of :volume
   validates_presence_of :lab_technician
+
+  validate :date_produced_is_a_date
+
+  def date_produced_description
+    if date_produced.is_a?(Time)
+      return date_produced.strftime(I18n.t('date.input_format.pattern'))
+    end
+
+    date_produced
+  end
+
+  private
+
+  def date_produced_is_a_date
+    errors.add(:date_produced, "should be a date") unless date_produced.is_a?(Time)
+  end
 end

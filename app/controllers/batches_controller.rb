@@ -9,4 +9,23 @@ class BatchesController < ApplicationController
     @batches = perform_pagination(@batches)
   end
 
+  def new
+    @batch_form = BatchForm.new()
+  end
+
+  def create
+    @batch_form = BatchForm.new(batch_params.merge({institution: @navigation_context.institution}))
+
+    if @batch_form.save
+      redirect_to batches_path, notice: 'Batch was successfully created.'
+    else
+      render action: 'new'
+    end
+  end
+
+  private
+
+  def batch_params
+    params.require(:batch).permit(:isolate_name, :date_produced, :inactivation_method, :volume, :lab_technician, :samples_quantity)
+  end
 end
