@@ -30,16 +30,17 @@
           = f.label :lab_technician
         .col
           = f.text_field :lab_technician
-      .row
-        .col.pe-3
-          = f.label :samples_quantity
-        .col
-          = f.number_field :samples_quantity, min: 0, max: 65535
+      - if @can_edit_sample_quantity
+        .row
+          .col.pe-3
+            = f.label :samples_quantity
+          .col
+            = f.number_field :samples_quantity, min: 0, max: 65535
 
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
-      = link_to 'Cancel', laboratory_samples_path, class: 'btn-link'
+      = link_to 'Cancel', batches_path, class: 'btn-link'
 
-      - if @can_delete
-        = confirm_deletion_button @sample, 'sample'
+      -# - if @can_delete
+      -#   = confirm_deletion_button @sample, 'sample'

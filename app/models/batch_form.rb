@@ -35,8 +35,12 @@ class BatchForm
   def batch=(value)
     @batch = value
     self.class.assign_attributes(self, @batch)
-    # date_produced is stored as String, but in BatchForm it needs to be set as Time when editing
-    self.date_produced = Time.parse(@batch.date_produced) rescue nil
+
+    self.date_produced = if @batch.date_produced.is_a?(Time)
+                           @batch.date_produced
+                         else
+                           Time.strptime(@batch.date_produced, date_format[:pattern]) rescue @batch.date_produced
+                         end
   end
 
   def self.edit(batch)
@@ -77,7 +81,7 @@ class BatchForm
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
 
   validates_numericality_of :volume, :greater_than => 0, :less_than_or_equal_to => 100, :message => "Volume value must be between 0 and 100"
-  validates_numericality_of :samples_quantity, :greater_than => 0, :message => "Samples quantity value must be greater than 0"
+  validates_numericality_of :samples_quantity, :greater_than => 0, :message => "value must be greater than 0", on: :create
 
   # begin date_produced
   # @date_produced is Time | Nil | String.
