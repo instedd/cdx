@@ -23,7 +23,7 @@ class BatchesController < ApplicationController
       isolate_name: params[:isolate_name],
       date_produced: to_date(params[:date_produced]),
       inactivation_method: params[:inactivation_method],
-      volume: params[:volume],
+      volume: params[:volume].to_i,
       lab_technician: params[:lab_technician]
     })
 

@@ -24,7 +24,7 @@
         .col.pe-3
           = f.label :volume
         .col
-          = f.number_field :volume
+          = f.number_field :volume, min: 0, max: 65535
       .row
         .col.pe-3
           = f.label :lab_technician
@@ -34,7 +34,7 @@
         .col.pe-3
           = f.label :samples_quantity
         .col
-          = f.number_field :samples_quantity
+          = f.number_field :samples_quantity, min: 0, max: 65535
 
     - if @show_barcode_preview
       .col
