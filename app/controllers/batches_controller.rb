@@ -25,18 +25,6 @@ class BatchesController < ApplicationController
 
   private
 
-  def date_format
-    { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
-  end
-
-  def date_produced_placeholder
-    date_format[:placeholder]
-  end
-
-  def to_date(value)
-    Time.strptime(value, date_format[:pattern]) rescue value
-  end
-
   def batch_params
     params.require(:batch).permit(:isolate_name, :date_produced, :inactivation_method, :volume, :lab_technician, :samples_quantity)
   end

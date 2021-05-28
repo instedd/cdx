@@ -36,10 +36,6 @@
         .col
           = f.number_field :samples_quantity, min: 0, max: 65535
 
-    - if @show_barcode_preview
-      .col
-        = render "barcode_card"
-
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
