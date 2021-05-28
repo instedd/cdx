@@ -24,11 +24,6 @@ class Batch < ActiveRecord::Base
   validates_presence_of :lab_technician
 
   validate :date_produced_is_a_date
-  validates :volume, inclusion: { in: 0..65535, message: 'number is invalid' }
-
-  def samples_quantity
-    laboratory_samples.size
-  end
 
   private
 

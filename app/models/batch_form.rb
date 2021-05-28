@@ -78,7 +78,7 @@ class BatchForm
 
 
   validates_numericality_of :volume, :greater_than => 0, :less_than_or_equal_to => 100, :message => "Volume value must be between 0 and 100"
-  validates :samples_quantity, :inclusion => { :in => 1..100 }
+  validates_numericality_of :samples_quantity, :greater_than => 0, :message => "Samples quantity value must be greater than 0"
 
   # begin date_produced
   # @date_produced is Time | Nil | String.

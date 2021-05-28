@@ -10,31 +10,13 @@ class BatchesController < ApplicationController
   end
 
   def new
-    @batch = Batch.new()
-
-    @date_produced_placeholder = date_produced_placeholder
+    @batch_form = BatchForm.new()
   end
 
   def create
-    params = batch_params
+    @batch_form = BatchForm.new(batch_params.merge({institution: @navigation_context.institution}))
 
-    @batch = Batch.new({
-      institution: @navigation_context.institution,
-      isolate_name: params[:isolate_name],
-      date_produced: to_date(params[:date_produced]),
-      inactivation_method: params[:inactivation_method],
-      volume: params[:volume].to_i,
-      lab_technician: params[:lab_technician]
-    })
-
-    @batch.laboratory_samples = (1..params[:samples_quantity].to_i).map {
-      LaboratorySample.new({
-        institution: @navigation_context.institution,
-        sample_type: 'specimen' # TODO: remove sample_type when adding QC-check
-      })
-    }
-
-    if @batch.save
+    if @batch_form.save
       redirect_to batches_path, notice: 'Batch was successfully created.'
     else
       render action: 'new'

@@ -1,6 +1,6 @@
-= form_for(@batch) do |f|
+= form_for(@batch_form) do |f|
 
-  = validation_errors @batch
+  = validation_errors @batch_form
 
   .row
     .col
@@ -13,13 +13,13 @@
         .col.pe-3
           = f.label :date_produced
         .col
-          = f.text_field :date_produced, placeholder: @date_produced_placeholder
+          = f.text_field :date_produced, placeholder: @batch_form.date_produced_placeholder
       .row
         .col.pe-3
           = f.label :inactivation_method
         .col
           = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
-            - select.items Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
+            - select.items BatchForm::INACTIVATION_METHOD_VALUES
       .row
         .col.pe-3
           = f.label :volume
