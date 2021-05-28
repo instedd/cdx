@@ -76,14 +76,13 @@ class BatchForm
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
 
-
   validates_numericality_of :volume, :greater_than => 0, :less_than_or_equal_to => 100, :message => "Volume value must be between 0 and 100"
   validates_numericality_of :samples_quantity, :greater_than => 0, :message => "Samples quantity value must be greater than 0"
 
   # begin date_produced
   # @date_produced is Time | Nil | String.
-  # PatientForm#date_produced will return always a string ready to be used by the user input with the user locale
-  # PatientForm#date_produced= will accept either String or Time. The String will be converted if possible to a Time using the user locale
+  # BatchForm#date_produced will return always a string ready to be used by the user input with the user locale
+  # BatchForm#date_produced= will accept either String or Time. The String will be converted if possible to a Time using the user locale
   validate :date_produced_is_a_date
 
   def date_format
@@ -115,10 +114,10 @@ class BatchForm
   end
 
   def date_produced_is_a_date
-    return if @dob.blank?
-    errors.add(:dob, "should be a date in #{dob_placeholder}") unless @dob.is_a?(Time)
+    return if @date_produced.blank?
+    errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless @date_produced.is_a?(Time)
   end
-  # end dob
+  # end date_produced
 
   private
 
