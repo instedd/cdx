@@ -24,7 +24,7 @@
             %th Date Produced
         - t.tbody do
           - @batches.each do |batch|
-            %tr
+            %tr.laboratory-sample-row{data: {href: edit_batch_path(batch) }}
               %td
                 =check_box_tag 'batch_ids[]', batch.id, false, { id: "batch_ids.#{batch.id}" }
                 %label.row{for: "batch_ids.#{batch.id}"}
