@@ -8,30 +8,34 @@
           %h1 There are no batches
           %p Every batch will hold multiple samples
     - else
-      = cdx_table title: pluralize(@total, "batch") do |t|
-        - t.columns do
-          %col{:width => "5%"}
-          %col{:width => "35%"}
-          %col{:width => "20%"}
-          %col{:width => "20%"}
-          %col{:width => "20%"}
-        - t.thead do
-          %tr
-            %th
-            %th Isolate name
-            %th Lab Technician
-            %th Inactivation Method
-            %th Date Produced
-        - t.tbody do
-          - @batches.each do |batch|
-            %tr.laboratory-sample-row{data: {href: edit_batch_path(batch) }}
-              %td
-                =check_box_tag 'batch_ids[]', batch.id, false, { id: "batch_ids.#{batch.id}" }
-                %label.row{for: "batch_ids.#{batch.id}"}
-              %td= batch.isolate_name
-              %td= batch.lab_technician
-              %td= batch.inactivation_method
-              %td= batch.date_produced_description
+      =form_tag bulk_action_batches_path, :id => 'batches_form' , :method => :get do
+        = cdx_table title: pluralize(@total, "batch") do |t|
+          - t.actions do
+            =button_tag class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected batches. This action CANNOT be undone. Are you sure you want to proceed?" } do
+              .icon-trash.btn-icon
+          - t.columns do
+            %col{:width => "5%"}
+            %col{:width => "35%"}
+            %col{:width => "20%"}
+            %col{:width => "20%"}
+            %col{:width => "20%"}
+          - t.thead do
+            %tr
+              %th
+              %th Isolate name
+              %th Lab Technician
+              %th Inactivation Method
+              %th Date Produced
+          - t.tbody do
+            - @batches.each do |batch|
+              %tr.laboratory-sample-row{data: {href: edit_batch_path(batch) }}
+                %td
+                  =check_box_tag 'batch_ids[]', batch.id, false, { id: "batch_ids.#{batch.id}" }
+                  %label.row{for: "batch_ids.#{batch.id}"}
+                %td= batch.isolate_name
+                %td= batch.lab_technician
+                %td= batch.inactivation_method
+                %td= batch.date_produced_description
 
       .pagination
         = render 'shared/pagination'

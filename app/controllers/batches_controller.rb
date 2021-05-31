@@ -41,6 +41,12 @@ class BatchesController < ApplicationController
     end
   end
 
+  def bulk_destroy
+    Batch.where(id: params[:batch_ids]).destroy_all
+
+    redirect_to batches_path, notice: 'Batches were successfully deleted.'
+  end
+
   private
 
   def batch_params
