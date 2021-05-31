@@ -76,6 +76,18 @@ label {
   }
 }
 
+.input-unit {
+  align-items: center;
+
+  .unit {
+    color: $gray3;
+    line-height: 40px;
+    min-height: 40px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
 // Checkboxes ---------------------------------------------------------//
 
 input[type="checkbox"] {

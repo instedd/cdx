@@ -43,6 +43,11 @@ class BatchForm
                          end
   end
 
+  def create
+
+    save
+  end
+
   def self.edit(batch)
     new.tap do |form|
       form.batch = batch
@@ -80,8 +85,12 @@ class BatchForm
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
 
-  validates_numericality_of :volume, :greater_than => 0, :less_than_or_equal_to => 100, :message => "Volume value must be between 0 and 100"
-  validates_numericality_of :samples_quantity, :greater_than => 0, :message => "value must be greater than 0", on: :create
+  validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
+  validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
+
+  def creating_batch?
+    self.batch.id.nil?
+  end
 
   # begin date_produced
   # @date_produced is Time | Nil | String.
