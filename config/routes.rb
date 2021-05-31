@@ -102,7 +102,11 @@ Rails.application.routes.draw do
       post 'reprocess'
     end
   end
-  resources :batches
+  resources :batches do
+    collection do
+      get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+    end
+  end
   resources :laboratory_samples do
     member do
       get 'print'
