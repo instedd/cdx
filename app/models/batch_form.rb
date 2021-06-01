@@ -44,6 +44,14 @@ class BatchForm
   end
 
   def create
+    samples_quantity = self.samples_quantity.to_i
+
+    batch.laboratory_samples = (1..samples_quantity).map {
+      LaboratorySample.new({
+        institution: self.institution,
+        sample_type: 'specimen' # TODO: remove sample_type when adding QC-check
+      })
+    }
 
     save
   end
