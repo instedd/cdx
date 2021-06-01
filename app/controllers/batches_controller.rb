@@ -17,9 +17,10 @@ class BatchesController < ApplicationController
   def create
     @batch_form = BatchForm.new(batch_params.merge({institution: @navigation_context.institution}))
 
-    if @batch_form.save
+    if @batch_form.create
       redirect_to batches_path, notice: 'Batch was successfully created.'
     else
+      @can_edit_sample_quantity = true
       render action: 'new'
     end
   end

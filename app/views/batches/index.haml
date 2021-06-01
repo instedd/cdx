@@ -15,14 +15,16 @@
               .icon-trash.btn-icon
           - t.columns do
             %col{:width => "5%"}
-            %col{:width => "35%"}
+            %col{:width => "30%"}
+            %col{:width => "15%"}
             %col{:width => "20%"}
-            %col{:width => "20%"}
-            %col{:width => "20%"}
+            %col{:width => "15%"}
+            %col{:width => "15%"}
           - t.thead do
             %tr
               %th
               %th Isolate name
+              %th Volume
               %th Lab Technician
               %th Inactivation Method
               %th Date Produced
@@ -33,6 +35,7 @@
                   =check_box_tag 'batch_ids[]', batch.id, false, { id: "batch_ids.#{batch.id}" }
                   %label.row{for: "batch_ids.#{batch.id}"}
                 %td= batch.isolate_name
+                %td= "#{batch.volume} μl"
                 %td= batch.lab_technician
                 %td= batch.inactivation_method
                 %td= batch.date_produced_description
