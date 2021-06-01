@@ -5,7 +5,7 @@ class Batch < ActiveRecord::Base
   belongs_to :institution
   validates_presence_of :institution
 
-  has_many :laboratory_samples
+  has_many :laboratory_samples, dependent: :destroy
 
   def self.entity_scope
     "batch"
