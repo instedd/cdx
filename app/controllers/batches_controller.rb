@@ -29,6 +29,7 @@ class BatchesController < ApplicationController
     batch = Batch.find(params[:id])
     @batch_form = BatchForm.edit(batch)
     @can_edit_sample_quantity = false
+    @samples = LaboratorySample.where(batch: batch)
   end
 
   def update

@@ -1,0 +1,15 @@
+%div.samples-count
+  = check_box_tag 'all_sample_ids'
+  %label.row{for: "all_samples_ids"}
+  = @samples.count.to_s + ' ' + "Samples"
+%div
+  - @samples.each do |sample|
+    %div.batches-samples
+      .samples-row
+        %div.samples-item
+          = check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
+          %label.row{for: "sample_ids.#{sample.id}"}
+          = sample.uuid
+        %div
+          = link_to edit_laboratory_sample_path(sample.id) do
+            .icon-keyboard-arrow-right.icon-gray

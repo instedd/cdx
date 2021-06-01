@@ -32,6 +32,12 @@
           = f.label :lab_technician
         .col
           = f.text_field :lab_technician, :class => 'input-x-large'
+
+      .row
+        .col.pe-3
+          = f.label :samples
+        .col
+          = render 'samples'
       - if @can_edit_sample_quantity
         .row
           .col.pe-3
