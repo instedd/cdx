@@ -1,18 +1,23 @@
 .batches-samples {
-  background-color: #FFFFFF;
-  box-shadow: 0 1px 3px 0px rgba(0,0,0,0.5);
-  margin-bottom: 1px;
-  padding: 3px;
+  padding-bottom: 1px;
+  width: 40%;
 }
 
 .samples-count {
   display: flex;
   align-items: center;
   font-weight: bolder;
-  padding-left: 17px;
+  padding-left: 14px;
+}
+
+.add-samples {
+  padding-left: 14px;
 }
 
 .samples-row {
+  background-color: #FFFFFF;
+  box-shadow: 0 1px 3px 0px rgba(0,0,0,0.5);
+  margin-bottom: 1px;
   padding: 3px 14px;
   width: 100%;
   display: flex;

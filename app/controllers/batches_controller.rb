@@ -56,6 +56,13 @@ class BatchesController < ApplicationController
     redirect_to batches_path, notice: 'Batch was successfully deleted.'
   end
 
+  def add_laboratory_sample
+    batch = Batch.find(params[:id])
+    @batch_form = BatchForm.edit(batch)
+    @batch_form.add_laboratory_sample
+    render action: 'edit'
+  end
+
   def bulk_destroy
     Batch.where(id: params[:batch_ids]).destroy_all
 
