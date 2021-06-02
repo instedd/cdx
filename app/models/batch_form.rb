@@ -139,6 +139,10 @@ class BatchForm
     errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless @date_produced.is_a?(Time)
   end
   # end date_produced
+  #
+  def laboratory_samples
+    @batch.laboratory_samples
+  end
 
   private
 
