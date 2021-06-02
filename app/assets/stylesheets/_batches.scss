@@ -6,10 +6,28 @@
 }
 
 .samples-count {
+  font-weight: bolder;
+  padding-left: 17px;
   display: flex;
   align-items: center;
-  font-weight: bolder;
-  padding-left: 15px;
+
+  .title {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+  }
+
+  .actions {
+    margin-left: 0px;
+
+    .btn-link {
+      margin-left: 0px;
+    }
+
+    .btn-icon {
+      color: inherit;
+    }
+  }
 }
 
 .samples-row {
