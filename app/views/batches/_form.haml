@@ -50,5 +50,5 @@
       = f.submit 'Save', class: 'btn-primary'
       = link_to 'Cancel', batches_path, class: 'btn-link'
 
-      -# - if @can_delete
-      -#   = confirm_deletion_button @sample, 'sample'
+      - if @can_delete
+        = confirm_deletion_button @batch_form, 'batch'
