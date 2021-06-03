@@ -11,6 +11,8 @@
         = sample.uuid
       = link_to edit_laboratory_sample_path(sample.id) do
         .icon-keyboard-arrow-right.icon-gray
+
 = link_to add_laboratory_sample_batch_path, method: :post, class: 'add-samples' do
-  .icon-circle-plus.icon-blue
-  = "ADD SAMPLE"
+  .add-samples.col.pe-2
+    .icon-circle-plus.icon-blue.icon-margin
+    = "ADD SAMPLE"
