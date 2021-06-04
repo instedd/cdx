@@ -1,21 +1,46 @@
 :javascript
   (function() {
-    $("#bulk-action-print").click(function(event) {
+    $("#bulk_action_print").click(function(event) {
       event.preventDefault();
+
+      var ids = selectedSampleIds();
+      if (ids.length <= 0) return;
+
       bulkPrint(selectedSampleIds());
     });
 
-    $("#bulk-action-destroy").click(function(event) {
+    $("#bulk_action_destroy").click(function(event) {
       event.preventDefault();
 
-      $.rails.showConfirmationDialog(
-        $('<button/>')
-          .data("method", "delete")
-          .data("confirm", "You're about to permanently delete the selected samples. This action CANNOT be undone. Are you sure you want to proceed?")
-          .click(function() { bulkDestroy(selectedSampleIds()); })
-      );
+      var ids = selectedSampleIds();
+      if (ids.length <= 0) return;
+
+      bulkDestroy(ids);
+      enableUndoDestroyAction();
     });
+
+    $("#bulk_action_destroy_undo").click(function(event) {
+      event.preventDefault();
+      bulkUndoDestroy();
+      enableDestroyAction();
+    })
   })();
+
+  function enableDestroyAction() {
+    $("#bulk_action_destroy")
+      .removeClass("hidden");
+
+    $("#bulk_action_destroy_undo")
+      .addClass("hidden");
+  }
+
+  function enableUndoDestroyAction() {
+    $("#bulk_action_destroy")
+      .addClass("hidden");
+
+    $("#bulk_action_destroy_undo")
+      .removeClass("hidden");
+  }
 
   function selectedSampleIds() {
     return $(".samples-item > input[type=checkbox]:checked")
@@ -27,19 +52,28 @@
 
   function bulkPrint(sampleIds) {
     var url = createBulkActionURL("print", sampleIds);
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   }
 
   function bulkDestroy(sampleIds) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', createBulkActionURL("destroy", sampleIds));
-    xhr.send();
+    sampleIds.forEach(function(id) {
+      $(".batches-samples > .samples-row:has(.samples-item > input[id=sample_ids_" + id + "])")
+        .addClass("mark-destroy")
 
-    xhr.onload = function(e) {
-      if (this.status == 200) {
-        updateSamplesList(sampleIds);
-      }
-    };
+      $("#sample_ids_" + id)
+        .attr("checked", false);
+
+      $("#destroy_sample_ids_" + id)
+        .attr("checked", true);
+    })
+  }
+
+  function bulkUndoDestroy() {
+    $(".mark-destroy")
+      .removeClass("mark-destroy");
+
+    $(".samples-item > input[type=checkbox]:checked")
+      .attr("checked", false);
   }
 
   function createBulkActionURL(action, sampleIds) {
@@ -50,18 +84,4 @@
     });
 
     return url;
-  }
-
-  function updateSamplesList(removeIds) {
-    // update the list itself
-    removeIds.forEach(function(id) {
-      var elemId = `sample_ids_${id}`;
-      $(".batches-samples:has(.samples-row > .samples-item > input[id=" + elemId + "])").remove();
-    });
-
-    // update the samples count
-    $("#count").html(function() {
-      var count = "#{ @batch_form.laboratory_samples.count }"
-      return `${count - removeIds.length} Samples`;
-    });
   }

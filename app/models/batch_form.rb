@@ -71,9 +71,13 @@ class BatchForm
     end
   end
 
-  def update(attributes)
+  def update(attributes, remove_sample_ids)
     attributes.each do |attr, value|
       self.send("#{attr}=", value)
+    end
+
+    @batch.laboratory_samples.each do |sample|
+      sample.mark_for_destruction if remove_sample_ids.include? sample.id
     end
 
     save
@@ -149,6 +153,7 @@ class BatchForm
   end
   # end date_produced
   #
+
   def laboratory_samples
     @batch.laboratory_samples
   end
