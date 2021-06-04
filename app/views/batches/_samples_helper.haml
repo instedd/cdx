@@ -1,0 +1,67 @@
+:javascript
+  (function() {
+    $("#bulk-action-print").click(function(event) {
+      event.preventDefault();
+      bulkPrint(selectedSampleIds());
+    });
+
+    $("#bulk-action-destroy").click(function(event) {
+      event.preventDefault();
+
+      $.rails.showConfirmationDialog(
+        $('<button/>')
+          .data("method", "delete")
+          .data("confirm", "You're about to permanently delete the selected samples. This action CANNOT be undone. Are you sure you want to proceed?")
+          .click(function() { bulkDestroy(selectedSampleIds()); })
+      );
+    });
+  })();
+
+  function selectedSampleIds() {
+    return $(".samples-item > input[type=checkbox]:checked")
+      .map(function(index, elem) {
+        return elem.value;
+      })
+      .toArray();
+  }
+
+  function bulkPrint(sampleIds) {
+    var url = createBulkActionURL("print", sampleIds);
+    window.open(url, '_blank');
+  }
+
+  function bulkDestroy(sampleIds) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', createBulkActionURL("destroy", sampleIds));
+    xhr.send();
+
+    xhr.onload = function(e) {
+      if (this.status == 200) {
+        updateSamplesList(sampleIds);
+      }
+    };
+  }
+
+  function createBulkActionURL(action, sampleIds) {
+    var url = new URL("#{ javascript_url Rails.application.routes.url_helpers.bulk_action_laboratory_samples_path }");
+    url.searchParams.append("bulk_action", action);
+    sampleIds.forEach(function(sampleId) {
+      url.searchParams.append("sample_ids[]", sampleId);
+    });
+
+    return url;
+  }
+
+  function updateSamplesList(removeIds) {
+    // update the list itself
+    removeIds.forEach(function(id) {
+      var elemId = `sample_ids_${id}`;
+      $(".batches-samples:has(.samples-row > .samples-item > input[id=" + elemId + "])").remove();
+    });
+
+    // update the samples count
+    $("#count").html(function() {
+      var count = "#{ @batch_form.laboratory_samples.count }"
+      return `${count - removeIds.length} Samples`;
+    });
+  }
