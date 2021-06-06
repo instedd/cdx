@@ -3,7 +3,7 @@
   %label.row{for: "all_samples_ids"}
   = @batch_form.laboratory_samples.count.to_s + ' ' + "Samples"
 - @batch_form.laboratory_samples.each do |sample|
-  .batches-samples.col.pe-7
+  .col.pe-7.batches-samples
     .samples-row
       .samples-item
         = check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
@@ -13,6 +13,7 @@
         .icon-keyboard-arrow-right.icon-gray
 
 = link_to add_laboratory_sample_batch_path, method: :post, class: 'add-samples' do
-  .add-samples.col.pe-2
+  .col.pe-7.add-samples
     .icon-circle-plus.icon-blue.icon-margin
-    = "ADD SAMPLE"
+    .add-sample-link
+      = "ADD SAMPLE"

@@ -29,7 +29,9 @@ class BatchesController < ApplicationController
     batch = Batch.find(params[:id])
     @batch_form = BatchForm.edit(batch)
     @can_edit_sample_quantity = false
-    @samples = @batch_form.laboratory_samples
+
+    # TODO: Implement user authorized to delete
+    @can_delete = true
   end
 
   def update
@@ -41,6 +43,16 @@ class BatchesController < ApplicationController
     else
       render action: 'edit'
     end
+  end
+
+  def destroy
+    @batch = Batch.find(params[:id])
+    # TODO:
+    # return unless authorize_resource(@patient, DELETE_PATIENT)
+
+    @batch.destroy
+
+    redirect_to batches_path, notice: 'Batch was successfully deleted.'
   end
 
   def add_laboratory_sample
