@@ -2,22 +2,22 @@
   background-color: #FFFFFF;
   box-shadow: 0 1px 3px 0px rgba(0,0,0,0.5);
   margin-bottom: 1px;
-  padding: 3px;
+  padding: 5px;
 }
 
 .samples-count {
   display: flex;
   align-items: center;
   font-weight: bolder;
-  padding-left: 17px;
+  padding-left: 15px;
 }
 
 .samples-row {
-  padding: 3px 14px;
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0px 10px;
+  width: 100%;
 }
 
 .samples-item {
@@ -28,4 +28,14 @@
 .sample-checkbox {
   width: 3px;
   height: 3px;
+}
+
+.add-samples {
+  display: flex;
+  align-items: center;
+  margin: 5px 2px;
+
+  .add-sample-link {
+    margin: 0px 7px;
+  }
 }

@@ -29,7 +29,6 @@ class BatchesController < ApplicationController
     batch = Batch.find(params[:id])
     @batch_form = BatchForm.edit(batch)
     @can_edit_sample_quantity = false
-    @samples = @batch_form.laboratory_samples
 
     # TODO: Implement user authorized to delete
     @can_delete = true
@@ -54,6 +53,14 @@ class BatchesController < ApplicationController
     @batch.destroy
 
     redirect_to batches_path, notice: 'Batch was successfully deleted.'
+  end
+
+  def add_laboratory_sample
+    batch = Batch.find(params[:id])
+    @batch_form = BatchForm.edit(batch)
+    @batch_form.add_laboratory_sample
+
+    redirect_to edit_batch_path(@batch_form), notice: 'New sample was added successfully.'
   end
 
   def bulk_destroy
