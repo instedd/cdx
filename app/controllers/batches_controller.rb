@@ -59,7 +59,8 @@ class BatchesController < ApplicationController
     batch = Batch.find(params[:id])
     @batch_form = BatchForm.edit(batch)
     @batch_form.add_laboratory_sample
-    render action: 'edit'
+
+    redirect_to edit_batch_path(@batch_form), notice: 'New sample was added successfully.'
   end
 
   def bulk_destroy
