@@ -1,0 +1,87 @@
+:javascript
+  (function() {
+    $("#bulk_action_print").click(function(event) {
+      event.preventDefault();
+
+      var ids = selectedSampleIds();
+      if (ids.length <= 0) return;
+
+      bulkPrint(selectedSampleIds());
+    });
+
+    $("#bulk_action_destroy").click(function(event) {
+      event.preventDefault();
+
+      var ids = selectedSampleIds();
+      if (ids.length <= 0) return;
+
+      bulkDestroy(ids);
+      enableUndoDestroyAction();
+    });
+
+    $("#bulk_action_destroy_undo").click(function(event) {
+      event.preventDefault();
+      bulkUndoDestroy();
+      enableDestroyAction();
+    })
+  })();
+
+  function enableDestroyAction() {
+    $("#bulk_action_destroy")
+      .removeClass("hidden");
+
+    $("#bulk_action_destroy_undo")
+      .addClass("hidden");
+  }
+
+  function enableUndoDestroyAction() {
+    $("#bulk_action_destroy")
+      .addClass("hidden");
+
+    $("#bulk_action_destroy_undo")
+      .removeClass("hidden");
+  }
+
+  function selectedSampleIds() {
+    return $(".samples-item > input[type=checkbox]:checked")
+      .map(function(index, elem) {
+        return elem.value;
+      })
+      .toArray();
+  }
+
+  function bulkPrint(sampleIds) {
+    var url = createBulkActionURL("print", sampleIds);
+    window.open(url, "_blank");
+  }
+
+  function bulkDestroy(sampleIds) {
+    sampleIds.forEach(function(id) {
+      $(".batches-samples > .samples-row:has(.samples-item > input[id=sample_ids_" + id + "])")
+        .addClass("mark-destroy")
+
+      $("#sample_ids_" + id)
+        .attr("checked", false);
+
+      $("#destroy_sample_ids_" + id)
+        .attr("checked", true);
+    })
+  }
+
+  function bulkUndoDestroy() {
+    $(".mark-destroy")
+      .removeClass("mark-destroy");
+
+    $(".samples-item > input[type=checkbox]:checked")
+      .attr("checked", false);
+  }
+
+  function createBulkActionURL(action, sampleIds) {
+    var url = new URL("#{ javascript_url Rails.application.routes.url_helpers.bulk_action_laboratory_samples_path }");
+    url.searchParams.append("bulk_action", action);
+    sampleIds.forEach(function(sampleId) {
+      url.searchParams.append("sample_ids[]", sampleId);
+    });
+
+    return url;
+  }

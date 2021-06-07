@@ -33,17 +33,18 @@
         .col
           = f.text_field :lab_technician, :class => 'input-x-large'
 
-      .row
-        .col.pe-3
-          = f.label :samples
-        .col.pe-7
-          = render 'samples'
       - if @can_edit_sample_quantity
         .row
           .col.pe-3
             = f.label :samples_quantity
           .col
             = f.number_field :samples_quantity, min: 0, :class => "input-small"
+      - else
+        .row
+          .col.pe-3
+            = f.label :samples
+          .col.pe-7
+            = render 'samples'
 
   .row.button-actions
     .col

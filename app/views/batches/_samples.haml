@@ -1,13 +1,24 @@
 .samples-count
-  = check_box_tag 'all_sample_ids'
-  %label.row{for: "all_samples_ids"}
-  = @batch_form.laboratory_samples.count.to_s + ' ' + "Samples"
+  .title
+    = check_box_tag 'all_sample_ids'
+    %label.row{for: "all_samples_ids"}
+    #count
+      = @batch_form.laboratory_samples.count.to_s + ' ' + "Samples"
+  .actions
+    = button_tag id: 'bulk_action_print', class: 'btn-link', name: 'bulk_action', value: 'print' do
+      .icon-print.btn-icon
+    = button_tag id: 'bulk_action_destroy', class: 'btn-link' do
+      .icon-trash.btn-icon
+    = button_tag id: 'bulk_action_destroy_undo', class: 'btn-link hidden' do
+      Undo
+
 - @batch_form.laboratory_samples.each do |sample|
   .col.pe-7.batches-samples
     .samples-row
       .samples-item
-        = check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
-        %label.row{for: "sample_ids.#{sample.id}"}
+        = check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids_#{sample.id}" }
+        %label.row{for: "sample_ids_#{sample.id}"}
+        = check_box_tag 'destroy_sample_ids[]', sample.id, false, { id: "destroy_sample_ids_#{sample.id}" }
         = sample.uuid
       = link_to edit_laboratory_sample_path(sample.id) do
         .icon-keyboard-arrow-right.icon-gray
@@ -17,3 +28,5 @@
     .icon-circle-plus.icon-blue.icon-margin
     .add-sample-link
       = "ADD SAMPLE"
+
+= render 'samples_helper'

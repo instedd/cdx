@@ -38,7 +38,7 @@ class BatchesController < ApplicationController
     batch = Batch.find(params[:id])
     @batch_form = BatchForm.edit(batch)
 
-    if @batch_form.update(batch_params)
+    if @batch_form.update(batch_params, remove_samples_params)
       redirect_to batches_path, notice: 'Batch was successfully updated.'
     else
       render action: 'edit'
@@ -73,5 +73,9 @@ class BatchesController < ApplicationController
 
   def batch_params
     params.require(:batch).permit(:isolate_name, :date_produced, :inactivation_method, :volume, :lab_technician, :samples_quantity)
+  end
+
+  def remove_samples_params
+    (params[:destroy_sample_ids] || []).map(&:to_i)
   end
 end
