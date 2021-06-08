@@ -20,8 +20,11 @@
         %label.row{for: "sample_ids_#{sample.id}"}
         = check_box_tag 'destroy_sample_ids[]', sample.id, false, { id: "destroy_sample_ids_#{sample.id}" }
         = sample.uuid
-      = link_to edit_laboratory_sample_path(sample.id) do
-        .icon-keyboard-arrow-right.icon-gray
+      .sample-row-actions
+        - if sample.is_quality_control
+          .icon-alert.icon-gray
+        = link_to edit_laboratory_sample_path(sample.id) do
+          .icon-keyboard-arrow-right.icon-gray
 
 = link_to add_laboratory_sample_batch_path, method: :post, class: 'add-samples' do
   .col.pe-7.add-samples

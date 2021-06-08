@@ -98,8 +98,8 @@ class LaboratorySamplesController < ApplicationController
     # TODO:
     # return unless authorize_resource(patient, UPDATE_PATIENT)
 
-    if @sample.update(update_sample_params)
-      redirect_to laboratory_samples_path, notice: 'Sample was successfully updated.'
+    if @sample.update(sample_params)
+      redirect_to edit_batch_path(@sample.batch), notice: 'Sample was successfully updated.'
     else
       render action: 'edit'
     end
@@ -124,10 +124,6 @@ class LaboratorySamplesController < ApplicationController
   private
 
   def sample_params
-    params.require(:laboratory_sample).permit(:sample_type)
-  end
-
-  def update_sample_params
-    params.require(:laboratory_sample).permit(:sample_type)
+    params.require(:laboratory_sample).permit(:is_quality_control)
   end
 end

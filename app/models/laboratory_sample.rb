@@ -12,9 +12,7 @@ class LaboratorySample < ActiveRecord::Base
     "laboratory_sample"
   end
 
-  attribute_field :sample_type, copy: true
+  attribute_field :is_quality_control
 
-  SAMPLE_TYPE_VALUES = LaboratorySample.entity_fields.detect { |f| f.name == 'sample_type' }.options
-  validates_presence_of :sample_type
-  validates_inclusion_of :sample_type, in: SAMPLE_TYPE_VALUES, message: "is not within valid options (should be one of #{SAMPLE_TYPE_VALUES.join(', ')})"
+  validates_presence_of :is_quality_control
 end
