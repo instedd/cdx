@@ -1,7 +1,7 @@
 .samples-count
   .title
-    = check_box_tag 'all_sample_ids'
-    %label.row{for: "all_samples_ids"}
+    = check_box_tag 'select_all_samples'
+    %label.row{for: "select_all_samples"}
     #count
       = @batch_form.laboratory_samples.count.to_s + ' ' + "Samples"
   .actions
@@ -16,9 +16,9 @@
   .col.pe-7.batches-samples
     .samples-row
       .samples-item
-        = check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids_#{sample.id}" }
+        = check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids_#{sample.id}", class: "select-checkbox" }
         %label.row{for: "sample_ids_#{sample.id}"}
-        = check_box_tag 'destroy_sample_ids[]', sample.id, false, { id: "destroy_sample_ids_#{sample.id}" }
+        = check_box_tag 'destroy_sample_ids[]', sample.id, false, { id: "destroy_sample_ids_#{sample.id}", class: "destroy-checkbox" }
         = sample.uuid
       = link_to edit_laboratory_sample_path(sample.id) do
         .icon-keyboard-arrow-right.icon-gray

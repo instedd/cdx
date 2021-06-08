@@ -23,7 +23,22 @@
       event.preventDefault();
       bulkUndoDestroy();
       enableDestroyAction();
-    })
+    });
+
+    // Logic for Select All/None checkbox
+    var allSamplesCheckbox = $("#select_all_samples");
+
+    allSamplesCheckbox.click(function(event) {
+      toggleSelectAllSamples(this.checked);
+    });
+
+    // when all checkboxes unselected then uncheck Select All/None checkboxes
+    $(".samples-item > input[type=checkbox].select-checkbox").change(function() {
+      var selectedCount = findSelectCheckboxes().filter(":checked").length
+      if (selectedCount == 0) {
+        allSamplesCheckbox.prop("checked", false);
+      }
+    });
   })();
 
   function enableDestroyAction() {
@@ -43,7 +58,7 @@
   }
 
   function selectedSampleIds() {
-    return $(".samples-item > input[type=checkbox]:checked")
+    return findSelectCheckboxes().filter(":checked")
       .map(function(index, elem) {
         return elem.value;
       })
@@ -57,14 +72,15 @@
 
   function bulkDestroy(sampleIds) {
     sampleIds.forEach(function(id) {
-      $(".batches-samples > .samples-row:has(.samples-item > input[id=sample_ids_" + id + "])")
-        .addClass("mark-destroy")
 
-      $("#sample_ids_" + id)
-        .attr("checked", false);
+      findSampleRow(id)
+        .addClass("mark-destroy");
 
-      $("#destroy_sample_ids_" + id)
-        .attr("checked", true);
+      findSampleSelectCheckbox(id)
+        .prop("checked", true);
+
+      findSampleDestroyCheckbox(id)
+        .prop("checked", true);
     })
   }
 
@@ -72,8 +88,14 @@
     $(".mark-destroy")
       .removeClass("mark-destroy");
 
-    $(".samples-item > input[type=checkbox]:checked")
-      .attr("checked", false);
+    findAllCheckboxes()
+      .prop("checked", false)
+      .change();
+  }
+
+  function toggleSelectAllSamples(selected) {
+    findSelectCheckboxesNotMarkedForDestroyed()
+      .prop("checked", selected);
   }
 
   function createBulkActionURL(action, sampleIds) {
@@ -84,4 +106,42 @@
     });
 
     return url;
+  }
+
+  // DOM Queries
+  function findSelectCheckboxes() {
+    return $(domQueries.selectCheckboxes);
+  }
+
+  function findDestroyCheckboxes() {
+    return $(domQueries.destroyCheckboxes);
+  }
+
+  function findSelectCheckboxesNotMarkedForDestroyed() {
+    return $(".samples-row").not(".mark-destroy").find(domQueries.selectCheckboxes);
+  }
+
+  function findAllCheckboxes() {
+    return $(domQueries.allCheckboxes);
+  }
+
+  function findSampleRow(sampleId) {
+    return $(domQueries.sampleRow(sampleId));
+  }
+
+  function findSampleSelectCheckbox(sampleId) {
+    return $(domQueries.sampleSelectCheckbox(sampleId));
+  }
+
+  function findSampleDestroyCheckbox(sampleId) {
+    return $(domQueries.sampleDestroyCheckbox(sampleId));
+  }
+
+  var domQueries = {
+    allCheckboxes: ".samples-item > input[type=checkbox]",
+    selectCheckboxes: ".samples-item > input[type=checkbox].select-checkbox",
+    destroyCheckboxes: ".samples-item > input[type=checkbox].destroy-checkbox",
+    sampleRow: function(sampleId) { return ".samples-row:has(.samples-item > input[id=sample_ids_" + sampleId + "])" },
+    sampleSelectCheckbox: function(sampleId) { return "#sample_ids_" + sampleId },
+    sampleDestroyCheckbox: function(sampleId) { return "#destroy_sample_ids_" + sampleId }
   }
