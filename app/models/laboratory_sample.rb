@@ -13,6 +13,4 @@ class LaboratorySample < ActiveRecord::Base
   end
 
   attribute_field :is_quality_control
-
-  validates_presence_of :is_quality_control
 end
