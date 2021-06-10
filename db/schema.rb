@@ -308,16 +308,15 @@ ActiveRecord::Schema.define(version: 20210603195140) do
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
 
   create_table "laboratory_samples", force: :cascade do |t|
-    t.string   "uuid",               limit: 255
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.integer  "institution_id",     limit: 4
-    t.integer  "batch_id",           limit: 4
-    t.text     "core_fields",        limit: 65535
-    t.text     "custom_fields",      limit: 65535
-    t.binary   "sensitive_data",     limit: 65535
+    t.string   "uuid",           limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "institution_id", limit: 4
+    t.integer  "batch_id",       limit: 4
+    t.text     "core_fields",    limit: 65535
+    t.text     "custom_fields",  limit: 65535
+    t.binary   "sensitive_data", limit: 65535
     t.datetime "deleted_at"
-    t.boolean  "is_quality_control",               default: false
   end
 
   add_index "laboratory_samples", ["batch_id"], name: "index_laboratory_samples_on_batch_id", using: :btree
