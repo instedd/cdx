@@ -61,7 +61,7 @@ class BatchForm
   def create_laboratory_sample
     LaboratorySample.new({
       institution: self.institution,
-      sample_type: 'specimen' # TODO: remove sample_type when adding QC-check
+      is_quality_control: false
     })
   end
 

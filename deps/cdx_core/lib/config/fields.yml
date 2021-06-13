@@ -14,12 +14,8 @@ entities:
   laboratory_sample: &LABORATORY_SAMPLE
     allows_custom: true
     fields:
-      sample_type:
-        type: enum
-        searchable: true
-        options:
-          - qc
-          - specimen
+      is_quality_control:
+        type: boolean
   batch: &BATCH
     fields:
       isolate_name:

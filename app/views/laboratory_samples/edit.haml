@@ -4,7 +4,7 @@
       .row
         .col
           %h2
-            = link_to laboratory_samples_path, class: 'side-link', title: 'Back' do
+            = link_to edit_batch_path(@sample.batch), class: 'side-link', title: 'Back' do
               = image_tag "arrow-left.png"
             = @sample.uuid
 

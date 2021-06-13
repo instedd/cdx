@@ -5,16 +5,16 @@
   .row
     .col
       .row
-        .col.pe-2
+        .col.pe-4
           = f.label :uuid
         .col
           .value= f.object.uuid
       .row
-        .col.pe-2
-          = f.label :type
+        .col.pe-4
+          = f.label :is_quality_control, "quality control"
         .col
-          = cdx_select form: f, name: :sample_type, searchable: false do |select|
-            - select.items LaboratorySample.entity_fields.detect { |f| f.name == 'sample_type' }.options
+          = f.check_box :is_quality_control
+          = f.label :is_quality_control, "&nbsp;".html_safe
 
     - if @show_barcode_preview
       .col
@@ -23,7 +23,7 @@
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
-      = link_to 'Cancel', laboratory_samples_path, class: 'btn-link'
+      = link_to 'Cancel', edit_batch_path(@sample.batch), class: 'btn-link'
 
       - if @can_delete
         = confirm_deletion_button @sample, 'sample'
