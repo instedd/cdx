@@ -88,6 +88,7 @@ class LaboratorySamplesController < ApplicationController
 
     @show_barcode_preview = true
     @show_print_action = true
+    @test_qc_result = TestQcResult.find_by(laboratory_sample: @sample.id)
 
     # TODO: Implement user authorized to delete
     @can_delete = true
@@ -97,10 +98,12 @@ class LaboratorySamplesController < ApplicationController
     @sample = LaboratorySample.find(params[:id])
     # TODO:
     # return unless authorize_resource(patient, UPDATE_PATIENT)
-    params = sample_params
-    params[:is_quality_control] = params[:is_quality_control] == '1'
-
-    if @sample.update(params)
+    if @sample.update(sample_params)
+      if @sample.is_quality_control
+        @test_qc_result = TestQcResult.find_or_create_by(laboratory_sample: @sample)
+        @test_qc_result.picture = test_qc_result_params[:picture]
+        @test_qc_result.save
+      end
       redirect_to edit_batch_path(@sample.batch), notice: 'Sample was successfully updated.'
     else
       render action: 'edit'
@@ -126,6 +129,12 @@ class LaboratorySamplesController < ApplicationController
   private
 
   def sample_params
-    params.require(:laboratory_sample).permit(:is_quality_control)
+    lab_sample_params = params.require(:laboratory_sample).permit(:is_quality_control)
+    lab_sample_params[:is_quality_control] = lab_sample_params[:is_quality_control] == '1'
+    lab_sample_params
+  end
+
+  def test_qc_result_params
+    params.require(:laboratory_sample).permit(:picture)
   end
 end

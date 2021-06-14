@@ -15,6 +15,22 @@
         .col
           = f.check_box :is_quality_control
           = f.label :is_quality_control, "&nbsp;".html_safe
+      - unless @test_qc_result.nil?
+        .col.pe-4
+          = "Assays"
+        .col
+          .choose-picture
+            - unless @sample.new_record? || @test_qc_result.picture.blank?
+              .file-uploaded
+                = image_tag @test_qc_result.picture.url(:card)
+            .upload-new-file.picture
+              .upload-picture-title
+                %span.icon-outline-picture.xx-large
+                %h2
+                  Drop a picture here
+                  %br or click to upload a file
+              %img{:src => ""}
+              = f.file_field :picture, :class => "upload-picture"
 
     - if @show_barcode_preview
       .col
@@ -27,3 +43,38 @@
 
       - if @can_delete
         = confirm_deletion_button @sample, 'sample'
+
+:javascript
+  custom_input_file( jQuery, window, document );
+  $(function() {
+    // Drag Picture to an input file and preview it
+    $('#laboratory_sample_picture').on('change', function(e) {
+        var reader = new FileReader();
+        reader.onload = function (event) {
+
+            $('.upload-new-file img').attr('src',event.target.result).addClass('uploaded');
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    });
+
+
+    // Change the class on the target zone when dragging a file over it
+    $(".clear-label").on('click', function () {
+      $(this).closest('.file-uploaded').addClass('remove');
+    });
+
+  });
+
+  document.addEventListener("dragenter", function( event ) {
+    if ( event.target.className == "upload-picture" ) {
+      $('.choose-picture').addClass('on');
+    }
+
+  }, false);
+
+  document.addEventListener("dragleave", function( event ) {
+    if ( event.target.className == "upload-picture" ) {
+      $('.choose-picture').removeClass('on');
+    }
+  }, false);
+
