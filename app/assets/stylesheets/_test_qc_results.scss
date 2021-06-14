@@ -1,0 +1,38 @@
+.choose-picture.assay {
+  // text-align: center;
+  // padding: 100px;
+  // border: 2px dashed $gray1;
+  // width: 540px;
+  min-height: 140px;
+  height: auto;
+  width: 100%;
+  // position: relative;
+
+  // h2 {
+  //   margin: 0 0 8px 0;
+  //   color: $gray2;
+  // }
+
+  // .ic140-picture {
+  //   opacity: 0.4;
+  // }
+
+  // .clear-label {
+  //   display: block;
+  // }
+  // &.on {
+  //   border-color: $blue;
+  // }
+}
+
+.assay {
+  .upload-new-file.picture {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .upload-picture-title {
+      margin-top: 0px;
+    }
+  }
+}

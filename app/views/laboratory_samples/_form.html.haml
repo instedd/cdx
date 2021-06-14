@@ -5,36 +5,38 @@
   .row
     .col
       .row
-        .col.pe-4
-          = f.label :uuid
-        .col
-          .value= f.object.uuid
-      .row
-        .col.pe-4
-          = f.label :is_quality_control, "quality control"
-        .col
-          = f.check_box :is_quality_control
-          = f.label :is_quality_control, "&nbsp;".html_safe
-      - unless @test_qc_result.nil?
-        .col.pe-4
-          = "Assays"
-        .col
-          .choose-picture
-            - unless @sample.new_record? || @test_qc_result.picture.blank?
-              .file-uploaded
-                = image_tag @test_qc_result.picture.url(:card)
-            .upload-new-file.picture
-              .upload-picture-title
-                %span.icon-outline-picture.xx-large
-                %h2
-                  Drop a picture here
-                  %br or click to upload a file
-              %img{:src => ""}
-              = f.file_field :picture, :class => "upload-picture"
+        .col.pe-6
+          .row
+            .col.pe-4
+              = f.label :uuid
+            .col
+              .value= f.object.uuid
+          .row
+            .col.pe-4
+              = f.label :is_quality_control, "quality control"
+            .col
+              = f.check_box :is_quality_control
+              = f.label :is_quality_control, "&nbsp;".html_safe
+        .col.pe-6
+          - if @show_barcode_preview
+            = render "barcode_card"
 
-    - if @show_barcode_preview
-      .col
-        = render "barcode_card"
+      - unless @test_qc_result.nil?
+        .row
+          .col.pe-2
+            = f.label "Assays"
+          .col
+            .choose-picture.assay
+              - unless @sample.new_record? || @test_qc_result.picture.blank?
+                .file-uploaded
+                  = image_tag @test_qc_result.picture.url(:card)
+              .upload-new-file.picture
+                .upload-picture-title
+                  %h2
+                    Drop a picture here
+                    %br or click to upload a file
+                %img{:src => ""}
+                = f.file_field :picture, :class => "upload-picture"
 
   .row.button-actions
     .col
