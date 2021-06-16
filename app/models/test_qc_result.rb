@@ -3,12 +3,15 @@ class TestQcResult < ActiveRecord::Base
   # include Entity
 
   belongs_to :laboratory_sample
+  has_many :assays, class_name: "TestQcResultAssay", dependent: :destroy
 
-  has_attached_file :picture, styles: { card: "130x130>" }, default_url: "card-unkown.png"
-  validates_attachment_content_type :picture, content_type: /\Aimage\/.*\Z/
+  def assays=(pictures = [])
+    pictures.each do |picture|
+      assays.create picture: picture
+    end
+  end
 
   # def self.entity_scope
   #   "test_result_qc"
   # end
-
 end

@@ -8,6 +8,8 @@ class LaboratorySample < ActiveRecord::Base
   belongs_to :batch
   validates_presence_of :batch
 
+  has_one :qc_result, class_name: "TestQcResult"
+
   def self.entity_scope
     "laboratory_sample"
   end
