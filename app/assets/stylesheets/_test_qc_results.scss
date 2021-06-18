@@ -17,15 +17,14 @@
 
     .upload-picture-title {
       align-self: center;
-      justify-content: center;
+      justify-self: center;
       margin-top: 0px;
     }
 
     .picture-container {
       position: relative;
       width: 130px;
-      min-height: 130px;
-      max-height: 130px;
+      height: 130px;
       top: inherit;
       left: inherit;
       margin: 7px;
