@@ -24,6 +24,7 @@
             %tr
               %th
               %th Isolate name
+              %th Batch ID
               %th Volume
               %th Lab Technician
               %th Inactivation Method
@@ -35,6 +36,7 @@
                   =check_box_tag 'batch_ids[]', batch.id, false, { id: "batch_ids.#{batch.id}" }
                   %label.row{for: "batch_ids.#{batch.id}"}
                 %td= batch.isolate_name
+                %td= batch.batch_number
                 %td= "#{batch.volume} μl"
                 %td= batch.lab_technician
                 %td= batch.inactivation_method

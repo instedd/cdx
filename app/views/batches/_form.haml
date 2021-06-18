@@ -6,6 +6,11 @@
     .col
       .row
         .col.pe-3
+          = f.label :batch_number
+        .col
+          = f.text_field :batch_number
+      .row
+        .col.pe-3
           = f.label :isolate_name
         .col
           = f.text_field :isolate_name, :class => 'input-x-large'
