@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210616220513) do
+ActiveRecord::Schema.define(version: 20210617115609) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -118,6 +118,8 @@ ActiveRecord::Schema.define(version: 20210616220513) do
     t.integer  "institution_id", limit: 4
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.string   "isolate_name",   limit: 255
+    t.string   "batch_number",   limit: 255
   end
 
   add_index "batches", ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree

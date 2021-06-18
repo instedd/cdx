@@ -8,6 +8,7 @@ class BatchForm
       :date_produced,
       :inactivation_method,
       :volume,
+      :batch_number,
       :lab_technician ]
   end
 

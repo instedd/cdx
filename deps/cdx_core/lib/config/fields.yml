@@ -18,6 +18,8 @@ entities:
         type: boolean
   batch: &BATCH
     fields:
+      batch_number:
+        searchable: true
       isolate_name:
         searchable: true
       date_produced:
