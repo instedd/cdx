@@ -1,0 +1,66 @@
+.choose-picture.assay {
+  min-height: 140px;
+  height: auto;
+  width: 100%;
+  padding: 0px;
+}
+
+.assay {
+  .upload-new-file.picture {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: auto;
+    padding: 7px;
+    min-height: 145px;
+    max-height: 300px;
+
+    .upload-picture-title {
+      align-self: center;
+      justify-self: center;
+      margin-top: 0px;
+    }
+
+    .picture-container {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      top: inherit;
+      left: inherit;
+      margin: 7px;
+      overflow: hidden;
+
+      background-color: #FFFFFF;
+      box-sizing: border-box;
+      box-shadow: 0 1px 3px 0px rgba(0,0,0,0.5);
+      border: 1px solid #000000;
+      border-radius: 5px;
+
+      > img {
+        position: relative;
+        width: 130px;
+        min-height: 130px;
+        max-height: 130px;
+      }
+
+      .picture-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+        background: #FFF;
+        height: 25px;
+      }
+    }
+
+    .upload-picture {
+      z-index: 0;
+    }
+
+    .clear-label {
+      z-index: 1;
+    }
+  }
+}
