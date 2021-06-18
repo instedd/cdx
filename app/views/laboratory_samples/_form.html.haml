@@ -31,13 +31,18 @@
             -#   %h2
             -#     Drop a picture here
             -#     %br or click to upload a file
-            - @sample.test_qc_result.test_qc_result_assays.each do |assay|
+            = qc.fields_for :test_qc_result_assays do |ay|
               .file-uploaded.picture-container
-                = image_tag assay.picture.url(:card)
+                = image_tag ay.object.picture.url(:card)
                 .picture-title
-                  = assay.picture_file_name
+                  = ay.object.picture_file_name
+                .clear-label
+                  = ay.check_box '_destroy', { id: "destroy_assay_#{ay.object.id}" }
+                  %label.cross{:for => "destroy_assay_#{ay.object.id}" }
+                    = image_tag "ic-cross.png"
 
             = qc.file_field :files, :class => "upload-picture",  accept: 'image/png,image/jpeg,image/gif', multiple: true
+
 
   .row.button-actions
     .col
@@ -84,10 +89,10 @@
 
 
     // Change the class on the target zone when dragging a file over it
-    $(".clear-label").on('click', function () {
+    $(".clear-label").on('click', function (e) {
       $(this).closest('.file-uploaded').addClass('remove');
+      e.stopPropagation();
     });
-
   });
 
   document.addEventListener("dragenter", function( event ) {

@@ -54,23 +54,14 @@
         background: #FFF;
         height: 25px;
       }
-
     }
 
-    // > div img {
-    //   position: relative;
-    //   width: 130px;
-    //   min-height: 130px;
-    //   max-height: 130px;
-    //   top: inherit;
-    //   left: inherit;
-    //   margin-left: 7px;
+    .upload-picture {
+      z-index: 0;
+    }
 
-    //   background-color: #FFFFFF;
-    //   box-sizing: border-box;
-    //   box-shadow: 0 1px 3px 0px rgba(0,0,0,0.5);
-    //   border: 1px solid #000000;
-    //   border-radius: 5px;
-    // }
+    .clear-label {
+      z-index: 1;
+    }
   }
 }

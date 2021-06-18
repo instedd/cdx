@@ -124,7 +124,7 @@ class LaboratorySamplesController < ApplicationController
   private
 
   def sample_params
-    lab_sample_params = params.require(:laboratory_sample).permit(:is_quality_control, test_qc_result_attributes: [ :id, files: [] ])
+    lab_sample_params = params.require(:laboratory_sample).permit(:is_quality_control, test_qc_result_attributes: [ :id, files: [], test_qc_result_assays_attributes: [ :id, :_destroy ] ])
     lab_sample_params[:is_quality_control] = lab_sample_params[:is_quality_control] == '1'
     lab_sample_params
   end
