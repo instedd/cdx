@@ -85,6 +85,7 @@ class LaboratorySamplesController < ApplicationController
 
   def edit
     @sample = LaboratorySample.find(params[:id])
+    @sample.test_qc_result = TestQcResult.new if @sample.test_qc_result.nil?
 
     @show_barcode_preview = true
     @show_print_action = true
@@ -94,18 +95,10 @@ class LaboratorySamplesController < ApplicationController
   end
 
   def update
-    puts "params!!!!"
-    puts params
-
     @sample = LaboratorySample.find(params[:id])
     # TODO:
     # return unless authorize_resource(patient, UPDATE_PATIENT)
     if @sample.update(sample_params)
-      if @sample.is_quality_control
-        @test_qc_result = TestQcResult.find_or_create_by(laboratory_sample: @sample)
-        @test_qc_result.update(test_qc_result_params)
-      end
-
       redirect_to edit_batch_path(@sample.batch), notice: 'Sample was successfully updated.'
     else
       render action: 'edit'
@@ -131,12 +124,8 @@ class LaboratorySamplesController < ApplicationController
   private
 
   def sample_params
-    lab_sample_params = params.require(:laboratory_sample).permit(:is_quality_control)
+    lab_sample_params = params.require(:laboratory_sample).permit(:is_quality_control, test_qc_result_attributes: [ :id, files: [] ])
     lab_sample_params[:is_quality_control] = lab_sample_params[:is_quality_control] == '1'
     lab_sample_params
-  end
-
-  def test_qc_result_params
-    params.require(:laboratory_sample).permit(assays: [])
   end
 end

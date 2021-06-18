@@ -3,11 +3,13 @@ class TestQcResult < ActiveRecord::Base
   # include Entity
 
   belongs_to :laboratory_sample
-  has_many :assays, class_name: "TestQcResultAssay", dependent: :destroy
 
-  def assays=(pictures = [])
+  has_many :test_qc_result_assays, dependent: :destroy
+  accepts_nested_attributes_for :test_qc_result_assays, allow_destroy: true
+
+  def files=(pictures = [])
     pictures.each do |picture|
-      assays.create picture: picture
+      test_qc_result_assays.build(picture: picture)
     end
   end
 

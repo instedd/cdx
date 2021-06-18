@@ -19,33 +19,25 @@
       .col
         = render "barcode_card"
 
-  - if @sample.is_quality_control
-    -# = fields_for :test_qc_result, @sample.test_qc_result do |qc|
+  -# - if @sample.is_quality_control
+  = f.fields_for :test_qc_result, @sample.test_qc_result do |qc|
     .row
       .col.pe-2
-        = f.label :assays
+        = qc.label :test_qc_result_assays, "Assays"
       .col
         .choose-picture.assay
-          -# - @sample.qc_result.assays.each do |assay|
-          -#   .file-uploaded
-          -#     = image_tag assay.picture.url(:card)
-
-          -# - unless @sample.new_record? || @test_qc_result.picture.blank?
-          -#   .file-uploaded
-          -#     = image_tag @test_qc_result.picture.url(:card)
           .upload-new-file.picture
             -# .upload-picture-title
             -#   %h2
             -#     Drop a picture here
             -#     %br or click to upload a file
-            -# %img{:src => ""}
-            - @sample.qc_result.assays.each do |assay|
+            - @sample.test_qc_result.test_qc_result_assays.each do |assay|
               .file-uploaded.picture-container
                 = image_tag assay.picture.url(:card)
                 .picture-title
                   = assay.picture_file_name
 
-            = f.file_field :assays, :class => "upload-picture", multiple: true
+            = qc.file_field :files, :class => "upload-picture",  accept: 'image/png,image/jpeg,image/gif', multiple: true
 
   .row.button-actions
     .col
@@ -78,7 +70,7 @@
     }
 
     // Drag Picture to an input file and preview it
-    $('#laboratory_sample_assays').on('change', function(e) {
+    $('#laboratory_sample_test_qc_result_attributes_files').on('change', function(e) {
       var files = e.target.files;
 
       for(var i = 0; i < files.length; i++) {
