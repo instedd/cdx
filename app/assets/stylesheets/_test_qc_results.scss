@@ -3,6 +3,16 @@
   height: auto;
   width: 100%;
   padding: 0px;
+
+  &+ .actions {
+    margin: 0 15px 15px;
+
+    .btn-icon {
+      background: none !important;
+      color: inherit;
+      margin: -3px 0 0;
+    }
+  }
 }
 
 .assay {
@@ -13,7 +23,7 @@
     overflow: auto;
     padding: 7px;
     min-height: 145px;
-    max-height: 300px;
+    max-height: 310px;
 
     .upload-picture-title {
       align-self: center;

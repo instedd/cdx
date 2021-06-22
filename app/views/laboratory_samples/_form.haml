@@ -37,6 +37,10 @@
                     = image_tag "ic-cross.png"
 
             = qc.file_field :files, :class => "upload-picture",  accept: 'image/png,image/jpeg,image/gif', multiple: true
+        .actions
+          = button_tag id: 'undo_added_files', class: 'btn-link hidden' do
+            .icon-close.btn-icon
+            Undo added files
 
 
   - if @sample.is_quality_control
