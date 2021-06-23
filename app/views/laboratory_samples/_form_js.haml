@@ -37,6 +37,12 @@
       $(this).closest('.file-uploaded').addClass('remove');
       e.stopPropagation();
     });
+
+    $('.assay > .upload-new-file').on('scroll', function(e) {
+      var scrollDiff = $(this).scrollTop();
+      // move dropzone-input into view
+      $('.upload-picture').css('top', scrollDiff);
+    });
   });
 
   document.addEventListener("dragenter", function( event ) {
