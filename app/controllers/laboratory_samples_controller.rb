@@ -101,17 +101,6 @@ class LaboratorySamplesController < ApplicationController
     # return unless authorize_resource(patient, UPDATE_PATIENT)
     params = sample_params
 
-    puts "*********************************DEBUGGER*********************************"
-    puts params
-
-    # if @sample.is_quality_control and not params[:notes].empty?
-    #   note = Note.new
-    #   note.description = params[:notes]
-    #   note.user_id = current_user.id
-    #   note.laboratory_sample = @sample
-    #   note.save
-    # end
-
     if @sample.update(params)
       redirect_to edit_batch_path(@sample.batch), notice: 'Sample was successfully updated.'
     else

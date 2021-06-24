@@ -38,7 +38,6 @@
     });
     $("#add-note").on('click', function (e) {
       e.preventDefault()
-      debugger;
       var noteText = $('#new-note').val();
       $('#notes').append(
         $('<div>').text($('#new-note').val())
