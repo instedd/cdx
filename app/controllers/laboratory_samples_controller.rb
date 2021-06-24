@@ -99,7 +99,16 @@ class LaboratorySamplesController < ApplicationController
     @sample = LaboratorySample.find(params[:id])
     # TODO:
     # return unless authorize_resource(patient, UPDATE_PATIENT)
-    if @sample.update(sample_params)
+    params = sample_params
+    if @sample.is_quality_control and not params[:notes].empty?
+      note = Note.new
+      note.description = params[:notes]
+      note.user_id = current_user.id
+      note.laboratory_sample = @sample
+      note.save
+    end
+
+    if @sample.update(params.except(:notes))
       redirect_to edit_batch_path(@sample.batch), notice: 'Sample was successfully updated.'
     else
       render action: 'edit'
@@ -125,7 +134,7 @@ class LaboratorySamplesController < ApplicationController
   private
 
   def sample_params
-    lab_sample_params = params.require(:laboratory_sample).permit(:is_quality_control, test_qc_result_attributes: [ :id, files: [], test_qc_result_assays_attributes: [ :id, :_destroy ] ], notes:[ :id, :description])
+    lab_sample_params = params.require(:laboratory_sample).permit(:is_quality_control, :notes, test_qc_result_attributes: [ :id, files: [], test_qc_result_assays_attributes: [ :id, :_destroy ] ])
     lab_sample_params[:is_quality_control] = lab_sample_params[:is_quality_control] == '1'
     lab_sample_params
   end

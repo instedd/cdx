@@ -38,20 +38,22 @@
 
             = qc.file_field :files, :class => "upload-picture",  accept: 'image/png,image/jpeg,image/gif', multiple: true
 
-  .row
-    .col.pe-2
-      = f.label :notes
-    .col.pe-3
-      = f.text_area :notes, :rows => 5
-  .row
-    .col.pe-2
-      = f.label :notes
-    .col.pe-3
-      - @notes.each do |note|
-        %div
-          = "by" + " " + User.find(note.user_id).first_name + " " + note.updated_at.to_s
-        %div
-          = note.description
+
+  - if @sample.is_quality_control
+    .row
+      .col.pe-2
+        = f.label :notes
+      .col.pe-3
+        = f.text_area :notes
+    .row
+      .col.pe-2
+        = f.label :notes
+      .col.pe-3
+        - @notes.each do |note|
+          %div
+            = "by" + " " + User.find(note.user_id).first_name + " " + note.updated_at.to_s
+          %div
+            = note.description
 
   .row.button-actions
     .col
