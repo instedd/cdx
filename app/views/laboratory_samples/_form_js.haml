@@ -1,5 +1,5 @@
 :javascript
-  $(function() {
+  (function() {
     var onloadPicture = function(filename) {
       return function(event) {
         var fileDiv = $('<div>', { class: 'picture-container' })
@@ -31,7 +31,6 @@
       }
     });
 
-
     // Change the class on the target zone when dragging a file over it
     $(".clear-label").on('click', function (e) {
       $(this).closest('.file-uploaded').addClass('remove');
@@ -43,7 +42,7 @@
       // move dropzone-input into view
       $('.upload-picture').css('top', scrollDiff);
     });
-  });
+  })();
 
   document.addEventListener("dragenter", function( event ) {
     if ( event.target.className == "upload-picture" ) {
@@ -57,4 +56,3 @@
       $('.choose-picture').removeClass('on');
     }
   }, false);
-
