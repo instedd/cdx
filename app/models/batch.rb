@@ -26,7 +26,7 @@ class Batch < ActiveRecord::Base
 
   validate :date_produced_is_a_date
 
-  validates :isolate_name, uniqueness: { scope: :batch_number }
+  validate :isolate_name_batch_number_combination
 
   def date_produced_description
     if date_produced.is_a?(Time)
@@ -41,4 +41,15 @@ class Batch < ActiveRecord::Base
   def date_produced_is_a_date
     errors.add(:date_produced, "should be a date") unless date_produced.is_a?(Time)
   end
+
+  def isolate_name_batch_number_combination
+    if Batch.
+      where("LOWER(isolate_name) = ? AND LOWER(batch_number) = ?",
+            isolate_name.downcase, batch_number.downcase).
+      exists?
+      errors.add(:isolate_name, "and Batch Number combination should be unique")
+    end
+  end
+
+
 end
