@@ -9,7 +9,9 @@ class LaboratorySample < ActiveRecord::Base
   validates_presence_of :batch
 
   has_one :test_qc_result
+  has_many :notes
   accepts_nested_attributes_for :test_qc_result, allow_destroy: true
+  accepts_nested_attributes_for :notes, allow_destroy: true
 
   def self.entity_scope
     "laboratory_sample"
