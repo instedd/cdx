@@ -36,6 +36,16 @@
       $(this).closest('.file-uploaded').addClass('remove');
       e.stopPropagation();
     });
+    $("#add-note").on('click', function (e) {
+      e.preventDefault()
+      debugger;
+      var noteText = $('#new-note').val();
+      $('#notes').append(
+        $('<div>').text($('#new-note').val())
+      ).append(
+         $('<input>').attr('type', 'hidden').attr('name', 'laboratory_sample[new_notes][]').val(noteText)
+      );
+    });
 
     $('.assay > .upload-new-file').on('scroll', function(e) {
       var scrollDiff = $(this).scrollTop();

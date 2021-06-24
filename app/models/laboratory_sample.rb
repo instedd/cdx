@@ -22,4 +22,16 @@ class LaboratorySample < ActiveRecord::Base
   def build_default_test_qc_result
     build_test_qc_result
   end
+
+  def new_notes=(notes_list = [])
+    puts "*********************************DEBUGGER2*********************************"
+    puts notes_list
+    notes_list.each do |note|
+      notes.build(
+        description: note[:description],
+        user: note[:user],
+      )
+    end
+  end
+
 end

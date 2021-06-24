@@ -43,17 +43,22 @@
     .row
       .col.pe-2
         = f.label :notes
-      .col.pe-3
-        = f.text_area :notes
+      #notes.col.pe-3
+        = f.fields_for :notes, @sample.notes do |note|
+          %div
+            = "by" + " " + User.find(note.object.user_id).first_name || "" + " " + note.object.updated_at.to_s || ""
+          %div
+            = note.object.description
     .row
       .col.pe-2
-        = f.label :notes
+        = f.label :notes, "&nbsp;".html_safe
       .col.pe-3
-        - @notes.each do |note|
-          %div
-            = "by" + " " + User.find(note.user_id).first_name + " " + note.updated_at.to_s
-          %div
-            = note.description
+        = text_area_tag "new-note","", {:rows => 5, id: "new-note"}
+        .actions
+          = button_tag id: 'add-note', class: 'btn-link' do
+            .icon-circle-plus.icon-blue.icon-margin
+            Add Note
+
 
   .row.button-actions
     .col
