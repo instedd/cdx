@@ -43,16 +43,18 @@
     .row
       .col.pe-2
         = f.label :notes
-      #notes.col.pe-3
+      #notes.col
         = f.fields_for :notes, @sample.notes do |note|
-          %div
-            = "by" + " " + User.find(note.object.user_id).first_name || "" + " " + note.object.updated_at.to_s || ""
-          %div
-            = note.object.description
+          %div.notes
+            .info
+              = "by" + " " + User.find(note.object.user_id).first_name + " " + User.find(note.object.user_id).last_name + " " + note.object.updated_at.to_s || ""
+            .description
+              = note.object.description
+            .dashed-line
     .row
       .col.pe-2
         = f.label :notes, "&nbsp;".html_safe
-      .col.pe-3
+      .col.notes-text-area
         = text_area_tag "new-note","", {:rows => 5, id: "new-note"}
         .actions
           = button_tag id: 'add-note', class: 'btn-link' do
