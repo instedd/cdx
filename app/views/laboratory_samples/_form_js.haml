@@ -3,15 +3,8 @@
     var onloadPicture = function(filename) {
       return function(event) {
         var fileDiv = $('<div>', { class: 'picture-container new-file' })
-          .append(
-            $('<img>')
-              .attr('src', event.target.result)
-              .addClass('uploaded')
-          )
-          .append(
-            $('<div>', { class: 'picture-title' })
-              .text(filename)
-          );
+          .append($('<img>', { class: 'uploaded', src: event.target.result }))
+          .append($('<div>', { class: 'picture-title' }).text(filename));
 
         $('.assay > .upload-new-file')
           .append(fileDiv);
@@ -40,17 +33,33 @@
       $(this).closest('.file-uploaded').addClass('remove');
       e.stopPropagation();
     });
+
     $("#add-note").on('click', function (e) {
       e.preventDefault()
-      var noteText = $('#new-note').val();
-      var user = "by #{current_user.full_name}";
-      var noteTitle = $('<div>').addClass('info').text(user);
-      var noteDescription = $('<div>').addClass('description').text($('#new-note').val());
-      var noteDashedLine = $('<div>').addClass('dashed-line');
-      var note = $('<div>').addClass('note').append(noteTitle).append(noteDescription).append(noteDashedLine);
-      $('#notes').append(note).append(
-         $('<input>').attr('type', 'hidden').attr('name', 'laboratory_sample[new_notes][]').val(noteText)
-      );
+
+      var newNote = {
+        info: "by #{current_user.full_name}",
+        description: $('#new-note').val().trim()
+      };
+
+      if (newNote.description === "") {
+        return;
+      }
+
+      // clear input
+      $('#new-note').val('');
+
+      var note = $('<div>', { class: 'note'})
+        .append($('<div>', { class: 'info' }).text(newNote.info))
+        .append($('<div>', { class: 'description' }).text(newNote.description))
+        .append($('<div>', { class: 'dashed-line' }));
+
+      var inputHidden = $('<input>', {
+        type: 'hidden',
+        name: 'laboratory_sample[new_notes][]'
+      }).val(newNote.description);
+
+      $('#notes').append(note).append(inputHidden);
     });
 
     $('.assay > .upload-new-file').on('scroll', function(e) {
