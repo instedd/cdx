@@ -1,4 +1,4 @@
-.notes {
+.note {
   font-size: 14px;
   line-height: 24px;
 
@@ -15,12 +15,11 @@
     border-bottom: 1px dashed #000000;
     margin: 16px 0px;
   }
-
 }
 
-.notes-text-area {
-  textarea {
-    resize: none;
+.notes-input {
+  display: flex;
+  input {
     width: 100%;
   }
 }

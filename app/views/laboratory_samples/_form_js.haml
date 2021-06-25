@@ -39,9 +39,12 @@
     $("#add-note").on('click', function (e) {
       e.preventDefault()
       var noteText = $('#new-note').val();
-      $('#notes').append(
-        $('<div>').text($('#new-note').val())
-      ).append(
+      var user = "by #{current_user.full_name}";
+      var noteTitle = $('<div>').addClass('info').text(user);
+      var noteDescription = $('<div>').addClass('description').text($('#new-note').val());
+      var noteDashedLine = $('<div>').addClass('dashed-line');
+      var note = $('<div>').addClass('note').append(noteTitle).append(noteDescription).append(noteDashedLine);
+      $('#notes').append(note).append(
          $('<input>').attr('type', 'hidden').attr('name', 'laboratory_sample[new_notes][]').val(noteText)
       );
     });

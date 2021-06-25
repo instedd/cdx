@@ -45,21 +45,20 @@
         = f.label :notes
       #notes.col
         = f.fields_for :notes, @sample.notes do |note|
-          %div.notes
+          .note
             .info
-              = "by" + " " + User.find(note.object.user_id).first_name + " " + User.find(note.object.user_id).last_name + " " + note.object.updated_at.to_s || ""
+              = "by #{note.object.user.full_name} #{@localization_helper.format_datetime(note.object.updated_at)} "
             .description
               = note.object.description
             .dashed-line
     .row
       .col.pe-2
         = f.label :notes, "&nbsp;".html_safe
-      .col.notes-text-area
-        = text_area_tag "new-note","", {:rows => 5, id: "new-note"}
+      .col.notes-input
+        = text_field_tag "new-note","", {id: "new-note", placeholder: "Add Note"}
         .actions
           = button_tag id: 'add-note', class: 'btn-link' do
             .icon-circle-plus.icon-blue.icon-margin
-            Add Note
 
 
   .row.button-actions
