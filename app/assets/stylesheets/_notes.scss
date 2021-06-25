@@ -1,0 +1,25 @@
+.note {
+  font-size: 14px;
+  line-height: 24px;
+
+  .info {
+    color: #999999;
+    margin-bottom: 4px;
+  }
+  .description {
+    margin-bottom: 8px;
+  }
+
+  .dashed-line {
+    opacity: 0.1;
+    border-bottom: 1px dashed #000000;
+    margin: 16px 0px;
+  }
+}
+
+.notes-input {
+  display: flex;
+  input {
+    width: 100%;
+  }
+}
