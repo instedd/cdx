@@ -127,7 +127,7 @@ class LaboratorySamplesController < ApplicationController
   def sample_params
     lab_sample_params = params.require(:laboratory_sample).permit(:is_quality_control, notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy], new_notes: [], test_qc_result_attributes: [ :id, files: [], test_qc_result_assays_attributes: [ :id, :_destroy ] ])
     lab_sample_params[:is_quality_control] = lab_sample_params[:is_quality_control] == '1'
-    new_notes_with_author = lab_sample_params[:new_notes].map do |note_description|
+    new_notes_with_author = (lab_sample_params[:new_notes] || []).map do |note_description|
       {user: current_user, description: note_description}
     end
     lab_sample_params[:new_notes] = new_notes_with_author
