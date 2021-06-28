@@ -3,7 +3,9 @@ class User < ApplicationRecord
   # :timeoutable
   devise :invitable, :database_authenticatable,
          :recoverable, :rememberable, :trackable,
-         :validatable, :confirmable, :timeoutable,
+         :validatable,
+        #  :confirmable,
+         :timeoutable,
          :lockable, :password_expirable, :password_archivable
 
   devise :omniauthable, :registerable unless Settings.single_tenant

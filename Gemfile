@@ -75,8 +75,9 @@ group :development do
   # gem 'quiet_assets'
 end
 
-gem 'devise', '~> 4.7.3' #'~> 3.5.5'
-gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension', tag: 'v0.7.2'
+gem 'devise', '~> 4.8' #'~> 3.5.5'
+gem 'devise-security', '~> 0.16.0'
+# gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension', tag: 'v0.7.2'
 gem 'devise_invitable', '~> 2.0.4'
 gem 'omniauth', '~> 2.0.4'
 gem 'omniauth-google-oauth2', '~> 1.0.0'
@@ -122,7 +123,7 @@ group :test do
   gem 'webmock', require: false
   gem 'capybara-mechanize', '~> 1.11.0'
   gem 'timecop'
-  gem 'shoulda'
+  gem 'shoulda', '~> 4.0'
   gem 'hashdiff'
   gem 'cucumber-rails', '~> 2.0.0', :require => false
   gem 'database_cleaner'

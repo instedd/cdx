@@ -5,8 +5,8 @@ class Api::MessagesController < ApiController
 
   wrap_parameters false
   skip_before_action :doorkeeper_authorize!, only: :create
-  skip_before_action :authenticate_user!, only: :create
-  skip_before_action :load_current_user_policies, only: :create
+  skip_before_action :authenticate_user!, raise: false, only: :create
+  # skip_before_action :load_current_user_policies, only: :create
 
   def create
     device = Device.includes(:device_model, :manifest, :institution, :site).find_by_uuid(params[:device_id])

@@ -65,6 +65,6 @@ module HTMLAssets
   end
 end
 
-Rails.application.assets.context_class.class_eval do
+Rails.application.config.assets.context_class.class_eval do
   include HTMLAssets::ViewContext
 end

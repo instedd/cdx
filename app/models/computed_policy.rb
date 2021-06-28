@@ -183,7 +183,7 @@ class ComputedPolicy < ApplicationRecord
     def update_user(user)
       computed_policies = policies_for(user).map{|p| compute_for(p)}.flatten
       computed_policies = compact_policies(computed_policies)
-      existing_policies = user.computed_policies
+      existing_policies = user.computed_policies.to_a
 
       to_create = computed_policies.substract(existing_policies) { |p1, p2| p1.attributes_equal?(p2) }
       to_delete = existing_policies.substract(computed_policies) { |p1, p2| p1.attributes_equal?(p2) }
