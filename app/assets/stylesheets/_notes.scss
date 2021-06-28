@@ -15,6 +15,12 @@
     border-bottom: 1px dashed #000000;
     margin: 16px 0px;
   }
+
+  .note-footer {
+    .clear-label {
+      display: contents;
+    }
+  }
 }
 
 .notes-input {

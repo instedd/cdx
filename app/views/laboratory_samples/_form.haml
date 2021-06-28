@@ -54,6 +54,12 @@
               = "by #{note.object.user.full_name} #{@localization_helper.format_datetime(note.object.updated_at)} "
             .description
               = note.object.description
+            .note-footer
+              .clear-label
+                = note.check_box '_destroy', { id: "destroy_note_#{note.object.id}" }
+                %label.cross{:for => "destroy_note_#{note.object.id}" }
+                  = image_tag "ic-cross.png"
+
             .dashed-line
     .row
       .col.pe-2
