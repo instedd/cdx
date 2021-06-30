@@ -5,6 +5,10 @@
   .info {
     color: #999999;
     margin-bottom: 4px;
+    height: 25px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
   }
   .description {
     margin-bottom: 8px;
