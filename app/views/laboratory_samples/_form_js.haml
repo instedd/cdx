@@ -29,9 +29,12 @@
     });
 
     // Change the class on the target zone when dragging a file over it
-    $(".clear-label").on('click', function(e) {
+    $(".clear-label > input[type='checkbox']").on('click', function(e) {
       $(this).closest('.file-uploaded').addClass('remove');
-      e.stopPropagation();
+    });
+
+    $(".clear-note > input[type='checkbox']").on('click', function(e) {
+      $(this).closest('.note').hide();
     });
 
     $("#add-note").on('click', function (e) {
