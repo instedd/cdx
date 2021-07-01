@@ -147,21 +147,21 @@ RSpec.describe PatientsController, type: :controller do
     let!(:patient) { institution.patients.make }
 
     it "should be accessible be institution owner" do
-      get :show, id: patient.id
+      get :show, params: { id: patient.id }
       expect(response).to be_success
       expect(assigns(:can_edit)).to be_truthy
     end
 
     it "should not be accessible if can not read" do
       sign_in other_user
-      get :show, id: patient.id
+      get :show, params: { id: patient.id }
       expect(response).to be_forbidden
     end
 
     it "should be accessible if can read" do
       grant user, other_user, Patient, READ_PATIENT
       sign_in other_user
-      get :show, id: patient.id
+      get :show, params: { id: patient.id }
       expect(response).to be_success
       expect(assigns(:can_edit)).to be_falsy
     end
@@ -170,7 +170,7 @@ RSpec.describe PatientsController, type: :controller do
       grant user, other_user, Patient, READ_PATIENT
       grant user, other_user, Patient, UPDATE_PATIENT
       sign_in other_user
-      get :show, id: patient.id
+      get :show, params: { id: patient.id }
       expect(response).to be_success
       expect(assigns(:can_edit)).to be_truthy
     end

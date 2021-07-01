@@ -284,14 +284,14 @@ describe TestResultsController, elasticsearch: true do
     let(:default_params) { {context: other_institution.uuid} }
 
     it "should not authorize outsider user" do
-      get :show, id: test_result.uuid
+      get :show, params: { id: test_result.uuid }
       expect(response).to be_forbidden
     end
 
     it "should authorize user with access to device" do
       grant owner, user, { :test_result => device }, QUERY_TEST
 
-      get :show, id: test_result.uuid
+      get :show, params: { id: test_result.uuid }
       expect(assigns(:test_result)).to eq(test_result)
       expect(response).to be_success
     end
@@ -299,7 +299,7 @@ describe TestResultsController, elasticsearch: true do
     it "should authorize user with access to site" do
       grant owner, user, { :test_result => site }, QUERY_TEST
 
-      get :show, id: test_result.uuid
+      get :show, params: { id: test_result.uuid }
       expect(assigns(:test_result)).to eq(test_result)
       expect(response).to be_success
     end
@@ -307,7 +307,7 @@ describe TestResultsController, elasticsearch: true do
     it "should authorize user with access to institution" do
       grant owner, user, { :test_result => institution }, QUERY_TEST
 
-      get :show, id: test_result.uuid
+      get :show, params: { id: test_result.uuid }
       expect(assigns(:test_result)).to eq(test_result)
       expect(response).to be_success
     end
@@ -325,7 +325,7 @@ describe TestResultsController, elasticsearch: true do
       it "should authorize user with access to device" do
         grant owner, user, { :test_result => device }, QUERY_TEST
 
-        get :show, id: test_result.uuid
+        get :show, params: { id: test_result.uuid }
         expect(assigns(:test_result)).to eq(test_result)
         expect(response).to be_success
       end
@@ -333,7 +333,7 @@ describe TestResultsController, elasticsearch: true do
       it "should authorize user with access to institution" do
         grant owner, user, { :test_result => institution }, QUERY_TEST
 
-        get :show, id: test_result.uuid
+        get :show, params: { id: test_result.uuid }
         expect(assigns(:test_result)).to eq(test_result)
         expect(response).to be_success
       end

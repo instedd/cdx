@@ -23,7 +23,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       grant i1.user, user, {encounter: i1}, READ_ENCOUNTER
 
       encounter = Encounter.make institution: i1
-      get :show, id: encounter.id
+      get :show, params: { id: encounter.id }
       expect(response).to have_http_status(:success)
 
       expect(assigns[:can_update]).to be_falsy
@@ -32,8 +32,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     it "returns http forbidden if not allowed" do
       i1 = Institution.make
       encounter = Encounter.make institution: i1
-      get :show, id: encounter.id
-
+      get :show, params: { id: encounter.id }
       expect(response).to have_http_status(:forbidden)
     end
 
@@ -44,7 +43,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       grant i1.user, user, {encounter: i1}, UPDATE_ENCOUNTER
 
       encounter = Encounter.make institution: i1
-      get :show, id: encounter.id
+      get :show, params: { id: encounter.id }
 
       expect(response).to have_http_status(:success)
       expect(assigns[:can_update]).to be_truthy
@@ -52,13 +51,13 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
     it "should load encounter by uuid" do
       encounter = Encounter.make institution: institution
-      get :show, id: encounter.uuid
+      get :show, params: { id: encounter.uuid }
       expect(assigns(:encounter)).to eq(encounter)
     end
 
     it "should load encounter by id" do
       encounter = Encounter.make institution: institution
-      get :show, id: encounter.id
+      get :show, params: { id: encounter.id }
       expect(assigns(:encounter)).to eq(encounter)
     end
 
@@ -66,7 +65,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
       encounter = Encounter.make institution: institution
       encounter2 = Encounter.make institution: institution, uuid: "#{encounter.id}lorem"
 
-      get :show, id: encounter2.uuid
+      get :show, params: { id: encounter2.uuid }
       expect(assigns(:encounter)).to eq(encounter2)
     end
   end

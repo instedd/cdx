@@ -1,7 +1,7 @@
 module MessageEncryption
   require 'securerandom'
 
-  DEFAULT_IV = "\xD7\xCA\xD5\x9D\x1D\xC0I\x01Sf\xC8\xFBa\x88\xE1\x03"
+  DEFAULT_IV = "\xCBPg\xCD%\x17HjvU\x1C\xB8" # SecureRandom.random_bytes(12) # "\xD7\xCA\xD5\x9D\x1D\xC0I\x01Sf\xC8\xFBa\x88\xE1\x03"
   DEFAULT_SALT = "1403203711"
 
   def self.encrypt string

@@ -46,7 +46,8 @@ module Resource
     end
 
     def supports_identifier?(key)
-      key.blank? || key.kind_of?(Fixnum) || key.strip.match(/\A\d+\z/)
+      # key.blank? || key.kind_of?(Fixnum) || key.strip.match(/\A\d+\z/)
+      key.blank? || key.kind_of?(Integer) || key.strip.match(/\A\d+\z/)
     end
 
     def resource_name_prefix

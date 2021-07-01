@@ -56,14 +56,18 @@ class Capybara::Node::Element
     click_without_ajax
     wait_for_ajax
   end
-  alias_method_chain :click, :ajax
+  # alias_method_chain :click, :ajax
+  alias_method :click_without_ajax, :click
+  alias_method :click, :click_with_ajax
 
   # remove targe=_blank before clicking
   def click_with_target_removed
     page.evaluate_script('$("a[target=_blank]").attr("target", null);')
     click_without_target_removed
   end
-  alias_method_chain :click, :target_removed
+  # alias_method_chain :click, :target_removed
+  alias_method :click_without_target_removed , :click
+  alias_method :click, :click_with_target_removed
 
   def page
     session

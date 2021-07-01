@@ -1,9 +1,9 @@
 class DeviceLogsController < ApplicationController
   before_filter :load_device, only: [:index, :show]
 
-  skip_before_filter :verify_authenticity_token, only: [:create]
-  skip_before_filter :authenticate_user!, only: [:create]
-  skip_before_filter :ensure_context, only: [:create]
+  skip_before_action :verify_authenticity_token, only: [:create]
+  skip_before_action :authenticate_user!, only: [:create]
+  skip_before_action :ensure_context, only: [:create]
 
   def index
     @device_logs = @device.device_logs.order(created_at: :desc)

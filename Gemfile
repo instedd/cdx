@@ -25,7 +25,7 @@ gem 'rubyzip', '~> 2.3.0' #'>= 1.0.0'
 
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'config', '~> 3.1.0' #'~> 3.1.0'
-gem 'rest-client', '~> 1.6' #'~> 2.1.0' TODO: update location_service
+gem 'rest-client', '~> 2.1.0' #'~> 1.6' TODO: update location_service
 gem 'barby', '~> 0.6.8'
 gem 'chunky_png', '~> 1.4.0'
 gem 'wicked_pdf', '~> 2.1'
@@ -38,7 +38,8 @@ gem 'cdx', path: '.'
 gem 'cdx-api-elasticsearch', path: '.'
 gem 'cdx-sync-server', git: 'https://github.com/instedd/cdx-sync-server.git', branch: 'master'
 gem 'geojson_import', git: 'https://github.com/instedd/geojson_import', branch: 'master'
-gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'
+# gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'
+gem 'location_service', path: './gems/ruby-location_service'
 gem 'view_components', git: 'https://github.com/manastech/rails-view_components.git', branch: 'master'
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
@@ -85,7 +86,7 @@ gem 'elasticsearch'
 
 gem 'oj', '~> 3.11.3'
 gem 'guid'
-gem 'encryptor'
+gem 'encryptor', '~> 3.0.0'
 
 gem 'dotiw'
 gem 'rails-i18n', '~> 5.0.0' #'~> 4.0.9' # '5.1.1' #'~> 4.0.0'
@@ -112,7 +113,7 @@ group :test do
   gem 'rails-controller-testing', '~> 1.0', '>= 1.0.5'
   gem 'testrail_rspec_formatter'
   gem 'test-unit'
-  gem 'tire'
+  # gem 'tire', '~> 0.6.2'
   # gem 'factory_girl_rails'
   gem 'machinist', '~> 1.0'
   gem 'capybara', '~> 3.35.3'

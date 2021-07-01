@@ -244,13 +244,13 @@ describe DevicesController do
   context "Show" do
     it "shows tests when there are device messages" do
       device.device_messages.make
-      get :show, id: device.id
+      get :show, params: { id: device.id }
       expect(response).to be_success
     end
 
     context "without device messages" do
       it "redirects to setup if activation is not supported" do
-        get :show, id: device.id
+        get :show, params: { id: device.id }
         expect(response).to redirect_to(setup_device_url(device))
       end
 
@@ -259,7 +259,7 @@ describe DevicesController do
 
         it "redirects to setup if it doesn't have a secret key" do
           expect(device.secret_key_hash).to be_nil
-          get :show, id: device.id
+          get :show, params: { id: device.id }
           expect(response).to redirect_to(setup_device_url(device))
         end
 
@@ -268,14 +268,14 @@ describe DevicesController do
 
           it "show tests if there is no activation token" do
             expect(device.activation_token).to be_nil
-            get :show, id: device.id
+            get :show, params: { id: device.id }
             expect(response).to be_success
           end
 
           it "redirects to setup if there is activation token" do
             device.new_activation_token
             device.save!
-            get :show, id: device.id
+            get :show, params: { id: device.id }
             expect(response).to redirect_to(setup_device_url(device))
           end
         end
