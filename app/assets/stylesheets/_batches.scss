@@ -87,8 +87,7 @@
   align-items: center;
   font-size: 14px;
   letter-spacing: 0;
-  line-height: 48px;
-  padding: 10px;
+  padding: 18px;
   .description {
     font-style: italic;
     color: rgba(0, 0, 0, 0.4);
@@ -99,8 +98,9 @@
     color: #000000;
     display: flex;
     justify-content: space-between;
+    margin-bottom: 8px;
   }
   [class^="icon-"], [class*=" icon-"] {
-    font-size: 40px;
+    font-size: 30px;
   }
 }
