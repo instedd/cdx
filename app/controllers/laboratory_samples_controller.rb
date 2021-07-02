@@ -3,10 +3,7 @@ class LaboratorySamplesController < ApplicationController
   def index
     # TODO: filter by Institution
     @samples = LaboratorySample.all.order('created_at DESC')
-
     @samples = @samples.where("uuid LIKE concat('%', ?, '%')", params[:uuid]) unless params[:uuid].blank?
-    @samples = @samples.where("sample_type = ?", params[:sample_type]) unless params[:sample_type].blank?
-
     # paginate samples
     @samples = perform_pagination(@samples)
   end
@@ -32,7 +29,7 @@ class LaboratorySamplesController < ApplicationController
 
     if @sample.save
       session.delete(:creating_sample_uuid)
-      redirect_to edit_laboratory_sample_path(@sample), notice: 'Sample was successfully created.'
+      redirect_to laboratory_samples_path, notice: 'Sample was successfully created.'
     else
       render action: 'new'
     end
@@ -100,7 +97,7 @@ class LaboratorySamplesController < ApplicationController
     # return unless authorize_resource(patient, UPDATE_PATIENT)
 
     if @sample.update(sample_params)
-      redirect_to edit_batch_path(@sample.batch), notice: 'Sample was successfully updated.'
+      redirect_to laboratory_samples_path, notice: 'Sample was successfully updated.'
     else
       render action: 'edit'
     end

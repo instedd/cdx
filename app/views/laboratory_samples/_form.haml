@@ -72,7 +72,7 @@
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary'
-      = link_to 'Cancel', edit_batch_path(@sample.batch), class: 'btn-link'
+      = link_to 'Cancel', sample_or_batch_creation_batches_path, class: 'btn-link'
 
       - if @can_delete
         = confirm_deletion_button @sample, 'sample'

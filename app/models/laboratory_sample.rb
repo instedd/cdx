@@ -6,7 +6,6 @@ class LaboratorySample < ActiveRecord::Base
   validates_presence_of :institution
 
   belongs_to :batch
-  validates_presence_of :batch
 
   has_one :test_qc_result
   has_many :notes

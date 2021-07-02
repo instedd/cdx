@@ -1,0 +1,31 @@
+- content_for(:subheader) do
+  .row.center.add-new
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to batches_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left-white.png"
+            New Sample
+
+
+.row
+  .col
+    .row
+      .col.pe-7
+        .option-card
+          %div
+            .title
+              Individual sample
+            .description
+              = "Create an individual sample and print a label"
+          = link_to new_laboratory_sample_path do
+            .icon-keyboard-arrow-right.icon-gray
+        .option-card
+          %div
+            .title
+              Batch
+            .description
+              = "Create a batch with multiple samples and print labels"
+          = link_to new_batch_path do
+            .icon-keyboard-arrow-right.icon-gray

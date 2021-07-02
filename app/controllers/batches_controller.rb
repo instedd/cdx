@@ -63,6 +63,10 @@ class BatchesController < ApplicationController
     redirect_to edit_batch_path(@batch_form), notice: 'New sample was added successfully.'
   end
 
+  def sample_or_batch_creation
+    render 'batch_or_sample_creation'
+  end
+
   def bulk_destroy
     Batch.where(id: params[:batch_ids]).destroy_all
 

@@ -13,8 +13,3 @@
           .filter
             %label.block Sample Id
             %input.input-x-large{type: "text", name: "uuid", value: params["uuid"], placeholder: "Filter by sample Id"}
-          .filter
-            %label.block Type
-            = cdx_select name: :sample_type, value: params["sample_type"], searchable: false do |select|
-              - select.item "", "Show all"
-              - select.items LaboratorySample.entity_fields.detect { |f| f.name == 'sample_type' }.options
