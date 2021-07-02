@@ -9,6 +9,7 @@ class LaboratorySample < ActiveRecord::Base
 
   has_one :test_qc_result
   has_many :notes
+
   accepts_nested_attributes_for :test_qc_result, allow_destroy: true
   accepts_nested_attributes_for :notes, allow_destroy: true
 
@@ -16,7 +17,9 @@ class LaboratorySample < ActiveRecord::Base
     "laboratory_sample"
   end
 
+  attribute_field :isolate_name, copy: true
   attribute_field :is_quality_control
+  attribute_field :production_date, :inactivation_method, :volume, :lab_technician
 
   def build_default_test_qc_result
     build_test_qc_result
