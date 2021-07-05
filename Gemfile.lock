@@ -36,6 +36,14 @@ GIT
       rails (>= 3.2)
 
 GIT
+  remote: https://github.com/instedd/ruby-location_service.git
+  revision: 4ceb5703a041d8c11bb95a0cca7b509d5c3a4ad4
+  branch: upgrade-rest-client
+  specs:
+    location_service (0.1.0)
+      rest-client (~> 2.1)
+
+GIT
   remote: https://github.com/manastech/rails-view_components.git
   revision: 59861a6e716944441b4cd5e584bb3f36d0a7c37e
   branch: master
@@ -52,12 +60,6 @@ PATH
       activesupport
       cdx
       elasticsearch
-
-PATH
-  remote: gems/ruby-location_service
-  specs:
-    location_service (0.1.0)
-      rest-client (~> 2.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -219,7 +221,7 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.5.2)
       railties (>= 5)
-    dotiw (5.3.1)
+    dotiw (5.2.0)
       activesupport
       i18n
     dry-configurable (0.12.1)
@@ -678,7 +680,7 @@ DEPENDENCIES
   devise-security (~> 0.16.0)
   devise_invitable (~> 2.0.4)
   doorkeeper
-  dotiw
+  dotiw (~> 5.2.0)
   elasticsearch
   encryptor (~> 3.0.0)
   faker

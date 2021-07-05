@@ -1,4 +1,4 @@
-FROM ruby:2.7
+FROM ruby:2.6
 
 # ENV POIROT_STDOUT true
 # ENV POIROT_SUPPRESS_RAILS_LOG true

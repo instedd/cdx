@@ -12,4 +12,9 @@ describe MessageEncryption do
     expect(decrypted).to eq("PLAIN_DATA")
   end
 
+  it "should decrypt to nil if blank string" do
+    decrypted = MessageEncryption.decrypt ""
+    expect(decrypted).to be_nil
+  end
+
 end

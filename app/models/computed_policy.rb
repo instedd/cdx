@@ -323,9 +323,12 @@ class ComputedPolicy < ApplicationRecord
     end
 
     def compact_policies(computed_policies)
-      computed_policies.delete_if do |policy|
-        computed_policies.any?{|p| !p.equal?(policy) && p.contains(policy) }
-      end
+      computed_policies.reduce([]) { | uniq_policies, policy |
+        uniq_policies.append(policy) if uniq_policies.none?{
+          |p| p.equal?(policy) || p.contains(policy) || policy.contains(p)
+        }
+        uniq_policies
+      }
     end
 
     def site_prefix(id)

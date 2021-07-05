@@ -12,7 +12,7 @@ module MessageEncryption
     unless string.blank?
       Encryptor.decrypt(string, :key => secret_key, :iv => iv, :salt => salt)
     else
-      ''
+      nil
     end
   end
 
