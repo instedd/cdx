@@ -70,7 +70,7 @@ module Resource
       resource_name_prefix
     end
 
-    def filter(conditions)
+    def filter_with(conditions)
       where(conditions)
     end
 
