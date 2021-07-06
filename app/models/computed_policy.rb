@@ -54,7 +54,7 @@ class ComputedPolicy < ApplicationRecord
       (filters && filter) ? filters.or(filter) : nil
     end
 
-    resource.filter(filter)
+    resource.where(filter)
   end
 
   def self.applicable_policies(action, resource_or_string, user=nil, opts={})
