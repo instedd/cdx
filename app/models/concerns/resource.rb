@@ -70,10 +70,5 @@ module Resource
     def resource_name
       resource_name_prefix
     end
-
-    def filter(conditions)
-      where(conditions)
-    end
-
   end
 end
