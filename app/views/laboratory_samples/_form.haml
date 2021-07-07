@@ -11,6 +11,29 @@
           .value= f.object.uuid
       .row
         .col.pe-4
+          = f.label :lab_technician
+        .col
+          = f.text_field :lab_technician
+      .row
+        .col.pe-4
+          = f.label :isolate_name
+        .col
+          = f.text_field :isolate_name, :class => 'input-x-large'
+      .row
+        .col.pe-4
+          = f.label :inactivation_method
+        .col
+          = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
+            - select.items LaboratorySample::INACTIVATION_METHOD_VALUES
+      .row
+        .col.pe-4
+          = f.label :volume
+        .col
+          .row.input-unit
+            = f.number_field :volume, min: 0, step: :any, :class => "input-small"
+            .span.unit (μl)
+      .row
+        .col.pe-4
           = f.label :is_quality_control, "quality control"
         .col
           = f.check_box :is_quality_control

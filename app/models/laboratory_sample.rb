@@ -17,9 +17,16 @@ class LaboratorySample < ActiveRecord::Base
     "laboratory_sample"
   end
 
+  INACTIVATION_METHOD_VALUES = entity_fields.detect { |f| f.name == 'inactivation_method' }.options
+  validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
+
+  validates_presence_of :isolate_name
+  validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
+  validates_presence_of :lab_technician
+
   attribute_field :isolate_name, copy: true
   attribute_field :is_quality_control
-  attribute_field :production_date, :inactivation_method, :volume, :lab_technician
+  attribute_field :inactivation_method, :volume, :lab_technician
 
   def build_default_test_qc_result
     build_test_qc_result
