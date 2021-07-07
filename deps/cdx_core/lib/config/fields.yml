@@ -18,6 +18,8 @@ entities:
         type: boolean
       isolate_name:
         searchable: true
+      production_date:
+        type: date
       inactivation_method:
         type: enum
         options:

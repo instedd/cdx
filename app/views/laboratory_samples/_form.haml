@@ -11,6 +11,11 @@
           .value= f.object.uuid
       .row
         .col.pe-4
+          = f.label :production_date
+        .col
+          = f.text_field :production_date, placeholder: @sample.production_date_placeholder
+      .row
+        .col.pe-4
           = f.label :lab_technician
         .col
           = f.text_field :lab_technician
