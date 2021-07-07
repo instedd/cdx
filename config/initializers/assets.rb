@@ -59,7 +59,10 @@ module HTMLAssets
         include Rails.application.routes.url_helpers
         include Rails.application.routes.mounted_helpers
         include ActionView::Helpers
-        alias_method_chain :output_buffer=, :sprockets
+
+        # alias_method_chain :output_buffer=, :sprockets
+        alias_method :output_buffer_without_sprockets=, :output_buffer=
+        alias_method :output_buffer=, :output_buffer_with_sprockets=
       end
     end
   end

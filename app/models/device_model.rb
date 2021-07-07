@@ -61,7 +61,7 @@ class DeviceModel < ApplicationRecord
     devices = self.devices.to_a
     raise ActiveRecord::RecordNotDestroyed, "Cannot destroy a device model with devices outside its institution" if devices.any?{|d| d.institution_id != institution_id}
     devices.each(&:destroy_cascade!)
-    devices(true) # Reload devices relation so destroy:restrict does not prevent the record from being destroyed
+    self.devices.reload # Reload devices relation so destroy:restrict does not prevent the record from being destroyed
   end
 
   def valid_filename_pattern

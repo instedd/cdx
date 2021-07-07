@@ -1251,10 +1251,10 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
     end
   end
-    
+
    context 'check invalid time' do
       let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
-     
+
       it "the start time is greater than today and generates and alert" do
         alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
         alert.query = {"test.error_code"=>"155"}
@@ -1263,10 +1263,10 @@ describe DeviceMessageProcessor, elasticsearch: true do
         alert.user = institution.user
         alert.save!
 
-        @check_invalid_test=TRUE
+        @check_invalid_test=true
         device_message_processor.process
         expect(AlertHistory.count).to equal (1)
       end
     end
-  
+
 end
