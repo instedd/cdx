@@ -66,6 +66,7 @@ class BatchForm
       inactivation_method: self.inactivation_method,
       isolate_name: self.isolate_name,
       volume: self.volume,
+      production_date: self.date_produced,
       lab_technician: self.lab_technician
     })
   end
