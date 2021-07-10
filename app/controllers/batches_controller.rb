@@ -55,10 +55,9 @@ class BatchesController < ApplicationController
     redirect_to batches_path, notice: 'Batch was successfully deleted.'
   end
 
-  def add_laboratory_sample
-    batch = Batch.find(params[:id])
-    @batch_form = BatchForm.edit(batch)
-    @batch_form.add_laboratory_sample
+  def add_sample
+    @batch_form = BatchForm.edit(Batch.find(params[:id]))
+    @batch_form.add_sample
 
     redirect_to edit_batch_path(@batch_form), notice: 'New sample was added successfully.'
   end

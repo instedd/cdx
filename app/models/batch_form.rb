@@ -54,22 +54,29 @@ class BatchForm
     save
   end
 
-  def add_laboratory_sample
-    batch.laboratory_samples.push create_laboratory_sample
+  def add_sample
+    batch.samples.push create_sample
     save
   end
 
-  def create_laboratory_sample
-    LaboratorySample.new({
+  def create_sample
+    Sample.new({
       institution: self.institution,
-      is_quality_control: false,
-      inactivation_method: self.inactivation_method,
-      isolate_name: self.isolate_name,
-      volume: self.volume,
-      production_date: self.date_produced,
-      lab_technician: self.lab_technician
+      sample_identifiers: [SampleIdentifier.new]
     })
   end
+
+  # def create_laboratory_sample
+  #   LaboratorySample.new({
+  #     institution: self.institution,
+  #     is_quality_control: false,
+  #     inactivation_method: self.inactivation_method,
+  #     isolate_name: self.isolate_name,
+  #     volume: self.volume,
+  #     production_date: self.date_produced,
+  #     lab_technician: self.lab_technician
+  #   })
+  # end
 
   def self.edit(batch)
     new.tap do |form|

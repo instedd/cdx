@@ -104,7 +104,7 @@ Rails.application.routes.draw do
   end
   resources :batches do
     member do
-      post 'add_laboratory_sample'
+      post 'add_sample'
     end
     collection do
       get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
