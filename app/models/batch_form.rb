@@ -160,10 +160,6 @@ class BatchForm
   # end date_produced
   #
 
-  def laboratory_samples
-    @batch.laboratory_samples
-  end
-
   private
 
   def self.assign_attributes(target, source)

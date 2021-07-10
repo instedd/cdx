@@ -4,6 +4,7 @@ class Sample < ActiveRecord::Base
   belongs_to :institution
   belongs_to :patient
   belongs_to :encounter
+  belongs_to :batch
 
   has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy
   has_many :test_results, through: :sample_identifiers

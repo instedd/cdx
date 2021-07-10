@@ -3,7 +3,7 @@
     = check_box_tag 'select_all_samples'
     %label.row{for: "select_all_samples"}
     #count
-      = @batch_form.laboratory_samples.count.to_s + ' ' + "Samples"
+      = @batch_form.batch.samples.count.to_s + ' ' + "Samples"
   .actions
     = button_tag id: 'bulk_action_print', class: 'btn-link', name: 'bulk_action', value: 'print' do
       .icon-print.btn-icon
@@ -12,7 +12,7 @@
     = button_tag id: 'bulk_action_destroy_undo', class: 'btn-link hidden' do
       Undo
 
-- @batch_form.laboratory_samples.each do |sample|
+- @batch_form.batch.samples.each do |sample|
   .col.pe-7.batches-samples
     .samples-row
       .samples-item
