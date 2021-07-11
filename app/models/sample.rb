@@ -18,6 +18,19 @@ class Sample < ActiveRecord::Base
     "sample"
   end
 
+  attribute_field :isolate_name,
+                  :is_quality_control,
+                  :inactivation_method,
+                  :volume,
+                  :lab_technician,
+                  :production_date
+
+  INACTIVATION_METHOD_VALUES = entity_fields.detect { |f| f.name == 'inactivation_method' }.options
+  # validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
+  # validates_presence_of :isolate_name
+  # validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
+  # validates_presence_of :lab_technician
+
   def self.find_by_entity_id(entity_id, opts)
     query = joins(:sample_identifiers).where(sample_identifiers: {entity_id: entity_id.to_s}, institution_id: opts.fetch(:institution_id))
     query = query.where(sample_identifiers: {site_id: opts[:site_id]}) if opts[:site_id]

@@ -11,6 +11,6 @@
       .label https://cdx.io
   - if @show_print_action
     .row.actions
-      = link_to print_laboratory_sample_path(@sample), download: "cdx_sample_#{@sample.uuid}.pdf", target: "_blank", class: 'btn-link' do
+      = link_to print_sample_path(@sample), download: "cdx_sample_#{@sample.uuid}.pdf", target: "_blank", class: 'btn-link' do
         .icon-print.btn-icon
         %span Print

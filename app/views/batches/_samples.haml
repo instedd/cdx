@@ -23,7 +23,7 @@
       .sample-row-actions
         -# - if sample.is_quality_control
         -#   .icon-alert.icon-gray
-        = link_to edit_laboratory_sample_path(sample.id) do
+        = link_to edit_sample_path(sample.id) do
           .icon-keyboard-arrow-right.icon-gray
 
 = link_to add_sample_batch_path, method: :post, class: 'add-samples' do
@@ -32,4 +32,4 @@
     .add-sample-link
       = "ADD SAMPLE"
 
-= render 'samples_helper'
+= render 'samples_js'
