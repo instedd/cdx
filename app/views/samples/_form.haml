@@ -47,28 +47,8 @@
       .col.pe-5
         = render "barcode_card"
 
-  -# = f.fields_for :test_qc_result, @sample.test_qc_result do |qc|
-  -#   .row
-  -#     .col.pe-2
-  -#       = qc.label :test_qc_result_assays, "Assays"
-  -#     .col
-  -#       .choose-picture.assay
-  -#         .upload-new-file.picture
-  -#           = qc.fields_for :test_qc_result_assays do |ay|
-  -#             .file-uploaded.picture-container
-  -#               = image_tag ay.object.picture.url(:card)
-  -#               .picture-title
-  -#                 = ay.object.picture_file_name
-  -#               .clear-label
-  -#                 = ay.check_box '_destroy', { id: "destroy_assay_#{ay.object.id}" }
-  -#                 %label.cross{:for => "destroy_assay_#{ay.object.id}" }
-  -#                   = image_tag "ic-cross.png"
-
-  -#           = qc.file_field :files, :class => "upload-picture",  accept: 'image/png,image/jpeg,image/gif', multiple: true
-  -#       .actions
-  -#         = button_tag id: 'undo_added_files', class: 'btn-link hidden' do
-  -#           .icon-close.btn-icon
-  -#           Undo added files
+  .col
+    = render 'form_assays', f: f
 
   .col
     = render 'form_notes', f: f

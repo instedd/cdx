@@ -12,6 +12,9 @@ class Sample < ActiveRecord::Base
   has_many :notes
   accepts_nested_attributes_for :notes, allow_destroy: true
 
+  has_many :assays, dependent: :destroy
+  accepts_nested_attributes_for :assays, allow_destroy: true
+
   validates_presence_of :institution
   validate :validate_encounter
   validate :validate_patient
@@ -71,6 +74,12 @@ class Sample < ActiveRecord::Base
 
   def has_entity_id?
     entity_ids.compact.any?
+  end
+
+  def new_assays=(pictures = [])
+    pictures.each do |picture|
+      assays.build(picture: picture)
+    end
   end
 
   def new_notes=(notes_list = [])

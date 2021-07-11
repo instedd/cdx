@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210711204458) do
+ActiveRecord::Schema.define(version: 20210711225220) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -113,6 +113,18 @@ ActiveRecord::Schema.define(version: 20210711204458) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "assays", force: :cascade do |t|
+    t.integer  "sample_id",            limit: 4
+    t.string   "picture_file_name",    limit: 255
+    t.string   "picture_content_type", limit: 255
+    t.integer  "picture_file_size",    limit: 4
+    t.datetime "picture_updated_at"
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "assays", ["sample_id"], name: "index_assays_on_sample_id", using: :btree
 
   create_table "batches", force: :cascade do |t|
     t.string   "uuid",           limit: 255
@@ -662,6 +674,7 @@ ActiveRecord::Schema.define(version: 20210711204458) do
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
   add_foreign_key "alerts", "institutions"
+  add_foreign_key "assays", "samples"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
   add_foreign_key "laboratory_samples", "batches"

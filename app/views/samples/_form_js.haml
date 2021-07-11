@@ -12,7 +12,7 @@
     }
 
     // Drag Picture to an input file and preview it
-    $('#laboratory_sample_test_qc_result_attributes_files').on('change', function(e) {
+    $('#sample_new_assays').on('change', function(e) {
       var files = e.target.files;
 
       for(var i = 0; i < files.length; i++) {
@@ -49,8 +49,8 @@
       $('#undo_added_files').addClass('hidden');
 
       // remove files from input FileList
-      var emptyClonedInput = $('#laboratory_sample_test_qc_result_attributes_files').val('').clone(true);
-      $('#laboratory_sample_test_qc_result_attributes_files')
+      var emptyClonedInput = $('#sample_new_assays').val('').clone(true);
+      $('#sample_new_assays')
         .replaceWith(emptyClonedInput);
     });
   })();

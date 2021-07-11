@@ -134,9 +134,10 @@ class SamplesController < ApplicationController
       :volume,
       :lab_technician,
       :is_quality_control,
+      assays_attributes: [ :id, :_destroy ],
+      new_assays: [],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
       new_notes: []
-      # test_qc_result_attributes: [ :id, files: [], test_qc_result_assays_attributes: [ :id, :_destroy ] ]
     )
 
     # quality control as boolean
