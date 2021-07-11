@@ -117,7 +117,7 @@ Rails.application.routes.draw do
     end
     collection do
       get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
-      get 'sample_or_batch_creation'
+      get 'new_sample_or_batch'
     end
   end
   resources :laboratory_samples do

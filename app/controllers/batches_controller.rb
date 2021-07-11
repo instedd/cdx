@@ -9,6 +9,10 @@ class BatchesController < ApplicationController
     @batches = perform_pagination(@batches)
   end
 
+  def new_sample_or_batch
+
+  end
+
   def new
     @batch_form = BatchForm.new()
     @can_edit_sample_quantity = true
@@ -60,10 +64,6 @@ class BatchesController < ApplicationController
     @batch_form.add_sample
 
     redirect_to edit_batch_path(@batch_form), notice: 'New sample was added successfully.'
-  end
-
-  def sample_or_batch_creation
-    render 'batch_or_sample_creation'
   end
 
   def bulk_destroy
