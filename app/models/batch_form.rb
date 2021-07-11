@@ -47,8 +47,8 @@ class BatchForm
   def create
     samples_quantity = self.samples_quantity.to_i
 
-    batch.laboratory_samples = (1..samples_quantity).map {
-      create_laboratory_sample
+    batch.samples = (1..samples_quantity).map {
+      create_sample
     }
 
     save
@@ -62,21 +62,15 @@ class BatchForm
   def create_sample
     Sample.new({
       institution: self.institution,
-      sample_identifiers: [SampleIdentifier.new]
+      sample_identifiers: [SampleIdentifier.new],
+      isolate_name: self.isolate_name,
+      production_date: self.date_produced,
+      inactivation_method: self.inactivation_method,
+      volume: self.volume,
+      lab_technician: self.lab_technician,
+      is_quality_control: false
     })
   end
-
-  # def create_laboratory_sample
-  #   LaboratorySample.new({
-  #     institution: self.institution,
-  #     is_quality_control: false,
-  #     inactivation_method: self.inactivation_method,
-  #     isolate_name: self.isolate_name,
-  #     volume: self.volume,
-  #     production_date: self.date_produced,
-  #     lab_technician: self.lab_technician
-  #   })
-  # end
 
   def self.edit(batch)
     new.tap do |form|
