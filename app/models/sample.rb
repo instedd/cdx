@@ -9,8 +9,10 @@ class Sample < ActiveRecord::Base
   has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy
   has_many :test_results, through: :sample_identifiers
 
-  validates_presence_of :institution
+  has_many :notes
+  accepts_nested_attributes_for :notes, allow_destroy: true
 
+  validates_presence_of :institution
   validate :validate_encounter
   validate :validate_patient
 
@@ -69,5 +71,14 @@ class Sample < ActiveRecord::Base
 
   def has_entity_id?
     entity_ids.compact.any?
+  end
+
+  def new_notes=(notes_list = [])
+    notes_list.each do |note|
+      notes.build(
+        description: note[:description],
+        user: note[:user],
+        )
+    end
   end
 end

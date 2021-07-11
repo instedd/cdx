@@ -33,38 +33,6 @@
       $(this).closest('.file-uploaded').addClass('remove');
     });
 
-    $(".clear-note > input[type='checkbox']").on('click', function(e) {
-      $(this).closest('.note').hide();
-    });
-
-    $("#add-note").on('click', function (e) {
-      e.preventDefault()
-
-      var newNote = {
-        info: "by #{current_user.full_name}",
-        description: $('#new-note').val().trim()
-      };
-
-      if (newNote.description === "") {
-        return;
-      }
-
-      // clear input
-      $('#new-note').val('');
-
-      var note = $('<div>', { class: 'note'})
-        .append($('<div>', { class: 'info' }).text(newNote.info))
-        .append($('<div>', { class: 'description' }).text(newNote.description))
-        .append($('<div>', { class: 'dashed-line' }));
-
-      var inputHidden = $('<input>', {
-        type: 'hidden',
-        name: 'laboratory_sample[new_notes][]'
-      }).val(newNote.description);
-
-      $('#notes').append(note).append(inputHidden);
-    });
-
     $('.assay > .upload-new-file').on('scroll', function(e) {
       var scrollDiff = $(this).scrollTop();
       // move dropzone-input into view

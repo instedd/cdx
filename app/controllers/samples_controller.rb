@@ -133,16 +133,21 @@ class SamplesController < ApplicationController
       :inactivation_method,
       :volume,
       :lab_technician,
-      :is_quality_control
-      # notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
-      # new_notes: [],
+      :is_quality_control,
+      notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
+      new_notes: []
       # test_qc_result_attributes: [ :id, files: [], test_qc_result_assays_attributes: [ :id, :_destroy ] ]
     )
+
+    # quality control as boolean
     sample_params[:is_quality_control] = sample_params[:is_quality_control] == '1'
-    # new_notes_with_author = (lab_sample_params[:new_notes] || []).map do |note_description|
-    #   {user: current_user, description: note_description}
-    # end
-    # lab_sample_params[:new_notes] = new_notes_with_author
+
+    # adding author to new notes
+    new_notes_with_author = (sample_params[:new_notes] || []).map do |note_description|
+      { user: current_user, description: note_description }
+    end
+    sample_params[:new_notes] = new_notes_with_author
+
     sample_params
   end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210710205858) do
+ActiveRecord::Schema.define(version: 20210711204458) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -343,14 +343,14 @@ ActiveRecord::Schema.define(version: 20210710205858) do
   end
 
   create_table "notes", force: :cascade do |t|
-    t.text     "description",          limit: 65535
-    t.integer  "user_id",              limit: 4
-    t.integer  "laboratory_sample_id", limit: 4
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.text     "description", limit: 65535
+    t.integer  "user_id",     limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "sample_id",   limit: 4
   end
 
-  add_index "notes", ["laboratory_sample_id"], name: "index_notes_on_laboratory_sample_id", using: :btree
+  add_index "notes", ["sample_id"], name: "index_notes_on_sample_id", using: :btree
   add_index "notes", ["user_id"], name: "index_notes_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: :cascade do |t|
@@ -666,6 +666,7 @@ ActiveRecord::Schema.define(version: 20210710205858) do
   add_foreign_key "encounters", "sites"
   add_foreign_key "laboratory_samples", "batches"
   add_foreign_key "laboratory_samples", "institutions"
+  add_foreign_key "notes", "samples"
   add_foreign_key "patients", "sites"
   add_foreign_key "samples", "batches"
 end

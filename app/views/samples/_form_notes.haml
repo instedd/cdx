@@ -1,0 +1,26 @@
+.row
+  .col.pe-2
+    = f.label :notes
+  #notes.col
+    = f.fields_for :notes, @sample.notes do |note|
+      .note
+        .info
+          = "by #{note.object.user.full_name} #{@localization_helper.format_datetime(note.object.updated_at)} "
+          .clear-note
+            = note.check_box '_destroy', { id: "destroy_note_#{note.object.id}" }
+            %label.cross{:for => "destroy_note_#{note.object.id}" }
+              = image_tag "ic-cross.png"
+        .description
+          = note.object.description
+        .dashed-line
+
+.row
+  .col.pe-2
+    = f.label :notes, "&nbsp;".html_safe
+  .col.notes-input
+    = text_field_tag "new-note","", {id: "new-note", placeholder: "Add Note"}
+    .actions
+      = button_tag id: 'add-note', class: 'btn-link' do
+        .icon-circle-plus.icon-blue.icon-margin
+
+= render 'form_notes_js'
