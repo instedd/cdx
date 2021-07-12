@@ -43,8 +43,9 @@
         .col
           = f.check_box :is_quality_control
           = f.label :is_quality_control, "&nbsp;".html_safe
-    - if @show_barcode_preview
-      .col.pe-5
+
+    .col.pe-5
+      - if @show_barcode_preview
         = render "barcode_card"
 
   .col
