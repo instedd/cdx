@@ -83,7 +83,7 @@ class BatchForm
       self.send("#{attr}=", value)
     end
 
-    @batch.laboratory_samples.each do |sample|
+    @batch.samples.each do |sample|
       sample.mark_for_destruction if remove_sample_ids.include? sample.id
     end
 

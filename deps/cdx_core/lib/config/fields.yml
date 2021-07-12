@@ -26,24 +26,6 @@ entities:
       volume:
         type: float
       lab_technician:
-  laboratory_sample: &LABORATORY_SAMPLE
-    allows_custom: true
-    fields:
-      is_quality_control:
-        type: boolean
-      isolate_name:
-        searchable: true
-      production_date:
-        type: date
-      inactivation_method:
-        type: enum
-        options:
-          - Formaldehyde
-          - Heat
-          - UV-C
-      volume:
-        type: float
-      lab_technician:
   batch: &BATCH
     fields:
       batch_number:
