@@ -8,32 +8,38 @@ class SamplesController < ApplicationController
     @samples = perform_pagination(@samples)
   end
 
-  # def new
-  #   @sample = LaboratorySample.new
-  #   session[:creating_sample_uuid] = @sample.uuid
-  #   @show_barcode_preview = false
-  # end
+  def new
+    session[:creating_sample_uuid] = SampleIdentifier.new.uuid
+    @sample = Sample.new({
+      institution: @navigation_context.institution,
+      sample_identifiers: [SampleIdentifier.new({uuid: session[:creating_sample_uuid]})]
+    })
 
-  # def create
-  #   uuid = session[:creating_sample_uuid]
+    @view_helper = view_helper_for(@sample)
 
-  #   if uuid.blank?
-  #     redirect_to new_laboratory_sample_path, notice: 'There was an error creating the sample'
-  #     return
-  #   end
+    @show_barcode_preview = false
+  end
 
-  #   @sample = LaboratorySample.new(sample_params.merge({
-  #     uuid: uuid,
-  #     institution: @navigation_context.institution
-  #   }))
+  def create
+    uuid = session[:creating_sample_uuid]
 
-  #   if @sample.save
-  #     session.delete(:creating_sample_uuid)
-  #     redirect_to samples_path, notice: 'Sample was successfully created.'
-  #   else
-  #     render action: 'new'
-  #   end
-  # end
+    if uuid.blank?
+      redirect_to new_sample_path, notice: 'There was an error creating the sample'
+      return
+    end
+
+    @sample = Sample.new(sample_params.merge({
+      institution: @navigation_context.institution,
+      sample_identifiers: [SampleIdentifier.new({uuid: uuid})]
+    }))
+
+    if @sample.save
+      session.delete(:creating_sample_uuid)
+      redirect_to samples_path, notice: 'Sample was successfully created.'
+    else
+      render action: 'new'
+    end
+  end
 
   def print
     @sample = Sample.find(params[:id])
@@ -84,10 +90,7 @@ class SamplesController < ApplicationController
     @sample = Sample.find(params[:id])
     # @sample.test_qc_result = TestQcResult.new if @sample.test_qc_result.nil?
 
-    @view_helper = {
-      production_date_placeholder: date_format[:placeholder],
-      back_path: conditional_root_path(@sample)
-    }
+    @view_helper = view_helper_for(@sample)
 
     @show_barcode_preview = true
     @show_print_action = true
@@ -156,9 +159,17 @@ class SamplesController < ApplicationController
     { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
   end
 
+  def view_helper_for(sample)
+    { production_date_placeholder: date_format[:placeholder], back_path: conditional_root_path(sample) }
+  end
+
   def conditional_root_path(sample)
     if sample.batch.nil?
-      sample_path(sample)
+      if sample.id.nil?
+        new_sample_or_batch_batches_path
+      else
+        sample_path(sample)
+      end
     else
       edit_batch_path(sample.batch)
     end
