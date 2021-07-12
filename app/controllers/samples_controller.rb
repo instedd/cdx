@@ -105,7 +105,7 @@ class SamplesController < ApplicationController
     # return unless authorize_resource(patient, UPDATE_PATIENT)
 
     if @sample.update(sample_params)
-      redirect_to conditional_root_path(@sample), notice: 'Sample was successfully updated.'
+      redirect_to conditional_back_path(@sample), notice: 'Sample was successfully updated.'
     else
       render action: 'edit'
     end
@@ -160,15 +160,15 @@ class SamplesController < ApplicationController
   end
 
   def view_helper_for(sample)
-    { production_date_placeholder: date_format[:placeholder], back_path: conditional_root_path(sample) }
+    { production_date_placeholder: date_format[:placeholder], back_path: conditional_back_path(sample) }
   end
 
-  def conditional_root_path(sample)
+  def conditional_back_path(sample)
     if sample.batch.nil?
       if sample.id.nil?
         new_sample_or_batch_batches_path
       else
-        sample_path(sample)
+        samples_path
       end
     else
       edit_batch_path(sample.batch)
