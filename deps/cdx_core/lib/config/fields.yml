@@ -15,7 +15,7 @@ entities:
         type: boolean
       isolate_name:
         searchable: true
-      production_date:
+      date_produced:
         type: date
       inactivation_method:
         type: enum

@@ -64,7 +64,7 @@ class BatchForm
       institution: self.institution,
       sample_identifiers: [SampleIdentifier.new],
       isolate_name: self.isolate_name,
-      production_date: self.date_produced,
+      date_produced: self.date_produced,
       inactivation_method: self.inactivation_method,
       volume: self.volume,
       lab_technician: self.lab_technician,

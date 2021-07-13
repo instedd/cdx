@@ -132,7 +132,7 @@ class SamplesController < ApplicationController
   def sample_params
     sample_params = params.require(:sample).permit(
       :isolate_name,
-      :production_date,
+      :date_produced,
       :inactivation_method,
       :volume,
       :lab_technician,
@@ -160,7 +160,7 @@ class SamplesController < ApplicationController
   end
 
   def view_helper_for(sample)
-    { production_date_placeholder: date_format[:placeholder], back_path: conditional_back_path(sample) }
+    { date_produced_placeholder: date_format[:placeholder], back_path: conditional_back_path(sample) }
   end
 
   def conditional_back_path(sample)

@@ -30,7 +30,7 @@ describe Cdx do
       "sample.uuid",
       "sample.is_quality_control",
       "sample.isolate_name",
-      "sample.production_date",
+      "sample.date_produced",
       "sample.inactivation_method",
       "sample.volume",
       "sample.lab_technician",

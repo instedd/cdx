@@ -28,7 +28,7 @@ class Sample < ActiveRecord::Base
                   :inactivation_method,
                   :volume,
                   :lab_technician,
-                  :production_date
+                  :date_produced
 
   INACTIVATION_METHOD_VALUES = entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   # validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
