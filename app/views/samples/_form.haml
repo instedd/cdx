@@ -24,10 +24,10 @@
 
       .row
         .col.pe-4
-          = f.label :is_quality_control, "quality control"
+          = f.label :specimen_role
         .col
-          = f.check_box :is_quality_control
-          = f.label :is_quality_control, "&nbsp;".html_safe
+          = cdx_select form: f, name: :specimen_role, searchable: false, :class => 'input-large' do |select|
+            - select.items SampleForm::SPECIMEN_ROLE_VALUES
 
       .row
         .col.pe-4

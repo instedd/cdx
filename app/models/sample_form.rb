@@ -3,14 +3,14 @@ class SampleForm
 
   # shared editable attributes with model
   def self.shared_attributes
-    [ :uuid,
-      :institution,
-      :isolate_name,
+    [ :institution,
+      :uuid,
       :date_produced,
-      :inactivation_method,
-      :volume,
       :lab_technician,
-      :is_quality_control ]
+      :specimen_role,
+      :isolate_name,
+      :inactivation_method,
+      :volume ]
   end
 
   def self.model_name
@@ -104,11 +104,13 @@ class SampleForm
     return false
   end
 
+  validates_presence_of :lab_technician
+  SPECIMEN_ROLE_VALUES = Sample.entity_fields.detect { |f| f.name == 'specimen_role' }.options
+  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLE_VALUES, message: "is not within valid options (should be one of #{SPECIMEN_ROLE_VALUES.join(', ')})"
+  validates_presence_of :isolate_name
   INACTIVATION_METHOD_VALUES = Sample.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
-  validates_presence_of :isolate_name
   validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
-  validates_presence_of :lab_technician
 
   # begin date_produced
   # @date_produced is Time | Nil | String.

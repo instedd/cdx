@@ -75,7 +75,16 @@ class BatchesController < ApplicationController
   private
 
   def batch_params
-    params.require(:batch).permit(:isolate_name, :date_produced, :inactivation_method, :volume, :lab_technician, :samples_quantity, :batch_number)
+    params.require(:batch).permit(
+      :batch_number,
+      :date_produced,
+      :lab_technician,
+      :specimen_role,
+      :isolate_name,
+      :inactivation_method,
+      :volume,
+      :samples_quantity
+    )
   end
 
   def remove_samples_params

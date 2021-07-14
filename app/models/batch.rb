@@ -13,7 +13,11 @@ class Batch < ActiveRecord::Base
 
   attribute_field :isolate_name, copy: true
   attribute_field :batch_number, copy: true
-  attribute_field :date_produced, :inactivation_method, :volume, :lab_technician
+  attribute_field :date_produced,
+                  :lab_technician,
+                  :specimen_role,
+                  :inactivation_method,
+                  :volume
 
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_presence_of :inactivation_method

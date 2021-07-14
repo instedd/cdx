@@ -11,8 +11,20 @@ entities:
         searchable: true
       collection_date:
         type: date
-      is_quality_control:
-        type: boolean
+      specimen_role:
+        type: enum
+        options:
+          - B - Blind Sample
+          - C - Calibrator
+          - E - Electronic QC
+          - F - Filler
+          - G - Group
+          - L - Pool
+          - O - Operator Proficiency
+          - P - Patient
+          - Q - Control specimen
+          - R - Replicate
+          - V - Verifying Calibrator
       isolate_name:
         searchable: true
       date_produced:
@@ -30,10 +42,25 @@ entities:
     fields:
       batch_number:
         searchable: true
-      isolate_name:
-        searchable: true
       date_produced:
         type: date
+        searchable: true
+      lab_technician:
+      specimen_role:
+        type: enum
+        options:
+          - B - Blind Sample
+          - C - Calibrator
+          - E - Electronic QC
+          - F - Filler
+          - G - Group
+          - L - Pool
+          - O - Operator Proficiency
+          - P - Patient
+          - Q - Control specimen
+          - R - Replicate
+          - V - Verifying Calibrator
+      isolate_name:
         searchable: true
       inactivation_method:
         type: enum
@@ -45,7 +72,6 @@ entities:
       volume:
         type: float
         searchable: true
-      lab_technician:
   test: &TEST
     allows_custom: true
     fields:
