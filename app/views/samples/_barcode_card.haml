@@ -2,15 +2,15 @@
   .row.barcode-content
     .row
       .title
-        = @sample.institution
+        = @sample_form.institution
     .row
-      = image_tag barcode_img_data_url(@sample.uuid)
-      .code Sample ID #{@sample.uuid}
+      = image_tag barcode_img_data_url(@sample_form.uuid)
+      .code Sample ID #{@sample_form.uuid}
     .row.logo
       = image_tag 'cdx-logo-bw.png', style: 'width: 20%;'
       .label https://cdx.io
   - if @show_print_action
     .row.actions
-      = link_to print_sample_path(@sample), download: "cdx_sample_#{@sample.uuid}.pdf", target: "_blank", class: 'btn-link' do
+      = link_to print_sample_path(@sample_form), download: "cdx_sample_#{@sample_form.uuid}.pdf", target: "_blank", class: 'btn-link' do
         .icon-print.btn-icon
         %span Print

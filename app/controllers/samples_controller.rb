@@ -10,13 +10,14 @@ class SamplesController < ApplicationController
 
   def new
     session[:creating_sample_uuid] = SampleIdentifier.new.uuid
-    @sample = Sample.new({
+
+    sample = Sample.new({
       institution: @navigation_context.institution,
       sample_identifiers: [SampleIdentifier.new({uuid: session[:creating_sample_uuid]})]
     })
 
-    @view_helper = view_helper_for(@sample)
-
+    @sample_form = SampleForm.for(sample)
+    @view_helper = view_helper_for(sample)
     @show_barcode_preview = false
   end
 
@@ -28,15 +29,17 @@ class SamplesController < ApplicationController
       return
     end
 
-    @sample = Sample.new(sample_params.merge({
+    sample = Sample.new(sample_params.merge({
       institution: @navigation_context.institution,
       sample_identifiers: [SampleIdentifier.new({uuid: uuid})]
     }))
+    @sample_form = SampleForm.for(sample)
 
-    if @sample.save
+    if @sample_form.save
       session.delete(:creating_sample_uuid)
       redirect_to samples_path, notice: 'Sample was successfully created.'
     else
+      @view_helper = view_helper_for(sample)
       render action: 'new'
     end
   end
@@ -87,10 +90,10 @@ class SamplesController < ApplicationController
   end
 
   def edit
-    @sample = Sample.find(params[:id])
-    # @sample.test_qc_result = TestQcResult.new if @sample.test_qc_result.nil?
+    sample = Sample.find(params[:id])
+    @sample_form = SampleForm.for(sample)
 
-    @view_helper = view_helper_for(@sample)
+    @view_helper = view_helper_for(sample)
 
     @show_barcode_preview = true
     @show_print_action = true
@@ -100,13 +103,16 @@ class SamplesController < ApplicationController
   end
 
   def update
-    @sample = Sample.find(params[:id])
+    sample = Sample.find(params[:id])
+    @sample_form = SampleForm.for(sample)
+
     # TODO:
     # return unless authorize_resource(patient, UPDATE_PATIENT)
 
-    if @sample.update(sample_params)
-      redirect_to conditional_back_path(@sample), notice: 'Sample was successfully updated.'
+    if @sample_form.update(sample_params)
+      redirect_to conditional_back_path(sample), notice: 'Sample was successfully updated.'
     else
+      @view_helper = view_helper_for(sample)
       render action: 'edit'
     end
   end

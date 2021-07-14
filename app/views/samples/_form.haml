@@ -1,6 +1,6 @@
-= form_for(@sample) do |f|
+= form_for(@sample_form) do |f|
 
-  = validation_errors @sample
+  = validation_errors @sample_form
 
   .row
     .col
@@ -24,7 +24,7 @@
           = f.label :inactivation_method
         .col
           = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
-            - select.items Sample::INACTIVATION_METHOD_VALUES
+            - select.items SampleForm::INACTIVATION_METHOD_VALUES
       .row
         .col.pe-4
           = f.label :volume
@@ -60,6 +60,6 @@
       = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'
 
       - if @can_delete
-        = confirm_deletion_button @sample, 'sample'
+        = confirm_deletion_button @sample_form, 'sample'
 
 = render 'form_js'
