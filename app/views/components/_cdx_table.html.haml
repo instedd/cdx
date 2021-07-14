@@ -4,11 +4,13 @@
     - if cdx_table[:title] || cdx_table[:actions]
       %tr
         %th.tableheader{colspan:100}
-          - if cdx_table[:title]
-            .table-title= cdx_table[:title]
-          - if cdx_table[:actions]
-            .table-actions= cdx_table[:actions]
-
+          .table-info
+            - if cdx_table[:title]
+              .table-title= cdx_table[:title]
+            .separator
+            - if cdx_table[:actions]
+              .table-actions= cdx_table[:actions]
+          .solid-line
     = cdx_table[:thead]
   %tbody
     = cdx_table[:tbody]

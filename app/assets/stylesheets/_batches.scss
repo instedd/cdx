@@ -104,3 +104,60 @@
     font-size: 30px;
   }
 }
+
+.tab-buttons{
+  display: flex;
+  align-items: flex-start;
+  margin-top: 35px;
+  .icons-group {
+    display: flex;
+    flex-direction: column;
+    .selected-icon-tab {
+      border-left: black;
+      padding: 5px;
+      width: 50px;
+      height: 50px;
+      border-style: none none none solid;
+      border-width: 10px;
+      margin-bottom: 4px;
+    }
+  }
+  .tab-batch {
+    background-color: white;
+    margin-bottom: 10px;
+    font-size: 30px;
+    color: rgba(0, 0, 0, 0.4);
+    padding: 15px;
+    &.selected {
+      padding: 0px;
+      color: black;
+      font-weight: bold;
+    }
+  }
+
+  .tab-sample {
+    background-color: white;
+    margin-bottom: 10px;
+    font-size: 30px;
+    color: rgba(0, 0, 0, 0.4);
+    padding: 15px;
+    &.selected {
+      padding: 0px;
+      color: black;
+      font-weight: bold;
+    }
+  }
+}
+
+.solid-line {
+  opacity: 0.1;
+  border-bottom: 1px solid #000000;
+  margin: 16px 0px;
+}
+
+.tab-separator {
+  width: 0.1px;
+  height: 100%;
+  border-right: 1px solid black;
+  opacity: 0.1;
+}

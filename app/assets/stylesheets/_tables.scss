@@ -88,8 +88,19 @@
     tr:last-child td {
       border-bottom: none;
     }
-  }
 
+    .table-info {
+      display: flex;
+      align-items: center;
+    }
+  }
+  .separator {
+    width: 0.1px;
+    height: 35px;
+    border-right: 1px solid #000000;
+    opacity: 0.1;
+    margin: 0px 4px;
+  }
   .pagination {
     .btn-link {
       color: $gray4;

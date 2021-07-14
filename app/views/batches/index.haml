@@ -1,7 +1,7 @@
 = render "filters"
 
 .row
-  .col
+  .col.pe-9
     - if @batches.empty?
       = empty_data title: 'No batches', icon: 'icon-outline-test xx-large' do |c|
         - c.body do
@@ -15,18 +15,16 @@
               .icon-trash.btn-icon
           - t.columns do
             %col{:width => "5%"}
+            %col{:width => "15%"}
+            %col{:width => "15%"}
+            %col{:width => "20%"}
             %col{:width => "25%"}
-            %col{:width => "15%"}
-            %col{:width => "10%"}
-            %col{:width => "15%"}
-            %col{:width => "15%"}
-            %col{:width => "15%"}
+            %col{:width => "20%"}
           - t.thead do
             %tr
               %th
               %th Isolate name
               %th Batch ID
-              %th Volume
               %th Lab Technician
               %th Inactivation Method
               %th Date Produced
@@ -45,3 +43,11 @@
 
       .pagination
         = render 'shared/pagination'
+
+  .col.tab-buttons
+    .tab-separator
+    .icons-group
+      .selected-icon-tab
+        .icon-batch.tab-batch.selected
+      = link_to samples_path do
+        .icon-sample.tab-sample
