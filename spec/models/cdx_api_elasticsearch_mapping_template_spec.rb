@@ -41,6 +41,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "type"=> "string",
                 "index"=> "not_analyzed"
               },
+              "isolate_name"=> {
+                "type"=>"string",
+                "index"=>"not_analyzed"
+              },
               "custom_fields" => {
                 "type" => "object"
               }

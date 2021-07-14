@@ -4,10 +4,10 @@
       .row
         .col
           %h1
-            = link_to "+", new_laboratory_sample_path, class: 'btn-add side-link fix', title: 'Add sample'
+            = link_to "+", new_sample_path, class: 'btn-add side-link fix', title: 'Add sample'
             Samples
 
-      %form#filters-form{action: laboratory_samples_path, "data-auto-submit" => true}
+      %form#filters-form{action: samples_path, "data-auto-submit" => true}
         %input{type: "hidden", name: "page_size", value: @page_size}
         .row
           .filter

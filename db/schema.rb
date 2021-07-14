@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210701173411) do
+ActiveRecord::Schema.define(version: 20210712213544) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -108,21 +108,40 @@ ActiveRecord::Schema.define(version: 20210701173411) do
     t.integer "site_id",  limit: 4, null: false
   end
 
+  create_table "ar_internal_metadata", primary_key: "key", force: :cascade do |t|
+    t.string   "value",      limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "assays", force: :cascade do |t|
+    t.integer  "sample_id",            limit: 4
+    t.string   "picture_file_name",    limit: 255
+    t.string   "picture_content_type", limit: 255
+    t.integer  "picture_file_size",    limit: 4
+    t.datetime "picture_updated_at"
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "assays", ["sample_id"], name: "index_assays_on_sample_id", using: :btree
+
   create_table "batches", force: :cascade do |t|
     t.string   "uuid",           limit: 255
     t.text     "core_fields",    limit: 65535
     t.text     "custom_fields",  limit: 65535
     t.binary   "sensitive_data", limit: 65535
+    t.string   "isolate_name",   limit: 255
     t.datetime "deleted_at"
     t.integer  "institution_id", limit: 4
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
-    t.string   "isolate_name",   limit: 255
     t.string   "batch_number",   limit: 255
   end
 
   add_index "batches", ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree
   add_index "batches", ["institution_id"], name: "index_batches_on_institution_id", using: :btree
+  add_index "batches", ["isolate_name"], name: "index_batches_on_isolate_name", using: :btree
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -308,24 +327,6 @@ ActiveRecord::Schema.define(version: 20210701173411) do
 
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
 
-  create_table "laboratory_samples", force: :cascade do |t|
-    t.string   "uuid",           limit: 255
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-    t.integer  "institution_id", limit: 4
-    t.integer  "batch_id",       limit: 4
-    t.text     "core_fields",    limit: 65535
-    t.text     "custom_fields",  limit: 65535
-    t.binary   "sensitive_data", limit: 65535
-    t.datetime "deleted_at"
-    t.string   "isolate_name",   limit: 255
-  end
-
-  add_index "laboratory_samples", ["batch_id"], name: "index_laboratory_samples_on_batch_id", using: :btree
-  add_index "laboratory_samples", ["deleted_at"], name: "index_laboratory_samples_on_deleted_at", using: :btree
-  add_index "laboratory_samples", ["institution_id"], name: "index_laboratory_samples_on_institution_id", using: :btree
-  add_index "laboratory_samples", ["isolate_name"], name: "index_laboratory_samples_on_isolate_name", using: :btree
-
   create_table "manifests", force: :cascade do |t|
     t.string   "version",         limit: 255
     t.text     "definition",      limit: 65535
@@ -336,14 +337,14 @@ ActiveRecord::Schema.define(version: 20210701173411) do
   end
 
   create_table "notes", force: :cascade do |t|
-    t.text     "description",          limit: 65535
-    t.integer  "user_id",              limit: 4
-    t.integer  "laboratory_sample_id", limit: 4
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.text     "description", limit: 65535
+    t.integer  "user_id",     limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "sample_id",   limit: 4
   end
 
-  add_index "notes", ["laboratory_sample_id"], name: "index_notes_on_laboratory_sample_id", using: :btree
+  add_index "notes", ["sample_id"], name: "index_notes_on_sample_id", using: :btree
   add_index "notes", ["user_id"], name: "index_notes_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: :cascade do |t|
@@ -490,8 +491,10 @@ ActiveRecord::Schema.define(version: 20210701173411) do
     t.integer  "encounter_id",   limit: 4
     t.boolean  "is_phantom",                   default: true
     t.datetime "deleted_at"
+    t.integer  "batch_id",       limit: 4
   end
 
+  add_index "samples", ["batch_id"], name: "index_samples_on_batch_id", using: :btree
   add_index "samples", ["deleted_at"], name: "index_samples_on_deleted_at", using: :btree
   add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
@@ -548,30 +551,6 @@ ActiveRecord::Schema.define(version: 20210701173411) do
   end
 
   add_index "subscribers", ["filter_id"], name: "index_subscribers_on_filter_id", using: :btree
-
-  create_table "test_qc_result_assays", force: :cascade do |t|
-    t.integer  "test_qc_result_id",    limit: 4
-    t.string   "picture_file_name",    limit: 255
-    t.string   "picture_content_type", limit: 255
-    t.integer  "picture_file_size",    limit: 4
-    t.datetime "picture_updated_at"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
-  add_index "test_qc_result_assays", ["test_qc_result_id"], name: "index_test_qc_result_assays_on_test_qc_result_id", using: :btree
-
-  create_table "test_qc_results", force: :cascade do |t|
-    t.integer  "laboratory_sample_id", limit: 4
-    t.string   "picture_file_name",    limit: 255
-    t.string   "picture_content_type", limit: 255
-    t.integer  "picture_file_size",    limit: 4
-    t.datetime "picture_updated_at"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
-  add_index "test_qc_results", ["laboratory_sample_id"], name: "index_test_qc_results_on_laboratory_sample_id", using: :btree
 
   create_table "test_result_parsed_data", force: :cascade do |t|
     t.integer  "test_result_id", limit: 4
@@ -657,9 +636,10 @@ ActiveRecord::Schema.define(version: 20210701173411) do
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
   add_foreign_key "alerts", "institutions"
+  add_foreign_key "assays", "samples"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
-  add_foreign_key "laboratory_samples", "batches"
-  add_foreign_key "laboratory_samples", "institutions"
+  add_foreign_key "notes", "samples"
   add_foreign_key "patients", "sites"
+  add_foreign_key "samples", "batches"
 end

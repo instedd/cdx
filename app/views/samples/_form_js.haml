@@ -12,7 +12,7 @@
     }
 
     // Drag Picture to an input file and preview it
-    $('#laboratory_sample_test_qc_result_attributes_files').on('change', function(e) {
+    $('#sample_new_assays').on('change', function(e) {
       var files = e.target.files;
 
       for(var i = 0; i < files.length; i++) {
@@ -33,38 +33,6 @@
       $(this).closest('.file-uploaded').addClass('remove');
     });
 
-    $(".clear-note > input[type='checkbox']").on('click', function(e) {
-      $(this).closest('.note').hide();
-    });
-
-    $("#add-note").on('click', function (e) {
-      e.preventDefault()
-
-      var newNote = {
-        info: "by #{current_user.full_name}",
-        description: $('#new-note').val().trim()
-      };
-
-      if (newNote.description === "") {
-        return;
-      }
-
-      // clear input
-      $('#new-note').val('');
-
-      var note = $('<div>', { class: 'note'})
-        .append($('<div>', { class: 'info' }).text(newNote.info))
-        .append($('<div>', { class: 'description' }).text(newNote.description))
-        .append($('<div>', { class: 'dashed-line' }));
-
-      var inputHidden = $('<input>', {
-        type: 'hidden',
-        name: 'laboratory_sample[new_notes][]'
-      }).val(newNote.description);
-
-      $('#notes').append(note).append(inputHidden);
-    });
-
     $('.assay > .upload-new-file').on('scroll', function(e) {
       var scrollDiff = $(this).scrollTop();
       // move dropzone-input into view
@@ -81,8 +49,8 @@
       $('#undo_added_files').addClass('hidden');
 
       // remove files from input FileList
-      var emptyClonedInput = $('#laboratory_sample_test_qc_result_attributes_files').val('').clone(true);
-      $('#laboratory_sample_test_qc_result_attributes_files')
+      var emptyClonedInput = $('#sample_new_assays').val('').clone(true);
+      $('#sample_new_assays')
         .replaceWith(emptyClonedInput);
     });
   })();

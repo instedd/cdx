@@ -8,7 +8,7 @@
           %h1 There are no samples
           %p Every sample will have a UUID and a barcode
     - else
-      =form_tag bulk_action_laboratory_samples_path, :id => 'laboratory_samples_form' , :method => :get do
+      =form_tag bulk_action_samples_path, :id => 'samples_form' , :method => :get do
         = cdx_table title: pluralize(@total, "sample") do |t|
           - t.actions do
             =button_tag class: 'btn-link', name: 'bulk_action', value: 'print' do
@@ -25,7 +25,7 @@
               %th Sample Id
           - t.tbody do
             - @samples.each do |sample|
-              %tr.laboratory-sample-row{data: {href: edit_laboratory_sample_path(sample) }}
+              %tr.laboratory-sample-row{data: {href: edit_sample_path(sample) }}
                 %td
                   =check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
                   %label.row{for: "sample_ids.#{sample.id}"}

@@ -1,19 +1,20 @@
-class BatchForm
+class SampleForm
   include ActiveModel::Model
 
   # shared editable attributes with model
   def self.shared_attributes
-    [ :institution,
+    [ :uuid,
+      :institution,
       :isolate_name,
       :date_produced,
       :inactivation_method,
       :volume,
-      :batch_number,
-      :lab_technician ]
+      :lab_technician,
+      :is_quality_control ]
   end
 
   def self.model_name
-    Batch.model_name
+    Sample.model_name
   end
 
   def model_name
@@ -22,103 +23,92 @@ class BatchForm
 
   def self.human_attribute_name(*args)
     # required to bind validations to active record i18n
-    Batch.human_attribute_name(*args)
+    Sample.human_attribute_name(*args)
   end
 
   attr_accessor *shared_attributes
-  attr_accessor :samples_quantity
-  delegate :id, :new_record?, :persisted?, to: :batch
+  delegate :id, :new_record?, :persisted?, to: :sample
+  delegate :uuid, :assays, :notes, to: :sample
 
-  def batch
-    @batch ||= Batch.new
-  end
-
-  def batch=(value)
-    @batch = value
-    self.class.assign_attributes(self, @batch)
-
-    self.date_produced = if @batch.date_produced.is_a?(Time)
-                           @batch.date_produced
-                         else
-                           Time.strptime(@batch.date_produced, date_format[:pattern]) rescue @batch.date_produced
-                         end
-  end
-
-  def create
-    samples_quantity = self.samples_quantity.to_i
-
-    batch.samples = (1..samples_quantity).map {
-      create_sample
-    }
-
-    save
-  end
-
-  def add_sample
-    batch.samples.push create_sample
-    save
-  end
-
-  def create_sample
-    Sample.new({
-      institution: self.institution,
-      sample_identifiers: [SampleIdentifier.new],
-      isolate_name: self.isolate_name,
-      date_produced: self.date_produced,
-      inactivation_method: self.inactivation_method,
-      volume: self.volume,
-      lab_technician: self.lab_technician,
-      is_quality_control: false
-    })
-  end
-
-  def self.edit(batch)
+  def self.for(sample)
     new.tap do |form|
-      form.batch = batch
+      form.sample = sample
     end
   end
 
-  def update(attributes, remove_sample_ids)
+  def sample
+    @sample # ||= Sample.new
+  end
+
+  def sample=(value)
+    @sample = value
+    self.class.assign_attributes(self, @sample)
+
+    self.date_produced =
+      if @sample.date_produced.is_a?(Time)
+        @sample.date_produced
+      else
+        Time.strptime(@sample.date_produced, date_format[:pattern]) rescue @sample.date_produced
+      end
+  end
+
+  # Used by fields_for
+  def assays_attributes=(assays)
+    @sample.assays_attributes = assays
+  end
+
+  # Used by fields_for
+  def notes_attributes=(notes)
+    @sample.notes_attributes = notes
+  end
+
+  def new_assays=(assays = [])
+    @sample.new_assays = assays
+  end
+
+  def new_notes=(notes = [])
+    @sample.new_notes = notes
+  end
+
+  def self.edit(sample)
+    new.tap do |form|
+      form.sample = sample
+    end
+  end
+
+  def update(attributes)
     attributes.each do |attr, value|
       self.send("#{attr}=", value)
-    end
-
-    @batch.samples.each do |sample|
-      sample.mark_for_destruction if remove_sample_ids.include? sample.id
     end
 
     save
   end
 
   def save
-    self.class.assign_attributes(batch, self)
-    # we need to set a Time in batch instead of self.date_produced :: String
-    batch.date_produced = @date_produced
+    self.class.assign_attributes(sample, self)
+    # we need to set a Time in sample instead of self.date_produced :: String
+    sample.date_produced = @date_produced
 
     # validate forms. stop if invalid
     form_valid = self.valid?
     return false unless form_valid
 
     # validate/save. All done if succeeded
-    is_valid = batch.save
+    is_valid = sample.save
     return true if is_valid
 
     # copy validations from model to form (form is valid, but model is not)
-    batch.errors.each do |key, error|
+    sample.errors.each do |key, error|
       errors.add(key, error) if self.class.shared_attributes.include?(key)
     end
     return false
   end
 
-  INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
+  INACTIVATION_METHOD_VALUES = Sample.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
-
+  validates_presence_of :isolate_name
   validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
-  validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
-
-  def creating_batch?
-    self.batch.id.nil?
-  end
+  validates_presence_of :lab_technician
 
   # begin date_produced
   # @date_produced is Time | Nil | String.

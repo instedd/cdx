@@ -1,0 +1,65 @@
+= form_for(@sample_form) do |f|
+
+  = validation_errors @sample_form
+
+  .row
+    .col
+      .row
+        .col.pe-4
+          = f.label :uuid
+        .col
+          .value= f.object.uuid
+      .row
+        .col.pe-4
+          = f.label :isolate_name
+        .col
+          = f.text_field :isolate_name, :class => 'input-x-large'
+      .row
+        .col.pe-4
+          = f.label :date_produced
+        .col
+          = f.text_field :date_produced, placeholder: @view_helper[:date_produced_placeholder]
+      .row
+        .col.pe-4
+          = f.label :inactivation_method
+        .col
+          = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
+            - select.items SampleForm::INACTIVATION_METHOD_VALUES
+      .row
+        .col.pe-4
+          = f.label :volume
+        .col
+          .row.input-unit
+            = f.number_field :volume, min: 0, step: :any, :class => "input-small"
+            .span.unit (μl)
+      .row
+        .col.pe-4
+          = f.label :lab_technician
+        .col
+          = f.text_field :lab_technician, :class => 'input-x-large'
+      .row
+        .col.pe-4
+          = f.label :is_quality_control, "quality control"
+        .col
+          = f.check_box :is_quality_control
+          = f.label :is_quality_control, "&nbsp;".html_safe
+
+    .col.pe-5
+      - if @show_barcode_preview
+        = render "barcode_card"
+
+  .col
+    = render 'form_assays', f: f
+
+  .col
+    = render 'form_notes', f: f
+
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'
+
+      - if @can_delete
+        = confirm_deletion_button @sample_form, 'sample'
+
+= render 'form_js'

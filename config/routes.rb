@@ -102,22 +102,22 @@ Rails.application.routes.draw do
       post 'reprocess'
     end
   end
-  resources :batches do
-    member do
-      post 'add_laboratory_sample'
-    end
-    collection do
-      get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
-      get 'sample_or_batch_creation'
-    end
-  end
-  resources :laboratory_samples do
+  resources :samples do
     member do
       get 'print'
     end
     collection do
       get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'print' }, action: :bulk_print
       get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+    end
+  end
+  resources :batches do
+    member do
+      post 'add_sample'
+    end
+    collection do
+      get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+      get 'new_sample_or_batch'
     end
   end
   resources :test_results , only: [:index, :show]

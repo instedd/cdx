@@ -5,7 +5,7 @@ class Batch < ActiveRecord::Base
   belongs_to :institution
   validates_presence_of :institution
 
-  has_many :laboratory_samples, dependent: :destroy, autosave: true
+  has_many :samples, dependent: :destroy, autosave: true
 
   def self.entity_scope
     "batch"
@@ -50,6 +50,4 @@ class Batch < ActiveRecord::Base
       errors.add(:isolate_name, "and Batch Number combination should be unique")
     end
   end
-
-
 end

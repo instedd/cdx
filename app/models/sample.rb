@@ -4,18 +4,31 @@ class Sample < ActiveRecord::Base
   belongs_to :institution
   belongs_to :patient
   belongs_to :encounter
+  belongs_to :batch
 
   has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy
   has_many :test_results, through: :sample_identifiers
 
-  validates_presence_of :institution
+  has_many :notes, dependent: :destroy
+  accepts_nested_attributes_for :notes, allow_destroy: true
 
+  has_many :assays, dependent: :destroy
+  accepts_nested_attributes_for :assays, allow_destroy: true
+
+  validates_presence_of :institution
   validate :validate_encounter
   validate :validate_patient
 
   def self.entity_scope
     "sample"
   end
+
+  attribute_field :isolate_name,
+                  :is_quality_control,
+                  :inactivation_method,
+                  :volume,
+                  :lab_technician,
+                  :date_produced
 
   def self.find_by_entity_id(entity_id, opts)
     query = joins(:sample_identifiers).where(sample_identifiers: {entity_id: entity_id.to_s}, institution_id: opts.fetch(:institution_id))
@@ -37,6 +50,10 @@ class Sample < ActiveRecord::Base
     self
   end
 
+  def uuid=(value)
+    # dummy setter needed by SampleForm
+  end
+
   def uuid
     uuids.sort.first
   end
@@ -55,5 +72,24 @@ class Sample < ActiveRecord::Base
 
   def has_entity_id?
     entity_ids.compact.any?
+  end
+
+  def new_assays=(pictures = [])
+    pictures.each do |picture|
+      assays.build(
+        picture: picture,
+        sample: self
+      )
+    end
+  end
+
+  def new_notes=(notes_list = [])
+    notes_list.each do |note|
+      notes.build(
+        description: note[:description],
+        user: note[:user],
+        sample: self
+      )
+    end
   end
 end

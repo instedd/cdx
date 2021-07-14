@@ -4,8 +4,8 @@
       .row
         .col
           %h2
-            = link_to laboratory_samples_path, class: 'side-link', title: 'Back' do
+            = link_to @view_helper[:back_path], class: 'side-link', title: 'Back' do
               = image_tag "arrow-left.png"
-            = @sample.uuid
+            = @sample_form.uuid
 
 = render 'form'

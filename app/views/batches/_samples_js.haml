@@ -99,7 +99,7 @@
   }
 
   function createBulkActionURL(action, sampleIds) {
-    var url = new URL("#{ javascript_url Rails.application.routes.url_helpers.bulk_action_laboratory_samples_path }");
+    var url = new URL("#{ javascript_url Rails.application.routes.url_helpers.bulk_action_samples_path }");
     url.searchParams.append("bulk_action", action);
     sampleIds.forEach(function(sampleId) {
       url.searchParams.append("sample_ids[]", sampleId);
