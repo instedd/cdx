@@ -189,11 +189,12 @@ class SamplesController < ApplicationController
   def user_can_delete_notes(notes)
     notes = notes.values unless notes.empty?
 
-    can_delete = notes
+    notes_id_to_destroy = notes
       .select { |note| note["_destroy"] == "1" }
-      .all? { |note|
-        db_note = Note.find(note["id"])
-        db_note.user_id == current_user.id
-      }
+      .map { |note| note["id"] }
+
+    can_delete = Note
+      .find(notes_id_to_destroy)
+      .all? { |db_note| db_note.user_id == current_user.id }
   end
 end
