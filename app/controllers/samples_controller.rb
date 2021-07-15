@@ -109,6 +109,11 @@ class SamplesController < ApplicationController
 
     # TODO:
     # return unless authorize_resource(patient, UPDATE_PATIENT)
+    params = sample_params
+    unless user_can_delete_notes(params["notes_attributes"] || [])
+      redirect_to edit_sample_path(sample.id), notice: 'Update failed: Notes can only be deleted by their authors'
+      return
+    end
 
     if @sample_form.update(sample_params)
       redirect_to conditional_back_path(sample), notice: 'Sample was successfully updated.'
@@ -177,5 +182,17 @@ class SamplesController < ApplicationController
     else
       edit_batch_path(sample.batch)
     end
+  end
+
+  def user_can_delete_notes(notes)
+    notes = notes.values unless notes.empty?
+
+    notes_id_to_destroy = notes
+      .select { |note| note["_destroy"] == "1" }
+      .map { |note| note["id"] }
+
+    can_delete = Note
+      .find(notes_id_to_destroy)
+      .all? { |db_note| db_note.user_id == current_user.id }
   end
 end
