@@ -23,12 +23,12 @@ class Sample < ActiveRecord::Base
     "sample"
   end
 
-  attribute_field :isolate_name,
-                  :is_quality_control,
-                  :inactivation_method,
-                  :volume,
+  attribute_field :date_produced,
                   :lab_technician,
-                  :date_produced
+                  :specimen_role,
+                  :isolate_name,
+                  :inactivation_method,
+                  :volume
 
   def self.find_by_entity_id(entity_id, opts)
     query = joins(:sample_identifiers).where(sample_identifiers: {entity_id: entity_id.to_s}, institution_id: opts.fetch(:institution_id))

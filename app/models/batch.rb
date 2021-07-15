@@ -13,7 +13,11 @@ class Batch < ActiveRecord::Base
 
   attribute_field :isolate_name, copy: true
   attribute_field :batch_number, copy: true
-  attribute_field :date_produced, :inactivation_method, :volume, :lab_technician
+  attribute_field :date_produced,
+                  :lab_technician,
+                  :specimen_role,
+                  :inactivation_method,
+                  :volume
 
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_presence_of :inactivation_method
@@ -43,10 +47,12 @@ class Batch < ActiveRecord::Base
   end
 
   def isolate_name_batch_number_combination
-    if Batch.
-      where("LOWER(isolate_name) = ? AND LOWER(batch_number) = ?",
-            isolate_name.downcase, batch_number.downcase).
-      exists?
+    combination_query = [
+      "LOWER(isolate_name) = ? AND LOWER(batch_number) = ? AND id != ?",
+      isolate_name.downcase, batch_number.downcase, self.id
+    ]
+
+    if Batch.where(combination_query).exists?
       errors.add(:isolate_name, "and Batch Number combination should be unique")
     end
   end

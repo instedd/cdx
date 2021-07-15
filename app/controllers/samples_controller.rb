@@ -13,7 +13,8 @@ class SamplesController < ApplicationController
 
     sample = Sample.new({
       institution: @navigation_context.institution,
-      sample_identifiers: [SampleIdentifier.new({uuid: session[:creating_sample_uuid]})]
+      sample_identifiers: [SampleIdentifier.new({uuid: session[:creating_sample_uuid]})],
+      specimen_role: "Q - Control specimen"
     })
 
     @sample_form = SampleForm.for(sample)
@@ -137,20 +138,17 @@ class SamplesController < ApplicationController
 
   def sample_params
     sample_params = params.require(:sample).permit(
-      :isolate_name,
       :date_produced,
+      :lab_technician,
+      :specimen_role,
+      :isolate_name,
       :inactivation_method,
       :volume,
-      :lab_technician,
-      :is_quality_control,
       assays_attributes: [ :id, :_destroy ],
       new_assays: [],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
       new_notes: []
     )
-
-    # quality control as boolean
-    sample_params[:is_quality_control] = sample_params[:is_quality_control] == '1'
 
     # adding author to new notes
     new_notes_with_author = (sample_params[:new_notes] || []).map do |note_description|
