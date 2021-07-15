@@ -28,7 +28,7 @@ describe Cdx do
       "sample.id",
       "sample.type",
       "sample.uuid",
-      "sample.is_quality_control",
+      "sample.specimen_role",
       "sample.isolate_name",
       "sample.date_produced",
       "sample.inactivation_method",
