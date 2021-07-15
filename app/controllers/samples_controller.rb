@@ -110,7 +110,7 @@ class SamplesController < ApplicationController
     # return unless authorize_resource(patient, UPDATE_PATIENT)
     params = sample_params
     unless user_can_delete_notes(params["notes_attributes"] || [])
-      redirect_to edit_sample_path(@sample.id), notice: 'Unauthorized: notes can only be deleted by their authors'
+      redirect_to edit_sample_path(sample.id), notice: 'Update failed: Notes can only be deleted by their authors'
       return
     end
 
@@ -187,6 +187,8 @@ class SamplesController < ApplicationController
   end
 
   def user_can_delete_notes(notes)
+    notes = notes.values unless notes.empty?
+
     can_delete = notes
       .select { |note| note["_destroy"] == "1" }
       .all? { |note|
