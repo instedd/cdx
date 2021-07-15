@@ -15,18 +15,16 @@
               .icon-trash.btn-icon
           - t.columns do
             %col{:width => "5%"}
-            %col{:width => "25%"}
-            %col{:width => "15%"}
-            %col{:width => "10%"}
-            %col{:width => "15%"}
-            %col{:width => "15%"}
+            %col{:width => "20%"}
+            %col{:width => "20%"}
+            %col{:width => "20%"}
+            %col{:width => "20%"}
             %col{:width => "15%"}
           - t.thead do
             %tr
               %th
               %th Isolate name
               %th Batch ID
-              %th Volume
               %th Lab Technician
               %th Inactivation Method
               %th Date Produced
@@ -38,10 +36,17 @@
                   %label.row{for: "batch_ids.#{batch.id}"}
                 %td= batch.isolate_name
                 %td= batch.batch_number
-                %td= "#{batch.volume} μl"
                 %td= batch.lab_technician
                 %td= batch.inactivation_method
                 %td= batch.date_produced_description
 
       .pagination
         = render 'shared/pagination'
+
+  .col.pe-1.tab-buttons
+    .tab-separator
+    .icons-group
+      = link_to samples_path do
+        .icon-sample.tab-sample
+      .selected-icon-tab
+        .icon-batch.tab-batch.selected

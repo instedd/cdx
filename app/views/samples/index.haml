@@ -17,12 +17,15 @@
               .icon-trash.btn-icon
           - t.columns do
             %col{:width => "5%"}
-            %col{:width => "50%"}
-            %col{:width => "45%"}
+            %col{:width => "40%"}
+            %col{:width => "30%"}
+            %col{:width => "25%"}
           - t.thead do
             %tr
               %th
               %th Sample Id
+              %th Lab Technician
+              %th Date Produced
           - t.tbody do
             - @samples.each do |sample|
               %tr.laboratory-sample-row{data: {href: edit_sample_path(sample) }}
@@ -30,6 +33,17 @@
                   =check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
                   %label.row{for: "sample_ids.#{sample.id}"}
                 %td= sample.uuid
+                %td= sample.lab_technician
+                %td= sample.date_produced
 
       .pagination
         = render 'shared/pagination'
+
+
+  .col.pe-1.tab-buttons
+    .tab-separator
+    .icons-group
+      .selected-icon-tab
+        .icon-sample.tab-sample.selected
+      = link_to batches_path do
+        .icon-batch.tab-batch
