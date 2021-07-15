@@ -6,10 +6,11 @@
       .note
         .info
           = "by #{note.object.user.full_name} #{@localization_helper.format_datetime(note.object.updated_at)} "
-          .clear-note
-            = note.check_box '_destroy', { id: "destroy_note_#{note.object.id}" }
-            %label.cross{:for => "destroy_note_#{note.object.id}" }
-              = image_tag "ic-cross.png"
+          - if note.object.user.id == current_user.id
+            .clear-note
+              = note.check_box '_destroy', { id: "destroy_note_#{note.object.id}" }
+              %label.cross{:for => "destroy_note_#{note.object.id}" }
+                = image_tag "ic-cross.png"
         .description
           = note.object.description
         .dashed-line
