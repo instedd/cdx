@@ -109,10 +109,11 @@ class SamplesController < ApplicationController
     # TODO:
     # return unless authorize_resource(patient, UPDATE_PATIENT)
     params = sample_params
-    unless user_can_delete_notes(params)
+    unless user_can_delete_notes(params["notes_attributes"] || [])
       redirect_to edit_sample_path(@sample.id), notice: 'Unauthorized: notes can only be deleted by their authors'
       return
     end
+
     if @sample_form.update(sample_params)
       redirect_to conditional_back_path(sample), notice: 'Sample was successfully updated.'
     else
@@ -185,15 +186,12 @@ class SamplesController < ApplicationController
     end
   end
 
-  def user_can_delete_notes(params)
-    notes = params["notes_attributes"] || []
-    can_delete = true
-    notes.each do |note|
-      db_note = Note.find(note[1]["id"])
-      if note[1]["_destroy"] == "1" && db_note.user_id != current_user.id
-        can_delete = false
-      end
-    end
-    can_delete
+  def user_can_delete_notes(notes)
+    can_delete = notes
+      .select { |note| note["_destroy"] == "1" }
+      .all? { |note|
+        db_note = Note.find(note["id"])
+        db_note.user_id == current_user.id
+      }
   end
 end
