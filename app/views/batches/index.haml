@@ -1,7 +1,7 @@
 = render "filters"
 
 .row
-  .col.pe-9
+  .col
     - if @batches.empty?
       = empty_data title: 'No batches', icon: 'icon-outline-test xx-large' do |c|
         - c.body do
@@ -44,7 +44,7 @@
       .pagination
         = render 'shared/pagination'
 
-  .col.tab-buttons
+  .col.pe-1.tab-buttons
     .tab-separator
     .icons-group
       .selected-icon-tab
