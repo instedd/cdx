@@ -118,18 +118,19 @@
       width: 50px;
       height: 50px;
       border-style: none none none solid;
-      border-width: 10px;
+      border-width: 5px;
       margin-bottom: 4px;
     }
   }
+
   .tab-batch {
     background-color: white;
     margin-bottom: 10px;
     font-size: 30px;
     color: rgba(0, 0, 0, 0.4);
-    padding: 15px;
+    padding: 15px 20px;
     &.selected {
-      padding: 0px;
+      padding: 0px 10px;
       color: black;
       font-weight: bold;
     }
@@ -140,9 +141,9 @@
     margin-bottom: 10px;
     font-size: 30px;
     color: rgba(0, 0, 0, 0.4);
-    padding: 15px;
+    padding: 15px 20px;
     &.selected {
-      padding: 0px;
+      padding: 0px 10px;
       color: black;
       font-weight: bold;
     }
