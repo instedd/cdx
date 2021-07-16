@@ -11,6 +11,12 @@
       }
     }
 
+    // Click on Add Assays
+    $('#add-assays').on('click', function(e) {
+      event.preventDefault();
+      $('#sample_new_assays').click();
+    });
+
     // Drag Picture to an input file and preview it
     $('#sample_new_assays').on('change', function(e) {
       var files = e.target.files;
@@ -24,7 +30,9 @@
       }
 
       if (files.length > 0) {
-        $('#undo_added_files').removeClass('hidden');
+        // toggle buttons
+        $('#add-assays').addClass('nodisplay');
+        $('#undo-added-assays').removeClass('nodisplay');
       }
     });
 
@@ -40,13 +48,15 @@
     });
 
     // Reset
-    $('#undo_added_files').on('click', function(e) {
+    $('#undo-added-assays').on('click', function(e) {
       event.preventDefault();
 
       // remove file preview
       $('.new-file').remove();
-      // hide button
-      $('#undo_added_files').addClass('hidden');
+
+      // toggle buttons
+      $('#add-assays').removeClass('nodisplay');
+      $('#undo-added-assays').addClass('nodisplay');
 
       // remove files from input FileList
       var emptyClonedInput = $('#sample_new_assays').val('').clone(true);
