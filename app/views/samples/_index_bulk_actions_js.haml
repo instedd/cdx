@@ -1,0 +1,24 @@
+:javascript
+  (function() {
+    allCheckboxes().on('change', function(e) {
+      toggleBulkActions();
+    });
+
+    // initial bulk actions state
+    toggleBulkActions();
+  })();
+
+  function allCheckboxes() {
+    return $("input[type='checkbox'][name='" + checkboxesName() + "']");
+  }
+
+  function toggleBulkActions() {
+    var selectedNone = selectedCheckboxes().length == 0;
+    actionsId().forEach(function(id) {
+      $("#" + id).prop('disabled', selectedNone);
+    });
+  }
+
+  function selectedCheckboxes() {
+    return allCheckboxes().filter(":checked");
+  }

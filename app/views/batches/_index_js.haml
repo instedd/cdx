@@ -1,30 +1,10 @@
 :javascript
-  (function() {
-    allCheckboxes().on('change', function(e) {
-      toggleBulkActions();
-    });
-
-    // initial bulk actions state
-    toggleBulkActions();
-  })();
-
-  function allCheckboxes() {
-    return $("input[type='checkbox'][name='batch_ids[]']");
+  function checkboxesName() {
+    return "batch_ids[]";
   }
 
-  function actions() {
+  function actionsId() {
     return [
-      $("#bulk-destroy")
+      "bulk-destroy"
     ];
-  }
-
-  function toggleBulkActions() {
-    var selectedNone = selectedCheckboxes().length == 0;
-    actions().forEach(function(action) {
-      action.prop('disabled', selectedNone);
-    });
-  }
-
-  function selectedCheckboxes() {
-    return allCheckboxes().filter(":checked");
   }
