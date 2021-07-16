@@ -92,4 +92,12 @@ class Sample < ActiveRecord::Base
       )
     end
   end
+
+  def date_produced_description
+    if date_produced.is_a?(Time)
+      return date_produced.strftime(I18n.t('date.input_format.pattern'))
+    end
+
+    date_produced
+  end
 end
