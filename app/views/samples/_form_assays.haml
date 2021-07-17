@@ -4,6 +4,15 @@
   .col
     .choose-picture.assay
       .upload-new-file.picture
+        .tooltip
+          .text
+            Drop assays here
+          .text
+            or
+          .action
+            .icon-upload.icon-blue
+            Choose a file to upload
+
         = f.fields_for :assays do |ay|
           .file-uploaded.picture-container
             = image_tag ay.object.picture.url(:card)
