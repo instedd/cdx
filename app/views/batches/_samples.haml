@@ -5,11 +5,11 @@
     #count
       = @batch_form.batch.samples.count.to_s + ' ' + "Samples"
   .actions
-    = button_tag id: 'bulk_action_print', class: 'btn-link', name: 'bulk_action', value: 'print' do
+    = button_tag id: 'bulk_print', class: 'btn-link', name: 'bulk_action', value: 'print' do
       .icon-print.btn-icon
-    = button_tag id: 'bulk_action_destroy', class: 'btn-link' do
+    = button_tag id: 'bulk_destroy', class: 'btn-link' do
       .icon-trash.btn-icon
-    = button_tag id: 'bulk_action_destroy_undo', class: 'btn-link hidden' do
+    = button_tag id: 'bulk_destroy_undo', class: 'btn-link hidden' do
       Undo
 
 - @batch_form.batch.samples.each do |sample|
@@ -33,3 +33,5 @@
       = "ADD SAMPLE"
 
 = render 'samples_js'
+= render 'samples_bulk_js'
+= render 'samples/index_bulk_actions_js'
