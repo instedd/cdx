@@ -3,7 +3,10 @@ class SamplesController < ApplicationController
   def index
     # TODO: filter by Institution
     @samples = Sample.all.order('created_at DESC')
-    @samples = @samples.where("uuid LIKE concat('%', ?, '%')", params[:uuid]) unless params[:uuid].blank?
+    @samples = @samples.joins(:sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
+    @samples = @samples.joins(:batch).where("batches.batch_number LIKE concat('%', ?, '%')", params[:batch_number]) unless params[:batch_number].blank?
+    @samples = @samples.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
+
     # paginate samples
     @samples = perform_pagination(@samples)
   end

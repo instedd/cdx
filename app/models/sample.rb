@@ -22,11 +22,10 @@ class Sample < ActiveRecord::Base
   def self.entity_scope
     "sample"
   end
-
+  attribute_field :isolate_name, copy: true
   attribute_field :date_produced,
                   :lab_technician,
                   :specimen_role,
-                  :isolate_name,
                   :inactivation_method,
                   :volume
 
