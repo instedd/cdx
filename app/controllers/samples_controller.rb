@@ -18,7 +18,7 @@ class SamplesController < ApplicationController
     })
 
     @sample_form = SampleForm.for(sample)
-    @view_helper = view_helper_for(sample)
+    @view_helper = view_helper({save_back_path: true})
     @show_barcode_preview = false
   end
 
@@ -38,9 +38,9 @@ class SamplesController < ApplicationController
 
     if @sample_form.save
       session.delete(:creating_sample_uuid)
-      redirect_to samples_path, notice: 'Sample was successfully created.'
+      redirect_to back_path, notice: 'Sample was successfully created.'
     else
-      @view_helper = view_helper_for(sample)
+      @view_helper = view_helper
       render action: 'new'
     end
   end
@@ -94,7 +94,7 @@ class SamplesController < ApplicationController
     sample = Sample.find(params[:id])
     @sample_form = SampleForm.for(sample)
 
-    @view_helper = view_helper_for(sample)
+    @view_helper = view_helper({save_back_path: true})
 
     @show_barcode_preview = true
     @show_print_action = true
@@ -116,9 +116,9 @@ class SamplesController < ApplicationController
     end
 
     if @sample_form.update(sample_params)
-      redirect_to conditional_back_path(sample), notice: 'Sample was successfully updated.'
+      redirect_to back_path, notice: 'Sample was successfully updated.'
     else
-      @view_helper = view_helper_for(sample)
+      @view_helper = view_helper
       render action: 'edit'
     end
   end
@@ -168,20 +168,17 @@ class SamplesController < ApplicationController
     { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
   end
 
-  def view_helper_for(sample)
-    { date_produced_placeholder: date_format[:placeholder], back_path: conditional_back_path(sample) }
+  def view_helper(save_back_path = false)
+    if save_back_path
+      session[:back_path] = URI(request.referer || '').path
+    end
+    back_path = session[:back_path] || samples_path
+
+    { date_produced_placeholder: date_format[:placeholder], back_path: back_path }
   end
 
-  def conditional_back_path(sample)
-    if sample.batch.nil?
-      if sample.id.nil?
-        new_sample_or_batch_batches_path
-      else
-        samples_path
-      end
-    else
-      edit_batch_path(sample.batch)
-    end
+  def back_path()
+    session.delete(:back_path) || samples_path
   end
 
   def user_can_delete_notes(notes)
