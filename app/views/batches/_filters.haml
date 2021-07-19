@@ -11,5 +11,11 @@
         %input{type: "hidden", name: "page_size", value: @page_size}
         .row
           .filter
+            %label.block Sample ID
+            %input.input-x-large{type: "text", name: "sample_id", value: params["sample_id"], placeholder: "Filter by Sample ID"}
+          .filter
+            %label.block Batch ID
+            %input.input-x-large{type: "text", name: "batch_number", value: params["batch_number"], placeholder: "Filter by batch ID"}
+          .filter
             %label.block Isolate Name
             %input.input-x-large{type: "text", name: "isolate_name", value: params["isolate_name"], placeholder: "Filter by isolate name"}

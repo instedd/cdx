@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210712213544) do
+ActiveRecord::Schema.define(version: 20210719114233) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -108,12 +108,6 @@ ActiveRecord::Schema.define(version: 20210712213544) do
     t.integer "site_id",  limit: 4, null: false
   end
 
-  create_table "ar_internal_metadata", primary_key: "key", force: :cascade do |t|
-    t.string   "value",      limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
   create_table "assays", force: :cascade do |t|
     t.integer  "sample_id",            limit: 4
     t.string   "picture_file_name",    limit: 255
@@ -131,17 +125,16 @@ ActiveRecord::Schema.define(version: 20210712213544) do
     t.text     "core_fields",    limit: 65535
     t.text     "custom_fields",  limit: 65535
     t.binary   "sensitive_data", limit: 65535
-    t.string   "isolate_name",   limit: 255
     t.datetime "deleted_at"
     t.integer  "institution_id", limit: 4
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.string   "isolate_name",   limit: 255
     t.string   "batch_number",   limit: 255
   end
 
   add_index "batches", ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree
   add_index "batches", ["institution_id"], name: "index_batches_on_institution_id", using: :btree
-  add_index "batches", ["isolate_name"], name: "index_batches_on_isolate_name", using: :btree
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -492,11 +485,13 @@ ActiveRecord::Schema.define(version: 20210712213544) do
     t.boolean  "is_phantom",                   default: true
     t.datetime "deleted_at"
     t.integer  "batch_id",       limit: 4
+    t.string   "isolate_name",   limit: 255
   end
 
   add_index "samples", ["batch_id"], name: "index_samples_on_batch_id", using: :btree
   add_index "samples", ["deleted_at"], name: "index_samples_on_deleted_at", using: :btree
   add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree
+  add_index "samples", ["isolate_name"], name: "index_samples_on_isolate_name", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
 
   create_table "sites", force: :cascade do |t|
