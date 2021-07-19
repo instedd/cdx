@@ -54,6 +54,15 @@
   &.icon-blue {
     color: $blue;
   }
+  &.icon-blue-important {
+    color: $blue !important;
+  }
+  &.icon-red {
+    color: $red;
+  }
+  &.icon-red-important {
+    color: $red !important;
+  }
   &.medium {
     font-size: 35px;
   }
