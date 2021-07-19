@@ -21,8 +21,8 @@
         = check_box_tag 'destroy_sample_ids[]', sample.id, false, { id: "destroy_sample_ids_#{sample.id}", class: "destroy-checkbox" }
         = sample.uuid
       .sample-row-actions
-        -# - if sample.is_quality_control
-        -#   .icon-alert.icon-gray
+        - if sample.is_quality_control
+          .icon-test.icon-gray{title: 'Q - Control specimen'}
         = link_to edit_sample_path(sample.id) do
           .icon-keyboard-arrow-right.icon-gray
 
