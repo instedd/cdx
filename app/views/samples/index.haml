@@ -39,11 +39,10 @@
       .pagination
         = render 'shared/pagination'
 
-
   .col.pe-1.tab-buttons
     .tab-separator
     .icons-group
       .selected-icon-tab
-        .icon-sample.tab-sample.selected
+        .icon-sample.tab-sample.selected{title: "Samples"}
       = link_to batches_path do
-        .icon-batch.tab-batch
+        .icon-batch.tab-batch{title: "Batches"}
