@@ -134,7 +134,14 @@ class SamplesController < ApplicationController
   end
 
   def bulk_destroy
-    Sample.where(id: params[:sample_ids]).destroy_all
+    sample_ids = params[:sample_ids]
+
+    if sample_ids.blank?
+      redirect_to samples_path, notice: 'Select at least one sample to destroy.'
+      return
+    end
+
+    Sample.where(id: sample_ids).destroy_all
 
     redirect_to samples_path, notice: 'Samples were successfully deleted.'
   end

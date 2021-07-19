@@ -67,7 +67,14 @@ class BatchesController < ApplicationController
   end
 
   def bulk_destroy
-    Batch.where(id: params[:batch_ids]).destroy_all
+    batch_ids = params[:batch_ids]
+
+    if batch_ids.blank?
+      redirect_to batches_path, notice: 'Select at least one batch to destroy.'
+      return
+    end
+
+    Batch.where(id: batch_ids).destroy_all
 
     redirect_to batches_path, notice: 'Batches were successfully deleted.'
   end

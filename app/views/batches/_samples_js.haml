@@ -1,6 +1,6 @@
 :javascript
   (function() {
-    $("#bulk_action_print").click(function(event) {
+    $("#bulk_print").click(function(event) {
       event.preventDefault();
 
       var ids = selectedSampleIds();
@@ -9,7 +9,7 @@
       bulkPrint(selectedSampleIds());
     });
 
-    $("#bulk_action_destroy").click(function(event) {
+    $("#bulk_destroy").click(function(event) {
       event.preventDefault();
 
       var ids = selectedSampleIds();
@@ -19,7 +19,7 @@
       enableUndoDestroyAction();
     });
 
-    $("#bulk_action_destroy_undo").click(function(event) {
+    $("#bulk_destroy_undo").click(function(event) {
       event.preventDefault();
       bulkUndoDestroy();
       enableDestroyAction();
@@ -42,18 +42,18 @@
   })();
 
   function enableDestroyAction() {
-    $("#bulk_action_destroy")
+    $("#bulk_destroy")
       .removeClass("hidden");
 
-    $("#bulk_action_destroy_undo")
+    $("#bulk_destroy_undo")
       .addClass("hidden");
   }
 
   function enableUndoDestroyAction() {
-    $("#bulk_action_destroy")
+    $("#bulk_destroy")
       .addClass("hidden");
 
-    $("#bulk_action_destroy_undo")
+    $("#bulk_destroy_undo")
       .removeClass("hidden");
   }
 
@@ -95,7 +95,8 @@
 
   function toggleSelectAllSamples(selected) {
     findSelectCheckboxesNotMarkedForDestroyed()
-      .prop("checked", selected);
+      .prop("checked", selected)
+      .change();
   }
 
   function createBulkActionURL(action, sampleIds) {
