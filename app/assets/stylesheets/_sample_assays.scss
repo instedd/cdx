@@ -21,9 +21,35 @@
     display: flex;
     flex-wrap: wrap;
     overflow: auto;
-    padding: 7px;
+    padding: 0px;
     min-height: 145px;
     max-height: 310px;
+
+    .tooltip {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      .text {
+        color: $gray3;
+        margin-bottom: 3px;
+      }
+
+      .action {
+        display: flex;
+        color: $blue;
+        text-transform: uppercase;
+
+        & > * {
+          margin: 0 3px;
+        }
+      }
+    }
 
     .upload-picture-title {
       align-self: center;
