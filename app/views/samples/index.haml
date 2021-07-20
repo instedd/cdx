@@ -25,7 +25,7 @@
               %th
               %th Sample Id
               %th Lab Technician
-              %th Date Produced
+              %th Production Date
           - t.tbody do
             - @samples.each do |sample|
               %tr.laboratory-sample-row{data: {href: edit_sample_path(sample) }}
