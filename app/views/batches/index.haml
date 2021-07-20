@@ -27,7 +27,7 @@
               %th Batch ID
               %th Lab Technician
               %th Inactivation Method
-              %th Date Produced
+              %th Production Date
           - t.tbody do
             - @batches.each do |batch|
               %tr.laboratory-sample-row{data: {href: edit_batch_path(batch) }}
