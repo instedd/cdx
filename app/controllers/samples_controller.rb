@@ -41,7 +41,7 @@ class SamplesController < ApplicationController
 
     if @sample_form.save
       session.delete(:creating_sample_uuid)
-      redirect_to back_path, notice: 'Sample was successfully created.'
+      redirect_to samples_path, notice: 'Sample was successfully created.'
     else
       @view_helper = view_helper
       render action: 'new'
