@@ -5,6 +5,7 @@
   padding: 0px;
 
   &+ .actions {
+    display: flex;
     margin: 0 15px 15px;
 
     .btn-icon {
