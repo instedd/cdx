@@ -1,13 +1,19 @@
 :javascript
   (function() {
-    var onloadPicture = function(filename) {
+    var onloadPicture = function(file) {
       return function(event) {
-        var fileDiv = $('<div>', { class: 'picture-container new-file' })
-          .append($('<img>', { class: 'uploaded', src: event.target.result }))
-          .append($('<div>', { class: 'picture-title' }).text(filename));
+        var src = "";
 
-        $('.assay > .upload-new-file')
-          .append(fileDiv);
+        var filetype = file.type;
+        if (filetype == 'image/png' || filetype == 'image/jpeg' || filetype == 'image/gif') {
+          src = event.target.result;
+        }
+
+        $('.assay > .upload-new-file').append(
+          $('<div>', { class: 'picture-container new-file' })
+            .append($('<img>', { class: 'uploaded', src: src }))
+            .append($('<div>', { class: 'picture-title' }).text(file.name))
+        );
       }
     }
 
@@ -22,11 +28,11 @@
       var files = e.target.files;
 
       for(var i = 0; i < files.length; i++) {
-        var name = files[i].name;
+        var file = files[i];
 
         var reader = new FileReader();
-        reader.onload = onloadPicture(name);
-        reader.readAsDataURL(files[i]);
+        reader.onload = onloadPicture(file);
+        reader.readAsDataURL(file);
       }
 
       if (files.length > 0) {

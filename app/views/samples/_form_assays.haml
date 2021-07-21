@@ -23,7 +23,7 @@
               %label.cross{:for => "destroy_assay_#{ay.object.id}" }
                 = image_tag "ic-cross.png"
 
-        = f.file_field :new_assays, :class => "upload-picture",  accept: 'image/png,image/jpeg,image/gif', multiple: true
+        = f.file_field :new_assays, :class => "upload-picture", multiple: true
 
     .actions
       = button_tag id: 'add-assays', class: 'btn-link' do
