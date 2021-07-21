@@ -13,17 +13,17 @@
             .icon-upload.icon-blue
             Choose a file to upload
 
+        = f.file_field :new_assays, :class => "upload-picture", multiple: true
+
         = f.fields_for :assays do |ay|
           .file-uploaded.picture-container
             = image_tag ay.object.picture.url(:card)
-            .picture-title
+            .picture-title{ title: ay.object.picture_file_name }
               = ay.object.picture_file_name
             .clear-label
               = ay.check_box '_destroy', { id: "destroy_assay_#{ay.object.id}" }
               %label.cross{:for => "destroy_assay_#{ay.object.id}" }
                 = image_tag "ic-cross.png"
-
-        = f.file_field :new_assays, :class => "upload-picture", multiple: true
 
     .actions
       = button_tag id: 'add-assays', class: 'btn-link' do

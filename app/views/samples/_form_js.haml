@@ -3,7 +3,6 @@
     var onloadPicture = function(file) {
       return function(event) {
         var src = "";
-
         var filetype = file.type;
         if (filetype == 'image/png' || filetype == 'image/jpeg' || filetype == 'image/gif') {
           src = event.target.result;
@@ -11,8 +10,9 @@
 
         $('.assay > .upload-new-file').append(
           $('<div>', { class: 'picture-container new-file' })
-            .append($('<img>', { class: 'uploaded', src: src }))
-            .append($('<div>', { class: 'picture-title' }).text(file.name))
+            .append((src == "") ? $('<div>', { class: 'any-filetype icon-document' }) : $('<img>', { class: 'uploaded', src: src }))
+            .append($('<div>', { class: 'picture-title', title: file.name })
+              .append($('<div>').text(file.name)))
         );
       }
     }
