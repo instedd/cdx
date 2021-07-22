@@ -20,7 +20,7 @@
           .file-uploaded.picture-container.assay-file
             = image_tag ay.object.picture.url(:card)
             .picture-title{ title: ay.object.picture_file_name }
-              = ay.object.picture_file_name
+              = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank"
             .clear-label
               = ay.check_box '_destroy', { id: "destroy_assay_#{ay.object.id}" }
               %label.cross{:for => "destroy_assay_#{ay.object.id}" }
