@@ -31,23 +31,28 @@
       width: 100%;
       height: 100%;
 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-
-      .text {
-        color: $gray3;
-        margin-bottom: 3px;
-      }
-
-      .action {
+      .tooltip-content {
         display: flex;
-        color: $blue;
-        text-transform: uppercase;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
 
-        & > * {
-          margin: 0 3px;
+        width: 100%;
+        height: 100%;
+
+        .text {
+          color: $gray3;
+          margin-bottom: 3px;
+        }
+
+        .action {
+          display: flex;
+          color: $blue;
+          text-transform: uppercase;
+
+          & > * {
+            margin: 0 3px;
+          }
         }
       }
     }

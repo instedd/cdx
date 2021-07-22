@@ -5,18 +5,19 @@
     .choose-picture.assay
       .upload-new-file.picture
         .tooltip
-          .text
-            Drop assays here
-          .text
-            or
-          .action
-            .icon-upload.icon-blue
-            Choose a file to upload
+          .tooltip-content
+            .text
+              Drop assays here
+            .text
+              or
+            .action
+              .icon-upload.icon-blue
+              Choose a file to upload
 
         = f.file_field :new_assays, :class => "upload-picture", multiple: true
 
         = f.fields_for :assays do |ay|
-          .file-uploaded.picture-container
+          .file-uploaded.picture-container.assay-file
             = image_tag ay.object.picture.url(:card)
             .picture-title{ title: ay.object.picture_file_name }
               = ay.object.picture_file_name
@@ -26,9 +27,9 @@
                 = image_tag "ic-cross.png"
 
     .actions
-      = button_tag id: 'add-assays', class: 'btn-link' do
+      = button_tag id: 'add-assays', class: "btn-link nodisplay" do
         .icon-circle-plus.btn-icon.icon-blue-important.icon-margin
-        Add Assay
+        Add Assays
       .span
       = button_tag id: 'undo-added-assays', class: 'btn-link nodisplay' do
         .icon-close.btn-icon.icon-red-important.icon-margin

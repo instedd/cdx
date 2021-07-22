@@ -9,11 +9,14 @@
         }
 
         $('.assay > .upload-new-file').append(
-          $('<div>', { class: 'picture-container new-file' })
+          $('<div>', { class: 'picture-container new-file assay-file' })
             .append((src == "") ? $('<div>', { class: 'any-filetype icon-document' }) : $('<img>', { class: 'uploaded', src: src }))
             .append($('<div>', { class: 'picture-title', title: file.name })
               .append($('<div>').text(file.name)))
         );
+
+        // render Tooltip and Add-assays action
+        toggleTooltipAction();
       }
     }
 
@@ -62,11 +65,17 @@
       // toggle buttons
       $('#undo-added-assays').addClass('nodisplay');
 
+      // render Tooltip and Add-assays action
+      toggleTooltipAction();
+
       // remove files from input FileList
       var emptyClonedInput = $('#sample_new_assays').val('').clone(true);
       $('#sample_new_assays')
         .replaceWith(emptyClonedInput);
     });
+
+    // initial state for Tooltip and Add-assays action
+    toggleTooltipAction();
   })();
 
   document.addEventListener("dragenter", function( event ) {
@@ -81,3 +90,14 @@
       $('.choose-picture').removeClass('on');
     }
   }, false);
+
+  function toggleTooltipAction() {
+    var assays = $('.assay-file');
+    if (assays.length > 0) {
+      $('.assay > .upload-new-file > .tooltip').addClass('nodisplay');
+      $('#add-assays').removeClass('nodisplay');
+    } else {
+      $('.assay > .upload-new-file > .tooltip').removeClass('nodisplay');
+      $('#add-assays').addClass('nodisplay');
+    }
+  }
