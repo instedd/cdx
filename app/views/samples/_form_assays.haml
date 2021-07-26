@@ -18,7 +18,10 @@
 
         = f.fields_for :assays do |ay|
           .file-uploaded.picture-container.assay-file
-            = image_tag ay.object.picture.url(:card)
+            - if ay.object.picture_content_type.start_with?('image/')
+              = image_tag ay.object.picture.url(:card)
+            - else
+              .any-filetype.icon-document
             .picture-title{ title: ay.object.picture_file_name }
               = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank"
             .clear-label

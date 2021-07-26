@@ -2,21 +2,15 @@
   (function() {
     var onloadPicture = function(file) {
       return function(event) {
-        var src = "";
-        var filetype = file.type;
-        if (filetype == 'image/png' || filetype == 'image/jpeg' || filetype == 'image/gif') {
-          src = event.target.result;
-        }
-
         $('.assay > .upload-new-file').append(
           $('<div>', { class: 'picture-container new-file assay-file' })
-            .append((src == "") ? $('<div>', { class: 'any-filetype icon-document' }) : $('<img>', { class: 'uploaded', src: src }))
+            .append(fileThumbnail(file, event.target.result))
             .append($('<div>', { class: 'picture-title', title: file.name })
               .append($('<div>').text(file.name)))
         );
 
         // render Tooltip and Add-assays action
-        toggleTooltipAction();
+        updateAddAssaysControls();
       }
     }
 
@@ -66,7 +60,7 @@
       $('#undo-added-assays').addClass('nodisplay');
 
       // render Tooltip and Add-assays action
-      toggleTooltipAction();
+      updateAddAssaysControls();
 
       // remove files from input FileList
       var emptyClonedInput = $('#sample_new_assays').val('').clone(true);
@@ -75,7 +69,7 @@
     });
 
     // initial state for Tooltip and Add-assays action
-    toggleTooltipAction();
+    updateAddAssaysControls();
   })();
 
   document.addEventListener("dragenter", function( event ) {
@@ -91,7 +85,15 @@
     }
   }, false);
 
-  function toggleTooltipAction() {
+  function fileThumbnail(file, url) {
+    if (file.type.startsWith('image/')) {
+      return $('<img>', { class: 'uploaded', src: url });
+    } else {
+      return $('<div>', { class: 'any-filetype icon-document' });
+    }
+  }
+
+  function updateAddAssaysControls() {
     var assays = $('.assay-file');
     if (assays.length > 0) {
       $('.assay > .upload-new-file > .tooltip').addClass('nodisplay');

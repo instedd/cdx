@@ -104,8 +104,12 @@
         background: #FFF;
         border-top: 1px solid $gray2;
         color: $gray4;
+      }
+    }
 
-        div {
+    .assay-file {
+      .picture-title {
+        a, div {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
