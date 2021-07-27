@@ -5,30 +5,34 @@
     .choose-picture.assay
       .upload-new-file.picture
         .tooltip
-          .text
-            Drop assays here
-          .text
-            or
-          .action
-            .icon-upload.icon-blue
-            Choose a file to upload
+          .tooltip-content
+            .text
+              Drop assays here
+            .text
+              or
+            .action
+              .icon-upload.icon-blue
+              Choose a file to upload
+
+        = f.file_field :new_assays, :class => "upload-picture", multiple: true
 
         = f.fields_for :assays do |ay|
-          .file-uploaded.picture-container
-            = image_tag ay.object.picture.url(:card)
-            .picture-title
-              = ay.object.picture_file_name
+          .file-uploaded.picture-container.assay-file
+            - if ay.object.is_image?
+              = image_tag ay.object.picture.url(:card)
+            - else
+              .any-filetype.icon-document
+            .picture-title{ title: ay.object.picture_file_name }
+              = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank", download: ay.object.picture_file_name
             .clear-label
               = ay.check_box '_destroy', { id: "destroy_assay_#{ay.object.id}" }
               %label.cross{:for => "destroy_assay_#{ay.object.id}" }
                 = image_tag "ic-cross.png"
 
-        = f.file_field :new_assays, :class => "upload-picture",  accept: 'image/png,image/jpeg,image/gif', multiple: true
-
     .actions
-      = button_tag id: 'add-assays', class: 'btn-link' do
+      = button_tag id: 'add-assays', class: "btn-link nodisplay" do
         .icon-circle-plus.btn-icon.icon-blue-important.icon-margin
-        Add Assay
+        Add Assays
       .span
       = button_tag id: 'undo-added-assays', class: 'btn-link nodisplay' do
         .icon-close.btn-icon.icon-red-important.icon-margin

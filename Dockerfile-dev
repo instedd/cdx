@@ -30,6 +30,9 @@ RUN \
     # wkhtmltopdf dependencies \
     xfonts-75dpi \
     xfonts-base \
+    imagemagick \
+    ghostscript \
+    libgs-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN \
