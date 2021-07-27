@@ -18,12 +18,12 @@
 
         = f.fields_for :assays do |ay|
           .file-uploaded.picture-container.assay-file
-            - if ay.object.picture_content_type.start_with?('image/')
+            - if ay.object.is_image?
               = image_tag ay.object.picture.url(:card)
             - else
               .any-filetype.icon-document
             .picture-title{ title: ay.object.picture_file_name }
-              = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank"
+              = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank", download: ay.object.picture_file_name
             .clear-label
               = ay.check_box '_destroy', { id: "destroy_assay_#{ay.object.id}" }
               %label.cross{:for => "destroy_assay_#{ay.object.id}" }
