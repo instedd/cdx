@@ -22,6 +22,8 @@
 
     // Drag Picture to an input file and preview it
     $('#sample_new_assays').on('change', function(e) {
+      removeFilesPreview();
+
       var files = e.target.files;
 
       for(var i = 0; i < files.length; i++) {
@@ -53,8 +55,7 @@
     $('#undo-added-assays').on('click', function(e) {
       event.preventDefault();
 
-      // remove file preview
-      $('.new-file').remove();
+      removeFilesPreview();
 
       // toggle buttons
       $('#undo-added-assays').addClass('nodisplay');
@@ -84,6 +85,11 @@
       $('.choose-picture').removeClass('on');
     }
   }, false);
+
+  function removeFilesPreview() {
+    // remove all new-files preview
+    $('.new-file').remove();
+  }
 
   function fileThumbnail(file, url) {
     if (file.type.startsWith('image/')) {
