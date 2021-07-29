@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210727162118) do
+ActiveRecord::Schema.define(version: 20210727193447) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -116,8 +116,12 @@ ActiveRecord::Schema.define(version: 20210727162118) do
     t.datetime "picture_updated_at"
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
+    t.string   "loinc_code",           limit: 255
+    t.string   "result",               limit: 255
   end
 
+  add_index "assay_attachments", ["loinc_code"], name: "index_assay_attachments_on_loinc_code", using: :btree
+  add_index "assay_attachments", ["result"], name: "index_assay_attachments_on_result", using: :btree
   add_index "assay_attachments", ["sample_id"], name: "index_assay_attachments_on_sample_id", using: :btree
 
   create_table "batches", force: :cascade do |t|
