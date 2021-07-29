@@ -16,7 +16,7 @@
 
         = f.file_field :new_assays, :class => "upload-picture", multiple: true
 
-        = f.fields_for :assays do |ay|
+        = f.fields_for :assay_attachments do |ay|
           .file-uploaded.picture-container.assay-file
             - if ay.object.is_image?
               = image_tag ay.object.picture.url(:card)
@@ -25,8 +25,8 @@
             .picture-title{ title: ay.object.picture_file_name }
               = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank", download: ay.object.picture_file_name
             .clear-label
-              = ay.check_box '_destroy', { id: "destroy_assay_#{ay.object.id}" }
-              %label.cross{:for => "destroy_assay_#{ay.object.id}" }
+              = ay.check_box '_destroy', { id: "destroy_assay_attachments_#{ay.object.id}" }
+              %label.cross{:for => "destroy_assay_attachments_#{ay.object.id}" }
                 = image_tag "ic-cross.png"
 
     .actions

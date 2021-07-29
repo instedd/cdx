@@ -1,4 +1,4 @@
-class Assay < ActiveRecord::Base
+class AssayAttachment < ActiveRecord::Base
   belongs_to :sample
   has_attached_file :picture, styles:  lambda { |a| a.instance.is_image? ? { :card => "130x130>" }  : {} }
 

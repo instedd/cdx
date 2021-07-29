@@ -12,8 +12,8 @@ class Sample < ActiveRecord::Base
   has_many :notes, dependent: :destroy
   accepts_nested_attributes_for :notes, allow_destroy: true
 
-  has_many :assays, dependent: :destroy
-  accepts_nested_attributes_for :assays, allow_destroy: true
+  has_many :assay_attachments, dependent: :destroy
+  accepts_nested_attributes_for :assay_attachments, allow_destroy: true
 
   validates_presence_of :institution
   validate :validate_encounter
@@ -79,7 +79,7 @@ class Sample < ActiveRecord::Base
 
   def new_assays=(pictures = [])
     pictures.each do |picture|
-      assays.build(
+      assay_attachments.build(
         picture: picture,
         sample: self
       )

@@ -28,7 +28,7 @@ class SampleForm
 
   attr_accessor *shared_attributes
   delegate :id, :new_record?, :persisted?, to: :sample
-  delegate :uuid, :assays, :notes, to: :sample
+  delegate :uuid, :assay_attachments, :notes, to: :sample
 
   def self.for(sample)
     new.tap do |form|
@@ -53,8 +53,8 @@ class SampleForm
   end
 
   # Used by fields_for
-  def assays_attributes=(assays)
-    @sample.assays_attributes = assays
+  def assay_attachments_attributes=(assays)
+    @sample.assay_attachments_attributes = assays
   end
 
   # Used by fields_for
