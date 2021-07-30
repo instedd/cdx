@@ -6,6 +6,10 @@
       = image_tag barcode_img_data_url(sample.uuid)
     .code
       Sample ID #{sample.uuid}
+    .code
+      Isolate Name: #{sample.isolate_name}  Inactivation Method: #{sample.inactivation_method}
+    .code
+      Production Date: #{sample.date_produced_description}
     .logo
       -# = image_tag 'cdx-logo-bw.png'
       = wicked_pdf_image_tag 'cdx-logo-bw.png'
