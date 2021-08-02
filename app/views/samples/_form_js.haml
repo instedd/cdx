@@ -4,19 +4,9 @@
       return function(event) {
       var infoColumn = createCardInfoColumn()
       var pictureColumn = createCardPictureColumn(file, event)
+      var cardContainer = createCardContainer(infoColumn, pictureColumn)
         $('.assay > .upload-new-file').append(
-          $('<div>', { class: 'file-uploaded' })
-          .append(
-            $('<div>', { class: 'card-container new-file' })
-            .append(infoColumn)
-            .append(pictureColumn)
-            .append(
-              $('<input>', {
-                type: 'hidden',
-                name: 'sample[new_assays][]'
-              })
-            )
-          )
+          $('<div>', { class: 'file-uploaded' }).append(cardContainer)
         );
 
         // render Tooltip and Add-assays action
@@ -151,5 +141,17 @@
               .append(fileThumbnail(file, event.target.result))
               .append($('<div>', { class: 'picture-title', title: file.name })
               .append($('<div>').text(file.name)))
+            )
+  }
+
+  function createCardContainer(infoColumn, pictureColumn){
+    return  $('<div>', { class: 'card-container new-file' })
+            .append(infoColumn)
+            .append(pictureColumn)
+            .append(
+              $('<input>', {
+                type: 'hidden',
+                name: 'sample[new_assays][]'
+              })
             )
   }
