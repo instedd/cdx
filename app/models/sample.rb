@@ -1,3 +1,5 @@
+require 'json'
+
 class Sample < ActiveRecord::Base
   include Entity
 
@@ -78,9 +80,21 @@ class Sample < ActiveRecord::Base
   end
 
   def new_assays=(pictures = [])
+    new_assay_pictures = Array.new
+    new_assays_info = Array.new
     pictures.each do |picture|
+      if picture.is_a? ActionDispatch::Http::UploadedFile
+        new_assay_pictures.push picture
+      else
+        new_assays_info.push picture
+      end
+    end
+
+    new_assay_pictures.each_with_index do |image, index|
       assay_attachments.build(
-        picture: picture,
+        picture: image,
+        loinc_code: JSON.parse(new_assays_info[index])["loinc_code"],
+        result: JSON.parse(new_assays_info[index])["result"],
         sample: self
       )
     end

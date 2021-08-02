@@ -95,6 +95,20 @@
     updateAddAssaysControls();
   })();
 
+   $(document).on('blur','.loinc_input',function(e){
+     var hiddenInput = e.currentTarget.parentElement.parentElement.parentElement.children[2]
+     hiddenInput.value = JSON.stringify({loinc_code: e.target.value})
+     debugger;
+   });
+
+  $(document).on('blur','.result_input',function(e){
+      var hiddenInput = e.currentTarget.parentElement.parentElement.parentElement.children[2]
+      hiddenInput.value = JSON.stringify($.extend(JSON.parse(hiddenInput.value), {result: e.target.value}))
+      debugger;
+   });
+
+  debugger;
+
   document.addEventListener("dragenter", function( event ) {
     if ( event.target.className == "upload-picture" ) {
       $('.choose-picture').addClass('on');
