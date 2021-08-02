@@ -7,7 +7,7 @@
         $('.assay > .upload-new-file').append(
           $('<div>', { class: 'file-uploaded' })
           .append(
-            $('<div>', { class: 'card-container' })
+            $('<div>', { class: 'card-container new-file' })
             .append(infoColumn)
             .append(pictureColumn)
             .append(
@@ -144,7 +144,7 @@
             )
   }
 
-  function createCardPictureColumn(file, event){
+  function createCardPictureColumn(file, event) {
     return $('<div>', { class: 'col pe-3' })
             .append(
               $('<div>', { class: 'picture-container assay-file'})
