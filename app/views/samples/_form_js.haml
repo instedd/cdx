@@ -3,10 +3,32 @@
     var onloadPicture = function(file) {
       return function(event) {
         $('.assay > .upload-new-file').append(
-          $('<div>', { class: 'picture-container new-file assay-file' })
-            .append(fileThumbnail(file, event.target.result))
-            .append($('<div>', { class: 'picture-title', title: file.name })
-            .append($('<div>').text(file.name)))
+          $('<div>', { class: 'file-uploaded picture-container' })
+          .append(
+            $('<div>', { class: 'assay-attachment-info'})
+              .append(
+                $('<div>')
+                .append($('<label for="new_sample_assay_attachments_attributes">Loinc</label>'))
+                .append($('<input class="loinc_input" type=text>'))
+              )
+              .append(
+                $('<div>')
+                  .append($('<label for="new_sample_assay_attachments_attributes">Result</label>'))
+                  .append($('<input class="result_input" type=text>'))
+              )
+          )
+          .append(
+              $('<div>', { class: 'assay-file'})
+              .append(fileThumbnail(file, event.target.result))
+              .append($('<div>', { class: 'picture-title', title: file.name })
+              .append($('<div>').text(file.name)))
+          )
+          .append(
+            $('<input>', {
+              type: 'hidden',
+              name: 'sample[new_assays][]'
+            })
+          )
         );
 
         // render Tooltip and Add-assays action
