@@ -74,12 +74,12 @@
   })();
 
    $(document).on('blur','.loinc_input',function(e){
-     var hiddenInput = e.target.closest('.card-container').children[2]
+     var hiddenInput = $(e.target.closest('.card-container')).find(":hidden")[0]
      hiddenInput.value = JSON.stringify({loinc_code: e.target.value})
    });
 
   $(document).on('blur','.result_input',function(e){
-      var hiddenInput = e.target.closest('.card-container').children[2]
+      var hiddenInput = $(e.target.closest('.card-container')).find(":hidden")[0]
       hiddenInput.value = JSON.stringify($.extend(JSON.parse(hiddenInput.value), {result: e.target.value}))
    });
 
