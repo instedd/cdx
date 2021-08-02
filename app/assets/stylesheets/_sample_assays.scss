@@ -65,6 +65,7 @@
 
     .card-container {
       display: flex;
+      padding: 5px;
       align-items: flex-start;
       margin: 5px;
       background-color: #FFFFFF;
@@ -80,7 +81,7 @@
       height: 100px;
       top: inherit;
       left: inherit;
-      margin: 7px;
+      margin: 15px;
       overflow: hidden;
 
       background-color: #FFFFFF;
@@ -134,6 +135,8 @@
     }
 
     .clear-label {
+      top: 0px;
+      right: 1px;
       z-index: 1;
     }
   }
