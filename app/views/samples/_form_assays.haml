@@ -19,16 +19,12 @@
         = f.fields_for :assay_attachments do |ay|
           .file-uploaded.picture-container
             .assay-attachment-info
-              .row
-                .col
-                  = ay.label :loinc
-                .col
-                  = ay.text_field :loinc_code
-              .row
-                .col
-                  = ay.label :result
-                .col
-                  = ay.text_field :result
+              %div
+                = ay.label :loinc
+                = ay.text_field :loinc_code
+              %div
+                = ay.label :result
+                = ay.text_field :result
             .assay-file
               - if ay.object.is_image?
                 = image_tag ay.object.picture.url(:card)
