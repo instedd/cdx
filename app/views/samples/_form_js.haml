@@ -3,7 +3,7 @@
     var onloadPicture = function(file) {
       return function(event) {
         $('.assay > .upload-new-file').append(
-          $('<div>', { class: 'file-uploaded picture-container' })
+          $('<div>', { class: 'file-uploaded picture-container new-file' })
           .append(
             $('<div>', { class: 'assay-attachment-info'})
               .append(
@@ -98,16 +98,12 @@
    $(document).on('blur','.loinc_input',function(e){
      var hiddenInput = e.currentTarget.parentElement.parentElement.parentElement.children[2]
      hiddenInput.value = JSON.stringify({loinc_code: e.target.value})
-     debugger;
    });
 
   $(document).on('blur','.result_input',function(e){
       var hiddenInput = e.currentTarget.parentElement.parentElement.parentElement.children[2]
       hiddenInput.value = JSON.stringify($.extend(JSON.parse(hiddenInput.value), {result: e.target.value}))
-      debugger;
    });
-
-  debugger;
 
   document.addEventListener("dragenter", function( event ) {
     if ( event.target.className == "upload-picture" ) {
