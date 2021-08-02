@@ -2,32 +2,20 @@
   (function() {
     var onloadPicture = function(file) {
       return function(event) {
+      var infoColumn = createCardInfoColumn()
+      var pictureColumn = createCardPictureColumn(file, event)
         $('.assay > .upload-new-file').append(
-          $('<div>', { class: 'file-uploaded picture-container new-file' })
+          $('<div>', { class: 'file-uploaded' })
           .append(
-            $('<div>', { class: 'assay-attachment-info'})
-              .append(
-                $('<div>')
-                .append($('<label for="new_sample_assay_attachments_attributes">Loinc</label>'))
-                .append($('<input class="loinc_input" type=text>'))
-              )
-              .append(
-                $('<div>')
-                  .append($('<label for="new_sample_assay_attachments_attributes">Result</label>'))
-                  .append($('<input class="result_input" type=text>'))
-              )
-          )
-          .append(
-              $('<div>', { class: 'assay-file'})
-              .append(fileThumbnail(file, event.target.result))
-              .append($('<div>', { class: 'picture-title', title: file.name })
-              .append($('<div>').text(file.name)))
-          )
-          .append(
-            $('<input>', {
-              type: 'hidden',
-              name: 'sample[new_assays][]'
-            })
+            $('<div>', { class: 'card-container' })
+            .append(infoColumn)
+            .append(pictureColumn)
+            .append(
+              $('<input>', {
+                type: 'hidden',
+                name: 'sample[new_assays][]'
+              })
+            )
           )
         );
 
@@ -140,4 +128,28 @@
       $('.assay > .upload-new-file > .tooltip').removeClass('nodisplay');
       $('#add-assays').addClass('nodisplay');
     }
+  }
+
+  function createCardInfoColumn() {
+    return $('<div>', { class: 'col' })
+            .append(
+              $('<div>', { class: 'row' })
+              .append($('<div>', { class: 'col pe-2' }).append($('<label for="new_sample_assay_attachments_attributes">Loinc</label>')))
+              .append($('<div>', { class: 'col' }).append($('<input class="loinc_input" type=text>')))
+            )
+            .append(
+              $('<div>', { class: 'row' })
+              .append($('<div>', { class: 'col pe-2' }).append($('<label for="new_sample_assay_attachments_attributes">Result</label>')))
+              .append($('<div>', { class: 'col' }).append($('<input class="result_input" type=text>')))
+            )
+  }
+
+  function createCardPictureColumn(file, event){
+    return $('<div>', { class: 'col pe-3' })
+            .append(
+              $('<div>', { class: 'picture-container assay-file'})
+              .append(fileThumbnail(file, event.target.result))
+              .append($('<div>', { class: 'picture-title', title: file.name })
+              .append($('<div>').text(file.name)))
+            )
   }
