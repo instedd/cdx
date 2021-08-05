@@ -8,8 +8,6 @@ if s3_bucket = ENV['PAPERCLIP_S3_BUCKET'].presence
     storage: :s3,
     bucket: s3_bucket
   }
-  if s3_host_name = ENV['PAPERCLIP_S3_HOST_NAME'].presence
-    paperclip_defaults[:s3_host_name] = s3_host_name
-  end
+  paperclip_defaults[:s3_host_name] = ENV['PAPERCLIP_S3_HOST_NAME'].presence
   Rails.application.config.paperclip_defaults = paperclip_defaults
 end
