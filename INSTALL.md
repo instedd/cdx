@@ -106,6 +106,12 @@ AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 ```
 
+If the S3 bucket is not in the default (`us-east-1`) region, you need to also specify the [bucket's region-specific host name](https://docs.aws.amazon.com/general/latest/gr/s3.html#s3_region):
+
+```
+PAPERCLIP_S3_HOST_NAME=s3.us-west-1.amazonaws.com
+```
+
 #### Local storage
 
 Alternatively, attachments can be stored locally. Create a folder within the data directory owned by user `9999` and mount it in `/app/public/system`. Assuming the data directory is `/u/apps/cdx/data/uploads`, then:
