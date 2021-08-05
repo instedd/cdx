@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210727193447) do
+ActiveRecord::Schema.define(version: 20210803151121) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -323,6 +323,14 @@ ActiveRecord::Schema.define(version: 20210727193447) do
   end
 
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
+
+  create_table "loinc_codes", force: :cascade do |t|
+    t.string "loinc_number", limit: 255
+    t.string "component",    limit: 255
+  end
+
+  add_index "loinc_codes", ["component"], name: "index_loinc_codes_on_component", using: :btree
+  add_index "loinc_codes", ["loinc_number"], name: "index_loinc_codes_on_loinc_number", using: :btree
 
   create_table "manifests", force: :cascade do |t|
     t.string   "version",         limit: 255
