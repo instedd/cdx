@@ -21,7 +21,7 @@
             .card-container
               .row
                 .col
-                  = react_component "LoincCodeSelect", placeholder: "Choose a Loinc Code", assayIndex: ay.index, loincInputValue: ay.object.loinc_code_id, defaultValue: params["loinc_code"], clearable: true
+                  = react_component "LoincCodeSelect", placeholder: "Choose a Loinc Code", assayIndex: ay.index, loincCode: LoincCode.find(ay.object.loinc_code_id), loincInputValue: ay.object.loinc_code_id, defaultValue: params["loinc_code"], clearable: true
                   .row
                     .col.pe-2
                       = ay.label :result

@@ -24,7 +24,6 @@ var LoincCodeSelect = React.createClass({
       </div>
       <div className="col">
 
-        <label style={{ display: "none" }}>disableautocomplete</label>
         <Select
           value={this.state.loincCode}
           className="input-xx-large"
@@ -42,21 +41,6 @@ var LoincCodeSelect = React.createClass({
 
         <input name={`sample[assay_attachments_attributes][${this.props.assayIndex}][loinc_code_id]`}
                type="hidden" value={this.state.loincInputValue} id={`sample[assay_attachments_attributes][${this.props.assayIndex}][loinc_code_id]`}/>
-
-        {/*{(function(){*/}
-        {/*  if (this.state.patient == null) {*/}
-        {/*    return <a className="btn-add-link" href={"/patients/new?" + $.param({next_url: window.location.href})} title="Create new patient"><span className="icon-circle-plus icon-blue"></span></a>;*/}
-        {/*  }*/}
-        {/*}.bind(this))()}*/}
-
-        {/*<br/>*/}
-        {/*<br/>*/}
-
-        {/*{(function(){*/}
-        {/*  if (this.state.loincCode != null) {*/}
-        {/*    return <PatientCard patient={this.state.patient} canEdit={true} />;*/}
-        {/*  }*/}
-        {/*}.bind(this))()}*/}
 
       </div>
     </div>);
