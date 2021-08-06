@@ -25,8 +25,7 @@
                     .col.pe-2
                       = ay.label :loinc_code
                     .col
-                      = ay.text_field :loinc_code_id
-                  -# = react_component "LoincCodeSelect", placeholder: "Choose a Loinc Code", assayIndex: ay.index, loincCode: LoincCode.find(ay.object.loinc_code_id), loincInputValue: ay.object.loinc_code_id, defaultValue: params["loinc_code"], clearable: true
+                      = ay.hidden_field :loinc_code_id, { class: 'loinc_input_hidden'}
                   .row
                     .col.pe-2
                       = ay.label :result
