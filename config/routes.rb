@@ -131,6 +131,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :loinc_codes do
+    collection do
+      get :search
+    end
+  end
+
 
   resources :alerts, except: [:show]
   resources :incidents, only: [:index]

@@ -21,11 +21,7 @@
             .card-container
               .row
                 .col
-                  .row
-                    .col.pe-2
-                      = ay.label :loinc
-                    .col
-                      = ay.text_field :loinc_code
+                  = react_component "LoincCodeSelect", placeholder: "Choose a Loinc Code", assayIndex: ay.index, loincInputValue: ay.object.loinc_code, defaultValue: params["loinc_code"], clearable: true
                   .row
                     .col.pe-2
                       = ay.label :result
