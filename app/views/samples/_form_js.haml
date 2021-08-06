@@ -66,12 +66,13 @@
     // initial state for Tooltip and Add-assays action
     updateAddAssaysControls();
 
-    debugger;
-
-    //create loinc inputs
+    // create loinc inputs
     $('.loinc_input_hidden').each(function(index, element){
-      var root = buildLoincCodeSelect(element.cloneNode());
-      element.parentElement.replaceWith(root[0])
+      var parent = element.parentElement;
+
+      var root = buildLoincCodeSelect(element);
+      console.log(root);
+      parent.append(root);
     });
 
   })();
@@ -129,18 +130,18 @@
 
   function createCardInfoColumn() {
     return $('<div>', { class: 'col' })
-            .append(
-              $('<div>', { class: 'row' })
-              .append($('<div>', { class: 'col pe-2' }).append($('<label for="new_sample_assay_attachments_attributes">Loinc</label>')))
-              .append($('<div>', { class: 'col' }).append(
-                buildLoincCodeSelect2()
-              ))
-            )
-            .append(
-              $('<div>', { class: 'row' })
-              .append($('<div>', { class: 'col pe-2' }).append($('<label for="new_sample_assay_attachments_attributes">Result</label>')))
-              .append($('<div>', { class: 'col' }).append($('<input class="result_input" type=text>')))
-            )
+      .append($('<div>', { class: 'row' })
+        .append($('<div>', { class: 'col pe-2' })
+          .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
+        .append($('<div>', { class: 'col' })
+          .append(buildLoincCodeSelect()))
+      )
+      .append($('<div>', { class: 'row' })
+        .append($('<div>', { class: 'col pe-2' })
+          .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
+        .append($('<div>', { class: 'col' })
+          .append($('<input class="result_input" type=text>')))
+      );
   }
 
   function createCardPictureColumn(file, url) {
@@ -159,25 +160,13 @@
             .append(pictureColumn)
   }
 
-  function buildLoincCodeSelect2() {
-    var loincInput =  $('<input>', {type: 'text', class: 'loinc_input'});
-    var loincInputHidden = $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
-
-    loincInput.on('blur', function(e){
-      loincInputHidden.val(JSON.stringify({loinc_code: e.target.value}))
-    });
-
-    return $('<div>').append(loincInput).append(loincInputHidden);
-  }
-
   function buildLoincCodeSelect(loincInputHidden) {
-    var loincInput =  $('<input>', {type: 'text', class: 'loinc_input'});
+    loincInputHidden = loincInputHidden || $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
 
+    var loincInput =  $('<input>', {type: 'text', class: 'loinc_input'});
     loincInput.on('blur', function(e){
       loincInputHidden.val(JSON.stringify({loinc_code: e.target.value}))
     });
-    debugger;
 
-    return $('<div>').append(loincInput).append(loincInputHidden);
-
+    return $('<div>').append(loincInput).append(loincInputHidden)[0];
   }
