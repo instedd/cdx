@@ -68,11 +68,7 @@
 
     // create loinc inputs
     $('.loinc_input_hidden').each(function(index, element){
-      var parent = element.parentElement;
-
-      var root = buildLoincCodeSelect(element);
-      console.log(root);
-      parent.append(root);
+      $(element).parent().append(buildLoincCodeSelect(element));
     });
 
   })();
@@ -161,9 +157,9 @@
   }
 
   function buildLoincCodeSelect(loincInputHidden) {
-    loincInputHidden = loincInputHidden || $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
+    loincInputHidden = $(loincInputHidden) || $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
 
-    var loincInput =  $('<input>', {type: 'text', class: 'loinc_input'});
+    var loincInput =  $('<input>', {type: 'text', class: 'loinc_input', value: loincInputHidden.val()});
     loincInput.on('blur', function(e){
       loincInputHidden.val(JSON.stringify({loinc_code: e.target.value}))
     });
