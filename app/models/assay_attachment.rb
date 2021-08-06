@@ -1,4 +1,5 @@
 class AssayAttachment < ActiveRecord::Base
+  has_many :loinc_codes, class_name: 'LoincCode', :foreign_key => "id",  :dependent => :destroy
   belongs_to :sample
   has_attached_file :picture, styles:  lambda { |a| a.instance.is_image? ? { :card => "130x130>" }  : {} }
 

@@ -40,8 +40,8 @@ var LoincCodeSelect = React.createClass({
           filterOptions={this.filterOptions}>
         </Select>
 
-        <input name={`sample[assay_attachments_attributes][${this.props.assayIndex}][loinc_code]`}
-               type="hidden" value={this.state.loincInputValue} id={`sample[assay_attachments_attributes][${this.props.assayIndex}][loinc_code]`}/>
+        <input name={`sample[assay_attachments_attributes][${this.props.assayIndex}][loinc_code_id]`}
+               type="hidden" value={this.state.loincInputValue} id={`sample[assay_attachments_attributes][${this.props.assayIndex}][loinc_code_id]`}/>
 
         {/*{(function(){*/}
         {/*  if (this.state.patient == null) {*/}
@@ -79,7 +79,7 @@ var LoincCodeSelect = React.createClass({
       }.bind(this));
     this.setState(function(state) {
       return React.addons.update(state, {
-        loincInputValue: { $set : selection[0].component }
+        loincInputValue: { $set : selection[0].id }
       })
     },
       function() {
