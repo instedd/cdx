@@ -104,13 +104,9 @@ class SampleForm
     return false
   end
 
-  validates_presence_of :lab_technician
+
   SPECIMEN_ROLE_VALUES = Sample.entity_fields.detect { |f| f.name == 'specimen_role' }.options
-  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLE_VALUES, message: "is not within valid options (should be one of #{SPECIMEN_ROLE_VALUES.join(', ')})"
-  validates_presence_of :isolate_name
   INACTIVATION_METHOD_VALUES = Sample.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
-  validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
-  validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
 
   # begin date_produced
   # @date_produced is Time | Nil | String.
@@ -147,7 +143,6 @@ class SampleForm
   end
 
   def date_produced_is_a_date
-    return if @date_produced.blank?
     errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless @date_produced.is_a?(Time)
   end
   # end date_produced
