@@ -93,7 +93,7 @@ class Sample < ActiveRecord::Base
     new_assay_pictures.each_with_index do |image, index|
       assay_attachments.build(
         picture: image,
-        loinc_code: JSON.parse(new_assays_info[index])["loinc_code"],
+        loinc_code: LoincCode.find(JSON.parse(new_assays_info[index])["loinc_code"]),
         result: JSON.parse(new_assays_info[index])["result"],
         sample: self
       )

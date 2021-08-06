@@ -2,13 +2,7 @@
   (function() {
     var onloadPicture = function(file) {
       return function(event) {
-      var infoColumn = createCardInfoColumn()
-      var pictureColumn = createCardPictureColumn(file, event)
-      var cardContainer = createCardContainer(infoColumn, pictureColumn)
-        $('.assay > .upload-new-file').append(
-          $('<div>', { class: 'file-uploaded' }).append(cardContainer)
-        );
-
+        createCard(file, event.target.result)
         // render Tooltip and Add-assays action
         updateAddAssaysControls();
       }
@@ -73,11 +67,6 @@
     updateAddAssaysControls();
   })();
 
-   $(document).on('blur','.loinc_input',function(e){
-     var hiddenInput = $(e.target.closest('.card-container')).find(":hidden")[0]
-     hiddenInput.value = JSON.stringify({loinc_code: e.target.value})
-   });
-
   $(document).on('blur','.result_input',function(e){
       var hiddenInput = $(e.target.closest('.card-container')).find(":hidden")[0]
       hiddenInput.value = JSON.stringify($.extend(JSON.parse(hiddenInput.value), {result: e.target.value}))
@@ -120,12 +109,23 @@
     }
   }
 
+  function createCard(file, url) {
+    var infoColumn = createCardInfoColumn()
+    var pictureColumn = createCardPictureColumn(file, url)
+    var cardContainer = createCardContainer(infoColumn, pictureColumn)
+    $('.assay > .upload-new-file').append(
+        $('<div>', { class: 'file-uploaded' }).append(cardContainer)
+    );
+  }
+
   function createCardInfoColumn() {
     return $('<div>', { class: 'col' })
             .append(
               $('<div>', { class: 'row' })
               .append($('<div>', { class: 'col pe-2' }).append($('<label for="new_sample_assay_attachments_attributes">Loinc</label>')))
-              .append($('<div>', { class: 'col' }).append($('<input class="loinc_input" type=text>')))
+              .append($('<div>', { class: 'col' }).append(
+                buildLoincCodeSelect()
+              ))
             )
             .append(
               $('<div>', { class: 'row' })
@@ -134,11 +134,11 @@
             )
   }
 
-  function createCardPictureColumn(file, event) {
+  function createCardPictureColumn(file, url) {
     return $('<div>', { class: 'col pe-3' })
             .append(
               $('<div>', { class: 'picture-container assay-file'})
-              .append(fileThumbnail(file, event.target.result))
+              .append(fileThumbnail(file, url))
               .append($('<div>', { class: 'picture-title', title: file.name })
               .append($('<div>').text(file.name)))
             )
@@ -148,10 +148,15 @@
     return  $('<div>', { class: 'card-container new-file' })
             .append(infoColumn)
             .append(pictureColumn)
-            .append(
-              $('<input>', {
-                type: 'hidden',
-                name: 'sample[new_assays][]'
-              })
-            )
+  }
+
+  function buildLoincCodeSelect() {
+    var loincInput =  $('<input>', {type: 'text', class: 'loinc_input'});
+    var loincInputHidden = $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
+
+    loincInput.on('blur', function(e){
+      loincInputHidden.val(JSON.stringify({loinc_code: e.target.value}))
+    });
+
+    return $('<div>').append(loincInput).append(loincInputHidden);
   }
