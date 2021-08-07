@@ -7,8 +7,10 @@ csv.each do |row|
   loinc_code.loinc_number = row["LOINC_NUM"]
   loinc_code.component = row["COMPONENT"]
 
-  if loinc_code.save
-    puts "Loinc with code: #{loinc_code.loinc_number} saved"
+  unless LoincCode.exists?(loinc_number: loinc_code.loinc_number)
+    if loinc_code.save
+      puts "Loinc with code: #{loinc_code.loinc_number} saved"
+    end
   end
 end
 
