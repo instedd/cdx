@@ -31,6 +31,7 @@
 //= require components
 //= require d3
 //= require jquery.custom-file-input
+//= require jquery.autocomplete
 //= require reflux
 //= require_tree .
 //= require turbolinks

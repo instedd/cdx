@@ -25,7 +25,7 @@
                     .col.pe-2
                       = ay.label :loinc_code
                     .col
-                      = ay.hidden_field :loinc_code_id, { class: 'loinc_input_hidden'}
+                      = hidden_field_tag :loinc_code, LoincCode.find(ay.object.loinc_code_id).component, { class: 'loinc_input_hidden'}
                   .row
                     .col.pe-2
                       = ay.label :result

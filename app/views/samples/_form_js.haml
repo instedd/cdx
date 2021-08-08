@@ -157,11 +157,26 @@
   }
 
   function buildLoincCodeSelect(loincInputHidden) {
-    loincInputHidden = $(loincInputHidden) || $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
+    loincInputHidden = loincInputHidden? $(loincInputHidden) : $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
 
     var loincInput =  $('<input>', {type: 'text', class: 'loinc_input', value: loincInputHidden.val()});
-    loincInput.on('blur', function(e){
-      loincInputHidden.val(JSON.stringify({loinc_code: e.target.value}))
+    loincInput.autocomplete({
+      lookup: function (query, done) {
+          $.ajax({
+            url: '/loinc_codes/search',
+            data: { q: query },
+            success: function(loincCodes) {
+              done({suggestions: loincCodes});
+            }
+          });
+      },
+      onSelect: function (suggestion) {
+        if(loincInputHidden.attr("name") === 'sample[new_assays][]'){
+          loincInputHidden.val(JSON.stringify({loinc_code: suggestion.id}))
+        } else {
+          loincInputHidden.val(suggestion.id)
+        }
+      }
     });
 
     return $('<div>').append(loincInput).append(loincInputHidden)[0];

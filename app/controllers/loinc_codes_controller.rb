@@ -5,7 +5,9 @@ class LoincCodesController < ApplicationController
 
     builder = Jbuilder.new do |json|
       json.array! @loinc_codes do |loinc_code|
-        json.(loinc_code, :id, :loinc_number, :component)
+        json.data loinc_code.loinc_number
+        json.value loinc_code.component
+        json.id loinc_code.id
       end
     end
 
