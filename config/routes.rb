@@ -131,11 +131,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :loinc_codes do
-    collection do
-      get :search
-    end
-  end
+  get 'loinc_codes/search' => 'loinc_codes#search'
 
 
   resources :alerts, except: [:show]
