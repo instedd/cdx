@@ -27,7 +27,7 @@
                     .col
                       .loinc_inputs
                         = text_field_tag :loinc_code_component, ay.object.loinc_code.description, { class: 'loinc_input'}
-                        = hidden_field_tag :loinc_code, ay.object.loinc_code.loinc_number, { class: 'loinc_input_hidden'}
+                        = ay.hidden_field :loinc_code_id, { class: 'loinc_input_hidden'}
                   .row
                     .col.pe-2
                       = ay.label :result
