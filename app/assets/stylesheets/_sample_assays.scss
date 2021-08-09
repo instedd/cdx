@@ -19,17 +19,23 @@
 .autocomplete-suggestions {
   border: 1px none #999;
   background: #FFF;
-  width: 500px;
+  width: 500px !important;
   box-shadow: 0 1px 3px 0px rgba(0,0,0,0.5);
   overflow: hidden;
   color: #000000;
   font-size: 14px;
   line-height: 24px;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .autocomplete-suggestions strong {
   font-weight: bold;
   color: black;
+}
+
+.autocomplete-suggestion {
+  padding: 10px;
 }
 
 .autocomplete-selected {
@@ -48,7 +54,6 @@
     overflow: auto;
     padding: 3px;
     min-height: 145px;
-    max-height: 310px;
 
     .tooltip {
       position: absolute;
