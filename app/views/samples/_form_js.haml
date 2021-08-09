@@ -78,11 +78,6 @@
 
   })();
 
-  $(document).on('blur','.result_input',function(e){
-      var hiddenInput = $(e.target.closest('.card-container')).find(":hidden")[0]
-      hiddenInput.value = JSON.stringify($.extend(JSON.parse(hiddenInput.value), {result: e.target.value}))
-   });
-
   document.addEventListener("dragenter", function( event ) {
     if ( event.target.className == "upload-picture" ) {
       $('.choose-picture').addClass('on');
@@ -121,7 +116,7 @@
   }
 
   function createCard(file, url) {
-    var infoColumn = createCardInfoColumn()
+    var infoColumn = createCardInfoColumn(file)
     var pictureColumn = createCardPictureColumn(file, url)
     var cardContainer = createCardContainer(infoColumn, pictureColumn)
     $('.assay > .upload-new-file').append(
@@ -129,19 +124,19 @@
     );
   }
 
-  function createCardInfoColumn() {
+  function createCardInfoColumn(file) {
     return $('<div>', { class: 'col' })
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-2' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
         .append($('<div>', { class: 'col' })
-          .append(buildLoincCodeSelect()))
+          .append(buildLoincCodeSelect({filename: file.name})))
       )
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-2' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
         .append($('<div>', { class: 'col' })
-          .append($('<input class="result_input" type=text>')))
+          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays_info][][${file.name}][result]` } )))
       );
   }
 
@@ -161,9 +156,9 @@
             .append(pictureColumn)
   }
 
-  function buildLoincCodeSelect(loincInputs) {
-    var loincInput = (loincInputs && loincInputs.input) ? loincInputs.input : $('<input>', {type: 'text', class: 'loinc_input'});
-    var loincInputHidden = (loincInputs && loincInputs.hidden) ? loincInputs.hidden : $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
+  function buildLoincCodeSelect(config) {
+    var loincInput = (config && config.input) ? config.input : $('<input>', {type: 'text', class: 'loinc_input'});
+    var loincInputHidden = (config && config.hidden) ? config.hidden : $('<input>', {type: 'hidden', name: `sample[new_assays_info][][${config.filename}][loinc_code_id]`});
 
     loincInput.autocomplete({
       lookup: function (query, done) {
@@ -176,11 +171,7 @@
           });
       },
       onSelect: function (suggestion) {
-        if(loincInputHidden.attr("name") === 'sample[new_assays][]'){
-          loincInputHidden.val(JSON.stringify({loinc_code: suggestion.id}))
-        } else {
-          loincInputHidden.val(suggestion.id)
-        }
+        loincInputHidden.val(suggestion.id)
       }
     });
 
