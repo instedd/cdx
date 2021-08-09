@@ -67,8 +67,13 @@
     updateAddAssaysControls();
 
     // create loinc inputs
-    $('.loinc_input_hidden').each(function(index, element){
-      $(element).parent().append(buildLoincCodeSelect(element));
+    $('.loinc_inputs').each(function(index, element){
+      var input = $(element).find('.loinc_input');
+      var hidden = $(element).find('.loinc_input_hidden');
+      $(element).replaceWith(buildLoincCodeSelect({
+        input: input,
+        hidden: hidden
+      }));
     });
 
   })();
@@ -156,10 +161,10 @@
             .append(pictureColumn)
   }
 
-  function buildLoincCodeSelect(loincInputHidden) {
-    loincInputHidden = loincInputHidden? $(loincInputHidden) : $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
+  function buildLoincCodeSelect(loincInputs) {
+    var loincInput = (loincInputs && loincInputs.input) ? loincInputs.input : $('<input>', {type: 'text', class: 'loinc_input'});
+    var loincInputHidden = (loincInputs && loincInputs.hidden) ? loincInputs.hidden : $('<input>', {type: 'hidden', name: 'sample[new_assays][]'});
 
-    var loincInput =  $('<input>', {type: 'text', class: 'loinc_input', value: loincInputHidden.val()});
     loincInput.autocomplete({
       lookup: function (query, done) {
           $.ajax({
