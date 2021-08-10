@@ -37,7 +37,7 @@ class SampleForm
   end
 
   def sample
-    @sample # ||= Sample.new
+    @sample
   end
 
   def sample=(value)

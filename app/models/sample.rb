@@ -79,14 +79,11 @@ class Sample < ActiveRecord::Base
 
   def new_assays=(new_assays = [])
     new_assays.each do |assay|
-      loinc_code_id = if assay[:loinc_code_id].empty?
-                        nil
-                      else
-                        assay[:loinc_code_id]
-                      end
+      loinc_code = LoincCode.find(assay[:loinc_code_id]) unless assay[:loinc_code_id].empty?
+
       assay_attachments.build(
         picture: assay[:file],
-        loinc_code: LoincCode.find(loinc_code_id),
+        loinc_code: loinc_code,
         result: assay[:result],
         sample: self
       )
