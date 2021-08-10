@@ -16,15 +16,44 @@
   }
 }
 
+.autocomplete-suggestions {
+  border: 1px none #999;
+  background: #FFF;
+  width: 500px !important;
+  box-shadow: 0 1px 3px 0px rgba(0,0,0,0.5);
+  overflow: hidden;
+  color: #000000;
+  font-size: 14px;
+  line-height: 24px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.autocomplete-suggestions strong {
+  font-weight: bold;
+  color: black;
+}
+
+.autocomplete-suggestion {
+  padding: 10px;
+}
+
+.autocomplete-selected {
+  background: #F0F0F0;
+}
+
+.autocomplete-group {
+  padding: 2px 5px;
+}
+
 .assay {
   .upload-new-file.picture {
     position: relative;
     display: flex;
     flex-wrap: wrap;
     overflow: auto;
-    padding: 0px;
+    padding: 3px;
     min-height: 145px;
-    max-height: 310px;
 
     .tooltip {
       position: absolute;
@@ -63,13 +92,25 @@
       margin-top: 0px;
     }
 
+    .card-container {
+      display: flex;
+      padding: 5px;
+      align-items: flex-start;
+      margin: 5px;
+      background-color: #FFFFFF;
+      box-sizing: border-box;
+      box-shadow: 0 1px 3px 0px rgba(0,0,0,0.5);
+      border: 1px solid $gray3;
+      border-radius: 5px;
+    }
+
     .picture-container {
       position: relative;
-      width: 130px;
-      height: 130px;
+      width: 120px;
+      height: 100px;
       top: inherit;
       left: inherit;
-      margin: 7px;
+      margin: 15px;
       overflow: hidden;
 
       background-color: #FFFFFF;
@@ -123,6 +164,8 @@
     }
 
     .clear-label {
+      top: 0px;
+      right: 1px;
       z-index: 1;
     }
   }

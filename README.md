@@ -25,6 +25,13 @@ Reference implementation for the Connected Diagnostics API (http://dxapi.org/)
 	$ docker-compose run --rm web rake db:setup db:test:prepare elasticsearch:setup
 	```
 
+### Additionally setup for importing Loinc Codes
+
+1. Import Loinc Codes
+	```
+	$ docker-compose run --rm web rails r script/loinc_codes/import_csv.rb
+	```
+
 ### Additionally setup for working with devices
 
 1. Import manifests: `bundle exec rake manifests:load`

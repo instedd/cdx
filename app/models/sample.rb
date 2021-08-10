@@ -12,8 +12,8 @@ class Sample < ActiveRecord::Base
   has_many :notes, dependent: :destroy
   accepts_nested_attributes_for :notes, allow_destroy: true
 
-  has_many :assays, dependent: :destroy
-  accepts_nested_attributes_for :assays, allow_destroy: true
+  has_many :assay_attachments, dependent: :destroy
+  accepts_nested_attributes_for :assay_attachments, allow_destroy: true
 
   validates_presence_of :institution
   validate :validate_encounter
@@ -77,10 +77,14 @@ class Sample < ActiveRecord::Base
     specimen_role == 'Q - Control specimen'
   end
 
-  def new_assays=(pictures = [])
-    pictures.each do |picture|
-      assays.build(
-        picture: picture,
+  def new_assays=(new_assays = [])
+    new_assays.each do |assay|
+      loinc_code = LoincCode.find(assay[:loinc_code_id]) unless assay[:loinc_code_id].empty?
+
+      assay_attachments.build(
+        picture: assay[:file],
+        loinc_code: loinc_code,
+        result: assay[:result],
         sample: self
       )
     end
