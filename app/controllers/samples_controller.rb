@@ -152,83 +152,44 @@ class SamplesController < ApplicationController
   private
 
   def sample_params
-    params.require(:sample).tap do |whitelisted|
-      whitelisted[:new_assays_info] = params[:sample][:new_assays_info]
-
-      whitelisted[:date_produced] = params[:sample][:date_produced],
-      whitelisted[:lab_technician] = params[:sample][:lab_technician],
-      whitelisted[:specimen_role] = params[:sample][:specimen_role],
-      whitelisted[:isolate_name] = params[:sample][:isolate_name],
-      whitelisted[:inactivation_method] = params[:sample][:inactivation_method],
-      whitelisted[:volume] = params[:sample][:volume],
-      whitelisted[:assay_attachments_attributes] = params[:sample][:assay_attachments_attributes],
-      whitelisted[:new_assays] = params[:sample][:new_assays],
-      whitelisted[:new_assays_info] = params[:sample][:new_assays_info],
-      whitelisted[:notes_attributes] = params[:sample][:notes_attributes],
-      whitelisted[:new_notes] = params[:sample][:new_notes]
-
-      # merge assays files with its corresponding info
-      puts whitelisted[:new_assays_info]
-
-      infos = whitelisted[:new_assays_info].reduce({}, :merge)
-      puts infos
-
-      assay_attachments = (whitelisted[:new_assays] || []).map do |assay_file|
-        puts assay_file.original_filename
-        { file: assay_file,
-          loinc_code_id: infos["#{assay_file.original_filename}"][:loinc_code_id],
-          result: infos["#{assay_file.original_filename}"][:result] }
-      end
-
-      puts whitelisted
-      whitelisted[:new_assays] = assay_attachments
-
-      # adding author to new notes
-      new_notes_with_author = (whitelisted[:new_notes] || []).map do |note_description|
-        { user: current_user, description: note_description }
-      end
-      whitelisted[:new_notes] = new_notes_with_author
-
-      return whitelisted
-
-    end
-
-    # sample_params = params.require(:sample).permit(
-    #   :date_produced,
-    #   :lab_technician,
-    #   :specimen_role,
-    #   :isolate_name,
-    #   :inactivation_method,
-    #   :volume,
-    #   assay_attachments_attributes: [ :id, :loinc_code_id, :result, :_destroy ],
-    #   new_assays: [],
-    #   new_assays_info: [{ filename: [ :loinc_code_id, :result ] }],
-    #   notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
-    #   new_notes: []
-    # )
+    sample_params = params.require(:sample).permit(
+      :date_produced,
+      :lab_technician,
+      :specimen_role,
+      :isolate_name,
+      :inactivation_method,
+      :volume,
+      assay_attachments_attributes: [ :id, :loinc_code_id, :result, :_destroy ],
+      new_assays: [],
+      new_assays_info: [ :filename, :loinc_code_id, :result ],
+      notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
+      new_notes: []
+    )
 
     # merge assays files with its corresponding info
-    # puts sample_params[:new_assays_info]
+    infos = sample_params[:new_assays_info].reduce({}) do | acc, t |
+      acc[t[:filename]] = {
+        loinc_code_id: t[:loinc_code_id],
+        result: t[:result]
+      }
+      acc
+    end
 
-    # infos = sample_params[:new_assays_info].reduce({}, :merge)
-    # puts infos
+    sample_params[:new_assays] = (sample_params[:new_assays] || []).map do |assay_file|
+      { file: assay_file,
+        loinc_code_id: infos[assay_file.original_filename][:loinc_code_id],
+        result: infos[assay_file.original_filename][:result] }
+    end
 
-    # assay_attachments = (sample_params[:new_assays] || []).map do |assay_file|
-    #   { file: assay_file,
-    #     loinc_code_id: infos[assay_file.original_filename][:loinc_code_id],
-    #     result: infos[assay_file.original_filename][:result] }
-    # end
+    sample_params.delete(:new_assays_info)
 
-    # puts assay_attachments
-    # sample_params[:new_assays] = assay_attachments
+    # adding author to new notes
+    new_notes_with_author = (sample_params[:new_notes] || []).map do |note_description|
+      { user: current_user, description: note_description }
+    end
+    sample_params[:new_notes] = new_notes_with_author
 
-    # # adding author to new notes
-    # new_notes_with_author = (sample_params[:new_notes] || []).map do |note_description|
-    #   { user: current_user, description: note_description }
-    # end
-    # sample_params[:new_notes] = new_notes_with_author
-
-    # sample_params
+    sample_params
   end
 
   def date_format

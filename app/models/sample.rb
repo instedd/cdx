@@ -79,21 +79,21 @@ class Sample < ActiveRecord::Base
     specimen_role == 'Q - Control specimen'
   end
 
-  def new_assays=(pictures = [])
-    new_assay_pictures = Array.new
-    new_assays_info = Array.new
-    pictures.each do |picture|
-      if picture.is_a? ActionDispatch::Http::UploadedFile
-        new_assay_pictures.push picture
-      else
-        new_assays_info.push picture
-      end
-    end
+  def new_assays=(new_assays = [])
+    # new_assay_pictures = Array.new
+    # new_assays_info = Array.new
+    # pictures.each do |picture|
+    #   if picture.is_a? ActionDispatch::Http::UploadedFile
+    #     new_assay_pictures.push picture
+    #   else
+    #     new_assays_info.push picture
+    #   end
+    # end
 
-    new_assay_pictures.each_with_index do |image, index|
+    new_assays.each do |assay|
       assay_attachments.build(
-        picture: image,
-        loinc_code: LoincCode.find(JSON.parse(new_assays_info[index])["loinc_code"]),
+        picture: assay.file,
+        loinc_code: assay.loinc_code_id,
         result: JSON.parse(new_assays_info[index])["result"],
         sample: self
       )
