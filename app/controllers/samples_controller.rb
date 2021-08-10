@@ -167,7 +167,7 @@ class SamplesController < ApplicationController
     )
 
     # merge assays files with its corresponding info
-    infos = sample_params[:new_assays_info].reduce({}) do | acc, t |
+    infos = (sample_params[:new_assays_info] || []).reduce({}) do | acc, t |
       acc[t[:filename]] = {
         loinc_code_id: t[:loinc_code_id],
         result: t[:result]
