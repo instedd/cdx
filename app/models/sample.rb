@@ -86,7 +86,7 @@ class Sample < ActiveRecord::Base
                       end
       assay_attachments.build(
         picture: assay[:file],
-        loinc_code: loinc_code_id,
+        loinc_code: LoincCode.find(loinc_code_id),
         result: assay[:result],
         sample: self
       )
