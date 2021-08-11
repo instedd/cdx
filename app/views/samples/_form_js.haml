@@ -35,7 +35,7 @@
     });
 
     // Change the class on the target zone when dragging a file over it
-    $(".clear-label > input[type='checkbox']").on('click', function(e) {
+    $(".remove > input[type='checkbox']").on('click', function(e) {
       $(this).closest('.file-uploaded').addClass('remove');
     });
 
@@ -96,14 +96,6 @@
     $('.new-file').remove();
   }
 
-  function fileThumbnail(file, url) {
-    if (file.type.startsWith('image/')) {
-      return $('<img>', { class: 'uploaded', src: url });
-    } else {
-      return $('<div>', { class: 'any-filetype icon-document' });
-    }
-  }
-
   function updateAddAssaysControls() {
     var assays = $('.assay-file');
     if (assays.length > 0) {
@@ -116,26 +108,28 @@
   }
 
   function createCard(file, url) {
-    var infoColumn = createCardInfoColumn(file)
-    var pictureColumn = createCardPictureColumn(file, url)
-    var cardContainer = createCardContainer(infoColumn, pictureColumn)
     $('.assay > .upload-new-file').append(
-        $('<div>', { class: 'file-uploaded' }).append(cardContainer)
+        $('<div>', { class: 'file-uploaded' })
+          .append($('<div>', { class: 'card-container new-file' })
+            .append(createCardInfoColumn(file))
+            .append(createCardPictureColumn(file, url))
+            .append(createCardDummyRemove())
+          )
     );
   }
 
   function createCardInfoColumn(file) {
-    return $('<div>', { class: 'col' })
+    return $('<div>', { class: 'info' })
       .append($('<div>', { class: 'row' })
-        .append($('<div>', { class: 'col pe-2' })
+        .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
-        .append($('<div>', { class: 'col' })
+        .append($('<div>', { class: 'col pe-8' })
           .append(buildLoincCodeSelect({filename: file.name})))
       )
       .append($('<div>', { class: 'row' })
-        .append($('<div>', { class: 'col pe-2' })
+        .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
-        .append($('<div>', { class: 'col' })
+        .append($('<div>', { class: 'col pe-8' })
           .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays_info][][result]` } )))
       )
       .append($('<div>')
@@ -143,7 +137,7 @@
   }
 
   function createCardPictureColumn(file, url) {
-    return $('<div>', { class: 'col pe-3' })
+    return $('<div>', { class: 'file' })
             .append(
               $('<div>', { class: 'picture-container assay-file'})
               .append(fileThumbnail(file, url))
@@ -152,10 +146,17 @@
             )
   }
 
-  function createCardContainer(infoColumn, pictureColumn){
-    return  $('<div>', { class: 'card-container new-file' })
-            .append(infoColumn)
-            .append(pictureColumn)
+  function createCardDummyRemove() {
+    return $('<div>', { class: 'remove' }).css('width', '34px');
+  }
+
+  function fileThumbnail(file, url) {
+    if (file.type.startsWith('image/')) {
+      return $('<img>', { class: 'uploaded', src: url });
+    } else {
+      return $('<div>', { class: 'any-filetype' })
+        .append($('<div>', { class: 'icon-document'}));
+    }
   }
 
   function buildLoincCodeSelect(config) {
