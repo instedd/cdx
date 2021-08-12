@@ -26,6 +26,7 @@ gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 
 gem 'config', '~> 1.2.0'
 gem 'rest-client'
 gem 'barby'
+gem 'rqrcode', '~> 0.10.1'
 gem 'chunky_png'
 gem 'wicked_pdf', '~> 2.1'
 gem 'gon'
