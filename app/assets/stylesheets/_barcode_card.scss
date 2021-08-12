@@ -21,6 +21,12 @@
     .code {
       font-size: 12px;
       padding: 0 5px;
+
+      .uuid {
+        font-size: 14px;
+        margin: 0 0 5px;
+        text-align: center;
+      }
     }
 
     .logo {
@@ -64,8 +70,8 @@
     font-family: 'Roboto Mono', monospace;
 
     background: $white;
-    padding: 5px 7px;
-    margin: 5px 15px;
+    // padding: 5px 7px;
+    margin: 5px;
 
     .title {
       font-size: 14px;
@@ -74,8 +80,14 @@
     }
 
     .code {
-      font-size: 12px;
+      font-size: 8px;
       padding: 0 5px;
+
+      .uuid {
+        font-size: 10px;
+        margin: 0 0 5px;
+        text-align: center;
+      }
     }
 
     .logo {

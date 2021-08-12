@@ -1,16 +1,20 @@
 .barcode-card-print
   .barcode-content
-    .title
-      = sample.institution
+    -# .title
+    -#   = sample.institution
     .barcode
-      = image_tag barcode_img_data_url(sample.uuid)
+      = image_tag barcode_img_data_url(sample.uuid.split('-').last)
     .code
-      Sample ID #{sample.uuid}
+      -# #{sample.uuid}
+      .uuid
+        #{sample.uuid.split('-').last}
     .code
-      Isolate Name: #{sample.isolate_name}  Inactivation Method: #{sample.inactivation_method}
+      Isol. #{sample.isolate_name}
     .code
-      Production Date: #{sample.date_produced_description}
-    .logo
-      -# = image_tag 'cdx-logo-bw.png'
-      = wicked_pdf_image_tag 'cdx-logo-bw.png'
-      .label https://cdx.io
+      Inac. #{sample.inactivation_method}
+    .code
+      Prod. #{sample.date_produced_description}
+    -# .logo
+    -#   -# = image_tag 'cdx-logo-bw.png'
+    -#   = wicked_pdf_image_tag 'cdx-logo-bw.png'
+    -#   .label https://cdx.io

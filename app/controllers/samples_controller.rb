@@ -57,9 +57,9 @@ class SamplesController < ApplicationController
       template: 'samples/barcode.pdf',
       layout: 'layouts/pdf.html',
       locals: { :sample => @sample },
-      margin: { top: 2, bottom: 0, left: 0, right: 0 },
-      page_width: '4in',
-      page_height: '1.5in',
+      margin: { top: 0, bottom: 0, left: 0, right: 0 },
+      page_width: '1in',
+      page_height: '1in',
       show_as_html: params.key?('debug')
   end
 
@@ -78,9 +78,9 @@ class SamplesController < ApplicationController
     end
 
     options = {
-      margin: { top: 2, bottom: 0, left: 0, right: 0 },
-      page_width: '4in',
-      page_height: '1.5in'
+      margin: { top: 0, bottom: 0, left: 0, right: 0 },
+      page_width: '1in',
+      page_height: '1in'
     }
 
     begin
