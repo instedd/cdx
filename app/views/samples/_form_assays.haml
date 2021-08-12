@@ -19,33 +19,33 @@
         = f.fields_for :assay_attachments do |ay|
           .file-uploaded
             .card-container
-              .row
-                .col
-                  .row
-                    .col.pe-2
-                      = ay.label :loinc_code, 'LOINC'
-                    .col
-                      .loinc_inputs
-                        = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: 'loinc_input'}
-                        = ay.hidden_field :loinc_code_id, { class: 'loinc_input_hidden'}
-                  .row
-                    .col.pe-2
-                      = ay.label :result
-                    .col
-                      = ay.text_field :result
+              .info
+                .row
+                  .col.pe-1
+                    = ay.label :loinc_code, 'LOINC'
+                  .col.pe-8
+                    .loinc_inputs
+                      = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: 'loinc_input'}
+                      = ay.hidden_field :loinc_code_id, { class: 'loinc_input_hidden'}
+                .row
+                  .col.pe-1
+                    = ay.label :result
+                  .col.pe-8
+                    = ay.text_field :result
 
-                .col.pe-3
-                  .picture-container.assay-file
-                    - if ay.object.is_image?
-                      = image_tag ay.object.picture.url(:card)
-                    - else
-                      .any-filetype.icon-document
-                    .picture-title{ title: ay.object.picture_file_name }
-                      = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank", download: ay.object.picture_file_name
-                  .clear-label
-                    = ay.check_box '_destroy', { id: "destroy_assay_attachments_#{ay.object.id}" }
-                    %label.cross{:for => "destroy_assay_attachments_#{ay.object.id}" }
-                      = image_tag "ic-cross.png"
+              .file
+                .picture-container.assay-file
+                  - if ay.object.is_image?
+                    = image_tag ay.object.picture.url(:card)
+                  - else
+                    .any-filetype
+                      .icon-document
+                  .picture-title{ title: ay.object.picture_file_name }
+                    = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank", download: ay.object.picture_file_name
+              .remove
+                = ay.check_box '_destroy', { id: "destroy_assay_attachments_#{ay.object.id}" }
+                %label.cross{:for => "destroy_assay_attachments_#{ay.object.id}" }
+                  = image_tag "ic-cross.png"
 
     .actions
       = button_tag id: 'add-assays', class: "btn-link nodisplay" do
