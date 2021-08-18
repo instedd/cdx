@@ -1,7 +1,10 @@
 class BatchesController < ApplicationController
 
   def index
-    @batches = Batch.all.order('created_at DESC')
+    @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLE)
+
+    @batches = Batch.where(institution: @navigation_context.institution)
+    @batches = check_access(@batches, READ_SAMPLE).order('created_at DESC')
 
     @batches = @batches.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
     @batches = @batches.where("batch_number LIKE concat('%', ?, '%')", params[:batch_number]) unless params[:batch_number].blank?

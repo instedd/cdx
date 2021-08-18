@@ -1,6 +1,7 @@
 class Batch < ActiveRecord::Base
   include Entity
   include AutoUUID
+  include Resource
 
   belongs_to :institution
   validates_presence_of :institution
