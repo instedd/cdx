@@ -13,7 +13,8 @@ module Resource
       Role,
       User,
       Patient,
-      Sample
+      Sample,
+      Batch
     ].freeze
   end
 

@@ -12,6 +12,7 @@
             "institution:registerDevice",
             "institution:createPatient",
             "institution:createSample",
+            "institution:createBatch",
             "institution:createSite",
             "institution:createRole",
             "institution:readUsers"
@@ -30,6 +31,11 @@
         },
         {
           "resource": "sample?institution=<%= institution_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "batch?institution=<%= institution_id %>",
           "action": "*",
           "delegable": true
         },
@@ -80,6 +86,10 @@
         {
           "resource": "sample?institution=<%= institution_id %>",
           "action": "sample:read"
+        },
+        {
+          "resource": "batch?institution=<%= institution_id %>",
+          "action": "batch:read"
         },
         {
           "resource": "site?institution=<%= institution_id %>",
