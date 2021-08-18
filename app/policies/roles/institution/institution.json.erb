@@ -11,6 +11,7 @@
             "institution:update",
             "institution:registerDevice",
             "institution:createPatient",
+            "institution:createSample",
             "institution:createSite",
             "institution:createRole",
             "institution:readUsers"
@@ -24,6 +25,11 @@
         },
         {
           "resource": "patient?institution=<%= institution_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "sample?institution=<%= institution_id %>",
           "action": "*",
           "delegable": true
         },
@@ -70,6 +76,10 @@
         {
           "resource": "patient?institution=<%= institution_id %>",
           "action": "patient:read"
+        },
+        {
+          "resource": "sample?institution=<%= institution_id %>",
+          "action": "sample:read"
         },
         {
           "resource": "site?institution=<%= institution_id %>",

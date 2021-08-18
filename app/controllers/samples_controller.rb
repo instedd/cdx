@@ -1,8 +1,11 @@
 class SamplesController < ApplicationController
 
   def index
-    # TODO: filter by Institution
-    @samples = Sample.all.order('created_at DESC')
+    @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLE)
+
+    @samples = Sample.where(institution: @navigation_context.institution)
+    @samples = check_access(@samples, READ_SAMPLE).order('created_at DESC')
+
     @samples = @samples.joins(:sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
     @samples = @samples.joins(:batch).where("batches.batch_number LIKE concat('%', ?, '%')", params[:batch_number]) unless params[:batch_number].blank?
     @samples = @samples.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
