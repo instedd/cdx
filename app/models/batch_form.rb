@@ -112,10 +112,8 @@ class BatchForm
   end
 
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
-  validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
 
-  SPECIMEN_ROLE_VALUES = YAML.load(File.read("#{Rails.root.to_s}/app/models/static_data/specimen_roles.yml"))["specimen_roles"]
-  # validates_inclusion_of :specimen_role, in: SPECIMEN_ROLE_VALUES, message: "is not within valid options (should be one of #{SPECIMEN_ROLE_VALUES.map{|k,v| "#{k}=#{v}"}.join('&')})"
+  SPECIMEN_ROLE_VALUES = Batch::SPECIMEN_ROLES
 
   validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
   validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
