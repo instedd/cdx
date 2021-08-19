@@ -19,6 +19,9 @@ class Sample < ActiveRecord::Base
   validate :validate_encounter
   validate :validate_patient
 
+
+  SPECIMEN_ROLES = YAML.load(File.read("#{Rails.root.to_s}/app/models/static_data/specimen_roles.yml"))["specimen_roles"]
+
   def self.entity_scope
     "sample"
   end

@@ -1,0 +1,182 @@
+:javascript
+  (function() {
+    var onloadPicture = function(file) {
+      return function(event) {
+        createCard(file, event.target.result)
+        // render Tooltip and Add-assays action
+        updateAddAssaysControls();
+      }
+    }
+
+    // Click on Add Assays
+    $('#add-assays').on('click', function(e) {
+      event.preventDefault();
+      $('#sample_new_assays').click();
+    });
+
+    // Drag Picture to an input file and preview it
+    $('#sample_new_assays').on('change', function(e) {
+      removeFilesPreview();
+
+      var files = e.target.files;
+
+      for(var i = 0; i < files.length; i++) {
+        var file = files[i];
+
+        var reader = new FileReader();
+        reader.onload = onloadPicture(file);
+        reader.readAsDataURL(file);
+      }
+
+      if (files.length > 0) {
+        // toggle buttons
+        $('#undo-added-assays').removeClass('nodisplay');
+      }
+    });
+
+    // Change the class on the target zone when dragging a file over it
+    $(".remove > input[type='checkbox']").on('click', function(e) {
+      $(this).closest('.file-uploaded').addClass('remove');
+    });
+
+    $('.assay > .upload-new-file').on('scroll', function(e) {
+      var scrollDiff = $(this).scrollTop();
+      // move dropzone-input into view
+      $('.upload-picture').css('top', scrollDiff);
+    });
+
+    // Reset
+    $('#undo-added-assays').on('click', function(e) {
+      event.preventDefault();
+
+      removeFilesPreview();
+
+      // toggle buttons
+      $('#undo-added-assays').addClass('nodisplay');
+
+      // render Tooltip and Add-assays action
+      updateAddAssaysControls();
+
+      // remove files from input FileList
+      var emptyClonedInput = $('#sample_new_assays').val('').clone(true);
+      $('#sample_new_assays')
+        .replaceWith(emptyClonedInput);
+    });
+
+    // initial state for Tooltip and Add-assays action
+    updateAddAssaysControls();
+
+    // create loinc inputs
+    $('.loinc_inputs').each(function(index, element){
+      var input = $(element).find('.loinc_input');
+      var hidden = $(element).find('.loinc_input_hidden');
+      $(element).replaceWith(buildLoincCodeSelect({
+        input: input,
+        hidden: hidden
+      }));
+    });
+
+  })();
+
+  document.addEventListener("dragenter", function( event ) {
+    if ( event.target.className == "upload-picture" ) {
+      $('.choose-picture').addClass('on');
+    }
+
+  }, false);
+
+  document.addEventListener("dragleave", function( event ) {
+    if ( event.target.className == "upload-picture" ) {
+      $('.choose-picture').removeClass('on');
+    }
+  }, false);
+
+  function removeFilesPreview() {
+    // remove all new-files preview
+    $('.new-file').remove();
+  }
+
+  function updateAddAssaysControls() {
+    var assays = $('.assay-file');
+    if (assays.length > 0) {
+      $('.assay > .upload-new-file > .tooltip').addClass('nodisplay');
+      $('#add-assays').removeClass('nodisplay');
+    } else {
+      $('.assay > .upload-new-file > .tooltip').removeClass('nodisplay');
+      $('#add-assays').addClass('nodisplay');
+    }
+  }
+
+  function createCard(file, url) {
+    $('.assay > .upload-new-file').append(
+        $('<div>', { class: 'file-uploaded' })
+          .append($('<div>', { class: 'card-container new-file' })
+            .append(createCardInfoColumn(file))
+            .append(createCardPictureColumn(file, url))
+            .append(createCardDummyRemove())
+          )
+    );
+  }
+
+  function createCardInfoColumn(file) {
+    return $('<div>', { class: 'info' })
+      .append($('<div>', { class: 'row' })
+        .append($('<div>', { class: 'col pe-1' })
+          .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
+        .append($('<div>', { class: 'col pe-8' })
+          .append(buildLoincCodeSelect({filename: file.name})))
+      )
+      .append($('<div>', { class: 'row' })
+        .append($('<div>', { class: 'col pe-1' })
+          .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
+        .append($('<div>', { class: 'col pe-8' })
+          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays_info][][result]` } )))
+      )
+      .append($('<div>')
+        .append($('<input>', { type: 'hidden', name: 'sample[new_assays_info][][filename]', value: file.name } )))
+  }
+
+  function createCardPictureColumn(file, url) {
+    return $('<div>', { class: 'file' })
+            .append(
+              $('<div>', { class: 'picture-container assay-file'})
+              .append(fileThumbnail(file, url))
+              .append($('<div>', { class: 'picture-title', title: file.name })
+              .append($('<div>').text(file.name)))
+            )
+  }
+
+  function createCardDummyRemove() {
+    return $('<div>', { class: 'remove' }).css('width', '34px');
+  }
+
+  function fileThumbnail(file, url) {
+    if (file.type.startsWith('image/')) {
+      return $('<img>', { class: 'uploaded', src: url });
+    } else {
+      return $('<div>', { class: 'any-filetype' })
+        .append($('<div>', { class: 'icon-document'}));
+    }
+  }
+
+  function buildLoincCodeSelect(config) {
+    var loincInput = (config && config.input) ? config.input : $('<input>', {type: 'text', class: 'loinc_input'});
+    var loincInputHidden = (config && config.hidden) ? config.hidden : $('<input>', {type: 'hidden', name: `sample[new_assays_info][][loinc_code_id]`});
+
+    loincInput.autocomplete({
+      lookup: function (query, done) {
+          $.ajax({
+            url: '/loinc_codes/search',
+            data: { q: query },
+            success: function(loincCodes) {
+              done({suggestions: loincCodes});
+            }
+          });
+      },
+      onSelect: function (suggestion) {
+        loincInputHidden.val(suggestion.id)
+      }
+    });
+
+    return $('<div>').append(loincInput).append(loincInputHidden)[0];
+  }

@@ -26,8 +26,9 @@
         .col.pe-4
           = f.label :specimen_role
         .col
-          = cdx_select form: f, name: :specimen_role, searchable: false, :class => 'input-large' do |select|
-            - select.items SampleForm::SPECIMEN_ROLE_VALUES
+          = f.text_field :specimen_role, :class => 'input-x-large'
+          - Sample::SPECIMEN_ROLES.each do |key, value|
+            = hidden_field_tag key, value, {disabled: true, class: 'spcimen_role_options'}
 
       .row
         .col.pe-4
@@ -69,3 +70,4 @@
         = confirm_deletion_button @sample_form, 'sample'
 
 = render 'form_js'
+= render 'form_assays_js'
