@@ -112,7 +112,6 @@ class SamplesController < ApplicationController
     @show_barcode_preview = true
     @show_print_action = true
 
-    # TODO: Implement user authorized to delete
     @can_delete = has_access?(sample, DELETE_SAMPLE)
   end
 
