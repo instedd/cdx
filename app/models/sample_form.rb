@@ -104,8 +104,6 @@ class SampleForm
     return false
   end
 
-
-  SPECIMEN_ROLE_VALUES = Sample.entity_fields.detect { |f| f.name == 'specimen_role' }.options
   INACTIVATION_METHOD_VALUES = Sample.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
 
   # begin date_produced

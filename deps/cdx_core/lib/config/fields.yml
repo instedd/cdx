@@ -12,19 +12,6 @@ entities:
       collection_date:
         type: date
       specimen_role:
-        type: enum
-        options:
-          - B - Blind Sample
-          - C - Calibrator
-          - E - Electronic QC
-          - F - Filler
-          - G - Group
-          - L - Pool
-          - O - Operator Proficiency
-          - P - Patient
-          - Q - Control specimen
-          - R - Replicate
-          - V - Verifying Calibrator
       isolate_name:
         searchable: true
       date_produced:
@@ -47,19 +34,6 @@ entities:
         searchable: true
       lab_technician:
       specimen_role:
-        type: enum
-        options:
-          - B - Blind Sample
-          - C - Calibrator
-          - E - Electronic QC
-          - F - Filler
-          - G - Group
-          - L - Pool
-          - O - Operator Proficiency
-          - P - Patient
-          - Q - Control specimen
-          - R - Replicate
-          - V - Verifying Calibrator
       isolate_name:
         searchable: true
       inactivation_method:

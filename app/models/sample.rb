@@ -19,9 +19,12 @@ class Sample < ActiveRecord::Base
   validate :validate_encounter
   validate :validate_patient
 
+  SPECIMEN_ROLES = YAML.load_file(File.join(File.dirname(__FILE__), ".", "config", "specimen_roles.yml"))["specimen_roles"]
+
   def self.entity_scope
     "sample"
   end
+
   attribute_field :isolate_name, copy: true
   attribute_field :date_produced,
                   :lab_technician,
