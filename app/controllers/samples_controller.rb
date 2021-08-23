@@ -24,20 +24,24 @@ class SamplesController < ApplicationController
     })
 
     @sample_form = SampleForm.for(sample)
+    prepare_for_institution_and_authorize(@sample_form, CREATE_INSTITUTION_SAMPLE)
+
     @view_helper = view_helper({save_back_path: true})
     @show_barcode_preview = false
   end
 
   def create
-    uuid = session[:creating_sample_uuid]
+    institution = @navigation_context.institution
+    return unless authorize_resource(institution, CREATE_INSTITUTION_SAMPLE)
 
+    uuid = session[:creating_sample_uuid]
     if uuid.blank?
       redirect_to new_sample_path, notice: 'There was an error creating the sample'
       return
     end
 
     sample = Sample.new(sample_params.merge({
-      institution: @navigation_context.institution,
+      institution: institution,
       sample_identifiers: [SampleIdentifier.new({uuid: uuid})]
     }))
     @sample_form = SampleForm.for(sample)
@@ -53,6 +57,7 @@ class SamplesController < ApplicationController
 
   def print
     @sample = Sample.find(params[:id])
+    return unless authorize_resource(@sample, READ_SAMPLE)
 
     @show_print_action = false
 
@@ -68,6 +73,7 @@ class SamplesController < ApplicationController
 
   def bulk_print
     @samples = Sample.where(id: params[:sample_ids])
+    return unless authorize_resource(@sample, READ_SAMPLE)
 
     if @samples.blank?
       redirect_to samples_path, notice: 'Select at least one sample to print.'
@@ -99,6 +105,7 @@ class SamplesController < ApplicationController
   def edit
     sample = Sample.find(params[:id])
     @sample_form = SampleForm.for(sample)
+    return unless authorize_resource(sample, UPDATE_SAMPLE)
 
     @view_helper = view_helper({save_back_path: true})
 
@@ -106,15 +113,14 @@ class SamplesController < ApplicationController
     @show_print_action = true
 
     # TODO: Implement user authorized to delete
-    @can_delete = true
+    @can_delete = has_access?(sample, DELETE_SAMPLE)
   end
 
   def update
     sample = Sample.find(params[:id])
     @sample_form = SampleForm.for(sample)
+    return unless authorize_resource(sample, UPDATE_SAMPLE)
 
-    # TODO:
-    # return unless authorize_resource(patient, UPDATE_PATIENT)
     params = sample_params
     unless user_can_delete_notes(params["notes_attributes"] || [])
       redirect_to edit_sample_path(sample.id), notice: 'Update failed: Notes can only be deleted by their authors'
@@ -131,8 +137,7 @@ class SamplesController < ApplicationController
 
   def destroy
     @sample = Sample.find(params[:id])
-    # TODO:
-    # return unless authorize_resource(@patient, DELETE_PATIENT)
+    return unless authorize_resource(@sample, DELETE_SAMPLE)
 
     @sample.destroy
 
