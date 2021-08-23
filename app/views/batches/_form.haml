@@ -28,7 +28,7 @@
         .col
           = f.text_field :specimen_role, :class => 'input-x-large'
           - Sample::SPECIMEN_ROLES.each do |key, value|
-            = hidden_field_tag key, value, {disabled: true, class: 'spcimen_role_options'}
+            = hidden_field_tag key, value, {disabled: true, class: 'specimen_role_options'}
 
       .row
         .col.pe-3
@@ -71,4 +71,4 @@
       - if @can_delete
         = confirm_deletion_button @batch_form, 'batch'
 
-= render 'form_js'
+= render 'samples/form_specimen_role_js'

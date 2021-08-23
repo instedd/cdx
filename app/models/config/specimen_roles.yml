@@ -6,7 +6,7 @@ specimen_roles:
   g: Group (where a specimen consists of multiple individual elements that are not individually identified)
   l: Pool (aliquots of individual specimens combined to form a single specimen representing all of the components.)
   o: Specimen used for testing Operator Proficiency
-  p: Patient (default if blank component value)
+  p: Patient
   q: Control specimen
   r: Replicate (of patient sample as a control)
   v: Verifying Calibrator, used for periodic calibration checks
