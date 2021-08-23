@@ -19,7 +19,7 @@ class Batch < ActiveRecord::Base
                   :inactivation_method,
                   :volume
 
-  SPECIMEN_ROLES = YAML.load(File.read("#{Rails.root.to_s}/app/models/static_data/specimen_roles.yml"))["specimen_roles"]
+  SPECIMEN_ROLES = YAML.load_file(File.join(File.dirname(__FILE__), ".", "config", "specimen_roles.yml"))["specimen_roles"]
 
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_presence_of :inactivation_method
