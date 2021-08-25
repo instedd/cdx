@@ -156,7 +156,7 @@ RSpec.describe BatchesController, type: :controller do
       expect(batch.inactivation_method).to eq(batch_form_plan[:inactivation_method])
       expect(batch.volume).to eq(batch_form_plan[:volume])
 
-      # samples created
+      # samples created (see samples_quantity)
       expect(batch.samples.count).to eq(1)
 
       expect(batch.core_fields['batch_number']).to eq(batch_form_plan[:batch_number])
@@ -235,10 +235,11 @@ RSpec.describe BatchesController, type: :controller do
     it "should not require specimen_role" do
       expect {
         post :create, batch: build_batch_form_plan(specimen_role: '')
-      }.to change(institution.batches, :count).by(0)
+      }.to change(institution.batches, :count).by(1)
 
-      expect(assigns(:batch_form).errors).to have_key(:specimen_role)
-      expect(response).to render_template("batches/new")
+      batch = institution.batches.last
+      expect(batch.specimen_role).to be_nil
+      expect(response).to redirect_to batches_path
     end
 
     # TODO: navigation_context site
