@@ -360,7 +360,7 @@ RSpec.describe SamplesController, type: :controller do
       expect(response).to be_redirect
     end
 
-    it "should be able to delete if can delete" do
+    it "should be able to destroy if can delete" do
       grant user, other_user, Sample, DELETE_SAMPLE
       sign_in other_user
 
@@ -372,13 +372,121 @@ RSpec.describe SamplesController, type: :controller do
       expect(sample.deleted_at).to_not be_nil
     end
 
-    it "should not able to delete if can not delete" do
+    it "should not able to destroy if can not delete" do
       sign_in other_user
 
       expect {
         delete :destroy, id: sample.id
       }.to change(institution.samples, :count).by(0)
 
+      expect(response).to be_forbidden
+    end
+  end
+
+  context "bulk_destroy" do
+    let!(:sample1) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: '08/08/2021'})}
+    let!(:sample2) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: '09/09/2018'})}
+
+    let!(:institution2)   { Institution.make }
+    let!(:sample3) { institution2.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: '07/07/2020'})}
+
+    it "should be able to bulk destroy samples" do
+
+      expect {
+        post :bulk_destroy, sample_ids: [sample1.id, sample2.id]
+      }.to change(institution.samples, :count).by(-2)
+
+      sample1.reload
+      expect(sample1.deleted_at).to_not be_nil
+      sample2.reload
+      expect(sample2.deleted_at).to_not be_nil
+
+      expect(response).to be_redirect
+    end
+
+    it "should be able to bulk destroy if can DELETE" do
+      grant user, other_user, Sample, DELETE_SAMPLE
+      sign_in other_user
+
+      expect {
+        post :bulk_destroy, sample_ids: [sample1.id, sample2.id]
+      }.to change(institution.samples, :count).by(-2)
+
+      sample1.reload
+      expect(sample1.deleted_at).to_not be_nil
+      sample2.reload
+      expect(sample2.deleted_at).to_not be_nil
+    end
+
+    it "should not able to bulk destroy if can not DELETE" do
+      sign_in other_user
+
+      expect {
+        post :bulk_destroy, sample_ids: [sample1.id, sample2.id]
+      }.to change(institution.samples, :count).by(0)
+
+      expect(response).to be_forbidden
+    end
+
+    it "should not able to bulk destroy if can not DELETE all samples" do
+      post :bulk_destroy, sample_ids: [sample1.id, sample2.id, sample3.id]
+      expect(response).to be_forbidden
+    end
+  end
+
+  context "print" do
+    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: '08/08/2021'})}
+
+    it "should be able to print a sample" do
+      post :print, id: sample.id
+      expect(response.headers['Content-Type']).to eq('application/pdf')
+    end
+
+    it "should be able to print if can READ" do
+      grant user, other_user, Sample, READ_SAMPLE
+      sign_in other_user
+
+      post :print, id: sample.id
+      expect(response.headers['Content-Type']).to eq('application/pdf')
+    end
+
+    it "should not able to print if can not READ" do
+      sign_in other_user
+
+      post :print, id: sample.id
+      expect(response).to be_forbidden
+    end
+  end
+
+  context "bulk_print" do
+    let!(:sample1) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: '08/08/2021'})}
+    let!(:sample2) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: '09/09/2018'})}
+
+    let!(:institution2)   { Institution.make }
+    let!(:sample3) { institution2.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: '07/07/2020'})}
+
+    it "should be able to bulk print samples" do
+      post :bulk_print, sample_ids: [sample1.id, sample2.id]
+      expect(response.headers['Content-Type']).to eq('application/pdf')
+    end
+
+    it "should be able to bulk print if can READ" do
+      grant user, other_user, Sample, READ_SAMPLE
+      sign_in other_user
+
+      post :bulk_print, sample_ids: [sample1.id, sample2.id]
+      expect(response.headers['Content-Type']).to eq('application/pdf')
+    end
+
+    it "should not able to bulk print if can not READ" do
+      sign_in other_user
+
+      post :bulk_print, sample_ids: [sample1.id, sample2.id]
+      expect(response).to be_forbidden
+    end
+
+    it "should not able to bulk print if can not READ all samples" do
+      post :bulk_print, sample_ids: [sample1.id, sample2.id, sample3.id]
       expect(response).to be_forbidden
     end
   end

@@ -72,15 +72,17 @@ class SamplesController < ApplicationController
   end
 
   def bulk_print
-    @samples = Sample.where(id: params[:sample_ids])
-    return unless authorize_resource(@sample, READ_SAMPLE)
+    sample_ids = params[:sample_ids]
 
-    if @samples.blank?
+    if sample_ids.blank?
       redirect_to samples_path, notice: 'Select at least one sample to print.'
       return
     end
 
-    sample_strings = @samples.map do |sample|
+    samples = Sample.where(id: params[:sample_ids])
+    return unless authorize_resources(samples, READ_SAMPLE)
+
+    sample_strings = samples.map do |sample|
       render_to_string template: 'samples/barcode.pdf',
         layout: 'layouts/pdf.html',
         locals: {:sample => sample}
@@ -94,7 +96,7 @@ class SamplesController < ApplicationController
 
     begin
       pdf_file = MultipagePdfRenderer.combine(sample_strings, options)
-      pdf_filename = "cdx_samples_#{@samples.size}_#{DateTime.now.strftime('%Y%m%d-%H%M')}.pdf"
+      pdf_filename = "cdx_samples_#{samples.size}_#{DateTime.now.strftime('%Y%m%d-%H%M')}.pdf"
 
       send_data pdf_file, type: 'application/pdf', filename: pdf_filename
     rescue
@@ -150,6 +152,9 @@ class SamplesController < ApplicationController
       redirect_to samples_path, notice: 'Select at least one sample to destroy.'
       return
     end
+
+    samples = Sample.where(id: sample_ids)
+    return unless authorize_resources(samples, DELETE_SAMPLE)
 
     Sample.where(id: sample_ids).destroy_all
 
@@ -226,5 +231,9 @@ class SamplesController < ApplicationController
     can_delete = Note
       .find(notes_id_to_destroy)
       .all? { |db_note| db_note.user_id == current_user.id }
+  end
+
+  def authorize_resources(resources, action)
+    resources.all? { | resource | authorize_resource(resource, action) }
   end
 end
