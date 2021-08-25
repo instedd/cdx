@@ -53,6 +53,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def authorize_resources(resources, action)
+    resources.all? { | resource | authorize_resource(resource, action) }
+  end
+
   def check_no_institution!
     return if current_user && current_user.need_change_password?
 

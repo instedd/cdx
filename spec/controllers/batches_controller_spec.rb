@@ -190,7 +190,7 @@ RSpec.describe BatchesController, type: :controller do
     it "should require date_produced" do
       expect {
         post :create, batch: build_batch_form_plan(date_produced: '')
-      }.to change(institution.samples, :count).by(0)
+      }.to change(institution.batches, :count).by(0)
 
       expect(assigns(:batch_form).errors).to have_key(:date_produced)
       expect(response).to render_template("batches/new")
@@ -361,7 +361,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should not update existing batch if not allowed" do
       sign_in other_user
-      post :update, id: batch.id, sample: { date_produced: '09/09/2021' }
+      post :update, id: batch.id, batch: { date_produced: '09/09/2021' }
       expect(response).to be_forbidden
 
       batch.reload
@@ -379,7 +379,6 @@ RSpec.describe BatchesController, type: :controller do
       inactivation_method: 'Formaldehyde',
       volume: 100
     )}
-
 
     it "should be able to soft delete a batch" do
       expect {
@@ -409,6 +408,85 @@ RSpec.describe BatchesController, type: :controller do
 
       expect {
         delete :destroy, id: batch.id
+      }.to change(institution.batches, :count).by(0)
+
+      expect(response).to be_forbidden
+    end
+  end
+
+  context "bulk_destroy" do
+    let!(:batch1) { institution.batches.make(
+      batch_number: '123',
+      isolate_name: 'ABC.42',
+      date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
+      lab_technician: 'Tec.Foo',
+      specimen_role: 'Q - Control specimen',
+      inactivation_method: 'Formaldehyde',
+      volume: 100
+    )}
+
+    let!(:batch2) { institution.batches.make(
+      batch_number: '456',
+      isolate_name: 'DEF.24',
+      date_produced: Time.strptime('09/09/2020', I18n.t('date.input_format.pattern')),
+      lab_technician: 'Tec.Foo',
+      specimen_role: 'Q - Control specimen',
+      inactivation_method: 'Formaldehyde',
+      volume: 200
+    )}
+
+    let!(:institution2)   { Institution.make }
+    let!(:batch3) { institution2.batches.make(
+      batch_number: '789',
+      isolate_name: 'GHI.4224',
+      date_produced: Time.strptime('07/07/2019', I18n.t('date.input_format.pattern')),
+      lab_technician: 'Tec.Foo',
+      specimen_role: 'Q - Control specimen',
+      inactivation_method: 'Formaldehyde',
+      volume: 300
+    )}
+
+    it "should be able to bulk destroy batches" do
+
+      expect {
+        post :bulk_destroy, batch_ids: [batch1.id, batch2.id]
+      }.to change(institution.batches, :count).by(-2)
+
+      batch1.reload
+      expect(batch1.deleted_at).to_not be_nil
+      batch2.reload
+      expect(batch2.deleted_at).to_not be_nil
+
+      expect(response).to be_redirect
+    end
+
+    it "should be able to bulk destroy if can DELETE" do
+      grant user, other_user, Batch, DELETE_BATCH
+      sign_in other_user
+
+      expect {
+        post :bulk_destroy, batch_ids: [batch1.id, batch2.id]
+      }.to change(institution.batches, :count).by(-2)
+
+      batch1.reload
+      expect(batch1.deleted_at).to_not be_nil
+      batch2.reload
+      expect(batch2.deleted_at).to_not be_nil
+    end
+
+    it "should not able to bulk destroy if can not DELETE" do
+      sign_in other_user
+
+      expect {
+        post :bulk_destroy, batch_ids: [batch1.id, batch2.id]
+      }.to change(institution.batches, :count).by(0)
+
+      expect(response).to be_forbidden
+    end
+
+    it "should not able to bulk destroy if can not DELETE all batches" do
+      expect {
+        post :bulk_destroy, batch_ids: [batch1.id, batch2.id, batch3.id]
       }.to change(institution.batches, :count).by(0)
 
       expect(response).to be_forbidden

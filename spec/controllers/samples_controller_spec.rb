@@ -391,7 +391,6 @@ RSpec.describe SamplesController, type: :controller do
     let!(:sample3) { institution2.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: '07/07/2020'})}
 
     it "should be able to bulk destroy samples" do
-
       expect {
         post :bulk_destroy, sample_ids: [sample1.id, sample2.id]
       }.to change(institution.samples, :count).by(-2)
@@ -429,7 +428,10 @@ RSpec.describe SamplesController, type: :controller do
     end
 
     it "should not able to bulk destroy if can not DELETE all samples" do
-      post :bulk_destroy, sample_ids: [sample1.id, sample2.id, sample3.id]
+      expect {
+        post :bulk_destroy, sample_ids: [sample1.id, sample2.id, sample3.id]
+      }.to change(institution.samples, :count).by(0)
+
       expect(response).to be_forbidden
     end
   end

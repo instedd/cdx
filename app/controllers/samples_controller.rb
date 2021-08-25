@@ -156,7 +156,7 @@ class SamplesController < ApplicationController
     samples = Sample.where(id: sample_ids)
     return unless authorize_resources(samples, DELETE_SAMPLE)
 
-    Sample.where(id: sample_ids).destroy_all
+    samples.destroy_all
 
     redirect_to samples_path, notice: 'Samples were successfully deleted.'
   end
@@ -231,9 +231,5 @@ class SamplesController < ApplicationController
     can_delete = Note
       .find(notes_id_to_destroy)
       .all? { |db_note| db_note.user_id == current_user.id }
-  end
-
-  def authorize_resources(resources, action)
-    resources.all? { | resource | authorize_resource(resource, action) }
   end
 end

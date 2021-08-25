@@ -80,7 +80,10 @@ class BatchesController < ApplicationController
       return
     end
 
-    Batch.where(id: batch_ids).destroy_all
+    batches = Batch.where(id: batch_ids)
+    return unless authorize_resources(batches, DELETE_BATCH)
+
+    batches.destroy_all
 
     redirect_to batches_path, notice: 'Batches were successfully deleted.'
   end
