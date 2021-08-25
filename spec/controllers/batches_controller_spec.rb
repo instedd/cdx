@@ -69,16 +69,14 @@ RSpec.describe BatchesController, type: :controller do
       expect(assigns(:batches).count).to eq(2)
     end
 
-    # TODO:
-    # it "should filter by Sample ID" do
-    #   institution.batches.make batch_number: '7788'
-    #   institution.batches.make batch_number: '8877'
-    #   institution.batches.make batch_number: '0123'
+    it "should filter by Sample ID" do
+      batch = institution.batches.make batch_number: '7788'
+      batch.samples.make sample_identifiers: [SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
 
-    #   get :index, batch_number: '88'
-    #   expect(response).to be_success
-    #   expect(assigns(:batches).count).to eq(2)
-    # end
+      get :index, sample_id: '88'
+      expect(response).to be_success
+      expect(assigns(:batches).count).to eq(1)
+    end
   end
 
   context "new" do
