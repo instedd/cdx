@@ -79,24 +79,6 @@ RSpec.describe BatchesController, type: :controller do
     #   expect(response).to be_success
     #   expect(assigns(:batches).count).to eq(2)
     # end
-
-    # TODO: navigation_context site
-    # it "should filter based con navigation_context site" do
-    #   site1 = institution.sites.make
-    #   site11 = Site.make :child, parent: site1
-    #   site2 = institution.sites.make
-
-    #   patient1 = institution.patients.make
-    #   patient2 = institution.patients.make
-
-    #   patient1.encounters.make site: site11
-    #   patient2.encounters.make site: site2
-
-    #   get :index, context: site1.uuid
-
-    #   expect(response).to be_success
-    #   expect(assigns(:patients).to_a).to eq([patient1])
-    # end
   end
 
   context "new" do
@@ -492,22 +474,4 @@ RSpec.describe BatchesController, type: :controller do
       expect(response).to be_forbidden
     end
   end
-
-  # TODO: search institution/site
-  # context "search" do
-  #   it "should search in entire institution" do
-  #     site1 = institution.sites.make
-  #     site2 = institution.sites.make
-  #     other_institution = Institution.make user: user
-
-  #     patient1 = institution.patients.make name: 'john doe', site: site1
-  #     patient2 = institution.patients.make name: 'john foo', site: site2
-  #     other_institution.patients.make name: 'john alone'
-
-  #     get :search, q: 'john', context: site1.uuid
-
-  #     json_response = JSON.parse(response.body)
-  #     expect(json_response.map { |p| p["id"] }).to match([patient1.id, patient2.id])
-  #   end
-  # end
 end
