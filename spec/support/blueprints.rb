@@ -129,6 +129,17 @@ Sample.blueprint do
   patient { object.encounter.try(:patient) }
 end
 
+Batch.blueprint do
+  institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make }
+  batch_number { '000' }
+  isolate_name { 'ABC.42.DE' }
+  date_produced { Time.strptime('01/01/2018', I18n.t('date.input_format.pattern')) }
+  lab_technician { 'Tec.Foo' }
+  specimen_role { 'Q - Control specimen' }
+  inactivation_method { 'Formaldehyde' }
+  volume { 100 }
+end
+
 Patient.blueprint do
   institution
   plain_sensitive_data {
