@@ -26,10 +26,10 @@ class Batch < ActiveRecord::Base
   validates_presence_of :inactivation_method
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
 
-  validates_presence_of :isolate_name
   validates_presence_of :date_produced
   validates_presence_of :volume
   validates_presence_of :lab_technician
+  validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
 
   validate :date_produced_is_a_date
 
@@ -46,10 +46,17 @@ class Batch < ActiveRecord::Base
   private
 
   def date_produced_is_a_date
-    errors.add(:date_produced, "should be a date") unless date_produced.is_a?(Time)
+    return if @date_produced.blank?
+    errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless @date_produced.is_a?(Time)
   end
 
   def isolate_name_batch_number_combination
+    if isolate_name.blank? or batch_number.blank?
+      errors.add(:isolate_name, "can't be blank") if isolate_name.blank?
+      errors.add(:batch_number, "can't be blank") if batch_number.blank?
+      return
+    end
+
     combination_query = [
       "LOWER(isolate_name) = ? AND LOWER(batch_number) = ? AND id != ?",
       isolate_name.downcase, batch_number.downcase, self.id

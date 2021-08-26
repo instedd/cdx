@@ -112,10 +112,8 @@ class BatchForm
   end
 
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
-
   SPECIMEN_ROLE_VALUES = Batch::SPECIMEN_ROLES
 
-  validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
   validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
 
   def creating_batch?
@@ -126,7 +124,6 @@ class BatchForm
   # @date_produced is Time | Nil | String.
   # BatchForm#date_produced will return always a string ready to be used by the user input with the user locale
   # BatchForm#date_produced= will accept either String or Time. The String will be converted if possible to a Time using the user locale
-  validate :date_produced_is_a_date
 
   def date_format
     { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
@@ -156,10 +153,6 @@ class BatchForm
     date_format[:placeholder]
   end
 
-  def date_produced_is_a_date
-    return if @date_produced.blank?
-    errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless @date_produced.is_a?(Time)
-  end
   # end date_produced
   #
 
