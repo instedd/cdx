@@ -5,10 +5,8 @@
     .barcode
       = image_tag barcode_img_data_url(sample.uuid)
     .code
-      -# #{sample.uuid}
       .uuid
         #{sample.uuid}
-        -# #{sample.uuid.split('-').last}
     .code
       Isol. #{sample.isolate_name}
     .code
