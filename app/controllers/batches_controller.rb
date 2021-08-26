@@ -1,7 +1,10 @@
 class BatchesController < ApplicationController
 
   def index
-    @batches = Batch.all.order('created_at DESC')
+    @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_BATCH)
+
+    @batches = Batch.where(institution: @navigation_context.institution)
+    @batches = check_access(@batches, READ_BATCH).order('created_at DESC')
 
     @batches = @batches.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
     @batches = @batches.where("batch_number LIKE concat('%', ?, '%')", params[:batch_number]) unless params[:batch_number].blank?
@@ -17,11 +20,18 @@ class BatchesController < ApplicationController
 
   def new
     @batch_form = BatchForm.new()
+    prepare_for_institution_and_authorize(@batch_form, CREATE_INSTITUTION_BATCH)
+
     @can_edit_sample_quantity = true
   end
 
   def create
-    @batch_form = BatchForm.new(batch_params.merge({institution: @navigation_context.institution}))
+    institution = @navigation_context.institution
+    return unless authorize_resource(institution, CREATE_INSTITUTION_BATCH)
+
+    @batch_form = BatchForm.new(batch_params.merge({
+      institution: institution
+    }))
 
     if @batch_form.create
       redirect_to batches_path, notice: 'Batch was successfully created.'
@@ -34,15 +44,17 @@ class BatchesController < ApplicationController
   def edit
     batch = Batch.find(params[:id])
     @batch_form = BatchForm.edit(batch)
+    return unless authorize_resource(batch, UPDATE_BATCH)
+
     @can_edit_sample_quantity = false
 
-    # TODO: Implement user authorized to delete
-    @can_delete = true
+    @can_delete = has_access?(batch, DELETE_BATCH)
   end
 
   def update
     batch = Batch.find(params[:id])
     @batch_form = BatchForm.edit(batch)
+    return unless authorize_resource(batch, UPDATE_BATCH)
 
     if @batch_form.update(batch_params, remove_samples_params)
       redirect_to batches_path, notice: 'Batch was successfully updated.'
@@ -53,19 +65,11 @@ class BatchesController < ApplicationController
 
   def destroy
     @batch = Batch.find(params[:id])
-    # TODO:
-    # return unless authorize_resource(@patient, DELETE_PATIENT)
+    return unless authorize_resource(@batch, DELETE_BATCH)
 
     @batch.destroy
 
     redirect_to batches_path, notice: 'Batch was successfully deleted.'
-  end
-
-  def add_sample
-    @batch_form = BatchForm.edit(Batch.find(params[:id]))
-    @batch_form.add_sample
-
-    redirect_to edit_batch_path(@batch_form), notice: 'New sample was added successfully.'
   end
 
   def bulk_destroy
@@ -76,9 +80,22 @@ class BatchesController < ApplicationController
       return
     end
 
-    Batch.where(id: batch_ids).destroy_all
+    batches = Batch.where(id: batch_ids)
+    return unless authorize_resources(batches, DELETE_BATCH)
+
+    batches.destroy_all
 
     redirect_to batches_path, notice: 'Batches were successfully deleted.'
+  end
+
+  def add_sample
+    batch = Batch.find(params[:id])
+    @batch_form = BatchForm.edit(batch)
+    return unless authorize_resource(batch, UPDATE_BATCH)
+
+    @batch_form.add_sample
+
+    redirect_to edit_batch_path(@batch_form), notice: 'New sample was added successfully.'
   end
 
   private

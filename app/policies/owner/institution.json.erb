@@ -9,6 +9,8 @@
         "institution:registerDevice",
         "institution:createSite",
         "institution:createPatient",
+        "institution:createSample",
+        "institution:createBatch",
         "institution:createRole",
         "institution:readUsers"
       ],
@@ -17,6 +19,8 @@
     {
       "resource": [
         "patient?institution=<%= institution_id %>",
+        "sample?institution=<%= institution_id %>",
+        "batch?institution=<%= institution_id %>",
         "site?institution=<%= institution_id %>",
         "device?institution=<%= institution_id %>",
         "testResult?institution=<%= institution_id %>",

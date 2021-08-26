@@ -1,6 +1,7 @@
 class Batch < ActiveRecord::Base
   include Entity
   include AutoUUID
+  include Resource
 
   belongs_to :institution
   validates_presence_of :institution
@@ -25,7 +26,10 @@ class Batch < ActiveRecord::Base
   validates_presence_of :inactivation_method
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
 
+  validates_presence_of :isolate_name
   validates_presence_of :date_produced
+  validates_presence_of :volume
+  validates_presence_of :lab_technician
 
   validate :date_produced_is_a_date
 

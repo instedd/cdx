@@ -12,7 +12,9 @@ module Resource
       Encounter,
       Role,
       User,
-      Patient
+      Patient,
+      Sample,
+      Batch
     ].freeze
   end
 

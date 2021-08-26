@@ -1,8 +1,11 @@
 class SamplesController < ApplicationController
 
   def index
-    # TODO: filter by Institution
-    @samples = Sample.all.order('created_at DESC')
+    @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLE)
+
+    @samples = Sample.where(institution: @navigation_context.institution)
+    @samples = check_access(@samples, READ_SAMPLE).order('created_at DESC')
+
     @samples = @samples.joins(:sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
     @samples = @samples.joins(:batch).where("batches.batch_number LIKE concat('%', ?, '%')", params[:batch_number]) unless params[:batch_number].blank?
     @samples = @samples.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
@@ -21,20 +24,24 @@ class SamplesController < ApplicationController
     })
 
     @sample_form = SampleForm.for(sample)
+    prepare_for_institution_and_authorize(@sample_form, CREATE_INSTITUTION_SAMPLE)
+
     @view_helper = view_helper({save_back_path: true})
     @show_barcode_preview = false
   end
 
   def create
-    uuid = session[:creating_sample_uuid]
+    institution = @navigation_context.institution
+    return unless authorize_resource(institution, CREATE_INSTITUTION_SAMPLE)
 
+    uuid = session[:creating_sample_uuid]
     if uuid.blank?
       redirect_to new_sample_path, notice: 'There was an error creating the sample'
       return
     end
 
     sample = Sample.new(sample_params.merge({
-      institution: @navigation_context.institution,
+      institution: institution,
       sample_identifiers: [SampleIdentifier.new({uuid: uuid})]
     }))
     @sample_form = SampleForm.for(sample)
@@ -50,6 +57,7 @@ class SamplesController < ApplicationController
 
   def print
     @sample = Sample.find(params[:id])
+    return unless authorize_resource(@sample, READ_SAMPLE)
 
     @show_print_action = false
 
@@ -64,14 +72,17 @@ class SamplesController < ApplicationController
   end
 
   def bulk_print
-    @samples = Sample.where(id: params[:sample_ids])
+    sample_ids = params[:sample_ids]
 
-    if @samples.blank?
+    if sample_ids.blank?
       redirect_to samples_path, notice: 'Select at least one sample to print.'
       return
     end
 
-    sample_strings = @samples.map do |sample|
+    samples = Sample.where(id: params[:sample_ids])
+    return unless authorize_resources(samples, READ_SAMPLE)
+
+    sample_strings = samples.map do |sample|
       render_to_string template: 'samples/barcode.pdf',
         layout: 'layouts/pdf.html',
         locals: {:sample => sample}
@@ -85,7 +96,7 @@ class SamplesController < ApplicationController
 
     begin
       pdf_file = MultipagePdfRenderer.combine(sample_strings, options)
-      pdf_filename = "cdx_samples_#{@samples.size}_#{DateTime.now.strftime('%Y%m%d-%H%M')}.pdf"
+      pdf_filename = "cdx_samples_#{samples.size}_#{DateTime.now.strftime('%Y%m%d-%H%M')}.pdf"
 
       send_data pdf_file, type: 'application/pdf', filename: pdf_filename
     rescue
@@ -96,22 +107,21 @@ class SamplesController < ApplicationController
   def edit
     sample = Sample.find(params[:id])
     @sample_form = SampleForm.for(sample)
+    return unless authorize_resource(sample, UPDATE_SAMPLE)
 
     @view_helper = view_helper({save_back_path: true})
 
     @show_barcode_preview = true
     @show_print_action = true
 
-    # TODO: Implement user authorized to delete
-    @can_delete = true
+    @can_delete = has_access?(sample, DELETE_SAMPLE)
   end
 
   def update
     sample = Sample.find(params[:id])
     @sample_form = SampleForm.for(sample)
+    return unless authorize_resource(sample, UPDATE_SAMPLE)
 
-    # TODO:
-    # return unless authorize_resource(patient, UPDATE_PATIENT)
     params = sample_params
     unless user_can_delete_notes(params["notes_attributes"] || [])
       redirect_to edit_sample_path(sample.id), notice: 'Update failed: Notes can only be deleted by their authors'
@@ -128,8 +138,7 @@ class SamplesController < ApplicationController
 
   def destroy
     @sample = Sample.find(params[:id])
-    # TODO:
-    # return unless authorize_resource(@patient, DELETE_PATIENT)
+    return unless authorize_resource(@sample, DELETE_SAMPLE)
 
     @sample.destroy
 
@@ -144,7 +153,10 @@ class SamplesController < ApplicationController
       return
     end
 
-    Sample.where(id: sample_ids).destroy_all
+    samples = Sample.where(id: sample_ids)
+    return unless authorize_resources(samples, DELETE_SAMPLE)
+
+    samples.destroy_all
 
     redirect_to samples_path, notice: 'Samples were successfully deleted.'
   end

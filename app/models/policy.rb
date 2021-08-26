@@ -28,6 +28,8 @@ class Policy < ActiveRecord::Base
     REGISTER_INSTITUTION_DEVICE_MODEL = "institution:registerDeviceModel"
     CREATE_INSTITUTION_ROLE =           "institution:createRole"
     CREATE_INSTITUTION_PATIENT =        "institution:createPatient"
+    CREATE_INSTITUTION_SAMPLE =         "institution:createSample"
+    CREATE_INSTITUTION_BATCH =         "institution:createBatch"
 
     READ_INSTITUTION_USERS = "institution:readUsers"
 
@@ -39,6 +41,14 @@ class Policy < ActiveRecord::Base
     READ_PATIENT =   "patient:read"
     UPDATE_PATIENT = "patient:update"
     DELETE_PATIENT = "patient:delete"
+
+    READ_SAMPLE =   "sample:read"
+    UPDATE_SAMPLE = "sample:update"
+    DELETE_SAMPLE = "sample:delete"
+
+    READ_BATCH =   "batch:read"
+    UPDATE_BATCH = "batch:update"
+    DELETE_BATCH = "batch:delete"
 
     READ_SITE =   "site:read"
     UPDATE_SITE = "site:update"
