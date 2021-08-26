@@ -222,17 +222,6 @@ RSpec.describe BatchesController, type: :controller do
       expect(response).to redirect_to batches_path
     end
 
-    # TODO: navigation_context site
-    # it "should use navigation_context as patient site" do
-    #   site = institution.sites.make
-    #   expect {
-    #     post :create, context: site.uuid, patient: patient_form_plan
-    #   }.to change(institution.patients, :count).by(1)
-
-    #   expect(Patient.last.site).to eq(site)
-
-    #   expect(response).to be_redirect
-    # end
   end
 
   context "edit" do
