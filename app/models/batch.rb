@@ -21,6 +21,7 @@ class Batch < ActiveRecord::Base
                   :volume
 
   SPECIMEN_ROLES = YAML.load_file(File.join(File.dirname(__FILE__), ".", "config", "specimen_roles.yml"))["specimen_roles"]
+  DATE_FORMAT = { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
 
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_presence_of :inactivation_method
@@ -43,11 +44,19 @@ class Batch < ActiveRecord::Base
     date_produced
   end
 
+  def date_format
+    { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
+  end
+
+  def date_produced_placeholder
+    self.date_format[:placeholder]
+  end
+
   private
 
   def date_produced_is_a_date
-    return if @date_produced.blank?
-    errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless @date_produced.is_a?(Time)
+    return if date_produced.blank?
+    errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless date_produced.is_a?(Time)
   end
 
   def isolate_name_batch_number_combination
