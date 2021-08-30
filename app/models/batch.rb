@@ -61,6 +61,7 @@ class Batch < ActiveRecord::Base
 
   def isolate_name_batch_number_combination
     if isolate_name.blank? or batch_number.blank?
+      puts "******************DEBUGGER BLANKK****************"
       errors.add(:isolate_name, "can't be blank") if isolate_name.blank?
       errors.add(:batch_number, "can't be blank") if batch_number.blank?
       return
@@ -70,6 +71,10 @@ class Batch < ActiveRecord::Base
       "LOWER(isolate_name) = ? AND LOWER(batch_number) = ? AND id != ?",
       isolate_name.downcase, batch_number.downcase, self.id
     ]
+
+    puts "******************DEBUGGER COUNT****************"
+    puts Batch.where(combination_query).to_sql
+    puts Batch.where(combination_query).count
 
     if Batch.where(combination_query).exists?
       errors.add(:isolate_name, "and Batch Number combination should be unique")
