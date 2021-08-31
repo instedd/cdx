@@ -34,7 +34,8 @@ class Batch < ActiveRecord::Base
 
   validate :date_produced_is_a_date
 
-  validate :isolate_name_batch_number_combination
+  validate :isolate_name_batch_number_combination_create, on: :create
+  validate :isolate_name_batch_number_combination_update, on: :update
 
   def date_produced_description
     if date_produced.is_a?(Time)
@@ -59,25 +60,38 @@ class Batch < ActiveRecord::Base
     errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless date_produced.is_a?(Time)
   end
 
-  def isolate_name_batch_number_combination
-    if isolate_name.blank? or batch_number.blank?
-      puts "******************DEBUGGER BLANKK****************"
-      errors.add(:isolate_name, "can't be blank") if isolate_name.blank?
-      errors.add(:batch_number, "can't be blank") if batch_number.blank?
-      return
-    end
+  def isolate_name_batch_number_combination_create
+    validate_isolate_name_batch_number_combination {
+      [ "#{query} AND id IS NOT NULL" ] + query_params
+    }
+  end
 
-    combination_query = [
-      "LOWER(isolate_name) = ? AND LOWER(batch_number) = ? AND id != ?",
-      isolate_name.downcase, batch_number.downcase, self.id
-    ]
+  def isolate_name_batch_number_combination_update
+    validate_isolate_name_batch_number_combination {
+      [ "#{query} AND id != ?" ] + query_params + [ id ]
+    }
+  end
 
-    puts "******************DEBUGGER COUNT****************"
-    puts Batch.where(combination_query).to_sql
-    puts Batch.where(combination_query).count
+  def query
+    "LOWER(isolate_name) = ? AND LOWER(batch_number) = ?"
+  end
 
-    if Batch.where(combination_query).exists?
+  def query_params
+    [ isolate_name.downcase, batch_number.downcase ]
+  end
+
+  def validate_isolate_name_batch_number_combination
+    return unless (present?(:isolate_name) && present?(:batch_number))
+
+    combination_exists = Batch.where(yield).exists?
+    if combination_exists
       errors.add(:isolate_name, "and Batch Number combination should be unique")
     end
+  end
+
+  def present?(attr_name)
+    valid = self[attr_name].present?
+    errors.add(attr_name, "can't be blank") unless valid
+    valid
   end
 end
