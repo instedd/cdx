@@ -112,6 +112,16 @@ RSpec.describe BatchesController, type: :controller do
       }
     }
 
+    let!(:batch) { institution.batches.make(
+      batch_number: '1234',
+      isolate_name: 'ABC.424',
+      date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
+      lab_technician: 'Tec.Foo',
+      specimen_role: 'Q - Control specimen',
+      inactivation_method: 'Formaldehyde',
+      volume: 100
+    )}
+
     def build_batch_form_plan(options)
       batch_form_plan.dup.merge! options
     end
@@ -176,6 +186,24 @@ RSpec.describe BatchesController, type: :controller do
       expect(response).to render_template("batches/new")
     end
 
+    it "should require isolate_name" do
+      expect {
+        post :create, batch: build_batch_form_plan(isolate_name: '')
+      }.to change(institution.batches, :count).by(0)
+
+      expect(assigns(:batch_form).errors).to have_key(:isolate_name)
+      expect(response).to render_template("batches/new")
+    end
+
+    it "should require batch_number" do
+      expect {
+        post :create, batch: build_batch_form_plan(batch_number: '')
+      }.to change(institution.batches, :count).by(0)
+
+      expect(assigns(:batch_form).errors).to have_key(:batch_number)
+      expect(response).to render_template("batches/new")
+    end
+
     it "should validate date_produced" do
       expect {
         post :create, batch: build_batch_form_plan(date_produced: '31/31/3100')
@@ -222,6 +250,29 @@ RSpec.describe BatchesController, type: :controller do
       expect(response).to redirect_to batches_path
     end
 
+    it "should validate batch_number and isolate_name uniqueness" do
+      expect {
+        post :create, batch: build_batch_form_plan(batch_number: batch.batch_number, isolate_name: batch.isolate_name)
+      }.to change(institution.batches, :count).by(0)
+
+      expect(response).to render_template("batches/new")
+    end
+
+    it "should validate batch_number (exists) and isolate_name uniqueness" do
+      expect {
+        post :create, batch: build_batch_form_plan(batch_number: batch.batch_number, isolate_name: 'DEF.24')
+      }.to change(institution.batches, :count).by(1)
+
+      expect(response).to redirect_to batches_path
+    end
+
+    it "should validate batch_number and isolate_name (exists) uniqueness" do
+      expect {
+        post :create, batch: build_batch_form_plan(batch_number: '456', isolate_name: batch.isolate_name)
+      }.to change(institution.batches, :count).by(1)
+
+      expect(response).to redirect_to batches_path
+    end
   end
 
   context "edit" do
