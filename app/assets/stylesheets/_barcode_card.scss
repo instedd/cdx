@@ -18,6 +18,11 @@
       padding: 0 5px;
     }
 
+    .barcode {
+      @include flexbox();
+      justify-content: center;
+    }
+
     .code {
       font-size: 12px;
       padding: 0 5px;
@@ -30,6 +35,9 @@
     }
 
     .logo {
+      @include flexbox();
+      align-items: center;
+
       font-size: 12px;
       padding: 0 5px;
       margin-top: 10px;
@@ -37,6 +45,11 @@
 
       .label {
         margin-left: 5px;
+      }
+
+      img {
+        width: 35px;
+        height: auto;
       }
     }
   }
@@ -79,6 +92,26 @@
       font-size: 6px;
       margin: 5px 0;
       text-align: center;
+    }
+  }
+
+  .logo {
+    @include flexbox();
+    flex-direction: row;
+    align-items: center;
+
+    font-size: 5px;
+    padding: 0 5px;
+    margin-top: 5px;
+    width: 100%;
+
+    .label {
+      margin-left: 5px;
+    }
+
+    img {
+      width: 15px;
+      height: auto;
     }
   }
 }

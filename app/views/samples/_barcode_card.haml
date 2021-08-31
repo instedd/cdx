@@ -20,9 +20,9 @@
       %strong
         Production Date:
       #{@sample_form.date_produced}
-    -# .row.logo
-    -#   = image_tag 'cdx-logo-bw.png'
-    -#   .label https://cdx.io
+    .logo
+      = image_tag 'cdx-logo-bw.png'
+      .label https://cdx.io
   - if @show_print_action
     .row.actions
       = link_to print_sample_path(@sample_form), download: "cdx_sample_#{@sample_form.uuid}.pdf", target: "_blank", class: 'btn-link' do
