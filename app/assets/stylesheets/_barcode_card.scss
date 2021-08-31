@@ -74,23 +74,24 @@
   font-family: 'Roboto Mono', monospace;
 
   background: $white;
-  margin: 3px;
-  padding: 10px;
+  margin: 2px;
+  padding: 5px;
 
   .barcode {
     margin: auto; // center barcode
+    margin-top: 0;
     margin-bottom: 0;
     width: 40%;
   }
 
   .code {
-    font-size: 6px;
+    font-size: 8px;
     margin: 0;
-    padding: 0 5px;
+    padding: 0 1px;
 
     .uuid {
-      font-size: 6px;
-      margin: 5px 0;
+      font-size: 8px;
+      margin: 1px 0;
       text-align: center;
     }
   }
@@ -100,13 +101,13 @@
     flex-direction: row;
     align-items: center;
 
-    font-size: 5px;
-    padding: 0 5px;
-    margin-top: 5px;
+    font-size: 6px;
+    padding: 0 1px;
+    margin-top: 1px;
     width: 100%;
 
     .label {
-      margin-left: 5px;
+      margin-left: 3px;
     }
 
     img {
