@@ -1,18 +1,26 @@
 .barcode-card
-  .row.barcode-content
-    .row
-      .title
-        = @sample_form.institution
-    .row
+  .barcode-content
+    -# .row
+    -#   .title
+    -#     = @sample_form.institution
+    .barcode
       = image_tag barcode_img_data_url(@sample_form.uuid)
-      .code Sample ID #{@sample_form.uuid}
-    .row
-      .code Isolate Name: #{@sample_form.isolate_name}
-    .row
-      .code Inactivation Method: #{@sample_form.inactivation_method}
-    .row
-      .code Production Date: #{@sample_form.date_produced}
-    .row.logo
+    .code
+      .uuid
+        #{@sample_form.uuid}
+    .code
+      %strong
+        Isolate Name:
+      #{@sample_form.isolate_name}
+    .code
+      %strong
+        Inactivation Method:
+      #{@sample_form.inactivation_method}
+    .code
+      %strong
+        Production Date:
+      #{@sample_form.date_produced}
+    .logo
       = image_tag 'cdx-logo-bw.png'
       .label https://cdx.io
   - if @show_print_action
