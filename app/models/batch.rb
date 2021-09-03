@@ -26,6 +26,8 @@ class Batch < ActiveRecord::Base
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_presence_of :inactivation_method
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
+  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLES, message: "is not within valid options (should be one of #{SPECIMEN_ROLES.transform_keys(&:upcase).keys.join(', ')})"
+
 
   validates_presence_of :date_produced
   validates_presence_of :volume
