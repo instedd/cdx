@@ -21,6 +21,8 @@ class Sample < ActiveRecord::Base
   validate :validate_patient
 
   SPECIMEN_ROLES = YAML.load_file(File.join(File.dirname(__FILE__), ".", "config", "specimen_roles.yml"))["specimen_roles"]
+  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLES.map {|key, value| "#{key.upcase} - #{value}"}, allow_blank: true, message: "is not within valid options (should be one of #{SPECIMEN_ROLES.transform_keys(&:upcase).keys.join(', ')})"
+
 
   def self.entity_scope
     "sample"
