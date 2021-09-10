@@ -25,6 +25,8 @@ class Batch < ActiveRecord::Base
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_presence_of :inactivation_method
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
+
+  SPECIMEN_ROLES = YAML.load_file(File.join(File.dirname(__FILE__), ".", "config", "specimen_roles.yml"))["specimen_roles"]
   validates_inclusion_of :specimen_role, in: SPECIMEN_ROLES.map {|key, value| "#{key.upcase} - #{value}"}, allow_blank: true, message: "is not within valid options (should be one of #{SPECIMEN_ROLES.transform_keys(&:upcase).keys.join(', ')})"
 
   validates_presence_of :date_produced
