@@ -12,6 +12,19 @@ entities:
       collection_date:
         type: date
       specimen_role:
+        type: enum
+        options:
+          - b
+          - c
+          - e
+          - f
+          - g
+          - l
+          - o
+          - p
+          - q
+          - r
+          - v
       isolate_name:
         searchable: true
       date_produced:
