@@ -135,7 +135,7 @@ Batch.blueprint do
   isolate_name { 'ABC.42.DE' }
   date_produced { Time.strptime('01/01/2018', I18n.t('date.input_format.pattern')) }
   lab_technician { 'Tec.Foo' }
-  specimen_role { 'Q - Control specimen' }
+  specimen_role { 'q' }
   inactivation_method { 'Formaldehyde' }
   volume { 100 }
 end
