@@ -262,7 +262,7 @@ RSpec.describe SamplesController, type: :controller do
         date_produced: '09/09/2021',
         isolate_name: 'ABC.42',
         lab_technician: 'TecFoo',
-        specimen_role: 'Q - Control specimen',
+        specimen_role: 'q',
         inactivation_method: 'Formaldehyde',
         volume: '100'
       }
@@ -272,7 +272,7 @@ RSpec.describe SamplesController, type: :controller do
       expect(sample.date_produced).to eq('09/09/2021')
       expect(sample.isolate_name).to eq('ABC.42')
       expect(sample.lab_technician).to eq('TecFoo')
-      expect(sample.specimen_role).to eq('Q - Control specimen')
+      expect(sample.specimen_role).to eq('q')
       expect(sample.inactivation_method).to eq('Formaldehyde')
       expect(sample.volume).to eq('100')
     end
@@ -291,7 +291,7 @@ RSpec.describe SamplesController, type: :controller do
         date_produced: '09/09/2021',
         isolate_name: 'ABC.42',
         lab_technician: 'TecFoo',
-        specimen_role: 'Q - Control specimen',
+        specimen_role: 'q',
         inactivation_method: 'Formaldehyde',
         volume: '100'
       }
@@ -301,7 +301,7 @@ RSpec.describe SamplesController, type: :controller do
       expect(sample.date_produced).to eq('09/09/2021')
       expect(sample.isolate_name).to eq('ABC.42')
       expect(sample.lab_technician).to eq('TecFoo')
-      expect(sample.specimen_role).to eq('Q - Control specimen')
+      expect(sample.specimen_role).to eq('q')
       expect(sample.inactivation_method).to eq('Formaldehyde')
       expect(sample.volume).to eq('100')
     end
