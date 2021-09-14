@@ -37,4 +37,12 @@ module Cdp
 
     config.assets.paths << Rails.root.join("app", "assets", "fonts")
   end
+
+  def self.version
+    if File.exist?(Rails.root.join("VERSION"))
+      File.read(Rails.root.join("VERSION")).strip
+    else
+      "development"
+    end
+  end
 end

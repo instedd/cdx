@@ -543,6 +543,8 @@ GEM
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
+    sentry-raven (2.13.0)
+      faraday (>= 0.7.6, < 1.0)
     sexp_processor (4.6.0)
     shellany (0.0.1)
     shoulda (3.5.0)
@@ -717,6 +719,7 @@ DEPENDENCIES
   rubyzip (>= 1.0.0)
   sass-rails (~> 4.0.0)
   sdoc
+  sentry-raven
   shoulda
   sidekiq
   sidekiq-cron (~> 0.3.1)
