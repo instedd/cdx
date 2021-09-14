@@ -31,7 +31,7 @@ class Batch < ActiveRecord::Base
   SPECIMEN_ROLES = SPECIMEN_ROLES_IDS.map { |id|
     { id: id, description: "#{id.upcase} - #{SPECIMEN_ROLES_DESCRIPTION[id]}"}
   }
-  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLES_IDS, allow_blank: true, message: "is not within valid options (should be one of #{SPECIMEN_ROLES_IDS.map{|id| id.upcase}.join(', ')})"
+  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLES_IDS, allow_blank: true, message: "is not within valid options"
 
 
   validates_presence_of :date_produced
