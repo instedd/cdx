@@ -15,7 +15,7 @@ module SpecimenRole
     end
 
     def specimen_role_descriptions
-      YAML.load_file(File.expand_path("../../config/specimen_roles.yml", __FILE__)["specimen_roles"])
+      YAML.load_file(File.join("app", "models", "config", "specimen_roles.yml"))["specimen_roles"]
     end
 
     def specimen_roles
