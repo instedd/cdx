@@ -20,10 +20,6 @@ class Sample < ActiveRecord::Base
   validate :validate_encounter
   validate :validate_patient
 
-  SPECIMEN_ROLES = YAML.load_file(File.join(File.dirname(__FILE__), ".", "config", "specimen_roles.yml"))["specimen_roles"]
-  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLES.map {|key, value| "#{key.upcase} - #{value}"}, allow_blank: true, message: "is not within valid options (should be one of #{SPECIMEN_ROLES.transform_keys(&:upcase).keys.join(', ')})"
-
-
   def self.entity_scope
     "sample"
   end
@@ -34,6 +30,13 @@ class Sample < ActiveRecord::Base
                   :specimen_role,
                   :inactivation_method,
                   :volume
+
+  SPECIMEN_ROLES_IDS = Sample.entity_fields.detect { |f| f.name == 'specimen_role' }.options
+  SPECIMEN_ROLES_DESCRIPTION = YAML.load_file(File.join(File.dirname(__FILE__), ".", "config", "specimen_roles.yml"))["specimen_roles"]
+  SPECIMEN_ROLES = SPECIMEN_ROLES_IDS.map { |id|
+    { id: id, description: "#{id.upcase} - #{SPECIMEN_ROLES_DESCRIPTION[id]}"}
+  }
+  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLES_IDS, allow_blank: true, message: "is not within valid options"
 
   def self.find_by_entity_id(entity_id, opts)
     query = joins(:sample_identifiers).where(sample_identifiers: {entity_id: entity_id.to_s}, institution_id: opts.fetch(:institution_id))

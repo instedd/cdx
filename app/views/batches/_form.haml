@@ -26,9 +26,8 @@
         .col.pe-3
           = f.label :specimen_role
         .col
-          = f.text_field :specimen_role, :class => 'input-x-large'
-          - Sample::SPECIMEN_ROLES.each do |key, value|
-            = hidden_field_tag key, value, {disabled: true, class: 'specimen_role_options'}
+          = cdx_select form: f, name: :specimen_role, searchable: true, :class => 'input-x-large' do |select|
+            - select.items Batch::SPECIMEN_ROLES, :id, :description
 
       .row
         .col.pe-3

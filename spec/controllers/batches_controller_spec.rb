@@ -105,7 +105,7 @@ RSpec.describe BatchesController, type: :controller do
         isolate_name: 'ABC.42',
         date_produced: '08/08/2018',
         lab_technician: 'Tec.Foo',
-        specimen_role: 'Q - Control specimen',
+        specimen_role: 'q',
         inactivation_method: 'Formaldehyde',
         volume: '100',
         samples_quantity: '1'
@@ -117,7 +117,7 @@ RSpec.describe BatchesController, type: :controller do
       isolate_name: 'ABC.424',
       date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
       lab_technician: 'Tec.Foo',
-      specimen_role: 'Q - Control specimen',
+      specimen_role: 'q',
       inactivation_method: 'Formaldehyde',
       volume: 100
     )}
@@ -281,7 +281,7 @@ RSpec.describe BatchesController, type: :controller do
       isolate_name: 'ABC.42',
       date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern')),
       lab_technician: 'Tec.Foo',
-      specimen_role: 'Q - Control specimen',
+      specimen_role: 'q',
       inactivation_method: 'Formaldehyde',
       volume: 100
     )}
@@ -325,7 +325,7 @@ RSpec.describe BatchesController, type: :controller do
       isolate_name: 'ABC.42',
       date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
       lab_technician: 'Tec.Foo',
-      specimen_role: 'Q - Control specimen',
+      specimen_role: 'q',
       inactivation_method: 'Formaldehyde',
       volume: 100
     )}
@@ -335,7 +335,7 @@ RSpec.describe BatchesController, type: :controller do
         isolate_name: 'ABC.42',
         date_produced: '09/09/2021',
         lab_technician: 'TecFoo',
-        specimen_role: 'P - Patient',
+        specimen_role: 'p',
         inactivation_method: 'Heat',
         volume: '200'
       }
@@ -345,7 +345,7 @@ RSpec.describe BatchesController, type: :controller do
       expect(batch.isolate_name).to eq('ABC.42')
       expect(batch.date_produced).to eq('09/09/2021')
       expect(batch.lab_technician).to eq('TecFoo')
-      expect(batch.specimen_role).to eq('P - Patient')
+      expect(batch.specimen_role).to eq('p')
       expect(batch.inactivation_method).to eq('Heat')
       expect(batch.volume).to eq('200')
     end
@@ -364,7 +364,7 @@ RSpec.describe BatchesController, type: :controller do
         isolate_name: 'ABC.42',
         date_produced: '09/09/2021',
         lab_technician: 'TecFoo',
-        specimen_role: 'P - Patient',
+        specimen_role: 'p',
         inactivation_method: 'Heat',
         volume: '200'
       }
@@ -374,7 +374,7 @@ RSpec.describe BatchesController, type: :controller do
       expect(batch.isolate_name).to eq('ABC.42')
       expect(batch.date_produced).to eq('09/09/2021')
       expect(batch.lab_technician).to eq('TecFoo')
-      expect(batch.specimen_role).to eq('P - Patient')
+      expect(batch.specimen_role).to eq('p')
       expect(batch.inactivation_method).to eq('Heat')
       expect(batch.volume).to eq('200')
     end
@@ -395,7 +395,7 @@ RSpec.describe BatchesController, type: :controller do
       isolate_name: 'ABC.42',
       date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
       lab_technician: 'Tec.Foo',
-      specimen_role: 'Q - Control specimen',
+      specimen_role: 'q',
       inactivation_method: 'Formaldehyde',
       volume: 100
     )}
@@ -440,7 +440,7 @@ RSpec.describe BatchesController, type: :controller do
       isolate_name: 'ABC.42',
       date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
       lab_technician: 'Tec.Foo',
-      specimen_role: 'Q - Control specimen',
+      specimen_role: 'q',
       inactivation_method: 'Formaldehyde',
       volume: 100
     )}
@@ -450,7 +450,7 @@ RSpec.describe BatchesController, type: :controller do
       isolate_name: 'DEF.24',
       date_produced: Time.strptime('09/09/2020', I18n.t('date.input_format.pattern')),
       lab_technician: 'Tec.Foo',
-      specimen_role: 'Q - Control specimen',
+      specimen_role: 'q',
       inactivation_method: 'Formaldehyde',
       volume: 200
     )}
@@ -461,7 +461,7 @@ RSpec.describe BatchesController, type: :controller do
       isolate_name: 'GHI.4224',
       date_produced: Time.strptime('07/07/2019', I18n.t('date.input_format.pattern')),
       lab_technician: 'Tec.Foo',
-      specimen_role: 'Q - Control specimen',
+      specimen_role: 'q',
       inactivation_method: 'Formaldehyde',
       volume: 300
     )}

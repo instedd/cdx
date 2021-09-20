@@ -20,13 +20,18 @@ class Batch < ActiveRecord::Base
                   :inactivation_method,
                   :volume
 
-  SPECIMEN_ROLES = YAML.load_file(File.join(File.dirname(__FILE__), ".", "config", "specimen_roles.yml"))["specimen_roles"]
   DATE_FORMAT = { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
 
   INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_presence_of :inactivation_method
   validates_inclusion_of :inactivation_method, in: INACTIVATION_METHOD_VALUES, message: "is not within valid options (should be one of #{INACTIVATION_METHOD_VALUES.join(', ')})"
-  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLES.map {|key, value| "#{key.upcase} - #{value}"}, allow_blank: true, message: "is not within valid options (should be one of #{SPECIMEN_ROLES.transform_keys(&:upcase).keys.join(', ')})"
+
+  SPECIMEN_ROLES_IDS = Batch.entity_fields.detect { |f| f.name == 'specimen_role' }.options
+  SPECIMEN_ROLES_DESCRIPTION = YAML.load_file(File.join(File.dirname(__FILE__), ".", "config", "specimen_roles.yml"))["specimen_roles"]
+  SPECIMEN_ROLES = SPECIMEN_ROLES_IDS.map { |id|
+    { id: id, description: "#{id.upcase} - #{SPECIMEN_ROLES_DESCRIPTION[id]}"}
+  }
+  validates_inclusion_of :specimen_role, in: SPECIMEN_ROLES_IDS, allow_blank: true, message: "is not within valid options"
 
 
   validates_presence_of :date_produced
