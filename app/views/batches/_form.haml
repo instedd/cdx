@@ -27,7 +27,7 @@
           = f.label :specimen_role
         .col
           = cdx_select form: f, name: :specimen_role, searchable: true, :class => 'input-x-large' do |select|
-            - select.items Batch::SPECIMEN_ROLES, :id, :description
+            - select.items Batch.specimen_roles, :id, :description
 
       .row
         .col.pe-3
