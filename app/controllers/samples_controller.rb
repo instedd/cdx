@@ -6,11 +6,12 @@ class SamplesController < ApplicationController
     @samples = Sample.where(institution: @navigation_context.institution)
     @samples = check_access(@samples, READ_SAMPLE).order('created_at DESC')
 
+    @samples = @samples.within(@navigation_context.entity, @navigation_context.exclude_subsites)
+
     @samples = @samples.joins(:sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
     @samples = @samples.joins(:batch).where("batches.batch_number LIKE concat('%', ?, '%')", params[:batch_number]) unless params[:batch_number].blank?
     @samples = @samples.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
 
-    # paginate samples
     @samples = perform_pagination(@samples)
   end
 
@@ -42,6 +43,7 @@ class SamplesController < ApplicationController
 
     sample = Sample.new(sample_params.merge({
       institution: institution,
+      site: @navigation_context.site,
       sample_identifiers: [SampleIdentifier.new({uuid: uuid})]
     }))
     @sample_form = SampleForm.for(sample)
