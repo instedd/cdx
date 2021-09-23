@@ -3,9 +3,9 @@ module SpecimenRole
 
   included do
     validates_inclusion_of :specimen_role,
-                           in: specimen_role_ids,
+                           in: lambda { |x| specimen_role_ids },
                            allow_blank: true,
-                           message: "is not within valid options (should be one of #{specimen_role_ids.map(&:upcase).join(', ')})"
+                           message: "is not within valid options"
 
   end
 

@@ -1,6 +1,7 @@
 class Sample < ActiveRecord::Base
   include Entity
   include Resource
+  include SpecimenRole
 
   belongs_to :institution
   belongs_to :patient

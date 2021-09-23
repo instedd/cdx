@@ -2,6 +2,7 @@ class Batch < ActiveRecord::Base
   include Entity
   include AutoUUID
   include Resource
+  include SpecimenRole
 
   belongs_to :institution
   validates_presence_of :institution
@@ -11,8 +12,6 @@ class Batch < ActiveRecord::Base
   def self.entity_scope
     "batch"
   end
-
-  include SpecimenRole
 
   attribute_field :isolate_name, copy: true
   attribute_field :batch_number, copy: true
