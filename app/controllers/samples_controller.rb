@@ -20,6 +20,7 @@ class SamplesController < ApplicationController
 
     sample = Sample.new({
       institution: @navigation_context.institution,
+      site: @navigation_context.site,
       sample_identifiers: [SampleIdentifier.new({uuid: session[:creating_sample_uuid]})],
       specimen_role: "Q - Control specimen"
     })

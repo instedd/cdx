@@ -4,6 +4,7 @@ class BatchForm
   # shared editable attributes with model
   def self.shared_attributes
     [ :institution,
+      :site,
       :batch_number,
       :date_produced,
       :lab_technician,
@@ -30,8 +31,14 @@ class BatchForm
   attr_accessor :samples_quantity
   delegate :id, :new_record?, :persisted?, to: :batch
 
+  def self.for(batch)
+    new.tap do |form|
+      form.batch = batch
+    end
+  end
+
   def batch
-    @batch ||= Batch.new
+    @batch
   end
 
   def batch=(value)
@@ -46,12 +53,8 @@ class BatchForm
   end
 
   def create
-    samples_quantity = self.samples_quantity.to_i
-
-    batch.samples = (1..samples_quantity).map {
-      create_sample
-    }
-
+    # samples_quantity = self.samples_quantity.to_i
+    batch.samples = self.samples_quantity.times.map { create_sample }
     save
   end
 
@@ -63,6 +66,7 @@ class BatchForm
   def create_sample
     Sample.new({
       institution: self.institution,
+      site: self.site,
       sample_identifiers: [SampleIdentifier.new],
       date_produced: self.date_produced,
       lab_technician: self.lab_technician,
@@ -71,12 +75,6 @@ class BatchForm
       inactivation_method: self.inactivation_method,
       volume: self.volume
     })
-  end
-
-  def self.edit(batch)
-    new.tap do |form|
-      form.batch = batch
-    end
   end
 
   def update(attributes, remove_sample_ids)

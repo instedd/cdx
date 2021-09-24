@@ -4,6 +4,7 @@ class SampleForm
   # shared editable attributes with model
   def self.shared_attributes
     [ :institution,
+      :site,
       :uuid,
       :date_produced,
       :lab_technician,
@@ -70,11 +71,11 @@ class SampleForm
     @sample.new_notes = notes
   end
 
-  def self.edit(sample)
-    new.tap do |form|
-      form.sample = sample
-    end
-  end
+  # def self.edit(sample)
+  #   new.tap do |form|
+  #     form.sample = sample
+  #   end
+  # end
 
   def update(attributes)
     attributes.each do |attr, value|
