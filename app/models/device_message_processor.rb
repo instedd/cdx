@@ -43,8 +43,8 @@ class DeviceMessageProcessor
       # Load original test if we are updating one
       test_id = parsed_message.get_in('test', 'core', 'id')
       original_test = test_id && TestResult.within_time(1.year, @parent.device_message.created_at).find_by(test_id: test_id, device_id: device.id, site_id: device.site_id)
-      test_result = original_test || TestResult.new(institution: institution, device: device) 
-      
+      test_result = original_test || TestResult.new(institution: institution, device: device)
+
       test_result.device_messages << device_message
       test_result.test_result_parsed_data << TestResultParsedDatum.new(data: @parsed_message)
       test_blender = @blender.load(test_result)
@@ -84,34 +84,48 @@ class DeviceMessageProcessor
 
       # Commit changes
       @blender.save_and_index!
-      
+
       check_invalid_start_time_alert(test_result)
     end
 
-   private
-    
+    private
+
+    def alert_sample_id_empty_or_included_in_test_result(alert, test_result)
+      test_result_sample_identifier_ids = SampleIdentifier.where(id: test_result.sample_identifier_id).pluck(:entity_id)
+      (alert.sample_id.empty?) || (test_result_sample_identifier_ids.include? alert.sample_id)
+    end
+
+    def alert_sites_empty_or_includes_test_result_site(alert, test_result)
+      sites_ids = alert.sites.map(&:id)
+      (sites_ids.empty?) || (sites_ids.include? test_result.site_id)
+    end
+
+    def alert_devices_empty_or_includes_test_result_device(alert, test_result)
+      devices_ids = alert.devices.map(&:id)
+      (devices_ids.empty?) || (devices_ids.include? test_result.device_id)
+    end
+
+    def should_send_alert(alert, test_result)
+      alert_sample_id_empty_or_included_in_test_result(alert, test_result) &&
+      alert_sites_empty_or_includes_test_result_site(alert, test_result) &&
+      alert_devices_empty_or_includes_test_result_device(alert, test_result)
+    end
+
     def check_invalid_start_time_alert(test_result)
       start_time = @parsed_message["test"]["core"]["start_time"]
-      end_time = @parsed_message["test"]["core"]["end_time"]     
-      start_time = Time.now if start_time==nil   
-      end_time = Time.now if end_time==nil     
-      if (start_time > Time.now + 1.day) || (end_time < start_time)
-        #CHECK does not return diaabled alerts
-        any_alerts_with_invalid_test_date_count= Alert.invalid_test_date.where({enabled: true, institution_id: test_result.institution_id}).count
-        if any_alerts_with_invalid_test_date_count > 0
-          any_alerts_with_invalid_test_date= Alert.invalid_test_date.where({enabled: true, institution_id: test_result.institution_id})
-          any_alerts_with_invalid_test_date.each do |alert|  
-            if ((alert.sample_id.length==0) || (alert.sample_id == SampleIdentifier.where(id: test_result.sample_identifier_id).pluck(:entity_id)[0])) 
-              sites=alert.sites.map{|site| site.id} 
-              if (sites.length==0) || ((sites.length > 0) and (sites.include? test_result.site_id))
-                devices=alert.devices.map{|device| device.id} 
-                if (devices.length==0) || ((devices.length > 0) and (devices.include? test_result.device_id))
-                  AlertJob.perform_later alert.id, test_result.uuid
-                end
-              end
-            end                        
+      end_time = @parsed_message["test"]["core"]["end_time"]
+      start_time = Time.now if start_time.nil?
+      end_time = Time.now if end_time.nil?
+
+      if (start_time > Time.now) || (start_time > end_time)
+
+        invalid_test_date_alerts = Alert.invalid_test_date.where({ enabled: true, institution_id: test_result.institution_id })
+
+        invalid_test_date_alerts.each { | alert |
+          if should_send_alert(alert, test_result)
+            AlertJob.perform_later alert.id, test_result.uuid
           end
-        end
+        }
       end
     end
 

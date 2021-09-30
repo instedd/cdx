@@ -37,7 +37,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       "test" => {
         "core" => {
           "id" => test_id,
-          "start_time" => @check_invalid_test == nil ? TEST_START_TIME : Time.now+1.day,
+          "start_time" => TEST_START_TIME,
           "assays" => [
             { "name" => "mtb", "condition" => "mtb", "result" => "positive"}
           ]
@@ -90,7 +90,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     device_message
   end
 
-  let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
+  let(:device_message_processor) { DeviceMessageProcessor.new(device_message) }
 
   def assert_sample_data(sample)
     expect(sample.plain_sensitive_data).to eq(SAMPLE_PII_FIELDS)
@@ -1252,21 +1252,59 @@ describe DeviceMessageProcessor, elasticsearch: true do
     end
   end
 
-   context 'check invalid time' do
-      let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
+  context 'check invalid time' do
+    it "the start time is greater than today and generates and alert" do
+      alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
+      alert.query = { "test.error_code"=>"155" }
+      alert.institution_id = institution.id
+      alert.sample_id = ""
+      alert.user = institution.user
+      alert.save!
 
-      it "the start time is greater than today and generates and alert" do
-        alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
-        alert.query = {"test.error_code"=>"155"}
-        alert.institution_id = institution.id
-        alert.sample_id=""
-        alert.user = institution.user
-        alert.save!
+      start_time = 1.day.from_now
+      end_time = start_time + 10.days
+      messages = [
+        parsed_message(
+          TEST_ID,
+          "test" => { "core" => {
+            "start_time" => start_time,
+            "end_time" => end_time
+          }}
+        )
+      ]
 
-        @check_invalid_test=true
-        device_message_processor.process
-        expect(AlertHistory.count).to equal (1)
-      end
+      allow(device_message).to receive(:parsed_messages).and_return(messages)
+
+      device_message_processor.process
+      expect(AlertHistory.count).to eq(1)
     end
 
+    it "should send alert if start time is greater than end time" do
+      alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
+      alert.query = { "test.error_code"=>"155" }
+      alert.institution_id = institution.id
+      alert.sample_id = ""
+      alert.user = institution.user
+      alert.save!
+
+      today = Time.now
+      start_time = today
+      end_time = today - 1.day
+
+      messages = [
+        parsed_message(
+          TEST_ID,
+          "test" => { "core" => {
+            "start_time" => start_time,
+            "end_time" => end_time
+          }}
+        )
+      ]
+
+      allow(device_message).to receive(:parsed_messages).and_return(messages)
+
+      device_message_processor.process
+      expect(AlertHistory.count).to eq(1)
+    end
+  end
 end

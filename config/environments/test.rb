@@ -50,4 +50,7 @@ Rails.application.configure do
   config.ssh_server_host = 'localhost'
   config.ssh_server_port = 2222
   config.ssh_user = 'cdx-sync'
+
+  # Do not queue jobs
+  config.active_job.queue_adapter = :inline
 end
