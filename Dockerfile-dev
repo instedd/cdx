@@ -16,6 +16,9 @@ ENV PHANTOM_JS_DOWNLOAD "https://bitbucket.org/ariya/phantomjs/downloads/${PHANT
 ENV PHANTOM_JS_TMP "/tmp/phantomjs"
 ENV LOCAL_SHARE "/usr/local/share"
 
+# Cleanup expired Let's Encrypt CA (Sept 30, 2021)
+RUN sed -i '/^mozilla\/DST_Root_CA_X3/s/^/!/' /etc/ca-certificates.conf && update-ca-certificates -f
+
 RUN \
   apt-get update && \
   apt-get install -y \

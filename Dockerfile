@@ -1,5 +1,8 @@
 FROM instedd/nginx-rails:2.2
 
+# Cleanup expired Let's Encrypt CA (Sept 30, 2021)
+RUN sed -i '/^mozilla\/DST_Root_CA_X3/s/^/!/' /etc/ca-certificates.conf && update-ca-certificates -f
+
 RUN \
   apt-get update && \
   apt-get install -y \
@@ -13,9 +16,6 @@ RUN \
   curl -L https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.jessie_amd64.deb --output wkhtmltopdf.deb && \
     dpkg -i wkhtmltopdf.deb && \
     rm -f wkhtmltopdf.deb
-
-# Cleanup expired Let's Encrypt CA (Sept 30, 2021)
-RUN sed -i '/^mozilla\/DST_Root_CA_X3/s/^/!/' /etc/ca-certificates.conf && update-ca-certificates -f
 
 ## Create a user for the web app.
 RUN \
