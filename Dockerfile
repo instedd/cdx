@@ -14,6 +14,9 @@ RUN \
     dpkg -i wkhtmltopdf.deb && \
     rm -f wkhtmltopdf.deb
 
+# Cleanup expired Let's Encrypt CA (Sept 30, 2021)
+RUN sed -i '/^mozilla\/DST_Root_CA_X3/s/^/!/' /etc/ca-certificates.conf && update-ca-certificates -f
+
 ## Create a user for the web app.
 RUN \
   addgroup --gid 9999 app && \
