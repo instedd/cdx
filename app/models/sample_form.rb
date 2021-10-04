@@ -71,12 +71,6 @@ class SampleForm
     @sample.new_notes = notes
   end
 
-  # def self.edit(sample)
-  #   new.tap do |form|
-  #     form.sample = sample
-  #   end
-  # end
-
   def update(attributes)
     attributes.each do |attr, value|
       self.send("#{attr}=", value)

@@ -53,7 +53,6 @@ class BatchForm
   end
 
   def create
-    # samples_quantity = self.samples_quantity.to_i
     batch.samples = self.samples_quantity.times.map { create_sample }
     save
   end
