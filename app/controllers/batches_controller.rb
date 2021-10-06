@@ -6,6 +6,8 @@ class BatchesController < ApplicationController
     @batches = Batch.where(institution: @navigation_context.institution)
     @batches = check_access(@batches, READ_BATCH).order('created_at DESC')
 
+    @batches = @batches.within(@navigation_context.entity, @navigation_context.exclude_subsites)
+
     @batches = @batches.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
     @batches = @batches.where("batch_number LIKE concat('%', ?, '%')", params[:batch_number]) unless params[:batch_number].blank?
     @batches = @batches.joins(samples: :sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
@@ -19,7 +21,12 @@ class BatchesController < ApplicationController
   end
 
   def new
-    @batch_form = BatchForm.new()
+    batch = Batch.new({
+      institution: @navigation_context.institution,
+      site: @navigation_context.site
+    })
+
+    @batch_form = BatchForm.for(batch)
     prepare_for_institution_and_authorize(@batch_form, CREATE_INSTITUTION_BATCH)
 
     @can_edit_sample_quantity = true
@@ -29,9 +36,12 @@ class BatchesController < ApplicationController
     institution = @navigation_context.institution
     return unless authorize_resource(institution, CREATE_INSTITUTION_BATCH)
 
-    @batch_form = BatchForm.new(batch_params.merge({
-      institution: institution
+    batch = Batch.new(batch_params.merge({
+      institution: institution,
+      site: @navigation_context.site
     }))
+    @batch_form = BatchForm.for(batch)
+    @batch_form.samples_quantity = batch_samples_quantity_params
 
     if @batch_form.create
       redirect_to batches_path, notice: 'Batch was successfully created.'
@@ -43,7 +53,7 @@ class BatchesController < ApplicationController
 
   def edit
     batch = Batch.find(params[:id])
-    @batch_form = BatchForm.edit(batch)
+    @batch_form = BatchForm.for(batch)
     return unless authorize_resource(batch, UPDATE_BATCH)
 
     @can_edit_sample_quantity = false
@@ -53,7 +63,7 @@ class BatchesController < ApplicationController
 
   def update
     batch = Batch.find(params[:id])
-    @batch_form = BatchForm.edit(batch)
+    @batch_form = BatchForm.for(batch)
     return unless authorize_resource(batch, UPDATE_BATCH)
 
     if @batch_form.update(batch_params, remove_samples_params)
@@ -90,7 +100,7 @@ class BatchesController < ApplicationController
 
   def add_sample
     batch = Batch.find(params[:id])
-    @batch_form = BatchForm.edit(batch)
+    @batch_form = BatchForm.for(batch)
     return unless authorize_resource(batch, UPDATE_BATCH)
 
     @batch_form.add_sample
@@ -108,9 +118,12 @@ class BatchesController < ApplicationController
       :specimen_role,
       :isolate_name,
       :inactivation_method,
-      :volume,
-      :samples_quantity
+      :volume
     )
+  end
+
+  def batch_samples_quantity_params
+    params.require(:batch).permit(:samples_quantity)[:samples_quantity].to_i
   end
 
   def remove_samples_params

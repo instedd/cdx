@@ -2,8 +2,8 @@ class Sample < ActiveRecord::Base
   include Entity
   include Resource
   include SpecimenRole
+  include SiteContained
 
-  belongs_to :institution
   belongs_to :patient
   belongs_to :encounter
   belongs_to :batch

@@ -3,8 +3,8 @@ class Batch < ActiveRecord::Base
   include AutoUUID
   include Resource
   include SpecimenRole
+  include SiteContained
 
-  belongs_to :institution
   validates_presence_of :institution
 
   has_many :samples, dependent: :destroy, autosave: true
