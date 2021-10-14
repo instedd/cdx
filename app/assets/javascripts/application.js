@@ -35,6 +35,8 @@
 //= require reflux
 //= require_tree .
 //= require turbolinks
+//= require dropzone
+
 Turbolinks.enableProgressBar()
 
 // Configure leaflet
