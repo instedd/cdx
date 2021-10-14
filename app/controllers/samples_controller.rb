@@ -164,6 +164,33 @@ class SamplesController < ApplicationController
     redirect_to samples_path, notice: 'Samples were successfully deleted.'
   end
 
+  def testing
+    sample = Sample.find(params[:id])
+    pictures = params[:file]
+    pictures.each do |index, file_data|
+      sample.assay_attachments.build(
+        picture: file_data,
+        sample: sample
+      )
+    end
+    if sample.save
+      render json: {status: :ok}
+    else
+      redirect_to edit_sample_path(sample.id), notice: 'Can not add assays'
+    end
+  end
+
+  def remove_assay_attachments
+    sample = Sample.find(params[:id])
+    return unless authorize_resource(sample, UPDATE_SAMPLE)
+
+    if AssayAttachment.destroy(params[:assay_id])
+      render json: {status: :ok}
+    else
+      redirect_to edit_sample_path(sample.id), notice: 'Can not destroy assays'
+    end
+  end
+
   private
 
   def sample_params
@@ -174,6 +201,7 @@ class SamplesController < ApplicationController
       :isolate_name,
       :inactivation_method,
       :volume,
+      file: [ :order, :file_data],
       assay_attachments_attributes: [ :id, :loinc_code_id, :result, :_destroy ],
       new_assays: [],
       new_assays_info: [ :filename, :loinc_code_id, :result ],

@@ -105,6 +105,7 @@ Rails.application.routes.draw do
   resources :samples do
     member do
       get 'print'
+      post 'remove_assay_attachments'
     end
     collection do
       get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'print' }, action: :bulk_print
@@ -132,6 +133,8 @@ Rails.application.routes.draw do
   end
 
   get 'loinc_codes/search' => 'loinc_codes#search'
+  post 'samples/testing' => 'samples#testing'
+  # post 'samples/remove_file' => 'samples#remove_file'
 
 
   resources :alerts, except: [:show]
@@ -210,3 +213,4 @@ Rails.application.routes.draw do
 
   get 'nndd' => 'application#nndd' if Rails.env.test?
 end
+
