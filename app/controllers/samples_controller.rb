@@ -164,15 +164,14 @@ class SamplesController < ApplicationController
     redirect_to samples_path, notice: 'Samples were successfully deleted.'
   end
 
-  def testing
+  def add_assay_attachments
     sample = Sample.find(params[:id])
-    pictures = params[:file]
-    pictures.each do |index, file_data|
-      sample.assay_attachments.build(
+    file_data = params[:file]
+    sample.assay_attachments.build(
         picture: file_data,
         sample: sample
-      )
-    end
+    )
+
     if sample.save
       render json: {status: :ok}
     else

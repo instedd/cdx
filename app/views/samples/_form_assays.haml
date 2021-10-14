@@ -1,7 +1,7 @@
 - unless @sample_form.new_record?
   .row
     .col.pe-2
-    = f.label :assays
+      = f.label :assays
     .col
       .choose-picture.assay.dropzone-field
         .upload-new-file.picture
@@ -59,3 +59,4 @@
           .icon-close.btn-icon.icon-red-important.icon-margin
           Remove recent assays
         = hidden_field_tag :remove_assay_attachments_url, remove_assay_attachments_sample_path
+        = hidden_field_tag :add_assay_attachments_url, add_assay_attachments_sample_path

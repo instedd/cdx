@@ -1,27 +1,5 @@
 :javascript
   (function() {
-    var myDropzone = new Dropzone(".dropzone-field", { url: "/samples/testing", uploadMultiple: true, maxFilesize: 10485760, disablePreviews: true, createImageThumbnails: false });
-
-    var onloadPicture = function(file) {
-        return function(event) {
-          debugger;
-          // render Tooltip and Add-assays action
-          updateAddAssaysControls();
-        }
-      }
-
-    myDropzone.on("sending", function(file, xhr, formData) {
-    // Will send the filesize along with the file as POST data.
-      sample_id = $(".edit_sample")[0].id.split('_').pop()
-      formData.append("id", sample_id);
-    });
-
-    myDropzone.on("successmultiple", function(files, response) {
-      // Gets triggered when the files have successfully been sent.
-      // Redirect user or notify of success.
-      location.reload();
-    });
-
     // Click on Add Assays
     $('.upload-picture').on('click', function(e) {
       e.preventDefault();
@@ -33,6 +11,7 @@
 
     // Change the class on the target zone when dragging a file over it
     $(".remove > input[type='checkbox']").on('click', function(e) {
+      debugger;
       var assayId = e.target.id.split('_').pop()
       var url = $("#remove_assay_attachments_url").val()
       $.ajax({
@@ -44,8 +23,8 @@
             }
           });
       $(this).closest('.file-uploaded').addClass('remove');
+      updateAddAssaysControls();
     });
-
   })();
 
   function removeFilesPreview() {
@@ -65,14 +44,48 @@
   }
 
   function createCard() {
-    $('.assay > .upload-new-file').append(
-        $('<div>')
-          .append($('<div>', { class: 'card-container' })
+    var cardWithDropzone = $('<div>').append(
+            $('<div>', { class: 'card-container' })
             .append(createCardInfoColumn())
             .append(createDummyCardPictureColumn())
             .append(createCardDummyRemove())
-          )
+    )
+    $('.assay > .upload-new-file').append(
+      cardWithDropzone
     );
+    var dropzoneInput = cardWithDropzone.find('.dropzone')
+    var url = $("#add_assay_attachments_url").val()
+    var dropzoneOptions = {
+     url: url,
+     uploadMultiple: false,
+     maxFilesize: 10,
+     previewTemplate: dropzoneInput.html(),
+     addedfile: function(file) {
+      dropzoneInput.children().remove()
+     },
+     thumbnail: function(file, url) {
+      if (file.type.startsWith('image/')) {
+        fileImage = $('<img>', { class: 'uploaded', src: url });
+        dropzoneInput.removeClass('any-filetype')
+        dropzoneInput.append(fileImage);
+        dropzoneInput.append($('<div>', { class: 'picture-title', title: file.name }));
+        dropzoneInput.append($('<div>').text(file.name));
+      }
+     }
+    }
+
+    dropzoneInput.dropzone(dropzoneOptions);
+    dropzoneInput.on("sending", function(file, xhr, formData) {
+    // Will send the filesize along with the file as POST data.
+      sample_id = $(".edit_sample")[0].id.split('_').pop()
+      formData.append("id", sample_id);
+    });
+
+    dropzoneInput.on("successmultiple", function(files, response) {
+      // Gets triggered when the files have successfully been sent.
+      // Redirect user or notify of success.
+      location.reload();
+    });
   }
 
   function buildLoincCodeSelect(config) {
@@ -122,10 +135,9 @@
   }
 
   function fileDummyThumbnail() {
-    var fileInput = $('<input>', {type: 'file', class: 'upload-picture', multiple: true, id: 'sample_new_assays', name: 'sample[new_assays][]', value: null });
-      return $('<div>', { class: 'any-filetype' })
+      var dropzoneIndex = $('.card-container').length + 1
+      return $('<div>', { class: 'any-filetype dropzone', id:`dropzone-container-${dropzoneIndex}` })
         .append($('<div>', { class: 'icon-document'}))
-        .append(fileInput);
   }
 
   function createCardDummyRemove() {
