@@ -407,15 +407,21 @@ label.on {
     margin-top: 100px;
   }
 
-  input[type="file"] {
+  .upload-picture {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     height: 100%;
     width: 100%;
-    z-index:2;
+  }
+
+  input[type="file"] {
+    //position: absolute;
+    //top: 0;
+    //left: 0;
+    //right: 0;
+    //bottom: 0;
+    //height: 100%;
+    //width: 100%;
+    //z-index:2;
     opacity:0;
     cursor:pointer;
   }
