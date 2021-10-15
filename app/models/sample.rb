@@ -21,6 +21,8 @@ class Sample < ActiveRecord::Base
   validate :validate_encounter
   validate :validate_patient
 
+  validates_associated :assay_attachments
+
   def self.entity_scope
     "sample"
   end

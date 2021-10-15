@@ -171,7 +171,6 @@ class SamplesController < ApplicationController
         picture: file_data,
         sample: sample
     )
-
     if sample.save
       render json: {status: :ok}
     else
@@ -208,19 +207,9 @@ class SamplesController < ApplicationController
       new_notes: []
     )
 
-    # merge assays files with its corresponding info
-    infos = (sample_params[:new_assays_info] || []).reduce({}) do | acc, t |
-      acc[t[:filename]] = {
-        loinc_code_id: t[:loinc_code_id],
-        result: t[:result]
-      }
-      acc
-    end
-
-    sample_params[:new_assays] = (sample_params[:new_assays] || []).map do |assay_file|
-      { file: assay_file,
-        loinc_code_id: infos[assay_file.original_filename][:loinc_code_id],
-        result: infos[assay_file.original_filename][:result] }
+    sample_params[:new_assays] = (sample_params[:new_assays_info] || []).map do |index, values|
+      { loinc_code_id: values[:loinc_code_id],
+        result: values[:result] }
     end
 
     sample_params.delete(:new_assays_info)
