@@ -11,7 +11,6 @@
 
     // Change the class on the target zone when dragging a file over it
     $(".remove > input[type='checkbox']").on('click', function(e) {
-      debugger;
       var assayId = e.target.id.split('_').pop()
       var url = $("#remove_assay_attachments_url").val()
       $.ajax({
@@ -88,9 +87,9 @@
     });
   }
 
-  function buildLoincCodeSelect(config) {
+  function buildLoincCodeSelect(config, cardIndex) {
     var loincInput = (config && config.input) ? config.input : $('<input>', {type: 'text', class: 'loinc_input'});
-    var loincInputHidden = (config && config.hidden) ? config.hidden : $('<input>', {type: 'hidden', name: `sample[new_assays_info][][loinc_code_id]`});
+    var loincInputHidden = (config && config.hidden) ? config.hidden : $('<input>', {type: 'hidden', name: `sample[new_assays_info][${cardIndex}][loinc_code_id]`});
 
     loincInput.autocomplete({
       lookup: function (query, done) {
@@ -111,18 +110,19 @@
   }
 
   function createCardInfoColumn() {
+   var cardIndex = $('.card-container').length + 1
    return $('<div>', { class: 'info' })
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
         .append($('<div>', { class: 'col pe-8' })
-          .append(buildLoincCodeSelect()))
+          .append(buildLoincCodeSelect(null, cardIndex)))
       )
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
         .append($('<div>', { class: 'col pe-8' })
-          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays_info][][result]` } )))
+          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays_info][${cardIndex}][result]` } )))
       )
   }
 
