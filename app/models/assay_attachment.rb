@@ -1,5 +1,5 @@
 class AssayAttachment < ActiveRecord::Base
-  belongs_to :loinc_code, :dependent => :destroy
+  belongs_to :loinc_code, :dependent => :destroy, required: false
   belongs_to :sample
   has_attached_file :picture, styles:  lambda { |a| a.instance.is_image? ? { :card => "130x130>" }  : {} }
 

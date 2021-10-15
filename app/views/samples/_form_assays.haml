@@ -3,7 +3,7 @@
     .col.pe-2
       = f.label :assays
     .col
-      .choose-picture.assay.dropzone-field
+      .choose-picture.assay
         .upload-new-file.picture
           .tooltip
             .tooltip-content
@@ -22,32 +22,41 @@
           = f.fields_for :assay_attachments do |ay|
             .file-uploaded
               .card-container
-                .info
-                  .row
-                    .col.pe-1
-                      = ay.label :loinc_code, 'LOINC'
-                    .col.pe-8
-                      .loinc_inputs
-                        = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: 'loinc_input'}
-                        = ay.hidden_field :loinc_code_id, { class: 'loinc_input_hidden'}
-                  .row
-                    - if ay.object.errors.include?(:result)
+                - if ay.object.errors.include?(:result) or ay.object.errors.include?(:picture)
+                  .info
+                    .row
+                      .col.pe-1
+                        = ay.label :loinc_code, 'LOINC'
+                      .col.pe-8
+                        .loinc_inputs
+                          = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: 'loinc_input'}
+                          = ay.hidden_field :loinc_code_id, { name:"sample[new_assays_info][#{ay.index}][loinc_code_id]", class: 'loinc_input_hidden'}
+
+                    .row
                       .col.pe-1
                         = ay.label :result, {class: 'input-required'}
                       .col.pe-8
-                        = ay.text_field :result, {class: 'input-required'}
-                    - else
+                        = text_field_tag :result,nil, {name:"sample[new_assays_info][#{ay.index}][result]", class: 'result_input input-required'}
+                  .file
+                    .picture-container.picture-required
+                      .icon-alert.icon-red
+                      = "You must define a result or an attachment"
+                - else
+                  .info
+                    .row
+                      .col.pe-1
+                        = ay.label :loinc_code, 'LOINC'
+                      .col.pe-8
+                        .loinc_inputs
+                          = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: 'loinc_input'}
+                          = ay.hidden_field :loinc_code_id, { class: 'loinc_input_hidden'}
+                    .row
                       .col.pe-1
                         = ay.label :result
                       .col.pe-8
                         = ay.text_field :result
 
-                .file
-                  - if ay.object.errors.include?(:picture)
-                    .picture-container.picture-required
-                      .icon-alert.icon-red
-                      = "You must define a result or an attachment"
-                  - else
+                  .file
                     .picture-container.assay-file
                       - if ay.object.is_image?
                         = image_tag ay.object.picture.url(:card)
@@ -56,10 +65,10 @@
                           .icon-document
                       .picture-title{ title: ay.object.picture_file_name }
                         = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank", download: ay.object.picture_file_name
-                .remove
-                  = ay.check_box '_destroy', { id: "destroy_assay_attachments_#{ay.object.id}" }
-                  %label.cross{:for => "destroy_assay_attachments_#{ay.object.id}" }
-                    = image_tag "ic-cross.png"
+                    .remove
+                      = ay.check_box '_destroy', { id: "destroy_assay_attachments_#{ay.object.id}" }
+                      %label.cross{:for => "destroy_assay_attachments_#{ay.object.id}" }
+                        = image_tag "ic-cross.png"
 
       .actions
         = button_tag id: 'add-assays', class: "btn-link nodisplay" do

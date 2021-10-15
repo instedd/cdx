@@ -18,11 +18,21 @@
             url: url,
             data:  {assay_id: assayId} ,
             success: function(response) {
+              updateAddAssaysControls();
               console.log(response)
             }
           });
       $(this).closest('.file-uploaded').addClass('remove');
-      updateAddAssaysControls();
+      // updateAddAssaysControls();
+    });
+
+    $('.loinc_inputs').each(function(index, element){
+      var input = $(element).find('.loinc_input');
+      var hidden = $(element).find('.loinc_input_hidden');
+      $(element).replaceWith(buildLoincCodeSelect({
+        input: input,
+        hidden: hidden
+      }));
     });
   })();
 
@@ -32,7 +42,7 @@
   }
 
   function updateAddAssaysControls() {
-    var assays = $('.assay-file');
+    var assays = $('.file-uploaded').not('.remove');
     if (assays.length > 0) {
       $('.assay > .upload-new-file > .tooltip').addClass('nodisplay');
       $('#add-assays').removeClass('nodisplay');
@@ -44,13 +54,13 @@
 
   function createCard() {
     var cardWithDropzone = $('<div>').append(
-            $('<div>', { class: 'card-container' })
+            $('<div>', { class: 'card-container new-file' })
             .append(createCardInfoColumn())
             .append(createDummyCardPictureColumn())
             .append(createCardDummyRemove())
     )
     $('.assay > .upload-new-file').append(
-      cardWithDropzone
+      $('<div>', { class: 'file-uploaded' }).append(cardWithDropzone)
     );
     var dropzoneInput = cardWithDropzone.find('.dropzone')
     var url = $("#add_assay_attachments_url").val()
@@ -59,7 +69,17 @@
      uploadMultiple: false,
      maxFilesize: 10,
      previewTemplate: dropzoneInput.html(),
-     addedfile: function(file) {
+     success: function(file, response){
+                var cardIndex = $('.card-container').length
+                var containerParent = dropzoneInput.closest('.file-uploaded');
+                var loincInputName = `sample[new_assays_info][${cardIndex}][loinc_code_id]`
+                var resultInputName = `sample[new_assays_info][${cardIndex}][result]`
+                $(`input[name="${loincInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][loinc_code_id]`)
+                $(`input[name="${resultInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][result]`)
+                containerParent.append($('<input>', { type: 'hidden', value: response.assay_attachment_id, name: `sample[assay_attachments_attributes][${cardIndex}][id]`, id: `sample_assay_attachments_attributes_${cardIndex}_id` } ))
+            },
+    addedfile: function(file) {
+      dropzoneInput.closest('.card-container');
       dropzoneInput.children().remove()
      },
      thumbnail: function(file, url) {
@@ -74,17 +94,6 @@
     }
 
     dropzoneInput.dropzone(dropzoneOptions);
-    dropzoneInput.on("sending", function(file, xhr, formData) {
-    // Will send the filesize along with the file as POST data.
-      sample_id = $(".edit_sample")[0].id.split('_').pop()
-      formData.append("id", sample_id);
-    });
-
-    dropzoneInput.on("successmultiple", function(files, response) {
-      // Gets triggered when the files have successfully been sent.
-      // Redirect user or notify of success.
-      location.reload();
-    });
   }
 
   function buildLoincCodeSelect(config, cardIndex) {

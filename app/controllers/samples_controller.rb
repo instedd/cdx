@@ -172,7 +172,7 @@ class SamplesController < ApplicationController
         sample: sample
     )
     if sample.save
-      render json: {status: :ok}
+      render json: {status: :ok, assay_attachment_id: sample.assay_attachments.last.id}
     else
       redirect_to edit_sample_path(sample.id), notice: 'Can not add assays'
     end
@@ -199,7 +199,7 @@ class SamplesController < ApplicationController
       :isolate_name,
       :inactivation_method,
       :volume,
-      file: [ :order, :file_data],
+      file: [],
       assay_attachments_attributes: [ :id, :loinc_code_id, :result, :_destroy ],
       new_assays: [],
       new_assays_info: [ :filename, :loinc_code_id, :result ],
