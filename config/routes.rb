@@ -102,7 +102,7 @@ Rails.application.routes.draw do
       post 'reprocess'
     end
   end
-  resources :samples do
+  resources :samples, except: :show do
     member do
       get 'print'
       post 'remove_assay_attachments'
