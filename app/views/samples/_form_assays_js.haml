@@ -10,6 +10,18 @@
 
     updateAddAssaysControls();
 
+    $('#undo-added-assays').on('click', function(e) {
+      event.preventDefault();
+
+      removeFilesPreview();
+
+      // toggle buttons
+      $('#undo-added-assays').addClass('nodisplay');
+
+      // render Tooltip and Add-assays action
+      updateAddAssaysControls();
+    });
+
     // Change the class on the target zone when dragging a file over it
     $(".remove").on('click', function(e) {
       var assayId = e.target.id.split('_').pop()
@@ -56,6 +68,7 @@
   function removeFilesPreview() {
     // remove all new-files preview
     $('.new-file').remove();
+    $('#undo-added-assays').addClass('nodisplay');
   }
 
   function updateAddAssaysControls() {
@@ -66,6 +79,9 @@
     } else {
       $('.assay > .upload-new-file > .tooltip').removeClass('nodisplay');
       $('#add-assays').addClass('nodisplay');
+    }
+    if ( $('.new-file').length > 0) {
+      $('#undo-added-assays').removeClass('nodisplay');
     }
   }
 
