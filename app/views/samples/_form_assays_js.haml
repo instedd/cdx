@@ -80,9 +80,8 @@
       $('.assay > .upload-new-file > .tooltip').removeClass('nodisplay');
       $('#add-assays').addClass('nodisplay');
     }
-    if ( $('.new-file').length > 0) {
-      $('#undo-added-assays').removeClass('nodisplay');
-    }
+    $('.new-file').length > 0 ? $('#undo-added-assays').removeClass('nodisplay') : $('#undo-added-assays').addClass('nodisplay');
+
   }
 
   function createCard(cardIndex) {
@@ -170,11 +169,11 @@
                 $(`input[name="${loincInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][loinc_code_id]`)
                 $(`input[name="${resultInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][result]`)
                 containerParent.append($('<input>', { type: 'hidden', value: response.assay_attachment_id, name: `sample[assay_attachments_attributes][${cardIndex}][id]`, id: `sample_assay_attachments_attributes_${cardIndex}_id` } ))
+                containerParent.find('.card-container').removeClass('new-file')
                 var removeContainer = containerParent.find('.card-container > .remove')
                 removeContainer.detach().appendTo(containerParent.find('.card-container > .file'));
                 removeContainer.append($('<img>', { src: $('#ic_cross_url').val(), alt: 'Ic cross'}));
-
-
+                updateAddAssaysControls()
             },
      addedfile: function(file) {
       dropzoneInput.closest('.card-container');
