@@ -11,7 +11,7 @@
     updateAddAssaysControls();
 
     // Change the class on the target zone when dragging a file over it
-    $(".remove > input[type='checkbox']").on('click', function(e) {
+    $(".remove").on('click', function(e) {
       var assayId = e.target.id.split('_').pop()
       var url = $("#remove_assay_attachments_url").val()
       $.ajax({
@@ -154,6 +154,11 @@
                 $(`input[name="${loincInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][loinc_code_id]`)
                 $(`input[name="${resultInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][result]`)
                 containerParent.append($('<input>', { type: 'hidden', value: response.assay_attachment_id, name: `sample[assay_attachments_attributes][${cardIndex}][id]`, id: `sample_assay_attachments_attributes_${cardIndex}_id` } ))
+                var removeContainer = containerParent.find('.card-container > .remove')
+                removeContainer.detach().appendTo(containerParent.find('.card-container > .file'));
+                removeContainer.append($('<img>', { src: $('#ic_cross_url').val(), alt: 'Ic cross'}));
+
+
             },
      addedfile: function(file) {
       dropzoneInput.closest('.card-container');
