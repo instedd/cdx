@@ -3,7 +3,8 @@
     // Click on Add Assays
     $('.upload-picture').on('click', function(e) {
       e.preventDefault();
-      createCard();
+      var cardIndex = $('.card-container').length + 1
+      createCard(cardIndex);
       updateAddAssaysControls();
     });
 
@@ -34,6 +35,22 @@
         hidden: hidden
       }));
     });
+
+    $('.picture-container.picture-required').on('click', function() {
+      var fileContainer = $(this).parent().parent()
+      var cardIndex = $('.card-container').length - 1
+      $(this).parent().remove();
+      fileContainer.append(createDummyCardPictureColumn(cardIndex)).append(createCardDummyRemove());
+      var dropzoneInput = fileContainer.find('.dropzone')
+      var dropzoneOptions = dropzoneConfig(dropzoneInput, cardIndex);
+      $('.input-required').removeClass('input-required')
+      dropzoneInput.dropzone(dropzoneOptions)
+    });
+
+    $('.input-required').on('click', function() {
+      $('.input-required').removeClass('input-required')
+    });
+
   })();
 
   function removeFilesPreview() {
@@ -52,46 +69,18 @@
     }
   }
 
-  function createCard() {
+  function createCard(cardIndex) {
     var cardWithDropzone = $('<div>').append(
             $('<div>', { class: 'card-container new-file' })
-            .append(createCardInfoColumn())
-            .append(createDummyCardPictureColumn())
+            .append(createCardInfoColumn(cardIndex))
+            .append(createDummyCardPictureColumn(cardIndex))
             .append(createCardDummyRemove())
     )
     $('.assay > .upload-new-file').append(
       $('<div>', { class: 'file-uploaded' }).append(cardWithDropzone)
     );
     var dropzoneInput = cardWithDropzone.find('.dropzone')
-    var url = $("#add_assay_attachments_url").val()
-    var dropzoneOptions = {
-     url: url,
-     uploadMultiple: false,
-     maxFilesize: 10,
-     previewTemplate: dropzoneInput.html(),
-     success: function(file, response){
-                var cardIndex = $('.card-container').length
-                var containerParent = dropzoneInput.closest('.file-uploaded');
-                var loincInputName = `sample[new_assays_info][${cardIndex}][loinc_code_id]`
-                var resultInputName = `sample[new_assays_info][${cardIndex}][result]`
-                $(`input[name="${loincInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][loinc_code_id]`)
-                $(`input[name="${resultInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][result]`)
-                containerParent.append($('<input>', { type: 'hidden', value: response.assay_attachment_id, name: `sample[assay_attachments_attributes][${cardIndex}][id]`, id: `sample_assay_attachments_attributes_${cardIndex}_id` } ))
-            },
-    addedfile: function(file) {
-      dropzoneInput.closest('.card-container');
-      dropzoneInput.children().remove()
-     },
-     thumbnail: function(file, url) {
-      if (file.type.startsWith('image/')) {
-        fileImage = $('<img>', { class: 'uploaded', src: url });
-        dropzoneInput.removeClass('any-filetype')
-        dropzoneInput.append(fileImage);
-        dropzoneInput.append($('<div>', { class: 'picture-title', title: file.name }));
-        dropzoneInput.append($('<div>').text(file.name));
-      }
-     }
-    }
+    var dropzoneOptions = dropzoneConfig(dropzoneInput, cardIndex)
 
     dropzoneInput.dropzone(dropzoneOptions);
   }
@@ -118,8 +107,7 @@
     return $('<div>').append(loincInput).append(loincInputHidden)[0];
   }
 
-  function createCardInfoColumn() {
-   var cardIndex = $('.card-container').length + 1
+  function createCardInfoColumn(cardIndex) {
    return $('<div>', { class: 'info' })
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-1' })
@@ -135,20 +123,51 @@
       )
   }
 
-  function createDummyCardPictureColumn() {
+  function createDummyCardPictureColumn(cardIndex) {
     return $('<div>', { class: 'file' })
             .append(
               $('<div>', { class: 'picture-container assay-file'})
-              .append(fileDummyThumbnail())
+              .append(fileDummyThumbnail(cardIndex))
             )
   }
 
-  function fileDummyThumbnail() {
-      var dropzoneIndex = $('.card-container').length + 1
+  function fileDummyThumbnail(dropzoneIndex) {
       return $('<div>', { class: 'any-filetype dropzone', id:`dropzone-container-${dropzoneIndex}` })
         .append($('<div>', { class: 'icon-document'}))
   }
 
   function createCardDummyRemove() {
     return $('<div>', { class: 'remove' }).css('width', '34px');
+  }
+
+  function dropzoneConfig(dropzoneInput, cardIndex) {
+    var url = $("#add_assay_attachments_url").val()
+    return {
+     url: url,
+     uploadMultiple: false,
+     maxFilesize: 10,
+     previewTemplate: dropzoneInput.html(),
+     success: function(file, response){
+                var containerParent = dropzoneInput.closest('.file-uploaded');
+                var loincInputName = `sample[new_assays_info][${cardIndex}][loinc_code_id]`
+                var resultInputName = `sample[new_assays_info][${cardIndex}][result]`
+                $(`input[name="${loincInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][loinc_code_id]`)
+                $(`input[name="${resultInputName}"]`).attr('name', `sample[assay_attachments_attributes][${cardIndex}][result]`)
+                containerParent.append($('<input>', { type: 'hidden', value: response.assay_attachment_id, name: `sample[assay_attachments_attributes][${cardIndex}][id]`, id: `sample_assay_attachments_attributes_${cardIndex}_id` } ))
+            },
+     addedfile: function(file) {
+      dropzoneInput.closest('.card-container');
+      dropzoneInput.children().remove()
+     },
+     thumbnail: function(file, url) {
+      if (file.type.startsWith('image/')) {
+        var fileImage = $('<img>', { class: 'uploaded', src: url });
+        dropzoneInput.removeClass('any-filetype')
+        dropzoneInput.append(fileImage);
+        dropzoneInput.append($('<div>', { class: 'picture-title', title: file.name }));
+        dropzoneInput.append($('<div>').text(file.name));
+      }
+     }
+    };
+
   }
