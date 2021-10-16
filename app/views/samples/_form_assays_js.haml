@@ -162,6 +162,7 @@
      uploadMultiple: false,
      maxFilesize: 10,
      previewTemplate: dropzoneInput.html(),
+     clickable: "#" + dropzoneInput.attr('id'),
      success: function(file, response){
                 var containerParent = dropzoneInput.closest('.file-uploaded');
                 var loincInputName = `sample[new_assays_info][${cardIndex}][loinc_code_id]`
