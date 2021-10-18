@@ -4,7 +4,8 @@ module InactivationMethod
   included do
     validates_inclusion_of :inactivation_method,
                            in: -> (x) { inactivation_methods },
-                           message: "is not within valid options"
+                           message: "is not within valid options",
+                           allow_blank: true
 
   end
 
