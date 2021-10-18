@@ -3,6 +3,8 @@
     = f.label :notes
   #notes.col
     = f.fields_for :notes, @sample_form.notes do |note|
+      #note-id-info
+        = hidden_field_tag "note_is_saved_" + note.index.to_s, note.object.id.present?, {disabled: true}
       .note
         .info
           = "by #{note.object.user.full_name} #{@localization_helper.format_datetime(note.object.updated_at)} "
