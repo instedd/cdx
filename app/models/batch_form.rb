@@ -108,7 +108,6 @@ class BatchForm
     return false
   end
 
-  INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   SPECIMEN_ROLE_VALUES = Batch.specimen_roles
 
   validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?

@@ -2,6 +2,7 @@ class Sample < ActiveRecord::Base
   include Entity
   include Resource
   include SpecimenRole
+  include InactivationMethod
   include SiteContained
 
   belongs_to :patient

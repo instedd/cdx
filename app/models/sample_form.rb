@@ -99,7 +99,6 @@ class SampleForm
     return false
   end
 
-  INACTIVATION_METHOD_VALUES = Sample.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
 
   # begin date_produced
   # @date_produced is Time | Nil | String.
