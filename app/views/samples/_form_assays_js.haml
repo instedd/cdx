@@ -1,5 +1,26 @@
 :javascript
   (function() {
+
+    dropzoneOptions = {
+      paramName: "file",
+      autoProcessQueue: false,
+      uploadMultiple: true,
+      url: 'cualquiercosa',
+      addedfile: function(file) {
+        //createCard(file)
+      },
+      thumbnail: function(file, url) {
+        createCard(file, url)
+      },
+      maxFilesize: 2
+    }
+
+    var dropzone = new Dropzone('#dropzone-field', dropzoneOptions)
+    // dropzone.on("addedfile", file => {
+    //
+    //   console.log(file);
+    // });
+
     var onloadPicture = function(file) {
       return function(event) {
         createCard(file, event.target.result)
@@ -10,7 +31,7 @@
 
     // Click on Add Assays
     $('#add-assays').on('click', function(e) {
-      event.preventDefault();
+      e.preventDefault();
       $('#sample_new_assays').click();
     });
 
@@ -113,7 +134,7 @@
           .append($('<div>', { class: 'card-container new-file' })
             .append(createCardInfoColumn(file))
             .append(createCardPictureColumn(file, url))
-            .append(createCardDummyRemove())
+            .append(createCardRemove(file))
           )
     );
   }
@@ -146,8 +167,13 @@
             )
   }
 
-  function createCardDummyRemove() {
-    return $('<div>', { class: 'remove' }).css('width', '34px');
+  function createCardRemove(file) {
+    var removeButton = $('<div>', { class: 'remove' }).append($('<img>', { src: '#{asset_url('ic-cross.png')}', alt: 'Ic cross'}));
+    removeButton.on('click', function() {
+      Dropzone.forElement("#dropzone-field").removeFile(file);
+      $(this).parents('.file-uploaded').remove();
+    });
+    return removeButton;
   }
 
   function fileThumbnail(file, url) {

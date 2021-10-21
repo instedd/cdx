@@ -14,7 +14,7 @@
               .icon-upload.icon-blue
               Choose a file to upload
 
-        = f.file_field :new_assays, :class => "upload-picture", multiple: true
+        #dropzone-field.upload-picture
 
         = f.fields_for :assay_attachments do |ay|
           .file-uploaded
