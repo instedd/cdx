@@ -1,6 +1,5 @@
 :javascript
   (function() {
-
     dropzoneOptions = {
       paramName: "file",
       autoProcessQueue: false,
@@ -10,49 +9,33 @@
         //createCard(file)
       },
       thumbnail: function(file, url) {
-        createCard(file, url)
+        var cards = $('.updating');
+        cards.removeClass('updating');
+
+        if(cards.length > 1) {
+          //this should not happen, but to be safe we clear it and do nothing
+          return;
+        }
+
+        if(cards.length == 1) {
+          var card = cards[0];
+          $(card).find('.file').off('click');
+          updateCard(card, file, url);
+        } else{
+          createCard(file, url);
+        }
+
+        updateAddAssaysControls();
       },
       maxFilesize: 2
     }
 
-    var dropzone = new Dropzone('#dropzone-field', dropzoneOptions)
-    // dropzone.on("addedfile", file => {
-    //
-    //   console.log(file);
-    // });
-
-    var onloadPicture = function(file) {
-      return function(event) {
-        createCard(file, event.target.result)
-        // render Tooltip and Add-assays action
-        updateAddAssaysControls();
-      }
-    }
+    new Dropzone('#dropzone-field', dropzoneOptions)
 
     // Click on Add Assays
     $('#add-assays').on('click', function(e) {
       e.preventDefault();
-      $('#sample_new_assays').click();
-    });
-
-    // Drag Picture to an input file and preview it
-    $('#sample_new_assays').on('change', function(e) {
-      removeFilesPreview();
-
-      var files = e.target.files;
-
-      for(var i = 0; i < files.length; i++) {
-        var file = files[i];
-
-        var reader = new FileReader();
-        reader.onload = onloadPicture(file);
-        reader.readAsDataURL(file);
-      }
-
-      if (files.length > 0) {
-        // toggle buttons
-        $('#undo-added-assays').removeClass('nodisplay');
-      }
+      createCardWithoutFile()
     });
 
     // Change the class on the target zone when dragging a file over it
@@ -68,7 +51,7 @@
 
     // Reset
     $('#undo-added-assays').on('click', function(e) {
-      event.preventDefault();
+      e.preventDefault();
 
       removeFilesPreview();
 
@@ -121,11 +104,20 @@
     var assays = $('.assay-file');
     if (assays.length > 0) {
       $('.assay > .upload-new-file > .tooltip').addClass('nodisplay');
-      $('#add-assays').removeClass('nodisplay');
     } else {
       $('.assay > .upload-new-file > .tooltip').removeClass('nodisplay');
-      $('#add-assays').addClass('nodisplay');
     }
+  }
+
+  function createCardWithoutFile() {
+    $('.assay > .upload-new-file').append(
+      $('<div>', { class: 'file-uploaded' })
+        .append($('<div>', { class: 'card-container new-file' })
+          .append(createCardInfoColumnWithoutFile())
+          .append(createCardPictureColumnWithoutFile())
+          .append(createCardRemove())
+        )
+    );
   }
 
   function createCard(file, url) {
@@ -139,13 +131,38 @@
     );
   }
 
+  function updateCard(card, file, url) {
+    updateCardInfoColumn(card, file)
+    updateCardPictureColumn(card, file, url)
+    updateCardRemove(card, file)
+  }
+
+  function createCardInfoColumnWithoutFile() {
+    return $('<div>', { class: 'info' })
+      .append($('<div>', { class: 'row' })
+        .append($('<div>', { class: 'col pe-1' })
+          .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
+        .append($('<div>', { class: 'col pe-8' })
+          .append(buildLoincCodeSelect()))
+      )
+      .append($('<div>', { class: 'row' })
+        .append($('<div>', { class: 'col pe-1' })
+          .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
+        .append($('<div>', { class: 'col pe-8' })
+          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays_info][][result]` } )))
+      )
+      // .append($('<div>')
+      //   .append($('<input>', { type: 'hidden', name: 'sample[new_assays_info][][filename]', value: file.name } )))
+  }
+
+
   function createCardInfoColumn(file) {
     return $('<div>', { class: 'info' })
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
         .append($('<div>', { class: 'col pe-8' })
-          .append(buildLoincCodeSelect({filename: file.name})))
+          .append(buildLoincCodeSelect()))
       )
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-1' })
@@ -157,6 +174,16 @@
         .append($('<input>', { type: 'hidden', name: 'sample[new_assays_info][][filename]', value: file.name } )))
   }
 
+  function updateCardInfoColumn(card, file) {
+    var cardInfo = $(card).find('.info')
+    cardInfo.find('div > input[name="sample[new_assays_info][][filename]"]').remove()
+    cardInfo
+      .append($('<div>')
+        .append($('<input>', { type: 'hidden', name: 'sample[new_assays_info][][filename]', value: file.name } )))
+
+  }
+
+
   function createCardPictureColumn(file, url) {
     return $('<div>', { class: 'file' })
             .append(
@@ -167,13 +194,54 @@
             )
   }
 
+  function updateCardPictureColumn(card, file, url) {
+    var cardFile = $(card).find('.file')
+    cardFile.empty()
+    cardFile
+      .append(
+        $('<div>', { class: 'picture-container assay-file'})
+          .append(fileThumbnail(file, url))
+          .append($('<div>', { class: 'picture-title', title: file.name })
+          .append($('<div>').text(file.name)))
+      )
+  }
+
+  function createCardPictureColumnWithoutFile() {
+    var fileContainer = $('<div>', { class: 'file' })
+    fileContainer.on('click', function() {
+      var card = $(this).parents('.file-uploaded');
+      card.addClass('updating');
+      $('#dropzone-field').click();
+    });
+
+    return fileContainer
+            .append(
+              $('<div>', { class: 'picture-container assay-file'}).append(
+                $('<div>', { class: 'any-filetype' })
+                  .append($('<div>', { class: 'icon-document'}))
+              )
+            );
+  }
+
   function createCardRemove(file) {
     var removeButton = $('<div>', { class: 'remove' }).append($('<img>', { src: '#{asset_url('ic-cross.png')}', alt: 'Ic cross'}));
     removeButton.on('click', function() {
-      Dropzone.forElement("#dropzone-field").removeFile(file);
+      if (file) {
+        Dropzone.forElement("#dropzone-field").removeFile(file);
+      }
       $(this).parents('.file-uploaded').remove();
     });
     return removeButton;
+  }
+
+  function updateCardRemove(card, file) {
+    var cardRemove = $(card).find('.remove')
+    cardRemove.on('click', function() {
+      if (file) {
+        Dropzone.forElement("#dropzone-field").removeFile(file);
+      }
+      $(this).parents('.file-uploaded').remove();
+    });
   }
 
   function fileThumbnail(file, url) {
