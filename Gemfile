@@ -57,6 +57,7 @@ end
 # gem 'bcrypt-ruby', '~> 3.1.2'
 
 gem 'puma'
+gem 'sentry-raven'
 
 # Use Sidekiq for background jobs
 gem 'sidekiq'
