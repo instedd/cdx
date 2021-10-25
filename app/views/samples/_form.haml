@@ -40,7 +40,7 @@
           = f.label :inactivation_method
         .col
           = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
-            - select.items SampleForm::INACTIVATION_METHOD_VALUES
+            - select.items Sample.inactivation_methods
 
       .row
         .col.pe-4
