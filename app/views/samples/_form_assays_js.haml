@@ -1,12 +1,39 @@
 :javascript
   (function() {
     dropzoneOptions = {
-      paramName: "file",
+      paramName: "sample[new_assays]",
+      parallelUploads: 100,
+      maxFiles: 100,
       autoProcessQueue: false,
       uploadMultiple: true,
-      url: 'cualquiercosa',
+      clickable: '#dropzonePreview',
+      init: function() {
+        debugger;
+        var myDropzone = this;
+        // First change the button to actually tell Dropzone to process the queue.
+        this.element.querySelector("input[type='submit']").addEventListener("click", function(e) {
+          debugger;
+          // Make sure that the form isn't actually being sent.
+          e.preventDefault();
+          e.stopPropagation();
+          var filesCount = myDropzone.files.length;
+          if(filesCount>0){
+            myDropzone.processQueue();
+            form.submit();
+          }
+          else{
+            debugger;
+            var form = myDropzone.element;
+            form.submit();
+          }
+
+        })},
       addedfile: function(file) {
         //createCard(file)
+      },
+      successmultiple: function(files, response) {
+        debugger;
+        window.location.href = ("/samples);
       },
       thumbnail: function(file, url) {
         var cards = $('.updating');
@@ -30,7 +57,7 @@
       maxFilesize: 2
     }
 
-    new Dropzone('#dropzone-field', dropzoneOptions)
+    Dropzone.options.uploadForm = dropzoneOptions;
 
     // Click on Add Assays
     $('#add-assays').on('click', function(e) {

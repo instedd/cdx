@@ -49,10 +49,16 @@ class SamplesController < ApplicationController
     }))
     @sample_form = SampleForm.for(sample)
 
+    redirect_to samples_path
+    return
+
     if @sample_form.save
+      puts "*************************DEBUGGER UPDATE CORRECTLY1*************************"
       session.delete(:creating_sample_uuid)
+      puts "*************************DEBUGGER UPDATE CORRECTLY2*************************"
       redirect_to samples_path, notice: 'Sample was successfully created.'
     else
+      puts "*************************DEBUGGER UPDATE WRONG*************************"
       @view_helper = view_helper
       render action: 'new'
     end
@@ -132,8 +138,10 @@ class SamplesController < ApplicationController
     end
 
     if @sample_form.update(sample_params)
+      puts "*************************DEBUGGER UPDATE CORRECTLY*************************"
       redirect_to back_path, notice: 'Sample was successfully updated.'
     else
+      puts "*************************DEBUGGER UPDATE WRONG*************************"
       @view_helper = view_helper
       render action: 'edit'
     end
@@ -175,11 +183,17 @@ class SamplesController < ApplicationController
       :inactivation_method,
       :volume,
       assay_attachments_attributes: [ :id, :loinc_code_id, :result, :_destroy ],
-      new_assays: [],
+      new_assays: {},
       new_assays_info: [ :filename, :loinc_code_id, :result ],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
       new_notes: []
     )
+
+    # assay_params = params.require(:new_assays)
+    #
+    # puts "******************ASSAYS PARAMS********************"
+    # puts assay_params
+
 
     # merge assays files with its corresponding info
     infos = (sample_params[:new_assays_info] || []).reduce({}) do | acc, t |
