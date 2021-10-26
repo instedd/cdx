@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210924033359) do
+ActiveRecord::Schema.define(version: 20211026021110) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -108,12 +108,6 @@ ActiveRecord::Schema.define(version: 20210924033359) do
     t.integer "site_id",  limit: 4, null: false
   end
 
-  create_table "ar_internal_metadata", primary_key: "key", force: :cascade do |t|
-    t.string   "value",      limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
   create_table "assay_attachments", force: :cascade do |t|
     t.integer  "sample_id",            limit: 4
     t.string   "picture_file_name",    limit: 255
@@ -130,16 +124,28 @@ ActiveRecord::Schema.define(version: 20210924033359) do
   add_index "assay_attachments", ["result"], name: "index_assay_attachments_on_result", using: :btree
   add_index "assay_attachments", ["sample_id"], name: "index_assay_attachments_on_sample_id", using: :btree
 
+  create_table "assay_files", force: :cascade do |t|
+    t.integer  "assay_attachment_id",  limit: 4
+    t.string   "picture_file_name",    limit: 255
+    t.string   "picture_content_type", limit: 255
+    t.integer  "picture_file_size",    limit: 4
+    t.datetime "picture_updated_at"
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "assay_files", ["assay_attachment_id"], name: "index_assay_files_on_assay_attachment_id", using: :btree
+
   create_table "batches", force: :cascade do |t|
     t.string   "uuid",           limit: 255
     t.text     "core_fields",    limit: 65535
     t.text     "custom_fields",  limit: 65535
     t.binary   "sensitive_data", limit: 65535
-    t.string   "isolate_name",   limit: 255
     t.datetime "deleted_at"
     t.integer  "institution_id", limit: 4
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.string   "isolate_name",   limit: 255
     t.string   "batch_number",   limit: 255
     t.integer  "site_id",        limit: 4
     t.string   "site_prefix",    limit: 255
@@ -147,7 +153,6 @@ ActiveRecord::Schema.define(version: 20210924033359) do
 
   add_index "batches", ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree
   add_index "batches", ["institution_id"], name: "index_batches_on_institution_id", using: :btree
-  add_index "batches", ["isolate_name"], name: "index_batches_on_isolate_name", using: :btree
   add_index "batches", ["site_id"], name: "index_batches_on_site_id", using: :btree
 
   create_table "computed_policies", force: :cascade do |t|
@@ -658,6 +663,7 @@ ActiveRecord::Schema.define(version: 20210924033359) do
   add_foreign_key "alerts", "institutions"
   add_foreign_key "assay_attachments", "loinc_codes"
   add_foreign_key "assay_attachments", "samples"
+  add_foreign_key "assay_files", "assay_attachments"
   add_foreign_key "batches", "sites"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
