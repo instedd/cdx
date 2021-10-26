@@ -33,6 +33,7 @@ gem 'gon'
 gem 'rchardet'
 gem 'therubyracer'
 gem 'd3_rails'
+gem 'dropzonejs-rails', '~> 0.8.5'
 
 gem 'cdx', path: '.'
 gem 'cdx-api-elasticsearch', path: '.'
