@@ -14,7 +14,7 @@
               .icon-upload.icon-blue
               Choose a file to upload
 
-        = f.file_field :new_assays, :class => "upload-picture", multiple: true
+        #dropzonePreview.upload-picture.dz-default.dz-message
 
         = f.fields_for :assay_attachments do |ay|
           .file-uploaded
@@ -48,9 +48,9 @@
                   = image_tag "ic-cross.png"
 
     .actions
-      = button_tag id: 'add-assays', class: "btn-link nodisplay" do
+      = button_tag id: 'add-assays', class: "btn-link" do
         .icon-circle-plus.btn-icon.icon-blue-important.icon-margin
-        Add Assays
+        New Assay
       .span
       = button_tag id: 'undo-added-assays', class: 'btn-link nodisplay' do
         .icon-close.btn-icon.icon-red-important.icon-margin
