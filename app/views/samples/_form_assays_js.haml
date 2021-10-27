@@ -1,14 +1,20 @@
 :javascript
   (function() {
     dropzoneOptions = {
-      paramName: "assays_files",
+      paramName: "assay_files",
       autoProcessQueue: true,
-      url: 'cualquiercosa',
+      url: '/assay_files/create',
       uploadMultiple: true,
+      sendingmultiple: function () {
+        $('#btn-save').prop('disabled', true);
+      },
       successmultiple: function(files, response) {
-        var test = 2;
-        debugger;
-
+        var assay_files = response.assay_files_data
+        Object.keys(assay_files).forEach(function(filename) {
+          var fileInput = $( ".info input[value='" + filename + "']" )
+          fileInput.replaceWith($('<input>', {type: 'hidden', name: `sample[new_assays][][assay_file_id]`, value: assay_files[filename]}))
+        })
+        $('#btn-save').prop('disabled', false);
       },
       thumbnail: function(file, url) {
         var cards = $('.updating');
@@ -31,8 +37,6 @@
       }
     }
 
-    debugger;
-
     $('#dropzonePreview').dropzone(dropzoneOptions);
 
     // Click on Add Assays
@@ -50,24 +54,6 @@
       var scrollDiff = $(this).scrollTop();
       // move dropzone-input into view
       $('.upload-picture').css('top', scrollDiff);
-    });
-
-    // Reset
-    $('#undo-added-assays').on('click', function(e) {
-      e.preventDefault();
-
-      removeFilesPreview();
-
-      // toggle buttons
-      $('#undo-added-assays').addClass('nodisplay');
-
-      // render Tooltip and Add-assays action
-      updateAddAssaysControls();
-
-      // remove files from input FileList
-      var emptyClonedInput = $('#sample_new_assays').val('').clone(true);
-      $('#sample_new_assays')
-        .replaceWith(emptyClonedInput);
     });
 
     // initial state for Tooltip and Add-assays action
@@ -152,10 +138,10 @@
         .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
         .append($('<div>', { class: 'col pe-8' })
-          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays_info][][result]` } )))
+          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays][][result]` } )))
       )
       // .append($('<div>')
-      //   .append($('<input>', { type: 'hidden', name: 'sample[new_assays_info][][filename]', value: file.name } )))
+      //   .append($('<input>', { type: 'hidden', name: 'sample[new_assays][][filename]', value: file.name } )))
   }
 
 
@@ -171,18 +157,18 @@
         .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
         .append($('<div>', { class: 'col pe-8' })
-          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays_info][][result]` } )))
+          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[new_assays][][result]` } )))
       )
       .append($('<div>')
-        .append($('<input>', { type: 'hidden', name: 'sample[new_assays_info][][filename]', value: file.name } )))
+        .append($('<input>', { type: 'hidden', name: 'sample[new_assays][][filename]', value: file.name } )))
   }
 
   function updateCardInfoColumn(card, file) {
     var cardInfo = $(card).find('.info')
-    cardInfo.find('div > input[name="sample[new_assays_info][][filename]"]').remove()
+    cardInfo.find('div > input[name="sample[new_assays][][filename]"]').remove()
     cardInfo
       .append($('<div>')
-        .append($('<input>', { type: 'hidden', name: 'sample[new_assays_info][][filename]', value: file.name } )))
+        .append($('<input>', { type: 'hidden', name: 'sample[new_assays][][filename]', value: file.name } )))
 
   }
 
@@ -230,7 +216,7 @@
     var removeButton = $('<div>', { class: 'remove' }).append($('<img>', { src: '#{asset_url('ic-cross.png')}', alt: 'Ic cross'}));
     removeButton.on('click', function() {
       if (file) {
-        Dropzone.forElement("#dropzone-field").removeFile(file);
+        // Dropzone.forElement("#dropzonePreview").removeFile(file);
       }
       $(this).parents('.file-uploaded').remove();
     });
@@ -258,7 +244,7 @@
 
   function buildLoincCodeSelect(config) {
     var loincInput = (config && config.input) ? config.input : $('<input>', {type: 'text', class: 'loinc_input'});
-    var loincInputHidden = (config && config.hidden) ? config.hidden : $('<input>', {type: 'hidden', name: `sample[new_assays_info][][loinc_code_id]`});
+    var loincInputHidden = (config && config.hidden) ? config.hidden : $('<input>', {type: 'hidden', name: `sample[new_assays][][loinc_code_id]`});
 
     loincInput.autocomplete({
       lookup: function (query, done) {

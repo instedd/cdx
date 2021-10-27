@@ -40,8 +40,8 @@
                   - else
                     .any-filetype
                       .icon-document
-                  .picture-title{ title: ay.object.picture_file_name }
-                    = link_to ay.object.picture_file_name, ay.object.picture.url, target: "_blank", download: ay.object.picture_file_name
+                  .picture-title{ title: ay.object.assay_file.picture_file_name }
+                    = link_to ay.object.assay_file.picture_file_name, ay.object.assay_file.picture.url, target: "_blank", download: ay.object.assay_file.picture_file_name
               .remove
                 = ay.check_box '_destroy', { id: "destroy_assay_attachments_#{ay.object.id}" }
                 %label.cross{:for => "destroy_assay_attachments_#{ay.object.id}" }
@@ -51,7 +51,3 @@
       = button_tag id: 'add-assays', class: "btn-link" do
         .icon-circle-plus.btn-icon.icon-blue-important.icon-margin
         New Assay
-      .span
-      = button_tag id: 'undo-added-assays', class: 'btn-link nodisplay' do
-        .icon-close.btn-icon.icon-red-important.icon-margin
-        Remove recent assays
