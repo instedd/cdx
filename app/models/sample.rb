@@ -18,6 +18,8 @@ class Sample < ActiveRecord::Base
   has_many :assay_attachments, dependent: :destroy
   accepts_nested_attributes_for :assay_attachments, allow_destroy: true
 
+  validates_associated :assay_attachments, message: "are invalid"
+
   validates_presence_of :institution
   validate :validate_encounter
   validate :validate_patient

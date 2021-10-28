@@ -40,6 +40,16 @@
 
     $('#dropzonePreview').dropzone(dropzoneOptions);
 
+    $('.picture-container.picture-required').on('click', function() {
+      $('.input-required').removeClass('input-required');
+      $(this).closest('.file-uploaded').remove();
+      $('#dropzonePreview').click()
+    });
+
+    $('.input-required').on('click', function() {
+      $('.input-required').removeClass('input-required')
+    });
+
     // Click on Add Assays
     $('#add-assays').on('click', function(e) {
       e.preventDefault();

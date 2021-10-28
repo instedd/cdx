@@ -176,6 +176,16 @@
       }
     }
 
+    .picture-required {
+      border: 2px dashed #EB2122;
+      box-shadow: none;
+      color: #EB2122;
+      font-weight: 300;
+      letter-spacing: 0;
+      line-height: 18px;
+      text-align: center;
+    }
+
     .assay-file {
       .picture-title {
         a, div {
