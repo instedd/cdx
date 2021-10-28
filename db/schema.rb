@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211026021110) do
+ActiveRecord::Schema.define(version: 20211028075009) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -118,8 +118,10 @@ ActiveRecord::Schema.define(version: 20211026021110) do
     t.datetime "updated_at",                       null: false
     t.string   "result",               limit: 255
     t.integer  "loinc_code_id",        limit: 4
+    t.integer  "assay_file_id",        limit: 4
   end
 
+  add_index "assay_attachments", ["assay_file_id"], name: "index_assay_attachments_on_assay_file_id", using: :btree
   add_index "assay_attachments", ["loinc_code_id"], name: "index_assay_attachments_on_loinc_code_id", using: :btree
   add_index "assay_attachments", ["result"], name: "index_assay_attachments_on_result", using: :btree
   add_index "assay_attachments", ["sample_id"], name: "index_assay_attachments_on_sample_id", using: :btree
@@ -661,6 +663,7 @@ ActiveRecord::Schema.define(version: 20211026021110) do
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
   add_foreign_key "alerts", "institutions"
+  add_foreign_key "assay_attachments", "assay_files"
   add_foreign_key "assay_attachments", "loinc_codes"
   add_foreign_key "assay_attachments", "samples"
   add_foreign_key "assay_files", "assay_attachments"
