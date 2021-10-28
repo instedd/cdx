@@ -81,20 +81,6 @@ class Sample < ActiveRecord::Base
     specimen_role == 'Q - Control specimen'
   end
 
-  def new_assays=(new_assays = [])
-    new_assays.each do |assay|
-      loinc_code = LoincCode.find(assay[:loinc_code_id]) unless assay[:loinc_code_id].empty?
-      assay_file = AssayFile.find(assay[:assay_file_id]) unless assay[:assay_file_id].empty?
-
-      assay_attachments.build(
-        loinc_code: loinc_code,
-        result: assay[:result],
-        assay_file: assay_file,
-        sample: self
-      )
-    end
-  end
-
   def new_notes=(notes_list = [])
     notes_list.each do |note|
       notes.build(

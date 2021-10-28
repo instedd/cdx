@@ -174,8 +174,7 @@ class SamplesController < ApplicationController
       :isolate_name,
       :inactivation_method,
       :volume,
-      assay_attachments_attributes: [ :id, :loinc_code_id, :result, :_destroy ],
-      new_assays: [ :loinc_code_id, :result, :assay_file_id ],
+      assay_attachments_attributes: [ :id, :loinc_code_id, :result, :assay_file_id, :_destroy ],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
       new_notes: []
     )
