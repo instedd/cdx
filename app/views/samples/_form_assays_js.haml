@@ -95,11 +95,6 @@
     }
   }, false);
 
-  function removeFilesPreview() {
-    // remove all new-files preview
-    $('.new-file').remove();
-  }
-
   function updateAddAssaysControls() {
     var assays = $('.assay-file');
     if (assays.length > 0) {
@@ -151,8 +146,6 @@
         .append($('<div>', { class: 'col pe-8' })
           .append($('<input>', { type: 'text', class: 'result_input', name: `sample[assay_attachments_attributes][][result]` } )))
       )
-      // .append($('<div>')
-      //   .append($('<input>', { type: 'hidden', name: 'sample[assay_attachments_attributes][][filename]', value: file.name } )))
   }
 
 
