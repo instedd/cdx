@@ -34,6 +34,7 @@ gem 'rchardet'
 gem 'therubyracer'
 gem 'd3_rails'
 gem 'dropzonejs-rails', '0.8.4'
+gem 'whenever', '~> 1.0'
 
 gem 'cdx', path: '.'
 gem 'cdx-api-elasticsearch', path: '.'

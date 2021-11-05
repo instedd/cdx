@@ -6,6 +6,7 @@ RUN sed -i '/^mozilla\/DST_Root_CA_X3/s/^/!/' /etc/ca-certificates.conf && updat
 RUN \
   apt-get update && \
   apt-get install -y \
+    cron \
     # wkhtmltopdf dependencies \
     xfonts-75dpi \
     xfonts-base \
@@ -42,6 +43,9 @@ ADD . /app
 
 # Precompile assets
 RUN bundle exec rake assets:precompile RAILS_ENV=production
+
+# Update cron jobs used in whenever gem
+RUN whenever --update-crontab
 
 # Download NNDD
 RUN \

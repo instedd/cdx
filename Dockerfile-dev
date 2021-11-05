@@ -24,6 +24,7 @@ RUN \
   apt-get install -y \
     build-essential \
     chrpath \
+    cron \
     libssl-dev \
     libxft-dev \
     libfreetype6 \
