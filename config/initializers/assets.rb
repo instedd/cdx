@@ -9,7 +9,7 @@ Rails.application.config.assets.version = '1.0'
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
 # Rails.application.config.assets.precompile += %w( search.js )
-Rails.application.config.assets.precompile += %w( *.png *.gif )
+Rails.application.config.assets.precompile += %w( *.png *.gif *.js)
 
 # Allow components and view helpers to be used in assets
 # source: https://github.com/sstephenson/sprockets/issues/218#issuecomment-94729397
@@ -68,6 +68,6 @@ module HTMLAssets
   end
 end
 
-Rails.application.config.assets.context_class.class_eval do
-  include HTMLAssets::ViewContext
+Rails.application.config.assets.configure do |env|
+  env.context_class.send :include, HTMLAssets::ViewContext
 end

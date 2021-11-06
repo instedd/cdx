@@ -1,4 +1,6 @@
 module ApplicationHelper
+  extend ::ViewComponents::ComponentsBuilder
+
   include Policy::Actions
 
   def has_access?(resource, action)

@@ -88,7 +88,7 @@ RSpec.configure do |config|
     Timecop.return
   end
 
-  config.exclude_pattern = "spec/features/**/*_spec.rb"
+  # config.exclude_pattern = "spec/features/**/*_spec.rb"
 end
 
 require "bundler/setup"
