@@ -5,6 +5,8 @@ class AssayFile < ActiveRecord::Base
   validates_attachment_size :picture, :in => 0.megabytes..10.megabytes
   do_not_validate_attachment_file_type :picture
 
+  belongs_to :assay_attachment
+
   validates_presence_of :picture
 
   def is_image?

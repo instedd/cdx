@@ -4,10 +4,19 @@ class AssayAttachment < ActiveRecord::Base
   belongs_to :assay_file, dependent: :destroy
   accepts_nested_attributes_for :assay_file, allow_destroy: true
 
+  after_save :assign_assay_file
+
   validate :presence_assay_file_or_result
 
   def picture
     self.assay_file.picture
+  end
+
+  def assign_assay_file
+    unless assay_file.nil?
+      assay_file.assay_attachment = self
+      assay_file.save
+    end
   end
 
   def presence_assay_file_or_result
