@@ -41,7 +41,7 @@
                 %div
                   = ay.hidden_field :assay_file_id, value: ay.object.assay_file_id
 
-              - if ay.object.errors.include?(:assay_file)
+              - if ay.object.errors.include?(:assay_file) or ay.object.errors.include?(:result)
                 .file
                   .picture-container.picture-required
                     .icon-alert.icon-red
