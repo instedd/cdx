@@ -8,10 +8,6 @@ class AssayAttachment < ActiveRecord::Base
 
   validate :presence_assay_file_or_result
 
-  def picture
-    self.assay_file.picture
-  end
-
   def assign_assay_file
     unless assay_file.nil?
       assay_file.assay_attachment = self
