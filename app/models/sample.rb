@@ -79,10 +79,6 @@ class Sample < ActiveRecord::Base
     entity_ids.compact.any?
   end
 
-  def is_quality_control
-    specimen_role == 'Q - Control specimen'
-  end
-
   def new_notes=(notes_list = [])
     notes_list.each do |note|
       notes.build(
