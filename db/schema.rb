@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211028075009) do
+ActiveRecord::Schema.define(version: 20211104135226) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -109,16 +109,12 @@ ActiveRecord::Schema.define(version: 20211028075009) do
   end
 
   create_table "assay_attachments", force: :cascade do |t|
-    t.integer  "sample_id",            limit: 4
-    t.string   "picture_file_name",    limit: 255
-    t.string   "picture_content_type", limit: 255
-    t.integer  "picture_file_size",    limit: 4
-    t.datetime "picture_updated_at"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-    t.string   "result",               limit: 255
-    t.integer  "loinc_code_id",        limit: 4
-    t.integer  "assay_file_id",        limit: 4
+    t.integer  "sample_id",     limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.string   "result",        limit: 255
+    t.integer  "loinc_code_id", limit: 4
+    t.integer  "assay_file_id", limit: 4
   end
 
   add_index "assay_attachments", ["assay_file_id"], name: "index_assay_attachments_on_assay_file_id", using: :btree
@@ -134,11 +130,9 @@ ActiveRecord::Schema.define(version: 20211028075009) do
     t.datetime "picture_updated_at"
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
-    t.integer  "assay_attachments_id", limit: 4
   end
 
   add_index "assay_files", ["assay_attachment_id"], name: "index_assay_files_on_assay_attachment_id", using: :btree
-  add_index "assay_files", ["assay_attachments_id"], name: "index_assay_files_on_assay_attachments_id", using: :btree
 
   create_table "batches", force: :cascade do |t|
     t.string   "uuid",           limit: 255
@@ -665,9 +659,9 @@ ActiveRecord::Schema.define(version: 20211028075009) do
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
   add_foreign_key "alerts", "institutions"
+  add_foreign_key "assay_attachments", "assay_files"
   add_foreign_key "assay_attachments", "loinc_codes"
   add_foreign_key "assay_attachments", "samples"
-  add_foreign_key "assay_files", "assay_attachments"
   add_foreign_key "batches", "sites"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
