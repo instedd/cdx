@@ -51,7 +51,7 @@ class SampleForm
       if @sample.date_produced.is_a?(Time)
         @sample.date_produced
       else
-        Time.strptime(@sample.date_produced, date_format[:pattern]) rescue @sample.date_produced
+        Time.strptime(@sample.date_produced, Sample.date_format[:pattern]) rescue @sample.date_produced
       end
   end
 
@@ -98,17 +98,13 @@ class SampleForm
   # @date_produced is Time | Nil | String.
   # BatchForm#date_produced will return always a string ready to be used by the user input with the user locale
   # BatchForm#date_produced= will accept either String or Time. The String will be converted if possible to a Time using the user locale
-  validate :date_produced_is_a_date
-
-  def date_format
-    { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
-  end
-
+  # validate :date_produced_is_a_date
+  #
   def date_produced
     value = @date_produced
 
     if value.is_a?(Time)
-      return value.strftime(date_format[:pattern])
+      return value.strftime(Sample.date_format[:pattern])
     end
 
     value
@@ -118,19 +114,12 @@ class SampleForm
     value = nil if value.blank?
 
     @date_produced = if value.is_a?(String)
-      Time.strptime(value, date_format[:pattern]) rescue value
+      Time.strptime(value, Sample.date_format[:pattern]) rescue value
     else
       value
     end
   end
 
-  def date_produced_placeholder
-    date_format[:placeholder]
-  end
-
-  def date_produced_is_a_date
-    errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless @date_produced.is_a?(Time)
-  end
   # end date_produced
   #
 
