@@ -6,7 +6,6 @@ module SpecimenRole
                            in: -> (x) { specimen_role_ids },
                            allow_blank: true,
                            message: "is not within valid options"
-
   end
 
   def is_quality_control
@@ -15,7 +14,7 @@ module SpecimenRole
 
   class_methods do
     def specimen_roles
-      @@specimen_roles ||= build_specimen_roles
+      @specimen_roles ||= build_specimen_roles
     end
 
     private
@@ -27,11 +26,11 @@ module SpecimenRole
     end
 
     def specimen_role_ids
-      @@specimen_role_ids ||= entity_fields.detect { |f| f.name == 'specimen_role' }.options
+      @specimen_role_ids ||= entity_fields.detect { |f| f.name == 'specimen_role' }.options
     end
 
     def specimen_role_descriptions
-      @@descriptions ||= load_specimen_role_descriptions
+      @descriptions ||= load_specimen_role_descriptions
     end
 
     def load_specimen_role_descriptions
