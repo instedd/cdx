@@ -31,6 +31,7 @@ class BatchForm
   attr_accessor :samples_quantity
   delegate :id, :new_record?, :persisted?, to: :batch
 
+  validates_presence_of :date_produced
   validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
 
   def self.for(batch)
@@ -69,7 +70,7 @@ class BatchForm
       institution: self.institution,
       site: self.site,
       sample_identifiers: [SampleIdentifier.new],
-      date_produced: self.date_produced,
+      date_produced: @date_produced,
       lab_technician: self.lab_technician,
       specimen_role: self.specimen_role,
       isolate_name: self.isolate_name,

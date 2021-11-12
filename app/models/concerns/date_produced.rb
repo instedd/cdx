@@ -2,7 +2,6 @@ module DateProduced
   extend ActiveSupport::Concern
 
   included do
-    validates_presence_of :date_produced
     validate :date_produced_is_a_date
 
     def date_produced_is_a_date

@@ -1,6 +1,5 @@
 class SampleForm
   include ActiveModel::Model
-
   # shared editable attributes with model
   def self.shared_attributes
     [ :institution,
@@ -32,6 +31,8 @@ class SampleForm
   attr_accessor *shared_attributes
   delegate :id, :new_record?, :persisted?, to: :sample
   delegate :uuid, :assay_attachments, :notes, to: :sample
+
+  validates_presence_of :date_produced
 
   def self.for(sample)
     new.tap do |form|
