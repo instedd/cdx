@@ -12,9 +12,17 @@ module SpecimenRole
     specimen_role == 'q'
   end
 
+  def specimen_role_description
+    self.class.specimen_role_description(specimen_role)
+  end
+
   class_methods do
     def specimen_roles
       @specimen_roles ||= build_specimen_roles
+    end
+
+    def specimen_role_description(id)
+      "#{id.upcase} - #{specimen_role_descriptions[id]}" if id
     end
 
     private
