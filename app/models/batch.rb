@@ -31,6 +31,8 @@ class Batch < ActiveRecord::Base
   validate :isolate_name_batch_number_combination_create, on: :create
   validate :isolate_name_batch_number_combination_update, on: :update
 
+  validates_associated :samples, message: "are invalid"
+
   private
 
   def isolate_name_batch_number_combination_create
