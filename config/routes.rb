@@ -132,6 +132,7 @@ Rails.application.routes.draw do
   end
 
   get 'loinc_codes/search' => 'loinc_codes#search'
+  post 'assay_files/create' => 'assay_files#create'
 
 
   resources :alerts, except: [:show]

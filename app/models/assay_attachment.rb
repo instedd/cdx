@@ -1,12 +1,24 @@
 class AssayAttachment < ActiveRecord::Base
-  belongs_to :loinc_code, :dependent => :destroy
+  belongs_to :loinc_code
   belongs_to :sample
-  has_attached_file :picture, styles:  lambda { |a| a.instance.is_image? ? { :card => "130x130>" }  : {} }
+  belongs_to :assay_file, dependent: :destroy
+  accepts_nested_attributes_for :assay_file, allow_destroy: true
 
-  validates_attachment_size :picture, :in => 0.megabytes..10.megabytes
-  do_not_validate_attachment_file_type :picture
+  after_save :assign_assay_file
 
-  def is_image?
-    self.picture.content_type =~ /\Aimage\/.*\Z/
+  validate :presence_assay_file_or_result
+
+  def assign_assay_file
+    unless assay_file.nil?
+      assay_file.assay_attachment = self
+      assay_file.save
+    end
   end
+
+  def presence_assay_file_or_result
+    unless result.present? or assay_file.present?
+      errors.add(:result, "must contain a file or a result")
+    end
+  end
+
 end

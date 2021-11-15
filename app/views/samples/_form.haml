@@ -62,7 +62,7 @@
 
   .row.button-actions
     .col
-      = f.submit 'Save', class: 'btn-primary'
+      = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
       = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'
 
       - if @can_delete

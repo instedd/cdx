@@ -174,29 +174,10 @@ class SamplesController < ApplicationController
       :isolate_name,
       :inactivation_method,
       :volume,
-      assay_attachments_attributes: [ :id, :loinc_code_id, :result, :_destroy ],
-      new_assays: [],
-      new_assays_info: [ :filename, :loinc_code_id, :result ],
+      assay_attachments_attributes: [ :id, :loinc_code_id, :result, :assay_file_id, :_destroy ],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
       new_notes: []
     )
-
-    # merge assays files with its corresponding info
-    infos = (sample_params[:new_assays_info] || []).reduce({}) do | acc, t |
-      acc[t[:filename]] = {
-        loinc_code_id: t[:loinc_code_id],
-        result: t[:result]
-      }
-      acc
-    end
-
-    sample_params[:new_assays] = (sample_params[:new_assays] || []).map do |assay_file|
-      { file: assay_file,
-        loinc_code_id: infos[assay_file.original_filename][:loinc_code_id],
-        result: infos[assay_file.original_filename][:result] }
-    end
-
-    sample_params.delete(:new_assays_info)
 
     # adding author to new notes
     new_notes_with_author = (sample_params[:new_notes] || []).map do |note_description|

@@ -437,6 +437,10 @@ label.on {
 
 }
 
+.file-uploaded {
+  z-index: 99;
+}
+
 .file-uploaded + .upload-new-file {
   display: none;
 }
@@ -453,4 +457,9 @@ label.on {
   input[type="text"], input[type="password"] {
     width: 400px;
   }
+}
+
+.input-required {
+  color: #EB2122;
+  border-bottom-color: #EB2122 !important;
 }

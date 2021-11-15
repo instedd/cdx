@@ -11,6 +11,7 @@ class SampleForm
       :specimen_role,
       :isolate_name,
       :inactivation_method,
+      :assay_attachments,
       :volume ]
   end
 
