@@ -23,22 +23,22 @@
           - t.thead do
             %tr
               %th
-              %th Isolate name
               %th Batch ID
-              %th Lab Technician
+              %th Isolate name
               %th Inactivation Method
               %th Production Date
+              %th Lab Technician
           - t.tbody do
             - @batches.each do |batch|
               %tr.laboratory-sample-row{data: {href: edit_batch_path(batch) }}
                 %td
                   =check_box_tag 'batch_ids[]', batch.id, false, { id: "batch_ids.#{batch.id}" }
                   %label.row{for: "batch_ids.#{batch.id}"}
-                %td= batch.isolate_name
                 %td= batch.batch_number
-                %td= batch.lab_technician
+                %td= batch.isolate_name
                 %td= batch.inactivation_method
                 %td= batch.date_produced_description
+                %td= batch.lab_technician
 
       .pagination
         = render 'shared/pagination'
