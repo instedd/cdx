@@ -12,13 +12,13 @@ class Sample < ActiveRecord::Base
   has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy
   has_many :test_results, through: :sample_identifiers
 
-  has_many :notes, dependent: :destroy
-  accepts_nested_attributes_for :notes, allow_destroy: true
-
   has_many :assay_attachments, dependent: :destroy
   accepts_nested_attributes_for :assay_attachments, allow_destroy: true
-
   validates_associated :assay_attachments, message: "are invalid"
+
+  has_many :notes, dependent: :destroy
+  accepts_nested_attributes_for :notes, allow_destroy: true
+  validates_associated :notes, message: "are invalid"
 
   validates_presence_of :institution
   validate :validate_encounter
@@ -77,16 +77,6 @@ class Sample < ActiveRecord::Base
 
   def has_entity_id?
     entity_ids.compact.any?
-  end
-
-  def new_notes=(notes_list = [])
-    notes_list.each do |note|
-      notes.build(
-        description: note[:description],
-        user: note[:user],
-        sample: self
-      )
-    end
   end
 
   def date_produced_description

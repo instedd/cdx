@@ -21,14 +21,13 @@
 
       var note = $('<div>', { class: 'note'})
         .append($('<div>', { class: 'info' }).text(newNote.info))
-        .append($('<div>', { class: 'description' }).text(newNote.description))
+        .append($('<div>', { class: 'description' }).text(newNote.description)
+          .append($('<input>', {
+            type: 'hidden',
+            name: `sample[notes_attributes][${Date.now()}][description]`
+          }).val(newNote.description)))
         .append($('<div>', { class: 'dashed-line' }));
 
-      var inputHidden = $('<input>', {
-        type: 'hidden',
-        name: 'sample[new_notes][]'
-      }).val(newNote.description);
-
-      $('#notes').append(note).append(inputHidden);
+      $('#notes').append(note);
     });
   })();

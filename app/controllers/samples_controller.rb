@@ -175,14 +175,14 @@ class SamplesController < ApplicationController
       :volume,
       assay_attachments_attributes: [ :id, :loinc_code_id, :result, :assay_file_id, :_destroy ],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
-      new_notes: []
     )
 
-    # adding author to new notes
-    new_notes_with_author = (sample_params[:new_notes] || []).map do |note_description|
-      { user: current_user, description: note_description }
+    if sample_params[:notes_attributes].present?
+      # adding author to new notes
+      sample_params[:notes_attributes]
+        .select { |key, note| note[:id].nil? } # select new notes
+        .each { |key, note| note[:user] = current_user } # add current_user as author of the new note
     end
-    sample_params[:new_notes] = new_notes_with_author
 
     sample_params
   end

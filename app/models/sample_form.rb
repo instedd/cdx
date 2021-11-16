@@ -12,6 +12,7 @@ class SampleForm
       :isolate_name,
       :inactivation_method,
       :assay_attachments,
+      :notes,
       :volume ]
   end
 
@@ -62,14 +63,6 @@ class SampleForm
   # Used by fields_for
   def notes_attributes=(notes)
     @sample.notes_attributes = notes
-  end
-
-  def new_assays=(assays = [])
-    @sample.new_assays = assays
-  end
-
-  def new_notes=(notes = [])
-    @sample.new_notes = notes
   end
 
   def update(attributes)
