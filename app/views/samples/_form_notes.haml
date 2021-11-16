@@ -2,7 +2,7 @@
   .col.pe-2
     = f.label :notes
   #notes.col
-    = f.fields_for :notes, @sample_form.notes do |note|
+    = f.fields_for :notes do |note|
       .note
         .info
           - if note.object.id.nil? # rendering new note because of a validation error
