@@ -108,8 +108,6 @@ class BatchForm
     return false
   end
 
-  SPECIMEN_ROLE_VALUES = Batch.specimen_roles
-
   validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
 
   def creating_batch?
