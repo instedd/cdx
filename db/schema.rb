@@ -139,11 +139,11 @@ ActiveRecord::Schema.define(version: 20211104135226) do
     t.text     "core_fields",    limit: 65535
     t.text     "custom_fields",  limit: 65535
     t.binary   "sensitive_data", limit: 65535
+    t.string   "isolate_name",   limit: 255
     t.datetime "deleted_at"
     t.integer  "institution_id", limit: 4
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
-    t.string   "isolate_name",   limit: 255
     t.string   "batch_number",   limit: 255
     t.integer  "site_id",        limit: 4
     t.string   "site_prefix",    limit: 255

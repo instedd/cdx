@@ -79,16 +79,6 @@ class Sample < ActiveRecord::Base
     entity_ids.compact.any?
   end
 
-  def new_notes=(notes_list = [])
-    notes_list.each do |note|
-      notes.build(
-        description: note[:description],
-        user: note[:user],
-        sample: self
-      )
-    end
-  end
-
   def date_produced_description
     if date_produced.is_a?(Time)
       return date_produced.strftime(I18n.t('date.input_format.pattern'))
