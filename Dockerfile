@@ -44,9 +44,6 @@ ADD . /app
 # Precompile assets
 RUN bundle exec rake assets:precompile RAILS_ENV=production
 
-# Update cron jobs used in whenever gem
-RUN whenever --update-crontab
-
 # Download NNDD
 RUN \
   mkdir -p /app/public/ && \
