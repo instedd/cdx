@@ -70,7 +70,7 @@ class BatchForm
       institution: self.institution,
       site: self.site,
       sample_identifiers: [SampleIdentifier.new],
-      date_produced: @date_produced,
+      date_produced: self.date_produced,
       lab_technician: self.lab_technician,
       specimen_role: self.specimen_role,
       isolate_name: self.isolate_name,

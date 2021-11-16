@@ -7,7 +7,14 @@ module DateProduced
 
   def date_produced_is_a_date
     return if date_produced.blank?
-    errors.add(:date_produced, "should be a date in #{self.class.date_produced_placeholder}") unless date_produced.is_a?(Time)
+    case date_produced
+      when Time
+        return true
+      when String
+        Time.strptime(date_produced, self.class.date_format[:pattern]) rescue errors.add(:date_produced, "should be a date in #{self.class.date_produced_placeholder}")
+      else
+        errors.add(:date_produced, "should be a date in #{self.class.date_produced_placeholder}")
+    end
   end
 
   def date_produced_description
