@@ -5,6 +5,7 @@ class Batch < ActiveRecord::Base
   include SpecimenRole
   include InactivationMethod
   include SiteContained
+  include DateProduced
 
   validates_presence_of :institution
 
@@ -22,43 +23,17 @@ class Batch < ActiveRecord::Base
                   :inactivation_method,
                   :volume
 
-  DATE_FORMAT = { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
-
-  INACTIVATION_METHOD_VALUES = Batch.entity_fields.detect { |f| f.name == 'inactivation_method' }.options
   validates_presence_of :inactivation_method
-
-  validates_presence_of :date_produced
   validates_presence_of :volume
   validates_presence_of :lab_technician
   validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
 
-  validate :date_produced_is_a_date
-
   validate :isolate_name_batch_number_combination_create, on: :create
   validate :isolate_name_batch_number_combination_update, on: :update
 
-  def date_produced_description
-    if date_produced.is_a?(Time)
-      return date_produced.strftime(I18n.t('date.input_format.pattern'))
-    end
-
-    date_produced
-  end
-
-  def date_format
-    { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
-  end
-
-  def date_produced_placeholder
-    self.date_format[:placeholder]
-  end
+  validates_associated :samples, message: "are invalid"
 
   private
-
-  def date_produced_is_a_date
-    return if date_produced.blank?
-    errors.add(:date_produced, "should be a date in #{date_produced_placeholder}") unless date_produced.is_a?(Time)
-  end
 
   def isolate_name_batch_number_combination_create
     validate_isolate_name_batch_number_combination {

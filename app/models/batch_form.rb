@@ -31,6 +31,9 @@ class BatchForm
   attr_accessor :samples_quantity
   delegate :id, :new_record?, :persisted?, to: :batch
 
+  validates_presence_of :date_produced
+  validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
+
   def self.for(batch)
     new.tap do |form|
       form.batch = batch
@@ -48,7 +51,7 @@ class BatchForm
     self.date_produced = if @batch.date_produced.is_a?(Time)
                            @batch.date_produced
                          else
-                           Time.strptime(@batch.date_produced, date_format[:pattern]) rescue @batch.date_produced
+                           Time.strptime(@batch.date_produced, Batch.date_format[:pattern]) rescue @batch.date_produced
                          end
   end
 
@@ -67,7 +70,7 @@ class BatchForm
       institution: self.institution,
       site: self.site,
       sample_identifiers: [SampleIdentifier.new],
-      date_produced: self.date_produced,
+      date_produced: @date_produced, # ::Time
       lab_technician: self.lab_technician,
       specimen_role: self.specimen_role,
       isolate_name: self.isolate_name,
@@ -108,8 +111,6 @@ class BatchForm
     return false
   end
 
-  validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
-
   def creating_batch?
     self.batch.id.nil?
   end
@@ -119,15 +120,11 @@ class BatchForm
   # BatchForm#date_produced will return always a string ready to be used by the user input with the user locale
   # BatchForm#date_produced= will accept either String or Time. The String will be converted if possible to a Time using the user locale
 
-  def date_format
-    { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
-  end
-
   def date_produced
     value = @date_produced
 
     if value.is_a?(Time)
-      return value.strftime(date_format[:pattern])
+      return value.strftime(Batch.date_format[:pattern])
     end
 
     value
@@ -137,16 +134,11 @@ class BatchForm
     value = nil if value.blank?
 
     @date_produced = if value.is_a?(String)
-      Time.strptime(value, date_format[:pattern]) rescue value
+      Time.strptime(value, Batch.date_format[:pattern]) rescue value
     else
       value
     end
   end
-
-  def date_produced_placeholder
-    date_format[:placeholder]
-  end
-
   # end date_produced
   #
 

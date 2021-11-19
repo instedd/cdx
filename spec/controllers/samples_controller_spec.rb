@@ -255,7 +255,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "update" do
-    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: '08/08/2021'})}
+    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern')) })}
 
     it "should update existing sample" do
       post :update, id: sample.id, sample: {
@@ -317,7 +317,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "destroy" do
-    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: '08/08/2021'})}
+    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
 
     it "should be able to soft delete a sample" do
       expect {
@@ -354,11 +354,11 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "bulk_destroy" do
-    let!(:sample1) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: '08/08/2021'})}
-    let!(:sample2) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: '09/09/2018'})}
+    let!(:sample1) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
+    let!(:sample2) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
 
     let!(:institution2)   { Institution.make }
-    let!(:sample3) { institution2.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: '07/07/2020'})}
+    let!(:sample3) { institution2.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
 
     it "should be able to bulk destroy samples" do
       expect {
@@ -407,7 +407,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "print" do
-    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: '08/08/2021'})}
+    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
 
     it "should be able to print a sample" do
       post :print, id: sample.id
@@ -431,11 +431,11 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "bulk_print" do
-    let!(:sample1) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: '08/08/2021'})}
-    let!(:sample2) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: '09/09/2018'})}
+    let!(:sample1) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
+    let!(:sample2) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
 
     let!(:institution2)   { Institution.make }
-    let!(:sample3) { institution2.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: '07/07/2020'})}
+    let!(:sample3) { institution2.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
 
     it "should be able to bulk print samples" do
       post :bulk_print, sample_ids: [sample1.id, sample2.id]
