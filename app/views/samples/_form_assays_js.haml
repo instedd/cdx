@@ -3,6 +3,7 @@
     dropzoneOptions = {
       paramName: "assay_files",
       autoProcessQueue: true,
+      maxThumbnailFilesize: 20,
       parallelUploads: 10,
       url: '/assay_files/create',
       uploadMultiple: true,
@@ -10,18 +11,20 @@
         var completeFileName = file.name;
         var sanitizedName = completeFileName.replace(/[^a-z^A-Z^0-9\^_.-]/g, '_');
         var fileName = sanitizedName.split('.')[0];
-        return sanitizedName.replace(fileName, fileName + new Date().getTime());
+        return sanitizedName.replace(fileName, fileName + Date.now());
       },
       sendingmultiple: function () {
         $('#btn-save').prop('disabled', true);
       },
       successmultiple: function(files, response) {
-        var assay_files = response.assay_files_data
-        Object.keys(assay_files).forEach(function(filename) {
-          var fileInput = $( ".info input[value='" + filename + "']" )
-          var mockIndex = fileInput.closest('.card-container').find('input[name="mockIndex"]').val()
-          fileInput.replaceWith($('<input>', {type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][assay_file_id]`, value: assay_files[filename]}))
-        })
+        var assay_files = response.assay_files_data || {}
+        if(assay_files){
+          Object.keys(assay_files).forEach(function(filename) {
+            var fileInput = $( ".info input[value='" + filename + "']" )
+            var mockIndex = fileInput.closest('.card-container').find('input[name="mockIndex"]').val() || ''
+            fileInput.replaceWith($('<input>', {type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][assay_file_id]`, value: assay_files[filename]}))
+          })
+        }
         $('#btn-save').prop('disabled', false);
       },
       thumbnail: function(file, url) {
