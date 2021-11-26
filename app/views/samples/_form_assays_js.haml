@@ -9,7 +9,7 @@
       uploadMultiple: true,
       renameFile: function (file) {
         var completeFileName = file.name;
-        var sanitizedName = completeFileName.replace(/[^a-z^A-Z^0-9\^_.-]/g, '_');
+        var sanitizedName = completeFileName.replace(/[^\p{Letter}\p{Number}_.-]/gu, '_');
         var fileName = sanitizedName.split('.')[0];
         return sanitizedName.replace(fileName, fileName + Date.now());
       },
@@ -18,13 +18,11 @@
       },
       successmultiple: function(files, response) {
         var assay_files = response.assay_files_data || {}
-        if(assay_files){
-          Object.keys(assay_files).forEach(function(filename) {
-            var fileInput = $( ".info input[value='" + filename + "']" )
-            var mockIndex = fileInput.closest('.card-container').find('input[name="mockIndex"]').val() || ''
-            fileInput.replaceWith($('<input>', {type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][assay_file_id]`, value: assay_files[filename]}))
-          })
-        }
+        Object.keys(assay_files).forEach(function(filename) {
+          var fileInput = $( ".info input[value='" + filename + "']" )
+          var mockIndex = fileInput.closest('.card-container').find('input[name="mockIndex"]').val() || ''
+          fileInput.replaceWith($('<input>', {type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][assay_file_id]`, value: assay_files[filename]}))
+        })
         $('#btn-save').prop('disabled', false);
       },
       thumbnail: function(file, url) {
