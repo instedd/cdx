@@ -45,7 +45,7 @@
                 .file
                   .picture-container.picture-required
                     .icon-alert.icon-red
-                    = "You must define a result or an attachment"
+                    = "The file can’t exceed 10 MB"
               - else
                 - if ay.object.assay_file.nil? or not ay.object.assay_file.is_image?
                   .file

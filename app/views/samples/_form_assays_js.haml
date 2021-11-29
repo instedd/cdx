@@ -3,17 +3,24 @@
     dropzoneOptions = {
       paramName: "assay_files",
       autoProcessQueue: true,
+      maxThumbnailFilesize: 20,
       parallelUploads: 10,
       url: '/assay_files/create',
       uploadMultiple: true,
+      renameFile: function (file) {
+        var completeFileName = file.name;
+        var sanitizedName = completeFileName.replace(/[^\p{Letter}\p{Number}_.-]/gu, '_');
+        var fileName = sanitizedName.split('.')[0];
+        return sanitizedName.replace(fileName, fileName + Date.now());
+      },
       sendingmultiple: function () {
         $('#btn-save').prop('disabled', true);
       },
       successmultiple: function(files, response) {
-        var assay_files = response.assay_files_data
+        var assay_files = response.assay_files_data || {}
         Object.keys(assay_files).forEach(function(filename) {
           var fileInput = $( ".info input[value='" + filename + "']" )
-          var mockIndex = fileInput.closest('.card-container').find('input[name="mockIndex"]').val()
+          var mockIndex = fileInput.closest('.card-container').find('input[name="mockIndex"]').val() || ''
           fileInput.replaceWith($('<input>', {type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][assay_file_id]`, value: assay_files[filename]}))
         })
         $('#btn-save').prop('disabled', false);
@@ -55,6 +62,7 @@
     $('#add-assays').on('click', function(e) {
       e.preventDefault();
       createCardWithoutFile()
+      updateAddAssaysControls()
     });
 
     // Change the class on the target zone when dragging a file over it
@@ -97,7 +105,7 @@
   }, false);
 
   function updateAddAssaysControls() {
-    var assays = $('.assay-file');
+    var assays = $('.card-container');
     if (assays.length > 0) {
       $('.assay > .upload-new-file > .tooltip').addClass('nodisplay');
     } else {
@@ -169,7 +177,7 @@
           .append($('<input>', { type: 'text', class: 'result_input', name: `sample[assay_attachments_attributes][${mockIndex}][result]` } )))
       )
       .append($('<div>')
-        .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][filename]`, value: file.name.replaceAll(' ', '_') } )))
+        .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][filename]`, value: file.upload.filename } )))
   }
 
   function updateCardInfoColumn(card, file) {
@@ -178,7 +186,7 @@
     cardInfo.find(`div > input[name="sample[assay_attachments_attributes][${mockIndex}][filename]"]`).remove()
     cardInfo
       .append($('<div>')
-        .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][filename]`, value: file.name.replaceAll(' ', '_') } )))
+        .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][filename]`, value: file.upload.filename } )))
 
   }
 
@@ -188,8 +196,8 @@
             .append(
               $('<div>', { class: 'picture-container assay-file'})
               .append(fileThumbnail(file, url))
-              .append($('<div>', { class: 'picture-title', title: file.name })
-              .append($('<div>').text(file.name)))
+              .append($('<div>', { class: 'picture-title', title: file.upload.filename })
+              .append($('<div>').text(file.upload.filename)))
             )
   }
 
@@ -200,8 +208,8 @@
       .append(
         $('<div>', { class: 'picture-container assay-file'})
           .append(fileThumbnail(file, url))
-          .append($('<div>', { class: 'picture-title', title: file.name })
-          .append($('<div>').text(file.name)))
+          .append($('<div>', { class: 'picture-title', title: file.upload.filename })
+          .append($('<div>').text(file.upload.filename)))
       )
   }
 
