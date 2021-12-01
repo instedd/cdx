@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211104135226) do
+ActiveRecord::Schema.define(version: 20211201181600) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -139,11 +139,11 @@ ActiveRecord::Schema.define(version: 20211104135226) do
     t.text     "core_fields",    limit: 65535
     t.text     "custom_fields",  limit: 65535
     t.binary   "sensitive_data", limit: 65535
-    t.string   "isolate_name",   limit: 255
     t.datetime "deleted_at"
     t.integer  "institution_id", limit: 4
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.string   "isolate_name",   limit: 255
     t.string   "batch_number",   limit: 255
     t.integer  "site_id",        limit: 4
     t.string   "site_prefix",    limit: 255
@@ -513,6 +513,7 @@ ActiveRecord::Schema.define(version: 20211104135226) do
     t.string   "isolate_name",   limit: 255
     t.integer  "site_id",        limit: 4
     t.string   "site_prefix",    limit: 255
+    t.string   "specimen_role",  limit: 255
   end
 
   add_index "samples", ["batch_id"], name: "index_samples_on_batch_id", using: :btree
@@ -521,6 +522,7 @@ ActiveRecord::Schema.define(version: 20211104135226) do
   add_index "samples", ["isolate_name"], name: "index_samples_on_isolate_name", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
   add_index "samples", ["site_id"], name: "index_samples_on_site_id", using: :btree
+  add_index "samples", ["specimen_role"], name: "index_samples_on_specimen_role", using: :btree
 
   create_table "sites", force: :cascade do |t|
     t.string   "name",                             limit: 255

@@ -30,9 +30,9 @@ class Sample < ActiveRecord::Base
   end
 
   attribute_field :isolate_name, copy: true
+  attribute_field :specimen_role, copy: true
   attribute_field :date_produced,
                   :lab_technician,
-                  :specimen_role,
                   :inactivation_method,
                   :volume
 

@@ -13,6 +13,7 @@ entities:
         type: date
       specimen_role:
         type: enum
+        searchable: true
         options:
           - b
           - c
