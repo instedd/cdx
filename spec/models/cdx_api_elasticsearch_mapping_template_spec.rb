@@ -45,6 +45,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "type"=>"string",
                 "index"=>"not_analyzed"
               },
+              "specimen_role"=> {
+                "type"=>"string",
+                "index"=>"not_analyzed"
+              },
               "custom_fields" => {
                 "type" => "object"
               }
