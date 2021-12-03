@@ -17,8 +17,8 @@ class Batch < ActiveRecord::Base
 
   attribute_field :isolate_name, copy: true
   attribute_field :batch_number, copy: true
-  attribute_field :date_produced,
-                  :lab_technician,
+  attribute_field :date_produced, copy: true
+  attribute_field :lab_technician,
                   :specimen_role,
                   :inactivation_method,
                   :volume
