@@ -29,7 +29,6 @@ entities:
       isolate_name:
         searchable: true
       date_produced:
-        searchable: true
         type: date
       inactivation_method:
         type: enum

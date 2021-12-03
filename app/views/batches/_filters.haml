@@ -13,10 +13,16 @@
         .row
           .filter
             %label.block Sample ID
-            %input.input-x-large{type: "text", name: "sample_id", value: params["sample_id"], placeholder: "Filter by Sample ID"}
+            %input.input-large{type: "text", name: "sample_id", value: params["sample_id"], placeholder: "Filter by Sample ID"}
           .filter
             %label.block Batch ID
-            %input.input-x-large{type: "text", name: "batch_number", value: params["batch_number"], placeholder: "Filter by batch ID"}
+            %input.input-large{type: "text", name: "batch_number", value: params["batch_number"], placeholder: "Filter by batch ID"}
           .filter
             %label.block Isolate Name
-            %input.input-x-large{type: "text", name: "isolate_name", value: params["isolate_name"], placeholder: "Filter by isolate name"}
+            %input.input-large{type: "text", name: "isolate_name", value: params["isolate_name"], placeholder: "Filter by isolate name"}
+          .filter
+            %label.block From date
+            %input.input-large{type: "date", name: "date_produced_from", value: params["date_produced_from"]}
+          .filter
+            %label.block To date
+            %input.input-large{type: "date", name: "date_produced_to", value: params["date_produced_to"]}
