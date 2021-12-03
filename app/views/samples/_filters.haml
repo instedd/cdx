@@ -20,3 +20,8 @@
           .filter
             %label.block Isolate Name
             %input.input-x-large{type: "text", name: "isolate_name", value: params["isolate_name"], placeholder: "Filter by isolate name"}
+          .filter
+            %label.block Specimen Role
+            = cdx_select name: "specimen_role", value: params["specimen_role"] do |specimen_role|
+              - specimen_role.item "", "All specimen roles"
+              - specimen_role.items Sample.specimen_roles.map{|item| {id: item[:id], description: item[:description].truncate(30) }}, :id, :description
