@@ -11,6 +11,8 @@ class BatchesController < ApplicationController
     @batches = @batches.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
     @batches = @batches.where("batch_number LIKE concat('%', ?, '%')", params[:batch_number]) unless params[:batch_number].blank?
     @batches = @batches.joins(samples: :sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
+    @batches = @batches.where("date_produced >= ?", params[:date_produced_from].to_time) unless params[:date_produced_from].blank?
+    @batches = @batches.where("date_produced <= ?", params[:date_produced_to].to_time) unless params[:date_produced_to].blank?
 
     #paginate batches
     @batches = perform_pagination(@batches)
