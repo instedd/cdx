@@ -1,7 +1,11 @@
 class MigrateSpecimenRole < ActiveRecord::Migration
   def up
     Sample.find_each do |sample|
-      next if sample.specimen_role.nil?
+      sample.date_produced = if sample.date_produced.is_a?(String)
+                              Time.strptime(sample.date_produced, Sample.date_format[:pattern]) rescue sample.date_produced
+                            else
+                              sample.date_produced
+                            end
       sample.save
     end
   end
