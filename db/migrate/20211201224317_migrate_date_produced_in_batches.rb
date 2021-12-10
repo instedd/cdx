@@ -3,7 +3,7 @@ class MigrateDateProducedInBatches < ActiveRecord::Migration
     Batch.find_each do |batch|
       next if batch.date_produced.nil?
       batch.date_produced = if batch.date_produced.is_a?(String)
-                              Time.strptime(value, Batch.date_format[:pattern]) rescue batch.date_produced
+                              Time.strptime(batch.date_produced, Batch.date_format[:pattern]) rescue batch.date_produced
                             else
                               batch.date_produced
                             end
