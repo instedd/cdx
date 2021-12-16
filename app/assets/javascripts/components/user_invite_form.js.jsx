@@ -60,6 +60,10 @@ var UserInviteForm = React.createClass({
     this.props.onFinished();
   },
 
+  componentDidMount: function() {
+    this.props.changeTitle('Invite Users');
+  },
+
   render: function() {
     return (<div>
       <div className="row">

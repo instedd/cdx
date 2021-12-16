@@ -45,6 +45,10 @@ var ManufacturerInviteForm = React.createClass({
     this.props.onFinished()
   },
 
+  componentDidMount: function() {
+    this.props.changeTitle('Invite Manufacturer');
+  },
+
   render: function() {
     return (
       <div>

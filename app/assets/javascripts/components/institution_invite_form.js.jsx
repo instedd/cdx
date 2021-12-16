@@ -30,6 +30,10 @@ var InstitutionInviteForm = React.createClass({
     });
   },
 
+  componentDidMount: function() {
+    this.props.changeTitle('Invite Institution');
+  },
+
   render: function() {
     return (
       <div>

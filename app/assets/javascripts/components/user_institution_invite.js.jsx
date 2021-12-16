@@ -1,4 +1,19 @@
 var AddUserOrInstitutionLink = React.createClass({
+
+  getInitialState: function() {
+    return {
+      title: 'Invite'
+    };
+  },
+
+  changeTitle: function(newTitle) {
+    this.setState({
+      title: newTitle
+    });
+  },
+
+
+
   openInviteModal: function() {
     this.refs.inviteModal.show();
     event.preventDefault();
@@ -13,9 +28,9 @@ var AddUserOrInstitutionLink = React.createClass({
       <a className="btn-add icon side-link" href='#' title="Invite users" onClick={this.openInviteModal} ><span className="icon-mail icon-white"></span></a>
 
       <Modal ref="inviteModal">
-        <h1>Invite</h1>
+        <h1>{this.state.title}</h1>
 
-        <ModalPresenter onFinished={this.closeInviteModal} institution_types= {this.props.institution_types} roles={this.props.roles} context={this.props.context} />
+        <ModalPresenter changeTitle={this.changeTitle} onFinished={this.closeInviteModal} institution_types= {this.props.institution_types} roles={this.props.roles} context={this.props.context} />
       </Modal>
     </div>);
   }
@@ -56,6 +71,17 @@ var ModalPresenter = React.createClass({
     this.props.onFinished();
   },
 
+  changeTitle: function (newTitle){
+    this.props.changeTitle(newTitle);
+  },
+
+  componentDidUpdate: function() {
+    const { step } = this.state;
+    if(step === 'modalPresenter'){
+      this.changeTitle('Invite');
+    }
+  },
+
   presenterForm: function() {
     return (
       <div>
@@ -85,16 +111,16 @@ var ModalPresenter = React.createClass({
         return this.presenterForm();
       case 'userInviteStep':
         return (
-          <UserInviteForm onFinished={this.closeModal} roles={this.props.roles} context={this.props.context} modalPresenterStep={()=> {this.modalPresenterStep()}}/>
+          <UserInviteForm changeTitle={this.changeTitle} onFinished={this.closeModal} roles={this.props.roles} context={this.props.context} modalPresenterStep={()=> {this.modalPresenterStep()}}/>
         );
       case 'institutionInviteStep':
         return (
-          <InstitutionInviteForm types={this.props.institution_types} onFinished={()=> {this.closeModal()}} modalPresenterStep={()=> {this.modalPresenterStep()}} manufacturerStep={()=> {this.manufacturerStep()}}/>
+          <InstitutionInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} modalPresenterStep={()=> {this.modalPresenterStep()}} manufacturerStep={()=> {this.manufacturerStep()}}/>
         );
 
       case 'manufacturerInviteStep':
         return (
-          <ManufacturerInviteForm types={this.props.institution_types} onFinished={()=> {this.closeModal()}} institutionInviteStep={()=> {this.institutionInviteStep()}}/>
+          <ManufacturerInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} institutionInviteStep={()=> {this.institutionInviteStep()}}/>
         );
     }
   },
