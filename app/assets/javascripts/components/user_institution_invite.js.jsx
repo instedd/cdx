@@ -24,7 +24,6 @@ var AddUserOrInstitutionLink = React.createClass({
 var UserInviteForm = React.createClass({
   getInitialState: function() {
     return {
-      step: 1,
       users: [],
       role: null,
       includeMessage: false,
@@ -128,7 +127,6 @@ var UserInviteForm = React.createClass({
 var InstitutionInviteForm = React.createClass({
   getInitialState: function() {
     return {
-      step: 2,
       type: null,
       name: ''
     };
@@ -189,7 +187,6 @@ var InstitutionInviteForm = React.createClass({
 var ManufacturerInviteForm = React.createClass({
   getInitialState: function() {
     return {
-      step: 3,
       name: '',
       email: '',
       includeMessage: false,
@@ -279,31 +276,31 @@ var ManufacturerInviteForm = React.createClass({
 var ModalPresenter = React.createClass({
   getInitialState: function() {
     return {
-      step: 0
+      step: 'modalPresenter'
     };
   },
 
   modalPresenterStep: function() {
     this.setState({
-      step: 0
+      step: 'modalPresenter'
     });
   },
 
   manufacturerStep: function() {
     this.setState({
-      step: 3
+      step: 'manufacturerInviteStep'
     });
   },
 
   userInviteStep: function() {
     this.setState({
-      step: 1
+      step: 'userInviteStep'
     });
   },
 
   institutionInviteStep: function() {
     this.setState({
-      step: 2
+      step: 'institutionInviteStep'
     });
   },
 
@@ -314,7 +311,7 @@ var ModalPresenter = React.createClass({
   render: function() {
     const { step } = this.state;
     switch (step) {
-      case 0 :
+      case 'modalPresenter':
         return (
           <div>
             <div className="row invitation-option-card" onClick={() => {this.userInviteStep()}}>
@@ -334,16 +331,16 @@ var ModalPresenter = React.createClass({
             </div>
           </div>
         )
-      case 1:
+      case 'userInviteStep':
         return (
           <UserInviteForm onFinished={this.closeModal} roles={this.props.roles} context={this.props.context} modalPresenterStep={()=> {this.modalPresenterStep()}}/>
         );
-      case 2:
+      case 'institutionInviteStep':
         return (
           <InstitutionInviteForm types={this.props.institution_types} onFinished={()=> {this.closeModal()}} modalPresenterStep={()=> {this.modalPresenterStep()}} manufacturerStep={()=> {this.manufacturerStep()}}/>
         );
 
-      case 3:
+      case 'manufacturerInviteStep':
         return (
           <ManufacturerInviteForm types={this.props.institution_types} onFinished={()=> {this.closeModal()}} institutionInviteStep={()=> {this.institutionInviteStep()}}/>
         );
