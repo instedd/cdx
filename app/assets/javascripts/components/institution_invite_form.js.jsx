@@ -17,7 +17,7 @@ var InstitutionInviteForm = React.createClass({
   },
 
   next: function() {
-    this.props.adminInviteStep()
+    this.props.adminInviteStep(this.state)
   },
 
   cancel: function() {
@@ -43,7 +43,7 @@ var InstitutionInviteForm = React.createClass({
         </div>
         <div className="row">
           <div className="col pe-3"><label>Name</label></div>
-          <div className="col"><input type="text" onChange={this.setName} /></div>
+          <div className="col"><input type="text" onChange={(e)=> {this.setName(e.currentTarget.value)}} /></div>
         </div>
         <div className="modal-footer">
           <div className="footer-buttons-aligning">
