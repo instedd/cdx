@@ -37,8 +37,7 @@ class Institution < ActiveRecord::Base
   end
 
   def self.kinds
-    hash = {}
-    KINDS.map { |kind| {value: kind, label: kind} }
+    KINDS.map { |kind| {value: kind, label: kind.humanize} }
   end
 
   def filter_by_owner(user, check_conditions)

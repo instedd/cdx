@@ -148,6 +148,10 @@ var InstitutionInviteForm = React.createClass({
     this.props.manufacturerStep()
   },
 
+  cancel: function() {
+    this.props.onFinished()
+  },
+
   setName: function(newName) {
     this.setState({
       name: newName
@@ -168,7 +172,7 @@ var InstitutionInviteForm = React.createClass({
         <div className="modal-footer">
           <div className="footer-buttons-aligning">
             <div>
-              <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
+              <button className="btn btn-link" onClick={this.cancel}>Cancel</button>
             </div>
             <div>
               <button className="btn btn-link" onClick={this.back}>Back</button>
@@ -226,6 +230,10 @@ var ManufacturerInviteForm = React.createClass({
     });
   },
 
+  cancel: function() {
+    this.props.onFinished()
+  },
+
   render: function() {
     return (
       <div>
@@ -253,7 +261,7 @@ var ManufacturerInviteForm = React.createClass({
         <div className="modal-footer">
           <div className="footer-buttons-aligning">
             <div>
-              <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
+              <button className="btn btn-link" onClick={this.cancel}>Cancel</button>
             </div>
             <div>
               <button className="btn btn-primary" onClick={this.next}>Send</button>
@@ -299,6 +307,10 @@ var ModalPresenter = React.createClass({
     });
   },
 
+  closeModal: function() {
+    this.props.onFinished();
+  },
+
   render: function() {
     const { step } = this.state;
     switch (step) {
@@ -328,12 +340,12 @@ var ModalPresenter = React.createClass({
         );
       case 2:
         return (
-          <InstitutionInviteForm types={this.props.institution_types} modalPresenterStep={()=> {this.modalPresenterStep()}} manufacturerStep={()=> {this.manufacturerStep()}}/>
+          <InstitutionInviteForm types={this.props.institution_types} onFinished={()=> {this.closeModal()}} modalPresenterStep={()=> {this.modalPresenterStep()}} manufacturerStep={()=> {this.manufacturerStep()}}/>
         );
 
       case 3:
         return (
-          <ManufacturerInviteForm types={this.props.institution_types} institutionInviteStep={()=> {this.institutionInviteStep()}}/>
+          <ManufacturerInviteForm types={this.props.institution_types} onFinished={()=> {this.closeModal()}} institutionInviteStep={()=> {this.institutionInviteStep()}}/>
         );
     }
   },
