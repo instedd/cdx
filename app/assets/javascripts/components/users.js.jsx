@@ -20,4 +20,3 @@ var AddUserLink = React.createClass({
     </div>);
   }
 });
-
