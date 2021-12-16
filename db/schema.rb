@@ -444,6 +444,16 @@ ActiveRecord::Schema.define(version: 20211217160437) do
   add_index "patients", ["institution_id"], name: "index_patients_on_institution_id", using: :btree
   add_index "patients", ["site_id"], name: "index_patients_on_site_id", using: :btree
 
+  create_table "pending_institution_invites", force: :cascade do |t|
+    t.integer  "user_id",          limit: 4
+    t.string   "institution_name", limit: 255
+    t.string   "institution_kind", limit: 255, default: "institution"
+    t.datetime "created_at",                                           null: false
+    t.datetime "updated_at",                                           null: false
+  end
+
+  add_index "pending_institution_invites", ["user_id"], name: "index_pending_institution_invites_on_user_id", using: :btree
+
   create_table "policies", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
     t.integer  "granter_id", limit: 4
