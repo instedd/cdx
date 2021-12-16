@@ -17,7 +17,7 @@ var AdminInviteForm = React.createClass({
     const {name, email, message} = this.state;
     const data = {
       institutionData: institutionData,
-      userData: {name, email},
+      users: {name, email},
       message: message
     }
 
