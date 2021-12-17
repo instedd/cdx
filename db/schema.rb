@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211201224317) do
+ActiveRecord::Schema.define(version: 20211217160437) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -443,6 +443,18 @@ ActiveRecord::Schema.define(version: 20211201224317) do
   add_index "patients", ["deleted_at"], name: "index_patients_on_deleted_at", using: :btree
   add_index "patients", ["institution_id"], name: "index_patients_on_institution_id", using: :btree
   add_index "patients", ["site_id"], name: "index_patients_on_site_id", using: :btree
+
+  create_table "pending_institution_invites", force: :cascade do |t|
+    t.integer  "invited_user_id",    limit: 4
+    t.integer  "invited_by_user_id", limit: 4
+    t.string   "institution_name",   limit: 255
+    t.string   "institution_kind",   limit: 255, default: "institution"
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+  end
+
+  add_index "pending_institution_invites", ["invited_by_user_id"], name: "index_pending_institution_invites_on_invited_by_user_id", using: :btree
+  add_index "pending_institution_invites", ["invited_user_id"], name: "index_pending_institution_invites_on_invited_user_id", using: :btree
 
   create_table "policies", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
