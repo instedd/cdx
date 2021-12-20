@@ -2,8 +2,9 @@ class NormalizeSpecimenRoleAndDateProducedSamples < ActiveRecord::Migration
   def up
     Sample.find_each do |sample|
       unless sample.specimen_role.blank?
+        specimen_role_ids_list = %w[b c e f g l o p q r v]
         specimen_role_id = sample.specimen_role[0].downcase
-        sample.specimen_role = (Sample.specimen_role_ids_list.include? specimen_role_id) ? specimen_role_id : sample.specimen_role
+        sample.specimen_role = (specimen_role_ids_list.include? specimen_role_id) ? specimen_role_id : sample.specimen_role
       end
 
       sample.date_produced = if sample.date_produced.is_a?(String)

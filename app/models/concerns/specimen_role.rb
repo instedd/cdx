@@ -25,10 +25,6 @@ module SpecimenRole
       "#{id.upcase} - #{specimen_role_descriptions[id]}" if id
     end
 
-    def specimen_role_ids_list
-      specimen_role_ids
-    end
-
     private
 
     def build_specimen_roles
