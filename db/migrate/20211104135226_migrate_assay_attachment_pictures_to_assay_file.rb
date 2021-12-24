@@ -31,7 +31,7 @@ class MigrateAssayAttachmentPicturesToAssayFile < ActiveRecord::Migration
       assay_file.assay_attachment.picture_file_size = assay_file.picture_file_size
       assay_file.assay_attachment.picture_updated_at = assay_file.picture_updated_at
       assay_file.assay_attachment.picture_content_type = assay_file.picture_content_type
-      assay_file.assay_attachment.save
+      assay_file.assay_attachment.save!
     end
 
   end
