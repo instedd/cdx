@@ -1,7 +1,8 @@
 var AdminInviteForm = React.createClass({
   getInitialState: function() {
     return {
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       includeMessage: false,
       message: ''
@@ -14,10 +15,10 @@ var AdminInviteForm = React.createClass({
 
   sendInvitation: function() {
     const { institutionData } = this.props;
-    const {name, email, message} = this.state;
+    const {firstName, lastName, email, message} = this.state;
     const data = {
-      institutionData: institutionData,
-      users: {name, email},
+      institution_data: institutionData,
+      user_invite_data: {firstName, lastName, email},
       message: message
     }
 
@@ -25,7 +26,7 @@ var AdminInviteForm = React.createClass({
       data.message = this.state.message;
 
     $.ajax({
-      url: '/users',
+      url: '/users/create_with_institution_invite',
       method: 'POST',
       data: data,
       success: function () {
@@ -36,9 +37,15 @@ var AdminInviteForm = React.createClass({
 
   },
 
-  setName: function(newName) {
+  setFirstName: function(newName) {
     this.setState({
-      name: newName
+      firstName: newName
+    });
+  },
+
+  setLastName: function(newName) {
+    this.setState({
+      lastName: newName
     });
   },
 
@@ -73,15 +80,19 @@ var AdminInviteForm = React.createClass({
     return (
       <div>
         <div className="row">
-          <div className="col pe-3"><label>Name</label></div>
-          <div className="col"><input type="text" onChange={(e)=> {this.setName(e.currentTarget.value)}} /></div>
+          <div className="col pe-4"><label>First Name</label></div>
+          <div className="col"><input type="text" onChange={(e)=> {this.setFirstName(e.currentTarget.value)}} /></div>
         </div>
         <div className="row">
-          <div className="col pe-3"><label>Email</label></div>
+          <div className="col pe-4"><label>First Name</label></div>
+          <div className="col"><input type="text" onChange={(e)=> {this.setLastName(e.currentTarget.value)}} /></div>
+        </div>
+        <div className="row">
+          <div className="col pe-4"><label>Email</label></div>
           <div className="col"><input type="text" onChange={(e)=> {this.setEmail(e.currentTarget.value)}} /></div>
         </div>
         <div className="row">
-          <div>
+          <div className="col pe-5">
             <input id="message-check" type="checkbox" checked={this.state.includeMessage} onChange={this.toggleMessage} />
             <label className="include-message" htmlFor="message-check">Include message</label>
           </div>
