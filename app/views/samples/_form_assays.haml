@@ -47,7 +47,7 @@
                     .icon-alert.icon-red
                     = "The file can’t exceed 10 MB"
               - else
-                - if ay.object.assay_file.nil? or not ay.object.assay_file.is_image?
+                - if ay.object.assay_file.nil?
                   .file
                     .picture-container.assay-file
                       .any-filetype
@@ -59,10 +59,14 @@
                 - else
                   .file
                     .picture-container.assay-file
-                      = image_tag ay.object.assay_file.picture.url(:card)
-                      .any-filetype
-                        .picture-title{ title: ay.object.assay_file.picture_file_name }
-                          = link_to ay.object.assay_file.picture_file_name, ay.object.assay_file.picture.url, target: "_blank", download: ay.object.assay_file.picture_file_name
+                      - if ay.object.assay_file.is_image?
+                        = image_tag ay.object.assay_file.picture.url(:card)
+                      - else
+                        .any-filetype
+                          .icon-document
+                      .picture-title{ title: ay.object.assay_file.picture_file_name }
+                        = link_to ay.object.assay_file.picture_file_name, ay.object.assay_file.picture.url, target: "_blank", download: ay.object.assay_file.picture_file_name
+
                   .remove
                     = ay.check_box '_destroy', { id: "destroy_assay_attachments_#{ay.object.id}" }
                     %label.cross{:for => "destroy_assay_attachments_#{ay.object.id}" }
