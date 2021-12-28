@@ -18,7 +18,6 @@
       },
       successmultiple: function(files, response) {
         var assay_files = response.assay_files_data || {}
-        console.log(assay_files)
         Object.keys(assay_files).forEach(function(filename) {
           var fileInput = $( ".info input[value='" + filename + "']" )
           var mockIndex = fileInput.closest('.card-container').find('input[name="mockIndex"]').val() || ''
@@ -32,6 +31,10 @@
 
         if(cards.length > 1) {
           //this should not happen, but to be safe we clear it and do nothing
+          // TODO: We should fix this because if the user clicks to add
+          // a file to a new assay (created initially without a file) and then
+          // cancel the file-selection, then the `.updating` class is not removed
+          // and breaks the logic for updating a card
           return;
         }
 
@@ -48,7 +51,6 @@
         updateAddAssaysControls();
       },
       thumbnail: function(file, url) {
-        console.log("thumbnail")
         updateThumbnail(file, url)
       }
     }
