@@ -70,7 +70,7 @@
     // Click on Add Assays
     $('#add-assays').on('click', function(e) {
       e.preventDefault();
-      createCardWithoutFile()
+      createCard()
       updateAddAssaysControls()
     });
 
@@ -122,26 +122,13 @@
     }
   }
 
-  function createCardWithoutFile() {
-    var mockIndex = Date.now();
-    $('.assay > .upload-new-file').append(
-      $('<div>', { class: 'file-uploaded' })
-        .append($('<div>', { class: 'card-container new-file' })
-          .append($('<input>', { type: 'hidden', name: 'mockIndex', value: mockIndex } ))
-          .append(createCardInfoColumnWithoutFile(mockIndex))
-          .append(createCardPictureColumnWithoutFile())
-          .append(createCardRemove())
-        )
-    );
-  }
-
   function createCard(file) {
     var mockIndex = Date.now();
     $('.assay > .upload-new-file').append(
         $('<div>', { class: 'file-uploaded' })
           .append($('<div>', { class: 'card-container new-file' })
             .append($('<input>', { type: 'hidden', name: 'mockIndex', value: mockIndex } ))
-            .append(createCardInfoColumn(file, mockIndex))
+            .append(createCardInfoColumn(mockIndex, file))
             .append(createCardPictureColumn(file))
             .append(createCardRemove(file))
           )
@@ -154,8 +141,8 @@
     updateCardRemove(card, file)
   }
 
-  function createCardInfoColumnWithoutFile(mockIndex) {
-    return $('<div>', { class: 'info' })
+  function createCardInfoColumn(mockIndex, file) {
+    var info = $('<div>', { class: 'info' })
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
@@ -168,25 +155,13 @@
         .append($('<div>', { class: 'col pe-8' })
           .append($('<input>', { type: 'text', class: 'result_input', name: `sample[assay_attachments_attributes][${mockIndex}][result]` } )))
       )
-  }
 
-
-  function createCardInfoColumn(file, mockIndex) {
-    return $('<div>', { class: 'info' })
-      .append($('<div>', { class: 'row' })
-        .append($('<div>', { class: 'col pe-1' })
-          .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
-        .append($('<div>', { class: 'col pe-8' })
-          .append(buildLoincCodeSelect({mockIndex: mockIndex})))
-      )
-      .append($('<div>', { class: 'row' })
-        .append($('<div>', { class: 'col pe-1' })
-          .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
-        .append($('<div>', { class: 'col pe-8' })
-          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[assay_attachments_attributes][${mockIndex}][result]` } )))
-      )
-      .append($('<div>')
+    if (file) {
+      info = info.append($('<div>')
         .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][filename]`, value: file.upload.filename } )))
+    }
+
+    return info
   }
 
   function updateCardInfoColumn(card, file) {
@@ -198,15 +173,23 @@
         .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][filename]`, value: file.upload.filename } )))
   }
 
-
   function createCardPictureColumn(file) {
-    return $('<div>', { class: 'file' })
-            .append(
-              $('<div>', { class: 'picture-container assay-file'})
-              .append(fileThumbnail(file))
-              .append($('<div>', { class: 'picture-title', title: file.upload.filename })
-              .append($('<div>').text(file.upload.filename)))
-            )
+    var fileRoot = $('<div>', { class: 'file' })
+    var filePreview = $('<div>', { class: 'picture-container assay-file'}).append(fileThumbnail(file))
+
+    if (file) {
+      filePreview
+        .append($('<div>', { class: 'picture-title', title: file.upload.filename })
+        .append($('<div>').text(file.upload.filename)))
+    } else {
+      fileRoot.on('click', function() {
+        var card = $(this).parents('.file-uploaded');
+        card.addClass('updating');
+        $('#dropzonePreview').click();
+      });
+    }
+
+    return fileRoot.append(filePreview)
   }
 
   function updateCardPictureColumn(card, file) {
@@ -219,23 +202,6 @@
           .append($('<div>', { class: 'picture-title', title: file.upload.filename })
           .append($('<div>').text(file.upload.filename)))
       )
-  }
-
-  function createCardPictureColumnWithoutFile() {
-    var fileContainer = $('<div>', { class: 'file' })
-    fileContainer.on('click', function() {
-      var card = $(this).parents('.file-uploaded');
-      card.addClass('updating');
-      $('#dropzonePreview').click();
-    });
-
-    return fileContainer
-            .append(
-              $('<div>', { class: 'picture-container assay-file'}).append(
-                $('<div>', { class: 'any-filetype choose-file' })
-                  .append($('<div>', { class: 'icon-upload'}))
-              )
-            );
   }
 
   function createCardRemove(file) {
@@ -260,8 +226,11 @@
   }
 
   function fileThumbnail(file) {
-    return $('<div>', { id: file.upload.uuid + '-thumbnail', class: 'any-filetype' })
-        .append($('<div>', { class: 'icon-document'}));
+    return (file)
+      ? $('<div>', { id: file.upload.uuid + '-thumbnail', class: 'any-filetype' })
+          .append($('<div>', { class: 'icon-document'}))
+      : $('<div>', { class: 'any-filetype choose-file' })
+          .append($('<div>', { class: 'icon-upload'}))
   }
 
   function updateThumbnail(file, thumbnailUrl) {
