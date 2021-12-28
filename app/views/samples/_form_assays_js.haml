@@ -18,6 +18,7 @@
       },
       successmultiple: function(files, response) {
         var assay_files = response.assay_files_data || {}
+        console.log(assay_files)
         Object.keys(assay_files).forEach(function(filename) {
           var fileInput = $( ".info input[value='" + filename + "']" )
           var mockIndex = fileInput.closest('.card-container').find('input[name="mockIndex"]').val() || ''
@@ -25,7 +26,7 @@
         })
         $('#btn-save').prop('disabled', false);
       },
-      thumbnail: function(file, url) {
+      addedfile: function(file) {
         var cards = $('.updating');
         cards.removeClass('updating');
 
@@ -34,15 +35,21 @@
           return;
         }
 
+        if (cards.length == 0) {
+          createCard(file);
+        }
+
         if(cards.length == 1) {
           var card = cards[0];
           $(card).find('.file').off('click');
-          updateCard(card, file, url);
-        } else{
-          createCard(file, url);
+          updateCard(card, file);
         }
 
         updateAddAssaysControls();
+      },
+      thumbnail: function(file, url) {
+        console.log("thumbnail")
+        updateThumbnail(file, url)
       }
     }
 
@@ -126,22 +133,22 @@
     );
   }
 
-  function createCard(file, url) {
+  function createCard(file) {
     var mockIndex = Date.now();
     $('.assay > .upload-new-file').append(
         $('<div>', { class: 'file-uploaded' })
           .append($('<div>', { class: 'card-container new-file' })
             .append($('<input>', { type: 'hidden', name: 'mockIndex', value: mockIndex } ))
             .append(createCardInfoColumn(file, mockIndex))
-            .append(createCardPictureColumn(file, url))
+            .append(createCardPictureColumn(file))
             .append(createCardRemove(file))
           )
     );
   }
 
-  function updateCard(card, file, url) {
+  function updateCard(card, file) {
     updateCardInfoColumn(card, file)
-    updateCardPictureColumn(card, file, url)
+    updateCardPictureColumn(card, file)
     updateCardRemove(card, file)
   }
 
@@ -187,27 +194,26 @@
     cardInfo
       .append($('<div>')
         .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][filename]`, value: file.upload.filename } )))
-
   }
 
 
-  function createCardPictureColumn(file, url) {
+  function createCardPictureColumn(file) {
     return $('<div>', { class: 'file' })
             .append(
               $('<div>', { class: 'picture-container assay-file'})
-              .append(fileThumbnail(file, url))
+              .append(fileThumbnail(file))
               .append($('<div>', { class: 'picture-title', title: file.upload.filename })
               .append($('<div>').text(file.upload.filename)))
             )
   }
 
-  function updateCardPictureColumn(card, file, url) {
+  function updateCardPictureColumn(card, file) {
     var cardFile = $(card).find('.file')
     cardFile.empty()
     cardFile
       .append(
         $('<div>', { class: 'picture-container assay-file'})
-          .append(fileThumbnail(file, url))
+          .append(fileThumbnail(file))
           .append($('<div>', { class: 'picture-title', title: file.upload.filename })
           .append($('<div>').text(file.upload.filename)))
       )
@@ -224,8 +230,8 @@
     return fileContainer
             .append(
               $('<div>', { class: 'picture-container assay-file'}).append(
-                $('<div>', { class: 'any-filetype' })
-                  .append($('<div>', { class: 'icon-document'}))
+                $('<div>', { class: 'any-filetype choose-file' })
+                  .append($('<div>', { class: 'icon-upload'}))
               )
             );
   }
@@ -251,13 +257,14 @@
     });
   }
 
-  function fileThumbnail(file, url) {
-    if (file.type.startsWith('image/')) {
-      return $('<img>', { class: 'uploaded', src: url });
-    } else {
-      return $('<div>', { class: 'any-filetype' })
+  function fileThumbnail(file) {
+    return $('<div>', { id: file.upload.uuid + '-thumbnail', class: 'any-filetype' })
         .append($('<div>', { class: 'icon-document'}));
-    }
+  }
+
+  function updateThumbnail(file, thumbnailUrl) {
+    $("#" + file.upload.uuid + '-thumbnail')
+      .replaceWith($('<img>', { class: 'image-thumbnail', src: thumbnailUrl }));
   }
 
   function buildLoincCodeSelect(config) {

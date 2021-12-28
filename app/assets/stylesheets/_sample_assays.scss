@@ -119,6 +119,7 @@
         padding: 10px;
         margin-left: 5px;
         align-self: flex-start;
+        cursor: pointer;
       }
     }
 
@@ -160,6 +161,15 @@
           font-size: 48px;
           color: $gray3;
         }
+
+        .icon-upload {
+          font-size: 36px;
+          color: $gray3;
+        }
+      }
+
+      .choose-file {
+        cursor: pointer;
       }
 
       .picture-title {
