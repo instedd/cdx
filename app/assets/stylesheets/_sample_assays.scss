@@ -114,6 +114,10 @@
         display: flex;
       }
 
+      .file.no-file {
+        visibility: hidden;
+      }
+
       .remove {
         display: flex;
         padding: 10px;
