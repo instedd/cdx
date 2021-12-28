@@ -49,9 +49,9 @@ var ModalPresenter = React.createClass({
     });
   },
 
-  manufacturerStep: function() {
+  adminInviteStep: function() {
     this.setState({
-      step: 'manufacturerInviteStep'
+      step: 'adminInviteStep'
     });
   },
 
@@ -115,12 +115,12 @@ var ModalPresenter = React.createClass({
         );
       case 'institutionInviteStep':
         return (
-          <InstitutionInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} modalPresenterStep={()=> {this.modalPresenterStep()}} manufacturerStep={()=> {this.manufacturerStep()}}/>
+          <InstitutionInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} modalPresenterStep={()=> {this.modalPresenterStep()}} adminInviteStep={()=> {this.adminInviteStep()}}/>
         );
 
-      case 'manufacturerInviteStep':
+      case 'adminInviteStep':
         return (
-          <ManufacturerInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} institutionInviteStep={()=> {this.institutionInviteStep()}}/>
+          <AdminInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} institutionInviteStep={()=> {this.institutionInviteStep()}}/>
         );
     }
   },

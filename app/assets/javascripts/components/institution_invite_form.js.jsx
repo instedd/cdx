@@ -17,7 +17,7 @@ var InstitutionInviteForm = React.createClass({
   },
 
   next: function() {
-    this.props.manufacturerStep()
+    this.props.adminInviteStep()
   },
 
   cancel: function() {

@@ -1,4 +1,4 @@
-var ManufacturerInviteForm = React.createClass({
+var AdminInviteForm = React.createClass({
   getInitialState: function() {
     return {
       name: '',
@@ -46,7 +46,7 @@ var ManufacturerInviteForm = React.createClass({
   },
 
   componentDidMount: function() {
-    this.props.changeTitle('Invite Manufacturer');
+    this.props.changeTitle('Invite Admin');
   },
 
   render: function() {
