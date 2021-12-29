@@ -17,11 +17,14 @@
         $('#btn-save').prop('disabled', true);
       },
       successmultiple: function(files, response) {
+        // For each file uploaded successfuly
+        // we replace the input (with value = filename)
+        // with a new input-hidden with value = "the id returned by the server for that file"
         var assay_files = response.assay_files_data || {}
         Object.keys(assay_files).forEach(function(filename) {
           var fileInput = $( ".info input[value='" + filename + "']" )
-          var mockIndex = fileInput.closest('.card-container').find('input[name="mockIndex"]').val() || ''
-          fileInput.replaceWith($('<input>', {type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][assay_file_id]`, value: assay_files[filename]}))
+          var arrayNewIndex = fileInput.closest('.card-container').find('input[name="arrayNewIndex"]').val() || ''
+          fileInput.replaceWith($('<input>', {type: 'hidden', name: `sample[assay_attachments_attributes][${arrayNewIndex}][assay_file_id]`, value: assay_files[filename]}))
         })
         $('#btn-save').prop('disabled', false);
       },
@@ -43,12 +46,10 @@
         }
 
         if(cards.length == 1) {
-          var card = cards[0];
-          $(card).find('.file').off('click');
-          updateCard(card, file);
+          updateCard(cards[0], file);
         }
 
-        updateAddAssaysControls();
+        updateTooltipDisplayState();
       },
       thumbnail: function(file, url) {
         updateThumbnail(file, url)
@@ -71,7 +72,7 @@
     $('#add-assays').on('click', function(e) {
       e.preventDefault();
       createCard()
-      updateAddAssaysControls()
+      updateTooltipDisplayState()
     });
 
     // Change the class on the target zone when dragging a file over it
@@ -85,17 +86,15 @@
       $('.upload-picture').css('top', scrollDiff);
     });
 
-    // initial state for Tooltip and Add-assays action
-    updateAddAssaysControls();
+    // initial state for Tooltip
+    updateTooltipDisplayState();
 
     // create loinc inputs
     $('.loinc_inputs').each(function(index, element){
-      var input = $(element).find('.loinc_input');
-      var hidden = $(element).find('.loinc_input_hidden');
-      $(element).replaceWith(buildLoincCodeSelect({
-        input: input,
-        hidden: hidden
-      }));
+      $(element).replaceWith(loincSelectorAt(
+        $(element).find('.loinc_input'),
+        $(element).find('.loinc_input_hidden')
+      ));
     });
 
   })();
@@ -113,7 +112,7 @@
     }
   }, false);
 
-  function updateAddAssaysControls() {
+  function updateTooltipDisplayState() {
     var assays = $('.card-container');
     if (assays.length > 0) {
       $('.assay > .upload-new-file > .tooltip').addClass('nodisplay');
@@ -123,59 +122,77 @@
   }
 
   function createCard(file) {
-    var mockIndex = Date.now();
-    $('.assay > .upload-new-file').append(
-        $('<div>', { class: 'file-uploaded' })
-          .append($('<div>', { class: 'card-container new-file' })
-            .append($('<input>', { type: 'hidden', name: 'mockIndex', value: mockIndex } ))
-            .append(createCardInfoColumn(mockIndex, file))
-            .append(createCardPictureColumn(file))
-            .append(createCardRemove(file))
-          )
-    );
+    (new CardBuilder).createCardFor(file);
   }
 
   function updateCard(card, file) {
-    updateCardInfoColumn(card, file)
-    updateCardPictureColumn(card, file)
-    updateCardRemove(card, file)
+    (new CardUpdater(card)).updateCardWith(file);
   }
 
-  function createCardInfoColumn(mockIndex, file) {
+  function updateThumbnail(file, thumbnailUrl) {
+    $("#" + file.upload.uuid + '-thumbnail')
+      .replaceWith($('<img>', { class: 'image-thumbnail', src: thumbnailUrl }));
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // CardBuilder
+
+  var CardBuilder = function() {
+    this.arrayNewIndex = Date.now();
+    this.root = $('.assay > .upload-new-file');
+  }
+
+  CardBuilder.prototype.createCardFor = function(file) {
+    // file.arrayNewIndex = this.arrayNewIndex;
+
+    this.root.append(
+      $('<div>', { class: 'file-uploaded' })
+        .append($('<div>', { class: 'card-container new-file' })
+          .append(this.newIndex())
+          .append(this.createCardInfoColumn(file))
+          .append(this.createCardPictureColumn(file))
+          .append(this.createCardRemove(file))
+        )
+    );
+  }
+
+  CardBuilder.prototype.newIndex = function() {
+    return $('<input>', { type: 'hidden', name: 'arrayNewIndex', value: this.arrayNewIndex } )
+  }
+
+  CardBuilder.prototype.createCardInfoColumn = function(file) {
+    var formArrayName = (function(key) {
+      return `sample[assay_attachments_attributes][${this.arrayNewIndex}][${key}]`;
+    }).bind(this);
+
     var info = $('<div>', { class: 'info' })
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Loinc' })))
         .append($('<div>', { class: 'col pe-8' })
-          .append(buildLoincCodeSelect({mockIndex: mockIndex})))
+          .append(loincSelectorAt(
+            $('<input>', {type: 'text', class: 'loinc_input'}),
+            $('<input>', {type: 'hidden', name: formArrayName('loinc_code_id')})
+          )))
       )
       .append($('<div>', { class: 'row' })
         .append($('<div>', { class: 'col pe-1' })
           .append($('<label>', { for: 'new_sample_assay_attachments_attributes', text: 'Result' })))
         .append($('<div>', { class: 'col pe-8' })
-          .append($('<input>', { type: 'text', class: 'result_input', name: `sample[assay_attachments_attributes][${mockIndex}][result]` } )))
+          .append($('<input>', { type: 'text', class: 'result_input', name: formArrayName("result") })))
       )
 
     if (file) {
       info = info.append($('<div>')
-        .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][filename]`, value: file.upload.filename } )))
+        .append($('<input>', { type: 'hidden', name: formArrayName("filename"), value: file.upload.filename })))
     }
 
     return info
   }
 
-  function updateCardInfoColumn(card, file) {
-    var mockIndex = $(card).find('input[name="mockIndex"]').val();
-    var cardInfo = $(card).find('.info')
-    cardInfo.find(`div > input[name="sample[assay_attachments_attributes][${mockIndex}][filename]"]`).remove()
-    cardInfo
-      .append($('<div>')
-        .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][filename]`, value: file.upload.filename } )))
-  }
-
-  function createCardPictureColumn(file) {
+  CardBuilder.prototype.createCardPictureColumn = function(file) {
     var fileRoot = $('<div>', { class: 'file' })
-    var filePreview = $('<div>', { class: 'picture-container assay-file'}).append(fileThumbnail(file))
+    var filePreview = $('<div>', { class: 'picture-container assay-file'}).append(this.fileThumbnail(file))
 
     if (file) {
       filePreview
@@ -192,19 +209,7 @@
     return fileRoot.append(filePreview)
   }
 
-  function updateCardPictureColumn(card, file) {
-    var cardFile = $(card).find('.file')
-    cardFile.empty()
-    cardFile
-      .append(
-        $('<div>', { class: 'picture-container assay-file'})
-          .append(fileThumbnail(file))
-          .append($('<div>', { class: 'picture-title', title: file.upload.filename })
-          .append($('<div>').text(file.upload.filename)))
-      )
-  }
-
-  function createCardRemove(file) {
+  CardBuilder.prototype.createCardRemove = function(file) {
     var removeButton = $('<div>', { class: 'remove' }).append($('<img>', { src: '#{asset_url('ic-cross.png')}', alt: 'Ic cross'}));
     removeButton.on('click', function() {
       if (file) {
@@ -215,8 +220,56 @@
     return removeButton;
   }
 
-  function updateCardRemove(card, file) {
-    var cardRemove = $(card).find('.remove')
+  CardBuilder.prototype.fileThumbnail = function(file) {
+    return (file)
+      ? $('<div>', { id: file.upload.uuid + '-thumbnail', class: 'any-filetype' })
+          .append($('<div>', { class: 'icon-document'}))
+      : $('<div>', { class: 'any-filetype choose-file' })
+          .append($('<div>', { class: 'icon-upload'}))
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // CardUpdater
+
+  var CardUpdater = function(card) {
+    this.card = card;
+    this.cardElem = $(card);
+    this.arrayNewIndex = this.cardElem.find('input[name="arrayNewIndex"]').val();
+  }
+
+  CardUpdater.prototype.updateCardWith = function(file) {
+    this.updateCardInfoColumn(file)
+    this.updateCardPictureColumn(file)
+    this.updateCardRemove(file)
+  }
+
+  CardUpdater.prototype.updateCardInfoColumn = function(file) {
+    var cardInfo = this.cardElem.find('.info')
+    cardInfo
+      .find(`div > input[name="sample[assay_attachments_attributes][${this.arrayNewIndex}][filename]"]`)
+      .remove()
+    cardInfo
+      .append($('<div>')
+        .append($('<input>', { type: 'hidden', name: `sample[assay_attachments_attributes][${this.arrayNewIndex}][filename]`, value: file.upload.filename } )))
+  }
+
+  CardUpdater.prototype.updateCardPictureColumn = function(file) {
+    var cardFile = this.cardElem.find('.file')
+    cardFile.empty()
+    cardFile
+      .append(
+        $('<div>', { class: 'picture-container assay-file'})
+          .append(this.fileThumbnail(file))
+          .append($('<div>', { class: 'picture-title', title: file.upload.filename })
+          .append($('<div>').text(file.upload.filename)))
+      )
+
+    // Card cannot be updated again with another file
+    cardFile.off('click');
+  }
+
+  CardUpdater.prototype.updateCardRemove = function(file) {
+    var cardRemove = this.cardElem.find('.remove')
     cardRemove.on('click', function() {
       if (file) {
         Dropzone.forElement("#dropzonePreview").removeFile(file);
@@ -225,7 +278,7 @@
     });
   }
 
-  function fileThumbnail(file) {
+  CardUpdater.prototype.fileThumbnail = function(file) {
     return (file)
       ? $('<div>', { id: file.upload.uuid + '-thumbnail', class: 'any-filetype' })
           .append($('<div>', { class: 'icon-document'}))
@@ -233,16 +286,10 @@
           .append($('<div>', { class: 'icon-upload'}))
   }
 
-  function updateThumbnail(file, thumbnailUrl) {
-    $("#" + file.upload.uuid + '-thumbnail')
-      .replaceWith($('<img>', { class: 'image-thumbnail', src: thumbnailUrl }));
-  }
+  /////////////////////////////////////////////////////////////////////////////
+  // Loinc Code Selector
 
-  function buildLoincCodeSelect(config) {
-    var mockIndex = config.mockIndex || ''
-    var loincInput = (config && config.input) ? config.input : $('<input>', {type: 'text', class: 'loinc_input'});
-    var loincInputHidden = (config && config.hidden) ? config.hidden : $('<input>', {type: 'hidden', name: `sample[assay_attachments_attributes][${mockIndex}][loinc_code_id]`});
-
+  function loincSelectorAt(loincInput, loincInputHidden) {
     loincInput.autocomplete({
       lookup: function (query, done) {
           $.ajax({
