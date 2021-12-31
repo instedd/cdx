@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_filter :load_resource, only: [:edit, :update, :assign_role, :unassign_role]
-  after_filter :create_institution_invite, only: [:create_with_institution_invite]
+  after_filter :send_institution_invite, only: [:create_with_institution_invite]
 
   def index
     site_admin = !has_access?(@navigation_context.entity, READ_INSTITUTION_USERS) && @navigation_context.entity.kind_of?(Institution)
@@ -66,12 +66,13 @@ class UsersController < ApplicationController
 
   def create_with_institution_invite
     user_invite_data = params[:user_invite_data]
-    message = params[:message]
-    @user_email = user_invite_data["email"]
     first_name = params[:firstName]
     last_name = params[:lastName]
+    @message = params[:message]
+    @user_email = user_invite_data["email"]
     user = User.create_with({first_name: first_name, last_name:last_name}).find_or_initialize_by(email: @user_email.strip)
-    send_invitation(message, user) unless user.persisted?
+    mark_as_invited(user)
+    user.save!
     render nothing: true
   end
 
@@ -111,22 +112,27 @@ class UsersController < ApplicationController
   private
 
   def send_invitation(message, user)
+    mark_as_invited(user)
+    InvitationMailer.invite_message(user, @role, message).deliver_now
+  end
+
+  def mark_as_invited(user)
     user.invite! do |u|
       u.skip_invitation = true
     end
     user.invitation_sent_at = Time.now.utc # mark invitation as delivered
     user.invited_by_id = current_user.id
-    # TODO: send the correct invitation when a user is created from params with institution data
-    InvitationMailer.invite_message(user, @role, message).deliver_now if params["institution_data"].blank?
   end
 
-  def create_institution_invite
+  def send_institution_invite
+    invited_user = User.find_by(email: @user_email)
     pending_invite = PendingInstitutionInvite.new
-    pending_invite.invited_user = User.find_by(email: @user_email)
+    pending_invite.invited_user = invited_user unless invited_user.nil?
     pending_invite.invited_by_user = current_user
     pending_invite.institution_name = params["institution_data"]["name"]
     pending_invite.institution_kind = params["institution_data"]["type"]
-    pending_invite.save
+    pending_invite.save!
+    InvitationMailer.invite_institution_message(invited_user, pending_invite, @message).deliver_now
   end
 
   def user_params
