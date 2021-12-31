@@ -86,7 +86,7 @@ var AdminInviteForm = React.createClass({
           <div className="col"><input type="text" onChange={(e)=> {this.setFirstName(e.currentTarget.value)}} /></div>
         </div>
         <div className="row">
-          <div className="col pe-4"><label>First Name</label></div>
+          <div className="col pe-4"><label>Last Name</label></div>
           <div className="col"><input type="text" onChange={(e)=> {this.setLastName(e.currentTarget.value)}} /></div>
         </div>
         <div className="row">
