@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
   before_filter :load_resource, only: [:edit, :update, :assign_role, :unassign_role]
-  after_filter :create_institution_invite, only: [:create_with_institution_invite]
 
   def index
     site_admin = !has_access?(@navigation_context.entity, READ_INSTITUTION_USERS) && @navigation_context.entity.kind_of?(Institution)
@@ -71,6 +70,7 @@ class UsersController < ApplicationController
     first_name = params[:firstName]
     last_name = params[:lastName]
     user = User.create_with({first_name: first_name, last_name:last_name}).find_or_initialize_by(email: @user_email.strip)
+    @pending_invite = create_institution_invite
     send_invitation(message, user) unless user.persisted?
     render nothing: true
   end
@@ -116,8 +116,11 @@ class UsersController < ApplicationController
     end
     user.invitation_sent_at = Time.now.utc # mark invitation as delivered
     user.invited_by_id = current_user.id
-    # TODO: send the correct invitation when a user is created from params with institution data
-    InvitationMailer.invite_message(user, @role, message).deliver_now if params["institution_data"].blank?
+    if params["institution_data"].blank?
+      InvitationMailer.invite_message(user, @role, message).deliver_now
+    else
+      InvitationMailer.invite_institution_message(user, @pending_invite, message).deliver_now
+    end
   end
 
   def create_institution_invite
@@ -127,6 +130,7 @@ class UsersController < ApplicationController
     pending_invite.institution_name = params["institution_data"]["name"]
     pending_invite.institution_kind = params["institution_data"]["type"]
     pending_invite.save
+    pending_invite
   end
 
   def user_params
