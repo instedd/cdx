@@ -73,7 +73,9 @@ var AdminInviteForm = React.createClass({
   },
 
   componentDidMount: function() {
-    this.props.changeTitle('Invite Admin');
+    const institutionType = this.props.types.find(type => type.value === this.props.institutionData.type);
+    const title = `Invite ${institutionType.label}`;
+    this.props.changeTitle(title);
   },
 
   render: function() {
