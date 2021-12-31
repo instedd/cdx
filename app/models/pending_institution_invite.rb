@@ -10,6 +10,5 @@ class PendingInstitutionInvite < ActiveRecord::Base
   validates_presence_of :institution_name
   validates_presence_of :institution_kind
 
-  validates_presence_of :institution_kind
   validates_inclusion_of :institution_kind, in: institution_kinds
 end
