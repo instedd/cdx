@@ -69,9 +69,13 @@ class UsersController < ApplicationController
     institution_data = params[:institution_data]
     @message = params[:message]
     @user_email = user_invite_data["email"]
-    user = User.create_with({first_name: params[:firstName], last_name: params[:lastName]}).find_or_initialize_by(email: @user_email.strip)
+    user = User.find_or_initialize_by(email: @user_email.strip)
+    unless user.persisted?
+      user.first_name = user_invite_data[:firstName]
+      user.last_name = user_invite_data[:lastName]
+    end
     mark_as_invited(user)
-    InvitationMailer.invite_institution_message(user, institution_data.institution_name, @message).deliver_now
+    InvitationMailer.invite_institution_message(user, institution_data["name"], @message).deliver_now
     user.save!
 
     render nothing: true
