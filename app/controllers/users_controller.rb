@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_filter :load_resource, only: [:edit, :update, :assign_role, :unassign_role]
-  after_filter :send_institution_invite, only: [:create_with_institution_invite]
+  after_filter :create_institution_invite, only: [:create_with_institution_invite]
 
   def index
     site_admin = !has_access?(@navigation_context.entity, READ_INSTITUTION_USERS) && @navigation_context.entity.kind_of?(Institution)
@@ -66,13 +66,14 @@ class UsersController < ApplicationController
 
   def create_with_institution_invite
     user_invite_data = params[:user_invite_data]
-    first_name = params[:firstName]
-    last_name = params[:lastName]
+    institution_data = params[:institution_data]
     @message = params[:message]
     @user_email = user_invite_data["email"]
-    user = User.create_with({first_name: first_name, last_name:last_name}).find_or_initialize_by(email: @user_email.strip)
+    user = User.create_with({first_name: params[:firstName], last_name: params[:lastName]}).find_or_initialize_by(email: @user_email.strip)
     mark_as_invited(user)
+    InvitationMailer.invite_institution_message(user, institution_data.institution_name, @message).deliver_now
     user.save!
+
     render nothing: true
   end
 
@@ -124,7 +125,7 @@ class UsersController < ApplicationController
     user.invited_by_id = current_user.id
   end
 
-  def send_institution_invite
+  def create_institution_invite
     invited_user = User.find_by(email: @user_email)
     pending_invite = PendingInstitutionInvite.new
     pending_invite.invited_user = invited_user unless invited_user.nil?
@@ -132,7 +133,6 @@ class UsersController < ApplicationController
     pending_invite.institution_name = params["institution_data"]["name"]
     pending_invite.institution_kind = params["institution_data"]["type"]
     pending_invite.save!
-    InvitationMailer.invite_institution_message(invited_user, pending_invite, @message).deliver_now
   end
 
   def user_params
