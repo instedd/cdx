@@ -1,7 +1,7 @@
 = form_for(@institution) do |f|
   = validation_errors @institution
   - if @institution.new_record?
-    .row.centered.institution-container
+    .row.centered.institution-container{:class => ("active" unless @institution.kind.blank?)}
       .col
         = f.radio_button :kind, "health_organization", checked: @institution.kind == "health_organization", class: 'institution'
         .institution-option

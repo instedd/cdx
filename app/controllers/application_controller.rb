@@ -67,7 +67,12 @@ class ApplicationController < ActionController::Base
 
     if current_user && current_user.institutions.empty? && current_user.policies.empty? && current_user.roles.empty?
       if has_access?(Institution, CREATE_INSTITUTION)
-        redirect_to new_institution_path
+        if PendingInstitutionInvite.user_has_pending_invites?(current_user)
+          redirect_to new_from_invite_data_institutions_path
+          return
+        else
+          redirect_to new_institution_path
+        end
       else
         redirect_to pending_approval_institutions_path
       end

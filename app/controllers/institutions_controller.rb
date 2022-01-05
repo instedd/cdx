@@ -1,6 +1,6 @@
 class InstitutionsController < ApplicationController
   before_filter :load_institutions
-  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
+  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval, :new_from_invite_data]
   skip_before_action :ensure_context, except: [:no_data_allowed]
 
   def index
@@ -96,6 +96,14 @@ class InstitutionsController < ApplicationController
     home = after_sign_in_path_for(current_user)
 
     redirect_to home if home != no_data_allowed_institutions_path
+  end
+
+  def new_from_invite_data
+    pending_invite = PendingInstitutionInvite.find_by(invited_user_id: current_user)
+    @institution = current_user.institutions.new
+    @institution.kind = pending_invite.institution_kind
+    @institution.name = pending_invite.institution_name
+    render action: 'new'
   end
 
   private

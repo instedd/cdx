@@ -48,6 +48,7 @@ Rails.application.routes.draw do
     collection do
       get :pending_approval
       get :no_data_allowed
+      get :new_from_invite_data
     end
   end
 

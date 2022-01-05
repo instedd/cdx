@@ -11,4 +11,9 @@ class PendingInstitutionInvite < ActiveRecord::Base
   validates_presence_of :institution_kind
 
   validates_inclusion_of :institution_kind, in: institution_kinds
+
+  def self.user_has_pending_invites?(user)
+    where(invited_user_id: user).count > 0
+  end
+
 end
