@@ -7,10 +7,9 @@ class MigrateAssayAttachmentPicturesToAssayFile < ActiveRecord::Migration
       assay_file.picture_file_size = assay_attachment.picture_file_size
       assay_file.picture_updated_at = assay_attachment.picture_updated_at
       assay_file.assay_attachment = assay_attachment
-      if assay_file.save
-        assay_attachment.assay_File = assay_file
-        assay_attachment.save
-      end
+      assay_file.save!
+      assay_attachment.assay_file = assay_file
+      assay_attachment.save!
     end
 
     remove_column :assay_attachments, :picture_file_name
@@ -31,7 +30,7 @@ class MigrateAssayAttachmentPicturesToAssayFile < ActiveRecord::Migration
       assay_file.assay_attachment.picture_file_size = assay_file.picture_file_size
       assay_file.assay_attachment.picture_updated_at = assay_file.picture_updated_at
       assay_file.assay_attachment.picture_content_type = assay_file.picture_content_type
-      assay_file.assay_attachment.save
+      assay_file.assay_attachment.save!
     end
 
   end
