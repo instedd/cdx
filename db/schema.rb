@@ -449,6 +449,7 @@ ActiveRecord::Schema.define(version: 20211217160437) do
     t.integer  "invited_by_user_id", limit: 4
     t.string   "institution_name",   limit: 255
     t.string   "institution_kind",   limit: 255, default: "institution"
+    t.string   "status",             limit: 255, default: "pending"
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
   end

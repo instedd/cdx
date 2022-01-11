@@ -16,7 +16,7 @@ class PendingInstitutionInvite < ActiveRecord::Base
   validates_inclusion_of :status, in: statuses
 
   def self.user_has_pending_invites?(user)
-    where(invited_user_id: user).count > 0
+    where(invited_user_id: user,  status: 'pending').count > 0
   end
 
 end

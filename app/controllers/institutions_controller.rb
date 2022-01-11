@@ -100,11 +100,15 @@ class InstitutionsController < ApplicationController
   end
 
   def new_from_invite_data
-    pending_invite = PendingInstitutionInvite.find_by(invited_user_id: current_user)
-    @institution = current_user.institutions.new
-    @institution.kind = pending_invite.institution_kind
-    @institution.name = pending_invite.institution_name
-    render action: 'new'
+    pending_invite = PendingInstitutionInvite.where(invited_user_id: current_user,  status: 'pending').last
+    unless pending_invite.nil?
+      @institution = current_user.institutions.new
+      @institution.kind = pending_invite.institution_kind
+      @institution.name = pending_invite.institution_name
+      render action: 'new'
+    else
+      no_data_allowed
+    end
   end
 
   def accept_pending_invite
