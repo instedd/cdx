@@ -2,6 +2,7 @@ class InstitutionsController < ApplicationController
   before_filter :load_institutions
   skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval, :new_from_invite_data]
   skip_before_action :ensure_context, except: [:no_data_allowed]
+  after_filter :accept_pending_invite, only: [:create]
 
   def index
     @can_create = has_access?(Institution, CREATE_INSTITUTION)
@@ -104,6 +105,14 @@ class InstitutionsController < ApplicationController
     @institution.kind = pending_invite.institution_kind
     @institution.name = pending_invite.institution_name
     render action: 'new'
+  end
+
+  def accept_pending_invite
+    pending_invite = PendingInstitutionInvite.find_by(invited_user_id: current_user)
+    unless pending_invite.nil?
+      pending_invite.status = 'accepted'
+      pending_invite.save!
+    end
   end
 
   private
