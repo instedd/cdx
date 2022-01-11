@@ -69,13 +69,8 @@ class UsersController < ApplicationController
     institution_data = params[:institution_data]
     @message = params[:message]
     @user_email = user_invite_data["email"]
-    user = User.find_or_initialize_by(email: @user_email.strip)
-    unless user.persisted?
-      user.first_name = user_invite_data[:firstName]
-      user.last_name = user_invite_data[:lastName]
-    end
-    mark_as_invited(user)
-    InvitationMailer.invite_institution_message(user, institution_data["name"], @message).deliver_now
+    user = initialize_user(user_invite_data)
+    send_institution_invite(institution_data, user)
     user.save!
 
     render nothing: true
@@ -115,6 +110,20 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def send_institution_invite(institution_data, user)
+    mark_as_invited(user)
+    InvitationMailer.invite_institution_message(user, institution_data["name"], @message).deliver_now
+  end
+
+  def initialize_user(user_invite_data)
+    user = User.find_or_initialize_by(email: @user_email.strip)
+    unless user.persisted?
+      user.first_name = user_invite_data[:firstName]
+      user.last_name = user_invite_data[:lastName]
+    end
+    user
+  end
 
   def send_invitation(message, user)
     mark_as_invited(user)
