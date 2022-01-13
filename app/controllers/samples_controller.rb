@@ -25,6 +25,11 @@ class SamplesController < ApplicationController
 
     @show_barcode_preview = true
     @show_print_action = true
+
+    @can_delete = false
+    @can_update = false
+
+    render action: 'edit'
   end
 
   def new
@@ -129,6 +134,7 @@ class SamplesController < ApplicationController
     @show_print_action = true
 
     @can_delete = has_access?(sample, DELETE_SAMPLE)
+    @can_update = true
   end
 
   def update
