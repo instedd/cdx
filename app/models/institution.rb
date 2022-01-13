@@ -36,6 +36,10 @@ class Institution < ActiveRecord::Base
     end
   end
 
+  def self.kinds
+    KINDS.map { |kind| {value: kind, label: kind.humanize} }
+  end
+
   def filter_by_owner(user, check_conditions)
     user_id == user.id ? self : nil
   end

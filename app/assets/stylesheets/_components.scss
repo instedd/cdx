@@ -61,6 +61,11 @@
       position: absolute;
       bottom: 40px;
       width: 100%;
+      .footer-buttons-aligning {
+        display: flex;
+        justify-content: space-between;
+        width: 80%;
+      }
     }
     &.small {
       min-width: 250px;
