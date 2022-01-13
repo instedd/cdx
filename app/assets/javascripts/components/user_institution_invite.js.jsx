@@ -39,7 +39,8 @@ var AddUserOrInstitutionLink = React.createClass({
 var ModalPresenter = React.createClass({
   getInitialState: function() {
     return {
-      step: 'modalPresenter'
+      step: 'modalPresenter',
+      institutionData: null
     };
   },
 
@@ -49,9 +50,10 @@ var ModalPresenter = React.createClass({
     });
   },
 
-  adminInviteStep: function() {
+  adminInviteStep: function(institutionData) {
     this.setState({
-      step: 'adminInviteStep'
+      step: 'adminInviteStep',
+      institutionData: institutionData
     });
   },
 
@@ -115,12 +117,12 @@ var ModalPresenter = React.createClass({
         );
       case 'institutionInviteStep':
         return (
-          <InstitutionInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} modalPresenterStep={()=> {this.modalPresenterStep()}} adminInviteStep={()=> {this.adminInviteStep()}}/>
+          <InstitutionInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} modalPresenterStep={()=> {this.modalPresenterStep()}} adminInviteStep={(institutionData)=> {this.adminInviteStep(institutionData)}}/>
         );
 
       case 'adminInviteStep':
         return (
-          <AdminInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} institutionInviteStep={()=> {this.institutionInviteStep()}}/>
+          <AdminInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} institutionInviteStep={()=> {this.institutionInviteStep()}} institutionData={this.state.institutionData}/>
         );
     }
   },

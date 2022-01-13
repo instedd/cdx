@@ -200,6 +200,7 @@ Rails.application.routes.draw do
       get :autocomplete
       post :update_setting
       get :no_data_allowed
+      post :create_with_institution_invite
     end
   end
   resources :roles do
