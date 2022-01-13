@@ -18,6 +18,12 @@ class BatchesController < ApplicationController
     @batches = perform_pagination(@batches)
   end
 
+  def show
+    batch = Batch.find(params[:id])
+    @batch_form = BatchForm.for(batch)
+    return unless authorize_resource(batch, READ_BATCH)
+  end
+
   def new_sample_or_batch
 
   end
