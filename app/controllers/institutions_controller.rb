@@ -94,6 +94,7 @@ class InstitutionsController < ApplicationController
     # Otherwise there is a home to display different from no_data_allowed
     # which filter the data shown per current institution.
     home = after_sign_in_path_for(current_user)
+
     redirect_to home if home != no_data_allowed_institutions_path
   end
 
