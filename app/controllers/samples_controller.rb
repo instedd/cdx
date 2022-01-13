@@ -16,6 +16,17 @@ class SamplesController < ApplicationController
     @samples = perform_pagination(@samples)
   end
 
+  def show
+    sample = Sample.find(params[:id])
+    @sample_form = SampleForm.for(sample)
+    return unless authorize_resource(sample, READ_SAMPLE)
+
+    @view_helper = view_helper({save_back_path: true})
+
+    @show_barcode_preview = true
+    @show_print_action = true
+  end
+
   def new
     session[:creating_sample_uuid] = SampleIdentifier.new.uuid
 
