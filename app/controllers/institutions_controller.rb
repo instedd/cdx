@@ -32,6 +32,10 @@ class InstitutionsController < ApplicationController
   end
 
   def create
+    unless PendingInstitutionInvite.where(invited_user_id: current_user,  status: 'pending').count > 0
+      no_data_allowed
+      return
+    end
     @institution = Institution.new(institution_params)
     @institution.user_id = current_user.id
     return unless authorize_resource(Institution, CREATE_INSTITUTION)
