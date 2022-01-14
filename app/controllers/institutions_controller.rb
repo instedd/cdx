@@ -32,7 +32,7 @@ class InstitutionsController < ApplicationController
   end
 
   def create
-    unless PendingInstitutionInvite.where(invited_user_id: current_user,  status: 'pending').count > 0
+    if PendingInstitutionInvite.where(invited_user_id: current_user,  status: 'accepted').count > 0
       no_data_allowed
       return
     end
