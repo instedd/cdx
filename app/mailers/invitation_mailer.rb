@@ -16,4 +16,13 @@ class InvitationMailer < ApplicationMailer
 
     mail(:to => @user.email, :subject => "Invitation to Connected Diagnostics")
   end
+
+  def create_institution_message(user, institution_name, message)
+    @user = user
+    @institution_name = institution_name
+    @message = message
+
+    mail(:to => @user.email, :subject => "Invitation to Connected Diagnostics")
+  end
+
 end

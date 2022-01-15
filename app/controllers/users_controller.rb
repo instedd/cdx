@@ -112,8 +112,12 @@ class UsersController < ApplicationController
   private
 
   def send_institution_invite(institution_data, user)
-    mark_as_invited(user)
-    InvitationMailer.invite_institution_message(user, institution_data["name"], @message).deliver_now
+    unless user.persisted?
+      mark_as_invited(user)
+      InvitationMailer.invite_institution_message(user, institution_data["name"], @message).deliver_now
+    else
+      InvitationMailer.create_institution_message(user, institution_data["name"], @message).deliver_now
+    end
   end
 
   def initialize_user(user_invite_data)
