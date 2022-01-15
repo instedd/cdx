@@ -1,7 +1,8 @@
 class InstitutionsController < ApplicationController
   before_filter :load_institutions
-  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
+  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval, :new_from_invite_data]
   skip_before_action :ensure_context, except: [:no_data_allowed]
+  after_filter :accept_pending_invite, only: [:create]
 
   def index
     @can_create = has_access?(Institution, CREATE_INSTITUTION)
@@ -31,6 +32,10 @@ class InstitutionsController < ApplicationController
   end
 
   def create
+    if PendingInstitutionInvite.where(invited_user_id: current_user,  status: 'accepted').count > 0
+      no_data_allowed
+      return
+    end
     @institution = Institution.new(institution_params)
     @institution.user_id = current_user.id
     return unless authorize_resource(Institution, CREATE_INSTITUTION)
@@ -96,6 +101,26 @@ class InstitutionsController < ApplicationController
     home = after_sign_in_path_for(current_user)
 
     redirect_to home if home != no_data_allowed_institutions_path
+  end
+
+  def new_from_invite_data
+    pending_invite = PendingInstitutionInvite.where(invited_user_id: current_user,  status: 'pending').last
+    unless pending_invite.nil?
+      @institution = current_user.institutions.new
+      @institution.kind = pending_invite.institution_kind
+      @institution.name = pending_invite.institution_name
+      render action: 'new'
+    else
+      no_data_allowed
+    end
+  end
+
+  def accept_pending_invite
+    pending_invite = PendingInstitutionInvite.find_by(invited_user_id: current_user)
+    unless pending_invite.nil?
+      pending_invite.status = 'accepted'
+      pending_invite.save!
+    end
   end
 
   private

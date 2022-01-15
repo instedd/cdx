@@ -5,6 +5,7 @@ class CreatePendingInstitutionInvites < ActiveRecord::Migration
       t.references :invited_by_user, index: true
       t.string :institution_name
       t.string :institution_kind, default: 'institution'
+      t.string :status, default: 'pending'
       t.timestamps null: false
     end
   end
