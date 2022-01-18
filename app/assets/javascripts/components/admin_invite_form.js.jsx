@@ -5,7 +5,9 @@ var AdminInviteForm = React.createClass({
       lastName: '',
       email: '',
       includeMessage: false,
-      message: ''
+      message: '',
+      hasEmailError: false,
+      sendButtonDisabled: true
     };
   },
 
@@ -50,6 +52,23 @@ var AdminInviteForm = React.createClass({
   },
 
   setEmail: function(newEmail) {
+    debugger;
+
+    if(this.isBlank(newEmail)){
+      this.setState({
+        hasEmailError: true,
+        sendButtonDisabled: true
+      });
+    } else {
+      this.setState({
+        email: newEmail,
+        hasEmailError: false,
+        sendButtonDisabled: false
+      });
+
+    }
+
+
     this.setState({
       email: newEmail
     });
@@ -60,6 +79,10 @@ var AdminInviteForm = React.createClass({
     this.setState({
       includeMessage: !oldValue
     });
+  },
+
+  isBlank: function(str) {
+    return (!str || /^\s*$/.test(str));
   },
 
   writeMessage: function(event) {
@@ -93,6 +116,13 @@ var AdminInviteForm = React.createClass({
           <div className="col pe-4"><label>Email</label></div>
           <div className="col"><input type="text" onChange={(e)=> {this.setEmail(e.currentTarget.value)}} /></div>
         </div>
+        { this.state.hasEmailError ?
+          <div className="col">
+            <span style={{ color: "red" }}>Required field</span>
+          </div>
+          : null
+        }
+
         <div className="row">
           <div className="col pe-5">
             <input id="message-check" type="checkbox" checked={this.state.includeMessage} onChange={this.toggleMessage} />
@@ -112,7 +142,7 @@ var AdminInviteForm = React.createClass({
               <button className="btn btn-link" onClick={this.cancel}>Cancel</button>
             </div>
             <div>
-              <button className="btn btn-primary" onClick={this.sendInvitation}>Send</button>
+              <button className="btn btn-primary" onClick={this.sendInvitation} disabled={this.state.sendButtonDisabled}>Send</button>
             </div>
           </div>
         </div>
