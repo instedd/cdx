@@ -32,9 +32,10 @@ class InstitutionsController < ApplicationController
 
   def create
     inst_params = institution_params
+    pending_invite_id = get_pending_invite_id_from_params(inst_params)
 
-    if inst_params.has_key?(:pending_institution_invite_id)
-      @pending_invite = PendingInstitutionInvite.find_by(id: inst_params["pending_institution_invite_id"])
+    if pending_invite_id
+      @pending_invite = PendingInstitutionInvite.find_by(id: pending_invite_id )
 
       unless @pending_invite and @pending_invite.status == 'pending'
         no_data_allowed
@@ -113,7 +114,7 @@ class InstitutionsController < ApplicationController
   end
 
   def new_from_invite_data
-    pending_institution_invite_id = params["pending_institution_invite_id"]
+    pending_institution_invite_id = get_pending_invite_id_from_params(params)
     pending_invite = PendingInstitutionInvite.find_by(invited_user_email: current_user.email,  id: pending_institution_invite_id, status: 'pending')
     unless pending_invite.nil?
       @institution = current_user.institutions.new
@@ -142,5 +143,9 @@ class InstitutionsController < ApplicationController
 
   def institution_params
     params.require(:institution).permit(:name, :kind, :pending_institution_invite_id)
+  end
+
+  def get_pending_invite_id_from_params(inst_params)
+    (inst_params.has_key?(:pending_institution_invite_id)) ? inst_params["pending_institution_invite_id"] : nil
   end
 end
