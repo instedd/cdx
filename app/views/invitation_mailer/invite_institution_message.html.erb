@@ -5,12 +5,12 @@
   Please follow the instructions to complete the signup
 </p>
 
-<p><%= link_to "Create account", accept_invitation_url(@user, :invitation_token => @token), class: "btn-primary" %></p>
+<p><%= link_to "Create account", accept_invitation_url(@user, :invitation_token => @token, :pending_institution_invite_id => @pending_institution_invite_id), class: "btn-primary" %></p>
 
 <% content_for :footer do %>
   <p class="footer">
     Link not working? Paste this into your browser:
-    <%= link_to accept_invitation_url(@user, :invitation_token => @token), accept_invitation_url(@user, :invitation_token => @token) %>
+    <%= link_to accept_invitation_url(@user, :invitation_token => @token, :pending_institution_invite_id => @pending_institution_invite_id), accept_invitation_url(@user, :invitation_token => @token, :pending_institution_invite_id => @pending_institution_invite_id) %>
   </p>
   <p class="footer"><%= t("devise.mailer.invitation_instructions.ignore").html_safe %></p>
 <% end %>
