@@ -32,11 +32,14 @@ class InstitutionsController < ApplicationController
 
   def create
     inst_params = institution_params
-    @pending_invite = PendingInstitutionInvite.find(inst_params["pending_institution_invite_id"])
 
-    unless @pending_invite and @pending_invite.status == 'pending'
-      no_data_allowed
-      return
+    if inst_params.has_key?(:pending_institution_invite_id)
+      @pending_invite = PendingInstitutionInvite.find_by(id: inst_params["pending_institution_invite_id"])
+
+      unless @pending_invite and @pending_invite.status == 'pending'
+        no_data_allowed
+        return
+      end
     end
 
     @institution = Institution.new(inst_params)
