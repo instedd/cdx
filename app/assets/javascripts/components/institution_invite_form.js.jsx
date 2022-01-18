@@ -10,24 +10,15 @@ var InstitutionInviteForm = React.createClass({
   },
 
   changeType: function(newValue) {
-    if(this.isBlank(newValue)){
-      this.setState({
-        hasTypeError: true,
-        nextButtonDisabled: true
-      });
-    } else {
-      this.setState({
-        name: newValue,
-        hasTypeError: false
-      });
+    var oldValue = this.state.type
+    var isBlankNewValue = this.isBlank(newValue)
+    var isBlankName = this.isBlank(this.state.name)
 
-      if(!this.isBlank(this.state.name)){
-        this.setState({
-          nextButtonDisabled: false
-        });
-      }
-
-    }
+    this.setState({
+      type: isBlankNewValue ? oldValue : newValue,
+      hasTypeError: isBlankNewValue,
+      nextButtonDisabled: isBlankNewValue || isBlankName
+    })
   },
 
   back: function() {
@@ -49,24 +40,15 @@ var InstitutionInviteForm = React.createClass({
   },
 
   setName: function(newName) {
-    if(this.isBlank(newName)){
-      this.setState({
-        hasNameError: true,
-        nextButtonDisabled: true
-      });
-    } else {
-      this.setState({
-        name: newName,
-        hasNameError: false
-      });
+    var oldValue = this.state.name
+    var isBlankNewName = this.isBlank(newName)
+    var isBlankType = this.isBlank(this.state.type)
 
-      if(!this.isBlank(this.state.type)){
-        this.setState({
-          nextButtonDisabled: false
-        });
-      }
-
-    }
+    this.setState({
+      name: isBlankNewName ? oldValue : newName,
+      hasNameError: isBlankNewName,
+      nextButtonDisabled: isBlankNewName || isBlankType
+    })
   },
 
   componentDidMount: function() {

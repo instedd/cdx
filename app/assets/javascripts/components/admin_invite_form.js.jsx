@@ -52,10 +52,9 @@ var AdminInviteForm = React.createClass({
   },
 
   setEmail: function(newEmail) {
-    debugger;
-
     if(this.isBlank(newEmail)){
       this.setState({
+        email: newEmail,
         hasEmailError: true,
         sendButtonDisabled: true
       });
@@ -67,11 +66,6 @@ var AdminInviteForm = React.createClass({
       });
 
     }
-
-
-    this.setState({
-      email: newEmail
-    });
   },
 
   toggleMessage: function() {
