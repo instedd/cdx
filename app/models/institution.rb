@@ -5,6 +5,7 @@ class Institution < ActiveRecord::Base
   KINDS = %w(institution manufacturer health_organization)
 
   belongs_to :user
+  belongs_to :pending_institution_invite
 
   has_many :sites, dependent: :restrict_with_error
   has_many :devices, dependent: :restrict_with_error

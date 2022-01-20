@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211217160437) do
+ActiveRecord::Schema.define(version: 20220114191523) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -329,12 +329,13 @@ ActiveRecord::Schema.define(version: 20211217160437) do
   end
 
   create_table "institutions", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.integer  "user_id",    limit: 4
+    t.string   "name",                          limit: 255
+    t.integer  "user_id",                       limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uuid",       limit: 255
-    t.string   "kind",       limit: 255, default: "institution"
+    t.string   "uuid",                          limit: 255
+    t.string   "kind",                          limit: 255, default: "institution"
+    t.integer  "pending_institution_invite_id", limit: 4
   end
 
   add_index "institutions", ["user_id"], name: "index_institutions_on_user_id", using: :btree
@@ -445,7 +446,7 @@ ActiveRecord::Schema.define(version: 20211217160437) do
   add_index "patients", ["site_id"], name: "index_patients_on_site_id", using: :btree
 
   create_table "pending_institution_invites", force: :cascade do |t|
-    t.integer  "invited_user_id",    limit: 4
+    t.string   "invited_user_email", limit: 255
     t.integer  "invited_by_user_id", limit: 4
     t.string   "institution_name",   limit: 255
     t.string   "institution_kind",   limit: 255, default: "institution"
@@ -455,7 +456,7 @@ ActiveRecord::Schema.define(version: 20211217160437) do
   end
 
   add_index "pending_institution_invites", ["invited_by_user_id"], name: "index_pending_institution_invites_on_invited_by_user_id", using: :btree
-  add_index "pending_institution_invites", ["invited_user_id"], name: "index_pending_institution_invites_on_invited_user_id", using: :btree
+  add_index "pending_institution_invites", ["invited_user_email"], name: "index_pending_institution_invites_on_invited_user_email", using: :btree
 
   create_table "policies", force: :cascade do |t|
     t.integer  "user_id",    limit: 4

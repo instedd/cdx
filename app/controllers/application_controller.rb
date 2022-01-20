@@ -67,8 +67,10 @@ class ApplicationController < ActionController::Base
 
     if current_user && current_user.institutions.empty? && current_user.policies.empty? && current_user.roles.empty?
       if has_access?(Institution, CREATE_INSTITUTION)
-        if PendingInstitutionInvite.user_has_pending_invites?(current_user)
-          redirect_to new_from_invite_data_institutions_path
+        pending_institution_invite_id = session[:pending_invite_id] || pending_institution_invite_id_from_url()
+        pending_invite = PendingInstitutionInvite.find(pending_institution_invite_id) if pending_institution_invite_id
+        if pending_invite and pending_invite.is_pending?
+          redirect_to new_from_invite_data_institutions_path(pending_institution_invite_id: pending_institution_invite_id)
           return
         else
           redirect_to new_institution_path
@@ -136,7 +138,10 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource_or_scope)
-    if has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
+    pending_invite_id = pending_institution_invite_id_from_url
+    if session[:user_return_to] == new_from_invite_data_institutions_path(pending_institution_invite_id: pending_invite_id) and has_access_to_institutions_create?
+      new_from_invite_data_institutions_path(pending_institution_invite_id: pending_invite_id)
+    elsif has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
       dashboard_path
     elsif has_access_to_sites_index?
       sites_path
@@ -196,4 +201,17 @@ class ApplicationController < ActionController::Base
       end
     logger.warn "Authorization failed. #{action} requested by #{current_user.email} in #{resource_name}"
   end
+
+  private
+
+  def pending_institution_invite_id_from_url
+    url = session[:user_return_to] || request.original_url
+    parsed_url = URI.parse(url)
+    parsed_query = URI::decode_www_form(parsed_url.query).to_h unless parsed_url.query.nil?
+    if parsed_query and parsed_query.has_key?("pending_institution_invite_id")
+      session[:pending_invite_id] = parsed_query["pending_institution_invite_id"]
+      parsed_query["pending_institution_invite_id"]
+    end
+  end
+
 end

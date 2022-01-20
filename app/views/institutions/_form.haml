@@ -38,6 +38,7 @@
         = f.label :name, :class => 'block'
       .col
         = f.text_field :name, readonly: @readonly, :class => 'input-block'
+        = f.hidden_field :pending_institution_invite_id
     - if not f.object.new_record?
       .row
         .col.px-1
