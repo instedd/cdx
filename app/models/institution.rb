@@ -5,6 +5,7 @@ class Institution < ActiveRecord::Base
   KINDS = %w(institution manufacturer health_organization)
 
   belongs_to :user
+  belongs_to :pending_institution_invite
 
   has_many :sites, dependent: :restrict_with_error
   has_many :devices, dependent: :restrict_with_error
@@ -34,6 +35,10 @@ class Institution < ActiveRecord::Base
     else
       self
     end
+  end
+
+  def self.kinds
+    KINDS.map { |kind| {value: kind, label: kind.humanize} }
   end
 
   def filter_by_owner(user, check_conditions)

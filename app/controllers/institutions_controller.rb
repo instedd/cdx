@@ -1,6 +1,6 @@
 class InstitutionsController < ApplicationController
   before_filter :load_institutions
-  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval]
+  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval, :new_from_invite_data]
   skip_before_action :ensure_context, except: [:no_data_allowed]
 
   def index
@@ -31,7 +31,19 @@ class InstitutionsController < ApplicationController
   end
 
   def create
-    @institution = Institution.new(institution_params)
+    inst_params = institution_params
+    pending_invite_id = get_pending_invite_id_from_params(inst_params)
+
+    if pending_invite_id
+      @pending_invite = PendingInstitutionInvite.find_by(id: pending_invite_id )
+
+      unless @pending_invite and @pending_invite.status == 'pending'
+        no_data_allowed
+        return
+      end
+    end
+
+    @institution = Institution.new(inst_params)
     @institution.user_id = current_user.id
     return unless authorize_resource(Institution, CREATE_INSTITUTION)
 
@@ -47,6 +59,9 @@ class InstitutionsController < ApplicationController
 
         # This is needed for the next redirect, which will use it
         params[:context] = new_context
+
+        #set pending institution invite as accepted if it is not nil
+        accept_pending_invite unless @pending_invite.nil?
 
         format.html { redirect_to root_path, notice: 'Institution was successfully created.' }
         format.json { render action: 'show', status: :created, location: @institution }
@@ -94,7 +109,30 @@ class InstitutionsController < ApplicationController
     # Otherwise there is a home to display different from no_data_allowed
     # which filter the data shown per current institution.
     home = after_sign_in_path_for(current_user)
+
     redirect_to home if home != no_data_allowed_institutions_path
+  end
+
+  def new_from_invite_data
+    pending_institution_invite_id = get_pending_invite_id_from_params(params)
+    pending_invite = PendingInstitutionInvite.find_by(invited_user_email: current_user.email,  id: pending_institution_invite_id, status: 'pending')
+    unless pending_invite.nil?
+      @institution = current_user.institutions.new
+      @institution.kind = pending_invite.institution_kind
+      @institution.name = pending_invite.institution_name
+      @institution.pending_institution_invite = pending_invite
+      render action: 'new'
+    else
+      session[:user_return_to] = nil
+      no_data_allowed
+    end
+  end
+
+  def accept_pending_invite
+    unless @pending_invite.nil? and current_user.email != @pending_invite.invited_user_email
+      @pending_invite.status = 'accepted'
+      @pending_invite.save!
+    end
   end
 
   private
@@ -104,6 +142,10 @@ class InstitutionsController < ApplicationController
   end
 
   def institution_params
-    params.require(:institution).permit(:name, :kind)
+    params.require(:institution).permit(:name, :kind, :pending_institution_invite_id)
+  end
+
+  def get_pending_invite_id_from_params(inst_params)
+    (inst_params.has_key?(:pending_institution_invite_id)) ? inst_params["pending_institution_invite_id"] : nil
   end
 end

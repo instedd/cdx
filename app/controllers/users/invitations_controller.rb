@@ -17,6 +17,12 @@ class Users::InvitationsController < Devise::InvitationsController
     end
   end
 
+  def edit
+    session[:pending_invite_id] = params["pending_institution_invite_id"]
+    super
+  end
+
+
   protected
 
   def update_sanitized_params

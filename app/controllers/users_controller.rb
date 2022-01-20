@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_filter :load_resource, only: [:edit, :update, :assign_role, :unassign_role]
+  before_filter :create_institution_invite, only: [:create_with_institution_invite]
 
   def index
     site_admin = !has_access?(@navigation_context.entity, READ_INSTITUTION_USERS) && @navigation_context.entity.kind_of?(Institution)
@@ -56,17 +57,22 @@ class UsersController < ApplicationController
     (params[:users] || []).each do |email|
       email = email.strip
       user = User.find_or_initialize_by(email: email)
-      unless user.persisted?
-        user.invite! do |u|
-          u.skip_invitation = true
-        end
-        user.invitation_sent_at = Time.now.utc # mark invitation as delivered
-        user.invited_by_id = current_user.id
-        InvitationMailer.invite_message(user, @role, message).deliver_now
-      end
+      send_invitation(message, user) unless user.persisted?
       user.roles << @role unless user.roles.include?(@role)
       ComputedPolicy.update_user(user)
     end
+    render nothing: true
+  end
+
+  def create_with_institution_invite
+    user_invite_data = params[:user_invite_data]
+    institution_data = params[:institution_data]
+    @message = params[:message]
+    @user_email = user_invite_data["email"]
+    user = initialize_user(user_invite_data)
+    send_institution_invite(institution_data, user)
+    user.save!
+
     render nothing: true
   end
 
@@ -104,6 +110,50 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def send_institution_invite(institution_data, user)
+    unless user.persisted?
+      mark_as_invited(user)
+      InvitationMailer.invite_institution_message(user, @pending_invite, @message).deliver_now
+    else
+      InvitationMailer.create_institution_message(user, @pending_invite, @message).deliver_now
+    end
+  end
+
+  def initialize_user(user_invite_data)
+    user = User.find_or_initialize_by(email: @user_email.strip)
+    unless user.persisted?
+      user.first_name = user_invite_data[:firstName]
+      user.last_name = user_invite_data[:lastName]
+    end
+    user
+  end
+
+  def send_invitation(message, user)
+    mark_as_invited(user)
+    InvitationMailer.invite_message(user, @role, message).deliver_now
+  end
+
+  def mark_as_invited(user)
+    user.invite! do |u|
+      u.skip_invitation = true
+    end
+    user.invitation_sent_at = Time.now.utc # mark invitation as delivered
+    user.invited_by_id = current_user.id
+  end
+
+  def create_institution_invite
+    invited_user_email = params[:user_invite_data]["email"]
+    unless invited_user_email.nil?
+      pending_invite = PendingInstitutionInvite.new
+      pending_invite.invited_user_email = invited_user_email
+      pending_invite.invited_by_user = current_user
+      pending_invite.institution_name = params["institution_data"]["name"]
+      pending_invite.institution_kind = params["institution_data"]["type"]
+      pending_invite.save!
+      @pending_invite = pending_invite
+    end
+  end
 
   def user_params
     params.require(:user).permit(:is_active)
