@@ -57,4 +57,3 @@ RUN mkdir -p /app/tmp /app/log && chown -R app:app /app/tmp /app/log
 
 # Add config files
 ADD docker/web-run /etc/service/web/run
-ADD docker/client_max_body_size.conf /etc/nginx/conf.d/client_max_body_size.conf
