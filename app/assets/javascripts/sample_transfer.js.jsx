@@ -22,7 +22,7 @@ var SampleTransfer = React.createClass({
       </button>
       <Modal ref="transferModal">
         <h1>{this.state.title}</h1>
-        <SampleTransferModal onFinished={this.closeTransferModal} context={this.props.context} />
+        <SampleTransferModal onFinished={this.closeTransferModal} context={this.props.context} institutions={this.props.institutions}/>
       </Modal>
     </span>);
   }
@@ -39,9 +39,6 @@ var SampleTransferModal = React.createClass({
   closeModal: function() {
     event.preventDefault();
     this.props.onFinished();
-  },
-
-  componentDidUpdate: function() {
   },
 
   batchSamples: function() {
@@ -89,7 +86,7 @@ var SampleTransferModal = React.createClass({
         </div>
         <div className="row">
           <div className="col pe-3"><label>Institution</label></div>
-          <div className="col"><CdxSelect name="institution" items={[]} value={[]} onChange={this.changeInstitution} /></div>
+          <div className="col"><CdxSelect name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} /></div>
         </div>
         <div className="row">
           <div className="col pe-3">
