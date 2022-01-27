@@ -1,8 +1,11 @@
 var InstitutionInviteForm = React.createClass({
   getInitialState: function() {
+    const { institutionData } = this.props
+    const { type, name } = institutionData ? institutionData : { type: 'institution', name: '' }
+
     return {
-      type: 'institution',
-      name: '',
+      type: type,
+      name: name,
       hasTypeError: false,
       hasNameError: false,
       nextButtonDisabled: true
@@ -22,17 +25,17 @@ var InstitutionInviteForm = React.createClass({
   },
 
   back: function() {
-    this.props.modalPresenterStep()
+    this.props.onBack()
   },
 
   next: function() {
     if(!this.state.hasTypeError && !this.state.hasNameError){
-      this.props.adminInviteStep(this.state)
+      this.props.onNext(this.state)
     }
   },
 
   cancel: function() {
-    this.props.onFinished()
+    this.props.onCancel()
   },
 
   isBlank: function(str) {
@@ -70,7 +73,7 @@ var InstitutionInviteForm = React.createClass({
         }
         <div className="row">
           <div className="col pe-3"><label>Name</label></div>
-          <div className="col"><input className="input-large" type="text" onChange={(e)=> {this.setName(e.currentTarget.value)}} /></div>
+          <div className="col"><input className="input-large" type="text" value={this.state.name} onChange={(e)=> {this.setName(e.currentTarget.value)}} /></div>
         </div>
         { this.state.hasNameError ?
           <div className="col">

@@ -85,8 +85,12 @@ var AdminInviteForm = React.createClass({
     });
   },
 
+  back: function () {
+    this.props.onBack(this.props.institutionData)
+  },
+
   cancel: function() {
-    this.props.onFinished()
+    this.props.onCancel()
   },
 
   componentDidMount: function() {
@@ -136,6 +140,7 @@ var AdminInviteForm = React.createClass({
               <button className="btn btn-link" onClick={this.cancel}>Cancel</button>
             </div>
             <div>
+              <button className="btn btn-link" onClick={this.back}>Back</button>
               <button className="btn btn-primary" onClick={this.sendInvitation} disabled={this.state.sendButtonDisabled}>Send</button>
             </div>
           </div>
