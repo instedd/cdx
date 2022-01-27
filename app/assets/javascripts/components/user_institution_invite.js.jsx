@@ -12,7 +12,7 @@ var AddUserOrInstitutionLink = React.createClass({
     });
   },
 
-  openInviteModal: function() {
+  openInviteModal: function(event) {
     this.refs.inviteModal.show();
     event.preventDefault();
   },
@@ -43,6 +43,8 @@ var ModalPresenter = React.createClass({
   },
 
   modalPresenterStep: function() {
+    this.changeTitle('Invite');
+
     this.setState({
       step: 'modalPresenter'
     });
@@ -76,23 +78,16 @@ var ModalPresenter = React.createClass({
     this.props.changeTitle(newTitle);
   },
 
-  componentDidUpdate: function() {
-    const { step } = this.state;
-    if(step === 'modalPresenter'){
-      this.changeTitle('Invite');
-    }
-  },
-
   presenterForm: function() {
     return (
       <div>
-        <div className="row invitation-option-card" onClick={() => {this.userInviteStep()}}>
+        <div className="row invitation-option-card" onClick={this.userInviteStep}>
           <div className="col pe-10 description">
             NEW USER
           </div>
           <div className="col pe-1 icon-keyboard-arrow-right icon-gray"></div>
         </div>
-        <div className="row invitation-option-card" onClick={() => {this.institutionInviteStep()}}>
+        <div className="row invitation-option-card" onClick={this.institutionInviteStep}>
           <div className="col pe-10 description">
             NEW INSTITUTION
           </div>
