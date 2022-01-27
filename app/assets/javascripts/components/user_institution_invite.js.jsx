@@ -116,7 +116,7 @@ var ModalPresenter = React.createClass({
                           onFinished={this.closeModal}
                           roles={this.props.roles}
                           context={this.props.context}
-                          modalPresenterStep={()=> {this.modalPresenterStep()}}/>
+                          onBack={()=> {this.modalPresenterStep()}}/>
         );
       case 'institutionInviteStep':
         return (
