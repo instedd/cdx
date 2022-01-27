@@ -81,13 +81,13 @@ var ModalPresenter = React.createClass({
   presenterForm: function() {
     return (
       <div>
-        <div className="row invitation-option-card" onClick={this.userInviteStep}>
+        <div className="row invitation-option-card" onClick={() => this.userInviteStep()}>
           <div className="col pe-10 description">
             NEW USER
           </div>
           <div className="col pe-1 icon-keyboard-arrow-right icon-gray"></div>
         </div>
-        <div className="row invitation-option-card" onClick={this.institutionInviteStep}>
+        <div className="row invitation-option-card" onClick={() => this.institutionInviteStep()}>
           <div className="col pe-10 description">
             NEW INSTITUTION
           </div>

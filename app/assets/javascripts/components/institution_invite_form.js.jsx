@@ -7,7 +7,7 @@ var InstitutionInviteForm = React.createClass({
       type: type,
       name: name,
       hasTypeError: false
-    };
+    }
   },
 
   changeType: function(newValue) {
