@@ -1,4 +1,4 @@
-<h1><%= "#{User.find(@user.invited_by_id).full_name} has invited you to join #{@institution_name} as an administrator" %></h2>
+<h1><%= "#{@invitation_sender.full_name} has invited you to join #{@institution_name} as an administrator" %></h2>
 
 <p class="custom-message">
   <%= @message %><br />

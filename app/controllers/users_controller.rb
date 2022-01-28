@@ -112,11 +112,11 @@ class UsersController < ApplicationController
   private
 
   def send_institution_invite(institution_data, user)
-    unless user.persisted?
-      mark_as_invited(user)
-      InvitationMailer.invite_institution_message(user, @pending_invite, @message).deliver_now
+    if user.persisted?
+      InvitationMailer.create_institution_message(user, current_user, @pending_invite, @message).deliver_now
     else
-      InvitationMailer.create_institution_message(user, @pending_invite, @message).deliver_now
+      mark_as_invited(user)
+      InvitationMailer.invite_institution_message(user, current_user, @pending_invite, @message).deliver_now
     end
   end
 
