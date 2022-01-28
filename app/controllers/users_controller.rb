@@ -61,7 +61,8 @@ class UsersController < ApplicationController
       user.roles << @role unless user.roles.include?(@role)
       ComputedPolicy.update_user(user)
     end
-    render nothing: true
+    flash[:notice] = "Invitations sent"
+    render json: {status: :ok}
   end
 
   def create_with_institution_invite
@@ -73,7 +74,8 @@ class UsersController < ApplicationController
     send_institution_invite(institution_data, user)
     user.save!
 
-    render nothing: true
+    flash[:notice] = "Invitation sent"
+    render json: {status: :ok}
   end
 
   def assign_role
