@@ -1,54 +1,57 @@
 var InstitutionInviteForm = React.createClass({
   getInitialState: function() {
+    const { institutionData } = this.props
+    const { type, name } = institutionData ? institutionData : { type: 'institution', name: null }
+
     return {
-      type: 'institution',
-      name: '',
-      hasTypeError: false,
-      hasNameError: false,
-      nextButtonDisabled: true
-    };
+      type: type,
+      name: name
+    }
   },
 
-  changeType: function(newValue) {
-    var oldValue = this.state.type
-    var isBlankNewValue = this.isBlank(newValue)
-    var isBlankName = this.isBlank(this.state.name)
-
+  setType: function(newType) {
     this.setState({
-      type: isBlankNewValue ? oldValue : newValue,
-      hasTypeError: isBlankNewValue,
-      nextButtonDisabled: isBlankNewValue || isBlankName
+      type: newType
     })
   },
 
+  showTypeError: function () {
+    const { type } = this.state
+    return this.isBlank(type)
+  },
+
   back: function() {
-    this.props.modalPresenterStep()
+    this.props.onBack()
   },
 
   next: function() {
-    if(!this.state.hasTypeError && !this.state.hasNameError){
-      this.props.adminInviteStep(this.state)
+    if(this.isValidInput()){
+      this.props.onNext(this.state)
     }
   },
 
   cancel: function() {
-    this.props.onFinished()
+    this.props.onCancel()
   },
 
   isBlank: function(str) {
     return (!str || /^\s*$/.test(str));
   },
 
-  setName: function(newName) {
-    var oldValue = this.state.name
-    var isBlankNewName = this.isBlank(newName)
-    var isBlankType = this.isBlank(this.state.type)
+  isValidInput: function() {
+    const { type, name } = this.state
+    return !this.isBlank(type) && !this.isBlank(name)
+  },
 
+  setName: function(newName) {
     this.setState({
-      name: isBlankNewName ? oldValue : newName,
-      hasNameError: isBlankNewName,
-      nextButtonDisabled: isBlankNewName || isBlankType
+      name: newName
     })
+  },
+
+  showNameError: function() {
+    const { name } = this.state
+    return name != null && this.isBlank(name)
   },
 
   componentDidMount: function() {
@@ -60,9 +63,11 @@ var InstitutionInviteForm = React.createClass({
       <div>
         <div className="row">
           <div className="col pe-3"><label>Type</label></div>
-          <div className="col"><CdxSelect name="type" items={this.props.types} value={this.state.type} onChange={this.changeType} /></div>
+          <div className="col">
+            <CdxSelect name="type" items={this.props.types} value={this.state.type} onChange={this.setType}/>
+          </div>
         </div>
-        { this.state.hasTypeError ?
+        { this.showTypeError() ?
           <div className="col">
             <span style={{ color: "red" }}>Required field</span>
           </div>
@@ -70,9 +75,11 @@ var InstitutionInviteForm = React.createClass({
         }
         <div className="row">
           <div className="col pe-3"><label>Name</label></div>
-          <div className="col"><input className="input-large" type="text" onChange={(e)=> {this.setName(e.currentTarget.value)}} /></div>
+          <div className="col">
+            <input className="input-large" type="text" value={this.state.name} onChange={(e)=> {this.setName(e.currentTarget.value)}} />
+          </div>
         </div>
-        { this.state.hasNameError ?
+        { this.showNameError() ?
           <div className="col">
             <span style={{ color: "red" }}>Required field</span>
           </div>
@@ -85,7 +92,7 @@ var InstitutionInviteForm = React.createClass({
             </div>
             <div>
               <button className="btn btn-link" onClick={this.back}>Back</button>
-              <button className="btn btn-primary" onClick={this.next} disabled={this.state.nextButtonDisabled}>Next</button>
+              <button className="btn btn-primary" onClick={this.next} disabled={!this.isValidInput()}>Next</button>
             </div>
           </div>
         </div>

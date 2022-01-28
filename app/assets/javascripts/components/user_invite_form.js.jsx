@@ -56,6 +56,10 @@ var UserInviteForm = React.createClass({
     }));
   },
 
+  back: function () {
+    this.props.onBack()
+  },
+
   closeModal: function() {
     this.props.onFinished();
   },
@@ -97,7 +101,7 @@ var UserInviteForm = React.createClass({
 
       <div className="modal-footer">
         <div className="footer-buttons-aligning">
-          <button className="btn btn-link" onClick={this.props.modalPresenterStep}>Back</button>
+          <button className="btn btn-link" onClick={this.back}>Back</button>
           <button className="btn btn-primary" onClick={this.sendInvitation}>Send</button>
         </div>
       </div>

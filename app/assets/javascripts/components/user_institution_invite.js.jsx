@@ -12,9 +12,7 @@ var AddUserOrInstitutionLink = React.createClass({
     });
   },
 
-
-
-  openInviteModal: function() {
+  openInviteModal: function(event) {
     this.refs.inviteModal.show();
     event.preventDefault();
   },
@@ -45,6 +43,8 @@ var ModalPresenter = React.createClass({
   },
 
   modalPresenterStep: function() {
+    this.changeTitle('Invite');
+
     this.setState({
       step: 'modalPresenter'
     });
@@ -63,9 +63,10 @@ var ModalPresenter = React.createClass({
     });
   },
 
-  institutionInviteStep: function() {
+  institutionInviteStep: function (institutionData) {
     this.setState({
-      step: 'institutionInviteStep'
+      step: 'institutionInviteStep',
+      institutionData: institutionData
     });
   },
 
@@ -77,23 +78,16 @@ var ModalPresenter = React.createClass({
     this.props.changeTitle(newTitle);
   },
 
-  componentDidUpdate: function() {
-    const { step } = this.state;
-    if(step === 'modalPresenter'){
-      this.changeTitle('Invite');
-    }
-  },
-
   presenterForm: function() {
     return (
       <div>
-        <div className="row invitation-option-card" onClick={() => {this.userInviteStep()}}>
+        <div className="row invitation-option-card" onClick={() => this.userInviteStep()}>
           <div className="col pe-10 description">
             NEW USER
           </div>
           <div className="col pe-1 icon-keyboard-arrow-right icon-gray"></div>
         </div>
-        <div className="row invitation-option-card" onClick={() => {this.institutionInviteStep()}}>
+        <div className="row invitation-option-card" onClick={() => this.institutionInviteStep()}>
           <div className="col pe-10 description">
             NEW INSTITUTION
           </div>
@@ -113,16 +107,28 @@ var ModalPresenter = React.createClass({
         return this.presenterForm();
       case 'userInviteStep':
         return (
-          <UserInviteForm changeTitle={this.changeTitle} onFinished={this.closeModal} roles={this.props.roles} context={this.props.context} modalPresenterStep={()=> {this.modalPresenterStep()}}/>
+          <UserInviteForm changeTitle={this.changeTitle}
+                          onFinished={this.closeModal}
+                          roles={this.props.roles}
+                          context={this.props.context}
+                          onBack={()=> {this.modalPresenterStep()}}/>
         );
       case 'institutionInviteStep':
         return (
-          <InstitutionInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} modalPresenterStep={()=> {this.modalPresenterStep()}} adminInviteStep={(institutionData)=> {this.adminInviteStep(institutionData)}}/>
+          <InstitutionInviteForm changeTitle={this.changeTitle}
+                                 types={this.props.institution_types}
+                                 onCancel={()=> {this.closeModal()}}
+                                 onBack={()=> {this.modalPresenterStep()}}
+                                 onNext={(institutionData)=> {this.adminInviteStep(institutionData)}}
+                                 institutionData={this.state.institutionData}/>
         );
-
       case 'adminInviteStep':
         return (
-          <AdminInviteForm changeTitle={this.changeTitle} types={this.props.institution_types} onFinished={()=> {this.closeModal()}} institutionInviteStep={()=> {this.institutionInviteStep()}} institutionData={this.state.institutionData}/>
+          <AdminInviteForm changeTitle={this.changeTitle}
+                           types={this.props.institution_types}
+                           onCancel={()=> {this.closeModal()}}
+                           onBack={(institutionData) => { this.institutionInviteStep(institutionData)}}
+                           institutionData={this.state.institutionData}/>
         );
     }
   },
