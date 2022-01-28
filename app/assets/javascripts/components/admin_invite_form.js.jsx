@@ -103,6 +103,11 @@ var AdminInviteForm = React.createClass({
     return (
       <div>
         <div className="row">
+          <div className="col">
+            <p>CONTACT DETAILS FOR NEW ACCOUNT'S ADMINISTRATOR</p>
+          </div>
+        </div>
+        <div className="row">
           <div className="col pe-4"><label>First Name</label></div>
           <div className="col"><input type="text" onChange={(e)=> {this.setFirstName(e.currentTarget.value)}} /></div>
         </div>
