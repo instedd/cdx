@@ -5,19 +5,19 @@ var InstitutionInviteForm = React.createClass({
 
     return {
       type: type,
-      name: name,
-      hasTypeError: false
+      name: name
     }
   },
 
-  changeType: function(newValue) {
-    var oldValue = this.state.type
-    var isBlankNewValue = this.isBlank(newValue)
-
+  setType: function(newType) {
     this.setState({
-      type: isBlankNewValue ? oldValue : newValue,
-      hasTypeError: isBlankNewValue
+      type: newType
     })
+  },
+
+  showTypeError: function () {
+    const { type } = this.state
+    return this.isBlank(type)
   },
 
   back: function() {
@@ -64,10 +64,10 @@ var InstitutionInviteForm = React.createClass({
         <div className="row">
           <div className="col pe-3"><label>Type</label></div>
           <div className="col">
-            <CdxSelect name="type" items={this.props.types} value={this.state.type} onChange={this.changeType}/>
+            <CdxSelect name="type" items={this.props.types} value={this.state.type} onChange={this.setType}/>
           </div>
         </div>
-        { this.state.hasTypeError ?
+        { this.showTypeError() ?
           <div className="col">
             <span style={{ color: "red" }}>Required field</span>
           </div>
