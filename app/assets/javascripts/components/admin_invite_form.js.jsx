@@ -6,7 +6,7 @@ var AdminInviteForm = React.createClass({
       email: '',
       includeMessage: false,
       message: '',
-      hasEmailError: false,
+      hasEmailError: null,
       sendButtonDisabled: true
     };
   },
@@ -55,13 +55,13 @@ var AdminInviteForm = React.createClass({
     if(this.isBlank(newEmail) || !this.isValidEmail(newEmail)){
       this.setState({
         email: newEmail,
-        hasEmailError: true,
+        hasEmailError: 'Please enter a valid email',
         sendButtonDisabled: true
       });
     } else {
       this.setState({
         email: newEmail,
-        hasEmailError: false,
+        hasEmailError: null,
         sendButtonDisabled: false
       });
 
@@ -131,7 +131,7 @@ var AdminInviteForm = React.createClass({
         </div>
         { this.state.hasEmailError ?
           <div className="col">
-            <span style={{ color: "red" }}>Please enter a valid email</span>
+            <span style={{ color: "red" }}>{this.state.hasEmailError}</span>
           </div>
           : null
         }
