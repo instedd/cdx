@@ -71,6 +71,7 @@ class SamplesController < ApplicationController
       redirect_to samples_path, notice: 'Sample was successfully created.'
     else
       @view_helper = view_helper
+      @can_update = true
       render action: 'new'
     end
   end
@@ -153,6 +154,7 @@ class SamplesController < ApplicationController
       redirect_to back_path, notice: 'Sample was successfully updated.'
     else
       @view_helper = view_helper
+      @can_update = true
       render action: 'edit'
     end
   end
