@@ -19,6 +19,7 @@ class SamplesController < ApplicationController
       .pluck(:uuid, :name)
       .map{|uuid, name| {value: uuid, label: name}}
 
+    @samples_test = @samples
     @samples = perform_pagination(@samples)
   end
 
@@ -188,6 +189,21 @@ class SamplesController < ApplicationController
     samples.destroy_all
 
     redirect_to samples_path, notice: 'Samples were successfully deleted.'
+  end
+
+  def transfer_samples
+    destination_inst = Institution.find_by(uuid: params["institution_id"])
+    params["samples"].each do |sample|
+      sample_identifier = SampleIdentifier.find_by(uuid: sample)
+      to_transfer = Sample.find(sample_identifier.sample_id)
+      if to_transfer.batch_id.nil?
+        to_transfer.institution = destination_inst
+        to_transfer.save!
+      end
+    end
+
+    flash[:notice] = "Samples transferred successfully"
+    render json: {status: :ok}
   end
 
   private

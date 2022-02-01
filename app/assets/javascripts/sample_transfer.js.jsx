@@ -22,7 +22,7 @@ var SampleTransfer = React.createClass({
       </button>
       <Modal ref="transferModal">
         <h1>{this.state.title}</h1>
-        <SampleTransferModal onFinished={this.closeTransferModal} context={this.props.context} institutions={this.props.institutions}/>
+        <SampleTransferModal onFinished={this.closeTransferModal} context={this.props.context} institutions={this.props.institutions} samples={this.props.samples} />
       </Modal>
     </span>);
   }
@@ -32,7 +32,8 @@ var SampleTransferModal = React.createClass({
   getInitialState: function() {
     return {
       institutionId: null,
-      includeQcInfo: null
+      includeQcInfo: null,
+      selectedSamples: selectedSamplesIds()
     };
   },
 
@@ -41,13 +42,28 @@ var SampleTransferModal = React.createClass({
     this.props.onFinished();
   },
 
-  batchSamples: function() {
-    const data =[{uuid:"test1", inactivationMethod: "inactivationTest1"},{uuid:"test2", inactivationMethod: "inactivationTest2"}];
-    const listItems = data.map((sample) => this.sampleRow(sample));
+  transferSamples: function() {
+    const data = {
+      institution_id: this.state.institutionId,
+      samples: this.state.selectedSamples
+    }
+    $.ajax({
+      url: '/samples/transfer_samples',
+      method: 'GET',
+      data: data,
+      success: function () {
+        this.closeModal();
+        window.location.reload(true); // reload page to update users table
+      }.bind(this)
+    });
 
-    return (
-        {listItems}
-    )
+
+  },
+
+  batchSamples: function() {
+    let checkedSamples = this.state.selectedSamples
+    const listItems = checkedSamples.map((sample) => this.sampleRow(sample));
+    return ({listItems});
   },
 
   changeInstitution: function(newValue) {
@@ -61,7 +77,10 @@ var SampleTransferModal = React.createClass({
       <div className="col pe-7 batches-samples">
         <div className="samples-row">
           <div className="samples-item">
-            {sampleData.uuid}
+            { sampleData.length > 23 ?
+              sampleData.substring(0, 23) + '...' :
+              sampleData
+            }
           </div>
         </div>
       </div>
@@ -98,7 +117,7 @@ var SampleTransferModal = React.createClass({
           <div className="footer-buttons-aligning">
             <div>
               <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
-              <button className="btn btn-primary">Transfer</button>
+              <button className="btn btn-primary" type="button" onClick={this.transferSamples}>Transfer</button>
             </div>
             <div />
           </div>
