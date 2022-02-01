@@ -79,6 +79,22 @@ RSpec.describe BatchesController, type: :controller do
     end
   end
 
+  context "show" do
+    let!(:batch) { institution.batches.make }
+
+    it "should be accessible to institution owner" do
+      get :show, id: batch.id
+      expect(response).to be_success
+    end
+
+    it "shouldn't be accessible to anybody" do
+      sign_in other_user
+
+      get :show, id: batch.id
+      expect(response).to be_forbidden
+    end
+  end
+
   context "new" do
     it "should be accessible be institution owner" do
       get :new

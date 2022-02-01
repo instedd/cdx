@@ -70,6 +70,24 @@ RSpec.describe SamplesController, type: :controller do
     end
   end
 
+  context "show" do
+    let!(:sample) do
+      institution.samples.make sample_identifiers: [SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
+    end
+
+    it "should be accessible to institution owner" do
+      get :show, id: sample.id
+      expect(response).to be_success
+    end
+
+    it "shouldn't be accessible to anybody" do
+      sign_in other_user
+
+      get :show, id: sample.id
+      expect(response).to be_forbidden
+    end
+  end
+
   context "new" do
     it "should be accessible be institution owner" do
       get :new

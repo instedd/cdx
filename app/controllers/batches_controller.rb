@@ -18,6 +18,18 @@ class BatchesController < ApplicationController
     @batches = perform_pagination(@batches)
   end
 
+  def show
+    batch = Batch.find(params[:id])
+    @batch_form = BatchForm.for(batch)
+    return unless authorize_resource(batch, READ_BATCH)
+
+    @can_edit_sample_quantity = false
+    @can_delete = false
+    @can_update = false
+
+    render action: 'edit'
+  end
+
   def new_sample_or_batch
 
   end
@@ -59,8 +71,8 @@ class BatchesController < ApplicationController
     return unless authorize_resource(batch, UPDATE_BATCH)
 
     @can_edit_sample_quantity = false
-
     @can_delete = has_access?(batch, DELETE_BATCH)
+    @can_update = true
   end
 
   def update
