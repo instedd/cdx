@@ -46,6 +46,7 @@ class SamplesController < ApplicationController
 
     @view_helper = view_helper({save_back_path: true})
     @show_barcode_preview = false
+    @can_update = true
   end
 
   def create

@@ -44,6 +44,7 @@ class BatchesController < ApplicationController
     prepare_for_institution_and_authorize(@batch_form, CREATE_INSTITUTION_BATCH)
 
     @can_edit_sample_quantity = true
+    @can_update = true
   end
 
   def create
