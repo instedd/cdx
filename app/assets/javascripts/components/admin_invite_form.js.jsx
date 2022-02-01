@@ -6,7 +6,7 @@ var AdminInviteForm = React.createClass({
       email: '',
       includeMessage: false,
       message: '',
-      hasEmailError: false,
+      hasEmailError: null,
       sendButtonDisabled: true
     };
   },
@@ -52,16 +52,16 @@ var AdminInviteForm = React.createClass({
   },
 
   setEmail: function(newEmail) {
-    if(this.isBlank(newEmail)){
+    if(this.isBlank(newEmail) || !this.isValidEmail(newEmail)){
       this.setState({
         email: newEmail,
-        hasEmailError: true,
+        hasEmailError: 'Please enter a valid email',
         sendButtonDisabled: true
       });
     } else {
       this.setState({
         email: newEmail,
-        hasEmailError: false,
+        hasEmailError: null,
         sendButtonDisabled: false
       });
 
@@ -79,6 +79,14 @@ var AdminInviteForm = React.createClass({
     return (!str || /^\s*$/.test(str));
   },
 
+  isValidEmail: function(email) {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  },
+
   writeMessage: function(event) {
     this.setState({
       message: event.target.value
@@ -92,6 +100,8 @@ var AdminInviteForm = React.createClass({
   cancel: function() {
     this.props.onCancel()
   },
+
+
 
   componentDidMount: function() {
     const institutionType = this.props.types.find(type => type.value === this.props.institutionData.type);
@@ -121,7 +131,7 @@ var AdminInviteForm = React.createClass({
         </div>
         { this.state.hasEmailError ?
           <div className="col">
-            <span style={{ color: "red" }}>Required field</span>
+            <span style={{ color: "red" }}>{this.state.hasEmailError}</span>
           </div>
           : null
         }
