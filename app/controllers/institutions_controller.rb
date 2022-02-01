@@ -34,7 +34,7 @@ class InstitutionsController < ApplicationController
     inst_params = institution_params
     pending_invite_id = get_pending_invite_id_from_params(inst_params)
 
-    if pending_invite_id
+    unless pending_invite_id.blank?
       @pending_invite = PendingInstitutionInvite.find_by(id: pending_invite_id )
 
       unless @pending_invite and @pending_invite.status == 'pending'
