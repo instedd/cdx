@@ -61,6 +61,7 @@ class BatchesController < ApplicationController
     if @batch_form.create
       redirect_to batches_path, notice: 'Batch was successfully created.'
     else
+      @can_update = true
       @can_edit_sample_quantity = true
       render action: 'new'
     end
@@ -84,6 +85,7 @@ class BatchesController < ApplicationController
     if @batch_form.update(batch_params, remove_samples_params)
       redirect_to batches_path, notice: 'Batch was successfully updated.'
     else
+      @can_update = true
       render action: 'edit'
     end
   end
