@@ -17,9 +17,8 @@ var SampleTransfer = React.createClass({
 
   render: function() {
     return (<span>
-      <button name="bulk_action" type="button" id="bulk_transfer" className="btn-link" onClick={this.openTransferModal} >
-        <div className="icon-send btn-icon"></div>
-      </button>
+      <div id="modal_opener"  onClick={this.openTransferModal} >
+      </div>
       <Modal ref="transferModal">
         <h1>{this.state.title}</h1>
         <SampleTransferModal onFinished={this.closeTransferModal} context={this.props.context} institutions={this.props.institutions} samples={this.props.samples} />

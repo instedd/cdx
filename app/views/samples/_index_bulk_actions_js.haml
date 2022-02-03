@@ -6,6 +6,12 @@
 
     // initial bulk actions state
     toggleBulkActions();
+
+    //opens transfer modal
+    $('#bulk_transfer').on('click', function(e) {
+      $('#modal_opener').click()
+    });
+
   })();
 
   function allCheckboxes() {
