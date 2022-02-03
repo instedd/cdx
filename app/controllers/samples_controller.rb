@@ -19,7 +19,6 @@ class SamplesController < ApplicationController
       .pluck(:uuid, :name)
       .map{|uuid, name| {value: uuid, label: name}}
 
-    @samples_test = @samples
     @samples = perform_pagination(@samples)
   end
 

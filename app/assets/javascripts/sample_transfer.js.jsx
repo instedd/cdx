@@ -73,12 +73,18 @@ var SampleTransferModal = React.createClass({
 
   sampleRow: function(sampleData) {
     return (
-      <div className="col pe-7 batches-samples">
+      <div className="col batches-samples">
         <div className="samples-row">
-          <div className="samples-item">
-            { sampleData.length > 23 ?
-              sampleData.substring(0, 23) + '...' :
-              sampleData
+          <div className="samples-item transfer-data">
+            { sampleData.uuid.length > 23 ?
+              sampleData.uuid.substring(0, 23) + '...' :
+              sampleData.uuid
+            }
+          </div>
+          <div className="samples-item transfer-data">
+            { sampleData.isolateName.length > 23 ?
+              sampleData.isolateName.substring(0, 23) + '...' :
+              sampleData.isolateName
             }
           </div>
         </div>
@@ -95,10 +101,10 @@ var SampleTransferModal = React.createClass({
 
   render: function() {
     return(
-      <div>
+      <div className="samples-transfer-modal">
         <div className="row">
           <div className="col pe-3"><label>Samples</label></div>
-          <div className="col pe-7">
+          <div className="col">
             {this.batchSamples()}
           </div>
         </div>

@@ -30,12 +30,13 @@
   }
 
   function selectedSamplesIds() {
-    var samples = $('.laboratory-sample-row')
+    var samples = $('.laboratory-sample-row');
     return $.map(samples, function(sample) {
-      var checkbox = $(sample).children().first()
-      var checkboxInput = checkbox.children().first()
-      if(checkboxInput.filter(":checked").length == 1) {
-        return $(sample).children().eq(1).get(0).textContent;
+      var checkboxInput = $(sample).find('input[name="sample_ids[]"]');
+      if(checkboxInput.is(':checked')) {
+        var uuid = $(sample).children('#sample_uuid').text();
+        var isolateName = $(sample).children('#sample_isolate_name').text();
+        return {uuid, isolateName};
       }
      })
   }
