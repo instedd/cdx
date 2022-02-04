@@ -236,4 +236,5 @@ class SamplesController < ApplicationController
       .find(notes_id_to_destroy)
       .all? { |db_note| db_note.user_id == current_user.id }
   end
+
 end
