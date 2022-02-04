@@ -190,22 +190,37 @@ class SamplesController < ApplicationController
     redirect_to samples_path, notice: 'Samples were successfully deleted.'
   end
 
-  def transfer_samples
-    destination_inst = Institution.find_by(uuid: params["institution_id"])
-    params["samples"].each do |sample|
-      sample_identifier = SampleIdentifier.find_by(uuid: sample)
-      to_transfer = Sample.find(sample_identifier.sample_id)
-      if to_transfer.batch_id.nil?
-        to_transfer.institution = destination_inst
-        to_transfer.save!
-      end
+  def transfer
+    new_owner = Institution.find_by(uuid: params["institution_id"])
+    if new_owner.nil?
+      message = "Destination Institution does not exists"
+    else
+      not_transferred = []
+      change_ownership(new_owner, not_transferred)
+      message = (not_transferred.empty?) ? "All samples has been transferred successfully." : "#{not_transferred.length} #{"sample".pluralize(not_transferred.length)} failed on the transfer."
     end
 
-    flash[:notice] = "Samples transferred successfully"
+    flash[:notice] = message
     render json: {status: :ok}
   end
 
   private
+
+  def change_ownership(new_owner, not_transferred)
+    params["samples"].each do |sample|
+      sample_identifier = SampleIdentifier.find_by(uuid: sample)
+      to_transfer = Sample.find(sample_identifier.sample_id)
+      if to_transfer.batch_id.nil?
+        to_transfer.site_id = nil unless to_transfer.site_id.nil?
+        to_transfer.institution = new_owner
+        begin
+          to_transfer.save!
+        rescue
+          not_transferred << to_transfer.uuid
+        end
+      end
+    end
+  end
 
   def sample_params
     sample_params = params.require(:sample).permit(

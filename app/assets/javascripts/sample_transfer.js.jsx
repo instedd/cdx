@@ -44,10 +44,10 @@ var SampleTransferModal = React.createClass({
   transferSamples: function() {
     const data = {
       institution_id: this.state.institutionId,
-      samples: this.state.selectedSamples
+      samples: this.state.selectedSamples.map((sample) => sample.uuid)
     }
     $.ajax({
-      url: '/samples/transfer_samples',
+      url: '/samples/transfer',
       method: 'GET',
       data: data,
       success: function () {
