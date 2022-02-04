@@ -5,6 +5,7 @@ class SampleForm
     [ :institution,
       :site,
       :uuid,
+      :batch,
       :date_produced,
       :lab_technician,
       :specimen_role,

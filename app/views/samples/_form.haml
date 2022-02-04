@@ -9,6 +9,12 @@
           = f.label :uuid
         .col
           .value= f.object.uuid
+      - unless f.object.batch.nil?
+        .row
+          .col.pe-4
+            = f.label :batch_id
+          .col
+            .value= f.object.batch.batch_number
 
       .row
         .col.pe-4
