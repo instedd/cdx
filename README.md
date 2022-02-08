@@ -32,6 +32,17 @@ Reference implementation for the Connected Diagnostics API (http://dxapi.org/)
 	$ docker-compose run --rm web rails r script/loinc_codes/import_csv.rb
 	```
 
+### Creating your first user in localhost
+1. Go to http://localhost:3000
+2. Create your account
+3. You won't receive the email.  Instead, you can confirm your account by following the steps below
+4. With the container up, run this command ```docker-compose exec web bash```
+5. Then run this command ```rails c```
+6. Then run this command ```User.last.confirm!```
+
+This will confirm the last user that was created in your local environment.  Then you should be able to Login normally. 
+
+
 ### Additionally setup for working with devices
 
 1. Import manifests: `bundle exec rake manifests:load`
