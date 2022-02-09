@@ -1,6 +1,7 @@
 require 'machinist/active_record'
 require 'sham'
 require 'faker'
+require_relative "../policy_spec_helper"
 
 class Sham
   # Emulates Machinist 2 serial number
@@ -67,6 +68,14 @@ end
 
 Institution.blueprint(:manufacturer) do
   kind { "manufacturer" }
+end
+
+PendingInstitutionInvite.blueprint do
+  invited_user_email { Faker::Internet.email }
+  invited_by_user { User.make }
+  institution_name { Faker::Name.name }
+  institution_kind { "institution" }
+  status { "pending" }
 end
 
 Device.blueprint do
