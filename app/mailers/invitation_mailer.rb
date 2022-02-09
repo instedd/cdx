@@ -1,6 +1,7 @@
 class InvitationMailer < ApplicationMailer
-  def invite_message(user, role, message)
+  def invite_message(user, invitation_sender, role, message)
     @user = user
+    @invitation_sender = invitation_sender
     @role = role
     @token = user.raw_invitation_token
     @message = message

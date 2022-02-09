@@ -133,7 +133,7 @@ class UsersController < ApplicationController
 
   def send_invitation(message, user)
     mark_as_invited(user)
-    InvitationMailer.invite_message(user, @role, message).deliver_now
+    InvitationMailer.invite_message(user, current_user, @role, message).deliver_now
   end
 
   def mark_as_invited(user)
