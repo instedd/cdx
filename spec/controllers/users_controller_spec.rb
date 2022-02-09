@@ -88,6 +88,109 @@ describe UsersController, type: :controller do
     end
   end
 
+  describe "POST create_with_institution_invite" do
+    it "sends an invitation to a new user" do
+      expect do
+        post :create_with_institution_invite, {
+          user_invite_data: {email: "new@example.com"},
+          institution_data: {name: "New Institution", type: "institution"},
+        }
+      end.to change{User.count}.by(1)
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+      user = User.find_by(email: "new@example.com")
+      expect(user).to be_valid_invitation
+    end
+
+    it "sets first and last name of new user" do
+      post :create_with_institution_invite, {
+        user_invite_data: {email: "new@example.com", firstName: "New", lastName: "User" },
+        institution_data: {name: "New Institution", type: "institution"},
+      }
+      expect(response).to be_success
+      user = User.find_by(email: "new@example.com")
+      expect(user.first_name).to eq "New"
+      expect(user.last_name).to eq "User"
+    end
+
+    it "creates institution invite" do
+      post :create_with_institution_invite, {
+        user_invite_data: {email: "new@example.com" },
+        institution_data: {name: "New Institution", type: "institution"},
+      }
+      invite = PendingInstitutionInvite.first
+      expect(invite.invited_user_email).to eq "new@example.com"
+      expect(invite.invited_by_user).to eq user
+      expect(invite.institution_name).to eq "New Institution"
+      expect(invite.institution_kind).to eq "institution"
+      expect(invite).to be_is_pending
+    end
+
+    it "fails for empty institution name and kind" do
+      expect do
+        post :create_with_institution_invite, {
+          user_invite_data: {email: "new@example.com" },
+          institution_data: {name: "", type: "institution"},
+        }
+      end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Institution name can't be blank")
+
+      expect do
+        post :create_with_institution_invite, {
+          user_invite_data: {email: "new@example.com" },
+          institution_data: {name: "New Institution", type: ""},
+        }
+      end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Institution kind can't be blank, Institution kind is not included in the list")
+
+      expect do
+        post :create_with_institution_invite, {
+          user_invite_data: {email: "new@example.com" },
+          institution_data: {name: "New Institution", type: "foo"},
+        }
+      end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Institution kind is not included in the list")
+    end
+
+    it "fails for empty mail" do
+      expect do
+        post :create_with_institution_invite, {
+          user_invite_data: {email: ""},
+          institution_data: {name: "New Institution", type: "institution"},
+        }
+      end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Invited user email can't be blank")
+    end
+
+    pending "rejects sending to multiple adresses (#1436)" do
+      post :create_with_institution_invite, {
+        user_invite_data: {email: "new@example.com,other@example.com"},
+        institution_data: {name: "New Institution", type: "institution"},
+      }
+      expect(response).not_to be_success
+    end
+
+    context "existing user" do
+      let!(:existing_user) { User.make }
+
+      it "sends invitation" do
+        expect do
+          post :create_with_institution_invite, {
+            user_invite_data: {email: existing_user.email},
+            institution_data: {name: "New Institution", type: "institution"},
+          }
+        end.not_to change{User.count}
+        expect(ActionMailer::Base.deliveries.count).to eq(1)
+        expect(existing_user).not_to be_valid_invitation
+      end
+
+      it "doesn't change first and last name" do
+        post :create_with_institution_invite, {
+          user_invite_data: {email: existing_user.email, firstName: "New", lastName: "User" },
+          institution_data: {name: "New Institution", type: "institution"},
+        }
+        expect(response).to be_success
+        expect(existing_user.first_name).not_to eq "New"
+        expect(existing_user.last_name).not_to eq "User"
+      end
+    end
+  end
+
   describe "GET index" do
 
     let(:role) { Role.first }
