@@ -40,6 +40,51 @@ describe InstitutionsController do
       expect(user.reload.last_navigation_context).to eq(Institution.last.uuid)
     end
 
+    context "institution invite" do
+      it "create with invite" do
+        invite = PendingInstitutionInvite.make(invited_user_email: user.email)
+        post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
+
+        institution = Institution.last
+        expect(response).to redirect_to root_path(context: institution.uuid)
+        expect(institution.name).to eq invite.institution_name
+        expect(institution.kind).to eq invite.institution_kind
+
+        invite.reload
+        expect(invite).not_to be_is_pending
+      end
+
+      it "create with invite, overwriting name and type" do
+        invite = PendingInstitutionInvite.make(invited_user_email: user.email)
+        post :create, {institution: {name: "Institution Override", kind: "manufacturer", pending_institution_invite_id: invite.id}}
+
+        institution = Institution.last
+        expect(response).to redirect_to root_path(context: institution.uuid)
+        expect(institution.name).to eq "Institution Override"
+        expect(institution.kind).to eq "manufacturer"
+
+        invite.reload
+        expect(invite).not_to be_is_pending
+      end
+
+      it "create with invite, not invited user" do
+        invite = PendingInstitutionInvite.make
+        post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
+
+        institution = Institution.last
+        expect(response).to redirect_to root_path(context: institution.uuid)
+
+        invite.reload
+        expect(invite).to be_is_pending
+      end
+
+      it "fails if invite already accepted" do
+        invite = PendingInstitutionInvite.make(invited_user_email: user.email, status: "accepted")
+        expect do
+          post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
+        end.to raise_error(ActionView::MissingTemplate)
+      end
+    end
   end
 
   context "new" do
@@ -63,4 +108,32 @@ describe InstitutionsController do
 
   end
 
+  describe "new_from_invite_data" do
+    it "with invite" do
+      invite = PendingInstitutionInvite.make(invited_user_email: user.email)
+      get :new_from_invite_data, {pending_institution_invite_id: invite.id}
+      expect(response).to be_success
+    end
+
+    it "without invite" do
+      expect do
+        get :new_from_invite_data
+      end.to raise_error(ActionView::MissingTemplate)
+    end
+
+    it "with accepted invite" do
+      invite = PendingInstitutionInvite.make(status: "accepted", invited_user_email: user.email)
+      expect do
+        get :new_from_invite_data, {pending_institution_invite_id: invite.id}
+      end.to raise_error(ActionView::MissingTemplate)
+    end
+
+    it "gets redirect from other page when pending invitation" do
+      dummy_institution = Institution.make # there must be some institution in the database for the redirect to trigger
+      invite = PendingInstitutionInvite.make(invited_user_email: user.email)
+      session[:pending_invite_id] = invite.id
+      get :index
+      expect(response).to redirect_to new_from_invite_data_institutions_path(pending_institution_invite_id: invite.id)
+    end
+  end
 end
