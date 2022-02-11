@@ -12,6 +12,8 @@ end
 class AcceptInvitiation < CdxPageBase
   set_url '/users/invitation/accept{?query*}'
 
+  element :first_name, :field, "First name"
+  element :last_name, :field, "Last name"
   element :password, :field, 'Password'
   element :password_confirmation, :field, 'Password confirmation'
   element :primary, '[value="Set my password"]'
