@@ -9,8 +9,8 @@ RSpec.describe Reports::Base do
 
   let(:current_user) { User.make }
   let(:site_user) { "#{current_user.first_name} #{current_user.last_name}" }
-  let(:user_device) { Device.make institution_id: institution.id, site: site }
-  let(:institution) { Institution.make(user_id: current_user.id) }
+  let(:user_device) { Device.make institution: institution, site: site }
+  let(:institution) { Institution.make(user: current_user) }
   let(:site) { Site.make(institution: institution) }
   let(:query) { {} }
   let(:options) { {} }

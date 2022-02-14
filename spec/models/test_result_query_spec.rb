@@ -6,23 +6,23 @@ describe TestResultQuery, elasticsearch: true do
   let(:user)            {User.make}
   let(:user_2)          {User.make}
 
-  let(:institution)     {Institution.make user_id: user.id}
-  let(:institution_2)   {Institution.make user_id: user.id}
-  let(:institution_3)   {Institution.make user_id: user.id}
+  let(:institution)     {Institution.make user: user}
+  let(:institution_2)   {Institution.make user: user}
+  let(:institution_3)   {Institution.make user: user}
 
   let(:site)      {Site.make institution: institution}
   let(:site_2)    {Site.make institution: institution_2}
   let(:site_3)    {Site.make institution: institution_3}
   let(:site_4)    {Site.make institution: institution}
 
-  let(:site_sub_1) { Site.make institution: institution, parent_id: site.id }
+  let(:site_sub_1) { Site.make institution: institution, parent: site }
 
-  let(:user_device)     {Device.make institution_id: institution.id, site: site}
-  let(:user_device_2)   {Device.make institution_id: institution.id, site: site}
-  let(:user_device_3)   {Device.make institution_id: institution_2.id, site: site_2}
-  let(:user_device_4)   {Device.make institution_id: institution_3.id, site: site_3}
-  let(:user_device_5)   {Device.make institution_id: institution.id, site: site_4}
-  let(:user_device_6)   {Device.make institution_id: institution.id, site: site_sub_1}
+  let(:user_device)     {Device.make institution: institution, site: site}
+  let(:user_device_2)   {Device.make institution: institution, site: site}
+  let(:user_device_3)   {Device.make institution: institution_2, site: site_2}
+  let(:user_device_4)   {Device.make institution: institution_3, site: site_3}
+  let(:user_device_5)   {Device.make institution: institution, site: site_4}
+  let(:user_device_6)   {Device.make institution: institution, site: site_sub_1}
   let(:non_user_device) {Device.make}
 
   let(:core_fields) { {"assays" =>["condition" => "mtb", "result" => :positive]} }
@@ -147,7 +147,7 @@ describe TestResultQuery, elasticsearch: true do
     it "has access to all institutions if superadmin" do
       super_user = User.make
       super_institution = user.create Institution.make_unsaved
-      super_device = Device.make institution_id: super_institution.id
+      super_device = Device.make institution: super_institution
       super_user.grant_superadmin_policy
 
       TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: user_device)])
@@ -175,7 +175,7 @@ describe TestResultQuery, elasticsearch: true do
 
     it "should include names if there is no site" do
       site
-      device = Device.make institution_id: institution.id, site: nil
+      device = Device.make institution: institution, site: nil
       TestResult.create_and_index(core_fields: core_fields, device_messages:[DeviceMessage.make(device: device)])
       refresh_index
 

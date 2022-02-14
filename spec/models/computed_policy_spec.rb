@@ -545,8 +545,8 @@ describe ComputedPolicy do
     let!(:site11) { Site.make :child, parent: site1 }
     let!(:site111) { Site.make :child, parent: site11 }
 
-    let!(:device1) { Device.make site_id: site1.id }
-    let!(:device11) { Device.make site_id: site11.id }
+    let!(:device1) { Device.make site: site1 }
+    let!(:device11) { Device.make site: site11 }
 
     let!(:granter)  { User.make }
     let!(:granter2) { User.make }

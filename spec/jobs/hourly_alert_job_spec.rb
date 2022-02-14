@@ -6,7 +6,7 @@ Sidekiq::Testing.fake!
 
 describe HourlyAlertJob, elasticsearch: true do
   let(:user) {User.make}
-  let(:institution) {Institution.make user_id: user.id}
+  let(:institution) {Institution.make user: user}
   let(:worker) { HourlyAlertJob.new }
 
   context "end to end alert aggregation test" do

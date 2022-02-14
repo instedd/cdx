@@ -5,7 +5,7 @@ Sidekiq::Testing.fake!
 
 describe HourlyUtilizationEfficiencyJob, elasticsearch: true do
   let(:user) {User.make}
-  let(:institution) {Institution.make user_id: user.id}
+  let(:institution) {Institution.make user: user}
   let(:worker) { HourlyUtilizationEfficiencyJob.new }
 
   context "end to end alert Utilization Efficiency test" do

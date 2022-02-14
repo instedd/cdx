@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
   let(:user) {User.make}
-  let(:institution) {Institution.make user_id: user.id}
+  let(:institution) {Institution.make user: user}
 
   before(:each) {sign_in user}
 

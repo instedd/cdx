@@ -506,8 +506,8 @@ describe Policy do
       let!(:site11) { Site.make :child, parent: site1 }
       let!(:site111) { Site.make :child, parent: site11 }
 
-      let!(:device1) { Device.make site_id: site1.id }
-      let!(:device11) { Device.make site_id: site11.id }
+      let!(:device1) { Device.make site: site1 }
+      let!(:device11) { Device.make site: site11 }
 
       let!(:user2) { User.make }
 
@@ -757,19 +757,19 @@ describe Policy do
       let!(:user2) { User.make }
 
       let!(:site)  { Site.make institution: institution }
-      let!(:device)      { Device.make institution_id: institution.id, site: site }
+      let!(:device)      { Device.make institution: institution, site: site }
       let!(:test_result) { TestResult.make device_messages: [DeviceMessage.make(device: device)]}
 
       let!(:institution2) { user.institutions.make }
       let!(:site2)  { Site.make institution: institution2 }
-      let!(:device2)      { Device.make institution_id: institution2.id, site: site2 }
+      let!(:device2)      { Device.make institution: institution2, site: site2 }
       let!(:test_result2) { TestResult.make device_messages: [DeviceMessage.make(device: device2)]}
 
       let!(:institution3) { user.institutions.make }
       let!(:site3) { Site.make institution: institution3 }
-      let!(:device3) { Device.make institution_id: institution3.id, site: site3 }
-      let!(:site3_1) { Site.make institution: institution3, parent_id: site3.id }
-      let!(:device3_1) { Device.make institution_id: institution3.id, site: site3_1 }
+      let!(:device3) { Device.make institution: institution3, site: site3 }
+      let!(:site3_1) { Site.make institution: institution3, parent: site3 }
+      let!(:device3_1) { Device.make institution: institution3, site: site3_1 }
       let!(:test_result3) { TestResult.make device_messages: [DeviceMessage.make(device: device3)]}
       let!(:test_result3_1) { TestResult.make device_messages: [DeviceMessage.make(device: device3_1)]}
 

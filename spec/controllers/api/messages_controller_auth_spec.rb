@@ -3,8 +3,8 @@ require 'spec_helper'
 describe Api::MessagesController, elasticsearch: true, validate_manifest: false do
 
   let(:user) {User.make}
-  let(:institution) {Institution.make user_id: user.id}
-  let(:device) {Device.make institution_id: institution.id}
+  let(:institution) {Institution.make user: user}
+  let(:device) {Device.make institution: institution}
   let(:data)  {Oj.dump test:{assays: [result: :positive]} }
 
   context "Authentication" do

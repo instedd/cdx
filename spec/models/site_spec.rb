@@ -82,10 +82,10 @@ describe Site do
   describe "roles" do
     it "creates predefined roles for site" do
       user = User.make
-      institution = Institution.make user_id: user.id
+      institution = Institution.make user: user
       site = nil
       expect {
-        site = Site.make institution_id: institution.id
+        site = Site.make institution: institution
       }.to change(Role, :count).by(4)
       roles = Role.where(site_id: site.id).all
       roles.each do |role|
@@ -95,8 +95,8 @@ describe Site do
 
     it "renames predefined roles for site on update" do
       user = User.make
-      institution = Institution.make user_id: user.id
-      site = Site.make institution_id: institution.id
+      institution = Institution.make user: user
+      site = Site.make institution: institution
       site.name = "New site"
       site.save!
 
@@ -111,8 +111,8 @@ describe Site do
 
     it "deletes all roles when destroyed" do
       user = User.make
-      institution = Institution.make user_id: user.id
-      site = Site.make institution_id: institution.id
+      institution = Institution.make user: user
+      site = Site.make institution: institution
       expect {
         site.destroy
       }.to change(Role, :count).by(-4)

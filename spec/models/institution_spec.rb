@@ -7,16 +7,16 @@ describe Institution do
     it "creates predefined roles for institution" do
       institution = nil
       expect {
-        institution = Institution.make user_id: user.id
+        institution = Institution.make user: user
       }.to change(Role, :count).by(2)
-      roles = Role.where(institution_id: institution.id).all
+      roles = Role.where(institution: institution).all
       roles.each do |role|
         expect(role.key).not_to eq(nil)
       end
     end
 
     it "renames predefined roles for institution on update" do
-      institution = Institution.make user_id: user.id
+      institution = Institution.make user: user
       institution.name = "New Institution"
       institution.save!
 
@@ -30,7 +30,7 @@ describe Institution do
     end
 
     it "deletes all roles when destroyed" do
-      institution = Institution.make user_id: user.id
+      institution = Institution.make user: user
       expect {
         institution.destroy
       }.to change(Role, :count).by(-2)

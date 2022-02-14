@@ -3,9 +3,9 @@ require 'spec_helper'
 describe Api::MessagesController, elasticsearch: true, validate_manifest: false do
 
   let(:user) {User.make}
-  let(:institution) {Institution.make user_id: user.id}
+  let(:institution) {Institution.make user: user}
   let(:site) {Site.make institution: institution}
-  let(:device) {Device.make institution_id: institution.id, site: site}
+  let(:device) {Device.make institution: institution, site: site}
   let(:data)  {Oj.dump test: {assays: [result: :positive]}}
   let(:datas) {Oj.dump [
     {test: {assays: [result: :positive]}},
@@ -184,7 +184,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "merges pii from different tests in the same sample across devices" do
-      device2 = Device.make institution_id: institution.id, device_model: device.device_model, site: site
+      device2 = Device.make institution: institution, device_model: device.device_model, site: site
       device.manifest.update! definition: %{{
         "metadata" : {
           "version" : 1,

@@ -4,9 +4,9 @@ require 'fileutils'
 
 describe DeviceMessageImporter, elasticsearch: true do
   let(:user) { User.make }
-  let(:institution) { Institution.make user_id: user.id }
+  let(:institution) { Institution.make user: user }
   let(:device_model) { DeviceModel.make name: 'test_model' }
-  let(:device) { Device.make institution_id: institution.id, device_model: device_model }
+  let(:device) { Device.make institution: institution, device_model: device_model }
   let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
   let(:inbox) { sync_dir.inbox_path(device.uuid) }
 

@@ -9,18 +9,18 @@ describe TestResultsController, elasticsearch: true do
   let(:location) { Location.make parent: root_location }
   let(:site)     { Site.make institution: institution, location: location }
   let(:subsite)  { Site.make institution: institution, location: location, parent: site }
-  let(:device)   { Device.make institution_id: institution.id, site: site }
+  let(:device)   { Device.make institution: institution, site: site }
 
   let(:site2)    { Site.make institution: institution, location: location }
-  let(:device2)  { Device.make institution_id: institution.id, site: site2 }
+  let(:device2)  { Device.make institution: institution, site: site2 }
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }
 
   let(:other_user)        { User.make }
-  let(:other_institution) { Institution.make user_id: other_user.id }
+  let(:other_institution) { Institution.make user: other_user }
   let(:other_site)  { Site.make institution: other_institution }
-  let(:other_device)      { Device.make institution_id: other_institution.id, site: other_site }
+  let(:other_device)      { Device.make institution: other_institution, site: other_site }
 
   it "should display an empty page when there are no test results" do
     response = get :index
@@ -58,7 +58,7 @@ describe TestResultsController, elasticsearch: true do
 
     it "should show all tests for site" do
       user.update_attribute(:last_navigation_context, site.uuid)
-      device2 = Device.make institution_id: institution.id, site: subsite
+      device2 = Device.make institution: institution, site: subsite
 
       test_result = TestResult.create_and_index device: device
       test_result_subsite = TestResult.create_and_index device: device2
@@ -68,7 +68,7 @@ describe TestResultsController, elasticsearch: true do
     end
 
     it "with exclusion should show only tests for site, not subsites" do
-      device2 = Device.make institution_id: institution.id, site: subsite
+      device2 = Device.make institution: institution, site: subsite
 
       test_result = TestResult.create_and_index device: device
       test_result_subsite = TestResult.create_and_index device: device2
@@ -264,9 +264,9 @@ describe TestResultsController, elasticsearch: true do
   describe "show single test result" do
 
     let!(:owner) { User.make }
-    let!(:institution) { Institution.make user_id: owner.id }
+    let!(:institution) { Institution.make user: owner }
     let!(:site)  { Site.make institution: institution }
-    let!(:device) { Device.make institution_id: institution.id, site: site }
+    let!(:device) { Device.make institution: institution, site: site }
 
     let!(:test_result) do
       TestResult.create_and_index(
@@ -276,9 +276,9 @@ describe TestResultsController, elasticsearch: true do
     end
 
     let!(:user) { User.make }
-    let!(:other_institution) { Institution.make user_id: user.id }
+    let!(:other_institution) { Institution.make user: user }
     let!(:other_site)  { Site.make institution: other_institution }
-    let!(:other_device) { Device.make institution_id: other_institution.id, site: other_site }
+    let!(:other_device) { Device.make institution: other_institution, site: other_site }
 
     before(:each) { sign_in user }
     let(:default_params) { {context: other_institution.uuid} }

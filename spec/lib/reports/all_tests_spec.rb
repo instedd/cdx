@@ -2,13 +2,13 @@ require 'spec_helper'
 
 RSpec.describe Reports::AllTests, elasticsearch: true do
   let(:current_user) { User.make }
-  let(:institution) { Institution.make(user_id: current_user.id) }
+  let(:institution) { Institution.make(user: current_user) }
   let(:site) { Site.make(institution: institution) }
   let(:current_user_two) { User.make }
-  let(:institution_two) { Institution.make(user_id: current_user_two.id) }
+  let(:institution_two) { Institution.make(user: current_user_two) }
   let(:site_two) { Site.make(institution: institution_two) }
-  let(:user_device) { Device.make institution_id: institution.id, site: site }
-  let(:user_device_two) { Device.make institution_id: institution_two.id, site: site_two }
+  let(:user_device) { Device.make institution: institution, site: site }
+  let(:user_device_two) { Device.make institution: institution_two, site: site_two }
 
   let(:nav_context) { NavigationContext.new(current_user, institution.uuid) }
   let(:options) { {} }
