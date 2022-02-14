@@ -9,27 +9,30 @@ class InvitationMailerPreview < ActionMailer::Preview
   end
 
   def create_institution_message
-    invite = PendingInstitutionInvite.new
-    invite.id = 12345
-    current_user = User.new(email: "existing@example.com", first_name: "Current", last_name: "User")
-    invite.invited_by_user = current_user
-    invite.invited_user_email = "new@example.com"
-    invite.institution_name = "New Institution"
-    invite.institution_kind = "institution"
-    new_user = User.new(email: "new@example.com")
-    InvitationMailer.create_institution_message(new_user, current_user, invite, "custom message")
+    sender = User.new(email: "existing@example.com", first_name: "Current", last_name: "User")
+    invitee = User.new(email: "new@example.com")
+    invite = PendingInstitutionInvite.new(
+      id: 12345,
+      invited_by_user: sender,
+      invited_user_email: invitee.email,
+      institution_name: "New Institution",
+      institution_kind: "institution",
+    )
+    InvitationMailer.create_institution_message(invitee, sender, invite, "custom message")
   end
 
   def invite_institution_message
-    invite = PendingInstitutionInvite.new
-    invite.id = 12345
-    current_user = User.new(email: "existing@example.com", first_name: "Current", last_name: "User")
-    invite.invited_by_user = current_user
-    invite.invited_user_email = "new@example.com"
-    invite.institution_name = "New Institution"
-    invite.institution_kind = "institution"
-    new_user = User.new(email: "new@example.com")
-    new_user.__send__(:generate_invitation_token)
-    InvitationMailer.invite_institution_message(new_user, current_user, invite, "custom message")
+    sender = User.new(email: "existing@example.com", first_name: "Current", last_name: "User")
+    invitee = User.new(email: "new@example.com")
+    invitee.__send__(:generate_invitation_token)
+    invite = PendingInstitutionInvite.new(
+      id: 12345,
+      invited_by_user: sender,
+      invited_user_email: invitee.email,
+      institution_name: "New Institution",
+      institution_kind: "institution",
+    )
+
+    InvitationMailer.invite_institution_message(invitee, sender, invite, "custom message")
   end
 end
