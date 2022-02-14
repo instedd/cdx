@@ -4,21 +4,21 @@ require 'policy_spec_helper'
 RSpec.describe User, type: :model do
   describe '.full_name' do
     it 'concatenates the users first and last name' do
-      user = User.make(first_name: 'Roger', last_name: 'Melly')
+      user = User.make_unsaved(first_name: 'Roger', last_name: 'Melly')
       expect(user.full_name).to eq('Roger Melly')
     end
   end
 
   describe '.invited_pending?' do
     context 'when outstanding invitation' do
-      let(:user) { User.make(:invited_pending) }
+      let(:user) { User.make_unsaved(:invited_pending) }
       it 'is truthy' do
         expect(user.invited_pending?).to be_truthy
       end
     end
 
     context 'when no outstanding invitation' do
-      let(:user) { User.make }
+      let(:user) { User.make_unsaved }
       it 'is falsey' do
         expect(user.invited_pending?).to be_falsey
       end
@@ -26,7 +26,7 @@ RSpec.describe User, type: :model do
   end
 
   describe '.active_for_authentication?' do
-    let(:user) { User.make(is_active: false) }
+    let(:user) { User.make_unsaved(is_active: false) }
     it 'is falsey when is_active flag is :false' do
       expect(user.active_for_authentication?).to be_falsey
     end
