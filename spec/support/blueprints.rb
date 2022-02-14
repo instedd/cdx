@@ -1,6 +1,6 @@
 require 'machinist/active_record'
 require 'sham'
-require 'faker'
+require 'ffaker'
 require_relative "../policy_spec_helper"
 
 class Sham
@@ -18,24 +18,24 @@ SampleSshKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4'+
           'X8f1ohAZ9IG41hwIOvB5UcrFenqYIpMPBCCOnizUcyIFJhegJDWh2oWlBo041emGOX3VCRjtGug3 fbulgarelli@Manass-MacBook-2.local'
 
 Sham.define do
-  name { Faker::Name.name }
-  email { Faker::Internet.email }
-  password { Faker::Name.name }
-  url { Faker::Internet.url }
+  name { FFaker::Name.name }
+  email { FFaker::Internet.email }
+  password { FFaker::Name.name }
+  url { FFaker::Internet.uri("http") }
 end
 
 User.blueprint do
   email
   password
-  first_name { Faker::Name.first_name }
-  last_name { Faker::Name.last_name }
+  first_name { FFaker::Name.first_name }
+  last_name { FFaker::Name.last_name }
   password_confirmation { password }
   confirmed_at { Time.now - 1.day }
 end
 
 Alert.blueprint do
-  name { Faker::Name.first_name }
-  description { Faker::Name.last_name }
+  name { FFaker::Name.first_name }
+  description { FFaker::Name.last_name }
   message { 'test message' }
   category_type {"anomalies"}
   sms_limit {10000}
@@ -227,12 +227,12 @@ Site.blueprint do
   institution
   name
   location_geoid { object.location.try(:id) || LocationService.repository.make.id }
-  address { Faker::Address.street_address }
-  city { Faker::Address.city }
-  state { Faker::Address.state }
-  zip_code { Faker::Address.zip_code }
-  country { Faker::Address.country }
-  region { Faker::Address.state }
+  address { FFaker::Address.street_address }
+  city { FFaker::Address.city }
+  state { FFaker::AddressUS.state }
+  zip_code { FFaker::AddressUS.zip_code }
+  country { FFaker::Address.country }
+  region { FFaker::AddressUS.state }
   lat { rand(-180..180) }
   lng { rand(-90..90) }
 end

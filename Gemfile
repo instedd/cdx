@@ -86,7 +86,8 @@ gem 'dotiw'
 gem 'rails-i18n', '~> 4.0.0'
 gem 'doorkeeper'
 
-gem 'faker'
+gem 'faker' # NOTE: until we upgrade to ruby 2.5+ then we can upgrade to ffaker 2.20 to replace Faker::Number
+gem 'ffaker'
 gem 'leaflet-rails'
 
 gem 'nuntium_api', '~> 0.21'
