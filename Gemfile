@@ -68,8 +68,6 @@ gem 'sidekiq-cron', '~> 0.3.1'
 group :development do
   gem 'letter_opener'
   gem 'web-console', '~> 2.0'
-  gem 'spring'
-  gem 'spring-commands-rspec'
   gem 'quiet_assets'
 end
 
@@ -103,6 +101,8 @@ group :development, :test do
   gem 'pry-stack_explorer'
   gem 'pry-clipboard'
   gem 'rspec-rails'
+  gem 'spring'
+  gem 'spring-commands-rspec'
 end
 
 group :test do
