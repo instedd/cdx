@@ -60,7 +60,7 @@ describe "invite user" do
     ActionMailer::Base.deliveries.count
   end
 
-  describe "insitution invite" do
+  describe "institution invite" do
     context "new user" do
       let!(:new_user) {
         User.make(:invited_pending).tap do |user|
