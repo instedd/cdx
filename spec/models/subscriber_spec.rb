@@ -3,13 +3,13 @@ require 'policy_spec_helper'
 
 describe Subscriber, elasticsearch: true do
 
-  let(:model){DeviceModel.make}
-  let(:device){Device.make device_model: model}
-  let(:device_message){DeviceMessage.make(device: device)}
+  let(:model){DeviceModel.make!}
+  let(:device){Device.make! device_model: model}
+  let(:device_message){DeviceMessage.make!(device: device)}
   let(:institution){device.institution}
   let(:site){device.site}
 
-  let!(:filter) { Filter.make query: {"test.assays.condition" => "mtb", "site.uuid" => site.uuid}, user: institution.user}
+  let!(:filter) { Filter.make! query: {"test.assays.condition" => "mtb", "site.uuid" => site.uuid}, user: institution.user}
   let!(:manifest) {
     manifest = Manifest.create! device_model: model, definition: %{
       {
@@ -35,7 +35,7 @@ describe Subscriber, elasticsearch: true do
   it "generates a correct filter_test GET query with specified fields" do
     fields = ["test.assays", "patient.gender"]
     url = "http://subscriber/cdp_trigger"
-    subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'GET'
+    subscriber = Subscriber.make! fields: fields, url: url, filter: filter, verb: 'GET'
     callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5B0%5D%5Bcondition%5D=mtb&test%5Bassays%5D%5B1%5D%5Bname%5D=mtb&test%5Bassays%5D%5B2%5D%5Bresult%5D=positive"
     callback_request = stub_request(:get, callback_query).to_return(status: 200, body: "", headers: {})
 
@@ -47,7 +47,7 @@ describe Subscriber, elasticsearch: true do
   it "generates a correct filter_test POST query with specified fields" do
     fields = ["test.assays", "patient.gender"]
     url = "http://subscriber/cdp_trigger?token=48"
-    subscriber = Subscriber.make fields: fields, url: url, filter: filter, verb: 'POST'
+    subscriber = Subscriber.make! fields: fields, url: url, filter: filter, verb: 'POST'
     callback_request = stub_request(:post, url)
       .with(body: {
         test: { assays: [{result:"positive", condition:"mtb", name:"mtb"}] },
@@ -62,7 +62,7 @@ describe Subscriber, elasticsearch: true do
 
   it "generates a correct filter_test POST query with all fields" do
     url = "http://subscriber/cdp_trigger?token=48"
-    subscriber = Subscriber.make fields: [], url: url, filter: filter, verb: 'POST'
+    subscriber = Subscriber.make! fields: [], url: url, filter: filter, verb: 'POST'
     callback_request = stub_request(:post, url).to_return(:status => 200, :body => "", :headers => {})
 
     submit_test
@@ -84,23 +84,23 @@ describe Subscriber, elasticsearch: true do
   end
 
   it "creates percolator for each subscriber" do
-    subscriber = Subscriber.make filter: filter, user: institution.user
+    subscriber = Subscriber.make! filter: filter, user: institution.user
     percolator = Cdx::Api.client.get index: Cdx::Api.index_name_pattern, type: '.percolator', id: subscriber.id
     expect(percolator["_source"]).to eq({query: filter.create_query.elasticsearch_query, type: 'test'}.with_indifferent_access)
   end
 
   it "updates percolator when the filter changes" do
-    subscriber = Subscriber.make filter: filter, user: institution.user
+    subscriber = Subscriber.make! filter: filter, user: institution.user
     filter.update_attributes! query: {"test.assays.condition" => "mtb"}
     percolator = Cdx::Api.client.get index: Cdx::Api.index_name_pattern, type: '.percolator', id: subscriber.id
     expect(percolator["_source"]).to eq({query: filter.create_query.elasticsearch_query, type: 'test'}.with_indifferent_access)
   end
 
   it "updates percolator when policies are changed" do
-    user2 = User.make
-    filter2 = Filter.make query: {"test.assays.condition" => "mtb", "site.uuid" => site.uuid}, user: user2
+    user2 = User.make!
+    filter2 = Filter.make! query: {"test.assays.condition" => "mtb", "site.uuid" => site.uuid}, user: user2
     url = "http://subscriber/cdp_trigger?token=48"
-    subscriber = Subscriber.make filter: filter2, user: user2, fields: [], url: url, verb: 'POST'
+    subscriber = Subscriber.make! filter: filter2, user: user2, fields: [], url: url, verb: 'POST'
     callback_request = stub_request(:post, url).to_return(:status => 200, :body => "", :headers => {})
     grant(institution.user, user2, "testResult?device=#{device.id}", Policy::Actions::QUERY_TEST)
 
@@ -110,7 +110,7 @@ describe Subscriber, elasticsearch: true do
   end
 
   it "deletes percolator when the subscriber is deleted" do
-    subscriber = Subscriber.make filter: filter, user: institution.user
+    subscriber = Subscriber.make! filter: filter, user: institution.user
     subscriber.destroy
     refresh_index
     result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
@@ -118,13 +118,13 @@ describe Subscriber, elasticsearch: true do
   end
 
   def submit_test
-    patient = Patient.make(
+    patient = Patient.make!(
       core_fields: {"gender" => "male"},
       institution: institution
     )
 
-    sample = Sample.make patient: patient, institution: institution
-    sample_identifier = SampleIdentifier.make sample: sample
+    sample = Sample.make! patient: patient, institution: institution
+    sample_identifier = SampleIdentifier.make! sample: sample
 
     TestResult.create_and_index(
       patient: patient, sample_identifier: sample_identifier,

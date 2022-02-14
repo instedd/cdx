@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe DeviceMessage, elasticsearch: true do
-  let(:device) { Device.make device_model: DeviceModel.make }
+  let(:device) { Device.make! device_model: DeviceModel.make! }
 
   it 'stores failed messages with raw data when it hits an issue parsing a manifest' do
     manifest = Manifest.create! device_model: device.device_model, definition: %{
@@ -78,7 +78,7 @@ describe DeviceMessage, elasticsearch: true do
   end
 
   context 'reprocess' do
-    let(:device_message) { DeviceMessage.make }
+    let(:device_message) { DeviceMessage.make! }
 
     before(:each) do
       expect(device_message).to receive(:clear_errors)
@@ -101,17 +101,17 @@ describe DeviceMessage, elasticsearch: true do
   end
 
   context "within" do
-    let!(:site) { Site.make }
-    let!(:subsite) { Site.make parent: site, institution: site.institution }
-    let!(:other_site) { Site.make }
-    let!(:device1) { Device.make site: site, institution: site.institution }
-    let!(:device2) { Device.make site: subsite, institution: site.institution }
-    let!(:device3) { Device.make site: other_site, institution: other_site.institution }
-    let!(:device4) { Device.make site: nil, institution: site.institution }
-    let!(:device_message1) { DeviceMessage.make device: device1 }
-    let!(:device_message2) { DeviceMessage.make device: device2 }
-    let!(:device_message3) { DeviceMessage.make device: device3 }
-    let!(:device_message4) { DeviceMessage.make device: device4 }
+    let!(:site) { Site.make! }
+    let!(:subsite) { Site.make! parent: site, institution: site.institution }
+    let!(:other_site) { Site.make! }
+    let!(:device1) { Device.make! site: site, institution: site.institution }
+    let!(:device2) { Device.make! site: subsite, institution: site.institution }
+    let!(:device3) { Device.make! site: other_site, institution: other_site.institution }
+    let!(:device4) { Device.make! site: nil, institution: site.institution }
+    let!(:device_message1) { DeviceMessage.make! device: device1 }
+    let!(:device_message2) { DeviceMessage.make! device: device2 }
+    let!(:device_message3) { DeviceMessage.make! device: device3 }
+    let!(:device_message4) { DeviceMessage.make! device: device4 }
 
     it "institution, no exclusion, should show device messages from site, subsites and no site" do
       expect(DeviceMessage.within(site.institution).to_a).to eq([device_message1, device_message2, device_message4])

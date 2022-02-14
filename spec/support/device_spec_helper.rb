@@ -2,7 +2,7 @@ class DeviceSpecHelper
   attr_reader :device_model
 
   def initialize(name)
-    @device_model = DeviceModel.make name: name
+    @device_model = DeviceModel.make! name: name
     @sync_dir = CDXSync::SyncDirectory.new(Dir.mktmpdir('sync'))
 
     load_manifest @device_model, "#{name}_manifest.json"
@@ -10,8 +10,8 @@ class DeviceSpecHelper
     @sync_dir.ensure_sync_path!
   end
 
-  def make(attributes = {})
-    device = Device.make({device_model: device_model}.merge(attributes))
+  def make!(attributes = {})
+    device = Device.make!({device_model: device_model}.merge(attributes))
 
     @sync_dir.ensure_client_sync_paths! device.uuid
 

@@ -10,11 +10,11 @@ RSpec.describe Reports::Grouped do
     end
   end
 
-  let(:current_user) { User.make }
+  let(:current_user) { User.make! }
   let(:site_user) { "#{current_user.first_name} #{current_user.last_name}" }
-  let(:user_device) { Device.make institution: institution, site: site }
-  let(:institution) { Institution.make(user: current_user) }
-  let(:site) { Site.make(institution: institution) }
+  let(:user_device) { Device.make! institution: institution, site: site }
+  let(:institution) { Institution.make!(user: current_user) }
+  let(:site) { Site.make!(institution: institution) }
   let(:nav_context) { NavigationContext.new(current_user, site.uuid) }
   let(:filter) do
     {

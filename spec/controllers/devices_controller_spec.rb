@@ -2,24 +2,24 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe DevicesController do
-  let!(:institution) {Institution.make}
+  let!(:institution) {Institution.make!}
   let!(:user) {institution.user}
-  let!(:site) {institution.sites.make}
-  let!(:device_model) {DeviceModel.make(institution: Institution.make(:manufacturer))}
-  let!(:manifest) {Manifest.make(device_model: device_model)}
-  let!(:device) {Device.make institution: institution, site: site, device_model: device_model}
-  let!(:other_institution) {Institution.make user: user}
-  let!(:other_site) {other_institution.sites.make}
+  let!(:site) {Site.make! institution: institution}
+  let!(:device_model) {DeviceModel.make!(institution: Institution.make!(:manufacturer))}
+  let!(:manifest) {Manifest.make!(device_model: device_model)}
+  let!(:device) {Device.make! site: site, device_model: device_model}
+  let!(:other_institution) {Institution.make! user: user}
+  let!(:other_site) {Site.make!(institution: other_institution)}
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }
 
   context "Index" do
 
-    let!(:user2) {User.make}
-    let!(:institution2) {Institution.make user: user2}
-    let!(:site2) {institution2.sites.make}
-    let!(:device2) {site2.devices.make}
+    let!(:user2) {User.make!}
+    let!(:institution2) {Institution.make! user: user2}
+    let!(:site2) {Site.make!(institution: institution2)}
+    let!(:device2) {Device.make!(site: site2)}
 
     it "should diplay index" do
       get :index
@@ -36,7 +36,7 @@ describe DevicesController do
     end
 
     it "should display index filtered by institution" do
-      other_device = Device.make institution: other_institution
+      other_device = Device.make! institution: other_institution
 
       get :index, context: other_institution.uuid
       expect(response).to be_success
@@ -44,8 +44,8 @@ describe DevicesController do
     end
 
     it "should display index filtered by site" do
-      other_site = Site.make institution: institution
-      other_device = Device.make site: other_site
+      other_site = Site.make! institution: institution
+      other_device = Device.make! site: other_site
 
       get :index, context: other_site.uuid
       expect(response).to be_success
@@ -53,12 +53,12 @@ describe DevicesController do
     end
 
     it "should display index filtered by manufacturer" do
-      manufacturer = Institution.make
+      manufacturer = Institution.make!
       device2.device_model.tap do |device_model|
         device_model.institution = manufacturer
         device_model.save!
       end
-      Device.make institution: institution2
+      Device.make! institution: institution2
 
       grant user2, user, [Institution.resource_name, Device.resource_name], "*"
 
@@ -100,7 +100,7 @@ describe DevicesController do
     end
 
     it "should download all pages" do
-      devices = 30.times.map { |i| Device.make institution: institution, site: site, device_model: device_model }
+      devices = 30.times.map { |i| Device.make! site: site, device_model: device_model }
       get :index, format: :csv
       expect(response).to be_success
 
@@ -112,9 +112,9 @@ describe DevicesController do
 
   context "Index when devices have no sites" do
 
-    let!(:user2) {User.make}
-    let!(:institution2) {Institution.make user: user2}
-    let!(:device2) {institution2.devices.make site: nil}
+    let!(:user2) {User.make!}
+    let!(:institution2) {Institution.make! user: user2}
+    let!(:device2) {Device.make! institution: institution2, site: nil}
     let(:default_params) { {context: institution2.uuid} }
 
     it "should display devices without sites when selecting institution" do
@@ -126,12 +126,12 @@ describe DevicesController do
     end
 
     it "should display manufacturers used by the devices in the current context despite manufacturer filter" do
-      device_model2 = DeviceModel.make institution: Institution.make
-      device2 = Device.make institution: institution, site: site, device_model: device_model2
+      device_model2 = DeviceModel.make! institution: Institution.make!
+      device2 = Device.make! site: site, device_model: device_model2
 
-      site3 = institution.sites.make
-      device_model3 = DeviceModel.make institution: Institution.make
-      device3 = Device.make institution: institution, site: site3, device_model: device_model3
+      site3 = Site.make! institution: institution
+      device_model3 = DeviceModel.make! institution: Institution.make!
+      device3 = Device.make! site: site3, device_model: device_model3
 
       get :index, context: institution.uuid, manufacturer: device_model2.institution.id
       expect(assigns(:manufacturers)).to match_array([device_model.institution, device_model2.institution, device_model3.institution])
@@ -162,8 +162,8 @@ describe DevicesController do
 
     it "loads published device models and from allowed institutions" do
       published = device_model
-      unpublished = institution.device_models.make(:unpublished)
-      other_unpublished = DeviceModel.make(:unpublished, institution: Institution.make)
+      unpublished = DeviceModel.make!(:unpublished, institution: institution)
+      other_unpublished = DeviceModel.make!(:unpublished, institution: Institution.make!)
 
       get :new
       expect(assigns(:device_models)).to contain_exactly(published, unpublished)
@@ -171,18 +171,18 @@ describe DevicesController do
 
     it "loads unpublished device models only of context institution" do
       published = device_model
-      unpublished = institution.device_models.make(:unpublished)
-      other_institution = Institution.make(user: user)
-      other_unpublished = DeviceModel.make(:unpublished, institution: other_institution)
+      unpublished = DeviceModel.make!(:unpublished, institution: institution)
+      other_institution = Institution.make!(user: user)
+      other_unpublished = DeviceModel.make!(:unpublished, institution: other_institution)
 
       get :new, context: other_institution.uuid
       expect(assigns(:device_models)).to contain_exactly(published, other_unpublished)
     end
 
     it "loads all sites from allowed institutions in context" do
-      yet_another_institution = Institution.make
-      site1 = yet_another_institution.sites.make
-      site2 = yet_another_institution.sites.make
+      yet_another_institution = Institution.make!
+      site1 = Site.make!(institution: yet_another_institution)
+      site2 = Site.make!(institution: yet_another_institution)
 
       grant yet_another_institution.user, user, yet_another_institution, READ_INSTITUTION
       grant yet_another_institution.user, user, yet_another_institution, REGISTER_INSTITUTION_DEVICE
@@ -202,9 +202,9 @@ describe DevicesController do
 
     it "loads published device models and from device institution" do
       published = device_model
-      unpublished = institution.device_models.make(:unpublished)
-      other_user_institution = user.institutions.make
-      other_unpublished = other_user_institution.device_models.make(:unpublished)
+      unpublished = DeviceModel.make!(:unpublished, institution: institution)
+      other_user_institution = Institution.make!(user: user)
+      other_unpublished = DeviceModel.make!(:unpublished, institution: other_user_institution)
 
       get :edit, id: device.id
       expect(assigns(:device_models)).to contain_exactly(published, unpublished)
@@ -243,7 +243,7 @@ describe DevicesController do
 
   context "Show" do
     it "shows tests when there are device messages" do
-      device.device_messages.make
+      DeviceMessage.make!(device: device)
       get :show, id: device.id
       expect(response).to be_success
     end

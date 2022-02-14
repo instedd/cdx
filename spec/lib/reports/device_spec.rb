@@ -1,15 +1,15 @@
 require 'spec_helper'
 
 RSpec.describe Reports::Devices, elasticsearch: true do
-  let(:current_user) { User.make }
+  let(:current_user) { User.make! }
   let(:site_user) { "#{current_user.first_name} #{current_user.last_name}" }
-  let(:institution) { Institution.make(user: current_user) }
-  let(:site) { Site.make(institution: institution) }
-  let(:current_user_two) { User.make }
-  let(:institution_two) { Institution.make(user: current_user_two) }
-  let(:site_two) { Site.make(institution: institution_two) }
-  let(:user_device) { Device.make institution: institution, site: site }
-  let(:user_device_two) { Device.make institution: institution_two, site: site_two }
+  let(:institution) { Institution.make!(user: current_user) }
+  let(:site) { Site.make!(institution: institution) }
+  let(:current_user_two) { User.make! }
+  let(:institution_two) { Institution.make!(user: current_user_two) }
+  let(:site_two) { Site.make!(institution: institution_two) }
+  let(:user_device) { Device.make! institution: institution, site: site }
+  let(:user_device_two) { Device.make! institution: institution_two, site: site_two }
 
   let(:nav_context) { NavigationContext.new(current_user, institution.uuid) }
 
@@ -22,7 +22,7 @@ RSpec.describe Reports::Devices, elasticsearch: true do
         'name' => 'mtb',
         'site_user' => site_user
       },
-      device_messages:[DeviceMessage.make(device: user_device)]
+      device_messages:[DeviceMessage.make!(device: user_device)]
     )
 
     TestResult.create_and_index(
@@ -33,7 +33,7 @@ RSpec.describe Reports::Devices, elasticsearch: true do
         'name' => 'mtb',
         'site_user' => site_user
       },
-      device_messages:[DeviceMessage.make(device: user_device)]
+      device_messages:[DeviceMessage.make!(device: user_device)]
     )
 
     TestResult.create_and_index(
@@ -44,12 +44,12 @@ RSpec.describe Reports::Devices, elasticsearch: true do
         'name' => 'man_flu',
         'status' => 'error'
       },
-      device_messages:[DeviceMessage.make(device: user_device)]
+      device_messages:[DeviceMessage.make!(device: user_device)]
     )
 
     TestResult.create_and_index(
       core_fields: { 'assays' => ['condition' => 'mtb', 'result' => :negative] },
-      device_messages:[DeviceMessage.make(device: user_device_two)]
+      device_messages:[DeviceMessage.make!(device: user_device_two)]
     )
     
     refresh_index

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe "roles", elasticsearch: true do
-  let!(:institution) { Institution.make }
+  let!(:institution) { Institution.make! }
   let!(:user) { institution.user }
-  let!(:site) { institution.sites.make }
+  let!(:site) { Site.make! institution: institution }
 
   context "Site owner" do
 
@@ -32,7 +32,7 @@ describe "roles", elasticsearch: true do
   end
 
   context "site admin" do
-    let!(:site_admin) { User.make }
+    let!(:site_admin) { User.make! }
 
     before(:each) {
       role = site.roles.select{|r| r.name.include?("Admin")}

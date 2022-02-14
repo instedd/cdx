@@ -10,20 +10,20 @@ describe Device do
     end
 
     it "should have an institution and site if not specified" do
-      should_be_valid_with_instition_and_site Device.make_unsaved
+      should_be_valid_with_instition_and_site Device.make!
     end
 
     it "should allow institution override and keep a site" do
-      should_be_valid_with_instition_and_site Device.make_unsaved(institution: Institution.make)
+      should_be_valid_with_instition_and_site Device.make(institution: Institution.make!)
     end
 
     it "should allow site override and keep an institution" do
-      should_be_valid_with_instition_and_site Device.make_unsaved(site: Site.make)
+      should_be_valid_with_instition_and_site Device.make(site: Site.make!)
     end
 
     it "should allow creating a device from site association" do
-      site = Site.make
-      device = site.devices.make
+      site = Site.make!
+      device = Device.make! site: site
       should_be_valid_with_instition_and_site device
       expect(device.site).to eq(site)
     end
@@ -36,49 +36,49 @@ describe Device do
     it { is_expected.to validate_presence_of :institution }
 
     it "should validate unpublished device model to belong to the same institution" do
-      device = Device.make_unsaved institution: Institution.make
-      device.device_model = DeviceModel.make(:unpublished, institution: Institution.make)
+      device = Device.make institution: Institution.make!
+      device.device_model = DeviceModel.make!(:unpublished, institution: Institution.make!)
       expect(device).to be_invalid
 
-      device.device_model = DeviceModel.make(:unpublished, institution: device.institution)
+      device.device_model = DeviceModel.make!(:unpublished, institution: device.institution)
       expect(device).to be_valid
     end
 
     it "should not validate published device model" do
-      device = Device.make_unsaved institution: Institution.make
-      device.device_model = DeviceModel.make(institution: Institution.make)
+      device = Device.make institution: Institution.make!
+      device.device_model = DeviceModel.make!(institution: Institution.make!)
       expect(device).to be_valid
     end
 
     it "should not allow institution and institution of site be different" do
-      device = Device.make_unsaved
-      device.institution = Institution.make
-      device.site = Site.make
+      device = Device.make!
+      device.institution = Institution.make!
+      device.site = Site.make!
       expect(device).to_not be_valid
     end
 
     it "should allow same institution and institution of site" do
-      device = Device.make_unsaved
-      device.institution = Institution.make
-      device.site = Site.make institution: device.institution
+      device = Device.make!
+      device.institution = Institution.make!
+      device.site = Site.make! institution: device.institution
       expect(device).to be_valid
     end
 
     it "should allow device without institution" do
-      device = Device.make_unsaved institution: Institution.make
+      device = Device.make institution: Institution.make!
       device.site = nil
       expect(device).to be_valid
     end
 
     it "should require all FTP fields for Alere device" do
-      device = Device.make_unsaved institution: Institution.make
-      device.device_model = DeviceModel.make(institution: Institution.make, name: "Alere")
+      device = Device.make institution: Institution.make!
+      device.device_model = DeviceModel.make!(institution: Institution.make!, name: "Alere")
       expect(device).to be_invalid
     end
 
     it "should be valid with all FTP fields filled for Alere device" do
-      device = Device.make_unsaved institution: Institution.make
-      device.device_model = DeviceModel.make(institution: Institution.make, name: "Alere")
+      device = Device.make institution: Institution.make!
+      device.device_model = DeviceModel.make!(institution: Institution.make!, name: "Alere")
       device.ftp_password = "12345678"
       device.ftp_hostname = "Test"
       device.ftp_port = 3000
@@ -88,27 +88,27 @@ describe Device do
     end
 
     it "should not require FTP fields at all for non Alere device" do
-      device = Device.make_unsaved institution: Institution.make
-      device.device_model = DeviceModel.make(institution: Institution.make, name: "Not lere")
+      device = Device.make institution: Institution.make!
+      device.device_model = DeviceModel.make!(institution: Institution.make!, name: "Not lere")
       expect(device).to be_valid
     end
   end
 
   context "within institution or site scope" do
-    let(:institution) { Institution.make }
-    let(:other_institution) { Institution.make }
+    let(:institution) { Institution.make! }
+    let(:other_institution) { Institution.make! }
 
-    let(:site1)  { Site.make institution: institution }
-    let(:site11) { Site.make :child, parent: site1 }
-    let(:site12) { Site.make :child, parent: site1 }
-    let(:site2)  { Site.make institution: institution }
+    let(:site1)  { Site.make! institution: institution }
+    let(:site11) { Site.make! :child, parent: site1 }
+    let(:site12) { Site.make! :child, parent: site1 }
+    let(:site2)  { Site.make! institution: institution }
 
-    let(:device1)  { Device.make site: site1 }
-    let(:device11) { Device.make site: site11 }
-    let(:device12) { Device.make site: site12 }
-    let(:device2)  { Device.make site: site2 }
+    let(:device1)  { Device.make! site: site1 }
+    let(:device11) { Device.make! site: site11 }
+    let(:device12) { Device.make! site: site12 }
+    let(:device2)  { Device.make! site: site2 }
 
-    let(:other_device)  { Device.make institution: other_institution }
+    let(:other_device)  { Device.make! institution: other_institution }
 
     it "should filter by institution" do
       expect(Device.within(institution)).to eq([device1, device11, device12, device2])
@@ -131,13 +131,13 @@ describe Device do
   context 'cascade destroy', elasticsearch: true do
 
     it "should delete device elements in cascade" do
-      device = Device.make
+      device = Device.make!
 
       TestResult.create_and_index(
         core_fields: {"assays" =>["name" => "mtb", "condition" => "mtb", "result" => :positive]},
-        device_messages: [ DeviceMessage.make(device: device) ])
-      DeviceLog.make(device: device)
-      DeviceCommand.make(device: device)
+        device_messages: [ DeviceMessage.make!(device: device) ])
+      DeviceLog.make!(device: device)
+      DeviceCommand.make!(device: device)
 
       device.destroy_cascade!
 
@@ -176,7 +176,7 @@ describe Device do
   end
 
   context 'commands' do
-    let(:device) { Device.make }
+    let(:device) { Device.make! }
 
     it "doesn't have pending log requests" do
       expect(device.has_pending_log_requests?).to be(false)
@@ -194,7 +194,7 @@ describe Device do
   end
 
   context 'site_prefix' do
-    let(:device) { Device.make }
+    let(:device) { Device.make! }
 
     it "has a site_prefix" do
       expect(device.site_prefix).to eq(device.site.prefix)
@@ -202,13 +202,13 @@ describe Device do
   end
 
   context "within" do
-    let!(:site) { Site.make }
-    let!(:subsite) { Site.make parent: site, institution: site.institution }
-    let!(:other_site) { Site.make }
-    let!(:device1) { Device.make site: site, institution: site.institution }
-    let!(:device2) { Device.make site: subsite, institution: site.institution }
-    let!(:device3) { Device.make site: other_site, institution: other_site.institution }
-    let!(:device4) { Device.make site: nil, institution: site.institution }
+    let!(:site) { Site.make! }
+    let!(:subsite) { Site.make! parent: site, institution: site.institution }
+    let!(:other_site) { Site.make! }
+    let!(:device1) { Device.make! site: site, institution: site.institution }
+    let!(:device2) { Device.make! site: subsite, institution: site.institution }
+    let!(:device3) { Device.make! site: other_site, institution: other_site.institution }
+    let!(:device4) { Device.make! site: nil, institution: site.institution }
 
     it "institution, no exclusion, should show devices from site, subsites and no site" do
       expect(Device.within(site.institution).to_a).to eq([device1, device2, device4])

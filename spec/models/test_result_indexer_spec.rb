@@ -3,31 +3,31 @@ require "spec_helper"
 describe TestResultIndexer, elasticsearch: true do
 
   let(:institution) do
-    Institution.make
+    Institution.make!
   end
 
   let(:patient) do
-    Patient.make(uuid: 'abc', core_fields: { 'gender' => 'male' }, custom_fields: { 'hiv' => 'positive' }, institution: institution)
+    Patient.make!(uuid: 'abc', core_fields: { 'gender' => 'male' }, custom_fields: { 'hiv' => 'positive' }, institution: institution)
   end
 
   let(:encounter) do
-    Encounter.make(patient: patient, core_fields: {}, custom_fields: { 'status' => 'completed' }, institution: institution)
+    Encounter.make!(patient: patient, core_fields: {}, custom_fields: { 'status' => 'completed' }, institution: institution)
   end
 
   let(:sample) do
-    Sample.make(patient: patient, encounter: encounter, core_fields: { 'type' => 'sputum' }, custom_fields: { 'culture_days' => '10' }, institution: institution)
+    Sample.make!(patient: patient, encounter: encounter, core_fields: { 'type' => 'sputum' }, custom_fields: { 'culture_days' => '10' }, institution: institution)
   end
 
   let(:sample_identifier) do
-    SampleIdentifier.make(sample: sample, uuid: 'abc')
+    SampleIdentifier.make!(sample: sample, uuid: 'abc')
   end
 
   let(:device) do
-    Device.make(institution: institution)
+    Device.make!(institution: institution)
   end
 
   let(:test) do
-    TestResult.make(
+    TestResult.make!(
       device: device,
       sample_identifier: sample_identifier,
       patient: patient,

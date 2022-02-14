@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "device model" do
-  let(:user) { Institution.make(:manufacturer).user }
+  let(:user) { Institution.make!(:manufacturer).user }
   before(:each) { sign_in(user) }
 
   it "can create model and access to it's details" do

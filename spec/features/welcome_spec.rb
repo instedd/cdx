@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe "the login process" do
   it "existing user can login" do
-    user = User.make institutions: [Institution.make]
+    user = User.make!
+    Institution.make! user: user
 
     goto_page HomePage do |page|
       page.form.user_name.set user.email

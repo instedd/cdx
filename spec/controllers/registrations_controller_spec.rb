@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe RegistrationsController do
 
-  let!(:institution) {Institution.make}
+  let!(:institution) {Institution.make!}
   let!(:user) {institution.user}
 
   before(:each) do

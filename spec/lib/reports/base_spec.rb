@@ -7,11 +7,11 @@ RSpec.describe Reports::Base do
     def self.execute; end
   end
 
-  let(:current_user) { User.make }
+  let(:current_user) { User.make! }
   let(:site_user) { "#{current_user.first_name} #{current_user.last_name}" }
-  let(:user_device) { Device.make institution: institution, site: site }
-  let(:institution) { Institution.make(user: current_user) }
-  let(:site) { Site.make(institution: institution) }
+  let(:user_device) { Device.make! institution: institution, site: site }
+  let(:institution) { Institution.make!(user: current_user) }
+  let(:site) { Site.make!(institution: institution) }
   let(:query) { {} }
   let(:options) { {} }
   let(:since) { (Date.today - 1.year).iso8601 }
@@ -106,7 +106,7 @@ RSpec.describe Reports::Base do
               'site_user' => site_user,
               'type' => 'specimen'
             },
-            device_messages: [DeviceMessage.make(device: user_device)]
+            device_messages: [DeviceMessage.make!(device: user_device)]
           )
         end
       end
@@ -135,7 +135,7 @@ RSpec.describe Reports::Base do
                 'status' => 'error',
                 'site_user' => site_user
               },
-              device_messages: [DeviceMessage.make(device: user_device)]
+              device_messages: [DeviceMessage.make!(device: user_device)]
             )
           end
         end

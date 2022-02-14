@@ -27,7 +27,7 @@ describe Manifest do
         "field_mapping" : {}
       }}
 
-      Manifest.make(definition: definition)
+      Manifest.make!(definition: definition)
 
       manifest = Manifest.first
 
@@ -50,7 +50,7 @@ describe Manifest do
         "field_mapping" : {}
       }}
 
-      Manifest.new(device_model: DeviceModel.make, definition: definition).save(:validate => false)
+      Manifest.new(device_model: DeviceModel.make!, definition: definition).save(:validate => false)
 
       manifest = Manifest.first
 
@@ -73,13 +73,13 @@ describe Manifest do
         "field_mapping" : {}
       }}).save(:validate => false)
 
-      manifest = Manifest.make
+      manifest = Manifest.make! device_model: DeviceModel.make!
 
       expect(Manifest.valid).to eq([manifest])
     end
 
     it "leaves device models after being deleted" do
-      Manifest.make definition: definition
+      Manifest.make! definition: definition
 
       Manifest.first.destroy
 
@@ -88,7 +88,7 @@ describe Manifest do
     end
 
     it "ensures one manifest per device model" do
-      Manifest.create!(device_model: DeviceModel.make(name: 'bar'), definition: definition)
+      Manifest.create!(device_model: DeviceModel.make!(name: 'bar'), definition: definition)
 
       expect(Manifest.count).to eq(1)
       expect(DeviceModel.count).to eq(1)
@@ -100,7 +100,7 @@ describe Manifest do
     end
 
     it "creates conditions from manifest" do
-      Manifest.make(definition: definition)
+      Manifest.make!(definition: definition)
 
       conditions = Condition.all
       expect(conditions.count).to eq(2)
@@ -120,7 +120,7 @@ describe Manifest do
         "field_mapping" : {}
       }}
 
-      manifest = Manifest.create(device_model: DeviceModel.make, definition: definition)
+      manifest = Manifest.create(device_model: DeviceModel.make!, definition: definition)
       expect(manifest).not_to be_valid
       expect(manifest.errors[:conditions]).to eq(["must be in snake case: MTB"])
     end

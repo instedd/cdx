@@ -3,22 +3,22 @@ require 'policy_spec_helper'
 
 describe Policy do
 
-  let(:user) { User.make }
-  let(:institution) { user.create Institution.make_unsaved }
+  let(:user) { User.make! }
+  let(:institution) { Institution.make!(user: user) }
 
   context "Validations" do
 
-    let!(:user2) { User.make }
+    let!(:user2) { User.make! }
 
     it "disallows policy creation if self-granted" do
-      policy = Policy.make_unsaved
+      policy = Policy.make!
       policy.granter = user
       policy.user = user
       expect(policy.save).to eq(false)
     end
 
     it "disallows policy creation if granter is nil" do
-      policy = Policy.make_unsaved
+      policy = Policy.make!
       policy.granter = nil
       expect(policy.save).to eq(false)
     end
@@ -63,11 +63,11 @@ describe Policy do
 
   context "Authorize" do
 
-    let!(:user2) { User.make }
+    let!(:user2) { User.make! }
 
-    let!(:institution2a) { user2.institutions.make }
-    let!(:institution2b) { user2.institutions.make }
-    let!(:institution2c) { user2.institutions.make }
+    let!(:institution2a) { Institution.make! user: user2 }
+    let!(:institution2b) { Institution.make! user: user2 }
+    let!(:institution2c) { Institution.make! user: user2 }
 
     before(:each) do
       user; institution
@@ -81,7 +81,7 @@ describe Policy do
     end
 
     it "should return an empty scope when queried over an unauthorized class" do
-      authorized = Policy.authorize READ_INSTITUTION, Institution, User.make
+      authorized = Policy.authorize READ_INSTITUTION, Institution, User.make!
       expect(authorized).to be_kind_of(Institution::ActiveRecord_Relation)
       expect(authorized.to_a).to be_empty
     end
@@ -102,14 +102,14 @@ describe Policy do
 
   context "with complex grants" do
 
-    let!(:site1) { institution.sites.make }
-    let!(:site2) { institution.sites.make }
+    let!(:site1) { Site.make! institution: institution }
+    let!(:site2) { Site.make! }
 
-    let!(:other_institution) { Institution.make }
-    let!(:other_site)  { other_institution.sites.make }
-    let!(:other_device)      { other_site.devices.make }
+    let!(:other_institution) { Institution.make! }
+    let!(:other_site) { Site.make! institution: other_institution }
+    let!(:other_device) { Device.make! site: other_site }
 
-    let!(:user2) { User.make }
+    let!(:user2) { User.make! }
 
     it "should be able to see all sites if granted a policy for all and another by id" do
       grant nil,  user2, Site,  READ_SITE
@@ -151,7 +151,7 @@ describe Policy do
   context "Institution" do
     context "Create" do
       it "allows creating institutions" do
-        user2 = User.make
+        user2 = User.make!
 
         assert_can user2, Institution, CREATE_INSTITUTION, []
       end
@@ -159,7 +159,7 @@ describe Policy do
       it "doesn't allow to create institutions if single-tenant deploy" do
         Settings.single_tenant = true
 
-        user2 = User.make
+        user2 = User.make!
 
         assert_cannot user2, Institution, CREATE_INSTITUTION
 
@@ -200,7 +200,7 @@ describe Policy do
 
       it "doesn't allow a user to read another institution" do
         user2, institution2 = create_user_and_institution
-        institution3 = Institution.make(user: user2)
+        institution3 = Institution.make!(user: user2)
 
         grant user2.reload, user.reload, institution3, [READ_INSTITUTION]
 
@@ -223,7 +223,7 @@ describe Policy do
       end
 
       it "disallows read one institution if granter doesn't have a permission for it" do
-        user2 = User.make
+        user2 = User.make!
         user3, institution3 = create_user_and_institution
 
         policy = grant user3, user, institution3, READ_INSTITUTION
@@ -236,7 +236,7 @@ describe Policy do
 
       it "disallows read all institution if granter doesn't have a permission for it" do
         user; institution
-        user2 = User.make
+        user2 = User.make!
         user3, institution3 = create_user_and_institution
         grant user, user2, Institution, READ_INSTITUTION
 
@@ -244,8 +244,8 @@ describe Policy do
       end
 
       it "disallows delegable" do
-        user2 = User.make
-        user3 = User.make
+        user2 = User.make!
+        user3 = User.make!
 
         policy = grant user, user2, institution, READ_INSTITUTION, delegable: true
         grant user2, user3, institution, READ_INSTITUTION, delegable: true
@@ -257,9 +257,9 @@ describe Policy do
       end
 
       it "allows delegable with disallow from one branch" do
-        user2 = User.make
-        user3 = User.make
-        user4 = User.make
+        user2 = User.make!
+        user3 = User.make!
+        user4 = User.make!
 
         grant user, user2, institution, READ_INSTITUTION, delegable: false
         grant user, user3, institution, READ_INSTITUTION, delegable: true
@@ -280,7 +280,7 @@ describe Policy do
       end
 
       it "disallow read if explicitly denied" do
-        user2 = User.make
+        user2 = User.make!
 
         grant user, user2, institution, READ_INSTITUTION, except: institution
 
@@ -288,10 +288,10 @@ describe Policy do
       end
 
       it "allows reading all institutions except one" do
-        institution2 = user.create Institution.make_unsaved
-        institution3 = user.create Institution.make_unsaved
+        institution2 = user.create Institution.make!
+        institution3 = user.create Institution.make!
 
-        user2 = User.make
+        user2 = User.make!
 
         grant user, user2, Institution, READ_INSTITUTION, except: institution3
 
@@ -338,12 +338,12 @@ describe Policy do
   context "Site" do
     context "Create" do
       it "disallows creating institution site" do
-        user2 = User.make
+        user2 = User.make!
         assert_cannot user2, institution, CREATE_INSTITUTION_SITE
       end
 
       it "allows creating institution site" do
-        user2 = User.make
+        user2 = User.make!
 
         grant user, user2, institution, CREATE_INSTITUTION_SITE
 
@@ -353,27 +353,27 @@ describe Policy do
 
     context "Read" do
       it "disallows reading institution site" do
-        site = institution.sites.make
+        site = Site.make! institution: institution
 
-        user2 = User.make
+        user2 = User.make!
         assert_cannot user2, site, READ_SITE
       end
 
       it "allows reading self site" do
-        site = institution.sites.make
+        site = Site.make! institution: institution
 
         assert_can user, site, READ_SITE
       end
 
       it "allows reading self sites" do
-        site = institution.sites.make
+        site = Site.make! institution: institution
 
         assert_can user, institution.sites, READ_SITE
       end
 
       it "allows reading an specific site" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, site, READ_SITE
 
@@ -381,8 +381,8 @@ describe Policy do
       end
 
       it "allows reading other sites" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Site, READ_SITE
 
@@ -390,8 +390,8 @@ describe Policy do
       end
 
       it "allows reading other sites" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Site, READ_SITE
 
@@ -399,8 +399,8 @@ describe Policy do
       end
 
       it "allows reading other site" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Site, READ_SITE
 
@@ -408,8 +408,8 @@ describe Policy do
       end
 
       it "allows reading other institution sites" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, "#{Site.resource_name}?institution=#{institution.id}", READ_SITE
 
@@ -418,10 +418,10 @@ describe Policy do
       end
 
       it "disallows reading other institution sites when id is other" do
-        institution2 = user.create Institution.make_unsaved
+        institution2 = Institution.make! user: user
 
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, "#{Site.resource_name}?institution=#{institution2.id}", READ_SITE
 
@@ -431,15 +431,15 @@ describe Policy do
 
     context "Update" do
       it "disallows updating other user's site" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         assert_cannot user2, site, UPDATE_SITE
       end
 
       it "allows updating an specific site" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, site, UPDATE_SITE
 
@@ -447,8 +447,8 @@ describe Policy do
       end
 
       it "allows updating other user's sites" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Site, UPDATE_SITE
 
@@ -456,8 +456,8 @@ describe Policy do
       end
 
       it "allows updating other user's site" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Site, UPDATE_SITE
 
@@ -467,15 +467,15 @@ describe Policy do
 
     context "Delete" do
       it "disallows deleting other user's site" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         assert_cannot user2, site, DELETE_SITE
       end
 
       it "allows deleting an specific site" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, site, DELETE_SITE
 
@@ -483,8 +483,8 @@ describe Policy do
       end
 
       it "allows deleting other user's sites" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Site, DELETE_SITE
 
@@ -492,8 +492,8 @@ describe Policy do
       end
 
       it "allows deleting other user's site" do
-        site = institution.sites.make
-        user2 = User.make
+        site = Site.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Site, DELETE_SITE
 
@@ -502,14 +502,14 @@ describe Policy do
     end
 
     context "with subsites" do
-      let!(:site1) { Site.make }
-      let!(:site11) { Site.make :child, parent: site1 }
-      let!(:site111) { Site.make :child, parent: site11 }
+      let!(:site1) { Site.make! }
+      let!(:site11) { Site.make! :child, parent: site1 }
+      let!(:site111) { Site.make! :child, parent: site11 }
 
-      let!(:device1) { Device.make site: site1 }
-      let!(:device11) { Device.make site: site11 }
+      let!(:device1) { Device.make! site: site1 }
+      let!(:device11) { Device.make! site: site11 }
 
-      let!(:user2) { User.make }
+      let!(:user2) { User.make! }
 
       it "can't access sub-sites" do
         grant nil, user, site1, READ_SITE
@@ -574,8 +574,8 @@ describe Policy do
   context "Device Model" do
     context "Update" do
       it "should not allow to update by manufacturer admin if has no institution" do
-        device_model = DeviceModel.make
-        user.institutions.make(kind: :manufacturer)
+        device_model = DeviceModel.make!
+        Institution.make! user: user, kind: "manufacturer"
         assert_cannot user, device_model, UPDATE_DEVICE_MODEL
       end
     end
@@ -584,12 +584,12 @@ describe Policy do
   context "Device" do
     context "Create" do
       it "disallows creating institution device" do
-        user2 = User.make
+        user2 = User.make!
         assert_cannot user2, institution, REGISTER_INSTITUTION_DEVICE
       end
 
       it "allows creating institution device" do
-        user2 = User.make
+        user2 = User.make!
 
         grant user, user2, institution, REGISTER_INSTITUTION_DEVICE
 
@@ -599,27 +599,27 @@ describe Policy do
 
     context "Read" do
       it "disallows reading institution device" do
-        device = institution.devices.make
+        device = Device.make! institution: institution
 
-        user2 = User.make
+        user2 = User.make!
         assert_cannot user2, device, READ_DEVICE
       end
 
       it "allows reading self device" do
-        device = institution.devices.make
+        device = Device.make! institution: institution
 
         assert_can user, device, READ_DEVICE
       end
 
       it "allows reading self devices" do
-        device = institution.devices.make
+        device = Device.make! institution: institution
 
         assert_can user, institution.devices, READ_DEVICE, [device]
       end
 
       it "allows reading an specific device" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, device, READ_DEVICE
 
@@ -627,8 +627,8 @@ describe Policy do
       end
 
       it "allows reading institution devices" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Institution, "*"
         grant user, user2, Device, READ_DEVICE
@@ -637,18 +637,18 @@ describe Policy do
       end
 
       it "allows reading other devices" do
-        device = institution.devices.make
-        other_device = Device.make
+        device = Device.make! institution: institution
+        other_device = Device.make!
 
-        user2 = User.make
+        user2 = User.make!
 
         grant user, user2, Device, READ_DEVICE
         assert_can user2, Device, READ_DEVICE, [device]
       end
 
       it "allows reading other device" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Device, READ_DEVICE
 
@@ -656,8 +656,8 @@ describe Policy do
       end
 
       it "allows reading other institution devices" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, "#{Device.resource_name}?institution=#{institution.id}", READ_DEVICE
 
@@ -666,10 +666,10 @@ describe Policy do
       end
 
       it "disallows reading other institution devices when id is other" do
-        institution2 = user.create Institution.make_unsaved
+        institution2 = Institution.make! user: user
 
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, "#{Device.resource_name}?institution=#{institution2.id}", READ_DEVICE
 
@@ -679,15 +679,15 @@ describe Policy do
 
     context "Update" do
       it "disallows updating other user's device" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         assert_cannot user2, device, UPDATE_DEVICE
       end
 
       it "allows updating an specific device" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, device, UPDATE_DEVICE
 
@@ -695,8 +695,8 @@ describe Policy do
       end
 
       it "allows updating other user's devices" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Device, UPDATE_DEVICE
 
@@ -704,8 +704,8 @@ describe Policy do
       end
 
       it "allows updating other user's device" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Device, UPDATE_DEVICE
 
@@ -715,15 +715,15 @@ describe Policy do
 
     context "Delete" do
       it "disallows deleting other user's device" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         assert_cannot user2, device, DELETE_DEVICE
       end
 
       it "allows deleting an specific device" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, device, DELETE_DEVICE
 
@@ -731,8 +731,8 @@ describe Policy do
       end
 
       it "allows deleting other user's devices" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Device, DELETE_DEVICE
 
@@ -740,8 +740,8 @@ describe Policy do
       end
 
       it "allows deleting other user's device" do
-        device = institution.devices.make
-        user2 = User.make
+        device = Device.make! institution: institution
+        user2 = User.make!
 
         grant user, user2, Device, DELETE_DEVICE
 
@@ -754,24 +754,24 @@ describe Policy do
 
     context "Query" do
 
-      let!(:user2) { User.make }
+      let!(:user2) { User.make! }
 
-      let!(:site)  { Site.make institution: institution }
-      let!(:device)      { Device.make institution: institution, site: site }
-      let!(:test_result) { TestResult.make device_messages: [DeviceMessage.make(device: device)]}
+      let!(:site)  { Site.make! institution: institution }
+      let!(:device)      { Device.make! institution: institution, site: site }
+      let!(:test_result) { TestResult.make! device_messages: [DeviceMessage.make!(device: device)]}
 
-      let!(:institution2) { user.institutions.make }
-      let!(:site2)  { Site.make institution: institution2 }
-      let!(:device2)      { Device.make institution: institution2, site: site2 }
-      let!(:test_result2) { TestResult.make device_messages: [DeviceMessage.make(device: device2)]}
+      let!(:institution2) { Institution.make! user: user }
+      let!(:site2)  { Site.make! institution: institution2 }
+      let!(:device2)      { Device.make! institution: institution2, site: site2 }
+      let!(:test_result2) { TestResult.make! device_messages: [DeviceMessage.make!(device: device2)]}
 
-      let!(:institution3) { user.institutions.make }
-      let!(:site3) { Site.make institution: institution3 }
-      let!(:device3) { Device.make institution: institution3, site: site3 }
-      let!(:site3_1) { Site.make institution: institution3, parent: site3 }
-      let!(:device3_1) { Device.make institution: institution3, site: site3_1 }
-      let!(:test_result3) { TestResult.make device_messages: [DeviceMessage.make(device: device3)]}
-      let!(:test_result3_1) { TestResult.make device_messages: [DeviceMessage.make(device: device3_1)]}
+      let!(:institution3) { Institution.make! user: user }
+      let!(:site3) { Site.make! institution: institution3 }
+      let!(:device3) { Device.make! institution: institution3, site: site3 }
+      let!(:site3_1) { Site.make! institution: institution3, parent: site3 }
+      let!(:device3_1) { Device.make! institution: institution3, site: site3_1 }
+      let!(:test_result3) { TestResult.make! device_messages: [DeviceMessage.make!(device: device3)]}
+      let!(:test_result3_1) { TestResult.make! device_messages: [DeviceMessage.make!(device: device3_1)]}
 
       it "does not allow user to query test result" do
         assert_cannot user2, test_result, QUERY_TEST
@@ -838,8 +838,8 @@ describe Policy do
   end
 
   def create_user_and_institution
-    user = User.make
-    institution = user.create Institution.make_unsaved
+    user = User.make!
+    institution = Institution.make! user: user
     [user, institution]
   end
 

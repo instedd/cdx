@@ -5,22 +5,22 @@ describe Patient do
   context "validations" do
 
     it "should make a valid patient" do
-      expect(Patient.make_unsaved).to be_valid
-      expect(Patient.make_unsaved :phantom).to be_valid
+      expect(Patient.make!).to be_valid
+      expect(Patient.make :phantom).to be_valid
     end
 
     it "should make phantom if required" do
-      expect(Patient.make :phantom).to be_phantom
+      expect(Patient.make! :phantom).to be_phantom
     end
 
     it "should make non phantom if required" do
-      expect(Patient.make).to_not be_phantom
+      expect(Patient.make!).to_not be_phantom
     end
 
     it "should validate uniqness of entity_id_hash and entity_id" do
-      institution = Institution.make
-      Patient.make entity_id: '1001', institution: institution
-      patient = Patient.make_unsaved entity_id: '1001', institution: institution
+      institution = Institution.make!
+      Patient.make! entity_id: '1001', institution: institution
+      patient = Patient.make entity_id: '1001', institution: institution
 
       expect(patient).to be_invalid
       expect(patient.errors).to have_key(:entity_id_hash)
@@ -28,7 +28,7 @@ describe Patient do
     end
 
     context "on fields" do
-      let(:patient) { Patient.make_unsaved }
+      let(:patient) { Patient.make }
 
       it "should support valid core fields" do
         patient.core_fields['gender'] = 'male'
@@ -70,13 +70,13 @@ describe Patient do
   end
 
   context "within" do
-    let!(:site) { Site.make }
-    let!(:subsite) { Site.make parent: site, institution: site.institution }
-    let!(:other_site) { Site.make }
-    let!(:patient1) { Patient.make site: site, institution: site.institution }
-    let!(:patient2) { Patient.make site: subsite, institution: site.institution }
-    let!(:patient3) { Patient.make site: other_site, institution: other_site.institution }
-    let!(:patient4) { Patient.make site: nil, institution: site.institution }
+    let!(:site) { Site.make! }
+    let!(:subsite) { Site.make! parent: site, institution: site.institution }
+    let!(:other_site) { Site.make! }
+    let!(:patient1) { Patient.make! site: site, institution: site.institution }
+    let!(:patient2) { Patient.make! site: subsite, institution: site.institution }
+    let!(:patient3) { Patient.make! site: other_site, institution: other_site.institution }
+    let!(:patient4) { Patient.make! site: nil, institution: site.institution }
 
     it "institution, no exclusion, should show patients from site, subsites and no site" do
       expect(Patient.within(site.institution).to_a).to eq([patient1, patient2, patient4])
@@ -102,7 +102,7 @@ describe Patient do
   it "#dob_description" do
     Timecop.freeze(Time.utc(2015, 1, 1, 12, 0, 0))
 
-    patient = Patient.make
+    patient = Patient.make!
     patient.dob = "1983-10-20"
     expect(patient.dob_description("%m/%d/%Y")).to eq("10/20/1983 (31 y/o)")
 

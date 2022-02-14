@@ -75,6 +75,3 @@ end
 After('@single_tenant') do
   Settings.single_tenant = false
 end
-
-Before { Sham.reset }
-

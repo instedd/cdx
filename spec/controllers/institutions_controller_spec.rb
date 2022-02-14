@@ -1,16 +1,16 @@
 require 'spec_helper'
 
 describe InstitutionsController do
-  let(:user) {User.make}
+  let(:user) {User.make!}
   before(:each) {sign_in user}
 
   context "index" do
 
-    let!(:institution)   { user.institutions.make }
-    let!(:other_institution) { Institution.make }
+    let!(:institution)   { Institution.make! user: user }
+    let!(:other_institution) { Institution.make! }
 
     it "should list insitutions" do
-      institution2 = user.institutions.make
+      institution2 = Institution.make! user: user
       get :index
       expect(response).to be_success
       expect(assigns(:institutions)).to contain_exactly(institution, institution2)
@@ -47,7 +47,7 @@ describe InstitutionsController do
 
     context "institution invite" do
       it "create with invite" do
-        invite = PendingInstitutionInvite.make(invited_user_email: user.email)
+        invite = PendingInstitutionInvite.make!(invited_user_email: user.email)
         post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
 
         institution = Institution.last
@@ -60,7 +60,7 @@ describe InstitutionsController do
       end
 
       it "create with invite, overwriting name and type" do
-        invite = PendingInstitutionInvite.make(invited_user_email: user.email)
+        invite = PendingInstitutionInvite.make!(invited_user_email: user.email)
         post :create, {institution: {name: "Institution Override", kind: "manufacturer", pending_institution_invite_id: invite.id}}
 
         institution = Institution.last
@@ -73,7 +73,7 @@ describe InstitutionsController do
       end
 
       it "create with invite, not invited user" do
-        invite = PendingInstitutionInvite.make
+        invite = PendingInstitutionInvite.make!
         post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
 
         institution = Institution.last
@@ -84,7 +84,7 @@ describe InstitutionsController do
       end
 
       it "fails if invite already accepted" do
-        invite = PendingInstitutionInvite.make(invited_user_email: user.email, status: "accepted")
+        invite = PendingInstitutionInvite.make!(invited_user_email: user.email, status: "accepted")
         expect do
           post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
         end.to raise_error(ActionView::MissingTemplate)
@@ -100,13 +100,13 @@ describe InstitutionsController do
     end
 
     it "gets new page when there is one institution" do
-      user.institutions.make
+      Institution.make! user: user
       get :new
       expect(response).to be_success
     end
 
     it "gets new page when there are many institutions" do
-      2.times { user.institutions.make }
+      2.times { Institution.make! user: user }
       get :new
       expect(response).to be_success
     end
@@ -115,7 +115,7 @@ describe InstitutionsController do
 
   describe "new_from_invite_data" do
     it "with invite" do
-      invite = PendingInstitutionInvite.make(invited_user_email: user.email)
+      invite = PendingInstitutionInvite.make!(invited_user_email: user.email)
       get :new_from_invite_data, {pending_institution_invite_id: invite.id}
       expect(response).to be_success
     end
@@ -127,15 +127,15 @@ describe InstitutionsController do
     end
 
     it "with accepted invite" do
-      invite = PendingInstitutionInvite.make(status: "accepted", invited_user_email: user.email)
+      invite = PendingInstitutionInvite.make!(status: "accepted", invited_user_email: user.email)
       expect do
         get :new_from_invite_data, {pending_institution_invite_id: invite.id}
       end.to raise_error(ActionView::MissingTemplate)
     end
 
     it "gets redirect from other page when pending invitation" do
-      dummy_institution = Institution.make # there must be some institution in the database for the redirect to trigger
-      invite = PendingInstitutionInvite.make(invited_user_email: user.email)
+      dummy_institution = Institution.make! # there must be some institution in the database for the redirect to trigger
+      invite = PendingInstitutionInvite.make!(invited_user_email: user.email)
       session[:pending_invite_id] = invite.id
       get :index
       expect(response).to redirect_to new_from_invite_data_institutions_path(pending_institution_invite_id: invite.id)

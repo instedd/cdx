@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Api::MessagesController, elasticsearch: true, validate_manifest: false do
 
-  let(:user) {User.make}
-  let(:institution) {Institution.make user: user}
-  let(:site) {Site.make institution: institution}
-  let(:device) {Device.make institution: institution, site: site}
+  let(:user) {User.make!}
+  let(:institution) {Institution.make! user: user}
+  let(:site) {Site.make! institution: institution}
+  let(:device) {Device.make! institution: institution, site: site}
   let(:data)  {Oj.dump test: {assays: [result: :positive]}}
   let(:datas) {Oj.dump [
     {test: {assays: [result: :positive]}},
@@ -105,7 +105,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       expect(test["_id"]).to eq(test["_source"]["test"]["uuid"])
       expect(test["_source"]["encounter"]["patient_age"]["years"]).to eq(30)
 
-      a_device = Device.make(institution: institution)
+      a_device = Device.make!(institution: institution)
       post :create, Oj.dump(test: {id: "1234", age: {"years" => 20}}), device_id: a_device.uuid, authentication_token: a_device.plain_secret_key
 
       expect(TestResult.count).to eq(2)
@@ -184,7 +184,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     end
 
     it "merges pii from different tests in the same sample across devices" do
-      device2 = Device.make institution: institution, device_model: device.device_model, site: site
+      device2 = Device.make! institution: institution, device_model: device.device_model, site: site
       device.manifest.update! definition: %{{
         "metadata" : {
           "version" : 1,

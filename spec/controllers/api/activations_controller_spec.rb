@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Api::ActivationsController do
-  let!(:device) { Device.make }
+  let!(:device) { Device.make! }
 
   shared_context :set_device_token do
     before { device.new_activation_token('12345').tap { device.save! } }

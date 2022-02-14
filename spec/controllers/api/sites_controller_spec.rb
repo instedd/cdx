@@ -2,17 +2,17 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe Api::SitesController do
-  let(:user) {User.make}
-  let(:institution) {Institution.make user: user}
-  let(:device) {Device.make institution: institution}
+  let(:user) {User.make!}
+  let(:institution) {Institution.make! user: user}
+  let(:device) {Device.make! institution: institution}
   let(:data) {Oj.dump results: [result: :positive]}
   before(:each) {sign_in user}
 
   context "Sites" do
     it "should list the sites" do
-      institution = Institution.make user: user
+      institution = Institution.make! user: user
       sites = 3.times.map do
-        site = Site.make(institution: institution)
+        site = Site.make!(institution: institution)
         {'uuid' => site.uuid, 'name' => site.name, 'location' => site.location_geoid, 'parent_uuid' => site.parent.try(:uuid), 'institution_uuid' => site.institution.uuid}
       end
 
@@ -21,25 +21,25 @@ describe Api::SitesController do
     end
 
     it "should list the sites for a given institution" do
-      institution = Institution.make user: user
+      institution = Institution.make! user: user
       sites = 3.times.map do
-        site = Site.make(institution: institution)
+        site = Site.make!(institution: institution)
         {'uuid' => site.uuid, 'name' => site.name, 'location' => site.location_geoid, 'parent_uuid' => site.parent.try(:uuid), 'institution_uuid' => site.institution.uuid}
       end
 
-      Site.make institution: (Institution.make user: user)
+      Site.make! institution: (Institution.make! user: user)
 
       get :index, institution_uuid: institution.uuid, format: 'json'
       expect(Oj.load(response.body)).to eq({'total_count' => 3, 'sites' => sites})
     end
 
     context "hierarchical" do
-      let!(:institution) { Institution.make }
-      let!(:root) { Site.make institution: institution }
-      let!(:site_a) { Site.make :child, parent: root }
-      let!(:site_a_1) { Site.make :child, parent: site_a }
-      let!(:site_b) { Site.make :child, parent: root }
-      let!(:site_b_1) { Site.make :child, parent: site_b }
+      let!(:institution) { Institution.make! }
+      let!(:root) { Site.make! institution: institution }
+      let!(:site_a) { Site.make! :child, parent: root }
+      let!(:site_a_1) { Site.make! :child, parent: site_a }
+      let!(:site_b) { Site.make! :child, parent: root }
+      let!(:site_b_1) { Site.make! :child, parent: site_b }
 
       let(:json_response) { Oj.load(response.body) }
       def response_of(site)
@@ -57,7 +57,7 @@ describe Api::SitesController do
       end
 
       it "should hide parent site and parent_uuid if no access" do
-        user = User.make
+        user = User.make!
         grant institution.user, user, site_a_1, READ_SITE
         sign_in user
 
@@ -67,7 +67,7 @@ describe Api::SitesController do
       end
 
       it "READ_SITE should propagate to the childs" do
-        user = User.make
+        user = User.make!
         grant institution.user, user, [site_a, site_b_1], [READ_SITE, READ_SITE]
         sign_in user
 
@@ -87,8 +87,8 @@ describe Api::SitesController do
         expect(r).to render_template("api/sites/index")
       end
 
-      let(:institution) { Institution.make user: user }
-      let(:site) { Site.make(institution: institution) }
+      let(:institution) { Institution.make! user: user }
+      let(:site) { Site.make!(institution: institution) }
 
       render_views
 

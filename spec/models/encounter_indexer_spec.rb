@@ -3,19 +3,19 @@ require "spec_helper"
 describe EncounterIndexer, elasticsearch: true do
 
   let(:institution) do
-    Institution.make
+    Institution.make!
   end
 
   let(:site) do
-    Site.make institution: institution
+    Site.make! institution: institution
   end
 
   let(:patient) do
-    Patient.make(uuid: 'abc', core_fields: { 'gender' => 'male' }, custom_fields: { 'hiv' => 'positive' }, institution: institution)
+    Patient.make!(uuid: 'abc', core_fields: { 'gender' => 'male' }, custom_fields: { 'hiv' => 'positive' }, institution: institution)
   end
 
   let(:encounter) do
-    Encounter.make(patient: patient, core_fields: { 'start_time' => DateTime.new(2015,1,1,0,0,0).utc.iso8601, 'diagnosis' => [{ "condition" => "mtb", "name" => "mtb", "result" => "negative", "quantitative_result" => "20"}] }, custom_fields: { 'status' => 'completed' }, plain_sensitive_data: { 'observations' => 'Diagnosis positive'}, institution: institution)
+    Encounter.make!(patient: patient, core_fields: { 'start_time' => DateTime.new(2015,1,1,0,0,0).utc.iso8601, 'diagnosis' => [{ "condition" => "mtb", "name" => "mtb", "result" => "negative", "quantitative_result" => "20"}] }, custom_fields: { 'status' => 'completed' }, plain_sensitive_data: { 'observations' => 'Diagnosis positive'}, institution: institution)
   end
 
   let(:encounter_indexer) { EncounterIndexer.new(encounter)}

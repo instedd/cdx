@@ -2,19 +2,19 @@ require 'spec_helper'
 
 describe SampleIdentifier do
   context "blueprint" do
-    let(:site) { Site.make }
+    let(:site) { Site.make! }
 
     it "should use site institution for sample" do
-      expect(SampleIdentifier.make(site: site).sample.institution).to eq(site.institution)
+      expect(SampleIdentifier.make!(site: site).sample.institution).to eq(site.institution)
     end
 
     it "should be able to create without site for manufacturers" do
-      expect(SampleIdentifier.make(sample: Sample.make(institution: Institution.make(:manufacturer))).site).to be_nil
+      expect(SampleIdentifier.make!(sample: Sample.make!(institution: Institution.make!(:manufacturer))).site).to be_nil
     end
 
     it "should create from samples" do
-      sample = Sample.make
-      sample_ident = sample.sample_identifiers.make
+      sample = Sample.make!
+      sample_ident = SampleIdentifier.make!(sample: sample)
 
       expect(sample.institution).to be_kind_institution
       expect(sample_ident.sample).to eq(sample)
@@ -27,7 +27,7 @@ describe SampleIdentifier do
     it { is_expected.to validate_presence_of :sample }
 
     context "validations for manufacturer" do
-      let(:sample) { Sample.make institution: Institution.make(:manufacturer) }
+      let(:sample) { Sample.make! institution: Institution.make!(:manufacturer) }
 
       it "does not validate presence of site" do
         expect(SampleIdentifier.new(sample: sample, site: nil, entity_id: "100000")).to be_valid
@@ -35,9 +35,9 @@ describe SampleIdentifier do
     end
 
     context "validations for institution" do
-      let(:institution) { Institution.make(:institution) }
-      let(:sample) { Sample.make institution: institution }
-      let(:site) { Site.make institution: institution }
+      let(:institution) { Institution.make! }
+      let(:sample) { Sample.make! institution: institution }
+      let(:site) { Site.make! institution: institution }
 
       it "validate presence of site" do
         expect(SampleIdentifier.new(sample: sample, site: site, entity_id: "100000")).to be_valid
@@ -106,7 +106,7 @@ describe SampleIdentifier do
       end
 
       it "should be able to update" do
-        sample_ident = SampleIdentifier.make sample: sample, site: site
+        sample_ident = SampleIdentifier.make! sample: sample, site: site
         sample_ident.save!
       end
     end

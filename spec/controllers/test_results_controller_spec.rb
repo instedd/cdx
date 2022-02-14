@@ -2,25 +2,25 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe TestResultsController, elasticsearch: true do
-  let!(:user)        {User.make}
-  let!(:institution) { user.create Institution.make_unsaved }
+  let(:user)         { User.make! }
+  let!(:institution) { Institution.make!(user: user) }
 
-  let(:root_location) { Location.make }
-  let(:location) { Location.make parent: root_location }
-  let(:site)     { Site.make institution: institution, location: location }
-  let(:subsite)  { Site.make institution: institution, location: location, parent: site }
-  let(:device)   { Device.make institution: institution, site: site }
+  let(:root_location) { Location.make! }
+  let(:location) { Location.make! parent: root_location }
+  let(:site)     { Site.make! institution: institution, location: location }
+  let(:subsite)  { Site.make! institution: institution, location: location, parent: site }
+  let(:device)   { Device.make! institution: institution, site: site }
 
-  let(:site2)    { Site.make institution: institution, location: location }
-  let(:device2)  { Device.make institution: institution, site: site2 }
+  let(:site2)    { Site.make! institution: institution, location: location }
+  let(:device2)  { Device.make! institution: institution, site: site2 }
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }
 
-  let(:other_user)        { User.make }
-  let(:other_institution) { Institution.make user: other_user }
-  let(:other_site)  { Site.make institution: other_institution }
-  let(:other_device)      { Device.make institution: other_institution, site: other_site }
+  let(:other_institution) { Institution.make! }
+  let(:other_user)        { other_institution.user }
+  let(:other_site)        { Site.make! institution: other_institution }
+  let(:other_device)      { Device.make! institution: other_institution, site: other_site }
 
   it "should display an empty page when there are no test results" do
     response = get :index
@@ -30,7 +30,7 @@ describe TestResultsController, elasticsearch: true do
   it "should list test results" do
     test_result = TestResult.create_and_index(
       core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
-      device_messages: [ DeviceMessage.make(device: device) ])
+      device_messages: [ DeviceMessage.make!(device: device) ])
 
     get :index
     expect(response).to be_success
@@ -43,7 +43,7 @@ describe TestResultsController, elasticsearch: true do
 
       test_result = TestResult.create_and_index(
       core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
-      device_messages: [ DeviceMessage.make(device: device) ])
+      device_messages: [ DeviceMessage.make!(device: device) ])
 
       get :index, context: site.uuid
       expect(assigns(:tests).map{|t| t['test']['uuid']}).to contain_exactly(test_result.uuid)
@@ -58,7 +58,7 @@ describe TestResultsController, elasticsearch: true do
 
     it "should show all tests for site" do
       user.update_attribute(:last_navigation_context, site.uuid)
-      device2 = Device.make institution: institution, site: subsite
+      device2 = Device.make! institution: institution, site: subsite
 
       test_result = TestResult.create_and_index device: device
       test_result_subsite = TestResult.create_and_index device: device2
@@ -68,7 +68,7 @@ describe TestResultsController, elasticsearch: true do
     end
 
     it "with exclusion should show only tests for site, not subsites" do
-      device2 = Device.make institution: institution, site: subsite
+      device2 = Device.make! institution: institution, site: subsite
 
       test_result = TestResult.create_and_index device: device
       test_result_subsite = TestResult.create_and_index device: device2
@@ -84,7 +84,7 @@ describe TestResultsController, elasticsearch: true do
       subsite; site2; device2
       TestResult.create_and_index(
         core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
-        device_messages: [ DeviceMessage.make(device: device) ])
+        device_messages: [ DeviceMessage.make!(device: device) ])
     end
 
     it "should load for filters" do
@@ -104,7 +104,7 @@ describe TestResultsController, elasticsearch: true do
 
   context "CSV" do
     let!(:patient) do
-      Patient.make(
+      Patient.make!(
         institution: institution,
         core_fields: { "gender" => "male" },
         custom_fields: { "custom" => "patient value" },
@@ -112,7 +112,7 @@ describe TestResultsController, elasticsearch: true do
       )
     end
     let!(:encounter) do
-      Encounter.make(
+      Encounter.make!(
         institution: institution,
         patient: patient,
         core_fields: {
@@ -128,7 +128,7 @@ describe TestResultsController, elasticsearch: true do
       )
     end
     let!(:sample) do
-      Sample.make(
+      Sample.make!(
         institution: institution,
         encounter: encounter,
         patient: patient,
@@ -136,7 +136,7 @@ describe TestResultsController, elasticsearch: true do
         custom_fields: { "custom" => "sample value" }
       )
     end
-    let!(:sample_id) { sample.sample_identifiers.make }
+    let!(:sample_id) { SampleIdentifier.make!(sample: sample) }
     let!(:test) do
       TestResult.make_from_sample(
         sample,
@@ -263,22 +263,22 @@ describe TestResultsController, elasticsearch: true do
 
   describe "show single test result" do
 
-    let!(:owner) { User.make }
-    let!(:institution) { Institution.make user: owner }
-    let!(:site)  { Site.make institution: institution }
-    let!(:device) { Device.make institution: institution, site: site }
+    let!(:owner) { User.make! }
+    let!(:institution) { Institution.make! user: owner }
+    let!(:site)  { Site.make! institution: institution }
+    let!(:device) { Device.make! institution: institution, site: site }
 
     let!(:test_result) do
       TestResult.create_and_index(
         core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
-        device_messages: [ DeviceMessage.make(device: device) ]
+        device_messages: [ DeviceMessage.make!(device: device) ]
       )
     end
 
-    let!(:user) { User.make }
-    let!(:other_institution) { Institution.make user: user }
-    let!(:other_site)  { Site.make institution: other_institution }
-    let!(:other_device) { Device.make institution: other_institution, site: other_site }
+    let!(:user) { User.make! }
+    let!(:other_institution) { Institution.make! user: user }
+    let!(:other_site)  { Site.make! institution: other_institution }
+    let!(:other_device) { Device.make! institution: other_institution, site: other_site }
 
     before(:each) { sign_in user }
     let(:default_params) { {context: other_institution.uuid} }
@@ -313,7 +313,7 @@ describe TestResultsController, elasticsearch: true do
     end
 
     context "when original site was moved (ie soft deleted + device changed)" do
-      let!(:new_site) { Site.make institution: institution }
+      let!(:new_site) { Site.make! institution: institution }
 
       before(:each) {
         device.site = new_site

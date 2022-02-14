@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
-  let(:user) {User.make}
-  let(:institution) {Institution.make user: user}
+  let(:user) {User.make!}
+  let(:institution) {Institution.make! user: user}
 
   before(:each) {sign_in user}
 
@@ -15,19 +15,19 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
   end
 
   context "Locations" do
-    let(:parent_location) {Location.make}
-    let(:leaf_location1) {Location.make parent: parent_location}
-    let(:leaf_location2) {Location.make parent: parent_location}
-    let(:upper_leaf_location) {Location.make}
+    let(:parent_location) {Location.make!}
+    let(:leaf_location1) {Location.make! parent: parent_location}
+    let(:leaf_location2) {Location.make! parent: parent_location}
+    let(:upper_leaf_location) {Location.make!}
 
-    let(:site1) {Site.make institution: institution, location_geoid: leaf_location1.id}
-    let(:site2) {Site.make institution: institution, location_geoid: leaf_location2.id}
-    let(:site3) {Site.make institution: institution, location_geoid: upper_leaf_location.id}
+    let(:site1) {Site.make! institution: institution, location_geoid: leaf_location1.id}
+    let(:site2) {Site.make! institution: institution, location_geoid: leaf_location2.id}
+    let(:site3) {Site.make! institution: institution, location_geoid: upper_leaf_location.id}
 
     it "filters by location" do
-      device1 = Device.make institution: institution, site: site1
-      device2 = Device.make institution: institution, site: site2
-      device3 = Device.make institution: institution, site: site3
+      device1 = Device.make! institution: institution, site: site1
+      device2 = Device.make! institution: institution, site: site2
+      device3 = Device.make! institution: institution, site: site3
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_b"]})
@@ -51,9 +51,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
     end
 
     it "groups by administrative level" do
-      device1 = Device.make institution: institution, site: site1
-      device2 = Device.make institution: institution, site: site2
-      device3 = Device.make institution: institution, site: site3
+      device1 = Device.make! institution: institution, site: site1
+      device2 = Device.make! institution: institution, site: site2
+      device3 = Device.make! institution: institution, site: site3
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[name: "flu_a"]})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[name: "flu_b"]})

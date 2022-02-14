@@ -2,20 +2,20 @@ require 'spec_helper'
 
 describe Api::MessagesController, elasticsearch: true, validate_manifest: false do
 
-  let(:user) {User.make}
-  let(:institution) {Institution.make user: user}
-  let(:device) {Device.make institution: institution}
+  let(:user) {User.make!}
+  let(:institution) {Institution.make! user: user}
+  let(:device) {Device.make! institution: institution}
   let(:data) {Oj.dump test: {assays: [result: :positive]}}
 
   before(:each) {sign_in user}
 
   context "Locations" do
-    let(:parent_location) {Location.make}
-    let(:leaf_location1) {Location.make parent: parent_location}
-    let(:leaf_location2) {Location.make parent: parent_location}
-    let(:upper_leaf_location) {Location.make}
+    let(:parent_location) {Location.make!}
+    let(:leaf_location1) {Location.make! parent: parent_location}
+    let(:leaf_location2) {Location.make! parent: parent_location}
+    let(:upper_leaf_location) {Location.make!}
 
-    let(:site1) {Site.make institution: institution, location_geoid: leaf_location1.id}
+    let(:site1) {Site.make! institution: institution, location_geoid: leaf_location1.id}
 
     it "should store the location id when the device is registered in only one site" do
       device.site = site1

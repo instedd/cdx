@@ -77,7 +77,7 @@ describe Manifest, validate_manifest: false do
     end
 
     it "has access to device from script" do
-      device = Device.make
+      device = Device.make!
       assert_manifest_application %(
         {
           "sample.fields": { "script": "device.name + ',' + device.uuid" }
@@ -91,7 +91,7 @@ describe Manifest, validate_manifest: false do
     end
 
     it "has access to site from script" do
-      device = Device.make
+      device = Device.make!
       site = device.site
 
       assert_manifest_application %(
@@ -107,7 +107,7 @@ describe Manifest, validate_manifest: false do
     end
 
     it "has access to location from script" do
-      device = Device.make
+      device = Device.make!
       loc = device.site.location
 
       assert_manifest_application %(
@@ -373,7 +373,7 @@ describe Manifest, validate_manifest: false do
           "run_at" : "sat13feb014pm"
         }',
         {"test" => {"custom" => {"month" => "2001-02-13T20:00:00+0000"}, "pii" => {}, "core" => {}}},
-        Device.make(time_zone: 'Atlantic Time (Canada)')
+        Device.make!(time_zone: 'Atlantic Time (Canada)')
     end
 
     it "obtains the distance in years between two dates" do

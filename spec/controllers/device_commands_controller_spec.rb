@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe DeviceCommandsController do
-  let(:institution) {Institution.make}
-  let(:device) { Device.make institution: institution}
+  let(:institution) {Institution.make!}
+  let(:device) { Device.make! institution: institution}
 
   before(:each) do
     device.set_key_for_activation_token

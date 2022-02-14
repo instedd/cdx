@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
-  let(:user) { User.make }
-  let!(:institution) { Institution.make user: user }
-  let(:site) { Site.make institution: institution }
-  let(:device) { Device.make institution: institution, site: site }
+  let(:user) { User.make! }
+  let!(:institution) { Institution.make! user: user }
+  let(:site) { Site.make! institution: institution }
+  let(:device) { Device.make! institution: institution, site: site }
   let(:data) { Oj.dump test:{assays: [result: :positive]} }
   before(:each) { sign_in user }
 
@@ -19,7 +19,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
   context "Query" do
     context "Policies" do
       it "allows a user to query tests of it's own institutions" do
-        device2 = Device.make
+        device2 = Device.make!
 
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[{name: "mtb", result: :positive}]})
         DeviceMessage.create_and_process device: device2, plain_text_data: (Oj.dump test:{assays:[{name: "mtb", result: :negative}]})
@@ -62,7 +62,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
     end
 
     context "Filter" do
-      let(:device2) {Device.make institution: institution}
+      let(:device2) {Device.make! institution: institution}
 
       it "should check for new tests since a date" do
         Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
@@ -289,7 +289,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       context "permissions" do
 
         it "should not return pii if unauthorised" do
-          other_user = User.make
+          other_user = User.make!
           grant user, other_user, { testResult: institution }, Policy::Actions::QUERY_TEST
           sign_in other_user
           get :pii, id: test.uuid
@@ -298,7 +298,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         end
 
         it "should return pii if unauthorised" do
-          other_user = User.make
+          other_user = User.make!
           grant user, other_user, { testResult: institution }, Policy::Actions::PII_TEST
           sign_in other_user
           get :pii, id: test.uuid

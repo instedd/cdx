@@ -9,20 +9,20 @@ describe Blender do
       DatabaseCleaner.clean_with :truncation
       LocationService.fake!
 
-      @institution = Institution.make
+      @institution = Institution.make!
 
-      @patient_p1 = @institution.patients.make(is_phantom: false)
-      @patient_p2 = @institution.patients.make(is_phantom: false)
+      @patient_p1 = Patient.make!(institution: @institution, is_phantom: false)
+      @patient_p2 = Patient.make!(institution: @institution, is_phantom: false)
 
-      @encounter_p1e1 = @patient_p1.encounters.make(is_phantom: false)
-      @encounter_p1e2 = @patient_p1.encounters.make(is_phantom: false)
-      @encounter_p1e3 = @patient_p1.encounters.make(is_phantom: false)
-      @encounter_p2e1 = @patient_p2.encounters.make(is_phantom: false)
+      @encounter_p1e1 = Encounter.make!(patient: @patient_p1, is_phantom: false)
+      @encounter_p1e2 = Encounter.make!(patient: @patient_p1, is_phantom: false)
+      @encounter_p1e3 = Encounter.make!(patient: @patient_p1, is_phantom: false)
+      @encounter_p2e1 = Encounter.make!(patient: @patient_p2, is_phantom: false)
 
-      @sample_p1e1s1 = @encounter_p1e1.samples.make(is_phantom: false)
-      @sample_p1e1s2 = @encounter_p1e1.samples.make(is_phantom: false)
-      @sample_p1e2s1 = @encounter_p1e2.samples.make(is_phantom: false)
-      @sample_p2e1s1 = @encounter_p2e1.samples.make(is_phantom: false)
+      @sample_p1e1s1 = Sample.make!(encounter: @encounter_p1e1, is_phantom: false)
+      @sample_p1e1s2 = Sample.make!(encounter: @encounter_p1e1, is_phantom: false)
+      @sample_p1e2s1 = Sample.make!(encounter: @encounter_p1e2, is_phantom: false)
+      @sample_p2e1s1 = Sample.make!(encounter: @encounter_p2e1, is_phantom: false)
 
       @test_p1e1s1t1 = TestResult.make_from_sample(@sample_p1e1s1)
       @test_p1e1s1t2 = TestResult.make_from_sample(@sample_p1e1s1)
@@ -32,10 +32,10 @@ describe Blender do
       @test_p1e0s0t1 = TestResult.make_from_patient(@patient_p1)
       @test_p2e1s1t1 = TestResult.make_from_sample(@sample_p2e1s1)
 
-      @other_institution = Institution.make
-      @other_patient = @other_institution.patients.make(is_phantom: false)
-      @other_encounter = @other_patient.encounters.make(is_phantom: false)
-      @other_sample = @other_encounter.samples.make(is_phantom: false)
+      @other_institution = Institution.make!
+      @other_patient = Patient.make!(institution: @other_institution, is_phantom: false)
+      @other_encounter = Encounter.make!(patient: @other_patient, is_phantom: false)
+      @other_sample = Sample.make!(encounter: @other_encounter, is_phantom: false)
       @other_test = TestResult.make_from_sample(@other_sample)
     end
 
@@ -499,9 +499,9 @@ describe Blender do
           sample: { id: 2 }
         }
       end
-      let(:site1) { Site.make }
-      let(:site2) { Site.make institution: site1.institution }
-      let(:device) { Device.make institution: site1.institution, site: site1 }
+      let(:site1) { Site.make! }
+      let(:site2) { Site.make! institution: site1.institution }
+      let(:device) { Device.make! institution: site1.institution, site: site1 }
 
       it "should not link the samples" do
         DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(message)

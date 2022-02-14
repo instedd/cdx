@@ -1,5 +1,5 @@
 def setup_user
-  @user ||= User.make(
+  @user ||= User.make!(
     password_changed_at: Time.now,
     password: 'abc123abc'
   )

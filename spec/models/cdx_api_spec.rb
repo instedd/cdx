@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Cdx::Api, elasticsearch: true do
   include_context "cdx api helpers"
 
-  let!(:device) {Device.make}
+  let!(:device) {Device.make!}
   let!(:institution) { device.institution }
 
   describe "Filter" do

@@ -3,12 +3,12 @@ require 'spec_helper'
 describe FtpMonitor, elasticsearch: true do
   context 'orchestration' do
     it 'should group devices by ftp info' do
-      dm = DeviceModel.make(supports_ftp: true, filename_pattern: '(?<sn>.+)')
-      d1 = Device.make(device_model: dm, ftp_hostname: 'example.com')
-      d2 = Device.make(device_model: dm, ftp_hostname: 'example.com')
-      d3 = Device.make(device_model: dm, ftp_hostname: 'example.com', ftp_port: 1000)
-      d4 = Device.make(device_model: dm, ftp_hostname: 'example.com', ftp_port: 1000)
-      d5 = Device.make(device_model: dm, ftp_hostname: 'example.com', ftp_port: 2000)
+      dm = DeviceModel.make!(supports_ftp: true, filename_pattern: '(?<sn>.+)')
+      d1 = Device.make!(device_model: dm, ftp_hostname: 'example.com')
+      d2 = Device.make!(device_model: dm, ftp_hostname: 'example.com')
+      d3 = Device.make!(device_model: dm, ftp_hostname: 'example.com', ftp_port: 1000)
+      d4 = Device.make!(device_model: dm, ftp_hostname: 'example.com', ftp_port: 1000)
+      d5 = Device.make!(device_model: dm, ftp_hostname: 'example.com', ftp_port: 2000)
 
       groups = FtpMonitor.new.device_groups
       expect(groups).to have(3).items
@@ -34,11 +34,11 @@ describe FtpMonitor, elasticsearch: true do
     let(:ftp_info) { FtpInfo.new(hostname: 'example.com') }
     let(:files)    { [] }
 
-    let(:model1)  { DeviceModel.make(supports_ftp: true, filename_pattern: 'M1_(?<sn>[A-Z0-9]+)_(?<ts>\d{8})') }
-    let(:model2)  { DeviceModel.make(supports_ftp: true, filename_pattern: 'M2_(?<sn>[A-Z0-9]+)') }
-    let(:device1) { Device.make(device_model: model1, serial_number: 'A1000') }
-    let(:device2) { Device.make(device_model: model2, serial_number: 'A2000') }
-    let(:device3) { Device.make(device_model: model2, serial_number: 'A3000') }
+    let(:model1)  { DeviceModel.make!(supports_ftp: true, filename_pattern: 'M1_(?<sn>[A-Z0-9]+)_(?<ts>\d{8})') }
+    let(:model2)  { DeviceModel.make!(supports_ftp: true, filename_pattern: 'M2_(?<sn>[A-Z0-9]+)') }
+    let(:device1) { Device.make!(device_model: model1, serial_number: 'A1000') }
+    let(:device2) { Device.make!(device_model: model2, serial_number: 'A2000') }
+    let(:device3) { Device.make!(device_model: model2, serial_number: 'A3000') }
 
     let(:subject) { FtpMonitor::FtpProcessor.new(ftp_info, [device1, device2, device3]) }
 
@@ -221,7 +221,7 @@ describe FtpMonitor, elasticsearch: true do
       let(:temp_dir) { Dir.mktmpdir('ftp') }
       let(:device_model) do
         # if this pattern change, also update it in load_manifests.rake
-        DeviceModel.make(
+        DeviceModel.make!(
           name: 'alere_q',
           supports_ftp: true,
           filename_pattern:
@@ -230,7 +230,7 @@ describe FtpMonitor, elasticsearch: true do
       end
       let!(:manifest) { load_manifest 'alere_q_manifest.json', device_model }
       let!(:device) do
-        Device.make(
+        Device.make!(
           device_model: device_model,
           ftp_hostname: 'example.com',
           ftp_port: 2000,

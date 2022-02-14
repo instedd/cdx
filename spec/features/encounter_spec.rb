@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe "create encounter" do
-  let(:device) { Device.make }
+  let(:device) { Device.make! }
   let(:institution) { device.institution }
   let(:site) { institution.sites.first }
   let(:user) { device.institution.user }
@@ -35,7 +35,7 @@ describe "create encounter" do
   end
 
   it "should obly user to choose site when context is institution with multiple sites" do
-    other_site = institution.sites.make
+    other_site = Site.make! institution: institution
     user.update_attribute(:last_navigation_context, institution.uuid)
 
     goto_page NewEncounterPage do |page|
@@ -51,10 +51,10 @@ describe "create encounter" do
   end
 
   context "within not owned institution" do
-    let(:other_institution) { Institution.make }
-    let(:site1) { other_institution.sites.make }
-    let(:site2) { other_institution.sites.make }
-    let(:site3) { other_institution.sites.make }
+    let(:other_institution) { Institution.make! }
+    let(:site1) { Site.make! institution: other_institution }
+    let(:site2) { Site.make! institution: other_institution }
+    let(:site3) { Site.make! institution: other_institution }
 
     before(:each) {
       grant other_institution.user, user, other_institution, READ_INSTITUTION
@@ -258,7 +258,7 @@ describe "create encounter" do
   end
 
   it "should be able to create fresh encounter with existing patient" do
-    patient = institution.patients.make name: FFaker::Name.name, site: site
+    patient = Patient.make! institution: institution, name: FFaker::Name.name, site: site
 
     goto_page NewFreshEncounterPage do |page|
       page.patient.type_and_select patient.name

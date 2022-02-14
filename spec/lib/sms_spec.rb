@@ -14,11 +14,11 @@ describe "SMS" do
 
   context "sms operation" do
     it "should test sending sms" do
-      alert = Alert.make
+      alert = Alert.make!
       alert.name="test alert"
       alert.sms_message="welcome mr {lastname}"
 
-      recipient = AlertRecipient.make
+      recipient = AlertRecipient.make!
       recipient.recipient_type = AlertRecipient.recipient_types["external_user"]
       recipient.alert=alert
 
@@ -31,7 +31,7 @@ describe "SMS" do
       person[:recipient_id] = recipient.id
       tel_list.push person
 
-      recipient2 = AlertRecipient.make
+      recipient2 = AlertRecipient.make!
       recipient2.recipient_type = AlertRecipient.recipient_types["external_user"]
       recipient2.telephone="456777"
       recipient2.alert=alert

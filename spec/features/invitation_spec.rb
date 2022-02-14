@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "invite user" do
-  let(:institution) { Institution.make }
+  let(:institution) { Institution.make! }
   let(:user) { institution.user }
 
   describe "from users list" do
@@ -62,12 +62,8 @@ describe "invite user" do
 
   describe "institution invite" do
     context "new user" do
-      let!(:new_user) {
-        User.make(:invited_pending).tap do |user|
-          user.send("generate_invitation_token!")
-        end
-      }
-      let!(:invite) { PendingInstitutionInvite.make(invited_user_email: new_user.email, invited_by_user: user) }
+      let!(:new_user) { User.make!(:invited_pending) }
+      let!(:invite) { PendingInstitutionInvite.make!(invited_user_email: new_user.email, invited_by_user: user) }
 
       it "onboards invitee" do
         # TODO: Add invitation send workflow after it has been remodeled in #1430

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe CSVMessageParser do
-  let(:user) {User.make}
-  let(:institution) {Institution.make user: user}
-  let(:device) {Device.make institution: institution}
+  let(:user) {User.make!}
+  let(:institution) {Institution.make! user: user}
+  let(:device) {Device.make! institution: institution}
 
   it "parses a single line CSV" do
     data = CSVMessageParser.new.load <<-CSV.strip_heredoc

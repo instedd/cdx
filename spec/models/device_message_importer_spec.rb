@@ -3,10 +3,10 @@ require 'spec_helper'
 require 'fileutils'
 
 describe DeviceMessageImporter, elasticsearch: true do
-  let(:user) { User.make }
-  let(:institution) { Institution.make user: user }
-  let(:device_model) { DeviceModel.make name: 'test_model' }
-  let(:device) { Device.make institution: institution, device_model: device_model }
+  let(:user) { User.make! }
+  let(:institution) { Institution.make! user: user }
+  let(:device_model) { DeviceModel.make! name: 'test_model' }
+  let(:device) { Device.make! institution: institution, device_model: device_model }
   let(:sync_dir) { CDXSync::SyncDirectory.new(Dir.mktmpdir('sync')) }
   let(:inbox) { sync_dir.inbox_path(device.uuid) }
 
@@ -148,7 +148,7 @@ describe DeviceMessageImporter, elasticsearch: true do
 
   context "real scenarios" do
     context 'epicenter headless_es' do
-      let!(:device_model) { DeviceModel.make name: 'epicenter_headless_es' }
+      let!(:device_model) { DeviceModel.make! name: 'epicenter_headless_es' }
       let!(:manifest)     { load_manifest 'epicenter_m.g.i.t._spanish_manifest.json', device_model }
 
       it "parses csv in utf-16le" do
@@ -182,7 +182,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'cepheid' do
-      let!(:device_model) { DeviceModel.make name: "GX Model I" }
+      let!(:device_model) { DeviceModel.make! name: "GX Model I" }
       let!(:manifest)     { load_manifest 'genexpert_manifest.json', device_model }
 
       context 'sample' do
@@ -230,7 +230,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'genoscan' do
-      let(:device_model) { DeviceModel.make name: 'genoscan' }
+      let(:device_model) { DeviceModel.make! name: 'genoscan' }
       let!(:manifest) { load_manifest 'genoscan_manifest.json', device_model }
 
       it 'parses csv' do
@@ -288,7 +288,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'alere q' do
-      let(:device_model) { DeviceModel.make name: 'alere q' }
+      let(:device_model) { DeviceModel.make! name: 'alere q' }
       let!(:manifest) { load_manifest 'alere_q_manifest.json', device_model }
 
       it 'parses csv' do
@@ -343,7 +343,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'alere pima' do
-      let(:device_model) { DeviceModel.make name: 'alere pima' }
+      let(:device_model) { DeviceModel.make! name: 'alere pima' }
       let!(:manifest) { load_manifest 'alere_pima_manifest.json', device_model }
 
       it 'parses csv' do
@@ -377,7 +377,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'fio' do
-      let(:device_model) { DeviceModel.make name: 'FIO' }
+      let(:device_model) { DeviceModel.make! name: 'FIO' }
       let!(:manifest) { load_manifest 'deki_reader_manifest.json', device_model }
 
       it 'parses xml' do
@@ -416,7 +416,7 @@ describe DeviceMessageImporter, elasticsearch: true do
     end
 
     context 'BDMicroImager' do
-      let!(:device_model) { DeviceModel.make name: "BD MicroImager" }
+      let!(:device_model) { DeviceModel.make! name: "BD MicroImager" }
       let!(:manifest) { load_manifest 'micro_imager_manifest.json', device_model }
 
       it "should parse bd micro's document" do

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe UsersController, type: :controller do
-  let(:user) { User.make }
-  let!(:institution) { user.institutions.make }
+  let(:user) { User.make! }
+  let!(:institution) { user.institutions.make! }
   let(:default_params) { { context: institution.uuid } }
 
   before do
@@ -10,7 +10,7 @@ describe UsersController, type: :controller do
     sign_in user
   end
 
-  let(:user_to_edit) { User.make }
+  let(:user_to_edit) { User.make! }
 
   describe 'GET :edit' do
     before do
@@ -167,7 +167,7 @@ describe UsersController, type: :controller do
     end
 
     context "existing user" do
-      let!(:existing_user) { User.make }
+      let!(:existing_user) { User.make! }
 
       it "sends invitation" do
         expect do
@@ -214,7 +214,7 @@ describe UsersController, type: :controller do
     end
 
     it "should filter by name" do
-      another_user = User.make first_name: "lulululu"
+      another_user = User.make! first_name: "lulululu"
       another_user.roles << role
       another_user.update_computed_policies
 
@@ -224,7 +224,7 @@ describe UsersController, type: :controller do
     end
 
     it "should filter by role" do
-      another_user = User.make
+      another_user = User.make!
       expect(role).to_not eq(Role.last)
       another_user.roles << Role.last
       another_user.update_computed_policies
@@ -235,7 +235,7 @@ describe UsersController, type: :controller do
     end
 
     it "should filter by last activity" do
-      another_user = User.make(:invited_pending)
+      another_user = User.make!(:invited_pending)
       another_user.roles << role
       another_user.update_computed_policies
       user_to_edit.last_sign_in_at = 3.weeks.ago

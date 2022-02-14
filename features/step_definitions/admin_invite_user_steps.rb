@@ -1,16 +1,16 @@
 Given(/^an authenticated superadmin called Bob$/) do
-  @administrator = User.make(password: 'copado123', first_name: 'Bob')
+  @administrator = User.make!(password: 'copado123', first_name: 'Bob')
   @administrator.grant_superadmin_policy
   @administrator.reload.update_computed_policies
   authenticate(@administrator)
 end
 
 Given(/^an institution name "(.*?)"$/) do |arg1|
-  @institution = Institution.make(user_id: @administrator.id)
+  @institution = Institution.make!(user_id: @administrator.id)
 end
 
 Given(/^a prospective user called Bill Smith, with email "(.*?)"$/) do |email|
-  @user = User.make_unsaved(email: email)
+  @user = User.make(email: email)
 end
 
 Given(/^Bill does not have an account$/) do
@@ -36,7 +36,7 @@ Given(/^the following users created by Bob$/) do |users|
       name: user[:lab_name], institution: @institution.id
     ).first_or_create
 
-    user = User.make(
+    user = User.make!(
       first_name: user[:first_name],
       last_name: user[:last_name],
       roles: [site.roles.first]

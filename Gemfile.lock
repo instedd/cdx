@@ -345,7 +345,7 @@ GEM
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.9)
-    machinist (1.0.6)
+    machinist (2.0)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     mechanize (2.7.3)
@@ -664,7 +664,7 @@ DEPENDENCIES
   letter_opener
   location_service!
   lodash-rails
-  machinist (~> 1.0)
+  machinist (~> 2.0)
   mysql2
   newrelic_rpm
   nokogiri (~> 1.6.7.2)

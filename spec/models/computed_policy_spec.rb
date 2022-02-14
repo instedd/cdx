@@ -7,16 +7,14 @@ describe ComputedPolicy do
 
   before(:each) { allow(Policy).to receive(:implicit).and_return(nil) }
 
-  let!(:user) { User.make email: "user@example.com" }
+  let!(:user) { User.make! email: "user@example.com" }
 
   context "from superadmin" do
 
-    let!(:device)  { Device.make }
-    let!(:device2) { Device.make }
+    let!(:device)  { Device.make! }
+    let!(:device2) { Device.make! }
 
-    let!(:superadmin) do
-      User.make { |u| u.grant_superadmin_policy }
-    end
+    let!(:superadmin) { User.make!.tap(&:grant_superadmin_policy) }
 
     it "should create computed policy for single resource" do
       expect {
@@ -114,11 +112,11 @@ describe ComputedPolicy do
 
   context "from regular user" do
 
-    let!(:device)  { Device.make }
-    let!(:device2) { Device.make }
+    let!(:device)  { Device.make! }
+    let!(:device2) { Device.make! }
 
-    let!(:granter)  { User.make }
-    let!(:granter2) { User.make }
+    let!(:granter)  { User.make! }
+    let!(:granter2) { User.make! }
 
     it "should create intersection from resources" do
       grant nil, granter, [device, device2], [READ_DEVICE]
@@ -282,16 +280,16 @@ describe ComputedPolicy do
 
   context "recursively" do
 
-    let!(:device)  { Device.make }
-    let!(:device2) { Device.make }
+    let!(:device)  { Device.make! }
+    let!(:device2) { Device.make! }
 
-    let!(:granter)  { User.make }
-    let!(:granter2) { User.make }
-    let!(:granter3) { User.make }
+    let!(:granter)  { User.make! }
+    let!(:granter2) { User.make! }
+    let!(:granter3) { User.make! }
 
     it "should recompute policies" do
-      i1 = granter.institutions.make
-      i2 = granter2.institutions.make
+      i1 = Institution.make! user: granter
+      i2 = Institution.make! user: granter2
 
       expect {
         grant granter2, user, Device, [READ_DEVICE]
@@ -308,8 +306,8 @@ describe ComputedPolicy do
     end
 
     it "should recompute policies when a policy is removed" do
-      i1 = granter.institutions.make
-      i2 = granter2.institutions.make
+      i1 = Institution.make! user: granter
+      i2 = Institution.make! user: granter2
 
       policies = []
 
@@ -332,7 +330,7 @@ describe ComputedPolicy do
     it "should recompute policies when an institution is destroyed (#453)" do
       old_computed_policies = granter.computed_policies.to_a
 
-      i1 = granter.institutions.make
+      i1 = Institution.make! user: granter
       i1.destroy
 
       granter.reload
@@ -340,9 +338,9 @@ describe ComputedPolicy do
     end
 
     it "should support a loop of policies" do
-      i1 = granter.institutions.make
-      i2 = granter2.institutions.make
-      i3 = granter3.institutions.make
+      i1 = Institution.make! user: granter
+      i2 = Institution.make! user: granter2
+      i3 = Institution.make! user: granter3
 
       grant(granter, granter2, Device, [READ_DEVICE])
       grant(granter2, granter3, Device, [READ_DEVICE])
@@ -358,22 +356,22 @@ describe ComputedPolicy do
 
   context "condition resources" do
 
-    let!(:institution_i1) { Institution.make }
-    let!(:institution_i2) { Institution.make }
+    let!(:institution_i1) { Institution.make! }
+    let!(:institution_i2) { Institution.make! }
 
-    let!(:site_i1_l1) { institution_i1.sites.make }
-    let!(:site_i1_l2) { institution_i1.sites.make }
-    let!(:site_i2_l1) { institution_i2.sites.make }
-    let!(:site_i2_l2) { institution_i2.sites.make }
+    let!(:site_i1_l1) { Site.make! institution: institution_i1 }
+    let!(:site_i1_l2) { Site.make! institution: institution_i1 }
+    let!(:site_i2_l1) { Site.make! institution: institution_i2 }
+    let!(:site_i2_l2) { Site.make! institution: institution_i2 }
 
-    let!(:device_i1_l1_d1) { site_i1_l1.devices.make }
-    let!(:device_i1_l1_d2) { site_i1_l1.devices.make }
-    let!(:device_i1_l2_d1) { site_i1_l2.devices.make }
-    let!(:device_i1_l2_d2) { site_i1_l2.devices.make }
-    let!(:device_i2_l1_d1) { site_i2_l1.devices.make }
-    let!(:device_i2_l1_d2) { site_i2_l1.devices.make }
-    let!(:device_i2_l2_d1) { site_i2_l2.devices.make }
-    let!(:device_i2_l2_d2) { site_i2_l2.devices.make }
+    let!(:device_i1_l1_d1) { Device.make! site: site_i1_l1 }
+    let!(:device_i1_l1_d2) { Device.make! site: site_i1_l1 }
+    let!(:device_i1_l2_d1) { Device.make! site: site_i1_l2 }
+    let!(:device_i1_l2_d2) { Device.make! site: site_i1_l2 }
+    let!(:device_i2_l1_d1) { Device.make! site: site_i2_l1 }
+    let!(:device_i2_l1_d2) { Device.make! site: site_i2_l1 }
+    let!(:device_i2_l2_d1) { Device.make! site: site_i2_l2 }
+    let!(:device_i2_l2_d2) { Device.make! site: site_i2_l2 }
 
     def condition_resources(action=QUERY_TEST, resource=TestResult, u=nil)
       resources = ComputedPolicy.condition_resources_for(action, resource, u || user)
@@ -436,8 +434,8 @@ describe ComputedPolicy do
     end
 
     it "should return devices with no sites if policy is by institution" do
-      device_i3_s0_d1 = Device.make(institution: Institution.make, site: nil)
-      device_i4_s0_d1 = Device.make(institution: Institution.make, site: nil)
+      device_i3_s0_d1 = Device.make!(institution: Institution.make!, site: nil)
+      device_i4_s0_d1 = Device.make!(institution: Institution.make!, site: nil)
       expect(device_i3_s0_d1.site).to be_nil
 
       grant nil, user, {:device => device_i3_s0_d1.institution}, READ_DEVICE
@@ -449,7 +447,7 @@ describe ComputedPolicy do
     end
 
     it "should return devices with no sites if policy is by institution" do
-      device_i1_s0_d1 = Device.make(institution: institution_i1, site: nil)
+      device_i1_s0_d1 = Device.make!(institution: institution_i1, site: nil)
       expect(device_i1_s0_d1.site).to be_nil
 
       grant nil, user, {:device => institution_i1}, READ_DEVICE
@@ -461,7 +459,7 @@ describe ComputedPolicy do
     end
 
     it "should not return devices with no sites if policy is by sites" do
-      device_i1_s0_d1 = Device.make(institution: institution_i1, site: nil)
+      device_i1_s0_d1 = Device.make!(institution: institution_i1, site: nil)
       expect(device_i1_s0_d1.site).to be_nil
 
       grant nil, user, {:device => site_i1_l1}, READ_DEVICE
@@ -521,7 +519,7 @@ describe ComputedPolicy do
     end
 
     context "sites and subsites" do
-      let!(:subsite1) { Site.make :child, parent: site_i1_l1}
+      let!(:subsite1) { Site.make! :child, parent: site_i1_l1}
 
       it "grants access only to the given site" do
         grant nil, user, {:device => site_i1_l1}, '*'
@@ -541,15 +539,15 @@ describe ComputedPolicy do
   end
 
   context "sites" do
-    let!(:site1) { Site.make }
-    let!(:site11) { Site.make :child, parent: site1 }
-    let!(:site111) { Site.make :child, parent: site11 }
+    let!(:site1) { Site.make! }
+    let!(:site11) { Site.make! :child, parent: site1 }
+    let!(:site111) { Site.make! :child, parent: site11 }
 
-    let!(:device1) { Device.make site: site1 }
-    let!(:device11) { Device.make site: site11 }
+    let!(:device1) { Device.make! site: site1 }
+    let!(:device11) { Device.make! site: site11 }
 
-    let!(:granter)  { User.make }
-    let!(:granter2) { User.make }
+    let!(:granter)  { User.make! }
+    let!(:granter2) { User.make! }
 
     it "grants access to same site" do
       grant nil, granter, site1, [READ_SITE]
@@ -624,25 +622,25 @@ describe ComputedPolicy do
 
   context "authorised users" do
 
-    let!(:institution_i1) { Institution.make(user: nil) }
-    let!(:institution_i2) { Institution.make(user: nil) }
+    let!(:institution_i1) { Institution.make!(user: nil) }
+    let!(:institution_i2) { Institution.make!(user: nil) }
 
-    let!(:site_i1_l1) { institution_i1.sites.make }
-    let!(:site_i1_l2) { institution_i1.sites.make }
-    let!(:site_i2_l1) { institution_i2.sites.make }
-    let!(:site_i2_l2) { institution_i2.sites.make }
+    let!(:site_i1_l1) { Site.make! institution: institution_i1 }
+    let!(:site_i1_l2) { Site.make! institution: institution_i1 }
+    let!(:site_i2_l1) { Site.make! institution: institution_i2 }
+    let!(:site_i2_l2) { Site.make! institution: institution_i2 }
 
-    let!(:device_i1_l1_d1) { site_i1_l1.devices.make }
-    let!(:device_i1_l1_d2) { site_i1_l1.devices.make }
-    let!(:device_i1_l2_d1) { site_i1_l2.devices.make }
-    let!(:device_i1_l2_d2) { site_i1_l2.devices.make }
-    let!(:device_i2_l1_d1) { site_i2_l1.devices.make }
-    let!(:device_i2_l1_d2) { site_i2_l1.devices.make }
-    let!(:device_i2_l2_d1) { site_i2_l2.devices.make }
-    let!(:device_i2_l2_d2) { site_i2_l2.devices.make }
+    let!(:device_i1_l1_d1) { Device.make! site: site_i1_l1 }
+    let!(:device_i1_l1_d2) { Device.make! site: site_i1_l1 }
+    let!(:device_i1_l2_d1) { Device.make! site: site_i1_l2 }
+    let!(:device_i1_l2_d2) { Device.make! site: site_i1_l2 }
+    let!(:device_i2_l1_d1) { Device.make! site: site_i2_l1 }
+    let!(:device_i2_l1_d2) { Device.make! site: site_i2_l1 }
+    let!(:device_i2_l2_d1) { Device.make! site: site_i2_l2 }
+    let!(:device_i2_l2_d2) { Device.make! site: site_i2_l2 }
 
-    let!(:user2) { User.make email: "user2@example.com" }
-    let!(:user3) { User.make email: "user3@example.com" }
+    let!(:user2) { User.make! email: "user2@example.com" }
+    let!(:user3) { User.make! email: "user3@example.com" }
 
     def authorized_users(action=[READ_DEVICE], resource=nil)
       ComputedPolicy.authorized_users(action, resource || device_i1_l1_d1)
@@ -725,15 +723,15 @@ describe ComputedPolicy do
 
   context "roles" do
 
-    let!(:device)  { Device.make }
+    let!(:device)  { Device.make! }
 
     let!(:superadmin) do
-      User.make { |u| u.grant_superadmin_policy }
+      User.make! { |u| u.grant_superadmin_policy }
     end
 
     it "should create computed policy for single resource" do
       policy = grant nil, nil, device, [READ_DEVICE]
-      role = Role.make institution: device.institution, policy: policy
+      role = Role.make! institution: device.institution, policy: policy
 
       expect {
         role.users << user

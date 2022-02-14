@@ -3,10 +3,10 @@ require 'policy_spec_helper'
 
 describe Api::EncountersController, elasticsearch: true, validate_manifest: false do
 
-  let(:user) { User.make }
-  let!(:institution) { Institution.make user: user }
-  let(:site) { Site.make institution: institution }
-  let(:device) { Device.make institution: institution, site: site }
+  let(:user) { User.make! }
+  let!(:institution) { Institution.make! user: user }
+  let(:site) { Site.make! institution: institution }
+  let(:device) { Device.make! institution: institution, site: site }
   let(:data) { Oj.dump test:{assays: [result: :positive]} }
 
   before(:each) { sign_in user }
@@ -21,7 +21,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
   context "Query" do
     context "Policies" do
       it "allows a user to query encounters of it's own institutions" do
-        device2 = Device.make
+        device2 = Device.make!
 
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[{name: "mtb", result: :positive}]}, encounter: {patient_age: Cdx::Field::DurationField.years(10)})
         DeviceMessage.create_and_process device: device2, plain_text_data: (Oj.dump test:{assays:[{name: "mtb", result: :negative}]}, encounter: {patient_age: Cdx::Field::DurationField.years(20)})
@@ -74,7 +74,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
       it "should not return pii if unauthorised" do
         expect(Encounter.count).to eq(1)
 
-        other_user = User.make
+        other_user = User.make!
         grant user, other_user, encounter, Policy::Actions::READ_ENCOUNTER
         sign_in other_user
         get :pii, id: encounter.uuid
@@ -85,7 +85,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
       it "should return pii if unauthorised" do
         expect(Encounter.count).to eq(1)
 
-        other_user = User.make
+        other_user = User.make!
         grant user, other_user, encounter, Policy::Actions::PII_ENCOUNTER
         sign_in other_user
         get :pii, id: encounter.uuid

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe FiltersController do
-  let(:user) { User.make }
-  let!(:institution) { user.create Institution.make_unsaved }
-  let!(:filter) { user.filters.make query: { site: 1 } }
+  let(:user) { User.make! }
+  let!(:institution) { Institution.make! user: user }
+  let!(:filter) { Filter.make! user: user, query: { site: 1 } }
   before(:each) { sign_in user }
   let(:default_params) { {context: institution.uuid} }
 

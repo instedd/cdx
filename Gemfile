@@ -109,8 +109,7 @@ end
 group :test do
   gem 'test-unit'
   gem 'tire'
-  # gem 'factory_girl_rails'
-  gem 'machinist', '~> 1.0'
+  gem 'machinist', '~> 2.0' # NOTE: eventually replace with FactoryBot
   gem 'capybara'
   gem 'guard-rspec'
   gem 'rspec'

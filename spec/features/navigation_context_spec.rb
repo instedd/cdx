@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "navigation context" do
-  let(:institution) { Institution.make }
+  let(:institution) { Institution.make! }
   let(:user) { institution.user }
   before(:each) { sign_in(user) }
 
@@ -13,7 +13,7 @@ describe "navigation context" do
   end
 
   it "user get last context by default" do
-    other_institution = Institution.make user: user
+    other_institution = Institution.make! user: user
     goto_page HomePage do |page|
       # Context panel is now open by default
       page.get_context_picker do |context|
@@ -34,7 +34,7 @@ describe "navigation context" do
   end
 
   it "user is get back to a safe context if permission changed" do
-    other_institution = Institution.make
+    other_institution = Institution.make!
     user.update_attribute :last_navigation_context, other_institution.uuid
 
     goto_page HomePage

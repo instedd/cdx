@@ -5,15 +5,15 @@ include Alerts
 describe "Alerts" do
   describe "#building build_mailing_list" do
     it "tests building mailing list" do
-      institution = Institution.make
+      institution = Institution.make!
       user = institution.user
 
-      alert = Alert.make
+      alert = Alert.make!
       alert.user = user
       alert.name="test alert"
       alert.message="welcome"
       
-      recipient1 = AlertRecipient.make
+      recipient1 = AlertRecipient.make!
       recipient1.recipient_type = AlertRecipient.recipient_types["external_user"]
       recipient1.first_name="bob"
       recipient1.last_name="smith"
@@ -22,7 +22,7 @@ describe "Alerts" do
       recipient1.alert=alert
       recipient1.save
 
-      recipient1a = AlertRecipient.make
+      recipient1a = AlertRecipient.make!
       recipient1a.recipient_type = AlertRecipient.recipient_types["external_user"]
       recipient1.first_name="boba"
       recipient1a.last_name="smitha"
@@ -31,7 +31,7 @@ describe "Alerts" do
       recipient1a.alert=alert
       recipient1a.save
 
-      recipient2 = AlertRecipient.make
+      recipient2 = AlertRecipient.make!
       recipient2.recipient_type = AlertRecipient.recipient_types["internal_user"]
       recipient2.user = user
       recipient2.alert=alert

@@ -476,7 +476,7 @@ describe Manifest, validate_manifest: false do
     end
 
     it "map custom fields to core fields" do
-      device = Device.make custom_mappings: {"test.custom_id" => "patient.id"}
+      device = Device.make! custom_mappings: {"test.custom_id" => "patient.id"}
       assert_manifest_application '{
           "test.custom_id" :{ "lookup" : "custom_id" }
         }',

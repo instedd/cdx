@@ -2,8 +2,8 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 RSpec.describe EncountersController, type: :controller, elasticsearch: true do
-  let(:institution) { Institution.make }
-  let(:site) { Site.make institution: institution }
+  let(:institution) { Institution.make! }
+  let(:site) { Site.make! institution: institution }
   let(:user) { institution.user }
 
   before(:each) { sign_in user }
@@ -18,11 +18,11 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
   describe "GET #show" do
     it "returns http success if allowed" do
-      i1 = Institution.make
+      i1 = Institution.make!
       grant i1.user, user, {site: i1}, CREATE_SITE_ENCOUNTER
       grant i1.user, user, {encounter: i1}, READ_ENCOUNTER
 
-      encounter = Encounter.make institution: i1
+      encounter = Encounter.make! institution: i1
       get :show, id: encounter.id
       expect(response).to have_http_status(:success)
 
@@ -30,20 +30,20 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "returns http forbidden if not allowed" do
-      i1 = Institution.make
-      encounter = Encounter.make institution: i1
+      i1 = Institution.make!
+      encounter = Encounter.make! institution: i1
       get :show, id: encounter.id
 
       expect(response).to have_http_status(:forbidden)
     end
 
     it "redirects to edit if can edit" do
-      i1 = Institution.make
+      i1 = Institution.make!
       grant i1.user, user, {site: i1}, CREATE_SITE_ENCOUNTER
       grant i1.user, user, {encounter: i1}, READ_ENCOUNTER
       grant i1.user, user, {encounter: i1}, UPDATE_ENCOUNTER
 
-      encounter = Encounter.make institution: i1
+      encounter = Encounter.make! institution: i1
       get :show, id: encounter.id
 
       expect(response).to have_http_status(:success)
@@ -51,20 +51,20 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "should load encounter by uuid" do
-      encounter = Encounter.make institution: institution
+      encounter = Encounter.make! institution: institution
       get :show, id: encounter.uuid
       expect(assigns(:encounter)).to eq(encounter)
     end
 
     it "should load encounter by id" do
-      encounter = Encounter.make institution: institution
+      encounter = Encounter.make! institution: institution
       get :show, id: encounter.id
       expect(assigns(:encounter)).to eq(encounter)
     end
 
     it "should load encounter first by uuid" do
-      encounter = Encounter.make institution: institution
-      encounter2 = Encounter.make institution: institution, uuid: "#{encounter.id}lorem"
+      encounter = Encounter.make! institution: institution
+      encounter2 = Encounter.make! institution: institution, uuid: "#{encounter.id}lorem"
 
       get :show, id: encounter2.uuid
       expect(assigns(:encounter)).to eq(encounter2)
@@ -73,18 +73,18 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
   describe "GET #edit" do
     it "returns http success if allowed" do
-      i1 = Institution.make
+      i1 = Institution.make!
       grant i1.user, user, {site: i1}, CREATE_SITE_ENCOUNTER
       grant i1.user, user, {encounter: i1}, UPDATE_ENCOUNTER
 
-      encounter = Encounter.make institution: i1
+      encounter = Encounter.make! institution: i1
       get :edit, id: encounter.id
       expect(response).to have_http_status(:success)
     end
 
     it "returns http forbidden if not allowed" do
-      i1 = Institution.make
-      encounter = Encounter.make institution: i1
+      i1 = Institution.make!
+      encounter = Encounter.make! institution: i1
       get :edit, id: encounter.id
 
       expect(response).to have_http_status(:forbidden)
@@ -93,9 +93,9 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
   describe "GET #sites" do
     it "returns sites of the context institution if user has access to create them" do
-      i1 = Institution.make
-      s1 = Site.make institution: i1
-      s2 = Site.make institution: i1
+      i1 = Institution.make!
+      s1 = Site.make! institution: i1
+      s2 = Site.make! institution: i1
 
       grant i1.user, user, i1, READ_INSTITUTION
       grant i1.user, user, s1, READ_SITE
@@ -112,7 +112,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
   describe "POST #create" do
     let(:sample) {
-      device = Device.make institution: institution
+      device = Device.make! institution: institution
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
       Sample.first
     }
@@ -184,16 +184,16 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   end
 
   describe "PUT #update" do
-    let(:encounter) { Encounter.make institution: institution, site: site }
+    let(:encounter) { Encounter.make! institution: institution, site: site }
 
     let(:sample) {
-      device = Device.make institution: institution
+      device = Device.make! institution: institution
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
       Sample.first
     }
 
     let(:empty_sample) {
-      SampleIdentifier.make(site: site).sample.tap do |s|
+      SampleIdentifier.make!(site: site).sample.tap do |s|
         s.update_attribute(:encounter_id, encounter.id)
       end
     }
@@ -257,7 +257,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
   describe "GET #search_sample" do
     it "returns sample by entity id" do
-      device = Device.make institution: institution
+      device = Device.make! institution: institution
 
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'bab'})
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'bcb'})
@@ -271,9 +271,9 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "filters sample of selected institution within permission" do
-      device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
-      device2 = Device.make institution: i2 = Institution.make, site: Site.make(institution: i2)
-      device3 = Device.make institution: i1, site: Site.make(institution: i1)
+      device1 = Device.make! institution: i1 = Institution.make!, site: Site.make!(institution: i1)
+      device2 = Device.make! institution: i2 = Institution.make!, site: Site.make!(institution: i2)
+      device3 = Device.make! institution: i1, site: Site.make!(institution: i1)
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'bab'})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'cac'})
@@ -300,7 +300,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
   describe "GET #search_test" do
     it "returns test_result by test_id" do
-      device = Device.make institution: institution
+      device = Device.make! institution: institution
 
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'bab'})
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'bcb'})
@@ -314,9 +314,9 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "filters test_result of selected institution within permission" do
-      device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
-      device2 = Device.make institution: i2 = Institution.make, site: Site.make(institution: i2)
-      device3 = Device.make institution: i1, site: Site.make(institution: i1)
+      device1 = Device.make! institution: i1 = Institution.make!, site: Site.make!(institution: i1)
+      device2 = Device.make! institution: i2 = Institution.make!, site: Site.make!(institution: i2)
+      device3 = Device.make! institution: i1, site: Site.make!(institution: i1)
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'bab'})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'cac'})
@@ -341,7 +341,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   end
 
   describe "PUT #add_sample" do
-    let(:test1) { TestResult.make institution: institution, device: Device.make(site: Site.make(institution: institution)) }
+    let(:test1) { TestResult.make! institution: institution, device: Device.make!(site: Site.make!(institution: institution)) }
 
     it "renders json response with filled encounter and status ok" do
       put :add_sample, sample_uuid: test1.sample.uuids[0], encounter: {
@@ -384,10 +384,10 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "it returns json status error if failed due to other encounter" do
-      device = Device.make institution: institution
+      device = Device.make! institution: institution
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
       sample_with_encounter = Sample.first
-      sample_with_encounter.encounter = Encounter.make institution: institution, patient: Patient.last
+      sample_with_encounter.encounter = Encounter.make! institution: institution, patient: Patient.last
       sample_with_encounter.save!
 
       put :add_sample, sample_uuid: sample_with_encounter.uuid, encounter: {
@@ -411,7 +411,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "it returns json status error if failed due to other patient" do
-      device = Device.make institution: institution
+      device = Device.make! institution: institution
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'}, patient: {id: 'b'})
 
@@ -433,7 +433,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "it merges data from another patient if both are phantom" do
-      device = Device.make institution: institution
+      device = Device.make! institution: institution
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {gender: 'male'})
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'}, patient: {name: 'Doe'})
 
@@ -455,7 +455,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "it merges data from another patient if one of them phantom" do
-      device = Device.make institution: institution
+      device = Device.make! institution: institution
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {gender: 'male'})
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'}, patient: {name: 'Doe', id: 'P10'})
 
@@ -478,8 +478,8 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "ensure only samples withing permissions can be used" do
-      device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
-      device2 = Device.make institution: i1, site: Site.make(institution: i1)
+      device1 = Device.make! institution: i1 = Institution.make!, site: Site.make!(institution: i1)
+      device2 = Device.make! institution: i1, site: Site.make!(institution: i1)
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'})
@@ -506,8 +506,8 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "can use existing encounter to add sample" do
-      encounter = Encounter.make institution: institution
-      device = Device.make institution: institution
+      encounter = Encounter.make! institution: institution
+      device = Device.make! institution: institution
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'})
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'b'})
       sample_a, sample_b = Sample.all.to_a
@@ -536,7 +536,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   end
 
   describe "PUT #add_test" do
-    let(:test1) { TestResult.make institution: institution, device: Device.make(site: Site.make(institution: institution)) }
+    let(:test1) { TestResult.make! institution: institution, device: Device.make!(site: Site.make!(institution: institution)) }
 
     it "renders json response with filled encounter and status ok" do
       put :add_test, test_uuid: test1.uuid, encounter: {
@@ -559,8 +559,8 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "ensure only test_results withing permissions can be used" do
-      device1 = Device.make institution: i1 = Institution.make, site: Site.make(institution: i1)
-      device2 = Device.make institution: i1, site: Site.make(institution: i1)
+      device1 = Device.make! institution: i1 = Institution.make!, site: Site.make!(institution: i1)
+      device2 = Device.make! institution: i1, site: Site.make!(institution: i1)
 
       DeviceMessage.create_and_process device: device1, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'bab'})
       DeviceMessage.create_and_process device: device2, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"], id: 'cac'})
@@ -588,14 +588,14 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
   end
 
   describe 'PUT #merge_samples' do
-    let(:site) { Site.make(institution: institution) }
+    let(:site) { Site.make!(institution: institution) }
 
     let(:samples) do
       3.times.map do |x|
-        test = TestResult.make \
+        test = TestResult.make! \
           institution: institution,
-          device: Device.make(site: site),
-          sample_identifier: SampleIdentifier.make(site: site, entity_id: "ID#{x+1}", sample: Sample.make(institution: institution))
+          device: Device.make!(site: site),
+          sample_identifier: SampleIdentifier.make!(site: site, entity_id: "ID#{x+1}", sample: Sample.make!(institution: institution))
         test.sample
       end
     end
@@ -604,19 +604,19 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     let!(:sample3) { samples[2] }
 
     let!(:sample2) do
-      test = TestResult.make \
+      test = TestResult.make! \
           institution: institution,
-          device: Device.make(site: site),
-          sample_identifier: SampleIdentifier.make(site: site, entity_id: "ID2B", sample: samples[1])
+          device: Device.make!(site: site),
+          sample_identifier: SampleIdentifier.make!(site: site, entity_id: "ID2B", sample: samples[1])
 
       samples[1].reload
     end
 
     let(:sample_with_encounter) do
-      device = Device.make institution: institution, site: site
+      device = Device.make! institution: institution, site: site
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'a'}, patient: {id: 'a'})
       sample_with_encounter = Sample.first
-      sample_with_encounter.encounter = Encounter.make institution: institution
+      sample_with_encounter.encounter = Encounter.make! institution: institution
       sample_with_encounter.save!
       sample_with_encounter
     end
@@ -660,7 +660,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "renders json response with merged samples from the same existing encounter" do
-      encounter = Encounter.make institution: institution, samples: [sample1, sample2], patient: nil
+      encounter = Encounter.make! institution: institution, samples: [sample1, sample2], patient: nil
       put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
         id: encounter.id,
         institution: { uuid: institution.uuid },
@@ -682,7 +682,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "saves merged samples after a merge sample operation" do
-      encounter = Encounter.make institution: institution, samples: [sample1, sample2], patient: nil
+      encounter = Encounter.make! institution: institution, samples: [sample1, sample2], patient: nil
       put :merge_samples, sample_uuids: [sample1.uuid, sample2.uuid], encounter: {
         id: encounter.id,
         institution: { uuid: institution.uuid },
@@ -743,7 +743,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "it fails if a sample belongs to a different patient" do
-      device = Device.make institution: institution
+      device = Device.make! institution: institution
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'SWP_ID1'}, patient: {id: 'a'})
       DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(test:{assays:[condition: "flu_a"]}, sample: {id: 'SWP_ID2'}, patient: {id: 'b'})
 
@@ -811,7 +811,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "should preserve patient by id" do
-      patient = institution.patients.make
+      patient = Patient.make! institution: institution
 
       put :new_sample, encounter: {
         institution: { uuid: institution.uuid },
@@ -850,11 +850,11 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
     end
 
     it "return error if sample ID already exists for same patient" do
-      patient = institution.patients.make
-      TestResult.make \
+      patient = Patient.make! institution: institution
+      TestResult.make! \
         institution: institution,
-        device: Device.make(site: site),
-        sample_identifier: SampleIdentifier.make(site: site, entity_id: "12345678", sample: Sample.make(institution: institution))
+        device: Device.make!(site: site),
+        sample_identifier: SampleIdentifier.make!(site: site, entity_id: "12345678", sample: Sample.make!(institution: institution))
 
       put :add_sample_manually, entity_id: '12345678', encounter: {
         institution: { uuid: institution.uuid },
