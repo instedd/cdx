@@ -5,7 +5,7 @@ RSpec.describe InvitationMailer, type: :mailer do
   let!(:invite) { PendingInstitutionInvite.make(invited_by_user: current_user) }
   let!(:new_user) {
     User.make(:invited_pending).tap do |user|
-      user.send("generate_invitation_token")
+      user.__send__(:generate_invitation_token)
     end
   }
   let!(:existing_user) { User.make }

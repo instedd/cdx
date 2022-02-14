@@ -4,7 +4,7 @@ class InvitationMailerPreview < ActionMailer::Preview
     current_user = User.new(email: "existing@example.com", first_name: "Current", last_name: "User")
     user = User.new(email: "new1@example.com", first_name: "Invited", last_name: "Person")
     user.invited_by = current_user
-    user.send("generate_invitation_token")
+    user.__send__(:generate_invitation_token)
     InvitationMailer.invite_message(user, current_user, Role.new(name: "Senior Executive Parrot Specialist"), "custom message")
   end
 
@@ -29,7 +29,7 @@ class InvitationMailerPreview < ActionMailer::Preview
     invite.institution_name = "New Institution"
     invite.institution_kind = "institution"
     new_user = User.new(email: "new@example.com")
-    new_user.send("generate_invitation_token")
+    new_user.__send__(:generate_invitation_token)
     InvitationMailer.invite_institution_message(new_user, current_user, invite, "custom message")
   end
 end
