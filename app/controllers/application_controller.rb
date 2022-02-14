@@ -44,12 +44,19 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_resource(resource, action)
+    unless authorize_resource?(resource, action)
+      log_authorization_warn resource, action
+      head :forbidden
+      return nil
+    end
+    true
+  end
+
+  def authorize_resource?(resource, action)
     if has_access?(resource, action)
       check_access(resource, action)
     else
-      log_authorization_warn resource, action
-      head :forbidden
-      nil
+      false
     end
   end
 
