@@ -106,7 +106,6 @@ group :development, :test do
 end
 
 group :test do
-  gem 'testrail_rspec_formatter'
   gem 'test-unit'
   gem 'tire'
   # gem 'factory_girl_rails'
