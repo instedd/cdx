@@ -151,22 +151,24 @@ describe Site do
 
     describe "should recycle using the site policy" do
       def it_recycle_within(start, before_next, start_next, start_next2)
-        Timecop.freeze(start)
-        expect(site.generate_next_sample_entity_id!).to eq("100000")
-        expect(site.generate_next_sample_entity_id!).to eq("100001")
+        begin
+          Timecop.freeze(start)
+          expect(site.generate_next_sample_entity_id!).to eq("100000")
+          expect(site.generate_next_sample_entity_id!).to eq("100001")
 
-        Timecop.freeze(before_next)
-        expect(site.generate_next_sample_entity_id!).to eq("100002")
+          Timecop.freeze(before_next)
+          expect(site.generate_next_sample_entity_id!).to eq("100002")
 
-        Timecop.freeze(start_next)
-        expect(site.generate_next_sample_entity_id!).to eq("100000")
-        expect(site.generate_next_sample_entity_id!).to eq("100001")
+          Timecop.freeze(start_next)
+          expect(site.generate_next_sample_entity_id!).to eq("100000")
+          expect(site.generate_next_sample_entity_id!).to eq("100001")
 
-        Timecop.freeze(start_next2)
-        expect(site.generate_next_sample_entity_id!).to eq("100000")
-        expect(site.generate_next_sample_entity_id!).to eq("100001")
-
-        Timecop.return
+          Timecop.freeze(start_next2)
+          expect(site.generate_next_sample_entity_id!).to eq("100000")
+          expect(site.generate_next_sample_entity_id!).to eq("100001")
+        ensure
+          Timecop.return
+        end
       end
 
       it "works weekly" do
@@ -229,18 +231,21 @@ describe Site do
     it "should skip existing sample identifiers of site within time window" do
       site.sample_id_reset_policy = "weekly"
       site.save!
-      Timecop.freeze(Time.utc(2015, 12,  7, 15,  0, 0))
-      SampleIdentifier.make!(site: site, entity_id: "100000")
-      SampleIdentifier.make!(site: site, entity_id: "100001")
 
-      Timecop.freeze(Time.utc(2015, 12,  14, 15,  0, 0))
-      SampleIdentifier.make!(site: site, entity_id: "100002")
+      begin
+        Timecop.freeze(Time.utc(2015, 12,  7, 15,  0, 0))
+        SampleIdentifier.make!(site: site, entity_id: "100000")
+        SampleIdentifier.make!(site: site, entity_id: "100001")
 
-      expect(site.generate_next_sample_entity_id!).to eq("100000")
-      expect(site.generate_next_sample_entity_id!).to eq("100001")
-      expect(site.generate_next_sample_entity_id!).to eq("100003")
+        Timecop.freeze(Time.utc(2015, 12,  14, 15,  0, 0))
+        SampleIdentifier.make!(site: site, entity_id: "100002")
 
-      Timecop.return
+        expect(site.generate_next_sample_entity_id!).to eq("100000")
+        expect(site.generate_next_sample_entity_id!).to eq("100001")
+        expect(site.generate_next_sample_entity_id!).to eq("100003")
+      ensure
+        Timecop.return
+      end
     end
   end
 

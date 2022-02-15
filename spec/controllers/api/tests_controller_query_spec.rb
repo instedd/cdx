@@ -67,21 +67,25 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
     context "Filter" do
       it "should check for new tests since a date" do
-        Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
-        DeviceMessage.create_and_process device: device, plain_text_data: data
-        Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :negative]})
+        begin
+          Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
+          DeviceMessage.create_and_process device: device, plain_text_data: data
+          Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
+          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :negative]})
 
-        response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
-        expect(response.size).to eq(1)
-        expect(response.first["test"]["assays"].first["result"]).to eq("negative")
+          response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
+          expect(response.size).to eq(1)
+          expect(response.first["test"]["assays"].first["result"]).to eq("negative")
 
-        response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
+          response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
 
-        expect(response.first["test"]["assays"].first["result"]).to eq("positive")
-        expect(response.last["test"]["assays"].first["result"]).to eq("negative")
+          expect(response.first["test"]["assays"].first["result"]).to eq("positive")
+          expect(response.last["test"]["assays"].first["result"]).to eq("negative")
 
-        expect(get_updates('test.reported_time_since' => Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601)).to be_empty
+          expect(get_updates('test.reported_time_since' => Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601)).to be_empty
+        ensure
+          Timecop.return
+        end
       end
 
       it "filters by an analyzed result" do
@@ -216,6 +220,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         render_views
 
         before(:each) { Timecop.freeze }
+        after(:each) { Timecop.return }
 
         it "responds a csv for a given grouping" do
           DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :positive], error_code: 1234})

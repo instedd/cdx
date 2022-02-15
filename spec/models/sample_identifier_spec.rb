@@ -57,22 +57,24 @@ describe SampleIdentifier do
       def it_recycle_within(start, before_next, start_next, start_next2)
         entity_id = "100000"
 
-        Timecop.freeze(start)
-        SampleIdentifier.create!(sample: sample, site: site, entity_id: entity_id)
-        expect_invalid_by_entity_id SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)
+        begin
+          Timecop.freeze(start)
+          SampleIdentifier.create!(sample: sample, site: site, entity_id: entity_id)
+          expect_invalid_by_entity_id SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)
 
-        Timecop.freeze(before_next)
-        expect_invalid_by_entity_id SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)
+          Timecop.freeze(before_next)
+          expect_invalid_by_entity_id SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)
 
-        Timecop.freeze(start_next)
-        expect(SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)).to be_valid
-        SampleIdentifier.create!(sample: sample, site: site, entity_id: entity_id)
-        expect_invalid_by_entity_id SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)
+          Timecop.freeze(start_next)
+          expect(SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)).to be_valid
+          SampleIdentifier.create!(sample: sample, site: site, entity_id: entity_id)
+          expect_invalid_by_entity_id SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)
 
-        Timecop.freeze(start_next2)
-        expect(SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)).to be_valid
-
-        Timecop.return
+          Timecop.freeze(start_next2)
+          expect(SampleIdentifier.new(sample: sample, site: site, entity_id: entity_id)).to be_valid
+        ensure
+          Timecop.return
+        end
       end
 
       it "works weekly" do

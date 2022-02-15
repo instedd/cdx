@@ -96,6 +96,7 @@ describe Api::SitesController do
       render_views
 
       before(:each) { Timecop.freeze }
+      after(:each) { Timecop.return }
 
       it "should respond a csv" do
         institution

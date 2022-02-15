@@ -14,6 +14,8 @@ describe "performance", elasticsearch: true do
     sign_in(user)
   }
 
+  after(:each) { Timecop.return }
+
   it "should have 2 test results" do
     expect(device.test_results.count).to eq(2)
   end

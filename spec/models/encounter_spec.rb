@@ -242,6 +242,7 @@ describe Encounter do
         add_sample_and_process_later(sample_entity_id, message)
         encounter.reload
       }
+      after(:each) { Timecop.return }
 
       it "should only have messaged after timestamp as pending" do
         expect(encounter.test_results_not_in_diagnostic).to eq([TestResult.last])

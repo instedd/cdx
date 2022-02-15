@@ -43,15 +43,19 @@ describe HourlyUtilizationEfficiencyJob, elasticsearch: true do
       before_test_recipient_count=RecipientNotificationHistory.count
       @alert.create_percolator
 
-      Timecop.freeze(Time.now + 1.day)
-      device1 = Device.make! institution: institution, site: site1
-      DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative]}, sample: {id: '12345'}, patient: {id: 'a',gender: :male})
-      worker.perform
-      after_test_history_count = AlertHistory.count
-      after_test_recipient_count= RecipientNotificationHistory.count
+      begin
+        Timecop.freeze(Time.now + 1.day)
+        device1 = Device.make! institution: institution, site: site1
+        DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative]}, sample: {id: '12345'}, patient: {id: 'a',gender: :male})
+        worker.perform
+        after_test_history_count = AlertHistory.count
+        after_test_recipient_count= RecipientNotificationHistory.count
 
-      expect(before_test_history_count+2).to eq(after_test_history_count)
-      expect(before_test_recipient_count+1).to eq(after_test_recipient_count)
+        expect(before_test_history_count+2).to eq(after_test_history_count)
+        expect(before_test_recipient_count+1).to eq(after_test_recipient_count)
+      ensure
+        Timecop.return
+      end
     end
 
   end

@@ -83,12 +83,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
-    Timecop.return
     ActionMailer::Base.deliveries.clear
-  end
-
-  config.after(:each) do
-    Timecop.return
   end
 
   config.exclude_pattern = "spec/features/**/*_spec.rb"
