@@ -213,11 +213,10 @@ class SamplesController < ApplicationController
     Sample.transaction do
       samples.each do |to_transfer|
         raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
-        if to_transfer.batch_id.nil?
-          to_transfer.site_id = nil
-          to_transfer.institution = new_owner
-          to_transfer.save!
-        end
+        to_transfer.batch_id = nil
+        to_transfer.site_id = nil
+        to_transfer.institution = new_owner
+        to_transfer.save!
       end
     end
   end
