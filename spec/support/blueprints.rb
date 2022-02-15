@@ -59,6 +59,7 @@ User.blueprint(:invited_pending) do
   invitation_created_at 1.day.ago
   invitation_sent_at 1.day.ago
   invitation_accepted_at nil
+  object.__send__(:generate_invitation_token)
 end
 
 Institution.blueprint do

@@ -3,11 +3,7 @@ require "spec_helper"
 RSpec.describe InvitationMailer, type: :mailer do
   let!(:current_user) { User.new(email: "existing@example.com", first_name: "Current", last_name: "User") }
   let!(:invite) { PendingInstitutionInvite.make(invited_by_user: current_user) }
-  let!(:new_user) {
-    User.make(:invited_pending).tap do |user|
-      user.__send__(:generate_invitation_token)
-    end
-  }
+  let!(:new_user) { User.make(:invited_pending) }
   let!(:existing_user) { User.make }
 
   it "#invite_message" do
