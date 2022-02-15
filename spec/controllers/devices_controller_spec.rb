@@ -2,14 +2,16 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe DevicesController do
-  let!(:institution) {Institution.make!}
-  let!(:user) {institution.user}
-  let!(:site) {Site.make! institution: institution}
-  let!(:device_model) {DeviceModel.make!(institution: Institution.make!(:manufacturer))}
-  let!(:manifest) {Manifest.make!(device_model: device_model)}
-  let!(:device) {Device.make! site: site, device_model: device_model}
-  let!(:other_institution) {Institution.make! user: user}
-  let!(:other_site) {Site.make!(institution: other_institution)}
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @site = Site.make! institution: @institution
+    @device_model = DeviceModel.make!(institution: Institution.make!(:manufacturer))
+    @manifest = Manifest.make!(device_model: @device_model)
+    @device = Device.make! site: @site, device_model: @device_model
+    @other_institution = Institution.make! user: @user
+    @other_site = Site.make!(institution: @other_institution)
+  end
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }

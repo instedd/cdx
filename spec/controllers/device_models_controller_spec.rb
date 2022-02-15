@@ -2,17 +2,18 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe DeviceModelsController do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user, kind: "manufacturer"
+    @device_model = DeviceModel.make! :unpublished, institution: @institution
+    @institution1 = Institution.make! user: @user, kind: "manufacturer"
+    @device_model1 = DeviceModel.make! :unpublished, institution: @institution1
 
-  let!(:user)         { User.make! }
-  let!(:institution)  { Institution.make! user: user, kind: "manufacturer"}
-  let!(:device_model) { DeviceModel.make! :unpublished, institution: institution }
-  let!(:institution1)  { Institution.make! user: user, kind: "manufacturer"}
-  let!(:device_model1) { DeviceModel.make! :unpublished, institution: institution1 }
-
-  let!(:user2)         { User.make! }
-  let!(:institution2)  { Institution.make! user: user2, kind: "manufacturer"}
-  let!(:device_model2) { DeviceModel.make! :unpublished, institution: institution2 }
-  let!(:device_model3) { DeviceModel.make! :unpublished, institution: institution2 }
+    @user2 = User.make!
+    @institution2 = Institution.make! user: @user2, kind: "manufacturer"
+    @device_model2 = DeviceModel.make! :unpublished, institution: @institution2
+    @device_model3 = DeviceModel.make! :unpublished, institution: @institution2
+  end
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }

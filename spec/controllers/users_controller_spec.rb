@@ -1,14 +1,15 @@
 require 'spec_helper'
 
 describe UsersController, type: :controller do
-  let(:user) { User.make! }
-  let!(:institution) { user.institutions.make! }
+  setup_fixtures do
+    @user = User.make!
+    @user.grant_superadmin_policy
+    @institution = Institution.make! user: @user
+  end
+
   let(:default_params) { { context: institution.uuid } }
 
-  before do
-    user.grant_superadmin_policy
-    sign_in user
-  end
+  before { sign_in user }
 
   let(:user_to_edit) { User.make! }
 

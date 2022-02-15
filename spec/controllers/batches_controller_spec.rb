@@ -2,12 +2,15 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 RSpec.describe BatchesController, type: :controller do
-  let!(:institution)   { Institution.make! }
-  let!(:user)          { institution.user }
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @other_user = Institution.make!.user
+  end
+
   before(:each)        { sign_in user }
   let(:default_params) { {context: institution.uuid} }
 
-  let!(:other_user) { Institution.make!.user }
   before(:each) {
     grant user, other_user, institution, READ_INSTITUTION
   }

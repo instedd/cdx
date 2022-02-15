@@ -1,12 +1,16 @@
 require 'spec_helper'
+require 'policy_spec_helper'
 
 describe Api::TestsController, elasticsearch: true, validate_manifest: false do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @site = Site.make! institution: @institution
+    @device = Device.make! institution: @institution, site: @site
+  end
 
-  let(:user) { User.make! }
-  let!(:institution) { Institution.make! user: user }
-  let(:site) { Site.make! institution: institution }
-  let(:device) { Device.make! institution: institution, site: site }
   let(:data) { Oj.dump test:{assays: [result: :positive]} }
+
   before(:each) { sign_in user }
 
   def get_updates(options, body="")
@@ -62,8 +66,6 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
     end
 
     context "Filter" do
-      let(:device2) {Device.make! institution: institution}
-
       it "should check for new tests since a date" do
         Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
         DeviceMessage.create_and_process device: device, plain_text_data: data

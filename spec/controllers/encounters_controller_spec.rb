@@ -2,9 +2,11 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 RSpec.describe EncountersController, type: :controller, elasticsearch: true do
-  let(:institution) { Institution.make! }
-  let(:site) { Site.make! institution: institution }
-  let(:user) { institution.user }
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @site = Site.make! institution: @institution
+  end
 
   before(:each) { sign_in user }
   let(:default_params) { {context: institution.uuid} }

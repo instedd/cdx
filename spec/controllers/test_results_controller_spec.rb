@@ -2,25 +2,27 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe TestResultsController, elasticsearch: true do
-  let(:user)         { User.make! }
-  let!(:institution) { Institution.make!(user: user) }
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
 
-  let(:root_location) { Location.make! }
-  let(:location) { Location.make! parent: root_location }
-  let(:site)     { Site.make! institution: institution, location: location }
-  let(:subsite)  { Site.make! institution: institution, location: location, parent: site }
-  let(:device)   { Device.make! institution: institution, site: site }
+    @root_location = Location.make!
+    @location = Location.make! parent: @root_location
+    @site = Site.make! institution: @institution, location: @location
+    @subsite = Site.make! institution: @institution, location: @location, parent: @site
+    @device = Device.make! institution: @institution, site: @site
 
-  let(:site2)    { Site.make! institution: institution, location: location }
-  let(:device2)  { Device.make! institution: institution, site: site2 }
+    @site2 = Site.make! institution: @institution, location: @location
+    @device2 = Device.make! institution: @institution, site: @site2
+
+    @other_institution = Institution.make!
+    @other_user = @other_institution.user
+    @other_site = Site.make! institution: @other_institution
+    @other_device = Device.make! institution: @other_institution, site: @other_site
+  end
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }
-
-  let(:other_institution) { Institution.make! }
-  let(:other_user)        { other_institution.user }
-  let(:other_site)        { Site.make! institution: other_institution }
-  let(:other_device)      { Device.make! institution: other_institution, site: other_site }
 
   it "should display an empty page when there are no test results" do
     response = get :index

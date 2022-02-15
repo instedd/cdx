@@ -77,6 +77,8 @@ describe DeviceMessageProcessor, elasticsearch: true do
     end
   end
 
+  before(:each) { LocationService.fake! }
+
   let(:institution) {Institution.make!(kind: 'institution')}
 
   let(:site) {Site.make!(institution: institution, location_geoid: 'ne:ARG_1300')}

@@ -2,11 +2,13 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe Api::EncountersController, elasticsearch: true, validate_manifest: false do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @site = Site.make! institution: @institution
+  end
 
-  let(:user) { User.make! }
-  let!(:institution) { Institution.make! user: user }
-  let(:site) { Site.make! institution: institution }
-  let(:device) { Device.make! institution: institution, site: site }
+  let(:device) { Device.make!(institution: institution, site: site) }
   let(:data) { Oj.dump test:{assays: [result: :positive]} }
 
   before(:each) { sign_in user }

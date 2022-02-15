@@ -3,6 +3,8 @@ require 'spec_helper'
 describe Cdx::Api, elasticsearch: true do
   include_context "cdx api helpers"
 
+  before(:each) { LocationService.fake! }
+
   let!(:device) {Device.make!}
   let!(:institution) { device.institution }
 

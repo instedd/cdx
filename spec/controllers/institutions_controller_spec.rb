@@ -1,7 +1,10 @@
 require 'spec_helper'
 
 describe InstitutionsController do
-  let(:user) {User.make!}
+  setup_fixtures do
+    @user = User.make!
+  end
+
   before(:each) {sign_in user}
 
   context "index" do

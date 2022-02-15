@@ -2,12 +2,13 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe SitesController do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
 
-  let!(:institution) {Institution.make!}
-  let!(:user)        {institution.user}
-
-  let!(:institution2) { Institution.make! }
-  let!(:site2)  { Site.make! institution: institution2 }
+    @institution2 = Institution.make!
+    @site2 = Site.make! institution: @institution2
+  end
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }

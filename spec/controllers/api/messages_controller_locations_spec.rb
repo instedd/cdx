@@ -1,10 +1,12 @@
 require 'spec_helper'
 
 describe Api::MessagesController, elasticsearch: true, validate_manifest: false do
-
-  let(:user) {User.make!}
-  let(:institution) {Institution.make! user: user}
-  let(:device) {Device.make! institution: institution}
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @site = Site.make! institution: @institution
+    @device = Device.make! institution: @institution, site: @site
+  end
   let(:data) {Oj.dump test: {assays: [result: :positive]}}
 
   before(:each) {sign_in user}

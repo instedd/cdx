@@ -2,16 +2,20 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 RSpec.describe SamplesController, type: :controller do
-  let!(:institution)   { Institution.make! }
-  let!(:user)          { institution.user }
-  before(:each)        { sign_in user }
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+
+    @other_user = Institution.make!.user
+  end
+
   let(:default_params) { {context: institution.uuid} }
   let(:loinc_code)     { LoincCode.make! }
 
-  let!(:other_user) { Institution.make!.user }
-  before(:each) {
+  before(:each) do
     grant user, other_user, institution, READ_INSTITUTION
-  }
+    sign_in user
+  end
 
   context "index" do
     it "should be accessible by institution owner" do

@@ -1,8 +1,10 @@
 require 'spec_helper'
 
 describe Api::FiltersController do
-  let(:user) { User.make! }
-  let!(:institution) { Institution.make!(user: user) }
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+  end
 
   before(:each) { sign_in user }
 

@@ -2,12 +2,13 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe RolesController do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @site = Site.make! institution: @institution
 
-  let!(:institution) {Institution.make!}
-  let!(:user)        {institution.user}
-  let!(:site)        {Site.make! institution: institution}
-
-  let!(:institution2) { Institution.make! }
+    @institution2 = Institution.make!
+  end
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }

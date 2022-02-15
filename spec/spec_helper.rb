@@ -67,6 +67,7 @@ RSpec.configure do |config|
 
   config.include Devise::TestHelpers, :type => :controller
   config.include DefaultParamsHelper, :type => :controller
+  config.extend SpecFixtures
   config.include ManifestSpecHelper
   config.include CdxFieldsHelper
   config.include FeatureSpecHelpers, :type => :feature
@@ -77,8 +78,11 @@ RSpec.configure do |config|
          to_return(:status => 200, :body => "", :headers => {})
   end
 
-  config.before(:each) do
+  config.before(:suite) do
     LocationService.fake!
+  end
+
+  config.before(:each) do
     Timecop.return
     ActionMailer::Base.deliveries.clear
   end
