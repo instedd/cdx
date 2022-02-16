@@ -22,10 +22,10 @@
               .info
                 .row
                   .col.pe-1
-                    = ay.label :loinc_code, 'LOINC'
+                    = ay.label :loinc_code, 'LOINC', class: ('input-required' if ay.object.errors.include?(:loinc_code))
                   .col.pe-8
                     .loinc_inputs
-                      = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: 'loinc_input'}
+                      = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: "loinc_input#{" input-required" if ay.object.errors.include?(:loinc_code)}" }
                       = ay.hidden_field :loinc_code_id, { class: 'loinc_input_hidden'}
                 .row
                   - if ay.object.errors.include?(:result) or ay.object.errors.include?(:assay_file)

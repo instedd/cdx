@@ -7,6 +7,7 @@ class AssayAttachment < ActiveRecord::Base
   after_save :assign_assay_file
 
   validate :presence_assay_file_or_result
+  validates_presence_of :loinc_code
 
   def assign_assay_file
     unless assay_file.nil?

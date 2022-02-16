@@ -139,6 +139,17 @@ Sample.blueprint do
   patient { object.encounter.try(:patient) }
 end
 
+AssayAttachment.blueprint do
+  loinc_code { LoincCode.make }
+  sample { Sample.make }
+  result { Faker::Lorem.words(10) }
+end
+
+LoincCode.blueprint do
+  loinc_number { "10000-#{Sham.sn}" }
+  component { Faker::Lorem.words(4) }
+end
+
 Batch.blueprint do
   institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make }
   batch_number { '000' }
