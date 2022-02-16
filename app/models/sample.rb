@@ -31,6 +31,7 @@ class Sample < ActiveRecord::Base
 
   attribute_field :isolate_name, copy: true
   attribute_field :specimen_role, copy: true
+  attribute_field :old_batch_number, copy: true
   attribute_field :date_produced,
                   :lab_technician,
                   :inactivation_method,
