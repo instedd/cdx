@@ -133,7 +133,7 @@ class UsersController < ApplicationController
 
   def send_invitation(message, user)
     mark_as_invited(user)
-    InvitationMailer.invite_message(user, @role, message).deliver_now
+    InvitationMailer.invite_message(user, current_user, @role, message).deliver_now
   end
 
   def mark_as_invited(user)
@@ -145,16 +145,13 @@ class UsersController < ApplicationController
   end
 
   def create_institution_invite
-    invited_user_email = params[:user_invite_data]["email"]
-    unless invited_user_email.nil?
-      pending_invite = PendingInstitutionInvite.new
-      pending_invite.invited_user_email = invited_user_email
-      pending_invite.invited_by_user = current_user
-      pending_invite.institution_name = params["institution_data"]["name"]
-      pending_invite.institution_kind = params["institution_data"]["type"]
-      pending_invite.save!
-      @pending_invite = pending_invite
-    end
+    pending_invite = PendingInstitutionInvite.new
+    pending_invite.invited_user_email = params[:user_invite_data]["email"]
+    pending_invite.invited_by_user = current_user
+    pending_invite.institution_name = params["institution_data"]["name"]
+    pending_invite.institution_kind = params["institution_data"]["type"]
+    pending_invite.save!
+    @pending_invite = pending_invite
   end
 
   def user_params

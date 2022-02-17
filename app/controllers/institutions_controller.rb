@@ -128,14 +128,14 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  private
+
   def accept_pending_invite
-    unless @pending_invite.nil? and current_user.email != @pending_invite.invited_user_email
+    if @pending_invite && current_user.email == @pending_invite.invited_user_email
       @pending_invite.status = 'accepted'
       @pending_invite.save!
     end
   end
-
-  private
 
   def load_institutions
     @institutions = check_access(Institution, READ_INSTITUTION) || []
