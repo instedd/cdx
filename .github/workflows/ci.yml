@@ -11,27 +11,63 @@ on:
     branches:
       - "**:**"
 
+env:
+  DOCKER_COMPOSE: docker-compose -f docker-compose.yml -f docker-compose.ci.yml
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set environment up
+      - uses: actions/cache@v2
+        id: docker-cache
+        with:
+          path: tmp/docker
+          key: Docker-v2-${{ hashFiles('Dockerfile-dev', 'docker-compose.yml', '/docker-compose.ci.yml') }}
+          restore-keys: |
+            Docker-v2-
+
+      - name: Load Docker image
+        if: steps.docker-cache.outputs.cache-hit == 'true'
         run: |
-          docker-compose build
-          docker-compose run --rm -e RAILS_ENV=test web bundle install
-          docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
-          docker-compose up -d db elasticsearch redis sshd csv_watch ftp_monitor sidekiq
+          docker load < tmp/docker/docker_images.tar
+
+      - name: Build Docker image
+        if: steps.docker-cache.outputs.cache-hit != 'true'
+        run: |
+          $DOCKER_COMPOSE build
+          docker save cdx_web cdx_csv_watch cdx_ftp_monitor cdx_sidekiq > tmp/docker/docker_images.tar
+
+      - uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('.ruby-version') }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-${{ hashFiles('.ruby-version') }}-
+            ${{ runner.os }}-gems-
+
+      - name: Install dependencies
+        run: |
+          $DOCKER_COMPOSE run --rm --no-deps -e RAILS_ENV=test web bundle install --jobs 4
+          $DOCKER_COMPOSE run --rm --no-deps -e RAILS_ENV=test web bundle clean --force
+
+      - name: Setup databases
+        run: |
+          $DOCKER_COMPOSE up -d db elasticsearch redis
+          $DOCKER_COMPOSE run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
+
+      - name: Start services
+        run: $DOCKER_COMPOSE up -d sshd csv_watch ftp_monitor sidekiq
 
       - name: Run specs
-        run: docker-compose run --rm -e RAILS_ENV=test web bundle exec rspec
+        run: $DOCKER_COMPOSE run --rm -e RAILS_ENV=test web bundle exec rspec
 
-      - name: Run integration specs (rspec+capybara)
-        run: docker-compose run --rm -e RAILS_ENV=test web bundle exec rspec spec/features/**
+      - name: Run integration specs (rspec + capybara)
+        run: $DOCKER_COMPOSE run --rm -e RAILS_ENV=test web bundle exec rspec spec/features/**
 
       - name: Run integration specs (cucumber)
-        run: docker-compose run --rm -e RAILS_ENV=test web bundle exec cucumber
+        run: $DOCKER_COMPOSE run --rm -e RAILS_ENV=test web bundle exec cucumber
 
   build:
     runs-on: ubuntu-latest

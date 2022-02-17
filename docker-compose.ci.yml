@@ -1,0 +1,18 @@
+version: "2.0"
+
+services:
+  web:
+    volumes:
+      - ./vendor/bundle:/usr/local/bundle
+
+  csv_watch:
+    volumes:
+      - ./vendor/bundle:/usr/local/bundle
+
+  ftp_monitor:
+    volumes:
+      - ./vendor/bundle:/usr/local/bundle
+
+  sidekiq:
+    volumes:
+      - ./vendor/bundle:/usr/local/bundle
