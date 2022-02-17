@@ -25,7 +25,13 @@ jobs:
           docker-compose up -d db elasticsearch redis sshd csv_watch ftp_monitor sidekiq
 
       - name: Run specs
-        run: docker-compose run --rm -e RAILS_ENV=test web bundle exec rake
+        run: docker-compose run --rm -e RAILS_ENV=test web bundle exec rspec
+
+      - name: Run integration specs (rspec+capybara)
+        run: docker-compose run --rm -e RAILS_ENV=test web bundle exec rspec spec/features/**
+
+      - name: Run integration specs (cucumber)
+        run: docker-compose run --rm -e RAILS_ENV=test web bundle exec cucumber
 
   build:
     runs-on: ubuntu-latest
