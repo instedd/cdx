@@ -6,6 +6,7 @@ RSpec.describe SamplesController, type: :controller do
   let!(:user)          { institution.user }
   before(:each)        { sign_in user }
   let(:default_params) { {context: institution.uuid} }
+  let(:loinc_code)     { LoincCode.make }
 
   let!(:other_user) { Institution.make.user }
   before(:each) {
@@ -233,6 +234,29 @@ RSpec.describe SamplesController, type: :controller do
       sample = institution.samples.first
       expect(sample.volume).to be_nil
       expect(sample.core_fields).to_not have_key('volume')
+    end
+
+    describe "assays" do
+      it "saves attachment" do
+        expect {
+          get :new
+          post :create, sample: build_sample_form_plan(assay_attachments_attributes: [ {loinc_code_id: loinc_code.id, result: "foo bar"} ])
+        }.to change{ institution.samples.count }.by(1)
+
+        sample = institution.samples.first
+        expect(sample.assay_attachments.size).to eq 1
+        attachment = sample.assay_attachments.first
+        expect(attachment.result).to eq "foo bar"
+        expect(attachment.loinc_code).to eq loinc_code
+      end
+
+      it "errors on attachment error" do
+        expect {
+          get :new
+          post :create, sample: build_sample_form_plan(assay_attachments_attributes: [ {loinc_code_id: loinc_code.id } ])
+        }.not_to change{ institution.samples.count }
+        expect(@response.body).to include("must contain a file or a result")
+      end
     end
   end
 
