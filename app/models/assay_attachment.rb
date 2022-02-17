@@ -19,6 +19,7 @@ class AssayAttachment < ActiveRecord::Base
   def presence_assay_file_or_result
     unless result.present? or assay_file.present?
       errors.add(:result, "must contain a file or a result")
+      errors.add(:assay_file, "must contain a file or a result")
     end
   end
 
