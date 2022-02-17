@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220216134506) do
+ActiveRecord::Schema.define(version: 20220217152217) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -466,6 +466,20 @@ ActiveRecord::Schema.define(version: 20220216134506) do
     t.datetime "updated_at"
     t.string   "name",       limit: 255
   end
+
+  create_table "qc_infos", force: :cascade do |t|
+    t.string   "uuid",           limit: 255
+    t.string   "batch_number",   limit: 255
+    t.text     "core_fields",    limit: 65535
+    t.text     "custom_fields",  limit: 65535
+    t.binary   "sensitive_data", limit: 65535
+    t.datetime "deleted_at"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "qc_infos", ["batch_number"], name: "index_qc_infos_on_batch_number", using: :btree
+  add_index "qc_infos", ["uuid"], name: "index_qc_infos_on_uuid", using: :btree
 
   create_table "recipient_notification_histories", force: :cascade do |t|
     t.integer  "user_id",            limit: 4

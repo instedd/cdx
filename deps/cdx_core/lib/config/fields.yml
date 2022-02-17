@@ -1,4 +1,42 @@
 entities:
+  qcInfo: &QC_INFO
+    allows_custom: true
+    fields:
+      id:
+        searchable: true
+      uuid:
+        searchable: true
+        multiple: true
+      batch_number:
+        searchable: true
+      specimen_role:
+        type: enum
+        searchable: true
+        options:
+          - b
+          - c
+          - e
+          - f
+          - g
+          - l
+          - o
+          - p
+          - q
+          - r
+          - v
+      isolate_name:
+        searchable: true
+      date_produced:
+        type: date
+      inactivation_method:
+        type: enum
+        options:
+          - Formaldehyde
+          - Heat
+          - UV-C
+      volume:
+        type: float
+      lab_technician:
   sample: &SAMPLE
     allows_custom: true
     fields:
