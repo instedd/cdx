@@ -8,6 +8,7 @@ class AssayAttachment < ActiveRecord::Base
 
   validate :presence_assay_file_or_result
   validates_presence_of :loinc_code
+  validates_associated :assay_file
 
   def assign_assay_file
     unless assay_file.nil?
