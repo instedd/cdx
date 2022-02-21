@@ -142,6 +142,16 @@ LoincCode.blueprint do
   component { Faker::Lorem.words(4) }
 end
 
+SampleTransfer.blueprint do
+  sample { Sample.make! }
+  receiver_institution { Institution.make! }
+  sender_institution { object.sample.institution }
+end
+
+SampleTransfer.blueprint(:confirmed) do
+  confirmed_at { Faker::Time.backward }
+end
+
 Batch.blueprint do
   institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make }
   batch_number { '000' }
