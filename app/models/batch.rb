@@ -33,6 +33,10 @@ class Batch < ActiveRecord::Base
 
   validates_associated :samples, message: "are invalid"
 
+  def qc_sample
+    self.samples.select {|sample| sample.is_quality_control?}.first
+  end
+
   private
 
   def isolate_name_batch_number_combination_create

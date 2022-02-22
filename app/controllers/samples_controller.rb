@@ -192,6 +192,7 @@ class SamplesController < ApplicationController
 
   def transfer
     new_owner = Institution.find_by(uuid: params["institution_id"])
+
     if new_owner.nil?
       flash[:notice] = "Destination Institution does not exists"
     else
@@ -213,13 +214,44 @@ class SamplesController < ApplicationController
     Sample.transaction do
       samples.each do |to_transfer|
         raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
-        to_transfer.old_batch_number = to_transfer.batch.batch_number unless to_transfer.batch.nil?
+
+        unless to_transfer.batch.nil?
+          if params["includes_qc_info"] == "true"
+            qc_info = create_qc_info(to_transfer)
+            to_transfer.qc_info_id = qc_info.id if qc_info
+            to_transfer.old_batch_number = to_transfer.batch.batch_number
+          end
+        end
         to_transfer.batch_id = nil
         to_transfer.site_id = nil
         to_transfer.institution = new_owner
         to_transfer.save!
       end
     end
+  end
+
+  def create_qc_info(sample)
+    sample_qc = sample.batch.qc_sample
+    return if sample_qc.nil?
+
+    qc_info = QcInfo.find_by_sample_qc_id(sample_qc.id)
+    unless qc_info
+      qc_info = QcInfo.new({
+                             sample_qc_id: sample_qc.id,
+                             uuid: sample_qc.uuid,
+                             batch_number: sample_qc.batch.batch_number,
+                             date_produced: sample_qc.date_produced,
+                             lab_technician: sample_qc.lab_technician,
+                             specimen_role: sample_qc.specimen_role,
+                             isolate_name: sample_qc.isolate_name,
+                             inactivation_method: sample_qc.inactivation_method,
+                             volume: sample_qc.volume
+                           })
+    end
+
+    qc_info.samples << sample
+    qc_info.save!
+    qc_info
   end
 
   def sample_params

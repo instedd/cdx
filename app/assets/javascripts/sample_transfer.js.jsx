@@ -31,8 +31,8 @@ var SampleTransferModal = React.createClass({
   getInitialState: function() {
     return {
       institutionId: null,
-      includeQcInfo: null,
-      selectedSamples: selectedSamplesIds()
+      includeQcInfo: false,
+      selectedSamples: selectedSamplesIds(),
     };
   },
 
@@ -47,6 +47,7 @@ var SampleTransferModal = React.createClass({
   transferSamples: function() {
     const data = {
       institution_id: this.state.institutionId,
+      includes_qc_info: this.state.includeQcInfo,
       samples: this.state.selectedSamples.map((sample) => sample.uuid)
     }
     $.ajax({
@@ -98,7 +99,7 @@ var SampleTransferModal = React.createClass({
   toggleQcInfo: function() {
     var oldValue = this.state.includeQcInfo;
     this.setState({
-      includeMessage: !oldValue
+      includeQcInfo: !oldValue
     });
   },
 

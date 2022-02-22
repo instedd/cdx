@@ -4,13 +4,7 @@ class QcInfo < ActiveRecord::Base
   include InactivationMethod
   include DateProduced
 
-  has_many :assay_attachments, dependent: :destroy
-  accepts_nested_attributes_for :assay_attachments, allow_destroy: true
-  validates_associated :assay_attachments, message: "are invalid"
-
-  has_many :notes, dependent: :destroy
-  accepts_nested_attributes_for :notes, allow_destroy: true
-  validates_associated :notes, message: "are invalid"
+  has_many :samples
 
   def self.entity_scope
     "qcInfo"

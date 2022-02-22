@@ -6,6 +6,7 @@ class CreateQcInfos < ActiveRecord::Migration
       t.text :core_fields
       t.text :custom_fields
       t.binary :sensitive_data
+      t.integer :sample_qc_id
 
       t.datetime :deleted_at
 
