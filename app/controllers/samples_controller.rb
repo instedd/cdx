@@ -248,11 +248,39 @@ class SamplesController < ApplicationController
                              inactivation_method: sample_qc.inactivation_method,
                              volume: sample_qc.volume
                            })
+      create_notes_for_qc_info(qc_info, sample)
+      create_assay_attachments_for_qc_info(qc_info, sample)
     end
-
     qc_info.samples << sample
     qc_info.save!
     qc_info
+  end
+
+  def create_assay_attachments_for_qc_info(qc_info, sample)
+    sample.assay_attachments.each do |assay_attachment|
+      new_assay_attachment = assay_attachment.dup
+      if assay_attachment.assay_file
+        new_assay_file = assay_attachment.assay_file.dup
+        new_assay_file.save!
+        new_assay_attachment.assay_file = new_assay_file
+      end
+      #avoids duplicating assay_attachment for the original sample
+      new_assay_attachment.sample = nil
+      new_assay_attachment.save!
+
+      qc_info.assay_attachments << new_assay_attachment
+    end
+  end
+
+  def create_notes_for_qc_info(qc_info, sample)
+    sample.notes.each do |note|
+      new_note = note.dup
+      #avoids duplicating notes for the original sample
+      new_note.sample_id = nil
+      new_note.save!
+
+      qc_info.notes << new_note
+    end
   end
 
   def sample_params

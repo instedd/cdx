@@ -5,6 +5,8 @@ class QcInfo < ActiveRecord::Base
   include DateProduced
 
   has_many :samples
+  has_many :assay_attachments
+  has_many :notes
 
   def self.entity_scope
     "qcInfo"
