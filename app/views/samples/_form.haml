@@ -4,6 +4,15 @@
 
   .row
     .col
+      - unless f.object.qc_info.nil?
+        .row
+          .col.pe-4
+            = f.label :quality_control
+          .col
+            = link_to edit_qc_info_path(f.object.qc_info.id), class: 'centered' do
+              .icon-test.icon-blue
+              = "VIEW QC INFO"
+
       .row
         .col.pe-4
           = f.label :uuid

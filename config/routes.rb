@@ -122,6 +122,7 @@ Rails.application.routes.draw do
       get 'new_sample_or_batch'
     end
   end
+  resources :qc_infos
   resources :test_results , only: [:index, :show]
   resources :filters, format: 'html'
   resources :subscribers
