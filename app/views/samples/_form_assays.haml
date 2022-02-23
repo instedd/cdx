@@ -22,30 +22,24 @@
               .info
                 .row
                   .col.pe-1
-                    = ay.label :loinc_code, 'LOINC'
+                    = ay.label :loinc_code, 'LOINC', class: ('input-required' if ay.object.errors.include?(:loinc_code))
                   .col.pe-8
                     .loinc_inputs
-                      = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: 'loinc_input'}
+                      = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: "loinc_input#{" input-required" if ay.object.errors.include?(:loinc_code)}" }
                       = ay.hidden_field :loinc_code_id, { class: 'loinc_input_hidden'}
                 .row
-                  - if ay.object.errors.include?(:result) or ay.object.errors.include?(:assay_file)
-                    .col.pe-1
-                      = ay.label :result, {class: 'input-required'}
-                    .col.pe-8
-                      = ay.text_field :result, {class: 'input-required'}
-                  - else
-                    .col.pe-1
-                      = ay.label :result
-                    .col.pe-8
-                      = ay.text_field :result
+                  .col.pe-1
+                    = ay.label :result, class: ('input-required' if ay.object.errors.include?(:result))
+                  .col.pe-8
+                    = ay.text_field :result, class: ('input-required' if ay.object.errors.include?(:result))
                 %div
                   = ay.hidden_field :assay_file_id, value: ay.object.assay_file_id
 
-              - if ay.object.errors.include?(:assay_file) or ay.object.errors.include?(:result)
+              - if ay.object.errors.include?(:assay_file)
                 .file
                   .picture-container.picture-required
                     .icon-alert.icon-red
-                    = "The file can’t exceed 10 MB"
+                    = ay.object.errors[:assay_file].join(" - ")
               - else
                 - if ay.object.assay_file.nil?
                   .file.is-hidden

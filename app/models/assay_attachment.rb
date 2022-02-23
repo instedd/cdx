@@ -7,6 +7,7 @@ class AssayAttachment < ActiveRecord::Base
   after_save :assign_assay_file
 
   validate :presence_assay_file_or_result
+  validates_associated :assay_file
 
   def assign_assay_file
     unless assay_file.nil?
@@ -18,6 +19,7 @@ class AssayAttachment < ActiveRecord::Base
   def presence_assay_file_or_result
     unless result.present? or assay_file.present?
       errors.add(:result, "must contain a file or a result")
+      errors.add(:assay_file, "must contain a file or a result")
     end
   end
 
