@@ -52,3 +52,10 @@
             = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
             .span.unit (μl)
 
+
+  .col
+    = render 'show_assays', f: f
+
+  .col
+    = render 'show_notes', f: f
+
