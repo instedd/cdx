@@ -260,8 +260,7 @@ class SamplesController < ApplicationController
     sample.assay_attachments.each do |assay_attachment|
       new_assay_attachment = assay_attachment.dup
       if assay_attachment.assay_file
-        new_assay_file = assay_attachment.assay_file.dup
-        new_assay_file.save!
+        new_assay_file = AssayFile.create(picture: assay_attachment.assay_file.picture)
         new_assay_attachment.assay_file = new_assay_file
       end
       #avoids duplicating assay_attachment for the original sample
