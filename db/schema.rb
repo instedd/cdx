@@ -337,10 +337,6 @@ ActiveRecord::Schema.define(version: 20220223051739) do
     t.datetime "updated_at"
     t.string   "uuid",                          limit: 255
     t.string   "kind",                          limit: 255, default: "institution"
-    t.string   "phone",                         limit: 255
-    t.string   "address",                       limit: 255
-    t.string   "zip_code",                      limit: 255
-    t.string   "country",                       limit: 255
     t.integer  "pending_institution_invite_id", limit: 4
   end
 
