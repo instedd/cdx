@@ -1,4 +1,5 @@
 class SamplesController < ApplicationController
+  include Concerns::ControllerHelper
 
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLE)
@@ -274,23 +275,6 @@ class SamplesController < ApplicationController
     end
 
     sample_params
-  end
-
-  def date_format
-    { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
-  end
-
-  def view_helper(save_back_path = false)
-    if save_back_path
-      session[:back_path] = URI(request.referer || '').path
-    end
-    back_path = session[:back_path] || samples_path
-
-    { date_produced_placeholder: date_format[:placeholder], back_path: back_path }
-  end
-
-  def back_path()
-    session.delete(:back_path) || samples_path
   end
 
   def user_can_delete_notes(notes)
