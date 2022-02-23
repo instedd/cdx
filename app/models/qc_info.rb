@@ -5,8 +5,12 @@ class QcInfo < ActiveRecord::Base
   include DateProduced
 
   has_many :samples
+
   has_many :assay_attachments
+  accepts_nested_attributes_for :assay_attachments
+
   has_many :notes
+  accepts_nested_attributes_for :notes
 
   has_many :assay_attachments
   accepts_nested_attributes_for :assay_attachments
