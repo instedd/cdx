@@ -103,6 +103,7 @@ Rails.application.routes.draw do
       post 'reprocess'
     end
   end
+  resources :sample_transfers, only: [:index]
   resources :samples do
     member do
       get 'print'
