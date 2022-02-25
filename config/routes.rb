@@ -110,6 +110,7 @@ Rails.application.routes.draw do
     collection do
       get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'print' }, action: :bulk_print
       get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+      get 'transfer'
     end
   end
   resources :batches do

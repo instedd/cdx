@@ -6,6 +6,12 @@
 
     // initial bulk actions state
     toggleBulkActions();
+
+    //opens transfer modal
+    $('#bulk_transfer').on('click', function(e) {
+      $('#modal_opener').click()
+    });
+
   })();
 
   function allCheckboxes() {
@@ -21,4 +27,16 @@
 
   function selectedCheckboxes() {
     return allCheckboxes().filter(":checked");
+  }
+
+  function selectedSamplesIds() {
+    var samples = $('.laboratory-sample-row');
+    return $.map(samples, function(sample) {
+      var checkboxInput = $(sample).find('input[name="sample_ids[]"]');
+      if(checkboxInput.is(':checked')) {
+        var uuid = $(sample).children('#sample_uuid').text();
+        var isolateName = $(sample).children('#sample_isolate_name').text();
+        return {uuid, isolateName};
+      }
+     })
   }

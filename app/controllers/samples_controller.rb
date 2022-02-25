@@ -13,6 +13,12 @@ class SamplesController < ApplicationController
     @samples = @samples.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
     @samples = @samples.where("specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
 
+    @institutions = Institution
+      .where()
+      .not(uuid: @navigation_context.institution.uuid)
+      .pluck(:uuid, :name)
+      .map{|uuid, name| {value: uuid, label: name}}
+
     @samples = perform_pagination(@samples)
   end
 
@@ -184,7 +190,37 @@ class SamplesController < ApplicationController
     redirect_to samples_path, notice: 'Samples were successfully deleted.'
   end
 
+  def transfer
+    new_owner = Institution.find_by(uuid: params["institution_id"])
+    if new_owner.nil?
+      flash[:notice] = "Destination Institution does not exists"
+    else
+      begin
+        change_ownership(new_owner)
+        flash[:notice] = "All samples has been transferred successfully."
+      rescue
+        flash[:notice] = "Samples transfer failed."
+      end
+    end
+
+    render json: {status: :ok}
+  end
+
   private
+
+  def change_ownership(new_owner)
+    samples = Sample.joins(:sample_identifiers).where("sample_identifiers.uuid": params["samples"])
+    Sample.transaction do
+      samples.each do |to_transfer|
+        raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
+        if to_transfer.batch_id.nil?
+          to_transfer.site_id = nil
+          to_transfer.institution = new_owner
+          to_transfer.save!
+        end
+      end
+    end
+  end
 
   def sample_params
     sample_params = params.require(:sample).permit(

@@ -53,6 +53,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #TODO: refactor authorize_resource and authorize_resource? as both share almost the same code
+  def authorize_resource?(resource, action)
+    if has_access?(resource, action)
+      check_access(resource, action)
+    else
+      false
+    end
+  end
+
   def authorize_resources(resources, action)
     resources.all? { | resource | authorize_resource(resource, action) }
   end
