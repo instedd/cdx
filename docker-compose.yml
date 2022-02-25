@@ -41,7 +41,7 @@ services:
       - es01:/usr/share/elasticsearch/data
 
   redis:
-    image: redis:3.0.5
+    image: redis:6.2-alpine
 
   sshd:
     image: instedd/cdx-sync-sshd
