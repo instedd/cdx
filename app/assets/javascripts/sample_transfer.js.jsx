@@ -36,8 +36,11 @@ var SampleTransferModal = React.createClass({
     };
   },
 
-  closeModal: function() {
-    event.preventDefault();
+  closeModal: function(event) {
+    if(event) {
+      event.preventDefault();
+    }
+
     this.props.onFinished();
   },
 
