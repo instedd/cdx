@@ -209,10 +209,9 @@ class SamplesController < ApplicationController
   private
 
   def change_ownership(new_owner)
+    samples = Sample.joins(:sample_identifiers).where("sample_identifiers.uuid": params["samples"])
     Sample.transaction do
-      params["samples"].each do |sample|
-        sample_identifier = SampleIdentifier.find_by(uuid: sample)
-        to_transfer = Sample.find(sample_identifier.sample_id)
+      samples.each do |to_transfer|
         raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
         if to_transfer.batch_id.nil?
           to_transfer.site_id = nil
