@@ -13,4 +13,61 @@ class SampleTransfersController < ApplicationController
     @sample_transfers = perform_pagination(@sample_transfers)
     @sample_transfers = @sample_transfers.map { |t| SampleTransferPresenter.new(t, @navigation_context) }
   end
+
+  def create
+    new_owner = Institution.find_by(uuid: params["institution_id"])
+    if new_owner.nil?
+      flash[:notice] = "Destination Institution does not exists"
+    else
+      begin
+        change_ownership(new_owner)
+        flash[:notice] = "All samples has been transferred successfully."
+      rescue
+        flash[:notice] = "Samples transfer failed."
+      end
+    end
+
+    render json: { status: :ok }
+  end
+
+  private
+
+  def change_ownership(new_owner)
+    samples = Sample.joins(:sample_identifiers).where("sample_identifiers.uuid": params["samples"])
+    Sample.transaction do
+      samples.each do |to_transfer|
+        raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
+
+        transfer = SampleTransfer.new(
+          sample: to_transfer,
+          receiver_institution: new_owner,
+        )
+        transfer.confirm
+        transfer.save!
+
+        unless to_transfer.batch.nil?
+          if params["includes_qc_info"] == "true"
+            qc_info = create_qc_info(to_transfer)
+            to_transfer.qc_info_id = qc_info.id if qc_info
+            to_transfer.old_batch_number = to_transfer.batch.batch_number
+          end
+        end
+
+        to_transfer.batch_id = nil
+        to_transfer.site_id = nil
+        to_transfer.institution = new_owner
+        to_transfer.save!
+      end
+    end
+  end
+
+  def create_qc_info(sample)
+    sample_qc = sample.batch.qc_sample
+    return if sample_qc.nil?
+
+    qc_info = QcInfo.find_or_duplicate_from(sample_qc)
+    qc_info.samples << sample
+    qc_info.save!
+    qc_info
+  end
 end
