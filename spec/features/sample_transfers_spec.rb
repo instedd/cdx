@@ -18,12 +18,12 @@ describe "sample transfers" do
       unrelated = SampleTransfer.make!
 
       goto_page ListSampleTransfersPage do |page|
-        expect(page.entry(in_pending.sample.uuid)).to have_content("Confirm receipt")
+        expect(page.entry(in_pending.sample.partial_uuid)).to have_content("Confirm receipt")
         expect(page.entry(in_confirmed.sample.uuid)).to have_content("Receipt confirmed on February 24, 2022")
-        expect(page.entry(out_pending.sample.uuid)).to have_content("Sent on March 04, 2022")
+        expect(page.entry(out_pending.sample.partial_uuid)).to have_content("Sent on March 04, 2022")
         expect(page.entry(out_confirmed.sample.uuid)).to have_content("Delivery confirmed on February 21, 2022")
 
-        expect(page).not_to have_content(unrelated.sample.uuid)
+        expect(page).not_to have_content(unrelated.sample.partial_uuid)
       end
     end
 
@@ -37,9 +37,9 @@ describe "sample transfers" do
       end
 
       expect_page ListSampleTransfersPage do |page|
-        expect(page.entry(subject.sample.uuid))
+        expect(page.entry(subject.sample.partial_uuid))
 
-        expect(page).not_to have_content(other.sample.uuid)
+        expect(page).not_to have_content(other.sample.partial_uuid)
       end
     end
   end

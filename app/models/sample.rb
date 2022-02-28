@@ -67,6 +67,10 @@ class Sample < ActiveRecord::Base
     uuids.sort.first
   end
 
+  def partial_uuid
+    uuid.to_s[0..-5]
+  end
+
   def entity_ids
     self.sample_identifiers.map(&:entity_id)
   end

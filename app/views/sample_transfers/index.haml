@@ -24,7 +24,7 @@
         - t.tbody do
           - @sample_transfers.each do |transfer|
             %tr.laboratory-sample-row{class: ("faded" if transfer.confirmed?)}
-              %td= transfer.sample.uuid
+              %td= transfer.sample_uuid
               %td= transfer.sample.isolate_name
               %td= transfer.sample.inactivation_method
               %td= transfer.other_institution

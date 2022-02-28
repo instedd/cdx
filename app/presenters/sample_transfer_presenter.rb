@@ -42,4 +42,12 @@ class SampleTransferPresenter
       "sender"
     end
   end
+
+  def sample_uuid
+    if confirmed?
+      sample.uuid
+    else
+      sample.partial_uuid + "XXXX"
+    end
+  end
 end
