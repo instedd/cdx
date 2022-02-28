@@ -85,4 +85,16 @@ class Sample < ActiveRecord::Base
   def has_entity_id?
     entity_ids.compact.any?
   end
+
+  def start_transfer_to(new_owner)
+    transfer = SampleTransfer.create!(
+      sample: self,
+      receiver_institution: new_owner,
+    )
+
+    self.old_batch_number = batch.batch_number unless batch.nil?
+    update!(batch: nil, site: nil, institution: nil)
+
+    transfer
+  end
 end

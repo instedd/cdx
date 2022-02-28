@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe SampleTransfersController, type: :controller do
   let!(:my_institution) { Institution.make! }
+  let(:my_site) { Site.make!(institution: my_institution) }
   let!(:other_institution) { Institution.make! }
   let!(:current_user) { my_institution.user }
   let(:default_params) { { context: my_institution.uuid } }
@@ -63,7 +64,7 @@ RSpec.describe SampleTransfersController, type: :controller do
     end
 
     it "creates single transfer" do
-      sample = Sample.make(:filled, institution: my_institution)
+      sample = Sample.make(:filled, institution: my_institution, site: my_site)
 
       post :create, institution_id: other_institution.uuid, samples: [sample.uuid]
 
@@ -71,17 +72,18 @@ RSpec.describe SampleTransfersController, type: :controller do
       expect(flash.to_h).to eq({ "success" => "All samples have been transferred successfully." })
 
       sample.reload
-      expect(sample.institution).to eq other_institution
+      expect(sample.site).to be_nil
+      expect(sample.institution).to be_nil
 
       transfer = sample.sample_transfers.first
       expect(transfer.sample).to eq sample
       expect(transfer.sender_institution).to eq my_institution
       expect(transfer.receiver_institution).to eq other_institution
-      expect(transfer).to be_confirmed
+      expect(transfer).not_to be_confirmed
     end
 
     it "creates multiple transfers" do
-      samples = 3.times.map { Sample.make(:filled, institution: my_institution) }
+      samples = 3.times.map { Sample.make(:filled, institution: my_institution, site: my_site) }
 
       post :create, institution_id: other_institution.uuid, samples: samples.map(&:uuid)
 
@@ -89,12 +91,13 @@ RSpec.describe SampleTransfersController, type: :controller do
       expect(flash.to_h).to eq({ "success" => "All samples have been transferred successfully." })
 
       samples.each(&:reload)
-      expect(samples.map(&:institution)).to eq [other_institution] * 3
+      expect(samples.map(&:site)).to eq [nil] * 3
+      expect(samples.map(&:institution)).to eq [nil] * 3
 
       transfers = SampleTransfer.all
       expect(transfers.map(&:sender_institution)).to eq [my_institution] * 3
       expect(transfers.map(&:receiver_institution)).to eq [other_institution] * 3
-      expect(transfers.all?(&:confirmed?)).to be true
+      expect(transfers.any?(&:confirmed?)).to be false
     end
   end
 end
