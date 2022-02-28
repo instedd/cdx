@@ -20,11 +20,10 @@ class SampleTransfersController < ApplicationController
       flash[:error] = "Destination Institution does not exists"
       render json: { status: :error }, status: 404
     else
-      begin
-        change_ownership(new_owner)
+      if create_transfer(new_owner, params["samples"])
         flash[:success] = "All samples have been transferred successfully."
         render json: { status: :ok }
-      rescue
+      else
         flash[:error] = "Samples transfer failed."
         render json: { status: :error }, status: 500
       end
@@ -33,8 +32,8 @@ class SampleTransfersController < ApplicationController
 
   private
 
-  def change_ownership(new_owner)
-    samples = Sample.joins(:sample_identifiers).where("sample_identifiers.uuid": params["samples"])
+  def create_transfer(new_owner, samples)
+    samples = Sample.joins(:sample_identifiers).where("sample_identifiers.uuid": samples)
     Sample.transaction do
       samples.each do |to_transfer|
         raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
@@ -60,6 +59,12 @@ class SampleTransfersController < ApplicationController
         to_transfer.save!
       end
     end
+
+    true
+  rescue => exception
+    Raven.capture_exception(exception)
+
+    false
   end
 
   def create_qc_info(sample)
