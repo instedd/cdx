@@ -100,4 +100,25 @@ RSpec.describe SampleTransfersController, type: :controller do
       expect(transfers.any?(&:confirmed?)).to be false
     end
   end
+
+  describe "PATCH #confirm" do
+    before(:each) do
+      sign_in current_user
+    end
+
+    it "confirms" do
+      sample = Sample.make!(institution: other_institution)
+      transfer = sample.start_transfer_to(my_institution)
+
+      Timecop.freeze do
+        patch :confirm, sample_transfer_id: transfer.id
+
+        transfer.reload
+        expect(transfer.confirmed_at).to eq Time.now.change(usec: 0) # account for DB time field granularity
+      end
+
+      sample.reload
+      expect(sample.institution).to eq my_institution
+    end
+  end
 end

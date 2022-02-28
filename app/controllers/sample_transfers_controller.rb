@@ -30,6 +30,16 @@ class SampleTransfersController < ApplicationController
     end
   end
 
+  def confirm
+    transfer = SampleTransfer.find(params[:sample_transfer_id])
+
+    transfer.confirm_and_apply!
+
+    flash[:success] = "Sample has been confirmed."
+
+    render json: { status: :ok }
+  end
+
   private
 
   def create_transfer(new_owner, samples)

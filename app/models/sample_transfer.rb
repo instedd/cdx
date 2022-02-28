@@ -34,6 +34,11 @@ class SampleTransfer < ActiveRecord::Base
     save!
   end
 
+  def confirm_and_apply!
+    sample.update!(institution: receiver_institution)
+    confirm!
+  end
+
   def confirmed?
     !!confirmed_at
   end
