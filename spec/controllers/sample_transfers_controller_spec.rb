@@ -56,4 +56,45 @@ RSpec.describe SampleTransfersController, type: :controller do
       end
     end
   end
+
+  describe "POST #create" do
+    before(:each) do
+      sign_in current_user
+    end
+
+    it "creates single transfer" do
+      sample = Sample.make(:filled, institution: my_institution)
+
+      post :create, institution_id: other_institution.uuid, samples: [sample.uuid]
+
+      expect(response).to be_success
+      expect(flash.to_h).to eq({ "success" => "All samples have been transferred successfully." })
+
+      sample.reload
+      expect(sample.institution).to eq other_institution
+
+      transfer = sample.sample_transfers.first
+      expect(transfer.sample).to eq sample
+      expect(transfer.sender_institution).to eq my_institution
+      expect(transfer.receiver_institution).to eq other_institution
+      expect(transfer).to be_confirmed
+    end
+
+    it "creates multiple transfers" do
+      samples = 3.times.map { Sample.make(:filled, institution: my_institution) }
+
+      post :create, institution_id: other_institution.uuid, samples: samples.map(&:uuid)
+
+      expect(response).to be_success
+      expect(flash.to_h).to eq({ "success" => "All samples have been transferred successfully." })
+
+      samples.each(&:reload)
+      expect(samples.map(&:institution)).to eq [other_institution] * 3
+
+      transfers = SampleTransfer.all
+      expect(transfers.map(&:sender_institution)).to eq [my_institution] * 3
+      expect(transfers.map(&:receiver_institution)).to eq [other_institution] * 3
+      expect(transfers.all?(&:confirmed?)).to be true
+    end
+  end
 end

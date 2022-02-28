@@ -17,17 +17,18 @@ class SampleTransfersController < ApplicationController
   def create
     new_owner = Institution.find_by(uuid: params["institution_id"])
     if new_owner.nil?
-      flash[:notice] = "Destination Institution does not exists"
+      flash[:error] = "Destination Institution does not exists"
+      render json: { status: :error }, status: 404
     else
       begin
         change_ownership(new_owner)
-        flash[:notice] = "All samples has been transferred successfully."
+        flash[:success] = "All samples have been transferred successfully."
+        render json: { status: :ok }
       rescue
-        flash[:notice] = "Samples transfer failed."
+        flash[:error] = "Samples transfer failed."
+        render json: { status: :error }, status: 500
       end
     end
-
-    render json: { status: :ok }
   end
 
   private
