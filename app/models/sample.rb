@@ -23,7 +23,6 @@ class Sample < ActiveRecord::Base
   accepts_nested_attributes_for :notes, allow_destroy: true
   validates_associated :notes, message: "are invalid"
 
-  validates_presence_of :institution
   validate :validate_encounter
   validate :validate_patient
 
