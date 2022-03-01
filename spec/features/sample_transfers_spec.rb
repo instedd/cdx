@@ -43,4 +43,54 @@ describe "sample transfers" do
       end
     end
   end
+
+  describe "transfer workflow" do
+    let!(:institution_a) { Institution.make! }
+    let!(:institution_b) { Institution.make! }
+    let!(:user_a) { institution_a.user }
+    let!(:user_b) { institution_b.user }
+
+    pending "pending due to JS driver incompatibility (#1426)" do
+      sample = Sample.make!(:filled, institution: institution_a)
+
+      sign_in user_a
+
+      goto_page ListSamplesPage do |page|
+        page.entry(sample.uuid).select
+        page.actions.bulk_transfer.click
+
+        page.bulk_transfer_modal.tap do |modal|
+          expect(modal).to have_content("Transfer samples")
+          modal.institution.set institution_b.name
+          modal.submit
+        end
+      end
+
+      expect_page ListSamplesPage do |page|
+        expect(page).not_to have_content(sample.uuid)
+      end
+
+      sign_in user_b
+
+      goto_page ListSampleTransfersPage do |page|
+        expect(page).to have_content(sample.partial_uuid)
+
+        page.entry(sample.partial_uuid).find_link("Confirm receipt").click
+
+        page.confirm_receipt_modal.tap do |modal|
+          expect(modal).to have_content("Confirm receipt")
+
+          modal.submit
+        end
+      end
+
+      expect_page ListSampleTransfersPage do |page|
+        expect(page).not_to have_content(sample.partial_uuid)
+      end
+
+      goto_page ListSamplesPage do |page|
+        expect(page).to have_content(sample.uuid)
+      end
+    end
+  end
 end
