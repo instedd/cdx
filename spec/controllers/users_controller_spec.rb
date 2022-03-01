@@ -157,12 +157,13 @@ describe UsersController, type: :controller do
       end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Invited user email can't be blank")
     end
 
-    pending "rejects sending to multiple adresses (#1436)" do
-      post :create_with_institution_invite, {
-        user_invite_data: {email: "new@example.com,other@example.com"},
-        institution_data: {name: "New Institution", type: "institution"},
-      }
-      expect(response).not_to be_success
+    it "rejects sending to multiple adresses (#1436)" do
+      expect do
+        post :create_with_institution_invite, {
+          user_invite_data: {email: "new@example.com,other@example.com"},
+          institution_data: {name: "New Institution", type: "institution"},
+        }
+      end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Invited user email is invalid")
     end
 
     context "existing user" do

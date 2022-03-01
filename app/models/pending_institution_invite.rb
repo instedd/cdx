@@ -6,6 +6,7 @@ class PendingInstitutionInvite < ActiveRecord::Base
   statuses = %w(pending accepted)
 
   validates_presence_of :invited_user_email
+  validates_format_of :invited_user_email, without: /,/
   validates_presence_of :invited_by_user
   validates_presence_of :institution_name
   validates_presence_of :institution_kind
