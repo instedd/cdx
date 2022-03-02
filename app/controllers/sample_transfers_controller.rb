@@ -33,6 +33,24 @@ class SampleTransfersController < ApplicationController
   def confirm
     transfer = SampleTransfer.find(params[:sample_transfer_id])
 
+    unless transfer.receiver_institution == @navigation_context.institution
+      render json: { status: "error" }, status: :not_found
+      return
+    end
+
+    resource = {
+      resource_type: "sample",
+      resource_id: transfer.sample.id,
+      institution_id: @navigation_context.institution.id,
+      site_id: @navigation_context.site.try(&:uuid),
+    }
+    unless ComputedPolicy.authorize_instance(UPDATE_SAMPLE, resource, current_user)
+      log_authorization_warn SampleTransfer, UPDATE_SAMPLE
+
+      render json: { status: "error" }, status: :forbidden
+      return
+    end
+
     transfer.confirm_and_apply!
 
     flash[:success] = "Sample has been confirmed."

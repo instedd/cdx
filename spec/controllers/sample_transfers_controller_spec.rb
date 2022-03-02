@@ -107,11 +107,12 @@ RSpec.describe SampleTransfersController, type: :controller do
     end
 
     it "confirms" do
-      sample = Sample.make!(institution: other_institution)
+      sample = Sample.make!
       transfer = sample.start_transfer_to(my_institution)
 
       Timecop.freeze do
         patch :confirm, sample_transfer_id: transfer.id
+        expect(response).to be_success
 
         transfer.reload
         expect(transfer.confirmed_at).to eq Time.now.change(usec: 0) # account for DB time field granularity
@@ -119,6 +120,36 @@ RSpec.describe SampleTransfersController, type: :controller do
 
       sample.reload
       expect(sample.institution).to eq my_institution
+    end
+
+    it "verifies user is authorized" do
+      sample = Sample.make!
+      transfer = sample.start_transfer_to(other_institution)
+
+      grant other_institution.user, current_user, other_institution, Policy::Actions::READ_INSTITUTION
+
+      patch :confirm, sample_transfer_id: transfer.id, context: other_institution.uuid
+      expect(response).to be_forbidden
+
+      transfer.reload
+      expect(transfer).not_to be_confirmed
+
+      sample.reload
+      expect(sample.institution).to be_nil
+    end
+
+    it "verifies current context is receiver" do
+      sample = Sample.make!
+      transfer = sample.start_transfer_to(other_institution)
+
+      patch :confirm, sample_transfer_id: transfer.id
+      expect(response).to be_not_found
+
+      transfer.reload
+      expect(transfer).not_to be_confirmed
+
+      sample.reload
+      expect(sample.institution).to be_nil
     end
   end
 end
