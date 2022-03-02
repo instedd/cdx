@@ -5,8 +5,7 @@ class PendingInstitutionInvite < ActiveRecord::Base
   institution_kinds = %w(institution manufacturer health_organization)
   statuses = %w(pending accepted)
 
-  validates_presence_of :invited_user_email
-  validates_format_of :invited_user_email, without: /,/
+  validates :invited_user_email, presence: true, format: { with: Devise.email_regexp, allow_blank: true }
   validates_presence_of :invited_by_user
   validates_presence_of :institution_name
   validates_presence_of :institution_kind
