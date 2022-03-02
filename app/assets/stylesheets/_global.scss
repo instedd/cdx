@@ -190,9 +190,13 @@ a[title="Back"] {
   margin: -10px -10px 0;
   padding: 0 1em 0.5em;
 
+  form .row {
+    margin-bottom: -2%;
+  }
+
   .filter {
     @include flex(0 0 16%);
-    margin: 0 2%;
+    margin: 0 2% 2%;
 
     > label {
       min-height: auto;
