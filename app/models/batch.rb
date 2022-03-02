@@ -28,9 +28,9 @@ class Batch < ApplicationRecord
   validates_presence_of :volume
   validates_presence_of :lab_technician
   validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
-
-  validate :isolate_name_batch_number_combination_create, on: :create
-  validate :isolate_name_batch_number_combination_update, on: :update
+  validates_presence_of :batch_number
+  validates_presence_of :isolate_name
+  validates_uniqueness_of :batch_number, scope: :isolate_name
 
   validates_associated :samples, message: "are invalid"
 
@@ -39,7 +39,7 @@ class Batch < ApplicationRecord
   }
 
   def qc_sample
-    self.samples.select {|sample| sample.is_quality_control?}.first
+    self.samples.select { |sample| sample.is_quality_control? }.first
   end
 
   def has_qc_sample?
@@ -71,13 +71,13 @@ class Batch < ApplicationRecord
 
   def isolate_name_batch_number_combination_create
     validate_isolate_name_batch_number_combination {
-      [ "#{query} AND id IS NOT NULL" ] + query_params
+      ["#{query} AND id IS NOT NULL"] + query_params
     }
   end
 
   def isolate_name_batch_number_combination_update
     validate_isolate_name_batch_number_combination {
-      [ "#{query} AND id != ?" ] + query_params + [ id ]
+      ["#{query} AND id != ?"] + query_params + [id]
     }
   end
 
@@ -86,7 +86,7 @@ class Batch < ApplicationRecord
   end
 
   def query_params
-    [ isolate_name.downcase, batch_number.downcase ]
+    [isolate_name.downcase, batch_number.downcase]
   end
 
   def validate_isolate_name_batch_number_combination
