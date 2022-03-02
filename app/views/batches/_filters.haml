@@ -6,7 +6,7 @@
           %h1
             - if @can_create
               = link_to "+", new_sample_or_batch_batches_path, class: 'btn-add side-link fix', title: 'Add sample/batch'
-            Samples
+            Batches
 
       %form#filters-form{action: batches_path, "data-auto-submit" => true}
         %input{type: "hidden", name: "page_size", value: @page_size}
