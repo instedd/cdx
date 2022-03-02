@@ -12,7 +12,6 @@ gem 'csv_builder'
 gem 'decent_exposure'
 gem 'nokogiri', '~> 1.6.7.2'
 gem 'react-rails', '~> 1.3.2'
-gem 'foreman'
 gem 'paperclip', git: 'https://github.com/instedd/paperclip', branch: 'fix/v4.3.6-no-mimemagic'
 gem 'aws-sdk', '~> 1.6'
 gem 'newrelic_rpm'
@@ -69,10 +68,6 @@ gem 'sidekiq-cron', '~> 0.3.1'
 group :development do
   gem 'letter_opener'
   gem 'web-console', '~> 2.0'
-  gem 'capistrano', '~> 3.1.0', require: false
-  gem 'capistrano-rails', '~> 1.1', require: false
-  gem 'capistrano-bundler', '~> 1.1', require: false
-  gem 'capistrano-rvm', '~> 0.1', require: false
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'quiet_assets'
