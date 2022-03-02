@@ -20,9 +20,10 @@
           .filter
             %label.block Isolate Name
             %input.input-large{type: "text", name: "isolate_name", value: params["isolate_name"], placeholder: "Filter by isolate name"}
-          .filter
-            %label.block From date
-            %input.input-large{type: "date", name: "date_produced_from", value: params["date_produced_from"]}
-          .filter
-            %label.block To date
-            %input.input-large{type: "date", name: "date_produced_to", value: params["date_produced_to"]}
+          .filter-group
+            .filter
+              %label.block From date
+              %input.input-large{type: "date", name: "date_produced_from", value: params["date_produced_from"]}
+            .filter
+              %label.block To date
+              %input.input-large{type: "date", name: "date_produced_to", value: params["date_produced_to"]}
