@@ -1,4 +1,0 @@
-web: bundle exec rails s
-elasticsearch: elasticsearch
-locations: sh -c 'cd ../location-service/ && bin/api'
-postgres: postgres
