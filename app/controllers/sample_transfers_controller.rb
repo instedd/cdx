@@ -46,7 +46,12 @@ class SampleTransfersController < ApplicationController
       return
     end
 
-    transfer.confirm_and_apply!
+    unless transfer.confirm_and_apply
+      flash[:error] = "Sample transfer has already been confirmed"
+
+      render json: { status: "error" }, status: :bad_request
+      return
+    end
 
     flash[:success] = "Sample has been confirmed."
 

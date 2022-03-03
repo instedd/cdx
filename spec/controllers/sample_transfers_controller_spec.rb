@@ -152,5 +152,19 @@ RSpec.describe SampleTransfersController, type: :controller do
       sample.reload
       expect(sample.institution).to be_nil
     end
+
+    it "verifies transfer is unconfirmed" do
+      sample = Sample.make
+      transfer = sample.start_transfer_to(my_institution)
+      transfer.confirm_and_apply!
+      transfer.confirmed_at = original_confirmed_at = Time.now.change(usec: 0) - 1.hour
+      transfer.save!
+
+      patch :confirm, sample_transfer_id: transfer.id
+      expect(response).to be_bad_request
+
+      transfer.reload
+      expect(transfer.confirmed_at).to eq original_confirmed_at
+    end
   end
 end

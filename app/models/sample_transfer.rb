@@ -25,7 +25,6 @@ class SampleTransfer < ActiveRecord::Base
 
   def confirm
     if confirmed?
-      self.errors.add(:confirmed_at, "Already confirmed.")
       false
     else
       self.confirmed_at = Time.now
@@ -34,13 +33,28 @@ class SampleTransfer < ActiveRecord::Base
   end
 
   def confirm!
-    confirm
-    save!
+    if confirm
+      save!
+    else
+      raise ActiveRecord::RecordNotSaved.new("Sample transfer has already been confirmed.")
+    end
+  end
+
+  def confirm_and_apply
+    if confirm
+      save!
+      sample.update!(institution: receiver_institution)
+      true
+    else
+      false
+    end
   end
 
   def confirm_and_apply!
-    sample.update!(institution: receiver_institution)
     confirm!
+    sample.update!(institution: receiver_institution)
+
+    nil
   end
 
   def confirmed?
