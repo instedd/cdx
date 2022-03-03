@@ -30,6 +30,11 @@ describe InstitutionsController do
       expect(Institution.count).to eq(1)
     end
 
+    it "institution is created with a blank invitation id" do
+      post :create, {"institution" => {"name" => "foo", "pending_institution_invite_id" => ""}}
+      expect(Institution.count).to eq(1)
+    end
+
     it "institutions without name are not created" do
       post :create, {"institution" => {"name" => ""}}
       expect(Institution.count).to eq(0)
