@@ -23,23 +23,25 @@
             %th Status
         - t.tbody do
           - @sample_transfers.each do |transfer|
-            %tr.laboratory-sample-row{class: ("faded" unless transfer.confirmed?)}
+            %tr.laboratory-sample-row{class: ("faded" if transfer.confirmed?)}
               %td= transfer.sample.uuid
               %td= transfer.sample.isolate_name
               %td= transfer.sample.inactivation_method
               %td= transfer.other_institution
-              %td
-                - if confirmed_at = transfer.confirmed_at
-                  = transfer.receiver? ? "Received" : "Sent"
-                  = time_tag confirmed_at, I18n.l(confirmed_at, format: I18n.t("date.formats.long")), title: I18n.l(confirmed_at)
-                - else
+              - if confirmed_at = transfer.confirmed_at
+                %td{title: "#{transfer.receiver_institution} confirmed receipt on #{I18n.l(confirmed_at)}"}
+                  = transfer.receiver? ? "Receipt confirmed on" : "Delivery confirmed on"
+                  = time_tag confirmed_at, I18n.l(confirmed_at, format: I18n.t("date.formats.long"))
+              - else
+                %td{title: "#{transfer.sender_institution} sent on #{I18n.l(transfer.created_at)}, unconfirmed by #{transfer.receiver_institution}"}
                   - if transfer.receiver?
                     - if transfer.can_confirm?
                       %button{disabled: "disabled"} Confirm receipt
                     - else
                       Unconfirmed
                   - else
-                    Pending
+                    Sent on
+                    = time_tag transfer.created_at, I18n.l(transfer.created_at, format: I18n.t("date.formats.long"))
 
       .pagination
         = render 'shared/pagination'

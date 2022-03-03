@@ -6,7 +6,8 @@ class SampleTransferPresenter
     @context = context
   end
 
-  delegate :sample, :confirmed_at, :confirmed?, to: :transfer
+  # TODO(Rails 5.1): Use delegate_missing
+  delegate :sample, :confirmed_at, :confirmed?, :created_at, :receiver_institution, :sender_institution, to: :transfer
 
   def receiver?
     context.institution == transfer.receiver_institution

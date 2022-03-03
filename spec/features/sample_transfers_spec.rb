@@ -11,17 +11,17 @@ describe "sample transfers" do
     end
 
     it "shows status" do
-      in_pending = SampleTransfer.make!(receiver_institution: my_institution)
+      in_pending = SampleTransfer.make!(receiver_institution: my_institution, created_at: Time.new(2022, 3, 4))
       in_confirmed = SampleTransfer.make!(receiver_institution: my_institution, confirmed_at: Time.new(2022, 2, 24, 15, 31))
-      out_pending = SampleTransfer.make!(sender_institution: my_institution)
+      out_pending = SampleTransfer.make!(sender_institution: my_institution, created_at: Time.new(2022, 3, 4))
       out_confirmed = SampleTransfer.make!(sender_institution: my_institution, confirmed_at: Time.new(2022, 2, 21, 12, 00))
       unrelated = SampleTransfer.make!
 
       goto_page ListSampleTransfersPage do |page|
         expect(page.entry(in_pending.sample.uuid)).to have_content("Confirm receipt")
-        expect(page.entry(in_confirmed.sample.uuid)).to have_content("Received February 24, 2022")
-        expect(page.entry(out_pending.sample.uuid)).to have_content("Pending")
-        expect(page.entry(out_confirmed.sample.uuid)).to have_content("Sent February 21, 2022")
+        expect(page.entry(in_confirmed.sample.uuid)).to have_content("Receipt confirmed on February 24, 2022")
+        expect(page.entry(out_pending.sample.uuid)).to have_content("Sent on March 04, 2022")
+        expect(page.entry(out_confirmed.sample.uuid)).to have_content("Delivery confirmed on February 21, 2022")
 
         expect(page).not_to have_content(unrelated.sample.uuid)
       end
