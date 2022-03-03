@@ -3,7 +3,7 @@ require 'spec_helper'
 require 'tempfile'
 
 describe SshKey do
-  let!(:device) { Device.make }
+  let!(:device) { Device.make! }
   let!(:ssh_key) { SshKey.create!(
       public_key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4'+
           'hzyCbJQ5RgrZPFz+rTscTuJ5NPuBIKiinXwkA38CE9+N37L8q9kMqxsbDumVFbamYVlS9fsmF1TqRRhobfJfZGpt'+
@@ -42,7 +42,7 @@ describe SshKey do
   end
 
   it "deletes other ssh keys with same public key" do
-    other_ssh_key = SshKey.create! public_key: ssh_key.public_key, device: Device.make
+    other_ssh_key = SshKey.create! public_key: ssh_key.public_key, device: Device.make!
     expect(SshKey.all.to_a).to eq([other_ssh_key])
   end
 end

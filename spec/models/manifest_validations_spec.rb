@@ -42,7 +42,7 @@ describe Manifest do
           "api_version" : "1.0.0"
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:parse_error]).not_to eq(nil)
@@ -53,7 +53,7 @@ describe Manifest do
         "metadata" : {
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:metadata].first).to eq("can't be blank")
@@ -66,7 +66,7 @@ describe Manifest do
         },
         "field_mapping" : []
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:metadata].first).to eq("must include version field")
@@ -79,14 +79,14 @@ describe Manifest do
         },
         "field_mapping" : []
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:metadata].first).to eq("must include api_version field")
     end
 
     it "checks the version number against the current api version" do
-      expect {Manifest.make(definition: %{{
+      expect {Manifest.make!(definition: %{{
         "metadata" : {
           "conditions": ["mtb"],
           "api_version" : "1.1.1",
@@ -104,7 +104,7 @@ describe Manifest do
           "api_version" : "1.1.0"
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:field_mapping].first).to eq("must be a json object")
@@ -116,7 +116,7 @@ describe Manifest do
         },
         "field_mapping" : []
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:field_mapping].first).to eq("must be a json object")
@@ -131,7 +131,7 @@ describe Manifest do
         "custom_fields": [],
         "field_mapping" : {}
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:custom_fields].first).to eq("must be a json object")
@@ -153,7 +153,7 @@ describe Manifest do
           "test.custom": {"lookup" : "test.custom"}
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:invalid_type].first).to eq(": target 'test.custom'. Field can't specify a type.")
@@ -175,7 +175,7 @@ describe Manifest do
           "nonexistent.custom": {"lookup" : "test.custom"}
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       expect(m).to be_invalid
       expect(m.errors[:custom_fields]).to contain_exactly(": target 'nonexistent.custom'. Scope 'nonexistent' is invalid.")
     end
@@ -196,7 +196,7 @@ describe Manifest do
           "custom": {"lookup" : "test.custom"}
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       expect(m).to be_invalid
       expect(m.errors[:custom_fields]).to contain_exactly(": target 'custom'. A scope must be specified.")
     end
@@ -221,7 +221,7 @@ describe Manifest do
           "patient.rbc_count": {"lookup": "patient.rbc_count"}
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(1)
     end
@@ -237,7 +237,7 @@ describe Manifest do
           "custom": {"lookup" : "custom"}
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:metadata].first).to eq("must include conditions field")
@@ -255,7 +255,7 @@ describe Manifest do
           "custom": {"lookup" : "custom"}
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:conditions].first).to eq("must be a json array")
@@ -273,7 +273,7 @@ describe Manifest do
           "custom": {"lookup" : "custom"}
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:conditions].first).to eq("must be a non-empty json array")
@@ -291,7 +291,7 @@ describe Manifest do
           "custom": {"lookup" : "custom"}
         }
       }}
-      m = Manifest.new(device_model: DeviceModel.make, definition: definition)
+      m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
       expect(m.errors[:conditions].first).to eq("must be a json string array")

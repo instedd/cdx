@@ -1,8 +1,10 @@
 require 'spec_helper'
 
 describe Api::InstitutionsController do
-  let!(:user) { User.make }
-  let!(:institution) { Institution.make user: user }
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+  end
 
   context "with signed in user" do
     before(:each) { sign_in user }
@@ -17,8 +19,8 @@ describe Api::InstitutionsController do
       end
 
       it "should list the institutions for given user" do
-        other_institution = Institution.make user: user
-        Institution.make user: User.make
+        other_institution = Institution.make! user: user
+        Institution.make! user: User.make!
         result = get :index, format: 'json'
         expect(Oj.load(result.body)).to eq({'total_count' => 2, 'institutions' => [
           {'uuid' => institution.uuid, 'name' => institution.name},
@@ -37,6 +39,7 @@ describe Api::InstitutionsController do
         render_views
 
         before(:each) { Timecop.freeze }
+        after(:each) { Timecop.return }
 
         it "should respond a csv" do
           get :index, format: 'csv'

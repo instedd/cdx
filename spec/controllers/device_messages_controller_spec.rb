@@ -1,12 +1,14 @@
 require 'spec_helper'
 
 describe DeviceMessagesController do
-
-  let!(:institution) { Institution.make }
-  let!(:other_institution) { Institution.make }
-  let!(:site) { Site.make institution: institution }
-  let!(:device) { Device.make institution: institution, site: site }
-  let!(:device_message) { DeviceMessage.make device: device, site: site}
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @site = Site.make! institution: @institution
+    @device = Device.make! institution: @institution
+    @device_message = DeviceMessage.make! device: @device, site: @site
+    @other_institution = Institution.make!
+  end
 
   it "should be downloadable by authorized users" do
     sign_in institution.user

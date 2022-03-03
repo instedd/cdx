@@ -1,15 +1,18 @@
 require 'spec_helper'
 
 describe SubscribersController, elasticsearch: true do
-  let(:user) { User.make }
-  let!(:institution) { user.create Institution.make_unsaved }
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+  end
+
   before(:each) { sign_in user }
 
   context "with filters" do
-    let(:filter) { user.filters.make query: { site: 1 } }
+    let(:filter) { Filter.make! user: user, query: { site: 1 } }
 
     it "list subscribers" do
-      subscriber = filter.subscribers.make fields: ['foo', 'bar']
+      subscriber = Subscriber.make! user: user, filter: filter, fields: ['foo', 'bar']
       get :index, format: :json
       expect(response.body).to eq([subscriber].to_json)
     end
@@ -23,7 +26,7 @@ describe SubscribersController, elasticsearch: true do
     end
 
     it "deletes a subscriber" do
-      subscriber = filter.subscribers.make fields: ['foo', 'bar']
+      subscriber = Subscriber.make! user: user, filter: filter, fields: ['foo', 'bar']
       delete :destroy, filter_id: filter.id, id: subscriber.id
       expect(filter.subscribers.count).to be(0)
     end

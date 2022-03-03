@@ -2,12 +2,12 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe "Patients", elasticsearch: true do
-  let(:institution) { Institution.make }
+  let(:institution) { Institution.make! }
   let(:user) { institution.user }
-  let(:site) { institution.sites.make }
+  let(:site) { Site.make! institution: institution }
 
   let!(:device_spec_helper) { DeviceSpecHelper.new 'genoscan' }
-  let!(:device) { device_spec_helper.make site: site }
+  let!(:device) { device_spec_helper.make! site: site }
 
   context "without name" do
     before(:each) {

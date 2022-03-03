@@ -1,10 +1,12 @@
 require 'spec_helper'
 
 describe Api::MessagesController, elasticsearch: true, validate_manifest: false do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+  end
 
-  let(:user) {User.make}
-  let(:institution) {Institution.make user_id: user.id}
-  let(:device) {Device.make institution_id: institution.id}
+  let(:device) { Device.make! institution: institution }
   let(:data)  {Oj.dump test:{assays: [result: :positive]} }
 
   context "Authentication" do

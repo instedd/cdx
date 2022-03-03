@@ -1,9 +1,10 @@
 require 'spec_helper'
 
 describe RegistrationsController do
-
-  let!(:institution) {Institution.make}
-  let!(:user) {institution.user}
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+  end
 
   before(:each) do
     @request.env["devise.mapping"] = Devise.mappings[:user]

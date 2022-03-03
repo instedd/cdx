@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe "policy", elasticsearch: true do
 
-  let(:institution) { Institution.make }
+  let(:institution) { Institution.make! }
   let(:user) { institution.user }
-  let!(:site1) { institution.sites.make }
-  let!(:site2) { Site.make :child, parent: site1 }
+  let!(:site1) { Site.make! institution: institution }
+  let!(:site2) { Site.make! :child, parent: site1 }
   let!(:device_spec_helper) { DeviceSpecHelper.new 'genoscan' }
 
   before(:each) {
@@ -18,7 +18,7 @@ describe "policy", elasticsearch: true do
     }
 
     context "regarding target site" do
-      let!(:device) { device_spec_helper.make site: site1 }
+      let!(:device) { device_spec_helper.make! site: site1 }
 
       before(:each) {
         device_spec_helper.import_sample_csv device, 'genoscan_sample.csv'
@@ -39,7 +39,7 @@ describe "policy", elasticsearch: true do
     end
 
     context "regarding target child site" do
-      let!(:device) { device_spec_helper.make site: site2 }
+      let!(:device) { device_spec_helper.make! site: site2 }
 
       before(:each) {
         device_spec_helper.import_sample_csv device, 'genoscan_sample.csv'

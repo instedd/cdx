@@ -2,16 +2,20 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 RSpec.describe SamplesController, type: :controller do
-  let!(:institution)   { Institution.make }
-  let!(:user)          { institution.user }
-  before(:each)        { sign_in user }
-  let(:default_params) { {context: institution.uuid} }
-  let(:loinc_code)     { LoincCode.make }
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
 
-  let!(:other_user) { Institution.make.user }
-  before(:each) {
+    @other_user = Institution.make!.user
+  end
+
+  let(:default_params) { {context: institution.uuid} }
+  let(:loinc_code)     { LoincCode.make! }
+
+  before(:each) do
     grant user, other_user, institution, READ_INSTITUTION
-  }
+    sign_in user
+  end
 
   context "index" do
     it "should be accessible by institution owner" do
@@ -20,13 +24,13 @@ RSpec.describe SamplesController, type: :controller do
     end
 
     it "should list samples if can read" do
-      institution.samples.make
+      Sample.make! institution: institution
       get :index
       expect(assigns(:samples).count).to eq(1)
     end
 
     it "should not list samples if can not read" do
-      institution.samples.make
+      Sample.make! institution: institution
       sign_in other_user
       get :index
       expect(assigns(:samples).count).to eq(0)
@@ -51,9 +55,9 @@ RSpec.describe SamplesController, type: :controller do
     end
 
     it "should filter by Isolate Name" do
-      institution.samples.make isolate_name: 'ABC.42'
-      institution.samples.make isolate_name: 'DEF.24'
-      institution.samples.make isolate_name: 'GHI.42'
+      Sample.make! institution: institution, isolate_name: 'ABC.42'
+      Sample.make! institution: institution, isolate_name: 'DEF.24'
+      Sample.make! institution: institution, isolate_name: 'GHI.42'
 
       get :index, isolate_name: '42'
       expect(response).to be_success
@@ -61,9 +65,9 @@ RSpec.describe SamplesController, type: :controller do
     end
 
     it "should filter by Sample ID" do
-      institution.samples.make sample_identifiers: [SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
-      institution.samples.make sample_identifiers: [SampleIdentifier.make(uuid: '89101112-8ce1-a0c8-ac1b-58bed3633e88')]
-      institution.samples.make sample_identifiers: [SampleIdentifier.make(uuid: '13141516-8ce1-a0c8-ac1b-58bed3633e00')]
+      Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
+      Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '89101112-8ce1-a0c8-ac1b-58bed3633e88')]
+      Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '13141516-8ce1-a0c8-ac1b-58bed3633e00')]
 
       get :index, sample_id: '88'
       expect(response).to be_success
@@ -73,7 +77,7 @@ RSpec.describe SamplesController, type: :controller do
 
   context "show" do
     let!(:sample) do
-      institution.samples.make sample_identifiers: [SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
+      Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
     end
 
     it "should be accessible to institution owner" do
@@ -261,7 +265,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "edit" do
-    let!(:sample) { institution.samples.make sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')] }
+    let!(:sample) { Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')] }
 
     it "should be accessible by institution owner" do
       get :edit, id: sample.id
@@ -297,7 +301,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "update" do
-    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern')) })}
+    let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [ SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
     it "should update existing sample" do
       post :update, id: sample.id, sample: {
@@ -359,7 +363,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "destroy" do
-    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
+    let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [ SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
     it "should be able to soft delete a sample" do
       expect {
@@ -396,11 +400,11 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "bulk_destroy" do
-    let!(:sample1) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
-    let!(:sample2) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
+    let!(:sample1) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
+    let!(:sample2) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
-    let!(:institution2)   { Institution.make }
-    let!(:sample3) { institution2.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
+    let!(:institution2)   { Institution.make! }
+    let!(:sample3) { Sample.make!(institution: institution2, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
     it "should be able to bulk destroy samples" do
       expect {
@@ -449,7 +453,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "print" do
-    let!(:sample) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
+    let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
     it "should be able to print a sample" do
       post :print, id: sample.id
@@ -473,11 +477,11 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "bulk_print" do
-    let!(:sample1) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
-    let!(:sample2) { institution.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
+    let!(:sample1) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
+    let!(:sample2) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
-    let!(:institution2)   { Institution.make }
-    let!(:sample3) { institution2.samples.make({ sample_identifiers: [ SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))})}
+    let!(:institution2)   { Institution.make! }
+    let!(:sample3) { Sample.make!(institution: institution2, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
     it "should be able to bulk print samples" do
       post :bulk_print, sample_ids: [sample1.id, sample2.id]

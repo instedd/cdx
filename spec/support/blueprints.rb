@@ -1,15 +1,6 @@
 require 'machinist/active_record'
-require 'sham'
-require 'faker'
+require 'ffaker'
 require_relative "../policy_spec_helper"
-
-class Sham
-  # Emulates Machinist 2 serial number
-  def self.sn
-    @sn ||= 0
-    @sn += 1
-  end
-end
 
 SampleSshKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4'+
           'hzyCbJQ5RgrZPFz+rTscTuJ5NPuBIKiinXwkA38CE9+N37L8q9kMqxsbDumVFbamYVlS9fsmF1TqRRhobfJfZGpt'+
@@ -17,25 +8,18 @@ SampleSshKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4'+
           'bCAzqtIUUJOMKz4lHn5Os/d8temlYskaKQ1n+FuX5qJXNr1SW8euH72fjQndu78DCwVNwnnrG+nEe3a9m2QwL5xn'+
           'X8f1ohAZ9IG41hwIOvB5UcrFenqYIpMPBCCOnizUcyIFJhegJDWh2oWlBo041emGOX3VCRjtGug3 fbulgarelli@Manass-MacBook-2.local'
 
-Sham.define do
-  name { Faker::Name.name }
-  email { Faker::Internet.email }
-  password { Faker::Name.name }
-  url { Faker::Internet.url }
-end
-
 User.blueprint do
-  email
-  password
-  first_name { Faker::Name.first_name }
-  last_name { Faker::Name.last_name }
+  email { FFaker::Internet.email }
+  password { FFaker::Internet.password }
+  first_name { FFaker::Name.first_name }
+  last_name { FFaker::Name.last_name }
   password_confirmation { password }
-  confirmed_at { Time.now - 1.day }
+  confirmed_at { 1.day.ago }
 end
 
 Alert.blueprint do
-  name { Faker::Name.first_name }
-  description { Faker::Name.last_name }
+  name { FFaker::Name.first_name }
+  description { FFaker::Name.last_name }
   message { 'test message' }
   category_type {"anomalies"}
   sms_limit {10000}
@@ -54,17 +38,17 @@ end
 
 
 User.blueprint(:invited_pending) do
-  confirmed_at nil
+  confirmed_at { nil }
   invitation_token { SecureRandom.urlsafe_base64 }
-  invitation_created_at 1.day.ago
-  invitation_sent_at 1.day.ago
-  invitation_accepted_at nil
+  invitation_created_at { 1.day.ago }
+  invitation_sent_at { 1.day.ago }
+  invitation_accepted_at { nil }
   object.__send__(:generate_invitation_token)
 end
 
 Institution.blueprint do
   user
-  name
+  name { FFaker::Name.name }
 end
 
 Institution.blueprint(:manufacturer) do
@@ -82,9 +66,9 @@ end
 Device.blueprint do
   site { Site.make(institution: (object.institution || Institution.make)) }
   institution { object.site.try(:institution) || Institution.make }
-  name
-  serial_number { name }
-  device_model { Manifest.make.device_model }
+  name { FFaker::Name.name }
+  serial_number { sn }
+  device_model { Manifest.make!.device_model }
   time_zone { "UTC" }
 end
 
@@ -97,12 +81,12 @@ DeviceCommand.blueprint do
 end
 
 DeviceModel.blueprint do
-  name
+  name { FFaker::Name.name }
   published_at { 1.day.ago }
 end
 
 DeviceModel.blueprint(:unpublished) do
-  name
+  name { FFaker::Name.name }
   published_at { nil }
 end
 
@@ -113,25 +97,33 @@ end
 
 Encounter.blueprint do
   institution { object.patient.try(:institution) || Institution.make }
-  site { object.institution.sites.first || object.institution.sites.make }
-  core_fields {
-    { "id" => "encounter-#{Sham.sn}" }.tap do |h|
-      h["start_time"] = object.start_time if object.start_time
-    end
-  }
+  site { object.institution.sites.first || Site.make(institution: object.institution) }
+
+  core_fields do
+    fields = { "id" => "encounter-#{sn}" }
+    fields["start_time"] = object.start_time if object.start_time
+    fields
+  end
 end
 
 def first_or_make_site_unless_manufacturer(institution)
   unless institution.kind_manufacturer?
-    institution.sites.first || institution.sites.make
+    institution.sites.first || Site.make(institution: institution)
   end
 end
 
 SampleIdentifier.blueprint do
-  sample { Sample.make_unsaved({}.tap do |h|
-    h[:institution] = object.site.institution if object.site
-  end)}
-  site { first_or_make_site_unless_manufacturer(object.sample.institution) }
+  sample do
+    if object.site
+      Sample.make(institution: object.site.institution)
+    else
+      Sample.make
+    end
+  end
+
+  site do
+    first_or_make_site_unless_manufacturer(object.sample.institution)
+  end
 end
 
 Sample.blueprint do
@@ -146,7 +138,7 @@ AssayAttachment.blueprint do
 end
 
 LoincCode.blueprint do
-  loinc_number { "10000-#{Sham.sn}" }
+  loinc_number { "10000-#{sn}" }
   component { Faker::Lorem.words(4) }
 end
 
@@ -163,16 +155,17 @@ end
 
 Patient.blueprint do
   institution
+
   plain_sensitive_data {
     {}.tap do |h|
-      h["id"] = object.entity_id || "patient-#{Sham.sn}"
+      h["id"] = object.entity_id || "patient-#{sn}"
       h["name"] = object.name if object.name
     end
   }
 end
 
 Patient.blueprint :phantom do
-  name
+  name { FFaker::Name.name }
   plain_sensitive_data {
     {}.tap do |h|
       h["id"] = nil
@@ -182,7 +175,7 @@ Patient.blueprint :phantom do
 end
 
 TestResult.blueprint do
-  test_id { "test-#{Sham.sn}" }
+  test_id { "test-#{sn}" }
 
   device_messages { [ DeviceMessage.make(device: object.device || Device.make) ] }
   device { object.device_messages.first.try(:device) || Device.make }
@@ -198,14 +191,14 @@ DeviceMessage.blueprint do
 end
 
 Policy.blueprint do
-  name
-  granter { Institution.make.user }
+  name { FFaker::Name.name }
+  granter { Institution.make!.user }
   definition { policy_definition(object.granter.institutions.first, CREATE_INSTITUTION, true) }
   user
 end
 
 Role.blueprint do
-  name
+  name { FFaker::Name.name }
   policy
   institution
   site { Site.make institution: object.institution }
@@ -213,37 +206,41 @@ end
 
 Subscriber.blueprint do
   user
-  name
-  url
+  name { FFaker::Name.name }
+  url { FFaker::Internet.uri("http") }
   last_run_at { Time.now }
 end
 
 Filter.blueprint do
   user
-  name
+  name { FFaker::Name.name }
 end
 
 Site.blueprint do
   institution
-  name
+  name { FFaker::Name.name }
   location_geoid { object.location.try(:id) || LocationService.repository.make.id }
-  address { Faker::Address.street_address }
-  city { Faker::Address.city }
-  state { Faker::Address.state }
-  zip_code { Faker::Address.zip_code }
-  country { Faker::Address.country }
-  region { Faker::Address.state }
+  address { FFaker::Address.street_address }
+  city { FFaker::Address.city }
+  state { FFaker::AddressUS.state }
+  zip_code { FFaker::AddressUS.zip_code }
+  country { FFaker::Address.country }
+  region { FFaker::AddressUS.state }
   lat { rand(-180..180) }
   lng { rand(-90..90) }
 end
 
 Site.blueprint :child do
   parent { nil }
-  institution { parent.institution }
+  institution { object.parent.institution }
 end
 
 Location; class Location
   def self.make(params={})
+    LocationService.repository.make(params)
+  end
+
+  def self.make!(params={})
     LocationService.repository.make(params)
   end
 end

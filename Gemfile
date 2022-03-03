@@ -68,8 +68,6 @@ gem 'sidekiq-cron', '~> 0.3.1'
 group :development do
   gem 'letter_opener'
   gem 'web-console', '~> 2.0'
-  gem 'spring'
-  gem 'spring-commands-rspec'
   gem 'quiet_assets'
 end
 
@@ -88,7 +86,8 @@ gem 'dotiw'
 gem 'rails-i18n', '~> 4.0.0'
 gem 'doorkeeper'
 
-gem 'faker'
+gem 'faker' # NOTE: until we upgrade to ruby 2.5+ then we can upgrade to ffaker 2.20 to replace Faker::Number
+gem 'ffaker'
 gem 'leaflet-rails'
 
 gem 'nuntium_api', '~> 0.21'
@@ -103,14 +102,14 @@ group :development, :test do
   gem 'pry-stack_explorer'
   gem 'pry-clipboard'
   gem 'rspec-rails'
+  gem 'spring'
+  gem 'spring-commands-rspec'
 end
 
 group :test do
-  gem 'testrail_rspec_formatter'
   gem 'test-unit'
   gem 'tire'
-  # gem 'factory_girl_rails'
-  gem 'machinist', '~> 1.0'
+  gem 'machinist', '~> 2.0' # NOTE: eventually replace with FactoryBot
   gem 'capybara'
   gem 'guard-rspec'
   gem 'rspec'

@@ -2,17 +2,18 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe DeviceModelsController do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user, kind: "manufacturer"
+    @device_model = DeviceModel.make! :unpublished, institution: @institution
+    @institution1 = Institution.make! user: @user, kind: "manufacturer"
+    @device_model1 = DeviceModel.make! :unpublished, institution: @institution1
 
-  let!(:user)         { User.make }
-  let!(:institution)  { user.institutions.make kind: "manufacturer"}
-  let!(:device_model) { institution.device_models.make(:unpublished) }
-  let!(:institution1)  { user.institutions.make kind: "manufacturer"}
-  let!(:device_model1) { institution1.device_models.make(:unpublished) }
-
-  let!(:user2)         { User.make }
-  let!(:institution2)  { user2.institutions.make kind: "manufacturer"}
-  let!(:device_model2) { institution2.device_models.make(:unpublished) }
-  let!(:device_model3) { institution2.device_models.make(:unpublished) }
+    @user2 = User.make!
+    @institution2 = Institution.make! user: @user2, kind: "manufacturer"
+    @device_model2 = DeviceModel.make! :unpublished, institution: @institution2
+    @device_model3 = DeviceModel.make! :unpublished, institution: @institution2
+  end
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }
@@ -150,11 +151,11 @@ describe DeviceModelsController do
 
   context "update" do
 
-    let(:published_device_model)  { institution.device_models.make }
-    let(:published_device_model2) { institution2.device_models.make }
+    let(:published_device_model)  { DeviceModel.make! institution: institution }
+    let(:published_device_model2) { DeviceModel.make! institution: institution2 }
 
-    let(:site)  { institution.sites.make }
-    let(:site2) { institution2.sites.make }
+    let(:site)  { Site.make! institution: institution }
+    let(:site2) { Site.make! institution: institution2 }
 
     it "should update a device model" do
       patch :update, id: device_model.id, device_model: { name: "NEWNAME", supports_activation: true, manifest_attributes: manifest_attributes, support_url: "http://example.org/new" }
@@ -229,13 +230,13 @@ describe DeviceModelsController do
     end
 
     it "should unpublish a device model if it has devices in the same institution" do
-      published_device_model.devices.make(site: site)
+      Device.make!(site: site, device_model: published_device_model)
       patch :update, id: published_device_model.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(published_device_model.reload).to_not be_published
     end
 
     it "should not unpublish a device model if it has devices outside the institution" do
-      published_device_model.devices.make(site: site2)
+      Device.make!(site: site2, device_model: published_device_model)
       patch :update, id: published_device_model.id, unpublish: "1", device_model: { name: "NEWNAME", manifest_attributes: manifest_attributes }
       expect(published_device_model.reload).to be_published
     end
@@ -266,11 +267,11 @@ describe DeviceModelsController do
 
   context "publish" do
 
-    let(:published_device_model)  { institution.device_models.make }
-    let(:published_device_model2) { institution2.device_models.make }
+    let(:published_device_model)  { DeviceModel.make! institution: institution }
+    let(:published_device_model2) { DeviceModel.make! institution: institution2 }
 
-    let(:site)  { institution.sites.make }
-    let(:site2) { institution2.sites.make }
+    let(:site)  { Site.make! institution: institution }
+    let(:site2) { Site.make! institution: institution2 }
 
     it "should publish a device model" do
       put :publish, id: device_model.id, publish: "1"
@@ -310,13 +311,13 @@ describe DeviceModelsController do
     end
 
     it "should unpublish a device model if it has devices in the same institution" do
-      published_device_model.devices.make(site: site)
+      Device.make!(site: site, device_model: published_device_model)
       put :publish, id: published_device_model.id, unpublish: "1"
       expect(published_device_model.reload).to_not be_published
     end
 
     it "should not unpublish a device model if it has devices outside the institution" do
-      published_device_model.devices.make(site: site2)
+      Device.make!(site: site2, device_model: published_device_model)
       put :publish, id: published_device_model.id, unpublish: "1"
       expect(published_device_model.reload).to be_published
     end
@@ -326,7 +327,7 @@ describe DeviceModelsController do
 
   context "destroy" do
 
-    let(:published_device_model)  { institution.device_models.make }
+    let(:published_device_model)  { DeviceModel.make! institution: institution }
 
     it "should delete a device model" do
       expect {

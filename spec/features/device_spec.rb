@@ -3,8 +3,8 @@ require 'policy_spec_helper'
 
 describe "device" do
   context "create" do
-    let(:user) { Institution.make.user }
-    let(:other_institution) { Institution.make }
+    let(:user) { Institution.make!.user }
+    let(:other_institution) { Institution.make! }
 
     before(:each) {
       grant other_institution.user, user, other_institution, [READ_INSTITUTION]
@@ -32,8 +32,8 @@ describe "device" do
 
   context "creating a device by a lab user (fix #830, #677)" do
     let!(:device_spec_helper) { DeviceSpecHelper.new 'genoscan' }
-    let(:user) { Institution.make.user }
-    let(:other_institution) { Institution.make }
+    let(:user) { Institution.make!.user }
+    let(:other_institution) { Institution.make! }
 
     before(:each) {
       grant other_institution.user, user, other_institution, [READ_INSTITUTION]
@@ -59,7 +59,7 @@ describe "device" do
     end
 
     context "with a single site" do
-      let!(:site) { other_institution.sites.make }
+      let!(:site) { Site.make! institution: other_institution }
 
       it "should assign the device to the sole site" do
         expect(create_device.site).to eq(site)
@@ -67,8 +67,8 @@ describe "device" do
     end
 
     context "with multiple sites" do
-      let!(:site) { other_institution.sites.make }
-      let!(:site2) { other_institution.sites.make }
+      let!(:site) { Site.make! institution: other_institution }
+      let!(:site2) { Site.make! institution: other_institution }
 
       it "should assign the device to no site" do
         expect(create_device.site).to be_nil
@@ -87,7 +87,7 @@ describe "device" do
 
   context "activation" do
     context "manufacturer" do
-      let(:user) { Institution.make(:manufacturer).user }
+      let(:user) { Institution.make!(:manufacturer).user }
       before(:each) { sign_in(user) }
 
       it "can create model with activation and device get a token" do
@@ -151,12 +151,12 @@ describe "device" do
 
   context "setup instructions" do
     let(:device_model) {
-      Manifest.make.device_model.tap do |dm|
+      Manifest.make!.device_model.tap do |dm|
         dm.support_url = "http://example.org/support/url"
         dm.save!
       end
     }
-    let(:device) { Device.make device_model: device_model }
+    let(:device) { Device.make! device_model: device_model }
     let(:user) { device.institution.user }
 
     before(:each) {
@@ -205,12 +205,12 @@ describe "device" do
   end
 
   context "device with test" do
-    let(:institution) { Institution.make }
+    let(:institution) { Institution.make! }
     let(:user) { institution.user }
-    let(:site) { institution.sites.make }
+    let(:site) { Site.make! institution: institution }
 
     let(:device_spec_helper) { DeviceSpecHelper.new 'genoscan' }
-    let(:device) { device_spec_helper.make site: site }
+    let(:device) { device_spec_helper.make! site: site }
 
     before(:each) {
       device_spec_helper.import_sample_csv device, 'genoscan_sample.csv'
@@ -239,14 +239,14 @@ describe "device" do
   end
 
   context "moving site" do
-    let(:institution) { Institution.make }
+    let(:institution) { Institution.make! }
     let(:user) { institution.user }
-    let!(:old_parent) { institution.sites.make }
-    let!(:new_parent) { institution.sites.make }
-    let(:site) { Site.make :child, parent: old_parent }
+    let!(:old_parent) { Site.make! institution: institution }
+    let!(:new_parent) { Site.make! institution: institution }
+    let(:site) { Site.make! :child, parent: old_parent }
 
     let!(:device_spec_helper) { DeviceSpecHelper.new 'genoscan' }
-    let!(:device) { device_spec_helper.make site: site }
+    let!(:device) { device_spec_helper.make! site: site }
 
     before(:each) {
       device_spec_helper.import_sample_csv device, 'genoscan_sample.csv'

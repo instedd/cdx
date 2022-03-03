@@ -5,24 +5,21 @@ describe Blender do
     # Setup of all these entities is quite expensive, so they are set up at the beginning of this fixture,
     # modified within a transaction and rolled back in each test and reloaded,
     # then deleted via truncation on the end of the fixture
-    before(:all) do
-      DatabaseCleaner.clean_with :truncation
-      LocationService.fake!
+    setup_fixtures do
+      @institution = Institution.make!
 
-      @institution = Institution.make
+      @patient_p1 = Patient.make!(institution: @institution, is_phantom: false)
+      @patient_p2 = Patient.make!(institution: @institution, is_phantom: false)
 
-      @patient_p1 = @institution.patients.make(is_phantom: false)
-      @patient_p2 = @institution.patients.make(is_phantom: false)
+      @encounter_p1e1 = Encounter.make!(patient: @patient_p1, is_phantom: false)
+      @encounter_p1e2 = Encounter.make!(patient: @patient_p1, is_phantom: false)
+      @encounter_p1e3 = Encounter.make!(patient: @patient_p1, is_phantom: false)
+      @encounter_p2e1 = Encounter.make!(patient: @patient_p2, is_phantom: false)
 
-      @encounter_p1e1 = @patient_p1.encounters.make(is_phantom: false)
-      @encounter_p1e2 = @patient_p1.encounters.make(is_phantom: false)
-      @encounter_p1e3 = @patient_p1.encounters.make(is_phantom: false)
-      @encounter_p2e1 = @patient_p2.encounters.make(is_phantom: false)
-
-      @sample_p1e1s1 = @encounter_p1e1.samples.make(is_phantom: false)
-      @sample_p1e1s2 = @encounter_p1e1.samples.make(is_phantom: false)
-      @sample_p1e2s1 = @encounter_p1e2.samples.make(is_phantom: false)
-      @sample_p2e1s1 = @encounter_p2e1.samples.make(is_phantom: false)
+      @sample_p1e1s1 = Sample.make!(encounter: @encounter_p1e1, is_phantom: false)
+      @sample_p1e1s2 = Sample.make!(encounter: @encounter_p1e1, is_phantom: false)
+      @sample_p1e2s1 = Sample.make!(encounter: @encounter_p1e2, is_phantom: false)
+      @sample_p2e1s1 = Sample.make!(encounter: @encounter_p2e1, is_phantom: false)
 
       @test_p1e1s1t1 = TestResult.make_from_sample(@sample_p1e1s1)
       @test_p1e1s1t2 = TestResult.make_from_sample(@sample_p1e1s1)
@@ -32,71 +29,39 @@ describe Blender do
       @test_p1e0s0t1 = TestResult.make_from_patient(@patient_p1)
       @test_p2e1s1t1 = TestResult.make_from_sample(@sample_p2e1s1)
 
-      @other_institution = Institution.make
-      @other_patient = @other_institution.patients.make(is_phantom: false)
-      @other_encounter = @other_patient.encounters.make(is_phantom: false)
-      @other_sample = @other_encounter.samples.make(is_phantom: false)
+      @other_institution = Institution.make!
+      @other_patient = Patient.make!(institution: @other_institution, is_phantom: false)
+      @other_encounter = Encounter.make!(patient: @other_patient, is_phantom: false)
+      @other_sample = Sample.make!(encounter: @other_encounter, is_phantom: false)
       @other_test = TestResult.make_from_sample(@other_sample)
     end
 
-    after(:all) do
-      DatabaseCleaner.clean_with :truncation
-    end
-
-    before(:each) do
-      [
-        @institution,
-        @patient_p1,
-        @patient_p2,
-        @encounter_p1e1,
-        @encounter_p1e2,
-        @encounter_p1e3,
-        @encounter_p2e1,
-        @sample_p1e1s1,
-        @sample_p1e1s2,
-        @sample_p1e2s1,
-        @sample_p2e1s1,
-        @test_p1e1s1t1,
-        @test_p1e1s1t2,
-        @test_p1e1s2t1,
-        @test_p1e2s1t1,
-        @test_p1e3s0t1,
-        @test_p1e0s0t1,
-        @test_p2e1s1t1,
-        @other_institution,
-        @other_patient,
-        @other_encounter,
-        @other_sample,
-        @other_test
-      ].each(&:reload)
-    end
-
-    let(:blender) { Blender.new(@institution) }
+    let(:blender) { Blender.new(institution) }
 
     shared_examples "loads all entities" do
       it "should load patient" do
-        expect(blender.patients.map(&:single_entity)).to contain_exactly(@patient_p1)
+        expect(blender.patients.map(&:single_entity)).to contain_exactly(patient_p1)
       end
 
       it "should load encounters" do
         expect(blender.encounters.map(&:single_entity))
-          .to contain_exactly(@encounter_p1e1, @encounter_p1e2, @encounter_p1e3)
+          .to contain_exactly(encounter_p1e1, encounter_p1e2, encounter_p1e3)
       end
 
       it "should load samples" do
         expect(blender.samples.map(&:single_entity))
-          .to contain_exactly(@sample_p1e1s1, @sample_p1e1s2, @sample_p1e2s1)
+          .to contain_exactly(sample_p1e1s1, sample_p1e1s2, sample_p1e2s1)
       end
 
       it "should load tests" do
         expect(blender.test_results.map(&:single_entity))
           .to contain_exactly(
-            @test_p1e1s1t1,
-            @test_p1e1s1t2,
-            @test_p1e1s2t1,
-            @test_p1e3s0t1,
-            @test_p1e0s0t1,
-            @test_p1e2s1t1
+            test_p1e1s1t1,
+            test_p1e1s1t2,
+            test_p1e1s2t1,
+            test_p1e3s0t1,
+            test_p1e0s0t1,
+            test_p1e2s1t1
           )
       end
     end
@@ -149,78 +114,78 @@ describe Blender do
 
     context "setup" do
       it "should have created two institutions" do
-        expect(Institution.all).to contain_exactly(@institution, @other_institution)
+        expect(Institution.all).to contain_exactly(institution, other_institution)
       end
 
       it "should have created three patients" do
-        expect(Patient.all).to contain_exactly(@patient_p1, @patient_p2, @other_patient)
+        expect(Patient.all).to contain_exactly(patient_p1, patient_p2, other_patient)
       end
 
       it "should have created five encounters" do
         expect(Encounter.all)
-          .to contain_exactly(@encounter_p1e1, @encounter_p1e2, @encounter_p1e3, @encounter_p2e1, @other_encounter)
+          .to contain_exactly(encounter_p1e1, encounter_p1e2, encounter_p1e3, encounter_p2e1, other_encounter)
       end
 
       it "should have created five samples" do
         expect(Sample.all)
-          .to contain_exactly(@sample_p1e1s1, @sample_p1e1s2, @sample_p2e1s1, @sample_p1e2s1, @other_sample)
+          .to contain_exactly(sample_p1e1s1, sample_p1e1s2, sample_p2e1s1, sample_p1e2s1, other_sample)
       end
 
       it "should have created eight tests" do
         expect(TestResult.all)
           .to contain_exactly(
-            @test_p1e1s1t1,
-            @test_p1e1s1t2,
-            @test_p1e1s2t1,
-            @test_p1e3s0t1,
-            @test_p2e1s1t1,
-            @test_p1e0s0t1,
-            @test_p1e2s1t1,
-            @other_test
+            test_p1e1s1t1,
+            test_p1e1s1t2,
+            test_p1e1s2t1,
+            test_p1e3s0t1,
+            test_p2e1s1t1,
+            test_p1e0s0t1,
+            test_p1e2s1t1,
+            other_test
           )
       end
     end
 
     context "loading a test" do
-      before(:each) { blender.load(@test_p1e1s1t1) }
+      before(:each) { blender.load(test_p1e1s1t1) }
       include_examples "loads all entities"
       include_examples "has valid invariant"
     end
 
     context "loading a sample" do
-      before(:each) { blender.load(@sample_p1e1s1) }
+      before(:each) { blender.load(sample_p1e1s1) }
       include_examples "loads all entities"
       include_examples "has valid invariant"
     end
 
     context "loading an encounter" do
-      before(:each) { blender.load(@encounter_p1e1) }
+      before(:each) { blender.load(encounter_p1e1) }
       include_examples "loads all entities"
       include_examples "has valid invariant"
     end
 
     context "loading a patient" do
-      before(:each) { blender.load(@patient_p1) }
+      before(:each) { blender.load(patient_p1) }
       include_examples "loads all entities"
       include_examples "has valid invariant"
     end
 
     context "returning existing data" do
-      before(:each) { blender.load(@patient_p1) }
-      let!(:blender_p1e1) { blender.load(@encounter_p1e1) }
+      before(:each) { blender.load(patient_p1) }
+      let!(:blender_p1e1) { blender.load(encounter_p1e1) }
 
       include_examples "loads all entities"
       include_examples "has valid invariant"
 
       it "should return encounter" do
-        expect(blender_p1e1.single_entity).to eq(@encounter_p1e1)
+        expect(blender_p1e1.single_entity).to eq(encounter_p1e1)
       end
     end
 
     context "changing a sample to another encounter" do
-      let(:blender_p1e1s2)   { blender.load(@sample_p1e1s2)  }
-      let(:blender_p1e2)     { blender.load(@encounter_p1e2) }
-      let(:blender_p1e1s2t1) { blender.load(@test_p1e1s2t1)  }
+      let(:blender_p1e1s2)   { blender.load(sample_p1e1s2)  }
+      let(:blender_p1e2)     { blender.load(encounter_p1e2) }
+      let(:blender_p1e1s2t1) { blender.load(test_p1e1s2t1)  }
 
       before(:each) do
         blender.set_parent(blender_p1e1s2, blender_p1e2)
@@ -238,18 +203,18 @@ describe Blender do
 
       it "should save changes" do
         blender.save_without_index!
-        expect(@sample_p1e1s2.reload.encounter).to eq(@encounter_p1e2)
-        expect(@test_p1e1s2t1.reload.encounter).to eq(@encounter_p1e2)
+        expect(sample_p1e1s2.reload.encounter).to eq(encounter_p1e2)
+        expect(test_p1e1s2t1.reload.encounter).to eq(encounter_p1e2)
       end
     end
 
     context "changing a sample to another encounter from a different patient" do
-      let(:blender_p2)       { blender.load(@patient_p2)     }
-      let(:blender_p2e1)     { blender.load(@encounter_p2e1) }
-      let(:blender_p1e1s2)   { blender.load(@sample_p1e1s2)  }
-      let(:blender_p1e1s2t1) { blender.load(@test_p1e1s2t1)  }
-      let(:blender_p1e1s1)   { blender.load(@sample_p1e1s1)  }
-      let(:blender_p1e1)     { blender.load(@encounter_p1e1) }
+      let(:blender_p2)       { blender.load(patient_p2)     }
+      let(:blender_p2e1)     { blender.load(encounter_p2e1) }
+      let(:blender_p1e1s2)   { blender.load(sample_p1e1s2)  }
+      let(:blender_p1e1s2t1) { blender.load(test_p1e1s2t1)  }
+      let(:blender_p1e1s1)   { blender.load(sample_p1e1s1)  }
+      let(:blender_p1e1)     { blender.load(encounter_p1e1) }
 
       before(:each) do
         blender.set_parent(blender_p1e1s2, blender_p2e1)
@@ -280,28 +245,28 @@ describe Blender do
       it "should save changes" do
         blender.save_without_index!
 
-        expect(@sample_p1e1s2.reload.encounter).to eq(@encounter_p2e1)
-        expect(@sample_p1e1s2.reload.patient).to eq(@patient_p2)
+        expect(sample_p1e1s2.reload.encounter).to eq(encounter_p2e1)
+        expect(sample_p1e1s2.reload.patient).to eq(patient_p2)
 
-        expect(@test_p1e1s2t1.reload.encounter).to eq(@encounter_p2e1)
-        expect(@test_p1e1s2t1.reload.patient).to eq(@patient_p2)
+        expect(test_p1e1s2t1.reload.encounter).to eq(encounter_p2e1)
+        expect(test_p1e1s2t1.reload.patient).to eq(patient_p2)
       end
     end
 
     context "merging a test result encounter" do
-      let(:blender_p1e2s1t1) { blender.load(@test_p1e2s1t1) }
-      let(:blender_p1e2s1) { blender.load(@sample_p1e2s1) }
-      let(:blender_p1e2) { blender.load(@encounter_p1e2) }
-      let(:blender_p1e1) { blender.load(@encounter_p1e1) }
+      let(:blender_p1e2s1t1) { blender.load(test_p1e2s1t1) }
+      let(:blender_p1e2s1) { blender.load(sample_p1e2s1) }
+      let(:blender_p1e2) { blender.load(encounter_p1e2) }
+      let(:blender_p1e1) { blender.load(encounter_p1e1) }
 
       context "when phantom" do
         before(:each) do
-          @encounter_p1e2.update_attributes!(is_phantom: true, core_fields: {})
+          encounter_p1e2.update_attributes!(is_phantom: true, core_fields: {})
           blender.merge_parent(blender_p1e2s1t1, blender_p1e1)
         end
 
         it "should merge both encounters" do
-          expect(blender_p1e1.entities).to contain_exactly(@encounter_p1e1, @encounter_p1e2)
+          expect(blender_p1e1.entities).to contain_exactly(encounter_p1e1, encounter_p1e2)
         end
 
         it "should reassign test encounter" do
@@ -315,11 +280,11 @@ describe Blender do
         it "should save changes" do
           blender.save_without_index!
 
-          expect(@encounter_p1e2.reload.test_results.to_a).to be_empty
-          expect(@encounter_p1e2.reload.samples.to_a).to be_empty
+          expect(encounter_p1e2.reload.test_results.to_a).to be_empty
+          expect(encounter_p1e2.reload.samples.to_a).to be_empty
 
-          expect(@test_p1e2s1t1.reload.encounter).to eq(@encounter_p1e1)
-          expect(@sample_p1e2s1.reload.encounter).to eq(@encounter_p1e1)
+          expect(test_p1e2s1t1.reload.encounter).to eq(encounter_p1e1)
+          expect(sample_p1e2s1.reload.encounter).to eq(encounter_p1e1)
         end
       end
 
@@ -334,30 +299,30 @@ describe Blender do
 
     context "merging a test result encounter from another patient" do
       before(:each) do
-        @encounter_p2e1.update_attributes!(is_phantom: true, core_fields: {})
+        encounter_p2e1.update_attributes!(is_phantom: true, core_fields: {})
       end
 
-      let(:blender_p1) { blender.load(@patient_p1) }
-      let(:blender_p2) { blender.load(@patient_p2) }
+      let(:blender_p1) { blender.load(patient_p1) }
+      let(:blender_p2) { blender.load(patient_p2) }
 
-      let(:blender_p1e1) { blender.load(@encounter_p1e1) }
-      let(:blender_p2e1) { blender.load(@encounter_p2e1) }
+      let(:blender_p1e1) { blender.load(encounter_p1e1) }
+      let(:blender_p2e1) { blender.load(encounter_p2e1) }
 
-      let(:blender_p2e1s1)   { blender.load(@sample_p2e1s1) }
-      let(:blender_p2e1s1t1) { blender.load(@test_p2e1s1t1) }
+      let(:blender_p2e1s1)   { blender.load(sample_p2e1s1) }
+      let(:blender_p2e1s1t1) { blender.load(test_p2e1s1t1) }
 
-      let(:blender_p1e1s1)   { blender.load(@sample_p1e1s1) }
-      let(:blender_p1e1s1t1) { blender.load(@test_p1e1s1t1) }
+      let(:blender_p1e1s1)   { blender.load(sample_p1e1s1) }
+      let(:blender_p1e1s1t1) { blender.load(test_p1e1s1t1) }
 
       context "when phantom" do
         before(:each) do
-          @patient_p2.attributes = { is_phantom: true, plain_sensitive_data: {}, entity_id_hash: nil }
-          @patient_p2.save(validate: false)
+          patient_p2.attributes = { is_phantom: true, plain_sensitive_data: {}, entity_id_hash: nil }
+          patient_p2.save(validate: false)
           blender.merge_parent(blender_p2e1s1t1, blender_p1e1)
         end
 
         it "should merge both patients" do
-          expect(blender_p1.entities).to contain_exactly(@patient_p1, @patient_p2)
+          expect(blender_p1.entities).to contain_exactly(patient_p1, patient_p2)
         end
 
         it "should reassign the patient for the test" do
@@ -371,29 +336,29 @@ describe Blender do
         it "should save changes" do
           blender.save_without_index!
 
-          expect(@patient_p2.reload.test_results.to_a).to be_empty
-          expect(@patient_p2.reload.samples.to_a).to be_empty
-          expect(@encounter_p2e1.reload.test_results.to_a).to be_empty
-          expect(@encounter_p2e1.reload.samples.to_a).to be_empty
+          expect(patient_p2.reload.test_results.to_a).to be_empty
+          expect(patient_p2.reload.samples.to_a).to be_empty
+          expect(encounter_p2e1.reload.test_results.to_a).to be_empty
+          expect(encounter_p2e1.reload.samples.to_a).to be_empty
 
-          expect(@test_p2e1s1t1.reload.patient).to eq(@patient_p1)
-          expect(@sample_p2e1s1.reload.patient).to eq(@patient_p1)
+          expect(test_p2e1s1t1.reload.patient).to eq(patient_p1)
+          expect(sample_p2e1s1.reload.patient).to eq(patient_p1)
         end
       end
 
       context "when merging on phantom" do
         before(:each) do
-          @patient_p2.attributes = { is_phantom: true, plain_sensitive_data: {}, entity_id_hash: nil }
-          @patient_p2.save(validate: false)
+          patient_p2.attributes = { is_phantom: true, plain_sensitive_data: {}, entity_id_hash: nil }
+          patient_p2.save(validate: false)
           blender.merge_parent(blender_p1e1s1t1, blender_p2e1)
         end
 
         it "should merge both encounters" do
-          expect(blender_p2e1.entities).to contain_exactly(@encounter_p1e1, @encounter_p2e1)
+          expect(blender_p2e1.entities).to contain_exactly(encounter_p1e1, encounter_p2e1)
         end
 
         it "should merge both patients" do
-          expect(blender_p2.entities).to contain_exactly(@patient_p1, @patient_p2)
+          expect(blender_p2.entities).to contain_exactly(patient_p1, patient_p2)
         end
 
         it "should reassign the encounter for the test" do
@@ -415,29 +380,29 @@ describe Blender do
         it "should save changes" do
           blender.save_without_index!
 
-          expect(@patient_p2.reload.test_results.to_a).to be_empty
-          expect(@patient_p2.reload.samples.to_a).to be_empty
-          expect(@encounter_p2e1.reload.test_results.to_a).to be_empty
-          expect(@encounter_p2e1.reload.samples.to_a).to be_empty
+          expect(patient_p2.reload.test_results.to_a).to be_empty
+          expect(patient_p2.reload.samples.to_a).to be_empty
+          expect(encounter_p2e1.reload.test_results.to_a).to be_empty
+          expect(encounter_p2e1.reload.samples.to_a).to be_empty
 
-          expect(@test_p1e1s1t1.reload.patient).to eq(@patient_p1)
-          expect(@test_p1e1s1t2.reload.patient).to eq(@patient_p1)
-          expect(@test_p1e1s2t1.reload.patient).to eq(@patient_p1)
-          expect(@sample_p1e1s1.reload.patient).to eq(@patient_p1)
-          expect(@sample_p1e1s2.reload.patient).to eq(@patient_p1)
-          expect(@encounter_p1e1.reload.patient).to eq(@patient_p1)
+          expect(test_p1e1s1t1.reload.patient).to eq(patient_p1)
+          expect(test_p1e1s1t2.reload.patient).to eq(patient_p1)
+          expect(test_p1e1s2t1.reload.patient).to eq(patient_p1)
+          expect(sample_p1e1s1.reload.patient).to eq(patient_p1)
+          expect(sample_p1e1s2.reload.patient).to eq(patient_p1)
+          expect(encounter_p1e1.reload.patient).to eq(patient_p1)
 
-          expect(@test_p1e1s1t1.reload.encounter).to eq(@encounter_p1e1)
-          expect(@test_p1e1s1t2.reload.encounter).to eq(@encounter_p1e1)
-          expect(@test_p1e1s2t1.reload.encounter).to eq(@encounter_p1e1)
-          expect(@sample_p1e1s1.reload.encounter).to eq(@encounter_p1e1)
-          expect(@sample_p1e1s2.reload.encounter).to eq(@encounter_p1e1)
+          expect(test_p1e1s1t1.reload.encounter).to eq(encounter_p1e1)
+          expect(test_p1e1s1t2.reload.encounter).to eq(encounter_p1e1)
+          expect(test_p1e1s2t1.reload.encounter).to eq(encounter_p1e1)
+          expect(sample_p1e1s1.reload.encounter).to eq(encounter_p1e1)
+          expect(sample_p1e1s2.reload.encounter).to eq(encounter_p1e1)
 
-          expect(@test_p2e1s1t1.reload.patient).to eq(@patient_p1)
-          expect(@sample_p2e1s1.reload.patient).to eq(@patient_p1)
+          expect(test_p2e1s1t1.reload.patient).to eq(patient_p1)
+          expect(sample_p2e1s1.reload.patient).to eq(patient_p1)
 
-          expect(@test_p2e1s1t1.reload.encounter).to eq(@encounter_p1e1)
-          expect(@sample_p2e1s1.reload.encounter).to eq(@encounter_p1e1)
+          expect(test_p2e1s1t1.reload.encounter).to eq(encounter_p1e1)
+          expect(sample_p2e1s1.reload.encounter).to eq(encounter_p1e1)
         end
       end
 
@@ -451,12 +416,12 @@ describe Blender do
     end
 
     context "when changing an encounter to another patient" do
-      let(:blender_p2)       { blender.load(@patient_p2)     }
-      let(:blender_p1)       { blender.load(@patient_p1)     }
-      let(:blender_p1e1s1)   { blender.load(@sample_p1e1s1)  }
-      let(:blender_p1e1s1t1) { blender.load(@test_p1e1s1t1)  }
-      let(:blender_p1e1)     { blender.load(@encounter_p1e1) }
-      let(:blender_p1e2)     { blender.load(@encounter_p1e2) }
+      let(:blender_p2)       { blender.load(patient_p2)     }
+      let(:blender_p1)       { blender.load(patient_p1)     }
+      let(:blender_p1e1s1)   { blender.load(sample_p1e1s1)  }
+      let(:blender_p1e1s1t1) { blender.load(test_p1e1s1t1)  }
+      let(:blender_p1e1)     { blender.load(encounter_p1e1) }
+      let(:blender_p1e2)     { blender.load(encounter_p1e2) }
 
       before(:each) do
         blender.set_parent(blender_p1e1, blender_p2)
@@ -483,9 +448,9 @@ describe Blender do
       it "should save changes" do
         blender.save_without_index!
 
-        expect(@sample_p1e1s1.reload.patient).to eq(@patient_p2)
-        expect(@encounter_p1e1.reload.patient).to eq(@patient_p2)
-        expect(@test_p1e1s1t1.reload.patient).to eq(@patient_p2)
+        expect(sample_p1e1s1.reload.patient).to eq(patient_p2)
+        expect(encounter_p1e1.reload.patient).to eq(patient_p2)
+        expect(test_p1e1s1t1.reload.patient).to eq(patient_p2)
       end
     end
   end
@@ -499,9 +464,9 @@ describe Blender do
           sample: { id: 2 }
         }
       end
-      let(:site1) { Site.make }
-      let(:site2) { Site.make institution: site1.institution }
-      let(:device) { Device.make institution: site1.institution, site: site1 }
+      let(:site1) { Site.make! }
+      let(:site2) { Site.make! institution: site1.institution }
+      let(:device) { Device.make! institution: site1.institution, site: site1 }
 
       it "should not link the samples" do
         DeviceMessage.create_and_process device: device, plain_text_data: Oj.dump(message)

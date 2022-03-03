@@ -6,12 +6,12 @@ describe AlertMailer, type: :mailer do
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.deliveries = []
 
-    alert = Alert.make
+    alert = Alert.make!
     alert.name = 'test alert'
     alert.message = 'welcome mr {lastname}'
     alert.email_limit = 1000
 
-    recipient = AlertRecipient.make
+    recipient = AlertRecipient.make!
     recipient.recipient_type = AlertRecipient.recipient_types['external_user']
     recipient.alert = alert
 

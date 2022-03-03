@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe AlertRecipient, :type => :model do
-  let!(:user) { User.make }
+  let!(:user) { User.make! }
 
   context "validates fields" do 
     before(:example) do

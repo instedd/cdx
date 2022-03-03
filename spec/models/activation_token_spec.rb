@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "ActivationToken" do
-  let!(:device) { Device.make }
+  let!(:device) { Device.make! }
   let!(:token) { device.new_activation_token.tap { device.save! } }
 
   describe 'new' do

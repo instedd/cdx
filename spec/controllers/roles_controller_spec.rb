@@ -2,12 +2,13 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe RolesController do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @site = Site.make! institution: @institution
 
-  let!(:institution) {Institution.make}
-  let!(:user)        {institution.user}
-  let!(:site)        {Site.make institution: institution}
-
-  let!(:institution2) { Institution.make }
+    @institution2 = Institution.make!
+  end
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }
@@ -53,7 +54,7 @@ describe RolesController do
   end
 
   context "update" do
-    let!(:role) { Role.make institution: institution }
+    let!(:role) { Role.make! institution: institution }
     let!(:initial_action) { role.policy.definition["statement"][0]["action"][0] }
 
     it "should begin with non * action" do
@@ -116,12 +117,12 @@ describe RolesController do
 
   context "authorizations" do
 
-    let(:grantee) { User.make }
+    let(:grantee) { User.make! }
 
-    let!(:site)  { Site.make(institution: institution) }
-    let!(:site2) { Site.make(institution: institution2) }
-    let!(:device) { Device.make(site: site, institution: institution) }
-    let!(:device2) { Device.make(site: site2, institution: institution2) }
+    let!(:site)  { Site.make!(institution: institution) }
+    let!(:site2) { Site.make!(institution: institution2) }
+    let!(:device) { Device.make!(site: site, institution: institution) }
+    let!(:device2) { Device.make!(site: site2, institution: institution2) }
 
     def create_role(args)
       expect {
@@ -153,7 +154,7 @@ describe RolesController do
     end
 
     it "should not allow to access a forbidden resource when creating a role" do
-      device_model = DeviceModel.make
+      device_model = DeviceModel.make!
       create_role name: "Device models", definition: policy_definition("deviceModel", '*').to_json
       add_grantee_to_role "Device models"
 

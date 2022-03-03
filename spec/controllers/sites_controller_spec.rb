@@ -2,20 +2,21 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe SitesController do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
 
-  let!(:institution) {Institution.make}
-  let!(:user)        {institution.user}
-
-  let!(:institution2) { Institution.make }
-  let!(:site2)  { institution2.sites.make }
+    @institution2 = Institution.make!
+    @site2 = Site.make! institution: @institution2
+  end
 
   before(:each) {sign_in user}
   let(:default_params) { {context: institution.uuid} }
 
   context "index" do
 
-    let!(:site) { institution.sites.make }
-    let!(:other_site) { Site.make }
+    let!(:site) { Site.make! institution: institution }
+    let!(:other_site) { Site.make! }
 
     it "should get accessible sites in index" do
       get :index
@@ -33,7 +34,7 @@ describe SitesController do
     end
 
     it "should list sites without location" do
-      unlocated_site = institution.sites.make(location: nil)
+      unlocated_site = Site.make! institution: institution, location: nil
       get :index
 
       expect(response).to be_success
@@ -53,7 +54,7 @@ describe SitesController do
   end
 
   context "new" do
-    let!(:site) { institution.sites.make }
+    let!(:site) { Site.make! institution: institution }
 
     it "should get new page" do
       get :new
@@ -77,14 +78,14 @@ describe SitesController do
 
     it "should create new site in context institution" do
       expect {
-        post :create, site: Site.plan
+        post :create, site: Site.make.attributes
       }.to change(institution.sites, :count).by(1)
       expect(response).to be_redirect
     end
 
     it "should not create site in context institution despite params" do
       expect {
-        post :create, site: Site.plan(institution: institution2)
+        post :create, site: Site.make(institution: institution2).attributes
       }.to change(institution.sites, :count).by(1)
       expect(response).to be_redirect
     end
@@ -92,16 +93,16 @@ describe SitesController do
     it "should not create site in institution without permission to create site" do
       grant institution2.user, user, Institution, [READ_INSTITUTION]
       expect {
-        post :create, context: institution2.uuid, site: Site.plan
+        post :create, context: institution2.uuid, site: Site.make.attributes
       }.to change(institution.sites, :count).by(0)
       expect(response).to be_forbidden
     end
 
     it "should create if no location geoid" do
       expect {
-        site = Site.plan(institution: institution)
-        site.delete :location_geoid
-        post :create, site: site
+        site_params = Site.make(institution: institution).attributes
+        site_params.delete :location_geoid
+        post :create, site: site_params
       }.to change(institution.sites, :count).by(1)
       expect(response).to be_redirect
     end
@@ -110,8 +111,8 @@ describe SitesController do
 
   context "edit" do
 
-    let!(:site) { institution.sites.make }
-    let!(:other_site) { Site.make }
+    let!(:site) { Site.make! institution: institution }
+    let!(:other_site) { Site.make! }
 
     it "should edit site" do
       get :edit, id: site.id
@@ -127,7 +128,7 @@ describe SitesController do
 
   context "update" do
 
-    let!(:site) { institution.sites.make }
+    let!(:site) { Site.make! institution: institution }
 
     it "should update site" do
       patch :update, id: site.id, site: { name: "newname", location_geoid: "LOCATION_GEOID", lat: 40, lng: 50 }
@@ -153,9 +154,9 @@ describe SitesController do
     end
 
     it "should not update parent site if user has no institution:createSite but yes other properties" do
-      new_parent = institution.sites.make
+      new_parent = Site.make! institution: institution
 
-      other_user = User.make
+      other_user = User.make!
       grant user, other_user, institution, [READ_INSTITUTION]
       grant user, other_user, "site?institution=#{institution.id}", [READ_SITE]
       grant user, other_user, "site?institution=#{institution.id}", [UPDATE_SITE]
@@ -170,16 +171,16 @@ describe SitesController do
     end
 
     context "not changing parent site by user with institution:createSite policy" do
-      let!(:parent) { institution.sites.make }
-      let!(:site) { Site.make :child, parent: parent }
-      let!(:device) { Device.make site: site }
-      let!(:test) { TestResult.make device: device }
+      let!(:parent) { Site.make! institution: institution }
+      let!(:site) { Site.make! :child, parent: parent }
+      let!(:device) { Device.make! site: site }
+      let!(:test) { TestResult.make! device: device }
 
       before(:each) {
-        patch :update, id: site.id, context: site.uuid, site: (
-          Site.plan(institution: institution).merge({ parent_id: parent.id, name: "new-name" })
-        )
-
+        patch :update,
+          id: site.id,
+          context: site.uuid,
+          site: Site.make(institution: institution, parent: parent, name: "new-name").attributes
         site.reload
       }
 
@@ -195,16 +196,16 @@ describe SitesController do
     end
 
     context "change parent site by user with institution:createSite policy" do
-      let!(:new_parent) { institution.sites.make }
+      let!(:new_parent) { Site.make! institution: institution }
       let(:new_site) { Site.last }
-      let!(:device) { Device.make site: site }
-      let!(:test) { TestResult.make device: device }
+      let!(:device) { Device.make! site: site }
+      let!(:test) { TestResult.make! device: device }
 
       before(:each) {
-        patch :update, id: site.id, context: site.uuid, site: (
-          Site.plan(institution: institution).merge({ parent_id: new_parent.id, name: site.name })
-        )
-
+        patch :update,
+          id: site.id,
+          context: site.uuid,
+          site: Site.make(institution: institution, parent: new_parent, name: site.name).attributes
         site.reload
       }
 
@@ -244,13 +245,12 @@ describe SitesController do
     end
 
     context "changing parent site and with some validation errors" do
-      let!(:new_parent) { institution.sites.make }
+      let!(:new_parent) { Site.make! institution: institution }
 
       before(:each) {
-        patch :update, id: site.id, site: (
-          Site.plan(institution: institution).merge({ parent_id: new_parent.id, name: '' })
-        )
-
+        patch :update,
+          id: site.id,
+          site: Site.make(institution: institution, parent: new_parent, name: '').attributes
         site.reload
       }
 
@@ -275,7 +275,7 @@ describe SitesController do
 
   context "destroy" do
 
-    let!(:site) { institution.sites.make }
+    let!(:site) { Site.make! institution: institution }
 
     it "should destroy a site" do
       expect {
@@ -292,7 +292,7 @@ describe SitesController do
     end
 
     it "should not destroy site with associated devices" do
-      site.devices.make
+      Device.make! site: site
       expect(site.devices).not_to be_empty
       expect {
         expect {
@@ -302,8 +302,8 @@ describe SitesController do
     end
 
     it "should destroy a site after moving it's associated devices" do
-      site3 = institution.sites.make
-      site.devices.make
+      site3 = Site.make! institution: institution
+      Device.make! site: site
       expect(site.devices).not_to be_empty
       expect {
         expect {
@@ -322,5 +322,4 @@ describe SitesController do
     end
 
   end
-
 end

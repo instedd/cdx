@@ -1,12 +1,8 @@
 require "spec_helper"
 
 RSpec.describe Users::InvitationsController, type: :controller do
-  let!(:new_user) {
-    User.make(:invited_pending).tap do |user|
-      user.send("generate_invitation_token!")
-    end
-  }
-  let(:invite) { PendingInstitutionInvite.make }
+  let!(:new_user) { User.make!(:invited_pending) }
+  let(:invite) { PendingInstitutionInvite.make! }
 
   before(:each) do
     @request.env["devise.mapping"] = Devise.mappings[:user]

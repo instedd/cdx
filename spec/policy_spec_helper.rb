@@ -23,13 +23,13 @@ end
 
 def grant(granter, user, resource, action, opts = {})
   [granter, user].compact.each(&:reload)
-  policy = Policy.make_unsaved
-  policy.definition = policy_definition(resource, action, opts.fetch(:delegable, true), opts.fetch(:except, []), opts.fetch(:include_subsites, false))
-  policy.granter = granter
-  policy.user = user
-  policy.allows_implicit = true
-  policy.save!
-  policy
+
+  Policy.make!(
+    definition: policy_definition(resource, action, opts.fetch(:delegable, true), opts.fetch(:except, []), opts.fetch(:include_subsites, false)),
+    granter: granter,
+    user: user,
+    allows_implicit: true,
+  )
 end
 
 def policy_definition(resource, action, delegable = true, except = [], include_subsites = false)

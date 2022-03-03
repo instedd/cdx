@@ -2,12 +2,15 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 RSpec.describe BatchesController, type: :controller do
-  let!(:institution)   { Institution.make }
-  let!(:user)          { institution.user }
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @other_user = Institution.make!.user
+  end
+
   before(:each)        { sign_in user }
   let(:default_params) { {context: institution.uuid} }
 
-  let!(:other_user) { Institution.make.user }
   before(:each) {
     grant user, other_user, institution, READ_INSTITUTION
   }
@@ -19,13 +22,13 @@ RSpec.describe BatchesController, type: :controller do
     end
 
     it "should list batches if can read" do
-      institution.batches.make
+      Batch.make! institution: institution
       get :index
       expect(assigns(:batches).count).to eq(1)
     end
 
     it "should not list batches if can not read" do
-      institution.batches.make
+      Batch.make! institution: institution
       sign_in other_user
       get :index
       expect(assigns(:batches).count).to eq(0)
@@ -50,9 +53,9 @@ RSpec.describe BatchesController, type: :controller do
     end
 
     it "should filter by Isolate Name" do
-      institution.batches.make batch_number: '123', isolate_name: 'ABC.42'
-      institution.batches.make batch_number: '456', isolate_name: 'DEF.24'
-      institution.batches.make batch_number: '789', isolate_name: 'GHI.42'
+      Batch.make! institution: institution, batch_number: '123', isolate_name: 'ABC.42'
+      Batch.make! institution: institution, batch_number: '456', isolate_name: 'DEF.24'
+      Batch.make! institution: institution, batch_number: '789', isolate_name: 'GHI.42'
 
       get :index, isolate_name: '42'
       expect(response).to be_success
@@ -60,9 +63,9 @@ RSpec.describe BatchesController, type: :controller do
     end
 
     it "should filter by Batch Number" do
-      institution.batches.make batch_number: '7788'
-      institution.batches.make batch_number: '8877'
-      institution.batches.make batch_number: '0123'
+      Batch.make! institution: institution, batch_number: '7788'
+      Batch.make! institution: institution, batch_number: '8877'
+      Batch.make! institution: institution, batch_number: '0123'
 
       get :index, batch_number: '88'
       expect(response).to be_success
@@ -70,8 +73,8 @@ RSpec.describe BatchesController, type: :controller do
     end
 
     it "should filter by Sample ID" do
-      batch = institution.batches.make batch_number: '7788'
-      batch.samples.make sample_identifiers: [SampleIdentifier.make(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
+      batch = Batch.make! institution: institution, batch_number: '7788'
+      Sample.make! batch: batch, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
 
       get :index, sample_id: '88'
       expect(response).to be_success
@@ -80,7 +83,7 @@ RSpec.describe BatchesController, type: :controller do
   end
 
   context "show" do
-    let!(:batch) { institution.batches.make }
+    let!(:batch) { Batch.make! institution: institution }
 
     it "should be accessible to institution owner" do
       get :show, id: batch.id
@@ -128,7 +131,8 @@ RSpec.describe BatchesController, type: :controller do
       }
     }
 
-    let!(:batch) { institution.batches.make(
+    let!(:batch) { Batch.make!(
+      institution: institution,
       batch_number: '1234',
       isolate_name: 'ABC.424',
       date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
@@ -292,7 +296,8 @@ RSpec.describe BatchesController, type: :controller do
   end
 
   context "edit" do
-    let!(:batch) { institution.batches.make(
+    let!(:batch) { Batch.make!(
+      institution: institution,
       batch_number: '123',
       isolate_name: 'ABC.42',
       date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern')),
@@ -336,7 +341,8 @@ RSpec.describe BatchesController, type: :controller do
   end
 
   context "update" do
-    let!(:batch) { institution.batches.make(
+    let!(:batch) { Batch.make!(
+      institution: institution,
       batch_number: '123',
       isolate_name: 'ABC.42',
       date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
@@ -406,7 +412,8 @@ RSpec.describe BatchesController, type: :controller do
   end
 
   context "destroy" do
-    let!(:batch) { institution.batches.make(
+    let!(:batch) { Batch.make!(
+      institution: institution,
       batch_number: '123',
       isolate_name: 'ABC.42',
       date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
@@ -451,7 +458,8 @@ RSpec.describe BatchesController, type: :controller do
   end
 
   context "bulk_destroy" do
-    let!(:batch1) { institution.batches.make(
+    let!(:batch1) { Batch.make!(
+      institution: institution,
       batch_number: '123',
       isolate_name: 'ABC.42',
       date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
@@ -461,7 +469,8 @@ RSpec.describe BatchesController, type: :controller do
       volume: 100
     )}
 
-    let!(:batch2) { institution.batches.make(
+    let!(:batch2) { Batch.make!(
+      institution: institution,
       batch_number: '456',
       isolate_name: 'DEF.24',
       date_produced: Time.strptime('09/09/2020', I18n.t('date.input_format.pattern')),
@@ -471,8 +480,9 @@ RSpec.describe BatchesController, type: :controller do
       volume: 200
     )}
 
-    let!(:institution2)   { Institution.make }
-    let!(:batch3) { institution2.batches.make(
+    let!(:institution2)   { Institution.make! }
+    let!(:batch3) { Batch.make!(
+      institution: institution2,
       batch_number: '789',
       isolate_name: 'GHI.4224',
       date_produced: Time.strptime('07/07/2019', I18n.t('date.input_format.pattern')),

@@ -224,7 +224,7 @@ GEM
       rails (>= 3, < 5)
     d3_rails (3.5.6)
       railties (>= 3.1.0)
-    database_cleaner (1.4.0)
+    database_cleaner (1.99.0)
     debug_inspector (0.0.2)
     decent_exposure (2.3.2)
     deep_merge (1.2.1)
@@ -260,10 +260,11 @@ GEM
     encryptor (1.3.0)
     erubis (2.7.0)
     execjs (2.6.0)
-    faker (1.5.0)
-      i18n (~> 0.5)
+    faker (1.9.1)
+      i18n (>= 0.7)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
+    ffaker (2.11.0)
     ffi (1.9.10)
     filewatcher (0.3.6)
       trollop (~> 2.0)
@@ -344,7 +345,7 @@ GEM
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.9)
-    machinist (1.0.6)
+    machinist (2.0)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     mechanize (2.7.3)
@@ -554,7 +555,8 @@ GEM
       addressable (>= 2.3.3, < 3.0)
       capybara (>= 2.1, < 3.0)
     slop (3.6.0)
-    spring (1.3.6)
+    spring (2.0.2)
+      activesupport (>= 4.2)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     sprockets (2.12.4)
@@ -568,8 +570,6 @@ GEM
       sprockets (>= 2.8, < 4.0)
     test-unit (3.1.3)
       power_assert
-    testrail_rspec_formatter (0.2.0)
-      rspec (~> 3.0)
     therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
       ref
@@ -650,6 +650,7 @@ DEPENDENCIES
   elasticsearch
   encryptor
   faker
+  ffaker
   geojson_import!
   gon
   guard-rspec
@@ -664,7 +665,7 @@ DEPENDENCIES
   letter_opener
   location_service!
   lodash-rails
-  machinist (~> 1.0)
+  machinist (~> 2.0)
   mysql2
   newrelic_rpm
   nokogiri (~> 1.6.7.2)
@@ -706,7 +707,6 @@ DEPENDENCIES
   spring
   spring-commands-rspec
   test-unit
-  testrail_rspec_formatter
   therubyracer
   timecop
   tire

@@ -35,17 +35,17 @@ RSpec.shared_context "cdx api helpers" do
   end
 
   def index_with_test_result(test)
-    test_result = TestResult.make device: device
+    test_result = TestResult.make! device: device
     test_result.core_fields = JSON.parse((test[:test] || {}).to_json)
 
     if test[:encounter]
-      encounter = Encounter.make_unsaved institution: test_result.institution
+      encounter = Encounter.make institution: test_result.institution
       encounter.core_fields.merge! JSON.parse(test[:encounter].to_json)
       test_result.encounter = encounter
     end
 
     if test[:patient]
-      patient = Patient.make_unsaved institution: test_result.institution
+      patient = Patient.make institution: test_result.institution
       patient.core_fields.merge! JSON.parse(test[:patient].to_json)
       test_result.patient = patient
     end

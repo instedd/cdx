@@ -10,12 +10,12 @@ RSpec.describe AlertMailer, type: :mailer do
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.deliveries = []
 
-    alert = Alert.make
+    alert = Alert.make!
     alert.name="test alert"
     alert.message="welcome mr {lastname}"
     alert.email_limit=99
 
-    recipient = AlertRecipient.make
+    recipient = AlertRecipient.make!
     recipient.recipient_type = AlertRecipient.recipient_types["external_user"]
     recipient.alert=alert
 
@@ -28,7 +28,7 @@ RSpec.describe AlertMailer, type: :mailer do
     person[:recipient_id] = recipient.id
     email_list.push person
 
-    recipient2 = AlertRecipient.make
+    recipient2 = AlertRecipient.make!
     recipient2.recipient_type = AlertRecipient.recipient_types["external_user"]
     recipient2.email="ddd@ggg.com"
     recipient2.alert=alert

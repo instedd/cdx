@@ -1,12 +1,16 @@
 require 'spec_helper'
+require 'policy_spec_helper'
 
 describe Api::TestsController, elasticsearch: true, validate_manifest: false do
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @site = Site.make! institution: @institution
+    @device = Device.make! institution: @institution, site: @site
+  end
 
-  let(:user) { User.make }
-  let!(:institution) { Institution.make user_id: user.id }
-  let(:site) { Site.make institution: institution }
-  let(:device) { Device.make institution: institution, site: site }
   let(:data) { Oj.dump test:{assays: [result: :positive]} }
+
   before(:each) { sign_in user }
 
   def get_updates(options, body="")
@@ -19,7 +23,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
   context "Query" do
     context "Policies" do
       it "allows a user to query tests of it's own institutions" do
-        device2 = Device.make
+        device2 = Device.make!
 
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[{name: "mtb", result: :positive}]})
         DeviceMessage.create_and_process device: device2, plain_text_data: (Oj.dump test:{assays:[{name: "mtb", result: :negative}]})
@@ -62,24 +66,26 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
     end
 
     context "Filter" do
-      let(:device2) {Device.make institution: institution}
-
       it "should check for new tests since a date" do
-        Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
-        DeviceMessage.create_and_process device: device, plain_text_data: data
-        Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
-        DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :negative]})
+        begin
+          Timecop.freeze(Time.utc(2013, 1, 1, 12, 0, 0))
+          DeviceMessage.create_and_process device: device, plain_text_data: data
+          Timecop.freeze(Time.utc(2013, 1, 2, 12, 0, 0))
+          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :negative]})
 
-        response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
-        expect(response.size).to eq(1)
-        expect(response.first["test"]["assays"].first["result"]).to eq("negative")
+          response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 2, 12, 0, 0).utc.iso8601)
+          expect(response.size).to eq(1)
+          expect(response.first["test"]["assays"].first["result"]).to eq("negative")
 
-        response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
+          response = get_updates('test.reported_time_since' => Time.utc(2013, 1, 1, 12, 0, 0).utc.iso8601)
 
-        expect(response.first["test"]["assays"].first["result"]).to eq("positive")
-        expect(response.last["test"]["assays"].first["result"]).to eq("negative")
+          expect(response.first["test"]["assays"].first["result"]).to eq("positive")
+          expect(response.last["test"]["assays"].first["result"]).to eq("negative")
 
-        expect(get_updates('test.reported_time_since' => Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601)).to be_empty
+          expect(get_updates('test.reported_time_since' => Time.utc(2013, 1, 3, 12, 0, 0).utc.iso8601)).to be_empty
+        ensure
+          Timecop.return
+        end
       end
 
       it "filters by an analyzed result" do
@@ -214,6 +220,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         render_views
 
         before(:each) { Timecop.freeze }
+        after(:each) { Timecop.return }
 
         it "responds a csv for a given grouping" do
           DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :positive], error_code: 1234})
@@ -289,7 +296,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       context "permissions" do
 
         it "should not return pii if unauthorised" do
-          other_user = User.make
+          other_user = User.make!
           grant user, other_user, { testResult: institution }, Policy::Actions::QUERY_TEST
           sign_in other_user
           get :pii, id: test.uuid
@@ -298,7 +305,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
         end
 
         it "should return pii if unauthorised" do
-          other_user = User.make
+          other_user = User.make!
           grant user, other_user, { testResult: institution }, Policy::Actions::PII_TEST
           sign_in other_user
           get :pii, id: test.uuid

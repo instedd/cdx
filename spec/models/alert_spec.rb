@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe Alert, :type => :model, elasticsearch: true do
-  let!(:user) { User.make }
-  let(:model){DeviceModel.make}
-  let(:device){Device.make device_model: model}
-  let(:device_message){DeviceMessage.make(device: device)}
+  let!(:user) { User.make! }
+  let(:model){DeviceModel.make!}
+  let(:device){Device.make! device_model: model}
+  let(:device_message){DeviceMessage.make!(device: device)}
   let(:institution){device.institution}
   let(:site){device.site}
 
@@ -15,25 +15,25 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
     end
 
     it "can create alert" do
-      alert = Alert.make
+      alert = Alert.make!
       expect(alert).to be_valid
     end
 
     it "cannot create for missing fields with utilisation category" do
-      alert = Alert.make
+      alert = Alert.make!
       alert.category_type = "utilization_efficiency"
       expect(alert).to_not be_valid
     end
 
     it "cannot create for invalid error_code with device_errors category" do
-      alert = Alert.make
+      alert = Alert.make!
       alert.category_type = "device_errors"
       alert.error_code="aa"
       expect(alert).to_not be_valid
     end
     
     it "cannot create for aggregation threshold greater than 100%" do
-      alert = Alert.make
+      alert = Alert.make!
       alert.category_type = "device_errors"
       alert.error_code="11"
       alert.use_aggregation_percentage = true
@@ -45,14 +45,14 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
 
   context "validate soft delete" do
     it "soft deletes an alert" do
-      alert = Alert.make
+      alert = Alert.make!
       alert.destroy
       deleted_alert_id = Alert.where(id: alert.id).pluck(:id)
       expect(deleted_alert_id).to eq([])
     end
 
     it "soft deletes an alert and alert still exists" do
-      alert = Alert.make
+      alert = Alert.make!
       alert.destroy
       deleted_alert_id = Alert.with_deleted.where(id: alert.id).pluck(:id)
       expect(deleted_alert_id).to eq([alert.id])
@@ -61,7 +61,7 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
 
   context "validate perculator" do
     it "creates a perculator" do
-      alert = Alert.make
+      alert = Alert.make!
       alert.query = {"test.error_code"=>"155"}
       alert.user = institution.user
       result = Cdx::Api.client.search index: Cdx::Api.index_name_pattern, type: '.percolator'
@@ -78,7 +78,7 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
 
 
   it "updates percolator when the alert query changes" do
-    alert = Alert.make
+    alert = Alert.make!
     alert.query = {"test.error_code"=>"155"}
     alert.user = institution.user
 
@@ -89,7 +89,7 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
 
 
   it "deletes percolator when the alert is deleted" do
-    alert = Alert.make
+    alert = Alert.make!
     alert.query = {"test.error_code"=>"155"}
     alert.user = institution.user
 
@@ -104,7 +104,7 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
 
 
   it "deletes percolator when the alert is disabled" do
-    alert = Alert.make
+    alert = Alert.make!
     alert.query = {"test.error_code"=>"155"}
     alert.user = institution.user
 
@@ -122,7 +122,7 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
   
   
   it "does not create a percolator for invalid_test_date anomalie" do 
-    alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
+    alert = Alert.make!(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
     alert.query = {"test.error_code"=>"155"}
     alert.user = institution.user
     alert.save!
@@ -135,7 +135,7 @@ RSpec.describe Alert, :type => :model, elasticsearch: true do
   end
   
   it "does not give an error when you delete a percolator for invalid_test_date anomalie" do
-    alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
+    alert = Alert.make!(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
     alert.query = {"test.error_code"=>"155"}
     alert.user = institution.user
 

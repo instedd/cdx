@@ -2,8 +2,8 @@ include AlertsHelper
 include CdxPageHelper
 
 Given(/^the user has an account$/) do
-  @user = User.make(password: '12345678', first_name: 'Bob', email: 'zaa1aa@ggg.com')
-  @institution = Institution.make user_id: @user.id
+  @user = User.make!(password: '12345678', first_name: 'Bob', email: 'zaa1aa@ggg.com')
+  @institution = Institution.make! user_id: @user.id
   @user.grant_superadmin_policy
   authenticate(@user)
 
@@ -12,9 +12,20 @@ Given(/^the user has an account$/) do
   @navigation_context = NavigationContext.new(@user, default_params[:context])
 end
 
+def create_entity_device(entity)
+  site =
+    case entity
+    when Institution
+      Site.create(institution: entity)
+    when Site
+      Site.create(:child, site: entity)
+    end
+  Device.make!(site: site)
+end
+
 Given(/^the user creates a new error category alert with all fields with name "(.*?)"$/) do |arg1|
-  site = @navigation_context.entity.sites.make
-  device = site.devices.make
+  create_entity_device @navigation_context.entity
+
   @alert = NewAlertPage.new
   @alert.load
 
@@ -41,8 +52,7 @@ Given(/^the user creates a new error category alert with all fields with name "(
 end
 
 Given(/^the user creates a new anomalie category alert with all fields with name "(.*?)"$/) do |arg1|
-  site = @navigation_context.entity.sites.make
-  device = site.devices.make
+  create_entity_device @navigation_context.entity
 
   @alert = NewAlertPage.new
   @alert.load
@@ -69,8 +79,7 @@ Given(/^the user creates a new anomalie category alert with all fields with name
 end
 
 Given(/^the user creates a new testresult alert with all fields with name "(.*?)"$/) do |arg1|
-  site = @navigation_context.entity.sites.make
-  device = site.devices.make
+  create_entity_device @navigation_context.entity
 
   @alert = NewAlertPage.new
   @alert.load
@@ -101,8 +110,7 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
 end
 
 Given(/^the user Successful creates a new utilization efficiency category with all fields with name "(.*?)"$/) do |arg1|
-  site = @navigation_context.entity.sites.make
-  device = site.devices.make
+  create_entity_device @navigation_context.entity
 
   @alert = NewAlertPage.new
   @alert.load
@@ -159,13 +167,13 @@ Then (/^the user should not see in list alerts "(.*?)"$/) do |arg1|
 end
 
 Then (/^the user should have error_code alert result$/) do
-  parent_location = Location.make
-  leaf_location1 = Location.make parent: parent_location
-  upper_leaf_location = Location.make
+  parent_location = Location.make!
+  leaf_location1 = Location.make! parent: parent_location
+  upper_leaf_location = Location.make!
 
   before_test_history_count = AlertHistory.count
-  site1 = Site.make institution: @institution, location_geoid: leaf_location1.id
-  device1 = Device.make institution: @institution, site: site1
+  site1 = Site.make! institution: @institution, location_geoid: leaf_location1.id
+  device1 = Device.make! institution: @institution, site: site1
 
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
   DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2, type: 'specimen'}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
@@ -175,13 +183,13 @@ Then (/^the user should have error_code alert result$/) do
 end
 
 Then (/^the user should have no error_code alert result for qc test$/) do
-  parent_location = Location.make
-  leaf_location1 = Location.make parent: parent_location
-  upper_leaf_location = Location.make
+  parent_location = Location.make!
+  leaf_location1 = Location.make! parent: parent_location
+  upper_leaf_location = Location.make!
 
   before_test_history_count = AlertHistory.count
-  site1 = Site.make institution: @institution, location_geoid: leaf_location1.id
-  device1 = Device.make institution: @institution, site: site1
+  site1 = Site.make! institution: @institution, location_geoid: leaf_location1.id
+  device1 = Device.make! institution: @institution, site: site1
 
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
   DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 2, type: 'qc'}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
@@ -191,13 +199,13 @@ Then (/^the user should have no error_code alert result for qc test$/) do
 end
 
 Then (/^the user should have no_sample_id alert result$/) do
-  parent_location = Location.make
-  leaf_location1 = Location.make parent: parent_location
-  upper_leaf_location = Location.make
+  parent_location = Location.make!
+  leaf_location1 = Location.make! parent: parent_location
+  upper_leaf_location = Location.make!
 
   before_test_history_count = AlertHistory.count
-  site1 = Site.make institution: @institution, location_geoid: leaf_location1.id
-  device1 = Device.make institution: @institution, site: site1
+  site1 = Site.make! institution: @institution, location_geoid: leaf_location1.id
+  device1 = Device.make! institution: @institution, site: site1
 
   #note: make sure the test above using thise does not have sample-id set, and aggregation type = record
   DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], type: 'specimen'}, sample: {}, patient: {id: 'a',gender: :male})

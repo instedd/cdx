@@ -1,8 +1,11 @@
 require 'spec_helper'
 
 describe DeviceLogsController do
-  let(:institution) {Institution.make}
-  let(:device) { Device.make institution: institution}
+  setup_fixtures do
+    @user = User.make!
+    @institution = Institution.make! user: @user
+    @device = Device.make! institution: @institution
+  end
 
   before(:each) do
     device.set_key_for_activation_token

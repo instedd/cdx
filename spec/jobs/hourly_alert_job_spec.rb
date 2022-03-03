@@ -5,13 +5,13 @@ Sidekiq::Testing.fake!
 
 
 describe HourlyAlertJob, elasticsearch: true do
-  let(:user) {User.make}
-  let(:institution) {Institution.make user_id: user.id}
+  let(:user) {User.make!}
+  let(:institution) {Institution.make! user: user}
   let(:worker) { HourlyAlertJob.new }
 
   context "end to end alert aggregation test" do
     before(:example) do
-      @alert = Alert.make
+      @alert = Alert.make!
       @alert.user = institution.user
       @alert.category_type == "device_errors"
       @alert.aggregation_type = Alert.aggregation_types.key(1)
@@ -31,11 +31,11 @@ describe HourlyAlertJob, elasticsearch: true do
       @alert.destroy
     end
 
-    let(:parent_location) {Location.make}
-    let(:leaf_location1) {Location.make parent: parent_location}
-    let(:upper_leaf_location) {Location.make}
+    let(:parent_location) {Location.make!}
+    let(:leaf_location1) {Location.make! parent: parent_location}
+    let(:upper_leaf_location) {Location.make!}
 
-    let(:site1) {Site.make institution: institution, location_geoid: leaf_location1.id}
+    let(:site1) {Site.make! institution: institution, location_geoid: leaf_location1.id}
 
     it "for error code category inject an error code" do
       before_test_history_count = AlertHistory.count
@@ -43,7 +43,7 @@ describe HourlyAlertJob, elasticsearch: true do
 
       @alert.create_percolator
 
-      device1 = Device.make institution: institution, site: site1
+      device1 = Device.make! institution: institution, site: site1
       DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 155}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
       worker.perform
 
@@ -60,7 +60,7 @@ describe HourlyAlertJob, elasticsearch: true do
 
       @alert.create_percolator
 
-      device1 = Device.make institution: institution, site: site1
+      device1 = Device.make! institution: institution, site: site1
       DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 888}, sample: {id: 'a'}, patient: {id: 'a',gender: :male})
       worker.perform
 
@@ -78,7 +78,7 @@ describe HourlyAlertJob, elasticsearch: true do
 
       @alert.create_percolator
 
-      device1 = Device.make institution: institution, site: site1
+      device1 = Device.make! institution: institution, site: site1
       DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 155}, sample: {id: 'aa',entity_id: "111"}, patient: {id: 'a',gender: :male})
       DeviceMessage.create_and_process device: device1, plain_text_data: (Oj.dump test:{assays:[result: :negative], error_code: 155}, sample: {id: 'aa',entity_id: "112"}, patient: {id: 'a',gender: :male})
 

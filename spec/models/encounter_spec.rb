@@ -3,11 +3,11 @@ require 'spec_helper'
 describe Encounter do
   it { is_expected.to validate_presence_of :institution }
 
-  let(:encounter) { Encounter.make }
+  let(:encounter) { Encounter.make! }
 
   it "#human_diagnose" do
     encounter.core_fields[Encounter::ASSAYS_FIELD] = [{"condition" => "flu_a", "name" => "flu_a", "result" => "positive", "quantitative_result" => nil}]
-    encounter.human_diagnose.should eq("FLU_A detected.")
+    expect(encounter.human_diagnose).to eq("FLU_A detected.")
   end
 
   describe "merge assays" do
@@ -167,7 +167,7 @@ describe Encounter do
   end
 
   context "update diagnostic" do
-    let(:device) { Device.make site: encounter.site }
+    let(:device) { Device.make! site: encounter.site }
 
     before(:each) { Timecop.freeze(Time.now) }
     after(:each) { Timecop.return }
@@ -176,7 +176,7 @@ describe Encounter do
     end
 
     def add_sample_and_process_later(sample_entity_id, message)
-      encounter.samples.make sample_identifiers: [SampleIdentifier.make_unsaved(site: encounter.site, entity_id: sample_entity_id)]
+      encounter.samples.make! sample_identifiers: [SampleIdentifier.make(site: encounter.site, entity_id: sample_entity_id)]
 
       Timecop.freeze(Time.now + 1.second)
 
@@ -242,6 +242,7 @@ describe Encounter do
         add_sample_and_process_later(sample_entity_id, message)
         encounter.reload
       }
+      after(:each) { Timecop.return }
 
       it "should only have messaged after timestamp as pending" do
         expect(encounter.test_results_not_in_diagnostic).to eq([TestResult.last])

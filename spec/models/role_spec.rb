@@ -3,22 +3,22 @@ require 'policy_spec_helper'
 
 describe Role do
   it "should validate that site belongs to institution" do
-    role = Role.make_unsaved
-    institution = Institution.make
-    role.site = Site.make institution: institution
+    role = Role.make!
+    institution = Institution.make!
+    role.site = Site.make! institution: institution
     role.institution = institution
-    role.policy = Policy.make definition: policy_definition(institution, CREATE_INSTITUTION, true), user: User.make, granter: institution.user
+    role.policy = Policy.make! definition: policy_definition(institution, CREATE_INSTITUTION, true), user: User.make!, granter: institution.user
     # At this point the role is valid
     expect(role).to be_valid
 
-    role.institution = Institution.make
+    role.institution = Institution.make!
     expect(role).to be_invalid
   end
 
   context "within" do
-    let!(:site) { Site.make }
-    let!(:subsite) { Site.make parent: site, institution: site.institution }
-    let!(:other_site) { Site.make }
+    let!(:site) { Site.make! }
+    let!(:subsite) { Site.make! parent: site, institution: site.institution }
+    let!(:other_site) { Site.make! }
 
     # Roles are automatically created with institutions and sites.
     # At this time, it's 2 per institution and 4 per site

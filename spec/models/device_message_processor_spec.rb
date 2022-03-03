@@ -77,11 +77,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
     end
   end
 
-  let(:institution) {Institution.make(kind: 'institution')}
+  before(:each) { LocationService.fake! }
 
-  let(:site) {Site.make(institution: institution, location_geoid: 'ne:ARG_1300')}
+  let(:institution) {Institution.make!(kind: 'institution')}
 
-  let(:device) {Device.make(institution: institution, site: site)}
+  let(:site) {Site.make!(institution: institution, location_geoid: 'ne:ARG_1300')}
+
+  let(:device) {Device.make!(institution: institution, site: site)}
 
   let(:device_message) do
     device_message = DeviceMessage.new(device: device, plain_text_data: '{}')
@@ -207,7 +209,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     let(:sample_created_at) { DateTime.now }
 
     let(:patient) do
-      Patient.make(
+      Patient.make!(
         uuid: 'def', institution: device_message.institution,
         core_fields: PATIENT_CORE_FIELDS,
         plain_sensitive_data: {"id" => PATIENT_ID},
@@ -215,7 +217,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     end
 
     let(:sample) do
-      Sample.make(
+      Sample.make!(
         institution: device_message.institution, patient: patient,
         core_fields: {"type" => "blood"},
         created_at: sample_created_at
@@ -223,7 +225,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
     end
 
     let(:sample_identifier) do
-      SampleIdentifier.make(
+      SampleIdentifier.make!(
         sample: sample,
         uuid: 'abc',
         entity_id: SAMPLE_ID,
@@ -381,12 +383,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
     let(:custom_fields) { {"hiv" => PATIENT_HIV} }
 
     it "shouldn't update sample from another institution" do
-      sample = Sample.make(
+      sample = Sample.make!(
         core_fields: core_fields,
         custom_fields: custom_fields
       )
 
-      sample_identifier = SampleIdentifier.make(
+      sample_identifier = SampleIdentifier.make!(
         sample: sample,
         uuid: 'abc',
         entity_id: SAMPLE_ID
@@ -403,17 +405,17 @@ describe DeviceMessageProcessor, elasticsearch: true do
     end
 
     it "shouldn't update sample from another site" do
-      sample = Sample.make(
+      sample = Sample.make!(
         core_fields: core_fields,
         custom_fields: custom_fields,
         institution: institution
       )
 
-      sample_identifier = SampleIdentifier.make(
+      sample_identifier = SampleIdentifier.make!(
         sample: sample,
         uuid: 'abc',
         entity_id: SAMPLE_ID,
-        site: Site.make(institution: institution)
+        site: Site.make!(institution: institution)
       )
 
       device_message_processor.process
@@ -429,13 +431,13 @@ describe DeviceMessageProcessor, elasticsearch: true do
     it "should update sample from another site for manufacturer" do
       institution.update_attributes! kind: 'manufacturer'
 
-      sample = Sample.make(
+      sample = Sample.make!(
         core_fields: core_fields,
         custom_fields: custom_fields,
         institution: institution
       )
 
-      sample_identifier = SampleIdentifier.make(
+      sample_identifier = SampleIdentifier.make!(
         sample: sample,
         uuid: 'abc',
         entity_id: SAMPLE_ID
@@ -486,7 +488,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       core_fields: {"assays" => [result("flu", "flu", "negative"), result("mtb1", "mtb1", "positive")]},
     )
 
-    new_device_site = Site.make institution: institution
+    new_device_site = Site.make! institution: institution
     device.site = new_device_site
     device.save!
 
@@ -502,7 +504,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       core_fields: {"assays" => [result("flu", "flu", "negative"), result("mtb1", "mtb1", "positive")]},
     )
 
-    new_device_site = Site.make institution: institution
+    new_device_site = Site.make! institution: institution
     device.site = new_device_site
     device.save!
 
@@ -576,12 +578,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
       it 'should merge sample if test has a sample' do
         register_cdx_fields sample: { fields: { existing_field: {} } }
 
-        sample = Sample.make(
+        sample = Sample.make!(
           institution: device_message.institution,
           core_fields: {"existing_field" => "a value"},
         )
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample,
           uuid: 'abc',
           entity_id: SAMPLE_ID
@@ -617,12 +619,12 @@ describe DeviceMessageProcessor, elasticsearch: true do
           existing_pii_field: { pii: true }
         } }
 
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           plain_sensitive_data: {"id" => PATIENT_ID},
         )
 
-        sample = Sample.make(
+        sample = Sample.make!(
           patient: patient,
           institution: device_message.institution,
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
@@ -630,7 +632,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
         )
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample
         )
 
@@ -657,16 +659,16 @@ describe DeviceMessageProcessor, elasticsearch: true do
           existing_pii_field: { pii: true }
         } }
 
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
           custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
         )
 
-        sample = Sample.make patient: patient, institution: device_message.institution
+        sample = Sample.make! patient: patient, institution: device_message.institution
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample
         )
 
@@ -689,14 +691,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
           existing_field: {}
         } }
 
-        patient = Patient.make institution: device_message.institution
+        patient = Patient.make! institution: device_message.institution
 
-        sample = Sample.make(
+        sample = Sample.make!(
           institution: device_message.institution, patient: patient,
           core_fields: {"existing_field" => "a value"},
         )
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample,
           uuid: 'abc',
           entity_id: SAMPLE_ID
@@ -717,11 +719,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should create a new sample if the existing sample has a different sample id' do
-        sample = Sample.make(
+        sample = Sample.make!(
           institution: device_message.institution
         )
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample,
           uuid: 'abc',
           entity_id: "def9772"
@@ -739,11 +741,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should not destroy existing sample if it has other references' do
-        sample = Sample.make(
+        sample = Sample.make!(
           institution: device_message.institution
         )
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample,
           uuid: 'abc',
           entity_id: "def9772"
@@ -760,16 +762,16 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it "should assign existing sample's patient to the test" do
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           plain_sensitive_data: {"id" => PATIENT_ID},
         )
 
-        sample = Sample.make(
+        sample = Sample.make!(
           institution: device_message.institution, patient: patient,
         )
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample,
           uuid: 'abc',
           entity_id: SAMPLE_ID,
@@ -800,7 +802,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           existing_indexed_field: {},
         } }
 
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           plain_sensitive_data: {"id" => PATIENT_ID},
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
@@ -826,17 +828,17 @@ describe DeviceMessageProcessor, elasticsearch: true do
           existing_indexed_field: {},
         } }
 
-        patient = Patient.make(
+        patient = Patient.make!(
           plain_sensitive_data: {"id" => PATIENT_ID},
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
           institution: device_message.institution
         )
 
-        sample = Sample.make(
+        sample = Sample.make!(
           institution: device_message.institution, patient: patient,
         )
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample,
           entity_id: SAMPLE_ID
         )
@@ -872,11 +874,11 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should store patient data in patient if sample is present but doest not have a patient' do
-        sample = Sample.make(
+        sample = Sample.make!(
           institution: device_message.institution,
         )
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample,
           entity_id: SAMPLE_ID
         )
@@ -910,7 +912,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should extract existing data in test and create the patient entity' do
-        patient = Patient.make(
+        patient = Patient.make!(
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
           custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
@@ -935,19 +937,19 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should extract existing data in patient and create the patient entity' do
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
           custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
         )
 
-        sample = Sample.make(
+        sample = Sample.make!(
           institution: device_message.institution, patient: patient,
           plain_sensitive_data: SAMPLE_PII_FIELDS,
         )
 
-        sample_identifier = SampleIdentifier.make(
+        sample_identifier = SampleIdentifier.make!(
           sample: sample
         )
 
@@ -967,7 +969,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should merge patient with existing patient if patient id matches' do
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           plain_sensitive_data: {"id" => PATIENT_ID, "existing_pii_field" => "existing_pii_field_value"},
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
@@ -990,7 +992,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it "should merge patient with existing patient if patient id matches, even if it's a different year" do
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           plain_sensitive_data: {"id" => PATIENT_ID, "existing_pii_field" => "existing_pii_field_value"},
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
@@ -1014,14 +1016,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it "should merge patient with existing patient if patient id matches, even if it's a different site" do
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           plain_sensitive_data: {"id" => PATIENT_ID, "existing_pii_field" => "existing_pii_field_value"},
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
           custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
           created_at: 2.years.ago,
         )
-        other_device = Device.make(institution: institution, site: Site.make(institution: institution))
+        other_device = Device.make!(institution: institution, site: Site.make!(institution: institution))
         TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: nil, device: other_device, patient: patient
 
         device_message_processor.process
@@ -1038,7 +1040,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should create a new patient if the existing patient has a differente patient id' do
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           plain_sensitive_data: {"id" => "9000"},
         )
@@ -1056,7 +1058,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should not destroy existing patient if it has other references' do
-        patient = Patient.make(
+        patient = Patient.make!(
           institution: device_message.institution,
           plain_sensitive_data: {"id" => "9000"},
         )
@@ -1073,7 +1075,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
 
       it 'should create patient and store reference in test and sample' do
         TestResult.create_and_index test_id: TEST_ID, device: device,\
-          sample_identifier: SampleIdentifier.make(entity_id: SAMPLE_ID, sample: Sample.make(institution: device_message_processor.institution))
+          sample_identifier: SampleIdentifier.make!(entity_id: SAMPLE_ID, sample: Sample.make!(institution: device_message_processor.institution))
 
         device_message_processor.process
 
@@ -1109,7 +1111,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it 'should merge encounter if test has an encounter' do
-        encounter = Encounter.make(
+        encounter = Encounter.make!(
           uuid: 'ghi', institution: device_message.institution,
           custom_fields: {"existing_field" => "a value"},
           plain_sensitive_data: ENCOUNTER_PII_FIELDS,
@@ -1142,7 +1144,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
           existing_pii_field: { pii: true },
         } }
 
-        encounter = Encounter.make(
+        encounter = Encounter.make!(
           uuid: 'ghi', institution: device_message.institution,
           core_fields: {"existing_indexed_field" => "existing_indexed_field_value"},
           custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
@@ -1170,14 +1172,14 @@ describe DeviceMessageProcessor, elasticsearch: true do
           existing_pii_field: { pii: true },
         } }
 
-        encounter = Encounter.make(
+        encounter = Encounter.make!(
           uuid: 'ghi', institution: device_message.institution,
           core_fields: {"id" => ENCOUNTER_ID, "existing_indexed_field" => "existing_indexed_field_value"},
           custom_fields: {"existing_custom_field" => "existing_custom_field_value"},
           plain_sensitive_data: {"existing_pii_field" => "existing_pii_field_value"},
         )
 
-        other_device = Device.make(institution: institution, site: Site.make(institution: institution))
+        other_device = Device.make!(institution: institution, site: Site.make!(institution: institution))
         TestResult.create_and_index test_id: TEST_ID_2, sample_identifier: nil, device: other_device, encounter: encounter
 
         device_message_processor.process
@@ -1195,7 +1197,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
 
       it "should update encounter if encounter_id changes" do
-        old_encounter = Encounter.make(
+        old_encounter = Encounter.make!(
           uuid: 'ghi', institution: device_message.institution,
           core_fields: {"id" => "ANOTHER ID"},
         )
@@ -1256,7 +1258,7 @@ describe DeviceMessageProcessor, elasticsearch: true do
       let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
      
       it "the start time is greater than today and generates and alert" do
-        alert = Alert.make(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
+        alert = Alert.make!(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
         alert.query = {"test.error_code"=>"155"}
         alert.institution_id = institution.id
         alert.sample_id=""

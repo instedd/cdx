@@ -22,7 +22,7 @@ Capybara.javascript_driver = :poltergeist
 Dir[Rails.root.join("features/support/page_objects/*.rb")].each {|f| require f}
 Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
-WebMock.disable_net_connect!(:allow_localhost => true, allow: [/fonts\.googleapis\.com/, /manastech\.testrail\.com/, /elasticsearch/])
+WebMock.disable_net_connect!(:allow_localhost => true, allow: [/fonts\.googleapis\.com/, /elasticsearch/])
 
 # This is to make machinist work with Rails 4
 class ActiveRecord::Reflection::AssociationReflection
@@ -67,6 +67,7 @@ RSpec.configure do |config|
 
   config.include Devise::TestHelpers, :type => :controller
   config.include DefaultParamsHelper, :type => :controller
+  config.extend SpecFixtures
   config.include ManifestSpecHelper
   config.include CdxFieldsHelper
   config.include FeatureSpecHelpers, :type => :feature
@@ -77,14 +78,12 @@ RSpec.configure do |config|
          to_return(:status => 200, :body => "", :headers => {})
   end
 
-  config.before(:each) do
+  config.before(:suite) do
     LocationService.fake!
-    Timecop.return
-    ActionMailer::Base.deliveries.clear
   end
 
-  config.after(:each) do
-    Timecop.return
+  config.before(:each) do
+    ActionMailer::Base.deliveries.clear
   end
 
   config.exclude_pattern = "spec/features/**/*_spec.rb"
