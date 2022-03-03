@@ -31,12 +31,7 @@ class SampleTransfersController < ApplicationController
   end
 
   def confirm
-    transfer = SampleTransfer.find(params[:sample_transfer_id])
-
-    unless transfer.receiver_institution == @navigation_context.institution
-      render json: { status: "error" }, status: :not_found
-      return
-    end
+    transfer = SampleTransfer.with_receiver(@navigation_context.institution).find(params[:sample_transfer_id])
 
     resource = {
       resource_type: "sample",

@@ -15,6 +15,10 @@ class SampleTransfer < ActiveRecord::Base
           where("sender_institution_id = ? OR receiver_institution_id = ?", institution.id, institution.id)
         }
 
+  scope :with_receiver, ->(institution) {
+          where(receiver_institution_id: institution.id)
+        }
+
   scope :ordered_by_creation, -> {
           order(created_at: :desc)
         }

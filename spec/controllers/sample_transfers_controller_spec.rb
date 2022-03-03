@@ -142,8 +142,9 @@ RSpec.describe SampleTransfersController, type: :controller do
       sample = Sample.make!
       transfer = sample.start_transfer_to(other_institution)
 
-      patch :confirm, sample_transfer_id: transfer.id
-      expect(response).to be_not_found
+      expect {
+        patch :confirm, sample_transfer_id: transfer.id
+      }.to raise_error(ActiveRecord::RecordNotFound)
 
       transfer.reload
       expect(transfer).not_to be_confirmed
