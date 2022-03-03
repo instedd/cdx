@@ -8,6 +8,8 @@ class User < ActiveRecord::Base
 
   devise :omniauthable, :registerable unless Settings.single_tenant
 
+  validates_format_of :email, with: Devise.email_regexp, allow_blank: true
+
   has_many :identities, dependent: :destroy
   has_many :institutions
   has_many :sites, through: :institutions
