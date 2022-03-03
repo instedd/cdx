@@ -186,13 +186,19 @@ a[title="Back"] {
 }
 
 .filters {
+  $filter-gap: 1.5rem;
+
   background: $gray1;
   margin: -10px -10px 0;
   padding: 0 1em 0.5em;
 
+  form .row {
+    margin-bottom: -$filter-gap;
+  }
+
   .filter {
     @include flex(0 0 16%);
-    margin: 0 2%;
+    margin: 0 $filter-gap $filter-gap;
 
     > label {
       min-height: auto;
@@ -207,6 +213,12 @@ a[title="Back"] {
     .LocationSelect {
       width: 100%;
     }
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: $filter-gap;
   }
 
   .advanced {

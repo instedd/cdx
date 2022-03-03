@@ -6,7 +6,7 @@
           %h1
             - if @can_create
               = link_to "+", new_sample_or_batch_batches_path, class: 'btn-add side-link fix', title: 'Add sample/batch'
-            Samples
+            Batches
 
       %form#filters-form{action: batches_path, "data-auto-submit" => true}
         %input{type: "hidden", name: "page_size", value: @page_size}
@@ -20,9 +20,10 @@
           .filter
             %label.block Isolate Name
             %input.input-large{type: "text", name: "isolate_name", value: params["isolate_name"], placeholder: "Filter by isolate name"}
-          .filter
-            %label.block From date
-            %input.input-large{type: "date", name: "date_produced_from", value: params["date_produced_from"]}
-          .filter
-            %label.block To date
-            %input.input-large{type: "date", name: "date_produced_to", value: params["date_produced_to"]}
+          .filter-group
+            .filter
+              %label.block From date
+              %input.input-large{type: "date", name: "date_produced_from", value: params["date_produced_from"]}
+            .filter
+              %label.block To date
+              %input.input-large{type: "date", name: "date_produced_to", value: params["date_produced_to"]}
