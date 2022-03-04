@@ -31,10 +31,6 @@ describe Device do
 
   context "validations" do
 
-    it { is_expected.to validate_presence_of :device_model }
-    it { is_expected.to validate_presence_of :name }
-    it { is_expected.to validate_presence_of :institution }
-
     it "should validate unpublished device model to belong to the same institution" do
       device = Device.make institution: Institution.make!
       device.device_model = DeviceModel.make!(:unpublished, institution: Institution.make!)

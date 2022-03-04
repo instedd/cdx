@@ -24,8 +24,6 @@ describe SampleIdentifier do
   end
 
   context "validations" do
-    it { is_expected.to validate_presence_of :sample }
-
     context "validations for manufacturer" do
       let(:sample) { Sample.make! institution: Institution.make!(:manufacturer) }
 

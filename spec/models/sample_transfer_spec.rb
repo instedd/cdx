@@ -9,12 +9,9 @@ RSpec.describe SampleTransfer, type: :model do
     expect(SampleTransfer.new(sample: sample).sender_institution).to eq sample.institution
   end
 
-  it "validates presence of references" do
+  it "validates" do
     transfer = SampleTransfer.new(sample: sample, receiver_institution: receiver, sender_institution: sender)
     expect(transfer).to be_valid
-    expect(transfer).to validate_presence_of(:sample)
-    expect(transfer).to validate_presence_of(:receiver_institution)
-    expect(transfer).to validate_presence_of(:sender_institution)
   end
 
   describe ".within" do
