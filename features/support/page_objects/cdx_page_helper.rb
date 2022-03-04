@@ -13,6 +13,6 @@ module CdxPageHelper
 
   def finished_all_ajax_requests?
     return true unless page.current_url.start_with?("http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}")
-    page.evaluate_script('jQuery.active').zero?
+    page.evaluate_script('window.jQuery && jQuery.active').try(&:zero?)
   end
 end
