@@ -39,6 +39,8 @@ entities:
       volume:
         type: float
       lab_technician:
+      old_batch_number:
+        searchable: true
   batch: &BATCH
     fields:
       batch_number:

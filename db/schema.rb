@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220114191523) do
+ActiveRecord::Schema.define(version: 20220216134506) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -515,21 +515,22 @@ ActiveRecord::Schema.define(version: 20220114191523) do
   add_index "sample_identifiers", ["uuid"], name: "index_sample_identifiers_on_uuid", unique: true, using: :btree
 
   create_table "samples", force: :cascade do |t|
-    t.binary   "sensitive_data", limit: 65535
-    t.integer  "institution_id", limit: 4
-    t.text     "custom_fields",  limit: 65535
-    t.text     "core_fields",    limit: 65535
+    t.binary   "sensitive_data",   limit: 65535
+    t.integer  "institution_id",   limit: 4
+    t.text     "custom_fields",    limit: 65535
+    t.text     "core_fields",      limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "patient_id",     limit: 4
-    t.integer  "encounter_id",   limit: 4
-    t.boolean  "is_phantom",                   default: true
+    t.integer  "patient_id",       limit: 4
+    t.integer  "encounter_id",     limit: 4
+    t.boolean  "is_phantom",                     default: true
     t.datetime "deleted_at"
-    t.integer  "batch_id",       limit: 4
-    t.string   "isolate_name",   limit: 255
-    t.integer  "site_id",        limit: 4
-    t.string   "site_prefix",    limit: 255
-    t.string   "specimen_role",  limit: 255
+    t.integer  "batch_id",         limit: 4
+    t.string   "isolate_name",     limit: 255
+    t.integer  "site_id",          limit: 4
+    t.string   "site_prefix",      limit: 255
+    t.string   "specimen_role",    limit: 255
+    t.string   "old_batch_number", limit: 255
   end
 
   add_index "samples", ["batch_id"], name: "index_samples_on_batch_id", using: :btree

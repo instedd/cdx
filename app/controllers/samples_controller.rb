@@ -9,7 +9,7 @@ class SamplesController < ApplicationController
     @samples = @samples.within(@navigation_context.entity, @navigation_context.exclude_subsites)
 
     @samples = @samples.joins(:sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
-    @samples = @samples.joins(:batch).where("batches.batch_number LIKE concat('%', ?, '%')", params[:batch_number]) unless params[:batch_number].blank?
+    @samples = @samples.joins("LEFT JOIN batches ON batches.id = samples.batch_id").where("batches.batch_number LIKE concat('%', ?, '%') OR samples.old_batch_number LIKE concat('%', ?, '%')", params[:batch_number], params[:batch_number]) unless params[:batch_number].blank?
     @samples = @samples.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
     @samples = @samples.where("specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
 
@@ -213,11 +213,11 @@ class SamplesController < ApplicationController
     Sample.transaction do
       samples.each do |to_transfer|
         raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
-        if to_transfer.batch_id.nil?
-          to_transfer.site_id = nil
-          to_transfer.institution = new_owner
-          to_transfer.save!
-        end
+        to_transfer.old_batch_number = to_transfer.batch.batch_number unless to_transfer.batch.nil?
+        to_transfer.batch_id = nil
+        to_transfer.site_id = nil
+        to_transfer.institution = new_owner
+        to_transfer.save!
       end
     end
   end

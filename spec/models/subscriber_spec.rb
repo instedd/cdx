@@ -75,7 +75,7 @@ describe Subscriber, elasticsearch: true do
       expect(response["site"].keys).to match_array(["uuid", "name", "path"])
       expect(response["location"].keys).to match_array(["id", "parents", "admin_levels", "lat", "lng"])
       expect(response["patient"].keys).to match_array(["gender"])
-      expect(response["sample"].keys).to match_array(["uuid", "id", "type", "collection_date", "specimen_role", "isolate_name", "date_produced", "inactivation_method", "volume", "lab_technician"])
+      expect(response["sample"].keys).to match_array(["uuid", "id", "type", "collection_date", "specimen_role", "isolate_name", "date_produced", "inactivation_method", "volume", "lab_technician", "old_batch_number"])
       expect(response["test"].keys).to match_array(["id", "uuid", "start_time", "end_time", "reported_time", "updated_time", "error_code", "error_description", "name", "status", "assays", "type", "site_user"])
       expect(response["institution"]["name"]).to eq(institution.name)
       expect(response["site"]["name"]).to eq(site.name)
