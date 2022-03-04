@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Encounter do
-  it { is_expected.to validate_presence_of :institution }
-
   let(:encounter) { Encounter.make! }
 
   it "#human_diagnose" do
