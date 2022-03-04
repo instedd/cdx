@@ -33,7 +33,7 @@ class ComputedPolicy < ActiveRecord::Base
   end
 
   def self.authorize(action, resource, user, opts={})
-    return resource.kind_of?(Resource)\
+    return resource.kind_of?(Resource) || resource.kind_of?(Hash)\
       ? authorize_instance(action, resource, user, opts)\
       : authorize_scope(action, resource, user, opts)
   end

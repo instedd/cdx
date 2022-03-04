@@ -1,4 +1,6 @@
 class SampleTransfersController < ApplicationController
+  helper_method :can_confirm_transfer?
+
   def index
     @sample_transfers = SampleTransfer
       .within(@navigation_context.institution)
@@ -33,18 +35,7 @@ class SampleTransfersController < ApplicationController
   def confirm
     transfer = SampleTransfer.with_receiver(@navigation_context.institution).find(params[:sample_transfer_id])
 
-    resource = {
-      resource_type: "sample",
-      resource_id: transfer.sample.id,
-      institution_id: @navigation_context.institution.id,
-      site_id: @navigation_context.site.try(&:uuid),
-    }
-    unless ComputedPolicy.authorize_instance(UPDATE_SAMPLE, resource, current_user)
-      log_authorization_warn SampleTransfer, UPDATE_SAMPLE
-
-      render json: { status: "error" }, status: :forbidden
-      return
-    end
+    return unless authorize_resource(confirmation_resource(transfer), UPDATE_SAMPLE)
 
     unless transfer.confirm_and_apply
       flash[:error] = "Sample transfer has already been confirmed"
@@ -59,6 +50,19 @@ class SampleTransfersController < ApplicationController
   end
 
   private
+
+  def can_confirm_transfer?(sample_transfer)
+    authorize_resource?(confirmation_resource(sample_transfer.sample), UPDATE_SAMPLE)
+  end
+
+  def confirmation_resource(sample)
+    {
+      resource_type: "sample",
+      resource_id: sample.id,
+      institution_id: @navigation_context.institution.id,
+      site_id: @navigation_context.site.try(&:uuid),
+    }
+  end
 
   def create_transfer(new_owner, samples)
     samples = Sample.joins(:sample_identifiers).where("sample_identifiers.uuid": samples)

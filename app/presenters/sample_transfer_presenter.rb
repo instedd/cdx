@@ -27,10 +27,6 @@ class SampleTransferPresenter
     end
   end
 
-  def can_confirm?
-    true
-  end
-
   def status
     confirmed? ? "confirmed" : "in-transit"
   end

@@ -53,24 +53,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  #TODO: refactor authorize_resource and authorize_resource? as both share almost the same code
-  def authorize_resource?(resource, action)
-    if has_access?(resource, action)
-      check_access(resource, action)
-    else
-      false
-    end
-  end
-
-  #TODO: refactor authorize_resource and authorize_resource? as both share almost the same code
-  def authorize_resource?(resource, action)
-    if has_access?(resource, action)
-      check_access(resource, action)
-    else
-      false
-    end
-  end
-
   def authorize_resources(resources, action)
     resources.all? { | resource | authorize_resource(resource, action) }
   end
@@ -211,9 +193,11 @@ class ApplicationController < ActionController::Base
   end
 
   def log_authorization_warn(resource, action)
-    resource_name =
-      if resource.is_a? Class
+    resource_name = case resource
+      when Class
         "#{resource} class"
+      when Hash
+        "#{resource[:resource_type].camelize} (id=#{resource[:resource_id]})"
       else
         "#{resource.class} (id=#{resource.id})"
       end
