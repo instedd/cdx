@@ -1,0 +1,28 @@
+name: Gems cache
+
+inputs:
+  version:
+    default: "v0"
+
+outputs:
+  cache-hit:
+    value: ${{ steps.gems-cache.outputs.cache-hit }}
+
+runs:
+  using: composite
+
+  steps:
+    - uses: actions/cache@v2
+      id: gems-cache
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ inputs.version }}-${{ hashFiles('.ruby-version') }}-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-${{ inputs.version }}-${{ hashFiles('.ruby-version') }}-
+          ${{ runner.os }}-gems-
+
+    - name: Install gems
+      if: steps.gems-cache.outputs.cache-hit != 'true'
+      run: |
+        docker-compose run --rm --no-deps $COMPOSE_DEFAULT_SERVICE bash -c "bundle install --jobs 4 --retry 3 && bundle clean --force"
+      shell: bash

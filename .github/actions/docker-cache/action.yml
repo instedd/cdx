@@ -1,0 +1,37 @@
+name: Docker cache
+
+inputs:
+  docker-images:
+    default: ""
+
+  version:
+    default: "v0"
+
+outputs:
+  cache-hit:
+    value: ${{ steps.docker-cache.outputs.cache-hit }}
+
+runs:
+  using: composite
+
+  steps:
+    - uses: actions/cache@v2
+      id: docker-cache
+      with:
+        path: tmp/docker
+        key: Docker-${{ inputs.version }}-${{ hashFiles('Dockerfile*', 'docker-compose*') }}
+        restore-keys: |
+          Docker-${{ inputs.version }}-
+
+    - name: Load Docker image
+      if: steps.docker-cache.outputs.cache-hit == 'true'
+      run: |
+        docker load < tmp/docker/docker_images.tar
+      shell: bash
+
+    - name: Build Docker image
+      if: steps.docker-cache.outputs.cache-hit != 'true'
+      run: |
+        docker-compose build
+        docker save ${{ inputs.docker-images }} > tmp/docker/docker_images.tar
+      shell: bash
