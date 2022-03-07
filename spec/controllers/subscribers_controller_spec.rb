@@ -9,12 +9,18 @@ describe SubscribersController, elasticsearch: true do
   before(:each) { sign_in user }
 
   context "with filters" do
-    let(:filter) { Filter.make! user: user, query: { site: 1 } }
+    let!(:filter) { Filter.make! user: user, query: { site: 1 } }
+    let(:subscriber) { Subscriber.make! user: user, filter: filter, fields: ['foo', 'bar'] }
 
     it "list subscribers" do
-      subscriber = Subscriber.make! user: user, filter: filter, fields: ['foo', 'bar']
+      subscriber
       get :index, format: :json
       expect(response.body).to eq([subscriber].to_json)
+    end
+
+    it "new" do
+      get :new
+      expect(response).to be_success
     end
 
     it "creates a subscriber" do
@@ -26,7 +32,6 @@ describe SubscribersController, elasticsearch: true do
     end
 
     it "deletes a subscriber" do
-      subscriber = Subscriber.make! user: user, filter: filter, fields: ['foo', 'bar']
       delete :destroy, filter_id: filter.id, id: subscriber.id
       expect(filter.subscribers.count).to be(0)
     end

@@ -20,9 +20,6 @@ gem 'jbuilder', '~> 1.2'
 gem 'view_components', git: 'https://github.com/manastech/rails-view_components.git', branch: 'master'
 gem 'wicked_pdf', '~> 2.1'
 
-# Controllers
-gem 'decent_exposure'
-
 # Authentication
 # gem 'bcrypt-ruby', '~> 3.1.2'
 gem 'devise', '~> 3.5.5'

@@ -18,10 +18,6 @@ class ApplicationController < ActionController::Base
       current_user.try(:timestamps_in_device_time_zone))
   end
 
-  decent_configuration do
-    strategy DecentExposure::StrongParametersStrategy
-  end
-
   def render_json(object, params={})
     render params.merge(text: object.to_json_oj, content_type: 'text/json')
   end

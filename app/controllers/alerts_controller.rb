@@ -1,10 +1,8 @@
 class AlertsController < ApplicationController
   include AlertsHelper
 
+  helper_method :alert_info
   respond_to :html, :json
-
-  #could not name it 'alert' as rails gave a warning as this is a reserved method.
-  expose(:alert_info, model: :alert, attributes: :alert_params)
 
   before_filter do
     head :forbidden unless has_access_to_test_results_index?
@@ -158,6 +156,26 @@ class AlertsController < ApplicationController
   end
 
   private
+
+  def alert_info
+    # could not name it 'alert' as rails gave a warning as this is a reserved method.
+    @alert_info ||= load_or_initialize_alert
+  end
+
+  def load_or_initialize_alert
+    alert =
+      if id = params[:id]
+        Alert.find(id)
+      else
+        Alert.new
+      end
+
+    if params[:alert]
+      alert.attributes = alert_params
+    end
+
+    alert
+  end
 
   def alert_params
     params.require(:alert).permit(:name, :description, :devices_info, :users_info, :enabled, :sites_info, :error_code, 

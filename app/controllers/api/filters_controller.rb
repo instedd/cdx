@@ -1,6 +1,5 @@
 class Api::FiltersController < ApiController
   respond_to :json
-  expose(:filters) { current_user.filters }
 
   def index
     respond_with filters
@@ -8,5 +7,11 @@ class Api::FiltersController < ApiController
 
   def show
     render :edit
+  end
+
+  private
+
+  def filters
+    @filters ||= current_user.filters
   end
 end

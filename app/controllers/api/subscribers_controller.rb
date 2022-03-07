@@ -2,15 +2,6 @@ class Api::SubscribersController < ApiController
   include Concerns::SubscribersController
 
   respond_to :json
-  expose(:subscribers) do
-    if params[:filter_id]
-      current_user.filters.find(params[:filter_id]).subscribers
-    else
-      current_user.subscribers
-    end
-  end
-  expose(:subscriber, attributes: :subscriber_params)
-  expose(:filters) { current_user.filters }
 
   def index
     respond_with subscribers
