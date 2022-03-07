@@ -113,6 +113,7 @@ group :test do
 
   gem 'database_cleaner'
   gem 'machinist', '~> 2.0' # NOTE: eventually replace with FactoryBot
+  gem 'simplecov', require: false
   gem 'timecop'
   gem 'webmock', require: false
 
