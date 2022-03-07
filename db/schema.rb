@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220223051739) do
+ActiveRecord::Schema.define(version: 20220222115959) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
