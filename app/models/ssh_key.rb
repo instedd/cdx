@@ -1,4 +1,4 @@
-class SshKey < ActiveRecord::Base
+class SshKey < ApplicationRecord
   belongs_to :device
 
   validates_uniqueness_of :device_id

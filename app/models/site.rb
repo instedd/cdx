@@ -1,4 +1,4 @@
-class Site < ActiveRecord::Base
+class Site < ApplicationRecord
   include AutoUUID
   include Resource
   include WithLocation

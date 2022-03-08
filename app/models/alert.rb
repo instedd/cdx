@@ -1,4 +1,4 @@
-class Alert < ActiveRecord::Base
+class Alert < ApplicationRecord
   belongs_to :user
   belongs_to :site
   belongs_to :institution

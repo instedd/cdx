@@ -1,4 +1,4 @@
-class DeviceMessage < ActiveRecord::Base
+class DeviceMessage < ApplicationRecord
   belongs_to :device
   belongs_to :site
   has_one :institution, through: :device

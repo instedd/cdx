@@ -1,4 +1,4 @@
-class DeviceCommand < ActiveRecord::Base
+class DeviceCommand < ApplicationRecord
   belongs_to :device
 
   def reply(data)
