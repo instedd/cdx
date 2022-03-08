@@ -235,51 +235,10 @@ class SamplesController < ApplicationController
     sample_qc = sample.batch.qc_sample
     return if sample_qc.nil?
 
-    qc_info = QcInfo.find_by_sample_qc_id(sample_qc.id)
-    unless qc_info
-      qc_info = QcInfo.new({
-                             sample_qc_id: sample_qc.id,
-                             uuid: sample_qc.uuid,
-                             batch_number: sample_qc.batch.batch_number,
-                             date_produced: sample_qc.date_produced,
-                             lab_technician: sample_qc.lab_technician,
-                             specimen_role: sample_qc.specimen_role,
-                             isolate_name: sample_qc.isolate_name,
-                             inactivation_method: sample_qc.inactivation_method,
-                             volume: sample_qc.volume
-                           })
-      create_notes_for_qc_info(qc_info, sample)
-      create_assay_attachments_for_qc_info(qc_info, sample)
-    end
+    qc_info = QcInfo.find_or_duplicate_from(sample_qc)
     qc_info.samples << sample
     qc_info.save!
     qc_info
-  end
-
-  def create_assay_attachments_for_qc_info(qc_info, sample)
-    sample.assay_attachments.each do |assay_attachment|
-      new_assay_attachment = assay_attachment.dup
-      if assay_attachment.assay_file
-        new_assay_file = AssayFile.create(picture: assay_attachment.assay_file.picture)
-        new_assay_attachment.assay_file = new_assay_file
-      end
-      #avoids duplicating assay_attachment for the original sample
-      new_assay_attachment.sample = nil
-      new_assay_attachment.save!
-
-      qc_info.assay_attachments << new_assay_attachment
-    end
-  end
-
-  def create_notes_for_qc_info(qc_info, sample)
-    sample.notes.each do |note|
-      new_note = note.dup
-      #avoids duplicating notes for the original sample
-      new_note.sample_id = nil
-      new_note.save!
-
-      qc_info.notes << new_note
-    end
   end
 
   def sample_params
