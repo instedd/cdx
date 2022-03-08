@@ -1,4 +1,4 @@
-class Device < ActiveRecord::Base
+class Device < ApplicationRecord
   include Resource
   include SiteContained
   acts_as_paranoid

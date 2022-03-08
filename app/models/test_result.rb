@@ -1,4 +1,4 @@
-class TestResult < ActiveRecord::Base
+class TestResult < ApplicationRecord
   include AutoUUID
   include Entity
   include Resource

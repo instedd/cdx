@@ -1,4 +1,4 @@
-class DeviceModel < ActiveRecord::Base
+class DeviceModel < ApplicationRecord
 
   include Resource
 

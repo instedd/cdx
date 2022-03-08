@@ -1,4 +1,4 @@
-class RecipientNotificationHistory < ActiveRecord::Base
+class RecipientNotificationHistory < ApplicationRecord
   belongs_to :user
   belongs_to :alert
   belongs_to :alert_history

@@ -1,4 +1,4 @@
-class Patient < ActiveRecord::Base
+class Patient < ApplicationRecord
   include Entity
   include AutoUUID
   include AutoIdHash

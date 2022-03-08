@@ -1,4 +1,4 @@
-class QcInfo < ActiveRecord::Base
+class QcInfo < ApplicationRecord
   include Entity
   include SpecimenRole
   include InactivationMethod
