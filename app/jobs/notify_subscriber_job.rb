@@ -1,4 +1,4 @@
-class NotifySubscriberJob < ActiveJob::Base
+class NotifySubscriberJob < ApplicationJob
   queue_as :default
 
   def perform(subscriber_id, test_elasticsearch_id)
