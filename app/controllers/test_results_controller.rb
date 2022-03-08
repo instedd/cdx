@@ -1,9 +1,9 @@
 class TestResultsController < ApplicationController
   include Policy::Actions
 
-  before_filter :load_filter_resources
+  before_action :load_filter_resources
 
-  before_filter do
+  before_action do
     head :forbidden unless has_access_to_test_results_index?
   end
 

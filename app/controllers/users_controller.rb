@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
-  before_filter :load_resource, only: [:edit, :update, :assign_role, :unassign_role]
-  before_filter :create_institution_invite, only: [:create_with_institution_invite]
+  before_action :load_resource, only: [:edit, :update, :assign_role, :unassign_role]
+  before_action :create_institution_invite, only: [:create_with_institution_invite]
 
   def index
     site_admin = !has_access?(@navigation_context.entity, READ_INSTITUTION_USERS) && @navigation_context.entity.kind_of?(Institution)

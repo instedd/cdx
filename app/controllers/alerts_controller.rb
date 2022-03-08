@@ -4,7 +4,7 @@ class AlertsController < ApplicationController
   helper_method :alert_info
   respond_to :html, :json
 
-  before_filter do
+  before_action do
     head :forbidden unless has_access_to_test_results_index?
   end
 
