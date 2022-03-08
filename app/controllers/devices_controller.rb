@@ -1,12 +1,12 @@
 class DevicesController < ApplicationController
-  before_filter :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models, :sites, :setup, :performance]
-  before_filter :load_institutions, only: [:new, :create, :edit, :update, :device_models]
-  before_filter :load_sites, only: [:new, :create, :edit, :update]
-  before_filter :load_device_models_for_create, only: [:index, :new, :create]
-  before_filter :load_device_models_for_update, only: [:edit, :update]
-  before_filter :load_filter_resources, only: :index
+  before_action :load_device, except: [:index, :new, :create, :show, :custom_mappings, :device_models, :sites, :setup, :performance]
+  before_action :load_institutions, only: [:new, :create, :edit, :update, :device_models]
+  before_action :load_sites, only: [:new, :create, :edit, :update]
+  before_action :load_device_models_for_create, only: [:index, :new, :create]
+  before_action :load_device_models_for_update, only: [:edit, :update]
+  before_action :load_filter_resources, only: :index
 
-  before_filter do
+  before_action do
     head :forbidden unless has_access_to_devices_index?
   end
 

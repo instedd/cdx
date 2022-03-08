@@ -1,6 +1,6 @@
 class PoliciesController < ApplicationController
   layout "application", only: [:index, :new]
-  before_filter do
+  before_action do
     head :forbidden unless can_delegate_permissions?
   end
 

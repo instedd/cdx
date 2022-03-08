@@ -1,6 +1,6 @@
 class SitesController < ApplicationController
   set_institution_tab :sites
-  before_filter do
+  before_action do
     head :forbidden unless has_access_to_sites_index?
   end
 
