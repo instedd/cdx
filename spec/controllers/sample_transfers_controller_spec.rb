@@ -26,6 +26,15 @@ RSpec.describe SampleTransfersController, type: :controller do
       expect(assigns(:sample_transfers)).to be_empty
     end
 
+    it "orders transfers by creation date" do
+      sample_transfers = [
+        SampleTransfer.make!(sender_institution: my_institution, created_at: Time.now - 1.day),
+        SampleTransfer.make!(receiver_institution: my_institution, created_at: Time.now),
+      ]
+      get :index
+      expect(assigns(:sample_transfers).map(&:transfer)).to eq sample_transfers.reverse
+    end
+
     describe "filters" do
       let!(:subject) { SampleTransfer.make!(sender_institution: my_institution, sample: Sample.make!(:filled, batch: Batch.make!, specimen_role: "c")) }
       let!(:other) { SampleTransfer.make!(receiver_institution: my_institution, sample: Sample.make!(:filled, batch: Batch.make!)) }

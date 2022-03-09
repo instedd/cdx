@@ -15,6 +15,10 @@ class SampleTransfer < ActiveRecord::Base
           where("sender_institution_id = ? OR receiver_institution_id = ?", institution.id, institution.id)
         }
 
+  scope :ordered_by_creation, -> {
+          order(created_at: :desc)
+        }
+
   def confirm
     if confirmed?
       self.errors.add(:confirmed_at, "Already confirmed.")
