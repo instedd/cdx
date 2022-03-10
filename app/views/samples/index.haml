@@ -19,7 +19,7 @@
                 .icon-print.btn-icon
               =button_tag id: 'bulk_destroy', class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected samples. This action CANNOT be undone. Are you sure you want to proceed?" } do
                 .icon-trash.btn-icon
-              #notification.icon-error.icon-red.nodisplay
+              #table-notification.icon-error.icon-red.table-info.hidden
                 .text-small= "QC Samples can't be transferred"
 
           - t.columns do
@@ -39,7 +39,7 @@
               %th Production Date
           - t.tbody do
             - @samples.each do |sample|
-              %tr.laboratory-sample-row{data: {href: has_access?(sample, Policy::Actions::UPDATE_SAMPLE) ? edit_sample_path(sample) : sample_path(sample)}}
+              %tr.laboratory-sample-row{data: {is_qc: sample.is_quality_control?.to_s, href: has_access?(sample, Policy::Actions::UPDATE_SAMPLE) ? edit_sample_path(sample) : sample_path(sample)}}
                 %td
                   =check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
                   %label.row{for: "sample_ids.#{sample.id}"}
@@ -48,7 +48,7 @@
                 %td= sample.inactivation_method
                 %td= sample.specimen_role_description
                 %td= sample.date_produced_description
-                %td{id: 'sample_is_qc', class: 'nodisplay'}= sample.is_quality_control?
+                -#%td{id: 'sample_is_qc', class: 'nodisplay'}= sample.is_quality_control?
 
       .pagination
         = render 'shared/pagination'

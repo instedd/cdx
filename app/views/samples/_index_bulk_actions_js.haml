@@ -28,17 +28,14 @@
 
   function toggleBulkTransfer(checkbox) {
     var row = checkbox.parents('.laboratory-sample-row')
-    var isQc = row.children('#sample_is_qc').text() === 'true'
     if (checkbox.is(':checked')){
-      if(isQc){
-        $("#bulk_transfer").prop('disabled', isQc);
-        $('#notification').addClass('table-info')
-        $('#notification').show()
+      if(row.data().isQc){
+        $("#bulk_transfer").prop('disabled', true);
+        $('#table-notification').css("visibility", "visible");
       }
     }
     else {
-      checkbox.removeClass('table-info')
-      $('#notification').hide()
+      $('#table-notification').css("visibility", "hidden");
     }
   }
 
@@ -54,7 +51,6 @@
       if(checkboxInput.is(':checked')) {
         var uuid = $(sample).children('#sample_uuid').text();
         var isolateName = $(sample).children('#sample_isolate_name').text();
-        debugger;
         return {uuid, isolateName};
       }
      })
