@@ -69,7 +69,10 @@ describe "policy", elasticsearch: true do
         modal.users.native.send_keys :enter
         modal.submit
       end
-      page.logout
+
+      page.retry_block(attempts: 3) do
+        page.logout
+      end
     end
 
     # Accept the invitation

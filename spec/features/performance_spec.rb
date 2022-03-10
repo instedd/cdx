@@ -30,6 +30,7 @@ describe "performance", elasticsearch: true do
   it "device charts should hide qc tests" do
     Timecop.travel(Time.utc(2015, 9, 1))
     goto_page DevicePage, id: device.id do |page|
+      page.tab_header.performance.click # FIXME: this click shouldn't be needed
       expect(page.tests_run.pie_chart.total.text).to eq("1")
     end
   end

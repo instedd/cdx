@@ -1,3 +1,4 @@
+@javascript
 Feature: view incidents
 
   Background:

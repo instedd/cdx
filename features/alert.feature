@@ -1,23 +1,26 @@
+@javascript
 Feature: create an alert
 
   Background:
     Given the user has an account
 
+  @wip
   Scenario: Successful create error category alert with all fields
     Given the user creates a new error category alert with all fields with name "errorcategory"
     Then the user should see in list alerts "errorcategory"
-    Then the user should have error_code alert result 
+    Then the user should have error_code alert result
     Then the user should have an incident
 
   Scenario: Successful create error category alert with all fields but no incident for QC test type
     Given the user creates a new error category alert with all fields with name "errorcategory"
     Then the user should see in list alerts "errorcategory"
-    Then the user should have no error_code alert result for qc test 
+    Then the user should have no error_code alert result for qc test
 
+  @wip
   Scenario: Successful create anomalie category alert with all fields
     Given the user creates a new anomalie category alert with all fields with name "anomaliecategory"
     Then the user should see in list alerts "anomaliecategory"
-    Then the user should have no_sample_id alert result 
+    Then the user should have no_sample_id alert result
     Then the user should have an incident
 
   Scenario: Successful create testresult category alert with all fields
@@ -35,18 +38,19 @@ Feature: create an alert
     Then the user should view edit page "viewalert"
     Then the user should see no edit alert incidents
 
-  Scenario: Successful create, view and delete alert 
+  Scenario: Successful create, view and delete alert
     Given the user creates a new error category alert with all fields with name "deletealert"
     And the user should see in list alerts "deletealert"
     And the user should click edit "deletealert"
-    And delete the alert  
+    And delete the alert
     Then the user should not see in list alerts "deletealert"
 
-  Scenario: Successful create error category alert with email limit 2 and verify only 2 emails sent 
+  @wip
+  Scenario: Successful create error category alert with email limit 2 and verify only 2 emails sent
    Given the user creates a new error category alert with all fields with name "verifyemaillimit"
    Then the user should see in list alerts "verifyemaillimit"
-   Then the user should have error_code alert result 
-   Then the user should have error_code alert result 
-   Then the user should have error_code alert result 
-   Then the user should have error_code alert result 
+   Then the user should have error_code alert result
+   Then the user should have error_code alert result
+   Then the user should have error_code alert result
+   Then the user should have error_code alert result
    Then the user should have two emails

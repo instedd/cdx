@@ -33,7 +33,6 @@ describe "sample transfers" do
 
       goto_page ListSampleTransfersPage do |page|
         page.filters.sample_id.set subject.sample.uuid
-        page.filters.submit
       end
 
       expect_page ListSampleTransfersPage do |page|

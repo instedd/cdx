@@ -10,7 +10,7 @@ class EncounterFormPage < CdxPageBase
 
   section :diagnosis, EncounterDiagnosis, ".assays-editor"
   element :append_sample, :link, "Append sample"
-  element :add_tests, :link, "Add tests"
+  element :add_tests, :link, "Add tests", visible: :all
 
   def open_append_sample
     append_sample.click
