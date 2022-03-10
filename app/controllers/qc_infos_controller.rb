@@ -1,5 +1,5 @@
 class QcInfosController < ApplicationController
-  include Concerns::ControllerHelper
+  include Concerns::ViewHelper
 
   def edit
     @qc_info = QcInfo.find(params[:id])

@@ -1,5 +1,5 @@
 class SamplesController < ApplicationController
-  include Concerns::ControllerHelper
+  include Concerns::ViewHelper
 
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLE)
