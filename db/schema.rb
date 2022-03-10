@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220221152647) do
+ActiveRecord::Schema.define(version: 20220222115959) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -538,8 +538,8 @@ ActiveRecord::Schema.define(version: 20220221152647) do
     t.integer  "sender_institution_id",   limit: 4
     t.integer  "receiver_institution_id", limit: 4
     t.datetime "confirmed_at"
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
   end
 
   add_index "sample_transfers", ["confirmed_at"], name: "index_sample_transfers_on_confirmed_at", using: :btree
