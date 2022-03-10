@@ -15,11 +15,13 @@ class CdxPageBase < SitePrism::Page
   section :navigation_context, NavigationContextSection, "#context_side_bar"
   element :primary, ".btn-primary"
   element :content, ".content", match: :first
+  element :user_menu, ".user"
   element :logout_link, :link, "Log out"
   section :confirmation, ConfirmationSection, '[data-react-class="ConfirmationModal"]'
 
   def logout
-    logout_link.trigger('click')
+    user_menu.click
+    logout_link.click
     wait_for_submit
   end
 
@@ -28,7 +30,7 @@ class CdxPageBase < SitePrism::Page
   end
 
   def close_context_picker
-    navigation_context_handle.trigger('click')
+    navigation_context_handle.click
   end
 
   def submit
@@ -37,10 +39,26 @@ class CdxPageBase < SitePrism::Page
   end
 
   def success?
-    status_code == 200
+    # we can't test the page's HTTP status code with Selenium WebDriver so we
+    # merely test that the `user_menu` element is present on page:
+    !!user_menu
+  rescue
+    false
   end
 
-  def forbidden?
-    status_code == 403
+  # FIXME: sometimes we must force some manual retry in addition to
+  #        Capybara.default_max_wait_time
+  def retry_block(attempts: 1, sleep_for: 0.5)
+    begin
+      yield
+    rescue Capybara::ElementNotFound => ex
+      if attempts > 0
+        attempts -= 1
+        sleep(sleep_for)
+        retry
+      else
+        raise ex
+      end
+    end
   end
 end

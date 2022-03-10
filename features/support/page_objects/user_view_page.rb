@@ -4,7 +4,7 @@ class UserViewPage < CdxPageBase
   element :invite_users, "a[title='Invite users']"
 
   def open_invite_users(&block)
-    invite_users.trigger('click')
+    invite_users.click
 
     modal = UserInviteModal.new
     modal.select_new_user_option(&block)
@@ -15,7 +15,7 @@ class UserInviteModal < CdxPageBase
   element :new_user_option, ".modal .invitation-option-card", text: "NEW USER"
 
   def select_new_user_option
-    new_user_option.trigger('click')
+    new_user_option.click
 
     modal = InviteUsersModal.new
     yield modal if block_given?

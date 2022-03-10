@@ -29,6 +29,7 @@ class DevicePage < DeviceSetupPage
   element :edit, "a[title='Edit']"
 
   section :tab_header, '.tabs' do
+    element :performance, :link, 'Performance'
     element :setup, :link, 'Setup'
   end
 

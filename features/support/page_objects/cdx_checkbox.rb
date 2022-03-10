@@ -12,7 +12,7 @@ class CdxCheckbox < SitePrism::Section
   end
 
   private
-  
+
   def check
     return if checked?
     root_element.click
@@ -28,6 +28,6 @@ class CdxCheckbox < SitePrism::Section
   end
 
   def checkbox_field
-    page.find("##{root_element['for']}", visible: false)
+    parent_page.find("##{root_element['for']}", visible: false)
   end
 end

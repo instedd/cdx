@@ -10,24 +10,17 @@ require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'rspec/collection_matchers'
 require 'coffee_script'
-
 require 'capybara/rspec'
-# require 'capybara/mechanize'
-require 'capybara/poltergeist'
+
 require 'webmock/rspec'
-require 'capybara-screenshot/rspec'
-
-Capybara.javascript_driver = :poltergeist
-
-# HTTPI.log = false
-# Savon.log = false
+ALLOWED_WEBMOCK_HOSTS = [/fonts\.googleapis\.com/, /elasticsearch/]
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("features/support/page_objects/*.rb")].each {|f| require f}
 Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
-WebMock.disable_net_connect!(:allow_localhost => true, allow: [/fonts\.googleapis\.com/, /elasticsearch/])
+WebMock.disable_net_connect!(:allow_localhost => true, allow: ALLOWED_WEBMOCK_HOSTS.compact)
 
 # This is to make machinist work with Rails 4
 class ActiveRecord::Reflection::AssociationReflection

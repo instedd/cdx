@@ -1,7 +1,7 @@
 module CdxPageHelper
   # source: https://robots.thoughtbot.com/automatically-wait-for-ajax-with-capybara
   def wait_for_ajax
-    Timeout.timeout(Capybara.default_wait_time) do
+    Timeout.timeout(Capybara.default_max_wait_time) do
       loop until finished_all_ajax_requests?
     end
   end
@@ -12,7 +12,19 @@ module CdxPageHelper
   end
 
   def finished_all_ajax_requests?
-    return true unless page.current_url.start_with?("http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}")
+    return true unless page.current_host == test_server_host
     page.evaluate_script('window.jQuery && jQuery.active').try(&:zero?)
+  end
+
+  private
+
+  # The server is `nil` for `:rack_test` driver which uses www.example.com internally:
+  def test_server_host
+    @test_server_host ||=
+      if server = Capybara.current_session.server
+        "#{server.host}:#{server.port}"
+      else
+        "www.example.com"
+      end
   end
 end
