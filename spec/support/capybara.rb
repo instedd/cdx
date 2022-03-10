@@ -9,10 +9,11 @@ else
 end
 
 # Configure the capybara test server on an IP accessible from the network, so we
-# can use a remote selenium server from the host, another docker container, ...
+# can use a remote selenium server from another compose service (or the host).
 ENV['SERVER_HOST'] ||= Socket.ip_address_list.find(&:ipv4_private?).ip_address
 ENV['SERVER_PORT'] ||= '4000'
 ENV['HEADLESS'] ||= 'true'
+ENV['SELENIUM_URL'] ||= 'http://selenium:4444/'
 
 Capybara.configure do |config|
   config.server = :puma, { Silent: true }
@@ -22,10 +23,7 @@ end
 
 if defined?(ALLOWED_WEBMOCK_HOSTS)
   ALLOWED_WEBMOCK_HOSTS << /http:\/\/#{Capybara.server_host}:#{Capybara.server_port}/
-
-  if url = ENV["SELENIUM_URL"].presence
-    ALLOWED_WEBMOCK_HOSTS << /^#{Regexp.escape(url)}/
-  end
+  ALLOWED_WEBMOCK_HOSTS << /^#{Regexp.escape(ENV["SELENIUM_URL"])}/
 end
 
 Capybara.register_driver :selenium do |app|
@@ -40,11 +38,7 @@ Capybara.register_driver :selenium do |app|
     options.args << "--headless" if ENV['HEADLESS'] == "true"
   end
 
-  if url = ENV['SELENIUM_URL'].presence
-    Capybara::Selenium::Driver.new(app, browser: browser, options: options, url: url)
-  else
-    Capybara::Selenium::Driver.new(app, browser: browser, options: options)
-  end
+  Capybara::Selenium::Driver.new(app, browser: browser, options: options, url: ENV['SELENIUM_URL'])
 end
 
 # NOTE: consider using :rack_test when possible because it's _much_ faster

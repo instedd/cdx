@@ -27,6 +27,14 @@ services:
       - elasticsearch
     command: /bin/sh -c './bin/rails s -b 0.0.0.0'
 
+  selenium:
+    build:
+      context: .
+      dockerfile: Dockerfile.selenium
+    working_dir: /src
+    volumes:
+      - .:/src # we mount the source to be able to attach fixture files
+
   db:
     image: mysql:5.7
     environment:
