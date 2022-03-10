@@ -1,4 +1,5 @@
 class SamplesController < ApplicationController
+  include Concerns::ViewHelper
 
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLE)
@@ -192,6 +193,7 @@ class SamplesController < ApplicationController
 
   def transfer
     new_owner = Institution.find_by(uuid: params["institution_id"])
+
     if new_owner.nil?
       flash[:notice] = "Destination Institution does not exists"
     else
@@ -213,13 +215,30 @@ class SamplesController < ApplicationController
     Sample.transaction do
       samples.each do |to_transfer|
         raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
-        to_transfer.old_batch_number = to_transfer.batch.batch_number unless to_transfer.batch.nil?
+
+        unless to_transfer.batch.nil?
+          if params["includes_qc_info"] == "true"
+            qc_info = create_qc_info(to_transfer)
+            to_transfer.qc_info_id = qc_info.id if qc_info
+            to_transfer.old_batch_number = to_transfer.batch.batch_number
+          end
+        end
         to_transfer.batch_id = nil
         to_transfer.site_id = nil
         to_transfer.institution = new_owner
         to_transfer.save!
       end
     end
+  end
+
+  def create_qc_info(sample)
+    sample_qc = sample.batch.qc_sample
+    return if sample_qc.nil?
+
+    qc_info = QcInfo.find_or_duplicate_from(sample_qc)
+    qc_info.samples << sample
+    qc_info.save!
+    qc_info
   end
 
   def sample_params
@@ -242,23 +261,6 @@ class SamplesController < ApplicationController
     end
 
     sample_params
-  end
-
-  def date_format
-    { pattern: I18n.t('date.input_format.pattern'), placeholder: I18n.t('date.input_format.placeholder') }
-  end
-
-  def view_helper(save_back_path = false)
-    if save_back_path
-      session[:back_path] = URI(request.referer || '').path
-    end
-    back_path = session[:back_path] || samples_path
-
-    { date_produced_placeholder: date_format[:placeholder], back_path: back_path }
-  end
-
-  def back_path()
-    session.delete(:back_path) || samples_path
   end
 
   def user_can_delete_notes(notes)
