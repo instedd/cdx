@@ -45,13 +45,88 @@ RSpec.describe SampleTransfer, type: :model do
       end
 
       expect(transfer).to be_confirmed
+      expect(transfer).to be_changed
     end
 
-    it "errors if already confirmed" do
+    it "returns false if already confirmed" do
       transfer = SampleTransfer.make(:confirmed)
-      expect { transfer.confirm }.not_to change { transfer.confirmed_at }
-      expect(transfer.confirm).to be false
-      expect(transfer.errors).to have_key(:confirmed_at)
+
+      expect {
+        expect(transfer.confirm).to be false
+      }.not_to change { transfer.confirmed_at }
+    end
+  end
+
+  describe "#confirm!" do
+    it "sets confirmed_at" do
+      transfer = SampleTransfer.make
+      expect(transfer).not_to be_confirmed
+
+      Timecop.freeze do
+        expect(transfer.confirm!).to be true
+        expect(transfer.confirmed_at).to eq Time.now
+      end
+
+      expect(transfer).to be_confirmed
+      expect(transfer).not_to be_changed
+    end
+
+    it "raises if already confirmed" do
+      transfer = SampleTransfer.make(:confirmed)
+
+      expect {
+        expect { transfer.confirm! }.to raise_error(ActiveRecord::RecordNotSaved)
+      }.not_to change { transfer.confirmed_at }
+    end
+  end
+
+  describe "#confirm_and_apply" do
+    it "confirms and assigns institution" do
+      transfer = SampleTransfer.make
+      expect(transfer).not_to be_confirmed
+
+      Timecop.freeze do
+        expect(transfer.confirm_and_apply).to be true
+        expect(transfer.confirmed_at).to eq Time.now
+      end
+
+      transfer.sample.reload
+      expect(transfer.sample.institution).to eq(transfer.receiver_institution)
+      expect(transfer).to be_confirmed
+      expect(transfer).not_to be_changed
+    end
+
+    it "returns false if already confirmed" do
+      transfer = SampleTransfer.make(:confirmed)
+
+      expect {
+        expect(transfer.confirm_and_apply).to be false
+      }.not_to change { transfer.confirmed_at }
+    end
+  end
+
+  describe "#confirm_and_apply!" do
+    it "confirms and assigns institution" do
+      transfer = SampleTransfer.make
+      expect(transfer).not_to be_confirmed
+
+      Timecop.freeze do
+        transfer.confirm_and_apply!
+        expect(transfer.confirmed_at).to eq Time.now
+      end
+
+      transfer.sample.reload
+      expect(transfer.sample.institution).to eq(transfer.receiver_institution)
+      expect(transfer).to be_confirmed
+      expect(transfer).not_to be_changed
+    end
+
+    it "returns false if already confirmed" do
+      transfer = SampleTransfer.make(:confirmed)
+
+      expect {
+        expect { transfer.confirm_and_apply! }.to raise_error(ActiveRecord::RecordNotSaved)
+      }.not_to change { [transfer.confirmed_at, transfer.sample.institution] }
     end
   end
 end

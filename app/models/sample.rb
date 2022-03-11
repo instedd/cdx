@@ -23,7 +23,6 @@ class Sample < ActiveRecord::Base
   accepts_nested_attributes_for :notes, allow_destroy: true
   validates_associated :notes, message: "are invalid"
 
-  validates_presence_of :institution
   validate :validate_encounter
   validate :validate_patient
 
@@ -67,6 +66,10 @@ class Sample < ActiveRecord::Base
     uuids.sort.first
   end
 
+  def partial_uuid
+    uuid.to_s[0..-5]
+  end
+
   def entity_ids
     self.sample_identifiers.map(&:entity_id)
   end
@@ -81,5 +84,17 @@ class Sample < ActiveRecord::Base
 
   def has_entity_id?
     entity_ids.compact.any?
+  end
+
+  def start_transfer_to(new_owner)
+    transfer = SampleTransfer.create!(
+      sample: self,
+      receiver_institution: new_owner,
+    )
+
+    self.old_batch_number = batch.batch_number unless batch.nil?
+    update!(batch: nil, site: nil, institution: nil)
+
+    transfer
   end
 end

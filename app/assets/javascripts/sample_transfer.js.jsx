@@ -51,8 +51,8 @@ var SampleTransferModal = React.createClass({
       samples: this.state.selectedSamples.map((sample) => sample.uuid)
     }
     $.ajax({
-      url: '/samples/transfer',
-      method: 'GET',
+      url: '/sample_transfers',
+      method: 'POST',
       data: data,
       success: function () {
         this.closeModal();

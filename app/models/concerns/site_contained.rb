@@ -8,7 +8,6 @@ module SiteContained
     belongs_to :institution
     belongs_to :site, -> { with_deleted }
 
-    validates_presence_of :institution
     validate :same_institution_of_site
     before_save :set_site_prefix
 

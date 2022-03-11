@@ -5,7 +5,7 @@ class SamplesController < ApplicationController
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLE)
 
     @samples = Sample.where(institution: @navigation_context.institution)
-    @samples = check_access(@samples, READ_SAMPLE).order('created_at DESC')
+    @samples = check_access(@samples, READ_SAMPLE).order("created_at DESC")
 
     @samples = @samples.within(@navigation_context.entity, @navigation_context.exclude_subsites)
 
@@ -18,7 +18,7 @@ class SamplesController < ApplicationController
       .where()
       .not(uuid: @navigation_context.institution.uuid)
       .pluck(:uuid, :name)
-      .map{|uuid, name| {value: uuid, label: name}}
+      .map { |uuid, name| { value: uuid, label: name } }
 
     @samples = perform_pagination(@samples)
   end
@@ -28,7 +28,7 @@ class SamplesController < ApplicationController
     @sample_form = SampleForm.for(sample)
     return unless authorize_resource(sample, READ_SAMPLE)
 
-    @view_helper = view_helper({save_back_path: true})
+    @view_helper = view_helper({ save_back_path: true })
 
     @show_barcode_preview = true
     @show_print_action = true
@@ -36,7 +36,7 @@ class SamplesController < ApplicationController
     @can_delete = false
     @can_update = false
 
-    render action: 'edit'
+    render action: "edit"
   end
 
   def new
@@ -45,13 +45,13 @@ class SamplesController < ApplicationController
     sample = Sample.new({
       institution: @navigation_context.institution,
       site: @navigation_context.site,
-      sample_identifiers: [SampleIdentifier.new({uuid: session[:creating_sample_uuid]})]
+      sample_identifiers: [SampleIdentifier.new({ uuid: session[:creating_sample_uuid] })],
     })
 
     @sample_form = SampleForm.for(sample)
     prepare_for_institution_and_authorize(@sample_form, CREATE_INSTITUTION_SAMPLE)
 
-    @view_helper = view_helper({save_back_path: true})
+    @view_helper = view_helper({ save_back_path: true })
     @show_barcode_preview = false
     @can_update = true
   end
@@ -62,24 +62,24 @@ class SamplesController < ApplicationController
 
     uuid = session[:creating_sample_uuid]
     if uuid.blank?
-      redirect_to new_sample_path, notice: 'There was an error creating the sample'
+      redirect_to new_sample_path, notice: "There was an error creating the sample"
       return
     end
 
     sample = Sample.new(sample_params.merge({
       institution: institution,
       site: @navigation_context.site,
-      sample_identifiers: [SampleIdentifier.new({uuid: uuid})]
+      sample_identifiers: [SampleIdentifier.new({ uuid: uuid })],
     }))
     @sample_form = SampleForm.for(sample)
 
     if @sample_form.save
       session.delete(:creating_sample_uuid)
-      redirect_to samples_path, notice: 'Sample was successfully created.'
+      redirect_to samples_path, notice: "Sample was successfully created."
     else
       @view_helper = view_helper
       @can_update = true
-      render action: 'new'
+      render action: "new"
     end
   end
 
@@ -90,20 +90,20 @@ class SamplesController < ApplicationController
     @show_print_action = false
 
     render pdf: "cdx_sample_#{@sample.uuid}",
-      template: 'samples/barcode.pdf',
-      layout: 'layouts/pdf.html',
+      template: "samples/barcode.pdf",
+      layout: "layouts/pdf.html",
       locals: { :sample => @sample },
       margin: { top: 0, bottom: 0, left: 0, right: 0 },
-      page_width: '1in',
-      page_height: '1in',
-      show_as_html: params.key?('debug')
+      page_width: "1in",
+      page_height: "1in",
+      show_as_html: params.key?("debug")
   end
 
   def bulk_print
     sample_ids = params[:sample_ids]
 
     if sample_ids.blank?
-      redirect_to samples_path, notice: 'Select at least one sample to print.'
+      redirect_to samples_path, notice: "Select at least one sample to print."
       return
     end
 
@@ -111,24 +111,24 @@ class SamplesController < ApplicationController
     return unless authorize_resources(samples, READ_SAMPLE)
 
     sample_strings = samples.map do |sample|
-      render_to_string template: 'samples/barcode.pdf',
-        layout: 'layouts/pdf.html',
-        locals: {:sample => sample}
+      render_to_string template: "samples/barcode.pdf",
+        layout: "layouts/pdf.html",
+        locals: { :sample => sample }
     end
 
     options = {
       margin: { top: 0, bottom: 0, left: 0, right: 0 },
-      page_width: '1in',
-      page_height: '1in'
+      page_width: "1in",
+      page_height: "1in",
     }
 
     begin
       pdf_file = MultipagePdfRenderer.combine(sample_strings, options)
-      pdf_filename = "cdx_samples_#{samples.size}_#{DateTime.now.strftime('%Y%m%d-%H%M')}.pdf"
+      pdf_filename = "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}.pdf"
 
-      send_data pdf_file, type: 'application/pdf', filename: pdf_filename
+      send_data pdf_file, type: "application/pdf", filename: pdf_filename
     rescue
-      redirect_to samples_path, notice: 'There was an error creating the print file.'
+      redirect_to samples_path, notice: "There was an error creating the print file."
     end
   end
 
@@ -137,7 +137,7 @@ class SamplesController < ApplicationController
     @sample_form = SampleForm.for(sample)
     return unless authorize_resource(sample, UPDATE_SAMPLE)
 
-    @view_helper = view_helper({save_back_path: true})
+    @view_helper = view_helper({ save_back_path: true })
 
     @show_barcode_preview = true
     @show_print_action = true
@@ -153,16 +153,16 @@ class SamplesController < ApplicationController
 
     params = sample_params
     unless user_can_delete_notes(params["notes_attributes"] || [])
-      redirect_to edit_sample_path(sample.id), notice: 'Update failed: Notes can only be deleted by their authors'
+      redirect_to edit_sample_path(sample.id), notice: "Update failed: Notes can only be deleted by their authors"
       return
     end
 
     if @sample_form.update(sample_params)
-      redirect_to back_path, notice: 'Sample was successfully updated.'
+      redirect_to back_path, notice: "Sample was successfully updated."
     else
       @view_helper = view_helper
       @can_update = true
-      render action: 'edit'
+      render action: "edit"
     end
   end
 
@@ -172,14 +172,14 @@ class SamplesController < ApplicationController
 
     @sample.destroy
 
-    redirect_to samples_path, notice: 'Sample was successfully deleted.'
+    redirect_to samples_path, notice: "Sample was successfully deleted."
   end
 
   def bulk_destroy
     sample_ids = params[:sample_ids]
 
     if sample_ids.blank?
-      redirect_to samples_path, notice: 'Select at least one sample to destroy.'
+      redirect_to samples_path, notice: "Select at least one sample to destroy."
       return
     end
 
@@ -188,65 +188,10 @@ class SamplesController < ApplicationController
 
     samples.destroy_all
 
-    redirect_to samples_path, notice: 'Samples were successfully deleted.'
-  end
-
-  def transfer
-    new_owner = Institution.find_by(uuid: params["institution_id"])
-
-    if new_owner.nil?
-      flash[:notice] = "Destination Institution does not exists"
-    else
-      begin
-        change_ownership(new_owner)
-        flash[:notice] = "All samples has been transferred successfully."
-      rescue
-        flash[:notice] = "Samples transfer failed."
-      end
-    end
-
-    render json: {status: :ok}
+    redirect_to samples_path, notice: "Samples were successfully deleted."
   end
 
   private
-
-  def change_ownership(new_owner)
-    samples = Sample.joins(:sample_identifiers).where("sample_identifiers.uuid": params["samples"])
-    Sample.transaction do
-      samples.each do |to_transfer|
-        raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
-
-        transfer = SampleTransfer.new(
-          sample: to_transfer,
-          receiver_institution: new_owner,
-        )
-        transfer.confirm
-        transfer.save!
-
-        unless to_transfer.batch.nil?
-          if params["includes_qc_info"] == "true"
-            qc_info = create_qc_info(to_transfer)
-            to_transfer.qc_info_id = qc_info.id if qc_info
-            to_transfer.old_batch_number = to_transfer.batch.batch_number
-          end
-        end
-        to_transfer.batch_id = nil
-        to_transfer.site_id = nil
-        to_transfer.institution = new_owner
-        to_transfer.save!
-      end
-    end
-  end
-
-  def create_qc_info(sample)
-    sample_qc = sample.batch.qc_sample
-    return if sample_qc.nil?
-
-    qc_info = QcInfo.find_or_duplicate_from(sample_qc)
-    qc_info.samples << sample
-    qc_info.save!
-    qc_info
-  end
 
   def sample_params
     sample_params = params.require(:sample).permit(
@@ -256,7 +201,7 @@ class SamplesController < ApplicationController
       :isolate_name,
       :inactivation_method,
       :volume,
-      assay_attachments_attributes: [ :id, :loinc_code_id, :result, :assay_file_id, :_destroy ],
+      assay_attachments_attributes: [:id, :loinc_code_id, :result, :assay_file_id, :_destroy],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
     )
 
@@ -281,5 +226,4 @@ class SamplesController < ApplicationController
       .find(notes_id_to_destroy)
       .all? { |db_note| db_note.user_id == current_user.id }
   end
-
 end

@@ -1,5 +1,5 @@
-class ListSampleTransfersPage < CdxPageBase
-  set_url "/sample_transfers"
+class ListSamplesPage < CdxPageBase
+  set_url "/samples"
 
   section :filters, "#filters-form" do
     element :sample_id, :field, "Sample ID"
@@ -19,7 +19,13 @@ class ListSampleTransfersPage < CdxPageBase
     find("tr", text: uuid)
   end
 
-  section :confirm_receipt_modal, ".modal" do
+  section :actions, ".table-actions" do
+    element :bulk_transfer, :link, "#bulk_transfer"
+  end
+
+  section :bulk_transfer_modal, ".modal" do
+    element :institution, :field, "Institution"
+
     def submit
       root_element.native.send_keys :enter
       wait_for_submit

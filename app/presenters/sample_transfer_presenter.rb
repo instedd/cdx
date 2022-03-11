@@ -27,10 +27,6 @@ class SampleTransferPresenter
     end
   end
 
-  def can_confirm?
-    true
-  end
-
   def status
     confirmed? ? "confirmed" : "in-transit"
   end
@@ -40,6 +36,14 @@ class SampleTransferPresenter
       "receiver"
     elsif sender?
       "sender"
+    end
+  end
+
+  def sample_uuid
+    if confirmed?
+      sample.uuid
+    else
+      sample.partial_uuid + "XXXX"
     end
   end
 end

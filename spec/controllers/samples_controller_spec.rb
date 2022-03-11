@@ -73,6 +73,15 @@ RSpec.describe SamplesController, type: :controller do
       expect(response).to be_success
       expect(assigns(:samples).count).to eq(2)
     end
+
+    it "excludes samples in transit" do
+      sample = Sample.make(institution: institution)
+      SampleTransfer.make(sample: sample)
+      sample.update_attribute("institution", nil)
+
+      get :index
+      expect(assigns(:samples)).to be_empty
+    end
   end
 
   context "show" do
