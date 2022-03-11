@@ -13,7 +13,7 @@ require 'coffee_script'
 require 'capybara/rspec'
 
 require 'webmock/rspec'
-ALLOWED_WEBMOCK_HOSTS = [/fonts\.googleapis\.com/, /elasticsearch/]
+ALLOWED_WEBMOCK_HOSTS = [/elasticsearch/]
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -69,12 +69,6 @@ RSpec.configure do |config|
   config.include ManifestSpecHelper
   config.include CdxFieldsHelper
   config.include FeatureSpecHelpers, :type => :feature
-
-  config.before(:each) do
-    stub_request(:get, "http://fonts.googleapis.com/css").
-         with(:query => hash_including(:family)).
-         to_return(:status => 200, :body => "", :headers => {})
-  end
 
   config.before(:suite) do
     LocationService.fake!

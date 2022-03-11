@@ -1,6 +1,16 @@
+def next?(next_version = nil, current_version = nil)
+  is_next = File.basename(__FILE__) == "Gemfile.next"
+
+  if next_version && current_version
+    is_next ? next_version : current_version
+  else
+    is_next
+  end
+end
+
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.11'
+gem 'rails', next?('~> 5.0.0', '~> 4.2.11')
 gem 'rake', '~> 10.5.0'
 
 # Databases
@@ -12,7 +22,7 @@ gem 'encryptor', '~> 1.3'
 gem 'kaminari', '~> 0.16'
 gem 'paperclip', git: 'https://github.com/instedd/paperclip', branch: 'fix/v4.3.6-no-mimemagic'
 gem 'paranoia', '<= 2.4.2' # last version to support ruby 2.2
-gem 'premailer-rails', '~> 1.8'
+gem 'premailer-rails', '< 1.10' # 1.10 requires Rails.application.assets_manifest
 
 # Views
 gem 'csv_builder', '~> 2.1'
@@ -41,7 +51,7 @@ gem 'faker' # NOTE: until we upgrade to ruby 2.5+ then we can upgrade to ffaker 
 gem 'ffaker'
 gem 'guid', '~> 0.1'
 gem 'nokogiri', '~> 1.6'
-gem 'oj', '~> 2.12'
+gem 'oj', '~> 2.12', '< 2.17.3' # NOTE: 2.17.3 will stringify Time as a Float then load a BigDecimal...
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'rails-i18n', '~> 4.0'
 gem 'rchardet', '~> 1.6'
@@ -72,27 +82,28 @@ gem 'nuntium_api', '~> 0.21'
 gem 'sentry-raven', '~> 2.13'
 
 # Assets
+gem 'execjs', '< 2.8.0' # 2.8 removed support for therubyracer
 gem 'gon', '~> 6.0'
-gem 'therubyracer', '~> 0.12'
 gem 'sass-rails', '~> 4.0'
+gem 'therubyracer', '~> 0.12' # FIXME: deprecated for years
 gem 'turbolinks', '~> 2.5'
-gem 'uglifier', '>= 2.7.2'
+gem 'uglifier', '~> 2.7'
 
-gem 'd3_rails', '~> 3.5'
-gem 'dropzonejs-rails', '~> 0.8'
-gem 'jquery-rails', '~> 4.0'
-gem 'jquery-turbolinks', '~> 2.1'
-gem 'leaflet-rails', '~> 0.7'
-gem 'lodash-rails', '~> 3.10'
-gem 'react-rails', '~> 1.3'
+gem 'd3_rails', '~> 3.5.6'
+gem 'dropzonejs-rails', '~> 0.8.4'
+gem 'jquery-rails', '~> 4.0.4'
+gem 'jquery-turbolinks', '~> 2.1.0'
+gem 'leaflet-rails', '~> 0.7.4'
+gem 'lodash-rails', '~> 3.10.1'
+gem 'react-rails', '~> 1.3.2'
 
 source 'https://rails-assets.org' do
-  gem 'rails-assets-urijs', '~> 1.17'
+  gem 'rails-assets-urijs', '~> 1.17.0'
 end
 
 group :development do
   gem 'letter_opener'
-  gem 'quiet_assets'
+  gem 'quiet_assets' unless next?
   gem 'web-console', '~> 2.0'
 end
 
@@ -114,7 +125,7 @@ group :test do
   gem 'machinist', '~> 2.0' # NOTE: eventually replace with FactoryBot
   gem 'simplecov', require: false
   gem 'timecop', '~> 0.8'
-  gem 'webmock', '~> 1.12', require: false
+  gem 'webmock', '~> 1.23.0', require: false # a spec fails with 1.24.x
 
   # integration tests
   gem 'capybara', '~> 2.4'

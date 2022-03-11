@@ -15,6 +15,11 @@ RSpec.describe SamplesController, type: :controller do
   before(:each) do
     grant user, other_user, institution, READ_INSTITUTION
     sign_in user
+
+    # WickedPDF will try to request Google Fonts
+    stub_request(:get, %r{^https://fonts\.googleapis\.com/css})
+      .with(:query => hash_including("family"))
+      .to_return(:status => 200, :body => "", :headers => {})
   end
 
   context "index" do

@@ -13,9 +13,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
   before(:each) { sign_in user }
 
-  def get_updates(options, body="")
+  def get_updates(params, body="")
     refresh_index
-    response = get :index, body, options.merge(format: 'json')
+    response = get :index, body, params.merge(format: 'json').stringify_keys
     expect(response.status).to eq(200)
     Oj.load(response.body)["tests"]
   end
