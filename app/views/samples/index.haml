@@ -36,7 +36,10 @@
                 %td
                   =check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
                   %label.row{for: "sample_ids.#{sample.id}"}
-                %td= sample.uuid
+                %td.middle-ellipsis{title:sample.uuid} 
+                  %span.elide
+                    %span.head=sample.uuid
+                    %span.tail=sample.uuid
                 %td= sample.isolate_name
                 %td= sample.inactivation_method
                 %td= sample.specimen_role_description

@@ -80,6 +80,28 @@
         color: $gray2;
         font-style: italic;
       }
+
+      &.middle-ellipsis {
+        >span.elide {
+          display: flex;
+          max-width: 100%;
+          user-select: all;
+          
+          >span.head {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 1em;
+          }
+          
+          >span.tail {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 1em;
+            direction: rtl;
+            text-align: left;
+          }
+        }
+      }
     }
 
     tr:last-child th {
