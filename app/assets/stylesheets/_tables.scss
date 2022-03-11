@@ -82,18 +82,18 @@
       }
 
       &.middle-ellipsis {
-        >span.elide {
+        >span.middle-ellipsis-elide {
           display: flex;
           max-width: 100%;
           user-select: all;
           
-          >span.head {
+          >span.middle-ellipsis-head {
             overflow: hidden;
             text-overflow: ellipsis;
             min-width: 1em;
           }
           
-          >span.tail {
+          >span.middle-ellipsis-tail {
             overflow: hidden;
             text-overflow: ellipsis;
             min-width: 1em;
