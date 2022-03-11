@@ -216,6 +216,13 @@ class SamplesController < ApplicationController
       samples.each do |to_transfer|
         raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
 
+        transfer = SampleTransfer.new(
+          sample: to_transfer,
+          receiver_institution: new_owner,
+        )
+        transfer.confirm
+        transfer.save!
+
         unless to_transfer.batch.nil?
           if params["includes_qc_info"] == "true"
             qc_info = create_qc_info(to_transfer)

@@ -533,6 +533,20 @@ ActiveRecord::Schema.define(version: 20220222115959) do
   add_index "sample_identifiers", ["sample_id"], name: "index_sample_identifiers_on_sample_id", using: :btree
   add_index "sample_identifiers", ["uuid"], name: "index_sample_identifiers_on_uuid", unique: true, using: :btree
 
+  create_table "sample_transfers", force: :cascade do |t|
+    t.integer  "sample_id",               limit: 4
+    t.integer  "sender_institution_id",   limit: 4
+    t.integer  "receiver_institution_id", limit: 4
+    t.datetime "confirmed_at"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "sample_transfers", ["confirmed_at"], name: "index_sample_transfers_on_confirmed_at", using: :btree
+  add_index "sample_transfers", ["receiver_institution_id"], name: "index_sample_transfers_on_receiver_institution_id", using: :btree
+  add_index "sample_transfers", ["sample_id"], name: "index_sample_transfers_on_sample_id", using: :btree
+  add_index "sample_transfers", ["sender_institution_id"], name: "index_sample_transfers_on_sender_institution_id", using: :btree
+
   create_table "samples", force: :cascade do |t|
     t.binary   "sensitive_data",   limit: 65535
     t.integer  "institution_id",   limit: 4

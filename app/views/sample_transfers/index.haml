@@ -1,0 +1,57 @@
+= render "filters"
+
+.row
+  .col
+    - if @sample_transfers.empty?
+      = empty_data icon: 'icon-outline-test xx-large' do |c|
+        - c.body do
+          %h1 There are no sample transfers
+    - else
+      = cdx_table title: pluralize(@total, "sample transfer") do |t|
+        - t.columns do
+          %col{:width => "20%"}
+          %col{:width => "20%"}
+          %col{:width => "20%"}
+          %col{:width => "20%"}
+          %col{:width => "25%"}
+        - t.thead do
+          %tr
+            %th Sample Id
+            %th Isolate Name
+            %th Inactivation Method
+            %th Transfer
+            %th Status
+        - t.tbody do
+          - @sample_transfers.each do |transfer|
+            %tr.laboratory-sample-row{class: ("faded" if transfer.confirmed?)}
+              %td= transfer.sample.uuid
+              %td= transfer.sample.isolate_name
+              %td= transfer.sample.inactivation_method
+              %td= transfer.other_institution
+              - if confirmed_at = transfer.confirmed_at
+                %td{title: "#{transfer.receiver_institution} confirmed receipt on #{I18n.l(confirmed_at)}"}
+                  = transfer.receiver? ? "Receipt confirmed on" : "Delivery confirmed on"
+                  = time_tag confirmed_at, I18n.l(confirmed_at, format: I18n.t("date.formats.long"))
+              - else
+                %td{title: "#{transfer.sender_institution} sent on #{I18n.l(transfer.created_at)}, unconfirmed by #{transfer.receiver_institution}"}
+                  - if transfer.receiver?
+                    - if transfer.can_confirm?
+                      %button{disabled: "disabled"} Confirm receipt
+                    - else
+                      Unconfirmed
+                  - else
+                    Sent on
+                    = time_tag transfer.created_at, I18n.l(transfer.created_at, format: I18n.t("date.formats.long"))
+
+      .pagination
+        = render 'shared/pagination'
+
+  .col.pe-1.tab-buttons
+    .tab-separator
+    .icons-group
+      = link_to samples_path do
+        .icon-sample.tab-sample{title: "Samples"}
+      = link_to batches_path do
+        .icon-batch.tab-batch{title: "Batches"}
+      .selected-icon-tab
+        .icon-transfer.tab-transfer.selected{title: "Transfers"}
