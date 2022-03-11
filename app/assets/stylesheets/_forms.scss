@@ -468,3 +468,11 @@ label.on {
   display: flex;
   align-items: center;
 }
+
+input + .error {
+  visibility: hidden;
+}
+
+input.input-required + .error {
+  visibility: visible;
+}

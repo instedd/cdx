@@ -20,9 +20,11 @@ class ListSampleTransfersPage < CdxPageBase
   end
 
   section :confirm_receipt_modal, ".modal" do
+    element :uuid_check, :field, "Sample ID"
+    element :submit_button, :button, "Confirm"
+
     def submit
-      root_element.native.send_keys :enter
-      wait_for_submit
+      submit_button.click
     end
   end
 end

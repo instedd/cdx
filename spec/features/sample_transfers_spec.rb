@@ -80,6 +80,8 @@ describe "sample transfers" do
         page.confirm_receipt_modal.tap do |modal|
           expect(modal).to have_content("Confirm receipt")
 
+          modal.uuid_check.set sample.uuid[-4..-1]
+
           modal.submit
         end
       end
@@ -91,6 +93,49 @@ describe "sample transfers" do
       goto_page ListSamplesPage do |page|
         expect(page).to have_content(sample.uuid)
       end
+    end
+
+    it "verifies sample id" do
+      sample = Sample.make!(:filled, institution: institution_a)
+      transfer = sample.start_transfer_to(institution_b)
+
+      sign_in user_b
+
+      goto_page ListSampleTransfersPage do |page|
+        page.entry(sample.partial_uuid).find_link("Confirm receipt").click
+
+        page.confirm_receipt_modal.tap do |modal|
+          expect(modal).to have_content("Confirm receipt")
+
+          expect(modal).not_to have_content("Invalid sample ID")
+          expect(modal).not_to have_submit_button
+
+          modal.uuid_check.set "a"
+          expect(modal).not_to have_content("Invalid sample ID")
+          expect(modal).not_to have_submit_button
+
+          modal.uuid_check.set "x"
+          expect(modal).to have_content("Invalid sample ID")
+          expect(modal).not_to have_submit_button
+
+          modal.uuid_check.set "xxxx"
+          expect(modal).to have_content("Invalid sample ID")
+          expect(modal).not_to have_submit_button
+
+          modal.uuid_check.set "1111"
+          expect(modal).to have_content("Invalid sample ID")
+          expect(modal).not_to have_submit_button
+
+          modal.uuid_check.set sample.uuid[-4..-1]
+          expect(modal).not_to have_content("Invalid sample ID")
+          expect(modal).to have_submit_button
+
+          modal.submit
+        end
+      end
+
+      transfer.reload
+      expect(transfer).to be_confirmed
     end
   end
 end
