@@ -69,6 +69,7 @@ class SampleTransfersController < ApplicationController
     Sample.transaction do
       samples.each do |to_transfer|
         raise "User not authorized for transferring Samples " unless authorize_resource?(to_transfer, UPDATE_SAMPLE)
+        raise "QC Samples can't be transferred" if to_transfer.is_quality_control?
 
         unless to_transfer.batch.nil?
           if params["includes_qc_info"] == "true"

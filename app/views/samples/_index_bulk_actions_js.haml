@@ -2,6 +2,7 @@
   (function() {
     allCheckboxes().on('change', function(e) {
       toggleBulkActions();
+      toggleBulkTransfer($(e.target))
     });
 
     // initial bulk actions state
@@ -24,6 +25,20 @@
       $("#" + id).prop('disabled', selectedNone);
     });
   }
+
+  function toggleBulkTransfer(checkbox) {
+    var row = checkbox.parents('.laboratory-sample-row')
+    if (checkbox.is(':checked')){
+      if(row.data().isQc){
+        $("#bulk_transfer").prop('disabled', true);
+        $('#table-notification').css("visibility", "visible");
+      }
+    }
+    else {
+      $('#table-notification').css("visibility", "hidden");
+    }
+  }
+
 
   function selectedCheckboxes() {
     return allCheckboxes().filter(":checked");
