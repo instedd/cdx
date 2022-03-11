@@ -193,16 +193,6 @@ class SamplesController < ApplicationController
 
   private
 
-  def create_qc_info(sample)
-    sample_qc = sample.batch.qc_sample
-    return if sample_qc.nil?
-
-    qc_info = QcInfo.find_or_duplicate_from(sample_qc)
-    qc_info.samples << sample
-    qc_info.save!
-    qc_info
-  end
-
   def sample_params
     sample_params = params.require(:sample).permit(
       :date_produced,
