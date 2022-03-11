@@ -11,28 +11,19 @@ RSpec.describe SampleTransfersController, type: :controller do
       sign_in current_user
     end
 
-    it "includes transfers from and to my institution" do
-      sample_transfers = [
-        SampleTransfer.make!(sender_institution: my_institution),
-        SampleTransfer.make!(receiver_institution: my_institution),
-      ]
-      get :index
-      expect(assigns(:sample_transfers).map(&:transfer)).to eq sample_transfers
-    end
-
-    it "excludes transfers not from or to my institution" do
-      SampleTransfer.make!
-      get :index
-      expect(assigns(:sample_transfers)).to be_empty
-    end
-
-    it "orders transfers by creation date" do
+    it "includes transfers from and to my institution (ordered by creation date)" do
       sample_transfers = [
         SampleTransfer.make!(sender_institution: my_institution, created_at: Time.now - 1.day),
         SampleTransfer.make!(receiver_institution: my_institution, created_at: Time.now),
       ]
       get :index
       expect(assigns(:sample_transfers).map(&:transfer)).to eq sample_transfers.reverse
+    end
+
+    it "excludes transfers not from or to my institution" do
+      SampleTransfer.make!
+      get :index
+      expect(assigns(:sample_transfers)).to be_empty
     end
 
     describe "filters" do
