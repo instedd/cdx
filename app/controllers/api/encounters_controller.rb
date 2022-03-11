@@ -2,12 +2,14 @@ class Api::EncountersController < ApiController
   wrap_parameters false
 
   def index
-    params.delete(:format)
-    params.delete(:controller)
-    params.delete(:action)
     body = Oj.load(request.body.read) || {}
     filters = params.merge(body)
+    filters.delete(:format)
+    filters.delete(:controller)
+    filters.delete(:action)
+
     query = Encounter.query(filters, current_user)
+
     respond_to do |format|
       format.csv do
         @filename = "Encounters-#{DateTime.now.strftime('%Y-%m-%d-%H-%M-%S')}.csv"

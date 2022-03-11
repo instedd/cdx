@@ -15,7 +15,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
 
   def get_updates(options, body="")
     refresh_index
-    response = get :index, body, options.merge(format: 'json')
+    response = get :index, body, options.merge(format: 'json').stringify_keys
     expect(response.status).to eq(200)
     Oj.load(response.body)["encounters"]
   end
