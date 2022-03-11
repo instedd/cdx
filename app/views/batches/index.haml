@@ -3,7 +3,7 @@
 .row
   .col
     - if @batches.empty?
-      = empty_data icon: 'icon-outline-test xx-large' do |c|
+      = empty_data title: 'No batches', icon: 'icon-outline-test xx-large' do |c|
         - c.body do
           %h1 There are no batches
           %p Every batch will hold multiple samples
