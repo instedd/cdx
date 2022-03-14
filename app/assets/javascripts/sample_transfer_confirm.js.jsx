@@ -91,7 +91,7 @@ var SampleTransferConfirmModal = React.createClass({
             <div className="col pe-3"><label htmlFor="uuid_check">Sample ID</label></div>
             <div className="col">
               {this.props.uuid.substr(0, this.props.uuid.length - 4)}
-              <input type="text" id="uuid_check" onChange={this.checkUUID} autoFocus autoComplete="false" size="3" minLength="4" maxLength="4" placeholder="XXXX" required />
+              <input type="text" id="uuid_check" onChange={this.checkUUID} autoFocus autoComplete="false" size="4" minLength="4" maxLength="4" placeholder="XXXX" required />
               <span className="error"><div className="icon-error icon-red" /> Invalid sample ID</span>
             </div>
           </div>
