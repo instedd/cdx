@@ -193,9 +193,11 @@ class ApplicationController < ActionController::Base
   end
 
   def log_authorization_warn(resource, action)
-    resource_name =
-      if resource.is_a? Class
+    resource_name = case resource
+      when Class
         "#{resource} class"
+      when Hash
+        "#{resource[:resource_type].camelize} (id=#{resource[:resource_id]})"
       else
         "#{resource.class} (id=#{resource.id})"
       end

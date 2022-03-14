@@ -49,6 +49,10 @@ describe "Cdx::Api::Elasticsearch::MappingTemplate" do
                 "type"=>"string",
                 "index"=>"not_analyzed"
               },
+              "old_batch_number"=> {
+              "type"=>"string",
+              "index"=>"not_analyzed"
+              },
               "custom_fields" => {
                 "type" => "object"
               }

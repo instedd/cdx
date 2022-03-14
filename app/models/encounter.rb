@@ -12,6 +12,7 @@ class Encounter < ActiveRecord::Base
 
   belongs_to :patient
 
+  validates_presence_of :institution
   validates_presence_of :site, if: Proc.new { |encounter| encounter.institution && !encounter.institution.kind_manufacturer? }
 
   validate :validate_patient

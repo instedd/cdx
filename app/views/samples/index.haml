@@ -11,10 +11,17 @@
       =form_tag bulk_action_samples_path, :id => 'samples_form' , :method => :get do
         = cdx_table title: pluralize(@total, "sample") do |t|
           - t.actions do
-            =button_tag id: 'bulk_print', class: 'btn-link', name: 'bulk_action', value: 'print' do
-              .icon-print.btn-icon
-            =button_tag id: 'bulk_destroy', class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected samples. This action CANNOT be undone. Are you sure you want to proceed?" } do
-              .icon-trash.btn-icon
+            %div.table-info
+              = react_component "SampleTransfer", context: @navigation_context.to_hash, institutions: @institutions
+              =button_tag id: 'bulk_transfer', class: 'btn-link', name: 'bulk_action', value: 'transfer', type: 'button' do
+                .icon-send.btn-icon
+              =button_tag id: 'bulk_print', class: 'btn-link', name: 'bulk_action', value: 'print' do
+                .icon-print.btn-icon
+              =button_tag id: 'bulk_destroy', class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected samples. This action CANNOT be undone. Are you sure you want to proceed?" } do
+                .icon-trash.btn-icon
+              #table-notification.icon-notification.icon-red.table-info.hidden
+                .notification-text= "QC Samples can't be transferred"
+
           - t.columns do
             %col{:width => "5%"}
             %col{:width => "20%"}
@@ -32,12 +39,12 @@
               %th Production Date
           - t.tbody do
             - @samples.each do |sample|
-              %tr.laboratory-sample-row{data: {href: has_access?(sample, Policy::Actions::UPDATE_SAMPLE) ? edit_sample_path(sample) : sample_path(sample)}}
+              %tr.laboratory-sample-row{data: {is_qc: sample.is_quality_control?.to_s, href: has_access?(sample, Policy::Actions::UPDATE_SAMPLE) ? edit_sample_path(sample) : sample_path(sample)}}
                 %td
                   =check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
                   %label.row{for: "sample_ids.#{sample.id}"}
-                %td= sample.uuid
-                %td= sample.isolate_name
+                %td{id: 'sample_uuid'}= sample.uuid
+                %td{id: 'sample_isolate_name'}= sample.isolate_name
                 %td= sample.inactivation_method
                 %td= sample.specimen_role_description
                 %td= sample.date_produced_description
@@ -52,6 +59,8 @@
         .icon-sample.tab-sample.selected{title: "Samples"}
       = link_to batches_path do
         .icon-batch.tab-batch{title: "Batches"}
+      = link_to sample_transfers_path do
+        .icon-transfer.tab-transfer{title: "Transfers"}
 
 = render 'index_js'
 = render 'index_bulk_actions_js'

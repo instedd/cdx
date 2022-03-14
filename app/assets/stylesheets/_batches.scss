@@ -5,6 +5,10 @@
   padding: 5px;
 }
 
+.samples-transfer-modal {
+  min-width: 650px;
+}
+
 .samples-count {
   font-weight: bolder;
   padding-left: 15px;
@@ -64,6 +68,10 @@
   display: flex;
   align-items: center;
   min-height: 40px;
+}
+
+.transfer-data {
+  color: black;
 }
 
 .sample-checkbox {
@@ -139,6 +147,19 @@
   }
 
   .tab-sample {
+    background-color: white;
+    margin-bottom: 10px;
+    font-size: 30px;
+    color: rgba(0, 0, 0, 0.4);
+    padding: 15px 20px;
+    &.selected {
+      padding: 0px 10px;
+      color: black;
+      font-weight: bold;
+    }
+  }
+
+  .tab-transfer {
     background-color: white;
     margin-bottom: 10px;
     font-size: 30px;

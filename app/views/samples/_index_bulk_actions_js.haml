@@ -2,10 +2,17 @@
   (function() {
     allCheckboxes().on('change', function(e) {
       toggleBulkActions();
+      toggleBulkTransfer($(e.target))
     });
 
     // initial bulk actions state
     toggleBulkActions();
+
+    //opens transfer modal
+    $('#bulk_transfer').on('click', function(e) {
+      $('#modal_opener').click()
+    });
+
   })();
 
   function allCheckboxes() {
@@ -19,6 +26,32 @@
     });
   }
 
+  function toggleBulkTransfer(checkbox) {
+    var row = checkbox.parents('.laboratory-sample-row')
+    if (checkbox.is(':checked')){
+      if(row.data().isQc){
+        $("#bulk_transfer").prop('disabled', true);
+        $('#table-notification').css("visibility", "visible");
+      }
+    }
+    else {
+      $('#table-notification').css("visibility", "hidden");
+    }
+  }
+
+
   function selectedCheckboxes() {
     return allCheckboxes().filter(":checked");
+  }
+
+  function selectedSamplesIds() {
+    var samples = $('.laboratory-sample-row');
+    return $.map(samples, function(sample) {
+      var checkboxInput = $(sample).find('input[name="sample_ids[]"]');
+      if(checkboxInput.is(':checked')) {
+        var uuid = $(sample).children('#sample_uuid').text();
+        var isolateName = $(sample).children('#sample_isolate_name').text();
+        return {uuid, isolateName};
+      }
+     })
   }

@@ -127,8 +127,20 @@ SampleIdentifier.blueprint do
 end
 
 Sample.blueprint do
-  institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make }
+  institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make! }
   patient { object.encounter.try(:patient) }
+end
+
+# FIXME: These properties should probably be part of the main blueprint, but that breaks a number of different existing specs.
+Sample.blueprint(:filled) do
+  institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make! }
+  sample_identifiers { [SampleIdentifier.make!(sample: object)] }
+  isolate_name { Faker::Name.name }
+  specimen_role { "p" }
+end
+
+Sample.blueprint(:batch) do
+  batch { Batch.make! }
 end
 
 AssayAttachment.blueprint do
@@ -142,12 +154,22 @@ LoincCode.blueprint do
   component { Faker::Lorem.words(4) }
 end
 
+SampleTransfer.blueprint do
+  sample { Sample.make!(:filled) }
+  receiver_institution { Institution.make! }
+  sender_institution { object.sample.institution || Institution.make! }
+end
+
+SampleTransfer.blueprint(:confirmed) do
+  confirmed_at { Faker::Time.backward }
+end
+
 Batch.blueprint do
-  institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make }
-  batch_number { '000' }
+  institution { Institution.make }
+  batch_number { "#{sn}" }
   isolate_name { 'ABC.42.DE' }
   date_produced { Time.strptime('01/01/2018', I18n.t('date.input_format.pattern')) }
-  lab_technician { 'Tec.Foo' }
+  lab_technician { "Tec.Foo" }
   specimen_role { 'q' }
   inactivation_method { 'Formaldehyde' }
   volume { 100 }

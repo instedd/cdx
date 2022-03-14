@@ -34,6 +34,7 @@ describe Cdx do
       "sample.inactivation_method",
       "sample.volume",
       "sample.lab_technician",
+      "sample.old_batch_number",
       "test.assays.result",
       "test.assays.name",
       "test.assays.condition",
