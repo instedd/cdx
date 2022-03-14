@@ -201,4 +201,8 @@ module ApplicationHelper
     end
     filters_params
   end
+
+  def format_uuid(uuid)
+    uuid[0,4]+"…"+uuid[uuid.length-4,uuid.length]
+  end
 end
