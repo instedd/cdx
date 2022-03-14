@@ -33,11 +33,10 @@ gem 'wicked_pdf', '~> 2.1'
 
 # Authentication
 # gem 'bcrypt-ruby', '~> 3.1.2'
-gem 'devise', '~> 3.5.5'
+gem 'devise', '~> 4.0.0'
 gem 'devise-security', '<= 0.12.0' # last version to support ruby 2.2
-#gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
 gem 'devise_invitable', '~> 1.5'
-gem 'doorkeeper', '~> 3.0'
+gem 'doorkeeper', '~> 4.2.0'
 gem 'omniauth', '~> 1.2'
 gem 'omniauth-google-oauth2', '~> 0.2'
 

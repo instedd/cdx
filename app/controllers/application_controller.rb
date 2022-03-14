@@ -166,6 +166,14 @@ class ApplicationController < ActionController::Base
     new_user_session_path
   end
 
+  def after_invite_path_for(inviter, invitee = nil)
+    after_sign_in_path_for(inviter)
+  end
+
+  def after_accept_path_for(resource)
+    after_sign_in_path_for(resource)
+  end
+
   def date_options_for_filter
     [{label: "Previous month", value: 1.month.ago.beginning_of_month}, {label: "Previous week", value: 1.week.ago.beginning_of_week},{label: "Previous year", value: 1.year.ago.beginning_of_year}]
   end
