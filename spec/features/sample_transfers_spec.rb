@@ -20,7 +20,7 @@ describe "sample transfers" do
       goto_page ListSampleTransfersPage do |page|
         expect(page.entry(in_pending.sample.partial_uuid)).to have_content("Confirm receipt")
         expect(page.entry(in_confirmed.sample.uuid)).to have_content("Receipt confirmed on February 24, 2022")
-        expect(page.entry(out_pending.sample.partial_uuid)).to have_content("Sent on March 04, 2022")
+        expect(page.entry(out_pending.sample.uuid)).to have_content("Sent on March 04, 2022")
         expect(page.entry(out_confirmed.sample.uuid)).to have_content("Delivery confirmed on February 21, 2022")
 
         expect(page).not_to have_content(unrelated.sample.partial_uuid)

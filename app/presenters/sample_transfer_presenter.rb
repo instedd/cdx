@@ -40,7 +40,7 @@ class SampleTransferPresenter
   end
 
   def sample_uuid
-    if confirmed?
+    if sender? || confirmed?
       sample.uuid
     else
       sample.partial_uuid + "XXXX"
