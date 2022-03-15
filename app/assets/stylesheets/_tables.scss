@@ -80,6 +80,10 @@
         color: $gray2;
         font-style: italic;
       }
+
+      >abbr{
+        text-decoration: none;
+      }
     }
 
     tr:last-child th {
