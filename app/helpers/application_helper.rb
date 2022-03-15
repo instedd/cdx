@@ -207,6 +207,6 @@ module ApplicationHelper
   end
   
   def format_uuid(uuid)
-    "#{uuid[0,4]}…#{uuid[-4,4]}"
+    uuid.nil? ? "" : "#{uuid[0,4]}…#{uuid[-4,4]}"
   end
 end
