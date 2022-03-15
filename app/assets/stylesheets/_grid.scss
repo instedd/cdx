@@ -108,7 +108,9 @@
     @include flex(0 0 1000px);
   }
 
-
+  &.display{
+    line-height: 40px;
+  }
 }
 
 

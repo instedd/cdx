@@ -6,39 +6,39 @@
     .col
       - unless f.object.qc_info.nil?
         .row
-          .col.pe-4
+          .col.pe-4.display
             = f.label :quality_control
-          .col
+          .col.display
             = link_to edit_qc_info_path(f.object.qc_info.id), class: 'centered' do
               .icon-test.icon-blue
               = "VIEW QC INFO"
 
       .row
-        .col.pe-4
+        .col.pe-4.display
           = f.label :uuid
-        .col
+        .col.display
           .value= f.object.uuid
       - unless f.object.batch.nil?
         .row
-          .col.pe-4
+          .col.pe-4.display
             = f.label :batch_id
-          .col
+          .col.display
             .value= f.object.batch.batch_number
 
       .row
-        .col.pe-4
+        .col.pe-4.display
           = f.label :date_produced, "production date"
-        .col
+        .col.display
           = f.text_field :date_produced, placeholder: @view_helper[:date_produced_placeholder], readonly: !@can_update
 
       .row
-        .col.pe-4
+        .col.pe-4.display
           = f.label :lab_technician
-        .col
+        .col.display
           = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
 
       .row
-        .col.pe-4
+        .col.pe-4.display
           = f.label :specimen_role
         .col
           - if @can_update
@@ -47,13 +47,13 @@
           - else
             = text_field_tag :specimen_role, Sample.specimen_role_description(f.object.specimen_role), { :class => 'input-x-large', readonly: true }
       .row
-        .col.pe-4
+        .col.pe-4.display
           = f.label :isolate_name
-        .col
+        .col.display
           = f.text_field :isolate_name, :class => 'input-x-large', readonly: !@can_update
 
       .row
-        .col.pe-4
+        .col.pe-4.display
           = f.label :inactivation_method
         .col
           - if @can_update
@@ -63,9 +63,9 @@
             = f.text_field :inactivation_method, readonly: true
 
       .row
-        .col.pe-4
+        .col.pe-4.display
           = f.label :volume
-        .col
+        .col.display
           .row.input-unit
             = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
             .span.unit (μl)
