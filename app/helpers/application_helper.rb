@@ -202,8 +202,8 @@ module ApplicationHelper
     filters_params
   end
 
-  def short_uuid_with_title(name, uuid)
-    content_tag(name, format_uuid(uuid), title: uuid)
+  def short_uuid_with_title(uuid)
+    content_tag(:abbr, format_uuid(uuid), title: uuid)
   end
   
   def format_uuid(uuid)
