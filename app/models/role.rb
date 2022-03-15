@@ -11,6 +11,7 @@ class Role < ActiveRecord::Base
 
   attr_accessor :definition
 
+  validates_presence_of :institution
   validates_presence_of :name
   validates_presence_of :policy
 

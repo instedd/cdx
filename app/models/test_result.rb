@@ -20,6 +20,7 @@ class TestResult < ActiveRecord::Base
 
   has_many :alert_histories
 
+  validates_presence_of :institution
   validates_presence_of :device
   # validates_uniqueness_of :test_id, scope: :device_id, allow_nil: true
   validate :same_patient_in_sample

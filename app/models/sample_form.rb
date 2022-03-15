@@ -13,7 +13,8 @@ class SampleForm
       :inactivation_method,
       :assay_attachments,
       :notes,
-      :volume ]
+      :volume,
+      :qc_info ]
   end
 
   def self.model_name
@@ -31,7 +32,7 @@ class SampleForm
 
   attr_accessor *shared_attributes
   delegate :id, :new_record?, :persisted?, to: :sample
-  delegate :uuid, :assay_attachments, :notes, to: :sample
+  delegate :uuid, :assay_attachments, :notes, :qc_info, to: :sample
 
   validates_presence_of :date_produced
 

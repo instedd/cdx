@@ -1,12 +1,21 @@
 module ApplicationHelper
   include Policy::Actions
 
-  def has_access?(resource, action)
-    Policy.can? action, resource, current_user
+  #TODO: refactor authorize_resource and authorize_resource? as both share almost the same code
+  def authorize_resource?(resource, action, user = nil)
+    if has_access?(resource, action, user)
+      check_access(resource, action, user)
+    else
+      false
+    end
   end
 
-  def check_access(resource, action)
-    Policy.authorize action, resource, current_user
+  def has_access?(resource, action, user = nil)
+    Policy.can? action, resource, user || current_user
+  end
+
+  def check_access(resource, action, user = nil)
+    Policy.authorize action, resource, user || current_user
   end
 
   def has_access_to_patients_index?

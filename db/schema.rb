@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220114191523) do
+ActiveRecord::Schema.define(version: 20220222115959) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -115,10 +115,12 @@ ActiveRecord::Schema.define(version: 20220114191523) do
     t.string   "result",        limit: 255
     t.integer  "loinc_code_id", limit: 4
     t.integer  "assay_file_id", limit: 4
+    t.integer  "qc_info_id",    limit: 4
   end
 
   add_index "assay_attachments", ["assay_file_id"], name: "index_assay_attachments_on_assay_file_id", using: :btree
   add_index "assay_attachments", ["loinc_code_id"], name: "index_assay_attachments_on_loinc_code_id", using: :btree
+  add_index "assay_attachments", ["qc_info_id"], name: "index_assay_attachments_on_qc_info_id", using: :btree
   add_index "assay_attachments", ["result"], name: "index_assay_attachments_on_result", using: :btree
   add_index "assay_attachments", ["sample_id"], name: "index_assay_attachments_on_sample_id", using: :btree
 
@@ -363,8 +365,10 @@ ActiveRecord::Schema.define(version: 20220114191523) do
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
     t.integer  "sample_id",   limit: 4
+    t.integer  "qc_info_id",  limit: 4
   end
 
+  add_index "notes", ["qc_info_id"], name: "index_notes_on_qc_info_id", using: :btree
   add_index "notes", ["sample_id"], name: "index_notes_on_sample_id", using: :btree
   add_index "notes", ["user_id"], name: "index_notes_on_user_id", using: :btree
 
@@ -467,6 +471,21 @@ ActiveRecord::Schema.define(version: 20220114191523) do
     t.string   "name",       limit: 255
   end
 
+  create_table "qc_infos", force: :cascade do |t|
+    t.string   "uuid",           limit: 255
+    t.string   "batch_number",   limit: 255
+    t.text     "core_fields",    limit: 65535
+    t.text     "custom_fields",  limit: 65535
+    t.binary   "sensitive_data", limit: 65535
+    t.integer  "sample_qc_id",   limit: 4
+    t.datetime "deleted_at"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "qc_infos", ["batch_number"], name: "index_qc_infos_on_batch_number", using: :btree
+  add_index "qc_infos", ["uuid"], name: "index_qc_infos_on_uuid", using: :btree
+
   create_table "recipient_notification_histories", force: :cascade do |t|
     t.integer  "user_id",            limit: 4
     t.integer  "alert_recipient_id", limit: 4
@@ -514,22 +533,38 @@ ActiveRecord::Schema.define(version: 20220114191523) do
   add_index "sample_identifiers", ["sample_id"], name: "index_sample_identifiers_on_sample_id", using: :btree
   add_index "sample_identifiers", ["uuid"], name: "index_sample_identifiers_on_uuid", unique: true, using: :btree
 
+  create_table "sample_transfers", force: :cascade do |t|
+    t.integer  "sample_id",               limit: 4
+    t.integer  "sender_institution_id",   limit: 4
+    t.integer  "receiver_institution_id", limit: 4
+    t.datetime "confirmed_at"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "sample_transfers", ["confirmed_at"], name: "index_sample_transfers_on_confirmed_at", using: :btree
+  add_index "sample_transfers", ["receiver_institution_id"], name: "index_sample_transfers_on_receiver_institution_id", using: :btree
+  add_index "sample_transfers", ["sample_id"], name: "index_sample_transfers_on_sample_id", using: :btree
+  add_index "sample_transfers", ["sender_institution_id"], name: "index_sample_transfers_on_sender_institution_id", using: :btree
+
   create_table "samples", force: :cascade do |t|
-    t.binary   "sensitive_data", limit: 65535
-    t.integer  "institution_id", limit: 4
-    t.text     "custom_fields",  limit: 65535
-    t.text     "core_fields",    limit: 65535
+    t.binary   "sensitive_data",   limit: 65535
+    t.integer  "institution_id",   limit: 4
+    t.text     "custom_fields",    limit: 65535
+    t.text     "core_fields",      limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "patient_id",     limit: 4
-    t.integer  "encounter_id",   limit: 4
-    t.boolean  "is_phantom",                   default: true
+    t.integer  "patient_id",       limit: 4
+    t.integer  "encounter_id",     limit: 4
+    t.boolean  "is_phantom",                     default: true
     t.datetime "deleted_at"
-    t.integer  "batch_id",       limit: 4
-    t.string   "isolate_name",   limit: 255
-    t.integer  "site_id",        limit: 4
-    t.string   "site_prefix",    limit: 255
-    t.string   "specimen_role",  limit: 255
+    t.integer  "batch_id",         limit: 4
+    t.string   "isolate_name",     limit: 255
+    t.integer  "site_id",          limit: 4
+    t.string   "site_prefix",      limit: 255
+    t.string   "specimen_role",    limit: 255
+    t.string   "old_batch_number", limit: 255
+    t.integer  "qc_info_id",       limit: 4
   end
 
   add_index "samples", ["batch_id"], name: "index_samples_on_batch_id", using: :btree
@@ -537,6 +572,7 @@ ActiveRecord::Schema.define(version: 20220114191523) do
   add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree
   add_index "samples", ["isolate_name"], name: "index_samples_on_isolate_name", using: :btree
   add_index "samples", ["patient_id"], name: "index_samples_on_patient_id", using: :btree
+  add_index "samples", ["qc_info_id"], name: "index_samples_on_qc_info_id", using: :btree
   add_index "samples", ["site_id"], name: "index_samples_on_site_id", using: :btree
   add_index "samples", ["specimen_role"], name: "index_samples_on_specimen_role", using: :btree
 

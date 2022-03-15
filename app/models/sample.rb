@@ -9,9 +9,11 @@ class Sample < ActiveRecord::Base
   belongs_to :patient
   belongs_to :encounter
   belongs_to :batch
+  belongs_to :qc_info
 
   has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy
   has_many :test_results, through: :sample_identifiers
+  has_many :sample_transfers, dependent: :destroy
 
   has_many :assay_attachments, dependent: :destroy
   accepts_nested_attributes_for :assay_attachments, allow_destroy: true
@@ -21,7 +23,6 @@ class Sample < ActiveRecord::Base
   accepts_nested_attributes_for :notes, allow_destroy: true
   validates_associated :notes, message: "are invalid"
 
-  validates_presence_of :institution
   validate :validate_encounter
   validate :validate_patient
 
@@ -31,6 +32,7 @@ class Sample < ActiveRecord::Base
 
   attribute_field :isolate_name, copy: true
   attribute_field :specimen_role, copy: true
+  attribute_field :old_batch_number, copy: true
   attribute_field :date_produced,
                   :lab_technician,
                   :inactivation_method,
@@ -64,6 +66,10 @@ class Sample < ActiveRecord::Base
     uuids.sort.first
   end
 
+  def partial_uuid
+    uuid.to_s[0..-5]
+  end
+
   def entity_ids
     self.sample_identifiers.map(&:entity_id)
   end
@@ -78,5 +84,17 @@ class Sample < ActiveRecord::Base
 
   def has_entity_id?
     entity_ids.compact.any?
+  end
+
+  def start_transfer_to(new_owner)
+    transfer = SampleTransfer.create!(
+      sample: self,
+      receiver_institution: new_owner,
+    )
+
+    self.old_batch_number = batch.batch_number unless batch.nil?
+    update!(batch: nil, site: nil, institution: nil)
+
+    transfer
   end
 end

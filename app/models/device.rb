@@ -23,6 +23,7 @@ class Device < ActiveRecord::Base
   attr_reader :plain_secret_key
 
   validates_uniqueness_of :uuid
+  validates_presence_of :institution
   validates_presence_of :name
   validates_presence_of :serial_number
   validates_presence_of :device_model

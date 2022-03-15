@@ -41,27 +41,31 @@ This will confirm the last user that was created in your local environment.  The
 
 ### Additionally setup for working with devices
 
-1. Import manifests: `bundle exec rake manifests:load`
+1.  With the container up, run this command ```docker-compose exec web bash```.
+
+2. Then run this command ```export PASSWORD=XXXX``` (defining a password at least 8 characters long)
+
+3. Import manifests: `bundle exec rake manifests:load`
 
 To create an initial set of tests:
 
-2. Navigate to the application
+4. Navigate to the application
 
-3. Create a new account and sign in
+5. Create a new account and sign in
 
-4. Create a new institution
+6. Create a new institution
 
-5. Create a new site
+7. Create a new site
 
-6. Create a new device, choosing Genoscan model
+8. Create a new device, choosing Genoscan model
 
-7. Navigate to `/api/playground`
+9. Navigate to `/api/playground`
 
-8. Select your newly created device
+10. Select your newly created device
 
-9. Copy the contents of `/spec/fixtures/csvs/genoscan_sample.csv` into the _Data_ field
+11. Copy the contents of `/spec/fixtures/csvs/genoscan_sample.csv` into the _Data_ field
 
-10. Run create message and navigate to _Tests_ to verify the tests were successfully imported
+12. Run create message and navigate to _Tests_ to verify the tests were successfully imported
 
 ### Running the environment
 

@@ -8,7 +8,7 @@ module SpecimenRole
                            message: "is not within valid options"
   end
 
-  def is_quality_control
+  def is_quality_control?
     specimen_role == 'q'
   end
 
