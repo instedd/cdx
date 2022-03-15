@@ -7,13 +7,4 @@ class Hash
   def reverse_deep_merge!(other_hash)
     replace(other_hash.deep_merge(self))
   end
-
-  def get_in(*path)
-    step = path.shift
-    value = self[step]
-    return value if path.empty?
-    return nil if value.nil?
-    return value.get_in(*path)
-  end
-
 end

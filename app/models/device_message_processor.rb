@@ -41,16 +41,16 @@ class DeviceMessageProcessor
 
     def process
       # Load original test if we are updating one
-      test_id = parsed_message.get_in('test', 'core', 'id')
+      test_id = parsed_message.dig('test', 'core', 'id')
       original_test = test_id && TestResult.within_time(1.year, @parent.device_message.created_at).find_by(test_id: test_id, device_id: device.id, site_id: device.site_id)
-      test_result = original_test || TestResult.new(institution: institution, device: device) 
-      
+      test_result = original_test || TestResult.new(institution: institution, device: device)
+
       test_result.device_messages << device_message
       test_result.test_result_parsed_data << TestResultParsedDatum.new(data: @parsed_message)
       test_blender = @blender.load(test_result)
 
       # Merge new attributes and sample id
-      sample_id = parsed_message.get_in('sample', 'core', 'id').try(:to_s)
+      sample_id = parsed_message.dig('sample', 'core', 'id').try(:to_s)
       test_blender.merge_attributes attributes_for('test').merge(sample_id: sample_id)
 
       # Re-assign each entity if present and does not match the original test's
@@ -58,7 +58,7 @@ class DeviceMessageProcessor
       [Sample, Encounter, Patient].each do |klazz|
 
         original_entity_id = entity_id_for(original_test, klazz)
-        new_entity_id = parsed_message.get_in(klazz.entity_scope, (klazz == Patient ? 'pii' : 'core'), 'id').try(:to_s)
+        new_entity_id = parsed_message.dig(klazz.entity_scope, (klazz == Patient ? 'pii' : 'core'), 'id').try(:to_s)
         entity_id_does_not_match = original_entity_id && new_entity_id && original_entity_id != new_entity_id
 
         new_entity = find_entity_by_id(klazz, new_entity_id)
@@ -84,32 +84,32 @@ class DeviceMessageProcessor
 
       # Commit changes
       @blender.save_and_index!
-      
+
       check_invalid_start_time_alert(test_result)
     end
 
    private
-    
+
     def check_invalid_start_time_alert(test_result)
       start_time = @parsed_message["test"]["core"]["start_time"]
-      end_time = @parsed_message["test"]["core"]["end_time"]     
-      start_time = Time.now if start_time==nil   
-      end_time = Time.now if end_time==nil     
+      end_time = @parsed_message["test"]["core"]["end_time"]
+      start_time = Time.now if start_time==nil
+      end_time = Time.now if end_time==nil
       if (start_time > Time.now + 1.day) || (end_time < start_time)
         #CHECK does not return diaabled alerts
         any_alerts_with_invalid_test_date_count= Alert.invalid_test_date.where({enabled: true, institution_id: test_result.institution_id}).count
         if any_alerts_with_invalid_test_date_count > 0
           any_alerts_with_invalid_test_date= Alert.invalid_test_date.where({enabled: true, institution_id: test_result.institution_id})
-          any_alerts_with_invalid_test_date.each do |alert|  
-            if ((alert.sample_id.length==0) || (alert.sample_id == SampleIdentifier.where(id: test_result.sample_identifier_id).pluck(:entity_id)[0])) 
-              sites=alert.sites.map{|site| site.id} 
+          any_alerts_with_invalid_test_date.each do |alert|
+            if ((alert.sample_id.length==0) || (alert.sample_id == SampleIdentifier.where(id: test_result.sample_identifier_id).pluck(:entity_id)[0]))
+              sites=alert.sites.map{|site| site.id}
               if (sites.length==0) || ((sites.length > 0) and (sites.include? test_result.site_id))
-                devices=alert.devices.map{|device| device.id} 
+                devices=alert.devices.map{|device| device.id}
                 if (devices.length==0) || ((devices.length > 0) and (devices.include? test_result.device_id))
                   AlertJob.perform_later alert.id, test_result.uuid
                 end
               end
-            end                        
+            end
           end
         end
       end
@@ -128,7 +128,7 @@ class DeviceMessageProcessor
     def attributes_for(scope)
       keys = {'core' => 'core_fields', 'custom' => 'custom_fields', 'pii' => 'plain_sensitive_data'}
       Hash[keys.map do |msg_key, attr_key|
-        [attr_key, parsed_message.get_in(scope, msg_key) || {}]
+        [attr_key, parsed_message.dig(scope, msg_key) || {}]
       end]
     end
 

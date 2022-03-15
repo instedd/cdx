@@ -18,7 +18,7 @@ class ManifestField
 
   def store value, message
     if value.present?
-      index value, target_without_scope, message.get_in(*store_target)
+      index value, target_without_scope, message.dig(*store_target)
     end
     message
   end

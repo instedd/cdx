@@ -122,7 +122,7 @@ class EntityCsvBuilder
     @dynamic_headers.each_with_index do |field_keys, index|
       field, keys = field_keys
       keys.each do |key|
-        expanded << (test_dynamic_fields.get_in(index, key))
+        expanded << (test_dynamic_fields.dig(index, key))
       end
     end
 
@@ -133,10 +133,10 @@ class EntityCsvBuilder
       count.times do |repetition|
         if field.nested?
           field.sub_fields.each do |sub_field|
-            expanded << format_value(test_multi_fields.get_in(index, repetition, sub_field.name))
+            expanded << format_value(test_multi_fields.dig(index, repetition, sub_field.name))
           end
         else
-          expanded << format_value(test_multi_fields.get_in(index, repetition))
+          expanded << format_value(test_multi_fields.dig(index, repetition))
         end
       end
     end
@@ -146,7 +146,7 @@ class EntityCsvBuilder
     @custom_headers.each_with_index do |scope_fields, index|
       scope, fields = scope_fields
       fields.each do |field|
-        expanded << format_value(test_custom_fields.get_in(index, field))
+        expanded << format_value(test_custom_fields.dig(index, field))
       end
     end
 
