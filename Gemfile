@@ -11,7 +11,11 @@ end
 source 'https://rubygems.org'
 
 gem 'rails', next?('~> 5.0.0', '~> 4.2.11')
-gem 'rake', '~> 10.5.0'
+
+gem 'globalid', '< 0.5.0'        # NOTE: remove gem after upgrading to ruby 2.5
+gem 'rack', '< 2.2.0' if next?   # NOTE: remove gem after upgrading to ruby 2.3
+gem 'rake', '~> 10.5.0'          # NOTE: remove gem after upgrading rspec
+gem 'sprockets-rails', '< 3.3.0' # NOTE: remove gem after upgrading to ruby 2.5
 
 # Databases
 gem 'mysql2', '~> 0.3'
@@ -46,13 +50,13 @@ gem 'base58', '~> 0.1'
 gem 'barby', '~> 0.6'
 gem 'config', '~> 1.2'
 gem 'dotiw', '~> 3.0'
-gem 'faker' # NOTE: until we upgrade to ruby 2.5+ then we can upgrade to ffaker 2.20 to replace Faker::Number
-gem 'ffaker'
+gem 'faker', '< 1.9.2' # NOTE: kept until we upgrade to ruby 2.5+ then we can upgrade to ffaker 2.20 to replace Faker::Number
+gem 'ffaker', '< 2.12.0'
 gem 'guid', '~> 0.1'
-gem 'nokogiri', '~> 1.6'
+gem 'nokogiri', '~> 1.6', '< 1.10.0' # last version to support ruby 2.2
 gem 'oj', '~> 2.12', '< 2.17.3' # NOTE: 2.17.3 will stringify Time as a Float then load a BigDecimal...
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
-gem 'rails-i18n', '~> 4.0'
+gem 'rails-i18n', next?('~> 5.0', '~> 4.0')
 gem 'rchardet', '~> 1.6'
 gem 'rest-client', '~> 1.8' # NOTE: only used for a single HTTP call
 gem 'rubyzip', '>= 1.0.0'
@@ -71,7 +75,7 @@ gem 'geojson_import', git: 'https://github.com/instedd/geojson_import', branch: 
 # Services
 gem 'puma', '~> 2.13'
 gem 'sidekiq', '~> 3.5'
-gem 'sinatra', '~> 1.4' # for sidekiq web
+gem 'sinatra', '~> 1.4' unless next? # for sidekiq web FIXME: upgrade sidekiq
 gem 'sidekiq-cron', '~> 0.3'
 gem 'whenever', '~> 1.0' # TODO: replace with a sidekiq-cron job
 
@@ -83,14 +87,19 @@ gem 'sentry-raven', '~> 2.13'
 # Assets
 gem 'execjs', '< 2.8.0' # 2.8 removed support for therubyracer
 gem 'gon', '~> 6.0'
-gem 'sass-rails', '~> 4.0'
+if next?
+  gem 'sass-rails', '~> 5.0', '< 5.0.8'
+else
+  gem 'sass-rails', '~> 4.0'
+end
 gem 'therubyracer', '~> 0.12' # FIXME: deprecated for years
 gem 'turbolinks', '~> 2.5'
 gem 'uglifier', '~> 2.7'
 
+# TODO: externalize frontend dependencies (NPM or YARN)!
 gem 'd3_rails', '~> 3.5.6'
 gem 'dropzonejs-rails', '~> 0.8.4'
-gem 'jquery-rails', '~> 4.0.4'
+gem 'jquery-rails', '~> 4.0'
 gem 'jquery-turbolinks', '~> 2.1.0'
 gem 'leaflet-rails', '~> 0.7.4'
 gem 'lodash-rails', '~> 3.10.1'
@@ -103,14 +112,13 @@ end
 group :development do
   gem 'letter_opener'
   gem 'quiet_assets' unless next?
-  gem 'web-console', '~> 2.0'
+  gem 'web-console', '< 4.0' # last version to support ruby 2.2
 end
 
 group :development, :test do
-  gem 'pry-byebug'
+  gem 'pry-byebug', '< 2.7.0' unless next? # last version to support ruby 2.2
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
-  gem 'pry-clipboard'
   gem 'spring'
   gem 'spring-commands-rspec'
 end
@@ -122,6 +130,7 @@ group :test do
 
   gem 'database_cleaner', '~> 1.99'
   gem 'machinist', '~> 2.0' # NOTE: eventually replace with FactoryBot
+  gem 'rails-controller-testing' if next?
   gem 'simplecov', require: false
   gem 'timecop', '~> 0.8'
   gem 'webmock', '~> 1.23.0', require: false # a spec fails with 1.24.x
