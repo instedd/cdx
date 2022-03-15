@@ -31,7 +31,7 @@ gem 'premailer-rails', '< 1.10' # 1.10 requires Rails.application.assets_manifes
 # Views
 gem 'csv_builder', '~> 2.1'
 gem 'haml-rails', '~> 0.9'
-gem 'jbuilder', '~> 1.2'
+gem 'jbuilder', '~> 1.2' # TODO: next?('~> 2.5', '~> 1.2')
 gem 'view_components', git: 'https://github.com/manastech/rails-view_components.git', branch: 'master'
 gem 'wicked_pdf', '~> 2.1'
 
@@ -73,7 +73,7 @@ gem 'geojson_import', git: 'https://github.com/instedd/geojson_import', branch: 
 # end
 
 # Services
-gem 'puma', '~> 2.13'
+gem 'puma', next?('~> 3.0', '~> 2.13')
 gem 'sidekiq', '~> 3.5'
 gem 'sinatra', '~> 1.4' unless next? # for sidekiq web FIXME: upgrade sidekiq
 gem 'sidekiq-cron', '~> 0.3'
@@ -93,7 +93,7 @@ else
   gem 'sass-rails', '~> 4.0'
 end
 gem 'therubyracer', '~> 0.12' # FIXME: deprecated for years
-gem 'turbolinks', '~> 2.5'
+gem 'turbolinks', '~> 2.5' # TODO: next?('~> 5', '~> 2.5')
 gem 'uglifier', '~> 2.7'
 
 # TODO: externalize frontend dependencies (NPM or YARN)!
@@ -111,7 +111,11 @@ end
 
 group :development do
   gem 'letter_opener'
+  gem 'listen', '~> 3.0.5' if next?
   gem 'quiet_assets' unless next?
+  gem 'spring'
+  gem 'spring-commands-rspec'
+  gem 'spring-watcher-listen', '~> 2.0.0' if next?
   gem 'web-console', '< 4.0' # last version to support ruby 2.2
 end
 
@@ -119,8 +123,6 @@ group :development, :test do
   gem 'pry-byebug', '< 2.7.0' unless next? # last version to support ruby 2.2
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
-  gem 'spring'
-  gem 'spring-commands-rspec'
 end
 
 group :test do
