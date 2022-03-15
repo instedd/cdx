@@ -5,15 +5,14 @@ require 'active_support/core_ext/module/aliasing'
 module DefaultParamsHelper
   extend ActiveSupport::Concern
 
-  def process_with_default_params(action, *args)
+  def process(action, *args)
     if args[1].nil? || args[1].is_a?(Hash)
       args[1] = default_params.merge(args[1] || {})
     end
-    process_without_default_params(action, *args)
+    super(action, *args)
   end
 
   included do
     let(:default_params) { {} }
-    alias_method_chain :process, :default_params
   end
 end
