@@ -203,10 +203,10 @@ module ApplicationHelper
   end
 
   def short_uuid_with_title(uuid)
-    content_tag(:abbr, format_uuid(uuid), title: uuid)
+    uuid.nil? ? "" : content_tag(:abbr, format_uuid(uuid), title: uuid)
   end
   
   def format_uuid(uuid)
-    uuid.nil? ? "" : "#{uuid[0,4]}…#{uuid[-4,4]}"
+    "#{uuid[0,4]}…#{uuid[-4,4]}"
   end
 end
