@@ -203,14 +203,6 @@ module ApplicationHelper
     end
   end
 
-  def filters_params
-    filters_params = params
-    ['controller', 'action', 'page_size', 'page'].each do |param|
-      filters_params.delete(param)
-    end
-    filters_params
-  end
-
   def short_uuid_with_title(uuid)
     uuid.nil? ? "" : content_tag(:abbr, format_uuid(uuid), title: uuid)
   end
