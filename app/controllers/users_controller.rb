@@ -92,7 +92,7 @@ class UsersController < ApplicationController
 
   def autocomplete
     users = User.within(@navigation_context.institution)
-                .uniq
+                .distinct
                 .where("first_name LIKE ? OR last_name LIKE ? OR (email LIKE ? AND first_name IS NULL AND last_name IS NULL)", "%#{params["q"]}%", "%#{params["q"]}%", "%#{params["q"]}%")
                 .map{|r| {value: r.email, label: r.full_name}}
     render json: users
