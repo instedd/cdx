@@ -48,15 +48,17 @@ module FeatureSpecHelpers
   end
 end
 
-class Capybara::Node::Element
-  include CdxPageHelper
-
+module CdxClickWithAjax
   # Make every click in element wait for ajax to complete
-  def click_with_ajax
-    click_without_ajax
+  def click
+    super
     wait_for_ajax
   end
-  alias_method_chain :click, :ajax
+end
+
+class Capybara::Node::Element
+  include CdxPageHelper
+  prepend CdxClickWithAjax
 
   # Removes the `target` attribute before clicking a link. Useful to remove an
   # "_blank" target for example.
