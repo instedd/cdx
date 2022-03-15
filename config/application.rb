@@ -1,4 +1,5 @@
 require_relative 'boot'
+require_relative '../lib/ruby_dig' # TODO: remove after upgrading to RUBY 2.3
 
 require 'rails/all'
 
