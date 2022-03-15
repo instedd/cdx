@@ -38,19 +38,19 @@ var SampleTransferModal = React.createClass({
   },
 
   showQcWarningCheckbox: function(selectedSamples) {
-    const hasQc = selectedSamples.filter((sample) => sample.existsQcReference === true).length
-    if(selectedSamples.length > 0 && selectedSamples.length === hasQc) {
+    const haveQc = selectedSamples.filter((sample) => sample.existsQcReference === true).length
+    if(selectedSamples.length > 0 && selectedSamples.length === haveQc) {
       return this.includeQcInfoCheckbox()
     }
     else {
-      if (hasQc === 0) {
+      if (haveQc === 0) {
         return this.qcInfoMessage()
       }
       else {
         return (
           <span>
             {this.includeQcInfoCheckbox()}
-            {this.qcInfoMessage(selectedSamples.length - hasQc)}
+            {this.qcInfoMessage(selectedSamples.length - haveQc)}
           </span>
         )
       }
