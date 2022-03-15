@@ -18,8 +18,11 @@ class ApplicationController < ActionController::Base
       current_user.try(:timestamps_in_device_time_zone))
   end
 
+  # TODO: use `render json:` directly
   def render_json(object, params={})
-    render params.merge(text: object.to_json_oj, content_type: 'text/json')
+    params[:json] = object.to_json_oj
+    # params[:content_type] = "application/json"
+    render params
   end
 
   def self.set_institution_tab(key)
