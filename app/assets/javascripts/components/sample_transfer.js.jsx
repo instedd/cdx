@@ -29,11 +29,32 @@ var SampleTransfer = React.createClass({
 
 var SampleTransferModal = React.createClass({
   getInitialState: function() {
+
     return {
       institutionId: null,
       includeQcInfo: false,
-      selectedSamples: selectedSamplesIds(),
+      selectedSamples: selectedSamplesIds()
     };
+  },
+
+  showQcWarningCheckbox: function(selectedSamples) {
+    const hasQc = selectedSamples.filter((sample) => sample.existsQcReference === true).length
+    if(selectedSamples.length > 0 && selectedSamples.length === hasQc) {
+      return this.includeQcInfoCheckbox()
+    }
+    else {
+      if (hasQc === 0) {
+        return this.qcInfoMessage()
+      }
+      else {
+        return (
+          <span>
+            {this.includeQcInfoCheckbox()}
+            {this.qcInfoMessage(selectedSamples.length - hasQc)}
+          </span>
+        )
+      }
+    }
   },
 
   closeModal: function(event) {
@@ -96,6 +117,19 @@ var SampleTransferModal = React.createClass({
     )
   },
 
+  qcInfoMessage: function(quantity) {
+    let infoMessage = "There is no Quality Control (QC) info available for these samples"
+    if(quantity > 0) {
+      infoMessage = `There is no Quality Control (QC) info available for ${quantity} ${quantity === 1? 'sample' : 'samples'}`
+    }
+
+    return (
+      <div className="col icon-info-outline icon-gray table-info" style={{padding: '0 10px'}}>
+        <div className="notification-text">{infoMessage}</div>
+      </div>
+    )
+  },
+
   toggleQcInfo: function() {
     var oldValue = this.state.includeQcInfo;
     this.setState({
@@ -103,7 +137,16 @@ var SampleTransferModal = React.createClass({
     });
   },
 
-  render: function() {
+  includeQcInfoCheckbox: function () {
+    return (<div className="row">
+      <div className="col pe-3" style={{padding: '10px 10px 0px 10px'}}>
+        <input id="include-qc-check" type="checkbox" checked={this.state.includeQcInfo} onChange={this.toggleQcInfo}/>
+        <label htmlFor="include-qc-check">Include a copy of the QC data</label>
+      </div>
+    </div>)
+
+
+  }, render: function() {
     return(
       <div className="samples-transfer-modal">
         <div className="row">
@@ -116,12 +159,7 @@ var SampleTransferModal = React.createClass({
           <div className="col pe-3"><label>Institution</label></div>
           <div className="col"><CdxSelect name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} /></div>
         </div>
-        <div className="row">
-          <div className="col pe-3">
-            <input id="include-qc-check" type="checkbox" checked={this.state.includeQcInfo} onChange={this.toggleQcInfo} />
-            <label htmlFor="include-qc-check">Include a copy of the QC data</label>
-          </div>
-        </div>
+        {this.showQcWarningCheckbox(this.state.selectedSamples)}
         <div className="modal-footer">
           <div className="footer-buttons-aligning">
             <div>

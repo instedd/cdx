@@ -51,7 +51,8 @@
       if(checkboxInput.is(':checked')) {
         var uuid = $(sample).children('#sample_uuid').text();
         var isolateName = $(sample).children('#sample_isolate_name').text();
-        return {uuid, isolateName};
+        var existsQcReference = $(sample).data().hasqcreference
+        return {uuid, isolateName, existsQcReference};
       }
      })
   }
