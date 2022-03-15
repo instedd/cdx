@@ -1,13 +1,16 @@
 class SitesController < ApplicationController
   set_institution_tab :sites
+
   before_action do
     head :forbidden unless has_access_to_sites_index?
   end
 
+  helper_method :filters_params
+
   def index
     @sites = check_access(Site.within(@navigation_context.entity, @navigation_context.exclude_subsites), READ_SITE)
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SITE)
-    apply_filters
+    @sites = apply_filters(@sites)
 
     respond_to do |format|
       format.html do
@@ -163,9 +166,25 @@ class SitesController < ApplicationController
     params.require(:site).permit(*allowed_params)
   end
 
-  def apply_filters
-    @sites = @sites.where("location_geoid LIKE concat(?, '%')", params[:location]) if params[:location].present?
-    @sites = @sites.where("name LIKE ?", "%#{params[:name]}%") if params[:name].present?
+  def apply_filters(scope)
+    if location = filters_params[:location]
+      scope = scope.where("location_geoid LIKE concat(?, '%')", location)
+    end
+
+    if name = filters_params[:name]
+      scope = scope.where("name LIKE ?", "%#{name}%")
+    end
+
+    scope
+  end
+
+  def filters_params
+    @filters_params ||=
+      if Rails::VERSION::MAJOR >= 5
+        params.permit(:location, :name).reject! { |_, value| value.blank? }
+      else
+        params.permit(:location, :name).tap { |x| x.reject! { |_, value| value.blank? } }
+      end
   end
 
   def build_csv
