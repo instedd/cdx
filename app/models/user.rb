@@ -39,7 +39,7 @@ class User < ApplicationRecord
     else
       ids = Site.within(institution_or_site).pluck(:id)
       joins(:roles).where("roles.site_id IN (?)", ids)
-    end.uniq
+    end.distinct
   }
 
   def timeout_in
