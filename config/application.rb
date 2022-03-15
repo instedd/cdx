@@ -24,7 +24,8 @@ module Cdp
     config.react.addons = true
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
+    config.active_record.raise_in_transactional_callbacks = true if Rails::VERSION::MAJOR < 5
+
     config.generators do |g|
       g.test_framework :rspec
       g.assets = false

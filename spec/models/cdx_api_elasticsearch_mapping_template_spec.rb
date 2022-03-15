@@ -1,6 +1,6 @@
-require "bundler/setup"
+#require "bundler/setup"
 require "cdx/api/elasticsearch"
-require "pry-byebug"
+#require "pry-byebug"
 
 describe "Cdx::Api::Elasticsearch::MappingTemplate" do
 

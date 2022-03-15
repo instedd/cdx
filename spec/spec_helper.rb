@@ -1,6 +1,8 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'
 
+require "bundler/setup"
+
 if ENV['COVERAGE'] == 'true'
   require 'simplecov'
   SimpleCov.start 'rails'
@@ -81,6 +83,5 @@ RSpec.configure do |config|
   config.exclude_pattern = "spec/features/**/*_spec.rb"
 end
 
-require "bundler/setup"
 require "cdx"
-require "pry-byebug"
+require "pry-byebug" unless Rails::VERSION::MAJOR >= 5
