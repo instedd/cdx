@@ -2,6 +2,12 @@ require 'spec_helper'
 require 'policy_spec_helper'
 
 describe Subscriber, elasticsearch: true do
+  include ActiveJob::TestHelper
+
+  after do
+    clear_enqueued_jobs
+    clear_performed_jobs
+  end
 
   let(:model){DeviceModel.make!}
   let(:device){Device.make! device_model: model}
@@ -39,7 +45,7 @@ describe Subscriber, elasticsearch: true do
     callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5B0%5D%5Bcondition%5D=mtb&test%5Bassays%5D%5B1%5D%5Bname%5D=mtb&test%5Bassays%5D%5B2%5D%5Bresult%5D=positive"
     callback_request = stub_request(:get, callback_query).to_return(status: 200, body: "", headers: {})
 
-    submit_test
+    perform_enqueued_jobs { submit_test }
 
     assert_requested(callback_request)
   end
@@ -55,7 +61,7 @@ describe Subscriber, elasticsearch: true do
       })
       .to_return(status: 200, body: "", headers: {})
 
-    submit_test
+    perform_enqueued_jobs { submit_test }
 
     assert_requested(callback_request)
   end
@@ -65,7 +71,7 @@ describe Subscriber, elasticsearch: true do
     subscriber = Subscriber.make! fields: [], url: url, filter: filter, verb: 'POST'
     callback_request = stub_request(:post, url).to_return(:status => 200, :body => "", :headers => {})
 
-    submit_test
+    perform_enqueued_jobs { submit_test }
 
     assert_requested(:post, url) do |req|
       response = JSON.parse(req.body)
@@ -104,7 +110,7 @@ describe Subscriber, elasticsearch: true do
     callback_request = stub_request(:post, url).to_return(:status => 200, :body => "", :headers => {})
     grant(institution.user, user2, "testResult?device=#{device.id}", Policy::Actions::QUERY_TEST)
 
-    submit_test
+    perform_enqueued_jobs { submit_test }
 
     assert_requested(callback_request)
   end

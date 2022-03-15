@@ -5,6 +5,16 @@ Sidekiq::Testing.fake!
 
 
 describe HourlyAlertJob, elasticsearch: true do
+  include ActiveJob::TestHelper
+
+  before do
+    @old_queue_adapter, ActiveJob::Base.queue_adapter = ActiveJob::Base.queue_adapter, :inline
+  end
+
+  after do
+    ActiveJob::Base.queue_adapter = @old_queue_adapter
+  end
+
   let(:user) {User.make!}
   let(:institution) {Institution.make! user: user}
   let(:worker) { HourlyAlertJob.new }
@@ -71,7 +81,7 @@ describe HourlyAlertJob, elasticsearch: true do
       expect(before_test_recipient_count).to eq(after_test_recipient_count)
     end
 
-  
+
     it "check non-repeat logic for when same smaple id but different event-id that multiple alert triggers are not generated" do
       before_test_history_count = AlertHistory.count
       before_test_recipient_count=RecipientNotificationHistory.count
@@ -90,7 +100,7 @@ describe HourlyAlertJob, elasticsearch: true do
       expect(before_test_history_count+3).to eq(after_test_history_count)
       expect(before_test_recipient_count+1).to eq(after_test_recipient_count)
     end
-    
+
 
   end
 end
