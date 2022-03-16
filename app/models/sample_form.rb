@@ -58,6 +58,10 @@ class SampleForm
       end
   end
 
+  def batch_number
+    batch.try(&:number) || sample.old_batch_number
+  end
+
   # Used by fields_for
   def assay_attachments_attributes=(assays)
     @sample.assay_attachments_attributes = assays
