@@ -39,22 +39,13 @@ var SampleTransferModal = React.createClass({
 
   showQcWarningCheckbox: function(selectedSamples) {
     const haveQc = selectedSamples.filter((sample) => sample.existsQcReference === true).length
-    if(selectedSamples.length > 0 && selectedSamples.length === haveQc) {
-      return this.includeQcInfoCheckbox()
-    }
-    else {
-      if (haveQc === 0) {
-        return this.qcInfoMessage()
-      }
-      else {
-        return (
-          <span>
-            {this.includeQcInfoCheckbox()}
-            {this.qcInfoMessage(selectedSamples.length - haveQc)}
-          </span>
-        )
-      }
-    }
+    const missingQuantity = selectedSamples.length - haveQc
+    return (
+      <div>
+        {haveQc > 0 && this.includeQcInfoCheckbox()}
+        {missingQuantity > 0 && this.qcInfoMessage(missingQuantity, selectedSamples)}
+      </div>
+    )
   },
 
   closeModal: function(event) {
@@ -117,12 +108,11 @@ var SampleTransferModal = React.createClass({
     )
   },
 
-  qcInfoMessage: function(quantity) {
+  qcInfoMessage: function(missingQuantity, selectedSamples) {
     let infoMessage = "There is no Quality Control (QC) info available for these samples"
-    if(quantity > 0) {
-      infoMessage = `There is no Quality Control (QC) info available for ${quantity} ${quantity === 1? 'sample' : 'samples'}`
+    if(missingQuantity > 0 && missingQuantity != selectedSamples.length) {
+      infoMessage = `There is no Quality Control (QC) info available for ${missingQuantity} ${missingQuantity === 1? 'sample' : 'samples'}`
     }
-
     return (
       <div className="col icon-info-outline icon-gray table-info" style={{padding: '0 10px'}}>
         <div className="notification-text">{infoMessage}</div>
