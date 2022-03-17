@@ -3,7 +3,8 @@ class Api::EncountersController < ApiController
 
   def index
     body = Oj.load(request.body.read) || {}
-    filters = params.merge(body)
+
+    filters = params.permit!.to_h.merge(body)
     filters.delete(:format)
     filters.delete(:controller)
     filters.delete(:action)
