@@ -88,9 +88,14 @@ describe InstitutionsController do
 
       it "fails if invite already accepted" do
         invite = PendingInstitutionInvite.make!(invited_user_email: user.email, status: "accepted")
-        expect do
-          post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
-        end.to raise_error(ActionView::MissingTemplate)
+        params = {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
+
+        if Rails::VERSION::MAJOR >= 5
+          response = post :create, params
+          expect(response.status).to eq 204
+        else
+          expect { post :create, params }.to raise_error(ActionView::MissingTemplate)
+        end
       end
     end
   end
@@ -126,14 +131,14 @@ describe InstitutionsController do
     it "without invite" do
       expect do
         get :new_from_invite_data
-      end.to raise_error(ActionView::MissingTemplate)
+      end.to raise_error(Rails::VERSION::MAJOR >= 5 ? ActionController::UnknownFormat : ActionView::MissingTemplate)
     end
 
     it "with accepted invite" do
       invite = PendingInstitutionInvite.make!(status: "accepted", invited_user_email: user.email)
       expect do
         get :new_from_invite_data, {pending_institution_invite_id: invite.id}
-      end.to raise_error(ActionView::MissingTemplate)
+      end.to raise_error(Rails::VERSION::MAJOR >= 5 ? ActionController::UnknownFormat : ActionView::MissingTemplate)
     end
 
     it "gets redirect from other page when pending invitation" do
