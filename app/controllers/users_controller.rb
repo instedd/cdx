@@ -87,7 +87,7 @@ class UsersController < ApplicationController
     end
     # Since user is not being updated here, we need to force the new role's policy update
     ComputedPolicy.update_user(@user)
-    render nothing: true
+    head :ok
   end
 
   def autocomplete
@@ -100,7 +100,7 @@ class UsersController < ApplicationController
 
   def update_setting
     current_user.update_attributes({sidebar_open: params[:sidebar_open]})
-    render nothing: true
+    head :ok
   end
 
   def no_data_allowed
