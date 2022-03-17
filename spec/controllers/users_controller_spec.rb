@@ -43,7 +43,7 @@ describe UsersController, type: :controller do
 
     context 'when the is active box is unchecked' do
       it 'can suspend a users access' do
-        user_params[:is_active] = false
+        user_params["is_active"] = false
         put :update, id: user_to_edit.id, user: user_params
         expect(user_to_edit.reload.is_active).to be_falsey
       end
