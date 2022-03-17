@@ -81,6 +81,17 @@ RSpec.configure do |config|
   end
 
   config.exclude_pattern = "spec/features/**/*_spec.rb"
+
+  # disable noisy backtraces:
+  config.filter_rails_from_backtrace!
+  config.filter_gems_from_backtrace("capybara")
+  config.filter_gems_from_backtrace("omniauth")
+  config.filter_gems_from_backtrace("railties")
+  config.filter_gems_from_backtrace("puma")
+  config.filter_gems_from_backtrace("rack")
+  config.filter_gems_from_backtrace("request_store")
+  config.filter_gems_from_backtrace("sentry-raven")
+  config.filter_gems_from_backtrace("warden")
 end
 
 require "cdx"
