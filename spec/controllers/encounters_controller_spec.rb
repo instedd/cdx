@@ -66,7 +66,7 @@ RSpec.describe EncountersController, type: :controller, elasticsearch: true do
 
     it "should load encounter first by uuid" do
       encounter = Encounter.make! institution: institution
-      encounter2 = Encounter.make! institution: institution, uuid: "#{encounter.id}lorem"
+      encounter2 = Encounter.make! institution: institution, uuid: SecureRandom.uuid
 
       get :show, id: encounter2.uuid
       expect(assigns(:encounter)).to eq(encounter2)
