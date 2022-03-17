@@ -73,6 +73,14 @@ var PatientSelect = React.createClass({
     },
 
   search: function(value, callback) {
+    // FIXME: Search is called when selecting the patient and `value` is no
+    //        longer the string to autocomplete but the actual selected patient
+    //        object.
+    //
+    //        We should probably fix what's causing this behavior, but in the
+    //        meantime let's just avoid making a bad request!
+    if (typeof(value) !== "string") return;
+
     $.ajax({
       url: '/patients/search',
       data: { context: this.props.context.uuid, q: value },
