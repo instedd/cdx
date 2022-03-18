@@ -108,8 +108,16 @@
     @include flex(0 0 1000px);
   }
 
-  &.display{
+  &.form-field-label label{
     line-height: 40px;
+  }
+
+  &.form-field-value div.value{
+    margin-top: -1px;
+  }
+
+  &.form-field-value input:not(.input-small){
+    margin-top: 5px;
   }
 }
 
