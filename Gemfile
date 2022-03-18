@@ -120,7 +120,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'pry-byebug', '< 2.7.0' unless next? # last version to support ruby 2.2
+  gem 'pry-byebug', '< 2.7.0' # last version to support ruby 2.2
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
 end
