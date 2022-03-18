@@ -109,13 +109,15 @@ var SampleTransferModal = React.createClass({
   },
 
   qcInfoMessage: function(missingQuantity, selectedSamples) {
-    let infoMessage = "There is no Quality Control (QC) info available for these samples"
-    if(missingQuantity > 0 && missingQuantity != selectedSamples.length) {
-      infoMessage = `There is no Quality Control (QC) info available for ${missingQuantity} ${missingQuantity === 1? 'sample' : 'samples'}`
-    }
+    const infoMessage = (missingQuantity > 0 && missingQuantity != selectedSamples.length)
+      ? `There is no Quality Control (QC) info available for ${missingQuantity} ${missingQuantity === 1 ? 'sample' : 'samples'}`
+      : "There is no Quality Control (QC) info available for these samples"
+
     return (
-      <div className="col icon-info-outline icon-gray table-info" style={{padding: '0 10px'}}>
-        <div className="notification-text">{infoMessage}</div>
+      <div className="row">
+        <div className="col icon-info-outline icon-gray qc-info-message">
+          <div className="notification-text">{infoMessage}</div>
+        </div>
       </div>
     )
   },
@@ -129,7 +131,7 @@ var SampleTransferModal = React.createClass({
 
   includeQcInfoCheckbox: function () {
     return (<div className="row">
-      <div className="col pe-3" style={{padding: '10px 10px 0px 10px'}}>
+      <div className="col pe-3 qc-info-checkbox">
         <input id="include-qc-check" type="checkbox" checked={this.state.includeQcInfo} onChange={this.toggleQcInfo}/>
         <label htmlFor="include-qc-check">Include a copy of the QC data</label>
       </div>
