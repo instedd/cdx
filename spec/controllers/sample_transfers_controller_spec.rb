@@ -36,8 +36,14 @@ RSpec.describe SampleTransfersController, type: :controller do
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
       end
 
-      it "by batch_name" do
+      it "by batch_number" do
         get :index, batch_number: subject.sample.batch.batch_number
+        expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
+      end
+
+      it "by old_batch_number" do
+        subject.sample.update(old_batch_number: "12345678")
+        get :index, batch_number: subject.sample.old_batch_number
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
       end
 
