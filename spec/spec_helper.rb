@@ -95,4 +95,4 @@ RSpec.configure do |config|
 end
 
 require "cdx"
-require "pry-byebug" unless Rails::VERSION::MAJOR >= 5
+require "pry-byebug"
