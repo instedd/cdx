@@ -59,7 +59,7 @@ class SampleForm
   end
 
   def batch_number
-    batch.try(&:number) || sample.old_batch_number
+    batch.try(&:batch_number) || sample.old_batch_number
   end
 
   # Used by fields_for
