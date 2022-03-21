@@ -11,6 +11,21 @@
   &.center {
     @include justify-content(center);
   }
+
+  .form-field {
+    label {
+      line-height: 40px;
+    }
+
+  .Select-control {
+      padding-bottom: 6px;
+      height: 34px;
+    }
+
+    input:not(.input-small) {
+      margin-top: 5px;
+    }
+  }
 }
 
 /* default for even distribution */
@@ -106,18 +121,6 @@
 
   &.px-10 {
     @include flex(0 0 1000px);
-  }
-
-  &.form-field-label label{
-    line-height: 40px;
-  }
-
-  &.form-field-value div.value{
-    margin-top: -1px;
-  }
-
-  &.form-field-value input:not(.input-small){
-    margin-top: 5px;
   }
 }
 

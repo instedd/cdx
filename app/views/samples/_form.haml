@@ -5,67 +5,67 @@
   .row
     .col
       - unless f.object.qc_info.nil?
-        .row
-          .col.pe-4.form-field-label
+        .row.form-field
+          .col.pe-4
             = f.label :quality_control
-          .col.form-field-value
+          .col
             = link_to edit_qc_info_path(f.object.qc_info.id), class: 'centered' do
               .icon-test.icon-blue
               = "VIEW QC INFO"
 
-      .row
-        .col.pe-4.form-field-label
+      .row.form-field
+        .col.pe-4
           = f.label :uuid
-        .col.form-field-value
+        .col
           .value= f.object.uuid
       - unless f.object.batch.nil?
-        .row
-          .col.pe-4.form-field-label
+        .row.form-field
+          .col.pe-4
             = f.label :batch_id
-          .col.form-field-value
+          .col
             .value= f.object.batch.batch_number
 
-      .row
-        .col.pe-4.form-field-label
+      .row.form-field
+        .col.pe-4
           = f.label :date_produced, "production date"
-        .col.form-field-value
+        .col
           = f.text_field :date_produced, placeholder: @view_helper[:date_produced_placeholder], readonly: !@can_update
 
-      .row
-        .col.pe-4.form-field-label
+      .row.form-field
+        .col.pe-4
           = f.label :lab_technician
-        .col.form-field-value
+        .col
           = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
 
-      .row
-        .col.pe-4.form-field-label
+      .row.form-field
+        .col.pe-4
           = f.label :specimen_role
-        .col.form-field-value
+        .col
           - if @can_update
             = cdx_select form: f, name: :specimen_role, searchable: true, :class => 'input-x-large' do |select|
               - select.items Sample.specimen_roles, :id, :description
           - else
             = text_field_tag :specimen_role, Sample.specimen_role_description(f.object.specimen_role), { :class => 'input-x-large', readonly: true }
-      .row
-        .col.pe-4.form-field-label
+      .row.form-field
+        .col.pe-4
           = f.label :isolate_name
-        .col.form-field-value
+        .col
           = f.text_field :isolate_name, :class => 'input-x-large', readonly: !@can_update
 
-      .row
-        .col.pe-4.form-field-label
+      .row.form-field
+        .col.pe-4
           = f.label :inactivation_method
-        .col.form-field-value
+        .col
           - if @can_update
             = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
               - select.items Sample.inactivation_methods
           - else
             = f.text_field :inactivation_method, readonly: true
 
-      .row
-        .col.pe-4.form-field-label
+      .row.form-field
+        .col.pe-4
           = f.label :volume
-        .col.form-field-value
+        .col
           .row.input-unit
             = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
             .span.unit (μl)

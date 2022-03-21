@@ -207,7 +207,7 @@ var AlertCategorySelect = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<div className="row">
+				<div className="row form-field">
 					<div className="col">
 						<FlashErrorMessages messages={this.state.error_messages} />
 						<form className = "alertForm" id="new_alert" onSubmit = {this.handleAlertSubmit} >
