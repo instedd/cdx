@@ -24,7 +24,7 @@ var PatientCard = React.createClass({
 
     if (patient == null) {
       return (
-        <%= to_jsx(card(image: asset_url('card-unkown.png')) do |c|
+        <%= to_jsx(card(image: 'card-unkown.png') do |c|
           c.top do
             "No patient information"
           end
@@ -32,7 +32,7 @@ var PatientCard = React.createClass({
       );
     } else {
       return (
-        <%= to_jsx(card(image: asset_url('card-unkown.png')) do |c|
+        <%= to_jsx(card(image: 'card-unkown.png') do |c|
           c.top do
             raw <<-JSX
               <a href={"/patients/" + patient.id}>{patient.name || "(Unknown name)"}</a><br/>
