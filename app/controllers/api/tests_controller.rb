@@ -26,20 +26,20 @@ class Api::TestsController < ApiController
           )
         end
       end
-      format.json { render_json query.execute }
+      format.json { render json: query.execute }
     end
   end
 
   def pii
     test = TestResult.find_by_uuid(params[:id])
     return unless authorize_resource(test, Policy::Actions::PII_TEST)
-    render_json "uuid" => params[:id], "pii" => test.pii_data
+    render json: { "uuid" => params[:id], "pii" => test.pii_data }
   end
 
   def schema
     schema = TestsSchema.new params["locale"]
     respond_to do |format|
-      format.json { render_json schema.build }
+      format.json { render json: Oj.dump(schema.build) }
     end
   end
 end

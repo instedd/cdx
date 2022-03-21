@@ -23,10 +23,10 @@ class Api::SitesController < ApiController
         render :layout => false
       end
       format.json do
-        render_json({
+        render json: {
           total_count: @sites.size,
           sites: @sites
-        })
+        }
       end
     end
   end
