@@ -10,10 +10,10 @@ class Api::InstitutionsController < ApiController
         render :layout => false
       end
       format.json do
-        render_json({
+        render json: {
           total_count: @institutions.size,
           institutions: @institutions
-        })
+        }
       end
     end
   end
