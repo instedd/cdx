@@ -31,7 +31,7 @@ gem 'premailer-rails', '< 1.10' # 1.10 requires Rails.application.assets_manifes
 # Views
 gem 'csv_builder', '~> 2.1'
 gem 'haml-rails', '~> 0.9'
-gem 'jbuilder', '~> 1.2' # TODO: next?('~> 2.5', '~> 1.2')
+gem 'jbuilder', '~> 2.5'
 gem 'view_components', git: 'https://github.com/manastech/rails-view_components.git', branch: 'master'
 gem 'wicked_pdf', '~> 2.1'
 
