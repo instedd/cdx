@@ -74,9 +74,8 @@ gem 'geojson_import', git: 'https://github.com/instedd/geojson_import', branch: 
 
 # Services
 gem 'puma', next?('~> 3.0', '~> 2.13')
-gem 'sidekiq', '~> 3.5'
-gem 'sinatra', '~> 1.4' unless next? # for sidekiq web FIXME: upgrade sidekiq
-gem 'sidekiq-cron', '~> 0.3'
+gem 'sidekiq', '~> 4.2'
+gem 'sidekiq-cron', '~> 0.3' # TODO: not maintained, consider sidekiq-scheduler instead
 gem 'whenever', '~> 1.0' # TODO: replace with a sidekiq-cron job
 
 # External services
