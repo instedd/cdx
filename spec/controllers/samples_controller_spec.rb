@@ -100,6 +100,14 @@ RSpec.describe SamplesController, type: :controller do
       get :show, id: sample.id
       expect(response).to be_forbidden
     end
+
+    it "shows old_batch_number" do
+      sample.update(old_batch_number: "1234567")
+
+      get :show, id: sample.id
+
+      expect(response.body).to include(sample.old_batch_number)
+    end
   end
 
   context "new" do
@@ -306,6 +314,14 @@ RSpec.describe SamplesController, type: :controller do
       get :edit, id: sample.id
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_truthy
+    end
+
+    it "shows old_batch_number" do
+      sample.update(old_batch_number: "1234567")
+
+      get :edit, id: sample.id
+
+      expect(response.body).to include(sample.old_batch_number)
     end
   end
 

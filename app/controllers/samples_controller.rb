@@ -17,6 +17,7 @@ class SamplesController < ApplicationController
     @institutions = Institution
       .where()
       .not(uuid: @navigation_context.institution.uuid)
+      .order(name: :asc)
       .pluck(:uuid, :name)
       .map { |uuid, name| { value: uuid, label: name } }
 

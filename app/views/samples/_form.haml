@@ -18,12 +18,12 @@
           = f.label :uuid
         .col
           .value= f.object.uuid
-      - unless f.object.batch.nil?
+      - if batch_number = f.object.batch_number
         .row.form-field
           .col.pe-4
             = f.label :batch_id
           .col
-            .value= f.object.batch.batch_number
+            .value= batch_number
 
       .row.form-field
         .col.pe-4

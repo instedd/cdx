@@ -37,6 +37,10 @@ class Batch < ActiveRecord::Base
     self.samples.select {|sample| sample.is_quality_control?}.first
   end
 
+  def has_qc_sample?
+    self.qc_sample.present?
+  end
+
   private
 
   def isolate_name_batch_number_combination_create

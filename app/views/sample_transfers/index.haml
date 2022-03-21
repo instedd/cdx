@@ -39,6 +39,7 @@
                       = react_component "SampleTransferConfirm", url: sample_transfer_confirm_path(sample_transfer_id: transfer.transfer), uuid: transfer.sample.uuid
                     - else
                       Unconfirmed
+                      .icon-help.icon-gray{title: "You're not authorized to confirm this transfer."}
                   - else
                     Sent on
                     = time_tag transfer.created_at, I18n.l(transfer.created_at, format: I18n.t("date.formats.long"))

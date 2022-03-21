@@ -39,11 +39,11 @@
               %th Production Date
           - t.tbody do
             - @samples.each do |sample|
-              %tr.laboratory-sample-row{data: {is_qc: sample.is_quality_control?.to_s, href: has_access?(sample, Policy::Actions::UPDATE_SAMPLE) ? edit_sample_path(sample) : sample_path(sample)}}
+              %tr.laboratory-sample-row{data: { hasQcReference: sample.batch.nil? ? false.to_s : sample.batch.has_qc_sample?.to_s, is_qc: sample.is_quality_control?.to_s, href: has_access?(sample, Policy::Actions::UPDATE_SAMPLE) ? edit_sample_path(sample) : sample_path(sample)}}
                 %td
                   =check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids.#{sample.id}" }
                   %label.row{for: "sample_ids.#{sample.id}"}
-                %td{id: 'sample_uuid'}= sample.uuid
+                %td{id: 'sample_uuid', data: {uuid: sample.uuid}}= short_uuid_with_title sample.uuid
                 %td{id: 'sample_isolate_name'}= sample.isolate_name
                 %td= sample.inactivation_method
                 %td= sample.specimen_role_description
