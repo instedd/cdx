@@ -1,10 +1,9 @@
-# FIXME: reenable Sidekiq::Web (must upgrade Sidekiq to upgrade Sinatra that supports Rack 2)
-# require 'sidekiq/web'
-# require 'sidekiq/cron/web'
+require 'sidekiq/web'
+require 'sidekiq/cron/web'
 
 Rails.application.routes.draw do
   use_doorkeeper
-  # mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
+  mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
 
   if Settings.single_tenant
     devise_for(
