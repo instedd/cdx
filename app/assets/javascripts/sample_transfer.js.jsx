@@ -121,7 +121,11 @@ var SampleTransferModal = React.createClass({
         </div>
         <div className="row">
           <div className="col pe-3"><label>Institution</label></div>
-          <div className="col"><CdxSelect name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} /></div>
+          <div className="col">
+            <CdxSelect name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
+            <span className="error" hidden><div className="icon-error icon-red" /> Institution can't be blank</span>
+          </div>
+          
         </div>
         <div className="row">
           <div className="col pe-3">
@@ -134,7 +138,6 @@ var SampleTransferModal = React.createClass({
             <div>
               <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
               <button className="btn btn-primary" type="button" onClick={this.transferSamples}>Transfer</button>
-              <span className="error" hidden> <div className="icon-error icon-red" /> An institution is required</span>
             </div>
             <div />
           </div>
