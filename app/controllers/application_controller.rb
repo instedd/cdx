@@ -47,7 +47,7 @@ class ApplicationController < ActionController::Base
     if has_access?(resource, action)
       check_access(resource, action)
     else
-      forbid_access(action, resource)
+      forbid_access(resource, action)
     end
   end
 
@@ -82,7 +82,7 @@ class ApplicationController < ActionController::Base
   # filters/authorize navigation_context institutions by action. Assign calls resource.institution= if action is allowed
   def prepare_for_institution_and_authorize(resource, action)
     if authorize_resource(@navigation_context.institution, action).blank?
-      forbid_access(action, resource)
+      forbid_access(resource, action)
     else
       resource.institution = @navigation_context.institution
     end
@@ -202,7 +202,7 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def forbid_access(action, resource)
+  def forbid_access(resource, action)
     log_authorization_warn resource, action
     head :forbidden
     nil
