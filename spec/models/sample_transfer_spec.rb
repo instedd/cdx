@@ -36,7 +36,7 @@ RSpec.describe SampleTransfer, type: :model do
       transfer = SampleTransfer.make
       expect(transfer).not_to be_confirmed
 
-      Timecop.freeze do
+      Timecop.freeze(Time.now.change(usec: 0)) do
         expect(transfer.confirm).to be true
         expect(transfer.confirmed_at).to eq Time.now
       end
@@ -59,7 +59,7 @@ RSpec.describe SampleTransfer, type: :model do
       transfer = SampleTransfer.make
       expect(transfer).not_to be_confirmed
 
-      Timecop.freeze do
+      Timecop.freeze(Time.now.change(usec: 0)) do
         expect(transfer.confirm!).to be true
         expect(transfer.confirmed_at).to eq Time.now
       end
@@ -82,7 +82,7 @@ RSpec.describe SampleTransfer, type: :model do
       transfer = SampleTransfer.make
       expect(transfer).not_to be_confirmed
 
-      Timecop.freeze do
+      Timecop.freeze(Time.now.change(usec: 0)) do
         expect(transfer.confirm_and_apply).to be true
         expect(transfer.confirmed_at).to eq Time.now
       end
@@ -107,7 +107,7 @@ RSpec.describe SampleTransfer, type: :model do
       transfer = SampleTransfer.make
       expect(transfer).not_to be_confirmed
 
-      Timecop.freeze do
+      Timecop.freeze(Time.now.change(usec: 0)) do
         transfer.confirm_and_apply!
         expect(transfer.confirmed_at).to eq Time.now
       end
