@@ -143,7 +143,7 @@ var SampleTransferModal = React.createClass({
       <div className="samples-transfer-modal">
         <div className="row">
           <div className="col pe-3"><label>Samples</label></div>
-          <div className="col">
+          <div className="col samples-list">
             {this.batchSamples()}
           </div>
         </div>
