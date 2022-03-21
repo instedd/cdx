@@ -50,16 +50,20 @@ var SampleTransferModal = React.createClass({
       includes_qc_info: this.state.includeQcInfo,
       samples: this.state.selectedSamples.map((sample) => sample.uuid)
     }
-    $.ajax({
-      url: '/sample_transfers',
-      method: 'POST',
-      data: data,
-      success: function () {
-        this.closeModal();
-        window.location.reload(true); // reload page to update users table
-      }.bind(this)
-    });
-
+    if (data.institution_id == null){
+      $(".error").prop("hidden",false);
+    }
+    else{
+      $.ajax({
+        url: '/sample_transfers',
+        method: 'POST',
+        data: data,
+        success: function () {
+          this.closeModal();
+          window.location.reload(true); // reload page to update users table
+        }.bind(this)
+      });
+    }
 
   },
 
@@ -70,6 +74,9 @@ var SampleTransferModal = React.createClass({
   },
 
   changeInstitution: function(newValue) {
+    if ($(".error").prop("hidden") === false){
+      $(".error").prop("hidden", true)
+    } 
     this.setState({
       institutionId: newValue,
     })
@@ -127,6 +134,7 @@ var SampleTransferModal = React.createClass({
             <div>
               <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
               <button className="btn btn-primary" type="button" onClick={this.transferSamples}>Transfer</button>
+              <span className="error" hidden> <div className="icon-error icon-red" /> An institution is required</span>
             </div>
             <div />
           </div>
