@@ -42,9 +42,9 @@ RSpec.describe SampleTransfersController, type: :controller do
       end
 
       it "by old_batch_number" do
-        subject.sample.update(old_batch_number: "12345678")
-        get :index, batch_number: subject.sample.old_batch_number
-        expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
+        transfer = SampleTransfer.make!(sender_institution: my_institution, sample: Sample.make!(:filled, specimen_role: "c", old_batch_number: "12345678"))
+        get :index, batch_number: "12345678"
+        expect(assigns(:sample_transfers).map(&:transfer)).to eq [transfer]
       end
 
       it "by isolate_name" do
