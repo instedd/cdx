@@ -27,9 +27,7 @@
   }
 
   function toggleBulkTransfer() {
-    debugger;
-    var areQc = selectedSamplesIds().some((sample) => sample.isQc === true)
-    if(areQc){
+    if(selectedSamplesIds().some((sample) => sample.isQc === true)){
         $("#bulk_transfer").prop('disabled', true);
         $('#table-notification').css("visibility", "visible");
       }
