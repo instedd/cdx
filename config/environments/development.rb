@@ -67,6 +67,15 @@ Rails.application.configure do
 
   config.active_job.queue_adapter = :sidekiq
 
+  # allow web-console to work within docker:
+  config.web_console.whitelisted_ips = [
+    '::1',
+    '127.0.0.0/24',
+    '10.0.0.0/8',
+    '172.16.0.0/12',
+    '192.168.0.0/16',
+  ]
+
   config.authorized_keys_path = 'tmp/.ssh/authorized_keys'
   config.sync_dir_path = 'tmp/sync'
   config.ssh_server_host = 'localhost'
