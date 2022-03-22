@@ -62,16 +62,20 @@ var SampleTransferModal = React.createClass({
       includes_qc_info: this.state.includeQcInfo,
       samples: this.state.selectedSamples.map((sample) => sample.uuid)
     }
-    $.ajax({
-      url: '/sample_transfers',
-      method: 'POST',
-      data: data,
-      success: function () {
-        this.closeModal();
-        window.location.reload(true); // reload page to update users table
-      }.bind(this)
-    });
-
+    if (data.institution_id == null){
+      $(".institution-select").addClass("input-required");
+    }
+    else{
+      $.ajax({
+        url: '/sample_transfers',
+        method: 'POST',
+        data: data,
+        success: function () {
+          this.closeModal();
+          window.location.reload(true); // reload page to update users table
+        }.bind(this)
+      });
+    }
 
   },
 
@@ -82,6 +86,7 @@ var SampleTransferModal = React.createClass({
   },
 
   changeInstitution: function(newValue) {
+    $(".institution-select").removeClass("input-required")
     this.setState({
       institutionId: newValue,
     })
@@ -149,7 +154,11 @@ var SampleTransferModal = React.createClass({
         </div>
         <div className="row">
           <div className="col pe-3"><label>Institution</label></div>
-          <div className="col"><CdxSelect name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} /></div>
+          <div className="col">
+            <CdxSelect className="institution-select" name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
+            <span className="error"><div className="icon-error icon-red" /> Institution can't be blank</span>
+          </div>
+          
         </div>
         {this.showQcWarningCheckbox(this.state.selectedSamples)}
         <div className="modal-footer">
