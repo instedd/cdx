@@ -469,10 +469,12 @@ label.on {
   align-items: center;
 }
 
+div + .error,
 input + .error {
   visibility: hidden;
 }
 
+div.input-required + .error,
 input.input-required + .error {
   visibility: visible;
 }

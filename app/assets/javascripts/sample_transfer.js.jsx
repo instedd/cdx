@@ -51,7 +51,7 @@ var SampleTransferModal = React.createClass({
       samples: this.state.selectedSamples.map((sample) => sample.uuid)
     }
     if (data.institution_id == null){
-      $(".error").prop("hidden",false);
+      $(".institution-select").addClass("input-required");
     }
     else{
       $.ajax({
@@ -74,9 +74,7 @@ var SampleTransferModal = React.createClass({
   },
 
   changeInstitution: function(newValue) {
-    if ($(".error").prop("hidden") === false){
-      $(".error").prop("hidden", true)
-    } 
+    $(".institution-select").removeClass("input-required")
     this.setState({
       institutionId: newValue,
     })
@@ -122,8 +120,8 @@ var SampleTransferModal = React.createClass({
         <div className="row">
           <div className="col pe-3"><label>Institution</label></div>
           <div className="col">
-            <CdxSelect name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
-            <span className="error" hidden><div className="icon-error icon-red" /> Institution can't be blank</span>
+            <CdxSelect className="institution-select" name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
+            <span className="error"><div className="icon-error icon-red" /> Institution can't be blank</span>
           </div>
           
         </div>
