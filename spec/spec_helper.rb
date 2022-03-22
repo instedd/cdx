@@ -3,8 +3,10 @@ ENV["RAILS_ENV"] ||= 'test'
 
 require "bundler/setup"
 
-if ENV['COVERAGE'] == 'true'
+if ENV['CI'] || ENV['COVERAGE'] == 'true'
   require 'simplecov'
+  SimpleCov.command_name ENV['FEATURES'] == 'true' ? 'Rspec Features' : 'Rspec'
+  SimpleCov.formatter SimpleCov::Formatter::SimpleFormatter if ENV['CI']
   SimpleCov.start 'rails'
 end
 
@@ -80,7 +82,11 @@ RSpec.configure do |config|
     ActionMailer::Base.deliveries.clear
   end
 
-  config.exclude_pattern = "spec/features/**/*_spec.rb"
+  if ENV['FEATURES'] == 'true'
+    config.pattern = "spec/features/**/*_spec.rb"
+  else
+    config.exclude_pattern = "spec/features/**/*_spec.rb"
+  end
 
   # disable noisy backtraces:
   config.filter_rails_from_backtrace!
