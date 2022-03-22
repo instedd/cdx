@@ -4,8 +4,9 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-if ENV['COVERAGE'] == 'true'
+if ENV['CI'] || ENV['COVERAGE'] == 'true'
   require 'simplecov'
+  SimpleCov.formatter SimpleCov::Formatter::SimpleFormatter if ENV['CI']
   SimpleCov.start 'rails'
 end
 
