@@ -11,7 +11,7 @@ describe Api::FiltersController do
   it "list filters" do
     filter = Filter.make!(user: user, query: { site: 1 })
 
-    get :index, format: :json
+    get :index, format: 'json'
     expect(response.body).to eq([filter].to_json)
   end
 end

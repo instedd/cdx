@@ -10,7 +10,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
   def get_updates(options, body="")
     refresh_index
-    response = get :index, body, options.merge(format: 'json')
+    response = get :index, body: body, params: options, format: 'json'
     expect(response.status).to eq(200)
     Oj.load(response.body)["tests"]
   end

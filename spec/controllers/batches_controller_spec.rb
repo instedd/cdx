@@ -57,7 +57,7 @@ RSpec.describe BatchesController, type: :controller do
       Batch.make! institution: institution, batch_number: '456', isolate_name: 'DEF.24'
       Batch.make! institution: institution, batch_number: '789', isolate_name: 'GHI.42'
 
-      get :index, isolate_name: '42'
+      get :index, params: { isolate_name: '42' }
       expect(response).to be_success
       expect(assigns(:batches).count).to eq(2)
     end
@@ -67,7 +67,7 @@ RSpec.describe BatchesController, type: :controller do
       Batch.make! institution: institution, batch_number: '8877'
       Batch.make! institution: institution, batch_number: '0123'
 
-      get :index, batch_number: '88'
+      get :index, params: { batch_number: '88' }
       expect(response).to be_success
       expect(assigns(:batches).count).to eq(2)
     end
@@ -76,7 +76,7 @@ RSpec.describe BatchesController, type: :controller do
       batch = Batch.make! institution: institution, batch_number: '7788'
       Sample.make! batch: batch, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
 
-      get :index, sample_id: '88'
+      get :index, params: { sample_id: '88' }
       expect(response).to be_success
       expect(assigns(:batches).count).to eq(1)
     end
@@ -86,14 +86,14 @@ RSpec.describe BatchesController, type: :controller do
     let!(:batch) { Batch.make! institution: institution }
 
     it "should be accessible to institution owner" do
-      get :show, id: batch.id
+      get :show, params: { id: batch.id }
       expect(response).to be_success
     end
 
     it "shouldn't be accessible to anybody" do
       sign_in other_user
 
-      get :show, id: batch.id
+      get :show, params: { id: batch.id }
       expect(response).to be_forbidden
     end
   end
@@ -148,14 +148,14 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should create new batch in context institution" do
       expect {
-        post :create, batch: batch_form_plan
+        post :create, params: { batch: batch_form_plan }
       }.to change(institution.batches, :count).by(1)
 
       expect(response).to redirect_to batches_path
     end
 
     it "should save fields" do
-      post :create, batch: batch_form_plan
+      post :create, params: { batch: batch_form_plan }
       batch = institution.batches.last
 
       expect(batch.batch_number).to eq(batch_form_plan[:batch_number])
@@ -183,7 +183,7 @@ RSpec.describe BatchesController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, batch: batch_form_plan
+        post :create, params: { batch: batch_form_plan }
       }.to change(institution.batches, :count).by(1)
     end
 
@@ -191,7 +191,7 @@ RSpec.describe BatchesController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, batch: batch_form_plan
+        post :create, params: { batch: batch_form_plan }
       }.to change(institution.batches, :count).by(0)
 
       expect(response).to be_forbidden
@@ -199,7 +199,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should require date_produced" do
       expect {
-        post :create, batch: build_batch_form_plan(date_produced: '')
+        post :create, params: { batch: build_batch_form_plan(date_produced: '') }
       }.to change(institution.batches, :count).by(0)
 
       expect(assigns(:batch_form).errors).to have_key(:date_produced)
@@ -208,7 +208,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should require isolate_name" do
       expect {
-        post :create, batch: build_batch_form_plan(isolate_name: '')
+        post :create, params: { batch: build_batch_form_plan(isolate_name: '') }
       }.to change(institution.batches, :count).by(0)
 
       expect(assigns(:batch_form).errors).to have_key(:isolate_name)
@@ -217,7 +217,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should require batch_number" do
       expect {
-        post :create, batch: build_batch_form_plan(batch_number: '')
+        post :create, params: { batch: build_batch_form_plan(batch_number: '') }
       }.to change(institution.batches, :count).by(0)
 
       expect(assigns(:batch_form).errors).to have_key(:batch_number)
@@ -226,7 +226,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should validate date_produced" do
       expect {
-        post :create, batch: build_batch_form_plan(date_produced: '31/31/3100')
+        post :create, params: { batch: build_batch_form_plan(date_produced: '31/31/3100') }
       }.to change(institution.batches, :count).by(0)
 
       expect(assigns(:batch_form).errors).to have_key(:date_produced)
@@ -235,7 +235,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should require lab_technician" do
       expect {
-        post :create, batch: build_batch_form_plan(lab_technician: '')
+        post :create, params: { batch: build_batch_form_plan(lab_technician: '') }
       }.to change(institution.batches, :count).by(0)
 
       expect(assigns(:batch_form).errors).to have_key(:lab_technician)
@@ -244,7 +244,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should require inactivation_method" do
       expect {
-        post :create, batch: build_batch_form_plan(inactivation_method: '')
+        post :create, params: { batch: build_batch_form_plan(inactivation_method: '') }
       }.to change(institution.batches, :count).by(0)
 
       expect(assigns(:batch_form).errors).to have_key(:inactivation_method)
@@ -253,7 +253,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should require volume" do
       expect {
-        post :create, batch: build_batch_form_plan(volume: '')
+        post :create, params: { batch: build_batch_form_plan(volume: '') }
       }.to change(institution.batches, :count).by(0)
 
       expect(assigns(:batch_form).errors).to have_key(:volume)
@@ -262,7 +262,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should not require specimen_role" do
       expect {
-        post :create, batch: build_batch_form_plan(specimen_role: '')
+        post :create, params: { batch: build_batch_form_plan(specimen_role: '') }
       }.to change(institution.batches, :count).by(1)
 
       batch = institution.batches.last
@@ -272,7 +272,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should validate batch_number and isolate_name uniqueness" do
       expect {
-        post :create, batch: build_batch_form_plan(batch_number: batch.batch_number, isolate_name: batch.isolate_name)
+        post :create, params: { batch: build_batch_form_plan(batch_number: batch.batch_number, isolate_name: batch.isolate_name) }
       }.to change(institution.batches, :count).by(0)
 
       expect(response).to render_template("batches/new")
@@ -280,7 +280,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should validate batch_number (exists) and isolate_name uniqueness" do
       expect {
-        post :create, batch: build_batch_form_plan(batch_number: batch.batch_number, isolate_name: 'DEF.24')
+        post :create, params: { batch: build_batch_form_plan(batch_number: batch.batch_number, isolate_name: 'DEF.24') }
       }.to change(institution.batches, :count).by(1)
 
       expect(response).to redirect_to batches_path
@@ -288,7 +288,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should validate batch_number and isolate_name (exists) uniqueness" do
       expect {
-        post :create, batch: build_batch_form_plan(batch_number: '456', isolate_name: batch.isolate_name)
+        post :create, params: { batch: build_batch_form_plan(batch_number: '456', isolate_name: batch.isolate_name) }
       }.to change(institution.batches, :count).by(1)
 
       expect(response).to redirect_to batches_path
@@ -308,7 +308,7 @@ RSpec.describe BatchesController, type: :controller do
     )}
 
     it "should be accessible by institution owner" do
-      get :edit, id: batch.id
+      get :edit, params: { id: batch.id }
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_truthy
     end
@@ -317,7 +317,7 @@ RSpec.describe BatchesController, type: :controller do
       grant user, other_user, Batch, UPDATE_BATCH
       sign_in other_user
 
-      get :edit, id: batch.id
+      get :edit, params: { id: batch.id }
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_falsy
     end
@@ -325,7 +325,7 @@ RSpec.describe BatchesController, type: :controller do
     it "should not be accessible if can not edit" do
       sign_in other_user
 
-      get :edit, id: batch.id
+      get :edit, params: { id: batch.id }
       expect(response).to be_forbidden
     end
 
@@ -334,7 +334,7 @@ RSpec.describe BatchesController, type: :controller do
       grant user, other_user, Batch, DELETE_BATCH
       sign_in other_user
 
-      get :edit, id: batch.id
+      get :edit, params: { id: batch.id }
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_truthy
     end
@@ -353,13 +353,16 @@ RSpec.describe BatchesController, type: :controller do
     )}
 
     it "should update existing batch" do
-      post :update, id: batch.id, batch: {
-        isolate_name: 'ABC.42',
-        date_produced: '09/09/2021',
-        lab_technician: 'TecFoo',
-        specimen_role: 'p',
-        inactivation_method: 'Heat',
-        volume: '200'
+      post :update, params: {
+        id: batch.id,
+        batch: {
+          isolate_name: 'ABC.42',
+          date_produced: '09/09/2021',
+          lab_technician: 'TecFoo',
+          specimen_role: 'p',
+          inactivation_method: 'Heat',
+          volume: '200'
+        }
       }
       expect(response).to be_redirect
 
@@ -373,7 +376,7 @@ RSpec.describe BatchesController, type: :controller do
     end
 
     it "should require date_produced" do
-      post :update, id: batch.id, batch: { date_produced: '' }
+      post :update, params: { id: batch.id, batch: { date_produced: '' } }
       expect(assigns(:batch_form).errors).to have_key(:date_produced)
       expect(response).to render_template("batches/edit")
     end
@@ -382,13 +385,16 @@ RSpec.describe BatchesController, type: :controller do
       grant user, other_user, Batch, UPDATE_BATCH
 
       sign_in other_user
-      post :update, id: batch.id, batch: {
-        isolate_name: 'ABC.42',
-        date_produced: '09/09/2021',
-        lab_technician: 'TecFoo',
-        specimen_role: 'p',
-        inactivation_method: 'Heat',
-        volume: '200'
+      post :update, params: {
+        id: batch.id,
+        batch: {
+          isolate_name: 'ABC.42',
+          date_produced: '09/09/2021',
+          lab_technician: 'TecFoo',
+          specimen_role: 'p',
+          inactivation_method: 'Heat',
+          volume: '200'
+        }
       }
       expect(response).to be_redirect
 
@@ -403,7 +409,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should not update existing batch if not allowed" do
       sign_in other_user
-      post :update, id: batch.id, batch: { date_produced: '09/09/2021' }
+      post :update, params: { id: batch.id, batch: { date_produced: '09/09/2021' } }
       expect(response).to be_forbidden
 
       batch.reload
@@ -425,7 +431,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should be able to soft delete a batch" do
       expect {
-        delete :destroy, id: batch.id
+        delete :destroy, params: { id: batch.id }
       }.to change(institution.batches, :count).by(-1)
 
       batch.reload
@@ -439,7 +445,7 @@ RSpec.describe BatchesController, type: :controller do
       sign_in other_user
 
       expect {
-        delete :destroy, id: batch.id
+        delete :destroy, params: { id: batch.id }
       }.to change(institution.batches, :count).by(-1)
 
       batch.reload
@@ -450,7 +456,7 @@ RSpec.describe BatchesController, type: :controller do
       sign_in other_user
 
       expect {
-        delete :destroy, id: batch.id
+        delete :destroy, params: { id: batch.id }
       }.to change(institution.batches, :count).by(0)
 
       expect(response).to be_forbidden
@@ -495,7 +501,7 @@ RSpec.describe BatchesController, type: :controller do
     it "should be able to bulk destroy batches" do
 
       expect {
-        post :bulk_destroy, batch_ids: [batch1.id, batch2.id]
+        post :bulk_destroy, params: { batch_ids: [batch1.id, batch2.id] }
       }.to change(institution.batches, :count).by(-2)
 
       batch1.reload
@@ -511,7 +517,7 @@ RSpec.describe BatchesController, type: :controller do
       sign_in other_user
 
       expect {
-        post :bulk_destroy, batch_ids: [batch1.id, batch2.id]
+        post :bulk_destroy, params: { batch_ids: [batch1.id, batch2.id] }
       }.to change(institution.batches, :count).by(-2)
 
       batch1.reload
@@ -524,7 +530,7 @@ RSpec.describe BatchesController, type: :controller do
       sign_in other_user
 
       expect {
-        post :bulk_destroy, batch_ids: [batch1.id, batch2.id]
+        post :bulk_destroy, params: { batch_ids: [batch1.id, batch2.id] }
       }.to change(institution.batches, :count).by(0)
 
       expect(response).to be_forbidden
@@ -532,7 +538,7 @@ RSpec.describe BatchesController, type: :controller do
 
     it "should not able to bulk destroy if can not DELETE all batches" do
       expect {
-        post :bulk_destroy, batch_ids: [batch1.id, batch2.id, batch3.id]
+        post :bulk_destroy, params: { batch_ids: [batch1.id, batch2.id, batch3.id] }
       }.to change(institution.batches, :count).by(0)
 
       expect(response).to be_forbidden

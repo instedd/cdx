@@ -17,7 +17,7 @@ describe Api::SubscribersController, elasticsearch: true do
   end
 
   it "creates a subscriber" do
-    post :create, format: :json, filter_id: filter.id, subscriber: { name: "foo", url: "http://foo.com", fields: %w(foo bar) }
+    post :create, format: :json, params: { filter_id: filter.id, subscriber: { name: "foo", url: "http://foo.com", fields: %w(foo bar) } }
     subscriber = filter.subscribers.first
     expect(subscriber.name).to eq("foo")
     expect(subscriber.url).to eq("http://foo.com")
@@ -26,7 +26,7 @@ describe Api::SubscribersController, elasticsearch: true do
 
   it "deletes a subscriber" do
     subscriber = Subscriber.make! user: user, filter: filter, fields: ['foo', 'bar']
-    delete :destroy, filter_id: filter.id, id: subscriber.id
+    delete :destroy, params: { filter_id: filter.id, id: subscriber.id }
     expect(filter.subscribers.count).to be(0)
   end
 end

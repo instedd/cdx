@@ -17,10 +17,12 @@ describe RolesController do
 
     it "should infer the institution from current context" do
       expect {
-        post :create, role: {
-          name: "Some role",
-          site_id: site.id,
-          definition: policy_definition('device', '*').to_json
+        post :create, params: {
+          role: {
+            name: "Some role",
+            site_id: site.id,
+            definition: policy_definition('device', '*').to_json
+          }
         }
       }.to change(institution.roles, :count).by(1)
       expect(Role.last.institution).to eq(institution)
@@ -29,10 +31,12 @@ describe RolesController do
     it "should infer the institution from current context, even when having access to multiple institutions" do
       grant nil, user, "institution/#{institution2.id}", [READ_INSTITUTION]
       expect {
-        post :create, role: {
-          name: "Some role",
-          site_id: site.id,
-          definition: policy_definition('device', '*').to_json
+        post :create, params: {
+          role: {
+            name: "Some role",
+            site_id: site.id,
+            definition: policy_definition('device', '*').to_json
+          }
         }
       }.to change(institution.roles, :count).by(1)
       expect(Role.last.institution).to eq(institution)
@@ -41,11 +45,13 @@ describe RolesController do
     it "should infer the institution from current context, even when it's not the default" do
       grant nil, user, "institution/#{institution2.id}", [READ_INSTITUTION]
       expect {
-        post :create, role: {
-          name: "Some role",
-          site_id: site.id,
-          definition: policy_definition('device', '*').to_json,
-          context: institution2.uuid
+        post :create, params: {
+          role: {
+            name: "Some role",
+            site_id: site.id,
+            definition: policy_definition('device', '*').to_json,
+            context: institution2.uuid
+          }
         }
       }.to change(institution.roles, :count).by(1)
       expect(Role.last.institution).to eq(institution)
@@ -62,20 +68,20 @@ describe RolesController do
     end
 
     it "should be able to update the policy definition" do
-      put :update, id: role.id, role: { name: role.name, definition: policy_definition('device', '*').to_json }
+      put :update, params: { id: role.id, role: { name: role.name, definition: policy_definition('device', '*').to_json } }
       role.reload
       expect(role.policy.definition["statement"][0]["action"][0]).to eq("*")
     end
 
     it "should be able to update name" do
-      put :update, id: role.id, role: { name: "new-name", definition: policy_definition('device', '*').to_json }
+      put :update, params: { id: role.id, role: { name: "new-name", definition: policy_definition('device', '*').to_json } }
       role.reload
       expect(role.name).to eq("new-name")
       expect(role.policy.definition["statement"][0]["action"][0]).to eq("*")
     end
 
     it "should not change policy if name is invalid" do
-      put :update, id: role.id, role: { name: "", definition: policy_definition('device', '*').to_json }
+      put :update, params: { id: role.id, role: { name: "", definition: policy_definition('device', '*').to_json } }
       role.reload
       expect(role.name).to_not eq("")
       expect(role.policy.definition["statement"][0]["action"][0]).to eq(initial_action)
@@ -86,7 +92,7 @@ describe RolesController do
     end
 
     it "should not change name if policy is empty" do
-      put :update, id: role.id, role: { name: "new-name", definition: "{statement:[]}" }
+      put :update, params: { id: role.id, role: { name: "new-name", definition: "{statement:[]}" } }
       role.reload
       expect(role.name).to_not eq("new-name")
       expect(role.policy.definition["statement"][0]["action"][0]).to eq(initial_action)
@@ -97,7 +103,7 @@ describe RolesController do
     end
 
     it "should not change name if policy is invalid json" do
-      put :update, id: role.id, role: { name: "new-name", definition: "i am not a json" }
+      put :update, params: { id: role.id, role: { name: "new-name", definition: "i am not a json" } }
       role.reload
       expect(role.name).to_not eq("new-name")
       expect(role.policy.definition["statement"][0]["action"][0]).to eq(initial_action)
@@ -108,7 +114,7 @@ describe RolesController do
     end
 
     it "should change name only if policy is empty" do
-      put :update, id: role.id, role: { name: "new-name", definition: "" }
+      put :update, params: { id: role.id, role: { name: "new-name", definition: "" } }
       role.reload
       expect(role.name).to eq("new-name")
       expect(role.policy.definition["statement"][0]["action"][0]).to eq(initial_action)
@@ -126,7 +132,7 @@ describe RolesController do
 
     def create_role(args)
       expect {
-        post :create, role: args
+        post :create, params: { role: args }
       }.to change(institution.roles, :count).by(1)
 
     end
@@ -164,7 +170,7 @@ describe RolesController do
     it "should update computed policies when updating a role which users already have" do
       create_role name: "All sites", definition: policy_definition('site', '*').to_json
       add_grantee_to_role 'All sites'
-      post :update, id: Role.find_by_name('All sites').id, role: { name: "All sites", definition: policy_definition('device', '*').to_json }
+      post :update, params: { id: Role.find_by_name('All sites').id, role: { name: "All sites", definition: policy_definition('device', '*').to_json } }
 
       assert_cannot grantee, device2, 'device:read'
       assert_can grantee, device, 'device:read'

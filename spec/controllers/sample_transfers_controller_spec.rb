@@ -32,33 +32,33 @@ RSpec.describe SampleTransfersController, type: :controller do
       let!(:other) { SampleTransfer.make!(receiver_institution: my_institution, sample: Sample.make!(:filled, batch: Batch.make!)) }
 
       it "by sample id" do
-        get :index, sample_id: subject.sample.uuid[0..8]
+        get :index, params: { sample_id: subject.sample.uuid[0..8] }
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
       end
 
       it "by batch_number" do
-        get :index, batch_number: subject.sample.batch.batch_number
+        get :index, params: { batch_number: subject.sample.batch.batch_number }
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
       end
 
       it "by old_batch_number" do
         subject.sample.update(old_batch_number: "12345678")
-        get :index, batch_number: subject.sample.old_batch_number
+        get :index, params: { batch_number: subject.sample.old_batch_number }
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
       end
 
       it "by isolate_name" do
-        get :index, isolate_name: subject.sample.isolate_name
+        get :index, params: { isolate_name: subject.sample.isolate_name }
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
       end
 
       it "by specimen_role" do
-        get :index, specimen_role: subject.sample.specimen_role
+        get :index, params: { specimen_role: subject.sample.specimen_role }
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
       end
 
       it "combined" do
-        get :index, sample_id: subject.sample.uuid[0..8], batch_number: subject.sample.batch.batch_number, isolate_name: subject.sample.isolate_name, specimen_role: subject.sample.specimen_role
+        get :index, params: { sample_id: subject.sample.uuid[0..8], batch_number: subject.sample.batch.batch_number, isolate_name: subject.sample.isolate_name, specimen_role: subject.sample.specimen_role }
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe SampleTransfersController, type: :controller do
     it "creates single transfer" do
       sample = Sample.make(:filled, institution: my_institution, site: my_site)
 
-      post :create, institution_id: other_institution.uuid, samples: [sample.uuid]
+      post :create, params: { institution_id: other_institution.uuid, samples: [sample.uuid] }
 
       expect(response).to be_success
       expect(flash.to_h).to eq({ "success" => "All samples have been transferred successfully." })
@@ -91,7 +91,7 @@ RSpec.describe SampleTransfersController, type: :controller do
     it "creates multiple transfers" do
       samples = 3.times.map { Sample.make(:filled, institution: my_institution, site: my_site) }
 
-      post :create, institution_id: other_institution.uuid, samples: samples.map(&:uuid)
+      post :create, params: { institution_id: other_institution.uuid, samples: samples.map(&:uuid) }
 
       expect(response).to be_success
       expect(flash.to_h).to eq({ "success" => "All samples have been transferred successfully." })
@@ -117,7 +117,7 @@ RSpec.describe SampleTransfersController, type: :controller do
       transfer = sample.start_transfer_to(my_institution)
 
       Timecop.freeze do
-        patch :confirm, sample_transfer_id: transfer.id
+        patch :confirm, params: { sample_transfer_id: transfer.id }
         expect(response).to be_success
 
         transfer.reload
@@ -134,7 +134,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
       grant other_institution.user, current_user, other_institution, Policy::Actions::READ_INSTITUTION
 
-      patch :confirm, sample_transfer_id: transfer.id, context: other_institution.uuid
+      patch :confirm, params: { sample_transfer_id: transfer.id, context: other_institution.uuid }
       expect(response).to be_forbidden
 
       transfer.reload
@@ -149,7 +149,7 @@ RSpec.describe SampleTransfersController, type: :controller do
       transfer = sample.start_transfer_to(other_institution)
 
       expect {
-        patch :confirm, sample_transfer_id: transfer.id
+        patch :confirm, params: { sample_transfer_id: transfer.id }
       }.to raise_error(ActiveRecord::RecordNotFound)
 
       transfer.reload
@@ -166,7 +166,7 @@ RSpec.describe SampleTransfersController, type: :controller do
       transfer.confirmed_at = original_confirmed_at = Time.now.change(usec: 0) - 1.hour
       transfer.save!
 
-      patch :confirm, sample_transfer_id: transfer.id
+      patch :confirm, params: { sample_transfer_id: transfer.id }
       expect(response).to be_bad_request
 
       transfer.reload

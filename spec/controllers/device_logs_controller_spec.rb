@@ -15,12 +15,12 @@ describe DeviceLogsController do
 
   describe "create" do
     it "creates" do
-      post :create, "Some failure", device_id: device.uuid, key: @plain_secret_key
+      post :create, body: "Some failure", params: { device_id: device.uuid, key: @plain_secret_key }
       expect(DeviceLog.count).to eq(1)
     end
 
     it "returns forbidden if wrong key" do
-      post :create, "Some failure", device_id: device.uuid, key: "#{@plain_secret_key}..."
+      post :create, body: "Some failure", params: { device_id: device.uuid, key: "#{@plain_secret_key}..." }
       expect(response).to be_forbidden
     end
   end
