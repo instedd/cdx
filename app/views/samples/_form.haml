@@ -5,7 +5,7 @@
   .row
     .col
       - unless f.object.qc_info.nil?
-        .row
+        .row.form-field
           .col.pe-4
             = f.label :quality_control
           .col
@@ -13,31 +13,31 @@
               .icon-test.icon-blue
               = "VIEW QC INFO"
 
-      .row
+      .row.form-field
         .col.pe-4
           = f.label :uuid
         .col
           .value= f.object.uuid
       - if batch_number = f.object.batch_number
-        .row
+        .row.form-field
           .col.pe-4
             = f.label :batch_id
           .col
             .value= batch_number
 
-      .row
+      .row.form-field
         .col.pe-4
           = f.label :date_produced, "production date"
         .col
           = f.text_field :date_produced, placeholder: @view_helper[:date_produced_placeholder], readonly: !@can_update
 
-      .row
+      .row.form-field
         .col.pe-4
           = f.label :lab_technician
         .col
           = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
 
-      .row
+      .row.form-field
         .col.pe-4
           = f.label :specimen_role
         .col
@@ -46,13 +46,13 @@
               - select.items Sample.specimen_roles, :id, :description
           - else
             = text_field_tag :specimen_role, Sample.specimen_role_description(f.object.specimen_role), { :class => 'input-x-large', readonly: true }
-      .row
+      .row.form-field
         .col.pe-4
           = f.label :isolate_name
         .col
           = f.text_field :isolate_name, :class => 'input-x-large', readonly: !@can_update
 
-      .row
+      .row.form-field
         .col.pe-4
           = f.label :inactivation_method
         .col
@@ -62,7 +62,7 @@
           - else
             = f.text_field :inactivation_method, readonly: true
 
-      .row
+      .row.form-field
         .col.pe-4
           = f.label :volume
         .col

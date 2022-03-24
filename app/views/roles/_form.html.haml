@@ -6,21 +6,21 @@
         - @role.errors.full_messages.each do |msg|
           %li= msg
 
-  .row
+  .row.form-field
     .col.pe-2
       = f.label :name
     .col
       = f.text_field :name
 
   - if @accessible_institutions != 1
-    .row
+    .row.form-field
       .col.pe-2
         = f.label :institution_id
       .col
         .value= @institution
 
   - if @role.new_record?
-    .row
+    .row.form-field
       .col.pe-2
         = f.label :site_id
       .col
@@ -28,7 +28,7 @@
           - select.item "", "Choose one"
           - select.items @sites, :id, :name
   - elsif @role.site_id
-    .row
+    .row.form-field
       .col.pe-2
         = f.label :site_id
       .col
