@@ -13,6 +13,7 @@
         = render "shared/header_nav"
 
       .content.row
+        = snackbar
         = flash_message
         .col.px-3#context_side_bar{"data-context-react-props": {context: @navigation_context.try(:to_hash) || {}}.to_json}
         .col

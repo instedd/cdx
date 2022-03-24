@@ -70,6 +70,13 @@ module ApplicationHelper
     I18n.localize(value, locale: current_user.locale, format: I18n.t('date.input_format.pattern'))
   end
 
+  def snackbar
+    res = content_tag :div, id: "snackbar" do 
+      '' 
+    end
+    res
+  end
+
   def flash_message
     res = nil
 

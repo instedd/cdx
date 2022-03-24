@@ -308,6 +308,33 @@ a[title="Back"] {
   position: inherit;
 }
 
+.flash-snackbar{
+  display:flex;
+  align-items: center;
+  padding: 14px 6px;
+
+  .icon{
+    display: flex;
+    width: 48px;
+    height: 48px;
+    font-size: 30px;
+    border-radius: 50%;
+    background-color: black;
+    color: white;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .flash-snackbar-message{
+    margin-left:10px; 
+    margin-right:5px;
+
+    .flash-snackbar-line2{
+      font-weight: normal;
+    }
+  }
+}
+
 .explore-link {
   background: image-url('ic-search-blue.png') no-repeat left 2px;
   font-family: "Titillium Web", sans-serif;
