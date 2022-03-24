@@ -27,7 +27,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     mail = InvitationMailer.create_institution_message(existing_user, current_user, invite, "custom message")
 
     html = Nokogiri::HTML(mail.body.to_s)
-    assert_link(html, new_from_invite_data_institutions_url(:pending_institution_invite_id => invite.id))
+    assert_link(html, new_institution_url(:pending_institution_invite_id => invite.id))
     body = html.content
     expect(body).to include("custom message")
     expect(body).to include(invite.institution_name)

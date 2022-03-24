@@ -18,8 +18,24 @@ class PendingInstitutionInvite < ActiveRecord::Base
     where(invited_user_email: user.email,  status: 'pending').count > 0
   end
 
-  def is_pending?
+  def pending?
     status == 'pending'
   end
 
+  def accepted?
+    status == 'accepted'
+  end
+
+  def accept!
+    self.status = 'accepted'
+    save!
+  end
+
+  def to_institution_params
+    {
+      kind: institution_kind,
+      name: institution_name,
+      pending_institution_invite: self,
+    }
+  end
 end
