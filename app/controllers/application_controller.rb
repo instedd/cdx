@@ -67,8 +67,8 @@ class ApplicationController < ActionController::Base
       if has_access?(Institution, CREATE_INSTITUTION)
         pending_institution_invite_id = session[:pending_invite_id] || pending_institution_invite_id_from_url()
         pending_invite = PendingInstitutionInvite.find(pending_institution_invite_id) if pending_institution_invite_id
-        if pending_invite and pending_invite.is_pending?
-          redirect_to new_from_invite_data_institutions_path(pending_institution_invite_id: pending_institution_invite_id)
+        if pending_invite and pending_invite.pending?
+          redirect_to new_institution_path(pending_institution_invite_id: pending_institution_invite_id)
           return
         else
           redirect_to new_institution_path
@@ -135,8 +135,8 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource_or_scope)
     pending_invite_id = pending_institution_invite_id_from_url
-    if session[:user_return_to] == new_from_invite_data_institutions_path(pending_institution_invite_id: pending_invite_id) and has_access_to_institutions_create?
-      new_from_invite_data_institutions_path(pending_institution_invite_id: pending_invite_id)
+    if session[:user_return_to] == new_institution_path(pending_institution_invite_id: pending_invite_id) and has_access_to_institutions_create?
+      new_institution_path(pending_institution_invite_id: pending_invite_id)
     elsif has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
       dashboard_path
     elsif has_access_to_sites_index?

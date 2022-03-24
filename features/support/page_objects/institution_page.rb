@@ -1,5 +1,5 @@
 class InstitutionNewFromInvitePage < CdxPageBase
-  set_url '/institutions/new_from_invite_data{?query*}'
+  set_url '/institutions/new{?query*}'
 
   element :name, :field, "Name"
 end
