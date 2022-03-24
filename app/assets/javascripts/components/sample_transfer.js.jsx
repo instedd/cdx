@@ -56,13 +56,6 @@ var SampleTransferModal = React.createClass({
     this.props.onFinished();
   },
 
-  successSnackbar : function(data) {
-    React.render(<SampleTransferSuccessSnackbar 
-      samplesCount={data.samples.length} 
-      institution={this.props.institutions.filter(e => e.value===data.institution_id)[0].label} 
-    />, document.getElementById("snackbar"));
-  },
-
 
   transferSamples: function() {
     const data = {
@@ -80,7 +73,11 @@ var SampleTransferModal = React.createClass({
         data: data,
         success: function () {
           this.closeModal();
-          this.successSnackbar(data);
+          React.render(
+            <SampleTransferSuccessSnackbar 
+              samplesCount={data.samples.length} 
+              institution={this.props.institutions.filter(e => e.value===data.institution_id)[0].label} 
+            />, document.getElementById("snackbar"));
           data.samples.forEach(element => {
             $('tr:has(td[data-uuid="'+element+'"])').remove()
           });          
