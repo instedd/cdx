@@ -22,7 +22,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     it "should store the location id when the device is registered in only one site" do
       device.site = site1
       device.save!
-      post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
+      post :create, body: data, params: { device_id: device.uuid, authentication_token: device.plain_secret_key }
 
       test = all_elasticsearch_tests.first["_source"]
       expect(test["location"]["id"]).to eq(leaf_location1.geo_id)
@@ -37,7 +37,7 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
       device.save!
 
       expect {
-        post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
+        post :create, body: data, params: { device_id: device.uuid, authentication_token: device.plain_secret_key }
       }.to change{DeviceMessage.count}.by(1)
 
       expect(all_elasticsearch_tests).to be_empty

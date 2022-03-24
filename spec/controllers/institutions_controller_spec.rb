@@ -29,35 +29,35 @@ describe InstitutionsController do
   context "create" do
 
     it "institution is created if name is provided" do
-      post :create, {"institution" => {"name" => "foo"}}
+      post :create, params: {"institution" => {"name" => "foo"}}
       expect(Institution.count).to eq(1)
     end
 
     it "institution is created with a blank invitation id" do
-      post :create, {"institution" => {"name" => "foo", "pending_institution_invite_id" => ""}}
+      post :create, params: {"institution" => {"name" => "foo", "pending_institution_invite_id" => ""}}
       expect(Institution.count).to eq(1)
     end
 
     it "institutions without name are not created" do
-      post :create, {"institution" => {"name" => ""}}
+      post :create, params: {"institution" => {"name" => ""}}
       expect(Institution.count).to eq(0)
     end
 
     it "associates institution to user" do
       expect {
-        post :create, {"institution" => {"name" => "foo"}}
+        post :create, params: {"institution" => {"name" => "foo"}}
       }.to change(user.institutions, :count).by(1)
     end
 
     it "sets the newly created institution in context (#796)" do
-      post :create, {"institution" => {"name" => "foo"}}
+      post :create, params: {"institution" => {"name" => "foo"}}
       expect(user.reload.last_navigation_context).to eq(Institution.last.uuid)
     end
 
     context "institution invite" do
       it "create with invite" do
         invite = PendingInstitutionInvite.make!(invited_user_email: user.email)
-        post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
+        post :create, params: {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
 
         institution = Institution.last
         expect(response).to redirect_to root_path(context: institution.uuid)
@@ -70,7 +70,7 @@ describe InstitutionsController do
 
       it "create with invite, overwriting name and type" do
         invite = PendingInstitutionInvite.make!(invited_user_email: user.email)
-        post :create, {institution: {name: "Institution Override", kind: "manufacturer", pending_institution_invite_id: invite.id}}
+        post :create, params: {institution: {name: "Institution Override", kind: "manufacturer", pending_institution_invite_id: invite.id}}
 
         institution = Institution.last
         expect(response).to redirect_to root_path(context: institution.uuid)
@@ -83,7 +83,7 @@ describe InstitutionsController do
 
       it "create with invite, not invited user" do
         invite = PendingInstitutionInvite.make!
-        post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
+        post :create, params: {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
 
         institution = Institution.last
         expect(response).to redirect_to root_path(context: institution.uuid)
@@ -94,7 +94,7 @@ describe InstitutionsController do
 
       it "fails if invite already accepted" do
         invite = PendingInstitutionInvite.make!(invited_user_email: user.email, status: "accepted")
-        post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
+        post :create, params: {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
         expect(response).to redirect_to(new_institution_path)
         expect(flash[:error]).to_not be_nil
       end
@@ -121,13 +121,13 @@ describe InstitutionsController do
 
     it "with invite" do
       invite = PendingInstitutionInvite.make!(invited_user_email: user.email)
-      get :new, {pending_institution_invite_id: invite.id}
+      get :new, params: { pending_institution_invite_id: invite.id }
       expect(response).to be_success
     end
 
     it "with accepted invite" do
       invite = PendingInstitutionInvite.make!(status: "accepted", invited_user_email: user.email)
-      get :new, {pending_institution_invite_id: invite.id}
+      get :new, params: { pending_institution_invite_id: invite.id }
       expect(response).to redirect_to(new_institution_path)
       expect(flash[:error]).to_not be_nil
     end
