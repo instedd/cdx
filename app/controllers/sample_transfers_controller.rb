@@ -21,12 +21,14 @@ class SampleTransfersController < ApplicationController
   def create
     new_owner = Institution.find_by(uuid: params["institution"])
     if new_owner.nil?
-      redirect_to samples_path, notice: "Destination Institution does not exists."
+      flash[:error] = "Destination Institution does not exists."
+      redirect_to samples_path
     else
       if create_transfer(new_owner, params["samples"])
         redirect_to samples_path, notice: "All samples have been transferred successfully. "
       else
-        redirect_to samples_path, notice: "Transfer failed."
+        flash[:error] = "Samples transfer failed. "
+        redirect_to samples_path
       end
     end
   end
