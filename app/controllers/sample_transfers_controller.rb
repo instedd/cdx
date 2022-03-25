@@ -1,6 +1,8 @@
 class SampleTransfersController < ApplicationController
   helper_method :can_confirm_transfer?
-
+  skip_before_filter :verify_authenticity_token, :only => :create
+  skip_before_filter :ensure_context, :only => :create
+  
   def index
     @sample_transfers = SampleTransfer
       .within(@navigation_context.institution)
@@ -17,17 +19,14 @@ class SampleTransfersController < ApplicationController
   end
 
   def create
-    new_owner = Institution.find_by(uuid: params["institution_id"])
+    new_owner = Institution.find_by(uuid: params["institution"])
     if new_owner.nil?
-      flash[:error] = "Destination Institution does not exists"
-      render json: { status: :error }, status: 404
+      redirect_to samples_path, notice: "Destination Institution does not exists."
     else
       if create_transfer(new_owner, params["samples"])
-        flash[:success] = "All samples have been transferred successfully."
-        render json: { status: :ok }
+        redirect_to samples_path, notice: "All samples have been transferred successfully. "
       else
-        flash[:error] = "Samples transfer failed."
-        render json: { status: :error }, status: 500
+        redirect_to samples_path, notice: "Transfer failed."
       end
     end
   end

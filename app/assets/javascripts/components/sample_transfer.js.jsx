@@ -48,37 +48,6 @@ var SampleTransferModal = React.createClass({
     )
   },
 
-  closeModal: function(event) {
-    if(event) {
-      event.preventDefault();
-    }
-
-    this.props.onFinished();
-  },
-
-  transferSamples: function() {
-    const data = {
-      institution_id: this.state.institutionId,
-      includes_qc_info: this.state.includeQcInfo,
-      samples: this.state.selectedSamples.map((sample) => sample.uuid)
-    }
-    if (data.institution_id == null){
-      $(".institution-select").addClass("input-required");
-    }
-    else{
-      $.ajax({
-        url: '/sample_transfers',
-        method: 'POST',
-        data: data,
-        success: function () {
-          this.closeModal();
-          window.location.reload(true); // reload page to update users table
-        }.bind(this)
-      });
-    }
-
-  },
-
   batchSamples: function() {
     let checkedSamples = this.state.selectedSamples
     const listItems = checkedSamples.map((sample) => this.sampleRow(sample));
@@ -96,6 +65,7 @@ var SampleTransferModal = React.createClass({
     return (
       <div className="col batches-samples">
         <div className="samples-row">
+          <input type="hidden" name="samples[]" value={sampleData.uuid} />
           <div className="samples-item transfer-data">
             { sampleData.uuid.length > 23 ?
               sampleData.uuid.substring(0, 23) + '...' :
@@ -121,6 +91,7 @@ var SampleTransferModal = React.createClass({
     return (
       <div className="row">
         <div className="col icon-info-outline icon-gray qc-info-message">
+          <input type="hidden" name="includes_qc_info" value="false" />
           <div className="notification-text">{infoMessage}</div>
         </div>
       </div>
@@ -132,20 +103,26 @@ var SampleTransferModal = React.createClass({
     this.setState({
       includeQcInfo: !oldValue
     });
+
+    if ($("#include-qc-check").is(":checked")) {
+      $("#include-qc-check").attr("value", "true");
+    } else {
+      $("#include-qc-check").attr("value", "fañse");
+    }
   },
 
   includeQcInfoCheckbox: function () {
     return (<div className="row">
       <div className="col pe-3 qc-info-checkbox">
-        <input id="include-qc-check" type="checkbox" checked={this.state.includeQcInfo} onChange={this.toggleQcInfo}/>
+        <input name="includes_qc_info" id="include-qc-check" type="checkbox" checked={this.state.includeQcInfo} onChange={this.toggleQcInfo}/>
         <label htmlFor="include-qc-check">Include a copy of the QC data</label>
       </div>
     </div>)
-
-
-  }, render: function() {
+  }
+  , render: function() {
     return(
       <div className="samples-transfer-modal">
+        <form action="/sample_transfers" method="post">
         <div className="row">
           <div className="col pe-3"><label>Samples</label></div>
           <div className="col">
@@ -165,11 +142,12 @@ var SampleTransferModal = React.createClass({
           <div className="footer-buttons-aligning">
             <div>
               <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
-              <button className="btn btn-primary" type="button" onClick={this.transferSamples}>Transfer</button>
+              <button className="btn btn-primary" type="submit">Transfer</button>
             </div>
             <div />
           </div>
         </div>
+      </form>
       </div>
 
     )
