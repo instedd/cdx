@@ -33,7 +33,10 @@ var SampleTransferModal = React.createClass({
     return {
       institutionId: null,
       includeQcInfo: false,
-      selectedSamples: selectedSamplesIds()
+      selectedSamples: selectedSamplesIds(),
+      listHeight: 0,
+      topReached: true,
+      bottomReached: false
     };
   },
 
@@ -129,6 +132,18 @@ var SampleTransferModal = React.createClass({
     });
   },
 
+  handleScroll: function(event) {
+    const element = event.target;
+    let bottom = element.scrollHeight - element.scrollTop - 10 < this.state.listHeight
+    let top = element.scrollTop < 10
+
+    this.setState({
+      bottomReached: bottom,
+      topReached: top
+    })
+
+  },
+
   includeQcInfoCheckbox: function () {
     return (<div className="row">
       <div className="col pe-3 qc-info-checkbox">
@@ -136,15 +151,21 @@ var SampleTransferModal = React.createClass({
         <label htmlFor="include-qc-check">Include a copy of the QC data</label>
       </div>
     </div>)
+  },
 
+  componentDidMount: function() {
+    this.setState({ listHeight: this.divElement.getDOMNode().clientHeight });
+  },
 
-  }, render: function() {
+   render: function() {
     return(
-      <div className="samples-transfer-modal">
+      <div className="samples-transfer-modal" onScroll={this.handleScroll} >
         <div className="row">
           <div className="col pe-3"><label>Samples</label></div>
-          <div className="col samples-list">
-            {this.batchSamples()}
+            <div className={`gradients ${this.state.bottomReached ? "bottom" : "" } ${this.state.topReached ? "top" : "" } `}>
+              <div className="col samples-list" ref={ (divElement) => { this.divElement = divElement } }>
+                {this.batchSamples()}
+              </div>
           </div>
         </div>
         <div className="row">

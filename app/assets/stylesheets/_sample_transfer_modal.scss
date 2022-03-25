@@ -12,3 +12,34 @@
   max-height: 400px ;
   overflow: scroll;
 }
+
+.gradients {
+  position: relative;
+  &:before {
+    content: '';
+    height: 12px;
+    width: 100%;
+    position: absolute;
+    background: radial-gradient(ellipse at top, rgba(0,0,0,0.2) 0%, rgba(0, 0, 0, 0) 75%);
+    z-index: 99;
+    transition: opacity 0.25s;
+  }
+  &:after {
+    bottom: 0;
+    content: '';
+    height: 12px;
+    width: 100%;
+    position: absolute;
+    background: radial-gradient(ellipse at bottom, rgba(0,0,0,0.2) 0%, rgba(0, 0, 0, 0) 75%);
+    z-index: 99;
+    transition: opacity 0.25s;
+  }
+
+  &.top::before {
+    opacity: 0;
+  }
+  &.bottom::after {
+    opacity: 0;
+
+  }
+}
