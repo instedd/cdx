@@ -26,7 +26,7 @@ class SampleTransfersController < ApplicationController
     else
       if create_transfer(new_owner, params["samples"])
         flash[:notice] =  "All samples have been transferred successfully. "
-        redirect_to samples_path, success: "All samples have been transferred successfully. "
+        redirect_to samples_path
       else
         flash[:error] = "Samples transfer failed. "
         redirect_to samples_path
