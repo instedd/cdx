@@ -118,8 +118,9 @@ var SampleTransferModal = React.createClass({
         <label htmlFor="include-qc-check">Include a copy of the QC data</label>
       </div>
     </div>)
-  }
-  , render: function() {
+  }, 
+  
+  render: function() {
     return(
       <div className="samples-transfer-modal">
         <form action="/sample_transfers" method="post">
