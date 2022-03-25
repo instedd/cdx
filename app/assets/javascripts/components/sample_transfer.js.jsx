@@ -133,7 +133,7 @@ var SampleTransferModal = React.createClass({
         <div className="row">
           <div className="col pe-3"><label>Institution</label></div>
           <div className="col">
-            <CdxSelect className="institution-select" name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
+            <CdxSelect className="institution-select" name="institution_id" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
             <span className="error"><div className="icon-error icon-red" /> Institution can't be blank</span>
           </div>
           

@@ -19,7 +19,7 @@ class SampleTransfersController < ApplicationController
   end
 
   def create
-    new_owner = Institution.find_by(uuid: params["institution"])
+    new_owner = Institution.find_by(uuid: params["institution_id"])
     if new_owner.nil?
       flash[:error] = "Destination Institution does not exists."
       redirect_to samples_path
