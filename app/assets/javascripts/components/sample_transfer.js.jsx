@@ -154,7 +154,7 @@ var SampleTransferModal = React.createClass({
   },
 
   componentDidMount: function() {
-    this.setState({ listHeight: this.divElement.getDOMNode().clientHeight });
+    this.setState({ listHeight: this.scrollableElement.getDOMNode().clientHeight });
   },
 
    render: function() {
@@ -163,7 +163,7 @@ var SampleTransferModal = React.createClass({
         <div className="row">
           <div className="col pe-3"><label>Samples</label></div>
             <div className={`gradients ${this.state.bottomReached ? "bottom" : "" } ${this.state.topReached ? "top" : "" } `}>
-              <div className="col samples-list" ref={ (divElement) => { this.divElement = divElement } }>
+              <div className="col samples-list" ref={ (scrollableElement) => { this.scrollableElement = scrollableElement } }>
                 {this.batchSamples()}
               </div>
           </div>
