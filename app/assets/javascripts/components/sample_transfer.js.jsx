@@ -124,33 +124,30 @@ var SampleTransferModal = React.createClass({
     return(
       <div className="samples-transfer-modal">
         <form action="/sample_transfers" method="post">
-        <div className="row">
-          <div className="col pe-3"><label>Samples</label></div>
-          <div className="col">
-            {this.batchSamples()}
-          </div>
-        </div>
-        <div className="row">
-          <div className="col pe-3"><label>Institution</label></div>
-          <div className="col">
-            <CdxSelect className="institution-select" name="institution_id" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
-            <span className="error"><div className="icon-error icon-red" /> Institution can't be blank</span>
-          </div>
-          
-        </div>
-        {this.showQcWarningCheckbox(this.state.selectedSamples)}
-        <div className="modal-footer">
-          <div className="footer-buttons-aligning">
-            <div>
-              <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
-              <button className="btn btn-primary" type="submit">Transfer</button>
+          <div className="row">
+            <div className="col pe-3"><label>Samples</label></div>
+            <div className="col">
+              {this.batchSamples()}
             </div>
-            <div />
           </div>
-        </div>
-      </form>
+          <div className="row">
+            <div className="col pe-3"><label>Institution</label></div>
+            <div className="col">
+              <CdxSelect className="institution-select" name="institution_id" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
+              <span className="error"><div className="icon-error icon-red" /> Institution can't be blank</span>
+            </div>
+          </div>
+          {this.showQcWarningCheckbox(this.state.selectedSamples)}
+          <div className="modal-footer">
+            <div className="footer-buttons-aligning">
+              <div>
+                <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
+                <button className="btn btn-primary" type="submit">Transfer</button>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
-
     )
   },
 
