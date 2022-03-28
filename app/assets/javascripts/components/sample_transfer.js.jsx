@@ -107,7 +107,7 @@ var SampleTransferModal = React.createClass({
     if ($("#include-qc-check").is(":checked")) {
       $("#include-qc-check").attr("value", "true");
     } else {
-      $("#include-qc-check").attr("value", "fañse");
+      $("#include-qc-check").attr("value", "false");
     }
   },
 
