@@ -1,4 +1,4 @@
-name: CI
+name: CI (next)
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
   test:
     uses: ./.github/workflows/test.yml
     with:
-      gemfile: Gemfile
+      gemfile: Gemfile.next
 
   build:
     runs-on: ubuntu-latest
@@ -31,3 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ysbaddaden/ci-docker-builder@404e79d61e395349ca8c941d9eedbf79c0cba3df
+        with:
+          tag-suffix: "-next"
+          build-options: "--build-arg gemfile=Gemfile.next"
