@@ -75,7 +75,7 @@ RSpec.describe SampleTransfersController, type: :controller do
       post :create, institution_id: other_institution.uuid, samples: [sample.uuid]
 
       expect(response).to redirect_to(samples_path)
-      expect(flash.to_h).to eq({ "notice" => "All samples have been transferred successfully. " })
+      expect(flash.to_h).to eq({ "notice" => "All samples have been transferred successfully." })
 
       sample.reload
       expect(sample.site).to be_nil
@@ -94,7 +94,7 @@ RSpec.describe SampleTransfersController, type: :controller do
       post :create, institution_id: other_institution.uuid, samples: samples.map(&:uuid)
 
       expect(response).to redirect_to(samples_path)
-      expect(flash.to_h).to eq({ "notice" => "All samples have been transferred successfully. " })
+      expect(flash.to_h).to eq({ "notice" => "All samples have been transferred successfully." })
 
       samples.each(&:reload)
       expect(samples.map(&:site)).to eq [nil] * 3

@@ -104,11 +104,8 @@ var SampleTransferModal = React.createClass({
       includeQcInfo: !oldValue
     });
 
-    if ($("#include-qc-check").is(":checked")) {
-      $("#include-qc-check").attr("value", "true");
-    } else {
-      $("#include-qc-check").attr("value", "false");
-    }
+    var qcChecked = $("#include-qc-check");
+    qcChecked.attr("value", !qcChecked.is(":checked"));
   },
 
   includeQcInfoCheckbox: function () {
