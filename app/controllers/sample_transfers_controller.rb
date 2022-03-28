@@ -28,7 +28,7 @@ class SampleTransfersController < ApplicationController
         flash[:notice] =  "All samples have been transferred successfully."
         redirect_to samples_path
       else
-        flash[:error] = "Samples transfer failed. "
+        flash[:error] = "Samples transfer failed."
         redirect_to samples_path
       end
     end
