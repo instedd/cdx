@@ -24,17 +24,16 @@ RUN \
   adduser --uid 9999 --gid 9999 --disabled-password --gecos "Application" app && \
   usermod -L app
 
+ARG gemfile=Gemfile
+ENV BUNDLE_GEMFILE=${gemfile}
 ENV POIROT_STDOUT true
 ENV POIROT_SUPPRESS_RAILS_LOG true
 ENV PUMA_OPTIONS "--preload -w 4"
 ENV NNDD_VERSION "cdx-0.11-pre7"
 
 # Install gem bundle
-ADD Gemfile /app/
-ADD Gemfile.lock /app/
-ADD cdx.gemspec /app/
-ADD cdx-api-elasticsearch.gemspec /app/
-ADD deps/ /app/deps/
+COPY Gemfile* cdx.gemspec cdx-api-elasticsearch.gemspec /app/
+COPY deps/ /app/deps/
 
 RUN bundle install --jobs 8 --deployment --without development test
 

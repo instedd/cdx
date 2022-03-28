@@ -1,0 +1,108 @@
+name: Test
+
+on:
+  workflow_call:
+    inputs:
+      gemfile:
+        required: true
+        type: string
+
+env:
+  COMPOSE_FILE: docker-compose.yml:docker-compose.ci.yml
+  COMPOSE_DEFAULT_SERVICE: web
+  BUNDLE_GEMFILE: ${{ inputs.gemfile }}
+  BUNDLE_LOCKFILE: ${{ inputs.gemfile }}.lock
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/docker-cache
+        with:
+          docker-images: cdx_web cdx_selenium
+      - uses: ./.github/actions/gems-cache
+
+  unit:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/docker-cache
+      - uses: ./.github/actions/gems-cache
+
+      - name: Setup databases
+        run: |
+          docker-compose up -d db elasticsearch redis
+          docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
+
+      - name: Run specs
+        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true web bundle exec rspec
+
+      - run: cp coverage/.resultset.json resultset.unit_tests.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: unit_tests_coverage
+          path: resultset.*.json
+          retention-days: 1
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/docker-cache
+      - uses: ./.github/actions/gems-cache
+
+      - name: Setup databases
+        run: |
+          docker-compose up -d db elasticsearch redis
+          docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
+
+      - name: Start services (Selenium)
+        run: docker-compose up -d selenium
+
+      - name: Run specs (capybara)
+        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e FEATURES=true web bundle exec rspec
+
+      - name: Run specs (cucumber)
+        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true web bundle exec cucumber
+
+      - run: cp coverage/.resultset.json resultset.integration_tests.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: integration_tests_coverage
+          path: resultset.*.json
+          retention-days: 1
+
+  analysis:
+    runs-on: ubuntu-latest
+    needs:
+      - unit
+      - integration
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/docker-cache
+      - uses: ./.github/actions/gems-cache
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: unit_tests_coverage
+      - uses: actions/download-artifact@v3
+        with:
+          name: integration_tests_coverage
+      - run: docker-compose run --no-deps --rm web rake coverage:report
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Coverage
+          path: coverage/
+          retention-days: 60
+
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: |
+            unit_tests_coverage
+            integration_tests_coverage
