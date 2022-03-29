@@ -109,6 +109,7 @@ Rails.application.routes.draw do
   resources :samples do
     member do
       get 'print'
+      get 'edit_or_show'
     end
     collection do
       get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'print' }, action: :bulk_print

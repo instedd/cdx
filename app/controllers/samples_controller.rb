@@ -25,6 +25,16 @@ class SamplesController < ApplicationController
       .preload(:batch, :sample_identifiers)
   end
 
+  def edit_or_show
+    sample = Sample.find(params[:id])
+
+    if has_access?(sample, UPDATE_SAMPLE)
+      redirect_to edit_sample_path(sample)
+    else
+      redirect_to sample_path(sample)
+    end
+  end
+
   def show
     sample = Sample.find(params[:id])
     @sample_form = SampleForm.for(sample)

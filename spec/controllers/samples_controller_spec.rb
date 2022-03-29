@@ -84,6 +84,26 @@ RSpec.describe SamplesController, type: :controller do
     end
   end
 
+  context "edit_or_show" do
+    let!(:sample) do
+      Sample.make! institution: institution, sample_identifiers: [
+        SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88'),
+      ]
+    end
+
+    it "redirects to edit when user has UPDATE_SAMPLE permission" do
+      get :edit_or_show, id: sample.id
+      expect(response).to redirect_to(edit_sample_path(sample))
+    end
+
+    it "redirects to show when user doesn't have UPDATE_SAMPLE permission" do
+      sign_in other_user
+
+      get :edit_or_show, id: sample.id
+      expect(response).to redirect_to(sample_path(sample))
+    end
+  end
+
   context "show" do
     let!(:sample) do
       Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')]
