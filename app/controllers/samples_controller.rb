@@ -22,6 +22,7 @@ class SamplesController < ApplicationController
       .map { |uuid, name| { value: uuid, label: name } }
 
     @samples = perform_pagination(@samples)
+      .preload(:batch, :sample_identifiers)
   end
 
   def show
