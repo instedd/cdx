@@ -47,9 +47,7 @@ class ApplicationController < ActionController::Base
     if has_access?(resource, action)
       check_access(resource, action)
     else
-      log_authorization_warn resource, action
-      head :forbidden
-      nil
+      forbid_access(resource, action)
     end
   end
 
@@ -69,8 +67,8 @@ class ApplicationController < ActionController::Base
       if has_access?(Institution, CREATE_INSTITUTION)
         pending_institution_invite_id = session[:pending_invite_id] || pending_institution_invite_id_from_url()
         pending_invite = PendingInstitutionInvite.find(pending_institution_invite_id) if pending_institution_invite_id
-        if pending_invite and pending_invite.is_pending?
-          redirect_to new_from_invite_data_institutions_path(pending_institution_invite_id: pending_institution_invite_id)
+        if pending_invite and pending_invite.pending?
+          redirect_to new_institution_path(pending_institution_invite_id: pending_institution_invite_id)
           return
         else
           redirect_to new_institution_path
@@ -84,9 +82,7 @@ class ApplicationController < ActionController::Base
   # filters/authorize navigation_context institutions by action. Assign calls resource.institution= if action is allowed
   def prepare_for_institution_and_authorize(resource, action)
     if authorize_resource(@navigation_context.institution, action).blank?
-      log_authorization_warn resource, action
-      head :forbidden
-      nil
+      forbid_access(resource, action)
     else
       resource.institution = @navigation_context.institution
     end
@@ -139,8 +135,8 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource_or_scope)
     pending_invite_id = pending_institution_invite_id_from_url
-    if session[:user_return_to] == new_from_invite_data_institutions_path(pending_institution_invite_id: pending_invite_id) and has_access_to_institutions_create?
-      new_from_invite_data_institutions_path(pending_institution_invite_id: pending_invite_id)
+    if session[:user_return_to] == new_institution_path(pending_institution_invite_id: pending_invite_id) and has_access_to_institutions_create?
+      new_institution_path(pending_institution_invite_id: pending_invite_id)
     elsif has_access?(TestResult, Policy::Actions::MEDICAL_DASHBOARD)
       dashboard_path
     elsif has_access_to_sites_index?
@@ -205,6 +201,12 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def forbid_access(resource, action)
+    log_authorization_warn resource, action
+    head :forbidden
+    nil
+  end
 
   def pending_institution_invite_id_from_url
     url = session[:user_return_to] || request.original_url

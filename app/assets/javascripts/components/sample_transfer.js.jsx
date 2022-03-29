@@ -51,33 +51,6 @@ var SampleTransferModal = React.createClass({
     )
   },
 
-  closeModal: function(event) {
-    if(event) {
-      event.preventDefault();
-    }
-
-    this.props.onFinished();
-  },
-
-  transferSamples: function() {
-    const data = {
-      institution_id: this.state.institutionId,
-      includes_qc_info: this.state.includeQcInfo,
-      samples: this.state.selectedSamples.map((sample) => sample.uuid)
-    }
-    $.ajax({
-      url: '/sample_transfers',
-      method: 'POST',
-      data: data,
-      success: function () {
-        this.closeModal();
-        window.location.reload(true); // reload page to update users table
-      }.bind(this)
-    });
-
-
-  },
-
   batchSamples: function() {
     let checkedSamples = this.state.selectedSamples
     const listItems = checkedSamples.map((sample) => this.sampleRow(sample));
@@ -85,6 +58,7 @@ var SampleTransferModal = React.createClass({
   },
 
   changeInstitution: function(newValue) {
+    $(".institution-select").removeClass("input-required")
     this.setState({
       institutionId: newValue,
     })
@@ -94,6 +68,7 @@ var SampleTransferModal = React.createClass({
     return (
       <div className="col batches-samples">
         <div className="samples-row">
+          <input type="hidden" name="samples[]" value={sampleData.uuid} />
           <div className="samples-item transfer-data">
             { sampleData.uuid.length > 23 ?
               sampleData.uuid.substring(0, 23) + '...' :
@@ -119,6 +94,7 @@ var SampleTransferModal = React.createClass({
     return (
       <div className="row">
         <div className="col icon-info-outline icon-gray qc-info-message">
+          <input type="hidden" name="includes_qc_info" value="false" />
           <div className="notification-text">{infoMessage}</div>
         </div>
       </div>
@@ -130,6 +106,9 @@ var SampleTransferModal = React.createClass({
     this.setState({
       includeQcInfo: !oldValue
     });
+
+    var qcChecked = $("#include-qc-check");
+    qcChecked.attr("value", !qcChecked.is(":checked"));
   },
 
   handleScroll: function(event) {
@@ -147,43 +126,46 @@ var SampleTransferModal = React.createClass({
   includeQcInfoCheckbox: function () {
     return (<div className="row">
       <div className="col pe-3 qc-info-checkbox">
-        <input id="include-qc-check" type="checkbox" checked={this.state.includeQcInfo} onChange={this.toggleQcInfo}/>
+        <input name="includes_qc_info" id="include-qc-check" type="checkbox" checked={this.state.includeQcInfo} onChange={this.toggleQcInfo}/>
         <label htmlFor="include-qc-check">Include a copy of the QC data</label>
       </div>
     </div>)
-  },
+  }, 
 
   componentDidMount: function() {
     this.setState({ listHeight: this.scrollableElement.getDOMNode().clientHeight });
   },
 
-   render: function() {
+  render: function() {
     return(
-      <div className="samples-transfer-modal" onScroll={this.handleScroll} >
-        <div className="row">
-          <div className="col pe-3"><label>Samples</label></div>
+      <div className="samples-transfer-modal" onScroll={this.handleScroll}>
+        <form action="/sample_transfers" method="post">
+          <div className="row">
+            <div className="col pe-3"><label>Samples</label></div>
             <div className={`gradients ${this.state.bottomReached ? "bottom" : "" } ${this.state.topReached ? "top" : "" } `}>
               <div className="col samples-list" ref={ (scrollableElement) => { this.scrollableElement = scrollableElement } }>
                 {this.batchSamples()}
               </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col pe-3"><label>Institution</label></div>
-          <div className="col"><CdxSelect name="institution" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} /></div>
-        </div>
-        {this.showQcWarningCheckbox(this.state.selectedSamples)}
-        <div className="modal-footer">
-          <div className="footer-buttons-aligning">
-            <div>
-              <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
-              <button className="btn btn-primary" type="button" onClick={this.transferSamples}>Transfer</button>
             </div>
-            <div />
           </div>
-        </div>
+          <div className="row">
+            <div className="col pe-3"><label>Institution</label></div>
+            <div className="col">
+              <CdxSelect className="institution-select" name="institution_id" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
+              <span className="error"><div className="icon-error icon-red" /> Institution can't be blank</span>
+            </div>
+          </div>
+          {this.showQcWarningCheckbox(this.state.selectedSamples)}
+          <div className="modal-footer">
+            <div className="footer-buttons-aligning">
+              <div>
+                <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
+                <button className="btn btn-primary" type="submit">Transfer</button>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
-
     )
   },
 

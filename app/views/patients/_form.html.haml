@@ -4,32 +4,32 @@
 
   = validation_errors @patient
 
-  .row
+  .row.form-field
     .col.pe-2
       = f.label :institution
     .col
       .value= f.object.institution
 
-  .row
+  .row.form-field
     .col.pe-2
       = f.label :name
     .col
       = f.text_field :name, :class => 'input-large'
 
-  .row
+  .row.form-field
     .col.pe-2
       = f.label :entity_id
     .col
       = f.text_field :entity_id, :class => 'input-large'
 
-  .row
+  .row.form-field
     .col.pe-2
       = f.label :gender
     .col
       = cdx_select form: f, name: :gender do |select|
         - select.items PatientForm::GENDER_VALUES
 
-  .row
+  .row.form-field
     .col.pe-2
       = f.label :dob
     .col
@@ -37,13 +37,13 @@
 
   = patient_address_component(@patient)
 
-  .row
+  .row.form-field
     .col.pe-2
       = f.label :email
     .col
       = f.text_field :email, :class => 'input-large'
 
-  .row
+  .row.form-field
     .col.pe-2
       = f.label :phone
     .col

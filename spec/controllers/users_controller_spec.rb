@@ -123,7 +123,7 @@ describe UsersController, type: :controller do
       expect(invite.invited_by_user).to eq user
       expect(invite.institution_name).to eq "New Institution"
       expect(invite.institution_kind).to eq "institution"
-      expect(invite).to be_is_pending
+      expect(invite).to be_pending
     end
 
     it "fails for empty institution name and kind" do

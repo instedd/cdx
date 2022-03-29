@@ -42,9 +42,9 @@ RSpec.describe SampleTransfersController, type: :controller do
       end
 
       it "by old_batch_number" do
-        subject.sample.update(old_batch_number: "12345678")
-        get :index, batch_number: subject.sample.old_batch_number
-        expect(assigns(:sample_transfers).map(&:transfer)).to eq [subject]
+        transfer = SampleTransfer.make!(sender_institution: my_institution, sample: Sample.make!(:filled, specimen_role: "c", old_batch_number: "12345678"))
+        get :index, batch_number: "12345678"
+        expect(assigns(:sample_transfers).map(&:transfer)).to eq [transfer]
       end
 
       it "by isolate_name" do
@@ -74,8 +74,8 @@ RSpec.describe SampleTransfersController, type: :controller do
 
       post :create, institution_id: other_institution.uuid, samples: [sample.uuid]
 
-      expect(response).to be_success
-      expect(flash.to_h).to eq({ "success" => "All samples have been transferred successfully." })
+      expect(response).to redirect_to(samples_path)
+      expect(flash.to_h).to eq({ "notice" => "All samples have been transferred successfully." })
 
       sample.reload
       expect(sample.site).to be_nil
@@ -93,8 +93,8 @@ RSpec.describe SampleTransfersController, type: :controller do
 
       post :create, institution_id: other_institution.uuid, samples: samples.map(&:uuid)
 
-      expect(response).to be_success
-      expect(flash.to_h).to eq({ "success" => "All samples have been transferred successfully." })
+      expect(response).to redirect_to(samples_path)
+      expect(flash.to_h).to eq({ "notice" => "All samples have been transferred successfully." })
 
       samples.each(&:reload)
       expect(samples.map(&:site)).to eq [nil] * 3

@@ -88,6 +88,26 @@ label {
   }
 }
 
+.form-field {
+  label {
+    line-height: 1.6;
+    margin-top: 9px;
+  }
+
+  .Select-control {
+    padding-bottom: 6px;
+    height: 34px;
+  }
+  
+  .value{
+    margin-left: 5px;
+  }
+
+  input:not(.input-small) {
+    margin-top: 5px;
+  }
+}
+
 // Checkboxes ---------------------------------------------------------//
 
 input[type="checkbox"] {
@@ -469,10 +489,12 @@ label.on {
   align-items: center;
 }
 
+div + .error,
 input + .error {
   visibility: hidden;
 }
 
+div.input-required + .error,
 input.input-required + .error {
   visibility: visible;
 }

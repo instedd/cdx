@@ -85,7 +85,7 @@ var Address = React.createClass({
     }
 
     return <div>
-      <div className="row">
+      <div className="row form-field">
         <div className="col pe-2">
           <label>Address</label>
         </div>
@@ -94,7 +94,7 @@ var Address = React.createClass({
           <div className="warn">{this.state.error}</div>
         </div>
       </div>
-      <div className="row">
+      <div className="row form-field">
         <div className="col pe-2">
           <label>Region</label>
         </div>

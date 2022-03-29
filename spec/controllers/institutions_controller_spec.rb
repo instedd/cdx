@@ -43,6 +43,12 @@ describe InstitutionsController do
       expect(Institution.count).to eq(0)
     end
 
+    it "associates institution to user" do
+      expect {
+        post :create, {"institution" => {"name" => "foo"}}
+      }.to change(user.institutions, :count).by(1)
+    end
+
     it "sets the newly created institution in context (#796)" do
       post :create, {"institution" => {"name" => "foo"}}
       expect(user.reload.last_navigation_context).to eq(Institution.last.uuid)
@@ -59,7 +65,7 @@ describe InstitutionsController do
         expect(institution.kind).to eq invite.institution_kind
 
         invite.reload
-        expect(invite).not_to be_is_pending
+        expect(invite).to be_accepted
       end
 
       it "create with invite, overwriting name and type" do
@@ -72,7 +78,7 @@ describe InstitutionsController do
         expect(institution.kind).to eq "manufacturer"
 
         invite.reload
-        expect(invite).not_to be_is_pending
+        expect(invite).to be_accepted
       end
 
       it "create with invite, not invited user" do
@@ -83,20 +89,19 @@ describe InstitutionsController do
         expect(response).to redirect_to root_path(context: institution.uuid)
 
         invite.reload
-        expect(invite).to be_is_pending
+        expect(invite).to be_pending
       end
 
       it "fails if invite already accepted" do
         invite = PendingInstitutionInvite.make!(invited_user_email: user.email, status: "accepted")
-        expect do
-          post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
-        end.to raise_error(ActionView::MissingTemplate)
+        post :create, {institution: {name: invite.institution_name, kind: invite.institution_kind, pending_institution_invite_id: invite.id}}
+        expect(response).to redirect_to(new_institution_path)
+        expect(flash[:error]).to_not be_nil
       end
     end
   end
 
   context "new" do
-
     it "gets new page when there are no institutions" do
       get :new
       expect(response).to be_success
@@ -114,26 +119,17 @@ describe InstitutionsController do
       expect(response).to be_success
     end
 
-  end
-
-  describe "new_from_invite_data" do
     it "with invite" do
       invite = PendingInstitutionInvite.make!(invited_user_email: user.email)
-      get :new_from_invite_data, {pending_institution_invite_id: invite.id}
+      get :new, {pending_institution_invite_id: invite.id}
       expect(response).to be_success
-    end
-
-    it "without invite" do
-      expect do
-        get :new_from_invite_data
-      end.to raise_error(ActionView::MissingTemplate)
     end
 
     it "with accepted invite" do
       invite = PendingInstitutionInvite.make!(status: "accepted", invited_user_email: user.email)
-      expect do
-        get :new_from_invite_data, {pending_institution_invite_id: invite.id}
-      end.to raise_error(ActionView::MissingTemplate)
+      get :new, {pending_institution_invite_id: invite.id}
+      expect(response).to redirect_to(new_institution_path)
+      expect(flash[:error]).to_not be_nil
     end
 
     it "gets redirect from other page when pending invitation" do
@@ -141,7 +137,7 @@ describe InstitutionsController do
       invite = PendingInstitutionInvite.make!(invited_user_email: user.email)
       session[:pending_invite_id] = invite.id
       get :index
-      expect(response).to redirect_to new_from_invite_data_institutions_path(pending_institution_invite_id: invite.id)
+      expect(response).to redirect_to new_institution_path(pending_institution_invite_id: invite.id)
     end
   end
 end

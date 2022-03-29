@@ -1,6 +1,8 @@
 class SampleTransfersController < ApplicationController
   helper_method :can_confirm_transfer?
-
+  skip_before_filter :verify_authenticity_token, :only => :create
+  skip_before_filter :ensure_context, :only => :create
+  
   def index
     @sample_transfers = SampleTransfer
       .within(@navigation_context.institution)
@@ -8,7 +10,7 @@ class SampleTransfersController < ApplicationController
       .ordered_by_creation
 
     @sample_transfers = @sample_transfers.joins(sample: :sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
-    @sample_transfers = @sample_transfers.joins(sample: :batch).where("batches.batch_number LIKE concat('%', ?, '%') OR samples.old_batch_number LIKE concat('%', ?, '%')", params[:batch_number], params[:batch_number]) unless params[:batch_number].blank?
+    @sample_transfers = @sample_transfers.joins(:sample).joins("LEFT JOIN batches ON batches.id = samples.batch_id").where("batches.batch_number LIKE concat('%', ?, '%') OR samples.old_batch_number LIKE concat('%', ?, '%')", params[:batch_number], params[:batch_number]) unless params[:batch_number].blank?
     @sample_transfers = @sample_transfers.joins(:sample).where("samples.isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
     @sample_transfers = @sample_transfers.joins(:sample).where("samples.specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
 
@@ -19,15 +21,15 @@ class SampleTransfersController < ApplicationController
   def create
     new_owner = Institution.find_by(uuid: params["institution_id"])
     if new_owner.nil?
-      flash[:error] = "Destination Institution does not exists"
-      render json: { status: :error }, status: 404
+      flash[:error] = "Destination Institution does not exists."
+      redirect_to samples_path
     else
       if create_transfer(new_owner, params["samples"])
-        flash[:success] = "All samples have been transferred successfully."
-        render json: { status: :ok }
+        flash[:notice] =  "All samples have been transferred successfully."
+        redirect_to samples_path
       else
         flash[:error] = "Samples transfer failed."
-        render json: { status: :error }, status: 500
+        redirect_to samples_path
       end
     end
   end

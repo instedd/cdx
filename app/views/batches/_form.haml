@@ -4,25 +4,25 @@
 
   .row
     .col
-      .row
+      .row.form-field
         .col.pe-3
           = f.label :batch_id
         .col
           = f.text_field :batch_number, readonly: !@can_update
 
-      .row
+      .row.form-field
         .col.pe-3
           = f.label :date_produced, "production date"
         .col
           = f.text_field :date_produced, placeholder: Batch.date_produced_placeholder, readonly: !@can_update
 
-      .row
+      .row.form-field
         .col.pe-3
           = f.label :lab_technician
         .col
           = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
 
-      .row
+      .row.form-field
         .col.pe-3
           = f.label :specimen_role
         .col
@@ -32,13 +32,13 @@
           - else
             = text_field_tag :specimen_role, Batch.specimen_role_description(f.object.specimen_role), { :class => 'input-x-large', readonly: true }
 
-      .row
+      .row.form-field
         .col.pe-3
           = f.label :isolate_name
         .col
           = f.text_field :isolate_name, :class => 'input-x-large', readonly: !@can_update
 
-      .row
+      .row.form-field
         .col.pe-3
           = f.label :inactivation_method
         .col
@@ -48,7 +48,7 @@
           - else
             = f.text_field :inactivation_method, readonly: true
 
-      .row
+      .row.form-field
         .col.pe-3
           = f.label :volume
         .col
@@ -57,13 +57,13 @@
             .span.unit (μl)
 
       - if @can_edit_sample_quantity
-        .row
+        .row.form-field
           .col.pe-3
             = f.label :samples_quantity
           .col
             = f.number_field :samples_quantity, min: 0, :class => "input-small"
       - else
-        .row
+        .row.form-field
           .col.pe-3
             = f.label :samples
           .col.pe-7
