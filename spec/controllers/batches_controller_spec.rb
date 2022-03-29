@@ -85,12 +85,12 @@ RSpec.describe BatchesController, type: :controller do
   context "edit_or_show" do
     let!(:batch) { Batch.make! institution: institution }
 
-    it "redirects to edit when user has UPDATE_SAMPLE permission" do
+    it "redirects to edit when user has UPDATE_BATCH permission" do
       get :edit_or_show, id: batch.id
       expect(response).to redirect_to(edit_batch_path(batch))
     end
 
-    it "redirects to show when user doesn't have UPDATE_SAMPLE permission" do
+    it "redirects to show when user doesn't have UPDATE_BATCH permission" do
       sign_in other_user
 
       get :edit_or_show, id: batch.id
