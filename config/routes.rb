@@ -118,6 +118,7 @@ Rails.application.routes.draw do
   end
   resources :batches do
     member do
+      get 'edit_or_show'
       post 'add_sample'
     end
     collection do
