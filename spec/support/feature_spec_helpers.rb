@@ -33,7 +33,20 @@ module FeatureSpecHelpers
 
   def goto_page(klass, args = {})
     page = klass.new
-    page.load args
+
+    attempts = 0
+    begin
+      page.load args
+    rescue Net::ReadTimeout
+      # Selenium and/or the browser may not be ready yet (especially on CI) so
+      # let's retry a few times...
+      if (attempts += 1) == 3
+        retry
+      else
+        raise
+      end
+    end
+
     yield page if block_given?
   end
 
