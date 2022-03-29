@@ -25,7 +25,7 @@
     transition: opacity 0.25s;
   }
   &:after {
-    bottom: 0;
+    bottom: 12px; // so it's in the scrollable area (not after)
     content: '';
     height: 12px;
     width: 100%;
