@@ -139,6 +139,7 @@ class SamplesController < ApplicationController
     return unless authorize_resource(sample, UPDATE_SAMPLE)
 
     @view_helper = view_helper({ save_back_path: true })
+    @view_helper[:back_path] = samples_path unless sample.qc_info.nil?
 
     @show_barcode_preview = true
     @show_print_action = true
