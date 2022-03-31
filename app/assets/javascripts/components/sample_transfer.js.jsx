@@ -108,7 +108,7 @@ var SampleTransferModal = React.createClass({
     });
 
     var qcChecked = $("#include-qc-check");
-    qcChecked.attr("value", !qcChecked.is(":checked"));
+    qcChecked.attr("value", !oldValue);
   },
 
   handleScroll: function(event) {
