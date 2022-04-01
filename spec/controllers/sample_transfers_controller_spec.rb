@@ -81,10 +81,12 @@ RSpec.describe SampleTransfersController, type: :controller do
       expect(sample.site).to be_nil
       expect(sample.institution).to be_nil
 
-      transfer = sample.sample_transfers.first
+      transfer = sample.sample_transfers.take
+
       expect(transfer.sample).to eq sample
       expect(transfer.sender_institution).to eq my_institution
       expect(transfer.receiver_institution).to eq other_institution
+      expect(transfer.transfer_package).to_not be_nil
       expect(transfer).not_to be_confirmed
     end
 
@@ -103,6 +105,7 @@ RSpec.describe SampleTransfersController, type: :controller do
       transfers = SampleTransfer.all
       expect(transfers.map(&:sender_institution)).to eq [my_institution] * 3
       expect(transfers.map(&:receiver_institution)).to eq [other_institution] * 3
+      expect(transfers.map(&:transfer_package_id)).to eq [TransferPackage.take.id] * 3
       expect(transfers.any?(&:confirmed?)).to be false
     end
   end
@@ -114,7 +117,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "confirms" do
       sample = Sample.make!
-      transfer = sample.start_transfer_to(my_institution)
+      transfer = TransferPackage.sending_to(my_institution).add!(sample)
 
       Timecop.freeze do
         patch :confirm, sample_transfer_id: transfer.id
@@ -130,7 +133,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "verifies user is authorized" do
       sample = Sample.make!
-      transfer = sample.start_transfer_to(other_institution)
+      transfer = TransferPackage.sending_to(other_institution).add!(sample)
 
       grant other_institution.user, current_user, other_institution, Policy::Actions::READ_INSTITUTION
 
@@ -146,7 +149,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "verifies current context is receiver" do
       sample = Sample.make!
-      transfer = sample.start_transfer_to(other_institution)
+      transfer = TransferPackage.sending_to(other_institution).add!(sample)
 
       expect {
         patch :confirm, sample_transfer_id: transfer.id
@@ -161,7 +164,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "verifies transfer is unconfirmed" do
       sample = Sample.make
-      transfer = sample.start_transfer_to(my_institution)
+      transfer = TransferPackage.sending_to(my_institution).add!(sample)
       transfer.confirm_and_apply!
       transfer.confirmed_at = original_confirmed_at = Time.now.change(usec: 0) - 1.hour
       transfer.save!
