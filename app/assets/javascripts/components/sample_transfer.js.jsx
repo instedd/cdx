@@ -159,7 +159,7 @@ var SampleTransferModal = React.createClass({
           <div className="modal-footer">
             <div className="footer-buttons-aligning">
               <div>
-                <button className="btn btn-link" onClick={this.closeModal}>Cancel</button>
+                <button className="btn btn-link" onClick={this.props.onFinished}>Cancel</button>
                 <button className="btn btn-primary" type="submit">Transfer</button>
               </div>
             </div>
