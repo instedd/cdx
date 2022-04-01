@@ -2,7 +2,7 @@ namespace :elasticsearch do
   desc "Initialize the cdx elasticsearch index template"
   task setup: :environment do
     Cdx::Api.config.log = false
-    Cdx::Api::Elasticsearch::MappingTemplate.new.initialize_template "cdx_tests_template_#{Rails.env}"
+    Cdx::Api::Elasticsearch::MappingTemplate.new.initialize_template Cdx::Api.mapping_template_name
     Cdx::Api.client.indices.delete index: Cdx::Api.index_name, ignore: 404
     Cdx::Api.client.indices.create index: Cdx::Api.index_name
   end

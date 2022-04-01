@@ -12,4 +12,15 @@ RUN apk del curl
 EXPOSE 4444
 EXPOSE 5900
 
-ENTRYPOINT ["geckodriver", "--host", "0.0.0.0"]
+RUN echo "#! /usr/bin/env sh" > /entrypoint.sh && \
+    echo "geckodriver --host 0.0.0.0 -p 4444 &" >> /entrypoint.sh && \
+    echo "geckodriver --host 0.0.0.0 -p 4445 &" >> /entrypoint.sh && \
+    echo "geckodriver --host 0.0.0.0 -p 4446 &" >> /entrypoint.sh && \
+    echo "geckodriver --host 0.0.0.0 -p 4447 &" >> /entrypoint.sh && \
+    echo "geckodriver --host 0.0.0.0 -p 4448 &" >> /entrypoint.sh && \
+    echo "geckodriver --host 0.0.0.0 -p 4449 &" >> /entrypoint.sh && \
+    echo "geckodriver --host 0.0.0.0 -p 4450 &" >> /entrypoint.sh && \
+    echo "geckodriver --host 0.0.0.0 -p 4451" >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

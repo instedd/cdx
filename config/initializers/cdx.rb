@@ -2,7 +2,19 @@ require "cdx/api/elasticsearch"
 
 module Cdx::Api
   def self.index_name
-    "cdx_#{Rails.env}"
+    if Rails.env.test?
+      "cdx_#{Rails.env}#{ENV["TEST_ENV_NUMBER"]}"
+    else
+      "cdx_#{Rails.env}"
+    end
+  end
+
+  def self.mapping_template_name
+    if Rails.env.test?
+      "cdx_tests_template_#{Rails.env}#{ENV["TEST_ENV_NUMBER"]}"
+    else
+      "cdx_tests_template_#{Rails.env}"
+    end
   end
 end
 

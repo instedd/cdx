@@ -113,6 +113,7 @@ group :development do
   gem 'listen', '~> 3.0.5' if next?
   gem 'quiet_assets' unless next?
   gem 'spring'
+  gem 'spring-commands-parallel-tests'
   gem 'spring-commands-rspec'
   gem 'spring-watcher-listen', '~> 2.0.0' if next?
   gem 'web-console', '< 4.0' # last version to support ruby 2.2
@@ -122,6 +123,9 @@ group :development, :test do
   gem 'pry-byebug', '< 2.7.0' # last version to support ruby 2.2
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
+
+  gem 'parallel_tests', '~> 2.32.0' # last version to support ruby 2.2
+  gem 'parallel', '~> 1.19.2'       # TODO: remove after upgrading ruby and parallel_tests
 end
 
 group :test do
