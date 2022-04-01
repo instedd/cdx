@@ -136,10 +136,17 @@ var SampleTransferModal = React.createClass({
     this.setState({ listHeight: this.scrollableElement.getDOMNode().clientHeight });
   },
 
+  confirmTransfer: function(e) {
+    if (this.state.institutionId == null){
+      $(".institution-select").addClass("input-required");
+      e.preventDefault();
+    }
+  },
+
   render: function() {
     return(
       <div className="samples-transfer-modal" onScroll={this.handleScroll}>
-        <form action="/sample_transfers" method="post">
+        <form action="/sample_transfers" method="post"  onSubmit={this.confirmTransfer}>
           <div className="row">
             <div className="col pe-3"><label>Samples</label></div>
             <div className={`gradients ${this.state.bottomReached ? "bottom" : "" } ${this.state.topReached ? "top" : "" } `}>
