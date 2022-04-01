@@ -97,7 +97,7 @@ describe "sample transfers" do
 
     it "verifies sample id" do
       sample = Sample.make!(:filled, institution: institution_a)
-      transfer = sample.start_transfer_to(institution_b)
+      transfer = TransferPackage.sending_to(institution_b).add!(sample)
 
       sign_in user_b
 

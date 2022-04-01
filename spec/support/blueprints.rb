@@ -154,6 +154,12 @@ LoincCode.blueprint do
   component { Faker::Lorem.words(4) }
 end
 
+TransferPackage.blueprint do
+  uuid { SecureRandom.uuid }
+  receiver_institution { Institution.make! }
+  recipient { Faker::Name.name }
+end
+
 SampleTransfer.blueprint do
   sample { Sample.make!(:filled) }
   receiver_institution { Institution.make! }

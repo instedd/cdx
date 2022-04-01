@@ -121,12 +121,12 @@ var SampleTransferModal = React.createClass({
 
   includeQcInfoCheckbox: function () {
     return (<div className="row">
-      <div className="col pe-3 qc-info-checkbox">
+      <div className="col pe-4 qc-info-checkbox">
         <input name="includes_qc_info" id="include-qc-check" type="checkbox" checked={this.state.includeQcInfo} onChange={this.toggleQcInfo}/>
         <label htmlFor="include-qc-check">Include a copy of the QC data</label>
       </div>
     </div>)
-  }, 
+  },
 
   componentDidMount: function() {
     this.setState({ listHeight: this.scrollableElement.getDOMNode().clientHeight });
@@ -144,18 +144,24 @@ var SampleTransferModal = React.createClass({
       <div className="samples-transfer-modal" onScroll={this.handleScroll}>
         <form action="/sample_transfers" method="post"  onSubmit={this.validateForm}>
           <div className="row">
-            <div className="col pe-3"><label>Samples</label></div>
+            <div className="col pe-4"><label>Institution</label></div>
+            <div className="col">
+              <CdxSelect className="institution-select" name="institution_id" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
+              <span className="error"><div className="icon-error icon-red" /> Institution can't be blank</span>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col pe-4"><label>Responsible Person</label></div>
+            <div className="col">
+              <input type="text" name="recipient" className="input-block"/>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col pe-4"><label>Samples</label></div>
             <div className={`gradients ${this.state.bottomReached ? "bottom" : "" } ${this.state.topReached ? "top" : "" } `}>
               <div className="col samples-list" ref={ (scrollableElement) => { this.scrollableElement = scrollableElement } }>
                 {this.batchSamples()}
               </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col pe-3"><label>Institution</label></div>
-            <div className="col">
-              <CdxSelect className="institution-select" name="institution_id" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
-              <span className="error"><div className="icon-error icon-red" /> Institution can't be blank</span>
             </div>
           </div>
           {this.showQcWarningCheckbox(this.state.selectedSamples)}

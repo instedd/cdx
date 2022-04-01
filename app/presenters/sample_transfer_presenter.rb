@@ -7,7 +7,7 @@ class SampleTransferPresenter
   end
 
   # TODO(Rails 5.1): Use delegate_missing
-  delegate :sample, :confirmed_at, :confirmed?, :created_at, :receiver_institution, :sender_institution, to: :transfer
+  delegate :transfer_package, :sample, :confirmed_at, :confirmed?, :created_at, :receiver_institution, :sender_institution, to: :transfer
 
   def receiver?
     context.institution == transfer.receiver_institution
@@ -45,5 +45,9 @@ class SampleTransferPresenter
     else
       sample.partial_uuid + "XXXX"
     end
+  end
+
+  def recipient
+    transfer_package.try(&:recipient)
   end
 end
