@@ -22,6 +22,17 @@ class SamplesController < ApplicationController
       .map { |uuid, name| { value: uuid, label: name } }
 
     @samples = perform_pagination(@samples)
+      .preload(:batch, :sample_identifiers)
+  end
+
+  def edit_or_show
+    sample = Sample.find(params[:id])
+
+    if has_access?(sample, UPDATE_SAMPLE)
+      redirect_to edit_sample_path(sample)
+    else
+      redirect_to sample_path(sample)
+    end
   end
 
   def show

@@ -18,6 +18,16 @@ class BatchesController < ApplicationController
     @batches = perform_pagination(@batches)
   end
 
+  def edit_or_show
+    batch = Batch.find(params[:id])
+
+    if has_access?(batch, UPDATE_BATCH)
+      redirect_to edit_batch_path(batch)
+    else
+      redirect_to batch_path(batch)
+    end
+  end
+
   def show
     batch = Batch.find(params[:id])
     @batch_form = BatchForm.for(batch)

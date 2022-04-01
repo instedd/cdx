@@ -30,7 +30,7 @@
               %th Lab Technician
           - t.tbody do
             - @batches.each do |batch|
-              %tr.laboratory-sample-row{data: {href: has_access?(batch, Policy::Actions::UPDATE_BATCH) ? edit_batch_path(batch) : batch_path(batch)}}
+              %tr.laboratory-sample-row{data: {href: edit_or_show_batch_path(batch)}}
                 %td
                   =check_box_tag 'batch_ids[]', batch.id, false, { id: "batch_ids.#{batch.id}" }
                   %label.row{for: "batch_ids.#{batch.id}"}
