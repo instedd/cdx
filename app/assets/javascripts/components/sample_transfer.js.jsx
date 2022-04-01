@@ -102,13 +102,9 @@ var SampleTransferModal = React.createClass({
   },
 
   toggleQcInfo: function() {
-    var oldValue = this.state.includeQcInfo;
     this.setState({
-      includeQcInfo: !oldValue
+      includeQcInfo: !this.state.includeQcInfo
     });
-
-    var qcChecked = $("#include-qc-check");
-    qcChecked.attr("value", !qcChecked.is(":checked"));
   },
 
   handleScroll: function(event) {
