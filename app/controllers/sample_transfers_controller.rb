@@ -15,7 +15,7 @@ class SampleTransfersController < ApplicationController
     @sample_transfers = @sample_transfers.joins(:sample).where("samples.specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
 
     @sample_transfers = perform_pagination(@sample_transfers)
-      .preload(:transfer_package, :sample, :sender_institution, :receiver_institution)
+      .preload(:transfer_package, :sender_institution, :receiver_institution, sample: %i[batch qc_info])
       .map { |transfer| SampleTransferPresenter.new(transfer, @navigation_context) }
   end
 
@@ -67,8 +67,8 @@ class SampleTransfersController < ApplicationController
     }
   end
 
-  def create_transfer(new_owner, samples)
-    samples = Sample.joins(:sample_identifiers).where("sample_identifiers.uuid": samples)
+  def create_transfer(new_owner, sample_uuids)
+    samples = Sample.find_all_by_any_uuid(sample_uuids)
 
     Sample.transaction do
       package = TransferPackage.sending_to(new_owner, transfer_package_params)

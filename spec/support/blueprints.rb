@@ -143,6 +143,13 @@ Sample.blueprint(:batch) do
   batch { Batch.make! }
 end
 
+QcInfo.blueprint do
+  sample_qc { Sample.make(:batch) }
+  uuid { object.sample_qc.uuid }
+  batch_number { object.sample_qc.batch.batch_number }
+  date_produced { object.sample_qc.date_produced }
+end
+
 AssayAttachment.blueprint do
   loinc_code { LoincCode.make }
   sample { Sample.make }

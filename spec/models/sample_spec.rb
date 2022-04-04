@@ -40,4 +40,14 @@ describe Sample do
 
   end
 
+  it "has_qc_reference?" do
+    expect(Sample.make.has_qc_reference?).to eq(false)
+    expect(Sample.make(qc_info: QcInfo.make).has_qc_reference?).to eq(true)
+
+    Batch.make(samples: [
+      Sample.make(specimen_role: "q"),
+      sample = Sample.make(specimen_role: "p"),
+    ])
+    expect(sample.has_qc_reference?).to eq(true)
+  end
 end

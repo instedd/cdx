@@ -85,4 +85,8 @@ class Sample < ActiveRecord::Base
   def has_entity_id?
     entity_ids.compact.any?
   end
+
+  def has_qc_reference?
+    !!(qc_info || (batch && batch.has_qc_sample?))
+  end
 end
