@@ -15,7 +15,7 @@ class SampleTransfersController < ApplicationController
     @sample_transfers = @sample_transfers.joins(:sample).where("samples.specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
 
     @sample_transfers = perform_pagination(@sample_transfers)
-      .preload(:transfer_package, :sample, :sender_institution, :receiver_institution)
+      .preload(:transfer_package, :sender_institution, :receiver_institution, sample: %i[batch qc_info])
       .map { |transfer| SampleTransferPresenter.new(transfer, @navigation_context) }
   end
 

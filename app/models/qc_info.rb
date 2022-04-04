@@ -4,6 +4,8 @@ class QcInfo < ActiveRecord::Base
   include InactivationMethod
   include DateProduced
 
+  belongs_to :sample_qc, class_name: "Sample"
+
   has_many :samples
 
   has_many :assay_attachments
