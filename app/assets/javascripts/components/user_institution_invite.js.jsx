@@ -21,6 +21,12 @@ var AddUserOrInstitutionLink = React.createClass({
     this.refs.inviteModal.hide();
   },
 
+  componentDidMount: function () {
+    if(window.location.href.indexOf('#inviteInstitutions') != -1) {
+      this.openInviteModal()
+    }
+  },
+
   render: function() {
     return (<div>
       <a className="btn-add icon side-link" href='#' title="Invite users" onClick={this.openInviteModal} ><span className="icon-mail icon-white"></span></a>

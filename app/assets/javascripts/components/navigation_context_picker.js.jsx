@@ -106,10 +106,10 @@ var NavigationContextPicker = React.createClass({
     return (
       <div className="side-bar">
         <SitePicker selected_uuid={this.state.context.uuid} onSiteSelected={this.changeContextSite} onSubsitesToggled={this.onSubsitesToggled} subsitesIncluded={this.state.subsitesIncluded} />
-        <button className="btn new-institution">
+        <a className="btn new-institution" href={`${this.props.invitesPath}`+ '#inviteInstitutions'}>
           <span className="icon-earth icon-white" />
           Bring other institutions on board CDx
-        </button>
+        </a>
       </div>
     );
   }
