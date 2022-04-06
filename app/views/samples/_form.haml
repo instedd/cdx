@@ -42,7 +42,7 @@
           = f.label :specimen_role
         .col
           - if @can_update
-            = cdx_select form: f, name: :specimen_role, searchable: true, :class => 'input-x-large' do |select|
+            = cdx_select form: f, name: :specimen_role, searchable: true,  :class => 'input-x-large' do |select|
               - select.items Sample.specimen_roles, :id, :description
           - else
             = text_field_tag :specimen_role, Sample.specimen_role_description(f.object.specimen_role), { :class => 'input-x-large', readonly: true }
@@ -89,5 +89,3 @@
         - if @can_delete
           = confirm_deletion_button @sample_form, 'sample'
 
-- if @can_update
-  = render 'form_specimen_role_js'

@@ -16,6 +16,10 @@ var CdxSelect = React.createClass({
     }
   },
 
+  onInputChange: function (newValue) {
+    this.selectRef.setValue(newValue)
+  },
+
   render: function() {
     var placeholder = "Choose one"
     if (this.props.items.length > 0 && this.props.items[0].value === "") {
@@ -23,6 +27,7 @@ var CdxSelect = React.createClass({
     }
 
     return (<Select className={this.props.className}
+      ref={(ref) => { this.selectRef = ref }}
       name={this.props.name}
       value={this.props.value}
       options={this.props.items}
@@ -30,7 +35,8 @@ var CdxSelect = React.createClass({
       clearable={false}
       multi={this.props.multi}
       searchable={this.props.searchable}
-      onChange={this.onChange}>
+      onChange={this.onChange}
+      onInputChange={this.props.searchable && this.onInputChange}>
     </Select>);
   }
 });
