@@ -104,8 +104,12 @@ var NavigationContextPicker = React.createClass({
     // since the picker tracks the selected state
     // there is no need to update the properties
     return (
-      <div>
+      <div className="side-bar">
         <SitePicker selected_uuid={this.state.context.uuid} onSiteSelected={this.changeContextSite} onSubsitesToggled={this.onSubsitesToggled} subsitesIncluded={this.state.subsitesIncluded} />
+        <button className="btn new-institution">
+          <span className="icon-earth icon-white" />
+          Bring other institutions on board CDx
+        </button>
       </div>
     );
   }
