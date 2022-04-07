@@ -30,7 +30,7 @@ class Batch < ApplicationRecord
   validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
   validates_presence_of :batch_number
   validates_presence_of :isolate_name
-  validates_uniqueness_of :batch_number, scope: :isolate_name
+  validates_uniqueness_of :batch_number, scope: :isolate_name, case_sensitive: false
 
   validates_associated :samples, message: "are invalid"
 
