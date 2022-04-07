@@ -13,7 +13,7 @@
 
       .content.row
         = flash_message
-        .col.px-3#context_side_bar{"data-context-react-props": {context: @navigation_context.try(:to_hash) || {}, invitesPath: users_path}.to_json}
+        .col.px-3#context_side_bar{"data-context-react-props": {context: @navigation_context.try(:to_hash) || {}, institution_types: Institution.kinds}.to_json}
         .col
           = yield(:subheader)
           .row

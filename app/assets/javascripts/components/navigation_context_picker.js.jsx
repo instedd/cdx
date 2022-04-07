@@ -64,7 +64,11 @@ $(document).on('ready', function(){
 
 var NavigationContextPicker = React.createClass({
   buildState: function(props) {
-    return { context: props.context, subsitesIncluded: !props.context.full_context.endsWith("-!") }
+    return {
+      context: props.context,
+      subsitesIncluded: !props.context.full_context.endsWith("-!"),
+      modalTitle:'Invite'
+       }
   },
 
   getInitialState: function() {
@@ -100,16 +104,35 @@ var NavigationContextPicker = React.createClass({
     Turbolinks.visit(new_context_url.toString());
   },
 
+  changeModalTitle: function(newTitle) {
+    this.setState({
+      modalTitle: newTitle
+    });
+  },
+
+  closeInviteModal: function() {
+    this.refs.inviteModal.hide();
+  },
+
+  openInviteModal: function(event) {
+    this.refs.inviteModal.show();
+    event.preventDefault();
+  },
+
   render: function() {
     // since the picker tracks the selected state
     // there is no need to update the properties
     return (
       <div className="side-bar">
         <SitePicker selected_uuid={this.state.context.uuid} onSiteSelected={this.changeContextSite} onSubsitesToggled={this.onSubsitesToggled} subsitesIncluded={this.state.subsitesIncluded} />
-        <a className="btn new-institution" href={`${this.props.invitesPath}`+ '#inviteInstitutions'}>
+        <a className="btn new-institution" onClick={this.openInviteModal}>
           <span className="icon-earth icon-white" />
           Bring other institutions on board CDx
         </a>
+        <Modal ref="inviteModal">
+          <h1>{this.state.title}</h1>
+          <ModalPresenter changeTitle={this.changeModalTitle} onFinished={this.closeInviteModal} institution_types= {this.props.institution_types} context={this.props.context} />
+        </Modal>
       </div>
     );
   }
