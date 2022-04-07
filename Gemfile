@@ -86,10 +86,6 @@ gem 'uglifier', '>= 2.7.2'
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs'
-
-  group :test do
-    gem 'rails-assets-es5-shim'
-  end
 end
 
 group :development do
@@ -119,9 +115,9 @@ group :test do
   gem 'webmock', require: false
 
   # integration tests
-  gem 'capybara'
+  gem 'capybara', '~> 2.4'
   gem 'capybara-screenshot'
   gem 'cucumber-rails', require: false
-  gem 'poltergeist'
-  gem 'site_prism'
+  gem 'selenium-webdriver', '< 4.0'
+  gem 'site_prism', '~> 2.7'
 end

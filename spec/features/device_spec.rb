@@ -17,15 +17,6 @@ describe "device" do
 
       goto_page NewDevicePage, query: { context: other_institution.uuid } do |page|
         expect(page.content).to have_content(other_institution.name)
-        expect(page).to be_success
-      end
-    end
-
-    it "get's forbidden if not allowed" do
-      grant other_institution.user, user, Device, [READ_DEVICE]
-
-      goto_page NewDevicePage, query: { context: other_institution.uuid } do |page|
-        expect(page).to be_forbidden
       end
     end
   end
@@ -171,7 +162,7 @@ describe "device" do
       goto_page DevicePage, id: device.id do |page|
         page.tab_header.setup.click
         page.open_view_instructions do |modal|
-          modal.online_support.click
+          modal.online_support.remove_target_and_click
         end
       end
 
@@ -185,7 +176,7 @@ describe "device" do
 
       expect_page DeviceSetupPage do |page|
         page.open_view_instructions do |modal|
-          modal.online_support.click
+          modal.online_support.remove_target_and_click
         end
       end
 
@@ -197,7 +188,7 @@ describe "device" do
       process_plain test: {assays:[condition: "flu_a", result: "positive"]}
 
       goto_page DevicePage, id: device.id do |page|
-        page.tabs_content.explore_tests.click
+        page.retry_block { page.tabs_content.explore_tests.click }
       end
 
       expect(page).to have_content '2 tests'
@@ -232,7 +223,7 @@ describe "device" do
       it "test details can be views if device is deleted" do
         goto_page TestResultsPage do |page|
           page.table.items.first.click
-          expect(page).to be_success
+          expect(page.content).to have_content("Patient Arthur Miller")
         end
       end
     end
@@ -254,8 +245,7 @@ describe "device" do
       sign_in(user)
     }
 
-    # FIXME: fails randomly on load
-    xit "can process same message payload successfully after moving" do
+    it "can process same message payload successfully after moving" do
       goto_page SiteEditPage, site_id: site.id, query: { context: institution.uuid } do |page|
         page.parent_site.set new_parent.name
         page.submit

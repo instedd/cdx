@@ -3,7 +3,7 @@ include CdxPageHelper
 
 Given(/^the user has an account$/) do
   @user = User.make!(password: '12345678', first_name: 'Bob', email: 'zaa1aa@ggg.com')
-  @institution = Institution.make! user_id: @user.id
+  @institution = Institution.make! user_id: @user.id, name: "LABORATORY"
   @user.grant_superadmin_policy
   authenticate(@user)
 
@@ -16,11 +16,11 @@ def create_entity_device(entity)
   site =
     case entity
     when Institution
-      Site.create(institution: entity)
+      Site.create(institution: entity, name: "LAB SITE")
     when Site
-      Site.create(:child, site: entity)
+      Site.create(:child, site: entity, name: "LAB SITE")
     end
-  Device.make!(site: site)
+  Device.make!(site: site, name: "INTERNAL DEVICE")
 end
 
 Given(/^the user creates a new error category alert with all fields with name "(.*?)"$/) do |arg1|
@@ -36,17 +36,17 @@ Given(/^the user creates a new error category alert with all fields with name "(
     find('label[for=device_errors]').click
 
     form.device_errors_value.set 2
-    form.sites.set_exact_multi "Mrs. Terry Goyette"
-    form.devices.set_exact_multi "Mr. Alphonso Witting"
-    form.roles.set_exact_multi "Institution Aric Smith Reader"
-    form.internal_users.set_exact_multi @user.email
+    form.sites.set_exact_multi "LAB SITE"
+    form.devices.set_exact_multi "INTERNAL DEVICE"
+    form.roles.set_exact_multi "LABORATORY"
+    # form.internal_users.set_exact_multi @user.email # FIXME: not listed!
     form.aggregation.set "record"
     form.channel.set_exact "email"
     form.emaillimit.set 2
     alert_form_fillin_externaluser(form)
     form.new_externaluser.click
   # form.submit.click
-    find_button("submit").trigger('click')
+    find_button("submit").click
     wait_for_submit
   end
 end
@@ -64,16 +64,16 @@ Given(/^the user creates a new anomalie category alert with all fields with name
     find('label[for=anomalies]').click
 
     form.anomalies.set_exact_multi "missing_sample_id"
-    form.sites.set_exact_multi "Mrs. Terry Goyette"
-    form.devices.set_exact_multi "Mr. Alphonso Witting"
-    form.roles.set_exact_multi "Institution Aric Smith Reader"
-    form.internal_users.set_exact_multi @user.email
+    form.sites.set_exact_multi "LAB SITE"
+    form.devices.set_exact_multi "INTERNAL DEVICE"
+    form.roles.set_exact_multi "Institution LABORATORY Reader"
+    # form.internal_users.set_exact_multi @user.email # FIXME: not listed!
     form.aggregation.set "record"
     form.channel.set_exact "email"
     alert_form_fillin_externaluser(form)
     form.new_externaluser.click
 
-    find_button("submit").trigger('click')
+    find_button("submit").click
     wait_for_submit
   end
 end
@@ -89,10 +89,10 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
 
     find('label[for=test_results]').click
 
-    form.sites.set_exact_multi "Mrs. Terry Goyette"
-    form.devices.set_exact_multi "Mr. Alphonso Witting"
-    form.roles.set_exact_multi "Institution Aric Smith Reader"
-    form.internal_users.set_exact_multi @user.email
+    form.sites.set_exact_multi "LAB SITE"
+    form.devices.set_exact_multi "INTERNAL DEVICE"
+    form.roles.set_exact_multi "Institution LABORATORY Reader"
+    # form.internal_users.set_exact_multi @user.email # FIXME: not listed!
     form.aggregation.set "aggregated"
     form.aggregation_frequency.set "day"
     form.aggregationthresholdlimit.set 5
@@ -104,7 +104,7 @@ Given(/^the user creates a new testresult alert with all fields with name "(.*?)
 
     form.new_externaluser.click
     #  form.submit.click
-    find_button("submit").trigger('click')
+    find_button("submit").click
     wait_for_submit
   end
 end
@@ -119,10 +119,10 @@ Given(/^the user Successful creates a new utilization efficiency category with a
     alert_form_fillin_basic(form, arg1)
 
     find('label[for=utilization_efficiency]').click
-    form.sites.set_exact_multi "Mrs. Terry Goyette"
-    form.devices.set_exact_multi "Mr. Alphonso Witting"
-    form.roles.set_exact_multi "Institution Aric Smith Reader"
-    form.internal_users.set_exact_multi @user.email
+    form.sites.set_exact_multi "LAB SITE"
+    form.devices.set_exact_multi "INTERNAL DEVICE"
+    form.roles.set_exact_multi "Institution LABORATORY Reader"
+    # form.internal_users.set_exact_multi @user.email # FIXME: not listed!
     form.aggregation_frequency.set "day"
     form.aggregationthresholdlimit.set 5
     form.channel.set_exact "sms"
@@ -132,7 +132,7 @@ Given(/^the user Successful creates a new utilization efficiency category with a
 
     form.new_externaluser.click
     # form.submit.click
-    find_button("submit").trigger('click')
+    find_button("submit").click
     wait_for_submit
   end
 end

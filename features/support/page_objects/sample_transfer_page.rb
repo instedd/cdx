@@ -8,11 +8,6 @@ class ListSampleTransfersPage < CdxPageBase
     element :specimen_role, :field, "Specimen Role"
 
     include CdxPageHelper
-
-    def submit
-      root_element.native.send_keys :enter
-      wait_for_submit
-    end
   end
 
   def entry(uuid)

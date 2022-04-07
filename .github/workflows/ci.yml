@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/docker-cache
         with:
-          docker-images: cdx_web cdx_csv_watch cdx_ftp_monitor cdx_sidekiq
+          docker-images: cdx_web cdx_selenium
       - uses: ./.github/actions/gems-cache
 
   unit_tests:
@@ -53,6 +53,9 @@ jobs:
         run: |
           docker-compose up -d db elasticsearch redis
           docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
+
+      - name: Start services (Selenium)
+        run: docker-compose up -d selenium
 
       - name: Run specs (capybara)
         run: docker-compose run --rm -e RAILS_ENV=test web bundle exec rspec spec/features/**

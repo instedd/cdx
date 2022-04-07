@@ -58,12 +58,16 @@ class Capybara::Node::Element
   end
   alias_method_chain :click, :ajax
 
-  # remove targe=_blank before clicking
-  def click_with_target_removed
-    page.evaluate_script('$("a[target=_blank]").attr("target", null);')
-    click_without_target_removed
+  # Removes the `target` attribute before clicking a link. Useful to remove an
+  # "_blank" target for example.
+  def remove_target_and_click
+    # The expression returns null otherwise we get a "Cyclic object value" in
+    # Firefox, this is caused by the driver trying to return the objects
+    # serialized as JSON, but the raw A elements have cyclic references, causing
+    # JSON.stringify to crash.
+    page.evaluate_script("$('a').removeAttr('target'), null")
+    click
   end
-  alias_method_chain :click, :target_removed
 
   def page
     session

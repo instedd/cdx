@@ -136,8 +136,6 @@ In the client side, you will need to run another filewatcher: [cdx-sync-client](
 
 2. Install dependencies:
 	* `bundle install`.
-	* PhantomJS 1.9.8 for [Poltergeist](https://github.com/teampoltergeist/poltergeist) (development and test only)
-		* Install it in mac with: `brew install phantomjs`
 	* ImageMagick for [Paperclip](https://github.com/thoughtbot/paperclip#image-processor)
 		* Install it in mac with: `brew install imagemagick`
 	* [Redis](http://redis.io/download) is [used](https://github.com/mperham/sidekiq/wiki/Using-Redis) by [sidekiq](http://sidekiq.org/). CDX uses sidekiq as [ActiveJob](http://guides.rubyonrails.org/active_job_basics.html#backends) backend

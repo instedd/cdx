@@ -24,7 +24,7 @@ describe "Patients", elasticsearch: true do
 
       expect_page PatientPage do |page|
         expect(page).to have_content("(Unknown name)")
-        expect(page).to be_success
+        expect(page).to have_content("03/19/2015")
       end
     end
   end
