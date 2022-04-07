@@ -15,6 +15,11 @@ RSpec.describe SamplesController, type: :controller do
   before(:each) do
     grant user, other_user, institution, READ_INSTITUTION
     sign_in user
+
+    # WickedPDF will try to request Google Fonts
+    stub_request(:get, %r{^https://fonts\.googleapis\.com/css})
+      .with(:query => hash_including("family"))
+      .to_return(:status => 200, :body => "", :headers => {})
   end
 
   context "index" do
@@ -59,7 +64,7 @@ RSpec.describe SamplesController, type: :controller do
       Sample.make! institution: institution, isolate_name: 'DEF.24'
       Sample.make! institution: institution, isolate_name: 'GHI.42'
 
-      get :index, isolate_name: '42'
+      get :index, params: { isolate_name: '42' }
       expect(response).to be_success
       expect(assigns(:samples).count).to eq(2)
     end
@@ -69,7 +74,7 @@ RSpec.describe SamplesController, type: :controller do
       Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '89101112-8ce1-a0c8-ac1b-58bed3633e88')]
       Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '13141516-8ce1-a0c8-ac1b-58bed3633e00')]
 
-      get :index, sample_id: '88'
+      get :index, params: { sample_id: '88' }
       expect(response).to be_success
       expect(assigns(:samples).count).to eq(2)
     end
@@ -92,14 +97,14 @@ RSpec.describe SamplesController, type: :controller do
     end
 
     it "redirects to edit when user has UPDATE_SAMPLE permission" do
-      get :edit_or_show, id: sample.id
+      get :edit_or_show, params: { id: sample.id }
       expect(response).to redirect_to(edit_sample_path(sample))
     end
 
     it "redirects to show when user doesn't have UPDATE_SAMPLE permission" do
       sign_in other_user
 
-      get :edit_or_show, id: sample.id
+      get :edit_or_show, params: { id: sample.id }
       expect(response).to redirect_to(sample_path(sample))
     end
   end
@@ -110,21 +115,21 @@ RSpec.describe SamplesController, type: :controller do
     end
 
     it "should be accessible to institution owner" do
-      get :show, id: sample.id
+      get :show, params: { id: sample.id }
       expect(response).to be_success
     end
 
     it "shouldn't be accessible to anybody" do
       sign_in other_user
 
-      get :show, id: sample.id
+      get :show, params: { id: sample.id }
       expect(response).to be_forbidden
     end
 
     it "shows old_batch_number" do
       sample.update(old_batch_number: "1234567")
 
-      get :show, id: sample.id
+      get :show, params: { id: sample.id }
 
       expect(response.body).to include(sample.old_batch_number)
     end
@@ -164,7 +169,7 @@ RSpec.describe SamplesController, type: :controller do
         # sets session[:creating_sample_uuid] (see implementation)
         get :new
         # use session[:creating_sample_uuid]
-        post :create, sample: sample_form_plan
+        post :create, params: { sample: sample_form_plan }
       }.to change(institution.samples, :count).by(1)
 
       expect(response).to redirect_to samples_path
@@ -172,7 +177,7 @@ RSpec.describe SamplesController, type: :controller do
 
     it "should save fields" do
       get :new
-      post :create, sample: sample_form_plan
+      post :create, params: { sample: sample_form_plan }
       sample = institution.samples.last
 
       expect(sample.isolate_name).to eq(sample_form_plan[:isolate_name])
@@ -187,7 +192,7 @@ RSpec.describe SamplesController, type: :controller do
 
       expect {
         get :new
-        post :create, sample: sample_form_plan
+        post :create, params: { sample: sample_form_plan }
       }.to change(institution.samples, :count).by(1)
     end
 
@@ -196,7 +201,7 @@ RSpec.describe SamplesController, type: :controller do
 
       expect {
         get :new
-        post :create, sample: sample_form_plan
+        post :create, params: { sample: sample_form_plan }
       }.to change(institution.samples, :count).by(0)
 
       expect(response).to be_forbidden
@@ -205,7 +210,7 @@ RSpec.describe SamplesController, type: :controller do
     it "should require date_produced" do
       expect {
         get :new
-        post :create, sample: build_sample_form_plan(date_produced: '')
+        post :create, params: { sample: build_sample_form_plan(date_produced: '') }
       }.to change(institution.samples, :count).by(0)
 
       expect(assigns(:sample_form).errors).to have_key(:date_produced)
@@ -215,7 +220,7 @@ RSpec.describe SamplesController, type: :controller do
     it "should validate date_produced" do
       expect {
         get :new
-        post :create, sample: build_sample_form_plan(date_produced: '31/31/3100')
+        post :create, params: { sample: build_sample_form_plan(date_produced: '31/31/3100') }
       }.to change(institution.samples, :count).by(0)
 
       expect(assigns(:sample_form).errors).to have_key(:date_produced)
@@ -225,7 +230,7 @@ RSpec.describe SamplesController, type: :controller do
     it "should not require isolate_name" do
       expect {
         get :new
-        post :create, sample: build_sample_form_plan(isolate_name: '')
+        post :create, params: { sample: build_sample_form_plan(isolate_name: '') }
       }.to change(institution.samples, :count).by(1)
 
       sample = institution.samples.first
@@ -236,7 +241,7 @@ RSpec.describe SamplesController, type: :controller do
     it "should not require lab_technician" do
       expect {
         get :new
-        post :create, sample: build_sample_form_plan(lab_technician: '')
+        post :create, params: { sample: build_sample_form_plan(lab_technician: '') }
       }.to change(institution.samples, :count).by(1)
 
       sample = institution.samples.first
@@ -247,7 +252,7 @@ RSpec.describe SamplesController, type: :controller do
     it "should not require specimen_role" do
       expect {
         get :new
-        post :create, sample: build_sample_form_plan(specimen_role: '')
+        post :create, params: { sample: build_sample_form_plan(specimen_role: '') }
       }.to change(institution.samples, :count).by(1)
 
       sample = institution.samples.first
@@ -258,7 +263,7 @@ RSpec.describe SamplesController, type: :controller do
     it "should not require inactivation_method" do
       expect {
         get :new
-        post :create, sample: build_sample_form_plan(inactivation_method: '')
+        post :create, params: { sample: build_sample_form_plan(inactivation_method: '') }
       }.to change(institution.samples, :count).by(1)
 
       sample = institution.samples.first
@@ -269,7 +274,7 @@ RSpec.describe SamplesController, type: :controller do
     it "should not require volume" do
       expect {
         get :new
-        post :create, sample: build_sample_form_plan(volume: '')
+        post :create, params: { sample: build_sample_form_plan(volume: '') }
       }.to change(institution.samples, :count).by(1)
 
       sample = institution.samples.first
@@ -281,7 +286,7 @@ RSpec.describe SamplesController, type: :controller do
       it "saves attachment" do
         expect {
           get :new
-          post :create, sample: build_sample_form_plan(assay_attachments_attributes: [ {loinc_code_id: loinc_code.id, result: "foo bar"} ])
+          post :create, params: { sample: build_sample_form_plan(assay_attachments_attributes: [ {loinc_code_id: loinc_code.id, result: "foo bar"} ]) }
         }.to change{ institution.samples.count }.by(1)
 
         sample = institution.samples.first
@@ -294,7 +299,7 @@ RSpec.describe SamplesController, type: :controller do
       it "errors on attachment error" do
         expect {
           get :new
-          post :create, sample: build_sample_form_plan(assay_attachments_attributes: [ {loinc_code_id: loinc_code.id } ])
+          post :create, params: { sample: build_sample_form_plan(assay_attachments_attributes: [ {loinc_code_id: loinc_code.id } ]) }
         }.not_to change{ institution.samples.count }
         expect(@response.body).to include("must contain a file or a result")
       end
@@ -305,7 +310,7 @@ RSpec.describe SamplesController, type: :controller do
     let!(:sample) { Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')] }
 
     it "should be accessible by institution owner" do
-      get :edit, id: sample.id
+      get :edit, params: { id: sample.id }
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_truthy
     end
@@ -314,7 +319,7 @@ RSpec.describe SamplesController, type: :controller do
       grant user, other_user, Sample, UPDATE_SAMPLE
       sign_in other_user
 
-      get :edit, id: sample.id
+      get :edit, params: { id: sample.id }
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_falsy
     end
@@ -322,7 +327,7 @@ RSpec.describe SamplesController, type: :controller do
     it "should not be accessible if can not edit" do
       sign_in other_user
 
-      get :edit, id: sample.id
+      get :edit, params: { id: sample.id }
       expect(response).to be_forbidden
     end
 
@@ -331,7 +336,7 @@ RSpec.describe SamplesController, type: :controller do
       grant user, other_user, Sample, DELETE_SAMPLE
       sign_in other_user
 
-      get :edit, id: sample.id
+      get :edit, params: { id: sample.id }
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_truthy
     end
@@ -339,7 +344,7 @@ RSpec.describe SamplesController, type: :controller do
     it "shows old_batch_number" do
       sample.update(old_batch_number: "1234567")
 
-      get :edit, id: sample.id
+      get :edit, params: { id: sample.id }
 
       expect(response.body).to include(sample.old_batch_number)
     end
@@ -349,13 +354,16 @@ RSpec.describe SamplesController, type: :controller do
     let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [ SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
     it "should update existing sample" do
-      post :update, id: sample.id, sample: {
-        date_produced: '09/09/2021',
-        isolate_name: 'ABC.42',
-        lab_technician: 'TecFoo',
-        specimen_role: 'q',
-        inactivation_method: 'Formaldehyde',
-        volume: '100'
+      post :update, params: {
+        id: sample.id,
+        sample: {
+          date_produced: '09/09/2021',
+          isolate_name: 'ABC.42',
+          lab_technician: 'TecFoo',
+          specimen_role: 'q',
+          inactivation_method: 'Formaldehyde',
+          volume: '100'
+        }
       }
       expect(response).to be_redirect
 
@@ -369,7 +377,7 @@ RSpec.describe SamplesController, type: :controller do
     end
 
     it "should require date_produced" do
-      post :update, id: sample.id, sample: { date_produced: '' }
+      post :update, params: { id: sample.id, sample: { date_produced: '' } }
       expect(assigns(:sample_form).errors).to have_key(:date_produced)
       expect(response).to render_template("samples/edit")
     end
@@ -378,13 +386,16 @@ RSpec.describe SamplesController, type: :controller do
       grant user, other_user, Sample, UPDATE_SAMPLE
 
       sign_in other_user
-      post :update, id: sample.id, sample: {
-        date_produced: '09/09/2021',
-        isolate_name: 'ABC.42',
-        lab_technician: 'TecFoo',
-        specimen_role: 'q',
-        inactivation_method: 'Formaldehyde',
-        volume: '100'
+      post :update, params: {
+        id: sample.id,
+        sample: {
+          date_produced: '09/09/2021',
+          isolate_name: 'ABC.42',
+          lab_technician: 'TecFoo',
+          specimen_role: 'q',
+          inactivation_method: 'Formaldehyde',
+          volume: '100'
+        }
       }
       expect(response).to be_redirect
 
@@ -399,7 +410,7 @@ RSpec.describe SamplesController, type: :controller do
 
     it "should not update existing sample if not allowed" do
       sign_in other_user
-      post :update, id: sample.id, sample: { date_produced: '09/09/2021' }
+      post :update, params: { id: sample.id, sample: { date_produced: '09/09/2021' } }
       expect(response).to be_forbidden
 
       sample.reload
@@ -412,7 +423,7 @@ RSpec.describe SamplesController, type: :controller do
 
     it "should be able to soft delete a sample" do
       expect {
-        delete :destroy, id: sample.id
+        delete :destroy, params: { id: sample.id }
       }.to change(institution.samples, :count).by(-1)
 
       sample.reload
@@ -426,7 +437,7 @@ RSpec.describe SamplesController, type: :controller do
       sign_in other_user
 
       expect {
-        delete :destroy, id: sample.id
+        delete :destroy, params: { id: sample.id }
       }.to change(institution.samples, :count).by(-1)
 
       sample.reload
@@ -437,7 +448,7 @@ RSpec.describe SamplesController, type: :controller do
       sign_in other_user
 
       expect {
-        delete :destroy, id: sample.id
+        delete :destroy, params: { id: sample.id }
       }.to change(institution.samples, :count).by(0)
 
       expect(response).to be_forbidden
@@ -453,7 +464,7 @@ RSpec.describe SamplesController, type: :controller do
 
     it "should be able to bulk destroy samples" do
       expect {
-        post :bulk_destroy, sample_ids: [sample1.id, sample2.id]
+        post :bulk_destroy, params: { sample_ids: [sample1.id, sample2.id] }
       }.to change(institution.samples, :count).by(-2)
 
       sample1.reload
@@ -469,7 +480,7 @@ RSpec.describe SamplesController, type: :controller do
       sign_in other_user
 
       expect {
-        post :bulk_destroy, sample_ids: [sample1.id, sample2.id]
+        post :bulk_destroy, params: { sample_ids: [sample1.id, sample2.id] }
       }.to change(institution.samples, :count).by(-2)
 
       sample1.reload
@@ -482,7 +493,7 @@ RSpec.describe SamplesController, type: :controller do
       sign_in other_user
 
       expect {
-        post :bulk_destroy, sample_ids: [sample1.id, sample2.id]
+        post :bulk_destroy, params: { sample_ids: [sample1.id, sample2.id] }
       }.to change(institution.samples, :count).by(0)
 
       expect(response).to be_forbidden
@@ -490,7 +501,7 @@ RSpec.describe SamplesController, type: :controller do
 
     it "should not able to bulk destroy if can not DELETE all samples" do
       expect {
-        post :bulk_destroy, sample_ids: [sample1.id, sample2.id, sample3.id]
+        post :bulk_destroy, params: { sample_ids: [sample1.id, sample2.id, sample3.id] }
       }.to change(institution.samples, :count).by(0)
 
       expect(response).to be_forbidden
@@ -501,7 +512,7 @@ RSpec.describe SamplesController, type: :controller do
     let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
     it "should be able to print a sample" do
-      post :print, id: sample.id
+      post :print, params: { id: sample.id }
       expect(response.headers['Content-Type']).to eq('application/pdf')
     end
 
@@ -509,14 +520,14 @@ RSpec.describe SamplesController, type: :controller do
       grant user, other_user, Sample, READ_SAMPLE
       sign_in other_user
 
-      post :print, id: sample.id
+      post :print, params: { id: sample.id }
       expect(response.headers['Content-Type']).to eq('application/pdf')
     end
 
     it "should not able to print if can not READ" do
       sign_in other_user
 
-      post :print, id: sample.id
+      post :print, params: { id: sample.id }
       expect(response).to be_forbidden
     end
   end
@@ -529,7 +540,7 @@ RSpec.describe SamplesController, type: :controller do
     let!(:sample3) { Sample.make!(institution: institution2, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
 
     it "should be able to bulk print samples" do
-      post :bulk_print, sample_ids: [sample1.id, sample2.id]
+      post :bulk_print, params: { sample_ids: [sample1.id, sample2.id] }
       expect(response.headers['Content-Type']).to eq('application/pdf')
     end
 
@@ -537,19 +548,19 @@ RSpec.describe SamplesController, type: :controller do
       grant user, other_user, Sample, READ_SAMPLE
       sign_in other_user
 
-      post :bulk_print, sample_ids: [sample1.id, sample2.id]
+      post :bulk_print, params: { sample_ids: [sample1.id, sample2.id] }
       expect(response.headers['Content-Type']).to eq('application/pdf')
     end
 
     it "should not able to bulk print if can not READ" do
       sign_in other_user
 
-      post :bulk_print, sample_ids: [sample1.id, sample2.id]
+      post :bulk_print, params: { sample_ids: [sample1.id, sample2.id] }
       expect(response).to be_forbidden
     end
 
     it "should not able to bulk print if can not READ all samples" do
-      post :bulk_print, sample_ids: [sample1.id, sample2.id, sample3.id]
+      post :bulk_print, params: { sample_ids: [sample1.id, sample2.id, sample3.id] }
       expect(response).to be_forbidden
     end
   end

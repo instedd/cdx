@@ -38,7 +38,7 @@ describe Manifest do
     it "shouldn't pass validations when creating if definition is an invalid json" do
       definition = %{{
         "metadata" : {
-          "version" : "1.0.0" , ,
+          "version" : "1.0.0",
           "api_version" : "1.0.0"
         }
       }}

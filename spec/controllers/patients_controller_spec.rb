@@ -63,7 +63,7 @@ RSpec.describe PatientsController, type: :controller do
       Patient.make! institution: institution, name: 'Clark'
       Patient.make! institution: institution, name: 'Mery johana'
 
-      get :index, name: 'jo'
+      get :index, params: { name: 'jo' }
       expect(response).to be_success
       expect(assigns(:patients).count).to eq(2)
     end
@@ -73,7 +73,7 @@ RSpec.describe PatientsController, type: :controller do
       Patient.make! institution: institution, entity_id: '21100'
       Patient.make! institution: institution, entity_id: '40440'
 
-      get :index, entity_id: '11'
+      get :index, params: { entity_id: '11' }
       expect(response).to be_success
       expect(assigns(:patients).count).to eq(2)
     end
@@ -83,7 +83,7 @@ RSpec.describe PatientsController, type: :controller do
       Patient.make! institution: institution, location_geoid: 'ne:US3432'
       Patient.make! institution: institution, location_geoid: 'ne:ARne:US'
 
-      get :index, location: 'ne:US'
+      get :index, params: { location: 'ne:US' }
       expect(response).to be_success
       expect(assigns(:patients).count).to eq(2)
     end
@@ -99,7 +99,7 @@ RSpec.describe PatientsController, type: :controller do
       Encounter.make! patient: patient1, site: site11
       Encounter.make! patient: patient2, site: site2
 
-      get :index, context: site1.uuid
+      get :index, params: { context: site1.uuid }
 
       expect(response).to be_success
       expect(assigns(:patients).to_a).to eq([patient1])
@@ -113,7 +113,7 @@ RSpec.describe PatientsController, type: :controller do
       patient2 = Patient.make! institution: institution, site: site2
       patient1 = Patient.make! institution: institution, site: site11
 
-      get :index, context: site1.uuid
+      get :index, params: { context: site1.uuid }
 
       expect(response).to be_success
       expect(assigns(:patients).to_a).to eq([patient1])
@@ -126,7 +126,7 @@ RSpec.describe PatientsController, type: :controller do
       Encounter.make! patient: patient1, start_time: Time.new(2016, 1, 14, 0, 0, 0)
       Encounter.make! patient: patient2, start_time: Time.new(2016, 1, 7, 0, 0, 0)
 
-      get :index, last_encounter: '2016-01-10 00:00:00 UTC'
+      get :index, params: { last_encounter: '2016-01-10 00:00:00 UTC' }
 
       expect(response).to be_success
       expect(assigns(:patients).to_a).to eq([patient1])
@@ -138,7 +138,7 @@ RSpec.describe PatientsController, type: :controller do
       Encounter.make! patient: patient1, start_time: Time.new(2016, 1, 14, 0, 0, 0)
       Encounter.make! patient: patient1, start_time: Time.new(2016, 1, 11, 0, 0, 0)
 
-      get :index, last_encounter: '2016-01-10 00:00:00 UTC'
+      get :index, params: { last_encounter: '2016-01-10 00:00:00 UTC' }
 
       expect(response).to be_success
       expect(assigns(:patients).to_a).to eq([patient1])
@@ -150,21 +150,21 @@ RSpec.describe PatientsController, type: :controller do
     let!(:patient) { Patient.make! institution: institution }
 
     it "should be accessible be institution owner" do
-      get :show, id: patient.id
+      get :show, params: { id: patient.id }
       expect(response).to be_success
       expect(assigns(:can_edit)).to be_truthy
     end
 
     it "should not be accessible if can not read" do
       sign_in other_user
-      get :show, id: patient.id
+      get :show, params: { id: patient.id }
       expect(response).to be_forbidden
     end
 
     it "should be accessible if can read" do
       grant user, other_user, Patient, READ_PATIENT
       sign_in other_user
-      get :show, id: patient.id
+      get :show, params: { id: patient.id }
       expect(response).to be_success
       expect(assigns(:can_edit)).to be_falsy
     end
@@ -173,7 +173,7 @@ RSpec.describe PatientsController, type: :controller do
       grant user, other_user, Patient, READ_PATIENT
       grant user, other_user, Patient, UPDATE_PATIENT
       sign_in other_user
-      get :show, id: patient.id
+      get :show, params: { id: patient.id }
       expect(response).to be_success
       expect(assigns(:can_edit)).to be_truthy
     end
@@ -200,7 +200,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should preserve next_url" do
       next_url = 'http://example.org/some_next_url'
-      get :new, next_url: next_url
+      get :new, params: { next_url: next_url }
       expect(response.body).to include(next_url)
     end
   end
@@ -216,14 +216,14 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should create new patient in context institution" do
       expect {
-        post :create, patient: patient_form_plan
+        post :create, params: { patient: patient_form_plan }
       }.to change(institution.patients, :count).by(1)
 
       expect(response).to redirect_to patient_path(Patient.last)
     end
 
     it "should save fields" do
-      post :create, patient: patient_form_plan
+      post :create, params: { patient: patient_form_plan }
       patient = institution.patients.last
 
       expect(patient.name).to eq(patient_form_plan[:name])
@@ -238,7 +238,7 @@ RSpec.describe PatientsController, type: :controller do
     end
 
     it "should save it as non phantom" do
-      post :create, patient: patient_form_plan
+      post :create, params: { patient: patient_form_plan }
       patient = institution.patients.last
       expect(patient).to_not be_phantom
     end
@@ -248,7 +248,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: patient_form_plan
+        post :create, params: { patient: patient_form_plan }
       }.to change(institution.patients, :count).by(1)
     end
 
@@ -256,7 +256,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        post :create, patient: patient_form_plan
+        post :create, params: { patient: patient_form_plan }
       }.to change(institution.patients, :count).by(0)
 
       expect(response).to be_forbidden
@@ -264,7 +264,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should require name" do
       expect {
-        post :create, patient: build_patient_form_plan(name: '')
+        post :create, params: { patient: build_patient_form_plan(name: '') }
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:name)
@@ -273,7 +273,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should require entity_id" do
       expect {
-        post :create, patient: build_patient_form_plan(entity_id: '')
+        post :create, params: { patient: build_patient_form_plan(entity_id: '') }
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:entity_id)
@@ -284,7 +284,7 @@ RSpec.describe PatientsController, type: :controller do
       Patient.make! institution: institution, entity_id: '1001'
 
       expect {
-        post :create, patient: build_patient_form_plan(entity_id: '1001')
+        post :create, params: { patient: build_patient_form_plan(entity_id: '1001') }
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:entity_id)
@@ -293,7 +293,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should not require dob" do
       expect {
-        post :create, patient: build_patient_form_plan(dob: '')
+        post :create, params: { patient: build_patient_form_plan(dob: '') }
       }.to change(institution.patients, :count).by(1)
 
       patient = institution.patients.first
@@ -303,7 +303,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should validate dob if present" do
       expect {
-        post :create, patient: build_patient_form_plan(dob: '14/14/2000')
+        post :create, params: { patient: build_patient_form_plan(dob: '14/14/2000') }
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:dob)
@@ -312,7 +312,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should validate gender" do
       expect {
-        post :create, patient: build_patient_form_plan(gender: 'invalid-value')
+        post :create, params: { patient: build_patient_form_plan(gender: 'invalid-value') }
       }.to change(institution.patients, :count).by(0)
 
       expect(assigns(:patient).errors).to have_key(:gender)
@@ -321,7 +321,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should not require gender" do
       expect {
-        post :create, patient: build_patient_form_plan(gender: '')
+        post :create, params: { patient: build_patient_form_plan(gender: '') }
       }.to change(institution.patients, :count).by(1)
 
       patient = institution.patients.first
@@ -332,7 +332,7 @@ RSpec.describe PatientsController, type: :controller do
     it "should use navigation_context as patient site" do
       site = Site.make! institution: institution
       expect {
-        post :create, context: site.uuid, patient: patient_form_plan
+        post :create, params: { context: site.uuid, patient: patient_form_plan }
       }.to change(institution.patients, :count).by(1)
 
       expect(Patient.last.site).to eq(site)
@@ -342,7 +342,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should preserve next_url" do
       next_url = 'http://example.org/some_next_url'
-      post :create, patient: build_patient_form_plan(name: ''), next_url: next_url
+      post :create, params: { patient: build_patient_form_plan(name: ''), next_url: next_url }
 
       expect(assigns(:patient)).to be_invalid
       expect(response).to render_template("patients/new")
@@ -351,7 +351,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should redirects to next_url on creation with patient_id" do
       next_url = 'http://example.org/some_next_url?foo=bar'
-      post :create, patient: build_patient_form_plan({}), next_url: next_url
+      post :create, params: { patient: build_patient_form_plan({}), next_url: next_url }
 
       patient = Patient.last
       expect(response).to redirect_to "#{next_url}&patient_id=#{patient.id}"
@@ -362,7 +362,7 @@ RSpec.describe PatientsController, type: :controller do
     let!(:patient) { Patient.make! institution: institution }
 
     it "should be accessible by institution owner" do
-      get :edit, id: patient.id
+      get :edit, params: { id: patient.id }
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_truthy
     end
@@ -371,7 +371,7 @@ RSpec.describe PatientsController, type: :controller do
       grant user, other_user, Patient, UPDATE_PATIENT
       sign_in other_user
 
-      get :edit, id: patient.id
+      get :edit, params: { id: patient.id }
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_falsy
     end
@@ -379,7 +379,7 @@ RSpec.describe PatientsController, type: :controller do
     it "should not be accessible if can not edit" do
       sign_in other_user
 
-      get :edit, id: patient.id
+      get :edit, params: { id: patient.id }
       expect(response).to be_forbidden
     end
 
@@ -388,7 +388,7 @@ RSpec.describe PatientsController, type: :controller do
       grant user, other_user, Patient, DELETE_PATIENT
       sign_in other_user
 
-      get :edit, id: patient.id
+      get :edit, params: { id: patient.id }
       expect(response).to be_success
       expect(assigns(:can_delete)).to be_truthy
     end
@@ -398,7 +398,7 @@ RSpec.describe PatientsController, type: :controller do
     let(:patient) { Patient.make! institution: institution }
 
     it "should update existing patient" do
-      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000' }
+      post :update, params: { id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000' } }
       expect(response).to be_redirect
 
       patient.reload
@@ -411,7 +411,7 @@ RSpec.describe PatientsController, type: :controller do
       patient = Patient.make! :phantom, institution: institution
       expect(patient.entity_id).to be_blank
       expect(patient.entity_id_hash).to be_blank
-      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: 'other-id' }
+      post :update, params: { id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: 'other-id' } }
       expect(response).to be_redirect
 
       patient.reload
@@ -425,7 +425,7 @@ RSpec.describe PatientsController, type: :controller do
     it "should not change entity_id from previous" do
       old_entity_id = patient.entity_id
       expect(patient.entity_id).to_not be_blank
-      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: 'other-id' }
+      post :update, params: { id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: 'other-id' } }
       expect(assigns(:patient).errors).to have_key(:entity_id)
       expect(response).to render_template("patients/edit")
 
@@ -437,7 +437,7 @@ RSpec.describe PatientsController, type: :controller do
     it "should not remove entity_id from previous" do
       old_entity_id = patient.entity_id
       expect(patient.entity_id).to_not be_blank
-      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: '' }
+      post :update, params: { id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/18/2000', entity_id: '' } }
       expect(assigns(:patient).errors).to have_key(:entity_id)
       expect(response).to render_template("patients/edit")
 
@@ -446,7 +446,7 @@ RSpec.describe PatientsController, type: :controller do
     end
 
     it "should require name" do
-      post :update, id: patient.id, patient: { name: '', dob: '1/1/2000' }
+      post :update, params: { id: patient.id, patient: { name: '', dob: '1/1/2000' } }
       expect(assigns(:patient).errors).to have_key(:name)
       expect(response).to render_template("patients/edit")
     end
@@ -454,7 +454,7 @@ RSpec.describe PatientsController, type: :controller do
     it "should require entity_id" do
       patient = Patient.make! :phantom, institution: institution
 
-      post :update, id: patient.id, patient: { entity_id: '' }
+      post :update, params: { id: patient.id, patient: { entity_id: '' } }
       expect(assigns(:patient).errors).to have_key(:entity_id)
       expect(response).to render_template("patients/edit")
     end
@@ -463,7 +463,7 @@ RSpec.describe PatientsController, type: :controller do
       grant user, other_user, Patient, UPDATE_PATIENT
 
       sign_in other_user
-      post :update, id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' }
+      post :update, params: { id: patient.id, patient: { name: 'Lorem', gender: 'female', dob: '1/1/2000' } }
       expect(response).to be_redirect
 
       patient.reload
@@ -474,7 +474,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should not update existing patient if allowed" do
       sign_in other_user
-      post :update, id: patient.id, patient: { name: 'Lorem', dob: '1/1/2000' }
+      post :update, params: { id: patient.id, patient: { name: 'Lorem', dob: '1/1/2000' } }
       expect(response).to be_forbidden
 
       patient.reload
@@ -487,7 +487,7 @@ RSpec.describe PatientsController, type: :controller do
 
     it "should be able to soft delete a patient" do
       expect {
-        delete :destroy, id: patient.id
+        delete :destroy, params: { id: patient.id }
       }.to change(institution.patients, :count).by(-1)
 
       patient.reload
@@ -501,7 +501,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        delete :destroy, id: patient.id
+        delete :destroy, params: { id: patient.id }
       }.to change(institution.patients, :count).by(-1)
 
       patient.reload
@@ -512,7 +512,7 @@ RSpec.describe PatientsController, type: :controller do
       sign_in other_user
 
       expect {
-        delete :destroy, id: patient.id
+        delete :destroy, params: { id: patient.id }
       }.to change(institution.patients, :count).by(0)
 
       expect(response).to be_forbidden
@@ -529,7 +529,7 @@ RSpec.describe PatientsController, type: :controller do
       patient2 = Patient.make! institution: institution, name: 'john foo', site: site2
       Patient.make! institution: other_institution, name: 'john alone'
 
-      get :search, q: 'john', context: site1.uuid
+      get :search, params: { q: 'john', context: site1.uuid }
 
       json_response = JSON.parse(response.body)
       expect(json_response.map { |p| p["id"] }).to match([patient1.id, patient2.id])

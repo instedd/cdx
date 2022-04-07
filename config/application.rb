@@ -1,4 +1,5 @@
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
+require_relative '../lib/ruby_dig' # TODO: remove after upgrading to RUBY 2.3
 
 require 'rails/all'
 
@@ -23,7 +24,8 @@ module Cdp
     config.react.addons = true
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
+    config.active_record.raise_in_transactional_callbacks = true if Rails::VERSION::MAJOR < 5
+
     config.generators do |g|
       g.test_framework :rspec
       g.assets = false

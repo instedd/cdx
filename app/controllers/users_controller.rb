@@ -18,7 +18,7 @@ class UsersController < ApplicationController
     @available_roles_hash = @available_roles.map { |r| { value: r.id, label: r.name } }
     @context_roles_hash = @context_roles.map { |r| { value: r.id, label: r.name } }
     @can_update = has_access?(User, UPDATE_USER)
-    apply_filters
+    @users = apply_filters(@users)
     @total = @users.count
 
     @date_options = date_options_for_filter
@@ -87,12 +87,12 @@ class UsersController < ApplicationController
     end
     # Since user is not being updated here, we need to force the new role's policy update
     ComputedPolicy.update_user(@user)
-    render nothing: true
+    head :ok
   end
 
   def autocomplete
     users = User.within(@navigation_context.institution)
-                .uniq
+                .distinct
                 .where("first_name LIKE ? OR last_name LIKE ? OR (email LIKE ? AND first_name IS NULL AND last_name IS NULL)", "%#{params["q"]}%", "%#{params["q"]}%", "%#{params["q"]}%")
                 .map{|r| {value: r.email, label: r.full_name}}
     render json: users
@@ -100,7 +100,7 @@ class UsersController < ApplicationController
 
   def update_setting
     current_user.update_attributes({sidebar_open: params[:sidebar_open]})
-    render nothing: true
+    head :ok
   end
 
   def no_data_allowed
@@ -176,11 +176,35 @@ class UsersController < ApplicationController
     end
   end
 
-  def apply_filters
-    @users = @users.where("first_name LIKE ? OR last_name LIKE ? OR (email LIKE ? AND first_name IS NULL AND last_name IS NULL)", "%#{params["name"]}%", "%#{params["name"]}%", "%#{params["name"]}%") if params["name"].present?
-    # There's no need to redo the join to roles_users because it was done by the scope "within"
-    @users = @users.where("roles_users.role_id = ?", params["role"].to_i) if params["role"].present?
-    @users = @users.where("last_sign_in_at > ? OR (last_sign_in_at IS NULL AND invitation_accepted_at IS NULL AND invitation_created_at > ?)", params["last_activity"], params["last_activity"]) if params["last_activity"].present?
-    @users = @users.where("is_active = ?", params["is_active"].to_i) if params["is_active"].present?
+  def apply_filters(scope)
+    if name = filters_params[:name]
+      search = "%#{name}%"
+      scope = scope.where("first_name LIKE ? OR last_name LIKE ? OR (email LIKE ? AND first_name IS NULL AND last_name IS NULL)", search, search, search)
+    end
+
+    if role = filters_params[:role]
+      # There's no need to redo the join to roles_users because it was done by the scope "within"
+      scope = scope.where("roles_users.role_id = ?", role.to_i)
+    end
+
+    if last_activity = filters_params[:last_activity]
+      scope = scope.where("last_sign_in_at > ? OR (last_sign_in_at IS NULL AND invitation_accepted_at IS NULL AND invitation_created_at > ?)", last_activity, last_activity)
+    end
+
+    if is_active = filters_params[:is_active]
+      scope = scope.where("is_active = ?", is_active.to_i)
+    end
+
+    scope
   end
+
+  def filters_params
+    @filters_params ||=
+      if Rails::VERSION::MAJOR >= 5
+        params.permit(:name, :role, :last_activity, :is_active).reject! { |_, value| value.blank? }
+      else
+        params.permit(:name, :role, :last_activity, :is_active).tap { |x| x.reject! { |_, value| value.blank? } }
+      end
+  end
+  helper_method :filters_params
 end

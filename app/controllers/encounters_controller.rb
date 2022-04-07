@@ -139,12 +139,14 @@ class EncountersController < ApplicationController
   end
 
   def load_encounter
-    @encounter = Encounter.where('uuid = :id', params).first ||
-                 Encounter.where('id = :id', params).first
+    @encounter =
+      if params[:id] =~ /^[-0-9a-f]{36}$/i
+        Encounter.find_by(uuid: params[:id])
+      else
+        Encounter.where(id: params[:id]).take
+      end
 
-    return head(:not_found) unless @encounter.present? &&
-                                   (@encounter.id == params[:id].to_i ||
-                                   @encounter.uuid == params[:id])
+    return head(:not_found) unless @encounter
 
     @encounter.new_samples = []
     @institution = @encounter.institution

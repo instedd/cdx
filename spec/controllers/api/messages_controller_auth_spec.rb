@@ -24,20 +24,20 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
 
     it "should create message authenticating via web" do
       sign_in user
-      response = post :create, data, device_id: device.uuid
+      response = post :create, body: data, params: { device_id: device.uuid }
       expect(response.status).to eq(200)
       assert_message_created
     end
 
     it "should fail without authentication" do
-      response = post :create, data, device_id: device.uuid
+      response = post :create, body: data, params: { device_id: device.uuid }
       expect(response).not_to be_ok
       assert_nothing_created
     end
 
     it "should create message authenticating with basic auth" do
       request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials('', device.plain_secret_key)
-      response = post :create, data, device_id: device.uuid
+      response = post :create, body: data, params: { device_id: device.uuid }
       expect(response.status).to eq(200)
       assert_message_created
     end
@@ -45,27 +45,27 @@ describe Api::MessagesController, elasticsearch: true, validate_manifest: false 
     it "should create message authenticating via secret key" do
       device.set_key
       device.save!
-      response = post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
+      response = post :create, body: data, params: { device_id: device.uuid, authentication_token: device.plain_secret_key }
       expect(response.status).to eq(200)
       assert_message_created
     end
 
     it "should create message authenticating via secret key when signed in" do
       sign_in user
-      response = post :create, data, device_id: device.uuid, authentication_token: device.plain_secret_key
+      response = post :create, body: data, params: { device_id: device.uuid, authentication_token: device.plain_secret_key }
       expect(response.status).to eq(200)
       assert_message_created
     end
 
     it "should fail auth if secret key is incorrect" do
-      response = post :create, data, device_id: device.uuid, authentication_token: "WRONG"
+      response = post :create, body: data, params: { device_id: device.uuid, authentication_token: "WRONG" }
       expect(response).not_to be_ok
       assert_nothing_created
     end
 
     it "should fail auth if secret key is incorrect even if signed in" do
       sign_in user
-      response = post :create, data, device_id: device.uuid, authentication_token: "WRONG"
+      response = post :create, body: data, params: { device_id: device.uuid, authentication_token: "WRONG" }
       expect(response).not_to be_ok
       assert_nothing_created
     end

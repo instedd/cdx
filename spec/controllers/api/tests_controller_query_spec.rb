@@ -13,9 +13,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
   before(:each) { sign_in user }
 
-  def get_updates(options, body="")
+  def get_updates(params, body="")
     refresh_index
-    response = get :index, body, options.merge(format: 'json')
+    response = get :index, body: body, params: params.stringify_keys, format: 'json'
     expect(response.status).to eq(200)
     Oj.load(response.body)["tests"]
   end
@@ -144,7 +144,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
     end
 
      context "ErrorCode" do
-     
+
        it "filters by error code" do
          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", result: :positive], type: :qc, error_code: '155'})
          DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[name: "mtb", result: :negative], type: :specimen})
@@ -154,9 +154,9 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
          expect(response.size).to eq(1)
          expect(response.first["test"]["assays"].first["result"]).to eq("positive")
          expect(response.first["test"]["error_code"]).to eq(155)
-       end 
+       end
     end
-    
+
     context "Grouping" do
       it "groups by gender in query params" do
         DeviceMessage.create_and_process device: device, plain_text_data: (Oj.dump test:{assays:[result: :positive]}, patient: {gender: :male})
@@ -229,14 +229,14 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
           refresh_index
 
-          response = get :index, "", format: 'csv', group_by: 'test.assays.result,test.error_code'
+          response = get :index, body: "", format: 'csv', params: { group_by: 'test.assays.result,test.error_code' }
 
           check_csv response
           expect(response.body).to eq("test.assays.result,test.error_code,count\nnegative,1234,2\npositive,1234,1\n")
         end
 
         it "returns a csv with columns for a given grouping even when there are no assays" do
-          get :index, "", format: 'csv', group_by: 'test.site_user,test.error_code'
+          get :index, body: "", format: 'csv', params: { group_by: 'test.site_user,test.error_code' }
           expect(response.body).to eq("test.site_user,test.error_code,count\n")
         end
       end
@@ -285,7 +285,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
       let(:test) { TestResult.first }
 
       it "should retrieve a test PII by uuid" do
-        response = get :pii, id: test.uuid
+        response = get :pii, params: { id: test.uuid }
         expect(response.status).to eq(200)
         response = Oj.load response.body
 
@@ -299,7 +299,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
           other_user = User.make!
           grant user, other_user, { testResult: institution }, Policy::Actions::QUERY_TEST
           sign_in other_user
-          get :pii, id: test.uuid
+          get :pii, params: { id: test.uuid }
 
           expect(response).to be_forbidden
         end
@@ -308,7 +308,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
           other_user = User.make!
           grant user, other_user, { testResult: institution }, Policy::Actions::PII_TEST
           sign_in other_user
-          get :pii, id: test.uuid
+          get :pii, params: { id: test.uuid }
 
           expect(response).to be_success
         end
@@ -319,7 +319,7 @@ describe Api::TestsController, elasticsearch: true, validate_manifest: false do
 
       it "should return test schema" do
         allow_any_instance_of(TestsSchema).to receive(:build).and_return('a schema definition')
-        response = get :schema, locale: "es-AR", format: 'json'
+        response = get :schema, params: { locale: "es-AR" }, format: 'json'
 
         response_schema = Oj.load response.body
         expect(response_schema).to eq('a schema definition')

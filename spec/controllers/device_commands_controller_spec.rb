@@ -17,13 +17,13 @@ describe DeviceCommandsController do
     it "lists" do
       command = device.device_commands.create! name: "some_name", command: %({"args": [1, 2, 3]})
 
-      get :index, device_id: device.uuid, key: @plain_secret_key
+      get :index, params: { device_id: device.uuid, key: @plain_secret_key }
 
       expect(JSON.parse(response.body)).to eq([{"id" => command.id, "name" => "some_name", "args" => [1, 2, 3]}])
     end
 
     it "returns forbidden if wrong key" do
-      get :index, device_id: device.uuid, key: "#{@plain_secret_key}..."
+      get :index, params: { device_id: device.uuid, key: "#{@plain_secret_key}..." }
       expect(response).to be_forbidden
     end
   end
@@ -32,7 +32,7 @@ describe DeviceCommandsController do
     it "send_logs" do
       command = device.request_client_logs
 
-      post :reply, "some log content", device_id: device.uuid, key: @plain_secret_key, id: command.id
+      post :reply, body: "some log content", params: { device_id: device.uuid, key: @plain_secret_key, id: command.id }
 
       expect(device.device_commands.count).to eq(0)
 
@@ -43,7 +43,7 @@ describe DeviceCommandsController do
 
     it "returns forbidden if wrong key" do
       command = device.request_client_logs
-      post :reply, "some log content", device_id: device.uuid, key: "#{@plain_secret_key}...", id: command.id
+      post :reply, body: "some log content", params: { device_id: device.uuid, key: "#{@plain_secret_key}...", id: command.id }
       expect(response).to be_forbidden
     end
   end

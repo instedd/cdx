@@ -8,7 +8,7 @@ Rails.application.config.assets.version = '1.0'
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-Rails.application.config.assets.precompile += %w( *.png *.gif )
+Rails.application.config.assets.precompile += %w( *.png *.gif *.js )
 
 # Allow components and view helpers to be used in assets
 # source: https://github.com/sstephenson/sprockets/issues/218#issuecomment-94729397
@@ -43,9 +43,9 @@ module HTMLAssets
       @_lookup_context ||= LookupContext.new(self, environment.paths.to_a + [File.join(Rails.root, "app", "views")])
     end
 
-    def output_buffer_with_sprockets=(buffer)
-      unless is_sprockets?
-        output_buffer_without_sprockets=(buffer)
+    module OutputBufferWriter
+      def output_buffer=(buffer)
+        super(buffer) unless is_sprockets?
       end
     end
 
@@ -58,12 +58,18 @@ module HTMLAssets
         include Rails.application.routes.url_helpers
         include Rails.application.routes.mounted_helpers
         include ActionView::Helpers
-        alias_method_chain :output_buffer=, :sprockets
+        prepend OutputBufferWriter
       end
     end
   end
 end
 
-Rails.application.assets.context_class.class_eval do
-  include HTMLAssets::ViewContext
+if Rails::VERSION::MAJOR >= 5
+  Rails.application.config.assets.configure do |env|
+    env.context_class.__send__ :include, HTMLAssets::ViewContext
+  end
+else
+  Rails.application.assets.context_class.class_eval do
+    include HTMLAssets::ViewContext
+  end
 end

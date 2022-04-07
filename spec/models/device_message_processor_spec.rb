@@ -1253,22 +1253,31 @@ describe DeviceMessageProcessor, elasticsearch: true do
       end
     end
   end
-    
-   context 'check invalid time' do
-      let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
-     
-      it "the start time is greater than today and generates and alert" do
-        alert = Alert.make!(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
-        alert.query = {"test.error_code"=>"155"}
-        alert.institution_id = institution.id
-        alert.sample_id=""
-        alert.user = institution.user
-        alert.save!
 
-        @check_invalid_test=TRUE
-        device_message_processor.process
-        expect(AlertHistory.count).to equal (1)
-      end
-    end
-  
+   context 'check invalid time' do
+     include ActiveJob::TestHelper
+
+     after do
+       clear_enqueued_jobs
+       clear_performed_jobs
+     end
+
+     let(:device_message_processor) {DeviceMessageProcessor.new(device_message)}
+
+     it "the start time is greater than today and generates and alert" do
+       alert = Alert.make!(:category_type =>"anomalies", :anomalie_type => "invalid_test_date")
+       alert.query = {"test.error_code"=>"155"}
+       alert.institution_id = institution.id
+       alert.sample_id=""
+       alert.user = institution.user
+       alert.save!
+
+       @check_invalid_test = true
+       perform_enqueued_jobs do
+         device_message_processor.process
+       end
+       expect(AlertHistory.count).to eq(1)
+     end
+   end
+
 end

@@ -37,6 +37,7 @@ services:
 
   db:
     image: mysql:5.7
+    command: --innodb-flush-method=nosync --innodb-flush-log-at-trx-commit=0 --innodb-flush-log-at-timeout=2700 --sync-binlog=0
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:

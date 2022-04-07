@@ -32,7 +32,7 @@ describe Api::SitesController do
 
       Site.make! institution: (Institution.make! user: user)
 
-      get :index, institution_uuid: institution.uuid, format: 'json'
+      get :index, params: { institution_uuid: institution.uuid }, format: 'json'
       expect(Oj.load(response.body)).to eq({'total_count' => 3, 'sites' => sites})
     end
 

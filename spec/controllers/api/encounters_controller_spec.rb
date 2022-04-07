@@ -15,7 +15,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
 
   def get_updates(options, body="")
     refresh_index
-    response = get :index, body, options.merge(format: 'json')
+    response = get :index, body: body, params: options, format: "json"
     expect(response.status).to eq(200)
     Oj.load(response.body)["encounters"]
   end
@@ -38,7 +38,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
 
   context "Schema" do
     it "should return the encounters schema" do
-      get :schema, locale: 'es-AR', format: 'json'
+      get :schema, params: { locale: 'es-AR' }, format: 'json'
       expect(response).to be_success
       schema = Oj.load(response.body)
       expect(schema.keys).to contain_exactly('$schema', 'type', 'title', 'properties')
@@ -61,7 +61,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
     it "should return pii for institution owner" do
       expect(Encounter.count).to eq(1)
 
-      get :pii, id: encounter.uuid
+      get :pii, params: { id: encounter.uuid }
 
       expect(response).to be_success
       pii = Oj.load(response.body)
@@ -79,7 +79,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
         other_user = User.make!
         grant user, other_user, encounter, Policy::Actions::READ_ENCOUNTER
         sign_in other_user
-        get :pii, id: encounter.uuid
+        get :pii, params: { id: encounter.uuid }
 
         expect(response).to be_forbidden
       end
@@ -90,7 +90,7 @@ describe Api::EncountersController, elasticsearch: true, validate_manifest: fals
         other_user = User.make!
         grant user, other_user, encounter, Policy::Actions::PII_ENCOUNTER
         sign_in other_user
-        get :pii, id: encounter.uuid
+        get :pii, params: { id: encounter.uuid }
 
         expect(response).to be_success
       end

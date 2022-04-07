@@ -47,14 +47,14 @@ describe TestResultsController, elasticsearch: true do
       core_fields: {"assays" =>["condition" => "mtb", "result" => :positive]},
       device_messages: [ DeviceMessage.make!(device: device) ])
 
-      get :index, context: site.uuid
+      get :index, params: { context: site.uuid }
       expect(assigns(:tests).map{|t| t['test']['uuid']}).to contain_exactly(test_result.uuid)
     end
 
     it "with exclusion should show no tests (devices with no site can't have tests)" do
       test_result = TestResult.create_and_index device: device
 
-      get :index, context: institution.uuid+"-!"
+      get :index, params: { context: institution.uuid+"-!" }
       expect(assigns(:tests)).to be_empty
     end
 
@@ -65,7 +65,7 @@ describe TestResultsController, elasticsearch: true do
       test_result = TestResult.create_and_index device: device
       test_result_subsite = TestResult.create_and_index device: device2
 
-      get :index, context: site.uuid+"-*"
+      get :index, params: { context: site.uuid+"-*" }
       expect(assigns(:tests).map{|t| t['test']['uuid']}).to eq([test_result.uuid, test_result_subsite.uuid])
     end
 
@@ -75,7 +75,7 @@ describe TestResultsController, elasticsearch: true do
       test_result = TestResult.create_and_index device: device
       test_result_subsite = TestResult.create_and_index device: device2
 
-      get :index, context: site.uuid+"-!"
+      get :index, params: { context: site.uuid+"-!" }
       expect(assigns(:tests).map{|t| t['test']['uuid']}).to contain_exactly(test_result.uuid)
     end
   end
@@ -97,7 +97,7 @@ describe TestResultsController, elasticsearch: true do
     end
 
     it "should load for filters scoped by context" do
-      get :index, context: site.uuid
+      get :index, params: { context: site.uuid }
       expect(response).to be_success
       expect(assigns(:sites).to_a).to contain_exactly(site, subsite)
       expect(assigns(:devices).to_a).to contain_exactly(device)
@@ -286,14 +286,14 @@ describe TestResultsController, elasticsearch: true do
     let(:default_params) { {context: other_institution.uuid} }
 
     it "should not authorize outsider user" do
-      get :show, id: test_result.uuid
+      get :show, params: { id: test_result.uuid }
       expect(response).to be_forbidden
     end
 
     it "should authorize user with access to device" do
       grant owner, user, { :test_result => device }, QUERY_TEST
 
-      get :show, id: test_result.uuid
+      get :show, params: { id: test_result.uuid }
       expect(assigns(:test_result)).to eq(test_result)
       expect(response).to be_success
     end
@@ -301,7 +301,7 @@ describe TestResultsController, elasticsearch: true do
     it "should authorize user with access to site" do
       grant owner, user, { :test_result => site }, QUERY_TEST
 
-      get :show, id: test_result.uuid
+      get :show, params: { id: test_result.uuid }
       expect(assigns(:test_result)).to eq(test_result)
       expect(response).to be_success
     end
@@ -309,7 +309,7 @@ describe TestResultsController, elasticsearch: true do
     it "should authorize user with access to institution" do
       grant owner, user, { :test_result => institution }, QUERY_TEST
 
-      get :show, id: test_result.uuid
+      get :show, params: { id: test_result.uuid }
       expect(assigns(:test_result)).to eq(test_result)
       expect(response).to be_success
     end
@@ -327,7 +327,7 @@ describe TestResultsController, elasticsearch: true do
       it "should authorize user with access to device" do
         grant owner, user, { :test_result => device }, QUERY_TEST
 
-        get :show, id: test_result.uuid
+        get :show, params: { id: test_result.uuid }
         expect(assigns(:test_result)).to eq(test_result)
         expect(response).to be_success
       end
@@ -335,7 +335,7 @@ describe TestResultsController, elasticsearch: true do
       it "should authorize user with access to institution" do
         grant owner, user, { :test_result => institution }, QUERY_TEST
 
-        get :show, id: test_result.uuid
+        get :show, params: { id: test_result.uuid }
         expect(assigns(:test_result)).to eq(test_result)
         expect(response).to be_success
       end

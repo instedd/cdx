@@ -55,7 +55,7 @@ describe Api::InstitutionsController do
     let!(:token) { user.create_api_token }
 
     it "should list the institution" do
-      result = get :index, access_token: token.token, format: 'json'
+      result = get :index, params: { access_token: token.token }, format: 'json'
 
       expect(Oj.load(result.body)).to eq({'total_count' => 1, 'institutions' => [
         {'uuid' => institution.uuid, 'name' => institution.name}

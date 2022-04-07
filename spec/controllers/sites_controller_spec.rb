@@ -45,7 +45,7 @@ describe SitesController do
       grant institution2.user, user, Institution, [READ_INSTITUTION]
       grant nil, user, "site?institution=#{institution2.id}", [READ_SITE]
 
-      get :index, context: institution2.uuid
+      get :index, params: { context: institution2.uuid }
 
       expect(response).to be_success
       expect(assigns(:sites)).to contain_exactly(site2)
@@ -62,13 +62,13 @@ describe SitesController do
     end
 
     it "should initialize no parent if context is institution" do
-      get :new, context: institution.uuid
+      get :new, params: { context: institution.uuid }
       expect(response).to be_success
       expect(assigns(:site).parent).to be_nil
     end
 
     it "should initialize parent if context is site" do
-      get :new, context: site.uuid
+      get :new, params: { context: site.uuid }
       expect(response).to be_success
       expect(assigns(:site).parent).to eq(site)
     end
@@ -78,14 +78,14 @@ describe SitesController do
 
     it "should create new site in context institution" do
       expect {
-        post :create, site: Site.make.attributes
+        post :create, params: { site: Site.make.attributes }
       }.to change(institution.sites, :count).by(1)
       expect(response).to be_redirect
     end
 
     it "should not create site in context institution despite params" do
       expect {
-        post :create, site: Site.make(institution: institution2).attributes
+        post :create, params: { site: Site.make(institution: institution2).attributes }
       }.to change(institution.sites, :count).by(1)
       expect(response).to be_redirect
     end
@@ -93,7 +93,7 @@ describe SitesController do
     it "should not create site in institution without permission to create site" do
       grant institution2.user, user, Institution, [READ_INSTITUTION]
       expect {
-        post :create, context: institution2.uuid, site: Site.make.attributes
+        post :create, params: { context: institution2.uuid, site: Site.make.attributes }
       }.to change(institution.sites, :count).by(0)
       expect(response).to be_forbidden
     end
@@ -102,7 +102,7 @@ describe SitesController do
       expect {
         site_params = Site.make(institution: institution).attributes
         site_params.delete :location_geoid
-        post :create, site: site_params
+        post :create, params: { site: site_params }
       }.to change(institution.sites, :count).by(1)
       expect(response).to be_redirect
     end
@@ -115,12 +115,12 @@ describe SitesController do
     let!(:other_site) { Site.make! }
 
     it "should edit site" do
-      get :edit, id: site.id
+      get :edit, params: { id: site.id }
       expect(response).to be_success
     end
 
     it "should not edit site if not allowed" do
-      get :edit, id: site2.id
+      get :edit, params: { id: site2.id }
       expect(response).to be_forbidden
     end
 
@@ -131,7 +131,10 @@ describe SitesController do
     let!(:site) { Site.make! institution: institution }
 
     it "should update site" do
-      patch :update, id: site.id, site: { name: "newname", location_geoid: "LOCATION_GEOID", lat: 40, lng: 50 }
+      patch :update, params: {
+        id: site.id,
+        site: { name: "newname", location_geoid: "LOCATION_GEOID", lat: 40, lng: 50 },
+      }
       expect(site.reload.name).to eq("newname")
       expect(site.reload.lat).to eq(40)
       expect(site.reload.lng).to eq(50)
@@ -140,7 +143,10 @@ describe SitesController do
 
     it "should update site inferring latlng from geoid" do
       expect(Location).to receive(:details).with("LOCATION_GEOID") { [Location.new.tap {|l| l.lat= 10; l.lng= -42}] }
-      patch :update, id: site.id, site: { name: "newname", location_geoid: "LOCATION_GEOID" }
+      patch :update, params: {
+        id: site.id,
+        site: { name: "newname", location_geoid: "LOCATION_GEOID" },
+      }
       expect(site.reload.name).to eq("newname")
       expect(site.reload.lat).to eq(10)
       expect(site.reload.lng).to eq(-42)
@@ -148,7 +154,10 @@ describe SitesController do
     end
 
     it "should not update site for another institution" do
-      patch :update, id: site2.id, site: { name: "newname" }
+      patch :update, params: {
+        id: site2.id,
+        site: { name: "newname" },
+      }
       expect(site2.reload.name).to_not eq("newname")
       expect(response).to be_forbidden
     end
@@ -163,7 +172,10 @@ describe SitesController do
 
       sign_in other_user
       expect {
-        patch :update, id: site.id, site: { name: 'newname', parent_id: new_parent.id }
+        patch :update, params: {
+          id: site.id,
+          site: { name: 'newname', parent_id: new_parent.id },
+        }
       }.to change(Site, :count).by(0)
 
       expect(site.reload.name).to eq("newname")
@@ -177,10 +189,11 @@ describe SitesController do
       let!(:test) { TestResult.make! device: device }
 
       before(:each) {
-        patch :update,
+        patch :update, params: {
           id: site.id,
           context: site.uuid,
-          site: Site.make(institution: institution, parent: parent, name: "new-name").attributes
+          site: Site.make(institution: institution, parent: parent, name: "new-name").attributes,
+        }
         site.reload
       }
 
@@ -202,10 +215,11 @@ describe SitesController do
       let!(:test) { TestResult.make! device: device }
 
       before(:each) {
-        patch :update,
+        patch :update, params: {
           id: site.id,
           context: site.uuid,
-          site: Site.make(institution: institution, parent: new_parent, name: site.name).attributes
+          site: Site.make(institution: institution, parent: new_parent, name: site.name).attributes,
+        }
         site.reload
       }
 
@@ -248,9 +262,10 @@ describe SitesController do
       let!(:new_parent) { Site.make! institution: institution }
 
       before(:each) {
-        patch :update,
+        patch :update, params: {
           id: site.id,
-          site: Site.make(institution: institution, parent: new_parent, name: '').attributes
+          site: Site.make(institution: institution, parent: new_parent, name: '').attributes,
+        }
         site.reload
       }
 
@@ -279,14 +294,14 @@ describe SitesController do
 
     it "should destroy a site" do
       expect {
-        delete :destroy, id: site.id
+        delete :destroy, params: { id: site.id }
       }.to change(institution.sites, :count).by(-1)
       expect(response).to be_redirect
     end
 
     it "should not destroy site for another institution" do
       expect {
-        delete :destroy, id: site2.id
+        delete :destroy, params: { id: site2.id }
       }.to change(institution2.sites, :count).by(0)
       expect(response).to be_forbidden
     end
@@ -296,7 +311,7 @@ describe SitesController do
       expect(site.devices).not_to be_empty
       expect {
         expect {
-          delete :destroy, id: site.id
+          delete :destroy, params: { id: site.id }
         }.to raise_error(ActiveRecord::DeleteRestrictionError)
       }.not_to change(institution.sites, :count)
     end
@@ -307,7 +322,7 @@ describe SitesController do
       expect(site.devices).not_to be_empty
       expect {
         expect {
-          delete :destroy, id: site.id
+          delete :destroy, params: { id: site.id }
         }.to raise_error(ActiveRecord::DeleteRestrictionError)
       }.not_to change(institution.sites, :count)
 
@@ -317,7 +332,7 @@ describe SitesController do
       }
 
       expect {
-        delete :destroy, id: site.id
+        delete :destroy, params: { id: site.id }
       }.to change(institution.sites, :count).by(-1)
     end
 

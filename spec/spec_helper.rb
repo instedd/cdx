@@ -1,8 +1,12 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'
 
-if ENV['COVERAGE'] == 'true'
+require "bundler/setup"
+
+if ENV['CI'] || ENV['COVERAGE'] == 'true'
   require 'simplecov'
+  SimpleCov.command_name ENV['FEATURES'] == 'true' ? 'Rspec Features' : 'Rspec'
+  SimpleCov.formatter SimpleCov::Formatter::SimpleFormatter if ENV['CI']
   SimpleCov.start 'rails'
 end
 
@@ -13,7 +17,7 @@ require 'coffee_script'
 require 'capybara/rspec'
 
 require 'webmock/rspec'
-ALLOWED_WEBMOCK_HOSTS = [/fonts\.googleapis\.com/, /elasticsearch/]
+ALLOWED_WEBMOCK_HOSTS = [/elasticsearch/]
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -70,12 +74,6 @@ RSpec.configure do |config|
   config.include CdxFieldsHelper
   config.include FeatureSpecHelpers, :type => :feature
 
-  config.before(:each) do
-    stub_request(:get, "http://fonts.googleapis.com/css").
-         with(:query => hash_including(:family)).
-         to_return(:status => 200, :body => "", :headers => {})
-  end
-
   config.before(:suite) do
     LocationService.fake!
   end
@@ -84,9 +82,23 @@ RSpec.configure do |config|
     ActionMailer::Base.deliveries.clear
   end
 
-  config.exclude_pattern = "spec/features/**/*_spec.rb"
+  if ENV['FEATURES'] == 'true'
+    config.pattern = "spec/features/**/*_spec.rb"
+  else
+    config.exclude_pattern = "spec/features/**/*_spec.rb"
+  end
+
+  # disable noisy backtraces:
+  config.filter_rails_from_backtrace!
+  config.filter_gems_from_backtrace("capybara")
+  config.filter_gems_from_backtrace("omniauth")
+  config.filter_gems_from_backtrace("railties")
+  config.filter_gems_from_backtrace("puma")
+  config.filter_gems_from_backtrace("rack")
+  config.filter_gems_from_backtrace("request_store")
+  config.filter_gems_from_backtrace("sentry-raven")
+  config.filter_gems_from_backtrace("warden")
 end
 
-require "bundler/setup"
 require "cdx"
 require "pry-byebug"

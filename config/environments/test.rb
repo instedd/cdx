@@ -12,9 +12,17 @@ Rails.application.configure do
   # preloads Rails for running tests, you may have to set it to true.
   config.eager_load = false
 
-  # Configure static file server for tests with Cache-Control for performance.
-  config.serve_static_files   = true
-  config.static_cache_control = 'public, max-age=3600'
+  if Rails::VERSION::MAJOR >= 5
+    # Configure public file server for tests with Cache-Control for performance.
+    config.public_file_server.enabled = true
+    config.public_file_server.headers = {
+      'Cache-Control' => 'public, max-age=3600'
+    }
+  else
+    # Configure static file server for tests with Cache-Control for performance.
+    config.serve_static_files   = true
+    config.static_cache_control = 'public, max-age=3600'
+  end
 
   # Show full error reports and disable caching.
   config.consider_all_requests_local       = true
@@ -25,14 +33,17 @@ Rails.application.configure do
 
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
+  config.action_mailer.perform_caching = false if Rails::VERSION::MAJOR >= 5
 
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
-  # Randomize the order test cases are executed.
-  config.active_support.test_order = :random
+  if Rails::VERSION::MAJOR < 5
+    # Randomize the order test cases are executed.
+    config.active_support.test_order = :random
+  end
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
@@ -47,4 +58,6 @@ Rails.application.configure do
   config.ssh_server_host = 'localhost'
   config.ssh_server_port = 2222
   config.ssh_user = 'cdx-sync'
+
+  config.active_job.queue_adapter = :test
 end

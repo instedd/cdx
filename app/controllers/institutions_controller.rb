@@ -109,7 +109,7 @@ class InstitutionsController < ApplicationController
   private
 
   def load_pending_invite!
-    invite_id = params.get_in(:institution, :pending_institution_invite_id) || params[:pending_institution_invite_id]
+    invite_id = params.dig(:institution, :pending_institution_invite_id) || params[:pending_institution_invite_id]
     return unless invite_id
 
     @pending_invite = PendingInstitutionInvite.find_by(

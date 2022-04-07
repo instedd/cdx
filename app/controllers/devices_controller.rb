@@ -13,10 +13,11 @@ class DevicesController < ApplicationController
   def index
     @devices = check_access(Device, READ_DEVICE).joins(:device_model).includes(:site, :institution, device_model: :institution)
     @devices = @devices.within(@navigation_context.entity, @navigation_context.exclude_subsites)
+
+    # NOTE: we load manufacturers _before_ filtering devices?
     @manufacturers = Institution.where(id: @devices.select('device_models.institution_id'))
 
-    @devices = @devices.where(device_models: { institution_id: params[:manufacturer].to_i}) if params[:manufacturer].presence
-    @devices = @devices.where(device_model: params[:device_model].to_i) if params[:device_model].present?
+    @devices = apply_filters(@devices)
 
     @page_size = (params["page_size"] || 10).to_i
     @page = (params["page"] || 1).to_i
@@ -258,11 +259,10 @@ class DevicesController < ApplicationController
   end
 
   def device_params
-    params.require(:device).permit(:name, :serial_number, :device_model_id, :time_zone, :site_id, :ftp_hostname, :ftp_port, :ftp_username, :ftp_password, :ftp_directory, :ftp_passive).tap do |whitelisted|
-      if custom_mappings = params[:device][:custom_mappings]
-        whitelisted[:custom_mappings] = custom_mappings.select { |k, v| v.present? }
-      end
-    end
+    params
+      .require(:device)
+      .permit(:name, :serial_number, :device_model_id, :time_zone, :site_id, :ftp_hostname, :ftp_port, :ftp_username, :ftp_password, :ftp_directory, :ftp_passive, :custom_mappings)
+      .tap { |authorized| authorized[:custom_mappings].try { reject { |_, v| v.blank? } } }
   end
 
   def query_tests_histogram
@@ -360,4 +360,25 @@ class DevicesController < ApplicationController
     end
   end
 
+  def apply_filters(scope)
+    if manufacturer = params[:manufacturer]
+      scope = scope.where(device_models: { institution_id: manufacturer.to_i})
+    end
+
+    if device_model = params[:device_model]
+      scope = scope.where(device_model: device_model.to_i)
+    end
+
+    scope
+  end
+
+  def filters_params
+    @filters_params ||=
+      if Rails::VERSION::MAJOR >= 5
+        params.permit(:manufacturer, :device_model).reject! { |_, value| value.blank? }
+      else
+        params.permit(:manufacturer, :device_model).tap { |x| x.reject! { |_, value| value.blank? } }
+      end
+  end
+  helper_method :filters_params
 end

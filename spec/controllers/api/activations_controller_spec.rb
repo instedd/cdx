@@ -10,7 +10,7 @@ describe Api::ActivationsController do
   end
 
   shared_context :do_ssh_key_post do
-    before { post :create, { token: '12345', public_key: SampleSshKey }, format: :json  }
+    before { post :create, params: { token: '12345', public_key: SampleSshKey }, format: :json  }
   end
 
   let(:response_json) { JSON.parse(response.body) }
@@ -27,7 +27,7 @@ describe Api::ActivationsController do
 
     context 'when token exists and device secret key is valid ignoring case and dashes' do
       let!(:activation_token) { device.new_activation_token('AAAABBBB').tap { device.save! } }
-      before { post :create, { token: 'aaaa-bbbb', public_key: SampleSshKey }, format: :json  }
+      before { post :create, params: { token: 'aaaa-bbbb', public_key: SampleSshKey }, format: :json  }
 
       it { expect(response_json['status']).to eq('success') }
       it { expect(response_json['message']).to eq('Device activated') }
@@ -60,7 +60,7 @@ describe Api::ActivationsController do
 
     context 'when no parameter is supplied' do
       include_context :set_device_token
-      before { post :create, { token: '12345' }, format: :json }
+      before { post :create, params: { token: '12345' }, format: :json }
 
       it { expect(response_json['status']).to eq('failure') }
       it { expect(response_json['message']).to eq('Missing public_key or generate_key parameter') }
@@ -68,7 +68,7 @@ describe Api::ActivationsController do
 
     context 'when device key is requested' do
       include_context :set_device_token
-      before { post :create, { token: '12345', generate_key: true }, format: :json }
+      before { post :create, params: { token: '12345', generate_key: true }, format: :json }
 
       it { expect(response_json['status']).to eq('success') }
       it { expect(response_json['settings']['device_uuid']).to eq(device.uuid) }
