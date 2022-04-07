@@ -328,7 +328,7 @@ GEM
     method_source (1.0.0)
     mime-types (2.99.3)
     mini_mime (1.1.2)
-    mini_portile2 (2.4.0)
+    mini_portile2 (2.8.0)
     minitest (5.15.0)
     multi_json (1.15.0)
     multi_test (0.1.2)
@@ -336,8 +336,9 @@ GEM
     multipart-post (2.1.1)
     mysql2 (0.5.3)
     netrc (0.11.0)
-    nokogiri (1.9.1)
-      mini_portile2 (~> 2.4.0)
+    nokogiri (1.13.3)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
     nuntium_api (0.21)
       json
       rest-client
@@ -386,6 +387,7 @@ GEM
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     raabro (1.4.0)
+    racc (1.6.0)
     rack (1.6.13)
     rack-protection (2.2.0)
       rack
@@ -590,7 +592,7 @@ DEPENDENCIES
   lodash-rails (~> 3.10.1)
   machinist (~> 2.0)
   mysql2 (~> 0.3)
-  nokogiri (~> 1.6, < 1.10.0)
+  nokogiri (~> 1.13)
   nuntium_api (~> 0.21)
   oj (~> 2.12, < 2.17.3)
   omniauth (~> 1.2)
