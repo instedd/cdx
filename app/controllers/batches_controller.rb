@@ -40,10 +40,6 @@ class BatchesController < ApplicationController
     render action: 'edit'
   end
 
-  def new_sample_or_batch
-
-  end
-
   def new
     batch = Batch.new({
       institution: @navigation_context.institution,

@@ -20,8 +20,20 @@
           %li{:class => params[:controller] == "patients" && "active"}
             = link_to "Patients", patients_path
         - if has_access_to_samples_index?
-          %li{:class => ["samples", "batches"].include?(params[:controller]) && "active"}
-            = link_to "Samples", samples_path
+          %li{:class => "samples-dropdown"}
+            %span{:class => "samples-dropdown-text"}= "SAMPLES"
+            %span{:class => "samples-dropdown-arrow"}
+            %ul{:class => "samples-dropdown-ul"}
+              %li{:class => params[:controller] == "samples" && "active"}
+                = link_to "Individual samples" , samples_path
+                %span{:class => "check"}
+              %li{:class => params[:controller] == "batches" && "active"}
+                = link_to "Batches", batches_path
+                %span{:class => "check"}
+              %li{:class => params[:controller] == "sample_transfers" && "active"}
+                = link_to "Transfers", sample_transfers_path
+                %span{:class => "check"}
+            %script= "$('.samples-dropdown-ul').css('margin-left', $('.samples-dropdown-text').position().left+'px')"
         - if has_access_to_test_results_index?
           %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
             = link_to "Tests", test_results_path

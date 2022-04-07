@@ -50,12 +50,3 @@
       .pagination
         = render 'shared/pagination'
 
-  .col.pe-1.tab-buttons
-    .tab-separator
-    .icons-group
-      = link_to samples_path do
-        .icon-sample.tab-sample{title: "Samples"}
-      = link_to batches_path do
-        .icon-batch.tab-batch{title: "Batches"}
-      .selected-icon-tab
-        .icon-transfer.tab-transfer.selected{title: "Transfers"}

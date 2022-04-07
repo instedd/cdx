@@ -5,7 +5,7 @@
         .col
           %h1
             - if @can_create
-              = link_to "+", new_sample_or_batch_batches_path, class: 'btn-add side-link fix', title: 'Add sample/batch'
+              = link_to "+", new_sample_path, class: 'btn-add side-link fix', title: 'Add sample/batch'
             Samples
 
       %form#filters-form{action: samples_path, "data-auto-submit" => true}

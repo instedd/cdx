@@ -34,7 +34,7 @@ header {
         max-width: inherit !important;
       }
     }
-
+    
     nav {
       @include align-self(stretch);
       @include flex-grow(2);
@@ -119,6 +119,93 @@ header {
     }
   }
 }
+
+.samples-dropdown {
+      
+  span.samples-dropdown-text {
+    cursor: pointer;
+    padding-left: 20px;
+    color: $gray-light;
+  }
+
+  span.samples-dropdown-arrow {
+    background: image-url("arr-select-down-inv.png") no-repeat center 6px ;
+    line-height: 25px;
+    text-align: center;
+    vertical-align: text-bottom;
+    width: 26px;
+    height: 26px;
+    padding-right: 25px;
+  }
+  
+  ul.samples-dropdown-ul {
+    border-radius: 3px;
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
+    background: $gray-dark;
+    margin-top: 10px;
+    padding: 2px;
+    position: absolute;
+    width: fit-content;
+    visibility: hidden;
+    z-index: 1;
+    transition: visibility 0.2s;
+    left:0px;
+    
+    li {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      
+      span.check{
+        content: image-url('checkmark.png');
+        align-self: center;
+        color: $gray-light;
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
+        opacity: 0.5;
+        visibility: hidden;
+      }
+
+      &.active{
+        a {
+          color: $white-light;
+        }
+        span.check{
+          visibility: inherit;
+          opacity: 1;
+        }
+      }
+
+      &:hover {
+        background: $white-translucent;
+        color: $black;
+      }
+    }
+
+    a {
+      border-radius: 3px;
+      color: $gray-light;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; 
+    }
+  }
+
+  &:focus {
+    pointer-events: none;
+    ul {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+  }
+
+  &:hover ul.samples-dropdown-ul {
+    visibility: visible;
+  }
+}
+
 
 .content {
   @include flex(1 0 auto);
