@@ -40,7 +40,7 @@ gem 'wicked_pdf', '~> 2.1'
 gem 'devise', '~> 4.0.0'
 gem 'devise-security', '<= 0.12.0' # last version to support ruby 2.2
 gem 'devise_invitable', '~> 1.5'
-gem 'doorkeeper', '~> 4.2.0'
+gem 'doorkeeper', '~> 5.0.3'
 gem 'omniauth', '~> 1.2'
 gem 'omniauth-google-oauth2', '~> 0.2'
 
