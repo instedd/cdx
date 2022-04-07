@@ -1,4 +1,4 @@
-class LoincCode < ActiveRecord::Base
+class LoincCode < ApplicationRecord
 
   def description
     "#{self.loinc_number} - #{self.component}"

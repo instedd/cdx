@@ -1,99 +1,101 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.5'
+gem 'rails', '~> 4.2.11'
+gem 'rake', '~> 10.5.0'
+
+# Databases
 gem 'mysql2'
-gem 'sass-rails', '~> 4.0.0'
-gem 'uglifier', '>= 2.7.2'
-gem 'jquery-rails'
-gem 'haml-rails'
-gem 'lodash-rails'
-gem 'awesome_nested_set', '~> 3.0.0.rc.3'
-gem 'csv_builder'
-gem 'decent_exposure'
-gem 'nokogiri', '~> 1.6.7.2'
-gem 'react-rails', '~> 1.3.2'
+gem 'elasticsearch'
+
+# Models
+gem 'encryptor'
+gem 'kaminari'
 gem 'paperclip', git: 'https://github.com/instedd/paperclip', branch: 'fix/v4.3.6-no-mimemagic'
-gem 'aws-sdk', '~> 1.6'
-gem 'newrelic_rpm'
 gem 'paranoia'
 gem 'premailer-rails'
-gem 'kaminari'
-gem 'base58'
-gem 'rubyzip', '>= 1.0.0'
 
-gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
-gem 'config', '~> 1.2.0'
-gem 'rest-client'
-gem 'barby'
-gem 'rqrcode', '~> 0.10.1'
-gem 'chunky_png'
+# Views
+gem 'csv_builder'
+gem 'haml-rails'
+gem 'jbuilder', '~> 1.2'
+gem 'view_components', git: 'https://github.com/manastech/rails-view_components.git', branch: 'master'
 gem 'wicked_pdf', '~> 2.1'
-gem 'gon'
+
+# Authentication
+# gem 'bcrypt-ruby', '~> 3.1.2'
+gem 'devise', '~> 3.5.5'
+gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
+gem 'devise_invitable'
+gem 'doorkeeper'
+gem 'omniauth'
+gem 'omniauth-google-oauth2'
+
+# Libraries
+gem 'aws-sdk', '~> 1.6'
+gem 'base58'
+gem 'barby'
+gem 'config', '~> 1.2.0'
+gem 'dotiw'
+gem 'faker' # NOTE: until we upgrade to ruby 2.5+ then we can upgrade to ffaker 2.20 to replace Faker::Number
+gem 'ffaker'
+gem 'guid'
+gem 'nokogiri', '~> 1.6.7.2'
+gem 'oj'
+gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
+gem 'rails-i18n', '~> 4.0.0'
 gem 'rchardet'
-gem 'therubyracer'
-gem 'd3_rails'
-gem 'dropzonejs-rails', '0.8.4'
-gem 'whenever', '~> 1.0'
+gem 'rest-client' # NOTE: only used for a single HTTP call
+gem 'rubyzip', '>= 1.0.0'
+gem 'rqrcode', '~> 0.10.1' # required by Barby::QRCode
 
 gem 'cdx', path: '.'
 gem 'cdx-api-elasticsearch', path: '.'
 gem 'cdx-sync-server', git: 'https://github.com/instedd/cdx-sync-server.git', branch: 'master'
 gem 'geojson_import', git: 'https://github.com/instedd/geojson_import', branch: 'master'
-gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'
-gem 'view_components', git: 'https://github.com/manastech/rails-view_components.git', branch: 'master'
 
-# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
-gem 'turbolinks'
-gem 'jquery-turbolinks'
+# group :doc do
+#   # bundle exec rake doc:rails generates the API under doc/api.
+#   gem 'sdoc', require: false
+# end
 
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 1.2'
-
-group :doc do
-  # bundle exec rake doc:rails generates the API under doc/api.
-  gem 'sdoc', require: false
-end
-
-# Use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.1.2'
-
+# Services
 gem 'puma'
+gem 'sidekiq'
+gem 'sinatra' # for sidekiq web
+gem 'sidekiq-cron', '~> 0.3.1'
+gem 'whenever', '~> 1.0' # TODO: replace with a sidekiq-cron job
+
+# External services
+gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'
+gem 'nuntium_api', '~> 0.21'
 gem 'sentry-raven'
 
-# Use Sidekiq for background jobs
-gem 'sidekiq'
-gem 'sinatra'
-gem 'sidekiq-cron', '~> 0.3.1'
-
-group :development do
-  gem 'letter_opener'
-  gem 'web-console', '~> 2.0'
-  gem 'quiet_assets'
-end
-
-gem 'devise', '~> 3.5.5'
-gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension'
-gem 'devise_invitable'
-gem 'omniauth'
-gem 'omniauth-google-oauth2'
-gem 'elasticsearch'
-
-gem 'oj'
-gem 'guid'
-gem 'encryptor'
-
-gem 'dotiw'
-gem 'rails-i18n', '~> 4.0.0'
-gem 'doorkeeper'
-
-gem 'faker' # NOTE: until we upgrade to ruby 2.5+ then we can upgrade to ffaker 2.20 to replace Faker::Number
-gem 'ffaker'
+# Assets
+gem 'd3_rails'
+gem 'dropzonejs-rails', '0.8.4'
+gem 'gon'
+gem 'jquery-rails'
+gem 'jquery-turbolinks'
 gem 'leaflet-rails'
-
-gem 'nuntium_api', '~> 0.21'
+gem 'lodash-rails'
+gem 'react-rails', '~> 1.3.2'
+gem 'sass-rails', '~> 4.0.0'
+gem 'therubyracer'
+gem 'turbolinks'
+gem 'uglifier', '>= 2.7.2'
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs'
+
+  group :test do
+    gem 'rails-assets-es5-shim'
+  end
+end
+
+group :development do
+  gem 'letter_opener'
+  gem 'quiet_assets'
+  gem 'web-console', '~> 2.0'
 end
 
 group :development, :test do
@@ -101,32 +103,25 @@ group :development, :test do
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
   gem 'pry-clipboard'
-  gem 'rspec-rails'
   gem 'spring'
   gem 'spring-commands-rspec'
 end
 
 group :test do
-  gem 'test-unit'
-  gem 'tire'
-  gem 'machinist', '~> 2.0' # NOTE: eventually replace with FactoryBot
-  gem 'capybara'
-  gem 'guard-rspec'
   gem 'rspec'
   gem 'rspec-collection_matchers'
-  gem 'vcr'
-  gem 'webmock', require: false
-  gem 'capybara-mechanize'
-  gem 'timecop'
-  gem 'shoulda'
-  gem 'hashdiff'
-  gem 'cucumber-rails', :require => false
-  gem 'database_cleaner'
-  gem 'site_prism'
-  gem 'poltergeist'
-  gem 'capybara-screenshot'
+  gem 'rspec-rails'
 
-  source 'https://rails-assets.org' do
-    gem 'rails-assets-es5-shim'
-  end
+  gem 'database_cleaner'
+  gem 'machinist', '~> 2.0' # NOTE: eventually replace with FactoryBot
+  gem 'simplecov', require: false
+  gem 'timecop'
+  gem 'webmock', require: false
+
+  # integration tests
+  gem 'capybara'
+  gem 'capybara-screenshot'
+  gem 'cucumber-rails', require: false
+  gem 'poltergeist'
+  gem 'site_prism'
 end

@@ -1,4 +1,4 @@
-class ComputedPolicyException < ActiveRecord::Base
+class ComputedPolicyException < ApplicationRecord
 
   belongs_to :computed_policy, inverse_of: :exceptions
 

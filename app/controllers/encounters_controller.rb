@@ -1,5 +1,5 @@
 class EncountersController < ApplicationController
-  before_filter :load_encounter, only: %W(show edit)
+  before_action :load_encounter, only: %W(show edit)
 
   def new_index
     return unless authorize_resource(Site, CREATE_SITE_ENCOUNTER).empty?

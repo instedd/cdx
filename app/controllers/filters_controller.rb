@@ -1,10 +1,9 @@
 class FiltersController < ApplicationController
   respond_to :html, :json
-  expose(:filters) { current_user.filters }
-  expose(:filter, attributes: :filter_params)
-  expose(:site) { Site.find_by_uuid(filter.query["site.uuid"]) }
-  expose(:condition) { filter.query["test.assays.condition"] }
-  before_filter do
+
+  helper_method :filters, :filter, :site, :condition
+
+  before_action do
     head :forbidden unless has_access_to_test_results_index?
   end
 
@@ -46,5 +45,36 @@ class FiltersController < ApplicationController
     params.require(:filter).permit(:name).tap do |whitelisted|
       whitelisted[:query] = params[:filter][:query] || {}
     end
+  end
+
+  def filters
+    @filters ||= current_user.filters
+  end
+
+  def filter
+    @filter ||= load_or_initialize_filter
+  end
+
+  def load_or_initialize_filter
+    filter =
+      if id = params[:id]
+        filters.find(id)
+      else
+        filters.build
+      end
+
+    if params[:filter]
+      filter.attributes = filter_params
+    end
+
+    filter
+  end
+
+  def site
+    @site ||= Site.find_by_uuid(filter.query["site.uuid"])
+  end
+
+  def condition
+    @condition ||= filter.query["test.assays.condition"]
   end
 end

@@ -1,4 +1,4 @@
-class TransferPackage < ActiveRecord::Base
+class TransferPackage < ApplicationRecord
   belongs_to :receiver_institution, class_name: "Institution"
   has_many :sample_transfers
 

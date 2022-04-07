@@ -1,4 +1,4 @@
-class Batch < ActiveRecord::Base
+class Batch < ApplicationRecord
   include Entity
   include AutoUUID
   include Resource

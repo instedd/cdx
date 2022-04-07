@@ -1,4 +1,4 @@
-class AssayFile < ActiveRecord::Base
+class AssayFile < ApplicationRecord
 
   has_attached_file :picture, styles:  lambda { |a| a.instance.is_image? ? { :card => "130x130>" }  : {} }
 

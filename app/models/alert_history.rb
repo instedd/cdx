@@ -1,4 +1,4 @@
-class AlertHistory < ActiveRecord::Base
+class AlertHistory < ApplicationRecord
   belongs_to :user
   belongs_to :alert
   belongs_to :test_result

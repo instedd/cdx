@@ -1,6 +1,6 @@
 include Alerts
 
-class AlertJob < ActiveJob::Base
+class AlertJob < ApplicationJob
   queue_as :default
 
   def perform(alert_id, test_elasticsearch_id)

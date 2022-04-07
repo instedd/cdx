@@ -1,7 +1,7 @@
 class SampleTransfersController < ApplicationController
   helper_method :can_confirm_transfer?
-  skip_before_filter :verify_authenticity_token, :only => :create
-  skip_before_filter :ensure_context, :only => :create
+  skip_before_action :verify_authenticity_token, :only => :create
+  skip_before_action :ensure_context, :only => :create
 
   def index
     @sample_transfers = SampleTransfer

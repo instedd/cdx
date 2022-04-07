@@ -2,7 +2,7 @@ class DeviceModelsController < ApplicationController
 
   include DeviceModelsHelper
 
-  before_filter do
+  before_action do
     head :forbidden unless has_access_to_device_models_index?
   end
 

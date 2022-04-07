@@ -1,4 +1,4 @@
-class AlertRecipient < ActiveRecord::Base
+class AlertRecipient < ApplicationRecord
   belongs_to :user
   belongs_to :alert
   belongs_to :role

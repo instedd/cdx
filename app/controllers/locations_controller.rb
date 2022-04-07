@@ -1,5 +1,5 @@
 class LocationsController < ApplicationController
-  before_filter { @in_locations = true }
+  before_action { @in_locations = true }
 
   def index
     @locations = Location.children(params[:parent_id])

@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
-  skip_before_filter :verify_authenticity_token, if: :json_request?
+  skip_before_action :verify_authenticity_token, if: :json_request?
 
   before_action :authenticate_user!
   before_action :check_no_institution!
@@ -18,16 +18,12 @@ class ApplicationController < ActionController::Base
       current_user.try(:timestamps_in_device_time_zone))
   end
 
-  decent_configuration do
-    strategy DecentExposure::StrongParametersStrategy
-  end
-
   def render_json(object, params={})
     render params.merge(text: object.to_json_oj, content_type: 'text/json')
   end
 
   def self.set_institution_tab(key)
-    before_filter do
+    before_action do
       send :set_institution_tab, key
     end
   end

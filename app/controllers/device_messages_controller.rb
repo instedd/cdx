@@ -1,5 +1,5 @@
 class DeviceMessagesController < ApplicationController
-  before_filter :load_message, only: [:raw, :reprocess]
+  before_action :load_message, only: [:raw, :reprocess]
 
   def index
     device_ids = check_access(Device, SUPPORT_DEVICE).within(@navigation_context.entity, @navigation_context.exclude_subsites).pluck(:id)

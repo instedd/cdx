@@ -1,4 +1,4 @@
-class SampleTransfer < ActiveRecord::Base
+class SampleTransfer < ApplicationRecord
   belongs_to :sample
   belongs_to :sender_institution, class_name: "Institution"
   belongs_to :receiver_institution, class_name: "Institution"

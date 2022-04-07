@@ -1,4 +1,4 @@
-class AssayAttachment < ActiveRecord::Base
+class AssayAttachment < ApplicationRecord
   belongs_to :loinc_code
   belongs_to :sample
   belongs_to :assay_file, dependent: :destroy

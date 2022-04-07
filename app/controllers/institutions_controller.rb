@@ -1,6 +1,6 @@
 class InstitutionsController < ApplicationController
-  before_filter :load_institutions
-  skip_before_filter :check_no_institution!, only: [:new, :create, :pending_approval, :new_from_invite_data]
+  before_action :load_institutions
+  skip_before_action :check_no_institution!, only: [:new, :create, :pending_approval, :new_from_invite_data]
   skip_before_action :ensure_context, except: [:no_data_allowed]
   before_action :load_pending_invite!, only: [:new, :new_from_invite_data, :create]
 

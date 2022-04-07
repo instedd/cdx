@@ -3,16 +3,8 @@ class SubscribersController < ApplicationController
   skip_before_action :ensure_context
 
   respond_to :html, :json
-  expose(:subscribers) do
-    if params[:filter_id]
-      current_user.filters.find(params[:filter_id]).subscribers
-    else
-      current_user.subscribers
-    end
-  end
-  expose(:subscriber, attributes: :subscriber_params)
-  expose(:filters) { current_user.filters }
-  before_filter do
+
+  before_action do
     head :forbidden unless has_access_to_test_results_index?
   end
 
