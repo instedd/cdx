@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220331164557) do
+ActiveRecord::Schema.define(version: 20220407173015) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -664,10 +664,12 @@ ActiveRecord::Schema.define(version: 20220331164557) do
   add_index "test_results", ["uuid"], name: "index_test_results_on_uuid", using: :btree
 
   create_table "transfer_packages", force: :cascade do |t|
-    t.integer "receiver_institution_id", limit: 4,                   null: false
-    t.string  "uuid",                    limit: 36,                  null: false
-    t.string  "recipient",               limit: 255
-    t.boolean "includes_qc_info",                    default: false
+    t.integer  "receiver_institution_id", limit: 4,                   null: false
+    t.string   "uuid",                    limit: 36,                  null: false
+    t.string   "recipient",               limit: 255
+    t.boolean  "includes_qc_info",                    default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "users", force: :cascade do |t|
