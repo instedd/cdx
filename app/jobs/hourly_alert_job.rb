@@ -1,3 +1,4 @@
+require "alerts"
 include Alerts
 
 class HourlyAlertJob

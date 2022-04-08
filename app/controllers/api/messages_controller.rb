@@ -1,3 +1,5 @@
+require "demo_data"
+
 class Api::MessagesController < ApiController
   include DemoData
 

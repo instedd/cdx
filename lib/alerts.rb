@@ -1,3 +1,5 @@
+require_relative "./sms"
+
 module Alerts
   include SMS
 

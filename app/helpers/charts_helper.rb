@@ -1,3 +1,5 @@
+require "reports"
+
 module ChartsHelper
   def devices_reporting_chart
     results = Reports::Devices.process(current_user, @navigation_context, options)
