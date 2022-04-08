@@ -14,8 +14,6 @@ end
 class UserInviteModal < CdxPageBase
 
   def select_new_user_option
-    new_user_option.click
-
     modal = InviteUsersModal.new
     yield modal if block_given?
     modal
