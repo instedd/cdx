@@ -1,3 +1,42 @@
+var AddInstitutionLink = React.createClass({
+
+  getInitialState: function() {
+    return {
+      modalTitle: 'Invite Institution'
+    };
+  },
+
+  openInviteModal: function(event) {
+    this.refs.inviteModal.show();
+    event.preventDefault();
+  },
+
+  closeInviteModal: function() {
+    this.refs.inviteModal.hide();
+  },
+
+  changeModalTitle: function(newTitle) {
+    this.setState({
+      modalTitle: newTitle
+    });
+  },
+
+  render: function() {
+    return (<div>
+      <a className="btn new-institution" onClick={this.openInviteModal}>
+        <span className="icon-earth icon-white" />
+        Bring other institutions on board CDx
+      </a>
+      <span id="institution-invitation-modal">
+        <Modal ref="inviteModal">
+          <h1>{this.state.modalTitle}</h1>
+          <ModalPresenter changeTitle={this.changeModalTitle} onFinished={this.closeInviteModal} institution_types= {this.props.institution_types} context={this.props.context} />
+        </Modal>
+      </span>
+    </div>);
+  }
+});
+
 var ModalPresenter = React.createClass({
   getInitialState: function() {
     return {
