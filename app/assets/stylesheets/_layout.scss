@@ -41,11 +41,13 @@ header {
       margin-left: 15px;
 
       ul {
+        display: flex;
+        align-items: baseline;
+        gap: .21em;
         margin: 0;
         padding: 0;
 
         li {
-          display: inline;
           padding: 0;
           margin: 0;
 
@@ -121,24 +123,23 @@ header {
 }
 
 .samples-dropdown {
-      
-  span.samples-dropdown-text {
+  
+  .samples-dropdown-text {
     cursor: pointer;
     padding-left: 20px;
     color: $gray-light;
+    position: relative;
   }
 
-  span.samples-dropdown-arrow {
-    background: image-url("arr-select-down-inv.png") no-repeat center 6px ;
-    line-height: 25px;
-    text-align: center;
-    vertical-align: text-bottom;
-    width: 26px;
-    height: 26px;
+  .samples-dropdown-text::after {
+    content: image-url("arr-select-down-inv.png");
     padding-right: 25px;
+    padding-left: 10px;
+    vertical-align: middle;
   }
   
   ul.samples-dropdown-ul {
+    flex-direction: column;
     border-radius: 3px;
     box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
     background: $gray-dark;
@@ -152,27 +153,21 @@ header {
     left:0px;
     
     li {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      
-      span.check{
-        content: image-url('checkmark.png');
-        align-self: center;
-        color: $gray-light;
-        width: 24px;
-        height: 24px;
-        margin-right: 12px;
-        opacity: 0.5;
-        visibility: hidden;
+      display: flex;
+      a {
+        min-width: 200px;
       }
 
       &.active{
         a {
           color: $white-light;
         }
-        span.check{
-          visibility: inherit;
-          opacity: 1;
+
+        a::after{
+          content: image-url('checkmark.svg');
+          opacity: 0.8;
+          float: right;
+          font-size: x-large;
         }
       }
 
@@ -187,8 +182,6 @@ header {
       color: $gray-light;
       display: block;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis; 
     }
   }
 
