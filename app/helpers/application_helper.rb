@@ -211,9 +211,9 @@ module ApplicationHelper
     "#{uuid[0,4]}…#{uuid[-4,4]}"
   end
 
-  def field_errors(msgs)
-    content_tag :div, :class => "error" do
-      msgs.each do |msg|
+  def field_errors(obj, field)
+    content_tag :div, :class => "error-field" do
+      obj.errors.full_messages_for(field).each do |msg|
         concat( content_tag(:span, content_tag(:div,"",class:["icon-error","icon-red"]) + msg) )
       end
     end
