@@ -123,12 +123,12 @@ header {
 }
 
 .samples-dropdown {
+  position: relative;
   
   .samples-dropdown-text {
     cursor: pointer;
     padding-left: 20px;
     color: $gray-light;
-    position: relative;
   }
 
   .samples-dropdown-text::after {
