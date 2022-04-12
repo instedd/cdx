@@ -43,16 +43,6 @@
       .pagination
         = render 'shared/pagination'
 
-  .col.pe-1.tab-buttons
-    .tab-separator
-    .icons-group
-      = link_to samples_path do
-        .icon-sample.tab-sample{title: "Samples"}
-      .selected-icon-tab
-        .icon-batch.tab-batch.selected{title: "Batches"}
-      = link_to sample_transfers_path do
-        .icon-transfer.tab-transfer{title: "Transfers"}
-
 = render 'index_js'
 = render 'samples/index_bulk_actions_js'
 
