@@ -87,8 +87,7 @@ class SampleForm
 
     # validate forms. stop if invalid
     form_valid = self.valid?
-    return false unless form_valid
-
+    
     # validate/save. All done if succeeded
     is_valid = sample.save
     return true if is_valid
