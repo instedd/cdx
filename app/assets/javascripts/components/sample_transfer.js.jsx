@@ -95,7 +95,7 @@ var SampleTransferModal = React.createClass({
       <div className="row">
         <div className="col icon-info-outline icon-gray qc-info-message">
           <input type="hidden" name="includes_qc_info" value="false" />
-          <div className="notification-text">{infoMessage}</div>
+          {infoMessage}
         </div>
       </div>
     )

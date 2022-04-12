@@ -20,7 +20,7 @@
               =button_tag id: 'bulk_destroy', class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected samples. This action CANNOT be undone. Are you sure you want to proceed?" } do
                 .icon-trash.btn-icon
               #table-notification.icon-notification.icon-red.table-info.hidden
-                .notification-text= "QC Samples can't be transferred"
+                QC Samples can't be transferred
 
           - t.columns do
             %col{:width => "5%"}
