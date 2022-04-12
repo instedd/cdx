@@ -87,6 +87,12 @@ class SampleForm
 
     # validate forms. stop if invalid
     form_valid = self.valid?
+    self.assay_attachments.each do |aa|
+      form_valid &= aa.valid?
+    end 
+    self.notes.each do |n|
+      form_valid &= n.valid?
+    end 
     
     # validate/save. All done if succeeded
     is_valid = sample.save
@@ -94,8 +100,9 @@ class SampleForm
 
     # copy validations from model to form (form is valid, but model is not)
     sample.errors.each do |key, error|
-      errors.add(key, error) if self.class.shared_attributes.include?(key)
+      errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
     end
+
     return false
   end
 
