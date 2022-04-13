@@ -6,10 +6,7 @@ class TransferPackagesController < ApplicationController
     full_uuid = uuid.size == 36
     @samples = Sample
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
-      .joins(:sample_identifiers).where(
-        (full_uuid ? "sample_identifiers.uuid = ?" : "sample_identifiers.uuid LIKE concat(?, '%')"),
-        uuid
-      )
+      .autocomplete(uuid)
       .order("created_at DESC")
       .limit(5)
 
