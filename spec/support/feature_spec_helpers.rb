@@ -25,6 +25,10 @@ module FeatureSpecHelpers
     end
 
     goto_page HomePage do |page|
+      unless page.has_form?
+        page.user_menu.icon.click
+        page.user_menu.logout.click
+      end
       page.form.user_name.set user.email
       page.form.password.set user.password
       page.form.login.click

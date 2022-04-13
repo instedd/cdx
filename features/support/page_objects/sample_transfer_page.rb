@@ -1,6 +1,13 @@
 class ListSampleTransfersPage < CdxPageBase
   set_url "/sample_transfers"
 
+  class SampleTransferEntry < SitePrism::Section
+    element :uuid, "td:first-child"
+    element :state, "td:last-child"
+
+    element :confirm, :link, "Confirm receipt"
+  end
+
   section :filters, "#filters-form" do
     element :sample_id, :field, "Sample ID"
     element :batch_number, :field, "Batch Number"
@@ -10,8 +17,10 @@ class ListSampleTransfersPage < CdxPageBase
     include CdxPageHelper
   end
 
+  sections :entries, SampleTransferEntry, ".laboratory-sample-row"
+
   def entry(uuid)
-    find("tr", text: uuid)
+    SampleTransferEntry.new(self, find("tr", text: uuid))
   end
 
   section :confirm_receipt_modal, ".modal" do

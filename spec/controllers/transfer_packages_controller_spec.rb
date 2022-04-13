@@ -2,11 +2,12 @@ require "spec_helper"
 
 RSpec.describe TransferPackagesController, type: :controller do
   setup_fixtures do
-    @user = User.make!
-    @institution = Institution.make! user: @user
+    @institution = Institution.make!
+    @user = @institution.user
 
-    @other_user = Institution.make!.user
-    @other_institution = Institution.make! user: @other_user
+    @other_institution = Institution.make!
+    @other_user = @other_institution.user
+    grant @other_user, @user, @other_institution, READ_INSTITUTION
   end
 
   let(:default_params) { { context: institution.uuid } }
@@ -124,6 +125,179 @@ RSpec.describe TransferPackagesController, type: :controller do
         expect(data["samples"].map { |s| s["uuid"] }).to eq [sample.uuid, qc_sample.uuid, other_sample.uuid]
         expect(data["samples"].map { |s| s["error"] }).to eq [nil, "Sample 01234567-4444-a0c8-ac1b-58bed3633e88 is a QC sample and can't be transferred.", nil]
       end
+    end
+  end
+
+  describe "GET #new" do
+    before(:each) { sign_in(user) }
+    let(:default_params) { { context: institution.uuid } }
+
+    it "should be accessible be institution owner" do
+      get :new
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "should be allowed it can create" do
+      # grant other_institution.user, user, other_institution, CREATE_INSTITUTION_SAMPLE
+      get :new, params: { context: other_institution.uuid }
+      expect(response).to have_http_status(:ok)
+    end
+
+    pending "should not be allowed it can not create" do
+      get :new, params: { context: other_institution.uuid }
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe "POST #create" do
+    before(:each) { sign_in(user) }
+    let(:default_params) { { context: institution.uuid } }
+
+    it "creates transfer package" do
+      sample1 = Sample.make!(:filled, institution: institution)
+      sample2 = Sample.make!(:filled, institution: institution)
+
+      expect do
+        post :create, params: {
+                        transfer_package: {
+                          receiver_institution: other_institution.id,
+                          recipient: "Mr. X",
+                          includes_qc_info: true,
+                          sample_transfers_attributes: {
+                            0 => {
+                              sample_uuid: sample1.uuid,
+                            },
+                            1 => {
+                              sample_uuid: sample2.uuid,
+                            },
+                          },
+                        },
+                      }
+      end.to change { TransferPackage.count }.by(1)
+
+      package = TransferPackage.last
+      expect(package.recipient).to eq "Mr. X"
+      expect(package.sender_institution).to eq institution
+      expect(package.receiver_institution).to eq other_institution
+      expect(package.includes_qc_info?).to eq true
+      expect(package.sample_transfers.map(&:sample)).to eq [sample1, sample2]
+    end
+
+    it "ignores blank sample_uuid" do
+      sample = Sample.make!(:filled, institution: institution)
+
+      expect do
+        post :create, params: {
+                        transfer_package: {
+                          receiver_institution: other_institution.id,
+                          recipient: "Mr. X",
+                          includes_qc_info: true,
+                          sample_transfers_attributes: {
+                            0 => {
+                              sample_uuid: sample.uuid,
+                            },
+                            1 => {
+                              sample_uuid: nil,
+                            },
+                            2 => {
+                              sample_uuid: "",
+                            },
+                          },
+                        },
+                      }
+      end.to change { TransferPackage.count }.by(1)
+
+      package = TransferPackage.last
+      expect(package.recipient).to eq "Mr. X"
+      expect(package.sender_institution).to eq institution
+      expect(package.receiver_institution).to eq other_institution
+      expect(package.includes_qc_info?).to eq true
+      expect(package.sample_transfers.map(&:sample)).to eq [sample]
+    end
+
+    it "only allows samples in current institution" do
+      sample = Sample.make!(:filled, institution: other_institution)
+
+      expect do
+        post :create, params: {
+                        transfer_package: {
+                          receiver_institution: other_institution.id,
+                          sample_transfers_attributes: {
+                            0 => {
+                              sample_uuid: sample.uuid,
+                            },
+                          },
+                        },
+                      }
+      end.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "shows form again when empty samples" do
+      expect do
+        post :create, params: {
+                        transfer_package: {
+                          receiver_institution: other_institution.id,
+                        },
+                      }
+      end.not_to change { TransferPackage.count }
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "shows form again when missing receiver" do
+      sample = Sample.make!(:filled, institution: institution)
+
+      expect do
+        post :create, params: {
+                        transfer_package: {
+                          sample_transfers_attributes: {
+                            0 => {
+                              sample_uuid: sample.uuid,
+                            },
+                          },
+                        },
+                      }
+      end.not_to change { TransferPackage.count }
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "rejects transferring QC sample" do
+      sample = Sample.make!(:filled, institution: institution, specimen_role: "q")
+
+      expect do
+        post :create, params: {
+                        transfer_package: {
+                          receiver_institution: other_institution.id,
+                          sample_transfers_attributes: {
+                            0 => {
+                              sample_uuid: sample.uuid,
+                            },
+                          },
+                        },
+                      }
+      end.to raise_error("Can't transfer QC sample")
+    end
+
+    it "rejects unauthorized transfer" do
+      unauthorized_user = User.make!
+      grant user, unauthorized_user, institution, READ_INSTITUTION
+      sign_in unauthorized_user
+
+      sample = Sample.make!(:filled, institution: institution)
+
+      expect do
+        post :create, params: {
+                        transfer_package: {
+                          receiver_institution: other_institution.id,
+                          sample_transfers_attributes: {
+                            0 => {
+                              sample_uuid: sample.uuid,
+                            },
+                          },
+                        },
+                      }
+      end.to raise_error("User not authorized for transferring sample #{sample.uuid}")
     end
   end
 end

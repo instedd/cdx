@@ -1,0 +1,39 @@
+= form_for(@transfer_package) do |f|
+  .row
+    .col
+      .row.form-field
+        .col.pe-4
+          = f.label :uuid
+        .col
+          .value
+            = f.object.uuid
+
+      .row.form-field
+        .col.pe-4
+          = f.label :receiver_institution, "Institution", title: "Receiver institution"
+        .col
+          - if @can_update
+            = cdx_select form: f, name: :receiver_institution, searchable: true, class: "input-x-large" do |select|
+              - select.items @available_institutions, :id, :name
+          - else
+            = text_field_tag :receiver_institution, { :class => 'input-x-large', readonly: true }
+
+      .row.form-field
+        .col.pe-4
+          = f.label :recipient
+        .col
+          = f.text_field :recipient, :class => 'input-x-large', readonly: !@can_update
+
+      .row.form-field
+        .col.pe-4
+          = f.label :sample_transfers, "Samples"
+        .col
+          = react_component("SampleTransferSelector",
+              context: @navigation_context.uuid,
+              includeQcInfo: @transfer_package.includes_qc_info, samples: samples_data(@transfer_package.sample_transfers.map(&:sample)))
+
+  - if @can_update
+    .row.button-actions
+      .col
+        = f.submit 'Transfer', class: 'btn-primary', id: 'btn-save'
+        = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'

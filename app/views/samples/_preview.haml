@@ -1,0 +1,14 @@
+.sample-preview
+  .sample__uuid
+    = link_to sample.uuid, sample, target: "_blank"
+  .sample__volume
+    - if sample.volume
+      = "#{sample.volume} μl"
+  .sample__specimen_role
+    = sample.specimen_role.try &:upcase
+  .sample__inactivation_method
+    = sample.inactivation_method
+  .sample__isolate_name
+    = sample.isolate_name
+  .sample__date_produced
+    = time_tag sample.date_produced, I18n.l(sample.date_produced, format: I18n.t("date.input_format.pattern"))
