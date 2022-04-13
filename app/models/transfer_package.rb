@@ -1,4 +1,5 @@
 class TransferPackage < ApplicationRecord
+  belongs_to :sender_institution, class_name: "Institution"
   belongs_to :receiver_institution, class_name: "Institution"
   has_many :sample_transfers
 

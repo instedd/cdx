@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220407173015) do
+ActiveRecord::Schema.define(version: 20220408103851) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -670,6 +670,7 @@ ActiveRecord::Schema.define(version: 20220407173015) do
     t.boolean  "includes_qc_info",                    default: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "sender_institution_id",   limit: 4,                   null: false
   end
 
   create_table "users", force: :cascade do |t|
