@@ -12,11 +12,6 @@ class TransferPackagesController < ApplicationController
 
     @samples = check_access(@samples, READ_SAMPLE)
 
-    if full_uuid && @samples.any?(&:is_quality_control?)
-      render json: { error: "Sample #{uuid} is a QC sample and can't be transferred." }
-      return
-    end
-
     render json: { samples: samples_data(@samples) }
   end
 
@@ -24,11 +19,14 @@ class TransferPackagesController < ApplicationController
 
   def samples_data(samples)
     samples.map { |sample|
-      next if sample.is_quality_control?
-      {
+      data = {
         uuid: sample.uuid,
         hasQcReference: sample.has_qc_reference?,
       }
+      if sample.is_quality_control?
+        data[:error] = "Sample #{sample.uuid} is a QC sample and can't be transferred."
+      end
+      data
     }.compact
   end
 end
