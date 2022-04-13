@@ -12,16 +12,18 @@ class SampleTransfer < ApplicationRecord
   end
 
   scope :within, ->(institution) {
-          where("sender_institution_id = ? OR receiver_institution_id = ?", institution.id, institution.id)
+          joins(:transfer_package).merge(TransferPackage.within(institution))
         }
 
   scope :with_receiver, ->(institution) {
-          where(receiver_institution_id: institution.id)
+          joins(:transfer_package).merge(TransferPackage.with_receiver(institution))
         }
 
   scope :ordered_by_creation, -> {
           order(created_at: :desc)
         }
+
+  delegate :receiver_institution, :sender_institution, to: :transfer_package
 
   def confirm
     if confirmed?

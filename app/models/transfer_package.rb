@@ -11,6 +11,18 @@ class TransferPackage < ApplicationRecord
     self.uuid ||= SecureRandom.uuid
   end
 
+  scope :within, ->(institution) {
+          if Rails::VERSION::MAJOR >= 5
+            where(sender_institution_id: institution.id).or(with_receiver(institution))
+          else
+            where(arel_table[:sender_institution_id].eq(institution.id).or(arel_table[:receiver_institution_id].eq(institution.id)))
+          end
+        }
+
+  scope :with_receiver, ->(institution) {
+          where(receiver_institution_id: institution.id)
+        }
+
   def self.sending_to(sender, receiver, attributes = nil)
     create!(attributes) do |package|
       package.sender_institution = sender
