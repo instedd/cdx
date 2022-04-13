@@ -117,7 +117,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "confirms" do
       sample = Sample.make!
-      transfer = TransferPackage.sending_to(my_institution).add!(sample)
+      transfer = TransferPackage.sending_to(other_institution, my_institution).add!(sample)
 
       Timecop.freeze do
         patch :confirm, params: { sample_transfer_id: transfer.id }
@@ -133,7 +133,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "verifies user is authorized" do
       sample = Sample.make!
-      transfer = TransferPackage.sending_to(other_institution).add!(sample)
+      transfer = TransferPackage.sending_to(my_institution, other_institution).add!(sample)
 
       grant other_institution.user, current_user, other_institution, Policy::Actions::READ_INSTITUTION
 
@@ -149,7 +149,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "verifies current context is receiver" do
       sample = Sample.make!
-      transfer = TransferPackage.sending_to(other_institution).add!(sample)
+      transfer = TransferPackage.sending_to(my_institution, other_institution).add!(sample)
 
       expect {
         patch :confirm, params: { sample_transfer_id: transfer.id }
@@ -164,7 +164,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "verifies transfer is unconfirmed" do
       sample = Sample.make
-      transfer = TransferPackage.sending_to(my_institution).add!(sample)
+      transfer = TransferPackage.sending_to(other_institution, my_institution).add!(sample)
       transfer.confirm_and_apply!
       transfer.confirmed_at = original_confirmed_at = Time.now.change(usec: 0) - 1.hour
       transfer.save!

@@ -71,7 +71,7 @@ class SampleTransfersController < ApplicationController
     samples = Sample.find_all_by_any_uuid(sample_uuids)
 
     Sample.transaction do
-      package = TransferPackage.sending_to(new_owner, transfer_package_params)
+      package = TransferPackage.sending_to(samples.first.institution, new_owner, transfer_package_params)
 
       samples.each do |sample|
         raise "User not authorized for transferring Samples " unless authorize_resource?(sample, UPDATE_SAMPLE)

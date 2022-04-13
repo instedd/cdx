@@ -164,6 +164,8 @@ end
 TransferPackage.blueprint do
   uuid { SecureRandom.uuid }
   receiver_institution { Institution.make! }
+  receiver_institution { Institution.make! }
+  sender_institution { Institution.make! }
   recipient { Faker::Name.name }
 end
 

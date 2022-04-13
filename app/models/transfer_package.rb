@@ -3,13 +3,18 @@ class TransferPackage < ApplicationRecord
   belongs_to :receiver_institution, class_name: "Institution"
   has_many :sample_transfers
 
+  # TODO: remove these after upgrading to Rails 5.0 (belongs_to associations are required by default):
+  validates_presence_of :sender_institution
+  validates_presence_of :receiver_institution
+
   after_initialize do
     self.uuid ||= SecureRandom.uuid
   end
 
-  def self.sending_to(institution, attributes = nil)
+  def self.sending_to(sender, receiver, attributes = nil)
     create!(attributes) do |package|
-      package.receiver_institution = institution
+      package.sender_institution = sender
+      package.receiver_institution = receiver
     end
   end
 
