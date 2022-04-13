@@ -14,8 +14,8 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "includes transfers from and to my institution (ordered by creation date)" do
       sample_transfers = [
-        SampleTransfer.make!(sender_institution: my_institution, created_at: Time.now - 1.day),
-        SampleTransfer.make!(receiver_institution: my_institution, created_at: Time.now),
+        SampleTransfer.make!(transfer_package: TransferPackage.make!(sender_institution: my_institution), created_at: Time.now - 1.day),
+        SampleTransfer.make!(transfer_package: TransferPackage.make!(receiver_institution: my_institution), created_at: Time.now),
       ]
       get :index
       expect(assigns(:sample_transfers).map(&:transfer)).to eq sample_transfers.reverse
@@ -28,8 +28,8 @@ RSpec.describe SampleTransfersController, type: :controller do
     end
 
     describe "filters" do
-      let!(:subject) { SampleTransfer.make!(sender_institution: my_institution, sample: Sample.make!(:filled, batch: Batch.make!, specimen_role: "c")) }
-      let!(:other) { SampleTransfer.make!(receiver_institution: my_institution, sample: Sample.make!(:filled, batch: Batch.make!)) }
+      let!(:subject) { SampleTransfer.make!(transfer_package: TransferPackage.make!(sender_institution: my_institution), sample: Sample.make!(:filled, batch: Batch.make!, specimen_role: "c")) }
+      let!(:other) { SampleTransfer.make!(transfer_package: TransferPackage.make!(receiver_institution: my_institution), sample: Sample.make!(:filled, batch: Batch.make!)) }
 
       it "by sample id" do
         get :index, params: { sample_id: subject.sample.uuid[0..8] }
@@ -42,7 +42,7 @@ RSpec.describe SampleTransfersController, type: :controller do
       end
 
       it "by old_batch_number" do
-        transfer = SampleTransfer.make!(sender_institution: my_institution, sample: Sample.make!(:filled, specimen_role: "c", old_batch_number: "12345678"))
+        transfer = SampleTransfer.make!(transfer_package: TransferPackage.make!(sender_institution: my_institution), sample: Sample.make!(:filled, specimen_role: "c", old_batch_number: "12345678"))
         get :index, params: { batch_number: "12345678" }
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [transfer]
       end

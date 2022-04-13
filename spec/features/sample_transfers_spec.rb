@@ -5,16 +5,18 @@ describe "sample transfers" do
     let!(:my_institution) { Institution.make! }
     let!(:other_institution) { Institution.make! }
     let!(:current_user) { my_institution.user }
+    let!(:receiver_package) { TransferPackage.make receiver_institution: my_institution }
+    let!(:sender_package) { TransferPackage.make sender_institution: my_institution }
 
     before(:each) do
       sign_in(current_user)
     end
 
     it "shows status" do
-      in_pending = SampleTransfer.make!(receiver_institution: my_institution, created_at: Time.new(2022, 3, 4))
-      in_confirmed = SampleTransfer.make!(receiver_institution: my_institution, confirmed_at: Time.new(2022, 2, 24, 15, 31))
-      out_pending = SampleTransfer.make!(sender_institution: my_institution, created_at: Time.new(2022, 3, 4))
-      out_confirmed = SampleTransfer.make!(sender_institution: my_institution, confirmed_at: Time.new(2022, 2, 21, 12, 00))
+      in_pending = SampleTransfer.make!(transfer_package: receiver_package, created_at: Time.new(2022, 3, 4))
+      in_confirmed = SampleTransfer.make!(transfer_package: receiver_package, confirmed_at: Time.new(2022, 2, 24, 15, 31))
+      out_pending = SampleTransfer.make!(transfer_package: sender_package, created_at: Time.new(2022, 3, 4))
+      out_confirmed = SampleTransfer.make!(transfer_package: sender_package, confirmed_at: Time.new(2022, 2, 21, 12, 00))
       unrelated = SampleTransfer.make!
 
       goto_page ListSampleTransfersPage do |page|
@@ -29,8 +31,8 @@ describe "sample transfers" do
     end
 
     it "filters" do
-      subject = SampleTransfer.make!(receiver_institution: my_institution)
-      other = SampleTransfer.make!(receiver_institution: my_institution)
+      subject = SampleTransfer.make!(transfer_package: receiver_package)
+      other = SampleTransfer.make!(transfer_package: receiver_package)
 
       goto_page ListSampleTransfersPage do |page|
         page.filters.sample_id.set subject.sample.uuid
@@ -97,7 +99,7 @@ describe "sample transfers" do
 
     it "verifies sample id" do
       sample = Sample.make!(:filled, institution: institution_a)
-      transfer = TransferPackage.sending_to(institution_b).add!(sample)
+      transfer = TransferPackage.sending_to(institution_a, institution_b).add!(sample)
 
       sign_in user_b
 

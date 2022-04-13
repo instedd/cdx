@@ -2,7 +2,7 @@ class SampleTransfer < ApplicationRecord
   belongs_to :sample
   belongs_to :sender_institution, class_name: "Institution"
   belongs_to :receiver_institution, class_name: "Institution"
-  belongs_to :transfer_package, required: false
+  belongs_to :transfer_package
 
   # TODO: remove these after upgrading to Rails 5.0 (belongs_to associations are required by default):
   validates_presence_of :sample

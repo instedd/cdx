@@ -10,7 +10,7 @@ RSpec.describe SampleTransfer, type: :model do
   end
 
   it "validates" do
-    transfer = SampleTransfer.new(sample: sample, receiver_institution: receiver, sender_institution: sender)
+    transfer = SampleTransfer.new(sample: sample, transfer_package: TransferPackage.make)
     expect(transfer).to be_valid
   end
 
