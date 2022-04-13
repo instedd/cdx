@@ -60,15 +60,15 @@ RSpec.describe TransferPackagesController, type: :controller do
         expect(data["samples"]).to be_empty
       end
 
-      it "does not include QC sample" do
+      it "adds error for QC sample" do
         qc_sample = Sample.make! :filled, institution: institution, specimen_role: "q", sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-4444-a0c8-ac1b-58bed3633e88")]
 
         get :find_sample, params: { uuid: qc_sample.uuid }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"]).to be_nil
-        expect(data["error"]).to eq "Sample 01234567-4444-a0c8-ac1b-58bed3633e88 is a QC sample and can't be transferred."
+        expect(data["samples"].map { |s| s["uuid"] }).to eq [qc_sample.uuid]
+        expect(data["samples"].map { |s| s["error"] }).to eq ["Sample 01234567-4444-a0c8-ac1b-58bed3633e88 is a QC sample and can't be transferred."]
       end
     end
 
@@ -114,14 +114,15 @@ RSpec.describe TransferPackagesController, type: :controller do
         expect(data["samples"].map { |s| s["uuid"] }).to eq [other_institution_sample.uuid]
       end
 
-      it "does not include QC sample" do
-        Sample.make! :filled, institution: institution, specimen_role: "q", sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-4444-a0c8-ac1b-58bed3633e88")]
+      it "adds error for QC sample" do
+        qc_sample = Sample.make! :filled, institution: institution, created_at: sample.created_at - 1.hour, specimen_role: "q", sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-4444-a0c8-ac1b-58bed3633e88")]
 
         get :find_sample, params: { uuid: "01234567" }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"].map { |s| s["uuid"] }).to eq [sample.uuid, other_sample.uuid]
+        expect(data["samples"].map { |s| s["uuid"] }).to eq [sample.uuid, qc_sample.uuid, other_sample.uuid]
+        expect(data["samples"].map { |s| s["error"] }).to eq [nil, "Sample 01234567-4444-a0c8-ac1b-58bed3633e88 is a QC sample and can't be transferred.", nil]
       end
     end
   end
