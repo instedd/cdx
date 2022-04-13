@@ -6,8 +6,6 @@ class SampleTransfer < ApplicationRecord
 
   # TODO: remove these after upgrading to Rails 5.0 (belongs_to associations are required by default):
   validates_presence_of :sample
-  validates_presence_of :sender_institution
-  validates_presence_of :receiver_institution
 
   after_initialize do
     self.sender_institution ||= sample.try &:institution

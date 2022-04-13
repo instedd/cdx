@@ -21,7 +21,6 @@ class TransferPackage < ApplicationRecord
   def add!(sample)
     transfer = sample_transfers.create!(
       sample: sample,
-      receiver_institution: receiver_institution,
     )
 
     if sample.batch
