@@ -12,6 +12,29 @@
       color: $gray4;
     }
 
+    .table-title {
+      font-size: 120%;
+      font-weight: bold;
+      color: $black;
+      vertical-align: middle;
+      display: inline-block;
+      margin-right: 10px;
+      text-transform:none;
+    }
+
+    .table-actions {
+      display: inline-block;
+      vertical-align: middle;
+
+      .btn-link {
+        margin-left: 0px;
+      }
+
+      .btn-icon {
+        color: inherit;
+      }
+    }
+
     th {
       font-weight: 400;
       color: $gray3;
@@ -20,29 +43,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       padding: 14px 10px;
-
-      .table-title {
-        font-size: 120%;
-        font-weight: bold;
-        color: $black;
-        vertical-align: middle;
-        display: inline-block;
-        margin-right: 10px;
-        text-transform:none;
-      }
-
-      .table-actions {
-        display: inline-block;
-        vertical-align: middle;
-
-        .btn-link {
-          margin-left: 0px;
-        }
-
-        .btn-icon {
-          color: inherit;
-        }
-      }
 
       a {
         color: inherit;
