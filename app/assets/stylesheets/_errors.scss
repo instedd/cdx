@@ -4,7 +4,7 @@
 }
 
 form {
-  .error-field {
+  .error {
     font-size: 12px;
     font-style: italic;
     color: $red;
@@ -12,8 +12,8 @@ form {
     visibility: hidden;
     display: flex;
     flex-direction: column;
-
-    span {
+    
+    li {
       display: inline-flex;
       align-items: center;
     }
@@ -24,7 +24,7 @@ form {
     border-bottom-color: #EB2122 !important;
   }
     
-  div.field_with_errors + .error-field {
+  .field_with_errors + .error {
     visibility: visible;
   }
 }
