@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220331164557) do
+ActiveRecord::Schema.define(version: 20220407173015) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -141,11 +141,11 @@ ActiveRecord::Schema.define(version: 20220331164557) do
     t.text     "core_fields",    limit: 65535
     t.text     "custom_fields",  limit: 65535
     t.binary   "sensitive_data", limit: 65535
-    t.string   "isolate_name",   limit: 255
     t.datetime "deleted_at"
     t.integer  "institution_id", limit: 4
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.string   "isolate_name",   limit: 255
     t.string   "batch_number",   limit: 255
     t.integer  "site_id",        limit: 4
     t.string   "site_prefix",    limit: 255
@@ -155,7 +155,6 @@ ActiveRecord::Schema.define(version: 20220331164557) do
   add_index "batches", ["date_produced"], name: "index_batches_on_date_produced", using: :btree
   add_index "batches", ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree
   add_index "batches", ["institution_id"], name: "index_batches_on_institution_id", using: :btree
-  add_index "batches", ["isolate_name"], name: "index_batches_on_isolate_name", using: :btree
   add_index "batches", ["site_id"], name: "index_batches_on_site_id", using: :btree
 
   create_table "computed_policies", force: :cascade do |t|
@@ -665,10 +664,12 @@ ActiveRecord::Schema.define(version: 20220331164557) do
   add_index "test_results", ["uuid"], name: "index_test_results_on_uuid", using: :btree
 
   create_table "transfer_packages", force: :cascade do |t|
-    t.integer "receiver_institution_id", limit: 4,                   null: false
-    t.string  "uuid",                    limit: 36,                  null: false
-    t.string  "recipient",               limit: 255
-    t.boolean "includes_qc_info",                    default: false
+    t.integer  "receiver_institution_id", limit: 4,                   null: false
+    t.string   "uuid",                    limit: 36,                  null: false
+    t.string   "recipient",               limit: 255
+    t.boolean  "includes_qc_info",                    default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "users", force: :cascade do |t|

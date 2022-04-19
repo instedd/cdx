@@ -35,7 +35,9 @@ class SampleForm
   delegate :uuid, :assay_attachments, :notes, :qc_info, to: :sample
 
   validates_presence_of :date_produced
-
+  validates_each :assay_attachments, :notes do |record, attr, value|
+    record.errors.add(attr, "are invalid") unless value.all?(&:valid?) && !record.errors.include?(attr)
+  end
   def self.for(sample)
     new.tap do |form|
       form.sample = sample
@@ -87,18 +89,12 @@ class SampleForm
 
     # validate forms. stop if invalid
     form_valid = self.valid?
-    self.assay_attachments.each do |aa|
-      form_valid &= aa.valid?
-    end 
-    self.notes.each do |n|
-      form_valid &= n.valid?
-    end 
+    return false unless form_valid
     
     # validate/save. All done if succeeded
     is_valid = sample.save
     return true if is_valid
 
-    # copy validations from model to form (form is valid, but model is not)
     sample.errors.each do |key, error|
       errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
     end

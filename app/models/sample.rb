@@ -15,8 +15,6 @@ class Sample < ApplicationRecord
   has_many :test_results, through: :sample_identifiers
   has_many :sample_transfers, dependent: :destroy
 
-  validates_presence_of :date_produced
-
   has_many :assay_attachments, dependent: :destroy
   accepts_nested_attributes_for :assay_attachments, allow_destroy: true
   validates_associated :assay_attachments, message: "are invalid"
