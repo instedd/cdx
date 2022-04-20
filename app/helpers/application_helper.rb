@@ -212,11 +212,6 @@ module ApplicationHelper
   end
 
   def field_errors(record, attr_name)
-    #content_tag :div, :class => "error-field" do
-    #  obj.errors.full_messages_for(field).each do |msg|
-    #    concat( content_tag(:span, content_tag(:div,"",class:["icon-error","icon-red"]) + msg) )
-    #  end
-    #end
     messages = record.errors.full_messages_for(attr_name)
     return if messages.empty?
   
