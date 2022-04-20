@@ -4,6 +4,7 @@
 }
 
 form {
+  // Deprecated: to be generalized
   .error {
     font-size: 12px;
     font-style: italic;
@@ -11,7 +12,6 @@ form {
     margin-top: 5px;
     visibility: hidden;
     display: flex;
-    flex-direction: column;
     
     li {
       display: inline-flex;
