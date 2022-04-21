@@ -23,7 +23,7 @@ class TransferPackage < ApplicationRecord
           where(receiver_institution_id: institution.id)
         }
 
-  def self.sending_to(sender, receiver, attributes = nil)
+  def self.sending(sender, receiver, attributes = nil)
     create!(attributes) do |package|
       package.sender_institution = sender
       package.receiver_institution = receiver
