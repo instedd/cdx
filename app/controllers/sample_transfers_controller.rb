@@ -25,11 +25,14 @@ class SampleTransfersController < ApplicationController
       flash[:error] = "Destination Institution does not exists."
       redirect_to samples_path
     else
-      if create_transfer(new_owner, params["samples"])
-        flash[:notice] =  "All samples have been transferred successfully."
-        redirect_to samples_path
-      else
+      begin
+        create_transfer(new_owner, params["samples"])
+      rescue => exception
         flash[:error] = "Samples transfer failed."
+
+        raise exception
+      else
+        flash[:notice] = "All samples have been transferred successfully."
         redirect_to samples_path
       end
     end
@@ -80,12 +83,6 @@ class SampleTransfersController < ApplicationController
         package.add!(sample)
       end
     end
-
-    true
-  rescue => exception
-    Raven.capture_exception(exception)
-
-    false
   end
 
   def transfer_package_params
