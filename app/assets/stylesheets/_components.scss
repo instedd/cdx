@@ -150,6 +150,14 @@
       height: 40px;
     }
 
+    #institution-invitation-modal {
+      input, input:focus {
+        color: black;
+        padding-left: 0px;
+        height: 30px;
+      }
+    }
+
     > div {
       flex: 1;
       position: absolute;
