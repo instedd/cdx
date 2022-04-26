@@ -6,7 +6,7 @@ class SampleTransfersController < ApplicationController
   def index
     @sample_transfers = SampleTransfer
       .within(@navigation_context.institution)
-      .includes(:receiver_institution, :sender_institution, sample: [:sample_identifiers])
+      .includes(transfer_package: [:receiver_institution, :sender_institution], sample: [:sample_identifiers])
       .ordered_by_creation
 
     @sample_transfers = @sample_transfers.joins(sample: :sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
@@ -15,7 +15,7 @@ class SampleTransfersController < ApplicationController
     @sample_transfers = @sample_transfers.joins(:sample).where("samples.specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
 
     @sample_transfers = perform_pagination(@sample_transfers)
-      .preload(:transfer_package, :sender_institution, :receiver_institution, sample: %i[batch qc_info])
+      .preload(transfer_package: %i[sender_institution receiver_institution], sample: %i[batch qc_info])
       .map { |transfer| SampleTransferPresenter.new(transfer, @navigation_context) }
   end
 
@@ -71,7 +71,7 @@ class SampleTransfersController < ApplicationController
     samples = Sample.find_all_by_any_uuid(sample_uuids)
 
     Sample.transaction do
-      package = TransferPackage.sending_to(new_owner, transfer_package_params)
+      package = TransferPackage.sending(samples.first.institution, new_owner, transfer_package_params)
 
       samples.each do |sample|
         raise "User not authorized for transferring Samples " unless authorize_resource?(sample, UPDATE_SAMPLE)

@@ -1,21 +1,38 @@
 class TransferPackage < ApplicationRecord
+  belongs_to :sender_institution, class_name: "Institution"
   belongs_to :receiver_institution, class_name: "Institution"
   has_many :sample_transfers
+
+  # TODO: remove these after upgrading to Rails 5.0 (belongs_to associations are required by default):
+  validates_presence_of :sender_institution
+  validates_presence_of :receiver_institution
 
   after_initialize do
     self.uuid ||= SecureRandom.uuid
   end
 
-  def self.sending_to(institution, attributes = nil)
+  scope :within, ->(institution) {
+          if Rails::VERSION::MAJOR >= 5
+            where(sender_institution_id: institution.id).or(with_receiver(institution))
+          else
+            where(arel_table[:sender_institution_id].eq(institution.id).or(arel_table[:receiver_institution_id].eq(institution.id)))
+          end
+        }
+
+  scope :with_receiver, ->(institution) {
+          where(receiver_institution_id: institution.id)
+        }
+
+  def self.sending(sender, receiver, attributes = nil)
     create!(attributes) do |package|
-      package.receiver_institution = institution
+      package.sender_institution = sender
+      package.receiver_institution = receiver
     end
   end
 
   def add!(sample)
     transfer = sample_transfers.create!(
       sample: sample,
-      receiver_institution: receiver_institution,
     )
 
     if sample.batch

@@ -164,13 +164,14 @@ end
 TransferPackage.blueprint do
   uuid { SecureRandom.uuid }
   receiver_institution { Institution.make! }
+  receiver_institution { Institution.make! }
+  sender_institution { Institution.make! }
   recipient { Faker::Name.name }
 end
 
 SampleTransfer.blueprint do
   sample { Sample.make!(:filled) }
-  receiver_institution { Institution.make! }
-  sender_institution { object.sample.institution || Institution.make! }
+  transfer_package { TransferPackage.make(sender_institution: object.sample.institution || Institution.make!) }
 end
 
 SampleTransfer.blueprint(:confirmed) do
