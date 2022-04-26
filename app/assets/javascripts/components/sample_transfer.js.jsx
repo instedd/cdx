@@ -134,7 +134,8 @@ var SampleTransferModal = React.createClass({
 
   validateForm: function(e) {
     if (this.state.institutionId == null){
-      $(".institution-select").addClass("input-required");
+      $(".institution-select").addClass("field_with_errors");
+      $("#institution_id_error").removeClass("hidden-error");
       e.preventDefault();
     }
   },
@@ -147,7 +148,7 @@ var SampleTransferModal = React.createClass({
             <div className="col pe-4"><label>Institution</label></div>
             <div className="col">
               <CdxSelect className="institution-select" name="institution_id" items={this.props.institutions} value={this.state.institutionId} onChange={this.changeInstitution} />
-              <span className="error"><div className="icon-error icon-red" /> Institution can't be blank</span>
+              <ul className="errors-field hidden-error" id="institution_id_error"><li><i className="icon-error icon-red" /> Institution can't be blank</li></ul>
             </div>
           </div>
           <div className="row">

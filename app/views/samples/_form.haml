@@ -1,7 +1,4 @@
 = form_for(@sample_form) do |f|
-
-  = validation_errors @sample_form
-
   .row
     .col
       - unless f.object.qc_info.nil?
@@ -30,6 +27,7 @@
           = f.label :date_produced, "production date"
         .col
           = f.text_field :date_produced, placeholder: @view_helper[:date_produced_placeholder], readonly: !@can_update
+          = field_errors @sample_form, :date_produced
 
       .row.form-field
         .col.pe-4

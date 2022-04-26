@@ -1,16 +1,10 @@
 = form_for @role do |f|
-  - if @role.errors.any?
-    #error_explanation
-      %p= "#{pluralize(@role.errors.count, "error")} prohibited this role from being saved:"
-      %ul
-        - @role.errors.full_messages.each do |msg|
-          %li= msg
-
   .row.form-field
     .col.pe-2
       = f.label :name
     .col
       = f.text_field :name
+      = field_errors @role, :name
 
   - if @accessible_institutions != 1
     .row.form-field
@@ -42,6 +36,7 @@
       %h1 Policies
       %p.text-small.muted
         %i Policies grant users permisions over specific resources
+      = field_errors @role, :policy
   = react_component 'PolicyDefinition', definition: @role.definition, actions: actions_per_resource_type, context: params['context'], resources: @policy_definition_resources, resourceTypes: resource_types
   .row.button-actions
     .col

@@ -479,22 +479,31 @@ label.on {
   }
 }
 
-.input-required {
-  color: #EB2122;
-  border-bottom-color: #EB2122 !important;
-}
-
 .centered {
   display: flex;
   align-items: center;
 }
 
-div + .error,
-input + .error {
-  visibility: hidden;
+.errors-field {
+  font-size: 12px;
+  font-style: italic;
+  color: $red;
+  margin-top: 5px;
+  display: flex;
+  
+  li {
+    display: inline-flex;
+    align-items: center;
+    line-height: normal;
+  }
 }
 
-div.input-required + .error,
-input.input-required + .error {
-  visibility: visible;
+div.field_with_errors,
+.field_with_errors > input {
+  color: #EB2122;
+  border-bottom-color: #EB2122 !important;
+}
+
+.hidden-error {
+  visibility: hidden;
 }

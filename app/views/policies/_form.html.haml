@@ -1,14 +1,8 @@
 = form_for @policy do |f|
-  - if @policy.errors.any?
-    #error_explanation
-      %p= "#{pluralize(@policy.errors.count, "error")} prohibited this policy from being saved:"
-      %ul
-        - @policy.errors.full_messages.each do |msg|
-          %li= msg
-
   .row.form-field
     .col.pe-2
       = f.label :name
+      = field_errors @policy, :name
     .col
       = f.text_field :name
   .row.form-field
@@ -23,6 +17,7 @@
     .col.pe-3
       .value
         = f.text_area :definition, :rows => 5, :class => 'input-block'
+        = field_errors @policy, :definition
   .row.button-actions
     .col
       = f.submit 'Save', :class => 'btn-primary'

@@ -1,6 +1,4 @@
 = form_for(@device) do |f|
-  = validation_errors @device
-
   .row.form-field
     .col.pe-2
       = f.label :institution
@@ -13,6 +11,7 @@
     .col
       = cdx_select form: f, name: :device_model_id, class: 'input-x-large' do |select|
         - select.items(@device_models, :id, :full_name)
+      = field_errors @device, :device_model
 
   - if @allow_to_pick_site
     .row.form-field
@@ -35,11 +34,13 @@
       = f.label :name
     .col
       = f.text_field :name
+      = field_errors @device, :name
   .row.form-field
     .col.pe-2
       = f.label :serial_number
     .col
       = f.text_field :serial_number
+      = field_errors @device, :serial_number
   .row.form-field
     .col.pe-2
       = f.label :time_zone

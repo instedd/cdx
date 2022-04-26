@@ -1,6 +1,4 @@
 = form_for(@site) do |f|
-  = validation_errors @site
-
   .row.form-field
     .col.pe-2
       = f.label :institution
@@ -12,6 +10,7 @@
       = f.label :name
     .col
       = f.text_field :name, :class => 'input-large'
+      = field_errors @site, :name
   - if @site.new_record? || @can_move
     .row.form-field
       .col.pe-2

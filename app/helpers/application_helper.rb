@@ -215,7 +215,7 @@ module ApplicationHelper
     messages = record.errors.full_messages_for(attr_name)
     return if messages.empty?
   
-    content_tag :ul, class: "error" do
+    content_tag :ul, class: "errors-field" do
       messages.each do |message|
         concat (content_tag :li do
           concat content_tag :i, "", class: "icon-error icon-red"
@@ -224,5 +224,4 @@ module ApplicationHelper
       end
     end
   end
-
 end
