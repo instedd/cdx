@@ -51,16 +51,17 @@ class PatientForm
 
     # validate forms. stop if invalid
     form_valid = self.valid?
-    return false unless form_valid
+    patient_valid = patient.valid?
+    patient.errors.each do |key, error|
+      errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
+    end
+    return false unless form_valid & patient_valid
 
     # validate/save patient. all done if succeeded
     patient_valid = patient.save
     return true if patient_valid
 
     # copy validations from patient to form (form is valid, but patient is not)
-    patient.errors.each do |key, error|
-      errors.add(key, error) if self.class.shared_attributes.include?(key)
-    end
     return false
   end
 

@@ -35,9 +35,7 @@ class SampleForm
   delegate :uuid, :assay_attachments, :notes, :qc_info, to: :sample
 
   validates_presence_of :date_produced
-  validates_each :assay_attachments, :notes do |record, attr, value|
-    record.errors.add(attr, "are invalid") unless value.all?(&:valid?) && !record.errors.include?(attr)
-  end
+
   def self.for(sample)
     new.tap do |form|
       form.sample = sample
@@ -87,17 +85,17 @@ class SampleForm
     # we need to set a Time in sample instead of self.date_produced :: String
     sample.date_produced = @date_produced
 
-    # validate forms. stop if invalid
     form_valid = self.valid?
-    return false unless form_valid
-    
-    # validate/save. All done if succeeded
-    is_valid = sample.save
-    return true if is_valid
-
+    sample_valid = sample.valid?
+    # copy validations from patient to form (form is valid, but patient is not)
     sample.errors.each do |key, error|
       errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
     end
+    return false unless form_valid && sample_valid 
+
+    # validate/save. All done if succeeded
+    is_valid = sample.save
+    return true if is_valid
 
     return false
   end
