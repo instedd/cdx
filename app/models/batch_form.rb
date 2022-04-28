@@ -98,17 +98,14 @@ class BatchForm
 
     form_valid = self.valid?
     batch_valid = batch.valid?
-    # copy validations from model to form (form is valid, but model is not)
+    # copy validations from model to form to display errors if present 
     batch.errors.each do |key, error|
-      errors.add(key, error) if self.class.shared_attributes.include?(key)  && !errors.include?(key)
+      errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
     end
     return false unless form_valid && batch_valid 
 
     # validate/save. All done if succeeded
-    is_valid = batch.save
-    return true if is_valid
-
-    return false
+    batch.save
   end
 
   def creating_batch?

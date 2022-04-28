@@ -27,9 +27,9 @@ class Batch < ApplicationRecord
   validates_presence_of :volume
   validates_presence_of :lab_technician
   validates_numericality_of :volume, greater_than: 0, message: "value must be greater than 0"
-  validates_presence_of :batch_number
-  validates_presence_of :isolate_name
-  validates_uniqueness_of :batch_number, scope: :isolate_name, message: "and Isolate Name combination should be unique"
+
+  validate :isolate_name_batch_number_combination_create, on: :create
+  validate :isolate_name_batch_number_combination_update, on: :update
 
   validates_associated :samples, message: "are invalid"
 
@@ -41,4 +41,40 @@ class Batch < ApplicationRecord
     self.qc_sample.present?
   end
 
+  private
+
+  def isolate_name_batch_number_combination_create
+    validate_isolate_name_batch_number_combination {
+      [ "#{query} AND id IS NOT NULL" ] + query_params
+    }
+  end
+
+  def isolate_name_batch_number_combination_update
+    validate_isolate_name_batch_number_combination {
+      [ "#{query} AND id != ?" ] + query_params + [ id ]
+    }
+  end
+
+  def query
+    "LOWER(isolate_name) = ? AND LOWER(batch_number) = ?"
+  end
+
+  def query_params
+    [ isolate_name.downcase, batch_number.downcase ]
+  end
+
+  def validate_isolate_name_batch_number_combination
+    return unless (present?(:isolate_name) && present?(:batch_number))
+
+    combination_exists = Batch.where(yield).exists?
+    if combination_exists
+      errors.add(:isolate_name, "and Batch Number combination should be unique")
+    end
+  end
+
+  def present?(attr_name)
+    valid = self[attr_name].present?
+    errors.add(attr_name, "can't be blank") unless valid
+    valid
+  end
 end

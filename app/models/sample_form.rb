@@ -87,17 +87,13 @@ class SampleForm
 
     form_valid = self.valid?
     sample_valid = sample.valid?
-    # copy validations from patient to form (form is valid, but patient is not)
+    # copy validations from model to form to display errors if present 
     sample.errors.each do |key, error|
       errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
     end
     return false unless form_valid && sample_valid 
 
-    # validate/save. All done if succeeded
-    is_valid = sample.save
-    return true if is_valid
-
-    return false
+    sample.save
   end
 
 
