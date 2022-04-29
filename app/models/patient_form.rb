@@ -49,19 +49,16 @@ class PatientForm
     self.class.assign_attributes(patient, self)
     patient.dob = @dob  # we need to set a Time in patient insead of self.dob :: String
 
-    # validate forms. stop if invalid
     form_valid = self.valid?
-    return false unless form_valid
-
-    # validate/save patient. all done if succeeded
-    patient_valid = patient.save
-    return true if patient_valid
-
-    # copy validations from patient to form (form is valid, but patient is not)
+    patient_valid = patient.valid?
+    # copy validations from model to form to display errors if present 
     patient.errors.each do |key, error|
-      errors.add(key, error) if self.class.shared_attributes.include?(key)
+      errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
     end
-    return false
+    return false unless form_valid & patient_valid
+
+    # validated, then save
+    patient.save
   end
 
   validates_presence_of :name, :entity_id
