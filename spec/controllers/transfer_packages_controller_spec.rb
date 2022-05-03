@@ -160,7 +160,7 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect do
         post :create, params: {
                         transfer_package: {
-                          receiver_institution: other_institution.id,
+                          receiver_institution_id: other_institution.id,
                           recipient: "Mr. X",
                           includes_qc_info: true,
                           sample_transfers_attributes: {
@@ -189,7 +189,7 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect do
         post :create, params: {
                         transfer_package: {
-                          receiver_institution: other_institution.id,
+                          receiver_institution_id: other_institution.id,
                           recipient: "Mr. X",
                           includes_qc_info: true,
                           sample_transfers_attributes: {
@@ -221,7 +221,7 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect do
         post :create, params: {
                         transfer_package: {
-                          receiver_institution: other_institution.id,
+                          receiver_institution_id: other_institution.id,
                           sample_transfers_attributes: {
                             0 => {
                               sample_uuid: sample.uuid,
@@ -236,7 +236,7 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect do
         post :create, params: {
                         transfer_package: {
-                          receiver_institution: other_institution.id,
+                          receiver_institution_id: other_institution.id,
                         },
                       }
       end.not_to change { TransferPackage.count }
@@ -268,7 +268,7 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect do
         post :create, params: {
                         transfer_package: {
-                          receiver_institution: other_institution.id,
+                          receiver_institution_id: other_institution.id,
                           sample_transfers_attributes: {
                             0 => {
                               sample_uuid: sample.uuid,
@@ -289,7 +289,7 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect do
         post :create, params: {
                         transfer_package: {
-                          receiver_institution: other_institution.id,
+                          receiver_institution_id: other_institution.id,
                           sample_transfers_attributes: {
                             0 => {
                               sample_uuid: sample.uuid,

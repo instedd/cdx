@@ -16,9 +16,6 @@ class TransferPackagesController < ApplicationController
     params.merge!({
       sender_institution: @navigation_context.institution,
     })
-    if id = params.delete(:receiver_institution).presence
-      params[:receiver_institution] = Institution.find(id)
-    end
 
     samples = Sample
       .within(@navigation_context.institution)
@@ -71,7 +68,7 @@ class TransferPackagesController < ApplicationController
 
   def transfer_package_params
     params.require(:transfer_package).permit(
-      :receiver_institution,
+      :receiver_institution_id,
       :recipient,
       :includes_qc_info,
     ).tap do |whitelisted|
