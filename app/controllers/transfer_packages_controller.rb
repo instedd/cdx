@@ -12,12 +12,8 @@ class TransferPackagesController < ApplicationController
   end
 
   def create
-    params = transfer_package_params
-    params.merge!({
-      sender_institution: @navigation_context.institution,
-    })
-
-    @transfer_package = TransferPackage.new(params)
+    @transfer_package = TransferPackage.new(transfer_package_params)
+    @transfer_package.sender_institution = @navigation_context.institution
 
     if @transfer_package.sample_transfers.empty?
       @transfer_package.errors.add :sample_transfers, "Must not be empty"
