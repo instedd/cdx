@@ -1,4 +1,4 @@
-version: '2.0'
+version: '2.2'
 
 services:
   base: &base
@@ -34,6 +34,7 @@ services:
     working_dir: /src
     volumes:
       - .:/src # we mount the source to be able to attach fixture files
+    scale: 2
 
   db:
     image: mysql:5.7
