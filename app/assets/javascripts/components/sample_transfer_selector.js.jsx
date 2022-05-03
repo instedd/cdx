@@ -29,10 +29,11 @@ var SampleTransferSelector = React.createClass({
         selector.removeSample(sample);
       }
 
-      let name = `transfer_package[sample_transfers_attributes][${i}][sample_uuid]`;
+      let id = Date.now();
+      let name = `transfer_package[sample_transfers_attributes][${id}][sample_id]`;
       return <div className="sample-transfer-preview">
         <div dangerouslySetInnerHTML={{ __html: sample.preview }}></div>
-        <input type="hidden" name={name} value={sample.uuid} />
+        <input type="hidden" name={name} value={sample.id} />
         <a href="#" className="sample-transfer-preview__remove" title="Remove sample" onClick={handleClick}>
           <i className="icon-close" />
         </a>

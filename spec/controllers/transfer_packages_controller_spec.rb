@@ -164,11 +164,11 @@ RSpec.describe TransferPackagesController, type: :controller do
                           recipient: "Mr. X",
                           includes_qc_info: true,
                           sample_transfers_attributes: {
-                            0 => {
-                              sample_uuid: sample1.uuid,
+                            "0" => {
+                              sample_id: sample1.id,
                             },
-                            1 => {
-                              sample_uuid: sample2.uuid,
+                            "1" => {
+                              sample_id: sample2.id,
                             },
                           },
                         },
@@ -193,14 +193,14 @@ RSpec.describe TransferPackagesController, type: :controller do
                           recipient: "Mr. X",
                           includes_qc_info: true,
                           sample_transfers_attributes: {
-                            0 => {
-                              sample_uuid: sample.uuid,
+                            "0" => {
+                              sample_id: sample.id,
                             },
-                            1 => {
-                              sample_uuid: nil,
+                            "1" => {
+                              sample_id: nil,
                             },
-                            2 => {
-                              sample_uuid: "",
+                            "2" => {
+                              sample_id: "",
                             },
                           },
                         },
@@ -223,13 +223,13 @@ RSpec.describe TransferPackagesController, type: :controller do
                         transfer_package: {
                           receiver_institution_id: other_institution.id,
                           sample_transfers_attributes: {
-                            0 => {
-                              sample_uuid: sample.uuid,
+                            "0" => {
+                              sample_id: sample.id,
                             },
                           },
                         },
                       }
-      end.to raise_error(ActiveRecord::RecordNotFound)
+      end.to raise_error("User not authorized for transferring sample #{sample.uuid}")
     end
 
     it "shows form again when empty samples" do
@@ -251,8 +251,8 @@ RSpec.describe TransferPackagesController, type: :controller do
         post :create, params: {
                         transfer_package: {
                           sample_transfers_attributes: {
-                            0 => {
-                              sample_uuid: sample.uuid,
+                            "0" => {
+                              sample_id: sample.id,
                             },
                           },
                         },
@@ -270,8 +270,8 @@ RSpec.describe TransferPackagesController, type: :controller do
                         transfer_package: {
                           receiver_institution_id: other_institution.id,
                           sample_transfers_attributes: {
-                            0 => {
-                              sample_uuid: sample.uuid,
+                            "0" => {
+                              sample_id: sample.id,
                             },
                           },
                         },
@@ -291,8 +291,8 @@ RSpec.describe TransferPackagesController, type: :controller do
                         transfer_package: {
                           receiver_institution_id: other_institution.id,
                           sample_transfers_attributes: {
-                            0 => {
-                              sample_uuid: sample.uuid,
+                            "0" => {
+                              sample_id: sample.id,
                             },
                           },
                         },

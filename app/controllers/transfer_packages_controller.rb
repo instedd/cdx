@@ -17,26 +17,15 @@ class TransferPackagesController < ApplicationController
       sender_institution: @navigation_context.institution,
     })
 
-    samples = Sample
-      .within(@navigation_context.institution)
-      .find_all_by_any_uuid(params[:sample_transfers_attributes].values.map { |sample_transfer| sample_transfer[:sample_uuid] })
-
-    params[:sample_transfers_attributes].transform_values! do |sample_transfer_attributes|
-      uuid = sample_transfer_attributes[:sample_uuid]
-      sample = samples.find { |st| uuid == st.uuid }
-      raise ActiveRecord::RecordNotFound unless sample
-      raise "User not authorized for transferring sample #{sample.uuid}" unless authorize_resource?(sample, UPDATE_SAMPLE)
-
-      ActionController::Parameters.new(sample: sample).permit!
-    end
-
-    # FIXME: permit! shouldn't be necessary here
-    params.permit!
-
     @transfer_package = TransferPackage.new(params)
 
     if @transfer_package.sample_transfers.empty?
       @transfer_package.errors.add :sample_transfers, "Must not be empty"
+    end
+
+    @transfer_package.sample_transfers.each do |sample_transfer|
+      sample = sample_transfer.sample
+      raise "User not authorized for transferring sample #{sample.uuid}" unless authorize_resource?(sample, UPDATE_SAMPLE)
     end
 
     if @transfer_package.errors.empty? && @transfer_package.save
@@ -71,23 +60,8 @@ class TransferPackagesController < ApplicationController
       :receiver_institution_id,
       :recipient,
       :includes_qc_info,
-    ).tap do |whitelisted|
-      if sample_transfers_attributes = params[:transfer_package][:sample_transfers_attributes]
-        sample_transfers_attributes.reject! { |_, attributes| attributes[:sample_uuid].blank? }
-        sample_transfers_attributes.transform_values! { |attributes|
-          ActionController::Parameters.new(attributes).permit(
-            :sample_uuid
-          )
-        }
-        if Rails::VERSION::MAJOR >= 5
-          whitelisted[:sample_transfers_attributes] = sample_transfers_attributes.permit!
-        else
-          whitelisted[:sample_transfers_attributes] = sample_transfers_attributes
-        end
-      else
-        whitelisted[:sample_transfers_attributes] = {}
-      end
-    end
+      sample_transfers_attributes: [:sample_id, :_destroy],
+    )
   end
 
   def available_institutions
@@ -97,6 +71,7 @@ class TransferPackagesController < ApplicationController
   def samples_data(samples)
     samples.map { |sample|
       data = {
+        id: sample.id,
         uuid: sample.uuid,
         hasQcReference: sample.has_qc_reference?,
         preview: render_to_string(partial: "samples/preview", locals: { sample: sample }),
