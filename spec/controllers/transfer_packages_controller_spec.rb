@@ -276,7 +276,7 @@ RSpec.describe TransferPackagesController, type: :controller do
                           },
                         },
                       }
-      end.to raise_error("Can't transfer QC sample")
+      end.not_to change{ TransferPackage.count }
     end
 
     it "rejects unauthorized transfer" do

@@ -5,6 +5,14 @@ class SampleTransfer < ApplicationRecord
   # TODO: remove these after upgrading to Rails 5.0 (belongs_to associations are required by default):
   validates_presence_of :sample
 
+  validate :specimen_role_validation
+
+  def specimen_role_validation
+    if sample.try &:is_quality_control?
+      errors.add(:sample, "Can't transfer QC sample")
+    end
+  end
+
   scope :within, ->(institution) {
           joins(:transfer_package).merge(TransferPackage.within(institution))
         }

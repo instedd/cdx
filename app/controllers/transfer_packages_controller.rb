@@ -28,7 +28,6 @@ class TransferPackagesController < ApplicationController
       uuid = sample_transfer_attributes[:sample_uuid]
       sample = samples.find { |st| uuid == st.uuid }
       raise ActiveRecord::RecordNotFound unless sample
-      raise "Can't transfer QC sample" if sample.is_quality_control?
       raise "User not authorized for transferring sample #{sample.uuid}" unless authorize_resource?(sample, UPDATE_SAMPLE)
 
       ActionController::Parameters.new(sample: sample).permit!
