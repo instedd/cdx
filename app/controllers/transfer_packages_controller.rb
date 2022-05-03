@@ -2,13 +2,13 @@ class TransferPackagesController < ApplicationController
   include Concerns::ViewHelper
 
   helper_method :samples_data
+  helper_method :available_institutions
 
   def new
     @view_helper = view_helper({ save_back_path: true })
     @can_update = true
 
     @transfer_package = TransferPackage.new(sender_institution: @navigation_context.institution)
-    @available_institutions = available_institutions
   end
 
   def create
@@ -45,8 +45,6 @@ class TransferPackagesController < ApplicationController
     if @transfer_package.errors.empty? && @transfer_package.save
       redirect_to sample_transfers_path, notice: "Samples were succesfully sent"
     else
-      @available_institutions = available_institutions
-
       @view_helper = view_helper
       @can_update = true
       render action: "new"
