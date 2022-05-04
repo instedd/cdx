@@ -1,7 +1,7 @@
 Given(/^User foo@example\.com has not changed password for (\d+) months$/) do |changed|
   @user = User.make!(
     password: 'abc123abc',
-    password_changed_at: changed.to_i.months.ago
+    password_changed_at: (changed.to_i.months + 1.days).ago,
   )
   Institution.make! user: @user
 end
@@ -12,13 +12,14 @@ end
 
 Given(/^the previous passwords$/) do |table|
   @prev_passwords = table.raw.flatten[1..-1].unshift(@user.password)
+  password_changed_at = @user.password_changed_at
   table.hashes.each do |hash|
     @user.password = hash['password']
     @user.password_confirmation = hash['password']
     @user.save!
   end
-  @user.password_changed_at = 3.months.ago
-  @user.save!
+  # reset
+  @user.update!(password_changed_at: password_changed_at)
 end
 
 When(/^they try to use one of previous (\d+) passwords$/) do |arg1|
