@@ -10,7 +10,7 @@ if s3_bucket = ENV['PAPERCLIP_S3_BUCKET'].presence
     s3_protocol: 'https',
   }
   paperclip_defaults[:s3_host_name] = ENV['PAPERCLIP_S3_HOST_NAME'].presence
-  Rails.application.config.paperclip_defaults = paperclip_defaults
+  Paperclip::Attachment.default_options.update(paperclip_defaults)
 end
 
 Paperclip.options[:content_type_mappings] = {
