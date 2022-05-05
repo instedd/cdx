@@ -12,6 +12,71 @@ RSpec.describe TransferPackagesController, type: :controller do
 
   let(:default_params) { { context: institution.uuid } }
 
+  describe "GET #index" do
+    before(:each) { sign_in user }
+
+    it "lists transfers" do
+      transfer_in = TransferPackage.make!(sender_institution: institution, receiver_institution: other_institution)
+      transfer_out = TransferPackage.make!(sender_institution: other_institution, receiver_institution: institution)
+      transfer_unrelated = TransferPackage.make!
+
+      get :index
+      expect(response).to have_http_status :ok
+
+      expect(response.body).to include(transfer_in.uuid)
+      expect(response.body).to include(transfer_out.uuid)
+      expect(response.body).not_to include(transfer_unrelated.uuid)
+    end
+
+    describe "filters" do
+      let!(:subject) { TransferPackage.make!(sender_institution: institution) }
+      let!(:other) { TransferPackage.make!(receiver_institution: institution) }
+
+      it "by transfer id" do
+        get :index, params: { search_uuid: subject.uuid[0..8] }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to eq [subject]
+      end
+
+      it "by box id" do
+        get :index, params: { search_uuid: subject.boxes.first.uuid[0..8] }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to eq [subject]
+      end
+
+      it "by sample id" do
+        get :index, params: { search_uuid: subject.samples.first.uuid[0..8] }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to eq [subject]
+      end
+
+      it "by institution" do
+        get :index, params: { institution: subject.receiver_institution.name }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to eq [subject]
+
+        get :index, params: { institution: other.sender_institution.name }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to eq [other]
+      end
+
+      it "by status" do
+        subject.update(confirmed_at: Time.now)
+        get :index, params: { status: "confirmed" }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to eq [subject]
+
+        get :index, params: { status: "in transit" }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to eq [other]
+      end
+
+      it "combined" do
+        get :index, params: { search_uuid: subject.uuid[0..8], institution: subject.receiver_institution.name }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to eq [subject]
+
+        get :index, params: { search_uuid: subject.uuid[0..8], institution: subject.receiver_institution.name }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to eq [subject]
+
+        get :index, params: { search_uuid: subject.uuid[0..8], institution: other_institution.name }
+        expect(assigns(:transfer_packages).map(&:transfer_package)).to be_empty
+      end
+    end
+  end
+
   describe "GET #find_box" do
     let!(:sample) do
       Sample.make! :filled, institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-1111-a0c8-ac1b-58bed3633e88")]

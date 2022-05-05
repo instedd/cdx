@@ -29,6 +29,8 @@
                 = link_to "Batches", batches_path
               %li{:class => params[:controller] == "boxes" && "active"}
                 = link_to "Boxes", boxes_path
+              %li{:class => params[:controller] == "transfer_packages" && "active"}
+                = link_to "Transfers", transfer_packages_path
         - if has_access_to_test_results_index?
           %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
             = link_to "Tests", test_results_path

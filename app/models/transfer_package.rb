@@ -32,6 +32,14 @@ class TransferPackage < ApplicationRecord
           where(receiver_institution_id: institution.id)
         }
 
+  scope :search_uuid, ->(uuid) {
+    if uuid.present?
+      joins(box_transfers: {box: {samples: :sample_identifiers}})
+        .where("transfer_packages.uuid LIKE concat('%', ?, '%') OR boxes.uuid LIKE concat('%', ?, '%') OR sample_identifiers.uuid LIKE concat('%', ?, '%')", uuid, uuid, uuid)
+        .distinct
+    end
+  }
+
   before_create do
     box_transfers.each do |box_transfer|
       box = box_transfer.box
