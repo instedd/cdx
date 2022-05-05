@@ -170,6 +170,10 @@ TransferPackage.blueprint do
   recipient { Faker::Name.name }
 end
 
+TransferPackage.blueprint(:confirmed) do
+  confirmed_at { Faker::Time.backward }
+end
+
 SampleTransfer.blueprint do
   sample { Sample.make!(:filled) }
   transfer_package { TransferPackage.make(sender_institution: object.sample.institution || Institution.make!) }
