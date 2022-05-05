@@ -10,11 +10,11 @@ class NavigationContext
     @include_subsites = !context.end_with?("-!")
     uuid = context.end_with?("-*") || context.end_with?("-!") ? context[0..-3] : context
 
-    @institution = Institution.where(uuid: uuid).first
+    @institution = Institution.where(uuid: uuid).take
     @site = nil
 
     unless @institution
-      @site = Site.where(uuid: uuid).first
+      @site = Site.where(uuid: uuid).take
       @institution = @site.try :institution
     end
   end

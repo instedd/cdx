@@ -5,8 +5,8 @@ module SiteContained
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :institution
-    belongs_to :site, -> { with_deleted }
+    belongs_to :institution, required: true
+    belongs_to :site, -> { with_deleted }, required: false
 
     validate :same_institution_of_site
     before_save :set_site_prefix

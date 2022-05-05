@@ -1,0 +1,20 @@
+= form_for(@box) do |f|
+
+  = validation_errors @box if @can_update
+
+  .row
+    .col
+      .row.form-field
+        .col.pe-4
+          = f.label :uuid
+        .col
+          .value= @box.uuid
+
+  - if @can_update
+    .row.button-actions
+      .col
+        = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
+        = link_to 'Cancel', boxes_path, class: 'btn-link'
+
+        - if @can_delete
+          = confirm_deletion_button @box, 'box'

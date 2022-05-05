@@ -1,0 +1,20 @@
+.row
+  .col
+    - if @boxes.empty?
+      = empty_data icon: 'icon-outline-test xx-large' do |c|
+        - c.body do
+          %h1 There are no boxes
+          %p Every box will have a UUID and a barcode
+    - else
+      = cdx_table title: pluralize(@total, "box") do |t|
+        - t.columns do
+          %col{:width => "100%"}
+        - t.thead do
+          %tr
+            %th Box Id
+        - t.tbody do
+          - @boxes.each do |box|
+            %tr{data: {href: edit_box_path(box)}}
+              %td= short_uuid_with_title box.uuid
+      .pagination
+        = render 'shared/pagination'

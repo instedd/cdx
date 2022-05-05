@@ -13,6 +13,7 @@
             "institution:createPatient",
             "institution:createSample",
             "institution:createBatch",
+            "institution:createBox",
             "institution:createSite",
             "institution:createRole",
             "institution:readUsers"
@@ -36,6 +37,11 @@
         },
         {
           "resource": "batch?institution=<%= institution_id %>",
+          "action": "*",
+          "delegable": true
+        },
+        {
+          "resource": "box?institution=<%= institution_id %>",
           "action": "*",
           "delegable": true
         },
@@ -90,6 +96,10 @@
         {
           "resource": "batch?institution=<%= institution_id %>",
           "action": "batch:read"
+        },
+        {
+          "resource": "box?institution=<%= institution_id %>",
+          "action": "box:read"
         },
         {
           "resource": "site?institution=<%= institution_id %>",

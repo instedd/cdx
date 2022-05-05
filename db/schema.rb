@@ -150,12 +150,31 @@ ActiveRecord::Schema.define(version: 20220513214928) do
     t.integer  "site_id",        limit: 4
     t.string   "site_prefix",    limit: 255
     t.datetime "date_produced"
+    t.integer  "box_id",         limit: 4
   end
 
+  add_index "batches", ["box_id"], name: "index_batches_on_box_id", using: :btree
   add_index "batches", ["date_produced"], name: "index_batches_on_date_produced", using: :btree
   add_index "batches", ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree
   add_index "batches", ["institution_id"], name: "index_batches_on_institution_id", using: :btree
   add_index "batches", ["site_id"], name: "index_batches_on_site_id", using: :btree
+
+  create_table "boxes", force: :cascade do |t|
+    t.string   "uuid",           limit: 36,    null: false
+    t.integer  "institution_id", limit: 4,     null: false
+    t.integer  "site_id",        limit: 4
+    t.string   "site_prefix",    limit: 255
+    t.text     "core_fields",    limit: 65535
+    t.text     "custom_fields",  limit: 65535
+    t.text     "sensitive_data", limit: 65535
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "boxes", ["institution_id"], name: "index_boxes_on_institution_id", using: :btree
+  add_index "boxes", ["site_id"], name: "index_boxes_on_site_id", using: :btree
+  add_index "boxes", ["site_prefix"], name: "index_boxes_on_site_prefix", using: :btree
+  add_index "boxes", ["uuid"], name: "index_boxes_on_uuid", using: :btree
 
   create_table "computed_policies", force: :cascade do |t|
     t.integer "user_id",                  limit: 4
@@ -566,9 +585,11 @@ ActiveRecord::Schema.define(version: 20220513214928) do
     t.string   "specimen_role",    limit: 255
     t.string   "old_batch_number", limit: 255
     t.integer  "qc_info_id",       limit: 4
+    t.integer  "box_id",           limit: 4
   end
 
   add_index "samples", ["batch_id"], name: "index_samples_on_batch_id", using: :btree
+  add_index "samples", ["box_id"], name: "index_samples_on_box_id", using: :btree
   add_index "samples", ["deleted_at"], name: "index_samples_on_deleted_at", using: :btree
   add_index "samples", ["institution_id"], name: "index_samples_on_institution_id_and_entity_id", using: :btree
   add_index "samples", ["isolate_name"], name: "index_samples_on_isolate_name", using: :btree
