@@ -11,4 +11,5 @@
   .sample__isolate_name
     = sample.isolate_name
   .sample__date_produced
-    = time_tag sample.date_produced, I18n.l(sample.date_produced, format: I18n.t("date.input_format.pattern"))
+    - if sample.date_produced
+      = time_tag sample.date_produced, I18n.l(sample.date_produced, format: I18n.t("date.input_format.pattern"))
