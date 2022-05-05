@@ -32,7 +32,7 @@ class BatchForm
   delegate :id, :new_record?, :persisted?, to: :batch
 
   validates_presence_of :date_produced
-  validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
+  validates_numericality_of :samples_quantity, greater_than_or_equal_to: 0, message: "value must be greater or equal to 0", if: :creating_batch?
 
   def self.for(batch)
     new.tap do |form|
