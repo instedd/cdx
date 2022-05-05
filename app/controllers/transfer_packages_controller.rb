@@ -4,6 +4,38 @@ class TransferPackagesController < ApplicationController
   helper_method :boxes_data
   helper_method :available_institutions
 
+  def index
+    @transfer_packages = TransferPackage
+      .within(@navigation_context.institution)
+      .includes(:receiver_institution, :sender_institution)
+      .order(created_at: :desc)
+
+    if search_uuid = params[:search_uuid].presence
+      @transfer_packages = @transfer_packages.joins(box_transfers: {box: {samples: :sample_identifiers}})
+        .where("transfer_packages.uuid LIKE concat('%', ?, '%') OR boxes.uuid LIKE concat('%', ?, '%') OR sample_identifiers.uuid LIKE concat('%', ?, '%')", search_uuid, search_uuid, search_uuid)
+        .distinct
+    end
+
+    case params[:status]
+    when "confirmed"
+      @transfer_packages = @transfer_packages.where.not(confirmed_at: nil)
+    when "in transit"
+      @transfer_packages = @transfer_packages.where(confirmed_at: nil)
+    else
+      params.delete(:status)
+    end
+
+    if institution_query = params[:institution].presence
+      @transfer_packages = @transfer_packages
+        .joins(:receiver_institution, :sender_institution)
+        .where("(institutions.name LIKE concat('%', ?, '%') AND institutions.id != ?) OR (sender_institutions_transfer_packages.name LIKE concat('%', ?, '%') AND sender_institutions_transfer_packages.id != ?)", institution_query, @navigation_context.institution.id, institution_query, @navigation_context.institution.id)
+    end
+
+    @transfer_packages = perform_pagination(@transfer_packages)
+      .preload(:sender_institution, :receiver_institution)
+      .map { |transfer| TransferPackagePresenter.new(transfer, @navigation_context) }
+  end
+
   def new
     @view_helper = view_helper({ save_back_path: true })
     @can_update = true

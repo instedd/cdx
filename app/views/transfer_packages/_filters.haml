@@ -1,0 +1,23 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            = link_to "+", new_transfer_package_path, class: 'btn-add side-link fix', title: 'Create transfer package'
+            Transfers
+
+      %form#filters-form{action: transfer_packages_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
+        .row
+          .filter
+            %label.block{for: "search_uuid"} UUID
+            %input.input-x-large{type: "text", name: "search_uuid", id: "search_uuid", value: params["search_uuid"], placeholder: "Transfer, Box, or Sample UUID"}
+          .filter
+            %label.block{for: "institution"} Institution
+            %input.input-x-large{type: "text", name: "institution", id: "institution", value: params["institution"], placeholder: "Filter by institution"}
+          .filter
+            %label.block{for: "status"} Status
+            = cdx_select name: "status", value: params["status"] do |status|
+              - status.item "", "Any status"
+              - status.items ["confirmed", "in transit"]

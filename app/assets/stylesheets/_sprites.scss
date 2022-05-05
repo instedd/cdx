@@ -63,6 +63,9 @@
   &.icon-red-important {
     color: $red !important;
   }
+  &.icon-text-color {
+    color: inherit;
+  }
 
   &.medium {
     font-size: 35px;
@@ -185,6 +188,9 @@
 }
 .icon-link:before {
   content: "\e925";
+}
+.icon-local_shipping:before {
+  content: "\e961";
 }
 .icon-location:before {
   content: "\e926";
