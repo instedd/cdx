@@ -122,7 +122,7 @@ Rails.application.routes.draw do
       post 'add_sample'
     end
     collection do
-      get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+      post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end
   resources :qc_infos
