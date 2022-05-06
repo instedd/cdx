@@ -71,7 +71,7 @@ RSpec.describe BoxesController, type: :controller do
       get :edit, params: { id: box.id }
       expect(response).to be_success
 
-      expect(assigns(:can_update)).to eq(true)
+      expect(assigns(:can_update)).to eq(false)
       expect(assigns(:can_delete)).to eq(true)
     end
 
@@ -94,7 +94,7 @@ RSpec.describe BoxesController, type: :controller do
       get :edit, params: { id: box.id }
       expect(response).to be_success
 
-      expect(assigns(:can_update)).to eq(true)
+      expect(assigns(:can_update)).to eq(false)
       expect(assigns(:can_delete)).to eq(false)
     end
 
@@ -107,7 +107,7 @@ RSpec.describe BoxesController, type: :controller do
       get :edit, params: { id: box.id }
       expect(response).to be_success
 
-      expect(assigns(:can_update)).to eq(true)
+      expect(assigns(:can_update)).to eq(false)
       expect(assigns(:can_delete)).to eq(true)
     end
 

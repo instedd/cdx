@@ -10,11 +10,50 @@
         .col
           .value= @box.uuid
 
-  - if @can_update
+      .row.form-field
+        .col.pe-4
+          = f.label :purpose
+        .col
+          - if @can_update
+            = react_component "CdxSelectSectionToggler", { items: Box.purposes.map { |v| { label: v, value: v } }, value: @box.purpose, submit: "#btn-save" }
+          - else
+            = f.text_field :purpose, readonly: true
+
+      #LOD
+        .row.form-field
+          .col.pe-4
+            = label_tag "box_batch_uuids_0", "batch"
+          .col
+            = text_field_tag "box[batch_uuids][0]", "", id: "box_batch_uuids_0", disabled: true
+
+      #Variants
+        - 1.upto(6) do |index|
+          .row.form-field
+            .col.pe-4
+              = label_tag "box_batch_uuids_#{index}", "Batch #{index}"
+            .col
+              = text_field_tag "box[batch_uuids][#{index}]", "", id: "box_batch_uuids_#{index}", disabled: true
+
+      #Challenge
+        .row.form-field
+          .col.pe-4
+            = label_tag "box_batch_uuids_0", "Virus batch"
+          .col
+            = text_field_tag "box[batch_uuids][id]", "", id: "box_batch_uuids_0", disabled: true
+
+        - 1.upto(6) do |index|
+          .row.form-field
+            .col.pe-4
+              = label_tag "box_batch_uuids_#{index}", "Batch #{index}"
+            .col
+              = text_field_tag "box[batch_uuids][#{index}]", "", id: "box_batch_uuids_#{index}", disabled: true
+
+  - if @can_update || @can_delete
     .row.button-actions
       .col
-        = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
-        = link_to 'Cancel', boxes_path, class: 'btn-link'
+        - if @can_update
+          = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
+          = link_to 'Cancel', boxes_path, class: 'btn-link'
 
         - if @can_delete
           = confirm_deletion_button @box, 'box'

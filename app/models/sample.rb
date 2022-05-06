@@ -9,6 +9,7 @@ class Sample < ApplicationRecord
   belongs_to :patient
   belongs_to :encounter
   belongs_to :batch
+  belongs_to :box
   belongs_to :qc_info
 
   has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy

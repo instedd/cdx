@@ -150,10 +150,8 @@ ActiveRecord::Schema.define(version: 20220513214928) do
     t.integer  "site_id",        limit: 4
     t.string   "site_prefix",    limit: 255
     t.datetime "date_produced"
-    t.integer  "box_id",         limit: 4
   end
 
-  add_index "batches", ["box_id"], name: "index_batches_on_box_id", using: :btree
   add_index "batches", ["date_produced"], name: "index_batches_on_date_produced", using: :btree
   add_index "batches", ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree
   add_index "batches", ["institution_id"], name: "index_batches_on_institution_id", using: :btree
@@ -166,11 +164,13 @@ ActiveRecord::Schema.define(version: 20220513214928) do
     t.string   "site_prefix",    limit: 255
     t.text     "core_fields",    limit: 65535
     t.text     "custom_fields",  limit: 65535
-    t.text     "sensitive_data", limit: 65535
+    t.binary   "sensitive_data", limit: 65535
+    t.datetime "deleted_at"
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
   end
 
+  add_index "boxes", ["deleted_at"], name: "index_boxes_on_deleted_at", using: :btree
   add_index "boxes", ["institution_id"], name: "index_boxes_on_institution_id", using: :btree
   add_index "boxes", ["site_id"], name: "index_boxes_on_site_id", using: :btree
   add_index "boxes", ["site_prefix"], name: "index_boxes_on_site_prefix", using: :btree

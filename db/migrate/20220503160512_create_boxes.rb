@@ -9,16 +9,13 @@ class CreateBoxes < ActiveRecord::Migration
 
       t.text       :core_fields
       t.text       :custom_fields
-      t.text       :sensitive_data
+      t.binary     :sensitive_data
 
-      t.timestamps null: false
+      t.datetime   :deleted_at,                   index: true
+      t.timestamps                   null: false
     end
 
     change_table :samples do |t|
-      t.belongs_to :box, null: true, index: true
-    end
-
-    change_table :batches do |t|
       t.belongs_to :box, null: true, index: true
     end
   end
