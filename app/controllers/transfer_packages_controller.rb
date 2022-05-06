@@ -18,13 +18,15 @@ class TransferPackagesController < ApplicationController
     if @transfer_package.sample_transfers.empty?
       @transfer_package.errors.add :sample_transfers, "Must not be empty"
     end
+    no_errors = @transfer_package.errors.empty?
+    valid = @transfer_package.valid? && no_errors
 
     @transfer_package.sample_transfers.each do |sample_transfer|
       sample = sample_transfer.sample
       raise "User not authorized for transferring sample #{sample.uuid}" unless authorize_resource?(sample, UPDATE_SAMPLE)
     end
 
-    if @transfer_package.errors.empty? && @transfer_package.save
+    if valid && @transfer_package.save
       redirect_to sample_transfers_path, notice: "Samples were succesfully sent"
     else
       @view_helper = view_helper
