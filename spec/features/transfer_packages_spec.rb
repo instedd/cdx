@@ -13,9 +13,9 @@ describe "transfer packages" do
       sign_in user_a
 
       goto_page NewTransferPackagePage do |page|
-        expect(page).to have_content("Create Transfer Package")
+        expect(page).to have_content("Send samples")
 
-        page.institution.set institution_b.name
+        page.destination.set institution_b.name
         page.recipient.set "Santa Claus"
         page.sample_search.set sample.uuid
         page.wait_until_sample_search_visible

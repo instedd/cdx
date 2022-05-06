@@ -10,7 +10,7 @@
 
       .row.form-field
         .col.pe-4
-          = f.label :receiver_institution_id, "Institution", title: "Receiver institution"
+          = f.label :receiver_institution_id, "Destination", title: "Receiver institution"
         .col
           - if @can_update
             = cdx_select form: f, name: :receiver_institution_id, searchable: true, class: "input-x-large" do |select|

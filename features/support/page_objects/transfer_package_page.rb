@@ -5,7 +5,7 @@ class NewTransferPackagePage < CdxPageBase
     element :sample_uuid, ".sample__uuid"
   end
 
-  section :institution, CdxSelect, "label", text: /Institution/i
+  section :destination, CdxSelect, "label", text: /Destination/i
   element :recipient, :field, "Recipient"
 
   sections :samples_list, SampleTransferPreview, ".sample-transfer-preview"
