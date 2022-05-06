@@ -93,7 +93,6 @@ var SampleTransferSelector = React.createClass({
 
   loadSample: function(uuid) {
     url = "/transfer_packages/find_sample"
-    console.log(this.state)
     this.setState({
       error: null,
       status: "loading",
