@@ -12,6 +12,7 @@ env:
   COMPOSE_DEFAULT_SERVICE: web
   BUNDLE_GEMFILE: ${{ inputs.gemfile }}
   BUNDLE_LOCKFILE: ${{ inputs.gemfile }}.lock
+  SELENIUM_URL: http://cdx_selenium_%{test_env_number}:4444/ # dealing with docker-compose v1 name (https://github.com/instedd/cdx/pull/1644)
 
 jobs:
   setup:
@@ -64,10 +65,10 @@ jobs:
         run: docker-compose up -d selenium
 
       - name: Run specs (capybara)
-        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e FEATURES=true web bundle exec rspec
+        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e FEATURES=true -e SELENIUM_URL web bundle exec rspec
 
       - name: Run specs (cucumber)
-        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true web bundle exec cucumber
+        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e SELENIUM_URL web bundle exec cucumber
 
       - run: cp coverage/.resultset.json resultset.integration_tests.json
 
