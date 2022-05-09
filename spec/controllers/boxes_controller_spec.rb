@@ -120,14 +120,22 @@ RSpec.describe BoxesController, type: :controller do
   end
 
   describe "create" do
+    let :batch do
+      Batch.make!(institution: institution)
+    end
+
     let :box_plan do
-      { placeholder: true } # TODO: set real attributes
+      {
+        purpose: "LOD",
+        batch_uuids: [batch.uuid],
+      }
     end
 
     it "should create box in context institution" do
-      expect { post :create, params: { box: box_plan } }
-        .to change(institution.boxes, :count).by(1)
-      expect(response).to redirect_to boxes_path
+      expect do
+        post :create, params: { box: box_plan }
+        expect(response).to redirect_to boxes_path
+      end.to change(institution.boxes, :count).by(1)
 
       box = assigns(:box).reload
       expect(box.uuid).to_not be_nil
@@ -137,9 +145,10 @@ RSpec.describe BoxesController, type: :controller do
     it "should create box in context site" do
       default_params[:context] = site.uuid
 
-      expect { post :create, params: { box: box_plan } }
-        .to change(site.boxes, :count).by(1)
-      expect(response).to redirect_to boxes_path
+      expect do
+        post :create, params: { box: box_plan }
+        expect(response).to redirect_to boxes_path
+      end.to change(site.boxes, :count).by(1)
 
       box = assigns(:box).reload
       expect(box.uuid).to_not be_nil
@@ -149,47 +158,91 @@ RSpec.describe BoxesController, type: :controller do
 
     it "should create box if allowed" do
       grant user, other_user, institution, CREATE_INSTITUTION_BOX
+      grant user, other_user, batch, READ_BATCH
       sign_in other_user
 
-      expect { post :create, params: { box: box_plan } }
-        .to change(institution.boxes, :count).by(1)
-      expect(response).to redirect_to boxes_path
+      expect do
+        post :create, params: { box: box_plan }
+        expect(response).to redirect_to boxes_path
+      end.to change(institution.boxes, :count).by(1)
     end
 
     it "should not create box if not allowed" do
       sign_in other_user
 
-      expect { post :create, params: { box: box_plan } }
-        .to change(institution.boxes, :count).by(0)
-      expect(response).to be_forbidden
+      expect do
+        post :create, params: { box: box_plan }
+        expect(response).to be_forbidden
+      end.to change(institution.boxes, :count).by(0)
+    end
+
+    it "creates samples for LOD purpose" do
+      expect do
+        post :create, params: { box: {
+          purpose: "LOD",
+          batch_uuids: [batch.uuid],
+        } }
+        expect(response).to redirect_to(boxes_path)
+      end.to change(institution.samples, :count).by(24)
+
+      expect(batch.samples.count).to eq(24)
+    end
+
+    it "creates samples for Variants purpose" do
+      batches = Batch.make!(6, institution: institution)
+
+      expect do
+        post :create, params: { box: {
+          purpose: "Variants",
+          batch_uuids: batches.map(&:uuid),
+        } }
+        expect(response).to redirect_to(boxes_path)
+      end.to change(institution.samples, :count).by(54)
+
+      batches.each { |b| expect(b.samples.count).to eq(9) }
+    end
+
+    it "creates samples for Challenge purpose" do
+      batches = Batch.make!(6, institution: institution)
+
+      expect do
+        post :create, params: { box: {
+          purpose: "Challenge",
+          batch_uuids: [batch.uuid, *batches.map(&:uuid)],
+        } }
+        expect(response).to redirect_to(boxes_path)
+      end.to change(institution.samples, :count).by(108)
+
+      expect(batch.samples.count).to eq(54)
+      batches.each { |b| expect(b.samples.count).to eq(9) }
     end
   end
 
-  describe "update" do
-    let :box_plan do
-      { placeholder: true } # TODO: set real attributes
-    end
+  # describe "update" do
+  #   let :box_plan do
+  #     { placeholder: true } # TODO: set real attributes
+  #   end
 
-    it "should update box" do
-      patch :update, params: { id: box.id, box: box_plan }
-      expect(response).to redirect_to boxes_path
-    end
+  #   it "should update box" do
+  #     patch :update, params: { id: box.id, box: box_plan }
+  #     expect(response).to redirect_to boxes_path
+  #   end
 
-    it "should update box if allowed" do
-      grant user, other_user, box, UPDATE_BOX
-      sign_in other_user
+  #   it "should update box if allowed" do
+  #     grant user, other_user, box, UPDATE_BOX
+  #     sign_in other_user
 
-      patch :update, params: { id: box.id, box: box_plan }
-      expect(response).to redirect_to boxes_path
-    end
+  #     patch :update, params: { id: box.id, box: box_plan }
+  #     expect(response).to redirect_to boxes_path
+  #   end
 
-    it "should not update box if not allowed" do
-      sign_in other_user
+  #   it "should not update box if not allowed" do
+  #     sign_in other_user
 
-      patch :update, params: { id: box.id, box: box_plan }
-      expect(response).to be_forbidden
-    end
-  end
+  #     patch :update, params: { id: box.id, box: box_plan }
+  #     expect(response).to be_forbidden
+  #   end
+  # end
 
   describe "delete" do
     it "should destroy box" do
@@ -201,15 +254,21 @@ RSpec.describe BoxesController, type: :controller do
       grant user, other_user, box, DELETE_BOX
       sign_in other_user
 
-      delete :destroy, params: { id: box.id }
-      expect(response).to redirect_to boxes_path
+      expect do
+        delete :destroy, params: { id: box.id }
+        expect(response).to redirect_to boxes_path
+      end.to change(institution.boxes, :count).by(-1)
+
+      expect(box.reload.deleted_at).to_not be_nil
     end
 
     it "should not destroy box if not allowed" do
       sign_in other_user
 
-      delete :destroy, params: { id: box.id }
-      expect(response).to be_forbidden
+      expect do
+        delete :destroy, params: { id: box.id }
+        expect(response).to be_forbidden
+      end.to change(institution.boxes.unscoped, :count).by(0)
     end
   end
 end

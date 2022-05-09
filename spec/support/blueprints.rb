@@ -200,6 +200,7 @@ end
 
 Box.blueprint do
   institution { Institution.make }
+  purpose { "LOD" }
 end
 
 Patient.blueprint do

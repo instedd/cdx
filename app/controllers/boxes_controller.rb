@@ -19,7 +19,7 @@ class BoxesController < ApplicationController
 
   def edit
     return unless authorize_resource(@box, READ_BOX)
-    @can_update = false # has_access?(@box, UPDATE_BOX)
+    @can_update = false
     @can_delete = has_access?(@box, DELETE_BOX)
   end
 
@@ -29,6 +29,31 @@ class BoxesController < ApplicationController
     @box = Box.new(new_box_params)
     @box.attributes = box_params
 
+    batch_uuids = params.dig(:box, :batch_uuids).to_a
+
+    case @box.purpose
+    when "LOD"
+      batch = Batch.find_by(uuid: batch_uuids)
+      return unless authorize_resource(batch, READ_BATCH)
+      @box.build_samples(batch, exponents: 1..8, replicas: 3)
+
+    when "Variants"
+      batches = check_access(Batch.where(uuid: batch_uuids), READ_BATCH)
+      batches.each do |batch|
+        @box.build_samples(batch, exponents: [1, 4, 8], replicas: 3)
+      end
+
+    when "Challenge"
+      batch = Batch.find_by(uuid: batch_uuids.shift)
+      return unless authorize_resource(batch, READ_BATCH)
+      @box.build_samples(batch, exponents: [1, 4, 8], replicas: 18)
+
+      batches = check_access(Batch.where(uuid: batch_uuids), READ_BATCH)
+      batches.each do |batch|
+        @box.build_samples(batch, exponents: [1, 4, 8], replicas: 3)
+      end
+    end
+
     if @box.save
       redirect_to boxes_path, notice: "Box was successfully created."
     else
@@ -36,15 +61,15 @@ class BoxesController < ApplicationController
     end
   end
 
-  def update
-    return unless authorize_resource(@box, UPDATE_BOX)
+  # def update
+  #   return unless authorize_resource(@box, UPDATE_BOX)
 
-    if @box.update(box_params)
-      redirect_to boxes_path, notice: "Box was successfully updated."
-    else
-      render :edit
-    end
-  end
+  #   if @box.update(box_params)
+  #     redirect_to boxes_path, notice: "Box was successfully updated."
+  #   else
+  #     render :edit
+  #   end
+  # end
 
   def destroy
     return unless authorize_resource(@box, DELETE_BOX)
