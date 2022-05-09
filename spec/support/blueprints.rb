@@ -137,6 +137,7 @@ Sample.blueprint(:filled) do
   sample_identifiers { [SampleIdentifier.make!(sample: object)] }
   isolate_name { Faker::Name.name }
   specimen_role { "p" }
+  date_produced { Faker::Time.backward }
 end
 
 Sample.blueprint(:batch) do

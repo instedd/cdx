@@ -3,6 +3,12 @@ class TransferPackage < ApplicationRecord
   belongs_to :receiver_institution, class_name: "Institution"
   has_many :sample_transfers
 
+  accepts_nested_attributes_for :sample_transfers,
+    allow_destroy: true,
+    reject_if: :all_blank
+
+  validates_associated :sample_transfers
+
   # TODO: remove these after upgrading to Rails 5.0 (belongs_to associations are required by default):
   validates_presence_of :sender_institution
   validates_presence_of :receiver_institution

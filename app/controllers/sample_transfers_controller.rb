@@ -7,7 +7,7 @@ class SampleTransfersController < ApplicationController
     @sample_transfers = SampleTransfer
       .within(@navigation_context.institution)
       .includes(transfer_package: [:receiver_institution, :sender_institution], sample: [:sample_identifiers])
-      .ordered_by_creation
+      .order(created_at: :desc)
 
     @sample_transfers = @sample_transfers.joins(sample: :sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
     @sample_transfers = @sample_transfers.joins(:sample).joins("LEFT JOIN batches ON batches.id = samples.batch_id").where("batches.batch_number LIKE concat('%', ?, '%') OR samples.old_batch_number LIKE concat('%', ?, '%')", params[:batch_number], params[:batch_number]) unless params[:batch_number].blank?
