@@ -5,6 +5,9 @@ class BoxesController < ApplicationController
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_BOX)
 
     @boxes = Box.where(institution: @navigation_context.institution)
+    @boxes = @boxes.where("uuid LIKE ?", params[:uuid] + "%") if params[:uuid].present?
+    @boxes = @boxes.where(purpose: params[:purpose]) if params[:purpose].present?
+
     @boxes = check_access(@boxes, READ_BOX).order('created_at DESC')
     @boxes = @boxes.within(@navigation_context.entity, @navigation_context.exclude_subsites)
     @boxes = perform_pagination(@boxes)

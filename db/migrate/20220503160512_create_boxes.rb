@@ -11,6 +11,8 @@ class CreateBoxes < ActiveRecord::Migration
       t.text       :custom_fields
       t.binary     :sensitive_data
 
+      t.string     :purpose,                      index: true
+
       t.datetime   :deleted_at,                   index: true
       t.timestamps                   null: false
     end

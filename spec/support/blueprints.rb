@@ -199,7 +199,7 @@ Batch.blueprint(:qc_sample) do
 end
 
 Box.blueprint do
-  institution { Institution.make }
+  institution { object.site.try(&:institution) || Institution.make }
   purpose { "LOD" }
 end
 

@@ -5,7 +5,7 @@
         .col
           %h1
             - if @can_create
-              = link_to "+", new_box_path, class: 'btn-add side-link fix', title: 'Add box'
+              = link_to "+", new_box_path, class: "btn-add side-link fix", title: "Add box"
             Boxes
 
       %form#filters-form{action: boxes_path, "data-auto-submit" => true}
@@ -13,12 +13,9 @@
         .row
           .filter
             %label.block ID
-            %input.input-large{type: "text", name: "uuid", value: params["uuid"], placeholder: "Filter by ID"}
-          -#
-            .filter-group
-              .filter
-                %label.block From date
-                %input.input-large{type: "date", name: "date_produced_from", value: params["date_produced_from"]}
-              .filter
-                %label.block To date
-                %input.input-large{type: "date", name: "date_produced_to", value: params["date_produced_to"]}
+            %input.input-large{type: "text", name: "uuid", value: params[:uuid], placeholder: "Filter by ID"}
+          .filter
+            %label.block Purpose
+            = cdx_select name: "purpose", value: params[:purpose] do |select|
+              - select.item "", "Show all"
+              - select.items Box.purposes

@@ -35,12 +35,39 @@ RSpec.describe BoxesController, type: :controller do
       expect(assigns(:boxes).count).to eq(0)
     end
 
-    it "should filter by site" do
-      default_params[:context] = "#{site.uuid}-*"
+    describe "filters" do
+      before(:each) do
+        Box.make!(3, institution: @institution, purpose: "LOD")
+        Box.make!(2, institution: @institution, purpose: "Variants")
+        Box.make!(4, institution: @institution, purpose: "Challenge")
+      end
 
-      get :index
-      expect(response).to be_success
-      expect(assigns(:boxes).count).to eq(1)
+      it "paginates" do
+        get :index
+        expect(assigns(:boxes).count).to eq(10)
+      end
+
+      it "by site" do
+        get :index, params: { context: "#{site.uuid}-*" }
+        expect(response).to be_success
+        expect(assigns(:boxes).count).to eq(1)
+      end
+
+      it "by uuid" do
+        get :index, params: { uuid: @box.uuid[0..6] }
+        expect(assigns(:boxes).count).to eq(1)
+      end
+
+      it "by purpose" do
+        get :index, params: { purpose: "LOD" }
+        expect(assigns(:boxes).count).to eq(5)
+
+        get :index, params: { purpose: "Variants" }
+        expect(assigns(:boxes).count).to eq(2)
+
+        get :index, params: { purpose: "Challenge" }
+        expect(assigns(:boxes).count).to eq(4)
+      end
     end
   end
 
@@ -185,6 +212,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(response).to redirect_to(boxes_path)
       end.to change(institution.samples, :count).by(24)
 
+      expect(Box.last.samples.count).to eq(24)
       expect(batch.samples.count).to eq(24)
     end
 
@@ -199,6 +227,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(response).to redirect_to(boxes_path)
       end.to change(institution.samples, :count).by(54)
 
+      expect(Box.last.samples.count).to eq(54)
       batches.each { |b| expect(b.samples.count).to eq(9) }
     end
 
@@ -213,6 +242,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(response).to redirect_to(boxes_path)
       end.to change(institution.samples, :count).by(108)
 
+      expect(Box.last.samples.count).to eq(108)
       expect(batch.samples.count).to eq(54)
       batches.each { |b| expect(b.samples.count).to eq(9) }
     end

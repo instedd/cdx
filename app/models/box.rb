@@ -11,7 +11,7 @@ class Box < ApplicationRecord
     "box"
   end
 
-  attribute_field :purpose
+  attribute_field :purpose, copy: true
 
   validates_presence_of :purpose
   validates_inclusion_of :purpose, in: ->(_) { Box.purposes }
