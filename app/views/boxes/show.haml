@@ -1,0 +1,38 @@
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to boxes_path, class: "side-link", title: "Back" do
+              = image_tag "arrow-left.png"
+            Box detail
+
+.row
+  .col
+    .row.form-field
+      .col.pe-3
+        %label ID
+      .col
+        .value= @box.uuid
+
+    .row.form-field
+      .col.pe-3
+        %label Purpose
+      .col
+        .value= @box.purpose
+
+    .row.form-field
+      .col.pe-3
+        %label Contents
+      .col.pe-7
+        - @samples.each do |sample|
+          .col.pe-7.batches-samples
+            .samples-row
+              .samples-item= sample.uuid
+              .sample-row-action= sample.batch.try(&:batch_number)
+
+- if @can_delete
+  .row.button-actions
+    .col
+      = confirm_deletion_button @box, 'box'

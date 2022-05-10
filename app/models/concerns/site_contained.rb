@@ -4,8 +4,14 @@
 module SiteContained
   extend ActiveSupport::Concern
 
-  included do
-    belongs_to :institution, required: true
+  class_methods do
+    def institution_is_required
+      true
+    end
+  end
+
+  included do |klass|
+    belongs_to :institution, required: institution_is_required
     belongs_to :site, -> { with_deleted }, required: false
 
     validate :same_institution_of_site
@@ -17,9 +23,9 @@ module SiteContained
       elsif institution_or_site.is_a?(Institution) && !exclude_subsites
         where(institution: institution_or_site)
       elsif institution_or_site.is_a?(Site) && exclude_subsites
-        where("site_id = ?", institution_or_site.id)
+        where(site_id: institution_or_site.id)
       else
-        where("site_prefix LIKE concat(?, '%')", institution_or_site.prefix)
+        where("#{quoted_table_name}.site_prefix LIKE concat(?, '%')", institution_or_site.prefix)
       end
     }
 

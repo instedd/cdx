@@ -47,6 +47,17 @@ class Batch < ApplicationRecord
     end
   end
 
+  def build_sample(**attributes)
+    samples.build(
+      institution_id: institution_id,
+      site_id: site_id,
+      sample_identifiers: [SampleIdentifier.new],
+      isolate_name: isolate_name,
+      inactivation_method: inactivation_method,
+      **attributes
+    )
+  end
+
   private
 
   def isolate_name_batch_number_combination_create

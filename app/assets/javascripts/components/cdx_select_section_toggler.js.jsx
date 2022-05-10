@@ -5,6 +5,7 @@ var CdxSelectSectionToggler = React.createClass({
 
   render: function () {
     return (<CdxSelect
+      name={this.props.name}
       items={this.props.items}
       value={this.props.value}
       onChange={this.toggle.bind(this)}

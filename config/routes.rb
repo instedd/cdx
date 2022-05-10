@@ -130,7 +130,11 @@ Rails.application.routes.draw do
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end
-  resources :boxes, except: [:show]
+  resources :boxes, except: [:edit, :update] do
+    collection do
+      post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+    end
+  end
   resources :qc_infos
   resources :test_results , only: [:index, :show]
   resources :filters, format: 'html'

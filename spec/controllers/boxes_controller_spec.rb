@@ -53,6 +53,12 @@ RSpec.describe BoxesController, type: :controller do
         expect(assigns(:boxes).count).to eq(1)
       end
 
+      it "by site excluding subsites" do
+        get :index, params: { context: "#{site.uuid}-!" }
+        expect(response).to be_success
+        expect(assigns(:boxes).count).to eq(1)
+      end
+
       it "by uuid" do
         get :index, params: { uuid: @box.uuid[0..6] }
         expect(assigns(:boxes).count).to eq(1)
@@ -68,6 +74,28 @@ RSpec.describe BoxesController, type: :controller do
         get :index, params: { purpose: "Challenge" }
         expect(assigns(:boxes).count).to eq(4)
       end
+    end
+  end
+
+  describe "show" do
+    it "should be accessible to institution owner" do
+      get :show, params: { id: box.id }
+      expect(response).to be_success
+    end
+
+    it "should be allowed if can read" do
+      grant user, other_user, box, READ_BOX
+      sign_in other_user
+
+      get :show, params: { id: box.id }
+      expect(response).to be_success
+    end
+
+    it "shouldn't be allowed if can't read" do
+      sign_in other_user
+
+      get :show, params: { id: box.id }
+      expect(response).to be_forbidden
     end
   end
 
@@ -93,58 +121,58 @@ RSpec.describe BoxesController, type: :controller do
     end
   end
 
-  describe "edit" do
-    it "should be accessible to institution owner" do
-      get :edit, params: { id: box.id }
-      expect(response).to be_success
+  # describe "edit" do
+  #   it "should be accessible to institution owner" do
+  #     get :edit, params: { id: box.id }
+  #     expect(response).to be_success
 
-      expect(assigns(:can_update)).to eq(false)
-      expect(assigns(:can_delete)).to eq(true)
-    end
+  #     expect(assigns(:can_update)).to eq(false)
+  #     expect(assigns(:can_delete)).to eq(true)
+  #   end
 
-    it "should be allowed if can read" do
-      grant user, other_user, box, READ_BOX
-      sign_in other_user
+  #   it "should be allowed if can read" do
+  #     grant user, other_user, box, READ_BOX
+  #     sign_in other_user
 
-      get :edit, params: { id: box.id }
-      expect(response).to be_success
+  #     get :edit, params: { id: box.id }
+  #     expect(response).to be_success
 
-      expect(assigns(:can_update)).to eq(false)
-      expect(assigns(:can_delete)).to eq(false)
-    end
+  #     expect(assigns(:can_update)).to eq(false)
+  #     expect(assigns(:can_delete)).to eq(false)
+  #   end
 
-    it "should be allowed if can update" do
-      grant user, other_user, box, READ_BOX
-      grant user, other_user, box, UPDATE_BOX
-      sign_in other_user
+  #   it "should be allowed if can update" do
+  #     grant user, other_user, box, READ_BOX
+  #     grant user, other_user, box, UPDATE_BOX
+  #     sign_in other_user
 
-      get :edit, params: { id: box.id }
-      expect(response).to be_success
+  #     get :edit, params: { id: box.id }
+  #     expect(response).to be_success
 
-      expect(assigns(:can_update)).to eq(false)
-      expect(assigns(:can_delete)).to eq(false)
-    end
+  #     expect(assigns(:can_update)).to eq(false)
+  #     expect(assigns(:can_delete)).to eq(false)
+  #   end
 
-    it "should be allowed if can update and delete" do
-      grant user, other_user, box, READ_BOX
-      grant user, other_user, box, UPDATE_BOX
-      grant user, other_user, box, DELETE_BOX
-      sign_in other_user
+  #   it "should be allowed if can update and delete" do
+  #     grant user, other_user, box, READ_BOX
+  #     grant user, other_user, box, UPDATE_BOX
+  #     grant user, other_user, box, DELETE_BOX
+  #     sign_in other_user
 
-      get :edit, params: { id: box.id }
-      expect(response).to be_success
+  #     get :edit, params: { id: box.id }
+  #     expect(response).to be_success
 
-      expect(assigns(:can_update)).to eq(false)
-      expect(assigns(:can_delete)).to eq(true)
-    end
+  #     expect(assigns(:can_update)).to eq(false)
+  #     expect(assigns(:can_delete)).to eq(true)
+  #   end
 
-    it "shouldn't be allowed if can't read" do
-      sign_in other_user
+  #   it "shouldn't be allowed if can't read" do
+  #     sign_in other_user
 
-      get :edit, params: { id: box.id }
-      expect(response).to be_forbidden
-    end
-  end
+  #     get :edit, params: { id: box.id }
+  #     expect(response).to be_forbidden
+  #   end
+  # end
 
   describe "create" do
     let :batch do
@@ -154,7 +182,7 @@ RSpec.describe BoxesController, type: :controller do
     let :box_plan do
       {
         purpose: "LOD",
-        batch_uuids: [batch.uuid],
+        batch_numbers: [batch.batch_number],
       }
     end
 
@@ -207,7 +235,7 @@ RSpec.describe BoxesController, type: :controller do
       expect do
         post :create, params: { box: {
           purpose: "LOD",
-          batch_uuids: [batch.uuid],
+          batch_numbers: [batch.batch_number],
         } }
         expect(response).to redirect_to(boxes_path)
       end.to change(institution.samples, :count).by(24)
@@ -222,7 +250,7 @@ RSpec.describe BoxesController, type: :controller do
       expect do
         post :create, params: { box: {
           purpose: "Variants",
-          batch_uuids: batches.map(&:uuid),
+          batch_numbers: batches.map(&:batch_number),
         } }
         expect(response).to redirect_to(boxes_path)
       end.to change(institution.samples, :count).by(54)
@@ -237,7 +265,7 @@ RSpec.describe BoxesController, type: :controller do
       expect do
         post :create, params: { box: {
           purpose: "Challenge",
-          batch_uuids: [batch.uuid, *batches.map(&:uuid)],
+          batch_numbers: [batch.batch_number, *batches.map(&:batch_number)],
         } }
         expect(response).to redirect_to(boxes_path)
       end.to change(institution.samples, :count).by(108)
@@ -274,13 +302,15 @@ RSpec.describe BoxesController, type: :controller do
   #   end
   # end
 
-  describe "delete" do
-    it "should destroy box" do
-      delete :destroy, params: { id: box.id }
-      expect(response).to redirect_to boxes_path
+  describe "destroy" do
+    it "should delete box" do
+      expect do
+        delete :destroy, params: { id: box.id }
+        expect(response).to redirect_to boxes_path
+      end.to change(institution.boxes, :count).by(-1)
     end
 
-    it "should destroy box if allowed" do
+    it "should delete box if allowed" do
       grant user, other_user, box, DELETE_BOX
       sign_in other_user
 
@@ -292,11 +322,56 @@ RSpec.describe BoxesController, type: :controller do
       expect(box.reload.deleted_at).to_not be_nil
     end
 
-    it "should not destroy box if not allowed" do
+    it "should not delete box if not allowed" do
       sign_in other_user
 
       expect do
         delete :destroy, params: { id: box.id }
+        expect(response).to be_forbidden
+      end.to change(institution.boxes.unscoped, :count).by(0)
+    end
+  end
+
+  describe "bulk_destroy" do
+    it "should delete boxes" do
+      expect do
+        post :bulk_destroy, params: { box_ids: [box.id, site_box.id] }
+        expect(response).to redirect_to boxes_path
+      end.to change(institution.boxes, :count).by(-2)
+
+      expect(box.reload.deleted_at).to_not be_nil
+      expect(site_box.reload.deleted_at).to_not be_nil
+    end
+
+    it "should delete boxes if allowed" do
+      grant user, other_user, box, DELETE_BOX
+      grant user, other_user, site_box, DELETE_BOX
+      sign_in other_user
+
+      expect do
+        post :bulk_destroy, params: { box_ids: [box.id, site_box.id] }
+        expect(response).to redirect_to boxes_path
+      end.to change(institution.boxes, :count).by(-2)
+
+      expect(box.reload.deleted_at).to_not be_nil
+      expect(site_box.reload.deleted_at).to_not be_nil
+    end
+
+    it "should not delete boxes if not all allowed" do
+      grant user, other_user, box, DELETE_BOX
+      sign_in other_user
+
+      expect do
+        post :bulk_destroy, params: { box_ids: [box.id, site_box.id] }
+        expect(response).to be_forbidden
+      end.to change(institution.boxes, :count).by(0)
+    end
+
+    it "should not delete boxes if not allowed" do
+      sign_in other_user
+
+      expect do
+        post :bulk_destroy, params: { box_ids: [box.id, site_box.id] }
         expect(response).to be_forbidden
       end.to change(institution.boxes.unscoped, :count).by(0)
     end

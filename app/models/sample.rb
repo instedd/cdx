@@ -1,4 +1,8 @@
 class Sample < ApplicationRecord
+  def self.institution_is_required
+    false
+  end
+
   include Entity
   include Resource
   include SpecimenRole

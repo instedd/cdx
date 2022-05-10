@@ -1,59 +1,54 @@
 = form_for(@box) do |f|
 
-  = validation_errors @box if @can_update
+  = validation_errors @box
 
   .row
     .col
       .row.form-field
-        .col.pe-4
+        .col.pe-3
           = f.label :uuid
         .col
           .value= @box.uuid
 
       .row.form-field
-        .col.pe-4
+        .col.pe-3
           = f.label :purpose
         .col
-          - if @can_update
-            = react_component "CdxSelectSectionToggler", { items: Box.purposes.map { |v| { label: v, value: v } }, value: @box.purpose, submit: "#btn-save" }
-          - else
-            = f.text_field :purpose, readonly: true
+          = react_component "CdxSelectSectionToggler", { name: "box[purpose]", items: Box.purposes.map { |v| { label: v, value: v } }, value: @box.purpose, submit: "#btn-save" }
 
       #LOD
         .row.form-field
-          .col.pe-4
-            = label_tag "box_batch_uuids_0", "batch"
+          .col.pe-3
+            = label_tag "box_batch_numbers_0", "Batch"
           .col
-            = text_field_tag "box[batch_uuids][0]", "", id: "box_batch_uuids_0", disabled: true
+            = text_field_tag "box[batch_numbers][0]", "", id: "box_batch_numbers_0", disabled: true, placeholder: "Enter batch id"
 
       #Variants
         - 1.upto(6) do |index|
           .row.form-field
-            .col.pe-4
-              = label_tag "box_batch_uuids_#{index}", "Batch #{index}"
+            .col.pe-3
+              = label_tag "box_batch_numbers_#{index}", "Variant #{index}"
             .col
-              = text_field_tag "box[batch_uuids][#{index}]", "", id: "box_batch_uuids_#{index}", disabled: true
+              = text_field_tag "box[batch_numbers][#{index}]", "", id: "box_batch_numbers_#{index}", disabled: true, placeholder: "Enter batch id"
 
       #Challenge
         .row.form-field
-          .col.pe-4
-            = label_tag "box_batch_uuids_0", "Virus batch"
+          .col.pe-3
+            = label_tag "box_batch_numbers_0", "Virus"
           .col
-            = text_field_tag "box[batch_uuids][id]", "", id: "box_batch_uuids_0", disabled: true
+            = text_field_tag "box[batch_numbers][id]", "", id: "box_batch_numbers_0", disabled: true, placeholder: "Enter batch id"
 
         - 1.upto(6) do |index|
           .row.form-field
-            .col.pe-4
-              = label_tag "box_batch_uuids_#{index}", "Batch #{index}"
+            .col.pe-3
+              = label_tag "box_batch_numbers_#{index}", "Distractor #{index}"
             .col
-              = text_field_tag "box[batch_uuids][#{index}]", "", id: "box_batch_uuids_#{index}", disabled: true
+              = text_field_tag "box[batch_numbers][#{index}]", "", id: "box_batch_numbers_#{index}", disabled: true, placeholder: "Enter batch id"
 
-  - if @can_update || @can_delete
-    .row.button-actions
-      .col
-        - if @can_update
-          = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
-          = link_to 'Cancel', boxes_path, class: 'btn-link'
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
+      = link_to 'Cancel', boxes_path, class: 'btn-link'
 
-        - if @can_delete
-          = confirm_deletion_button @box, 'box'
+      - if @can_delete
+        = confirm_deletion_button @box, 'box'
