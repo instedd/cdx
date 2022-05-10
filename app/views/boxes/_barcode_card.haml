@@ -4,7 +4,7 @@
       = image_tag barcode_svg_data_url(@box.uuid)
 
     .title
-      National Health Laboratory Service
+      = @box.institution.name
     .code
       Box ID #{@box.uuid}
     .code

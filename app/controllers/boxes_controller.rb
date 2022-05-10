@@ -1,3 +1,5 @@
+require "labels_pdf_renderer"
+
 class BoxesController < ApplicationController
   before_action :load_box, except: %i[index new create bulk_destroy]
 
@@ -14,10 +16,41 @@ class BoxesController < ApplicationController
   end
 
   def show
-    authorize_resource(@box, READ_BOX)
+    return unless authorize_resource(@box, READ_BOX)
     @can_delete = has_access?(@box, DELETE_BOX)
 
     @samples = @box.scrambled_samples.preload(:batch).to_a
+  end
+
+  def print
+    return unless authorize_resource(@box, READ_BOX)
+
+    pages = []
+
+    # render box label
+    pages << render_to_string(
+      template: "boxes/barcode.pdf",
+      "layout": "layouts/pdf.html",
+      locals: { box: @box }
+    )
+
+    # render samples' labels
+    @box.samples.preload(:sample_identifiers).each do |sample|
+      pages << render_to_string(
+        template: "samples/barcode.pdf",
+        "layout": "layouts/pdf.html",
+        locals: { sample: sample }
+      )
+    end
+
+    begin
+      send_data LabelsPdfRenderer.combine(pages),
+        type: "application/pdf",
+        filename: "cdx_box_#{DateTime.now.strftime("%Y%m%d-%H%M")}.pdf"
+    rescue => ex
+      Raven.capture_exception(ex)
+      redirect_to boxes_path, notice: "There was an error creating the print file."
+    end
   end
 
   def new

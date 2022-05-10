@@ -99,6 +99,32 @@ RSpec.describe BoxesController, type: :controller do
     end
   end
 
+  describe "print" do
+    before do
+      stub_request(:get, %r{https://fonts\.googleapis\.com/.*}).to_return(body: "")
+    end
+
+    it "should be accessible to institution owner" do
+      get :print, params: { id: box.id }
+      expect(response).to be_success
+    end
+
+    it "should be allowed if can read" do
+      grant user, other_user, box, READ_BOX
+      sign_in other_user
+
+      get :print, params: { id: box.id }
+      expect(response).to be_success
+    end
+
+    it "shouldn't be allowed if can't read" do
+      sign_in other_user
+
+      get :print, params: { id: box.id }
+      expect(response).to be_forbidden
+    end
+  end
+
   describe "new" do
     it "should be accessible to institution owner" do
       get :new

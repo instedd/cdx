@@ -1,7 +1,7 @@
 require 'open3'
 
 # https://github.com/mileszs/wicked_pdf/issues/339
-class MultipagePdfRenderer
+module MultipagePdfRenderer
   def self.combine(documents, options)
     outfile = ::WickedPdf::WickedPdfTempfile.new('multipage_pdf_renderer.pdf')
 

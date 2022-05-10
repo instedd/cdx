@@ -1,3 +1,5 @@
+require "labels_pdf_renderer"
+
 class SamplesController < ApplicationController
   include Concerns::ViewHelper
 
@@ -122,24 +124,18 @@ class SamplesController < ApplicationController
     samples = Sample.where(id: params[:sample_ids])
     return unless authorize_resources(samples, READ_SAMPLE)
 
-    sample_strings = samples.map do |sample|
+    pages = samples.preload(:sample_identifiers).map do |sample|
       render_to_string template: "samples/barcode.pdf",
         layout: "layouts/pdf.html",
         locals: { :sample => sample }
     end
 
-    options = {
-      margin: { top: 0, bottom: 0, left: 0, right: 0 },
-      page_width: "1in",
-      page_height: "1in",
-    }
-
     begin
-      pdf_file = MultipagePdfRenderer.combine(sample_strings, options)
-      pdf_filename = "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}.pdf"
-
-      send_data pdf_file, type: "application/pdf", filename: pdf_filename
-    rescue
+      send_data LabelsPdfRenderer.combine(pages),
+        type: "application/pdf",
+        filename: "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}.pdf"
+    rescue => ex
+      Raven.capture_exception(ex)
       redirect_to samples_path, notice: "There was an error creating the print file."
     end
   end
