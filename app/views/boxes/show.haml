@@ -10,22 +10,29 @@
 
 .row
   .col
-    .row.form-field
-      .col.pe-3
+    .row
+      .col.pe-5
         %label ID
       .col
         .value= @box.uuid
 
-    .row.form-field
-      .col.pe-3
+    .row
+      .col.pe-5
         %label Purpose
       .col
         .value= @box.purpose
 
-    .row.form-field
+  .col.pe-5
+    .row
+      .col
+        = render "barcode_card"
+
+.row
+  .col
+    .row
       .col.pe-3
         %label Contents
-      .col.pe-7
+      .col.pe-9
         - @samples.each do |sample|
           .col.pe-7.batches-samples
             .samples-row

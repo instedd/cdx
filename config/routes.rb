@@ -131,6 +131,9 @@ Rails.application.routes.draw do
     end
   end
   resources :boxes, except: [:edit, :update] do
+    member do
+      get 'print'
+    end
     collection do
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
