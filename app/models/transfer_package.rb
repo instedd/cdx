@@ -54,6 +54,27 @@ class TransferPackage < ApplicationRecord
     transfer
   end
 
+  def confirm
+    if confirmed?
+      false
+    else
+      self.confirmed_at = Time.now
+      true
+    end
+  end
+
+  def confirm!
+    if confirm
+      save!
+    else
+      raise ActiveRecord::RecordNotSaved.new("Transfer package has already been confirmed.")
+    end
+  end
+
+  def confirmed?
+    !!confirmed_at
+  end
+
   private
 
   def create_qc_info(sample)
