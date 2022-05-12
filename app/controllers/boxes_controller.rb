@@ -60,11 +60,6 @@ class BoxesController < ApplicationController
     @box = Box.new(new_box_params)
   end
 
-  # def edit
-  #   return unless authorize_resource(@box, UPDATE_BOX)
-  #   @can_delete = has_access?(@box, DELETE_BOX)
-  # end
-
   def create
     return unless authorize_resource(@navigation_context.institution, CREATE_INSTITUTION_BOX)
 
@@ -102,16 +97,6 @@ class BoxesController < ApplicationController
       render :new
     end
   end
-
-  # def update
-  #   return unless authorize_resource(@box, UPDATE_BOX)
-
-  #   if @box.update(box_params)
-  #     redirect_to boxes_path, notice: "Box was successfully updated."
-  #   else
-  #     render :edit
-  #   end
-  # end
 
   def destroy
     return unless authorize_resource(@box, DELETE_BOX)

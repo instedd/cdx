@@ -147,59 +147,6 @@ RSpec.describe BoxesController, type: :controller do
     end
   end
 
-  # describe "edit" do
-  #   it "should be accessible to institution owner" do
-  #     get :edit, params: { id: box.id }
-  #     expect(response).to be_success
-
-  #     expect(assigns(:can_update)).to eq(false)
-  #     expect(assigns(:can_delete)).to eq(true)
-  #   end
-
-  #   it "should be allowed if can read" do
-  #     grant user, other_user, box, READ_BOX
-  #     sign_in other_user
-
-  #     get :edit, params: { id: box.id }
-  #     expect(response).to be_success
-
-  #     expect(assigns(:can_update)).to eq(false)
-  #     expect(assigns(:can_delete)).to eq(false)
-  #   end
-
-  #   it "should be allowed if can update" do
-  #     grant user, other_user, box, READ_BOX
-  #     grant user, other_user, box, UPDATE_BOX
-  #     sign_in other_user
-
-  #     get :edit, params: { id: box.id }
-  #     expect(response).to be_success
-
-  #     expect(assigns(:can_update)).to eq(false)
-  #     expect(assigns(:can_delete)).to eq(false)
-  #   end
-
-  #   it "should be allowed if can update and delete" do
-  #     grant user, other_user, box, READ_BOX
-  #     grant user, other_user, box, UPDATE_BOX
-  #     grant user, other_user, box, DELETE_BOX
-  #     sign_in other_user
-
-  #     get :edit, params: { id: box.id }
-  #     expect(response).to be_success
-
-  #     expect(assigns(:can_update)).to eq(false)
-  #     expect(assigns(:can_delete)).to eq(true)
-  #   end
-
-  #   it "shouldn't be allowed if can't read" do
-  #     sign_in other_user
-
-  #     get :edit, params: { id: box.id }
-  #     expect(response).to be_forbidden
-  #   end
-  # end
-
   describe "create" do
     let :batch do
       Batch.make!(institution: institution)
@@ -301,32 +248,6 @@ RSpec.describe BoxesController, type: :controller do
       batches.each { |b| expect(b.samples.count).to eq(9) }
     end
   end
-
-  # describe "update" do
-  #   let :box_plan do
-  #     { placeholder: true } # TODO: set real attributes
-  #   end
-
-  #   it "should update box" do
-  #     patch :update, params: { id: box.id, box: box_plan }
-  #     expect(response).to redirect_to boxes_path
-  #   end
-
-  #   it "should update box if allowed" do
-  #     grant user, other_user, box, UPDATE_BOX
-  #     sign_in other_user
-
-  #     patch :update, params: { id: box.id, box: box_plan }
-  #     expect(response).to redirect_to boxes_path
-  #   end
-
-  #   it "should not update box if not allowed" do
-  #     sign_in other_user
-
-  #     patch :update, params: { id: box.id, box: box_plan }
-  #     expect(response).to be_forbidden
-  #   end
-  # end
 
   describe "destroy" do
     it "should delete box" do
