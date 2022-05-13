@@ -29,7 +29,7 @@ var SampleTransferSelector = React.createClass({
         selector.removeSample(sample);
       }
 
-      let id = Date.now();
+      let id = Math.floor(Math.random() * 1000000000);
       let name = `transfer_package[sample_transfers_attributes][${id}][sample_id]`;
       return <div className="sample-transfer-preview">
         <div dangerouslySetInnerHTML={{ __html: sample.preview }}></div>
