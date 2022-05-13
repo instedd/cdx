@@ -99,4 +99,16 @@ class Sample < ApplicationRecord
   def has_qc_reference?
     !!(qc_info || (batch && batch.has_qc_sample?))
   end
+
+  # Removes sample from its context when getting transferred.
+  # It's added to the destination context when confirmed.
+  def detach_from_context
+    assign_attributes(site: nil, institution: nil)
+  end
+
+  def attach_qc_info
+    if qc_info = batch.try(&:qc_info)
+      self.qc_info = qc_info
+    end
+  end
 end

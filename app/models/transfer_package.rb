@@ -29,6 +29,19 @@ class TransferPackage < ApplicationRecord
           where(receiver_institution_id: institution.id)
         }
 
+  before_create do
+    sample_transfers.each do |sample_transfer|
+      sample = sample_transfer.sample
+      unless confirmed?
+        sample.detach_from_context
+      end
+      if includes_qc_info
+        sample.attach_qc_info
+      end
+      sample.save!
+    end
+  end
+
   def self.sending(sender, receiver, attributes = nil)
     create!(attributes) do |package|
       package.sender_institution = sender
@@ -42,8 +55,8 @@ class TransferPackage < ApplicationRecord
     )
 
     if sample.batch
-      if includes_qc_info && (qc_info = create_qc_info(sample))
-        sample.qc_info = qc_info
+      if includes_qc_info
+        sample.attach_qc_info
       end
 
       sample.old_batch_number = sample.batch.batch_number
@@ -73,17 +86,5 @@ class TransferPackage < ApplicationRecord
 
   def confirmed?
     !!confirmed_at
-  end
-
-  private
-
-  def create_qc_info(sample)
-    sample_qc = sample.batch.qc_sample
-    return unless sample_qc
-
-    qc_info = QcInfo.find_or_duplicate_from(sample_qc)
-    qc_info.samples << sample
-    qc_info.save!
-    qc_info
   end
 end

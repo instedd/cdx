@@ -194,6 +194,10 @@ Batch.blueprint do
   volume { 100 }
 end
 
+Batch.blueprint(:qc_sample) do
+  samples { [Sample.make(specimen_role: 'q')] }
+end
+
 Patient.blueprint do
   institution
 

@@ -20,6 +20,51 @@ RSpec.describe TransferPackage, type: :model do
     expect(transfer.errors["sample_transfers.sample"]).to eq ["Can't transfer QC sample"]
   end
 
+  describe ".save" do
+    describe "attach QC info" do
+      let(:batch) { Batch.make!(:qc_sample) }
+      let(:sample1) { Sample.make(institution: sender, batch: batch) }
+      let(:sample2) { Sample.make(institution: sender, batch: batch) }
+
+      it "includes_qc_info: true" do
+        transfer = TransferPackage.new(sender_institution: sender, receiver_institution: receiver, includes_qc_info: true)
+        transfer.sample_transfers.build(sample: sample1)
+        transfer.sample_transfers.build(sample: sample2)
+        transfer.save
+
+        sample1.reload
+        sample2.reload
+        expect(sample1.qc_info).to be_a(QcInfo)
+        expect(sample2.qc_info).to be_a(QcInfo)
+        expect(sample1.qc_info).to eq sample2.qc_info
+      end
+
+      it "includes_qc_info: false" do
+        transfer = TransferPackage.new(sender_institution: sender, receiver_institution: receiver, includes_qc_info: false)
+        transfer.sample_transfers.build(sample: sample1)
+        transfer.sample_transfers.build(sample: sample2)
+        transfer.save
+
+        sample1.reload
+        sample2.reload
+        expect(sample1.qc_info).to be_nil
+        expect(sample2.qc_info).to be_nil
+      end
+    end
+
+    it "updates sample context" do
+      site = Site.make(institution: sender)
+      sample = Sample.make(institution: sender, site: site)
+      transfer = TransferPackage.new(sender_institution: sender, receiver_institution: receiver)
+      transfer.sample_transfers.build(sample: sample)
+      transfer.save
+
+      sample.reload
+      expect(sample.institution).to be_nil
+      expect(sample.site).to be_nil
+    end
+  end
+
   describe "#confirm" do
     it "sets confirmed_at" do
       transfer = TransferPackage.make
