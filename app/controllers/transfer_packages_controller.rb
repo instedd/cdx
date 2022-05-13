@@ -15,11 +15,11 @@ class TransferPackagesController < ApplicationController
     @transfer_package = TransferPackage.new(transfer_package_params)
     @transfer_package.sender_institution = @navigation_context.institution
 
+    valid = @transfer_package.valid?
     if @transfer_package.sample_transfers.empty?
-      @transfer_package.errors.add :sample_transfers, "Must not be empty"
+      @transfer_package.errors.add :sample_transfers, "must not be empty"
+      valid = false
     end
-    no_errors = @transfer_package.errors.empty?
-    valid = @transfer_package.valid? && no_errors
 
     @transfer_package.sample_transfers.each do |sample_transfer|
       sample = sample_transfer.sample
