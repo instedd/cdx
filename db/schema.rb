@@ -171,6 +171,7 @@ ActiveRecord::Schema.define(version: 20220513214928) do
     t.datetime "updated_at",                   null: false
   end
 
+  add_index "boxes", ["created_at"], name: "index_boxes_on_created_at", using: :btree
   add_index "boxes", ["deleted_at"], name: "index_boxes_on_deleted_at", using: :btree
   add_index "boxes", ["institution_id"], name: "index_boxes_on_institution_id", using: :btree
   add_index "boxes", ["purpose"], name: "index_boxes_on_purpose", using: :btree

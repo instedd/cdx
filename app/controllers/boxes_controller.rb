@@ -55,46 +55,21 @@ class BoxesController < ApplicationController
 
   def new
     return unless authorize_resource(@navigation_context.institution, CREATE_INSTITUTION_BOX)
-    @can_delete = false
 
-    @box = Box.new(new_box_params)
+    @box_form = BoxForm.build(@navigation_context)
   end
 
   def create
     return unless authorize_resource(@navigation_context.institution, CREATE_INSTITUTION_BOX)
 
-    @box = Box.new(new_box_params)
-    @box.attributes = box_params
+    @box_form = BoxForm.build(@navigation_context, box_params)
+    @box_form.batches = check_access(load_batches, READ_BATCH)
+    @box_form.build_samples
 
-    batch_numbers = params.dig(:box, :batch_numbers).to_a
-
-    case @box.purpose
-    when "LOD"
-      batch = Batch.find_by!(batch_number: batch_numbers)
-      return unless authorize_resource(batch, READ_BATCH)
-      @box.build_samples(batch, exponents: 1..8, replicas: 3)
-
-    when "Variants"
-      batches = check_access(Batch.where(batch_number: batch_numbers), READ_BATCH)
-      batches.each do |batch|
-        @box.build_samples(batch, exponents: [1, 4, 8], replicas: 3)
-      end
-
-    when "Challenge"
-      batch = Batch.find_by!(batch_number: batch_numbers.shift)
-      return unless authorize_resource(batch, READ_BATCH)
-      @box.build_samples(batch, exponents: [1, 4, 8], replicas: 18)
-
-      batches = check_access(Batch.where(batch_number: batch_numbers), READ_BATCH)
-      batches.each do |batch|
-        @box.build_samples(batch, exponents: [1, 4, 8], replicas: 3)
-      end
-    end
-
-    if @box.save
+    if @box_form.save
       redirect_to boxes_path, notice: "Box was successfully created."
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -114,21 +89,29 @@ class BoxesController < ApplicationController
     redirect_to boxes_path, notice: "Boxes were successfully deleted."
   end
 
-
   private
 
   def load_box
     @box = Box.where(institution: @navigation_context.institution).find(params.fetch(:id))
   end
 
-  def box_params
-    params.require(:box).permit(:purpose)
+  def load_batches
+    Batch
+      .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+      .where(batch_number: @box_form.batch_numbers.values.reject(&:blank?))
   end
 
-  def new_box_params
-    {
-      institution: @navigation_context.institution,
-      site: @navigation_context.site,
-    }
+  def box_params
+    if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 0
+      params.require(:box).permit(:purpose).tap do |allowed|
+        allowed[:batch_numbers] = params[:box][:batch_numbers].permit!
+      end
+    elsif Rails::VERSION::MAJOR >= 5
+      params.require(:box).permit(:purpose, batch_numbers: {})
+    else
+      params.require(:box).permit(:purpose).tap do |allowed|
+        allowed[:batch_numbers] = params[:box][:batch_numbers]
+      end
+    end
   end
 end

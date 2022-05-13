@@ -33,10 +33,7 @@ var CdxSelectSectionToggler = React.createClass({
     if (!id) return
 
     var section = document.querySelector("#" + id);
-
-    Array.from(section.querySelectorAll("input, select, textarea"))
-      .forEach(function (element) { element.disabled = disabled; });
-
+    section.disabled = disabled;
     section.style.display = display;
   }
 })

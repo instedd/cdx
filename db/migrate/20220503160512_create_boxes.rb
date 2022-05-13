@@ -17,6 +17,8 @@ class CreateBoxes < ActiveRecord::Migration
       t.timestamps                   null: false
     end
 
+    add_index :boxes, :created_at
+
     change_table :samples do |t|
       t.belongs_to :box, null: true, index: true
     end

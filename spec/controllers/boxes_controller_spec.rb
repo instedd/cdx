@@ -24,7 +24,7 @@ RSpec.describe BoxesController, type: :controller do
   describe "index" do
     it "should be accessible by institution owner" do
       get :index
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
       expect(assigns(:boxes).count).to eq(2)
     end
 
@@ -49,13 +49,13 @@ RSpec.describe BoxesController, type: :controller do
 
       it "by site" do
         get :index, params: { context: "#{site.uuid}-*" }
-        expect(response).to be_success
+        expect(response).to have_http_status(:ok)
         expect(assigns(:boxes).count).to eq(1)
       end
 
       it "by site excluding subsites" do
         get :index, params: { context: "#{site.uuid}-!" }
-        expect(response).to be_success
+        expect(response).to have_http_status(:ok)
         expect(assigns(:boxes).count).to eq(1)
       end
 
@@ -80,7 +80,7 @@ RSpec.describe BoxesController, type: :controller do
   describe "show" do
     it "should be accessible to institution owner" do
       get :show, params: { id: box.id }
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "should be allowed if can read" do
@@ -88,14 +88,14 @@ RSpec.describe BoxesController, type: :controller do
       sign_in other_user
 
       get :show, params: { id: box.id }
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "shouldn't be allowed if can't read" do
       sign_in other_user
 
       get :show, params: { id: box.id }
-      expect(response).to be_forbidden
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -106,7 +106,7 @@ RSpec.describe BoxesController, type: :controller do
 
     it "should be accessible to institution owner" do
       get :print, params: { id: box.id }
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "should be allowed if can read" do
@@ -114,21 +114,21 @@ RSpec.describe BoxesController, type: :controller do
       sign_in other_user
 
       get :print, params: { id: box.id }
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "shouldn't be allowed if can't read" do
       sign_in other_user
 
       get :print, params: { id: box.id }
-      expect(response).to be_forbidden
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
   describe "new" do
     it "should be accessible to institution owner" do
       get :new
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "should be allowed if can create" do
@@ -136,26 +136,26 @@ RSpec.describe BoxesController, type: :controller do
       sign_in other_user
 
       get :new
-      expect(response).to be_success
+      expect(response).to have_http_status(:ok)
     end
 
     it "shouldn't be allowed if can't create" do
       sign_in other_user
 
       get :new
-      expect(response).to be_forbidden
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
   describe "create" do
     let :batch do
-      Batch.make!(institution: institution)
+      Batch.make!(institution: institution, site: site)
     end
 
     let :box_plan do
       {
         purpose: "LOD",
-        batch_numbers: [batch.batch_number],
+        batch_numbers: { "0" => batch.batch_number },
       }
     end
 
@@ -165,7 +165,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(response).to redirect_to boxes_path
       end.to change(institution.boxes, :count).by(1)
 
-      box = assigns(:box).reload
+      box = assigns(:box_form).box.reload
       expect(box.uuid).to_not be_nil
       expect(box.institution_id).to eq institution.id
     end
@@ -178,7 +178,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(response).to redirect_to boxes_path
       end.to change(site.boxes, :count).by(1)
 
-      box = assigns(:box).reload
+      box = assigns(:box_form).box.reload
       expect(box.uuid).to_not be_nil
       expect(box.institution_id).to eq institution.id
       expect(box.site_id).to eq site.id
@@ -200,52 +200,132 @@ RSpec.describe BoxesController, type: :controller do
 
       expect do
         post :create, params: { box: box_plan }
-        expect(response).to be_forbidden
+        expect(response).to have_http_status(:forbidden)
       end.to change(institution.boxes, :count).by(0)
     end
 
-    it "creates samples for LOD purpose" do
-      expect do
-        post :create, params: { box: {
-          purpose: "LOD",
-          batch_numbers: [batch.batch_number],
-        } }
-        expect(response).to redirect_to(boxes_path)
-      end.to change(institution.samples, :count).by(24)
+    describe "LOD purpose" do
+      it "creates samples" do
+        expect do
+          post :create, params: { box: {
+            purpose: "LOD",
+            batch_numbers: { "0" => batch.batch_number },
+          } }
+          expect(response).to redirect_to(boxes_path)
+        end.to change(institution.samples, :count).by(24)
 
-      expect(Box.last.samples.count).to eq(24)
-      expect(batch.samples.count).to eq(24)
+        expect(Box.last.samples.count).to eq(24)
+        expect(batch.samples.count).to eq(24)
+      end
+
+      it "requires one batch" do
+        expect do
+          post :create, params: { box: {
+            purpose: "LOD",
+            batch_numbers: { "0" => "" },
+          } }
+          expect(response).to have_http_status(:unprocessable_entity)
+        end.to change(institution.samples, :count).by(0)
+      end
     end
 
-    it "creates samples for Variants purpose" do
-      batches = Batch.make!(6, institution: institution)
+    describe "Variants purpose" do
+      it "creates samples" do
+        batches = Batch.make!(6, institution: institution)
+        batch_numbers = Hash[batches.map.with_index { |b, i| [i.to_s, b.batch_number] }]
 
-      expect do
-        post :create, params: { box: {
-          purpose: "Variants",
-          batch_numbers: batches.map(&:batch_number),
-        } }
-        expect(response).to redirect_to(boxes_path)
-      end.to change(institution.samples, :count).by(54)
+        expect do
+          post :create, params: { box: {
+            purpose: "Variants",
+            batch_numbers: batch_numbers,
+          } }
+          expect(response).to redirect_to(boxes_path)
+        end.to change(institution.samples, :count).by(54)
 
-      expect(Box.last.samples.count).to eq(54)
-      batches.each { |b| expect(b.samples.count).to eq(9) }
+        expect(Box.last.samples.count).to eq(54)
+        batches.each { |b| expect(b.samples.count).to eq(9) }
+      end
+
+      it "requires at least 2 variant batches" do
+        expect do
+          post :create, params: { box: {
+            purpose: "Variants",
+            batch_numbers: { "0" => batch.batch_number },
+          } }
+          expect(response).to have_http_status(:unprocessable_entity)
+        end.to change(institution.samples, :count).by(0)
+      end
+
+      it "creates samples from 2 batches" do
+        other_batch = Batch.make!(institution: institution)
+
+        expect do
+          post :create, params: { box: {
+            purpose: "Variants",
+            batch_numbers: {
+              "4" => batch.batch_number,
+              "2" => other_batch.batch_number,
+            },
+          } }
+          expect(response).to redirect_to(boxes_path)
+        end.to change(institution.samples, :count).by(18)
+      end
     end
 
-    it "creates samples for Challenge purpose" do
-      batches = Batch.make!(6, institution: institution)
+    describe "Challenge purpose" do
+      it "creates samples" do
+        batches = Batch.make!(6, institution: institution)
+        batch_numbers = Hash[[batch, *batches].map.with_index { |b, i| [i.to_s, b.batch_number] }]
 
-      expect do
-        post :create, params: { box: {
-          purpose: "Challenge",
-          batch_numbers: [batch.batch_number, *batches.map(&:batch_number)],
-        } }
-        expect(response).to redirect_to(boxes_path)
-      end.to change(institution.samples, :count).by(108)
+        expect do
+          post :create, params: { box: {
+            purpose: "Challenge",
+            batch_numbers: batch_numbers,
+          } }
+          expect(response).to redirect_to(boxes_path)
+        end.to change(institution.samples, :count).by(108)
 
-      expect(Box.last.samples.count).to eq(108)
-      expect(batch.samples.count).to eq(54)
-      batches.each { |b| expect(b.samples.count).to eq(9) }
+        expect(Box.last.samples.count).to eq(108)
+        expect(batch.samples.count).to eq(54)
+        batches.each { |b| expect(b.samples.count).to eq(9) }
+      end
+
+      it "requires a virus batch" do
+        distractor = Batch.make!(institution: institution)
+
+        expect do
+          post :create, params: { box: {
+            purpose: "Challenge",
+            batch_numbers: { "1" => distractor.batch_number },
+          } }
+          expect(response).to have_http_status(:unprocessable_entity)
+        end.to change(institution.samples, :count).by(0)
+      end
+
+      it "requires at least 1 distractor batches" do
+        expect do
+          post :create, params: { box: {
+            purpose: "Challenge",
+            batch_numbers: { "0" => batch.batch_number },
+          } }
+          expect(response).to have_http_status(:unprocessable_entity)
+        end.to change(institution.samples, :count).by(0)
+      end
+
+      it "creates samples from 1 virus batch and 1 distractor batches" do
+        distractor = Batch.make!(institution: institution)
+
+        expect do
+          post :create, params: { box: {
+            purpose: "Challenge",
+            batch_numbers: {
+              "0" => batch.batch_number,
+              "4" => distractor.batch_number,
+            },
+          } }
+          expect(response).to redirect_to(boxes_path)
+        end.to change(institution.samples, :count).by(63)
+      end
     end
   end
 
@@ -274,7 +354,7 @@ RSpec.describe BoxesController, type: :controller do
 
       expect do
         delete :destroy, params: { id: box.id }
-        expect(response).to be_forbidden
+        expect(response).to have_http_status(:forbidden)
       end.to change(institution.boxes.unscoped, :count).by(0)
     end
   end
@@ -310,7 +390,7 @@ RSpec.describe BoxesController, type: :controller do
 
       expect do
         post :bulk_destroy, params: { box_ids: [box.id, site_box.id] }
-        expect(response).to be_forbidden
+        expect(response).to have_http_status(:forbidden)
       end.to change(institution.boxes, :count).by(0)
     end
 
@@ -319,7 +399,7 @@ RSpec.describe BoxesController, type: :controller do
 
       expect do
         post :bulk_destroy, params: { box_ids: [box.id, site_box.id] }
-        expect(response).to be_forbidden
+        expect(response).to have_http_status(:forbidden)
       end.to change(institution.boxes.unscoped, :count).by(0)
     end
   end

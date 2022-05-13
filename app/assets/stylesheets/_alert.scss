@@ -1,0 +1,13 @@
+.alert-container {
+  .alert {
+    width: fit-content;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    border: 1px solid
+  }
+
+  .alert.alert-error {
+    border-color: #EB2122;
+    color: #EB2122;
+  }
+}

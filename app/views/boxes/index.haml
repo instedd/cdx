@@ -30,7 +30,7 @@
                 %td
                   =check_box_tag "box_ids[]", box.id, false, { id: "box_ids.#{box.id}" }
                   %label.row{for: "box_ids.#{box.id}"}
-                %td= box.uuid
+                %td= short_uuid_with_title box.uuid
                 %td= box.purpose
                 %td= box.samples_count
 

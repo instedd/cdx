@@ -1,54 +1,69 @@
-= form_for(@box) do |f|
+= form_for(@box_form.box) do |f|
 
-  = validation_errors @box
+  = validation_errors @box_form
 
   .row
     .col
       .row.form-field
         .col.pe-3
-          = f.label :uuid
+          = f.label :purpose
         .col
-          .value= @box.uuid
+          = react_component "CdxSelectSectionToggler", { name: "box[purpose]", items: Box.purposes.map { |v| { label: v, value: v } }, value: @box_form.purpose, submit: "#btn-save" }
 
       .row.form-field
         .col.pe-3
-          = f.label :purpose
+          %label Contents
         .col
-          = react_component "CdxSelectSectionToggler", { name: "box[purpose]", items: Box.purposes.map { |v| { label: v, value: v } }, value: @box.purpose, submit: "#btn-save" }
+          %fieldset#LOD(disabled)
+            .row
+              .col.pe-2
+                = label_tag "box_batch_numbers_0", "Batch", class: "is-normal-case"
+              .col
+                .batches-samples
+                  = text_field_tag "box[batch_numbers][0]", @box_form.batch_numbers["0"], id: "box_batch_numbers_0", placeholder: "Enter batch id", class: "input-block"
+                  - if @box_form.batch_errors["0"]
+                    .field_with_errors
+                      Error:
+                      = @box_form.batch_errors["0"]
 
-      #LOD
-        .row.form-field
-          .col.pe-3
-            = label_tag "box_batch_numbers_0", "Batch"
-          .col
-            = text_field_tag "box[batch_numbers][0]", "", id: "box_batch_numbers_0", disabled: true, placeholder: "Enter batch id"
+          %fieldset#Variants(disabled=true)
+            - 1.upto(6) do |index|
+              .row
+                .col.pe-2
+                  = label_tag "box_batch_numbers_#{index}", "Variant #{index}", class: "is-normal-case"
+                .col
+                  .batches-samples
+                    = text_field_tag "box[batch_numbers][#{index}]", @box_form.batch_numbers[index.to_s], id: "box_batch_numbers_#{index}", placeholder: "Enter batch id", class: "input-block"
+                    - if @box_form.batch_errors[index.to_s]
+                      .field_with_errors
+                        Error:
+                        = @box_form.batch_errors[index.to_s]
 
-      #Variants
-        - 1.upto(6) do |index|
-          .row.form-field
-            .col.pe-3
-              = label_tag "box_batch_numbers_#{index}", "Variant #{index}"
-            .col
-              = text_field_tag "box[batch_numbers][#{index}]", "", id: "box_batch_numbers_#{index}", disabled: true, placeholder: "Enter batch id"
+          %fieldset#Challenge(disabled)
+            .row
+              .col.pe-2
+                = label_tag "box_batch_numbers_0", "Virus", class: "is-normal-case"
+              .col
+                .batches-samples
+                  = text_field_tag "box[batch_numbers][0]", @box_form.batch_numbers["0"], id: "box_batch_numbers_0", placeholder: "Enter batch id", class: "input-block"
+                  - if @box_form.batch_errors["0"]
+                    .field_with_errors
+                      Error:
+                      = @box_form.batch_errors["0"]
 
-      #Challenge
-        .row.form-field
-          .col.pe-3
-            = label_tag "box_batch_numbers_0", "Virus"
-          .col
-            = text_field_tag "box[batch_numbers][id]", "", id: "box_batch_numbers_0", disabled: true, placeholder: "Enter batch id"
-
-        - 1.upto(6) do |index|
-          .row.form-field
-            .col.pe-3
-              = label_tag "box_batch_numbers_#{index}", "Distractor #{index}"
-            .col
-              = text_field_tag "box[batch_numbers][#{index}]", "", id: "box_batch_numbers_#{index}", disabled: true, placeholder: "Enter batch id"
+            - 1.upto(6) do |index|
+              .row
+                .col.pe-2
+                  = label_tag "box_batch_numbers_#{index}", "Distractor #{index}", class: "is-normal-case"
+                .col
+                  .batches-samples
+                    = text_field_tag "box[batch_numbers][#{index}]", @box_form.batch_numbers[index.to_s], id: "box_batch_numbers_#{index}", placeholder: "Enter batch id", class: "input-block"
+                    - if @box_form.batch_errors[index.to_s]
+                      .field_with_errors
+                        Error:
+                        = @box_form.batch_errors[index.to_s]
 
   .row.button-actions
     .col
       = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
       = link_to 'Cancel', boxes_path, class: 'btn-link'
-
-      - if @can_delete
-        = confirm_deletion_button @box, 'box'
