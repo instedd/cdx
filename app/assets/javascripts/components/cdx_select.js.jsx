@@ -16,6 +16,18 @@ var CdxSelect = React.createClass({
     }
   },
 
+  // Searchable selects don't prevent typing whatever, in which case the input
+  // will have the invalid value, yet the value sent by the form will be empty
+  // or worse: a valid value that was previously selected, leading to send a
+  // value that doesn't reflect what's on the screen, and the backend to
+  // validate a value when it should fail.
+  //
+  // To counter this problem, we copy the typed value, so what we send to the
+  // backend reflects what's visible in the UI.
+  onInputChange: function (newValue) {
+    this.selectRef.setValue(newValue)
+  },
+
   render: function() {
     var placeholder = "Choose one"
     if (this.props.items.length > 0 && this.props.items[0].value === "") {
@@ -23,6 +35,7 @@ var CdxSelect = React.createClass({
     }
 
     return (<Select className={this.props.className}
+      ref={(ref) => { this.selectRef = ref }}
       name={this.props.name}
       value={this.props.value}
       options={this.props.items}
@@ -30,7 +43,8 @@ var CdxSelect = React.createClass({
       clearable={false}
       multi={this.props.multi}
       searchable={this.props.searchable}
-      onChange={this.onChange}>
+      onChange={this.onChange}
+      onInputChange={this.props.searchable && this.onInputChange}>
     </Select>);
   }
 });

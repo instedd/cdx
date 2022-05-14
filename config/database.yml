@@ -20,7 +20,7 @@ development:
 
 test: &test
   <<: *default
-  database: cdp_test
+  database: cdp_test<%= ENV["TEST_ENV_NUMBER"] %>
 
 production:
   <<: *default

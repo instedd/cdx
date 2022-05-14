@@ -6,8 +6,8 @@ class SampleTransfersController < ApplicationController
   def index
     @sample_transfers = SampleTransfer
       .within(@navigation_context.institution)
-      .includes(:receiver_institution, :sender_institution, sample: [:sample_identifiers])
-      .ordered_by_creation
+      .includes(transfer_package: [:receiver_institution, :sender_institution], sample: [:sample_identifiers])
+      .order(created_at: :desc)
 
     @sample_transfers = @sample_transfers.joins(sample: :sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_id]) unless params[:sample_id].blank?
     @sample_transfers = @sample_transfers.joins(:sample).joins("LEFT JOIN batches ON batches.id = samples.batch_id").where("batches.batch_number LIKE concat('%', ?, '%') OR samples.old_batch_number LIKE concat('%', ?, '%')", params[:batch_number], params[:batch_number]) unless params[:batch_number].blank?
@@ -15,7 +15,7 @@ class SampleTransfersController < ApplicationController
     @sample_transfers = @sample_transfers.joins(:sample).where("samples.specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
 
     @sample_transfers = perform_pagination(@sample_transfers)
-      .preload(:transfer_package, :sender_institution, :receiver_institution, sample: %i[batch qc_info])
+      .preload(transfer_package: %i[sender_institution receiver_institution], sample: %i[batch qc_info])
       .map { |transfer| SampleTransferPresenter.new(transfer, @navigation_context) }
   end
 
@@ -25,11 +25,14 @@ class SampleTransfersController < ApplicationController
       flash[:error] = "Destination Institution does not exists."
       redirect_to samples_path
     else
-      if create_transfer(new_owner, params["samples"])
-        flash[:notice] =  "All samples have been transferred successfully."
-        redirect_to samples_path
-      else
+      begin
+        create_transfer(new_owner, params["samples"])
+      rescue => exception
         flash[:error] = "Samples transfer failed."
+
+        raise exception
+      else
+        flash[:notice] = "All samples have been transferred successfully."
         redirect_to samples_path
       end
     end
@@ -71,7 +74,7 @@ class SampleTransfersController < ApplicationController
     samples = Sample.find_all_by_any_uuid(sample_uuids)
 
     Sample.transaction do
-      package = TransferPackage.sending_to(new_owner, transfer_package_params)
+      package = TransferPackage.sending(samples.first.institution, new_owner, transfer_package_params)
 
       samples.each do |sample|
         raise "User not authorized for transferring Samples " unless authorize_resource?(sample, UPDATE_SAMPLE)
@@ -80,12 +83,6 @@ class SampleTransfersController < ApplicationController
         package.add!(sample)
       end
     end
-
-    true
-  rescue => exception
-    Raven.capture_exception(exception)
-
-    false
   end
 
   def transfer_package_params

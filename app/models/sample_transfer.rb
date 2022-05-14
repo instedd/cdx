@@ -1,29 +1,31 @@
 class SampleTransfer < ApplicationRecord
   belongs_to :sample
-  belongs_to :sender_institution, class_name: "Institution"
-  belongs_to :receiver_institution, class_name: "Institution"
-  belongs_to :transfer_package, required: false
+  belongs_to :transfer_package
 
   # TODO: remove these after upgrading to Rails 5.0 (belongs_to associations are required by default):
   validates_presence_of :sample
-  validates_presence_of :sender_institution
-  validates_presence_of :receiver_institution
 
-  after_initialize do
-    self.sender_institution ||= sample.try &:institution
+  validate :specimen_role_validation
+
+  def specimen_role_validation
+    if sample.try &:is_quality_control?
+      errors.add(:sample, "Can't transfer QC sample")
+    end
   end
 
   scope :within, ->(institution) {
-          where("sender_institution_id = ? OR receiver_institution_id = ?", institution.id, institution.id)
+          joins(:transfer_package).merge(TransferPackage.within(institution))
         }
 
   scope :with_receiver, ->(institution) {
-          where(receiver_institution_id: institution.id)
+          joins(:transfer_package).merge(TransferPackage.with_receiver(institution))
         }
 
   scope :ordered_by_creation, -> {
           order(created_at: :desc)
         }
+
+  delegate :receiver_institution, :sender_institution, to: :transfer_package
 
   def confirm
     if confirmed?

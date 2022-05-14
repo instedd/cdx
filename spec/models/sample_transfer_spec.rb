@@ -5,13 +5,15 @@ RSpec.describe SampleTransfer, type: :model do
   let(:sender) { Institution.make }
   let(:receiver) { Institution.make }
 
-  it "sets sender institution from sample" do
-    expect(SampleTransfer.new(sample: sample).sender_institution).to eq sample.institution
+  it "validates" do
+    transfer = SampleTransfer.new(sample: sample, transfer_package: TransferPackage.make)
+    expect(transfer).to be_valid
   end
 
-  it "validates" do
-    transfer = SampleTransfer.new(sample: sample, receiver_institution: receiver, sender_institution: sender)
-    expect(transfer).to be_valid
+  it "validates specimen role" do
+    transfer = SampleTransfer.new(sample: Sample.make(specimen_role: "q"), transfer_package: TransferPackage.make)
+    expect(transfer).not_to be_valid
+    expect(transfer.errors[:sample]).to eq ["Can't transfer QC sample"]
   end
 
   describe ".within" do

@@ -112,8 +112,13 @@ Rails.application.routes.draw do
       get 'edit_or_show'
     end
     collection do
-      get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'print' }, action: :bulk_print
-      get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+      post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'print' }, action: :bulk_print
+      post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+    end
+  end
+  resources :transfer_packages, only: [:new, :create] do
+    collection do
+      get "find_sample"
     end
   end
   resources :batches do
@@ -122,7 +127,7 @@ Rails.application.routes.draw do
       post 'add_sample'
     end
     collection do
-      get 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+      post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end
   resources :qc_infos

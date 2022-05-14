@@ -929,8 +929,8 @@ describe Cdx::Api, elasticsearch: true do
         Cdx::Fields.test.searchable_fields.concat @extra_fields
 
         # Delete the index and recreate it to make ES grab the new template
-        Cdx::Api.client.indices.delete index: "cdx_test", ignore: 404
-        Cdx::Api.initialize_template "cdx_tests_template_test"
+        Cdx::Api.client.indices.delete index: Cdx::Api.index_name, ignore: 404
+        Cdx::Api.initialize_template Cdx::Api.mapping_template_name
       end
 
       after(:all) do
@@ -944,8 +944,8 @@ describe Cdx::Api, elasticsearch: true do
         end
 
         # Delete the index and recreate it to make ES grab the new template
-        Cdx::Api.client.indices.delete index: "cdx_test", ignore: 404
-        Cdx::Api.initialize_template "cdx_tests_template_test"
+        Cdx::Api.client.indices.delete index: Cdx::Api.index_name, ignore: 404
+        Cdx::Api.initialize_template Cdx::Api.mapping_template_name
       end
 
       it "should allow searching by the new field" do

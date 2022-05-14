@@ -32,7 +32,7 @@ class BatchForm
   delegate :id, :new_record?, :persisted?, to: :batch
 
   validates_presence_of :date_produced
-  validates_numericality_of :samples_quantity, greater_than: 0, message: "value must be greater than 0", if: :creating_batch?
+  validates_numericality_of :samples_quantity, greater_than_or_equal_to: 0, message: "value must be greater or equal to 0", if: :creating_batch?
 
   def self.for(batch)
     new.tap do |form|
@@ -96,19 +96,16 @@ class BatchForm
     # we need to set a Time in batch instead of self.date_produced :: String
     batch.date_produced = @date_produced
 
-    # validate forms. stop if invalid
     form_valid = self.valid?
-    return false unless form_valid
+    batch_valid = batch.valid?
+    # copy validations from model to form to display errors if present 
+    batch.errors.each do |key, error|
+      errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
+    end
+    return false unless form_valid && batch_valid 
 
     # validate/save. All done if succeeded
-    is_valid = batch.save
-    return true if is_valid
-
-    # copy validations from model to form (form is valid, but model is not)
-    batch.errors.each do |key, error|
-      errors.add(key, error) if self.class.shared_attributes.include?(key)
-    end
-    return false
+    batch.save
   end
 
   def creating_batch?

@@ -14,8 +14,8 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "includes transfers from and to my institution (ordered by creation date)" do
       sample_transfers = [
-        SampleTransfer.make!(sender_institution: my_institution, created_at: Time.now - 1.day),
-        SampleTransfer.make!(receiver_institution: my_institution, created_at: Time.now),
+        SampleTransfer.make!(transfer_package: TransferPackage.make!(sender_institution: my_institution), created_at: Time.now - 1.day),
+        SampleTransfer.make!(transfer_package: TransferPackage.make!(receiver_institution: my_institution), created_at: Time.now),
       ]
       get :index
       expect(assigns(:sample_transfers).map(&:transfer)).to eq sample_transfers.reverse
@@ -28,8 +28,8 @@ RSpec.describe SampleTransfersController, type: :controller do
     end
 
     describe "filters" do
-      let!(:subject) { SampleTransfer.make!(sender_institution: my_institution, sample: Sample.make!(:filled, batch: Batch.make!, specimen_role: "c")) }
-      let!(:other) { SampleTransfer.make!(receiver_institution: my_institution, sample: Sample.make!(:filled, batch: Batch.make!)) }
+      let!(:subject) { SampleTransfer.make!(transfer_package: TransferPackage.make!(sender_institution: my_institution), sample: Sample.make!(:filled, batch: Batch.make!, specimen_role: "c")) }
+      let!(:other) { SampleTransfer.make!(transfer_package: TransferPackage.make!(receiver_institution: my_institution), sample: Sample.make!(:filled, batch: Batch.make!)) }
 
       it "by sample id" do
         get :index, params: { sample_id: subject.sample.uuid[0..8] }
@@ -42,7 +42,7 @@ RSpec.describe SampleTransfersController, type: :controller do
       end
 
       it "by old_batch_number" do
-        transfer = SampleTransfer.make!(sender_institution: my_institution, sample: Sample.make!(:filled, specimen_role: "c", old_batch_number: "12345678"))
+        transfer = SampleTransfer.make!(transfer_package: TransferPackage.make!(sender_institution: my_institution), sample: Sample.make!(:filled, specimen_role: "c", old_batch_number: "12345678"))
         get :index, params: { batch_number: "12345678" }
         expect(assigns(:sample_transfers).map(&:transfer)).to eq [transfer]
       end
@@ -117,7 +117,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "confirms" do
       sample = Sample.make!
-      transfer = TransferPackage.sending_to(my_institution).add!(sample)
+      transfer = TransferPackage.sending(other_institution, my_institution).add!(sample)
 
       Timecop.freeze do
         patch :confirm, params: { sample_transfer_id: transfer.id }
@@ -133,7 +133,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "verifies user is authorized" do
       sample = Sample.make!
-      transfer = TransferPackage.sending_to(other_institution).add!(sample)
+      transfer = TransferPackage.sending(my_institution, other_institution).add!(sample)
 
       grant other_institution.user, current_user, other_institution, Policy::Actions::READ_INSTITUTION
 
@@ -149,7 +149,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "verifies current context is receiver" do
       sample = Sample.make!
-      transfer = TransferPackage.sending_to(other_institution).add!(sample)
+      transfer = TransferPackage.sending(my_institution, other_institution).add!(sample)
 
       expect {
         patch :confirm, params: { sample_transfer_id: transfer.id }
@@ -164,7 +164,7 @@ RSpec.describe SampleTransfersController, type: :controller do
 
     it "verifies transfer is unconfirmed" do
       sample = Sample.make
-      transfer = TransferPackage.sending_to(my_institution).add!(sample)
+      transfer = TransferPackage.sending(other_institution, my_institution).add!(sample)
       transfer.confirm_and_apply!
       transfer.confirmed_at = original_confirmed_at = Time.now.change(usec: 0) - 1.hour
       transfer.save!

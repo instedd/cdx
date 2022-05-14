@@ -19,6 +19,7 @@ class Institution < ApplicationRecord
   has_many :roles, dependent: :destroy
   has_many :alerts
 
+  validates_uniqueness_of :name, :case_sensitive => false
   validates_presence_of :name
   validates_presence_of :kind
   validates_inclusion_of :kind, in: KINDS

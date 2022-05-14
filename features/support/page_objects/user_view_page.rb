@@ -12,11 +12,8 @@ class UserViewPage < CdxPageBase
 end
 
 class UserInviteModal < CdxPageBase
-  element :new_user_option, ".modal .invitation-option-card", text: "NEW USER"
 
   def select_new_user_option
-    new_user_option.click
-
     modal = InviteUsersModal.new
     yield modal if block_given?
     modal
@@ -25,7 +22,6 @@ end
 
 class InviteUsersModal < CdxPageBase
   section :role, CdxSelect, ".modal label", text: /Role/i
-  element :add_user, :link, "Add"
   element :users, ".item-search input"
 
   element :primary, ".modal .btn-primary"

@@ -48,6 +48,16 @@ class Sample < ApplicationRecord
     joins(:sample_identifiers).where(sample_identifiers: {uuid: uuids})
   end
 
+  scope :autocomplete, ->(uuid) {
+          if uuid.size == 36
+            # Full UUID
+            find_all_by_any_uuid(uuid)
+          else
+            # Partial UUID
+            joins(:sample_identifiers).where("sample_identifiers.uuid LIKE concat(?, '%')", uuid)
+          end
+        }
+
   def merge(other_sample)
     # Adds all sample_identifiers from other_sample if they have an uuid (ie they have been persisted)
     # or if they contain a new entity_id (ie not already in this sample.sample_identifiers)

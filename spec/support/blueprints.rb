@@ -137,6 +137,7 @@ Sample.blueprint(:filled) do
   sample_identifiers { [SampleIdentifier.make!(sample: object)] }
   isolate_name { Faker::Name.name }
   specimen_role { "p" }
+  date_produced { Faker::Time.backward }
 end
 
 Sample.blueprint(:batch) do
@@ -164,13 +165,18 @@ end
 TransferPackage.blueprint do
   uuid { SecureRandom.uuid }
   receiver_institution { Institution.make! }
+  receiver_institution { Institution.make! }
+  sender_institution { Institution.make! }
   recipient { Faker::Name.name }
+end
+
+TransferPackage.blueprint(:confirmed) do
+  confirmed_at { Faker::Time.backward }
 end
 
 SampleTransfer.blueprint do
   sample { Sample.make!(:filled) }
-  receiver_institution { Institution.make! }
-  sender_institution { object.sample.institution || Institution.make! }
+  transfer_package { TransferPackage.make(sender_institution: object.sample.institution || Institution.make!) }
 end
 
 SampleTransfer.blueprint(:confirmed) do

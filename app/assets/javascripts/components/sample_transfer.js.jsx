@@ -151,7 +151,7 @@ var SampleTransferModal = React.createClass({
             </div>
           </div>
           <div className="row">
-            <div className="col pe-4"><label>Responsible Person</label></div>
+            <div className="col pe-4"><label>Recipient</label></div>
             <div className="col">
               <input type="text" name="recipient" className="input-block"/>
             </div>

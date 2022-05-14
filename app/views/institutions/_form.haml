@@ -1,5 +1,4 @@
 = form_for(@institution) do |f|
-  = validation_errors @institution
   - if @institution.new_record?
     .row.centered.institution-container{:class => ("active" unless @institution.kind.blank?)}
       .col
@@ -37,7 +36,8 @@
       .col.px-1
         = f.label :name, :class => 'block'
       .col
-        = f.text_field :name, readonly: @readonly, :class => 'input-block'
+        = f.text_field :name, readonly: @readonly, :class => ['input-block', @institution.errors.has_key?(:name) ? 'input-required':'']
+        = field_errors @institution, :name
         = f.hidden_field :pending_institution_invite_id
     - if not f.object.new_record?
       .row

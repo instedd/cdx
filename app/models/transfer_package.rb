@@ -1,21 +1,44 @@
 class TransferPackage < ApplicationRecord
+  belongs_to :sender_institution, class_name: "Institution"
   belongs_to :receiver_institution, class_name: "Institution"
   has_many :sample_transfers
+
+  accepts_nested_attributes_for :sample_transfers,
+    allow_destroy: true,
+    reject_if: :all_blank
+
+  validates_associated :sample_transfers
+
+  # TODO: remove these after upgrading to Rails 5.0 (belongs_to associations are required by default):
+  validates_presence_of :sender_institution
+  validates_presence_of :receiver_institution
 
   after_initialize do
     self.uuid ||= SecureRandom.uuid
   end
 
-  def self.sending_to(institution, attributes = nil)
+  scope :within, ->(institution) {
+          if Rails::VERSION::MAJOR >= 5
+            where(sender_institution_id: institution.id).or(with_receiver(institution))
+          else
+            where(arel_table[:sender_institution_id].eq(institution.id).or(arel_table[:receiver_institution_id].eq(institution.id)))
+          end
+        }
+
+  scope :with_receiver, ->(institution) {
+          where(receiver_institution_id: institution.id)
+        }
+
+  def self.sending(sender, receiver, attributes = nil)
     create!(attributes) do |package|
-      package.receiver_institution = institution
+      package.sender_institution = sender
+      package.receiver_institution = receiver
     end
   end
 
   def add!(sample)
     transfer = sample_transfers.create!(
       sample: sample,
-      receiver_institution: receiver_institution,
     )
 
     if sample.batch
@@ -29,6 +52,27 @@ class TransferPackage < ApplicationRecord
     sample.update!(batch: nil, site: nil, institution: nil)
 
     transfer
+  end
+
+  def confirm
+    if confirmed?
+      false
+    else
+      self.confirmed_at = Time.now
+      true
+    end
+  end
+
+  def confirm!
+    if confirm
+      save!
+    else
+      raise ActiveRecord::RecordNotSaved.new("Transfer package has already been confirmed.")
+    end
+  end
+
+  def confirmed?
+    !!confirmed_at
   end
 
   private

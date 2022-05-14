@@ -8,12 +8,14 @@ else
   require 'capybara-screenshot/rspec'
 end
 
+test_env_number = (ENV["TEST_ENV_NUMBER"].presence || 1).to_i
+
 # Configure the capybara test server on an IP accessible from the network, so we
 # can use a remote selenium server from another compose service (or the host).
 ENV['SERVER_HOST'] ||= Socket.ip_address_list.find(&:ipv4_private?).ip_address
-ENV['SERVER_PORT'] ||= '4000'
+ENV['SERVER_PORT'] ||= (4000 + test_env_number).to_s
 ENV['HEADLESS'] ||= 'true'
-ENV['SELENIUM_URL'] ||= 'http://selenium:4444/'
+ENV["SELENIUM_URL"] = (ENV["SELENIUM_URL"] || "http://cdx-selenium-%{test_env_number}:4444/").gsub("%{test_env_number}", test_env_number.to_s)
 
 Capybara.configure do |config|
   config.server = :puma, { Silent: true }

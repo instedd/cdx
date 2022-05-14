@@ -64,7 +64,11 @@ $(document).on('ready', function(){
 
 var NavigationContextPicker = React.createClass({
   buildState: function(props) {
-    return { context: props.context, subsitesIncluded: !props.context.full_context.endsWith("-!") }
+    return {
+      context: props.context,
+      subsitesIncluded: !props.context.full_context.endsWith("-!"),
+      modalTitle:'Invite'
+       }
   },
 
   getInitialState: function() {
@@ -104,8 +108,9 @@ var NavigationContextPicker = React.createClass({
     // since the picker tracks the selected state
     // there is no need to update the properties
     return (
-      <div>
+      <div className="side-bar">
         <SitePicker selected_uuid={this.state.context.uuid} onSiteSelected={this.changeContextSite} onSubsitesToggled={this.onSubsitesToggled} subsitesIncluded={this.state.subsitesIncluded} />
+        <AddInstitutionLink institution_types= {this.props.institution_types} context={this.props.context} />
       </div>
     );
   }

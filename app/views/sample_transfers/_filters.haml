@@ -4,6 +4,7 @@
       .row
         .col
           %h1
+            = link_to "+", new_transfer_package_path, class: 'btn-add side-link fix', title: 'Create transfer package'
             Sample Transfers
 
       %form#filters-form{action: sample_transfers_path, "data-auto-submit" => true}

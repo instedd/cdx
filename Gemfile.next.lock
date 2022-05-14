@@ -368,6 +368,9 @@ GEM
       oauth2 (~> 1.4)
       omniauth (>= 1.9, < 3)
     orm_adapter (0.5.0)
+    parallel (1.19.2)
+    parallel_tests (2.32.0)
+      parallel
     paranoia (2.4.2)
       activerecord (>= 4.0, < 6.1)
     premailer (1.11.1)
@@ -518,6 +521,8 @@ GEM
     slop (3.6.0)
     spring (2.0.2)
       activesupport (>= 4.2)
+    spring-commands-parallel-tests (1.0.1)
+      spring (>= 0.9.1)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     spring-watcher-listen (2.0.1)
@@ -619,6 +624,8 @@ DEPENDENCIES
   omniauth (~> 1.2)
   omniauth-google-oauth2 (~> 0.2)
   paperclip!
+  parallel (~> 1.19.2)
+  parallel_tests (~> 2.32.0)
   paranoia (<= 2.4.2)
   poirot_rails!
   premailer-rails (< 1.10)
@@ -648,6 +655,7 @@ DEPENDENCIES
   simplecov
   site_prism (~> 2.17)
   spring
+  spring-commands-parallel-tests
   spring-commands-rspec
   spring-watcher-listen (~> 2.0.0)
   sprockets-rails (< 3.3.0)

@@ -210,4 +210,19 @@ module ApplicationHelper
   def format_uuid(uuid)
     "#{uuid[0,4]}…#{uuid[-4,4]}"
   end
+
+  def field_errors(record, attr_name)
+    messages = record.errors.full_messages_for(attr_name)
+    return if messages.empty?
+  
+    content_tag :ul, class: "error" do
+      messages.each do |message|
+        concat (content_tag :li do
+          concat content_tag :i, "", class: "icon-error icon-red"
+          concat message
+        end)
+      end
+    end
+  end
+
 end

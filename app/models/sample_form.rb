@@ -85,19 +85,15 @@ class SampleForm
     # we need to set a Time in sample instead of self.date_produced :: String
     sample.date_produced = @date_produced
 
-    # validate forms. stop if invalid
     form_valid = self.valid?
-    return false unless form_valid
-
-    # validate/save. All done if succeeded
-    is_valid = sample.save
-    return true if is_valid
-
-    # copy validations from model to form (form is valid, but model is not)
+    sample_valid = sample.valid?
+    # copy validations from model to form to display errors if present 
     sample.errors.each do |key, error|
-      errors.add(key, error) if self.class.shared_attributes.include?(key)
+      errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
     end
-    return false
+    return false unless form_valid && sample_valid 
+
+    sample.save
   end
 
 
