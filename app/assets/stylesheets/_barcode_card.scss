@@ -68,6 +68,9 @@
 // Print Barcode style
 
 .barcode-card-print {
+  page-break-after: always;
+  break-after: page;
+
   height: 100%;
   width: 100%;
 
