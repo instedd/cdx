@@ -28,9 +28,9 @@ class BoxForm
   def batches=(relation)
     records = relation.to_a
 
-    @batches = Hash[@batch_numbers.map do |key, batch_number|
-      [key, records.find { |b| b.batch_number == batch_number }]
-    end]
+    @batches = @batch_numbers.transform_values do |batch_number|
+      records.find { |b| b.batch_number == batch_number }
+    end
   end
 
   def build_samples
