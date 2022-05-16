@@ -26,3 +26,31 @@
     = setting_card title: pluralize(@policies_count, "Policy"), href: policies_path, icon: 'icon-outline-sharing-request xx-large' do |c|
       - c.body do
         Share test results with health organization
+
+  - if has_access_to_users_index?
+    -# Devise clears the controller param for users index
+    = setting_card title: "Users", href: users_path, icon: 'icon-outline-user xx-large' do |c|
+      - c.body do
+        Manage users on your team
+
+.row.center
+  - if has_access_to_devices_index?
+    = setting_card title: "Devices", href: devices_path, icon: 'icon-outline-device xx-large' do |c|
+      - c.body do
+        Manage test devices in your inventory
+
+  - if has_access?(Device, Policy::Actions::SUPPORT_DEVICE)
+    = setting_card title: "Device Logs", href: device_messages_path, icon: 'icon-outline-report xx-large' do |c|
+      - c.body do
+        Investigate device logs
+
+  - if has_access_to_device_models_index?
+    = setting_card title: "Device Models", href: device_models_path, icon: 'icon-outline-model xx-large' do |c|
+      - c.body do
+        Configure device models
+
+.row.center
+  - if has_access_to_sites_index?
+    = setting_card title: "Sites", href: sites_path, icon: 'icon-outline-site xx-large' do |c|
+      - c.body do
+        Manage sites of your institution
