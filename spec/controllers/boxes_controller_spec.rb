@@ -204,6 +204,19 @@ RSpec.describe BoxesController, type: :controller do
       end.to change(institution.boxes, :count).by(0)
     end
 
+    def expect_samples(batch, concentration_exponents:, replicates:)
+      samples = batch.samples.order(:id).to_a
+      expect(samples.size).to eq(concentration_exponents.size * replicates)
+
+      concentration_exponents.each do |e|
+        1.upto(replicates) do |r|
+          expect(sample = samples.shift).to_not be_nil
+          expect(sample.concentration).to eq(1 * (10 ** -e))
+          expect(sample.replicate).to eq(r)
+        end
+      end
+    end
+
     describe "LOD purpose" do
       it "creates samples" do
         expect do
@@ -215,7 +228,7 @@ RSpec.describe BoxesController, type: :controller do
         end.to change(institution.samples, :count).by(24)
 
         expect(Box.last.samples.count).to eq(24)
-        expect(batch.samples.count).to eq(24)
+        expect_samples(batch, concentration_exponents: 1..8, replicates: 3)
       end
 
       it "requires one batch" do
@@ -243,7 +256,9 @@ RSpec.describe BoxesController, type: :controller do
         end.to change(institution.samples, :count).by(54)
 
         expect(Box.last.samples.count).to eq(54)
-        batches.each { |b| expect(b.samples.count).to eq(9) }
+        batches.each do |b|
+          expect_samples(b, concentration_exponents: [1, 4, 8], replicates: 3)
+        end
       end
 
       it "requires at least 2 variant batches" do
@@ -287,8 +302,14 @@ RSpec.describe BoxesController, type: :controller do
         end.to change(institution.samples, :count).by(108)
 
         expect(Box.last.samples.count).to eq(108)
-        expect(batch.samples.count).to eq(54)
-        batches.each { |b| expect(b.samples.count).to eq(9) }
+
+        # virus batch
+        expect_samples(batch, concentration_exponents: [1, 4, 8], replicates: 18)
+
+        # distractor batches
+        batches.each do |b|
+          expect_samples(b, concentration_exponents: [1, 4, 8], replicates: 3)
+        end
       end
 
       it "requires a virus batch" do

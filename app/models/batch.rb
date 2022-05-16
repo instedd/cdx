@@ -21,7 +21,8 @@ class Batch < ApplicationRecord
   attribute_field :lab_technician,
                   :specimen_role,
                   :inactivation_method,
-                  :volume
+                  :volume,
+                  :virus_lineage
 
   validates_presence_of :inactivation_method
   validates_presence_of :volume
@@ -49,11 +50,15 @@ class Batch < ApplicationRecord
 
   def build_sample(**attributes)
     samples.build(
-      institution_id: institution_id,
-      site_id: site_id,
+      institution: institution,
+      site: site,
       sample_identifiers: [SampleIdentifier.new],
+      date_produced: self[:date_produced], # Time instead of String
+      lab_technician: lab_technician,
+      specimen_role: specimen_role,
       isolate_name: isolate_name,
       inactivation_method: inactivation_method,
+      virus_lineage: virus_lineage,
       **attributes
     )
   end

@@ -60,4 +60,9 @@ describe Sample do
     expect(sample.batch).to be_nil
     expect(sample.old_batch_number).to eq batch.batch_number
   end
+
+  it "concentration" do
+    expect(Sample.new(concentration_number: 1, concentration_exponent: 8).concentration).to eq(1 * (10 ** -8))
+    expect(Sample.new(concentration_number: 2, concentration_exponent: 4).concentration).to eq(2 * (10 ** -4))
+  end
 end
