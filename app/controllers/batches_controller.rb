@@ -141,7 +141,8 @@ class BatchesController < ApplicationController
       :specimen_role,
       :isolate_name,
       :inactivation_method,
-      :volume
+      :volume,
+      :virus_lineage
     )
   end
 

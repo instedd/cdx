@@ -195,6 +195,11 @@ class SamplesController < ApplicationController
       :isolate_name,
       :inactivation_method,
       :volume,
+      :virus_lineage,
+      :concentration_number,
+      :concentration_exponent,
+      :replicate,
+      :media,
       assay_attachments_attributes: [:id, :loinc_code_id, :result, :assay_file_id, :_destroy],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
     )

@@ -11,7 +11,8 @@ class BatchForm
       :specimen_role,
       :isolate_name,
       :inactivation_method,
-      :volume ]
+      :volume,
+      :virus_lineage ]
   end
 
   def self.model_name
@@ -56,27 +57,20 @@ class BatchForm
   end
 
   def create
-    batch.samples = self.samples_quantity.times.map { create_sample }
+    batch.samples = self.samples_quantity.times.map { build_sample }
     save
   end
 
   def add_sample
-    batch.samples.push create_sample
+    batch.samples.push build_sample
     save
   end
 
-  def create_sample
-    Sample.new({
-      institution: self.institution,
-      site: self.site,
-      sample_identifiers: [SampleIdentifier.new],
-      date_produced: @date_produced, # ::Time
-      lab_technician: self.lab_technician,
-      specimen_role: self.specimen_role,
-      isolate_name: self.isolate_name,
-      inactivation_method: self.inactivation_method,
-      volume: self.volume
-    })
+  def build_sample
+    batch.build_sample(
+      date_produced: @date_produced,
+      volume: volume,
+    )
   end
 
   def update(attributes, remove_sample_ids)

@@ -194,6 +194,16 @@ RSpec.describe BatchesController, type: :controller do
       expect(batch.core_fields['volume']).to eq(batch_form_plan[:volume])
     end
 
+    it "creates with optional attributes" do
+      post :create, params: { batch: batch_form_plan.merge(
+        virus_lineage: "B.1.1.529"
+      ) }
+      expect(response).to have_http_status(:redirect)
+
+      batch = institution.batches.last
+      expect(batch.virus_lineage).to eq("B.1.1.529")
+    end
+
     it "should create new batch in context institution if allowed" do
       grant user, other_user, institution, CREATE_INSTITUTION_BATCH
       sign_in other_user
@@ -558,6 +568,56 @@ RSpec.describe BatchesController, type: :controller do
       }.to change(institution.batches, :count).by(0)
 
       expect(response).to be_forbidden
+    end
+  end
+
+  describe "add_sample" do
+    let!(:batch) { Batch.make!(
+      institution: institution,
+      batch_number: '1234',
+      isolate_name: 'ABC.424',
+      date_produced: Time.strptime('08/08/2021', I18n.t('date.input_format.pattern')),
+      lab_technician: 'Tec.Foo',
+      specimen_role: 'q',
+      inactivation_method: 'Formaldehyde',
+      volume: 100,
+      virus_lineage: 'B.1.1.529'
+    )}
+
+    it "creates sample from batch" do
+      expect do
+        post :add_sample, params: { id: batch.id }
+        expect(response).to redirect_to(edit_batch_path(batch))
+      end.to change(batch.samples, :count).by(1)
+
+      sample = batch.samples.last
+      expect(sample.batch_id).to eq(batch.id)
+      expect(sample.isolate_name).to eq(batch.isolate_name)
+      expect(sample.date_produced).to eq(batch.date_produced)
+      expect(sample.lab_technician).to eq(batch.lab_technician)
+      expect(sample.specimen_role).to eq(batch.specimen_role)
+      expect(sample.inactivation_method).to eq(batch.inactivation_method)
+      expect(sample.volume).to eq(batch.volume)
+      expect(sample.virus_lineage).to eq(batch.virus_lineage)
+    end
+
+    it "should be allowed if can update batch" do
+      grant user, other_user, Batch, UPDATE_BATCH
+      sign_in other_user
+
+      expect do
+        post :add_sample, params: { id: batch.id }
+        expect(response).to redirect_to(edit_batch_path(batch))
+      end.to change(batch.samples, :count).by(1)
+    end
+
+    it "should not be allowed if can't update batch" do
+      sign_in other_user
+
+      expect do
+        post :add_sample, params: { id: batch.id }
+        expect(response).to have_http_status(:forbidden)
+      end.to change(batch.samples, :count).by(0)
     end
   end
 end
