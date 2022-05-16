@@ -1,73 +1,43 @@
-= form_for(@batch_form) do |f|
-
-  = validation_errors @batch_form
-
+= cdx_form_for(@batch_form) do |f|
   .row
     .col
-      .row.form-field
-        .col.pe-3
-          = f.label :batch_id
-        .col
-          = f.text_field :batch_number, readonly: !@can_update
+      = f.form_field :batch_number do
+        = f.text_field :batch_number, readonly: !@can_update
 
-      .row.form-field
-        .col.pe-3
-          = f.label :date_produced
-        .col
-          = f.text_field :date_produced, placeholder: Batch.date_produced_placeholder, readonly: !@can_update
+      = f.form_field :date_produced do
+        = f.text_field :date_produced, placeholder: Batch.date_produced_placeholder, readonly: !@can_update
 
-      .row.form-field
-        .col.pe-3
-          = f.label :lab_technician
-        .col
-          = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
+      = f.form_field :lab_technician do
+        = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
 
-      .row.form-field
-        .col.pe-3
-          = f.label :specimen_role
-        .col
-          - if @can_update
-            = cdx_select form: f, name: :specimen_role, searchable: true, :class => 'input-x-large' do |select|
-              - select.items Batch.specimen_roles, :id, :description
-          - else
-            = text_field_tag :specimen_role, Batch.specimen_role_description(f.object.specimen_role), { :class => 'input-x-large', readonly: true }
+      = f.form_field :specimen_role do
+        - if @can_update
+          = cdx_select form: f, name: :specimen_role, searchable: true, :class => 'input-x-large' do |select|
+            - select.items Batch.specimen_roles, :id, :description
+        - else
+          = text_field_tag :specimen_role, Batch.specimen_role_description(f.object.specimen_role), { :class => 'input-x-large', readonly: true }
 
-      .row.form-field
-        .col.pe-3
-          = f.label :isolate_name
-        .col
-          = f.text_field :isolate_name, :class => 'input-x-large', readonly: !@can_update
+      = f.form_field :isolate_name do
+        = f.text_field :isolate_name, :class => 'input-x-large', readonly: !@can_update
 
-      .row.form-field
-        .col.pe-3
-          = f.label :inactivation_method
-        .col
-          - if @can_update
-            = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
-              - select.items Batch.inactivation_methods
-          - else
-            = f.text_field :inactivation_method, readonly: true
+      = f.form_field :inactivation_method do
+        - if @can_update
+          = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
+            - select.items Batch.inactivation_methods
+        - else
+          = f.text_field :inactivation_method, readonly: true
 
-      .row.form-field
-        .col.pe-3
-          = f.label :volume
-        .col
-          .row.input-unit
-            = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
-            .span.unit (μl)
+      = f.form_field :volume do
+        .row.input-unit
+          = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
+          .span.unit (μl)
 
       - if @can_edit_sample_quantity
-        .row.form-field
-          .col.pe-3
-            = f.label :samples_quantity
-          .col
-            = f.number_field :samples_quantity, min: 0, :class => "input-small"
+        = f.form_field :samples_quantity do
+          = f.number_field :samples_quantity, min: 0, :class => "input-small"
       - else
-        .row.form-field
-          .col.pe-3
-            = f.label :samples
-          .col.pe-7
-            = render (@can_update ? 'samples' : 'show_samples')
+        = f.form_field :samples do
+          = render (@can_update ? 'samples' : 'show_samples')
 
   - if @can_update
     .row.button-actions
