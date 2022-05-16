@@ -12,7 +12,7 @@
 
       .row.form-field
         .col.pe-3
-          = f.label :date_produced, "production date"
+          = f.label :date_produced
         .col
           = f.text_field :date_produced, placeholder: Batch.date_produced_placeholder, readonly: !@can_update
 

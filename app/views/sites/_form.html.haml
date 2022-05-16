@@ -35,7 +35,7 @@
 
   .row.form-field
     .col.pe-2
-      = f.label :sample_id_reset_policy, "Sample ID reset policy"
+      = f.label :sample_id_reset_policy
     .col
       = cdx_select form: f, name: :sample_id_reset_policy, class: 'input-large' do |select|
         - select.item "yearly", "Yearly"
@@ -43,7 +43,7 @@
         - select.item "weekly", "Weekly"
   .row.form-field
     .col.pe-2
-      = f.label :allows_manual_entry, "Allow manual entry"
+      = f.label :allows_manual_entry
     .col
       = f.check_box :allows_manual_entry
       %label{for: 'site_allows_manual_entry'} &nbsp;
