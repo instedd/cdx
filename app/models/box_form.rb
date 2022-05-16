@@ -42,7 +42,7 @@ class BoxForm
   def build_samples
     case @box.purpose
     when "LOD"
-      @box.build_samples(@batches["0"], exponents: 1..8, replicas: 3)
+      @box.build_samples(@batches["lod"], exponents: 1..8, replicas: 3)
 
     when "Variants"
       @batches.each_value do |batch|
@@ -50,16 +50,17 @@ class BoxForm
       end
 
     when "Challenge"
-      @box.build_samples(@batches["0"], exponents: [1, 4, 8], replicas: 18)
+      @box.build_samples(@batches["virus"], exponents: [1, 4, 8], replicas: 18)
 
       @batches.each do |key, batch|
-        @box.build_samples(batch, exponents: [1, 4, 8], replicas: 3) unless key == "0"
+        @box.build_samples(batch, exponents: [1, 4, 8], replicas: 3) unless key == "virus"
       end
     end
   end
 
   def valid?
     @box.valid?
+    @batch_errors.each { |key, message| @box.errors.add(key.to_sym, message) unless key.blank? }
     validate_batches
     @box.errors.empty? && @batch_errors.empty?
   end
@@ -79,14 +80,13 @@ class BoxForm
 
     case @box.purpose
     when "LOD"
-      @batch_errors["0"] = "please select a batch" unless @batches["0"]
-      @box.errors.add(:base, "You must select exactly one batch") if count > 1
+      @box.errors.add(:lod, "a batch is required") unless @batches["lod"]
 
     when "Variants"
       @box.errors.add(:base, "You must select at least two batches") unless count >= 2
 
     when "Challenge"
-      @batch_errors["0"] = "please select a virus batch" unless @batches["0"]
+      @box.errors.add(:virus, "a virus batch is required") unless @batches["virus"]
       @box.errors.add(:base, "You must select at least one distractor batch") unless count >= 2
     end
   end

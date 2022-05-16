@@ -1,6 +1,6 @@
 = form_for(@box_form.box) do |f|
 
-  = validation_errors @box_form
+  = validation_errors @box_form, :base
 
   .row
     .col
@@ -17,51 +17,37 @@
           %fieldset#LOD(disabled)
             .row
               .col.pe-2
-                = label_tag "box_batch_numbers_0", "Batch", class: "is-normal-case"
+                = label_tag "box_batch_numbers_lod", "Batch", class: "is-normal-case"
               .col
-                .batches-samples
-                  = text_field_tag "box[batch_numbers][0]", @box_form.batch_numbers["0"], id: "box_batch_numbers_0", placeholder: "Enter batch id", class: "input-block"
-                  - if @box_form.batch_errors["0"]
-                    .field_with_errors
-                      Error:
-                      = @box_form.batch_errors["0"]
+                = field_with_error @box_form, "lod" do
+                  = text_field_tag "box[batch_numbers][lod]", @box_form.batch_numbers["lod"], id: "box_batch_numbers_lod", placeholder: "Enter batch id", class: "input-block"
 
-          %fieldset#Variants(disabled=true)
+          %fieldset#Variants(disabled)
             - 1.upto(6) do |index|
+              - key = "variant_#{index}"
               .row
                 .col.pe-2
-                  = label_tag "box_batch_numbers_#{index}", "Variant #{index}", class: "is-normal-case"
+                  = label_tag "box_batch_numbers_#{key}", "Variant #{index}", class: "is-normal-case"
                 .col
-                  .batches-samples
-                    = text_field_tag "box[batch_numbers][#{index}]", @box_form.batch_numbers[index.to_s], id: "box_batch_numbers_#{index}", placeholder: "Enter batch id", class: "input-block"
-                    - if @box_form.batch_errors[index.to_s]
-                      .field_with_errors
-                        Error:
-                        = @box_form.batch_errors[index.to_s]
+                  = field_with_error @box_form, key do
+                    = text_field_tag "box[batch_numbers][#{key}]", @box_form.batch_numbers[key], id: "box_batch_numbers_#{key}", placeholder: "Enter batch id", class: "input-block"
 
           %fieldset#Challenge(disabled)
             .row
               .col.pe-2
-                = label_tag "box_batch_numbers_0", "Virus", class: "is-normal-case"
+                = label_tag "box_batch_numbers_virus", "Virus", class: "is-normal-case"
               .col
-                .batches-samples
-                  = text_field_tag "box[batch_numbers][0]", @box_form.batch_numbers["0"], id: "box_batch_numbers_0", placeholder: "Enter batch id", class: "input-block"
-                  - if @box_form.batch_errors["0"]
-                    .field_with_errors
-                      Error:
-                      = @box_form.batch_errors["0"]
+                = field_with_error @box_form, "virus" do
+                  = text_field_tag "box[batch_numbers][virus]", @box_form.batch_numbers["virus"], id: "box_batch_numbers_virus", placeholder: "Enter batch id", class: "input-block"
 
             - 1.upto(6) do |index|
+              - key = "distractor_#{index}"
               .row
                 .col.pe-2
-                  = label_tag "box_batch_numbers_#{index}", "Distractor #{index}", class: "is-normal-case"
+                  = label_tag "box_batch_numbers_#{key}", "Distractor #{index}", class: "is-normal-case"
                 .col
-                  .batches-samples
-                    = text_field_tag "box[batch_numbers][#{index}]", @box_form.batch_numbers[index.to_s], id: "box_batch_numbers_#{index}", placeholder: "Enter batch id", class: "input-block"
-                    - if @box_form.batch_errors[index.to_s]
-                      .field_with_errors
-                        Error:
-                        = @box_form.batch_errors[index.to_s]
+                  = field_with_error @box_form, key do
+                    = text_field_tag "box[batch_numbers][#{key}]", @box_form.batch_numbers[key], id: "box_batch_numbers_#{key}", placeholder: "Enter batch id", class: "input-block"
 
   .row.button-actions
     .col

@@ -155,7 +155,7 @@ RSpec.describe BoxesController, type: :controller do
     let :box_plan do
       {
         purpose: "LOD",
-        batch_numbers: { "0" => batch.batch_number },
+        batch_numbers: { "lod" => batch.batch_number },
       }
     end
 
@@ -209,7 +209,7 @@ RSpec.describe BoxesController, type: :controller do
         expect do
           post :create, params: { box: {
             purpose: "LOD",
-            batch_numbers: { "0" => batch.batch_number },
+            batch_numbers: { "lod" => batch.batch_number },
           } }
           expect(response).to redirect_to(boxes_path)
         end.to change(institution.samples, :count).by(24)
@@ -222,7 +222,7 @@ RSpec.describe BoxesController, type: :controller do
         expect do
           post :create, params: { box: {
             purpose: "LOD",
-            batch_numbers: { "0" => "" },
+            batch_numbers: { "lod" => "" },
           } }
           expect(response).to have_http_status(:unprocessable_entity)
         end.to change(institution.samples, :count).by(0)
@@ -232,7 +232,7 @@ RSpec.describe BoxesController, type: :controller do
     describe "Variants purpose" do
       it "creates samples" do
         batches = Batch.make!(6, institution: institution)
-        batch_numbers = Hash[batches.map.with_index { |b, i| [i.to_s, b.batch_number] }]
+        batch_numbers = Hash[batches.map.with_index { |b, i| ["variant_#{i}", b.batch_number] }]
 
         expect do
           post :create, params: { box: {
@@ -250,7 +250,7 @@ RSpec.describe BoxesController, type: :controller do
         expect do
           post :create, params: { box: {
             purpose: "Variants",
-            batch_numbers: { "0" => batch.batch_number },
+            batch_numbers: { "variant_1" => batch.batch_number },
           } }
           expect(response).to have_http_status(:unprocessable_entity)
         end.to change(institution.samples, :count).by(0)
@@ -263,8 +263,8 @@ RSpec.describe BoxesController, type: :controller do
           post :create, params: { box: {
             purpose: "Variants",
             batch_numbers: {
-              "4" => batch.batch_number,
-              "2" => other_batch.batch_number,
+              "variant_4" => batch.batch_number,
+              "variant_2" => other_batch.batch_number,
             },
           } }
           expect(response).to redirect_to(boxes_path)
@@ -275,7 +275,8 @@ RSpec.describe BoxesController, type: :controller do
     describe "Challenge purpose" do
       it "creates samples" do
         batches = Batch.make!(6, institution: institution)
-        batch_numbers = Hash[[batch, *batches].map.with_index { |b, i| [i.to_s, b.batch_number] }]
+        batch_numbers = { "virus" => batch.batch_number }
+        batches.each_with_index { |b, i| batch_numbers["distractor_#{i + 1}"] = b.batch_number }
 
         expect do
           post :create, params: { box: {
@@ -306,7 +307,7 @@ RSpec.describe BoxesController, type: :controller do
         expect do
           post :create, params: { box: {
             purpose: "Challenge",
-            batch_numbers: { "0" => batch.batch_number },
+            batch_numbers: { "virus" => batch.batch_number },
           } }
           expect(response).to have_http_status(:unprocessable_entity)
         end.to change(institution.samples, :count).by(0)
@@ -319,8 +320,8 @@ RSpec.describe BoxesController, type: :controller do
           post :create, params: { box: {
             purpose: "Challenge",
             batch_numbers: {
-              "0" => batch.batch_number,
-              "4" => distractor.batch_number,
+              "virus" => batch.batch_number,
+              "distractor_4" => distractor.batch_number,
             },
           } }
           expect(response).to redirect_to(boxes_path)
