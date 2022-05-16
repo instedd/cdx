@@ -1,5 +1,3 @@
-require "labels_pdf_renderer"
-
 class SamplesController < ApplicationController
   include Concerns::ViewHelper
 
@@ -114,30 +112,17 @@ class SamplesController < ApplicationController
   end
 
   def bulk_print
-    sample_ids = params[:sample_ids]
-
-    if sample_ids.blank?
-      redirect_to samples_path, notice: "Select at least one sample to print."
-      return
-    end
-
     samples = Sample.where(id: params[:sample_ids])
     return unless authorize_resources(samples, READ_SAMPLE)
 
-    pages = samples.preload(:sample_identifiers).map do |sample|
-      render_to_string template: "samples/barcode.pdf",
-        layout: "layouts/pdf.html",
-        locals: { :sample => sample }
-    end
-
-    begin
-      send_data LabelsPdfRenderer.combine(pages),
-        type: "application/pdf",
-        filename: "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}.pdf"
-    rescue => ex
-      Raven.capture_exception(ex)
-      redirect_to samples_path, notice: "There was an error creating the print file."
-    end
+    render pdf: "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}",
+      template: "samples/bulk_print.pdf",
+      layout: "layouts/pdf.html",
+      locals: { samples: samples.preload(:sample_identifiers) },
+      margin: { top: 0, bottom: 0, left: 0, right: 0 },
+      page_width: "1in",
+      page_height: "1in",
+      show_as_html: params.key?("debug")
   end
 
   def edit
