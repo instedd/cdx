@@ -64,13 +64,17 @@ class BoxesController < ApplicationController
 
     @box_form = BoxForm.build(@navigation_context, box_params)
     @box_form.batches = check_access(load_batches, READ_BATCH)
-    @box_form.build_samples
 
-    if @box_form.save
-      redirect_to boxes_path, notice: "Box was successfully created."
-    else
-      render :new, status: :unprocessable_entity
+    if @box_form.valid?
+      @box_form.build_samples
+
+      if @box_form.save
+        redirect_to boxes_path, notice: "Box was successfully created."
+        return
+      end
     end
+
+    render :new, status: :unprocessable_entity
   end
 
   def destroy

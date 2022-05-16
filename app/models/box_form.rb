@@ -42,9 +42,7 @@ class BoxForm
   def build_samples
     case @box.purpose
     when "LOD"
-      if batch = get_batch("0") { "please select a batch" }
-        @box.build_samples(batch, exponents: 1..8, replicas: 3)
-      end
+      @box.build_samples(@batches["0"], exponents: 1..8, replicas: 3)
 
     when "Variants"
       @batches.each_value do |batch|
@@ -52,9 +50,8 @@ class BoxForm
       end
 
     when "Challenge"
-      if batch = get_batch("0") { "please select a virus batch" }
-        @box.build_samples(batch, exponents: [1, 4, 8], replicas: 18)
-      end
+      @box.build_samples(@batches["0"], exponents: [1, 4, 8], replicas: 18)
+
       @batches.each do |key, batch|
         @box.build_samples(batch, exponents: [1, 4, 8], replicas: 3) unless key == "0"
       end
@@ -77,24 +74,19 @@ class BoxForm
 
   private
 
-  def get_batch(key)
-    if batch = @batches[key]
-      batch
-    else
-      @batch_errors[key] ||= yield
-      nil
-    end
-  end
-
   def validate_batches
-    count = @box.samples.map { |s| s.batch.try(&:batch_number) }.compact.uniq.size
+    count = @batches.map { |_, b| b.batch_number }.uniq.size
 
     case @box.purpose
     when "LOD"
-      @box.errors.add(:base, "You must select exactly one batch") unless count == 1
+      @batch_errors["0"] = "please select a batch" unless @batches["0"]
+      @box.errors.add(:base, "You must select exactly one batch") if count > 1
+
     when "Variants"
       @box.errors.add(:base, "You must select at least two batches") unless count >= 2
+
     when "Challenge"
+      @batch_errors["0"] = "please select a virus batch" unless @batches["0"]
       @box.errors.add(:base, "You must select at least one distractor batch") unless count >= 2
     end
   end
