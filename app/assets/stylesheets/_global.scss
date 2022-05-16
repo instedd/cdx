@@ -43,6 +43,8 @@ hr {
 }
 .centered {
   text-align: center;
+  display: flex;
+  justify-content: center;
 }
 .absolute-right {
   position: absolute;
@@ -117,6 +119,7 @@ a[title="Back"] {
 .box {
   background: $white;
   padding: 25px;
+  width: 100%;
 
   &.small {
     padding: 10px;
