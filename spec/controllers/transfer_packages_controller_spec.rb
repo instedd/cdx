@@ -242,6 +242,7 @@ RSpec.describe TransferPackagesController, type: :controller do
       end.not_to change { TransferPackage.count }
 
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Sample transfers must not be empty")
     end
 
     it "shows form again when missing receiver" do
@@ -260,6 +261,7 @@ RSpec.describe TransferPackagesController, type: :controller do
       end.not_to change { TransferPackage.count }
 
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Receiver institution can't be blank")
     end
 
     it "rejects transferring QC sample" do

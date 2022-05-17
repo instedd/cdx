@@ -8,7 +8,8 @@ describe "transfer packages" do
     let!(:user_b) { institution_b.user }
 
     it "creates transfer" do
-      sample = Sample.make!(:filled, institution: institution_a)
+      sample1 = Sample.make!(:filled, institution: institution_a)
+      sample2 = Sample.make!(:filled, institution: institution_a)
 
       sign_in user_a
 
@@ -17,35 +18,45 @@ describe "transfer packages" do
 
         page.destination.set institution_b.name
         page.recipient.set "Santa Claus"
-        page.sample_search.set sample.uuid
+
+        page.sample_search.set sample1.uuid
         page.wait_until_sample_search_visible
-        expect(page.selected_sample_uuids).to eq [sample.uuid]
+        expect(page.selected_sample_uuids).to eq [sample1.uuid]
+
+        page.sample_search.set sample2.uuid
+        page.wait_until_sample_search_visible
+        expect(page.selected_sample_uuids).to eq [sample1.uuid, sample2.uuid]
+
         page.submit
       end
 
       expect_page ListSampleTransfersPage do |page|
-        entry = page.entry(sample.uuid)
+        entry = page.entry(sample1.uuid)
+        expect(entry.state).to have_text("Sent on")
+
+        entry = page.entry(sample2.uuid)
         expect(entry.state).to have_text("Sent on")
       end
 
       sign_in user_b
 
       goto_page ListSampleTransfersPage do |page|
-        expect(page).to have_content(sample.partial_uuid)
+        expect(page).to have_content(sample1.partial_uuid)
+        expect(page).to have_content(sample2.partial_uuid)
 
-        page.entry(sample.partial_uuid).confirm.click
+        page.entry(sample1.partial_uuid).confirm.click
 
         page.confirm_receipt_modal.tap do |modal|
           expect(modal).to have_content("Confirm receipt")
 
-          modal.uuid_check.set sample.uuid[-4..-1]
+          modal.uuid_check.set sample1.uuid[-4..-1]
 
           modal.submit
         end
       end
 
       expect_page ListSampleTransfersPage do |page|
-        entry = page.entry(sample.uuid)
+        entry = page.entry(sample1.uuid)
         expect(entry.state).to have_text("Receipt confirmed")
       end
     end
