@@ -40,10 +40,9 @@
           = render (@can_update ? 'samples' : 'show_samples')
 
   - if @can_update
-    .row.button-actions
-      .col
-        = f.submit 'Save', class: 'btn-primary'
-        = link_to 'Cancel', batches_path, class: 'btn-link'
+    = f.form_actions do
+      = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', batches_path, class: 'btn-link'
 
-        - if @can_delete
-          = confirm_deletion_button @batch_form, 'batch'
+      - if @can_delete
+        = confirm_deletion_button @batch_form, 'batch'

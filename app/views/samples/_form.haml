@@ -51,11 +51,9 @@
     = render (@can_update ? 'form_notes' : 'show_notes'), f: f
 
   - if @can_update
-    .row.button-actions
-      .col
-        = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
-        = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'
+    = f.form_actions do
+      = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
+      = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'
 
-        - if @can_delete
-          = confirm_deletion_button @sample_form, 'sample'
-
+      - if @can_delete
+        = confirm_deletion_button @sample_form, 'sample'

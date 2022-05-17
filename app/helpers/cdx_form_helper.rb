@@ -54,6 +54,15 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
     }
   end
 
+  # Renders the final section of the form which usually includes the submit
+  # button and other actions.
+  def form_actions
+    @template.render partial: "form_builder/form_actions", locals: {
+      form: self,
+      body: yield
+    }
+  end
+
   private
 
   def errors_to_show

@@ -21,7 +21,6 @@
           includeQcInfo: @transfer_package.includes_qc_info, samples: samples_data(@transfer_package.sample_transfers.map(&:sample)))
 
   - if @can_update
-    .row.button-actions
-      .col
-        = f.submit 'Transfer', class: 'btn-primary', id: 'btn-save'
-        = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'
+    = f.form_actions do
+      = f.submit 'Transfer', class: 'btn-primary', id: 'btn-save'
+      = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'
