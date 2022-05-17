@@ -1,0 +1,7 @@
+- unless messages.empty?
+  .row.form-errors
+    .col
+      %ul.errors
+        - messages.each do |message|
+          %li
+            = message

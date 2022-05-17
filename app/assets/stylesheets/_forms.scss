@@ -98,7 +98,7 @@ label {
     padding-bottom: 6px;
     height: 34px;
   }
-  
+
   .value{
     margin-left: 5px;
   }
@@ -497,4 +497,45 @@ input + .error {
 div.input-required + .error,
 input.input-required + .error {
   visibility: visible;
+}
+
+// .form-errors is written at the end of the form but should show up on the front
+form {
+  display: flex;
+  flex-direction: column;
+
+  > .form-errors {
+    order: -1;
+  }
+}
+
+.form-field {
+  &.form-field--error {
+    input, textarea {
+      border-color: $red;
+    }
+
+    label {
+      color: $red;
+    }
+  }
+
+  > .form-field__label {
+    flex: 0 0 17em;
+  }
+}
+
+.errors {
+  color: $red;
+  > li {
+    margin: 5px 0;
+  }
+}
+
+.field-errors {
+
+}
+.form-errors {
+  margin: 10px;
+  border-bottom: 1px solid $red;
 }

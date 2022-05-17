@@ -1,74 +1,44 @@
-= form_for(@sample_form) do |f|
-
-  = validation_errors @sample_form
-
+= cdx_form_for(@sample_form) do |f|
   .row
     .col
       - unless f.object.qc_info.nil?
-        .row.form-field
-          .col.pe-4
-            = f.label :quality_control
-          .col
-            = link_to edit_qc_info_path(f.object.qc_info.id, sample_id: f.object.id), class: 'centered' do
-              .icon-test.icon-blue
-              = "VIEW QC INFO"
+        = f.form_field :quality_control do
+          = link_to edit_qc_info_path(f.object.qc_info.id, sample_id: f.object.id), class: 'centered' do
+            .icon-test.icon-blue
+            = "VIEW QC INFO"
 
-      .row.form-field
-        .col.pe-4
-          = f.label :uuid
-        .col
-          .value= f.object.uuid
+      = f.form_field :uuid, value: f.object.uuid
+
       - if batch_number = f.object.batch_number
-        .row.form-field
-          .col.pe-4
-            = f.label :batch_id
-          .col
-            .value= batch_number
+        = f.form_field :batch_id, value: batch_number
 
-      .row.form-field
-        .col.pe-4
-          = f.label :date_produced
-        .col
-          = f.text_field :date_produced, placeholder: @view_helper[:date_produced_placeholder], readonly: !@can_update
+      = f.form_field :date_produced do
+        = f.text_field :date_produced, placeholder: @view_helper[:date_produced_placeholder], readonly: !@can_update
 
-      .row.form-field
-        .col.pe-4
-          = f.label :lab_technician
-        .col
-          = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
+      = f.form_field :lab_technician do
+        = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
 
-      .row.form-field
-        .col.pe-4
-          = f.label :specimen_role
-        .col
-          - if @can_update
-            = cdx_select form: f, name: :specimen_role, searchable: true, :class => 'input-x-large' do |select|
-              - select.items Sample.specimen_roles, :id, :description
-          - else
-            = text_field_tag :specimen_role, Sample.specimen_role_description(f.object.specimen_role), { :class => 'input-x-large', readonly: true }
-      .row.form-field
-        .col.pe-4
-          = f.label :isolate_name
-        .col
-          = f.text_field :isolate_name, :class => 'input-x-large', readonly: !@can_update
+      = f.form_field :specimen_role do
+        - if @can_update
+          = cdx_select form: f, name: :specimen_role, searchable: true, :class => 'input-x-large' do |select|
+            - select.items Sample.specimen_roles, :id, :description
+        - else
+          = text_field_tag :specimen_role, Sample.specimen_role_description(f.object.specimen_role), { :class => 'input-x-large', readonly: true }
 
-      .row.form-field
-        .col.pe-4
-          = f.label :inactivation_method
-        .col
-          - if @can_update
-            = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
-              - select.items Sample.inactivation_methods
-          - else
-            = f.text_field :inactivation_method, readonly: true
+      = f.form_field :isolate_name do
+        = f.text_field :isolate_name, :class => 'input-x-large', readonly: !@can_update
 
-      .row.form-field
-        .col.pe-4
-          = f.label :volume
-        .col
-          .row.input-unit
-            = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
-            .span.unit (μl)
+      = f.form_field :inactivation_method do
+        - if @can_update
+          = cdx_select form: f, name: :inactivation_method, searchable: false do |select|
+            - select.items Sample.inactivation_methods
+        - else
+          = f.text_field :inactivation_method, readonly: true
+
+      = f.form_field :volume do
+        .row.input-unit
+          = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
+          .span.unit (μl)
 
     .col.pe-5
       - if @show_barcode_preview

@@ -1,0 +1,7 @@
+.row.form-field{class: form.object.errors.has_key?(method) && "form-field--error" }
+  .col.form-field__label
+    = form.label method, options[:label_opts] || {}
+  .col
+    = value
+
+    = form.field_errors method
