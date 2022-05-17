@@ -1,7 +1,7 @@
 .row.form-field{class: form.object.errors.has_key?(method) && "form-field--error" }
   .col.form-field__label
-    = form.label method, options[:label_opts] || {}
+    - label_options = options[:label] || {}
+    = form.label method, label_options[:text], label_options
   .col
-    = value
-
-    = form.field_errors method
+    = yield
+    = form.field_errors method, full_message: options[:full_message]

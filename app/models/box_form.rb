@@ -30,7 +30,7 @@ class BoxForm
 
     @batches = @batch_numbers.transform_values do |batch_number|
       records.find { |b| b.batch_number == batch_number }
-    end
+    end.compact
   end
 
   def build_samples
@@ -74,7 +74,7 @@ class BoxForm
   def validate_existence_of_batches
     @batch_numbers.each do |key, batch_number|
       unless batch_number.blank? || @batches[key]
-        @box.errors.add(key, "batch doesn't exist")
+        @box.errors.add(key, "Batch doesn't exist")
       end
     end
   end
@@ -84,11 +84,11 @@ class BoxForm
 
     case @box.purpose
     when "LOD"
-      @box.errors.add(:lod, "a batch is required") unless @batches["lod"]
+      @box.errors.add(:lod, "A batch is required") unless @batches["lod"] || @box.errors.include?(:lod)
     when "Variants"
       @box.errors.add(:base, "You must select at least two batches") unless count >= 2
     when "Challenge"
-      @box.errors.add(:virus, "a virus batch is required") unless @batches["virus"]
+      @box.errors.add(:virus, "A virus batch is required") unless @batches["virus"] || @box.errors.include?(:virus)
       @box.errors.add(:base, "You must select at least one distractor batch") unless count >= 2
     end
   end
