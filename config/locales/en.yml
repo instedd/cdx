@@ -20,15 +20,38 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
+  attributes:
+    date_produced: Production date
+    url: URL
+
   activerecord:
     attributes:
+      device:
+        ftp_passive: Passive
+
       manifest:
         definition: Manifest
-      site:
-        parent: Parent site
+
       patient:
         dob: Birthday
         entity_id: Patient id
+
+      site:
+        parent: Parent site
+        sample_id_reset_policy: Sample ID reset policy
+        allows_manual_entry: Allow manual entry
+
+      subscribe:
+        verb: HTTP Verb
+
+      transfer_package:
+        receiver_institution: Destination
+        sample_transfers: Samples
+
+      user:
+        telephone: Phone
+        is_active: Status
+        last_sign_in_at: Activity
 
   user:
     settings:

@@ -13,7 +13,7 @@
           .value= f.object.email
       .row
         .col.pe-2
-          = f.label :telephone, "Phone"
+          = f.label :telephone
         .col
           .value= f.object.telephone
       .row
@@ -27,14 +27,14 @@
         - if @can_update
           .row
             .col.pe-2
-              .value= f.label :is_active, "Status"
+              .value= f.label :is_active
             .col
               .value
                 = f.check_box :is_active, class: 'power'
                 %label{:for => 'user_is_active'} Can access Cdx?
         .row
           .col.pe-2
-            = f.label :last_sign_in_at, "Activity"
+            = f.label :last_sign_in_at
           .col
             .value= last_activity(f.object)
   - if @can_update

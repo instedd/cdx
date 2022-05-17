@@ -53,7 +53,7 @@
         .col.pe-2= f.text_field :ftp_hostname, placeholder: 'Hostname'
         .col.pe-2= f.number_field :ftp_port, min: 0, max: 65535, placeholder: 'Port'
         .col.pe-1
-          = f.label :ftp_passive, "Passive"
+          = f.label :ftp_passive
         .col.pe-1
           = f.check_box :ftp_passive
           = f.label :ftp_passive, "&nbsp;".html_safe

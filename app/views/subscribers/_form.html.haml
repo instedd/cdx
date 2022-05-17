@@ -19,12 +19,12 @@
       = f.text_field :name
   .row
     .col.pe-2
-      = f.label :url, "URL"
+      = f.label :url
     .col
       = f.text_field :url
   .row
     .col.pe-2
-      = f.label :verb, "HTTP Verb"
+      = f.label :verb
     .col
       .value.annotation GET will send fields in query string. POST will send a JSON object in the request body.
       = cdx_select form: f, name: :verb do |select|

@@ -17,7 +17,7 @@
 
       .row
         .col.pe-4
-          = f.label :date_produced, "production date"
+          = f.label :date_produced
         .col
           = f.text_field :formatted_date_produced, placeholder: @view_helper[:date_produced_placeholder], readonly: !@can_update
 
