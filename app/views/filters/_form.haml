@@ -1,33 +1,19 @@
-= form_for(filter) do |f|
-  - if filter.errors.any?
-    #error_explanation
-      %p= "#{pluralize(filter.errors.count, "error")} prohibited this filter from being saved:"
-      %ul
-        - filter.errors.full_messages.each do |msg|
-          %li= msg
-
+= cdx_form_for(filter) do |f|
   = f.fields_for(:query) do |p|
     - filter.query.each do |key, value|
       = p.hidden_field key, value: value
 
-  .row
-    .col.pe-2
-      %label Site
-    .col
-      #{site.try(:name)}
-  .row
-    .col.pe-2
-      %label Condition
-    .col
-      #{condition}
-  .row
-    .col.pe-2
-      = f.label :name, :class => 'block'
-    .col
-      = f.text_field :name
-  .row.button-actions
-    .col
-      = f.submit class: "btn-primary"
-      = link_to 'Cancel', filters_path, class: 'btn-link'
-      - if @editing
-        = confirm_deletion_button filter, 'filter'
+  = f.form_field :site do
+    = site.try(:name)
+
+  = f.form_field :condition do
+    = condition
+
+  = f.form_field :name
+    = f.text_field :name
+
+  = f.form_actions do
+    = f.submit class: "btn-primary"
+    = link_to 'Cancel', filters_path, class: 'btn-link'
+    - if @editing
+      = confirm_deletion_button filter, 'filter'

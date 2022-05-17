@@ -45,7 +45,7 @@ describe Manifest do
       m = Manifest.new(device_model: DeviceModel.make!, definition: definition)
       m.save
       expect(Manifest.count).to eq(0)
-      expect(m.errors[:parse_error]).not_to eq(nil)
+      expect(m.errors[:definition]).not_to eq(nil)
     end
 
     it "shouldn't pass validations if metadata is empty" do

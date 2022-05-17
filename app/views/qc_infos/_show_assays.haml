@@ -1,37 +1,34 @@
-.row
-  .col.pe-2
-    = f.label :assays
-  .col
-    .choose-picture.assay
-      .upload-new-file.picture
-        = f.fields_for :assay_attachments do |ay|
-          .file-uploaded
-            .card-container
-              .info
-                .row
-                  .col.pe-1
-                    = ay.label :loinc_code, 'LOINC'
-                  .col.pe-8
-                    .loinc_inputs
-                      = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: 'loinc_input', readonly: true }
-                .row
-                  .col.pe-1
-                    = ay.label :result
-                  .col.pe-8
-                    = ay.text_field :result, readonly: true
+= f.form_field :assays do
+  .choose-picture.assay
+    .upload-new-file.picture
+      = f.fields_for :assay_attachments do |ay|
+        .file-uploaded
+          .card-container
+            .info
+              .row
+                .col.pe-1
+                  = ay.label :loinc_code, 'LOINC'
+                .col.pe-8
+                  .loinc_inputs
+                    = text_field_tag :loinc_code_component, loinc_code_description(ay.object.loinc_code), { class: 'loinc_input', readonly: true }
+              .row
+                .col.pe-1
+                  = ay.label :result
+                .col.pe-8
+                  = ay.text_field :result, readonly: true
 
-              - if ay.object.assay_file.nil?
-                .file.is-hidden
-                  .picture-container.assay-file
+            - if ay.object.assay_file.nil?
+              .file.is-hidden
+                .picture-container.assay-file
+                  .any-filetype
+                    .icon-document
+            - else
+              .file
+                .picture-container.assay-file
+                  - if ay.object.assay_file.is_image?
+                    = image_tag ay.object.assay_file.picture.url(:card)
+                  - else
                     .any-filetype
                       .icon-document
-              - else
-                .file
-                  .picture-container.assay-file
-                    - if ay.object.assay_file.is_image?
-                      = image_tag ay.object.assay_file.picture.url(:card)
-                    - else
-                      .any-filetype
-                        .icon-document
-                    .picture-title{ title: ay.object.assay_file.picture_file_name }
-                      = link_to ay.object.assay_file.picture_file_name, ay.object.assay_file.picture.url, target: "_blank", download: ay.object.assay_file.picture_file_name
+                  .picture-title{ title: ay.object.assay_file.picture_file_name }
+                    = link_to ay.object.assay_file.picture_file_name, ay.object.assay_file.picture.url, target: "_blank", download: ay.object.assay_file.picture_file_name

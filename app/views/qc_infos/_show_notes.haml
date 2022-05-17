@@ -1,7 +1,5 @@
-.row
-  .col.pe-2
-    = f.label :notes
-  #notes.col
+= f.form_field :notes do
+  #notes
     = f.fields_for :notes do |note|
       .note
         .info

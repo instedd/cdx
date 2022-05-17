@@ -2,17 +2,16 @@
   .col
     %h1 Password reset
     %p Choose a strong password and don't reuse it for other accounts.
-= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f|
+= cdx_form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f|
   = f.hidden_field :reset_password_token
   .row
     .col
       = f.password_field :password, autofocus: true, autocomplete: "off", placeholder: 'Password', class: "input-block"
       - if @minimum_password_length
-        .small-quote
+        .form_field-hint
           (#{@minimum_password_length} characters minimum)
+      = f.field_errors :password
   %br
   .row
     .col
       = f.submit "Reset my password", class: "btn-secondary input-block"
-
-= devise_error_messages!

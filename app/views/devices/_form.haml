@@ -1,51 +1,30 @@
-= form_for(@device) do |f|
-  = validation_errors @device
+= cdx_form_for(@device) do |f|
+  = f.form_field :institution, value: @navigation_context.institution.name
 
-  .row.form-field
-    .col.pe-2
-      = f.label :institution
-    .col
-      .value= @navigation_context.institution.name
-
-  .row.form-field
-    .col.pe-2
-      = f.label :device_model_id
-    .col
-      = cdx_select form: f, name: :device_model_id, class: 'input-x-large' do |select|
-        - select.items(@device_models, :id, :full_name)
+  = f.form_field :device_model do
+    = cdx_select form: f, name: :device_model_id, class: 'input-x-large' do |select|
+      - select.items(@device_models, :id, :full_name)
 
   - if @allow_to_pick_site
-    .row.form-field
-      .col.pe-2
-        = f.label :site
-      .col
-        = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
-          - select.item "", "None"
-          - select.items(@sites, :id, :name)
+    = f.form_field :site do
+      = cdx_select form: f, name: :site_id, class: 'input-x-large' do |select|
+        - select.item "", "None"
+        - select.items(@sites, :id, :name)
   - elsif f.object.new_record?
     = f.hidden_field :site_id
   - else # once created is better to show site name, otherwise user might have read access to many site's device, and we should avoid not showing site name in that scenario
-    .row.form-field
-      .col.pe-2
-        = f.label :site
-      .col
-        .value= f.object.site.name
-  .row.form-field
-    .col.pe-2
-      = f.label :name
-    .col
-      = f.text_field :name
-  .row.form-field
-    .col.pe-2
-      = f.label :serial_number
-    .col
-      = f.text_field :serial_number
-  .row.form-field
-    .col.pe-2
-      = f.label :time_zone
-    .col
-      = cdx_select form: f, name: :time_zone, class: 'input-x-large' do |select|
-        - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
+    = f.form_field :site, value: f.object.site.name
+
+  = f.form_field :name do
+    = f.text_field :name
+
+  = f.form_field :serial_number do
+    = f.text_field :serial_number
+
+  = f.form_field :time_zone do
+    = cdx_select form: f, name: :time_zone, class: 'input-x-large' do |select|
+      - select.items(ActiveSupport::TimeZone.all, :name, :to_s)
+
   - if @device.new_record? || @device.device_model.try(:supports_ftp)
     .device-ftp-config{class: ('nodisplay' unless @device.device_model.try(:supports_ftp))}
       .row.form-field
@@ -58,18 +37,19 @@
           = f.check_box :ftp_passive
           = f.label :ftp_passive, "&nbsp;".html_safe
         .col.pe-2= f.text_field :ftp_directory, placeholder: 'Folder'
+
       .row.form-field
         .col.pe-2= f.label :ftp_username, 'Login'
         .col.pe-2= f.text_field :ftp_username, placeholder: 'Username', autocomplete: 'off'
         .col.pe-2= f.password_field :ftp_password, value: @device.ftp_password, placeholder: 'Password', autocomplete: 'off'
+
   #custom_mappings
     = render "custom_mappings" if @device.device_model
 
-  .row.button-actions
-    .col
-      = f.submit 'Save', class: 'btn-primary'
-      - if @can_delete
-        = link_to "Delete", @device, method: :delete, data: { confirm: "You are about to permanently delete this site. This action CANNOT be undone. Are you sure you want to proceed?" }, class: 'btn-secondary pull-right'
+  = f.form_actions do
+    = f.submit 'Save', class: 'btn-primary'
+    - if @can_delete
+      = link_to "Delete", @device, method: :delete, data: { confirm: "You are about to permanently delete this site. This action CANNOT be undone. Are you sure you want to proceed?" }, class: 'btn-secondary pull-right'
 
 :coffeescript
   $ ->

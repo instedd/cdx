@@ -1,12 +1,12 @@
 .row
   .col
     %h1 Resend unlock instructions
-= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post }) do |f|
+= cdx_form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post }) do |f|
   .row
     .col
       = f.email_field :email, autofocus: true, placeholder: 'Email', class: "input-block"
+      = f.field_errors :unconfirmed_email
   %br
   .row
     .col
       = f.submit "Resend unlock instructions", class: "btn-secondary input-block"
-= devise_error_messages!

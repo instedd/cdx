@@ -1,56 +1,34 @@
-= form_for(subscriber) do |f|
-  - if subscriber.errors.any?
-    #error_explanation
-      %p= "#{pluralize(subscriber.errors.count, "error")} prohibited this subscriber from being saved:"
-      %ul
-        - subscriber.errors.full_messages.each do |msg|
-          %li= msg
+= cdx_form_for(subscriber) do |f|
+  = f.form_field :filter do
+    = cdx_select form: f, name: :filter_id do |select|
+      - select.items filters, :id, :name
 
-  .row
-    .col.pe-2
-      = f.label :filter
-    .col
-      = cdx_select form: f, name: :filter_id do |select|
-        - select.items filters, :id, :name
-  .row
-    .col.pe-2
-      = f.label :name
-    .col
-      = f.text_field :name
-  .row
-    .col.pe-2
-      = f.label :url
-    .col
-      = f.text_field :url
-  .row
-    .col.pe-2
-      = f.label :verb
-    .col
-      .value.annotation GET will send fields in query string. POST will send a JSON object in the request body.
-      = cdx_select form: f, name: :verb do |select|
-        - select.items Subscriber::VALID_VERBS
-  .row
-    .col.pe-2
-      = f.label :url_user, "User (optional)"
-    .col
-      = f.text_field :url_user
-  .row
-    .col.pe-2
-      = f.label :url_password, "Password (optional)"
-    .col
-      = f.password_field :url_password
-  .row
-    .col.pe-2
-      = f.label :fields
-    .col
-      .value.annotation Empty selection will send all fields
-      - Subscriber.available_field_names.sort.each do |field|
-        = check_box_tag "fields[#{field}]", true, subscriber.fields.try {|f| f.include?(field)}, id: "fields.#{field}"
-        %label{for: "fields.#{field}"}
-          = field
-  .row.button-actions
-    .col
-      = f.submit nil, class: "btn-primary"
-      = link_to 'Cancel', subscribers_path, class: 'btn-link'
-      - if @editing
-        = confirm_deletion_button subscriber, 'subscriber'
+  = f.form_field :name do
+    = f.text_field :name
+
+  = f.form_field :url do
+    = f.text_field :url
+
+  = f.form_field :verb do
+    .value.annotation GET will send fields in query string. POST will send a JSON object in the request body.
+    = cdx_select form: f, name: :verb do |select|
+      - select.items Subscriber::VALID_VERBS
+
+  = f.form_field :url_user, label_opts: "User (optional)" do
+    = f.text_field :url_user
+
+  = f.form_field :url_password, label_opts: "Password (optional)" do
+    = f.password_field :url_password
+
+  = f.form_field :fields do
+    .value.annotation Empty selection will send all fields
+    - Subscriber.available_field_names.sort.each do |field|
+      = check_box_tag "fields[#{field}]", true, subscriber.fields.try {|f| f.include?(field)}, id: "fields.#{field}"
+      %label{for: "fields.#{field}"}
+        = field
+
+  = f.form_actions do
+    = f.submit nil, class: "btn-primary"
+    = link_to 'Cancel', subscribers_path, class: 'btn-link'
+    - if @editing
+      = confirm_deletion_button subscriber, 'subscriber'
