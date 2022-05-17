@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220505070823) do
+ActiveRecord::Schema.define(version: 20220513214928) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -54,31 +54,31 @@ ActiveRecord::Schema.define(version: 20220505070823) do
     t.integer  "user_id",                             limit: 4
     t.string   "name",                                limit: 255
     t.string   "description",                         limit: 255
-    t.boolean  "enabled",                                           default: true
+    t.boolean  "enabled",                                              default: true
     t.datetime "last_alert"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "error_code",                          limit: 255
     t.integer  "category_type",                       limit: 4
-    t.integer  "aggregation_type",                    limit: 4,     default: 0
-    t.text     "query",                               limit: 65535
-    t.text     "message",                             limit: 65535
-    t.integer  "channel_type",                        limit: 4,     default: 0
-    t.integer  "aggregation_frequency",               limit: 4,     default: 0
-    t.integer  "sms_limit",                           limit: 4,     default: 0
-    t.integer  "anomalie_type",                       limit: 4,     default: 0
-    t.boolean  "notify_patients",                                   default: false
-    t.text     "sms_message",                         limit: 65535
+    t.integer  "aggregation_type",                    limit: 4,        default: 0
+    t.text     "query",                               limit: 16777215
+    t.text     "message",                             limit: 16777215
+    t.integer  "channel_type",                        limit: 4,        default: 0
+    t.integer  "aggregation_frequency",               limit: 4,        default: 0
+    t.integer  "sms_limit",                           limit: 4,        default: 0
+    t.integer  "anomalie_type",                       limit: 4,        default: 0
+    t.boolean  "notify_patients",                                      default: false
+    t.text     "sms_message",                         limit: 16777215
     t.datetime "deleted_at"
     t.integer  "test_result_min_threshold",           limit: 4
     t.integer  "test_result_max_threshold",           limit: 4
-    t.integer  "aggregation_threshold",               limit: 4,     default: 0
+    t.integer  "aggregation_threshold",               limit: 4,        default: 0
     t.string   "sample_id",                           limit: 255
-    t.integer  "utilization_efficiency_type",         limit: 4,     default: 0
-    t.integer  "utilization_efficiency_number",       limit: 4,     default: 0
+    t.integer  "utilization_efficiency_type",         limit: 4,        default: 0
+    t.integer  "utilization_efficiency_number",       limit: 4,        default: 0
     t.datetime "utilization_efficiency_last_checked"
-    t.integer  "email_limit",                         limit: 4,     default: 0
-    t.boolean  "use_aggregation_percentage",                        default: false
+    t.integer  "email_limit",                         limit: 4,        default: 0
+    t.boolean  "use_aggregation_percentage",                           default: false
     t.integer  "institution_id",                      limit: 4
     t.datetime "time_last_aggregation_checked"
   end
@@ -138,13 +138,13 @@ ActiveRecord::Schema.define(version: 20220505070823) do
 
   create_table "batches", force: :cascade do |t|
     t.string   "uuid",           limit: 255
-    t.text     "core_fields",    limit: 65535
-    t.text     "custom_fields",  limit: 65535
+    t.text     "core_fields",    limit: 16777215
+    t.text     "custom_fields",  limit: 16777215
     t.binary   "sensitive_data", limit: 65535
     t.datetime "deleted_at"
     t.integer  "institution_id", limit: 4
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
     t.string   "isolate_name",   limit: 255
     t.string   "batch_number",   limit: 255
     t.integer  "site_id",        limit: 4
@@ -209,10 +209,10 @@ ActiveRecord::Schema.define(version: 20220505070823) do
     t.binary   "raw_data",             limit: 65535
     t.integer  "device_id",            limit: 4
     t.boolean  "index_failed"
-    t.text     "index_failure_reason", limit: 65535
+    t.text     "index_failure_reason", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "index_failure_data",   limit: 65535
+    t.text     "index_failure_data",   limit: 16777215
     t.integer  "site_id",              limit: 4
   end
 
@@ -258,7 +258,7 @@ ActiveRecord::Schema.define(version: 20220505070823) do
     t.integer  "device_model_id",  limit: 4
     t.string   "secret_key_hash",  limit: 255
     t.string   "time_zone",        limit: 255
-    t.text     "custom_mappings",  limit: 65535
+    t.text     "custom_mappings",  limit: 16777215
     t.integer  "site_id",          limit: 4
     t.string   "serial_number",    limit: 255
     t.string   "site_prefix",      limit: 255
@@ -280,11 +280,11 @@ ActiveRecord::Schema.define(version: 20220505070823) do
     t.string   "uuid",            limit: 255
     t.string   "entity_id",       limit: 255
     t.binary   "sensitive_data",  limit: 65535
-    t.text     "custom_fields",   limit: 65535
-    t.text     "core_fields",     limit: 65535
+    t.text     "custom_fields",   limit: 16777215
+    t.text     "core_fields",     limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "is_phantom",                    default: true
+    t.boolean  "is_phantom",                       default: true
     t.datetime "deleted_at"
     t.integer  "site_id",         limit: 4
     t.datetime "user_updated_at"
@@ -298,7 +298,7 @@ ActiveRecord::Schema.define(version: 20220505070823) do
   create_table "file_messages", force: :cascade do |t|
     t.string  "filename",          limit: 255
     t.string  "status",            limit: 255
-    t.text    "message",           limit: 65535
+    t.text    "message",           limit: 16777215
     t.integer "device_id",         limit: 4
     t.integer "device_message_id", limit: 4
     t.string  "ftp_hostname",      limit: 255
@@ -315,7 +315,7 @@ ActiveRecord::Schema.define(version: 20220505070823) do
   create_table "filters", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
     t.string   "name",       limit: 255
-    t.text     "query",      limit: 65535
+    t.text     "query",      limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -352,7 +352,7 @@ ActiveRecord::Schema.define(version: 20220505070823) do
 
   create_table "manifests", force: :cascade do |t|
     t.string   "version",         limit: 255
-    t.text     "definition",      limit: 65535
+    t.text     "definition",      limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "api_version",     limit: 255
@@ -360,10 +360,10 @@ ActiveRecord::Schema.define(version: 20220505070823) do
   end
 
   create_table "notes", force: :cascade do |t|
-    t.text     "description", limit: 65535
+    t.text     "description", limit: 16777215
     t.integer  "user_id",     limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
     t.integer  "sample_id",   limit: 4
     t.integer  "qc_info_id",  limit: 4
   end
@@ -373,12 +373,12 @@ ActiveRecord::Schema.define(version: 20220505070823) do
   add_index "notes", ["user_id"], name: "index_notes_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: :cascade do |t|
-    t.integer  "resource_owner_id", limit: 4,     null: false
-    t.integer  "application_id",    limit: 4,     null: false
-    t.string   "token",             limit: 255,   null: false
-    t.integer  "expires_in",        limit: 4,     null: false
-    t.text     "redirect_uri",      limit: 65535, null: false
-    t.datetime "created_at",                      null: false
+    t.integer  "resource_owner_id", limit: 4,        null: false
+    t.integer  "application_id",    limit: 4,        null: false
+    t.string   "token",             limit: 255,      null: false
+    t.integer  "expires_in",        limit: 4,        null: false
+    t.text     "redirect_uri",      limit: 16777215, null: false
+    t.datetime "created_at",                         null: false
     t.datetime "revoked_at"
     t.string   "scopes",            limit: 255
   end
@@ -401,11 +401,11 @@ ActiveRecord::Schema.define(version: 20220505070823) do
   add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true, using: :btree
 
   create_table "oauth_applications", force: :cascade do |t|
-    t.string   "name",         limit: 255,                null: false
-    t.string   "uid",          limit: 255,                null: false
-    t.string   "secret",       limit: 255,                null: false
-    t.text     "redirect_uri", limit: 65535,              null: false
-    t.string   "scopes",       limit: 255,   default: "", null: false
+    t.string   "name",         limit: 255,                   null: false
+    t.string   "uid",          limit: 255,                   null: false
+    t.string   "secret",       limit: 255,                   null: false
+    t.text     "redirect_uri", limit: 16777215,              null: false
+    t.string   "scopes",       limit: 255,      default: "", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "owner_id",     limit: 4
@@ -426,14 +426,14 @@ ActiveRecord::Schema.define(version: 20220505070823) do
 
   create_table "patients", force: :cascade do |t|
     t.binary   "sensitive_data", limit: 65535
-    t.text     "custom_fields",  limit: 65535
-    t.text     "core_fields",    limit: 65535
+    t.text     "custom_fields",  limit: 16777215
+    t.text     "core_fields",    limit: 16777215
     t.string   "entity_id_hash", limit: 255
     t.string   "uuid",           limit: 255
     t.integer  "institution_id", limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "is_phantom",                   default: true
+    t.boolean  "is_phantom",                      default: true
     t.datetime "deleted_at"
     t.string   "location_geoid", limit: 60
     t.float    "lat",            limit: 24
@@ -465,7 +465,7 @@ ActiveRecord::Schema.define(version: 20220505070823) do
   create_table "policies", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
     t.integer  "granter_id", limit: 4
-    t.text     "definition", limit: 65535
+    t.text     "definition", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "name",       limit: 255
@@ -474,13 +474,13 @@ ActiveRecord::Schema.define(version: 20220505070823) do
   create_table "qc_infos", force: :cascade do |t|
     t.string   "uuid",           limit: 255
     t.string   "batch_number",   limit: 255
-    t.text     "core_fields",    limit: 65535
-    t.text     "custom_fields",  limit: 65535
+    t.text     "core_fields",    limit: 16777215
+    t.text     "custom_fields",  limit: 16777215
     t.binary   "sensitive_data", limit: 65535
     t.integer  "sample_qc_id",   limit: 4
     t.datetime "deleted_at"
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
   end
 
   add_index "qc_infos", ["batch_number"], name: "index_qc_infos_on_batch_number", using: :btree
@@ -551,13 +551,13 @@ ActiveRecord::Schema.define(version: 20220505070823) do
   create_table "samples", force: :cascade do |t|
     t.binary   "sensitive_data",   limit: 65535
     t.integer  "institution_id",   limit: 4
-    t.text     "custom_fields",    limit: 65535
-    t.text     "core_fields",      limit: 65535
+    t.text     "custom_fields",    limit: 16777215
+    t.text     "core_fields",      limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "patient_id",       limit: 4
     t.integer  "encounter_id",     limit: 4
-    t.boolean  "is_phantom",                     default: true
+    t.boolean  "is_phantom",                        default: true
     t.datetime "deleted_at"
     t.integer  "batch_id",         limit: 4
     t.string   "isolate_name",     limit: 255
@@ -606,7 +606,7 @@ ActiveRecord::Schema.define(version: 20220505070823) do
   add_index "sites", ["deleted_at"], name: "index_sites_on_deleted_at", using: :btree
 
   create_table "ssh_keys", force: :cascade do |t|
-    t.text     "public_key", limit: 65535
+    t.text     "public_key", limit: 16777215
     t.integer  "device_id",  limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -618,14 +618,14 @@ ActiveRecord::Schema.define(version: 20220505070823) do
     t.integer  "user_id",      limit: 4
     t.string   "name",         limit: 255
     t.string   "url",          limit: 255
-    t.text     "fields",       limit: 65535
+    t.text     "fields",       limit: 16777215
     t.datetime "last_run_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "url_user",     limit: 255
     t.string   "url_password", limit: 255
     t.integer  "filter_id",    limit: 4
-    t.string   "verb",         limit: 255,   default: "GET"
+    t.string   "verb",         limit: 255,      default: "GET"
   end
 
   add_index "subscribers", ["filter_id"], name: "index_subscribers_on_filter_id", using: :btree
@@ -641,12 +641,12 @@ ActiveRecord::Schema.define(version: 20220505070823) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "uuid",                 limit: 255
-    t.text     "custom_fields",        limit: 65535
+    t.text     "custom_fields",        limit: 16777215
     t.string   "test_id",              limit: 255
     t.binary   "sensitive_data",       limit: 65535
     t.integer  "device_id",            limit: 4
     t.integer  "patient_id",           limit: 4
-    t.text     "core_fields",          limit: 65535
+    t.text     "core_fields",          limit: 16777215
     t.integer  "encounter_id",         limit: 4
     t.integer  "site_id",              limit: 4
     t.integer  "institution_id",       limit: 4
