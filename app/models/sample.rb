@@ -103,7 +103,12 @@ class Sample < ApplicationRecord
   # Removes sample from its context when getting transferred.
   # It's added to the destination context when confirmed.
   def detach_from_context
-    assign_attributes(site: nil, institution: nil)
+    assign_attributes(
+      batch: nil,
+      old_batch_number: batch.try(:batch_number),
+      site: nil,
+      institution: nil
+    )
   end
 
   def attach_qc_info

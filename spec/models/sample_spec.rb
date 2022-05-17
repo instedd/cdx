@@ -50,4 +50,14 @@ describe Sample do
     ])
     expect(sample.has_qc_reference?).to eq(true)
   end
+
+  it "#detach_from_context" do
+    sample = Sample.make(:batch)
+    batch = sample.batch
+    sample.detach_from_context
+    expect(sample.site).to be_nil
+    expect(sample.institution).to be_nil
+    expect(sample.batch).to be_nil
+    expect(sample.old_batch_number).to eq batch.batch_number
+  end
 end

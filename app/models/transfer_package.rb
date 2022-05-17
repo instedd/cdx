@@ -32,8 +32,8 @@ class TransferPackage < ApplicationRecord
   before_create do
     sample_transfers.each do |sample_transfer|
       sample = sample_transfer.sample
-      sample.detach_from_context unless confirmed?
       sample.attach_qc_info if includes_qc_info
+      sample.detach_from_context unless confirmed?
       sample.save!
     end
   end
