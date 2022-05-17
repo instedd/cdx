@@ -519,6 +519,10 @@ form {
       color: $red;
     }
   }
+
+  > .form-field__label {
+    flex: 0 0 17em;
+  }
 }
 
 .errors {
