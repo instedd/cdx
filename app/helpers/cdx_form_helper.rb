@@ -47,11 +47,17 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
 
   # Renders form errors for fields that have not been handled by a dedicated
   # `#field` errors.
-  def form_errors
-    @template.render partial: "form_builder/form_errors", locals: {
+  def form_errors(options = {})
+    rendered = @template.render partial: "form_builder/form_errors", locals: {
       form: self,
-      messages: error_messages_to_show,
+      messages: error_messages_to_show.values.flatten,
     }
+
+    log_unhandled_errors unless options[:ignore_unhandled]
+
+    rendered
+  ensure
+    @errors_to_show = []
   end
 
   private
@@ -61,10 +67,26 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
   end
 
   def error_messages_to_show
-    errors_to_show.map do |attribute|
-      @object.errors.full_messages_for(attribute)
-    end.flatten.tap do
-      @errors_to_show = []
+    Hash[errors_to_show.map do |attribute|
+      messages = @object.errors.full_messages_for(attribute)
+      next if messages.empty?
+      [attribute, messages]
+    end.compact]
+  end
+
+  def log_unhandled_errors
+    unhandled_errors = error_messages_to_show.dup
+    unhandled_errors.delete(:base)
+    return if unhandled_errors.empty?
+
+    if Rails.env.test?
+      raise "Unhandled form errors in #{@object.model_name}: #{unhandled_errors}"
     end
+
+    Rails.logger.info "Unhandled form errors in #{@object.model_name}: #{unhandled_errors}"
+    Raven.capture_message("Unhandled form errors",
+      form: @object.model_name,
+      errors: unhandled_errors,
+    )
   end
 end
