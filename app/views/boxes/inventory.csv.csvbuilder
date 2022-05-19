@@ -1,0 +1,27 @@
+csv << [
+  "Purpose",
+  "Sample #",
+  "Label ID (QR code)",
+  "Batch ID",
+  "Virus Lineage",
+  "Replicate",
+  "Production Date",
+  "Concentration",
+  "Inactivation Method",
+  "Media",
+]
+
+@samples.each_with_index do |sample, index|
+  csv << [
+    @box.purpose,
+    index + 1,
+    sample.uuid,
+    sample.batch_number,
+    sample.virus_lineage,
+    sample.replicate,
+    sample.date_produced.to_date,
+    sample.concentration_formula,
+    sample.inactivation_method,
+    sample.media,
+  ]
+end

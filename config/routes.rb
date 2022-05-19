@@ -134,6 +134,7 @@ Rails.application.routes.draw do
   resources :boxes, except: [:edit, :update] do
     member do
       get 'print'
+      get 'inventory', constraints: { format: 'csv' }
     end
     collection do
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy

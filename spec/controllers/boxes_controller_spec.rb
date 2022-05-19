@@ -125,6 +125,32 @@ RSpec.describe BoxesController, type: :controller do
     end
   end
 
+  describe "inventory" do
+    it "should be accessible to institution owner" do
+      get :inventory, params: { id: box.id, format: "csv" }
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to eq("text/csv")
+      expect(response.body.strip.split("\n").size).to eq(box.samples.count + 1)
+      expect(response.headers["Content-Disposition"]).to match(/cdx_box_inventory_#{box.uuid}\.csv/)
+    end
+
+    it "should be allowed if can read" do
+      grant user, other_user, box, READ_BOX
+      sign_in other_user
+
+      get :inventory, params: { id: box.id, format: "csv" }
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to eq("text/csv")
+    end
+
+    it "shouldn't be allowed if can't read" do
+      sign_in other_user
+
+      get :inventory, params: { id: box.id, format: "csv" }
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   describe "new" do
     it "should be accessible to institution owner" do
       get :new

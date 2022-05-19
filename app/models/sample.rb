@@ -155,7 +155,17 @@ class Sample < ApplicationRecord
 
   def concentration
     if (n = concentration_number) && (e = concentration_exponent)
-      n.to_i * (10 ** -e.to_i)
+      n * (10 ** -e)
+    end
+  end
+
+  def concentration_formula
+    if (n = concentration_number) && (e = concentration_exponent)
+      if n == 1
+        "10E-#{e}"
+      else
+        "#{n} × 10E-#{e}"
+      end
     end
   end
 end

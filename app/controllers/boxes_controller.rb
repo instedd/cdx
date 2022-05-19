@@ -17,7 +17,19 @@ class BoxesController < ApplicationController
     return unless authorize_resource(@box, READ_BOX)
     @can_delete = has_access?(@box, DELETE_BOX)
 
-    @samples = @box.scrambled_samples.preload(:batch).to_a
+    @samples = @box.scrambled_samples.preload(:batch, :sample_identifiers)
+  end
+
+  def inventory
+    return unless authorize_resource(@box, READ_BOX)
+
+    @samples = @box.samples.preload(:batch, :sample_identifiers)
+
+    respond_to do |format|
+      format.csv do
+        @filename = "cdx_box_inventory_#{@box.uuid}.csv"
+      end
+    end
   end
 
   def print
@@ -28,7 +40,7 @@ class BoxesController < ApplicationController
       layout: "layouts/pdf.html",
       locals: {
         box: @box,
-        samples: @box.samples.preload(:sample_identifiers),
+        samples: @box.samples.preload(:batch, :sample_identifiers),
       },
       margin: { top: 0, bottom: 0, left: 0, right: 0 },
       page_width: "1in",
