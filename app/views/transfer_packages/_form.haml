@@ -19,6 +19,7 @@
         = react_component("SampleTransferSelector",
           context: @navigation_context.uuid,
           includeQcInfo: @transfer_package.includes_qc_info, samples: samples_data(@transfer_package.sample_transfers.map(&:sample)))
+        = f.field_errors :"sample_transfers.sample"
 
   - if @can_update
     .row.button-actions

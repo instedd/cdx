@@ -13,7 +13,7 @@ RSpec.describe SampleTransfer, type: :model do
   it "validates specimen role" do
     transfer = SampleTransfer.new(sample: Sample.make(specimen_role: "q"), transfer_package: TransferPackage.make)
     expect(transfer).not_to be_valid
-    expect(transfer.errors[:sample]).to eq ["Can't transfer QC sample"]
+    expect(transfer.errors[:sample]).to eq ["can't transfer QC sample"]
   end
 
   describe ".within" do

@@ -17,7 +17,7 @@ RSpec.describe TransferPackage, type: :model do
     transfer.sample_transfers.new sample: Sample.make(institution: transfer.sender_institution, specimen_role: 'q')
 
     expect(transfer).not_to be_valid
-    expect(transfer.errors["sample_transfers.sample"]).to eq ["Can't transfer QC sample"]
+    expect(transfer.errors["sample_transfers.sample"]).to eq ["can't transfer QC sample"]
   end
 
   describe ".save" do
