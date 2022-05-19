@@ -1,4 +1,8 @@
 class Sample < ApplicationRecord
+  def self.institution_is_required
+    false
+  end
+
   include Entity
   include Resource
   include SpecimenRole
@@ -9,6 +13,7 @@ class Sample < ApplicationRecord
   belongs_to :patient
   belongs_to :encounter
   belongs_to :batch
+  belongs_to :box
   belongs_to :qc_info
 
   has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy

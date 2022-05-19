@@ -29,7 +29,8 @@ class Policy < ApplicationRecord
     CREATE_INSTITUTION_ROLE =           "institution:createRole"
     CREATE_INSTITUTION_PATIENT =        "institution:createPatient"
     CREATE_INSTITUTION_SAMPLE =         "institution:createSample"
-    CREATE_INSTITUTION_BATCH =         "institution:createBatch"
+    CREATE_INSTITUTION_BATCH =          "institution:createBatch"
+    CREATE_INSTITUTION_BOX =            "institution:createBox"
 
     READ_INSTITUTION_USERS = "institution:readUsers"
 
@@ -49,6 +50,10 @@ class Policy < ApplicationRecord
     READ_BATCH =   "batch:read"
     UPDATE_BATCH = "batch:update"
     DELETE_BATCH = "batch:delete"
+
+    READ_BOX =   "box:read"
+    UPDATE_BOX = "box:update"
+    DELETE_BOX = "box:delete"
 
     READ_SITE =   "site:read"
     UPDATE_SITE = "site:update"

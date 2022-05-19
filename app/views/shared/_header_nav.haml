@@ -27,6 +27,8 @@
                 = link_to "Individual samples" , samples_path
               %li{:class => params[:controller] == "batches" && "active"}
                 = link_to "Batches", batches_path
+              %li{:class => params[:controller] == "boxes" && "active"}
+                = link_to "Boxes", boxes_path
               %li{:class => params[:controller] == "sample_transfers" && "active"}
                 = link_to "Transfers", sample_transfers_path
         - if has_access_to_test_results_index?

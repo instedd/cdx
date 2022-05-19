@@ -113,6 +113,16 @@ entities:
       volume:
         type: float
         searchable: true
+  box: &BOX
+    allows_custom: true
+    fields:
+      purpose:
+        type: enum
+        searchable: true
+        options:
+          - LOD
+          - Variants
+          - Challenge
   test: &TEST
     allows_custom: true
     fields:

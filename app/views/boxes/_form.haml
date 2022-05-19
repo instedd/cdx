@@ -1,0 +1,39 @@
+= cdx_form_for(@box_form.box) do |f|
+  .row
+    .col
+      = f.form_field :purpose do
+        = react_component "CdxSelectSectionToggler", { name: "box[purpose]",
+          items: Box.purposes.map { |v| { label: v, value: v } },
+          value: @box_form.purpose, submit: "#btn-save" }
+
+      .row.form-field
+        .col.form-field__label
+          %label Contents
+        .col
+          %fieldset#LOD(disabled)
+            = f.form_field "lod", label: { text: "Batch", class: "is-normal-case" }, full_message: false do
+              = text_field_tag "box[batch_numbers][lod]", @box_form.batch_numbers["lod"],
+                id: "box_lod", placeholder: "Enter batch id", class: "input-block"
+
+          %fieldset#Variants(disabled)
+            - 1.upto(6) do |index|
+              - key = "variant_#{index}"
+              = f.form_field key, label: { text: "Variant #{index}", class: "is-normal-case" }, full_message: false do
+                = text_field_tag "box[batch_numbers][#{key}]", @box_form.batch_numbers[key],
+                  id: "box_#{key}", placeholder: "Enter batch id", class: "input-block"
+
+          %fieldset#Challenge(disabled)
+            = f.form_field "virus", label: { text: "Virus", class: "is-normal-case" }, full_message: false do
+              = text_field_tag "box[batch_numbers][virus]", @box_form.batch_numbers["virus"],
+                id: "box_virus", placeholder: "Enter batch id", class: "input-block"
+
+            - 1.upto(6) do |index|
+              - key = "distractor_#{index}"
+              = f.form_field key, label: { text: "Distractor #{index}", class: "is-normal-case" }, full_message: false do
+                = text_field_tag "box[batch_numbers][#{key}]", @box_form.batch_numbers[key],
+                  id: "box_#{key}", placeholder: "Enter batch id", class: "input-block"
+
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
+      = link_to 'Cancel', boxes_path, class: 'btn-link'

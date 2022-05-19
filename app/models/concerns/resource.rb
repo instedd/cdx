@@ -14,7 +14,8 @@ module Resource
       User,
       Patient,
       Sample,
-      Batch
+      Batch,
+      Box
     ].freeze
   end
 
