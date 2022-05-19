@@ -154,7 +154,8 @@ RSpec.describe TransferPackagesController, type: :controller do
     let(:default_params) { { context: institution.uuid } }
 
     it "creates transfer package" do
-      sample1 = Sample.make!(:filled, institution: institution)
+      batch = Batch.make!(:qc_sample)
+      sample1 = Sample.make!(:filled, institution: institution, batch: batch)
       sample2 = Sample.make!(:filled, institution: institution)
 
       expect do
@@ -181,6 +182,14 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect(package.receiver_institution).to eq other_institution
       expect(package.includes_qc_info?).to eq true
       expect(package.sample_transfers.map(&:sample)).to eq [sample1, sample2]
+
+      sample1.reload
+      sample2.reload
+      expect(sample1.institution).to be_nil
+      expect(sample2.institution).to be_nil
+
+      expect(sample1.qc_info).not_to be_nil
+      expect(sample2.qc_info).to be_nil
     end
 
     it "ignores blank sample_uuid" do

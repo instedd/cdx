@@ -41,6 +41,12 @@ class Batch < ApplicationRecord
     self.qc_sample.present?
   end
 
+  def qc_info
+    if qc_sample = self.qc_sample
+      QcInfo.find_or_duplicate_from(qc_sample)
+    end
+  end
+
   private
 
   def isolate_name_batch_number_combination_create
