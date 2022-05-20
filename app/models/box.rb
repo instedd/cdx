@@ -34,6 +34,8 @@ class Box < ApplicationRecord
           concentration_number: 1,
           concentration_exponent: exponent,
           replicate: replicate,
+          institution: institution,
+          site: site,
         )
       end
     end

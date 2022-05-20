@@ -65,4 +65,19 @@ describe Sample do
     expect(Sample.new(concentration_number: 1, concentration_exponent: 8).concentration).to eq(1 * (10 ** -8))
     expect(Sample.new(concentration_number: 2, concentration_exponent: 4).concentration).to eq(2 * (10 ** -4))
   end
+
+  it "validates box context" do
+    institution = Institution.make!
+    site = Site.make!(institution: institution)
+    sample = Sample.make(institution: institution, site: site)
+
+    sample.box = Box.make!
+    expect(sample).not_to be_valid
+
+    sample.box = Box.make!(institution: institution)
+    expect(sample).not_to be_valid
+
+    sample.box = Box.make!(institution: institution, site: site)
+    expect(sample).to be_valid
+  end
 end
