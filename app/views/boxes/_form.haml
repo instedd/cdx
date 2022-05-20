@@ -12,26 +12,30 @@
         .col
           %fieldset#LOD(disabled)
             = f.form_field "lod", label: { text: "Batch", class: "is-normal-case" }, full_message: false do
-              = text_field_tag "box[batch_numbers][lod]", @box_form.batch_numbers["lod"],
-                id: "box_lod", placeholder: "Enter batch id", class: "input-block"
+              = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+                name: "box[batch_uuids][lod]", value: @box_form.batch_uuids["lod"],
+                placeholder: "Enter batch id", className: "input-block" }
 
           %fieldset#Variants(disabled)
             - 1.upto(6) do |index|
               - key = "variant_#{index}"
               = f.form_field key, label: { text: "Variant #{index}", class: "is-normal-case" }, full_message: false do
-                = text_field_tag "box[batch_numbers][#{key}]", @box_form.batch_numbers[key],
-                  id: "box_#{key}", placeholder: "Enter batch id", class: "input-block"
+                = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+                  name: "box[batch_uuids][#{key}]", value: @box_form.batch_uuids[key],
+                  placeholder: "Enter batch id", className: "input-block" }
 
           %fieldset#Challenge(disabled)
             = f.form_field "virus", label: { text: "Virus", class: "is-normal-case" }, full_message: false do
-              = text_field_tag "box[batch_numbers][virus]", @box_form.batch_numbers["virus"],
-                id: "box_virus", placeholder: "Enter batch id", class: "input-block"
+              = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+                name: "box[batch_uuids][virus]", value: @box_form.batch_uuids["virus"],
+                placeholder: "Enter batch id", className: "input-block" }
 
             - 1.upto(6) do |index|
               - key = "distractor_#{index}"
               = f.form_field key, label: { text: "Distractor #{index}", class: "is-normal-case" }, full_message: false do
-                = text_field_tag "box[batch_numbers][#{key}]", @box_form.batch_numbers[key],
-                  id: "box_#{key}", placeholder: "Enter batch id", class: "input-block"
+                = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+                  name: "box[batch_uuids][#{key}]", value: @box_form.batch_uuids[key],
+                  placeholder: "Enter batch id", className: "input-block" }
 
   .row.button-actions
     .col

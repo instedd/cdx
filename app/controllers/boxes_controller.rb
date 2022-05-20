@@ -85,19 +85,19 @@ class BoxesController < ApplicationController
   def load_batches
     Batch
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
-      .where(batch_number: @box_form.batch_numbers.values.reject(&:blank?))
+      .where(uuid: @box_form.batch_uuids.values.reject(&:blank?))
   end
 
   def box_params
     if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 0
       params.require(:box).permit(:purpose).tap do |allowed|
-        allowed[:batch_numbers] = params[:box][:batch_numbers].permit!
+        allowed[:batch_uuids] = params[:box][:batch_uuids].permit!
       end
     elsif Rails::VERSION::MAJOR >= 5
-      params.require(:box).permit(:purpose, batch_numbers: {})
+      params.require(:box).permit(:purpose, batch_uuids: {})
     else
       params.require(:box).permit(:purpose).tap do |allowed|
-        allowed[:batch_numbers] = params[:box][:batch_numbers]
+        allowed[:batch_uuids] = params[:box][:batch_uuids]
       end
     end
   end

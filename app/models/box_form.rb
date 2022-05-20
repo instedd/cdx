@@ -1,5 +1,5 @@
 class BoxForm
-  attr_reader :box, :batch_numbers
+  attr_reader :box, :batch_uuids
 
   delegate :purpose, :purpose=, to: :box
   delegate :model_name, :errors, to: :box
@@ -11,25 +11,25 @@ class BoxForm
     )
 
     if params
-      batch_numbers = params.delete(:batch_numbers) || {}
+      batch_uuids = params.delete(:batch_uuids) || {}
       box.attributes = params
     else
-      batch_numbers = {}
+      batch_uuids = {}
     end
 
-    new(box, batch_numbers)
+    new(box, batch_uuids)
   end
 
-  def initialize(box, batch_numbers)
+  def initialize(box, batch_uuids)
     @box = box
-    @batch_numbers = batch_numbers
+    @batch_uuids = batch_uuids
   end
 
   def batches=(relation)
     records = relation.to_a
 
-    @batches = @batch_numbers.transform_values do |batch_number|
-      records.find { |b| b.batch_number == batch_number }
+    @batches = @batch_uuids.transform_values do |batch_uuid|
+      records.find { |b| b.uuid == batch_uuid }
     end.compact
   end
 
@@ -72,15 +72,15 @@ class BoxForm
   private
 
   def validate_existence_of_batches
-    @batch_numbers.each do |key, batch_number|
-      unless batch_number.blank? || @batches[key]
+    @batch_uuids.each do |key, batch_uuid|
+      unless batch_uuid.blank? || @batches[key]
         @box.errors.add(key, "Batch doesn't exist")
       end
     end
   end
 
   def validate_batches_for_purpose
-    count = @batches.map { |_, b| b.try(&:batch_number) }.uniq.size
+    count = @batches.map { |_, b| b.try(&:uuid) }.uniq.size
 
     case @box.purpose
     when "LOD"

@@ -34,6 +34,10 @@ class Batch < ApplicationRecord
 
   validates_associated :samples, message: "are invalid"
 
+  scope :autocomplete, ->(query) {
+    where("batches.batch_number LIKE ?", "%#{query}%")
+  }
+
   def qc_sample
     self.samples.select {|sample| sample.is_quality_control?}.first
   end

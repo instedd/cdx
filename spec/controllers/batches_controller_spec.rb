@@ -82,6 +82,56 @@ RSpec.describe BatchesController, type: :controller do
     end
   end
 
+  context "autocomplete" do
+    let(:batch) { Batch.make! institution: institution }
+
+    it "should be accessible by institution owner" do
+      get :autocomplete, params: { query: batch.batch_number, format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(response).to be_success
+    end
+
+    it "should list batches if can read" do
+      grant user, other_user, batch, READ_BATCH
+      sign_in other_user
+
+      get :autocomplete, params: { query: batch.batch_number, format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(1)
+    end
+
+    it "should not list batches if can not read" do
+      sign_in other_user
+
+      get :autocomplete, params: { query: batch.batch_number, format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(0)
+    end
+
+    it "autocompletes batch number" do
+      Batch.make! institution: institution, batch_number: "virus.limit"
+      Batch.make! institution: institution, batch_number: "limit.virus"
+      Batch.make! institution: institution, batch_number: "something else"
+
+      get :autocomplete, params: { query: "virus", format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(2)
+
+      get :autocomplete, params: { query: "else", format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(1)
+    end
+
+    it "in context" do
+      site = Site.make! institution: institution
+      batch = Batch.make! institution: institution, site: site
+
+      get :autocomplete, params: { context: "#{site.uuid}-*", query: batch.batch_number, format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(1)
+    end
+  end
+
   context "edit_or_show" do
     let!(:batch) { Batch.make! institution: institution }
 
