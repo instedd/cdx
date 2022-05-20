@@ -35,6 +35,12 @@ class Sample < ApplicationRecord
   validates_numericality_of :concentration_exponent, only_integer: true, greater_than: 0, allow_blank: true
   validates_numericality_of :replicate, only_integer: true, greater_than_or_equal_to: 0, allow_blank: true
   validates_inclusion_of :media, in: ->(_) { Sample.medias }, allow_blank: true
+  validate :validate_box_context, if: -> { box.present? }
+
+  def validate_box_context
+    errors.add(:institution, "must be the same as the box it is contained in") unless institution == box.institution
+    errors.add(:site, "must be the same box it is contained in") unless site == box.site
+  end
 
   def self.entity_scope
     "sample"
