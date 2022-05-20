@@ -88,8 +88,12 @@ class BoxForm
     when "Variants"
       @box.errors.add(:base, "You must select at least two batches") unless count >= 2
     when "Challenge"
-      @box.errors.add(:virus, "A virus batch is required") unless @batches["virus"] || @box.errors.include?(:virus)
-      @box.errors.add(:base, "You must select at least one distractor batch") unless count >= 2
+      if @batches["virus"]
+        @box.errors.add(:base, "You must select at least one distractor batch") unless count >= 2
+      else
+        @box.errors.add(:virus, "A virus batch is required") unless @box.errors.include?(:virus)
+        @box.errors.add(:base, "You must select at least one distractor batch") unless count >= 1
+      end
     end
   end
 end
