@@ -2,10 +2,7 @@
 %html
   %head
     %title Connected Diagnostics Platform
-    - if Rails::VERSION::MAJOR < 5
-      = stylesheet_link_tag wicked_pdf_asset_base64("pdf")
-    - else
-      = wicked_pdf_stylesheet_link_tag "pdf"
+    = stylesheet_link_tag wicked_pdf_asset_base64("pdf")
     = wicked_pdf_stylesheet_link_tag "https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap"
   %body
     = yield
