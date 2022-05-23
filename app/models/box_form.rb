@@ -1,28 +1,23 @@
 class BoxForm
   attr_reader :box, :batch_uuids
+  attr_accessor :media
 
   delegate :purpose, :purpose=, to: :box
   delegate_missing_to :box
 
-  def self.build(navigation_context, params = nil)
+  def self.build(navigation_context, params = {})
     box = Box.new(
       institution: navigation_context.institution,
       site: navigation_context.site,
+      purpose: params[:purpose],
     )
-
-    if params
-      batch_uuids = params.delete(:batch_uuids) || {}
-      box.attributes = params
-    else
-      batch_uuids = {}
-    end
-
-    new(box, batch_uuids)
+    new(box, params)
   end
 
-  def initialize(box, batch_uuids)
+  def initialize(box, params)
     @box = box
-    @batch_uuids = batch_uuids
+    @batch_uuids = params[:batch_uuids].presence || {}
+    @media = params[:media].presence
   end
 
   def batches=(relation)
@@ -36,19 +31,19 @@ class BoxForm
   def build_samples
     case @box.purpose
     when "LOD"
-      @box.build_samples(@batches["lod"], concentration_exponents: 1..8, replicates: 3)
+      @box.build_samples(@batches["lod"], concentration_exponents: 1..8, replicates: 3, media: media)
 
     when "Variants"
       @batches.each_value do |batch|
-        @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 3)
+        @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 3, media: media)
       end
 
     when "Challenge"
       @batches.each do |key, batch|
         if key == "virus"
-          @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 18)
+          @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 18, media: media)
         else
-          @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 3)
+          @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 3, media: media)
         end
       end
     end

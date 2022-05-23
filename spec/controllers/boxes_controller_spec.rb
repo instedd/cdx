@@ -210,6 +210,16 @@ RSpec.describe BoxesController, type: :controller do
       expect(box.site_id).to eq site.id
     end
 
+    it "should create box with optional params" do
+      expect do
+        post :create, params: { box: box_plan.merge(media: "Saliva") }
+        expect(response).to redirect_to boxes_path
+      end.to change(institution.boxes, :count).by(1)
+
+      box = assigns(:box_form).box.reload
+      expect(box.samples.map(&:media).uniq).to eq(["Saliva"])
+    end
+
     it "should create box if allowed" do
       grant user, other_user, institution, CREATE_INSTITUTION_BOX
       grant user, other_user, batch, READ_BATCH
