@@ -2,7 +2,7 @@ class BoxForm
   attr_reader :box, :batch_uuids
 
   delegate :purpose, :purpose=, to: :box
-  delegate :model_name, :errors, to: :box
+  delegate_missing_to :box
 
   def self.build(navigation_context, params = nil)
     box = Box.new(

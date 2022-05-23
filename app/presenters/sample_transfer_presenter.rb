@@ -1,13 +1,12 @@
 class SampleTransferPresenter
   attr_reader :transfer, :context, :current_user
 
+  delegate_missing_to :transfer
+
   def initialize(transfer, context)
     @transfer = transfer
     @context = context
   end
-
-  # TODO(Rails 5.1): Use delegate_missing
-  delegate :transfer_package, :sample, :confirmed_at, :confirmed?, :created_at, :receiver_institution, :sender_institution, to: :transfer
 
   def receiver?
     context.institution == transfer.receiver_institution
