@@ -16,8 +16,8 @@ class BoxForm
 
   def initialize(box, params)
     @box = box
-    @batch_uuids = params[:batch_uuids].presence || {}
     @media = params[:media].presence
+    @batch_uuids = params[:batch_uuids].presence.to_h
   end
 
   def batches=(relation)
