@@ -80,3 +80,6 @@
 
 - if @can_update
   = render 'samples/form_specimen_role_js'
+
+= form_tag bulk_action_samples_path(format: "pdf"), method: :post, style: "display: none", id: "bulk_print_form", target: "_blank" do
+  = hidden_field_tag :bulk_action, "print"
