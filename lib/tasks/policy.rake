@@ -32,6 +32,60 @@ namespace :policy do
     PoliciesMigrator.new.update_roles
   end
 
+  desc "Add Box permissions to predefined roles (one time migration)"
+  task :add_box_permissions => :environment do
+    search = lambda do |statements, resource|
+      statements.find { |s| s["resource"] == resource }
+    end
+
+    copy_box_policies = lambda do |predefined_role, actual_role|
+      definition = actual_role.policy.definition
+      actual_statements = definition["statement"]
+      changed = false
+
+      predefined_role.policy.definition["statement"].each do |statement|
+        if statement["resource"].start_with?("box?")
+          unless search.call(actual_statements, statement["resource"])
+            actual_statements << statement
+            changed = true
+          end
+        elsif statement["action"].include?("institution:createBox")
+          if actual = search.call(actual_statements, statement["resource"])
+            unless actual["action"].include?("institution:createBox" )
+              actual["action"] << "institution:createBox"
+              changed = true
+            end
+          end
+        end
+      end
+
+      if changed
+        actual_role.policy.allows_implicit = true
+        actual_role.policy.save!
+      end
+    end
+
+    Institution.find_each do |institution|
+      Policy.predefined_institution_roles(institution).each do |predefined_role|
+        if role = Role.find_by(institution: institution, name: predefined_role.name)
+          puts "Updating #{role.name} ..."
+          copy_box_policies.call(predefined_role, role)
+          role.policy.save
+        end
+      end
+    end
+
+    Site.find_each do |site|
+      Policy.predefined_site_roles(site).each do |predefined_role|
+        if role = Role.find_by(site: site, name: predefined_role.name)
+          puts "Updating #{role.name} ..."
+          copy_box_policies.call(predefined_role, role)
+          role.policy.save
+        end
+      end
+    end
+  end
+
   class PoliciesMigrator
 
     module NewActions
