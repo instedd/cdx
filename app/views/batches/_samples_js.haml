@@ -66,8 +66,24 @@
   }
 
   function bulkPrint(sampleIds) {
-    var url = createBulkActionURL("print", sampleIds);
-    window.open(url, "_blank");
+    var form = document.getElementById("bulk_print_form");
+
+    // remove samples from a previous bulk print:
+    Array.prototype.forEach.call(form.querySelectorAll("input[name='sample_ids[]']"), function (input) {
+      form.removeChild(input);
+    });
+
+    // add new samples
+    sampleIds.forEach(function (sampleId) {
+      var input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "sample_ids[]";
+      input.value = sampleId;
+      form.appendChild(input);
+    });
+
+    // eventually submit the form
+    form.submit();
   }
 
   function bulkDestroy(sampleIds) {
@@ -97,16 +113,6 @@
     findSelectCheckboxesNotMarkedForDestroyed()
       .prop("checked", selected)
       .change();
-  }
-
-  function createBulkActionURL(action, sampleIds) {
-    var url = new URL("#{ javascript_url Rails.application.routes.url_helpers.bulk_action_samples_path }");
-    url.searchParams.append("bulk_action", action);
-    sampleIds.forEach(function(sampleId) {
-      url.searchParams.append("sample_ids[]", sampleId);
-    });
-
-    return url;
   }
 
   // DOM Queries
