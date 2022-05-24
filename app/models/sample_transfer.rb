@@ -9,7 +9,7 @@ class SampleTransfer < ApplicationRecord
 
   def specimen_role_validation
     if sample.try &:is_quality_control?
-      errors.add(:sample, "Can't transfer QC sample")
+      errors.add(:sample, "can't transfer QC sample")
     end
   end
 

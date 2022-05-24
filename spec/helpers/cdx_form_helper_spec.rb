@@ -27,6 +27,7 @@ RSpec.describe CdxFormHelper, type: :helper do
         rendered = form.form_field(:foo) { form.text_field :foo }
         expect(rendered).to include("Foo has an error")
         expect(rendered).not_to include("Bar has an errror")
+        form.form_errors(ignore_unhandled: true)
       end
     end
   end
@@ -37,7 +38,7 @@ RSpec.describe CdxFormHelper, type: :helper do
       model.errors.add(:base, "base error")
       model.errors.add(:other, "has an error")
       cdx_form_for(model, url: "") do |form|
-        rendered = form.form_errors
+        rendered = form.form_errors(ignore_unhandled: true)
         expect(rendered).to include("base error")
         expect(rendered).to include("Other has an error")
       end
@@ -50,7 +51,7 @@ RSpec.describe CdxFormHelper, type: :helper do
       model.errors.add(:other, "has an error")
       cdx_form_for(model, url: "") do |form|
         form.form_field(:foo) {}
-        rendered = form.form_errors
+        rendered = form.form_errors(ignore_unhandled: true)
         expect(rendered).to include("base error")
         expect(rendered).to include("Other has an error")
         expect(rendered).not_to include("Foo has an errror")
@@ -61,7 +62,7 @@ RSpec.describe CdxFormHelper, type: :helper do
       model = FooModel.new(foo: "bar")
       model.errors.add(:foo, "has an error")
       cdx_form_for(model, url: "") do |form|
-        rendered = form.form_errors
+        rendered = form.form_errors(ignore_unhandled: true)
         expect(rendered).to include("Foo has an error")
 
         rendered = form.form_errors
@@ -71,9 +72,17 @@ RSpec.describe CdxFormHelper, type: :helper do
 
     it "renders errors implicitly" do
       model = FooModel.new(foo: "bar")
-      model.errors.add(:foo, "has an error")
+      model.errors.add(:base, "Has an error")
       rendered = cdx_form_for(model, url: "") { }
-      expect(rendered).to include("Foo has an error")
+      expect(rendered).to include("Has an error")
+    end
+
+    it "raises for unhandled error" do
+      model = FooModel.new(foo: "bar")
+      model.errors.add(:foo, "has an error")
+      cdx_form_for(model, url: "") do |form|
+        expect { form.form_errors }.to raise_error(%(Unhandled form errors in FooModel: {:foo=>["Foo has an error"]}))
+      end
     end
   end
 end
