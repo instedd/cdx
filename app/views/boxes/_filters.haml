@@ -1,0 +1,21 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            - if @can_create
+              = link_to "+", new_box_path, class: "btn-add side-link fix", title: "Add box"
+            Boxes
+
+      %form#filters-form{action: boxes_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
+        .row
+          .filter
+            %label.block ID
+            %input.input-large{type: "text", name: "uuid", value: params[:uuid], placeholder: "Filter by ID"}
+          .filter
+            %label.block Purpose
+            = cdx_select name: "purpose", value: params[:purpose] do |select|
+              - select.item "", "Show all"
+              - select.items Box.purposes

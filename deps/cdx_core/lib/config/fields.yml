@@ -76,6 +76,20 @@ entities:
           - UV-C
       volume:
         type: float
+      virus_lineage:
+        type: string
+      concentration_number:
+        type: integer
+      concentration_exponent:
+        type: integer
+      replicate:
+        type: integer
+      media:
+        type: enum
+        options:
+          - Transport media
+          - Saliva
+          - Other
       lab_technician:
       old_batch_number:
         searchable: true
@@ -113,6 +127,18 @@ entities:
       volume:
         type: float
         searchable: true
+      virus_lineage:
+        type: string
+  box: &BOX
+    allows_custom: true
+    fields:
+      purpose:
+        type: enum
+        searchable: true
+        options:
+          - LOD
+          - Variants
+          - Challenge
   test: &TEST
     allows_custom: true
     fields:

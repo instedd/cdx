@@ -45,12 +45,12 @@
           = label_tag "kind", "Type", :class => 'block'
         .col
           .value= f.object.kind.humanize.titleize
-    .row.button-actions
-      .col
-        - unless @readonly
-          = f.submit 'Save', class: 'btn-primary'
 
-        = link_to (@readonly ? 'back' : 'Cancel'), (@institutions.one? ? dashboard_path : institutions_path), class: 'btn-link'
+    = f.form_actions do
+      - unless @readonly
+        = f.submit 'Save', class: 'btn-primary'
 
-        - if @can_delete
-          = confirm_deletion_button @institution
+      = link_to (@readonly ? 'back' : 'Cancel'), (@institutions.one? ? dashboard_path : institutions_path), class: 'btn-link'
+
+      - if @can_delete
+        = confirm_deletion_button @institution

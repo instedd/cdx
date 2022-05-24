@@ -9,6 +9,7 @@ class Site < ApplicationRecord
   has_many :test_results
   has_many :sample_identifiers
   has_many :samples, through: :sample_identifiers
+  has_many :boxes
   has_and_belongs_to_many :alerts
 
   belongs_to :parent, class_name: "Site"

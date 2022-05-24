@@ -1,7 +1,7 @@
 class ConvertDatabaseToUtf8Mb4 < ActiveRecord::Migration
   def up
     connection.execute "ALTER DATABASE CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_520_ci';"
-    
+
     %w{
       alert_condition_results
       alert_histories
@@ -13,6 +13,7 @@ class ConvertDatabaseToUtf8Mb4 < ActiveRecord::Migration
       assay_attachments
       assay_files
       batches
+      boxes
       computed_policies
       computed_policy_exceptions
       conditions

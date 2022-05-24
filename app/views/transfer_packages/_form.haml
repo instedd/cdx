@@ -22,7 +22,6 @@
         = f.field_errors :"sample_transfers.sample"
 
   - if @can_update
-    .row.button-actions
-      .col
-        = f.submit 'Transfer', class: 'btn-primary', id: 'btn-save'
-        = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'
+    = f.form_actions do
+      = f.submit 'Transfer', class: 'btn-primary', id: 'btn-save'
+      = link_to 'Cancel', @view_helper[:back_path], class: 'btn-link'

@@ -1,0 +1,16 @@
+.barcode-card-print
+  .barcode-content
+    .barcode
+      = image_tag barcode_img_data_url(box.uuid)
+    .code
+      .uuid
+        #{box.uuid}
+    .code
+      &nbsp;
+    .code
+      Purpose: #{box.purpose}
+    .code
+      &nbsp;
+    .logo
+      = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+      .label https://cdx.io

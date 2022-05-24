@@ -18,26 +18,34 @@ end
 class FormFieldBuilder < ActionView::Helpers::FormBuilder
   # Renders a form field including label, value (block) and error messages.
   def form_field(method, options = {}, &block)
-    if block_given?
-      value = @template.capture(&block)
-    else
-      value = @template.content_tag("div", options[:value], class: "value")
-    end
+    options = { full_message: true }.merge(options)
 
-    @template.render partial: "form_builder/field", locals: {
+    @template.render layout: "form_builder/field", locals: {
       form: self,
-      method: method,
-      value: value,
+      method: method.to_sym,
       options: objectify_options(options),
-    }
+    } do
+      if block
+        @template.capture(&block)
+      else
+        @template.content_tag("div", options[:value], class: "value")
+      end
+    end
   end
 
   # Renders all error messages for *attribute*.
-  def field_errors(attribute)
-    messages = @object.errors.full_messages_for(attribute)
+  def field_errors(attr_name, full_message: true)
+    attr_name = attr_name.to_sym
+
+    messages =
+      if full_message
+        @object.errors.full_messages_for(attr_name)
+      else
+        @object.errors[attr_name]
+      end
     return if messages.empty?
 
-    errors_to_show.delete attribute
+    errors_to_show.delete(attr_name)
 
     @template.render partial: "form_builder/field_errors", locals: {
       form: self,
@@ -58,6 +66,15 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
     rendered
   ensure
     @errors_to_show = []
+  end
+
+  # Renders the final section of the form which usually includes the submit
+  # button and other actions.
+  def form_actions
+    @template.render partial: "form_builder/form_actions", locals: {
+      form: self,
+      body: yield
+    }
   end
 
   private

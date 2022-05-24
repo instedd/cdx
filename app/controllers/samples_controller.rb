@@ -112,36 +112,17 @@ class SamplesController < ApplicationController
   end
 
   def bulk_print
-    sample_ids = params[:sample_ids]
-
-    if sample_ids.blank?
-      redirect_to samples_path, notice: "Select at least one sample to print."
-      return
-    end
-
     samples = Sample.where(id: params[:sample_ids])
     return unless authorize_resources(samples, READ_SAMPLE)
 
-    sample_strings = samples.map do |sample|
-      render_to_string template: "samples/barcode.pdf",
-        layout: "layouts/pdf.html",
-        locals: { :sample => sample }
-    end
-
-    options = {
+    render pdf: "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}",
+      template: "samples/bulk_print.pdf",
+      layout: "layouts/pdf.html",
+      locals: { samples: samples.preload(:sample_identifiers) },
       margin: { top: 0, bottom: 0, left: 0, right: 0 },
       page_width: "1in",
       page_height: "1in",
-    }
-
-    begin
-      pdf_file = MultipagePdfRenderer.combine(sample_strings, options)
-      pdf_filename = "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}.pdf"
-
-      send_data pdf_file, type: "application/pdf", filename: pdf_filename
-    rescue
-      redirect_to samples_path, notice: "There was an error creating the print file."
-    end
+      show_as_html: params.key?("debug")
   end
 
   def edit
@@ -214,6 +195,11 @@ class SamplesController < ApplicationController
       :isolate_name,
       :inactivation_method,
       :volume,
+      :virus_lineage,
+      :concentration_number,
+      :concentration_exponent,
+      :replicate,
+      :media,
       assay_attachments_attributes: [:id, :loinc_code_id, :result, :assay_file_id, :_destroy],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
     )

@@ -282,6 +282,26 @@ RSpec.describe SamplesController, type: :controller do
       expect(sample.core_fields).to_not have_key('volume')
     end
 
+    it "creates with optional params" do
+      expect do
+        get :new
+        post :create, params: { sample: build_sample_form_plan(
+          virus_lineage: "B.1.1.529",
+          concentration_number: 2,
+          concentration_exponent: 8,
+          replicate: 12,
+          media: "Other",
+        ) }
+      end.to change(institution.samples, :count).by(1)
+
+      sample = institution.samples.first
+      expect(sample.virus_lineage).to eq("B.1.1.529")
+      expect(sample.concentration_number).to eq(2)
+      expect(sample.concentration_exponent).to eq(8)
+      expect(sample.replicate).to eq(12)
+      expect(sample.media).to eq("Other")
+    end
+
     describe "assays" do
       it "saves attachment" do
         expect {

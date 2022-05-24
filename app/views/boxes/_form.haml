@@ -1,0 +1,43 @@
+= cdx_form_for(@box_form.box) do |f|
+  .row
+    .col
+      = f.form_field :purpose do
+        = react_component "CdxSelectSectionToggler", { name: "box[purpose]",
+          items: Box.purposes.map { |v| { label: v, value: v } },
+          value: @box_form.purpose, submit: "#btn-save" }
+
+      .row.form-field
+        .col.form-field__label
+          %label Contents
+        .col
+          %fieldset#LOD(disabled)
+            = f.form_field "lod", label: { text: "Batch", class: "is-normal-case" }, full_message: false do
+              = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+                name: "box[batch_uuids][lod]", value: @box_form.batch_uuids["lod"],
+                placeholder: "Enter batch id", className: "input-block" }
+
+          %fieldset#Variants(disabled)
+            - 1.upto(6) do |index|
+              - key = "variant_#{index}"
+              = f.form_field key, label: { text: "Variant #{index}", class: "is-normal-case" }, full_message: false do
+                = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+                  name: "box[batch_uuids][#{key}]", value: @box_form.batch_uuids[key],
+                  placeholder: "Enter batch id", className: "input-block" }
+
+          %fieldset#Challenge(disabled)
+            = f.form_field "virus", label: { text: "Virus", class: "is-normal-case" }, full_message: false do
+              = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+                name: "box[batch_uuids][virus]", value: @box_form.batch_uuids["virus"],
+                placeholder: "Enter batch id", className: "input-block" }
+
+            - 1.upto(6) do |index|
+              - key = "distractor_#{index}"
+              = f.form_field key, label: { text: "Distractor #{index}", class: "is-normal-case" }, full_message: false do
+                = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+                  name: "box[batch_uuids][#{key}]", value: @box_form.batch_uuids[key],
+                  placeholder: "Enter batch id", className: "input-block" }
+
+  .row.button-actions
+    .col
+      = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
+      = link_to 'Cancel', boxes_path, class: 'btn-link'

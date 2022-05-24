@@ -127,6 +127,16 @@ Rails.application.routes.draw do
       post 'add_sample'
     end
     collection do
+      get 'autocomplete'
+      post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+    end
+  end
+  resources :boxes, except: [:edit, :update] do
+    member do
+      get 'print'
+      get 'inventory', constraints: { format: 'csv' }
+    end
+    collection do
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end

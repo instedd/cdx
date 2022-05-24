@@ -18,6 +18,16 @@ class BatchesController < ApplicationController
     @batches = perform_pagination(@batches)
   end
 
+  def autocomplete
+    batches = Batch
+      .where(institution: @navigation_context.institution)
+      .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+      .autocomplete(params[:query])
+      .limit(10)
+
+    @batches = check_access(batches, READ_BATCH).pluck(:uuid, :batch_number)
+  end
+
   def edit_or_show
     batch = Batch.find(params[:id])
 
@@ -141,7 +151,8 @@ class BatchesController < ApplicationController
       :specimen_role,
       :isolate_name,
       :inactivation_method,
-      :volume
+      :volume,
+      :virus_lineage
     )
   end
 

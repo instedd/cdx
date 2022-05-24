@@ -21,7 +21,8 @@ class Batch < ApplicationRecord
   attribute_field :lab_technician,
                   :specimen_role,
                   :inactivation_method,
-                  :volume
+                  :volume,
+                  :virus_lineage
 
   validates_presence_of :inactivation_method
   validates_presence_of :volume
@@ -32,6 +33,10 @@ class Batch < ApplicationRecord
   validate :isolate_name_batch_number_combination_update, on: :update
 
   validates_associated :samples, message: "are invalid"
+
+  scope :autocomplete, ->(query) {
+    where("batches.batch_number LIKE ?", "%#{query}%")
+  }
 
   def qc_sample
     self.samples.select {|sample| sample.is_quality_control?}.first
@@ -45,6 +50,21 @@ class Batch < ApplicationRecord
     if qc_sample = self.qc_sample
       QcInfo.find_or_duplicate_from(qc_sample)
     end
+  end
+
+  def build_sample(**attributes)
+    samples.build(
+      institution: institution,
+      site: site,
+      sample_identifiers: [SampleIdentifier.new],
+      date_produced: self[:date_produced], # Time instead of String
+      lab_technician: lab_technician,
+      specimen_role: specimen_role,
+      isolate_name: isolate_name,
+      inactivation_method: inactivation_method,
+      virus_lineage: virus_lineage,
+      **attributes
+    )
   end
 
   private

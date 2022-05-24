@@ -6,6 +6,7 @@ class SampleForm
       :site,
       :uuid,
       :batch,
+      :box,
       :date_produced,
       :lab_technician,
       :specimen_role,
@@ -14,6 +15,11 @@ class SampleForm
       :assay_attachments,
       :notes,
       :volume,
+      :virus_lineage,
+      :concentration_number,
+      :concentration_exponent,
+      :replicate,
+      :media,
       :qc_info ]
   end
 
