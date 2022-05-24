@@ -49,3 +49,6 @@
 
       - if @can_delete
         = confirm_deletion_button @batch_form, 'batch'
+
+= form_tag bulk_action_samples_path(format: "pdf"), method: :post, style: "display: none", id: "bulk_print_form", target: "_blank" do
+  = hidden_field_tag :bulk_action, "print"
