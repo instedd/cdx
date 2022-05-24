@@ -65,6 +65,10 @@ en:
     formats:
       traditional: "%m/%d/%Y"
 
+  time:
+    formats:
+      traditional: "%m/%d/%Y %l:%M %P"
+
 # es:
 #   date:
 #     input_format:

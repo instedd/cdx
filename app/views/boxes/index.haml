@@ -15,10 +15,10 @@
               .icon-trash.btn-icon
           - t.columns do
             %col{:width => "5%"}
-            %col{:width => "30%"}
+            %col{:width => "20%"}
             %col{:width => "35%"}
             %col{:width => "15%"}
-            %col{:width => "15%"}
+            %col{:width => "25%"}
           - t.thead do
             %tr
               %th
@@ -35,7 +35,7 @@
                 %td= short_uuid_with_title box.uuid
                 %td= box.purpose
                 %td= box.samples_count
-                %td= l box.created_at.to_date, format: :traditional
+                %td= l box.created_at, format: :traditional
 
       .pagination
         = render "shared/pagination"
