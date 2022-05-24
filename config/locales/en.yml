@@ -62,8 +62,14 @@ en:
       pattern: "%m/%d/%Y"
       placeholder: MM/DD/YYYY
 
+    formats:
+      traditional: "%m/%d/%Y"
+
 # es:
 #   date:
 #     input_format:
 #       pattern: "%d/%m/%Y"
 #       placeholder: DD/MM/YYYY
+#
+#    formats:
+#      traditional: "%d/%m/%Y"

@@ -16,7 +16,8 @@
           - t.columns do
             %col{:width => "5%"}
             %col{:width => "30%"}
-            %col{:width => "50%"}
+            %col{:width => "35%"}
+            %col{:width => "15%"}
             %col{:width => "15%"}
           - t.thead do
             %tr
@@ -24,6 +25,7 @@
               %th Box Id
               %th Purpose
               %th Samples
+              %th Creation date
           - t.tbody do
             - @boxes.count_samples.each do |box|
               %tr.laboratory-sample-row{data: {href: box_path(box)}}
@@ -33,6 +35,7 @@
                 %td= short_uuid_with_title box.uuid
                 %td= box.purpose
                 %td= box.samples_count
+                %td= l box.created_at.to_date, format: :traditional
 
       .pagination
         = render "shared/pagination"
