@@ -34,7 +34,7 @@ class Sample < ApplicationRecord
   validates_numericality_of :concentration_number, only_integer: true, greater_than: 0, allow_blank: true
   validates_numericality_of :concentration_exponent, only_integer: true, greater_than: 0, allow_blank: true
   validates_numericality_of :replicate, only_integer: true, greater_than_or_equal_to: 0, allow_blank: true
-  validates_inclusion_of :media, in: ->(_) { Sample.medias }, allow_blank: true
+  validates_inclusion_of :media, in: ->(_) { Sample.media }, allow_blank: true
   validate :validate_box_context, if: -> { box.present? }
 
   def validate_box_context
@@ -79,7 +79,7 @@ class Sample < ApplicationRecord
           end
         }
 
-  def self.medias
+  def self.media
     entity_fields.find { |f| f.name == 'media' }.options
   end
 

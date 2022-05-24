@@ -1,10 +1,15 @@
-= cdx_form_for(@box_form.box) do |f|
+= cdx_form_for(@box_form) do |f|
   .row
     .col
       = f.form_field :purpose do
         = react_component "CdxSelectSectionToggler", { name: "box[purpose]",
           items: Box.purposes.map { |v| { label: v, value: v } },
           value: @box_form.purpose, submit: "#btn-save" }
+
+      = f.form_field :media do
+        = cdx_select form: f, name: :media, searchable: false do |select|
+          - select.item "", " "
+          - select.items Sample.media
 
       .row.form-field
         .col.form-field__label

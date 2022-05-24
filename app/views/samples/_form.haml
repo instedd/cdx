@@ -69,7 +69,7 @@
         - if @can_update
           = cdx_select form: f, name: :media, searchable: false do |select|
             - select.item "", " "
-            - select.items Sample.medias
+            - select.items Sample.media
         - else
           = f.text_field :media, readonly: true
 

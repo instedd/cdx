@@ -101,16 +101,12 @@ class BoxesController < ApplicationController
   end
 
   def box_params
-    if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 0
-      params.require(:box).permit(:purpose).tap do |allowed|
+    if Rails::VERSION::STRING.start_with?("4.2.") || Rails::VERSION::STRING.start_with?("5.0.")
+      params.require(:box).permit(:purpose, :media).tap do |allowed|
         allowed[:batch_uuids] = params[:box][:batch_uuids].permit!
       end
-    elsif Rails::VERSION::MAJOR >= 5
-      params.require(:box).permit(:purpose, batch_uuids: {})
-    else
-      params.require(:box).permit(:purpose).tap do |allowed|
-        allowed[:batch_uuids] = params[:box][:batch_uuids]
-      end
+    elsif Rails::VERSION::MAJOR
+      params.require(:box).permit(:purpose, :media, batch_uuids: {})
     end
   end
 end
