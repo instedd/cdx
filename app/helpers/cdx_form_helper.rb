@@ -69,14 +69,12 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
   def error_messages_to_show
     Hash[errors_to_show.map do |attribute|
       messages = @object.errors.full_messages_for(attribute)
-      next if messages.empty?
-      [attribute, messages]
+      [attribute, messages] unless messages.empty?
     end.compact]
   end
 
   def log_unhandled_errors
-    unhandled_errors = error_messages_to_show.dup
-    unhandled_errors.delete(:base)
+    unhandled_errors = error_messages_to_show.reject { |k, _| k == :base }
     return if unhandled_errors.empty?
 
     if Rails.env.test?
