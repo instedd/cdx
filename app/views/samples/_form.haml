@@ -17,6 +17,12 @@
           = g.form_field :uuid, value: box.uuid, label: { text: "Box ID" }
           = g.form_field :purpose, value: box.purpose, label: { text: "Box Purpose" }
 
+    .col.pe-5
+      - if @show_barcode_preview
+        = render "barcode_card"
+
+  .row
+    .col
       = f.form_field :date_produced do
         = f.text_field :date_produced, placeholder: @view_helper[:date_produced_placeholder], readonly: !@can_update
 
@@ -66,10 +72,6 @@
             - select.items Sample.medias
         - else
           = f.text_field :media, readonly: true
-
-    .col.pe-5
-      - if @show_barcode_preview
-        = render "barcode_card"
 
   .col
     = render (@can_update ? 'form_assays' : 'show_assays'), f: f
