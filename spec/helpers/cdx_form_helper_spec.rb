@@ -81,7 +81,31 @@ RSpec.describe CdxFormHelper, type: :helper do
       model = FooModel.new(foo: "bar")
       model.errors.add(:foo, "has an error")
       cdx_form_for(model, url: "") do |form|
-        expect { form.form_errors }.to raise_error(%(Unhandled form errors in FooModel: {:foo=>["Foo has an error"]}))
+        expect { form.form_errors }.to raise_error(%(Unhandled form errors in foo_model: {:foo=>["Foo has an error"]}))
+      end
+    end
+  end
+
+  describe "#fields_for" do
+    it "handles nested error messages" do
+      foo = FooModel.new(bar: "bar")
+      model = FooModel.new(foo: foo)
+      model.errors.add(:"foo.bar", "has an error")
+      rendered = cdx_form_for(model, url: "") do |form|
+        form.fields_for(:foo) do |foo_form|
+          rendered = foo_form.form_field :bar
+          expect(rendered).to include("Foo bar has an error")
+        end
+      end
+    end
+
+    it "raises for unhandled error" do
+      foo = FooModel.new(bar: "bar")
+      model = FooModel.new(foo: foo)
+      model.errors.add(:"foo.base", "Has an error")
+      model.errors.add(:"foo.foo", "is empty")
+      cdx_form_for(model, url: "") do |form|
+        expect { form.fields_for(:foo) {} }.to raise_error(%(Unhandled form errors in foo_model[foo]: {:"foo.base"=>["Foo base Has an error"], :"foo.foo"=>["Foo foo is empty"]}))
       end
     end
   end

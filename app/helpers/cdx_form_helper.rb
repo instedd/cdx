@@ -35,17 +35,16 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
 
   # Renders all error messages for *attribute*.
   def field_errors(attr_name, full_message: true)
-    attr_name = attr_name.to_sym
-
+    error_key = prefixed_error_key(attr_name)
     messages =
       if full_message
-        @object.errors.full_messages_for(attr_name)
+        object_errors.full_messages_for(error_key)
       else
-        @object.errors[attr_name]
+        object_errors[error_key]
       end
     return if messages.empty?
 
-    errors_to_show.delete(attr_name)
+    errors_to_show.delete(error_key)
 
     @template.render partial: "form_builder/field_errors", locals: {
       form: self,
@@ -65,7 +64,7 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
 
     rendered
   ensure
-    @errors_to_show = []
+    clear_errors_to_show
   end
 
   # Renders the final section of the form which usually includes the submit
@@ -78,30 +77,77 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
     end
   end
 
+  def fields_for(record_name, record_object = nil, fields_options = {}, &block)
+    fields_options[:nested_errors_namespace] = prefixed_error_key(record_name)
+
+    super(record_name, record_object = nil, objectify_options(fields_options)) do |form|
+      form.errors_to_show = errors_to_show
+      block.call(form)
+
+      @template.concat form.form_errors
+    end
+  end
+
+  def has_error?(attr_name)
+    errors_to_show.include?(prefixed_error_key(attr_name))
+  end
+
+  protected
+
+  def errors_to_show=(errors_to_show)
+    @errors_to_show = errors_to_show
+  end
+
   private
 
   def errors_to_show
-    @errors_to_show ||= @object.errors.keys
+    @errors_to_show ||= object_errors.keys
+  end
+
+  def object_errors
+    (@object || @options[:object]).errors
+  end
+
+  def prefixed_error_key(key)
+    if nested_prefix = @options[:nested_errors_namespace]
+      "#{nested_prefix}.#{key}"
+    else
+      key
+    end.to_sym
   end
 
   def error_messages_to_show
+    nested_prefix = @options[:nested_errors_namespace]
+    nested_prefix = "#{nested_prefix}." if nested_prefix
     Hash[errors_to_show.map do |attribute|
-      messages = @object.errors.full_messages_for(attribute)
+      next if nested_prefix && !attribute.to_s.starts_with?(nested_prefix)
+
+      messages = object_errors.full_messages_for(attribute)
       [attribute, messages] unless messages.empty?
     end.compact]
+  end
+
+  def clear_errors_to_show
+    if nested_prefix = @options[:nested_errors_namespace]
+      nested_prefix = "#{nested_prefix}."
+      errors_to_show.delete_if { |key| key.to_s.starts_with?(nested_prefix) }
+    else
+      errors_to_show.clear
+    end
   end
 
   def log_unhandled_errors
     unhandled_errors = error_messages_to_show.reject { |k, _| k == :base }
     return if unhandled_errors.empty?
 
+    message = "Unhandled form errors in #{object_name}: #{unhandled_errors}"
     if Rails.env.test?
-      raise "Unhandled form errors in #{@object.model_name}: #{unhandled_errors}"
+      raise message
     end
 
-    Rails.logger.info "Unhandled form errors in #{@object.model_name}: #{unhandled_errors}"
+    Rails.logger.info message
     Raven.capture_message("Unhandled form errors",
-      form: @object.model_name,
+      form: object_name,
       errors: unhandled_errors,
     )
   end
