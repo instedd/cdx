@@ -1,21 +1,10 @@
 module DateProduced
   extend ActiveSupport::Concern
 
-  included do
-    validate :date_produced_is_a_date
-  end
-
-  def date_produced_is_a_date
-    return if date_produced.blank?
-    errors.add(:date_produced, :invalid) unless date_produced.is_a?(Time)
-  end
-
   def date_produced_description
-    if date_produced.is_a?(Time)
-      return date_produced.strftime(I18n.t('date.input_format.pattern'))
-    end
+    return unless date_produced
 
-    date_produced
+    date_produced.strftime(I18n.t('date.input_format.pattern'))
   end
 
   class_methods do

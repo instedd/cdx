@@ -42,6 +42,20 @@ class SampleForm
 
   validates_presence_of :date_produced
 
+  if Rails::VERSION::MAJOR >= 6
+    include ActiveModel::Attributes
+    attribute :date_produced, :date
+  else
+    def date_produced=(value)
+      value = value.presence
+      if value.is_a?(Time) || value.nil?
+        @date_produced = value
+      else
+        @date_produced = value.to_time rescue nil
+      end
+    end
+  end
+
   def self.for(sample)
     new.tap do |form|
       form.sample = sample
@@ -55,13 +69,6 @@ class SampleForm
   def sample=(value)
     @sample = value
     self.class.assign_attributes(self, @sample)
-
-    self.date_produced =
-      if @sample.date_produced.is_a?(Time)
-        @sample.date_produced
-      else
-        Time.strptime(@sample.date_produced, Sample.date_format[:pattern]) rescue @sample.date_produced
-      end
   end
 
   def batch_number
@@ -88,49 +95,17 @@ class SampleForm
 
   def save
     self.class.assign_attributes(sample, self)
-    # we need to set a Time in sample instead of self.date_produced :: String
-    sample.date_produced = @date_produced
 
     form_valid = self.valid?
     sample_valid = sample.valid?
-    # copy validations from model to form to display errors if present 
+    # copy validations from model to form to display errors if present
     sample.errors.each do |key, error|
       errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
     end
-    return false unless form_valid && sample_valid 
+    return false unless form_valid && sample_valid
 
     sample.save
   end
-
-
-  # begin date_produced
-  # @date_produced is Time | Nil | String.
-  # BatchForm#date_produced will return always a string ready to be used by the user input with the user locale
-  # BatchForm#date_produced= will accept either String or Time. The String will be converted if possible to a Time using the user locale
-  # validate :date_produced_is_a_date
-  #
-  def date_produced
-    value = @date_produced
-
-    if value.is_a?(Time)
-      return value.strftime(Sample.date_format[:pattern])
-    end
-
-    value
-  end
-
-  def date_produced=(value)
-    value = nil if value.blank?
-
-    @date_produced = if value.is_a?(String)
-      Time.strptime(value, Sample.date_format[:pattern]) rescue value
-    else
-      value
-    end
-  end
-
-  # end date_produced
-  #
 
   private
 
