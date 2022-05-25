@@ -2,33 +2,11 @@
 // FORMS
 // =============================================================================
 
-input[type="text"][disabled] {
-  cursor: not-allowed;
-  pointer-events: none;
-  opacity: .4;
-}
-input[type="number"][disabled] {
-  cursor: not-allowed;
-  pointer-events: none;
-  opacity: .4;
-}
-
-input[type="text"][disabled] {
-  cursor: not-allowed;
-  pointer-events: none;
-  opacity: .4;
-}
-input[type="number"][disabled] {
-  cursor: not-allowed;
-  pointer-events: none;
-  opacity: .4;
-}
-
-
 input[type="text"],
 input[type="email"],
 input[type="password"],
-input[type="number"] {
+input[type="number"],
+input[type="date"] {
   @include placeholder-style(italic);
   background-color: transparent;
   font-family: $sans;
@@ -38,6 +16,12 @@ input[type="number"] {
   padding: 0 5px;
   height: 30px;
   outline: 0 !important;
+
+  &[disabled] {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: .4;
+  }
 }
 
 textarea {
