@@ -21,7 +21,7 @@ describe "sample transfers" do
 
       goto_page ListSampleTransfersPage do |page|
         # NOTE: can't use have_content because it may not visible (hidden by scroll)
-        expect(page.entry(in_pending.sample.partial_uuid).text(:all)).to include("Confirm receipt")
+        expect(page.entry(in_pending.sample.partial_uuid).text(:all)).to include("Unconfirmed")
         expect(page.entry(in_confirmed.sample.uuid).text(:all)).to include("Receipt confirmed on February 24, 2022")
         expect(page.entry(out_pending.sample.uuid).text(:all)).to include("Sent on March 04, 2022")
         expect(page.entry(out_confirmed.sample.uuid).text(:all)).to include("Delivery confirmed on February 21, 2022")
@@ -95,49 +95,6 @@ describe "sample transfers" do
       goto_page ListSamplesPage do |page|
         expect(page).to have_content(sample.uuid)
       end
-    end
-
-    it "verifies sample id" do
-      sample = Sample.make!(:filled, institution: institution_a)
-      transfer = TransferPackage.sending(institution_a, institution_b).add!(sample)
-
-      sign_in user_b
-
-      goto_page ListSampleTransfersPage do |page|
-        page.entry(sample.partial_uuid).find_link("Confirm receipt").click
-
-        page.confirm_receipt_modal.tap do |modal|
-          expect(modal).to have_content("Confirm receipt")
-
-          expect(modal).not_to have_content("Invalid sample ID")
-          expect(modal).not_to have_submit_button
-
-          modal.uuid_check.set "a"
-          expect(modal).not_to have_content("Invalid sample ID")
-          expect(modal).not_to have_submit_button
-
-          modal.uuid_check.set "x"
-          expect(modal).to have_content("Invalid sample ID")
-          expect(modal).not_to have_submit_button
-
-          modal.uuid_check.set "xxxx"
-          expect(modal).to have_content("Invalid sample ID")
-          expect(modal).not_to have_submit_button
-
-          modal.uuid_check.set "1111"
-          expect(modal).to have_content("Invalid sample ID")
-          expect(modal).not_to have_submit_button
-
-          modal.uuid_check.set sample.uuid[-4..-1]
-          expect(modal).not_to have_content("Invalid sample ID")
-          expect(modal).to have_submit_button
-
-          modal.submit
-        end
-      end
-
-      transfer.reload
-      expect(transfer).to be_confirmed
     end
   end
 end

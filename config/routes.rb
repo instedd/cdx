@@ -103,8 +103,7 @@ Rails.application.routes.draw do
       post 'reprocess'
     end
   end
-  resources :sample_transfers, only: [:create, :index] do
-    patch "confirm"
+  resources :sample_transfers, only: [:index] do
   end
   resources :samples do
     member do
