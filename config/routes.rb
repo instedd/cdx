@@ -4,6 +4,7 @@ require 'sidekiq/cron/web'
 Rails.application.routes.draw do
   use_doorkeeper
   mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
+  devise_skip = ENV['CDX_DISABLE_SIGNUPS'] ? [:registrations] : []
 
   if Settings.single_tenant
     devise_for(
@@ -11,7 +12,8 @@ Rails.application.routes.draw do
       controllers: {
         sessions: 'sessions',
         invitations: 'users/invitations'
-      }
+      },
+      skip: devise_skip
     )
     as :user do
       get 'users/registration/edit', to: 'registrations#edit', as: :edit_user_registration, defaults: { format: 'html' }
@@ -31,7 +33,8 @@ Rails.application.routes.draw do
       },
       path_names: {
         registration: 'registration'
-      }
+      },
+      skip: devise_skip
     )
   end
 
