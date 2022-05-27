@@ -8,16 +8,26 @@ RSpec.describe TransferPackage, type: :model do
     transfer = TransferPackage.new
     expect(transfer).not_to be_valid
 
-    transfer = TransferPackage.new(receiver_institution: receiver, sender_institution: sender)
+    transfer = TransferPackage.new(
+      receiver_institution: receiver,
+      sender_institution: sender,
+      box_transfers: [BoxTransfer.make],
+    )
     expect(transfer).to be_valid
   end
 
-  it "validates sample transfer" do
-    transfer = TransferPackage.make
-    transfer.sample_transfers.new sample: Sample.make(institution: transfer.sender_institution, specimen_role: 'q')
-
-    expect(transfer).not_to be_valid
-    expect(transfer.errors["sample_transfers.sample"]).to eq ["can't transfer QC sample"]
+  it "accepts nested attributes" do
+    box = Box.make!
+    transfer = TransferPackage.new(
+      sender_institution: sender,
+      receiver_institution: receiver,
+      box_transfers_attributes: {
+        "0" => {
+          box_id: box.id
+        }
+      }
+    )
+    transfer.save!
   end
 
   describe ".save" do
@@ -28,9 +38,9 @@ RSpec.describe TransferPackage, type: :model do
 
       it "includes_qc_info: true" do
         transfer = TransferPackage.new(sender_institution: sender, receiver_institution: receiver, includes_qc_info: true)
-        transfer.sample_transfers.build(sample: sample1)
-        transfer.sample_transfers.build(sample: sample2)
-        transfer.save
+        transfer.add Box.make(institution: sender, samples: [sample1])
+        transfer.add Box.make(institution: sender, samples: [sample2])
+        transfer.save!
 
         sample1.reload
         sample2.reload
@@ -41,9 +51,9 @@ RSpec.describe TransferPackage, type: :model do
 
       it "includes_qc_info: false" do
         transfer = TransferPackage.new(sender_institution: sender, receiver_institution: receiver, includes_qc_info: false)
-        transfer.sample_transfers.build(sample: sample1)
-        transfer.sample_transfers.build(sample: sample2)
-        transfer.save
+        transfer.add Box.make(samples: [sample1])
+        transfer.add Box.make(samples: [sample2])
+        transfer.save!
 
         sample1.reload
         sample2.reload
@@ -52,12 +62,17 @@ RSpec.describe TransferPackage, type: :model do
       end
     end
 
-    it "updates sample context" do
+    it "updates box and sample context" do
       site = Site.make(institution: sender)
       sample = Sample.make(institution: sender, site: site)
       transfer = TransferPackage.new(sender_institution: sender, receiver_institution: receiver)
-      transfer.sample_transfers.build(sample: sample)
-      transfer.save
+      box = Box.make!(institution: sender, site: site, samples: [sample])
+      transfer.add(box)
+      transfer.save!
+
+      box.reload
+      expect(box.institution).to be_nil
+      expect(box.site).to be_nil
 
       sample.reload
       expect(sample.institution).to be_nil

@@ -1,4 +1,8 @@
 class Box < ApplicationRecord
+  def self.institution_is_required
+    false
+  end
+
   include AutoUUID
   include Entity
   include Resource
@@ -6,6 +10,18 @@ class Box < ApplicationRecord
 
   has_many :samples, dependent: :nullify, autosave: true
   has_many :batches, -> { distinct.order("samples.id ASC") }, through: :samples
+
+  has_many :box_transfers
+
+  scope :autocomplete, ->(uuid) {
+          if uuid.size == 36
+            # Full UUID
+            where(uuid: uuid)
+          else
+            # Partial UUID
+            where("uuid LIKE concat(?, '%')", uuid)
+          end
+        }
 
   def self.entity_scope
     "box"
@@ -46,5 +62,23 @@ class Box < ApplicationRecord
   # creation date or the sample's auto-incremented id.
   def scrambled_samples
     samples.joins(:sample_identifiers).order("uuid")
+  end
+
+  def attach_qc_info
+    samples.each do |sample|
+      sample.attach_qc_info
+      sample.save!
+    end
+  end
+
+  def detach_from_context
+    assign_attributes(
+      site: nil,
+      institution: nil
+    )
+    samples.each do |sample|
+      sample.detach_from_context
+      sample.save!
+    end
   end
 end

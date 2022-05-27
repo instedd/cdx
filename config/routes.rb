@@ -117,7 +117,7 @@ Rails.application.routes.draw do
   end
   resources :transfer_packages, only: [:new, :create] do
     collection do
-      get "find_sample"
+      get "find_box"
     end
   end
   resources :batches do

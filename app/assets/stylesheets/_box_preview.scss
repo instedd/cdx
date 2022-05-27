@@ -1,0 +1,24 @@
+.box-preview {
+  display: grid;
+  grid-template-areas:
+      "uuid uuid uuid uuid uuid"
+      "data data data data data";
+  grid-template-columns: auto 1fr auto;
+  grid-gap: 5px;
+
+  .box__uuid {
+    font-weight: bold;
+    margin-right: 15px;
+    grid-area: uuid;
+
+    > a {
+      color: inherit;
+    }
+  }
+}
+
+.qc-info-message {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+}

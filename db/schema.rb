@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220513214928) do
+ActiveRecord::Schema.define(version: 20220519135949) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -157,9 +157,19 @@ ActiveRecord::Schema.define(version: 20220513214928) do
   add_index "batches", ["institution_id"], name: "index_batches_on_institution_id", using: :btree
   add_index "batches", ["site_id"], name: "index_batches_on_site_id", using: :btree
 
+  create_table "box_transfers", force: :cascade do |t|
+    t.integer  "box_id",              limit: 4, null: false
+    t.integer  "transfer_package_id", limit: 4, null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "box_transfers", ["box_id"], name: "index_box_transfers_on_box_id", using: :btree
+  add_index "box_transfers", ["transfer_package_id"], name: "index_box_transfers_on_transfer_package_id", using: :btree
+
   create_table "boxes", force: :cascade do |t|
     t.string   "uuid",           limit: 36,    null: false
-    t.integer  "institution_id", limit: 4,     null: false
+    t.integer  "institution_id", limit: 4
     t.integer  "site_id",        limit: 4
     t.string   "site_prefix",    limit: 255
     t.text     "core_fields",    limit: 65535
@@ -755,6 +765,8 @@ ActiveRecord::Schema.define(version: 20220513214928) do
   add_foreign_key "assay_attachments", "loinc_codes"
   add_foreign_key "assay_attachments", "samples"
   add_foreign_key "batches", "sites"
+  add_foreign_key "box_transfers", "boxes"
+  add_foreign_key "box_transfers", "transfer_packages"
   add_foreign_key "device_messages", "sites"
   add_foreign_key "encounters", "sites"
   add_foreign_key "notes", "samples"

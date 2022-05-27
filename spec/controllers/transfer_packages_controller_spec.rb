@@ -12,59 +12,71 @@ RSpec.describe TransferPackagesController, type: :controller do
 
   let(:default_params) { { context: institution.uuid } }
 
-  describe "GET #find_sample" do
+  describe "GET #find_box" do
     let!(:sample) do
       Sample.make! :filled, institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-1111-a0c8-ac1b-58bed3633e88")]
+    end
+
+    let!(:box) do
+      Box.make! institution: institution, samples: [sample], uuid: "01234567-1111-a0c8-ac1b-58bed3633e88"
     end
 
     let!(:other_sample) do
       Sample.make! :filled, institution: institution, created_at: sample.created_at - 1.day, sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-2222-a0c8-ac1b-58bed3633e88")]
     end
 
+    let!(:other_box) do
+      Box.make! institution: institution, samples: [other_sample], uuid: "01234567-2222-a0c8-ac1b-58bed3633e88"
+    end
+
     let!(:other_institution_sample) do
       Sample.make! :filled, institution: other_institution, sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-9999-a0c8-ac1b-58bed3633e88")]
+    end
+
+    let!(:other_institution_box) do
+      Box.make! institution: other_institution, samples: [other_institution_sample], uuid: "01234567-9999-a0c8-ac1b-58bed3633e88"
     end
 
     before(:each) { sign_in(user) }
 
     context "full UUID" do
-      it "finds sample" do
-        get :find_sample, params: { uuid: sample.uuid }
+      it "finds box" do
+        get :find_box, params: { uuid: box.uuid }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"].map { |s| s["uuid"] }).to eq [sample.uuid]
+        expect(data["boxes"].map { |s| s["uuid"] }).to eq [box.uuid]
       end
 
       it "empty result when missing" do
-        get :find_sample, params: { uuid: "00000000-1111-2222-3333-444444444444" }
+        get :find_box, params: { uuid: "00000000-1111-2222-3333-444444444444" }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"]).to be_empty
+        expect(data["boxes"]).to be_empty
       end
 
       it "empty result when inaccessible" do
-        get :find_sample, params: { uuid: other_institution_sample.uuid }
+        get :find_box, params: { uuid: other_institution_box.uuid }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"]).to be_empty
+        expect(data["boxes"]).to be_empty
       end
 
       it "checks read access" do
         sign_in other_user
-        get :find_sample, params: { uuid: sample.uuid, context: other_institution.uuid }
+        get :find_box, params: { uuid: box.uuid, context: other_institution.uuid }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"]).to be_empty
+        expect(data["boxes"]).to be_empty
       end
 
-      it "adds error for QC sample" do
+      pending "adds error for QC sample" do
         qc_sample = Sample.make! :filled, institution: institution, specimen_role: "q", sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-4444-a0c8-ac1b-58bed3633e88")]
 
-        get :find_sample, params: { uuid: qc_sample.uuid }
+        get :find_box, params: { uuid: qc_sample.uuid }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
@@ -74,51 +86,51 @@ RSpec.describe TransferPackagesController, type: :controller do
     end
 
     context "partial" do
-      it "finds single sample" do
-        get :find_sample, params: { uuid: "01234567-1" }
+      it "finds single box" do
+        get :find_box, params: { uuid: "01234567-1" }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"].map { |s| s["uuid"] }).to eq [sample.uuid]
+        expect(data["boxes"].map { |s| s["uuid"] }).to eq [box.uuid]
       end
 
-      it "finds multiple samples" do
-        get :find_sample, params: { uuid: "01234567" }
+      it "finds multiple boxes" do
+        get :find_box, params: { uuid: "01234567" }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"].map { |s| s["uuid"] }).to eq [sample.uuid, other_sample.uuid]
+        expect(data["boxes"].map { |s| s["uuid"] }.sort).to eq [box.uuid, other_box.uuid]
       end
 
       it "empty result when missing" do
-        get :find_sample, params: { uuid: "00000000" }
+        get :find_box, params: { uuid: "00000000" }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"]).to be_empty
+        expect(data["boxes"]).to be_empty
       end
 
       it "empty result when inaccessible" do
-        get :find_sample, params: { uuid: "01234567-9999" }
+        get :find_box, params: { uuid: "01234567-9999" }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"]).to be_empty
+        expect(data["boxes"]).to be_empty
       end
 
       it "checks read access" do
         sign_in other_user
-        get :find_sample, params: { uuid: "01234567", context: other_institution.uuid }
+        get :find_box, params: { uuid: "01234567", context: other_institution.uuid }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
-        expect(data["samples"].map { |s| s["uuid"] }).to eq [other_institution_sample.uuid]
+        expect(data["boxes"].map { |s| s["uuid"] }).to eq [other_institution_box.uuid]
       end
 
-      it "adds error for QC sample" do
+      pending "adds error for QC box" do
         qc_sample = Sample.make! :filled, institution: institution, created_at: sample.created_at - 1.hour, specimen_role: "q", sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-4444-a0c8-ac1b-58bed3633e88")]
 
-        get :find_sample, params: { uuid: "01234567" }
+        get :find_box, params: { uuid: "01234567" }
         expect(response).to be_success
 
         data = JSON.parse(response.body)
@@ -156,7 +168,9 @@ RSpec.describe TransferPackagesController, type: :controller do
     it "creates transfer package" do
       batch = Batch.make!(:qc_sample)
       sample1 = Sample.make!(:filled, institution: institution, batch: batch)
+      box1 = Box.make!(institution: institution, samples: [sample1])
       sample2 = Sample.make!(:filled, institution: institution)
+      box2 = Box.make!(institution: institution, samples: [sample2])
 
       expect do
         post :create, params: {
@@ -164,12 +178,12 @@ RSpec.describe TransferPackagesController, type: :controller do
                           receiver_institution_id: other_institution.id,
                           recipient: "Mr. X",
                           includes_qc_info: true,
-                          sample_transfers_attributes: {
+                          box_transfers_attributes: {
                             "0" => {
-                              sample_id: sample1.id,
+                              box_id: box1.id,
                             },
                             "1" => {
-                              sample_id: sample2.id,
+                              box_id: box2.id,
                             },
                           },
                         },
@@ -181,12 +195,17 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect(package.sender_institution).to eq institution
       expect(package.receiver_institution).to eq other_institution
       expect(package.includes_qc_info?).to eq true
-      expect(package.sample_transfers.map(&:sample)).to eq [sample1, sample2]
+      expect(package.boxes).to eq [box1, box2]
 
       sample1.reload
       sample2.reload
       expect(sample1.institution).to be_nil
       expect(sample2.institution).to be_nil
+
+      box1.reload
+      box2.reload
+      expect(box1.institution).to be_nil
+      expect(box2.institution).to be_nil
 
       expect(sample1.qc_info).not_to be_nil
       expect(sample2.qc_info).to be_nil
@@ -194,6 +213,7 @@ RSpec.describe TransferPackagesController, type: :controller do
 
     it "ignores blank sample_uuid" do
       sample = Sample.make!(:filled, institution: institution)
+      box = Box.make!(institution: institution, samples: [sample])
 
       expect do
         post :create, params: {
@@ -201,15 +221,15 @@ RSpec.describe TransferPackagesController, type: :controller do
                           receiver_institution_id: other_institution.id,
                           recipient: "Mr. X",
                           includes_qc_info: true,
-                          sample_transfers_attributes: {
+                          box_transfers_attributes: {
                             "0" => {
-                              sample_id: sample.id,
+                              box_id: box.id,
                             },
                             "1" => {
-                              sample_id: nil,
+                              box_id: nil,
                             },
                             "2" => {
-                              sample_id: "",
+                              box_id: "",
                             },
                           },
                         },
@@ -221,24 +241,25 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect(package.sender_institution).to eq institution
       expect(package.receiver_institution).to eq other_institution
       expect(package.includes_qc_info?).to eq true
-      expect(package.sample_transfers.map(&:sample)).to eq [sample]
+      expect(package.boxes).to eq [box]
     end
 
     it "only allows samples in current institution" do
-      sample = Sample.make!(:filled, institution: other_institution)
+      box = Box.make!(institution: other_institution, samples: [Sample.make(:filled, institution: other_institution)])
 
       expect do
         post :create, params: {
                         transfer_package: {
                           receiver_institution_id: other_institution.id,
-                          sample_transfers_attributes: {
+                          box_transfers_attributes: {
                             "0" => {
-                              sample_id: sample.id,
+                              box_id: box.id,
                             },
                           },
                         },
                       }
-      end.to raise_error("User not authorized for transferring sample #{sample.uuid}")
+        puts response.body
+      end.to raise_error("User not authorized for transferring box #{box.uuid}")
     end
 
     it "shows form again when empty samples" do
@@ -251,18 +272,18 @@ RSpec.describe TransferPackagesController, type: :controller do
       end.not_to change { TransferPackage.count }
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Samples must not be empty")
+      expect(response.body).to include("Box transfers must not be empty")
     end
 
     it "shows form again when missing receiver" do
-      sample = Sample.make!(:filled, institution: institution)
+      box = Box.make!(institution: institution, samples: [Sample.make!(:filled, institution: institution)])
 
       expect do
         post :create, params: {
                         transfer_package: {
-                          sample_transfers_attributes: {
+                          box_transfers_attributes: {
                             "0" => {
-                              sample_id: sample.id,
+                              box_id: box.id,
                             },
                           },
                         },
@@ -273,42 +294,25 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect(response.body).to include("Destination can't be blank")
     end
 
-    it "rejects transferring QC sample" do
-      sample = Sample.make!(:filled, institution: institution, specimen_role: "q")
-
-      expect do
-        post :create, params: {
-                        transfer_package: {
-                          receiver_institution_id: other_institution.id,
-                          sample_transfers_attributes: {
-                            "0" => {
-                              sample_id: sample.id,
-                            },
-                          },
-                        },
-                      }
-      end.not_to change{ TransferPackage.count }
-    end
-
     it "rejects unauthorized transfer" do
       unauthorized_user = User.make!
       grant user, unauthorized_user, institution, READ_INSTITUTION
       sign_in unauthorized_user
 
-      sample = Sample.make!(:filled, institution: institution)
+      box = Box.make!(institution: institution, samples: [Sample.make!(:filled, institution: institution)])
 
       expect do
         post :create, params: {
                         transfer_package: {
                           receiver_institution_id: other_institution.id,
-                          sample_transfers_attributes: {
+                          box_transfers_attributes: {
                             "0" => {
-                              sample_id: sample.id,
+                              box_id: box.id,
                             },
                           },
                         },
                       }
-      end.to raise_error("User not authorized for transferring sample #{sample.uuid}")
+      end.to raise_error("User not authorized for transferring box #{box.uuid}")
     end
   end
 end

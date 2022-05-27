@@ -1,0 +1,10 @@
+.box-preview
+  .box__uuid{title: "UUID"}
+    = link_to box.uuid, box, target: "_blank"
+  .box__purpose{title: "Purpose"}
+    = box.purpose
+  .box__samples{title: "Samples"}
+    = box.samples_count
+    samples
+  .box__created_at{title: "Creation date"}
+    = time_tag box.created_at, I18n.l(box.created_at, format: I18n.t("date.formats.long"))

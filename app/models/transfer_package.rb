@@ -1,13 +1,16 @@
 class TransferPackage < ApplicationRecord
   belongs_to :sender_institution, class_name: "Institution"
   belongs_to :receiver_institution, class_name: "Institution"
-  has_many :sample_transfers
+  has_many :box_transfers
+  has_many :boxes, through: :box_transfers
+  has_many :samples, through: :boxes
 
-  accepts_nested_attributes_for :sample_transfers,
+  accepts_nested_attributes_for :box_transfers,
     allow_destroy: true,
     reject_if: :all_blank
 
-  validates_associated :sample_transfers
+  validates_associated :box_transfers
+  validates_size_of :box_transfers, minimum: 1, message: "must not be empty"
 
   # TODO: remove these after upgrading to Rails 5.0 (belongs_to associations are required by default):
   validates_presence_of :sender_institution
@@ -30,11 +33,11 @@ class TransferPackage < ApplicationRecord
         }
 
   before_create do
-    sample_transfers.each do |sample_transfer|
-      sample = sample_transfer.sample
-      sample.attach_qc_info if includes_qc_info
-      sample.detach_from_context unless confirmed?
-      sample.save!
+    box_transfers.each do |box_transfer|
+      box = box_transfer.box
+      box.attach_qc_info if includes_qc_info
+      box.detach_from_context unless confirmed?
+      box.save!
     end
   end
 
@@ -45,22 +48,8 @@ class TransferPackage < ApplicationRecord
     end
   end
 
-  def add!(sample)
-    transfer = sample_transfers.create!(
-      sample: sample,
-    )
-
-    if sample.batch
-      if includes_qc_info
-        sample.attach_qc_info
-      end
-
-      sample.old_batch_number = sample.batch.batch_number
-    end
-
-    sample.update!(batch: nil, site: nil, institution: nil)
-
-    transfer
+  def add(box)
+    box_transfers.build(box: box)
   end
 
   def confirm

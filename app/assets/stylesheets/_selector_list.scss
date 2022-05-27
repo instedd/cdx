@@ -1,10 +1,10 @@
-.sample-transfer-list {
+.selector-list {
   * .error {
     min-height: 3em;
   }
 }
 
-.sample-transfer-preview {
+.selector-list-item {
   position: relative;
   border: 1px solid #ddd;
   border-width: 1px 1px 0;
@@ -20,7 +20,7 @@
     border-bottom-right-radius: 4px;
   }
 
-  > .sample-transfer-preview__remove {
+  > .selector-list-item__remove {
     position: absolute;
     top: 0;
     right: 0;
@@ -36,29 +36,4 @@
       color: inherit;
     }
   }
-}
-
-.sample-preview {
-  display: grid;
-  grid-template-areas:
-      "uuid uuid uuid uuid uuid"
-      "data data data data data";
-  grid-template-columns: auto auto auto 1fr auto;
-  grid-gap: 5px;
-
-  .sample__uuid {
-    font-weight: bold;
-    margin-right: 15px;
-    grid-area: uuid;
-
-    > a {
-      color: inherit;
-    }
-  }
-}
-
-.qc-info-message {
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
 }
