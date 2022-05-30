@@ -67,24 +67,6 @@ $(document).on("ready", function(){
 })
 
 $(document).ready(function(){
-  function setFilledClass(elem) {
-    window.setTimeout(function(){
-      if(elem.val().length > 0) {
-          elem.addClass('filled');
-      } else {
-          elem.removeClass('filled');
-      }
-    }, 0);
-  }
-
-  $("input[type='email'], input[type='password']")
-    .on('keydown', function() {
-      setFilledClass($(this));
-    })
-    .each(function() {
-      setFilledClass($(this));
-    });
-
   $('form[data-auto-submit]').each(function(){
     var form = $(this);
     var payload = form.serialize();

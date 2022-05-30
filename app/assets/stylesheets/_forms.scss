@@ -277,10 +277,7 @@ body.devise {
 
     @include placeholder($sans, 25px);
     background: image-url('ic-login.png') no-repeat $white;
-
-    &.filled {
-      background: $white;
-    }
+    padding-left: 30px;
   }
 
   input[type="email"] {
