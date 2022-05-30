@@ -13,7 +13,7 @@
           .col
             .logo
             = image_tag 'cdx-logo.png'
-          - unless Settings.single_tenant || ENV['CDX_DISABLE_SIGNUPS']
+          - unless Settings.single_tenant || !Settings.public_registration
             .col
               = link_to "Create an account", new_registration_path(:user), :class => 'btn-primary pull-right'
 

@@ -4,7 +4,13 @@ require 'sidekiq/cron/web'
 Rails.application.routes.draw do
   use_doorkeeper
   mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
-  devise_skip = ENV['CDX_DISABLE_SIGNUPS'] ? [:registrations] : []
+
+  concern :editable_user_registration do
+    as :user do
+      get 'users/registration/edit', to: 'registrations#edit', as: :edit_user_registration, defaults: { format: 'html' }
+      match 'users/registration/update(.:model)', to: 'registrations#update', as: :registration, via: [:post, :put]
+    end
+  end
 
   if Settings.single_tenant
     devise_for(
@@ -12,17 +18,10 @@ Rails.application.routes.draw do
       controllers: {
         sessions: 'sessions',
         invitations: 'users/invitations'
-      },
-      skip: devise_skip
+      }
     )
-    as :user do
-      get 'users/registration/edit', to: 'registrations#edit', as: :edit_user_registration, defaults: { format: 'html' }
-      match 'users/registration/update(.:model)',
-            to: 'registrations#update',
-            as: :registration,
-            via: [:post, :put]
-    end
-  else
+    concerns :editable_user_registration
+  elsif Settings.public_registration
     devise_for(
       :users,
       controllers: {
@@ -33,9 +32,18 @@ Rails.application.routes.draw do
       },
       path_names: {
         registration: 'registration'
-      },
-      skip: devise_skip
+      }
     )
+  else
+    devise_for(
+      :users,
+      controllers: {
+        omniauth_callbacks: 'omniauth_callbacks',
+        sessions: 'sessions',
+        invitations: 'users/invitations'
+      }
+    )
+    concerns :editable_user_registration
   end
 
   get 'settings' => 'home#settings'
