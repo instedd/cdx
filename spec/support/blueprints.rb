@@ -187,7 +187,7 @@ Batch.blueprint do
   institution { Institution.make }
   batch_number { "#{sn}" }
   isolate_name { 'ABC.42.DE' }
-  date_produced { Time.strptime('01/01/2018', I18n.t('date.input_format.pattern')) }
+  date_produced { Time.zone.local(2018, 1, 1) }
   lab_technician { "Tec.Foo" }
   specimen_role { 'q' }
   inactivation_method { 'Formaldehyde' }

@@ -371,7 +371,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "update" do
-    let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [ SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
+    let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [ SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.zone.local(2018, 1, 1)) }
 
     it "should update existing sample" do
       post :update, params: {
@@ -439,7 +439,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "destroy" do
-    let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [ SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
+    let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [ SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced:  Time.zone.local(2018, 1, 1)) }
 
     it "should be able to soft delete a sample" do
       expect {
@@ -476,11 +476,11 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "bulk_destroy" do
-    let!(:sample1) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
-    let!(:sample2) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
+    let!(:sample1) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.zone.local(2018, 1, 1)) }
+    let!(:sample2) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: Time.zone.local(2018, 1, 1)) }
 
     let!(:institution2)   { Institution.make! }
-    let!(:sample3) { Sample.make!(institution: institution2, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
+    let!(:sample3) { Sample.make!(institution: institution2, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: Time.zone.local(2018, 1, 1)) }
 
     it "should be able to bulk destroy samples" do
       expect {
@@ -529,7 +529,7 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "print" do
-    let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
+    let!(:sample) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.zone.local(2018, 1, 1)) }
 
     it "should be able to print a sample" do
       post :print, params: { id: sample.id }
@@ -553,11 +553,11 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "bulk_print" do
-    let!(:sample1) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
-    let!(:sample2) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
+    let!(:sample1) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.zone.local(2018, 1, 1)) }
+    let!(:sample2) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e89')], date_produced: Time.zone.local(2018, 1, 1)) }
 
     let!(:institution2)   { Institution.make! }
-    let!(:sample3) { Sample.make!(institution: institution2, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: Time.strptime('01/01/2018', I18n.t('date.input_format.pattern'))) }
+    let!(:sample3) { Sample.make!(institution: institution2, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e90')], date_produced: Time.zone.local(2018, 1, 1)) }
 
     it "should be able to bulk print samples" do
       post :bulk_print, params: { sample_ids: [sample1.id, sample2.id] }
