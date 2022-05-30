@@ -362,9 +362,25 @@ RSpec.describe BatchesController, type: :controller do
       expect(response).to redirect_to batches_path
     end
 
+    it "should validate batch_number (exists) and isolate_name uniqueness (case insensitive)" do
+      expect {
+        post :create, params: { batch: build_batch_form_plan(batch_number: batch.batch_number.upcase, isolate_name: "DEF.24") }
+      }.to change(institution.batches, :count).by(1)
+
+      expect(response).to redirect_to batches_path
+    end
+
     it "should validate batch_number and isolate_name (exists) uniqueness" do
       expect {
         post :create, params: { batch: build_batch_form_plan(batch_number: '456', isolate_name: batch.isolate_name) }
+      }.to change(institution.batches, :count).by(1)
+
+      expect(response).to redirect_to batches_path
+    end
+
+    it "should validate batch_number and isolate_name (exists) uniqueness (case insensitive)" do
+      expect {
+        post :create, params: { batch: build_batch_form_plan(batch_number: "456", isolate_name: batch.isolate_name.upcase) }
       }.to change(institution.batches, :count).by(1)
 
       expect(response).to redirect_to batches_path
