@@ -7,7 +7,7 @@ module Concerns::ViewHelper
     end
     back_path = session[:back_path] || samples_path
 
-    { date_produced_placeholder: date_format[:placeholder], back_path: back_path }
+    { back_path: back_path }
   end
 
   private

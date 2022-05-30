@@ -80,16 +80,4 @@ class QcInfo < ApplicationRecord
       qc_info.assay_attachments << new_assay_attachment
     end
   end
-
-  def formatted_date_produced
-    value = date_produced
-
-    if value.is_a?(Time)
-      return value.strftime(self.class.date_format[:pattern])
-    end
-
-    value
-  end
-
 end
-

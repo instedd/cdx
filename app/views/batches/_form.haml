@@ -5,7 +5,7 @@
         = f.text_field :batch_number, readonly: !@can_update
 
       = f.form_field :date_produced do
-        = f.text_field :date_produced, placeholder: Batch.date_produced_placeholder, readonly: !@can_update
+        = f.date_field :date_produced, readonly: !@can_update
 
       = f.form_field :lab_technician do
         = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
