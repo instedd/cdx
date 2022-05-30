@@ -9,7 +9,7 @@ google_client_id:
 google_client_secret:
 google_maps_api_key:
 single_tenant: <%= ENV['SINGLE_TENANT'] %>
-public_registration: <%= ENV['PUBLIC_REGISTRATION'] %>
+public_registration: <%= ENV['PUBLIC_REGISTRATION'].presence || "true" %>
 db_per_branch: false
 use_demo_data: false
 
