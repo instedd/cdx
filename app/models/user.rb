@@ -6,7 +6,10 @@ class User < ApplicationRecord
          :validatable, :confirmable, :timeoutable,
          :lockable, :password_expirable, :password_archivable
 
-  devise :omniauthable, :registerable unless Settings.single_tenant
+  unless Settings.single_tenant
+    devise :omniauthable
+    devise :registerable if Settings.public_registration
+  end
 
   validates_format_of :email, with: Devise.email_regexp, allow_blank: true
 

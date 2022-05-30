@@ -5,6 +5,13 @@ Rails.application.routes.draw do
   use_doorkeeper
   mount Sidekiq::Web => '/sidekiq' if Rails.env == 'development'
 
+  concern :editable_user_registration do
+    as :user do
+      get 'users/registration/edit', to: 'registrations#edit', as: :edit_user_registration, defaults: { format: 'html' }
+      match 'users/registration/update(.:model)', to: 'registrations#update', as: :registration, via: [:post, :put]
+    end
+  end
+
   if Settings.single_tenant
     devise_for(
       :users,
@@ -13,14 +20,8 @@ Rails.application.routes.draw do
         invitations: 'users/invitations'
       }
     )
-    as :user do
-      get 'users/registration/edit', to: 'registrations#edit', as: :edit_user_registration, defaults: { format: 'html' }
-      match 'users/registration/update(.:model)',
-            to: 'registrations#update',
-            as: :registration,
-            via: [:post, :put]
-    end
-  else
+    concerns :editable_user_registration
+  elsif Settings.public_registration
     devise_for(
       :users,
       controllers: {
@@ -33,6 +34,16 @@ Rails.application.routes.draw do
         registration: 'registration'
       }
     )
+  else
+    devise_for(
+      :users,
+      controllers: {
+        omniauth_callbacks: 'omniauth_callbacks',
+        sessions: 'sessions',
+        invitations: 'users/invitations'
+      }
+    )
+    concerns :editable_user_registration
   end
 
   get 'settings' => 'home#settings'
