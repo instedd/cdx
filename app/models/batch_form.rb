@@ -35,6 +35,20 @@ class BatchForm
   validates_presence_of :date_produced
   validates_numericality_of :samples_quantity, greater_than_or_equal_to: 0, message: "value must be greater or equal to 0", if: :creating_batch?
 
+  if Rails::VERSION::MAJOR >= 6
+    include ActiveModel::Attributes
+    attribute :date_produced, :date
+  else
+    def date_produced=(value)
+      value = value.presence
+      if value.is_a?(Time) || value.nil?
+        @date_produced = value
+      else
+        @date_produced = value.to_time rescue nil
+      end
+    end
+  end
+
   def self.for(batch)
     new.tap do |form|
       form.batch = batch
@@ -48,12 +62,6 @@ class BatchForm
   def batch=(value)
     @batch = value
     self.class.assign_attributes(self, @batch)
-
-    self.date_produced = if @batch.date_produced.is_a?(Time)
-                           @batch.date_produced
-                         else
-                           Time.strptime(@batch.date_produced, Batch.date_format[:pattern]) rescue @batch.date_produced
-                         end
   end
 
   def create
@@ -87,16 +95,13 @@ class BatchForm
 
   def save
     self.class.assign_attributes(batch, self)
-    # we need to set a Time in batch instead of self.date_produced :: String
-    batch.date_produced = @date_produced
-
     form_valid = self.valid?
     batch_valid = batch.valid?
-    # copy validations from model to form to display errors if present 
+    # copy validations from model to form to display errors if present
     batch.errors.each do |key, error|
       errors.add(key, error) if self.class.shared_attributes.include?(key) && !errors.include?(key)
     end
-    return false unless form_valid && batch_valid 
+    return false unless form_valid && batch_valid
 
     # validate/save. All done if succeeded
     batch.save
@@ -105,33 +110,6 @@ class BatchForm
   def creating_batch?
     self.batch.id.nil?
   end
-
-  # begin date_produced
-  # @date_produced is Time | Nil | String.
-  # BatchForm#date_produced will return always a string ready to be used by the user input with the user locale
-  # BatchForm#date_produced= will accept either String or Time. The String will be converted if possible to a Time using the user locale
-
-  def date_produced
-    value = @date_produced
-
-    if value.is_a?(Time)
-      return value.strftime(Batch.date_format[:pattern])
-    end
-
-    value
-  end
-
-  def date_produced=(value)
-    value = nil if value.blank?
-
-    @date_produced = if value.is_a?(String)
-      Time.strptime(value, Batch.date_format[:pattern]) rescue value
-    else
-      value
-    end
-  end
-  # end date_produced
-  #
 
   private
 

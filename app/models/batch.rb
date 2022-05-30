@@ -57,7 +57,7 @@ class Batch < ApplicationRecord
       institution: institution,
       site: site,
       sample_identifiers: [SampleIdentifier.new],
-      date_produced: self[:date_produced], # Time instead of String
+      date_produced: date_produced,
       lab_technician: lab_technician,
       specimen_role: specimen_role,
       isolate_name: isolate_name,
