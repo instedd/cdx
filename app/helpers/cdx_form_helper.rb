@@ -80,7 +80,7 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
   def fields_for(record_name, record_object = nil, fields_options = {}, &block)
     fields_options[:nested_errors_namespace] = prefixed_error_key(record_name)
 
-    super(record_name, record_object = nil, objectify_options(fields_options)) do |form|
+    super(record_name, record_object, objectify_options(fields_options)) do |form|
       form.errors_to_show = errors_to_show
       block.call(form)
 
