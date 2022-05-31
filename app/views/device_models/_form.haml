@@ -7,6 +7,9 @@
         = f.text_field :name
 
       = f.fields_for :manifest do |manifest_form|
+        - # FIXME: This is just to surpress the error message showing up in the
+        - # form (via `form_errors`).
+        - f.field_errors :"manifest.definition"
         = manifest_form.form_field :definition do
           - if !@device_model.new_record? && @device_model.manifest.definition
             .file-uploaded
