@@ -78,6 +78,12 @@ class Sample < ApplicationRecord
           end
         }
 
+  # Returns of samples with a stable order that isn't the original creation date
+  # or the sample's auto-incremented id.
+  scope :scrambled, -> {
+    joins(:sample_identifiers).order("sample_identifiers.uuid")
+  }
+
   def self.media
     entity_fields.find { |f| f.name == 'media' }.options
   end

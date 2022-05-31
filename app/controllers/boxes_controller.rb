@@ -17,13 +17,13 @@ class BoxesController < ApplicationController
     return unless authorize_resource(@box, READ_BOX)
     @can_delete = has_access?(@box, DELETE_BOX)
 
-    @samples = @box.scrambled_samples.preload(:batch, :sample_identifiers)
+    @samples = load_box_samples
   end
 
   def inventory
     return unless authorize_resource(@box, READ_BOX)
 
-    @samples = @box.samples.preload(:batch, :sample_identifiers)
+    @samples = load_box_samples
 
     respond_to do |format|
       format.csv do
@@ -92,6 +92,12 @@ class BoxesController < ApplicationController
 
   def load_box
     @box = Box.where(institution: @navigation_context.institution).find(params.fetch(:id))
+  end
+
+  def load_box_samples
+    samples = @box.samples.preload(:batch, :sample_identifiers)
+    samples = samples.scrambled if @box.blinded?
+    samples
   end
 
   def load_batches
