@@ -7,7 +7,7 @@ class TransferPackagePresenter
   end
 
   # TODO(Rails 5.1): Use delegate_missing
-  delegate :uuid, :recipient, :confirmed_at, :confirmed?, :created_at, :receiver_institution, :sender_institution, :sample_transfers, :samples, to: :transfer_package
+  delegate :uuid, :errors, :recipient, :confirmed_at, :confirmed?, :created_at, :receiver_institution, :sender_institution, :box_transfers, :boxes, :samples, to: :transfer_package
 
   def receiver?
     context.institution == transfer_package.receiver_institution
