@@ -81,4 +81,21 @@ class Box < ApplicationRecord
       sample.save!
     end
   end
+
+  def blind_attributes
+    case purpose
+    when "LOD"
+      %i[concentration concentration_formula replicate]
+    when "Variants"
+      %i[virus_lineage batch_number]
+    when "Challenge"
+      %i[concentration concentration_formula replicate virus_lineage batch_number]
+    else
+      []
+    end
+  end
+
+  def blind_attribute?(attr_name)
+    blind_attributes.include?(attr_name)
+  end
 end

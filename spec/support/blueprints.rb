@@ -199,6 +199,33 @@ Box.blueprint(:filled) do
   samples { [Sample.make(:filled, box: object, institution: object.institution, site: object.site) ] }
 end
 
+Box.blueprint(:LOD) do
+  institution { object.site.try(&:institution) || Institution.make }
+  purpose { "LOD" }
+  samples { [
+    Sample.make(institution: object.institution, date_produced: Date.today),
+    Sample.make(institution: object.institution, date_produced: Date.today),
+  ] }
+end
+
+Box.blueprint(:Variants) do
+  institution { object.site.try(&:institution) || Institution.make }
+  purpose { "Variants" }
+  samples { [
+    Sample.make(institution: object.institution, date_produced: Date.today),
+    Sample.make(institution: object.institution, date_produced: Date.today),
+  ] }
+end
+
+Box.blueprint(:Challenge) do
+  institution { object.site.try(&:institution) || Institution.make }
+  purpose { "Challenge" }
+  samples { [
+    Sample.make(institution: object.institution, date_produced: Date.today),
+    Sample.make(institution: object.institution, date_produced: Date.today),
+  ] }
+end
+
 BoxTransfer.blueprint do
   box { Box.make(:filled, institution: nil, site: nil) }
   transfer_package { TransferPackage.make }

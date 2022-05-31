@@ -43,7 +43,6 @@ class SamplesController < ApplicationController
     @view_helper = view_helper({ save_back_path: true })
 
     @show_barcode_preview = true
-    @show_print_action = true
 
     @can_delete = false
     @can_update = false
@@ -99,8 +98,6 @@ class SamplesController < ApplicationController
     @sample = Sample.find(params[:id])
     return unless authorize_resource(@sample, READ_SAMPLE)
 
-    @show_print_action = false
-
     render pdf: "cdx_sample_#{@sample.uuid}",
       template: "samples/barcode.pdf",
       layout: "layouts/pdf.html",
@@ -134,7 +131,6 @@ class SamplesController < ApplicationController
     @view_helper[:back_path] = samples_path unless sample.qc_info.nil?
 
     @show_barcode_preview = true
-    @show_print_action = true
 
     @can_delete = has_access?(sample, DELETE_SAMPLE)
     @can_update = true
