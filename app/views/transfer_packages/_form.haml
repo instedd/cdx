@@ -1,25 +1,21 @@
 = cdx_form_for(@transfer_package) do |f|
-  .row
-    .col
-      = f.form_field :uuid do
-        .value
-          = f.object.uuid
+  = f.form_field :uuid, value: f.object.uuid
 
-      = f.form_field :receiver_institution do
-        - if @can_update
-          = cdx_select form: f, name: :receiver_institution_id, searchable: true, class: "input-x-large" do |select|
-            - select.items available_institutions, :id, :name
-        - else
-          = text_field_tag :receiver_institution, { :class => 'input-x-large', readonly: true }
+  = f.form_field :receiver_institution do
+    - if @can_update
+      = cdx_select form: f, name: :receiver_institution_id, searchable: true, class: "input-x-large" do |select|
+        - select.items available_institutions, :id, :name
+    - else
+      = text_field_tag :receiver_institution, { :class => 'input-x-large', readonly: true }
 
-      = f.form_field :recipient do
-        = f.text_field :recipient, :class => 'input-x-large', readonly: !@can_update
+  = f.form_field :recipient do
+    = f.text_field :recipient, :class => 'input-x-large', readonly: !@can_update
 
-      = f.form_field :sample_transfers do
-        = react_component("SampleTransferSelector",
-          context: @navigation_context.uuid,
-          includeQcInfo: @transfer_package.includes_qc_info, samples: samples_data(@transfer_package.sample_transfers.map(&:sample)))
-        = f.field_errors :"sample_transfers.sample"
+  = f.form_field :box_transfers do
+    = react_component("BoxSelector",
+      context: @navigation_context.uuid,
+      includeQcInfo: @transfer_package.includes_qc_info, boxes: boxes_data(@transfer_package.boxes))
+    = f.field_errors :"box_transfers.box.sample"
 
   - if @can_update
     = f.form_actions do

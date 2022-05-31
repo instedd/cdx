@@ -107,8 +107,8 @@ Encounter.blueprint do
 end
 
 def first_or_make_site_unless_manufacturer(institution)
-  unless institution.kind_manufacturer?
-    institution.sites.first || Site.make(institution: institution)
+  unless institution.try &:kind_manufacturer?
+    institution.try { |i| i.sites.first } || Site.make(institution: institution)
   end
 end
 
@@ -168,6 +168,7 @@ TransferPackage.blueprint do
   receiver_institution { Institution.make! }
   sender_institution { Institution.make! }
   recipient { Faker::Name.name }
+  box_transfers { [BoxTransfer.make(transfer_package: object)] }
 end
 
 TransferPackage.blueprint(:confirmed) do
@@ -201,6 +202,15 @@ end
 Box.blueprint do
   institution { object.site.try(&:institution) || Institution.make }
   purpose { "LOD" }
+end
+
+Box.blueprint(:filled) do
+  samples { [Sample.make(:filled, box: object, institution: object.institution, site: object.site) ] }
+end
+
+BoxTransfer.blueprint do
+  box { Box.make(:filled, institution: nil, site: nil) }
+  transfer_package { TransferPackage.make }
 end
 
 Patient.blueprint do

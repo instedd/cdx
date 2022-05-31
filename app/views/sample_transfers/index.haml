@@ -38,15 +38,10 @@
               - else
                 %td{title: "#{transfer.sender_institution} sent on #{I18n.l(transfer.created_at)}, unconfirmed by #{transfer.receiver_institution}"}
                   - if transfer.receiver?
-                    - if can_confirm_transfer?(transfer)
-                      = react_component "SampleTransferConfirm", url: sample_transfer_confirm_path(sample_transfer_id: transfer.transfer), uuid: transfer.sample.uuid
-                    - else
-                      Unconfirmed
-                      .icon-help.icon-gray{title: "You're not authorized to confirm this transfer."}
+                    Unconfirmed
                   - else
                     Sent on
                     = time_tag transfer.created_at, I18n.l(transfer.created_at, format: I18n.t("date.formats.long"))
 
       .pagination
         = render 'shared/pagination'
-

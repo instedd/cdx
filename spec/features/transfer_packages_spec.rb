@@ -8,88 +8,89 @@ describe "transfer packages" do
     let!(:user_b) { institution_b.user }
 
     it "creates transfer" do
-      sample1 = Sample.make!(:filled, institution: institution_a)
-      sample2 = Sample.make!(:filled, institution: institution_a)
+      box1 = Box.make!(:filled, institution: institution_a)
+      box2 = Box.make!(:filled, institution: institution_a)
 
       sign_in user_a
 
       goto_page NewTransferPackagePage do |page|
-        expect(page).to have_content("Send samples")
+        expect(page).to have_content("Send boxes")
 
         page.destination.set institution_b.name
         page.recipient.set "Santa Claus"
 
-        page.sample_search.set sample1.uuid
-        page.wait_until_sample_search_visible
-        expect(page.selected_sample_uuids).to eq [sample1.uuid]
+        page.box_search.set box1.uuid
+        page.wait_until_box_search_visible
+        expect(page.selected_box_uuids).to eq [box1.uuid]
 
-        page.sample_search.set sample2.uuid
-        page.wait_until_sample_search_visible
-        expect(page.selected_sample_uuids).to eq [sample1.uuid, sample2.uuid]
+        page.box_search.set box2.uuid
+        page.wait_until_box_search_visible
+        expect(page.selected_box_uuids).to eq [box1.uuid, box2.uuid]
 
         page.submit
       end
 
-      expect_page ListSampleTransfersPage do |page|
-        entry = page.entry(sample1.uuid)
-        expect(entry.state).to have_text("Sent on")
+      # TODO: This needs to be re-enabled when TransferPackageControler#index is implemented
+      # expect_page ListBoxTransfersPage do |page|
+      #   entry = page.entry(box1.uuid)
+      #   expect(entry.state).to have_text("Sent on")
 
-        entry = page.entry(sample2.uuid)
-        expect(entry.state).to have_text("Sent on")
-      end
+      #   entry = page.entry(box2.uuid)
+      #   expect(entry.state).to have_text("Sent on")
+      # end
 
-      sign_in user_b
+      # sign_in user_b
 
-      goto_page ListSampleTransfersPage do |page|
-        expect(page).to have_content(sample1.partial_uuid)
-        expect(page).to have_content(sample2.partial_uuid)
+      # goto_page ListBoxTransfersPage do |page|
+      #   expect(page).to have_content(box1.partial_uuid)
+      #   expect(page).to have_content(box2.partial_uuid)
 
-        page.entry(sample1.partial_uuid).confirm.click
+      #   page.entry(box1.partial_uuid).confirm.click
 
-        page.confirm_receipt_modal.tap do |modal|
-          expect(modal).to have_content("Confirm receipt")
+      #   page.confirm_receipt_modal.tap do |modal|
+      #     expect(modal).to have_content("Confirm receipt")
 
-          modal.uuid_check.set sample1.uuid[-4..-1]
+      #     modal.uuid_check.set box1.uuid[-4..-1]
 
-          modal.submit
-        end
-      end
+      #     modal.submit
+      #   end
+      # end
 
-      expect_page ListSampleTransfersPage do |page|
-        entry = page.entry(sample1.uuid)
-        expect(entry.state).to have_text("Receipt confirmed")
-      end
+      # expect_page ListBoxTransfersPage do |page|
+      #   entry = page.entry(box1.uuid)
+      #   expect(entry.state).to have_text("Receipt confirmed")
+      # end
     end
 
-    describe "sample selector" do
+    describe "box selector" do
       before(:each) { sign_in user_a }
 
       it "recognizes complete UUID" do
-        sample = Sample.make!(:filled, institution: institution_a)
+        box = Box.make!(:filled, institution: institution_a)
 
         goto_page NewTransferPackagePage do |page|
-          page.sample_search.native.send_keys sample.uuid
-          page.wait_until_sample_search_visible
-          expect(page.selected_sample_uuids).to eq [sample.uuid]
+          page.box_search.native.send_keys box.uuid
+          page.wait_until_box_search_visible
+          expect(page.selected_box_uuids).to eq [box.uuid]
         end
       end
 
       it "search for partial UUID" do
-        sample = Sample.make!(:filled, institution: institution_a)
+        box = Box.make!(:filled, institution: institution_a)
 
         goto_page NewTransferPackagePage do |page|
-          page.sample_search.native.send_keys sample.uuid[0, 5], :enter
-          page.wait_until_sample_search_visible
-          expect(page.selected_sample_uuids).to eq [sample.uuid]
+          page.box_search.native.send_keys box.uuid[0, 5], :enter
+          page.wait_until_box_search_visible
+          expect(page.selected_box_uuids).to eq [box.uuid]
         end
       end
 
-      it "no sample found" do
+      it "no box found" do
         goto_page NewTransferPackagePage do |page|
-          page.sample_search.native.send_keys "1", :enter
-          page.wait_until_sample_search_visible
-          expect(page.selected_sample_uuids).to be_empty
-          expect(page).to have_content("No sample found")
+          page.box_search.native.send_keys "1", :enter
+          page.wait_until_box_search_visible
+          expect(page.selected_box_uuids).to be_empty
+          expect(page).to have_content("No box found")
         end
       end
     end

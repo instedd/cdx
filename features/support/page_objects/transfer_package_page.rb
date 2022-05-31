@@ -1,20 +1,20 @@
 class NewTransferPackagePage < CdxPageBase
   set_url "/transfer_packages/new"
 
-  class SampleTransferPreview < SitePrism::Section
-    element :sample_uuid, ".sample__uuid"
+  class BoxTransferPreview < SitePrism::Section
+    element :box_uuid, ".box__uuid"
   end
 
   section :destination, CdxSelect, "label", text: /Destination/i
   element :recipient, :field, "Recipient"
 
-  sections :samples_list, SampleTransferPreview, ".sample-transfer-preview"
+  sections :boxes_list, BoxTransferPreview, ".box-preview"
 
-  def selected_sample_uuids
-    samples_list.map { |preview| preview.sample_uuid.text }
+  def selected_box_uuids
+    boxes_list.map { |preview| preview.box_uuid.text }
   end
 
-  element :sample_search, :field, "Enter, paste or scan sample ID"
+  element :box_search, :field, "Enter, paste or scan box ID"
 
   element :submit_button, :button, "Transfer"
 

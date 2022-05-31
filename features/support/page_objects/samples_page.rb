@@ -20,15 +20,5 @@ class ListSamplesPage < CdxPageBase
   end
 
   section :actions, ".table-actions" do
-    element :bulk_transfer, :link, "#bulk_transfer"
-  end
-
-  section :bulk_transfer_modal, ".modal" do
-    element :institution, :field, "Institution"
-
-    def submit
-      root_element.native.send_keys :enter
-      wait_for_submit
-    end
   end
 end
