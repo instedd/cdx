@@ -1,21 +1,24 @@
 .row
   .col
     %h1= t 'devise.invitations.edit.header'
-= form_for resource, :as => resource_name, :url => invitation_path(resource_name), :html => { :method => :put, id: 'accept-invitation' } do |f|
+= cdx_form_for resource, :as => resource_name, :url => invitation_path(resource_name), :html => { :method => :put, id: 'accept-invitation' } do |f|
   = f.hidden_field :invitation_token
   .row
     .col
       = f.text_field :first_name, autofocus: true, placeholder: 'First name', class: "input-large"
       = f.text_field :last_name, autofocus: true, placeholder: 'Last name', class: "input-large"
+      = f.field_errors :first_name
+      = f.field_errors :last_name
   .row
     .col
       = f.password_field :password, autofocus: true, placeholder: 'Password', class: "input-block"
+      = f.field_errors :password
   .row
     .col
       = f.password_field :password_confirmation, autofocus: true, placeholder: 'Password confirmation', class: "input-block"
+      = f.field_errors :password_confirmation
   %br
   .row
     .col
       = f.submit t("devise.invitations.edit.submit_button"), class: "btn-secondary input-block"
-= devise_error_messages!
 

@@ -146,7 +146,7 @@ class Manifest < ApplicationRecord
     end
 
   rescue Oj::ParseError => ex
-    self.errors.add(:parse_error, ex.message)
+    self.errors.add(:definition, ex.message)
   end
 
   def filename

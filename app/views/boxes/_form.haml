@@ -42,7 +42,6 @@
                   name: "box[batch_uuids][#{key}]", value: @box_form.batch_uuids[key],
                   placeholder: "Enter batch id", className: "input-block" }
 
-  .row.button-actions
-    .col
-      = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
-      = link_to 'Cancel', boxes_path, class: 'btn-link'
+  = f.form_actions do
+    = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
+    = link_to 'Cancel', boxes_path, class: 'btn-link'

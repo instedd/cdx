@@ -1,13 +1,15 @@
 .row
   .col
     %h1 Login
-= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
+= cdx_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
   .row
     .col
       = f.email_field :email, autofocus: true, placeholder: 'Email', class: "input-block"
+      = f.field_errors :email
   .row
     .col
       = f.password_field :password, autocomplete: "off", placeholder: 'Password', class: "input-block"
+      = f.field_errors :password
   %br
   .row
     .col

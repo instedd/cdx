@@ -2,10 +2,11 @@
   .col
     %h1 Login problems?
     %p Enter your email and we'll send you a link to reset your password
-= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f|
+= cdx_form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f|
   .row
     .col
       = f.email_field :email, autofocus: true, placeholder: 'Email', class: "input-block"
+      = f.field_errors :email
   %br
   .row
     .col
@@ -17,4 +18,3 @@
       = link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name), class: "pull-right"
       %br
       = link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name), class: "pull-right"
-= devise_error_messages!

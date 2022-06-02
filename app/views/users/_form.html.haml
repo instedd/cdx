@@ -1,44 +1,21 @@
-= form_for(@user) do |f|
+= cdx_form_for(@user) do |f|
   .row
     .col
-      .row
-        .col.pe-2
-          = f.label :name
-        .col
-          .value= f.object.full_name
-      .row
-        .col.pe-2
-          = f.label :email
-        .col
-          .value= f.object.email
-      .row
-        .col.pe-2
-          = f.label :telephone
-        .col
-          .value= f.object.telephone
-      .row
-        .col.pe-2
-          = f.label :roles
-        .col
-          .value
-            = react_component 'OptionList', chosenOnes: @user_roles, callback: "/users/#{@user.id}/assign_role", autocompleteCallback: "/roles/autocomplete"
+      = f.form_field :name, value: f.object.full_name
+      = f.form_field :email, value: f.object.email
+      = f.form_field :telephone, value: f.object.telephone
+
+      = f.form_field :roles do
+        = react_component 'OptionList', chosenOnes: @user_roles, callback: "/users/#{@user.id}/assign_role", autocompleteCallback: "/roles/autocomplete"
     .col
       .box.small.gray
         - if @can_update
-          .row
-            .col.pe-2
-              .value= f.label :is_active
-            .col
-              .value
-                = f.check_box :is_active, class: 'power'
-                %label{:for => 'user_is_active'} Can access Cdx?
-        .row
-          .col.pe-2
-            = f.label :last_sign_in_at
-          .col
-            .value= last_activity(f.object)
+          = f.form_field :is_active do
+            = f.check_box :is_active, class: 'power'
+            %label{:for => 'user_is_active'} Can access Cdx?
+        = f.form_field :last_sign_in_at, value: last_activity(f.object)
+
   - if @can_update
-    .row.button-actions
-      .col
-        = f.submit 'Save', class: 'btn-primary'
-        = link_to 'Cancel', users_path,  class: 'btn-link'
+    = f.form_actions do
+      = f.submit 'Save', class: 'btn-primary'
+      = link_to 'Cancel', users_path,  class: 'btn-link'

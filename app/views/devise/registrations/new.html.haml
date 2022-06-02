@@ -1,22 +1,30 @@
 .row
   .col
     %h1 Sign up
-= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f|
+= cdx_form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f|
   .row
     .col
       = f.text_field :first_name, autofocus: true, placeholder: 'First name', class: 'input-block'
+      = f.field_errors :first_name
   .row
     .col
       = f.text_field :last_name, placeholder: 'Last name', class: 'input-block'
+      = f.field_errors :last_name
   .row
     .col
       = f.email_field :email, placeholder: 'Email', class: "input-block"
+      = f.field_errors :email
   .row
     .col
       = f.password_field :password, autocomplete: "off", placeholder: 'Password', class: "input-block"
       - if @minimum_password_length
-        .small-quote.pull-right
+        .form_field-hint
           (#{@minimum_password_length} characters minimum)
+      = f.field_errors :password
+  .row
+    .col
+      = f.password_field :password_confirmation, autocomplete: "off", placeholder: 'Password Confirmation', class: "input-block"
+      = f.field_errors :password_confirmation
   %br
   .row
     .col
@@ -25,4 +33,3 @@
       = link_to "Have an account? Log in", new_session_path(resource_name)
       %br
       = link_to "Login problems?", new_password_path(resource_name)
-= devise_error_messages!
