@@ -38,8 +38,10 @@ class TransferPackagesController < ApplicationController
       .find(params[:id])
 
     @transfer_package = TransferPackagePresenter.new(transfer_package, @navigation_context)
+
     @view_helper = view_helper({ save_back_path: true })
     @can_update = false
+    @can_confirm = !transfer_package.confirmed? && @transfer_package.receiver? && authorize_resource(confirmation_resource(transfer_package), UPDATE_BOX)
   end
 
   def new
@@ -59,7 +61,7 @@ class TransferPackagesController < ApplicationController
     end
 
     if @transfer_package.save
-      redirect_to boxes_path, notice: "Boxes were succesfully sent"
+      redirect_to transfer_packages_path, notice: "Transfer package was successfully sent"
     else
       @view_helper = view_helper
       @can_update = true
@@ -82,6 +84,25 @@ class TransferPackagesController < ApplicationController
     @boxes = check_access(@boxes, READ_BOX)
 
     render json: { boxes: boxes_data(@boxes) }
+  end
+
+  def confirm
+    transfer_package = TransferPackage
+      .with_receiver(@navigation_context.institution)
+      .find(params[:id])
+    @transfer_package = TransferPackagePresenter.new(transfer_package, @navigation_context)
+
+    return unless authorize_resource(confirmation_resource(transfer_package.boxes.take), UPDATE_BOX)
+
+    if transfer_package.confirmed?
+      flash[:info] = "Transfer had already been confirmed."
+      redirect_to transfer_package
+      return
+    end
+
+    transfer_package.confirm!
+    flash[:success] = "Transfer has been confirmed."
+    redirect_to transfer_package
   end
 
   def unblind

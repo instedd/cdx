@@ -30,36 +30,47 @@ describe "transfer packages" do
         page.submit
       end
 
-      # TODO: This needs to be re-enabled when TransferPackageControler#index is implemented
-      # expect_page ListBoxTransfersPage do |page|
-      #   entry = page.entry(box1.uuid)
-      #   expect(entry.state).to have_text("Sent on")
+      expect_page ListTransferPackagesPage do |page|
+        entry = page.entries.first
+        expect(entry.origin).to have_text(institution_a.name)
+        expect(Date.parse(entry.transfer_date.text)).to be_today
+        expect(entry.destination).to have_text(institution_b.name)
+        expect(entry.recipient).to have_text("Santa Claus")
+        expect(entry.state).to have_text("In transit")
+      end
 
-      #   entry = page.entry(box2.uuid)
-      #   expect(entry.state).to have_text("Sent on")
-      # end
+      sign_in user_b
 
-      # sign_in user_b
+      goto_page ListTransferPackagesPage do |page|
+        entry = page.entries.first
+        expect(entry.origin).to have_text(institution_a.name)
+        expect(Date.parse(entry.transfer_date.text)).to be_today
+        expect(entry.destination).to have_text(institution_b.name)
+        expect(entry.recipient).to have_text("Santa Claus")
+        expect(entry.state).to have_text("In transit")
 
-      # goto_page ListBoxTransfersPage do |page|
-      #   expect(page).to have_content(box1.partial_uuid)
-      #   expect(page).to have_content(box2.partial_uuid)
+        entry.uuid.click
+      end
 
-      #   page.entry(box1.partial_uuid).confirm.click
+      expect_page ShowTransferPackagePage do |page|
+        expect(page).to have_content("Transfer Details")
 
-      #   page.confirm_receipt_modal.tap do |modal|
-      #     expect(modal).to have_content("Confirm receipt")
+        expect(page).to have_content("Sent on")
+        page.confirm_button.click
+      end
 
-      #     modal.uuid_check.set box1.uuid[-4..-1]
+      expect_page ShowTransferPackagePage do |page|
+        expect(page).to have_content("Transfer Details")
 
-      #     modal.submit
-      #   end
-      # end
+        expect(page).to have_content("Sent on")
+        expect(page).to have_content("Confirmed on")
+        expect(page).not_to have_confirm_button
+      end
 
-      # expect_page ListBoxTransfersPage do |page|
-      #   entry = page.entry(box1.uuid)
-      #   expect(entry.state).to have_text("Receipt confirmed")
-      # end
+      goto_page ListTransferPackagesPage do |page|
+        entry = page.entries.first
+        expect(entry.state).to have_text("Recieved")
+      end
     end
 
     describe "box selector" do

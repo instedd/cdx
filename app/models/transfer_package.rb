@@ -59,20 +59,15 @@ class TransferPackage < ApplicationRecord
     box_transfers.build(box: box)
   end
 
-  def confirm
-    if confirmed?
-      false
-    else
-      self.confirmed_at = Time.now
-      true
-    end
-  end
-
   def confirm!
-    if confirm
+    raise ActiveRecord::RecordNotSaved.new("Transfer package has already been confirmed.") if confirmed?
+
+    transaction do
+      boxes.update_all(institution_id: receiver_institution.id)
+      samples.update_all(institution_id: receiver_institution.id)
+
+      self.confirmed_at = Time.now
       save!
-    else
-      raise ActiveRecord::RecordNotSaved.new("Transfer package has already been confirmed.")
     end
   end
 

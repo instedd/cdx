@@ -56,7 +56,9 @@ module FeatureSpecHelpers
 
   def expect_page(klass)
     page = klass.new
-    expect(page).to be_displayed
+    unless page.displayed?
+      fail "Expected `#{page.inspect}` to be displayed, got `#{page.page.current_url}`"
+    end
     yield page if block_given?
   end
 

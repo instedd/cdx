@@ -15,7 +15,7 @@
           %col{width: "20%"}
           %col{width: "20%"}
           %col{width: "20%"}
-          %col{width: "2%"}
+          %col{style: "width: 1.7em;"}
         - t.thead do
           %tr
             %th Transfer Id
@@ -27,21 +27,21 @@
             %th
         - t.tbody do
           - @transfer_packages.each do |transfer|
-            %tr{class: ("faded" if transfer.confirmed?), data: { href: transfer_package_path(transfer) }}
-              %td= short_uuid_with_title(transfer.uuid)
-              %td{title: "#{transfer.sender_institution} sent on #{I18n.l(transfer.created_at)}"}
+            %tr.transfer_package-row{class: ("faded" if transfer.confirmed?), data: { href: transfer_package_path(transfer) }}
+              %td.col-uuid= short_uuid_with_title(transfer.uuid)
+              %td.col-transfer_date{title: "#{transfer.sender_institution} sent on #{I18n.l(transfer.created_at)}"}
                 = time_tag transfer.created_at, I18n.l(transfer.created_at, format: I18n.t("date.formats.long"))
-              %td= transfer.sender_institution
-              %td= transfer.receiver_institution
-              %td= transfer.recipient
+              %td.col-origin= transfer.sender_institution
+              %td.col-destination= transfer.receiver_institution
+              %td.col-recipient= transfer.recipient
               - if confirmed_at = transfer.confirmed_at
-                %td.text-right{title: "#{transfer.receiver_institution} confirmed receipt on #{I18n.l(confirmed_at)}"}
+                %td.col-state.text-right{title: "#{transfer.receiver_institution} confirmed receipt on #{I18n.l(confirmed_at)}"}
                   Recieved
                   = time_tag confirmed_at, I18n.l(confirmed_at, format: I18n.t("date.formats.long"))
                 %td{style: "padding-left: 0;"}
                   %span.icon-tick.icon-text-color{style: "vertical-align: bottom;"}
               - else
-                %td.text-right
+                %td.col-state.text-right
                   In transit
                 %td{style: "padding-left: 0;"}
                   %span.icon-local_shipping.icon-text-color{style: "vertical-align: bottom;"}
