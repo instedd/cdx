@@ -175,15 +175,6 @@ TransferPackage.blueprint(:confirmed) do
   confirmed_at { Faker::Time.backward }
 end
 
-SampleTransfer.blueprint do
-  sample { Sample.make!(:filled) }
-  transfer_package { TransferPackage.make(sender_institution: object.sample.institution || Institution.make!) }
-end
-
-SampleTransfer.blueprint(:confirmed) do
-  confirmed_at { Faker::Time.backward }
-end
-
 Batch.blueprint do
   institution { Institution.make }
   batch_number { "#{sn}" }

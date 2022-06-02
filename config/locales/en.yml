@@ -46,7 +46,6 @@ en:
 
       transfer_package:
         receiver_institution: Destination
-        sample_transfers: Samples
 
       user:
         telephone: Phone

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220519135949) do
+ActiveRecord::Schema.define(version: 20220531182313) do
 
   create_table "alert_condition_results", force: :cascade do |t|
     t.string  "result",   limit: 255
@@ -565,21 +565,6 @@ ActiveRecord::Schema.define(version: 20220519135949) do
   add_index "sample_identifiers", ["sample_id"], name: "index_sample_identifiers_on_sample_id", using: :btree
   add_index "sample_identifiers", ["uuid"], name: "index_sample_identifiers_on_uuid", unique: true, using: :btree
 
-  create_table "sample_transfers", force: :cascade do |t|
-    t.integer  "sample_id",               limit: 4
-    t.integer  "sender_institution_id",   limit: 4
-    t.integer  "receiver_institution_id", limit: 4
-    t.datetime "confirmed_at"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-    t.integer  "transfer_package_id",     limit: 4, null: false
-  end
-
-  add_index "sample_transfers", ["confirmed_at"], name: "index_sample_transfers_on_confirmed_at", using: :btree
-  add_index "sample_transfers", ["receiver_institution_id"], name: "index_sample_transfers_on_receiver_institution_id", using: :btree
-  add_index "sample_transfers", ["sample_id"], name: "index_sample_transfers_on_sample_id", using: :btree
-  add_index "sample_transfers", ["sender_institution_id"], name: "index_sample_transfers_on_sender_institution_id", using: :btree
-
   create_table "samples", force: :cascade do |t|
     t.binary   "sensitive_data",   limit: 65535
     t.integer  "institution_id",   limit: 4
@@ -596,8 +581,8 @@ ActiveRecord::Schema.define(version: 20220519135949) do
     t.integer  "site_id",          limit: 4
     t.string   "site_prefix",      limit: 255
     t.string   "specimen_role",    limit: 255
-    t.string   "old_batch_number", limit: 255
     t.integer  "qc_info_id",       limit: 4
+    t.string   "old_batch_number", limit: 255
     t.integer  "box_id",           limit: 4
   end
 
