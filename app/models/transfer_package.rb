@@ -83,4 +83,12 @@ class TransferPackage < ApplicationRecord
   def confirmed?
     !!confirmed_at
   end
+
+  def blinded?
+    boxes.where(blinded: true).exists?
+  end
+
+  def unblind_boxes!
+    boxes.update_all(blinded: false)
+  end
 end

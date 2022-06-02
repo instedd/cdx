@@ -37,6 +37,10 @@ a {
 hr {
   border: none;
   border-bottom: 1px solid $gray1;
+
+  &.with-margins {
+    margin: 3em 0;
+  }
 }
 .block {
   display: block;

@@ -435,4 +435,31 @@ RSpec.describe TransferPackagesController, type: :controller do
       end.to raise_error("User not authorized for transferring box #{box.uuid}")
     end
   end
+
+  describe "unblind" do
+    before(:each) { sign_in user }
+
+    it "unblinds samples (transfer out)" do
+      package = TransferPackage.make! sender_institution: institution, receiver_institution: other_institution, blinded: true
+
+      post :unblind, params: { id: package.to_param }
+      expect(response).to redirect_to(transfer_package_path(package))
+
+      package.boxes.each do|box|
+        expect(box.reload.blinded).to eq(false)
+      end
+    end
+
+    it "won't unblind samples (transfer in)" do
+      package = TransferPackage.make! sender_institution: other_institution, receiver_institution: institution, blinded: true
+
+      assert_raises(ActiveRecord::RecordNotFound) do
+        post :unblind, params: { id: package.to_param }
+      end
+
+      package.boxes.each do |box|
+        expect(box.reload.blinded).to eq(true)
+      end
+    end
+  end
 end
