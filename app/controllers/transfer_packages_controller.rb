@@ -31,6 +31,17 @@ class TransferPackagesController < ApplicationController
       .map { |transfer| TransferPackagePresenter.new(transfer, @navigation_context) }
   end
 
+  def show
+    transfer_package = TransferPackage
+      .within(@navigation_context.institution)
+      .includes(:box_transfers, :boxes)
+      .find(params[:id])
+
+    @transfer_package = TransferPackagePresenter.new(transfer_package, @navigation_context)
+    @view_helper = view_helper({ save_back_path: true })
+    @can_update = false
+  end
+
   def new
     @view_helper = view_helper({ save_back_path: true })
     @can_update = true

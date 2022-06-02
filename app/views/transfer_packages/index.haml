@@ -27,7 +27,7 @@
             %th
         - t.tbody do
           - @transfer_packages.each do |transfer|
-            %tr{class: ("faded" if transfer.confirmed?)}
+            %tr{class: ("faded" if transfer.confirmed?), data: { href: transfer_package_path(transfer) }}
               %td= short_uuid_with_title(transfer.uuid)
               %td{title: "#{transfer.sender_institution} sent on #{I18n.l(transfer.created_at)}"}
                 = time_tag transfer.created_at, I18n.l(transfer.created_at, format: I18n.t("date.formats.long"))

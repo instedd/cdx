@@ -256,7 +256,12 @@ a[title="Back"] {
   h2 {
     margin: 0.3em 0;
   }
+}
 
+.show {
+  background: $gray1;
+  margin: -10px -10px 0;
+  padding: 0 1em 0.5em;
 }
 
 #nav-context {

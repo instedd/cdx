@@ -1,0 +1,37 @@
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to @view_helper[:back_path], class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left.png"
+            Transfer Details
+
+= cdx_form_for(@transfer_package) do |f|
+  = f.form_field :uuid, value: @transfer_package.uuid
+
+  = f.form_field :origin, value: @transfer_package.sender_institution
+
+  = f.form_field :destination, value: @transfer_package.receiver_institution
+
+  = f.form_field :recipient, value: @transfer_package.recipient
+
+  = f.form_field :log do
+    .value
+      %ol.dispatch-log
+        %li.log-entry.log-entry--created
+          %span.icon-local_shipping.icon-text-color
+          Sent on
+          = time_tag @transfer_package.created_at, I18n.l(@transfer_package.created_at, format: I18n.t("date.formats.long"))
+        - if @transfer_package.confirmed?
+          %li.log-entry.log-entry--confirmed
+            %span.icon-tick.icon-text-color
+            Confirmed on
+            = time_tag @transfer_package.confirmed_at, I18n.l(@transfer_package.confirmed_at, format: I18n.t("date.formats.long"))
+
+  = f.form_field :boxes do
+    .value
+      %strong= pluralize(@transfer_package.boxes.size, "box")
+    %div
+      = render partial: 'boxes/preview', layout: 'shared/list', collection: @transfer_package.boxes.count_samples, as: :box

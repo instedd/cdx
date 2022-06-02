@@ -77,6 +77,36 @@ RSpec.describe TransferPackagesController, type: :controller do
     end
   end
 
+  describe "GET #show" do
+    before(:each) { sign_in user }
+
+    let!(:transfer_out) { TransferPackage.make!(sender_institution: institution, receiver_institution: other_institution) }
+    let!(:transfer_in) { TransferPackage.make!(sender_institution: other_institution, receiver_institution: institution) }
+    let!(:transfer_other) { TransferPackage.make! }
+
+    it "shows outgoing" do
+      get :show, params: { id: transfer_out.id }
+
+      expect(response).to have_http_status :ok
+      expect(response.body).to include("Sent on")
+      expect(response.body).to include(transfer_out.created_at.xmlschema)
+    end
+
+    it "shows incoming" do
+      get :show, params: { id: transfer_in.id }
+
+      expect(response).to have_http_status :ok
+      expect(response.body).to include("Sent on")
+      expect(response.body).to include(transfer_in.created_at.xmlschema)
+    end
+
+    it "doesn't show unrelated transfer" do
+      expect {
+        get :show, params: { id: transfer_other.id }
+      }.to raise_exception(ActiveRecord::RecordNotFound)
+    end
+  end
+
   describe "GET #find_box" do
     let!(:sample) do
       Sample.make! :filled, institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: "01234567-1111-a0c8-ac1b-58bed3633e88")]
