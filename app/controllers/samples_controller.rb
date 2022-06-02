@@ -37,13 +37,12 @@ class SamplesController < ApplicationController
 
   def show
     sample = Sample.find(params[:id])
-    @sample_form = SampleForm.for(sample)
     return unless authorize_resource(sample, READ_SAMPLE)
 
+    @sample_form = SamplePresenter.new(SampleForm.for(sample), request.format)
     @view_helper = view_helper({ save_back_path: true })
 
     @show_barcode_preview = true
-
     @can_delete = false
     @can_update = false
 
@@ -59,7 +58,7 @@ class SamplesController < ApplicationController
       sample_identifiers: [SampleIdentifier.new({ uuid: session[:creating_sample_uuid] })],
     })
 
-    @sample_form = SampleForm.for(sample)
+    @sample_form = SamplePresenter.new(SampleForm.for(sample), request.format)
     prepare_for_institution_and_authorize(@sample_form, CREATE_INSTITUTION_SAMPLE)
 
     @view_helper = view_helper({ save_back_path: true })
@@ -82,7 +81,7 @@ class SamplesController < ApplicationController
       site: @navigation_context.site,
       sample_identifiers: [SampleIdentifier.new({ uuid: uuid })],
     }))
-    @sample_form = SampleForm.for(sample)
+    @sample_form = SamplePresenter.new(SampleForm.for(sample), request.format)
 
     if @sample_form.save
       session.delete(:creating_sample_uuid)
@@ -124,8 +123,9 @@ class SamplesController < ApplicationController
 
   def edit
     sample = Sample.find(params[:id])
-    @sample_form = SampleForm.for(sample)
     return unless authorize_resource(sample, UPDATE_SAMPLE)
+
+    @sample_form = SamplePresenter.new(SampleForm.for(sample), request.format)
 
     @view_helper = view_helper({ save_back_path: true })
     @view_helper[:back_path] = samples_path unless sample.qc_info.nil?
@@ -138,8 +138,9 @@ class SamplesController < ApplicationController
 
   def update
     sample = Sample.find(params[:id])
-    @sample_form = SampleForm.for(sample)
     return unless authorize_resource(sample, UPDATE_SAMPLE)
+
+    @sample_form = SamplePresenter.new(SampleForm.for(sample), request.format)
 
     params = sample_params
     unless user_can_delete_notes(params["notes_attributes"] || [])

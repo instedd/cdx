@@ -132,6 +132,70 @@ RSpec.describe SamplesController, type: :controller do
 
       expect(response.body).to include(sample.old_batch_number)
     end
+
+    context "blinded attributes" do
+      let(:batch) do
+        Batch.make!(
+          institution: institution,
+          batch_number: "B.CV19.123",
+        )
+      end
+
+      let(:sample) do
+        Sample.make!(
+          institution: institution,
+          batch: batch,
+          virus_lineage: "CV.19.B.1.1.XYZ",
+          concentration_number: 5,
+          concentration_exponent: 8,
+          replicate: 2,
+          date_produced: Date.today.to_s,
+          sample_identifiers: [SampleIdentifier.make],
+        )
+      end
+
+      it "blinds values when box is blinded (LOD)" do
+        Box.make! institution: institution, samples: [sample], purpose: "LOD", blinded: true
+
+        get :show, params: { id: sample.to_param }
+        expect(response).to have_http_status(:ok)
+
+        expect(response.body).to include("Blinded value")
+        expect(response.body).to include(batch.batch_number)
+        assert_select "input[name='sample[concentration_number]']", count: 0
+        assert_select "input[name='sample[concentration_exponent]']", count: 0
+        assert_select "input[name='sample[replicate]']", count: 0
+        assert_select "input[name='sample[virus_lineage]'][value='CV.19.B.1.1.XYZ']"
+      end
+
+      it "blinds values when box is blinded (Variants)" do
+        Box.make! institution: institution, samples: [sample], purpose: "Variants", blinded: true
+
+        get :show, params: { id: sample.to_param }
+        expect(response).to have_http_status(:ok)
+
+        expect(response.body).to include("Blinded value")
+        expect(response.body).to_not include(batch.batch_number)
+        assert_select "input[name='sample[concentration_number]'][value=5]"
+        assert_select "input[name='sample[concentration_exponent]'][value=8]"
+        assert_select "input[name='sample[replicate]'][value=2]"
+        assert_select "input[name='sample[virus_lineage]']", count: 0
+      end
+
+      it "blinds values when box is blinded (Challenge)" do
+        Box.make! institution: institution, samples: [sample], purpose: "Challenge", blinded: true
+
+        get :show, params: { id: sample.to_param }
+        expect(response).to have_http_status(:ok)
+
+        expect(response.body).to include("Blinded value")
+        expect(response.body).to_not include(batch.batch_number)
+        assert_select "input[name='sample[concentration_number]']", count: 0
+        assert_select "input[name='sample[concentration_exponent]']", count: 0
+        assert_select "input[name='sample[replicate]']", count: 0
+        assert_select "input[name='sample[virus_lineage]']", count: 0
+      end
+    end
   end
 
   context "new" do

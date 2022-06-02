@@ -87,9 +87,9 @@ class Box < ApplicationRecord
     when "LOD"
       %i[concentration concentration_formula replicate]
     when "Variants"
-      %i[virus_lineage batch_number]
+      %i[batch_number virus_lineage]
     when "Challenge"
-      %i[concentration concentration_formula replicate virus_lineage batch_number]
+      %i[batch_number concentration concentration_formula replicate virus_lineage]
     else
       []
     end
