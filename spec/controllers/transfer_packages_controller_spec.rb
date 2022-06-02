@@ -304,6 +304,9 @@ RSpec.describe TransferPackagesController, type: :controller do
 
       expect(sample1.qc_info).not_to be_nil
       expect(sample2.qc_info).to be_nil
+
+      expect(box1.blinded).to eq(false)
+      expect(box2.blinded).to eq(false)
     end
 
     it "ignores blank sample_uuid" do
@@ -337,6 +340,28 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect(package.receiver_institution).to eq other_institution
       expect(package.includes_qc_info?).to eq true
       expect(package.boxes).to eq [box]
+    end
+
+    it "blinds boxes" do
+      box1 = Box.make!(:LOD, institution: institution)
+      box2 = Box.make!(:Variants, institution: institution)
+
+      expect do
+        post :create, params: {
+                        transfer_package: {
+                          receiver_institution_id: other_institution.id,
+                          recipient: "Mr. X",
+                          blinded: true,
+                          box_transfers_attributes: {
+                            "0" => { box_id: box1.id },
+                            "1" => { box_id: box2.id },
+                          },
+                        },
+                      }
+      end.to change { TransferPackage.count }.by(1)
+
+      expect(box1.reload.blinded).to eq(true)
+      expect(box2.reload.blinded).to eq(true)
     end
 
     it "only allows samples in current institution" do

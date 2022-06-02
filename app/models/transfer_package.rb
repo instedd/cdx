@@ -16,6 +16,8 @@ class TransferPackage < ApplicationRecord
   validates_presence_of :sender_institution
   validates_presence_of :receiver_institution
 
+  attr_accessor :blinded
+
   after_initialize do
     self.uuid ||= SecureRandom.uuid
   end
@@ -45,6 +47,7 @@ class TransferPackage < ApplicationRecord
       box = box_transfer.box
       box.attach_qc_info if includes_qc_info
       box.detach_from_context unless confirmed?
+      box.blinded = !!blinded
       box.save!
     end
   end
