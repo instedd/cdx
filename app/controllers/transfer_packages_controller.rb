@@ -84,6 +84,18 @@ class TransferPackagesController < ApplicationController
     render json: { boxes: boxes_data(@boxes) }
   end
 
+  def unblind
+    return unless authorize_resource(Box.new(institution: @navigation_context.institution), UPDATE_BOX)
+
+    transfer_package = TransferPackage.find_by!(
+      sender_institution_id: @navigation_context.institution.id,
+      id: params[:id],
+    )
+    transfer_package.unblind_boxes!
+
+    redirect_to transfer_package_path(transfer_package), notice: "Samples were successfully unblinded."
+  end
+
   private
 
   def transfer_package_params
@@ -91,6 +103,7 @@ class TransferPackagesController < ApplicationController
       :receiver_institution_id,
       :recipient,
       :includes_qc_info,
+      :blinded,
       box_transfers_attributes: [:box_id, :_destroy],
     )
   end

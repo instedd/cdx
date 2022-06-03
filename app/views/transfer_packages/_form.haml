@@ -17,6 +17,11 @@
       includeQcInfo: @transfer_package.includes_qc_info, boxes: boxes_data(@transfer_package.boxes))
     = f.field_errors :"box_transfers.box.sample"
 
+  .row
+    .col
+      = f.check_box :blinded
+      = f.label :blinded, "Blind samples (you'll be able to unblind them later from transfer details)"
+
   - if @can_update
     = f.form_actions do
       = f.submit 'Transfer', class: 'btn-primary', id: 'btn-save'

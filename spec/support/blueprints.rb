@@ -196,7 +196,10 @@ Box.blueprint do
 end
 
 Box.blueprint(:filled) do
-  samples { [Sample.make(:filled, box: object, institution: object.institution, site: object.site) ] }
+  samples { [
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+  ] }
 end
 
 BoxTransfer.blueprint do

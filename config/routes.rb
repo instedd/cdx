@@ -125,6 +125,9 @@ Rails.application.routes.draw do
     end
   end
   resources :transfer_packages, only: [:new, :create, :index, :show] do
+    member do
+      post :unblind
+    end
     collection do
       get "find_box"
     end

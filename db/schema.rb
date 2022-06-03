@@ -168,7 +168,7 @@ ActiveRecord::Schema.define(version: 20220602170219) do
   add_index "box_transfers", ["transfer_package_id"], name: "index_box_transfers_on_transfer_package_id", using: :btree
 
   create_table "boxes", force: :cascade do |t|
-    t.string   "uuid",           limit: 36,    null: false
+    t.string   "uuid",           limit: 36,                       null: false
     t.integer  "institution_id", limit: 4
     t.integer  "site_id",        limit: 4
     t.string   "site_prefix",    limit: 255
@@ -177,8 +177,9 @@ ActiveRecord::Schema.define(version: 20220602170219) do
     t.binary   "sensitive_data", limit: 65535
     t.string   "purpose",        limit: 255
     t.datetime "deleted_at"
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.boolean  "blinded",                         default: false, null: false
   end
 
   add_index "boxes", ["created_at"], name: "index_boxes_on_created_at", using: :btree

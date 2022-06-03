@@ -37,9 +37,9 @@ RSpec.describe BoxesController, type: :controller do
 
     describe "filters" do
       before(:each) do
-        Box.make!(3, institution: @institution, purpose: "LOD")
-        Box.make!(2, institution: @institution, purpose: "Variants")
-        Box.make!(4, institution: @institution, purpose: "Challenge")
+        Box.make!(3, :filled, institution: @institution, purpose: "LOD")
+        Box.make!(2, :filled, institution: @institution, purpose: "Variants")
+        Box.make!(4, :filled, institution: @institution, purpose: "Challenge")
       end
 
       it "paginates" do
@@ -131,6 +131,7 @@ RSpec.describe BoxesController, type: :controller do
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq("text/csv")
       expect(response.body.strip.split("\n").size).to eq(box.samples.count + 1)
+      expect(response.body).to_not match("Blinded")
       expect(response.headers["Content-Disposition"]).to match(/cdx_box_inventory_#{box.uuid}\.csv/)
     end
 
@@ -148,6 +149,48 @@ RSpec.describe BoxesController, type: :controller do
 
       get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:forbidden)
+    end
+
+    it "blinds columns for LOD purpose" do
+      box = Box.make! :filled, institution: institution, purpose: "LOD", blinded: true
+
+      get :inventory, params: { id: box.id, format: "csv" }
+      expect(response).to have_http_status(:ok)
+
+      CSV.parse(response.body).tap(&:shift).each do |row|
+        expect(row[3]).to_not eq("Blinded")
+        expect(row[4]).to_not eq("Blinded")
+        expect(row[5]).to eq("Blinded")
+        expect(row[7]).to eq("Blinded")
+      end
+    end
+
+    it "blinds columns for Variants purpose" do
+      box = Box.make! :filled, institution: institution, purpose: "Variants", blinded: true
+
+      get :inventory, params: { id: box.id, format: "csv" }
+      expect(response).to have_http_status(:ok)
+
+      CSV.parse(response.body).tap(&:shift).each do |row|
+        expect(row[3]).to eq("Blinded")
+        expect(row[4]).to eq("Blinded")
+        expect(row[5]).to_not eq("Blinded")
+        expect(row[7]).to_not eq("Blinded")
+      end
+    end
+
+    it "blinds columns for Challenge purpose" do
+      box = Box.make! :filled, institution: institution, purpose: "Challenge", blinded: true
+
+      get :inventory, params: { id: box.id, format: "csv" }
+      expect(response).to have_http_status(:ok)
+
+      CSV.parse(response.body).tap(&:shift).each do |row|
+        expect(row[3]).to eq("Blinded")
+        expect(row[4]).to eq("Blinded")
+        expect(row[5]).to eq("Blinded")
+        expect(row[7]).to eq("Blinded")
+      end
     end
   end
 
