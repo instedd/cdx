@@ -199,12 +199,7 @@ class UsersController < ApplicationController
   end
 
   def filters_params
-    @filters_params ||=
-      if Rails::VERSION::MAJOR >= 5
-        params.permit(:name, :role, :last_activity, :is_active).reject! { |_, value| value.blank? }
-      else
-        params.permit(:name, :role, :last_activity, :is_active).tap { |x| x.reject! { |_, value| value.blank? } }
-      end
+    @filters_params ||= params.permit(:name, :role, :last_activity, :is_active).reject! { |_, value| value.blank? }
   end
   helper_method :filters_params
 end

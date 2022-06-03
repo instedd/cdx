@@ -10,10 +10,10 @@ end
 
 source 'https://rubygems.org'
 
-gem 'rails', next?('~> 5.0.0', '~> 4.2.11')
+gem 'rails', '~> 5.0.0'
 
 gem 'globalid', '< 0.5.0'        # NOTE: remove gem after upgrading to ruby 2.5
-gem 'rack', '< 2.2.0' if next?   # NOTE: remove gem after upgrading to ruby 2.3
+gem 'rack', '< 2.2.0'            # NOTE: remove gem after upgrading to ruby 2.3
 gem 'rake', '~> 10.5.0'          # NOTE: remove gem after upgrading rspec
 gem 'sprockets-rails', '< 3.3.0' # NOTE: remove gem after upgrading to ruby 2.5
 
@@ -56,7 +56,7 @@ gem 'guid', '~> 0.1'
 gem 'nokogiri', '~> 1.6', '< 1.10.0' # last version to support ruby 2.2
 gem 'oj', '~> 2.12', '< 2.17.3' # NOTE: 2.17.3 will stringify Time as a Float then load a BigDecimal...
 gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
-gem 'rails-i18n', next?('~> 5.0', '~> 4.0')
+gem 'rails-i18n', '~> 5.0'
 gem 'rchardet', '~> 1.6'
 gem 'rest-client', '~> 1.8' # NOTE: only used for a single HTTP call
 gem 'rubyzip', '>= 1.0.0'
@@ -73,7 +73,7 @@ gem 'geojson_import', git: 'https://github.com/instedd/geojson_import', branch: 
 # end
 
 # Services
-gem 'puma', next?('~> 3.0', '~> 2.13')
+gem 'puma', '~> 3.0'
 gem 'sidekiq', '~> 4.2'
 gem 'sidekiq-cron', '~> 0.3' # TODO: not maintained, consider sidekiq-scheduler instead
 gem 'whenever', '~> 1.0' # TODO: replace with a sidekiq-cron job
@@ -86,13 +86,9 @@ gem 'sentry-raven', '~> 2.13'
 # Assets
 gem 'execjs', '< 2.8.0' # 2.8 removed support for therubyracer
 gem 'gon', '~> 6.0'
-if next?
-  gem 'sass-rails', '~> 5.0', '< 5.0.8'
-else
-  gem 'sass-rails', '~> 4.0'
-end
+gem 'sass-rails', '~> 5.0', '< 5.0.8'
 gem 'therubyracer', '~> 0.12' # FIXME: deprecated for years
-gem 'turbolinks', '~> 2.5' # TODO: next?('~> 5', '~> 2.5')
+gem 'turbolinks', '~> 2.5' # TODO: upgrade to '~> 5'
 gem 'uglifier', '~> 2.7'
 
 # TODO: externalize frontend dependencies (NPM or YARN)!
@@ -110,12 +106,11 @@ end
 
 group :development do
   gem 'letter_opener'
-  gem 'listen', '~> 3.0.5' if next?
-  gem 'quiet_assets' unless next?
+  gem 'listen', '~> 3.0.5'
   gem 'spring'
   gem 'spring-commands-parallel-tests'
   gem 'spring-commands-rspec'
-  gem 'spring-watcher-listen', '~> 2.0.0' if next?
+  gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console', '< 4.0' # last version to support ruby 2.2
 end
 
@@ -135,7 +130,7 @@ group :test do
 
   gem 'database_cleaner', '~> 1.99'
   gem 'machinist', '~> 2.0' # NOTE: eventually replace with FactoryBot
-  gem 'rails-controller-testing' if next?
+  gem 'rails-controller-testing'
   gem 'simplecov', require: false
   gem 'timecop', '~> 0.8'
   gem 'webmock', '~> 1.23.0', require: false # a spec fails with 1.24.x

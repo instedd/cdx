@@ -64,12 +64,6 @@ module HTMLAssets
   end
 end
 
-if Rails::VERSION::MAJOR >= 5
-  Rails.application.config.assets.configure do |env|
-    env.context_class.__send__ :include, HTMLAssets::ViewContext
-  end
-else
-  Rails.application.assets.context_class.class_eval do
-    include HTMLAssets::ViewContext
-  end
+Rails.application.config.assets.configure do |env|
+  env.context_class.__send__ :include, HTMLAssets::ViewContext
 end

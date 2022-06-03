@@ -2,7 +2,7 @@ name: Gems cache
 
 inputs:
   version:
-    default: "v0"
+    default: "v1"
 
 outputs:
   cache-hit:
