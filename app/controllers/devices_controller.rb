@@ -373,12 +373,7 @@ class DevicesController < ApplicationController
   end
 
   def filters_params
-    @filters_params ||=
-      if Rails::VERSION::MAJOR >= 5
-        params.permit(:manufacturer, :device_model).reject! { |_, value| value.blank? }
-      else
-        params.permit(:manufacturer, :device_model).tap { |x| x.reject! { |_, value| value.blank? } }
-      end
+    @filters_params ||= params.permit(:manufacturer, :device_model).reject! { |_, value| value.blank? }
   end
   helper_method :filters_params
 end

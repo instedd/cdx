@@ -23,11 +23,7 @@ class TransferPackage < ApplicationRecord
   end
 
   scope :within, ->(institution) {
-          if Rails::VERSION::MAJOR >= 5
-            where(sender_institution_id: institution.id).or(with_receiver(institution))
-          else
-            where(arel_table[:sender_institution_id].eq(institution.id).or(arel_table[:receiver_institution_id].eq(institution.id)))
-          end
+          where(sender_institution_id: institution.id).or(with_receiver(institution))
         }
 
   scope :with_receiver, ->(institution) {
