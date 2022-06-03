@@ -1,0 +1,50 @@
+= render "filters"
+
+.row
+  .col
+    - if @transfer_packages.empty?
+      = empty_data icon: 'icon-outline-test xx-large' do |c|
+        - c.body do
+          %h1 There are no transfers
+    - else
+      = cdx_table title: pluralize(@total, "transfer") do |t|
+        - t.columns do
+          %col{width: "10%"}
+          %col{width: "12%"}
+          %col{width: "20%"}
+          %col{width: "20%"}
+          %col{width: "20%"}
+          %col{width: "20%"}
+          %col{width: "2%"}
+        - t.thead do
+          %tr
+            %th Transfer Id
+            %th Transfer date
+            %th Origin
+            %th Destination
+            %th Recipient
+            %th.text-right Status
+            %th
+        - t.tbody do
+          - @transfer_packages.each do |transfer|
+            %tr{class: ("faded" if transfer.confirmed?), data: { href: transfer_package_path(transfer) }}
+              %td= short_uuid_with_title(transfer.uuid)
+              %td{title: "#{transfer.sender_institution} sent on #{I18n.l(transfer.created_at)}"}
+                = time_tag transfer.created_at, I18n.l(transfer.created_at, format: I18n.t("date.formats.long"))
+              %td= transfer.sender_institution
+              %td= transfer.receiver_institution
+              %td= transfer.recipient
+              - if confirmed_at = transfer.confirmed_at
+                %td.text-right{title: "#{transfer.receiver_institution} confirmed receipt on #{I18n.l(confirmed_at)}"}
+                  Recieved
+                  = time_tag confirmed_at, I18n.l(confirmed_at, format: I18n.t("date.formats.long"))
+                %td{style: "padding-left: 0;"}
+                  %span.icon-tick.icon-text-color{style: "vertical-align: bottom;"}
+              - else
+                %td.text-right
+                  In transit
+                %td{style: "padding-left: 0;"}
+                  %span.icon-local_shipping.icon-text-color{style: "vertical-align: bottom;"}
+
+      .pagination
+        = render 'shared/pagination'
