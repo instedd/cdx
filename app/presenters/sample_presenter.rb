@@ -10,13 +10,7 @@ class SamplePresenter
     @format = format
   end
 
-  [
-    :batch_number,
-    :concentration,
-    :concentration_formula,
-    :replicate,
-    :virus_lineage,
-  ].each do |attr_name|
+  Box.blind_attribute_names.each do |attr_name|
     define_method attr_name do
       if blinded_attribute?(attr_name)
         blinded_value
