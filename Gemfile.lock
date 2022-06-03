@@ -395,7 +395,7 @@ GEM
     public_suffix (3.1.1)
     puma (3.12.6)
     raabro (1.4.0)
-    rack (2.1.4)
+    rack (2.2.3.1)
     rack-protection (2.2.0)
       rack
     rack-test (0.6.3)
@@ -633,7 +633,7 @@ DEPENDENCIES
   pry-rescue
   pry-stack_explorer
   puma (~> 3.0)
-  rack (< 2.2.0)
+  rack (< 2.3.0)
   rails (~> 5.0.0)
   rails-assets-urijs (~> 1.17.0)!
   rails-controller-testing
