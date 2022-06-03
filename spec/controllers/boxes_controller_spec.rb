@@ -37,9 +37,9 @@ RSpec.describe BoxesController, type: :controller do
 
     describe "filters" do
       before(:each) do
-        Box.make!(3, institution: @institution, purpose: "LOD")
-        Box.make!(2, institution: @institution, purpose: "Variants")
-        Box.make!(4, institution: @institution, purpose: "Challenge")
+        Box.make!(3, :filled, institution: @institution, purpose: "LOD")
+        Box.make!(2, :filled, institution: @institution, purpose: "Variants")
+        Box.make!(4, :filled, institution: @institution, purpose: "Challenge")
       end
 
       it "paginates" do
@@ -152,7 +152,7 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "blinds columns for LOD purpose" do
-      box = Box.make! :LOD, institution: institution, blinded: true
+      box = Box.make! :filled, institution: institution, purpose: "LOD", blinded: true
 
       get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
@@ -166,7 +166,7 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "blinds columns for Variants purpose" do
-      box = Box.make! :Variants, institution: institution, blinded: true
+      box = Box.make! :filled, institution: institution, purpose: "Variants", blinded: true
 
       get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
@@ -180,7 +180,7 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "blinds columns for Challenge purpose" do
-      box = Box.make! :Challenge, institution: institution, blinded: true
+      box = Box.make! :filled, institution: institution, purpose: "Challenge", blinded: true
 
       get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)

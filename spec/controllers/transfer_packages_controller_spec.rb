@@ -343,8 +343,8 @@ RSpec.describe TransferPackagesController, type: :controller do
     end
 
     it "blinds boxes" do
-      box1 = Box.make!(:LOD, institution: institution)
-      box2 = Box.make!(:Variants, institution: institution)
+      box1 = Box.make!(:filled, institution: institution, purpose: "LOD")
+      box2 = Box.make!(:filled, institution: institution, purpose: "Variants")
 
       expect do
         post :create, params: {
