@@ -109,7 +109,7 @@ class TransferPackagesController < ApplicationController
   end
 
   def available_institutions
-    Institution.where.not(id: @transfer_package.sender_institution.id)
+    Institution.where.not(id: @transfer_package.sender_institution.id).order(:name)
   end
 
   def boxes_data(boxes)
