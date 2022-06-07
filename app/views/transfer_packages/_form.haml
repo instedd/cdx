@@ -1,5 +1,6 @@
 = cdx_form_for(@transfer_package) do |f|
-  = f.form_field :uuid, value: f.object.uuid
+  - if f.object.persisted?
+    = f.form_field :uuid, value: f.object.uuid
 
   = f.form_field :receiver_institution do
     - if @can_update

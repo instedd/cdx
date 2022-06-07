@@ -36,6 +36,10 @@
     %div
       = render partial: 'boxes/preview', layout: 'shared/list', collection: @transfer_package.boxes.count_samples, as: :box
 
+  - if @can_confirm
+    = f.form_actions do
+      = f.submit "Confirm Transfer", formaction: confirm_transfer_package_path(@transfer_package), class: "btn-primary", id: "btn-save"
+
 - if @transfer_package.sender?
   .row
     .col

@@ -80,32 +80,9 @@ RSpec.describe TransferPackage, type: :model do
     end
   end
 
-  describe "#confirm" do
-    it "sets confirmed_at" do
-      transfer = TransferPackage.make
-      expect(transfer).not_to be_confirmed
-
-      Timecop.freeze(Time.now.change(usec: 0)) do
-        expect(transfer.confirm).to be true
-        expect(transfer.confirmed_at).to eq Time.now
-      end
-
-      expect(transfer).to be_confirmed
-      expect(transfer).to be_changed
-    end
-
-    it "returns false if already confirmed" do
-      transfer = TransferPackage.make(:confirmed)
-
-      expect {
-        expect(transfer.confirm).to be false
-      }.not_to change { transfer.confirmed_at }
-    end
-  end
-
   describe "#confirm!" do
     it "sets confirmed_at" do
-      transfer = TransferPackage.make
+      transfer = TransferPackage.make!
       expect(transfer).not_to be_confirmed
 
       Timecop.freeze(Time.now.change(usec: 0)) do
@@ -113,8 +90,11 @@ RSpec.describe TransferPackage, type: :model do
         expect(transfer.confirmed_at).to eq Time.now
       end
 
+      transfer.reload
       expect(transfer).to be_confirmed
       expect(transfer).not_to be_changed
+      expect(transfer.boxes.map(&:institution)).to eq [transfer.receiver_institution]
+      expect(transfer.samples.map(&:institution)).to eq [transfer.receiver_institution, transfer.receiver_institution]
     end
 
     it "raises if already confirmed" do
