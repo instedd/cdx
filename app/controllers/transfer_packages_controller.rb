@@ -92,7 +92,7 @@ class TransferPackagesController < ApplicationController
       .find(params[:id])
     @transfer_package = TransferPackagePresenter.new(transfer_package, @navigation_context)
 
-    return unless authorize_resource(confirmation_resource(transfer_package.boxes.take), UPDATE_BOX)
+    return unless authorize_resource(confirmation_resource(transfer_package), UPDATE_BOX)
 
     if transfer_package.confirmed?
       flash[:info] = "Transfer had already been confirmed."
@@ -144,10 +144,10 @@ class TransferPackagesController < ApplicationController
     }
   end
 
-  def confirmation_resource(box)
+  def confirmation_resource(transfer_package)
     {
       resource_type: "box",
-      resource_id: box.id,
+      resource_id: transfer_package.boxes.take.id,
       institution_id: @navigation_context.institution.id,
       site_id: @navigation_context.site.try(&:uuid),
     }
