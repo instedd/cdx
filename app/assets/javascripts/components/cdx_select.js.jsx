@@ -25,7 +25,9 @@ var CdxSelect = React.createClass({
   // To counter this problem, we copy the typed value, so what we send to the
   // backend reflects what's visible in the UI.
   onInputChange: function (newValue) {
-    this.selectRef.setValue(newValue)
+    // we can't use setValue() because it has too many side effects, we only
+    // want to set the hidden input's value:
+    this.selectRef.setState({ value: newValue });
   },
 
   render: function() {
