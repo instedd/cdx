@@ -105,6 +105,17 @@ RSpec.describe TransferPackagesController, type: :controller do
         get :show, params: { id: transfer_other.id }
       }.to raise_exception(ActiveRecord::RecordNotFound)
     end
+
+    it "doesn't show confirm button when not authorized" do
+      limited_user = User.make!
+      grant user, limited_user, @institution, READ_INSTITUTION
+      sign_in limited_user
+
+      get :show, params: { id: transfer_in.id }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include("Confirm Transfer")
+    end
   end
 
   describe "GET #find_box" do
