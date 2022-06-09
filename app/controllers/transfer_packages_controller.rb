@@ -41,7 +41,7 @@ class TransferPackagesController < ApplicationController
 
     @view_helper = view_helper({ save_back_path: true })
     @can_update = false
-    @can_confirm = !transfer_package.confirmed? && @transfer_package.receiver? && authorize_resource(confirmation_resource(transfer_package), UPDATE_BOX)
+    @can_confirm = !transfer_package.confirmed? && @transfer_package.receiver? && authorize_resource?(confirmation_resource(transfer_package), UPDATE_BOX)
   end
 
   def new
