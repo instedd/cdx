@@ -224,13 +224,12 @@ RSpec.describe SamplesController, type: :controller do
         assert_select "input[name='sample[virus_lineage]']", count: 0
       end
 
-      xit "blinds values when box is blinded (Other)" do
+      it "blinds values when box is blinded (Other)" do
         Box.make! institution: institution, samples: [sample], purpose: "Other", blinded: true
 
         get :show, params: { id: sample.to_param }
         expect(response).to have_http_status(:ok)
 
-        # TODO: which columns are expected to be blinded?
         expect(response.body).to include("Blinded value")
         expect(response.body).to_not include(batch.batch_number)
         assert_select "input[name='sample[concentration_number]']", count: 0

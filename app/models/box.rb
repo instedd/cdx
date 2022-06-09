@@ -95,10 +95,8 @@ class Box < ApplicationRecord
       %i[concentration concentration_formula replicate]
     when "Variants"
       %i[batch_number virus_lineage]
-    when "Challenge"
+    when "Challenge", "Other"
       %i[batch_number concentration concentration_formula replicate virus_lineage]
-    when "Other"
-      []
     else
       []
     end

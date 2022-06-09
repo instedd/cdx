@@ -197,18 +197,17 @@ RSpec.describe BoxesController, type: :controller do
       end
     end
 
-    xit "blinds columns for Other purpose" do
+    it "blinds columns for Other purpose" do
       box = Box.make! :filled, institution: institution, purpose: "Other", blinded: true
 
       get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
 
-      # TODO: which columns should be blinded?
       CSV.parse(response.body).tap(&:shift).each do |row|
-        # expect(row[3]).to eq("Blinded")
-        # expect(row[4]).to eq("Blinded")
-        # expect(row[5]).to eq("Blinded")
-        # expect(row[7]).to eq("Blinded")
+        expect(row[3]).to eq("Blinded")
+        expect(row[4]).to eq("Blinded")
+        expect(row[5]).to eq("Blinded")
+        expect(row[7]).to eq("Blinded")
       end
     end
   end
