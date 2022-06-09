@@ -86,7 +86,7 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
     super(record_name, record_object, objectify_options(fields_options)) do |form|
       # Clear errors that are handeld in the nested form
       form.errors_to_show.each do |nested_key|
-        errors_to_show.delete("#{record_name}.#{nested_key}")
+        errors_to_show.delete("#{record_name}.#{nested_key}".to_sym)
       end
 
       block.call(form)

@@ -89,9 +89,11 @@ RSpec.describe CdxFormHelper, type: :helper do
   describe "#fields_for" do
     it "handles nested error messages" do
       bar = FooModel.new(bar: "baz")
-      model = FooModel.new(foo: "foo", bar: bar)
       bar.errors.add(:base, "Has an error")
       bar.errors.add(:bar, "has an error")
+      model = FooModel.new(bar: bar)
+      model.errors.add(:"bar.base", "Has an error")
+      model.errors.add(:"bar.bar", "has an error")
       cdx_form_for(model, url: "") do |form|
         expect(
           form.fields_for(:bar) do |foo_form|
