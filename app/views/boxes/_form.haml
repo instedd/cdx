@@ -7,7 +7,7 @@
           value: @box_form.purpose, submit: "#btn-save" }
 
       = f.form_field :media do
-        = cdx_select form: f, name: :media, searchable: false do |select|
+        = cdx_select form: f, name: :media, searchable: false, class: "input-large" do |select|
           - select.item "", " "
           - select.items Sample.media
 
@@ -41,6 +41,11 @@
                 = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
                   name: "box[batch_uuids][#{key}]", value: @box_form.batch_uuids[key],
                   placeholder: "Enter batch id", className: "input-block" }
+
+          %fieldset#Other(disabled)
+            = react_component "SamplesSelector", { url: autocomplete_samples_path(format: "json", context: params[:context], qc: 0),
+              name: "box[sample_uuids]", samples: samples_data(@box_form.samples), placeholder: "Enter sample id", className: "input-block" }
+            /= f.field_errors :"box.samples"
 
   = f.form_actions do
     = f.submit 'Save', class: 'btn-primary', id: 'btn-save'

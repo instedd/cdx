@@ -139,6 +139,7 @@ entities:
           - LOD
           - Variants
           - Challenge
+          - Other
   test: &TEST
     allows_custom: true
     fields:

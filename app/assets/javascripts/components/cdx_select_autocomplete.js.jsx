@@ -1,4 +1,10 @@
 var CdxSelectAutocomplete = React.createClass({
+  getInitialState: function () {
+    return {
+      options: null,
+    };
+  },
+
   render: function () {
     return (<Select
       className={this.props.className}
@@ -7,7 +13,9 @@ var CdxSelectAutocomplete = React.createClass({
       placeholder={this.props.placeholder}
       searchable={true}
       clearable={true}
-      asyncOptions={this.asyncOptions.bind(this)}
+      asyncOptions={this.asyncOptions}
+      value={this.props.value || ""}
+      onChange={this.onChange}
     />);
   },
 
@@ -17,7 +25,7 @@ var CdxSelectAutocomplete = React.createClass({
     }
 
     var url = this.props.url;
-    url += (url.includes("?") ? "&query=" : "?query=") + encodeURIComponent(query);
+    url += (url.includes("?") ? "&query=" : "?query=") + encodeURIComponent(query.trim());
 
     $.ajax({
       type: this.props.method || "GET",
@@ -34,5 +42,11 @@ var CdxSelectAutocomplete = React.createClass({
         callback(error);
       },
     })
+  },
+
+  onChange: function (value, options) {
+    if (this.props.onSelect) {
+      this.props.onSelect.call(null, value, options);
+    }
   },
 });

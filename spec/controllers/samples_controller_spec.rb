@@ -88,6 +88,34 @@ RSpec.describe SamplesController, type: :controller do
     end
   end
 
+  context "autocomplete" do
+    before do
+      Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], specimen_role: "q"
+      Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '89101112-8ce1-a0c8-ac1b-58bed3633e88')], specimen_role: "b"
+      Sample.make! institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '89141516-8ce1-a0c8-ac1b-58bed3633e00')], specimen_role: "q"
+    end
+
+    it "autocompletes sample uuid" do
+      get :autocomplete, params: { query: "01", format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(1)
+
+      get :autocomplete, params: { query: "891", format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(2)
+    end
+
+    it "skips quality control samples" do
+      get :autocomplete, params: { query: "01", qc: "0", format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(0)
+
+      get :autocomplete, params: { query: "891", qc: "0", format: "json" }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(1)
+    end
+  end
+
   context "edit_or_show" do
     let!(:sample) do
       Sample.make! institution: institution, sample_identifiers: [
@@ -188,6 +216,21 @@ RSpec.describe SamplesController, type: :controller do
         get :show, params: { id: sample.to_param }
         expect(response).to have_http_status(:ok)
 
+        expect(response.body).to include("Blinded value")
+        expect(response.body).to_not include(batch.batch_number)
+        assert_select "input[name='sample[concentration_number]']", count: 0
+        assert_select "input[name='sample[concentration_exponent]']", count: 0
+        assert_select "input[name='sample[replicate]']", count: 0
+        assert_select "input[name='sample[virus_lineage]']", count: 0
+      end
+
+      xit "blinds values when box is blinded (Other)" do
+        Box.make! institution: institution, samples: [sample], purpose: "Other", blinded: true
+
+        get :show, params: { id: sample.to_param }
+        expect(response).to have_http_status(:ok)
+
+        # TODO: which columns are expected to be blinded?
         expect(response.body).to include("Blinded value")
         expect(response.body).to_not include(batch.batch_number)
         assert_select "input[name='sample[concentration_number]']", count: 0
