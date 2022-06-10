@@ -36,7 +36,7 @@
               %td.col-recipient= transfer.recipient
               - if confirmed_at = transfer.confirmed_at
                 %td.col-state.text-right{title: "#{transfer.receiver_institution} confirmed receipt on #{I18n.l(confirmed_at)}"}
-                  Recieved
+                  Received
                   = time_tag confirmed_at, I18n.l(confirmed_at, format: I18n.t("date.formats.long"))
                 %td{style: "padding-left: 0;"}
                   %span.icon-tick.icon-text-color{style: "vertical-align: bottom;"}

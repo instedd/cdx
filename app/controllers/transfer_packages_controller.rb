@@ -95,14 +95,14 @@ class TransferPackagesController < ApplicationController
     return unless authorize_resource(confirmation_resource(transfer_package), UPDATE_BOX)
 
     if transfer_package.confirmed?
-      flash[:info] = "Transfer had already been confirmed."
-      redirect_to transfer_package
+      flash[:notice] = "Transfer had already been confirmed."
+      redirect_to transfer_packages_path
       return
     end
 
     transfer_package.confirm!
-    flash[:success] = "Transfer has been confirmed."
-    redirect_to transfer_package
+    flash[:notice] = "Transfer has been confirmed."
+    redirect_to transfer_packages_path
   end
 
   def unblind
