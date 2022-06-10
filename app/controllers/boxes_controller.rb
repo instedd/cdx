@@ -1,5 +1,6 @@
 class BoxesController < ApplicationController
   before_action :load_box, except: %i[index new create bulk_destroy]
+  helper_method :samples_data
 
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_BOX)
@@ -59,6 +60,7 @@ class BoxesController < ApplicationController
 
     @box_form = BoxForm.build(@navigation_context, box_params)
     @box_form.batches = check_access(load_batches, READ_BATCH)
+    @box_form.samples = check_access(load_samples, READ_SAMPLE)
 
     if @box_form.valid?
       @box_form.build_samples
@@ -106,13 +108,31 @@ class BoxesController < ApplicationController
       .where(uuid: @box_form.batch_uuids.values.reject(&:blank?))
   end
 
+  def load_samples
+    Sample
+      .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+      .find_all_by_any_uuid(@box_form.sample_uuids.values.reject(&:blank?))
+  end
+
   def box_params
     if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 0
       params.require(:box).permit(:purpose, :media).tap do |allowed|
-        allowed[:batch_uuids] = params[:box][:batch_uuids].permit!
+        allowed[:batch_uuids] = params[:box][:batch_uuids].try(&:permit!)
+        allowed[:sample_uuids] = params[:box][:sample_uuids].try(&:permit!)
       end
     else
-      params.require(:box).permit(:purpose, :media, batch_uuids: {})
+      params.require(:box).permit(:purpose, :media, batch_uuids: {}, sample_uuids: [])
+    end
+  end
+
+  def samples_data(samples)
+    # NOTE: duplicates the samples/autocomplete template (but returns an
+    # Array<Hash> instead of rendering to a JSON String)
+    samples.map do |sample|
+      {
+        uuid: sample.uuid,
+        batch_number: sample.batch_number,
+      }
     end
   end
 end

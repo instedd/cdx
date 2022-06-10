@@ -84,6 +84,8 @@ class Sample < ApplicationRecord
     joins(:sample_identifiers).order("sample_identifiers.uuid")
   }
 
+  scope :without_qc, -> { where.not(specimen_role: "q") }
+
   def self.media
     entity_fields.find { |f| f.name == 'media' }.options
   end

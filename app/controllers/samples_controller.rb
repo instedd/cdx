@@ -25,6 +25,20 @@ class SamplesController < ApplicationController
       .preload(:batch, :sample_identifiers)
   end
 
+  def autocomplete
+    samples = Sample
+      .where(institution: @navigation_context.institution)
+      .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+
+    samples = samples.without_qc if params[:qc] == "0"
+
+    @samples = check_access(samples, READ_SAMPLE)
+      .joins(:sample_identifiers)
+      .autocomplete(params[:query])
+      .limit(10)
+      .preload(:batch)
+  end
+
   def edit_or_show
     sample = Sample.find(params[:id])
 

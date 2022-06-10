@@ -8,7 +8,7 @@
     .samples-row
       .samples-item
         = sample.uuid
-      .sample-row-actions
+      .samples-row-actions
         - if sample.is_quality_control?
           .icon-test.icon-gray{title: 'Q - Control specimen'}
         = link_to sample_path(sample.id) do

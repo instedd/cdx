@@ -40,6 +40,7 @@ RSpec.describe BoxesController, type: :controller do
         Box.make!(3, :filled, institution: @institution, purpose: "LOD")
         Box.make!(2, :filled, institution: @institution, purpose: "Variants")
         Box.make!(4, :filled, institution: @institution, purpose: "Challenge")
+        Box.make!(1, :filled, institution: @institution, purpose: "Other")
       end
 
       it "paginates" do
@@ -73,6 +74,9 @@ RSpec.describe BoxesController, type: :controller do
 
         get :index, params: { purpose: "Challenge" }
         expect(assigns(:boxes).count).to eq(4)
+
+        get :index, params: { purpose: "Other" }
+        expect(assigns(:boxes).count).to eq(1)
       end
     end
   end
@@ -181,6 +185,20 @@ RSpec.describe BoxesController, type: :controller do
 
     it "blinds columns for Challenge purpose" do
       box = Box.make! :filled, institution: institution, purpose: "Challenge", blinded: true
+
+      get :inventory, params: { id: box.id, format: "csv" }
+      expect(response).to have_http_status(:ok)
+
+      CSV.parse(response.body).tap(&:shift).each do |row|
+        expect(row[3]).to eq("Blinded")
+        expect(row[4]).to eq("Blinded")
+        expect(row[5]).to eq("Blinded")
+        expect(row[7]).to eq("Blinded")
+      end
+    end
+
+    it "blinds columns for Other purpose" do
+      box = Box.make! :filled, institution: institution, purpose: "Other", blinded: true
 
       get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
@@ -426,6 +444,56 @@ RSpec.describe BoxesController, type: :controller do
           } }
           expect(response).to redirect_to(boxes_path)
         end.to change(institution.samples, :count).by(63)
+      end
+    end
+
+    describe "Other purpose" do
+      it "creates with samples" do
+        samples = Sample.make! 2, :filled, institution: institution, specimen_role: "b"
+
+        expect do
+          expect do
+            post :create, params: { box: {
+              purpose: "Other",
+              sample_uuids: {
+                "sample_0" => samples[0].uuid,
+                "sample_1" => samples[1].uuid,
+              }
+            } }
+            expect(response).to redirect_to(boxes_path)
+          end.to change(institution.samples, :count).by(0)
+        end.to change(institution.boxes, :count).by(1)
+
+        expect(Box.last.samples.map(&:uuid).sort).to eq(samples.map(&:uuid).sort)
+      end
+
+      it "won't create with QC samples" do
+        samples = [
+          Sample.make!(:filled, institution: institution, specimen_role: "b"),
+          Sample.make!(:filled, institution: institution, specimen_role: "q"),
+        ]
+
+        expect do
+          expect do
+            post :create, params: { box: {
+              purpose: "Other",
+              sample_uuids: {
+                "sample_0" => samples[0].uuid,
+                "sample_1" => samples[1].uuid,
+              }
+            } }
+            expect(response).to have_http_status(:unprocessable_entity)
+          end.to change(institution.samples, :count).by(0)
+        end.to change(institution.boxes, :count).by(0)
+      end
+
+      it "requires at least 1 sample" do
+        expect do
+          expect do
+            post :create, params: { box: { purpose: "Other", sample_uuids: {} } }
+            expect(response).to have_http_status(:unprocessable_entity)
+          end.to change(institution.samples, :count).by(0)
+        end.to change(institution.boxes, :count).by(0)
       end
     end
   end

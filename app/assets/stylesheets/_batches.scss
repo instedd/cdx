@@ -69,6 +69,11 @@
   align-items: center;
   min-height: 40px;
 }
+.samples-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 .transfer-data {
   color: black;
