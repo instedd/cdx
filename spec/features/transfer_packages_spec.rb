@@ -59,17 +59,18 @@ describe "transfer packages" do
         page.confirm_button.click
       end
 
+      expect_page ListTransferPackagesPage do |page|
+        entry = page.entries.first
+        expect(entry.state).to have_text("Received")
+        entry.uuid.click
+      end
+
       expect_page ShowTransferPackagePage do |page|
         expect(page).to have_content("Transfer Details")
 
         expect(page).to have_content("Sent on")
         expect(page).to have_content("Confirmed on")
         expect(page).not_to have_confirm_button
-      end
-
-      goto_page ListTransferPackagesPage do |page|
-        entry = page.entries.first
-        expect(entry.state).to have_text("Recieved")
       end
     end
 

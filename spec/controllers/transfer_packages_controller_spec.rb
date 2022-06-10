@@ -470,9 +470,9 @@ RSpec.describe TransferPackagesController, type: :controller do
     it "confirms transfer package" do
       transfer = TransferPackage.make!(receiver_institution: institution)
 
-      put :confirm, params: {
-                      id: transfer.id,
-                    }
+      put :confirm, params: { id: transfer.id }
+      expect(response).to redirect_to(transfer_packages_path)
+      expect(flash[:notice]).to eq("Transfer has been confirmed.")
 
       transfer.reload
       expect(transfer).to be_confirmed
@@ -483,20 +483,16 @@ RSpec.describe TransferPackagesController, type: :controller do
     it "ignores confirmed transfer package" do
       transfer = TransferPackage.make!(:confirmed, receiver_institution: institution)
 
-      put :confirm, params: {
-                      id: transfer.id,
-                    }
-      expect(response).to redirect_to(transfer_package_path(transfer))
-      expect(flash[:info]).to eq("Transfer had already been confirmed.")
+      put :confirm, params: { id: transfer.id }
+      expect(response).to redirect_to(transfer_packages_path)
+      expect(flash[:notice]).to eq("Transfer had already been confirmed.")
     end
 
     it "sender can't confirm" do
       transfer = TransferPackage.make!(:confirmed, sender_institution: institution)
 
       expect do
-        put :confirm, params: {
-                        id: transfer.id,
-                      }
+        put :confirm, params: { id: transfer.id }
       end.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
