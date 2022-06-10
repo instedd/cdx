@@ -126,10 +126,12 @@ class BoxesController < ApplicationController
   end
 
   def samples_data(samples)
+    # NOTE: duplicates the samples/autocomplete template (but returns an
+    # Array<Hash> instead of rendering to a JSON String)
     samples.map do |sample|
       {
-        value: sample.uuid,
-        label: "#{sample.uuid} (#{sample.batch_number})",
+        uuid: sample.uuid,
+        batch_number: sample.batch_number,
       }
     end
   end

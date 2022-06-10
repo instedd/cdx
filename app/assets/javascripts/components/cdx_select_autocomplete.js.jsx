@@ -25,6 +25,7 @@ var CdxSelectAutocomplete = React.createClass({
     if (!query) return callback(null, []);
 
     var autoselect = this.props.autoselect;
+    var prepareOptions = this.props.prepareOptions;
     var url = this.props.url;
     url += (url.includes("?") ? "&query=" : "?query=") + encodeURIComponent(query);
 
@@ -33,6 +34,9 @@ var CdxSelectAutocomplete = React.createClass({
       url: url,
 
       success: function (options) {
+        if (prepareOptions) {
+          options = prepareOptions.call(null, options);
+        }
         callback(null, {
           options: options,
           complete: options.size < 10,

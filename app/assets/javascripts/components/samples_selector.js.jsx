@@ -8,7 +8,7 @@ var SamplesSelector = React.createClass({
   render: function () {
     return (<div className="samples-selector">
       {this.renderTitle()}
-      {this.state.samples.map(this.renderSample.bind(this))}
+      {this.state.samples.map(this.renderSample)}
 
       <a className="add-samples" href="#" onClick={this.addSample}>
         <div className="add-samples">
@@ -37,7 +37,7 @@ var SamplesSelector = React.createClass({
       function removeSample(event) {
         this.removeSample(event, index);
       }
-      return (<div className="batches-samples">
+      return (<div className="batches-samples" key={"samples-selector-" + index}>
         <div className="samples-row">
           <div className="samples-item">{sample.uuid}</div>
           <div className="samples-row-actions">
@@ -53,20 +53,28 @@ var SamplesSelector = React.createClass({
       function selectSample(_, options) {
         this.selectSample(index, options && options[0]);
       }
-      return (<div className="batches-samples">
+      return (<div className="batches-samples" key={"samples-selector-" + index}>
         <div className="samples-row">
           <CdxSelectAutocomplete
-            key={"samples-selector-" + index}
             className={this.props.className}
             url={this.props.url}
             placeholder={this.props.placeholder}
             value={sample.uuid}
+            prepareOptions={this.prepareOptions}
             autoselect={true}
             onSelect={selectSample.bind(this)}
           />
         </div>
       </div>);
     }
+  },
+
+  prepareOptions: function (options) {
+    return options.map(function (option) {
+      option.value = option.uuid;
+      option.label = option.uuid + " (" + option.batch_number + ")";
+      return option;
+    });
   },
 
   addSample: function (event) {
