@@ -78,11 +78,34 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
     end
   end
 
-  private
+  def fields_for(record_name, record_object = nil, fields_options = {}, &block)
+    if record_object.nil? && @object.respond_to?(record_name)
+      record_object = @object.send(record_name)
+    end
+
+    super(record_name, record_object, objectify_options(fields_options)) do |form|
+      # Clear errors that are handeld in the nested form
+      form.errors_to_show.each do |nested_key|
+        errors_to_show.delete("#{record_name}.#{nested_key}".to_sym)
+      end
+
+      block.call(form)
+
+      @template.concat form.form_errors
+    end
+  end
+
+  def has_error?(attr_name)
+    errors_to_show.include?(attr_name.to_sym)
+  end
+
+  protected
 
   def errors_to_show
     @errors_to_show ||= @object.errors.keys
   end
+
+  private
 
   def error_messages_to_show
     Hash[errors_to_show.map do |attribute|
