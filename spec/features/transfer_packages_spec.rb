@@ -105,6 +105,16 @@ describe "transfer packages" do
           expect(page).to have_content("No box found")
         end
       end
+
+      it "trims whitespace UUID" do
+        box = Box.make!(:filled, institution: institution_a)
+
+        goto_page NewTransferPackagePage do |page|
+          page.box_search.native.send_keys "  #{box.uuid}  "
+          page.wait_until_box_search_visible
+          expect(page.selected_box_uuids).to eq [box.uuid]
+        end
+      end
     end
   end
 end

@@ -66,7 +66,7 @@ var BoxSelector = React.createClass({
   },
 
   handleChange: function(e) {
-    let search = e.target.value;
+    let search = e.target.value.trim();
 
     this.setState({ search: search });
 
