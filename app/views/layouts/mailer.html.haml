@@ -1,11 +1,6 @@
 %html
   %head
-    - if Rails.env.development?
-      -# https://github.com/fphilipe/premailer-rails/issues/108
-      :css
-        #{Rails.application.assets.find_asset('mailer.css').body}
-    - else
-      = stylesheet_link_tag "mailer", :media => "all"
+    = stylesheet_link_tag "mailer", :media => "all"
   %body
     .container
       .email-logo.centered
