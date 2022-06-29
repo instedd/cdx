@@ -196,19 +196,27 @@ $(document).ready(function(){
 });
 
 $(document).on("click", ".btn-copy", function(e) {
+  e.preventDefault();
+
   var copyBtn = $(this);
-  var element = copyBtn.prev(".copy-content")[0];
+  var element = copyBtn.prev("input, .copy-content");
   var selection = window.getSelection();
 
   //copy to clipboard
-  element.innerText = element.innerText.trim();
-  selection.selectAllChildren(element);
-  document.execCommand("copy");
-  selection.removeAllRanges();
+  if( element.hasClass("copy-content") ) {
+    element[0].innerText = element[0].innerText.trim();
+    selection.selectAllChildren(element[0]);
+    document.execCommand("copy");
+    selection.removeAllRanges();
+  } else {
+    element.select();
+    document.execCommand("copy");
+    element.blur();
+  }
 
   // tooltip
   if( copyBtn.find(".ttext").length == 0 )
-    copyBtn.append('<span class="ttext"><i class="icon-tick"></i> Copied</span>');
+    copyBtn.append('<span class="ttext ttimer2"><i class="icon-tick"></i> Copied</span>');
 
   //timer
   var timer = 0;
@@ -217,7 +225,6 @@ $(document).on("click", ".btn-copy", function(e) {
     copyBtn.find(".ttext").remove();
   }, 2000 );
 
-  e.preventDefault();
 });
 $(document).on("click", ".copy-content", function() {
   $(this).next(".btn-copy").click();

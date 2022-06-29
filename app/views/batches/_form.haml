@@ -3,6 +3,7 @@
     .col
       = f.form_field :batch_number do
         = f.text_field :batch_number, readonly: !@can_update
+        %button.icon-copy.btn-copy.ttip
 
       = f.form_field :date_produced do
         = f.date_field :date_produced, readonly: !@can_update
