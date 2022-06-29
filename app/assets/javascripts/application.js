@@ -215,15 +215,12 @@ $(document).on("click", ".btn-copy", function(e) {
   }
 
   // tooltip
-  if( copyBtn.find(".ttext").length == 0 )
+  if( copyBtn.find(".ttext").length == 0 ) {
     copyBtn.append('<span class="ttext ttimer2"><i class="icon-tick"></i> Copied</span>');
-
-  //timer
-  var timer = 0;
-  clearTimeout( timer );
-  timer = setTimeout( function() {
-    copyBtn.find(".ttext").remove();
-  }, 2000 );
+    var timer = setTimeout( function() {
+      copyBtn.find(".ttext").remove();
+    }, 2000 );
+  }
 
 });
 $(document).on("click", ".copy-content", function() {
