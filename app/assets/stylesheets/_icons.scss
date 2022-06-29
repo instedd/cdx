@@ -1,0 +1,199 @@
+@mixin icon-color($color, $important: null) {
+  @if red($color) == green($color) and red($color) == blue($color) {
+    // black to grayscale
+    filter: invert(1) brightness(100% / 255 * red($color));
+  } @else {
+    // black to color
+    filter: invert(1) brightness(50%) sepia(100%) saturate(10000%)
+      hue-rotate(hue($color))
+      saturate(100% + saturation($color))
+      brightness(100% + lightness($color))
+      $important;
+  }
+
+  @if alpha($color) != 1 {
+    opacity: alpha($color) $important;
+  }
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  display: inline-block;
+  content: " ";
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  line-height: 1;
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+
+  &.bigger {
+    width: 24px;
+    height: 24px;
+    background-size: 24px 24px;
+  }
+
+  &.medium {
+    width: 35px;
+    height: 35px;
+    background-size: 35px 35px;
+  }
+
+  &.xx-large {
+    width: 140px;
+    height: 140px;
+    background-size: 140px 140px;
+  }
+
+  &.icon-gray {
+    @include icon-color($gray-medium);
+  }
+  &.icon-gray-light {
+    @include icon-color($gray-light);
+  }
+  &.icon-white {
+    @include icon-color($white);
+  }
+  &.icon-blue {
+    @include icon-color($blue);
+  }
+  &.icon-blue-important {
+    @include icon-color($blue, !important);
+  }
+  &.icon-red {
+    @include icon-color($red);
+  }
+  &.icon-red-important {
+    @include icon-color($red, !important);
+  }
+
+  // &.icon-text-color {
+  //   color: inherit;
+  // }
+}
+
+.icon-alert { background-image: asset-url('icons/alert.svg'); }
+.icon-algorithm { background-image: asset-url('icons/algorithm.svg'); }
+.icon-arrow-down { background-image: asset-url('icons/arrow-down.svg'); }
+.icon-arrow-left { background-image: asset-url('icons/arrow-left.svg'); }
+.icon-arrow-right { background-image: asset-url('icons/arrow-right.svg'); }
+.icon-arrow-up { background-image: asset-url('icons/arrow-up.svg'); }
+.icon-bell { background-image: asset-url('icons/bell.svg'); }
+.icon-building { background-image: asset-url('icons/building.svg'); }
+.icon-cartridge { background-image: asset-url('icons/cartridge.svg'); }
+.icon-checkbox-outline { background-image: asset-url('icons/checkbox-outline.svg'); }
+.icon-checkbox-selected { background-image: asset-url('icons/checkbox-selected.svg'); }
+.icon-expand { background-image: asset-url('icons/expand.svg'); }
+.icon-collpase { background-image: asset-url('icons/collpase.svg'); }
+.icon-circle-minus { background-image: asset-url('icons/circle-minus.svg'); }
+.icon-circle-plus { background-image: asset-url('icons/circle-plus.svg'); }
+.icon-close { background-image: asset-url('icons/close.svg'); }
+.icon-comment { background-image: asset-url('icons/comment.svg'); }
+.icon-copy { background-image: asset-url('icons/copy.svg'); }
+.icon-culture { background-image: asset-url('icons/culture.svg'); }
+.icon-document { background-image: asset-url('icons/document.svg'); }
+.icon-download { background-image: asset-url('icons/download.svg'); }
+.icon-earth { background-image: asset-url('icons/earth.svg'); }
+.icon-info-outline { background-image: asset-url('icons/info-outline.svg'); }
+.icon-ellipsis { background-image: asset-url('icons/ellipsis.svg'); }
+.icon-error { background-image: asset-url('icons/error.svg'); }
+.icon-ethernet { background-image: asset-url('icons/ethernet.svg'); }
+.icon-eye { background-image: asset-url('icons/eye.svg'); }
+.icon-forward { background-image: asset-url('icons/forward.svg'); }
+.icon-help { background-image: asset-url('icons/help.svg'); }
+.icon-horizontal-thumb-outline { background-image: asset-url('icons/horizontal-thumb-outline.svg'); }
+.icon-horizontal-thumb-fill { background-image: asset-url('icons/horizontal-thumb-fill.svg'); }
+.icon-info { background-image: asset-url('icons/info.svg'); }
+.icon-ink-dropper { background-image: asset-url('icons/ink-dropper.svg'); }
+.icon-key { background-image: asset-url('icons/key.svg'); }
+.icon-keyboard-arrow-down { background-image: asset-url('icons/keyboard-arrow-down.svg'); }
+.icon-keyboard-arrow-left { background-image: asset-url('icons/keyboard-arrow-left.svg'); }
+.icon-keyboard-arrow-right { background-image: asset-url('icons/keyboard-arrow-right.svg'); }
+.icon-keyboard-arrow-up { background-image: asset-url('icons/keyboard-arrow-up.svg'); }
+.icon-link { background-image: asset-url('icons/link.svg'); }
+.icon-location { background-image: asset-url('icons/location.svg'); }
+.icon-lock { background-image: asset-url('icons/lock.svg'); }
+.icon-mail { background-image: asset-url('icons/mail.svg'); }
+.icon-map { background-image: asset-url('icons/map.svg'); }
+.icon-mask { background-image: asset-url('icons/mask.svg'); }
+.icon-microscope { background-image: asset-url('icons/microscope.svg'); }
+.icon-circle-minus-outline { background-image: asset-url('icons/circle-minus-outline.svg'); }
+.icon-circle-plus-outline { background-image: asset-url('icons/circle-plus-outline.svg'); }
+.icon-patient { background-image: asset-url('icons/patient.svg'); }
+.icon-pencil { background-image: asset-url('icons/pencil.svg'); }
+.icon-plus { background-image: asset-url('icons/plus.svg'); }
+.icon-power { background-image: asset-url('icons/power.svg'); }
+.icon-print { background-image: asset-url('icons/print.svg'); }
+.icon-punchcard { background-image: asset-url('icons/punchcard.svg'); }
+.icon-radio-button-outline { background-image: asset-url('icons/radio-button-outline.svg'); }
+.icon-radio-button-selected { background-image: asset-url('icons/radio-button-selected.svg'); }
+.icon-refresh { background-image: asset-url('icons/refresh.svg'); }
+.icon-search { background-image: asset-url('icons/search.svg'); }
+.icon-strip { background-image: asset-url('icons/strip.svg'); }
+.icon-table { background-image: asset-url('icons/table.svg'); }
+.icon-tag { background-image: asset-url('icons/tag.svg'); }
+.icon-test-tube { background-image: asset-url('icons/test-tube.svg'); }
+.icon-test { background-image: asset-url('icons/test.svg'); }
+.icon-ascending { background-image: asset-url('icons/ascending.svg'); }
+.icon-descending { background-image: asset-url('icons/descending.svg'); }
+.icon-tick { background-image: asset-url('icons/tick.svg'); }
+.icon-time-span { background-image: asset-url('icons/time-span.svg'); }
+.icon-trash { background-image: asset-url('icons/trash.svg'); }
+.icon-trend { background-image: asset-url('icons/trend.svg'); }
+.icon-break { background-image: asset-url('icons/break.svg'); }
+.icon-update { background-image: asset-url('icons/update.svg'); }
+.icon-upload { background-image: asset-url('icons/upload.svg'); }
+.icon-user { background-image: asset-url('icons/user.svg'); }
+.icon-wrap { background-image: asset-url('icons/wrap.svg'); }
+.icon-wrench { background-image: asset-url('icons/wrench.svg'); }
+.icon-outline-alert { background-image: asset-url('icons/outline-alert.svg'); }
+.icon-outline-algorithm { background-image: asset-url('icons/outline-algorithm.svg'); }
+.icon-outline-category { background-image: asset-url('icons/outline-category.svg'); }
+.icon-outline-device { background-image: asset-url('icons/outline-device.svg'); }
+.icon-outline-email { background-image: asset-url('icons/outline-email.svg'); }
+.icon-outline-female-avatar { background-image: asset-url('icons/outline-female-avatar.svg'); }
+.icon-outline-instructions { background-image: asset-url('icons/outline-instructions.svg'); }
+.icon-outline-lock { background-image: asset-url('icons/outline-lock.svg'); }
+.icon-outline-male-avatar { background-image: asset-url('icons/outline-male-avatar.svg'); }
+.icon-outline-patient { background-image: asset-url('icons/outline-patient.svg'); }
+.icon-outline-picture { background-image: asset-url('icons/outline-picture.svg'); }
+.icon-outline-report { background-image: asset-url('icons/outline-report.svg'); }
+.icon-outline-role { background-image: asset-url('icons/outline-role.svg'); }
+.icon-outline-search { background-image: asset-url('icons/outline-search.svg'); }
+.icon-outline-sharing-request { background-image: asset-url('icons/outline-sharing-request.svg'); }
+.icon-outline-site { background-image: asset-url('icons/outline-site.svg'); }
+.icon-outline-test { background-image: asset-url('icons/outline-test.svg'); }
+.icon-outline-user { background-image: asset-url('icons/outline-user.svg'); }
+.icon-send { background-image: asset-url('icons/send.svg'); }
+.icon-check_circle { background-image: asset-url('icons/check_circle.svg'); }
+.icon-transfer { background-image: asset-url('icons/transfer.svg'); }
+.icon-batch { background-image: asset-url('icons/batch.svg'); }
+.icon-outline-box { background-image: asset-url('icons/outline-box.svg'); }
+.icon-local_shipping { background-image: asset-url('icons/local_shipping.svg'); }
+.icon-visibility_off { background-image: asset-url('icons/visibility_off.svg'); }
+.icon-notification { background-image: asset-url('icons/notification.svg'); }
+
+// =============================================================================
+// DEPRECATED Icons for replacement
+// =============================================================================
+
+/*---------------------- Icons 20 x 20 black  ------------------------*/
+
+[class^="icond-"],
+[class*=" icond-"] {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  vertical-align: text-top;
+  background-image: image-url($icons-20x20-black);
+  background-repeat: no-repeat;
+
+  /*------------ Gray Icons --------------*/
+  &.icon-gray {
+    opacity: 0.4;
+  }
+}
+
+.icond-unify           {background-position:    -40px 0px};
+// .icond-separe          {background-position:    -60px 0px};
+// .icond-block           {background-position:   -100px 0px};
