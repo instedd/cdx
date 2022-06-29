@@ -194,3 +194,31 @@ $(document).ready(function(){
     e.stopPropagation();
   });
 });
+
+$(document).on("click", ".btn-copy", function(e) {
+  var copyBtn = $(this);
+  var element = copyBtn.prev(".copy-content")[0];
+  var selection = window.getSelection();
+
+  //copy to clipboard
+  element.innerText = element.innerText.trim();
+  selection.selectAllChildren(element);
+  document.execCommand("copy");
+  selection.removeAllRanges();
+
+  // tooltip
+  if( copyBtn.find(".ttext").length == 0 )
+    copyBtn.append('<span class="ttext"><i class="icon-tick"></i> Copied</span>');
+
+  //timer
+  var timer = 0;
+  clearTimeout( timer );
+  timer = setTimeout( function() {
+    copyBtn.find(".ttext").remove();
+  }, 2000 );
+
+  e.preventDefault();
+});
+$(document).on("click", ".copy-content", function() {
+  $(this).next(".btn-copy").click();
+});

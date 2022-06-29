@@ -7,7 +7,10 @@
             .icon-test.icon-blue
             = "VIEW QC INFO"
 
-      = f.form_field :uuid, value: f.object.uuid
+      = f.form_field :uuid do
+        %span.copy-content
+          = f.object.uuid
+        %button.icon-copy.btn-copy.ttip.ttimer2
 
       - if f.object.batch_number
         = f.form_field :batch_id, value: @sample_form.batch_number
