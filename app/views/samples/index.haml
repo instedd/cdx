@@ -35,8 +35,7 @@
               %th Inactivation
               %th Specimen Role
               %th Production Date
-              %th{ :class => "#{params["sort"] ? 'sorted' : ''}" }
-                = link_to "Modified", ( params["sort"] ? request.query_parameters.except(:sort) : request.query_parameters.merge({:sort => 'updated_at'}) )
+              %th= link_to "Modified", ( params["sort"] ? request.query_parameters.except(:sort) : request.query_parameters.merge({:sort => 'updated_at'}) ), :class => "#{params["sort"] ? 'ordered' : ''}"
 
           - t.tbody do
             - @samples.each do |sample|
