@@ -25,3 +25,10 @@
             = cdx_select name: "specimen_role", value: params["specimen_role"] do |specimen_role|
               - specimen_role.item "", "All specimen roles"
               - specimen_role.items Sample.specimen_roles.map{|item| {id: item[:id], description: item[:description].truncate(30) }}, :id, :description
+          .filter-group
+            .filter
+              %label.block Modified From
+              %input.input-large{type: "date", name: "updated_at_from", value: params["updated_at_from"]}
+            .filter
+              %label.block Modified To
+              %input.input-large{type: "date", name: "updated_at_to", value: params["updated_at_to"]}
