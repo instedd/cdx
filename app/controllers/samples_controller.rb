@@ -15,6 +15,7 @@ class SamplesController < ApplicationController
     @samples = @samples.where("specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
     @samples = @samples.where("updated_at >= ?", params[:updated_at_from].to_time) unless params[:updated_at_from].blank?
     @samples = @samples.where("updated_at <= ?", params[:updated_at_to].to_time) unless params[:updated_at_to].blank?
+    @samples = @samples.where("updated_at >= ?", params[:modified].to_time) unless params[:modified].blank?
     @samples = @samples.order( params[:sort] + ' DESC') unless params[:sort].blank?
 
     @institutions = Institution
