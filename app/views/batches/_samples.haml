@@ -6,9 +6,9 @@
       = "#{@batch_form.batch.samples.count} Samples"
   .actions
     = button_tag id: 'bulk_print', class: 'btn-link', name: 'bulk_action', value: 'print' do
-      .icon-print.btn-icon
+      = icon "print", class: "btn-icon"
     = button_tag id: 'bulk_destroy', class: 'btn-link' do
-      .icon-trash.btn-icon
+      = icon "trash", class: "btn-icon"
     = button_tag id: 'bulk_destroy_undo', class: 'btn-link hidden' do
       Undo
 

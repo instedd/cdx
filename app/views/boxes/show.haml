@@ -42,7 +42,7 @@
       .col.pe-3
         .inventory-button
           = link_to inventory_box_path(@box, format: "csv"), target: "_blank", class: 'btn-link' do
-            .icon-download.btn-icon
+            = icon "download", class: "btn-icon"
             %span Download inventory
       - if @box.blinded && !@box.transferred?
         .col.pe-3

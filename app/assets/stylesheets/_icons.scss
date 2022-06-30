@@ -26,22 +26,42 @@
   background-repeat: no-repeat;
   background-size: 20px 20px;
 
+  & > svg {
+    width: 20px;
+    height: 20px;
+  }
+
   &.bigger {
     width: 24px;
     height: 24px;
     background-size: 24px 24px;
+
+    & > svg {
+      width: 24px;
+      height: 24px;
+    }
   }
 
   &.medium {
     width: 35px;
     height: 35px;
     background-size: 35px 35px;
+
+    & > svg {
+      width: 35px;
+      height: 35px;
+    }
   }
 
   &.xx-large {
     width: 140px;
     height: 140px;
     background-size: 140px 140px;
+
+    & > svg {
+      width: 140px;
+      height: 140px;
+    }
   }
 
   &.icon-gray {
@@ -66,9 +86,11 @@
     @include icon-color($red, !important);
   }
 
-  // &.icon-text-color {
-  //   color: inherit;
-  // }
+  // NOTE: only works for embedded SVG icons (see IconHelper#icon)
+  &.icon-text-color {
+    color: inherit;
+    svg { fill: currentcolor; }
+  }
 }
 
 .icon-alert { background-image: asset-url('icons/alert.svg'); }
