@@ -87,8 +87,9 @@ entities:
       media:
         type: enum
         options:
-          - Transport media
+          - Culture media
           - Saliva
+          - Transport media
           - Other
       lab_technician:
       old_batch_number:
