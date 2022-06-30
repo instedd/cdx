@@ -3,7 +3,7 @@
     %h2
       = setting_card[:title]
 
-    .empty-icon.centered
-      %span{class: setting_card[:icon]}
+    .empty-icon
+      = icon setting_card[:icon], class: "xx-large"
 
     = setting_card[:body]

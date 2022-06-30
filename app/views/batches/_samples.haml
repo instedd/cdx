@@ -22,13 +22,13 @@
         = sample.uuid
       .samples-row-actions
         - if sample.is_quality_control?
-          .icon-test.icon-gray{title: 'Q - Control specimen'}
+          = icon "test", class: "icon-gray", title: "Q - Control specimen"
         = link_to edit_sample_path(sample.id) do
-          .icon-keyboard-arrow-right.icon-gray
+          = icon "keyboard-arrow-right", class: "icon-gray"
 
 = link_to add_sample_batch_path, method: :post, class: 'add-samples' do
   .col.pe-7.add-samples
-    .icon-circle-plus.icon-blue.icon-margin
+    = icon "circle-plus", class: "icon-blue icon-margin"
     .add-sample-link
       = "ADD SAMPLE"
 

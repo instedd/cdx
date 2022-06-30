@@ -3,7 +3,7 @@
 .row
   .col
     - if @messages.empty?
-      = empty_data icon: 'icon-outline-instructions xx-large' do |c|
+      = empty_data icon: 'outline-instructions' do |c|
         - c.body do
           %h1 There are no logs to report at this time
           %p Connect a device and upload tests to see the progress here
@@ -45,7 +45,7 @@
               %td= @localization_helper.format_datetime_time_zone(message.created_at, message.device.time_zone)
               %td
                 = link_to raw_device_message_path(message) do
-                  .icon-download.icon-gray
+                  = icon "download", class: "icon-gray"
 
       .pagination
         = render 'shared/pagination'

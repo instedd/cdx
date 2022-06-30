@@ -4,7 +4,7 @@
       - unless f.object.qc_info.nil?
         = f.form_field :quality_control do
           = link_to edit_qc_info_path(f.object.qc_info.id, sample_id: f.object.id), class: 'centered' do
-            .icon-test.icon-blue
+            = icon "text", class: "icon-blue"
             = "VIEW QC INFO"
 
       = f.form_field :uuid do

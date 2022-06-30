@@ -1,3 +1,7 @@
+// Allows to colorize any element, whether it's SVG embedded in HTML (in which
+// case the `fill` property would be simpler/better) but more importantly when
+// adding the icons as an external reference such as an IMG element or
+// `background-image` property, where we can't manipulate the `fill` property.
 @mixin icon-color($color, $important: null) {
   @if red($color) == green($color) and red($color) == blue($color) {
     // black to grayscale
@@ -19,78 +23,74 @@
 [class^="icon-"], [class*=" icon-"] {
   display: inline-block;
   content: " ";
-  width: 20px;
-  height: 20px;
   vertical-align: middle;
   line-height: 1;
   background-repeat: no-repeat;
   background-size: 20px 20px;
 
-  & > svg {
+  &, & > svg {
     width: 20px;
     height: 20px;
   }
 
   &.bigger {
-    width: 24px;
-    height: 24px;
     background-size: 24px 24px;
 
-    & > svg {
+    &, & > svg {
       width: 24px;
       height: 24px;
     }
   }
 
   &.medium {
-    width: 35px;
-    height: 35px;
     background-size: 35px 35px;
 
-    & > svg {
+    &, & > svg {
       width: 35px;
       height: 35px;
     }
   }
 
   &.xx-large {
-    width: 140px;
-    height: 140px;
     background-size: 140px 140px;
 
-    & > svg {
+    &, & > svg {
       width: 140px;
       height: 140px;
     }
   }
+}
 
-  &.icon-gray {
-    @include icon-color($gray-medium);
-  }
-  &.icon-gray-light {
-    @include icon-color($gray-light);
-  }
-  &.icon-white {
-    @include icon-color($white);
-  }
-  &.icon-blue {
-    @include icon-color($blue);
-  }
-  &.icon-blue-important {
-    @include icon-color($blue, !important);
-  }
-  &.icon-red {
-    @include icon-color($red);
-  }
-  &.icon-red-important {
-    @include icon-color($red, !important);
-  }
+.icon-baseline {
+  vertical-align: baseline;
+}
 
-  // NOTE: only works for embedded SVG icons (see IconHelper#icon)
-  &.icon-text-color {
-    color: inherit;
-    svg { fill: currentcolor; }
-  }
+.icon-gray {
+  @include icon-color($gray-medium);
+}
+.icon-gray-light {
+  @include icon-color($gray-light);
+}
+.icon-white {
+  @include icon-color($white);
+}
+.icon-blue {
+  @include icon-color($blue);
+}
+.icon-blue-important {
+  @include icon-color($blue, !important);
+}
+.icon-red {
+  @include icon-color($red);
+}
+.icon-red-important {
+  @include icon-color($red, !important);
+}
+
+// NOTE: only works for embedded SVG icons (see IconHelper#icon)
+.icon-text-color {
+  color: inherit;
+  svg { fill: currentcolor; }
 }
 
 .icon-alert { background-image: asset-url('icons/alert.svg'); }

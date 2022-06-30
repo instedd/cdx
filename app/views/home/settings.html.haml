@@ -7,7 +7,7 @@
 
 .row.center
   - if has_access_to_test_results_index?
-    = setting_card title: pluralize(@alerts_count, "Alert Group"), href: alerts_path, icon: 'icon-outline-alert xx-large' do |c|
+    = setting_card title: pluralize(@alerts_count, "Alert Group"), href: alerts_path, icon: 'outline-alert' do |c|
       - c.body do
         Keep your team notified about important stuff.
         %br
@@ -18,11 +18,11 @@
         = link_to "incidents", incidents_path
 
   - if has_access_to_roles_index?
-    = setting_card title: pluralize(@roles_count, "Role"), href: roles_path, icon: 'icon-outline-role xx-large' do |c|
+    = setting_card title: pluralize(@roles_count, "Role"), href: roles_path, icon: 'outline-role' do |c|
       - c.body do
         Manage users permissions with reusable policies
 
   - if can_delegate_permissions?
-    = setting_card title: pluralize(@policies_count, "Policy"), href: policies_path, icon: 'icon-outline-sharing-request xx-large' do |c|
+    = setting_card title: pluralize(@policies_count, "Policy"), href: policies_path, icon: 'outline-sharing-request' do |c|
       - c.body do
         Share test results with health organization

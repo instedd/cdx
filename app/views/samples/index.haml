@@ -3,7 +3,7 @@
 .row
   .col
     - if @samples.empty?
-      = empty_data icon: 'icon-outline-test xx-large' do |c|
+      = empty_data icon: 'outline-test' do |c|
         - c.body do
           %h1 There are no samples
           %p Every sample will have a UUID and a barcode
@@ -16,7 +16,8 @@
                 = icon "print", class: "btn-icon"
               =button_tag id: 'bulk_destroy', class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected samples. This action CANNOT be undone. Are you sure you want to proceed?" } do
                 = icon "trash", class: "btn-icon"
-              #table-notification.icon-notification.icon-red.table-info.hidden
+              #table-notification.table-info.hidden.icon-red
+                = icon "notification"
                 .notification-text= "QC Samples can't be transferred"
 
           - t.columns do

@@ -29,6 +29,6 @@
     = text_field_tag "new-note","", {id: "new-note", placeholder: "Add Note"}
     .actions
       = button_tag id: 'add-note', class: 'btn-link' do
-        .icon-circle-plus.icon-blue.icon-margin
+        = icon "circle-plus", class: "icon-blue icon-margin"
 
 = render 'form_notes_js'
