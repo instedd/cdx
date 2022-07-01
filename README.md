@@ -154,3 +154,13 @@ In the client side, you will need to run another filewatcher: [cdx-sync-client](
 6. Run tests: `bundle exec rake` (this will run `rspec` and `cucumber`)
 
 7. Start development server: `bundle exec rails s`
+
+## Screen resolutions
+
+The minimum supported screen resolution is 1366x768.
+Mobile devices and screen resolutions less than 1366x768 are not supported.
+
+## Supported browsers
+
+The supported browsers are: Google Chrome, Safari, Firefox.
+It's recomended to use the latest version of the browser.
