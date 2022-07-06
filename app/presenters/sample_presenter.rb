@@ -48,7 +48,7 @@ class SamplePresenter
 
   def blinded_value
     if @format.html?
-      %(<div class="blinded"><i class="icon-visibility_off"></i> Blinded value</div>).html_safe
+      %(<span class="blinded"><i class="icon-visibility_off"></i> Blinded value</span>).html_safe
     else
       "Blinded"
     end
