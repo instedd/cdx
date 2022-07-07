@@ -481,3 +481,60 @@ ul.samples {
   }
 
 }
+
+.ttip {
+  position: relative;
+  display: inline-block;
+
+  .ttext {
+    width: 100px;
+    background-color: #fff;
+    color: #000;
+    text-align: center;
+    padding: 10px 5px;
+    position: absolute;
+    z-index: 1;
+    box-shadow: 1px 6px 8px -1px rgba(0, 0, 0, .3 );
+    bottom: 40px;
+    left: 50%;
+    margin-left: -20px;
+    font: normal 14px/16px "Open Sans", sans-serif;
+
+    .icon-tick {
+      background: #8c1;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+  }
+
+  .ttext::after {
+    content: " ";
+    position: absolute;
+    bottom: -9px;
+    left: 10px;
+    margin-left: 0px;
+    border-width: 9px;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+    transform: rotate(135deg);
+  }
+}
+
+.ttimer2::before {
+    content: " ";
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 50%;
+    background: #8c1;
+    height: 2px;
+    animation: timerbar 2s;
+}
+
+@keyframes timerbar {
+  from { width: 0%; }
+  to { width: 100%; }
+}

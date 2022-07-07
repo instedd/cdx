@@ -201,3 +201,15 @@
     margin-right: 8px;
   }
 }
+.btn-copy {
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 3px;
+  font-size: 18px;
+
+  &:hover {
+    border: 1px solid #999;
+  }
+}

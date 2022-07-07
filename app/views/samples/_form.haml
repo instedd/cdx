@@ -7,14 +7,20 @@
             .icon-test.icon-blue
             = "VIEW QC INFO"
 
-      = f.form_field :uuid, value: f.object.uuid
+      = f.form_field :uuid do
+        %span.copy-content
+          = f.object.uuid
+        %button.icon-copy.btn-copy.ttip
 
       - if f.object.batch_number
         = f.form_field :batch_id, value: @sample_form.batch_number
 
       - if box = @sample_form.box
         = f.fields_for :box, box do |g|
-          = g.form_field :uuid, value: box.uuid, label: { text: "Box ID" }
+          = g.form_field :uuid, label: { text: "Box ID" } do
+            %span.copy-content
+              = g.object.uuid
+            %button.icon-copy.btn-copy.ttip
           = g.form_field :purpose, value: box.purpose, label: { text: "Box Purpose" }
 
     .col.pe-5

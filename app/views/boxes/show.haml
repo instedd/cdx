@@ -14,7 +14,10 @@
       .col.pe-5
         %label ID
       .col
-        .value= @box.uuid
+        .value
+          %span.copy-content
+            = @box.uuid
+          %button.icon-copy.btn-copy.ttip
 
     .row
       .col.pe-5
