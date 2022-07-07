@@ -14,7 +14,6 @@ class SamplesController < ApplicationController
     @samples = @samples.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
     @samples = @samples.where("specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
 
-    # puts @samples
     @institutions = Institution
       .where()
       .not(uuid: @navigation_context.institution.uuid)
