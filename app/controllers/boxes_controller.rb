@@ -36,7 +36,7 @@ class BoxesController < ApplicationController
   def print
     return unless authorize_resource(@box, READ_BOX)
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    samples = @box.blinded ? samples.order("created_at ASC") : samples.order("batch, concentration, replicate ASC")
+    samples = @box.blinded ? samples.joins(:sample_identifiers).order("uuid ASC") : samples.order("batch, concentration, replicate ASC")
 
     render pdf: "cdx_box_#{@box.uuid}",
       template: "boxes/print.pdf",
