@@ -35,13 +35,15 @@ class BoxesController < ApplicationController
 
   def print
     return unless authorize_resource(@box, READ_BOX)
+    samples = @box.samples.preload(:batch, :sample_identifiers)
+    samples = @box.blinded ? samples.order("created_at ASC") : samples.order("batch, concentration, replicate ASC")
 
     render pdf: "cdx_box_#{@box.uuid}",
       template: "boxes/print.pdf",
       layout: "layouts/pdf.html",
       locals: {
         box: @box,
-        samples: @box.samples.preload(:batch, :sample_identifiers),
+        samples: samples,
       },
       margin: { top: 0, bottom: 0, left: 0, right: 0 },
       page_width: "1in",
