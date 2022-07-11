@@ -47,7 +47,8 @@
           = f.text_field :virus_lineage, class: 'input-x-large', readonly: !@can_update
 
       = f.form_field :isolate_name do
-        = f.text_field :isolate_name, class: 'input-x-large', readonly: !@can_update
+        - @sample_form.blinded_attribute(:isolate_name) do
+          = f.text_field :isolate_name, class: 'input-x-large', readonly: !@can_update
 
       = f.form_field :inactivation_method do
         - if @can_update

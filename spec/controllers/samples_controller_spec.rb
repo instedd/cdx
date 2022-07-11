@@ -182,36 +182,8 @@ RSpec.describe SamplesController, type: :controller do
         )
       end
 
-      it "blinds values when box is blinded (LOD)" do
-        Box.make! institution: institution, samples: [sample], purpose: "LOD", blinded: true
-
-        get :show, params: { id: sample.to_param }
-        expect(response).to have_http_status(:ok)
-
-        expect(response.body).to include("Blinded value")
-        expect(response.body).to include(batch.batch_number)
-        assert_select "input[name='sample[concentration_number]']", count: 0
-        assert_select "input[name='sample[concentration_exponent]']", count: 0
-        assert_select "input[name='sample[replicate]']", count: 0
-        assert_select "input[name='sample[virus_lineage]'][value='CV.19.B.1.1.XYZ']"
-      end
-
-      it "blinds values when box is blinded (Variants)" do
-        Box.make! institution: institution, samples: [sample], purpose: "Variants", blinded: true
-
-        get :show, params: { id: sample.to_param }
-        expect(response).to have_http_status(:ok)
-
-        expect(response.body).to include("Blinded value")
-        expect(response.body).to_not include(batch.batch_number)
-        assert_select "input[name='sample[concentration_number]'][value=5]"
-        assert_select "input[name='sample[concentration_exponent]'][value=8]"
-        assert_select "input[name='sample[replicate]'][value=2]"
-        assert_select "input[name='sample[virus_lineage]']", count: 0
-      end
-
-      it "blinds values when box is blinded (Challenge)" do
-        Box.make! institution: institution, samples: [sample], purpose: "Challenge", blinded: true
+      it "blinds values in Samples" do
+        Box.make! institution: institution, samples: [sample], blinded: true
 
         get :show, params: { id: sample.to_param }
         expect(response).to have_http_status(:ok)
@@ -222,20 +194,7 @@ RSpec.describe SamplesController, type: :controller do
         assert_select "input[name='sample[concentration_exponent]']", count: 0
         assert_select "input[name='sample[replicate]']", count: 0
         assert_select "input[name='sample[virus_lineage]']", count: 0
-      end
-
-      it "blinds values when box is blinded (Other)" do
-        Box.make! institution: institution, samples: [sample], purpose: "Other", blinded: true
-
-        get :show, params: { id: sample.to_param }
-        expect(response).to have_http_status(:ok)
-
-        expect(response.body).to include("Blinded value")
-        expect(response.body).to_not include(batch.batch_number)
-        assert_select "input[name='sample[concentration_number]']", count: 0
-        assert_select "input[name='sample[concentration_exponent]']", count: 0
-        assert_select "input[name='sample[replicate]']", count: 0
-        assert_select "input[name='sample[virus_lineage]']", count: 0
+        assert_select "input[name='sample[isolate_name]']", count: 0
       end
     end
   end
