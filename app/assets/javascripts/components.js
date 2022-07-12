@@ -17,7 +17,9 @@ function cdx_select_on_change(name, callback) {
     callback($(this).val());
   });
 }
-
 $(document).on("change", "input[type=date]", function(){
   $(this).val() != '' ? $(this).addClass("filled") : $(this).removeClass("filled");
+});
+$(function(){
+  $("input[type=date]").change();
 });
