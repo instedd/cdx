@@ -32,13 +32,3 @@
             .filter
               %label.block Modified To
               %input.input-large{type: "date", name: "updated_at_to", value: params["updated_at_to"]}
-            .filter
-              %label.block Modified
-              = cdx_select name: "modified", value: params["modified"] do |modified|
-                - modified.item "", "All"
-                - modified.item Date.today, "Today"
-                - modified.item Date.today - 1.days, "Yesterday"
-                - modified.item Date.today - 7.days, "7 Days"
-                - modified.item Date.today - 30.days, "30 Days"
-                - modified.item Date.today - 60.days, "60 Days"
-                - modified.item Date.today - 365.days, "Last Year"

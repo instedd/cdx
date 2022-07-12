@@ -377,3 +377,9 @@ a[title="Back"] {
 .faded {
   color: $gray3;
 }
+input[type=date].filled::-webkit-datetime-edit { 
+  color: $black;
+}
+input[type=date]::-webkit-datetime-edit {
+    color: $gray3;
+}
