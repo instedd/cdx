@@ -164,7 +164,7 @@ RSpec.describe BoxesController, type: :controller do
       CSV.parse(response.body).tap(&:shift).each do |row|
         expect(row[3]).to eq("Blinded")
         expect(row[4]).to eq("Blinded")
-        expect(row[5]).to eq("Blinded")
+        expect(row[6]).to eq("Blinded")
         expect(row[7]).to eq("Blinded")
       end
     end
