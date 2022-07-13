@@ -39,7 +39,7 @@ class BoxesController < ApplicationController
     if @box.blinded
       samples = samples.scrambled
     else
-      samples = samples.sort_by{|sample| [sample.old_batch_number, sample.concentration, sample.replicate ]}
+      samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
     end
 
     render pdf: "cdx_box_#{@box.uuid}",
@@ -107,7 +107,7 @@ class BoxesController < ApplicationController
     if @box.blinded
       samples = samples.scrambled if @box.blinded?
     else
-      samples = samples.sort_by{|sample| [sample.old_batch_number, sample.concentration, sample.replicate ]}
+      samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
     end
     SamplePresenter.map(samples, request.format)
   end
