@@ -36,7 +36,11 @@ class BoxesController < ApplicationController
   def print
     return unless authorize_resource(@box, READ_BOX)
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    samples = @box.blinded ? samples.joins(:sample_identifiers).order("uuid ASC") : samples.order("batch, concentration, replicate ASC")
+    if @box.blinded
+      samples = samples.scrambled
+    else
+      samples = samples.sort_by{|sample| [sample.old_batch_number, sample.concentration, sample.replicate ]}
+    end
 
     render pdf: "cdx_box_#{@box.uuid}",
       template: "boxes/print.pdf",
@@ -100,7 +104,11 @@ class BoxesController < ApplicationController
 
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    samples = samples.scrambled if @box.blinded?
+    if @box.blinded
+      samples = samples.scrambled if @box.blinded?
+    else
+      samples = samples.sort_by{|sample| [sample.old_batch_number, sample.concentration, sample.replicate ]}
+    end
     SamplePresenter.map(samples, request.format)
   end
 
