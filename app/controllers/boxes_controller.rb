@@ -37,7 +37,7 @@ class BoxesController < ApplicationController
     return unless authorize_resource(@box, READ_BOX)
     samples = @box.samples.preload(:batch, :sample_identifiers)
     if @box.blinded
-      samples = samples.scrambled
+      samples = samples.scrambled #this sorts by uuid
     else
       samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
     end
@@ -105,7 +105,7 @@ class BoxesController < ApplicationController
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
     if @box.blinded
-      samples = samples.scrambled if @box.blinded?
+      samples = samples.scrambled #this sorts by uuid
     else
       samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
     end
