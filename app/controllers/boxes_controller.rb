@@ -42,6 +42,8 @@ class BoxesController < ApplicationController
       samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
     end
 
+    samples = SamplePresenter.map(samples, request.format)
+
     render pdf: "cdx_box_#{@box.uuid}",
       template: "boxes/print.pdf",
       layout: "layouts/pdf.html",

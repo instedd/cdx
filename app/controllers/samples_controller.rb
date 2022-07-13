@@ -113,6 +113,7 @@ class SamplesController < ApplicationController
     @sample = Sample.find(params[:id])
     return unless authorize_resource(@sample, READ_SAMPLE)
 
+    @sample = SamplePresenter.new(@sample, request.format)
     render pdf: "cdx_sample_#{@sample.uuid}",
       template: "samples/barcode.pdf",
       layout: "layouts/pdf.html",
