@@ -1,5 +1,6 @@
 class BoxesController < ApplicationController
-  before_action :load_box, except: %i[index new create bulk_destroy]
+  before_action :load_box, except: %i[index new create bulk_destroy print inventory]
+  before_action :load_box_print, only: %i[print inventory]
   helper_method :samples_data
 
   def index
@@ -35,8 +36,9 @@ class BoxesController < ApplicationController
 
   def print
     return unless authorize_resource(@box, READ_BOX)
+
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    if @box.blinded
+    if @box.blinded and @navigation_context.institution['id'] == @box.institution_id
       samples = samples.scrambled #this sorts by uuid
     else
       samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
@@ -104,14 +106,25 @@ class BoxesController < ApplicationController
     @box = Box.where(institution: @navigation_context.institution).find(params.fetch(:id))
   end
 
+  def load_box_print
+    begin
+      @box = Box.where(institution: @navigation_context.institution).find(params.fetch(:id))
+    rescue ActiveRecord::RecordNotFound
+      @box = Box
+        .joins(box_transfers: :transfer_package)
+        .where( transfer_packages: { sender_institution_id: @navigation_context.institution['id'] })
+        .find(params.fetch(:id))
+    end
+  end
+
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    if @box.blinded
+    if @box.blinded and @navigation_context.institution['id'] == @box.institution_id
       samples = samples.scrambled #this sorts by uuid
+      SamplePresenter.map(samples, request.format)
     else
       samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
     end
-    SamplePresenter.map(samples, request.format)
   end
 
   def load_batches
