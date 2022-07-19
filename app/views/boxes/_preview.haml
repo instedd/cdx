@@ -12,10 +12,11 @@
     samples
 
   .box__btns{title: "Actions"}
-    = link_to print_box_path(box), target: "_blank", class: 'btn-link' do
-      .icon-print.btn-icon
-      %span Print box and sample labels
+    - if @buttons
+      = link_to print_box_path(box, transfer_package: @transfer_package), target: "_blank", class: 'btn-link' do
+        .icon-print.btn-icon
+        %span Print box and sample labels
 
-    = link_to inventory_box_path(box, format: "csv"), target: "_blank", class: 'btn-link' do
-      .icon-download.btn-icon
-      %span Download inventory
+      = link_to inventory_box_path(box, transfer_package: @transfer_package, format: "csv"), target: "_blank", class: 'btn-link' do
+        .icon-download.btn-icon
+        %span Download inventory

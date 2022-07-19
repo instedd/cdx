@@ -23,9 +23,13 @@ class BoxesController < ApplicationController
   end
 
   def inventory
-    return unless authorize_resource(@box, READ_BOX)
+    floating_box_auth_exception
 
-    @samples = load_box_samples
+    @samples = load_box_samples_print
+
+    if @box.blinded and !is_sender
+      @samples = SamplePresenter.map(@samples, request.format)
+    end
 
     respond_to do |format|
       format.csv do
@@ -35,23 +39,17 @@ class BoxesController < ApplicationController
   end
 
   def print
-    return unless authorize_resource(@box, READ_BOX)
+    floating_box_auth_exception
 
-    samples = @box.samples.preload(:batch, :sample_identifiers)
-    if @box.blinded and @navigation_context.institution['id'] == @box.institution_id
-      samples = samples.scrambled #this sorts by uuid
-    else
-      samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
-    end
-
-    samples = SamplePresenter.map(samples, request.format)
+    @samples = load_box_samples_print
+    @samples = SamplePresenter.map(@samples, request.format)
 
     render pdf: "cdx_box_#{@box.uuid}",
       template: "boxes/print.pdf",
       layout: "layouts/pdf.html",
       locals: {
         box: @box,
-        samples: samples,
+        samples: @samples,
       },
       margin: { top: 0, bottom: 0, left: 0, right: 0 },
       page_width: "1in",
@@ -110,20 +108,39 @@ class BoxesController < ApplicationController
     begin
       @box = Box.where(institution: @navigation_context.institution).find(params.fetch(:id))
     rescue ActiveRecord::RecordNotFound
+      @transfer_package = TransferPackage.where("id = ? and ( sender_institution_id = ? or receiver_institution_id = ? )", params.fetch(:transfer_package), @navigation_context.institution['id'], @navigation_context.institution['id']).first
       @box = Box
         .joins(box_transfers: :transfer_package)
-        .where( transfer_packages: { sender_institution_id: @navigation_context.institution['id'] })
+        .where( transfer_packages: { id: @transfer_package.id })
         .find(params.fetch(:id))
     end
   end
 
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    if @box.blinded and @navigation_context.institution['id'] == @box.institution_id
-      samples = samples.scrambled #this sorts by uuid
-      SamplePresenter.map(samples, request.format)
-    else
+    SamplePresenter.map(samples, request.format)
+  end
+
+  def load_box_samples_print
+    samples = @box.samples.preload(:batch, :sample_identifiers)
+    if is_sender or !@box.blinded
       samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
+    else
+      samples = samples.scrambled #this sorts by uuid
+    end
+  end
+
+  def is_sender
+    return @box
+      .box_transfers
+      .joins(:transfer_package)
+      .where( transfer_packages: { id: params.fetch(:transfer_package), sender_institution_id: @navigation_context.institution['id'] } )
+      .present?
+  end
+
+  def floating_box_auth_exception
+    if @box.institution != nil and !BoxTransfer.joins(:transfer_package, :box).where( transfer_packages: { id: params.fetch(:transfer_package), sender_institution_id: @navigation_context.institution['id'] }, box_id: params[:id] ).present?
+      return unless authorize_resource(@box, READ_BOX)
     end
   end
 

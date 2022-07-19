@@ -36,7 +36,7 @@ class TransferPackagesController < ApplicationController
       .within(@navigation_context.institution)
       .includes(:box_transfers, :boxes)
       .find(params[:id])
-
+    @buttons = true
     @transfer_package = TransferPackagePresenter.new(transfer_package, @navigation_context)
 
     @view_helper = view_helper({ save_back_path: true })
