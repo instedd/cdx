@@ -23,7 +23,9 @@ class BoxesController < ApplicationController
   end
 
   def inventory
-    floating_box_auth_exception
+    if !is_sender
+      return unless authorize_resource(@box, READ_BOX)
+    end
 
     @samples = load_box_samples_print
 
@@ -39,7 +41,9 @@ class BoxesController < ApplicationController
   end
 
   def print
-    floating_box_auth_exception
+    if !is_sender
+      return unless authorize_resource(@box, READ_BOX)
+    end
 
     @samples = load_box_samples_print
     @samples = SamplePresenter.map(@samples, request.format)
@@ -108,11 +112,11 @@ class BoxesController < ApplicationController
     begin
       @box = Box.where(institution: @navigation_context.institution).find(params.fetch(:id))
     rescue ActiveRecord::RecordNotFound
-      @transfer_package = TransferPackage.where("id = ? and ( sender_institution_id = ? or receiver_institution_id = ? )", params.fetch(:transfer_package), @navigation_context.institution['id'], @navigation_context.institution['id']).first
-      @box = Box
-        .joins(box_transfers: :transfer_package)
-        .where( transfer_packages: { id: @transfer_package.id })
-        .find(params.fetch(:id))
+      @boxes = TransferPackage
+        .within( @navigation_context.institution )
+        .find( params.fetch( :transfer_package ) )
+        .boxes
+      @box = @boxes.find( params.fetch( :id ) )
     end
   end
 
@@ -131,17 +135,9 @@ class BoxesController < ApplicationController
   end
 
   def is_sender
-    return @box
-      .box_transfers
-      .joins(:transfer_package)
-      .where( transfer_packages: { id: params.fetch(:transfer_package), sender_institution_id: @navigation_context.institution['id'] } )
+    return TransferPackage
+      .where( id: params.fetch(:transfer_package), sender_institution_id: @navigation_context.institution['id'] )
       .present?
-  end
-
-  def floating_box_auth_exception
-    if @box.institution != nil and !BoxTransfer.joins(:transfer_package, :box).where( transfer_packages: { id: params.fetch(:transfer_package), sender_institution_id: @navigation_context.institution['id'] }, box_id: params[:id] ).present?
-      return unless authorize_resource(@box, READ_BOX)
-    end
   end
 
   def load_batches

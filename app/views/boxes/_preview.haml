@@ -12,7 +12,7 @@
     samples
 
   .box__btns{title: "Actions"}
-    - if @buttons
+    - if @buttons and @can_confirm == false
       = link_to print_box_path(box, transfer_package: @transfer_package), target: "_blank", class: 'btn-link' do
         .icon-print.btn-icon
         %span Print box and sample labels

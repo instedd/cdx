@@ -165,14 +165,23 @@ end
 TransferPackage.blueprint do
   uuid { SecureRandom.uuid }
   receiver_institution { Institution.make! }
-  receiver_institution { Institution.make! }
   sender_institution { Institution.make! }
   recipient { Faker::Name.name }
-  box_transfers { [BoxTransfer.make(transfer_package: object)] }
+  box_transfers { [BoxTransfer.make(
+      transfer_package: object,
+      box: Box.make(:filled)
+    )
+  ] }
 end
 
 TransferPackage.blueprint(:confirmed) do
   confirmed_at { Faker::Time.backward }
+  box_transfers { [
+    BoxTransfer.make(
+      transfer_package: object,
+      box: Box.make(:filled, institution: object.receiver_institution )
+    )
+  ] }
 end
 
 Batch.blueprint do
@@ -197,6 +206,14 @@ end
 
 Box.blueprint(:filled) do
   samples { [
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
     Sample.make(:filled, box: object, institution: object.institution, site: object.site),
     Sample.make(:filled, box: object, institution: object.institution, site: object.site),
   ] }
