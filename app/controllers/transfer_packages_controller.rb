@@ -77,11 +77,14 @@ class TransferPackagesController < ApplicationController
     @boxes = Box
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
       .autocomplete(uuid)
-      .order("created_at DESC")
+      .order("boxes.created_at DESC")
       .count_samples
       .limit(5)
 
     @boxes = check_access(@boxes, READ_BOX)
+
+    # blocks resending the same box
+    @boxes = @boxes.reject { |box| BoxTransfer.where(box: box).present? }
 
     render json: { boxes: boxes_data(@boxes) }
   end

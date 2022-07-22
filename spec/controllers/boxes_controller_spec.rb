@@ -163,7 +163,6 @@ RSpec.describe BoxesController, type: :controller do
 
       @as_its = []
       CSV.parse(response.body).tap(&:shift).each do |row|
-        pp row
         @as_its << { :batch_number => row[3], :concentration => row[6], :replicate => row[7] }
       end
       @sorted = @as_its
