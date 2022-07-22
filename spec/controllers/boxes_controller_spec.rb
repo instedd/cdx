@@ -17,7 +17,7 @@ RSpec.describe BoxesController, type: :controller do
     @floating_transfer = TransferPackage.make! sender_institution: @institution, receiver_institution: @other_institution, blinded: true
     @floating_box = @floating_transfer.box_transfers[0].box
 
-    @confirmed_transfer = TransferPackage.make! :confirmed, sender_institution: @institution, receiver_institution: @other_institution, blinded: true
+    @confirmed_transfer = TransferPackage.make! :receiver_confirmed, sender_institution: @institution, receiver_institution: @other_institution, blinded: true
     @confirmed_box = @confirmed_transfer.box_transfers[0].box
 
     grant @user, @other_user, @institution, READ_INSTITUTION
