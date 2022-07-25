@@ -158,9 +158,8 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "should be ordered by batch_number, concentration, replicate ASC" do
-      get :inventory, params: { id: @floating_box.id, transfer_package: @floating_transfer.id, format: "csv" }
+      get :inventory, params: { id: @confirmed_box.id, transfer_package: @confirmed_transfer.id, format: "csv" }
       expect(response).to have_http_status(:ok)
-
       @as_its = []
       CSV.parse(response.body).tap(&:shift).each do |row|
         @as_its << { :batch_number => row[3], :concentration => row[6], :replicate => row[7] }
