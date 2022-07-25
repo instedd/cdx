@@ -175,4 +175,12 @@ class Sample < ApplicationRecord
       end
     end
   end
+
+  def self.sort_columns
+    %i[updated_at]
+  end
+
+  def self.sort_column?(attr_name)
+    sort_columns.include?(attr_name)
+  end
 end
