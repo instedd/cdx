@@ -528,3 +528,12 @@ form {
   margin: 10px;
   border-bottom: 1px solid $red;
 }
+
+.copy-content {
+  cursor: pointer;
+  line-height: 26px;
+
+  &:hover {
+    border-bottom: 1px dashed #999;
+  }
+}

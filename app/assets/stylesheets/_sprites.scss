@@ -378,7 +378,9 @@
 .icon-visibility_off:before {
   content: "\e962";
 }
-
+.icon-copy:before {
+  content: "copy";
+}
 
 
 // =============================================================================
@@ -407,4 +409,3 @@
 .icond-unify           {background-position:    -40px 0px};
 .icond-separe          {background-position:    -60px 0px};
 .icond-block           {background-position:   -100px 0px};
-

@@ -24,7 +24,12 @@ class SamplesController < ApplicationController
     @samples = perform_pagination(@samples)
       .preload(:batch, :sample_identifiers)
 
+<<<<<<< HEAD
     @samples = SamplePresenter.map(@samples, request.format )
+=======
+
+    @samples = SamplePresenter.map(@samples, request.format ) }
+>>>>>>> d5f7e63c86f544145c9c9061545eda3a9ca7c39a
   end
 
   def autocomplete

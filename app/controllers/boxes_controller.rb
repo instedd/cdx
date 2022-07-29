@@ -106,7 +106,11 @@ class BoxesController < ApplicationController
   private
 
   def load_box
-    @box = Box.where(institution: @navigation_context.institution).find(params.fetch(:id))
+    begin
+      @box = Box.where(institution: @navigation_context.institution).find(params.fetch(:id))
+    rescue ActiveRecord::RecordNotFound
+      redirect_to root_path
+    end
   end
 
   def load_box_print
