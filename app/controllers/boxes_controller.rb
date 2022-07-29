@@ -113,11 +113,9 @@ class BoxesController < ApplicationController
 
     @box = Box.where(institution: @navigation_context.institution, id: params.fetch(:id)).take
     if @boxes.nil?
-      @boxes = TransferPackage
-        .within( @navigation_context.institution )
-        .find( params.fetch( :transfer_package ) )
-        .boxes
-      @box = @boxes.find( params.fetch( :id ) )
+      @box = Box
+        .joins(box_transfers: :transfer_package)
+        .where("boxes.id = ? and ( transfer_packages.sender_institution_id = ? or transfer_packages.receiver_institution_id = ? )", params.fetch(:id), @navigation_context.institution, @navigation_context.institution).take
     end
   end
 
@@ -136,9 +134,10 @@ class BoxesController < ApplicationController
   end
 
   def is_sender
-    return TransferPackage
-      .where( id: params.fetch(:transfer_package), sender_institution_id: @navigation_context.institution['id'] )
-      .present?
+    return BoxTransfer
+      .joins(:transfer_package)
+      .where( box_id: params.fetch(:id), transfer_packages: { sender_institution_id: @navigation_context.institution } )
+      .any?
   end
 
   def load_batches

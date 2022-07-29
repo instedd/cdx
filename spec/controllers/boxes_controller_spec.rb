@@ -117,7 +117,7 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "should be accessible to institution owner" do
-      get :print, params: { id: @floating_box.id, transfer_package: @floating_transfer.id }
+      get :print, params: { id: @floating_box.id }
       expect(response).to have_http_status(:ok)
     end
 
@@ -125,31 +125,31 @@ RSpec.describe BoxesController, type: :controller do
       grant user, other_user, box, READ_BOX
       sign_in other_user
 
-      get :print, params: { id: @confirmed_box.id, transfer_package: @confirmed_transfer.id, context: other_institution.uuid }
+      get :print, params: { id: @confirmed_box.id, context: other_institution.uuid }
       expect(response).to have_http_status(:ok)
     end
 
     it "shouldn't be allowed if can't read" do
       sign_in other_user
-      get :print, params: { id: @floating_box.id, transfer_package: @floating_transfer.id, context: other_institution.uuid }
+      get :print, params: { id: @floating_box.id, context: other_institution.uuid }
       expect(response).to have_http_status(:forbidden)
     end
 
     it "confirmed box should be accessible to sender" do
-      get :print, params: { id: @confirmed_box.id, transfer_package: @confirmed_transfer.id }
+      get :print, params: { id: @confirmed_box.id }
       expect(response).to have_http_status(:ok)
     end
 
     it "floating box shouldn't be accessible receiver" do
       sign_in other_user
-      get :print, params: { id: @floating_box.id, transfer_package: @floating_transfer.id, context: other_institution.uuid }
+      get :print, params: { id: @floating_box.id, context: other_institution.uuid }
       expect(response).to have_http_status(:forbidden)
     end
   end
 
   describe "inventory" do
     it "should be accessible to institution owner" do
-      get :inventory, params: { id: @floating_box.id, transfer_package: @floating_transfer.id, format: "csv" }
+      get :inventory, params: { id: @floating_box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq("text/csv")
       expect(response.body.strip.split("\n").size).to eq(@floating_box.samples.count + 1)
@@ -158,7 +158,7 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "should be ordered by batch_number, concentration, replicate ASC" do
-      get :inventory, params: { id: @confirmed_box.id, transfer_package: @confirmed_transfer.id, format: "csv" }
+      get :inventory, params: { id: @confirmed_box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
       @as_its = []
       CSV.parse(response.body).tap(&:shift).each do |row|
@@ -172,21 +172,21 @@ RSpec.describe BoxesController, type: :controller do
       grant user, other_user, confirmed_box, READ_BOX
       sign_in other_user
 
-      get :inventory, params: { id: @confirmed_box.id, transfer_package: @confirmed_transfer.id, context: other_institution.uuid, format: "csv" }
+      get :inventory, params: { id: @confirmed_box.id, context: other_institution.uuid, format: "csv" }
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq("text/csv")
     end
 
     it "shouldn't be allowed if can't read" do
       sign_in other_user
-      get :inventory, params: { id: @floating_box.id, transfer_package: @floating_transfer.id, context: other_institution.uuid, format: "csv" }
+      get :inventory, params: { id: @floating_box.id, context: other_institution.uuid, format: "csv" }
       expect(response).to have_http_status(:forbidden)
     end
 
     it "should be blinded and ordered by uuid for the receiver" do
       sign_in other_user
 
-      get :inventory, params: { id: @confirmed_box.id, transfer_package: @confirmed_transfer.id, context: other_institution.uuid, format: "csv" }
+      get :inventory, params: { id: @confirmed_box.id, context: other_institution.uuid, format: "csv" }
       expect(response).to have_http_status(:ok)
 
       @as_its = []
@@ -202,7 +202,7 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "confirmed box should be accessible to sender" do
-      get :inventory, params: { id: @confirmed_box.id, transfer_package: @confirmed_transfer.id, format: "csv" }
+      get :inventory, params: { id: @confirmed_box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq("text/csv")
       expect(response.body.strip.split("\n").size).to eq(@confirmed_box.samples.count + 1)
@@ -212,7 +212,7 @@ RSpec.describe BoxesController, type: :controller do
 
     it "floating box shouldn't be accessible receiver" do
       sign_in other_user
-      get :print, params: { id: @floating_box.id, transfer_package: @floating_transfer.id, context: other_institution.uuid }
+      get :print, params: { id: @floating_box.id, context: other_institution.uuid }
       expect(response).to have_http_status(:forbidden)
     end
   end
