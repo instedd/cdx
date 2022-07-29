@@ -36,7 +36,7 @@ class TransferPackagesController < ApplicationController
       .within(@navigation_context.institution)
       .includes(:box_transfers, :boxes)
       .find(params[:id])
-    @buttons = true
+    @show_print_buttons = true
     @transfer_package = TransferPackagePresenter.new(transfer_package, @navigation_context)
 
     @view_helper = view_helper({ save_back_path: true })
@@ -76,15 +76,14 @@ class TransferPackagesController < ApplicationController
     full_uuid = uuid.size == 36
     @boxes = Box
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+      .left_joins(:box_transfers)
+      .where(box_transfers: {id: nil})
       .autocomplete(uuid)
       .order("boxes.created_at DESC")
       .count_samples
       .limit(5)
 
     @boxes = check_access(@boxes, READ_BOX)
-
-    # blocks resending the same box
-    @boxes = @boxes.reject { |box| BoxTransfer.where(box: box).present? }
 
     render json: { boxes: boxes_data(@boxes) }
   end

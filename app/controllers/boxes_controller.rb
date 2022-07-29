@@ -23,13 +23,14 @@ class BoxesController < ApplicationController
   end
 
   def inventory
-    if !is_sender
+    @sender = is_sender
+    if !@sender
       return unless authorize_resource(@box, READ_BOX)
     end
 
     @samples = load_box_samples_print
 
-    if @box.blinded and !is_sender
+    if @box.blinded and !@sender
       @samples = SamplePresenter.map(@samples, request.format)
     end
 

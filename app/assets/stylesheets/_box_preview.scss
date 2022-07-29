@@ -3,7 +3,7 @@
   grid-template-areas:
       "uuid uuid uuid btns"
       "purpose samples time btns";
-  grid-template-columns: 90px 90px 160px auto;
+  grid-template-columns: auto auto auto 1fr;
   grid-gap: 5px;
 
   .box__uuid {
@@ -18,10 +18,12 @@
   }
   .box__btns {
     grid-area: btns;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
   }
   .box__created_at {
     grid-area: time;
-    // text-align: right;
   }
   .box__purpose {
     grid-area: purpose;
@@ -30,8 +32,7 @@
     grid-area: samples;
   }
   .btn-link {
-    float: right;
-    clear: right;
+    display: block;
   }
 }
 
