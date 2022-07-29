@@ -110,9 +110,9 @@ class BoxesController < ApplicationController
   end
 
   def load_box_print
-    begin
-      @box = Box.where(institution: @navigation_context.institution).find(params.fetch(:id))
-    rescue ActiveRecord::RecordNotFound
+
+    @box = Box.where(institution: @navigation_context.institution, id: params.fetch(:id)).take
+    if @boxes.nil?
       @boxes = TransferPackage
         .within( @navigation_context.institution )
         .find( params.fetch( :transfer_package ) )
