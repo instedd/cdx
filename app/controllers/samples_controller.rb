@@ -13,6 +13,12 @@ class SamplesController < ApplicationController
     @samples = @samples.joins("LEFT JOIN batches ON batches.id = samples.batch_id").where("batches.batch_number LIKE concat('%', ?, '%') OR samples.old_batch_number LIKE concat('%', ?, '%')", params[:batch_number], params[:batch_number]) unless params[:batch_number].blank?
     @samples = @samples.where("isolate_name LIKE concat('%', ?, '%')", params[:isolate_name]) unless params[:isolate_name].blank?
     @samples = @samples.where("specimen_role = ?", params[:specimen_role]) unless params[:specimen_role].blank?
+    @samples = @samples.where("updated_at >= ?", params[:updated_at_from].to_time) unless params[:updated_at_from].blank?
+    @samples = @samples.where("updated_at <= ?", params[:updated_at_to].to_time) unless params[:updated_at_to].blank?
+    @samples = @samples.where("updated_at >= ?", params[:modified].to_time) unless params[:modified].blank?
+    if params[:sort].present? && Sample.sort_column?( params[:sort] )
+      @samples = @samples.order( params[:sort] => :desc) unless params[:sort].blank?
+    end
 
     @institutions = Institution
       .where()

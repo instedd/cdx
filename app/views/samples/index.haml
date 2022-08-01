@@ -20,12 +20,13 @@
                 .notification-text= "QC Samples can't be transferred"
 
           - t.columns do
-            %col{:width => "5%"}
-            %col{:width => "20%"}
-            %col{:width => "20%"}
-            %col{:width => "20%"}
-            %col{:width => "20%"}
-            %col{:width => "20%"}
+            %col{:width => "4%"}
+            %col{:width => "12%"}
+            %col{:width => "18%"}
+            %col{:width => "12%"}
+            %col{:width => "26%"}
+            %col{:width => "13%"}
+            %col{:width => "15%"}
           - t.thead do
             %tr
               %th
@@ -34,6 +35,11 @@
               %th Inactivation
               %th Specimen Role
               %th Production Date
+              - if params[:sort] == "updated_at"
+                %th= link_to "Modified", request.query_parameters.except(:sort), class: "ordered"
+              - else
+                %th= link_to "Modified", request.query_parameters.merge(sort: "updated_at")
+
           - t.tbody do
             - @samples.each do |sample|
               %tr.laboratory-sample-row{data: { hasQcReference: sample.has_qc_reference?.to_s, is_qc: sample.is_quality_control?.to_s, href: edit_or_show_sample_path(sample)}}
@@ -45,6 +51,7 @@
                 %td= sample.inactivation_method
                 %td= sample.specimen_role_description
                 %td= sample.date_produced_description
+                %td= sample.updated_at.strftime("%m/%d/%Y %H:%M")
 
       .pagination
         = render 'shared/pagination'
