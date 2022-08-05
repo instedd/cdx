@@ -23,16 +23,9 @@ class BoxesController < ApplicationController
   end
 
   def inventory
-    @sender = is_sender
-    if !@sender
-      return unless authorize_resource(@box, READ_BOX)
-    end
+    return unless authorize_resource( box_resource(@box), READ_BOX )
 
-    @samples = load_box_samples_print
-
-    if @box.blinded and !@sender
-      @samples = SamplePresenter.map(@samples, request.format)
-    end
+    @samples = load_box_samples( sender? )
 
     respond_to do |format|
       format.csv do
@@ -42,12 +35,9 @@ class BoxesController < ApplicationController
   end
 
   def print
-    if !is_sender
-      return unless authorize_resource(@box, READ_BOX)
-    end
+    return unless authorize_resource( box_resource(@box), READ_BOX )
 
-    @samples = load_box_samples_print
-    @samples = SamplePresenter.map(@samples, request.format)
+    @samples = load_box_samples
 
     render pdf: "cdx_box_#{@box.uuid}",
       template: "boxes/print.pdf",
@@ -114,34 +104,35 @@ class BoxesController < ApplicationController
   end
 
   def load_box_print
-
     @box = Box.where(institution: @navigation_context.institution, id: params.fetch(:id)).take
-    if @boxes.nil?
+    if @box.nil?
       @box = Box
         .joins(box_transfers: :transfer_package)
-        .where("boxes.id = ? and ( transfer_packages.sender_institution_id = ? or transfer_packages.receiver_institution_id = ? )", params.fetch(:id), @navigation_context.institution, @navigation_context.institution).take
+        .merge( TransferPackage.within( @navigation_context.institution ) )
+        .where(id: params.fetch(:id))
+        .take
     end
   end
 
-  def load_box_samples
+  def load_box_samples( force_unblind = false )
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    SamplePresenter.map(samples, request.format)
-  end
-
-  def load_box_samples_print
-    samples = @box.samples.preload(:batch, :sample_identifiers)
-    if !@box.blinded or is_sender
-      samples = samples.sort_by{|sample| [sample.batch_number, sample.concentration, sample.replicate ]}
+    if !@box.blinded or sender?
+      samples = samples.sort_by{ |sample| [sample.batch_number, sample.concentration, sample.replicate ] }
     else
-      samples = samples.scrambled #this sorts by uuid
+      samples.scrambled
     end
+    if force_unblind == false
+      samples = SamplePresenter.map(samples, request.format)
+    end
+    return samples
   end
 
-  def is_sender
-    return BoxTransfer
+  def sender?
+    return @sender unless @sender.nil?
+    @sender = BoxTransfer
       .joins(:transfer_package)
       .where( box_id: params.fetch(:id), transfer_packages: { sender_institution_id: @navigation_context.institution } )
-      .any?
+      .exists?
   end
 
   def load_batches
@@ -176,5 +167,17 @@ class BoxesController < ApplicationController
         batch_number: sample.batch_number,
       }
     end
+  end
+
+  def box_resource(box)
+    return box if box.institution_id == @navigation_context.institution.id || !sender?
+
+    # the box is being transferred or the user is the sender:
+    {
+      resource_type: "box",
+      resource_id: box.id,
+      institution_id: @navigation_context.institution.id,
+      site_id: @navigation_context.site.try(&:uuid),
+    }
   end
 end

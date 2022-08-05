@@ -160,12 +160,10 @@ RSpec.describe BoxesController, type: :controller do
     it "should be ordered by batch_number, concentration, replicate ASC" do
       get :inventory, params: { id: @confirmed_box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
-      @as_its = []
-      CSV.parse(response.body).tap(&:shift).each do |row|
-        @as_its << { :batch_number => row[3], :concentration => row[6], :replicate => row[7] }
+      results = CSV.parse(response.body).tap(&:shift).map do |row|
+        { :batch_number => row[3], :concentration => row[6], :replicate => row[7] }
       end
-      @sorted = @as_its
-      expect(@as_its).to eq(@sorted.sort_by{ |sample|  [ sample[:batch_number], sample[:concentration], sample[:replicate] ] })
+      expect( results ).to eq( results.sort_by{ |sample|  [ sample[:batch_number], sample[:concentration], sample[:replicate] ] } )
     end
 
     it "should be allowed if can read" do
