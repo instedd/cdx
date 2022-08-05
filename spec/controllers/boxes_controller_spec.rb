@@ -187,16 +187,16 @@ RSpec.describe BoxesController, type: :controller do
       get :inventory, params: { id: @confirmed_box.id, context: other_institution.uuid, format: "csv" }
       expect(response).to have_http_status(:ok)
 
-      @as_its = []
+      sort_verify = []
       CSV.parse(response.body).tap(&:shift).each do |row|
-        @as_its << row[2]
+        sort_verify << row[2]
         expect(row[3]).to eq("Blinded")
         expect(row[4]).to eq("Blinded")
         expect(row[6]).to eq("Blinded")
         expect(row[7]).to eq("Blinded")
       end
-      @sorted = @as_its
-      expect(@as_its).to eq(@sorted.sort)
+      expect(sort_verify).to eq(sort_verify.sort)
+
     end
 
     it "confirmed box should be accessible to sender" do

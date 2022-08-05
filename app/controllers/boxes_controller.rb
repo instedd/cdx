@@ -119,7 +119,7 @@ class BoxesController < ApplicationController
     if !@box.blinded or sender?
       samples = samples.sort_by{ |sample| [sample.batch_number, sample.concentration, sample.replicate ] }
     else
-      samples.scrambled
+      samples = samples.scrambled
     end
     if force_unblind == false
       samples = SamplePresenter.map(samples, request.format)
