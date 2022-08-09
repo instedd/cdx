@@ -16,6 +16,7 @@ class SamplesController < ApplicationController
     @samples = @samples.where("updated_at >= ?", params[:updated_at_from].to_time) unless params[:updated_at_from].blank?
     @samples = @samples.where("updated_at <= ?", params[:updated_at_to].to_time) unless params[:updated_at_to].blank?
     @samples = @samples.where("updated_at >= ?", params[:modified].to_time) unless params[:modified].blank?
+    puts Sample.sort_column?( params[:sort] )
     if params[:sort].present? && Sample.sort_column?( params[:sort] )
       @samples = @samples.order( params[:sort] => :desc) unless params[:sort].blank?
     end
