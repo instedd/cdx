@@ -177,7 +177,7 @@ class Sample < ApplicationRecord
   end
 
   def self.sort_columns
-    %i[updated_at]
+    ['updated_at']
   end
 
   def self.sort_column?(attr_name)
