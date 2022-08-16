@@ -1,5 +1,5 @@
 class BoxesController < ApplicationController
-  before_action :load_box, except: %i[index new create bulk_destroy print inventory]
+  before_action :load_box, only: %i[show delete]
   before_action :load_box_print, only: %i[print inventory]
   helper_method :samples_data
 
