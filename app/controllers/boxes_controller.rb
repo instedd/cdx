@@ -1,5 +1,5 @@
 class BoxesController < ApplicationController
-  before_action :load_box, only: %i[show delete destroy]
+  before_action :load_box, only: %i[show destroy]
   before_action :load_box_print, only: %i[print inventory]
   helper_method :samples_data
 
