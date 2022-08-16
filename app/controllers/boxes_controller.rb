@@ -121,10 +121,10 @@ class BoxesController < ApplicationController
     else
       samples = samples.scrambled
     end
-    if force_unblind == false
+    unless force_unblind
       samples = SamplePresenter.map(samples, request.format)
     end
-    return samples
+    samples
   end
 
   def sender?
