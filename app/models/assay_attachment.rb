@@ -1,6 +1,6 @@
 class AssayAttachment < ApplicationRecord
   belongs_to :loinc_code
-  belongs_to :sample
+  belongs_to :sample, :touch => true
   belongs_to :assay_file, dependent: :destroy
   accepts_nested_attributes_for :assay_file, allow_destroy: true
 
