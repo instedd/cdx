@@ -30,7 +30,7 @@ class SamplesController < ApplicationController
     @samples = perform_pagination(@samples)
       .preload(:batch, :sample_identifiers)
 
-    @samples = @samples.map { |sample|  SamplePresenter.new(sample, request.format ) }
+    @samples = SamplePresenter.map(@samples, request.format )
   end
 
   def autocomplete
@@ -119,6 +119,7 @@ class SamplesController < ApplicationController
     @sample = Sample.find(params[:id])
     return unless authorize_resource(@sample, READ_SAMPLE)
 
+    @sample = SamplePresenter.new(@sample, request.format)
     render pdf: "cdx_sample_#{@sample.uuid}",
       template: "samples/barcode.pdf",
       layout: "layouts/pdf.html",

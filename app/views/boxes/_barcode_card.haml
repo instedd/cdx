@@ -12,10 +12,3 @@
     .logo
       = image_tag 'cdx-logo-bw.png'
       .label https://cdx.io
-
-
-  .row.actions
-    - unless @box.blinded?
-      = link_to print_box_path(@box), target: "_blank", class: 'btn-link' do
-        .icon-print.btn-icon
-        %span Print box and sample labels

@@ -1,19 +1,38 @@
 .box-preview {
   display: grid;
   grid-template-areas:
-      "uuid uuid uuid uuid uuid"
-      "data data data data data";
-  grid-template-columns: auto 1fr auto;
+      "uuid uuid uuid btns"
+      "purpose samples time btns";
+  grid-template-columns: auto auto auto 1fr;
   grid-gap: 5px;
 
   .box__uuid {
     font-weight: bold;
     margin-right: 15px;
     grid-area: uuid;
+    padding-top: 8px;
 
     > a {
       color: inherit;
     }
+  }
+  .box__btns {
+    grid-area: btns;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .box__created_at {
+    grid-area: time;
+  }
+  .box__purpose {
+    grid-area: purpose;
+  }
+  .box__samples {
+    grid-area: samples;
+  }
+  .btn-link {
+    display: block;
   }
 }
 

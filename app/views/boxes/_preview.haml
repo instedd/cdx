@@ -1,10 +1,22 @@
 .box-preview
   .box__uuid{title: "UUID"}
     = box.uuid
+
+  .box__created_at{title: "Creation date"}
+    = time_tag box.created_at, I18n.l(box.created_at, format: I18n.t("date.formats.long"))
+
   .box__purpose{title: "Purpose"}
     = box.purpose
   .box__samples{title: "Samples"}
     = box.samples_count
     samples
-  .box__created_at{title: "Creation date"}
-    = time_tag box.created_at, I18n.l(box.created_at, format: I18n.t("date.formats.long"))
+
+  .box__btns{title: "Actions"}
+    - if @show_print_buttons and !@can_confirm
+      = link_to print_box_path(box), target: "_blank", class: 'btn-link' do
+        .icon-print.btn-icon
+        %span Print box and sample labels
+
+      = link_to inventory_box_path(box, format: "csv"), target: "_blank", class: 'btn-link' do
+        .icon-download.btn-icon
+        %span Download inventory
