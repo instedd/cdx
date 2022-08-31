@@ -41,7 +41,7 @@ gem 'devise', '~> 4.0.0'
 gem 'devise-security', '<= 0.12.0' # last version to support ruby 2.2
 gem 'devise_invitable', '~> 1.5'
 gem 'doorkeeper', '~> 4.2.0'
-gem 'omniauth', '~> 1.2'
+gem 'omniauth', '~> 1.9'
 gem 'omniauth-google-oauth2', '~> 0.2'
 
 # Libraries
