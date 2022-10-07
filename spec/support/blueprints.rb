@@ -212,7 +212,6 @@ Box.blueprint(:filled) do
 end
 
 Box.blueprint(:overfilled) do
-
   @batch_one = Batch.make!
   @batch_two = Batch.make!
 
