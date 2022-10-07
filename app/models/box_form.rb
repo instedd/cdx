@@ -32,6 +32,7 @@ class BoxForm
     case @box.purpose
     when "LOD"
       @box.build_samples(@batches["lod"], concentration_exponents: 1..8, replicates: 3, media: media)
+      @box.build_samples(@batches["lod"], concentration_number: 0, replicates: 4, media: media)
 
     when "Variants"
       @batches.each_value do |batch|

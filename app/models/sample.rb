@@ -30,8 +30,8 @@ class Sample < ApplicationRecord
   validate :validate_encounter
   validate :validate_patient
 
-  validates_numericality_of :concentration_number, only_integer: true, greater_than: 0, allow_blank: true
-  validates_numericality_of :concentration_exponent, only_integer: true, greater_than: 0, allow_blank: true
+  validates_numericality_of :concentration_number, only_integer: true, greater_than_or_equal: 0, allow_blank: true
+  validates_numericality_of :concentration_exponent, only_integer: true, greater_than_or_equal: 0, allow_blank: true
   validates_numericality_of :replicate, only_integer: true, greater_than_or_equal_to: 0, allow_blank: true
   validates_inclusion_of :media, in: ->(_) { Sample.media }, allow_blank: true
   validate :validate_box_context, if: -> { box.present? }
