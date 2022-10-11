@@ -10,6 +10,12 @@ class SamplePresenter
     @format = format
   end
 
+  def to_param
+    # NOTE: we must manually delegate to_param otherwise named routes aren't
+    # generated correctly.
+    @sample.to_param
+  end
+
   Box.blind_attribute_names.each do |attr_name|
     define_method attr_name do
       if blinded_attribute?(attr_name)

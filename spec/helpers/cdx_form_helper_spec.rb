@@ -85,4 +85,60 @@ RSpec.describe CdxFormHelper, type: :helper do
       end
     end
   end
+
+  describe "#fields_for" do
+    it "handles nested error messages" do
+      bar = FooModel.new(bar: "baz")
+      bar.errors.add(:base, "Has an error")
+      bar.errors.add(:bar, "has an error")
+      model = FooModel.new(bar: bar)
+      model.errors.add(:"bar.base", "Has an error")
+      model.errors.add(:"bar.bar", "has an error")
+      cdx_form_for(model, url: "") do |form|
+        expect(
+          form.fields_for(:bar) do |foo_form|
+            expect(
+              foo_form.form_field(:bar) { foo_form.text_field :bar }
+            ).to include("Bar has an error")
+          end
+        ).to include("Has an error")
+      end
+    end
+
+    it "raises for unhandled nested errror" do
+      bar = FooModel.new(bar: "baz")
+      model = FooModel.new(foo: "foo", bar: bar)
+      bar.errors.add(:base, "has an error")
+      bar.errors.add(:bar, "is empty")
+      expect(
+        cdx_form_for(model, url: "") do |form|
+          expect { form.fields_for(:bar) {} }.to raise_error(%{Unhandled form errors in FooModel: {:bar=>["Bar is empty"]}})
+        end
+      ).not_to include("is empty")
+    end
+
+    it "raises for unhandled nested errror" do
+      bar = FooModel.new(bar: "baz")
+      model = FooModel.new(foo: "foo", bar: bar)
+      bar.errors.add(:base, "has an error")
+      expect(
+        cdx_form_for(model, url: "") do |form|
+          expect(
+            form.fields_for(:bar) {}
+          ).to include("has an error")
+        end
+      ).not_to include("has an error")
+    end
+
+    it "doesn't hide unknown errors" do
+      bar = FooModel.new(bar: "baz")
+      model = FooModel.new(foo: "foo", bar: bar)
+      model.errors.add(:"bar.unknown", "has an error")
+      expect do
+        cdx_form_for(model, url: "") do |form|
+          form.fields_for(:bar) {}
+        end
+      end.to raise_error(%{Unhandled form errors in FooModel: {:"bar.unknown"=>["Bar unknown has an error"]}})
+    end
+  end
 end

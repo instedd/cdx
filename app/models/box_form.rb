@@ -1,5 +1,5 @@
 class BoxForm
-  attr_reader :box, :batch_uuids
+  attr_reader :box, :batch_uuids, :sample_uuids
   attr_accessor :media
 
   delegate :purpose, :purpose=, to: :box
@@ -18,12 +18,21 @@ class BoxForm
     @box = box
     @media = params[:media].presence
     @batch_uuids = params[:batch_uuids].presence.to_h
+    @sample_uuids = params[:sample_uuids].presence.to_h
   end
 
   def batches=(relation)
     records = relation.to_a
 
     @batches = @batch_uuids.transform_values do |batch_uuid|
+      records.find { |b| b.uuid == batch_uuid }
+    end.compact
+  end
+
+  def samples=(relation)
+    records = relation.to_a
+
+    @samples = @sample_uuids.transform_values do |batch_uuid|
       records.find { |b| b.uuid == batch_uuid }
     end.compact
   end
@@ -47,13 +56,17 @@ class BoxForm
           @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 3, media: media)
         end
       end
+
+    when "Other"
+      @box.samples = @samples.values
     end
   end
 
   def valid?
     @box.valid?
     validate_existence_of_batches
-    validate_batches_for_purpose
+    validate_existence_of_samples
+    validate_batches_or_samples_for_purpose
     @box.errors.empty?
   end
 
@@ -75,21 +88,37 @@ class BoxForm
     end
   end
 
-  def validate_batches_for_purpose
-    count = @batches.map { |_, b| b.try(&:uuid) }.uniq.size
+  def validate_existence_of_samples
+    @sample_uuids.each do |key, sample_uuid|
+      unless sample_uuid.blank? || @samples[key]
+        @box.errors.add(key, "Sample doesn't exist")
+      end
+    end
+  end
 
+  def validate_batches_or_samples_for_purpose
     case @box.purpose
     when "LOD"
       @box.errors.add(:lod, "A batch is required") unless @batches["lod"] || @box.errors.include?(:lod)
     when "Variants"
-      @box.errors.add(:base, "You must select at least two batches") unless count >= 2
+      @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
     when "Challenge"
       if @batches["virus"]
-        @box.errors.add(:base, "You must select at least one distractor batch") unless count >= 2
+        @box.errors.add(:base, "You must select at least one distractor batch") unless unique_batch_count >= 2
       else
         @box.errors.add(:virus, "A virus batch is required") unless @box.errors.include?(:virus)
-        @box.errors.add(:base, "You must select at least one distractor batch") unless count >= 1
+        @box.errors.add(:base, "You must select at least one distractor batch") unless unique_batch_count >= 1
+      end
+    when "Other"
+      if @samples.empty?
+        @box.errors.add(:base, "You must select at least one sample")
+      elsif @samples.any? { |_, sample| sample.is_quality_control? }
+        @box.errors.add(:base, "You can't select a QC sample")
       end
     end
+  end
+
+  def unique_batch_count
+    @batches.map { |_, b| b.try(&:uuid) }.uniq.size
   end
 end

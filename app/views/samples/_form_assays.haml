@@ -32,6 +32,7 @@
                     = ay.label :result, class: ('input-required' if ay.object.errors.include?(:result))
                   .col.pe-8
                     = ay.text_field :result, class: ('input-required' if ay.object.errors.include?(:result))
+                    - ay.field_errors(:result)
                 %div
                   = ay.hidden_field :assay_file_id, value: ay.object.assay_file_id
 
@@ -40,6 +41,7 @@
                   .picture-container.picture-required
                     .icon-alert.icon-red
                     = ay.object.errors[:assay_file].join(" - ")
+                - ay.field_errors :assay_file
               - else
                 - if ay.object.assay_file.nil?
                   .file.is-hidden

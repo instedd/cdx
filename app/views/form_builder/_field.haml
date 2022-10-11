@@ -1,4 +1,4 @@
-.row.form-field{class: "#{form.object.errors.has_key?(method) ? "form-field--error " : ""}form-field--#{method}" }
+.row.form-field{class: "#{form.has_error?(method) ? "form-field--error " : ""}form-field--#{method}" }
   .col.form-field__label
     - label_options = options[:label] || {}
     = form.label method, label_options[:text], label_options

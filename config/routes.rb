@@ -120,6 +120,7 @@ Rails.application.routes.draw do
       get 'edit_or_show'
     end
     collection do
+      get 'autocomplete'
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'print' }, action: :bulk_print
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
