@@ -25,6 +25,7 @@ services:
     depends_on:
       - db
       - elasticsearch
+      - redis
     command: /bin/sh -c './bin/rails s -b 0.0.0.0'
 
   selenium:
