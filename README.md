@@ -36,7 +36,7 @@ Reference implementation for the Connected Diagnostics API (http://dxapi.org/)
 5. Then run this command ```rails c```
 6. Then run this command ```User.last.confirm!```
 
-This will confirm the last user that was created in your local environment.  Then you should be able to Login normally. 
+This will confirm the last user that was created in your local environment.  Then you should be able to Login normally.
 
 
 ### Additionally setup for working with devices
@@ -164,3 +164,128 @@ Mobile devices and screen resolutions less than 1366x768 are not supported.
 
 The supported browsers are: Google Chrome, Safari, Firefox.
 It's recomended to use the latest version of the browser.
+
+## Tests
+
+### Unit tests
+
+Unit tests are written in rspec and can be run inside the docker container:
+
+```console
+$ docker compose run --rm web bash
+> rspec
+```
+
+You may only run specs inside a directory or file by specifying it on the
+command line. You may even specify a line to target a single test. For example:
+
+```console
+$ docker compose run --rm web bash
+> rspec spec/controllers
+> rspec spec/controllers/samples_controller_test.rb
+> rspec spec/controllers/samples_controller_test.rb:26
+```
+
+The test suite is particularly slow, but we can reduce the runtime a bit by
+running it in parallel. For example to split the test suite in 2 parts (you can
+replace 2 with 3, 4 or more) and only run the unit tests and skip the system
+tests:
+
+```console
+$ docker compose run --rm web bash
+> bin/rails parallel:setup[2]
+> parallel_rspec -n 2 spec/ --exclude-pattern spec/features/
+```
+
+
+### System tests
+
+System tests are regular rspec tests using the
+[SitePrism](https://github.com/site-prism/site_prism). Under the hood this
+is basically Capybara and Selenium Webdriver.
+
+System tests are grouped under `spec/features`. There are some legacy Cucumber
+tests under `/features` (kept until we can rewrite them).
+
+Specs usually don't interact with Capybara and the browser directly but through
+page objects using the [SitePrism](https://github.com/site-prism/site_prism)
+abstraction library: the page object describes how to access the different
+resources and the tests then use these to open pages, navigate, fill and submit
+form. Those pages are located under `features/support/page_objects`.
+
+#### Headless
+
+By default system tests are configured to run in headless Firefox ESR docker
+containers that must be started.
+
+By default we start 2 instances, if you're using `parallel_rspec` make sure to
+scale as many as required in a `docker-compose.override.yml` file. You'll may
+also want to scale it down to 1:
+
+```yaml
+version: "2.2"
+
+services:
+  selenium:
+    scale: 4
+```
+
+You can then run headless system tests inside a docker container:
+
+```console
+$ docker compose up -d selenium
+$ docker compose run --rm web bash
+> rspec spec/features/*
+> rspec spec/features/my_spec.rb
+> cucumber
+```
+
+#### Visible
+
+When writing or debugging system tests, you'll likely want to run tests in a
+visible browser. You should install and run `geckodriver` and/or `chromedriver`
+on your host and make sure it's available on an IP that the docker containers
+can reach. For example once of:
+
+```
+$ geckodriver --host 0.0.0.0
+$ chromedriver --allowed-ips 0.0.0.0
+```
+
+Then export environment variables before running tests. For example (make sure
+to replace `your.host.ip` with an actual IP on your host:
+
+```console
+$ docker compose run --rm web bash
+> export HEADLESS=false
+> export SELENIUM_URL=http://your.host.ip:4444/
+> rspec spec/features/*
+> cucumber
+```
+
+You may also target another browser (by default it's Firefox), for example
+Chrome with:
+
+```console
+> export BROWSER=chrome
+```
+
+If you want system tests to always run visible on a host browser, you can set
+the environment variables in your `docker-compose.override.yml`. For example:
+
+```yaml
+version: "2.2"
+
+services:
+  web:
+    environment:
+      HEADLESS: "false"
+      SELENIUM_URL: "http://<your.host.ip>:4444/"
+      BROWSER: "chrome" # or "firefox"
+```
+
+Then run tests as per the above:
+```console
+$ docker compose run --rm web bash
+> rspec spec/features/my_spec.rb
+```
