@@ -245,18 +245,20 @@ $ docker compose run --rm web bash
 When writing or debugging system tests, you'll likely want to run tests in a
 visible browser. You should install and run `geckodriver` and/or `chromedriver`
 on your host and make sure it's available on an IP that the docker containers
-can reach. For example:
+can reach. For example once of:
 
 ```
 $ geckodriver --host 0.0.0.0
+$ chromedriver --allowed-ips 0.0.0.0
 ```
 
-Then export environment variables before running tests. For example:
+Then export environment variables before running tests. For example (make sure
+to replace `your.host.ip` with an actual IP on your host:
 
 ```console
 $ docker compose run --rm web bash
 > export HEADLESS=false
-> export SELENIUM_URL=http://<your.host.ip>:4444/
+> export SELENIUM_URL=http://your.host.ip:4444/
 > rspec spec/features/*
 > cucumber
 ```
