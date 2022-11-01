@@ -9,12 +9,8 @@
         #{sample.uuid}
     .code
       I.N. #{sample.isolate_name}
-    - if sample.box
-      .code
-        Purpose: #{sample.box.purpose}
-    - else
-      .code
-        I.M. #{sample.inactivation_method}
+    .code
+      I.M. #{sample.inactivation_method}
     .code
       P.D. #{sample.date_produced_description}
     .logo
