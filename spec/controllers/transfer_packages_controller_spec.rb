@@ -190,8 +190,9 @@ RSpec.describe TransferPackagesController, type: :controller do
         expect(data["samples"].map { |s| s["uuid"] }).to eq [qc_sample.uuid]
         expect(data["samples"].map { |s| s["error"] }).to eq ["Sample 01234567-4444-a0c8-ac1b-58bed3633e88 is a QC sample and can't be transferred."]
       end
+
       it "blocks transfered boxes" do
-        confirmed_transfer = TransferPackage.make! :receiver_confirmed, sender_institution: @institution, receiver_institution: @other_institution, blinded: true
+        confirmed_transfer = TransferPackage.make! :receiver_confirmed, sender_institution: @institution, receiver_institution: @other_institution
         confirmed_box = confirmed_transfer.box_transfers[0].box
 
         get :find_box, params: { uuid: confirmed_box.uuid }
@@ -364,28 +365,6 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect(package.boxes).to eq [box]
     end
 
-    it "blinds boxes" do
-      box1 = Box.make!(:filled, institution: institution, purpose: "LOD")
-      box2 = Box.make!(:filled, institution: institution, purpose: "Variants")
-
-      expect do
-        post :create, params: {
-                        transfer_package: {
-                          receiver_institution_id: other_institution.id,
-                          recipient: "Mr. X",
-                          blinded: true,
-                          box_transfers_attributes: {
-                            "0" => { box_id: box1.id },
-                            "1" => { box_id: box2.id },
-                          },
-                        },
-                      }
-      end.to change { TransferPackage.count }.by(1)
-
-      expect(box1.reload.blinded).to eq(true)
-      expect(box2.reload.blinded).to eq(true)
-    end
-
     it "only allows samples in current institution" do
       box = Box.make!(institution: other_institution, samples: [Sample.make(:filled, institution: other_institution)])
 
@@ -462,7 +441,7 @@ RSpec.describe TransferPackagesController, type: :controller do
     before(:each) { sign_in user }
 
     it "unblinds samples (transfer out)" do
-      package = TransferPackage.make! sender_institution: institution, receiver_institution: other_institution, blinded: true
+      package = TransferPackage.make! :blinded, sender_institution: institution, receiver_institution: other_institution
 
       post :unblind, params: { id: package.to_param }
       expect(response).to redirect_to(transfer_package_path(package))
@@ -473,7 +452,7 @@ RSpec.describe TransferPackagesController, type: :controller do
     end
 
     it "won't unblind samples (transfer in)" do
-      package = TransferPackage.make! sender_institution: other_institution, receiver_institution: institution, blinded: true
+      package = TransferPackage.make! :blinded, sender_institution: other_institution, receiver_institution: institution
 
       assert_raises(ActiveRecord::RecordNotFound) do
         post :unblind, params: { id: package.to_param }

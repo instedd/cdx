@@ -14,10 +14,10 @@ RSpec.describe BoxesController, type: :controller do
     @other_institution = Institution.make!
     @other_user = @other_institution.user
 
-    @floating_transfer = TransferPackage.make! sender_institution: @institution, receiver_institution: @other_institution, blinded: true
+    @floating_transfer = TransferPackage.make! :blinded, sender_institution: @institution, receiver_institution: @other_institution
     @floating_box = @floating_transfer.box_transfers[0].box
 
-    @confirmed_transfer = TransferPackage.make! :receiver_confirmed, sender_institution: @institution, receiver_institution: @other_institution, blinded: true
+    @confirmed_transfer = TransferPackage.make! :receiver_confirmed, sender_institution: @institution, receiver_institution: @other_institution
     @confirmed_box = @confirmed_transfer.box_transfers[0].box
 
     grant @user, @other_user, @institution, READ_INSTITUTION
@@ -246,6 +246,7 @@ RSpec.describe BoxesController, type: :controller do
       {
         purpose: "LOD",
         batch_uuids: { "lod" => batch.uuid },
+        blinded: true,
       }
     end
 
@@ -276,7 +277,7 @@ RSpec.describe BoxesController, type: :controller do
 
     it "should create box with optional params" do
       expect do
-        post :create, params: { box: box_plan.merge(media: "Saliva") }
+        post :create, params: { box: box_plan.merge(media: "Saliva", blinded: true) }
         expect(response).to redirect_to boxes_path
       end.to change(institution.boxes, :count).by(1)
 
@@ -327,6 +328,7 @@ RSpec.describe BoxesController, type: :controller do
           post :create, params: { box: {
             purpose: "LOD",
             batch_uuids: { "lod" => batch.uuid },
+            blinded: true
           } }
           expect(response).to redirect_to(boxes_path)
         end.to change(institution.samples, :count).by(28)
@@ -356,6 +358,7 @@ RSpec.describe BoxesController, type: :controller do
           post :create, params: { box: {
             purpose: "Variants",
             batch_uuids: batch_uuids,
+            blinded: true,
           } }
           expect(response).to redirect_to(boxes_path)
         end.to change(institution.samples, :count).by(54)
@@ -386,6 +389,7 @@ RSpec.describe BoxesController, type: :controller do
               "variant_4" => batch.uuid,
               "variant_2" => other_batch.uuid,
             },
+            blinded: true,
           } }
           expect(response).to redirect_to(boxes_path)
         end.to change(institution.samples, :count).by(18)
@@ -402,6 +406,7 @@ RSpec.describe BoxesController, type: :controller do
           post :create, params: { box: {
             purpose: "Challenge",
             batch_uuids: batch_uuids,
+            blinded: true,
           } }
           expect(response).to redirect_to(boxes_path)
         end.to change(institution.samples, :count).by(108)
@@ -449,6 +454,7 @@ RSpec.describe BoxesController, type: :controller do
               "virus" => batch.uuid,
               "distractor_4" => distractor.uuid,
             },
+            blinded: true
           } }
           expect(response).to redirect_to(boxes_path)
         end.to change(institution.samples, :count).by(63)
@@ -466,7 +472,8 @@ RSpec.describe BoxesController, type: :controller do
               sample_uuids: {
                 "sample_0" => samples[0].uuid,
                 "sample_1" => samples[1].uuid,
-              }
+              },
+              blinded: true,
             } }
             expect(response).to redirect_to(boxes_path)
           end.to change(institution.samples, :count).by(0)
